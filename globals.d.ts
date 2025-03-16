@@ -32,7 +32,6 @@ export type SRC20_TYPES =
   | "mint"
   | "transfer"
   | "trending";
-
 export type SRC20_FILTER_TYPES =
   | "minting"
   | "trending mints"
@@ -53,11 +52,84 @@ export type COLLECTION_FILTER_TYPES =
   | "posh"
   | "recursive"
   | "artists";
-
 export type LISTING_FILTER_TYPES =
   | "all"
   | "psbt"
   | "dispensers";
+// NEW SUGGESTIONS
+// Filter types - Stamp
+export type FILTERS_STAMP_MARKET =
+  | "atomic" // Named "psbt" earlier
+  | "dispensers"
+  | "listings" // Named "for sale" earlier
+  | "sales" // Named "sold" earlier
+  | "price range"; // Alternative to "priceRange"
+// Include "Price Range" min/max values
+// market: {
+//  atomic: false,
+//  dispenser: false,
+//  listings: false,
+//  sales: false,
+//  priceRange: {
+//    min: "",
+//   max: "",
+//  },
+//  },
+export type FILTERS_STAMP_FILETYPE =
+  | "jpg"
+  | "jpeg"
+  | "png"
+  | "gif"
+  | "webp"
+  | "avif" // New
+  | "mp3" // New
+  | "mpeg" // New
+  | "bmp"
+  | "svg"
+  | "html"
+  | "legacy" // New
+  | "olga"; // New
+export type FILTERS_STAMP_EDITIONS =
+  | "single" // Alternative to "1/1" or "oneOfOne" for code usage
+  | "multiple"
+  | "locked"
+  | "unlocked"
+  | "divisible";
+export type FILTERS_STAMP_RARITY =
+  | "sub" // Has multiple variants (100/1000/5000/10000)
+  | "stamp range"; // Alternative to "stampRange"
+// Include "(Custom) Stamp Range" min/max values
+
+// Filter types - SRC20
+export type FILTERS_SRC20_DETAILS =
+  | "deploy"
+  | "suuply"
+  | "holders";
+// Include "Holders" min/max values (when user applied)
+// details: {
+// deploy: boolean;
+// supply: boolean;
+// holders: boolean;
+// holdersRange?: {
+//  min: number;
+//  max: number;
+//  };
+export type FILTERS_SRC20_STATUS =
+  | "fully minted" // New
+  | "minting"
+  | "trending mints";
+export type FILTERS_SRC20_MARKET =
+  | "marketcap"
+  | "volume"
+  | "price change";
+// Include "volume" and "price change" periods - defaulet value = 24H
+// market: {
+// marketcap: boolean;
+// volume: boolean;
+// volumePeriod?: "24h" | "3d" | "7d";
+// priceChange: boolean;
+// priceChangePeriod?: "24h" | "3d" | "7d";
+// };
 
 import Big from "big";
 

@@ -2,12 +2,10 @@ import { SRC20_FILTER_TYPES } from "$globals";
 
 // Define a type for the SRC20 filters object
 export type SRC20Filters = {
-  market: {
-    marketcap: boolean;
-    volume: boolean;
-    volumePeriod?: "24h" | "3d" | "7d";
-    priceChange: boolean;
-    priceChangePeriod?: "24h" | "3d" | "7d";
+  status: {
+    fullyMinted: boolean;
+    minting: boolean;
+    trendingMints: boolean;
   };
   details: {
     deploy: boolean;
@@ -18,10 +16,12 @@ export type SRC20Filters = {
       max: number;
     };
   };
-  mint: {
-    fullyminted: boolean;
-    minting: boolean;
-    trendingMints: boolean;
+  market: {
+    marketcap: boolean;
+    volume: boolean;
+    volumePeriod?: "24h" | "3d" | "7d";
+    priceChange: boolean;
+    priceChangePeriod?: "24h" | "3d" | "7d";
   };
   [key: string]: any; // Add index signature to allow string indexing
 };
@@ -44,8 +44,8 @@ export const defaultFilters: SRC20Filters = {
       max: 10000,
     },
   },
-  mint: {
-    fullyminted: false,
+  status: {
+    fullyMinted: false,
     minting: false,
     trendingMints: false,
   },
@@ -119,22 +119,22 @@ export function filtersToQueryParams(
   }
 
   // Process mint filters
-  if (filters.mint.fullyminted) {
-    queryParams.set("mint[fullyminted]", "true");
+  if (filters.status.fullyMinted) {
+    queryParams.set("status[fullyMinted]", "true");
   } else {
-    queryParams.delete("mint[fullyminted]");
+    queryParams.delete("status[fullyMinted]");
   }
 
-  if (filters.mint.minting) {
-    queryParams.set("mint[minting]", "true");
+  if (filters.status.minting) {
+    queryParams.set("status[minting]", "true");
   } else {
-    queryParams.delete("mint[minting]");
+    queryParams.delete("status[minting]");
   }
 
-  if (filters.mint.trendingMints) {
-    queryParams.set("mint[trendingMints]", "true");
+  if (filters.status.trendingMints) {
+    queryParams.set("status[trendingMints]", "true");
   } else {
-    queryParams.delete("mint[trendingMints]");
+    queryParams.delete("status[trendingMints]");
   }
 
   return queryParams.toString();
@@ -196,28 +196,26 @@ export function queryParamsToFilters(query: string): SRC20Filters {
   }
 
   // Parse mint filters
-  if (params.get("mint[fullyminted]") === "true") {
-    filters.mint.fullyminted = true;
+  if (params.get("status[fullyMinted]") === "true") {
+    filters.status.fullyMinted = true;
   }
 
-  if (params.get("mint[minting]") === "true") {
-    filters.mint.minting = true;
+  if (params.get("status[minting]") === "true") {
+    filters.status.minting = true;
   }
 
-  if (params.get("mint[trendingMints]") === "true") {
-    filters.mint.trendingMints = true;
+  if (params.get("status[trendingMints]") === "true") {
+    filters.status.trendingMints = true;
   }
 
   return filters;
 }
 
 export const allQueryKeysFromFiltersSRC20 = [
-  // Market filters
-  "market[marketcap]",
-  "market[volume]",
-  "market[volumePeriod]",
-  "market[priceChange]",
-  "market[priceChangePeriod]",
+  // Status filters
+  "status[fullyMinted]",
+  "status[minting]",
+  "status[trendingMints]",
 
   // Details filters
   "details[deploy]",
@@ -226,8 +224,10 @@ export const allQueryKeysFromFiltersSRC20 = [
   "details[holdersRange][min]",
   "details[holdersRange][max]",
 
-  // Mint filters
-  "mint[fullyminted]",
-  "mint[minting]",
-  "mint[trendingMints]",
+  // Market filters
+  "market[marketcap]",
+  "market[volume]",
+  "market[volumePeriod]",
+  "market[priceChange]",
+  "market[priceChangePeriod]",
 ];

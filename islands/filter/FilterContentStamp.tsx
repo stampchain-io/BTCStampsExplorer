@@ -37,9 +37,9 @@ const defaultFilters = {
     olga: false,
   },
   editions: {
-    locked: false,
-    oneOfOne: false,
+    single: false,
     multiple: false,
+    locked: false,
     unlocked: false,
     divisible: false,
   },
@@ -274,9 +274,9 @@ export const allQueryKeysFromFilters = [
   "fileType[olga]",
 
   // Editions filters
-  "editions[locked]",
-  "editions[oneOfOne]",
+  "editions[single]",
   "editions[multiple]",
+  "editions[locked]",
   "editions[unlocked]",
   "editions[divisible]",
 
@@ -315,14 +315,14 @@ export function queryParamsToFilters(search: string) {
   }
 
   // Parse editions params
-  if (queryParams.get("editions[locked]") === "true") {
-    filters.editions.locked = true;
-  }
-  if (queryParams.get("editions[oneOfOne]") === "true") {
-    filters.editions.oneOfOne = true;
+  if (queryParams.get("editions[single]") === "true") {
+    filters.editions.single = true;
   }
   if (queryParams.get("editions[multiple]") === "true") {
     filters.editions.multiple = true;
+  }
+  if (queryParams.get("editions[locked]") === "true") {
+    filters.editions.locked = true;
   }
   if (queryParams.get("editions[unlocked]") === "true") {
     filters.editions.unlocked = true;
@@ -456,9 +456,23 @@ const Radio = ({ label, value, checked, onChange }: RadioProps) => {
 function hasActiveFilters(section: string, filters: typeof defaultFilters) {
   switch (section) {
     case "fileType":
-      return Object.values(filters.fileType).some((value) => value === true);
+      return filters.fileType.jpg ||
+        filters.fileType.png ||
+        filters.fileType.gif ||
+        filters.fileType.webp ||
+        filters.fileType.avif ||
+        filters.fileType.bmp ||
+        filters.fileType.mp3 ||
+        filters.fileType.svg ||
+        filters.fileType.html ||
+        filters.fileType.legacy ||
+        filters.fileType.olga;
     case "editions":
-      return Object.values(filters.editions).some((value) => value === true);
+      return filters.editions.single ||
+        filters.editions.multiple ||
+        filters.editions.locked ||
+        filters.editions.unlocked ||
+        filters.editions.divisible;
     case "rarity":
       return filters.rarity.sub !== false ||
         filters.rarity.stampRange.min !== "" ||
@@ -817,11 +831,13 @@ export const FilterContentStamp = ({
       >
         <Checkbox
           label="1/1"
-          checked={filters.editions.oneOfOne}
-          onChange={() =>
+          checked={filters.editions.single}
+          onChange={() => {
             handleFilterChange("editions", {
-              oneOfOne: !filters.editions.oneOfOne,
-            })}
+              ...filters.editions,
+              single: !filters.editions.single,
+            });
+          }}
         />
         <Checkbox
           label="MULTIPLE"

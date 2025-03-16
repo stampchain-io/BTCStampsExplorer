@@ -1,8 +1,4 @@
-import {
-  _STAMP_FILTER_TYPES,
-  _STAMP_TYPES,
-  STAMP_SUFFIX_FILTERS,
-} from "$globals";
+import { STAMP_SUFFIX_FILTERS } from "$globals";
 import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
 // Define a type for the filters object
@@ -31,9 +27,9 @@ export type StampFilters = {
     olga: boolean;
   };
   editions: {
-    locked: boolean;
-    oneOfOne: boolean;
+    single: boolean;
     multiple: boolean;
+    locked: boolean;
     unlocked: boolean;
     divisible: boolean;
   };
@@ -73,9 +69,9 @@ export const defaultFilters: StampFilters = {
     olga: false,
   },
   editions: {
-    locked: false,
-    oneOfOne: false,
+    single: false,
     multiple: false,
+    locked: false,
     unlocked: false,
     divisible: false,
   },
@@ -357,9 +353,9 @@ export const allQueryKeysFromFilters = [
   "fileType[olga]",
 
   // Editions filters
-  "editions[locked]",
-  "editions[oneOfOne]",
+  "editions[single]",
   "editions[multiple]",
+  "editions[locked]",
   "editions[unlocked]",
   "editions[divisible]",
 

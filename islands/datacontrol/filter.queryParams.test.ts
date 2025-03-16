@@ -13,7 +13,7 @@ Deno.test("filterToQueryParams - does not encode false values", () => {
     },
     status: {
       locked: false,
-      oneOfOne: false,
+      single: false,
     },
     fileType: {
       svg: false,
@@ -51,7 +51,7 @@ Deno.test("filterToQueryParams - encode string values", () => {
     },
     status: {
       locked: false,
-      oneOfOne: false,
+      single: false,
     },
     fileType: {
       svg: false,
@@ -89,7 +89,7 @@ Deno.test("filterToQueryParams - encode boolean values", () => {
     },
     status: {
       locked: false,
-      oneOfOne: false,
+      single: false,
     },
     fileType: {
       svg: true,
@@ -155,7 +155,7 @@ Deno.test("queryParamsToFilters empty", () => {
     stampRangePreset: 10000,
     status: {
       locked: false,
-      oneOfOne: false,
+      single: false,
     },
   });
 });
@@ -197,7 +197,7 @@ Deno.test("queryParamsToFilters stampRangePreset", () => {
     stampRangePreset: 5000,
     status: {
       locked: false,
-      oneOfOne: false,
+      single: false,
     },
   });
 });
@@ -239,7 +239,7 @@ Deno.test("queryParamsToFilters file type filters", () => {
     stampRangePreset: 10000,
     status: {
       locked: false,
-      oneOfOne: false,
+      single: false,
     },
   });
 });
@@ -281,7 +281,7 @@ Deno.test("queryParamsToFilters stamp range min max", () => {
     stampRangePreset: 10000,
     status: {
       locked: false,
-      oneOfOne: false,
+      single: false,
     },
   });
 });

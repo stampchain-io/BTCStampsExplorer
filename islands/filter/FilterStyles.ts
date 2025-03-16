@@ -76,7 +76,7 @@ export const labelGreyBaseFilter = (
 // Button styles
 export const buttonStyles = {
   base:
-    "inline-flex items-center justify-center border-2 rounded-md text-sm tablet:text-xs font-extrabold tracking-wider transition-colors duration-300",
+    "inline-flex items-center justify-center border-2 rounded-md text-sm tablet:text-sm font-extrabold tracking-wider transition-colors duration-300",
 
   // Variants
   variant: {
@@ -98,7 +98,7 @@ export const buttonStyles = {
   size: {
     sm: "h-9 tablet:h-8 px-4 tablet:px-3",
     md: "h-10 tablet:h-9 px-4 tablet:px-3",
-    lg: "h-11 tablet:h-10 px-5 tablet:px-4",
+    lg: "h-11 tablet:h-11 px-5 tablet:px-4",
   },
 };
 

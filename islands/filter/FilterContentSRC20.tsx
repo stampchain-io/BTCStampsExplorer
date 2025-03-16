@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
+import { SRC20_FILTER_TYPES } from "$globals";
 import { SRC20Filters } from "$islands/filter/FilterOptionsSRC20.tsx";
 import { useDebouncedCallback } from "$lib/utils/filterUtils.ts";
 import {
@@ -11,18 +12,18 @@ import {
 // Helper function to check if a section has active filters
 function hasActiveFilters(section: string, filters: SRC20Filters) {
   switch (section) {
-    case "market":
-      return filters.market.marketcap ||
-        filters.market.volume ||
-        filters.market.priceChange;
+    case "status":
+      return filters.status.fullyMinted ||
+        filters.status.minting ||
+        filters.status.trendingMints;
     case "details":
       return filters.details.deploy ||
         filters.details.supply ||
         filters.details.holders;
-    case "mint":
-      return filters.mint.fullyminted ||
-        filters.mint.minting ||
-        filters.mint.trendingMints;
+    case "market":
+      return filters.market.marketcap ||
+        filters.market.volume ||
+        filters.market.priceChange;
     default:
       return false;
   }
@@ -45,7 +46,7 @@ export const FilterContentSRC20 = ({
   }, [initialFilters]);
 
   const [expandedSections, setExpandedSections] = useState({
-    mint: true,
+    status: true,
     market: hasActiveFilters("market", filters),
     details: hasActiveFilters("details", filters),
     holdersRange: false,
@@ -93,20 +94,20 @@ export const FilterContentSRC20 = ({
 
   // Update the handleStatusChange function to allow deselection
   const handleStatusChange = (
-    status: "fullyminted" | "minting" | "trendingMints",
+    status: "fullyMinted" | "minting" | "trendingMints",
   ) => {
     setFilters((prevFilters) => {
       const newFilters = {
         ...prevFilters,
-        mint: {
-          ...prevFilters.mint,
-          fullyminted: prevFilters.mint.fullyminted === true
+        status: {
+          ...prevFilters.status,
+          fullyMinted: prevFilters.status.fullyMinted === true
             ? false
-            : status === "fullyminted",
-          minting: prevFilters.mint.minting === true
+            : status === "fullyMinted",
+          minting: prevFilters.status.minting === true
             ? false
             : status === "minting",
-          trendingMints: prevFilters.mint.trendingMints === true
+          trendingMints: prevFilters.status.trendingMints === true
             ? false
             : status === "trendingMints",
         },
@@ -159,23 +160,23 @@ export const FilterContentSRC20 = ({
       {/* STATUS SECTION - Independent group */}
       <CollapsibleSection
         title="STATUS"
-        section="mint"
-        expanded={expandedSections.mint}
-        toggle={() => toggleSection("mint")}
+        section="status"
+        expanded={expandedSections.status}
+        toggle={() => toggleSection("status")}
         variant="collapsibleTitle"
       >
         <Radiobutton
           label="FULLY MINTED"
-          value="fullyminted"
-          checked={filters.mint.fullyminted}
-          onChange={() => handleStatusChange("fullyminted")}
+          value="fullyMinted"
+          checked={filters.status.fullyMinted}
+          onChange={() => handleStatusChange("fullyMinted")}
           name="status"
         />
 
         <Radiobutton
           label="MINTING"
           value="minting"
-          checked={filters.mint.minting}
+          checked={filters.status.minting}
           onChange={() => handleStatusChange("minting")}
           name="status"
         />
@@ -183,7 +184,7 @@ export const FilterContentSRC20 = ({
         <Radiobutton
           label="TRENDING MINTS"
           value="trendingMints"
-          checked={filters.mint.trendingMints}
+          checked={filters.status.trendingMints}
           onChange={() => handleStatusChange("trendingMints")}
           name="status"
         />
