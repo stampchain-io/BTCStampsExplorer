@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { SRC20_FILTER_TYPES } from "$globals";
 import { SRC20Filters } from "$islands/filter/FilterOptionsSRC20.tsx";
-import { useDebouncedCallback } from "$lib/utils/filterUtils.ts";
 import {
   CollapsibleSection,
   Radiobutton,
@@ -70,32 +69,6 @@ export const FilterContentSRC20 = ({
     volumePeriod: false,
     priceChangePeriod: false,
   });
-
-  const debouncedOnFilterChange = useDebouncedCallback(
-    (str: string) => {
-      globalThis.location.href = globalThis.location.pathname + "?" +
-        str;
-    },
-    500,
-  );
-
-  const handleFilterChange = (
-    category: string,
-    key: string,
-    value: boolean,
-  ) => {
-    setFilters((prevFilters) => {
-      const newFilters = {
-        ...prevFilters,
-        [category]: {
-          ...prevFilters[category],
-          [key]: value,
-        },
-      };
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
-  };
 
   const toggleSection = (section: string) => {
     setExpandedSections({

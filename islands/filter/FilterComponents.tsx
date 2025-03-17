@@ -80,12 +80,13 @@ export const BadgeIcon = ({
         transform -translate-x-1/2 -translate-y-1/2 
         size-6
         flex items-center justify-center
-        text-xs font-medium 
+        text-xs font-bold tracking-wider
         text-black 
         bg-stamp-purple 
         group-hover:bg-stamp-purple-bright
         rounded-full
         transition-all duration-300
+        z-10
         ${text === "0" ? "opacity-0" : "opacity-100"}
         ${className}
       `}
