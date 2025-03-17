@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
+import { HamburgerMenuIcon } from "./HeaderComponents.tsx";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
@@ -85,7 +86,7 @@ const mobileNavLinks: NavLink[] = [
 ];
 
 /* ===== SOCIAL MEDIA LINKS ===== */
-const socialLinks = [
+const _socialLinks = [
   { href: "https://x.com/Stampchain", icon: "/img/footer/XLogo.svg" },
   { href: "https://t.me/BitcoinStamps", icon: "/img/footer/TelegramLogo.svg" },
   { href: "https://discord.gg/PCZU6xrt", icon: "/img/footer/DiscordLogo.svg" },
@@ -97,7 +98,7 @@ const socialLinks = [
 
 /* ===== HEADER LOGO STYLING ===== */
 const headerLogo =
-  "text-3xl mobileMd:text-4xl mobileLg:text-4xl font-black italic purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 pr-2";
+  "font-black text-4xl italic purple-hover-gradient hover:purple-hover-gradient2 tracking-wide transtion-all duration-300 pr-2";
 
 /* ===== MAIN HEADER COMPONENT ===== */
 export function Header() {
@@ -222,8 +223,10 @@ export function Header() {
             key={typeof link.title === "string"
               ? link.title
               : link.title.default}
-            className={`group relative text-base text-stamp-purple font-bold tracking-wide cursor-pointer text-nowrap ${
-              isMobile ? "flex flex-col gap-[6px] text-lg" : ""
+            className={`relative w-full group tracking-wide transition-colors duration-300 cursor-pointer text-nowrap ${
+              isMobile
+                ? "flex flex-col gap-3 font-bold text-lg text-stamp-grey hover:text-stamp-grey-light"
+                : "font-bold text-base text-stamp-purple"
             }`}
           >
             <a
@@ -234,22 +237,22 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath(link?.href ? link?.href : null);
               }}
-              className={`inline-block tablet:text-stamp-purple font-extrabold tracking-wider cursor-pointer whitespace-nowrap ${
+              className={`inline-block w-full tracking-wider transition-colors duration-300 cursor-pointer whitespace-nowrap ${
                 isMobile
-                  ? `text-xl mobileLg:text-2xl ${
+                  ? ` ${
                     link.subLinks
-                      ? "text-stamp-grey-darker hover:text-stamp-grey-light font-black "
-                      : "text-stamp-grey hover:text-stamp-grey-darker"
+                      ? "font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey "
+                      : "inline-block font-black text-xl text-transparent bg-clip-text bg-gradient-to-r from-stamp-grey-light via-stamp-grey to-stamp-grey-darker hover:text-stamp-grey-light"
                   }`
-                  : "group-hover:text-stamp-purple-bright"
+                  : "font-extrabold text-stamp-purple group-hover:text-stamp-purple-bright"
               }`}
             >
-              <span className="hidden tablet:inline min-[1024px]:hidden">
+              <span className="hidden">
                 {typeof link.title === "string"
                   ? link.title
                   : link.title.tablet}
               </span>
-              <span className="tablet:hidden min-[1024px]:inline">
+              <span className="">
                 {typeof link.title === "string"
                   ? link.title
                   : link.title.default}
@@ -259,8 +262,8 @@ export function Header() {
               <div
                 className={`${
                   isMobile
-                    ? "hidden group-hover:flex flex-col z-10 w-full gap-1.5"
-                    : "hidden group-hover:flex flex-col absolute top-[100%] left-1/2 -translate-x-1/2 min-w-[calc(100%+24px)] min-[1024px]:min-w-[calc(100%+36px)] z-10 pt-[3px] pb-[15px] px-3 min-[1024px]:px-[18px] space-y-[3px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
+                    ? "hidden group-hover:flex flex-col z-10 w-full gap-1.5 group"
+                    : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
                 }`}
               >
                 {link.subLinks?.map((subLink) => (
@@ -271,10 +274,14 @@ export function Header() {
                       toggleMenu();
                       setCurrentPath(subLink?.href ? subLink?.href : null);
                     }}
-                    className={`hover:text-stamp-purple-bright text-sm text-left ${
-                      currentPath === subLink.href
-                        ? "text-stamp-purple-bright"
-                        : ""
+                    className={`transition-colors duration-300 ${
+                      isMobile
+                        ? currentPath === subLink.href
+                          ? "text-base text-stamp-grey-light hover:text-stamp-grey py-1"
+                          : "text-base text-stamp-grey hover:text-stamp-grey-light py-1"
+                        : currentPath === subLink.href
+                        ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
+                        : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
                     }`}
                   >
                     {subLink.title}
@@ -291,7 +298,7 @@ export function Header() {
   /* ===== COMPONENT RENDER ===== */
   return (
     <header className="tablet:flex justify-between items-center max-w-desktop w-full
-     mx-auto px-3 mobileMd:px-6 desktop:px-12 my-[18px] mobileMd:my-6 mobileLg:my-9 tablet:my-12">
+     mx-auto px-6 mobileMd:px-9 tablet:px-12 my-[18px] mobileMd:my-6 mobileLg:my-9 tablet:my-12">
       {/* ===== LOGO AND MOBILE MENU TOGGLE ===== */}
       <div className="flex justify-between items-center w-full ">
         <a
@@ -302,26 +309,9 @@ export function Header() {
         >
           STAMPCHAIN
         </a>
-        <button
-          onClick={toggleMenu}
-          className="tablet:hidden block relative z-40"
-          id="navbar-toggle"
-        >
-          {open && (
-            <img
-              src="/img/header/menu-close.svg"
-              alt="menu"
-              className="size-5 mobileMd:size-[22px] mr-1.5 transition-all duration-300 ease-in-out"
-            />
-          )}
-          {!open && (
-            <img
-              src="/img/header/menu-open.svg"
-              alt="menu"
-              className="size-5 mobileMd:size-[22px] transition-all duration-300 ease-in-out"
-            />
-          )}
-        </button>
+        <div className="tablet:hidden block relative z-40">
+          <HamburgerMenuIcon isOpen={open} onClick={toggleMenu} />
+        </div>
       </div>
 
       {/* ===== DESKTOP NAVIGATION ===== */}
@@ -333,19 +323,24 @@ export function Header() {
       {/* ===== MOBILE NAVIGATION DRAWER ===== */}
       <div
         className={`flex tablet:hidden flex-col justify-between
-           fixed top-0 right-0 left-auto w-full min-[420px]:w-[380px] h-screen 
-           z-30 bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 backdrop-blur-md
+           fixed top-0 right-0 left-auto w-full min-[420px]:w-[380px] h-screen z-30
+           p-9 pt-[88px]
+           bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 backdrop-blur-md
            shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
-           px-6 pb-[18px] mobileLg:pb-[49px] pt-[89px] mobileLg:pt-[126px] 
            transition-transform duration-500 ease-in-out will-change-transform
-           overflow-y-auto scrollbar-black
+           overflow-y-auto overflow-x-hidden scrollbar-black
          ${open ? "translate-x-0" : "translate-x-full"}`}
         id="navbar-collapse"
       >
-        {/* ===== MOBILE MENU LINKS ===== */}
-        <div className="flex flex-col items-end justify-between gap-4 text-red-500">
-          {renderNavLinks(true)}
-          <ConnectWallet />
+        {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
+        <div className="flex flex-col h-full justify-between">
+          <div className="flex flex-col items-start gap-4">
+            {renderNavLinks(true)}
+          </div>
+
+          <div className="flex w-full sticky bottom-0 justify-end">
+            <ConnectWallet />
+          </div>
         </div>
 
         {/* ===== SOCIAL MEDIA ICONS ===== */}

@@ -11,6 +11,34 @@ import { ConnectorsModal } from "./ConnectorsModal.tsx";
 import { _getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import AnimationLayout from "$components/shared/animation/AnimationLayout.tsx";
 
+/* ===== BUTTON STYLING CONSTANTS ===== */
+const buttonOutlineRoundedPurple = `
+  inline-flex items-center justify-center
+  h-110 tablet:h-10 px-5 tablet:px-[18px] rounded-md
+  bg-transparent border-2 rounded-md border-stamp-purple hover:border-stamp-purple-bright 
+  font-bold text-base tablet:text-sm text-stamp-purple hover:text-stamp-purple-bright tracking-wider 
+  transition-colors duration-300 cursor-pointer select-none
+`;
+
+const buttonOutlineRoundedPurpleGradient = `
+  inline-flex items-center justify-center
+  h-10 tablet:h-9 px-5 tablet:px-[18px] rounded-md
+  bg-transparent hover:border-stamp-purple-bright 
+  font-bold text-base tablet:text-sm text-stamp-purple hover:text-stamp-purple-bright tracking-wider 
+  transition-colors duration-300 cursor-pointer select-none 
+`;
+
+const animatedBorderPurple = `
+  relative !bg-[#2b1132] p-[2px] rounded-md
+  before:absolute before:inset-0 before:rounded-md before:z-[1]
+  before:bg-[conic-gradient(from_var(--angle),#660099,#8800CC,#AA00FF,#8800CC,#660099)]
+  before:[--angle:0deg] before:animate-rotate
+  hover:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
+  focus-within:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
+  before:transition-colors before:duration-300
+  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#2b1132]
+`;
+
 /* ===== WALLET MODAL COMPONENT INTERFACE ===== */
 interface Props {
   connectors?: ComponentChildren[];
@@ -87,88 +115,97 @@ export const WalletModal = ({ connectors = [] }: Props) => {
     }
   };
 
-  const walletButtonStyle =
-    "bg-transparent border-2 rounded-md border-gradient-to-b from-[#660099] to-[#AA00FF] hover:border-stamp-purple-bright text-sm tracking-wider h-10 px-4 mobileLg:px-5 transition-colors duration-300 ";
-
   /* ===== COMPONENT RENDER ===== */
   return (
     <div
       class="relative "
       ref={modalRef}
     >
+      {/* ===== CONNECT WALLET BUTTON ===== */}
+      {!(isConnected && address) && (
+        <div className="relative">
+          <div className={`hidden tablet:block ${animatedBorderPurple}`}>
+            <button
+              type="button"
+              ref={buttonRef}
+              onClick={toggleModal}
+              className={buttonOutlineRoundedPurpleGradient}
+            >
+              CONNECT
+            </button>
+          </div>
+          <div className="block tablet:hidden -m-9 p-9">
+            <button
+              type="button"
+              ref={buttonRef}
+              onClick={toggleModal}
+              className="font-medium text-base gray-gradient1-hover text-right tracking-wide transition-colors duration-300"
+            >
+              CONNECT WALLET
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ===== CONNECTED WALLET DISPLAY ===== */}
       {isConnected && address && (
         <>
-          <div class="relative group">
+          {/* ===== MOBILE/TABLET MENU ===== */}
+          <div class="tablet:hidden flex flex-col gap-2 text-right">
+            <p class="py-0.5 font-bold text-sm text-stamp-grey-darker tracking-tighter cursor-default select-none">
+              {abbreviateAddress(address, 6)}
+            </p>
+
             <button
-              type="button"
-              ref={buttonRef}
-              // onClick={toggleModal}
-              class={`${walletButtonStyle} hidden tablet:block mt-6 mobileLg:mt-9 tablet:mt-0`}
+              onClick={() => {
+                if (isConnected && address) {
+                  globalThis.location.href = `/wallet/${address}`;
+                }
+              }}
+              class="font-medium text-base gray-gradient3-hover tracking-wide transition-colors duration-300"
             >
-              {abbreviateAddress(address)}
+              DASHBOARD
             </button>
 
             <button
               type="button"
               ref={buttonRef}
-              class={`${walletButtonStyle} block tablet:hidden !border-0 tablet:border-2 text-xl`}
+              onClick={() => walletSignOut()}
+              class="font-medium text-base gray-gradient1-hover tracking-wide transition-colors duration-300"
             >
+              DISCONNECT
+            </button>
+          </div>
+
+          {/* ===== DESKTOP DROPDOWN MENU ===== */}
+          <div class="hidden tablet:flex items-center relative group">
+            <div class="font-extrabold text-base text-transparent bg-clip-text bg-gradient-to-r from-stamp-purple to-stamp-purple-bright group-hover:text-stamp-purple-bright tracking-wider cursor-pointer select-none">
               CONNECTED
-            </button>
+            </div>
 
-            {/* ===== DROPDOWN MENU ===== */}
-            <div class="hidden group-hover:block absolute top-full tablet:top-0 -left-2 tablet:left-0 z-[1000]
-              tablet:bg-gradient-to-b tablet:from-[#000000]/20 tablet:to-[#000000]/80 tablet:backdrop-blur-md
-              tablet:border-2 tablet:rounded-md tablet:border-stamp-purple tablet:hover:border-stamp-purple-bright
-             ">
-              <div class="items-center text-base mobileLg:text-sm text-red-500 tablet:text-stamp-purple hover:text-blue-500 font-medium tablet:font-bold tracking-wider text-center transition-opacity duration-300 cursor-pointer">
-                <button
-                  type="button"
-                  ref={buttonRef}
-                  // onClick={toggleModal}
-                  class="hidden tablet:block px-5 py-2.5"
-                >
-                  {abbreviateAddress(address)}
-                </button>
-
-                <p class="block tablet:hidden px-4 py-2">
-                  {abbreviateAddress(address)}
+            <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-20
+                        pt-1 pb-3.5 space-y-1 whitespace-nowrap 
+                        backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
+              <div class="flex flex-col px-[18px] gap-1 font-bold text-sm text-stamp-purple text-left tracking-wide transition-all duration-300 ease-in-out cursor-pointer">
+                <p class="py-1 font-regular text-xs text-stamp-grey-darker cursor-default select-none">
+                  {abbreviateAddress(address, 6)}
                 </p>
-                <button
-                  onClick={() => {
-                    if (isConnected && address) {
-                      globalThis.location.href = `/wallet/${address}`;
-                    }
-                  }}
-                  class="-mt-1 w-full"
+                <a
+                  href={`/wallet/${address}`}
+                  class="hover:text-stamp-purple-bright"
                 >
                   DASHBOARD
-                </button>
-                <button
+                </a>
+                <a
                   onClick={() => walletSignOut()}
-                  class="pt-1.5 tablet:pt-1 pb-3 w-full"
+                  class="hover:text-stamp-purple-bright"
                 >
-                  SIGN OUT
-                </button>
+                  DISCONNECT
+                </a>
               </div>
             </div>
           </div>
         </>
-      )}
-
-      {/* ===== CONNECT WALLET BUTTON ===== */}
-      {!(isConnected && address) && (
-        <div class="relative inline-block">
-          <button
-            type="button"
-            ref={buttonRef}
-            onClick={toggleModal}
-            class="bg-transparent border-2 rounded-md border-gradient-to-b from-[#660099] to-[#AA00FF] hover:border-stamp-purple-bright text-sm tracking-wider h-10 px-4 mobileLg:px-5 mt-6 mobileLg:mt-9 tablet:mt-0 transition-colors duration-300 "
-          >
-            CONNECT
-          </button>
-        </div>
       )}
 
       {/* ===== CONNECT WALLET MODAL ===== */}

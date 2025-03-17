@@ -65,7 +65,7 @@ export function Footer() {
 
   return (
     <footer className="
-      px-3 tablet:px-6 desktop:px-12 py-6 tablet:py-18
+      px-6 mobileMd:px-9 tablet:px-12 py-6 tablet:py-18
       max-w-desktop w-full mx-auto flex flex-col tablet:flex-row justify-between gap-2 mobileLg:gap-3 tablet:gap-4
     ">
       <img

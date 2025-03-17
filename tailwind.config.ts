@@ -193,10 +193,11 @@ export default {
         "margin-tablet": "36px", // 36px
         "margin-desktop": "72px", // 72px
         "padding-mobile": "12px", // 12px
-        "padding-tablet": "24px", // 24px
+        "padding-tablet": "24px", // 24px - NOT CORRECT
         "padding-desktop": "48px", // 48px
-        "calc-24": "calc(100% - 24px)",
         "calc-12": "calc(100% - 12px)",
+        "calc-24": "calc(100% - 24px)",
+        "calc-36": "calc(100% - 36px)",
       },
       boxShadow: {
         "stamp": "0px 0px 30px #aa00ff",
