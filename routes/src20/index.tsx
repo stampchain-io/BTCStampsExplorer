@@ -69,9 +69,18 @@ export const handler: Handlers = {
 
       if (!("total" in resultData)) throw new Error("Expected paginated response");
 
-      const src20Data = resultData.data.map((item) => ({
-        ...item,
-        floor_unit_price: marketInfo.find(m => m.tick.toLowerCase() === item.tick.toLowerCase())?.floor_unit_price || null,
+      const src20Data = await Promise.all(resultData.data.map(async (item) => {
+        const chartData = await fetch(`https://api.stampscan.xyz/utxo/combinedListings?tick=${item.tick}&limit=100`).then((r) => r.json());
+        const highchartsData = chartData.map((cItem) => [
+          new Date(cItem.create_time).getTime(),
+          cItem.price,
+        ]).sort((a, b) => a[0] - b[0]);
+
+        return {
+          ...item,
+          floor_unit_price: marketInfo.find(m => m.tick.toLowerCase() === item.tick.toLowerCase())?.floor_unit_price || null,
+          chart: highchartsData
+        };
       }));
 
       return ctx.render({
@@ -92,7 +101,6 @@ export const handler: Handlers = {
 };
 
 export default function SRC20Page({ data }: any) {
-  console.log("data=====>", data)
   if (!data || !data.src20s) {
     return <div>Error: No data received</div>;
   }

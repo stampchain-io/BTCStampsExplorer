@@ -774,6 +774,7 @@ export function StampImage(
           src={htmlContent || src}
           toggleModal={toggleCodeModal}
           handleCloseModal={handleCloseCodeModal}
+          stamp_url={stamp.stamp_url}
         />
       )}
 

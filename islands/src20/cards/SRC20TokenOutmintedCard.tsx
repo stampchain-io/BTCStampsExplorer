@@ -2,12 +2,12 @@ import {
   SRC20BaseCard,
   SRC20BaseCardProps,
 } from "$islands/src20/cards/SRC20BaseCard.tsx";
+import ChartWidget from "$islands/src20/ChartWidget.tsx";
 
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 
 export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
   const { src20, fromPage } = props;
-
   const dataLabelSm =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
   const dataValueSm =
@@ -75,6 +75,13 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
                     abbreviateAddress(src20.destination)}
                 </span>
               </p>
+            </div>
+          </div>
+
+          {/* Graph */}
+           <div class="flex flex-col -mb-3 mobileLg:-mb-6">
+            <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
+              <ChartWidget fromPage="home" data={src20.chart} tick={src20.tick} />
             </div>
           </div>
         </>

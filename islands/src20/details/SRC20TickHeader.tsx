@@ -90,7 +90,7 @@ export function SRC20TickHeader({
   _align,
 }: SRC20TickHeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  console.log("market===>", marketInfo)
+
   const tickValue = deployment.tick
     ? (() => {
       console.log("Original tick:", deployment.tick);
