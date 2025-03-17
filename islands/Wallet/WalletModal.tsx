@@ -8,9 +8,199 @@ import {
 } from "$client/wallet/wallet.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectorsModal } from "./ConnectorsModal.tsx";
-import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
+import { _getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import AnimationLayout from "$components/shared/animation/AnimationLayout.tsx";
 
+/* ===== WALLET MODAL COMPONENT INTERFACE ===== */
+interface Props {
+  connectors?: ComponentChildren[];
+}
+
+/* ===== MAIN WALLET MODAL COMPONENT ===== */
+export const WalletModal = ({ connectors = [] }: Props) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const { wallet, isConnected, disconnect } = walletContext;
+  const { address } = wallet;
+  const modalRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [path, setPath] = useState<string | null>(null);
+
+  /* ===== PATH INITIALIZATION ===== */
+  useEffect(() => {
+    setPath(globalThis.location.pathname?.split("/")[1] || null);
+  }, []);
+
+  /* ===== MODAL VISIBILITY HANDLER ===== */
+  useEffect(() => {
+    if (showConnectWalletModal.value) {
+      setIsModalOpen(true);
+    }
+  }, [showConnectWalletModal.value]);
+
+  /* ===== CLICK OUTSIDE HANDLER ===== */
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsPopupOpen(false);
+      }
+    };
+
+    if (isPopupOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isPopupOpen]);
+
+  /* ===== MODAL TOGGLE FUNCTION ===== */
+  const toggleModal = () => {
+    if (isConnected) {
+      console.log("connected");
+      // setIsPopupOpen(!isPopupOpen);
+    } else {
+      setIsModalOpen(!isModalOpen);
+      showConnectWalletModal.value = true;
+    }
+  };
+
+  /* ===== MODAL CLOSE HANDLER ===== */
+  const handleCloseModal = (event: MouseEvent) => {
+    if (event.target === event.currentTarget) {
+      setIsModalOpen(false);
+    }
+  };
+
+  /* ===== WALLET SIGN OUT FUNCTION ===== */
+  const walletSignOut = () => {
+    disconnect();
+    if (path === "wallet" && typeof globalThis !== "undefined") {
+      globalThis.history.pushState({}, "", "/");
+      globalThis.location.reload();
+    }
+  };
+
+  const walletButtonStyle =
+    "bg-transparent border-2 rounded-md border-gradient-to-b from-[#660099] to-[#AA00FF] hover:border-stamp-purple-bright text-sm tracking-wider h-10 px-4 mobileLg:px-5 transition-colors duration-300 ";
+
+  /* ===== COMPONENT RENDER ===== */
+  return (
+    <div
+      class="relative "
+      ref={modalRef}
+    >
+      {/* ===== CONNECTED WALLET DISPLAY ===== */}
+      {isConnected && address && (
+        <>
+          <div class="relative group">
+            <button
+              type="button"
+              ref={buttonRef}
+              // onClick={toggleModal}
+              class={`${walletButtonStyle} hidden tablet:block mt-6 mobileLg:mt-9 tablet:mt-0`}
+            >
+              {abbreviateAddress(address)}
+            </button>
+
+            <button
+              type="button"
+              ref={buttonRef}
+              class={`${walletButtonStyle} block tablet:hidden !border-0 tablet:border-2 text-xl`}
+            >
+              CONNECTED
+            </button>
+
+            {/* ===== DROPDOWN MENU ===== */}
+            <div class="hidden group-hover:block absolute top-full tablet:top-0 -left-2 tablet:left-0 z-[1000]
+              tablet:bg-gradient-to-b tablet:from-[#000000]/20 tablet:to-[#000000]/80 tablet:backdrop-blur-md
+              tablet:border-2 tablet:rounded-md tablet:border-stamp-purple tablet:hover:border-stamp-purple-bright
+             ">
+              <div class="items-center text-base mobileLg:text-sm text-red-500 tablet:text-stamp-purple hover:text-blue-500 font-medium tablet:font-bold tracking-wider text-center transition-opacity duration-300 cursor-pointer">
+                <button
+                  type="button"
+                  ref={buttonRef}
+                  // onClick={toggleModal}
+                  class="hidden tablet:block px-5 py-2.5"
+                >
+                  {abbreviateAddress(address)}
+                </button>
+
+                <p class="block tablet:hidden px-4 py-2">
+                  {abbreviateAddress(address)}
+                </p>
+                <button
+                  onClick={() => {
+                    if (isConnected && address) {
+                      globalThis.location.href = `/wallet/${address}`;
+                    }
+                  }}
+                  class="-mt-1 w-full"
+                >
+                  DASHBOARD
+                </button>
+                <button
+                  onClick={() => walletSignOut()}
+                  class="pt-1.5 tablet:pt-1 pb-3 w-full"
+                >
+                  SIGN OUT
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ===== CONNECT WALLET BUTTON ===== */}
+      {!(isConnected && address) && (
+        <div class="relative inline-block">
+          <button
+            type="button"
+            ref={buttonRef}
+            onClick={toggleModal}
+            class="bg-transparent border-2 rounded-md border-gradient-to-b from-[#660099] to-[#AA00FF] hover:border-stamp-purple-bright text-sm tracking-wider h-10 px-4 mobileLg:px-5 mt-6 mobileLg:mt-9 tablet:mt-0 transition-colors duration-300 "
+          >
+            CONNECT
+          </button>
+        </div>
+      )}
+
+      {/* ===== CONNECT WALLET MODAL ===== */}
+      {isModalOpen && (
+        <AnimationLayout
+          handleClose={() => {
+            setIsModalOpen(false);
+            showConnectWalletModal.value = false;
+          }}
+        >
+          <ConnectorsModal
+            connectors={connectors}
+            toggleModal={() => {
+              setIsModalOpen(false);
+              showConnectWalletModal.value = false;
+            }}
+            handleCloseModal={handleCloseModal}
+          />
+        </AnimationLayout>
+      )}
+    </div>
+  );
+};
+
+/*
+ * ===== LEGACY WALLET POPUP COMPONENT =====
+ * This component is not currently used in the application.
+ * It contains functionality for updating display names that will be moved to the dashboard.
+ *
+ * TODO(@reinamora137): This will need to move to the new dashboard /wallet page
+ */
+/*
 const WalletPopup = (
   { logout, _onClose }: { logout: () => void; onClose: () => void },
 ) => {
@@ -182,19 +372,16 @@ const WalletPopup = (
           Update
         </button>
       </div>
-      <hr /> */
-      }
+      <hr />
       <p class="font-normal">My address</p>
       <p class="text-[14px] break-all font-normal">{wallet.address}</p>
-      {
-        /* <p
+    <p
         class="text-[14px] text-[#8B51C0] flex gap-[5px] items-center cursor-pointer"
         onClick={() => {}}
       >
         Add address
         <img src="/img/wallet/icon_plus.svg" alt="" />
-      </p> */
-      }
+      </p>
       <hr />
       <button
         class="w-full text-center bg-[#5503A6] border border-[#8A8989] rounded-[7px] py-4 mt-5 cursor-pointer font-normal"
@@ -205,178 +392,11 @@ const WalletPopup = (
     </div>
   );
 };
+*/
 
-interface Props {
-  connectors?: ComponentChildren[];
-}
-
-export const WalletModal = ({ connectors = [] }: Props) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const { wallet, isConnected, disconnect } = walletContext;
-  const { address } = wallet;
-  const modalRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [path, setPath] = useState<string | null>(null);
-
-  useEffect(() => {
-    setPath(globalThis.location.pathname?.split("/")[1] || null);
-  }, []);
-
-  useEffect(() => {
-    if (showConnectWalletModal.value) {
-      setIsModalOpen(true);
-    }
-  }, [showConnectWalletModal.value]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node)
-      ) {
-        setIsPopupOpen(false);
-      }
-    };
-
-    if (isPopupOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isPopupOpen]);
-
-  const toggleModal = () => {
-    if (isConnected) {
-      console.log("connected");
-      // setIsPopupOpen(!isPopupOpen);
-    } else {
-      setIsModalOpen(!isModalOpen);
-      showConnectWalletModal.value = true;
-    }
-  };
-
-  const handleCloseModal = (event: MouseEvent) => {
-    if (event.target === event.currentTarget) {
-      setIsModalOpen(false);
-    }
-  };
-
-  const walletSignOut = () => {
-    disconnect();
-    if (path === "wallet" && typeof globalThis !== "undefined") {
-      globalThis.history.pushState({}, "", "/");
-      globalThis.location.reload();
-    }
-  };
-
-  return (
-    <div
-      class="relative "
-      ref={modalRef}
-    >
-      {isConnected && address && (
-        <>
-          <div class="relative group">
-            <button
-              type="button"
-              ref={buttonRef}
-              // onClick={toggleModal}
-              class="hidden tablet:block text-stamp-purple backdrop-blur-md bg-transparent font-extrabold border-2 border-stamp-purple rounded-md opacity-100 group-hover:opacity-0 group-hover:border-stamp-purple-bright text-sm mobileLg:text-base tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5"
-            >
-              {abbreviateAddress(address)}
-            </button>
-
-            <button
-              type="button"
-              ref={buttonRef}
-              class="block tablet:hidden text-stamp-purple-dark font-extrabold text-xl mobileLg:text-2xl -mt-1"
-            >
-              CONNECTED
-            </button>
-
-            <div class="z-[1000] absolute top-full tablet:top-0 -left-2 tablet:left-0 text-base mobileLg:text-lg tablet:text-base font-extrabold text-stamp-purple hidden group-hover:block transition-opacity duration-300 tablet:border-2 tablet:border-stamp-purple tablet:rounded-md tablet:hover:border-stamp-purple-bright">
-              <button
-                type="button"
-                ref={buttonRef}
-                // onClick={toggleModal}
-                class="hidden tablet:block text-stamp-purple-bright px-5 py-2.5 text-sm mobileLg:text-base tracking-[0.05em]"
-              >
-                {abbreviateAddress(address)}
-              </button>
-
-              <p class="block tablet:hidden px-4 py-2 items-center hover:text-stamp-purple-bright cursor-pointer">
-                {abbreviateAddress(address)}
-              </p>
-              <button
-                onClick={() => {
-                  if (isConnected && address) {
-                    globalThis.location.href = `/wallet/${address}`;
-                  }
-                }}
-                class="-mt-1 items-center tablet:text-stamp-purple hover:text-stamp-purple-bright cursor-pointer w-full text-center"
-              >
-                DASHBOARD
-              </button>
-              <button
-                onClick={() => walletSignOut()}
-                class="pt-1.5 tablet:pt-1 pb-3 items-center tablet:text-stamp-purple hover:text-stamp-purple-bright cursor-pointer w-full text-center"
-              >
-                SIGN OUT
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
-      {!(isConnected && address) && (
-        <div class="relative inline-block">
-          <button
-            type="button"
-            ref={buttonRef}
-            onClick={toggleModal}
-            class="bg-stamp-purple border-2 border-stamp-purple rounded-md  hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 mt-6 mobileLg:mt-9 tablet:mt-0 "
-          >
-            CONNECT
-          </button>
-        </div>
-      )}
-
-      {isModalOpen && (
-        <AnimationLayout
-          handleClose={() => {
-            setIsModalOpen(false);
-            showConnectWalletModal.value = false;
-          }}
-        >
-          <ConnectorsModal
-            connectors={connectors}
-            toggleModal={() => {
-              setIsModalOpen(false);
-              showConnectWalletModal.value = false;
-            }}
-            handleCloseModal={handleCloseModal}
-          />
-        </AnimationLayout>
-      )}
-
-      {
-        /* {isModalOpen && !isConnected && (
-        <ConnectorsModal
-          connectors={connectors}
-          toggleModal={() => {
-            setIsModalOpen(false);
-            showConnectWalletModal.value = false;
-          }}
-          handleCloseModal={handleCloseModal}
-        />
-      )} */
-      }
-
+{/* ===== LEGACY POPUP RENDERING (UNUSED) ===== */}
+{
+  /*
       {isPopupOpen && isConnected && (
         <WalletPopup
           logout={() => {
@@ -390,6 +410,5 @@ export const WalletModal = ({ connectors = [] }: Props) => {
           onClose={() => setIsPopupOpen(false)}
         />
       )}
-    </div>
-  );
-};
+      */
+}
