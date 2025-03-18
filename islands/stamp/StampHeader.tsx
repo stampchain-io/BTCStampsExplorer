@@ -19,9 +19,24 @@ export const StampHeader = (
   const [filterOpen, setFilterOpen] = useState(false);
 
   const searchparams = new URLSearchParams(search);
-  const filterCount = allQueryKeysFromFilters.filter((key) => {
-    return searchparams.has(key) && searchparams.get(key) != "false";
-  }).length;
+
+  // Updated filter count logic that handles the flat filetype parameter
+  let filterCount = 0;
+
+  // Check each filter type
+  allQueryKeysFromFilters.forEach((key) => {
+    // Special handling for the flat filetype parameter
+    if (key === "filetype" && searchparams.has(key)) {
+      const filetypeValue = searchparams.get(key);
+      if (filetypeValue) {
+        // Count each selected filetype in the comma-separated list
+        filterCount += filetypeValue.split(",").length;
+      }
+    } // Regular handling for other filter parameters
+    else if (searchparams.has(key) && searchparams.get(key) !== "false") {
+      filterCount += 1;
+    }
+  });
 
   const handleSearchOpen = (open: boolean) => {
     setSearchOpen(open);

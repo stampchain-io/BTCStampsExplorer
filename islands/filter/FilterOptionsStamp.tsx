@@ -92,21 +92,32 @@ export function filtersToQueryParams(
     "Converting filters to query params:",
     JSON.stringify(filters, null, 2),
   );
-  console.log(
-    "Price range min value in filtersToQueryParams:",
-    filters.market.priceRange.min,
-  );
-  console.log(
-    "Price range min type in filtersToQueryParams:",
-    typeof filters.market.priceRange.min,
-  );
 
   const queryParams = new URLSearchParams(search);
 
-  // Log existing query params
-  console.log("Existing query params:", search);
+  // Extract selected filetypes into a flat parameter
+  const selectedFiletypes = Object.entries(filters.fileType)
+    .filter(([_, selected]) => selected)
+    .map(([type]) => type);
 
+  // Remove all existing fileType nested parameters
+  Array.from(queryParams.keys())
+    .filter((key) => key.startsWith("fileType["))
+    .forEach((key) => queryParams.delete(key));
+
+  // Delete old flat parameter if it exists
+  queryParams.delete("filetype");
+
+  // Add the flat filetype parameter if we have selected types
+  if (selectedFiletypes.length > 0) {
+    queryParams.set("filetype", selectedFiletypes.join(","));
+  }
+
+  // Process other filter categories (unchanged)
   Object.entries(filters).forEach(([category, value]) => {
+    // Skip fileType as we've handled it separately
+    if (category === "fileType") return;
+
     if (typeof value !== null && typeof value === "object") {
       Object.entries(value).forEach(([key, val]) => {
         // Handle rarity parameters
@@ -352,6 +363,9 @@ export function filtersToServicePayload(filters: StampFilters) {
 // }
 
 export const allQueryKeysFromFilters = [
+  // Add only the flat filetype parameter, remove all nested ones
+  "filetype",
+
   // Market filters
   "market[atomic]",
   "market[dispenser]",
@@ -359,21 +373,6 @@ export const allQueryKeysFromFilters = [
   "market[sales]",
   "market[priceRange][min]",
   "market[priceRange][max]",
-
-  // File type filters
-  "fileType[jpg]",
-  "fileType[jpeg]",
-  "fileType[png]",
-  "fileType[gif]",
-  "fileType[webp]",
-  "fileType[avif]",
-  "fileType[bmp]",
-  "fileType[mp3]",
-  "fileType[mpeg]",
-  "fileType[svg]",
-  "fileType[html]",
-  "fileType[legacy]",
-  "fileType[olga]",
 
   // Editions filters
   "editions[single]",
@@ -392,11 +391,31 @@ export function queryParamsToFilters(query: string): StampFilters {
   const params = new URLSearchParams(query);
   const filtersPartial: Partial<StampFilters> = {};
 
+  // Handle flat filetype format
+  const flatFiletype = params.get("filetype");
+  if (flatFiletype) {
+    const filetypeValues = flatFiletype.split(",");
+
+    // Initialize fileType with default values
+    filtersPartial.fileType = { ...defaultFilters.fileType };
+
+    // Set selected filetypes to true
+    filetypeValues.forEach((type) => {
+      if (type in filtersPartial.fileType) {
+        filtersPartial.fileType[type] = true;
+      }
+    });
+  }
+  // NO ELSE BLOCK - Remove backward compatibility
+
+  // Process other categories (no changes needed)
   Object.keys(defaultFilters).forEach((category) => {
-    if (category in defaultFilters) {
-      const filter = defaultFilters[category as keyof StampFilters];
-      if (typeof filter === "object") {
-        Object.keys(filter).forEach((key) => {
+    // Skip fileType as we've handled it separately
+    if (category === "fileType") return;
+
+    if (typeof defaultFilters[category as keyof StampFilters] === "object") {
+      Object.keys(defaultFilters[category as keyof StampFilters] as any)
+        .forEach((key) => {
           const value = params.get(`${category}[${key}]`);
           if (value !== null) {
             if (!filtersPartial[category as keyof StampFilters]) {
@@ -419,18 +438,17 @@ export function queryParamsToFilters(query: string): StampFilters {
             categoryObj[key] = coercedValue;
           }
         });
-      } else {
-        const value = params.get(category);
-        if (value !== null) {
-          const defaultValue = defaultFilters[category as keyof StampFilters];
-          const coercedValue = typeof defaultValue === "boolean"
-            ? JSON.parse(value)
-            : typeof defaultValue === "number"
-            ? parseInt(value)
-            : value;
+    } else {
+      const value = params.get(category);
+      if (value !== null) {
+        const defaultValue = defaultFilters[category as keyof StampFilters];
+        const coercedValue = typeof defaultValue === "boolean"
+          ? JSON.parse(value)
+          : typeof defaultValue === "number"
+          ? parseInt(value)
+          : value;
 
-          (filtersPartial as any)[category] = coercedValue;
-        }
+        (filtersPartial as any)[category] = coercedValue;
       }
     }
   });

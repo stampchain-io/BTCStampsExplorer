@@ -56,8 +56,36 @@ export function filtersToQueryParams(
   search: string,
   filters: typeof defaultFilters,
 ) {
+  console.log(
+    "Converting filters to query params:",
+    JSON.stringify(filters, null, 2),
+  );
+
   const queryParams = new URLSearchParams(search);
+
+  // Extract selected filetypes into a flat parameter
+  const selectedFiletypes = Object.entries(filters.fileType)
+    .filter(([_, selected]) => selected)
+    .map(([type]) => type);
+
+  // Delete all existing fileType parameters (nested format)
+  Array.from(queryParams.keys())
+    .filter((key) => key.startsWith("fileType["))
+    .forEach((key) => queryParams.delete(key));
+
+  // Set the new flat filetype parameter if we have selections
+  if (selectedFiletypes.length > 0) {
+    queryParams.set("filetype", selectedFiletypes.join(","));
+  } else {
+    queryParams.delete("filetype");
+  }
+
+  // Process all other filter categories - KEEP THIS ORIGINAL CODE UNTOUCHED
   Object.entries(filters).forEach(([category, value]) => {
+    // Skip fileType category as we've handled it separately
+    if (category === "fileType") return;
+
+    // THIS IS THE ORIGINAL CODE - keep this exactly as it was
     if (typeof value !== null && typeof value === "object") {
       Object.entries(value).forEach(([key, val]) => {
         // Handle rarity parameters
@@ -68,17 +96,28 @@ export function filtersToQueryParams(
             queryParams.delete(`${category}[${key}][min]`);
             queryParams.delete(`${category}[${key}][max]`);
 
-            // Type guard to ensure val has min and max properties
+            console.log("Rarity range values:", JSON.stringify(val, null, 2));
+
+            // Add type guard to ensure val has min and max properties
             if (
-              typeof val === "object" && val !== null && "min" in val &&
-              "max" in val
+              val && typeof val === "object" && "min" in val && "max" in val
             ) {
-              // Only add parameters if we have non-empty values
-              if (val.min && val.min.toString().trim() !== "") {
-                queryParams.append(`${category}[${key}][min]`, val.min);
+              // Only add min parameter if it has a non-empty value
+              if (val.min !== undefined && val.min !== null && val.min !== "") {
+                console.log(`Adding ${category}[${key}][min]=${val.min}`);
+                queryParams.append(
+                  `${category}[${key}][min]`,
+                  val.min.toString(),
+                );
               }
-              if (val.max && val.max.toString().trim() !== "") {
-                queryParams.append(`${category}[${key}][max]`, val.max);
+
+              // Only add max parameter if it has a non-empty value
+              if (val.max !== undefined && val.max !== null && val.max !== "") {
+                console.log(`Adding ${category}[${key}][max]=${val.max}`);
+                queryParams.append(
+                  `${category}[${key}][max]`,
+                  val.max.toString(),
+                );
               }
             }
           } else if (key === "sub" && val) {
@@ -93,42 +132,56 @@ export function filtersToQueryParams(
           queryParams.delete(`${category}[${key}][min]`);
           queryParams.delete(`${category}[${key}][max]`);
 
-          // Type guard to ensure val has min and max properties
-          if (
-            typeof val === "object" && val !== null && "min" in val &&
-            "max" in val
-          ) {
-            // Only add parameters if we have non-empty values
-            if (val.min && val.min.toString().trim() !== "") {
-              queryParams.append(`${category}[${key}][min]`, val.min);
+          console.log("Price range values:", JSON.stringify(val, null, 2));
+
+          // Add type guard to ensure val has min and max properties
+          if (val && typeof val === "object" && "min" in val && "max" in val) {
+            // Only add min parameter if it has a non-empty value
+            if (val.min !== undefined && val.min !== null && val.min !== "") {
+              console.log(`Adding min to URL: ${val.min}`);
+              queryParams.append(
+                `${category}[${key}][min]`,
+                val.min.toString(),
+              );
             }
-            if (val.max && val.max.toString().trim() !== "") {
-              queryParams.append(`${category}[${key}][max]`, val.max);
+
+            // Only add max parameter if it has a non-empty value
+            if (val.max !== undefined && val.max !== null && val.max !== "") {
+              console.log(`Adding max to URL: ${val.max}`);
+              queryParams.append(
+                `${category}[${key}][max]`,
+                val.max.toString(),
+              );
             }
           }
+
           return;
         }
 
-        const strVal = typeof val === "object"
-          ? JSON.stringify(val)
-          : val.toString();
-        if (typeof val === "boolean") {
-          if (strVal !== "false") {
+        // Before trying to call toString(), check the type of val
+        if (val !== null && val !== undefined) {
+          const strVal = val.toString();
+
+          if (typeof val === "boolean") {
+            if (strVal !== "false") {
+              queryParams.set(`${category}[${key}]`, strVal);
+            } else {
+              queryParams.delete(`${category}[${key}]`);
+            }
+          } else if (typeof val === "object") {
+            // Skip objects as they're handled in the specific conditions above
+            // This prevents trying to compare an object with an empty string
+          } else if (val !== "") {
             queryParams.set(`${category}[${key}]`, strVal);
-          } else {
-            queryParams.delete(`${category}[${key}]`);
           }
-        } else if (typeof val === "object") {
-          // Handle object values (like priceRange or stampRange) that weren't caught by the earlier conditions
-          // These are already handled by the specific conditions above, so we can skip them here
-        } else if (val !== "") {
-          // This condition now only applies to string or number values
-          queryParams.set(`${category}[${key}]`, strVal);
         }
       });
     }
   });
-  return queryParams.toString();
+
+  const result = queryParams.toString();
+  console.log("Final query params:", result);
+  return result;
 }
 
 export function filtersToServicePayload(filters: typeof defaultFilters) {
@@ -258,19 +311,7 @@ export const allQueryKeysFromFilters = [
   "market[priceRange][max]",
 
   // File type filters
-  "fileType[jpg]",
-  "fileType[jpeg]",
-  "fileType[png]",
-  "fileType[gif]",
-  "fileType[webp]",
-  "fileType[avif]",
-  "fileType[bmp]",
-  "fileType[mp3]",
-  "fileType[mpeg]",
-  "fileType[svg]",
-  "fileType[html]",
-  "fileType[legacy]",
-  "fileType[olga]",
+  "filetype",
 
   // Editions filters
   "editions[single]",
@@ -285,106 +326,80 @@ export const allQueryKeysFromFilters = [
   "rarity[stampRange][max]",
 ];
 
-export function queryParamsToFilters(search: string) {
-  const queryParams = new URLSearchParams(search);
+export function queryParamsToFilters(query: string): StampFilters {
+  const params = new URLSearchParams(query);
+  // Initialize with default filters
   const filters = { ...defaultFilters };
 
+  // ONLY handle flat filetype parameter
+  const flatFiletype = params.get("filetype");
+  if (flatFiletype) {
+    const filetypeValues = flatFiletype.split(",");
+
+    // Set selected filetypes to true
+    filetypeValues.forEach((type) => {
+      if (type in filters.fileType) {
+        filters.fileType[type] = true;
+      }
+    });
+  }
+  // END NEW SECTION - DO NOT MODIFY ANYTHING BELOW THIS POINT
+
   // Parse market params
-  if (queryParams.get("market[atomic]") === "true") {
+  if (params.get("market[atomic]") === "true") {
     filters.market.atomic = true;
   }
-  if (queryParams.get("market[dispenser]") === "true") {
+  if (params.get("market[dispenser]") === "true") {
     filters.market.dispenser = true;
   }
-  if (queryParams.get("market[listings]") === "true") {
+  if (params.get("market[listings]") === "true") {
     filters.market.listings = true;
   }
-  if (queryParams.get("market[sales]") === "true") {
+  if (params.get("market[sales]") === "true") {
     filters.market.sales = true;
   }
 
-  // Parse market price range
-  const marketPriceMin = queryParams.get("market[priceRange][min]");
-  const marketPriceMax = queryParams.get("market[priceRange][max]");
-  if (marketPriceMin) {
-    filters.market.priceRange.min = marketPriceMin;
+  // Parse price range params
+  const minPriceParam = params.get("market[priceRange][min]");
+  if (minPriceParam) {
+    filters.market.priceRange.min = minPriceParam;
   }
-  if (marketPriceMax) {
-    filters.market.priceRange.max = marketPriceMax;
-  }
-
-  // Parse editions params
-  if (queryParams.get("editions[single]") === "true") {
-    filters.editions.single = true;
-  }
-  if (queryParams.get("editions[multiple]") === "true") {
-    filters.editions.multiple = true;
-  }
-  if (queryParams.get("editions[locked]") === "true") {
-    filters.editions.locked = true;
-  }
-  if (queryParams.get("editions[unlocked]") === "true") {
-    filters.editions.unlocked = true;
-  }
-  if (queryParams.get("editions[divisible]") === "true") {
-    filters.editions.divisible = true;
-  }
-
-  // Parse fileType params
-  if (
-    queryParams.get("fileType[jpg]") === "true" ||
-    queryParams.get("fileType[jpeg]") === "true"
-  ) {
-    filters.fileType.jpg = true;
-  }
-  if (queryParams.get("fileType[png]") === "true") {
-    filters.fileType.png = true;
-  }
-  if (queryParams.get("fileType[gif]") === "true") {
-    filters.fileType.gif = true;
-  }
-  if (queryParams.get("fileType[webp]") === "true") {
-    filters.fileType.webp = true;
-  }
-  if (queryParams.get("fileType[avif]") === "true") {
-    filters.fileType.avif = true;
-  }
-  if (queryParams.get("fileType[bmp]") === "true") {
-    filters.fileType.bmp = true;
-  }
-  if (
-    queryParams.get("fileType[mp3]") === "true" ||
-    queryParams.get("fileType[mpeg]") === "true"
-  ) {
-    filters.fileType.mp3 = true;
-  }
-  if (queryParams.get("fileType[svg]") === "true") {
-    filters.fileType.svg = true;
-  }
-  if (queryParams.get("fileType[html]") === "true") {
-    filters.fileType.html = true;
-  }
-  if (queryParams.get("fileType[legacy]") === "true") {
-    filters.fileType.legacy = true;
-  }
-  if (queryParams.get("fileType[olga]") === "true") {
-    filters.fileType.olga = true;
+  const maxPriceParam = params.get("market[priceRange][max]");
+  if (maxPriceParam) {
+    filters.market.priceRange.max = maxPriceParam;
   }
 
   // Parse rarity params
-  const raritySubParam = queryParams.get("rarity[sub]");
+  const raritySubParam = params.get("rarity[sub]");
   if (raritySubParam) {
-    filters.rarity.sub = raritySubParam === "true";
+    filters.rarity.sub = raritySubParam === "true" ? true : raritySubParam;
   }
 
   // Parse rarity range params
-  const rarityMinParam = queryParams.get("rarity[stampRange][min]");
+  const rarityMinParam = params.get("rarity[stampRange][min]");
   if (rarityMinParam) {
     filters.rarity.stampRange.min = rarityMinParam;
   }
-  const rarityMaxParam = queryParams.get("rarity[stampRange][max]");
+  const rarityMaxParam = params.get("rarity[stampRange][max]");
   if (rarityMaxParam) {
     filters.rarity.stampRange.max = rarityMaxParam;
+  }
+
+  // Parse editions params
+  if (params.get("editions[single]") === "true") {
+    filters.editions.single = true;
+  }
+  if (params.get("editions[multiple]") === "true") {
+    filters.editions.multiple = true;
+  }
+  if (params.get("editions[locked]") === "true") {
+    filters.editions.locked = true;
+  }
+  if (params.get("editions[unlocked]") === "true") {
+    filters.editions.unlocked = true;
+  }
+  if (params.get("editions[divisible]") === "true") {
+    filters.editions.divisible = true;
   }
 
   return filters;

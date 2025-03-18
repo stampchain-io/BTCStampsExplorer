@@ -155,7 +155,7 @@ export const createStampHandler = (
 
         // Extract filters INSIDE the routeConfig.isIndex block
         const filetypeFilters =
-          url.searchParams.get("filetypeFilters")?.split(",").filter(Boolean) as
+          url.searchParams.get("filetype")?.split(",").filter(Boolean) as
             | STAMP_FILETYPES[]
             | undefined || undefined;
         const suffixFilters =

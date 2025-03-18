@@ -120,12 +120,7 @@ export type STAMP_RARITY =
   | "1000" // stamp < 1000 && stamp >= 100
   | "5000" // stamp < 5000 && stamp >= 1000
   | "10000" // stamp < 10000 && stamp >= 5000
-  | {
-    stampRange: {
-      min?: string | number;
-      max?: string | number;
-    };
-  };
+  | "custom"; // For custom range - requires min/max params in URL
 
 // Filter types - SRC20
 export type SRC20_STATUS =
