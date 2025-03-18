@@ -113,10 +113,30 @@ export function filtersToQueryParams(
     queryParams.set("filetype", selectedFiletypes.join(","));
   }
 
+  // NEW SECTION FOR EDITIONS
+  // Extract selected editions into a flat parameter
+  const selectedEditions = Object.entries(filters.editions)
+    .filter(([_, selected]) => selected)
+    .map(([type]) => type);
+
+  // Remove all existing editions nested parameters
+  Array.from(queryParams.keys())
+    .filter((key) => key.startsWith("editions["))
+    .forEach((key) => queryParams.delete(key));
+
+  // Delete old flat parameter if it exists
+  queryParams.delete("editions");
+
+  // Add the flat editions parameter if we have selected types
+  if (selectedEditions.length > 0) {
+    queryParams.set("editions", selectedEditions.join(","));
+  }
+  // END OF NEW SECTION
+
   // Process other filter categories (unchanged)
   Object.entries(filters).forEach(([category, value]) => {
-    // Skip fileType as we've handled it separately
-    if (category === "fileType") return;
+    // Skip fileType and editions as we've handled them separately
+    if (category === "fileType" || category === "editions") return;
 
     if (typeof value !== null && typeof value === "object") {
       Object.entries(value).forEach(([key, val]) => {
@@ -363,8 +383,9 @@ export function filtersToServicePayload(filters: StampFilters) {
 // }
 
 export const allQueryKeysFromFilters = [
-  // Add only the flat filetype parameter, remove all nested ones
+  // Flat filter parameters
   "filetype",
+  "editions",
 
   // Market filters
   "market[atomic]",
@@ -373,13 +394,6 @@ export const allQueryKeysFromFilters = [
   "market[sales]",
   "market[priceRange][min]",
   "market[priceRange][max]",
-
-  // Editions filters
-  "editions[single]",
-  "editions[multiple]",
-  "editions[locked]",
-  "editions[unlocked]",
-  "editions[divisible]",
 
   // Rarity filters
   "rarity[sub]",
@@ -406,12 +420,29 @@ export function queryParamsToFilters(query: string): StampFilters {
       }
     });
   }
-  // NO ELSE BLOCK - Remove backward compatibility
+
+  // NEW SECTION FOR EDITIONS
+  // Handle flat editions format
+  const flatEditions = params.get("editions");
+  if (flatEditions) {
+    const editionsValues = flatEditions.split(",");
+
+    // Initialize editions with default values
+    filtersPartial.editions = { ...defaultFilters.editions };
+
+    // Set selected editions to true
+    editionsValues.forEach((type) => {
+      if (type in filtersPartial.editions) {
+        filtersPartial.editions[type] = true;
+      }
+    });
+  }
+  // END OF NEW SECTION
 
   // Process other categories (no changes needed)
   Object.keys(defaultFilters).forEach((category) => {
-    // Skip fileType as we've handled it separately
-    if (category === "fileType") return;
+    // Skip fileType and editions as we've handled them separately
+    if (category === "fileType" || category === "editions") return;
 
     if (typeof defaultFilters[category as keyof StampFilters] === "object") {
       Object.keys(defaultFilters[category as keyof StampFilters] as any)

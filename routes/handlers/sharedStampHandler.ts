@@ -162,7 +162,7 @@ export const createStampHandler = (
           url.searchParams.get("suffixFilters")?.split(",").filter(Boolean) ||
           undefined;
         const editionFilters =
-          url.searchParams.get("editionFilters")?.split(",").filter(Boolean) as
+          url.searchParams.get("editions")?.split(",").filter(Boolean) as
             | STAMP_EDITIONS[]
             | undefined || undefined;
 
