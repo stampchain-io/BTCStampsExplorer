@@ -6,7 +6,7 @@ import {
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
   StampBalance,
-  StampFilters,  // New import for the filter interface
+  StampFilters,
   STAMP_FILETYPES,
   STAMP_EDITIONS,
   STAMP_RARITY,
@@ -26,6 +26,7 @@ import {
 } from "$lib/utils/identifierUtils.ts";
 import { getMimeType, getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
+import type { STAMP_RARITY } from "$/globals.d.ts";
 
 export class StampRepository {
   static sanitize(input: string): string {
@@ -40,11 +41,12 @@ export class StampRepository {
     ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string,
     blockIdentifier?: number | string,
     collectionId?: string | string[],
-    filterBy?: STAMP_FILTER_TYPES[],
-    suffixFilters?: STAMP_SUFFIX_FILTERS[],
     isSearchQuery?: boolean,
     filters?: StampFilters,
-    editionFilters?: STAMP_EDITIONS[]
+    suffixFilters?: STAMP_SUFFIX_FILTERS[],
+    filterBy?: STAMP_FILTER_TYPES[],
+    editionFilters?: STAMP_EDITIONS[],
+    rarityFilters?: STAMP_RARITY
   ) {
 
     if (identifier !== undefined) {
@@ -61,7 +63,7 @@ export class StampRepository {
 
         const numericIds = validIdentifiers.filter((id): id is number =>
           isStampNumber(id)
-        );
+        ); 
         const txHashes = validIdentifiers.filter((id): id is string =>
           isTxHash(id)
         );
@@ -271,6 +273,11 @@ export class StampRepository {
     // Handle edition filters if not using the full filters object
     if (editionFilters && editionFilters.length > 0 && !filters) {
       this.buildEditionsFilterConditions(editionFilters, whereConditions, queryParams);
+    }
+
+    // Handle rarity filters
+    if (rarityFilters) {
+      this.buildRarityFilterConditions(rarityFilters, whereConditions, queryParams);
     }
   }
 
@@ -535,9 +542,6 @@ export class StampRepository {
     cacheDuration?: number | "never";
     collectionId?: string | string[];
     sortColumn?: string;
-    filterBy?: STAMP_FILTER_TYPES[];
-    suffixFilters?: STAMP_SUFFIX_FILTERS[];
-    filetypeFilters?: STAMP_FILETYPES[];
     groupBy?: string;
     groupBySubquery?: boolean;
     collectionStampLimit?: number;
@@ -547,7 +551,11 @@ export class StampRepository {
     creatorAddress?: string;
     isSearchQuery?: boolean;
     filters?: StampFilters;
+    filterBy?: STAMP_FILTER_TYPES[];
+    suffixFilters?: STAMP_SUFFIX_FILTERS[];
+    filetypeFilters?: STAMP_FILETYPES[];
     editionFilters?: STAMP_EDITIONS[];
+    rarityFilters?: STAMP_RARITY;
   }) {
     // Extract all parameters including both filter types
     const {
@@ -564,9 +572,6 @@ export class StampRepository {
       cacheDuration = 1000 * 60 * 3,
       collectionId,
       sortColumn = "block_index",
-      filterBy = [],
-      suffixFilters = [],
-      filetypeFilters = [],
       groupBy,
       groupBySubquery = false,
       collectionStampLimit,
@@ -576,7 +581,11 @@ export class StampRepository {
       creatorAddress,
       isSearchQuery = false,
       filters,
+      filterBy = [],
+      suffixFilters = [],
+      filetypeFilters = [],
       editionFilters = [],
+      rarityFilters,
     } = options;
 
     // Combine both filter types for processing
@@ -594,11 +603,12 @@ export class StampRepository {
       ident,
       blockIdentifier,
       collectionId,
-      filterBy,
-      combinedFilters,
       isSearchQuery,
       filters,
-      editionFilters
+      suffixFilters,
+      filterBy,
+      editionFilters,
+      rarityFilters
     );
 
     if (creatorAddress) {
@@ -1191,6 +1201,49 @@ export class StampRepository {
     // Combine categories with AND logic (must satisfy all selected categories)
     if (categoryConditions.length > 0) {
       whereConditions.push(categoryConditions.join(" AND "));
+    }
+  }
+
+  private static buildRarityFilterConditions(
+    rarityFilters: STAMP_RARITY,
+    whereConditions: string[],
+    queryParams: (string | number)[]
+  ) {
+    // Handle preset range (string value)
+    if (typeof rarityFilters === 'string') {
+      switch (rarityFilters) {
+        case "100":
+          whereConditions.push("(st.stamp < 100 AND st.stamp >= 0)");
+          break;
+        case "1000":
+          whereConditions.push("(st.stamp < 1000 AND st.stamp >= 100)");
+          break;
+        case "5000":
+          whereConditions.push("(st.stamp < 5000 AND st.stamp >= 1000)");
+          break;
+        case "10000":
+          whereConditions.push("(st.stamp < 10000 AND st.stamp >= 5000)");
+          break;
+      }
+    }
+    // Handle custom stamp range (object value)
+    else if (typeof rarityFilters === 'object' && rarityFilters && 'stampRange' in rarityFilters) {
+      const { min, max } = rarityFilters.stampRange;
+      const rangeConditions = [];
+      
+      if (min !== undefined && min !== null && min !== '') {
+        rangeConditions.push("st.stamp >= ?");
+        queryParams.push(Number(min));
+      }
+      
+      if (max !== undefined && max !== null && max !== '') {
+        rangeConditions.push("st.stamp <= ?");
+        queryParams.push(Number(max));
+      }
+      
+      if (rangeConditions.length > 0) {
+        whereConditions.push(`(${rangeConditions.join(" AND ")})`);
+      }
     }
   }
 }

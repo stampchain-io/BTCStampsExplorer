@@ -1,4 +1,4 @@
-import { STAMP_EDITIONS, STAMP_FILETYPES } from "$globals";
+import { STAMP_EDITIONS, STAMP_FILETYPES, STAMP_RARITY } from "$globals";
 import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
 // Define a type for the filters object
@@ -307,11 +307,40 @@ export function filtersToServicePayload(filters: StampFilters) {
   if (filters.editions.unlocked) editionFilters.push("unlocked");
   if (filters.editions.divisible) editionFilters.push("divisible");
 
-  return {
+  // Handle rarity as a single value (radio button selection)
+  let rarityFilters: STAMP_RARITY | undefined = undefined;
+
+  // If sub is selected and it's not "stamp range", use that value
+  if (filters.rarity.sub && filters.rarity.sub !== "stamp range") {
+    rarityFilters = filters.rarity.sub as STAMP_RARITY;
+  } // If sub is "stamp range" or we have values in stampRange, use the custom range
+  else if (
+    (filters.rarity.sub === "stamp range" || !filters.rarity.sub) &&
+    filters.rarity.stampRange &&
+    (filters.rarity.stampRange.min || filters.rarity.stampRange.max)
+  ) {
+    rarityFilters = {
+      stampRange: {
+        min: filters.rarity.stampRange.min || "",
+        max: filters.rarity.stampRange.max || "",
+      },
+    };
+  }
+
+  // After extracting the filters
+  console.log("Extracted filetypeFilters:", filetypeFilters);
+  console.log("Extracted editionFilters:", editionFilters);
+  console.log("Extracted rarityFilters:", rarityFilters);
+
+  // Before returning
+  const result = {
     ident: [],
     filetypeFilters: Array.from(new Set(filetypeFilters)),
     editionFilters: editionFilters.length > 0 ? editionFilters : undefined,
+    rarityFilters: rarityFilters,
   };
+  console.log("Filter payload:", result);
+  return result;
 }
 
 // export function queryParamsToServicePayload(query: URLSearchParams): {

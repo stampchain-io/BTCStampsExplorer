@@ -4,6 +4,8 @@ import { RouteType } from "$server/services/cacheService.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { validateSortDirection } from "$server/services/validationService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { STAMP_EDITIONS, STAMP_FILETYPES, STAMP_RARITY } from "$globals";
+
 type StampHandlerConfig = {
   type: "stamps" | "cursed";
   isIndex: boolean;
@@ -74,11 +76,29 @@ export const createStampHandler = (
         }
 
         const filetypeFilters =
-          url.searchParams.get("filetypeFilters")?.split(",") || undefined;
+          url.searchParams.get("filetypeFilters")?.split(",").filter(Boolean) as
+            | STAMP_FILETYPES[]
+            | undefined || undefined;
         const suffixFilters =
-          url.searchParams.get("suffixFilters")?.split(",") || undefined;
+          url.searchParams.get("suffixFilters")?.split(",").filter(Boolean) ||
+          undefined;
         const editionFilters =
-          url.searchParams.get("editionFilters")?.split(",") || undefined;
+          url.searchParams.get("editionFilters")?.split(",").filter(Boolean) as
+            | STAMP_EDITIONS[]
+            | undefined || undefined;
+
+        // Extract rarity filters - this will be JSON-encoded since it's an object
+        const rarityFiltersStr = url.searchParams.get("rarityFilters");
+        let rarityFilters: STAMP_RARITY | undefined = undefined;
+
+        if (rarityFiltersStr) {
+          try {
+            rarityFilters = JSON.parse(rarityFiltersStr);
+          } catch (error) {
+            console.error("Error parsing rarityFilters:", error);
+            rarityFilters = undefined;
+          }
+        }
 
         // For index routes, we only need core columns for better performance
         const result = await StampController.getStamps({
@@ -93,6 +113,7 @@ export const createStampHandler = (
           suffixFilters,
           filetypeFilters,
           editionFilters,
+          rarityFilters,
         });
 
         return ApiResponseUtil.success(result, { routeType: cacheType });

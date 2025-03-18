@@ -116,22 +116,16 @@ export type STAMP_EDITIONS =
   | "divisible"; // Maps to StampTableV4.divisible = 1
 
 export type STAMP_RARITY =
-  | "sub" // Has multiple variants for stamp number ranges (0-99, 100-999, etc.)
-  | "stamp range"; // Maps to custom StampTableV4.stamp field ranges
-// Include "(Custom) Stamp Range" min/max values
-// rarity: {
-//   sub?: {
-//     lt100?: boolean;      // stamp < 100
-//     lt1000?: boolean;     // stamp < 1000 && stamp >= 100
-//     lt5000?: boolean;     // stamp < 5000 && stamp >= 1000
-//     lt10000?: boolean;    // stamp < 10000 && stamp >= 5000
-//     gte10000?: boolean;   // stamp >= 10000
-//   },
-//   stampRange?: {
-//     min: string | number; // Minimum stamp number
-//     max: string | number; // Maximum stamp number
-//   }
-// }
+  | "100" // stamp < 100
+  | "1000" // stamp < 1000 && stamp >= 100
+  | "5000" // stamp < 5000 && stamp >= 1000
+  | "10000" // stamp < 10000 && stamp >= 5000
+  | {
+    stampRange: {
+      min?: string | number;
+      max?: string | number;
+    };
+  };
 
 // Filter types - SRC20
 export type SRC20_STATUS =
@@ -192,19 +186,7 @@ export interface StampFilters {
   };
   filetype?: STAMP_FILETYPES[];
   editions?: STAMP_EDITIONS[];
-  rarity?: {
-    sub?: {
-      lt100?: boolean; // stamp < 100
-      lt1000?: boolean; // stamp < 1000 && stamp >= 100
-      lt5000?: boolean; // stamp < 5000 && stamp >= 1000
-      lt10000?: boolean; // stamp < 10000 && stamp >= 5000
-      gte10000?: boolean; // stamp >= 10000
-    };
-    stampRange?: {
-      min: string | number; // Minimum stamp number
-      max: string | number; // Maximum stamp number
-    };
-  };
+  rarity?: STAMP_RARITY;
   search?: string; // Maps to various fields like cpid, creator, stamp
 }
 

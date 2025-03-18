@@ -9,10 +9,13 @@ import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import {
   PaginatedStampBalanceResponseBody,
   ProcessedHolder,
+  StampRow,
   STAMP_FILTER_TYPES,
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
-  StampRow,
+  STAMP_FILETYPES,
+  STAMP_EDITIONS,
+  STAMP_RARITY,
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
@@ -65,6 +68,7 @@ export class StampController {
     url,
     filetypeFilters,
     editionFilters,
+    rarityFilters,
   }: {
     page?: number;
     limit?: number;
@@ -75,7 +79,6 @@ export class StampController {
      */
     suffixFilters?: string[];
     ident?: SUBPROTOCOLS[];
-    filterBy?: STAMP_FILTER_TYPES[];
     url?: string;
     isSearchQuery?: boolean;
     enrichWithAssetInfo?: boolean;
@@ -86,8 +89,10 @@ export class StampController {
     identifier?: string | number | (string | number)[];
     noPagination?: boolean
     cacheDuration?: number
-    filetypeFilters?: string[];
-    editionFilters?: string[];
+    filterBy?: STAMP_FILTER_TYPES[];
+    filetypeFilters?: STAMP_FILETYPES[];
+    editionFilters?: STAMP_EDITIONS[];
+    rarityFilters?: STAMP_RARITY;
   } = {}) {
     try {
     const filterByArray = typeof filterBy === "string"
@@ -149,7 +154,6 @@ export class StampController {
       blockIdentifier,
       cacheDuration,
       noPagination,
-      filterBy: filterByArray,
       sortColumn,
       collectionStampLimit,
       groupBy,
@@ -157,8 +161,10 @@ export class StampController {
       skipTotalCount,
       cacheType,
       isSearchQuery,
+      filterBy: filterByArray,
       filetypeFilters,
       editionFilters,
+      rarityFilters,
     });
 
       // Process stamps with floor prices and asset info if needed

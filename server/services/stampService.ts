@@ -7,6 +7,7 @@ import {
   SUBPROTOCOLS,
   STAMP_FILETYPES,
   STAMP_EDITIONS,
+  STAMP_RARITY,
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
@@ -121,17 +122,17 @@ export class StampService {
     cacheDuration?: number | "never";
     collectionId?: string | string[];
     sortColumn?: string;
-    filterBy?: STAMP_FILTER_TYPES[];
-    suffixFilters?: STAMP_SUFFIX_FILTERS[];
-    filetypeFilters?: STAMP_FILETYPES[];
-    editionFilters?: STAMP_EDITIONS[];
     groupBy?: string;
     groupBySubquery?: boolean;
     skipTotalCount?: boolean;
     cacheType?: RouteType;
     creatorAddress?: string;
+    filterBy?: STAMP_FILTER_TYPES[];
+    suffixFilters?: STAMP_SUFFIX_FILTERS[];
+    filetypeFilters?: STAMP_FILETYPES[];
+    editionFilters?: STAMP_EDITIONS[];
+    rarityFilters?: STAMP_RARITY;
   }) {
-    // Create a new options object instead of modifying the input
     const queryOptions = {
       ...options,
       // Add collection query defaults if needed
@@ -139,7 +140,6 @@ export class StampService {
         groupBy: "collection_id",
         groupBySubquery: true
       } : {}),
-      // Pass all filter types to repository
     };
 
     const [result, lastBlock] = await Promise.all([
@@ -149,7 +149,8 @@ export class StampService {
         cacheType: options.cacheType,
         cacheDuration: options.cacheDuration,
         filetypeFilters: options.filetypeFilters,
-        editionFilters: options.editionFilters
+        editionFilters: options.editionFilters,
+        rarityFilters: options.rarityFilters,
       }),
       BlockService.getLastBlock(),
     ]);
