@@ -6,6 +6,11 @@ import {
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
   StampBalance,
+  StampFilters,  // New import for the filter interface
+  STAMP_FILETYPES,
+  STAMP_EDITIONS,
+  STAMP_RARITY,
+  STAMP_MARKET
 } from "$globals";
 import { XcpBalance } from "$types/index.d.ts";
 import { summarize_issuances } from "./index.ts";
@@ -37,7 +42,9 @@ export class StampRepository {
     collectionId?: string | string[],
     filterBy?: STAMP_FILTER_TYPES[],
     suffixFilters?: STAMP_SUFFIX_FILTERS[],
-    isSearchQuery?: boolean 
+    isSearchQuery?: boolean,
+    filters?: StampFilters,
+    editionFilters?: STAMP_EDITIONS[]
   ) {
 
     if (identifier !== undefined) {
@@ -180,10 +187,39 @@ export class StampRepository {
 
     // File suffix condition from suffixFilters
     if (suffixFilters && suffixFilters.length > 0) {
-      const suffixCondition = suffixFilters
-        .map((suffix) => `st.stamp_url LIKE '%${suffix}'`)
-        .join(" OR ");
-      whereConditions.push(`(${suffixCondition})`);
+      // Extract different filter types
+      const fileExtensions = suffixFilters.filter(filter => 
+        !["legacy", "olga", "single", "multiple", "locked", "unlocked", "divisible"].includes(filter)
+      );
+      
+      const encodingFilters = suffixFilters.filter(filter => 
+        filter === "legacy" || filter === "olga"
+      );
+      
+      const editionFilters = suffixFilters.filter(filter => 
+        ["single", "multiple", "locked", "unlocked", "divisible"].includes(filter)
+      ) as STAMP_EDITIONS[];
+      
+      // Process file extensions
+      if (fileExtensions.length > 0) {
+        const suffixCondition = fileExtensions
+          .map((suffix) => `st.stamp_url LIKE '%${suffix}'`)
+          .join(" OR ");
+        whereConditions.push(`(${suffixCondition})`);
+      }
+      
+      // Process encoding filters
+      if (encodingFilters.length > 0) {
+        const encodingCondition = this.buildEncodingFilterSQL(encodingFilters);
+        if (encodingCondition) {
+          whereConditions.push(encodingCondition);
+        }
+      }
+      
+      // Process edition filters
+      if (editionFilters.length > 0) {
+        this.buildEditionsFilterConditions(editionFilters, whereConditions, queryParams);
+      }
     }
 
     // **FilterBy conditions**
@@ -226,6 +262,16 @@ export class StampRepository {
         whereConditions.push(`(${filterConditions.join(" OR ")})`);
       }
     }
+
+    // Handle new filter system if filters are provided
+    if (filters) {
+      this.buildFilterConditions(filters, whereConditions, queryParams);
+    }
+
+    // Handle edition filters if not using the full filters object
+    if (editionFilters && editionFilters.length > 0 && !filters) {
+      this.buildEditionsFilterConditions(editionFilters, whereConditions, queryParams);
+    }
   }
 
   static async getTotalStampCountFromDb(options: {
@@ -236,6 +282,7 @@ export class StampRepository {
     collectionId?: string | string[];
     filterBy?: STAMP_FILTER_TYPES[];
     suffixFilters?: STAMP_SUFFIX_FILTERS[];
+    filetypeFilters?: STAMP_FILETYPES[];
     creatorAddress?: string;
   }) {
     const {
@@ -245,9 +292,13 @@ export class StampRepository {
       blockIdentifier,
       collectionId,
       filterBy,
-      suffixFilters,
+      suffixFilters = [],
+      filetypeFilters = [],
       creatorAddress,
     } = options;
+
+    // Combine filters
+    const combinedFilters = [...suffixFilters, ...filetypeFilters];
 
     const whereConditions: string[] = [];
     const queryParams: (string | number)[] = [];
@@ -261,7 +312,7 @@ export class StampRepository {
       blockIdentifier,
       collectionId,
       filterBy,
-      suffixFilters
+      combinedFilters
     );
 
     if (creatorAddress) {
@@ -486,6 +537,7 @@ export class StampRepository {
     sortColumn?: string;
     filterBy?: STAMP_FILTER_TYPES[];
     suffixFilters?: STAMP_SUFFIX_FILTERS[];
+    filetypeFilters?: STAMP_FILETYPES[];
     groupBy?: string;
     groupBySubquery?: boolean;
     collectionStampLimit?: number;
@@ -493,28 +545,15 @@ export class StampRepository {
     selectColumns?: string[];
     includeSecondary?: boolean;
     creatorAddress?: string;
-    isSearchQuery?: boolean
+    isSearchQuery?: boolean;
+    filters?: StampFilters;
+    editionFilters?: STAMP_EDITIONS[];
   }) {
-    const queryOptions = {
-      limit: SMALL_LIMIT,
-      page: 1,
-      sortBy: "ASC",
-      sortOrder: "index_asc",
-      type: "stamps",
-      includeSecondary: true,
-      ...options,
-      ...(options.collectionId && (!options.groupBy || !options.groupBySubquery)
-        ? {
-            groupBy: "collection_id",
-            groupBySubquery: true,
-          }
-        : {}),
-    };
-
+    // Extract all parameters including both filter types
     const {
-      limit,
-      page,
-      sortBy,
+      limit = 100,
+      page = 0,
+      sortBy = "DESC",
       sortOrder,
       type,
       ident,
@@ -524,19 +563,26 @@ export class StampRepository {
       noPagination = false,
       cacheDuration = 1000 * 60 * 3,
       collectionId,
-      sortColumn = sortOrder?.includes("index") ? "tx_index" : "tx_index",
-      filterBy,
-      suffixFilters,
+      sortColumn = "block_index",
+      filterBy = [],
+      suffixFilters = [],
+      filetypeFilters = [],
       groupBy,
       groupBySubquery = false,
-      collectionStampLimit = 12,
+      collectionStampLimit,
       skipTotalCount = false,
       selectColumns,
-      includeSecondary = true,
+      includeSecondary = false,
       creatorAddress,
-      isSearchQuery
-    } = queryOptions;
+      isSearchQuery = false,
+      filters,
+      editionFilters = [],
+    } = options;
 
+    // Combine both filter types for processing
+    const combinedFilters = [...suffixFilters, ...filetypeFilters];
+
+    // Rest of the method remains the same, but use combinedFilters instead
     const whereConditions: string[] = [];
     const queryParams: (string | number)[] = [];
 
@@ -549,8 +595,10 @@ export class StampRepository {
       blockIdentifier,
       collectionId,
       filterBy,
-      suffixFilters,
-      isSearchQuery
+      combinedFilters,
+      isSearchQuery,
+      filters,
+      editionFilters
     );
 
     if (creatorAddress) {
@@ -740,6 +788,7 @@ export class StampRepository {
         collectionId,
         filterBy,
         suffixFilters,
+        filetypeFilters,
       });
       total = totalResult.rows[0]?.total || 0;
       totalPages = noPagination ? 1 : Math.ceil(total / limit);
@@ -961,5 +1010,187 @@ export class StampRepository {
     return {
       total: result.rows[0]?.total || 0
     };
+  }
+
+  /**
+   * Builds SQL conditions for filtering stamps by file type
+   * @param filetypes Array of file type filters
+   * @param whereConditions Array of SQL conditions to append to
+   * @param queryParams Array of parameters to append to
+   */
+  private static buildFileTypeFilterConditions(
+    filetypes: STAMP_FILETYPES[],
+    whereConditions: string[],
+    queryParams: (string | number)[]
+  ) {
+    // Separate encoding filters (legacy/olga) from mimetype filters
+    const mimetypeFilters = filetypes.filter(type => 
+      type !== "legacy" && type !== "olga"
+    );
+    
+    const encodingFilters = filetypes.filter(type => 
+      type === "legacy" || type === "olga"
+    );
+    
+    // Handle mimetype filters
+    if (mimetypeFilters.length > 0) {
+      const mimetypeConditions = mimetypeFilters.map(filetype => {
+        if (filetype === "jpg" || filetype === "jpeg") {
+          return "st.stamp_mimetype = 'image/jpeg'";
+        } else if (filetype === "png") {
+          return "st.stamp_mimetype = 'image/png'";
+        } else if (filetype === "gif") {
+          return "st.stamp_mimetype = 'image/gif'";
+        } else if (filetype === "webp") {
+          return "st.stamp_mimetype = 'image/webp'";
+        } else if (filetype === "avif") {
+          return "st.stamp_mimetype = 'image/avif'";
+        } else if (filetype === "mp3" || filetype === "mpeg") {
+          return "st.stamp_mimetype = 'audio/mpeg'";
+        } else if (filetype === "bmp") {
+          return "st.stamp_mimetype = 'image/bmp'";
+        } else if (filetype === "svg") {
+          return "st.stamp_mimetype = 'image/svg+xml'";
+        } else if (filetype === "html") {
+          return "st.stamp_mimetype = 'text/html'";
+        }
+        return "";
+      }).filter(Boolean);
+      
+      if (mimetypeConditions.length > 0) {
+        whereConditions.push(`(${mimetypeConditions.join(" OR ")})`);
+      }
+    }
+    
+    // Handle encoding filters
+    if (encodingFilters.length > 0) {
+      const encodingCondition = this.buildEncodingFilterSQL(encodingFilters);
+      if (encodingCondition) {
+        whereConditions.push(encodingCondition);
+      }
+    }
+  }
+
+  /**
+   * Builds SQL conditions for filtering stamps by encoding type (legacy or OLGA)
+   * @param filters Array of file type filters that may include "legacy" or "olga"
+   * @returns SQL condition string for filtering by encoding based on block height
+   */
+  private static buildEncodingFilterSQL(filters: STAMP_FILETYPES[]): string {
+    if (!filters || !filters.includes("legacy") && !filters.includes("olga")) {
+      return "";
+    }
+    
+    let sql = "";
+    
+    if (filters.includes("legacy")) {
+      sql += "st.block_index < 833000";
+    }
+    
+    if (filters.includes("olga")) {
+      if (sql) sql += " OR ";
+      sql += "st.block_index >= 833000";
+    }
+    
+    return sql ? `(${sql})` : "";
+  }
+
+  /**
+   * Builds all SQL filter conditions from the given filters object
+   * @param filters StampFilters object containing all filter options
+   * @param whereConditions Array of SQL conditions to append to
+   * @param queryParams Array of parameters to append to
+   */
+  private static buildFilterConditions(
+    filters: StampFilters,
+    whereConditions: string[],
+    queryParams: (string | number)[]
+  ) {
+    // Handle filetype filters (including encoding filters)
+    if (filters.filetype && filters.filetype.length > 0) {
+      this.buildFileTypeFilterConditions(filters.filetype, whereConditions, queryParams);
+    }
+    
+    // Handle editions filters
+    if (filters.editions && filters.editions.length > 0) {
+      this.buildEditionsFilterConditions(filters.editions, whereConditions, queryParams);
+    }
+    
+    // Handle rarity filters
+    if (filters.rarity) {
+      this.buildRarityFilterConditions(filters.rarity, whereConditions, queryParams);
+    }
+    
+    // Handle market filters
+    if (filters.market) {
+      this.buildMarketFilterConditions(filters.market, whereConditions, queryParams);
+    }
+    
+    // Handle search text
+    if (filters.search) {
+      this.buildSearchConditions(filters.search, whereConditions, queryParams);
+    }
+  }
+
+  /**
+   * Builds SQL conditions for filtering stamps by edition properties
+   * @param editions Array of edition filters
+   * @param whereConditions Array of SQL conditions to append to
+   * @param queryParams Array of parameters to append to
+   */
+  private static buildEditionsFilterConditions(
+    editions: STAMP_EDITIONS[],
+    whereConditions: string[],
+    queryParams: (string | number)[]
+  ) {
+    if (!editions || editions.length === 0) {
+      return;
+    }
+    
+    // Group filters by category
+    const supplyFilters = [];
+    const lockFilters = [];
+    const divisibilityFilters = [];
+    
+    // Sort filters into their respective categories
+    if (editions.includes("single")) {
+      supplyFilters.push("st.supply = 1");
+    }
+    
+    if (editions.includes("multiple")) {
+      supplyFilters.push("st.supply > 1");
+    }
+    
+    if (editions.includes("locked")) {
+      lockFilters.push("st.locked = 1");
+    }
+    
+    if (editions.includes("unlocked")) {
+      lockFilters.push("st.locked = 0");
+    }
+    
+    if (editions.includes("divisible")) {
+      divisibilityFilters.push("st.divisible = 1");
+    }
+    
+    // Build category conditions - within each category use OR
+    const categoryConditions = [];
+    
+    if (supplyFilters.length > 0) {
+      categoryConditions.push(`(${supplyFilters.join(" OR ")})`);
+    }
+    
+    if (lockFilters.length > 0) {
+      categoryConditions.push(`(${lockFilters.join(" OR ")})`);
+    }
+    
+    if (divisibilityFilters.length > 0) {
+      categoryConditions.push(`(${divisibilityFilters.join(" OR ")})`);
+    }
+    
+    // Combine categories with AND logic (must satisfy all selected categories)
+    if (categoryConditions.length > 0) {
+      whereConditions.push(categoryConditions.join(" AND "));
+    }
   }
 }

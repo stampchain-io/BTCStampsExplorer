@@ -73,6 +73,13 @@ export const createStampHandler = (
           return sortValidation;
         }
 
+        const filetypeFilters =
+          url.searchParams.get("filetypeFilters")?.split(",") || undefined;
+        const suffixFilters =
+          url.searchParams.get("suffixFilters")?.split(",") || undefined;
+        const editionFilters =
+          url.searchParams.get("editionFilters")?.split(",") || undefined;
+
         // For index routes, we only need core columns for better performance
         const result = await StampController.getStamps({
           page,
@@ -83,6 +90,9 @@ export const createStampHandler = (
           skipTotalCount: false,
           includeSecondary: true, // Explicitly exclude secondary columns for listings
           cacheType,
+          suffixFilters,
+          filetypeFilters,
+          editionFilters,
         });
 
         return ApiResponseUtil.success(result, { routeType: cacheType });

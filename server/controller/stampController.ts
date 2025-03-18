@@ -63,7 +63,8 @@ export class StampController {
     enrichWithAssetInfo = false,
     isSearchQuery = false,
     url,
-    // filtersV2,
+    filetypeFilters,
+    editionFilters,
   }: {
     page?: number;
     limit?: number;
@@ -85,6 +86,8 @@ export class StampController {
     identifier?: string | number | (string | number)[];
     noPagination?: boolean
     cacheDuration?: number
+    filetypeFilters?: string[];
+    editionFilters?: string[];
   } = {}) {
     try {
     const filterByArray = typeof filterBy === "string"
@@ -153,7 +156,9 @@ export class StampController {
       groupBySubquery,
       skipTotalCount,
       cacheType,
-      isSearchQuery
+      isSearchQuery,
+      filetypeFilters,
+      editionFilters,
     });
 
       // Process stamps with floor prices and asset info if needed

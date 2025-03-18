@@ -1,6 +1,15 @@
 // General Types ---------------------------------------------------------------
-export type ROOT_DOMAIN_TYPES = ".btc" | ".sats" | ".xbt" | ".x" | ".pink";
-export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721" | "SRC-101";
+export type ROOT_DOMAIN_TYPES =
+  | ".btc"
+  | ".sats"
+  | ".xbt"
+  | ".x"
+  | ".pink";
+export type SUBPROTOCOLS =
+  | "STAMP"
+  | "SRC-20"
+  | "SRC-721"
+  | "SRC-101";
 export type STAMP_TYPES = // These just reformat to variations of SUBPROTOCOLS
   | "all"
   | "stamps"
@@ -56,55 +65,84 @@ export type LISTING_FILTER_TYPES =
   | "all"
   | "psbt"
   | "dispensers";
+
 // NEW SUGGESTIONS
 // Filter types - Stamp
-export type FILTERS_STAMP_MARKET =
-  | "atomic" // Named "psbt" earlier
-  | "dispensers"
-  | "listings" // Named "for sale" earlier
-  | "sales" // Named "sold" earlier
-  | "price range"; // Alternative to "priceRange"
+export type STAMP_MARKET =
+  | "atomic" // Maps to transactions with psbt format in transactions table
+  | "dispensers" // Maps to entries in the dispensers table with active give_remaining
+  | "listings" // Maps to active sale listings in transactions table with specific status
+  | "sales" // Maps to completed sales in transactions table with confirmed status
+  | "price range"; // Maps to price filters across all market types using btc_amount/satoshirate fields
+// Price Range filters: atomic, dispensers, listings and sales - depending on what is selected (one or multiple)
 // Include "Price Range" min/max values
+// DB mapping details:
+// - atomic: Uses transactions.btc_amount where type indicates atomic swap
+// - dispensers: Uses dispensers.satoshirate or dispensers.btcrate
+// - listings: Uses transactions.btc_amount where status indicates active listing
+// - sales: Uses transactions.btc_amount where status indicates completed sale
+// - price range: Applied to the appropriate field based on selected market types
 // market: {
-//  atomic: false,
-//  dispenser: false,
-//  listings: false,
-//  sales: false,
+//  atomic: boolean;
+//  dispenser: boolean;
+//  listings: boolean;
+//  sales: boolean;
 //  priceRange: {
-//    min: "",
-//   max: "",
-//  },
-//  },
-export type FILTERS_STAMP_FILETYPE =
-  | "jpg"
-  | "jpeg"
-  | "png"
-  | "gif"
-  | "webp"
-  | "avif" // New
-  | "mp3" // New
-  | "mpeg" // New
-  | "bmp"
-  | "svg"
-  | "html"
-  | "legacy" // New
-  | "olga"; // New
-export type FILTERS_STAMP_EDITIONS =
-  | "single" // Alternative to "1/1" or "oneOfOne" for code usage
-  | "multiple"
-  | "locked"
-  | "unlocked"
-  | "divisible";
-export type FILTERS_STAMP_RARITY =
-  | "sub" // Has multiple variants (100/1000/5000/10000)
-  | "stamp range"; // Alternative to "stampRange"
+//    min: string | number;
+//    max: string | number;
+//  }
+// }
+
+export type STAMP_FILETYPES =
+  | "jpg" // Maps to StampTableV4.stamp_mimetype = 'image/jpeg'
+  | "jpeg" // Grouped with jpg
+  | "png" // Maps to StampTableV4.stamp_mimetype = 'image/png'
+  | "gif" // Maps to StampTableV4.stamp_mimetype = 'image/gif'
+  | "webp" // Maps to StampTableV4.stamp_mimetype = 'image/webp'
+  | "avif" // Maps to StampTableV4.stamp_mimetype = 'image/avif'
+  | "mp3" // Maps to StampTableV4.stamp_mimetype = 'audio/mpeg'
+  | "mpeg" // Grouped with mp3
+  | "bmp" // Maps to StampTableV4.stamp_mimetype = 'image/bmp'
+  | "svg" // Maps to StampTableV4.stamp_mimetype = 'image/svg+xml'
+  | "html" // Maps to StampTableV4.stamp_mimetype = 'text/html'
+  | "legacy" // Maps to StampTableV4.block_index < 833000
+  | "olga"; // Maps to StampTableV4.block_index >= 833000
+
+export type STAMP_EDITIONS =
+  | "single" // Maps to StampTableV4.supply = 1
+  | "multiple" // Maps to StampTableV4.supply > 1
+  | "locked" // Maps to StampTableV4.locked = 1
+  | "unlocked" // Maps to StampTableV4.locked = 0
+  | "divisible"; // Maps to StampTableV4.divisible = 1
+
+export type STAMP_RARITY =
+  | "sub" // Has multiple variants for stamp number ranges (0-99, 100-999, etc.)
+  | "stamp range"; // Maps to custom StampTableV4.stamp field ranges
 // Include "(Custom) Stamp Range" min/max values
+// rarity: {
+//   sub?: {
+//     lt100?: boolean;      // stamp < 100
+//     lt1000?: boolean;     // stamp < 1000 && stamp >= 100
+//     lt5000?: boolean;     // stamp < 5000 && stamp >= 1000
+//     lt10000?: boolean;    // stamp < 10000 && stamp >= 5000
+//     gte10000?: boolean;   // stamp >= 10000
+//   },
+//   stampRange?: {
+//     min: string | number; // Minimum stamp number
+//     max: string | number; // Maximum stamp number
+//   }
+// }
 
 // Filter types - SRC20
-export type FILTERS_SRC20_DETAILS =
-  | "deploy"
-  | "suuply"
-  | "holders";
+export type SRC20_STATUS =
+  | "fully minted" // Compare SRC20Valid with mint_status where progress = 100%
+  | "minting" // Compare SRC20Valid with mint_status where progress < 100%
+  | "trending mints"; // Requires aggregation of recent mint transactions
+
+export type SRC20_DETAILS =
+  | "deploy" // Maps to SRC20Valid.op = 'deploy'
+  | "supply" // Maps to SRC20Valid.max field
+  | "holders"; // Maps to src20_token_stats.holders_count
 // Include "Holders" min/max values (when user applied)
 // details: {
 // deploy: boolean;
@@ -114,22 +152,103 @@ export type FILTERS_SRC20_DETAILS =
 //  min: number;
 //  max: number;
 //  };
-export type FILTERS_SRC20_STATUS =
-  | "fully minted" // New
-  | "minting"
-  | "trending mints";
-export type FILTERS_SRC20_MARKET =
-  | "marketcap"
-  | "volume"
-  | "price change";
-// Include "volume" and "price change" periods - defaulet value = 24H
+// supplyRange?: {
+//   min: string | number;
+//   max: string | number;
+// };
+
+export type SRC20_MARKET =
+  | "marketcap" // Calculated field: floor_price * total_supply
+  | "volume" // Calculated from recent transactions
+  | "price change"; // Calculated from price history
+// Include "volume" and "price change" periods - default value = 24H
 // market: {
 // marketcap: boolean;
+// marketcapRange?: {
+//   min: number;
+//   max: number;
+// };
 // volume: boolean;
 // volumePeriod?: "24h" | "3d" | "7d";
 // priceChange: boolean;
 // priceChangePeriod?: "24h" | "3d" | "7d";
+// priceChangeRange?: {
+//   min: number; // Percentage
+//   max: number; // Percentage
 // };
+// };
+
+// Full Filter Interfaces
+export interface StampFilters {
+  market?: {
+    atomic?: boolean;
+    dispensers?: boolean;
+    listings?: boolean;
+    sales?: boolean;
+    priceRange?: {
+      min: string | number;
+      max: string | number;
+    };
+  };
+  filetype?: STAMP_FILETYPES[];
+  editions?: STAMP_EDITIONS[];
+  rarity?: {
+    sub?: {
+      lt100?: boolean; // stamp < 100
+      lt1000?: boolean; // stamp < 1000 && stamp >= 100
+      lt5000?: boolean; // stamp < 5000 && stamp >= 1000
+      lt10000?: boolean; // stamp < 10000 && stamp >= 5000
+      gte10000?: boolean; // stamp >= 10000
+    };
+    stampRange?: {
+      min: string | number; // Minimum stamp number
+      max: string | number; // Maximum stamp number
+    };
+  };
+  search?: string; // Maps to various fields like cpid, creator, stamp
+}
+
+export interface SRC20Filters {
+  status?: SRC20_STATUS[];
+  details?: {
+    deploy?: boolean;
+    supply?: boolean;
+    holders?: boolean;
+    holdersRange?: {
+      min: number;
+      max: number;
+    };
+    supplyRange?: {
+      min: string | number;
+      max: string | number;
+    };
+  };
+  market?: {
+    marketcap?: boolean;
+    marketcapRange?: {
+      min: number;
+      max: number;
+    };
+    volume?: boolean;
+    volumePeriod?: "24h" | "3d" | "7d";
+    priceChange?: boolean;
+    priceChangePeriod?: "24h" | "3d" | "7d";
+    priceChangeRange?: {
+      min: number; // Percentage
+      max: number; // Percentage
+    };
+  };
+  search?: string; // Maps to tick or tick_hash
+}
+
+// Utility type for handling emoji ticks
+export interface EmojiTickHandling {
+  ensureUnicodeEscape: (tick: string) => string; // For DB operations
+  convertToEmoji: (tick: string) => string; // For display
+  isEmojiFormat: (tick: string) => boolean;
+  isUnicodeEscapeFormat: (tick: string) => boolean;
+  isURLEncodedFormat: (tick: string) => boolean;
+}
 
 import Big from "big";
 

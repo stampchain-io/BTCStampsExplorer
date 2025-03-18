@@ -5,6 +5,8 @@ import {
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
   SUBPROTOCOLS,
+  STAMP_FILETYPES,
+  STAMP_EDITIONS,
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
@@ -121,6 +123,8 @@ export class StampService {
     sortColumn?: string;
     filterBy?: STAMP_FILTER_TYPES[];
     suffixFilters?: STAMP_SUFFIX_FILTERS[];
+    filetypeFilters?: STAMP_FILETYPES[];
+    editionFilters?: STAMP_EDITIONS[];
     groupBy?: string;
     groupBySubquery?: boolean;
     skipTotalCount?: boolean;
@@ -134,7 +138,8 @@ export class StampService {
       ...(options.collectionId && (!options.groupBy || !options.groupBySubquery) ? {
         groupBy: "collection_id",
         groupBySubquery: true
-      } : {})
+      } : {}),
+      // Pass all filter types to repository
     };
 
     const [result, lastBlock] = await Promise.all([
@@ -142,7 +147,9 @@ export class StampService {
         ...queryOptions,
         includeSecondary: options.includeSecondary,
         cacheType: options.cacheType,
-        cacheDuration: options.cacheDuration
+        cacheDuration: options.cacheDuration,
+        filetypeFilters: options.filetypeFilters,
+        editionFilters: options.editionFilters
       }),
       BlockService.getLastBlock(),
     ]);

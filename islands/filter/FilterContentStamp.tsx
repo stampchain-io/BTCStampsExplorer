@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { STAMP_SUFFIX_FILTERS } from "$globals";
+import { STAMP_EDITIONS, STAMP_FILETYPES } from "$globals";
 import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
 import {
@@ -134,110 +134,109 @@ export function filtersToQueryParams(
 export function filtersToServicePayload(filters: typeof defaultFilters) {
   const filterPayload = {
     vector: {
-      suffixFilters: [] as Partial<
-        typeof filterOptions["vector"]["suffixFilters"]
-      >,
+      filetypeFilters: [] as STAMP_FILETYPES[],
       ident: ["STAMP"],
     },
     pixel: {
-      suffixFilters: [] as Partial<
-        typeof filterOptions["pixel"]["suffixFilters"]
-      >,
+      filetypeFilters: [] as STAMP_FILETYPES[],
       ident: ["STAMP, SRC-721"],
     },
     recursive: {
-      suffixFilters: [] as Partial<
-        typeof filterOptions["recursive"]["suffixFilters"]
-      >,
+      filetypeFilters: [] as STAMP_FILETYPES[],
       ident: ["SRC-721"],
     },
     audio: {
-      suffixFilters: [] as Partial<
-        typeof filterOptions["audio"]["suffixFilters"]
-      >,
+      filetypeFilters: [] as STAMP_FILETYPES[],
       ident: ["STAMP"],
     },
     encoding: {
-      suffixFilters: [] as Partial<
-        typeof filterOptions["encoding"]["suffixFilters"]
-      >,
+      filetypeFilters: [] as STAMP_FILETYPES[],
       ident: ["STAMP"],
     },
   };
 
   // JPG/JPEG (combined)
   if (filters.fileType.jpg) {
-    filterPayload.pixel.suffixFilters.push("jpg");
-    filterPayload.pixel.suffixFilters.push("jpeg");
+    filterPayload.pixel.filetypeFilters.push("jpg");
+    filterPayload.pixel.filetypeFilters.push("jpeg");
   }
 
   // PNG
   if (filters.fileType.png) {
-    filterPayload.pixel.suffixFilters.push("png");
+    filterPayload.pixel.filetypeFilters.push("png");
   }
 
   // GIF
   if (filters.fileType.gif) {
-    filterPayload.pixel.suffixFilters.push("gif");
+    filterPayload.pixel.filetypeFilters.push("gif");
   }
 
   // WEBP
   if (filters.fileType.webp) {
-    filterPayload.pixel.suffixFilters.push("webp");
+    filterPayload.pixel.filetypeFilters.push("webp");
   }
 
   // AVIF
   if (filters.fileType.avif) {
-    filterPayload.pixel.suffixFilters.push("avif");
+    filterPayload.pixel.filetypeFilters.push("avif");
   }
 
   // BMP
   if (filters.fileType.bmp) {
-    filterPayload.pixel.suffixFilters.push("bmp");
+    filterPayload.pixel.filetypeFilters.push("bmp");
   }
 
   // MP3/MPEG (combined)
   if (filters.fileType.mp3) {
-    filterPayload.audio.suffixFilters.push("mp3");
-    filterPayload.audio.suffixFilters.push("mpeg");
+    filterPayload.audio.filetypeFilters.push("mp3");
+    filterPayload.audio.filetypeFilters.push("mpeg");
   }
 
   // SVG
   if (filters.fileType.svg) {
-    filterPayload.vector.suffixFilters.push("svg");
-    filterPayload.recursive.suffixFilters.push("svg");
+    filterPayload.vector.filetypeFilters.push("svg");
+    filterPayload.recursive.filetypeFilters.push("svg");
   }
 
   // HTML
   if (filters.fileType.html) {
-    filterPayload.vector.suffixFilters.push("html");
-    filterPayload.recursive.suffixFilters.push("html");
+    filterPayload.vector.filetypeFilters.push("html");
+    filterPayload.recursive.filetypeFilters.push("html");
   }
 
   // LEGACY
   if (filters.fileType.legacy) {
-    filterPayload.encoding.suffixFilters.push("legacy");
+    filterPayload.encoding.filetypeFilters.push("legacy");
   }
 
   // OLGA
   if (filters.fileType.olga) {
-    filterPayload.encoding.suffixFilters.push("olga");
+    filterPayload.encoding.filetypeFilters.push("olga");
   }
 
-  // DENO ERROR - this is a known issue that will be addressed in an upcoming update to the STAMP_SUFFIX_FILTERS
-  const suffixFilters = Object.entries(filterPayload).reduce(
+  // Collect all file types
+  const filetypeFilters = Object.entries(filterPayload).reduce(
     (acc, [key, value]) => {
-      if (value.suffixFilters.length > 0) {
-        acc.push(...value.suffixFilters);
+      if (value.filetypeFilters.length > 0) {
+        acc.push(...value.filetypeFilters);
       }
       return acc;
     },
-    [] as STAMP_SUFFIX_FILTERS[],
+    [] as STAMP_FILETYPES[],
   );
+
+  // Collect edition filters
+  const editionFilters: STAMP_EDITIONS[] = [];
+  if (filters.editions.single) editionFilters.push("single");
+  if (filters.editions.multiple) editionFilters.push("multiple");
+  if (filters.editions.locked) editionFilters.push("locked");
+  if (filters.editions.unlocked) editionFilters.push("unlocked");
+  if (filters.editions.divisible) editionFilters.push("divisible");
 
   return {
     ident: [],
-    suffixFilters: Array.from(new Set(suffixFilters)),
+    filetypeFilters: Array.from(new Set(filetypeFilters)),
+    editionFilters: editionFilters.length > 0 ? editionFilters : undefined,
   };
 }
 
