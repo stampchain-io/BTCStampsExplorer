@@ -53,8 +53,24 @@ export const createStampHandler = (
   async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
+      console.log(
+        "All URL parameters:",
+        Object.fromEntries(url.searchParams.entries()),
+      );
+      console.log("Rarity parameter:", url.searchParams.get("rarity[sub]"));
+      console.log(
+        "Filetype parameter:",
+        url.searchParams.get("filetypeFilters"),
+      );
+      console.log("Edition parameter:", url.searchParams.get("editionFilters"));
       const cacheType = getCacheType(url.pathname, routeConfig.isIndex);
       const requestQuery = url.searchParams.get("q");
+
+      console.log(
+        "URL parameters:",
+        Object.fromEntries(url.searchParams.entries()),
+      );
+      console.log("Rarity sub value:", url.searchParams.get("rarity[sub]"));
 
       if (routeConfig.isIndex) {
         const pagination = getPaginationParams(url);
@@ -87,18 +103,62 @@ export const createStampHandler = (
             | STAMP_EDITIONS[]
             | undefined || undefined;
 
-        // Extract rarity filters - this will be JSON-encoded since it's an object
-        const rarityFiltersStr = url.searchParams.get("rarityFilters");
+        // Extract rarity filter from URL parameters
         let rarityFilters: STAMP_RARITY | undefined = undefined;
+        const raritySub = url.searchParams.get("rarity[sub]");
 
-        if (rarityFiltersStr) {
-          try {
-            rarityFilters = JSON.parse(rarityFiltersStr);
-          } catch (error) {
-            console.error("Error parsing rarityFilters:", error);
-            rarityFilters = undefined;
+        console.log("Raw rarity[sub] value:", raritySub);
+        console.log("rarity[sub] type:", typeof raritySub);
+
+        if (raritySub) {
+          console.log("Found rarity[sub]:", raritySub);
+          // If it's one of the preset values, use it directly
+          if (["100", "1000", "5000", "10000"].includes(raritySub)) {
+            rarityFilters = raritySub as STAMP_RARITY;
+            console.log(
+              "Matched preset value, setting rarityFilters to:",
+              rarityFilters,
+            );
+          } else {
+            console.log("Value not in preset list:", raritySub);
           }
+        } else {
+          console.log("No rarity[sub] parameter found");
         }
+
+        // Also handle custom range if needed
+        const rarityMin = url.searchParams.get("rarity[stampRange][min]");
+        const rarityMax = url.searchParams.get("rarity[stampRange][max]");
+
+        console.log("Custom range values - min:", rarityMin, "max:", rarityMax);
+
+        if (rarityMin || rarityMax) {
+          rarityFilters = {
+            stampRange: {
+              min: rarityMin || "",
+              max: rarityMax || "",
+            },
+          };
+          console.log("Set custom range rarityFilters:", rarityFilters);
+        }
+
+        console.log("Final rarity filters:", rarityFilters);
+
+        // Log the complete options being passed to the controller
+        console.log("Complete options for StampController.getStamps:", {
+          page,
+          limit: effectiveLimit,
+          sortBy: sortValidation,
+          type: routeConfig.type,
+          allColumns: false,
+          skipTotalCount: false,
+          includeSecondary: true,
+          cacheType,
+          suffixFilters,
+          filetypeFilters,
+          editionFilters,
+          rarityFilters,
+        });
 
         // For index routes, we only need core columns for better performance
         const result = await StampController.getStamps({
@@ -115,6 +175,13 @@ export const createStampHandler = (
           editionFilters,
           rarityFilters,
         });
+
+        // Log the result count to see if any filtering was applied
+        console.log(
+          `Result returned ${result.data?.length || 0} stamps out of ${
+            result.total || 0
+          } total`,
+        );
 
         return ApiResponseUtil.success(result, { routeType: cacheType });
       } else {
@@ -242,6 +309,7 @@ export const createStampHandler = (
         );
       }
     } catch (error) {
+      console.error("Error in stamp handler:", error);
       const errorMessage = routeConfig.isIndex
         ? `Error fetching paginated ${routeConfig.type}`
         : "Error fetching stamp data";

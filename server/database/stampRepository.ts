@@ -41,10 +41,10 @@ export class StampRepository {
     ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string,
     blockIdentifier?: number | string,
     collectionId?: string | string[],
+    filterBy?: STAMP_FILTER_TYPES[],
+    suffixFilters?: STAMP_SUFFIX_FILTERS[],
     isSearchQuery?: boolean,
     filters?: StampFilters,
-    suffixFilters?: STAMP_SUFFIX_FILTERS[],
-    filterBy?: STAMP_FILTER_TYPES[],
     editionFilters?: STAMP_EDITIONS[],
     rarityFilters?: STAMP_RARITY
   ) {
@@ -319,7 +319,11 @@ export class StampRepository {
       blockIdentifier,
       collectionId,
       filterBy,
-      combinedFilters
+      combinedFilters,
+      false,
+      undefined,
+      undefined,
+      undefined
     );
 
     if (creatorAddress) {
@@ -603,10 +607,10 @@ export class StampRepository {
       ident,
       blockIdentifier,
       collectionId,
+      filterBy,
+      combinedFilters,
       isSearchQuery,
       filters,
-      suffixFilters,
-      filterBy,
       editionFilters,
       rarityFilters
     );
