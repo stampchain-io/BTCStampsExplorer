@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { STAMP_EDITIONS, STAMP_FILETYPES } from "$globals";
-import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
 import {
   checkboxIcon,
