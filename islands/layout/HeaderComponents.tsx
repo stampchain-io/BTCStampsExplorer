@@ -13,7 +13,7 @@ export const HamburgerMenuIcon = (
       <style>
         {`
         .hamburger-btn {
-          width: 30px;
+          width: 26px;
           cursor: pointer;
           z-index: 100;
         }
@@ -22,9 +22,8 @@ export const HamburgerMenuIcon = (
           display: block;
           width: 100%;
           height: 4px;
-          border-radius: 0px;
-          background: linear-gradient(90deg, #AA00FF, #8800CC, #660099);
-          transition: all 0.3s;
+          border-radius: 1px;
+          background: linear-gradient(90deg, #AA00FF, #8800CC, #AA00FF);
           position: relative;
         }
         
@@ -33,73 +32,79 @@ export const HamburgerMenuIcon = (
         }
         
         .active span {
-          background: #666666;
+        width: 24px;
+          animation-fill-mode: forwards !important;
         }
 
         .active:hover span {
-          background: #CCCCCC;
+          background: #999999;
         }
 
         .hamburger-btn span + span {
           margin-top: 4px;
         }
         
-        /* Give specific class names to better target each line */
         .active .line-1 {
-          animation: ease 0.2s top forwards;
+        height: 3px;
+          animation: ease 0.3s top forwards;
         }
         
         .not-active .line-1 {
-          animation: ease 0.2s top-2 forwards;
+          animation: ease 0.3s top-2 forwards;
         }
         
         .active .line-2 {
-          animation: ease 0.2s scaled forwards;
+        height: 3px;
+          animation: ease 0.3s scaled forwards;
         }
         
         /* The middle line styling */
         .not-active .line-2 {
           width: 70%;
           margin-left: auto;
-          animation: ease 0.2s scaled-2 forwards;
+          animation: ease 0.3s scaled-2 forwards;
         }
         
         /* Direct hover style for middle line */
         .hamburger-btn:hover .line-2 {
-          width: 100% !important; /* Important to override other styles */
+          width: 100% !important;
           transition: width 0.3s ease;
         }
         
         .active .line-3 {
-          animation: ease 0.2s bottom forwards;
+          height: 3px;
+          animation: ease 0.3s bottom forwards;
         }
         
         .not-active .line-3 {
-          animation: ease 0.2s bottom-2 forwards;
+          animation: ease 0.3s bottom-2 forwards;
         }
 
         @keyframes top {
           0% {
             top: 0;
             transform: rotate(0);
+            background: linear-gradient(90deg, #AA00FF, #8800CC, #AA00FF);
           }
           50% {
-            top: 8px;
+            top: 7px;
             transform: rotate(0);
+            background: #8f5aa9;
           }
           100% {
-            top: 8px;
+            top: 7px;
             transform: rotate(45deg);
+            background: #666666;
           }
         }
         
         @keyframes top-2 {
           0% {
-            top: 8px;
+            top: 7px;
             transform: rotate(45deg);
           }
           50% {
-            top: 8px;
+            top: 7px;
             transform: rotate(0deg);
           }
           100% {
@@ -112,24 +117,27 @@ export const HamburgerMenuIcon = (
           0% {
             bottom: 0;
             transform: rotate(0);
+            background: linear-gradient(90deg, #AA00FF, #8800CC, #AA00FF);
           }
           50% {
-            bottom: 8px;
+            bottom: 7px;
             transform: rotate(0);
+            background: #666666;
           }
           100% {
-            bottom: 8px;
+            bottom: 7px;
             transform: rotate(135deg);
+            background: #666666;
           }
         }
         
         @keyframes bottom-2 {
           0% {
-            bottom: 8px;
+            bottom: 7px;
             transform: rotate(135deg);
           }
           50% {
-            bottom: 8px;
+            bottom: 7px;
             transform: rotate(0);
           }
           100% {
@@ -139,11 +147,17 @@ export const HamburgerMenuIcon = (
         }
         
         @keyframes scaled {
+          0% {
+            transform: scale(1);
+            background: linear-gradient(90deg, #AA00FF, #8800CC, #AA00FF);
+          }
           50% {
             transform: scale(0);
+            background: #666666;
           }
           100% {
             transform: scale(0);
+            background: #666666;
           }
         }
         
