@@ -139,6 +139,28 @@ export class StampController {
       suffixFilters = []; // No suffix filter applied
     }
 
+    // If rarityFilters is undefined but url is provided, check for range parameters
+    if (!rarityFilters && url) {
+      try {
+        const urlObj = new URL(url);
+        const rarityMin = urlObj.searchParams.get("rarity[stampRange][min]");
+        const rarityMax = urlObj.searchParams.get("rarity[stampRange][max]");
+        
+        if (rarityMin || rarityMax) {
+          console.log("Controller detected custom range params:", { rarityMin, rarityMax });
+          rarityFilters = {
+            stampRange: {
+              min: rarityMin || "",
+              max: rarityMax || ""
+            }
+          };
+          console.log("Controller set rarityFilters:", rarityFilters);
+        }
+      } catch (error) {
+        console.error("Error parsing URL in controller:", error);
+      }
+    }
+
     const stampResult = await StampService.getStamps({
       page,
       limit,

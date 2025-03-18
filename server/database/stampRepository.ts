@@ -560,6 +560,8 @@ export class StampRepository {
     filetypeFilters?: STAMP_FILETYPES[];
     editionFilters?: STAMP_EDITIONS[];
     rarityFilters?: STAMP_RARITY;
+    directRarityMin?: string;
+    directRarityMax?: string;
   }) {
     // Extract all parameters including both filter types
     const {
@@ -590,6 +592,8 @@ export class StampRepository {
       filetypeFilters = [],
       editionFilters = [],
       rarityFilters,
+      directRarityMin,
+      directRarityMax,
     } = options;
 
     // Combine both filter types for processing
@@ -618,6 +622,20 @@ export class StampRepository {
     if (creatorAddress) {
       whereConditions.push("st.creator = ?");
       queryParams.push(creatorAddress);
+    }
+
+    // Use either the object or direct parameters
+    let effectiveRarityFilters = rarityFilters;
+    
+    // If no rarityFilters but direct parameters are provided, use those
+    if (!effectiveRarityFilters && (directRarityMin || directRarityMax)) {
+      effectiveRarityFilters = {
+        stampRange: {
+          min: directRarityMin || "",
+          max: directRarityMax || ""
+        }
+      };
+      console.log("Repository created rarity filters:", effectiveRarityFilters);
     }
 
     // Core stamp fields that are always needed
@@ -781,6 +799,10 @@ export class StampRepository {
         ${offsetClause}
       `;
     }
+
+    // Near the end of the getStamps method, right before executing the query
+    console.log("[SQL DEBUG] Final SQL query:", query);
+    console.log("[SQL DEBUG] With parameters:", queryParams);
 
     // Execute the data query
     const dataResult = await dbManager.executeQueryWithCache(
@@ -1213,41 +1235,66 @@ export class StampRepository {
     whereConditions: string[],
     queryParams: (string | number)[]
   ) {
-    // Handle preset range (string value)
-    if (typeof rarityFilters === 'string') {
-      switch (rarityFilters) {
+    console.log("[RARITY DEBUG] Starting buildRarityFilterConditions with:", rarityFilters);
+    console.log("[RARITY DEBUG] Type of rarityFilters:", typeof rarityFilters);
+    console.log("[RARITY DEBUG] Initial whereConditions:", [...whereConditions]);
+    
+    // Handle both string and number preset values
+    if (typeof rarityFilters === 'string' || typeof rarityFilters === 'number') {
+      console.log("[RARITY DEBUG] Processing value:", rarityFilters);
+      
+      switch (String(rarityFilters)) {
         case "100":
+          console.log("[RARITY DEBUG] Case 100 matched");
           whereConditions.push("(st.stamp < 100 AND st.stamp >= 0)");
           break;
         case "1000":
+          console.log("[RARITY DEBUG] Case 1000 matched");
           whereConditions.push("(st.stamp < 1000 AND st.stamp >= 100)");
           break;
         case "5000":
+          console.log("[RARITY DEBUG] Case 5000 matched");
           whereConditions.push("(st.stamp < 5000 AND st.stamp >= 1000)");
           break;
         case "10000":
+          console.log("[RARITY DEBUG] Case 10000 matched");
           whereConditions.push("(st.stamp < 10000 AND st.stamp >= 5000)");
           break;
+        default:
+          console.log("[RARITY DEBUG] No case matched for value:", rarityFilters);
       }
     }
     // Handle custom stamp range (object value)
     else if (typeof rarityFilters === 'object' && rarityFilters && 'stampRange' in rarityFilters) {
+      console.log("[RARITY DEBUG] Processing as object with stampRange:", rarityFilters);
+      
       const { min, max } = rarityFilters.stampRange;
       const rangeConditions = [];
       
       if (min !== undefined && min !== null && min !== '') {
+        console.log("[RARITY DEBUG] Adding min condition:", min);
         rangeConditions.push("st.stamp >= ?");
         queryParams.push(Number(min));
       }
       
       if (max !== undefined && max !== null && max !== '') {
+        console.log("[RARITY DEBUG] Adding max condition:", max);
         rangeConditions.push("st.stamp <= ?");
         queryParams.push(Number(max));
       }
       
       if (rangeConditions.length > 0) {
-        whereConditions.push(`(${rangeConditions.join(" AND ")})`);
+        const condition = `(${rangeConditions.join(" AND ")})`;
+        console.log("[RARITY DEBUG] Adding range condition:", condition);
+        whereConditions.push(condition);
+      } else {
+        console.log("[RARITY DEBUG] No range conditions added");
       }
+    } else {
+      console.log("[RARITY DEBUG] rarityFilters not handled:", rarityFilters);
     }
+    
+    console.log("[RARITY DEBUG] Final whereConditions:", [...whereConditions]);
+    console.log("[RARITY DEBUG] Final queryParams:", [...queryParams]);
   }
 }

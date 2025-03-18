@@ -46,7 +46,7 @@ export const CloseIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 32 32"
-    class="size-7 tablet:size-6 hover:fill-stamp-grey-light"
+    class="size-7 tablet:size-6 hover:fill-stamp-grey-light transform transition-colors duration-300"
     role="button"
     aria-label="Close Filter"
     fill="url(#closeFilterGradient)"

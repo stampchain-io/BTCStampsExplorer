@@ -132,7 +132,32 @@ export class StampService {
     filetypeFilters?: STAMP_FILETYPES[];
     editionFilters?: STAMP_EDITIONS[];
     rarityFilters?: STAMP_RARITY;
+    url?: string;
   }) {
+    // Extract rarity parameters from URL if not already set
+    let rarityFilters = options.rarityFilters;
+    
+    if (!rarityFilters && options.url) {
+      try {
+        const url = new URL(options.url);
+        const rarityMin = url.searchParams.get("rarity[stampRange][min]");
+        const rarityMax = url.searchParams.get("rarity[stampRange][max]");
+        
+        if (rarityMin || rarityMax) {
+          console.log("Service extracting rarity params:", { rarityMin, rarityMax });
+          rarityFilters = {
+            stampRange: {
+              min: rarityMin || "",
+              max: rarityMax || ""
+            }
+          };
+          console.log("Service created rarityFilters:", rarityFilters);
+        }
+      } catch (error) {
+        console.error("Error extracting rarity from URL:", error);
+      }
+    }
+
     const queryOptions = {
       ...options,
       // Add collection query defaults if needed
@@ -142,6 +167,17 @@ export class StampService {
       } : {}),
     };
 
+    if (options.url) {
+      const url = new URL(options.url);
+      console.log("All URL params in service:", Object.fromEntries(url.searchParams.entries()));
+      console.log("Rarity params:", {
+        min: url.searchParams.get("rarity[stampRange][min]"),
+        max: url.searchParams.get("rarity[stampRange][max]")
+      });
+    }
+
+    console.log("About to call repository with rarityFilters:", rarityFilters);
+
     const [result, lastBlock] = await Promise.all([
       StampRepository.getStamps({
         ...queryOptions,
@@ -150,7 +186,7 @@ export class StampService {
         cacheDuration: options.cacheDuration,
         filetypeFilters: options.filetypeFilters,
         editionFilters: options.editionFilters,
-        rarityFilters: options.rarityFilters,
+        rarityFilters: rarityFilters,
       }),
       BlockService.getLastBlock(),
     ]);
