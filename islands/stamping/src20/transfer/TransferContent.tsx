@@ -251,6 +251,7 @@ export function TransferContent(
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20"
+          fromPage="src20_transfer"
           fileType="application/json"
           fileSize={undefined}
           issuance={undefined}
