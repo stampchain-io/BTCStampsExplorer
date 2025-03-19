@@ -246,14 +246,11 @@ const FilterDrawer = (
     } else {
       // Log Stamp-specific properties
       const stampFilters = currentFilters as StampFilters;
-      console.log(
-        "Price range min value before query params:",
-        stampFilters.market.priceRange.min,
-      );
-      console.log(
-        "Price range min type before query params:",
-        typeof stampFilters.market.priceRange.min,
-      );
+      console.log("Market filters:", stampFilters.market);
+      console.log("Market min value:", stampFilters.marketMin);
+      console.log("Market max value:", stampFilters.marketMax);
+      console.log("Market min type:", typeof stampFilters.marketMin);
+      console.log("Market max type:", typeof stampFilters.marketMax);
     }
 
     const queryString = getFiltersToQueryParams(
@@ -419,14 +416,6 @@ const FilterDrawer = (
               console.log(
                 "filters changed in FilterDrawer:",
                 JSON.stringify(filters, null, 2),
-              );
-              console.log(
-                "Price range min value:",
-                filters.market.priceRange.min,
-              );
-              console.log(
-                "Price range min type:",
-                typeof filters.market.priceRange.min,
               );
               setCurrentFilters(filters);
             }}

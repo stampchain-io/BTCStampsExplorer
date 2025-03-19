@@ -72,26 +72,7 @@ export type STAMP_MARKET =
   | "atomic" // Maps to transactions with psbt format in transactions table
   | "dispensers" // Maps to entries in the dispensers table with active give_remaining
   | "listings" // Maps to active sale listings in transactions table with specific status
-  | "sales" // Maps to completed sales in transactions table with confirmed status
-  | "price range"; // Maps to price filters across all market types using btc_amount/satoshirate fields
-// Price Range filters: atomic, dispensers, listings and sales - depending on what is selected (one or multiple)
-// Include "Price Range" min/max values
-// DB mapping details:
-// - atomic: Uses transactions.btc_amount where type indicates atomic swap
-// - dispensers: Uses dispensers.satoshirate or dispensers.btcrate
-// - listings: Uses transactions.btc_amount where status indicates active listing
-// - sales: Uses transactions.btc_amount where status indicates completed sale
-// - price range: Applied to the appropriate field based on selected market types
-// market: {
-//  atomic: boolean;
-//  dispenser: boolean;
-//  listings: boolean;
-//  sales: boolean;
-//  priceRange: {
-//    min: string | number;
-//    max: string | number;
-//  }
-// }
+  | "sales"; // Maps to completed sales in transactions table with confirmed status
 
 export type STAMP_FILETYPES =
   | "jpg" // Maps to StampTableV4.stamp_mimetype = 'image/jpeg'
@@ -169,20 +150,13 @@ export type SRC20_MARKET =
 
 // Full Filter Interfaces
 export interface StampFilters {
-  market?: {
-    atomic?: boolean;
-    dispensers?: boolean;
-    listings?: boolean;
-    sales?: boolean;
-    priceRange?: {
-      min: string | number;
-      max: string | number;
-    };
-  };
+  market: STAMP_MARKET[];
+  marketMin?: string;
+  marketMax?: string;
   filetype?: STAMP_FILETYPES[];
   editions?: STAMP_EDITIONS[];
   rarity?: STAMP_RARITY;
-  search?: string; // Maps to various fields like cpid, creator, stamp
+  search?: string;
 }
 
 export interface SRC20Filters {

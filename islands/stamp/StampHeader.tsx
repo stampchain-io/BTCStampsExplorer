@@ -38,6 +38,19 @@ export const StampHeader = (
     }
   }
 
+  // Handle market parameter (count each market selection)
+  if (searchparams.has("market")) {
+    const markets = searchparams.get("market");
+    if (markets) {
+      filterCount += markets.split(",").length;
+    }
+  }
+
+  // Handle market price range (count as one filter if either min or max is set)
+  if (searchparams.has("marketMin") || searchparams.has("marketMax")) {
+    filterCount += 1;
+  }
+
   // Handle rarity parameter (count either preset or custom range values)
   let hasCountedRarity = false;
   if (searchparams.has("rarity")) {
@@ -48,34 +61,11 @@ export const StampHeader = (
   // If not already counted a preset, count min and max separately if they exist
   if (!hasCountedRarity) {
     if (searchparams.has("rarityMin")) {
-      filterCount += 1; // Count min as one filter
-    }
-    if (searchparams.has("rarityMax")) {
-      filterCount += 1; // Count max as one filter
-    }
-  }
-
-  // Handle market filters (still using nested format)
-  const marketFilters = [
-    "market[atomic]",
-    "market[dispenser]",
-    "market[listings]",
-    "market[sales]",
-  ];
-  marketFilters.forEach((key) => {
-    if (searchparams.has(key) && searchparams.get(key) === "true") {
       filterCount += 1;
     }
-  });
-
-  // Handle price range (count as one filter if either min or max is set)
-  let hasCountedPriceRange = false;
-  if (
-    searchparams.has("market[priceRange][min]") ||
-    searchparams.has("market[priceRange][max]")
-  ) {
-    filterCount += 1;
-    hasCountedPriceRange = true;
+    if (searchparams.has("rarityMax")) {
+      filterCount += 1;
+    }
   }
 
   const handleSearchOpen = (open: boolean) => {
