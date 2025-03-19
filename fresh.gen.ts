@@ -106,7 +106,6 @@ import * as $howto_stamp_index from "./routes/howto/stamp/index.tsx";
 import * as $howto_styles from "./routes/howto/styles.ts";
 import * as $howto_transferbitname_index from "./routes/howto/transferbitname/index.tsx";
 import * as $howto_transferstamp_index from "./routes/howto/transferstamp/index.tsx";
-import * as $howto_transfertoken_config from "./routes/howto/transfertoken/config.ts";
 import * as $howto_transfertoken_index from "./routes/howto/transfertoken/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $media_index from "./routes/media/index.tsx";
