@@ -51,19 +51,19 @@ export const StampHeader = (
     filterCount += 1;
   }
 
-  // Handle rarity parameter (count either preset or custom range values)
-  let hasCountedRarity = false;
-  if (searchparams.has("rarity")) {
+  // Handle range parameter (count either preset or custom range values)
+  let hasCountedRange = false;
+  if (searchparams.has("range")) {
     filterCount += 1;
-    hasCountedRarity = true;
+    hasCountedRange = true;
   }
 
   // If not already counted a preset, count min and max separately if they exist
-  if (!hasCountedRarity) {
-    if (searchparams.has("rarityMin")) {
+  if (!hasCountedRange) {
+    if (searchparams.has("rangeMin")) {
       filterCount += 1;
     }
-    if (searchparams.has("rarityMax")) {
+    if (searchparams.has("rangeMax")) {
       filterCount += 1;
     }
   }

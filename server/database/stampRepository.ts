@@ -9,8 +9,8 @@ import {
   StampFilters,
   STAMP_FILETYPES,
   STAMP_EDITIONS,
-  STAMP_RARITY,
-  STAMP_MARKET
+  STAMP_MARKET,
+  STAMP_RANGES
 } from "$globals";
 import { XcpBalance } from "$types/index.d.ts";
 import { summarize_issuances } from "./index.ts";
@@ -26,7 +26,6 @@ import {
 } from "$lib/utils/identifierUtils.ts";
 import { getMimeType, getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
-import type { STAMP_RARITY } from "$/globals.d.ts";
 
 export class StampRepository {
   static sanitize(input: string): string {
@@ -46,9 +45,9 @@ export class StampRepository {
     isSearchQuery?: boolean,
     filters?: StampFilters,
     editionFilters?: STAMP_EDITIONS[],
-    rarityFilters?: STAMP_RARITY,
-    directRarityMin?: string,
-    directRarityMax?: string
+    rangeFilters?: STAMP_RANGES,
+    rangeMin?: string,
+    rangeMax?: string
   ) {
 
     if (identifier !== undefined) {
@@ -277,14 +276,14 @@ export class StampRepository {
       this.buildEditionsFilterConditions(editionFilters, whereConditions, queryParams);
     }
 
-    // Handle rarity filters
-    if (rarityFilters) {
-      this.buildRarityFilterConditions(
-        rarityFilters, 
+    // Handle range filters
+    if (rangeFilters) {
+      this.buildRangeFilterConditions(
+        rangeFilters, 
         whereConditions, 
         queryParams, 
-        directRarityMin, 
-        directRarityMax
+        rangeMin, 
+        rangeMax
       );
     }
   }
@@ -567,9 +566,9 @@ export class StampRepository {
     suffixFilters?: STAMP_SUFFIX_FILTERS[];
     filetypeFilters?: STAMP_FILETYPES[];
     editionFilters?: STAMP_EDITIONS[];
-    rarityFilters?: STAMP_RARITY;
-    directRarityMin?: string;
-    directRarityMax?: string;
+    rangeFilters?: STAMP_RANGES;
+    rangeMin?: string;
+    rangeMax?: string;
     marketFilters?: STAMP_MARKET[];
     marketMin?: string;
     marketMax?: string;
@@ -602,9 +601,9 @@ export class StampRepository {
       suffixFilters = [],
       filetypeFilters = [],
       editionFilters = [],
-      rarityFilters,
-      directRarityMin,
-      directRarityMax,
+      rangeFilters,
+      rangeMin,
+      rangeMax,
       marketFilters,
       marketMin,
       marketMax,
@@ -630,9 +629,9 @@ export class StampRepository {
       isSearchQuery,
       filters,
       editionFilters,
-      rarityFilters,
-      directRarityMin,
-      directRarityMax
+      rangeFilters,
+      rangeMin,
+      rangeMax
     );
 
     if (creatorAddress) {
@@ -641,18 +640,18 @@ export class StampRepository {
     }
 
     // Use either the object or direct parameters
-    let effectiveRarityFilters = rarityFilters;
+    let effectiveRangeFilters = rangeFilters;
     
-    // If no rarityFilters but direct parameters are provided, use those
-    if (!effectiveRarityFilters && (directRarityMin || directRarityMax)) {
-      effectiveRarityFilters = {
+    // If no rangeFilters but direct parameters are provided, use those
+    if (!effectiveRangeFilters && (rangeMin || rangeMax)) {
+      effectiveRangeFilters = {
         sub: "stamp range",
         stampRange: {
-          min: directRarityMin || "",
-          max: directRarityMax || ""
+          min: rangeMin || "",
+          max: rangeMax || ""
         }
-      } as STAMP_RARITY;
-      console.log("Repository created rarity filters:", effectiveRarityFilters);
+      } as STAMP_RANGES;
+      console.log("Repository created range filters:", effectiveRangeFilters);
     }
 
     // Core stamp fields that are always needed
@@ -1098,14 +1097,16 @@ export class StampRepository {
           return "st.stamp_mimetype = 'image/webp'";
         } else if (filetype === "avif") {
           return "st.stamp_mimetype = 'image/avif'";
-        } else if (filetype === "mp3" || filetype === "mpeg") {
-          return "st.stamp_mimetype = 'audio/mpeg'";
         } else if (filetype === "bmp") {
           return "st.stamp_mimetype = 'image/bmp'";
         } else if (filetype === "svg") {
           return "st.stamp_mimetype = 'image/svg+xml'";
         } else if (filetype === "html") {
           return "st.stamp_mimetype = 'text/html'";
+        } else if (filetype === "txt") {
+          return "st.stamp_mimetype = 'text/plain'";
+        } else if (filetype === "mp3" || filetype === "mpeg") {
+          return "st.stamp_mimetype = 'audio/mpeg'";
         }
         return "";
       }).filter(Boolean);
@@ -1169,9 +1170,9 @@ export class StampRepository {
       this.buildEditionsFilterConditions(filters.editions, whereConditions, queryParams);
     }
     
-    // Handle rarity filters
-    if (filters.rarity) {
-      this.buildRarityFilterConditions(filters.rarity, whereConditions, queryParams, undefined, undefined);
+    // Handle range filters
+    if (filters.range) {
+      this.buildRangeFilterConditions(filters.range, whereConditions, queryParams, undefined, undefined);
     }
     
     // Handle market filters
@@ -1247,71 +1248,43 @@ export class StampRepository {
     }
   }
 
-  private static buildRarityFilterConditions(
-    rarityFilters: STAMP_RARITY,
+  private static buildRangeFilterConditions(
+    rangeFilters: STAMP_RANGES,
     whereConditions: string[],
     queryParams: (string | number)[],
-    directRarityMin?: string,
-    directRarityMax?: string
+    rangeMin?: string,
+    rangeMax?: string
   ) {
-    console.log("[RARITY DEBUG] Starting buildRarityFilterConditions with:", rarityFilters);
-    console.log("[RARITY DEBUG] Type of rarityFilters:", typeof rarityFilters);
-    console.log("[RARITY DEBUG] Initial whereConditions:", whereConditions);
-    console.log("[RARITY DEBUG] Custom range values:", { min: directRarityMin, max: directRarityMax });
-    
-    if (typeof rarityFilters === 'string') {
-      console.log("[RARITY DEBUG] Processing value:", rarityFilters);
-      
-      // Add special case for "custom"
-      if (rarityFilters === "custom") {
-        console.log("[RARITY DEBUG] Handling custom case");
-        
-        if (directRarityMin && directRarityMax) {
-          whereConditions.push("(st.supply BETWEEN ? AND ?)");
-          queryParams.push(directRarityMin, directRarityMax);
-        } else if (directRarityMin) {
-          whereConditions.push("(st.supply >= ?)");
-          queryParams.push(directRarityMin);
-        } else if (directRarityMax) {
-          whereConditions.push("(st.supply <= ?)");
-          queryParams.push(directRarityMax);
-        }
-      }
-      // Handle presets
-      else if (rarityFilters === "100") {
-        whereConditions.push("(st.stamp < 100 AND st.stamp >= 0)");
-      }
-      else if (rarityFilters === "1000") {
-        whereConditions.push("(st.stamp < 1000 AND st.stamp >= 100)");
-      }
-      else if (rarityFilters === "5000") {
-        whereConditions.push("(st.stamp < 5000 AND st.stamp >= 1000)");
-      }
-      else if (rarityFilters === "10000") {
-        whereConditions.push("(st.stamp < 10000 AND st.stamp >= 5000)");
+    console.log("[RANGE DEBUG] Starting buildRangeFilterConditions with:", rangeFilters);
+    console.log("[RANGE DEBUG] Type of rangeFilters:", typeof rangeFilters);
+    console.log("[RANGE DEBUG] Initial whereConditions:", whereConditions);
+    console.log("[RANGE DEBUG] Custom range values:", { min: rangeMin, max: rangeMax });
+
+    // Handle preset ranges first
+    if (rangeFilters && rangeFilters !== "custom") {
+      console.log("[RANGE DEBUG] Processing preset range:", rangeFilters);
+      whereConditions.push("(st.stamp < ?)");
+      queryParams.push(rangeFilters);
+      return; // Exit early for preset ranges
+    }
+
+    // Handle custom range
+    if (rangeFilters === "custom" || (rangeMin || rangeMax)) {
+      console.log("[RANGE DEBUG] Handling custom range");
+      if (rangeMin && rangeMax) {
+        whereConditions.push("(st.stamp BETWEEN ? AND ?)");
+        queryParams.push(rangeMin, rangeMax);
+      } else if (rangeMin) {
+        whereConditions.push("(st.stamp >= ?)");
+        queryParams.push(rangeMin);
+      } else if (rangeMax) {
+        whereConditions.push("(st.stamp <= ?)");
+        queryParams.push(rangeMax);
       }
     }
-    // Handle object with stampRange
-    else if (typeof rarityFilters === 'object' && rarityFilters && 'stampRange' in rarityFilters) {
-      // Existing object handling code
-    }
-    
-    // Add these conditions if we have direct min/max values, regardless of rarityFilters
-    if (directRarityMin || directRarityMax) {
-      if (directRarityMin && directRarityMax) {
-        whereConditions.push("(st.supply BETWEEN ? AND ?)");
-        queryParams.push(directRarityMin, directRarityMax);
-      } else if (directRarityMin) {
-        whereConditions.push("(st.supply >= ?)");
-        queryParams.push(directRarityMin);
-      } else if (directRarityMax) {
-        whereConditions.push("(st.supply <= ?)");
-        queryParams.push(directRarityMax);
-      }
-    }
-    
-    console.log("[RARITY DEBUG] Final whereConditions:", whereConditions);
-    console.log("[RARITY DEBUG] Final queryParams:", queryParams);
+
+    console.log("[RANGE DEBUG] Final whereConditions:", whereConditions);
+    console.log("[RANGE DEBUG] Final queryParams:", queryParams);
   }
 
   private static buildMarketFilterConditions(

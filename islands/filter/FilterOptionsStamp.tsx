@@ -2,7 +2,7 @@ import {
   STAMP_EDITIONS,
   STAMP_FILETYPES,
   STAMP_MARKET,
-  STAMP_RARITY,
+  STAMP_RANGES,
 } from "$globals";
 
 export type StampFilters = {
@@ -11,11 +11,9 @@ export type StampFilters = {
   marketMax: string;
   fileType: STAMP_FILETYPES[];
   editions: STAMP_EDITIONS[];
-  rarity: {
-    preset: STAMP_RARITY | null;
-    min: string;
-    max: string;
-  };
+  range: STAMP_RANGES | null;
+  rangeMin: string;
+  rangeMax: string;
   [key: string]: any; // Keep index signature for flexibility
 };
 
@@ -25,11 +23,9 @@ export const defaultFilters: StampFilters = {
   marketMax: "",
   fileType: [],
   editions: [],
-  rarity: {
-    preset: null,
-    min: "",
-    max: "",
-  },
+  range: null,
+  rangeMin: "",
+  rangeMax: "",
 };
 
 export function filtersToQueryParams(
@@ -77,21 +73,23 @@ export function filtersToQueryParams(
     queryParams.delete("editions");
   }
 
-  // RARITY
-  if (filters.rarity.preset) {
-    queryParams.set("rarity", filters.rarity.preset);
+  // RANGE (flattened structure)
+  if (filters.range) {
+    queryParams.set("range", filters.range);
   } else {
-    queryParams.delete("rarity");
-    if (filters.rarity.min) {
-      queryParams.set("rarityMin", filters.rarity.min);
-    } else {
-      queryParams.delete("rarityMin");
-    }
-    if (filters.rarity.max) {
-      queryParams.set("rarityMax", filters.rarity.max);
-    } else {
-      queryParams.delete("rarityMax");
-    }
+    queryParams.delete("range");
+  }
+
+  if (filters.rangeMin) {
+    queryParams.set("rangeMin", filters.rangeMin);
+  } else {
+    queryParams.delete("rangeMin");
+  }
+
+  if (filters.rangeMax) {
+    queryParams.set("rangeMax", filters.rangeMax);
+  } else {
+    queryParams.delete("rangeMax");
   }
 
   const result = queryParams.toString();
@@ -105,19 +103,21 @@ export function filtersToServicePayload(filters: StampFilters) {
   const editionFilters = filters.editions;
   const marketFilters = filters.market;
 
-  // Handle rarity
-  let rarityFilters: STAMP_RARITY | undefined = undefined;
-  if (filters.rarity.preset) {
-    rarityFilters = filters.rarity.preset;
-  } else if (filters.rarity.min || filters.rarity.max) {
-    rarityFilters = "custom";
+  // Handle range
+  let rangeFilters: STAMP_RANGES | undefined = undefined;
+  if (filters.range) {
+    rangeFilters = filters.range;
+  } else if (filters.rangeMin || filters.rangeMax) {
+    rangeFilters = "custom";
   }
 
   const result = {
     ident: [],
     filetypeFilters: filetypeFilters.length > 0 ? filetypeFilters : undefined,
     editionFilters: editionFilters.length > 0 ? editionFilters : undefined,
-    rarityFilters,
+    rangeFilters: rangeFilters || undefined,
+    rangeMin: filters.rangeMin || undefined,
+    rangeMax: filters.rangeMax || undefined,
     marketFilters: marketFilters.length > 0 ? marketFilters : undefined,
     marketMin: filters.marketMin || undefined,
     marketMax: filters.marketMax || undefined,
@@ -141,9 +141,9 @@ export const allQueryKeysFromFilters = [
   "marketMax",
   "filetype",
   "editions",
-  "rarity",
-  "rarityMin",
-  "rarityMax",
+  "range",
+  "rangeMin",
+  "rangeMax",
 ];
 
 export function queryParamsToFilters(query: string): StampFilters {
@@ -154,11 +154,9 @@ export function queryParamsToFilters(query: string): StampFilters {
     marketMax: "",
     fileType: [],
     editions: [],
-    rarity: {
-      preset: null,
-      min: "",
-      max: "",
-    },
+    range: null,
+    rangeMin: "",
+    rangeMax: "",
   };
 
   // Parse market parameter (comma-separated string to array)
@@ -190,23 +188,20 @@ export function queryParamsToFilters(query: string): StampFilters {
     filtersPartial.editions = editionsParam.split(",") as STAMP_EDITIONS[];
   }
 
-  // Parse rarity parameters
-  const rarityPreset = params.get("rarity");
-  const rarityMin = params.get("rarityMin");
-  const rarityMax = params.get("rarityMax");
+  // Parse range parameters (flat structure)
+  const range = params.get("range");
+  if (range) {
+    filtersPartial.range = range as STAMP_RANGES;
+  }
 
-  if (rarityPreset) {
-    filtersPartial.rarity = {
-      preset: rarityPreset as STAMP_RARITY,
-      min: "",
-      max: "",
-    };
-  } else if (rarityMin || rarityMax) {
-    filtersPartial.rarity = {
-      preset: null,
-      min: rarityMin || "",
-      max: rarityMax || "",
-    };
+  const rangeMin = params.get("rangeMin");
+  if (rangeMin) {
+    filtersPartial.rangeMin = rangeMin;
+  }
+
+  const rangeMax = params.get("rangeMax");
+  if (rangeMax) {
+    filtersPartial.rangeMax = rangeMax;
   }
 
   return { ...defaultFilters, ...filtersPartial };

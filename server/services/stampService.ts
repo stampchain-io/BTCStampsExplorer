@@ -7,8 +7,8 @@ import {
   SUBPROTOCOLS,
   STAMP_FILETYPES,
   STAMP_EDITIONS,
-  STAMP_RARITY,
   STAMP_MARKET,
+  STAMP_RANGES,
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
@@ -132,33 +132,34 @@ export class StampService {
     suffixFilters?: STAMP_SUFFIX_FILTERS[];
     filetypeFilters?: STAMP_FILETYPES[];
     editionFilters?: STAMP_EDITIONS[];
-    rarityFilters?: STAMP_RARITY;
-    url?: string;
+    rangeFilters?: STAMP_RANGES;
+    rangeMin?: string;
+    rangeMax?: string;
     marketFilters?: STAMP_MARKET[];
     marketMin?: string;
     marketMax?: string;
   }) {
-    // Extract rarity parameters from URL if not already set
-    let rarityFilters = options.rarityFilters;
+    // Extract range parameters from URL if not already set
+    let rangeFilters = options.rangeFilters;
     
-    if (!rarityFilters && options.url) {
+    if (!rangeFilters && options.url) {
       try {
         const url = new URL(options.url);
-        const rarityMin = url.searchParams.get("rarity[stampRange][min]");
-        const rarityMax = url.searchParams.get("rarity[stampRange][max]");
+        const rangeMin = url.searchParams.get("range[stampRange][min]");
+        const rangeMax = url.searchParams.get("range[stampRange][max]");
         
-        if (rarityMin || rarityMax) {
-          console.log("Service extracting rarity params:", { rarityMin, rarityMax });
-          rarityFilters = {
+        if (rangeMin || rangeMax) {
+          console.log("Service extracting range params:", { rangeMin, rangeMax });
+          rangeFilters = {
             stampRange: {
-              min: rarityMin || "",
-              max: rarityMax || ""
+              min: rangeMin || "",
+              max: rangeMax || ""
             }
           };
-          console.log("Service created rarityFilters:", rarityFilters);
+          console.log("Service created rangeFilters:", rangeFilters);
         }
       } catch (error) {
-        console.error("Error extracting rarity from URL:", error);
+        console.error("Error extracting range from URL:", error);
       }
     }
 
@@ -174,13 +175,13 @@ export class StampService {
     if (options.url) {
       const url = new URL(options.url);
       console.log("All URL params in service:", Object.fromEntries(url.searchParams.entries()));
-      console.log("Rarity params:", {
-        min: url.searchParams.get("rarity[stampRange][min]"),
-        max: url.searchParams.get("rarity[stampRange][max]")
+      console.log("Range params:", {
+        min: url.searchParams.get("range[stampRange][min]"),
+        max: url.searchParams.get("range[stampRange][max]")
       });
     }
 
-    console.log("About to call repository with rarityFilters:", rarityFilters);
+    console.log("About to call repository with rangeFilters:", rangeFilters);
 
     const [result, lastBlock] = await Promise.all([
       StampRepository.getStamps({
@@ -190,7 +191,9 @@ export class StampService {
         cacheDuration: options.cacheDuration,
         filetypeFilters: options.filetypeFilters,
         editionFilters: options.editionFilters,
-        rarityFilters: rarityFilters,
+        rangeFilters: rangeFilters,
+        rangeMin: options.rangeMin,
+        rangeMax: options.rangeMax,
         marketFilters: options.marketFilters,
         marketMin: options.marketMin,
         marketMax: options.marketMax,

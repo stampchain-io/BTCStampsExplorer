@@ -15,8 +15,8 @@ import {
   STAMP_TYPES,
   STAMP_FILETYPES,
   STAMP_EDITIONS,
-  STAMP_RARITY,
   STAMP_MARKET,
+  STAMP_RANGES,
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
@@ -69,9 +69,9 @@ export class StampController {
     url,
     filetypeFilters,
     editionFilters,
-    rarityFilters,
-    directRarityMin,
-    directRarityMax,
+    rangeFilters,
+    rangeMin,
+    rangeMax,
     marketFilters,
     marketMin,
     marketMax,
@@ -98,9 +98,9 @@ export class StampController {
     filterBy?: STAMP_FILTER_TYPES[];
     filetypeFilters?: STAMP_FILETYPES[];
     editionFilters?: STAMP_EDITIONS[];
-    rarityFilters?: STAMP_RARITY;
-    directRarityMin?: string;
-    directRarityMax?: string;
+    rangeFilters?: STAMP_RANGES;
+    rangeMin?: string;
+    rangeMax?: string;
     marketFilters?: STAMP_MARKET[];
     marketMin?: string;
     marketMax?: string;
@@ -117,15 +117,15 @@ export class StampController {
       url,
       filetypeFilters,
       editionFilters,
-      rarityFilters,
-      directRarityMin,
-      directRarityMax,
+      rangeFilters,
+      rangeMin,
+      rangeMax,
       marketFilters,
       marketMin,
       marketMax
     });
     
-    console.log("About to call repository with rarityFilters:", rarityFilters);
+    console.log("About to call repository with rangeFilters:", rangeFilters);
     
     const filterByArray = typeof filterBy === "string"
       ? filterBy.split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
@@ -171,22 +171,22 @@ export class StampController {
       suffixFilters = []; // No suffix filter applied
     }
 
-    // If rarityFilters is undefined but url is provided, check for range parameters
-    if (!rarityFilters && url) {
+    // If rangeFilters is undefined but url is provided, check for range parameters
+    if (!rangeFilters && url) {
       try {
         const urlObj = new URL(url);
-        const rarityMin = urlObj.searchParams.get("rarity[stampRange][min]");
-        const rarityMax = urlObj.searchParams.get("rarity[stampRange][max]");
+        const rangeMin = urlObj.searchParams.get("range[stampRange][min]");
+        const rangeMax = urlObj.searchParams.get("range[stampRange][max]");
         
-        if (rarityMin || rarityMax) {
-          console.log("Controller detected custom range params:", { rarityMin, rarityMax });
-          rarityFilters = {
+        if (rangeMin || rangeMax) {
+          console.log("Controller detected custom range params:", { rangeMin, rangeMax });
+          rangeFilters = {
             stampRange: {
-              min: rarityMin || "",
-              max: rarityMax || ""
+              min: rangeMin || "",
+              max: rangeMax || ""
             }
           };
-          console.log("Controller set rarityFilters:", rarityFilters);
+          console.log("Controller set rangeFilters:", rangeFilters);
         }
       } catch (error) {
         console.error("Error parsing URL in controller:", error);
@@ -218,9 +218,9 @@ export class StampController {
       filterBy: filterByArray,
       filetypeFilters,
       editionFilters,
-      rarityFilters,
-      directRarityMin,
-      directRarityMax,
+      rangeFilters,
+      rangeMin,
+      rangeMax,
       marketFilters,
       marketMin,
       marketMax

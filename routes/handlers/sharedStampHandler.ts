@@ -8,7 +8,7 @@ import {
   STAMP_EDITIONS,
   STAMP_FILETYPES,
   STAMP_MARKET,
-  STAMP_RARITY,
+  STAMP_RANGES,
 } from "$globals";
 
 type StampHandlerConfig = {
@@ -65,7 +65,7 @@ export const createStampHandler = (
         pathname: url.pathname,
         params: Object.fromEntries(
           [...url.searchParams.entries()].filter(([key]) =>
-            key.includes("rarity") || key === "type"
+            key.includes("range") || key === "type"
           ),
         ),
         headers: Object.fromEntries([...req.headers.entries()]),
@@ -75,7 +75,7 @@ export const createStampHandler = (
         "All URL parameters:",
         Object.fromEntries(url.searchParams.entries()),
       );
-      console.log("Rarity parameter:", url.searchParams.get("rarity[sub]"));
+      console.log("Range parameter:", url.searchParams.get("range[sub]"));
       console.log(
         "Filetype parameter:",
         url.searchParams.get("filetypeFilters"),
@@ -88,20 +88,20 @@ export const createStampHandler = (
         "URL parameters:",
         Object.fromEntries(url.searchParams.entries()),
       );
-      console.log("Rarity sub value:", url.searchParams.get("rarity[sub]"));
+      console.log("Range sub value:", url.searchParams.get("range[sub]"));
 
       // Try different ways to extract the parameter
       console.log(
         "Direct parameter access:",
-        url.searchParams.get("rarity[sub]"),
+        url.searchParams.get("range[sub]"),
       );
 
       // Try using entries to see all parameters
       for (const [key, value] of url.searchParams.entries()) {
         console.log(`Parameter: ${key} = ${value}`);
-        // Check if any key contains "rarity"
-        if (key.includes("rarity")) {
-          console.log("Found rarity-related parameter:", key, value);
+        // Check if any key contains "range"
+        if (key.includes("range")) {
+          console.log("Found range-related parameter:", key, value);
         }
       }
 
@@ -140,21 +140,21 @@ export const createStampHandler = (
         const marketMin = url.searchParams.get("marketMin") || undefined;
         const marketMax = url.searchParams.get("marketMax") || undefined;
 
-        // Extract rarity filters
-        const rarityPreset = url.searchParams.get("rarityPreset") || "";
-        const rarityMin = url.searchParams.get("rarityMin") || "";
-        const rarityMax = url.searchParams.get("rarityMax") || "";
+        // Extract range filters
+        const rangePreset = url.searchParams.get("rangePreset") || "";
+        const rangeMin = url.searchParams.get("rangeMin") || "";
+        const rangeMax = url.searchParams.get("rangeMax") || "";
 
-        let rarityFilters: STAMP_RARITY | undefined = undefined;
+        let rangeFilters: STAMP_RANGES | undefined = undefined;
 
-        // Set rarityFilters based on preset or custom values
+        // Set rangeFilters based on preset or custom values
         if (
-          rarityPreset &&
-          ["100", "1000", "5000", "10000"].includes(rarityPreset as any)
+          rangePreset &&
+          ["100", "1000", "5000", "10000"].includes(rangePreset as any)
         ) {
-          rarityFilters = rarityPreset as STAMP_RARITY;
-        } else if (rarityMin || rarityMax) {
-          rarityFilters = "custom";
+          rangeFilters = rangePreset as STAMP_RANGES;
+        } else if (rangeMin || rangeMax) {
+          rangeFilters = "custom";
         }
 
         // Important part: Pass the min/max values directly to the controller
@@ -172,9 +172,9 @@ export const createStampHandler = (
           marketFilters,
           marketMin,
           marketMax,
-          rarityFilters,
-          directRarityMin: rarityMin,
-          directRarityMax: rarityMax,
+          rangeFilters,
+          rangeMin,
+          rangeMax,
         });
 
         // Return the normal result

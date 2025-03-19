@@ -311,9 +311,13 @@ export const RangeButtons = ({
 export const RangeSlider = ({
   variant,
   onChange,
+  initialMin,
+  initialMax,
 }: {
-  variant: "holders" | "price" | "rarity";
+  variant: "holders" | "price" | "range";
   onChange?: (min: number, max: number) => void;
+  initialMin?: number;
+  initialMax?: number;
 }) => {
   // Define range configurations for different variants
   const rangeConfigs = {
@@ -357,8 +361,8 @@ export const RangeSlider = ({
         );
       },
     },
-    // Rarity configuration
-    rarity: {
+    // range configuration
+    range: {
       min: 0,
       max: Infinity,
       segments: [
@@ -383,65 +387,19 @@ export const RangeSlider = ({
   // Get the configuration for the current variant
   const config = rangeConfigs[variant];
 
-  // Initialize state with the min and max values from the config
-  const [minValue, setMinValue] = useState(config.min);
-  const [maxValue, setMaxValue] = useState(config.max);
+  // Track both current and pending values
+  const [minValue, setMinValue] = useState(initialMin || config.min);
+  const [maxValue, setMaxValue] = useState(initialMax || config.max);
+  const [pendingMin, setPendingMin] = useState(initialMin || config.min);
+  const [pendingMax, setPendingMax] = useState(initialMax || config.max);
+  const [isDragging, setIsDragging] = useState(false);
   const [hoveredHandle, setHoveredHandle] = useState<"min" | "max" | null>(
     null,
   );
-  const sliderRef = useRef<HTMLDivElement>(null);
-
-  // Add this state to track which handle was last changed
   const [lastChangedHandle, setLastChangedHandle] = useState<
     "min" | "max" | null
   >(null);
-
-  // Add these states while preserving existing ones
-  const [isDragging, setIsDragging] = useState(false);
-  const [pendingMin, setPendingMin] = useState<number>(config.min);
-  const [pendingMax, setPendingMax] = useState<number>(maxValue);
-
-  // Add event listeners for mouse up
-  useEffect(() => {
-    const handleMouseUp = () => {
-      if (isDragging) {
-        setIsDragging(false);
-        // Preserve decimal precision when triggering onChange
-        if (variant === "price") {
-          // Use the same precision rules we established before
-          const finalMin = pendingMin < 0.0001
-            ? Number(pendingMin.toFixed(6))
-            : pendingMin < 0.01
-            ? Number(pendingMin.toFixed(5))
-            : Number(pendingMin.toFixed(3));
-
-          const finalMax = pendingMax === Infinity
-            ? Infinity
-            : pendingMax < 0.0001
-            ? Number(pendingMax.toFixed(6))
-            : pendingMax < 0.01
-            ? Number(pendingMax.toFixed(5))
-            : Number(pendingMax.toFixed(3));
-
-          onChange?.(finalMin, finalMax);
-        } else {
-          // For non-price variants (rarity, holders), use integer values
-          onChange?.(
-            Math.round(pendingMin),
-            Math.round(pendingMax === Infinity ? Infinity : pendingMax),
-          );
-        }
-      }
-    };
-
-    globalThis.addEventListener("mouseup", handleMouseUp);
-    globalThis.addEventListener("touchend", handleMouseUp);
-
-    return () => {
-      globalThis.removeEventListener("mouseup", handleMouseUp);
-      globalThis.removeEventListener("touchend", handleMouseUp);
-    };
-  }, [isDragging, pendingMin, pendingMax, onChange, variant]);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   // Convert actual value to slider position (0-100)
   const valueToPosition = (value: number): number => {
@@ -523,7 +481,7 @@ export const RangeSlider = ({
     if (variant === "price") {
       return 0.000001; // Smallest step for price
     }
-    return 1; // Default step for holders and rarity
+    return 1; // Default step for holders and range
   };
 
   // Modify the handle functions while preserving decimal precision
@@ -532,15 +490,13 @@ export const RangeSlider = ({
     const sliderValue = parseInt((e.target as HTMLInputElement).value);
     const newMin = positionToValue(sliderValue);
 
-    // Ensure new min value doesn't exceed max value minus minimum step
     const minStep = getMinStep();
-    // Special handling for Infinity case
-    const clampedMin = maxValue === Infinity
+    const clampedMin = pendingMax === Infinity
       ? newMin
-      : Math.min(newMin, maxValue - minStep * 10);
+      : Math.min(newMin, pendingMax - minStep * 10);
 
-    setMinValue(clampedMin);
     setPendingMin(clampedMin);
+    setMinValue(clampedMin);
     setLastChangedHandle("min");
   };
 
@@ -549,22 +505,59 @@ export const RangeSlider = ({
     const sliderValue = parseInt((e.target as HTMLInputElement).value);
     const newMax = positionToValue(sliderValue);
 
-    // Special handling for Infinity and near-Infinity cases
     if (sliderValue >= 99.5) {
-      setMaxValue(Infinity);
       setPendingMax(Infinity);
+      setMaxValue(Infinity);
       setLastChangedHandle("max");
       return;
     }
 
-    // Ensure new max value doesn't go below min value plus minimum step
     const minStep = getMinStep();
-    const clampedMax = Math.max(newMax, minValue + minStep * 10);
+    const clampedMax = Math.max(newMax, pendingMin + minStep * 10);
 
-    setMaxValue(clampedMax);
     setPendingMax(clampedMax);
+    setMaxValue(clampedMax);
     setLastChangedHandle("max");
   };
+
+  // Update useEffect to handle final value updates
+  useEffect(() => {
+    const handleMouseUp = () => {
+      if (isDragging) {
+        setIsDragging(false);
+        if (variant === "price") {
+          const finalMin = pendingMin < 0.0001
+            ? Number(pendingMin.toFixed(6))
+            : pendingMin < 0.01
+            ? Number(pendingMin.toFixed(5))
+            : Number(pendingMin.toFixed(3));
+
+          const finalMax = pendingMax === Infinity
+            ? Infinity
+            : pendingMax < 0.0001
+            ? Number(pendingMax.toFixed(6))
+            : pendingMax < 0.01
+            ? Number(pendingMax.toFixed(5))
+            : Number(pendingMax.toFixed(3));
+
+          onChange?.(finalMin, finalMax);
+        } else {
+          onChange?.(
+            Math.round(pendingMin),
+            pendingMax === Infinity ? Infinity : Math.round(pendingMax),
+          );
+        }
+      }
+    };
+
+    globalThis.addEventListener("mouseup", handleMouseUp);
+    globalThis.addEventListener("touchend", handleMouseUp);
+
+    return () => {
+      globalThis.removeEventListener("mouseup", handleMouseUp);
+      globalThis.removeEventListener("touchend", handleMouseUp);
+    };
+  }, [isDragging, pendingMin, pendingMax, onChange, variant]);
 
   // Define the gradient colors
   const trackGradientFill = (hoveredHandle: "min" | "max" | null) => {

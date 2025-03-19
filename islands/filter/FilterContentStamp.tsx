@@ -3,7 +3,7 @@ import {
   STAMP_EDITIONS,
   STAMP_FILETYPES,
   STAMP_MARKET,
-  STAMP_RARITY,
+  STAMP_RANGES,
 } from "$globals";
 import {
   checkboxIcon,
@@ -23,11 +23,9 @@ const defaultFilters: StampFilters = {
   marketMax: "",
   fileType: [],
   editions: [],
-  rarity: {
-    preset: null,
-    min: "",
-    max: "",
-  },
+  range: null,
+  rangeMin: "",
+  rangeMax: "",
 };
 
 export function filtersToQueryParams(search: string, filters: StampFilters) {
@@ -67,21 +65,23 @@ export function filtersToQueryParams(search: string, filters: StampFilters) {
     queryParams.delete("editions");
   }
 
-  // RARITY
-  if (filters.rarity.preset) {
-    queryParams.set("rarity", filters.rarity.preset);
+  // RANGE
+  if (filters.range) {
+    queryParams.set("range", filters.range);
   } else {
-    queryParams.delete("rarity");
-    if (filters.rarity.min) {
-      queryParams.set("rarityMin", filters.rarity.min);
-    } else {
-      queryParams.delete("rarityMin");
-    }
-    if (filters.rarity.max) {
-      queryParams.set("rarityMax", filters.rarity.max);
-    } else {
-      queryParams.delete("rarityMax");
-    }
+    queryParams.delete("range");
+  }
+
+  if (filters.rangeMin) {
+    queryParams.set("rangeMin", filters.rangeMin);
+  } else {
+    queryParams.delete("rangeMin");
+  }
+
+  if (filters.rangeMax) {
+    queryParams.set("rangeMax", filters.rangeMax);
+  } else {
+    queryParams.delete("rangeMax");
   }
 
   return queryParams.toString();
@@ -216,9 +216,9 @@ export const allQueryKeysFromFilters = [
   "marketMax",
   "filetype",
   "editions",
-  "rarity",
-  "rarityMin",
-  "rarityMax",
+  "range",
+  "rangeMin",
+  "rangeMax",
 ];
 
 export function queryParamsToFilters(query: string): StampFilters {
@@ -249,20 +249,20 @@ export function queryParamsToFilters(query: string): StampFilters {
     filters.marketMax = marketMax;
   }
 
-  // Parse rarity params
-  const rarityPreset = params.get("rarity");
-  if (rarityPreset) {
-    filters.rarity.preset = rarityPreset;
+  // Parse range parameters (flat structure)
+  const range = params.get("range");
+  if (range) {
+    filters.range = range as STAMP_RANGES;
   }
 
-  const rarityMin = params.get("rarityMin");
-  if (rarityMin) {
-    filters.rarity.min = rarityMin;
+  const rangeMin = params.get("rangeMin");
+  if (rangeMin) {
+    filters.rangeMin = rangeMin;
   }
 
-  const rarityMax = params.get("rarityMax");
-  if (rarityMax) {
-    filters.rarity.max = rarityMax;
+  const rangeMax = params.get("rangeMax");
+  if (rangeMax) {
+    filters.rangeMax = rangeMax;
   }
 
   // Parse editions parameter (comma-separated string to array)
@@ -282,7 +282,7 @@ export function queryParamsToServicePayload(search: string) {
     fileTypes: filters.fileType,
     market: filters.market,
     editions: filters.editions,
-    rarity: filters.rarity,
+    range: filters.range,
     priceRange: filters.market.length > 0
       ? { min: filters.marketMin, max: filters.marketMax }
       : undefined,
@@ -341,10 +341,10 @@ function hasActiveFilters(section: string, filters: StampFilters): boolean {
       return filters.fileType.length > 0;
     case "editions":
       return filters.editions.length > 0;
-    case "rarity":
-      return filters.rarity.preset !== null ||
-        filters.rarity.min !== "" ||
-        filters.rarity.max !== "";
+    case "range":
+      return filters.range !== null ||
+        filters.rangeMin !== "" ||
+        filters.rangeMax !== "";
     default:
       return false;
   }
@@ -358,20 +358,37 @@ export const FilterContentStamp = ({
   onFiltersChange: (filters: StampFilters) => void;
 }) => {
   const [filters, setFilters] = useState(initialFilters);
+  const [expandedSections, setExpandedSections] = useState({
+    fileType: hasActiveFilters("fileType", filters),
+    editions: hasActiveFilters("editions", filters),
+    range: hasActiveFilters("range", filters),
+    market: hasActiveFilters("market", filters),
+    customRange: filters.rangeMin !== "" || filters.rangeMax !== "",
+    priceRange: hasActiveFilters("priceRange", filters),
+  });
 
   // Watch for changes to initialFilters
   useEffect(() => {
     setFilters(initialFilters);
-  }, [initialFilters]);
 
-  const [expandedSections, setExpandedSections] = useState({
-    fileType: hasActiveFilters("fileType", filters),
-    editions: hasActiveFilters("editions", filters),
-    rarity: hasActiveFilters("rarity", filters),
-    market: hasActiveFilters("market", filters),
-    customRange: hasActiveFilters("customRange", filters),
-    priceRange: hasActiveFilters("priceRange", filters),
-  });
+    // When filters are cleared, explicitly reset min/max values in RangeSlider
+    if (
+      !initialFilters.range && !initialFilters.rangeMin &&
+      !initialFilters.rangeMax
+    ) {
+      // Force RangeSlider to reset by updating its key
+      setExpandedSections((prev) => ({
+        ...prev,
+        customRange: false, // Close the custom range section
+      }));
+    } else {
+      setExpandedSections((prev) => ({
+        ...prev,
+        customRange: initialFilters.rangeMin !== "" ||
+          initialFilters.rangeMax !== "",
+      }));
+    }
+  }, [initialFilters]);
 
   const handleFilterChange = (
     category: keyof typeof defaultFilters,
@@ -399,7 +416,7 @@ export const FilterContentStamp = ({
   };
 
   const [isDraggingPrice, setIsDraggingPrice] = useState(false);
-  const [isDraggingRarity, setIsDraggingRarity] = useState(false);
+  const [isDraggingRange, setIsDraggingRange] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -410,9 +427,9 @@ export const FilterContentStamp = ({
         setIsDraggingPrice(false);
       }
 
-      if (isDraggingRarity) {
+      if (isDraggingRange) {
         // Reset dragging state
-        setIsDraggingRarity(false);
+        setIsDraggingRange(false);
       }
     };
 
@@ -425,7 +442,7 @@ export const FilterContentStamp = ({
       globalThis.removeEventListener("mouseup", handleMouseUp);
       globalThis.removeEventListener("mouseleave", handleMouseUp);
     };
-  }, [isDraggingPrice, isDraggingRarity]);
+  }, [isDraggingPrice, isDraggingRange]);
 
   const handlePriceRangeChange = (min: number, max: number) => {
     setFilters((prevFilters) => {
@@ -439,25 +456,62 @@ export const FilterContentStamp = ({
     });
   };
 
-  const handleRarityRangeChange = (min: number, max: number) => {
-    console.log("Rarity range changed:", {
-      min,
-      max,
-      minStr: min.toString(),
-      maxStr: max === Infinity ? "" : max.toString(),
-    });
+  const handleRangeChange = (value: string | null) => {
+    setFilters((prevFilters) => {
+      // If clicking the same value, clear it
+      if (prevFilters.range === value) {
+        const newFilters = {
+          ...prevFilters,
+          range: null,
+          rangeMin: "",
+          rangeMax: "",
+        };
+        onFiltersChange(newFilters);
+        return newFilters;
+      }
 
-    // Create new state with both the new flat format and transitional structure
+      // Otherwise set the new value
+      const newFilters = {
+        ...prevFilters,
+        range: value as STAMP_RANGES | null,
+        rangeMin: "",
+        rangeMax: "",
+      };
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
+  const handleCustomRangeToggle = () => {
+    setFilters((prevFilters) => {
+      // If custom range is active, clear it
+      if (prevFilters.rangeMin || prevFilters.rangeMax) {
+        const newFilters = {
+          ...prevFilters,
+          range: null,
+          rangeMin: "",
+          rangeMax: "",
+        };
+        onFiltersChange(newFilters);
+        return newFilters;
+      }
+
+      // Otherwise just toggle the section
+      setExpandedSections((prev) => ({
+        ...prev,
+        customRange: true,
+      }));
+      return prevFilters;
+    });
+  };
+
+  const handleRangeSliderChange = (min: number, max: number) => {
     setFilters((prevFilters) => {
       const newFilters = {
         ...prevFilters,
-        rarity: {
-          ...prevFilters.rarity,
-          // New flat format
-          preset: null,
-          min: min.toString(),
-          max: max === Infinity ? "" : max.toString(),
-        },
+        range: null,
+        rangeMin: min.toString(),
+        rangeMax: max === Infinity ? "" : max.toString(),
       };
 
       // Important: update parent component state
@@ -503,58 +557,6 @@ export const FilterContentStamp = ({
         ...prevFilters,
         editions: newEditions,
       };
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
-  };
-
-  // Update rarity handling
-  const handleRarityChange = (value: string | null, isCustomRange = false) => {
-    setFilters((prevFilters) => {
-      let newRarity;
-
-      if (isCustomRange) {
-        // For custom range toggle
-        if (
-          prevFilters.rarity.preset === null &&
-          (prevFilters.rarity.min !== "" || prevFilters.rarity.max !== "")
-        ) {
-          // Clear custom range if it was active
-          newRarity = {
-            preset: null,
-            min: "",
-            max: "",
-          };
-        } else {
-          // Enable custom range with empty values
-          newRarity = {
-            preset: null,
-            min: "",
-            max: "",
-          };
-        }
-      } else if (value === prevFilters.rarity.preset) {
-        // Deselect if already selected
-        newRarity = {
-          preset: null,
-          min: "",
-          max: "",
-        };
-      } else {
-        // Select new preset and reset custom range
-        newRarity = {
-          preset: value,
-          min: "",
-          max: "",
-        };
-      }
-
-      const newFilters = {
-        ...prevFilters,
-        rarity: newRarity,
-      };
-
-      // Important: Call onFiltersChange to update parent state
       onFiltersChange(newFilters);
       return newFilters;
     });
@@ -784,75 +786,54 @@ export const FilterContentStamp = ({
       </CollapsibleSection>
 
       <CollapsibleSection
-        title="RARITY"
-        section="rarity"
-        expanded={expandedSections.rarity}
-        toggle={() => toggleSection("rarity")}
+        title="RANGE"
+        section="range"
+        expanded={expandedSections.range}
+        toggle={() => toggleSection("range")}
         variant="collapsibleTitle"
       >
-        {/* Standard Radio Buttons */}
+        {/* Preset ranges */}
         {[100, 1000, 5000, 10000].map((value) => (
           <Radio
             key={value}
             label={`< ${value}`}
             value={value.toString()}
-            name="rarity"
-            checked={filters.rarity.preset === value.toString()}
-            onChange={() => handleRarityChange(value.toString())}
+            name="range"
+            checked={filters.range === value.toString()}
+            onChange={() => handleRangeChange(value.toString())}
           />
         ))}
 
-        {/* Custom Range Radio Button */}
+        {/* Custom range option */}
         <Radio
           label="STAMP RANGE"
-          value="stamp range"
-          name="rarity"
-          checked={filters.rarity.preset === null &&
-            (filters.rarity.min !== "" || filters.rarity.max !== "")}
-          onChange={() => {
-            // Toggle custom range selection
-            if (
-              filters.rarity.preset === null &&
-              (filters.rarity.min !== "" || filters.rarity.max !== "")
-            ) {
-              // Deselect custom range
-              handleFilterChange("rarity", {
-                preset: null,
-                min: "",
-                max: "",
-              });
-            } else {
-              // Select custom range
-              handleFilterChange("rarity", {
-                preset: null,
-                min: "",
-                max: "",
-              });
-            }
-
-            // Toggle the custom range section
-            setExpandedSections({
-              ...expandedSections,
-              customRange: !expandedSections.customRange,
-            });
-          }}
+          value="custom"
+          name="range"
+          checked={!filters.range &&
+            (filters.rangeMin !== "" || filters.rangeMax !== "")}
+          onChange={handleCustomRangeToggle}
         />
 
-        {/* Custom Range Slider (only shown when custom range is selected) */}
-        {expandedSections.customRange && (
-          <CollapsibleSection
-            title=""
-            section="customRange"
-            expanded={true}
-            toggle={() => {}}
-            variant="collapsibleLabel"
-          >
-            <RangeSlider
-              variant="rarity"
-              onChange={handleRarityRangeChange}
-            />
-          </CollapsibleSection>
-        )}
+        {/* Custom range slider */}
+        <CollapsibleSection
+          title=""
+          section="customRange"
+          expanded={expandedSections.customRange}
+          toggle={() => {}}
+          variant="collapsibleLabel"
+        >
+          <RangeSlider
+            key={`range-${filters.rangeMin || "0"}-${
+              filters.rangeMax || "max"
+            }`}
+            variant="range"
+            onChange={handleRangeSliderChange}
+            initialMin={filters.rangeMin ? parseInt(filters.rangeMin) : 0}
+            initialMax={filters.rangeMax
+              ? parseInt(filters.rangeMax)
+              : Infinity}
+          />
+        </CollapsibleSection>
       </CollapsibleSection>
     </div>
   );
