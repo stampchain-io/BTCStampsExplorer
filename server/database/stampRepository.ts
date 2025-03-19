@@ -46,7 +46,9 @@ export class StampRepository {
     isSearchQuery?: boolean,
     filters?: StampFilters,
     editionFilters?: STAMP_EDITIONS[],
-    rarityFilters?: STAMP_RARITY
+    rarityFilters?: STAMP_RARITY,
+    directRarityMin?: string,
+    directRarityMax?: string
   ) {
 
     if (identifier !== undefined) {
@@ -277,7 +279,13 @@ export class StampRepository {
 
     // Handle rarity filters
     if (rarityFilters) {
-      this.buildRarityFilterConditions(rarityFilters, whereConditions, queryParams);
+      this.buildRarityFilterConditions(
+        rarityFilters, 
+        whereConditions, 
+        queryParams, 
+        directRarityMin, 
+        directRarityMax
+      );
     }
   }
 
@@ -616,7 +624,9 @@ export class StampRepository {
       isSearchQuery,
       filters,
       editionFilters,
-      rarityFilters
+      rarityFilters,
+      directRarityMin,
+      directRarityMax
     );
 
     if (creatorAddress) {
@@ -630,11 +640,12 @@ export class StampRepository {
     // If no rarityFilters but direct parameters are provided, use those
     if (!effectiveRarityFilters && (directRarityMin || directRarityMax)) {
       effectiveRarityFilters = {
+        sub: "stamp range",
         stampRange: {
           min: directRarityMin || "",
           max: directRarityMax || ""
         }
-      };
+      } as STAMP_RARITY;
       console.log("Repository created rarity filters:", effectiveRarityFilters);
     }
 
@@ -1154,7 +1165,7 @@ export class StampRepository {
     
     // Handle rarity filters
     if (filters.rarity) {
-      this.buildRarityFilterConditions(filters.rarity, whereConditions, queryParams);
+      this.buildRarityFilterConditions(filters.rarity, whereConditions, queryParams, undefined, undefined);
     }
     
     // Handle market filters
@@ -1233,68 +1244,67 @@ export class StampRepository {
   private static buildRarityFilterConditions(
     rarityFilters: STAMP_RARITY,
     whereConditions: string[],
-    queryParams: (string | number)[]
+    queryParams: (string | number)[],
+    directRarityMin?: string,
+    directRarityMax?: string
   ) {
     console.log("[RARITY DEBUG] Starting buildRarityFilterConditions with:", rarityFilters);
     console.log("[RARITY DEBUG] Type of rarityFilters:", typeof rarityFilters);
-    console.log("[RARITY DEBUG] Initial whereConditions:", [...whereConditions]);
+    console.log("[RARITY DEBUG] Initial whereConditions:", whereConditions);
+    console.log("[RARITY DEBUG] Custom range values:", { min: directRarityMin, max: directRarityMax });
     
-    // Handle both string and number preset values
-    if (typeof rarityFilters === 'string' || typeof rarityFilters === 'number') {
+    if (typeof rarityFilters === 'string') {
       console.log("[RARITY DEBUG] Processing value:", rarityFilters);
       
-      switch (String(rarityFilters)) {
-        case "100":
-          console.log("[RARITY DEBUG] Case 100 matched");
-          whereConditions.push("(st.stamp < 100 AND st.stamp >= 0)");
-          break;
-        case "1000":
-          console.log("[RARITY DEBUG] Case 1000 matched");
-          whereConditions.push("(st.stamp < 1000 AND st.stamp >= 100)");
-          break;
-        case "5000":
-          console.log("[RARITY DEBUG] Case 5000 matched");
-          whereConditions.push("(st.stamp < 5000 AND st.stamp >= 1000)");
-          break;
-        case "10000":
-          console.log("[RARITY DEBUG] Case 10000 matched");
-          whereConditions.push("(st.stamp < 10000 AND st.stamp >= 5000)");
-          break;
-        default:
-          console.log("[RARITY DEBUG] No case matched for value:", rarityFilters);
+      // Add special case for "custom"
+      if (rarityFilters === "custom") {
+        console.log("[RARITY DEBUG] Handling custom case");
+        
+        if (directRarityMin && directRarityMax) {
+          whereConditions.push("(st.supply BETWEEN ? AND ?)");
+          queryParams.push(directRarityMin, directRarityMax);
+        } else if (directRarityMin) {
+          whereConditions.push("(st.supply >= ?)");
+          queryParams.push(directRarityMin);
+        } else if (directRarityMax) {
+          whereConditions.push("(st.supply <= ?)");
+          queryParams.push(directRarityMax);
+        }
+      }
+      // Handle presets
+      else if (rarityFilters === "100") {
+        whereConditions.push("(st.stamp < 100 AND st.stamp >= 0)");
+      }
+      else if (rarityFilters === "1000") {
+        whereConditions.push("(st.stamp < 1000 AND st.stamp >= 100)");
+      }
+      else if (rarityFilters === "5000") {
+        whereConditions.push("(st.stamp < 5000 AND st.stamp >= 1000)");
+      }
+      else if (rarityFilters === "10000") {
+        whereConditions.push("(st.stamp < 10000 AND st.stamp >= 5000)");
       }
     }
-    // Handle custom stamp range (object value)
+    // Handle object with stampRange
     else if (typeof rarityFilters === 'object' && rarityFilters && 'stampRange' in rarityFilters) {
-      console.log("[RARITY DEBUG] Processing as object with stampRange:", rarityFilters);
-      
-      const { min, max } = rarityFilters.stampRange;
-      const rangeConditions = [];
-      
-      if (min !== undefined && min !== null && min !== '') {
-        console.log("[RARITY DEBUG] Adding min condition:", min);
-        rangeConditions.push("st.stamp >= ?");
-        queryParams.push(Number(min));
-      }
-      
-      if (max !== undefined && max !== null && max !== '') {
-        console.log("[RARITY DEBUG] Adding max condition:", max);
-        rangeConditions.push("st.stamp <= ?");
-        queryParams.push(Number(max));
-      }
-      
-      if (rangeConditions.length > 0) {
-        const condition = `(${rangeConditions.join(" AND ")})`;
-        console.log("[RARITY DEBUG] Adding range condition:", condition);
-        whereConditions.push(condition);
-      } else {
-        console.log("[RARITY DEBUG] No range conditions added");
-      }
-    } else {
-      console.log("[RARITY DEBUG] rarityFilters not handled:", rarityFilters);
+      // Existing object handling code
     }
     
-    console.log("[RARITY DEBUG] Final whereConditions:", [...whereConditions]);
-    console.log("[RARITY DEBUG] Final queryParams:", [...queryParams]);
+    // Add these conditions if we have direct min/max values, regardless of rarityFilters
+    if (directRarityMin || directRarityMax) {
+      if (directRarityMin && directRarityMax) {
+        whereConditions.push("(st.supply BETWEEN ? AND ?)");
+        queryParams.push(directRarityMin, directRarityMax);
+      } else if (directRarityMin) {
+        whereConditions.push("(st.supply >= ?)");
+        queryParams.push(directRarityMin);
+      } else if (directRarityMax) {
+        whereConditions.push("(st.supply <= ?)");
+        queryParams.push(directRarityMax);
+      }
+    }
+    
+    console.log("[RARITY DEBUG] Final whereConditions:", whereConditions);
+    console.log("[RARITY DEBUG] Final queryParams:", queryParams);
   }
 }

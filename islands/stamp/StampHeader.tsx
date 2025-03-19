@@ -20,23 +20,63 @@ export const StampHeader = (
 
   const searchparams = new URLSearchParams(search);
 
-  // Updated filter count logic that handles the flat filetype parameter
   let filterCount = 0;
 
-  // Check each filter type
-  allQueryKeysFromFilters.forEach((key) => {
-    // Special handling for the flat filetype parameter
-    if (key === "filetype" && searchparams.has(key)) {
-      const filetypeValue = searchparams.get(key);
-      if (filetypeValue) {
-        // Count each selected filetype in the comma-separated list
-        filterCount += filetypeValue.split(",").length;
-      }
-    } // Regular handling for other filter parameters
-    else if (searchparams.has(key) && searchparams.get(key) !== "false") {
+  // Handle filetype parameter (count each filetype selection)
+  if (searchparams.has("filetype")) {
+    const filetypes = searchparams.get("filetype");
+    if (filetypes) {
+      filterCount += filetypes.split(",").length;
+    }
+  }
+
+  // Handle editions parameter (count each edition selection)
+  if (searchparams.has("editions")) {
+    const editions = searchparams.get("editions");
+    if (editions) {
+      filterCount += editions.split(",").length;
+    }
+  }
+
+  // Handle rarity parameter (count either preset or custom range values)
+  let hasCountedRarity = false;
+  if (searchparams.has("rarity")) {
+    filterCount += 1;
+    hasCountedRarity = true;
+  }
+
+  // If not already counted a preset, count min and max separately if they exist
+  if (!hasCountedRarity) {
+    if (searchparams.has("rarityMin")) {
+      filterCount += 1; // Count min as one filter
+    }
+    if (searchparams.has("rarityMax")) {
+      filterCount += 1; // Count max as one filter
+    }
+  }
+
+  // Handle market filters (still using nested format)
+  const marketFilters = [
+    "market[atomic]",
+    "market[dispenser]",
+    "market[listings]",
+    "market[sales]",
+  ];
+  marketFilters.forEach((key) => {
+    if (searchparams.has(key) && searchparams.get(key) === "true") {
       filterCount += 1;
     }
   });
+
+  // Handle price range (count as one filter if either min or max is set)
+  let hasCountedPriceRange = false;
+  if (
+    searchparams.has("market[priceRange][min]") ||
+    searchparams.has("market[priceRange][max]")
+  ) {
+    filterCount += 1;
+    hasCountedPriceRange = true;
+  }
 
   const handleSearchOpen = (open: boolean) => {
     setSearchOpen(open);

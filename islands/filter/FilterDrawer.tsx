@@ -330,6 +330,41 @@ const FilterDrawer = (
     };
   }, [open]);
 
+  const handleApplyFilters = () => {
+    // Convert filters to query params string
+    const existingParams = new URLSearchParams(window.location.search);
+    const baseParams = existingParams.get("type")
+      ? `type=${existingParams.get("type")}`
+      : "";
+
+    // Create query string from current filters
+    let queryParams;
+    if (type === "stamp") {
+      // Convert stamp filters to query params
+      queryParams = stampFiltersToQueryParams(
+        baseParams,
+        currentFilters as StampFilters,
+      );
+      console.log("Applying stamp filters, generated query:", queryParams);
+    } else if (type === "src20") {
+      // Convert src20 filters to query params
+      queryParams = src20FiltersToQueryParams(
+        baseParams,
+        currentFilters as SRC20Filters,
+      );
+      console.log("Applying src20 filters, generated query:", queryParams);
+    }
+
+    // Construct the new URL with the query params
+    const newUrl = window.location.pathname +
+      (queryParams ? `?${queryParams}` : "");
+    console.log("Navigating to new URL:", newUrl);
+
+    // Update URL and close drawer
+    window.location.href = newUrl;
+    setOpen(false);
+  };
+
   return (
     <div
       id={drawerId}
@@ -425,7 +460,7 @@ const FilterDrawer = (
           CLEAR
         </button>
         <button
-          onClick={handleCloseDrawerUpdate}
+          onClick={handleApplyFilters}
           className={`w-full ${button("flatGrey", "lg")}`}
         >
           APPLY

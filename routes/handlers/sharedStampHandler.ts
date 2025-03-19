@@ -121,48 +121,34 @@ export const createStampHandler = (
           return sortValidation;
         }
 
-        // Extract filters INSIDE the routeConfig.isIndex block
+        // Extract filters
         const filetypeFilters =
           url.searchParams.get("filetype")?.split(",").filter(Boolean) as
             | STAMP_FILETYPES[]
             | undefined || undefined;
-        const suffixFilters =
-          url.searchParams.get("suffixFilters")?.split(",").filter(Boolean) ||
-          undefined;
         const editionFilters =
           url.searchParams.get("editions")?.split(",").filter(Boolean) as
             | STAMP_EDITIONS[]
             | undefined || undefined;
 
-        // NEW SECTION FOR HANDLING FLAT RARITY PARAMETERS
+        // Extract rarity filters
+        const rarityPreset = url.searchParams.get("rarityPreset") || "";
+        const rarityMin = url.searchParams.get("rarityMin") || "";
+        const rarityMax = url.searchParams.get("rarityMax") || "";
+
         let rarityFilters: STAMP_RARITY | undefined = undefined;
-        const rarityPreset = url.searchParams.get("rarity");
-        const rarityMin = url.searchParams.get("rarityMin");
-        const rarityMax = url.searchParams.get("rarityMax");
 
-        // Declare these variables before using them
-        let directRarityMin: string | undefined = undefined;
-        let directRarityMax: string | undefined = undefined;
-
-        // Check if we have a preset value
+        // Set rarityFilters based on preset or custom values
         if (
           rarityPreset &&
-          ["100", "1000", "5000", "10000"].includes(rarityPreset)
+          ["100", "1000", "5000", "10000"].includes(rarityPreset as any)
         ) {
           rarityFilters = rarityPreset as STAMP_RARITY;
-        } // Check if we have a custom range
-        else if (rarityMin || rarityMax) {
-          // Based on the globals.d.ts type, we need to handle this appropriately
-          // For string literal type:
-          rarityFilters = "custom" as STAMP_RARITY;
-
-          // Set these for the controller since we can't add them to rarityFilters
-          directRarityMin = rarityMin || "";
-          directRarityMax = rarityMax || "";
+        } else if (rarityMin || rarityMax) {
+          rarityFilters = "custom";
         }
-        // END OF NEW SECTION
 
-        // Create a direct result object for testing
+        // Important part: Pass the min/max values directly to the controller
         const result = await StampController.getStamps({
           page,
           limit: effectiveLimit,
@@ -172,12 +158,11 @@ export const createStampHandler = (
           skipTotalCount: false,
           includeSecondary: true,
           cacheType,
-          suffixFilters,
           filetypeFilters,
           editionFilters,
           rarityFilters,
-          directRarityMin,
-          directRarityMax,
+          directRarityMin: rarityMin,
+          directRarityMax: rarityMax,
         });
 
         // Return the normal result

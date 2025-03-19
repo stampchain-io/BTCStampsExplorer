@@ -469,27 +469,19 @@ const Radio = ({ label, value, checked, onChange }: RadioProps) => {
 function hasActiveFilters(section: string, filters: typeof defaultFilters) {
   switch (section) {
     case "fileType":
-      return filters.fileType.jpg ||
-        filters.fileType.png ||
-        filters.fileType.gif ||
-        filters.fileType.webp ||
-        filters.fileType.avif ||
-        filters.fileType.bmp ||
-        filters.fileType.mp3 ||
-        filters.fileType.svg ||
-        filters.fileType.html ||
-        filters.fileType.legacy ||
-        filters.fileType.olga;
+      // Check if the fileType array has any items
+      return filters.fileType.length > 0;
+
     case "editions":
-      return filters.editions.single ||
-        filters.editions.multiple ||
-        filters.editions.locked ||
-        filters.editions.unlocked ||
-        filters.editions.divisible;
+      // Check if the editions array has any items
+      return filters.editions.length > 0;
+
     case "rarity":
-      return filters.rarity.sub !== false ||
-        filters.rarity.stampRange.min !== "" ||
-        filters.rarity.stampRange.max !== "";
+      // Check if either preset is set or min/max values exist
+      return filters.rarity.preset !== null ||
+        filters.rarity.min !== "" ||
+        filters.rarity.max !== "";
+
     case "market":
       return filters.market.atomic ||
         filters.market.dispenser ||
@@ -497,12 +489,14 @@ function hasActiveFilters(section: string, filters: typeof defaultFilters) {
         filters.market.sales ||
         filters.market.priceRange.min !== "" ||
         filters.market.priceRange.max !== "";
+
     case "customRange": // For rarity custom range subsection
-      return filters.rarity.stampRange.min !== "" ||
-        filters.rarity.stampRange.max !== "";
+      return filters.rarity.min !== "" || filters.rarity.max !== "";
+
     case "priceRange": // For market price range subsection
       return filters.market.priceRange.min !== "" ||
         filters.market.priceRange.max !== "";
+
     default:
       return false;
   }
@@ -512,12 +506,12 @@ export const FilterContentStamp = ({
   initialFilters,
   onFiltersChange,
 }: {
-  initialFilters: typeof defaultFilters;
-  onFiltersChange: (filters: typeof defaultFilters) => void;
+  initialFilters: StampFilters;
+  onFiltersChange: (filters: StampFilters) => void;
 }) => {
   const [filters, setFilters] = useState(initialFilters);
 
-  // Add this effect to watch for changes to initialFilters
+  // Watch for changes to initialFilters
   useEffect(() => {
     setFilters(initialFilters);
   }, [initialFilters]);
@@ -609,26 +603,140 @@ export const FilterContentStamp = ({
   };
 
   const handleRarityRangeChange = (min: number, max: number) => {
-    // Only update if values are defined
-    if (min !== undefined && max !== undefined) {
-      // Convert min to string, or empty string if it's 0
-      const minStr = min === 0 ? "" : min.toString();
+    console.log("Rarity range changed:", {
+      min,
+      max,
+      minStr: min.toString(),
+      maxStr: max === Infinity ? "" : max.toString(),
+    });
 
-      // For max, if it's Infinity, use an empty string
-      const maxStr = max === Infinity ? "" : max.toString();
-
-      console.log("Rarity range changed:", { min, max, minStr, maxStr }); // Debug log
-
-      // Directly update the filters state with the new values
-      handleFilterChange("rarity", {
-        ...filters.rarity,
-        sub: false, // Disable the radio button when using custom range
-        stampRange: {
-          min: minStr,
-          max: maxStr,
+    // Create new state with both the new flat format and transitional structure
+    setFilters((prevFilters) => {
+      const newFilters = {
+        ...prevFilters,
+        rarity: {
+          ...prevFilters.rarity,
+          // New flat format
+          preset: null,
+          min: min.toString(),
+          max: max === Infinity ? "" : max.toString(),
+          // Transitional structure
+          sub: "stamp range",
+          stampRange: {
+            min: min.toString(),
+            max: max === Infinity ? "" : max.toString(),
+          },
         },
-      });
-    }
+      };
+
+      // Important: update parent component state
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
+  // Fix: Add a dedicated file type toggle function
+  const toggleFileType = (type: string) => {
+    setFilters((prevFilters) => {
+      // Make a copy of the fileType array
+      const newFileTypes = [...prevFilters.fileType];
+
+      if (newFileTypes.includes(type)) {
+        // Remove if already present
+        const index = newFileTypes.indexOf(type);
+        newFileTypes.splice(index, 1);
+      } else {
+        // Add if not present
+        newFileTypes.push(type);
+      }
+
+      const newFilters = {
+        ...prevFilters,
+        fileType: newFileTypes,
+      };
+
+      // Important: Call onFiltersChange to update parent state
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
+  // Fix: Add a dedicated editions toggle function
+  const toggleEdition = (type: string) => {
+    setFilters((prevFilters) => {
+      // Make a copy of the editions array
+      const newEditions = [...prevFilters.editions];
+
+      if (newEditions.includes(type)) {
+        // Remove if already present
+        const index = newEditions.indexOf(type);
+        newEditions.splice(index, 1);
+      } else {
+        // Add if not present
+        newEditions.push(type);
+      }
+
+      const newFilters = {
+        ...prevFilters,
+        editions: newEditions,
+      };
+
+      // Important: Call onFiltersChange to update parent state
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
+  // Update rarity handling
+  const handleRarityChange = (value: string | null, isCustomRange = false) => {
+    setFilters((prevFilters) => {
+      let newRarity;
+
+      if (isCustomRange) {
+        // For custom range toggle
+        if (
+          prevFilters.rarity.preset === null &&
+          (prevFilters.rarity.min !== "" || prevFilters.rarity.max !== "")
+        ) {
+          // Clear custom range if it was active
+          newRarity = {
+            preset: null,
+            min: "",
+            max: "",
+          };
+        } else {
+          // Enable custom range with empty values
+          newRarity = {
+            preset: null,
+            min: "",
+            max: "",
+          };
+        }
+      } else if (value === prevFilters.rarity.preset) {
+        // Deselect if already selected
+        newRarity = {
+          preset: null,
+          min: "",
+          max: "",
+        };
+      } else {
+        // Select new preset and reset custom range
+        newRarity = {
+          preset: value,
+          min: "",
+          max: "",
+        };
+      }
+
+      const newFilters = {
+        ...prevFilters,
+        rarity: newRarity,
+      };
+
+      // Important: Call onFiltersChange to update parent state
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
   };
 
   return (
@@ -710,63 +818,39 @@ export const FilterContentStamp = ({
         <Checkbox
           key="jpg"
           label="JPG/JPEG"
-          checked={filters.fileType.jpg}
-          onChange={() =>
-            handleFilterChange("fileType", {
-              ...filters.fileType,
-              jpg: !filters.fileType.jpg,
-            })}
+          checked={filters.fileType.includes("jpg")}
+          onChange={() => toggleFileType("jpg")}
         />
 
         <Checkbox
           key="png"
           label="PNG"
-          checked={filters.fileType.png}
-          onChange={() =>
-            handleFilterChange("fileType", {
-              ...filters.fileType,
-              png: !filters.fileType.png,
-            })}
+          checked={filters.fileType.includes("png")}
+          onChange={() => toggleFileType("png")}
         />
         <Checkbox
           key="gif"
           label="GIF"
-          checked={filters.fileType.gif}
-          onChange={() =>
-            handleFilterChange("fileType", {
-              ...filters.fileType,
-              gif: !filters.fileType.gif,
-            })}
+          checked={filters.fileType.includes("gif")}
+          onChange={() => toggleFileType("gif")}
         />
         <Checkbox
           key="webp"
           label="WEBP"
-          checked={filters.fileType.webp}
-          onChange={() =>
-            handleFilterChange("fileType", {
-              ...filters.fileType,
-              webp: !filters.fileType.webp,
-            })}
+          checked={filters.fileType.includes("webp")}
+          onChange={() => toggleFileType("webp")}
         />
         <Checkbox
           key="avif"
           label="AVIF"
-          checked={filters.fileType.avif}
-          onChange={() =>
-            handleFilterChange("fileType", {
-              ...filters.fileType,
-              avif: !filters.fileType.avif,
-            })}
+          checked={filters.fileType.includes("avif")}
+          onChange={() => toggleFileType("avif")}
         />
         <Checkbox
           key="bmp"
           label="BMP"
-          checked={filters.fileType.bmp}
-          onChange={() =>
-            handleFilterChange("fileType", {
-              ...filters.fileType,
-              bmp: !filters.fileType.bmp,
-            })}
+          checked={filters.fileType.includes("bmp")}
+          onChange={() => toggleFileType("bmp")}
         />
 
         {/* Category: VECTOR */}
@@ -776,22 +860,14 @@ export const FilterContentStamp = ({
         <Checkbox
           key="svg"
           label="SVG"
-          checked={filters.fileType.svg}
-          onChange={() =>
-            handleFilterChange("fileType", {
-              ...filters.fileType,
-              svg: !filters.fileType.svg,
-            })}
+          checked={filters.fileType.includes("svg")}
+          onChange={() => toggleFileType("svg")}
         />
         <Checkbox
           key="html"
           label="HTML"
-          checked={filters.fileType.html}
-          onChange={() =>
-            handleFilterChange("fileType", {
-              ...filters.fileType,
-              html: !filters.fileType.html,
-            })}
+          checked={filters.fileType.includes("html")}
+          onChange={() => toggleFileType("html")}
         />
 
         {/* Category: AUDIO */}
@@ -801,12 +877,8 @@ export const FilterContentStamp = ({
         <Checkbox
           key="mp3"
           label="MP3/MPEG"
-          checked={filters.fileType.mp3}
-          onChange={() =>
-            handleFilterChange("fileType", {
-              ...filters.fileType,
-              mp3: !filters.fileType.mp3,
-            })}
+          checked={filters.fileType.includes("mp3")}
+          onChange={() => toggleFileType("mp3")}
         />
 
         {/* Category: ENCODING */}
@@ -816,83 +888,55 @@ export const FilterContentStamp = ({
         <Checkbox
           key="legacy"
           label="LEGACY"
-          checked={filters.fileType.legacy}
-          onChange={() =>
-            handleFilterChange("fileType", {
-              ...filters.fileType,
-              legacy: !filters.fileType.legacy,
-            })}
+          checked={filters.fileType.includes("legacy")}
+          onChange={() => toggleFileType("legacy")}
         />
         <Checkbox
           key="olga"
           label="OLGA"
-          checked={filters.fileType.olga}
-          onChange={() =>
-            handleFilterChange("fileType", {
-              ...filters.fileType,
-              olga: !filters.fileType.olga,
-            })}
+          checked={filters.fileType.includes("olga")}
+          onChange={() => toggleFileType("olga")}
         />
       </CollapsibleSection>
 
       <CollapsibleSection
         title="EDITIONS"
         section="editions"
-        expanded={expandedSections["editions"]}
+        expanded={expandedSections.editions}
         toggle={() => toggleSection("editions")}
         variant="collapsibleTitle"
       >
         <Checkbox
           label="1/1"
-          checked={filters.editions.single}
-          onChange={() => {
-            handleFilterChange("editions", {
-              ...filters.editions,
-              single: !filters.editions.single,
-            });
-          }}
+          checked={filters.editions.includes("single")}
+          onChange={() => toggleEdition("single")}
         />
         <Checkbox
           label="MULTIPLE"
-          checked={filters.editions.multiple}
-          onChange={() =>
-            handleFilterChange("editions", {
-              ...filters.editions,
-              multiple: !filters.editions.multiple,
-            })}
+          checked={filters.editions.includes("multiple")}
+          onChange={() => toggleEdition("multiple")}
         />
         <Checkbox
           label="LOCKED"
-          checked={filters.editions.locked}
-          onChange={() =>
-            handleFilterChange("editions", {
-              locked: !filters.editions.locked,
-            })}
+          checked={filters.editions.includes("locked")}
+          onChange={() => toggleEdition("locked")}
         />
         <Checkbox
           label="UNLOCKED"
-          checked={filters.editions.unlocked}
-          onChange={() =>
-            handleFilterChange("editions", {
-              ...filters.editions,
-              unlocked: !filters.editions.unlocked,
-            })}
+          checked={filters.editions.includes("unlocked")}
+          onChange={() => toggleEdition("unlocked")}
         />
         <Checkbox
           label="DIVISIBLE"
-          checked={filters.editions.divisible}
-          onChange={() =>
-            handleFilterChange("editions", {
-              ...filters.editions,
-              divisible: !filters.editions.divisible,
-            })}
+          checked={filters.editions.includes("divisible")}
+          onChange={() => toggleEdition("divisible")}
         />
       </CollapsibleSection>
 
       <CollapsibleSection
         title="RARITY"
         section="rarity"
-        expanded={expandedSections["rarity"]}
+        expanded={expandedSections.rarity}
         toggle={() => toggleSection("rarity")}
         variant="collapsibleTitle"
       >
@@ -902,68 +946,61 @@ export const FilterContentStamp = ({
             key={value}
             label={`< ${value}`}
             value={value.toString()}
-            checked={filters.rarity?.sub === value.toString()}
-            onChange={() => {
-              if (filters.rarity?.sub === value.toString()) {
-                handleFilterChange("rarity", {
-                  sub: false,
-                  stampRange: {
-                    min: filters.rarity?.stampRange?.min || "",
-                    max: filters.rarity?.stampRange?.max || "",
-                  },
-                });
-              } else {
-                // Select the radio button, clear stampRange and close the custom range section
-                handleFilterChange("rarity", {
-                  sub: value.toString(),
-                  stampRange: {
-                    min: "", // Clear min
-                    max: "", // Clear max
-                  },
-                });
-                // Close the custom range collapsible when selecting a standard radio button
-                setExpandedSections({
-                  ...expandedSections,
-                  customRange: false,
-                });
-              }
-            }}
+            checked={filters.rarity.preset === value.toString()}
+            onChange={() => handleRarityChange(value.toString())}
           />
         ))}
 
-        {/* Custom Range Radio Button with Collapsible Section */}
+        {/* Custom Range Radio Button */}
         <Radio
-          label="CUSTOM RANGE"
-          value="custom rarity range"
-          checked={expandedSections.customRange}
+          label="STAMP RANGE"
+          value="stamp range"
+          checked={(filters.rarity.preset === null &&
+            filters.rarity.sub === "stamp range") ||
+            (filters.rarity.min !== "" || filters.rarity.max !== "") ||
+            (filters.rarity.stampRange &&
+              (filters.rarity.stampRange.min !== "" ||
+                filters.rarity.stampRange.max !== ""))}
           onChange={() => {
-            // If already selected, deselect and clear values
-            if (expandedSections.customRange) {
+            // Toggle custom range selection
+            if (
+              (filters.rarity.preset === null &&
+                filters.rarity.sub === "stamp range") ||
+              (filters.rarity.min !== "" || filters.rarity.max !== "") ||
+              (filters.rarity.stampRange &&
+                (filters.rarity.stampRange.min !== "" ||
+                  filters.rarity.stampRange.max !== ""))
+            ) {
+              // Deselect custom range
               handleFilterChange("rarity", {
+                preset: null,
+                min: "",
+                max: "",
                 sub: false,
                 stampRange: {
                   min: "",
                   max: "",
                 },
-              });
-              setExpandedSections({
-                ...expandedSections,
-                customRange: false,
               });
             } else {
-              // Otherwise, select it but don't set any default values yet
+              // Select custom range
               handleFilterChange("rarity", {
-                sub: false,
+                preset: null,
+                min: "",
+                max: "",
+                sub: "stamp range",
                 stampRange: {
                   min: "",
                   max: "",
                 },
               });
-              setExpandedSections({
-                ...expandedSections,
-                customRange: true,
-              });
             }
+
+            // Toggle the custom range section
+            setExpandedSections({
+              ...expandedSections,
+              customRange: !expandedSections.customRange,
+            });
           }}
         />
 

@@ -13,34 +13,14 @@ export type StampFilters = {
       max: string;
     };
   };
-  fileType: {
-    jpg: boolean;
-    png: boolean;
-    gif: boolean;
-    webp: boolean;
-    avif: boolean;
-    bmp: boolean;
-    mp3: boolean;
-    svg: boolean;
-    html: boolean;
-    legacy: boolean;
-    olga: boolean;
-  };
-  editions: {
-    single: boolean;
-    multiple: boolean;
-    locked: boolean;
-    unlocked: boolean;
-    divisible: boolean;
-  };
+  fileType: string[];
+  editions: string[];
   rarity: {
-    sub: string | false;
-    stampRange: {
-      min: string;
-      max: string;
-    };
+    preset: string | null;
+    min: string;
+    max: string;
   };
-  [key: string]: any; // Add index signature to allow string indexing
+  [key: string]: any; // Keep index signature for flexibility
 };
 
 // Update the defaultFilters declaration to export it
@@ -55,32 +35,12 @@ export const defaultFilters: StampFilters = {
       max: "",
     },
   },
-  fileType: {
-    jpg: false,
-    png: false,
-    gif: false,
-    webp: false,
-    avif: false,
-    bmp: false,
-    mp3: false,
-    svg: false,
-    html: false,
-    legacy: false,
-    olga: false,
-  },
-  editions: {
-    single: false,
-    multiple: false,
-    locked: false,
-    unlocked: false,
-    divisible: false,
-  },
+  fileType: [],
+  editions: [],
   rarity: {
-    sub: false,
-    stampRange: {
-      min: "",
-      max: "",
-    },
+    preset: null,
+    min: "",
+    max: "",
   },
 };
 
@@ -95,132 +55,77 @@ export function filtersToQueryParams(
 
   const queryParams = new URLSearchParams(search);
 
-  // Extract selected filetypes into a flat parameter
-  const selectedFiletypes = Object.entries(filters.fileType)
-    .filter(([_, selected]) => selected)
-    .map(([type]) => type);
-
-  // Remove all existing fileType nested parameters
-  Array.from(queryParams.keys())
-    .filter((key) => key.startsWith("fileType["))
-    .forEach((key) => queryParams.delete(key));
-
-  // Delete old flat parameter if it exists
-  queryParams.delete("filetype");
-
-  // Add the flat filetype parameter if we have selected types
-  if (selectedFiletypes.length > 0) {
-    queryParams.set("filetype", selectedFiletypes.join(","));
+  // FILETYPE - already fixed (flat format)
+  if (filters.fileType.length > 0) {
+    queryParams.set("filetype", filters.fileType.join(","));
+  } else {
+    queryParams.delete("filetype");
   }
 
-  // NEW SECTION FOR EDITIONS
-  // Extract selected editions into a flat parameter
-  const selectedEditions = Object.entries(filters.editions)
-    .filter(([_, selected]) => selected)
-    .map(([type]) => type);
-
-  // Remove all existing editions nested parameters
-  Array.from(queryParams.keys())
-    .filter((key) => key.startsWith("editions["))
-    .forEach((key) => queryParams.delete(key));
-
-  // Delete old flat parameter if it exists
-  queryParams.delete("editions");
-
-  // Add the flat editions parameter if we have selected types
-  if (selectedEditions.length > 0) {
-    queryParams.set("editions", selectedEditions.join(","));
+  // EDITIONS - already fixed (flat format)
+  if (filters.editions.length > 0) {
+    queryParams.set("editions", filters.editions.join(","));
+  } else {
+    queryParams.delete("editions");
   }
-  // END OF NEW SECTION
 
-  // NEW SECTION FOR RARITY
-  // Remove all existing rarity nested parameters
-  Array.from(queryParams.keys())
-    .filter((key) => key.startsWith("rarity["))
-    .forEach((key) => queryParams.delete(key));
-
-  // Delete old flat parameters if they exist
+  // FIX FOR RARITY - handle both new and transitional structure
+  // Delete any existing rarity parameters
   queryParams.delete("rarity");
   queryParams.delete("rarityMin");
   queryParams.delete("rarityMax");
 
-  // Handle rarity filter
-  if (filters.rarity.sub && filters.rarity.sub !== "stamp range") {
-    // If using a preset (100, 1000, 5000, 10000)
+  // Check for preset first (from either structure)
+  if (filters.rarity.preset) {
+    queryParams.set("rarity", filters.rarity.preset);
+  } else if (
+    filters.rarity.sub && filters.rarity.sub !== "stamp range" &&
+    filters.rarity.sub !== false
+  ) {
+    // Handle transitional structure (during implementation)
     queryParams.set("rarity", filters.rarity.sub.toString());
-  } else if (filters.rarity.stampRange) {
-    // If using a custom range, use separate min/max parameters
-    if (filters.rarity.stampRange.min) {
-      queryParams.set("rarityMin", filters.rarity.stampRange.min);
+  } // Handle custom range values from either structure
+  else {
+    // Check new structure first
+    if (filters.rarity.min) {
+      queryParams.set("rarityMin", filters.rarity.min);
     }
-    if (filters.rarity.stampRange.max) {
-      queryParams.set("rarityMax", filters.rarity.stampRange.max);
+    if (filters.rarity.max) {
+      queryParams.set("rarityMax", filters.rarity.max);
+    }
+
+    // Check transitional structure if needed
+    if (
+      !filters.rarity.min && !filters.rarity.max && filters.rarity.stampRange
+    ) {
+      if (filters.rarity.stampRange.min) {
+        queryParams.set("rarityMin", filters.rarity.stampRange.min);
+      }
+      if (filters.rarity.stampRange.max) {
+        queryParams.set("rarityMax", filters.rarity.stampRange.max);
+      }
     }
   }
-  // END OF NEW SECTION
 
-  // Process other filter categories (unchanged)
-  Object.entries(filters).forEach(([category, value]) => {
-    // Skip categories we've handled separately
-    if (
-      category === "fileType" || category === "editions" ||
-      category === "rarity"
-    ) return;
-
-    if (typeof value !== null && typeof value === "object") {
-      Object.entries(value).forEach(([key, val]) => {
-        // Handle price range
-        if (category === "market" && key === "priceRange") {
-          // Always clean up priceRange parameters first
-          queryParams.delete(`${category}[${key}][min]`);
-          queryParams.delete(`${category}[${key}][max]`);
-
-          console.log("Price range values:", JSON.stringify(val, null, 2));
-
-          // Add type guard to ensure val has min and max properties
-          if (val && typeof val === "object" && "min" in val && "max" in val) {
-            // Only add min parameter if it has a non-empty value
-            if (val.min !== undefined && val.min !== null && val.min !== "") {
-              console.log(`Adding min to URL: ${val.min}`);
-              queryParams.append(
-                `${category}[${key}][min]`,
-                val.min.toString(),
-              );
-            }
-
-            // Only add max parameter if it has a non-empty value
-            if (val.max !== undefined && val.max !== null && val.max !== "") {
-              console.log(`Adding max to URL: ${val.max}`);
-              queryParams.append(
-                `${category}[${key}][max]`,
-                val.max.toString(),
-              );
-            }
-          }
-
-          return;
-        }
-
-        // Before trying to call toString(), check the type of val
-        if (val !== null && val !== undefined) {
-          const strVal = val.toString();
-
-          if (typeof val === "boolean") {
-            if (strVal !== "false") {
-              queryParams.set(`${category}[${key}]`, strVal);
-            } else {
-              queryParams.delete(`${category}[${key}]`);
-            }
-          } else if (typeof val === "object") {
-            // Skip objects as they're handled in the specific conditions above
-            // This prevents trying to compare an object with an empty string
-          } else if (val !== "") {
-            queryParams.set(`${category}[${key}]`, strVal);
-          }
-        }
-      });
+  // Market filters (keep as is)
+  for (const [key, value] of Object.entries(filters.market)) {
+    if (key === "priceRange") {
+      if (value.min) {
+        queryParams.set(`market[priceRange][min]`, value.min);
+      } else {
+        queryParams.delete(`market[priceRange][min]`);
+      }
+      if (value.max) {
+        queryParams.set(`market[priceRange][max]`, value.max);
+      } else {
+        queryParams.delete(`market[priceRange][max]`);
+      }
+    } else if (value === true) {
+      queryParams.set(`market[${key}]`, "true");
+    } else {
+      queryParams.delete(`market[${key}]`);
     }
-  });
+  }
 
   const result = queryParams.toString();
   console.log("Final query params:", result);
@@ -252,61 +157,61 @@ export function filtersToServicePayload(filters: StampFilters) {
   };
 
   // JPG/JPEG (combined)
-  if (filters.fileType.jpg) {
+  if (filters.fileType.includes("jpg")) {
     filterPayload.pixel.filetypeFilters.push("jpg");
     filterPayload.pixel.filetypeFilters.push("jpeg");
   }
 
   // PNG
-  if (filters.fileType.png) {
+  if (filters.fileType.includes("png")) {
     filterPayload.pixel.filetypeFilters.push("png");
   }
 
   // GIF
-  if (filters.fileType.gif) {
+  if (filters.fileType.includes("gif")) {
     filterPayload.pixel.filetypeFilters.push("gif");
   }
 
   // WEBP
-  if (filters.fileType.webp) {
+  if (filters.fileType.includes("webp")) {
     filterPayload.pixel.filetypeFilters.push("webp");
   }
 
   // AVIF
-  if (filters.fileType.avif) {
+  if (filters.fileType.includes("avif")) {
     filterPayload.pixel.filetypeFilters.push("avif");
   }
 
   // BMP
-  if (filters.fileType.bmp) {
+  if (filters.fileType.includes("bmp")) {
     filterPayload.pixel.filetypeFilters.push("bmp");
   }
 
   // MP3/MPEG (combined)
-  if (filters.fileType.mp3) {
+  if (filters.fileType.includes("mp3")) {
     filterPayload.audio.filetypeFilters.push("mp3");
     filterPayload.audio.filetypeFilters.push("mpeg");
   }
 
   // SVG
-  if (filters.fileType.svg) {
+  if (filters.fileType.includes("svg")) {
     filterPayload.vector.filetypeFilters.push("svg");
     filterPayload.recursive.filetypeFilters.push("svg");
   }
 
   // HTML
-  if (filters.fileType.html) {
+  if (filters.fileType.includes("html")) {
     filterPayload.vector.filetypeFilters.push("html");
     filterPayload.recursive.filetypeFilters.push("html");
   }
 
   // LEGACY
-  if (filters.fileType.legacy) {
+  if (filters.fileType.includes("legacy")) {
     filterPayload.encoding.filetypeFilters.push("legacy");
   }
 
   // OLGA
-  if (filters.fileType.olga) {
+  if (filters.fileType.includes("olga")) {
     filterPayload.encoding.filetypeFilters.push("olga");
   }
 
@@ -323,30 +228,20 @@ export function filtersToServicePayload(filters: StampFilters) {
 
   // Collect edition filters
   const editionFilters: STAMP_EDITIONS[] = [];
-  if (filters.editions.single) editionFilters.push("single");
-  if (filters.editions.multiple) editionFilters.push("multiple");
-  if (filters.editions.locked) editionFilters.push("locked");
-  if (filters.editions.unlocked) editionFilters.push("unlocked");
-  if (filters.editions.divisible) editionFilters.push("divisible");
+  if (filters.editions.includes("single")) editionFilters.push("single");
+  if (filters.editions.includes("multiple")) editionFilters.push("multiple");
+  if (filters.editions.includes("locked")) editionFilters.push("locked");
+  if (filters.editions.includes("unlocked")) editionFilters.push("unlocked");
+  if (filters.editions.includes("divisible")) editionFilters.push("divisible");
 
   // Handle rarity as a single value (radio button selection)
   let rarityFilters: STAMP_RARITY | undefined = undefined;
 
   // If sub is selected and it's not "stamp range", use that value
-  if (filters.rarity.sub && filters.rarity.sub !== "stamp range") {
-    rarityFilters = filters.rarity.sub as STAMP_RARITY;
-  } // If sub is "stamp range" or we have values in stampRange, use the custom range
-  else if (
-    (filters.rarity.sub === "stamp range" || !filters.rarity.sub) &&
-    filters.rarity.stampRange &&
-    (filters.rarity.stampRange.min || filters.rarity.stampRange.max)
-  ) {
-    rarityFilters = {
-      stampRange: {
-        min: filters.rarity.stampRange.min || "",
-        max: filters.rarity.stampRange.max || "",
-      },
-    };
+  if (filters.rarity.preset) {
+    rarityFilters = filters.rarity.preset as STAMP_RARITY;
+  } else if (filters.rarity.min || filters.rarity.max) {
+    rarityFilters = "custom" as STAMP_RARITY;
   }
 
   // After extracting the filters
@@ -374,7 +269,6 @@ export function filtersToServicePayload(filters: StampFilters) {
 // }
 
 export const allQueryKeysFromFilters = [
-  // Flat filter parameters
   "filetype",
   "editions",
   "rarity",
@@ -392,111 +286,70 @@ export const allQueryKeysFromFilters = [
 
 export function queryParamsToFilters(query: string): StampFilters {
   const params = new URLSearchParams(query);
-  const filtersPartial: Partial<StampFilters> = {};
+  const filtersPartial: Partial<StampFilters> = {
+    fileType: [],
+    editions: [],
+    rarity: {
+      preset: null,
+      min: "",
+      max: "",
+    },
+    market: { ...defaultFilters.market },
+  };
 
-  // Handle flat filetype format
-  const flatFiletype = params.get("filetype");
-  if (flatFiletype) {
-    const filetypeValues = flatFiletype.split(",");
-
-    // Initialize fileType with default values
-    filtersPartial.fileType = { ...defaultFilters.fileType };
-
-    // Set selected filetypes to true
-    filetypeValues.forEach((type) => {
-      if (type in filtersPartial.fileType) {
-        filtersPartial.fileType[type] = true;
-      }
-    });
+  // Parse filetype parameter (comma-separated string to array)
+  const filetypeParam = params.get("filetype");
+  if (filetypeParam) {
+    filtersPartial.fileType = filetypeParam.split(",");
   }
 
-  // NEW SECTION FOR EDITIONS
-  // Handle flat editions format
-  const flatEditions = params.get("editions");
-  if (flatEditions) {
-    const editionsValues = flatEditions.split(",");
-
-    // Initialize editions with default values
-    filtersPartial.editions = { ...defaultFilters.editions };
-
-    // Set selected editions to true
-    editionsValues.forEach((type) => {
-      if (type in filtersPartial.editions) {
-        filtersPartial.editions[type] = true;
-      }
-    });
+  // Parse editions parameter (comma-separated string to array)
+  const editionsParam = params.get("editions");
+  if (editionsParam) {
+    filtersPartial.editions = editionsParam.split(",");
   }
-  // END OF NEW SECTION
 
-  // NEW SECTION FOR RARITY
-  // Initialize rarity if we have any rarity-related parameters
-  if (
-    params.has("rarity") || params.has("rarityMin") || params.has("rarityMax")
-  ) {
-    filtersPartial.rarity = { ...defaultFilters.rarity };
+  // Parse rarity parameters
+  const rarityPreset = params.get("rarity");
+  const rarityMin = params.get("rarityMin");
+  const rarityMax = params.get("rarityMax");
 
-    // Check if we have a preset rarity value
-    const rarityValue = params.get("rarity");
-    if (rarityValue && ["100", "1000", "5000", "10000"].includes(rarityValue)) {
-      filtersPartial.rarity.sub = rarityValue;
-    } // Check if we have min/max range values
-    else if (params.has("rarityMin") || params.has("rarityMax")) {
-      filtersPartial.rarity.sub = "stamp range";
-      filtersPartial.rarity.stampRange = {
-        min: params.get("rarityMin") || "",
-        max: params.get("rarityMax") || "",
+  // Set rarity values based on parameters
+  if (rarityPreset) {
+    filtersPartial.rarity = {
+      preset: rarityPreset,
+      min: "",
+      max: "",
+    };
+  } else if (rarityMin || rarityMax) {
+    filtersPartial.rarity = {
+      preset: null,
+      min: rarityMin || "",
+      max: rarityMax || "",
+    };
+  }
+
+  // Parse market filters (keep as is for now)
+  for (const key of Object.keys(defaultFilters.market)) {
+    if (key === "priceRange") continue;
+    const value = params.get(`market[${key}]`);
+    if (filtersPartial.market) {
+      filtersPartial.market[key as keyof typeof filtersPartial.market] =
+        value === "true";
+    }
+  }
+
+  // Handle price range
+  const minPrice = params.get("market[priceRange][min]");
+  const maxPrice = params.get("market[priceRange][max]");
+  if (minPrice || maxPrice) {
+    if (filtersPartial.market) {
+      filtersPartial.market.priceRange = {
+        min: minPrice || "",
+        max: maxPrice || "",
       };
     }
   }
-  // END OF NEW SECTION
-
-  // Process other categories (no changes needed)
-  Object.keys(defaultFilters).forEach((category) => {
-    // Skip categories we've handled separately
-    if (
-      category === "fileType" || category === "editions" ||
-      category === "rarity"
-    ) return;
-
-    if (typeof defaultFilters[category as keyof StampFilters] === "object") {
-      Object.keys(defaultFilters[category as keyof StampFilters] as any)
-        .forEach((key) => {
-          const value = params.get(`${category}[${key}]`);
-          if (value !== null) {
-            if (!filtersPartial[category as keyof StampFilters]) {
-              filtersPartial[category as keyof StampFilters] = {
-                ...defaultFilters[category as keyof StampFilters],
-              } as any;
-            }
-
-            const categoryObj =
-              filtersPartial[category as keyof StampFilters] as any;
-            const defaultValue =
-              (defaultFilters[category as keyof StampFilters] as any)[key];
-
-            const coercedValue = typeof defaultValue === "boolean"
-              ? JSON.parse(value)
-              : typeof defaultValue === "number"
-              ? parseInt(value)
-              : value;
-
-            categoryObj[key] = coercedValue;
-          }
-        });
-    } else {
-      const value = params.get(category);
-      if (value !== null) {
-        const defaultValue = defaultFilters[category as keyof StampFilters];
-        const coercedValue = typeof defaultValue === "boolean"
-          ? JSON.parse(value)
-          : typeof defaultValue === "number"
-          ? parseInt(value)
-          : value;
-
-        (filtersPartial as any)[category] = coercedValue;
-      }
-    }
-  });
 
   return { ...defaultFilters, ...filtersPartial };
 }
