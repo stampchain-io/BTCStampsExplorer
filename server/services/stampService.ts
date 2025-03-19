@@ -8,6 +8,7 @@ import {
   STAMP_FILETYPES,
   STAMP_EDITIONS,
   STAMP_RARITY,
+  STAMP_MARKET,
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
@@ -133,6 +134,9 @@ export class StampService {
     editionFilters?: STAMP_EDITIONS[];
     rarityFilters?: STAMP_RARITY;
     url?: string;
+    marketFilters?: STAMP_MARKET[];
+    marketMin?: string;
+    marketMax?: string;
   }) {
     // Extract rarity parameters from URL if not already set
     let rarityFilters = options.rarityFilters;
@@ -187,17 +191,42 @@ export class StampService {
         filetypeFilters: options.filetypeFilters,
         editionFilters: options.editionFilters,
         rarityFilters: rarityFilters,
+        marketFilters: options.marketFilters,
+        marketMin: options.marketMin,
+        marketMax: options.marketMax,
       }),
       BlockService.getLastBlock(),
     ]);
 
     if (!result) {
-      throw new Error("No stamps found");
+      throw new Error("NO STAMPS FOUND");
+    }
+
+    // Get initial results
+    const initialResult = result;
+
+    // If we have market filters, filter the results
+    if (options.marketFilters?.length) {
+      const filteredStamps = [];
+      
+      for (const stamp of initialResult.stamps) {
+        const marketData = await this.getMarketData(stamp.cpid, options.marketFilters);
+        if (marketData.matches) {
+          filteredStamps.push(stamp);
+        }
+      }
+
+      // Update the results with filtered stamps
+      initialResult.stamps = filteredStamps;
+      if (!options.skipTotalCount) {
+        initialResult.total = filteredStamps.length;
+        initialResult.pages = Math.ceil(initialResult.total / (options.limit || 24));
+      }
     }
 
     // Build base response
     const response = {
-      stamps: result.stamps,
+      stamps: initialResult.stamps,
       last_block: lastBlock,
     };
 
@@ -205,10 +234,10 @@ export class StampService {
     if ((options.collectionId && options.groupBy === "collection_id") || !options.skipTotalCount) {
       return {
         ...response,
-        page: result.page,
-        page_size: result.page_size,
-        pages: result.pages,
-        total: result.total,
+        page: initialResult.page,
+        page_size: initialResult.page_size,
+        pages: initialResult.pages,
+        total: initialResult.total,
       };
     }
 
@@ -405,5 +434,40 @@ export class StampService {
 
   static async countTotalStamps(): Promise<boolean> {
     return await StampRepository.countTotalStamps();
+  }
+
+  private static async getMarketData(cpid: string, marketFilters: STAMP_MARKET[]) {
+    const matches = await Promise.all(
+      marketFilters.map(async (type) => {
+        switch (type) {
+          case "listings": {
+            const listings = await DispenserManager.getDispensersByCpid(cpid);
+            return listings.dispensers.some(d => d.give_remaining > 0);
+          }
+          case "sales": {
+            const sales = await XcpManager.fetchDispenseEvents(100);
+            return sales.some(sale => sale.params.asset === cpid);
+          }
+          case "psbt": {
+            const psbt = await XcpManager.getPsbt(cpid);
+            return psbt.some(psbt => psbt.status === 'active');
+          }
+          { /* case "dispensers": {
+            const dispensers = await DispenserManager.getDispensersByCpid(cpid);
+            return dispensers.dispensers.some(d => d.give_remaining > 0);
+          }
+          case "atomic": {
+            const atomicSwaps = await XcpManager.getAtomicSwaps(cpid);
+            return atomicSwaps.some(swap => swap.status === 'open');
+          } */}
+          default:
+            return false;
+        }
+      })
+    );
+
+    return {
+      matches: matches.some(Boolean)
+    };
   }
 }

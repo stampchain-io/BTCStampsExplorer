@@ -16,6 +16,7 @@ import {
   STAMP_FILETYPES,
   STAMP_EDITIONS,
   STAMP_RARITY,
+  STAMP_MARKET,
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
@@ -70,7 +71,10 @@ export class StampController {
     editionFilters,
     rarityFilters,
     directRarityMin,
-    directRarityMax
+    directRarityMax,
+    marketFilters,
+    marketMin,
+    marketMax,
   }: {
     page?: number;
     limit?: number;
@@ -97,6 +101,9 @@ export class StampController {
     rarityFilters?: STAMP_RARITY;
     directRarityMin?: string;
     directRarityMax?: string;
+    marketFilters?: STAMP_MARKET[];
+    marketMin?: string;
+    marketMax?: string;
   } = {}) {
     console.log("stamp controller payload", {
       page,
@@ -112,7 +119,10 @@ export class StampController {
       editionFilters,
       rarityFilters,
       directRarityMin,
-      directRarityMax
+      directRarityMax,
+      marketFilters,
+      marketMin,
+      marketMax
     });
     
     console.log("About to call repository with rarityFilters:", rarityFilters);
@@ -210,7 +220,10 @@ export class StampController {
       editionFilters,
       rarityFilters,
       directRarityMin,
-      directRarityMax
+      directRarityMax,
+      marketFilters,
+      marketMin,
+      marketMax
     });
 
     // Process stamps with floor prices and asset info if needed

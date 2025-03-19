@@ -4,7 +4,12 @@ import { RouteType } from "$server/services/cacheService.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { validateSortDirection } from "$server/services/validationService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { STAMP_EDITIONS, STAMP_FILETYPES, STAMP_RARITY } from "$globals";
+import {
+  STAMP_EDITIONS,
+  STAMP_FILETYPES,
+  STAMP_MARKET,
+  STAMP_RARITY,
+} from "$globals";
 
 type StampHandlerConfig = {
   type: "stamps" | "cursed";
@@ -122,14 +127,18 @@ export const createStampHandler = (
         }
 
         // Extract filters
-        const filetypeFilters =
-          url.searchParams.get("filetype")?.split(",").filter(Boolean) as
-            | STAMP_FILETYPES[]
-            | undefined || undefined;
-        const editionFilters =
-          url.searchParams.get("editions")?.split(",").filter(Boolean) as
-            | STAMP_EDITIONS[]
-            | undefined || undefined;
+        const filetypeFilters = url.searchParams.get("filetype")?.split(",")
+          .filter(Boolean) as STAMP_FILETYPES[] | undefined;
+        const editionFilters = url.searchParams.get("editions")?.split(",")
+          .filter(Boolean) as STAMP_EDITIONS[] | undefined;
+
+        // Add market filter extraction
+        const marketParam = url.searchParams.get("market");
+        const marketFilters = marketParam?.split(",").filter(Boolean) as
+          | STAMP_MARKET[]
+          | undefined;
+        const marketMin = url.searchParams.get("marketMin") || undefined;
+        const marketMax = url.searchParams.get("marketMax") || undefined;
 
         // Extract rarity filters
         const rarityPreset = url.searchParams.get("rarityPreset") || "";
@@ -160,6 +169,9 @@ export const createStampHandler = (
           cacheType,
           filetypeFilters,
           editionFilters,
+          marketFilters,
+          marketMin,
+          marketMax,
           rarityFilters,
           directRarityMin: rarityMin,
           directRarityMax: rarityMax,

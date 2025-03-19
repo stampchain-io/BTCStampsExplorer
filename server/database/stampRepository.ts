@@ -570,6 +570,9 @@ export class StampRepository {
     rarityFilters?: STAMP_RARITY;
     directRarityMin?: string;
     directRarityMax?: string;
+    marketFilters?: STAMP_MARKET[];
+    marketMin?: string;
+    marketMax?: string;
   }) {
     // Extract all parameters including both filter types
     const {
@@ -602,6 +605,9 @@ export class StampRepository {
       rarityFilters,
       directRarityMin,
       directRarityMax,
+      marketFilters,
+      marketMin,
+      marketMax,
     } = options;
 
     // Combine both filter types for processing
@@ -1170,7 +1176,7 @@ export class StampRepository {
     
     // Handle market filters
     if (filters.market) {
-      this.buildMarketFilterConditions(filters.market, whereConditions, queryParams);
+      this.buildMarketFilterConditions(filters.market, undefined, undefined, whereConditions, queryParams);
     }
     
     // Handle search text
@@ -1306,5 +1312,64 @@ export class StampRepository {
     
     console.log("[RARITY DEBUG] Final whereConditions:", whereConditions);
     console.log("[RARITY DEBUG] Final queryParams:", queryParams);
+  }
+
+  private static buildMarketFilterConditions(
+    marketFilters: STAMP_MARKET[],
+    marketMin?: string,
+    marketMax?: string,
+    whereConditions: string[],
+    queryParams: (string | number)[]
+  ) {
+    if (!marketFilters?.length) return;
+
+    // Group filters by category
+    const listingFilters = [];
+    const saleFilters = [];
+
+    // Sort filters into their respective categories
+    // if (marketFilters.includes("atomic")) {
+    //   listingFilters.push("st.has_active_atomic = true");
+    // }
+    // if (marketFilters.includes("dispensers")) {
+    //   listingFilters.push("st.has_active_dispenser = true");
+    // }
+    // old listings push("st.unbound_quantity > 0");
+    if (marketFilters.includes("listings")) {
+      listingFilters.push("st.has_active_dispenser = true");
+    }
+    if (marketFilters.includes("sales")) {
+      saleFilters.push("st.has_recent_sale = true");
+    }
+    // NEEDS TO BE CORRECTLY UPDATED
+    if (marketFilters.includes("psbt")) {
+      saleFilters.push("st.has_recent_sale = true");
+    }
+
+    // Build category conditions - within each category use OR
+    const categoryConditions = [];
+
+    if (listingFilters.length > 0) {
+      categoryConditions.push(`(${listingFilters.join(" OR ")})`);
+    }
+
+    if (saleFilters.length > 0) {
+      categoryConditions.push(`(${saleFilters.join(" OR ")})`);
+    }
+
+    // Combine categories with AND logic
+    if (categoryConditions.length > 0) {
+      whereConditions.push(categoryConditions.join(" AND "));
+    }
+
+    // Price range conditions
+    if (marketMin) {
+      whereConditions.push("st.market_price >= ?");
+      queryParams.push(marketMin);
+    }
+    if (marketMax) {
+      whereConditions.push("st.market_price <= ?");
+      queryParams.push(marketMax);
+    }
   }
 }

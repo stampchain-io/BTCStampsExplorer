@@ -69,10 +69,11 @@ export type LISTING_FILTER_TYPES =
 // NEW SUGGESTIONS
 // Filter types - Stamp
 export type STAMP_MARKET =
-  | "atomic" // Maps to transactions with psbt format in transactions table
-  | "dispensers" // Maps to entries in the dispensers table with active give_remaining
-  | "listings" // Maps to active sale listings in transactions table with specific status
-  | "sales"; // Maps to completed sales in transactions table with confirmed status
+  | "atomic" // Unused in the UI
+  | "dispensers" // Unused in the UI
+  | "listings" // Maps to dispensers - should be updated to include atomic and dispensers -v3 - also named for sale
+  | "sales" // Named sold previously
+  | "psbt"; // aka utxo bound
 
 export type STAMP_FILETYPES =
   | "jpg" // Maps to StampTableV4.stamp_mimetype = 'image/jpeg'

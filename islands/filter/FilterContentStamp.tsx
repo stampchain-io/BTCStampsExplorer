@@ -558,14 +558,8 @@ export const FilterContentStamp = ({
   // Helper function to toggle market type
   const toggleMarket = (type: STAMP_MARKET) => {
     setFilters((prevFilters) => {
-      const newMarket = [...prevFilters.market];
-      const index = newMarket.indexOf(type);
-
-      if (index === -1) {
-        newMarket.push(type);
-      } else {
-        newMarket.splice(index, 1);
-      }
+      // For radio buttons, we either select the new type or clear if it's already selected
+      const newMarket = prevFilters.market.includes(type) ? [] : [type];
 
       const newFilters = {
         ...prevFilters,
@@ -593,28 +587,34 @@ export const FilterContentStamp = ({
         variant="collapsibleTitle"
       >
         {/* Category: LISTINGS */}
-        <Checkbox
-          label="ATOMIC"
-          checked={filters.market.includes("atomic")}
-          onChange={() => toggleMarket("atomic")}
-        />
-        <Checkbox
-          label="DISPENSERS"
-          checked={filters.market.includes("dispensers")}
-          onChange={() => toggleMarket("dispensers")}
-        />
-        <Checkbox
+        <Radio
           label="LISTINGS"
           checked={filters.market.includes("listings")}
           onChange={() => toggleMarket("listings")}
         />
-        <Checkbox
+        <Radio
           label="SALES"
           checked={filters.market.includes("sales")}
           onChange={() => toggleMarket("sales")}
         />
+        <Radio
+          label="UTXO BOUND"
+          checked={filters.market.includes("psbt")}
+          onChange={() => toggleMarket("psbt")}
+        />
+        {
+          /*
+          <Radio
+            label="DISPENSERS"
+            value="dispensers"
+            checked={filters.market.includes("dispensers")}
+            onChange={() => toggleMarket("dispensers")}
+          />
+        */
+        }
 
-        {/* Price Range Slider - only show if any market type is selected */}
+        {
+          /* Price Range Slider - only show if any market type is selected
         {filters.market.length > 0 && (
           <CollapsibleSection
             title="Price Range"
@@ -632,7 +632,8 @@ export const FilterContentStamp = ({
                 : Infinity}
             />
           </CollapsibleSection>
-        )}
+        )} */
+        }
       </CollapsibleSection>
 
       <CollapsibleSection
