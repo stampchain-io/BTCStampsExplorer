@@ -2,6 +2,7 @@ import { useState } from "preact/hooks";
 import { SRC20Row } from "$globals";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
+import { BaseCardStyles } from "./styles.ts";
 
 function splitTextAndEmojis(text: string): { text: string; emoji: string } {
   // Regex to match emojis
@@ -18,16 +19,6 @@ function splitTextAndEmojis(text: string): { text: string; emoji: string } {
     emoji: text.slice(emojiIndex),
   };
 }
-
-export const middleLayoutClassName =
-  "hidden tablet:flex text-center flex-col justify-center";
-export const defaultTextClassName =
-  "text-base mobileLg:text-lg text-stamp-grey-darker font-light";
-export const boldTextClassName = "font-bold text-stamp-grey-light";
-const dataLabelSm =
-  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-const dataValueSm =
-  "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
 
 export interface SRC20BaseCardProps {
   src20: SRC20Row;
@@ -116,16 +107,16 @@ export function SRC20BaseCard(
 
           {(fromPage === "src20" || fromPage === "home") && (
             <div class="flex flex-col pt-0.75 mobileLg:pt-1.5 -space-y-0.5">
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 SUPPLY{" "}
-                <span class={dataValueSm}>
+                <span class={BaseCardStyles.dataValueSm}>
                   {Number(src20.max).toLocaleString()}
                 </span>
               </p>
 
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 LIMIT{" "}
-                <span class={dataValueSm}>
+                <span class={BaseCardStyles.dataValueSm}>
                   {Number(src20.lim).toLocaleString()}
                 </span>
               </p>
@@ -134,10 +125,10 @@ export function SRC20BaseCard(
 
           {fromPage === "wallet" && (
             <div class="flex flex-col pt-0.75 mobileLg:pt-1.5 -space-y-0.5">
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 AMOUNT
               </p>
-              <p class={dataValueSm}>
+              <p class={BaseCardStyles.dataValueSm}>
                 {stripTrailingZeros(Number(src20.amt).toFixed(2))}
               </p>
             </div>
@@ -145,8 +136,9 @@ export function SRC20BaseCard(
 
           {fromPage === "stamping/src20" && (
             <div class="flex flex-col pt-1.5 mobileLg:pt-3 gap-1">
-              <p class={dataLabelSm}>
-                PROGRESS <span class={dataValueSm}>{progress}%</span>
+              <p class={BaseCardStyles.dataLabelSm}>
+                PROGRESS{" "}
+                <span class={BaseCardStyles.dataValueSm}>{progress}%</span>
               </p>
               <div class="relative min-w-[144px] mobileLg:min-w-[192px] h-1 mobileLg:h-1.5 bg-stamp-grey rounded-full">
                 <div

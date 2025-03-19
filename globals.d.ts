@@ -180,6 +180,9 @@ export interface SRC20Row {
   top_mints_percentage?: number;
   volume_7d?: number;
   value?: number;
+  stamp_url?: string;
+  deploy_img?: string;
+  deploy_tx?: string;
   mint_progress?: {
     max_supply: string;
     total_minted: string;
