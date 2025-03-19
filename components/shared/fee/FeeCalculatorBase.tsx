@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { logger } from "$lib/utils/logger.ts";
 import {
+  formatBTCAmount,
   formatSatoshisToBTC,
   formatSatoshisToUSD,
 } from "$lib/utils/formatUtils.ts";
 import type { BaseFeeCalculatorProps } from "$lib/types/base.d.ts";
+import { FeeStyles } from "$components/shared/fee/styles.ts";
 
 interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   isModal?: boolean;
@@ -13,11 +15,19 @@ interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   cancelText?: string;
   confirmText?: string;
   type?: string;
-  fileType?: string;
-  fileSize?: number;
-  issuance?: number;
+  fileType?: string | undefined;
+  fileSize?: number | undefined;
+  issuance?: number | undefined;
   serviceFee?: number;
   bitname?: string;
+  amount?: number;
+  receive?: number;
+  fromPage?: string;
+  price?: number;
+  edition?: number;
+  ticker?: string;
+  limit?: number;
+  supply?: number;
 }
 
 export function FeeCalculatorBase({
@@ -33,6 +43,8 @@ export function FeeCalculatorBase({
   tosAgreed = false,
   onTosChange = () => {},
   feeDetails,
+  transferDetails,
+  mintDetails,
   isModal = false,
   disabled = false,
   cancelText = "CANCEL",
@@ -41,8 +53,16 @@ export function FeeCalculatorBase({
   fileType,
   fileSize,
   issuance,
-  serviceFee,
+  serviceFee = 0,
   bitname,
+  amount = 0, //Donate Amount
+  receive = 0, // Donate receive
+  fromPage = "",
+  price = 0, // Stamp Buy
+  edition = 0, // Stamp Buy
+  ticker = "", // SRC20 Deploy
+  limit = 0, // SRC20 Deploy
+  supply = 0, // SRC20 Deploy
 }: ExtendedBaseFeeCalculatorProps) {
   const { fees } = useFeePolling();
   const [visible, setVisible] = useState(false);
@@ -164,7 +184,7 @@ export function FeeCalculatorBase({
         <span className="font-bold">{fee}</span> SAT/vB
       </p>
       {fees?.recommendedFee && (
-        <p className="mb-3 text-sm mobileLg:text-base text-stamp-grey-light font-light">
+        <p className="mb-3 text-sm mobileLg:text-base text-stamp-grey-light font-light text-nowrap">
           <span className="text-stamp-grey-darker">RECOMMENDED</span>{" "}
           <span className="font-medium">{fees.recommendedFee}</span> SAT/vB
         </p>
@@ -195,7 +215,7 @@ export function FeeCalculatorBase({
           className="w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
         />
         <div
-          className={`${tooltipImage} ${
+          className={`${FeeStyles.tooltipImage} ${
             isFeeTooltipVisible ? "opacity-100" : "opacity-0"
           }`}
           style={{
@@ -248,7 +268,7 @@ export function FeeCalculatorBase({
         </p>
 
         {/* Miner Fee */}
-        {!!feeDetails?.minerFee && !bitname && (
+        {!!feeDetails?.minerFee && (
           <p className={detailsText}>
             <span className={detailsTitle}>
               MINER FEE
@@ -262,7 +282,7 @@ export function FeeCalculatorBase({
         )}
 
         {/* Service Fee */}
-        {serviceFee && serviceFee > 0 && (
+        {serviceFee > 0 && (
           <p className={detailsText}>
             <span className={detailsTitle}>
               {isModal ? "SERVICE FEE" : "MINTING FEE"}
@@ -285,7 +305,7 @@ export function FeeCalculatorBase({
         )}
 
         {/* Dust Value */}
-        {!!feeDetails?.dustValue && (
+        {!!feeDetails?.dustValue && feeDetails?.dustValue > 0 && (
           <p className={detailsText}>
             <span className={detailsTitle}>
               DUST
@@ -299,7 +319,7 @@ export function FeeCalculatorBase({
         )}
 
         {/* Total */}
-        {!!feeDetails?.totalValue && (
+        {!!feeDetails?.totalValue && feeDetails?.totalValue > 0 && (
           <p className={detailsText}>
             <span className={detailsTitle}>
               TOTAL
@@ -331,18 +351,120 @@ export function FeeCalculatorBase({
               )[0]}
           </p>
         )}
+
+        {/* Donate amount */}
+        {(fromPage === "donate" && amount) &&
+          (
+            <p className={detailsText}>
+              <span className={detailsTitle}>
+                DONATION AMOUNT
+              </span>&nbsp;&nbsp;{(amount / 100000000).toFixed(8)} BTC
+            </p>
+          )}
+
+        {/* Receive amount on donate */}
+        {(fromPage === "donate" && receive) &&
+          (
+            <p className={detailsText}>
+              <span className={detailsTitle}>
+                RECEIVE
+              </span>&nbsp;&nbsp;{receive} USDSTAMPS
+            </p>
+          )}
+
+        {/** Stamp Buy Modal */}
+        {(fromPage === "stamp_buy" && price) &&
+          (
+            <p className={detailsText}>
+              <span className={detailsTitle}>
+                STAMP PRICE
+              </span>&nbsp;&nbsp;{formatBTCAmount(
+                typeof price === "number" ? price : 0,
+                { excludeSuffix: true },
+              )} BTC
+            </p>
+          )}
+
+        {/** Stamp Buy Modal */}
+        {(fromPage === "stamp_buy" && edition) &&
+          (
+            <p className={detailsText}>
+              <span className={detailsTitle}>
+                EDITIONS
+              </span>&nbsp;&nbsp;{edition}
+            </p>
+          )}
+
+        {/** SRC20 DEPLOY */}
+        {(fromPage === "src20_deploy" && ticker) &&
+          (
+            <p className={detailsText}>
+              <span className={detailsTitle}>
+                TICKER
+              </span>&nbsp;&nbsp;{ticker}
+            </p>
+          )}
+        {(fromPage === "src20_deploy" && limit) &&
+          (
+            <p className={detailsText}>
+              <span className={detailsTitle}>
+                LIMIT
+              </span>&nbsp;&nbsp;{limit}
+            </p>
+          )}
+        {(fromPage === "src20_deploy" && supply) &&
+          (
+            <p className={detailsText}>
+              <span className={detailsTitle}>
+                SUPPLY
+              </span>&nbsp;&nbsp;{supply}
+            </p>
+          )}
+        
+        {/* Transfer Details */}
+        {transferDetails?.address && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>
+              RECEIPIENT ADDY
+            </span>&nbsp;&nbsp;{ transferDetails?.address }
+          </p>
+        )}
+
+        {transferDetails?.token && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>
+              TOKEN TICKER
+            </span>&nbsp;&nbsp;{ transferDetails?.token }
+          </p>
+        )}
+
+        {transferDetails?.amount && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>
+              AMOUNT
+            </span>&nbsp;&nbsp;{ transferDetails?.amount }
+          </p>
+        )}
+
+        {/* Mint Details */}
+        {mintDetails?.token && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>
+              TOKEN TICKER
+            </span>&nbsp;&nbsp;{ mintDetails?.token }
+          </p>
+        )}
+
+        {mintDetails?.amount && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>
+              AMOUNT
+            </span>&nbsp;&nbsp;{ mintDetails?.amount }
+          </p>
+        )}
       </div>
     );
   };
-
-  const tooltipButton =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
-  const tooltipImage =
-    "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
-  const buttonPurpleOutline =
-    "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
-  const buttonPurpleFlat =
-    "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors";
 
   return (
     <div className={`text-[#999999] ${className}`}>
@@ -368,7 +490,7 @@ export function FeeCalculatorBase({
                 {coinType === "BTC" ? btcIcon : usdIcon}
               </div>
               <div
-                className={`${tooltipButton} ${
+                className={`${FeeStyles.tooltipButton} ${
                   isCurrencyTooltipVisible ? "opacity-100" : "opacity-0"
                 }`}
               >
@@ -496,7 +618,7 @@ export function FeeCalculatorBase({
         <div className="flex justify-end gap-6">
           {isModal && onCancel && (
             <button
-              className={`${buttonPurpleOutline} ${
+              className={`${FeeStyles.buttonPurpleOutline} ${
                 (disabled || isSubmitting || (!isModal && !tosAgreed))
                   ? "opacity-50 cursor-not-allowed"
                   : ""
@@ -508,7 +630,7 @@ export function FeeCalculatorBase({
             </button>
           )}
           <button
-            className={`${buttonPurpleFlat} ${
+            className={`${FeeStyles.buttonPurpleFlat} ${
               (disabled || isSubmitting || (!isModal && !tosAgreed))
                 ? "opacity-50 cursor-not-allowed"
                 : ""

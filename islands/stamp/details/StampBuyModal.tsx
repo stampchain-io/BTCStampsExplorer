@@ -26,10 +26,14 @@ const StampBuyModal = ({
   dispenser,
 }: Props) => {
   const { wallet } = walletContext;
+  const [tosAgreed, setTosAgreed] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [maxQuantity, setMaxQuantity] = useState(1);
   const [_pricePerUnit, setPricePerUnit] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
+  const displayPrice = dispenser
+    ? parseInt(dispenser.satoshirate.toString(), 10) / 100000000
+    : (typeof stamp.floorPrice === "number" ? stamp.floorPrice : 0);
 
   const {
     formState,
@@ -37,7 +41,6 @@ const StampBuyModal = ({
     handleSubmit,
     isSubmitting,
     error,
-    _setError,
     successMessage,
     setSuccessMessage,
   } = useTransactionForm({
@@ -167,7 +170,6 @@ const StampBuyModal = ({
         handleCloseModal();
       }}
       title="BUY"
-      preventPropagation={false}
     >
       <div className="flex flex-row gap-6">
         <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
@@ -209,7 +211,6 @@ const StampBuyModal = ({
       </div>
 
       <BasicFeeCalculator
-        isModal={true}
         fee={formState.fee}
         handleChangeFee={(newFee) => {
           logger.debug("ui", {
@@ -220,7 +221,12 @@ const StampBuyModal = ({
           internalHandleChangeFee(newFee);
         }}
         type="buy"
+        tosAgreed={tosAgreed}
+        onTosChange={setTosAgreed}
         amount={totalPrice}
+        price={displayPrice} // Stamp Buy
+        edition={quantity} // Stamp Buy
+        fromPage="stamp_buy"
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
         onSubmit={() => {
@@ -239,7 +245,7 @@ const StampBuyModal = ({
         }}
         buttonName="BUY"
         className="pt-9 mobileLg:pt-12"
-        userAddress={wallet?.address}
+        userAddress={wallet?.address ?? ""}
         inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
       />
