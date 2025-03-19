@@ -373,7 +373,6 @@ const FilterDrawer = (
         
         left-0 right-auto w-full min-[420px]:w-[340px] shadow-[12px_0_12px_-6px_rgba(0,0,0,0.5)]
         tablet:right-0 tablet:left-auto tablet:w-[320px] tablet:shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
-        
         ${
         open ? "translate-x-0" : "-translate-x-full tablet:translate-x-full"
       }`}
@@ -383,7 +382,7 @@ const FilterDrawer = (
       <div className="h-[calc(100vh-92px)] tablet:h-[calc(100vh-88px)] p-6 overflow-y-auto scrollbar-black">
         <div className="flex flex-col mb-8 tablet:mb-6">
           <div className="flex justify-between ">
-            <p className="tablet:hidden text-3xl font-black gray-gradient1 cursor-default select-none">
+            <p className="tablet:hidden font-black text-3xl gray-gradient1 cursor-default select-none">
               FILTERS
             </p>
             <button

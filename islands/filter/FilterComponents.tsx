@@ -4,7 +4,7 @@ import {
   checkboxIcon,
   formatNumber,
   handleIcon,
-  labelGreyBaseFilter,
+  labelGreySemiboldSmLogic,
 } from "$islands/filter/FilterStyles.ts";
 
 // Chevron icon component - with three size variants
@@ -46,7 +46,7 @@ export const CloseIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 32 32"
-    class="size-7 tablet:size-6 hover:fill-stamp-grey-light transform transition-colors duration-300"
+    class="size-6 tablet:size-5 hover:fill-stamp-grey-light transform transition-colors duration-300"
     role="button"
     aria-label="Close Filter"
     fill="url(#closeFilterGradient)"
@@ -76,17 +76,13 @@ export const BadgeIcon = ({
   return (
     <span
       className={`
-        absolute top-0 left-0 
-        transform -translate-x-1/2 -translate-y-1/2 
-        size-6
         flex items-center justify-center
-        text-xs font-bold tracking-wider
-        text-black 
-        bg-stamp-purple 
-        group-hover:bg-stamp-purple-bright
-        rounded-full
+        absolute top-0 left-0 z-10
+        transform -translate-x-1/2 -translate-y-1/2 
+        size-6 rounded-full
+        font-bold text-xs text-stamp-grey group-hover:text-black tracking-wider
+        bg-stamp-purple group-hover:bg-stamp-purple-bright
         transition-all duration-300
-        z-10
         ${text === "0" ? "opacity-0" : "opacity-100"}
         ${className}
       `}
@@ -130,11 +126,11 @@ export const CollapsibleSection = ({
           <button
             onClick={handleClick}
             onMouseLeave={handleMouseLeave}
-            className="flex items-center w-full justify-between py-3 group transition-colors duration-300"
+            className="flex items-center w-full justify-between py-4 tablet:py-3 transition-colors duration-300 group"
           >
             <span
               className={`
-                text-xl font-light transition-colors duration-300
+                font-light text-xl tablet:text-lg transition-colors duration-300
                 ${
                 expanded
                   ? `text-stamp-grey ${
@@ -166,7 +162,7 @@ export const CollapsibleSection = ({
                     }`
                 } transition-colors duration-300`}
               >
-                {ChevronIcon("lg")}
+                {ChevronIcon("md")}
               </div>
             </div>
           </button>
@@ -176,7 +172,7 @@ export const CollapsibleSection = ({
               expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
             }`}
           >
-            <div className="-mt-0.5 tablet:-mt-0 pb-3 pl-0.5">
+            <div className="-mt-1 tablet:-mt-1.5 pb-3 pl-0.5">
               {children}
             </div>
           </div>
@@ -205,12 +201,12 @@ export const CollapsibleSection = ({
                   }`
               } transition-colors duration-300`}
             >
-              {ChevronIcon("md")}
+              {ChevronIcon("sm")}
             </div>
 
             <span
               className={`${
-                labelGreyBaseFilter(expanded, canHoverSelected)
+                labelGreySemiboldSmLogic(expanded, canHoverSelected)
               } font-light`}
             >
               {title}
@@ -805,7 +801,7 @@ export const Checkbox = ({
   return (
     <div className="flex flex-col">
       <div
-        className="flex items-center py-1.5 cursor-pointer group"
+        className="flex items-center py-1.5 tablet:py-1.5 cursor-pointer group"
         onMouseLeave={handleMouseLeave}
         onClick={handleChange}
       >
@@ -815,7 +811,7 @@ export const Checkbox = ({
           checked={checked}
           readOnly
         />
-        <label className={labelGreyBaseFilter(checked, canHoverSelected)}>
+        <label className={labelGreySemiboldSmLogic(checked, canHoverSelected)}>
           {label}
         </label>
       </div>
@@ -854,7 +850,7 @@ export const Radiobutton = (
 
   return (
     <div
-      className="flex items-center py-1.5 cursor-pointer group"
+      className="flex items-center cursor-pointer group"
       onMouseLeave={handleMouseLeave}
       onClick={handleChange}
     >
@@ -866,7 +862,7 @@ export const Radiobutton = (
         checked={checked}
         readOnly
       />
-      <label className={labelGreyBaseFilter(checked, canHoverSelected)}>
+      <label className={labelGreySemiboldSmLogic(checked, canHoverSelected)}>
         {label}
       </label>
     </div>

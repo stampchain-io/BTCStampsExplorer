@@ -7,7 +7,8 @@ import {
 } from "$globals";
 import {
   checkboxIcon,
-  labelGreyBaseFilter,
+  labelGreyLightXs,
+  labelGreySemiboldSmLogic,
 } from "$islands/filter/FilterStyles.ts";
 import {
   Checkbox,
@@ -141,12 +142,6 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
     filterPayload.pixel.filetypeFilters.push("bmp");
   }
 
-  // MP3/MPEG (combined)
-  if (filters.fileType.includes("mp3")) {
-    filterPayload.audio.filetypeFilters.push("mp3");
-    filterPayload.audio.filetypeFilters.push("mpeg");
-  }
-
   // SVG
   if (filters.fileType.includes("svg")) {
     filterPayload.vector.filetypeFilters.push("svg");
@@ -157,6 +152,18 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
   if (filters.fileType.includes("html")) {
     filterPayload.vector.filetypeFilters.push("html");
     filterPayload.recursive.filetypeFilters.push("html");
+  }
+
+  // TXT
+  // if (filters.fileType.includes("txt")) {
+  //   filterPayload.vector.filetypeFilters.push("txt");
+  //   filterPayload.recursive.filetypeFilters.push("txt");
+  // }
+
+  // MP3/MPEG (combined)
+  if (filters.fileType.includes("mp3")) {
+    filterPayload.audio.filetypeFilters.push("mp3");
+    filterPayload.audio.filetypeFilters.push("mpeg");
   }
 
   // LEGACY
@@ -287,9 +294,10 @@ interface RadioProps {
   value: string;
   checked: boolean;
   onChange: () => void;
+  name: string;
 }
 
-const Radio = ({ label, value, checked, onChange }: RadioProps) => {
+const Radio = ({ label, value, checked, onChange, name }: RadioProps) => {
   const [canHover, setCanHover] = useState(true);
 
   const handleChange = () => {
@@ -310,12 +318,12 @@ const Radio = ({ label, value, checked, onChange }: RadioProps) => {
       <input
         className={checkboxIcon(checked, canHover)}
         type="radio"
-        name="rarity"
+        name={name}
         value={value}
         checked={checked}
         readOnly
       />
-      <label className={labelGreyBaseFilter(checked, canHover)}>
+      <label className={labelGreySemiboldSmLogic(checked, canHover)}>
         {label}
       </label>
     </div>
@@ -389,9 +397,6 @@ export const FilterContentStamp = ({
       [section]: !expandedSections[section],
     });
   };
-
-  const filterCollectionSm =
-    "flex justify-end text-xs mobileLg:text-sm font-light text-stamp-grey-darker mt-1 mobileLg:mt-0 -mb-5 cursor-default";
 
   const [isDraggingPrice, setIsDraggingPrice] = useState(false);
   const [isDraggingRarity, setIsDraggingRarity] = useState(false);
@@ -578,7 +583,7 @@ export const FilterContentStamp = ({
   };
 
   return (
-    <div className="space-y-1 mobileLg:space-y-1.5" ref={drawerRef}>
+    <div ref={drawerRef}>
       <CollapsibleSection
         title="MARKET PLACE"
         section="market"
@@ -586,19 +591,24 @@ export const FilterContentStamp = ({
         toggle={() => toggleSection("market")}
         variant="collapsibleTitle"
       >
-        {/* Category: LISTINGS */}
         <Radio
           label="LISTINGS"
+          value="listings"
+          name="market"
           checked={filters.market.includes("listings")}
           onChange={() => toggleMarket("listings")}
         />
         <Radio
           label="SALES"
+          value="sales"
+          name="market"
           checked={filters.market.includes("sales")}
           onChange={() => toggleMarket("sales")}
         />
         <Radio
           label="UTXO BOUND"
+          value="atomic"
+          name="market"
           checked={filters.market.includes("psbt")}
           onChange={() => toggleMarket("psbt")}
         />
@@ -644,7 +654,7 @@ export const FilterContentStamp = ({
         variant="collapsibleTitle"
       >
         {/* Category: PIXEL */}
-        <div className={filterCollectionSm}>
+        <div className={labelGreyLightXs}>
           PIXELS
         </div>
         <Checkbox
@@ -686,7 +696,7 @@ export const FilterContentStamp = ({
         />
 
         {/* Category: VECTOR */}
-        <div className={filterCollectionSm}>
+        <div className={labelGreyLightXs}>
           VECTOR
         </div>
         <Checkbox
@@ -701,9 +711,17 @@ export const FilterContentStamp = ({
           checked={filters.fileType.includes("html")}
           onChange={() => toggleFileType("html")}
         />
+        {
+          /* <Checkbox
+          key="txt"
+          label="TXT"
+          checked={filters.fileType.includes("txt")}
+          onChange={() => toggleFileType("txt")}
+        />*/
+        }
 
         {/* Category: AUDIO */}
-        <div className={filterCollectionSm}>
+        <div className={labelGreyLightXs}>
           AUDIO
         </div>
         <Checkbox
@@ -714,7 +732,7 @@ export const FilterContentStamp = ({
         />
 
         {/* Category: ENCODING */}
-        <div className={filterCollectionSm}>
+        <div className={labelGreyLightXs}>
           ENCODING
         </div>
         <Checkbox
@@ -778,6 +796,7 @@ export const FilterContentStamp = ({
             key={value}
             label={`< ${value}`}
             value={value.toString()}
+            name="rarity"
             checked={filters.rarity.preset === value.toString()}
             onChange={() => handleRarityChange(value.toString())}
           />
@@ -787,6 +806,7 @@ export const FilterContentStamp = ({
         <Radio
           label="STAMP RANGE"
           value="stamp range"
+          name="rarity"
           checked={filters.rarity.preset === null &&
             (filters.rarity.min !== "" || filters.rarity.max !== "")}
           onChange={() => {

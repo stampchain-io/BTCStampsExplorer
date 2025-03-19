@@ -6,14 +6,14 @@ export const formatNumber = (num: number): string => {
 // Icon styles
 // Handle icon - Slider
 export const handleIcon = `
-  absolute w-full h-2.5 tablet:h-2 rounded-full appearance-none bg-transparent pointer-events-none 
+  absolute w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none 
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
-  [&::-webkit-slider-thumb]:size-2.5 [&::-webkit-slider-thumb]:tablet:size-2
+  [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:tablet:size-3
   [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey
   [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
   [&::-webkit-slider-thumb]:active:cursor-grabbing
   [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
-  [&::-moz-range-thumb]:size-2.5 [&::-moz-range-thumb]:tablet:size-2
+  [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:tablet:size-3
   [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey
   [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
@@ -26,7 +26,7 @@ export const checkboxIcon = (
 ): string => `
   appearance-none
   relative
-  size-5 tablet:size-4
+  size-4 tablet:size-3.5
   rounded-full
   border-2
   cursor-pointer
@@ -55,11 +55,15 @@ export const checkboxIcon = (
 
 // Text styles
 // Label - Filter
-export const labelGreyBaseFilter = (
+export const labelGreyLightXs =
+  "flex justify-end mt-0.5 tablet:mt-1 -mb-5 font-light tablet:font-regular text-sm tablet:text-xs text-stamp-grey-darker tracking-wider cursor-default";
+
+export const labelGreySemiboldSmLogic = (
   checked: boolean,
   canHoverSelected: boolean,
 ): string => `
-  inline-block ml-3 mt-0.5 tablet:mt-[1px] text-base font-bold 
+  inline-block ml-4 tablet:ml-3 mt-0.5 tablet:mt-0
+  font-semibold text-base tablet:text-sm
   transition-colors duration-300
   cursor-pointer select-none
   ${
@@ -76,7 +80,7 @@ export const labelGreyBaseFilter = (
 // Button styles
 export const buttonStyles = {
   base:
-    "inline-flex items-center justify-center border-2 rounded-md text-sm tablet:text-sm font-extrabold tracking-wider transition-colors duration-300",
+    "inline-flex items-center justify-center border-2 rounded-md font-extrabold text-sm tablet:text-sm tracking-wider transition-colors duration-300",
 
   // Variants
   variant: {
@@ -98,7 +102,7 @@ export const buttonStyles = {
   size: {
     sm: "h-9 tablet:h-8 px-4 tablet:px-3",
     md: "h-10 tablet:h-9 px-4 tablet:px-3",
-    lg: "h-11 tablet:h-11 px-5 tablet:px-4",
+    lg: "h-11 tablet:h-10 px-5 tablet:px-4",
   },
 };
 
