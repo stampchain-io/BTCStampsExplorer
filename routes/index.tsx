@@ -77,59 +77,78 @@ export default function Home({ data }: PageProps<HomePageData>) {
       {/* Load Micro5 font only when needed */}
       <Micro5FontLoader />
 
-      <div class="layout-container flex flex-col gap-24 mobileLg:gap-36 text-white mobileMd:mt-32 mt-20">
-        {/* Critical above-fold content */}
-        <HomeHeader />
+      <div>
+        <img
+          src="/img/stamps-collage-purpleOverlay-4000.webp"
+          alt="About Bitcoin Stamps and contact Stampchain"
+          class="
+          absolute
+          top-0
+          left-0
+          w-full
+          h-[450px] mobileMd:h-[500px] mobileLg:h-[600px] tablet:h-[700px] desktop:h-[850px]
+          object-cover
+          pointer-events-none
+          z-[-999]
+          [mask-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,0.3),rgba(0,0,0,0.5),rgba(0,0,0,0.3),rgba(0,0,0,0))]
+          [-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,0.3),rgba(0,0,0,0.5),rgba(0,0,0,0.3),rgba(0,0,0,0))]
+        "
+        />
 
-        {/* Important but can be deferred slightly */}
-        <div style="content-visibility: auto;">
-          <HomeCarousel carouselStamps={carouselStamps} />
-        </div>
+        <div class="layout-container flex flex-col gap-24 mobileLg:gap-36 mt-0 min-[420px]:mt-3 mobileMd:mt-6 tablet:mt-3">
+          {/* Critical above-fold content */}
+          <HomeHeader />
 
-        {/* Defer non-critical content */}
-        <div style="content-visibility: auto; contain-intrinsic-size: 0 500px;">
-          <HomeStampPreview
-            stamps_art={stamps_art}
-            stamps_posh={stamps_posh}
-            stamps_src721={stamps_src721}
-            collectionData={collectionData}
-          />
-        </div>
+          {/* Important but can be deferred slightly */}
+          <div style="content-visibility: auto;">
+            <HomeCarousel carouselStamps={carouselStamps} />
+          </div>
 
-        {/* Lazy load below-the-fold content */}
-        <div style="margin-top: -48px; content-visibility: auto; contain-intrinsic-size: 0 800px;">
-          <GetStampingModule />
-          <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
-            <RecentSales
-              title="RECENT SALES"
-              subTitle="HOT STAMPS"
-              variant="home"
-              displayCounts={{
-                mobileSm: 3,
-                mobileMd: 4,
-                mobileLg: 5,
-                tablet: 6,
-                desktop: 7,
-              }}
+          {/* Defer non-critical content */}
+          <div style="content-visibility: auto; contain-intrinsic-size: 0 500px;">
+            <HomeStampPreview
+              stamps_art={stamps_art}
+              stamps_posh={stamps_posh}
+              stamps_src721={stamps_src721}
+              collectionData={collectionData}
             />
           </div>
-          <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36 gap-12 mobileLg:gap-[72px]">
-            <SRC20Section
-              title="SRC-20 TOKENS"
-              subTitle="TOP TICKERS"
-              type="all"
-              fromPage="home"
-            />
-            <SRC20Section
-              subTitle="TRENDING MINTS"
-              type="trending"
-              fromPage="home"
-            />
+
+          {/* Lazy load below-the-fold content */}
+          <div style="margin-top: -48px; content-visibility: auto; contain-intrinsic-size: 0 800px;">
+            <GetStampingModule />
+            <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
+              <RecentSales
+                title="RECENT SALES"
+                subTitle="HOT STAMPS"
+                variant="home"
+                displayCounts={{
+                  mobileSm: 3,
+                  mobileMd: 4,
+                  mobileLg: 5,
+                  tablet: 6,
+                  desktop: 7,
+                }}
+              />
+            </div>
+            <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36 gap-12 mobileLg:gap-[72px]">
+              <SRC20Section
+                title="SRC-20 TOKENS"
+                subTitle="TOP TICKERS"
+                type="all"
+                fromPage="home"
+              />
+              <SRC20Section
+                subTitle="TRENDING MINTS"
+                type="trending"
+                fromPage="home"
+              />
+            </div>
           </div>
-        </div>
-        <div class="flex flex-col gap-6 mobileLg:gap-12">
-          <StampChainModule />
-          <PartnersModule />
+          <div class="flex flex-col gap-6 mobileLg:gap-12">
+            <StampChainModule />
+            <PartnersModule />
+          </div>
         </div>
       </div>
     </>

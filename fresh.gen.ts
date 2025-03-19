@@ -91,6 +91,7 @@ import * as $dashboard_address_ from "./routes/dashboard/[address].tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
 import * as $fairmint from "./routes/fairmint.tsx";
 import * as $faq_index from "./routes/faq/index.tsx";
+import * as $faq_styles from "./routes/faq/styles.ts";
 import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/sharedBlockWithStampsHandler.ts";
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
 import * as $handlers_sharedContentHandler from "./routes/handlers/sharedContentHandler.ts";
@@ -102,11 +103,13 @@ import * as $howto_leathercreate_index from "./routes/howto/leathercreate/index.
 import * as $howto_minttoken_index from "./routes/howto/minttoken/index.tsx";
 import * as $howto_registerbitname_index from "./routes/howto/registerbitname/index.tsx";
 import * as $howto_stamp_index from "./routes/howto/stamp/index.tsx";
+import * as $howto_styles from "./routes/howto/styles.ts";
 import * as $howto_transferbitname_index from "./routes/howto/transferbitname/index.tsx";
 import * as $howto_transferstamp_index from "./routes/howto/transferstamp/index.tsx";
 import * as $howto_transfertoken_index from "./routes/howto/transfertoken/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $media_index from "./routes/media/index.tsx";
+import * as $media_styles from "./routes/media/styles.ts";
 import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
@@ -120,6 +123,7 @@ import * as $stamping_src101_action_ from "./routes/stamping/src101/[action].tsx
 import * as $stamping_src20 from "./routes/stamping/src20.tsx";
 import * as $stamping_src20_action_ from "./routes/stamping/src20/[action].tsx";
 import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
+import * as $stamping_stamp_action_ from "./routes/stamping/stamp/[action].tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
 import * as $test_design_system from "./routes/test/design-system.tsx";
 import * as $test_test_image from "./routes/test/test-image.ts";
@@ -152,6 +156,8 @@ import * as $about_AboutContact from "./islands/about/AboutContact.tsx";
 import * as $about_AboutDonate from "./islands/about/AboutDonate.tsx";
 import * as $about_AboutHeader from "./islands/about/AboutHeader.tsx";
 import * as $about_AboutTeam from "./islands/about/AboutTeam.tsx";
+import * as $about_styles from "./islands/about/styles.ts";
+import * as $about_types from "./islands/about/types.ts";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
@@ -169,6 +175,7 @@ import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
+import * as $datacontrol_faq from "./islands/datacontrol/faq.ts";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
@@ -230,6 +237,8 @@ import * as $stamping_src20_trade_TradeContent from "./islands/stamping/src20/tr
 import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src20/transfer/LatestTransfer.tsx";
 import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
 import * as $stamping_stamp_OlgaContent from "./islands/stamping/stamp/OlgaContent.tsx";
+import * as $stamping_stamp_transfer_LatestStampTransfer from "./islands/stamping/stamp/transfer/LatestStampTransfer.tsx";
+import * as $stamping_stamp_transfer_TransferStampContent from "./islands/stamping/stamp/transfer/TransferStampContent.tsx";
 import * as $test_ReviewDogTest from "./islands/test/ReviewDogTest.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
@@ -351,6 +360,7 @@ const manifest = {
     "./routes/docs/index.tsx": $docs_index,
     "./routes/fairmint.tsx": $fairmint,
     "./routes/faq/index.tsx": $faq_index,
+    "./routes/faq/styles.ts": $faq_styles,
     "./routes/handlers/sharedBlockWithStampsHandler.ts":
       $handlers_sharedBlockWithStampsHandler,
     "./routes/handlers/sharedCollectionHandler.ts":
@@ -364,11 +374,13 @@ const manifest = {
     "./routes/howto/minttoken/index.tsx": $howto_minttoken_index,
     "./routes/howto/registerbitname/index.tsx": $howto_registerbitname_index,
     "./routes/howto/stamp/index.tsx": $howto_stamp_index,
+    "./routes/howto/styles.ts": $howto_styles,
     "./routes/howto/transferbitname/index.tsx": $howto_transferbitname_index,
     "./routes/howto/transferstamp/index.tsx": $howto_transferstamp_index,
     "./routes/howto/transfertoken/index.tsx": $howto_transfertoken_index,
     "./routes/index.tsx": $index,
     "./routes/media/index.tsx": $media_index,
+    "./routes/media/styles.ts": $media_styles,
     "./routes/presskit/index.tsx": $presskit_index,
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/src20/[tick].tsx": $src20_tick_,
@@ -382,6 +394,7 @@ const manifest = {
     "./routes/stamping/src20.tsx": $stamping_src20,
     "./routes/stamping/src20/[action].tsx": $stamping_src20_action_,
     "./routes/stamping/stamp.tsx": $stamping_stamp,
+    "./routes/stamping/stamp/[action].tsx": $stamping_stamp_action_,
     "./routes/termsofservice/index.tsx": $termsofservice_index,
     "./routes/test/design-system.tsx": $test_design_system,
     "./routes/test/test-image.ts": $test_test_image,
@@ -426,6 +439,8 @@ const manifest = {
     "./islands/about/AboutDonate.tsx": $about_AboutDonate,
     "./islands/about/AboutHeader.tsx": $about_AboutHeader,
     "./islands/about/AboutTeam.tsx": $about_AboutTeam,
+    "./islands/about/styles.ts": $about_styles,
+    "./islands/about/types.ts": $about_types,
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
@@ -449,6 +464,7 @@ const manifest = {
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
+    "./islands/datacontrol/faq.ts": $datacontrol_faq,
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/home/FontLoader.tsx": $home_FontLoader,
@@ -526,6 +542,10 @@ const manifest = {
     "./islands/stamping/src20/transfer/TransferContent.tsx":
       $stamping_src20_transfer_TransferContent,
     "./islands/stamping/stamp/OlgaContent.tsx": $stamping_stamp_OlgaContent,
+    "./islands/stamping/stamp/transfer/LatestStampTransfer.tsx":
+      $stamping_stamp_transfer_LatestStampTransfer,
+    "./islands/stamping/stamp/transfer/TransferStampContent.tsx":
+      $stamping_stamp_transfer_TransferStampContent,
     "./islands/test/ReviewDogTest.tsx": $test_ReviewDogTest,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,

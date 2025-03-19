@@ -32,6 +32,10 @@ export default function App({ Component, state }: PageProps<unknown>) {
         <link rel="stylesheet" href="/styles.css" />
         <link rel="preload" href="/gradients.css" as="style" />
         <link rel="stylesheet" href="/gradients.css" />
+        <link rel="preload" href="/modal.css" as="style" />
+        <link rel="stylesheet" href="/modal.css" />
+        <link rel="preload" href="/slick.css" as="style" />
+        <link rel="stylesheet" href="/slick.css" />
 
         {/* Main font loader */}
         <FontLoader />

@@ -101,7 +101,7 @@ export interface WalletOverviewInfo {
 }
 
 // Extended interface for wallet data that includes dispenser stats
-export interface WalletData extends WalletOverviewInfo {
+export interface WalletData extends Partial<WalletOverviewInfo> {
   dispensers?: DispenserStats;
 }
 

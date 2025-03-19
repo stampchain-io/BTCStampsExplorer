@@ -138,16 +138,21 @@ export function SRC20Section({
   }
 
   return (
-    <div>
+    <div class="w-full">
       {title && (
-        <h1 class={ModulesStyles.titlePurpleDL}>
+        <h1
+          class={`${ModulesStyles.titlePurpleDL} ${
+            fromPage === "home" && type === "trending" ? "opacity-0" : ""
+          }`}
+        >
           {title}
         </h1>
       )}
       {subTitle && (
         <h2
-          class={ModulesStyles.subTitlePurple +
-            " mb-3 mobileMd:mb-6 desktop:mb-9"}
+          class={`${ModulesStyles.subTitlePurple} mb-3 mobileMd:mb-6 desktop:mb-9 ${
+            type === "trending" ? " tablet:text-right text-left" : ""
+          }`}
         >
           {subTitle}
         </h2>

@@ -123,6 +123,7 @@ export interface StampSectionProps {
   isRecentSales?: boolean;
   filterBy?: STAMP_FILTER_TYPES | STAMP_FILTER_TYPES[];
   showDetails?: boolean;
+  showEdition?: boolean;
   gridClass?: string;
   displayCounts?: DisplayCountBreakpoints;
   pagination?: Pagination;
@@ -179,6 +180,9 @@ export interface SRC20Row {
   top_mints_percentage?: number;
   volume_7d?: number;
   value?: number;
+  stamp_url?: string;
+  deploy_img?: string;
+  deploy_tx?: string;
   mint_progress?: {
     max_supply: string;
     total_minted: string;
@@ -680,6 +684,19 @@ export interface Config {
   MINTING_SERVICE_FEE_ENABLED: boolean;
   MINTING_SERVICE_FEE: string | null;
   MINTING_SERVICE_FEE_ADDRESS: string | null;
+}
+
+export interface WalletDataTypes {
+  accounts: string[];
+  address: string;
+  publicKey: string;
+  btcBalance: {
+    confirmed: number;
+    unconfirmed: number;
+    total: number;
+  };
+  network: "mainnet" | "testnet"; // Adjust if needed
+  provider: string;
 }
 
 declare global {

@@ -18,6 +18,7 @@ import {
 } from "$types/pagination.d.ts";
 import { SRC20Row, StampRow } from "$globals";
 import { DEFAULT_PAGINATION } from "$server/services/routeValidationService.ts";
+import { WalletOverviewInfo } from "$types/wallet.d.ts";
 
 /**
  * We add stampsSortBy to the query to handle the ASC / DESC sorting on stamps.
@@ -331,16 +332,33 @@ export const handler: Handlers = {
   },
 };
 
+// Helper function to determine if address should be treated as dispenser-only
+function isDispenserOnlyAddress(data: WalletPageProps["data"]) {
+  // Check if address has dispensers
+  const hasDispensers = data.data.dispensers.data.length > 0;
+
+  // Check if address has other assets
+  const hasOtherStamps =
+    data.data.stamps.data.length > (data.data.dispensers.data.length || 0);
+  const hasSrc20Tokens = data.data.src20.data.length > 0;
+  const hasCreatedStamps = data.stampsCreated > 0;
+
+  // Only treat as dispenser if it ONLY has dispenser activity
+  return hasDispensers && !hasOtherStamps && !hasSrc20Tokens &&
+    !hasCreatedStamps;
+}
+
 export default function Wallet(props: WalletPageProps) {
   const { data } = props;
+  const isDispenserOnly = isDispenserOnlyAddress(data);
 
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6" f-client-nav>
       <WalletHeader />
-      {data.data.dispensers.data.length > 0
+      {isDispenserOnly
         ? (
           <WalletDispenserDetails
-            walletData={data.walletData}
+            walletData={data.walletData as WalletOverviewInfo}
             stampsTotal={data.stampsTotal}
             src20Total={data.src20Total}
             stampsCreated={data.stampsCreated}
@@ -350,7 +368,7 @@ export default function Wallet(props: WalletPageProps) {
         : (
           <>
             <WalletProfileDetails
-              walletData={data.walletData}
+              walletData={data.walletData as WalletOverviewInfo}
               stampsTotal={data.stampsTotal}
               src20Total={data.src20Total}
               stampsCreated={data.stampsCreated}

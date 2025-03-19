@@ -6,6 +6,7 @@ import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.ts
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
+import {DonateModalStyles} from "./styles.ts"
 
 interface Props {
   stamp: StampRow;
@@ -26,7 +27,7 @@ const WalletDonateModal = ({
 }: Props) => {
   const { wallet } = walletContext;
   const [quantity, setQuantity] = useState(1);
-  const [maxQuantity, setMaxQuantity] = useState(1);
+  // const [maxQuantity, setMaxQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isAmountTooltipVisible, setIsAmountTooltipVisible] = useState(false);
@@ -51,10 +52,10 @@ const WalletDonateModal = ({
 
   useEffect(() => {
     if (dispenser) {
-      const maxQty = Math.floor(
-        dispenser.give_remaining / dispenser.give_quantity,
-      );
-      setMaxQuantity(maxQty);
+      // const maxQty = Math.floor(
+      //   dispenser.give_remaining / dispenser.give_quantity,
+      // );
+      // setMaxQuantity(maxQty);
       setTotalPrice(quantity * dispenser.satoshirate);
     }
   }, [dispenser, quantity]);
@@ -168,16 +169,19 @@ const WalletDonateModal = ({
     };
   }, []);
 
-  // Update total price when quantity or dispenser changes
-  useEffect(() => {
-    if (dispenser) {
-      const price = quantity * dispenser.satoshirate;
-      setTotalPrice(price);
-    }
-  }, [quantity, dispenser]);
+  // Helper functions to convert between slider position and amount value
+  const amountToSliderPos = (amount: number) =>
+    amount <= 20
+      ? (amount / 20) * 66.67
+      : 66.67 + ((amount - 20) / 480) * 33.33;
 
-  const tooltipImage =
-    "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
+  const sliderPosToAmount = (pos: number) => {
+    if (pos <= 66.67) {
+      return Math.round((pos / 66.67) * 20); // 1-20 with 1.0 steps
+    }
+    const value = 20 + ((pos - 66.67) / 33.33) * 480;
+    return Math.min(500, Math.round(value)); // 20-500 with 1.0 steps
+  };
 
   return (
     <ModalLayout
@@ -193,7 +197,7 @@ const WalletDonateModal = ({
       <div className="mb-6">
         <p className="text-3xl mobileLg:text-4xl font-bold text-stamp-grey-light text-center">
           {(totalPrice / 100000000).toFixed(8)}{" "}
-          <span className="font-extralight">BTC</span>
+          <span className="font-extralight">BTCc</span>
         </p>
       </div>
 
@@ -209,15 +213,16 @@ const WalletDonateModal = ({
           <div className="flex flex-col items-start -space-y-0.5">
             <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey-light">
               <span className="font-light text-stamp-grey-darker">RECEIVE</span>
-              {" "}
-              {quantity} EDITION{quantity > 1 ? "S" : ""}
-            </p>
-            <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
-              MAX {maxQuantity}
+              <br />
+              {quantity * 1000}{" "}
+              <span className="font-light">
+                USDSTAMPS
+              </span>
+              {quantity * 1000 > 1 ? "" : ""}
             </p>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-[18px]">
             <div
               className="relative w-full group"
               onMouseMove={handleMouseMove}
@@ -229,16 +234,19 @@ const WalletDonateModal = ({
               <input
                 type="range"
                 min="1"
-                max={maxQuantity}
-                value={quantity}
+                max="100"
+                step="0.25"
+                value={amountToSliderPos(quantity)}
                 onInput={(e) => {
                   const target = e.target as HTMLInputElement;
-                  setQuantity(parseInt(target.value));
+                  setQuantity(
+                    Math.max(1, sliderPosToAmount(parseFloat(target.value))),
+                  );
                 }}
                 className="w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
               />
               <div
-                className={`${tooltipImage} ${
+                className={`${DonateModalStyles.tooltipImage} ${
                   isAmountTooltipVisible ? "opacity-100" : "opacity-0"
                 }`}
                 style={{
@@ -255,7 +263,6 @@ const WalletDonateModal = ({
       </div>
 
       <BasicFeeCalculator
-        isModal={true}
         fee={formState.fee}
         handleChangeFee={(newFee) => {
           logger.debug("ui", {
@@ -266,7 +273,9 @@ const WalletDonateModal = ({
           internalHandleChangeFee(newFee);
         }}
         type="buy"
+        fromPage="donate"
         amount={totalPrice}
+        receive={quantity * 1000}
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
         onSubmit={() => {
@@ -285,7 +294,7 @@ const WalletDonateModal = ({
         }}
         buttonName="DONATE"
         className="pt-9 mobileLg:pt-12"
-        userAddress={wallet?.address}
+        userAddress={wallet?.address ?? ""}
         inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
       />

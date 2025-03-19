@@ -431,7 +431,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
   // Helper function to check if it's a POSH stamp (move near top of component)
   const isPoshStamp = (cpid: string) => {
-    return !cpid.startsWith("A");
+    return !cpid?.startsWith("A");
   };
 
   const titleRef = useRef<HTMLParagraphElement>(null);
@@ -469,7 +469,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     updateScale();
   }, [stamp.cpid, stamp.stamp, htmlStampTitle]);
 
-  const [src101, setSrc101] = useState<Src101Detail>({});
+  const [src101, setSrc101] = useState<Src101Detail>();
   const [showListings, setShowListings] = useState(false);
   const [dispensers, setDispensers] = useState<any[]>([]);
   const [isLoadingDispensers, setIsLoadingDispensers] = useState(false);
@@ -510,9 +510,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     try {
       const res = await getSRC101Data(stamp as StampRow);
       setSrc101(res);
-    } catch (error) {
+    } catch (error: any) {
       console.log("Fetch SRC101 Error====>", error.message);
-      setSrc101({});
+      setSrc101({} as Src101Detail);
     }
   };
 

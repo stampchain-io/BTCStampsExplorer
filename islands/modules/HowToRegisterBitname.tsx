@@ -6,52 +6,64 @@ export const HowToRegisterBitnameModule = () => {
     <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col">
         <h1 class={ModulesStyles.titleGreyDL}>HOW-TO</h1>
-        <h2 class={ModulesStyles.subTitleGrey}>REGISTER A DOMAIN</h2>
+        <h2 class={ModulesStyles.subTitleGrey}>REGISTER YOUR BITNAME</h2>
         <p class={ModulesStyles.bodyTextLight}>
           <ul class="list-disc pl-5 space-y-2">
             <li>
-              Start typing a <b>token name</b>{" "}
-              to filter and select the correct ticker.
+              Select your preferred <b>Top Level Domain</b>{" "}
+              from the .btc dropdown menu. We support multiple TLDs, such as
+              {" "}
+              <b>.btc</b>, <b>.sats</b>, <b>.x</b>.
             </li>
             <li>
-              The ticker logo image and name will be shown along with the
-              maximum limit per mint.
+              Type in the <b>domain name</b> you want to claim.
             </li>
             <li>
-              Double-check that the displayed information matches the ticker you
-              wish to mint.
+              Click the <b>availability</b>{" "}
+              button to check if the domain is already registered or available.
             </li>
             <li>
-              If the <b>minting progress</b>{" "}
-              is near 95%, be cautious as you risk losing your funds. <br />
-              When a token is minted out, and progress has reached 100%, you
-              will no longer be able to mint it.
+              If the domain name isn't claimed, you can proceed to register it.
             </li>
             <li>
-              <b>Fee</b>{" "}
-              displays the suggested amount, which can be adjusted using the
-              slider.{" "}
+              Set the desired <b>transaction fee</b>{" "}
+              by adjusting the fee selector slider. We do not advise setting a
+              fee lower than the <b>recommended fee</b>.
             </li>
             <li>
               An <b>estimate</b>{" "}
-              is displayed based on the current fee and transaction size.
+              of the total cost of the registration is displayed. You can view a
+              breakdown of the domain registration and transaction fees, in the
+              {" "}
+              <b>details</b> dropdown section.
             </li>
             <li>
-              Accept the <b>terms and conditions</b> to enable the mint button.
+              Accept the <b>terms of service</b> to enable the register button.
             </li>
             <li>
-              The <b>mint button</b>{" "}
-              will submit your transaction with all the provided details.
+              Click the <b>register button</b>{" "}
+              to submit your transaction with all the provided details and
+              confirm the transaction in your wallet.
             </li>
           </ul>
           <br />
-          Reducing the fee may slow down the minting process.<br />
-          Fees are shown in BTC by default, but you can switch to USDT using the
-          toggle.<br />
-          All related costs are listed in the <b>details</b> section.<br />
+          Reducing the transaction fee may slow down the registration process.
+          <br />
+          All fees are shown in BTC by default. You can view the costs in USDT
+          by switching the toggle.<br />
+          You can check the progress of the registration by viewing your tx hash
+          in a{" "}
+          <a
+            href="https://mempool.space/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="animated-underline"
+          >
+            blockchain explorer
+          </a>.
         </p>
       </div>
-      <ReadAllButton href="/howto/registerbitname" />
+      {/* <ReadAllButton href="/howto/registerbitname" /> */}
     </div>
   );
 };

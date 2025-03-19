@@ -1,26 +1,11 @@
 import { Collection, StampRow } from "$globals";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
+import { HeaderStyles } from "./styles.ts";
 
 export const CollectionDetailsHeader = (
   { collection, stamps }: { collection: Collection; stamps: StampRow[] },
 ) => {
-  console.log("collection: ", collection);
-
-  const titleGreyLD =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient1";
-  const dataColumn = "flex flex-col -space-y-1";
-  const dataLabelSm =
-    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-  const dataLabel =
-    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-  const dataValueXs =
-    "text-xs mobileLg:text-sm font-normal text-stamp-grey-light";
-  const dataValueSm =
-    "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-  const dataValueXl =
-    "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
-
   return (
     <div className="flex flex-col gap-3 mobileMd:gap-6">
       <div className="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
@@ -34,7 +19,9 @@ export const CollectionDetailsHeader = (
               className="h-[78px] w-[78px] mobileMd:h-[82px] mobileMd:w-[82px] mobileLg:h-[108px] mobileLg:w-[108px] object-contain items-center standalone:h-24 standalone:w-auto pixelart image-rendering-pixelated"
             />
             <div className="flex flex-col pl-[18px] mobileMd:pl-6">
-              <p className={`${titleGreyLD} pb-0.75 mobileLg:pb-1.5`}>
+              <p
+                className={`${HeaderStyles.titleGreyLD} pb-0.75 mobileLg:pb-1.5`}
+              >
                 {collection.collection_name.length > 12
                   ? (
                     <>
@@ -49,13 +36,13 @@ export const CollectionDetailsHeader = (
                   )
                   : collection.collection_name.toUpperCase()}
               </p>
-              <p className={dataLabel}>
+              <p className={HeaderStyles.dataLabel}>
                 COLLECTION BY
               </p>
               <div>
                 <p className="inline-blocktext-xl mobileLg:text-2xl font-black gray-gradient3 -mt-1">
                   {collection.creators
-                    ? abbreviateAddress(collection.creators, 6)
+                    ? abbreviateAddress(collection.creators?.[0] || "", 6)
                     : "N/A"}
                 </p>
               </div>
@@ -63,26 +50,26 @@ export const CollectionDetailsHeader = (
           </div>
 
           <div className="hidden min-[480px]:flex flex-col justify-end -space-y-0.5">
-            <div className={`${dataColumn} items-end`}>
-              <p className={dataLabelSm}>
+            <div className={`${HeaderStyles.dataColumn} items-end`}>
+              <p className={HeaderStyles.dataLabelSm}>
                 HOLDERS{" "}
-                <span className={dataValueSm}>
+                <span className={HeaderStyles.dataValueSm}>
                   N/A
                 </span>
               </p>
             </div>
-            <div className={`${dataColumn} items-end`}>
-              <p className={dataLabelSm}>
+            <div className={`${HeaderStyles.dataColumn} items-end`}>
+              <p className={HeaderStyles.dataLabelSm}>
                 EDITIONS{" "}
-                <span className={dataValueSm}>
+                <span className={HeaderStyles.dataValueSm}>
                   {Number(collection.total_editions).toFixed(0)}
                 </span>
               </p>
             </div>
-            <div className={`${dataColumn} items-end`}>
-              <p className={dataLabelSm}>
+            <div className={`${HeaderStyles.dataColumn} items-end`}>
+              <p className={HeaderStyles.dataLabelSm}>
                 STAMPS{" "}
-                <span className={dataValueSm}>
+                <span className={HeaderStyles.dataValueSm}>
                   {collection.stamp_count}
                 </span>
               </p>
@@ -91,11 +78,11 @@ export const CollectionDetailsHeader = (
         </div>
         {collection.collection_description && (
           <div className="flex flex-col pt-1.5 mobileLg:pt-3">
-            <div className={dataColumn}>
-              <p className={dataLabelSm}>
+            <div className={HeaderStyles.dataColumn}>
+              <p className={HeaderStyles.dataLabelSm}>
                 ABOUT
               </p>
-              <p className={`${dataValueXs} pt-1 mobileLg:pt-0.5`}>
+              <p className={`${HeaderStyles.dataValueXs} pt-1 mobileLg:pt-0.5`}>
                 {collection.collection_description}
               </p>
             </div>
@@ -105,31 +92,31 @@ export const CollectionDetailsHeader = (
 
       <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6 ">
         <div className="flex flex-col">
-          <p className={dataLabel}>
+          <p className={HeaderStyles.dataLabel}>
             MARKETCAP
           </p>
-          <p className={dataValueXl}>
+          <p className={HeaderStyles.dataValueXl}>
             N/A <span className="font-light">BTC</span>
           </p>
         </div>
         <div class="flex flex-wrap justify-between pt-3 mobileLg:pt-6">
           <div className="-space-y-0.5">
-            <p className={dataLabelSm}>
+            <p className={HeaderStyles.dataLabelSm}>
               TOTAL VOLUME
             </p>
-            <p className={dataValueSm}>N/A BTC</p>
+            <p className={HeaderStyles.dataValueSm}>N/A BTC</p>
           </div>
           <div className="text-center -space-y-0.5">
-            <p className={dataLabelSm}>
+            <p className={HeaderStyles.dataLabelSm}>
               24H VOLUME
             </p>
-            <p className={dataValueSm}>N/A BTC</p>
+            <p className={HeaderStyles.dataValueSm}>N/A BTC</p>
           </div>
           <div className="text-right -space-y-0.5">
-            <p className={dataLabelSm}>
+            <p className={HeaderStyles.dataLabelSm}>
               FLOOR PRICE
             </p>
-            <p className={dataValueSm}>N/A BTC</p>
+            <p className={HeaderStyles.dataValueSm}>N/A BTC</p>
           </div>
         </div>
       </div>

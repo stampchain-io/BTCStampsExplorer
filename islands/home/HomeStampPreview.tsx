@@ -9,24 +9,28 @@ import StampSection from "$islands/stamp/StampSection.tsx";
 import CollectionSection from "$islands/collection/CollectionSection.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 
+interface HomeStampPreviewProps {
+  stamps_art?: StampRow[];
+  stamps_posh?: StampRow[];
+  stamps_src721?: StampRow[];
+  collectionData?: Collection[];
+}
+
 export function HomeStampPreview({
   stamps_src721 = [],
   stamps_art = [],
   stamps_posh = [],
   collectionData = [],
-}: {
-  stamps_art: StampRow[];
-  stamps_posh: StampRow[];
-  stamps_src721: StampRow[];
-  collectionData: Collection[];
-}) {
+}: HomeStampPreviewProps) {
   const LatestArtStampsSection: StampSectionProps[] = [
     {
       subTitle: "ON-CHAIN MARVELS",
       type: "classic",
       stamps: stamps_art,
+      fromPage: "home",
       layout: "grid",
       showDetails: false,
+      showEdition: true,
       viewAllLink: "/stamp/art",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
@@ -34,10 +38,10 @@ export function HomeStampPreview({
         auto-rows-fr
       `,
       displayCounts: {
-        "mobileSm": 8, // 2 columns x 4 rows
-        "mobileLg": 12, // 3 columns x 4 rows
-        "tablet": 16, // 4 columns x 4 rows
-        "desktop": 20, // 5 columns x 4 rows
+        mobileSm: 8,
+        mobileLg: 12,
+        tablet: 16,
+        desktop: 20,
       },
     },
   ];
@@ -51,10 +55,10 @@ export function HomeStampPreview({
       grid-cols-2 tablet:grid-cols-3 gap-3 mobileLg:gap-6
     `,
     displayCounts: {
-      "mobileSm": 2, // 2 columns x 1 rows
-      "mobileLg": 2, // 2 columns x 1 rows
-      "tablet": 3, // 3 columns x 1 rows
-      "desktop": 3, // 3 columns x 1 rows
+      mobileSm: 2,
+      mobileLg: 2,
+      tablet: 3,
+      desktop: 3,
     },
   };
 
@@ -64,25 +68,28 @@ export function HomeStampPreview({
       subTitle: "FRESH POSH STAMPS",
       type: "posh",
       stamps: stamps_posh,
+      fromPage: "home",
       layout: "grid",
       showDetails: false,
-      viewAllLink: "/stamp/posh",
+      showEdition: true,
+      viewAllLink: "/collection/overview/posh",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
         auto-rows-fr
       `,
       displayCounts: {
-        "mobileSm": 4, // 2 columns x 2 rows
-        "mobileLg": 6, // 3 columns x 2 rows
-        "tablet": 8, // 4 columns x 2 rows
-        "desktop": 10, // 5 columns x 2 rows
+        mobileSm: 4,
+        mobileLg: 6,
+        tablet: 8,
+        desktop: 10,
       },
     },
     {
       subTitle: "RECENT RECURSIVE",
       filterBy: "recursive",
       stamps: stamps_src721,
+      fromPage: "home",
       layout: "grid",
       showDetails: false,
       viewAllLink: "/collection/overview/recursive",
@@ -92,10 +99,10 @@ export function HomeStampPreview({
         auto-rows-fr
       `,
       displayCounts: {
-        "mobileSm": 8, // 4 columns x 2 rows
-        "mobileLg": 10, // 5 columns x 2 rows
-        "tablet": 12, // 6 columns x 2 rows
-        "desktop": 12, // 6 columns x 2 rows
+        mobileSm: 8,
+        mobileLg: 10,
+        tablet: 12,
+        desktop: 12,
       },
     },
   ];
@@ -109,18 +116,18 @@ export function HomeStampPreview({
       grid-cols-2 tablet:grid-cols-3 gap-3 mobileLg:gap-6
     `,
     displayCounts: {
-      "mobileSm": 2, // 2 columns x 1 rows
-      "mobileLg": 2, // 2 columns x 1 rows
-      "tablet": 3, // 3 columns x 1 rows
-      "desktop": 3, // 3 columns x 1 rows
+      mobileSm: 2,
+      mobileLg: 2,
+      tablet: 3,
+      desktop: 3,
     },
   };
-  console.log(stamps_art, stamps_posh, stamps_src721, collectionData);
+
   return (
     <div className="
-      flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36
-      max-w-desktop w-full mx-auto
-    ">
+        flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36
+        max-w-desktop w-full mx-auto
+      ">
       {/* LATEST ART STAMPS */}
       <div className="flex flex-col">
         <div className="w-full">
@@ -130,8 +137,8 @@ export function HomeStampPreview({
           </h1>
         </div>
         <div className="flex flex-col gap-3 mobileMd:gap-6">
-          {LatestArtStampsSection.map((section) => (
-            <StampSection key={section.title} {...section} />
+          {LatestArtStampsSection.map((section, index) => (
+            <StampSection key={index} {...section} />
           ))}
         </div>
       </div>
@@ -140,8 +147,8 @@ export function HomeStampPreview({
       <CollectionSection {...FeaturedArtistsSection} />
 
       {/* COLLECTIONS */}
-      {CollectionsSection.map((section) => (
-        <StampSection key={section.title} {...section} />
+      {CollectionsSection.map((section, index) => (
+        <StampSection key={index} {...section} />
       ))}
 
       {/* CUTTING EDGE */}

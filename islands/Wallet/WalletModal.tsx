@@ -9,6 +9,7 @@ import {
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectorsModal } from "./ConnectorsModal.tsx";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
+import AnimationLayout from "$components/shared/animation/AnimationLayout.tsx";
 
 const WalletPopup = (
   { logout, _onClose }: { logout: () => void; onClose: () => void },
@@ -345,7 +346,26 @@ export const WalletModal = ({ connectors = [] }: Props) => {
         </div>
       )}
 
-      {isModalOpen && !isConnected && (
+      {isModalOpen && (
+        <AnimationLayout
+          handleClose={() => {
+            setIsModalOpen(false);
+            showConnectWalletModal.value = false;
+          }}
+        >
+          <ConnectorsModal
+            connectors={connectors}
+            toggleModal={() => {
+              setIsModalOpen(false);
+              showConnectWalletModal.value = false;
+            }}
+            handleCloseModal={handleCloseModal}
+          />
+        </AnimationLayout>
+      )}
+
+      {
+        /* {isModalOpen && !isConnected && (
         <ConnectorsModal
           connectors={connectors}
           toggleModal={() => {
@@ -354,7 +374,8 @@ export const WalletModal = ({ connectors = [] }: Props) => {
           }}
           handleCloseModal={handleCloseModal}
         />
-      )}
+      )} */
+      }
 
       {isPopupOpen && isConnected && (
         <WalletPopup

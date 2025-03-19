@@ -1,7 +1,6 @@
 import {
   CollectionOverviewSectionProps,
   CollectionSectionProps,
-  STAMP_FILTER_TYPES,
   StampRow,
   StampSectionProps,
   SUBPROTOCOLS,
@@ -26,7 +25,7 @@ type CollectionPageProps = {
     _pages: number;
     _page_size: number;
     _filterBy: string[];
-    sortBy: string;
+    sortBy: "ASC" | "DESC";
     stamps_src721: StampRow[];
     stamps_posh: StampRow[];
   };
@@ -97,10 +96,6 @@ export const handler: Handlers = {
 export default function Collection(props: CollectionPageProps) {
   const {
     collections,
-    _page,
-    _pages,
-    _page_size,
-    _filterBy,
     sortBy,
     stamps_src721 = [],
     stamps_posh = [],

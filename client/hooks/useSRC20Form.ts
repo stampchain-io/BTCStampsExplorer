@@ -16,6 +16,7 @@ interface PSBTFees {
   effectiveFeeRate: number;
   estimatedSize?: number;
   totalVsize?: number;
+  est_tx_size?: number;
 }
 
 interface SRC20FormState {

@@ -3,7 +3,7 @@ import { Handlers } from "$fresh/server.ts";
 import WalletDashboardHeader from "$islands/Wallet/details/WalletDashboardHeader.tsx";
 import WalletDashboardDetails from "$islands/Wallet/details/WalletDashboardDetails.tsx";
 import WalletDashboardContent from "$islands/Wallet/details/WalletDashboardContent.tsx";
-import { WalletPageProps } from "$lib/types/index.d.ts";
+import { WalletOverviewInfo, WalletPageProps } from "$lib/types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
@@ -19,6 +19,14 @@ import { DispenserRow, SRC20Row, StampRow } from "$globals";
  * We add stampsSortBy to the query to handle the ASC / DESC sorting on stamps.
  * This is optional; if not provided, default to "DESC".
  */
+
+/** Utility function to extract query parameters with defaults */
+const getPaginationParams = (url: URL, prefix: string, defaultLimit = 10) => ({
+  page: Number(url.searchParams.get(`${prefix}_page`)) || 1,
+  limit: Number(url.searchParams.get(`${prefix}_limit`)) || defaultLimit,
+});
+
+
 export const handler: Handlers = {
   async GET(req, ctx) {
     const { address } = ctx.params;
@@ -39,21 +47,13 @@ export const handler: Handlers = {
         | "DESC";
 
     // Get pagination parameters for each section
-    const stampsParams = {
-      page: Number(url.searchParams.get("stamps_page")) || 1,
-      limit: Number(url.searchParams.get("stamps_limit")) || 32,
-    } as PaginationQueryParams;
-
-    const src20Params = {
-      page: Number(url.searchParams.get("src20_page")) || 1,
-      limit: Number(url.searchParams.get("src20_limit")) || 10,
-    } as PaginationQueryParams;
-
-    const dispensersParams = {
-      page: Number(url.searchParams.get("dispensers_page")) || 1,
-      limit: Number(url.searchParams.get("dispensers_limit")) || 10,
-    } as PaginationQueryParams;
-
+    // Extract pagination parameters
+    const paginationParams = {
+      stamps: getPaginationParams(url, "stamps", 32),
+      src20: getPaginationParams(url, "src20"),
+      dispensers: getPaginationParams(url, "dispensers"),
+    };
+  
     const anchor = url.searchParams.get("anchor");
 
     try {
@@ -68,8 +68,8 @@ export const handler: Handlers = {
         // Stamps with sorting and pagination
         StampController.getStampBalancesByAddress(
           address,
-          stampsParams.limit || 10,
-          stampsParams.page || 1,
+          paginationParams.stamps.limit || 10,
+          paginationParams.stamps.page || 1,
           stampsSortBy,
         ),
 
@@ -77,8 +77,8 @@ export const handler: Handlers = {
         Src20Controller.handleSrc20BalanceRequest({
           address,
           includePagination: true,
-          limit: src20Params.limit || 10,
-          page: src20Params.page || 1,
+          limit: paginationParams.src20.limit || 10,
+          page: paginationParams.src20.page || 1,
           includeMintData: true,
           sortBy: src20SortBy,
         }),
@@ -92,8 +92,8 @@ export const handler: Handlers = {
         // Dispensers with sorting and pagination
         StampController.getDispensersWithStampsByAddress(
           address,
-          dispensersParams.page || 1,
-          dispensersParams.limit || 10,
+          paginationParams.dispensers.page || 1,
+          paginationParams.dispensers.limit || 10,
           {
             sortBy: dispensersSortBy,
           },
@@ -283,7 +283,7 @@ export default function Dashboard(props: WalletPageProps) {
     <div class="flex flex-col gap-3 mobileMd:gap-6" f-client-nav>
       <WalletDashboardHeader />
       <WalletDashboardDetails
-        walletData={data.walletData}
+        walletData={data.walletData as WalletOverviewInfo}
         stampsTotal={data.stampsTotal}
         src20Total={data.src20Total}
         stampsCreated={data.stampsCreated}
@@ -293,7 +293,7 @@ export default function Dashboard(props: WalletPageProps) {
         stamps={data.data.stamps}
         src20={data.data.src20}
         dispensers={data.data.dispensers}
-        address={data.walletData.address}
+        address={data.walletData.address as string}
         anchor={data.anchor}
         stampsSortBy={props.stampsSortBy ?? "DESC"}
         src20SortBy={props.src20SortBy ?? "DESC"}

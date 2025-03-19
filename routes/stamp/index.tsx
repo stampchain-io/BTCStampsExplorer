@@ -11,13 +11,7 @@ const MAX_PAGE_SIZE = 120;
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
     const url = new URL(req.url);
-    console.log("[Stamp Handler]", {
-      url: url.toString(),
-      pathname: url.pathname,
-      params: Object.fromEntries(url.searchParams),
-      headers: Object.fromEntries(req.headers),
-    });
-
+    
     // Only process requests for /stamp route
     if (url.searchParams.has("_fresh") && !url.pathname.startsWith("/stamp")) {
       return new Response(null, { status: 204 });

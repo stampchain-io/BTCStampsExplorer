@@ -855,13 +855,13 @@ export function OlgaContent() {
         setSubmissionMessage(null);
         setTxDetails(null); // Reset transaction details on error
       }
-    } catch (error) {
+    } catch (error: any) {
       logger.error("stamps", {
         message: "Unexpected minting error",
         error,
       });
       setApiError(
-        error.message || error.response.data.error ||
+        error?.message || error?.response.data.error ||
           "An unexpected error occurred",
       );
       setSubmissionMessage(null);
@@ -1027,7 +1027,7 @@ export function OlgaContent() {
   const imagePreviewDiv = (
     <div
       id="image-preview"
-      class={`relative rounded items-center mx-auto text-center cursor-pointer ${PREVIEW_SIZE_CLASSES} content-center bg-stamp-purple-dark group hover:bg-[#8800CC] transition duration-300`}
+      class={`relative rounded items-center mx-auto text-center cursor-pointer ${PREVIEW_SIZE_CLASSES} content-center group transition duration-300`}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
@@ -1049,7 +1049,7 @@ export function OlgaContent() {
             {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
               ? (
                 <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-black [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] bg [image-rendering:pixelated]`}
                   src={URL.createObjectURL(file)}
                   alt="Preview"
                   onError={(e) => {
@@ -1087,7 +1087,7 @@ export function OlgaContent() {
               )
               : (
                 <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-black [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] [image-rendering:pixelated]`}
                   src={NOT_AVAILABLE_IMAGE}
                   alt={`File: ${file.name}`}
                 />
@@ -1104,7 +1104,7 @@ export function OlgaContent() {
         : (
           <label
             for="upload"
-            class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
+            class="cursor-pointer bg-conic-pattern bg-[length:4px_4px] h-full flex flex-col items-center justify-center gap-3"
           >
             <img
               src="/img/stamping/image-upload.svg"
@@ -1395,7 +1395,7 @@ export function OlgaContent() {
                 {tooltipText}
               </div>
             </button>
-            <div className="flex gap-3 mobileMd:gap-6 items-center">
+            <div className="flex items-center gap-[18px] mobileMd:gap-[30px]">
               <p className="text-xl mobileLg:text-2xl font-semibold text-stamp-grey">
                 EDITIONS
               </p>
@@ -1594,7 +1594,7 @@ export function OlgaContent() {
         />
 
         <StatusMessages
-          submissionMessage={submissionMessage}
+          submissionMessage={submissionMessage ?? ""}
           apiError={apiError}
         />
       </div>

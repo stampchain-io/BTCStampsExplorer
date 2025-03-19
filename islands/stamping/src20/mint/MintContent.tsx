@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 
-import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
+import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { SRC20InputField } from "../SRC20InputField.tsx";
 
 import { logger } from "$lib/utils/logger.ts";
+import { SRC20MintStatus } from "$types/src20.d.ts";
 
 interface MintProgressProps {
   progress: string;
@@ -55,8 +56,8 @@ const MintProgress = (
 
 interface MintContentProps {
   trxType?: "olga" | "multisig";
-  tick?: string | null;
-  mintStatus?: any;
+  tick?: string | undefined | null;
+  mintStatus?: SRC20MintStatus | null | undefined;
   holders?: number;
 }
 
@@ -91,7 +92,6 @@ export function MintContent({
     config,
     isSubmitting,
     submissionMessage,
-    walletError,
     apiError,
     setFormState,
     handleInputBlur,
@@ -177,7 +177,6 @@ export function MintContent({
 
     return () => {
       clearTimeout(delayDebounceFn);
-      setIsSearching(false);
     };
   }, [searchTerm, isSelecting, tick, isSwitchingFields]);
 
@@ -395,15 +394,20 @@ export function MintContent({
       </div>
 
       <div className={`${backgroundContainer} w-full`}>
-        <ComplexFeeCalculator
+        <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20"
+          fromPage="src20_mint"
           fileType="application/json"
           fileSize={undefined}
           issuance={undefined}
           serviceFee={undefined}
           BTCPrice={formState.BTCPrice}
+          mintDetails={{
+            token: formState.token,
+            amount: formState.amt
+          }}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
@@ -422,7 +426,6 @@ export function MintContent({
         <StatusMessages
           submissionMessage={submissionMessage}
           apiError={apiError}
-          walletError={walletError}
         />
       </div>
     </div>
