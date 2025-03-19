@@ -401,7 +401,7 @@ const FilterDrawer = (
               </div>
               <CloseIcon />
             </button>
-            <p className="hidden tablet:block text-3xl font-black gray-gradient1 cursor-default select-none">
+            <p className="hidden tablet:block font-black text-2xl gray-gradient1 cursor-default select-none">
               FILTERS
             </p>
           </div>

@@ -80,7 +80,7 @@ export const labelGreySemiboldSmLogic = (
 // Button styles
 export const buttonStyles = {
   base:
-    "inline-flex items-center justify-center border-2 rounded-md font-extrabold text-sm tablet:text-sm tracking-wider transition-colors duration-300",
+    "inline-flex items-center justify-center border-2 rounded-md font-bold text-sm tablet:text-sm tracking-wider transition-colors duration-300",
 
   // Variants
   variant: {
@@ -95,7 +95,7 @@ export const buttonStyles = {
       "bg-transparent hover:bg-stamp-grey border-stamp-grey hover:border-stamp-grey text-stamp-grey hover:text-black",
 
     flatTest:
-      "bg-red-500 hover:bg-green-500 border-red-500 hover:border-green-500  text-black",
+      "bg-red-500 hover:bg-green-500 border-red-500 hover:border-green-500 text-black",
   },
 
   // Sizes
