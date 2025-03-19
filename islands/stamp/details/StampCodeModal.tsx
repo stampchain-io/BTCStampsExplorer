@@ -1,4 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
+import { formatHtmlFromUrl } from "$client/utils/format.ts";
 
 interface StampCodeModalProps {
   src: string;
@@ -22,7 +23,8 @@ export default function StampCodeModal(
   }, []);
 
   useEffect(() => {
-    setFormattedSrc(formatHtmlSource(src));
+    setFormattedSrc(formatHtmlFromUrl(src));
+    // setFormattedSrc(formatHtmlSource(src));
   }, [src]);
 
   useEffect(() => {
