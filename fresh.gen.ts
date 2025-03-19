@@ -123,6 +123,7 @@ import * as $stamping_src101_action_ from "./routes/stamping/src101/[action].tsx
 import * as $stamping_src20 from "./routes/stamping/src20.tsx";
 import * as $stamping_src20_action_ from "./routes/stamping/src20/[action].tsx";
 import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
+import * as $stamping_stamp_action_ from "./routes/stamping/stamp/[action].tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
 import * as $test_design_system from "./routes/test/design-system.tsx";
 import * as $test_test_image from "./routes/test/test-image.ts";
@@ -175,7 +176,6 @@ import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $datacontrol_faq from "./islands/datacontrol/faq.ts";
-import * as $datacontrol_howto from "./islands/datacontrol/howto.ts";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
@@ -237,6 +237,8 @@ import * as $stamping_src20_trade_TradeContent from "./islands/stamping/src20/tr
 import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src20/transfer/LatestTransfer.tsx";
 import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
 import * as $stamping_stamp_OlgaContent from "./islands/stamping/stamp/OlgaContent.tsx";
+import * as $stamping_stamp_transfer_LatestStampTransfer from "./islands/stamping/stamp/transfer/LatestStampTransfer.tsx";
+import * as $stamping_stamp_transfer_TransferStampContent from "./islands/stamping/stamp/transfer/TransferStampContent.tsx";
 import * as $test_ReviewDogTest from "./islands/test/ReviewDogTest.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
@@ -392,6 +394,7 @@ const manifest = {
     "./routes/stamping/src20.tsx": $stamping_src20,
     "./routes/stamping/src20/[action].tsx": $stamping_src20_action_,
     "./routes/stamping/stamp.tsx": $stamping_stamp,
+    "./routes/stamping/stamp/[action].tsx": $stamping_stamp_action_,
     "./routes/termsofservice/index.tsx": $termsofservice_index,
     "./routes/test/design-system.tsx": $test_design_system,
     "./routes/test/test-image.ts": $test_test_image,
@@ -462,7 +465,6 @@ const manifest = {
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/datacontrol/faq.ts": $datacontrol_faq,
-    "./islands/datacontrol/howto.ts": $datacontrol_howto,
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/home/FontLoader.tsx": $home_FontLoader,
@@ -540,6 +542,10 @@ const manifest = {
     "./islands/stamping/src20/transfer/TransferContent.tsx":
       $stamping_src20_transfer_TransferContent,
     "./islands/stamping/stamp/OlgaContent.tsx": $stamping_stamp_OlgaContent,
+    "./islands/stamping/stamp/transfer/LatestStampTransfer.tsx":
+      $stamping_stamp_transfer_LatestStampTransfer,
+    "./islands/stamping/stamp/transfer/TransferStampContent.tsx":
+      $stamping_stamp_transfer_TransferStampContent,
     "./islands/test/ReviewDogTest.tsx": $test_ReviewDogTest,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
