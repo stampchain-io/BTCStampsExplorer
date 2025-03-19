@@ -1,103 +1,15 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
-
-interface NavLink {
-  title: string | {
-    default: string;
-    tablet: string;
-  };
-  href?: string;
-  subLinks?: NavLink[];
-}
-
-const desktopNavLinks: NavLink[] = [
-  {
-    title: {
-      default: "ART STAMPS",
-      tablet: "STAMPS",
-    },
-    href: "#",
-    subLinks: [
-      { title: "ALL", href: "/stamp?type=classic" },
-      { title: "COLLECTIONS", href: "/collection" },
-      { title: "STAMPING", href: "/stamping/stamp" },
-      { title: "TRANSFER", href: "/stamping/stamp/transfer" },
-    ],
-  },
-  {
-    title: {
-      default: "SRC-20 TOKENS",
-      tablet: "TOKENS",
-    },
-    href: "#",
-    subLinks: [
-      { title: "ALL", href: "/src20" },
-      { title: "TRENDING", href: "/src20?type=trending" },
-      { title: "DEPLOY", href: "/stamping/src20/deploy" },
-      { title: "MINT", href: "/stamping/src20/mint" },
-      { title: "TRANSFER", href: "/stamping/src20/transfer" },
-    ],
-  },
-  {
-    title: {
-      default: "BITNAME DOMAINS",
-      tablet: "BITNAME",
-    },
-    href: "#",
-    subLinks: [
-      { title: "REGISTER", href: "/stamping/src101/mint" },
-    ],
-  },
-];
-
-const mobileNavLinks: NavLink[] = [
-  {
-    title: "ART STAMPS",
-    href: "/stamp?type=classic",
-  },
-  {
-    title: "COLLECTIONS",
-    href: "/collection",
-  },
-  {
-    title: "SRC-20 TOKENS",
-    href: "/src20",
-  },
-  {
-    title: "TRENDING TOKENS",
-    href: "/src20?type=trending",
-  },
-  {
-    title: "TOOLS",
-    href: "#",
-    subLinks: [
-      { title: "STAMPING", href: "/stamping/stamp" },
-      { title: "TRANSFER STAMP", href: "/stamping/stamp/transfer" },
-      { title: "DEPLOY TOKEN", href: "/stamping/src20/deploy" },
-      { title: "MINT TOKEN", href: "/stamping/src20/mint" },
-      { title: "TRANSFER TOKEN", href: "/stamping/src20/transfer" },
-      { title: "REGISTER BITNAME", href: "/stamping/src101/mint" },
-    ],
-  },
-];
-
-const socialLinks = [
-  { href: "https://x.com/Stampchain", icon: "/img/footer/XLogo.svg" },
-  { href: "https://t.me/BitcoinStamps", icon: "/img/footer/TelegramLogo.svg" },
-  { href: "https://discord.gg/PCZU6xrt", icon: "/img/footer/DiscordLogo.svg" },
-  {
-    href: "https://github.com/stampchain-io/",
-    icon: "/img/footer/GithubLogo.svg",
-  },
-];
-
-const headerLogo =
-  "text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black italic purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 pr-2";
+import {
+  desktopNavLinks,
+  mobileNavLinks,
+  socialLinks,
+} from "$islands/datacontrol/Layout.ts";
+import { HeaderStyles } from "./styles.ts";
 
 export function Header() {
   const [open, setOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState<string | null>(null);
-  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
 
   useEffect(() => {
     // Set initial path
@@ -132,8 +44,6 @@ export function Header() {
       );
     };
   }, [open]);
-
-  const toggleWalletModal = () => setIsWalletModalOpen(!isWalletModalOpen);
 
   const toggleMenu = () => {
     setOpen(!open);
@@ -236,7 +146,7 @@ export function Header() {
           href="/home"
           f-partial="/home"
           onClick={() => setCurrentPath("home")}
-          className={headerLogo}
+          className={HeaderStyles.headerLogo}
         >
           STAMPCHAIN
         </a>
