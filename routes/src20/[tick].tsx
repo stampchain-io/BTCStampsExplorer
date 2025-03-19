@@ -2,6 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { SRC20TickHeader } from "$islands/src20/details/SRC20TickHeader.tsx";
 import Table from "$islands/shared/Tables.tsx";
 import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
+import ChartWidget from "$islands/src20/ChartWidget.tsx";
 import { SRC20TickPageData } from "$lib/types/src20.d.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 
@@ -16,22 +17,29 @@ export const handler: Handlers = {
       const url = new URL(_req.url);
       const baseUrl = `${url.protocol}//${url.host}`;
 
-      const [body, transferCount, mintCount] = await Promise.all([
+      const [body, transferCount, mintCount, combinedListings] = await Promise.all([
         Src20Controller.fetchSrc20TickPageData(decodedTick),
         fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`)
           .then((r) => r.json()),
         fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`)
           .then((r) => r.json()),
+        fetch(`https://api.stampscan.xyz/utxo/combinedListings?tick=${encodedTick}`).then((r) => r.json())
       ]);
 
       if (!body) {
         return ctx.renderNotFound();
       }
 
+      const highchartsData = combinedListings.map((item, index) => [
+        new Date(item.create_time).getTime(),
+        item.price,
+      ]).sort((a, b) => a[0] - b[0]);
+
       body.initialCounts = {
         transfers: transferCount.total || 0,
         mints: mintCount.total || 0,
       };
+      body.highcharts = highchartsData || []
 
       return await ctx.render(body);
     } catch (error) {
@@ -66,6 +74,7 @@ function SRC20TickPage(props: SRC20TickPageProps) {
     total_mints,
     total_transfers,
     marketInfo,
+    highcharts
   } = props.data;
 
   const tick = deployment.tick;
@@ -84,6 +93,7 @@ function SRC20TickPage(props: SRC20TickPageProps) {
         totalTransfers={total_transfers}
         marketInfo={marketInfo}
       />
+      <ChartWidget data={highcharts} />
       <HoldersGraph holders={holders} />
       <Table
         type="src20"
