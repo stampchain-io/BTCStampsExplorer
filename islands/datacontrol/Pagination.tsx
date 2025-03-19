@@ -10,7 +10,7 @@ const _navArrow = `
   w-7 h-7 mobileLg:h-9 mobileLg:w-9`;
 const navContent = `
   flex items-center justify-center
-  w-7 h-7 mobileLg:h-9 mobileLg:w-9 rounded-md hover:bg-stamp-primary-hover
+  w-7 h-7 mobileLg:h-12 mobileLg:w-12 mobileLg:px-3 px-0 rounded-md hover:bg-stamp-primary-hover
   text-sm leading-[16.5px] mobileLg:text-base mobileLg:leading-[19px]
   font-medium text-black`;
 
@@ -109,7 +109,7 @@ export function Pagination({
         {/* Show ellipsis if there are pages before the range */}
         {startPage > 1 && (
           <>
-            {renderPageButton(1)}
+            {page < 1 && renderPageButton(1)}
             <span class="text-stamp-purple-dark">...</span>
           </>
         )}
@@ -125,7 +125,7 @@ export function Pagination({
         {endPage < totalPages && (
           <>
             <span class="text-stamp-purple-dark">...</span>
-            {renderPageButton(totalPages)}
+            {page > totalPages && renderPageButton(totalPages)}
           </>
         )}
 
