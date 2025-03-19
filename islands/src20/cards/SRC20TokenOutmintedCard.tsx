@@ -3,23 +3,11 @@ import {
   SRC20BaseCardProps,
 } from "$islands/src20/cards/SRC20BaseCard.tsx";
 import ChartWidget from "$islands/src20/ChartWidget.tsx";
-
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+import { BaseCardStyles } from "./styles.ts";
 
 export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
   const { src20, fromPage } = props;
-  const dataLabelSm =
-    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-  const dataValueSm =
-    "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-  const _dataLabel =
-    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-  const _dataValue =
-    "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
-  const _dataValueLg =
-    "text-2xl mobileLg:text-3xl font-black text-stamp-grey-light -mt-0.5";
-  const _dataValueXl =
-    "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
 
   return (
     <SRC20BaseCard {...props}>
@@ -28,21 +16,21 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
           {/* Price, Change, Volume group */}
           <div class="flex flex-col -mb-3 mobileLg:-mb-6">
             <div class="hidden min-[720px]:flex flex-col justify-center text-center -space-y-0.5 ">
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 PRICE{" "}
-                <span class={dataValueSm}>
+                <span class={BaseCardStyles.dataValueSm}>
                   {Math.round((src20.floor_unit_price ?? 0) * 1e8)
                     .toLocaleString()}
                 </span>{" "}
                 <span class="text-stamp-grey-light">SATS</span>
               </p>
-              <p class={dataLabelSm}>
-                CHANGE <span class={dataValueSm}>N/A</span>
+              <p class={BaseCardStyles.dataLabelSm}>
+                CHANGE <span class={BaseCardStyles.dataValueSm}>N/A</span>
                 <span class="text-stamp-grey-light">%</span>
               </p>
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 VOLUME{" "}
-                <span class={dataValueSm}>
+                <span class={BaseCardStyles.dataValueSm}>
                   {Math.round(src20.volume24 ?? 0).toLocaleString()}
                 </span>{" "}
                 <span class="text-stamp-grey-light">BTC</span>
@@ -53,24 +41,24 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
           {/* Holders, Deploy, Creator group */}
           <div class="flex flex-col -mb-3 mobileLg:-mb-6">
             <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 HOLDERS{" "}
-                <span class={dataValueSm}>
+                <span class={BaseCardStyles.dataValueSm}>
                   {Number(src20.holders).toLocaleString()}
                 </span>
               </p>
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 DEPLOY{" "}
-                <span class={dataValueSm}>
+                <span class={BaseCardStyles.dataValueSm}>
                   {formatDate(new Date(src20.block_time), {
                     month: "short",
                     year: "numeric",
                   }).toUpperCase()}
                 </span>
               </p>
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 CREATOR{" "}
-                <span class={dataValueSm}>
+                <span class={BaseCardStyles.dataValueSm}>
                   {src20.creator_name ||
                     abbreviateAddress(src20.destination)}
                 </span>
@@ -92,24 +80,24 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
           {/* Holders, Deploy, Creator group */}
           <div class="flex flex-col -mb-3 mobileLg:-mb-6">
             <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 HOLDERS{" "}
-                <span class={dataValueSm}>
+                <span class={BaseCardStyles.dataValueSm}>
                   {Number(src20.holders).toLocaleString()}
                 </span>
               </p>
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 DEPLOY{" "}
-                <span class={dataValueSm}>
+                <span class={BaseCardStyles.dataValueSm}>
                   {formatDate(new Date(src20.block_time), {
                     month: "short",
                     year: "numeric",
                   }).toUpperCase()}
                 </span>
               </p>
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 CREATOR{" "}
-                <span class={dataValueSm}>
+                <span class={BaseCardStyles.dataValueSm}>
                   {src20.creator_name ||
                     abbreviateAddress(src20.destination)}
                 </span>
@@ -124,20 +112,20 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
           {/* Price, Change, Volume group */}
           <div class="flex flex-col -mb-3 mobileLg:-mb-6">
             <div class="hidden min-[640px]:flex flex-col justify-center text-center -space-y-0.5 ">
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 PRICE{" "}
-                <span class={dataValueSm}>
+                <span class={BaseCardStyles.dataValueSm}>
                   {Math.round((src20.floor_unit_price ?? 0) * 1e8)
                     .toLocaleString()}
                 </span>{" "}
                 <span class="text-stamp-grey-light">SATS</span>
               </p>
-              <p class={dataLabelSm}>
-                CHANGE <span class={dataValueSm}>N/A</span>
+              <p class={BaseCardStyles.dataLabelSm}>
+                CHANGE <span class={BaseCardStyles.dataValueSm}>N/A</span>
                 <span class="text-stamp-grey-light">%</span>
               </p>
-              <p class={dataLabelSm}>
-                VOLUME <span class={dataValueSm}>N/A</span>{" "}
+              <p class={BaseCardStyles.dataLabelSm}>
+                VOLUME <span class={BaseCardStyles.dataValueSm}>N/A</span>{" "}
                 <span class="text-stamp-grey-light">BTC</span>
               </p>
             </div>
@@ -146,10 +134,10 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
           {/* Value group */}
           <div class="flex flex-col -mb-3 mobileLg:-mb-6">
             <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
-              <p class={dataLabelSm}>
+              <p class={BaseCardStyles.dataLabelSm}>
                 VALUE{" "}
               </p>
-              <p class={dataValueSm}>
+              <p class={BaseCardStyles.dataValueSm}>
                 {Math.round((src20.value ?? 0) * 1e8).toLocaleString()}{" "}
                 <span class="text-stamp-grey-light">SATS</span>
               </p>

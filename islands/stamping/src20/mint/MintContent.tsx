@@ -398,6 +398,7 @@ export function MintContent({
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20"
+          fromPage="src20_mint"
           fileType="application/json"
           fileSize={undefined}
           issuance={undefined}

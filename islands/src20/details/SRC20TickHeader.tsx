@@ -83,14 +83,9 @@ function StatItem(
 
 export function SRC20TickHeader({
   deployment,
-  _mintStatus,
-  _totalMints,
-  _totalTransfers,
   marketInfo,
-  _align,
 }: SRC20TickHeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-
   const tickValue = deployment.tick
     ? (() => {
       console.log("Original tick:", deployment.tick);

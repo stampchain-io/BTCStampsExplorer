@@ -118,6 +118,7 @@
     "highcharts": "https://esm.sh/highcharts@11.2.0",
     "highcharts/": "https://esm.sh/highcharts@11.2.0/",
     "highcharts-react-official": "https://esm.sh/highcharts-react-official@3.2.1",
+    "screenshotone-api-sdk": "https://esm.sh/screenshotone-api-sdk@1.1.19",
     "$/": "./",
     "$client/": "./client/",
     "$components/": "./components/",
