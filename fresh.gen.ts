@@ -176,6 +176,7 @@ import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $datacontrol_faq from "./islands/datacontrol/faq.ts";
+import * as $datacontrol_howto from "./islands/datacontrol/howto.ts";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
@@ -466,6 +467,7 @@ const manifest = {
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/datacontrol/faq.ts": $datacontrol_faq,
+    "./islands/datacontrol/howto.ts": $datacontrol_howto,
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/home/FontLoader.tsx": $home_FontLoader,

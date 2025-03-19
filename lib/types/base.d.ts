@@ -75,6 +75,17 @@ export interface FeeDetails {
   totalVsize?: number;
 }
 
+export interface TransferDetails {
+  address: string;
+  amount: number;
+  token: string;
+}
+
+export interface MintDetails {
+  amount: number;
+  token: string;
+}
+
 export interface BaseFeeCalculatorProps {
   fee: number;
   handleChangeFee: (fee: number) => void;
@@ -88,6 +99,8 @@ export interface BaseFeeCalculatorProps {
   tosAgreed?: boolean;
   onTosChange?: (agreed: boolean) => void;
   feeDetails?: FeeDetails;
+  transferDetails?: TransferDetails;
+  mintDetails?: MintDetails;
 }
 
 export interface BasicFeeProps
@@ -101,23 +114,30 @@ export interface BasicFeeProps
   outputTypes?: ScriptType[];
   utxoAncestors?: AncestorInfo[];
   bitname?: string;
+  receive?: number;
+  fromPage?: string;
+  price?: number;
+  edition?: number;
+  ticker?: string;
+  limit?: number;
+  supply?: number;
 }
 
 export interface ComplexFeeProps extends BaseFeeCalculatorProps {
   type: string;
-  fileType: string | undefined;
-  fileSize: number | undefined;
-  issuance: number | undefined;
-  serviceFee: number | undefined;
-  userAddress: string | undefined;
-  outputTypes: ScriptType[] | undefined;
-  utxoAncestors: AncestorInfo[] | undefined;
-  feeDetails: FeeDetails | undefined;
-  effectiveFeeRate: number | undefined;
-  onRefresh: (() => Promise<void>) | undefined;
-  disabled: boolean | undefined;
-  inputType: string | undefined;
-  bitname: string | undefined;
+  fileType?: string;
+  fileSize?: number;
+  issuance?: number;
+  serviceFee?: number;
+  userAddress?: string;
+  outputTypes?: ScriptType[];
+  utxoAncestors?: AncestorInfo[];
+  feeDetails?: FeeDetails;
+  effectiveFeeRate?: number;
+  onRefresh?: () => Promise<void>;
+  disabled?: boolean;
+  inputType?: string;
+  bitname?: string;
 }
 
 interface PSBTFees extends FeeDetails {

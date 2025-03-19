@@ -140,6 +140,8 @@ export default {
         "gradient-top": "var(--gradient-top)",
         "gradient-filters":
           "linear-gradient(to bottom, #080808 100%, #080808 80%)",
+        "conic-pattern":
+          "repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%, rgba(128, 128, 128, 0.1) 25% 50%)",
       },
       animation: {
         "fade-in": "fadeIn",

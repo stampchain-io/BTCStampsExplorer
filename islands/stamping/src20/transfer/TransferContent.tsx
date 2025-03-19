@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 
 import { walletContext } from "$client/wallet/wallet.ts";
 
-import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
+import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { SRC20InputField } from "$islands/stamping/src20/SRC20InputField.tsx";
 
@@ -247,7 +247,7 @@ export function TransferContent(
       </div>
 
       <div className={`${backgroundContainer} w-full`}>
-        <ComplexFeeCalculator
+        <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20"
@@ -268,6 +268,11 @@ export function TransferContent(
           disabled={undefined}
           effectiveFeeRate={undefined}
           utxoAncestors={undefined}
+          transferDetails={{
+            address: formState.toAddress,
+            token: formState.token,
+            amount: formState.amt
+          }}
           feeDetails={{
             minerFee: formState.psbtFees?.estMinerFee || 0,
             dustValue: formState.psbtFees?.totalDustValue || 0,

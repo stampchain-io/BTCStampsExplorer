@@ -149,8 +149,6 @@ export default function CollectionOverview(
     page_size,
   } = data;
 
-  console.log("stamps: ", stamps);
-
   const renderContent = () => {
     switch (selectedTab) {
       case "artist":
