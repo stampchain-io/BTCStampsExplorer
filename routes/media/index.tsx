@@ -1,5 +1,6 @@
 import { Button } from "$buttons";
 import { styles } from "./styles.ts";
+import { subtitleGrey, text, titleGreyDL } from "$components/text/styles.ts";
 
 export default function Media() {
   return (
@@ -22,9 +23,9 @@ export default function Media() {
       />
       <section>
         <div className="flex flex-col w-full desktop:w-3/4">
-          <h1 className={styles.titleGreyDL}>MEDIA MATTERS</h1>
-          <h2 className={styles.subTitleGrey}>HONOURABLE STAMP MENTIONS</h2>
-          <p className={styles.bodyTextLight}>
+          <h1 className={titleGreyDL}>MEDIA MATTERS</h1>
+          <h2 className={subtitleGrey}>HONOURABLE STAMP MENTIONS</h2>
+          <p className={text}>
             Explore the world of Bitcoin Stamps with our curated list of news
             coverage, in-depth articles, reports and video podcasts. <br />
             <br />
@@ -42,10 +43,10 @@ export default function Media() {
       </section>
 
       <section>
-        <h1 className={styles.titleGreyDL}>INTERVIEWS</h1>
+        <h1 className={titleGreyDL}>INTERVIEWS</h1>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
           <div className="flex flex-col">
-            <h2 className={styles.subTitleGrey}>RICE TVX</h2>
+            <h2 className={subtitleGrey}>RICE TVX</h2>
             <div className="relative w-full pt-[56.25%]">
               {/* 16:9 aspect ratio wrapper */}
               <iframe
@@ -56,7 +57,7 @@ export default function Media() {
                 allowFullScreen
               />
             </div>
-            <p className={styles.bodyTextLight}>
+            <p className={text}>
               On this episode, I am joined by Mike In Space! He is the creator
               of Bitcoin Stamps & the SRC-20 protocol.<br />
               <br />
@@ -69,7 +70,7 @@ export default function Media() {
             </p>
           </div>
           <div className="flex flex-col">
-            <h2 className={styles.subTitleGrey}>WAGE CUCKING</h2>
+            <h2 className={subtitleGrey}>WAGE CUCKING</h2>
             <div className="relative w-full pt-[56.25%]">
               {/* 16:9 aspect ratio wrapper */}
               <iframe
@@ -80,7 +81,7 @@ export default function Media() {
                 allowFullScreen
               />
             </div>
-            <p className={styles.bodyTextLight}>
+            <p className={text}>
               This week Jmo and Andreas were joined by the creator of Bitcoin
               STAMPS, Mike In Space!<br />
               <br />
@@ -91,7 +92,7 @@ export default function Media() {
             </p>
           </div>
           <div className="flex flex-col">
-            <h2 className={styles.subTitleGrey}>UNIVERSE</h2>
+            <h2 className={subtitleGrey}>UNIVERSE</h2>
             <div className="relative w-full pt-[56.25%]">
               {/* 16:9 aspect ratio wrapper */}
               <iframe
@@ -102,7 +103,7 @@ export default function Media() {
                 allowFullScreen
               />
             </div>
-            <p className={styles.bodyTextLight}>
+            <p className={text}>
               Curious about the story behind Bitcoin Stamps?<br />
               <br />
               Join us for an exclusive episode of "Guess Who's Coming to the
@@ -119,10 +120,10 @@ export default function Media() {
       </section>
 
       <section>
-        <h1 className={styles.titleGreyDL}>IN THE NEWS</h1>
-        <h2 className={styles.subTitleGrey}>BREAKING STORIES</h2>
+        <h1 className={titleGreyDL}>IN THE NEWS</h1>
+        <h2 className={subtitleGrey}>BREAKING STORIES</h2>
         <div className="flex flex-col -space-y-[18px]">
-          <p className={styles.articleSource}>
+          <p className={text}>
             BINANCE
             <br />
             <a
@@ -134,7 +135,7 @@ export default function Media() {
             </a>
           </p>
           <br />
-          <p className={styles.articleSource}>
+          <p className={text}>
             YAHOO FINANCE
             <br />
             <a
@@ -146,7 +147,7 @@ export default function Media() {
             </a>
           </p>
           <br />
-          <p className={styles.articleSource}>
+          <p className={text}>
             BINGX
             <br />
             <a
@@ -158,7 +159,7 @@ export default function Media() {
             </a>
           </p>
           <br />
-          <p className={styles.articleSource}>
+          <p className={text}>
             HACKERNOON
             <br />
             <a
@@ -170,7 +171,7 @@ export default function Media() {
             </a>
           </p>
           <br />
-          <p className={styles.articleSource}>
+          <p className={text}>
             COINMARKETCAP
             <br />
             <a
@@ -182,7 +183,7 @@ export default function Media() {
             </a>
           </p>
           <br />
-          <p className={styles.articleSource}>
+          <p className={text}>
             M2
             <br />
             <a
@@ -194,7 +195,7 @@ export default function Media() {
             </a>
           </p>
           <br />
-          <p className={styles.articleSource}>
+          <p className={text}>
             GATE
             <br />
             <a
@@ -206,7 +207,7 @@ export default function Media() {
             </a>
           </p>
           <br />
-          <p className={styles.articleSource}>
+          <p className={text}>
             BITCOIN.COM
             <br />
             <a
@@ -218,7 +219,7 @@ export default function Media() {
             </a>
           </p>
           <br />
-          <p className={styles.articleSource}>
+          <p className={text}>
             OKX
             <br />
             <a
@@ -230,7 +231,7 @@ export default function Media() {
             </a>
           </p>
           <br />
-          <p className={styles.articleSource}>
+          <p className={text}>
             COIN CODEX
             <br />
             <a
@@ -245,11 +246,11 @@ export default function Media() {
       </section>
 
       <section>
-        <h1 className={styles.titleGreyDL}>REPORTS</h1>
+        <h1 className={titleGreyDL}>REPORTS</h1>
         <div className="grid grid-cols-1 mobileLg:grid-cols-3 gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
           <div className="col-span-1 mobileLg:col-span-2">
-            <h2 className={styles.subTitleGrey}>SQRR - DEEP DIVE</h2>
-            <p className={styles.bodyTextLight}>
+            <h2 className={subtitleGrey}>SQRR - DEEP DIVE</h2>
+            <p className={text}>
               Stamps is a blockchain protocol created by MikeInSpace that
               enables storing images on-chain on Bitcoin transaction
               outputs.<br />
@@ -272,8 +273,8 @@ export default function Media() {
             </div>
           </div>
           <div className="col-span-1 mobileLg:text-right">
-            <h2 className={styles.subTitleGrey}>INSIGHTS</h2>
-            <p className={styles.bodyTextLight}>
+            <h2 className={subtitleGrey}>INSIGHTS</h2>
+            <p className={text}>
               <b>Detailed monthly reports about Bitcoin Stamps.</b>
               <br />
               A comprehensive research into the usage of the Stamps protocol,
