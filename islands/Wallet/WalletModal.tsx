@@ -7,7 +7,7 @@ import {
   walletContext,
 } from "$client/wallet/wallet.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { ConnectorsModal } from "./ConnectorsModal.tsx";
+import { ConnectorsModal } from "$islands/Wallet/ConnectorsModal.tsx";
 import { _getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import AnimationLayout from "$components/shared/animation/AnimationLayout.tsx";
 

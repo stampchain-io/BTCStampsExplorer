@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
-import { HamburgerMenuIcon } from "./HeaderComponents.tsx";
+import { HamburgerMenuIcon } from "$islands/layout/HeaderComponents.tsx";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
