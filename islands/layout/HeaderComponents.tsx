@@ -65,7 +65,7 @@ export const HamburgerMenuIcon = (
           animation: ease 0.3s scaled-2 forwards;
         }
         
-        /* Direct hover style for middle line */
+        /* Direct hover style for middle line - NEEDS TO ANIMATE OUT */
         .hamburger-btn:hover .line-2 {
           width: 100% !important;
           transition: width 0.3s ease;
