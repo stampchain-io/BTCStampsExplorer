@@ -2,8 +2,6 @@ import { JSX } from "preact";
 import { StampRow } from "$globals";
 
 interface SelectFieldProps {
-  _placeholder?: string;
-  _value: string;
   onChange: (e: JSX.TargetedEvent<HTMLSelectElement, Event>) => void;
   error?: string;
   disabled?: boolean;
@@ -11,8 +9,6 @@ interface SelectFieldProps {
 }
 
 export function SelectField({
-  _placeholder = "",
-  _value,
   onChange,
   error,
   disabled = false,

@@ -1,3 +1,4 @@
+import { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
@@ -5,12 +6,13 @@ import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.ts
 import { SelectField } from "$islands/stamping/SelectField.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import type { StampRow } from "$globals";
+import { ContentStyles } from "./styles.ts";
 
 interface Props {
   trxType: string;
 }
 
-export function TransferStampContent({ trxType }: Props) {
+export function TransferStampContent({}: Props) {
   const { wallet } = walletContext;
   const [maxQuantity, setMaxQuantity] = useState(1);
   const [quantity, setQuantity] = useState(1);
@@ -44,7 +46,6 @@ export function TransferStampContent({ trxType }: Props) {
     error,
     setError,
     successMessage,
-    setSuccessMessage,
   } = useTransactionForm({
     type: "transfer",
     initialFee: 1,
@@ -74,7 +75,11 @@ export function TransferStampContent({ trxType }: Props) {
           },
         });
       } catch (error) {
-        setError(error.message);
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError(String(error)); // Fallback in case it's not an instance of Error
+        }
       }
     };
 
@@ -98,7 +103,7 @@ export function TransferStampContent({ trxType }: Props) {
   const handleStampSelect = (e: Event) => {
     const value = (e.currentTarget as HTMLSelectElement).value;
     const selectedItem = stamps.data.find(
-      (item) => item.stamp.toString() === value,
+      (item) => item?.stamp?.toString() === value,
     );
 
     if (selectedItem) {
@@ -127,9 +132,13 @@ export function TransferStampContent({ trxType }: Props) {
         formState,
         quantity,
       });
-      handleSubmit();
+      await handleSubmit(() => Promise.resolve());
     } catch (error) {
-      setError(error.message);
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError(String(error)); // Fallback in case it's not an instance of Error
+      }
     }
   };
 
@@ -174,23 +183,17 @@ export function TransferStampContent({ trxType }: Props) {
   // Reset loading state when selected stamp changes
   useEffect(() => {
     setIsImageLoading(true);
+
+    if (selectedStamp) {
+      setMaxQuantity(selectedStamp?.unbound_quantity);
+    }
   }, [selectedStamp?.tx_hash]);
 
-  const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-  const titlePurpleLDCenter =
-    "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
-  const inputFieldContainer =
-    "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
-  const feeSelectorContainer =
-    "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
-  const inputField =
-    "h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
-
   return (
-    <div class={bodyTools}>
-      <h1 class={titlePurpleLDCenter}>TRANSFER</h1>
+    <div class={ContentStyles.bodyTools}>
+      <h1 class={ContentStyles.titlePurpleLDCenter}>TRANSFER</h1>
 
-      <div class={inputFieldContainer}>
+      <div class={ContentStyles.inputFieldContainer}>
         <div class="w-full flex gap-3 mobileMd:gap-6">
           <div class="flex items-center justify-center rounded w-[96px] h-[96px] mobileMd:w-[108px] mobileMd:h-[108px] mobileLg:w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker overflow-hidden">
             {renderStampContent()}
@@ -199,7 +202,6 @@ export function TransferStampContent({ trxType }: Props) {
           <div class="flex flex-col flex-1 gap-3 mobileMd:gap-6">
             <SelectField
               options={stamps.data}
-              value={selectedStamp?.stamp?.toString() || ""}
               onChange={handleStampSelect}
             />
 
@@ -218,7 +220,7 @@ export function TransferStampContent({ trxType }: Props) {
                 max={maxQuantity}
                 value={quantity}
                 onChange={handleQuantityChange}
-                class={`${inputField} !w-[42px] mobileLg:!w-12 text-center`}
+                class={`${ContentStyles.inputField} !w-[42px] mobileLg:!w-12 text-center`}
               />
             </div>
           </div>
@@ -226,18 +228,18 @@ export function TransferStampContent({ trxType }: Props) {
         <div class="flex w-full">
           <input
             value={formState.recipientAddress}
-            onInput={(e) =>
-              setFormState({
+            onInput={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+              setFormState((prev) => ({
                 ...prev,
-                recipientAddress: (e.target as HTMLInputElement).value,
-              })}
+                recipientAddress: e.currentTarget.value,
+              }))}
             placeholder="Recipient address"
-            class={inputField}
+            class={ContentStyles.inputField}
           />
         </div>
       </div>
 
-      <div class={feeSelectorContainer}>
+      <div class={ContentStyles.feeSelectorContainer}>
         <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={internalHandleChangeFee}
@@ -247,7 +249,7 @@ export function TransferStampContent({ trxType }: Props) {
           onSubmit={handleTransferSubmit}
           buttonName={wallet?.address ? "TRANSFER" : "CONNECT WALLET"}
           className="pt-9 mobileLg:pt-12"
-          userAddress={wallet?.address}
+          userAddress={wallet?.address || ""}
           inputType="P2WPKH"
           outputTypes={["P2WPKH"]}
           tosAgreed={tosAgreed}
