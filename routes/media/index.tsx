@@ -1,3 +1,4 @@
+import { Button } from "$buttons";
 import { styles } from "./styles.ts";
 
 export default function Media() {
@@ -20,21 +21,24 @@ export default function Media() {
         "
       />
       <section>
-        <h1 className={styles.titleGreyDL}>MEDIA MATTERS</h1>
-        <h2 className={styles.subTitleGrey}>HONOURABLE STAMP MENTIONS</h2>
-        <p className={styles.bodyTextLight}>
-          Explore the world of Bitcoin Stamps with our curated list of news
-          coverage, in-depth articles, reports and video podcasts. <br />
-          <br />
-          We share articles worthwhile reading. From technical deep-dives into
-          the protocol, ecosystem formats and lingo explainers, to all things
-          stamp art. Catch up on the most important news coverage, or watch Mike
-          in Space share his vision behind stamps, break down the technology and
-          offer unique insights on where the technology is headed.<br />
-          <br />
-          Stay informed by regularly checking back. We're constantly adding new
-          interviews and articles about the space.
-        </p>
+        <div className="flex flex-col w-full desktop:w-3/4">
+          <h1 className={styles.titleGreyDL}>MEDIA MATTERS</h1>
+          <h2 className={styles.subTitleGrey}>HONOURABLE STAMP MENTIONS</h2>
+          <p className={styles.bodyTextLight}>
+            Explore the world of Bitcoin Stamps with our curated list of news
+            coverage, in-depth articles, reports and video podcasts. <br />
+            <br />
+            We share articles worthwhile reading. From technical deep-dives into
+            the protocol, ecosystem formats and lingo explainers, to all things
+            stamp art. Catch up on the most important news coverage, or watch
+            Mike in Space share his vision behind stamps, break down the
+            technology and offer unique insights on where the technology is
+            headed.<br />
+            <br />
+            Stay informed by regularly checking back. We're constantly adding
+            new interviews and articles about the space.
+          </p>
+        </div>
       </section>
 
       <section>
@@ -256,12 +260,15 @@ export default function Media() {
               <br />
             </p>
             <div className="flex justify-end mobileLg:justify-start">
-              <a
+              <Button
+                variant="outline"
+                color="grey"
+                size="lg"
                 href="https://sqrr.xyz/reports/docs/4/1/Stamps%20Protocol_Final_17_May_2023.pdf"
                 target="_blank"
               >
-                <button className={styles.buttonGreyOutline}>DOWNLOAD</button>
-              </a>
+                DOWNLOAD
+              </Button>
             </div>
           </div>
           <div className="col-span-1 mobileLg:text-right">
@@ -274,9 +281,15 @@ export default function Media() {
               <br />
             </p>
             <div className="flex justify-end">
-              <a href="https://sqrr.xyz/reports/" target="_blank">
-                <button className={styles.buttonGreyOutline}>READ</button>
-              </a>
+              <Button
+                variant="outline"
+                color="grey"
+                size="lg"
+                href="https://sqrr.xyz/reports/"
+                target="_blank"
+              >
+                READ
+              </Button>
             </div>
           </div>
         </div>

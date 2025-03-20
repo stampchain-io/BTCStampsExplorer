@@ -1,4 +1,5 @@
 import { ARTICLE_LINKS } from "$/lib/utils/constants.ts";
+import { Button } from "$buttons";
 
 export function KeepReading() {
   const titleGreyDL =
@@ -7,8 +8,6 @@ export function KeepReading() {
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
   const bodyTextLight =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
-  const buttonGreyOutline =
-    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
 
   return (
     <section>
@@ -38,13 +37,9 @@ export function KeepReading() {
             stuff you never thought you needed to know.
           </p>
           <div class="w-full flex justify-end pt-3 mobileMd:pt-6">
-            <a
-              href="/faq"
-              f-partial="/faq"
-              class={`${buttonGreyOutline} float-right`}
-            >
+            <Button variant="outline" color="grey" size="lg" href="/faq">
               FAQ
-            </a>
+            </Button>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import { ContactStyles } from "$islands/about/styles.ts";
+import { ButtonProcessing } from "$buttons";
 
 const AboutContact = () => {
   const [name, setName] = useState<string>("");
@@ -8,12 +9,15 @@ const AboutContact = () => {
   const [subject, setSubject] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: Event) => {
+  const handleSubmit = async (e: Event) => {
     e.preventDefault();
+    setIsSubmitting(true);
     setError(
       "Contact form is not setup properly - leave a message on Telegram instead",
     );
+    setIsSubmitting(false);
   };
 
   return (
@@ -85,12 +89,15 @@ const AboutContact = () => {
                 />
               </div>
               <div className="w-full flex justify-end">
-                <button
+                <ButtonProcessing
                   type="submit"
-                  className={ContactStyles.buttonGreyOutline}
+                  variant="outline"
+                  color="grey"
+                  size="lg"
+                  isSubmitting={isSubmitting}
                 >
                   SEND
-                </button>
+                </ButtonProcessing>
               </div>
               {error && <p className="text-red-500 mt-2">{error}</p>}
             </form>
