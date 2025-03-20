@@ -136,7 +136,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
         />
       </Head>
 
-      <body class="!relative bg-stamp-bg-grey-darkest min-h-screen overflow-x-hidden overflow-hidden">
+      <body class="!relative min-h-screen overflow-x-hidden overflow-hidden">
         {state?.route !== "/"
           ? <div class="bgGradientTop contain-layout" />
           : (
