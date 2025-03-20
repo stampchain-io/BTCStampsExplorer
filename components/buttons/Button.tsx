@@ -15,20 +15,39 @@ export function Button({
   size,
   disabled,
   isActive,
+  href,
+  "f-partial": fPartial,
+  class: className,
+  children,
   ...props
 }: ButtonProps & { isActive?: boolean }) {
   const buttonClass = button(variant, color, size, {
-    disabled,
-    active: isActive,
+    disabled: disabled ?? undefined,
+    active: isActive ?? undefined,
   });
+
+  const combinedClass = `${buttonClass} ${className ?? ""}`;
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        f-partial={fPartial || href}
+        class={combinedClass}
+        {...props}
+      >
+        {children}
+      </a>
+    );
+  }
 
   return (
     <button
-      {...props}
+      type="button"
       disabled={!IS_BROWSER || disabled}
-      class={`${buttonClass} ${props.class || ""}`}
+      class={combinedClass}
     >
-      {props.children}
+      {children}
     </button>
   );
 }
@@ -43,24 +62,38 @@ export function ButtonIcon({
   disabled,
   isLoading,
   isActive,
+  href,
+  "f-partial": fPartial,
+  class: className,
   children,
   ...props
 }: ButtonProps & { isLoading?: boolean; isActive?: boolean }) {
   const buttonClass = button(variant, color, size, {
-    disabled,
-    loading: isLoading,
-    active: isActive,
+    disabled: disabled ?? undefined,
+    loading: isLoading ?? undefined,
+    active: isActive ?? undefined,
   });
 
-  return (
-    <button
-      {...props}
-      disabled={!IS_BROWSER || disabled || isLoading}
-      class={`${buttonClass} p-0 aspect-square`}
-    >
-      {isLoading ? <LoadingSpinner /> : children}
-    </button>
-  );
+  return href
+    ? (
+      <a
+        href={href}
+        f-partial={fPartial || href}
+        class={`${buttonClass} p-0 aspect-square`}
+        {...props}
+      >
+        {isLoading ? <LoadingSpinner /> : children}
+      </a>
+    )
+    : (
+      <button
+        {...props}
+        disabled={!IS_BROWSER || disabled || isLoading}
+        class={`${buttonClass} p-0 aspect-square`}
+      >
+        {isLoading ? <LoadingSpinner /> : children}
+      </button>
+    );
 }
 
 /**
@@ -73,22 +106,118 @@ export function ButtonProcessing({
   disabled,
   isSubmitting,
   isActive,
+  href,
+  "f-partial": fPartial,
+  class: className,
   children,
   ...props
 }: ButtonProps & { isSubmitting: boolean; isActive?: boolean }) {
   const buttonClass = button(variant, color, size, {
-    disabled,
-    loading: isSubmitting,
-    active: isActive,
+    disabled: disabled ?? undefined,
+    loading: isSubmitting ?? undefined,
+    active: isActive ?? undefined,
   });
 
-  return (
-    <button
-      {...props}
-      disabled={!IS_BROWSER || disabled || isSubmitting}
-      class={buttonClass}
-    >
-      {isSubmitting ? <LoadingSpinner /> : children}
-    </button>
-  );
+  return href
+    ? (
+      <a
+        href={href}
+        f-partial={fPartial || href}
+        class={buttonClass}
+        {...props}
+      >
+        {isSubmitting ? <LoadingSpinner /> : children}
+      </a>
+    )
+    : (
+      <button
+        {...props}
+        disabled={!IS_BROWSER || disabled || isSubmitting}
+        class={buttonClass}
+      >
+        {isSubmitting ? <LoadingSpinner /> : children}
+      </button>
+    );
 }
+
+/**
+ * Button Components
+ *
+ * @example Normal Button
+ * ```tsx
+ * <Button variant="outline" color="grey" size="lg">
+ *   CLICK ME
+ * </Button>
+ * ```
+ *
+ * @example Icon Button
+ * ```tsx
+ * <ButtonIcon variant="outline" color="purple" size="md">
+ *   <svg>...</svg>
+ * </ButtonIcon>
+ * ```
+ *
+ * @example Icon Button with Loading Spinner
+ * ```tsx
+ * import { useButtonActions } from "$islands/shared/actions/buttonActions.tsx";
+ *
+ * export default function MyComponent() {
+ *   const { isActive, activeHandlers } = useButtonActions();
+ *
+ *   return (
+ *     <ButtonIcon
+ *       variant="outline"
+ *       color="purple"
+ *       size="md"
+ *       isLoading={true}
+ *       isActive={isActive}
+ *       {...activeHandlers}
+ *     >
+ *       <svg>...</svg>
+ *     </ButtonIcon>
+ *   );
+ * }
+ * ```
+ *
+ * @example Processing Button
+ * ```tsx
+ * <ButtonProcessing
+ *   variant="outline"
+ *   color="grey"
+ *   size="lg"
+ *   isSubmitting={false}
+ * >
+ *   SUBMIT
+ * </ButtonProcessing>
+ * ```
+ *
+ * @example Processing Button with Active State and Spinner
+ * ```tsx
+ * import { useButtonActions } from "$islands/shared/actions/buttonActions.tsx";
+ *
+ * export default function MyComponent() {
+ *   const { isActive, activeHandlers } = useButtonActions();
+ *   const [isSubmitting, setIsSubmitting] = useState(false);
+ *
+ *   const handleSubmit = async () => {
+ *     setIsSubmitting(true);
+ *     await submitData();
+ *     setIsSubmitting(false);
+ *   };
+ *
+ *   return (
+ *     <ButtonProcessing
+ *       variant="outline"
+ *       color="grey"
+ *       size="lg"
+ *       isSubmitting={isSubmitting}
+ *       isActive={isActive}
+ *       {...activeHandlers}
+ *       onClick={handleSubmit}
+ *     >
+ *       SUBMIT
+ *     </ButtonProcessing>
+ *   );
+ * }
+ * ```
+ */

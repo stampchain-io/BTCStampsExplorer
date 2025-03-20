@@ -6,18 +6,40 @@ export interface ButtonVariants {
   variant: Record<"outline" | "flat" | "flatOutline" | "outlineFlat", string>;
   color: Record<"grey" | "purple" | "test", string>;
   size: Record<"xs" | "sm" | "md" | "lg" | "xl", string>;
-  state: { 
+  state: {
     disabled: string;
     loading: string;
     active: string;
   };
+  spinner: string;
 }
 
-export interface ButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
+// Base shared props for both button and anchor
+interface BaseButtonProps {
   variant: keyof typeof buttonStyles.variant;
   color: keyof typeof buttonStyles.color;
   size: keyof typeof buttonStyles.size;
+  class?: string;
+  children?: JSX.Element | string;
+  disabled?: boolean;
 }
+
+// Button specific props
+export interface ButtonElementProps extends BaseButtonProps {
+  href?: undefined;
+  "f-partial"?: undefined;
+  target?: undefined;
+}
+
+// Anchor specific props
+export interface AnchorElementProps extends BaseButtonProps {
+  href: string;
+  "f-partial"?: string;
+  target?: "_blank" | "_self" | "_parent" | "_top";
+}
+
+// Union type for all possible props
+export type ButtonProps = ButtonElementProps | AnchorElementProps;
 
 // Button Styles
 export const buttonStyles: ButtonVariants = {
@@ -67,7 +89,8 @@ export const buttonStyles: ButtonVariants = {
   },
 
   size: {
-    xs: "h-8 tablet:h-7 px-4 tablet:px-3 text-xs tablet:text-[10px] font-semibold",
+    xs:
+      "h-8 tablet:h-7 px-4 tablet:px-3 text-xs tablet:text-[10px] font-semibold",
     sm: "h-9 tablet:h-8 px-5 tablet:px-4 text-xs tablet:text-xs",
     md: "h-10 tablet:h-9 px-5 text-sm tablet:text-xs",
     lg: "h-11 tablet:h-10 px-5 text-sm",
@@ -90,6 +113,14 @@ export const buttonStyles: ButtonVariants = {
       transition-transform
     `,
   },
+
+  spinner: `
+    animate-spin 
+    rounded-full 
+    h-5 w-5 
+    border-b-2 
+    border-[var(--hover-color)]
+  `,
 };
 
 /**
@@ -99,7 +130,11 @@ export const button = (
   variant: keyof typeof buttonStyles.variant,
   color: keyof typeof buttonStyles.color,
   size: keyof typeof buttonStyles.size,
-  state?: { disabled?: boolean; loading?: boolean; active?: boolean },
+  state?: {
+    disabled?: boolean | undefined;
+    loading?: boolean | undefined;
+    active?: boolean | undefined;
+  },
 ) => {
   const stateClasses = [];
   if (state?.disabled) stateClasses.push(buttonStyles.state.disabled);
@@ -111,6 +146,6 @@ export const button = (
     ${buttonStyles.variant[variant]} 
     ${buttonStyles.color[color]} 
     ${buttonStyles.size[size]}
-    ${stateClasses.join(' ')}
+    ${stateClasses.join(" ")}
   `;
 };
