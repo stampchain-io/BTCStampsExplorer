@@ -1,3 +1,4 @@
+/* ===== GET STAMPING MODULE ===== */
 import { useEffect, useState } from "preact/hooks";
 import { formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { Button } from "$buttons";
@@ -33,7 +34,6 @@ export function GetStampingModule({}: GetStampingModuleProps) {
   const displayFee = typeof recommendedFee === "number" ? recommendedFee : "0";
 
   /* ===== COMPONENT RENDER ===== */
-  /* ===== GET STAMPING MODULE ===== */
   return (
     <div class="flex flex-col">
       {/* ===== TITLE SECTION ===== */}

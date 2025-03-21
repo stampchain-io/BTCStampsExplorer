@@ -4,9 +4,11 @@ import { PartnersModule } from "$islands/modules/Partners.tsx";
 import AboutDonate from "$islands/about/AboutDonate.tsx";
 import AboutContact from "$islands/about/AboutContact.tsx";
 
+/* ===== ABOUT PAGE ===== */
 export default function About() {
   return (
     <div>
+      {/* ===== BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
         alt="About Bitcoin Stamps and contact Stampchain"
@@ -24,20 +26,21 @@ export default function About() {
         "
       />
 
-      <div className="flex flex-col gap-12 mobileLg:gap-24">
+      {/* ===== ABOUT SECTION ===== */}
+      <div className="flex flex-col gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
         <AboutHeader />
 
-        {/* Team */}
+        {/* ===== TEAM SECTION ===== */}
         <AboutTeam />
 
-        {/* Partners */}
+        {/* ===== PARTNERS SECTION ===== */}
         <PartnersModule />
 
-        {/* Donate */}
+        {/* ===== DONATE SECTION ===== */}
         <div id="donate"></div>
         <AboutDonate />
 
-        {/* Contact */}
+        {/* ===== CONTACT SECTION ===== */}
         <div id="contact"></div>
         <AboutContact />
       </div>

@@ -1,21 +1,29 @@
-import { TeamStyles } from "$islands/about/styles.ts";
+/* ===== ABOUT TEAM MODULE ===== */
+import { aboutSubTitlePurple, aboutTitlePurpleLD, subtitlePurple } from "$text";
 
+/* ===== COMPONENT INTERFACE ===== */
 export default function AboutTeam() {
+  /* ===== COMPONENT RENDER ===== */
   return (
     <>
       <section>
+        {/* ===== TEAM SECTION CONTAINER ===== */}
         <div className="w-full flex justify-start items-start pt-6">
           <div className="w-full">
-            <h2 className={TeamStyles.subTitlePurple}>
-              THE TEAM
-            </h2>
-            <div className="flex justify-between items-start mx-0 mobileLg:mx-12 desktop:mx-16 gap-3 mobileMd:gap-6 mt-3">
+            {/* ===== SECTION TITLE ===== */}
+            <h2 className={subtitlePurple}>THE TEAM</h2>
+
+            {/* ===== TEAM MEMBERS GRID ===== */}
+            <div className="flex justify-between items-start
+             mx-0 mobileLg:mx-12 desktop:mx-16 mt-3
+              gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+              {/* ===== MIKE IN SPACE CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/code.png" />
-                <p className={TeamStyles.aboutTitlePurpleLD}>
+                <p className={aboutTitlePurpleLD}>
                   MIKE IN SPACE
                 </p>
-                <p className={TeamStyles.aboutSubTitlePurple}>
+                <p className={aboutSubTitlePurple}>
                   CODE{" "}
                   <span className="mobileMd:hidden">
                     <br />
@@ -23,12 +31,14 @@ export default function AboutTeam() {
                   CONOISSEUR
                 </p>
               </div>
+
+              {/* ===== REINAMORA CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/backend.png" />
-                <p className={TeamStyles.aboutTitlePurpleLD}>
+                <p className={aboutTitlePurpleLD}>
                   REINAMORA
                 </p>
-                <p className={TeamStyles.aboutSubTitlePurple}>
+                <p className={aboutSubTitlePurple}>
                   BACKEND{" "}
                   <span className="mobileMd:hidden">
                     <br />
@@ -36,12 +46,14 @@ export default function AboutTeam() {
                   BIGBRAINS
                 </p>
               </div>
+
+              {/* ===== ARWYN CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/memetic.png" />
-                <p className={TeamStyles.aboutTitlePurpleLD}>
+                <p className={aboutTitlePurpleLD}>
                   ARWYN
                 </p>
-                <p className={TeamStyles.aboutSubTitlePurple}>
+                <p className={aboutSubTitlePurple}>
                   MEMETIC{" "}
                   <span className="mobileMd:hidden">
                     <br />

@@ -1,8 +1,8 @@
+/* ===== STAMPCHAIN MODULE ===== */
 import { Button } from "$buttons";
 import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
 /* ===== COMPONENT RENDER ===== */
-/* ===== STAMPCHAIN MODULE ===== */
 export const StampChainModule = () => {
   return (
     <div class="grid grid-cols-1 desktop:grid-cols-3 gap-7 items-end

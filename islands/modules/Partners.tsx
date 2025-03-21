@@ -1,3 +1,4 @@
+/* ===== PARTNERS MODULE ===== */
 import { useState } from "preact/hooks";
 import { subtitleGrey } from "$text";
 
@@ -96,14 +97,14 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
 }
 
 /* ===== COMPONENT RENDER ===== */
-/* ===== PARTNERS MODULE ===== */
+
 export function PartnersModule() {
   return (
     <div class="flex flex-col max-w-desktop w-full mx-auto">
       {/* ===== TITLE SECTION ===== */}
       <h2 className={subtitleGrey}>PARTNERS</h2>
       {/* ===== BANNER CARDS SECTION ===== */}
-      <div class="grid grid-cols-3 pt-2 gap-6 tablet:gap-9">
+      <div class="grid grid-cols-3 pt-2 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
         {partners.map((partner) => (
           <PartnerCard key={partner.name} {...partner} />
         ))}

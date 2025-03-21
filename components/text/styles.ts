@@ -55,6 +55,10 @@ export const subtitlePurple =
   "font-extralight text-2xl mobileMd:text-3xl text-stamp-purple-bright mb-2 cursor-default select-none whitespace-nowrap";
 
 // Headings
+export const headingGrey =
+  "font-black text-3xl mobileLg:text-4xl text-stamp-grey-light tracking-wide cursor-default select-none whitespace-nowrap"; // used in about donate section
+export const headingLinkGreyLD = // check naming - used in media page
+  "font-bold text-xl gray-gradient1-hover tracking-wide inline-block relative transition-colors duration-300";
 
 // Body text / Values
 export const textXxs = "font-normal text-[10px] text-stamp-grey-light";
@@ -62,13 +66,11 @@ export const textXs = "font-normal text-xs text-stamp-grey-light";
 export const textSm = "font-normal text-sm text-stamp-grey-light";
 export const text = "font-normal text-base text-stamp-grey-light";
 export const textLg = "font-normal text-lg text-stamp-grey-light";
-
-// Links
-// Just add "animated-underline" to the class name to apply the animated underline effect or use the const below for standard body text
 export const textLinkUnderline =
   "font-bold text-base text-stamp-grey-light animated-underline transition-colors duration-300";
-export const headingLinkGreyLD = // check naming - used in media index.tsx
-  "font-bold text-xl gray-gradient1-hover inline-block relative transition-colors duration-300";
+
+// Links
+// Use the specifics created or just add "animated-underline" to the class name to apply the animated underline effect
 
 // Labels
 export const labelSm =
@@ -78,7 +80,17 @@ export const label =
 export const labelLg =
   "font-medium text-lg text-stamp-grey-light cursor-default select-none whitespace-nowrap";
 
+export const dataValue =
+  "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
+export const dataValueXL =
+  "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
+export const dataValueXLlink = "text-3xl mobileLg:text-4xl font-black -mt-1";
+export const textLoader =
+  "text-sm mobileLg:text-base font-medium text-stamp-grey uppercase text-center py-3 animated-text-loader";
+
 // Overline - Category labels, above titles (update from filter styles)
+export const overline =
+  "font-light text-base text-stamp-grey-darker tracking-wide inline-block cursor-default select-none whitespace-nowrap";
 
 // Captions - used for stamp/token cards
 
@@ -92,3 +104,18 @@ export const labelLg =
 // Success
 
 // Old styles
+// About page
+export const dataLabelPurple =
+  "text-base mobileLg:text-lg font-light text-stamp-purple-highlight";
+export const dataValuePurpleSm =
+  "text-2xl mobileLg:text-3xl font-black text-black text-stroke-glow-small";
+export const dataValuePurple =
+  "text-4xl mobileLg:text-5xl desktop:text-6xl font-black text-black text-stroke-glow-small";
+export const dataValuePurpleXl =
+  "text-6xl mobileLg:text-7xl desktop:text-8xl font-black text-black text-stroke-glow-large";
+export const aboutTitlePurpleLD =
+  "text-sm mobileMd:text-lg mobileLg:text-xl font-black purple-gradient1 text-center mt-3 mobileMd:mt-4 mobileLg:mt-5 mb-1 mobileMd:mb-0";
+export const aboutSubTitlePurple =
+  "text-xs mobileMd:text-base font-medium text-stamp-purple text-center whitespace-nowrap";
+export const dataLabel =
+  "text-base mobileLg:text-lg font-light text-yellow-500 uppercase";
