@@ -40,15 +40,17 @@ export function GetStampingModule({}: GetStampingModuleProps) {
       <h1 className={titleGreyDL}>GET STAMPING</h1>
       <h2 className={subtitleGrey}>IMMORTALISE YOUR ART</h2>
       {/* ===== MAIN CONTENT SECTION ===== */}
-      <div className="flex flex-col tablet:flex-row gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+      <div
+        className={`flex flex-col tablet:flex-row gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop ${text}`}
+      >
         <div className="flex flex-col">
-          <p className={text}>
+          <p>
             <b>
               The Stampchain stamping machine has been revamped and refitted
               with sleek new naming features.
             </b>
-            <br />
-            <br />
+          </p>
+          <p>
             <b>
               Experience greater creative freedom and adorn your treasured art
               with fanciful letters and posh names.
@@ -59,17 +61,19 @@ export function GetStampingModule({}: GetStampingModuleProps) {
             stamps.
           </p>
         </div>
-        <div className="flex flex-col mobileLg:-mt-3 tablet:mt-0 tablet:text-right">
-          <p className={text}>
+        <div className="flex flex-col -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:mt-0 tablet:text-right">
+          <p>
             <b>Wanna stay true to classic A grade numerics?</b>
             <br />
             No problem, we still offer random lucky numbers - or you can choose
-            a custom CPID number for your stamp.<br />
-            <br />
+            a custom CPID number for your stamp.
+          </p>
+          <p>
             Either way the stamping machine handles everything, from low-fi
             pixel art (png/jpg/gif) to hi-res vector art (svg/html) - up to a
-            whooping 65kB.<br />
-            <br />
+            whooping 65kB.
+          </p>
+          <p>
             <i>
               <b>Time to get stamping!</b>
             </i>
@@ -78,7 +82,7 @@ export function GetStampingModule({}: GetStampingModuleProps) {
       </div>
 
       {/* ===== BUTTONS SECTION ===== */}
-      <div className="flex flex-col pt-6 gap-3">
+      <div className="flex flex-col pt-7 gap-3">
         {/* ===== ACTION BUTTONS ===== */}
         <div className="flex gap-6 justify-end">
           <Button
