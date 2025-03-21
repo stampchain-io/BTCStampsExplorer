@@ -183,22 +183,20 @@ export default {
         },
       },
       spacing: {
-        "stamp-card": "6px",
-        "stamp-card-lg": "max(6px,min(12px,calc(6px+((100vw-360px)*0.029))))",
-        "search-icon": "12px",
-        "stroke-width": "2px",
         // PAGE GUTTERS (horizontal padding from screen edges to header, footer and body)
         "gutter-mobile": "24px", // updated breakpoint naming convention
         "gutter-tablet": "36px", // updated breakpoint naming convention
         "gutter-desktop": "48px", // updated breakpoint naming convention
-        // SECTION GAPS (vertical spacing between major sections in the body)
-        "section-mobile": "48px", // updated breakpoint naming convention
-        "section-tablet": "72px", // updated breakpoint naming convention
-        "section-desktop": "72px", // updated breakpoint naming convention
+        // BODY GAP (vertical spacing between the body and the header and footer)
+        // Defined in the header and footer files
         // GRID GAPS (spacing between grid/flex items)
         "grid-mobile": "24px", // updated breakpoint naming convention
         "grid-tablet": "36px", // updated breakpoint naming convention
         "grid-desktop": "48px", // updated breakpoint naming convention
+        // SECTION GAPS (vertical spacing between major sections in the body)
+        "section-mobile": "48px", // updated breakpoint naming convention
+        "section-tablet": "72px", // updated breakpoint naming convention
+        "section-desktop": "72px", // updated breakpoint naming convention
         // COMPONENT GAPS
         // CONTENT PADDING
         // STACK SPACING
@@ -212,6 +210,11 @@ export default {
         "calc-12": "calc(100% - 12px)",
         "calc-24": "calc(100% - 24px)",
         "calc-36": "calc(100% - 36px)",
+
+        "stamp-card": "6px",
+        "stamp-card-lg": "max(6px,min(12px,calc(6px+((100vw-360px)*0.029))))",
+        "search-icon": "12px",
+        "stroke-width": "2px",
       },
       boxShadow: {
         "stamp": "0px 0px 30px #aa00ff",

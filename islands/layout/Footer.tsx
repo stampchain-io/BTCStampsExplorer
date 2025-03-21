@@ -67,7 +67,7 @@ export function Footer() {
     <footer className="
       flex flex-col tablet:flex-row justify-between max-w-desktop w-full mx-auto 
       px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
-      py-6 tablet:py-18
+      pt-24 pb-6 tablet:pt-24 tablet:pb-9
       gap-2 mobileLg:gap-3 tablet:gap-4
     ">
       <img

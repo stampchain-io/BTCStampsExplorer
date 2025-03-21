@@ -295,10 +295,10 @@ export function Header() {
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <header className="tablet:flex justify-between items-center max-w-desktop w-full
-     mx-auto my-[18px] mobileMd:my-6 mobileLg:my-9 tablet:my-12
+    <header className="tablet:flex justify-between items-center max-w-desktop w-full mx-auto 
+     pt-6 pb-9 mobileLg:pt-9 mobileLg:pb-14
      px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop">
-      {/* ===== LOGO AND MOBILE MENU TOGGLE ===== */}
+      {/* ===== LOGO AND MOBILE MENU TOGGLE BUTTON ===== */}
       <div className="flex justify-between items-center w-full ">
         <a
           href="/home"

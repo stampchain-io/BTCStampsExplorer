@@ -157,8 +157,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
                 <Header />
                 <main
                   class="flex flex-col flex-grow w-full max-w-desktop mx-auto
-                  px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
-                  pt-0 mobileLg:pt-3 tablet:pt-3 pb-12 mobileLg:pb-24 desktop:pb-36"
+                  px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop"
                   f-client-nav
                 >
                   <Partial name="body">
