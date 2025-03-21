@@ -121,6 +121,8 @@
     "$icons": "./components/icons/index.ts",
     "$text": "./components/text/styles.ts",
     "$constants": "./lib/utils/constants.ts",
+    "$forms": "./components/Forms/styles.ts",
+    "$notifications": "./components/notifications/styles.ts",
     "$globals": "./globals.d.ts",
     "$handlers/": "./routes/handlers/",
     "$islands/": "./islands/",
