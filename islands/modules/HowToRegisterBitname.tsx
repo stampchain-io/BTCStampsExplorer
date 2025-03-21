@@ -1,13 +1,13 @@
-import { ModulesStyles } from "$islands/modules/Styles.ts";
-import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
+import { ReadAllButton } from "$components/buttons/ReadAllButton.tsx";
+import { subtitleGrey, text, titleGreyDL } from "$text";
 
 export const HowToRegisterBitnameModule = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col">
-        <h1 class={ModulesStyles.titleGreyDL}>HOW-TO</h1>
-        <h2 class={ModulesStyles.subTitleGrey}>REGISTER YOUR BITNAME</h2>
-        <p class={ModulesStyles.bodyTextLight}>
+        <h1 class={titleGreyDL}>HOW-TO</h1>
+        <h2 class={subtitleGrey}>REGISTER YOUR BITNAME</h2>
+        <p class={text}>
           <ul class="list-disc pl-5 space-y-2">
             <li>
               Select your preferred <b>Top Level Domain</b>{" "}
@@ -46,7 +46,8 @@ export const HowToRegisterBitnameModule = () => {
               confirm the transaction in your wallet.
             </li>
           </ul>
-          <br />
+        </p>
+        <p class={text}>
           Reducing the transaction fee may slow down the registration process.
           <br />
           All fees are shown in BTC by default. You can view the costs in USDT

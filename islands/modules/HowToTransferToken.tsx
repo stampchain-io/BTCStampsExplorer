@@ -1,13 +1,13 @@
-import { ModulesStyles } from "$islands/modules/Styles.ts";
-import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
+import { ReadAllButton } from "$components/buttons/ReadAllButton.tsx";
+import { subtitleGrey, text, titleGreyDL } from "$text";
 
 export const HowToTransferTokenModule = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col">
-        <h1 class={ModulesStyles.titleGreyDL}>HOW-TO</h1>
-        <h2 class={ModulesStyles.subTitleGrey}>TRANSFER A TOKEN</h2>
-        <p class={ModulesStyles.bodyTextLight}>
+        <h1 class={titleGreyDL}>HOW-TO</h1>
+        <h2 class={subtitleGrey}>TRANSFER A TOKEN</h2>
+        <p class={text}>
           <ul class="list-disc pl-5 space-y-2">
             <li>
               The Bitcoin <b>recepient address</b>{" "}
@@ -39,7 +39,8 @@ export const HowToTransferTokenModule = () => {
               information.
             </li>
           </ul>
-          <br />
+        </p>
+        <p class={text}>
           Reducing the fee may slow down the transfer process.<br />
           Fees are shown in BTC by default, but you can change to USDT using the
           toggle switch.<br />
