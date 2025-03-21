@@ -1,3 +1,5 @@
+import type { JSX } from "preact";
+
 // TypeScript interfaces
 export interface IconVariants { // WIP
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
@@ -5,6 +7,10 @@ export interface IconVariants { // WIP
   className?: string;
   role?: string;
   ariaLabel?: string;
+  style?: JSX.CSSProperties;
+  onMouseEnter?: JSX.MouseEventHandler<SVGElement>;
+  onMouseLeave?: JSX.MouseEventHandler<SVGElement>;
+  onClick?: JSX.MouseEventHandler<SVGElement>;
 }
 
 export interface BadgeVariants {

@@ -118,6 +118,8 @@
     "$client/": "./client/",
     "$components/": "./components/",
     "$buttons": "./components/buttons/index.ts",
+    "$icons": "./components/icons/index.ts",
+    "$text": "./components/text/styles.ts",
     "$constants": "./lib/utils/constants.ts",
     "$globals": "./globals.d.ts",
     "$handlers/": "./routes/handlers/",
