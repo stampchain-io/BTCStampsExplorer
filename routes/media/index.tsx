@@ -128,7 +128,7 @@ export default function Media() {
         <h1 className={titleGreyDL}>IN THE NEWS</h1>
         <h2 className={subtitleGrey}>BREAKING STORIES</h2>
         {/* ===== NEWS ARTICLES LIST ===== */}
-        <div className="flex flex-col min-[1280px]:flex-row">
+        <div className="flex flex-col min-[1280px]:flex-row gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
           <div className="flex flex-col w-full min-[1280px]:w-1/2 space-y-6">
             <p className={text}>
               BINANCE
@@ -186,8 +186,8 @@ export default function Media() {
               </a>
             </p>
           </div>
-          <div className="flex flex-col w-full pt-6 space-y-6
-                          min-[1280px]:w-1/2 min-[1280px]:justify-end min-[1280px]:pt-0  min-[1280px]:text-right ">
+          <div className="flex flex-col w-full mobileLg:-mt-3 tablet:-mt-6 min-[1280px]:mt-0 space-y-6
+                          min-[1280px]:w-1/2 min-[1280px]:justify-end min-[1280px]:pt-0 min-[1280px]:text-right">
             <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
               M2
               <br />
