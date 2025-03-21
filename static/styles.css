@@ -526,33 +526,6 @@ body {
   outline-style: none !important;
 }
 
-/* Animated underline for links */
-.animated-underline {
-  font-weight: 700;
-  text-decoration: none;
-  background-image: linear-gradient(#CCCCCC, #CCCCCC);
-  background-position: 0% 100%;
-  background-repeat: no-repeat;
-  background-size: 100% 2px;
-  transition: background-size .3s, color .6s;
-  padding-bottom: 3px;
-  text-shadow:
-    -3px 0 #000,
-    /* Left */
-    3px 0 #000,
-    /* Right */
-    0 -3px #000,
-    /* Top */
-    0 3px #000;
-  /* Bottom */
-}
-
-.animated-underline:hover,
-.animated-underline:focus {
-  background-size: 0% 2px;
-  color: #999999;
-}
-
 /* Animated loader text */
 .animated-text-loader span {
   display: inline-block;
@@ -627,4 +600,38 @@ body {
   100% {
     transform: translateX(-100%);
   }
+}
+
+/* Custom text styles */
+/* Bold text */
+b,
+strong {
+  font-weight: 600;
+}
+
+/* Animated underline for links */
+.animated-underline {
+  font-weight: 700;
+  text-decoration: none;
+  background-image: linear-gradient(#CCCCCC, #CCCCCC);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+  transition: background-size .3s, color .6s;
+  padding-bottom: 3px;
+  text-shadow:
+    -3px 0 #000,
+    /* Left */
+    3px 0 #000,
+    /* Right */
+    0 -3px #000,
+    /* Top */
+    0 3px #000;
+  /* Bottom */
+}
+
+.animated-underline:hover,
+.animated-underline:focus {
+  background-size: 0% 2px;
+  color: #999999;
 }

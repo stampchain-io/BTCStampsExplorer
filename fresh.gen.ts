@@ -109,7 +109,6 @@ import * as $howto_transferstamp_index from "./routes/howto/transferstamp/index.
 import * as $howto_transfertoken_index from "./routes/howto/transfertoken/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $media_index from "./routes/media/index.tsx";
-import * as $media_styles from "./routes/media/styles.ts";
 import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
@@ -380,7 +379,6 @@ const manifest = {
     "./routes/howto/transfertoken/index.tsx": $howto_transfertoken_index,
     "./routes/index.tsx": $index,
     "./routes/media/index.tsx": $media_index,
-    "./routes/media/styles.ts": $media_styles,
     "./routes/presskit/index.tsx": $presskit_index,
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/src20/[tick].tsx": $src20_tick_,
