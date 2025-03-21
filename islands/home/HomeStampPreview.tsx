@@ -7,7 +7,7 @@ import {
 
 import StampSection from "$islands/stamp/StampSection.tsx";
 import CollectionSection from "$islands/collection/CollectionSection.tsx";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { titlePurpleDL } from "$text";
 
 interface HomeStampPreviewProps {
   stamps_art?: StampRow[];
@@ -30,18 +30,19 @@ export function HomeStampPreview({
       fromPage: "home",
       layout: "grid",
       showDetails: false,
-      showEdition: true,
+      showEdition: false,
       viewAllLink: "/stamp/art",
       gridClass: `
-        grid w-full gap-3 mobileMd:gap-6
-        grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
+        grid w-full gap-6
+        grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6
         auto-rows-fr
       `,
       displayCounts: {
         mobileSm: 8,
-        mobileLg: 12,
-        tablet: 16,
-        desktop: 20,
+        mobileMd: 12,
+        mobileLg: 16,
+        tablet: 20,
+        desktop: 24,
       },
     },
   ];
@@ -71,18 +72,19 @@ export function HomeStampPreview({
       fromPage: "home",
       layout: "grid",
       showDetails: false,
-      showEdition: true,
+      showEdition: false,
       viewAllLink: "/collection/overview/posh",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
-        grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
+        grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-6 desktop:grid-cols-7
         auto-rows-fr
       `,
       displayCounts: {
         mobileSm: 4,
-        mobileLg: 6,
-        tablet: 8,
-        desktop: 10,
+        mobileMd: 6,
+        mobileLg: 8,
+        tablet: 12,
+        desktop: 14,
       },
     },
     {
@@ -125,13 +127,13 @@ export function HomeStampPreview({
 
   return (
     <div className="
-        flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36
-        max-w-desktop w-full mx-auto
+        flex flex-col max-w-desktop w-full mx-auto
+        gap-12 mobileLg:gap-24 desktop:gap-36
       ">
       {/* LATEST ART STAMPS */}
       <div className="flex flex-col">
         <div className="w-full">
-          <h1 className={ModulesStyles.titlePurpleDL}>
+          <h1 className={titlePurpleDL}>
             <span className="block mobileLg:hidden">LATEST STAMPS</span>
             <span className="hidden mobileLg:block">LATEST ART STAMPS</span>
           </h1>

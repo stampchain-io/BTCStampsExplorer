@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
+import { ViewAllButton } from "$components/buttons/ViewAllButton.tsx";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { StampRow, StampSectionProps } from "$globals";
@@ -208,7 +208,9 @@ export default function StampSection({
           )}
       </div>
 
-      {((viewAllLink && viewAllLink !== "/stamp/art" && viewAllLink !== "/collection/overview/posh" && fromPage == "home") || fromPage === "stamp_detail")
+      {((viewAllLink && viewAllLink !== "/stamp/art" &&
+          viewAllLink !== "/collection/overview/posh" && fromPage == "home") ||
+          fromPage === "stamp_detail")
         ? (
           <div class="swiper-container overflow-hidden">
             <div class="swiper-wrapper">

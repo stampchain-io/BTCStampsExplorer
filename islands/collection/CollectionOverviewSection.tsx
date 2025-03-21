@@ -3,7 +3,7 @@ import { Collection, CollectionOverviewSectionProps } from "$globals";
 
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 
-import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
+import { ViewAllButton } from "$components/buttons/ViewAllButton.tsx";
 import { CollectionOverviewCard } from "$components/collection/CollectionOverviewCard.tsx";
 
 import { ModulesStyles } from "$islands/modules/Styles.ts";
