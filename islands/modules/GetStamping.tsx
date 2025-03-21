@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { Button } from "$buttons";
-import { subtitleGrey, text, titleGreyDL } from "$text";
+import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
 /* ===== COMPONENT INTERFACE ===== */
 export function GetStampingModule({}: GetStampingModuleProps) {
@@ -39,7 +39,7 @@ export function GetStampingModule({}: GetStampingModuleProps) {
       {/* ===== TITLE SECTION ===== */}
       <h1 className={titleGreyDL}>GET STAMPING</h1>
       <h2 className={subtitleGrey}>IMMORTALISE YOUR ART</h2>
-      {/* ===== MAIN CONTENT SECTION ===== */}
+      {/* ===== TEXT CONTENT SECTION ===== */}
       <div
         className={`flex flex-col tablet:flex-row gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop ${text}`}
       >
@@ -63,7 +63,7 @@ export function GetStampingModule({}: GetStampingModuleProps) {
         </div>
         <div className="flex flex-col -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:mt-0 tablet:text-right">
           <p>
-            <b>Wanna stay true to classic A grade numerics?</b>
+            <b>Wanna stay true to classic A grade numerics ?</b>
             <br />
             No problem, we still offer random lucky numbers - or you can choose
             a custom CPID number for your stamp.
@@ -74,9 +74,9 @@ export function GetStampingModule({}: GetStampingModuleProps) {
             whooping 65kB.
           </p>
           <p>
-            <i>
-              <b>Time to get stamping!</b>
-            </i>
+            <span className={textLg}>
+              <b>Time to get stamping !</b>
+            </span>
           </p>
         </div>
       </div>

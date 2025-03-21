@@ -1,5 +1,5 @@
 import { Button } from "$buttons";
-import { subtitleGrey, text, titleGreyDL } from "$text";
+import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
 /* ===== COMPONENT RENDER ===== */
 /* ===== STAMPCHAIN MODULE ===== */
@@ -9,16 +9,21 @@ export const StampChainModule = () => {
       max-w-desktop w-full mx-auto
     ">
       <div className="col-span1 desktop:col-span-2">
+        {/* ===== TITLE SECTION ===== */}
         <h1 className={titleGreyDL}>STAMPCHAIN</h1>
         <h2 className={subtitleGrey}>
           THE CREATORS OF BITCOIN STAMPS
         </h2>
+        {/* ===== TEXT CONTENT SECTION ===== */}
         <div className={`flex flex-col ${text}`}>
           <p>
-            <b>
-              As the architects of the Bitcoin Stamps protocol, we've been at
-              the forefront of the ecosystem since its inception.
-            </b>{" "}
+            <span className={textLg}>
+              <b>
+                As the architects of the Bitcoin Stamps protocol, we've been at
+                the forefront of the ecosystem since its inception.
+              </b>
+            </span>
+            <br />
             Our platform combines deep technical expertise with user-friendly
             tools to help you create, collect, and trade Bitcoin Stamps with
             confidence.

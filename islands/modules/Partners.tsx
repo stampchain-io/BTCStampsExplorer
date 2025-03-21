@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { subtitleGrey } from "$text";
 
+/* ===== INTERFACES ===== */
 interface Partner {
   name: string;
   largeImage: string;
@@ -8,6 +9,7 @@ interface Partner {
   url?: string;
 }
 
+/* ===== PARTNER DATA ===== */
 const partners: Partner[] = [
   {
     name: "Bitfinity",
@@ -29,9 +31,12 @@ const partners: Partner[] = [
   },
 ];
 
+/* ===== PARTNER CARD COMPONENT ===== */
 function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
+  /* ===== STATE MANAGEMENT ===== */
   const [isHovered, setIsHovered] = useState(false);
 
+  /* ===== CARD CONTENT ===== */
   const content = (
     <div
       class={`relative w-full border-2 ${
@@ -42,7 +47,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Invisible images for sizing */}
+      {/* ===== SIZING IMAGES ===== */}
       <img
         src={largeImage}
         alt=""
@@ -54,7 +59,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
         class="block mobileMd:hidden w-full invisible"
       />
 
-      {/* Actual display images */}
+      {/* ===== DISPLAY IMAGES ===== */}
       <img
         src={largeImage}
         alt={`${name} banner`}
@@ -72,7 +77,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
         }`}
       />
 
-      {/* Gradient overlay */}
+      {/* ===== GRADIENT OVERLAY ===== */}
       <div
         class={`w-full h-full bg-gradient-to-tr from-[#666666FF] via-[#9999997F] to-[#CCCCCC00] absolute left-0 top-0 transition-opacity duration-300 ${
           isHovered ? "!hidden" : ""
@@ -90,11 +95,15 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
     : content;
 }
 
+/* ===== COMPONENT RENDER ===== */
+/* ===== PARTNERS MODULE ===== */
 export function PartnersModule() {
   return (
     <div class="flex flex-col max-w-desktop w-full mx-auto">
-      <h2 className={ModulesStyles.subTitleGrey}>PARTNERS</h2>
-      <div class="grid grid-cols-3 -m-[6px] gap-[6px] mobileMd:gap-[18px] desktop:gap-[30px]">
+      {/* ===== TITLE SECTION ===== */}
+      <h2 className={subtitleGrey}>PARTNERS</h2>
+      {/* ===== BANNER CARDS SECTION ===== */}
+      <div class="grid grid-cols-3 pt-2 gap-6 tablet:gap-9">
         {partners.map((partner) => (
           <PartnerCard key={partner.name} {...partner} />
         ))}

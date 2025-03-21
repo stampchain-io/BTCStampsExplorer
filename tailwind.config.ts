@@ -189,15 +189,16 @@ export default {
         "gutter-desktop": "48px", // updated breakpoint naming convention
         // LAYOUT GAP (vertical spacing between the body and the header and footer)
         // Defined in the header and footer files
-        // GRID GAPS (spacing between grid/flex items)
-        "grid-mobile": "24px", // updated breakpoint naming convention
-        "grid-tablet": "36px", // updated breakpoint naming convention
-        "grid-desktop": "48px", // updated breakpoint naming convention
         // SECTION GAPS (vertical spacing between major sections in the body)
         "section-mobile": "48px", // updated breakpoint naming convention
         "section-tablet": "72px", // updated breakpoint naming convention
         "section-desktop": "72px", // updated breakpoint naming convention
-        // COMPONENT GAPS
+        // GRID GAPS (spacing between grid/flex items)
+        "grid-mobile": "24px", // updated breakpoint naming convention
+        "grid-tablet": "36px", // updated breakpoint naming convention
+        "grid-desktop": "48px", // updated breakpoint naming convention
+
+        // COMPONENT GAPS - not used
         "component-mobile": "48px", // updated breakpoint naming convention
         "component-tablet": "72px", // updated breakpoint naming convention
         "component-desktop": "72px", // updated breakpoint naming convention
