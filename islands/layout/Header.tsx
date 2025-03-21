@@ -1,6 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
 import { HamburgerMenuIcon } from "$islands/layout/HeaderComponents.tsx";
+import { logo } from "$components/text/styles.ts";
+import { GearIcon } from "$components/icons/Icon.tsx";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
@@ -95,10 +97,6 @@ const _socialLinks = [
     icon: "/img/footer/GithubLogo.svg",
   },
 ];
-
-/* ===== HEADER LOGO STYLING ===== */
-const headerLogo =
-  "font-black text-4xl italic purple-hover-gradient hover:purple-hover-gradient2 tracking-wide transtion-all duration-300 pr-2";
 
 /* ===== MAIN HEADER COMPONENT ===== */
 export function Header() {
@@ -242,7 +240,7 @@ export function Header() {
                   ? ` ${
                     link.subLinks
                       ? "font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey "
-                      : "inline-block font-black text-xl text-transparent bg-clip-text bg-gradient-to-r from-stamp-grey-light via-stamp-grey to-stamp-grey-darker hover:text-stamp-grey-light"
+                      : "font-light text-3xl text-transparent bg-clip-text bg-gradient-to-r from-stamp-grey-light via-stamp-grey to-stamp-grey-darker hover:text-stamp-grey-light inline-block "
                   }`
                   : "font-extrabold text-stamp-purple group-hover:text-stamp-purple-bright"
               }`}
@@ -298,14 +296,15 @@ export function Header() {
   /* ===== COMPONENT RENDER ===== */
   return (
     <header className="tablet:flex justify-between items-center max-w-desktop w-full
-     mx-auto px-6 mobileMd:px-9 tablet:px-12 my-[18px] mobileMd:my-6 mobileLg:my-9 tablet:my-12">
+     mx-auto my-[18px] mobileMd:my-6 mobileLg:my-9 tablet:my-12
+     px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop">
       {/* ===== LOGO AND MOBILE MENU TOGGLE ===== */}
       <div className="flex justify-between items-center w-full ">
         <a
           href="/home"
           f-partial="/home"
           onClick={() => setCurrentPath("home")}
-          className={headerLogo}
+          className={logo}
         >
           STAMPCHAIN
         </a>
@@ -338,8 +337,36 @@ export function Header() {
             {renderNavLinks(true)}
           </div>
 
-          <div className="flex w-full sticky bottom-0 justify-end">
-            <ConnectWallet />
+          <div className="flex w-full sticky bottom-0 justify-between">
+            <div className="flex justify-start">
+              <GearIcon
+                className="w-8 h-8 fill-stamp-grey hover:fill-stamp-grey-light"
+                style={{
+                  transition: "all 100ms ease-in-out",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  const target = e.currentTarget as HTMLElement;
+                  target.style.transform = "rotate(-5deg)";
+                }}
+                onMouseLeave={(e) => {
+                  const target = e.currentTarget as HTMLElement;
+                  target.style.transform = "rotate(0deg)";
+                }}
+                onClick={(e) => {
+                  const target = e.currentTarget as HTMLElement;
+                  target.style.transition = "all 300ms ease-in-out";
+                  target.style.transform = "rotate(360deg)";
+                  setTimeout(() => {
+                    target.style.transition = "all 100ms ease-in-out";
+                    target.style.transform = "rotate(0deg)";
+                  }, 300);
+                }}
+              />
+            </div>
+            <div className="flex justify-end">
+              <ConnectWallet />
+            </div>
           </div>
         </div>
 
