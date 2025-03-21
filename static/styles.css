@@ -603,6 +603,18 @@ body {
 }
 
 /* Custom text styles */
+/* Space between paragraphs */
+@layer base {
+  p {
+    margin-bottom: 18px;
+  }
+
+  /* Remove margin from last paragraph in a container */
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
 /* Bold text */
 b,
 strong {
