@@ -25,20 +25,22 @@ export default function Media() {
 
       {/* ===== INTRODUCTION SECTION ===== */}
       <section>
-        <div className="flex flex-col w-full desktop:w-3/4">
+        <div className={`flex flex-col w-full desktop:w-3/4 ${text}`}>
           <h1 className={titleGreyDL}>MEDIA MATTERS</h1>
           <h2 className={subtitleGrey}>HONOURABLE STAMP MENTIONS</h2>
-          <p className={text}>
+          <p>
             Explore the world of Bitcoin Stamps with our curated list of news
-            coverage, in-depth articles, reports and video podcasts. <br />
-            <br />
+            coverage, in-depth articles, reports and video podcasts.
+          </p>
+          <p>
             We share articles worthwhile reading. From technical deep-dives into
             the protocol, ecosystem formats and lingo explainers, to all things
             stamp art. Catch up on the most important news coverage, or watch
             Mike in Space share his vision behind stamps, break down the
             technology and offer unique insights on where the technology is
-            headed.<br />
-            <br />
+            headed.
+          </p>
+          <p>
             Stay informed by regularly checking back. We're constantly adding
             new interviews and articles about the space.
           </p>
@@ -48,7 +50,9 @@ export default function Media() {
       {/* ===== INTERVIEWS SECTION ===== */}
       <section>
         <h1 className={titleGreyDL}>INTERVIEWS</h1>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+        <div
+          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop ${text}`}
+        >
           {/* ===== RICE TVX INTERVIEW ===== */}
           <div className="flex flex-col">
             <h2 className={subtitleGrey}>RICE TVX</h2>
@@ -61,10 +65,11 @@ export default function Media() {
                 allowFullScreen
               />
             </div>
-            <p className={text}>
+            <p>
               On this episode, I am joined by Mike In Space! He is the creator
-              of Bitcoin Stamps & the SRC-20 protocol.<br />
-              <br />
+              of Bitcoin Stamps & the SRC-20 protocol.
+            </p>
+            <p>
               I invited him on to learn more about him & all things Stamp. Mike
               refers to Stamps & SRC-20 as an art experiment that allows for the
               creation of NFTs, memecoins, & more on the Bitcoin blockchain. We
@@ -87,8 +92,9 @@ export default function Media() {
             </div>
             <p className={text}>
               This week Jmo and Andreas were joined by the creator of Bitcoin
-              STAMPS, Mike In Space!<br />
-              <br />
+              STAMPS, Mike In Space!
+            </p>
+            <p>
               Tune in for the lowdown on STAMPS, and how it compares to Ordinals
               and Ethereum. Plus, why Mike thinks they will live on the
               blockchain for hundreds of years to come. This is an episode you
@@ -108,14 +114,16 @@ export default function Media() {
               />
             </div>
             <p className={text}>
-              Curious about the story behind Bitcoin Stamps?<br />
-              <br />
+              Curious about the story behind Bitcoin Stamps?
+            </p>
+            <p>
               Join us for an exclusive episode of "Guess Who's Coming to the
               Universe" as special guest @mikeinspace shares the origins and
               vision that sparked the creation of Stamps! From inspiration to
               innovation, he takes us through the journey of building secure,
-              transferable digital artifacts on Bitcoin.<br />
-              <br />
+              transferable digital artifacts on Bitcoin.
+            </p>
+            <p>
               Don't miss this deep dive into all things Stamps and what's next
               in the Bitcoin collectible space!
             </p>
@@ -129,7 +137,7 @@ export default function Media() {
         <h2 className={subtitleGrey}>BREAKING STORIES</h2>
         {/* ===== NEWS ARTICLES LIST ===== */}
         <div className="flex flex-col min-[1280px]:flex-row gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
-          <div className="flex flex-col w-full min-[1280px]:w-1/2 space-y-6">
+          <div className="flex flex-col w-full min-[1280px]:w-1/2">
             <p className={text}>
               BINANCE
               <br />
@@ -186,7 +194,7 @@ export default function Media() {
               </a>
             </p>
           </div>
-          <div className="flex flex-col w-full mobileLg:-mt-3 tablet:-mt-6 min-[1280px]:mt-0 space-y-6
+          <div className="flex flex-col w-full -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:-mt-7 min-[1280px]:mt-0
                           min-[1280px]:w-1/2 min-[1280px]:justify-end min-[1280px]:pt-0 min-[1280px]:text-right">
             <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
               M2
@@ -250,21 +258,22 @@ export default function Media() {
       {/* ===== REPORTS SECTION ===== */}
       <section>
         <h1 className={titleGreyDL}>REPORTS</h1>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-3 gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
+        <div className="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
           {/* ===== SQRR DEEP DIVE ===== */}
-          <div className="col-span-1 mobileLg:col-span-2">
+          <div
+            className={`flex flex-col w-full mobileLg:w-2/3 ${text}`}
+          >
             <h2 className={subtitleGrey}>SQRR - DEEP DIVE</h2>
-            <p className={text}>
+            <p>
               Stamps is a blockchain protocol created by MikeInSpace that
-              enables storing images on-chain on Bitcoin transaction
-              outputs.<br />
-              <br />
+              enables storing images on-chain on Bitcoin transaction outputs.
+            </p>
+            <p>
               It utilizes the Counterparty platform, a longstanding Bitcoin meta
               layer, to broadcast Stamping transactions to the Bitcoin Network.
-              In addition, using a Counterparty transaction ...<br />
-              <br />
+              In addition, using a Counterparty transaction ...
             </p>
-            <div className="flex justify-end mobileLg:justify-start">
+            <div className="flex justify-end mobileLg:justify-start pt-3">
               <Button
                 variant="outline"
                 color="grey"
@@ -278,16 +287,15 @@ export default function Media() {
           </div>
 
           {/* ===== INSIGHTS REPORT ===== */}
-          <div className="col-span-1 mobileLg:text-right">
+          <div className="flex flex-col w-full mobileLg:w-1/3 mobileLg:text-right">
             <h2 className={subtitleGrey}>INSIGHTS</h2>
             <p className={text}>
               <b>Detailed monthly reports about Bitcoin Stamps.</b>
               <br />
               A comprehensive research into the usage of the Stamps protocol,
-              with multiple stats and illustrative charts.<br />
-              <br />
+              with multiple stats and illustrative charts.
             </p>
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-3">
               <Button
                 variant="outline"
                 color="grey"
