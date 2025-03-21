@@ -1,10 +1,11 @@
 import { Button } from "$buttons";
-import { styles } from "./styles.ts";
-import { subtitleGrey, text, titleGreyDL } from "$components/text/styles.ts";
+import { headingLinkGreyLD, subtitleGrey, text, titleGreyDL } from "$text";
 
+/* ===== MEDIA PAGE ===== */
 export default function Media() {
   return (
-    <div className={styles.body}>
+    <div className="flex flex-col gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
+      {/* ===== BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
         alt="Read about Bitcoin Stamps and the media mentions of Stampchain"
@@ -21,6 +22,8 @@ export default function Media() {
           [-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0.0),rgba(0,0,0,0.5),rgba(0,0,0,0))]
         "
       />
+
+      {/* ===== INTRODUCTION SECTION ===== */}
       <section>
         <div className="flex flex-col w-full desktop:w-3/4">
           <h1 className={titleGreyDL}>MEDIA MATTERS</h1>
@@ -42,13 +45,14 @@ export default function Media() {
         </div>
       </section>
 
+      {/* ===== INTERVIEWS SECTION ===== */}
       <section>
         <h1 className={titleGreyDL}>INTERVIEWS</h1>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+          {/* ===== RICE TVX INTERVIEW ===== */}
           <div className="flex flex-col">
             <h2 className={subtitleGrey}>RICE TVX</h2>
             <div className="relative w-full pt-[56.25%]">
-              {/* 16:9 aspect ratio wrapper */}
               <iframe
                 className="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
                 src="https://www.youtube.com/embed/zwzi0qsd3sg"
@@ -69,10 +73,10 @@ export default function Media() {
               everything in between!
             </p>
           </div>
+          {/* ===== WAGE CUCKING INTERVIEW ===== */}
           <div className="flex flex-col">
             <h2 className={subtitleGrey}>WAGE CUCKING</h2>
             <div className="relative w-full pt-[56.25%]">
-              {/* 16:9 aspect ratio wrapper */}
               <iframe
                 className="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
                 src="https://www.youtube.com/embed/jJV_-EFZshU"
@@ -91,10 +95,10 @@ export default function Media() {
               don't want to miss!
             </p>
           </div>
+          {/* ===== UNIVERSE INTERVIEW ===== */}
           <div className="flex flex-col">
             <h2 className={subtitleGrey}>UNIVERSE</h2>
             <div className="relative w-full pt-[56.25%]">
-              {/* 16:9 aspect ratio wrapper */}
               <iframe
                 className="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
                 src="https://www.youtube.com/embed/y07GjM0DqYs?si=bSAG-uFvhjMsSLtc"
@@ -119,135 +123,135 @@ export default function Media() {
         </div>
       </section>
 
+      {/* ===== NEWS SECTION ===== */}
       <section>
         <h1 className={titleGreyDL}>IN THE NEWS</h1>
         <h2 className={subtitleGrey}>BREAKING STORIES</h2>
-        <div className="flex flex-col -space-y-[18px]">
-          <p className={text}>
-            BINANCE
-            <br />
-            <a
-              href="https://academy.binance.com/en/articles/what-are-bitcoin-stamps"
-              target="_blank"
-              className={styles.articleLink}
-            >
-              WHAT ARE BITCOIN STAMPS
-            </a>
-          </p>
-          <br />
-          <p className={text}>
-            YAHOO FINANCE
-            <br />
-            <a
-              href="https://finance.yahoo.com/video/project-bitcoin-stamps-renews-debate-164902188.html?guccounter=1"
-              target="_blank"
-              className={styles.articleLink}
-            >
-              NEW PROJECT RENEWS DEBATE OVER BITCOIN NFTS
-            </a>
-          </p>
-          <br />
-          <p className={text}>
-            BINGX
-            <br />
-            <a
-              href="https://blog.bingx.com/bingx-insights/a-dive-into-bitcoin-stamps/"
-              target="_blank"
-              className={styles.articleLink}
-            >
-              A DIVE INTO BITCOIN STAMPS
-            </a>
-          </p>
-          <br />
-          <p className={text}>
-            HACKERNOON
-            <br />
-            <a
-              href="https://hackernoon.com/what-are-bitcoin-stamps"
-              target="_blank"
-              className={styles.articleLink}
-            >
-              WHAT ARE BITCOIN STAMPS
-            </a>
-          </p>
-          <br />
-          <p className={text}>
-            COINMARKETCAP
-            <br />
-            <a
-              href="https://coinmarketcap.com/community/articles/6554749e8f19ea588322c1ae/"
-              target="_blank"
-              className={styles.articleLink}
-            >
-              BITCOIN STAMPS VS ORDINALS
-            </a>
-          </p>
-          <br />
-          <p className={text}>
-            M2
-            <br />
-            <a
-              href="https://explore.m2.com/learn/what-are-bitcoin-stamps"
-              target="_blank"
-              className={styles.articleLink}
-            >
-              WHAT ARE BITCOIN STAMPS
-            </a>
-          </p>
-          <br />
-          <p className={text}>
-            GATE
-            <br />
-            <a
-              href="https://www.gate.io/learn/articles/what-are-bitcoin-stamps-and-src-20/1006"
-              target="_blank"
-              className={styles.articleLink}
-            >
-              WHAT ARE BITCOIN STAMPS AND SRC-20
-            </a>
-          </p>
-          <br />
-          <p className={text}>
-            BITCOIN.COM
-            <br />
-            <a
-              href="https://news.bitcoin.com/study-src20-protocols-unmatched-data-permanence-makes-it-a-superior-choice-over-brc20-and-runes/"
-              target="_blank"
-              className={styles.articleLink}
-            >
-              SRC20 PROTOCOL'S "UNMATCHED DATA PERMANENCE"
-            </a>
-          </p>
-          <br />
-          <p className={text}>
-            OKX
-            <br />
-            <a
-              href="https://www.okx.com/learn/what-is-src20-spurring-innovation-in-bitcoin-ecosystem"
-              target="_blank"
-              className={styles.articleLink}
-            >
-              WHAT IS SRC-20
-            </a>
-          </p>
-          <br />
-          <p className={text}>
-            COIN CODEX
-            <br />
-            <a
-              href="https://coincodex.com/article/44872/src-20-tokens/"
-              target="_blank"
-              className={styles.articleLink}
-            >
-              WHAT ARE SRC-20 TOKENS
-            </a>
-          </p>
+        {/* ===== NEWS ARTICLES LIST ===== */}
+        <div className="flex flex-col min-[1280px]:flex-row">
+          <div className="flex flex-col w-full min-[1280px]:w-1/2 space-y-6">
+            <p className={text}>
+              BINANCE
+              <br />
+              <a
+                href="https://academy.binance.com/en/articles/what-are-bitcoin-stamps"
+                target="_blank"
+                className={`${headingLinkGreyLD} -mt-1`}
+              >
+                WHAT ARE BITCOIN STAMPS
+              </a>
+            </p>
+            <p className={text}>
+              YAHOO FINANCE
+              <br />
+              <a
+                href="https://finance.yahoo.com/video/project-bitcoin-stamps-renews-debate-164902188.html?guccounter=1"
+                target="_blank"
+                className={`${headingLinkGreyLD} -mt-1`}
+              >
+                NEW PROJECT RENEWS DEBATE OVER BITCOIN NFTS
+              </a>
+            </p>
+            <p className={text}>
+              BINGX
+              <br />
+              <a
+                href="https://blog.bingx.com/bingx-insights/a-dive-into-bitcoin-stamps/"
+                target="_blank"
+                className={`${headingLinkGreyLD} -mt-1`}
+              >
+                A DIVE INTO BITCOIN STAMPS
+              </a>
+            </p>
+            <p className={text}>
+              HACKERNOON
+              <br />
+              <a
+                href="https://hackernoon.com/what-are-bitcoin-stamps"
+                target="_blank"
+                className={`${headingLinkGreyLD} -mt-1`}
+              >
+                WHAT ARE BITCOIN STAMPS
+              </a>
+            </p>
+            <p className={text}>
+              COINMARKETCAP
+              <br />
+              <a
+                href="https://coinmarketcap.com/community/articles/6554749e8f19ea588322c1ae/"
+                target="_blank"
+                className={`${headingLinkGreyLD} -mt-1`}
+              >
+                BITCOIN STAMPS VS ORDINALS
+              </a>
+            </p>
+          </div>
+          <div className="flex flex-col w-full pt-6 space-y-6
+                          min-[1280px]:w-1/2 min-[1280px]:justify-end min-[1280px]:pt-0  min-[1280px]:text-right ">
+            <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
+              M2
+              <br />
+              <a
+                href="https://explore.m2.com/learn/what-are-bitcoin-stamps"
+                target="_blank"
+                className={`${headingLinkGreyLD} -mt-1`}
+              >
+                WHAT ARE BITCOIN STAMPS
+              </a>
+            </p>
+            <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
+              GATE
+              <br />
+              <a
+                href="https://www.gate.io/learn/articles/what-are-bitcoin-stamps-and-src-20/1006"
+                target="_blank"
+                className={`${headingLinkGreyLD} -mt-1`}
+              >
+                WHAT ARE BITCOIN STAMPS AND SRC-20
+              </a>
+            </p>
+            <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
+              BITCOIN.COM
+              <br />
+              <a
+                href="https://news.bitcoin.com/study-src20-protocols-unmatched-data-permanence-makes-it-a-superior-choice-over-brc20-and-runes/"
+                target="_blank"
+                className={`${headingLinkGreyLD} -mt-1`}
+              >
+                SRC20 PROTOCOL'S "UNMATCHED DATA PERMANENCE"
+              </a>
+            </p>
+            <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
+              OKX
+              <br />
+              <a
+                href="https://www.okx.com/learn/what-is-src20-spurring-innovation-in-bitcoin-ecosystem"
+                target="_blank"
+                className={`${headingLinkGreyLD} -mt-1`}
+              >
+                WHAT IS SRC-20
+              </a>
+            </p>
+            <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
+              COIN CODEX
+              <br />
+              <a
+                href="https://coincodex.com/article/44872/src-20-tokens/"
+                target="_blank"
+                className={`${headingLinkGreyLD} -mt-1`}
+              >
+                WHAT ARE SRC-20 TOKENS
+              </a>
+            </p>
+          </div>
         </div>
       </section>
 
+      {/* ===== REPORTS SECTION ===== */}
       <section>
         <h1 className={titleGreyDL}>REPORTS</h1>
         <div className="grid grid-cols-1 mobileLg:grid-cols-3 gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
+          {/* ===== SQRR DEEP DIVE ===== */}
           <div className="col-span-1 mobileLg:col-span-2">
             <h2 className={subtitleGrey}>SQRR - DEEP DIVE</h2>
             <p className={text}>
@@ -272,6 +276,8 @@ export default function Media() {
               </Button>
             </div>
           </div>
+
+          {/* ===== INSIGHTS REPORT ===== */}
           <div className="col-span-1 mobileLg:text-right">
             <h2 className={subtitleGrey}>INSIGHTS</h2>
             <p className={text}>
