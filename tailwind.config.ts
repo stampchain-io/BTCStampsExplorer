@@ -187,14 +187,28 @@ export default {
         "stamp-card-lg": "max(6px,min(12px,calc(6px+((100vw-360px)*0.029))))",
         "search-icon": "12px",
         "stroke-width": "2px",
-        "gutter-mobile": "12px", // 12px
-        "gutter-desktop": "24px", // 24px
-        "margin-mobile": "18px", // 18px
-        "margin-tablet": "36px", // 36px
-        "margin-desktop": "72px", // 72px
-        "padding-mobile": "12px", // 12px
-        "padding-tablet": "24px", // 24px - NOT CORRECT
-        "padding-desktop": "48px", // 48px
+        // PAGE GUTTERS (horizontal padding from screen edges to header, footer and body)
+        "gutter-mobile": "24px", // updated breakpoint naming convention
+        "gutter-tablet": "36px", // updated breakpoint naming convention
+        "gutter-desktop": "48px", // updated breakpoint naming convention
+        // SECTION GAPS (vertical spacing between major sections in the body)
+        "section-mobile": "48px", // updated breakpoint naming convention
+        "section-tablet": "72px", // updated breakpoint naming convention
+        "section-desktop": "72px", // updated breakpoint naming convention
+        // GRID GAPS (spacing between grid/flex items)
+        "grid-mobile": "24px", // updated breakpoint naming convention
+        "grid-tablet": "36px", // updated breakpoint naming convention
+        "grid-desktop": "48px", // updated breakpoint naming convention
+        // COMPONENT GAPS
+        // CONTENT PADDING
+        // STACK SPACING
+        "margin-mobile": "18px", // not updated - needs attention
+        "margin-tablet": "36px", // not updated - needs attention
+        "margin-desktop": "72px", // not updated - needs attention
+        "padding-mobile": "12px", // not updated - needs attention
+        "padding-tablet": "24px", // not updated - needs attention
+        "padding-desktop": "48px", // not updated - needs attention
+        // CALCULATIONS
         "calc-12": "calc(100% - 12px)",
         "calc-24": "calc(100% - 24px)",
         "calc-36": "calc(100% - 36px)",
