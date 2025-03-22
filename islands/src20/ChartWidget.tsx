@@ -129,7 +129,11 @@ const ChartWidget = (
   return (
     <div className="p-4">
       {loading
-        ? <p className="text-gray-500 text-center">Loading chart...</p>
+        ? (
+          <p className="text-gray-500 text-center">
+            <div class="animate-spin rounded-full mt-0 size-5 border-b-2 border-stamp-purple-highlight" />
+          </p>
+        )
         : <></>}
       <div id={tick ? `chart-container-${tick}` : "chart-container"} />
     </div>
