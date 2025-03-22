@@ -50,7 +50,7 @@ function IntroSection() {
         <AuthorSection
           name="TonyNL"
           twitter="tonynlbtc"
-          website="https://tonynlb.com"
+          website="https://linktr.ee/tonynl"
         />
       </div>
     </div>
