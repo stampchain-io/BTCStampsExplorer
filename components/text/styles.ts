@@ -55,10 +55,14 @@ export const subtitlePurple =
   "font-extralight text-2xl mobileMd:text-3xl text-stamp-purple-bright mb-2 cursor-default select-none whitespace-nowrap";
 
 // Headings
-export const headingGrey =
-  "font-black text-3xl mobileLg:text-4xl text-stamp-grey-light tracking-wide cursor-default select-none whitespace-nowrap"; // used in about donate section
+export const headingGrey2 =
+  "font-black text-3xl mobileLg:text-4xl text-stamp-grey-light tracking-wide cursor-default select-none whitespace-nowrap"; // was used in about donate section - rename
 export const headingLinkGreyLD = // check naming - used in media page
   "font-bold text-xl gray-gradient1-hover tracking-wide inline-block relative transition-colors duration-300";
+export const headingGreySlim =
+  "font-light text-2xl mobileMd:text-3xl text-stamp-grey mb-4 cursor-default select-none whitespace-nowrap";
+export const headingGrey =
+  "font-bold text-2xl mobileMd:text-3xl text-stamp-grey tracking-wide mb-4 cursor-default select-none whitespace-nowrap";
 
 // Body text / Values
 export const textXxs = "font-normal text-[10px] text-stamp-grey-light";
@@ -76,12 +80,10 @@ export const textLinkUnderline =
 export const labelSm =
   "font-medium text-sm text-stamp-grey-light cursor-default select-none whitespace-nowrap";
 export const label =
-  "font-medium text-base text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+  "font-medium text-base text-stamp-grey-light cursor-default select-none whitespace-nowrap"; // = dataValue
 export const labelLg =
   "font-medium text-lg text-stamp-grey-light cursor-default select-none whitespace-nowrap";
 
-export const dataValue =
-  "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
 export const dataValueXL =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
 export const dataValueXLlink = "text-3xl mobileLg:text-4xl font-black -mt-1";

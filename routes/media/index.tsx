@@ -14,7 +14,7 @@ export default function Media() {
           top-[50%] mobileMd:top-[55%] mobileLg:top-[50%] tablet:top-[50%] desktop:top-[40%]
           left-0
           w-full
-          h-[1400px] mobileMd:h-[1100px] mobileLg:h-[1200px] tablet:h-[1200px] desktop:h-[1200px]
+          h-[1400px] mobileMd:h-[1100px] mobileLg:h-[1200px] tablet:h-[1000px] desktop:h-[1000px]
           object-cover
           pointer-events-none
           z-[-999]
@@ -37,8 +37,7 @@ export default function Media() {
             the protocol, ecosystem formats and lingo explainers, to all things
             stamp art. Catch up on the most important news coverage, or watch
             Mike in Space share his vision behind stamps, break down the
-            technology and offer unique insights on where the technology is
-            headed.
+            technology and offer unique insights on what the future holds.
           </p>
           <p>
             Stay informed by regularly checking back. We're constantly adding
