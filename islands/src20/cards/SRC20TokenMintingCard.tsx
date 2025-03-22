@@ -14,7 +14,8 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
   }&trxType=olga`;
   const progressWidth = `${src20.progress}%`;
 
-  const handleMintClick = () => {
+  const handleMintClick = (event: MouseEvent) => {
+    event.preventDefault();
     globalThis.location.href = mintHref;
   };
 
@@ -44,7 +45,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
           </div>
 
           {/* Top Mints & Progress Bar */}
-          <div class="flex flex-col -mb-3 mobileLg:-mb-[22px] -ml-24 tablet:ml-0 ">
+          <div class="flex flex-col -mb-3 mobileLg:-mb-[22px] -ml-24 tablet:ml-0">
             <div class="hidden min-[640px]:flex flex-col justify-center text-center -space-y-0.5 ">
               <p class={BaseCardStyles.dataLabelSm}>
                 TOP MINTS{" "}
@@ -56,7 +57,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
                 <p class={BaseCardStyles.dataLabelSm}>
                   PROGRESS{" "}
                   <span class={BaseCardStyles.dataValueSm}>
-                    {src20.progress}
+                    {Number(src20.progress)}
                   </span>
                   <span class="text-stamp-grey-light">%</span>
                 </p>
@@ -92,7 +93,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
               <p class={BaseCardStyles.dataLabelSm}>
                 PROGRESS{" "}
                 <span class={BaseCardStyles.dataValueSm}>
-                  {src20?.mint_progress?.progress}
+                  {Number(src20?.mint_progress?.progress)}
                 </span>
                 <span class="text-stamp-grey-light">%</span>
               </p>
