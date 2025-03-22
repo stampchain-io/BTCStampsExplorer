@@ -6,6 +6,7 @@ import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
 import FilterModal from "$islands/src20/FilterModal.tsx";
+import { HeaderStyles } from "./styles.ts";
 
 export const SRC20Header = (
   { filterBy, sortBy }: {
@@ -42,17 +43,16 @@ export const SRC20Header = (
     }
   }, [filterValue]);
 
-  const titlePurpleDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1";
-
   return (
     <div
       class={`relative flex flex-row justify-between items-start w-full gap-3 ${
         isOpen1 ? "-mb-[220px] mobileMd:-mb-[216px] mobileLg:-mb-[244px]" : ""
       }`}
     >
-      <h1 className={`${titlePurpleDL} block mobileLg:hidden`}>TOKENS</h1>
-      <h1 className={`${titlePurpleDL} hidden mobileLg:block`}>
+      <h1 className={`${HeaderStyles.titlePurpleDL} block mobileLg:hidden`}>
+        TOKENS
+      </h1>
+      <h1 className={`${HeaderStyles.titlePurpleDL} hidden mobileLg:block`}>
         SRC-20 TOKENS
       </h1>
       <div class="flex relative items-start justify-between gap-3">

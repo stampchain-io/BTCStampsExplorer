@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Button } from "$components/shared/Button.tsx";
+import { SearchStyles } from "./styles.ts";
 
 export function SRC20SearchClient({
   open2,
@@ -109,18 +110,6 @@ export function SRC20SearchClient({
     globalThis.location.href = `/src20/${tick}`;
   };
 
-  const modalBgTop =
-    "fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-70 backdrop-filter backdrop-blur-md overflow-y-auto";
-  const modalSearch =
-    "w-[90%] max-w-[480px] mobileLg:max-w-[580px] my-12 mobileLg:my-[72px] tablet:my-24";
-  const animatedBorderGrey = `
-  relative rounded-md !bg-[#080808] p-[2px]
-  before:absolute before:inset-0 before:rounded-md before:z-[1]
-  before:bg-[conic-gradient(from_var(--angle),#666666,#999999,#CCCCCC,#999999,#666666)]
-  before:[--angle:0deg] before:animate-rotate
-  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#080808]
-`;
-
   return (
     <>
       {showButton && (
@@ -157,13 +146,13 @@ export function SRC20SearchClient({
 
       {open2 && (
         <div
-          class={modalBgTop}
+          class={SearchStyles.modalBgTop}
           onClick={(e) => {
             if (e.target === e.currentTarget) handleOpen2(false);
           }}
         >
-          <div class={modalSearch} ref={searchContainerRef}>
-            <div className={animatedBorderGrey}>
+          <div class={SearchStyles.modalSearch} ref={searchContainerRef}>
+            <div className={SearchStyles.animatedBorderGrey}>
               <div class="relative flex flex-col max-h-[90%] overflow-hidden">
                 <input
                   ref={inputRef}
@@ -221,7 +210,7 @@ export function SRC20SearchClient({
                 )}
                 {results.length > 0 && !error && (
                   <ul class="max-h-[190px] mobileLg:max-h-[180px] !bg-[#080808] rounded-b-md z-[2] overflow-y-auto [&::-webkit-scrollbar-track]:bg-[#333333] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#CCCCCC]">
-                    {results.map((result) => (
+                    {results.map((result: { tick: string }) => (
                       <li
                         key={result.tick}
                         onClick={() => handleResultClick(result.tick)}

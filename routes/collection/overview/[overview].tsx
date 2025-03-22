@@ -146,7 +146,6 @@ export default function CollectionOverview(
     collections,
     page,
     pages,
-    page_size,
   } = data;
 
   const renderContent = () => {
@@ -157,10 +156,8 @@ export default function CollectionOverview(
             <CollectionOverviewArtistContent collections={collections || []} />
             <Pagination
               page={page}
-              pages={pages}
-              page_size={page_size}
-              type="collection"
-              data_length={collections?.length || 0}
+              totalPages={pages}
+              prefix=""
             />
           </>
         );
@@ -176,10 +173,8 @@ export default function CollectionOverview(
               />
               <Pagination
                 page={page}
-                pages={pages}
-                page_size={page_size}
-                type={selectedTab}
-                data_length={stamps?.length || 0}
+                totalPages={pages}
+                prefix=""
               />
             </div>
           </div>
