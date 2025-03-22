@@ -27,7 +27,7 @@ export default function About() {
       />
 
       {/* ===== ABOUT SECTION ===== */}
-      <div className="flex flex-col gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
+      <div className="flex flex-col gap-section-mobile-sm mobileLg:gap-section-tablet-sm tablet:gap-section-desktop-sm">
         <AboutHeader />
 
         {/* ===== TEAM SECTION ===== */}

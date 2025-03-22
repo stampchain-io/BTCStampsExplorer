@@ -108,7 +108,7 @@ export default function AboutHeader() {
           {/* ===== STATISTICS SECTION ===== */}
           {/* ===== GENESIS STAMP INFO ===== */}
           <div class="flex flex-col col-span-12 mobileLg:col-span-6 desktop:col-span-4 w-full h-full justify-center items-center pl-24 mobileLg:pl-0 mt-12 mobileLg:mt-auto">
-            <p className={subtitlePurple}>
+            <p className={`${subtitlePurple} !mb-1.5`}>
               GENESIS STAMP
             </p>
             <div class="flex flex-col items-center">

@@ -8,14 +8,14 @@ export default function AboutTeam() {
     <>
       <section>
         {/* ===== TEAM SECTION CONTAINER ===== */}
-        <div className="w-full flex justify-start items-start pt-6">
+        <div className="w-full flex justify-start items-start py-9">
           <div className="w-full">
             {/* ===== SECTION TITLE ===== */}
             <h2 className={subtitlePurple}>THE TEAM</h2>
 
             {/* ===== TEAM MEMBERS GRID ===== */}
             <div className="flex justify-between items-start
-             mx-0 mobileLg:mx-12 desktop:mx-16 mt-3
+             mx-0 mobileLg:mx-12 desktop:mx-16 mt-4
               gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
               {/* ===== MIKE IN SPACE CARD ===== */}
               <div className="flex flex-col items-center">

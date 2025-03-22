@@ -100,9 +100,9 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
 
 export function PartnersModule() {
   return (
-    <div class="flex flex-col max-w-desktop w-full mx-auto">
+    <div class="flex flex-col max-w-desktop w-full mx-auto mb-4">
       {/* ===== TITLE SECTION ===== */}
-      <h2 className={subtitleGrey}>PARTNERS</h2>
+      <h2 className={`${subtitleGrey} !mb-2`}>PARTNERS</h2>
       {/* ===== BANNER CARDS SECTION ===== */}
       <div class="grid grid-cols-3 pt-2 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
         {partners.map((partner) => (
