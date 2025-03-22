@@ -1,5 +1,8 @@
+/* ===== HOW-TO LAYOUT COMPONENT ===== */
 import { KeepReading } from "$components/howto/KeepReading.tsx";
+import { subtitleGrey, text, titleGreyDL } from "$text";
 
+/* ===== COMPONENT INTERFACE ===== */
 interface HowToLayoutProps {
   title: string;
   subtitle: string;
@@ -8,28 +11,37 @@ interface HowToLayoutProps {
   importantNotes?: string[];
 }
 
+/* ===== COMPONENT DEFINITION ===== */
 export function HowToLayout(
   { title, subtitle, headerImage, children, importantNotes = [] }:
     HowToLayoutProps,
 ) {
-  const titleGreyDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
-  const subTitleGrey =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
-
+  /* ===== COMPONENT RENDER ===== */
   return (
-    <div class="flex flex-col gap-12 mobileLg:gap-24 text-base mobileLg:text-lg font-medium text-stamp-grey-light">
+    <div class="flex flex-col gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
       <div class="flex flex-col w-full tablet:max-w-[1080px] tablet:mx-auto">
+        {/* ===== MAIN CONTENT SECTION ===== */}
         <section>
+          {/* ===== HEADER ===== */}
           <h1 className={titleGreyDL}>{title}</h1>
-          <h2 className={subTitleGrey}>{subtitle}</h2>
+          <h2 className={subtitleGrey}>{subtitle}</h2>
+
+          {/* ===== FEATURED IMAGE ===== */}
           <img
             src={headerImage}
             width="1020"
             alt="Screenshot"
-            class="pb-3 mobileMd:pb-6"
+            class="pb-9 mobileMd:pb-12"
           />
-          {children}
+
+          {/* ===== CONTENT ===== */}
+          <div>
+            <div class={`flex flex-col ${text}`}>
+              {children}
+            </div>
+          </div>
+
+          {/* ===== IMPORTANT NOTES SECTION ===== */}
           {importantNotes.length > 0 && (
             <>
               <p className="pt-6 mobileLg:pt-12 text-xl mobileLg:text-2xl font-bold">
@@ -44,6 +56,8 @@ export function HowToLayout(
           )}
         </section>
       </div>
+
+      {/* ===== KEEP READING SECTION ===== */}
       <KeepReading />
     </div>
   );
