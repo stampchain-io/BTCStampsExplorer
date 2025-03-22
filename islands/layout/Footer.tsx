@@ -1,64 +1,10 @@
 import { useState } from "preact/hooks";
-
-interface FooterLink {
-  title: string;
-  href: string;
-  isExternal?: boolean;
-  hiddenOnMobile?: boolean;
-}
-
-const resourcesStampLinks: FooterLink[] = [
-  { title: "FAQ", href: "/faq" },
-  { title: "HOW-TO", href: "/howto" },
-  { title: "MEDIA", href: "/media" },
-  {
-    title: "PRESS KIT",
-    href:
-      "https://drive.google.com/drive/folders/18QsMTZ_ZII5FVxuAs2CLFoLdZE3NOdlT",
-    isExternal: true,
-  },
-];
-
-const stampChainLinks: FooterLink[] = [
-  { title: "ABOUT", href: "/about" },
-  { title: "DONATE", href: "/about#donate" },
-  { title: "CONTACT", href: "/about#contact" },
-  { title: "TERMS OF SERVICE", href: "/termsofservice", hiddenOnMobile: true },
-];
-
-const socialLinks = [
-  {
-    href: "https://x.com/Stampchain",
-    icon: "/img/footer/XLogo.svg",
-    hoverIcon: "/img/footer/XLogo-hover.svg",
-  },
-  {
-    href: "https://t.me/BitcoinStamps",
-    icon: "/img/footer/TelegramLogo.svg",
-    hoverIcon: "/img/footer/TelegramLogo-hover.svg",
-  },
-  {
-    href: "https://discord.gg/BRYRt4bH",
-    icon: "/img/footer/DiscordLogo.svg",
-    hoverIcon: "/img/footer/DiscordLogo-hover.svg",
-  },
-  {
-    href: "https://github.com/stampchain-io/",
-    icon: "/img/footer/GithubLogo.svg",
-    hoverIcon: "/img/footer/GithubLogo-hover.svg",
-  },
-];
-
-const footerLogo =
-  "purple-gradient2 text-4xl leading-[43.2px] mobileLg:text-5xl mobileLg:leading-[57.6px] italic font-black";
-const footerTagline =
-  "text-stamp-purple-bright text-sm leading-[16.8px] mobileLg:text-lg mobileLg:leading-[21.6px] font-light mb-3 mobileLg:mb-[18px]";
-const footerNavTitle =
-  "text-stamp-purple-dark hidden tablet:block text-lg leading-[23.4px] tracking-wide font-black";
-const navContent =
-  "text-stamp-purple-dark text-xs leading-[14.4px] mobileLg:text-sm mobileLg:leading-[16.8px] tablet:text-base tablet:leading-[19.2px] font-medium hover:text-stamp-purple-bright";
-const copyright =
-  "text-xs leading-[14.4px] tablet:text-sm tablet:leading-[16.8px] font-medium text-stamp-purple-darker/75";
+import {
+  resourcesStampLinks,
+  socialLinks,
+  stampChainLinks,
+} from "$islands/datacontrol/Layout.ts";
+import { FooterStyles } from "./styles.ts";
 
 export function Footer() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -86,11 +32,11 @@ export function Footer() {
         "
       />
       <div className="w-full flex flex-col gap-1 items-center tablet:items-start">
-        <p className={footerLogo}>
+        <p className={FooterStyles.footerLogo}>
           STAMPCHAIN
           <span className="font-extralight pr-1">.IO</span>
         </p>
-        <p className={footerTagline}>
+        <p className={FooterStyles.footerTagline}>
           IMMORTALISED ART - STORED ON BITCOIN
         </p>
         <div className="flex flex-row tablet:hidden justify-center w-full gap-[18px] mobileLg:gap-6 leading-4 text-right mb-1 mobileLg:mb-2">
@@ -99,7 +45,7 @@ export function Footer() {
               key={index}
               href={link.href}
               f-partial={!link.isExternal ? link.href : undefined}
-              className={navContent +
+              className={FooterStyles.navContent +
                 (link?.hiddenOnMobile ? " hidden" : "")}
               target={link.isExternal ? "_blank" : undefined}
             >
@@ -134,14 +80,14 @@ export function Footer() {
 
       <div className="flex flex-col tablet:flex-row w-full justify-end tablet:justify-between tablet:pt-3">
         <div className="flex flex-col w-full tablet:w-1/2 items-center tablet:items-start gap-1.5">
-          <p className={footerNavTitle}>RESOURCES</p>
+          <p className={FooterStyles.footerNavTitle}>RESOURCES</p>
           <div className="flex flex-row tablet:flex-col w-full justify-center gap-[18px] mobileLg:gap-6 tablet:gap-1">
             {resourcesStampLinks.map((link, index) => (
               <a
                 key={index}
                 href={link.href}
                 f-partial={!link.isExternal ? link.href : undefined}
-                className={navContent}
+                className={FooterStyles.navContent}
                 target={link.isExternal ? "_blank" : undefined}
               >
                 {link.title}
@@ -150,7 +96,7 @@ export function Footer() {
             <a
               href="/termsofservice"
               f-partial="/termsofservice"
-              className={`${navContent} block tablet:hidden`}
+              className={`${FooterStyles.navContent} block tablet:hidden`}
             >
               TERMS
             </a>
@@ -158,14 +104,14 @@ export function Footer() {
         </div>
 
         <div className="hidden flex-col tablet:flex w-full tablet:w-1/2 justify-center gap-1.5 text-right">
-          <p className={footerNavTitle}>STAMPCHAIN</p>
+          <p className={FooterStyles.footerNavTitle}>STAMPCHAIN</p>
           <div className="flex flex-col w-full gap-1">
             {stampChainLinks.map((link, index) => (
               <a
                 key={index}
                 href={link.href}
                 f-partial={!link.isExternal ? link.href : undefined}
-                className={navContent}
+                className={FooterStyles.navContent}
                 target={link.isExternal ? "_blank" : undefined}
               >
                 {link.title}
@@ -174,14 +120,14 @@ export function Footer() {
           </div>
 
           <p
-            className={`${copyright} hidden tablet:block mt-[9px]`}
+            className={`${FooterStyles.copyright} hidden tablet:block mt-[9px]`}
           >
             <span className="italic font-bold">STAMPCHAIN</span> @ 2025
           </p>
         </div>
 
         <p
-          className={`${copyright} block tablet:hidden text-center mt-[18px] mobileLg:mt-6`}
+          className={`${FooterStyles.copyright} block tablet:hidden text-center mt-[18px] mobileLg:mt-6`}
         >
           <span className="italic font-bold">STAMPCHAIN</span> @ 2025
         </p>

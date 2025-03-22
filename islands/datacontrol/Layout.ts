@@ -7,6 +7,13 @@ interface NavLink {
   subLinks?: NavLink[];
 }
 
+interface FooterLink {
+  title: string;
+  href: string;
+  isExternal?: boolean;
+  hiddenOnMobile?: boolean;
+}
+
 export const desktopNavLinks: NavLink[] = [
   {
     title: {
@@ -79,11 +86,43 @@ export const mobileNavLinks: NavLink[] = [
 ];
 
 export const socialLinks = [
-  { href: "https://x.com/Stampchain", icon: "/img/footer/XLogo.svg" },
-  { href: "https://t.me/BitcoinStamps", icon: "/img/footer/TelegramLogo.svg" },
-  { href: "https://discord.gg/PCZU6xrt", icon: "/img/footer/DiscordLogo.svg" },
+  {
+    href: "https://x.com/Stampchain",
+    icon: "/img/footer/XLogo.svg",
+    hoverIcon: "/img/footer/XLogo-hover.svg",
+  },
+  {
+    href: "https://t.me/BitcoinStamps",
+    icon: "/img/footer/TelegramLogo.svg",
+    hoverIcon: "/img/footer/TelegramLogo-hover.svg",
+  },
+  {
+    href: "https://discord.gg/PCZU6xrt",
+    icon: "/img/footer/DiscordLogo.svg",
+    hoverIcon: "/img/footer/DiscordLogo-hover.svg",
+  },
   {
     href: "https://github.com/stampchain-io/",
     icon: "/img/footer/GithubLogo.svg",
+    hoverIcon: "/img/footer/GithubLogo-hover.svg",
   },
+];
+
+export const resourcesStampLinks: FooterLink[] = [
+  { title: "FAQ", href: "/faq" },
+  { title: "HOW-TO", href: "/howto" },
+  { title: "MEDIA", href: "/media" },
+  {
+    title: "PRESS KIT",
+    href:
+      "https://drive.google.com/drive/folders/18QsMTZ_ZII5FVxuAs2CLFoLdZE3NOdlT",
+    isExternal: true,
+  },
+];
+
+export const stampChainLinks: FooterLink[] = [
+  { title: "ABOUT", href: "/about" },
+  { title: "DONATE", href: "/about#donate" },
+  { title: "CONTACT", href: "/about#contact" },
+  { title: "TERMS OF SERVICE", href: "/termsofservice", hiddenOnMobile: true },
 ];
