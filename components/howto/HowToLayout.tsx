@@ -1,6 +1,6 @@
 /* ===== HOW-TO LAYOUT COMPONENT ===== */
 import { KeepReading } from "$components/howto/KeepReading.tsx";
-import { subtitleGrey, text, titleGreyDL } from "$text";
+import { headingGrey, subtitleGrey, text, titleGreyDL } from "$text";
 
 /* ===== COMPONENT INTERFACE ===== */
 interface HowToLayoutProps {
@@ -18,8 +18,8 @@ export function HowToLayout(
 ) {
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class="flex flex-col gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
-      <div class="flex flex-col w-full tablet:max-w-[1080px] tablet:mx-auto">
+    <div class="flex flex-col gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
+      <div class="flex flex-col w-full tablet:max-w-[922px] tablet:mx-auto">
         {/* ===== MAIN CONTENT SECTION ===== */}
         <section>
           {/* ===== HEADER ===== */}
@@ -29,9 +29,9 @@ export function HowToLayout(
           {/* ===== FEATURED IMAGE ===== */}
           <img
             src={headerImage}
-            width="1020"
+            width="100%"
             alt="Screenshot"
-            class="pb-9 mobileMd:pb-12"
+            class="pt-2 pb-9 mobileMd:pb-12"
           />
 
           {/* ===== CONTENT ===== */}
@@ -42,17 +42,17 @@ export function HowToLayout(
           </div>
 
           {/* ===== IMPORTANT NOTES SECTION ===== */}
-          {importantNotes.length > 0 && (
-            <>
-              <p className="pt-6 mobileLg:pt-12 text-xl mobileLg:text-2xl font-bold">
+          {importantNotes?.length > 0 && (
+            <div class="mt-0">
+              <p className={`${headingGrey} !text-stamp-grey-light mb-0`}>
                 IMPORTANT
               </p>
-              {importantNotes.map((note) => (
-                <>
+              {importantNotes.map((note, index) => (
+                <p key={index} className={text}>
                   {note}
-                </>
+                </p>
               ))}
-            </>
+            </div>
           )}
         </section>
       </div>

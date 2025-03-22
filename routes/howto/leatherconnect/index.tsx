@@ -60,7 +60,7 @@ function IntroSection() {
 /* ===== STEPS COMPONENT ===== */
 function ConnectSteps() {
   return (
-    <StepList>
+    <StepList hasImportantNotes={LEATHER_CONNECT_IMPORTANT_NOTES?.length > 0}>
       {LEATHER_CONNECT_STEPS.map((step) => (
         <Step
           key={step.number}

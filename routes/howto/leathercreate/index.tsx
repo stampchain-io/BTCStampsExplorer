@@ -44,7 +44,7 @@ function IntroSection() {
 /* ===== WALLET STEPS COMPONENT ===== */
 function WalletSteps() {
   return (
-    <StepList>
+    <StepList hasImportantNotes={LEATHER_CREATE_IMPORTANT_NOTES?.length > 0}>
       {LEATHER_CREATE_WALLET_STEPS.map((step) => (
         <Step
           key={step.number}

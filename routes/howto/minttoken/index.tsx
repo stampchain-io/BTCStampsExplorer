@@ -33,7 +33,7 @@ function IntroSection() {
 /* ===== STEPS COMPONENT ===== */
 function MintSteps() {
   return (
-    <StepList>
+    <StepList hasImportantNotes={MINT_IMPORTANT_NOTES?.length > 0}>
       {MINT_STEPS.map((step) => (
         <Step
           key={step.number}

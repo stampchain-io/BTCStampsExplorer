@@ -27,7 +27,7 @@ function IntroSection() {
 /* ===== STEPS COMPONENT ===== */
 function BitnameSteps() {
   return (
-    <StepList>
+    <StepList hasImportantNotes={BITNAME_IMPORTANT_NOTES?.length > 0}>
       {BITNAME_STEPS.map((step) => (
         <Step
           key={step.number}

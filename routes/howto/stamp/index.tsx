@@ -31,7 +31,7 @@ function IntroSection() {
 /* ===== STEPS COMPONENT ===== */
 function StampSteps() {
   return (
-    <StepList>
+    <StepList hasImportantNotes={STAMP_IMPORTANT_NOTES?.length > 0}>
       {STAMP_STEPS.map((step) => (
         <Step
           key={step.number}

@@ -1,5 +1,51 @@
 import { StepProps } from "$components/howto/Step.tsx";
 
+/**
+ * HOW-TO DESCRIPTION FORMATTING
+ *
+ * There are three ways to format step descriptions:
+ *
+ * 1. Single line - for simple descriptions
+ *    description: "Simple one line description"
+ *
+ * 2. Line breaks within a paragraph - using \n
+ *    description: "First line\nSecond line\nThird line"
+ *
+ * 3. Multiple paragraphs - using array - recommended for longer description
+ *    description: [
+ *      "First paragraph that can also\nhave line breaks",
+ *      "Second completely separate paragraph",
+ *      "Third paragraph with more\nline breaks\nand content"
+ *    ]
+ *
+ * The Step component will maintain proper spacing:
+ * - \n = line break (less space)
+ * - Array items = new paragraphs (more space)
+ */
+
+export const EXAMPLE_STEPS: StepProps[] = [
+  {
+    title: "SINGLE LINE",
+    image: "/img/how-tos/example/01.png",
+    description: "This is a simple one-line description",
+  },
+  {
+    title: "LINE BREAKS",
+    image: "/img/how-tos/example/02.png",
+    description:
+      "First line with basic info\nSecond line with more details\nThird line with final points",
+  },
+  {
+    title: "MULTIPLE PARAGRAPHS",
+    image: "/img/how-tos/example/03.png",
+    description: [
+      "First paragraph that can contain\nmultiple lines\nof related content",
+      "Second paragraph for a new thought or section",
+      "Third paragraph with\nmore structured\ncontent within",
+    ],
+  },
+];
+
 // Deploy
 export const DEPLOY_STEPS: StepProps[] = [
   {
@@ -97,7 +143,6 @@ export const LEATHER_CONNECT_IMPORTANT_NOTES = [
 ];
 
 // LEATHER CREATE
-
 interface WalletStep extends StepProps {
   number: number;
 }
@@ -127,7 +172,7 @@ export const LEATHER_CREATE_WALLET_STEPS: WalletStep[] = [
     title: "LEATHER WALLET INSTALLED",
     image: "/img/how-tos/createleatherwallet/04.png",
     description:
-      `This screen is the confirmation that the extension has been dowloaded and installed.\nThe next step is to create your LEather wallet`,
+      `This screen is the confirmation that the extension has been dowloaded and installed.\nThe next step is to create your Leather wallet`,
   },
   {
     number: 5,
@@ -139,9 +184,10 @@ export const LEATHER_CREATE_WALLET_STEPS: WalletStep[] = [
     number: 6,
     title: "BACK UP YOUR SECRET KEY",
     image: "/img/how-tos/createleatherwallet/06.png",
-    description: `Back up your secret key.\n
-      Critical Reminder!\n
-      Make sure to back up your secret key in a secure location.\nIf you lose your secret key, you won't be able to restore or import it.\nAdditionally, if someone gains access to your secret key, they will have full control of your wallet.`,
+    description: [
+      "Back up your secret key.",
+      "Critical Reminder!\nMake sure to back up your secret key in a secure location.\nIf you lose your secret key, you won't be able to restore or import it.\nAdditionally, if someone gains access to your secret key, they will have full control of your wallet.",
+    ],
   },
   {
     number: 7,
@@ -179,7 +225,6 @@ export const LEATHER_CREATE_IMPORTANT_NOTES = [
   "Never share your seed words nor your private keys.",
 ];
 
-
 // MINT TOKEN
 export const MINT_STEPS: StepProps[] = [
   {
@@ -215,11 +260,7 @@ export const MINT_STEPS: StepProps[] = [
   },
 ];
 
-export const MINT_IMPORTANT_NOTES = [
-  "Lowering the fee might slow down the minting process. ",
-  "Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
-];
-
+export const MINT_IMPORTANT_NOTES = [];
 
 // BITNAME
 export const BITNAME_STEPS: StepProps[] = [
@@ -256,10 +297,7 @@ export const BITNAME_STEPS: StepProps[] = [
   },
 ];
 
-export const BITNAME_IMPORTANT_NOTES = [
-  "Lowering the fee might slow down the minting process. ",
-  "Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
-];
+export const BITNAME_IMPORTANT_NOTES = [];
 
 // STAMP
 export const STAMP_STEPS: StepProps[] = [
@@ -341,7 +379,6 @@ export const TRANSFER_BITNAME_IMPORTANT_NOTES = [
   " Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
 ];
 
-
 // TRANSFER_STAMP
 export const TRANSFER_STAMP_STEPS: StepProps[] = [
   {
@@ -420,4 +457,35 @@ export const TRANSFER_TOKEN_STEPS: StepProps[] = [
 export const TRANSFER_TOKEN_IMPORTANT_NOTES = [
   "Lowering the fee might slow down the stamping process.",
   " Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
+];
+
+// TEMPLATE
+interface TemplateStep extends StepProps {
+  number: number;
+}
+
+export const TEMPLATE_STEPS: TemplateStep[] = [
+  {
+    number: 1,
+    title: "FIRST STEP TITLE",
+    image: "/img/how-tos/template/01.png",
+    description: "Description of first step",
+  },
+  {
+    number: 2,
+    title: "SECOND STEP TITLE",
+    image: "/img/how-tos/template/02.png",
+    description: "Description of second step",
+  },
+  // Add more steps as needed
+];
+
+export const TEMPLATE_SETUP_STEPS = [
+  "First setup instruction",
+  "Second setup instruction",
+];
+
+export const TEMPLATE_IMPORTANT_NOTES = [
+  "First important note about the process",
+  "Second important note about the process",
 ];

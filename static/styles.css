@@ -622,6 +622,7 @@ strong {
 }
 
 /* Animated underline for links */
+/* Animate right to left - background-position controls the direction of the animation */
 .animated-underline {
   font-weight: 700;
   text-decoration: none;
@@ -645,5 +646,32 @@ strong {
 .animated-underline:hover,
 .animated-underline:focus {
   background-size: 0% 2px;
+  color: #999999;
+}
+
+/* Animate left to right */
+.animated-underline-thin {
+  font-weight: 400;
+  text-decoration: none;
+  background-image: linear-gradient(#CCCCCC, #CCCCCC);
+  background-position: 100% 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  transition: background-size .3s, color .6s;
+  padding-bottom: 2px;
+  text-shadow:
+    -2px 0 #000,
+    /* Left */
+    2px 0 #000,
+    /* Right */
+    0 -2px #000,
+    /* Top */
+    0 2px #000;
+  /* Bottom */
+}
+
+.animated-underline-thin:hover,
+.animated-underline-thin:focus {
+  background-size: 0% 1px;
   color: #999999;
 }

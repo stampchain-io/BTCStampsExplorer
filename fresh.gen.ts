@@ -103,7 +103,7 @@ import * as $howto_leathercreate_index from "./routes/howto/leathercreate/index.
 import * as $howto_minttoken_index from "./routes/howto/minttoken/index.tsx";
 import * as $howto_registerbitname_index from "./routes/howto/registerbitname/index.tsx";
 import * as $howto_stamp_index from "./routes/howto/stamp/index.tsx";
-import * as $howto_styles from "./routes/howto/styles.ts";
+import * as $howto_template_index from "./routes/howto/template/index.tsx";
 import * as $howto_transferbitname_index from "./routes/howto/transferbitname/index.tsx";
 import * as $howto_transferstamp_index from "./routes/howto/transferstamp/index.tsx";
 import * as $howto_transfertoken_index from "./routes/howto/transfertoken/index.tsx";
@@ -154,7 +154,6 @@ import * as $about_AboutContact from "./islands/about/AboutContact.tsx";
 import * as $about_AboutDonate from "./islands/about/AboutDonate.tsx";
 import * as $about_AboutHeader from "./islands/about/AboutHeader.tsx";
 import * as $about_AboutTeam from "./islands/about/AboutTeam.tsx";
-import * as $about_styles from "./islands/about/styles.ts";
 import * as $about_types from "./islands/about/types.ts";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
@@ -373,7 +372,7 @@ const manifest = {
     "./routes/howto/minttoken/index.tsx": $howto_minttoken_index,
     "./routes/howto/registerbitname/index.tsx": $howto_registerbitname_index,
     "./routes/howto/stamp/index.tsx": $howto_stamp_index,
-    "./routes/howto/styles.ts": $howto_styles,
+    "./routes/howto/template/index.tsx": $howto_template_index,
     "./routes/howto/transferbitname/index.tsx": $howto_transferbitname_index,
     "./routes/howto/transferstamp/index.tsx": $howto_transferstamp_index,
     "./routes/howto/transfertoken/index.tsx": $howto_transfertoken_index,
@@ -436,7 +435,6 @@ const manifest = {
     "./islands/about/AboutDonate.tsx": $about_AboutDonate,
     "./islands/about/AboutHeader.tsx": $about_AboutHeader,
     "./islands/about/AboutTeam.tsx": $about_AboutTeam,
-    "./islands/about/styles.ts": $about_styles,
     "./islands/about/types.ts": $about_types,
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,

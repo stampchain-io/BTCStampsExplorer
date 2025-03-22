@@ -46,7 +46,7 @@ export default function HowTo() {
 
       {/* ===== LEATHER WALLET CREATION GUIDE ===== */}
       <section>
-        <h2 className={headingGrey}>CREATE A LEATHER WALLET</h2>
+        <h2 className={`${headingGrey} mb-4`}>CREATE A LEATHER WALLET</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
           <img
             src="/img/how-tos/createleatherwallet/00.png"
@@ -75,7 +75,7 @@ export default function HowTo() {
 
       {/* ===== LEATHER WALLET CONNECTION GUIDE ===== */}
       <section>
-        <h2 className={headingGrey}>CONNECT YOUR LEATHER WALLET</h2>
+        <h2 className={`${headingGrey} mb-4`}>CONNECT YOUR LEATHER WALLET</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
           <img
             src="/img/how-tos/connectleatherwallet/00.png"
@@ -104,7 +104,7 @@ export default function HowTo() {
 
       {/* ===== TOKEN DEPLOYMENT GUIDE ===== */}
       <section>
-        <h2 className={headingGrey}>DEPLOY YOUR OWN TOKEN</h2>
+        <h2 className={`${headingGrey} mb-4`}>DEPLOY YOUR OWN TOKEN</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
           <img
             src="/img/how-tos/deploy/00.png"
@@ -133,7 +133,7 @@ export default function HowTo() {
 
       {/* ===== TOKEN MINTING GUIDE ===== */}
       <section>
-        <h2 className={headingGrey}>MINT YOUR TOKEN</h2>
+        <h2 className={`${headingGrey} mb-4`}>MINT YOUR TOKEN</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
           <img
             src="/img/how-tos/mintsrc20/00.png"
@@ -161,7 +161,7 @@ export default function HowTo() {
 
       {/* ===== ART STAMPING GUIDE ===== */}
       <section>
-        <h2 className={headingGrey}>STAMPING ART</h2>
+        <h2 className={`${headingGrey} mb-4`}>STAMPING ART</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
           <img
             src="/img/how-tos/stamping/00.png"

@@ -190,9 +190,12 @@ export default {
         // LAYOUT GAP (vertical spacing between the body and the header and footer)
         // Defined in the header and footer files
         // SECTION GAPS (vertical spacing between major sections in the body)
-        "section-mobile": "48px", // updated breakpoint naming convention
-        "section-tablet": "72px", // updated breakpoint naming convention
-        "section-desktop": "72px", // updated breakpoint naming convention
+        "section-mobile": "48px", // updated breakpoint naming convention - index pages with section content
+        "section-tablet": "72px", // updated breakpoint naming convention - index pages with section content
+        "section-desktop": "72px", // updated breakpoint naming convention - index pages with section content
+        "section-mobile-sm": "24px", // updated breakpoint naming convention - index pages with multiple island sections
+        "section-tablet-sm": "36px", // updated breakpoint naming convention - index pages with multiple island sections
+        "section-desktop-sm": "36px", // updated breakpoint naming convention - index pages with multiple island sections
         // GRID GAPS (spacing between grid/flex items)
         "grid-mobile": "24px", // updated breakpoint naming convention
         "grid-tablet": "36px", // updated breakpoint naming convention

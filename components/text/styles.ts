@@ -57,12 +57,10 @@ export const subtitlePurple =
 // Headings
 export const headingGrey2 =
   "font-black text-3xl mobileLg:text-4xl text-stamp-grey-light tracking-wide cursor-default select-none whitespace-nowrap"; // was used in about donate section - rename
-export const headingLinkGreyLD = // check naming - used in media page
+export const headingGreyLDLink = // used in media page / keep reading in howto pages
   "font-bold text-xl gray-gradient1-hover tracking-wide inline-block relative transition-colors duration-300";
-export const headingGreySlim =
-  "font-light text-2xl mobileMd:text-3xl text-stamp-grey mb-4 cursor-default select-none whitespace-nowrap";
 export const headingGrey =
-  "font-bold text-2xl mobileMd:text-3xl text-stamp-grey tracking-wide mb-4 cursor-default select-none whitespace-nowrap";
+  "font-bold text-2xl mobileMd:text-3xl text-stamp-grey tracking-wide cursor-default select-none";
 
 // Body text / Values
 export const textXxs = "font-normal text-[10px] text-stamp-grey-light";
@@ -70,6 +68,7 @@ export const textXs = "font-normal text-xs text-stamp-grey-light";
 export const textSm = "font-normal text-sm text-stamp-grey-light";
 export const text = "font-normal text-base text-stamp-grey-light";
 export const textLg = "font-normal text-lg text-stamp-grey-light";
+export const textXl = "font-normal text-xl text-stamp-grey-light";
 export const textLinkUnderline =
   "font-bold text-base text-stamp-grey-light animated-underline transition-colors duration-300";
 
@@ -108,7 +107,7 @@ export const overline =
 // Old styles
 // About page
 export const dataLabelPurple =
-  "text-base mobileLg:text-lg font-light text-stamp-purple-highlight";
+  "font-light text-base text-stamp-purple-highlight mb-0.5";
 export const dataValuePurpleSm =
   "text-2xl mobileLg:text-3xl font-black text-black text-stroke-glow-small";
 export const dataValuePurple =

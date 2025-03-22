@@ -1,15 +1,22 @@
+/* ===== KEEP READING COMPONENT ===== */
 import { ARTICLE_LINKS } from "$/lib/utils/constants.ts";
 import { Button } from "$buttons";
-import { subtitleGrey, text, titleGreyDL } from "$text";
+import { headingGreyLDLink, subtitleGrey, text, titleGreyDL } from "$text";
 
+/* ===== COMPONENT DEFINITION ===== */
 export function KeepReading() {
+  /* ===== COMPONENT RENDER ===== */
   return (
     <section>
+      {/* ===== SECTION TITLE ===== */}
       <h1 class={titleGreyDL}>
         KEEP READING
       </h1>
-      <div class="grid grid-cols-1 tablet:grid-cols-2 gap-grid-mobile tablet:gap-grid-tablet">
-        <div>
+
+      {/* ===== CONTENT GRID ===== */}
+      <div class="flex flex-col tablet:flex-row gap-grid-mobile tablet:gap-grid-tablet">
+        {/* ===== HOW-TO ARTICLES LIST ===== */}
+        <div class="w-full tablet:w-2/3">
           <h2 class={subtitleGrey}>HOW-TO</h2>
           {ARTICLE_LINKS.map(({ title, href }) => (
             <div class="block">
@@ -17,20 +24,23 @@ export function KeepReading() {
                 key={`${title}-${href}`}
                 href={href}
                 f-partial={href}
-                class="inline-block text-xl mobileLg:text-2xl font-bold gray-gradient1-hover"
+                class={`${headingGreyLDLink} pb-1`}
               >
                 {title}
               </a>
             </div>
           ))}
         </div>
-        <div class="flex flex-col tablet:items-end tablet:text-right">
+
+        {/* ===== FAQ SECTION ===== */}
+        <div class="flex flex-col w-full tablet:w-1/3 tablet:items-end tablet:text-right">
           <h2 class={subtitleGrey}>FAQ</h2>
           <p class={text}>
             All you ever wanted to know about the Bitcoin Stamps protocol and
             stuff you never thought you needed to know.
           </p>
-          <div class="w-full flex justify-end pt-3 mobileMd:pt-6">
+          {/* ===== FAQ BUTTON ===== */}
+          <div class="w-full flex justify-end mt-1">
             <Button variant="outline" color="grey" size="lg" href="/faq">
               FAQ
             </Button>

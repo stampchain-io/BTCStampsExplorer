@@ -40,7 +40,7 @@ function IntroSection() {
 /* ===== STEPS COMPONENT ===== */
 function DeploySteps() {
   return (
-    <StepList>
+    <StepList hasImportantNotes={DEPLOY_IMPORTANT_NOTES?.length > 0}>
       {DEPLOY_STEPS.map((step) => (
         <Step
           key={step.number}

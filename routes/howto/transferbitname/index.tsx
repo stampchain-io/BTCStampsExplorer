@@ -31,7 +31,7 @@ function IntroSection() {
 /* ===== STEPS COMPONENT ===== */
 function TransferSteps() {
   return (
-    <StepList>
+    <StepList hasImportantNotes={TRANSFER_BITNAME_IMPORTANT_NOTES?.length > 0}>
       {TRANSFER_BITNAME_STEPS.map((step) => (
         <Step
           key={step.number}
