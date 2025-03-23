@@ -152,7 +152,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
         <>
           {/* ===== MOBILE/TABLET MENU ===== */}
           <div class="tablet:hidden flex flex-col gap-2 text-right">
-            <p class="py-0.5 font-bold text-sm text-stamp-grey-darker tracking-tighter cursor-default select-none">
+            <p class="font-bold text-sm text-stamp-grey-darker tracking-tighter cursor-default select-none py-0.5 mb-0">
               {abbreviateAddress(address, 6)}
             </p>
 
@@ -187,7 +187,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
                         pt-1 pb-3.5 space-y-1 whitespace-nowrap 
                         backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
               <div class="flex flex-col px-[18px] gap-1 font-bold text-sm text-stamp-purple text-left tracking-wide transition-all duration-300 ease-in-out cursor-pointer">
-                <p class="py-1 font-regular text-xs text-stamp-grey-darker cursor-default select-none">
+                <p class="font-regular text-xs text-stamp-grey-darker cursor-default select-none mb-0 py-1">
                   {abbreviateAddress(address, 6)}
                 </p>
                 <a
