@@ -120,3 +120,15 @@ export const aboutSubTitlePurple =
   "text-xs mobileMd:text-base font-medium text-stamp-purple text-center whitespace-nowrap";
 export const dataLabel =
   "text-base mobileLg:text-lg font-light text-yellow-500 uppercase";
+
+// Footer
+export const footerLogo =
+  "font-black italic text-3xl mobileLg:text-5xl tablet:text-4xl purple-gradient2";
+export const footerTagline =
+  "font-regular text-sm mobileLg:text-base tablet:text-sm text-stamp-purple-bright";
+export const footerNavTitle =
+  "font-extrabold text-xs tablet:text-sm text-stamp-purple-dark tracking-wide ";
+export const navContent =
+  "font-bold text-xl tablet:text-sm hover:text-stamp-purple-bright";
+export const copyright =
+  "font-light text-xs tablet:text-sm text-stamp-purple-darker/30";

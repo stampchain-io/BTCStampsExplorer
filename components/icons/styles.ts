@@ -22,12 +22,12 @@ export interface BadgeVariants {
 export const iconStyles = { // WIP
   base: "transform transition-all duration-300",
   sizes: {
-    xs: "size-3 tablet:size-2",
-    sm: "size-4 tablet:size-3",
-    md: "size-5 tablet:size-4",
-    lg: "size-6 tablet:size-5",
-    xl: "size-7 tablet:size-6",
-    xxl: "size-8 tablet:size-7",
+    xs: "size-7",
+    sm: "size-8",
+    md: "size-9",
+    lg: "size-10",
+    xl: "size-11",
+    xxl: "size-12",
   },
   colors: {
     grey: "fill-stamp-grey hover:fill-stamp-grey-light",

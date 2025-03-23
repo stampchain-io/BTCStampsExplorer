@@ -89,12 +89,11 @@ export const buttonStyles: ButtonVariants = {
   },
 
   size: {
-    xs:
-      "h-8 tablet:h-7 px-4 tablet:px-3 text-xs tablet:text-[10px] font-semibold",
-    sm: "h-9 tablet:h-8 px-5 tablet:px-4 text-xs tablet:text-xs",
-    md: "h-10 tablet:h-9 px-5 text-sm tablet:text-xs",
-    lg: "h-11 tablet:h-10 px-5 text-sm",
-    xl: "h-12 tablet:h-11 px-6 tablet:px-5 text-base",
+    xs: "h-7 px-4 tablet:px-3 text-xs tablet:text-[10px] font-semibold",
+    sm: "h-8 px-5 tablet:px-4 text-xs tablet:text-xs",
+    md: "h-9 px-5 text-sm tablet:text-xs",
+    lg: "h-10 px-5 text-sm",
+    xl: "h-11 px-6 tablet:px-5 text-base",
   },
 
   state: {
