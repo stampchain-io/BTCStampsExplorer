@@ -1,5 +1,5 @@
 import { Button } from "$buttons";
-import { headingLinkGreyLD, subtitleGrey, text, titleGreyDL } from "$text";
+import { headingGreyLDLink, subtitleGrey, text, titleGreyDL } from "$text";
 
 /* ===== MEDIA PAGE ===== */
 export default function Media() {
@@ -143,7 +143,7 @@ export default function Media() {
               <a
                 href="https://academy.binance.com/en/articles/what-are-bitcoin-stamps"
                 target="_blank"
-                className={`${headingLinkGreyLD} -mt-1`}
+                className={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT ARE BITCOIN STAMPS
               </a>
@@ -154,7 +154,7 @@ export default function Media() {
               <a
                 href="https://finance.yahoo.com/video/project-bitcoin-stamps-renews-debate-164902188.html?guccounter=1"
                 target="_blank"
-                className={`${headingLinkGreyLD} -mt-1`}
+                className={`${headingGreyLDLink} -mt-1`}
               >
                 NEW PROJECT RENEWS DEBATE OVER BITCOIN NFTS
               </a>
@@ -165,7 +165,7 @@ export default function Media() {
               <a
                 href="https://blog.bingx.com/bingx-insights/a-dive-into-bitcoin-stamps/"
                 target="_blank"
-                className={`${headingLinkGreyLD} -mt-1`}
+                className={`${headingGreyLDLink} -mt-1`}
               >
                 A DIVE INTO BITCOIN STAMPS
               </a>
@@ -176,7 +176,7 @@ export default function Media() {
               <a
                 href="https://hackernoon.com/what-are-bitcoin-stamps"
                 target="_blank"
-                className={`${headingLinkGreyLD} -mt-1`}
+                className={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT ARE BITCOIN STAMPS
               </a>
@@ -187,7 +187,7 @@ export default function Media() {
               <a
                 href="https://coinmarketcap.com/community/articles/6554749e8f19ea588322c1ae/"
                 target="_blank"
-                className={`${headingLinkGreyLD} -mt-1`}
+                className={`${headingGreyLDLink} -mt-1`}
               >
                 BITCOIN STAMPS VS ORDINALS
               </a>
@@ -201,7 +201,7 @@ export default function Media() {
               <a
                 href="https://explore.m2.com/learn/what-are-bitcoin-stamps"
                 target="_blank"
-                className={`${headingLinkGreyLD} -mt-1`}
+                className={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT ARE BITCOIN STAMPS
               </a>
@@ -212,7 +212,7 @@ export default function Media() {
               <a
                 href="https://www.gate.io/learn/articles/what-are-bitcoin-stamps-and-src-20/1006"
                 target="_blank"
-                className={`${headingLinkGreyLD} -mt-1`}
+                className={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT ARE BITCOIN STAMPS AND SRC-20
               </a>
@@ -223,7 +223,7 @@ export default function Media() {
               <a
                 href="https://news.bitcoin.com/study-src20-protocols-unmatched-data-permanence-makes-it-a-superior-choice-over-brc20-and-runes/"
                 target="_blank"
-                className={`${headingLinkGreyLD} -mt-1`}
+                className={`${headingGreyLDLink} -mt-1`}
               >
                 SRC20 PROTOCOL'S "UNMATCHED DATA PERMANENCE"
               </a>
@@ -234,7 +234,7 @@ export default function Media() {
               <a
                 href="https://www.okx.com/learn/what-is-src20-spurring-innovation-in-bitcoin-ecosystem"
                 target="_blank"
-                className={`${headingLinkGreyLD} -mt-1`}
+                className={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT IS SRC-20
               </a>
@@ -245,7 +245,7 @@ export default function Media() {
               <a
                 href="https://coincodex.com/article/44872/src-20-tokens/"
                 target="_blank"
-                className={`${headingLinkGreyLD} -mt-1`}
+                className={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT ARE SRC-20 TOKENS
               </a>
