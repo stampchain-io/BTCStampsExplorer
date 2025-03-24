@@ -610,42 +610,62 @@ export class SRC20Repository {
 
   static async searchValidSrc20TxFromDb(query: string) {
     const sanitizedQuery = query.replace(/[^\w-]/g, "");
-
     const sqlQuery = `
-    SELECT DISTINCT
-        tick,
-        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
-        (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted,
-        dep.max AS max_supply,
-        dep.lim AS lim,
-        dep.deci AS decimals
-    FROM ${SRC20_TABLE} dep
-    WHERE
-        (tick LIKE ? OR
-        tx_hash LIKE ? OR
-        creator LIKE ? OR
-        destination LIKE ?)
-        AND dep.max IS NOT NULL
-    ORDER BY
-        CASE
-            WHEN tick LIKE ? THEN 0
-            ELSE 1
-        END,
-        tick
-    LIMIT 10;
+      SELECT DISTINCT
+          tick,
+          (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
+          (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted,
+          dep.max AS max_supply,
+          dep.lim AS lim,
+          dep.deci AS decimals
+      FROM ${SRC20_TABLE} dep
+      WHERE
+          (tick LIKE ? OR
+          tx_hash LIKE ? OR
+          creator LIKE ? OR
+          destination LIKE ?)
+          AND dep.max IS NOT NULL
+      ORDER BY
+          CASE
+              WHEN tick LIKE ? THEN 0
+              ELSE 1
+          END,
+          tick
+      LIMIT 10;
     `;
 
+    const sqlSimpleQuery = `
+          SELECT DISTINCT
+            tick,
+            (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
+            (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted,
+            dep.max AS max_supply,
+            dep.lim AS lim,
+            dep.deci AS decimals
+        FROM ${SRC20_TABLE} dep
+        WHERE
+            (tick LIKE ? )
+            AND dep.max IS NOT NULL
+        LIMIT 10;
+      `;
+    
     const searchParam = `%${sanitizedQuery}%`;
     const startSearchParam = `${sanitizedQuery}%`;
     const queryParams = [searchParam, searchParam, searchParam, searchParam, startSearchParam];
-
+    const querySimpleParams = [startSearchParam];
     try {
-      const result = await dbManager.executeQueryWithCache(
-        sqlQuery,
-        queryParams,
+      let result = await dbManager.executeQueryWithCache(
+        sqlSimpleQuery,
+        querySimpleParams,
         1000 * 60 * 2 // Cache duration: 2 minutes
       );
 
+      if(!result.rows.length)
+        result = await dbManager.executeQueryWithCache(
+          sqlQuery,
+          queryParams,
+          1000 * 60 * 2 // Cache duration: 2 minutes
+        );
       return this.convertResponseToEmoji(result.rows.map((row: any) => {
         const maxSupply = new BigFloat(row?.max_supply || "1");
         const totalMinted = new BigFloat(row.total_minted || "0");
@@ -658,7 +678,7 @@ export class SRC20Repository {
           total_minted: row.total_minted,
           max_supply: row.max_supply
         };
-      }).filter(Boolean)); // Remove null entries
+      }).filter(Boolean));
     } catch (error) {
       console.error("Error executing query:", error);
       return [];

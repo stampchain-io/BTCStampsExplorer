@@ -1,14 +1,30 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 
+import { StampController } from "$server/controller/stampController.ts";
 import { TransferStampContent } from "$islands/stamping/stamp/transfer/TransferStampContent.tsx";
 import LatestTransfer from "$islands/stamping/stamp/transfer/LatestStampTransfer.tsx";
 
 import { HowToTransferStampModule } from "$islands/modules/HowToTransferStamp.tsx";
+import { StampRow } from "$globals";
+
+interface StampingStampPageProps {
+  selectedTab: string;
+  trxType: string;
+  latestStamps: StampRow[];
+}
 
 export const handler: Handlers = {
-  GET(req, ctx) {
+  async GET(_, ctx) {
     console.log("Handler called for [action] route");
+    const stampResult = await StampController.getStamps({
+      limit: 16,
+      sortBy: "DESC",
+      type: "stamps",
+      page: 1,
+    });
+
     const data = {
+      latestStamps: stampResult.data,
       selectedTab: "transfer", // Example data
       trxType: "olga", // Example data
     };
@@ -25,6 +41,7 @@ export default function StampingStampPage(
   const {
     selectedTab = "defaultTab",
     trxType = "defaultType",
+    latestStamps = [],
   } = data || {};
 
   console.log("Data received:", data);
@@ -55,7 +72,7 @@ export default function StampingStampPage(
     console.log("Rendering Right Sidebar for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
-        return <LatestTransfer />;
+        return <LatestTransfer latestStamps={latestStamps} />;
       default:
         return <div>No sidebar content available for this tab.</div>;
     }

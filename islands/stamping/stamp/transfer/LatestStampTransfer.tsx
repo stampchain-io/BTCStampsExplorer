@@ -1,30 +1,18 @@
 import { useEffect, useState } from "preact/hooks";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
-import type { StampTransaction } from "$lib/types/stamping.ts";
 import type { JSX } from "preact";
+import { StampRow } from "$globals";
 
-export default function LatestTransfer(): JSX.Element {
+export default function LatestTransfer(
+  { latestStamps }: { latestStamps: StampRow[] },
+): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
-  const [transactions, setTransactions] = useState<StampTransaction[]>([]);
+  const [transactions, setTransactions] = useState<StampRow[]>([]);
 
   useEffect(() => {
-    const fetchRecentTransactions = async () => {
-      try {
-        const response = await fetch("/api/internal/src20/recentTransactions");
-        if (!response.ok) {
-          throw new Error("Failed to fetch recent transactions");
-        }
-        const data = await response.json();
-        setTransactions(data.transfer || []);
-      } catch (error) {
-        console.error("Error fetching recent transfers:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRecentTransactions();
+    setTransactions(latestStamps);
+    setIsLoading(false);
   }, []);
 
   if (isLoading) {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { formatHtmlFromUrl } from "$client/utils/format.ts";
+import { StampDetailStyles } from "$islands/stamp/styles.ts";
 
 interface StampCodeModalProps {
   src: string;
@@ -8,7 +9,7 @@ interface StampCodeModalProps {
 }
 
 export default function StampCodeModal(
-  { src, _toggleModal, handleCloseModal }: StampCodeModalProps,
+  { src, handleCloseModal }: StampCodeModalProps,
 ) {
   const [formattedSrc, setFormattedSrc] = useState("");
 
@@ -39,85 +40,9 @@ export default function StampCodeModal(
       document.removeEventListener("keydown", handleKeyboardShortcut);
   }, [handleCloseModal]);
 
-  function formatHtmlSource(html: string): string {
-    if (!html || typeof html !== "string") {
-      return "No content available";
-    }
-
-    try {
-      // Store pre tag contents to restore later
-      const preTags: string[] = [];
-      let formatted = html.replace(/<pre[\s\S]*?<\/pre>/g, (match) => {
-        preTags.push(match);
-        return `###PRE_TAG_${preTags.length - 1}###`;
-      });
-
-      // Apply formatting to non-pre content
-      formatted = formatted
-        .replace(/;/g, ";\n")
-        .replace(/</g, "\n<")
-        .replace(/>/g, ">\n")
-        .replace(/\{/g, " {\n")
-        .replace(/\}/g, "\n}\n");
-
-      // Format script tags (excluding pre content)
-      if (formatted.includes("<script")) {
-        formatted = formatted.replace(
-          /(<script.*?>)([\s\S]*?)(<\/script>)/g,
-          (_match, openTag, content, closeTag) => {
-            const formattedScript = content
-              .replace(/([{}\[\]])/g, "$1\n")
-              .replace(/;/g, ";\n")
-              .replace(/,\s*/g, ",\n")
-              .replace(/\) {/g, ") {\n")
-              .replace(/\n\n+/g, "\n");
-
-            return `${openTag}\n${formattedScript}\n${closeTag}`;
-          },
-        );
-      }
-
-      // Restore pre tags
-      formatted = formatted.replace(
-        /###PRE_TAG_(\d+)###/g,
-        (_, index) => preTags[index],
-      );
-
-      let indent = 0;
-      let result = "";
-
-      formatted.split("\n").forEach((line) => {
-        line = line.trim();
-        if (!line) return;
-
-        if (line.match(/^<\//) || line === "}" || line === "]") {
-          indent = Math.max(0, indent - 2);
-        }
-
-        const lineIndent = indent;
-        result += " ".repeat(lineIndent) + line + "\n";
-
-        if (
-          (line.match(/^<[^/]/) && !line.match(/\/>/) &&
-            !line.includes("</")) ||
-          line.endsWith("{") || line.endsWith("[")
-        ) {
-          indent += 2;
-        }
-      });
-
-      return result.trim();
-    } catch (_error) {
-      return "Error formatting content";
-    }
-  }
-
-  const modalBgCenter =
-    "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black bg-opacity-70 backdrop-filter backdrop-blur-md";
-
   return (
     <div
-      class={modalBgCenter}
+      class={StampDetailStyles.modalBgCenter}
       onClick={handleCloseModal}
     >
       <div
