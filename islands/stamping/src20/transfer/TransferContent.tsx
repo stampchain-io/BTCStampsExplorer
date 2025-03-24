@@ -6,6 +6,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { useToast } from "$islands/Toast/ToastProvider.tsx";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import { TransferStyles } from "./styles.ts";
 
 interface Balance {
   tick: string;
@@ -26,7 +27,6 @@ export function TransferContent(
     config,
     isSubmitting,
     submissionMessage,
-    walletError,
     apiError,
     handleInputBlur,
   } = useSRC20Form("transfer", trxType);
@@ -50,12 +50,6 @@ export function TransferContent(
       addToast(apiError, "error");
     }
   }, [apiError]);
-
-  useEffect(() => {
-    if (walletError) {
-      addToast(walletError, "error");
-    }
-  }, [walletError]);
 
   useEffect(() => {
     if (submissionMessage?.message) {
@@ -175,7 +169,7 @@ export function TransferContent(
     if (!isNaN(inputAmount) && !isNaN(maxAmount) && inputAmount > maxAmount) {
       handleInputChange({
         target: { value: maxAmount.toString() },
-      } as Event, "amt");
+      } as unknown as Event, "amt");
       return;
     }
 
@@ -259,7 +253,6 @@ export function TransferContent(
         <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
-          type="src20"
           fromPage="src20_transfer"
           fileType="application/json"
           fileSize={undefined}
