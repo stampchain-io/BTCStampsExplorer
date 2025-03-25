@@ -659,3 +659,31 @@ body {
 .highcharts-range-selector-buttons .highcharts-button-pressed text {
   fill: white !important;
 }
+
+/* Tooltip Styles */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  background-color: #080808;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  padding: 8px 12px 8px 12px;
+  border-radius: 8px;
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}

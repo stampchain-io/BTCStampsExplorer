@@ -6,6 +6,7 @@ import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator as _useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
+import ViewToggleButton from "$islands/datacontrol/View.tsx";
 import { StampStyles } from "./styles.ts";
 
 export const StampHeader = (
@@ -38,6 +39,7 @@ export const StampHeader = (
         ART STAMPS
       </h1>
       <div className="flex relative items-start justify-between gap-3">
+        <ViewToggleButton />
         <Filter
           initFilter={filterBy}
           open={isOpen1}

@@ -34,6 +34,7 @@ export function StampCard({
   showEdition = false,
   showMinDetails = false,
   variant = "default",
+  view,
   fromPage,
 }: {
   stamp: StampWithSaleData;
@@ -43,6 +44,7 @@ export function StampCard({
   showMinDetails?: boolean;
   variant?: "default" | "grey";
   fromPage?: string;
+  view: string;
 }) {
   // Add window size hook
   const { width } = useWindowSize();
@@ -351,7 +353,7 @@ export function StampCard({
         </div>
 
         {/* Full Details Section with variant support */}
-        {showDetails && !showMinDetails && (
+        {view === "detail" && showDetails && !showMinDetails && (
           <div class="flex flex-col items-center px-[6px] pt-[18px] pb-0">
             {/* Stamp Number with container */}
             <div class="flex items-center justify-center max-w-[90%]">
@@ -399,7 +401,7 @@ export function StampCard({
           </div>
         )}
 
-        {showEdition && (
+        {view === "detail" && showEdition && (
           <div class="flex flex-col items-center px-1.5 mobileLg:px-3 pt-1.5 mobileLg:pt-3">
             <div class="flex items-center justify-center">
               {shouldDisplayHash && (
@@ -431,7 +433,7 @@ export function StampCard({
         )}
 
         {/* Minimal Details Section */}
-        {showMinDetails && !showDetails && (
+        {view === "detail" && showMinDetails && !showDetails && (
           <div class="flex flex-col items-center px-1.5 mobileLg:px-3 pt-1.5 mobileLg:pt-3">
             <div class="flex items-center justify-center">
               {shouldDisplayHash && (

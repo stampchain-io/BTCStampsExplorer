@@ -11,7 +11,7 @@ const MAX_PAGE_SIZE = 120;
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
     const url = new URL(req.url);
-    
+
     // Only process requests for /stamp route
     if (url.searchParams.has("_fresh") && !url.pathname.startsWith("/stamp")) {
       return new Response(null, { status: 204 });
@@ -19,6 +19,7 @@ export const handler: Handlers = {
 
     try {
       const sortBy = url.searchParams.get("sortBy") || "DESC";
+      const view = url.searchParams.get("view") || "small";
       const filterBy = url.searchParams.get("filterBy")
         ? (url.searchParams.get("filterBy")?.split(",").filter(
           Boolean,
@@ -67,6 +68,7 @@ export const handler: Handlers = {
         stamps: Array.isArray(stamps) ? stamps : [],
         filterBy,
         sortBy,
+        view: view,
         selectedTab: recentSales ? "recent_sales" : selectedTab,
         page,
         limit: page_size,
@@ -90,6 +92,7 @@ export function StampPage(props: StampPageProps) {
     totalPages,
     filterBy,
     sortBy,
+    view,
     selectedTab,
   } = props.data;
 
@@ -105,6 +108,7 @@ export function StampPage(props: StampPageProps) {
       <StampContent
         stamps={stampsArray}
         isRecentSales={isRecentSales}
+        view={view}
         pagination={{
           page,
           totalPages,
