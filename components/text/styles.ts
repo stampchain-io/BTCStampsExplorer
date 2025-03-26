@@ -20,23 +20,38 @@ export type TextStyles = {
   textXs: string;
   textSm: string;
   text: string;
-  textLg: string;
-  textLink: string;
+  textLg: string; // UPDATE ALL TEXT STYLES
   labelSm: string;
   label: string;
   labelLg: string;
 };
 
 // Text styles
-// Logo
-export const logo =
-  "font-black italic text-4xl purple-hover-gradient hover:purple-hover-gradient2 tracking-wide pr-3 transition-colors duration-300";
+// Overlays - used for text overlay effectsof whole divs - text must be transparent or not declared with tailwind css
+export const overlayPurple =
+  "bg-gradient-to-r from-[#AA00FF]/80 via-[#AA00FF]/60 to-[#AA00FF]/40 text-transparent bg-clip-text";
 
+// Layout
+// Logo
+export const logoPurpleDL =
+  "font-black italic text-4xl purple-gradient2 tracking-wide cursor-default select-none whitespace-nowrap"; // used in footer
+export const logoPurpleDLLink =
+  "font-black italic text-4xl purple-gradient2-hover tracking-wide transition-colors duration-300";
+export const logoPurpleLD =
+  "font-black italic text-4xl purple-gradient4 tracking-wide transition-colors duration-300";
+export const logoPurpleLDLink =
+  "font-black italic text-4xl purple-gradient4-hover tracking-wide transition-colors duration-300"; // used in header
+export const tagline =
+  "font-regular text-sm text-stamp-purple-bright cursor-default select-none whitespace-nowrap"; // used in footer
 // Navigation
-// export const navMenuTitle =
-//   "font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey transition-colors duration-300";
-// export const navMenuLink =
-//   "font-extrabold text-stamp-purple group-hover:text-stamp-purple-bright transition-colors duration-300";
+export const navLinkPurple =
+  "font-medium tablet:font-bold text-sm hover:text-stamp-purple-bright transition-colors duration-300"; // transparent text - ued with the overlayPurple class
+export const navLinkPurpleThick =
+  "font-extrabold text-stamp-purple group-hover:text-stamp-purple-bright transition-colors duration-300";
+export const navLinkGreyThick =
+  "font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey transition-colors duration-300";
+export const copyright =
+  "font-normal text-xs mobileMd:text-sm tablet:text-xs cursor-default select-none whitespace-nowrap"; // transparent text - ued with the overlayPurple class
 
 // Titles
 export const titleGreyLD =
@@ -75,7 +90,8 @@ export const textLinkUnderline =
 // Links
 // Use the specifics created or just add "animated-underline" to the class name to apply the animated underline effect
 
-// Labels
+// Data Containers
+// Labels - REDUNDANT ???? - CHECK WITH BODY TEXT
 export const labelSm =
   "font-medium text-sm text-stamp-grey-light cursor-default select-none whitespace-nowrap";
 export const label =
@@ -83,14 +99,8 @@ export const label =
 export const labelLg =
   "font-medium text-lg text-stamp-grey-light cursor-default select-none whitespace-nowrap";
 
-export const dataValueXL =
-  "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
-export const dataValueXLlink = "text-3xl mobileLg:text-4xl font-black -mt-1";
-export const textLoader =
-  "text-sm mobileLg:text-base font-medium text-stamp-grey uppercase text-center py-3 animated-text-loader";
-
-// Overline - Category labels, above titles (update from filter styles)
-export const overline =
+// Overline - Category labels, tagline, above titles (update from filter styles)
+export const overline = // rename
   "font-light text-base text-stamp-grey-darker tracking-wide inline-block cursor-default select-none whitespace-nowrap";
 
 // Captions - used for stamp/token cards
@@ -121,14 +131,9 @@ export const aboutSubTitlePurple =
 export const dataLabel =
   "text-base mobileLg:text-lg font-light text-yellow-500 uppercase";
 
-// Footer
-export const footerLogo =
-  "font-black italic text-3xl mobileLg:text-5xl tablet:text-4xl purple-gradient2";
-export const footerTagline =
-  "font-regular text-sm mobileLg:text-base tablet:text-sm text-stamp-purple-bright";
-export const footerNavTitle =
-  "font-extrabold text-xs tablet:text-sm text-stamp-purple-dark tracking-wide ";
-export const navContent =
-  "font-bold text-xl tablet:text-sm hover:text-stamp-purple-bright";
-export const copyright =
-  "font-light text-xs tablet:text-sm text-stamp-purple-darker/30";
+// Tables
+export const dataValueXL =
+  "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
+export const dataValueXLlink = "text-3xl mobileLg:text-4xl font-black -mt-1";
+export const textLoader =
+  "text-sm mobileLg:text-base font-medium text-stamp-grey uppercase text-center py-3 animated-text-loader";

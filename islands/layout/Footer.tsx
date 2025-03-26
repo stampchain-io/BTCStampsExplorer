@@ -1,12 +1,11 @@
 /* ===== FOOTER COMPONENT ===== */
-import { useState } from "preact/hooks";
 import { DiscordIcon, GitHubIcon, TelegramIcon, TwitterIcon } from "$icons";
 import {
   copyright,
-  footerLogo,
-  footerNavTitle,
-  footerTagline,
-  navContent,
+  logoPurpleDL,
+  navLinkPurple,
+  overlayPurple,
+  tagline,
 } from "$text";
 
 /* ===== FOOTER LINK INTERFACE ===== */
@@ -34,16 +33,16 @@ const aboutLinks: FooterLink[] = [
   { title: "ABOUT", href: "/about" },
   { title: "DONATE", href: "/about#donate" },
   { title: "CONTACT", href: "/about#contact" },
-  { title: "TERMS", href: "/termsofservice", hiddenOnMobile: true },
+  { title: "TERMS", href: "/termsofservice" },
 ];
 
 const mobileLinks: FooterLink[] = [
   { title: "ABOUT", href: "/about" },
-  { title: "DONATE", href: "/about#donate" },
   { title: "MEDIA", href: "/media" },
   { title: "HOW-TO", href: "/howto" },
   { title: "FAQ", href: "/faq" },
-  { title: "TERMS", href: "/termsofservice" },
+  { title: "DONATE", href: "/about#donate" },
+  { title: "TERMS", href: "/termsofservice", hiddenOnMobile: true },
 ];
 
 /* ===== SOCIAL MEDIA CONFIGURATION ===== */
@@ -68,22 +67,19 @@ const socialLinks = [
 
 /* ===== MAIN FOOTER COMPONENT ===== */
 export function Footer() {
-  /* ===== STATE MANAGEMENT ===== */
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
   /* ===== COMPONENT RENDER ===== */
   return (
     <footer className="
       flex flex-col tablet:flex-row justify-between max-w-desktop w-full mx-auto 
       px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
-      pt-24 pb-6 tablet:pt-24 tablet:pb-9
+      pt-24 pb-6 tablet:pt-24 tablet:pb-6
       gap-2 mobileLg:gap-3 tablet:gap-4
     ">
       {/* ===== BACKGROUND LOGO ===== */}
       <img
         src="/img/home/stampchain-logo-480.svg"
         alt=""
-        class="
+        className="
           absolute z-[-999]
           size-[210px] mobileLg:size-[270px] tablet:size-[230px]
           bottom-[31px] mobileLg:bottom-[28px] tablet:-bottom-9
@@ -94,75 +90,72 @@ export function Footer() {
         "
       />
 
-      {/* ===== LEFT SECTION: LOGO AND SOCIAL LINKS ===== */}
+      {/* ===== MOBILE SMALL CENTER SECTION - MOBILE MEDIUM+ LEFT SECTION ===== */}
       <div className="
-        flex flex-row tablet:flex-col justify-between tablet:justify-start 
-        items-center tablet:items-start w-full gap-1
+        flex flex-col mobileMd:flex-row tablet:flex-col w-full 
+        justify-start mobileMd:justify-between tablet:justify-start 
+        items-center mobileMd:items-end tablet:items-start gap-1
       ">
-        {/* Logo and Tagline */}
+        {/* ===== LOGO AND TAGLINE ===== */}
         <div className="flex flex-col">
-          <p className={footerLogo}>
+          <p className={`${logoPurpleDL} text-center mobileMd:text-left`}>
             STAMPCHAIN
             <span className="font-extralight pr-1">.IO</span>
           </p>
-          <p className={`${footerTagline} -mt-5`}>
+          <p
+            className={`${tagline} -mt-5 text-center mobileMd:text-left`}
+          >
             IMMORTALISED ART - STORED ON BITCOIN
           </p>
         </div>
 
-        {/* Social Media Icons */}
-        <div className="flex gap-4 mt-0 tablet:mt-[18px]">
-          {socialLinks.map((link, index) => (
-            <a key={link.href} href={link.href} target="_blank">
+        {/* ===== SOCIAL MEDIA ICONS ===== */}
+        <div className="flex gap-4 mt-3 mobileMd:mt-0 tablet:mt-3">
+          {socialLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {link.icon}
             </a>
           ))}
         </div>
       </div>
 
-      {/* ===== RIGHT SECTION: NAVIGATION LINKS ===== */}
-      <div className="
-        flex flex-col justify-end tablet:justify-between w-full tablet:w-[420px] tablet:pt-1
-        bg-gradient-to-r from-[#AA00FF]/80 via-[#AA00FF]/60 to-[#AA00FF]/40
-        text-transparent bg-clip-text
-      ">
-        <div className="flex flex-row justify-end">
+      {/* ===== DESKTOP RIGHT SECTION ===== */}
+      <div className={`${overlayPurple}`}>
+        <div className="hidden tablet:flex flex-row justify-end w-[300px] pt-1">
           {/* ===== RESOURCES LINKS ===== */}
-          <div className="flex flex-col w-full tablet:w-1/2 items-center tablet:items-start gap-1.5">
-            <p className={`${footerNavTitle} hidden`}>RESOURCES</p>
-            <div className="flex flex-row tablet:flex-col w-full justify-center gap-[18px] mobileLg:gap-6 tablet:gap-1">
-              {resourcesLinks.map((link, index) => (
+          <div className="flex w-1/2 ">
+            <div className="flex flex-col w-full justify-center gap-1">
+              {resourcesLinks.map((link) => (
                 <a
-                  key={index}
+                  key={link.href}
                   href={link.href}
-                  f-partial={!link.isExternal ? link.href : undefined}
-                  className={`${navContent}`}
+                  f-partial={link.isExternal ? "" : link.href}
+                  className={`${navLinkPurple}`}
                   target={link.isExternal ? "_blank" : undefined}
+                  rel={link.isExternal ? "noopener noreferrer" : undefined}
                 >
                   {link.title}
                 </a>
               ))}
-              <a
-                href="/termsofservice"
-                f-partial="/termsofservice"
-                className={`${navContent} block tablet:hidden`}
-              >
-                TERMS
-              </a>
             </div>
           </div>
 
-          {/* ===== STAMPCHAIN LINKS (DESKTOP) ===== */}
-          <div className="hidden flex-col tablet:flex w-full tablet:w-1/2 justify-center gap-1.5 text-right">
-            <p className={`${footerNavTitle} hidden `}>STAMPCHAIN</p>
-            <div className="flex flex-col w-full gap-1">
-              {mobileLinks.map((link, index) => (
+          {/* ===== ABOUT LINKS  ===== */}
+          <div className="flex w-1/2">
+            <div className="flex flex-col w-full justify-center gap-1 text-right">
+              {aboutLinks.map((link) => (
                 <a
-                  key={index}
+                  key={link.href}
                   href={link.href}
-                  f-partial={!link.isExternal ? link.href : undefined}
-                  className={`${navContent} `}
+                  f-partial={link.isExternal ? "" : link.href}
+                  className={`${navLinkPurple}`}
                   target={link.isExternal ? "_blank" : undefined}
+                  rel={link.isExternal ? "noopener noreferrer" : undefined}
                 >
                   {link.title}
                 </a>
@@ -171,18 +164,35 @@ export function Footer() {
           </div>
         </div>
 
-        {/* ===== COPYRIGHT SECTION ===== */}
-        <div className="flex flex-row justify-end">
-          <p
-            className={`${copyright} hidden tablet:block mt-3 mb-0`}
-          >
-            <span className="italic">STAMPCHAIN</span> @ 2025
-          </p>
+        {/* ===== MOBILE BOTTOM ROW SECTION ===== */}
+        {/* ===== MIXED LINKS  ===== */}
+        <div className="flex tablet:hidden w-[360px] mobileMd:w-full justify-center mobileMd:justify-start mx-auto mt-2 mobileMd:mt-1 mb-2">
+          <div className="flex flex-row w-full justify-between">
+            {mobileLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                f-partial={link.isExternal ? "" : link.href}
+                className={`${navLinkPurple}`}
+                target={link.isExternal ? "_blank" : undefined}
+                rel={link.isExternal ? "noopener noreferrer" : undefined}
+              >
+                {link.title}
+              </a>
+            ))}
+            {/* ===== COPYRIGHT SECTION - MOBILEMD + MOBILELG ===== */}
+            <p
+              className={`${copyright} hidden mobileMd:block tablet:hidden`}
+            >
+              <span className="italic">STAMPCHAIN</span> @ 2025
+            </p>
+          </div>
+        </div>
 
-          <p
-            className={`${copyright} block tablet:hidden text-center mt-5 mobileLg:mt-6 mb-0`}
-          >
-            <span className="italic font-bold">STAMPCHAIN</span> @ 2025
+        {/* ===== COPYRIGHT SECTION - BASE/MOBILESM + TABLET/DESKTOP ===== */}
+        <div className="flex flex-row mobileMd:hidden tablet:block w-full justify-center tablet:justify-end tablet:text-right mt-3 tablet:mt-4">
+          <p className={`${copyright}`}>
+            <span className="italic">STAMPCHAIN</span> @ 2025
           </p>
         </div>
       </div>

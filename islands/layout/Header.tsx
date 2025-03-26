@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
 import { HamburgerMenuIcon } from "$islands/layout/HeaderComponents.tsx";
-import { logo } from "$text";
+import { logoPurpleLDLink } from "$text";
 import { GearIcon } from "$icons";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
@@ -84,17 +84,6 @@ const mobileNavLinks: NavLink[] = [
       { title: "TRANSFER TOKEN", href: "/stamping/src20/transfer" },
       { title: "REGISTER BITNAME", href: "/stamping/src101/mint" },
     ],
-  },
-];
-
-/* ===== SOCIAL MEDIA LINKS ===== */
-const _socialLinks = [
-  { href: "https://x.com/Stampchain", icon: "/img/footer/XLogo.svg" },
-  { href: "https://t.me/BitcoinStamps", icon: "/img/footer/TelegramLogo.svg" },
-  { href: "https://discord.gg/PCZU6xrt", icon: "/img/footer/DiscordLogo.svg" },
-  {
-    href: "https://github.com/stampchain-io/",
-    icon: "/img/footer/GithubLogo.svg",
   },
 ];
 
@@ -295,16 +284,16 @@ export function Header() {
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <header className="tablet:flex justify-between items-center max-w-desktop w-full mx-auto 
-     pt-6 pb-9 mobileLg:pt-9 mobileLg:pb-14
-     px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop">
+    <header className="tablet:flex justify-between items-center max-w-desktop w-full mx-auto
+     px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop 
+     pt-6 pb-9 mobileLg:pt-9 mobileLg:pb-14">
       {/* ===== LOGO AND MOBILE MENU TOGGLE BUTTON ===== */}
       <div className="flex justify-between items-center w-full ">
         <a
           href="/home"
           f-partial="/home"
           onClick={() => setCurrentPath("home")}
-          className={logo}
+          className={`${logoPurpleLDLink} pr-3`}
         >
           STAMPCHAIN
         </a>
@@ -323,9 +312,8 @@ export function Header() {
       <div
         className={`flex tablet:hidden flex-col justify-between
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[380px] h-screen z-30
-           p-9 pt-[88px]
            bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 backdrop-blur-md
-           shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
+           p-9 pt-[88px] shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
            transition-transform duration-500 ease-in-out will-change-transform
            overflow-y-auto overflow-x-hidden scrollbar-black
          ${open ? "translate-x-0" : "translate-x-full"}`}
@@ -369,29 +357,6 @@ export function Header() {
             </div>
           </div>
         </div>
-
-        {/* ===== SOCIAL MEDIA ICONS ===== */}
-        {
-          /* <div className="flex justify-center items-center">
-          {socialLinks.map((link, index) => (
-            <a key={link.href} href={link.href} target="_blank">
-              <img
-                src={link.icon}
-                className={`size-[31px] mobileLg:size-[46px] ${
-                  index === 0
-                    ? "mr-[12px] mobileLg:mr-[13px]"
-                    : index === 1
-                    ? "mr-[13px] mobileLg:mr-[17px]"
-                    : index === 2
-                    ? "mr-[17px] mobileLg:mr-[21px]"
-                    : ""
-                }`}
-                alt=""
-              />
-            </a>
-          ))}
-        </div> */
-        }
       </div>
     </header>
   );
