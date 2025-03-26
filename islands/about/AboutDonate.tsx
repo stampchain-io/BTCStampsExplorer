@@ -367,11 +367,11 @@ export default function AboutDonate() {
                 onMouseLeave={handleReceiveMouseLeave}
               >
                 <Icon
-                  type="icon"
                   name="handcoins"
                   weight="bold"
-                  size="md"
+                  size="xl"
                   color="purple"
+                  type="iconButton"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);
                     setIsReceiveModalOpen(true);

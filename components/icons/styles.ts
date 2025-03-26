@@ -36,15 +36,25 @@ export const iconStyles = {
     xl: "w-9 h-9",
     xxl: "w-10 h-10",
   },
-  color: {
+  // Base Icon styles
+  icon: {
+    grey: "fill-stamp-grey",
+    purple: "fill-stamp-purple",
+    gradient: "",
+  },
+  // IconLink styles
+  iconLink: {
     grey: "fill-stamp-grey hover:fill-stamp-grey-light",
     purple: "fill-stamp-purple hover:fill-stamp-purple-bright",
     gradient: "",
   },
-  type: {
-    icon: "hover:!fill-none",
-    iconLink: "hover:fill-red-500 transition-colors duration-300",
-    iconButton: "hover:fill-green-500 transition-colors duration-300",
+  // IconButton styles
+  iconButton: {
+    grey:
+      "fill-stamp-grey hover:fill-stamp-grey-light bg-[#333333]/40 hover:bg-[#333333]/20 tablet:bg-transparent tablet:hover:bg-transparent rounded-md p-1.5",
+    purple:
+      "fill-stamp-purple hover:fill-stamp-purple-bright bg-[#333333]/40 hover:bg-[#333333]/20 tablet:bg-transparent tablet:hover:bg-transparent rounded-md p-1.5",
+    gradient: "",
   },
 } as const;
 

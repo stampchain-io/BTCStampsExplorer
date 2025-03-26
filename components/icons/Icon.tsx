@@ -74,8 +74,8 @@ export function Icon(props: IconVariants) {
 
   // Combine classes based on type, size, and color
   const combinedClasses = `${iconStyles.base} ${iconStyles.size[size]} ${
-    iconStyles.color[color]
-  } ${iconStyles.type[type]} ${className}`;
+    iconStyles[type][color]
+  } ${className}`;
 
   // Common props
   const commonProps = {
