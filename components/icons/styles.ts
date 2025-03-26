@@ -2,11 +2,11 @@ import type { JSX } from "preact";
 
 /* ===== ICON BASE PROPS ===== */
 export interface IconVariants {
-  type: "icon" | "iconLink" | "iconButton";
   name: string;
   weight: "light" | "normal" | "bold";
   size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
   color: "grey" | "purple" | "gradient";
+  type: "icon" | "iconLink" | "iconButton";
   className?: string;
   role?: JSX.AriaRole;
   ariaLabel?: string;
@@ -29,12 +29,12 @@ export interface BadgeVariants {
 export const iconStyles = {
   base: "inline-block transition-colors duration-300",
   size: {
-    xs: "w-3 h-3",
-    sm: "w-4 h-4",
-    md: "w-5 h-5",
-    lg: "w-6 h-6",
-    xl: "w-8 h-8",
-    xxl: "w-12 h-12",
+    xs: "w-5 h-5",
+    sm: "w-6 h-6",
+    md: "w-7 h-7",
+    lg: "w-8 h-8",
+    xl: "w-9 h-9",
+    xxl: "w-10 h-10",
   },
   color: {
     grey: "fill-stamp-grey hover:fill-stamp-grey-light",

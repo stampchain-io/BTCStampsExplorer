@@ -50,11 +50,11 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
         name="twitter"
         weight="light"
-        size="xl"
+        size="lg"
         color="purple"
+        type="iconLink"
         href="https://x.com/Stampchain"
         target="_blank"
       />
@@ -63,11 +63,11 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
         name="telegram"
         weight="light"
-        size="xl"
+        size="lg"
         color="purple"
+        type="iconLink"
         href="https://t.me/BitcoinStamps"
         target="_blank"
       />
@@ -76,11 +76,11 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
         name="discord"
         weight="light"
-        size="xl"
+        size="lg"
         color="purple"
+        type="iconLink"
         href="https://discord.gg/BRYRt4bH"
         target="_blank"
       />
@@ -89,11 +89,11 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
         name="github"
         weight="light"
-        size="xl"
+        size="lg"
         color="purple"
+        type="iconLink"
         href="https://github.com/stampchain-io/"
         target="_blank"
       />

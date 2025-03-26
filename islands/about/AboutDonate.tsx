@@ -370,7 +370,7 @@ export default function AboutDonate() {
                   type="icon"
                   name="handcoins"
                   weight="bold"
-                  size="lg"
+                  size="md"
                   color="purple"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);
