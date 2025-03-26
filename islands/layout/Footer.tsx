@@ -1,5 +1,5 @@
 /* ===== FOOTER COMPONENT ===== */
-import { DiscordIcon, GitHubIcon, TelegramIcon, TwitterIcon } from "$icons";
+import { Icon } from "$icons";
 import {
   copyright,
   logoPurpleDL,
@@ -49,19 +49,59 @@ const mobileLinks: FooterLink[] = [
 const socialLinks = [
   {
     href: "https://x.com/Stampchain",
-    icon: <TwitterIcon size="md" color="purple" className="-mr-1" />,
+    icon: (
+      <Icon
+        type="iconLink"
+        name="twitter"
+        weight="light"
+        size="xl"
+        color="purple"
+        href="https://twitter.com"
+        target="_blank"
+      />
+    ),
   },
   {
     href: "https://t.me/BitcoinStamps",
-    icon: <TelegramIcon size="md" color="purple" />,
+    icon: (
+      <Icon
+        type="iconLink"
+        name="twitter"
+        weight="light"
+        size="xl"
+        color="purple"
+        href="https://twitter.com"
+        target="_blank"
+      />
+    ),
   },
   {
     href: "https://discord.gg/BRYRt4bH",
-    icon: <DiscordIcon size="md" color="purple" className="mr-1" />,
+    icon: (
+      <Icon
+        type="icon"
+        name="twitter"
+        weight="light"
+        size="xl"
+        color="purple"
+        href="https://twitter.com"
+        target="_blank"
+      />
+    ),
   },
   {
     href: "https://github.com/stampchain-io/",
-    icon: <GitHubIcon size="md" color="purple" />,
+    icon: (
+      <Icon
+        type="icon"
+        name="twitter"
+        weight="light"
+        size="xl"
+        color="purple"
+        href="https://twitter.com"
+        target="_blank"
+      />
+    ),
   },
 ];
 

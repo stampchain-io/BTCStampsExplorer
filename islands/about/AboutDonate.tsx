@@ -18,7 +18,7 @@ import {
 } from "$text";
 import { tooltipIcon } from "$notifications";
 import { Button } from "$buttons";
-import { HandCoinsIcon } from "$icons";
+import { Icon } from "$components/icons/Icon.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 /* ===== CONSTANTS ===== */
@@ -366,14 +366,16 @@ export default function AboutDonate() {
                 onMouseEnter={handleReceiveMouseEnter}
                 onMouseLeave={handleReceiveMouseLeave}
               >
-                <HandCoinsIcon
+                <Icon
+                  type="icon"
+                  name="handCoins"
+                  weight="bold"
                   size="xl"
                   color="purple"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);
                     setIsReceiveModalOpen(true);
                   }}
-                  className="p-2 bg-[#333333]/60 tablet:bg-transparent hover:bg-[#333333]/80 tablet:hover:bg-transparent rounded-md transition-colors duration-300"
                 />
                 <div
                   class={`${tooltipIcon} ${

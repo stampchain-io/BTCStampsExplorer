@@ -1,53 +1,55 @@
 import type { JSX } from "preact";
 
-// TypeScript interfaces
-export interface IconVariants { // WIP
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
-  color?: "grey" | "purple" | "gradient";
+/* ===== ICON BASE PROPS ===== */
+export interface IconVariants {
+  type: "icon" | "iconLink" | "iconButton";
+  name: string;
+  weight: "light" | "normal" | "bold";
+  size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+  color: "grey" | "purple" | "gradient";
   className?: string;
-  role?: string;
+  role?: JSX.AriaRole;
   ariaLabel?: string;
-  style?: JSX.CSSProperties;
-  onMouseEnter?: JSX.MouseEventHandler<SVGElement>;
-  onMouseLeave?: JSX.MouseEventHandler<SVGElement>;
-  onClick?: JSX.MouseEventHandler<SVGElement>;
+  onClick?: JSX.MouseEventHandler<
+    HTMLButtonElement | HTMLAnchorElement | HTMLImageElement | SVGElement
+  >;
+  href?: string;
+  target?: string;
+  rel?: string;
+  text?: string;
 }
 
+/* ===== BADGE PROPS ===== */
 export interface BadgeVariants {
   text: string;
   className?: string;
 }
 
-// Icon styles
-export const iconStyles = { // WIP
-  base: "transform transition-all duration-300",
-  sizes: {
-    xs: "size-7 tablet:size-6",
-    sm: "size-8 tablet:size-7",
-    md: "size-9 tablet:size-8",
-    lg: "size-10 tablet:size-9",
-    xl: "size-11 tablet:size-10",
-    xxl: "size-12 tablet:size-11",
+/* ===== ICON STYLES ===== */
+export const iconStyles = {
+  base: "inline-block transition-colors duration-300",
+  size: {
+    xs: "w-3 h-3",
+    sm: "w-4 h-4",
+    md: "w-5 h-5",
+    lg: "w-6 h-6",
+    xl: "w-8 h-8",
+    xxl: "w-12 h-12",
   },
-  colors: {
+  color: {
     grey: "fill-stamp-grey hover:fill-stamp-grey-light",
     purple: "fill-stamp-purple hover:fill-stamp-purple-bright",
     gradient: "",
   },
+  type: {
+    icon: "",
+    iconLink: "hover:fill-purple-500 transition-colors duration-300",
+    iconButton: "hover:fill-purple-500 transition-colors duration-300",
+  },
 } as const;
 
-export const icon = (
-  { size = "md", color = "grey", className = "" }: IconVariants,
-) => {
-  return `
-    ${iconStyles.base}
-    ${iconStyles.sizes[size]}
-    ${iconStyles.colors[color]}
-    ${className}
-  `;
-};
-
-// Slider handle icon
+/* ===== CUSTOM ICONS ===== */
+/* ===== SLIDER HANDLE ICON ===== */
 export const handleIcon = `
   absolute w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none 
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
@@ -62,7 +64,7 @@ export const handleIcon = `
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
 `;
 
-// Checkbox icon
+/* ===== CHECKBOX ICON ===== */
 export const checkboxIcon = (
   checked: boolean,
   canHoverSelected: boolean,

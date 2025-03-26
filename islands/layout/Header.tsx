@@ -2,7 +2,6 @@ import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
 import { HamburgerMenuIcon } from "$islands/layout/HeaderComponents.tsx";
 import { logoPurpleLDLink } from "$text";
-import { GearIcon } from "$icons";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
@@ -326,32 +325,6 @@ export function Header() {
           </div>
 
           <div className="flex w-full sticky bottom-0 justify-between">
-            <div className="flex justify-start">
-              <GearIcon
-                className="w-8 h-8 fill-stamp-grey hover:fill-stamp-grey-light"
-                style={{
-                  transition: "all 100ms ease-in-out",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={(e) => {
-                  const target = e.currentTarget as HTMLElement;
-                  target.style.transform = "rotate(-5deg)";
-                }}
-                onMouseLeave={(e) => {
-                  const target = e.currentTarget as HTMLElement;
-                  target.style.transform = "rotate(0deg)";
-                }}
-                onClick={(e) => {
-                  const target = e.currentTarget as HTMLElement;
-                  target.style.transition = "all 300ms ease-in-out";
-                  target.style.transform = "rotate(360deg)";
-                  setTimeout(() => {
-                    target.style.transition = "all 100ms ease-in-out";
-                    target.style.transform = "rotate(0deg)";
-                  }, 300);
-                }}
-              />
-            </div>
             <div className="flex justify-end">
               <ConnectWallet />
             </div>
