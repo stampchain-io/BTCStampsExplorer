@@ -42,9 +42,9 @@ export const iconStyles = {
     gradient: "",
   },
   type: {
-    icon: "",
-    iconLink: "hover:fill-purple-500 transition-colors duration-300",
-    iconButton: "hover:fill-purple-500 transition-colors duration-300",
+    icon: "hover:!fill-none",
+    iconLink: "hover:fill-red-500 transition-colors duration-300",
+    iconButton: "hover:fill-green-500 transition-colors duration-300",
   },
 } as const;
 

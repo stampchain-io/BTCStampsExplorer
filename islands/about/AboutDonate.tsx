@@ -368,9 +368,9 @@ export default function AboutDonate() {
               >
                 <Icon
                   type="icon"
-                  name="handCoins"
+                  name="handcoins"
                   weight="bold"
-                  size="xl"
+                  size="lg"
                   color="purple"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);

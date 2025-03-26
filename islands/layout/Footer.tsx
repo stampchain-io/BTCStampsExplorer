@@ -48,7 +48,6 @@ const mobileLinks: FooterLink[] = [
 /* ===== SOCIAL MEDIA CONFIGURATION ===== */
 const socialLinks = [
   {
-    href: "https://x.com/Stampchain",
     icon: (
       <Icon
         type="iconLink"
@@ -56,49 +55,46 @@ const socialLinks = [
         weight="light"
         size="xl"
         color="purple"
-        href="https://twitter.com"
+        href="https://x.com/Stampchain"
         target="_blank"
       />
     ),
   },
   {
-    href: "https://t.me/BitcoinStamps",
     icon: (
       <Icon
         type="iconLink"
-        name="twitter"
+        name="telegram"
         weight="light"
         size="xl"
         color="purple"
-        href="https://twitter.com"
+        href="https://t.me/BitcoinStamps"
         target="_blank"
       />
     ),
   },
   {
-    href: "https://discord.gg/BRYRt4bH",
     icon: (
       <Icon
-        type="icon"
-        name="twitter"
+        type="iconLink"
+        name="discord"
         weight="light"
         size="xl"
         color="purple"
-        href="https://twitter.com"
+        href="https://discord.gg/BRYRt4bH"
         target="_blank"
       />
     ),
   },
   {
-    href: "https://github.com/stampchain-io/",
     icon: (
       <Icon
-        type="icon"
-        name="twitter"
+        type="iconLink"
+        name="github"
         weight="light"
         size="xl"
         color="purple"
-        href="https://twitter.com"
+        href="https://github.com/stampchain-io/"
         target="_blank"
       />
     ),
