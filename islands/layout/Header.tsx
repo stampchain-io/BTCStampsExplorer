@@ -7,6 +7,7 @@ import {
   navLinkGreyLD,
   navLinkPurpleThick,
 } from "$text";
+import { CollapsibleSection } from "$components/shared/Collapsible.tsx";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
@@ -17,6 +18,16 @@ interface NavLink {
   href?: string;
   subLinks?: NavLink[];
 }
+
+/* ===== TOOLS CONFIGURATION ===== */
+const toolLinks = [
+  { title: "STAMPING", href: "/stamping/stamp" },
+  { title: "TRANSFER STAMP", href: "/stamping/stamp/transfer" },
+  { title: "DEPLOY TOKEN", href: "/stamping/src20/deploy" },
+  { title: "MINT TOKEN", href: "/stamping/src20/mint" },
+  { title: "TRANSFER TOKEN", href: "/stamping/src20/transfer" },
+  { title: "REGISTER BITNAME", href: "/stamping/src101/mint" },
+];
 
 /* ===== DESKTOP NAVIGATION CONFIGURATION ===== */
 const desktopNavLinks: NavLink[] = [
@@ -77,24 +88,13 @@ const mobileNavLinks: NavLink[] = [
     title: "TRENDING TOKENS",
     href: "/src20?type=trending",
   },
-  {
-    title: "TOOLS",
-    href: "#",
-    subLinks: [
-      { title: "STAMPING", href: "/stamping/stamp" },
-      { title: "TRANSFER STAMP", href: "/stamping/stamp/transfer" },
-      { title: "DEPLOY TOKEN", href: "/stamping/src20/deploy" },
-      { title: "MINT TOKEN", href: "/stamping/src20/mint" },
-      { title: "TRANSFER TOKEN", href: "/stamping/src20/transfer" },
-      { title: "REGISTER BITNAME", href: "/stamping/src101/mint" },
-    ],
-  },
 ];
 
 /* ===== MAIN HEADER COMPONENT ===== */
 export function Header() {
   const [open, setOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState<string | null>(null);
+  const [toolsOpen, setToolsOpen] = useState(false);
 
   /* ===== PATH TRACKING EFFECT ===== */
   useEffect(() => {
@@ -185,6 +185,12 @@ export function Header() {
   const closeMenu = () => {
     setTimeout(() => {
       setOpen(false);
+      // Close tools section after drawer is closed
+      setTimeout(() => {
+        if (toolsOpen) {
+          setToolsOpen(false);
+        }
+      }, 500); // Wait for drawer close animation to finish
     }, 500);
   };
 
@@ -194,6 +200,24 @@ export function Header() {
       closeMenu();
     } else {
       setOpen(true);
+      if (toolsOpen) {
+        setToolsOpen(false);
+      }
+    }
+  };
+
+  /* ===== TOOLS TOGGLE FUNCTION ===== */
+  const toggleTools = () => {
+    if (toolsOpen) {
+      // When closing, delay by 100ms
+      setTimeout(() => {
+        setToolsOpen(false);
+      }, 150);
+    } else {
+      // When opening, delay by 100ms
+      setTimeout(() => {
+        setToolsOpen(true);
+      }, 150);
     }
   };
 
@@ -249,40 +273,30 @@ export function Header() {
               </span>
             </a>
 
-            {/* Dropdown menu - only rendered if subLinks exist */}
+            {/* Dropdown menu - only rendered on desktop */}
             {link.subLinks && (
-              <div
-                // Different dropdown styles for mobile/desktop
-                className={`${
-                  isMobile
-                    ? "hidden group-hover:flex flex-col z-10 w-full pt-3 gap-2 group"
-                    : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
-                }`}
-              >
-                {/* Map through dropdown items */}
-                {link.subLinks?.map((subLink) => (
-                  <a
-                    key={subLink.href}
-                    href={subLink.href}
-                    onClick={() => {
-                      toggleMenu(); // Close mobile menu
-                      setCurrentPath(subLink?.href ? subLink?.href : null); // Update current path
-                    }}
-                    // Complex conditional styling for active/inactive states
-                    className={`font-bold transition-colors duration-300 ${
-                      isMobile
-                        ? currentPath === subLink.href
-                          ? "text-base text-stamp-grey-light hover:text-stamp-grey py-1"
-                          : "text-base text-stamp-grey hover:text-stamp-grey-light py-1"
-                        : currentPath === subLink.href
-                        ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-                        : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-                    }`}
-                  >
-                    {subLink.title}
-                  </a>
-                ))}
-              </div>
+              isMobile
+                ? null
+                : (
+                  <div className="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
+                    {link.subLinks?.map((subLink) => (
+                      <a
+                        key={subLink.href}
+                        href={subLink.href}
+                        onClick={() => {
+                          setCurrentPath(subLink?.href ? subLink?.href : null);
+                        }}
+                        className={`font-bold transition-colors duration-300 ${
+                          currentPath === subLink.href
+                            ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
+                            : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
+                        }`}
+                      >
+                        {subLink.title}
+                      </a>
+                    ))}
+                  </div>
+                )
             )}
           </div>
         ))}
@@ -321,7 +335,7 @@ export function Header() {
         className={`flex tablet:hidden flex-col justify-between
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[380px] h-screen z-30
            bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 backdrop-blur-md
-           p-9 pt-[88px] shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
+           pt-[88px] shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
            transition-transform duration-500 ease-in-out will-change-transform
            overflow-y-auto overflow-x-hidden scrollbar-black
          ${open ? "translate-x-0" : "translate-x-full"}`}
@@ -329,41 +343,113 @@ export function Header() {
       >
         {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
         <div className="flex flex-col h-full justify-between">
-          <div className="flex flex-col items-start gap-4">
+          <div className="flex flex-col items-start p-9 gap-4">
             {renderNavLinks(true)}
           </div>
 
-          <div className="flex w-full sticky bottom-0 justify-between">
-            <div className="flex justify-start">
-              <Icon
-                type="iconLink"
-                name="gear"
-                weight="normal"
-                size="lg"
-                color="grey"
-                onMouseEnter={(e) => {
-                  const target = e.currentTarget as HTMLElement;
-                  target.style.transform = "rotate(-10deg)";
-                  target.style.transition = "all 500ms ease-in-out";
+          <div className="flex flex-col w-full sticky bottom-0 backdrop-blur-md">
+            {/* Tools section with gear icon */}
+            <div className="flex w-full justify-between pt-6 pb-6 pl-9 pr-7">
+              <div className="flex justify-start items-end">
+                <Icon
+                  type="iconLink"
+                  name="gear"
+                  weight="normal"
+                  size="lg"
+                  color="grey"
+                  className="-ml-1 fill-stamp-grey-darker"
+                  onClick={(e) => {
+                    const target = e.currentTarget as HTMLElement;
+                    target.style.transition = "all 500ms ease-in-out";
+                    // We need to use !toolsOpen here because the state hasn't updated yet
+                    target.style.transform = !toolsOpen
+                      ? "rotate(180deg)"
+                      : "rotate(0deg)";
+                    toggleTools();
+                  }}
+                />
+              </div>
+              <div
+                className={`flex justify-end items-center transition-opacity duration-100
+                  ${toolsOpen ? "opacity-0" : "opacity-100"}`}
+                style={{
+                  transitionDelay: toolsOpen ? "0ms" : "450ms",
                 }}
-                onMouseLeave={(e) => {
-                  const target = e.currentTarget as HTMLElement;
-                  target.style.transform = "rotate(0deg)";
-                  target.style.transition = "all 500ms ease-in-out";
-                }}
-                onClick={(e) => {
-                  const target = e.currentTarget as HTMLElement;
-                  target.style.transition = "all 1000ms ease-in-out";
-                  target.style.transform = "rotate(360deg)";
-                }}
-              />
+              >
+                <ConnectWallet />
+              </div>
             </div>
-            <div className="flex justify-end">
-              <ConnectWallet />
-            </div>
+
+            {/* Collapsible tools section */}
+            <CollapsibleSection
+              title="Tools"
+              section="tools"
+              expanded={toolsOpen}
+              toggle={toggleTools}
+              variant="collapsibleTools"
+            >
+              <div className="flex flex-col gap-3">
+                {toolLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => {
+                      toggleMenu();
+                      setCurrentPath(link.href);
+                    }}
+                    className={`font-bold transition-colors duration-300 ${
+                      currentPath === link.href
+                        ? "text-base text-stamp-grey-light hover:text-stamp-grey py-1"
+                        : "text-base text-stamp-grey hover:text-stamp-grey-light py-1"
+                    }`}
+                  >
+                    {link.title}
+                  </a>
+                ))}
+              </div>
+            </CollapsibleSection>
           </div>
         </div>
       </div>
     </header>
   );
+}
+
+/* ===== DROPDOWN SUBLINKS FOR MOBILE AND DESKTOP ===== */
+/*
+<div
+// Different dropdown styles for mobile/desktop
+className={`${
+  isMobile
+    ? "hidden group-hover:flex flex-col z-10 w-full pt-3 gap-2 group"
+    : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
+}`}
+> */
+{
+  /*
+Map through dropdown items
+{link.subLinks?.map((subLink) => (
+  <a
+    key={subLink.href}
+    href={subLink.href}
+    onClick={() => {
+      toggleMenu(); // Close mobile menu
+      setCurrentPath(subLink?.href ? subLink?.href : null); // Update current path
+    }}
+    // Complex conditional styling for active/inactive states
+    className={`font-bold transition-colors duration-300 ${
+      isMobile
+        ? currentPath === subLink.href
+          ? "text-base text-stamp-grey-light hover:text-stamp-grey py-1"
+          : "text-base text-stamp-grey hover:text-stamp-grey-light py-1"
+        : currentPath === subLink.href
+        ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
+        : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
+    }`}
+  >
+    {subLink.title}
+  </a>
+))}
+</div>
+  */
 }

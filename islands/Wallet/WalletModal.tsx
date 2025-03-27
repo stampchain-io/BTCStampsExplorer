@@ -108,7 +108,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
               CONNECT
             </Button>
           </div>
-          <div className="block tablet:hidden -m-9 p-9">
+          <div className="block tablet:hidden">
             <Button
               variant="outline"
               color="grey"

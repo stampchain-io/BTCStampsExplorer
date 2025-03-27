@@ -49,17 +49,17 @@ export const iconStyles = {
 
   /* ===== ICON LINK STYLES ===== */
   iconLink: {
-    grey: "fill-stamp-grey hover:fill-stamp-grey-light",
-    purple: "fill-stamp-purple hover:fill-stamp-purple-bright",
+    grey: "fill-stamp-grey hover:fill-stamp-grey-light cursor-pointer",
+    purple: "fill-stamp-purple hover:fill-stamp-purple-bright cursor-pointer",
     gradient: "",
   },
 
   /* ===== ICON BUTTON STYLES ===== */
   iconButton: {
     grey:
-      "fill-stamp-grey hover:fill-stamp-grey-light bg-[#333333]/40 hover:bg-[#333333]/20 tablet:bg-transparent tablet:hover:bg-transparent rounded-md p-1.5",
+      "fill-stamp-grey hover:fill-stamp-grey-light bg-[#333333]/40 hover:bg-[#333333]/20 tablet:bg-transparent tablet:hover:bg-transparent rounded-md p-1.5 cursor-pointer",
     purple:
-      "fill-stamp-purple hover:fill-stamp-purple-bright bg-[#333333]/40 hover:bg-[#333333]/20 tablet:bg-transparent tablet:hover:bg-transparent rounded-md p-1.5",
+      "fill-stamp-purple hover:fill-stamp-purple-bright bg-[#333333]/40 hover:bg-[#333333]/20 tablet:bg-transparent tablet:hover:bg-transparent rounded-md p-1.5 cursor-pointer",
     gradient: "",
   },
 } as const;
