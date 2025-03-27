@@ -7,7 +7,43 @@ const LoadingSpinner = () => (
   <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-[var(--hover-color)]" />
 );
 
-/* ===== BASE BUTTON COMPONENT ===== */
+/* ===== HELPER FUNCTIONS ===== */
+const getButtonClass = (
+  variant: string,
+  color: string,
+  size: string,
+  states: { disabled?: boolean; loading?: boolean; active?: boolean },
+) => button(variant, color, size, states);
+
+const getCommonButtonProps = ({
+  type = "button",
+  disabled,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  onFocus,
+  onBlur,
+  role,
+  ariaLabel,
+  dataType,
+  className,
+  ...props
+}: any) => ({
+  type,
+  disabled,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  onFocus,
+  onBlur,
+  role,
+  "aria-label": ariaLabel,
+  "data-type": dataType,
+  class: className,
+  ...props,
+});
+
+/* ===== BUTTON COMPONENTS ===== */
 export function Button({
   variant,
   color,
@@ -17,38 +53,83 @@ export function Button({
   href,
   "f-partial": fPartial,
   class: className,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  onFocus,
+  onBlur,
+  role,
+  ariaLabel,
+  "data-type": dataType,
   children,
   ...props
 }: ButtonProps & { isActive?: boolean }) {
-  const buttonClass = button(variant, color, size, {
+  const buttonClass = getButtonClass(variant, color, size, {
     disabled: disabled ?? undefined,
     active: isActive ?? undefined,
   });
 
   const combinedClass = `${buttonClass} ${className ?? ""}`;
 
-  if (href) {
-    return (
-      <a
-        href={href}
-        f-partial={fPartial || href}
-        class={combinedClass}
-        {...props}
-      >
+  // Special handling for outlineGradient variant
+  if (variant === "outlineGradient") {
+    const innerButtonProps = getCommonButtonProps({
+      disabled: !IS_BROWSER || disabled,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+      onFocus,
+      onBlur,
+      role,
+      ariaLabel,
+      dataType,
+      ...props,
+    });
+
+    const innerContent = (
+      <button {...innerButtonProps}>
         {children}
-      </a>
+      </button>
     );
+
+    return href
+      ? (
+        <a href={href} f-partial={fPartial || href} class={combinedClass}>
+          {innerContent}
+        </a>
+      )
+      : (
+        <div class={combinedClass}>
+          {innerContent}
+        </div>
+      );
   }
 
-  return (
-    <button
-      type="button"
-      disabled={!IS_BROWSER || disabled}
-      class={combinedClass}
-    >
-      {children}
-    </button>
-  );
+  const commonProps = getCommonButtonProps({
+    disabled: !IS_BROWSER || disabled,
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+    onFocus,
+    onBlur,
+    role,
+    ariaLabel,
+    dataType,
+    className: combinedClass,
+    ...props,
+  });
+
+  return href
+    ? (
+      <a href={href} f-partial={fPartial || href} {...commonProps}>
+        {children}
+      </a>
+    )
+    : (
+      <button {...commonProps}>
+        {children}
+      </button>
+    );
 }
 
 /* ===== ICON BUTTON COMPONENT ===== */
@@ -62,33 +143,48 @@ export function ButtonIcon({
   href,
   "f-partial": fPartial,
   class: className,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  onFocus,
+  onBlur,
+  role,
+  ariaLabel,
+  "data-type": dataType,
   children,
   ...props
 }: ButtonProps & { isLoading?: boolean; isActive?: boolean }) {
-  const buttonClass = button(variant, color, size, {
+  const buttonClass = getButtonClass(variant, color, size, {
     disabled: disabled ?? undefined,
     loading: isLoading ?? undefined,
     active: isActive ?? undefined,
   });
 
+  const commonProps = getCommonButtonProps({
+    disabled: !IS_BROWSER || disabled || isLoading,
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+    onFocus,
+    onBlur,
+    role,
+    ariaLabel,
+    dataType,
+    className: `${buttonClass} p-0 aspect-square`,
+    ...props,
+  });
+
+  const content = isLoading ? <LoadingSpinner /> : children;
+
   return href
     ? (
-      <a
-        href={href}
-        f-partial={fPartial || href}
-        class={`${buttonClass} p-0 aspect-square`}
-        {...props}
-      >
-        {isLoading ? <LoadingSpinner /> : children}
+      <a href={href} f-partial={fPartial || href} {...commonProps}>
+        {content}
       </a>
     )
     : (
-      <button
-        {...props}
-        disabled={!IS_BROWSER || disabled || isLoading}
-        class={`${buttonClass} p-0 aspect-square`}
-      >
-        {isLoading ? <LoadingSpinner /> : children}
+      <button {...commonProps}>
+        {content}
       </button>
     );
 }
@@ -104,33 +200,48 @@ export function ButtonProcessing({
   href,
   "f-partial": fPartial,
   class: className,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  onFocus,
+  onBlur,
+  role,
+  ariaLabel,
+  "data-type": dataType,
   children,
   ...props
 }: ButtonProps & { isSubmitting: boolean; isActive?: boolean }) {
-  const buttonClass = button(variant, color, size, {
+  const buttonClass = getButtonClass(variant, color, size, {
     disabled: disabled ?? undefined,
     loading: isSubmitting ?? undefined,
     active: isActive ?? undefined,
   });
 
+  const commonProps = getCommonButtonProps({
+    disabled: !IS_BROWSER || disabled || isSubmitting,
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+    onFocus,
+    onBlur,
+    role,
+    ariaLabel,
+    dataType,
+    className: buttonClass,
+    ...props,
+  });
+
+  const content = isSubmitting ? <LoadingSpinner /> : children;
+
   return href
     ? (
-      <a
-        href={href}
-        f-partial={fPartial || href}
-        class={buttonClass}
-        {...props}
-      >
-        {isSubmitting ? <LoadingSpinner /> : children}
+      <a href={href} f-partial={fPartial || href} {...commonProps}>
+        {content}
       </a>
     )
     : (
-      <button
-        {...props}
-        disabled={!IS_BROWSER || disabled || isSubmitting}
-        class={buttonClass}
-      >
-        {isSubmitting ? <LoadingSpinner /> : children}
+      <button {...commonProps}>
+        {content}
       </button>
     );
 }

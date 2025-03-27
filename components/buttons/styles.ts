@@ -4,9 +4,18 @@ import { JSX } from "preact";
 /* ===== TYPE DEFINITIONS ===== */
 export interface ButtonVariants {
   base: string;
-  variant: Record<"outline" | "flat" | "flatOutline" | "outlineFlat", string>;
-  color: Record<"grey" | "purple" | "test", string>;
-  size: Record<"xs" | "sm" | "md" | "lg" | "xl", string>;
+  variant: Record<
+    "outline" | "flat" | "flatOutline" | "outlineFlat" | "outlineGradient",
+    string
+  >;
+  color: Record<
+    "grey" | "purple" | "purpleGradient" | "greyGradient" | "test",
+    string
+  >;
+  size: Record<
+    "xs" | "sm" | "md" | "lg" | "xl",
+    string
+  >;
   state: {
     disabled: string;
     loading: string;
@@ -23,6 +32,14 @@ interface BaseButtonProps {
   class?: string;
   children?: JSX.Element | string;
   disabled?: boolean;
+  role?: JSX.AriaRole;
+  ariaLabel?: string;
+  onClick?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
+  onMouseEnter?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
+  onMouseLeave?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
+  onFocus?: JSX.FocusEventHandler<HTMLButtonElement | HTMLAnchorElement>;
+  onBlur?: JSX.FocusEventHandler<HTMLButtonElement | HTMLAnchorElement>;
+  "data-type"?: string;
 }
 
 export interface ButtonElementProps extends BaseButtonProps {
@@ -71,6 +88,19 @@ export const buttonStyles: ButtonVariants = {
       border-[var(--default-color)] hover:border-[var(--hover-color)]
       text-[var(--default-color)] hover:text-black
     `,
+    outlineGradient: `
+      relative !bg-[#2b1132] !p-[2px] rounded-md !border-0
+      before:absolute before:inset-0 before:rounded-md before:z-[1]
+      before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
+      before:[--angle:0deg] before:animate-rotate
+      hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
+      before:transition-colors before:duration-300
+      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#2b1132] [&>*]:!border-0
+      [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
+      [&>*]:font-bold [&>*]:tracking-wider 
+      [&>*]:text-[var(--default-color)] hover:[&>*]:text-[var(--hover-color)]
+      [&>*]:transition-colors [&>*]:duration-100
+    `,
   },
 
   /* ===== COLOR STYLES ===== */
@@ -83,10 +113,24 @@ export const buttonStyles: ButtonVariants = {
       [--default-color:#8800CC]
       [--hover-color:#AA00FF]
     `,
-    test: `
-      [--default-color:#00CC00]
-      [--hover-color:#CC0000]
+    purpleGradient: `
+      [--color-dark:#660099]
+      [--color-medium:#8800CC]
+      [--color-light:#AA00FF]
+      [--default-color:var(--color-medium)]
+      [--hover-color:var(--color-light)]
     `,
+    greyGradient: `
+    [--color-dark:#666666]
+    [--color-medium:#999999]
+    [--color-light:#CCCCCC]
+    [--default-color:var(--color-medium)]
+    [--hover-color:var(--color-light)]
+  `,
+    test: `
+    [--default-color:#00CC00]
+    [--hover-color:#CC0000]
+  `,
   },
 
   /* ===== SIZE STYLES ===== */
