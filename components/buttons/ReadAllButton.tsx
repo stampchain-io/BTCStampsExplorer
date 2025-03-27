@@ -1,9 +1,12 @@
+/* ===== READ ALL BUTTON COMPONENT ===== */
 import { Button } from "$buttons";
 
+/* ===== COMPONENT PROPS ===== */
 interface ReadAllButtonProps {
   href?: string;
 }
 
+/* ===== COMPONENT DEFINITION ===== */
 export function ReadAllButton({ href = "/howto" }: ReadAllButtonProps) {
   return (
     <div className="flex justify-end tablet:justify-start mt-0.5 tablet:mt-1">

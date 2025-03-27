@@ -1,6 +1,7 @@
+/* ===== BUTTON STYLES MODULE ===== */
 import { JSX } from "preact";
 
-// TypeScript interfaces
+/* ===== TYPE DEFINITIONS ===== */
 export interface ButtonVariants {
   base: string;
   variant: Record<"outline" | "flat" | "flatOutline" | "outlineFlat", string>;
@@ -14,7 +15,7 @@ export interface ButtonVariants {
   spinner: string;
 }
 
-// Base shared props for both button and anchor
+/* ===== BUTTON PROPS INTERFACES ===== */
 interface BaseButtonProps {
   variant: keyof typeof buttonStyles.variant;
   color: keyof typeof buttonStyles.color;
@@ -24,25 +25,23 @@ interface BaseButtonProps {
   disabled?: boolean;
 }
 
-// Button specific props
 export interface ButtonElementProps extends BaseButtonProps {
   href?: undefined;
   "f-partial"?: undefined;
   target?: undefined;
 }
 
-// Anchor specific props
 export interface AnchorElementProps extends BaseButtonProps {
   href: string;
   "f-partial"?: string;
   target?: "_blank" | "_self" | "_parent" | "_top";
 }
 
-// Union type for all possible props
 export type ButtonProps = ButtonElementProps | AnchorElementProps;
 
-// Button Styles
+/* ===== BUTTON STYLE DEFINITIONS ===== */
 export const buttonStyles: ButtonVariants = {
+  /* ===== BASE STYLES ===== */
   base: `
     inline-flex items-center justify-center
     rounded-md border-2 
@@ -50,6 +49,7 @@ export const buttonStyles: ButtonVariants = {
     transition-colors duration-300
   `,
 
+  /* ===== VARIANT STYLES ===== */
   variant: {
     outline: `
       bg-transparent
@@ -73,6 +73,7 @@ export const buttonStyles: ButtonVariants = {
     `,
   },
 
+  /* ===== COLOR STYLES ===== */
   color: {
     grey: `
       [--default-color:#999999]
@@ -88,6 +89,7 @@ export const buttonStyles: ButtonVariants = {
     `,
   },
 
+  /* ===== SIZE STYLES ===== */
   size: {
     xs: "h-7 px-4 tablet:px-3 text-xs tablet:text-[10px] font-semibold",
     sm: "h-8 px-5 tablet:px-4 text-xs tablet:text-xs",
@@ -96,6 +98,7 @@ export const buttonStyles: ButtonVariants = {
     xl: "h-11 px-6 tablet:px-5 text-base",
   },
 
+  /* ===== STATE STYLES ===== */
   state: {
     disabled: `
       opacity-50
@@ -113,6 +116,7 @@ export const buttonStyles: ButtonVariants = {
     `,
   },
 
+  /* ===== SPINNER STYLES ===== */
   spinner: `
     animate-spin 
     rounded-full 
@@ -122,9 +126,7 @@ export const buttonStyles: ButtonVariants = {
   `,
 };
 
-/**
- * Combines button styles based on variant, color, size and state
- */
+/* ===== STYLE COMPOSITION FUNCTION ===== */
 export const button = (
   variant: keyof typeof buttonStyles.variant,
   color: keyof typeof buttonStyles.color,

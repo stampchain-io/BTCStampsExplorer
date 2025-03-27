@@ -1,14 +1,13 @@
+/* ===== BUTTON COMPONENTS MODULE ===== */
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { button, ButtonProps } from "./styles.ts";
 
-// Loading Spinner Component
+/* ===== LOADING SPINNER COMPONENT ===== */
 const LoadingSpinner = () => (
   <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-[var(--hover-color)]" />
 );
 
-/**
- * Base Button Component
- */
+/* ===== BASE BUTTON COMPONENT ===== */
 export function Button({
   variant,
   color,
@@ -52,9 +51,7 @@ export function Button({
   );
 }
 
-/**
- * Icon Button Component
- */
+/* ===== ICON BUTTON COMPONENT ===== */
 export function ButtonIcon({
   variant,
   color,
@@ -96,9 +93,7 @@ export function ButtonIcon({
     );
 }
 
-/**
- * Processing Button Component
- */
+/* ===== PROCESSING BUTTON COMPONENT ===== */
 export function ButtonProcessing({
   variant,
   color,
@@ -140,25 +135,21 @@ export function ButtonProcessing({
     );
 }
 
+/* ===== BUTTON COMPONENT DOCUMENTATION - UPDATE NEEDED !!! ===== */
 /**
  * Button Components
  *
  * @example Normal Button
- * ```tsx
  * <Button variant="outline" color="grey" size="lg">
  *   CLICK ME
  * </Button>
- * ```
  *
- * @example Icon Button
- * ```tsx
+ * @example Icon Button - NEEDS ICON COMPONENT - to be updated
  * <ButtonIcon variant="outline" color="purple" size="md">
  *   <svg>...</svg>
  * </ButtonIcon>
- * ```
  *
  * @example Icon Button with Loading Spinner
- * ```tsx
  * import { useButtonActions } from "$islands/shared/actions/buttonActions.tsx";
  *
  * export default function MyComponent() {
@@ -177,10 +168,8 @@ export function ButtonProcessing({
  *     </ButtonIcon>
  *   );
  * }
- * ```
  *
  * @example Processing Button
- * ```tsx
  * <ButtonProcessing
  *   variant="outline"
  *   color="grey"
@@ -189,10 +178,8 @@ export function ButtonProcessing({
  * >
  *   SUBMIT
  * </ButtonProcessing>
- * ```
  *
  * @example Processing Button with Active State and Spinner
- * ```tsx
  * import { useButtonActions } from "$islands/shared/actions/buttonActions.tsx";
  *
  * export default function MyComponent() {
@@ -219,5 +206,4 @@ export function ButtonProcessing({
  *     </ButtonProcessing>
  *   );
  * }
- * ```
  */
