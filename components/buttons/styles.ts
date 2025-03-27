@@ -121,15 +121,15 @@ export const buttonStyles: ButtonVariants = {
       [--hover-color:var(--color-light)]
     `,
     greyGradient: `
-    [--color-dark:#666666]
-    [--color-medium:#999999]
-    [--color-light:#CCCCCC]
-    [--default-color:var(--color-medium)]
-    [--hover-color:var(--color-light)]
+      [--color-dark:#666666]
+      [--color-medium:#999999]
+      [--color-light:#CCCCCC]
+      [--default-color:var(--color-medium)]
+      [--hover-color:var(--color-light)]
   `,
     test: `
-    [--default-color:#00CC00]
-    [--hover-color:#CC0000]
+      [--default-color:#00CC00]
+      [--hover-color:#CC0000]
   `,
   },
 

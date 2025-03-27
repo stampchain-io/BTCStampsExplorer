@@ -10,35 +10,8 @@ import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectorsModal } from "$islands/Wallet/ConnectorsModal.tsx";
 import { _getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import AnimationLayout from "$components/shared/animation/AnimationLayout.tsx";
-
-/* ===== BUTTON STYLING CONSTANTS ===== */
-const buttonOutlineRoundedPurple = `
-  inline-flex items-center justify-center
-  h-110 tablet:h-10 px-5 tablet:px-[18px] rounded-md
-  bg-transparent border-2 rounded-md border-stamp-purple hover:border-stamp-purple-bright 
-  font-bold text-base tablet:text-sm text-stamp-purple hover:text-stamp-purple-bright tracking-wider 
-  transition-colors duration-300 cursor-pointer select-none
-`;
-
-const buttonOutlineRoundedPurpleGradient = `
-  inline-flex items-center justify-center
-  h-10 tablet:h-9 px-5 tablet:px-[18px] rounded-md
-  bg-transparent hover:border-stamp-purple-bright 
-  font-bold text-base tablet:text-sm text-stamp-purple hover:text-stamp-purple-bright tracking-wider 
-  transition-colors duration-300 cursor-pointer select-none 
-`;
-
-const animatedBorderPurple = `
-  relative !bg-[#2b1132] p-[2px] rounded-md
-  before:absolute before:inset-0 before:rounded-md before:z-[1]
-  before:bg-[conic-gradient(from_var(--angle),#660099,#8800CC,#AA00FF,#8800CC,#660099)]
-  before:[--angle:0deg] before:animate-rotate
-  hover:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
-  focus-within:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
-  before:transition-colors before:duration-300
-  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#2b1132]
-`;
-
+import { Button } from "$components/buttons/Button.tsx";
+import { navLinkPurple } from "$text";
 /* ===== WALLET MODAL COMPONENT INTERFACE ===== */
 interface Props {
   connectors?: ComponentChildren[];
@@ -124,25 +97,28 @@ export const WalletModal = ({ connectors = [] }: Props) => {
       {/* ===== CONNECT WALLET BUTTON ===== */}
       {!(isConnected && address) && (
         <div className="relative">
-          <div className={`hidden tablet:block ${animatedBorderPurple}`}>
-            <button
-              type="button"
-              ref={buttonRef}
+          <div className={`hidden tablet:block`}>
+            <Button
+              variant="outlineGradient"
+              color="purpleGradient"
+              size="lg"
               onClick={toggleModal}
-              className={buttonOutlineRoundedPurpleGradient}
+              ref={buttonRef}
             >
               CONNECT
-            </button>
+            </Button>
           </div>
           <div className="block tablet:hidden -m-9 p-9">
-            <button
-              type="button"
-              ref={buttonRef}
+            <Button
+              variant="outline"
+              color="grey"
+              size="lg"
               onClick={toggleModal}
-              className="font-extrabold text-base gray-gradient1-hover text-right tracking-wide transition-colors duration-300"
+              ref={buttonRef}
+              class="!border-0 !p-0 !h-6 font-medium text-lg gray-gradient1-hover tracking-wide transition-colors duration-300"
             >
               CONNECT WALLET
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -151,30 +127,36 @@ export const WalletModal = ({ connectors = [] }: Props) => {
       {isConnected && address && (
         <>
           {/* ===== MOBILE/TABLET MENU ===== */}
-          <div class="tablet:hidden flex flex-col gap-2 text-right">
+          <div class="tablet:hidden flex flex-col gap-1 text-right">
             <p class="font-bold text-sm text-stamp-grey-darker tracking-tighter cursor-default select-none py-0.5 mb-0">
               {abbreviateAddress(address, 6)}
             </p>
 
-            <button
+            <Button
+              variant="outline"
+              color="grey"
+              size="lg"
               onClick={() => {
                 if (isConnected && address) {
                   globalThis.location.href = `/wallet/${address}`;
                 }
               }}
-              class="font-medium text-base gray-gradient3-hover tracking-wide transition-colors duration-300"
+              ref={buttonRef}
+              class="!border-0 !p-0 !h-6 font-normal text-lg gray-gradient1-hover tracking-wide transition-colors duration-300"
             >
               DASHBOARD
-            </button>
+            </Button>
 
-            <button
-              type="button"
-              ref={buttonRef}
+            <Button
+              variant="outline"
+              color="grey"
+              size="lg"
               onClick={() => walletSignOut()}
-              class="font-medium text-base gray-gradient1-hover tracking-wide transition-colors duration-300"
+              ref={buttonRef}
+              class="!border-0 !p-0 !h-6 font-normal text-lg gray-gradient1-hover tracking-wide transition-colors duration-300"
             >
               DISCONNECT
-            </button>
+            </Button>
           </div>
 
           {/* ===== DESKTOP DROPDOWN MENU ===== */}
@@ -186,19 +168,19 @@ export const WalletModal = ({ connectors = [] }: Props) => {
             <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-20
                         pt-1 pb-3.5 space-y-1 whitespace-nowrap 
                         backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
-              <div class="flex flex-col px-[18px] gap-1 font-bold text-sm text-stamp-purple text-left tracking-wide transition-all duration-300 ease-in-out cursor-pointer">
-                <p class="font-regular text-xs text-stamp-grey-darker cursor-default select-none mb-0 py-1">
+              <div class="flex flex-col px-[18px] gap-1">
+                <h6 class="font-regular text-xs text-stamp-grey-darker cursor-default select-none py-1">
                   {abbreviateAddress(address, 6)}
-                </p>
+                </h6>
                 <a
                   href={`/wallet/${address}`}
-                  class="hover:text-stamp-purple-bright"
+                  class={`${navLinkPurple} text-stamp-purple`}
                 >
                   DASHBOARD
                 </a>
                 <a
                   onClick={() => walletSignOut()}
-                  class="hover:text-stamp-purple-bright"
+                  class={`${navLinkPurple} text-stamp-purple`}
                 >
                   DISCONNECT
                 </a>

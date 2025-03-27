@@ -8,7 +8,7 @@
 
 // Type definitions - only import TextStyles when doing type work
 // Example: const myStyle: keyof TextStyles = "titleGreyLD";
-export type TextStyles = {
+export type TextStyles = { // UPDATE ALL TEXT STYLES
   logo: string;
   titleGreyLD: string;
   titleGreyDL: string;
@@ -20,14 +20,14 @@ export type TextStyles = {
   textXs: string;
   textSm: string;
   text: string;
-  textLg: string; // UPDATE ALL TEXT STYLES
+  textLg: string;
   labelSm: string;
   label: string;
   labelLg: string;
 };
 
 // Text styles
-// Overlays - used for text overlay effectsof whole divs - text must be transparent or not declared with tailwind css
+// Overlays - used for text overlay effects of whole divs - text must be transparent or not declared with tailwind css
 export const overlayPurple =
   "bg-gradient-to-r from-[#AA00FF]/80 via-[#AA00FF]/60 to-[#AA00FF]/40 text-transparent bg-clip-text";
 
@@ -41,17 +41,16 @@ export const logoPurpleLD =
   "font-black italic text-4xl purple-gradient4 tracking-wide transition-colors duration-300";
 export const logoPurpleLDLink =
   "font-black italic text-4xl purple-gradient4-hover tracking-wide transition-colors duration-300"; // used in header
-export const tagline =
-  "font-regular text-sm text-stamp-purple-bright cursor-default select-none whitespace-nowrap"; // used in footer
+
 // Navigation
 export const navLinkPurple =
-  "font-medium tablet:font-bold text-sm hover:text-stamp-purple-bright transition-colors duration-300"; // transparent text - ued with the overlayPurple class
+  "font-medium tablet:font-bold text-sm hover:text-stamp-purple-bright transition-colors duration-300 cursor-pointer select-none whitespace-nowrap"; // transparent text - ued with the overlayPurple class -  used in footer
 export const navLinkPurpleThick =
-  "font-extrabold text-stamp-purple group-hover:text-stamp-purple-bright transition-colors duration-300";
-export const navLinkGreyThick =
-  "font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey transition-colors duration-300";
-export const copyright =
-  "font-normal text-xs mobileMd:text-sm tablet:text-xs cursor-default select-none whitespace-nowrap"; // transparent text - ued with the overlayPurple class
+  "font-extrabold text-stamp-purple group-hover:text-stamp-purple-bright tracking-wide transition-colors duration-300 cursor-pointer select-none whitespace-nowrap"; // used in header - desktop menu
+export const navLinkGrey =
+  "font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey tracking-wide transition-colors duration-300 cursor-pointer select-none whitespace-nowrap"; // used in header - mobile menu
+export const navLinkGreyLD =
+  "font-light text-2xl gray-gradient1-hover tracking-wide inline-block transition-colors duration-300 cursor-pointer select-none whitespace-nowrap"; // used in header - mobile menu
 
 // Titles
 export const titleGreyLD =
@@ -102,13 +101,18 @@ export const labelLg =
 // Overline - Category labels, tagline, above titles (update from filter styles)
 export const overline = // rename
   "font-light text-base text-stamp-grey-darker tracking-wide inline-block cursor-default select-none whitespace-nowrap";
-
-// Captions - used for stamp/token cards
+export const tagline =
+  "font-regular text-sm text-stamp-purple-bright cursor-default select-none whitespace-nowrap"; // used in footer
+export const copyright =
+  "font-normal text-xs mobileMd:text-sm tablet:text-xs cursor-default select-none whitespace-nowrap"; // transparent text - ued with the overlayPurple class - used in footer
 
 // Code
 // Add "font-courier-prime" to the class name to use the Courier font and make text monospace
 
+// Captions - used for stamp/token cards
+
 // Tooltips
+// Check tooltips styles.ts
 
 // Errors
 

@@ -1,6 +1,7 @@
 /* ===== BUTTON COMPONENTS MODULE ===== */
 import { IS_BROWSER } from "$fresh/runtime.ts";
-import { button, ButtonProps } from "./styles.ts";
+import { JSX } from "preact";
+import { button, ButtonProps, buttonStyles } from "./styles.ts";
 
 /* ===== LOADING SPINNER COMPONENT ===== */
 const LoadingSpinner = () => (
@@ -9,11 +10,20 @@ const LoadingSpinner = () => (
 
 /* ===== HELPER FUNCTIONS ===== */
 const getButtonClass = (
-  variant: string,
-  color: string,
-  size: string,
-  states: { disabled?: boolean; loading?: boolean; active?: boolean },
-) => button(variant, color, size, states);
+  variant: keyof typeof buttonStyles.variant,
+  color: keyof typeof buttonStyles.color,
+  size: keyof typeof buttonStyles.size,
+  states: {
+    disabled?: boolean | undefined;
+    loading?: boolean | undefined;
+    active?: boolean | undefined;
+  },
+) =>
+  button(variant, color, size, {
+    disabled: states.disabled,
+    loading: states.loading,
+    active: states.active,
+  });
 
 const getCommonButtonProps = ({
   type = "button",
@@ -27,6 +37,7 @@ const getCommonButtonProps = ({
   ariaLabel,
   dataType,
   className,
+  ref,
   ...props
 }: any) => ({
   type,
@@ -40,8 +51,17 @@ const getCommonButtonProps = ({
   "aria-label": ariaLabel,
   "data-type": dataType,
   class: className,
+  ref,
   ...props,
 });
+
+/* ===== EXTENDED BUTTON PROPS ===== */
+type ExtendedButtonProps = ButtonProps & {
+  isActive?: boolean;
+  ref?:
+    | JSX.HTMLAttributes<HTMLButtonElement>["ref"]
+    | JSX.HTMLAttributes<HTMLAnchorElement>["ref"];
+};
 
 /* ===== BUTTON COMPONENTS ===== */
 export function Button({
@@ -61,12 +81,13 @@ export function Button({
   role,
   ariaLabel,
   "data-type": dataType,
+  ref,
   children,
   ...props
-}: ButtonProps & { isActive?: boolean }) {
+}: ExtendedButtonProps) {
   const buttonClass = getButtonClass(variant, color, size, {
-    disabled: disabled ?? undefined,
-    active: isActive ?? undefined,
+    disabled: disabled || undefined,
+    active: isActive || undefined,
   });
 
   const combinedClass = `${buttonClass} ${className ?? ""}`;
@@ -83,6 +104,7 @@ export function Button({
       role,
       ariaLabel,
       dataType,
+      ref,
       ...props,
     });
 
@@ -116,6 +138,7 @@ export function Button({
     ariaLabel,
     dataType,
     className: combinedClass,
+    ref,
     ...props,
   });
 
@@ -131,6 +154,11 @@ export function Button({
       </button>
     );
 }
+
+/* ===== EXTENDED ICON BUTTON PROPS ===== */
+type ExtendedIconButtonProps = ExtendedButtonProps & {
+  isLoading?: boolean;
+};
 
 /* ===== ICON BUTTON COMPONENT ===== */
 export function ButtonIcon({
@@ -151,13 +179,14 @@ export function ButtonIcon({
   role,
   ariaLabel,
   "data-type": dataType,
+  ref,
   children,
   ...props
-}: ButtonProps & { isLoading?: boolean; isActive?: boolean }) {
+}: ExtendedIconButtonProps) {
   const buttonClass = getButtonClass(variant, color, size, {
-    disabled: disabled ?? undefined,
-    loading: isLoading ?? undefined,
-    active: isActive ?? undefined,
+    disabled: disabled || undefined,
+    loading: isLoading || undefined,
+    active: isActive || undefined,
   });
 
   const commonProps = getCommonButtonProps({
@@ -171,6 +200,7 @@ export function ButtonIcon({
     ariaLabel,
     dataType,
     className: `${buttonClass} p-0 aspect-square`,
+    ref,
     ...props,
   });
 
@@ -188,6 +218,11 @@ export function ButtonIcon({
       </button>
     );
 }
+
+/* ===== EXTENDED PROCESSING BUTTON PROPS ===== */
+type ExtendedProcessingButtonProps = ExtendedButtonProps & {
+  isSubmitting: boolean;
+};
 
 /* ===== PROCESSING BUTTON COMPONENT ===== */
 export function ButtonProcessing({
@@ -208,13 +243,14 @@ export function ButtonProcessing({
   role,
   ariaLabel,
   "data-type": dataType,
+  ref,
   children,
   ...props
-}: ButtonProps & { isSubmitting: boolean; isActive?: boolean }) {
+}: ExtendedProcessingButtonProps) {
   const buttonClass = getButtonClass(variant, color, size, {
-    disabled: disabled ?? undefined,
-    loading: isSubmitting ?? undefined,
-    active: isActive ?? undefined,
+    disabled: disabled || undefined,
+    loading: isSubmitting || undefined,
+    active: isActive || undefined,
   });
 
   const commonProps = getCommonButtonProps({
@@ -228,6 +264,7 @@ export function ButtonProcessing({
     ariaLabel,
     dataType,
     className: buttonClass,
+    ref,
     ...props,
   });
 

@@ -18,7 +18,7 @@ import {
 } from "$text";
 import { tooltipIcon } from "$notifications";
 import { Button } from "$buttons";
-import { Icon } from "$components/icons/Icon.tsx";
+import { Icon } from "$icons";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 /* ===== CONSTANTS ===== */
@@ -367,11 +367,11 @@ export default function AboutDonate() {
                 onMouseLeave={handleReceiveMouseLeave}
               >
                 <Icon
+                  type="iconButton"
                   name="handcoins"
                   weight="bold"
                   size="xl"
                   color="purple"
-                  type="iconButton"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);
                     setIsReceiveModalOpen(true);

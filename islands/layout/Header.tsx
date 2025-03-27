@@ -1,7 +1,12 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
 import { HamburgerMenuIcon } from "$icons";
-import { logoPurpleLDLink } from "$text";
+import {
+  logoPurpleLDLink,
+  navLinkGrey,
+  navLinkGreyLD,
+  navLinkPurpleThick,
+} from "$text";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
@@ -90,8 +95,6 @@ const mobileNavLinks: NavLink[] = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState<string | null>(null);
-  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
 
   /* ===== PATH TRACKING EFFECT ===== */
   useEffect(() => {
@@ -178,15 +181,10 @@ export function Header() {
     };
   }, [open]);
 
-  /* ===== WALLET MODAL TOGGLE ===== */
-  const toggleWalletModal = () => setIsWalletModalOpen(!isWalletModalOpen);
-
   /* ===== MENU CLOSE FUNCTION ===== */
   const closeMenu = () => {
-    setIsClosing(true);
     setTimeout(() => {
       setOpen(false);
-      setIsClosing(false);
     }, 500);
   };
 
@@ -201,66 +199,77 @@ export function Header() {
 
   /* ===== NAVIGATION LINKS RENDERER ===== */
   const renderNavLinks = (isMobile = false) => {
+    // Choose which navigation links to use based on mobile/desktop view
     const filteredNavLinks = isMobile ? mobileNavLinks : desktopNavLinks;
+
     return (
       <>
+        {/* Map through each navigation link */}
         {filteredNavLinks.map((link) => (
+          // Main container for each nav item
           <div
+            // Generate unique key based on title type
             key={typeof link.title === "string"
               ? link.title
               : link.title.default}
-            className={`relative w-full group tracking-wide transition-colors duration-300 cursor-pointer text-nowrap ${
-              isMobile
-                ? "flex flex-col gap-3 font-bold text-lg text-stamp-grey hover:text-stamp-grey-light"
-                : "font-bold text-base text-stamp-purple"
-            }`}
+            // Base styles for nav container with conditional mobile styling
+            className={`relative group ${isMobile ? "" : ""}`}
           >
+            {/* Main navigation link */}
             <a
+              // Only set href if there are no sublinks (dropdown items)
               href={link.subLinks ? undefined : link.href}
+              // Click handler for navigation
               onClick={() => {
-                if (link.subLinks) return;
-                if (!link?.href) return;
-                toggleMenu();
-                setCurrentPath(link?.href ? link?.href : null);
+                if (link.subLinks) return; // Don't navigate if has dropdown
+                if (!link?.href) return; // Don't navigate if no href
+                toggleMenu(); // Close mobile menu if open
+                setCurrentPath(link?.href ? link?.href : null); // Update current path
               }}
-              className={`inline-block w-full tracking-wider transition-colors duration-300 cursor-pointer whitespace-nowrap ${
+              // Complex conditional styling for mobile/desktop
+              className={`inline-block w-full ${
                 isMobile
                   ? ` ${
-                    link.subLinks
-                      ? "font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey "
-                      : "font-light text-3xl text-transparent bg-clip-text bg-gradient-to-r from-stamp-grey-light via-stamp-grey to-stamp-grey-darker hover:text-stamp-grey-light inline-block "
-                  }`
-                  : "font-extrabold text-stamp-purple group-hover:text-stamp-purple-bright"
+                    // Title of menus
+                    link.subLinks ? navLinkGrey : navLinkGreyLD}`
+                  : navLinkPurpleThick
               }`}
             >
+              {/* Hidden tablet version of title */}
               <span className="hidden">
                 {typeof link.title === "string"
                   ? link.title
                   : link.title.tablet}
               </span>
+              {/* Visible default version of title */}
               <span className="">
                 {typeof link.title === "string"
                   ? link.title
                   : link.title.default}
               </span>
             </a>
+
+            {/* Dropdown menu - only rendered if subLinks exist */}
             {link.subLinks && (
               <div
+                // Different dropdown styles for mobile/desktop
                 className={`${
                   isMobile
-                    ? "hidden group-hover:flex flex-col z-10 w-full gap-1.5 group"
+                    ? "hidden group-hover:flex flex-col z-10 w-full pt-3 gap-2 group"
                     : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
                 }`}
               >
+                {/* Map through dropdown items */}
                 {link.subLinks?.map((subLink) => (
                   <a
                     key={subLink.href}
                     href={subLink.href}
                     onClick={() => {
-                      toggleMenu();
-                      setCurrentPath(subLink?.href ? subLink?.href : null);
+                      toggleMenu(); // Close mobile menu
+                      setCurrentPath(subLink?.href ? subLink?.href : null); // Update current path
                     }}
-                    className={`transition-colors duration-300 ${
+                    // Complex conditional styling for active/inactive states
+                    className={`font-bold transition-colors duration-300 ${
                       isMobile
                         ? currentPath === subLink.href
                           ? "text-base text-stamp-grey-light hover:text-stamp-grey py-1"
