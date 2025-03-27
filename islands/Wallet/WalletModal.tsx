@@ -115,7 +115,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
               size="lg"
               onClick={toggleModal}
               ref={buttonRef}
-              class="!border-0 !p-0 !h-6 font-medium text-lg gray-gradient1-hover tracking-wide transition-colors duration-300"
+              class="!border-0 !p-0 !h-6 font-normal text-lg gray-gradient1-hover tracking-wide transition-colors duration-300"
             >
               CONNECT WALLET
             </Button>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
-import { HamburgerMenuIcon } from "$icons";
+import { HamburgerMenuIcon, Icon } from "$icons";
 import {
   logoPurpleLDLink,
   navLinkGrey,
@@ -334,6 +334,30 @@ export function Header() {
           </div>
 
           <div className="flex w-full sticky bottom-0 justify-between">
+            <div className="flex justify-start">
+              <Icon
+                type="iconLink"
+                name="gear"
+                weight="normal"
+                size="lg"
+                color="grey"
+                onMouseEnter={(e) => {
+                  const target = e.currentTarget as HTMLElement;
+                  target.style.transform = "rotate(-10deg)";
+                  target.style.transition = "all 500ms ease-in-out";
+                }}
+                onMouseLeave={(e) => {
+                  const target = e.currentTarget as HTMLElement;
+                  target.style.transform = "rotate(0deg)";
+                  target.style.transition = "all 500ms ease-in-out";
+                }}
+                onClick={(e) => {
+                  const target = e.currentTarget as HTMLElement;
+                  target.style.transition = "all 1000ms ease-in-out";
+                  target.style.transform = "rotate(360deg)";
+                }}
+              />
+            </div>
             <div className="flex justify-end">
               <ConnectWallet />
             </div>

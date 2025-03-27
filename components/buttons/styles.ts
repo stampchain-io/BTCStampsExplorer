@@ -135,9 +135,9 @@ export const buttonStyles: ButtonVariants = {
 
   /* ===== SIZE STYLES ===== */
   size: {
-    xs: "h-7 px-4 tablet:px-3 text-xs tablet:text-[10px] font-semibold",
-    sm: "h-8 px-5 tablet:px-4 text-xs tablet:text-xs",
-    md: "h-9 px-5 text-sm tablet:text-xs",
+    xs: "h-7 px-4 tablet:px-3 text-xs tablet:text-[10px] ont-semibold",
+    sm: "h-8 px-5 tablet:px-4 text-xs",
+    md: "h-9 px-5 text-sm",
     lg: "h-10 px-5 text-sm",
     xl: "h-11 px-6 tablet:px-5 text-base",
   },
