@@ -6,7 +6,7 @@ import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator as _useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { StampStyles } from "./styles.ts";
+import { ModulesStyles } from "$islands/modules/Styles.ts";
 
 export const StampHeader = (
   { filterBy, sortBy }: {
@@ -31,10 +31,10 @@ export const StampHeader = (
         isOpen1 ? "-mb-[150px] mobileMd:-mb-[146px] mobileLg:-mb-[160px]" : ""
       }`}
     >
-      <h1 className={`${StampStyles.titlePurpleDL} block mobileLg:hidden`}>
+      <h1 className={`${ModulesStyles.titlePurpleDL} block mobileLg:hidden`}>
         STAMPS
       </h1>
-      <h1 className={`${StampStyles.titlePurpleDL} hidden mobileLg:block`}>
+      <h1 className={`${ModulesStyles.titlePurpleDL} hidden mobileLg:block`}>
         ART STAMPS
       </h1>
       <div className="flex relative items-start justify-between gap-3">

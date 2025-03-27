@@ -3,7 +3,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
-import { BTCModalStyles } from "./styles.ts";
+import { tooltipIcon } from "$components/shared/WalletStyles.ts";
 
 interface WalletSendModalProps {
   fee: number;
@@ -344,7 +344,7 @@ function WalletSendModal(
           >
             MAX
             <div
-              className={`${BTCModalStyles.tooltipIcon} ${
+              className={`${tooltipIcon} ${
                 isMaxTooltipVisible ? "opacity-100" : "opacity-0"
               }`}
             >
@@ -361,12 +361,11 @@ function WalletSendModal(
               recipientAddress: (e.target as HTMLInputElement).value,
             })}
           placeholder="Recipient address"
-          class={BTCModalStyles.inputField}
+          class="h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
         />
       </div>
 
       <BasicFeeCalculator
-        isModal={true}
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="send"
@@ -377,8 +376,8 @@ function WalletSendModal(
         onCancel={onClose}
         buttonName="SEND"
         className="pt-9 mobileLg:pt-12"
-        userAddress={wallet?.address}
-        recipientAddress={formState.recipientAddress}
+        userAddress={wallet?.address || ""}
+        recipientAddress={formState.recipientAddress || ""}
         inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
         tosAgreed={true}

@@ -2,6 +2,12 @@
 export const backgroundContainer =
   "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
 
+export const tooltipImage =
+  "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
+
+export const walletDataContainer =
+  "flex flex-col w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-3 mobileMd:gap-6";
+
 // Data column and layout styles
 export const dataColumn = "flex flex-col -space-y-1";
 
@@ -26,6 +32,8 @@ export const dataValueXl =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light";
 
 // Title styles
+export const titleGreyLD =
+  "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient1";
 export const titleGreyDL =
   "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
 export const subTitleGrey =
