@@ -1,6 +1,7 @@
+/* ===== ICON STYLES MODULE ===== */
 import type { JSX } from "preact";
 
-/* ===== ICON BASE PROPS ===== */
+/* ===== INTERFACE DEFINITIONS ===== */
 export interface IconVariants {
   name: string;
   weight: "light" | "normal" | "bold";
@@ -19,7 +20,6 @@ export interface IconVariants {
   text?: string;
 }
 
-/* ===== BADGE PROPS ===== */
 export interface BadgeVariants {
   text: string;
   className?: string;
@@ -27,7 +27,10 @@ export interface BadgeVariants {
 
 /* ===== ICON STYLES ===== */
 export const iconStyles = {
+  /* ===== BASE STYLES ===== */
   base: "inline-block transition-colors duration-300",
+
+  /* ===== SIZE VARIANTS ===== */
   size: {
     xs: "w-5 h-5",
     sm: "w-6 h-6",
@@ -36,19 +39,22 @@ export const iconStyles = {
     xl: "w-9 h-9",
     xxl: "w-10 h-10",
   },
-  // Base Icon styles
+
+  /* ===== BASIC ICON STYLES ===== */
   icon: {
     grey: "fill-stamp-grey",
     purple: "fill-stamp-purple",
     gradient: "",
   },
-  // IconLink styles
+
+  /* ===== ICON LINK STYLES ===== */
   iconLink: {
     grey: "fill-stamp-grey hover:fill-stamp-grey-light",
     purple: "fill-stamp-purple hover:fill-stamp-purple-bright",
     gradient: "",
   },
-  // IconButton styles
+
+  /* ===== ICON BUTTON STYLES ===== */
   iconButton: {
     grey:
       "fill-stamp-grey hover:fill-stamp-grey-light bg-[#333333]/40 hover:bg-[#333333]/20 tablet:bg-transparent tablet:hover:bg-transparent rounded-md p-1.5",
@@ -58,8 +64,8 @@ export const iconStyles = {
   },
 } as const;
 
-/* ===== CUSTOM ICONS ===== */
-/* ===== SLIDER HANDLE ICON ===== */
+/* ===== CUSTOM ICON STYLES ===== */
+/* ===== SLIDER HANDLE STYLES ===== */
 export const handleIcon = `
   absolute w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none 
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
@@ -74,7 +80,7 @@ export const handleIcon = `
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
 `;
 
-/* ===== CHECKBOX ICON ===== */
+/* ===== CHECKBOX STYLES ===== */
 export const checkboxIcon = (
   checked: boolean,
   canHoverSelected: boolean,

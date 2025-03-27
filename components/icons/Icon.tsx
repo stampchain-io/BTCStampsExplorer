@@ -1,3 +1,4 @@
+/* ===== ICON COMPONENTS MODULE ===== */
 import { BadgeVariants, iconStyles, IconVariants } from "./styles.ts";
 
 /* ===== SOCIAL MEDIA ICONS ===== */
@@ -57,7 +58,7 @@ const handcoinsIcon = {
     "M28.7913 17.6325C28.4191 17.3462 27.986 17.1496 27.5255 17.0578C27.0651 16.9661 26.5897 16.9819 26.1362 17.1038L20.9062 18.3063C21.0279 17.7922 21.0317 17.2574 20.9172 16.7417C20.8028 16.226 20.5731 15.7429 20.2454 15.3287C19.9177 14.9144 19.5005 14.5797 19.0251 14.3495C18.5496 14.1194 18.0282 13.9999 17.5 14H11.2425C10.717 13.9987 10.1964 14.1015 9.71092 14.3025C9.22539 14.5036 8.78451 14.7988 8.41375 15.1713L5.58625 18H2C1.46957 18 0.960859 18.2107 0.585786 18.5858C0.210714 18.9609 0 19.4696 0 20L0 25C0 25.5304 0.210714 26.0391 0.585786 26.4142C0.960859 26.7893 1.46957 27 2 27H15C15.0818 27 15.1632 26.99 15.2425 26.97L23.2425 24.97C23.2935 24.9579 23.3433 24.9411 23.3913 24.92L28.25 22.8525L28.305 22.8275C28.772 22.5942 29.1718 22.2458 29.4669 21.8152C29.7621 21.3846 29.9427 20.886 29.9918 20.3663C30.041 19.8466 29.957 19.3229 29.7478 18.8447C29.5387 18.3664 29.2112 17.9492 28.7962 17.6325H28.7913ZM2 20H5V25H2V20ZM27.4287 21.0263L22.6787 23.0488L14.875 25H7V19.4138L9.82875 16.5863C10.0138 16.3997 10.2341 16.2518 10.4768 16.1512C10.7195 16.0506 10.9798 15.9992 11.2425 16H17.5C17.8978 16 18.2794 16.158 18.5607 16.4393C18.842 16.7206 19 17.1022 19 17.5C19 17.8978 18.842 18.2794 18.5607 18.5607C18.2794 18.842 17.8978 19 17.5 19H14C13.7348 19 13.4804 19.1054 13.2929 19.2929C13.1054 19.4804 13 19.7348 13 20C13 20.2652 13.1054 20.5196 13.2929 20.7071C13.4804 20.8946 13.7348 21 14 21H18C18.0753 20.9998 18.1503 20.9914 18.2237 20.975L26.5987 19.0488L26.6375 19.0388C26.8932 18.9678 27.166 18.9939 27.4036 19.112C27.6412 19.2301 27.8267 19.4319 27.9245 19.6786C28.0222 19.9253 28.0253 20.1994 27.9331 20.4482C27.8409 20.697 27.6599 20.9029 27.425 21.0263H27.4287ZM20.5 12C20.7471 12.0003 20.9937 11.9802 21.2375 11.94C21.5117 12.7544 22.0133 13.4733 22.6832 14.0117C23.353 14.55 24.1629 14.8854 25.0173 14.978C25.8716 15.0706 26.7346 14.9167 27.5042 14.5344C28.2739 14.1521 28.9179 13.5574 29.3603 12.8206C29.8026 12.0839 30.0248 11.2359 30.0005 10.3769C29.9762 9.51787 29.7064 8.68379 29.2231 7.97325C28.7398 7.2627 28.0631 6.7054 27.2731 6.36724C26.4831 6.02909 25.6127 5.9242 24.765 6.065C24.501 5.28031 24.0256 4.58366 23.3912 4.05172C22.7568 3.51979 21.9879 3.17318 21.1692 3.05005C20.3505 2.92692 19.5137 3.03203 18.7509 3.35383C17.988 3.67563 17.3288 4.20163 16.8456 4.87396C16.3625 5.54628 16.0742 6.33886 16.0125 7.16447C15.9507 7.99008 16.118 8.81672 16.4958 9.55342C16.8735 10.2901 17.4472 10.9083 18.1537 11.34C18.8602 11.7716 19.6721 12 20.5 12ZM28 10.5C28 10.9945 27.8534 11.4778 27.5787 11.8889C27.304 12.3001 26.9135 12.6205 26.4567 12.8097C25.9999 12.9989 25.4972 13.0484 25.0123 12.952C24.5273 12.8555 24.0819 12.6174 23.7322 12.2678C23.3826 11.9181 23.1445 11.4727 23.048 10.9877C22.9516 10.5028 23.0011 10.0001 23.1903 9.54329C23.3795 9.08648 23.7 8.69603 24.1111 8.42133C24.5222 8.14662 25.0055 8 25.5 8C26.163 8 26.7989 8.26339 27.2678 8.73223C27.7366 9.20108 28 9.83696 28 10.5ZM20.5 5C21.0454 5.00027 21.5757 5.17888 22.0101 5.5086C22.4446 5.83832 22.7593 6.30105 22.9062 6.82625C22.3941 7.18662 21.9628 7.64992 21.6399 8.18652C21.3171 8.72312 21.1097 9.3212 21.0312 9.9425C20.8567 9.9802 20.6786 9.99948 20.5 10C19.837 10 19.2011 9.73661 18.7322 9.26777C18.2634 8.79893 18 8.16304 18 7.5C18 6.83696 18.2634 6.20108 18.7322 5.73223C19.2011 5.26339 19.837 5 20.5 5Z",
 } as const;
 
-// Global SVG handler
+/* ===== BASE ICON COMPONENT ===== */
 export function Icon(props: IconVariants) {
   const {
     type,
@@ -72,12 +73,10 @@ export function Icon(props: IconVariants) {
     ...rest
   } = props;
 
-  // Combine classes based on type, size, and color
   const combinedClasses = `${iconStyles.base} ${iconStyles.size[size]} ${
     iconStyles[type][color]
   } ${className}`;
 
-  // Common props
   const commonProps = {
     className: combinedClasses,
     role,
@@ -86,7 +85,7 @@ export function Icon(props: IconVariants) {
     ...rest,
   };
 
-  // Get the correct path based on icon name
+  /* ===== ICON PATH HANDLER ===== */
   const getIconPath = () => {
     switch (name) {
       case "twitter":
@@ -108,7 +107,8 @@ export function Icon(props: IconVariants) {
     }
   };
 
-  // SVG element
+  /* ===== SHARED ICONS ===== */
+  /* ===== SVG ELEMENT ===== */
   const svgElement = (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -119,7 +119,7 @@ export function Icon(props: IconVariants) {
     </svg>
   );
 
-  // Render based on type
+  /* ===== RENDER BASED ON TYPE ===== */
   if (type === "iconLink") {
     const { href, target, rel } = props;
     return (
@@ -139,6 +139,188 @@ export function Icon(props: IconVariants) {
 
   return svgElement;
 }
+
+/* ===== SPECIALIZED ICON COMPONENTS ===== */
+/* ===== LAYOUT ===== */
+/* ===== HAMBURGER MENU ICON ===== */
+export const HamburgerMenuIcon = (
+  { isOpen, onClick }: { isOpen: boolean; onClick: () => void },
+) => {
+  return (
+    <div
+      className={`hamburger-btn ${isOpen ? "active" : "not-active"}`}
+      onClick={onClick}
+    >
+      <span className="line-1"></span>
+      <span className="line-2"></span>
+      <span className="line-3"></span>
+      <style>
+        {`
+        .hamburger-btn {
+          width: 26px;
+          cursor: pointer;
+          z-index: 100;
+        }
+        
+        .hamburger-btn span {
+          display: block;
+          width: 100%;
+          height: 4px;
+          border-radius: 1px;
+          background: linear-gradient(90deg, #AA00FF, #8800CC, #AA00FF);
+          position: relative;
+        }
+        
+        .hamburger-btn:hover span {
+          background: linear-gradient(90deg, #AA00FF, #AA00FF, #AA00FF);
+        }
+        
+        .active span {
+        width: 24px;
+          animation-fill-mode: forwards !important;
+        }
+
+        .active:hover span {
+          background: #999999;
+        }
+
+        .hamburger-btn span + span {
+          margin-top: 4px;
+        }
+        
+        .active .line-1 {
+        height: 3px;
+          animation: ease 0.3s top forwards;
+        }
+        
+        .not-active .line-1 {
+          animation: ease 0.3s top-2 forwards;
+        }
+        
+        .active .line-2 {
+        height: 3px;
+          animation: ease 0.3s scaled forwards;
+        }
+        
+        /* The middle line styling */
+        .not-active .line-2 {
+          width: 70%;
+          margin-left: auto;
+          animation: ease 0.3s scaled-2 forwards;
+        }
+        
+        /* Direct hover style for middle line - NEEDS TO ANIMATE OUT */
+        .hamburger-btn:hover .line-2 {
+          width: 100% !important;
+          transition: width 0.3s ease;
+        }
+        
+        .active .line-3 {
+          height: 3px;
+          animation: ease 0.3s bottom forwards;
+        }
+        
+        .not-active .line-3 {
+          animation: ease 0.3s bottom-2 forwards;
+        }
+
+        @keyframes top {
+          0% {
+            top: 0;
+            transform: rotate(0);
+            background: linear-gradient(90deg, #AA00FF, #8800CC, #AA00FF);
+          }
+          50% {
+            top: 7px;
+            transform: rotate(0);
+            background: #8f5aa9;
+          }
+          100% {
+            top: 7px;
+            transform: rotate(45deg);
+            background: #666666;
+          }
+        }
+        
+        @keyframes top-2 {
+          0% {
+            top: 7px;
+            transform: rotate(45deg);
+          }
+          50% {
+            top: 7px;
+            transform: rotate(0deg);
+          }
+          100% {
+            top: 0;
+            transform: rotate(0deg);
+          }
+        }
+        
+        @keyframes bottom {
+          0% {
+            bottom: 0;
+            transform: rotate(0);
+            background: linear-gradient(90deg, #AA00FF, #8800CC, #AA00FF);
+          }
+          50% {
+            bottom: 7px;
+            transform: rotate(0);
+            background: #666666;
+          }
+          100% {
+            bottom: 7px;
+            transform: rotate(135deg);
+            background: #666666;
+          }
+        }
+        
+        @keyframes bottom-2 {
+          0% {
+            bottom: 7px;
+            transform: rotate(135deg);
+          }
+          50% {
+            bottom: 7px;
+            transform: rotate(0);
+          }
+          100% {
+            bottom: 0;
+            transform: rotate(0);
+          }
+        }
+        
+        @keyframes scaled {
+          0% {
+            transform: scale(1);
+            background: linear-gradient(90deg, #AA00FF, #8800CC, #AA00FF);
+          }
+          50% {
+            transform: scale(0);
+            background: #666666;
+          }
+          100% {
+            transform: scale(0);
+            background: #666666;
+          }
+        }
+        
+        @keyframes scaled-2 {
+          0% {
+            transform: scale(0);
+          }
+          50% {
+            transform: scale(0);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+      `}
+      </style>
+    </div>
+  );
+};
 
 export function CloseIcon({ color }: IconVariants) {
   return (
@@ -186,6 +368,7 @@ export function BadgeIcon({ text, className = "" }: BadgeVariants) {
   );
 }
 
+/* ===== ICON COMPONENT DOCUMENTATION ===== */
 /**
  * Icon Component
  *

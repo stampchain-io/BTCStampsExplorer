@@ -182,7 +182,6 @@ import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_SwiperStyles from "./islands/home/SwiperStyles.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
-import * as $layout_HeaderComponents from "./islands/layout/HeaderComponents.tsx";
 import * as $loading_LoadingContent from "./islands/loading/LoadingContent.tsx";
 import * as $loading_LoadingProvider from "./islands/loading/LoadingProvider.tsx";
 import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
@@ -469,7 +468,6 @@ const manifest = {
     "./islands/home/SwiperStyles.tsx": $home_SwiperStyles,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/Header.tsx": $layout_Header,
-    "./islands/layout/HeaderComponents.tsx": $layout_HeaderComponents,
     "./islands/loading/LoadingContent.tsx": $loading_LoadingContent,
     "./islands/loading/LoadingProvider.tsx": $loading_LoadingProvider,
     "./islands/modules/DeployMint.tsx": $modules_DeployMint,

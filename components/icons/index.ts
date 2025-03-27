@@ -1,2 +1,2 @@
-export * from "./Icon.tsx";
-export * from "./styles.ts";
+export * from "$components/icons/Icon.tsx";
+export * from "$components/icons/styles.ts";
