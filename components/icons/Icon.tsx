@@ -322,6 +322,7 @@ export const HamburgerMenuIcon = (
   );
 };
 
+/* ===== CLOSE ICON ===== */
 export function CloseIcon({ color }: IconVariants) {
   return (
     <svg
@@ -348,6 +349,7 @@ export function CloseIcon({ color }: IconVariants) {
   );
 }
 
+/* ===== BADGE ICON ===== */
 export function BadgeIcon({ text, className = "" }: BadgeVariants) {
   return (
     <span

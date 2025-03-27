@@ -50,11 +50,11 @@ const socialLinks = [
   {
     icon: (
       <Icon
+        type="iconLink"
         name="twitter"
         weight="light"
         size="lg"
         color="purple"
-        type="iconLink"
         href="https://x.com/Stampchain"
         target="_blank"
       />
@@ -63,11 +63,11 @@ const socialLinks = [
   {
     icon: (
       <Icon
+        type="iconLink"
         name="telegram"
         weight="light"
         size="lg"
         color="purple"
-        type="iconLink"
         href="https://t.me/BitcoinStamps"
         target="_blank"
       />
@@ -76,11 +76,11 @@ const socialLinks = [
   {
     icon: (
       <Icon
+        type="iconLink"
         name="discord"
         weight="light"
         size="lg"
         color="purple"
-        type="iconLink"
         href="https://discord.gg/BRYRt4bH"
         target="_blank"
       />
@@ -89,11 +89,11 @@ const socialLinks = [
   {
     icon: (
       <Icon
+        type="iconLink"
         name="github"
         weight="light"
         size="lg"
         color="purple"
-        type="iconLink"
         href="https://github.com/stampchain-io/"
         target="_blank"
       />
@@ -117,12 +117,12 @@ export function Footer() {
         alt=""
         className="
           absolute z-[-999]
-          size-[210px] mobileLg:size-[270px] tablet:size-[230px]
-          bottom-[31px] mobileLg:bottom-[28px] tablet:-bottom-9
-          left-[calc(50%+18px)] mobileLg:left-[calc(50%+69px)] tablet:left-[-115px]
-          opacity-25 tablet:opacity-20 pointer-events-none
-          [mask-image:linear-gradient(180deg,rgba(0,0,0,0.5),rgba(0,0,0,1))]
-          [-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0.5),rgba(0,0,0,1))]
+          size-[270px] mobileMd:size-[250px]
+          -bottom-11 mobileMd:-bottom-10
+          left-[-135px] mobileMd:left-[-120px]
+          opacity-20 pointer-events-none
+          [mask-image:linear-gradient(90deg,rgba(0,0,0,0.8),rgba(0,0,0,1))]
+          [-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,0.8),rgba(0,0,0,1))]
         "
       />
 
