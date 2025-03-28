@@ -1,6 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
-import { HamburgerMenuIcon, Icon } from "$icons";
+import { Icon } from "$icons";
+import { HamburgerMenuIcon } from "$components/icons/MenuIcon.tsx";
+import { CloseIcon } from "$components/icons/Icon.tsx";
 import {
   logoPurpleLDLink,
   navLinkGrey,
@@ -209,12 +211,12 @@ export function Header() {
   /* ===== TOOLS TOGGLE FUNCTION ===== */
   const toggleTools = () => {
     if (toolsOpen) {
-      // When closing, delay by 100ms
+      // When closing
       setTimeout(() => {
         setToolsOpen(false);
       }, 150);
     } else {
-      // When opening, delay by 100ms
+      // When opening
       setTimeout(() => {
         setToolsOpen(true);
       }, 150);
@@ -319,7 +321,7 @@ export function Header() {
         >
           STAMPCHAIN
         </a>
-        <div className="tablet:hidden block relative z-40">
+        <div className="tablet:hidden block relative -ml-1">
           <HamburgerMenuIcon isOpen={open} onClick={toggleMenu} />
         </div>
       </div>
@@ -335,15 +337,25 @@ export function Header() {
         className={`flex tablet:hidden flex-col justify-between
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[380px] h-screen z-30
            bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 backdrop-blur-md
-           pt-[88px] shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
+           pt-[30px] shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
            transition-transform duration-500 ease-in-out will-change-transform
            overflow-y-auto overflow-x-hidden scrollbar-black
          ${open ? "translate-x-0" : "translate-x-full"}`}
         id="navbar-collapse"
       >
         {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
-        <div className="flex flex-col h-full justify-between">
-          <div className="flex flex-col items-start p-9 gap-4">
+        <div className="flex flex-col h-full">
+          <div className="flex pl-6">
+            <CloseIcon
+              isOpen={open}
+              onClick={() => {
+                if (open) {
+                  closeMenu();
+                }
+              }}
+            />
+          </div>
+          <div className="flex flex-col flex-1 items-start pt-6 pl-6 gap-4">
             {renderNavLinks(true)}
           </div>
 
@@ -355,16 +367,18 @@ export function Header() {
                   type="iconLink"
                   name="gear"
                   weight="normal"
-                  size="lg"
+                  size="md"
                   color="grey"
                   className="-ml-1 fill-stamp-grey-darker"
                   onClick={(e) => {
                     const target = e.currentTarget as HTMLElement;
-                    target.style.transition = "all 500ms ease-in-out";
-                    // We need to use !toolsOpen here because the state hasn't updated yet
-                    target.style.transform = !toolsOpen
-                      ? "rotate(180deg)"
-                      : "rotate(0deg)";
+                    target.style.transition = "all 600ms ease-in-out";
+                    // If currently closed (toolsOpen is false), we're opening
+                    if (!toolsOpen) {
+                      target.style.transform = "rotate(180deg)";
+                    } else {
+                      target.style.transform = "rotate(0deg)";
+                    }
                     toggleTools();
                   }}
                 />

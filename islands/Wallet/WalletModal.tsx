@@ -115,7 +115,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
               size="lg"
               onClick={toggleModal}
               ref={buttonRef}
-              class="!border-0 !p-0 !h-6 font-normal text-lg gray-gradient1-hover tracking-wide transition-colors duration-300"
+              class="!justify-end !border-0 !p-0 !h-6 font-normal text-lg gray-gradient3-hover tracking-wide transition-colors duration-300"
             >
               CONNECT WALLET
             </Button>
@@ -142,7 +142,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
                 }
               }}
               ref={buttonRef}
-              class="!border-0 !p-0 !h-6 font-normal text-lg gray-gradient1-hover tracking-wide transition-colors duration-300"
+              class="!justify-end !border-0 !p-0 !h-6 font-normal text-lg gray-gradient3-hover tracking-wide transition-colors duration-300"
             >
               DASHBOARD
             </Button>
@@ -153,7 +153,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
               size="lg"
               onClick={() => walletSignOut()}
               ref={buttonRef}
-              class="!border-0 !p-0 !h-6 font-normal text-lg gray-gradient1-hover tracking-wide transition-colors duration-300"
+              class="!justify-end !border-0 !p-0 !h-6 font-normal text-lg gray-gradient3-hover tracking-wide transition-colors duration-300"
             >
               DISCONNECT
             </Button>
