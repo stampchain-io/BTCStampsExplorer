@@ -1,12 +1,12 @@
 /* ===== ICON STYLES MODULE ===== */
-import type { JSX } from "preact";
+import { JSX } from "preact";
 
 /* ===== INTERFACE DEFINITIONS ===== */
 export interface IconVariants {
   name: string;
   weight: "light" | "normal" | "bold";
   size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
-  color: "grey" | "purple" | "gradient";
+  color: "grey" | "purple" | "custom";
   type: "icon" | "iconLink" | "iconButton";
   className?: string;
   role?: JSX.AriaRole;
@@ -40,18 +40,25 @@ export const iconStyles = {
     xxl: "w-10 h-10",
   },
 
+  /* ===== COLOR VARIANTS ===== */
+  // The two-tone colors are built into the icon styles below
+  // The custom color def allows for special icons with advanced coloring
+  // eg. the gear icon in the collapsible menu in the mobile menu drawer has conditional logic to change color based on the state of the menu
+  // the close icon in the mobile menu drawer has custom color defs to add either grey or purple gradient fill
+  // the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
+
   /* ===== BASIC ICON STYLES ===== */
   icon: {
     grey: "fill-stamp-grey",
     purple: "fill-stamp-purple",
-    gradient: "",
+    custom: "",
   },
 
   /* ===== ICON LINK STYLES ===== */
   iconLink: {
     grey: "fill-stamp-grey hover:fill-stamp-grey-light cursor-pointer",
     purple: "fill-stamp-purple hover:fill-stamp-purple-bright cursor-pointer",
-    gradient: "",
+    custom: "",
   },
 
   /* ===== ICON BUTTON STYLES ===== */
@@ -60,7 +67,7 @@ export const iconStyles = {
       "fill-stamp-grey hover:fill-stamp-grey-light bg-[#333333]/40 hover:bg-[#333333]/20 tablet:bg-transparent tablet:hover:bg-transparent rounded-md p-1.5 cursor-pointer",
     purple:
       "fill-stamp-purple hover:fill-stamp-purple-bright bg-[#333333]/40 hover:bg-[#333333]/20 tablet:bg-transparent tablet:hover:bg-transparent rounded-md p-1.5 cursor-pointer",
-    gradient: "",
+    custom: "",
   },
 } as const;
 
