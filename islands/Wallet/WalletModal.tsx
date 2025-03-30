@@ -110,14 +110,14 @@ export const WalletModal = ({ connectors = [] }: Props) => {
           </div>
           <div className="block tablet:hidden">
             <Button
-              variant="outline"
-              color="grey"
-              size="lg"
+              variant="text"
+              color="greyGradient"
+              size="sm"
               onClick={toggleModal}
               ref={buttonRef}
-              class="!justify-end !border-0 !p-0 !h-6 font-normal text-lg gray-gradient3-hover tracking-wide transition-colors duration-300"
+              class="!justify-end"
             >
-              CONNECT WALLET
+              CONNECT
             </Button>
           </div>
         </div>
@@ -127,33 +127,33 @@ export const WalletModal = ({ connectors = [] }: Props) => {
       {isConnected && address && (
         <>
           {/* ===== MOBILE/TABLET MENU ===== */}
-          <div class="tablet:hidden flex flex-col gap-1 text-right">
+          <div class="tablet:hidden flex flex-col !justify-end gap-1 text-right">
             <p class="font-bold text-sm text-stamp-grey-darker tracking-tighter cursor-default select-none py-0.5 mb-0">
               {abbreviateAddress(address, 6)}
             </p>
 
             <Button
-              variant="outline"
-              color="grey"
-              size="lg"
+              variant="text"
+              color="greyGradient"
+              size="md"
               onClick={() => {
                 if (isConnected && address) {
                   globalThis.location.href = `/wallet/${address}`;
                 }
               }}
               ref={buttonRef}
-              class="!justify-end !border-0 !p-0 !h-6 font-normal text-lg gray-gradient3-hover tracking-wide transition-colors duration-300"
+              class="!justify-end"
             >
               DASHBOARD
             </Button>
 
             <Button
-              variant="outline"
-              color="grey"
-              size="lg"
+              variant="text"
+              color="greyGradient"
+              size="md"
               onClick={() => walletSignOut()}
               ref={buttonRef}
-              class="!justify-end !border-0 !p-0 !h-6 font-normal text-lg gray-gradient3-hover tracking-wide transition-colors duration-300"
+              class="!justify-end"
             >
               DISCONNECT
             </Button>

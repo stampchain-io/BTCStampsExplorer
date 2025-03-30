@@ -1,8 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
-import { Icon } from "$icons";
 import { HamburgerMenuIcon } from "$components/icons/MenuIcon.tsx";
-import { CloseIcon } from "$components/icons/Icon.tsx";
+import { CloseIcon } from "$components/icons/CloseIcon.tsx";
+import { GearIcon } from "$components/icons/GearIcon.tsx";
 import {
   logoPurpleLDLink,
   navLinkGrey,
@@ -336,8 +336,8 @@ export function Header() {
       <div
         className={`flex tablet:hidden flex-col justify-between
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[380px] h-screen z-30
-           bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 backdrop-blur-md
-           pt-[30px] shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
+           bg-gradient-to-b from-[#000000]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
+           shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
            transition-transform duration-500 ease-in-out will-change-transform
            overflow-y-auto overflow-x-hidden scrollbar-black
          ${open ? "translate-x-0" : "translate-x-full"}`}
@@ -345,8 +345,11 @@ export function Header() {
       >
         {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
         <div className="flex flex-col h-full">
-          <div className="flex pl-6">
+          <div className="flex pt-[30px] pl-9">
             <CloseIcon
+              size="md"
+              weight="bold"
+              color="greyGradient"
               isOpen={open}
               onClick={() => {
                 if (open) {
@@ -355,32 +358,21 @@ export function Header() {
               }}
             />
           </div>
-          <div className="flex flex-col flex-1 items-start pt-6 pl-6 gap-4">
+          <div className="flex flex-col flex-1 items-start pt-9 pl-9 gap-4">
             {renderNavLinks(true)}
           </div>
 
-          <div className="flex flex-col w-full sticky bottom-0 backdrop-blur-md">
+          <div className="flex flex-col w-full sticky bottom-0
+          bg-gradient-to-b from-[#000000]/33 via-[#000000]/66 to-[#000000]/100">
             {/* Tools section with gear icon */}
-            <div className="flex w-full justify-between pt-6 pb-6 pl-9 pr-7">
-              <div className="flex justify-start items-end">
-                <Icon
-                  type="iconLink"
-                  name="gear"
+            <div className="flex w-full justify-between pt-6 pb-6 pl-9 pr-9">
+              <div className="flex justify-start items-end -ml-1">
+                <GearIcon
+                  isOpen={toolsOpen}
+                  onToggle={toggleTools}
+                  size="lg"
                   weight="normal"
-                  size="md"
-                  color="grey"
-                  className="-ml-1 fill-stamp-grey-darker"
-                  onClick={(e) => {
-                    const target = e.currentTarget as HTMLElement;
-                    target.style.transition = "all 600ms ease-in-out";
-                    // If currently closed (toolsOpen is false), we're opening
-                    if (!toolsOpen) {
-                      target.style.transform = "rotate(180deg)";
-                    } else {
-                      target.style.transform = "rotate(0deg)";
-                    }
-                    toggleTools();
-                  }}
+                  color="greyLogicDL"
                 />
               </div>
               <div
@@ -394,7 +386,6 @@ export function Header() {
               </div>
             </div>
 
-            {/* Collapsible tools section */}
             <CollapsibleSection
               title="Tools"
               section="tools"
@@ -413,8 +404,8 @@ export function Header() {
                     }}
                     className={`font-bold transition-colors duration-300 ${
                       currentPath === link.href
-                        ? "text-base text-stamp-grey-light hover:text-stamp-grey py-1"
-                        : "text-base text-stamp-grey hover:text-stamp-grey-light py-1"
+                        ? "text-base text-stamp-grey-darker hover:text-stamp-grey-light"
+                        : "text-base text-stamp-grey-light hover:!text-stamp-grey-darker"
                     }`}
                   >
                     {link.title}

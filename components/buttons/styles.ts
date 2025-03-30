@@ -5,7 +5,12 @@ import { JSX } from "preact";
 export interface ButtonVariants {
   base: string;
   variant: Record<
-    "outline" | "flat" | "flatOutline" | "outlineFlat" | "outlineGradient",
+    | "outline"
+    | "flat"
+    | "flatOutline"
+    | "outlineFlat"
+    | "outlineGradient"
+    | "text",
     string
   >;
   color: Record<
@@ -13,6 +18,10 @@ export interface ButtonVariants {
     string
   >;
   size: Record<
+    "xs" | "sm" | "md" | "lg" | "xl",
+    string
+  >;
+  textSize: Record<
     "xs" | "sm" | "md" | "lg" | "xl",
     string
   >;
@@ -68,6 +77,15 @@ export const buttonStyles: ButtonVariants = {
 
   /* ===== VARIANT STYLES ===== */
   variant: {
+    text: `
+      bg-transparent
+      !border-0 !p-0 !h-auto
+      !items-start !justify-start
+      font-semibold tracking-wide
+      bg-gradient-to-r from-[var(--color-dark)] via-[var(--color-medium)] to-[var(--color-light)]
+      bg-clip-text text-transparent
+      hover:from-[var(--color-light)] hover:via-[var(--color-light)] hover:to-[var(--color-light)]
+    `,
     outline: `
       bg-transparent
       border-[var(--default-color)] hover:border-[var(--hover-color)]
@@ -135,11 +153,20 @@ export const buttonStyles: ButtonVariants = {
 
   /* ===== SIZE STYLES ===== */
   size: {
-    xs: "h-7 px-4 tablet:px-3 text-xs tablet:text-[10px] ont-semibold",
+    xs: "h-7 px-4 tablet:px-3 text-xs tablet:text-[10px] font-semibold",
     sm: "h-8 px-5 tablet:px-4 text-xs",
     md: "h-9 px-5 text-sm",
     lg: "h-10 px-5 text-sm",
     xl: "h-11 px-6 tablet:px-5 text-base",
+  },
+
+  /* ===== TEXT SIZE STYLES - ONLY USED FOR TEXT BUTTONS ===== */
+  textSize: {
+    xs: "text-xs",
+    sm: "text-sm",
+    md: "text-base",
+    lg: "text-lg",
+    xl: "text-xl",
   },
 
   /* ===== STATE STYLES ===== */

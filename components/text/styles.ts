@@ -50,7 +50,7 @@ export const navLinkPurpleThick =
 export const navLinkGrey =
   "font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey tracking-wide transition-colors duration-300 cursor-pointer select-none whitespace-nowrap"; // used in header - mobile menu
 export const navLinkGreyLD =
-  "font-light text-2xl gray-gradient1-hover tracking-wide inline-block transition-colors duration-300 cursor-pointer select-none whitespace-nowrap"; // used in header - mobile menu
+  "font-black text-2xl gray-gradient1-hover tracking-wide inline-block transition-colors duration-300 cursor-pointer select-none whitespace-nowrap"; // used in header - mobile menu
 
 // Titles
 export const titleGreyLD =
