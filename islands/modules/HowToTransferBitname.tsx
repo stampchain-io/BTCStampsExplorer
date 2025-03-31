@@ -1,4 +1,4 @@
-import { ReadAllButton } from "$components/buttons/ReadAllButton.tsx";
+import { ReadAllButton } from "$buttons";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
 export const HowToTransferBitnameModule = () => {
