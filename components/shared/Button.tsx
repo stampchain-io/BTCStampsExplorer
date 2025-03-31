@@ -18,17 +18,17 @@ interface ButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_STYLES = {
   default:
-    "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors",
+    "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md font-bold text-sm tracking-wider h-10 px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors",
   mint:
-    "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-xs mobileLg:text-sm font-extrabold text-black tracking-[0.05em] h-[36px] mobileLg:h-[42px] px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors",
+    "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md font-bold text-sm tracking-wider  h-9 px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors",
   cancel:
-    "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:text-stamp-purple-bright transition-colors",
+    "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md font-bold text-sm tracking-wider text-stamp-purple h-10 px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:text-stamp-purple-bright transition-colors",
   submit:
-    "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors",
+    "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md font-bold text-sm tracking-wider h-10 px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors",
   wallet:
-    "flex items-center justify-center w-[30px] h-[30px] mobileLg:w-9 mobileLg:h-9 p-0 border-2 border-stamp-purple rounded-md hover:border-stamp-purple-bright group cursor-pointer",
+    "flex items-center justify-center w-9 h-9 p-0 border-2 border-stamp-purple rounded-md hover:border-stamp-purple-bright group cursor-pointer",
   icon:
-    "flex items-center justify-center w-[30px] h-[30px] mobileLg:w-9 mobileLg:h-9 p-0 border-2 border-stamp-purple rounded-md hover:border-stamp-purple-bright group cursor-pointer",
+    "flex items-center justify-center w-9 h-9 p-0 border-2 border-stamp-purple rounded-md hover:border-stamp-purple-bright group cursor-pointer",
 };
 
 export function Button({

@@ -197,6 +197,14 @@ export const buttonStyles: ButtonVariants = {
   `,
 };
 
+/* ===== ADDITIONAL STYLES ===== */
+/* ===== TOGGLE SWITCH BUTTON STYLES ===== */
+export const toggleButton =
+  "flex items-center relative w-10 h-5 rounded-full bg-stamp-grey focus:outline-none transition duration-300";
+export const toggleKnobBackground =
+  "flex justify-center items-center relative w-5 h-5 bg-stamp-grey rounded-full transition transform duration-500 ";
+export const toggleKnob = "w-[18px] h-[18px] rounded-full";
+
 /* ===== STYLE COMPOSITION FUNCTION ===== */
 export const button = (
   variant: keyof typeof buttonStyles.variant,
