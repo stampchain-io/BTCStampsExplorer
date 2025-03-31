@@ -1,8 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
-import { HamburgerMenuIcon } from "$components/icons/MenuIcon.tsx";
-import { CloseIcon } from "$components/icons/CloseIcon.tsx";
-import { GearIcon } from "$components/icons/GearIcon.tsx";
+import { CloseIcon, GearIcon, HamburgerMenuIcon } from "$icons";
 import {
   logoPurpleLDLink,
   navLinkGrey,
