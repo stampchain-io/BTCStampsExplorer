@@ -112,7 +112,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
             <Button
               variant="text"
               color="greyGradient"
-              size="sm"
+              size="md"
               onClick={toggleModal}
               ref={buttonRef}
               class="!justify-end"
@@ -127,7 +127,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
       {isConnected && address && (
         <>
           {/* ===== MOBILE/TABLET MENU ===== */}
-          <div class="tablet:hidden flex flex-col !justify-end gap-1 text-right">
+          <div class="tablet:hidden flex flex-col gap-2 text-right">
             <p class="font-bold text-sm text-stamp-grey-darker tracking-tighter cursor-default select-none py-0.5 mb-0">
               {abbreviateAddress(address, 6)}
             </p>

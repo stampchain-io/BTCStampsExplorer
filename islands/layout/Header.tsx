@@ -345,7 +345,7 @@ export function Header() {
       >
         {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
         <div className="flex flex-col h-full">
-          <div className="flex pt-[30px] pl-9">
+          <div className="flex pt-[30px] px-9">
             <CloseIcon
               size="md"
               weight="bold"
@@ -358,21 +358,21 @@ export function Header() {
               }}
             />
           </div>
-          <div className="flex flex-col flex-1 items-start pt-9 pl-9 gap-4">
+          <div className="flex flex-col flex-1 items-start p-9 gap-4">
             {renderNavLinks(true)}
           </div>
 
           <div className="flex flex-col w-full sticky bottom-0
           bg-gradient-to-b from-[#000000]/33 via-[#000000]/66 to-[#000000]/100">
             {/* Tools section with gear icon */}
-            <div className="flex w-full justify-between pt-6 pb-6 pl-9 pr-9">
+            <div className="flex w-full justify-between py-6 px-9">
               <div className="flex justify-start items-end -ml-1">
                 <GearIcon
-                  isOpen={toolsOpen}
-                  onToggle={toggleTools}
                   size="lg"
                   weight="normal"
                   color="greyLogicDL"
+                  isOpen={toolsOpen}
+                  onToggle={toggleTools}
                 />
               </div>
               <div
@@ -430,8 +430,7 @@ className={`${
     : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
 }`}
 > */
-{
-  /*
+/*
 Map through dropdown items
 {link.subLinks?.map((subLink) => (
   <a
@@ -457,4 +456,3 @@ Map through dropdown items
 ))}
 </div>
   */
-}
