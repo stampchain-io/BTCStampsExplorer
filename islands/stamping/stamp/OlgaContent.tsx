@@ -7,14 +7,28 @@ import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { InputField } from "$islands/stamping/InputField.tsx";
+import { InputField } from "$forms";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
 import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
-
+import { titlePurpleLD } from "$text";
+import { ToggleSwitchButton } from "$buttons";
+import {
+  tooltipButton,
+  tooltipButtonInCollapsible,
+  tooltipImage,
+} from "$notifications";
+import {
+  bodyForms,
+  containerBackground,
+  formContainerCol,
+  formContainerRow,
+  inputTextarea,
+  SRC20InputField,
+} from "$forms";
 const log = (message: string, data?: unknown) => {
   logger.debug("stamps", {
     message: `[OlgaContent] ${message}`,
@@ -251,7 +265,7 @@ interface FileValidationResult {
 
 // At the top of the file with other constants
 const PREVIEW_SIZE_CLASSES =
-  "w-[96px] h-[96px] mobileMd:w-[108px] mobileMd:h-[108px] mobileLg:w-[120px] mobileLg:h-[120px]" as const;
+  "w-[100px] h-[100px] mobileMd:w-[100px] mobileMd:h-[100px]" as const;
 
 export function OlgaContent() {
   const { config, isLoading } = useConfig<Config>();
@@ -491,66 +505,24 @@ export function OlgaContent() {
 
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const handleShowAdvancedOptions = () => {
-    const switchToggle = document.querySelector("#switch-toggle-advanced");
-    if (!switchToggle) return;
-
+    // The toggle effect is now handled by the ToggleSwitchButton component
     setAllowAdvancedTooltip(false);
     setIsAdvancedTooltipVisible(false);
-
-    if (showAdvancedOptions !== true) {
-      switchToggle.classList.add("translate-x-full");
-      setTimeout(() => {
-        switchToggle.innerHTML =
-          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-dark'></div>`;
-      }, 150);
-    } else {
-      switchToggle.classList.remove("translate-x-full");
-      setTimeout(() => {
-        switchToggle.innerHTML =
-          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
-      }, 150);
-    }
     setShowAdvancedOptions(!showAdvancedOptions);
   };
 
   const handleIsPoshStamp = () => {
-    const switchToggle = document.querySelector("#switch-toggle-locked");
-    if (!switchToggle) return;
-
+    // The toggle effect is now handled by the ToggleSwitchButton component
     setAllowPoshTooltip(false);
     setIsPoshTooltipVisible(false);
 
     if (!isPoshStamp) {
-      switchToggle.classList.add("translate-x-full");
-      setTimeout(() => {
-        switchToggle.innerHTML =
-          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-dark'></div>`;
-      }, 150);
       setStampName(""); // Clear the input when switching to POSH
     } else {
-      switchToggle.classList.remove("translate-x-full");
-      setTimeout(() => {
-        switchToggle.innerHTML =
-          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
-      }, 150);
       setStampName(""); // Clear the input when switching to CUSTOM CPID
     }
     setIsPoshStamp(!isPoshStamp);
   };
-
-  useEffect(() => {
-    const advancedToggle = document.getElementById("switch-toggle-advanced");
-    if (advancedToggle) {
-      advancedToggle.innerHTML =
-        `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
-    }
-
-    const lockedToggle = document.getElementById("switch-toggle-locked");
-    if (lockedToggle) {
-      lockedToggle.innerHTML =
-        `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
-    }
-  }, []);
 
   const toBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -921,18 +893,6 @@ export function OlgaContent() {
     addressError,
   ]);
 
-  const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-  const backgroundContainer =
-    "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
-  const titlePurpleLDCenter =
-    "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
-  const tooltipButton =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
-  const tooltipImage =
-    "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
-  const tooltipButtonOverflow =
-    "fixed bg-[#000000BF] px-2 py-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
-
   const isFormValid = isValidForMinting({
     file,
     fileError,
@@ -1027,7 +987,7 @@ export function OlgaContent() {
   const imagePreviewDiv = (
     <div
       id="image-preview"
-      class={`relative rounded items-center mx-auto text-center cursor-pointer ${PREVIEW_SIZE_CLASSES} content-center group transition duration-300`}
+      class={`relative items-center content-center mx-auto rounded ${PREVIEW_SIZE_CLASSES}  text-center group transition duration-300 cursor-pointer `}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
@@ -1044,12 +1004,12 @@ export function OlgaContent() {
         ? (
           <label
             for="upload"
-            class="cursor-pointer h-full w-full flex flex-col items-center justify-center"
+            class="flex flex-col items-center justify-center h-full w-full cursor-pointer"
           >
             {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
               ? (
                 <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] bg [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey [image-rendering:pixelated]`}
                   src={URL.createObjectURL(file)}
                   alt="Preview"
                   onError={(e) => {
@@ -1070,7 +1030,7 @@ export function OlgaContent() {
                   loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
                   src={URL.createObjectURL(file)}
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-black [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-stamp-grey [image-rendering:pixelated]`}
                   onError={(e) => {
                     console.error("iframe error (detailed):", {
                       error: e,
@@ -1092,10 +1052,10 @@ export function OlgaContent() {
                   alt={`File: ${file.name}`}
                 />
               )}
-            <div class="absolute inset-0 hover:bg-black hover:bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+            <div class="flex items-center justify-center absolute inset-0 rounded hover:bg-stamp-grey-darkest/80 opacity-0 hover:opacity-100 transition-opacity">
               <img
                 src="/img/stamping/image-upload.svg"
-                class="w-7 h-7 mobileMd:min-w-8 mobileMd:min-h-8 mobileLg:min-w-9 mobileLg:min-h-9"
+                class="w-7 h-7 "
                 alt="Change file"
               />
             </div>
@@ -1104,11 +1064,11 @@ export function OlgaContent() {
         : (
           <label
             for="upload"
-            class="cursor-pointer bg-conic-pattern bg-[length:4px_4px] h-full flex flex-col items-center justify-center gap-3"
+            class="flex flex-col items-center justify-center h-full rounded bg-stamp-purple-dark hover:bg-stamp-purple cursor-pointer"
           >
             <img
               src="/img/stamping/image-upload.svg"
-              class="w-7 h-7 mobileMd:min-w-8 mobileMd:min-h-8 mobileLg:min-w-9 mobileLg:min-h-9"
+              class="w-7 h-7"
               alt="Upload image"
             />
           </label>
@@ -1128,7 +1088,7 @@ export function OlgaContent() {
     </div>
   );
 
-  const [tooltipText, setTooltipText] = useState("SIMPLE");
+  const [tooltipText, setTooltipText] = useState("SIMPLE SETTINGS");
   const [isAdvancedTooltipVisible, setIsAdvancedTooltipVisible] = useState(
     false,
   );
@@ -1138,7 +1098,7 @@ export function OlgaContent() {
   const handleAdvancedMouseEnter = () => {
     if (allowAdvancedTooltip) {
       setTooltipText(
-        showAdvancedOptions ? "SIMPLE" : "ADVANCED",
+        showAdvancedOptions ? "SIMPLE SETTINGS" : "ADVANCED SETTINGS",
       );
 
       if (advancedTooltipTimeoutRef.current) {
@@ -1220,23 +1180,18 @@ export function OlgaContent() {
 
   // Update the POSH toggle button JSX
   const poshToggleButton = (
-    <button
-      ref={poshButtonRef}
-      class="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
-      onClick={() => {
+    <ToggleSwitchButton
+      isActive={isPoshStamp}
+      onToggle={() => {
         handleIsPoshStamp();
         setIsPoshTooltipVisible(false);
         setAllowPoshTooltip(false);
       }}
+      toggleButtonId="switch-toggle-locked"
+      buttonRef={poshButtonRef}
       onMouseEnter={handlePoshMouseEnter}
       onMouseLeave={handlePoshMouseLeave}
-    >
-      <div
-        id="switch-toggle-locked"
-        class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
-      >
-      </div>
-    </button>
+    />
   );
 
   // Add state for lock tooltip text (near other tooltip states)
@@ -1359,8 +1314,8 @@ export function OlgaContent() {
   }, [isFullScreenModalOpen]);
 
   return (
-    <div class={bodyTools}>
-      <h1 class={titlePurpleLDCenter}>STAMP</h1>
+    <div>
+      <h1 class={`${titlePurpleLD} mb-2`}>STAMP</h1>
 
       {isConnected && addressError && (
         <div class="w-full text-red-500 text-center font-bold">
@@ -1368,25 +1323,26 @@ export function OlgaContent() {
         </div>
       )}
 
-      <div className="dark-gradient rounded-lg p-3 mobileMd:p-6 w-full">
-        <div className="flex gap-3 mobileMd:gap-6">
-          <div className="flex gap-3 mobileMd:gap-6">
+      <div className="dark-gradient rounded-lg p-6 w-full">
+        <div className="flex gap-5">
+          <div className="flex gap-6">
             {imagePreviewDiv}
             {fileError && <p class="text-red-500 mt-2">{fileError}</p>}
           </div>
 
           <div class="w-full flex flex-col justify-between items-end">
-            <button
-              class="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
-              onClick={handleShowAdvancedOptions}
-              onMouseEnter={handleAdvancedMouseEnter}
-              onMouseLeave={handleAdvancedMouseLeave}
-            >
-              <div
-                id="switch-toggle-advanced"
-                class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
-              >
-              </div>
+            <div className="relative">
+              <ToggleSwitchButton
+                isActive={showAdvancedOptions}
+                onToggle={() => {
+                  handleShowAdvancedOptions();
+                  setIsAdvancedTooltipVisible(false);
+                  setAllowAdvancedTooltip(false);
+                }}
+                toggleButtonId="switch-toggle-advanced"
+                onMouseEnter={handleAdvancedMouseEnter}
+                onMouseLeave={handleAdvancedMouseLeave}
+              />
               <div
                 class={`${tooltipButton} ${
                   isAdvancedTooltipVisible ? "opacity-100" : "opacity-0"
@@ -1394,18 +1350,19 @@ export function OlgaContent() {
               >
                 {tooltipText}
               </div>
-            </button>
-            <div className="flex gap-3 mobileMd:gap-6 items-center">
-              <p className="text-xl mobileLg:text-2xl font-semibold text-stamp-grey">
+            </div>
+            <div className="flex items-center gap-4 min-[420px]:gap-6">
+              <h6 className="font-semibold text-lg min-[420px]:text-xl text-stamp-grey">
                 EDITIONS
-              </p>
-              <div className="w-[42px] mobileLg:w-12">
+              </h6>
+              <div>
                 <InputField
                   type="text"
                   value={issuance}
                   onChange={(e) => handleIssuanceChange(e)}
                   error={issuanceError}
                   textAlign="center"
+                  class="!w-10"
                 />
               </div>
             </div>
@@ -1419,11 +1376,11 @@ export function OlgaContent() {
               : "max-h-0 opacity-0 mt-0"
           }`}
         >
-          <div className="flex gap-3 mobileMd:gap-6 justify-between mb-3 mobileMd:mb-6">
+          <div className="flex gap-6 justify-between mb-6">
             {poshToggleButton}
             <div
               ref={lockButtonRef}
-              className="w-[42px] h-[42px] mobileLg:w-12 mobileLg:h-12 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center group"
+              className="w-10 h-10 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center group"
               onClick={() => {
                 setIsLocked(!isLocked);
                 setIsLockTooltipVisible(false);
@@ -1437,7 +1394,7 @@ export function OlgaContent() {
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 32 32"
-                    class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 fill-stamp-purple-darker group-hover:fill-stamp-purple cursor-pointer"
+                    class="w-5 h-5 fill-stamp-purple-darker group-hover:fill-stamp-purple cursor-pointer"
                     role="button"
                     aria-label="Locked"
                   >
@@ -1448,7 +1405,7 @@ export function OlgaContent() {
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 32 32"
-                    class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 fill-stamp-purple-dark group-hover:fill-stamp-purple cursor-pointer"
+                    class="w-5 h-5 fill-stamp-purple-dark group-hover:fill-stamp-purple cursor-pointer"
                     role="button"
                     aria-label="Unlocked"
                   >
@@ -1457,7 +1414,7 @@ export function OlgaContent() {
                 )}
             </div>
           </div>
-          <div className="flex items-end gap-3 mobileMd:gap-6">
+          <div className="flex items-end gap-6">
             <div className="w-full">
               <InputField
                 type="text"
@@ -1473,7 +1430,7 @@ export function OlgaContent() {
             </div>
             <div
               ref={previewButtonRef}
-              className="min-w-[42px] h-[42px] mobileLg:min-w-12 mobileLg:h-12 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center group"
+              className="w-10 h-10 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center group"
               onClick={() => {
                 toggleFullScreenModal();
                 setIsPreviewTooltipVisible(false);
@@ -1485,7 +1442,7 @@ export function OlgaContent() {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 32 32"
-                class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 fill-stamp-purple-darker group-hover:fill-stamp-purple cursor-pointer"
+                class="w-5 h-5 fill-stamp-purple-darker group-hover:fill-stamp-purple cursor-pointer"
                 role="button"
                 aria-label="View Fullscreen"
               >
@@ -1503,9 +1460,92 @@ export function OlgaContent() {
         </div>
       </div>
 
-      {/* FIXME: FINALIZE OPTIMIZATION ROUTINE */}
-      {
-        /* <div
+      <div className={containerBackground}>
+        <ComplexFeeCalculator
+          fee={fee}
+          handleChangeFee={handleChangeFee}
+          type="stamp"
+          fileType={file?.type}
+          fileSize={fileSize}
+          issuance={parseInt(issuance, 10)}
+          BTCPrice={BTCPrice}
+          onRefresh={fetchFees}
+          isSubmitting={false}
+          onSubmit={handleMint}
+          buttonName={isConnected ? "STAMP" : "CONNECT WALLET"}
+          userAddress={address}
+          feeDetails={feeDetails}
+          tosAgreed={tosAgreed}
+          onTosChange={setTosAgreed}
+          disabled={!isFormValid}
+          utxoAncestors={[]}
+        />
+
+        <StatusMessages
+          submissionMessage={submissionMessage ?? ""}
+          apiError={apiError}
+        />
+      </div>
+
+      {isFullScreenModalOpen && (
+        <StampImageFullScreen
+          src={file}
+          handleCloseModal={handleCloseFullScreenModal}
+          contentType={file?.type?.startsWith("text/html") ? "html" : "image"}
+        />
+      )}
+
+      <div
+        className={`${tooltipButtonInCollapsible} ${
+          isPoshTooltipVisible && showAdvancedOptions
+            ? "opacity-100"
+            : "opacity-0"
+        }`}
+        style={{
+          left: `${tooltipPosition.x}px`,
+          top: `${tooltipPosition.y - 28}px`,
+          transform: "translate(-50%, 0)",
+        }}
+      >
+        {poshTooltipText}
+      </div>
+
+      <div
+        className={`${tooltipButtonInCollapsible} ${
+          isLockTooltipVisible && showAdvancedOptions
+            ? "opacity-100"
+            : "opacity-0"
+        }`}
+        style={{
+          left: `${tooltipPosition.x}px`,
+          top: `${tooltipPosition.y - 28}px`,
+          transform: "translate(-50%, 0)",
+        }}
+      >
+        {lockTooltipText}
+      </div>
+
+      <div
+        className={`${tooltipButtonInCollapsible} ${
+          isPreviewTooltipVisible && showAdvancedOptions
+            ? "opacity-100"
+            : "opacity-0"
+        }`}
+        style={{
+          left: `${tooltipPosition.x}px`,
+          top: `${tooltipPosition.y - 28}px`,
+          transform: "translate(-50%, 0)",
+        }}
+      >
+        FULLSCREEN
+      </div>
+    </div>
+  );
+}
+
+{/* FIXME: FINALIZE OPTIMIZATION ROUTINE */}
+{
+  /* <div
         class="bg-[#6E6E6E] w-full"
       >
         <p class="text-[#F5F5F5] text-[22px] font-semibold px-6 py-[15px]">
@@ -1570,87 +1610,4 @@ export function OlgaContent() {
             </label>
           </div>
         </div> */
-      }
-
-      <div className={`${backgroundContainer} w-full`}>
-        <ComplexFeeCalculator
-          fee={fee}
-          handleChangeFee={handleChangeFee}
-          type="stamp"
-          fileType={file?.type}
-          fileSize={fileSize}
-          issuance={parseInt(issuance, 10)}
-          BTCPrice={BTCPrice}
-          onRefresh={fetchFees}
-          isSubmitting={false}
-          onSubmit={handleMint}
-          buttonName={isConnected ? "STAMP" : "CONNECT WALLET"}
-          userAddress={address}
-          feeDetails={feeDetails}
-          tosAgreed={tosAgreed}
-          onTosChange={setTosAgreed}
-          disabled={!isFormValid}
-          utxoAncestors={[]}
-        />
-
-        <StatusMessages
-          submissionMessage={submissionMessage ?? ""}
-          apiError={apiError}
-        />
-      </div>
-
-      {isFullScreenModalOpen && (
-        <StampImageFullScreen
-          src={file}
-          handleCloseModal={handleCloseFullScreenModal}
-          contentType={file?.type?.startsWith("text/html") ? "html" : "image"}
-        />
-      )}
-
-      <div
-        className={`${tooltipButtonOverflow} ${
-          isPoshTooltipVisible && showAdvancedOptions
-            ? "opacity-100"
-            : "opacity-0"
-        }`}
-        style={{
-          left: `${tooltipPosition.x}px`,
-          top: `${tooltipPosition.y - 28}px`,
-          transform: "translate(-50%, 0)",
-        }}
-      >
-        {poshTooltipText}
-      </div>
-
-      <div
-        className={`${tooltipButtonOverflow} ${
-          isLockTooltipVisible && showAdvancedOptions
-            ? "opacity-100"
-            : "opacity-0"
-        }`}
-        style={{
-          left: `${tooltipPosition.x}px`,
-          top: `${tooltipPosition.y - 28}px`,
-          transform: "translate(-50%, 0)",
-        }}
-      >
-        {lockTooltipText}
-      </div>
-
-      <div
-        className={`${tooltipButtonOverflow} ${
-          isPreviewTooltipVisible && showAdvancedOptions
-            ? "opacity-100"
-            : "opacity-0"
-        }`}
-        style={{
-          left: `${tooltipPosition.x}px`,
-          top: `${tooltipPosition.y - 28}px`,
-          transform: "translate(-50%, 0)",
-        }}
-      >
-        FULLSCREEN
-      </div>
-    </div>
-  );
 }

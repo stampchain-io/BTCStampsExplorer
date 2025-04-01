@@ -55,7 +55,7 @@ export function DeployContent(
   const [allowTooltip, setAllowTooltip] = useState(true);
   const uploadTooltipTimeoutRef = useRef<number | null>(null);
   const toggleTooltipTimeoutRef = useRef<number | null>(null);
-  const [tooltipText, setTooltipText] = useState("OPTIONAL");
+  const [tooltipText, setTooltipText] = useState("OPTIONAL FIELDS");
   const { wallet, isConnected } = walletContext;
 
   if (!config) {
