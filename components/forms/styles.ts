@@ -23,6 +23,7 @@
 // Type definitions - only import FormStyles when doing type work
 export type FormStyles = {
   // Layout
+  bodyForms: string;
   formContainer: string;
   formRow: string;
   formRowResponsive: string;
@@ -61,8 +62,10 @@ export const inputField2col = "flex flex-col mobileMd:flex-row gap-6 w-full";
 export const containerBackground = "flex flex-col dark-gradient rounded-lg p-6";
 
 // Layout styles
+export const bodyForms =
+  "flex flex-col w-full mobileMd:max-w-[480px] mobileMd:mx-auto";
 export const formContainer =
-  "flex flex-col w-full p-6 gap-5 dark-gradient rounded-lg";
+  "flex flex-col w-full p-6 dark-gradient rounded-lg gap-5";
 export const formRow = "flex w-full";
 export const formRowResponsive = "flex flex-col mobileMd:flex-row w-full gap-5";
 

@@ -68,7 +68,7 @@ export const headingGreyLDLink = // used in media page / keep reading in howto p
 export const headingGrey =
   "font-bold text-2xl mobileMd:text-3xl text-stamp-grey tracking-wide cursor-default select-none";
 
-// Body text / Values
+// Body text
 export const textXxs = "font-normal text-[10px] text-stamp-grey-light";
 export const textXs = "font-normal text-xs text-stamp-grey-light";
 export const textSm = "font-normal text-sm text-stamp-grey-light";
@@ -79,16 +79,27 @@ export const textLinkUnderline =
   "font-bold text-base text-stamp-grey-light animated-underline transition-colors duration-300";
 
 // Links
-// Use the specifics created or just add "animated-underline" to the class name to apply the animated underline effect
+// Use the specific link styles created or just add "animated-underline" to the class name to apply the animated underline effect
 
-// Data Containers
-// Labels - REDUNDANT ???? - CHECK WITH BODY TEXT
+// Data text within containers
+// Labels
 export const labelSm =
-  "font-medium text-sm text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+  "font-light text-sm text-stamp-grey-darker cursor-default select-none whitespace-nowrap";
 export const label =
-  "font-medium text-base text-stamp-grey-light cursor-default select-none whitespace-nowrap"; // = dataValue
+  "font-light text-base text-stamp-grey-darker cursor-default select-none whitespace-nowrap"; // = dataValue
 export const labelLg =
-  "font-medium text-lg text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+  "font-light text-lg text-stamp-grey-darker cursor-default select-none whitespace-nowrap";
+export const labelXl =
+  "font-light text-xl text-stamp-grey-darker cursor-default select-none whitespace-nowrap";
+// Values
+export const valueSm =
+  "font-bold text-sm text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+export const value =
+  "font-bold text-base text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+export const valueLg =
+  "font-bold text-lg text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+export const valueXl =
+  "font-bold text-xl text-stamp-grey-light cursor-default select-none whitespace-nowrap";
 
 // Overline - Category labels, tagline, above titles (update from filter styles)
 export const overline = // rename

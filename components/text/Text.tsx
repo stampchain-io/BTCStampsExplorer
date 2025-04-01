@@ -11,9 +11,9 @@
  * Overview of the tags used in the codebase:
  * H1 - Page title
  * H2 - Section titles
- * H3 - Ssubsection title
- * H4 - Data labels
- * H5 - Data values
+ * H3 - Subsection title
+ * H4 - Headings
+ * H5 - Data labels and values
  * H6 - Least important or text code you need to park somewhere
  *
  * Use of h1,h2,h3,h4,h5,h6,p tags in the codebase according to SEO best practices:
