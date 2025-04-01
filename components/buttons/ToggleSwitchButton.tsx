@@ -14,6 +14,9 @@ interface ToggleSwitchButtonProps {
   onMouseEnter?: (e: MouseEvent) => void;
   onMouseLeave?: (e: MouseEvent) => void;
 
+  // Optional click handler
+  onClick?: (e: MouseEvent) => void;
+
   // Optional ref forwarding
   buttonRef?: preact.RefObject<HTMLButtonElement>;
 }
@@ -26,12 +29,21 @@ export function ToggleSwitchButton({
   className = "",
   onMouseEnter,
   onMouseLeave,
+  onClick,
   buttonRef,
 }: ToggleSwitchButtonProps): JSX.Element {
   /* ===== REFS ===== */
   const handleRef = useRef<HTMLDivElement>(null);
   const internalRef = useRef<HTMLButtonElement>(null);
   const actualRef = buttonRef || internalRef;
+
+  /* ===== CLICK HANDLER ===== */
+  const handleClick = (e: MouseEvent) => {
+    if (onClick) {
+      onClick(e);
+    }
+    onToggle();
+  };
 
   /* ===== INITIAL HANDLE APPEARANCE EFFECT ===== */
   useEffect(() => {
@@ -93,7 +105,7 @@ export function ToggleSwitchButton({
     <button
       ref={actualRef}
       class={`${toggleButton} ${className}`}
-      onClick={onToggle}
+      onClick={handleClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >

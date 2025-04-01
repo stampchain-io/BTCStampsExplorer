@@ -298,7 +298,7 @@ export function MintContent({
       )}
 
       <form
-        class={`${containerBackground}`}
+        class={`${containerBackground} mb-6`}
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
@@ -387,9 +387,9 @@ export function MintContent({
                       class="p-1.5 pl-3 hover:bg-[#C3C3C3] uppercase cursor-pointer"
                     >
                       {result.tick}
-                      <p class="font-medium text-xs text-stamp-grey-darker">
+                      <h6 class="font-medium text-xs text-stamp-grey-darker">
                         {(result.progress || 0).toFixed(1)}% minted
-                      </p>
+                      </h6>
                     </li>
                   ))}
                 </ul>
@@ -421,7 +421,7 @@ export function MintContent({
       </form>
 
       {/* ===== FEE CALCULATOR ===== */}
-      <div className={`${containerBackground} mt-6`}>
+      <div className={containerBackground}>
         <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

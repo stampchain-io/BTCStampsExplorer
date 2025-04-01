@@ -14,7 +14,7 @@
  * H3 - Subsection title
  * H4 - Headings
  * H5 - Data labels and values
- * H6 - Least important or text code you need to park somewhere
+ * H6 - Dropdown data values - least important text code you need to park somewhere
  *
  * Use of h1,h2,h3,h4,h5,h6,p tags in the codebase according to SEO best practices:
  * 1. H1 - Page Title (One per page)

@@ -208,7 +208,7 @@ export function TransferContent(
 
       {/* ===== FORM  ===== */}
       <form
-        class={`${containerBackground} ${formContainerCol}`}
+        class={`${containerBackground} ${formContainerCol} mb-6`}
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
@@ -294,7 +294,7 @@ export function TransferContent(
       </form>
 
       {/* ===== FEE CALCULATOR ===== */}
-      <div className={`${containerBackground} mt-6`}>
+      <div className={containerBackground}>
         <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

@@ -1,25 +1,37 @@
+/* ===== SRC20 TOKEN DEPLOYMENT COMPONENT ===== */
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
-
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-
 import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { SRC20InputField } from "../SRC20InputField.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import {
+  bodyForms,
+  containerBackground,
+  formContainerCol,
+  formContainerRow,
+  inputTextarea,
+  SRC20InputField,
+} from "$forms";
+import { titlePurpleLD } from "$text";
+import { ToggleSwitchButton } from "$buttons";
+import { tooltipButton, tooltipImage } from "$notifications";
 
+/* ===== INTERFACE DEFINITIONS ===== */
 interface UploadResponse extends APIResponse {
   url?: string;
 }
 
+/* ===== COMPONENT IMPLEMENTATION ===== */
 export function DeployContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
 ) {
   console.log("DeployContent trxType:", trxType);
+  /* ===== FORM HOOK AND STATE ===== */
   const {
     formState,
     setFormState,
@@ -34,6 +46,7 @@ export function DeployContent(
     handleInputBlur,
   } = useSRC20Form("deploy", trxType);
 
+  /* ===== LOCAL STATE ===== */
   const [fileUploadError, setFileUploadError] = useState<string | null>(null);
   const [tosAgreed, setTosAgreed] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
@@ -43,13 +56,13 @@ export function DeployContent(
   const uploadTooltipTimeoutRef = useRef<number | null>(null);
   const toggleTooltipTimeoutRef = useRef<number | null>(null);
   const [tooltipText, setTooltipText] = useState("OPTIONAL");
-
   const { wallet, isConnected } = walletContext;
 
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
   }
 
+  /* ===== FILE HANDLING ===== */
   const handleFileChange = (e: Event) => {
     const file = (e.target as HTMLInputElement).files?.[0] || null;
     if (file) {
@@ -70,6 +83,7 @@ export function DeployContent(
     }
   };
 
+  /* ===== FILE UPLOAD HANDLER ===== */
   const handleFileUpload = (file: File) => {
     if (!file) return;
 
@@ -146,6 +160,7 @@ export function DeployContent(
     reader.readAsDataURL(file);
   };
 
+  /* ===== SUBMIT HANDLER ===== */
   const handleSubmitWithUpload = async () => {
     if (!isConnected) {
       logger.debug("stamps", {
@@ -167,37 +182,15 @@ export function DeployContent(
     await handleSubmit();
   };
 
+  /* ===== ADANCED OPTIONS TOGGLE ===== */
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const handleShowAdvancedOptions = () => {
-    const switchToggle = document.querySelector("#switch-toggle-advanced");
-    if (!switchToggle) return;
     setAllowTooltip(false);
     setIsToggleTooltipVisible(false);
-
-    if (showAdvancedOptions !== true) {
-      switchToggle.classList.add("translate-x-full");
-      setTimeout(() => {
-        switchToggle.innerHTML =
-          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-dark'></div>`;
-      }, 150);
-    } else {
-      switchToggle.classList.remove("translate-x-full");
-      setTimeout(() => {
-        switchToggle.innerHTML =
-          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
-      }, 150);
-    }
     setShowAdvancedOptions(!showAdvancedOptions);
   };
 
-  useEffect(() => {
-    const advancedToggle = document.getElementById("switch-toggle-advanced");
-    if (advancedToggle) {
-      advancedToggle.innerHTML =
-        `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
-    }
-  }, []);
-
+  /* ===== TOOLTIP HANDLERS ===== */
   const handleMouseMove = (e: MouseEvent) => {
     setTooltipPosition({
       x: e.clientX,
@@ -224,7 +217,9 @@ export function DeployContent(
 
   const handleToggleMouseEnter = () => {
     if (allowTooltip) {
-      setTooltipText(showAdvancedOptions ? "MANDATORY" : "OPTIONAL");
+      setTooltipText(
+        showAdvancedOptions ? "REQUIRED FIELDS" : "OPTIONAL FIELDS",
+      );
 
       if (toggleTooltipTimeoutRef.current) {
         globalThis.clearTimeout(toggleTooltipTimeoutRef.current);
@@ -244,6 +239,7 @@ export function DeployContent(
     setAllowTooltip(true);
   };
 
+  /* ===== CLEANUP EFFECT ===== */
   useEffect(() => {
     return () => {
       if (uploadTooltipTimeoutRef.current) {
@@ -255,32 +251,35 @@ export function DeployContent(
     };
   }, []);
 
-  const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-  const titlePurpleLDCenter =
-    "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
-  const tooltipButton =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
-  const tooltipImage =
-    "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
-  const backgroundContainer =
-    "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
-
+  /* ===== COMPONENT RENDER ===== */
   return (
-    <div className={bodyTools}>
-      <h1 className={titlePurpleLDCenter}>DEPLOY</h1>
+    <div class={bodyForms}>
+      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>DEPLOY</h1>
 
-      <div className="dark-gradient rounded-lg p-3 mobileMd:p-6 w-full">
-        <div className="flex gap-3 mobileMd:gap-6">
-          <div className="flex flex-col gap-3 mobileMd:gap-6 !w-[108px] mobileMd:!w-[120px]">
+      <form
+        class={`${containerBackground} mb-6`}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmitWithUpload();
+        }}
+        aria-label="Deploy SRC20 token"
+        novalidate
+      >
+        {/* ===== MAIN FORM CONTAINER ===== */}
+        <div className={formContainerRow}>
+          {/* Image upload and decimals section */}
+          <div className={`${formContainerCol} !w-[100px]`}>
+            {/* Image upload preview */}
             <div
               id="image-preview"
-              class="relative rounded items-center text-center cursor-pointer min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] content-center transition duration-300"
+              class="relative flex flex-col items-center justify-center content-center mx-auto min-h-[100px] min-w-[100px] rounded bg-stamp-purple-dark hover:bg-stamp-purple transition duration-300 cursor-pointer"
               onMouseMove={handleMouseMove}
               onMouseEnter={handleUploadMouseEnter}
               onMouseLeave={handleUploadMouseLeave}
               onMouseDown={() => setIsUploadTooltipVisible(false)}
               onClick={() => setIsUploadTooltipVisible(false)}
             >
+              {/* File input and preview logic */}
               <input
                 id="upload"
                 type="file"
@@ -309,7 +308,7 @@ export function DeployContent(
                 >
                   <img
                     src="/img/stamping/image-upload.svg"
-                    class="w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"
+                    class="w-7 h-7"
                     alt=""
                   />
                   <div
@@ -328,18 +327,21 @@ export function DeployContent(
               )}
             </div>
 
+            {/* Decimal input */}
             <SRC20InputField
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              placeholder="Decimal amount"
+              placeholder="Decimals"
               value={formState.dec}
               onChange={(e) => handleInputChange(e, "dec")}
             />
           </div>
 
-          <div className="flex flex-col gap-3 mobileMd:gap-6 w-full">
+          {/* Token details section */}
+          <div className={formContainerCol}>
             <div class="w-full flex gap-3 mobileMd:gap-6">
+              {/* Token input */}
               <SRC20InputField
                 type="text"
                 placeholder="Ticker name"
@@ -356,21 +358,23 @@ export function DeployContent(
                 maxLength={5}
                 isUppercase
               />
-              <button
-                class="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
-                onClick={() => {
-                  handleShowAdvancedOptions();
-                  setIsToggleTooltipVisible(false);
-                  setAllowTooltip(false);
-                }}
-                onMouseEnter={handleToggleMouseEnter}
-                onMouseLeave={handleToggleMouseLeave}
-              >
-                <div
-                  id="switch-toggle-advanced"
-                  class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
-                >
-                </div>
+              {/* Advanced options toggle */}
+              <div className="relative" tabIndex={0}>
+                <ToggleSwitchButton
+                  isActive={showAdvancedOptions}
+                  onToggle={() => {
+                    handleShowAdvancedOptions();
+                    setIsToggleTooltipVisible(false);
+                    setAllowTooltip(false);
+                  }}
+                  toggleButtonId="switch-toggle-advanced"
+                  onMouseEnter={handleToggleMouseEnter}
+                  onMouseLeave={handleToggleMouseLeave}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                />
                 <div
                   className={`${tooltipButton} ${
                     isToggleTooltipVisible ? "opacity-100" : "opacity-0"
@@ -378,9 +382,10 @@ export function DeployContent(
                 >
                   {tooltipText}
                 </div>
-              </button>
+              </div>
             </div>
 
+            {/* Limit and supply inputs */}
             <SRC20InputField
               type="text"
               inputMode="numeric"
@@ -405,21 +410,22 @@ export function DeployContent(
           </div>
         </div>
 
+        {/* ===== ADVANCED OPTIONS SECTION ===== */}
         <div
           className={`overflow-hidden transition-all duration-500 ${
             showAdvancedOptions
-              ? "max-h-[400px] opacity-100 mt-3 mobileMd:mt-6"
+              ? "max-h-[250px] opacity-100 mt-5"
               : "max-h-0 opacity-0 mt-0"
           }`}
         >
-          <div className="flex flex-col gap-3 mobileMd:gap-6">
+          <div className={`${formContainerCol}`}>
             <textarea
               type="text"
-              class="h-[96px] mobileMd:h-[108px] mobileLg:h-[120px] p-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-[#CCCCCC]"
+              class={`${inputTextarea} scrollbar-grey`}
               placeholder="Description"
-              rows={5}
+              rows={3}
             />
-            <div className="w-full flex gap-3 mobileMd:gap-6">
+            <div className={`${formContainerRow}`}>
               <SRC20InputField
                 type="text"
                 placeholder="X"
@@ -433,7 +439,7 @@ export function DeployContent(
                 onChange={(e) => handleInputChange(e, "web")}
               />
             </div>
-            <div className="w-full flex gap-3 mobileMd:gap-6">
+            <div className={`${formContainerRow}`}>
               <SRC20InputField
                 type="text"
                 placeholder="Telegram"
@@ -449,9 +455,10 @@ export function DeployContent(
             </div>
           </div>
         </div>
-      </div>
+      </form>
 
-      <div className={`${backgroundContainer} w-full`}>
+      {/* ===== FEE CALCULATOR AND STATUS MESSAGES ===== */}
+      <div className={containerBackground}>
         <BasicFeeCalculator
           fee={formState.fee}
           ticker={formState.token}

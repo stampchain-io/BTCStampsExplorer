@@ -23,11 +23,12 @@
 // Type definitions - only import FormStyles when doing type work
 export type FormStyles = {
   // Layout
+  containerBackground: string;
   bodyForms: string;
-  formContainer: string;
+  formContainerCol: string;
+  formContainerRow: string;
   formRow: string;
   formRowResponsive: string;
-  formGroup: string;
   inputField1col: string;
   inputField2col: string;
 
@@ -59,19 +60,19 @@ export type FormStyles = {
 // Input fields - keeping for compatibility
 export const inputField1col = "flex gap-6 w-full";
 export const inputField2col = "flex flex-col mobileMd:flex-row gap-6 w-full";
-export const containerBackground = "flex flex-col dark-gradient rounded-lg p-6";
 
 // Layout styles
+// Global
+export const containerBackground =
+  "flex flex-col w-full p-6 dark-gradient rounded-lg"; // similar to inline backgroundContainer constant - should be moved to a sylesheet specific for global layout
+
+// Forms
 export const bodyForms =
-  "flex flex-col w-full mobileMd:max-w-[480px] mobileMd:mx-auto"; // should/could be moved to a sylesheet for layout
-export const formContainer =
-  "flex flex-col w-full p-6 dark-gradient rounded-lg gap-5"; // similar to inline backgroundContainer constant
+  "flex flex-col w-full mobileMd:max-w-[480px] mobileMd:mx-auto"; // should/could be moved to a sylesheet specific for global layout
+export const formContainerCol = "flex flex-col w-full gap-5";
+export const formContainerRow = "flex w-full gap-5";
 export const formRow = "flex w-full";
 export const formRowResponsive = "flex flex-col mobileMd:flex-row w-full gap-5";
-
-// not used so far
-export const formGroup = "flex flex-col gap-6 w-full";
-export const bodyClass = "flex flex-col w-full gap-6";
 
 // Label styles
 export const labelBase =
@@ -86,30 +87,20 @@ export const inputField = `
   font-medium text-sm text-stamp-grey-darkest
   placeholder:font-light placeholder:text-stamp-grey-darkest placeholder:uppercase 
 `;
+export const inputTextarea = `
+  h-[100px] p-3 w-full resize-none
+  rounded-md bg-stamp-grey focus:bg-stamp-grey-light outline-none focus:outline-none
+  font-medium text-sm text-stamp-grey-darkest
+  placeholder:font-light placeholder:text-stamp-grey-darkest placeholder:uppercase
+`;
 
-// Input styles
+// Input styles - not in use or updated
 export const inputNumeric = `
   ${inputField}
   [appearance:textfield]
   [&::-webkit-outer-spin-button]:appearance-none
   [&::-webkit-inner-spin-button]:appearance-none
-`;
-export const inputTextarea = `
-  h-[96px] mobileMd:h-[108px] mobileLg:h-[120px]
-  p-3
-  rounded-md
-  bg-stamp-grey
-  text-stamp-grey-darkest
-  placeholder:text-stamp-grey-darkest
-  placeholder:uppercase
-  placeholder:font-light
-  text-sm mobileLg:text-base
-  font-medium
-  w-full
-  outline-none
-  focus:bg-stamp-grey-light
-  resize-none
-`;
+`; // NOT IN USE OR UPDATED
 export const inputSelect = `
   ${inputField}
   appearance-none
@@ -117,7 +108,7 @@ export const inputSelect = `
   bg-[right_0.5rem_center]
   bg-[length:1.5em_1.5em]
   pr-10
-`;
+`; // NOT IN USE OR UPDATED
 export const inputCheckbox = `
   h-4 w-4
   rounded
@@ -125,16 +116,16 @@ export const inputCheckbox = `
   text-stamp-purple
   focus:ring-stamp-purple
   focus:ring-offset-0
-`;
+`; // NOT IN USE OR UPDATED
 export const inputRadio = `
   h-4 w-4
   border-stamp-grey
   text-stamp-purple
   focus:ring-stamp-purple
   focus:ring-offset-0
-`;
+`; // NOT IN USE OR UPDATED
 
-// State styles
+// State styles - not in use or updated
 export const stateDisabled = "opacity-50 cursor-not-allowed";
 export const stateLoading = "cursor-wait opacity-75";
 export const stateError = "text-xs border-red-500 focus:border-red-500";
@@ -187,8 +178,7 @@ export const fieldVariants = {
 
 // Form layout variants
 export const layoutVariants = {
-  default: formContainer,
+  default: formContainerCol,
   row: formRow,
   rowResponsive: formRowResponsive,
-  group: formGroup,
 } as const;
