@@ -26,9 +26,12 @@ import {
   containerBackground,
   formContainerCol,
   formContainerRow,
+  formRow,
   inputTextarea,
   SRC20InputField,
 } from "$forms";
+
+/* ===== LOGGING UTILITY ===== */
 const log = (message: string, data?: unknown) => {
   logger.debug("stamps", {
     message: `[OlgaContent] ${message}`,
@@ -36,6 +39,7 @@ const log = (message: string, data?: unknown) => {
   });
 };
 
+/* ===== TRANSACTION AND VALIDATION INTERFACES ===== */
 interface TransactionInput {
   txid: string;
   vout: number;
@@ -64,6 +68,7 @@ interface ValidationParams {
   addressError: string | undefined;
 }
 
+/* ===== FORM VALIDATION UTILITY ===== */
 function isValidForMinting(params: ValidationParams) {
   const {
     file,
@@ -164,7 +169,7 @@ interface MintRequest {
   assetName?: string;
 }
 
-// Update the extractErrorMessage function
+/* ===== ERROR HANDLING UTILITY ===== */
 function extractErrorMessage(error: unknown): string {
   logger.debug("stamps", {
     message: "Extracting error message from",
@@ -263,10 +268,11 @@ interface FileValidationResult {
   warning?: string | undefined;
 }
 
-// At the top of the file with other constants
+/* ===== STYLE CONSTANTS ===== */
 const PREVIEW_SIZE_CLASSES =
   "w-[100px] h-[100px] mobileMd:w-[100px] mobileMd:h-[100px]" as const;
 
+/* ===== MAIN COMPONENT IMPLEMENTATION ===== */
 export function OlgaContent() {
   const { config, isLoading } = useConfig<Config>();
 
@@ -278,48 +284,42 @@ export function OlgaContent() {
     return <div>Error: Configuration not loaded</div>;
   }
 
+  /* ===== WALLET AND ADDRESS STATE ===== */
   const { wallet, isConnected } = walletContext;
   const address = isConnected ? wallet.address : undefined;
 
+  /* ===== FILE AND FORM STATE ===== */
   type FileType = File | null;
-
   const [file, setFile] = useState<FileType>(null);
   const [fee, setFee] = useState<number>(0);
   const [issuance, setIssuance] = useState("1");
-
   const [BTCPrice, setBTCPrice] = useState<number>(60000);
   const [fileSize, setFileSize] = useState<number | undefined>(undefined);
   const [isLocked, setIsLocked] = useState(true);
   const [isPoshStamp, setIsPoshStamp] = useState(false);
   const [stampName, setStampName] = useState("");
-  const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
 
+  /* ===== FEE AND VALIDATION STATE ===== */
+  const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
   const [fileError, setFileError] = useState<string>("");
   const [issuanceError, setIssuanceError] = useState<string>("");
   const [stampNameError, setStampNameError] = useState<string>("");
   const [apiError, setApiError] = useState<string>("");
-
-  // Add the submissionMessage state
   const [submissionMessage, setSubmissionMessage] = useState<
     SubmissionMessage | null
   >(null);
-
-  // Add isSearching state
   const [isSearching, setIsSearching] = useState(false);
-
-  // Initialize addressError as undefined
   const [addressError, setAddressError] = useState<string | undefined>(
     undefined,
   );
-
   const [txDetails, setTxDetails] = useState<MintResponse | null>(null);
 
-  // Add new state and refs for tooltips
+  /* ===== TOOLTIP STATE AND REFS ===== */
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isUploadTooltipVisible, setIsUploadTooltipVisible] = useState(false);
-
   const uploadTooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== EFFECT HOOKS ===== */
   useEffect(() => {
     if (fees && !loading) {
       const recommendedFee = Math.round(fees.recommendedFee);
@@ -344,7 +344,6 @@ export function OlgaContent() {
   }, []);
 
   useEffect(() => {
-    // Set the checkbox to checked by default
     setIsLocked(true);
   }, []);
 
@@ -489,6 +488,7 @@ export function OlgaContent() {
     }
   }, [fee, txDetails]);
 
+  /* ===== WALLET ADDRESS VALIDATION ===== */
   const validateWalletAddress = (address: string) => {
     const { isValid, error } = validateWalletAddressForMinting(address);
     logger.debug("stamps", {
@@ -499,20 +499,20 @@ export function OlgaContent() {
     return isValid;
   };
 
+  /* ===== EVENT HANDLERS ===== */
   const handleChangeFee = (newFee: number) => {
     setFee(newFee);
   };
 
+  /* ===== ADVANCED OPTIONS HANDLERS ===== */
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const handleShowAdvancedOptions = () => {
-    // The toggle effect is now handled by the ToggleSwitchButton component
     setAllowAdvancedTooltip(false);
     setIsAdvancedTooltipVisible(false);
     setShowAdvancedOptions(!showAdvancedOptions);
   };
 
   const handleIsPoshStamp = () => {
-    // The toggle effect is now handled by the ToggleSwitchButton component
     setAllowPoshTooltip(false);
     setIsPoshTooltipVisible(false);
 
@@ -524,6 +524,7 @@ export function OlgaContent() {
     setIsPoshStamp(!isPoshStamp);
   };
 
+  /* ===== FILE HANDLING UTILITIES ===== */
   const toBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -673,6 +674,7 @@ export function OlgaContent() {
     }
   };
 
+  /* ===== MINTING HANDLER ===== */
   const handleMint = async () => {
     if (!isConnected) {
       logger.debug("stamps", {
@@ -924,7 +926,6 @@ export function OlgaContent() {
   // Add cleanup for blob URLs
   useEffect(() => {
     return () => {
-      // Cleanup any existing blob URLs when component unmounts
       if (file) {
         URL.revokeObjectURL(URL.createObjectURL(file));
       }
@@ -951,6 +952,7 @@ export function OlgaContent() {
     // ... rest of the effect
   }, [isConnected, wallet.address, file, fee]);
 
+  /* ===== TOOLTIP HANDLERS ===== */
   const handleMouseMove = (e: MouseEvent) => {
     setTooltipPosition({
       x: e.clientX,
@@ -1119,7 +1121,7 @@ export function OlgaContent() {
     setAllowAdvancedTooltip(true);
   };
 
-  // Clean up on unmount
+  /* ===== CLEANUP EFFECT ===== */
   useEffect(() => {
     return () => {
       if (advancedTooltipTimeoutRef.current) {
@@ -1186,6 +1188,10 @@ export function OlgaContent() {
         handleIsPoshStamp();
         setIsPoshTooltipVisible(false);
         setAllowPoshTooltip(false);
+      }}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
       }}
       toggleButtonId="switch-toggle-locked"
       buttonRef={poshButtonRef}
@@ -1313,9 +1319,10 @@ export function OlgaContent() {
       document.removeEventListener("keydown", handleKeyboardShortcut);
   }, [isFullScreenModalOpen]);
 
+  /* ===== COMPONENT RENDER ===== */
   return (
-    <div>
-      <h1 class={`${titlePurpleLD} mb-2`}>STAMP</h1>
+    <div class={bodyForms}>
+      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>STAMP</h1>
 
       {isConnected && addressError && (
         <div class="w-full text-red-500 text-center font-bold">
@@ -1323,14 +1330,22 @@ export function OlgaContent() {
         </div>
       )}
 
-      <div className="dark-gradient rounded-lg p-6 w-full">
+      <form
+        class={`${containerBackground} mb-6`}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleMint();
+        }}
+        aria-label="Stamp art stamps"
+        novalidate
+      >
         <div className="flex gap-5">
-          <div className="flex gap-6">
+          <div className="flex gap-5">
             {imagePreviewDiv}
             {fileError && <p class="text-red-500 mt-2">{fileError}</p>}
           </div>
 
-          <div class="w-full flex flex-col justify-between items-end">
+          <div class="flex flex-col justify-between items-end w-full">
             <div className="relative">
               <ToggleSwitchButton
                 isActive={showAdvancedOptions}
@@ -1338,6 +1353,10 @@ export function OlgaContent() {
                   handleShowAdvancedOptions();
                   setIsAdvancedTooltipVisible(false);
                   setAllowAdvancedTooltip(false);
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                 }}
                 toggleButtonId="switch-toggle-advanced"
                 onMouseEnter={handleAdvancedMouseEnter}
@@ -1351,20 +1370,19 @@ export function OlgaContent() {
                 {tooltipText}
               </div>
             </div>
-            <div className="flex items-center gap-4 min-[420px]:gap-6">
-              <h6 className="font-semibold text-lg min-[420px]:text-xl text-stamp-grey">
+            <div className="flex items-center gap-3 min-[420px]:gap-5">
+              <h5 className="font-semibold text-lg min-[420px]:text-xl text-stamp-grey">
                 EDITIONS
-              </h6>
-              <div>
-                <InputField
-                  type="text"
-                  value={issuance}
-                  onChange={(e) => handleIssuanceChange(e)}
-                  error={issuanceError}
-                  textAlign="center"
-                  class="!w-10"
-                />
-              </div>
+              </h5>
+
+              <InputField
+                type="text"
+                value={issuance}
+                onChange={(e) => handleIssuanceChange(e)}
+                error={issuanceError}
+                textAlign="center"
+                class="!w-10"
+              />
             </div>
           </div>
         </div>
@@ -1372,15 +1390,15 @@ export function OlgaContent() {
         <div
           className={`overflow-hidden transition-all duration-500 ${
             showAdvancedOptions
-              ? "max-h-[200px] opacity-100 mt-3 mobileMd:mt-6"
+              ? "max-h-[150px] opacity-100 mt-5"
               : "max-h-0 opacity-0 mt-0"
           }`}
         >
-          <div className="flex gap-6 justify-between mb-6">
+          <div className="flex justify-between gap-5 mb-5">
             {poshToggleButton}
             <div
               ref={lockButtonRef}
-              className="w-10 h-10 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center group"
+              className="flex items-center justify-center !w-10 !h-10 rounded-md bg-stamp-grey cursor-pointer group"
               onClick={() => {
                 setIsLocked(!isLocked);
                 setIsLockTooltipVisible(false);
@@ -1414,23 +1432,22 @@ export function OlgaContent() {
                 )}
             </div>
           </div>
-          <div className="flex items-end gap-6">
-            <div className="w-full">
-              <InputField
-                type="text"
-                value={stampName}
-                onChange={(e) => handleStampNameChange(e)}
-                placeholder={isPoshStamp
-                  ? "Named Stamp (Requires XCP)"
-                  : "Custom CPID"}
-                maxLength={isPoshStamp ? 13 : 21}
-                minLength={isPoshStamp ? 1 : 15}
-                error={stampNameError}
-              />
-            </div>
+          <div className={formContainerRow}>
+            <InputField
+              type="text"
+              value={stampName}
+              onChange={(e) => handleStampNameChange(e)}
+              placeholder={isPoshStamp
+                ? "Named Stamp (Requires XCP)"
+                : "Custom CPID"}
+              maxLength={isPoshStamp ? 13 : 21}
+              minLength={isPoshStamp ? 1 : 15}
+              error={stampNameError}
+            />
+
             <div
               ref={previewButtonRef}
-              className="w-10 h-10 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center group"
+              className="flex items-center justify-center !w-11 !h-10 rounded-md bg-stamp-grey cursor-pointer group"
               onClick={() => {
                 toggleFullScreenModal();
                 setIsPreviewTooltipVisible(false);
@@ -1458,7 +1475,7 @@ export function OlgaContent() {
             </div>
           </div>
         </div>
-      </div>
+      </form>
 
       <div className={containerBackground}>
         <ComplexFeeCalculator

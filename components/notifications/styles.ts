@@ -1,6 +1,5 @@
 // Notification styles
 // Tooltips
-
 const tooltipText =
   "font-normal text-[10px] text-stamp-grey-light whitespace-nowrap";
 const tooltipBackground =
@@ -13,7 +12,7 @@ export const tooltipButtonInCollapsible =
 export const tooltipImage =
   `fixed z-50 ${tooltipBackground} mb-1.5 ${tooltipText}`;
 
-// NOT USED - posssible duplicate of tooltipButton
+// NOT USED - posssible duplicate of tooltipButton - only difference is mb-1
 export const tooltipIcon =
   `absolute left-1/2 -translate-x-1/2 ${tooltipBackground} bottom-full ${tooltipText}`;
 

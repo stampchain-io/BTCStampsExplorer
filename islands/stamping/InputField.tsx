@@ -14,6 +14,7 @@ interface InputFieldProps {
   disabled?: boolean;
   textAlign?: "left" | "center" | "right";
   isUppercase?: boolean;
+  class?: string;
 }
 
 export function InputField({
