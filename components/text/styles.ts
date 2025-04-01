@@ -1,11 +1,3 @@
-/**
- * Global text styles for the application
- * Usage:
- * import { titleGreyLD, body } from "$text";
- * <h1 className={titleGreyLD}>Title</h1>
- * <p className={body}>Content</p>
- */
-
 // Type definitions - only import TextStyles when doing type work
 // Example: const myStyle: keyof TextStyles = "titleGreyLD";
 export type TextStyles = { // UPDATE ALL TEXT STYLES
