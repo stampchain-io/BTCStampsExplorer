@@ -8,8 +8,8 @@ import { logger } from "$lib/utils/logger.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import {
   bodyForms,
-  formContainer,
-  formRow,
+  containerBackground,
+  formContainerCol,
   formRowResponsive,
   SRC20InputField,
 } from "$forms";
@@ -208,7 +208,7 @@ export function TransferContent(
 
       {/* ===== FORM  ===== */}
       <form
-        class={formContainer}
+        class={`${containerBackground} ${formContainerCol}`}
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
@@ -217,17 +217,16 @@ export function TransferContent(
         novalidate
       >
         {/* ===== FORM INPUTS ===== */}
-        <div class={formRow}>
-          <SRC20InputField
-            type="text"
-            placeholder="Recipient address"
-            value={formState.toAddress}
-            onChange={(e) => handleInputChange(e, "toAddress")}
-            onBlur={() => handleInputBlur("toAddress")}
-            error={formState.toAddressError}
-            aria-label="Recipient address"
-          />
-        </div>
+
+        <SRC20InputField
+          type="text"
+          placeholder="Recipient address"
+          value={formState.toAddress}
+          onChange={(e) => handleInputChange(e, "toAddress")}
+          onBlur={() => handleInputBlur("toAddress")}
+          error={formState.toAddressError}
+          aria-label="Recipient address"
+        />
 
         {/* ===== TOKEN AND AMOUNT INPUTS ===== */}
         <div class={formRowResponsive}>
@@ -295,7 +294,7 @@ export function TransferContent(
       </form>
 
       {/* ===== FEE CALCULATOR ===== */}
-      <div className={`${formContainer} w-full mt-6`}>
+      <div className={`${containerBackground} mt-6`}>
         <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

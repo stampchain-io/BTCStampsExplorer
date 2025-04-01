@@ -1,59 +1,22 @@
+/* ===== SRC20 TOKEN MINTING COMPONENT ===== */
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
-
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { SRC20InputField } from "../SRC20InputField.tsx";
-
+import {
+  bodyForms,
+  containerBackground,
+  formContainerCol,
+  formContainerRow,
+  SRC20InputField,
+} from "$forms";
 import { logger } from "$lib/utils/logger.ts";
 import { SRC20MintStatus } from "$types/src20.d.ts";
+import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
 
-interface MintProgressProps {
-  progress: string;
-  progressWidth: string;
-  maxSupply: string;
-  limit: string;
-  minters: string;
-}
-const MintProgress = (
-  { progress, progressWidth, maxSupply, limit, minters }: MintProgressProps,
-) => {
-  return (
-    <div class="flex justify-between text-stamp-grey items-end">
-      <div class="w-1/2 flex flex-col gap-[6px]">
-        <p class="text-xl mobileLg:text-2xl font-light text-stamp-grey-light">
-          <span class="text-stamp-grey-darker">PROGRESS</span>{" "}
-          <span class="font-bold">
-            {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0]}
-          </span>
-          %
-        </p>
-        <div class="relative w-full max-w-[420px] h-1 mobileLg:h-1.5 bg-stamp-grey rounded-full">
-          <div
-            class="absolute left-0 top-0 h-1 mobileLg:h-1.5 bg-stamp-purple-dark rounded-full"
-            style={{ width: progressWidth }}
-          />
-        </div>
-      </div>
-      <div class="w-1/2 text-sm mobileLg:text-base font-light text-stamp-grey-darker text-right">
-        <p>
-          SUPPLY{" "}
-          <span class="text-stamp-grey-light font-bold">{maxSupply}</span>
-        </p>
-        <p>
-          LIMIT <span class="text-stamp-grey-light font-bold">{limit}</span>
-        </p>
-        <p class="-mb-[5px] mobileLg:-mb-[7px]">
-          MINTERS <span class="text-stamp-grey-light font-bold">{minters}</span>
-        </p>
-      </div>
-    </div>
-  );
-};
-
+/* ===== MAIN COMPONENT INTERFACE ===== */
 interface MintContentProps {
   trxType?: "olga" | "multisig";
   tick?: string | undefined | null;
@@ -61,7 +24,55 @@ interface MintContentProps {
   holders?: number;
 }
 
-// Add interface for search results
+/* ===== MINT PROGRESS SUBCOMPONENT ===== */
+interface MintProgressProps {
+  progress: string;
+  progressWidth: string;
+  maxSupply: string;
+  limit: string;
+  minters: string;
+}
+
+const MintProgress = (
+  { progress, progressWidth, maxSupply, limit, minters }: MintProgressProps,
+) => {
+  return (
+    <div class="flex justify-between items-end">
+      {/* Progress indicator */}
+      <div class=" flex flex-col w-1/2 gap-1.5">
+        <h5 class={labelXl}>
+          PROGRESS
+          <span class={`${valueXl} pl-3`}>
+            {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0]}
+            %
+          </span>
+        </h5>
+        {/* Progress bar */}
+        <div class="relative w-full max-w-[420px] h-1.5 bg-stamp-grey rounded-full">
+          <div
+            class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
+            style={{ width: progressWidth }}
+          />
+        </div>
+      </div>
+
+      {/* Supply and limit information */}
+      <div class="flex flex-col w-1/2 justify-end items-end -mb-1">
+        <h5 class={labelSm}>
+          SUPPLY <span class={`${valueSm} pl-1.5`}>{maxSupply}</span>
+        </h5>
+        <h5 class={labelSm}>
+          LIMIT <span class={`${valueSm} pl-1.5`}>{limit}</span>
+        </h5>
+        <h5 class={labelSm}>
+          MINTERS <span class={`${valueSm} pl-1.5`}>{minters}</span>
+        </h5>
+      </div>
+    </div>
+  );
+};
+
+/* ===== TOKEN SEARCH INTERFACE ===== */
 interface SearchResult {
   tick: string;
   progress: number;
@@ -69,20 +80,14 @@ interface SearchResult {
   max_supply: number;
 }
 
-const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-const titlePurpleLDCenter =
-  "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
-const inputFieldContainer =
-  "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
-const backgroundContainer =
-  "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
-
+/* ===== MINT CONTENT COMPONENT IMPLEMENTATION ===== */
 export function MintContent({
   trxType = "olga",
   tick,
   mintStatus: initialMintStatus,
   holders: initialHolders,
 }: MintContentProps = { trxType: "olga" }) {
+  /* ===== FORM HOOK AND STATE ===== */
   const {
     formState,
     handleChangeFee,
@@ -97,13 +102,16 @@ export function MintContent({
     handleInputBlur,
   } = useSRC20Form("mint", trxType, tick ?? undefined);
 
+  /* ===== LOCAL STATE ===== */
   const [mintStatus, setMintStatus] = useState<any>(initialMintStatus || null);
   const [holders, setHolders] = useState<number>(initialHolders || 0);
   const [error, setError] = useState<string | null>(null);
   const [tosAgreed, setTosAgreed] = useState(false);
 
+  /* ===== WALLET CONTEXT ===== */
   const { isConnected, wallet } = walletContext;
 
+  /* ===== TOKEN SEARCH STATE ===== */
   const [searchTerm, setSearchTerm] = useState("");
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -112,12 +120,12 @@ export function MintContent({
     null,
   );
   const [isImageLoading, setIsImageLoading] = useState(false);
-
-  // Add a ref to track if we're switching fields
   const [isSwitchingFields, setIsSwitchingFields] = useState(false);
 
+  /* ===== REFS ===== */
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  /* ===== TOKEN DATA RESET FUNCTION ===== */
   const resetTokenData = () => {
     setMintStatus(null);
     setHolders(0);
@@ -128,7 +136,7 @@ export function MintContent({
     }));
   };
 
-  // Update the useEffect that handles URL params
+  /* ===== URL PARAMETER HANDLING EFFECT ===== */
   useEffect(() => {
     if (tick) {
       setOpenDrop(false);
@@ -140,7 +148,7 @@ export function MintContent({
     }
   }, [tick]);
 
-  // Update the search useEffect to respect switching fields state
+  /* ===== TOKEN SEARCH EFFECT ===== */
   useEffect(() => {
     if (isSelecting || tick || isSwitchingFields) {
       return;
@@ -180,11 +188,11 @@ export function MintContent({
     };
   }, [searchTerm, isSelecting, tick, isSwitchingFields]);
 
-  // Update handleResultClick to handle field switching
+  /* ===== TOKEN SELECTION HANDLER ===== */
   const handleResultClick = async (tick: string) => {
     setOpenDrop(false);
     setIsSelecting(true);
-    setIsSwitchingFields(true); // Set switching state when selecting
+    setIsSwitchingFields(true);
     setSearchResults([]);
     setSearchTerm(tick.toUpperCase());
 
@@ -219,11 +227,10 @@ export function MintContent({
       resetTokenData();
     } finally {
       setIsImageLoading(false);
-      // Keep isSelecting and isSwitchingFields true until next focus
     }
   };
 
-  // Adjusted useEffect hook to always fetch data when token changes
+  /* ===== EMPTY SEARCH TERM EFFECT ===== */
   useEffect(() => {
     if (!searchTerm) {
       setError(null);
@@ -231,7 +238,7 @@ export function MintContent({
     }
   }, [searchTerm]);
 
-  // Calculate progress and other values
+  /* ===== MINT PROGRESS CALCULATIONS ===== */
   const progress = mintStatus ? mintStatus.progress : "0";
   const progressWidth = `${progress}%`;
   const maxSupply = mintStatus
@@ -240,6 +247,7 @@ export function MintContent({
   const limit = mintStatus ? Number(mintStatus.limit).toLocaleString() : "0";
   const minters = holders ? holders.toString() : "0";
 
+  /* ===== DEBUG LOGGING EFFECT ===== */
   useEffect(() => {
     logger.debug("stamps", {
       message: "MintContent formState updated",
@@ -251,11 +259,12 @@ export function MintContent({
     });
   }, [formState.fee, formState.psbtFees]);
 
+  /* ===== CONFIG CHECK ===== */
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
   }
 
-  // Before rendering ComplexFeeCalculator
+  /* ===== FEE CALCULATOR PREPARATION ===== */
   const feeDetailsForCalculator = {
     minerFee: formState.psbtFees?.estMinerFee || 0,
     dustValue: formState.psbtFees?.totalDustValue || 0,
@@ -276,32 +285,42 @@ export function MintContent({
     },
   });
 
+  /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyTools}>
-      <h1 class={titlePurpleLDCenter}>MINT</h1>
+    <div class={bodyForms}>
+      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>MINT</h1>
 
+      {/* ===== ERROR MESSAGE DISPLAY ===== */}
       {error && (
         <div class="w-full text-red-500 text-center font-bold">
           {error}
         </div>
       )}
 
-      <div class={inputFieldContainer}>
-        <div class="w-full flex gap-3 mobileMd:gap-6">
+      <form
+        class={`${containerBackground}`}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        aria-label="Mint SRC20 tokens"
+        novalidate
+      >
+        {/* ===== TOKEN SEARCH AND AMOUNT INPUT ===== */}
+        <div class={`${formContainerRow} mb-5`}>
+          {/* Token image preview */}
           <div
             id="image-preview"
-            class="relative rounded items-center justify-center mx-auto text-center min-w-[96px] h-[96px] w-[96px] mobileMd:min-w-[108px] mobileMd:w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:w-[120px] mobileLg:h-[120px] content-center bg-stamp-purple-darker flex flex-col"
+            class="relative flex flex-col items-center justify-center content-center mx-auto h-[100px] min-w-[100px] rounded bg-stamp-purple-darker"
           >
             {isImageLoading
               ? (
-                <div class="animate-spin rounded-full w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9 border-b-[3px] border-stamp-grey" />
+                <div class="animate-spin rounded-full w-7 h-7 border-b-[3px] border-stamp-grey" />
               )
               : (
                 <img
                   src={selectedTokenImage || `/img/stamping/image-upload.svg`}
-                  class={selectedTokenImage
-                    ? "w-full h-full"
-                    : "w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"}
+                  class={selectedTokenImage ? "w-full h-full" : "w-7 h-7"}
                   alt=""
                   loading="lazy"
                   onLoad={() => setIsImageLoading(false)}
@@ -309,7 +328,10 @@ export function MintContent({
                 />
               )}
           </div>
-          <div class="flex flex-col gap-3 mobileMd:gap-6 w-full relative">
+
+          {/* Token inputs */}
+          <div class={formContainerCol}>
+            {/* Token search field with dropdown */}
             <div
               class={`relative ${
                 openDrop && searchResults.length > 0 && !isSelecting
@@ -354,16 +376,18 @@ export function MintContent({
                 error={formState.tokenError}
                 isUppercase
               />
+
+              {/* Search results dropdown */}
               {openDrop && searchResults.length > 0 && !isSelecting && (
-                <ul class="absolute top-[100%] left-0 max-h-[168px] mobileLg:max-h-[208px] w-full bg-stamp-grey-light rounded-b-md text-stamp-grey-darkest text-sm mobileLg:text-base leading-none font-bold z-[11] overflow-y-auto scrollbar-grey">
+                <ul class="absolute top-[100%] left-0 max-h-[168px] w-full bg-stamp-grey-light rounded-b-md text-stamp-grey-darkest text-sm leading-none font-bold z-[11] overflow-y-auto scrollbar-grey">
                   {searchResults.map((result: SearchResult) => (
                     <li
                       key={result.tick}
                       onClick={() => handleResultClick(result.tick)}
-                      class="cursor-pointer p-1.5 pl-3 hover:bg-[#C3C3C3] uppercase"
+                      class="p-1.5 pl-3 hover:bg-[#C3C3C3] uppercase cursor-pointer"
                     >
                       {result.tick}
-                      <p class="text-xs mobileLg:text-sm text-stamp-grey-darker font-medium mobileLg:-mt-1">
+                      <p class="font-medium text-xs text-stamp-grey-darker">
                         {(result.progress || 0).toFixed(1)}% minted
                       </p>
                     </li>
@@ -372,6 +396,7 @@ export function MintContent({
               )}
             </div>
 
+            {/* Amount input field */}
             <SRC20InputField
               type="text"
               inputMode="numeric"
@@ -384,6 +409,8 @@ export function MintContent({
             />
           </div>
         </div>
+
+        {/* ===== MINT PROGRESS DISPLAY ===== */}
         <MintProgress
           progress={progress}
           progressWidth={progressWidth}
@@ -391,9 +418,10 @@ export function MintContent({
           limit={limit}
           minters={minters}
         />
-      </div>
+      </form>
 
-      <div className={`${backgroundContainer} w-full`}>
+      {/* ===== FEE CALCULATOR ===== */}
+      <div className={`${containerBackground} mt-6`}>
         <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
@@ -405,7 +433,7 @@ export function MintContent({
           BTCPrice={formState.BTCPrice}
           mintDetails={{
             token: formState.token,
-            amount: formState.amt
+            amount: formState.amt,
           }}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
@@ -422,6 +450,7 @@ export function MintContent({
           feeDetails={feeDetailsForCalculator}
         />
 
+        {/* ===== STATUS MESSAGES ===== */}
         <StatusMessages
           submissionMessage={submissionMessage}
           apiError={apiError}
