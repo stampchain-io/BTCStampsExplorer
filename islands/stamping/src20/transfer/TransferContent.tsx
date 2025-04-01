@@ -1,34 +1,31 @@
+/* ===== TRANSFER CONTENT COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
-
 import { walletContext } from "$client/wallet/wallet.ts";
-
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { SRC20InputField } from "../SRC20InputField.tsx";
-
 import { logger } from "$lib/utils/logger.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
+import {
+  bodyForms,
+  formContainer,
+  formRow,
+  formRowResponsive,
+  SRC20InputField,
+} from "$forms";
+import { titlePurpleLD } from "$text";
 
+/* ===== INTERFACE DEFINITIONS ===== */
 interface Balance {
   tick: string;
   amt: string;
-  // Add other balance fields as needed
 }
 
-const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-const titlePurpleLDCenter =
-  "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
-const inputFieldContainer =
-  "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
-const inputField2col =
-  "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
-const backgroundContainer =
-  "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
-
+/* ===== COMPONENT IMPLEMENTATION ===== */
 export function TransferContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
 ) {
+  /* ===== FORM STATE AND HANDLERS ===== */
   const {
     formState,
     setFormState,
@@ -44,20 +41,26 @@ export function TransferContent(
     handleInputBlur,
   } = useSRC20Form("transfer", trxType);
 
+  /* ===== LOCAL STATE ===== */
   const [tosAgreed, setTosAgreed] = useState(false);
   const [balances, setBalances] = useState<Balance[]>([]);
   const [searchResults, setSearchResults] = useState<Balance[]>([]);
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [isSelecting, setIsSelecting] = useState(false);
+
+  /* ===== REFS ===== */
   const dropdownRef = useRef<HTMLDivElement>(null);
   const tokenInputRef = useRef<HTMLInputElement>(null);
 
+  /* ===== WALLET CONTEXT ===== */
   const { wallet, isConnected } = walletContext;
 
+  /* ===== CONFIG CHECK ===== */
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
   }
 
+  /* ===== CLICK OUTSIDE HANDLER ===== */
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -74,6 +77,7 @@ export function TransferContent(
     };
   }, []);
 
+  /* ===== TOKEN SELECTION HANDLER ===== */
   const handleDropDown = (ticker: string, _amount: string) => {
     setOpenDrop(false);
     setIsSelecting(true);
@@ -88,6 +92,7 @@ export function TransferContent(
         maxAmount: maxAmount,
       }));
 
+      // Focus amount input after selection
       setTimeout(() => {
         const amountInput = document.querySelector(
           "[data-amount-input]",
@@ -101,6 +106,7 @@ export function TransferContent(
     }
   };
 
+  /* ===== TOKEN INPUT HANDLERS ===== */
   const handleTokenFieldFocus = () => {
     if (!formState.token?.trim() && !isSelecting) {
       setSearchResults(balances);
@@ -115,6 +121,7 @@ export function TransferContent(
     }, 200);
   };
 
+  /* ===== TOKEN SEARCH EFFECT ===== */
   useEffect(() => {
     if (isSelecting) {
       return;
@@ -137,6 +144,7 @@ export function TransferContent(
     return () => clearTimeout(delayDebounceFn);
   }, [formState.token, balances, isSelecting]);
 
+  /* ===== BALANCE FETCHING EFFECT ===== */
   useEffect(() => {
     const getBalances = async () => {
       if (!wallet?.address) return;
@@ -159,6 +167,7 @@ export function TransferContent(
     getBalances();
   }, [wallet?.address]);
 
+  /* ===== AMOUNT INPUT HANDLER ===== */
   const handleAmountChange = (e: Event) => {
     const inputAmount = Number((e.target as HTMLInputElement).value);
     const maxAmount = Number(formState.maxAmount);
@@ -173,21 +182,56 @@ export function TransferContent(
     handleInputChange(e, "amt");
   };
 
+  /* ===== TOKEN CHANGE HANDLER ===== */
+  const handleTokenChange = (e) => {
+    console.log("Token input event:", {
+      type: e.type,
+      target: e.target.value,
+      nativeEvent: e.nativeEvent,
+    });
+    const newValue = (e.target as HTMLInputElement).value
+      .toUpperCase();
+    if (newValue !== formState.token && !isSelecting) {
+      handleInputChange(e, "token");
+      setOpenDrop(true);
+    }
+  };
+
+  /* ===== COMPONENT RENDER ===== */
+  useEffect(() => {
+    console.log("Token input ref:", tokenInputRef.current);
+  }, []);
+
   return (
-    <div class={bodyTools}>
-      <h1 class={titlePurpleLDCenter}>TRANSFER</h1>
+    <div class={bodyForms}>
+      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>TRANSFER</h1>
 
-      <div class={inputFieldContainer}>
-        <SRC20InputField
-          type="text"
-          placeholder="Recipient address"
-          value={formState.toAddress}
-          onChange={(e) => handleInputChange(e, "toAddress")}
-          onBlur={() => handleInputBlur("toAddress")}
-          error={formState.toAddressError}
-        />
+      {/* ===== FORM  ===== */}
+      <form
+        class={formContainer}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        aria-label="Transfer SRC20 tokens"
+        novalidate
+      >
+        {/* ===== FORM INPUTS ===== */}
+        <div class={formRow}>
+          <SRC20InputField
+            type="text"
+            placeholder="Recipient address"
+            value={formState.toAddress}
+            onChange={(e) => handleInputChange(e, "toAddress")}
+            onBlur={() => handleInputBlur("toAddress")}
+            error={formState.toAddressError}
+            aria-label="Recipient address"
+          />
+        </div>
 
-        <div class={inputField2col}>
+        {/* ===== TOKEN AND AMOUNT INPUTS ===== */}
+        <div class={formRowResponsive}>
+          {/* Token Input with Dropdown */}
           <div
             class={`relative ${
               openDrop && searchResults.length > 0 && !isSelecting
@@ -197,41 +241,44 @@ export function TransferContent(
             ref={dropdownRef}
           >
             <SRC20InputField
-              ref={tokenInputRef}
               type="text"
               placeholder="Token"
               value={formState.token}
-              onChange={(e) => {
-                const newValue = (e.target as HTMLInputElement).value
-                  .toUpperCase();
-                if (newValue !== formState.token && !isSelecting) {
-                  handleInputChange(e, "token");
-                  setOpenDrop(true);
-                }
-              }}
+              onChange={handleTokenChange}
               onFocus={handleTokenFieldFocus}
               onBlur={handleTokenBlur}
+              ref={tokenInputRef}
               isUppercase
+              aria-label="Select token"
             />
+
+            {/* Token Dropdown */}
             {openDrop && searchResults.length > 0 && !isSelecting && (
-              <ul class="absolute top-[100%] left-0 max-h-[168px] mobileLg:max-h-[208px] w-full bg-stamp-grey-light rounded-b-md text-stamp-grey-darkest text-sm mobileLg:text-base leading-none font-bold z-[11] overflow-y-auto scrollbar-grey">
+              <ul
+                class="absolute top-[100%] left-0 max-h-[168px] w-full bg-stamp-grey-light rounded-b-md font-bold text-sm text-stamp-grey-darkest leading-none z-[11] overflow-y-auto scrollbar-grey"
+                role="listbox"
+                aria-label="Available tokens"
+              >
                 {searchResults.map((result) => (
                   <li
                     key={result.tick}
                     class="cursor-pointer p-1.5 pl-3 hover:bg-[#C3C3C3] uppercase"
                     onClick={() => handleDropDown(result.tick, result.amt)}
                     onMouseDown={(e) => e.preventDefault()}
+                    role="option"
+                    aria-selected={formState.token === result.tick}
                   >
                     {result.tick}
-                    <p class="text-xs mobileLg:text-sm text-stamp-grey-darker font-medium mobileLg:-mt-1">
+                    <h6 class="font-medium text-xs text-stamp-grey-darker">
                       {stripTrailingZeros(result.amt)}
-                    </p>
+                    </h6>
                   </li>
                 ))}
               </ul>
             )}
           </div>
 
+          {/* Amount Input */}
           <SRC20InputField
             type="text"
             inputMode="numeric"
@@ -242,11 +289,13 @@ export function TransferContent(
             onBlur={() => handleInputBlur("amt")}
             error={formState.amtError}
             data-amount-input
+            aria-label="Amount to transfer"
           />
         </div>
-      </div>
+      </form>
 
-      <div className={`${backgroundContainer} w-full`}>
+      {/* ===== FEE CALCULATOR ===== */}
+      <div className={`${formContainer} w-full mt-6`}>
         <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
@@ -271,7 +320,7 @@ export function TransferContent(
           transferDetails={{
             address: formState.toAddress,
             token: formState.token,
-            amount: formState.amt
+            amount: formState.amt,
           }}
           feeDetails={{
             minerFee: formState.psbtFees?.estMinerFee || 0,
@@ -282,6 +331,7 @@ export function TransferContent(
           }}
         />
 
+        {/* ===== STATUS MESSAGES ===== */}
         <StatusMessages
           submissionMessage={submissionMessage}
           apiError={apiError}

@@ -63,9 +63,9 @@ export const containerBackground = "flex flex-col dark-gradient rounded-lg p-6";
 
 // Layout styles
 export const bodyForms =
-  "flex flex-col w-full mobileMd:max-w-[480px] mobileMd:mx-auto";
+  "flex flex-col w-full mobileMd:max-w-[480px] mobileMd:mx-auto"; // should/could be moved to a sylesheet for layout
 export const formContainer =
-  "flex flex-col w-full p-6 dark-gradient rounded-lg gap-5";
+  "flex flex-col w-full p-6 dark-gradient rounded-lg gap-5"; // similar to inline backgroundContainer constant
 export const formRow = "flex w-full";
 export const formRowResponsive = "flex flex-col mobileMd:flex-row w-full gap-5";
 
