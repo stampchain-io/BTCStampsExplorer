@@ -1,5 +1,6 @@
 import { JSX } from "preact";
 import { StampRow } from "$globals";
+import { inputField } from "$forms";
 
 interface SelectFieldProps {
   _placeholder?: string;
@@ -23,7 +24,7 @@ export function SelectField({
       <select
         onChange={onChange}
         disabled={disabled}
-        className="h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
+        class={inputField}
       >
         {options.length
           ? options.map((item) => (
