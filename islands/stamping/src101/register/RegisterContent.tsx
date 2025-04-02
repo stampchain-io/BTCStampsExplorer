@@ -1,39 +1,37 @@
+/* ===== SRC101 BITNAME REGISTRATION COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import DetailModal from "$islands/stamping/src101/DetailModal.tsx";
 import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import { titlePurpleLD } from "$text";
+import { tooltipButton } from "$notifications";
+import { Button } from "$buttons";
+import {
+  bodyForms,
+  containerBackground,
+  formContainerCol,
+  formContainerRow,
+  inputFieldOutline,
+  inputTextarea,
+  outlineGradient,
+  purpleGradient,
+  SRC20InputField,
+} from "$forms";
 
-const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-const titlePurpleLDCenter =
-  "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 w-full text-center";
-const backgroundContainer =
-  "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
-const buttonPurpleOutline =
-  "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
-const animatedBorderPurple = `
-  relative rounded-md !bg-[#100318] p-[2px]
-  before:absolute before:inset-0 before:rounded-md before:z-[1]
-  before:bg-[conic-gradient(from_var(--angle),#660099,#8800CC,#AA00FF,#8800CC,#660099)]
-  before:[--angle:0deg] before:animate-rotate
-  hover:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
-  focus-within:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
-  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#100318]
-`;
-const tooltipButton =
-  "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
-
+/* ===== COMPONENT INTERFACE ===== */
 interface RegisterBitnameContentProps {
   trxType?: "olga" | "multisig";
 }
 
+/* ===== MAIN COMPONENT IMPLEMENTATION ===== */
 export function RegisterBitnameContent({
   trxType = "olga",
 }: RegisterBitnameContentProps) {
+  /* ===== FORM AND CONFIG HOOKS ===== */
   const {
     formState,
     handleChangeFee,
@@ -46,8 +44,8 @@ export function RegisterBitnameContent({
     apiError,
   } = useSRC101Form("mint", trxType);
 
+  /* ===== STATE MANAGEMENT ===== */
   const [tosAgreed, setTosAgreed] = useState<boolean>(false);
-
   const { wallet, isConnected } = walletContext;
   const [isExist, setIsExist] = useState(true);
   const [checkStatus, setCheckStatus] = useState(false);
@@ -60,6 +58,7 @@ export function RegisterBitnameContent({
   const [allowTldTooltip, setAllowTldTooltip] = useState(true);
   const tldTooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== CLICK OUTSIDE HANDLER ===== */
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -76,6 +75,7 @@ export function RegisterBitnameContent({
     };
   }, []);
 
+  /* ===== TOOLTIP CLEANUP ===== */
   useEffect(() => {
     return () => {
       if (tldTooltipTimeoutRef.current) {
@@ -84,6 +84,7 @@ export function RegisterBitnameContent({
     };
   }, []);
 
+  /* ===== TLD HANDLERS ===== */
   const handleTldSelect = (tld: ROOT_DOMAIN_TYPES) => {
     setOpenTldDropdown(false);
     setIsSelectingTld(true);
@@ -96,6 +97,7 @@ export function RegisterBitnameContent({
     setIsSelectingTld(false);
   };
 
+  /* ===== TOOLTIP HANDLERS ===== */
   const handleTldMouseEnter = () => {
     if (allowTldTooltip) {
       if (tldTooltipTimeoutRef.current) {
@@ -115,14 +117,17 @@ export function RegisterBitnameContent({
     setAllowTldTooltip(true);
   };
 
+  /* ===== CONFIG CHECK ===== */
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
   }
 
+  /* ===== MODAL HANDLERS ===== */
   const handleClose = () => {
     setIsOpen(false);
   };
 
+  /* ===== SUBMISSION HANDLERS ===== */
   const handleTransferSubmit = async (): Promise<void> => {
     try {
       if (!formState.toAddress) return;
@@ -135,6 +140,7 @@ export function RegisterBitnameContent({
     }
   };
 
+  /* ===== AVAILABILITY CHECK ===== */
   const checkAvailability = async (): Promise<boolean> => {
     setCheckStatus(false);
     try {
@@ -164,28 +170,40 @@ export function RegisterBitnameContent({
     }
   };
 
+  /* ===== COMPONENT RENDER ===== */
   return (
-    <div className={bodyTools}>
-      <h1 className={titlePurpleLDCenter}>REGISTER</h1>
+    <div class={bodyForms}>
+      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>REGISTER</h1>
 
-      <div className={`${backgroundContainer} w-full gap-3 mobileLg:gap-6`}>
+      <form
+        class={`${containerBackground} gap-5`}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleTransferSubmit();
+        }}
+        aria-label="Bitname registration form"
+        novalidate
+      >
+        {/* Animated Input Container */}
         <div
-          class={`${animatedBorderPurple} ${
+          class={`${outlineGradient} ${purpleGradient} ${
             openTldDropdown && !isSelectingTld ? "input-open-right" : ""
           }`}
         >
-          <div class="flex justify-between relative z-[2] !bg-[#100318] placeholder:!bg-[#100318] rounded-md">
+          <div class="flex justify-between relative z-[2]">
             <input
               type="text"
-              id="search-dropdown"
-              class="h-[54px] mobileLg:h-[60px] w-full bg-transparent rounded-md pl-6 text-base mobileLg:text-lg font-medium text-stamp-grey-light placeholder:font-light placeholder:!text-stamp-grey !outline-none focus-visible:!outline-none focus:!bg-[#100318]"
               placeholder="bitname"
+              id="search-dropdown"
+              class={inputFieldOutline}
               required
               value={formState.toAddress || ""}
               onChange={(e) => handleInputChange(e, "toAddress")}
               autocomplete="off"
               autoCorrect="off"
+              aria-label="Bitname input"
             />
+            {/* TLD Dropdown Container */}
             <div
               className="relative"
               ref={tldDropdownRef}
@@ -197,9 +215,10 @@ export function RegisterBitnameContent({
                   setAllowTldTooltip(false);
                   setIsTldTooltipVisible(false);
                 }}
-                className="h-[54px] min-w-24 mobileLg:h-[60px] px-[18px] mobileLg:px-6 rounded-md bg-transparent text-base mobileLg:text-lg font-bold text-stamp-grey hover:text-stamp-grey-light tracking-[0.05em] focus-visible:!outline-none"
+                className="h-12 min-w-20 mt-[1px] px-5 rounded-md bg-transparent font-bold text-base text-stamp-grey text-right hover:text-stamp-grey-light tracking-wider transition-colors duration-300 focus-visible:!outline-none"
                 onMouseEnter={handleTldMouseEnter}
                 onMouseLeave={handleTldMouseLeave}
+                aria-label="Select top level domain"
               >
                 <div
                   className={`${tooltipButton} tracking-normal ${
@@ -211,13 +230,15 @@ export function RegisterBitnameContent({
                 {formState.root}
               </button>
               {openTldDropdown && (
-                <ul className="absolute top-[100%] right-[-2px] max-h-[134px] w-[88px] mobileLg:max-h-[162px] mobileLg:w-[96px] bg-[#100318] bg-opacity-70 backdrop-filter backdrop-blur-md border-2 border-t-0 border-stamp-purple-bright rounded-b-md z-[11] overflow-y-auto">
+                <ul className="absolute top-[100%] right-[-2px] max-h-[160px] w-[80px] bg-[#100318] bg-opacity-70 backdrop-filter backdrop-blur-md border-2 border-t-0 border-stamp-purple-bright rounded-b-md z-[11] overflow-y-auto">
                   {ROOT_DOMAINS.map((tld) => (
                     <li
                       key={tld}
-                      className="cursor-pointer py-1.5 mobileLg:py-1 px-5 mobileLg:px-[26px] text-sm mobileLg:text-base text-stamp-grey font-bold tracking-[0.05em] leading-none hover:bg-stamp-purple-bright/15 hover:text-stamp-grey-light transition-colors"
+                      className="py-2 last:pb-4 tablet:py-1.5 tablet:last:pb-3 pr-5 font-bold text-sm text-stamp-grey text-right tracking-wide leading-none hover:bg-stamp-purple-bright/15 hover:text-stamp-grey-light transition-colors duration-300 cursor-pointer"
                       onClick={() => handleTldSelect(tld)}
                       onMouseDown={(e) => e.preventDefault()}
+                      role="option"
+                      aria-selected={formState.root === tld}
                     >
                       {tld}
                     </li>
@@ -226,41 +247,13 @@ export function RegisterBitnameContent({
               )}
             </div>
           </div>
-
-          {
-            /* <div className={animatedInputContainer}>
-            <InputField
-              type="text"
-              placeholder="Please input your bitname"
-              value={formState.toAddress?.replace(".btc", "") || ""}
-              onChange={(e) => {
-                const value = (e.target as HTMLInputElement).value.toLowerCase()
-                  .replace(
-                    ".btc",
-                    "",
-                  );
-                handleInputChange(
-                  {
-                    target: {
-                      value: value ? `${value}.btc` : "",
-                    },
-                  },
-                  "toAddress",
-                );
-              }}
-              error={formState.toAddressError}
-              class="relative z-[2] h-[54px] mobileLg:h-[60px] w-full !bg-[#100318] rounded-md pl-6 text-base mobileLg:text-lg font-bold text-stamp-grey-light placeholder:!bg-[#100318] placeholder:!text-stamp-grey placeholder:lowercase outline-none focus:!bg-[#100318]"
-            />
-          </div>
-          <span class="absolute z-[3] right-6 top-1/2 -translate-y-1/2 text-base mobileLg:text-lg font-black text-stamp-purple pointer-events-none">
-            .btc
-          </span> */
-          }
         </div>
+
+        {/* Status and Availability Check Section */}
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-col justify-center items-start">
             {/* message - default:noDisplay / display on user input & onClick - either already registered or available */}
-            <p className="text-sm mobileLg:text-base font-medium text-[#999999]">
+            <h6 className="font-medium text-sm text-stamp-grey">
               {formState.toAddress && checkStatus
                 ? isExist
                   ? `${
@@ -270,21 +263,25 @@ export function RegisterBitnameContent({
                     formState.toAddress.toLowerCase() + formState.root
                   } is available`
                 : ""}
-            </p>
+            </h6>
           </div>
           <div className="flex flex-col items-end">
-            <button
+            <Button
               type="button"
-              className={buttonPurpleOutline}
+              variant="outline"
+              color="purple"
+              size="lg"
               onClick={checkAvailability}
+              aria-label="Check bitname availability"
             >
               AVAILABILITY
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
+      </form>
 
-      <div className={`${backgroundContainer} w-full`}>
+      {/* ===== FEE CALCULATOR AND STATUS MESSAGES ===== */}
+      <div className={containerBackground}>
         <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
@@ -321,4 +318,34 @@ export function RegisterBitnameContent({
       )}
     </div>
   );
+}
+
+{
+  /* <div className={animatedInputContainer}>
+  <InputField
+    type="text"
+    placeholder="Please input your bitname"
+    value={formState.toAddress?.replace(".btc", "") || ""}
+    onChange={(e) => {
+      const value = (e.target as HTMLInputElement).value.toLowerCase()
+        .replace(
+          ".btc",
+          "",
+        );
+      handleInputChange(
+        {
+          target: {
+            value: value ? `${value}.btc` : "",
+          },
+        },
+        "toAddress",
+      );
+    }}
+    error={formState.toAddressError}
+    class="relative z-[2] h-[54px] mobileLg:h-[60px] w-full !bg-[#100318] rounded-md pl-6 text-base mobileLg:text-lg font-bold text-stamp-grey-light placeholder:!bg-[#100318] placeholder:!text-stamp-grey placeholder:lowercase outline-none focus:!bg-[#100318]"
+  />
+</div>
+<span class="absolute z-[3] right-6 top-1/2 -translate-y-1/2 text-base mobileLg:text-lg font-black text-stamp-purple pointer-events-none">
+  .btc
+</span> */
 }

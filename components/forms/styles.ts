@@ -87,6 +87,10 @@ export const inputField = `
   font-medium text-sm text-stamp-grey-darkest
   placeholder:font-light placeholder:text-stamp-grey-darkest placeholder:uppercase 
 `;
+// Most styling is done in the outlineGradient constant
+export const inputFieldOutline = `
+  h-12 w-full
+`;
 export const inputTextarea = `
   h-[100px] p-3 w-full resize-none
   rounded-md bg-stamp-grey focus:bg-stamp-grey-light outline-none focus:outline-none
@@ -182,3 +186,37 @@ export const layoutVariants = {
   row: formRow,
   rowResponsive: formRowResponsive,
 } as const;
+
+// Gradient color schemes
+export const purpleGradient = `
+  [--color-3:#660099]
+  [--color-2:#8800CC]
+  [--color-1:#AA00FF]
+  [--default-color:var(--color-2)]
+  [--hover-color:var(--color-1)]
+`;
+
+export const greyGradient = `
+  [--color-3:#666666]
+  [--color-2:#999999]
+  [--color-1:#CCCCCC]
+  [--default-color:var(--color-2)]
+  [--hover-color:var(--color-1)]
+`;
+
+// Base gradient input style
+export const outlineGradient = `
+  relative !bg-[#100318] !p-[2px] rounded-md !border-0
+  before:absolute before:inset-0 before:rounded-md before:z-[1]
+  before:bg-[conic-gradient(from_var(--angle),var(--color-3),var(--color-2),var(--color-1),var(--color-2),var(--color-3))]
+  before:[--angle:0deg] before:animate-rotate
+  hover:before:bg-[conic-gradient(from_var(--angle),var(--color-1),var(--color-1),var(--color-1),var(--color-1),var(--color-1))]
+  focus-within:before:bg-[conic-gradient(from_var(--angle),var(--color-1),var(--color-1),var(--color-1),var(--color-1),var(--color-1))]
+  before:transition-colors before:duration-300
+  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#100318]
+  [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-[#100318] [&>div]:placeholder:!bg-[#100318] [&>div]:rounded-md
+  [&>div>input]:h-12 [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-md [&>div>input]:pl-5 
+  [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-stamp-grey-light 
+  [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-stamp-grey 
+  [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-[#100318]
+`;
