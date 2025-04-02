@@ -13,13 +13,9 @@ import { Button } from "$buttons";
 import {
   bodyForms,
   containerBackground,
-  formContainerCol,
-  formContainerRow,
   inputFieldOutline,
-  inputTextarea,
   outlineGradient,
   purpleGradient,
-  SRC20InputField,
 } from "$forms";
 
 /* ===== COMPONENT INTERFACE ===== */

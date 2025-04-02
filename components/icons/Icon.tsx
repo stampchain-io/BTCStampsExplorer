@@ -50,6 +50,9 @@ export function Icon(props: IconVariants) {
       caretDoubleRight: "caretDoubleRight",
       upload: "image",
       image: "image",
+      fullscreen: "cornersOut",
+      locked: "lockClosed",
+      unlocked: "lockOpen",
       template: "template",
     };
 
