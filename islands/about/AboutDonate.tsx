@@ -368,7 +368,7 @@ export default function AboutDonate() {
               >
                 <Icon
                   type="iconButton"
-                  name="handcoins"
+                  name="donate"
                   weight="normal"
                   size="xl"
                   color="purple"

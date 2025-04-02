@@ -143,16 +143,15 @@ export default function StampingSrc20Page(
   };
 
   return (
-    <div class="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
-      <div class="self-center max-w-[680px] w-full mx-auto">
+    <div class="flex flex-col gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
+      <div class="flex w-full">
         {renderContent()}
       </div>
-
-      <div class="flex flex-col tablet:flex-row gap-12 mobileLg:gap-24 tablet:gap-6 desktop:gap-9">
-        <div class="w-full tablet:w-1/2">
+      <div class="flex flex-col tablet:flex-row justify-between gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
+        <div class="flex w-full tablet:w-1/2 desktop:w-1/3">
           {renderLeftSidebar()}
         </div>
-        <div class="w-full tablet:w-1/2">
+        <div class="flex w-full tablet:w-1/2 desktop:w-2/3">
           {renderRightSidebar()}
         </div>
       </div>

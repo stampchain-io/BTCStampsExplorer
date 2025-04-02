@@ -27,8 +27,7 @@ const VARIANT_STYLES = {
     "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md font-bold text-sm tracking-wider h-10 px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors",
   wallet:
     "flex items-center justify-center w-9 h-9 p-0 border-2 border-stamp-purple rounded-md hover:border-stamp-purple-bright group cursor-pointer",
-  icon:
-    "flex items-center justify-center w-9 h-9 p-0 border-2 border-stamp-purple rounded-md hover:border-stamp-purple-bright group cursor-pointer",
+  icon: "flex items-center justify-center w-9 h-9 group cursor-pointer",
 };
 
 export function Button({
@@ -41,7 +40,7 @@ export function Button({
   const baseClass = VARIANT_STYLES[variant];
   const className = props.class ? `${baseClass} ${props.class}` : baseClass;
   const iconClass =
-    "w-[16px] h-[16px] mobileLg:w-[20px] mobileLg:h-[20px] fill-stamp-purple group-hover:fill-stamp-purple-bright cursor-pointer";
+    "w-7 h-7 tablet:h-5 tablet:w-5 fill-stamp-purple group-hover:fill-stamp-purple-bright cursor-pointer";
 
   return (
     <button

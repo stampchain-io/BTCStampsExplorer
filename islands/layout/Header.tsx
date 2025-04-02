@@ -1,3 +1,4 @@
+/* ===== HEADER COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
 import { CloseIcon, GearIcon, HamburgerMenuIcon } from "$icons";
@@ -7,7 +8,6 @@ import {
   navLinkGreyLD,
   navLinkPurpleThick,
 } from "$text";
-import { CollapsibleSection } from "$components/shared/Collapsible.tsx";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
@@ -384,14 +384,13 @@ export function Header() {
               </div>
             </div>
 
-            <CollapsibleSection
-              title="Tools"
-              section="tools"
-              expanded={toolsOpen}
-              toggle={toggleTools}
-              variant="collapsibleTools"
+            <div
+              className={`overflow-hidden transition-all duration-500 ease-in-out
+                ${
+                toolsOpen ? "max-h-[260px] opacity-100" : "max-h-0 opacity-0"
+              }`}
             >
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col pl-9 pb-9 gap-3">
                 {toolLinks.map((link) => (
                   <a
                     key={link.href}
@@ -410,7 +409,7 @@ export function Header() {
                   </a>
                 ))}
               </div>
-            </CollapsibleSection>
+            </div>
           </div>
         </div>
       </div>

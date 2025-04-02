@@ -7,7 +7,8 @@ import {
   formatSatoshisToUSD,
 } from "$lib/utils/formatUtils.ts";
 import type { BaseFeeCalculatorProps } from "$lib/types/base.d.ts";
-import { FeeStyles } from "$components/shared/fee/styles.ts";
+import { tooltipButton, tooltipImage } from "$notifications";
+import { buttonPurpleFlat, buttonPurpleOutline } from "$buttons";
 
 interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   isModal?: boolean;
@@ -179,12 +180,12 @@ export function FeeCalculatorBase({
   // Fee selector component
   const renderFeeSelector = () => (
     <div className={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
-      <p className="text-base mobileLg:text-lg text-stamp-grey-light font-light">
+      <p className="font-light text-base text-stamp-grey-light mb-0">
         <span className="text-stamp-grey-darker">FEE</span>{" "}
         <span className="font-bold">{fee}</span> SAT/vB
       </p>
       {fees?.recommendedFee && (
-        <p className="mb-3 text-sm mobileLg:text-base text-stamp-grey-light font-light text-nowrap">
+        <p className="font-light text-sm text-stamp-grey-light mb-3 text-nowrap">
           <span className="text-stamp-grey-darker">RECOMMENDED</span>{" "}
           <span className="font-medium">{fees.recommendedFee}</span> SAT/vB
         </p>
@@ -212,10 +213,10 @@ export function FeeCalculatorBase({
             handleChangeFee(
               sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
             )}
-          className="w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+          className="w-full h-1 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
         />
         <div
-          className={`${FeeStyles.tooltipImage} ${
+          className={`${tooltipImage} ${
             isFeeTooltipVisible ? "opacity-100" : "opacity-0"
           }`}
           style={{
@@ -233,8 +234,7 @@ export function FeeCalculatorBase({
   // Estimate details component
   const renderDetails = () => {
     const detailsTitle = "text-stamp-grey-darker font-light";
-    const detailsText =
-      "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
+    const detailsText = "text-xs font-medium text-stamp-grey-light mb-0";
 
     return (
       <div className={`${visible ? "visible" : "invisible"} gap-1 mt-1.5`}>
@@ -420,13 +420,13 @@ export function FeeCalculatorBase({
               </span>&nbsp;&nbsp;{supply}
             </p>
           )}
-        
+
         {/* Transfer Details */}
         {transferDetails?.address && (
           <p className={detailsText}>
             <span className={detailsTitle}>
               RECEIPIENT ADDY
-            </span>&nbsp;&nbsp;{ transferDetails?.address }
+            </span>&nbsp;&nbsp;{transferDetails?.address}
           </p>
         )}
 
@@ -434,7 +434,7 @@ export function FeeCalculatorBase({
           <p className={detailsText}>
             <span className={detailsTitle}>
               TOKEN TICKER
-            </span>&nbsp;&nbsp;{ transferDetails?.token }
+            </span>&nbsp;&nbsp;{transferDetails?.token}
           </p>
         )}
 
@@ -442,7 +442,7 @@ export function FeeCalculatorBase({
           <p className={detailsText}>
             <span className={detailsTitle}>
               AMOUNT
-            </span>&nbsp;&nbsp;{ transferDetails?.amount }
+            </span>&nbsp;&nbsp;{transferDetails?.amount}
           </p>
         )}
 
@@ -451,7 +451,7 @@ export function FeeCalculatorBase({
           <p className={detailsText}>
             <span className={detailsTitle}>
               TOKEN TICKER
-            </span>&nbsp;&nbsp;{ mintDetails?.token }
+            </span>&nbsp;&nbsp;{mintDetails?.token}
           </p>
         )}
 
@@ -459,7 +459,7 @@ export function FeeCalculatorBase({
           <p className={detailsText}>
             <span className={detailsTitle}>
               AMOUNT
-            </span>&nbsp;&nbsp;{ mintDetails?.amount }
+            </span>&nbsp;&nbsp;{mintDetails?.amount}
           </p>
         )}
       </div>
@@ -477,20 +477,20 @@ export function FeeCalculatorBase({
             }`}
           >
             <button
-              className="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
+              className="min-w-10 h-5 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
               onClick={handleCoinToggle}
               onMouseEnter={handleCurrencyMouseEnter}
               onMouseLeave={handleCurrencyMouseLeave}
             >
               <div
-                className={`w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey ${
+                className={`w-5 h-5 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey ${
                   coinType === "BTC" ? "translate-x-full" : ""
                 }`}
               >
                 {coinType === "BTC" ? btcIcon : usdIcon}
               </div>
               <div
-                className={`${FeeStyles.tooltipButton} ${
+                className={`${tooltipButton} ${
                   isCurrencyTooltipVisible ? "opacity-100" : "opacity-0"
                 }`}
               >
@@ -501,7 +501,7 @@ export function FeeCalculatorBase({
         )}
       </div>
 
-      <p className="mt-4 text-xl mobileLg:text-2xl text-stamp-grey-light font-light">
+      <p className="mt-4 text-xl text-stamp-grey-light font-light">
         <span className="text-stamp-grey-darker">ESTIMATE</span>{" "}
         {coinType === "BTC"
           ? (
@@ -528,7 +528,7 @@ export function FeeCalculatorBase({
 
       <div
         onClick={() => setVisible(!visible)}
-        className="flex items-center gap-2 uppercase mt-2 text-xs mobileLg:text-sm cursor-pointer text-stamp-grey-darker hover:text-stamp-grey-light transition-colors duration-300 group"
+        className="flex items-center gap-2 uppercase mt-2 text-xs cursor-pointer text-stamp-grey-darker hover:text-stamp-grey-light transition-colors duration-300 group"
       >
         DETAILS
         <svg
@@ -544,7 +544,7 @@ export function FeeCalculatorBase({
 
       {renderDetails()}
 
-      <div className="flex flex-col items-end gap-4 pt-6 mobileLg:pt-9">
+      <div className="flex flex-col items-end gap-4 pt-6">
         {!isModal && (
           <div className="relative flex items-center">
             <input
@@ -579,7 +579,7 @@ export function FeeCalculatorBase({
                 )}
               </div>
               <span
-                className={`text-xs mobileLg:text-sm font-medium transition-colors duration-300 ${
+                className={`text-xs font-medium transition-colors duration-300 ${
                   tosAgreed ? "text-stamp-grey-darker" : "text-stamp-grey-light"
                 }`}
               >
@@ -618,7 +618,7 @@ export function FeeCalculatorBase({
         <div className="flex justify-end gap-6">
           {isModal && onCancel && (
             <button
-              className={`${FeeStyles.buttonPurpleOutline} ${
+              className={`${buttonPurpleOutline} ${
                 (disabled || isSubmitting || (!isModal && !tosAgreed))
                   ? "opacity-50 cursor-not-allowed"
                   : ""
@@ -630,9 +630,9 @@ export function FeeCalculatorBase({
             </button>
           )}
           <button
-            className={`${FeeStyles.buttonPurpleFlat} ${
+            className={`${buttonPurpleFlat} ${
               (disabled || isSubmitting || (!isModal && !tosAgreed))
-                ? "opacity-50 cursor-not-allowed"
+                ? "opacity-40 cursor-not-allowed"
                 : ""
             }`}
             onClick={onSubmit}
@@ -650,7 +650,7 @@ export function FeeCalculatorBase({
 const btcIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="w-[20px] h-[20px] mobileLg:w-6 mobileLg:h-6"
+    className="w-5 h-5"
     viewBox="0 0 24 24"
   >
     <path
@@ -663,7 +663,7 @@ const btcIcon = (
 const usdIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="w-[20px] h-[20px] mobileLg:w-6 mobileLg:h-6"
+    className="w-5 h-5"
     style={{ padding: "1px" }}
     viewBox="0 0 32 32"
   >

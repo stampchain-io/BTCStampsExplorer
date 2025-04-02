@@ -198,6 +198,12 @@ export const buttonStyles: ButtonVariants = {
 };
 
 /* ===== ADDITIONAL STYLES ===== */
+/* ===== TEMPORARY STYLES ===== */
+export const buttonPurpleOutline =
+  "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm font-bold tracking-wider text-stamp-purple h-10 px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors duration-300";
+export const buttonPurpleFlat =
+  "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm font-bold tracking-wider text-black h-10 px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors duration-300";
+
 /* ===== TOGGLE SWITCH BUTTON STYLES ===== */
 export const toggleButton =
   "flex items-center relative w-10 h-5 rounded-full bg-stamp-grey focus:outline-none transition duration-300";

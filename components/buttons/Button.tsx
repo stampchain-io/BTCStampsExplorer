@@ -1,7 +1,7 @@
 /* ===== BUTTON COMPONENTS MODULE ===== */
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { JSX } from "preact";
-import { button, ButtonProps, buttonStyles } from "./styles.ts";
+import { button, ButtonProps, buttonStyles } from "$buttons";
 
 /* ===== LOADING SPINNER COMPONENT ===== */
 const LoadingSpinner = () => (
