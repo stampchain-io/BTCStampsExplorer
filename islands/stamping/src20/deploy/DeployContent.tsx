@@ -3,12 +3,12 @@ import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import { Icon } from "$icons";
 import {
   bodyForms,
   containerBackground,
@@ -306,10 +306,12 @@ export function DeployContent(
                   for="upload"
                   class="cursor-pointer bg-conic-pattern bg-[length:4px_4px] h-full flex flex-col items-center justify-center gap-3"
                 >
-                  <img
-                    src="/img/stamping/image-upload.svg"
-                    class="w-7 h-7"
-                    alt=""
+                  <Icon
+                    type="icon"
+                    name="upload"
+                    weight="normal"
+                    size="xxl"
+                    color="grey"
                   />
                   <div
                     class={`${tooltipImage} ${
@@ -340,7 +342,7 @@ export function DeployContent(
 
           {/* Token details section */}
           <div className={formContainerCol}>
-            <div class="w-full flex gap-3 mobileMd:gap-6">
+            <div class={formContainerRow}>
               {/* Token input */}
               <SRC20InputField
                 type="text"
@@ -418,14 +420,14 @@ export function DeployContent(
               : "max-h-0 opacity-0 mt-0"
           }`}
         >
-          <div className={`${formContainerCol}`}>
+          <div className={formContainerCol}>
             <textarea
               type="text"
               class={`${inputTextarea} scrollbar-grey`}
               placeholder="Description"
               rows={3}
             />
-            <div className={`${formContainerRow}`}>
+            <div className={formContainerRow}>
               <SRC20InputField
                 type="text"
                 placeholder="X"
@@ -439,7 +441,7 @@ export function DeployContent(
                 onChange={(e) => handleInputChange(e, "web")}
               />
             </div>
-            <div className={`${formContainerRow}`}>
+            <div className={formContainerRow}>
               <SRC20InputField
                 type="text"
                 placeholder="Telegram"

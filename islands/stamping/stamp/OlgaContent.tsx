@@ -1,3 +1,4 @@
+/* ===== STAMPING COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { useConfig } from "$client/hooks/useConfig.ts";
 import axiod from "axiod";
@@ -16,6 +17,7 @@ import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 import { titlePurpleLD } from "$text";
 import { ToggleSwitchButton } from "$buttons";
+import { Icon } from "$icons";
 import {
   tooltipButton,
   tooltipButtonInCollapsible,
@@ -989,7 +991,7 @@ export function OlgaContent() {
   const imagePreviewDiv = (
     <div
       id="image-preview"
-      class={`relative items-center content-center mx-auto rounded ${PREVIEW_SIZE_CLASSES}  text-center group transition duration-300 cursor-pointer `}
+      class={`relative items-center content-center mx-auto rounded ${PREVIEW_SIZE_CLASSES} text-center group transition duration-300 cursor-pointer `}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
@@ -1055,10 +1057,12 @@ export function OlgaContent() {
                 />
               )}
             <div class="flex items-center justify-center absolute inset-0 rounded hover:bg-stamp-grey-darkest/80 opacity-0 hover:opacity-100 transition-opacity">
-              <img
-                src="/img/stamping/image-upload.svg"
-                class="w-7 h-7 "
-                alt="Change file"
+              <Icon
+                type="icon"
+                name="upload"
+                weight="normal"
+                size="xxl"
+                color="grey"
               />
             </div>
           </label>
@@ -1068,10 +1072,12 @@ export function OlgaContent() {
             for="upload"
             class="flex flex-col items-center justify-center h-full rounded bg-stamp-purple-dark hover:bg-stamp-purple cursor-pointer"
           >
-            <img
-              src="/img/stamping/image-upload.svg"
-              class="w-7 h-7"
-              alt="Upload image"
+            <Icon
+              type="icon"
+              name="upload"
+              weight="normal"
+              size="xxl"
+              color="grey"
             />
           </label>
         )}

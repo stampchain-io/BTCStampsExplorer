@@ -15,6 +15,7 @@ import {
 import { logger } from "$lib/utils/logger.ts";
 import { SRC20MintStatus } from "$types/src20.d.ts";
 import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
+import { Icon } from "$icons";
 
 /* ===== MAIN COMPONENT INTERFACE ===== */
 interface MintContentProps {
@@ -317,14 +318,24 @@ export function MintContent({
               ? (
                 <div class="animate-spin rounded-full w-7 h-7 border-b-[3px] border-stamp-grey" />
               )
-              : (
+              : selectedTokenImage
+              ? (
                 <img
-                  src={selectedTokenImage || `/img/stamping/image-upload.svg`}
-                  class={selectedTokenImage ? "w-full h-full" : "w-7 h-7"}
+                  src={selectedTokenImage}
+                  class="w-full h-full"
                   alt=""
                   loading="lazy"
                   onLoad={() => setIsImageLoading(false)}
                   onError={() => setIsImageLoading(false)}
+                />
+              )
+              : (
+                <Icon
+                  type="icon"
+                  name="image"
+                  weight="normal"
+                  size="xxl"
+                  color="grey"
                 />
               )}
           </div>

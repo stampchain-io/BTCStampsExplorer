@@ -48,6 +48,8 @@ export function Icon(props: IconVariants) {
       caretRight: "caretRight",
       caretDoubleLeft: "caretDoubleLeft",
       caretDoubleRight: "caretDoubleRight",
+      upload: "image",
+      image: "image",
       template: "template",
     };
 
@@ -81,6 +83,7 @@ export function Icon(props: IconVariants) {
     );
   }
 
+  // TO BE UPDATED
   if (type === "iconButton") {
     return (
       <button type="button" onClick={onClick}>

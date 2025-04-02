@@ -1,6 +1,6 @@
 /* ===== GEAR ICON COMPONENT ===== */
 import { Icon } from "$icons";
-import type { IconVariants } from "$components/icons/styles.ts";
+import type { IconVariants } from "$icons";
 
 /* ===== COMPONENT INTERFACE ===== */
 interface GearIconProps {
