@@ -1,3 +1,4 @@
+/* ===== IMPORTS AND DEPENDENCIES ===== */
 import { StampPageProps } from "$globals";
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
@@ -6,10 +7,13 @@ import { StampHeader } from "$islands/stamp/StampHeader.tsx";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "$globals";
 
+/* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
 
+/* ===== SERVER-SIDE HANDLER ===== */
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
+    /* ===== REQUEST PARSING ===== */
     const url = new URL(req.url);
     console.log("[Stamp Handler]", {
       url: url.toString(),
@@ -18,12 +22,13 @@ export const handler: Handlers = {
       headers: Object.fromEntries(req.headers),
     });
 
-    // Only process requests for /stamp route
+    // Fresh framework optimization - skip processing for non-stamp routes
     if (url.searchParams.has("_fresh") && !url.pathname.startsWith("/stamp")) {
       return new Response(null, { status: 204 });
     }
 
     try {
+      /* ===== QUERY PARAMETER EXTRACTION ===== */
       const sortBy = url.searchParams.get("sortBy") || "DESC";
       const filterBy = url.searchParams.get("filterBy")
         ? (url.searchParams.get("filterBy")?.split(",").filter(
@@ -37,13 +42,17 @@ export const handler: Handlers = {
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
       const recentSales = url.searchParams.get("recentSales") === "true";
 
+      /* ===== DATA FETCHING LOGIC ===== */
       let result;
       if (recentSales) {
+        // Handle recent sales view
         result = await StampController.getRecentSales(page, page_size);
       } else {
+        // Handle regular stamp listing
         const ident: SUBPROTOCOLS[] = [];
         let collectionId;
 
+        // Special handling for POSH stamps
         if (selectedTab === "posh") {
           const poshCollection = await CollectionService.getCollectionByName(
             "posh",
@@ -55,6 +64,7 @@ export const handler: Handlers = {
           }
         }
 
+        // Fetch stamps with filters
         result = await StampController.getStamps({
           page,
           limit: page_size,
@@ -67,6 +77,7 @@ export const handler: Handlers = {
         });
       }
 
+      /* ===== RESPONSE DATA FORMATTING ===== */
       const { data: stamps = [], ...restResult } = result;
       const data = {
         ...restResult,
@@ -89,6 +100,7 @@ export const handler: Handlers = {
   },
 };
 
+/* ===== CLIENT-SIDE PAGE COMPONENT ===== */
 export function StampPage(props: StampPageProps) {
   const {
     stamps,
@@ -102,12 +114,16 @@ export function StampPage(props: StampPageProps) {
   const stampsArray = Array.isArray(stamps) ? stamps : [];
   const isRecentSales = selectedTab === "recent_sales";
 
+  /* ===== COMPONENT RENDER ===== */
   return (
     <div class="w-full" f-client-nav data-partial="/stamp">
+      {/* Header Component with Filter Controls */}
       <StampHeader
         filterBy={filterBy as STAMP_FILTER_TYPES[]}
         sortBy={sortBy}
       />
+
+      {/* Main Content with Pagination */}
       <StampContent
         stamps={stampsArray}
         isRecentSales={isRecentSales}
