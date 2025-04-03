@@ -11,7 +11,7 @@ import { ConnectorsModal } from "$islands/Wallet/ConnectorsModal.tsx";
 import { _getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import AnimationLayout from "$components/shared/animation/AnimationLayout.tsx";
 import { Button } from "$components/buttons/Button.tsx";
-import { navLinkPurple } from "$text";
+import { navLinkPurple, valueDarkSm } from "$text";
 /* ===== WALLET MODAL COMPONENT INTERFACE ===== */
 interface Props {
   connectors?: ComponentChildren[];
@@ -129,8 +129,8 @@ export const WalletModal = ({ connectors = [] }: Props) => {
           {/* ===== MOBILE/TABLET MENU ===== */}
           <div class="tablet:hidden flex gap-5 text-right">
             <div class="flex flex-col justify-end">
-              <h6 class="font-medium text-sm text-stamp-grey-darker tracking-tighter cursor-default select-none">
-                {abbreviateAddress(address, 6)}
+              <h6 class={valueDarkSm}>
+                {abbreviateAddress(address, 8)}
               </h6>
             </div>
 
@@ -173,7 +173,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
                         pt-1 pb-3.5 
                         backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
               <div class="flex flex-col px-[18px] gap-1 whitespace-nowrap">
-                <h6 class="font-medium text-xs text-stamp-grey-darker cursor-default select-none pb-0.5">
+                <h6 class={`${valueDarkSm} pb-0.5`}>
                   {abbreviateAddress(address, 6)}
                 </h6>
                 <a

@@ -20,45 +20,45 @@ export default function AboutTeam() {
               {/* ===== MIKE IN SPACE CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/code.png" />
-                <p className={aboutTitlePurpleLD}>
+                <h5 className={aboutTitlePurpleLD}>
                   MIKE IN SPACE
-                </p>
-                <p className={aboutSubTitlePurple}>
+                </h5>
+                <h6 className={aboutSubTitlePurple}>
                   CODE{" "}
                   <span className="mobileMd:hidden">
                     <br />
                   </span>
                   CONOISSEUR
-                </p>
+                </h6>
               </div>
 
               {/* ===== REINAMORA CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/backend.png" />
-                <p className={aboutTitlePurpleLD}>
+                <h5 className={aboutTitlePurpleLD}>
                   REINAMORA
-                </p>
-                <p className={aboutSubTitlePurple}>
+                </h5>
+                <h6 className={aboutSubTitlePurple}>
                   BACKEND{" "}
                   <span className="mobileMd:hidden">
                     <br />
                   </span>
                   BIGBRAINS
-                </p>
+                </h6>
               </div>
 
               {/* ===== ARWYN CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/memetic.png" />
-                <p className={aboutTitlePurpleLD}>
+                <h5 className={aboutTitlePurpleLD}>
                   ARWYN
-                </p>
-                <p className={aboutSubTitlePurple}>
+                </h5>
+                <h6 className={aboutSubTitlePurple}>
                   MEMETIC{" "}
                   <span className="mobileMd:hidden">
                     <br />
                   </span>MASTER
-                </p>
+                </h6>
               </div>
             </div>
           </div>

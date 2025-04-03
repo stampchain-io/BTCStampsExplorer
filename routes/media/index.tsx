@@ -89,7 +89,7 @@ export default function Media() {
                 allowFullScreen
               />
             </div>
-            <p className={text}>
+            <p>
               This week Jmo and Andreas were joined by the creator of Bitcoin
               STAMPS, Mike In Space!
             </p>
@@ -112,7 +112,7 @@ export default function Media() {
                 allowFullScreen
               />
             </div>
-            <p className={text}>
+            <p>
               Curious about the story behind Bitcoin Stamps?
             </p>
             <p>

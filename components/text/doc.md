@@ -98,6 +98,10 @@
  * Values:
  * - valueSm, value, valueLg
  * - Purpose: Data display, metrics
+ *
+ * Tooltips:
+ * - tooltipText
+ * - Purpose: Text style specific to tooltips - defined in in /notifications/styles.ts
  * 
  * Interactive Elements
  * ------------------
@@ -272,17 +276,17 @@
  * ---------------
  * Common Issues
  * -------------
- * 1. **Style not applying**
+ * 1. Style not applying
  *   - Check import path
  *   - Verify className syntax
  *   - Check for conflicting styles
  * 
- * 2. **Responsive issues**
+ * 2. Responsive issues
  *   - Test at all breakpoints
  *   - Check mobile-first styles
  *   - Verify media query order
  * 
- * 3. **Animation glitches**
+ * 3. Animation glitches
  *   - Check transition properties
  *   - Verify hardware acceleration
  *   - Test performance impact
@@ -291,12 +295,12 @@
  * -----
  * Heading Structure
  * ----------------
- * - **H1**: Page title
- * - **H2**: Subtitles and major section titles
- * - **H3**: Subsection titles
- * - **H4**: Headings
- * - **H5**: Data labels and values
- * - **H6**: Dropdown data values and misc text
+ * - H1: Page title
+ * - H2: Subtitles and major section titles
+ * - H3: Subsection titles
+ * - H4: Headings
+ * - H5: Data labels and values
+ * - H6: Dropdown data values and misc text
  * 
  * SEO Guidelines
  * -------------

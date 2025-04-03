@@ -41,8 +41,8 @@ export type TextStyles = {
   value: string;
   valueLg: string;
   valueXl: string;
-  // Overline and tagline styles
-  overline: string;
+  valueDarkSm: string;
+  // Miscellaneous specific styles
   tagline: string;
   copyright: string;
   // Non updated styles
@@ -129,7 +129,7 @@ export const textLinkUnderline =
 // Data text within containers
 // Labels
 export const labelSm = `${labelFont} text-sm ${cursor}`;
-export const label = `${labelFont} text-base ${cursor}`; // = dataValue
+export const label = `${labelFont} text-base ${cursor}`; // = old dataValue name
 export const labelLg = `${labelFont} text-lg ${cursor}`;
 export const labelXl = `${labelFont} text-xl ${cursor}`;
 // Values
@@ -137,26 +137,23 @@ export const valueSm = `${valueFont} text-sm ${cursor}`;
 export const value = `${valueFont} text-base ${cursor}`;
 export const valueLg = `${valueFont} text-lg ${cursor}`;
 export const valueXl = `${valueFont} text-xl ${cursor}`;
+export const valueDarkSm =
+  `font-medium text-sm text-stamp-grey-darker tracking-tighter ${cursor}`; // used for addy styling in mobile/table/desktop header
+// Tooltips
+// One text style for tooltips - defined in /notifications/styles.ts
+// Code
+// Add "font-courier-prime" to the class name to use the Courier font and make text monospace
 
 // Overline - Category labels, tagline, above titles (update from filter styles)
-export const overline = // rename
-  `font-light text-base text-stamp-grey-darker tracking-wide inline-block ${cursor}`;
+
 export const tagline =
   `font-regular text-sm text-stamp-purple-bright ${cursor}`; // used in footer
 export const copyright =
   `font-normal text-xs mobileMd:text-sm tablet:text-xs ${cursor}`; // transparent text - ued with the overlayPurple class - used in footer
 
-// Code
-// Add "font-courier-prime" to the class name to use the Courier font and make text monospace
-
 // Captions - used for stamp/token cards
-
-// Tooltips
-// Update with tooltips styles.ts
-
-// Errors
-
-// Success
+// Errors - used for error messages - to be defined in /notifications/styles.ts
+// Success - used for success messages - to be defined in /notifications/styles.ts
 
 // Uncategorized styles
 // Add any new styles you cannot categorize here

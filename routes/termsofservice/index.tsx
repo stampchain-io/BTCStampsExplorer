@@ -1,74 +1,76 @@
 import { CourierFontLoader } from "$islands/home/FontLoader.tsx";
-import { subtitleGrey, text, titleGreyDL } from "$text";
+import { subtitleGrey, text, textSm, titleGreyDL } from "$text";
 
 /* ===== TERMS OF SERVICE PAGE ===== */
 export default function TermsOfService() {
   return (
     <>
       <CourierFontLoader />
-      <div className="flex flex-col gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
+      <div className="flex flex-col gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
         {/* ===== HEADER SECTION ===== */}
-        <section className="flex flex-col -mb-6">
+        <section>
           <h1 className={titleGreyDL}>TERMS OF SERVICE</h1>
           <div className="flex flex-col tablet:flex-row tablet:justify-between tablet:items-end">
-            <p className={subtitleGrey}>
+            <h2 className={subtitleGrey}>
               AGREEMENT TO OUR LEGAL TERMS
-            </p>
-            <p className="text-lg mobileLg:text-xl font-light text-stamp-grey pb-4 mobileLg:pb-2">
+            </h2>
+            <h5 className="text-lg mobileLg:text-xl font-light text-stamp-grey pb-4 mobileLg:pb-2">
               LAST UPDATED
               <span className="pl-3 font-medium text-stamp-grey-light">
                 SEPTEMBER 11 2024
               </span>
-            </p>
+            </h5>
           </div>
-          <p className={`${text} font-courier-prime leading-7`}>
-            We are Stampchain ("Company," "we," "us," "our"). We operate the
-            website https://stampchain.io (the "Site"), as well as any other
-            related products and services that refer or link to these legal
-            terms (the "Legal Terms") (collectively, the "Services").
-            <br />
-            <br />
-            These Legal Terms constitute a legally binding agreement made
-            between you, whether personally or on behalf of an entity ("you"),
-            and Stampchain, concerning your access to and use of the Services.
-            You agree that by accessing the Services, you have read, understood,
-            and agreed to be bound by all of these Legal Terms.
-            <br />
-            <br />
-            <b className="text-lg mobileLg:text-xl">
+          <div
+            className={`flex flex-col ${textSm} font-courier-prime leading-6`}
+          >
+            <p>
+              We are Stampchain ("Company," "we," "us," "our"). We operate the
+              website https://stampchain.io (the "Site"), as well as any other
+              related products and services that refer or link to these legal
+              terms (the "Legal Terms") (collectively, the "Services").
+            </p>
+            <p>
+              These Legal Terms constitute a legally binding agreement made
+              between you, whether personally or on behalf of an entity ("you"),
+              and Stampchain, concerning your access to and use of the Services.
+              You agree that by accessing the Services, you have read,
+              understood, and agreed to be bound by all of these Legal Terms.
+            </p>
+            <p className={`${text} !font-semibold`}>
               IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE
               EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST
               DISCONTINUE USE IMMEDIATELY.
-            </b>
-            <br />
-            <br />
-            Supplemental terms and conditions or documents that may be posted on
-            the Services from time to time are hereby expressly incorporated
-            herein by reference. We reserve the right, in our sole discretion,
-            to make changes or modifications to these Legal Terms from time to
-            time. We will alert you about any changes by updating the "Last
-            updated" date of these Legal Terms, and you waive any right to
-            receive specific notice of each such change.
-            <br />
-            It is your responsibility to periodically review these Legal Terms
-            to stay informed of updates. You will be subject to, and will be
-            deemed to have been made aware of and to have accepted, the changes
-            in any revised Legal Terms by your continued use of the Services
-            after the date such revised Legal Terms are posted.
-            <br />
-            The Services are intended for users who are at least 18 years old.
-            Persons under the age of 18 are not permitted to use or register for
-            the Services.
-            <br />
-            <br />
-            We recommend that you print a copy of these Legal Terms for your
-            records.
-          </p>
+            </p>
+            <p>
+              Supplemental terms and conditions or documents that may be posted
+              on the Services from time to time are hereby expressly
+              incorporated herein by reference. We reserve the right, in our
+              sole discretion, to make changes or modifications to these Legal
+              Terms from time to time. We will alert you about any changes by
+              updating the "Last updated" date of these Legal Terms, and you
+              waive any right to receive specific notice of each such change.
+              <br />
+              It is your responsibility to periodically review these Legal Terms
+              to stay informed of updates. You will be subject to, and will be
+              deemed to have been made aware of and to have accepted, the
+              changes in any revised Legal Terms by your continued use of the
+              Services after the date such revised Legal Terms are posted.
+              <br />
+              The Services are intended for users who are at least 18 years old.
+              Persons under the age of 18 are not permitted to use or register
+              for the Services.
+            </p>
+            <p>
+              We recommend that you print a copy of these Legal Terms for your
+              records.
+            </p>
+          </div>
         </section>
         {/* ===== TABLE OF CONTENTS ===== */}
         <section>
-          <p className="text-base mobileMd:text-lg mobileLg:text-xl text-stamp-grey-light font-courier-prime">
-            <span className="text-2xl mobileMd:text-3xl mobileLg:text-4xl">
+          <p className="font-semibold text-lg text-stamp-grey-light font-courier-prime">
+            <span className="text-2xl">
               TABLE OF CONTENTS<br />
             </span>
             1. OUR SERVICES<br />
@@ -102,7 +104,7 @@ export default function TermsOfService() {
 
         {/* ===== TERMS CONTENT ===== */}
         <div
-          className={`${text} flex flex-col -mt-9 space-y-9 tablet:space-y-6 font-courier-prime leading-7`}
+          className={`flex flex-col space-y-9 tablet:space-y-6 ${textSm} font-courier-prime leading-6`}
         >
           {/* ===== 1. OUR SERVICES ===== */}
           <section>
@@ -763,17 +765,17 @@ export default function TermsOfService() {
             further information regarding use of the Services, please{" "}
             <a
               href="/about#contact"
-              className={`${text} animated-underline`}
+              className={`${textSm} animated-underline`}
             >
               send us an email
             </a>.
           </section>
 
           {/* ===== FOOTER NOTE ===== */}
-          <b className="mt-3">
+          <p className="mt-3 !font-semibold">
             These terms of use were created using Termly's Terms and Conditions
             Generator.
-          </b>
+          </p>
         </div>
       </div>
     </>

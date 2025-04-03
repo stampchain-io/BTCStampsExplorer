@@ -9,13 +9,7 @@ import {
   Transaction,
   TxOutput,
 } from "$islands/about/types.ts";
-import {
-  headingGrey,
-  overline,
-  subtitlePurple,
-  text,
-  titlePurpleDL,
-} from "$text";
+import { headingGrey, label, subtitlePurple, text, titlePurpleDL } from "$text";
 import { tooltipIcon } from "$notifications";
 import { Button } from "$buttons";
 import { Icon } from "$icons";
@@ -325,24 +319,24 @@ export default function AboutDonate() {
             </p>
             <div className="grid grid-cols-12 mt-6 mb-6">
               <div className="col-span-6 flex flex-col justify-center items-center">
-                <p className={`${overline} mb-0`}>
+                <h6 className={`${label} mb-0`}>
                   MONTHLY EXPENSES
-                </p>
-                <p className={headingGrey}>
+                </h6>
+                <h6 className={headingGrey}>
                   2,500 <span className="font-extralight">USD</span>
-                </p>
+                </h6>
               </div>
               <div className="col-span-6 flex flex-col justify-center items-center">
-                <p className={`${overline} mb-0`}>
+                <h6 className={label}>
                   <span className="hidden min-[420px]:inline">
                     {currentMonth}
                   </span>{" "}
                   DONATIONS
-                </p>
-                <p className={headingGrey}>
+                </h6>
+                <h6 className={headingGrey}>
                   {monthlyDonations}{" "}
                   <span className="font-extralight">USD</span>
-                </p>
+                </h6>
               </div>
             </div>
             <p className={text}>

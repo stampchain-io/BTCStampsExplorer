@@ -133,9 +133,9 @@ export default function AboutHeader() {
         {/* ===== TOTAL STAMPS SECTION ===== */}
         <div class="grid grid-cols-12 mt-24">
           <div class="col-span-8 flex flex-col justify-center items-center">
-            <p class={dataLabelPurple}>
+            <h5 class={dataLabelPurple}>
               STAMPS STAMPED
-            </p>
+            </h5>
             {isLoading
               ? (
                 <div class="animate-spin rounded-full mt-6 h-10 w-10 border-b-2 border-stamp-purple-highlight" />
@@ -153,9 +153,9 @@ export default function AboutHeader() {
         <div class="grid grid-cols-12 mt-24">
           <div class="col-span-6"></div>
           <div class="col-span-6 flex flex-col justify-center items-center">
-            <p class={dataLabelPurple}>
+            <h5 class={dataLabelPurple}>
               TOKENS DEPLOYED
-            </p>
+            </h5>
             {isLoading
               ? (
                 <div class="animate-spin rounded-full mt-6 h-10 w-10 border-b-2 border-stamp-purple-highlight" />
@@ -170,9 +170,9 @@ export default function AboutHeader() {
 
         {/* ===== OG TOKEN SECTION ===== */}
         <div class="flex flex-col justify-center items-center mobileLg:mt-36 mt-24">
-          <p class={dataLabelPurple}>
+          <h5 class={dataLabelPurple}>
             OG TOKEN
-          </p>
+          </h5>
           <h6 class={dataValuePurple}>
             KEVIN
           </h6>

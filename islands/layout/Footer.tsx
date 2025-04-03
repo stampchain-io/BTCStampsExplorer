@@ -134,15 +134,15 @@ export function Footer() {
       ">
         {/* ===== LOGO AND TAGLINE ===== */}
         <div className="flex flex-col">
-          <p className={`${logoPurpleDL} text-center mobileMd:text-left`}>
+          <h5 className={`${logoPurpleDL} text-center mobileMd:text-left`}>
             STAMPCHAIN
             <span className="font-extralight pr-1">.IO</span>
-          </p>
-          <p
-            className={`${tagline} -mt-5 text-center mobileMd:text-left`}
+          </h5>
+          <h6
+            className={`${tagline} text-center mobileMd:text-left`}
           >
             IMMORTALISED ART - STORED ON BITCOIN
-          </p>
+          </h6>
         </div>
 
         {/* ===== SOCIAL MEDIA ICONS ===== */}
@@ -217,19 +217,19 @@ export function Footer() {
               </a>
             ))}
             {/* ===== COPYRIGHT SECTION - MOBILEMD + MOBILELG ===== */}
-            <p
+            <h6
               className={`${copyright} hidden mobileMd:block tablet:hidden`}
             >
               <span className="italic">STAMPCHAIN</span> @ 2025
-            </p>
+            </h6>
           </div>
         </div>
 
         {/* ===== COPYRIGHT SECTION - BASE/MOBILESM + TABLET/DESKTOP ===== */}
         <div className="flex flex-row mobileMd:hidden tablet:block w-full justify-center tablet:justify-end tablet:text-right mt-3 tablet:mt-4">
-          <p className={`${copyright}`}>
+          <h6 className={`${copyright}`}>
             <span className="italic">STAMPCHAIN</span> @ 2025
-          </p>
+          </h6>
         </div>
       </div>
     </footer>
