@@ -1,21 +1,63 @@
 // Type definitions - only import TextStyles when doing type work
 // Example: const myStyle: keyof TextStyles = "titleGreyLD";
-export type TextStyles = { // UPDATE ALL TEXT STYLES
-  logo: string;
+export type TextStyles = {
+  // Logo styles
+  logoPurpleDL: string;
+  logoPurpleDLLink: string;
+  logoPurpleLD: string;
+  logoPurpleLDLink: string;
+  // Navigation styles
+  navLinkPurple: string;
+  navLinkPurpleThick: string;
+  navLinkGrey: string;
+  navLinkGreyLD: string;
+  // Title styles
   titleGreyLD: string;
   titleGreyDL: string;
   titlePurpleLD: string;
   titlePurpleDL: string;
+  // Subtitle styles
   subtitleGrey: string;
   subtitlePurple: string;
+  // Heading styles
+  headingGrey2: string;
+  headingGreyLDLink: string;
+  headingGrey: string;
+  // Body text styles
   textXxs: string;
   textXs: string;
   textSm: string;
   text: string;
   textLg: string;
+  textXl: string;
+  textLinkUnderline: string;
+  // Label styles
   labelSm: string;
   label: string;
   labelLg: string;
+  labelXl: string;
+  // Value styles
+  valueSm: string;
+  value: string;
+  valueLg: string;
+  valueXl: string;
+  // Overline and tagline styles
+  overline: string;
+  tagline: string;
+  copyright: string;
+  // Non updated styles
+  // About page styles
+  dataLabelPurple: string;
+  dataValuePurpleSm: string;
+  dataValuePurple: string;
+  dataValuePurpleXl: string;
+  aboutTitlePurpleLD: string;
+  aboutSubTitlePurple: string;
+  dataLabel: string;
+  // Table styles
+  dataValueXL: string;
+  dataValueXLlink: string;
+  textLoader: string;
 };
 
 // Base text styles
@@ -34,7 +76,6 @@ const transition = "transition-colors duration-300";
 export const overlayPurple =
   "bg-gradient-to-r from-[#AA00FF]/80 via-[#AA00FF]/60 to-[#AA00FF]/40 text-transparent bg-clip-text";
 
-// Layout
 // Logo
 export const logoPurpleDL = `${logoFont} purple-gradient2 ${cursor}`; // used in footer
 export const logoPurpleDLLink =
@@ -111,7 +152,7 @@ export const copyright =
 // Captions - used for stamp/token cards
 
 // Tooltips
-// Check tooltips styles.ts
+// Update with tooltips styles.ts
 
 // Errors
 

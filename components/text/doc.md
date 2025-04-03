@@ -1,6 +1,5 @@
 # Text Styles
 ## Quick Start
-
 ```typescript
 // Add imports of the specific styles to the file
 import { titleGreyLD, text, subtitleGrey } from "$text";
@@ -12,7 +11,6 @@ import { titleGreyLD, text, subtitleGrey } from "$text";
   <p className={text}>Content goes here</p>
 </div>
 ```
-
 
 
 # Text Styles Documentation
@@ -37,7 +35,7 @@ Each text style is composed of:
 Format: `[purpose][Color]/[Size]`
 - Purpose: title, subtitle, text, label, etc.
 - Color: Grey, Purple or gradient versions with direction: LD (Light to Dark), DL (Dark to Light)
-- Size: xxs - xl (depending on the text purplose)
+- Size: xxs - xl (depending on the text purppose)
 
 Example: `titleGreyLD` = title style with grey gradient from light to dark
 Example: `textLg` = body text style according to size (based on the base textFont styles)
@@ -169,6 +167,65 @@ export type TextStyles = {
 - Add to appropriate category in this documentation
 - Include purpose and usage context
 - Note any specific behaviors or requirements
+
+## TypeScript Integration
+### TextStyles Type System
+The `TextStyles` type definition ensures type safety when using text styles throughout the application.
+```typescript
+// Type definitions - only import TextStyles when doing type work
+export type TextStyles = {
+  logo: string;
+  titleGreyLD: string;
+  titleGreyDL: string;
+  // ... other style definitions
+};
+```
+
+### When to Use TextStyles
+1. Type Checking
+   ```typescript
+   // When declaring variables that reference style names
+   const myStyle: keyof TextStyles = "titleGreyLD";
+   
+   // When creating functions that accept style parameters
+   function StyledText({ styleKey }: { styleKey: keyof TextStyles }) {
+     return <div className={styleKey}>Content</div>;
+   }
+   ```
+2. Dynamic Style Selection
+   ```typescript
+   // When mapping over style options
+   const availableStyles: (keyof TextStyles)[] = [
+     "titleGreyLD",
+     "subtitleGrey",
+     "text"
+   ];
+   ```
+3. Component Props
+   ```typescript
+   interface TextComponentProps {
+     styleVariant: keyof TextStyles;
+     children: React.ReactNode;
+   }
+   ```
+
+### Best Practices for Types
+1. Import Strategy
+   ```typescript
+   // For component usage - import specific styles
+   import { titleGreyLD, text } from "$text";
+
+   // For type work - import the type
+   import type { TextStyles } from "$text";
+   ```
+2. Type Safety
+   - Always use `keyof TextStyles` for type-safe style references
+   - Avoid using string literals for style names
+   - Let TypeScript help catch style name typos
+3. Documentation
+   - Document new types when adding styles
+   - Keep type definitions in sync with actual styles
+   - Include type examples in component documentation
 
 ## Best Practices & Guidelines
 
