@@ -209,6 +209,59 @@
  *    - Check link paths
  *    - Test all navigation
  * 
+ * Adding to How-To Overview Page
+ * ----------------------------
+ * To add a new article to the How-To Guides Overview page (/routes/howto/index.tsx):
+ * 
+ * 1. Create a new section in the overview page:
+ * @example
+ * {/* ===== NEW ARTICLE GUIDE ===== *\/}
+ * <section>
+ *   <h2 className={`${headingGrey} mb-4`}>NEW ARTICLE TITLE</h2>
+ *   <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+ *     <img
+ *       src="/img/how-tos/newarticle/00.png"
+ *       width="100%"
+ *       alt="Description of the guide"
+ *       class="rounded"
+ *     />
+ *     <div className="flex flex-col desktop:col-span-2 gap-2">
+ *       <p className={text}>
+ *         Brief introduction to the guide and its purpose.
+ *         <br />
+ *         Additional context or important information.
+ *       </p>
+ *       <p className={text}>
+ *         <a
+ *           href="/howto/newarticle"
+ *           f-partial="/howto/newarticle"
+ *           className="animated-underline"
+ *         >
+ *           Call to action text
+ *         </a>
+ *       </p>
+ *     </div>
+ *   </div>
+ * </section>
+ * 
+ * 2. Image Requirements for Overview:
+ * - Create a featured image (00.png) for the overview section
+ * - Same format and size requirements as step images
+ * - Should be visually representative of the guide
+ * - Place in the same directory as other guide images
+ * 
+ * 3. Layout Options:
+ * - Default layout: Image on left, text on right
+ * - Alternative layout: Add `class="block mobileLg:order-last"` to img for right-side image
+ * - Text can span 2 columns on desktop with `desktop:col-span-2`
+ * 
+ * 4. Best Practices:
+ * - Keep introduction text concise and engaging
+ * - Use clear call-to-action text
+ * - Maintain consistent styling with other sections
+ * - Ensure proper spacing and grid alignment
+ * - Test responsive behavior across all breakpoints
+ * 
  * @lastUpdated April 3, 2025
  * @author baba
  */
