@@ -18,6 +18,17 @@ export type TextStyles = { // UPDATE ALL TEXT STYLES
   labelLg: string;
 };
 
+// Base text styles
+const logoFont = "font-black italic text-4xl tracking-wide";
+const titleFont =
+  "font-black text-3xl mobileMd:text-4xl tracking-wide inline-block";
+const subtitleFont = "font-extralight text-2xl mobileMd:text-3xl mb-2";
+const textFont = "font-normal text-stamp-grey-light";
+const labelFont = "font-light text-stamp-grey-darker";
+const valueFont = "font-bold text-stamp-grey-light";
+const cursor = "cursor-default select-none whitespace-nowrap";
+const transition = "transition-colors duration-300";
+
 // Text styles
 // Overlays - used for text overlay effects of whole divs - text must be transparent or not declared with tailwind css
 export const overlayPurple =
@@ -25,89 +36,74 @@ export const overlayPurple =
 
 // Layout
 // Logo
-export const logoPurpleDL =
-  "font-black italic text-4xl purple-gradient2 tracking-wide cursor-default select-none whitespace-nowrap"; // used in footer
+export const logoPurpleDL = `${logoFont} purple-gradient2 ${cursor}`; // used in footer
 export const logoPurpleDLLink =
-  "font-black italic text-4xl purple-gradient2-hover tracking-wide transition-colors duration-300";
-export const logoPurpleLD =
-  "font-black italic text-4xl purple-gradient4 tracking-wide transition-colors duration-300";
+  `${logoFont} purple-gradient2-hover ${transition}`;
+export const logoPurpleLD = `${logoFont} purple-gradient4 ${cursor}`;
 export const logoPurpleLDLink =
-  "font-black italic text-4xl purple-gradient4-hover tracking-wide transition-colors duration-300"; // used in header
+  `${logoFont} purple-gradient4-hover ${transition}`; // used in header
 
 // Navigation
 export const navLinkPurple =
-  "font-medium tablet:font-bold text-sm hover:text-stamp-purple-bright transition-colors duration-300 cursor-pointer select-none whitespace-nowrap"; // transparent text - ued with the overlayPurple class -  used in footer
+  `font-medium tablet:font-bold text-sm hover:text-stamp-purple-bright ${transition} ${cursor}`; // transparent text - ued with the overlayPurple class -  used in footer
 export const navLinkPurpleThick =
-  "font-extrabold text-stamp-purple group-hover:text-stamp-purple-bright tracking-wide transition-colors duration-300 cursor-pointer select-none whitespace-nowrap"; // used in header - desktop menu
+  `font-extrabold text-stamp-purple group-hover:text-stamp-purple-bright tracking-wide ${transition} ${cursor}`; // used in header - desktop menu
 export const navLinkGrey =
-  "font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey tracking-wide transition-colors duration-300 cursor-pointer select-none whitespace-nowrap"; // used in header - mobile menu
+  `font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey tracking-wide ${transition} ${cursor}`; // used in header - mobile menu
 export const navLinkGreyLD =
-  "font-extrabold text-2xl gray-gradient1-hover tracking-wide inline-block transition-colors duration-300 cursor-pointer select-none whitespace-nowrap"; // used in header - mobile menu
+  `font-extrabold text-2xl gray-gradient1-hover tracking-wide inline-block ${transition} ${cursor}`; // used in header - mobile menu
 
 // Titles
-export const titleGreyLD =
-  "font-black text-3xl mobileMd:text-4xl gray-gradient1 tracking-wide inline-block cursor-default select-none whitespace-nowrap";
-export const titleGreyDL =
-  "font-black text-3xl mobileMd:text-4xl gray-gradient3 tracking-wide inline-block cursor-default select-none whitespace-nowrap";
-export const titlePurpleLD =
-  "font-black text-3xl mobileMd:text-4xl purple-gradient3 tracking-wide inline-block cursor-default select-none whitespace-nowrap";
-export const titlePurpleDL =
-  "font-black text-3xl mobileMd:text-4xl purple-gradient1 tracking-wide inline-block cursor-default select-none whitespace-nowrap";
+export const titleGreyLD = `${titleFont} gray-gradient1 ${cursor}`;
+export const titleGreyDL = `${titleFont} gray-gradient3 ${cursor}`;
+export const titlePurpleLD = `${titleFont} purple-gradient3 ${cursor}`;
+export const titlePurpleDL = `${titleFont} purple-gradient1 ${cursor}`;
 
 // Subtitles
-export const subtitleGrey =
-  "font-extralight text-2xl mobileMd:text-3xl text-stamp-grey-light mb-2 cursor-default select-none whitespace-nowrap";
+export const subtitleGrey = `${subtitleFont} text-stamp-grey-light ${cursor}`;
 export const subtitlePurple =
-  "font-extralight text-2xl mobileMd:text-3xl text-stamp-purple-bright mb-2 cursor-default select-none whitespace-nowrap";
+  `${subtitleFont} text-stamp-purple-bright ${cursor}`;
 
 // Headings
 export const headingGrey2 =
-  "font-black text-3xl mobileLg:text-4xl text-stamp-grey-light tracking-wide cursor-default select-none whitespace-nowrap"; // was used in about donate section - rename
+  `font-black text-3xl mobileLg:text-4xl text-stamp-grey-light tracking-wide ${cursor}`; // was used in about donate section - rename
 export const headingGreyLDLink = // used in media page / keep reading in howto pages
-  "font-bold text-xl gray-gradient1-hover tracking-wide inline-block relative transition-colors duration-300";
+  `font-bold text-xl gray-gradient1-hover tracking-wide inline-block relative ${transition}`;
 export const headingGrey =
   "font-bold text-2xl mobileMd:text-3xl text-stamp-grey tracking-wide cursor-default select-none";
 
 // Body text
-export const textXxs = "font-normal text-[10px] text-stamp-grey-light";
-export const textXs = "font-normal text-xs text-stamp-grey-light";
-export const textSm = "font-normal text-sm text-stamp-grey-light";
-export const text = "font-normal text-base text-stamp-grey-light";
-export const textLg = "font-normal text-lg text-stamp-grey-light";
-export const textXl = "font-normal text-xl text-stamp-grey-light";
+export const textXxs = `${textFont} text-[10px]`;
+export const textXs = `${textFont} text-xs`;
+export const textSm = `${textFont} text-sm`;
+export const text = `${textFont} text-base`;
+export const textLg = `${textFont} text-lg`;
+export const textXl = `${textFont} text-xl`;
 export const textLinkUnderline =
-  "font-bold text-base text-stamp-grey-light animated-underline transition-colors duration-300";
+  `font-bold text-base text-stamp-grey-light animated-underline ${transition}`;
 
 // Links
 // Use the specific link styles created or just add "animated-underline" to the class name to apply the animated underline effect
 
 // Data text within containers
 // Labels
-export const labelSm =
-  "font-light text-sm text-stamp-grey-darker cursor-default select-none whitespace-nowrap";
-export const label =
-  "font-light text-base text-stamp-grey-darker cursor-default select-none whitespace-nowrap"; // = dataValue
-export const labelLg =
-  "font-light text-lg text-stamp-grey-darker cursor-default select-none whitespace-nowrap";
-export const labelXl =
-  "font-light text-xl text-stamp-grey-darker cursor-default select-none whitespace-nowrap";
+export const labelSm = `${labelFont} text-sm ${cursor}`;
+export const label = `${labelFont} text-base ${cursor}`; // = dataValue
+export const labelLg = `${labelFont} text-lg ${cursor}`;
+export const labelXl = `${labelFont} text-xl ${cursor}`;
 // Values
-export const valueSm =
-  "font-bold text-sm text-stamp-grey-light cursor-default select-none whitespace-nowrap";
-export const value =
-  "font-bold text-base text-stamp-grey-light cursor-default select-none whitespace-nowrap";
-export const valueLg =
-  "font-bold text-lg text-stamp-grey-light cursor-default select-none whitespace-nowrap";
-export const valueXl =
-  "font-bold text-xl text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+export const valueSm = `${valueFont} text-sm ${cursor}`;
+export const value = `${valueFont} text-base ${cursor}`;
+export const valueLg = `${valueFont} text-lg ${cursor}`;
+export const valueXl = `${valueFont} text-xl ${cursor}`;
 
 // Overline - Category labels, tagline, above titles (update from filter styles)
 export const overline = // rename
-  "font-light text-base text-stamp-grey-darker tracking-wide inline-block cursor-default select-none whitespace-nowrap";
+  `font-light text-base text-stamp-grey-darker tracking-wide inline-block ${cursor}`;
 export const tagline =
-  "font-regular text-sm text-stamp-purple-bright cursor-default select-none whitespace-nowrap"; // used in footer
+  `font-regular text-sm text-stamp-purple-bright ${cursor}`; // used in footer
 export const copyright =
-  "font-normal text-xs mobileMd:text-sm tablet:text-xs cursor-default select-none whitespace-nowrap"; // transparent text - ued with the overlayPurple class - used in footer
+  `font-normal text-xs mobileMd:text-sm tablet:text-xs ${cursor}`; // transparent text - ued with the overlayPurple class - used in footer
 
 // Code
 // Add "font-courier-prime" to the class name to use the Courier font and make text monospace
@@ -120,6 +116,9 @@ export const copyright =
 // Errors
 
 // Success
+
+// Uncategorized styles
+// Add any new styles you cannot categorize here
 
 // Old styles
 // About page
