@@ -1,10 +1,10 @@
 /* ===== KEEP READING COMPONENT ===== */
-import { ARTICLE_LINKS } from "$/lib/utils/constants.ts";
+import { ARTICLE_LINKS } from "$components/howto/data.ts"; // needs direct import - cannot use "$howto"
 import { Button } from "$buttons";
 import { headingGreyLDLink, subtitleGrey, text, titleGreyDL } from "$text";
 
 /* ===== COMPONENT DEFINITION ===== */
-export function KeepReading() {
+export function ArticlesOverview() {
   /* ===== COMPONENT RENDER ===== */
   return (
     <section>

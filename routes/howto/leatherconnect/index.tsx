@@ -1,16 +1,14 @@
 /* ===== LEATHER CONNECT HOW-TO PAGE ===== */
-import { HowToLayout } from "$components/howto/HowToLayout.tsx";
 import {
+  Article,
   AuthorSection,
   BulletList,
-  Step,
-  StepList,
-} from "$components/howto/Step.tsx";
-import {
   LEATHER_CONNECT_IMPORTANT_NOTES,
   LEATHER_CONNECT_STEPS,
   LEATHER_CONNECT_SUPPORTED_WALLETS,
-} from "$islands/datacontrol/howto.ts";
+  List,
+  StepList,
+} from "$howto";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {
@@ -62,7 +60,7 @@ function ConnectSteps() {
   return (
     <StepList hasImportantNotes={LEATHER_CONNECT_IMPORTANT_NOTES?.length > 0}>
       {LEATHER_CONNECT_STEPS.map((step) => (
-        <Step
+        <List
           key={step.number}
           title={step.title}
           image={step.image}
@@ -76,7 +74,7 @@ function ConnectSteps() {
 /* ===== MAIN PAGE COMPONENT ===== */
 export default function LeatherConnect() {
   return (
-    <HowToLayout
+    <Article
       title="HOW-TO"
       subtitle="CONNECT YOUR LEATHER WALLET"
       headerImage="/img/how-tos/connectleatherwallet/00.png"
@@ -84,6 +82,6 @@ export default function LeatherConnect() {
     >
       <IntroSection />
       <ConnectSteps />
-    </HowToLayout>
+    </Article>
   );
 }

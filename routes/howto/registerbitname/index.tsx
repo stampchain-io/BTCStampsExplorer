@@ -1,10 +1,12 @@
 /* ===== REGISTER BITNAME HOW-TO PAGE ===== */
-import { HowToLayout } from "$components/howto/HowToLayout.tsx";
-import { AuthorSection, Step, StepList } from "$components/howto/Step.tsx";
 import {
+  Article,
+  AuthorSection,
   BITNAME_IMPORTANT_NOTES,
   BITNAME_STEPS,
-} from "$islands/datacontrol/howto.ts";
+  List,
+  StepList,
+} from "$howto";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {
@@ -29,7 +31,7 @@ function BitnameSteps() {
   return (
     <StepList hasImportantNotes={BITNAME_IMPORTANT_NOTES?.length > 0}>
       {BITNAME_STEPS.map((step) => (
-        <Step
+        <List
           key={step.number}
           title={step.title}
           image={step.image}
@@ -43,7 +45,7 @@ function BitnameSteps() {
 /* ===== MAIN PAGE COMPONENT ===== */
 export default function RegisterBitName() {
   return (
-    <HowToLayout
+    <Article
       title="HOW-TO"
       subtitle="REGISTER A BITNAME DOMAIN"
       headerImage="/img/how-tos/mintsrc20/00.png"
@@ -51,6 +53,6 @@ export default function RegisterBitName() {
     >
       <IntroSection />
       <BitnameSteps />
-    </HowToLayout>
+    </Article>
   );
 }

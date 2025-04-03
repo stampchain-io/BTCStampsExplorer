@@ -1,9 +1,9 @@
 /* ===== HOW-TO LAYOUT COMPONENT ===== */
-import { KeepReading } from "$components/howto/KeepReading.tsx";
+import { ArticlesOverview } from "./ArticlesOverviewBase.tsx";
 import { headingGrey, subtitleGrey, text, titleGreyDL } from "$text";
 
 /* ===== COMPONENT INTERFACE ===== */
-interface HowToLayoutProps {
+interface ArticleProps {
   title: string;
   subtitle: string;
   headerImage: string;
@@ -12,9 +12,8 @@ interface HowToLayoutProps {
 }
 
 /* ===== COMPONENT DEFINITION ===== */
-export function HowToLayout(
-  { title, subtitle, headerImage, children, importantNotes = [] }:
-    HowToLayoutProps,
+export function Article(
+  { title, subtitle, headerImage, children, importantNotes = [] }: ArticleProps,
 ) {
   /* ===== COMPONENT RENDER ===== */
   return (
@@ -57,8 +56,8 @@ export function HowToLayout(
         </section>
       </div>
 
-      {/* ===== KEEP READING SECTION ===== */}
-      <KeepReading />
+      {/* ===== ARTICLES OVERVIEW SUBSECTION ===== */}
+      <ArticlesOverview />
     </div>
   );
 }

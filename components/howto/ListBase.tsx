@@ -1,15 +1,15 @@
-/* ===== STEP COMPONENT ===== */
-import { headingGrey, text, textLg, textSm } from "$text";
+/* ===== LIST COMPONENT ===== */
+import { headingGrey, text } from "$text";
 
 /* ===== COMPONENT INTERFACE ===== */
-export interface StepProps {
+export interface ListProps {
   title: string;
   image: string;
   description: string | string[];
 }
 
 /* ===== COMPONENT DEFINITION ===== */
-export function Step({ title, image, description }: StepProps) {
+export function List({ title, image, description }: ListProps) {
   /* ===== HELPER FUNCTION FOR LINE BREAKS ===== */
   const formatLines = (text: string) => {
     return text.split("\n").map((line, index, array) => (
@@ -25,14 +25,14 @@ export function Step({ title, image, description }: StepProps) {
     <li
       class={`${headingGrey} font-light list-decimal list-inside mb-9 mobileLg:mb-12`}
     >
-      {/* ===== STEP TITLE ===== */}
+      {/* ===== LIST TITLE ===== */}
       <div class={`${headingGrey} inline-flex pl-1 pb-4`}>
         {title}
       </div>
 
-      {/* ===== STEP CONTENT ===== */}
+      {/* ===== LIST CONTENT ===== */}
       <section class="flex flex-col gap-9">
-        {/* ===== STEP IMAGE ===== */}
+        {/* ===== LIST IMAGE ===== */}
         <img
           src={image}
           width="100%"
@@ -40,7 +40,7 @@ export function Step({ title, image, description }: StepProps) {
           class="rounded-lg aspect-16/9"
         />
 
-        {/* ===== STEP DESCRIPTION ===== */}
+        {/* ===== LIST DESCRIPTION ===== */}
         <div class="flex flex-col">
           {/* Spacing between paragraphs */}
           {Array.isArray(description)
@@ -65,13 +65,13 @@ export function Step({ title, image, description }: StepProps) {
 }
 
 /* ===== SHARED LIST STYLES ===== */
-interface StepListProps {
+interface SharedListProps {
   children: preact.ComponentChildren;
   hasImportantNotes?: boolean;
 }
 
 export function StepList(
-  { children, hasImportantNotes = false }: StepListProps,
+  { children, hasImportantNotes = false }: SharedListProps,
 ) {
   return (
     <ul
@@ -91,41 +91,5 @@ export function BulletList(
     <ul class="list-disc pl-5 space-y-1.5 -mt-2 pb-3">
       {children}
     </ul>
-  );
-}
-
-/* ===== AUTHOR SECTION ===== */
-interface AuthorProps {
-  name: string;
-  twitter: string;
-  website?: string;
-}
-
-export function AuthorSection({ name, twitter, website }: AuthorProps) {
-  return (
-    <div class="flex flex-col items-end -mt-4">
-      <p class={`${textLg} tablet:text-base font-bold mb-2.5 tablet:mb-2`}>
-        <span class="text-stamp-grey-darker">by&nbsp;</span>
-        {name}
-      </p>
-      <a
-        href={`https://twitter.com/${twitter}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        class={`${textSm} tablet:text-xs tracking-wide mb-2 animated-underline-thin`}
-      >
-        @{twitter}
-      </a>
-      {website && (
-        <a
-          href={website}
-          target="_blank"
-          rel="noopener noreferrer"
-          class={`${textSm} tablet:text-xs tracking-wide animated-underline-thin`}
-        >
-          website
-        </a>
-      )}
-    </div>
   );
 }

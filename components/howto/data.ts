@@ -1,5 +1,5 @@
-import { StepProps } from "$components/howto/Step.tsx";
-
+/* ===== HOW-TO GUIDES DATA AND CONFIGURATION ===== */
+/* ===== DESCRIPTION FORMATTING DOCUMENTATION ===== */
 /**
  * HOW-TO DESCRIPTION FORMATTING
  *
@@ -23,7 +23,29 @@ import { StepProps } from "$components/howto/Step.tsx";
  * - Array items = new paragraphs (more space)
  */
 
-export const EXAMPLE_STEPS: StepProps[] = [
+/* ===== IMPORTS AND INTERFACES ===== */
+import { ListProps } from "$howto";
+
+/* ===== NAVIGATION AND ARTICLE LINKS ===== */
+export interface ArticleLinks {
+  title: string;
+  href: string;
+}
+
+export const ARTICLE_LINKS: ArticleLinks[] = [
+  { title: "CREATE A WALLET", href: "/howto/leathercreate" },
+  { title: "CONNECT YOUR LEATHER WALLET", href: "/howto/leatherconnect" },
+  { title: "DEPLOY YOUR OWN TOKEN", href: "/howto/deploytoken" },
+  { title: "MINT A TOKEN", href: "/howto/minttoken" },
+  { title: "TRANSFER TOKENS", href: "/howto/transfertoken" },
+  { title: "STAMP ART", href: "/howto/stamp" },
+  { title: "TRANSFER A STAMP", href: "/howto/transferstamp" },
+  { title: "REGISTER BITNAME DOMAIN", href: "/howto/registerbitname" },
+  { title: "TRANSFER A BITNAME DOMAIN", href: "/howto/transferbitname" },
+];
+
+/* ===== EXAMPLE STEPS CONFIGURATION ===== */
+export const EXAMPLE_STEPS: ListProps[] = [
   {
     title: "SINGLE LINE",
     image: "/img/how-tos/example/01.png",
@@ -46,8 +68,8 @@ export const EXAMPLE_STEPS: StepProps[] = [
   },
 ];
 
-// Deploy
-export const DEPLOY_STEPS: StepProps[] = [
+/* ===== TOKEN DEPLOYMENT GUIDE ===== */
+export const DEPLOY_STEPS: ListProps[] = [
   {
     title: "NAVIGATE TO MINT PAGE",
     image: "/img/how-tos/deploy/01.png",
@@ -86,8 +108,8 @@ export const DEPLOY_IMPORTANT_NOTES = [
   "Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
 ];
 
-// LEATHER CONNECT
-interface ConnectStep extends StepProps {
+/* ===== LEATHER WALLET CONNECTION GUIDE ===== */
+interface ConnectStep extends ListProps {
   number: number;
 }
 
@@ -142,8 +164,8 @@ export const LEATHER_CONNECT_IMPORTANT_NOTES = [
   " Ensure your wallet has sufficient funds before proceeding with transactions.",
 ];
 
-// LEATHER CREATE
-interface WalletStep extends StepProps {
+/* ===== LEATHER WALLET CREATION GUIDE ===== */
+interface WalletStep extends ListProps {
   number: number;
 }
 
@@ -225,8 +247,8 @@ export const LEATHER_CREATE_IMPORTANT_NOTES = [
   "Never share your seed words nor your private keys.",
 ];
 
-// MINT TOKEN
-export const MINT_STEPS: StepProps[] = [
+/* ===== TOKEN MINTING GUIDE ===== */
+export const MINT_STEPS: ListProps[] = [
   {
     title: "NAVIGATE TO MINT",
     image: "/img/how-tos/mintsrc20/01.png",
@@ -262,8 +284,8 @@ export const MINT_STEPS: StepProps[] = [
 
 export const MINT_IMPORTANT_NOTES = [];
 
-// BITNAME
-export const BITNAME_STEPS: StepProps[] = [
+/* ===== BITNAME REGISTRATION GUIDE ===== */
+export const BITNAME_STEPS: ListProps[] = [
   {
     title: "NAVIGATE TO MINT",
     image: "/img/how-tos/mintsrc20/01.png",
@@ -299,8 +321,8 @@ export const BITNAME_STEPS: StepProps[] = [
 
 export const BITNAME_IMPORTANT_NOTES = [];
 
-// STAMP
-export const STAMP_STEPS: StepProps[] = [
+/* ===== STAMP CREATION GUIDE ===== */
+export const STAMP_STEPS: ListProps[] = [
   {
     title: "NAVIGATE TO MINT PAGE",
     image: "/img/how-tos/stamping/01.png",
@@ -339,8 +361,8 @@ export const STAMP_IMPORTANT_NOTES = [
   " Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
 ];
 
-// TRANSFER_BITNAME
-export const TRANSFER_BITNAME_STEPS: StepProps[] = [
+/* ===== BITNAME TRANSFER GUIDE ===== */
+export const TRANSFER_BITNAME_STEPS: ListProps[] = [
   {
     title: "NAVIGATE TO MINT PAGE",
     image: "/img/how-tos/stamping/01.png",
@@ -379,8 +401,8 @@ export const TRANSFER_BITNAME_IMPORTANT_NOTES = [
   " Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
 ];
 
-// TRANSFER_STAMP
-export const TRANSFER_STAMP_STEPS: StepProps[] = [
+/* ===== STAMP TRANSFER GUIDE ===== */
+export const TRANSFER_STAMP_STEPS: ListProps[] = [
   {
     title: "NAVIGATE TO MINT PAGE",
     image: "/img/how-tos/stamping/01.png",
@@ -419,8 +441,8 @@ export const TRANSFER_STAMP_IMPORTANT_NOTES = [
   " Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
 ];
 
-// TRANSFER_TOKEN
-export const TRANSFER_TOKEN_STEPS: StepProps[] = [
+/* ===== TOKEN TRANSFER GUIDE ===== */
+export const TRANSFER_TOKEN_STEPS: ListProps[] = [
   {
     title: "NAVIGATE TO MINT PAGE",
     image: "/img/how-tos/stamping/01.png",
@@ -459,8 +481,8 @@ export const TRANSFER_TOKEN_IMPORTANT_NOTES = [
   " Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
 ];
 
-// TEMPLATE
-interface TemplateStep extends StepProps {
+/* ===== TEMPLATE CONFIGURATION ===== */
+interface TemplateStep extends ListProps {
   number: number;
 }
 

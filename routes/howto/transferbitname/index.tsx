@@ -1,10 +1,12 @@
 /* ===== TRANSFER BITNAME HOW-TO PAGE ===== */
-import { HowToLayout } from "$components/howto/HowToLayout.tsx";
-import { AuthorSection, Step, StepList } from "$components/howto/Step.tsx";
 import {
+  Article,
+  AuthorSection,
+  List,
+  StepList,
   TRANSFER_BITNAME_IMPORTANT_NOTES,
   TRANSFER_BITNAME_STEPS,
-} from "$islands/datacontrol/howto.ts";
+} from "$howto";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {
@@ -33,7 +35,7 @@ function TransferSteps() {
   return (
     <StepList hasImportantNotes={TRANSFER_BITNAME_IMPORTANT_NOTES?.length > 0}>
       {TRANSFER_BITNAME_STEPS.map((step) => (
-        <Step
+        <List
           key={step.number}
           title={step.title}
           image={step.image}
@@ -47,7 +49,7 @@ function TransferSteps() {
 /* ===== MAIN PAGE COMPONENT ===== */
 export default function TransferBitname() {
   return (
-    <HowToLayout
+    <Article
       title="HOW-TO"
       subtitle="TRANSFER BITNAME"
       headerImage="/img/how-tos/stamping/00.png"
@@ -55,6 +57,6 @@ export default function TransferBitname() {
     >
       <IntroSection />
       <TransferSteps />
-    </HowToLayout>
+    </Article>
   );
 }

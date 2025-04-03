@@ -1,10 +1,12 @@
 /* ===== DEPLOY TOKEN HOW-TO PAGE ===== */
-import { HowToLayout } from "$components/howto/HowToLayout.tsx";
-import { AuthorSection, Step, StepList } from "$components/howto/Step.tsx";
 import {
+  Article,
+  AuthorSection,
   DEPLOY_IMPORTANT_NOTES,
   DEPLOY_STEPS,
-} from "$islands/datacontrol/howto.ts";
+  List,
+  StepList,
+} from "$howto";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {
@@ -42,7 +44,7 @@ function DeploySteps() {
   return (
     <StepList hasImportantNotes={DEPLOY_IMPORTANT_NOTES?.length > 0}>
       {DEPLOY_STEPS.map((step) => (
-        <Step
+        <List
           key={step.number}
           title={step.title}
           image={step.image}
@@ -56,7 +58,7 @@ function DeploySteps() {
 /* ===== MAIN PAGE COMPONENT ===== */
 export default function DeployToken() {
   return (
-    <HowToLayout
+    <Article
       title="HOW-TO"
       subtitle="DEPLOY YOUR OWN TOKEN"
       headerImage="/img/how-tos/deploy/00.png"
@@ -64,6 +66,6 @@ export default function DeployToken() {
     >
       <IntroSection />
       <DeploySteps />
-    </HowToLayout>
+    </Article>
   );
 }

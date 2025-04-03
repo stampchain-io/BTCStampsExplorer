@@ -1,16 +1,14 @@
 /* ===== HOW-TO TEMPLATE PAGE ===== */
-import { HowToLayout } from "$components/howto/HowToLayout.tsx";
 import {
+  Article,
   AuthorSection,
   BulletList,
-  Step,
+  List,
   StepList,
-} from "$components/howto/Step.tsx";
-import {
   TEMPLATE_IMPORTANT_NOTES,
   TEMPLATE_SETUP_STEPS, // Optional: Only if using BulletList
   TEMPLATE_STEPS,
-} from "$islands/datacontrol/howto.ts";
+} from "$howto";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {
@@ -52,7 +50,7 @@ function TemplateSteps() {
   return (
     <StepList hasImportantNotes={TEMPLATE_IMPORTANT_NOTES?.length > 0}>
       {TEMPLATE_STEPS.map((step) => (
-        <Step
+        <List
           key={step.number}
           title={step.title}
           image={step.image}
@@ -66,7 +64,7 @@ function TemplateSteps() {
 /* ===== MAIN PAGE COMPONENT ===== */
 export default function Template() {
   return (
-    <HowToLayout
+    <Article
       title="HOW-TO"
       subtitle="YOUR SUBTITLE HERE"
       headerImage="/img/how-tos/template/00.png"
@@ -74,7 +72,7 @@ export default function Template() {
     >
       <IntroSection />
       <TemplateSteps />
-    </HowToLayout>
+    </Article>
   );
 }
 

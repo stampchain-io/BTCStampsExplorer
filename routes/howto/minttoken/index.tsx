@@ -1,10 +1,12 @@
 /* ===== MINT TOKEN HOW-TO PAGE ===== */
-import { HowToLayout } from "$components/howto/HowToLayout.tsx";
-import { AuthorSection, Step, StepList } from "$components/howto/Step.tsx";
 import {
+  Article,
+  AuthorSection,
+  List,
   MINT_IMPORTANT_NOTES,
   MINT_STEPS,
-} from "$islands/datacontrol/howto.ts";
+  StepList,
+} from "$howto";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {
@@ -35,7 +37,7 @@ function MintSteps() {
   return (
     <StepList hasImportantNotes={MINT_IMPORTANT_NOTES?.length > 0}>
       {MINT_STEPS.map((step) => (
-        <Step
+        <List
           key={step.number}
           title={step.title}
           image={step.image}
@@ -49,7 +51,7 @@ function MintSteps() {
 /* ===== MAIN PAGE COMPONENT ===== */
 export default function MintToken() {
   return (
-    <HowToLayout
+    <Article
       title="HOW-TO"
       subtitle="MINT A SRC-20 TOKEN"
       headerImage="/img/how-tos/mintsrc20/00.png"
@@ -57,6 +59,6 @@ export default function MintToken() {
     >
       <IntroSection />
       <MintSteps />
-    </HowToLayout>
+    </Article>
   );
 }

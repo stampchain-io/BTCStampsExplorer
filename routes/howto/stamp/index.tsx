@@ -1,10 +1,12 @@
 /* ===== STAMPING GUIDE HOW-TO PAGE ===== */
-import { HowToLayout } from "$components/howto/HowToLayout.tsx";
-import { AuthorSection, Step, StepList } from "$components/howto/Step.tsx";
 import {
+  Article,
+  AuthorSection,
+  List,
   STAMP_IMPORTANT_NOTES,
   STAMP_STEPS,
-} from "$islands/datacontrol/howto.ts";
+  StepList,
+} from "$howto";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {
@@ -33,7 +35,7 @@ function StampSteps() {
   return (
     <StepList hasImportantNotes={STAMP_IMPORTANT_NOTES?.length > 0}>
       {STAMP_STEPS.map((step) => (
-        <Step
+        <List
           key={step.number}
           title={step.title}
           image={step.image}
@@ -47,7 +49,7 @@ function StampSteps() {
 /* ===== MAIN PAGE COMPONENT ===== */
 export default function StampingGuide() {
   return (
-    <HowToLayout
+    <Article
       title="HOW-TO"
       subtitle="STAMP YOUR ART"
       headerImage="/img/how-tos/stamping/00.png"
@@ -55,6 +57,6 @@ export default function StampingGuide() {
     >
       <IntroSection />
       <StampSteps />
-    </HowToLayout>
+    </Article>
   );
 }
