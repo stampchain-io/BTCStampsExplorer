@@ -14,7 +14,7 @@ export interface ButtonVariants {
     string
   >;
   color: Record<
-    "grey" | "purple" | "purpleGradient" | "greyGradient" | "test",
+    "grey" | "purple" | "purpleGradient" | "greyGradient" | "test" | "custom",
     string
   >;
   size: Record<
@@ -82,9 +82,7 @@ export const buttonStyles: ButtonVariants = {
       !border-0 !p-0 !h-auto
       !items-start !justify-start
       font-semibold tracking-wide
-      bg-gradient-to-r from-[var(--color-dark)] via-[var(--color-medium)] to-[var(--color-light)]
-      bg-clip-text text-transparent
-      hover:from-[var(--color-light)] hover:via-[var(--color-light)] hover:to-[var(--color-light)]
+      text-[var(--default-color)] hover:text-[var(--hover-color)]
     `,
     outline: `
       bg-transparent
@@ -149,6 +147,7 @@ export const buttonStyles: ButtonVariants = {
       [--default-color:#00CC00]
       [--hover-color:#CC0000]
   `,
+    custom: "",
   },
 
   /* ===== SIZE STYLES ===== */
