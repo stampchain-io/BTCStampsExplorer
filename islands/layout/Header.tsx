@@ -212,12 +212,12 @@ export function Header() {
       // When closing
       setTimeout(() => {
         setToolsOpen(false);
-      }, 150);
+      }, 250);
     } else {
       // When opening
       setTimeout(() => {
         setToolsOpen(true);
-      }, 150);
+      }, 250);
     }
   };
 
@@ -377,7 +377,7 @@ export function Header() {
                 className={`flex justify-end items-center transition-opacity duration-100
                   ${toolsOpen ? "opacity-0" : "opacity-100"}`}
                 style={{
-                  transitionDelay: toolsOpen ? "0ms" : "450ms",
+                  transitionDelay: toolsOpen ? "0ms" : "425ms",
                 }}
               >
                 <ConnectWallet />

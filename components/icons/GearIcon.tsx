@@ -24,8 +24,8 @@ export function GearIcon({
   /* ===== CLICK HANDLER ===== */
   const handleClick: IconVariants["onClick"] = (e) => {
     const target = e.currentTarget;
-    target.style.transition = "all 600ms ease-in-out"; // Gear icon timing and rotation
-    target.style.transform = isOpen ? "rotate(0deg)" : "rotate(180deg)";
+    target.style.transition = "all 750ms ease-in-out"; // Gear icon timing - must match the timing of the collapsible section in Header.tsx (delay + duration)
+    target.style.transform = isOpen ? "rotate(0deg)" : "rotate(180deg)"; // Gear icon rotation
     onToggle();
   };
 

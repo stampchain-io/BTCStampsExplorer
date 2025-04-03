@@ -111,11 +111,11 @@ export const WalletModal = ({ connectors = [] }: Props) => {
           <div className="block tablet:hidden">
             <Button
               variant="text"
-              color="greyGradient"
+              color="custom"
               size="md"
               onClick={toggleModal}
               ref={buttonRef}
-              class="!justify-end"
+              class="!justify-end gray-gradient3-hover"
             >
               CONNECT
             </Button>
@@ -127,36 +127,40 @@ export const WalletModal = ({ connectors = [] }: Props) => {
       {isConnected && address && (
         <>
           {/* ===== MOBILE/TABLET MENU ===== */}
-          <div class="tablet:hidden flex flex-col gap-2 text-right">
-            <p class="font-bold text-sm text-stamp-grey-darker tracking-tighter cursor-default select-none py-0.5 mb-0">
-              {abbreviateAddress(address, 6)}
-            </p>
+          <div class="tablet:hidden flex gap-5 text-right">
+            <div class="flex flex-col justify-end">
+              <h6 class="font-medium text-sm text-stamp-grey-darker tracking-tighter cursor-default select-none">
+                {abbreviateAddress(address, 6)}
+              </h6>
+            </div>
 
-            <Button
-              variant="text"
-              color="greyGradient"
-              size="md"
-              onClick={() => {
-                if (isConnected && address) {
-                  globalThis.location.href = `/wallet/${address}`;
-                }
-              }}
-              ref={buttonRef}
-              class="!justify-end"
-            >
-              DASHBOARD
-            </Button>
+            <div class="flex flex-col w-fulljustify-between gap-3 group">
+              <Button
+                variant="text"
+                color="custom"
+                size="md"
+                onClick={() => {
+                  if (isConnected && address) {
+                    globalThis.location.href = `/wallet/${address}`;
+                  }
+                }}
+                ref={buttonRef}
+                class="!justify-end gray-gradient3-hover"
+              >
+                DASHBOARD
+              </Button>
 
-            <Button
-              variant="text"
-              color="greyGradient"
-              size="md"
-              onClick={() => walletSignOut()}
-              ref={buttonRef}
-              class="!justify-end"
-            >
-              DISCONNECT
-            </Button>
+              <Button
+                variant="text"
+                color="custom"
+                size="md"
+                onClick={() => walletSignOut()}
+                ref={buttonRef}
+                class="!justify-end gray-gradient3-hover"
+              >
+                DISCONNECT
+              </Button>
+            </div>
           </div>
 
           {/* ===== DESKTOP DROPDOWN MENU ===== */}
@@ -166,10 +170,10 @@ export const WalletModal = ({ connectors = [] }: Props) => {
             </div>
 
             <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-20
-                        pt-1 pb-3.5 space-y-1 whitespace-nowrap 
+                        pt-1 pb-3.5 
                         backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
-              <div class="flex flex-col px-[18px] gap-1">
-                <h6 class="font-regular text-xs text-stamp-grey-darker cursor-default select-none py-1">
+              <div class="flex flex-col px-[18px] gap-1 whitespace-nowrap">
+                <h6 class="font-medium text-xs text-stamp-grey-darker cursor-default select-none pb-0.5">
                   {abbreviateAddress(address, 6)}
                 </h6>
                 <a
