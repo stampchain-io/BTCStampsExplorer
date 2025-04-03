@@ -123,6 +123,7 @@
     "$forms": "./components/forms/index.ts",
     "$notifications": "./components/notifications/index.ts",
     "$howto": "./components/howto/index.ts",
+    "$faq": "./components/faq/index.ts",
     "$constants": "./lib/utils/constants.ts",
     "$globals": "./globals.d.ts",
     "$handlers/": "./routes/handlers/",

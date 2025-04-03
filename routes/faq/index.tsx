@@ -1,7 +1,6 @@
 import { Head as _Head } from "$fresh/runtime.ts";
-import Accordion from "$islands/shared/Accordion.tsx";
+import { Accordion, FAQ_CONTENT } from "$faq";
 import { subtitleGrey, text, textLg, titleGreyDL, titleGreyLD } from "$text";
-import { FAQ_CONTENT } from "$components/faq/data.ts";
 
 export default function FAQ() {
   return (
