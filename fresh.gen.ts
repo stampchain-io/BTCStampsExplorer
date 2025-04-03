@@ -91,7 +91,6 @@ import * as $dashboard_address_ from "./routes/dashboard/[address].tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
 import * as $fairmint from "./routes/fairmint.tsx";
 import * as $faq_index from "./routes/faq/index.tsx";
-import * as $faq_styles from "./routes/faq/styles.ts";
 import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/sharedBlockWithStampsHandler.ts";
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
 import * as $handlers_sharedContentHandler from "./routes/handlers/sharedContentHandler.ts";
@@ -127,7 +126,6 @@ import * as $test_design_system from "./routes/test/design-system.tsx";
 import * as $test_test_image from "./routes/test/test-image.ts";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
-import * as $Accordion from "./islands/Accordion.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
 import * as $DateRangePicker from "./islands/DateRangePicker.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
@@ -172,8 +170,6 @@ import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
-import * as $datacontrol_faq from "./islands/datacontrol/faq.ts";
-import * as $datacontrol_howto from "./islands/datacontrol/howto.ts";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
@@ -198,6 +194,7 @@ import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
+import * as $shared_Accordion from "./islands/shared/Accordion.tsx";
 import * as $shared_Tables from "./islands/shared/Tables.tsx";
 import * as $shared_actions_buttonActions from "./islands/shared/actions/buttonActions.tsx";
 import * as $src20_FilterModal from "./islands/src20/FilterModal.tsx";
@@ -357,7 +354,6 @@ const manifest = {
     "./routes/docs/index.tsx": $docs_index,
     "./routes/fairmint.tsx": $fairmint,
     "./routes/faq/index.tsx": $faq_index,
-    "./routes/faq/styles.ts": $faq_styles,
     "./routes/handlers/sharedBlockWithStampsHandler.ts":
       $handlers_sharedBlockWithStampsHandler,
     "./routes/handlers/sharedCollectionHandler.ts":
@@ -397,7 +393,6 @@ const manifest = {
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
   islands: {
-    "./islands/Accordion.tsx": $Accordion,
     "./islands/Carousel.tsx": $Carousel,
     "./islands/DateRangePicker.tsx": $DateRangePicker,
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
@@ -458,8 +453,6 @@ const manifest = {
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
-    "./islands/datacontrol/faq.ts": $datacontrol_faq,
-    "./islands/datacontrol/howto.ts": $datacontrol_howto,
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/home/FontLoader.tsx": $home_FontLoader,
@@ -484,6 +477,7 @@ const manifest = {
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
+    "./islands/shared/Accordion.tsx": $shared_Accordion,
     "./islands/shared/Tables.tsx": $shared_Tables,
     "./islands/shared/actions/buttonActions.tsx": $shared_actions_buttonActions,
     "./islands/src20/FilterModal.tsx": $src20_FilterModal,
