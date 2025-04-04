@@ -5,7 +5,7 @@ import { JSX } from "preact";
 export interface IconVariants {
   name: string;
   weight: "light" | "normal" | "bold";
-  size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+  size: "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" | "xsResponsive";
   color: "grey" | "purple" | "custom";
   type: "icon" | "iconLink" | "iconButton";
   className?: string;
@@ -32,12 +32,14 @@ export const iconStyles = {
 
   /* ===== SIZE VARIANTS ===== */
   size: {
+    xxs: "w-4 h-4",
     xs: "w-5 h-5",
     sm: "w-6 h-6",
     md: "w-7 h-7",
     lg: "w-8 h-8",
     xl: "w-9 h-9",
     xxl: "w-10 h-10",
+    xsResponsive: "w-5 h-5 tablet:w-4 tablet:h-4",
   },
 
   /* ===== COLOR VARIANTS ===== */

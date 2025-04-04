@@ -1,29 +1,4 @@
 /* ===== HOW-TO GUIDES DATA AND CONFIGURATION ===== */
-/* ===== DESCRIPTION FORMATTING DOCUMENTATION ===== */
-/**
- * HOW-TO DESCRIPTION FORMATTING
- *
- * There are three ways to format step descriptions:
- *
- * 1. Single line - for simple descriptions
- *    description: "Simple one line description"
- *
- * 2. Line breaks within a paragraph - using \n
- *    description: "First line\nSecond line\nThird line"
- *
- * 3. Multiple paragraphs - using array - recommended for longer description
- *    description: [
- *      "First paragraph that can also\nhave line breaks",
- *      "Second completely separate paragraph",
- *      "Third paragraph with more\nline breaks\nand content"
- *    ]
- *
- * The Step component will maintain proper spacing:
- * - \n = line break (less space)
- * - Array items = new paragraphs (more space)
- */
-
-/* ===== IMPORTS AND INTERFACES ===== */
 import { ListProps } from "$howto";
 
 /* ===== NAVIGATION AND ARTICLE LINKS ===== */
@@ -511,3 +486,27 @@ export const TEMPLATE_IMPORTANT_NOTES = [
   "First important note about the process",
   "Second important note about the process",
 ];
+
+/* ===== DESCRIPTION FORMATTING DOCUMENTATION ===== */
+/**
+ * HOW-TO DESCRIPTION FORMATTING
+ *
+ * There are three ways to format step descriptions:
+ *
+ * 1. Single line - for simple descriptions
+ *    description: "Simple one line description"
+ *
+ * 2. Line breaks within a paragraph - using \n
+ *    description: "First line\nSecond line\nThird line"
+ *
+ * 3. Multiple paragraphs - using array - recommended for longer description
+ *    description: [
+ *      "First paragraph that can also\nhave line breaks",
+ *      "Second completely separate paragraph",
+ *      "Third paragraph with more\nline breaks\nand content"
+ *    ]
+ *
+ * The Step component will maintain proper spacing:
+ * - \n = line break (less space)
+ * - Array items = new paragraphs (more space)
+ */

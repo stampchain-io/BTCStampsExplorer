@@ -108,7 +108,7 @@ export const subtitlePurple =
 // Headings
 export const headingGrey2 =
   `font-black text-3xl mobileLg:text-4xl text-stamp-grey-light tracking-wide ${cursor}`; // was used in about donate section - rename
-export const headingGreyLDLink = // used in media page / keep reading in howto pages
+export const headingGreyLDLink = // used in media page / keep reading in howto pages / accordion titles (custom code)
   `font-bold text-xl gray-gradient1-hover tracking-wide inline-block relative ${transition}`;
 export const headingGrey =
   "font-bold text-2xl mobileMd:text-3xl text-stamp-grey tracking-wide cursor-default select-none";

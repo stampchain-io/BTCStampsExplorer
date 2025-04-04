@@ -1,2 +1,4 @@
 export * from "$components/faq/data.ts";
-export * from "$islands/shared/Accordion.tsx";
+export * from "$components/faq/FaqHeader.tsx";
+export * from "$islands/faq/AccordionBase.tsx";
+export * from "$islands/faq/FaqAccordion.tsx";

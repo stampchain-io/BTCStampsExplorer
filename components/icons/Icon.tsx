@@ -41,6 +41,7 @@ export function Icon(props: IconVariants) {
       website: "globe", // alias mapping
       tools: "gear", // alias mapping
       close: "x", // alias mapping
+      expand: "plus", // alias mapping
       donate: "handcoins", // alias mapping
       caretUp: "caretUp",
       caretDown: "caretDown",
@@ -48,11 +49,11 @@ export function Icon(props: IconVariants) {
       caretRight: "caretRight",
       caretDoubleLeft: "caretDoubleLeft",
       caretDoubleRight: "caretDoubleRight",
-      upload: "image",
+      upload: "image", // alias mapping
       image: "image",
-      fullscreen: "cornersOut",
-      locked: "lockClosed",
-      unlocked: "lockOpen",
+      fullscreen: "cornersOut", // alias mapping
+      locked: "lockClosed", // alias mapping
+      unlocked: "lockOpen", // alias mapping
       template: "template",
     };
 

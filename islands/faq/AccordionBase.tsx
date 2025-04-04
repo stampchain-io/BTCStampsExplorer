@@ -1,6 +1,7 @@
 /* ===== SHARED ACCORDION COMPONENT ===== */
 import { JSX } from "preact";
 import { signal } from "@preact/signals";
+import { Icon } from "$icons";
 import { text } from "$text";
 
 /* ===== SHARED STATE MANAGEMENT ===== */
@@ -27,12 +28,12 @@ export const Accordion = (
         className="flex justify-between items-center cursor-pointer group"
         onClick={toggleAccordion}
       >
-        {/* Title with Dynamic Styling */}
+        {/* Title with Gradient Styling - cant use headingGreyLDLink styling (gray-gradient1-hover) because of the group hover effect */}
         <h2
-          className={`font-black text-xl gray-gradient1-hover group-hover:[background:none_!important] group-hover:[-webkit-text-fill-color:#CCCCCC_!important] group-hover:[text-fill-color:#CCCCCC_!important] transition-colors duration-300
+          className={`font-bold text-xl tracking-wide gray-gradient1-hover group-hover:[background:none_!important] group-hover:[-webkit-text-fill-color:#CCCCCC_!important] group-hover:[text-fill-color:#CCCCCC_!important] transition-colors duration-500
             ${
             isOpen
-              ? "[background:none_!important] [-webkit-text-fill-color:#CCCCCC_!important] [text-fill-color:#CCCCCC_!important]"
+              ? "[background:none_!important] [-webkit-text-fill-color:#CCCCCC_!important] [text-fill-color:#CCCCCC_!important] "
               : ""
           }`}
         >
@@ -41,11 +42,19 @@ export const Accordion = (
 
         {/* Toggle Icon */}
         <span
-          className={`text-2xl text-stamp-grey-darker group-hover:text-stamp-grey-light transition-all duration-300 ${
-            isOpen ? "text-stamp-grey-light rotate-45" : ""
+          className={`transition-transform duration-300 ${
+            isOpen
+              ? "fill-stamp-grey-light rotate-45"
+              : "fill-stamp-grey-darker group-hover:fill-stamp-grey-light transition-colors duration-100 rotate-0"
           }`}
         >
-          +
+          <Icon
+            type="iconLink"
+            name="expand"
+            weight="bold"
+            size="xsResponsive"
+            color="custom"
+          />
         </span>
       </div>
 
@@ -55,7 +64,9 @@ export const Accordion = (
           isOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-10"
         } mt-3 overflow-hidden transition-all duration-500`}
       >
-        <div className="font-normal text-4xl text-stamp-grey-light">
+        <div
+          className={`${text} [&>div>ul]:list-disc [&>div>ul]:list-inside [&>div>ul]:mb-6 [&>div>ul]:flex [&>div>ul]:flex-col [&>div>ul]:gap-1.5 mb-6`}
+        >
           {children}
         </div>
       </div>

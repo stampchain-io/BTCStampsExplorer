@@ -193,7 +193,7 @@ import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
-import * as $shared_Accordion from "./islands/shared/Accordion.tsx";
+import * as $shared_Accordion from "./islands/faq/FaqAccordion.tsx";
 import * as $shared_Tables from "./islands/shared/Tables.tsx";
 import * as $shared_actions_buttonActions from "./islands/shared/actions/buttonActions.tsx";
 import * as $src20_FilterModal from "./islands/src20/FilterModal.tsx";
@@ -475,7 +475,7 @@ const manifest = {
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
-    "./islands/shared/Accordion.tsx": $shared_Accordion,
+    "./islands/faq/FaqAccordion.tsx": $shared_Accordion,
     "./islands/shared/Tables.tsx": $shared_Tables,
     "./islands/shared/actions/buttonActions.tsx": $shared_actions_buttonActions,
     "./islands/src20/FilterModal.tsx": $src20_FilterModal,
