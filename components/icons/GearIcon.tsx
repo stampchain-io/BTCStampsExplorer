@@ -2,7 +2,7 @@
 import { Icon } from "$icons";
 import type { IconVariants } from "$icons";
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== TYPES ===== */
 interface GearIconProps {
   isOpen: boolean;
   onToggle: () => void;
@@ -12,7 +12,7 @@ interface GearIconProps {
   className?: string;
 }
 
-/* ===== COMPONENT IMPLEMENTATION ===== */
+/* ===== COMPONENT ===== */
 export function GearIcon({
   isOpen,
   onToggle,
@@ -21,7 +21,7 @@ export function GearIcon({
   color,
   className = "",
 }: GearIconProps) {
-  /* ===== CLICK HANDLER ===== */
+  /* ===== EVENT HANDLERS ===== */
   const handleClick: IconVariants["onClick"] = (e) => {
     const target = e.currentTarget;
     target.style.transition = "all 750ms ease-in-out"; // Gear icon timing - must match the timing of the collapsible section in Header.tsx (delay + duration)
@@ -29,7 +29,7 @@ export function GearIcon({
     onToggle();
   };
 
-  /* ===== COLOR CLASSES LOGIC ===== */
+  /* ===== STYLES ===== */
   const colorClasses = color === "greyLogicDL"
     ? `${
       isOpen

@@ -2,7 +2,7 @@
 import { Icon } from "$icons";
 import type { IconVariants } from "$icons";
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== TYPES ===== */
 interface CloseIconProps {
   isOpen: boolean;
   onClick: () => void;
@@ -12,7 +12,7 @@ interface CloseIconProps {
   className?: string;
 }
 
-/* ===== COMPONENT IMPLEMENTATION ===== */
+/* ===== COMPONENT ===== */
 export function CloseIcon({
   onClick,
   weight,
@@ -20,12 +20,12 @@ export function CloseIcon({
   color,
   className = "",
 }: CloseIconProps) {
-  /* ===== CLICK HANDLER ===== */
+  /* ===== EVENT HANDLERS ===== */
   const handleClick: IconVariants["onClick"] = (e) => {
     onClick();
   };
 
-  /* ===== COLOR CLASSES LOGIC ===== */
+  /* ===== STYLES ===== */
   const colorClasses = color === "greyGradient"
     ? `fill-[url(#greyGradient)] hover:fill-stamp-grey-light transform transition-colors duration-300`
     : color === "purpleGradient"

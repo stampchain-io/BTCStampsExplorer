@@ -1,12 +1,11 @@
-/* ===== FAQ PAGE HEADER COMPONENT ===== */
+/* ===== FAQ HEADER COMPONENT ===== */
 import { text, textLg, titleGreyDL, titleGreyLD } from "$text";
 
-/* ===== HEADER COMPONENT DEFINITION ===== */
+/* ===== COMPONENT ===== */
 export function FaqHeader() {
   return (
-    /* ===== HEADER SECTION CONTAINER ===== */
     <section className="text-center max-w-full mt-12 mb-10 mx-auto">
-      {/* Main Title with Gradient Styling */}
+      {/* ===== TITLE SECTION ===== */}
       <h1 className={titleGreyLD}>
         YOU'VE GOT QUESTIONS
         <br />
@@ -15,7 +14,7 @@ export function FaqHeader() {
         </span>
       </h1>
 
-      {/* Subtitle Section */}
+      {/* ===== SUBTITLE SECTION ===== */}
       <h6 className={`${textLg} mt-3`}>
         <b>
           New to Bitcoin Stamps? Curious to know more?

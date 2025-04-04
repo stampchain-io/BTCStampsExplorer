@@ -1,8 +1,8 @@
-/* ===== ICON COMPONENTS MODULE ===== */
+/* ===== ICON COMPONENT ===== */
 import { BadgeVariants, iconStyles, IconVariants } from "$icons";
 import * as iconPaths from "$icons";
 
-/* ===== BASE ICON COMPONENT ===== */
+/* ===== COMPONENT ===== */
 export function Icon(props: IconVariants) {
   const {
     type,
@@ -17,6 +17,7 @@ export function Icon(props: IconVariants) {
     ...rest
   } = props;
 
+  /* ===== STYLES ===== */
   const combinedClasses = `${iconStyles.base} ${iconStyles.size[size]} ${
     iconStyles[type][color]
   } ${className}`;
@@ -29,7 +30,7 @@ export function Icon(props: IconVariants) {
     ...rest,
   };
 
-  /* ===== ICON PATH HANDLER ===== */
+  /* ===== HELPERS ===== */
   const getIconPath = () => {
     // Map icon names to their path names
     const iconNameMap = {
@@ -104,7 +105,7 @@ export function Icon(props: IconVariants) {
 // Gradient close menu icon is defined in: CloseIcon.tsx
 // Animated gear icon code is in: GearIcon.tsx
 
-/* ===== BADGE ICON - UPDATE WHEN FILTER IS IMPLEMENTED ===== */
+/* ===== BADGE ICON COMPONENT - UPDATE WHEN FILTER IS IMPLEMENTED ===== */
 export function BadgeIcon({ text, className = "" }: BadgeVariants) {
   return (
     <span

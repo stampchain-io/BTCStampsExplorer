@@ -1,14 +1,15 @@
-// WIP
-// COPY OF SRC20InputField.tsx
-// CANNOT PROPERLY TEST IF IT WORKS WITH COMPONENTS OR IF THE CODE IS CORRECT
-// DUE TO MY LOCALHOST NOT BEING UP TO DATE WITH THE DB SERVER
-// NOT IN USE ATM
-// FORM INPUT FIELDS STILL USE THE ORIGINAL FILES
+/* ===== INPUT FIELD COMPONENT (WIP) ===== */
+// WIP: Copy of SRC20InputField.tsx
+// TODO(@baba):
+// - Test with components
+// - Verify code correctness
+// - Update with latest DB server requirements
+// - Currently not in use - form input fields use original files
 
 import { Ref } from "preact";
 import { inputField } from "$forms";
 
-// Generic interface that works for both islands and regular components
+/* ===== TYPES ===== */
 export interface InputFieldProps {
   type: string;
   placeholder: string;
@@ -26,6 +27,7 @@ export interface InputFieldProps {
   [key: string]: any;
 }
 
+/* ===== COMPONENT ===== */
 export function InputFieldWIP({
   type,
   placeholder,

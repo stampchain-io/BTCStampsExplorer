@@ -1,25 +1,25 @@
 /* ===== LIST COMPONENT ===== */
 import { headingGrey, text } from "$text";
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== TYPES ===== */
 export interface ListProps {
   title: string;
   image: string;
   description: string | string[];
 }
 
-/* ===== COMPONENT DEFINITION ===== */
-export function List({ title, image, description }: ListProps) {
-  /* ===== HELPER FUNCTION FOR LINE BREAKS ===== */
-  const formatLines = (text: string) => {
-    return text.split("\n").map((line, index, array) => (
-      <span key={index}>
-        {line.trim()}
-        {index < array.length - 1 && <br />}
-      </span>
-    ));
-  };
+/* ===== HELPERS ===== */
+const formatLines = (text: string) => {
+  return text.split("\n").map((line, index, array) => (
+    <span key={index}>
+      {line.trim()}
+      {index < array.length - 1 && <br />}
+    </span>
+  ));
+};
 
+/* ===== COMPONENT ===== */
+export function List({ title, image, description }: ListProps) {
   return (
     <li
       class={`${headingGrey} font-light list-decimal list-inside mb-9 mobileLg:mb-12`}
@@ -63,12 +63,13 @@ export function List({ title, image, description }: ListProps) {
   );
 }
 
-/* ===== SHARED LIST STYLES ===== */
+/* ===== TYPES ===== */
 interface SharedListProps {
   children: preact.ComponentChildren;
   hasImportantNotes?: boolean;
 }
 
+/* ===== SHARED COMPONENTS ===== */
 export function StepList(
   { children, hasImportantNotes = false }: SharedListProps,
 ) {

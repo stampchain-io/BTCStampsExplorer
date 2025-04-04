@@ -1,8 +1,8 @@
-/* ===== HOW-TO LAYOUT COMPONENT ===== */
+/* ===== ARTICLE COMPONENT ===== */
 import { ArticlesOverview } from "./ArticlesOverviewBase.tsx";
 import { headingGrey, subtitleGrey, text, titleGreyDL } from "$text";
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== TYPES ===== */
 interface ArticleProps {
   title: string;
   subtitle: string;
@@ -11,7 +11,7 @@ interface ArticleProps {
   importantNotes?: string[];
 }
 
-/* ===== COMPONENT DEFINITION ===== */
+/* ===== COMPONENT ===== */
 export function Article(
   { title, subtitle, headerImage, children, importantNotes = [] }: ArticleProps,
 ) {

@@ -1,9 +1,9 @@
-/* ===== KEEP READING COMPONENT ===== */
+/* ===== ARTICLES OVERVIEW COMPONENT ===== */
 import { ARTICLE_LINKS } from "$components/howto/data.ts"; // needs direct import - cannot use "$howto"
 import { Button } from "$buttons";
 import { headingGreyLDLink, subtitleGrey, text, titleGreyDL } from "$text";
 
-/* ===== COMPONENT DEFINITION ===== */
+/* ===== COMPONENT ===== */
 export function ArticlesOverview() {
   /* ===== COMPONENT RENDER ===== */
   return (

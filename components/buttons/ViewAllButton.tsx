@@ -1,12 +1,12 @@
 /* ===== VIEW ALL BUTTON COMPONENT ===== */
 import { Button } from "$buttons";
 
-/* ===== COMPONENT PROPS ===== */
+/* ===== TYPES ===== */
 type ViewAllButtonProps = {
   href: string;
 };
 
-/* ===== COMPONENT DEFINITION ===== */
+/* ===== COMPONENT ===== */
 export function ViewAllButton({ href }: ViewAllButtonProps) {
   return (
     <div className="flex justify-end w-full mt-6 mobileLg:mt-9">

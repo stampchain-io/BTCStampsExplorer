@@ -1,14 +1,14 @@
 /* ===== AUTHOR COMPONENT ===== */
 import { textLg, textSm } from "$text";
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== TYPES ===== */
 interface AuthorProps {
   name: string;
   twitter: string;
   website?: string;
 }
 
-/* ===== COMPONENT DEFINITION ===== */
+/* ===== COMPONENT ===== */
 export function AuthorSection({ name, twitter, website }: AuthorProps) {
   return (
     <section>

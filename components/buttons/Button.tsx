@@ -1,14 +1,14 @@
-/* ===== BUTTON COMPONENTS MODULE ===== */
+/* ===== BUTTON COMPONENT ===== */
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { JSX } from "preact";
 import { button, ButtonProps, buttonStyles } from "$buttons";
 
-/* ===== LOADING SPINNER COMPONENT ===== */
+/* ===== SUBCOMPONENTS ===== */
 const LoadingSpinner = () => (
   <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-[var(--hover-color)]" />
 );
 
-/* ===== HELPER FUNCTIONS ===== */
+/* ===== HELPERS ===== */
 const getButtonClass = (
   variant: keyof typeof buttonStyles.variant,
   color: keyof typeof buttonStyles.color,
@@ -55,7 +55,7 @@ const getCommonButtonProps = ({
   ...props,
 });
 
-/* ===== EXTENDED BUTTON PROPS ===== */
+/* ===== TYPES ===== */
 type ExtendedButtonProps = ButtonProps & {
   isActive?: boolean;
   ref?:
@@ -63,7 +63,7 @@ type ExtendedButtonProps = ButtonProps & {
     | JSX.HTMLAttributes<HTMLAnchorElement>["ref"];
 };
 
-/* ===== BUTTON COMPONENTS ===== */
+/* ===== COMPONENT ===== */
 export function Button({
   variant,
   color,
@@ -155,7 +155,7 @@ export function Button({
     );
 }
 
-/* ===== EXTENDED ICON BUTTON PROPS ===== */
+/* ===== TYPES ===== */
 type ExtendedIconButtonProps = ExtendedButtonProps & {
   isLoading?: boolean;
 };
@@ -219,7 +219,7 @@ export function ButtonIcon({
     );
 }
 
-/* ===== EXTENDED PROCESSING BUTTON PROPS ===== */
+/* ===== TYPES ===== */
 type ExtendedProcessingButtonProps = ExtendedButtonProps & {
   isSubmitting: boolean;
 };

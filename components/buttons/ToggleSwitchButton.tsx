@@ -3,7 +3,7 @@ import { JSX } from "preact";
 import { useEffect, useRef } from "preact/hooks";
 import { toggleButton, toggleKnob, toggleKnobBackground } from "$buttons";
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== TYPES ===== */
 interface ToggleSwitchButtonProps {
   isActive: boolean;
   onToggle: () => void;
@@ -21,7 +21,7 @@ interface ToggleSwitchButtonProps {
   buttonRef?: preact.RefObject<HTMLButtonElement>;
 }
 
-/* ===== COMPONENT IMPLEMENTATION ===== */
+/* ===== COMPONENT ===== */
 export function ToggleSwitchButton({
   isActive,
   onToggle,
@@ -37,7 +37,7 @@ export function ToggleSwitchButton({
   const internalRef = useRef<HTMLButtonElement>(null);
   const actualRef = buttonRef || internalRef;
 
-  /* ===== CLICK HANDLER ===== */
+  /* ===== EVENT HANDLERS ===== */
   const handleClick = (e: MouseEvent) => {
     if (onClick) {
       onClick(e);

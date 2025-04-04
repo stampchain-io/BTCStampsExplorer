@@ -1,8 +1,9 @@
 /* ===== MENU ICON COMPONENT ===== */
+/* ===== COMPONENT ===== */
 export const HamburgerMenuIcon = (
   { isOpen, onClick }: { isOpen: boolean; onClick: () => void },
 ) => {
-  /* ===== CLICK HANDLER WITH ANIMATION TIMING ===== */
+  /* ===== EVENT HANDLER ===== */
   const handleClick = () => { // If we're going from closed to open, add delay
     if (!isOpen) {
       setTimeout(() => {
@@ -13,7 +14,7 @@ export const HamburgerMenuIcon = (
     }
   };
 
-  /* ===== COMPONENT RENDER ===== */
+  /* ===== RENDER ICON ===== */
   return (
     <div
       className={`hamburger-menu ${isOpen ? "is-active" : ""}`}
