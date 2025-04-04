@@ -4,7 +4,7 @@ import { useState } from "preact/hooks";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import { ButtonProcessing } from "$buttons";
 import { subtitleGrey, text, titleGreyLD } from "$text";
-import { inputField1col, inputField2col } from "$forms";
+import { formRow, formRowResponsive } from "$forms";
 
 /* ===== STATE ===== */
 const AboutContact = () => {
@@ -72,7 +72,7 @@ const AboutContact = () => {
               onSubmit={handleSubmit}
             >
               {/* ===== NAME AND EMAIL FIELDS ===== */}
-              <div className={inputField2col}>
+              <div className={formRowResponsive}>
                 <InputField
                   type="text"
                   value={name}
@@ -88,7 +88,7 @@ const AboutContact = () => {
               </div>
 
               {/* ===== SUBJECT FIELD ===== */}
-              <div className={inputField1col}>
+              <div className={formRow}>
                 <InputField
                   type="text"
                   value={subject}
@@ -98,7 +98,7 @@ const AboutContact = () => {
               </div>
 
               {/* ===== MESSAGE FIELD ===== */}
-              <div className={inputField1col}>
+              <div className={formRow}>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.currentTarget.value)}
