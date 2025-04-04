@@ -99,11 +99,9 @@ export const inputTextarea = `
 `;
 
 // Input styles - not in use or updated
-export const inputNumeric = `
+export const inputFieldSquare = `
   ${inputField}
-  [appearance:textfield]
-  [&::-webkit-outer-spin-button]:appearance-none
-  [&::-webkit-inner-spin-button]:appearance-none
+  w-10
 `; // NOT IN USE OR UPDATED
 export const inputSelect = `
   ${inputField}

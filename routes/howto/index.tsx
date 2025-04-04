@@ -1,6 +1,6 @@
 /* ===== HOW-TO PAGE ===== */
 import { Head as _Head } from "$fresh/runtime.ts";
-import { headingGrey, subtitleGrey, text, titleGreyDL } from "$text";
+import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function HowTo() {
@@ -26,7 +26,7 @@ export default function HowTo() {
 
       {/* ===== INTRODUCTION SECTION ===== */}
       <section className="mb-3 mobileLg:mb-6">
-        <h1 className={titleGreyDL}>HOW-TO</h1>
+        <h1 className={titleGreyLD}>HOW-TO</h1>
         <h2 className={subtitleGrey}>OUR STEP-BY-STEP GUIDES</h2>
         <p className={text}>
           <b>

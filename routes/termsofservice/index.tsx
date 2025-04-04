@@ -1,6 +1,6 @@
 /* ===== TERMS OF SERVICE PAGE ===== */
 import { CourierFontLoader } from "$islands/home/FontLoader.tsx";
-import { subtitleGrey, text, textSm, titleGreyDL } from "$text";
+import { subtitleGrey, text, textSm, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function TermsOfService() {
@@ -10,7 +10,7 @@ export default function TermsOfService() {
       <div className="flex flex-col gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
         {/* ===== HEADER SECTION ===== */}
         <section>
-          <h1 className={titleGreyDL}>TERMS OF SERVICE</h1>
+          <h1 className={titleGreyLD}>TERMS OF SERVICE</h1>
           <div className="flex flex-col tablet:flex-row tablet:justify-between tablet:items-end">
             <h2 className={subtitleGrey}>
               AGREEMENT TO OUR LEGAL TERMS

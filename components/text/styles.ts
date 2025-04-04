@@ -145,9 +145,8 @@ export const valueDarkSm =
 // Add "font-courier-prime" to the class name to use the Courier font and make text monospace
 
 // Overline - Category labels, tagline, above titles (update from filter styles)
-
 export const tagline =
-  `font-regular text-sm text-stamp-purple-bright ${cursor}`; // used in footer
+  `font-regular text-sm bg-gradient-to-r from-[#660099] via-[#8800CC] to-[#AA00FF] text-transparent bg-clip-text ${cursor}`; // used in footer
 export const copyright =
   `font-normal text-xs mobileMd:text-sm tablet:text-xs ${cursor}`; // transparent text - ued with the overlayPurple class - used in footer
 

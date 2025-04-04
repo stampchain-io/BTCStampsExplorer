@@ -8,9 +8,9 @@ import {
 } from "$client/wallet/wallet.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectorsModal } from "$islands/Wallet/ConnectorsModal.tsx";
-import { _getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
+import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import AnimationLayout from "$components/shared/animation/AnimationLayout.tsx";
-import { Button } from "$components/buttons/Button.tsx";
+import { Button } from "$buttons";
 import { navLinkPurple, valueDarkSm } from "$text";
 /* ===== WALLET MODAL COMPONENT INTERFACE ===== */
 interface Props {

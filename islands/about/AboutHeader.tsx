@@ -8,7 +8,7 @@ import {
   dataValuePurpleXl,
   subtitlePurple,
   text,
-  titlePurpleDL,
+  titlePurpleLD,
 } from "$text";
 
 /* ===== STATE ===== */
@@ -45,7 +45,7 @@ export default function AboutHeader() {
     <section>
       <div>
         {/* ===== HEADER SECTION ===== */}
-        <h1 className={titlePurpleDL}>ABOUT</h1>
+        <h1 className={titlePurpleLD}>ABOUT</h1>
         <h2 className={subtitlePurple}>STAMPCHAIN</h2>
 
         {/* ===== INTRODUCTION SECTION ===== */}

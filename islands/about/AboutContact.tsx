@@ -3,7 +3,7 @@
 import { useState } from "preact/hooks";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import { ButtonProcessing } from "$buttons";
-import { subtitleGrey, text, titleGreyDL } from "$text";
+import { subtitleGrey, text, titleGreyLD } from "$text";
 import { inputField1col, inputField2col } from "$forms";
 
 /* ===== STATE ===== */
@@ -31,7 +31,7 @@ const AboutContact = () => {
       <section>
         {/* ===== HEADER SECTION ===== */}
         <div className="flex flex-col">
-          <h1 className={titleGreyDL}>
+          <h1 className={titleGreyLD}>
             CONTACT
           </h1>
           <h3 className={subtitleGrey}>

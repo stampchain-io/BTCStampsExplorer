@@ -23,15 +23,7 @@ import {
   tooltipButtonInCollapsible,
   tooltipImage,
 } from "$notifications";
-import {
-  bodyForms,
-  containerBackground,
-  formContainerCol,
-  formContainerRow,
-  formRow,
-  inputTextarea,
-  SRC20InputField,
-} from "$forms";
+import { bodyForms, containerBackground, formContainerRow } from "$forms";
 
 /* ===== LOGGING UTILITY ===== */
 const log = (message: string, data?: unknown) => {

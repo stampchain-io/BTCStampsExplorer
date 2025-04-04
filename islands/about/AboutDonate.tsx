@@ -9,7 +9,7 @@ import {
   Transaction,
   TxOutput,
 } from "$islands/about/types.ts";
-import { headingGrey, label, subtitlePurple, text, titlePurpleDL } from "$text";
+import { headingGrey, label, subtitlePurple, text, titlePurpleLD } from "$text";
 import { tooltipIcon } from "$notifications";
 import { Button } from "$buttons";
 import { Icon } from "$icons";
@@ -300,7 +300,7 @@ export default function AboutDonate() {
       <section>
         {/* ===== HEADER SECTION ===== */}
         <div className="w-full flex flex-col justify-center items-start">
-          <h1 className={titlePurpleDL}>DONATE</h1>
+          <h1 className={titlePurpleLD}>DONATE</h1>
           <h2 className={subtitlePurple}>TO THE DEV FUND</h2>
         </div>
         {/* ===== MAIN CONTENT SECTION ===== */}

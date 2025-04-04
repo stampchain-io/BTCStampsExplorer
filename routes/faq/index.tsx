@@ -1,7 +1,7 @@
 /* ===== FAQ PAGE ===== */
 import { Head as _Head } from "$fresh/runtime.ts";
 import { FAQ_CONTENT, FaqAccordion, FaqHeader } from "$faq";
-import { subtitleGrey, text, titleGreyDL } from "$text";
+import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function FAQ() {
@@ -18,7 +18,7 @@ export default function FAQ() {
         >
           {/* ===== ACCORDION HEADER SECTION ===== */}
           <div>
-            <h3 className={titleGreyDL}>{section.title}</h3>
+            <h3 className={titleGreyLD}>{section.title}</h3>
             <h4 className={subtitleGrey}>{section.subtitle}</h4>
             <p className={text}>
               {section.description.split("\n").map((line, lineIndex, array) => (
