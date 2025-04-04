@@ -1,40 +1,19 @@
-// Type definitions - only import FormStyles when doing type work
-export type FormStyles = {
-  // Layout
-  containerBackground: string;
-  bodyForms: string;
-  formContainerCol: string;
-  formContainerRow: string;
-  formRow: string;
-  formRowResponsive: string;
+/* ===== FORM STYLES MODULE ===== */
 
-  // Labels
-  labelBase: string;
-  labelLarge: string;
+/* ===== DEFAULT STYLES ===== */
+// Global sizes
+const inputFieldHeight = "h-10";
+const inputFieldWidth = "w-10";
+const inputFieldHeightLarge = "h-12";
 
-  // Inputs
-  inputField: string;
-  inputFieldSquare: string;
-  inputNumeric: string;
-  inputTextarea: string;
-  inputSelect: string;
-  inputCheckbox: string;
-  inputRadio: string;
+// Input field styles
+const inputFieldStyle = `p-3 w-full
+  rounded-md bg-stamp-grey focus:bg-stamp-grey-light outline-none focus:outline-none
+  font-medium text-sm text-stamp-grey-darkest
+  placeholder:font-light placeholder:text-stamp-grey-darkest placeholder:uppercase`;
 
-  // States
-  stateDisabled: string;
-  stateLoading: string;
-  stateError: string;
-  stateSuccess: string;
-
-  // Messages
-  messageError: string;
-  messageSuccess: string;
-  messageHelp: string;
-};
-
-// Layout styles
-// Global
+/* ===== LAYOUT STYLES ===== */
+// Global container
 export const containerBackground =
   "flex flex-col w-full p-6 dark-gradient rounded-lg"; // similar to inline backgroundContainer constant - should be moved to a sylesheet specific for global layout
 
@@ -47,29 +26,29 @@ export const formContainerRow = "flex w-full gap-5";
 export const formRow = "flex w-full";
 export const formRowResponsive = "flex flex-col mobileMd:flex-row w-full gap-5";
 
-// Base input styles
+/* ===== INPUT STYLES ===== */
+// Base input
 export const inputField = `
-  h-10 px-3 w-full
-  rounded-md bg-stamp-grey focus:bg-stamp-grey-light outline-none focus:outline-none
-  font-medium text-sm text-stamp-grey-darkest
-  placeholder:font-light placeholder:text-stamp-grey-darkest placeholder:uppercase 
-`;
-// Most styling of this input fieeld is done in the outlineGradient constant
-export const inputFieldOutline = `
-  h-12 w-full
-`;
-export const inputTextarea = `
-  h-[100px] p-3 w-full resize-none
-  rounded-md bg-stamp-grey focus:bg-stamp-grey-light outline-none focus:outline-none
-  font-medium text-sm text-stamp-grey-darkest
-  placeholder:font-light placeholder:text-stamp-grey-darkest placeholder:uppercase
+  ${inputFieldHeight}
+  ${inputFieldStyle}
 `;
 
-// NOT IN USE OR UPDATED
+// Outline input - most styling of this input field is done in the outlineGradient constant
+export const inputFieldOutline = `
+  ${inputFieldHeightLarge} w-full
+`;
+
+// Textarea
+export const inputTextarea = `
+  h-[100px] resize-none
+  ${inputFieldStyle}
+`;
+
+// NOT IN USE NOR UPDATED
 // Input styles - not in use or updated
 export const inputFieldSquare = `
   ${inputField}
-  w-10
+  ${inputFieldWidth}
 `;
 export const inputNumeric = `
   ${inputField}
@@ -101,25 +80,24 @@ export const inputRadio = `
   focus:ring-offset-0
 `;
 
-// Label styles - not in use or updated
+/* ===== LABEL STYLES ===== */
 export const labelBase =
   "font-medium text-base text-stamp-grey-light cursor-default select-none whitespace-nowrap";
 export const labelLarge =
   "font-medium text-lg text-stamp-grey-light cursor-default select-none whitespace-nowrap";
 
-// State styles - not in use or updated - TODO@(@baba)
+/* ===== STATE STYLES ===== */
 export const stateDisabled = "opacity-50 cursor-not-allowed";
 export const stateLoading = "cursor-wait opacity-75";
 export const stateError = "text-xs border-red-500 focus:border-red-500";
 export const stateSuccess = "text-xs border-green-500 focus:border-green-500";
 
-// Message styles
+/* ===== MESSAGE STYLES ===== */
 export const messageError = "text-xs text-red-500 mt-2";
 export const messageSuccess = "text-xs text-green-500 mt-2";
 export const messageHelp = "text-xs text-stamp-grey-darkest mt-1";
-// END
 
-// Form field variants
+/* ===== FIELD VARIANTS ===== */
 export const fieldVariants = {
   default: {
     container: "w-full",
@@ -159,14 +137,14 @@ export const fieldVariants = {
   },
 } as const;
 
-// Form layout variants
+/* ===== LAYOUT VARIANTS ===== */
 export const layoutVariants = {
   default: formContainerCol,
   row: formRow,
   rowResponsive: formRowResponsive,
 } as const;
 
-// Gradient color schemes
+/* ===== GRADIENT STYLES ===== */
 export const purpleGradient = `
   [--color-3:#660099]
   [--color-2:#8800CC]
@@ -183,7 +161,7 @@ export const greyGradient = `
   [--hover-color:var(--color-1)]
 `;
 
-// Base gradient input style
+/* ===== GRADIENT INPUT STYLES ===== */
 export const outlineGradient = `
   relative !bg-[#100318] !p-[2px] rounded-md !border-0
   before:absolute before:inset-0 before:rounded-md before:z-[1]
@@ -194,8 +172,52 @@ export const outlineGradient = `
   before:transition-colors before:duration-300
   [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#100318]
   [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-[#100318] [&>div]:placeholder:!bg-[#100318] [&>div]:rounded-md
-  [&>div>input]:h-12 [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-md [&>div>input]:pl-5 
+  [&>div>input]:${inputFieldHeightLarge} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-md [&>div>input]:pl-5 
   [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-stamp-grey-light 
   [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-stamp-grey 
   [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-[#100318]
 `;
+/* ===== TYPE DEFINITIONS ===== */
+export type FormStyles = {
+  // Layout
+  containerBackground: string;
+  bodyForms: string;
+  formContainerCol: string;
+  formContainerRow: string;
+  formRow: string;
+  formRowResponsive: string;
+
+  // Labels
+  labelBase: string;
+  labelLarge: string;
+
+  // Inputs
+  inputField: string;
+  inputFieldOutline: string;
+  inputFieldSquare: string;
+  inputNumeric: string;
+  inputTextarea: string;
+  inputSelect: string;
+  inputCheckbox: string;
+  inputRadio: string;
+
+  // States
+  stateDisabled: string;
+  stateLoading: string;
+  stateError: string;
+  stateSuccess: string;
+
+  // Messages
+  messageError: string;
+  messageSuccess: string;
+  messageHelp: string;
+
+  // Variants
+  fieldVariants: typeof fieldVariants;
+  layoutVariants: typeof layoutVariants;
+
+  // Gradients
+  purpleGradient: string;
+  greyGradient: string;
+  outlineGradient: string;
+};

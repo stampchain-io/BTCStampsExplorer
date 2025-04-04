@@ -1,7 +1,7 @@
 /* ===== ICON STYLES MODULE ===== */
 import { JSX } from "preact";
 
-/* ===== INTERFACE DEFINITIONS ===== */
+/* ===== TYPE DEFINITIONS ===== */
 export interface IconVariants {
   name: string;
   weight: "light" | "normal" | "bold";
@@ -25,7 +25,7 @@ export interface BadgeVariants {
   className?: string;
 }
 
-/* ===== ICON STYLES ===== */
+/* ===== ICON STYLE DEFINITIONS ===== */
 export const iconStyles = {
   /* ===== BASE STYLES ===== */
   base: "inline-block transition-colors duration-300",
@@ -43,13 +43,12 @@ export const iconStyles = {
   },
 
   /* ===== COLOR VARIANTS ===== */
-  // The two-tone colors are built into the icon styles below
-  // The custom color def allows for special icons with advanced coloring
-  // eg. the gear icon in the collapsible menu in the mobile menu drawer has conditional logic to change color based on the state of the menu
-  // the close icon in the mobile menu drawer has custom color defs to add either grey or purple gradient fill
-  // the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
+  // Note: Two-tone colors are built into the icon styles below
+  // Custom color allows for special icons with advanced coloring:
+  // - Gear icon in collapsible menu (mobile menu drawer) has conditional color based on menu state
+  // - Close icon in mobile menu drawer has custom gradient fill options (grey/purple)
+  //   - the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
 
-  /* ===== BASIC ICON STYLES ===== */
   icon: {
     grey: "fill-stamp-grey",
     purple: "fill-stamp-purple",
@@ -65,16 +64,24 @@ export const iconStyles = {
 
   /* ===== ICON BUTTON STYLES ===== */
   iconButton: {
-    grey:
-      "fill-stamp-grey hover:fill-stamp-grey-light bg-[#333333]/40 hover:bg-[#333333]/20 tablet:bg-transparent tablet:hover:bg-transparent rounded-md p-1.5 cursor-pointer",
-    purple:
-      "fill-stamp-purple hover:fill-stamp-purple-bright bg-[#333333]/40 hover:bg-[#333333]/20 tablet:bg-transparent tablet:hover:bg-transparent rounded-md p-1.5 cursor-pointer",
+    grey: `
+      fill-stamp-grey hover:fill-stamp-grey-light 
+      bg-[#333333]/40 hover:bg-[#333333]/20 
+      tablet:bg-transparent tablet:hover:bg-transparent 
+      rounded-md p-1.5 cursor-pointer
+    `,
+    purple: `
+      fill-stamp-purple hover:fill-stamp-purple-bright 
+      bg-[#333333]/40 hover:bg-[#333333]/20 
+      tablet:bg-transparent tablet:hover:bg-transparent 
+      rounded-md p-1.5 cursor-pointer
+    `,
     custom: "",
   },
 } as const;
 
-/* ===== CUSTOM ICON STYLES ===== */
-/* ===== SLIDER HANDLE STYLES ===== */
+/* ===== INTERACTIVE ELEMENT STYLES ===== */
+/* ===== SLIDER HANDLE ===== */
 export const handleIcon = `
   absolute w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none 
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
@@ -89,7 +96,7 @@ export const handleIcon = `
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
 `;
 
-/* ===== CHECKBOX STYLES ===== */
+/* ===== CHECKBOX ===== */
 export const checkboxIcon = (
   checked: boolean,
   canHoverSelected: boolean,
