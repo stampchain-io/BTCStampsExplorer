@@ -176,19 +176,18 @@ import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_SwiperStyles from "./islands/home/SwiperStyles.tsx";
+import * as $howto_HowToDeployToken from "./islands/howto/HowToDeployToken.tsx";
+import * as $howto_HowToMintToken from "./islands/howto/HowToMintToken.tsx";
+import * as $howto_HowToRegisterBitname from "./islands/howto/HowToRegisterBitname.tsx";
+import * as $howto_HowToStamp from "./islands/howto/HowToStamp.tsx";
+import * as $howto_HowToTransferBitname from "./islands/howto/HowToTransferBitname.tsx";
+import * as $howto_HowToTransferStamp from "./islands/howto/HowToTransferStamp.tsx";
+import * as $howto_HowToTransferToken from "./islands/howto/HowToTransferToken.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $loading_LoadingContent from "./islands/loading/LoadingContent.tsx";
 import * as $loading_LoadingProvider from "./islands/loading/LoadingProvider.tsx";
-import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
-import * as $modules_HowToDeployToken from "./islands/modules/HowToDeployToken.tsx";
-import * as $modules_HowToMintToken from "./islands/modules/HowToMintToken.tsx";
-import * as $modules_HowToRegisterBitname from "./islands/modules/HowToRegisterBitname.tsx";
-import * as $modules_HowToStamp from "./islands/modules/HowToStamp.tsx";
-import * as $modules_HowToTransferBitname from "./islands/modules/HowToTransferBitname.tsx";
-import * as $modules_HowToTransferStamp from "./islands/modules/HowToTransferStamp.tsx";
-import * as $modules_HowToTransferToken from "./islands/modules/HowToTransferToken.tsx";
 import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
@@ -459,19 +458,18 @@ const manifest = {
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
     "./islands/home/SwiperStyles.tsx": $home_SwiperStyles,
+    "./islands/howto/HowToDeployToken.tsx": $howto_HowToDeployToken,
+    "./islands/howto/HowToMintToken.tsx": $howto_HowToMintToken,
+    "./islands/howto/HowToRegisterBitname.tsx": $howto_HowToRegisterBitname,
+    "./islands/howto/HowToStamp.tsx": $howto_HowToStamp,
+    "./islands/howto/HowToTransferBitname.tsx": $howto_HowToTransferBitname,
+    "./islands/howto/HowToTransferStamp.tsx": $howto_HowToTransferStamp,
+    "./islands/howto/HowToTransferToken.tsx": $howto_HowToTransferToken,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/Header.tsx": $layout_Header,
     "./islands/loading/LoadingContent.tsx": $loading_LoadingContent,
     "./islands/loading/LoadingProvider.tsx": $loading_LoadingProvider,
-    "./islands/modules/DeployMint.tsx": $modules_DeployMint,
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
-    "./islands/modules/HowToDeployToken.tsx": $modules_HowToDeployToken,
-    "./islands/modules/HowToMintToken.tsx": $modules_HowToMintToken,
-    "./islands/modules/HowToRegisterBitname.tsx": $modules_HowToRegisterBitname,
-    "./islands/modules/HowToStamp.tsx": $modules_HowToStamp,
-    "./islands/modules/HowToTransferBitname.tsx": $modules_HowToTransferBitname,
-    "./islands/modules/HowToTransferStamp.tsx": $modules_HowToTransferStamp,
-    "./islands/modules/HowToTransferToken.tsx": $modules_HowToTransferToken,
     "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,

@@ -1,7 +1,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { RegisterBitnameContent } from "$islands/stamping/src101/register/RegisterContent.tsx";
-import { HowToRegisterBitnameModule } from "$islands/modules/HowToRegisterBitname.tsx";
 import RecentBitnameRegister from "$islands/stamping/src101/register/RecentRegister.tsx";
+import { HowToRegisterBitnameModule } from "$howto";
 
 interface StampingSrc101PageProps {
   selectedTab: string;

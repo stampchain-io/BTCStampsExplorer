@@ -1,6 +1,6 @@
 /**
- * How-To System Documentation
- * ==========================
+ * How-To Articles
+ * ===============
  * 
  * Overview
  * --------

@@ -1,19 +1,18 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
-
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
+import type { SRC20MintStatus } from "$lib/types/src20.d.ts";
 import { MintContent } from "$islands/stamping/src20/mint/MintContent.tsx";
 import PopularMinting from "$islands/stamping/src20/mint/PopularMinting.tsx";
 import { DeployContent } from "$islands/stamping/src20/deploy/DeployContent.tsx";
 import RecentDeploy from "$islands/stamping/src20/deploy/RecentDeploy.tsx";
 import { TransferContent } from "$islands/stamping/src20/transfer/TransferContent.tsx";
 import LatestTransfer from "$islands/stamping/src20/transfer/LatestTransfer.tsx";
-
-import { HowToDeployTokenModule } from "$islands/modules/HowToDeployToken.tsx";
-import { HowToMintTokenModule } from "$islands/modules/HowToMintToken.tsx";
-import { HowToTransferTokenModule } from "$islands/modules/HowToTransferToken.tsx";
-
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { SRC20Service } from "$server/services/src20/index.ts";
-import type { SRC20MintStatus } from "$lib/types/src20.d.ts";
+import {
+  HowToDeployTokenModule,
+  HowToMintTokenModule,
+  HowToTransferTokenModule,
+} from "$howto";
 
 interface StampingSrc20PageProps {
   selectedTab: string;

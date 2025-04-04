@@ -1,11 +1,9 @@
 import type { StampRow } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
-
+import { StampController } from "$server/controller/stampController.ts";
 import { OlgaContent } from "$islands/stamping/stamp/OlgaContent.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
-import { HowToStampModule } from "$islands/modules/HowToStamp.tsx";
-
-import { StampController } from "$server/controller/stampController.ts";
+import { HowToStampModule } from "$howto";
 
 interface StampPageData {
   latestStamps: StampRow[];
