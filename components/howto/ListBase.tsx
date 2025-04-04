@@ -20,7 +20,6 @@ export function List({ title, image, description }: ListProps) {
     ));
   };
 
-  /* ===== COMPONENT RENDER ===== */
   return (
     <li
       class={`${headingGrey} font-light list-decimal list-inside mb-9 mobileLg:mb-12`}

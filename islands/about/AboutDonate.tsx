@@ -1,4 +1,4 @@
-/* ===== ABOUT DONATE MODULE ===== */
+/* ===== ABOUT DONATE COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { StampRow } from "$globals";
@@ -25,9 +25,8 @@ const DONATE_STAMP: DonateStampData = {
   tx_hash: "6df1763d2df70b21f5fb52c9a47347c7466dfdf8a87d1430f640d363f0efa37a",
 };
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== STATE ===== */
 export default function AboutDonate() {
-  /* ===== STATE MANAGEMENT ===== */
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [fee, setFee] = useState<number>(0);
   const [monthlyDonations, setMonthlyDonations] = useState<number>(0);
@@ -274,7 +273,7 @@ export default function AboutDonate() {
     setIsOpen(false);
   };
 
-  /* ===== DONATE STAMP SUBCOMPONENT ===== */
+  /* ===== SUBCOMPONENTS ===== */
   const DonateStampCard = ({ onClick }: { onClick: () => void }) => (
     <div className="flex flex-col gap-5 items-center">
       <div className="w-[134px] mobileLg:w-[174px] tablet:w-[204px]">
@@ -295,7 +294,7 @@ export default function AboutDonate() {
     </div>
   );
 
-  /* ===== COMPONENT RENDER ===== */
+  /* ===== COMPONENT ===== */
   return (
     <>
       <section>

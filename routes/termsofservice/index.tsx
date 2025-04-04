@@ -1,7 +1,8 @@
+/* ===== TERMS OF SERVICE PAGE ===== */
 import { CourierFontLoader } from "$islands/home/FontLoader.tsx";
 import { subtitleGrey, text, textSm, titleGreyDL } from "$text";
 
-/* ===== TERMS OF SERVICE PAGE ===== */
+/* ===== PAGE COMPONENT ===== */
 export default function TermsOfService() {
   return (
     <>
@@ -67,7 +68,7 @@ export default function TermsOfService() {
             </p>
           </div>
         </section>
-        {/* ===== TABLE OF CONTENTS ===== */}
+        {/* ===== TABLE OF CONTENTS SECTION ===== */}
         <section>
           <p className="font-semibold text-lg text-stamp-grey-light font-courier-prime">
             <span className="text-2xl">
@@ -102,10 +103,11 @@ export default function TermsOfService() {
           </p>
         </section>
 
-        {/* ===== TERMS CONTENT ===== */}
+        {/* ===== TERMS CONTENT SECTION ===== */}
         <div
           className={`flex flex-col space-y-9 tablet:space-y-6 ${textSm} font-courier-prime leading-6`}
         >
+          {/* ===== TERMS DESCRIPTION SECTION ===== */}
           {/* ===== 1. OUR SERVICES ===== */}
           <section>
             1. OUR SERVICES<br />

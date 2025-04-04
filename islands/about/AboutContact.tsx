@@ -1,13 +1,13 @@
-/* ===== ABOUT CONTACT MODULE ===== */
+/* TODO @REINAMORA:  Update the contact form to be able to send emails */
+/* ===== ABOUT CONTACT COMPONENT ===== */
 import { useState } from "preact/hooks";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import { ButtonProcessing } from "$buttons";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 import { inputField1col, inputField2col } from "$forms";
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== STATE ===== */
 const AboutContact = () => {
-  /* ===== STATE MANAGEMENT ===== */
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [subject, setSubject] = useState<string>("");
@@ -15,7 +15,7 @@ const AboutContact = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /* ===== FORM HANDLERS ===== */
+  /* ===== EVENT HANDLERS ===== */
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -25,7 +25,7 @@ const AboutContact = () => {
     setIsSubmitting(false);
   };
 
-  /* ===== COMPONENT RENDER ===== */
+  /* ===== COMPONENT ===== */
   return (
     <>
       <section>

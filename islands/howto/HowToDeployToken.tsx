@@ -1,6 +1,8 @@
+/* ===== HOW TO DEPLOY TOKEN COMPONENT ===== */
 import { ReadAllButton } from "$buttons";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
+/* ===== COMPONENT ===== */
 export const HowToDeployTokenModule = () => {
   return (
     <div class="flex flex-col gap-6">

@@ -1,7 +1,7 @@
 /* ===== FAQ PAGE HEADER COMPONENT ===== */
 import { text, textLg, titleGreyDL, titleGreyLD } from "$text";
 
-/* ===== HEADER COMPONENT IMPLEMENTATION ===== */
+/* ===== HEADER COMPONENT DEFINITION ===== */
 export function FaqHeader() {
   return (
     /* ===== HEADER SECTION CONTAINER ===== */

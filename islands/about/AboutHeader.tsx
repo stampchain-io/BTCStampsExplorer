@@ -1,4 +1,4 @@
-/* ===== ABOUT HEADER MODULE ===== */
+/* ===== ABOUT HEADER COMPONENT ===== */
 import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
 import {
@@ -11,14 +11,13 @@ import {
   titlePurpleDL,
 } from "$text";
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== STATE ===== */
 export default function AboutHeader() {
-  /* ===== STATE MANAGEMENT ===== */
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [totalStampsCount, setTotalStampsCount] = useState<number>(0);
   const [totalTokensCount, setTotalTokensCount] = useState<number>(0);
 
-  /* ===== DATA FETCHING ===== */
+  /* ===== EVENT HANDLERS ===== */
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -36,11 +35,12 @@ export default function AboutHeader() {
     }
   };
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     fetchData();
   }, []);
 
-  /* ===== COMPONENT RENDER ===== */
+  /* ===== COMPONENT ===== */
   return (
     <section>
       <div>

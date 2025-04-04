@@ -1,6 +1,8 @@
+/* ===== HOW TO TRANSFER STAMP COMPONENT ===== */
 import { ReadAllButton } from "$buttons";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
+/* ===== COMPONENT ===== */
 export const HowToTransferStampModule = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">

@@ -3,20 +3,20 @@ import { Head as _Head } from "$fresh/runtime.ts";
 import { FAQ_CONTENT, FaqAccordion, FaqHeader } from "$faq";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
+/* ===== PAGE COMPONENT ===== */
 export default function FAQ() {
-  /* ===== COMPONENT RENDER ===== */
   return (
     <div className="flex flex-col gap-12 mobileLg:gap-[72px]">
       {/* ===== HEADER SECTION ===== */}
       <FaqHeader />
 
-      {/* ===== FAQ SECTIONS MAPPING ===== */}
+      {/* ===== FAQ SECTION ===== */}
       {FAQ_CONTENT.map((section) => (
         <section
           key={section.title}
           className="flex flex-col gap-6"
         >
-          {/* ===== SECTION HEADER ===== */}
+          {/* ===== ACCORDION HEADER SECTION ===== */}
           <div>
             <h3 className={titleGreyDL}>{section.title}</h3>
             <h4 className={subtitleGrey}>{section.subtitle}</h4>
@@ -30,7 +30,7 @@ export default function FAQ() {
             </p>
           </div>
 
-          {/* ===== ACCORDION GRID ===== */}
+          {/* ===== ACCORDION SUBSECTION ===== */}
           <div className="grid grid-cols-1 tablet:grid-cols-2 gap-3 tablet:gap-x-grid-desktop tablet:gap-y-3">
             {section.items.map((item) => (
               <FaqAccordion key={item.title} item={item} />

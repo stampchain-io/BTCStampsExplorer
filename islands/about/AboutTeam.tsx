@@ -1,7 +1,7 @@
-/* ===== ABOUT TEAM MODULE ===== */
+/* ===== ABOUT TEAM COMPONENT ===== */
 import { aboutSubTitlePurple, aboutTitlePurpleLD, subtitlePurple } from "$text";
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== COMPONENT ===== */
 export default function AboutTeam() {
   /* ===== COMPONENT RENDER ===== */
   return (

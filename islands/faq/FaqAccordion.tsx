@@ -2,12 +2,12 @@
 import { Accordion } from "$islands/faq/AccordionBase.tsx";
 import type { FAQ_CONTENT } from "$faq";
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== INTERFACE ===== */
 interface FaqAccordionProps {
   item: typeof FAQ_CONTENT[number]["items"][number];
 }
 
-/* ===== FAQ ACCORDION IMPLEMENTATION ===== */
+/* ===== COMPONENT ===== */
 export function FaqAccordion({ item }: FaqAccordionProps) {
   return (
     <Accordion title={item.title}>

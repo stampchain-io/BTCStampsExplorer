@@ -1,14 +1,14 @@
-/* ===== SHARED ACCORDION COMPONENT ===== */
+/* ===== ACCORDION BASE COMPONENT ===== */
 import { JSX } from "preact";
 import { signal } from "@preact/signals";
 import { Icon } from "$icons";
 import { text } from "$text";
 
-/* ===== SHARED STATE MANAGEMENT ===== */
+/* ===== STATE  ===== */
 // Create a shared signal outside the component
 const activeAccordion = signal<string | null>(null);
 
-/* ===== ACCORDION COMPONENT IMPLEMENTATION ===== */
+/* ===== COMPONENT ===== */
 export const Accordion = (
   { title, children }: { title: string; children: JSX.Element },
 ) => {
@@ -20,7 +20,6 @@ export const Accordion = (
     activeAccordion.value = isOpen ? null : title;
   };
 
-  /* ===== COMPONENT RENDER ===== */
   return (
     <div className="w-full">
       {/* Accordion Header */}

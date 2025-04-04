@@ -1,6 +1,7 @@
-import { ReadAllButton } from "$buttons";
+/* ===== HOW TO REGISTER BITNAME COMPONENT ===== */
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
+/* ===== COMPONENT ===== */
 export const HowToRegisterBitnameModule = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">

@@ -1,14 +1,15 @@
+/* ===== ABOUT PAGE ===== */
 import AboutHeader from "$islands/about/AboutHeader.tsx";
 import AboutTeam from "$islands/about/AboutTeam.tsx";
 import { PartnersModule } from "$islands/modules/Partners.tsx";
 import AboutDonate from "$islands/about/AboutDonate.tsx";
 import AboutContact from "$islands/about/AboutContact.tsx";
 
-/* ===== ABOUT PAGE ===== */
+/* ===== PAGE COMPONENT ===== */
 export default function About() {
   return (
     <div>
-      {/* ===== BACKGROUND IMAGE ===== */}
+      {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
         alt="About Bitcoin Stamps and contact Stampchain"

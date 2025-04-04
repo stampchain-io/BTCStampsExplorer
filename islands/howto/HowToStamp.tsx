@@ -1,6 +1,8 @@
+/* ===== HOW TO STAMP COMPONENT ===== */
 import { ReadAllButton } from "$buttons";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
+/* ===== COMPONENT ===== */
 export const HowToStampModule = () => {
   return (
     <div class="flex flex-col gap-6">

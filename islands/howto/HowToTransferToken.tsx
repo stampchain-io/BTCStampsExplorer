@@ -1,6 +1,8 @@
+/* ===== HOW TO TRANSFER TOKEN COMPONENT ===== */
 import { ReadAllButton } from "$buttons";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
+/* ===== COMPONENT ===== */
 export const HowToTransferTokenModule = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">

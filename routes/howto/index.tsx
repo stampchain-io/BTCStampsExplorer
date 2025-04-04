@@ -2,10 +2,11 @@
 import { Head as _Head } from "$fresh/runtime.ts";
 import { headingGrey, subtitleGrey, text, titleGreyDL } from "$text";
 
+/* ===== PAGE COMPONENT ===== */
 export default function HowTo() {
   return (
     <div className="flex flex-col gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
-      {/* ===== BACKGROUND IMAGE ===== */}
+      {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
         alt="How to practical guides on Bitcoin Stamps and the stamping tools of Stampchain"
