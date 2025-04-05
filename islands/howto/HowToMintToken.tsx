@@ -7,7 +7,7 @@ export const HowToMintTokenModule = () => {
   return (
     <div class="flex flex-col gap-6">
       <div class="flex flex-col">
-        <h1 class={titleGreyDL}>HOW-TO</h1>
+        <h3 class={titleGreyDL}>HOW-TO</h3>
         <h2 class={subtitleGrey}>MINT A TOKEN</h2>
         <p class={text}>
           <ul class="list-disc pl-5 space-y-2">

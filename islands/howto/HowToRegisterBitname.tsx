@@ -6,7 +6,7 @@ export const HowToRegisterBitnameModule = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col">
-        <h1 class={titleGreyDL}>HOW-TO</h1>
+        <h3 class={titleGreyDL}>HOW-TO</h3>
         <h2 class={subtitleGrey}>REGISTER YOUR BITNAME</h2>
         <p class={text}>
           <ul class="list-disc pl-5 space-y-2">
