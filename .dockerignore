@@ -1,3 +1,13 @@
-node_modules/
-.git
+# Ignore node modules and other build artifacts
+node_modules
+.npm
+.deno
+npm-debug.log
 .DS_Store
+.git
+.github
+tmp/
+
+# Ignore platform-specific artifacts that could cause issues
+**/*.arm64
+**/*.aarch64

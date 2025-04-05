@@ -217,6 +217,7 @@ import * as $src20_cards_SRC20TokenOutmintedCard from "./islands/src20/cards/SRC
 import * as $src20_cards_styles from "./islands/src20/cards/styles.ts";
 import * as $src20_details_SRC20HolderTable from "./islands/src20/details/SRC20HolderTable.tsx";
 import * as $src20_details_SRC20TickHeader from "./islands/src20/details/SRC20TickHeader.tsx";
+import * as $src20_styles from "./islands/src20/styles.ts";
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
@@ -229,6 +230,7 @@ import * as $stamp_details_StampImage from "./islands/stamp/details/StampImage.t
 import * as $stamp_details_StampImageFullScreen from "./islands/stamp/details/StampImageFullScreen.tsx";
 import * as $stamp_details_StampInfo from "./islands/stamp/details/StampInfo.tsx";
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
+import * as $stamp_styles from "./islands/stamp/styles.ts";
 import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
 import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
 import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
@@ -248,6 +250,7 @@ import * as $stamping_src20_transfer_styles from "./islands/stamping/src20/trans
 import * as $stamping_stamp_OlgaContent from "./islands/stamping/stamp/OlgaContent.tsx";
 import * as $stamping_stamp_transfer_LatestStampTransfer from "./islands/stamping/stamp/transfer/LatestStampTransfer.tsx";
 import * as $stamping_stamp_transfer_TransferStampContent from "./islands/stamping/stamp/transfer/TransferStampContent.tsx";
+import * as $stamping_stamp_transfer_styles from "./islands/stamping/stamp/transfer/styles.ts";
 import * as $test_ReviewDogTest from "./islands/test/ReviewDogTest.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
@@ -519,6 +522,7 @@ const manifest = {
       $src20_details_SRC20HolderTable,
     "./islands/src20/details/SRC20TickHeader.tsx":
       $src20_details_SRC20TickHeader,
+    "./islands/src20/styles.ts": $src20_styles,
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
     "./islands/stamp/StampContent.tsx": $stamp_StampContent,
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
@@ -533,6 +537,7 @@ const manifest = {
     "./islands/stamp/details/StampInfo.tsx": $stamp_details_StampInfo,
     "./islands/stamp/details/StampTextContent.tsx":
       $stamp_details_StampTextContent,
+    "./islands/stamp/styles.ts": $stamp_styles,
     "./islands/stamping/InputField.tsx": $stamping_InputField,
     "./islands/stamping/SelectField.tsx": $stamping_SelectField,
     "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,
@@ -566,6 +571,8 @@ const manifest = {
       $stamping_stamp_transfer_LatestStampTransfer,
     "./islands/stamping/stamp/transfer/TransferStampContent.tsx":
       $stamping_stamp_transfer_TransferStampContent,
+    "./islands/stamping/stamp/transfer/styles.ts":
+      $stamping_stamp_transfer_styles,
     "./islands/test/ReviewDogTest.tsx": $test_ReviewDogTest,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
