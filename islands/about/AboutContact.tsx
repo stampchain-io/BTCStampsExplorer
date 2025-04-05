@@ -4,7 +4,7 @@ import { useState } from "preact/hooks";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import { ButtonProcessing } from "$buttons";
 import { subtitleGrey, text, titleGreyLD } from "$text";
-import { gapGrid, rowForm, rowFormResponsive } from "$layout";
+import { gapGrid, rowForm, rowResponsiveForm } from "$layout";
 
 /* ===== STATE ===== */
 const AboutContact = () => {
@@ -72,7 +72,7 @@ const AboutContact = () => {
               onSubmit={handleSubmit}
             >
               {/* ===== NAME AND EMAIL FIELDS ===== */}
-              <div className={rowFormResponsive}>
+              <div className={rowResponsiveForm}>
                 <InputField
                   type="text"
                   value={name}

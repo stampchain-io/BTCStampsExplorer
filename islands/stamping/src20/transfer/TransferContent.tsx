@@ -10,7 +10,7 @@ import {
   bodyTool,
   containerBackground,
   containerColForm,
-  rowFormResponsive,
+  rowResponsiveForm,
 } from "$layout";
 import { SRC20InputField } from "$forms";
 import { titlePurpleLD } from "$text";
@@ -229,7 +229,7 @@ export function TransferContent(
         />
 
         {/* ===== TOKEN AND AMOUNT INPUTS ===== */}
-        <div class={rowFormResponsive}>
+        <div class={rowResponsiveForm}>
           {/* Token Input with Dropdown */}
           <div
             class={`relative ${

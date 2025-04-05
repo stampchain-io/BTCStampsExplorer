@@ -18,17 +18,23 @@ export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 /* ===== CONTAINER STYLES ===== */
 export const containerBackground =
   "flex flex-col w-full dark-gradient rounded-lg p-6";
-export const containerColData = "flex flex-col -space-y-1"; // Data specific
-export const containerColForm = "flex flex-col w-full gap-5"; // Form specific
-export const containerRowForm = "flex w-full gap-5"; // Form specific
+export const containerColData = "flex flex-col -space-y-1"; // Data specific (global)
+export const containerColForm = "flex flex-col w-full gap-5"; // Form input fields specific
+export const containerRowForm = "flex w-full gap-5"; // Form input fields specific
 
 /* ===== ROW STYLES ===== */
 export const rowForm = "flex w-full";
-export const rowFormResponsive = "flex flex-col mobileMd:flex-row w-full gap-5"; // CHANGE NAME !!!!
+export const rowResponsiveForm = "flex flex-col mobileMd:flex-row w-full gap-5";
 
 /* ===== COL STYLES ===== */
 
 /* ===== MODAL STYLES ===== */
+
+/* ===== LOADER STYLES ===== */
+export const loaderSpinGrey =
+  "animate-spin rounded-full w-7 h-7 border-b-[3px] border-stamp-grey";
+export const loaderSpinPurple =
+  "animate-spin rounded-full w-7 h-7 border-b-[3px] border-stamp-purple";
 
 /* ===== LEGACY STYLES ===== */
 export const modalBgCenter =
@@ -55,7 +61,11 @@ export type LayoutStyles = {
 
   // Row styles
   rowForm: string;
-  rowFormResponsive: string;
+  rowResponsiveForm: string;
+
+  // Loader styles
+  loaderSpinGrey: string;
+  loaderSpinPurple: string;
 
   // Modal styles
   modalBgCenter: string;

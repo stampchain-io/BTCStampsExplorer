@@ -119,6 +119,10 @@ export const aboutSubTitlePurple =
   "text-xs mobileMd:text-base font-medium text-stamp-purple text-center whitespace-nowrap";
 export const dataLabel =
   "text-base mobileLg:text-lg font-light text-red-500 uppercase"; // not in use ???
+export const dataValue =
+  "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase"; // check where used
+export const dataValueLg =
+  "text-xl mobileLg:text-2xl font-medium text-stamp-grey-light uppercase"; // check where used
 
 // Tables
 export const dataValueXL =
@@ -183,6 +187,8 @@ export type TextStyles = {
   aboutTitlePurpleLD: string;
   aboutSubTitlePurple: string;
   dataLabel: string;
+  dataValue: string;
+  dataValueLg: string;
   // Table styles
   dataValueXL: string;
   dataValueXLlink: string;

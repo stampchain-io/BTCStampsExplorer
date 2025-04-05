@@ -1,6 +1,6 @@
 /* ===== FORM STYLES MODULE ===== */
 
-/* ===== DEFAULT STYLES ===== */
+/* ===== BASE STYLES ===== */
 // Global sizes
 const inputFieldHeight = "h-10";
 const inputFieldWidth = "!w-10";
