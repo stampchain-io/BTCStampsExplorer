@@ -7,12 +7,12 @@ import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import {
-  bodyForms,
+  bodyTool,
   containerBackground,
-  formContainerCol,
-  formRowResponsive,
-  SRC20InputField,
-} from "$forms";
+  containerColForm,
+  rowFormResponsive,
+} from "$layout";
+import { SRC20InputField } from "$forms";
 import { titlePurpleLD } from "$text";
 
 /* ===== INTERFACE DEFINITIONS ===== */
@@ -203,12 +203,12 @@ export function TransferContent(
   }, []);
 
   return (
-    <div class={bodyForms}>
+    <div class={bodyTool}>
       <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>TRANSFER</h1>
 
       {/* ===== FORM  ===== */}
       <form
-        class={`${containerBackground} ${formContainerCol} mb-6`}
+        class={`${containerBackground} ${containerColForm} mb-6`}
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
@@ -229,7 +229,7 @@ export function TransferContent(
         />
 
         {/* ===== TOKEN AND AMOUNT INPUTS ===== */}
-        <div class={formRowResponsive}>
+        <div class={rowFormResponsive}>
           {/* Token Input with Dropdown */}
           <div
             class={`relative ${

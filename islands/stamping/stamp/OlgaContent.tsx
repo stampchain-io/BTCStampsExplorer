@@ -15,6 +15,7 @@ import { logger } from "$lib/utils/logger.ts";
 import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
+import { bodyTool, containerBackground, containerRowForm } from "$layout";
 import { titlePurpleLD } from "$text";
 import { ToggleSwitchButton } from "$buttons";
 import { Icon } from "$icons";
@@ -23,7 +24,6 @@ import {
   tooltipButtonInCollapsible,
   tooltipImage,
 } from "$notifications";
-import { bodyForms, containerBackground, formContainerRow } from "$forms";
 
 /* ===== LOGGING UTILITY ===== */
 const log = (message: string, data?: unknown) => {
@@ -1319,7 +1319,7 @@ export function OlgaContent() {
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyForms}>
+    <div class={bodyTool}>
       <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>STAMP</h1>
 
       {isConnected && addressError && (
@@ -1428,7 +1428,7 @@ export function OlgaContent() {
                 )}
             </div>
           </div>
-          <div className={formContainerRow}>
+          <div className={containerRowForm}>
             <InputField
               type="text"
               value={stampName}

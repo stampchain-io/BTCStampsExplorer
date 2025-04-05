@@ -5,15 +5,15 @@ import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import {
-  bodyForms,
-  containerBackground,
-  formContainerCol,
-  formContainerRow,
-  SRC20InputField,
-} from "$forms";
 import { logger } from "$lib/utils/logger.ts";
 import { SRC20MintStatus } from "$types/src20.d.ts";
+import {
+  bodyTool,
+  containerBackground,
+  containerColForm,
+  containerRowForm,
+} from "$layout";
+import { SRC20InputField } from "$forms";
 import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
 import { Icon } from "$icons";
 
@@ -288,7 +288,7 @@ export function MintContent({
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyForms}>
+    <div class={bodyTool}>
       <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>MINT</h1>
 
       {/* ===== ERROR MESSAGE DISPLAY ===== */}
@@ -308,7 +308,7 @@ export function MintContent({
         novalidate
       >
         {/* ===== TOKEN SEARCH AND AMOUNT INPUT ===== */}
-        <div class={`${formContainerRow} mb-5`}>
+        <div class={`${containerRowForm} mb-5`}>
           {/* Token image preview */}
           <div
             id="image-preview"
@@ -341,7 +341,7 @@ export function MintContent({
           </div>
 
           {/* Token inputs */}
-          <div class={formContainerCol}>
+          <div class={containerColForm}>
             {/* Token search field with dropdown */}
             <div
               class={`relative ${

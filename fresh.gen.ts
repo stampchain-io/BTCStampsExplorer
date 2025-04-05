@@ -171,6 +171,8 @@ import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
+import * as $faq_AccordionBase from "./islands/faq/AccordionBase.tsx";
+import * as $faq_FaqAccordion from "./islands/faq/FaqAccordion.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
@@ -193,7 +195,6 @@ import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
-import * as $shared_Accordion from "./islands/faq/FaqAccordion.tsx";
 import * as $shared_Tables from "./islands/shared/Tables.tsx";
 import * as $shared_actions_buttonActions from "./islands/shared/actions/buttonActions.tsx";
 import * as $src20_FilterModal from "./islands/src20/FilterModal.tsx";
@@ -453,6 +454,8 @@ const manifest = {
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
+    "./islands/faq/AccordionBase.tsx": $faq_AccordionBase,
+    "./islands/faq/FaqAccordion.tsx": $faq_FaqAccordion,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/home/FontLoader.tsx": $home_FontLoader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
@@ -475,7 +478,6 @@ const manifest = {
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
-    "./islands/faq/FaqAccordion.tsx": $shared_Accordion,
     "./islands/shared/Tables.tsx": $shared_Tables,
     "./islands/shared/actions/buttonActions.tsx": $shared_actions_buttonActions,
     "./islands/src20/FilterModal.tsx": $src20_FilterModal,

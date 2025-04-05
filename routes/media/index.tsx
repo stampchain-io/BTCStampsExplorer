@@ -1,12 +1,13 @@
 /* TODO @baba: Refactor the page and create island components for each section  - similar to About page */
 /* ===== MEDIA PAGE ===== */
+import { body } from "$layout";
 import { Button } from "$buttons";
 import { headingGreyLDLink, subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function Media() {
   return (
-    <div className="flex flex-col gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
+    <div className={body}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"

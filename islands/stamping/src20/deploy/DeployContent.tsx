@@ -8,15 +8,14 @@ import { logger } from "$lib/utils/logger.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
-import { Icon } from "$icons";
 import {
-  bodyForms,
+  bodyTool,
   containerBackground,
-  formContainerCol,
-  formContainerRow,
-  inputTextarea,
-  SRC20InputField,
-} from "$forms";
+  containerColForm,
+  containerRowForm,
+} from "$layout";
+import { Icon } from "$icons";
+import { inputTextarea, SRC20InputField } from "$forms";
 import { titlePurpleLD } from "$text";
 import { ToggleSwitchButton } from "$buttons";
 import { tooltipButton, tooltipImage } from "$notifications";
@@ -253,7 +252,7 @@ export function DeployContent(
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyForms}>
+    <div class={bodyTool}>
       <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>DEPLOY</h1>
 
       <form
@@ -266,9 +265,9 @@ export function DeployContent(
         novalidate
       >
         {/* ===== MAIN FORM CONTAINER ===== */}
-        <div className={formContainerRow}>
+        <div className={containerRowForm}>
           {/* Image upload and decimals section */}
-          <div className={`${formContainerCol} !w-[100px]`}>
+          <div className={`${containerColForm} !w-[100px]`}>
             {/* Image upload preview */}
             <div
               id="image-preview"
@@ -341,8 +340,8 @@ export function DeployContent(
           </div>
 
           {/* Token details section */}
-          <div className={formContainerCol}>
-            <div class={formContainerRow}>
+          <div className={containerColForm}>
+            <div class={containerRowForm}>
               {/* Token input */}
               <SRC20InputField
                 type="text"
@@ -420,14 +419,14 @@ export function DeployContent(
               : "max-h-0 opacity-0 mt-0"
           }`}
         >
-          <div className={formContainerCol}>
+          <div className={containerColForm}>
             <textarea
               type="text"
               class={`${inputTextarea} scrollbar-grey`}
               placeholder="Description"
               rows={3}
             />
-            <div className={formContainerRow}>
+            <div className={containerRowForm}>
               <SRC20InputField
                 type="text"
                 placeholder="X"
@@ -441,7 +440,7 @@ export function DeployContent(
                 onChange={(e) => handleInputChange(e, "web")}
               />
             </div>
-            <div className={formContainerRow}>
+            <div className={containerRowForm}>
               <SRC20InputField
                 type="text"
                 placeholder="Telegram"

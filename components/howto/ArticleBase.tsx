@@ -1,6 +1,7 @@
 /* ===== ARTICLE COMPONENT ===== */
-import { ArticlesOverview } from "./ArticlesOverviewBase.tsx";
+import { body, bodyArticle } from "$layout";
 import { headingGrey, subtitleGrey, text, titleGreyDL } from "$text";
+import { ArticlesOverview } from "./ArticlesOverviewBase.tsx";
 
 /* ===== TYPES ===== */
 interface ArticleProps {
@@ -17,8 +18,8 @@ export function Article(
 ) {
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class="flex flex-col gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
-      <div class="flex flex-col w-full tablet:max-w-[922px] tablet:mx-auto">
+    <div class={body}>
+      <div class={bodyArticle}>
         {/* ===== MAIN CONTENT SECTION ===== */}
         <section>
           {/* ===== HEADER ===== */}

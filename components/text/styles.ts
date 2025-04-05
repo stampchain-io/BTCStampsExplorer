@@ -63,15 +63,12 @@ export const textXl = `${textFont} text-xl`;
 export const textLinkUnderline =
   `font-bold text-base text-stamp-grey-light animated-underline ${transition}`;
 
-// Links
-// Use the specific link styles created or just add "animated-underline" to the class name to apply the animated underline effect
-
-// Data text within containers
-// Labels
+/* ===== LINK STYLES ===== */
+// Use the specific link styles created or just add "animated-underline" to the class name to apply an animated underline effect
 
 /* ===== LABEL STYLES ===== */
 export const labelSm = `${labelFont} text-sm ${cursor}`;
-export const label = `${labelFont} text-base ${cursor}`; // = old dataValue name
+export const label = `${labelFont} text-base ${cursor}`; // = old dataLabel name
 export const labelLg = `${labelFont} text-lg ${cursor}`;
 export const labelXl = `${labelFont} text-xl ${cursor}`;
 
@@ -80,11 +77,17 @@ export const valueSm = `${valueFont} text-sm ${cursor}`;
 export const value = `${valueFont} text-base ${cursor}`;
 export const valueLg = `${valueFont} text-lg ${cursor}`;
 export const valueXl = `${valueFont} text-xl ${cursor}`;
+export const value2xl =
+  `font-extrabold text-2xl text-stamp-grey-light -mt-1 ${cursor}`;
+export const value3xl =
+  `font-extrabold text-3xl text-stamp-grey-light -mt-1 ${cursor}`;
 export const valueDarkSm =
   `font-medium text-sm text-stamp-grey-darker tracking-tighter ${cursor}`; // used for addy styling in mobile/table/desktop header
-// Tooltips
+
+/* ===== TOOLTIP STYLES ===== */
 // One text style for tooltips - defined in /notifications/styles.ts
-// Code
+
+/* ===== CODE STYLES ===== */
 // Add "font-courier-prime" to the class name to use the Courier font and make text monospace
 
 /* ===== SPECIAL TEXT STYLES ===== */
@@ -97,11 +100,11 @@ export const copyright =
 // Errors - used for error messages - to be defined in /notifications/styles.ts
 // Success - used for success messages - to be defined in /notifications/styles.ts
 
-// Uncategorized styles
+/* ===== UNCATEGORIZED STYLES ===== */
 // Add any new styles you cannot categorize here
 
 /* ===== LEGACY STYLES ===== */
-// About page styles
+// About page
 export const dataLabelPurple =
   "font-light text-base text-stamp-purple-highlight mb-0.5";
 export const dataValuePurpleSm =
@@ -115,7 +118,7 @@ export const aboutTitlePurpleLD =
 export const aboutSubTitlePurple =
   "text-xs mobileMd:text-base font-medium text-stamp-purple text-center whitespace-nowrap";
 export const dataLabel =
-  "text-base mobileLg:text-lg font-light text-yellow-500 uppercase";
+  "text-base mobileLg:text-lg font-light text-red-500 uppercase"; // not in use ???
 
 // Tables
 export const dataValueXL =
@@ -166,6 +169,8 @@ export type TextStyles = {
   value: string;
   valueLg: string;
   valueXl: string;
+  value2xl: string;
+  value3xl: string;
   valueDarkSm: string;
   // Miscellaneous specific styles
   tagline: string;

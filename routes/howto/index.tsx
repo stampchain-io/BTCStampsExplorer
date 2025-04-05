@@ -1,11 +1,12 @@
 /* ===== HOW-TO PAGE ===== */
 import { Head as _Head } from "$fresh/runtime.ts";
+import { body } from "$layout";
 import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function HowTo() {
   return (
-    <div className="flex flex-col gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
+    <div className={body}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"

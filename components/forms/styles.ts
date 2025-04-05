@@ -3,7 +3,7 @@
 /* ===== DEFAULT STYLES ===== */
 // Global sizes
 const inputFieldHeight = "h-10";
-const inputFieldWidth = "w-10";
+const inputFieldWidth = "!w-10";
 const inputFieldHeightLarge = "h-12";
 
 // Input field styles
@@ -11,20 +11,6 @@ const inputFieldStyle = `p-3 w-full
   rounded-md bg-stamp-grey focus:bg-stamp-grey-light outline-none focus:outline-none
   font-medium text-sm text-stamp-grey-darkest
   placeholder:font-light placeholder:text-stamp-grey-darkest placeholder:uppercase`;
-
-/* ===== LAYOUT STYLES ===== */
-// Global container
-export const containerBackground =
-  "flex flex-col w-full p-6 dark-gradient rounded-lg"; // similar to inline backgroundContainer constant - should be moved to a sylesheet specific for global layout
-
-// Form styles
-// Forms
-export const bodyForms =
-  "flex flex-col w-full mobileMd:max-w-[480px] mobileMd:mx-auto"; // should/could be moved to a sylesheet specific for global layout
-export const formContainerCol = "flex flex-col w-full gap-5";
-export const formContainerRow = "flex w-full gap-5";
-export const formRow = "flex w-full";
-export const formRowResponsive = "flex flex-col mobileMd:flex-row w-full gap-5";
 
 /* ===== INPUT STYLES ===== */
 // Base input
@@ -44,8 +30,8 @@ export const inputTextarea = `
   ${inputFieldStyle}
 `;
 
-// NOT IN USE NOR UPDATED
-// Input styles - not in use or updated
+/* ===== NOT IN USE NOR UPDATED ===== */
+// Input styles
 export const inputFieldSquare = `
   ${inputField}
   ${inputFieldWidth}
@@ -79,70 +65,7 @@ export const inputRadio = `
   focus:ring-stamp-purple
   focus:ring-offset-0
 `;
-
-/* ===== LABEL STYLES ===== */
-export const labelBase =
-  "font-medium text-base text-stamp-grey-light cursor-default select-none whitespace-nowrap";
-export const labelLarge =
-  "font-medium text-lg text-stamp-grey-light cursor-default select-none whitespace-nowrap";
-
-/* ===== STATE STYLES ===== */
-export const stateDisabled = "opacity-50 cursor-not-allowed";
-export const stateLoading = "cursor-wait opacity-75";
-export const stateError = "text-xs border-red-500 focus:border-red-500";
-export const stateSuccess = "text-xs border-green-500 focus:border-green-500";
-
-/* ===== MESSAGE STYLES ===== */
-export const messageError = "text-xs text-red-500 mt-2";
-export const messageSuccess = "text-xs text-green-500 mt-2";
-export const messageHelp = "text-xs text-stamp-grey-darkest mt-1";
-
-/* ===== FIELD VARIANTS ===== */
-export const fieldVariants = {
-  default: {
-    container: "w-full",
-    label: labelBase,
-    input: inputField,
-    error: messageError,
-  },
-  numeric: {
-    container: "w-full",
-    label: labelBase,
-    input: inputNumeric,
-    error: messageError,
-  },
-  textarea: {
-    container: "w-full",
-    label: labelBase,
-    input: inputTextarea,
-    error: messageError,
-  },
-  select: {
-    container: "w-full",
-    label: labelBase,
-    input: inputSelect,
-    error: messageError,
-  },
-  checkbox: {
-    container: "flex items-center gap-2",
-    label: labelBase,
-    input: inputCheckbox,
-    error: messageError,
-  },
-  radio: {
-    container: "flex items-center gap-2",
-    label: labelBase,
-    input: inputRadio,
-    error: messageError,
-  },
-} as const;
-
-/* ===== LAYOUT VARIANTS ===== */
-export const layoutVariants = {
-  default: formContainerCol,
-  row: formRow,
-  rowResponsive: formRowResponsive,
-} as const;
+/* ===== ===== ===== */
 
 /* ===== GRADIENT STYLES ===== */
 export const purpleGradient = `
@@ -177,20 +100,28 @@ export const outlineGradient = `
   [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-stamp-grey 
   [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-[#100318]
 `;
+
+/* ===== NOT IN USE NOR UPDATED ===== */
+/* ===== LABEL STYLES ===== */
+export const labelBase =
+  "font-medium text-base text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+export const labelLarge =
+  "font-medium text-lg text-stamp-grey-light cursor-default select-none whitespace-nowrap";
+
+/* ===== STATE STYLES ===== */
+export const stateDisabled = "opacity-50 cursor-not-allowed";
+export const stateLoading = "cursor-wait opacity-75";
+export const stateError = "text-xs border-red-500 focus:border-red-500";
+export const stateSuccess = "text-xs border-green-500 focus:border-green-500";
+
+/* ===== MESSAGE STYLES ===== */
+export const messageError = "text-xs text-red-500 mt-2";
+export const messageSuccess = "text-xs text-green-500 mt-2";
+export const messageHelp = "text-xs text-stamp-grey-darkest mt-1";
+/* ===== ===== ===== */
+
 /* ===== TYPE DEFINITIONS ===== */
 export type FormStyles = {
-  // Layout
-  containerBackground: string;
-  bodyForms: string;
-  formContainerCol: string;
-  formContainerRow: string;
-  formRow: string;
-  formRowResponsive: string;
-
-  // Labels
-  labelBase: string;
-  labelLarge: string;
-
   // Inputs
   inputField: string;
   inputFieldOutline: string;
@@ -201,23 +132,23 @@ export type FormStyles = {
   inputCheckbox: string;
   inputRadio: string;
 
-  // States
+  // Gradients
+  purpleGradient: string;
+  greyGradient: string;
+  outlineGradient: string;
+
+  // Labels - not used
+  labelBase: string;
+  labelLarge: string;
+
+  // States - not used
   stateDisabled: string;
   stateLoading: string;
   stateError: string;
   stateSuccess: string;
 
-  // Messages
+  // Messages - not used
   messageError: string;
   messageSuccess: string;
   messageHelp: string;
-
-  // Variants
-  fieldVariants: typeof fieldVariants;
-  layoutVariants: typeof layoutVariants;
-
-  // Gradients
-  purpleGradient: string;
-  greyGradient: string;
-  outlineGradient: string;
 };

@@ -7,16 +7,11 @@ import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import { bodyTool, containerBackground } from "$layout";
 import { titlePurpleLD } from "$text";
 import { tooltipButton } from "$notifications";
 import { Button } from "$buttons";
-import {
-  bodyForms,
-  containerBackground,
-  inputFieldOutline,
-  outlineGradient,
-  purpleGradient,
-} from "$forms";
+import { inputFieldOutline, outlineGradient, purpleGradient } from "$forms";
 
 /* ===== COMPONENT INTERFACE ===== */
 interface RegisterBitnameContentProps {
@@ -168,7 +163,7 @@ export function RegisterBitnameContent({
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div class={bodyForms}>
+    <div class={bodyTool}>
       <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>REGISTER</h1>
 
       <form
