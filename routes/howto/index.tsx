@@ -1,12 +1,12 @@
 /* ===== HOW-TO PAGE ===== */
 import { Head as _Head } from "$fresh/runtime.ts";
-import { body } from "$layout";
+import { body, gapGrid, gapSection } from "$layout";
 import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function HowTo() {
   return (
-    <div className={body}>
+    <div className={`${body} ${gapSection}`}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
@@ -49,7 +49,9 @@ export default function HowTo() {
       {/* ===== LEATHER WALLET CREATION GUIDE ===== */}
       <section>
         <h2 className={`${headingGrey} mb-4`}>CREATE A LEATHER WALLET</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+        <div
+          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+        >
           <img
             src="/img/how-tos/createleatherwallet/00.png"
             width="100%"
@@ -78,7 +80,9 @@ export default function HowTo() {
       {/* ===== LEATHER WALLET CONNECTION GUIDE ===== */}
       <section>
         <h2 className={`${headingGrey} mb-4`}>CONNECT YOUR LEATHER WALLET</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+        <div
+          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+        >
           <img
             src="/img/how-tos/connectleatherwallet/00.png"
             width="100%"
@@ -107,7 +111,9 @@ export default function HowTo() {
       {/* ===== TOKEN DEPLOYMENT GUIDE ===== */}
       <section>
         <h2 className={`${headingGrey} mb-4`}>DEPLOY YOUR OWN TOKEN</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+        <div
+          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+        >
           <img
             src="/img/how-tos/deploy/00.png"
             width="100%"
@@ -136,7 +142,9 @@ export default function HowTo() {
       {/* ===== TOKEN MINTING GUIDE ===== */}
       <section>
         <h2 className={`${headingGrey} mb-4`}>MINT YOUR TOKEN</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+        <div
+          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+        >
           <img
             src="/img/how-tos/mintsrc20/00.png"
             width="100%"
@@ -164,7 +172,9 @@ export default function HowTo() {
       {/* ===== ART STAMPING GUIDE ===== */}
       <section>
         <h2 className={`${headingGrey} mb-4`}>STAMPING ART</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+        <div
+          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+        >
           <img
             src="/img/how-tos/stamping/00.png"
             width="100%"

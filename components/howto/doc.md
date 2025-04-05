@@ -218,7 +218,7 @@
  * {/* ===== NEW ARTICLE GUIDE ===== *\/}
  * <section>
  *   <h2 className={`${headingGrey} mb-4`}>NEW ARTICLE TITLE</h2>
- *   <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+ *   <div className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}>
  *     <img
  *       src="/img/how-tos/newarticle/00.png"
  *       width="100%"

@@ -1,5 +1,6 @@
 /* ===== TERMS OF SERVICE PAGE ===== */
 import { CourierFontLoader } from "$islands/home/FontLoader.tsx";
+import { body, gapGrid } from "$layout";
 import { subtitleGrey, text, textSm, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
@@ -7,7 +8,7 @@ export default function TermsOfService() {
   return (
     <>
       <CourierFontLoader />
-      <div className="flex flex-col gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+      <div className={`${body} ${gapGrid}`}>
         {/* ===== HEADER SECTION ===== */}
         <section>
           <h1 className={titleGreyLD}>TERMS OF SERVICE</h1>

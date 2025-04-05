@@ -8,6 +8,7 @@ import { DeployContent } from "$islands/stamping/src20/deploy/DeployContent.tsx"
 import RecentDeploy from "$islands/stamping/src20/deploy/RecentDeploy.tsx";
 import { TransferContent } from "$islands/stamping/src20/transfer/TransferContent.tsx";
 import LatestTransfer from "$islands/stamping/src20/transfer/LatestTransfer.tsx";
+import { body, gapSection } from "$layout";
 import {
   HowToDeployTokenModule,
   HowToMintTokenModule,
@@ -142,15 +143,17 @@ export default function StampingSrc20Page(
   };
 
   return (
-    <div class="flex flex-col gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
-      <div class="flex w-full">
+    <div className={`${body} ${gapSection}`}>
+      <div className={`flex w-full`}>
         {renderContent()}
       </div>
-      <div class="flex flex-col tablet:flex-row justify-between gap-section-mobile mobileLg:gap-section-tablet tablet:gap-section-desktop">
-        <div class="flex w-full tablet:w-1/2 desktop:w-1/3">
+      <div
+        className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
+      >
+        <div className="flex w-full tablet:w-1/2 desktop:w-1/3">
           {renderLeftSidebar()}
         </div>
-        <div class="flex w-full tablet:w-1/2 desktop:w-2/3">
+        <div className={`flex w-full tablet:w-1/2 desktop:w-2/3`}>
           {renderRightSidebar()}
         </div>
       </div>

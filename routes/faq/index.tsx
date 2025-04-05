@@ -1,12 +1,13 @@
 /* ===== FAQ PAGE ===== */
 import { Head as _Head } from "$fresh/runtime.ts";
+import { body, gapSection } from "$layout";
 import { FAQ_CONTENT, FaqAccordion, FaqHeader } from "$faq";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function FAQ() {
   return (
-    <div className="flex flex-col gap-12 mobileLg:gap-[72px]">
+    <div className={`${body} ${gapSection}`}>
       {/* ===== HEADER SECTION ===== */}
       <FaqHeader />
 

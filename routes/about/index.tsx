@@ -1,4 +1,5 @@
 /* ===== ABOUT PAGE ===== */
+import { body, gapSectionSlim } from "$layout";
 import AboutHeader from "$islands/about/AboutHeader.tsx";
 import AboutTeam from "$islands/about/AboutTeam.tsx";
 import { PartnersModule } from "$islands/modules/Partners.tsx";
@@ -8,7 +9,7 @@ import AboutContact from "$islands/about/AboutContact.tsx";
 /* ===== PAGE COMPONENT ===== */
 export default function About() {
   return (
-    <div>
+    <div className={`${body} ${gapSectionSlim}`}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
@@ -28,23 +29,21 @@ export default function About() {
       />
 
       {/* ===== ABOUT SECTION ===== */}
-      <div className="flex flex-col gap-section-mobile-sm mobileLg:gap-section-tablet-sm tablet:gap-section-desktop-sm">
-        <AboutHeader />
+      <AboutHeader />
 
-        {/* ===== TEAM SECTION ===== */}
-        <AboutTeam />
+      {/* ===== TEAM SECTION ===== */}
+      <AboutTeam />
 
-        {/* ===== PARTNERS SECTION ===== */}
-        <PartnersModule />
+      {/* ===== PARTNERS SECTION ===== */}
+      <PartnersModule />
 
-        {/* ===== DONATE SECTION ===== */}
-        <div id="donate"></div>
-        <AboutDonate />
+      {/* ===== DONATE SECTION ===== */}
+      <div id="donate"></div>
+      <AboutDonate />
 
-        {/* ===== CONTACT SECTION ===== */}
-        <div id="contact"></div>
-        <AboutContact />
-      </div>
+      {/* ===== CONTACT SECTION ===== */}
+      <div id="contact"></div>
+      <AboutContact />
     </div>
   );
 }

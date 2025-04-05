@@ -1,5 +1,6 @@
 /* ===== PARTNERS MODULE ===== */
 import { useState } from "preact/hooks";
+import { gapGrid } from "$layout";
 import { subtitleGrey } from "$text";
 
 /* ===== INTERFACES ===== */
@@ -104,7 +105,7 @@ export function PartnersModule() {
       {/* ===== TITLE SECTION ===== */}
       <h2 className={`${subtitleGrey} !mb-2`}>PARTNERS</h2>
       {/* ===== BANNER CARDS SECTION ===== */}
-      <div class="grid grid-cols-3 pt-2 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+      <div className={`grid grid-cols-3 pt-2 ${gapGrid}`}>
         {partners.map((partner) => (
           <PartnerCard key={partner.name} {...partner} />
         ))}

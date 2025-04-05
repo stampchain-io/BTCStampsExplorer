@@ -1,4 +1,5 @@
 /* ===== ARTICLES OVERVIEW COMPONENT ===== */
+import { gapGrid } from "$layout";
 import { ARTICLE_LINKS } from "$components/howto/data.ts"; // needs direct import - cannot use "$howto"
 import { Button } from "$buttons";
 import { headingGreyLDLink, subtitleGrey, text, titleGreyDL } from "$text";
@@ -14,7 +15,7 @@ export function ArticlesOverview() {
       </h1>
 
       {/* ===== CONTENT GRID ===== */}
-      <div class="flex flex-col tablet:flex-row gap-grid-mobile tablet:gap-grid-tablet">
+      <div class={`flex flex-col tablet:flex-row ${gapGrid}`}>
         {/* ===== HOW-TO ARTICLES LIST ===== */}
         <div class="w-full tablet:w-2/3">
           <h2 class={subtitleGrey}>HOW-TO</h2>

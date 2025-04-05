@@ -1,13 +1,13 @@
 /* TODO @baba: Refactor the page and create island components for each section  - similar to About page */
 /* ===== MEDIA PAGE ===== */
-import { body } from "$layout";
+import { body, gapGrid, gapSection } from "$layout";
 import { Button } from "$buttons";
 import { headingGreyLDLink, subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function Media() {
   return (
-    <div className={body}>
+    <div className={`${body} ${gapSection}`}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
@@ -53,7 +53,7 @@ export default function Media() {
       <section>
         <h1 className={titleGreyLD}>INTERVIEWS</h1>
         <div
-          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop ${text}`}
+          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid} ${text}`}
         >
           {/* ===== RICE TVX INTERVIEW ===== */}
           <div className="flex flex-col">
@@ -138,7 +138,7 @@ export default function Media() {
         <h1 className={titleGreyLD}>IN THE NEWS</h1>
         <h2 className={subtitleGrey}>BREAKING STORIES</h2>
         {/* ===== NEWS ARTICLES LIST ===== */}
-        <div className="flex flex-col min-[1280px]:flex-row gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+        <div className={`flex flex-col min-[1280px]:flex-row ${gapGrid}`}>
           <div className="flex flex-col w-full min-[1280px]:w-1/2">
             <p className={text}>
               BINANCE

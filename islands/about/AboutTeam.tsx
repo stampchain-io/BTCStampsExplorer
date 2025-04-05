@@ -1,4 +1,5 @@
 /* ===== ABOUT TEAM COMPONENT ===== */
+import { gapGrid } from "$layout";
 import { aboutSubTitlePurple, aboutTitlePurpleLD, subtitlePurple } from "$text";
 
 /* ===== COMPONENT ===== */
@@ -14,9 +15,11 @@ export default function AboutTeam() {
             <h2 className={subtitlePurple}>THE TEAM</h2>
 
             {/* ===== TEAM MEMBERS GRID ===== */}
-            <div className="flex justify-between items-start
+            <div
+              className={`flex justify-between items-start
              mx-0 mobileLg:mx-12 desktop:mx-16 mt-4
-              gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+              ${gapGrid}`}
+            >
               {/* ===== MIKE IN SPACE CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/code.png" />

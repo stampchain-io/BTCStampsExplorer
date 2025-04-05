@@ -1,6 +1,7 @@
 /* ===== GET STAMPING MODULE ===== */
 import { useEffect, useState } from "preact/hooks";
 import { formatUSDValue } from "$lib/utils/formatUtils.ts";
+import { gapGrid } from "$layout";
 import { Button } from "$buttons";
 import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
@@ -41,7 +42,7 @@ export function GetStampingModule({}: GetStampingModuleProps) {
       <h2 className={subtitleGrey}>IMMORTALISE YOUR ART</h2>
       {/* ===== TEXT CONTENT SECTION ===== */}
       <div
-        className={`flex flex-col tablet:flex-row gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop ${text}`}
+        className={`flex flex-col tablet:flex-row ${gapGrid} ${text}`}
       >
         <div className="flex flex-col">
           <p>

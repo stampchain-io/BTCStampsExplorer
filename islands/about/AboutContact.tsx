@@ -4,7 +4,7 @@ import { useState } from "preact/hooks";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import { ButtonProcessing } from "$buttons";
 import { subtitleGrey, text, titleGreyLD } from "$text";
-import { rowForm, rowFormResponsive } from "$layout";
+import { gapGrid, rowForm, rowFormResponsive } from "$layout";
 
 /* ===== STATE ===== */
 const AboutContact = () => {
@@ -39,7 +39,7 @@ const AboutContact = () => {
           </h3>
         </div>
         {/* ===== CONTENT SECTION ===== */}
-        <div className="flex flex-col mobileLg:flex-row gap-grid-mobile mobileLg:gap-grid-tablet tablet:gap-grid-desktop">
+        <div className={`flex flex-col mobileLg:flex-row ${gapGrid}`}>
           {/* ===== DESCRIPTION TEXT ===== */}
           <div className="w-full mobileLg:w-full">
             <p className={text}>
