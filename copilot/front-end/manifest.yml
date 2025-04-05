@@ -69,7 +69,7 @@ environments:
       retention: 1
       enhanced: true
     cpu: 256
-    memory: 512
+    memory: 768
     count: 1
     http:
       healthcheck:
@@ -79,10 +79,10 @@ environments:
         timeout: 5s
         grace_period: 60s
   prod:
-    cpu: 512       # Number of CPU units for the task.
+    cpu: 256       # Number of CPU units for the task.
     memory: 1024    # Amount of memory in MiB used by the task.
     count:
-      range: 1-3
+      range: 1-2
       cooldown:
         in: 60s
         out: 30s
