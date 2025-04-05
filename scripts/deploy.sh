@@ -107,8 +107,14 @@ main() {
     
     echo "Starting deployment for environment: $ENV"
     
-    # Comment out DB_HOST in .env
-    sed -i 's/^#*DB_HOST/#DB_HOST/' .env
+    # Comment out DB_HOST in .env (Portable sed command)
+    if [[ "$(uname)" == "Darwin" ]]; then
+        # macOS requires an empty string argument for -i
+        sed -i '' 's/^#*DB_HOST/#DB_HOST/' .env
+    else
+        # Linux does not
+        sed -i 's/^#*DB_HOST/#DB_HOST/' .env
+    fi
     
     # Check and fix stack if needed
     check_and_fix_stack "$ENV"
