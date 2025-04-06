@@ -1,6 +1,5 @@
 /* ===== COLLECTION LANDING PAGE ===== */
 import {
-  CollectionSectionLandingpageProps,
   CollectionSectionProps,
   StampRow,
   StampSectionProps,
@@ -12,12 +11,12 @@ import { CollectionController } from "$server/controller/collectionController.ts
 import { StampController } from "$server/controller/stampController.ts";
 import { RecursiveLayeringModule } from "$islands/modules/RecursiveLayering.tsx";
 import { NamedAssetsModule } from "$islands/modules/NamedAssets.tsx";
-import { CollectionOverviewSection, CollectionSection } from "$collection";
+import { CollectionArtistSection, CollectionSection } from "$collection";
 import { CollectionRow } from "$server/types/collection.d.ts";
 import { body, gapSection } from "$layout";
 
 /* ===== TYPES ===== */
-type CollectionPageProps = {
+type CollectionLandingPageProps = {
   data: {
     collections: CollectionRow[];
     total: number;
@@ -95,7 +94,7 @@ export const handler: Handlers = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function Collection(props: CollectionPageProps) {
+export default function CollectionLanding(props: CollectionLandingPageProps) {
   const {
     collections,
     sortBy,
@@ -189,7 +188,7 @@ export default function Collection(props: CollectionPageProps) {
     },
   };
 
-  const PopularArtistSection: CollectionSectionLandingpageProps = {
+  const PopularArtistSection: CollectionSectionProps = {
     title: "POPULAR ARTIST",
     subTitle: "COLLECTIONS",
     collections: collections,
@@ -222,7 +221,7 @@ export default function Collection(props: CollectionPageProps) {
         <CollectionSection {...CuttingEdgeSection} />
         <RecursiveLayeringModule />
       </div>
-      <CollectionOverviewSection {...PopularArtistSection} />
+      <CollectionArtistSection {...PopularArtistSection} />
     </div>
   );
 }

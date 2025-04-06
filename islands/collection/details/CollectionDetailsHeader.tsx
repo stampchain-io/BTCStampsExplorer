@@ -2,6 +2,7 @@
 import { Collection, StampRow } from "$globals";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
+import { containerColData } from "$layout";
 import {
   label,
   labelSm,
@@ -17,9 +18,6 @@ export const CollectionDetailsHeader = (
   { collection, stamps }: { collection: Collection; stamps: StampRow[] },
 ) => {
   console.log("collection: ", collection);
-
-  /* ===== STYLES ===== */
-  const dataColumn = "flex flex-col -space-y-1";
 
   /* ===== COMPONENT ===== */
   return (
@@ -65,7 +63,7 @@ export const CollectionDetailsHeader = (
           </div>
 
           <div className="hidden min-[480px]:flex flex-col justify-end -space-y-0.5">
-            <div className={`${dataColumn} items-end`}>
+            <div className={`${containerColData} items-end`}>
               <h5 className={labelSm}>
                 HOLDERS{" "}
                 <span className={textSm}>
@@ -73,7 +71,7 @@ export const CollectionDetailsHeader = (
                 </span>
               </h5>
             </div>
-            <div className={`${dataColumn} items-end`}>
+            <div className={`${containerColData} items-end`}>
               <h5 className={labelSm}>
                 EDITIONS{" "}
                 <span className={textSm}>
@@ -81,7 +79,7 @@ export const CollectionDetailsHeader = (
                 </span>
               </h5>
             </div>
-            <div className={`${dataColumn} items-end`}>
+            <div className={`${containerColData} items-end`}>
               <h5 className={labelSm}>
                 STAMPS{" "}
                 <span className={textSm}>
@@ -93,7 +91,7 @@ export const CollectionDetailsHeader = (
         </div>
         {collection.collection_description && (
           <div className="flex flex-col pt-3">
-            <div className={dataColumn}>
+            <div className={containerColData}>
               <h5 className={labelSm}>
                 ABOUT
               </h5>

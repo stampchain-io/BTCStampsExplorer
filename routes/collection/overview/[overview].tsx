@@ -1,6 +1,6 @@
 /* ===== COLLECTION OVERVIEW PAGE ===== */
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
-import { CollectionOverviewHeader, CollectionOverviewArtistContent } from "$collection";
+import { CollectionArtistSection, CollectionOverviewHeader } from "$collection";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { StampContent } from "$islands/stamp/StampContent.tsx";
 import { CollectionController } from "$server/controller/collectionController.ts";
@@ -160,7 +160,7 @@ export default function CollectionOverview(
       case "artist":
         return (
           <>
-            <CollectionOverviewArtistContent collections={collections || []} />
+            <CollectionArtistSection collections={collections || []} />
             <Pagination
               page={page}
               pages={pages}
@@ -195,7 +195,7 @@ export default function CollectionOverview(
 
   /* ===== COMPONENT ===== */
   return (
-    <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-9">
       <CollectionOverviewHeader />
       {renderContent()}
     </div>
