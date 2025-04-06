@@ -11,7 +11,7 @@ import { CollectionController } from "$server/controller/collectionController.ts
 import { StampController } from "$server/controller/stampController.ts";
 import { RecursiveLayeringModule } from "$islands/modules/RecursiveLayering.tsx";
 import { NamedAssetsModule } from "$islands/modules/NamedAssets.tsx";
-import { CollectionSection, CollectionSectionArtists } from "$collection";
+import { ArtistSection, CollectionSection } from "$collection";
 import { CollectionRow } from "$server/types/collection.d.ts";
 import { body, gapSection } from "$layout";
 
@@ -221,7 +221,7 @@ export default function CollectionLanding(props: CollectionLandingPageProps) {
         <CollectionSection {...CuttingEdgeSection} />
         <RecursiveLayeringModule />
       </div>
-      <CollectionSectionArtists {...PopularArtistSection} />
+      <ArtistSection {...PopularArtistSection} />
     </div>
   );
 }

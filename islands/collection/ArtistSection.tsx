@@ -8,7 +8,7 @@ import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
 
 /* ===== STATE ===== */
-export default function CollectionSectionArtists({
+export default function ArtistSection({
   title,
   subTitle,
   collections,

@@ -158,7 +158,7 @@ import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
 import * as $charts_HoldersPieChart from "./islands/charts/HoldersPieChart.tsx";
 import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
-import * as $collection_CollectionSectionArtists from "./islands/collection/CollectionSectionArtists.tsx";
+import * as $collection_ArtistSection from "./islands/collection/ArtistSection.tsx";
 import * as $collection_artist_ArtistCollectionWIP from "./islands/collection/artist/ArtistCollectionWIP.tsx";
 import * as $collection_artist_CollectionCreateButtonWIP from "./islands/collection/artist/CollectionCreateButtonWIP.tsx";
 import * as $collection_artist_CollectionOverviewArtistContentWIP from "./islands/collection/artist/CollectionOverviewArtistContentWIP.tsx";
@@ -435,8 +435,7 @@ const manifest = {
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
     "./islands/charts/HoldersPieChart.tsx": $charts_HoldersPieChart,
     "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
-    "./islands/collection/CollectionSectionArtists.tsx":
-      $collection_CollectionSectionArtists,
+    "./islands/collection/ArtistSection.tsx": $collection_ArtistSection,
     "./islands/collection/artist/ArtistCollectionWIP.tsx":
       $collection_artist_ArtistCollectionWIP,
     "./islands/collection/artist/CollectionCreateButtonWIP.tsx":
