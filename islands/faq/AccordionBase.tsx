@@ -20,6 +20,7 @@ export const Accordion = (
     activeAccordion.value = isOpen ? null : title;
   };
 
+  /* ===== RENDER ===== */
   return (
     <div className="w-full">
       {/* Accordion Header */}

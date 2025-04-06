@@ -9,6 +9,7 @@ interface FaqAccordionProps {
 
 /* ===== COMPONENT ===== */
 export function FaqAccordion({ item }: FaqAccordionProps) {
+  /* ===== RENDER ===== */
   return (
     <Accordion title={item.title}>
       <div>

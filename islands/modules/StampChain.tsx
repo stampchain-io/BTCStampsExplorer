@@ -1,20 +1,21 @@
-/* ===== STAMPCHAIN MODULE ===== */
+/* ===== STAMPCHAIN MODULE COMPONENT ===== */
 import { Button } from "$buttons";
 import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
-/* ===== COMPONENT RENDER ===== */
+/* ===== COMPONENT ===== */
 export const StampChainModule = () => {
+  /* ===== RENDER ===== */
   return (
     <div class="grid grid-cols-1 desktop:grid-cols-3 gap-7 items-end
       max-w-desktop w-full mx-auto
     ">
       <div className="col-span1 desktop:col-span-2">
-        {/* ===== TITLE SECTION ===== */}
+        {/* ===== HEADER SECTION ===== */}
         <h1 className={titleGreyDL}>STAMPCHAIN</h1>
         <h2 className={subtitleGrey}>
           THE CREATORS OF BITCOIN STAMPS
         </h2>
-        {/* ===== TEXT CONTENT SECTION ===== */}
+        {/* ===== CONTENT SECTION ===== */}
         <div className={`flex flex-col ${text}`}>
           <p>
             <span className={textLg}>

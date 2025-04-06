@@ -51,17 +51,17 @@ export default function CollectionSection({
     updateDisplayCount();
   }, [width, displayCounts, collectionArray.length]);
 
-  /* ===== COMPONENT ===== */
+  /* ===== RENDER ===== */
   return (
     <div>
-      {title && <h1 class={titleGreyLD}>{title}</h1>}
+      {title && <h3 class={titleGreyLD}>{title}</h3>}
       {subTitle && (
-        <h2
+        <h4
           class={subtitleGrey +
             "mb-6"}
         >
           {subTitle}
-        </h2>
+        </h4>
       )}
       <div class={gridClass}>
         {collectionArray.slice(0, displayCount).map((

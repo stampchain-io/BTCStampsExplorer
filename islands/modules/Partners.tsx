@@ -1,9 +1,9 @@
-/* ===== PARTNERS MODULE ===== */
+/* ===== PARTNERS MODULE COMPONENT ===== */
 import { useState } from "preact/hooks";
 import { gapGrid } from "$layout";
 import { subtitleGrey } from "$text";
 
-/* ===== INTERFACES ===== */
+/* ===== TYPES ===== */
 interface Partner {
   name: string;
   largeImage: string;
@@ -35,10 +35,10 @@ const partners: Partner[] = [
 
 /* ===== PARTNER CARD COMPONENT ===== */
 function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
-  /* ===== STATE MANAGEMENT ===== */
+  /* ===== STATE ===== */
   const [isHovered, setIsHovered] = useState(false);
 
-  /* ===== CARD CONTENT ===== */
+  /* ===== RENDER ===== */
   const content = (
     <div
       class={`relative w-full border-2 ${
@@ -97,9 +97,9 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
     : content;
 }
 
-/* ===== COMPONENT RENDER ===== */
-
+/* ===== COMPONENT ===== */
 export function PartnersModule() {
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col max-w-desktop w-full mx-auto mb-4">
       {/* ===== TITLE SECTION ===== */}

@@ -1,13 +1,13 @@
-/* ===== GET STAMPING MODULE ===== */
+/* ===== GET STAMPING MODULE COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { gapGrid } from "$layout";
 import { Button } from "$buttons";
 import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
-/* ===== COMPONENT INTERFACE ===== */
-export function GetStampingModule({}: GetStampingModuleProps) {
-  /* ===== STATE MANAGEMENT ===== */
+/* ===== COMPONENT ===== */
+export function GetStampingModule() {
+  /* ===== STATE ===== */
   const [btcPrice, setBtcPrice] = useState(0);
   const [recommendedFee, setRecommendedFee] = useState(6);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,17 +30,18 @@ export function GetStampingModule({}: GetStampingModuleProps) {
       });
   }, []);
 
-  /* ===== DISPLAY FORMATTING ===== */
+  /* ===== HELPERS ===== */
   const displayPrice = formatUSDValue(btcPrice).toLocaleString();
   const displayFee = typeof recommendedFee === "number" ? recommendedFee : "0";
 
-  /* ===== COMPONENT RENDER ===== */
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col">
-      {/* ===== TITLE SECTION ===== */}
-      <h1 className={titleGreyDL}>GET STAMPING</h1>
-      <h2 className={subtitleGrey}>IMMORTALISE YOUR ART</h2>
-      {/* ===== TEXT CONTENT SECTION ===== */}
+      {/* ===== HEADER SECTION ===== */}
+      <h3 className={titleGreyDL}>GET STAMPING</h3>
+      <h4 className={subtitleGrey}>IMMORTALISE YOUR ART</h4>
+
+      {/* ===== CONTENT SECTION ===== */}
       <div
         className={`flex flex-col tablet:flex-row ${gapGrid} ${text}`}
       >
@@ -84,8 +85,8 @@ export function GetStampingModule({}: GetStampingModuleProps) {
 
       {/* ===== BUTTONS SECTION ===== */}
       <div className="flex flex-col pt-7 gap-3">
-        {/* ===== ACTION BUTTONS ===== */}
-        <div className="flex gap-6 justify-end">
+        {/* ===== BUTTONS ===== */}
+        <div className="flex justify-end gap-6">
           <Button
             variant="outline"
             color="grey"
@@ -103,7 +104,8 @@ export function GetStampingModule({}: GetStampingModuleProps) {
             STAMP
           </Button>
         </div>
-        {/* ===== PRICE INFO DISPLAY ===== */}
+
+        {/* ===== PRICE/FEE INFO ===== */}
         <div className="flex justify-end gap-6
         font-light text-base text-stamp-grey">
           <p>

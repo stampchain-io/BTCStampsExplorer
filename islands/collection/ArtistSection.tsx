@@ -52,17 +52,17 @@ export default function ArtistSection({
     updateDisplayCount();
   }, [width, displayCounts, collectionArray.length]);
 
-  /* ===== COMPONENT ===== */
+  /* ===== RENDER ===== */
   return (
     <div>
-      {title && <h1 class={titlePurpleLD}>{title}</h1>}
+      {title && <h3 class={titlePurpleLD}>{title}</h3>}
       {subTitle && (
-        <h2
+        <h4
           class={subtitlePurple +
             " mb-3 mobileMd:mb-6 desktop:mb-9"}
         >
           {subTitle}
-        </h2>
+        </h4>
       )}
       <div class={gridClass}>
         {collectionArray.slice(0, displayCount).map((
