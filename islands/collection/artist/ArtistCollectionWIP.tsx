@@ -1,3 +1,5 @@
+/* ===== ARTIST COLLECTION COMPONENT ===== */
+// WIP - UNUSED
 export function ArtistCollection() {
   return (
     <div>

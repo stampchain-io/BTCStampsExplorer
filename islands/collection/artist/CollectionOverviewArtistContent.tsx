@@ -1,8 +1,13 @@
+/* ===== COLLECTION OVERVIEW ARTIST CONTENT COMPONENT ===== */
 import { Collection } from "$globals";
 import { CollectionOverviewCard } from "$components/collection/CollectionOverviewCard.tsx";
+
+/* ===== TYPES ===== */
 type CollectionOverviewArtistContentProps = {
   collections: Collection[];
 };
+
+/* ===== COMPONENT ===== */
 export function CollectionOverviewArtistContent(
   { collections }: CollectionOverviewArtistContentProps,
 ) {

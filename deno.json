@@ -124,6 +124,7 @@
     "$notifications": "./components/notifications/index.ts",
     "$howto": "./components/howto/index.ts",
     "$faq": "./components/faq/index.ts",
+    "$collection": "./components/collection/index.ts",
     "$layout": "./components/layout/index.ts",
     "$constants": "./lib/utils/constants.ts",
     "$globals": "./globals.d.ts",

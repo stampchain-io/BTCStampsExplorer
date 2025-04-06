@@ -1,3 +1,5 @@
+/* ===== COLLECTION CREATE BUTTON COMPONENT ===== */
+// WIP - UNUSED
 import { useState } from "preact/hooks";
 
 export function CollectionCreateButton() {

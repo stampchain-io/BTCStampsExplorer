@@ -143,7 +143,7 @@ export interface CollectionSectionProps {
   displayCounts?: DisplayCountBreakpoints;
 }
 
-export interface CollectionOverviewSectionProps {
+export interface CollectionSectionLandingpageProps {
   title?: string;
   subTitle?: string;
   collections: Collection[];

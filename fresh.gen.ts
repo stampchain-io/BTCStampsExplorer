@@ -2,7 +2,6 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $DetailModal from "./routes/DetailModal.tsx";
 import * as $_path_ from "./routes/[...path].ts";
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
@@ -84,7 +83,7 @@ import * as $api_v2_trx_utxoquery from "./routes/api/v2/trx/utxoquery.ts";
 import * as $api_v2_utxo_ancestors_address_ from "./routes/api/v2/utxo/ancestors/[address].ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $collection_details_id_ from "./routes/collection/details/[id].tsx";
-import * as $collection_index from "./routes/collection/index.tsx";
+import * as $collection_landingpage_index from "./routes/collection/landingpage/index.tsx";
 import * as $collection_overview_overview_ from "./routes/collection/overview/[overview].tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
@@ -158,14 +157,14 @@ import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
 import * as $charts_HoldersPieChart from "./islands/charts/HoldersPieChart.tsx";
-import * as $collection_ArtistCollection from "./islands/collection/ArtistCollection.tsx";
-import * as $collection_CollectionCreateButton from "./islands/collection/CollectionCreateButton.tsx";
-import * as $collection_CollectionDetailsContent from "./islands/collection/CollectionDetailsContent.tsx";
-import * as $collection_CollectionDetailsHeader from "./islands/collection/CollectionDetailsHeader.tsx";
-import * as $collection_CollectionOverviewArtistContent from "./islands/collection/CollectionOverviewArtistContent.tsx";
-import * as $collection_CollectionOverviewHeader from "./islands/collection/CollectionOverviewHeader.tsx";
-import * as $collection_CollectionOverviewSection from "./islands/collection/CollectionOverviewSection.tsx";
-import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
+import * as $collection_CollectionSectionBase from "./islands/collection/CollectionSectionBase.tsx";
+import * as $collection_artist_ArtistCollectionWIP from "./islands/collection/artist/ArtistCollectionWIP.tsx";
+import * as $collection_artist_CollectionCreateButtonWIP from "./islands/collection/artist/CollectionCreateButtonWIP.tsx";
+import * as $collection_artist_CollectionOverviewArtistContent from "./islands/collection/artist/CollectionOverviewArtistContent.tsx";
+import * as $collection_details_CollectionDetailsContent from "./islands/collection/details/CollectionDetailsContent.tsx";
+import * as $collection_details_CollectionDetailsHeader from "./islands/collection/details/CollectionDetailsHeader.tsx";
+import * as $collection_landingpage_CollectionSectionLandingpage from "./islands/collection/landingpage/CollectionSectionLandingpage.tsx";
+import * as $collection_overview_CollectionOverviewHeader from "./islands/collection/overview/CollectionOverviewHeader.tsx";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
@@ -190,6 +189,7 @@ import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $loading_LoadingContent from "./islands/loading/LoadingContent.tsx";
 import * as $loading_LoadingProvider from "./islands/loading/LoadingProvider.tsx";
+import * as $modals_DetailModal from "./islands/modals/DetailModal.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
@@ -240,7 +240,6 @@ import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
   routes: {
-    "./routes/DetailModal.tsx": $DetailModal,
     "./routes/[...path].ts": $_path_,
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
@@ -346,7 +345,7 @@ const manifest = {
       $api_v2_utxo_ancestors_address_,
     "./routes/api/v2/version.ts": $api_v2_version,
     "./routes/collection/details/[id].tsx": $collection_details_id_,
-    "./routes/collection/index.tsx": $collection_index,
+    "./routes/collection/landingpage/index.tsx": $collection_landingpage_index,
     "./routes/collection/overview/[overview].tsx":
       $collection_overview_overview_,
     "./routes/config.ts": $config,
@@ -435,20 +434,22 @@ const manifest = {
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
     "./islands/charts/HoldersPieChart.tsx": $charts_HoldersPieChart,
-    "./islands/collection/ArtistCollection.tsx": $collection_ArtistCollection,
-    "./islands/collection/CollectionCreateButton.tsx":
-      $collection_CollectionCreateButton,
-    "./islands/collection/CollectionDetailsContent.tsx":
-      $collection_CollectionDetailsContent,
-    "./islands/collection/CollectionDetailsHeader.tsx":
-      $collection_CollectionDetailsHeader,
-    "./islands/collection/CollectionOverviewArtistContent.tsx":
-      $collection_CollectionOverviewArtistContent,
-    "./islands/collection/CollectionOverviewHeader.tsx":
-      $collection_CollectionOverviewHeader,
-    "./islands/collection/CollectionOverviewSection.tsx":
-      $collection_CollectionOverviewSection,
-    "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
+    "./islands/collection/CollectionSectionBase.tsx":
+      $collection_CollectionSectionBase,
+    "./islands/collection/artist/ArtistCollectionWIP.tsx":
+      $collection_artist_ArtistCollectionWIP,
+    "./islands/collection/artist/CollectionCreateButtonWIP.tsx":
+      $collection_artist_CollectionCreateButtonWIP,
+    "./islands/collection/artist/CollectionOverviewArtistContent.tsx":
+      $collection_artist_CollectionOverviewArtistContent,
+    "./islands/collection/details/CollectionDetailsContent.tsx":
+      $collection_details_CollectionDetailsContent,
+    "./islands/collection/details/CollectionDetailsHeader.tsx":
+      $collection_details_CollectionDetailsHeader,
+    "./islands/collection/landingpage/CollectionSectionLandingpage.tsx":
+      $collection_landingpage_CollectionSectionLandingpage,
+    "./islands/collection/overview/CollectionOverviewHeader.tsx":
+      $collection_overview_CollectionOverviewHeader,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
@@ -473,6 +474,7 @@ const manifest = {
     "./islands/layout/Header.tsx": $layout_Header,
     "./islands/loading/LoadingContent.tsx": $loading_LoadingContent,
     "./islands/loading/LoadingProvider.tsx": $loading_LoadingProvider,
+    "./islands/modals/DetailModal.tsx": $modals_DetailModal,
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
     "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
     "./islands/modules/Partners.tsx": $modules_Partners,

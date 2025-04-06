@@ -1,7 +1,6 @@
 /* ===== COLLECTION OVERVIEW PAGE ===== */
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
-import { CollectionOverviewHeader } from "$islands/collection/CollectionOverviewHeader.tsx";
-import { CollectionOverviewArtistContent } from "$islands/collection/CollectionOverviewArtistContent.tsx";
+import { CollectionOverviewHeader, CollectionOverviewArtistContent } from "$collection";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { StampContent } from "$islands/stamp/StampContent.tsx";
 import { CollectionController } from "$server/controller/collectionController.ts";

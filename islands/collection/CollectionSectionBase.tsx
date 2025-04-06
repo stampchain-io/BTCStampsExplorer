@@ -1,28 +1,24 @@
+/* ===== COLLECTION SECTION COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { Collection, CollectionOverviewSectionProps } from "$globals";
-
-import { BREAKPOINTS } from "$lib/utils/constants.ts";
-
-import { ViewAllButton } from "$components/buttons/ViewAllButton.tsx";
-import { CollectionOverviewCard } from "$components/collection/CollectionOverviewCard.tsx";
-
-import { ModulesStyles } from "$islands/modules/Styles.ts";
-
+import { Collection, CollectionSectionProps } from "$globals";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
+import { BREAKPOINTS } from "$lib/utils/constants.ts";
+import { CollectionListCard } from "$collection";
+import { subtitleGrey, titleGreyLD } from "$text";
 
-export default function CollectionOverviewSection({
+/* ===== STATE ===== */
+export default function CollectionSection({
   title,
   subTitle,
   collections,
   gridClass,
   displayCounts,
-}: CollectionOverviewSectionProps) {
-  const { width } = useWindowSize();
-
+}: CollectionSectionProps) {
   const collectionArray = Array.isArray(collections) ? collections : [];
   const [displayCount, setDisplayCount] = useState(collectionArray.length);
+  const { width } = useWindowSize();
 
-  // Handle display count updates
+  /* ===== EVENT HANDLERS ===== */
   useEffect(() => {
     const updateDisplayCount = () => {
       if (displayCounts) {
@@ -55,13 +51,14 @@ export default function CollectionOverviewSection({
     updateDisplayCount();
   }, [width, displayCounts, collectionArray.length]);
 
+  /* ===== COMPONENT ===== */
   return (
     <div>
-      {title && <h1 class={ModulesStyles.titlePurpleDL}>{title}</h1>}
+      {title && <h1 class={titleGreyLD}>{title}</h1>}
       {subTitle && (
         <h2
-          class={ModulesStyles.subTitlePurple +
-            " mb-3 mobileMd:mb-6 desktop:mb-9"}
+          class={subtitleGrey +
+            "mb-6"}
         >
           {subTitle}
         </h2>
@@ -69,14 +66,15 @@ export default function CollectionOverviewSection({
       <div class={gridClass}>
         {collectionArray.slice(0, displayCount).map((
           collection: Collection,
+          key: number,
         ) => (
-          <CollectionOverviewCard
+          <CollectionListCard
             key={collection.collection_id}
             collection={collection}
+            isDarkMode={key % 2 ? false : true}
           />
         ))}
       </div>
-      <ViewAllButton href="/collection/overview/artist" />
     </div>
   );
 }

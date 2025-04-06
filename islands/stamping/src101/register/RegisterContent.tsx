@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import DetailModal from "$islands/stamping/src101/DetailModal.tsx";
+import DetailModal from "../../../modals/DetailModal.tsx";
 import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { ROOT_DOMAINS } from "$lib/utils/constants.ts";

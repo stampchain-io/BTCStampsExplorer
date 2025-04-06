@@ -1,21 +1,25 @@
+/* ===== COLLECTION OVERVIEW SECTION COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { Collection, CollectionSectionProps } from "$globals";
-import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
+import { Collection, CollectionSectionLandingpageProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
-import { CollectionListCard } from "$components/collection/CollectionListCard.tsx";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { ViewAllButton } from "$buttons";
+import { CollectionOverviewCard } from "$collection";
+import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
+import { subtitlePurple, titlePurpleLD } from "$text";
 
-export default function CollectionSection({
+/* ===== STATE ===== */
+export default function CollectionSectionLandingpage({
   title,
   subTitle,
   collections,
   gridClass,
   displayCounts,
-}: CollectionSectionProps) {
+}: CollectionSectionLandingpageProps) {
+  const { width } = useWindowSize();
   const collectionArray = Array.isArray(collections) ? collections : [];
   const [displayCount, setDisplayCount] = useState(collectionArray.length);
-  const { width } = useWindowSize();
-  // Handle display count updates
+
+  /* ===== EVENT HANDLERS ===== */
   useEffect(() => {
     const updateDisplayCount = () => {
       if (displayCounts) {
@@ -47,12 +51,14 @@ export default function CollectionSection({
     };
     updateDisplayCount();
   }, [width, displayCounts, collectionArray.length]);
+
+  /* ===== COMPONENT ===== */
   return (
     <div>
-      {title && <h1 class={ModulesStyles.titleGreyDL}>{title}</h1>}
+      {title && <h1 class={titlePurpleLD}>{title}</h1>}
       {subTitle && (
         <h2
-          class={ModulesStyles.subTitleGrey +
+          class={subtitlePurple +
             " mb-3 mobileMd:mb-6 desktop:mb-9"}
         >
           {subTitle}
@@ -61,15 +67,14 @@ export default function CollectionSection({
       <div class={gridClass}>
         {collectionArray.slice(0, displayCount).map((
           collection: Collection,
-          key: number,
         ) => (
-          <CollectionListCard
+          <CollectionOverviewCard
             key={collection.collection_id}
             collection={collection}
-            isDarkMode={key % 2 ? false : true}
           />
         ))}
       </div>
+      <ViewAllButton href="/collection/overview/artist" />
     </div>
   );
 }
