@@ -104,6 +104,7 @@ export const copyright =
 // Add any new styles you cannot categorize here
 
 /* ===== LEGACY STYLES ===== */
+// Update the legacy styles to new styles
 // About page
 export const dataLabelPurple =
   "font-light text-base text-stamp-purple-highlight mb-0.5";
@@ -118,7 +119,7 @@ export const aboutTitlePurpleLD =
 export const aboutSubTitlePurple =
   "text-xs mobileMd:text-base font-medium text-stamp-purple text-center whitespace-nowrap";
 export const dataLabel =
-  "text-base mobileLg:text-lg font-light text-red-500 uppercase"; // not in use ???
+  "text-base mobileLg:text-lg font-light text-red-500 uppercase"; // check where used
 export const dataValue =
   "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase"; // check where used
 export const dataValueLg =
@@ -176,7 +177,7 @@ export type TextStyles = {
   value2xl: string;
   value3xl: string;
   valueDarkSm: string;
-  // Miscellaneous specific styles
+  // Special text styles
   tagline: string;
   copyright: string;
   // Legacy styles

@@ -1,14 +1,13 @@
+/* ===== COLLECTION DETAILS PAGE ===== */
 import { FreshContext, Handlers } from "$fresh/server.ts";
-
 import { STAMP_FILTER_TYPES, StampRow, SUBPROTOCOLS } from "$globals";
-
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { CollectionDetailsHeader } from "$islands/collection/CollectionDetailsHeader.tsx";
 import { CollectionDetailsContent } from "$islands/collection/CollectionDetailsContent.tsx";
-
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 
+/* ===== TYPES ===== */
 type CollectionDetailsPageProps = {
   data: {
     id: string;
@@ -24,6 +23,7 @@ type CollectionDetailsPageProps = {
   };
 };
 
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
   async GET(req: Request, ctx: FreshContext) {
     try {
@@ -87,6 +87,7 @@ export const handler: Handlers = {
   },
 };
 
+/* ===== PAGE COMPONENT ===== */
 export default function CollectionDetails(props: CollectionDetailsPageProps) {
   const {
     id,
@@ -97,8 +98,9 @@ export default function CollectionDetails(props: CollectionDetailsPageProps) {
     collection,
   } = props.data;
 
+  /* ===== COMPONENT ===== */
   return (
-    <div class="flex flex-col gap-3 mobileMd:gap-6">
+    <div class="flex flex-col gap-6">
       <CollectionDetailsHeader collection={collection} stamps={stamps} />
       <CollectionDetailsContent stamps={stamps} />
       <Pagination

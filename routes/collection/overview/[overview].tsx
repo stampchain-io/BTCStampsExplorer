@@ -1,3 +1,4 @@
+/* ===== COLLECTION OVERVIEW PAGE ===== */
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
 import { CollectionOverviewHeader } from "$islands/collection/CollectionOverviewHeader.tsx";
 import { CollectionOverviewArtistContent } from "$islands/collection/CollectionOverviewArtistContent.tsx";
@@ -8,8 +9,11 @@ import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES } from "$globals";
 import { CollectionRow } from "$server/types/collection.d.ts";
+
+/* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
 
+/* ===== TYPES ===== */
 interface CollectionOverviewPageProps {
   selectedTab: "artist" | "posh" | "recursive";
   stamps?: any[];
@@ -22,6 +26,7 @@ interface CollectionOverviewPageProps {
   partial?: boolean;
 }
 
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers<CollectionOverviewPageProps> = {
   async GET(req: Request, ctx: FreshContext) {
     try {
@@ -137,6 +142,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
   },
 };
 
+/* ===== PAGE COMPONENT ===== */
 export default function CollectionOverview(
   { data }: PageProps<CollectionOverviewPageProps>,
 ) {
@@ -149,6 +155,7 @@ export default function CollectionOverview(
     page_size,
   } = data;
 
+  /* ===== HELPERS ===== */
   const renderContent = () => {
     switch (selectedTab) {
       case "artist":
@@ -187,8 +194,9 @@ export default function CollectionOverview(
     }
   };
 
+  /* ===== COMPONENT ===== */
   return (
-    <div class="flex flex-col gap-3 mobileMd:gap-6">
+    <div class="flex flex-col gap-6">
       <CollectionOverviewHeader />
       {renderContent()}
     </div>
