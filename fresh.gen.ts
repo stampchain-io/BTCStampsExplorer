@@ -157,11 +157,11 @@ import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
 import * as $charts_HoldersPieChart from "./islands/charts/HoldersPieChart.tsx";
-import * as $collection_CollectionArtistSection from "./islands/collection/CollectionArtistSection.tsx";
 import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
+import * as $collection_CollectionSectionArtists from "./islands/collection/CollectionSectionArtists.tsx";
 import * as $collection_artist_ArtistCollectionWIP from "./islands/collection/artist/ArtistCollectionWIP.tsx";
 import * as $collection_artist_CollectionCreateButtonWIP from "./islands/collection/artist/CollectionCreateButtonWIP.tsx";
-import * as $collection_artist_CollectionOverviewArtistContent from "./islands/collection/artist/CollectionOverviewArtistContent.tsx";
+import * as $collection_artist_CollectionOverviewArtistContentWIP from "./islands/collection/artist/CollectionOverviewArtistContentWIP.tsx";
 import * as $collection_details_CollectionDetailsContent from "./islands/collection/details/CollectionDetailsContent.tsx";
 import * as $collection_details_CollectionDetailsHeader from "./islands/collection/details/CollectionDetailsHeader.tsx";
 import * as $collection_overview_CollectionOverviewHeader from "./islands/collection/overview/CollectionOverviewHeader.tsx";
@@ -434,15 +434,15 @@ const manifest = {
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
     "./islands/charts/HoldersPieChart.tsx": $charts_HoldersPieChart,
-    "./islands/collection/CollectionArtistSection.tsx":
-      $collection_CollectionArtistSection,
     "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
+    "./islands/collection/CollectionSectionArtists.tsx":
+      $collection_CollectionSectionArtists,
     "./islands/collection/artist/ArtistCollectionWIP.tsx":
       $collection_artist_ArtistCollectionWIP,
     "./islands/collection/artist/CollectionCreateButtonWIP.tsx":
       $collection_artist_CollectionCreateButtonWIP,
-    "./islands/collection/artist/CollectionOverviewArtistContent.tsx":
-      $collection_artist_CollectionOverviewArtistContent,
+    "./islands/collection/artist/CollectionOverviewArtistContentWIP.tsx":
+      $collection_artist_CollectionOverviewArtistContentWIP,
     "./islands/collection/details/CollectionDetailsContent.tsx":
       $collection_details_CollectionDetailsContent,
     "./islands/collection/details/CollectionDetailsHeader.tsx":
