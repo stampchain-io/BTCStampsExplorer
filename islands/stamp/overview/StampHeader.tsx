@@ -1,40 +1,39 @@
 /* ===== STAMP OVERVIEW HEADER COMPONENT ===== */
+/* TODO (@baba) - update filter and styling */
 import { useState } from "preact/hooks";
 import { STAMP_FILTER_TYPES, STAMP_TYPES as _STAMP_TYPES } from "$globals";
-import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator as _useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
+import { StampSearchClient } from "$stamp";
 import { titlePurpleLD } from "$text";
 
-/* ===== COMPONENT INTERFACE ===== */
+/* ===== TYPES ===== */
 type StampHeaderProps = {
   filterBy: STAMP_FILTER_TYPES[];
   sortBy: "ASC" | "DESC" | undefined;
 };
 
-/* ===== HEADER COMPONENT IMPLEMENTATION ===== */
+/* ===== COMPONENT ===== */
 export const StampHeader = (
   { filterBy, sortBy }: StampHeaderProps,
 ) => {
-  /* ===== DROPDOWN STATE MANAGEMENT ===== */
+  /* ===== STATE MANAGEMENT ===== */
   const [isOpen1, setIsOpen1] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
 
-  /* ===== DROPDOWN HANDLERS ===== */
-  // Handle filter dropdown
+  /* ===== EVENT HANDLERS ===== */
   const handleOpen1 = (open: boolean) => {
     setIsOpen1(open);
     setIsOpen2(false); // Close search when filter opens
   };
 
-  // Handle search dropdown
   const handleOpen2 = (open: boolean) => {
     setIsOpen1(false); // Close filter when search opens
     setIsOpen2(open);
   };
 
-  /* ===== COMPONENT RENDER ===== */
+  /* ===== RENDER ===== */
   return (
     <div
       class={`relative flex flex-row justify-between items-start w-full gap-3 ${

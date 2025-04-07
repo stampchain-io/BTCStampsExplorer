@@ -1,7 +1,9 @@
-import { StampCard } from "$islands/stamp/StampCard.tsx";
+/* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
 import { StampRow } from "$globals";
+import { StampCard } from "$stamp";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
+/* ===== TYPES ===== */
 interface StampContentProps {
   stamps: StampRow[];
   isRecentSales?: boolean;
@@ -14,14 +16,17 @@ interface StampContentProps {
   };
 }
 
+/* ===== COMPONENT ===== */
 export function StampContent({
   stamps,
   isRecentSales = false,
   pagination,
   fromPage,
 }: StampContentProps) {
+  /* ===== RENDER ===== */
   return (
     <div class="w-full pt-3 pb-12 mobileMd:pt-6 mobileMd:pb-[72px]">
+      {/* ===== STAMPS GRID ===== */}
       <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-3 mobileMd:gap-6 w-full auto-rows-fr">
         {stamps.map((stamp) => (
           <StampCard
@@ -36,6 +41,8 @@ export function StampContent({
           />
         ))}
       </div>
+
+      {/* ===== PAGINATION ===== */}
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-9 mobileLg:mt-[72px]">
           <Pagination

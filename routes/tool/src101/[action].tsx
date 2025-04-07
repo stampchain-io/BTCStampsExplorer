@@ -1,6 +1,6 @@
 /* ===== SRC101 TOOLS PAGE ===== */
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { RecentBitnameRegister, RegisterBitnameContent } from "$tools";
+import { RecentBitnameRegister, RegisterBitnameContent } from "$tool";
 import { HowToRegisterBitnameModule } from "$howto";
 
 /* ===== TYPES ===== */
