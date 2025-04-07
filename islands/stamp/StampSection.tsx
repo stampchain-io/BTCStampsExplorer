@@ -4,14 +4,13 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { ViewAllButton } from "$buttons";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { StampRow, StampSectionProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { StampSearchClient } from "$stamp";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
-
+import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 /* ===== COMPONENT ===== */
 export default function StampSection({
   title,
@@ -169,18 +168,14 @@ export default function StampSection({
             >
               <h1
                 class={`${
-                  alignRight
-                    ? ModulesStyles.titlePurpleDL
-                    : ModulesStyles.titlePurpleDL
+                  alignRight ? titlePurpleLD : titlePurpleDL
                 } tablet:hidden`}
               >
                 {title}
               </h1>
               <h1
                 class={`hidden tablet:block ${
-                  alignRight
-                    ? ModulesStyles.titlePurpleLD
-                    : ModulesStyles.titlePurpleDL
+                  alignRight ? titlePurpleLD : titlePurpleDL
                 }`}
               >
                 {title}
@@ -193,7 +188,7 @@ export default function StampSection({
                 alignRight && "tablet:items-end"
               }`}
             >
-              <h2 className={ModulesStyles.subTitlePurple}>
+              <h2 className={subtitlePurple}>
                 {subTitle}
               </h2>
             </div>

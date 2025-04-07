@@ -1,8 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
 import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 import type { SRC20Row } from "$globals";
+import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 export default function PopularMinting() {
   const [isLoading, setIsLoading] = useState(true);
@@ -39,15 +39,15 @@ export default function PopularMinting() {
   return (
     <div class="flex flex-col items-start tablet:items-end">
       <div>
-        <h1 class={`${ModulesStyles.titlePurpleDL} tablet:hidden`}>
+        <h4 class={`${titlePurpleLD} tablet:hidden`}>
           TRENDING
-        </h1>
-        <h1 class={`hidden tablet:block ${ModulesStyles.titlePurpleLD}`}>
+        </h4>
+        <h4 class={`hidden tablet:block ${titlePurpleDL}`}>
           TRENDING
-        </h1>
+        </h4>
       </div>
-      <h2 class={ModulesStyles.subTitlePurple}>POPULAR TOKENS</h2>
-      <div class="w-full flex flex-col gap-3 mobileMd:gap-6">
+      <h3 class={subtitlePurple}>POPULAR TOKENS</h3>
+      <div class="w-full flex flex-col gap-6">
         {transactions.map((src20) => (
           src20.progress !== "100"
             ? (

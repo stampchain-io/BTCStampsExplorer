@@ -1,5 +1,7 @@
 /* ===== SRC101 TOOLS PAGE ===== */
+/*@baba-60+61+65*/
 import { Handlers, PageProps } from "$fresh/server.ts";
+import { body, gapSection } from "$layout";
 import { RecentBitnameRegister, RegisterBitnameContent } from "$tool";
 import { HowToRegisterBitnameModule } from "$howto";
 
@@ -55,12 +57,14 @@ export default function ToolsSrc101Page(
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-12 mobileLg:gap-24">
-      <div class="self-center max-w-[680px] w-full mx-auto">
+    <div className={`${body} ${gapSection}`}>
+      <div className={`flex w-full`}>
         {renderContent()}
       </div>
 
-      <div class="flex flex-col tablet:flex-row w-full gap-6 desktop:gap-9">
+      <div
+        className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
+      >
         <div class="w-full tablet:w-full">
           <HowToRegisterBitnameModule />
         </div>

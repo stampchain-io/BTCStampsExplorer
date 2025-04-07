@@ -1,7 +1,9 @@
 /* ===== STAMPING TOOL PAGE ===== */
+/*@baba-71-79*/
 import type { StampRow } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
+import { body, gapSection } from "$layout";
 import { StampSection } from "$stamp";
 import { OlgaContent } from "$tool";
 import { HowToStampModule } from "$howto";
@@ -66,15 +68,15 @@ export default function ToolsStampPage({ data }: PageProps<StampPageData>) {
 
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
-      <div class="self-center max-w-[680px] w-full mx-auto">
+    <div className={`${body} ${gapSection}`}>
+      <div className={`flex w-full`}>
         <OlgaContent />
       </div>
       <div class="flex flex-col tablet:flex-row w-full gap-12 mobileLg:gap-24 tablet:gap-6 desktop:gap-9">
         <div class="w-full tablet:w-1/2">
           <HowToStampModule />
         </div>
-        <div class="w-full tablet:w-1/2 flex flex-col gap-3 mobileMd:gap-6 items-start tablet:items-end">
+        <div class="flex flex-col w-full tablet:w-1/2 items-start tablet:items-end gap-6">
           <StampSection {...latestStampsSection} />
         </div>
       </div>

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import type { JSX } from "preact";
+import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 export default function RecentBitnameRegister(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
@@ -35,19 +35,19 @@ export default function RecentBitnameRegister(): JSX.Element {
   return (
     <div class="flex flex-col items-start tablet:items-end">
       <div>
-        <h1 class={`${ModulesStyles.titlePurpleDL} tablet:hidden`}>
+        <h4 class={`${titlePurpleLD} tablet:hidden`}>
           BITNAMES
-        </h1>
-        <h1 class={`${ModulesStyles.titlePurpleLD} hidden tablet:block`}>
+        </h4>
+        <h4 class={`${titlePurpleDL} hidden tablet:block`}>
           BITNAMES
-        </h1>
+        </h4>
       </div>
       {transactions.length > 0 && (
-        <h2 class={ModulesStyles.subTitlePurple}>
+        <h3 class={subtitlePurple}>
           # {transactions[0].block_index}
-        </h2>
+        </h3>
       )}
-      <div class="grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-3 desktop:grid-cols-4 gap-3 mobileMd:gap-6">
+      <div class="grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-3 desktop:grid-cols-4 gap-6">
         {transactions.map((stamp, index) => (
           <StampCard
             key={index}

@@ -5,12 +5,12 @@ import { XcpManager } from "$server/services/xcpService.ts";
 import { FairmintContent } from "$islands/tool/fairmint/FairmintContent.tsx";
 
 /* ===== TYPES ===== */
-interface FairmintPageProps {
+interface ToolsFairmintPageProps {
   fairminters: any[];
 }
 
 /* ===== SERVER HANDLER ===== */
-export const handler: Handlers<FairmintPageProps> = {
+export const handler: Handlers<ToolsFairmintPageProps> = {
   async GET(_req, ctx) {
     try {
       const fairminters = await XcpManager.getFairminters();
@@ -23,7 +23,9 @@ export const handler: Handlers<FairmintPageProps> = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function FairmintPage({ data }: PageProps<FairmintPageProps>) {
+export default function ToolsFairmintPage(
+  { data }: PageProps<ToolsFairmintPageProps>,
+) {
   /* ===== RENDER ===== */
   return (
     <>

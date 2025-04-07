@@ -1,8 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import type { JSX } from "preact";
+import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 export default function LatestTransfer(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
@@ -35,27 +35,25 @@ export default function LatestTransfer(): JSX.Element {
 
   return (
     <div class="flex flex-col items-start tablet:items-end">
-      <h1 class={`${ModulesStyles.titlePurpleDL} tablet:hidden`}>
+      <h4 class={`${titlePurpleLD} tablet:hidden`}>
         RECENT TRANSFERS
-      </h1>
-      <h1 class={`hidden tablet:block ${ModulesStyles.titlePurpleLD}`}>
+      </h4>
+      <h4 class={`hidden tablet:block ${titlePurpleDL}`}>
         RECENT TRANSFERS
-      </h1>
+      </h4>
       {transactions.length > 0 && (
-        <h2 class={ModulesStyles.subTitlePurple}>
+        <h3 class={subtitlePurple}>
           BLOCK #{transactions[0].block_index}
-        </h2>
+        </h3>
       )}
-      <div class="grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-3 mobileMd:gap-6">
+      <div class="grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-6">
         {transactions.map((stamp, index) => (
           <StampCard
             key={index}
-            stamp={stamp.stamp_url
-              ? stamp
-              : {
-                ...stamp,
-                stamp_url: `https://stampchain.io/stamps/${stamp.tx_hash}.svg`,
-              }}
+            stamp={stamp.stamp_url ? stamp : {
+              ...stamp,
+              stamp_url: `https://stampchain.io/stamps/${stamp.tx_hash}.svg`,
+            }}
             isRecentSale={false}
             showDetails={false}
           />
