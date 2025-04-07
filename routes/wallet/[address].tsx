@@ -1,6 +1,6 @@
 /* ===== WALLET PAGE ===== */
+/*@baba-367*/
 import { Handlers } from "$fresh/server.ts";
-
 import WalletHeader from "$islands/Wallet/details/WalletHeader.tsx";
 import WalletProfileDetails from "$islands/Wallet/details/WalletProfileDetails.tsx";
 import WalletDispenserDetails from "$islands/Wallet/details/WalletDispenserDetails.tsx";
@@ -8,7 +8,6 @@ import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
 import { WalletPageProps } from "$types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
-
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20MarketService } from "$server/services/src20/marketService.ts";
@@ -21,12 +20,14 @@ import { SRC20Row, StampRow } from "$globals";
 import { DEFAULT_PAGINATION } from "$server/services/routeValidationService.ts";
 import { WalletOverviewInfo } from "$types/wallet.d.ts";
 
+/* ===== SERVER HANDLER ===== */
 /**
  * We add stampsSortBy to the query to handle the ASC / DESC sorting on stamps.
  * This is optional; if not provided, default to "DESC".
  */
 export const handler: Handlers = {
   async GET(req, ctx) {
+    /* ===== PARAMETER EXTRACTION ===== */
     const { address } = ctx.params;
     const url = new URL(req.url);
 
@@ -62,6 +63,7 @@ export const handler: Handlers = {
 
     const anchor = url.searchParams.get("anchor");
 
+    /* ===== DATA FETCHING ===== */
     try {
       const [
         stampsResponse,
@@ -108,6 +110,7 @@ export const handler: Handlers = {
 
         StampController.getStampsCreatedCount(address),
         SRC20MarketService.fetchMarketListingSummary(),
+
         // SRC101 Balance request
         await Src101Controller.handleSrc101BalanceRequest({
           address,
@@ -151,6 +154,7 @@ export const handler: Handlers = {
         }),
       ]);
 
+      /* ===== DATA PROCESSING ===== */
       // Process responses and handle errors
       const stampsData = stampsResponse.status === "fulfilled"
         ? {
@@ -220,6 +224,7 @@ export const handler: Handlers = {
 
       console.log("Final Processed SRC-101 Data:", src101Data);
 
+      /* ===== WALLET DATA ASSEMBLY ===== */
       // Build wallet data
       const walletData = {
         balance: btcInfo?.balance ?? 0,
@@ -242,6 +247,7 @@ export const handler: Handlers = {
       };
       console.log("Final Wallet Data:", walletData);
 
+      /* ===== RESPONSE RENDERING ===== */
       return ctx.render({
         data: {
           stamps: {
@@ -287,6 +293,7 @@ export const handler: Handlers = {
         dispensersSortBy,
       });
     } catch (error) {
+      /* ===== ERROR HANDLING ===== */
       console.error("Error:", error);
       // Return safe default state with empty data
       return ctx.render({
@@ -333,6 +340,7 @@ export const handler: Handlers = {
   },
 };
 
+/* ===== HELPERS ===== */
 // Helper function to determine if address should be treated as dispenser-only
 function isDispenserOnlyAddress(data: WalletPageProps["data"]) {
   // Check if address has dispensers
@@ -349,12 +357,14 @@ function isDispenserOnlyAddress(data: WalletPageProps["data"]) {
     !hasCreatedStamps;
 }
 
+/* ===== PAGE COMPONENT ===== */
 export default function Wallet(props: WalletPageProps) {
   const { data } = props;
   const isDispenserOnly = isDispenserOnlyAddress(data);
 
+  /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-3 mobileMd:gap-6" f-client-nav>
+    <div class="flex flex-col gap-6" f-client-nav>
       <WalletHeader />
       {isDispenserOnly
         ? (

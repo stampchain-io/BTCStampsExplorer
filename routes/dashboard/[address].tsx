@@ -1,5 +1,6 @@
+/* ===== WALLET DASHBOARD PAGE ===== */
+/*@baba-297*/
 import { Handlers } from "$fresh/server.ts";
-
 import WalletDashboardHeader from "$islands/Wallet/details/WalletDashboardHeader.tsx";
 import WalletDashboardDetails from "$islands/Wallet/details/WalletDashboardDetails.tsx";
 import WalletDashboardContent from "$islands/Wallet/details/WalletDashboardContent.tsx";
@@ -15,6 +16,7 @@ import {
 } from "$lib/types/pagination.d.ts";
 import { DispenserRow, SRC20Row, StampRow } from "$globals";
 
+/* ===== HELPERS ===== */
 /**
  * We add stampsSortBy to the query to handle the ASC / DESC sorting on stamps.
  * This is optional; if not provided, default to "DESC".
@@ -26,9 +28,10 @@ const getPaginationParams = (url: URL, prefix: string, defaultLimit = 10) => ({
   limit: Number(url.searchParams.get(`${prefix}_limit`)) || defaultLimit,
 });
 
-
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
   async GET(req, ctx) {
+    /* ===== PARAMETER EXTRACTION ===== */
     const { address } = ctx.params;
     const url = new URL(req.url);
 
@@ -47,15 +50,20 @@ export const handler: Handlers = {
         | "DESC";
 
     // Get pagination parameters for each section
-    // Extract pagination parameters
     const paginationParams = {
       stamps: getPaginationParams(url, "stamps", 32),
       src20: getPaginationParams(url, "src20"),
       dispensers: getPaginationParams(url, "dispensers"),
     };
-  
+
+    // Define individual params for consistent use throughout the code
+    const stampsParams = paginationParams.stamps;
+    const src20Params = paginationParams.src20;
+    const dispensersParams = paginationParams.dispensers;
+
     const anchor = url.searchParams.get("anchor");
 
+    /* ===== DATA FETCHING ===== */
     try {
       const [
         stampsResponse,
@@ -68,8 +76,8 @@ export const handler: Handlers = {
         // Stamps with sorting and pagination
         StampController.getStampBalancesByAddress(
           address,
-          paginationParams.stamps.limit || 10,
-          paginationParams.stamps.page || 1,
+          stampsParams.limit || 10,
+          stampsParams.page || 1,
           stampsSortBy,
         ),
 
@@ -77,8 +85,8 @@ export const handler: Handlers = {
         Src20Controller.handleSrc20BalanceRequest({
           address,
           includePagination: true,
-          limit: paginationParams.src20.limit || 10,
-          page: paginationParams.src20.page || 1,
+          limit: src20Params.limit || 10,
+          page: src20Params.page || 1,
           includeMintData: true,
           sortBy: src20SortBy,
         }),
@@ -92,8 +100,8 @@ export const handler: Handlers = {
         // Dispensers with sorting and pagination
         StampController.getDispensersWithStampsByAddress(
           address,
-          paginationParams.dispensers.page || 1,
-          paginationParams.dispensers.limit || 10,
+          dispensersParams.page || 1,
+          dispensersParams.limit || 10,
           {
             sortBy: dispensersSortBy,
           },
@@ -103,6 +111,7 @@ export const handler: Handlers = {
         SRC20MarketService.fetchMarketListingSummary(),
       ]);
 
+      /* ===== DATA PROCESSING ===== */
       // Process responses and handle errors
       const stampsData = stampsResponse.status === "fulfilled"
         ? {
@@ -167,6 +176,7 @@ export const handler: Handlers = {
         d.give_remaining === 0
       );
 
+      /* ===== WALLET DATA ASSEMBLY ===== */
       // Build wallet data
       const walletData = {
         balance: btcInfo?.balance ?? 0,
@@ -187,6 +197,7 @@ export const handler: Handlers = {
         },
       };
 
+      /* ===== RESPONSE RENDERING ===== */
       return ctx.render({
         data: {
           stamps: {
@@ -231,6 +242,7 @@ export const handler: Handlers = {
         dispensersSortBy,
       });
     } catch (error) {
+      /* ===== ERROR HANDLING ===== */
       console.error("Error:", error);
       // Return safe default state with empty data
       return ctx.render({
@@ -276,11 +288,13 @@ export const handler: Handlers = {
   },
 };
 
+/* ===== PAGE COMPONENT ===== */
 export default function Dashboard(props: WalletPageProps) {
   const { data } = props;
 
+  /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-3 mobileMd:gap-6" f-client-nav>
+    <div class="flex flex-col gap-6" f-client-nav>
       <WalletDashboardHeader />
       <WalletDashboardDetails
         walletData={data.walletData as WalletOverviewInfo}

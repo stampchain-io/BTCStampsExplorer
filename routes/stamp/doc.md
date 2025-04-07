@@ -4,11 +4,11 @@
  * 
  * Overview
  * --------
- * The overview folder (index.tsx) contains the Stamp Overiew page
- * The details folder ([id].tsx) contains the Stamp Details page
+ * The index.tsx contains the Stamp Overiew page
+ * The [id].tsx contains the Stamp Details page
  * The trade.tsx file is moved to /routes/tools/stamp/
  *  - it is neither finetuned nor styled
- * art.tsx and posh.tsx are redirect files and need to be in the route folder
+ * art.tsx and posh.tsx are redirect files 
  * 
  * TODO(@reinamora) - 
  * The two redirects could probably be handled by the middleware system ? 
