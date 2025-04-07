@@ -1,5 +1,5 @@
 import { formatNumber, formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
-import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
+import { ScrollContainer } from "$layout";
 import {
   cellAlign,
   colGroup,

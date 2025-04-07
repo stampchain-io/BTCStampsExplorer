@@ -1,6 +1,6 @@
 /* ===== SRC20 HOLDER TABLE COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
+import { ScrollContainer } from "$layout";
 import {
   cellAlign,
   colGroup,
