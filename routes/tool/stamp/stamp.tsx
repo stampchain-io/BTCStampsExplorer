@@ -1,14 +1,17 @@
+/* ===== STAMPING TOOL PAGE ===== */
 import type { StampRow } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { OlgaContent } from "$islands/stamping/stamp/OlgaContent.tsx";
-import StampSection from "$islands/stamp/StampSection.tsx";
+import { StampSection } from "$stamp";
+import { OlgaContent } from "$tool";
 import { HowToStampModule } from "$howto";
 
+/* ===== TYPES ===== */
 interface StampPageData {
   latestStamps: StampRow[];
 }
 
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers<StampPageData> = {
   async GET(_, ctx) {
     try {
@@ -31,7 +34,9 @@ export const handler: Handlers<StampPageData> = {
   },
 };
 
-export default function StampingStampPage({ data }: PageProps<StampPageData>) {
+/* ===== PAGE COMPONENT ===== */
+export default function ToolsStampPage({ data }: PageProps<StampPageData>) {
+  /* ===== SECTION CONFIGURATION ===== */
   const latestStampsSection = {
     title: "LATEST STAMPS",
     subTitle: "ON-CHAIN MARVELS",
@@ -59,6 +64,7 @@ export default function StampingStampPage({ data }: PageProps<StampPageData>) {
     },
   };
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
       <div class="self-center max-w-[680px] w-full mx-auto">

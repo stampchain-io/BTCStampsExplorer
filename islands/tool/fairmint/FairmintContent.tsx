@@ -1,14 +1,20 @@
+/* ===== FAIRMINT CONTENT COMPONENT ===== */
 import { useState } from "preact/hooks";
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
 import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
-import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
+import { StatusMessages } from "$notifications";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { bodyTool, containerBackground, containerColForm } from "$layout";
+import { titlePurpleLD } from "$text";
 
+/* ===== TYPES ===== */
 interface FairmintContentProps {
   fairminters: any[];
 }
 
+/* ===== COMPONENT ===== */
 export function FairmintContent({ fairminters }: FairmintContentProps) {
+  /* ===== STATE ===== */
   const {
     formState,
     handleAssetChange,
@@ -25,27 +31,31 @@ export function FairmintContent({ fairminters }: FairmintContentProps) {
   const [tosAgreed, setTosAgreed] = useState(false);
   const { wallet } = walletContext;
 
+  /* ===== HELPERS ===== */
+  // Check if the fairminters array is empty
+  const hasFairminters = fairminters && fairminters.length > 0;
+
+  /* ===== RENDER ===== */
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  // Check if the fairminters array is empty
-  const hasFairminters = fairminters && fairminters.length > 0;
-
   return (
-    <div className="w-full max-w-full p-4 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
-      <form className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1">
-          <span>Select Token:</span>
+    <div class={bodyTool}>
+      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>FAIRMINT</h1>
+
+      <form class={`${containerBackground} mb-6`}>
+        {/* ===== TOKEN SELECTION ===== */}
+        <div className={containerColForm}>
           {hasFairminters
             ? (
               // Render the select dropdown if fairminters are available
               <select
-                className="p-2 rounded bg-[#999999] text-black"
+                className="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={handleAssetChange}
               >
-                <option value="">Select a token</option>
+                <option value="">SELECT A TOKEN</option>
                 {fairminters
                   .filter(
                     (fairminter) =>
@@ -68,24 +78,25 @@ export function FairmintContent({ fairminters }: FairmintContentProps) {
               // Render an input field if no fairminters are available
               <input
                 type="text"
-                className="p-2 rounded bg-[#999999] text-black"
-                placeholder="Enter asset"
+                placeholder="ENTER ASSET"
+                className="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={(e) => handleInputChange(e, "asset")}
               />
             )}
-        </label>
 
-        <label className="flex flex-col gap-1">
-          <span>Quantity:</span>
           <input
             type="number"
-            className="p-2 rounded bg-[#999999] text-black"
+            placeholder="QUANTITY"
+            className="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
             value={formState.quantity}
             onChange={(e) => handleInputChange(e, "quantity")}
           />
-        </label>
+        </div>
+      </form>
 
+      {/* ===== FEE CALCULATOR ===== */}
+      <div className={containerBackground}>
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
@@ -108,11 +119,12 @@ export function FairmintContent({ fairminters }: FairmintContentProps) {
           }}
         />
 
+        {/* ===== STATUS MESSAGES ===== */}
         <StatusMessages
           submissionMessage={submissionMessage}
           apiError={apiError}
         />
-      </form>
+      </div>
     </div>
   );
 }

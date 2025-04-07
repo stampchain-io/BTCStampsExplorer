@@ -1,7 +1,7 @@
 // deno-lint-ignore-file
 import { useState } from "preact/hooks";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
-import { InputField } from "$islands/stamping/InputField.tsx";
+import { InputField } from "$forms";
 import {
   COLLECTION_FILTER_TYPES,
   LISTING_FILTER_TYPES,

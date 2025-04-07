@@ -7,19 +7,19 @@ import { getWalletProvider } from "$client/wallet/walletHelper.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
-import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { InputField } from "$forms";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
-import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
+import { StampImageFullScreen } from "$stamp";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 import { bodyTool, containerBackground, containerRowForm } from "$layout";
 import { titlePurpleLD } from "$text";
 import { ToggleSwitchButton } from "$buttons";
 import { Icon } from "$icons";
+import { InputField } from "$forms";
 import {
+  StatusMessages,
   tooltipButton,
   tooltipButtonInCollapsible,
   tooltipImage,

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
-import { SelectField } from "$islands/stamping/SelectField.tsx";
+import { SelectField } from "$forms";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import type { StampRow } from "$globals";

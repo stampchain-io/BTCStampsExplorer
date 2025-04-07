@@ -1,14 +1,16 @@
+/* ===== SRC101 TOOLS PAGE ===== */
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { RegisterBitnameContent } from "$islands/stamping/src101/register/RegisterContent.tsx";
-import RecentBitnameRegister from "$islands/stamping/src101/register/RecentRegister.tsx";
+import { RecentBitnameRegister, RegisterBitnameContent } from "$tools";
 import { HowToRegisterBitnameModule } from "$howto";
 
-interface StampingSrc101PageProps {
+/* ===== TYPES ===== */
+interface ToolsSrc101PageProps {
   selectedTab: string;
   trxType: "multisig" | "olga";
 }
 
-export const handler: Handlers<StampingSrc101PageProps> = {
+/* ===== SERVER HANDLER ===== */
+export const handler: Handlers<ToolsSrc101PageProps> = {
   GET(req, ctx) {
     try {
       const url = new URL(req.url);
@@ -37,11 +39,13 @@ export const handler: Handlers<StampingSrc101PageProps> = {
   },
 };
 
-export default function StampingSrc101Page(
-  { data }: PageProps<StampingSrc101PageProps>,
+/* ===== PAGE COMPONENT ===== */
+export default function ToolsSrc101Page(
+  { data }: PageProps<ToolsSrc101PageProps>,
 ) {
   const { selectedTab, trxType } = data;
 
+  /* ===== HELPERS ===== */
   const renderContent = () => {
     if (selectedTab === "mint") {
       return <RegisterBitnameContent trxType={trxType} />;
@@ -49,13 +53,14 @@ export default function StampingSrc101Page(
     return null;
   };
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col gap-12 mobileLg:gap-24">
       <div class="self-center max-w-[680px] w-full mx-auto">
         {renderContent()}
       </div>
 
-      <div class="flex flex-col gap-3 mobileMd:gap-6 w-full desktop:gap-9 tablet:flex-row">
+      <div class="flex flex-col tablet:flex-row w-full gap-6 desktop:gap-9">
         <div class="w-full tablet:w-full">
           <HowToRegisterBitnameModule />
         </div>

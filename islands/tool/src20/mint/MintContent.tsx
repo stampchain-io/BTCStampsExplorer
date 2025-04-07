@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
-import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { SRC20MintStatus } from "$types/src20.d.ts";
 import {
@@ -16,6 +15,7 @@ import {
 import { SRC20InputField } from "$forms";
 import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
 import { Icon } from "$icons";
+import { StatusMessages } from "$notifications";
 
 /* ===== MAIN COMPONENT INTERFACE ===== */
 interface MintContentProps {

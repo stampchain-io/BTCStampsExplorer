@@ -3,7 +3,6 @@ import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
@@ -18,7 +17,7 @@ import { Icon } from "$icons";
 import { inputTextarea, SRC20InputField } from "$forms";
 import { titlePurpleLD } from "$text";
 import { ToggleSwitchButton } from "$buttons";
-import { tooltipButton, tooltipImage } from "$notifications";
+import { StatusMessages, tooltipButton, tooltipImage } from "$notifications";
 
 /* ===== INTERFACE DEFINITIONS ===== */
 interface UploadResponse extends APIResponse {

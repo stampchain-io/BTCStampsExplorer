@@ -1,21 +1,25 @@
+/* ===== SRC20 TOOLS PAGE ===== */
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import type { SRC20MintStatus } from "$lib/types/src20.d.ts";
-import { MintContent } from "$islands/stamping/src20/mint/MintContent.tsx";
-import PopularMinting from "$islands/stamping/src20/mint/PopularMinting.tsx";
-import { DeployContent } from "$islands/stamping/src20/deploy/DeployContent.tsx";
-import RecentDeploy from "$islands/stamping/src20/deploy/RecentDeploy.tsx";
-import { TransferContent } from "$islands/stamping/src20/transfer/TransferContent.tsx";
-import LatestTransfer from "$islands/stamping/src20/transfer/LatestTransfer.tsx";
-import { body, gapSection } from "$layout";
+import {
+  DeployContent,
+  LatestTransfer,
+  MintContent,
+  PopularMinting,
+  RecentDeploy,
+  TransferContent,
+} from "$tool";
 import {
   HowToDeployTokenModule,
   HowToMintTokenModule,
   HowToTransferTokenModule,
 } from "$howto";
+import { body, gapSection } from "$layout";
 
-interface StampingSrc20PageProps {
+/* ===== TYPES ===== */
+interface ToolsSrc20PageProps {
   selectedTab: string;
   trxType: "multisig" | "olga";
   tick?: string | null;
@@ -24,7 +28,8 @@ interface StampingSrc20PageProps {
   error?: string;
 }
 
-export const handler: Handlers<StampingSrc20PageProps> = {
+/* ===== SERVER HANDLER ===== */
+export const handler: Handlers<ToolsSrc20PageProps> = {
   async GET(req, ctx) {
     try {
       const url = new URL(req.url);
@@ -80,13 +85,14 @@ export const handler: Handlers<StampingSrc20PageProps> = {
       }
       return ctx.render({
         error: error instanceof Error ? error.message : "Internal server error",
-      } as StampingSrc20PageProps);
+      } as ToolsSrc20PageProps);
     }
   },
 };
 
-export default function StampingSrc20Page(
-  { data }: PageProps<StampingSrc20PageProps>,
+/* ===== PAGE COMPONENT ===== */
+export default function ToolsSrc20Page(
+  { data }: PageProps<ToolsSrc20PageProps>,
 ) {
   const {
     selectedTab,
@@ -96,6 +102,7 @@ export default function StampingSrc20Page(
     holders,
   } = data;
 
+  /* ===== HELPERS ===== */
   const renderContent = () => {
     switch (selectedTab) {
       case "mint":
@@ -142,6 +149,7 @@ export default function StampingSrc20Page(
     }
   };
 
+  /* ===== RENDER ===== */
   return (
     <div className={`${body} ${gapSection}`}>
       <div className={`flex w-full`}>

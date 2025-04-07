@@ -8,5 +8,5 @@ export * from "$islands/stamp/details/StampInfo.tsx";
 export * from "$islands/stamp/details/StampCodeModal.tsx";
 export * from "$islands/stamp/details/StampBuyModal.tsx";
 export * from "$islands/stamp/details/RecentSales.tsx";
-export * from "$islands/stamp/details/StampImageFullScreen.tsx";
+export { default as StampImageFullScreen } from "$islands/stamp/details/StampImageFullScreen.tsx";
 export * from "$islands/stamp/details/StampTextContent.tsx";

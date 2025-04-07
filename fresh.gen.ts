@@ -89,7 +89,6 @@ import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $dashboard_address_ from "./routes/dashboard/[address].tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
-import * as $fairmint from "./routes/fairmint.tsx";
 import * as $faq_index from "./routes/faq/index.tsx";
 import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/sharedBlockWithStampsHandler.ts";
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
@@ -119,11 +118,12 @@ import * as $stamp_posh from "./routes/stamp/posh.tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
 import * as $test_design_system from "./routes/test/design-system.tsx";
 import * as $test_test_image from "./routes/test/test-image.ts";
-import * as $tools_src101_action_ from "./routes/tools/src101/[action].tsx";
-import * as $tools_src20_action_ from "./routes/tools/src20/[action].tsx";
-import * as $tools_src20_src20RedirectWIP from "./routes/tools/src20/src20RedirectWIP.tsx";
-import * as $tools_stamp_stamp from "./routes/tools/stamp/stamp.tsx";
-import * as $tools_stamp_trade_index from "./routes/tools/stamp/trade.tsx";
+import * as $tool_fairmint_index from "./routes/tool/fairmint/index.tsx";
+import * as $tool_src101_action_ from "./routes/tool/src101/[action].tsx";
+import * as $tool_src20_action_ from "./routes/tool/src20/[action].tsx";
+import * as $tool_src20_src20RedirectWIP from "./routes/tool/src20/src20RedirectWIP.tsx";
+import * as $tool_stamp_stamp from "./routes/tool/stamp/stamp.tsx";
+import * as $tool_stamp_trade from "./routes/tool/stamp/trade.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
@@ -170,7 +170,6 @@ import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
-import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $faq_AccordionBase from "./islands/faq/AccordionBase.tsx";
 import * as $faq_FaqAccordion from "./islands/faq/FaqAccordion.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
@@ -220,21 +219,23 @@ import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampT
 import * as $stamp_index from "./islands/stamp/index.ts";
 import * as $stamp_overview_StampContent from "./islands/stamp/overview/StampContent.tsx";
 import * as $stamp_overview_StampHeader from "./islands/stamp/overview/StampHeader.tsx";
-import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
-import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
-import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
-import * as $stamping_src101_register_RecentRegister from "./islands/stamping/src101/register/RecentRegister.tsx";
-import * as $stamping_src101_register_RegisterContent from "./islands/stamping/src101/register/RegisterContent.tsx";
-import * as $stamping_src20_SRC20InputField from "./islands/stamping/src20/SRC20InputField.tsx";
-import * as $stamping_src20_deploy_DeployContent from "./islands/stamping/src20/deploy/DeployContent.tsx";
-import * as $stamping_src20_deploy_RecentDeploy from "./islands/stamping/src20/deploy/RecentDeploy.tsx";
-import * as $stamping_src20_mint_MintContent from "./islands/stamping/src20/mint/MintContent.tsx";
-import * as $stamping_src20_mint_PopularMinting from "./islands/stamping/src20/mint/PopularMinting.tsx";
-import * as $stamping_src20_trade_TradeContent from "./islands/stamping/src20/trade/TradeContent.tsx";
-import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src20/transfer/LatestTransfer.tsx";
-import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
-import * as $stamping_stamp_OlgaContent from "./islands/stamping/stamp/OlgaContent.tsx";
 import * as $test_ReviewDogTest from "./islands/test/ReviewDogTest.tsx";
+import * as $tool_InputField from "./islands/tool/InputField.tsx";
+import * as $tool_SelectField from "./islands/tool/SelectField.tsx";
+import * as $tool_StatusMessages from "./islands/tool/StatusMessages.tsx";
+import * as $tool_fairmint_FairmintContent from "./islands/tool/fairmint/FairmintContent.tsx";
+import * as $tool_index from "./islands/tool/index.ts";
+import * as $tool_src101_register_RecentRegister from "./islands/tool/src101/register/RecentRegister.tsx";
+import * as $tool_src101_register_RegisterContent from "./islands/tool/src101/register/RegisterContent.tsx";
+import * as $tool_src20_SRC20InputField from "./islands/tool/src20/SRC20InputField.tsx";
+import * as $tool_src20_deploy_DeployContent from "./islands/tool/src20/deploy/DeployContent.tsx";
+import * as $tool_src20_deploy_RecentDeploy from "./islands/tool/src20/deploy/RecentDeploy.tsx";
+import * as $tool_src20_mint_MintContent from "./islands/tool/src20/mint/MintContent.tsx";
+import * as $tool_src20_mint_PopularMinting from "./islands/tool/src20/mint/PopularMinting.tsx";
+import * as $tool_src20_transfer_LatestTransfer from "./islands/tool/src20/transfer/LatestTransfer.tsx";
+import * as $tool_src20_transfer_TransferContent from "./islands/tool/src20/transfer/TransferContent.tsx";
+import * as $tool_stamp_OlgaContent from "./islands/tool/stamp/OlgaContent.tsx";
+import * as $tool_stamp_TradeContent from "./islands/tool/stamp/TradeContent.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
 import type { Manifest } from "$fresh/server.ts";
@@ -353,7 +354,6 @@ const manifest = {
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/dashboard/[address].tsx": $dashboard_address_,
     "./routes/docs/index.tsx": $docs_index,
-    "./routes/fairmint.tsx": $fairmint,
     "./routes/faq/index.tsx": $faq_index,
     "./routes/handlers/sharedBlockWithStampsHandler.ts":
       $handlers_sharedBlockWithStampsHandler,
@@ -385,11 +385,12 @@ const manifest = {
     "./routes/termsofservice/index.tsx": $termsofservice_index,
     "./routes/test/design-system.tsx": $test_design_system,
     "./routes/test/test-image.ts": $test_test_image,
-    "./routes/tools/src101/[action].tsx": $tools_src101_action_,
-    "./routes/tools/src20/[action].tsx": $tools_src20_action_,
-    "./routes/tools/src20/src20RedirectWIP.tsx": $tools_src20_src20RedirectWIP,
-    "./routes/tools/stamp/stamp.tsx": $tools_stamp_stamp,
-    "./routes/tools/stamp/trade/index.tsx": $tools_stamp_trade_index,
+    "./routes/tool/fairmint/index.tsx": $tool_fairmint_index,
+    "./routes/tool/src101/[action].tsx": $tool_src101_action_,
+    "./routes/tool/src20/[action].tsx": $tool_src20_action_,
+    "./routes/tool/src20/src20RedirectWIP.tsx": $tool_src20_src20RedirectWIP,
+    "./routes/tool/stamp/stamp.tsx": $tool_stamp_stamp,
+    "./routes/tool/stamp/trade.tsx": $tool_stamp_trade,
     "./routes/upload/index.tsx": $upload_index,
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
@@ -454,7 +455,6 @@ const manifest = {
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
-    "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/faq/AccordionBase.tsx": $faq_AccordionBase,
     "./islands/faq/FaqAccordion.tsx": $faq_FaqAccordion,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
@@ -510,31 +510,31 @@ const manifest = {
     "./islands/stamp/index.ts": $stamp_index,
     "./islands/stamp/overview/StampContent.tsx": $stamp_overview_StampContent,
     "./islands/stamp/overview/StampHeader.tsx": $stamp_overview_StampHeader,
-    "./islands/stamping/InputField.tsx": $stamping_InputField,
-    "./islands/stamping/SelectField.tsx": $stamping_SelectField,
-    "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,
-    "./islands/stamping/src101/register/RecentRegister.tsx":
-      $stamping_src101_register_RecentRegister,
-    "./islands/stamping/src101/register/RegisterContent.tsx":
-      $stamping_src101_register_RegisterContent,
-    "./islands/stamping/src20/SRC20InputField.tsx":
-      $stamping_src20_SRC20InputField,
-    "./islands/stamping/src20/deploy/DeployContent.tsx":
-      $stamping_src20_deploy_DeployContent,
-    "./islands/stamping/src20/deploy/RecentDeploy.tsx":
-      $stamping_src20_deploy_RecentDeploy,
-    "./islands/stamping/src20/mint/MintContent.tsx":
-      $stamping_src20_mint_MintContent,
-    "./islands/stamping/src20/mint/PopularMinting.tsx":
-      $stamping_src20_mint_PopularMinting,
-    "./islands/stamping/src20/trade/TradeContent.tsx":
-      $stamping_src20_trade_TradeContent,
-    "./islands/stamping/src20/transfer/LatestTransfer.tsx":
-      $stamping_src20_transfer_LatestTransfer,
-    "./islands/stamping/src20/transfer/TransferContent.tsx":
-      $stamping_src20_transfer_TransferContent,
-    "./islands/stamping/stamp/OlgaContent.tsx": $stamping_stamp_OlgaContent,
     "./islands/test/ReviewDogTest.tsx": $test_ReviewDogTest,
+    "./islands/tool/InputField.tsx": $tool_InputField,
+    "./islands/tool/SelectField.tsx": $tool_SelectField,
+    "./islands/tool/StatusMessages.tsx": $tool_StatusMessages,
+    "./islands/tool/fairmint/FairmintContent.tsx":
+      $tool_fairmint_FairmintContent,
+    "./islands/tool/index.ts": $tool_index,
+    "./islands/tool/src101/register/RecentRegister.tsx":
+      $tool_src101_register_RecentRegister,
+    "./islands/tool/src101/register/RegisterContent.tsx":
+      $tool_src101_register_RegisterContent,
+    "./islands/tool/src20/SRC20InputField.tsx": $tool_src20_SRC20InputField,
+    "./islands/tool/src20/deploy/DeployContent.tsx":
+      $tool_src20_deploy_DeployContent,
+    "./islands/tool/src20/deploy/RecentDeploy.tsx":
+      $tool_src20_deploy_RecentDeploy,
+    "./islands/tool/src20/mint/MintContent.tsx": $tool_src20_mint_MintContent,
+    "./islands/tool/src20/mint/PopularMinting.tsx":
+      $tool_src20_mint_PopularMinting,
+    "./islands/tool/src20/transfer/LatestTransfer.tsx":
+      $tool_src20_transfer_LatestTransfer,
+    "./islands/tool/src20/transfer/TransferContent.tsx":
+      $tool_src20_transfer_TransferContent,
+    "./islands/tool/stamp/OlgaContent.tsx": $tool_stamp_OlgaContent,
+    "./islands/tool/stamp/TradeContent.tsx": $tool_stamp_TradeContent,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
   },

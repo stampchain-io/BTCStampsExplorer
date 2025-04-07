@@ -1,22 +1,28 @@
+/* ===== TRADE CONTENT COMPONENT ===== */
+/* TODO (@baba):
+  - Clean up styles completely
+  - Add fee calculator
+*/
 import { useCallback, useEffect, useState } from "preact/hooks";
-import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { InputField } from "$islands/stamping/InputField.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
 import { ComposeAttachOptions } from "$server/services/xcpService.ts";
 import { normalizeFeeRate } from "$server/services/xcpService.ts";
+import { bodyTool, containerBackground } from "$layout";
+import { subtitlePurple, titlePurpleLD } from "$text";
+import { Button } from "$buttons";
+import { InputField } from "$forms";
+import { StatusMessages } from "$notifications";
 
+/* ===== CONSTANTS ===== */
 const SIGHASH_SINGLE = 0x03;
 const SIGHASH_ANYONECANPAY = 0x80;
 const SIGHASH_SINGLE_ANYONECANPAY = SIGHASH_SINGLE | SIGHASH_ANYONECANPAY; // 131
-
 const MAX_FEE_RATE_VB = 500; // maximum sat/vB
-
-// Add this constant at the top with other constants
 const MIN_UTXO_VALUE = 546; // Minimum UTXO value in satoshis
 
-// Add these interfaces at the top with other types
+/* ===== TYPES ===== */
 interface InputToSign {
   index: number;
 }
@@ -26,14 +32,14 @@ interface StatusMessageType {
   txid?: string;
 }
 
+/* ===== COMPONENT ===== */
 export function TradeContent() {
-  // Move all useState declarations inside the component
+  /* ===== STATE ===== */
   const [availableAssets, setAvailableAssets] = useState<XcpBalance[]>([]);
   const [isLoadingAssets, setIsLoadingAssets] = useState(false);
   const [maxQuantity, setMaxQuantity] = useState<number | null>(null);
   const [availableUtxos, setAvailableUtxos] = useState<UTXO[]>([]);
   const [isLoadingUtxos, setIsLoadingUtxos] = useState(false);
-
   const { wallet, isConnected, showConnectModal } = walletContext;
   const address = wallet.address;
 
@@ -65,7 +71,7 @@ export function TradeContent() {
   >(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
-  // Fetch BTC Price
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     const fetchPrice = async () => {
       const price = await fetchBTCPriceInUSD();
@@ -74,6 +80,7 @@ export function TradeContent() {
     fetchPrice();
   }, []);
 
+  /* ===== EVENT HANDLERS ===== */
   const handleTradeInputChange = (e: Event, field: string) => {
     const value = (e.target as HTMLInputElement).value;
     setTradeFormState((prev) => ({ ...prev, [field]: value }));
@@ -84,6 +91,12 @@ export function TradeContent() {
     setAttachFormState((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleBuyerInputChange = (e: Event, field: string) => {
+    const value = (e.target as HTMLInputElement).value;
+    setBuyerFormState((prev) => ({ ...prev, [field]: value }));
+  };
+
+  /* ===== PSBT HANDLERS ===== */
   const handleCreatePSBT = async () => {
     if (!isConnected) {
       showConnectModal();
@@ -157,7 +170,6 @@ export function TradeContent() {
     }
   };
 
-  // New function to handle UTXO attach
   const handleUtxoAttach = async () => {
     if (!isConnected) {
       showConnectModal();
@@ -277,13 +289,6 @@ export function TradeContent() {
     }
   };
 
-  // Add this to your JSX
-  const handleBuyerInputChange = (e: Event, field: string) => {
-    const value = (e.target as HTMLInputElement).value;
-    setBuyerFormState((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // Add this to your JSX
   const handleCompleteSwap = async () => {
     if (!isConnected) {
       showConnectModal();
@@ -368,7 +373,7 @@ export function TradeContent() {
     }
   };
 
-  // Add this new function in your component
+  /* ===== QUERY HANDLERS ===== */
   const handleQueryUtxos = useCallback(async () => {
     if (!isConnected) {
       showConnectModal();
@@ -431,12 +436,6 @@ export function TradeContent() {
     }
   }, [address, isConnected]);
 
-  const handleUtxoSelection = (utxo: UTXO) => {
-    const utxoString = `${utxo.txid}:${utxo.vout}`;
-    setAttachFormState((prev) => ({ ...prev, utxo: utxoString }));
-  };
-
-  // Add this handler function
   const handleQueryAssets = useCallback(async () => {
     if (!isConnected) {
       showConnectModal();
@@ -491,7 +490,12 @@ export function TradeContent() {
     }
   }, [address, isConnected]);
 
-  // Add asset selection handler
+  /* ===== SELECTION HANDLERS ===== */
+  const handleUtxoSelection = (utxo: UTXO) => {
+    const utxoString = `${utxo.txid}:${utxo.vout}`;
+    setAttachFormState((prev) => ({ ...prev, utxo: utxoString }));
+  };
+
   const handleAssetSelection = (asset: XcpBalance) => {
     setAttachFormState((prev) => ({
       ...prev,
@@ -501,14 +505,21 @@ export function TradeContent() {
     setMaxQuantity(asset.quantity);
   };
 
+  /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col w-full items-center gap-8">
-      <p class="purple-gradient1 text-3xl tablet:text-6xl font-black mt-6 w-full text-center">
-        ATTACH STAMP TO UTXO / CREATE PSBT
-      </p>
+    <div className={`${bodyTool}`}>
+      {/* ===== SELLER SECTION ===== */}
+      <h1 className={`${titlePurpleLD} mobileMd:text-center`}>
+        ATTACH TO UTXO
+      </h1>
+      <h2 className={`${subtitlePurple} mobileMd:text-center`}>SELLER</h2>
 
-      <div className="dark-gradient rounded-lg p-6 w-full">
-        <div className="flex flex-col gap-4">
+      {/* ===== CREATE PSBT FORM ===== */}
+      <div className={containerBackground}>
+        <h3 className=" font-bold text-xl text-stamp-purple mb-2">
+          CREATE PSBT
+        </h3>
+        <div className="flex flex-col gap-5">
           <InputField
             type="text"
             placeholder="UTXO (e.g., txid:vout)"
@@ -526,15 +537,16 @@ export function TradeContent() {
           />
         </div>
 
-        {/* Updated button styling */}
-        <div className="flex justify-end gap-6 mt-6">
-          <button
-            className="bg-[#8800CC] text-[#330033] w-[120px] h-[48px] rounded-md font-extrabold"
+        <div className="flex justify-end mt-5">
+          <Button
+            variant="flat"
+            color="purple"
+            size="lg"
             onClick={handleCreatePSBT}
             disabled={isSubmitting}
           >
             {isSubmitting ? "PROCESSING" : "CREATE PSBT"}
-          </button>
+          </Button>
         </div>
 
         <StatusMessages
@@ -544,7 +556,7 @@ export function TradeContent() {
         />
 
         {tradeFormState.psbtHex && (
-          <div className="dark-gradient rounded-lg p-3 tablet:p-6 w-full break-words mt-6">
+          <div className={`${containerBackground} break-words mt-6`}>
             <h2 className="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
               className="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
@@ -558,13 +570,15 @@ export function TradeContent() {
         )}
       </div>
 
-      {/* New UTXO Attach Form */}
-      <div className="dark-gradient rounded-lg p-6 w-full">
-        <h2 class="text-xl font-bold mb-4 text-gray-400">UTXO Attach</h2>
-        <div className="flex flex-col gap-4">
+      {/* ===== UTXO ATTACH FORM ===== */}
+      <div className={containerBackground}>
+        <h3 className=" font-bold text-xl text-stamp-purple mb-2">
+          UTXO ATTACH
+        </h3>
+        <div className="flex flex-col gap-5">
           {/* Asset (CPID) section with query button */}
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-2 items-start">
+          <div className="flex flex-col gap-5">
+            <div className="flex gap-5 items-start">
               <div className="flex-grow">
                 <InputField
                   type="text"
@@ -573,13 +587,18 @@ export function TradeContent() {
                   onChange={(e) => handleAttachInputChange(e, "cpid")}
                 />
               </div>
-              <button
-                className="bg-[#6600CC] text-white px-4 py-2 h-[36px] rounded-md font-bold text-sm whitespace-nowrap"
-                onClick={handleQueryAssets}
-                disabled={isLoadingAssets || !isConnected}
-              >
-                {isLoadingAssets ? "Loading..." : "Query Assets"}
-              </button>
+
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  color="purple"
+                  size="lg"
+                  onClick={handleQueryAssets}
+                  disabled={isLoadingAssets || !isConnected}
+                >
+                  {isLoadingAssets ? "Loading..." : "QUERY ASSETS"}
+                </Button>
+              </div>
             </div>
 
             {/* Asset list */}
@@ -592,7 +611,7 @@ export function TradeContent() {
                   <button
                     key={asset.cpid}
                     onClick={() => handleAssetSelection(asset)}
-                    className="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-gray-700 last:border-b-0"
+                    className="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-red-500 last:border-b-0"
                   >
                     <div className="flex justify-between items-center">
                       <div className="truncate flex-1">
@@ -649,7 +668,7 @@ export function TradeContent() {
 
           {/* UTXO section with query button */}
           <div className="flex flex-col gap-2">
-            <div className="flex gap-2 items-start">
+            <div className="flex gap-5 items-start">
               <div className="flex-grow">
                 <InputField
                   type="text"
@@ -658,13 +677,15 @@ export function TradeContent() {
                   onChange={(e) => handleAttachInputChange(e, "utxo")}
                 />
               </div>
-              <button
-                className="bg-[#6600CC] text-white px-4 py-2 h-[36px] rounded-md font-bold text-sm whitespace-nowrap"
+              <Button
+                variant="outline"
+                color="purple"
+                size="lg"
                 onClick={handleQueryUtxos}
                 disabled={isLoadingUtxos || !isConnected}
               >
                 {isLoadingUtxos ? "Loading..." : "Query UTXOs"}
-              </button>
+              </Button>
             </div>
 
             {/* UTXO list */}
@@ -696,14 +717,16 @@ export function TradeContent() {
           </div>
         </div>
 
-        <div className="flex justify-end gap-6 mt-6">
-          <button
-            className="bg-[#8800CC] text-[#330033] w-[120px] h-[48px] rounded-md font-extrabold"
+        <div className="flex justify-end mt-5">
+          <Button
+            variant="flat"
+            color="purple"
+            size="lg"
             onClick={handleUtxoAttach}
             disabled={isSubmitting}
           >
             {isSubmitting ? "PROCESSING" : "ATTACH"}
-          </button>
+          </Button>
         </div>
 
         <StatusMessages
@@ -715,7 +738,7 @@ export function TradeContent() {
         />
 
         {attachFormState.psbtHex && (
-          <div className="dark-gradient rounded-lg p-3 tablet:p-6 w-full break-words mt-6">
+          <div className={`${containerBackground} break-words mt-6`}>
             <h2 className="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
               className="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
@@ -729,12 +752,14 @@ export function TradeContent() {
         )}
       </div>
 
-      {/* Complete Swap (Buyer) */}
-      <div className="dark-gradient rounded-lg p-6 w-full mt-6">
-        <h2 class="text-xl font-bold mb-4 text-gray-400">
-          Complete Swap (Buyer)
-        </h2>
-        <div className="flex flex-col gap-4">
+      {/* ===== BUYER SECTION ===== */}
+      {/* ===== COMPLETE SWAP FORM ===== */}
+      <div className={containerBackground}>
+        <h2 className={`${subtitlePurple} mobileMd:text-center`}>BUYER</h2>
+        <h3 className=" font-bold text-xl text-stamp-purple mb-2">
+          COMPLETE SWAP
+        </h3>
+        <div className="flex flex-col gap-5">
           <InputField
             type="text"
             placeholder="Seller's PSBT (Hex)"
@@ -756,14 +781,16 @@ export function TradeContent() {
             min="1"
           />
         </div>
-        <div className="flex justify-end gap-6 mt-6">
-          <button
-            className="bg-[#8800CC] text-[#330033] w-[120px] h-[48px] rounded-md font-extrabold"
+        <div className="flex justify-end mt-5">
+          <Button
+            variant="flat"
+            color="purple"
+            size="lg"
             onClick={handleCompleteSwap}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "PROCESSING" : "Complete Swap"}
-          </button>
+            {isSubmitting ? "PROCESSING" : "COMPLETE SWAP"}
+          </Button>
         </div>
       </div>
     </div>

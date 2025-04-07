@@ -3,7 +3,6 @@ import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
-import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import {
@@ -12,8 +11,9 @@ import {
   containerColForm,
   rowResponsiveForm,
 } from "$layout";
-import { SRC20InputField } from "$forms";
 import { titlePurpleLD } from "$text";
+import { SRC20InputField } from "$forms";
+import { StatusMessages } from "$notifications";
 
 /* ===== INTERFACE DEFINITIONS ===== */
 interface Balance {
