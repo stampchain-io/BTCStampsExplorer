@@ -21,12 +21,12 @@ interface NavLink {
 
 /* ===== TOOLS CONFIGURATION ===== */
 const toolLinks = [
-  { title: "STAMPING", href: "/stamping/stamp" },
-  { title: "TRANSFER STAMP", href: "/stamping/stamp/transfer" },
-  { title: "DEPLOY TOKEN", href: "/stamping/src20/deploy" },
-  { title: "MINT TOKEN", href: "/stamping/src20/mint" },
-  { title: "TRANSFER TOKEN", href: "/stamping/src20/transfer" },
-  { title: "REGISTER BITNAME", href: "/stamping/src101/mint" },
+  { title: "STAMPING", href: "/tool/stamp/stamp" },
+  { title: "TRANSFER STAMP", href: "/tool/stamp/transfer" },
+  { title: "DEPLOY TOKEN", href: "/tool/src20/deploy" },
+  { title: "MINT TOKEN", href: "/tool/src20/mint" },
+  { title: "TRANSFER TOKEN", href: "/tool/src20/transfer" },
+  { title: "REGISTER BITNAME", href: "/tool/src101/mint" },
 ];
 
 /* ===== DESKTOP NAVIGATION CONFIGURATION ===== */
@@ -40,8 +40,8 @@ const desktopNavLinks: NavLink[] = [
     subLinks: [
       { title: "ALL", href: "/stamp?type=classic" },
       { title: "COLLECTIONS", href: "/collection" },
-      { title: "STAMPING", href: "/stamping/stamp" },
-      { title: "TRANSFER", href: "/stamping/stamp/transfer" },
+      { title: "STAMPING", href: "/tool/stamp/stamp" },
+      { title: "TRANSFER", href: "/tool/stamp/transfer" },
     ],
   },
   {
@@ -53,9 +53,9 @@ const desktopNavLinks: NavLink[] = [
     subLinks: [
       { title: "ALL", href: "/src20" },
       { title: "TRENDING", href: "/src20?type=trending" },
-      { title: "DEPLOY", href: "/stamping/src20/deploy" },
-      { title: "MINT", href: "/stamping/src20/mint" },
-      { title: "TRANSFER", href: "/stamping/src20/transfer" },
+      { title: "DEPLOY", href: "/tool/src20/deploy" },
+      { title: "MINT", href: "/tool/src20/mint" },
+      { title: "TRANSFER", href: "/tool/src20/transfer" },
     ],
   },
   {
@@ -65,7 +65,7 @@ const desktopNavLinks: NavLink[] = [
     },
     href: "#",
     subLinks: [
-      { title: "REGISTER", href: "/stamping/src101/mint" },
+      { title: "REGISTER", href: "/tool/src101/mint" },
     ],
   },
 ];

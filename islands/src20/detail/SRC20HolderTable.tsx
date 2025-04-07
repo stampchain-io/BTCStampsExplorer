@@ -1,3 +1,4 @@
+/* ===== SRC20 HOLDER TABLE COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
 import {
@@ -11,6 +12,7 @@ import {
 } from "$components/shared/TableStyles.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
+/* ===== TYPES ===== */
 interface Holder {
   address: string | null;
   amt: number;
@@ -21,18 +23,23 @@ interface HoldersGraphTableProps {
   holders?: Holder[];
 }
 
+/* ===== CONSTANTS ===== */
 const PAGE_SIZE = 20;
 
+/* ===== COMPONENT ===== */
 const SRC20HolderTable = (
   { holders = [] }: HoldersGraphTableProps,
 ) => {
-  const headers = ["ADDRESS", "AMOUNT", "PERCENT"];
-  const totalCounts = holders.length;
+  /* ===== STATE ===== */
   const [data, setData] = useState<Holder[]>(holders.slice(0, PAGE_SIZE) || []);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
+  const headers = ["ADDRESS", "AMOUNT", "PERCENT"];
+  const totalCounts = holders.length;
+
+  /* ===== DATA HANDLERS ===== */
   const fetchData = (nextPage: number) => {
     if (!hasMore) return;
     setIsLoading(true);
@@ -43,6 +50,7 @@ const SRC20HolderTable = (
     setIsLoading(false);
   };
 
+  /* ===== EVENT HANDLERS ===== */
   const handleScroll = (e: Event) => {
     const target = e.target as HTMLDivElement;
     const scrollPosition = target.scrollTop + target.clientHeight;
@@ -63,16 +71,19 @@ const SRC20HolderTable = (
     }
   };
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     setHasMore(totalCounts > data.length);
   }, [data]);
 
+  /* ===== RENDER ===== */
   return (
     <ScrollContainer
       class="h-48 mobileLg:h-64 mt-3 mobileMd:mt-6 w-full"
       onScroll={handleScroll}
     >
       <table className={tableValue}>
+        {/* ===== TABLE STRUCTURE ===== */}
         <colgroup>
           {colGroup([
             { width: "w-[50%]" },
@@ -85,6 +96,8 @@ const SRC20HolderTable = (
             />
           ))}
         </colgroup>
+
+        {/* ===== TABLE HEADER ===== */}
         <thead>
           <tr>
             {headers.map((header, i) => (
@@ -98,6 +111,8 @@ const SRC20HolderTable = (
             ))}
           </tr>
         </thead>
+
+        {/* ===== TABLE CONTENT ===== */}
         <tbody className={tableValue}>
           {!isLoading && data.map((holder, index) => {
             if (!holder.address) {
@@ -139,6 +154,8 @@ const SRC20HolderTable = (
               </tr>
             );
           })}
+
+          {/* ===== LOADING INDICATOR ===== */}
           {isLoading && (
             <tr colSpan={3}>
               <td colSpan={3}>

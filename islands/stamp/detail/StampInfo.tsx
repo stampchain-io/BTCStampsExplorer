@@ -13,6 +13,7 @@ import { StampListingsOpen } from "$components/stampDetails/StampListingsOpen.ts
 import type { Dispenser } from "$components/stampDetails/StampListingsOpen.tsx";
 import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
 
+/* ===== TYPES ===== */
 interface StampInfoProps {
   stamp: StampRow;
   lowestPriceDispenser: any;
@@ -24,6 +25,7 @@ interface DimensionsType {
   unit: string | "responsive";
 }
 
+/* ===== COMPONENT ===== */
 export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const [fee, setFee] = useState<number>(0);
   const handleChangeFee = (newFee: number) => {

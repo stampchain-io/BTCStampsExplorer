@@ -1,3 +1,4 @@
+/* ===== SRC20 DETAIL HEADER COMPONENT ===== */
 import { useState } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import {
@@ -12,6 +13,7 @@ import {
 } from "$lib/utils/formatUtils.ts";
 import { SRC20SearchClient } from "$src20";
 
+/* ===== TYPES ===== */
 export interface SRC20TickHeaderProps {
   deployment: Deployment & {
     email?: string;
@@ -26,6 +28,7 @@ export interface SRC20TickHeaderProps {
   _align?: "left" | "center" | "right";
 }
 
+/* ===== STAT ITEM COMPONENT ===== */
 function StatItem(
   { label, value, direction, currency, align = "left", large = false }: {
     label: string;
@@ -42,6 +45,7 @@ function StatItem(
     right: "text-right",
   }[align];
 
+  /* ===== RENDER STAT ITEM ===== */
   return (
     <div
       class={`flex ${
@@ -81,6 +85,7 @@ function StatItem(
   );
 }
 
+/* ===== COMPONENT ===== */
 export function SRC20TickHeader({
   deployment,
   _mintStatus,
@@ -89,8 +94,11 @@ export function SRC20TickHeader({
   marketInfo,
   _align,
 }: SRC20TickHeaderProps) {
+  /* ===== STATE ===== */
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  console.log("market===>", marketInfo);
+
+  /* ===== COMPUTED VALUES ===== */
+  // Process tick value (handle emoji)
   const tickValue = deployment.tick
     ? (() => {
       console.log("Original tick:", deployment.tick);
@@ -99,12 +107,14 @@ export function SRC20TickHeader({
       return converted;
     })()
     : "N/A";
+
+  // Format deployment date
   const deployDate = formatDate(new Date(deployment.block_time), {
     month: "short",
     year: "numeric",
   });
 
-  // Provide default values for marketInfo properties
+  // Market data formatting
   const floorUnitPriceBTC = marketInfo?.floor_unit_price ?? 0;
   const sum1dBTC = marketInfo?.sum_1d ?? 0;
   const mcapBTC = marketInfo?.mcap ?? 0;
@@ -120,9 +130,11 @@ export function SRC20TickHeader({
   // Format Satoshi value with commas (no decimals needed)
   const floorUnitPriceSatsFormatted = floorUnitPriceSats.toLocaleString();
 
+  /* ===== STYLING ===== */
   const titleGreyLDClassName =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient1";
 
+  /* ===== RENDER ===== */
   return (
     <>
       <SRC20SearchClient
@@ -132,8 +144,10 @@ export function SRC20TickHeader({
       />
 
       <div class="flex w-full flex-col gap-6">
+        {/* ===== TOKEN INFO CARD ===== */}
         <div class="relative w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg">
           <div class="flex flex-row w-full">
+            {/* ===== TOKEN IMAGE AND CREATOR ===== */}
             <div className="flex gap-[18px] mobileMd:gap-[30px]">
               <img
                 src={`/content/${deployment.tx_hash}.svg`}
@@ -142,6 +156,7 @@ export function SRC20TickHeader({
                 loading="lazy"
               />
               <div class="relative z-10">
+                {/* Token name and social links */}
                 <div class="flex">
                   <p class={titleGreyLDClassName + " uppercase"}>
                     {tickValue}
@@ -169,6 +184,7 @@ export function SRC20TickHeader({
                     )}
                   </div>
                 </div>
+                {/* Creator information */}
                 <p class="text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase pt-1.5">
                   CREATOR
                 </p>
@@ -178,6 +194,8 @@ export function SRC20TickHeader({
                 </p>
               </div>
             </div>
+
+            {/* ===== DEPLOYMENT DETAILS ===== */}
             <div class="flex flex-col gap-0 justify-end ml-auto">
               <div class="hidden mobileLg:flex flex-col ml-20 mb-0 -space-y-0.5 items-center">
                 <StatItem
@@ -201,6 +219,7 @@ export function SRC20TickHeader({
               </div>
             </div>
 
+            {/* ===== TOKEN PARAMETERS ===== */}
             <div class="flex flex-col gap-0 justify-end items-end ml-auto">
               <div class="flex flex-col -space-y-0.5 text-right">
                 <StatItem
@@ -245,8 +264,9 @@ export function SRC20TickHeader({
           }
         </div>
 
-        {/* Market Information */}
+        {/* ===== MARKET INFORMATION CARD ===== */}
         <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
+          {/* Market cap */}
           <div className="flex flex-col">
             <StatItem
               label="MARKET CAP"
@@ -256,6 +276,8 @@ export function SRC20TickHeader({
               large
             />
           </div>
+
+          {/* ===== VOLUME STATS ===== */}
           <div class="flex flex-wrap justify-between pt-3 mobileLg:pt-6">
             <StatItem
               label="24H VOLUME"
@@ -280,6 +302,7 @@ export function SRC20TickHeader({
             />
           </div>
 
+          {/* ===== PRICE STATS ===== */}
           <div class="flex flex-wrap justify-between pt-1.5 mobileLg:pt-3">
             <StatItem
               label="PRICE"

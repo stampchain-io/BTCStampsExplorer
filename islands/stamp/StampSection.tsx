@@ -1,5 +1,5 @@
 /* ===== STAMP SECTION COMPONENT ===== */
-/* TODO (@baba) - move to galleries, update styling and refactor into a base slideshow component*/
+/* TODO (@baba) - move to galleries ??? - update styling and refactor into a base slideshow component*/
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { ViewAllButton } from "$buttons";

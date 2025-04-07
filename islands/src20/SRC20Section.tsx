@@ -1,12 +1,14 @@
+/* ===== SRC20 SECTION COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { SRC20Row } from "$globals";
 import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
 import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
-import { ViewAllButton } from "$components/buttons/ViewAllButton.tsx";
+import { ViewAllButton } from "$buttons";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 
+/* ===== TYPES ===== */
 interface SRC20SectionProps {
   title?: string;
   subTitle?: string;
@@ -25,6 +27,7 @@ interface SRC20SectionProps {
   useClientFetch?: boolean;
 }
 
+/* ===== IMAGE MODAL COMPONENT ===== */
 const ImageModal = (
   { imgSrc, isOpen, onClose }: {
     imgSrc: string | null;
@@ -34,6 +37,7 @@ const ImageModal = (
 ) => {
   if (!isOpen) return null;
 
+  /* ===== RENDER MODAL ===== */
   return (
     <div
       onClick={onClose}
@@ -46,6 +50,7 @@ const ImageModal = (
   );
 };
 
+/* ===== COMPONENT ===== */
 export function SRC20Section({
   title,
   subTitle,
@@ -57,12 +62,14 @@ export function SRC20Section({
   address,
   useClientFetch = fromPage === "home" || fromPage === "wallet",
 }: SRC20SectionProps) {
+  /* ===== STATE ===== */
   const [data, setData] = useState<SRC20Row[]>(initialData || []);
   const [isLoading, setIsLoading] = useState(!initialData);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [modalImg, setModalImg] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
 
+  /* ===== DATA FETCHING ===== */
   useEffect(() => {
     if (!initialData?.length && useClientFetch) {
       setIsTransitioning(true);
@@ -115,6 +122,7 @@ export function SRC20Section({
     useClientFetch,
   ]);
 
+  /* ===== EVENT HANDLERS ===== */
   const handlePageChange = (page: number) => {
     if (pagination?.onPageChange) {
       pagination.onPageChange(page);
@@ -126,6 +134,7 @@ export function SRC20Section({
   };
 
   const handleCloseModal = () => setModalOpen(false);
+
   const handleImageClick = (imgSrc: string | null) => {
     if (imgSrc) {
       setModalImg(imgSrc);
@@ -133,12 +142,15 @@ export function SRC20Section({
     }
   };
 
+  /* ===== LOADING STATE ===== */
   if (isLoading || isTransitioning) {
     return <div class="src20-skeleton loading-skeleton h-[400px]" />;
   }
 
+  /* ===== RENDER ===== */
   return (
     <div class="w-full">
+      {/* ===== SECTION HEADER ===== */}
       {title && (
         <h1
           class={`${ModulesStyles.titlePurpleDL} ${
@@ -159,12 +171,14 @@ export function SRC20Section({
       )}
 
       <div class="grid grid-cols-1 gap-3 mobileMd:gap-6 items-end max-w-desktop w-full mx-auto">
+        {/* ===== IMAGE MODAL ===== */}
         <ImageModal
           imgSrc={modalImg}
           isOpen={isModalOpen}
           onClose={handleCloseModal}
         />
 
+        {/* ===== SRC20 TOKENS LIST ===== */}
         <div class="flex flex-col gap-3 mobileMd:gap-6">
           {data.map((src20) => (
             parseFloat(src20?.progress || "0") >= 100
@@ -185,12 +199,14 @@ export function SRC20Section({
           ))}
         </div>
 
+        {/* ===== VIEW ALL BUTTON ===== */}
         {fromPage === "home" && (
           <div class="flex justify-end -mt-3 mobileMd:-mt-6">
             <ViewAllButton href={`/src20?type=${type}`} />
           </div>
         )}
 
+        {/* ===== PAGINATION ===== */}
         {pagination && pagination.totalPages > 1 && (
           <div class="mt-9 mobileLg:mt-[72px]">
             <Pagination
