@@ -1,3 +1,4 @@
+/* TODO (@baba) - move to forms - integrate into styles */
 import { useEffect, useRef } from "preact/hooks";
 import flatpickr from "flatpickr";
 
@@ -22,7 +23,7 @@ const DatePicker = ({ setDateRange }: PropTypes) => {
 
   return (
     <input
-      className="h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
+      className="h-10 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
       ref={calendarRef}
     />
   );
