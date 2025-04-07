@@ -112,18 +112,18 @@ import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
-import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_art from "./routes/stamp/art.tsx";
-import * as $stamp_index from "./routes/stamp/index.tsx";
+import * as $stamp_details_id_ from "./routes/stamp/details/[id].tsx";
+import * as $stamp_overview_index from "./routes/stamp/overview/index.tsx";
 import * as $stamp_posh from "./routes/stamp/posh.tsx";
-import * as $stamp_trade from "./routes/stamp/trade.tsx";
-import * as $stamping_src101_action_ from "./routes/stamping/src101/[action].tsx";
-import * as $stamping_src20 from "./routes/stamping/src20.tsx";
-import * as $stamping_src20_action_ from "./routes/stamping/src20/[action].tsx";
-import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
 import * as $test_design_system from "./routes/test/design-system.tsx";
 import * as $test_test_image from "./routes/test/test-image.ts";
+import * as $tools_src101_action_ from "./routes/tools/src101/[action].tsx";
+import * as $tools_src20_action_ from "./routes/tools/src20/[action].tsx";
+import * as $tools_src20_src20RedirectWIP from "./routes/tools/src20/src20RedirectWIP.tsx";
+import * as $tools_stamp_stamp from "./routes/tools/stamp/stamp.tsx";
+import * as $tools_stamp_trade_index from "./routes/tools/stamp/trade.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
@@ -157,8 +157,8 @@ import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
 import * as $charts_HoldersPieChart from "./islands/charts/HoldersPieChart.tsx";
-import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
 import * as $collection_ArtistSection from "./islands/collection/ArtistSection.tsx";
+import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
 import * as $collection_artist_ArtistCollectionWIP from "./islands/collection/artist/ArtistCollectionWIP.tsx";
 import * as $collection_artist_CollectionCreateButtonWIP from "./islands/collection/artist/CollectionCreateButtonWIP.tsx";
 import * as $collection_artist_CollectionOverviewArtistContentWIP from "./islands/collection/artist/CollectionOverviewArtistContentWIP.tsx";
@@ -208,8 +208,6 @@ import * as $src20_cards_SRC20TokenOutmintedCard from "./islands/src20/cards/SRC
 import * as $src20_details_SRC20HolderTable from "./islands/src20/details/SRC20HolderTable.tsx";
 import * as $src20_details_SRC20TickHeader from "./islands/src20/details/SRC20TickHeader.tsx";
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
-import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
-import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
 import * as $stamp_StampSection from "./islands/stamp/StampSection.tsx";
 import * as $stamp_details_RecentSales from "./islands/stamp/details/RecentSales.tsx";
@@ -219,6 +217,9 @@ import * as $stamp_details_StampImage from "./islands/stamp/details/StampImage.t
 import * as $stamp_details_StampImageFullScreen from "./islands/stamp/details/StampImageFullScreen.tsx";
 import * as $stamp_details_StampInfo from "./islands/stamp/details/StampInfo.tsx";
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
+import * as $stamp_index from "./islands/stamp/index.ts";
+import * as $stamp_overview_StampContent from "./islands/stamp/overview/StampContent.tsx";
+import * as $stamp_overview_StampHeader from "./islands/stamp/overview/StampHeader.tsx";
 import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
 import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
 import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
@@ -377,18 +378,18 @@ const manifest = {
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/src20/[tick].tsx": $src20_tick_,
     "./routes/src20/index.tsx": $src20_index,
-    "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/art.tsx": $stamp_art,
-    "./routes/stamp/index.tsx": $stamp_index,
+    "./routes/stamp/details/[id].tsx": $stamp_details_id_,
+    "./routes/stamp/overview/index.tsx": $stamp_overview_index,
     "./routes/stamp/posh.tsx": $stamp_posh,
-    "./routes/stamp/trade.tsx": $stamp_trade,
-    "./routes/stamping/src101/[action].tsx": $stamping_src101_action_,
-    "./routes/stamping/src20.tsx": $stamping_src20,
-    "./routes/stamping/src20/[action].tsx": $stamping_src20_action_,
-    "./routes/stamping/stamp.tsx": $stamping_stamp,
     "./routes/termsofservice/index.tsx": $termsofservice_index,
     "./routes/test/design-system.tsx": $test_design_system,
     "./routes/test/test-image.ts": $test_test_image,
+    "./routes/tools/src101/[action].tsx": $tools_src101_action_,
+    "./routes/tools/src20/[action].tsx": $tools_src20_action_,
+    "./routes/tools/src20/src20RedirectWIP.tsx": $tools_src20_src20RedirectWIP,
+    "./routes/tools/stamp/stamp.tsx": $tools_stamp_stamp,
+    "./routes/tools/stamp/trade/index.tsx": $tools_stamp_trade_index,
     "./routes/upload/index.tsx": $upload_index,
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
@@ -434,8 +435,8 @@ const manifest = {
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
     "./islands/charts/HoldersPieChart.tsx": $charts_HoldersPieChart,
-    "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
     "./islands/collection/ArtistSection.tsx": $collection_ArtistSection,
+    "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
     "./islands/collection/artist/ArtistCollectionWIP.tsx":
       $collection_artist_ArtistCollectionWIP,
     "./islands/collection/artist/CollectionCreateButtonWIP.tsx":
@@ -495,8 +496,6 @@ const manifest = {
     "./islands/src20/details/SRC20TickHeader.tsx":
       $src20_details_SRC20TickHeader,
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
-    "./islands/stamp/StampContent.tsx": $stamp_StampContent,
-    "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
     "./islands/stamp/StampSection.tsx": $stamp_StampSection,
     "./islands/stamp/details/RecentSales.tsx": $stamp_details_RecentSales,
@@ -508,6 +507,9 @@ const manifest = {
     "./islands/stamp/details/StampInfo.tsx": $stamp_details_StampInfo,
     "./islands/stamp/details/StampTextContent.tsx":
       $stamp_details_StampTextContent,
+    "./islands/stamp/index.ts": $stamp_index,
+    "./islands/stamp/overview/StampContent.tsx": $stamp_overview_StampContent,
+    "./islands/stamp/overview/StampHeader.tsx": $stamp_overview_StampHeader,
     "./islands/stamping/InputField.tsx": $stamping_InputField,
     "./islands/stamping/SelectField.tsx": $stamping_SelectField,
     "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,

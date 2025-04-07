@@ -2,7 +2,7 @@
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
 import { ArtistSection, CollectionOverviewHeader } from "$collection";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { StampContent } from "$islands/stamp/StampContent.tsx";
+import { StampContent } from "$stamp";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";

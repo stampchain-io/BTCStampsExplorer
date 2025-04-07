@@ -26,9 +26,9 @@ export default function FairmintPage({ data }: PageProps<FairmintPageProps>) {
         <title>Fairmint Tokens</title>
       </Head>
       <div className="flex flex-col items-center gap-8">
-        <p className="text-5xl tablet:text-5xl tablet:text-6xl font-black purple-gradient bg-clip-text text-transparent">
+        <h4 className="text-4xl tablet:text-5xl font-black purple-gradient bg-clip-text text-transparent">
           Fairmint Tokens
-        </p>
+        </h4>
         <FairmintContent fairminters={data.fairminters} />
       </div>
     </>

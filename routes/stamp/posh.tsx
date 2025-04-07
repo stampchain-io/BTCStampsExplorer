@@ -1,6 +1,8 @@
+/* ===== POSH REDIRECT ROUTE ===== */
 import { Handlers } from "$fresh/server.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
   GET(req) {
     const originalUrl = new URL(req.url);
@@ -12,8 +14,8 @@ export const handler: Handlers = {
   },
 };
 
+/* ===== PAGE COMPONENT ===== */
 export default function PoshRedirect() {
-  // During the GET request, user is immediately redirected.
-  // No actual UI for this page.
+  /* ===== RENDER ===== */
   return null;
 }
