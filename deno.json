@@ -133,7 +133,7 @@
     "$notifications": "./components/notifications/index.ts",
     "$stamp": "./islands/stamp/index.ts",
     "$src20": "./islands/src20/index.ts",
-    "$collection": "./components/collection/index.ts",
+    "$collection": "./islands/collection/index.ts",
     "$howto": "./components/howto/index.ts",
     "$faq": "./components/faq/index.ts",
     "$tool": "./islands/tool/index.ts"

@@ -1,11 +1,12 @@
-/* TODO @baba: Refactor the page and create island components for each section  - similar to About page */
 /* ===== MEDIA PAGE ===== */
+/* TODO @baba: Refactor the page and create island components for each section  - similar to About page */
 import { body, gapGrid, gapSection } from "$layout";
 import { Button } from "$buttons";
 import { headingGreyLDLink, subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
 export default function Media() {
+  /* ===== RENDER ===== */
   return (
     <div className={`${body} ${gapSection}`}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}

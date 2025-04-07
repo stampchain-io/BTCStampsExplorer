@@ -1,3 +1,4 @@
+/* ===== WALLET PAGE ===== */
 import { Handlers } from "$fresh/server.ts";
 
 import WalletHeader from "$islands/Wallet/details/WalletHeader.tsx";

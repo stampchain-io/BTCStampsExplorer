@@ -40,7 +40,7 @@ export const handler: Handlers = {
 
       return await ctx.render(body);
     } catch (error) {
-      console.error("Error in SRC20 tick page:", error);
+      console.error("Error in SRC20 detail page:", error);
       if ((error as Error).message?.includes("not found")) {
         return ctx.renderNotFound();
       }

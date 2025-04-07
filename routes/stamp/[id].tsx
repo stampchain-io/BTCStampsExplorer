@@ -1,4 +1,5 @@
 /* ===== STAMP DETAIL PAGE ===== */
+/*@baba-365+390*/
 import { StampRow } from "$globals";
 import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
@@ -361,7 +362,7 @@ export default function StampPage(props: StampDetailPageProps) {
       </Head>
 
       <div class={body}>
-        <div class="grid grid-cols-1 min-[880px]:grid-cols-2 desktop:grid-cols-3 gap-3 mobileMd:gap-6">
+        <div class="grid grid-cols-1 min-[880px]:grid-cols-2 desktop:grid-cols-3 gap-6">
           <div class="desktop:col-span-1">
             <StampImage
               stamp={stamp}

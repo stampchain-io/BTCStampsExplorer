@@ -82,9 +82,9 @@ import * as $api_v2_trx_stampdetach from "./routes/api/v2/trx/stampdetach.ts";
 import * as $api_v2_trx_utxoquery from "./routes/api/v2/trx/utxoquery.ts";
 import * as $api_v2_utxo_ancestors_address_ from "./routes/api/v2/utxo/ancestors/[address].ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
-import * as $collection_details_id_ from "./routes/collection/details/[id].tsx";
-import * as $collection_landingpage_index from "./routes/collection/landingpage/index.tsx";
-import * as $collection_overview_overview_ from "./routes/collection/overview/[overview].tsx";
+import * as $collection_id_ from "./routes/collection/[id].tsx";
+import * as $collection_overview_ from "./routes/collection/[overview].tsx";
+import * as $collection_index from "./routes/collection/index.tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $dashboard_address_ from "./routes/dashboard/[address].tsx";
@@ -109,11 +109,11 @@ import * as $index from "./routes/index.tsx";
 import * as $media_index from "./routes/media/index.tsx";
 import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
-import * as $src20_detail_tick_ from "./routes/src20/detail/[tick].tsx";
-import * as $src20_overview_index from "./routes/src20/overview/index.tsx";
+import * as $src20_tick_ from "./routes/src20/[tick].tsx";
+import * as $src20_index from "./routes/src20/index.tsx";
+import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_art from "./routes/stamp/art.tsx";
-import * as $stamp_detail_id_ from "./routes/stamp/detail/[id].tsx";
-import * as $stamp_overview_index from "./routes/stamp/overview/index.tsx";
+import * as $stamp_index from "./routes/stamp/index.tsx";
 import * as $stamp_posh from "./routes/stamp/posh.tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
 import * as $test_design_system from "./routes/test/design-system.tsx";
@@ -164,6 +164,7 @@ import * as $collection_artist_CollectionCreateButtonWIP from "./islands/collect
 import * as $collection_artist_CollectionOverviewArtistContentWIP from "./islands/collection/artist/CollectionOverviewArtistContentWIP.tsx";
 import * as $collection_details_CollectionDetailsContent from "./islands/collection/details/CollectionDetailsContent.tsx";
 import * as $collection_details_CollectionDetailsHeader from "./islands/collection/details/CollectionDetailsHeader.tsx";
+import * as $collection_index_1 from "./islands/collection/index.ts";
 import * as $collection_overview_CollectionOverviewHeader from "./islands/collection/overview/CollectionOverviewHeader.tsx";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
@@ -205,7 +206,7 @@ import * as $src20_cards_SRC20TokenMintingCard from "./islands/src20/cards/SRC20
 import * as $src20_cards_SRC20TokenOutmintedCard from "./islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 import * as $src20_detail_SRC20HolderTable from "./islands/src20/detail/SRC20HolderTable.tsx";
 import * as $src20_detail_SRC20TickHeader from "./islands/src20/detail/SRC20TickHeader.tsx";
-import * as $src20_index from "./islands/src20/index.ts";
+import * as $src20_index_1 from "./islands/src20/index.ts";
 import * as $src20_overview_SRC20Header from "./islands/src20/overview/SRC20Header.tsx";
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
@@ -217,7 +218,7 @@ import * as $stamp_detail_StampImage from "./islands/stamp/detail/StampImage.tsx
 import * as $stamp_detail_StampImageFullScreen from "./islands/stamp/detail/StampImageFullScreen.tsx";
 import * as $stamp_detail_StampInfo from "./islands/stamp/detail/StampInfo.tsx";
 import * as $stamp_detail_StampTextContent from "./islands/stamp/detail/StampTextContent.tsx";
-import * as $stamp_index from "./islands/stamp/index.ts";
+import * as $stamp_index_1 from "./islands/stamp/index.ts";
 import * as $stamp_overview_StampContent from "./islands/stamp/overview/StampContent.tsx";
 import * as $stamp_overview_StampHeader from "./islands/stamp/overview/StampHeader.tsx";
 import * as $test_ReviewDogTest from "./islands/test/ReviewDogTest.tsx";
@@ -347,10 +348,9 @@ const manifest = {
     "./routes/api/v2/utxo/ancestors/[address].ts":
       $api_v2_utxo_ancestors_address_,
     "./routes/api/v2/version.ts": $api_v2_version,
-    "./routes/collection/details/[id].tsx": $collection_details_id_,
-    "./routes/collection/landingpage/index.tsx": $collection_landingpage_index,
-    "./routes/collection/overview/[overview].tsx":
-      $collection_overview_overview_,
+    "./routes/collection/[id].tsx": $collection_id_,
+    "./routes/collection/[overview].tsx": $collection_overview_,
+    "./routes/collection/index.tsx": $collection_index,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/dashboard/[address].tsx": $dashboard_address_,
@@ -377,11 +377,11 @@ const manifest = {
     "./routes/media/index.tsx": $media_index,
     "./routes/presskit/index.tsx": $presskit_index,
     "./routes/s/[...id].tsx": $s_id_,
-    "./routes/src20/detail/[tick].tsx": $src20_detail_tick_,
-    "./routes/src20/overview/index.tsx": $src20_overview_index,
+    "./routes/src20/[tick].tsx": $src20_tick_,
+    "./routes/src20/index.tsx": $src20_index,
+    "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/art.tsx": $stamp_art,
-    "./routes/stamp/detail/[id].tsx": $stamp_detail_id_,
-    "./routes/stamp/overview/index.tsx": $stamp_overview_index,
+    "./routes/stamp/index.tsx": $stamp_index,
     "./routes/stamp/posh.tsx": $stamp_posh,
     "./routes/termsofservice/index.tsx": $termsofservice_index,
     "./routes/test/design-system.tsx": $test_design_system,
@@ -449,6 +449,7 @@ const manifest = {
       $collection_details_CollectionDetailsContent,
     "./islands/collection/details/CollectionDetailsHeader.tsx":
       $collection_details_CollectionDetailsHeader,
+    "./islands/collection/index.ts": $collection_index_1,
     "./islands/collection/overview/CollectionOverviewHeader.tsx":
       $collection_overview_CollectionOverviewHeader,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
@@ -494,7 +495,7 @@ const manifest = {
     "./islands/src20/detail/SRC20HolderTable.tsx":
       $src20_detail_SRC20HolderTable,
     "./islands/src20/detail/SRC20TickHeader.tsx": $src20_detail_SRC20TickHeader,
-    "./islands/src20/index.ts": $src20_index,
+    "./islands/src20/index.ts": $src20_index_1,
     "./islands/src20/overview/SRC20Header.tsx": $src20_overview_SRC20Header,
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
@@ -508,7 +509,7 @@ const manifest = {
     "./islands/stamp/detail/StampInfo.tsx": $stamp_detail_StampInfo,
     "./islands/stamp/detail/StampTextContent.tsx":
       $stamp_detail_StampTextContent,
-    "./islands/stamp/index.ts": $stamp_index,
+    "./islands/stamp/index.ts": $stamp_index_1,
     "./islands/stamp/overview/StampContent.tsx": $stamp_overview_StampContent,
     "./islands/stamp/overview/StampHeader.tsx": $stamp_overview_StampHeader,
     "./islands/test/ReviewDogTest.tsx": $test_ReviewDogTest,
