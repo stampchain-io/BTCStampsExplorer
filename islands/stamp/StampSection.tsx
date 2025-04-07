@@ -2,13 +2,13 @@
 /* TODO (@baba) - move to galleries, update styling and refactor into a base slideshow component*/
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { ViewAllButton } from "$components/buttons/ViewAllButton.tsx";
+import { ViewAllButton } from "$buttons";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { StampRow, StampSectionProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+import { StampSearchClient } from "$stamp";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
 

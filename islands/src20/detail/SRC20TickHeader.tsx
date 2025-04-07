@@ -10,7 +10,7 @@ import {
   formatDate,
   formatNumber,
 } from "$lib/utils/formatUtils.ts";
-import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
+import { SRC20SearchClient } from "$src20";
 
 export interface SRC20TickHeaderProps {
   deployment: Deployment & {
@@ -90,7 +90,7 @@ export function SRC20TickHeader({
   _align,
 }: SRC20TickHeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  console.log("market===>", marketInfo)
+  console.log("market===>", marketInfo);
   const tickValue = deployment.tick
     ? (() => {
       console.log("Original tick:", deployment.tick);

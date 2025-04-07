@@ -1,16 +1,18 @@
+/* ===== SRC20 OVERVIEW PAGE ===== */
 import { Handlers } from "$fresh/server.ts";
-import { SRC20TrxRequestParams } from "$globals";
-import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
-import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
+import { SRC20Header, SRC20Section } from "$src20";
 
+/* ===== HELPERS ===== */
 const getNumericParam = (url: URL, param: string, defaultValue: number) =>
   Number(url.searchParams.get(param)) || defaultValue;
 
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
     try {
+      /* ===== QUERY PARAMETERS ===== */
       const url = new URL(req.url);
       const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
       const sortBy = url.searchParams.get("sortBy") || "ASC";
@@ -18,6 +20,7 @@ export const handler: Handlers = {
       const page = Number(url.searchParams.get("page")) || 1;
       const limit = Number(url.searchParams.get("limit")) || 11;
 
+      /* ===== DATA FETCHING ===== */
       if (selectedTab === "trending") {
         const transactionCount = getNumericParam(url, "transactionCount", 1000);
         const trendingData = await Src20Controller
@@ -42,6 +45,7 @@ export const handler: Handlers = {
       const excludeFullyMinted = selectedTab === "minting";
       const onlyFullyMinted = !excludeFullyMinted;
 
+      // Extract market and date filters from URL parameters
       const marketFilters = [
         "minMarketCap",
         "maxMarketCap",
@@ -97,6 +101,7 @@ export const handler: Handlers = {
         throw new Error("Expected paginated response");
       }
 
+      /* ===== RESPONSE FORMATTING ===== */
       const src20Data = resultData.data.map((item) => ({
         ...item,
         floor_unit_price: marketInfo.find((m) =>
@@ -121,6 +126,7 @@ export const handler: Handlers = {
   },
 };
 
+/* ===== PAGE COMPONENT ===== */
 export default function SRC20Page({ data }: any) {
   console.log("data=====>", data);
   if (!data || !data.src20s) {
@@ -137,6 +143,7 @@ export default function SRC20Page({ data }: any) {
     selectedTab = "all",
   } = data;
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col gap-9 mobileLg:gap-[72px]">
       <SRC20Header

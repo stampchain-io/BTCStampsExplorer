@@ -1,4 +1,4 @@
-/* ===== STAMP DETAILS PAGE ===== */
+/* ===== STAMP DETAIL PAGE ===== */
 import { StampRow } from "$globals";
 import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";

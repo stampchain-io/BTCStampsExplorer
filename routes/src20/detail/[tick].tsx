@@ -1,13 +1,16 @@
+/* ===== SRC20 DETAIL PAGE ===== */
 import { Handlers } from "$fresh/server.ts";
-import { SRC20TickHeader } from "$islands/src20/detail/SRC20TickHeader.tsx";
-import Table from "$islands/shared/Tables.tsx";
-import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
 import { SRC20TickPageData } from "$lib/types/src20.d.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { SRC20TickHeader } from "$src20";
+import Table from "$islands/shared/Tables.tsx";
+import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
 
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
   async GET(_req, ctx) {
     try {
+      /* ===== TOKEN IDENTIFICATION ===== */
       const rawTick = ctx.params.tick;
       const decodedTick = decodeURIComponent(rawTick);
       const encodedTick = encodeURIComponent(rawTick);
@@ -16,6 +19,7 @@ export const handler: Handlers = {
       const url = new URL(_req.url);
       const baseUrl = `${url.protocol}//${url.host}`;
 
+      /* ===== DATA FETCHING ===== */
       const [body, transferCount, mintCount] = await Promise.all([
         Src20Controller.fetchSrc20TickPageData(decodedTick),
         fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`)
@@ -28,6 +32,7 @@ export const handler: Handlers = {
         return ctx.renderNotFound();
       }
 
+      /* ===== RESPONSE FORMATTING ===== */
       body.initialCounts = {
         transfers: transferCount.total || 0,
         mints: mintCount.total || 0,
@@ -46,11 +51,14 @@ export const handler: Handlers = {
   },
 };
 
+/* ===== TYPES ===== */
 interface SRC20TickPageProps {
   data: SRC20TickPageData | { error: string };
 }
 
+/* ===== PAGE COMPONENT ===== */
 function SRC20TickPage(props: SRC20TickPageProps) {
+  /* ===== ERROR HANDLING ===== */
   if ("error" in props.data) {
     return (
       <div class="text-center text-red-500">
@@ -70,11 +78,13 @@ function SRC20TickPage(props: SRC20TickPageProps) {
 
   const tick = deployment.tick;
 
+  /* ===== TABLE CONFIGURATION ===== */
   const tableConfigs = [
     { id: "mints", label: "MINTS" },
     { id: "transfers", label: "TRANSFERS" },
   ];
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col gap-6">
       <SRC20TickHeader

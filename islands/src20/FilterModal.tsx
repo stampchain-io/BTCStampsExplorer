@@ -1,4 +1,5 @@
 // deno-lint-ignore-file
+/* TODO (@baba) - move to modals upon filter update */
 import { useState } from "preact/hooks";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { InputField } from "$forms";
@@ -9,7 +10,7 @@ import {
   STAMP_FILTER_TYPES,
   WALLET_FILTER_TYPES,
 } from "$globals";
-import { Button } from "../../components/buttons/ButtonOLD.tsx";
+import { Button } from "$components/buttons/ButtonOLD.tsx";
 import DatePicker from "$islands/DateRangePicker.tsx";
 
 type FilterTypes =
