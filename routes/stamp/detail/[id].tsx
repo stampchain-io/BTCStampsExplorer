@@ -274,8 +274,6 @@ export default function StampPage(props: StampDetailPageProps) {
     ? `Bitcoin Stamp #${stamp.stamp} - ${stamp.name || "Unprunable UTXO Art"}`
     : "Bitcoin Stamp - Unprunable UTXO Art";
 
-  const bodyClassName = "flex flex-col gap-6";
-
   /* ===== SECTION CONFIGURATION ===== */
   const latestStampsSection = {
     title: "LATEST STAMPS",

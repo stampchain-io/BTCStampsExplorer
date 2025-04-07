@@ -7,7 +7,7 @@ import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
 import { PartnersModule } from "$islands/modules/Partners.tsx";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
-import { RecentSales } from "$islands/stamp/details/RecentSales.tsx";
+import { RecentSales } from "$islands/stamp/detail/RecentSales.tsx";
 import { HomeCarousel } from "$components/home/HomeCarousel.tsx";
 import { StampController } from "$server/controller/stampController.ts";
 import { Micro5FontLoader } from "$islands/home/FontLoader.tsx";

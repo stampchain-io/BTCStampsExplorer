@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
-import StampImage from "$islands/stamp/details/StampImage.tsx";
+import StampImage from "$islands/stamp/detail/StampImage.tsx";
 import {
   backgroundContainer,
   buttonPurpleFlat,
@@ -11,7 +11,7 @@ import {
   tooltipIcon,
 } from "$components/shared/WalletStyles.ts";
 import { StampRow } from "$globals";
-import StampBuyModal from "$islands/stamp/details/StampBuyModal.tsx";
+import StampBuyModal from "$islands/stamp/detail/StampBuyModal.tsx";
 import { StatItem, StatTitle } from "$components/shared/WalletComponents.tsx";
 
 interface WalletDispenserDetailsProps {

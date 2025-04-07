@@ -7,9 +7,9 @@ import {
   validateStampContent,
 } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
-import StampCodeModal from "$islands/stamp/details/StampCodeModal.tsx";
-import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
+import TextContentIsland from "$islands/stamp/detail/StampTextContent.tsx";
+import StampCodeModal from "$islands/stamp/detail/StampCodeModal.tsx";
+import StampImageFullScreen from "$islands/stamp/detail/StampImageFullScreen.tsx";
 import { logger } from "$lib/utils/logger.ts";
 
 function RightPanel(

@@ -1,5 +1,6 @@
+/* ===== STAMP INFO COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
-import StampBuyModal from "./StampBuyModal.tsx";
+import StampBuyModal from "$islands/stamp/detail/StampBuyModal.tsx";
 import {
   abbreviateAddress,
   formatBTCAmount,

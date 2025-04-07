@@ -1,7 +1,7 @@
-// islands/stamp/details/StampBuyModal.tsx
+/* ===== STAMP BUY MODAL COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import type { StampRow } from "$globals";
-import StampImage from "$islands/stamp/details/StampImage.tsx";
+import StampImage from "$islands/stamp/detail/StampImage.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";

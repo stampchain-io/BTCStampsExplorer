@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { SRC20TickHeader } from "$islands/src20/details/SRC20TickHeader.tsx";
+import { SRC20TickHeader } from "$islands/src20/detail/SRC20TickHeader.tsx";
 import Table from "$islands/shared/Tables.tsx";
 import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
 import { SRC20TickPageData } from "$lib/types/src20.d.ts";

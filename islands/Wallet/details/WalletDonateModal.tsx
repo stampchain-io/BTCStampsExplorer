@@ -1,6 +1,7 @@
+/* ===== WALLET DONATE MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { StampRow } from "$globals";
-import StampImage from "$islands/stamp/details/StampImage.tsx";
+import StampImage from "$islands/stamp/detail/StampImage.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";

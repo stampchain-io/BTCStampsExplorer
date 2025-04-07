@@ -5,7 +5,6 @@ import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 
-
 const getNumericParam = (url: URL, param: string, defaultValue: number) =>
   Number(url.searchParams.get(param)) || defaultValue;
 
@@ -38,15 +37,27 @@ export const handler: Handlers = {
           sortBy,
           selectedTab,
         });
-      } 
+      }
 
       const excludeFullyMinted = selectedTab === "minting";
       const onlyFullyMinted = !excludeFullyMinted;
 
       const marketFilters = [
-        "minMarketCap", "maxMarketCap", "minVolume", "maxVolume", "minPrice",
-        "maxPrice", "minHolder", "maxHolder", "minSupply", "maxSupply",
-        "minTxCount", "maxTxCount", "minProgress", "maxProgress", "trendingDate",
+        "minMarketCap",
+        "maxMarketCap",
+        "minVolume",
+        "maxVolume",
+        "minPrice",
+        "maxPrice",
+        "minHolder",
+        "maxHolder",
+        "minSupply",
+        "maxSupply",
+        "minTxCount",
+        "maxTxCount",
+        "minProgress",
+        "maxProgress",
+        "trendingDate",
       ].reduce((acc, key) => {
         const value = url.searchParams.get(key);
         if (value) acc[key] = Number(value);
@@ -60,29 +71,48 @@ export const handler: Handlers = {
       }, {} as Record<string, string>);
 
       const hasMarketFilters = Object.keys(marketFilters).length > 0;
-      const marketInfo = await SRC20Service.MarketService.fetchMarketListingSummary();
+      const marketInfo = await SRC20Service.MarketService
+        .fetchMarketListingSummary();
 
-      const resultData = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
-        { op: "DEPLOY", page, limit, sortBy, filterBy, ...marketFilters, ...dateFilters },
-        { excludeFullyMinted, onlyFullyMinted, includeMarketData: onlyFullyMinted || hasMarketFilters, enrichWithProgress: true }
-      );
+      const resultData = await SRC20Service.QueryService
+        .fetchAndFormatSrc20DataV2(
+          {
+            op: "DEPLOY",
+            page,
+            limit,
+            sortBy,
+            filterBy,
+            ...marketFilters,
+            ...dateFilters,
+          },
+          {
+            excludeFullyMinted,
+            onlyFullyMinted,
+            includeMarketData: onlyFullyMinted || hasMarketFilters,
+            enrichWithProgress: true,
+          },
+        );
 
-      if (!("total" in resultData)) throw new Error("Expected paginated response");
+      if (!("total" in resultData)) {
+        throw new Error("Expected paginated response");
+      }
 
       const src20Data = resultData.data.map((item) => ({
         ...item,
-        floor_unit_price: marketInfo.find(m => m.tick.toLowerCase() === item.tick.toLowerCase())?.floor_unit_price || null,
+        floor_unit_price: marketInfo.find((m) =>
+          m.tick.toLowerCase() === item.tick.toLowerCase()
+        )?.floor_unit_price || null,
       }));
 
       return ctx.render({
-          src20s: src20Data,
-          total: resultData.total,
-          page: resultData.page,
-          totalPages: resultData.totalPages,
-          limit: resultData.limit || limit,
-          filterBy,
-          sortBy,
-          selectedTab,
+        src20s: src20Data,
+        total: resultData.total,
+        page: resultData.page,
+        totalPages: resultData.totalPages,
+        limit: resultData.limit || limit,
+        filterBy,
+        sortBy,
+        selectedTab,
       });
     } catch (error) {
       console.error(error);
@@ -92,7 +122,7 @@ export const handler: Handlers = {
 };
 
 export default function SRC20Page({ data }: any) {
-  console.log("data=====>", data)
+  console.log("data=====>", data);
   if (!data || !data.src20s) {
     return <div>Error: No data received</div>;
   }

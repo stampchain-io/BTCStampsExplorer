@@ -1,6 +1,6 @@
 import { useEffect } from "preact/hooks";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
-import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
+import TextContentIsland from "$islands/stamp/detail/StampTextContent.tsx";
 
 interface StampImageFullScreenProps {
   src: string | File;
