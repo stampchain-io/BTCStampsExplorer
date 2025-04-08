@@ -1,6 +1,6 @@
 import { ComponentChildren } from "preact";
 import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
-import { WalletProviderBase } from "$islands/Wallet/WalletProviderBase.tsx";
+import { WalletProviderBase } from "$islands/modal/WalletProviderBase.tsx";
 import { showConnectWalletModal } from "$client/wallet/wallet.ts";
 
 interface Props {

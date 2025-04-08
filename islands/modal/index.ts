@@ -5,6 +5,6 @@ export * from "$islands/modal/BuyStampModal.tsx";
 export * from "$islands/modal/SendBTCModal.tsx";
 export * from "$islands/modal/RecieveAddyModal.tsx";
 export * from "$islands/modal/DonateStampModal.tsx";
-export * from "$islands/modal/DetailModal.tsx";
+export * from "$islands/modal/DetailSRC101Modal.tsx";
 /*{ default as PreviewImageModal }*/
 /* export * from "$islands/modal/SendStampModalWIP.tsx"; */

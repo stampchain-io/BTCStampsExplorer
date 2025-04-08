@@ -20,13 +20,13 @@ type FilterTypes =
   | COLLECTION_FILTER_TYPES
   | LISTING_FILTER_TYPES;
 
-interface FilterModalPropTypes {
+interface FilterSRC20ModalPropTypes {
   handleCloseModal: () => void;
   filterOptions: FilterTypes;
 }
 
-const FilterModal = (
-  { handleCloseModal, filterOptions }: FilterModalPropTypes,
+const FilterSRC20Modal = (
+  { handleCloseModal, filterOptions }: FilterSRC20ModalPropTypes,
 ) => {
   const [title, setTitle] = useState("");
   const [progress, setProgress] = useState({ min: "", max: "" });
@@ -322,4 +322,4 @@ const FilterModal = (
   );
 };
 
-export default FilterModal;
+export default FilterSRC20Modal;

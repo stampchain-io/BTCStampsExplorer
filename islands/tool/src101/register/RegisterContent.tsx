@@ -1,7 +1,7 @@
 /* ===== SRC101 BITNAME REGISTRATION COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-import DetailModal from "../../../modal/DetailModal.tsx";
+import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
@@ -299,7 +299,7 @@ export function RegisterBitnameContent({
       </div>
 
       {isOpen && modalData && (
-        <DetailModal
+        <DetailSRC101Modal
           handleClose={handleClose}
           name={modalData.tokenid_utf8}
           img={modalData.img}

@@ -8,7 +8,7 @@ import {
 } from "$client/wallet/wallet.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
-import { WalletProviderBase } from "$islands/Wallet/WalletProviderBase.tsx";
+import { WalletProviderBase } from "$islands/modal/WalletProviderBase.tsx";
 import { WalletProviderKey } from "$lib/utils/constants.ts";
 import AnimationLayout from "$components/shared/animation/AnimationLayout.tsx";
 import { Button } from "$buttons";

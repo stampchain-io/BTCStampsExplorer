@@ -5,7 +5,7 @@ import { SRC20_FILTER_TYPES } from "$globals";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { SRC20SearchClient } from "$src20";
-import FilterModal from "$islands/src20/FilterModal.tsx";
+import FilterSRC20Modal from "$islands/modal/FilterSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
 
 export const SRC20Header = (
@@ -81,7 +81,7 @@ export const SRC20Header = (
       </div>
       {openModal &&
         (
-          <FilterModal
+          <FilterSRC20Modal
             filterOptions={filterValue}
             handleCloseModal={handleCloseModal}
           />

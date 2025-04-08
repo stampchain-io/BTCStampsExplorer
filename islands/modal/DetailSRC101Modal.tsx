@@ -7,7 +7,7 @@ interface PropTypes {
   owner: string;
 }
 
-const DetailModal = ({ handleClose, img, name, owner }: PropTypes) => {
+const DetailSRC101Modal = ({ handleClose, img, name, owner }: PropTypes) => {
   return (
     <ModalLayout onClose={handleClose} title={`${name}.btc`}>
       <div class="flex flex-col justify-center gap-1">
@@ -29,4 +29,4 @@ const DetailModal = ({ handleClose, img, name, owner }: PropTypes) => {
   );
 };
 
-export default DetailModal;
+export default DetailSRC101Modal;
