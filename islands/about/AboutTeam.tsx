@@ -1,52 +1,67 @@
-import { TeamStyles } from "$islands/about/styles.ts";
+/* ===== ABOUT TEAM COMPONENT ===== */
+import { gapGrid } from "$layout";
+import { aboutSubTitlePurple, aboutTitlePurpleLD, subtitlePurple } from "$text";
 
+/* ===== COMPONENT ===== */
 export default function AboutTeam() {
+  /* ===== COMPONENT RENDER ===== */
   return (
     <>
       <section>
-        <div className="w-full flex justify-start items-start pt-6">
+        {/* ===== TEAM SECTION CONTAINER ===== */}
+        <div className="w-full flex justify-start items-start py-9">
           <div className="w-full">
-            <h2 className={TeamStyles.subTitlePurple}>
-              THE TEAM
-            </h2>
-            <div className="flex justify-between items-start mx-0 mobileLg:mx-12 desktop:mx-16 gap-3 mobileMd:gap-6 mt-3">
+            {/* ===== SECTION TITLE ===== */}
+            <h2 className={subtitlePurple}>THE TEAM</h2>
+
+            {/* ===== TEAM MEMBERS GRID ===== */}
+            <div
+              className={`flex justify-between items-start
+             mx-0 mobileLg:mx-12 desktop:mx-16 mt-4
+              ${gapGrid}`}
+            >
+              {/* ===== MIKE IN SPACE CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/code.png" />
-                <p className={TeamStyles.aboutTitlePurpleLD}>
+                <h5 className={aboutTitlePurpleLD}>
                   MIKE IN SPACE
-                </p>
-                <p className={TeamStyles.aboutSubTitlePurple}>
+                </h5>
+                <h6 className={aboutSubTitlePurple}>
                   CODE{" "}
                   <span className="mobileMd:hidden">
                     <br />
                   </span>
                   CONOISSEUR
-                </p>
+                </h6>
               </div>
+
+              {/* ===== REINAMORA CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/backend.png" />
-                <p className={TeamStyles.aboutTitlePurpleLD}>
+                <h5 className={aboutTitlePurpleLD}>
                   REINAMORA
-                </p>
-                <p className={TeamStyles.aboutSubTitlePurple}>
+                </h5>
+                <h6 className={aboutSubTitlePurple}>
                   BACKEND{" "}
                   <span className="mobileMd:hidden">
                     <br />
                   </span>
                   BIGBRAINS
-                </p>
+                </h6>
               </div>
+
+              {/* ===== ARWYN CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/memetic.png" />
-                <p className={TeamStyles.aboutTitlePurpleLD}>
+                <h5 className={aboutTitlePurpleLD}>
                   ARWYN
-                </p>
-                <p className={TeamStyles.aboutSubTitlePurple}>
+                </h5>
+                <h6 className={aboutSubTitlePurple}>
                   MEMETIC{" "}
                   <span className="mobileMd:hidden">
                     <br />
                   </span>MASTER
-                </p>
+                </h6>
               </div>
             </div>
           </div>

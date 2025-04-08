@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
+import { ScrollContainer } from "$layout";
 import {
   container,
   dataLabel,

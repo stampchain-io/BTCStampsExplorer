@@ -1,10 +1,12 @@
+/* ===== COLLECTION SECTION COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { Collection, CollectionSectionProps } from "$globals";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
-import { CollectionListCard } from "$components/collection/CollectionListCard.tsx";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { CollectionListCard } from "$collection";
+import { subtitleGrey, titleGreyLD } from "$text";
 
+/* ===== STATE ===== */
 export default function CollectionSection({
   title,
   subTitle,
@@ -15,7 +17,8 @@ export default function CollectionSection({
   const collectionArray = Array.isArray(collections) ? collections : [];
   const [displayCount, setDisplayCount] = useState(collectionArray.length);
   const { width } = useWindowSize();
-  // Handle display count updates
+
+  /* ===== EVENT HANDLERS ===== */
   useEffect(() => {
     const updateDisplayCount = () => {
       if (displayCounts) {
@@ -47,16 +50,18 @@ export default function CollectionSection({
     };
     updateDisplayCount();
   }, [width, displayCounts, collectionArray.length]);
+
+  /* ===== RENDER ===== */
   return (
     <div>
-      {title && <h1 class={ModulesStyles.titleGreyDL}>{title}</h1>}
+      {title && <h3 class={titleGreyLD}>{title}</h3>}
       {subTitle && (
-        <h2
-          class={ModulesStyles.subTitleGrey +
-            " mb-3 mobileMd:mb-6 desktop:mb-9"}
+        <h4
+          class={subtitleGrey +
+            "mb-6"}
         >
           {subTitle}
-        </h2>
+        </h4>
       )}
       <div class={gridClass}>
         {collectionArray.slice(0, displayCount).map((

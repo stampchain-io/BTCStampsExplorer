@@ -1,60 +1,78 @@
+/* TODO @REINAMORA:  Update the contact form to be able to send emails */
+/* ===== ABOUT CONTACT COMPONENT ===== */
 import { useState } from "preact/hooks";
-import { InputField } from "$islands/stamping/InputField.tsx";
-import { ContactStyles } from "$islands/about/styles.ts";
+import { InputField } from "$forms";
+import { ButtonProcessing } from "$buttons";
+import { subtitleGrey, text, titleGreyLD } from "$text";
+import { gapGrid, rowForm, rowResponsiveForm } from "$layout";
 
+/* ===== STATE ===== */
 const AboutContact = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [subject, setSubject] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: Event) => {
+  /* ===== EVENT HANDLERS ===== */
+  const handleSubmit = async (e: Event) => {
     e.preventDefault();
+    setIsSubmitting(true);
     setError(
       "Contact form is not setup properly - leave a message on Telegram instead",
     );
+    setIsSubmitting(false);
   };
 
+  /* ===== COMPONENT ===== */
   return (
     <>
       <section>
-        <div className="flex flex-col w-full mobileLg:w-1/2">
-          <h1 className={ContactStyles.titleGreyDL}>
+        {/* ===== HEADER SECTION ===== */}
+        <div className="flex flex-col">
+          <h1 className={titleGreyLD}>
             CONTACT
           </h1>
-          <h3 className={ContactStyles.subTitleGrey}>
+          <h3 className={subtitleGrey}>
             DROP US A MESSAGE
           </h3>
         </div>
-        <div className="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-          <div className="w-full mobileLg:w-1/2 space-y-3 mobileMd:space-y-6">
-            <p className={ContactStyles.bodyTextLight}>
+        {/* ===== CONTENT SECTION ===== */}
+        <div className={`flex flex-col mobileLg:flex-row ${gapGrid}`}>
+          {/* ===== DESCRIPTION TEXT ===== */}
+          <div className="w-full mobileLg:w-full">
+            <p className={text}>
               Reach out if you have any questions about stamps, our tooling and
-              services. <br />
-              <br />
+              services.
+            </p>
+            <p className={text}>
               Need guidance on deploying a community token or assistance with
-              stamping your future art project?<br />
+              stamping your future art project ?<br />
               Got ideas for a collaboration, improvements or protocol
-              integration? <br />
-              <br />
-              Send us a message -{" "}
+              integration ?
+            </p>
+            <p className={text}>
               <a
                 href="https://t.me/BitcoinStamps"
                 target="_blank"
                 className="animated-underline"
               >
-                or get in touch via Telegram
+                Get in touch via Telegram
               </a>{" "}
-              - and let's explore the infinite possibilities of stamps together!
+              - and let's explore the infinite possibilities of stamps together
+              !
             </p>
           </div>
-          <div className="w-full mobileLg:w-1/2 pt-3 mobileLg:pt-0">
+
+          {/* ===== CONTACT FORM ===== */}
+          <div className="hidden w-full mobileLg:w-1/2 pt-3 mobileLg:pt-0">
             <form
-              className="flex flex-col gap-3 mobileMd:gap-6 desktop:gap-9"
+              className="flex flex-col gap-6"
               onSubmit={handleSubmit}
             >
-              <div className={ContactStyles.inputField2col}>
+              {/* ===== NAME AND EMAIL FIELDS ===== */}
+              <div className={rowResponsiveForm}>
                 <InputField
                   type="text"
                   value={name}
@@ -68,7 +86,9 @@ const AboutContact = () => {
                   placeholder="Email"
                 />
               </div>
-              <div className={ContactStyles.inputField1col}>
+
+              {/* ===== SUBJECT FIELD ===== */}
+              <div className={rowForm}>
                 <InputField
                   type="text"
                   value={subject}
@@ -76,7 +96,9 @@ const AboutContact = () => {
                   placeholder="Subject"
                 />
               </div>
-              <div className={ContactStyles.inputField1col}>
+
+              {/* ===== MESSAGE FIELD ===== */}
+              <div className={rowForm}>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.currentTarget.value)}
@@ -84,14 +106,21 @@ const AboutContact = () => {
                   placeholder="Message"
                 />
               </div>
+
+              {/* ===== SUBMIT BUTTON ===== */}
               <div className="w-full flex justify-end">
-                <button
+                <ButtonProcessing
                   type="submit"
-                  className={ContactStyles.buttonGreyOutline}
+                  variant="outline"
+                  color="grey"
+                  size="lg"
+                  isSubmitting={isSubmitting}
                 >
                   SEND
-                </button>
+                </ButtonProcessing>
               </div>
+
+              {/* ===== ERROR MESSAGE ===== */}
               {error && <p className="text-red-500 mt-2">{error}</p>}
             </form>
           </div>

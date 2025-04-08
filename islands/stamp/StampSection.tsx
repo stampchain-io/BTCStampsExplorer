@@ -1,15 +1,17 @@
+/* ===== STAMP SECTION COMPONENT ===== */
+/* TODO (@baba) - move to galleries ??? - update styling and refactor into a base slideshow component*/
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
+import { ViewAllButton } from "$buttons";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { StampRow, StampSectionProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+import { StampSearchClient } from "$stamp";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
-
+import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
+/* ===== COMPONENT ===== */
 export default function StampSection({
   title,
   subTitle,
@@ -30,6 +32,7 @@ export default function StampSection({
   fromPage = "",
   sortBy = "ASC",
 }: StampSectionProps) {
+  /* ===== STATE ===== */
   const swiperRef = useRef<Swiper | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [displayCount, setDisplayCount] = useState(
@@ -39,11 +42,17 @@ export default function StampSection({
   const [isOpen1, setIsOpen1] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
 
+  /* ===== EVENT HANDLERS ===== */
   const handleOpen2 = (open: boolean) => {
     setIsOpen1(false);
     setIsOpen2(open);
   };
 
+  const handlePageChange = (page: number) => {
+    pagination?.onPageChange?.(page);
+  };
+
+  /* ===== DATA PROCESSING ===== */
   // Filter stamps based on filterBy prop if provided
   const filteredStamps = filterBy
     ? (stamps || []).filter((stamp) => {
@@ -74,7 +83,10 @@ export default function StampSection({
 
   // Apply layout-specific styling
   const containerClass = layout === "grid" ? gridClass : "flex flex-col gap-4"; // Row layout default styling
+  const seeAllLink = viewAllLink ||
+    (type === "all" ? "/stamp" : `/stamp?type=${type}`);
 
+  /* ===== EFFECTS ===== */
   // Update display count based on window width
   useEffect(() => {
     const handleResize = () => {
@@ -115,13 +127,7 @@ export default function StampSection({
     }
   }, [pagination?.page]);
 
-  const seeAllLink = viewAllLink ||
-    (type === "all" ? "/stamp" : `/stamp?type=${type}`);
-
-  const handlePageChange = (page: number) => {
-    pagination?.onPageChange?.(page);
-  };
-
+  // Initialize Swiper
   useEffect(() => {
     swiperRef.current = new Swiper(".swiper-container", {
       modules: [Navigation, Autoplay],
@@ -148,8 +154,10 @@ export default function StampSection({
     return () => swiperRef.current?.destroy();
   }, []);
 
+  /* ===== RENDER ===== */
   return (
     <div class="w-full">
+      {/* ===== SECTION HEADER ===== */}
       <div class="w-full flex justify-between items-center">
         <div class="flex flex-col w-full">
           {title && (
@@ -160,18 +168,14 @@ export default function StampSection({
             >
               <h1
                 class={`${
-                  alignRight
-                    ? ModulesStyles.titlePurpleDL
-                    : ModulesStyles.titlePurpleDL
+                  alignRight ? titlePurpleLD : titlePurpleDL
                 } tablet:hidden`}
               >
                 {title}
               </h1>
               <h1
                 class={`hidden tablet:block ${
-                  alignRight
-                    ? ModulesStyles.titlePurpleLD
-                    : ModulesStyles.titlePurpleDL
+                  alignRight ? titlePurpleLD : titlePurpleDL
                 }`}
               >
                 {title}
@@ -184,7 +188,7 @@ export default function StampSection({
                 alignRight && "tablet:items-end"
               }`}
             >
-              <h2 className={ModulesStyles.subTitlePurple}>
+              <h2 className={subtitlePurple}>
                 {subTitle}
               </h2>
             </div>
@@ -208,7 +212,10 @@ export default function StampSection({
           )}
       </div>
 
-      {((viewAllLink && viewAllLink !== "/stamp/art" && viewAllLink !== "/collection/overview/posh" && fromPage == "home") || fromPage === "stamp_detail")
+      {/* ===== STAMP CONTENT ===== */}
+      {((viewAllLink && viewAllLink !== "/stamp/art" &&
+          viewAllLink !== "/collection/overview/posh" && fromPage == "home") ||
+          fromPage === "stamp_detail")
         ? (
           <div class="swiper-container overflow-hidden">
             <div class="swiper-wrapper">
@@ -257,6 +264,7 @@ export default function StampSection({
           </div>
         )}
 
+      {/* ===== NAVIGATION CONTROLS ===== */}
       {viewAllLink && <ViewAllButton href={seeAllLink} />}
 
       {pagination && pagination.totalPages > 1 && (

@@ -1,28 +1,62 @@
-import { HowToLayout } from "$components/howto/HowToLayout.tsx";
-import { Step, StepProps } from "$components/howto/Step.tsx";
-import { TRANSFER_STAMP_IMPORTANT_NOTES, TRANSFER_STAMP_STEPS } from "$islands/datacontrol/howto.ts";
+/* ===== TRANSFER STAMP HOW-TO PAGE ===== */
+import {
+  Article,
+  AuthorSection,
+  List,
+  StepList,
+  TRANSFER_STAMP_IMPORTANT_NOTES,
+  TRANSFER_STAMP_STEPS,
+} from "$howto";
 
+/* ===== INTRODUCTION COMPONENT ===== */
+function IntroSection() {
+  return (
+    <div class="flex justify-between">
+      <div class="w-3/4">
+        <p>
+          A guide needs to be created for this.
+        </p>
+        <p>
+          NOTE: Before starting, please ensure that your wallet is connected to
+          stampchain.io and has sufficient funds.
+        </p>
+      </div>
+      <AuthorSection
+        name="TonyNL"
+        twitter="tonynlbtc"
+        website="https://linktr.ee/tonynl"
+      />
+    </div>
+  );
+}
+
+/* ===== STEPS COMPONENT ===== */
+function TransferSteps() {
+  return (
+    <StepList hasImportantNotes={TRANSFER_STAMP_IMPORTANT_NOTES?.length > 0}>
+      {TRANSFER_STAMP_STEPS.map((step) => (
+        <List
+          key={step.number}
+          title={step.title}
+          image={step.image}
+          description={step.description}
+        />
+      ))}
+    </StepList>
+  );
+}
+
+/* ===== MAIN PAGE COMPONENT ===== */
 export default function TransferStamp() {
   return (
-    <HowToLayout
+    <Article
       title="HOW-TO"
       subtitle="TRANSFER STAMPS"
       headerImage="/img/how-tos/stamping/00.png"
       importantNotes={TRANSFER_STAMP_IMPORTANT_NOTES}
     >
-      <p class="mb-6 mobileLg:mb-12">
-        TRANSFER YOUR STAMPS
-        <br />
-        <br />
-        NOTE: Before starting, please ensure that your wallet is connected to
-        stampchain.io and has sufficient funds.
-      </p>
-      <br />
-      <h2 class="text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-extralight text-stamp-grey-light">
-        <ul class="space-y-9 mobileLg:space-y-12">
-          {TRANSFER_STAMP_STEPS.map((step, index) => <Step key={index} {...step} />)}
-        </ul>
-      </h2>
-    </HowToLayout>
+      <IntroSection />
+      <TransferSteps />
+    </Article>
   );
 }

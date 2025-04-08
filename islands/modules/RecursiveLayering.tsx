@@ -1,14 +1,19 @@
-import { ModulesStyles } from "$islands/modules/Styles.ts";
+/* ===== RECURSIVE LAYERING MODULE COMPONENT ===== */
+import { Button } from "$buttons";
+import { subtitleGrey, text } from "$text";
 
+/* ===== COMPONENT ===== */
 export const RecursiveLayeringModule = () => {
+  /* ===== RENDER ===== */
   return (
     <>
+      {/* ===== CONTENT SECTION ===== */}
       <div class="flex flex-col mt-6 mobileLg:mt-12">
-        <h2 class={ModulesStyles.subTitleGrey}>
+        <h4 class={subtitleGrey}>
           RECURSIVE LAYERING
-        </h2>
+        </h4>
         <div
-          class={`grid grid-cols-1 tablet:grid-cols-2 gap-3 mobileLg:gap-6 ${ModulesStyles.bodyTextLight}`}
+          class={`grid grid-cols-1 tablet:grid-cols-2 gap-6 ${text}`}
         >
           <p>
             <b>
@@ -16,8 +21,9 @@ export const RecursiveLayeringModule = () => {
             </b>{" "}
             by leveraging multiple layers of data utilizing not just JSON, but
             also on-chain JS libraries to build complex recursion and on-chain
-            web applications.<br />
-            <br />
+            web applications.
+          </p>
+          <p>
             Its structure maximizes cost efficiency, making it suitable for
             larger, more detailed and animated art collections.
           </p>
@@ -31,13 +37,17 @@ export const RecursiveLayeringModule = () => {
           </p>
         </div>
       </div>
-      <a
+
+      {/* ===== BUTTON SECTION ===== */}
+      <Button
+        variant="outline"
+        color="grey"
+        size="lg"
         href="/about#contact"
-        f-partial="/about#contact"
-        class={`${ModulesStyles.buttonGreyOutline} float-right mt-3 mobileMd:mt-6`}
+        class="float-right mt-6"
       >
         CONTACT
-      </a>
+      </Button>
     </>
   );
 };

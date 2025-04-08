@@ -1,12 +1,16 @@
+/* ===== ABOUT PAGE ===== */
+import { body, gapSectionSlim } from "$layout";
 import AboutHeader from "$islands/about/AboutHeader.tsx";
 import AboutTeam from "$islands/about/AboutTeam.tsx";
 import { PartnersModule } from "$islands/modules/Partners.tsx";
 import AboutDonate from "$islands/about/AboutDonate.tsx";
 import AboutContact from "$islands/about/AboutContact.tsx";
 
+/* ===== PAGE COMPONENT ===== */
 export default function About() {
   return (
-    <div>
+    <div className={`${body} ${gapSectionSlim}`}>
+      {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
         alt="About Bitcoin Stamps and contact Stampchain"
@@ -24,23 +28,22 @@ export default function About() {
         "
       />
 
-      <div className="flex flex-col gap-12 mobileLg:gap-24">
-        <AboutHeader />
+      {/* ===== ABOUT SECTION ===== */}
+      <AboutHeader />
 
-        {/* Team */}
-        <AboutTeam />
+      {/* ===== TEAM SECTION ===== */}
+      <AboutTeam />
 
-        {/* Partners */}
-        <PartnersModule />
+      {/* ===== PARTNERS SECTION ===== */}
+      <PartnersModule />
 
-        {/* Donate */}
-        <div id="donate"></div>
-        <AboutDonate />
+      {/* ===== DONATE SECTION ===== */}
+      <div id="donate"></div>
+      <AboutDonate />
 
-        {/* Contact */}
-        <div id="contact"></div>
-        <AboutContact />
-      </div>
+      {/* ===== CONTACT SECTION ===== */}
+      <div id="contact"></div>
+      <AboutContact />
     </div>
   );
 }

@@ -1,28 +1,62 @@
-import { HowToLayout } from "$components/howto/HowToLayout.tsx";
-import { Step } from "$components/howto/Step.tsx";
-import { TRANSFER_TOKEN_IMPORTANT_NOTES, TRANSFER_TOKEN_STEPS } from "$islands/datacontrol/howto.ts";
+/* ===== TRANSFER TOKEN HOW-TO PAGE ===== */
+import {
+  Article,
+  AuthorSection,
+  List,
+  StepList,
+  TRANSFER_TOKEN_IMPORTANT_NOTES,
+  TRANSFER_TOKEN_STEPS,
+} from "$howto";
 
+/* ===== INTRODUCTION COMPONENT ===== */
+function IntroSection() {
+  return (
+    <div class="flex justify-between">
+      <div class="w-3/4">
+        <p>
+          TRANSFER YOUR TOKENS
+        </p>
+        <p>
+          NOTE: Before starting, please ensure that your wallet is connected to
+          stampchain.io and has sufficient funds.
+        </p>
+      </div>
+      <AuthorSection
+        name="TonyNL"
+        twitter="tonynlbtc"
+        website="https://linktr.ee/tonynl"
+      />
+    </div>
+  );
+}
+
+/* ===== STEPS COMPONENT ===== */
+function TransferSteps() {
+  return (
+    <StepList hasImportantNotes={TRANSFER_TOKEN_IMPORTANT_NOTES?.length > 0}>
+      {TRANSFER_TOKEN_STEPS.map((step) => (
+        <List
+          key={step.number}
+          title={step.title}
+          image={step.image}
+          description={step.description}
+        />
+      ))}
+    </StepList>
+  );
+}
+
+/* ===== MAIN PAGE COMPONENT ===== */
 export default function TransferToken() {
   return (
-    <HowToLayout
+    <Article
       title="HOW-TO"
       subtitle="TRANSFER TOKENS"
       headerImage="/img/how-tos/stamping/00.png"
       importantNotes={TRANSFER_TOKEN_IMPORTANT_NOTES}
     >
-      <p class="mb-6 mobileLg:mb-12">
-        TRANSFER YOUR TOKENS
-        <br />
-        <br />
-        NOTE: Before starting, please ensure that your wallet is connected to
-        stampchain.io and has sufficient funds.
-      </p>
-      <br />
-      <h2 class="text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-extralight text-stamp-grey-light">
-        <ul class="space-y-9 mobileLg:space-y-12">
-          {TRANSFER_TOKEN_STEPS.map((step, index) => <Step key={index} {...step} />)}
-        </ul>
-      </h2>
-    </HowToLayout>
+      <IntroSection />
+      <TransferSteps />
+    </Article>
   );
 }

@@ -1,23 +1,22 @@
+/* ===== COLLECTION LANDING PAGE ===== */
 import {
-  CollectionOverviewSectionProps,
   CollectionSectionProps,
   StampRow,
   StampSectionProps,
   SUBPROTOCOLS,
 } from "$globals";
 import { FreshContext, Handlers } from "$fresh/server.ts";
-
 import StampSection from "$islands/stamp/StampSection.tsx";
-import CollectionSection from "$islands/collection/CollectionSection.tsx";
-
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { RecursiveLayeringModule } from "$islands/modules/RecursiveLayering.tsx";
 import { NamedAssetsModule } from "$islands/modules/NamedAssets.tsx";
-import CollectionOverviewSection from "$islands/collection/CollectionOverviewSection.tsx";
+import { ArtistSection, CollectionSection } from "$collection";
 import { CollectionRow } from "$server/types/collection.d.ts";
+import { body, gapSection } from "$layout";
 
-type CollectionPageProps = {
+/* ===== TYPES ===== */
+type CollectionLandingPageProps = {
   data: {
     collections: CollectionRow[];
     total: number;
@@ -31,6 +30,7 @@ type CollectionPageProps = {
   };
 };
 
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
   async GET(req: Request, ctx: FreshContext) {
     try {
@@ -93,7 +93,8 @@ export const handler: Handlers = {
   },
 };
 
-export default function Collection(props: CollectionPageProps) {
+/* ===== PAGE COMPONENT ===== */
+export default function CollectionLanding(props: CollectionLandingPageProps) {
   const {
     collections,
     sortBy,
@@ -101,6 +102,7 @@ export default function Collection(props: CollectionPageProps) {
     stamps_posh = [],
   } = props.data;
 
+  /* ===== SECTION CONFIGURATIONS ===== */
   const CollectionsSection: StampSectionProps[] = [
     {
       title: "COLLECTIONS",
@@ -186,7 +188,7 @@ export default function Collection(props: CollectionPageProps) {
     },
   };
 
-  const PopularArtistSection: CollectionOverviewSectionProps = {
+  const PopularArtistSection: CollectionSectionProps = {
     title: "POPULAR ARTIST",
     subTitle: "COLLECTIONS",
     collections: collections,
@@ -202,8 +204,9 @@ export default function Collection(props: CollectionPageProps) {
     },
   };
 
+  /* ===== COMPONENT ===== */
   return (
-    <div class="text-stamp-grey-light flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
+    <div className={`${body} ${gapSection}`}>
       <StampSection
         fromPage="collection"
         sortBy={sortBy}
@@ -218,7 +221,7 @@ export default function Collection(props: CollectionPageProps) {
         <CollectionSection {...CuttingEdgeSection} />
         <RecursiveLayeringModule />
       </div>
-      <CollectionOverviewSection {...PopularArtistSection} />
+      <ArtistSection {...PopularArtistSection} />
     </div>
   );
 }

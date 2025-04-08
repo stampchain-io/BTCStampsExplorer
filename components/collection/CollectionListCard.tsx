@@ -1,6 +1,8 @@
+/* ===== COLLECTION LIST CARD COMPONENT ===== */
 import { Collection } from "$globals";
 import { useState } from "preact/hooks";
 
+/* ===== STYLES ===== */
 const containerClassName =
   `border-2 border-stamp-grey-darker rounded-md relative overflow-hidden
   w-full h-[92px] mobileMd:h-[116px] mobileLg:h-[130px] tablet:h-[148px] desktop:h-[160px]`;
@@ -13,16 +15,20 @@ const nameClassName = `hidden mobileLg:block
   absolute mobileLg:left-[14px] mobileLg:bottom-[9px] tablet:left-3 tablet:bottom-[6px] desktop:left-[18px] desktop:bottom-3
 `;
 
+/* ===== TYPES ===== */
 interface CollectionListCardProps {
   collection: Collection;
   isDarkMode: boolean;
 }
 
+/* ===== COMPONENT ===== */
 export function CollectionListCard(
   { collection, isDarkMode }: CollectionListCardProps,
 ) {
+  /* ===== STATE ===== */
   const [isHovered, setIsHovered] = useState(false);
 
+  /* ===== COMPONENT ===== */
   return (
     <a
       href={`/collection/details/${collection.collection_name}`}

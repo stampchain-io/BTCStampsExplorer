@@ -5,7 +5,6 @@ import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import WalletSendStampModal from "$islands/Wallet/details/WalletSendStampModal.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import { WalletContentProps } from "$types/wallet.d.ts";

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import WalletSendModal from "$islands/Wallet/details/WalletSendBTCModal.tsx";
-import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
+import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
+import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import {
@@ -716,7 +716,7 @@ export default function WalletDashboardDetails({
       </div>
 
       {isSendModalOpen && (
-        <WalletSendModal
+        <SendBTCModal
           fee={fee}
           balance={walletData.balance}
           handleChangeFee={setFee}
@@ -725,7 +725,7 @@ export default function WalletDashboardDetails({
       )}
 
       {isReceiveModalOpen && (
-        <WalletReceiveModal
+        <RecieveAddyModal
           onClose={() => setIsReceiveModalOpen(false)}
           address={walletData.address}
         />

@@ -1,6 +1,6 @@
 import { HoldersPieChart } from "$islands/charts/HoldersPieChart.tsx";
 import { dataLabel, dataValueXL } from "$components/shared/TableStyles.ts";
-import SRC20HolderTable from "$islands/src20/details/SRC20HolderTable.tsx";
+import SRC20HolderTable from "$islands/src20/detail/SRC20HolderTable.tsx";
 
 interface Holder {
   address: string | null;

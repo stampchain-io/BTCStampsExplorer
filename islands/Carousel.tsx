@@ -1,3 +1,4 @@
+/* TODO (@baba) - move to galleries, update styling */
 import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { StampRow } from "$globals";

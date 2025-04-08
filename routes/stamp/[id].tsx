@@ -1,23 +1,20 @@
+/* ===== STAMP DETAIL PAGE ===== */
+/*@baba-365+390*/
 import { StampRow } from "$globals";
-
 import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
-
-import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
-
-import { StampImage } from "$islands/stamp/details/StampImage.tsx";
-import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
-import StampSection from "$islands/stamp/StampSection.tsx";
-import Table from "$islands/shared/Tables.tsx";
-
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
-
 import { StampController } from "$server/controller/stampController.ts";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { DOMParser } from "dom";
+import { body } from "$layout";
+import { StampImage, StampInfo, StampSection } from "$stamp";
+import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
+import Table from "$islands/shared/Tables.tsx";
 
+/* ===== TYPES ===== */
 interface StampData {
   stamp: StampRow & { name?: string };
   total: number;
@@ -39,6 +36,7 @@ interface StampDetailPageProps {
   url?: string;
 }
 
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers<StampData> = {
   async GET(req: Request, ctx) {
     try {
@@ -157,6 +155,7 @@ export const handler: Handlers<StampData> = {
   },
 };
 
+/* ===== HELPERS ===== */
 // Helper functions to improve readability
 function findLowestPriceDispenser(dispensers: any[]) {
   const openDispensers = dispensers.filter((d) => d.give_remaining > 0);
@@ -196,6 +195,7 @@ function addPricesToStamp(
   };
 }
 
+/* ===== PAGE COMPONENT ===== */
 export default function StampPage(props: StampDetailPageProps) {
   const {
     stamp,
@@ -222,6 +222,7 @@ export default function StampPage(props: StampDetailPageProps) {
 
   console.log("Total counts:", totalCounts);
 
+  /* ===== META INFORMATION ===== */
   const title = htmlTitle
     ? htmlTitle.toUpperCase()
     : stamp?.cpid?.startsWith("A")
@@ -263,8 +264,7 @@ export default function StampPage(props: StampDetailPageProps) {
     ? `Bitcoin Stamp #${stamp.stamp} - ${stamp.name || "Unprunable UTXO Art"}`
     : "Bitcoin Stamp - Unprunable UTXO Art";
 
-  const bodyClassName = "flex flex-col gap-6";
-
+  /* ===== SECTION CONFIGURATION ===== */
   const latestStampsSection = {
     title: "LATEST STAMPS",
     subTitle: "ON-CHAIN MARVELS",
@@ -310,6 +310,7 @@ export default function StampPage(props: StampDetailPageProps) {
     },
   ];
 
+  /* ===== RENDER ===== */
   return (
     <>
       <Head>
@@ -349,8 +350,8 @@ export default function StampPage(props: StampDetailPageProps) {
         )}
       </Head>
 
-      <div class={bodyClassName}>
-        <div class="grid grid-cols-1 min-[880px]:grid-cols-2 desktop:grid-cols-3 gap-3 mobileMd:gap-6">
+      <div class={body}>
+        <div class="grid grid-cols-1 min-[880px]:grid-cols-2 desktop:grid-cols-3 gap-6">
           <div class="desktop:col-span-1">
             <StampImage
               stamp={stamp}

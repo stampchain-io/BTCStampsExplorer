@@ -10,7 +10,7 @@ import {
 } from "$lib/utils/imageUtils.ts";
 
 import { StampRow } from "$globals";
-import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
+import TextContentIsland from "./detail/StampTextContent.tsx";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { useEffect, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";

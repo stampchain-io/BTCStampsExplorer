@@ -1,3 +1,4 @@
+/* ===== UPLOAD PAGE ===== */
 import { useEffect as _useEffect, useState as _useState } from "preact/hooks";
 import { paginate } from "$lib/utils/paginationUtils.ts";
 import {
@@ -9,6 +10,7 @@ import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20Row } from "$globals";
 
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
     try {
@@ -46,15 +48,18 @@ export const handler: Handlers = {
   },
 };
 
+/* ===== TYPES ===== */
 interface PropTypes {
   data: {
     data: SRC20Row[];
   };
 }
 
+/* ===== PAGE COMPONENT ===== */
 export function UploadBackground(props: PropTypes) {
   const { data } = props.data;
 
+  /* ===== RENDER ===== */
   return (
     <>
       <div className={"self-center"}>

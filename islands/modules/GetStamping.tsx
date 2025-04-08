@@ -1,12 +1,18 @@
+/* ===== GET STAMPING MODULE COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { formatUSDValue } from "$lib/utils/formatUtils.ts";
+import { gapGrid } from "$layout";
+import { Button } from "$buttons";
+import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
-export function GetStampingModule({}: GetStampingModuleProps) {
+/* ===== COMPONENT ===== */
+export function GetStampingModule() {
+  /* ===== STATE ===== */
   const [btcPrice, setBtcPrice] = useState(0);
   const [recommendedFee, setRecommendedFee] = useState(6);
   const [isLoading, setIsLoading] = useState(true);
 
+  /* ===== DATA FETCHING ===== */
   useEffect(() => {
     fetch("/api/internal/fees")
       .then((res) => {
@@ -24,63 +30,84 @@ export function GetStampingModule({}: GetStampingModuleProps) {
       });
   }, []);
 
+  /* ===== HELPERS ===== */
   const displayPrice = formatUSDValue(btcPrice).toLocaleString();
   const displayFee = typeof recommendedFee === "number" ? recommendedFee : "0";
 
+  /* ===== RENDER ===== */
   return (
-    <div class="grid grid-cols-1 desktop:grid-cols-3 gap-3 mobileMd:gap-6 items-end max-w-desktop w-full mx-auto">
-      <div className="col-span1 desktop:col-span-2">
-        <h1 className={ModulesStyles.titleGreyDL}>GET STAMPING</h1>
-        <h2 className={ModulesStyles.subTitleGrey}>IMMORTALISE YOUR ART</h2>
-        <p className={ModulesStyles.bodyTextLight}>
-          <b>
-            The Stampchain stamping machine has been revamped and refitted with
-            sleek new naming features.
-          </b>
-          <br />
-          <br />
-          <b>
-            Experience greater creative freedom and adorn your treasured art
-            with fanciful letters and posh names.
-          </b>
-          <br />
-          By leveraging Counterparty’s asset-naming system and handling the XCP
-          fee, we’ve made it simple and smooth for you to create Posh stamps.
-          <br />
-          <br />
-          <b>Wanna stay true to classic A grade numerics?</b>
-          <br />
-          No problem, we still offer random lucky numbers - or you can choose a
-          custom CPID number for your stamp.<br />
-          <br />
-          Either way the stamping machine handles everything, from low-fi pixel
-          art (png/jpg/gif) to hi-res vector art (svg/html) - up to a whooping
-          65kB.<br />
-          <br />
-          <i>
-            <b>Time to get stamping!</b>
-          </i>
-        </p>
+    <div class="flex flex-col">
+      {/* ===== HEADER SECTION ===== */}
+      <h3 className={titleGreyDL}>GET STAMPING</h3>
+      <h4 className={subtitleGrey}>IMMORTALISE YOUR ART</h4>
+
+      {/* ===== CONTENT SECTION ===== */}
+      <div
+        className={`flex flex-col tablet:flex-row ${gapGrid} ${text}`}
+      >
+        <div className="flex flex-col">
+          <p>
+            <b>
+              The Stampchain stamping machine has been revamped and refitted
+              with sleek new naming features.
+            </b>
+          </p>
+          <p>
+            <b>
+              Experience greater creative freedom and adorn your treasured art
+              with fanciful letters and posh names.
+            </b>
+            <br />
+            By leveraging Counterparty's asset-naming system and handling the
+            XCP fee, we've made it simple and smooth for you to create Posh
+            stamps.
+          </p>
+        </div>
+        <div className="flex flex-col -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:mt-0 tablet:text-right">
+          <p>
+            <b>Wanna stay true to classic A grade numerics ?</b>
+            <br />
+            No problem, we still offer random lucky numbers - or you can choose
+            a custom CPID number for your stamp.
+          </p>
+          <p>
+            Either way the stamping machine handles everything, from low-fi
+            pixel art (png/jpg/gif) to hi-res vector art (svg/html) - up to a
+            whooping 65kB.
+          </p>
+          <p>
+            <span className={textLg}>
+              <b>Time to get stamping !</b>
+            </span>
+          </p>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-3 mobileMd:gap-6">
-        <div className="flex gap-3 mobileMd:gap-6 font-extrabold justify-end">
-          <a
+      {/* ===== BUTTONS SECTION ===== */}
+      <div className="flex flex-col pt-7 gap-3">
+        {/* ===== BUTTONS ===== */}
+        <div className="flex justify-end gap-6">
+          <Button
+            variant="outline"
+            color="grey"
+            size="lg"
             href="/faq"
-            f-partial="/faq"
-            className={ModulesStyles.buttonGreyOutline}
           >
             FAQ
-          </a>
-          <a
+          </Button>
+          <Button
+            variant="flat"
+            color="grey"
+            size="lg"
             href="/stamping/stamp"
-            f-partial="/stamping/stamp"
-            className={ModulesStyles.buttonGreyFlat}
           >
             STAMP
-          </a>
+          </Button>
         </div>
-        <div className="flex gap-3 mobileMd:gap-6 justify-end text-base mobileLg:text-lg text-stamp-grey font-light">
+
+        {/* ===== PRICE/FEE INFO ===== */}
+        <div className="flex justify-end gap-6
+        font-light text-base text-stamp-grey">
           <p>
             <span className="text-stamp-grey-darker">FEE</span>&nbsp;
             {isLoading

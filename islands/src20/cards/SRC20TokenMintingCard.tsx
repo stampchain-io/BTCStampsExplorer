@@ -1,4 +1,4 @@
-import { Button } from "$components/shared/Button.tsx";
+import { Button } from "$buttons";
 import {
   SRC20BaseCard,
   SRC20BaseCardProps,
@@ -129,7 +129,10 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
 
       {/* Mint Button */}
       <Button
-        variant="mint"
+        v
+        ariant="flat"
+        color="purple"
+        size="md"
         onClick={handleMintClick}
         class={(fromPage != "stamping/src20" && fromPage != "home")
           ? "hidden min-[480px]:block"
