@@ -1,5 +1,7 @@
+/* ===== SRC101 DETAIL MODAL COMPONENT ===== */
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 
+/* ===== TYPES ===== */
 interface PropTypes {
   handleClose: () => void;
   img: string;
@@ -7,13 +9,18 @@ interface PropTypes {
   owner: string;
 }
 
+/* ===== COMPONENT ===== */
 const DetailSRC101Modal = ({ handleClose, img, name, owner }: PropTypes) => {
+  /* ===== RENDER ===== */
   return (
     <ModalLayout onClose={handleClose} title={`${name}.btc`}>
       <div class="flex flex-col justify-center gap-1">
+        {/* ===== IMAGE SECTION ===== */}
         <div class="w-full">
           <img src={img} class="" />
         </div>
+
+        {/* ===== DETAILS SECTION ===== */}
         <div class="w-full flex flex-col gap-1">
           <div class="flex gap-2">
             <span class="text-stamp-grey-darker text-lg">Name</span>

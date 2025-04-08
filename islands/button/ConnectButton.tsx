@@ -1,5 +1,5 @@
 // KEEP file for reference on the handleUpdateDisplayName to move into the new wallet / dashboard page
-
+// UPDATE COMMENTARY
 import { useEffect, useRef, useState } from "preact/hooks";
 import { ComponentChildren } from "preact";
 import {
@@ -20,8 +20,13 @@ interface Props {
 
 /* ===== MAIN WALLET MODAL COMPONENT ===== */
 export const ConnectButton = () => {
-  // Move provider configuration here
-  const connectors: WalletProviderKey[] = ["unisat", "leather", "okx"];
+  const connectors: WalletProviderKey[] = [
+    "unisat",
+    "leather",
+    "okx",
+    "tapwallet",
+    "phantom",
+  ];
   const connectorComponents = connectors.map((key) => (extraProps: any) => (
     <WalletProviderBase providerKey={key} {...extraProps} />
   ));

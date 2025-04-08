@@ -1,4 +1,4 @@
-/* ===== WALLET DONATE MODAL COMPONENT ===== */
+/* ===== DONATE STAMP MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { StampRow } from "$globals";
 import StampImage from "$islands/stamp/detail/StampImage.tsx";
@@ -8,6 +8,7 @@ import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
 
+/* ===== TYPES ===== */
 interface Props {
   stamp: StampRow;
   fee: number;
@@ -17,6 +18,7 @@ interface Props {
   dispenser: any;
 }
 
+/* ===== COMPONENT ===== */
 const DonateStampModal = ({
   stamp,
   fee: initialFee,
@@ -25,14 +27,20 @@ const DonateStampModal = ({
   handleCloseModal,
   dispenser,
 }: Props) => {
+  /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
+
+  /* ===== STATE ===== */
   const [quantity, setQuantity] = useState(1);
   // const [maxQuantity, setMaxQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isAmountTooltipVisible, setIsAmountTooltipVisible] = useState(false);
+
+  /* ===== REFS ===== */
   const amountTooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== FORM HANDLING ===== */
   const {
     formState,
     handleChangeFee: internalHandleChangeFee,
@@ -46,10 +54,13 @@ const DonateStampModal = ({
     initialFee,
   });
 
+  /* ===== EFFECTS ===== */
+  // Sync fee state with parent
   useEffect(() => {
     handleChangeFee(formState.fee);
   }, [formState.fee]);
 
+  // Update total price when dispenser or quantity changes
   useEffect(() => {
     if (dispenser) {
       // const maxQty = Math.floor(
@@ -60,6 +71,7 @@ const DonateStampModal = ({
     }
   }, [dispenser, quantity]);
 
+  // Cleanup tooltip timeout
   useEffect(() => {
     return () => {
       if (amountTooltipTimeoutRef.current) {
@@ -68,6 +80,22 @@ const DonateStampModal = ({
     };
   }, []);
 
+  // Debug logging
+  useEffect(() => {
+    logger.debug("ui", {
+      message: "DonateStampModal mounted",
+      component: "DonateStampModal",
+    });
+
+    return () => {
+      logger.debug("ui", {
+        message: "DonateStampModal unmounting",
+        component: "DonateStampModal",
+      });
+    };
+  }, []);
+
+  /* ===== EVENT HANDLERS ===== */
   const handleMouseMove = (e: MouseEvent) => {
     setTooltipPosition({
       x: e.clientX,
@@ -99,6 +127,7 @@ const DonateStampModal = ({
     setIsAmountTooltipVisible(false);
   };
 
+  /* ===== TRANSACTION HANDLING ===== */
   const handleBuyClick = async () => {
     await handleSubmit(async () => {
       // Convert fee rate from sat/vB to sat/kB
@@ -154,22 +183,7 @@ const DonateStampModal = ({
     });
   };
 
-  // Add debug logging
-  useEffect(() => {
-    logger.debug("ui", {
-      message: "DonateStampModal mounted",
-      component: "DonateStampModal",
-    });
-
-    return () => {
-      logger.debug("ui", {
-        message: "DonateStampModal unmounting",
-        component: "DonateStampModal",
-      });
-    };
-  }, []);
-
-  // Helper functions to convert between slider position and amount value
+  /* ===== HELPER FUNCTIONS ===== */
   const amountToSliderPos = (amount: number) =>
     amount <= 20
       ? (amount / 20) * 66.67
@@ -183,9 +197,11 @@ const DonateStampModal = ({
     return Math.min(500, Math.round(value)); // 20-500 with 1.0 steps
   };
 
+  /* ===== STYLING ===== */
   const tooltipImage =
     "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
 
+  /* ===== RENDER ===== */
   return (
     <ModalLayout
       onClose={() => {
@@ -197,6 +213,7 @@ const DonateStampModal = ({
       }}
       title="DONATE"
     >
+      {/* ===== PRICE DISPLAY ===== */}
       <div className="mb-6">
         <p className="text-3xl mobileLg:text-4xl font-bold text-stamp-grey-light text-center">
           {(totalPrice / 100000000).toFixed(8)}{" "}
@@ -204,6 +221,7 @@ const DonateStampModal = ({
         </p>
       </div>
 
+      {/* ===== STAMP DETAILS ===== */}
       <div className="flex flex-row gap-6">
         <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
           <StampImage
@@ -212,6 +230,8 @@ const DonateStampModal = ({
             flag={false}
           />
         </div>
+
+        {/* ===== QUANTITY SELECTION ===== */}
         <div className="flex flex-col w-full">
           <div className="flex flex-col items-start -space-y-0.5">
             <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey-light">
@@ -225,6 +245,7 @@ const DonateStampModal = ({
             </p>
           </div>
 
+          {/* ===== AMOUNT SLIDER ===== */}
           <div className="mt-[18px]">
             <div
               className="relative w-full group"
@@ -265,6 +286,7 @@ const DonateStampModal = ({
         </div>
       </div>
 
+      {/* ===== FEE CALCULATOR ===== */}
       <BasicFeeCalculator
         fee={formState.fee}
         handleChangeFee={(newFee) => {
@@ -302,6 +324,7 @@ const DonateStampModal = ({
         outputTypes={["P2WPKH"]}
       />
 
+      {/* ===== STATUS MESSAGES ===== */}
       {error && <div className="text-red-500 mt-2">{error}</div>}
       {successMessage && (
         <div className="text-green-500 mt-2">{successMessage}</div>

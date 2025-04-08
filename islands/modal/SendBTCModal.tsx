@@ -1,9 +1,11 @@
+/* ===== SEND BTC MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 
+/* ===== TYPES ===== */
 interface SendBTCModalProps {
   fee: number;
   balance: number;
@@ -11,15 +13,25 @@ interface SendBTCModalProps {
   onClose: () => void;
 }
 
+/* ===== COMPONENT ===== */
 function SendBTCModal(
   { fee: initialFee, balance, handleChangeFee, onClose }: SendBTCModalProps,
 ) {
+  /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
+
+  /* ===== STATE ===== */
   const [_isSendingMax, _setIsSendingMax] = useState(false);
   const [isMaxTooltipVisible, setIsMaxTooltipVisible] = useState(false);
   const [allowMaxTooltip, setAllowMaxTooltip] = useState(true);
   const [maxTooltipText, setMaxTooltipText] = useState("EMPTY YOUR WALLET");
+  const [isMaxMode, setIsMaxMode] = useState(false);
+  const [_windowWidth, setWindowWidth] = useState(globalThis.innerWidth);
+
+  /* ===== REFS ===== */
   const maxTooltipTimeoutRef = useRef<number | null>(null);
+
+  /* ===== FORM HANDLING ===== */
   const {
     formState,
     setFormState,
@@ -34,15 +46,14 @@ function SendBTCModal(
     type: "send",
     initialFee,
   });
-  const [isMaxMode, setIsMaxMode] = useState(false);
-  const [_windowWidth, setWindowWidth] = useState(globalThis.innerWidth);
 
+  /* ===== EFFECTS ===== */
   // Sync external fee state with internal state
   useEffect(() => {
     handleChangeFee(formState.fee);
   }, [formState.fee]);
 
-  // Add cleanup effect
+  // Cleanup timeouts
   useEffect(() => {
     return () => {
       if (maxTooltipTimeoutRef.current) {
@@ -51,36 +62,7 @@ function SendBTCModal(
     };
   }, []);
 
-  // Move calculateMaxAmount inside component
-  const calculateMaxAmount = (feeRate: number, balanceAmount: number) => {
-    const estimatedVSize = 141;
-    const feeInSatoshis = Math.ceil((feeRate * estimatedVSize) / 1000);
-    const feeInBTC = feeInSatoshis / 100000000;
-    return balanceAmount > feeInBTC
-      ? (balanceAmount - feeInBTC).toFixed(8)
-      : null;
-  };
-
-  // Extract input sanitization logic
-  const sanitizeAmountInput = (value: string) => {
-    let sanitized = value.replace(/[^0-9.]/g, "");
-    const parts = sanitized.split(".");
-
-    // Ensure only one decimal point
-    if (parts.length > 2) {
-      sanitized = parts[0] + "." + parts[1];
-    }
-
-    // Limit decimal places to 8
-    if (parts.length === 2 && parts[1].length > 8) {
-      sanitized = parts[0] + "." + parts[1].slice(0, 8);
-    }
-
-    // Limit total length to 10 characters
-    return sanitized.slice(0, 10);
-  };
-
-  // Effect to update amount when fee changes in max mode
+  // Update amount when fee changes in max mode
   useEffect(() => {
     if (!isMaxMode || balance == null) return;
 
@@ -105,7 +87,7 @@ function SendBTCModal(
     }
   }, [formState.fee, balance, isMaxMode]);
 
-  // Reset tooltip state when fee changes or max mode is disabled
+  // Reset tooltip state
   useEffect(() => {
     if (!isMaxMode) {
       setMaxTooltipText("EMPTY YOUR WALLET");
@@ -114,6 +96,45 @@ function SendBTCModal(
     }
   }, [isMaxMode, formState.fee]);
 
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(globalThis.innerWidth);
+    };
+
+    globalThis.addEventListener("resize", handleResize);
+    return () => globalThis.removeEventListener("resize", handleResize);
+  }, []);
+
+  /* ===== HELPER FUNCTIONS ===== */
+  const calculateMaxAmount = (feeRate: number, balanceAmount: number) => {
+    const estimatedVSize = 141;
+    const feeInSatoshis = Math.ceil((feeRate * estimatedVSize) / 1000);
+    const feeInBTC = feeInSatoshis / 100000000;
+    return balanceAmount > feeInBTC
+      ? (balanceAmount - feeInBTC).toFixed(8)
+      : null;
+  };
+
+  const sanitizeAmountInput = (value: string) => {
+    let sanitized = value.replace(/[^0-9.]/g, "");
+    const parts = sanitized.split(".");
+
+    // Ensure only one decimal point
+    if (parts.length > 2) {
+      sanitized = parts[0] + "." + parts[1];
+    }
+
+    // Limit decimal places to 8
+    if (parts.length === 2 && parts[1].length > 8) {
+      sanitized = parts[0] + "." + parts[1].slice(0, 8);
+    }
+
+    // Limit total length to 10 characters
+    return sanitized.slice(0, 10);
+  };
+
+  /* ===== EVENT HANDLERS ===== */
   const handleSendSubmit = async () => {
     await handleSubmit(async () => {
       // Implement send transaction logic here
@@ -264,22 +285,16 @@ function SendBTCModal(
     }));
   };
 
+  /* ===== STYLING ===== */
   const inputField =
     "h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
   const tooltipIcon =
     "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
 
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(globalThis.innerWidth);
-    };
-
-    globalThis.addEventListener("resize", handleResize);
-    return () => globalThis.removeEventListener("resize", handleResize);
-  }, []);
-
+  /* ===== RENDER ===== */
   return (
     <ModalLayout onClose={onClose} title="SEND">
+      {/* ===== AMOUNT INPUT SECTION ===== */}
       <div class="flex flex-col gap-6 -mt-3">
         <div class="flex flex-col items-center text-center">
           <div class="flex justify-center items-baseline w-full">
@@ -296,26 +311,17 @@ function SendBTCModal(
                 style={{
                   width: (() => {
                     const value = formState.amount || "";
-
-                    // Define pixel values for different screen sizes
-                    const smallScreenChar = { one: 14, other: 19 };
-                    const largeScreenChar = { one: 19, other: 27 };
-
-                    // Use CSS media query to determine screen size
                     const isSmallScreen =
                       globalThis.matchMedia("(max-width: 767px)").matches;
                     const { one, other } = isSmallScreen
-                      ? smallScreenChar
-                      : largeScreenChar;
-
-                    // Calculate width based on input value
+                      ? { one: 14, other: 19 }
+                      : { one: 19, other: 27 };
                     const baseWidth = !value
                       ? other // Use 'other' width (24px) for empty/placeholder
                       : value.split("").reduce((total, char) => {
                         return total +
                           (char === "1" || char === "." ? one : other);
                       }, 0);
-
                     return `${baseWidth}px`;
                   })(),
                   background: "transparent",
@@ -331,6 +337,8 @@ function SendBTCModal(
               </span>
             </div>
           </div>
+
+          {/* ===== USD CONVERSION ===== */}
           <div class="text-sm mobileLg:text-base text-stamp-grey-darker font-light">
             {formState.amount && formState.BTCPrice
               ? (parseFloat(formState.amount) * formState.BTCPrice)
@@ -340,6 +348,8 @@ function SendBTCModal(
                 })
               : "0.00"} USD
           </div>
+
+          {/* ===== MAX BUTTON ===== */}
           <div
             className="relative text-base mobileLg:text-lg text-stamp-grey font-medium hover:text-stamp-grey-light mt-2 cursor-pointer"
             onClick={handleMaxClick}
@@ -357,6 +367,7 @@ function SendBTCModal(
           </div>
         </div>
 
+        {/* ===== RECIPIENT ADDRESS INPUT ===== */}
         <input
           value={formState.recipientAddress}
           onInput={(e) =>
@@ -369,6 +380,7 @@ function SendBTCModal(
         />
       </div>
 
+      {/* ===== FEE CALCULATOR ===== */}
       <BasicFeeCalculator
         isModal={true}
         fee={formState.fee}
@@ -388,6 +400,7 @@ function SendBTCModal(
         tosAgreed={true}
       />
 
+      {/* ===== STATUS MESSAGES ===== */}
       {error && <div class="text-red-500 mt-2">{error}</div>}
       {successMessage && <div class="text-green-500 mt-2">{successMessage}
       </div>}

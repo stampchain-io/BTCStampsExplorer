@@ -1,14 +1,18 @@
+/* ===== CONNECTED MODAL COMPONENT (WIP) ===== */
 import {
   showConnectWalletModal,
   walletContext,
 } from "$client/wallet/wallet.ts";
 
+/* ===== TYPES ===== */
 interface Props {
   toggleModal: () => void;
   handleCloseModal: (event: MouseEvent) => void;
 }
 
+/* ===== COMPONENT ===== */
 export const ConnectedModal = ({ toggleModal, handleCloseModal }: Props) => {
+  /* ===== EVENT HANDLERS ===== */
   const disconnectWallet = () => {
     console.log("Disconnecting wallet...");
     walletContext.disconnect();
@@ -16,6 +20,7 @@ export const ConnectedModal = ({ toggleModal, handleCloseModal }: Props) => {
     showConnectWalletModal.value = false;
   };
 
+  /* ===== RENDER ===== */
   return (
     <div
       class={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm ${
@@ -24,7 +29,9 @@ export const ConnectedModal = ({ toggleModal, handleCloseModal }: Props) => {
       onClick={handleCloseModal}
     >
       <div class="relative p-4 w-full max-w-2xl h-auto">
+        {/* ===== MODAL CONTENT ===== */}
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          {/* ===== HEADER SECTION ===== */}
           <div class="flex items-center justify-between p-4 tablet:p-5 border-b rounded-t dark:border-gray-600">
             <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
               Wallet Connected
@@ -57,6 +64,7 @@ export const ConnectedModal = ({ toggleModal, handleCloseModal }: Props) => {
             </button>
           </div>
 
+          {/* ===== ACTIONS SECTION ===== */}
           <div class="grid mobileLg:grid-cols-2 items-center p-4 tablet:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
             <button
               onClick={disconnectWallet}

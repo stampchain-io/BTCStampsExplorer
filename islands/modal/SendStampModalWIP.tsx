@@ -1,3 +1,4 @@
+/* ===== SEND STAMP MODAL COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
@@ -9,6 +10,7 @@ import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 
+/* ===== TYPES ===== */
 interface Props {
   fee: number;
   handleChangeFee: (fee: number) => void;
@@ -25,6 +27,7 @@ interface Props {
   };
 }
 
+/* ===== COMPONENT ===== */
 function SendStampModal({
   fee: initialFee,
   handleChangeFee = () => {},
@@ -32,12 +35,16 @@ function SendStampModal({
   handleCloseModal,
   stamps,
 }: Props) {
+  /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
+
+  /* ===== STATE ===== */
   const [maxQuantity, setMaxQuantity] = useState(1);
   const [quantity, setQuantity] = useState(0);
   const [imgSrc, setImgSrc] = useState("");
   const [selectedStamp, setSelectedStamp] = useState<StampRow | null>(null);
 
+  /* ===== FORM HANDLING ===== */
   const {
     formState,
     setFormState,
@@ -52,11 +59,30 @@ function SendStampModal({
     type: "transfer",
     initialFee,
   });
+
+  /* ===== EFFECTS ===== */
   // Sync external fee state with internal state
   useEffect(() => {
     handleChangeFee(formState.fee);
   }, [formState.fee]);
 
+  // Update max quantity and fetch stamp image when stamp is selected
+  useEffect(() => {
+    getMaxQuantity();
+    fetchStampImage();
+  }, [selectedStamp]);
+
+  // Log form state changes
+  useEffect(() => {
+    logger.debug("stamps", {
+      message: "Form state updated",
+      formState,
+      selectedStamp,
+      quantity,
+    });
+  }, [formState, selectedStamp, quantity]);
+
+  /* ===== EVENT HANDLERS ===== */
   const handleTransferSubmit = async () => {
     try {
       await logger.debug("stamps", {
@@ -67,7 +93,7 @@ function SendStampModal({
         recipientAddress: formState.recipientAddress,
       });
 
-      // Validate required fields before proceeding
+      // Validate required fields
       if (!formState.recipientAddress) {
         await logger.error("stamps", {
           message: "Transfer failed - missing recipient address",
@@ -100,6 +126,7 @@ function SendStampModal({
           throw new Error("No wallet connected");
         }
 
+        /* ===== TRANSACTION CREATION ===== */
         // Convert fee rate from sat/vB to sat/kB
         const feeRateKB = formState.fee * 1000;
         await logger.debug("stamps", {
@@ -130,6 +157,7 @@ function SendStampModal({
           endpoint: "/api/v2/create/send",
         });
 
+        /* ===== API INTERACTION ===== */
         try {
           const response = await fetch("/api/v2/create/send", {
             method: "POST",
@@ -175,7 +203,7 @@ function SendStampModal({
             psbt: responseData.psbt,
             inputsToSign: responseData.inputsToSign,
           });
-
+          /* ===== PSBT SIGNING ===== */
           const signResult = await walletContext.signPSBT(
             wallet,
             responseData.psbt,
@@ -217,9 +245,8 @@ function SendStampModal({
     }
   };
 
-  const handleQuantityChange = (
-    e: Event,
-  ): void => {
+  /* ===== HELPER FUNCTIONS ===== */
+  const handleQuantityChange = (e: Event): void => {
     const value = parseInt((e.target as HTMLInputElement).value, 10);
     let tmpValue = value;
     if (!isNaN(value)) {
@@ -237,6 +264,7 @@ function SendStampModal({
       });
     }
   };
+
   const getMaxQuantity = () => {
     if (selectedStamp) {
       setMaxQuantity(selectedStamp?.unbound_quantity);
@@ -264,12 +292,16 @@ function SendStampModal({
     });
   }, [formState, selectedStamp, quantity]);
 
+  /* ===== STYLING ===== */
   const inputField =
     "h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
 
+  /* ===== RENDER ===== */
   return (
     <ModalLayout onClose={handleCloseModal} title="TRANSFER">
+      {/* ===== STAMP SELECTION SECTION ===== */}
       <div className="flex w-full gap-3 mobileMd:gap-6">
+        {/* ===== STAMP PREVIEW ===== */}
         <div className="flex items-center justify-center rounded min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker">
           {selectedStamp
             ? (
@@ -290,6 +322,7 @@ function SendStampModal({
             )}
         </div>
 
+        {/* ===== STAMP DETAILS ===== */}
         <div className="flex flex-col gap-3 mobileMd:gap-6 flex-1">
           <SelectField
             options={stamps.data}
@@ -298,13 +331,13 @@ function SendStampModal({
               const selectedItem = stamps.data.find(
                 (item) => item.tx_hash === e.currentTarget.value,
               );
-
               if (selectedItem) {
                 setSelectedStamp(selectedItem);
               }
             }}
           />
 
+          {/* ===== QUANTITY SELECTION ===== */}
           <div className="flex w-full justify-between items-start">
             <div className="flex flex-col justify-start -space-y-0.5">
               <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey">
@@ -326,6 +359,7 @@ function SendStampModal({
         </div>
       </div>
 
+      {/* ===== RECIPIENT ADDRESS INPUT ===== */}
       <div className="flex pt-3 mobileMd:pt-6">
         <input
           value={formState.recipientAddress}
@@ -339,6 +373,7 @@ function SendStampModal({
         />
       </div>
 
+      {/* ===== FEE CALCULATOR ===== */}
       <BasicFeeCalculator
         isModal={true}
         fee={formState.fee}
@@ -356,6 +391,7 @@ function SendStampModal({
         tosAgreed={true}
       />
 
+      {/* ===== STATUS MESSAGES ===== */}
       {error && (
         <div className="text-red-500 text-center mt-4 font-medium">
           {error}

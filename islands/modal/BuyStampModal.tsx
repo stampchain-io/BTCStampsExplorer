@@ -8,6 +8,7 @@ import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
 
+/* ===== TYPES ===== */
 interface Props {
   stamp: StampRow;
   fee: number;
@@ -17,6 +18,7 @@ interface Props {
   dispenser: any;
 }
 
+/* ===== COMPONENT ===== */
 const BuyStampModal = ({
   stamp,
   fee: initialFee,
@@ -25,16 +27,22 @@ const BuyStampModal = ({
   handleCloseModal,
   dispenser,
 }: Props) => {
+  /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
+
+  /* ===== STATE ===== */
   const [tosAgreed, setTosAgreed] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [maxQuantity, setMaxQuantity] = useState(1);
   const [_pricePerUnit, setPricePerUnit] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
+
+  /* ===== COMPUTED VALUES ===== */
   const displayPrice = dispenser
     ? parseInt(dispenser.satoshirate.toString(), 10) / 100000000
     : (typeof stamp.floorPrice === "number" ? stamp.floorPrice : 0);
 
+  /* ===== FORM HANDLING ===== */
   const {
     formState,
     handleChangeFee: internalHandleChangeFee,
@@ -48,11 +56,13 @@ const BuyStampModal = ({
     initialFee,
   });
 
+  /* ===== EFFECTS ===== */
   // Sync external fee state with internal state
   useEffect(() => {
     handleChangeFee(formState.fee);
   }, [formState.fee]);
 
+  // Update quantity and price when dispenser changes
   useEffect(() => {
     if (dispenser) {
       const maxQty = Math.floor(
@@ -64,6 +74,22 @@ const BuyStampModal = ({
     }
   }, [dispenser, quantity]);
 
+  // Debug logging
+  useEffect(() => {
+    logger.debug("ui", {
+      message: "BuyStampModal mounted",
+      component: "BuyStampModal",
+    });
+
+    return () => {
+      logger.debug("ui", {
+        message: "BuyStampModal unmounting",
+        component: "BuyStampModal",
+      });
+    };
+  }, []);
+
+  /* ===== EVENT HANDLERS ===== */
   const handleQuantityChange = (e: Event) => {
     const value = parseInt((e.target as HTMLInputElement).value, 10);
     if (value > maxQuantity) {
@@ -75,6 +101,7 @@ const BuyStampModal = ({
     }
   };
 
+  /* ===== TRANSACTION HANDLING ===== */
   const handleBuyClick = async () => {
     await handleSubmit(async () => {
       // Convert fee rate from sat/vB to sat/kB
@@ -142,24 +169,11 @@ const BuyStampModal = ({
     });
   };
 
+  /* ===== STYLING ===== */
   const inputField =
     "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
 
-  // Add debug logging
-  useEffect(() => {
-    logger.debug("ui", {
-      message: "BuyStampModal mounted",
-      component: "BuyStampModal",
-    });
-
-    return () => {
-      logger.debug("ui", {
-        message: "BuyStampModal unmounting",
-        component: "BuyStampModal",
-      });
-    };
-  }, []);
-
+  /* ===== RENDER ===== */
   return (
     <ModalLayout
       onClose={() => {
@@ -171,6 +185,7 @@ const BuyStampModal = ({
       }}
       title="BUY"
     >
+      {/* ===== STAMP DETAILS SECTION ===== */}
       <div className="flex flex-row gap-6">
         <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
           <StampImage
@@ -187,6 +202,7 @@ const BuyStampModal = ({
             {stamp.stamp}
           </p>
 
+          {/* ===== QUANTITY SELECTION ===== */}
           <div className="flex flex-row pt-3 w-full justify-between items-center">
             <div className="flex flex-col items-start -space-y-0.5">
               <p className="text-xl mobileLg:text-2xl font-bold text-stamp-grey">
@@ -210,6 +226,7 @@ const BuyStampModal = ({
         </div>
       </div>
 
+      {/* ===== FEE CALCULATOR ===== */}
       <BasicFeeCalculator
         fee={formState.fee}
         handleChangeFee={(newFee) => {
@@ -224,8 +241,8 @@ const BuyStampModal = ({
         tosAgreed={tosAgreed}
         onTosChange={setTosAgreed}
         amount={totalPrice}
-        price={displayPrice} // Stamp Buy
-        edition={quantity} // Stamp Buy
+        price={displayPrice}
+        edition={quantity}
         fromPage="stamp_buy"
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
@@ -250,6 +267,7 @@ const BuyStampModal = ({
         outputTypes={["P2WPKH"]}
       />
 
+      {/* ===== STATUS MESSAGES ===== */}
       {error && <div className="text-red-500 mt-2">{error}</div>}
       {successMessage && (
         <div className="text-green-500 mt-2">{successMessage}</div>

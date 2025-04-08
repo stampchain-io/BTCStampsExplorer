@@ -1,21 +1,29 @@
+/* ===== RECEIVE ADDRESS MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import QRCode from "qrcode";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 
+/* ===== TYPES ===== */
 interface Props {
   onClose: () => void;
   address: string;
   title?: string;
 }
 
+/* ===== COMPONENT ===== */
 function RecieveAddyModal({ onClose, address, title = "RECEIVE" }: Props) {
+  /* ===== STATE ===== */
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [isCopyTooltipVisible, setIsCopyTooltipVisible] = useState(false);
   const [allowCopyTooltip, setAllowCopyTooltip] = useState(true);
   const [copyTooltipText, setCopyTooltipText] = useState("COPY ADDY");
+
+  /* ===== REFS ===== */
   const copyButtonRef = useRef<HTMLDivElement>(null);
   const copyTooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== EFFECTS ===== */
+  // Generate QR code on mount or address change
   useEffect(() => {
     const bitcoinUri = `bitcoin:${address}`;
     QRCode.toDataURL(bitcoinUri, {
@@ -30,6 +38,16 @@ function RecieveAddyModal({ onClose, address, title = "RECEIVE" }: Props) {
       .catch((err: Error) => console.error(err));
   }, [address]);
 
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (copyTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(copyTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  /* ===== EVENT HANDLERS ===== */
   const handleCopyMouseEnter = () => {
     if (allowCopyTooltip) {
       setCopyTooltipText(
@@ -78,19 +96,14 @@ function RecieveAddyModal({ onClose, address, title = "RECEIVE" }: Props) {
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (copyTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(copyTooltipTimeoutRef.current);
-      }
-    };
-  }, []);
-
+  /* ===== STYLING ===== */
   const tooltipIcon =
     "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
 
+  /* ===== RENDER ===== */
   return (
     <ModalLayout onClose={onClose} title={title}>
+      {/* ===== QR CODE SECTION ===== */}
       <div class="flex flex-col -mt-3 mobileLg:-mt-4 items-center">
         {qrCodeDataUrl && (
           <img
@@ -103,6 +116,8 @@ function RecieveAddyModal({ onClose, address, title = "RECEIVE" }: Props) {
           {formatAddress(address)}
         </p>
       </div>
+
+      {/* ===== COPY BUTTON SECTION ===== */}
       <div class="flex flex-col items-center pt-3 mobileLg:pt-6">
         <div
           ref={copyButtonRef}
@@ -135,6 +150,7 @@ function RecieveAddyModal({ onClose, address, title = "RECEIVE" }: Props) {
   );
 }
 
+/* ===== HELPER FUNCTIONS ===== */
 function formatAddress(address: string): JSX.Element[] {
   const groups = address.match(/.{1,4}/g) ?? [address];
   return groups.map((group, index) => [

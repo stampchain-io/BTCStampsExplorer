@@ -1,5 +1,5 @@
+/* ===== FILTER SRC20 MODAL COMPONENT ===== */
 // deno-lint-ignore-file
-/* TODO (@baba) - move to modals upon filter update */
 import { useState } from "preact/hooks";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { InputField } from "$forms";
@@ -13,6 +13,7 @@ import {
 import { Button } from "$components/buttons/ButtonOLD.tsx";
 import DatePicker from "$islands/DateRangePicker.tsx";
 
+/* ===== TYPES ===== */
 type FilterTypes =
   | SRC20_FILTER_TYPES
   | STAMP_FILTER_TYPES
@@ -25,9 +26,11 @@ interface FilterSRC20ModalPropTypes {
   filterOptions: FilterTypes;
 }
 
+/* ===== COMPONENT ===== */
 const FilterSRC20Modal = (
   { handleCloseModal, filterOptions }: FilterSRC20ModalPropTypes,
 ) => {
+  /* ===== STATE ===== */
   const [title, setTitle] = useState("");
   const [progress, setProgress] = useState({ min: "", max: "" });
   const [transactionCount, setTransactionCount] = useState({
@@ -44,6 +47,7 @@ const FilterSRC20Modal = (
   const [holder, setHolder] = useState({ min: "", max: "" });
   const [price, setPrice] = useState({ min: "", max: "" });
 
+  /* ===== EVENT HANDLERS ===== */
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     type: string,
@@ -79,6 +83,7 @@ const FilterSRC20Modal = (
     }
   };
 
+  /* ===== FORM SUBMISSION ===== */
   const handleSubmit = () => {
     const url = new URL(globalThis.location.href);
     switch (filterOptions[filterOptions.length - 1]) {
@@ -166,6 +171,7 @@ const FilterSRC20Modal = (
     window.location.href = url.toString();
   };
 
+  /* ===== FILTER CONTENT RENDERING ===== */
   const renderContent = () => {
     switch (filterOptions[filterOptions.length - 1]) {
       case "minting":
@@ -310,6 +316,8 @@ const FilterSRC20Modal = (
         break;
     }
   };
+
+  /* ===== RENDER ===== */
   return (
     <>
       <ModalLayout onClose={handleCloseModal} title={title}>
