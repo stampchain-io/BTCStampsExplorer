@@ -1,5 +1,5 @@
 /* ===== STAMP INFO COMPONENT ===== */
-/*@baba-750+764+815*/
+/*@baba-750+764+815+icons*/
 import { useEffect, useRef, useState } from "preact/hooks";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import {

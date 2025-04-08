@@ -1,8 +1,10 @@
+/* ===== RECENT SALES COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import type { StampRow } from "$globals";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { titlePurpleLD } from "$text";
 
+/* ===== TYPES ===== */
 interface DisplayCountBreakpoints {
   mobileSm: number;
   mobileMd: number;
@@ -28,6 +30,7 @@ interface RecentSalesProps {
   gridClass?: string;
 }
 
+/* ===== COMPONENT ===== */
 export function RecentSales({
   initialData = [],
   title = "LATEST STAMPS",
@@ -36,12 +39,14 @@ export function RecentSales({
   displayCounts,
   gridClass,
 }: RecentSalesProps) {
+  /* ===== STATE ===== */
   const [recentSales, setRecentSales] = useState<RecentSaleStamp[]>(
     initialData,
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /* ===== DATA FETCHING ===== */
   const fetchRecentSales = async () => {
     try {
       setIsLoading(true);
@@ -66,6 +71,7 @@ export function RecentSales({
     }
   };
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     if (initialData.length === 0) {
       fetchRecentSales();
@@ -75,10 +81,12 @@ export function RecentSales({
     return () => clearInterval(refreshInterval);
   }, []);
 
+  /* ===== ERROR HANDLING ===== */
   if (error) {
     return <div class="text-red-500">{error}</div>;
   }
 
+  /* ===== DISPLAY CONFIGURATIONS ===== */
   const defaultHomeDisplayCounts: DisplayCountBreakpoints = {
     mobileSm: 3,
     mobileMd: 4,
@@ -94,6 +102,7 @@ export function RecentSales({
     desktop: 6,
   };
 
+  /* ===== GRID STYLES ===== */
   const defaultHomeGridClass = `
     grid w-full gap-3 mobileMd:gap-6
     grid-cols-3 mobileMd:grid-cols-3 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-7
@@ -106,6 +115,7 @@ export function RecentSales({
     mobileLg:grid-cols-4 desktop:grid-cols-6
   `;
 
+  /* ===== SECTION PROPS ===== */
   const sectionProps = variant === "home"
     ? {
       subTitle: subTitle || "HOT STAMPS",
@@ -133,15 +143,16 @@ export function RecentSales({
       displayCounts: displayCounts || defaultDetailDisplayCounts,
     };
 
+  /* ===== RENDER ===== */
   return (
     <div>
-      <h1
+      <h3
         class={variant === "home"
-          ? ModulesStyles.titlePurpleDL
+          ? titlePurpleLD
           : "text-3xl tablet:text-7xl text-left mb-2 bg-clip-text text-transparent purple-gradient1 font-black"}
       >
         {title}
-      </h1>
+      </h3>
       <div class="flex flex-col gap-12">
         <StampSection {...sectionProps} />
         {isLoading && <div class="text-sm text-gray-400">Refreshing...</div>}

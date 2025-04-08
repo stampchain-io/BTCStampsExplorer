@@ -1,3 +1,4 @@
+/* ===== STAMP IMAGE COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { VNode } from "preact";
 import { StampRow } from "$globals";
@@ -11,7 +12,9 @@ import TextContentIsland from "$islands/stamp/detail/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { logger } from "$lib/utils/logger.ts";
+import { tooltipIcon } from "$notifications";
 
+/* ===== RIGHT PANEL SUBCOMPONENT ===== */
 function RightPanel(
   { stamp, toggleCodeModal, toggleFullScreenModal, showCodeButton }: {
     stamp: StampRow;
@@ -24,6 +27,7 @@ function RightPanel(
     return null;
   }
 
+  /* ===== SHARING CONFIGURATION ===== */
   const url = `https://stampchain.io/stamp/${stamp.stamp}`;
   const text = "Check out what I found @Stampchain";
 
@@ -46,6 +50,7 @@ function RightPanel(
     }
   };
 
+  /* ===== STATE & REFS ===== */
   const [showCopied, setShowCopied] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [allowTooltip, setAllowTooltip] = useState(true);
@@ -75,6 +80,7 @@ function RightPanel(
   const fullscreenButtonRef = useRef<HTMLDivElement>(null);
   const fullscreenTooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     return () => {
       if (xTooltipTimeoutRef.current) {
@@ -92,6 +98,7 @@ function RightPanel(
     };
   }, []);
 
+  /* ===== EVENT HANDLERS ===== */
   const handleXMouseEnter = () => {
     if (allowXTooltip) {
       if (xTooltipTimeoutRef.current) {
@@ -237,9 +244,7 @@ function RightPanel(
     setAllowFullscreenTooltip(true);
   };
 
-  const tooltipIcon =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
-
+  /* ===== RENDER ===== */
   return (
     <div className="flex justify-between pt-[10px] mobileMd:pt-[22px] pb-2 mobileMd:pb-5 px-3 mobileMd:px-6 dark-gradient rounded-lg">
       <div className="flex gap-3">
@@ -383,6 +388,7 @@ function RightPanel(
   );
 }
 
+/* ===== MAIN STAMP IMAGE COMPONENT ===== */
 export function StampImage(
   { stamp, className, flag }: {
     stamp: StampRow;
@@ -390,6 +396,7 @@ export function StampImage(
     flag?: boolean;
   },
 ) {
+  /* ===== STATE & REFS ===== */
   const [loading, setLoading] = useState<boolean>(true);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const imgScopeRef = useRef<HTMLDivElement | null>(null);
@@ -791,4 +798,5 @@ export function StampImage(
     </>
   );
 }
+
 export default StampImage;
