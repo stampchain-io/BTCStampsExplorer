@@ -35,6 +35,7 @@ export const inputTextarea = `
 export const inputFieldSquare = `
   ${inputField}
   ${inputFieldWidth}
+  text-center
 `;
 export const inputNumeric = `
   ${inputField}

@@ -4,9 +4,10 @@ import type { StampRow } from "$globals";
 import StampImage from "$islands/stamp/detail/StampImage.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
-import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
+import { ModalLayout } from "$components/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { tooltipImage } from "$notifications";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -196,10 +197,6 @@ const DonateStampModal = ({
     const value = 20 + ((pos - 66.67) / 33.33) * 480;
     return Math.min(500, Math.round(value)); // 20-500 with 1.0 steps
   };
-
-  /* ===== STYLING ===== */
-  const tooltipImage =
-    "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
 
   /* ===== RENDER ===== */
   return (

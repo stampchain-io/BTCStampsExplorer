@@ -2,6 +2,7 @@
 import { useEffect } from "preact/hooks";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 import TextContentIsland from "$islands/stamp/detail/StampTextContent.tsx";
+import { modalBgCenter } from "$layout";
 
 /* ===== TYPES ===== */
 interface PreviewImageModalProps {
@@ -50,10 +51,6 @@ const PreviewImageModal = ({
       URL.revokeObjectURL(imageUrl);
     });
   }
-
-  /* ===== STYLING ===== */
-  const modalBgCenter =
-    "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#000000] bg-opacity-70 backdrop-filter backdrop-blur-md";
 
   /* ===== RENDER ===== */
   return (

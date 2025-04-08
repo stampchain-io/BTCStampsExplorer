@@ -4,9 +4,10 @@ import type { StampRow } from "$globals";
 import StampImage from "$islands/stamp/detail/StampImage.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
-import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
+import { ModalLayout } from "$components/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { inputFieldSquare } from "$forms";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -169,10 +170,6 @@ const BuyStampModal = ({
     });
   };
 
-  /* ===== STYLING ===== */
-  const inputField =
-    "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
-
   /* ===== RENDER ===== */
   return (
     <ModalLayout
@@ -219,7 +216,7 @@ const BuyStampModal = ({
                 max={maxQuantity}
                 value={quantity}
                 onChange={handleQuantityChange}
-                className={`${inputField} !w-[42px] mobileLg:!w-12 !h-[42px] mobileLg:!h-12 text-center`}
+                className={inputFieldSquare}
               />
             </div>
           </div>

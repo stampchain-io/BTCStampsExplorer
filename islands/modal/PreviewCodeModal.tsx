@@ -1,6 +1,6 @@
 /* ===== PREVIEW CODE MODAL COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-
+import { modalBgCenter } from "$layout";
 /* ===== TYPES ===== */
 interface PreviewCodeModalProps {
   src: string;
@@ -118,10 +118,6 @@ export default function PreviewCodeModal(
       return "Error formatting content";
     }
   }
-
-  /* ===== STYLING ===== */
-  const modalBgCenter =
-    "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black bg-opacity-70 backdrop-filter backdrop-blur-md";
 
   /* ===== RENDER ===== */
   return (

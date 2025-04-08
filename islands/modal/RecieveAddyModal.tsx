@@ -1,7 +1,8 @@
 /* ===== RECEIVE ADDRESS MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import QRCode from "qrcode";
-import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
+import { ModalLayout } from "$components/modal/ModalLayout.tsx";
+import { tooltipIcon } from "$notifications";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -95,10 +96,6 @@ function RecieveAddyModal({ onClose, address, title = "RECEIVE" }: Props) {
       console.error("Failed to copy:", err);
     }
   };
-
-  /* ===== STYLING ===== */
-  const tooltipIcon =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
 
   /* ===== RENDER ===== */
   return (

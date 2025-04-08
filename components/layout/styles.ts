@@ -29,6 +29,8 @@ export const rowResponsiveForm = "flex flex-col mobileMd:flex-row w-full gap-5";
 /* ===== COL STYLES ===== */
 
 /* ===== MODAL STYLES ===== */
+export const modalBgCenter =
+  "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#000000] bg-opacity-70 backdrop-filter backdrop-blur-md";
 
 /* ===== LOADER STYLES ===== */
 export const loaderSpinGrey =
@@ -36,9 +38,7 @@ export const loaderSpinGrey =
 export const loaderSpinPurple =
   "animate-spin rounded-full w-7 h-7 border-b-[3px] border-stamp-purple";
 
-/* ===== LEGACY STYLES ===== */
-export const modalBgCenter =
-  "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black bg-opacity-70 backdrop-filter backdrop-blur-md";
+/* ===== LEGACY STYLES - not checked yet ===== */
 export const modalBgTop =
   "fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-70 backdrop-filter backdrop-blur-md";
 export const modalSearch = "w-[90%] max-w-[600px] mt-[72px] tablet:mt-24";
