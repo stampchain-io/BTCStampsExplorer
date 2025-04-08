@@ -44,17 +44,22 @@ export function Icon(props: IconVariants) {
       close: "x", // alias mapping
       expand: "plus", // alias mapping
       donate: "handcoins", // alias mapping
+      share: "share",
+      copy: "copy",
+      upload: "image", // alias mapping
+      image: "image",
+      fullscreen: "cornersOut", // alias mapping - change to previewImage
+      previewCode: "code", // alias mapping
+      locked: "lockClosed", // alias mapping
+      unlocked: "lockOpen", // alias mapping
+      keyburned: "flame", // alias mapping
+      divisible: "percent", // alias mapping
       caretUp: "caretUp",
       caretDown: "caretDown",
       caretLeft: "caretLeft",
       caretRight: "caretRight",
       caretDoubleLeft: "caretDoubleLeft",
       caretDoubleRight: "caretDoubleRight",
-      upload: "image", // alias mapping
-      image: "image",
-      fullscreen: "cornersOut", // alias mapping
-      locked: "lockClosed", // alias mapping
-      unlocked: "lockOpen", // alias mapping
       template: "template",
     };
 
@@ -79,6 +84,10 @@ export function Icon(props: IconVariants) {
   );
 
   /* ===== RENDER BASED ON TYPE ===== */
+  if (type === "icon") {
+    return svgElement;
+  }
+
   if (type === "iconLink") {
     const { href, target, rel } = props;
     return (
@@ -88,7 +97,6 @@ export function Icon(props: IconVariants) {
     );
   }
 
-  // TO BE UPDATED
   if (type === "iconButton") {
     return (
       <button type="button" onClick={onClick}>
@@ -97,7 +105,8 @@ export function Icon(props: IconVariants) {
     );
   }
 
-  return svgElement;
+  // This ensures TypeScript will catch if type is not one of the expected values
+  throw new Error(`Invalid icon type: ${type}`);
 }
 
 /* ===== SPECIALIZED ICONS ===== */
