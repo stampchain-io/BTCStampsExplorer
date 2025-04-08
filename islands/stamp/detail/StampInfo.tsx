@@ -1,6 +1,7 @@
 /* ===== STAMP INFO COMPONENT ===== */
+/*@baba-750+764+815*/
 import { useEffect, useRef, useState } from "preact/hooks";
-import StampBuyModal from "$islands/stamp/detail/StampBuyModal.tsx";
+import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import {
   abbreviateAddress,
   formatBTCAmount,
@@ -12,6 +13,18 @@ import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { StampListingsOpen } from "$components/stampDetails/StampListingsOpen.tsx";
 import type { Dispenser } from "$components/stampDetails/StampListingsOpen.tsx";
 import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
+import { containerBackground, containerColData } from "$layout";
+import {
+  label,
+  labelSm,
+  textSm,
+  textXl,
+  titleGreyLD,
+  value3xl,
+  valueDark,
+} from "$text";
+import { Button } from "$buttons";
+import { tooltipIcon } from "$notifications";
 
 /* ===== TYPES ===== */
 interface StampInfoProps {
@@ -27,6 +40,7 @@ interface DimensionsType {
 
 /* ===== COMPONENT ===== */
 export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
+  /* ===== STATE ===== */
   const [fee, setFee] = useState<number>(0);
   const handleChangeFee = (newFee: number) => {
     setFee(newFee);
@@ -68,6 +82,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     : stamp.supply;
 
   const editionLabel = stamp.supply === 1 ? "edition" : "editions";
+  /* ===== REFS AND UI STATE ===== */
   const [imageDimensions, setImageDimensions] = useState<DimensionsType | null>(
     null,
   );
@@ -80,22 +95,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     ? stamp.creator_name
     : abbreviateAddress(stamp.creator, 8);
 
-  const titleGreyLD =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient1";
-  const dataColumn = "flex flex-col -space-y-1";
-  const dataLabelSm =
-    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-  const dataLabel =
-    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-  const dataValueSm =
-    "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-  const dataValueXl =
-    "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
-  const tooltipIcon =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
-  const buttonPurpleFlat =
-    "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors ";
-
   const [isDivisibleTooltipVisible, setIsDivisibleTooltipVisible] = useState(
     false,
   );
@@ -104,17 +103,16 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const [isUnlockedTooltipVisible, setIsUnlockedTooltipVisible] = useState(
     false,
   );
-
   const [allowDivisibleTooltip, setAllowDivisibleTooltip] = useState(true);
   const [allowKeyburnTooltip, setAllowKeyburnTooltip] = useState(true);
   const [allowLockedTooltip, setAllowLockedTooltip] = useState(true);
   const [allowUnlockedTooltip, setAllowUnlockedTooltip] = useState(true);
-
   const divisibleTooltipTimeoutRef = useRef<number | null>(null);
   const keyburnTooltipTimeoutRef = useRef<number | null>(null);
   const lockedTooltipTimeoutRef = useRef<number | null>(null);
   const unlockedTooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== EFFECTS ===== */
   // Cleanup effect
   useEffect(() => {
     return () => {
@@ -131,6 +129,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     };
   }, []);
 
+  /* ===== EVENT HANDLERS ===== */
   // Tooltip handlers
   const handleDivisibleMouseEnter = () => {
     if (allowDivisibleTooltip) {
@@ -208,6 +207,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     setAllowUnlockedTooltip(true);
   };
 
+  /* ===== HELPER FUNCTIONS ===== */
   const handleContent = async () => {
     if (isSrc20Stamp()) {
       // Calculate size of JSON data for SRC-20 stamps
@@ -388,6 +388,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     handleContent();
   }, [stamp.stamp_mimetype, stamp.stamp_url, fileExtension]);
 
+  /* ===== UTILITY FUNCTIONS ===== */
   // Format file size
   const formatFileSize = (size: number) => {
     if (stamp.stamp_mimetype === "text/plain") {
@@ -408,6 +409,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     return `${dims.width} x ${dims.height} ${dims.unit.toUpperCase()}`;
   };
 
+  /* ===== STATE ===== */
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Add this state for HTML title
@@ -679,6 +681,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     };
   }, [stamp.stamp]);
 
+  /* ===== RENDER ===== */
   return (
     <>
       <StampSearchClient
@@ -687,14 +690,14 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         showButton={false}
       />
 
-      <div className={"flex flex-col gap-3 mobileMd:gap-6"}>
+      <div className={"flex flex-col gap-6"}>
         <div
-          className={"flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6"}
+          className={containerBackground}
         >
           <div>
-            <p
+            <h2
               ref={titleRef}
-              className={`${titleGreyLD} whitespace-nowrap overflow-hidden`}
+              className={`${titleGreyLD} overflow-hidden`}
               style={{
                 transform: `scale(${scale})`,
                 transformOrigin: "left",
@@ -729,15 +732,15 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     <span className="font-black">{stamp.stamp}</span>
                   </>
                 )}
-            </p>
+            </h2>
 
             {isSrc20Stamp() && stamp.cpid && (
-              <p className="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
+              <h6 className={`${valueDark} -mt-1 pb-1 block`}>
                 {stamp.cpid}
-              </p>
+              </h6>
             )}
 
-            <p className="-mt-1.5 text-xl mobileLg:text-2xl font-medium text-stamp-grey-light block">
+            <h5 className={`${textXl} -mt-1.5 block`}>
               {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
                 (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) && (
                 <>
@@ -745,18 +748,18 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   <span className="font-light">{stamp.stamp}</span>
                 </>
               )}
-            </p>
+            </h5>
 
             {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
-              <p className="text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
+              <h6 className={`${valueDark} block`}>
                 {stamp.cpid}
-              </p>
+              </h6>
             )}
 
             <div className="flex flex-col items-start pt-1.5 mobileLg:pt-3">
-              <p className={dataLabel}>BY</p>
+              <h6 className={label}>BY</h6>
               <a
-                className="text-xl mobileLg:text-2xl font-black gray-gradient3-hover -mt-1"
+                className="font-black text-xl gray-gradient3-hover -mt-1"
                 href={`/wallet/${stamp.creator}`}
                 target="_parent"
               >
@@ -792,18 +795,18 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
                   <div className="text-right">
                     {displayPriceUSD && (
-                      <p className={dataLabel}>
+                      <h6 className={label}>
                         {displayPriceUSD.toLocaleString("en-US", {
                           maximumFractionDigits: 2,
                         })} <span className="font-light">USD</span>
-                      </p>
+                      </h6>
                     )}
-                    <p className={dataValueXl}>
+                    <h6 className={value3xl}>
                       {formatBTCAmount(
                         typeof displayPrice === "number" ? displayPrice : 0,
                         { excludeSuffix: true },
                       )} <span className="font-extralight">BTC</span>
-                    </p>
+                    </h6>
                   </div>
                 </div>
 
@@ -812,7 +815,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     showListings && (
                       <div className="w-full mb-3 mobileLg:mb-6">
                         {isLoadingDispensers
-                          ? <p>LOADING</p>
+                          ? <h6>LOADING</h6>
                           : (
                             <StampListingsOpen
                               dispensers={dispensers}
@@ -829,47 +832,49 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   : null}
 
                 <div className="flex justify-end">
-                  <button
-                    className={`${buttonPurpleFlat}`}
+                  <Button
+                    variant="outline"
+                    color="purple"
+                    size="lg"
                     onClick={() =>
                       toggleModal(selectedDispenser || lowestPriceDispenser)}
                   >
                     BUY
-                  </button>
+                  </Button>
                 </div>
               </div>
             )
             : null}
         </div>
 
-        <div className="flex flex-col dark-gradient rounded-lg p-3 mobileLg:p-6">
+        <div className={containerBackground}>
           {!isSrc20Stamp() && (
             <div className="flex flex-col pb-3 mobileLg:pb-6">
-              <p className={dataLabel}>{editionLabel}</p>
-              <p className={dataValueXl}>{editionCount}{" "}</p>
+              <h6 className={label}>{editionLabel}</h6>
+              <h6 className={value3xl}>{editionCount}{" "}</h6>
             </div>
           )}
 
           <div className="flex flex-row">
-            <div className={`${dataColumn} flex-1 items-start`}>
-              <p className={dataLabelSm}>TYPE</p>
-              <p className={dataValueSm}>
+            <div className={`${containerColData} flex-1 items-start`}>
+              <h6 className={labelSm}>TYPE</h6>
+              <h6 className={textSm}>
                 {isSrc20Stamp()
                   ? "SRC-20"
                   : isSrc101Stamp()
                   ? "SRC-101"
                   : fileExtension}
-              </p>
+              </h6>
             </div>
-            <div className={`${dataColumn} flex-1 items-center`}>
-              <p className={dataLabelSm}>
+            <div className={`${containerColData} flex-1 items-center`}>
+              <h6 className={labelSm}>
                 {(isSrc20Stamp() || isSrc101Stamp())
                   ? "TRANSACTION"
                   : isMediaFile
                   ? "DURATION"
                   : "DIMENSIONS"}
-              </p>
-              <p className={dataValueSm}>
+              </h6>
+              <h6 className={textSm}>
                 {isSrc20Stamp()
                   ? stamp.stamp_base64 &&
                       JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
@@ -889,7 +894,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     ? "REGISTER"
                     : "TRANSFER"
                   : getDimensionsDisplay(imageDimensions)}
-              </p>
+              </h6>
             </div>
             <div className="flex flex-1 justify-end items-end pb-1 space-x-[9px]">
               {stamp.divisible == true && (
@@ -988,27 +993,27 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           </div>
 
           <div className="flex flex-row pt-1.5 mobileLg:pt-3">
-            <div className={`${dataColumn} flex-1 items-start`}>
-              <p className={dataLabelSm}>SIZE</p>
-              <p className={dataValueSm}>
+            <div className={`${containerColData} flex-1 items-start`}>
+              <h6 className={labelSm}>SIZE</h6>
+              <h6 className={textSm}>
                 {fileSize !== null ? formatFileSize(fileSize) : "N/A"}
-              </p>
+              </h6>
             </div>
-            <div className={`${dataColumn} flex-1 items-center`}>
-              <p className={dataLabelSm}>
+            <div className={`${containerColData} flex-1 items-center`}>
+              <h6 className={labelSm}>
                 {isSrc20Stamp() ? "SENT" : "CREATED"}
-              </p>
-              <p className={dataValueSm}>
+              </h6>
+              <h6 className={textSm}>
                 {createdDate}
-              </p>
+              </h6>
             </div>
-            <div className={`${dataColumn} flex-1 items-end`}>
-              <p className={dataLabelSm}>TX HASH</p>
+            <div className={`${containerColData} flex-1 items-end`}>
+              <h6 className={labelSm}>TX HASH</h6>
               <a
                 href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${dataValueSm} hover:text-stamp-grey transition-colors duration-300`}
+                className={`${textSm} hover:text-stamp-grey transition-colors duration-300`}
               >
                 {abbreviateAddress(stamp.tx_hash, 4)}
               </a>
@@ -1017,7 +1022,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         </div>
 
         {isModalOpen && (
-          <StampBuyModal
+          <BuyStampModal
             stamp={stamp}
             fee={fee}
             handleChangeFee={handleChangeFee}

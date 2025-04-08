@@ -11,7 +11,7 @@ import {
   tooltipIcon,
 } from "$components/shared/WalletStyles.ts";
 import { StampRow } from "$globals";
-import StampBuyModal from "$islands/stamp/detail/StampBuyModal.tsx";
+import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { StatItem, StatTitle } from "$components/shared/WalletComponents.tsx";
 
 interface WalletDispenserDetailsProps {
@@ -381,7 +381,7 @@ function DispenserStats({
           </div>
 
           {showBuyModal && (
-            <StampBuyModal
+            <BuyStampModal
               stamp={firstDispenser.stamp}
               fee={fee}
               handleChangeFee={setFee}

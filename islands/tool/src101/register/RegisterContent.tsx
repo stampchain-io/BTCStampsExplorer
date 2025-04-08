@@ -1,7 +1,7 @@
 /* ===== SRC101 BITNAME REGISTRATION COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-import DetailModal from "$islands/modals/DetailModal.tsx";
+import DetailModal from "../../../modal/DetailModal.tsx";
 import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { ROOT_DOMAINS } from "$lib/utils/constants.ts";

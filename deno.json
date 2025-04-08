@@ -131,6 +131,7 @@
     "$icons": "./components/icons/index.ts",
     "$forms": "./components/forms/index.ts",
     "$notifications": "./components/notifications/index.ts",
+    "$modal": "./islands/modal/index.ts",
     "$stamp": "./islands/stamp/index.ts",
     "$src20": "./islands/src20/index.ts",
     "$collection": "./islands/collection/index.ts",

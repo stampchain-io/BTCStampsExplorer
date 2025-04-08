@@ -8,7 +8,7 @@ import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
 import { phantomProvider } from "$client/wallet/phantom.ts";
 import { showConnectWalletModal } from "$client/wallet/wallet.ts";
 
-interface WalletConnectorProps {
+interface WalletProviderBaseProps {
   providerKey: WalletProviderKey;
   toggleModal: () => void;
 }
@@ -21,8 +21,8 @@ const walletConnectors = {
   phantom: phantomProvider.connectPhantom,
 } as const;
 
-export function WalletConnector(
-  { providerKey, toggleModal }: WalletConnectorProps,
+export function WalletProviderBase(
+  { providerKey, toggleModal }: WalletProviderBaseProps,
 ) {
   const { addToast = () => {} } = useToast() ?? {};
   const providerInfo = WALLET_PROVIDERS[providerKey];

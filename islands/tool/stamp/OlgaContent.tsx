@@ -10,7 +10,7 @@ import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
-import { StampImageFullScreen } from "$stamp";
+import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 import { bodyTool, containerBackground, containerRowForm } from "$layout";
@@ -1500,7 +1500,7 @@ export function OlgaContent() {
       </div>
 
       {isFullScreenModalOpen && (
-        <StampImageFullScreen
+        <PreviewImageModal
           src={file}
           handleCloseModal={handleCloseFullScreenModal}
           contentType={file?.type?.startsWith("text/html") ? "html" : "image"}

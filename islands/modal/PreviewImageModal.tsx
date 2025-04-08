@@ -1,20 +1,26 @@
+/* ===== PREVIEW IMAGE MODAL COMPONENT ===== */
 import { useEffect } from "preact/hooks";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 import TextContentIsland from "$islands/stamp/detail/StampTextContent.tsx";
 
-interface StampImageFullScreenProps {
+/* ===== TYPES ===== */
+interface PreviewImageModalProps {
   src: string | File;
   handleCloseModal: () => void;
   contentType?: "html" | "text" | "image";
 }
 
-const StampImageFullScreen = ({
+/* ===== COMPONENT ===== */
+const PreviewImageModal = ({
   src,
   handleCloseModal,
   contentType = "image",
-}: StampImageFullScreenProps) => {
+}: PreviewImageModalProps) => {
+  /* ===== COMPUTED VALUES ===== */
   const imageUrl = typeof src === "string" ? src : URL.createObjectURL(src);
 
+  /* ===== EFFECTS ===== */
+  // Effect for keyboard shortcut handling
   useEffect(() => {
     const handleKeyboardShortcut = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -27,6 +33,7 @@ const StampImageFullScreen = ({
       document.removeEventListener("keydown", handleKeyboardShortcut);
   }, [handleCloseModal]);
 
+  // Effect for preventing body scroll while modal is open
   useEffect(() => {
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
@@ -37,15 +44,18 @@ const StampImageFullScreen = ({
     };
   }, []);
 
+  // Cleanup for file object URLs
   if (src instanceof File) {
     globalThis.addEventListener("unload", () => {
       URL.revokeObjectURL(imageUrl);
     });
   }
 
+  /* ===== STYLING ===== */
   const modalBgCenter =
     "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#000000] bg-opacity-70 backdrop-filter backdrop-blur-md";
 
+  /* ===== RENDER ===== */
   return (
     <div
       class={modalBgCenter}
@@ -57,6 +67,7 @@ const StampImageFullScreen = ({
       >
         <div class="h-[min(calc(100vh-48px),calc(100vw-48px))] w-[min(calc(100vh-48px),calc(100vw-48px))] mobileLg:h-[min(calc(100vh-96px),calc(100vw-96px))] mobileLg:w-[min(calc(100vh-96px),calc(100vw-96px))]">
           <div class="flex flex-col h-full w-full stamp-container">
+            {/* ===== CONTENT RENDERING ===== */}
             {contentType === "html"
               ? (
                 <iframe
@@ -94,4 +105,4 @@ const StampImageFullScreen = ({
   );
 };
 
-export default StampImageFullScreen;
+export default PreviewImageModal;

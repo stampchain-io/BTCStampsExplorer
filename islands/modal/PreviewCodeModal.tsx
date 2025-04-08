@@ -1,16 +1,22 @@
+/* ===== PREVIEW CODE MODAL COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 
-interface StampCodeModalProps {
+/* ===== TYPES ===== */
+interface PreviewCodeModalProps {
   src: string;
   toggleModal: () => void;
   handleCloseModal: () => void;
 }
 
-export default function StampCodeModal(
-  { src, _toggleModal, handleCloseModal }: StampCodeModalProps,
+/* ===== COMPONENT ===== */
+export default function PreviewCodeModal(
+  { src, handleCloseModal }: PreviewCodeModalProps,
 ) {
+  /* ===== STATE ===== */
   const [formattedSrc, setFormattedSrc] = useState("");
 
+  /* ===== EFFECTS ===== */
+  // Effect to prevent body scrolling when modal is open
   useEffect(() => {
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
@@ -21,10 +27,12 @@ export default function StampCodeModal(
     };
   }, []);
 
+  // Effect to format the source code
   useEffect(() => {
     setFormattedSrc(formatHtmlSource(src));
   }, [src]);
 
+  // Effect for keyboard shortcut (Escape key)
   useEffect(() => {
     const handleKeyboardShortcut = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -37,6 +45,7 @@ export default function StampCodeModal(
       document.removeEventListener("keydown", handleKeyboardShortcut);
   }, [handleCloseModal]);
 
+  /* ===== HELPER FUNCTIONS ===== */
   function formatHtmlSource(html: string): string {
     if (!html || typeof html !== "string") {
       return "No content available";
@@ -110,9 +119,11 @@ export default function StampCodeModal(
     }
   }
 
+  /* ===== STYLING ===== */
   const modalBgCenter =
     "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black bg-opacity-70 backdrop-filter backdrop-blur-md";
 
+  /* ===== RENDER ===== */
   return (
     <div
       class={modalBgCenter}
@@ -122,6 +133,7 @@ export default function StampCodeModal(
         class="relative w-[calc(100vw-48px)] h-[calc(100vh-48px)] mobileLg:w-[calc(100vw-96px)] mobileLg:h-[calc(100vh-96px)] max-w-full mobileLg:max-w-[800px]"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* ===== MODAL CONTENT ===== */}
         <div class="flex flex-col p-6 mobileMd:p-9 rounded-md bg-[#FAFAFA] w-full h-full">
           {
             /* <div class="relative top-0 right-0 -mr-3 mobileLg:-mr-2 -mt-1.5 mobileMd:-mt-3 mobileLg:-mt-2 w-6 h-6 ms-auto cursor-pointer">
@@ -140,6 +152,7 @@ export default function StampCodeModal(
             </svg>
           </div> */
           }
+          {/* ===== CODE DISPLAY ===== */}
           <div class="flex flex-col text-xs mobileLg:text-sm text-stamp-grey-darkest leading-tight overflow-auto scrollbar-grey">
             <code class="whitespace-pre-wrap">{formattedSrc}</code>
           </div>

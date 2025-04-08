@@ -131,23 +131,15 @@ import * as $DateRangePicker from "./islands/DateRangePicker.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
-import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
-import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
-import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
-import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
-import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
+import * as $Wallet_WalletProviderBase from "./islands/Wallet/WalletProviderBase.tsx";
 import * as $Wallet_details_WalletContent from "./islands/Wallet/details/WalletContent.tsx";
 import * as $Wallet_details_WalletDashboardContent from "./islands/Wallet/details/WalletDashboardContent.tsx";
 import * as $Wallet_details_WalletDashboardDetails from "./islands/Wallet/details/WalletDashboardDetails.tsx";
 import * as $Wallet_details_WalletDashboardHeader from "./islands/Wallet/details/WalletDashboardHeader.tsx";
 import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletDetails.tsx";
 import * as $Wallet_details_WalletDispenserDetails from "./islands/Wallet/details/WalletDispenserDetails.tsx";
-import * as $Wallet_details_WalletDonateModal from "./islands/Wallet/details/WalletDonateModal.tsx";
 import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHeader.tsx";
 import * as $Wallet_details_WalletProfileDetails from "./islands/Wallet/details/WalletProfileDetails.tsx";
-import * as $Wallet_details_WalletReceiveModal from "./islands/Wallet/details/WalletReceiveModal.tsx";
-import * as $Wallet_details_WalletSendBTCModal from "./islands/Wallet/details/WalletSendBTCModal.tsx";
-import * as $Wallet_details_WalletSendStampModal from "./islands/Wallet/details/WalletSendStampModal.tsx";
 import * as $about_AboutContact from "./islands/about/AboutContact.tsx";
 import * as $about_AboutDonate from "./islands/about/AboutDonate.tsx";
 import * as $about_AboutHeader from "./islands/about/AboutHeader.tsx";
@@ -156,6 +148,7 @@ import * as $about_types from "./islands/about/types.ts";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
+import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $charts_HoldersPieChart from "./islands/charts/HoldersPieChart.tsx";
 import * as $collection_ArtistSection from "./islands/collection/ArtistSection.tsx";
 import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
@@ -189,7 +182,17 @@ import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $loading_LoadingContent from "./islands/loading/LoadingContent.tsx";
 import * as $loading_LoadingProvider from "./islands/loading/LoadingProvider.tsx";
-import * as $modals_DetailModal from "./islands/modals/DetailModal.tsx";
+import * as $modal_BuyStampModal from "./islands/modal/BuyStampModal.tsx";
+import * as $modal_ConnectWalletModal from "./islands/modal/ConnectWalletModal.tsx";
+import * as $modal_ConnectedModalWIP from "./islands/modal/ConnectedModalWIP.tsx";
+import * as $modal_DetailModal from "./islands/modal/DetailModal.tsx";
+import * as $modal_DonateStampModal from "./islands/modal/DonateStampModal.tsx";
+import * as $modal_PreviewCodeModal from "./islands/modal/PreviewCodeModal.tsx";
+import * as $modal_PreviewImageModal from "./islands/modal/PreviewImageModal.tsx";
+import * as $modal_RecieveAddyModal from "./islands/modal/RecieveAddyModal.tsx";
+import * as $modal_SendBTCModal from "./islands/modal/SendBTCModal.tsx";
+import * as $modal_SendStampModalWIP from "./islands/modal/SendStampModalWIP.tsx";
+import * as $modal_index from "./islands/modal/index.ts";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
@@ -212,10 +215,7 @@ import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
 import * as $stamp_StampSection from "./islands/stamp/StampSection.tsx";
 import * as $stamp_detail_RecentSales from "./islands/stamp/detail/RecentSales.tsx";
-import * as $stamp_detail_StampBuyModal from "./islands/stamp/detail/StampBuyModal.tsx";
-import * as $stamp_detail_StampCodeModal from "./islands/stamp/detail/StampCodeModal.tsx";
 import * as $stamp_detail_StampImage from "./islands/stamp/detail/StampImage.tsx";
-import * as $stamp_detail_StampImageFullScreen from "./islands/stamp/detail/StampImageFullScreen.tsx";
 import * as $stamp_detail_StampInfo from "./islands/stamp/detail/StampInfo.tsx";
 import * as $stamp_detail_StampTextContent from "./islands/stamp/detail/StampTextContent.tsx";
 import * as $stamp_index_1 from "./islands/stamp/index.ts";
@@ -401,12 +401,7 @@ const manifest = {
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
-    "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
-    "./islands/Wallet/ConnectedModal.tsx": $Wallet_ConnectedModal,
-    "./islands/Wallet/ConnectorsModal.tsx": $Wallet_ConnectorsModal,
-    "./islands/Wallet/WalletModal.tsx": $Wallet_WalletModal,
-    "./islands/Wallet/connectors/Wallet.connector.tsx":
-      $Wallet_connectors_Wallet_connector,
+    "./islands/Wallet/WalletProviderBase.tsx": $Wallet_WalletProviderBase,
     "./islands/Wallet/details/WalletContent.tsx": $Wallet_details_WalletContent,
     "./islands/Wallet/details/WalletDashboardContent.tsx":
       $Wallet_details_WalletDashboardContent,
@@ -417,17 +412,9 @@ const manifest = {
     "./islands/Wallet/details/WalletDetails.tsx": $Wallet_details_WalletDetails,
     "./islands/Wallet/details/WalletDispenserDetails.tsx":
       $Wallet_details_WalletDispenserDetails,
-    "./islands/Wallet/details/WalletDonateModal.tsx":
-      $Wallet_details_WalletDonateModal,
     "./islands/Wallet/details/WalletHeader.tsx": $Wallet_details_WalletHeader,
     "./islands/Wallet/details/WalletProfileDetails.tsx":
       $Wallet_details_WalletProfileDetails,
-    "./islands/Wallet/details/WalletReceiveModal.tsx":
-      $Wallet_details_WalletReceiveModal,
-    "./islands/Wallet/details/WalletSendBTCModal.tsx":
-      $Wallet_details_WalletSendBTCModal,
-    "./islands/Wallet/details/WalletSendStampModal.tsx":
-      $Wallet_details_WalletSendStampModal,
     "./islands/about/AboutContact.tsx": $about_AboutContact,
     "./islands/about/AboutDonate.tsx": $about_AboutDonate,
     "./islands/about/AboutHeader.tsx": $about_AboutHeader,
@@ -436,6 +423,7 @@ const manifest = {
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
+    "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/charts/HoldersPieChart.tsx": $charts_HoldersPieChart,
     "./islands/collection/ArtistSection.tsx": $collection_ArtistSection,
     "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
@@ -475,7 +463,17 @@ const manifest = {
     "./islands/layout/Header.tsx": $layout_Header,
     "./islands/loading/LoadingContent.tsx": $loading_LoadingContent,
     "./islands/loading/LoadingProvider.tsx": $loading_LoadingProvider,
-    "./islands/modals/DetailModal.tsx": $modals_DetailModal,
+    "./islands/modal/BuyStampModal.tsx": $modal_BuyStampModal,
+    "./islands/modal/ConnectWalletModal.tsx": $modal_ConnectWalletModal,
+    "./islands/modal/ConnectedModalWIP.tsx": $modal_ConnectedModalWIP,
+    "./islands/modal/DetailModal.tsx": $modal_DetailModal,
+    "./islands/modal/DonateStampModal.tsx": $modal_DonateStampModal,
+    "./islands/modal/PreviewCodeModal.tsx": $modal_PreviewCodeModal,
+    "./islands/modal/PreviewImageModal.tsx": $modal_PreviewImageModal,
+    "./islands/modal/RecieveAddyModal.tsx": $modal_RecieveAddyModal,
+    "./islands/modal/SendBTCModal.tsx": $modal_SendBTCModal,
+    "./islands/modal/SendStampModalWIP.tsx": $modal_SendStampModalWIP,
+    "./islands/modal/index.ts": $modal_index,
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
     "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
     "./islands/modules/Partners.tsx": $modules_Partners,
@@ -501,11 +499,7 @@ const manifest = {
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
     "./islands/stamp/StampSection.tsx": $stamp_StampSection,
     "./islands/stamp/detail/RecentSales.tsx": $stamp_detail_RecentSales,
-    "./islands/stamp/detail/StampBuyModal.tsx": $stamp_detail_StampBuyModal,
-    "./islands/stamp/detail/StampCodeModal.tsx": $stamp_detail_StampCodeModal,
     "./islands/stamp/detail/StampImage.tsx": $stamp_detail_StampImage,
-    "./islands/stamp/detail/StampImageFullScreen.tsx":
-      $stamp_detail_StampImageFullScreen,
     "./islands/stamp/detail/StampInfo.tsx": $stamp_detail_StampInfo,
     "./islands/stamp/detail/StampTextContent.tsx":
       $stamp_detail_StampTextContent,

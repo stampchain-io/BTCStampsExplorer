@@ -1,6 +1,6 @@
 /* ===== HEADER COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
+import { ConnectButton } from "$islands/button/ConnectButton.tsx";
 import { CloseIcon, GearIcon, HamburgerMenuIcon } from "$icons";
 import {
   logoPurpleLDLink,
@@ -327,7 +327,7 @@ export function Header() {
       {/* ===== DESKTOP NAVIGATION ===== */}
       <div className="hidden tablet:flex justify-between items-center gap-9">
         {renderNavLinks()}
-        <ConnectWallet />
+        <ConnectButton />
       </div>
 
       {/* ===== MOBILE NAVIGATION DRAWER ===== */}
@@ -380,7 +380,7 @@ export function Header() {
                   transitionDelay: toolsOpen ? "0ms" : "425ms",
                 }}
               >
-                <ConnectWallet />
+                <ConnectButton />
               </div>
             </div>
 

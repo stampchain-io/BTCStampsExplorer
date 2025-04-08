@@ -4,15 +4,15 @@ import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.ts
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 
-interface WalletSendModalProps {
+interface SendBTCModalProps {
   fee: number;
   balance: number;
   handleChangeFee: (fee: number) => void;
   onClose: () => void;
 }
 
-function WalletSendModal(
-  { fee: initialFee, balance, handleChangeFee, onClose }: WalletSendModalProps,
+function SendBTCModal(
+  { fee: initialFee, balance, handleChangeFee, onClose }: SendBTCModalProps,
 ) {
   const { wallet } = walletContext;
   const [_isSendingMax, _setIsSendingMax] = useState(false);
@@ -395,4 +395,4 @@ function WalletSendModal(
   );
 }
 
-export default WalletSendModal;
+export default SendBTCModal;

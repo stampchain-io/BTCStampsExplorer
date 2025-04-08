@@ -17,7 +17,7 @@ interface Props {
   dispenser: any;
 }
 
-const WalletDonateModal = ({
+const DonateStampModal = ({
   stamp,
   fee: initialFee,
   handleChangeFee,
@@ -157,14 +157,14 @@ const WalletDonateModal = ({
   // Add debug logging
   useEffect(() => {
     logger.debug("ui", {
-      message: "WalletDonateModal mounted",
-      component: "WalletDonateModal",
+      message: "DonateStampModal mounted",
+      component: "DonateStampModal",
     });
 
     return () => {
       logger.debug("ui", {
-        message: "WalletDonateModal unmounting",
-        component: "WalletDonateModal",
+        message: "DonateStampModal unmounting",
+        component: "DonateStampModal",
       });
     };
   }, []);
@@ -191,7 +191,7 @@ const WalletDonateModal = ({
       onClose={() => {
         logger.debug("ui", {
           message: "Modal closing",
-          component: "WalletDonateModal",
+          component: "DonateStampModal",
         });
         handleCloseModal();
       }}
@@ -271,7 +271,7 @@ const WalletDonateModal = ({
           logger.debug("ui", {
             message: "Fee changing",
             newFee,
-            component: "WalletDonateModal",
+            component: "DonateStampModal",
           });
           internalHandleChangeFee(newFee);
         }}
@@ -284,14 +284,14 @@ const WalletDonateModal = ({
         onSubmit={() => {
           logger.debug("ui", {
             message: "Submit clicked",
-            component: "WalletDonateModal",
+            component: "DonateStampModal",
           });
           handleBuyClick();
         }}
         onCancel={() => {
           logger.debug("ui", {
             message: "Cancel clicked",
-            component: "WalletDonateModal",
+            component: "DonateStampModal",
           });
           handleCloseModal();
         }}
@@ -310,4 +310,4 @@ const WalletDonateModal = ({
   );
 };
 
-export default WalletDonateModal;
+export default DonateStampModal;

@@ -8,8 +8,8 @@ import {
 } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import TextContentIsland from "$islands/stamp/detail/StampTextContent.tsx";
-import StampCodeModal from "$islands/stamp/detail/StampCodeModal.tsx";
-import StampImageFullScreen from "$islands/stamp/detail/StampImageFullScreen.tsx";
+import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
+import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { logger } from "$lib/utils/logger.ts";
 
 function RightPanel(
@@ -770,7 +770,7 @@ export function StampImage(
       )}
 
       {isCodeModalOpen && (
-        <StampCodeModal
+        <PreviewCodeModal
           src={htmlContent || src}
           toggleModal={toggleCodeModal}
           handleCloseModal={handleCloseCodeModal}
@@ -778,7 +778,7 @@ export function StampImage(
       )}
 
       {isFullScreenModalOpen && (
-        <StampImageFullScreen
+        <PreviewImageModal
           src={src}
           handleCloseModal={handleCloseFullScreenModal}
           contentType={stamp.stamp_mimetype === "text/html"

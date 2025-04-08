@@ -7,8 +7,9 @@ import {
   walletContext,
 } from "$client/wallet/wallet.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { ConnectorsModal } from "$islands/Wallet/ConnectorsModal.tsx";
-import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
+import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
+import { WalletProviderBase } from "$islands/Wallet/WalletProviderBase.tsx";
+import { WalletProviderKey } from "$lib/utils/constants.ts";
 import AnimationLayout from "$components/shared/animation/AnimationLayout.tsx";
 import { Button } from "$buttons";
 import { navLinkPurple, valueDarkSm } from "$text";
@@ -18,7 +19,13 @@ interface Props {
 }
 
 /* ===== MAIN WALLET MODAL COMPONENT ===== */
-export const WalletModal = ({ connectors = [] }: Props) => {
+export const ConnectButton = () => {
+  // Move provider configuration here
+  const connectors: WalletProviderKey[] = ["unisat", "leather", "okx"];
+  const connectorComponents = connectors.map((key) => (extraProps: any) => (
+    <WalletProviderBase providerKey={key} {...extraProps} />
+  ));
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { wallet, isConnected, disconnect } = walletContext;
@@ -202,8 +209,8 @@ export const WalletModal = ({ connectors = [] }: Props) => {
             showConnectWalletModal.value = false;
           }}
         >
-          <ConnectorsModal
-            connectors={connectors}
+          <ConnectWalletModal
+            connectors={connectorComponents}
             toggleModal={() => {
               setIsModalOpen(false);
               showConnectWalletModal.value = false;

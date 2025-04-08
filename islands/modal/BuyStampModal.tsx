@@ -1,4 +1,4 @@
-/* ===== STAMP BUY MODAL COMPONENT ===== */
+/* ===== BUY STAMP MODAL COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import type { StampRow } from "$globals";
 import StampImage from "$islands/stamp/detail/StampImage.tsx";
@@ -17,7 +17,7 @@ interface Props {
   dispenser: any;
 }
 
-const StampBuyModal = ({
+const BuyStampModal = ({
   stamp,
   fee: initialFee,
   handleChangeFee,
@@ -148,14 +148,14 @@ const StampBuyModal = ({
   // Add debug logging
   useEffect(() => {
     logger.debug("ui", {
-      message: "StampBuyModal mounted",
-      component: "StampBuyModal",
+      message: "BuyStampModal mounted",
+      component: "BuyStampModal",
     });
 
     return () => {
       logger.debug("ui", {
-        message: "StampBuyModal unmounting",
-        component: "StampBuyModal",
+        message: "BuyStampModal unmounting",
+        component: "BuyStampModal",
       });
     };
   }, []);
@@ -165,7 +165,7 @@ const StampBuyModal = ({
       onClose={() => {
         logger.debug("ui", {
           message: "Modal closing",
-          component: "StampBuyModal",
+          component: "BuyStampModal",
         });
         handleCloseModal();
       }}
@@ -216,7 +216,7 @@ const StampBuyModal = ({
           logger.debug("ui", {
             message: "Fee changing",
             newFee,
-            component: "StampBuyModal",
+            component: "BuyStampModal",
           });
           internalHandleChangeFee(newFee);
         }}
@@ -232,14 +232,14 @@ const StampBuyModal = ({
         onSubmit={() => {
           logger.debug("ui", {
             message: "Submit clicked",
-            component: "StampBuyModal",
+            component: "BuyStampModal",
           });
           handleBuyClick();
         }}
         onCancel={() => {
           logger.debug("ui", {
             message: "Cancel clicked",
-            component: "StampBuyModal",
+            component: "BuyStampModal",
           });
           handleCloseModal();
         }}
@@ -258,4 +258,4 @@ const StampBuyModal = ({
   );
 };
 
-export default StampBuyModal;
+export default BuyStampModal;

@@ -2,8 +2,8 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { StampRow } from "$globals";
-import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
-import WalletDonateModal from "$islands/Wallet/details/WalletDonateModal.tsx";
+import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
+import DonateStampModal from "$islands/modal/DonateStampModal.tsx";
 import {
   DonateStampData,
   Transaction,
@@ -403,7 +403,7 @@ export default function AboutDonate() {
 
         {/* ===== MODALS ===== */}
         {isOpen && (
-          <WalletDonateModal
+          <DonateStampModal
             stamp={DONATE_STAMP as unknown as StampRow}
             fee={fee}
             handleChangeFee={handleChangeFee}
@@ -413,7 +413,7 @@ export default function AboutDonate() {
           />
         )}
         {isReceiveModalOpen && (
-          <WalletReceiveModal
+          <RecieveAddyModal
             onClose={() => setIsReceiveModalOpen(false)}
             address={DONATE_ADDRESS}
             title="DONATE"

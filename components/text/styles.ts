@@ -81,6 +81,7 @@ export const value2xl =
   `font-extrabold text-2xl text-stamp-grey-light -mt-1 ${cursor}`;
 export const value3xl =
   `font-extrabold text-3xl text-stamp-grey-light -mt-1 ${cursor}`;
+export const valueDark = `font-bold text-base text-stamp-grey-darker ${cursor}`;
 export const valueDarkSm =
   `font-medium text-sm text-stamp-grey-darker tracking-tighter ${cursor}`; // used for addy styling in mobile/table/desktop header
 

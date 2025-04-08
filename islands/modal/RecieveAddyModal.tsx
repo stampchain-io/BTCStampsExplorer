@@ -8,7 +8,7 @@ interface Props {
   title?: string;
 }
 
-function WalletReceiveModal({ onClose, address, title = "RECEIVE" }: Props) {
+function RecieveAddyModal({ onClose, address, title = "RECEIVE" }: Props) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [isCopyTooltipVisible, setIsCopyTooltipVisible] = useState(false);
   const [allowCopyTooltip, setAllowCopyTooltip] = useState(true);
@@ -155,4 +155,4 @@ function formatAddress(address: string): JSX.Element[] {
   ]).flat();
 }
 
-export default WalletReceiveModal;
+export default RecieveAddyModal;

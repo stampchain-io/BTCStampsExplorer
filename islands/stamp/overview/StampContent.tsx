@@ -1,4 +1,5 @@
 /* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
+/*@baba-29+31*/
 import { StampRow } from "$globals";
 import { StampCard } from "$stamp";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";

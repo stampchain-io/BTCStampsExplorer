@@ -1,6 +1,6 @@
 import { ComponentChildren } from "preact";
 import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
-import { WalletConnector } from "./connectors/Wallet.connector.tsx";
+import { WalletProviderBase } from "$islands/Wallet/WalletProviderBase.tsx";
 import { showConnectWalletModal } from "$client/wallet/wallet.ts";
 
 interface Props {
@@ -9,10 +9,10 @@ interface Props {
   handleCloseModal: (event: MouseEvent) => void;
 }
 
-export const ConnectorsModal = (
+export const ConnectWalletModal = (
   { connectors, toggleModal, handleCloseModal }: Props,
 ) => {
-  console.log("Rendering ConnectorsModal with connectors:", connectors);
+  console.log("Rendering ConnectWalletModal with connectors:", connectors);
 
   const closeModal = () => {
     toggleModal();
@@ -45,7 +45,7 @@ export const ConnectorsModal = (
 
         <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-3 mobileMd:gap-6 items-center">
           {Object.keys(WALLET_PROVIDERS).map((providerKey) => (
-            <WalletConnector
+            <WalletProviderBase
               key={providerKey}
               providerKey={providerKey as WalletProviderKey}
               toggleModal={toggleModal}

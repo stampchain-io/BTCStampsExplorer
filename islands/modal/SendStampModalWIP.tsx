@@ -1,4 +1,3 @@
-// islands/stamp/details/WalletSendStampModal.tsx
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
@@ -26,7 +25,7 @@ interface Props {
   };
 }
 
-function WalletSendStampModal({
+function SendStampModal({
   fee: initialFee,
   handleChangeFee = () => {},
   toggleModal,
@@ -371,4 +370,4 @@ function WalletSendStampModal({
   );
 }
 
-export default WalletSendStampModal;
+export default SendStampModal;
