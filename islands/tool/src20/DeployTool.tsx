@@ -17,7 +17,7 @@ import { Icon } from "$icon";
 import { inputTextarea, SRC20InputField } from "$form";
 import { titlePurpleLD } from "$text";
 import { ToggleSwitchButton } from "$button";
-import { StatusMessages, tooltipButton, tooltipImage } from "$notifications";
+import { StatusMessages, tooltipButton, tooltipImage } from "$notification";
 
 /* ===== INTERFACE DEFINITIONS ===== */
 interface UploadResponse extends APIResponse {

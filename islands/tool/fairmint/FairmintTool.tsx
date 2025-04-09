@@ -2,7 +2,7 @@
 import { useState } from "preact/hooks";
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
 import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
-import { StatusMessages } from "$notifications";
+import { StatusMessages } from "$notification";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { bodyTool, containerBackground, containerColForm } from "$layout";
 import { titlePurpleLD } from "$text";

@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import QRCode from "qrcode";
 import { ModalLayout } from "$components/modal/ModalLayout.tsx";
-import { tooltipIcon } from "$notifications";
+import { tooltipIcon } from "$notification";
 
 /* ===== TYPES ===== */
 interface Props {

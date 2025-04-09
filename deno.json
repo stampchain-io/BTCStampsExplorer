@@ -135,7 +135,7 @@
     "$button": "./components/button/index.ts",
     "$icon": "./components/icon/index.ts",
     "$form": "./components/form/index.ts",
-    "$notifications": "./components/notifications/index.ts",
+    "$notification": "./components/notification/index.ts",
     "$gallery": "./islands/gallery/index.ts",
     "$modal": "./islands/modal/index.ts",
     "$stamp": "./islands/stamp/index.ts",

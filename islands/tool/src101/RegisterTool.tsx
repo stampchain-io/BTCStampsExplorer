@@ -10,7 +10,7 @@ import { bodyTool, containerBackground } from "$layout";
 import { titlePurpleLD } from "$text";
 import { Button } from "$button";
 import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
-import { StatusMessages, tooltipButton } from "$notifications";
+import { StatusMessages, tooltipButton } from "$notification";
 
 /* ===== COMPONENT INTERFACE ===== */
 interface SRC101RegisterToolProps {

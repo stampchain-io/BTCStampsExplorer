@@ -23,7 +23,7 @@ import {
   tooltipButton,
   tooltipButtonInCollapsible,
   tooltipImage,
-} from "$notifications";
+} from "$notification";
 
 /* ===== LOGGING UTILITY ===== */
 const log = (message: string, data?: unknown) => {

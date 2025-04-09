@@ -12,7 +12,7 @@ import TextContentIsland from "$islands/stamp/detail/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { logger } from "$lib/utils/logger.ts";
-import { tooltipIcon } from "$notifications";
+import { tooltipIcon } from "$notification";
 
 /* ===== RIGHT PANEL SUBCOMPONENT ===== */
 function RightPanel(

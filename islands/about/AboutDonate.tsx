@@ -10,7 +10,7 @@ import {
   TxOutput,
 } from "$islands/about/types.ts";
 import { headingGrey, label, subtitlePurple, text, titlePurpleLD } from "$text";
-import { tooltipIcon } from "$notifications";
+import { tooltipIcon } from "$notification";
 import { Button } from "$button";
 import { Icon } from "$icon";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";

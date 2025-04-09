@@ -24,7 +24,7 @@ import {
   valueDark,
 } from "$text";
 import { Button } from "$button";
-import { tooltipIcon } from "$notifications";
+import { tooltipIcon } from "$notification";
 
 /* ===== TYPES ===== */
 interface StampInfoProps {

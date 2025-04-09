@@ -5,7 +5,7 @@ import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.ts
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalLayout } from "$components/modal/ModalLayout.tsx";
 import { inputField } from "$form";
-import { tooltipIcon } from "$notifications";
+import { tooltipIcon } from "$notification";
 
 /* ===== TYPES ===== */
 interface SendBTCModalProps {

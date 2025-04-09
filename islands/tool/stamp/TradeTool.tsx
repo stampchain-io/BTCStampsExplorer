@@ -13,7 +13,7 @@ import { bodyTool, containerBackground } from "$layout";
 import { subtitlePurple, titlePurpleLD } from "$text";
 import { Button } from "$button";
 import { InputField } from "$form";
-import { StatusMessages } from "$notifications";
+import { StatusMessages } from "$notification";
 
 /* ===== CONSTANTS ===== */
 const SIGHASH_SINGLE = 0x03;

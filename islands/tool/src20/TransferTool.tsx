@@ -13,7 +13,7 @@ import {
 } from "$layout";
 import { titlePurpleLD } from "$text";
 import { SRC20InputField } from "$form";
-import { StatusMessages } from "$notifications";
+import { StatusMessages } from "$notification";
 
 /* ===== INTERFACE DEFINITIONS ===== */
 interface Balance {
