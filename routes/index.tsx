@@ -5,7 +5,7 @@ import { HomeHeader } from "$components/home/HomeHeader.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
-import { PartnersModule } from "$islands/modules/Partners.tsx";
+import { PartnersGallery } from "$gallery";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
 import { RecentSales } from "$islands/stamp/detail/RecentSales.tsx";
 import { HomeCarousel } from "$components/home/HomeCarousel.tsx";
@@ -148,7 +148,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
           </div>
           <div class="flex flex-col gap-6 mobileLg:gap-12">
             <StampChainModule />
-            <PartnersModule />
+            <PartnersGallery />
           </div>
         </div>
       </div>

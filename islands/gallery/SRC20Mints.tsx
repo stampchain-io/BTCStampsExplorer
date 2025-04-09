@@ -4,7 +4,7 @@ import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutminte
 import type { SRC20Row } from "$globals";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
-export default function PopularMinting() {
+export default function SRC20MintsGallery() {
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<SRC20Row[]>([]);
 

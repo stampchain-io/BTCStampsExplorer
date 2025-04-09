@@ -170,6 +170,11 @@ import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $faq_AccordionBase from "./islands/faq/AccordionBase.tsx";
 import * as $faq_FaqAccordion from "./islands/faq/FaqAccordion.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
+import * as $gallery_Partners from "./islands/gallery/Partners.tsx";
+import * as $gallery_SRC20Deploys from "./islands/gallery/SRC20Deploys.tsx";
+import * as $gallery_SRC20Mints from "./islands/gallery/SRC20Mints.tsx";
+import * as $gallery_SRC20Transfers from "./islands/gallery/SRC20Transfers.tsx";
+import * as $gallery_index from "./islands/gallery/index.ts";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
@@ -201,7 +206,6 @@ import * as $modal_WalletProviderBase from "./islands/modal/WalletProviderBase.t
 import * as $modal_index from "./islands/modal/index.ts";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
-import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
@@ -243,9 +247,6 @@ import * as $tool_src20_DeployTool from "./islands/tool/src20/DeployTool.tsx";
 import * as $tool_src20_MintTool from "./islands/tool/src20/MintTool.tsx";
 import * as $tool_src20_SRC20InputField from "./islands/tool/src20/SRC20InputField.tsx";
 import * as $tool_src20_TransferTool from "./islands/tool/src20/TransferTool.tsx";
-import * as $tool_src20_deploy_RecentDeploy from "./islands/tool/src20/deploy/RecentDeploy.tsx";
-import * as $tool_src20_mint_PopularMinting from "./islands/tool/src20/mint/PopularMinting.tsx";
-import * as $tool_src20_transfer_LatestTransfer from "./islands/tool/src20/transfer/LatestTransfer.tsx";
 import * as $tool_stamp_OlgaContent from "./islands/tool/stamp/OlgaContent.tsx";
 import * as $tool_stamp_TradeContent from "./islands/tool/stamp/TradeContent.tsx";
 import * as $tool_stamp_transfer_LatestStampTransfer from "./islands/tool/stamp/transfer/LatestStampTransfer.tsx";
@@ -463,6 +464,11 @@ const manifest = {
     "./islands/faq/AccordionBase.tsx": $faq_AccordionBase,
     "./islands/faq/FaqAccordion.tsx": $faq_FaqAccordion,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
+    "./islands/gallery/Partners.tsx": $gallery_Partners,
+    "./islands/gallery/SRC20Deploys.tsx": $gallery_SRC20Deploys,
+    "./islands/gallery/SRC20Mints.tsx": $gallery_SRC20Mints,
+    "./islands/gallery/SRC20Transfers.tsx": $gallery_SRC20Transfers,
+    "./islands/gallery/index.ts": $gallery_index,
     "./islands/home/FontLoader.tsx": $home_FontLoader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
@@ -494,7 +500,6 @@ const manifest = {
     "./islands/modal/index.ts": $modal_index,
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
     "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
-    "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
@@ -542,12 +547,6 @@ const manifest = {
     "./islands/tool/src20/MintTool.tsx": $tool_src20_MintTool,
     "./islands/tool/src20/SRC20InputField.tsx": $tool_src20_SRC20InputField,
     "./islands/tool/src20/TransferTool.tsx": $tool_src20_TransferTool,
-    "./islands/tool/src20/deploy/RecentDeploy.tsx":
-      $tool_src20_deploy_RecentDeploy,
-    "./islands/tool/src20/mint/PopularMinting.tsx":
-      $tool_src20_mint_PopularMinting,
-    "./islands/tool/src20/transfer/LatestTransfer.tsx":
-      $tool_src20_transfer_LatestTransfer,
     "./islands/tool/stamp/OlgaContent.tsx": $tool_stamp_OlgaContent,
     "./islands/tool/stamp/TradeContent.tsx": $tool_stamp_TradeContent,
     "./islands/tool/stamp/transfer/LatestStampTransfer.tsx":

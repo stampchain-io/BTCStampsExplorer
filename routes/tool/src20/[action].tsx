@@ -5,19 +5,17 @@ import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import type { SRC20MintStatus } from "$lib/types/src20.d.ts";
 import { body, gapSection } from "$layout";
-import {
-  LatestTransfer,
-  PopularMinting,
-  RecentDeploy,
-  SRC20DeployTool,
-  SRC20MintTool,
-  SRC20TransferTool,
-} from "$tool";
+import { SRC20DeployTool, SRC20MintTool, SRC20TransferTool } from "$tool";
 import {
   HowToDeployTokenModule,
   HowToMintTokenModule,
   HowToTransferTokenModule,
 } from "$howto";
+import {
+  SRC20DeploysGallery,
+  SRC20MintsGallery,
+  SRC20TransfersGallery,
+} from "$gallery";
 
 /* ===== TYPES ===== */
 interface ToolSrc20PageProps {
@@ -140,11 +138,11 @@ export default function ToolSrc20Page(
   const renderRightSidebar = () => {
     switch (selectedTab) {
       case "mint":
-        return <PopularMinting />;
+        return <SRC20MintsGallery />;
       case "deploy":
-        return <RecentDeploy />;
+        return <SRC20DeploysGallery />;
       case "transfer":
-        return <LatestTransfer />;
+        return <SRC20TransfersGallery />;
       default:
         return null;
     }

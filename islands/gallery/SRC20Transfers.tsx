@@ -4,7 +4,7 @@ import type { StampTransaction } from "$lib/types/stamping.ts";
 import type { JSX } from "preact";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
-export default function LatestTransfer(): JSX.Element {
+export default function SRC20TransfersGallery(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<StampTransaction[]>([]);
 

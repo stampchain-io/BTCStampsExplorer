@@ -98,7 +98,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
 }
 
 /* ===== COMPONENT ===== */
-export function PartnersModule() {
+export function PartnersGallery() {
   /* ===== RENDER ===== */
   return (
     <div class="flex flex-col max-w-desktop w-full mx-auto mb-4">

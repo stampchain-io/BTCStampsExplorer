@@ -1,9 +1,6 @@
 export * from "$islands/tool/src20/DeployTool.tsx";
 export * from "$islands/tool/src20/MintTool.tsx";
 export * from "$islands/tool/src20/TransferTool.tsx";
-export { default as RecentDeploy } from "$islands/tool/src20/deploy/RecentDeploy.tsx";
-export { default as PopularMinting } from "$islands/tool/src20/mint/PopularMinting.tsx";
-export { default as LatestTransfer } from "$islands/tool/src20/transfer/LatestTransfer.tsx";
 export * from "$islands/tool/src101/register/RegisterContent.tsx";
 export { default as RecentBitnameRegister } from "$islands/tool/src101/register/RecentRegister.tsx";
 export * from "$islands/tool/stamp/OlgaContent.tsx";

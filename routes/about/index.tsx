@@ -2,7 +2,7 @@
 import { body, gapSectionSlim } from "$layout";
 import AboutHeader from "$islands/about/AboutHeader.tsx";
 import AboutTeam from "$islands/about/AboutTeam.tsx";
-import { PartnersModule } from "$islands/modules/Partners.tsx";
+import { PartnersGallery } from "$gallery";
 import AboutDonate from "$islands/about/AboutDonate.tsx";
 import AboutContact from "$islands/about/AboutContact.tsx";
 
@@ -35,7 +35,7 @@ export default function About() {
       <AboutTeam />
 
       {/* ===== PARTNERS SECTION ===== */}
-      <PartnersModule />
+      <PartnersGallery />
 
       {/* ===== DONATE SECTION ===== */}
       <div id="donate"></div>
