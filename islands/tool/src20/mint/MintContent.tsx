@@ -11,6 +11,8 @@ import {
   containerBackground,
   containerColForm,
   containerRowForm,
+  imagePreviewTool,
+  loaderSpinGrey,
 } from "$layout";
 import { SRC20InputField } from "$forms";
 import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
@@ -312,12 +314,10 @@ export function MintContent({
           {/* Token image preview */}
           <div
             id="image-preview"
-            class="relative flex flex-col items-center justify-center content-center mx-auto h-[100px] min-w-[100px] rounded bg-stamp-purple-darker"
+            class={imagePreviewTool}
           >
             {isImageLoading
-              ? (
-                <div class="animate-spin rounded-full w-7 h-7 border-b-[3px] border-stamp-grey" />
-              )
+              ? <div class={loaderSpinGrey} />
               : selectedTokenImage
               ? (
                 <img

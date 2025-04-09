@@ -4,6 +4,7 @@ import { inputField } from "$forms";
 
 interface SelectFieldProps {
   onChange: (e: JSX.TargetedEvent<HTMLSelectElement, Event>) => void;
+  onClick?: (e: JSX.TargetedEvent<HTMLSelectElement, Event>) => void;
   error?: string;
   disabled?: boolean;
   options: StampRow[];
@@ -11,6 +12,7 @@ interface SelectFieldProps {
 
 export function SelectField({
   onChange,
+  onClick,
   error,
   disabled = false,
   options,
@@ -19,6 +21,7 @@ export function SelectField({
     <div class="w-full">
       <select
         onChange={onChange}
+        onClick={onClick}
         disabled={disabled}
         class={inputField}
       >

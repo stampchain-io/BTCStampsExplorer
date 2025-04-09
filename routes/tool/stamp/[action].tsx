@@ -1,9 +1,19 @@
+/* ===== STAMP TOOLS PAGE ===== */
+/*@baba-71-82*/
 import { Handlers, PageProps } from "$fresh/server.ts";
-
+import { body, gapSection } from "$layout";
 import { TransferStampContent } from "$islands/tool/stamp/transfer/TransferStampContent.tsx";
 import LatestTransfer from "$islands/tool/stamp/transfer/LatestStampTransfer.tsx";
 import { HowToTransferStampModule } from "$islands/howto/HowToTransferStamp.tsx";
 
+/* ===== TYPES ===== */
+interface ToolStampPageProps {
+  selectedTab: string;
+  trxType: "multisig" | "olga";
+  error?: string;
+}
+
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
   GET(req, ctx) {
     console.log("Handler called for [action] route");
@@ -16,11 +26,13 @@ export const handler: Handlers = {
   },
 };
 
-export default function StampingStampPage(
-  { data }: PageProps<StampingStampPageProps>,
+/* ===== PAGE COMPONENT ===== */
+export default function ToolStampPage(
+  { data }: PageProps<ToolStampPageProps>,
 ) {
-  console.log("StampingStampPage component rendered");
+  console.log("ToolStampPage component rendered");
 
+  /* ===== DATA EXTRACTION ===== */
   const {
     selectedTab = "defaultTab",
     trxType = "defaultType",
@@ -30,6 +42,7 @@ export default function StampingStampPage(
   console.log("Selected Tab:", selectedTab);
   console.log("Transaction Type:", trxType);
 
+  /* ===== CONTENT RENDERING HELPERS ===== */
   const renderContent = () => {
     console.log("Rendering Content for Tab:", selectedTab);
     switch (selectedTab) {
@@ -60,17 +73,20 @@ export default function StampingStampPage(
     }
   };
 
+  /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
-      <div class="self-center max-w-[680px] w-full mx-auto">
+    <div className={`${body} ${gapSection}`}>
+      <div className={`flex w-full`}>
         {renderContent()}
       </div>
 
-      <div class="flex flex-col tablet:flex-row gap-12 mobileLg:gap-24 tablet:gap-6 desktop:gap-9">
-        <div class="w-full tablet:w-1/2">
+      <div
+        className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
+      >
+        <div className="flex w-full tablet:w-1/2">
           {renderLeftSidebar()}
         </div>
-        <div class="w-full tablet:w-1/2">
+        <div className="flex w-full tablet:w-1/2">
           {renderRightSidebar()}
         </div>
       </div>

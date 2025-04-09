@@ -3,7 +3,7 @@ import { IS_BROWSER } from "$fresh/runtime.ts";
 import { JSX } from "preact";
 import { button, ButtonProps, buttonStyles } from "$buttons";
 
-/* ===== SUBCOMPONENTS ===== */
+/* ===== SUBCOMPONENTS - @baba - duplicate of loaderSpin in layout/styles.ts ===== */
 const LoadingSpinner = () => (
   <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-[var(--hover-color)]" />
 );

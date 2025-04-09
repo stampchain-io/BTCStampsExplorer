@@ -1,5 +1,5 @@
 /* ===== STAMPING TOOL PAGE ===== */
-/*@baba-71-79*/
+/*@baba-71-81*/
 import type { StampRow } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
@@ -37,7 +37,7 @@ export const handler: Handlers<StampPageData> = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function ToolsStampPage({ data }: PageProps<StampPageData>) {
+export default function ToolsStampingPage({ data }: PageProps<StampPageData>) {
   /* ===== SECTION CONFIGURATION ===== */
   const latestStampsSection = {
     title: "LATEST STAMPS",
@@ -72,11 +72,13 @@ export default function ToolsStampPage({ data }: PageProps<StampPageData>) {
       <div className={`flex w-full`}>
         <OlgaContent />
       </div>
-      <div class="flex flex-col tablet:flex-row w-full gap-12 mobileLg:gap-24 tablet:gap-6 desktop:gap-9">
-        <div class="w-full tablet:w-1/2">
+      <div
+        className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
+      >
+        <div className="flex w-full tablet:w-1/2">
           <HowToStampModule />
         </div>
-        <div class="flex flex-col w-full tablet:w-1/2 items-start tablet:items-end gap-6">
+        <div className="flex flex-col w-full tablet:w-1/2 items-start tablet:items-end gap-6">
           <StampSection {...latestStampsSection} />
         </div>
       </div>

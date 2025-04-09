@@ -246,12 +246,10 @@ import * as $tool_src20_mint_MintContent from "./islands/tool/src20/mint/MintCon
 import * as $tool_src20_mint_PopularMinting from "./islands/tool/src20/mint/PopularMinting.tsx";
 import * as $tool_src20_transfer_LatestTransfer from "./islands/tool/src20/transfer/LatestTransfer.tsx";
 import * as $tool_src20_transfer_TransferContent from "./islands/tool/src20/transfer/TransferContent.tsx";
-import * as $tool_src20_transfer_styles from "./islands/tool/src20/transfer/styles.ts";
 import * as $tool_stamp_OlgaContent from "./islands/tool/stamp/OlgaContent.tsx";
 import * as $tool_stamp_TradeContent from "./islands/tool/stamp/TradeContent.tsx";
 import * as $tool_stamp_transfer_LatestStampTransfer from "./islands/tool/stamp/transfer/LatestStampTransfer.tsx";
 import * as $tool_stamp_transfer_TransferStampContent from "./islands/tool/stamp/transfer/TransferStampContent.tsx";
-import * as $tool_stamp_transfer_styles from "./islands/tool/stamp/transfer/styles.ts";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
 import type { Manifest } from "$fresh/server.ts";
@@ -553,14 +551,12 @@ const manifest = {
       $tool_src20_transfer_LatestTransfer,
     "./islands/tool/src20/transfer/TransferContent.tsx":
       $tool_src20_transfer_TransferContent,
-    "./islands/tool/src20/transfer/styles.ts": $tool_src20_transfer_styles,
     "./islands/tool/stamp/OlgaContent.tsx": $tool_stamp_OlgaContent,
     "./islands/tool/stamp/TradeContent.tsx": $tool_stamp_TradeContent,
     "./islands/tool/stamp/transfer/LatestStampTransfer.tsx":
       $tool_stamp_transfer_LatestStampTransfer,
     "./islands/tool/stamp/transfer/TransferStampContent.tsx":
       $tool_stamp_transfer_TransferStampContent,
-    "./islands/tool/stamp/transfer/styles.ts": $tool_stamp_transfer_styles,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
   },

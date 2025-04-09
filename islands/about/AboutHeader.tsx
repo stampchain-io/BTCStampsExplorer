@@ -1,6 +1,7 @@
 /* ===== ABOUT HEADER COMPONENT ===== */
 import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
+import { loaderSpinLgPurple } from "$layout";
 import {
   dataLabelPurple,
   dataValuePurple,
@@ -137,9 +138,7 @@ export default function AboutHeader() {
               STAMPS STAMPED
             </h5>
             {isLoading
-              ? (
-                <div class="animate-spin rounded-full mt-6 h-10 w-10 border-b-2 border-stamp-purple-highlight" />
-              )
+              ? <div class={`${loaderSpinLgPurple} mt-6`} />
               : (
                 <h6 class={dataValuePurpleXl}>
                   {totalStampsCount.toLocaleString("en-US")}
@@ -157,9 +156,7 @@ export default function AboutHeader() {
               TOKENS DEPLOYED
             </h5>
             {isLoading
-              ? (
-                <div class="animate-spin rounded-full mt-6 h-10 w-10 border-b-2 border-stamp-purple-highlight" />
-              )
+              ? <div class={`${loaderSpinLgPurple} mt-6`} />
               : (
                 <h6 class={dataValuePurpleXl}>
                   {totalTokensCount.toLocaleString("en-US")}

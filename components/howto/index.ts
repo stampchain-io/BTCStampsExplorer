@@ -8,3 +8,4 @@ export * from "$islands/howto/HowToDeployToken.tsx";
 export * from "$islands/howto/HowToMintToken.tsx";
 export * from "$islands/howto/HowToTransferToken.tsx";
 export * from "$islands/howto/HowToRegisterBitname.tsx";
+export * from "$islands/howto/HowToTransferStamp.tsx";

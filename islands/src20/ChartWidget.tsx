@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import Highcharts from "highcharts/highstock";
-
+import { loaderSpinSmPurple } from "$layout";
 // ✅ Define TypeScript Props Interface
 interface ChartWidgetProps {
   data: [number, number][];
@@ -64,7 +64,7 @@ const ChartWidget = (
               type: "line",
               name: "",
               data: data,
-              color: "#8800cc",
+              color: "#8800CC",
               lineWidth: 2,
               tooltip: {
                 valueSuffix: "",
@@ -113,7 +113,7 @@ const ChartWidget = (
             {
               type: chartType, // ✅ Dynamic chart type (line/candlestick)
               name: "Price in SAT",
-              color: "#8800cc",
+              color: "#8800CC",
               data: data,
               tooltip: {
                 valueSuffix: " SAT",
@@ -128,13 +128,7 @@ const ChartWidget = (
 
   return (
     <div className="p-4">
-      {loading
-        ? (
-          <p className="text-gray-500 text-center">
-            <div class="animate-spin rounded-full mt-0 size-5 border-b-2 border-stamp-purple-highlight" />
-          </p>
-        )
-        : <></>}
+      {loading ? <div class={loaderSpinSmPurple} /> : <></>}
       <div id={tick ? `chart-container-${tick}` : "chart-container"} />
     </div>
   );

@@ -28,15 +28,26 @@ export const rowResponsiveForm = "flex flex-col mobileMd:flex-row w-full gap-5";
 
 /* ===== COL STYLES ===== */
 
+/* ===== IMAGE STYLES ===== */
+export const imagePreviewTool =
+  "flex items-center justify-center rounded min-w-[100px] h-[100px] bg-stamp-purple-darker overflow-hidden";
+export const imageUploadTool =
+  "flex items-center justify-center rounded min-w-[100px] h-[100px] bg-stamp-purple-bright overflow-hidden";
+
 /* ===== MODAL STYLES ===== */
 export const modalBgCenter =
   "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#000000] bg-opacity-70 backdrop-filter backdrop-blur-md";
 
 /* ===== LOADER STYLES ===== */
-export const loaderSpinGrey =
-  "animate-spin rounded-full w-7 h-7 border-b-[3px] border-stamp-grey";
-export const loaderSpinPurple =
-  "animate-spin rounded-full w-7 h-7 border-b-[3px] border-stamp-purple";
+// Internal loader style
+const loaderSpin = "animate-spin rounded-full border-b-[3px]";
+// Loader styles
+export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-stamp-grey`;
+export const loaderSpinGrey = `${loaderSpin} w-7 h-7 border-stamp-grey`;
+export const loaderSpinLgGrey = `${loaderSpin} w-10 h-10 border-stamp-grey`;
+export const loaderSpinSmPurple = `${loaderSpin} w-5 h-5 border-stamp-purple`;
+export const loaderSpinPurple = `${loaderSpin} w-7 h-7 border-stamp-purple`;
+export const loaderSpinLgPurple = `${loaderSpin} w-10 h-10 border-stamp-purple`;
 
 /* ===== LEGACY STYLES - not checked yet ===== */
 export const modalBgTop =

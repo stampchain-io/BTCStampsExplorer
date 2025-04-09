@@ -1,3 +1,4 @@
+/* ===== TRANSFER STAMP CONTENT COMPONENT ===== */
 import { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
@@ -6,14 +7,30 @@ import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.ts
 import { SelectField } from "$islands/tool/SelectField.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import type { StampRow } from "$globals";
-import { ContentStyles } from "./styles.ts";
+import {
+  bodyTool,
+  containerBackground,
+  containerColForm,
+  containerRowForm,
+  imagePreviewTool,
+  loaderSpinGrey,
+  rowForm,
+} from "$layout";
+import { titlePurpleLD } from "$text";
+import { Icon } from "$icons";
+import { inputField, inputFieldSquare } from "$forms";
 
+/* ===== TYPES ===== */
 interface Props {
   trxType: string;
 }
 
+/* ===== COMPONENT ===== */
 export function TransferStampContent({}: Props) {
+  /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
+
+  /* ===== STATE ===== */
   const [maxQuantity, setMaxQuantity] = useState(1);
   const [quantity, setQuantity] = useState(1);
   const [selectedStamp, setSelectedStamp] = useState<StampRow | null>(null);
@@ -36,7 +53,9 @@ export function TransferStampContent({}: Props) {
   });
   const [tosAgreed, setTosAgreed] = useState<boolean>(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
+  const [showFallbackIcon, setShowFallbackIcon] = useState(false);
 
+  /* ===== FORM HANDLING ===== */
   const {
     formState,
     setFormState,
@@ -51,6 +70,8 @@ export function TransferStampContent({}: Props) {
     initialFee: 1,
   });
 
+  /* ===== EFFECTS ===== */
+  // Fetch stamps effect
   useEffect(() => {
     const fetchStamps = async () => {
       try {
@@ -83,11 +104,13 @@ export function TransferStampContent({}: Props) {
       }
     };
 
+    // Only fetch if we have a wallet address
     if (wallet?.address) {
       fetchStamps();
     }
   }, [wallet?.address]);
 
+  // Set initial stamp effect
   useEffect(() => {
     if (stamps.data.length > 0 && !selectedStamp) {
       const firstStamp = stamps.data[0];
@@ -100,7 +123,20 @@ export function TransferStampContent({}: Props) {
     }
   }, [stamps.data]);
 
+  // Reset loading state when selected stamp changes
+  useEffect(() => {
+    setIsImageLoading(true);
+
+    if (selectedStamp) {
+      setMaxQuantity(selectedStamp?.unbound_quantity);
+    }
+  }, [selectedStamp?.tx_hash]);
+
+  /* ===== EVENT HANDLERS ===== */
   const handleStampSelect = (e: Event) => {
+    e.preventDefault(); // Prevent form submission
+    e.stopPropagation(); // Stop event bubbling
+
     const value = (e.currentTarget as HTMLSelectElement).value;
     const selectedItem = stamps.data.find(
       (item) => item?.stamp?.toString() === value,
@@ -117,6 +153,8 @@ export function TransferStampContent({}: Props) {
   };
 
   const handleQuantityChange = (e: Event) => {
+    e.preventDefault(); // Prevent form submission
+
     const input = e.target as HTMLInputElement;
     if (!input.value || input.value === "0") {
       input.value = "1";
@@ -142,13 +180,16 @@ export function TransferStampContent({}: Props) {
     }
   };
 
+  /* ===== RENDER HELPERS ===== */
   const renderStampContent = () => {
     if (!selectedStamp) {
       return (
-        <img
-          src="/img/stamping/image-upload.svg"
-          class="w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"
-          alt=""
+        <Icon
+          type="icon"
+          name="image"
+          weight="normal"
+          size="xxl"
+          color="grey"
         />
       );
     }
@@ -160,22 +201,35 @@ export function TransferStampContent({}: Props) {
       <div class="relative w-full h-full">
         {isImageLoading && (
           <div class="absolute inset-0 flex items-center justify-center">
-            <div class="animate-spin rounded-full w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9 border-b-[3px] border-stamp-grey" />
+            <div class={loaderSpinGrey} />
           </div>
         )}
-        <img
-          src={stampUrl}
-          alt={`Stamp #${selectedStamp.stamp}`}
-          class={`w-full h-full object-contain pixelart transition-opacity duration-300 ${
-            isImageLoading ? "opacity-0" : "opacity-100"
-          }`}
-          onLoad={() => setIsImageLoading(false)}
-          onError={(e) => {
-            setIsImageLoading(false);
-            (e.target as HTMLImageElement).src =
-              "/img/stamping/image-upload.svg";
-          }}
-        />
+        {showFallbackIcon
+          ? (
+            <div class="flex items-center justify-center w-full h-full">
+              <Icon
+                type="icon"
+                name="image"
+                weight="normal"
+                size="xxl"
+                color="grey"
+              />
+            </div>
+          )
+          : (
+            <img
+              src={stampUrl}
+              alt={`Stamp #${selectedStamp.stamp}`}
+              class={`w-full h-full object-contain pixelart transition-opacity duration-300 ${
+                isImageLoading ? "opacity-0" : "opacity-100"
+              }`}
+              onLoad={() => setIsImageLoading(false)}
+              onError={(e) => {
+                setIsImageLoading(false);
+                setShowFallbackIcon(true);
+              }}
+            />
+          )}
       </div>
     );
   };
@@ -189,30 +243,40 @@ export function TransferStampContent({}: Props) {
     }
   }, [selectedStamp?.tx_hash]);
 
+  /* ===== RENDER ===== */
   return (
-    <div class={ContentStyles.bodyTools}>
-      <h1 class={ContentStyles.titlePurpleLDCenter}>TRANSFER</h1>
+    <div class={bodyTool}>
+      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>TRANSFER</h1>
 
-      <div class={ContentStyles.inputFieldContainer}>
-        <div class="w-full flex gap-3 mobileMd:gap-6">
-          <div class="flex items-center justify-center rounded w-[96px] h-[96px] mobileMd:w-[108px] mobileMd:h-[108px] mobileLg:w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker overflow-hidden">
+      {/* ===== STAMP SELECTION SECTION ===== */}
+      <form
+        class={`${containerBackground} mb-6`}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleTransferSubmit();
+        }}
+        aria-label="Transfer stamp"
+        novalidate
+      >
+        <div class={`${containerRowForm} mb-5`}>
+          <div class={imagePreviewTool}>
             {renderStampContent()}
           </div>
 
-          <div class="flex flex-col flex-1 gap-3 mobileMd:gap-6">
+          <div class={containerColForm}>
             <SelectField
               options={stamps.data}
               onChange={handleStampSelect}
             />
 
-            <div class="flex w-full justify-end items-center gap-[18px] mobileMd:gap-[30px]">
+            <div class="flex w-full justify-end items-center gap-5">
               <div class="flex flex-col justify-start -space-y-0.5">
-                <p class="text-xl mobileLg:text-2xl font-bold text-stamp-grey">
+                <h5 class="text-xl font-bold text-stamp-grey">
                   EDITIONS
-                </p>
-                <p class="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
+                </h5>
+                <h6 class="text-sm font-medium text-stamp-grey-darker">
                   MAX {maxQuantity}
-                </p>
+                </h6>
               </div>
               <input
                 type="number"
@@ -220,12 +284,13 @@ export function TransferStampContent({}: Props) {
                 max={maxQuantity}
                 value={quantity}
                 onChange={handleQuantityChange}
-                class={`${ContentStyles.inputField} !w-[42px] mobileLg:!w-12 text-center`}
+                class={inputFieldSquare}
+                aria-label="Number of editions to transfer"
               />
             </div>
           </div>
         </div>
-        <div class="flex w-full">
+        <div class={rowForm}>
           <input
             value={formState.recipientAddress}
             onInput={(e: JSX.TargetedEvent<HTMLInputElement>) =>
@@ -234,12 +299,14 @@ export function TransferStampContent({}: Props) {
                 recipientAddress: e.currentTarget.value,
               }))}
             placeholder="Recipient address"
-            class={ContentStyles.inputField}
+            class={inputField}
+            aria-label="Recipient address"
           />
         </div>
-      </div>
+      </form>
 
-      <div class={ContentStyles.feeSelectorContainer}>
+      {/* ===== FEE CALCULATOR SECTION ===== */}
+      <div class={containerBackground}>
         <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={internalHandleChangeFee}
@@ -248,7 +315,6 @@ export function TransferStampContent({}: Props) {
           isSubmitting={isSubmitting}
           onSubmit={handleTransferSubmit}
           buttonName={wallet?.address ? "TRANSFER" : "CONNECT WALLET"}
-          className="pt-9 mobileLg:pt-12"
           userAddress={wallet?.address || ""}
           inputType="P2WPKH"
           outputTypes={["P2WPKH"]}
@@ -257,6 +323,7 @@ export function TransferStampContent({}: Props) {
         />
       </div>
 
+      {/* ===== STATUS MESSAGES ===== */}
       {error && (
         <div class="text-red-500 text-center mt-4 font-medium">
           {error}

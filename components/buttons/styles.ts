@@ -186,12 +186,12 @@ export const buttonStyles: ButtonVariants = {
     `,
   },
 
-  /* ===== SPINNER STYLES ===== */
+  /* ===== SPINNER STYLES - @baba - duplicate of loaderSpin in layout/styles.ts ===== */
   spinner: `
     animate-spin 
     rounded-full 
     h-5 w-5 
-    border-b-2 
+    border-b-[3px] 
     border-[var(--hover-color)]
   `,
 };
