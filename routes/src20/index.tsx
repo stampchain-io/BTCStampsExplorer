@@ -102,12 +102,23 @@ export const handler: Handlers = {
         throw new Error("Expected paginated response");
       }
 
-      /* ===== RESPONSE FORMATTING ===== */
-      const src20Data = resultData.data.map((item) => ({
-        ...item,
-        floor_unit_price: marketInfo.find((m) =>
-          m.tick.toLowerCase() === item.tick.toLowerCase()
-        )?.floor_unit_price || null,
+      /* ===== RESPONSE FORMATTING - @fullman ===== */
+      const src20Data = await Promise.all(resultData.data.map(async (item) => {
+        const chartData = await fetch(
+          `https://api.stampscan.xyz/utxo/combinedListings?tick=${item.tick}&limit=100`,
+        ).then((r) => r.json());
+        const highchartsData = chartData.map((cItem) => [
+          new Date(cItem.create_time).getTime(),
+          cItem.price,
+        ]).sort((a, b) => a[0] - b[0]);
+
+        return {
+          ...item,
+          floor_unit_price: marketInfo.find((m) =>
+            m.tick.toLowerCase() === item.tick.toLowerCase()
+          )?.floor_unit_price || null,
+          chart: highchartsData,
+        };
       }));
 
       return ctx.render({

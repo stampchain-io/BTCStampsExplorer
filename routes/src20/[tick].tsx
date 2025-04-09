@@ -34,6 +34,11 @@ export const handler: Handlers = {
       if (!body) {
         return ctx.renderNotFound();
       }
+      /* @fullman */
+      const highchartsData = combinedListings.map((item, index) => [
+        new Date(item.create_time).getTime(),
+        item.price,
+      ]).sort((a, b) => a[0] - b[0]);
 
       /* ===== RESPONSE FORMATTING ===== */
       body.initialCounts = {
