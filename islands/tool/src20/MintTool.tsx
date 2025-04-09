@@ -14,7 +14,7 @@ import {
   imagePreviewTool,
   loaderSpinGrey,
 } from "$layout";
-import { SRC20InputField } from "$forms";
+import { SRC20InputField } from "$form";
 import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
 import { Icon } from "$icons";
 import { StatusMessages } from "$notifications";

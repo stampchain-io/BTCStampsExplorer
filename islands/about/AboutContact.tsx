@@ -1,7 +1,7 @@
 /* TODO @REINAMORA:  Update the contact form to be able to send emails */
 /* ===== ABOUT CONTACT COMPONENT ===== */
 import { useState } from "preact/hooks";
-import { InputField } from "$forms";
+import { InputField } from "$form";
 import { ButtonProcessing } from "$buttons";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 import { gapGrid, rowForm, rowResponsiveForm } from "$layout";

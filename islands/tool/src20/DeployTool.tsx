@@ -14,7 +14,7 @@ import {
   containerRowForm,
 } from "$layout";
 import { Icon } from "$icons";
-import { inputTextarea, SRC20InputField } from "$forms";
+import { inputTextarea, SRC20InputField } from "$form";
 import { titlePurpleLD } from "$text";
 import { ToggleSwitchButton } from "$buttons";
 import { StatusMessages, tooltipButton, tooltipImage } from "$notifications";

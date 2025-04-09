@@ -9,7 +9,7 @@ import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.ts
 import { bodyTool, containerBackground } from "$layout";
 import { titlePurpleLD } from "$text";
 import { Button } from "$buttons";
-import { inputFieldOutline, outlineGradient, purpleGradient } from "$forms";
+import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
 import { StatusMessages, tooltipButton } from "$notifications";
 
 /* ===== COMPONENT INTERFACE ===== */

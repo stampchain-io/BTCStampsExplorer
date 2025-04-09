@@ -1,16 +1,6 @@
-/* ===== INPUT FIELD COMPONENT (WIP) ===== */
-// WIP: Copy of SRC20InputField.tsx
-// TODO(@baba):
-// - Test with components
-// - Verify code correctness
-// - Update with latest DB server requirements
-// - Currently not in use - form input fields use original files
+import { inputField } from "$form";
 
-import { Ref } from "preact";
-import { inputField } from "$forms";
-
-/* ===== TYPES ===== */
-export interface InputFieldProps {
+interface SRC20InputFieldProps {
   type: string;
   placeholder: string;
   value: string;
@@ -22,13 +12,9 @@ export interface InputFieldProps {
   inputMode?: "numeric" | "text" | "email";
   pattern?: string;
   onFocus?: () => void;
-  ref?: Ref<HTMLInputElement>;
-  "data-amount-input"?: boolean;
-  [key: string]: any;
 }
 
-/* ===== COMPONENT ===== */
-export function InputFieldWIP({
+export function SRC20InputField({
   type,
   placeholder,
   value,
@@ -40,9 +26,7 @@ export function InputFieldWIP({
   inputMode,
   pattern,
   onFocus,
-  ref,
-  ...props
-}: InputFieldProps) {
+}: SRC20InputFieldProps) {
   return (
     <div class="w-full">
       <input
@@ -56,8 +40,6 @@ export function InputFieldWIP({
         maxLength={maxLength}
         inputMode={inputMode}
         pattern={pattern}
-        ref={ref}
-        {...props}
       />
       {error && <div class="text-red-500 text-xs mt-1">{error}</div>}
     </div>

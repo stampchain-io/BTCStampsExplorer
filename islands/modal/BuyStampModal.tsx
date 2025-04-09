@@ -7,7 +7,7 @@ import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.ts
 import { ModalLayout } from "$components/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { inputFieldSquare } from "$forms";
+import { inputFieldSquare } from "$form";
 
 /* ===== TYPES ===== */
 interface Props {

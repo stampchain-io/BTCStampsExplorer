@@ -4,7 +4,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalLayout } from "$components/modal/ModalLayout.tsx";
-import { inputField } from "$forms";
+import { inputField } from "$form";
 import { tooltipIcon } from "$notifications";
 
 /* ===== TYPES ===== */

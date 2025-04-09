@@ -18,7 +18,7 @@ import {
 } from "$layout";
 import { titlePurpleLD } from "$text";
 import { Icon } from "$icons";
-import { inputField, inputFieldSquare } from "$forms";
+import { inputField, inputFieldSquare } from "$form";
 
 /* ===== TYPES ===== */
 interface Props {

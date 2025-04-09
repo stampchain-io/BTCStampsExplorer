@@ -1,6 +1,6 @@
 import { JSX } from "preact";
 import { StampRow } from "$globals";
-import { inputField } from "$forms";
+import { inputField } from "$form";
 
 interface SelectFieldProps {
   onChange: (e: JSX.TargetedEvent<HTMLSelectElement, Event>) => void;

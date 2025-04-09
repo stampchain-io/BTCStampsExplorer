@@ -8,7 +8,7 @@ import type { StampRow } from "$globals";
 import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-import { inputField, inputFieldSquare, SelectField } from "$forms";
+import { inputField, inputFieldSquare, SelectField } from "$form";
 
 /* ===== TYPES ===== */
 interface Props {

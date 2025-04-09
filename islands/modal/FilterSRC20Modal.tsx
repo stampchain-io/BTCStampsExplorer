@@ -2,7 +2,7 @@
 // deno-lint-ignore-file
 import { useState } from "preact/hooks";
 import { ModalLayout } from "$components/modal/ModalLayout.tsx";
-import { InputField } from "$forms";
+import { InputField } from "$form";
 import {
   COLLECTION_FILTER_TYPES,
   LISTING_FILTER_TYPES,

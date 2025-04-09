@@ -12,7 +12,7 @@ import { normalizeFeeRate } from "$server/services/xcpService.ts";
 import { bodyTool, containerBackground } from "$layout";
 import { subtitlePurple, titlePurpleLD } from "$text";
 import { Button } from "$buttons";
-import { InputField } from "$forms";
+import { InputField } from "$form";
 import { StatusMessages } from "$notifications";
 
 /* ===== CONSTANTS ===== */

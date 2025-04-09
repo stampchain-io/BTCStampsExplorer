@@ -12,7 +12,7 @@ import {
   rowResponsiveForm,
 } from "$layout";
 import { titlePurpleLD } from "$text";
-import { SRC20InputField } from "$forms";
+import { SRC20InputField } from "$form";
 import { StatusMessages } from "$notifications";
 
 /* ===== INTERFACE DEFINITIONS ===== */

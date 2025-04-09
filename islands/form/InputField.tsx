@@ -1,5 +1,5 @@
 import { JSX } from "preact";
-import { inputField } from "$forms";
+import { inputField } from "$form";
 interface InputFieldProps {
   type: string;
   placeholder?: string;

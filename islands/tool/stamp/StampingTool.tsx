@@ -17,7 +17,7 @@ import { bodyTool, containerBackground, containerRowForm } from "$layout";
 import { titlePurpleLD } from "$text";
 import { ToggleSwitchButton } from "$buttons";
 import { Icon } from "$icons";
-import { InputField } from "$forms";
+import { InputField } from "$form";
 import {
   StatusMessages,
   tooltipButton,
