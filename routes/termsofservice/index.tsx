@@ -1,6 +1,5 @@
 /* ===== TERMS OF SERVICE PAGE ===== */
-import { CourierFontLoader } from "$islands/home/FontLoader.tsx";
-import { body, gapGrid } from "$layout";
+import { body, CourierFontLoader, gapGrid } from "$layout";
 import { subtitleGrey, text, textSm, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */

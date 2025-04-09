@@ -1,3 +1,4 @@
+/*@baba-update styles and delete this file*/
 export const SearchStyles = {
   modalBgTop:
     "fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-70 backdrop-filter backdrop-blur-md overflow-y-auto",

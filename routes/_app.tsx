@@ -1,13 +1,10 @@
 import { type PageProps } from "$fresh/server.ts";
 import { Partial } from "$fresh/runtime.ts";
 import { Head } from "$fresh/runtime.ts";
-
-import { Header } from "$islands/layout/Header.tsx";
-import { Footer } from "$islands/layout/Footer.tsx";
 import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
 import { NavigatorProvider } from "$islands/Navigator/NavigatorProvider.tsx";
 import { MetaTags } from "$components/layout/MetaTags.tsx";
-import FontLoader from "$islands/home/FontLoader.tsx";
+import { FontLoader, Footer, Header } from "$layout";
 
 export default function App({ Component, state }: PageProps<unknown>) {
   if (state?.skipAppLayout) {

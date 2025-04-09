@@ -1,4 +1,5 @@
 /* ===== RECENT SALES COMPONENT ===== */
+/*@baba-move Refreshing to ViewAllButton-remove default (not used)*/
 import { useEffect, useState } from "preact/hooks";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import type { StampRow } from "$globals";
@@ -31,7 +32,7 @@ interface RecentSalesProps {
 }
 
 /* ===== COMPONENT ===== */
-export function RecentSales({
+export function RecentSalesGallery({
   initialData = [],
   title = "LATEST STAMPS",
   subTitle,
@@ -97,6 +98,7 @@ export function RecentSales({
 
   const defaultDetailDisplayCounts: DisplayCountBreakpoints = {
     mobileSm: 3,
+    mobileMd: 3,
     mobileLg: 4,
     tablet: 4,
     desktop: 6,

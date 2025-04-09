@@ -5,12 +5,11 @@ import { HomeHeader } from "$components/home/HomeHeader.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
-import { PartnersGallery } from "$gallery";
+import { PartnersGallery, RecentSalesGallery } from "$gallery";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
-import { RecentSales } from "$islands/stamp/detail/RecentSales.tsx";
 import { HomeCarousel } from "$components/home/HomeCarousel.tsx";
 import { StampController } from "$server/controller/stampController.ts";
-import { Micro5FontLoader } from "$islands/home/FontLoader.tsx";
+import { Micro5FontLoader } from "$layout";
 import type { Collection } from "$globals";
 
 // Define the shape of pageData from StampController.getHomePageData()
@@ -118,7 +117,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
           <div style="margin-top: -48px; content-visibility: auto; contain-intrinsic-size: 0 800px;">
             <GetStampingModule />
             <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
-              <RecentSales
+              <RecentSalesGallery
                 title="RECENT SALES"
                 subTitle="HOT STAMPS"
                 variant="home"

@@ -3,7 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 import { SRC20Row } from "$globals";
 import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
 import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { subtitlePurple, titlePurpleLD } from "$text";
 import { ViewAllButton } from "$button";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
@@ -153,7 +153,7 @@ export function SRC20Section({
       {/* ===== SECTION HEADER ===== */}
       {title && (
         <h1
-          class={`${ModulesStyles.titlePurpleDL} ${
+          class={`${titlePurpleLD} ${
             fromPage === "home" && type === "trending" ? "opacity-0" : ""
           }`}
         >
@@ -162,7 +162,7 @@ export function SRC20Section({
       )}
       {subTitle && (
         <h2
-          class={`${ModulesStyles.subTitlePurple} mb-3 mobileMd:mb-6 desktop:mb-9 ${
+          class={`${subtitlePurple} mb-3 mobileMd:mb-6 desktop:mb-9 ${
             type === "trending" ? " tablet:text-right text-left" : ""
           }`}
         >

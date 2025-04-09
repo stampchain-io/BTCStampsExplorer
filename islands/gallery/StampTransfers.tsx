@@ -1,8 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import type { JSX } from "preact";
+import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 export default function StampTransfersGallery(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
@@ -33,16 +33,16 @@ export default function StampTransfersGallery(): JSX.Element {
 
   return (
     <div class="flex flex-col items-start tablet:items-end">
-      <h1 class={`${ModulesStyles.titlePurpleDL} tablet:hidden`}>
+      <h3 class={`tablet:hidden ${titlePurpleLD}`}>
         STAMP TRANSFERS
-      </h1>
-      <h1 class={`hidden tablet:block ${ModulesStyles.titlePurpleLD}`}>
+      </h3>
+      <h3 class={`hidden tablet:block ${titlePurpleDL}`}>
         STAMP TRANSFERS
-      </h1>
+      </h3>
       {transactions.length > 0 && (
-        <h2 class={ModulesStyles.subTitlePurple}>
+        <h4 class={subtitlePurple}>
           BLOCK #{transactions[0].block_index}
-        </h2>
+        </h4>
       )}
       <div class="grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-3 mobileMd:gap-6">
         {transactions.map((stamp, index) => (
