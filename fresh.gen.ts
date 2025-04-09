@@ -127,7 +127,6 @@ import * as $tool_stamp_stamping from "./routes/tool/stamp/stamping.tsx";
 import * as $tool_stamp_trade from "./routes/tool/stamp/trade.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
-import * as $Carousel from "./islands/Carousel.tsx";
 import * as $DateRangePicker from "./islands/DateRangePicker.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
@@ -172,6 +171,7 @@ import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.t
 import * as $form_InputField from "./islands/form/InputField.tsx";
 import * as $form_SRC20InputField from "./islands/form/SRC20InputField.tsx";
 import * as $form_SelectField from "./islands/form/SelectField.tsx";
+import * as $gallery_Carousel from "./islands/gallery/Carousel.tsx";
 import * as $gallery_Partners from "./islands/gallery/Partners.tsx";
 import * as $gallery_RecentSales from "./islands/gallery/RecentSales.tsx";
 import * as $gallery_SRC101RegistersWIP from "./islands/gallery/SRC101RegistersWIP.tsx";
@@ -181,8 +181,8 @@ import * as $gallery_SRC20Transfers from "./islands/gallery/SRC20Transfers.tsx";
 import * as $gallery_StampTransfers from "./islands/gallery/StampTransfers.tsx";
 import * as $gallery_Team from "./islands/gallery/Team.tsx";
 import * as $gallery_index from "./islands/gallery/index.ts";
-import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
+import * as $home_StampChainSelectedWIP from "./islands/home/StampChainSelectedWIP.tsx";
 import * as $home_SwiperStyles from "./islands/home/SwiperStyles.tsx";
 import * as $howto_HowToDeployToken from "./islands/howto/HowToDeployToken.tsx";
 import * as $howto_HowToMintToken from "./islands/howto/HowToMintToken.tsx";
@@ -406,7 +406,6 @@ const manifest = {
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
   islands: {
-    "./islands/Carousel.tsx": $Carousel,
     "./islands/DateRangePicker.tsx": $DateRangePicker,
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
@@ -462,6 +461,7 @@ const manifest = {
     "./islands/form/InputField.tsx": $form_InputField,
     "./islands/form/SRC20InputField.tsx": $form_SRC20InputField,
     "./islands/form/SelectField.tsx": $form_SelectField,
+    "./islands/gallery/Carousel.tsx": $gallery_Carousel,
     "./islands/gallery/Partners.tsx": $gallery_Partners,
     "./islands/gallery/RecentSales.tsx": $gallery_RecentSales,
     "./islands/gallery/SRC101RegistersWIP.tsx": $gallery_SRC101RegistersWIP,
@@ -471,8 +471,8 @@ const manifest = {
     "./islands/gallery/StampTransfers.tsx": $gallery_StampTransfers,
     "./islands/gallery/Team.tsx": $gallery_Team,
     "./islands/gallery/index.ts": $gallery_index,
-    "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
+    "./islands/home/StampChainSelectedWIP.tsx": $home_StampChainSelectedWIP,
     "./islands/home/SwiperStyles.tsx": $home_SwiperStyles,
     "./islands/howto/HowToDeployToken.tsx": $howto_HowToDeployToken,
     "./islands/howto/HowToMintToken.tsx": $howto_HowToMintToken,

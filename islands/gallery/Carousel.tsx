@@ -12,7 +12,7 @@ interface CarouselProps {
   class?: string;
 }
 
-export default function Carousel(props: CarouselProps) {
+export default function CarouselGallery(props: CarouselProps) {
   const { stamps } = props;
   const isMobile = globalThis.innerWidth < 768;
   const duplicatedStamps = isMobile

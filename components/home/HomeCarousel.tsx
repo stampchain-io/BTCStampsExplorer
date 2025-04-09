@@ -1,4 +1,4 @@
-import Carousel from "$islands/Carousel.tsx";
+import CarouselGallery from "$islands/gallery/Carousel.tsx";
 import { StampRow } from "$globals";
 import SwiperStyles from "$islands/home/SwiperStyles.tsx";
 
@@ -29,7 +29,7 @@ export function HomeCarousel({ carouselStamps }: HomeCarouselProps) {
           justify-center
           items-center
         ">
-          <Carousel
+          <CarouselGallery
             stamps={carouselStamps}
             class="carousel-container"
           />

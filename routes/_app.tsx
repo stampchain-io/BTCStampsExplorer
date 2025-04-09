@@ -4,7 +4,8 @@ import { Head } from "$fresh/runtime.ts";
 import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
 import { NavigatorProvider } from "$islands/Navigator/NavigatorProvider.tsx";
 import { MetaTags } from "$components/layout/MetaTags.tsx";
-import { FontLoader, Footer, Header } from "$layout";
+import { Footer, Header } from "$layout";
+import FontLoader from "$islands/layout/FontLoader.tsx";
 
 export default function App({ Component, state }: PageProps<unknown>) {
   if (state?.skipAppLayout) {
