@@ -12,6 +12,8 @@ body {
   background-color: #000;
   /* Fallback color */
   overflow-x: hidden;
+  overflow-y: auto;
+  position: relative !important;
 }
 
 .primary-gradient {
@@ -674,4 +676,37 @@ strong {
 .animated-underline-thin:focus {
   background-size: 0% 1px;
   color: #999999;
+}
+
+/* SRC20 Chart Styles */
+/* Style for all zoom buttons */
+.highcharts-range-selector-buttons rect {
+  fill: transparent !important;
+  /* Transparent background */
+  stroke: #8800cc !important;
+  /* Purple border */
+  stroke-width: 2px !important;
+  /* Border thickness */
+  rx: 6px;
+  /* Rounded corners */
+}
+
+/* Style for zoom button text */
+.highcharts-range-selector-buttons text {
+  cursor: pointer !important;
+  fill: #8800cc !important;
+  /* Purple text */
+  font-weight: bold;
+}
+
+/* Active (selected) button */
+.highcharts-range-selector-buttons .highcharts-button-pressed rect {
+  fill: #8800cc !important;
+  /* Solid purple when selected */
+  stroke: #660099 !important;
+}
+
+/* Active text color */
+.highcharts-range-selector-buttons .highcharts-button-pressed text {
+  fill: white !important;
 }

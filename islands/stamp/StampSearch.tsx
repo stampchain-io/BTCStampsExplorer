@@ -12,16 +12,30 @@ export function StampSearchClient(
     showButton?: boolean;
   },
 ) {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [visible, setVisible] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
 
+  // Handle opening and closing animations
+  const handleModalClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      handleOpen2(false);
+    }, 400);
+  };
+
+  // Set up animations when modal opens/closes
   useEffect(() => {
     if (open2) {
+      setIsClosing(false); // Reset closing state
+      requestAnimationFrame(() => setIsVisible(true));
       document.documentElement.style.overflow = "hidden";
       document.body.style.overflow = "hidden";
     } else {
+      setIsVisible(false); // Reset visible state when fully closed
       document.documentElement.style.overflow = "";
       document.body.style.overflow = "";
     }
@@ -207,10 +221,40 @@ export function StampSearchClient(
       document.removeEventListener("keydown", handleKeyboardShortcut);
   }, [open2, handleOpen2]);
 
-  const modalBgTop =
-    "fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-70 backdrop-filter backdrop-blur-md overflow-y-auto";
-  const modalSearch =
-    "w-[90%] max-w-[480px] mobileLg:max-w-[580px] my-12 mobileLg:my-[72px] tablet:my-24";
+  const modalBgTop = `
+  fixed inset-0 z-50 
+  flex items-start justify-center 
+  overflow-y-auto
+  ${
+    isVisible && !isClosing
+      ? "bg-black/70 backdrop-blur-md animate-fade-in duration-100"
+      : "animate-fade-out duration-100 delay-500"
+  }
+`;
+
+  // const modalBgTop = `
+  //   fixed inset-0 z-50
+  //   flex items-start justify-center
+  //    overflow-y-auto
+  //   ${
+  //   isVisible && !isClosing
+  //     ? "bg-black/70 backdrop-blur-md animate-fade-in duration-100"
+  //     : "animate-fade-out duration-100"
+  // }
+  // `;
+
+  const modalSearch = `
+    w-[90%] max-w-[480px] 
+    mobileLg:max-w-[580px] 
+    my-12 mobileLg:my-[72px] tablet:my-24
+    ${
+    isVisible && !isClosing
+      ? "animate-slide-down duration-300 delay-100"
+      : "opacity-0 translate-y-[-36px]"
+  }
+    ${isClosing ? "animate-slide-up duration-300" : ""}
+  `;
+
   const animatedBorderGrey = `
   relative rounded-md !bg-[#080808] p-[2px]
   before:absolute before:inset-0 before:rounded-md before:z-[1]
@@ -244,7 +288,9 @@ export function StampSearchClient(
             </svg>
           }
           iconAlt="Search"
-          onClick={() => handleOpen2(true)}
+          onClick={() => {
+            handleOpen2(true);
+          }}
           role="button"
           aria-label="Search"
         />
@@ -264,8 +310,9 @@ export function StampSearchClient(
         <div
           class={modalBgTop}
           onClick={(e) => {
-            if (e.target === e.currentTarget) handleOpen2(false);
+            if (e.target === e.currentTarget) handleModalClose();
           }}
+          // onAnimationEnd={handleModalClose}
         >
           <div class={modalSearch}>
             <div className={animatedBorderGrey}>

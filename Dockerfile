@@ -1,3 +1,4 @@
+# Deno base image
 FROM denoland/deno:alpine-2.2.3
 
 # Set environment variables
@@ -8,7 +9,12 @@ ENV HOME=/app \
     XDG_CONFIG_HOME=/app/.config \
     XDG_CACHE_HOME=/app/.cache \
     XDG_DATA_HOME=/app/.local/share \
-    NPM_CONFIG_CACHE=/app/.npm
+    NPM_CONFIG_CACHE=/app/.npm \
+    # Skip Redis during build but enable at runtime
+    SKIP_REDIS=true \
+    SKIP_REDIS_CONNECTION=true \
+    SKIP_REDIS_TLS=true \
+    CACHE=false
 
 # Install additional tools
 RUN apk add --no-cache bash
@@ -41,12 +47,13 @@ RUN rm -rf node_modules/.deno && \
 USER deno
 
 # Build steps with all permissions granted and error handling
-RUN deno run --allow-all main.ts build --lock=lock.json --lock-write || (echo "Build failed" && exit 1)
+# Lock write is used to create lock.json if it doesn't exist
+RUN deno run --allow-all main.ts build --lock-write || (echo "Build failed" && exit 1)
 
-# Cache dependencies with proper error handling
+# Cache dependencies with proper error handling (without lock file)
 RUN DENO_DIR=/app/.deno \
     NPM_CONFIG_CACHE=/app/.npm \
-    deno cache --reload --lock=lock.json main.ts || (echo "Cache failed" && exit 1)
+    deno cache --reload main.ts || (echo "Cache failed" && exit 1)
 
 # Verify the build environment
 RUN echo "Verifying environment and permissions:" && \
@@ -57,5 +64,15 @@ RUN echo "Verifying environment and permissions:" && \
 
 EXPOSE 8000
 
-# Add all necessary permissions to the runtime command
-CMD ["deno", "run", "--allow-net", "--allow-read", "--allow-run", "--allow-write", "--allow-env", "--allow-sys", "main.ts"]
+# Runtime environment variables - Enable Redis at runtime
+ENV DENO_PERMISSIONS="--allow-net --allow-read --allow-run --allow-write --allow-env --allow-sys" \
+    SKIP_REDIS=false \
+    SKIP_REDIS_CONNECTION=false \
+    SKIP_REDIS_TLS=true \
+    DENO_ENV=production \
+    CACHE=true \
+    REDIS_DEBUG=true \
+    REDIS_TIMEOUT=15000 \
+    REDIS_MAX_RETRIES=10
+
+CMD ["sh", "-c", "deno run $DENO_PERMISSIONS main.ts"]

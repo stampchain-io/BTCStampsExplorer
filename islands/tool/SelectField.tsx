@@ -3,8 +3,6 @@ import { StampRow } from "$globals";
 import { inputField } from "$forms";
 
 interface SelectFieldProps {
-  _placeholder?: string;
-  _value: string;
   onChange: (e: JSX.TargetedEvent<HTMLSelectElement, Event>) => void;
   error?: string;
   disabled?: boolean;
@@ -12,8 +10,6 @@ interface SelectFieldProps {
 }
 
 export function SelectField({
-  _placeholder = "",
-  _value,
   onChange,
   error,
   disabled = false,

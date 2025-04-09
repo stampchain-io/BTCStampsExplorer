@@ -159,7 +159,7 @@ export default function StampSection({
     <div class="w-full">
       {/* ===== SECTION HEADER ===== */}
       <div class="w-full flex justify-between items-center">
-        <div class="flex flex-col">
+        <div class="flex flex-col w-full">
           {title && (
             <div
               class={`flex flex-col items-start ${

@@ -361,4 +361,8 @@ export class StampService {
   static async countTotalStamps(): Promise<boolean> {
     return await StampRepository.countTotalStamps();
   }
+
+  static async getSpecificStamp(tx_index: string): Promise<{ stamp_url: string, stamp_mimetype: string }> {
+    return await StampRepository.getSpecificStamp(tx_index);
+  }
 }

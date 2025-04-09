@@ -26,6 +26,9 @@ export const handler: Handlers = {
           .then((r) => r.json()),
         fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`)
           .then((r) => r.json()),
+        fetch(
+          `https://api.stampscan.xyz/utxo/combinedListings?tick=${encodedTick}`,
+        ).then((r) => r.json()),
       ]);
 
       if (!body) {
@@ -37,6 +40,7 @@ export const handler: Handlers = {
         transfers: transferCount.total || 0,
         mints: mintCount.total || 0,
       };
+      body.highcharts = highchartsData || [];
 
       return await ctx.render(body);
     } catch (error) {
@@ -74,6 +78,7 @@ function SRC20TickPage(props: SRC20TickPageProps) {
     total_mints,
     total_transfers,
     marketInfo,
+    highcharts,
   } = props.data;
 
   const tick = deployment.tick;
@@ -94,6 +99,7 @@ function SRC20TickPage(props: SRC20TickPageProps) {
         totalTransfers={total_transfers}
         marketInfo={marketInfo}
       />
+      <ChartWidget data={highcharts} />
       <HoldersGraph holders={holders} />
       <Table
         type="src20"

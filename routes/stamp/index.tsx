@@ -20,7 +20,7 @@ export const handler: Handlers = {
       headers: Object.fromEntries(req.headers),
     });
 
-    // Fresh framework optimization - skip processing for non-stamp routes
+    // Only process requests for /stamp route
     if (url.searchParams.has("_fresh") && !url.pathname.startsWith("/stamp")) {
       return new Response(null, { status: 204 });
     }

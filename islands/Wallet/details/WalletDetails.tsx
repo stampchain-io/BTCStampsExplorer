@@ -2,30 +2,8 @@ import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
+import { DetailStyles } from "./styles.ts";
 
-const walletDataContainer =
-  "flex flex-col w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-3 mobileMd:gap-6";
-const dataColumn = "flex flex-col -space-y-1";
-const dataLabelSm =
-  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-const dataLabel =
-  "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-const dataValueSm =
-  "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-const dataValue =
-  "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
-const dataValueLg =
-  "text-xl mobileLg:text-2xl font-medium text-stamp-grey-light uppercase";
-const dataValueXl =
-  "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light";
-const titleGreyDL =
-  "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
-const subTitleGrey =
-  "inline-block text-sm mobileMd:text-base mobileLg:text-lg font-medium text-stamp-grey-darker";
-const buttonPurpleFlat =
-  "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors";
-const tooltipIcon =
-  "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
     walletData: WalletOverviewInfo;
@@ -129,7 +107,7 @@ function WalletOverview(
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
       <div class="flex flex-col w-full tablet:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
         <div class="flex">
-          <p class={titleGreyDL}>
+          <p class={DetailStyles.titleGreyDL}>
             {walletData.address.startsWith("1D") ||
                 walletData.dispensers?.total > 0
               ? "DISPENSER"
@@ -139,12 +117,12 @@ function WalletOverview(
         <div class="flex gap-3 mobileMd:gap-6">
           <div class="flex">
             <p
-              class={`${subTitleGrey} hidden mobileMd:block mobileLg:hidden desktop:block`}
+              class={`${DetailStyles.subTitleGrey} hidden mobileMd:block mobileLg:hidden desktop:block`}
             >
               {walletData.address}
             </p>
             <p
-              class={`${subTitleGrey} block mobileMd:hidden mobileLg:block desktop:hidden`}
+              class={`${DetailStyles.subTitleGrey} block mobileMd:hidden mobileLg:block desktop:hidden`}
             >
               {abbreviateAddress(walletData.address, 14)}
             </p>
@@ -167,14 +145,14 @@ function WalletOverview(
               <path d="M27 4H11C10.7348 4 10.4804 4.10536 10.2929 4.29289C10.1054 4.48043 10 4.73478 10 5V10H5C4.73478 10 4.48043 10.1054 4.29289 10.2929C4.10536 10.4804 4 10.7348 4 11V27C4 27.2652 4.10536 27.5196 4.29289 27.7071C4.48043 27.8946 4.73478 28 5 28H21C21.2652 28 21.5196 27.8946 21.7071 27.7071C21.8946 27.5196 22 27.2652 22 27V22H27C27.2652 22 27.5196 21.8946 27.7071 21.7071C27.8946 21.5196 28 21.2652 28 21V5C28 4.73478 27.8946 4.48043 27.7071 4.29289C27.5196 4.10536 27.2652 4 27 4ZM20 26H6V12H20V26ZM26 20H22V11C22 10.7348 21.8946 10.4804 21.7071 10.2929C21.5196 10.1054 21.2652 10 21 10H12V6H26V20Z" />
             </svg>
             <div
-              class={`${tooltipIcon} ${
+              class={`${DetailStyles.tooltipIcon} ${
                 isTooltipVisible ? "opacity-100" : "opacity-0"
               }`}
             >
               COPY ADDY
             </div>
             <div
-              class={`${tooltipIcon} ${
+              class={`${DetailStyles.tooltipIcon} ${
                 showCopied ? "opacity-100" : "opacity-0"
               }`}
             >
@@ -219,7 +197,9 @@ function DispenserStats({
     <div className="flex flex-col pt-6">
       {/* Stamp Info Section */}
       <div>
-        <p className={`${dataValueLg} whitespace-nowrap overflow-hidden`}>
+        <p
+          className={`${DetailStyles.dataValueLg} whitespace-nowrap overflow-hidden`}
+        >
           <>
             <span className="font-light">STAMP #</span>
             <span className="font-black">{stampData.stamp}</span>
@@ -233,7 +213,7 @@ function DispenserStats({
         )}
 
         <div className="flex flex-col items-start pt-1.5 mobileLg:pt-3">
-          <p className={dataLabelSm}>BY</p>
+          <p className={DetailStyles.dataLabelSm}>BY</p>
           <a
             className="text-sm mobileLg:text-base font-black gray-gradient3-hover -mt-1"
             href={`/wallet/${stampData.creator}`}
@@ -281,7 +261,7 @@ function DispenserStats({
           align="right"
         />
         <div className="flex justify-end pt-6">
-          <button className={buttonPurpleFlat}>
+          <button className={DetailStyles.buttonPurpleFlat}>
             BUY
           </button>
         </div>
@@ -343,7 +323,7 @@ function StampStats(
 ) {
   return (
     <div
-      className={walletDataContainer}
+      className={DetailStyles.walletDataContainer}
       onClick={() => handleType("stamp")}
     >
       <div className="flex">
@@ -389,7 +369,7 @@ function TokenStats(
 
   return (
     <div
-      className={walletDataContainer}
+      className={DetailStyles.walletDataContainer}
       onClick={() => handleType("token")}
     >
       <div className="flex justify-between">
@@ -486,14 +466,14 @@ function StatTitle({ label, value, align = "left" }: StatTitleProps) {
   }[align];
 
   return (
-    <div class={`${dataColumn} `}>
+    <div class={`${DetailStyles.dataColumn} `}>
       <p
-        class={`${dataLabel} ${alignmentClass}`}
+        class={`${DetailStyles.dataLabel} ${alignmentClass}`}
       >
         {label}
       </p>
       <p
-        class={`${dataValueXl} ${alignmentClass}`}
+        class={`${DetailStyles.dataValueXl} ${alignmentClass}`}
       >
         {value}
       </p>
@@ -518,14 +498,14 @@ function StatItem(
   }[align];
 
   return (
-    <div class={`${dataColumn} ${customClass || ""}`}>
+    <div class={`${DetailStyles.dataColumn} ${customClass || ""}`}>
       <p
-        class={`${dataLabelSm}  ${alignmentClass}`}
+        class={`${DetailStyles.dataLabelSm}  ${alignmentClass}`}
       >
         {label}
       </p>
       <p
-        class={`${dataValueSm} ${alignmentClass}`}
+        class={`${DetailStyles.dataValueSm} ${alignmentClass}`}
       >
         {value}
       </p>
