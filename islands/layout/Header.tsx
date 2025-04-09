@@ -1,7 +1,7 @@
 /* ===== HEADER COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { ConnectButton } from "$islands/button/ConnectButton.tsx";
-import { CloseIcon, GearIcon, HamburgerMenuIcon } from "$icons";
+import { CloseIcon, GearIcon, HamburgerMenuIcon } from "$icon";
 import {
   logoPurpleLDLink,
   navLinkGrey,

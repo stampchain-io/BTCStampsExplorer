@@ -10,7 +10,7 @@ import {
   STAMP_FILTER_TYPES,
   WALLET_FILTER_TYPES,
 } from "$globals";
-import { Button } from "$components/buttons/ButtonOLD.tsx";
+import { Button } from "$components/button/ButtonOLD.tsx";
 import DatePicker from "$islands/DateRangePicker.tsx";
 
 /* ===== TYPES ===== */

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { Button } from "$components/buttons/ButtonOLD.tsx";
+import { Button } from "$components/button/ButtonOLD.tsx";
 
 export function SRC20SearchClient({
   open2,

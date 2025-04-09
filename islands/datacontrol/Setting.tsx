@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { Button } from "../../components/buttons/ButtonOLD.tsx";
+import { Button } from "$components/button/ButtonOLD.tsx";
 
 interface SettingProps {
   initFilter: string[];

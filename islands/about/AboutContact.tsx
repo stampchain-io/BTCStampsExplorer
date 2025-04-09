@@ -2,7 +2,7 @@
 /* ===== ABOUT CONTACT COMPONENT ===== */
 import { useState } from "preact/hooks";
 import { InputField } from "$form";
-import { ButtonProcessing } from "$buttons";
+import { ButtonProcessing } from "$button";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 import { gapGrid, rowForm, rowResponsiveForm } from "$layout";
 

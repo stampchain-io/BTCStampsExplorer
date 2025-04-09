@@ -2,7 +2,7 @@
 /* TODO (@baba) - move to galleries ??? - update styling and refactor into a base slideshow component*/
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { ViewAllButton } from "$buttons";
+import { ViewAllButton } from "$button";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { StampRow, StampSectionProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";

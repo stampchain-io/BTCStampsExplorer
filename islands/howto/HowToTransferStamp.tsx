@@ -1,5 +1,5 @@
 /* ===== HOW TO TRANSFER STAMP COMPONENT ===== */
-import { ReadAllButton } from "$buttons";
+import { ReadAllButton } from "$button";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */

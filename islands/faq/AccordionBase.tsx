@@ -1,7 +1,7 @@
 /* ===== ACCORDION BASE COMPONENT ===== */
 import { JSX } from "preact";
 import { signal } from "@preact/signals";
-import { Icon } from "$icons";
+import { Icon } from "$icon";
 import { text } from "$text";
 
 /* ===== STATE  ===== */

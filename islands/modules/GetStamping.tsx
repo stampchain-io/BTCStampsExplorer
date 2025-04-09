@@ -2,7 +2,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { gapGrid } from "$layout";
-import { Button } from "$buttons";
+import { Button } from "$button";
 import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */

@@ -1,7 +1,7 @@
 /* ===== ERROR 404 PAGE ===== */
 import { Head } from "$fresh/runtime.ts";
 import { subtitleGrey, titleGreyLD } from "$text";
-import { Button } from "$buttons";
+import { Button } from "$button";
 
 /* ===== PAGE COMPONENT ===== */
 export default function Error404() {

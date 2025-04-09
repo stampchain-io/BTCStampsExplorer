@@ -15,8 +15,8 @@ import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 import { bodyTool, containerBackground, containerRowForm } from "$layout";
 import { titlePurpleLD } from "$text";
-import { ToggleSwitchButton } from "$buttons";
-import { Icon } from "$icons";
+import { ToggleSwitchButton } from "$button";
+import { Icon } from "$icon";
 import { InputField } from "$form";
 import {
   StatusMessages,

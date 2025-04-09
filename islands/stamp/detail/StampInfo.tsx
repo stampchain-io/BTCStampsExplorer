@@ -23,7 +23,7 @@ import {
   value3xl,
   valueDark,
 } from "$text";
-import { Button } from "$buttons";
+import { Button } from "$button";
 import { tooltipIcon } from "$notifications";
 
 /* ===== TYPES ===== */

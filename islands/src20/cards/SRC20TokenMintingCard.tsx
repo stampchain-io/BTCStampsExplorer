@@ -1,4 +1,4 @@
-import { Button } from "$buttons";
+import { Button } from "$button";
 import {
   SRC20BaseCard,
   SRC20BaseCardProps,

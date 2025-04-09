@@ -1,5 +1,5 @@
 /* ===== READ ALL BUTTON COMPONENT ===== */
-import { Button } from "$buttons";
+import { Button } from "$button";
 
 /* ===== TYPES ===== */
 interface ReadAllButtonProps {

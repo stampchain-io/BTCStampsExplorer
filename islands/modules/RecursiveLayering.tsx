@@ -1,5 +1,5 @@
 /* ===== RECURSIVE LAYERING MODULE COMPONENT ===== */
-import { Button } from "$buttons";
+import { Button } from "$button";
 import { subtitleGrey, text } from "$text";
 
 /* ===== COMPONENT ===== */

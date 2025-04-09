@@ -17,7 +17,7 @@ import {
   rowForm,
 } from "$layout";
 import { titlePurpleLD } from "$text";
-import { Icon } from "$icons";
+import { Icon } from "$icon";
 import { inputField, inputFieldSquare } from "$form";
 
 /* ===== TYPES ===== */

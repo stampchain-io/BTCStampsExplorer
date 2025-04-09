@@ -11,7 +11,7 @@ import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { WalletProviderBase } from "$islands/modal/WalletProviderBase.tsx";
 import { WalletProviderKey } from "$lib/utils/constants.ts";
 import AnimationLayout from "$components/modal/AnimationLayout.tsx";
-import { Button } from "$buttons";
+import { Button } from "$button";
 import { navLinkPurple, valueDarkSm } from "$text";
 /* ===== WALLET MODAL COMPONENT INTERFACE ===== */
 interface Props {

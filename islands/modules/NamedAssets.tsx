@@ -1,6 +1,6 @@
 /* ===== NAMED ASSETS MODULE COMPONENT ===== */
 import { subtitleGrey, text } from "$text";
-import { Button } from "$buttons";
+import { Button } from "$button";
 
 /* ===== COMPONENT ===== */
 export const NamedAssetsModule = () => {

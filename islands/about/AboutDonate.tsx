@@ -11,8 +11,8 @@ import {
 } from "$islands/about/types.ts";
 import { headingGrey, label, subtitlePurple, text, titlePurpleLD } from "$text";
 import { tooltipIcon } from "$notifications";
-import { Button } from "$buttons";
-import { Icon } from "$icons";
+import { Button } from "$button";
+import { Icon } from "$icon";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 /* ===== CONSTANTS ===== */

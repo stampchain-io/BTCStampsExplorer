@@ -11,7 +11,7 @@ import { ComposeAttachOptions } from "$server/services/xcpService.ts";
 import { normalizeFeeRate } from "$server/services/xcpService.ts";
 import { bodyTool, containerBackground } from "$layout";
 import { subtitlePurple, titlePurpleLD } from "$text";
-import { Button } from "$buttons";
+import { Button } from "$button";
 import { InputField } from "$form";
 import { StatusMessages } from "$notifications";
 

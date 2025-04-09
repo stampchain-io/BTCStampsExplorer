@@ -1,5 +1,5 @@
 /* ===== VIEW ALL BUTTON COMPONENT ===== */
-import { Button } from "$buttons";
+import { Button } from "$button";
 
 /* ===== TYPES ===== */
 type ViewAllButtonProps = {

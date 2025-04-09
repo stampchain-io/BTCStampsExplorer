@@ -1,5 +1,5 @@
 /* ===== FOOTER COMPONENT ===== */
-import { Icon } from "$icons";
+import { Icon } from "$icon";
 import {
   copyright,
   logoPurpleDL,

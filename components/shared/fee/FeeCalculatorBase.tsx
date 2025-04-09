@@ -8,7 +8,7 @@ import {
 } from "$lib/utils/formatUtils.ts";
 import type { BaseFeeCalculatorProps } from "$lib/types/base.d.ts";
 import { tooltipButton, tooltipImage } from "$notifications";
-import { buttonPurpleFlat, buttonPurpleOutline } from "$buttons";
+import { buttonPurpleFlat, buttonPurpleOutline } from "$button";
 
 interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   isModal?: boolean;

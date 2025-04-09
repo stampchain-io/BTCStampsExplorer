@@ -1,6 +1,6 @@
 /* ===== ICON COMPONENT ===== */
-import { BadgeVariants, iconStyles, IconVariants } from "$icons";
-import * as iconPaths from "$icons";
+import { BadgeVariants, iconStyles, IconVariants } from "$icon";
+import * as iconPaths from "$icon";
 
 /* ===== COMPONENT ===== */
 export function Icon(props: IconVariants) {

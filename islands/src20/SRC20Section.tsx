@@ -4,7 +4,7 @@ import { SRC20Row } from "$globals";
 import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
 import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
-import { ViewAllButton } from "$buttons";
+import { ViewAllButton } from "$button";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 

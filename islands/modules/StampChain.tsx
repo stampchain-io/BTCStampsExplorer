@@ -1,5 +1,5 @@
 /* ===== STAMPCHAIN MODULE COMPONENT ===== */
-import { Button } from "$buttons";
+import { Button } from "$button";
 import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */

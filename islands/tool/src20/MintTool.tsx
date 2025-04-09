@@ -16,7 +16,7 @@ import {
 } from "$layout";
 import { SRC20InputField } from "$form";
 import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
-import { Icon } from "$icons";
+import { Icon } from "$icon";
 import { StatusMessages } from "$notifications";
 
 /* ===== MAIN COMPONENT INTERFACE ===== */

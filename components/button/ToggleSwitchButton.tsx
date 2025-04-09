@@ -1,7 +1,7 @@
 /* ===== TOGGLE SWITCH BUTTON COMPONENT ===== */
 import { JSX } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { toggleButton, toggleKnob, toggleKnobBackground } from "$buttons";
+import { toggleButton, toggleKnob, toggleKnobBackground } from "$button";
 
 /* ===== TYPES ===== */
 interface ToggleSwitchButtonProps {

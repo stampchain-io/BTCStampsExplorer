@@ -1,6 +1,6 @@
 /* ===== CLOSE ICON COMPONENT ===== */
-import { Icon } from "$icons";
-import type { IconVariants } from "$icons";
+import { Icon } from "$icon";
+import type { IconVariants } from "$icon";
 
 /* ===== TYPES ===== */
 interface CloseIconProps {

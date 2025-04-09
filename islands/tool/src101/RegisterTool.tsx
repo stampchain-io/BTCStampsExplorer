@@ -8,7 +8,7 @@ import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { bodyTool, containerBackground } from "$layout";
 import { titlePurpleLD } from "$text";
-import { Button } from "$buttons";
+import { Button } from "$button";
 import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
 import { StatusMessages, tooltipButton } from "$notifications";
 

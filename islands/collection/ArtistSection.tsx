@@ -2,7 +2,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { Collection, CollectionSectionProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
-import { ViewAllButton } from "$buttons";
+import { ViewAllButton } from "$button";
 import { CollectionOverviewCard } from "$collection";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
