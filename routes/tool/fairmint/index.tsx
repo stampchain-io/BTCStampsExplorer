@@ -2,7 +2,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
-import { FairmintTool } from "$islands/tool/fairmint/FairmintTool.tsx";
+import { FairmintTool } from "$tool";
 
 /* ===== TYPES ===== */
 interface ToolFairmintPageProps {

@@ -5,7 +5,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { body, gapSection } from "$layout";
 import { StampSection } from "$stamp";
-import { OlgaContent } from "$tool";
+import { StampingTool } from "$tool";
 import { HowToStampModule } from "$howto";
 
 /* ===== TYPES ===== */
@@ -70,7 +70,7 @@ export default function ToolStampingPage({ data }: PageProps<StampPageData>) {
   return (
     <div className={`${body} ${gapSection}`}>
       <div className={`flex w-full`}>
-        <OlgaContent />
+        <StampingTool />
       </div>
       <div
         className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}

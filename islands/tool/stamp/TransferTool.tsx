@@ -4,7 +4,7 @@ import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
-import { SelectField } from "$islands/tool/SelectField.tsx";
+import { SelectField } from "../../form/SelectField.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import type { StampRow } from "$globals";
 import {
@@ -26,7 +26,7 @@ interface Props {
 }
 
 /* ===== COMPONENT ===== */
-export function TransferStampContent({}: Props) {
+export function StampTransferTool({}: Props) {
   /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
 

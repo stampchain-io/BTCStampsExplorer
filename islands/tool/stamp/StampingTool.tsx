@@ -28,7 +28,7 @@ import {
 /* ===== LOGGING UTILITY ===== */
 const log = (message: string, data?: unknown) => {
   logger.debug("stamps", {
-    message: `[OlgaContent] ${message}`,
+    message: `[StampingTool] ${message}`,
     data,
   });
 };
@@ -267,7 +267,7 @@ const PREVIEW_SIZE_CLASSES =
   "w-[100px] h-[100px] mobileMd:w-[100px] mobileMd:h-[100px]" as const;
 
 /* ===== MAIN COMPONENT IMPLEMENTATION ===== */
-export function OlgaContent() {
+export function StampingTool() {
   const { config, isLoading } = useConfig<Config>();
 
   if (isLoading) {
@@ -902,7 +902,7 @@ export function OlgaContent() {
   // Add initialization tracking
   useEffect(() => {
     logger.debug("stamps", {
-      message: "OlgaContent mounted",
+      message: "StampingTool mounted",
       data: {
         isConnected,
         hasWallet: !!wallet,
@@ -912,7 +912,7 @@ export function OlgaContent() {
 
     return () => {
       logger.debug("stamps", {
-        message: "OlgaContent unmounted",
+        message: "StampingTool unmounted",
       });
     };
   }, []);

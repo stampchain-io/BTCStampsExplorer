@@ -33,7 +33,7 @@ interface StatusMessageType {
 }
 
 /* ===== COMPONENT ===== */
-export function TradeContent() {
+export function StampTradeTool() {
   /* ===== STATE ===== */
   const [availableAssets, setAvailableAssets] = useState<XcpBalance[]>([]);
   const [isLoadingAssets, setIsLoadingAssets] = useState(false);

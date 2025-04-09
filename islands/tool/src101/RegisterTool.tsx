@@ -13,14 +13,14 @@ import { inputFieldOutline, outlineGradient, purpleGradient } from "$forms";
 import { StatusMessages, tooltipButton } from "$notifications";
 
 /* ===== COMPONENT INTERFACE ===== */
-interface RegisterBitnameContentProps {
+interface SRC101RegisterToolProps {
   trxType?: "olga" | "multisig";
 }
 
 /* ===== MAIN COMPONENT IMPLEMENTATION ===== */
-export function RegisterBitnameContent({
+export function SRC101RegisterTool({
   trxType = "olga",
-}: RegisterBitnameContentProps) {
+}: SRC101RegisterToolProps) {
   /* ===== FORM AND CONFIG HOOKS ===== */
   const {
     formState,

@@ -1,14 +1,13 @@
 import { useEffect, useState } from "preact/hooks";
+import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import type { JSX } from "preact";
-import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
-export default function RecentBitnameRegister(): JSX.Element {
+export default function StampTransfersGallery(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<StampTransaction[]>([]);
 
-  /* REVIEW AND CHANGE THE CODE BELOW TO FETCH RECENT REGISTERS */
   useEffect(() => {
     const fetchRecentTransactions = async () => {
       try {
@@ -17,9 +16,9 @@ export default function RecentBitnameRegister(): JSX.Element {
           throw new Error("Failed to fetch recent transactions");
         }
         const data = await response.json();
-        setTransactions(data.deploy || []);
+        setTransactions(data.transfer || []);
       } catch (error) {
-        console.error("Error fetching recent deploys:", error);
+        console.error("Error fetching recent transfers:", error);
       } finally {
         setIsLoading(false);
       }
@@ -29,25 +28,23 @@ export default function RecentBitnameRegister(): JSX.Element {
   }, []);
 
   if (isLoading) {
-    return <div class="animate-pulse">Loading recent registers...</div>;
+    return <div class="animate-pulse">Loading recent transfers...</div>;
   }
 
   return (
     <div class="flex flex-col items-start tablet:items-end">
-      <div>
-        <h4 class={`${titlePurpleLD} tablet:hidden`}>
-          BITNAMES
-        </h4>
-        <h4 class={`${titlePurpleDL} hidden tablet:block`}>
-          BITNAMES
-        </h4>
-      </div>
+      <h1 class={`${ModulesStyles.titlePurpleDL} tablet:hidden`}>
+        STAMP TRANSFERS
+      </h1>
+      <h1 class={`hidden tablet:block ${ModulesStyles.titlePurpleLD}`}>
+        STAMP TRANSFERS
+      </h1>
       {transactions.length > 0 && (
-        <h3 class={subtitlePurple}>
-          # {transactions[0].block_index}
-        </h3>
+        <h2 class={ModulesStyles.subTitlePurple}>
+          BLOCK #{transactions[0].block_index}
+        </h2>
       )}
-      <div class="grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-3 desktop:grid-cols-4 gap-6">
+      <div class="grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-3 mobileMd:gap-6">
         {transactions.map((stamp, index) => (
           <StampCard
             key={index}

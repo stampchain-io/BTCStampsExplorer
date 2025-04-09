@@ -2,8 +2,9 @@
 /*@baba-60+61+65*/
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { body, gapSection } from "$layout";
-import { RecentBitnameRegister, RegisterBitnameContent } from "$tool";
+import { SRC101RegisterTool } from "$tool";
 import { HowToRegisterBitnameModule } from "$howto";
+import { SRC101RegistersGallery } from "$gallery";
 
 /* ===== TYPES ===== */
 interface ToolsSrc101PageProps {
@@ -50,7 +51,7 @@ export default function ToolsSrc101Page(
   /* ===== HELPERS ===== */
   const renderContent = () => {
     if (selectedTab === "mint") {
-      return <RegisterBitnameContent trxType={trxType} />;
+      return <SRC101RegisterTool trxType={trxType} />;
     }
     return null;
   };
@@ -69,7 +70,7 @@ export default function ToolsSrc101Page(
           <HowToRegisterBitnameModule />
         </div>
         <div class="w-full tablet:w-1/2 hidden">
-          <RecentBitnameRegister />
+          <SRC101RegistersGallery />
         </div>
       </div>
     </div>

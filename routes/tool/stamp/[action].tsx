@@ -2,9 +2,9 @@
 /*@baba-71-82*/
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { body, gapSection } from "$layout";
-import { TransferStampContent } from "$islands/tool/stamp/transfer/TransferStampContent.tsx";
-import LatestTransfer from "$islands/tool/stamp/transfer/LatestStampTransfer.tsx";
-import { HowToTransferStampModule } from "$islands/howto/HowToTransferStamp.tsx";
+import { StampTransferTool } from "$tool";
+import { StampTransfersGallery } from "$gallery";
+import { HowToTransferStampModule } from "$howto";
 
 /* ===== TYPES ===== */
 interface ToolStampPageProps {
@@ -47,7 +47,7 @@ export default function ToolStampPage(
     console.log("Rendering Content for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
-        return <TransferStampContent trxType={trxType} />;
+        return <StampTransferTool trxType={trxType} />;
       default:
         return <div>No content available for this tab.</div>;
     }
@@ -67,7 +67,7 @@ export default function ToolStampPage(
     console.log("Rendering Right Sidebar for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
-        return <LatestTransfer />;
+        return <StampTransfersGallery />;
       default:
         return <div>No sidebar content available for this tab.</div>;
     }
