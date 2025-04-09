@@ -143,7 +143,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function CollectionOverview(
+export default function CollectionOverviewPage(
   { data }: PageProps<CollectionOverviewPageProps>,
 ) {
   const {

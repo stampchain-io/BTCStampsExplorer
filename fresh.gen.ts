@@ -144,7 +144,6 @@ import * as $Wallet_details_styles from "./islands/Wallet/details/styles.ts";
 import * as $about_AboutContact from "./islands/about/AboutContact.tsx";
 import * as $about_AboutDonate from "./islands/about/AboutDonate.tsx";
 import * as $about_AboutHeader from "./islands/about/AboutHeader.tsx";
-import * as $about_AboutTeam from "./islands/about/AboutTeam.tsx";
 import * as $about_types from "./islands/about/types.ts";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
@@ -179,6 +178,7 @@ import * as $gallery_SRC20Deploys from "./islands/gallery/SRC20Deploys.tsx";
 import * as $gallery_SRC20Mints from "./islands/gallery/SRC20Mints.tsx";
 import * as $gallery_SRC20Transfers from "./islands/gallery/SRC20Transfers.tsx";
 import * as $gallery_StampTransfers from "./islands/gallery/StampTransfers.tsx";
+import * as $gallery_Team from "./islands/gallery/Team.tsx";
 import * as $gallery_index from "./islands/gallery/index.ts";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
@@ -431,7 +431,6 @@ const manifest = {
     "./islands/about/AboutContact.tsx": $about_AboutContact,
     "./islands/about/AboutDonate.tsx": $about_AboutDonate,
     "./islands/about/AboutHeader.tsx": $about_AboutHeader,
-    "./islands/about/AboutTeam.tsx": $about_AboutTeam,
     "./islands/about/types.ts": $about_types,
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
@@ -472,6 +471,7 @@ const manifest = {
     "./islands/gallery/SRC20Mints.tsx": $gallery_SRC20Mints,
     "./islands/gallery/SRC20Transfers.tsx": $gallery_SRC20Transfers,
     "./islands/gallery/StampTransfers.tsx": $gallery_StampTransfers,
+    "./islands/gallery/Team.tsx": $gallery_Team,
     "./islands/gallery/index.ts": $gallery_index,
     "./islands/home/FontLoader.tsx": $home_FontLoader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,

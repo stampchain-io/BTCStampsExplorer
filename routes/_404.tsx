@@ -4,7 +4,7 @@ import { subtitleGrey, titleGreyLD } from "$text";
 import { Button } from "$button";
 
 /* ===== PAGE COMPONENT ===== */
-export default function Error404() {
+export default function Error404Page() {
   /* ===== RENDER ===== */
   return (
     <>

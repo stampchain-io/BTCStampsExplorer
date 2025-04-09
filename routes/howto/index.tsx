@@ -4,7 +4,7 @@ import { body, gapGrid, gapSection } from "$layout";
 import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
-export default function HowTo() {
+export default function HowToPage() {
   return (
     <div className={`${body} ${gapSection}`}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}

@@ -5,7 +5,7 @@ import { FAQ_CONTENT, FaqAccordion, FaqHeader } from "$faq";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
-export default function FAQ() {
+export default function FaqPage() {
   return (
     <div className={`${body} ${gapSection}`}>
       {/* ===== HEADER SECTION ===== */}

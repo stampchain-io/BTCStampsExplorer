@@ -3,7 +3,7 @@ import { gapGrid } from "$layout";
 import { aboutSubTitlePurple, aboutTitlePurpleLD, subtitlePurple } from "$text";
 
 /* ===== COMPONENT ===== */
-export default function AboutTeam() {
+export default function TeamGallery() {
   /* ===== COMPONENT RENDER ===== */
   return (
     <>

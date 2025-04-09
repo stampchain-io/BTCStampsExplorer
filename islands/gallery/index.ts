@@ -1,4 +1,5 @@
 export * from "$islands/gallery/Partners.tsx";
+export { default as TeamGallery } from "$islands/gallery/Team.tsx";
 
 export { default as SRC20DeploysGallery } from "$islands/gallery/SRC20Deploys.tsx";
 export { default as SRC20MintsGallery } from "$islands/gallery/SRC20Mints.tsx";

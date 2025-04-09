@@ -289,7 +289,7 @@ export const handler: Handlers = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function Dashboard(props: WalletPageProps) {
+export default function DashboardPage(props: WalletPageProps) {
   const { data } = props;
 
   /* ===== RENDER ===== */

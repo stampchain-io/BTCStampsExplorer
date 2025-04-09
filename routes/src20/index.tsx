@@ -139,7 +139,7 @@ export const handler: Handlers = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function SRC20Page({ data }: any) {
+export default function SRC20OverviewlPage({ data }: any) {
   console.log("data=====>", data);
   if (!data || !data.src20s) {
     return <div>Error: No data received</div>;

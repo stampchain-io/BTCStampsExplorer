@@ -94,7 +94,9 @@ export const handler: Handlers = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function CollectionLanding(props: CollectionLandingPageProps) {
+export default function CollectionLandingPage(
+  props: CollectionLandingPageProps,
+) {
   const {
     collections,
     sortBy,

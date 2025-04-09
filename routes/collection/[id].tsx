@@ -87,7 +87,9 @@ export const handler: Handlers = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function CollectionDetails(props: CollectionDetailsPageProps) {
+export default function CollectionDetailPage(
+  props: CollectionDetailsPageProps,
+) {
   const {
     id,
     stamps,

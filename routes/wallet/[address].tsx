@@ -358,7 +358,7 @@ function isDispenserOnlyAddress(data: WalletPageProps["data"]) {
 }
 
 /* ===== PAGE COMPONENT ===== */
-export default function Wallet(props: WalletPageProps) {
+export default function WalletPage(props: WalletPageProps) {
   const { data } = props;
   const isDispenserOnly = isDispenserOnlyAddress(data);
 

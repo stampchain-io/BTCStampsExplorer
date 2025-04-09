@@ -99,7 +99,7 @@ export const handler: Handlers = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export function StampPage(props: StampPageProps) {
+export function StampOverviewPage(props: StampPageProps) {
   const {
     stamps,
     page,
@@ -139,4 +139,4 @@ export function StampPage(props: StampPageProps) {
   );
 }
 
-export default StampPage;
+export default StampOverviewPage;

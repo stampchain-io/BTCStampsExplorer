@@ -61,12 +61,12 @@ export const handler: Handlers = {
 };
 
 /* ===== TYPES ===== */
-interface SRC20TickPageProps {
-  data: SRC20TickPageData | { error: string };
+interface SRC20DetailPageProps {
+  data: SRC20DetailPageData | { error: string };
 }
 
 /* ===== PAGE COMPONENT ===== */
-function SRC20TickPage(props: SRC20TickPageProps) {
+function SRC20DetailPage(props: SRC20DetailPageProps) {
   /* ===== ERROR HANDLING ===== */
   if ("error" in props.data) {
     return (
@@ -114,4 +114,4 @@ function SRC20TickPage(props: SRC20TickPageProps) {
     </div>
   );
 }
-export default SRC20TickPage;
+export default SRC20DetailPage;

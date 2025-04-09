@@ -1,13 +1,12 @@
 /* ===== ABOUT PAGE ===== */
 import { body, gapSectionSlim } from "$layout";
 import AboutHeader from "$islands/about/AboutHeader.tsx";
-import AboutTeam from "$islands/about/AboutTeam.tsx";
-import { PartnersGallery } from "$gallery";
+import { PartnersGallery, TeamGallery } from "$gallery";
 import AboutDonate from "$islands/about/AboutDonate.tsx";
 import AboutContact from "$islands/about/AboutContact.tsx";
 
 /* ===== PAGE COMPONENT ===== */
-export default function About() {
+export default function AboutPage() {
   return (
     <div className={`${body} ${gapSectionSlim}`}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}
@@ -32,7 +31,7 @@ export default function About() {
       <AboutHeader />
 
       {/* ===== TEAM SECTION ===== */}
-      <AboutTeam />
+      <TeamGallery />
 
       {/* ===== PARTNERS SECTION ===== */}
       <PartnersGallery />

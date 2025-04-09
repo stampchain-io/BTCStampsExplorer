@@ -196,7 +196,7 @@ function addPricesToStamp(
 }
 
 /* ===== PAGE COMPONENT ===== */
-export default function StampPage(props: StampDetailPageProps) {
+export default function StampDetailPage(props: StampDetailPageProps) {
   const {
     stamp,
     htmlTitle,

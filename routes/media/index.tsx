@@ -5,7 +5,7 @@ import { Button } from "$button";
 import { headingGreyLDLink, subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
-export default function Media() {
+export default function MediaPage() {
   /* ===== RENDER ===== */
   return (
     <div className={`${body} ${gapSection}`}>

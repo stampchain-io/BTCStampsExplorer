@@ -4,7 +4,7 @@ import { body, gapGrid } from "$layout";
 import { subtitleGrey, text, textSm, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */
-export default function TermsOfService() {
+export default function TermsOfServicePage() {
   return (
     <>
       <CourierFontLoader />
