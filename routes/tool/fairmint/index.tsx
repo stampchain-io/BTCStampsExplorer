@@ -2,15 +2,15 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
-import { FairmintContent } from "$islands/tool/fairmint/FairmintContent.tsx";
+import { FairmintTool } from "$islands/tool/fairmint/FairmintTool.tsx";
 
 /* ===== TYPES ===== */
-interface ToolsFairmintPageProps {
+interface ToolFairmintPageProps {
   fairminters: any[];
 }
 
 /* ===== SERVER HANDLER ===== */
-export const handler: Handlers<ToolsFairmintPageProps> = {
+export const handler: Handlers<ToolFairmintPageProps> = {
   async GET(_req, ctx) {
     try {
       const fairminters = await XcpManager.getFairminters();
@@ -23,8 +23,8 @@ export const handler: Handlers<ToolsFairmintPageProps> = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function ToolsFairmintPage(
-  { data }: PageProps<ToolsFairmintPageProps>,
+export default function ToolFairmintPage(
+  { data }: PageProps<ToolFairmintPageProps>,
 ) {
   /* ===== RENDER ===== */
   return (
@@ -32,7 +32,7 @@ export default function ToolsFairmintPage(
       <Head>
         <title>Fairmint Tokens</title>
       </Head>
-      <FairmintContent fairminters={data.fairminters} />
+      <FairmintTool fairminters={data.fairminters} />
     </>
   );
 }

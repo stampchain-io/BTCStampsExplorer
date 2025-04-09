@@ -22,7 +22,7 @@ interface Balance {
 }
 
 /* ===== COMPONENT IMPLEMENTATION ===== */
-export function TransferContent(
+export function SRC20TransferTool(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
 ) {
   /* ===== FORM STATE AND HANDLERS ===== */

@@ -8,12 +8,12 @@ import { bodyTool, containerBackground, containerColForm } from "$layout";
 import { titlePurpleLD } from "$text";
 
 /* ===== TYPES ===== */
-interface FairmintContentProps {
+interface FairmintToolProps {
   fairminters: any[];
 }
 
 /* ===== COMPONENT ===== */
-export function FairmintContent({ fairminters }: FairmintContentProps) {
+export function FairmintTool({ fairminters }: FairmintToolProps) {
   /* ===== STATE ===== */
   const {
     formState,

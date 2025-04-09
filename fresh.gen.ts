@@ -234,18 +234,18 @@ import * as $test_ReviewDogTest from "./islands/test/ReviewDogTest.tsx";
 import * as $tool_InputField from "./islands/tool/InputField.tsx";
 import * as $tool_SelectField from "./islands/tool/SelectField.tsx";
 import * as $tool_StatusMessages from "./islands/tool/StatusMessages.tsx";
-import * as $tool_fairmint_FairmintContent from "./islands/tool/fairmint/FairmintContent.tsx";
+import * as $tool_fairmint_FairmintTool from "./islands/tool/fairmint/FairmintTool.tsx";
 import * as $tool_index from "./islands/tool/index.ts";
 import * as $tool_src101_register_RecentRegister from "./islands/tool/src101/register/RecentRegister.tsx";
 import * as $tool_src101_register_RegisterContent from "./islands/tool/src101/register/RegisterContent.tsx";
 import * as $tool_src101_register_styles from "./islands/tool/src101/register/styles.ts";
+import * as $tool_src20_DeployTool from "./islands/tool/src20/DeployTool.tsx";
+import * as $tool_src20_MintTool from "./islands/tool/src20/MintTool.tsx";
 import * as $tool_src20_SRC20InputField from "./islands/tool/src20/SRC20InputField.tsx";
-import * as $tool_src20_deploy_DeployContent from "./islands/tool/src20/deploy/DeployContent.tsx";
+import * as $tool_src20_TransferTool from "./islands/tool/src20/TransferTool.tsx";
 import * as $tool_src20_deploy_RecentDeploy from "./islands/tool/src20/deploy/RecentDeploy.tsx";
-import * as $tool_src20_mint_MintContent from "./islands/tool/src20/mint/MintContent.tsx";
 import * as $tool_src20_mint_PopularMinting from "./islands/tool/src20/mint/PopularMinting.tsx";
 import * as $tool_src20_transfer_LatestTransfer from "./islands/tool/src20/transfer/LatestTransfer.tsx";
-import * as $tool_src20_transfer_TransferContent from "./islands/tool/src20/transfer/TransferContent.tsx";
 import * as $tool_stamp_OlgaContent from "./islands/tool/stamp/OlgaContent.tsx";
 import * as $tool_stamp_TradeContent from "./islands/tool/stamp/TradeContent.tsx";
 import * as $tool_stamp_transfer_LatestStampTransfer from "./islands/tool/stamp/transfer/LatestStampTransfer.tsx";
@@ -531,26 +531,23 @@ const manifest = {
     "./islands/tool/InputField.tsx": $tool_InputField,
     "./islands/tool/SelectField.tsx": $tool_SelectField,
     "./islands/tool/StatusMessages.tsx": $tool_StatusMessages,
-    "./islands/tool/fairmint/FairmintContent.tsx":
-      $tool_fairmint_FairmintContent,
+    "./islands/tool/fairmint/FairmintTool.tsx": $tool_fairmint_FairmintTool,
     "./islands/tool/index.ts": $tool_index,
     "./islands/tool/src101/register/RecentRegister.tsx":
       $tool_src101_register_RecentRegister,
     "./islands/tool/src101/register/RegisterContent.tsx":
       $tool_src101_register_RegisterContent,
     "./islands/tool/src101/register/styles.ts": $tool_src101_register_styles,
+    "./islands/tool/src20/DeployTool.tsx": $tool_src20_DeployTool,
+    "./islands/tool/src20/MintTool.tsx": $tool_src20_MintTool,
     "./islands/tool/src20/SRC20InputField.tsx": $tool_src20_SRC20InputField,
-    "./islands/tool/src20/deploy/DeployContent.tsx":
-      $tool_src20_deploy_DeployContent,
+    "./islands/tool/src20/TransferTool.tsx": $tool_src20_TransferTool,
     "./islands/tool/src20/deploy/RecentDeploy.tsx":
       $tool_src20_deploy_RecentDeploy,
-    "./islands/tool/src20/mint/MintContent.tsx": $tool_src20_mint_MintContent,
     "./islands/tool/src20/mint/PopularMinting.tsx":
       $tool_src20_mint_PopularMinting,
     "./islands/tool/src20/transfer/LatestTransfer.tsx":
       $tool_src20_transfer_LatestTransfer,
-    "./islands/tool/src20/transfer/TransferContent.tsx":
-      $tool_src20_transfer_TransferContent,
     "./islands/tool/stamp/OlgaContent.tsx": $tool_stamp_OlgaContent,
     "./islands/tool/stamp/TradeContent.tsx": $tool_stamp_TradeContent,
     "./islands/tool/stamp/transfer/LatestStampTransfer.tsx":

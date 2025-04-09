@@ -37,7 +37,7 @@ export const handler: Handlers<StampPageData> = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function ToolsStampingPage({ data }: PageProps<StampPageData>) {
+export default function ToolStampingPage({ data }: PageProps<StampPageData>) {
   /* ===== SECTION CONFIGURATION ===== */
   const latestStampsSection = {
     title: "LATEST STAMPS",

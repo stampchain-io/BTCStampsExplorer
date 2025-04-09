@@ -6,12 +6,12 @@ import { SRC20Service } from "$server/services/src20/index.ts";
 import type { SRC20MintStatus } from "$lib/types/src20.d.ts";
 import { body, gapSection } from "$layout";
 import {
-  DeployContent,
   LatestTransfer,
-  MintContent,
   PopularMinting,
   RecentDeploy,
-  TransferContent,
+  SRC20DeployTool,
+  SRC20MintTool,
+  SRC20TransferTool,
 } from "$tool";
 import {
   HowToDeployTokenModule,
@@ -20,7 +20,7 @@ import {
 } from "$howto";
 
 /* ===== TYPES ===== */
-interface ToolsSrc20PageProps {
+interface ToolSrc20PageProps {
   selectedTab: string;
   trxType: "multisig" | "olga";
   tick?: string | null;
@@ -30,7 +30,7 @@ interface ToolsSrc20PageProps {
 }
 
 /* ===== SERVER HANDLER ===== */
-export const handler: Handlers<ToolsSrc20PageProps> = {
+export const handler: Handlers<ToolSrc20PageProps> = {
   async GET(req, ctx) {
     try {
       const url = new URL(req.url);
@@ -86,14 +86,14 @@ export const handler: Handlers<ToolsSrc20PageProps> = {
       }
       return ctx.render({
         error: error instanceof Error ? error.message : "Internal server error",
-      } as ToolsSrc20PageProps);
+      } as ToolSrc20PageProps);
     }
   },
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function ToolsSrc20Page(
-  { data }: PageProps<ToolsSrc20PageProps>,
+export default function ToolSrc20Page(
+  { data }: PageProps<ToolSrc20PageProps>,
 ) {
   const {
     selectedTab,
@@ -108,7 +108,7 @@ export default function ToolsSrc20Page(
     switch (selectedTab) {
       case "mint":
         return (
-          <MintContent
+          <SRC20MintTool
             trxType={trxType}
             tick={tick}
             mintStatus={mintStatus}
@@ -116,9 +116,9 @@ export default function ToolsSrc20Page(
           />
         );
       case "deploy":
-        return <DeployContent trxType={trxType} />;
+        return <SRC20DeployTool trxType={trxType} />;
       case "transfer":
-        return <TransferContent trxType={trxType} />;
+        return <SRC20TransferTool trxType={trxType} />;
       default:
         return null;
     }

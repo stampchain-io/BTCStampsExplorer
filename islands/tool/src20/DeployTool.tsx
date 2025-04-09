@@ -25,10 +25,10 @@ interface UploadResponse extends APIResponse {
 }
 
 /* ===== COMPONENT IMPLEMENTATION ===== */
-export function DeployContent(
+export function SRC20DeployTool(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
 ) {
-  console.log("DeployContent trxType:", trxType);
+  console.log("SRC20DeployTool trxType:", trxType);
   /* ===== FORM HOOK AND STATE ===== */
   const {
     formState,

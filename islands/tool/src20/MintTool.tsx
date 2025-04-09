@@ -20,7 +20,7 @@ import { Icon } from "$icons";
 import { StatusMessages } from "$notifications";
 
 /* ===== MAIN COMPONENT INTERFACE ===== */
-interface MintContentProps {
+interface SRC20MintToolProps {
   trxType?: "olga" | "multisig";
   tick?: string | undefined | null;
   mintStatus?: SRC20MintStatus | null | undefined;
@@ -84,12 +84,12 @@ interface SearchResult {
 }
 
 /* ===== MINT CONTENT COMPONENT IMPLEMENTATION ===== */
-export function MintContent({
+export function SRC20MintTool({
   trxType = "olga",
   tick,
   mintStatus: initialMintStatus,
   holders: initialHolders,
-}: MintContentProps = { trxType: "olga" }) {
+}: SRC20MintToolProps = { trxType: "olga" }) {
   /* ===== FORM HOOK AND STATE ===== */
   const {
     formState,
@@ -253,7 +253,7 @@ export function MintContent({
   /* ===== DEBUG LOGGING EFFECT ===== */
   useEffect(() => {
     logger.debug("stamps", {
-      message: "MintContent formState updated",
+      message: "SRC20MintTool formState updated",
       data: {
         fee: formState.fee,
         psbtFees: formState.psbtFees,
