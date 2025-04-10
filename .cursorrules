@@ -112,7 +112,7 @@ directory_structure:
         - can_use_hooks_and_state
       examples:
         - "BlockInfo.tsx - state and useEffect"
-        - "SRC20TokenMintingCard.tsx"
+        - "SRC20CardMinting.tsx"
         - "SRC20DetailsTab.tsx"
       patterns:
         - group_by_feature:

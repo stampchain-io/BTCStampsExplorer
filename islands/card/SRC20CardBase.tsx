@@ -1,9 +1,12 @@
+/* ===== SRC20 CARD BASE COMPONENT ===== */
+/*@baba-check styles*/
 import { useState } from "preact/hooks";
 import { SRC20Row } from "$globals";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
-import { BaseCardStyles } from "./styles.ts";
+import { labelSm, textSm } from "$text";
 
+/* ===== HELPER FUNCTIONS ===== */
 function splitTextAndEmojis(text: string): { text: string; emoji: string } {
   // Regex to match emojis
   const emojiRegex =
@@ -20,36 +23,40 @@ function splitTextAndEmojis(text: string): { text: string; emoji: string } {
   };
 }
 
-export interface SRC20BaseCardProps {
+/* ===== TYPES ===== */
+export interface SRC20CardBaseProps {
   src20: SRC20Row;
   fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
   onImageClick?: (imgSrc: string) => void;
 }
 
-export function SRC20BaseCard(
-  { src20, fromPage = "src20", onImageClick, children }: SRC20BaseCardProps & {
+/* ===== COMPONENT ===== */
+export function SRC20CardBase(
+  { src20, fromPage = "src20", onImageClick, children }: SRC20CardBaseProps & {
     children: preact.ComponentChildren;
   },
 ) {
+  /* ===== STATE ===== */
   const [isHovered, setIsHovered] = useState(false);
 
+  /* ===== COMPUTED VALUES ===== */
   const href = `/src20/${encodeURIComponent(unicodeEscapeToEmoji(src20.tick))}`;
   const progress = src20.progress || "0";
   const progressWidth = `${progress}%`;
-
   const imageUrl = src20.stamp_url ||
     src20.deploy_img ||
     `/content/${src20.tx_hash}.svg` ||
     `/content/${src20.deploy_tx}`;
 
   return (
+    /* ===== RENDER ===== */
     <a
       href={href}
       class="flex justify-between items-center border-2 border-transparent rounded-lg hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] w-full bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] p-3 mobileMd:p-6"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Left Section - Image and Title */}
+      {/* ===== LEFT SECTION - IMAGE AND TITLE ===== */}
       <div class="cursor-pointer flex gap-[18px] mobileMd:gap-[30px]">
         <img
           src={imageUrl}
@@ -58,6 +65,7 @@ export function SRC20BaseCard(
           alt={unicodeEscapeToEmoji(src20.tick)}
         />
         <div class="flex flex-col">
+          {/* ===== TITLE AND SOCIAL LINKS ===== */}
           <p class="text-2xl mobileLg:text-4xl font-black uppercase flex gap-4 relative z-[20]">
             {(() => {
               const { text, emoji } = splitTextAndEmojis(
@@ -79,6 +87,7 @@ export function SRC20BaseCard(
               );
             })()}
             <div class="flex gap-2">
+              {/* ===== SOCIAL ICONS ===== */}
               {src20.email != null && (
                 <a href={src20.email} target="_blank">
                   <img
@@ -105,40 +114,43 @@ export function SRC20BaseCard(
             </div>
           </p>
 
+          {/* ===== CONDITIONAL CONTENT SECTIONS ===== */}
+          {/* ===== SUPPLY AND LIMIT INFO ===== */}
           {(fromPage === "src20" || fromPage === "home") && (
             <div class="flex flex-col pt-0.75 mobileLg:pt-1.5 -space-y-0.5">
-              <p class={BaseCardStyles.dataLabelSm}>
+              <p class={labelSm}>
                 SUPPLY{" "}
-                <span class={BaseCardStyles.dataValueSm}>
+                <span class={textSm}>
                   {Number(src20.max).toLocaleString()}
                 </span>
               </p>
 
-              <p class={BaseCardStyles.dataLabelSm}>
+              <p class={labelSm}>
                 LIMIT{" "}
-                <span class={BaseCardStyles.dataValueSm}>
+                <span class={textSm}>
                   {Number(src20.lim).toLocaleString()}
                 </span>
               </p>
             </div>
           )}
 
+          {/* ===== WALLET AMOUNT INFO ===== */}
           {fromPage === "wallet" && (
             <div class="flex flex-col pt-0.75 mobileLg:pt-1.5 -space-y-0.5">
-              <p class={BaseCardStyles.dataLabelSm}>
+              <p class={labelSm}>
                 AMOUNT
               </p>
-              <p class={BaseCardStyles.dataValueSm}>
+              <p class={textSm}>
                 {stripTrailingZeros(Number(src20.amt).toFixed(2))}
               </p>
             </div>
           )}
 
+          {/* ===== PROGRESS BAR ===== */}
           {fromPage === "stamping/src20" && (
             <div class="flex flex-col pt-1.5 mobileLg:pt-3 gap-1">
-              <p class={BaseCardStyles.dataLabelSm}>
-                PROGRESS{" "}
-                <span class={BaseCardStyles.dataValueSm}>{progress}%</span>
+              <p class={labelSm}>
+                PROGRESS <span class={textSm}>{progress}%</span>
               </p>
               <div class="relative min-w-[144px] mobileLg:min-w-[192px] h-1 mobileLg:h-1.5 bg-stamp-grey rounded-full">
                 <div
@@ -151,6 +163,7 @@ export function SRC20BaseCard(
         </div>
       </div>
 
+      {/* ===== RIGHT SECTION - CHILDREN ===== */}
       {children}
     </a>
   );

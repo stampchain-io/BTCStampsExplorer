@@ -1,40 +1,44 @@
-import { Button } from "$button";
-import {
-  SRC20BaseCard,
-  SRC20BaseCardProps,
-} from "$islands/src20/cards/SRC20BaseCard.tsx";
+/* ===== SRC20 CARD MINTING COMPONENT ===== */
+/*@baba-check styles*/
+import { SRC20CardBase, SRC20CardBaseProps } from "$card";
+import { labelSm, textSm } from "$text";
 import { formatDate } from "$lib/utils/formatUtils.ts";
-import { BaseCardStyles } from "./styles.ts";
+import { Button } from "$button";
 
-export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
+/* ===== COMPONENT ===== */
+export function SRC20CardMinting(props: SRC20CardBaseProps) {
+  /* ===== PROPS EXTRACTION ===== */
   const { src20, fromPage } = props;
 
+  /* ===== COMPUTED VALUES ===== */
   const mintHref = `/stamping/src20/mint?tick=${
     encodeURIComponent(src20.tick)
   }&trxType=olga`;
   const progressWidth = `${src20.progress}%`;
 
+  /* ===== EVENT HANDLERS ===== */
   const handleMintClick = (event: MouseEvent) => {
     event.preventDefault();
     globalThis.location.href = mintHref;
   };
 
+  /* ===== RENDER ===== */
   return (
-    <SRC20BaseCard {...props}>
+    <SRC20CardBase {...props}>
       {fromPage === "src20" && (
         <>
-          {/* Holders & Deploy */}
+          {/* ===== HOLDERS AND DEPLOY SECTION ===== */}
           <div class="flex flex-col -mb-6 mobileLg:-mb-[44px]">
             <div class="hidden tablet:flex flex-col justify-center text-center -space-y-0.5 ">
-              <p class={BaseCardStyles.dataLabelSm}>
+              <p class={labelSm}>
                 HOLDERS{" "}
-                <span class={BaseCardStyles.dataValueSm}>
+                <span class={textSm}>
                   {Number(src20.holders).toLocaleString()}
                 </span>
               </p>
-              <p class={BaseCardStyles.dataLabelSm}>
+              <p class={labelSm}>
                 DEPLOY{" "}
-                <span class={BaseCardStyles.dataValueSm}>
+                <span class={textSm}>
                   {formatDate(new Date(src20.block_time), {
                     month: "short",
                     year: "numeric",
@@ -44,19 +48,19 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
             </div>
           </div>
 
-          {/* Top Mints & Progress Bar */}
+          {/* ===== MINTING PROGRESS SECTION ===== */}
           <div class="flex flex-col -mb-3 mobileLg:-mb-[22px] -ml-24 tablet:ml-0">
             <div class="hidden min-[640px]:flex flex-col justify-center text-center -space-y-0.5 ">
-              <p class={BaseCardStyles.dataLabelSm}>
+              <p class={labelSm}>
                 TOP MINTS{" "}
-                <span class={BaseCardStyles.dataValueSm}>
+                <span class={textSm}>
                   {src20.top_mints_percentage?.toFixed(1) || "N/A"}%
                 </span>
               </p>
               <div class="flex flex-col gap-1">
-                <p class={BaseCardStyles.dataLabelSm}>
+                <p class={labelSm}>
                   PROGRESS{" "}
-                  <span class={BaseCardStyles.dataValueSm}>
+                  <span class={textSm}>
                     {Number(src20.progress)}
                   </span>
                   <span class="text-stamp-grey-light">%</span>
@@ -73,26 +77,27 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
         </>
       )}
 
+      {/* ===== WALLET VIEW SECTION ===== */}
       {fromPage === "wallet" && (
         // Holders & Deploy
         <div class="flex flex-col justify-end">
           <div class="hidden min-[640px]:flex flex-col justify-center text-center -space-y-0.5 ">
-            <p class={BaseCardStyles.dataLabelSm}>
+            <p class={labelSm}>
               HOLDERS{" "}
-              <span class={BaseCardStyles.dataValueSm}>
+              <span class={textSm}>
                 {Number(src20?.mint_progress?.total_mints).toLocaleString()}
               </span>
             </p>
-            <p class={BaseCardStyles.dataLabelSm}>
+            <p class={labelSm}>
               TOP MINTS{" "}
-              <span class={BaseCardStyles.dataValueSm}>
+              <span class={textSm}>
                 {src20.top_mints_percentage?.toFixed(1) || "N/A"}%
               </span>
             </p>
             <div class="flex flex-col gap-1">
-              <p class={BaseCardStyles.dataLabelSm}>
+              <p class={labelSm}>
                 PROGRESS{" "}
-                <span class={BaseCardStyles.dataValueSm}>
+                <span class={textSm}>
                   {Number(src20?.mint_progress?.progress)}
                 </span>
                 <span class="text-stamp-grey-light">%</span>
@@ -102,24 +107,25 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
         </div>
       )}
 
+      {/* ===== STAMPING VIEW SECTION ===== */}
       {fromPage === "stamping/src20" && (
         <div class="flex-col gap-6 -mb-4 mobileLg:-mb-6 hidden mobileMd:flex tablet:hidden desktop:flex">
           <div class="flex flex-col justify-center text-center -space-y-0.5">
-            <p class={BaseCardStyles.dataLabelSm}>
+            <p class={labelSm}>
               SUPPLY{" "}
-              <span class={BaseCardStyles.dataValueSm}>
+              <span class={textSm}>
                 {Number(src20.max).toLocaleString()}
               </span>
             </p>
-            <p className={BaseCardStyles.dataLabelSm}>
+            <p class={labelSm}>
               HOLDERS{" "}
-              <span className={BaseCardStyles.dataValueSm}>
+              <span class={textSm}>
                 {Number(src20.holders || 0).toLocaleString()}
               </span>
             </p>
-            <p class={BaseCardStyles.dataLabelSm}>
+            <p class={labelSm}>
               TOP MINTS{" "}
-              <span class={BaseCardStyles.dataValueSm}>
+              <span class={textSm}>
                 {src20.top_mints_percentage?.toFixed(1) || "N/A"}%
               </span>
             </p>
@@ -127,10 +133,9 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
         </div>
       )}
 
-      {/* Mint Button */}
+      {/* ===== MINT BUTTON SECTION ===== */}
       <Button
-        v
-        ariant="flat"
+        variant="flat"
         color="purple"
         size="md"
         onClick={handleMintClick}
@@ -140,6 +145,6 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
       >
         MINT
       </Button>
-    </SRC20BaseCard>
+    </SRC20CardBase>
   );
 }

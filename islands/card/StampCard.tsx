@@ -1,3 +1,5 @@
+/* ===== STAMP CARD COMPONENT ===== */
+/*@baba-check styles+icon*/
 import {
   abbreviateAddress,
   formatSupplyValue,
@@ -10,14 +12,15 @@ import {
 } from "$lib/utils/imageUtils.ts";
 
 import { StampRow } from "$globals";
-import TextContentIsland from "./detail/StampTextContent.tsx";
+import TextContentIsland from "../stamp/detail/StampTextContent.tsx";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { useEffect, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { ABBREVIATION_LENGTHS, TEXT_STYLES } from "./styles.ts";
+import { ABBREVIATION_LENGTHS, TEXT_STYLES } from "$card";
 
+/* ===== TYPES ===== */
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
   sale_data?: {
     btc_amount: number;
@@ -27,6 +30,7 @@ interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
   stamp_base64?: string;
 }
 
+/* ===== COMPONENT ===== */
 export function StampCard({
   stamp,
   isRecentSale = false,
@@ -44,11 +48,15 @@ export function StampCard({
   variant?: "default" | "grey";
   fromPage?: string;
 }) {
-  // Add window size hook
+  /* ===== STATE ===== */
   const { width } = useWindowSize();
   const [loading, setLoading] = useState(true);
   const [src, setSrc] = useState<string>("");
-  // Function to get current abbreviation length based on screen size
+  const [validatedContent, setValidatedContent] = useState<preact.VNode | null>(
+    null,
+  );
+
+  /* ===== HELPER FUNCTIONS ===== */
   const getAbbreviationLength = () => {
     if (width >= BREAKPOINTS.desktop) return ABBREVIATION_LENGTHS.desktop;
     if (width >= BREAKPOINTS.tablet) return ABBREVIATION_LENGTHS.tablet;
@@ -57,6 +65,7 @@ export function StampCard({
     return ABBREVIATION_LENGTHS.mobileSm;
   };
 
+  /* ===== DATA FETCHING ===== */
   const fetchStampImage = async () => {
     setLoading(true);
     const res = await getStampImageSrc(stamp as StampRow);
@@ -66,15 +75,13 @@ export function StampCard({
     setLoading(false);
   };
 
+  /* ===== EFFECTS ===== */
+  // Fetch stamp image on mount
   useEffect(() => {
     fetchStampImage();
   }, []);
 
-  // Add state for validated content
-  const [validatedContent, setValidatedContent] = useState<preact.VNode | null>(
-    null,
-  );
-
+  // Validate SVG content when source changes
   useEffect(() => {
     const validateContent = async () => {
       if (stamp.stamp_mimetype === "image/svg+xml") {
@@ -118,6 +125,7 @@ export function StampCard({
     }
   }, [src, stamp.stamp_mimetype]);
 
+  /* ===== RENDER HELPERS ===== */
   const renderContent = () => {
     if (loading && !src) {
       return (
@@ -276,6 +284,7 @@ export function StampCard({
     };
   };
 
+  /* ===== COMPUTED VALUES ===== */
   const shouldDisplayHash = Number(stamp.stamp ?? 0) >= 0 ||
     (stamp.cpid && stamp.cpid.charAt(0) === "A");
 
@@ -292,7 +301,18 @@ export function StampCard({
     ? stamp.creator_name
     : abbreviateAddress(stamp.creator, getAbbreviationLength());
 
-  // Helper to get correct text styles based on variant
+  const stampValue = Number(stamp.stamp ?? 0) >= 0 ||
+      (stamp.cpid && stamp.cpid.charAt(0) === "A")
+    ? `${stamp.stamp}`
+    : `${stamp.cpid}`;
+
+  const editionCount = stamp.divisible
+    ? (stamp.supply / 100000000).toFixed(2)
+    : stamp.supply > 100000
+    ? "+100000"
+    : stamp.supply;
+
+  /* ===== STYLE HELPERS ===== */
   const getTextStyles = (type: "hashSymbol" | "stampNumber") => {
     if (variant === "grey") {
       return {
@@ -306,23 +326,12 @@ export function StampCard({
     };
   };
 
-  // Add function to check if number is long
   const isLongNumber = (value: string | number) => {
     const stringValue = String(value);
     return stringValue.length > 6;
   };
 
-  const stampValue = Number(stamp.stamp ?? 0) >= 0 ||
-      (stamp.cpid && stamp.cpid.charAt(0) === "A")
-    ? `${stamp.stamp}`
-    : `${stamp.cpid}`;
-
-  const editionCount = stamp.divisible
-    ? (stamp.supply / 100000000).toFixed(2)
-    : stamp.supply > 100000
-    ? "+100000"
-    : stamp.supply;
-
+  /* ===== RENDER ===== */
   return (
     <div class="relative flex justify-center w-full h-full max-w-72">
       <a
@@ -339,18 +348,21 @@ export function StampCard({
           bg-stamp-card-bg
         `}
       >
+        {/* ===== ATOM ICON ===== */}
         {fromPage && fromPage === "stamp" && (
           <div className="absolute top-0 right-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-[#1F002E] p-[3px] desktop:block hidden">
             <img className="" src="/img/stamp/atom.svg" />
           </div>
         )}
+
+        {/* ===== CONTENT SECTION ===== */}
         <div class="relative w-full h-full">
           <div class="aspect-stamp w-full h-full overflow-hidden flex items-center justify-center">
             {renderContent()}
           </div>
         </div>
 
-        {/* Full Details Section with variant support */}
+        {/* ===== DETAILS SECTION ===== */}
         {showDetails && !showMinDetails && (
           <div class="flex flex-col items-center px-[6px] pt-[18px] pb-0">
             {/* Stamp Number with container */}
@@ -399,6 +411,7 @@ export function StampCard({
           </div>
         )}
 
+        {/* ===== EDITION SECTION ===== */}
         {showEdition && (
           <div class="flex flex-col items-center px-1.5 mobileLg:px-3 pt-1.5 mobileLg:pt-3">
             <div class="flex items-center justify-center">
@@ -430,7 +443,7 @@ export function StampCard({
           </div>
         )}
 
-        {/* Minimal Details Section */}
+        {/* ===== MINIMAL DETAILS SECTION ===== */}
         {showMinDetails && !showDetails && (
           <div class="flex flex-col items-center px-1.5 mobileLg:px-3 pt-1.5 mobileLg:pt-3">
             <div class="flex items-center justify-center">
