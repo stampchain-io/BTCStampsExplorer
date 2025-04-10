@@ -11,7 +11,7 @@ import {
   WALLET_FILTER_TYPES,
 } from "$globals";
 import { Button } from "$components/button/ButtonOLD.tsx";
-import DatePicker from "$islands/DateRangePicker.tsx";
+import { SelectDate } from "$form";
 
 /* ===== TYPES ===== */
 type FilterTypes =
@@ -211,7 +211,7 @@ const FilterSRC20Modal = (
         setTitle("Filter Deploy Date");
         return (
           <>
-            <DatePicker setDateRange={setDateRange} />
+            <SelectDate setDateRange={setDateRange} />
           </>
         );
         break;
@@ -299,11 +299,7 @@ const FilterSRC20Modal = (
         setTitle("Filter Price");
         return (
           <>
-            <DatePicker
-              setDateRange={(newDt) => {
-                setPriceDate(newDt);
-              }}
-            />
+            <SelectDate setDateRange={setDateRange} />
 
             <InputField
               type="text"

@@ -1,12 +1,11 @@
-/* TODO (@baba) - move to forms - integrate into styles */
 import { useEffect, useRef } from "preact/hooks";
 import flatpickr from "flatpickr";
-
+import { inputField } from "$form";
 interface PropTypes {
   setDateRange: (date: Date[]) => void;
 }
 
-const DatePicker = ({ setDateRange }: PropTypes) => {
+const SelectDate = ({ setDateRange }: PropTypes) => {
   const calendarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,10 +22,10 @@ const DatePicker = ({ setDateRange }: PropTypes) => {
 
   return (
     <input
-      className="h-10 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
+      className={inputField}
       ref={calendarRef}
     />
   );
 };
 
-export default DatePicker;
+export default SelectDate;

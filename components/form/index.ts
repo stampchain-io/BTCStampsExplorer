@@ -5,3 +5,4 @@ export * from "$components/form/InputFieldWIP.tsx";
 export * from "$islands/form/SRC20InputField.tsx";
 export * from "$islands/form/InputField.tsx";
 export * from "$islands/form/SelectField.tsx";
+export { default as SelectDate } from "$islands/form/SelectDate.tsx";
