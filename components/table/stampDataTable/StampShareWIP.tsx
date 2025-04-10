@@ -1,3 +1,7 @@
+/* ===== STAMP SHARE COMPONENT ===== */
+/* WIP - Not used */
+/* @baba */
+
 import { StampRow } from "$globals";
 const rootUrl = globalThis.location?.origin || "https://stampchain.io";
 

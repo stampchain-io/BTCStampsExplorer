@@ -10,9 +10,9 @@ import { DispenserManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { DOMParser } from "dom";
 import { body } from "$layout";
-import { StampImage, StampInfo, StampSection } from "$stamp";
-import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
-import Table from "$islands/shared/Tables.tsx";
+import { StampImage, StampInfo } from "$stamp";
+import { StampGallery } from "$gallery";
+import { DataTableBase, HoldersTable } from "$table";
 
 /* ===== TYPES ===== */
 interface StampData {
@@ -367,17 +367,17 @@ export default function StampDetailPage(props: StampDetailPageProps) {
         </div>
 
         {holders && holders.length > 0 && (
-          <HoldersGraph holders={holders || []} />
+          <HoldersTable holders={holders || []} />
         )}
 
-        <Table
+        <DataTableBase
           type="stamps"
           configs={tableConfigs}
           cpid={stamp.cpid}
         />
 
         <div class="pt-12 mobileLg:pt-24 desktop:pt-36">
-          <StampSection {...latestStampsSection} />
+          <StampGallery {...latestStampsSection} />
         </div>
       </div>
     </>

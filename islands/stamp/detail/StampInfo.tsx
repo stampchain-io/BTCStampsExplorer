@@ -10,8 +10,6 @@ import {
 import { getSRC101Data, getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { Src101Detail, StampRow } from "$globals";
 import { StampSearchClient } from "$search";
-import { StampListingsOpen } from "$components/stampDetails/StampListingsOpen.tsx";
-import type { Dispenser } from "$components/stampDetails/StampListingsOpen.tsx";
 import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
 import { containerBackground, containerColData } from "$layout";
 import {
@@ -24,6 +22,7 @@ import {
   valueDark,
 } from "$text";
 import { Button } from "$button";
+import { Dispenser, StampListingsOpenTable } from "$table";
 import { tooltipIcon } from "$notification";
 
 /* ===== TYPES ===== */
@@ -817,7 +816,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                         {isLoadingDispensers
                           ? <h6>LOADING</h6>
                           : (
-                            <StampListingsOpen
+                            <StampListingsOpenTable
                               dispensers={dispensers}
                               floorPrice={typeof stamp.floorPrice === "number"
                                 ? stamp.floorPrice

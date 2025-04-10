@@ -6,15 +6,15 @@ import {
   tableStatus,
   tableValue,
   tableValueLink,
-} from "$components/shared/TableStyles.ts";
+} from "$table";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { SRC20Row } from "$globals";
 
-interface TokenTransfersProps {
+interface SRC20TransfersProps {
   sends: SRC20Row[];
 }
 
-export function TokenTransfers({ sends }: TokenTransfersProps) {
+export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
   const headers = ["FROM", "TO", "AMOUNT", "DATE", "TX HASH"];
 
   return (

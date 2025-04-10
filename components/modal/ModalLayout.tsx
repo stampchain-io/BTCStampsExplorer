@@ -1,3 +1,4 @@
+/*@baba-rename to ModalBase */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { logger } from "$lib/utils/logger.ts";
 

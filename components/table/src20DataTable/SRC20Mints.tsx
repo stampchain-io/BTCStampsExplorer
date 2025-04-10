@@ -6,15 +6,15 @@ import {
   tableStatus,
   tableValue,
   tableValueLink,
-} from "$components/shared/TableStyles.ts";
+} from "$table";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { SRC20Row } from "$globals";
 
-interface TokenMintsProps {
+interface SRC20MintsProps {
   mints: SRC20Row[];
 }
 
-export function TokenMints({ mints }: TokenMintsProps) {
+export function SRC20MintsTable({ mints }: SRC20MintsProps) {
   const headers = ["AMOUNT", "ADDRESS", "DATE", "TX HASH", "BLOCK"];
 
   return (

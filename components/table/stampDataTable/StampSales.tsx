@@ -11,7 +11,7 @@ import {
   tableStatus,
   tableValue,
   tableValueLink,
-} from "$components/shared/TableStyles.ts";
+} from "$table";
 
 interface Dispense {
   source: string;
@@ -26,7 +26,7 @@ interface StampSalesProps {
   dispenses: Dispense[];
 }
 
-export function StampSales({ dispenses }: StampSalesProps) {
+export function StampSalesTable({ dispenses }: StampSalesProps) {
   const headers = ["FROM", "TO", "QUANTITY", "PRICE", "DATE"];
 
   return (

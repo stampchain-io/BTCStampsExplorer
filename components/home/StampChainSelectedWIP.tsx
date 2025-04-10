@@ -1,3 +1,6 @@
+/* ===== STAMPCHAIN SELECTED COMPONENT ===== */
+/* WIP - never finished never used - an early figma mockup */
+/* Must be moved to an island to work */
 export const HomeStampChainSelected = () => {
   return (
     <div>

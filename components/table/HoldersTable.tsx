@@ -1,6 +1,6 @@
 import { HoldersPieChart } from "$islands/charts/HoldersPieChart.tsx";
-import { dataLabel, dataValueXL } from "$components/shared/TableStyles.ts";
-import SRC20HolderTable from "$islands/src20/detail/SRC20HolderTable.tsx";
+import { label, value3xl } from "$text";
+import { HoldersTableBase } from "$table";
 
 interface Holder {
   address: string | null;
@@ -8,11 +8,11 @@ interface Holder {
   percentage: number;
 }
 
-interface HoldersGraphProps {
+interface HoldersTableProps {
   holders?: Holder[];
 }
 
-export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
+export function HoldersTable({ holders = [] }: HoldersTableProps) {
   if (!holders.length) {
     return (
       <div className="flex flex-col bg-gradient-to-br primary-gradient p-6 relative rounded-lg">
@@ -26,8 +26,8 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
   return (
     <div className="relative flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
       <div className="text-left tablet:text-right">
-        <p className={dataLabel}>HOLDERS</p>
-        <p className={`${dataValueXL} text-stamp-grey-light`}>
+        <p className={label}>HOLDERS</p>
+        <p className={value3xl}>
           {totalHolders}
         </p>
       </div>
@@ -37,7 +37,7 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
         </div>
 
         <div className="relative w-full max-w-full">
-          <SRC20HolderTable holders={holders} />
+          <HoldersTableBase holders={holders} />
         </div>
       </div>
     </div>

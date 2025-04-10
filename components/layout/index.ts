@@ -6,3 +6,4 @@ export * from "$islands/layout/FontLoader.tsx";
 
 export * from "$islands/layout/Header.tsx";
 export * from "$islands/layout/Footer.tsx";
+export * from "$islands/layout/NavigatorProvider.tsx";

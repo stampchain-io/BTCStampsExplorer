@@ -4,22 +4,20 @@ import {
   container,
   dataLabel,
   dataValueXLlink,
+  SRC20MintsTable,
+  SRC20TransfersTable,
+  StampListingsAllTable,
+  StampSalesTable,
+  StampTransfersTable,
   TabData,
   TableProps,
   TableType,
   textLoader,
-} from "$components/shared/TableStyles.ts";
-
-import { TokenMints } from "$components/tokenDetails/TokenMints.tsx";
-import { TokenTransfers } from "$components/tokenDetails/TokenTransfers.tsx";
-
-import { StampListingsAll } from "$components/stampDetails/StampListingsAll.tsx";
-import { StampSales } from "$components/stampDetails/StampSales.tsx";
-import { StampTransfers } from "$components/stampDetails/StampTransfers.tsx";
+} from "$table";
 
 const PAGE_SIZE = 20;
 
-export default function Table({
+export default function DataTableBase({
   type,
   configs,
   cpid,
@@ -115,25 +113,27 @@ export default function Table({
     if (type === "stamps") {
       switch (selectedTab) {
         case "dispensers":
-          return <StampListingsAll dispensers={tabData.dispensers || []} />;
+          return (
+            <StampListingsAllTable dispensers={tabData.dispensers || []} />
+          );
         case "sales": {
           const dispensesWithRates = mapDispensesWithRates(
             tabData.dispenses || [],
             tabData.dispensers || [],
           );
-          return <StampSales dispenses={dispensesWithRates} />;
+          return <StampSalesTable dispenses={dispensesWithRates} />;
         }
         case "transfers":
-          return <StampTransfers sends={tabData.sends || []} />;
+          return <StampTransfersTable sends={tabData.sends || []} />;
         default:
           return null;
       }
     } else if (type === "src20") {
       switch (selectedTab) {
         case "mints":
-          return <TokenMints mints={tabData.mints || []} />;
+          return <SRC20MintsTable mints={tabData.mints || []} />;
         case "transfers":
-          return <TokenTransfers sends={tabData.transfers || []} />;
+          return <SRC20TransfersTable sends={tabData.transfers || []} />;
         default:
           return null;
       }

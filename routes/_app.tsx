@@ -2,9 +2,8 @@ import { type PageProps } from "$fresh/server.ts";
 import { Partial } from "$fresh/runtime.ts";
 import { Head } from "$fresh/runtime.ts";
 import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
-import { NavigatorProvider } from "$islands/Navigator/NavigatorProvider.tsx";
 import { MetaTags } from "$components/layout/MetaTags.tsx";
-import { Footer, Header } from "$layout";
+import { Footer, Header, NavigatorProvider } from "$layout";
 import FontLoader from "$islands/layout/FontLoader.tsx";
 
 export default function App({ Component, state }: PageProps<unknown>) {

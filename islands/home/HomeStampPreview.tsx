@@ -1,3 +1,4 @@
+/* @baba-rename to HomeContnet ??? HomeGallery ??? */
 import {
   Collection,
   CollectionSectionProps,

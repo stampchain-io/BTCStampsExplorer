@@ -9,7 +9,7 @@ import {
   tableValue,
   tableValueLink,
   textLoader,
-} from "$components/shared/TableStyles.ts";
+} from "$table";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 /* ===== TYPES ===== */
@@ -19,7 +19,7 @@ interface Holder {
   percentage: number;
 }
 
-interface HoldersGraphTableProps {
+interface HoldersTableBaseProps {
   holders?: Holder[];
 }
 
@@ -27,8 +27,8 @@ interface HoldersGraphTableProps {
 const PAGE_SIZE = 20;
 
 /* ===== COMPONENT ===== */
-const SRC20HolderTable = (
-  { holders = [] }: HoldersGraphTableProps,
+const HoldersTableBase = (
+  { holders = [] }: HoldersTableBaseProps,
 ) => {
   /* ===== STATE ===== */
   const [data, setData] = useState<Holder[]>(holders.slice(0, PAGE_SIZE) || []);
@@ -177,4 +177,4 @@ const SRC20HolderTable = (
   );
 };
 
-export default SRC20HolderTable;
+export default HoldersTableBase;

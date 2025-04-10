@@ -3,7 +3,8 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
-import { SRC20Header, SRC20Section } from "$src20";
+import { SRC20OverviewHeader } from "$src20";
+import { SRC20Gallery } from "$gallery";
 
 /* ===== HELPERS ===== */
 const getNumericParam = (url: URL, param: string, defaultValue: number) =>
@@ -158,13 +159,13 @@ export default function SRC20OverviewlPage({ data }: any) {
   /* ===== RENDER ===== */
   return (
     <div class="flex flex-col gap-9 mobileLg:gap-[72px]">
-      <SRC20Header
+      <SRC20OverviewHeader
         filterBy={filterBy}
         sortBy={sortBy}
         selectedTab={selectedTab}
       />
       {selectedTab === "all" && (
-        <SRC20Section
+        <SRC20Gallery
           type="all"
           fromPage="src20"
           sortBy={sortBy}
@@ -181,7 +182,7 @@ export default function SRC20OverviewlPage({ data }: any) {
         />
       )}
       {selectedTab === "trending" && (
-        <SRC20Section
+        <SRC20Gallery
           type="trending"
           fromPage="src20"
           sortBy={sortBy}

@@ -1,6 +1,6 @@
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
-export function StampVaults(
+export function StampVaultsTable(
   { vaults }: {
     vaults: {
       source: string;

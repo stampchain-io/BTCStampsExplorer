@@ -1,15 +1,19 @@
 import { StampRow } from "$globals";
+import type { Collection } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { HomeHeader } from "$components/home/HomeHeader.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
-import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
-import { PartnersGallery, SRC20Gallery, StampSalesGallery } from "$gallery";
-import { StampChainModule } from "$islands/modules/StampChain.tsx";
-import { HomeCarousel } from "../components/gallery/CarouselBase.tsx";
 import { StampController } from "$server/controller/stampController.ts";
 import { Micro5FontLoader } from "$layout";
-import type { Collection } from "$globals";
+import {
+  CarouselHome,
+  PartnersGallery,
+  SRC20Gallery,
+  StampSalesGallery,
+} from "$gallery";
+import { StampChainModule } from "$islands/modules/StampChain.tsx";
+import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
 
 // Define the shape of pageData from StampController.getHomePageData()
 interface StampControllerData {
@@ -99,7 +103,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
           {/* Important but can be deferred slightly */}
           <div style="content-visibility: auto;">
-            <HomeCarousel carouselStamps={carouselStamps} />
+            <CarouselHome carouselStamps={carouselStamps} />
           </div>
 
           {/* Defer non-critical content */}

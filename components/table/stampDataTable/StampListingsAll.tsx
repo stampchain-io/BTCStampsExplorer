@@ -10,7 +10,7 @@ import {
   tableStatus,
   tableValue,
   tableValueLink,
-} from "$components/shared/TableStyles.ts";
+} from "$table";
 
 interface Dispenser {
   source: string;
@@ -26,7 +26,7 @@ interface StampListingsAllProps {
   dispensers: Dispenser[];
 }
 
-export function StampListingsAll({ dispensers }: StampListingsAllProps) {
+export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
   const headers = [
     "PRICE",
     "ESCROW",

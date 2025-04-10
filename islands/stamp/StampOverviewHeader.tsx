@@ -2,7 +2,7 @@
 /* TODO (@baba) - update filter and styling */
 import { useState } from "preact/hooks";
 import { STAMP_FILTER_TYPES, STAMP_TYPES as _STAMP_TYPES } from "$globals";
-import { useNavigator as _useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
+import { useNavigator as _useNavigator } from "$layout";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { StampSearchClient } from "$search";

@@ -7,7 +7,7 @@ import {
   tableStatus,
   tableValue,
   tableValueLink,
-} from "$components/shared/TableStyles.ts";
+} from "$table";
 
 interface SendRow {
   source: string;
@@ -22,7 +22,7 @@ interface StampTransfersProps {
   sends: SendRow[];
 }
 
-export function StampTransfers({ sends }: StampTransfersProps) {
+export function StampTransfersTable({ sends }: StampTransfersProps) {
   const headers = ["FROM", "TO", "QUANTITY", "TX HASH", "DATE"];
 
   return (

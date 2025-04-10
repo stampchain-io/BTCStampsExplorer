@@ -1,12 +1,6 @@
 import { formatNumber, formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "$layout";
-import {
-  cellAlign,
-  colGroup,
-  row,
-  tableLabel,
-  tableValue,
-} from "$components/shared/TableStyles.ts";
+import { cellAlign, colGroup, row, tableLabel, tableValue } from "$table";
 
 export interface Dispenser {
   source: string;
@@ -27,7 +21,7 @@ interface StampListingsOpenProps {
   selectedDispenser: Dispenser | null;
 }
 
-export function StampListingsOpen({
+export function StampListingsOpenTable({
   dispensers,
   floorPrice,
   onSelectDispenser,

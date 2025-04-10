@@ -14,7 +14,7 @@ import {
 import { SRC20SearchClient } from "$search";
 
 /* ===== TYPES ===== */
-export interface SRC20TickHeaderProps {
+export interface SRC20DetailHeaderProps {
   deployment: Deployment & {
     email?: string;
     web?: string;
@@ -86,14 +86,14 @@ function StatItem(
 }
 
 /* ===== COMPONENT ===== */
-export function SRC20TickHeader({
+export function SRC20DetailHeader({
   deployment,
   _mintStatus,
   _totalMints,
   _totalTransfers,
   marketInfo,
   _align,
-}: SRC20TickHeaderProps) {
+}: SRC20DetailHeaderProps) {
   /* ===== STATE ===== */
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 

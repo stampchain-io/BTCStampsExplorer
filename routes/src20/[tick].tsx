@@ -2,9 +2,9 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20TickPageData } from "$lib/types/src20.d.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { SRC20TickHeader } from "$src20";
-import Table from "$islands/shared/Tables.tsx";
-import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
+import { SRC20DetailHeader } from "$src20";
+import { DataTableBase, HoldersTable } from "$table";
+import ChartWidget from "$islands/src20/ChartWidget.tsx";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
@@ -97,7 +97,7 @@ function SRC20DetailPage(props: SRC20DetailPageProps) {
   /* ===== RENDER ===== */
   return (
     <div class="flex flex-col gap-6">
-      <SRC20TickHeader
+      <SRC20DetailHeader
         deployment={deployment}
         mintStatus={mint_status}
         totalMints={total_mints}
@@ -105,8 +105,8 @@ function SRC20DetailPage(props: SRC20DetailPageProps) {
         marketInfo={marketInfo}
       />
       <ChartWidget data={highcharts} />
-      <HoldersGraph holders={holders} />
-      <Table
+      <HoldersTable holders={holders} />
+      <DataTableBase
         type="src20"
         configs={tableConfigs}
         tick={tick}

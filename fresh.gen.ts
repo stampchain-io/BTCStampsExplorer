@@ -127,7 +127,6 @@ import * as $tool_stamp_stamping from "./routes/tool/stamp/stamping.tsx";
 import * as $tool_stamp_trade from "./routes/tool/stamp/trade.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
-import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $Wallet_details_WalletContent from "./islands/Wallet/details/WalletContent.tsx";
@@ -191,7 +190,6 @@ import * as $gallery_SwiperStyles from "./islands/gallery/SwiperStyles.tsx";
 import * as $gallery_Team from "./islands/gallery/Team.tsx";
 import * as $gallery_index from "./islands/gallery/index.ts";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
-import * as $home_StampChainSelectedWIP from "./islands/home/StampChainSelectedWIP.tsx";
 import * as $howto_HowToDeployToken from "./islands/howto/HowToDeployToken.tsx";
 import * as $howto_HowToMintToken from "./islands/howto/HowToMintToken.tsx";
 import * as $howto_HowToRegisterBitname from "./islands/howto/HowToRegisterBitname.tsx";
@@ -202,6 +200,7 @@ import * as $howto_HowToTransferToken from "./islands/howto/HowToTransferToken.t
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
+import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
 import * as $loading_LoadingContent from "./islands/loading/LoadingContent.tsx";
 import * as $loading_LoadingProvider from "./islands/loading/LoadingProvider.tsx";
 import * as $modal_BuyStampModal from "./islands/modal/BuyStampModal.tsx";
@@ -225,18 +224,19 @@ import * as $search_SRC20Search from "./islands/search/SRC20Search.tsx";
 import * as $search_StampSearch from "./islands/search/StampSearch.tsx";
 import * as $search_index from "./islands/search/index.ts";
 import * as $search_styles from "./islands/search/styles.ts";
-import * as $shared_Tables from "./islands/shared/Tables.tsx";
 import * as $src20_ChartWidget from "./islands/src20/ChartWidget.tsx";
-import * as $src20_detail_SRC20HolderTable from "./islands/src20/detail/SRC20HolderTable.tsx";
-import * as $src20_detail_SRC20TickHeader from "./islands/src20/detail/SRC20TickHeader.tsx";
+import * as $src20_SRC20DetailHeader from "./islands/src20/SRC20DetailHeader.tsx";
+import * as $src20_SRC20OverviewHeader from "./islands/src20/SRC20OverviewHeader.tsx";
 import * as $src20_index_1 from "./islands/src20/index.ts";
-import * as $src20_overview_SRC20Header from "./islands/src20/overview/SRC20Header.tsx";
 import * as $stamp_StampOverviewContent from "./islands/stamp/StampOverviewContent.tsx";
 import * as $stamp_StampOverviewHeader from "./islands/stamp/StampOverviewHeader.tsx";
 import * as $stamp_detail_StampImage from "./islands/stamp/detail/StampImage.tsx";
 import * as $stamp_detail_StampInfo from "./islands/stamp/detail/StampInfo.tsx";
 import * as $stamp_detail_StampTextContent from "./islands/stamp/detail/StampTextContent.tsx";
 import * as $stamp_index_1 from "./islands/stamp/index.ts";
+import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
+import * as $table_HoldersTableBase from "./islands/table/HoldersTableBase.tsx";
+import * as $table_index from "./islands/table/index.ts";
 import * as $test_ReviewDogTest from "./islands/test/ReviewDogTest.tsx";
 import * as $tool_StatusMessages from "./islands/tool/StatusMessages.tsx";
 import * as $tool_fairmint_FairmintTool from "./islands/tool/fairmint/FairmintTool.tsx";
@@ -407,7 +407,6 @@ const manifest = {
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
   islands: {
-    "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
     "./islands/Wallet/details/WalletContent.tsx": $Wallet_details_WalletContent,
@@ -482,7 +481,6 @@ const manifest = {
     "./islands/gallery/Team.tsx": $gallery_Team,
     "./islands/gallery/index.ts": $gallery_index,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
-    "./islands/home/StampChainSelectedWIP.tsx": $home_StampChainSelectedWIP,
     "./islands/howto/HowToDeployToken.tsx": $howto_HowToDeployToken,
     "./islands/howto/HowToMintToken.tsx": $howto_HowToMintToken,
     "./islands/howto/HowToRegisterBitname.tsx": $howto_HowToRegisterBitname,
@@ -493,6 +491,7 @@ const manifest = {
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/Header.tsx": $layout_Header,
+    "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
     "./islands/loading/LoadingContent.tsx": $loading_LoadingContent,
     "./islands/loading/LoadingProvider.tsx": $loading_LoadingProvider,
     "./islands/modal/BuyStampModal.tsx": $modal_BuyStampModal,
@@ -516,13 +515,10 @@ const manifest = {
     "./islands/search/StampSearch.tsx": $search_StampSearch,
     "./islands/search/index.ts": $search_index,
     "./islands/search/styles.ts": $search_styles,
-    "./islands/shared/Tables.tsx": $shared_Tables,
     "./islands/src20/ChartWidget.tsx": $src20_ChartWidget,
-    "./islands/src20/detail/SRC20HolderTable.tsx":
-      $src20_detail_SRC20HolderTable,
-    "./islands/src20/detail/SRC20TickHeader.tsx": $src20_detail_SRC20TickHeader,
+    "./islands/src20/SRC20DetailHeader.tsx": $src20_SRC20DetailHeader,
+    "./islands/src20/SRC20OverviewHeader.tsx": $src20_SRC20OverviewHeader,
     "./islands/src20/index.ts": $src20_index_1,
-    "./islands/src20/overview/SRC20Header.tsx": $src20_overview_SRC20Header,
     "./islands/stamp/StampOverviewContent.tsx": $stamp_StampOverviewContent,
     "./islands/stamp/StampOverviewHeader.tsx": $stamp_StampOverviewHeader,
     "./islands/stamp/detail/StampImage.tsx": $stamp_detail_StampImage,
@@ -530,6 +526,9 @@ const manifest = {
     "./islands/stamp/detail/StampTextContent.tsx":
       $stamp_detail_StampTextContent,
     "./islands/stamp/index.ts": $stamp_index_1,
+    "./islands/table/DataTableBase.tsx": $table_DataTableBase,
+    "./islands/table/HoldersTableBase.tsx": $table_HoldersTableBase,
+    "./islands/table/index.ts": $table_index,
     "./islands/test/ReviewDogTest.tsx": $test_ReviewDogTest,
     "./islands/tool/StatusMessages.tsx": $tool_StatusMessages,
     "./islands/tool/fairmint/FairmintTool.tsx": $tool_fairmint_FairmintTool,

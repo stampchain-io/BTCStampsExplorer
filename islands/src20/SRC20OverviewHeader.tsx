@@ -8,7 +8,7 @@ import FilterSRC20Modal from "$islands/modal/FilterSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
 
 /* ===== COMPONENT ===== */
-export const SRC20Header = (
+export const SRC20OverviewHeader = (
   { filterBy, sortBy }: {
     filterBy: SRC20_FILTER_TYPES | SRC20_FILTER_TYPES[];
     sortBy: "ASC" | "DESC" | undefined;
