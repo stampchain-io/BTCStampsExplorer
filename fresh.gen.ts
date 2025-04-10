@@ -179,17 +179,19 @@ import * as $form_SelectDate from "./islands/form/SelectDate.tsx";
 import * as $form_SelectField from "./islands/form/SelectField.tsx";
 import * as $gallery_Carousel from "./islands/gallery/Carousel.tsx";
 import * as $gallery_Partners from "./islands/gallery/Partners.tsx";
-import * as $gallery_RecentSales from "./islands/gallery/RecentSales.tsx";
 import * as $gallery_SRC101RegistersWIP from "./islands/gallery/SRC101RegistersWIP.tsx";
 import * as $gallery_SRC20Deploys from "./islands/gallery/SRC20Deploys.tsx";
+import * as $gallery_SRC20Gallery from "./islands/gallery/SRC20Gallery.tsx";
 import * as $gallery_SRC20Mints from "./islands/gallery/SRC20Mints.tsx";
 import * as $gallery_SRC20Transfers from "./islands/gallery/SRC20Transfers.tsx";
+import * as $gallery_StampGallery from "./islands/gallery/StampGallery.tsx";
+import * as $gallery_StampSales from "./islands/gallery/StampSales.tsx";
 import * as $gallery_StampTransfers from "./islands/gallery/StampTransfers.tsx";
+import * as $gallery_SwiperStyles from "./islands/gallery/SwiperStyles.tsx";
 import * as $gallery_Team from "./islands/gallery/Team.tsx";
 import * as $gallery_index from "./islands/gallery/index.ts";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_StampChainSelectedWIP from "./islands/home/StampChainSelectedWIP.tsx";
-import * as $home_SwiperStyles from "./islands/home/SwiperStyles.tsx";
 import * as $howto_HowToDeployToken from "./islands/howto/HowToDeployToken.tsx";
 import * as $howto_HowToMintToken from "./islands/howto/HowToMintToken.tsx";
 import * as $howto_HowToRegisterBitname from "./islands/howto/HowToRegisterBitname.tsx";
@@ -222,17 +224,15 @@ import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $search_SRC20Search from "./islands/search/SRC20Search.tsx";
 import * as $search_StampSearch from "./islands/search/StampSearch.tsx";
 import * as $search_index from "./islands/search/index.ts";
+import * as $search_styles from "./islands/search/styles.ts";
 import * as $shared_Tables from "./islands/shared/Tables.tsx";
 import * as $src20_ChartWidget from "./islands/src20/ChartWidget.tsx";
-import * as $src20_SRC20Section from "./islands/src20/SRC20Section.tsx";
 import * as $src20_detail_SRC20HolderTable from "./islands/src20/detail/SRC20HolderTable.tsx";
 import * as $src20_detail_SRC20TickHeader from "./islands/src20/detail/SRC20TickHeader.tsx";
 import * as $src20_index_1 from "./islands/src20/index.ts";
 import * as $src20_overview_SRC20Header from "./islands/src20/overview/SRC20Header.tsx";
-import * as $src20_styles from "./islands/src20/styles.ts";
 import * as $stamp_StampOverviewContent from "./islands/stamp/StampOverviewContent.tsx";
 import * as $stamp_StampOverviewHeader from "./islands/stamp/StampOverviewHeader.tsx";
-import * as $stamp_StampSection from "./islands/stamp/StampSection.tsx";
 import * as $stamp_detail_StampImage from "./islands/stamp/detail/StampImage.tsx";
 import * as $stamp_detail_StampInfo from "./islands/stamp/detail/StampInfo.tsx";
 import * as $stamp_detail_StampTextContent from "./islands/stamp/detail/StampTextContent.tsx";
@@ -470,17 +470,19 @@ const manifest = {
     "./islands/form/SelectField.tsx": $form_SelectField,
     "./islands/gallery/Carousel.tsx": $gallery_Carousel,
     "./islands/gallery/Partners.tsx": $gallery_Partners,
-    "./islands/gallery/RecentSales.tsx": $gallery_RecentSales,
     "./islands/gallery/SRC101RegistersWIP.tsx": $gallery_SRC101RegistersWIP,
     "./islands/gallery/SRC20Deploys.tsx": $gallery_SRC20Deploys,
+    "./islands/gallery/SRC20Gallery.tsx": $gallery_SRC20Gallery,
     "./islands/gallery/SRC20Mints.tsx": $gallery_SRC20Mints,
     "./islands/gallery/SRC20Transfers.tsx": $gallery_SRC20Transfers,
+    "./islands/gallery/StampGallery.tsx": $gallery_StampGallery,
+    "./islands/gallery/StampSales.tsx": $gallery_StampSales,
     "./islands/gallery/StampTransfers.tsx": $gallery_StampTransfers,
+    "./islands/gallery/SwiperStyles.tsx": $gallery_SwiperStyles,
     "./islands/gallery/Team.tsx": $gallery_Team,
     "./islands/gallery/index.ts": $gallery_index,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
     "./islands/home/StampChainSelectedWIP.tsx": $home_StampChainSelectedWIP,
-    "./islands/home/SwiperStyles.tsx": $home_SwiperStyles,
     "./islands/howto/HowToDeployToken.tsx": $howto_HowToDeployToken,
     "./islands/howto/HowToMintToken.tsx": $howto_HowToMintToken,
     "./islands/howto/HowToRegisterBitname.tsx": $howto_HowToRegisterBitname,
@@ -513,18 +515,16 @@ const manifest = {
     "./islands/search/SRC20Search.tsx": $search_SRC20Search,
     "./islands/search/StampSearch.tsx": $search_StampSearch,
     "./islands/search/index.ts": $search_index,
+    "./islands/search/styles.ts": $search_styles,
     "./islands/shared/Tables.tsx": $shared_Tables,
     "./islands/src20/ChartWidget.tsx": $src20_ChartWidget,
-    "./islands/src20/SRC20Section.tsx": $src20_SRC20Section,
     "./islands/src20/detail/SRC20HolderTable.tsx":
       $src20_detail_SRC20HolderTable,
     "./islands/src20/detail/SRC20TickHeader.tsx": $src20_detail_SRC20TickHeader,
     "./islands/src20/index.ts": $src20_index_1,
     "./islands/src20/overview/SRC20Header.tsx": $src20_overview_SRC20Header,
-    "./islands/src20/styles.ts": $src20_styles,
     "./islands/stamp/StampOverviewContent.tsx": $stamp_StampOverviewContent,
     "./islands/stamp/StampOverviewHeader.tsx": $stamp_StampOverviewHeader,
-    "./islands/stamp/StampSection.tsx": $stamp_StampSection,
     "./islands/stamp/detail/StampImage.tsx": $stamp_detail_StampImage,
     "./islands/stamp/detail/StampInfo.tsx": $stamp_detail_StampInfo,
     "./islands/stamp/detail/StampTextContent.tsx":

@@ -1,13 +1,17 @@
+/* ===== SRC20 RECENT DEPLOYS GALLERY COMPONENT ===== */
 import type { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import { StampCard } from "$card";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
+/* ===== COMPONENT ===== */
 export default function SRC20DeploysGallery(): JSX.Element {
+  /* ===== STATE ===== */
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<StampTransaction[]>([]);
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     const fetchRecentTransactions = async () => {
       try {
@@ -29,12 +33,15 @@ export default function SRC20DeploysGallery(): JSX.Element {
     fetchRecentTransactions();
   }, []);
 
+  /* ===== LOADING STATE ===== */
   if (isLoading) {
     return <div class="animate-pulse">Loading recent deploys...</div>;
   }
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col items-start tablet:items-end">
+      {/* ===== TITLE SECTION ===== */}
       <div>
         <h4 class={`${titlePurpleLD} tablet:hidden`}>
           RECENT DEPLOYS
@@ -48,6 +55,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
           BLOCK #{transactions[0].block_index}
         </h3>
       )}
+      {/* ===== STAMPS GRID SECTION ===== */}
       <div class="grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-3 desktop:grid-cols-4 gap-6">
         {transactions.map((stamp, index) => (
           <StampCard

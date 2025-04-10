@@ -1,4 +1,4 @@
-/* ===== SRC20 SECTION COMPONENT ===== */
+/* ===== SRC20 GALLERY COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { SRC20Row } from "$globals";
@@ -8,7 +8,7 @@ import { ViewAllButton } from "$button";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 /* ===== TYPES ===== */
-interface SRC20SectionProps {
+interface SRC20GalleryProps {
   title?: string;
   subTitle?: string;
   type: "all" | "trending";
@@ -50,7 +50,7 @@ const ImageModal = (
 };
 
 /* ===== COMPONENT ===== */
-export function SRC20Section({
+export function SRC20Gallery({
   title,
   subTitle,
   type,
@@ -60,7 +60,7 @@ export function SRC20Section({
   pagination,
   address,
   useClientFetch = fromPage === "home" || fromPage === "wallet",
-}: SRC20SectionProps) {
+}: SRC20GalleryProps) {
   /* ===== STATE ===== */
   const [data, setData] = useState<SRC20Row[]>(initialData || []);
   const [isLoading, setIsLoading] = useState(!initialData);

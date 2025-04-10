@@ -3,11 +3,10 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { HomeHeader } from "$components/home/HomeHeader.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
-import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
-import { PartnersGallery, RecentSalesGallery } from "$gallery";
+import { PartnersGallery, SRC20Gallery, StampSalesGallery } from "$gallery";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
-import { HomeCarousel } from "$components/home/HomeCarousel.tsx";
+import { HomeCarousel } from "../components/gallery/CarouselBase.tsx";
 import { StampController } from "$server/controller/stampController.ts";
 import { Micro5FontLoader } from "$layout";
 import type { Collection } from "$globals";
@@ -117,7 +116,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
           <div style="margin-top: -48px; content-visibility: auto; contain-intrinsic-size: 0 800px;">
             <GetStampingModule />
             <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
-              <RecentSalesGallery
+              <StampSalesGallery
                 title="RECENT SALES"
                 subTitle="HOT STAMPS"
                 variant="home"
@@ -131,13 +130,13 @@ export default function Home({ data }: PageProps<HomePageData>) {
               />
             </div>
             <div class="flex flex-row pt-12 mobileLg:pt-24 desktop:pt-36 gap-12 mobileLg:gap-[72px]">
-              <SRC20Section
+              <SRC20Gallery
                 title="SRC-20 TOKENS"
                 subTitle="TOP TICKERS"
                 type="all"
                 fromPage="home"
               />
-              <SRC20Section
+              <SRC20Gallery
                 title="SRC-20 TOKENS"
                 subTitle="TRENDING MINTS"
                 type="trending"

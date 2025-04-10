@@ -1,4 +1,4 @@
-/* ===== PARTNERS MODULE COMPONENT ===== */
+/* ===== PARTNERS GALLERY COMPONENT ===== */
 import { useState } from "preact/hooks";
 import { gapGrid } from "$layout";
 import { subtitleGrey } from "$text";

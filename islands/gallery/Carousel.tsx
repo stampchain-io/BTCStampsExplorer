@@ -1,10 +1,12 @@
-/* TODO (@baba) - move to galleries, update styling */
+/* ===== CAROUSEL GALLERY COMPONENT ===== */
+/* TODO (@baba)-update styling */
 import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { StampRow } from "$globals";
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
+/* ===== TYPES ===== */
 interface CarouselProps {
   stamps: StampRow[];
   automatic?: boolean;
@@ -12,20 +14,27 @@ interface CarouselProps {
   class?: string;
 }
 
+/* ===== COMPONENT ===== */
 export default function CarouselGallery(props: CarouselProps) {
+  /* ===== PROPS EXTRACTION ===== */
   const { stamps } = props;
+
+  /* ===== COMPUTED VALUES ===== */
   const isMobile = globalThis.innerWidth < 768;
   const duplicatedStamps = isMobile
     ? [...stamps, ...[stamps[2]]]
     : [...stamps, ...stamps];
-  // const duplicatedStamps = [...props.stamps, ...props.stamps];
+
+  /* ===== STATE ===== */
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [loading, setLoading] = useState<boolean>(true);
 
+  /* ===== EVENT HANDLERS ===== */
   const handleLoad = () => {
     setLoading(false);
   };
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     if (IS_BROWSER) {
       const carouselElement = document.querySelector(
@@ -39,16 +48,20 @@ export default function CarouselGallery(props: CarouselProps) {
     }
   }, []);
 
+  /* ===== LOADING STATE ===== */
   if (!IS_BROWSER && loading) {
     return <div>Loading carousel...</div>;
   }
 
+  /* ===== RENDER ===== */
   return (
     <>
       <div
         class={`carousel-slider ${props.class ?? ""}`}
       >
+        {/* ===== SWIPER CONTAINER ===== */}
         <div class="swiper h-full">
+          {/* ===== SLIDES WRAPPER ===== */}
           <div class="swiper-wrapper ">
             {duplicatedStamps.map((stamp, index) => {
               const extension = stamp.stamp_url?.split(".")?.pop() || "";
@@ -68,6 +81,7 @@ export default function CarouselGallery(props: CarouselProps) {
                           class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded"
                           onLoad={handleLoad}
                         />
+                        {/* ===== HOVER OVERLAY ===== */}
                         {activeSlideIndex - 1 == index &&
                           (
                             <div
@@ -108,6 +122,7 @@ export default function CarouselGallery(props: CarouselProps) {
             })}
           </div>
         </div>
+        {/* ===== PAGINATION ===== */}
         <div
           class="swiper-pagination"
           data-slides-length={props.stamps.length}

@@ -114,7 +114,7 @@ export interface DisplayCountBreakpoints {
   "desktop": number; // 1440px+
 }
 
-export interface StampSectionProps {
+export interface StampGalleryProps {
   title?: string;
   subTitle?: string;
   type?: string;

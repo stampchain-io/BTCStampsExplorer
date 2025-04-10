@@ -1,12 +1,12 @@
 import CarouselGallery from "$islands/gallery/Carousel.tsx";
 import { StampRow } from "$globals";
-import SwiperStyles from "$islands/home/SwiperStyles.tsx";
+import SwiperStyles from "../../islands/gallery/SwiperStyles.tsx";
 
-interface HomeCarouselProps {
+interface CarouselBaseProps {
   carouselStamps: StampRow[];
 }
 
-export function HomeCarousel({ carouselStamps }: HomeCarouselProps) {
+export function CarouselBase({ carouselStamps }: CarouselBaseProps) {
   if (!carouselStamps?.length) {
     return null; // Or a loading state
   }

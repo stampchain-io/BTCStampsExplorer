@@ -5,8 +5,7 @@ import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
-import StampSection from "$islands/stamp/StampSection.tsx";
+import { SRC20Gallery, StampGallery } from "$gallery";
 import { WalletContentProps } from "$types/wallet.d.ts";
 import { Dispenser } from "$types/index.d.ts";
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
@@ -508,8 +507,8 @@ export default function WalletContent({
     }
   }, []);
 
-  // Build the stampSection config
-  const stampSection = {
+  // Build the stampGallery config
+  const stampGallery = {
     title: "",
     type: "all",
     stamps: stamps.data,
@@ -566,7 +565,7 @@ export default function WalletContent({
         />
         <div class="mt-3 mobileLg:mt-6">
           {stamps.data?.length
-            ? <StampSection {...stampSection} />
+            ? <StampGallery {...stampGallery} />
             : (
               <p class={`${dataLabel} -mt-1.5 mobileLg:-mt-3`}>
                 NO STAMPS IN THE WALLET
@@ -595,7 +594,7 @@ export default function WalletContent({
         <div class="mt-3 mobileLg:mt-6">
           {src20.data?.length
             ? (
-              <SRC20Section
+              <SRC20Gallery
                 type="all"
                 fromPage="wallet"
                 initialData={src20.data}

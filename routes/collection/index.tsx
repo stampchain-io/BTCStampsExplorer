@@ -1,12 +1,12 @@
 /* ===== COLLECTION LANDING PAGE ===== */
 import {
   CollectionSectionProps,
+  StampGalleryProps,
   StampRow,
-  StampSectionProps,
   SUBPROTOCOLS,
 } from "$globals";
 import { FreshContext, Handlers } from "$fresh/server.ts";
-import StampSection from "$islands/stamp/StampSection.tsx";
+import { StampGallery } from "$gallery";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { RecursiveLayeringModule } from "$islands/modules/RecursiveLayering.tsx";
@@ -105,7 +105,7 @@ export default function CollectionLandingPage(
   } = props.data;
 
   /* ===== SECTION CONFIGURATIONS ===== */
-  const CollectionsSection: StampSectionProps[] = [
+  const CollectionsSection: StampGalleryProps[] = [
     {
       title: "COLLECTIONS",
       subTitle: "FRESH POSH STAMPS",
@@ -209,7 +209,7 @@ export default function CollectionLandingPage(
   /* ===== COMPONENT ===== */
   return (
     <div className={`${body} ${gapSection}`}>
-      <StampSection
+      <StampGallery
         fromPage="collection"
         sortBy={sortBy}
         {...CollectionsSection[0]}
@@ -218,7 +218,7 @@ export default function CollectionLandingPage(
         <CollectionSection {...EspeciallyPoshSection} />
         <NamedAssetsModule />
       </div>
-      <StampSection {...CollectionsSection[1]} />
+      <StampGallery {...CollectionsSection[1]} />
       <div class="relative">
         <CollectionSection {...CuttingEdgeSection} />
         <RecursiveLayeringModule />

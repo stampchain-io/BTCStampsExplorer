@@ -1,10 +1,10 @@
-/* ===== STAMP SECTION COMPONENT ===== */
-/* TODO (@baba) - move to galleries ??? - update styling and refactor into a base slideshow component*/
+/* ===== STAMP GALLERY COMPONENT ===== */
+/* TODO (@baba)-update styling and refactor into a base slideshow component*/
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { ViewAllButton } from "$button";
 import { StampCard } from "$card";
-import { StampRow, StampSectionProps } from "$globals";
+import { StampGalleryProps, StampRow } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { StampSearchClient } from "$search";
@@ -13,7 +13,7 @@ import { Autoplay, Navigation } from "swiper/modules";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 /* ===== COMPONENT ===== */
-export default function StampSection({
+export default function StampGallery({
   title,
   subTitle,
   type,
@@ -32,7 +32,7 @@ export default function StampSection({
   alignRight = false,
   fromPage = "",
   sortBy = "ASC",
-}: StampSectionProps) {
+}: StampGalleryProps) {
   /* ===== STATE ===== */
   const swiperRef = useRef<Swiper | null>(null);
   const [isLoading, setIsLoading] = useState(false);

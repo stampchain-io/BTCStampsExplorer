@@ -1,7 +1,7 @@
 /* ===== RECENT SALES COMPONENT ===== */
-/*@baba-move Refreshing to ViewAllButton-remove default (not used)*/
+/*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
 import { useEffect, useState } from "preact/hooks";
-import StampSection from "$islands/stamp/StampSection.tsx";
+import { StampGallery } from "$gallery";
 import type { StampRow } from "$globals";
 import { titlePurpleLD } from "$text";
 
@@ -22,7 +22,7 @@ interface RecentSaleStamp extends StampRow {
   };
 }
 
-interface RecentSalesProps {
+interface StampSalesProps {
   initialData?: RecentSaleStamp[];
   title?: string;
   subTitle?: string;
@@ -32,14 +32,14 @@ interface RecentSalesProps {
 }
 
 /* ===== COMPONENT ===== */
-export function RecentSalesGallery({
+export function StampSalesGallery({
   initialData = [],
   title = "LATEST STAMPS",
   subTitle,
   variant = "detail",
   displayCounts,
   gridClass,
-}: RecentSalesProps) {
+}: StampSalesProps) {
   /* ===== STATE ===== */
   const [recentSales, setRecentSales] = useState<RecentSaleStamp[]>(
     initialData,
@@ -156,7 +156,7 @@ export function RecentSalesGallery({
         {title}
       </h3>
       <div class="flex flex-col gap-12">
-        <StampSection {...sectionProps} />
+        <StampGallery {...sectionProps} />
         {isLoading && <div class="text-sm text-gray-400">Refreshing...</div>}
       </div>
     </div>

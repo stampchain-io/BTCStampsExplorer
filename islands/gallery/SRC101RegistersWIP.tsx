@@ -1,13 +1,17 @@
+/* ===== SRC101 RECENT REGISTERS GALLERY COMPONENT (WIP) ===== */
 import type { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import { StampCard } from "$card";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
+/* ===== COMPONENT ===== */
 export default function SRC101RegistersGallery(): JSX.Element {
+  /* ===== STATE ===== */
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<StampTransaction[]>([]);
 
+  /* ===== EFFECTS ===== */
   /* REVIEW AND CHANGE THE CODE BELOW TO FETCH RECENT REGISTERS */
   useEffect(() => {
     const fetchRecentTransactions = async () => {
@@ -28,12 +32,15 @@ export default function SRC101RegistersGallery(): JSX.Element {
     fetchRecentTransactions();
   }, []);
 
+  /* ===== LOADING STATE ===== */
   if (isLoading) {
     return <div class="animate-pulse">Loading recent registers...</div>;
   }
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col items-start tablet:items-end">
+      {/* ===== TITLE SECTION ===== */}
       <div>
         <h4 class={`${titlePurpleLD} tablet:hidden`}>
           BITNAMES
@@ -47,6 +54,7 @@ export default function SRC101RegistersGallery(): JSX.Element {
           # {transactions[0].block_index}
         </h3>
       )}
+      {/* ===== STAMPS GRID SECTION ===== */}
       <div class="grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-3 desktop:grid-cols-4 gap-6">
         {transactions.map((stamp, index) => (
           <StampCard

@@ -1,11 +1,11 @@
 import {
   Collection,
   CollectionSectionProps,
+  StampGalleryProps,
   StampRow,
-  StampSectionProps,
 } from "$globals";
 
-import StampSection from "$islands/stamp/StampSection.tsx";
+import { StampGallery } from "$gallery";
 import { CollectionSection } from "$collection";
 import { titlePurpleDL } from "$text";
 
@@ -22,7 +22,7 @@ export function HomeStampPreview({
   stamps_posh = [],
   collectionData = [],
 }: HomeStampPreviewProps) {
-  const LatestArtStampsSection: StampSectionProps[] = [
+  const LatestArtStampsSection: StampGalleryProps[] = [
     {
       subTitle: "ON-CHAIN MARVELS",
       type: "classic",
@@ -63,7 +63,7 @@ export function HomeStampPreview({
     },
   };
 
-  const CollectionsSection: StampSectionProps[] = [
+  const CollectionsSection: StampGalleryProps[] = [
     {
       title: "COLLECTIONS",
       subTitle: "FRESH POSH STAMPS",
@@ -140,7 +140,7 @@ export function HomeStampPreview({
         </div>
         <div className="flex flex-col gap-3 mobileMd:gap-6">
           {LatestArtStampsSection.map((section, index) => (
-            <StampSection key={index} {...section} />
+            <StampGallery key={index} {...section} />
           ))}
         </div>
       </div>
@@ -150,7 +150,7 @@ export function HomeStampPreview({
 
       {/* COLLECTIONS */}
       {CollectionsSection.map((section, index) => (
-        <StampSection key={index} {...section} />
+        <StampGallery key={index} {...section} />
       ))}
 
       {/* CUTTING EDGE */}

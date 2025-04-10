@@ -1,10 +1,10 @@
-/* ===== ABOUT TEAM COMPONENT ===== */
+/* ===== TEAM GALLERY COMPONENT ===== */
 import { gapGrid } from "$layout";
 import { aboutSubTitlePurple, aboutTitlePurpleLD, subtitlePurple } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function TeamGallery() {
-  /* ===== COMPONENT RENDER ===== */
+  /* ===== RENDER ===== */
   return (
     <>
       <section>
