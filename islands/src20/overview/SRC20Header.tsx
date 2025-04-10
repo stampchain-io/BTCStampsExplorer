@@ -3,7 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 import { SRC20_FILTER_TYPES } from "$globals";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { SRC20SearchClient } from "$src20";
+import { SRC20SearchClient } from "$search";
 import FilterSRC20Modal from "$islands/modal/FilterSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
 

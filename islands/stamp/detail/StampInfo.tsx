@@ -9,7 +9,7 @@ import {
 } from "$lib/utils/formatUtils.ts";
 import { getSRC101Data, getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { Src101Detail, StampRow } from "$globals";
-import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+import { StampSearchClient } from "$search";
 import { StampListingsOpen } from "$components/stampDetails/StampListingsOpen.tsx";
 import type { Dispenser } from "$components/stampDetails/StampListingsOpen.tsx";
 import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";

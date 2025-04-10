@@ -6,4 +6,4 @@ export * from "$islands/stamp/detail/StampImage.tsx";
 export * from "$islands/stamp/detail/StampInfo.tsx";
 
 export * from "$islands/stamp/detail/StampTextContent.tsx";
-export * from "$islands/stamp/StampSearch.tsx";
+export * from "$islands/search/StampSearch.tsx";

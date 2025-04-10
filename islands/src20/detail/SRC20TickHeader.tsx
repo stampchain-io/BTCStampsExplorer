@@ -11,7 +11,7 @@ import {
   formatDate,
   formatNumber,
 } from "$lib/utils/formatUtils.ts";
-import { SRC20SearchClient } from "$src20";
+import { SRC20SearchClient } from "$search";
 
 /* ===== TYPES ===== */
 export interface SRC20TickHeaderProps {

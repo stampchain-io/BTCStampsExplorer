@@ -7,7 +7,7 @@ import { StampCard } from "$card";
 import { StampRow, StampSectionProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { StampSearchClient } from "$stamp";
+import { StampSearchClient } from "$search";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";

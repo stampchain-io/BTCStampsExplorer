@@ -127,7 +127,6 @@ import * as $tool_stamp_stamping from "./routes/tool/stamp/stamping.tsx";
 import * as $tool_stamp_trade from "./routes/tool/stamp/trade.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
-import * as $DateRangePicker from "./islands/form/SelectDate.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
@@ -176,6 +175,7 @@ import * as $faq_FaqAccordion from "./islands/faq/FaqAccordion.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $form_InputField from "./islands/form/InputField.tsx";
 import * as $form_SRC20InputField from "./islands/form/SRC20InputField.tsx";
+import * as $form_SelectDate from "./islands/form/SelectDate.tsx";
 import * as $form_SelectField from "./islands/form/SelectField.tsx";
 import * as $gallery_Carousel from "./islands/gallery/Carousel.tsx";
 import * as $gallery_Partners from "./islands/gallery/Partners.tsx";
@@ -219,9 +219,11 @@ import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
+import * as $search_SRC20Search from "./islands/search/SRC20Search.tsx";
+import * as $search_StampSearch from "./islands/search/StampSearch.tsx";
+import * as $search_index from "./islands/search/index.ts";
 import * as $shared_Tables from "./islands/shared/Tables.tsx";
 import * as $src20_ChartWidget from "./islands/src20/ChartWidget.tsx";
-import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
 import * as $src20_SRC20Section from "./islands/src20/SRC20Section.tsx";
 import * as $src20_detail_SRC20HolderTable from "./islands/src20/detail/SRC20HolderTable.tsx";
 import * as $src20_detail_SRC20TickHeader from "./islands/src20/detail/SRC20TickHeader.tsx";
@@ -230,7 +232,6 @@ import * as $src20_overview_SRC20Header from "./islands/src20/overview/SRC20Head
 import * as $src20_styles from "./islands/src20/styles.ts";
 import * as $stamp_StampOverviewContent from "./islands/stamp/StampOverviewContent.tsx";
 import * as $stamp_StampOverviewHeader from "./islands/stamp/StampOverviewHeader.tsx";
-import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
 import * as $stamp_StampSection from "./islands/stamp/StampSection.tsx";
 import * as $stamp_detail_StampImage from "./islands/stamp/detail/StampImage.tsx";
 import * as $stamp_detail_StampInfo from "./islands/stamp/detail/StampInfo.tsx";
@@ -406,7 +407,6 @@ const manifest = {
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
   islands: {
-    "./islands/DateRangePicker.tsx": $DateRangePicker,
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
@@ -466,6 +466,7 @@ const manifest = {
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/form/InputField.tsx": $form_InputField,
     "./islands/form/SRC20InputField.tsx": $form_SRC20InputField,
+    "./islands/form/SelectDate.tsx": $form_SelectDate,
     "./islands/form/SelectField.tsx": $form_SelectField,
     "./islands/gallery/Carousel.tsx": $gallery_Carousel,
     "./islands/gallery/Partners.tsx": $gallery_Partners,
@@ -509,9 +510,11 @@ const manifest = {
     "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
+    "./islands/search/SRC20Search.tsx": $search_SRC20Search,
+    "./islands/search/StampSearch.tsx": $search_StampSearch,
+    "./islands/search/index.ts": $search_index,
     "./islands/shared/Tables.tsx": $shared_Tables,
     "./islands/src20/ChartWidget.tsx": $src20_ChartWidget,
-    "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
     "./islands/src20/SRC20Section.tsx": $src20_SRC20Section,
     "./islands/src20/detail/SRC20HolderTable.tsx":
       $src20_detail_SRC20HolderTable,
@@ -521,7 +524,6 @@ const manifest = {
     "./islands/src20/styles.ts": $src20_styles,
     "./islands/stamp/StampOverviewContent.tsx": $stamp_StampOverviewContent,
     "./islands/stamp/StampOverviewHeader.tsx": $stamp_StampOverviewHeader,
-    "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
     "./islands/stamp/StampSection.tsx": $stamp_StampSection,
     "./islands/stamp/detail/StampImage.tsx": $stamp_detail_StampImage,
     "./islands/stamp/detail/StampInfo.tsx": $stamp_detail_StampInfo,

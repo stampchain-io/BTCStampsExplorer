@@ -1,6 +1,6 @@
 /* ===== COLLECTION OVERVIEW HEADER COMPONENT ===== */
 import { useState } from "preact/hooks";
-import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+import { StampSearchClient } from "$search";
 import { titlePurpleLD } from "$text";
 
 /* ===== STATE ===== */
