@@ -9,14 +9,14 @@ import { StampSearchClient } from "$stamp";
 import { titlePurpleLD } from "$text";
 
 /* ===== TYPES ===== */
-type StampHeaderProps = {
+type StampOverviewHeaderProps = {
   filterBy: STAMP_FILTER_TYPES[];
   sortBy: "ASC" | "DESC" | undefined;
 };
 
 /* ===== COMPONENT ===== */
-export const StampHeader = (
-  { filterBy, sortBy }: StampHeaderProps,
+export const StampOverviewHeader = (
+  { filterBy, sortBy }: StampOverviewHeaderProps,
 ) => {
   /* ===== STATE MANAGEMENT ===== */
   const [isOpen1, setIsOpen1] = useState(false);

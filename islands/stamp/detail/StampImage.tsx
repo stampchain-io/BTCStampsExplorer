@@ -246,7 +246,7 @@ function RightPanel(
 
   /* ===== RENDER ===== */
   return (
-    <div className="flex justify-between pt-[10px] mobileMd:pt-[22px] pb-2 mobileMd:pb-5 px-3 mobileMd:px-6 dark-gradient rounded-lg">
+    <div className="flex justify-between pt-[10px] mobileMd:pt-[22px] pb-2 mobileMd:pb-5 px-6 dark-gradient rounded-lg">
       <div className="flex gap-3">
         <div
           ref={copyButtonRef}
@@ -733,8 +733,8 @@ export function StampImage(
       {src !== NOT_AVAILABLE_IMAGE && !isHtml && !isPlainText && !isAudio && (
         flag
           ? (
-            <div className="flex flex-col gap-3 mobileMd:gap-6">
-              <div className="relative p-3 mobileMd:p-6 dark-gradient rounded-lg">
+            <div className="flex flex-col gap-6">
+              <div className="relative p-6 dark-gradient rounded-lg">
                 <div className="stamp-container">
                   <div className="relative z-10 aspect-square">
                     {validatedContent || (

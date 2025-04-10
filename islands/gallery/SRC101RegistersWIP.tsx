@@ -1,7 +1,7 @@
-import { useEffect, useState } from "preact/hooks";
-import { StampCard } from "$islands/stamp/StampCard.tsx";
-import type { StampTransaction } from "$lib/types/stamping.ts";
 import type { JSX } from "preact";
+import { useEffect, useState } from "preact/hooks";
+import type { StampTransaction } from "$lib/types/stamping.ts";
+import { StampCard } from "$card";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 export default function SRC101RegistersGallery(): JSX.Element {

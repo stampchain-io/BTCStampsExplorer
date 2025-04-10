@@ -1,14 +1,14 @@
 /* ===== COLLECTION OVERVIEW PAGE ===== */
 /*@baba-199*/
+import { STAMP_FILTER_TYPES } from "$globals";
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
-import { ArtistSection, CollectionOverviewHeader } from "$collection";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { StampContent } from "$stamp";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
-import { STAMP_FILTER_TYPES } from "$globals";
 import { CollectionRow } from "$server/types/collection.d.ts";
+import { StampOverviewContent } from "$stamp";
+import { ArtistSection, CollectionOverviewHeader } from "$collection";
+import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
@@ -174,7 +174,7 @@ export default function CollectionOverviewPage(
         return (
           <div class="w-full flex flex-col items-center" f-client-nav>
             <div data-partial="/stamp">
-              <StampContent
+              <StampOverviewContent
                 stamps={stamps || []}
                 isRecentSales={false}
               />

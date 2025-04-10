@@ -1,11 +1,11 @@
 /* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
 /*@baba-29+31*/
 import { StampRow } from "$globals";
-import { StampCard } from "$stamp";
+import { StampCard } from "$card";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 /* ===== TYPES ===== */
-interface StampContentProps {
+interface StampOverviewContentProps {
   stamps: StampRow[];
   isRecentSales?: boolean;
   fromPage?: string;
@@ -18,12 +18,12 @@ interface StampContentProps {
 }
 
 /* ===== COMPONENT ===== */
-export function StampContent({
+export function StampOverviewContent({
   stamps,
   isRecentSales = false,
   pagination,
   fromPage,
-}: StampContentProps) {
+}: StampOverviewContentProps) {
   /* ===== RENDER ===== */
   return (
     <div class="w-full pt-3 pb-12 mobileMd:pt-6 mobileMd:pb-[72px]">

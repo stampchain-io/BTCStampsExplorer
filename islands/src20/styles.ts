@@ -12,8 +12,3 @@ export const SearchStyles = {
   [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#080808]
   `,
 };
-
-export const HeaderStyles = {
-  titlePurpleDL:
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1",
-};

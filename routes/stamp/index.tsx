@@ -4,7 +4,7 @@ import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "$globals";
-import { StampContent, StampHeader } from "$stamp";
+import { StampOverviewContent, StampOverviewHeader } from "$stamp";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
@@ -116,13 +116,13 @@ export function StampOverviewPage(props: StampPageProps) {
   return (
     <div class="w-full" f-client-nav data-partial="/stamp">
       {/* Header Component with Filter Controls */}
-      <StampHeader
+      <StampOverviewHeader
         filterBy={filterBy as STAMP_FILTER_TYPES[]}
         sortBy={sortBy}
       />
 
       {/* Main Content with Pagination */}
-      <StampContent
+      <StampOverviewContent
         stamps={stampsArray}
         isRecentSales={isRecentSales}
         pagination={{

@@ -1,12 +1,11 @@
 /* ===== SRC20 SECTION COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { SRC20Row } from "$globals";
-import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
-import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
+import { SRC20CardMinted, SRC20CardMinting } from "$card";
 import { subtitlePurple, titlePurpleLD } from "$text";
 import { ViewAllButton } from "$button";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 
 /* ===== TYPES ===== */
 interface SRC20SectionProps {
@@ -183,14 +182,14 @@ export function SRC20Section({
           {data.map((src20) => (
             parseFloat(src20?.progress || "0") >= 100
               ? (
-                <SRC20TokenOutmintedCard
+                <SRC20CardMinted
                   src20={src20}
                   fromPage={fromPage}
                   onImageClick={handleImageClick}
                 />
               )
               : (
-                <SRC20TokenMintingCard
+                <SRC20CardMinting
                   src20={src20}
                   fromPage={fromPage}
                   onImageClick={handleImageClick}

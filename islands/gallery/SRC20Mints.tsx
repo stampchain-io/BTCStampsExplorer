@@ -1,7 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
-import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
-import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 import type { SRC20Row } from "$globals";
+import { SRC20CardMinted, SRC20CardMinting } from "$card";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 export default function SRC20MintsGallery() {
@@ -51,7 +50,7 @@ export default function SRC20MintsGallery() {
         {transactions.map((src20) => (
           src20.progress !== "100"
             ? (
-              <SRC20TokenMintingCard
+              <SRC20CardMinting
                 key={src20.tick}
                 src20={src20}
                 fromPage="stamping/src20"
@@ -59,7 +58,7 @@ export default function SRC20MintsGallery() {
               />
             )
             : (
-              <SRC20TokenOutmintedCard
+              <SRC20CardMinted
                 key={src20.tick}
                 src20={src20}
                 fromPage="stamping/src20"

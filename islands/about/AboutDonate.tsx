@@ -1,6 +1,6 @@
 /* ===== ABOUT DONATE COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
-import { StampCard } from "$islands/stamp/StampCard.tsx";
+import { StampCard } from "$card";
 import { StampRow } from "$globals";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
 import DonateStampModal from "$islands/modal/DonateStampModal.tsx";

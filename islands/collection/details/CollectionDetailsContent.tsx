@@ -1,6 +1,6 @@
 /* ===== COLLECTION DETAILS CONTENT COMPONENT ===== */
 import { StampRow } from "$globals";
-import { StampCard } from "$islands/stamp/StampCard.tsx";
+import { StampCard } from "$card";
 
 /* ===== COMPONENT ===== */
 export const CollectionDetailsContent = ({ stamps = [] }: {
