@@ -3,7 +3,7 @@ import { Head as _Head } from "$fresh/runtime.ts";
 import { body, gapSection } from "$layout";
 import { FaqHeader } from "$header";
 import { FaqAccordion } from "$content";
-import { FAQ_CONTENT } from "$faq";
+import { FAQ_CONTENT } from "$layout";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */

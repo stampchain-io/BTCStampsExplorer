@@ -10,7 +10,7 @@ import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { WalletProviderBase } from "$islands/modal/WalletProviderBase.tsx";
 import { WalletProviderKey } from "$lib/utils/constants.ts";
-import AnimationLayout from "$components/modal/AnimationLayout.tsx";
+import { AnimationLayout } from "$layout";
 import { Button } from "$button";
 import { navLinkPurple, valueDarkSm } from "$text";
 /* ===== WALLET MODAL COMPONENT INTERFACE ===== */

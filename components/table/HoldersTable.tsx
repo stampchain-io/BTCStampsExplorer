@@ -1,6 +1,5 @@
-import { HoldersPieChart } from "$islands/charts/HoldersPieChart.tsx";
+import { HoldersPieChart, HoldersTableBase } from "$table";
 import { label, value3xl } from "$text";
-import { HoldersTableBase } from "$table";
 
 interface Holder {
   address: string | null;

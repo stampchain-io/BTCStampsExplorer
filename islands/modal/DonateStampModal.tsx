@@ -4,7 +4,7 @@ import type { StampRow } from "$globals";
 import { StampImage } from "$content";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
-import { ModalLayout } from "$components/modal/ModalLayout.tsx";
+import { ModalLayout } from "$layout";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipImage } from "$notification";

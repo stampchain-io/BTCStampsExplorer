@@ -2,7 +2,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
-import { ModalLayout } from "$components/modal/ModalLayout.tsx";
+import { ModalLayout } from "$layout";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import type { StampRow } from "$globals";
 import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";

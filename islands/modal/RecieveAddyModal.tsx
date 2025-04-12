@@ -1,7 +1,7 @@
 /* ===== RECEIVE ADDRESS MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import QRCode from "qrcode";
-import { ModalLayout } from "$components/modal/ModalLayout.tsx";
+import { ModalLayout } from "$layout";
 import { tooltipIcon } from "$notification";
 
 /* ===== TYPES ===== */

@@ -150,7 +150,6 @@ import * as $card_SRC20CardMinting from "./islands/card/SRC20CardMinting.tsx";
 import * as $card_StampCard from "./islands/card/StampCard.tsx";
 import * as $card_index from "./islands/card/index.ts";
 import * as $card_styles from "./islands/card/styles.ts";
-import * as $charts_HoldersPieChart from "./islands/charts/HoldersPieChart.tsx";
 import * as $content_CollectionDetailContent from "./islands/content/CollectionDetailContent.tsx";
 import * as $content_StampOverviewContent from "./islands/content/StampOverviewContent.tsx";
 import * as $content_WalletDashboardContent from "./islands/content/WalletDashboardContent.tsx";
@@ -238,6 +237,7 @@ import * as $section_howto_HowToTransferToken from "./islands/section/howto/HowT
 import * as $section_index from "./islands/section/index.ts";
 import * as $src20_ChartWidget from "./islands/src20/ChartWidget.tsx";
 import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
+import * as $table_HoldersPieChart from "./islands/table/HoldersPieChart.tsx";
 import * as $table_HoldersTableBase from "./islands/table/HoldersTableBase.tsx";
 import * as $table_UploadImageTable from "./islands/table/UploadImageTable.tsx";
 import * as $table_index from "./islands/table/index.ts";
@@ -437,7 +437,6 @@ const manifest = {
     "./islands/card/StampCard.tsx": $card_StampCard,
     "./islands/card/index.ts": $card_index,
     "./islands/card/styles.ts": $card_styles,
-    "./islands/charts/HoldersPieChart.tsx": $charts_HoldersPieChart,
     "./islands/content/CollectionDetailContent.tsx":
       $content_CollectionDetailContent,
     "./islands/content/StampOverviewContent.tsx": $content_StampOverviewContent,
@@ -548,6 +547,7 @@ const manifest = {
     "./islands/section/index.ts": $section_index,
     "./islands/src20/ChartWidget.tsx": $src20_ChartWidget,
     "./islands/table/DataTableBase.tsx": $table_DataTableBase,
+    "./islands/table/HoldersPieChart.tsx": $table_HoldersPieChart,
     "./islands/table/HoldersTableBase.tsx": $table_HoldersTableBase,
     "./islands/table/UploadImageTable.tsx": $table_UploadImageTable,
     "./islands/table/index.ts": $table_index,

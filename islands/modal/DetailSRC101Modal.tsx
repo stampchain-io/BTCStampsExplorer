@@ -1,5 +1,5 @@
 /* ===== SRC101 DETAIL MODAL COMPONENT ===== */
-import { ModalLayout } from "$components/modal/ModalLayout.tsx";
+import { ModalLayout } from "$layout";
 
 /* ===== TYPES ===== */
 interface PropTypes {
