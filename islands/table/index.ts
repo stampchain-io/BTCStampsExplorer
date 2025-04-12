@@ -14,3 +14,4 @@ export * from "$components/table/stampDataTable/StampVaults.tsx";
 
 export { default as DataTableBase } from "$islands/table/DataTableBase.tsx";
 export { default as HoldersTableBase } from "$islands/table/HoldersTableBase.tsx";
+export * from "$islands/table/UploadImageTable.tsx";

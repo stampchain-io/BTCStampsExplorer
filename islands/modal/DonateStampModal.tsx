@@ -1,7 +1,7 @@
 /* ===== DONATE STAMP MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { StampRow } from "$globals";
-import StampImage from "../content/stampDetailContent/StampImage.tsx";
+import { StampImage } from "$content";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { ModalLayout } from "$components/modal/ModalLayout.tsx";

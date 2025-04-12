@@ -1,14 +1,18 @@
 /* ===== UPLOAD PAGE ===== */
+/* @baba+@reinamora - what is this page used for, should it be improved? */
 import { useEffect as _useEffect, useState as _useState } from "preact/hooks";
 import { paginate } from "$lib/utils/paginationUtils.ts";
 import {
   initialWallet as _initialWallet,
   walletContext,
 } from "$client/wallet/wallet.ts";
-import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
+
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20Row } from "$globals";
+import { body } from "$layout";
+import { titlePurpleLD } from "$text";
+import { UploadImageTable } from "$table";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
@@ -62,10 +66,11 @@ export function UploadBackground(props: PropTypes) {
   /* ===== RENDER ===== */
   return (
     <>
-      <div className={"self-center"}>
-        <p class="text-white text-7xl leading-normal">SRC20 Stamp Upload</p>
+      <div className={body}>
+        <h1 class={titlePurpleLD}>SRC20 Stamp Upload</h1>
+
+        <UploadImageTable data={data} />
       </div>
-      <UploadImageTable data={data} />
     </>
   );
 }

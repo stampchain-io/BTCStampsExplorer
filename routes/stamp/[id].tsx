@@ -10,7 +10,7 @@ import { DispenserManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { DOMParser } from "dom";
 import { body } from "$layout";
-import { StampImage, StampInfo } from "$stamp";
+import { StampImage, StampInfo } from "$content";
 import { StampGallery } from "$gallery";
 import { DataTableBase, HoldersTable } from "$table";
 

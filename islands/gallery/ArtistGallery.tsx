@@ -1,6 +1,6 @@
 /* ===== COLLECTION OVERVIEW SECTION COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { Collection, CollectionSectionProps } from "$globals";
+import { Collection, CollectionGalleryProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { ViewAllButton } from "$button";
 import { CollectionOverviewCard } from "$collection";
@@ -8,13 +8,13 @@ import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
 
 /* ===== STATE ===== */
-export default function ArtistSection({
+export default function ArtistGallery({
   title,
   subTitle,
   collections,
   gridClass,
   displayCounts,
-}: CollectionSectionProps) {
+}: CollectionGalleryProps) {
   const { width } = useWindowSize();
   const collectionArray = Array.isArray(collections) ? collections : [];
   const [displayCount, setDisplayCount] = useState(collectionArray.length);

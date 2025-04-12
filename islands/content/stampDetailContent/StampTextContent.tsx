@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
-export default function TextContentIsland({ src }: { src: string }) {
+export default function StampTextContent({ src }: { src: string }) {
   /* ===== STATE MANAGEMENT ===== */
   const [content, setContent] = useState<string>("Loading...");
   const [error, setError] = useState<string | null>(null);

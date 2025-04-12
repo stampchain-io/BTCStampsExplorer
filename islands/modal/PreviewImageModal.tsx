@@ -1,7 +1,7 @@
 /* ===== PREVIEW IMAGE MODAL COMPONENT ===== */
 import { useEffect } from "preact/hooks";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
-import TextContentIsland from "../content/stampDetailContent/StampTextContent.tsx";
+import { StampTextContent } from "$content";
 import { modalBgCenter } from "$layout";
 
 /* ===== TYPES ===== */
@@ -81,7 +81,7 @@ const PreviewImageModal = ({
               : contentType === "text"
               ? (
                 <div className="w-full h-full rounded-sm mobileMd:rounded-md aspect-square">
-                  <TextContentIsland src={imageUrl} />
+                  <StampTextContent src={imageUrl} />
                 </div>
               )
               : (

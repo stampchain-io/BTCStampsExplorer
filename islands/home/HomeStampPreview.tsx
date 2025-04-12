@@ -1,13 +1,13 @@
 /* @baba-rename to HomeContnet ??? HomeGallery ??? */
 import {
   Collection,
-  CollectionSectionProps,
+  CollectionGalleryProps,
   StampGalleryProps,
   StampRow,
 } from "$globals";
 
 import { StampGallery } from "$gallery";
-import { CollectionSection } from "$collection";
+import { CollectionGallery } from "$gallery";
 import { titlePurpleDL } from "$text";
 
 interface HomeStampPreviewProps {
@@ -48,7 +48,7 @@ export function HomeStampPreview({
     },
   ];
 
-  const FeaturedArtistsSection: CollectionSectionProps = {
+  const FeaturedArtistsSection: CollectionGalleryProps = {
     title: "FEATURED ARTISTS",
     subTitle: "RECURSIVE COLLECTIONS",
     collections: collectionData,
@@ -110,7 +110,7 @@ export function HomeStampPreview({
     },
   ];
 
-  const CuttingEdgeSection: CollectionSectionProps = {
+  const CuttingEdgeSection: CollectionGalleryProps = {
     title: "CUTTING EDGE",
     subTitle: "RECURSIVE COLLECTIONS",
     collections: collectionData,
@@ -147,7 +147,7 @@ export function HomeStampPreview({
       </div>
 
       {/* FEATURED ARTISTS */}
-      <CollectionSection {...FeaturedArtistsSection} />
+      <CollectionGallery {...FeaturedArtistsSection} />
 
       {/* COLLECTIONS */}
       {CollectionsSection.map((section, index) => (
@@ -155,7 +155,7 @@ export function HomeStampPreview({
       ))}
 
       {/* CUTTING EDGE */}
-      <CollectionSection {...CuttingEdgeSection} />
+      <CollectionGallery {...CuttingEdgeSection} />
     </div>
   );
 }

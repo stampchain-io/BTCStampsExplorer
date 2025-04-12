@@ -12,7 +12,7 @@ import {
 } from "$lib/utils/imageUtils.ts";
 
 import { StampRow } from "$globals";
-import TextContentIsland from "../content/stampDetailContent/StampTextContent.tsx";
+import { StampTextContent } from "$content";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { useEffect, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
@@ -163,7 +163,7 @@ export function StampCard({
     }
 
     if (stamp.stamp_mimetype === "text/plain") {
-      return <TextContentIsland src={src} />;
+      return <StampTextContent src={src} />;
     }
 
     // Handle HTML content

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { initialWallet } from "$client/wallet/wallet.ts";
+import { text, titlePurpleLD } from "$text";
 
 export const UploadImageHeader = () => {
   const [wallet, setWallet] = useState(initialWallet);
@@ -22,13 +23,11 @@ export const UploadImageHeader = () => {
   }, [wallet]);
 
   return (
-    <div class="text-white flex flex-col gap-8">
-      <div class="text-center">
-        <p class="text-7xl leading-normal">Upload Image</p>
-        <p class="text-[#DBDBDB] font-light">
-          Upload your background image to be used as a stamp
-        </p>
-      </div>
+    <div class="flex flex-col gap-3">
+      <h1 class={titlePurpleLD}>UPLOAD IMAGE</h1>
+      <p class={text}>
+        Upload your background image to be used as a stamp
+      </p>
     </div>
   );
 };

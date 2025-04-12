@@ -2,7 +2,7 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { STAMP_FILTER_TYPES, StampRow, SUBPROTOCOLS } from "$globals";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { CollectionDetailsContent } from "$collection";
+import { CollectionDetailContent } from "$content";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { CollectionDetailHeader } from "$header";
@@ -103,7 +103,7 @@ export default function CollectionDetailPage(
   return (
     <div class="flex flex-col gap-6">
       <CollectionDetailHeader collection={collection} stamps={stamps} />
-      <CollectionDetailsContent stamps={stamps} />
+      <CollectionDetailContent stamps={stamps} />
       <Pagination
         page={page}
         pages={pages}

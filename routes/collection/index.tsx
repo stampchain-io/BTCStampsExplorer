@@ -1,6 +1,6 @@
 /* ===== COLLECTION LANDING PAGE ===== */
 import {
-  CollectionSectionProps,
+  CollectionGalleryProps,
   StampGalleryProps,
   StampRow,
   SUBPROTOCOLS,
@@ -11,7 +11,7 @@ import { CollectionController } from "$server/controller/collectionController.ts
 import { StampController } from "$server/controller/stampController.ts";
 import { RecursiveLayeringModule } from "$islands/modules/RecursiveLayering.tsx";
 import { NamedAssetsModule } from "$islands/modules/NamedAssets.tsx";
-import { ArtistSection, CollectionSection } from "$collection";
+import { ArtistGallery, CollectionGallery } from "$gallery";
 import { CollectionRow } from "$server/types/collection.d.ts";
 import { body, gapSection } from "$layout";
 
@@ -158,7 +158,7 @@ export default function CollectionLandingPage(
     },
   ];
 
-  const EspeciallyPoshSection: CollectionSectionProps = {
+  const EspeciallyPoshSection: CollectionGalleryProps = {
     title: "ESPECIALLY POSH",
     subTitle: "STAMP COLLECTIONS",
     collections: collections,
@@ -174,7 +174,7 @@ export default function CollectionLandingPage(
     },
   };
 
-  const CuttingEdgeSection: CollectionSectionProps = {
+  const CuttingEdgeSection: CollectionGalleryProps = {
     title: "CUTTING EDGE",
     subTitle: "SRC-721r COLLECTIONS",
     collections: collections,
@@ -190,7 +190,7 @@ export default function CollectionLandingPage(
     },
   };
 
-  const PopularArtistSection: CollectionSectionProps = {
+  const PopularArtistGallery: CollectionGalleryProps = {
     title: "POPULAR ARTIST",
     subTitle: "COLLECTIONS",
     collections: collections,
@@ -215,15 +215,15 @@ export default function CollectionLandingPage(
         {...CollectionsSection[0]}
       />
       <div class="relative">
-        <CollectionSection {...EspeciallyPoshSection} />
+        <CollectionGallery {...EspeciallyPoshSection} />
         <NamedAssetsModule />
       </div>
       <StampGallery {...CollectionsSection[1]} />
       <div class="relative">
-        <CollectionSection {...CuttingEdgeSection} />
+        <CollectionGallery {...CuttingEdgeSection} />
         <RecursiveLayeringModule />
       </div>
-      <ArtistSection {...PopularArtistSection} />
+      <ArtistGallery {...PopularArtistGallery} />
     </div>
   );
 }

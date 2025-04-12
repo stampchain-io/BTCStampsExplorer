@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
-import StampImage from "../../content/stampDetailContent/StampImage.tsx";
+import { StampImage } from "$content";
 import {
   backgroundContainer,
   buttonPurpleFlat,

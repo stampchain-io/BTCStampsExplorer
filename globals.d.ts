@@ -135,7 +135,7 @@ export interface StampGalleryProps {
   sortBy?: "ASC" | "DESC" | undefined;
 }
 
-export interface CollectionSectionProps {
+export interface CollectionGalleryProps {
   title?: string;
   subTitle?: string;
   collections: Collection[];

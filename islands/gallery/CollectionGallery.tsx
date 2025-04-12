@@ -1,19 +1,19 @@
 /* ===== COLLECTION SECTION COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { Collection, CollectionSectionProps } from "$globals";
+import { Collection, CollectionGalleryProps } from "$globals";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { CollectionListCard } from "$collection";
 import { subtitleGrey, titleGreyLD } from "$text";
 
 /* ===== STATE ===== */
-export default function CollectionSection({
+export default function CollectionGallery({
   title,
   subTitle,
   collections,
   gridClass,
   displayCounts,
-}: CollectionSectionProps) {
+}: CollectionGalleryProps) {
   const collectionArray = Array.isArray(collections) ? collections : [];
   const [displayCount, setDisplayCount] = useState(collectionArray.length);
   const { width } = useWindowSize();
