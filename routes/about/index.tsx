@@ -1,6 +1,6 @@
 /* ===== ABOUT PAGE ===== */
 import { body, gapSectionSlim } from "$layout";
-import AboutHeader from "$islands/about/AboutHeader.tsx";
+import { AboutHeader } from "$header";
 import { PartnersGallery, TeamGallery } from "$gallery";
 import AboutDonate from "$islands/about/AboutDonate.tsx";
 import AboutContact from "$islands/about/AboutContact.tsx";

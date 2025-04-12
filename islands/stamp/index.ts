@@ -1,4 +1,4 @@
-export * from "$islands/stamp/StampOverviewHeader.tsx";
+
 export * from "$islands/stamp/StampOverviewContent.tsx";
 
 /*@baba-refactor/rename stamp details content */

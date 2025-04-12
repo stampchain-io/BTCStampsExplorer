@@ -3,7 +3,8 @@ import { Partial } from "$fresh/runtime.ts";
 import { Head } from "$fresh/runtime.ts";
 import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
 import { MetaTags } from "$components/layout/MetaTags.tsx";
-import { Footer, Header, NavigatorProvider } from "$layout";
+import { Footer, NavigatorProvider } from "$layout";
+import { Header } from "$header";
 import FontLoader from "$islands/layout/FontLoader.tsx";
 
 export default function App({ Component, state }: PageProps<unknown>) {

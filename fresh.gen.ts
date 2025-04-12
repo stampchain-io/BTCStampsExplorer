@@ -140,9 +140,7 @@ import * as $Wallet_details_WalletProfileDetails from "./islands/Wallet/details/
 import * as $Wallet_details_styles from "./islands/Wallet/details/styles.ts";
 import * as $about_AboutContact from "./islands/about/AboutContact.tsx";
 import * as $about_AboutDonate from "./islands/about/AboutDonate.tsx";
-import * as $about_AboutHeader from "./islands/about/AboutHeader.tsx";
 import * as $about_types from "./islands/about/types.ts";
-import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
@@ -160,9 +158,7 @@ import * as $collection_artist_ArtistCollectionWIP from "./islands/collection/ar
 import * as $collection_artist_CollectionCreateButtonWIP from "./islands/collection/artist/CollectionCreateButtonWIP.tsx";
 import * as $collection_artist_CollectionOverviewArtistContentWIP from "./islands/collection/artist/CollectionOverviewArtistContentWIP.tsx";
 import * as $collection_details_CollectionDetailsContent from "./islands/collection/details/CollectionDetailsContent.tsx";
-import * as $collection_details_CollectionDetailsHeader from "./islands/collection/details/CollectionDetailsHeader.tsx";
 import * as $collection_index_1 from "./islands/collection/index.ts";
-import * as $collection_overview_CollectionOverviewHeader from "./islands/collection/overview/CollectionOverviewHeader.tsx";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Layout from "./islands/datacontrol/Layout.ts";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
@@ -189,6 +185,15 @@ import * as $gallery_StampTransfers from "./islands/gallery/StampTransfers.tsx";
 import * as $gallery_SwiperStyles from "./islands/gallery/SwiperStyles.tsx";
 import * as $gallery_Team from "./islands/gallery/Team.tsx";
 import * as $gallery_index from "./islands/gallery/index.ts";
+import * as $header_AboutHeader from "./islands/header/AboutHeader.tsx";
+import * as $header_BlockHeader from "./islands/header/BlockHeader.tsx";
+import * as $header_CollectionDetailHeader from "./islands/header/CollectionDetailHeader.tsx";
+import * as $header_CollectionOverviewHeader from "./islands/header/CollectionOverviewHeader.tsx";
+import * as $header_Header from "./islands/header/Header.tsx";
+import * as $header_SRC20DetailHeader from "./islands/header/SRC20DetailHeader.tsx";
+import * as $header_SRC20OverviewHeader from "./islands/header/SRC20OverviewHeader.tsx";
+import * as $header_StampOverviewHeader from "./islands/header/StampOverviewHeader.tsx";
+import * as $header_index from "./islands/header/index.ts";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $howto_HowToDeployToken from "./islands/howto/HowToDeployToken.tsx";
 import * as $howto_HowToMintToken from "./islands/howto/HowToMintToken.tsx";
@@ -199,7 +204,6 @@ import * as $howto_HowToTransferStamp from "./islands/howto/HowToTransferStamp.t
 import * as $howto_HowToTransferToken from "./islands/howto/HowToTransferToken.tsx";
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
-import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
 import * as $loading_LoadingContent from "./islands/loading/LoadingContent.tsx";
 import * as $loading_LoadingProvider from "./islands/loading/LoadingProvider.tsx";
@@ -225,11 +229,7 @@ import * as $search_StampSearch from "./islands/search/StampSearch.tsx";
 import * as $search_index from "./islands/search/index.ts";
 import * as $search_styles from "./islands/search/styles.ts";
 import * as $src20_ChartWidget from "./islands/src20/ChartWidget.tsx";
-import * as $src20_SRC20DetailHeader from "./islands/src20/SRC20DetailHeader.tsx";
-import * as $src20_SRC20OverviewHeader from "./islands/src20/SRC20OverviewHeader.tsx";
-import * as $src20_index_1 from "./islands/src20/index.ts";
 import * as $stamp_StampOverviewContent from "./islands/stamp/StampOverviewContent.tsx";
-import * as $stamp_StampOverviewHeader from "./islands/stamp/StampOverviewHeader.tsx";
 import * as $stamp_detail_StampImage from "./islands/stamp/detail/StampImage.tsx";
 import * as $stamp_detail_StampInfo from "./islands/stamp/detail/StampInfo.tsx";
 import * as $stamp_detail_StampTextContent from "./islands/stamp/detail/StampTextContent.tsx";
@@ -425,9 +425,7 @@ const manifest = {
     "./islands/Wallet/details/styles.ts": $Wallet_details_styles,
     "./islands/about/AboutContact.tsx": $about_AboutContact,
     "./islands/about/AboutDonate.tsx": $about_AboutDonate,
-    "./islands/about/AboutHeader.tsx": $about_AboutHeader,
     "./islands/about/types.ts": $about_types,
-    "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
@@ -449,11 +447,7 @@ const manifest = {
       $collection_artist_CollectionOverviewArtistContentWIP,
     "./islands/collection/details/CollectionDetailsContent.tsx":
       $collection_details_CollectionDetailsContent,
-    "./islands/collection/details/CollectionDetailsHeader.tsx":
-      $collection_details_CollectionDetailsHeader,
     "./islands/collection/index.ts": $collection_index_1,
-    "./islands/collection/overview/CollectionOverviewHeader.tsx":
-      $collection_overview_CollectionOverviewHeader,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
     "./islands/datacontrol/Layout.ts": $datacontrol_Layout,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
@@ -480,6 +474,17 @@ const manifest = {
     "./islands/gallery/SwiperStyles.tsx": $gallery_SwiperStyles,
     "./islands/gallery/Team.tsx": $gallery_Team,
     "./islands/gallery/index.ts": $gallery_index,
+    "./islands/header/AboutHeader.tsx": $header_AboutHeader,
+    "./islands/header/BlockHeader.tsx": $header_BlockHeader,
+    "./islands/header/CollectionDetailHeader.tsx":
+      $header_CollectionDetailHeader,
+    "./islands/header/CollectionOverviewHeader.tsx":
+      $header_CollectionOverviewHeader,
+    "./islands/header/Header.tsx": $header_Header,
+    "./islands/header/SRC20DetailHeader.tsx": $header_SRC20DetailHeader,
+    "./islands/header/SRC20OverviewHeader.tsx": $header_SRC20OverviewHeader,
+    "./islands/header/StampOverviewHeader.tsx": $header_StampOverviewHeader,
+    "./islands/header/index.ts": $header_index,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
     "./islands/howto/HowToDeployToken.tsx": $howto_HowToDeployToken,
     "./islands/howto/HowToMintToken.tsx": $howto_HowToMintToken,
@@ -490,7 +495,6 @@ const manifest = {
     "./islands/howto/HowToTransferToken.tsx": $howto_HowToTransferToken,
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
     "./islands/layout/Footer.tsx": $layout_Footer,
-    "./islands/layout/Header.tsx": $layout_Header,
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
     "./islands/loading/LoadingContent.tsx": $loading_LoadingContent,
     "./islands/loading/LoadingProvider.tsx": $loading_LoadingProvider,
@@ -516,11 +520,7 @@ const manifest = {
     "./islands/search/index.ts": $search_index,
     "./islands/search/styles.ts": $search_styles,
     "./islands/src20/ChartWidget.tsx": $src20_ChartWidget,
-    "./islands/src20/SRC20DetailHeader.tsx": $src20_SRC20DetailHeader,
-    "./islands/src20/SRC20OverviewHeader.tsx": $src20_SRC20OverviewHeader,
-    "./islands/src20/index.ts": $src20_index_1,
     "./islands/stamp/StampOverviewContent.tsx": $stamp_StampOverviewContent,
-    "./islands/stamp/StampOverviewHeader.tsx": $stamp_StampOverviewHeader,
     "./islands/stamp/detail/StampImage.tsx": $stamp_detail_StampImage,
     "./islands/stamp/detail/StampInfo.tsx": $stamp_detail_StampInfo,
     "./islands/stamp/detail/StampTextContent.tsx":

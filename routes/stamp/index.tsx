@@ -4,7 +4,8 @@ import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "$globals";
-import { StampOverviewContent, StampOverviewHeader } from "$stamp";
+import { StampOverviewContent } from "$stamp";
+import { StampOverviewHeader } from "$header";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;

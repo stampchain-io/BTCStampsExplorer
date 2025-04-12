@@ -14,7 +14,7 @@ import {
 } from "$text";
 
 /* ===== COMPONENT ===== */
-export const CollectionDetailsHeader = (
+export const CollectionDetailHeader = (
   { collection, stamps }: { collection: Collection; stamps: StampRow[] },
 ) => {
   console.log("collection: ", collection);

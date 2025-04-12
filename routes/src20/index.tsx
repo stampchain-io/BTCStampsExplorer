@@ -3,7 +3,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
-import { SRC20OverviewHeader } from "$src20";
+import { SRC20OverviewHeader } from "$header";
 import { SRC20Gallery } from "$gallery";
 
 /* ===== HELPERS ===== */
