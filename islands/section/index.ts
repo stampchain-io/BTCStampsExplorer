@@ -1,6 +1,6 @@
-/* ===== SECTIONS ===== */
-/* ===== GALLERIES =====
-export * from "$islands/section/gallery/StampOverviewGallery.tsx"; */
+/* ===== PAGE SECTIONS ===== */
+/* ===== GALLERIES ===== */
+export * from "$islands/section/gallery/StampOverviewGallery.tsx";
 export { default as StampGallery } from "$islands/section/gallery/StampGallery.tsx";
 export * from "$islands/section/gallery/SRC20Gallery.tsx";
 export { default as CollectionGallery } from "$islands/section/gallery/CollectionGallery.tsx";
@@ -35,7 +35,8 @@ export * from "$islands/section/cta/StampChain.tsx";
 export * from "$islands/section/cta/GetStamping.tsx";
 export * from "$islands/section/cta/NamedAssets.tsx";
 export * from "$islands/section/cta/RecursiveLayering.tsx";
-/* I have no idea why, but these two files cannot be exported - it breaks the display of the tools */
+/* I have no idea why, but these two files cannot be barrel exported */
+/* It breaks the display of the tools */
 /* Direct path import in /routes/about/index.tsx instead */
 /* export * from "$islands/section/cta/DonateCta.tsx"; */
 /* export * from "$islands/section/cta/ContactCta.tsx"; */

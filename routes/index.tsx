@@ -2,16 +2,17 @@ import { StampRow } from "$globals";
 import type { Collection } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { HomeHeader } from "$components/home/HomeHeader.tsx";
-import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
 import { StampController } from "$server/controller/stampController.ts";
+
 import { Micro5FontLoader } from "$layout";
+import { HomeHeader } from "$header";
 import {
   CarouselHome,
   GetStampingModule,
   PartnersGallery,
   SRC20Gallery,
   StampChainModule,
+  StampOverviewGallery,
   StampSalesGallery,
 } from "$section";
 
@@ -108,7 +109,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
           {/* Defer non-critical content */}
           <div style="content-visibility: auto; contain-intrinsic-size: 0 500px;">
-            <HomeStampPreview
+            <StampOverviewGallery
               stamps_art={stamps_art}
               stamps_posh={stamps_posh}
               stamps_src721={stamps_src721}

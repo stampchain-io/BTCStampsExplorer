@@ -185,7 +185,6 @@ import * as $header_SRC20DetailHeader from "./islands/header/SRC20DetailHeader.t
 import * as $header_SRC20OverviewHeader from "./islands/header/SRC20OverviewHeader.tsx";
 import * as $header_StampOverviewHeader from "./islands/header/StampOverviewHeader.tsx";
 import * as $header_index from "./islands/header/index.ts";
-import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
@@ -224,6 +223,7 @@ import * as $section_gallery_SRC20Gallery from "./islands/section/gallery/SRC20G
 import * as $section_gallery_SRC20Mints from "./islands/section/gallery/SRC20Mints.tsx";
 import * as $section_gallery_SRC20Transfers from "./islands/section/gallery/SRC20Transfers.tsx";
 import * as $section_gallery_StampGallery from "./islands/section/gallery/StampGallery.tsx";
+import * as $section_gallery_StampOverviewGallery from "./islands/section/gallery/StampOverviewGallery.tsx";
 import * as $section_gallery_StampSales from "./islands/section/gallery/StampSales.tsx";
 import * as $section_gallery_StampTransfers from "./islands/section/gallery/StampTransfers.tsx";
 import * as $section_gallery_SwiperStyles from "./islands/section/gallery/SwiperStyles.tsx";
@@ -484,7 +484,6 @@ const manifest = {
     "./islands/header/SRC20OverviewHeader.tsx": $header_SRC20OverviewHeader,
     "./islands/header/StampOverviewHeader.tsx": $header_StampOverviewHeader,
     "./islands/header/index.ts": $header_index,
-    "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
@@ -528,6 +527,8 @@ const manifest = {
     "./islands/section/gallery/SRC20Transfers.tsx":
       $section_gallery_SRC20Transfers,
     "./islands/section/gallery/StampGallery.tsx": $section_gallery_StampGallery,
+    "./islands/section/gallery/StampOverviewGallery.tsx":
+      $section_gallery_StampOverviewGallery,
     "./islands/section/gallery/StampSales.tsx": $section_gallery_StampSales,
     "./islands/section/gallery/StampTransfers.tsx":
       $section_gallery_StampTransfers,

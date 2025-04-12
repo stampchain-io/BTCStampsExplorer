@@ -9,19 +9,19 @@ import {
 import { CollectionGallery, StampGallery } from "$section";
 import { titlePurpleDL } from "$text";
 
-interface HomeStampPreviewProps {
+interface StampOverviewGalleryProps {
   stamps_art?: StampRow[];
   stamps_posh?: StampRow[];
   stamps_src721?: StampRow[];
   collectionData?: Collection[];
 }
 
-export function HomeStampPreview({
+export function StampOverviewGallery({
   stamps_src721 = [],
   stamps_art = [],
   stamps_posh = [],
   collectionData = [],
-}: HomeStampPreviewProps) {
+}: StampOverviewGalleryProps) {
   const LatestArtStampsSection: StampGalleryProps[] = [
     {
       subTitle: "ON-CHAIN MARVELS",

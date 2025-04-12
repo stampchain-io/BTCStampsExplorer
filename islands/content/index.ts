@@ -1,4 +1,4 @@
-/* ===== CONTENT ===== */
+/* ===== PAGECONTENT ===== */
 /* ===== FAQ ===== */
 export * from "$islands/content/faqContent/AccordionBase.tsx";
 export * from "$islands/content/faqContent/FaqAccordion.tsx";
