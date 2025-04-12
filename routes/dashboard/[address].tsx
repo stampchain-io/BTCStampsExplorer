@@ -1,20 +1,17 @@
 /* ===== WALLET DASHBOARD PAGE ===== */
 /*@baba-297*/
 import { Handlers } from "$fresh/server.ts";
-import WalletDashboardHeader from "$islands/Wallet/details/WalletDashboardHeader.tsx";
-import WalletDashboardDetails from "$islands/Wallet/details/WalletDashboardDetails.tsx";
-import WalletDashboardContent from "$islands/Wallet/details/WalletDashboardContent.tsx";
 import { WalletOverviewInfo, WalletPageProps } from "$lib/types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20MarketService } from "$server/services/src20/marketService.ts";
 import { enrichTokensWithMarketData } from "$server/services/src20Service.ts";
-import {
-  PaginatedResponse,
-  PaginationQueryParams,
-} from "$lib/types/pagination.d.ts";
+import { PaginatedResponse } from "$lib/types/pagination.d.ts";
 import { DispenserRow, SRC20Row, StampRow } from "$globals";
+import { WalletDashboardHeader } from "$header";
+import WalletDashboardDetails from "$islands/Wallet/details/WalletDashboardDetails.tsx";
+import { WalletDashboardContent } from "$content";
 
 /* ===== HELPERS ===== */
 /**

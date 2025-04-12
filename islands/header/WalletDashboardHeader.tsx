@@ -1,10 +1,9 @@
-const WalletDashboardHeader = () => {
-  const titlePurpleDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1";
+import { titlePurpleLD } from "$text";
 
+const WalletDashboardHeader = () => {
   return (
     <div class="flex justify-between items-center gap-3 w-full relative">
-      <h1 className={titlePurpleDL}>DASHBOARD</h1>
+      <h1 className={titlePurpleLD}>DASHBOARD</h1>
       {
         /*<div class="flex gap-3 justify-between h-9 items-center">
         <Filter

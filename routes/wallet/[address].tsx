@@ -1,10 +1,6 @@
 /* ===== WALLET PAGE ===== */
 /*@baba-367*/
 import { Handlers } from "$fresh/server.ts";
-import WalletHeader from "$islands/Wallet/details/WalletHeader.tsx";
-import WalletProfileDetails from "$islands/Wallet/details/WalletProfileDetails.tsx";
-import WalletDispenserDetails from "$islands/Wallet/details/WalletDispenserDetails.tsx";
-import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
 import { WalletPageProps } from "$types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
@@ -19,6 +15,10 @@ import {
 import { SRC20Row, StampRow } from "$globals";
 import { DEFAULT_PAGINATION } from "$server/services/routeValidationService.ts";
 import { WalletOverviewInfo } from "$types/wallet.d.ts";
+import { WalletProfileHeader } from "$header";
+import { WalletProfileContent } from "$content";
+import WalletProfileDetails from "$islands/Wallet/details/WalletProfileDetails.tsx";
+import WalletDispenserDetails from "$islands/Wallet/details/WalletDispenserDetails.tsx";
 
 /* ===== SERVER HANDLER ===== */
 /**
@@ -365,7 +365,7 @@ export default function WalletPage(props: WalletPageProps) {
   /* ===== RENDER ===== */
   return (
     <div class="flex flex-col gap-6" f-client-nav>
-      <WalletHeader />
+      <WalletProfileHeader />
       {isDispenserOnly
         ? (
           <WalletDispenserDetails
@@ -385,7 +385,7 @@ export default function WalletPage(props: WalletPageProps) {
               stampsCreated={data.stampsCreated}
               setShowItem={() => {}}
             />
-            <WalletContent
+            <WalletProfileContent
               stamps={data.data.stamps}
               src20={data.data.src20}
               dispensers={data.data.dispensers}

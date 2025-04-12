@@ -399,7 +399,7 @@ function DispenserRow(
   );
 }
 
-export default function WalletContent({
+export default function WalletProfileContent({
   stamps,
   src20,
   dispensers,

@@ -137,13 +137,9 @@ import * as $WIP_artist_ArtistCollectionWIP from "./islands/WIP/artist/ArtistCol
 import * as $WIP_artist_CollectionCreateButtonWIP from "./islands/WIP/artist/CollectionCreateButtonWIP.tsx";
 import * as $WIP_artist_CollectionOverviewArtistContentWIP from "./islands/WIP/artist/CollectionOverviewArtistContentWIP.tsx";
 import * as $WIP_test_ReviewDogTest from "./islands/WIP/test/ReviewDogTest.tsx";
-import * as $Wallet_details_WalletContent from "./islands/Wallet/details/WalletContent.tsx";
-import * as $Wallet_details_WalletDashboardContent from "./islands/Wallet/details/WalletDashboardContent.tsx";
 import * as $Wallet_details_WalletDashboardDetails from "./islands/Wallet/details/WalletDashboardDetails.tsx";
-import * as $Wallet_details_WalletDashboardHeader from "./islands/Wallet/details/WalletDashboardHeader.tsx";
 import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletDetails.tsx";
 import * as $Wallet_details_WalletDispenserDetails from "./islands/Wallet/details/WalletDispenserDetails.tsx";
-import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHeader.tsx";
 import * as $Wallet_details_WalletProfileDetails from "./islands/Wallet/details/WalletProfileDetails.tsx";
 import * as $Wallet_details_styles from "./islands/Wallet/details/styles.ts";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
@@ -157,6 +153,8 @@ import * as $card_styles from "./islands/card/styles.ts";
 import * as $charts_HoldersPieChart from "./islands/charts/HoldersPieChart.tsx";
 import * as $content_CollectionDetailContent from "./islands/content/CollectionDetailContent.tsx";
 import * as $content_StampOverviewContent from "./islands/content/StampOverviewContent.tsx";
+import * as $content_WalletDashboardContent from "./islands/content/WalletDashboardContent.tsx";
+import * as $content_WalletProfileContent from "./islands/content/WalletProfileContent.tsx";
 import * as $content_blockContent_BlockSelector from "./islands/content/blockContent/BlockSelector.tsx";
 import * as $content_blockContent_BlockTransactions from "./islands/content/blockContent/BlockTransactions.tsx";
 import * as $content_faqContent_AccordionBase from "./islands/content/faqContent/AccordionBase.tsx";
@@ -184,6 +182,8 @@ import * as $header_Header from "./islands/header/Header.tsx";
 import * as $header_SRC20DetailHeader from "./islands/header/SRC20DetailHeader.tsx";
 import * as $header_SRC20OverviewHeader from "./islands/header/SRC20OverviewHeader.tsx";
 import * as $header_StampOverviewHeader from "./islands/header/StampOverviewHeader.tsx";
+import * as $header_WalletDashboardHeader from "./islands/header/WalletDashboardHeader.tsx";
+import * as $header_WalletProfileHeader from "./islands/header/WalletProfileHeader.tsx";
 import * as $header_index from "./islands/header/index.ts";
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
@@ -421,17 +421,11 @@ const manifest = {
     "./islands/WIP/artist/CollectionOverviewArtistContentWIP.tsx":
       $WIP_artist_CollectionOverviewArtistContentWIP,
     "./islands/WIP/test/ReviewDogTest.tsx": $WIP_test_ReviewDogTest,
-    "./islands/Wallet/details/WalletContent.tsx": $Wallet_details_WalletContent,
-    "./islands/Wallet/details/WalletDashboardContent.tsx":
-      $Wallet_details_WalletDashboardContent,
     "./islands/Wallet/details/WalletDashboardDetails.tsx":
       $Wallet_details_WalletDashboardDetails,
-    "./islands/Wallet/details/WalletDashboardHeader.tsx":
-      $Wallet_details_WalletDashboardHeader,
     "./islands/Wallet/details/WalletDetails.tsx": $Wallet_details_WalletDetails,
     "./islands/Wallet/details/WalletDispenserDetails.tsx":
       $Wallet_details_WalletDispenserDetails,
-    "./islands/Wallet/details/WalletHeader.tsx": $Wallet_details_WalletHeader,
     "./islands/Wallet/details/WalletProfileDetails.tsx":
       $Wallet_details_WalletProfileDetails,
     "./islands/Wallet/details/styles.ts": $Wallet_details_styles,
@@ -447,6 +441,9 @@ const manifest = {
     "./islands/content/CollectionDetailContent.tsx":
       $content_CollectionDetailContent,
     "./islands/content/StampOverviewContent.tsx": $content_StampOverviewContent,
+    "./islands/content/WalletDashboardContent.tsx":
+      $content_WalletDashboardContent,
+    "./islands/content/WalletProfileContent.tsx": $content_WalletProfileContent,
     "./islands/content/blockContent/BlockSelector.tsx":
       $content_blockContent_BlockSelector,
     "./islands/content/blockContent/BlockTransactions.tsx":
@@ -483,6 +480,8 @@ const manifest = {
     "./islands/header/SRC20DetailHeader.tsx": $header_SRC20DetailHeader,
     "./islands/header/SRC20OverviewHeader.tsx": $header_SRC20OverviewHeader,
     "./islands/header/StampOverviewHeader.tsx": $header_StampOverviewHeader,
+    "./islands/header/WalletDashboardHeader.tsx": $header_WalletDashboardHeader,
+    "./islands/header/WalletProfileHeader.tsx": $header_WalletProfileHeader,
     "./islands/header/index.ts": $header_index,
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
     "./islands/layout/Footer.tsx": $layout_Footer,
