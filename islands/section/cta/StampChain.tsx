@@ -11,10 +11,10 @@ export const StampChainModule = () => {
     ">
       <div className="col-span1 desktop:col-span-2">
         {/* ===== HEADER SECTION ===== */}
-        <h1 className={titleGreyDL}>STAMPCHAIN</h1>
-        <h2 className={subtitleGrey}>
+        <h3 className={titleGreyDL}>STAMPCHAIN</h3>
+        <h4 className={subtitleGrey}>
           THE CREATORS OF BITCOIN STAMPS
-        </h2>
+        </h4>
         {/* ===== CONTENT SECTION ===== */}
         <div className={`flex flex-col ${text}`}>
           <p>

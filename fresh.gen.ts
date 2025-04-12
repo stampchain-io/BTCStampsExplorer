@@ -146,9 +146,6 @@ import * as $Wallet_details_WalletDispenserDetails from "./islands/Wallet/detail
 import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHeader.tsx";
 import * as $Wallet_details_WalletProfileDetails from "./islands/Wallet/details/WalletProfileDetails.tsx";
 import * as $Wallet_details_styles from "./islands/Wallet/details/styles.ts";
-import * as $about_AboutContact from "./islands/about/AboutContact.tsx";
-import * as $about_AboutDonate from "./islands/about/AboutDonate.tsx";
-import * as $about_types from "./islands/about/types.ts";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
 import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
@@ -211,6 +208,8 @@ import * as $search_SRC20Search from "./islands/search/SRC20Search.tsx";
 import * as $search_StampSearch from "./islands/search/StampSearch.tsx";
 import * as $search_index from "./islands/search/index.ts";
 import * as $search_styles from "./islands/search/styles.ts";
+import * as $section_cta_ContactCta from "./islands/section/cta/ContactCta.tsx";
+import * as $section_cta_DonateCta from "./islands/section/cta/DonateCta.tsx";
 import * as $section_cta_GetStamping from "./islands/section/cta/GetStamping.tsx";
 import * as $section_cta_NamedAssets from "./islands/section/cta/NamedAssets.tsx";
 import * as $section_cta_RecursiveLayering from "./islands/section/cta/RecursiveLayering.tsx";
@@ -436,9 +435,6 @@ const manifest = {
     "./islands/Wallet/details/WalletProfileDetails.tsx":
       $Wallet_details_WalletProfileDetails,
     "./islands/Wallet/details/styles.ts": $Wallet_details_styles,
-    "./islands/about/AboutContact.tsx": $about_AboutContact,
-    "./islands/about/AboutDonate.tsx": $about_AboutDonate,
-    "./islands/about/types.ts": $about_types,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
     "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
@@ -511,6 +507,8 @@ const manifest = {
     "./islands/search/StampSearch.tsx": $search_StampSearch,
     "./islands/search/index.ts": $search_index,
     "./islands/search/styles.ts": $search_styles,
+    "./islands/section/cta/ContactCta.tsx": $section_cta_ContactCta,
+    "./islands/section/cta/DonateCta.tsx": $section_cta_DonateCta,
     "./islands/section/cta/GetStamping.tsx": $section_cta_GetStamping,
     "./islands/section/cta/NamedAssets.tsx": $section_cta_NamedAssets,
     "./islands/section/cta/RecursiveLayering.tsx":

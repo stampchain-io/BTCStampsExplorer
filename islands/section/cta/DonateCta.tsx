@@ -4,11 +4,7 @@ import { StampCard } from "$card";
 import { StampRow } from "$globals";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
 import DonateStampModal from "$islands/modal/DonateStampModal.tsx";
-import {
-  DonateStampData,
-  Transaction,
-  TxOutput,
-} from "$islands/about/types.ts";
+import { DonateStampData, Transaction, TxOutput } from "$layout";
 import { headingGrey, label, subtitlePurple, text, titlePurpleLD } from "$text";
 import { tooltipIcon } from "$notification";
 import { Button } from "$button";
@@ -26,7 +22,7 @@ const DONATE_STAMP: DonateStampData = {
 };
 
 /* ===== STATE ===== */
-export default function AboutDonate() {
+export default function DonateCta() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [fee, setFee] = useState<number>(0);
   const [monthlyDonations, setMonthlyDonations] = useState<number>(0);
@@ -300,8 +296,8 @@ export default function AboutDonate() {
       <section>
         {/* ===== HEADER SECTION ===== */}
         <div className="w-full flex flex-col justify-center items-start">
-          <h1 className={titlePurpleLD}>DONATE</h1>
-          <h2 className={subtitlePurple}>TO THE DEV FUND</h2>
+          <h3 className={titlePurpleLD}>DONATE</h3>
+          <h4 className={subtitlePurple}>TO THE DEV FUND</h4>
         </div>
         {/* ===== MAIN CONTENT SECTION ===== */}
         <p className={`${text} tablet:hidden block mb-0`}>

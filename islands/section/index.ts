@@ -1,21 +1,5 @@
 /* ===== SECTIONS ===== */
-/* ===== HOW TO ===== */
-export * from "$islands/section/howto/HowToStamp.tsx";
-export * from "$islands/section/howto/HowToTransferStamp.tsx";
-export * from "$islands/section/howto/HowToDeployToken.tsx";
-export * from "$islands/section/howto/HowToMintToken.tsx";
-export * from "$islands/section/howto/HowToTransferToken.tsx";
-export * from "$islands/section/howto/HowToRegisterBitname.tsx";
-
-/* ===== CTA =====
-export { default as AboutDonate } from "$islands/section/cta/AboutDonate.tsx";
-export { default as AboutContact } from "$islands/section/cta/AboutContact.tsx"; */
-export * from "$islands/section/cta/StampChain.tsx";
-export * from "$islands/section/cta/GetStamping.tsx";
-export * from "$islands/section/cta/NamedAssets.tsx";
-export * from "$islands/section/cta/RecursiveLayering.tsx";
-
-/* ===== SECTION GALLERIES =====
+/* ===== GALLERIES =====
 export * from "$islands/section/gallery/StampOverviewGallery.tsx"; */
 export { default as StampGallery } from "$islands/section/gallery/StampGallery.tsx";
 export * from "$islands/section/gallery/SRC20Gallery.tsx";
@@ -38,3 +22,20 @@ export { default as SRC20DeploysGallery } from "$islands/section/gallery/SRC20De
 export { default as SRC20MintsGallery } from "$islands/section/gallery/SRC20Mints.tsx";
 export { default as SRC20TransfersGallery } from "$islands/section/gallery/SRC20Transfers.tsx";
 export { default as SRC101RegistersGallery } from "$islands/section/gallery/SRC101RegistersWIP.tsx";
+/* ===== HOW TO ===== */
+export * from "$islands/section/howto/HowToStamp.tsx";
+export * from "$islands/section/howto/HowToTransferStamp.tsx";
+export * from "$islands/section/howto/HowToDeployToken.tsx";
+export * from "$islands/section/howto/HowToMintToken.tsx";
+export * from "$islands/section/howto/HowToTransferToken.tsx";
+export * from "$islands/section/howto/HowToRegisterBitname.tsx";
+
+/* ===== CTA ===== */
+export * from "$islands/section/cta/StampChain.tsx";
+export * from "$islands/section/cta/GetStamping.tsx";
+export * from "$islands/section/cta/NamedAssets.tsx";
+export * from "$islands/section/cta/RecursiveLayering.tsx";
+/* I have no idea why, but these two files cannot be exported - it breaks the display of the tools */
+/* Direct path import in /routes/about/index.tsx instead */
+/* export * from "$islands/section/cta/DonateCta.tsx"; */
+/* export * from "$islands/section/cta/ContactCta.tsx"; */

@@ -7,7 +7,7 @@ import { subtitleGrey, text, titleGreyLD } from "$text";
 import { gapGrid, rowForm, rowResponsiveForm } from "$layout";
 
 /* ===== STATE ===== */
-const AboutContact = () => {
+const ContactCta = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [subject, setSubject] = useState<string>("");
@@ -31,12 +31,12 @@ const AboutContact = () => {
       <section>
         {/* ===== HEADER SECTION ===== */}
         <div className="flex flex-col">
-          <h1 className={titleGreyLD}>
+          <h4 className={titleGreyLD}>
             CONTACT
-          </h1>
-          <h3 className={subtitleGrey}>
+          </h4>
+          <h5 className={subtitleGrey}>
             DROP US A MESSAGE
-          </h3>
+          </h5>
         </div>
         {/* ===== CONTENT SECTION ===== */}
         <div className={`flex flex-col mobileLg:flex-row ${gapGrid}`}>
@@ -130,4 +130,4 @@ const AboutContact = () => {
   );
 };
 
-export default AboutContact;
+export default ContactCta;

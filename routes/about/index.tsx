@@ -1,9 +1,10 @@
 /* ===== ABOUT PAGE ===== */
+/* ContactCta + DonateCta MUST use direct path imports - CANNOT use barrel file exports */
 import { body, gapSectionSlim } from "$layout";
 import { AboutHeader } from "$header";
+import DonateCta from "$islands/section/cta/DonateCta.tsx";
+import ContactCta from "$islands/section/cta/ContactCta.tsx";
 import { PartnersGallery, TeamGallery } from "$section";
-import AboutDonate from "$islands/about/AboutDonate.tsx";
-import AboutContact from "$islands/about/AboutContact.tsx";
 
 /* ===== PAGE COMPONENT ===== */
 export default function AboutPage() {
@@ -38,11 +39,11 @@ export default function AboutPage() {
 
       {/* ===== DONATE SECTION ===== */}
       <div id="donate"></div>
-      <AboutDonate />
+      <DonateCta />
 
       {/* ===== CONTACT SECTION ===== */}
       <div id="contact"></div>
-      <AboutContact />
+      <ContactCta />
     </div>
   );
 }
