@@ -157,13 +157,17 @@ import * as $collection_CollectionSection from "./islands/collection/CollectionS
 import * as $collection_artist_ArtistCollectionWIP from "./islands/collection/artist/ArtistCollectionWIP.tsx";
 import * as $collection_artist_CollectionCreateButtonWIP from "./islands/collection/artist/CollectionCreateButtonWIP.tsx";
 import * as $collection_artist_CollectionOverviewArtistContentWIP from "./islands/collection/artist/CollectionOverviewArtistContentWIP.tsx";
-import * as $collection_details_CollectionDetailsContent from "./islands/collection/details/CollectionDetailsContent.tsx";
 import * as $collection_index_1 from "./islands/collection/index.ts";
+import * as $content_CollectionDetailContent from "./islands/content/CollectionDetailContent.tsx";
+import * as $content_StampOverviewContent from "./islands/content/StampOverviewContent.tsx";
 import * as $content_blockContent_BlockSelector from "./islands/content/blockContent/BlockSelector.tsx";
 import * as $content_blockContent_BlockTransactions from "./islands/content/blockContent/BlockTransactions.tsx";
 import * as $content_faqContent_AccordionBase from "./islands/content/faqContent/AccordionBase.tsx";
 import * as $content_faqContent_FaqAccordion from "./islands/content/faqContent/FaqAccordion.tsx";
 import * as $content_index from "./islands/content/index.ts";
+import * as $content_stampDetailContent_StampImage from "./islands/content/stampDetailContent/StampImage.tsx";
+import * as $content_stampDetailContent_StampInfo from "./islands/content/stampDetailContent/StampInfo.tsx";
+import * as $content_stampDetailContent_StampTextContent from "./islands/content/stampDetailContent/StampTextContent.tsx";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Layout from "./islands/datacontrol/Layout.ts";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
@@ -232,11 +236,6 @@ import * as $search_StampSearch from "./islands/search/StampSearch.tsx";
 import * as $search_index from "./islands/search/index.ts";
 import * as $search_styles from "./islands/search/styles.ts";
 import * as $src20_ChartWidget from "./islands/src20/ChartWidget.tsx";
-import * as $stamp_StampOverviewContent from "./islands/stamp/StampOverviewContent.tsx";
-import * as $stamp_detail_StampImage from "./islands/stamp/detail/StampImage.tsx";
-import * as $stamp_detail_StampInfo from "./islands/stamp/detail/StampInfo.tsx";
-import * as $stamp_detail_StampTextContent from "./islands/stamp/detail/StampTextContent.tsx";
-import * as $stamp_index_1 from "./islands/stamp/index.ts";
 import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
 import * as $table_HoldersTableBase from "./islands/table/HoldersTableBase.tsx";
 import * as $table_index from "./islands/table/index.ts";
@@ -448,9 +447,10 @@ const manifest = {
       $collection_artist_CollectionCreateButtonWIP,
     "./islands/collection/artist/CollectionOverviewArtistContentWIP.tsx":
       $collection_artist_CollectionOverviewArtistContentWIP,
-    "./islands/collection/details/CollectionDetailsContent.tsx":
-      $collection_details_CollectionDetailsContent,
     "./islands/collection/index.ts": $collection_index_1,
+    "./islands/content/CollectionDetailContent.tsx":
+      $content_CollectionDetailContent,
+    "./islands/content/StampOverviewContent.tsx": $content_StampOverviewContent,
     "./islands/content/blockContent/BlockSelector.tsx":
       $content_blockContent_BlockSelector,
     "./islands/content/blockContent/BlockTransactions.tsx":
@@ -460,6 +460,12 @@ const manifest = {
     "./islands/content/faqContent/FaqAccordion.tsx":
       $content_faqContent_FaqAccordion,
     "./islands/content/index.ts": $content_index,
+    "./islands/content/stampDetailContent/StampImage.tsx":
+      $content_stampDetailContent_StampImage,
+    "./islands/content/stampDetailContent/StampInfo.tsx":
+      $content_stampDetailContent_StampInfo,
+    "./islands/content/stampDetailContent/StampTextContent.tsx":
+      $content_stampDetailContent_StampTextContent,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
     "./islands/datacontrol/Layout.ts": $datacontrol_Layout,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
@@ -530,12 +536,6 @@ const manifest = {
     "./islands/search/index.ts": $search_index,
     "./islands/search/styles.ts": $search_styles,
     "./islands/src20/ChartWidget.tsx": $src20_ChartWidget,
-    "./islands/stamp/StampOverviewContent.tsx": $stamp_StampOverviewContent,
-    "./islands/stamp/detail/StampImage.tsx": $stamp_detail_StampImage,
-    "./islands/stamp/detail/StampInfo.tsx": $stamp_detail_StampInfo,
-    "./islands/stamp/detail/StampTextContent.tsx":
-      $stamp_detail_StampTextContent,
-    "./islands/stamp/index.ts": $stamp_index_1,
     "./islands/table/DataTableBase.tsx": $table_DataTableBase,
     "./islands/table/HoldersTableBase.tsx": $table_HoldersTableBase,
     "./islands/table/index.ts": $table_index,

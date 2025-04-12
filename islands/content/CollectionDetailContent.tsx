@@ -3,7 +3,7 @@ import { StampRow } from "$globals";
 import { StampCard } from "$card";
 
 /* ===== COMPONENT ===== */
-export const CollectionDetailsContent = ({ stamps = [] }: {
+export const CollectionDetailContent = ({ stamps = [] }: {
   stamps: StampRow[];
 }) => {
   return (

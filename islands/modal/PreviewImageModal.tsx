@@ -1,7 +1,7 @@
 /* ===== PREVIEW IMAGE MODAL COMPONENT ===== */
 import { useEffect } from "preact/hooks";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
-import TextContentIsland from "$islands/stamp/detail/StampTextContent.tsx";
+import TextContentIsland from "../content/stampDetailContent/StampTextContent.tsx";
 import { modalBgCenter } from "$layout";
 
 /* ===== TYPES ===== */
