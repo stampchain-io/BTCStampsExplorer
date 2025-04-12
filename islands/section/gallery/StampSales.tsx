@@ -1,8 +1,8 @@
 /* ===== RECENT SALES COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
 import { useEffect, useState } from "preact/hooks";
-import { StampGallery } from "$gallery";
 import type { StampRow } from "$globals";
+import { StampGallery } from "$section";
 import { titlePurpleLD } from "$text";
 
 /* ===== TYPES ===== */

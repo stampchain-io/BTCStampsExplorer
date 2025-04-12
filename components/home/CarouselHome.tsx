@@ -1,5 +1,5 @@
 import { StampRow } from "$globals";
-import { CarouselGallery, SwiperStyles } from "$gallery";
+import { CarouselGallery, SwiperStyles } from "$section";
 
 interface CarouselHomeProps {
   carouselStamps: StampRow[];

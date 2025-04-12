@@ -8,11 +8,12 @@ import { StampController } from "$server/controller/stampController.ts";
 import { Micro5FontLoader } from "$layout";
 import {
   CarouselHome,
+  GetStampingModule,
   PartnersGallery,
   SRC20Gallery,
+  StampChainModule,
   StampSalesGallery,
-} from "$gallery";
-import { GetStampingModule, StampChainModule } from "$section";
+} from "$section";
 
 // Define the shape of pageData from StampController.getHomePageData()
 interface StampControllerData {

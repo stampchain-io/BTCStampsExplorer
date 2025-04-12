@@ -10,12 +10,10 @@ import {
   HowToDeployTokenModule,
   HowToMintTokenModule,
   HowToTransferTokenModule,
-} from "$section";
-import {
   SRC20DeploysGallery,
   SRC20MintsGallery,
   SRC20TransfersGallery,
-} from "$gallery";
+} from "$section";
 
 /* ===== TYPES ===== */
 interface ToolSrc20PageProps {

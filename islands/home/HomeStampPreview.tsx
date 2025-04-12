@@ -6,8 +6,7 @@ import {
   StampRow,
 } from "$globals";
 
-import { StampGallery } from "$gallery";
-import { CollectionGallery } from "$gallery";
+import { CollectionGallery, StampGallery } from "$section";
 import { titlePurpleDL } from "$text";
 
 interface HomeStampPreviewProps {

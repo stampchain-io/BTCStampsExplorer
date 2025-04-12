@@ -179,21 +179,6 @@ import * as $form_InputField from "./islands/form/InputField.tsx";
 import * as $form_SRC20InputField from "./islands/form/SRC20InputField.tsx";
 import * as $form_SelectDate from "./islands/form/SelectDate.tsx";
 import * as $form_SelectField from "./islands/form/SelectField.tsx";
-import * as $gallery_ArtistGallery from "./islands/gallery/ArtistGallery.tsx";
-import * as $gallery_Carousel from "./islands/gallery/Carousel.tsx";
-import * as $gallery_CollectionGallery from "./islands/gallery/CollectionGallery.tsx";
-import * as $gallery_Partners from "./islands/gallery/Partners.tsx";
-import * as $gallery_SRC101RegistersWIP from "./islands/gallery/SRC101RegistersWIP.tsx";
-import * as $gallery_SRC20Deploys from "./islands/gallery/SRC20Deploys.tsx";
-import * as $gallery_SRC20Gallery from "./islands/gallery/SRC20Gallery.tsx";
-import * as $gallery_SRC20Mints from "./islands/gallery/SRC20Mints.tsx";
-import * as $gallery_SRC20Transfers from "./islands/gallery/SRC20Transfers.tsx";
-import * as $gallery_StampGallery from "./islands/gallery/StampGallery.tsx";
-import * as $gallery_StampSales from "./islands/gallery/StampSales.tsx";
-import * as $gallery_StampTransfers from "./islands/gallery/StampTransfers.tsx";
-import * as $gallery_SwiperStyles from "./islands/gallery/SwiperStyles.tsx";
-import * as $gallery_Team from "./islands/gallery/Team.tsx";
-import * as $gallery_index from "./islands/gallery/index.ts";
 import * as $header_AboutHeader from "./islands/header/AboutHeader.tsx";
 import * as $header_BlockHeader from "./islands/header/BlockHeader.tsx";
 import * as $header_CollectionDetailHeader from "./islands/header/CollectionDetailHeader.tsx";
@@ -230,6 +215,20 @@ import * as $section_cta_GetStamping from "./islands/section/cta/GetStamping.tsx
 import * as $section_cta_NamedAssets from "./islands/section/cta/NamedAssets.tsx";
 import * as $section_cta_RecursiveLayering from "./islands/section/cta/RecursiveLayering.tsx";
 import * as $section_cta_StampChain from "./islands/section/cta/StampChain.tsx";
+import * as $section_gallery_ArtistGallery from "./islands/section/gallery/ArtistGallery.tsx";
+import * as $section_gallery_Carousel from "./islands/section/gallery/Carousel.tsx";
+import * as $section_gallery_CollectionGallery from "./islands/section/gallery/CollectionGallery.tsx";
+import * as $section_gallery_Partners from "./islands/section/gallery/Partners.tsx";
+import * as $section_gallery_SRC101RegistersWIP from "./islands/section/gallery/SRC101RegistersWIP.tsx";
+import * as $section_gallery_SRC20Deploys from "./islands/section/gallery/SRC20Deploys.tsx";
+import * as $section_gallery_SRC20Gallery from "./islands/section/gallery/SRC20Gallery.tsx";
+import * as $section_gallery_SRC20Mints from "./islands/section/gallery/SRC20Mints.tsx";
+import * as $section_gallery_SRC20Transfers from "./islands/section/gallery/SRC20Transfers.tsx";
+import * as $section_gallery_StampGallery from "./islands/section/gallery/StampGallery.tsx";
+import * as $section_gallery_StampSales from "./islands/section/gallery/StampSales.tsx";
+import * as $section_gallery_StampTransfers from "./islands/section/gallery/StampTransfers.tsx";
+import * as $section_gallery_SwiperStyles from "./islands/section/gallery/SwiperStyles.tsx";
+import * as $section_gallery_Team from "./islands/section/gallery/Team.tsx";
 import * as $section_howto_HowToDeployToken from "./islands/section/howto/HowToDeployToken.tsx";
 import * as $section_howto_HowToMintToken from "./islands/section/howto/HowToMintToken.tsx";
 import * as $section_howto_HowToRegisterBitname from "./islands/section/howto/HowToRegisterBitname.tsx";
@@ -478,21 +477,6 @@ const manifest = {
     "./islands/form/SRC20InputField.tsx": $form_SRC20InputField,
     "./islands/form/SelectDate.tsx": $form_SelectDate,
     "./islands/form/SelectField.tsx": $form_SelectField,
-    "./islands/gallery/ArtistGallery.tsx": $gallery_ArtistGallery,
-    "./islands/gallery/Carousel.tsx": $gallery_Carousel,
-    "./islands/gallery/CollectionGallery.tsx": $gallery_CollectionGallery,
-    "./islands/gallery/Partners.tsx": $gallery_Partners,
-    "./islands/gallery/SRC101RegistersWIP.tsx": $gallery_SRC101RegistersWIP,
-    "./islands/gallery/SRC20Deploys.tsx": $gallery_SRC20Deploys,
-    "./islands/gallery/SRC20Gallery.tsx": $gallery_SRC20Gallery,
-    "./islands/gallery/SRC20Mints.tsx": $gallery_SRC20Mints,
-    "./islands/gallery/SRC20Transfers.tsx": $gallery_SRC20Transfers,
-    "./islands/gallery/StampGallery.tsx": $gallery_StampGallery,
-    "./islands/gallery/StampSales.tsx": $gallery_StampSales,
-    "./islands/gallery/StampTransfers.tsx": $gallery_StampTransfers,
-    "./islands/gallery/SwiperStyles.tsx": $gallery_SwiperStyles,
-    "./islands/gallery/Team.tsx": $gallery_Team,
-    "./islands/gallery/index.ts": $gallery_index,
     "./islands/header/AboutHeader.tsx": $header_AboutHeader,
     "./islands/header/BlockHeader.tsx": $header_BlockHeader,
     "./islands/header/CollectionDetailHeader.tsx":
@@ -532,6 +516,25 @@ const manifest = {
     "./islands/section/cta/RecursiveLayering.tsx":
       $section_cta_RecursiveLayering,
     "./islands/section/cta/StampChain.tsx": $section_cta_StampChain,
+    "./islands/section/gallery/ArtistGallery.tsx":
+      $section_gallery_ArtistGallery,
+    "./islands/section/gallery/Carousel.tsx": $section_gallery_Carousel,
+    "./islands/section/gallery/CollectionGallery.tsx":
+      $section_gallery_CollectionGallery,
+    "./islands/section/gallery/Partners.tsx": $section_gallery_Partners,
+    "./islands/section/gallery/SRC101RegistersWIP.tsx":
+      $section_gallery_SRC101RegistersWIP,
+    "./islands/section/gallery/SRC20Deploys.tsx": $section_gallery_SRC20Deploys,
+    "./islands/section/gallery/SRC20Gallery.tsx": $section_gallery_SRC20Gallery,
+    "./islands/section/gallery/SRC20Mints.tsx": $section_gallery_SRC20Mints,
+    "./islands/section/gallery/SRC20Transfers.tsx":
+      $section_gallery_SRC20Transfers,
+    "./islands/section/gallery/StampGallery.tsx": $section_gallery_StampGallery,
+    "./islands/section/gallery/StampSales.tsx": $section_gallery_StampSales,
+    "./islands/section/gallery/StampTransfers.tsx":
+      $section_gallery_StampTransfers,
+    "./islands/section/gallery/SwiperStyles.tsx": $section_gallery_SwiperStyles,
+    "./islands/section/gallery/Team.tsx": $section_gallery_Team,
     "./islands/section/howto/HowToDeployToken.tsx":
       $section_howto_HowToDeployToken,
     "./islands/section/howto/HowToMintToken.tsx": $section_howto_HowToMintToken,

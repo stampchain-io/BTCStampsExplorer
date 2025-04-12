@@ -1,10 +1,9 @@
 /* ===== STAMP TOOLS PAGE ===== */
 /*@baba-71-82*/
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { body, gapSection } from "$layout";
 import { StampTransferTool } from "$tool";
-import { StampTransfersGallery } from "$gallery";
-import { HowToTransferStampModule } from "$section";
+import { HowToTransferStampModule, StampTransfersGallery } from "$section";
+import { body, gapSection } from "$layout";
 
 /* ===== TYPES ===== */
 interface ToolStampPageProps {

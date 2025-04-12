@@ -5,7 +5,7 @@ import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { SRC20Gallery, StampGallery } from "$gallery";
+import { SRC20Gallery, StampGallery } from "$section";
 import { WalletContentProps } from "$types/wallet.d.ts";
 import { Dispenser } from "$types/index.d.ts";
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";

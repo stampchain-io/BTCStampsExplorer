@@ -11,7 +11,7 @@ import { RouteType } from "$server/services/cacheService.ts";
 import { DOMParser } from "dom";
 import { body } from "$layout";
 import { StampImage, StampInfo } from "$content";
-import { StampGallery } from "$gallery";
+import { StampGallery } from "$section";
 import { DataTableBase, HoldersTable } from "$table";
 
 /* ===== TYPES ===== */

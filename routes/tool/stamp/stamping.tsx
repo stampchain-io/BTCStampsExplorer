@@ -3,10 +3,9 @@
 import type { StampRow } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { body, gapSection } from "$layout";
-import { StampGallery } from "$gallery";
 import { StampingTool } from "$tool";
-import { HowToStampModule } from "$section";
+import { HowToStampModule, StampGallery } from "$section";
+import { body, gapSection } from "$layout";
 
 /* ===== TYPES ===== */
 interface StampPageData {

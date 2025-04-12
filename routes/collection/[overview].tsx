@@ -7,7 +7,7 @@ import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { CollectionRow } from "$server/types/collection.d.ts";
 import { StampOverviewContent } from "$content";
-import { ArtistGallery } from "$gallery";
+import { ArtistGallery } from "$section";
 import { CollectionOverviewHeader } from "$header";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 

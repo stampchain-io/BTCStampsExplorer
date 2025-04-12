@@ -10,8 +10,13 @@ import { CollectionController } from "$server/controller/collectionController.ts
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionRow } from "$server/types/collection.d.ts";
 import { body, gapSection } from "$layout";
-import { NamedAssetsModule, RecursiveLayeringModule } from "$section";
-import { ArtistGallery, CollectionGallery, StampGallery } from "$gallery";
+import {
+  ArtistGallery,
+  CollectionGallery,
+  NamedAssetsModule,
+  RecursiveLayeringModule,
+  StampGallery,
+} from "$section";
 
 /* ===== TYPES ===== */
 type CollectionLandingPageProps = {
