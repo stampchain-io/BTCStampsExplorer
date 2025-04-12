@@ -10,7 +10,7 @@ import { enrichTokensWithMarketData } from "$server/services/src20Service.ts";
 import { PaginatedResponse } from "$lib/types/pagination.d.ts";
 import { DispenserRow, SRC20Row, StampRow } from "$globals";
 import { WalletDashboardHeader } from "$header";
-import WalletDashboardDetails from "$islands/Wallet/details/WalletDashboardDetails.tsx";
+import WalletDashboardDetails from "$islands/content/WalletDashboardDetails.tsx";
 import { WalletDashboardContent } from "$content";
 
 /* ===== HELPERS ===== */

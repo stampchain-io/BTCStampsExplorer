@@ -3,12 +3,10 @@ import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import {
-  backgroundContainer,
-  titleGreyDL,
-  tooltipIcon,
-} from "$components/shared/WalletStyles.ts";
 import { StatItem, StatTitle } from "$components/shared/WalletComponents.tsx";
+import { containerBackground } from "$layout";
+import { titleGreyLD } from "$text";
+import { tooltipIcon } from "$notification";
 
 interface WalletDashboardDetailsProps {
   walletData: WalletOverviewInfo;
@@ -422,7 +420,7 @@ function DashboardProfile() {
           />
         </div>
         <div class="flex ml-1.5 mobileMd:ml-0 mt-1.5 mobileMd:-mt-2 mobileLg:mt-0">
-          <p class={titleGreyDL}>
+          <p class={titleGreyLD}>
             ANONYMOUS
           </p>
         </div>
@@ -511,7 +509,7 @@ function WalletStats(
   return (
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
       <div class="flex flex-col w-full">
-        <div className={backgroundContainer}>
+        <div className={containerBackground}>
           <StampStats
             stampsTotal={stampsTotal}
             stampsCreated={stampsCreated}
@@ -521,7 +519,7 @@ function WalletStats(
         </div>
       </div>
       <div class="flex flex-col w-full">
-        <div className={backgroundContainer}>
+        <div className={containerBackground}>
           <DispenserStats
             dispensers={{
               open: dispensers?.open ?? 0,
@@ -533,7 +531,7 @@ function WalletStats(
         </div>
       </div>
       <div class="flex flex-col w-full">
-        <div className={backgroundContainer}>
+        <div className={containerBackground}>
           <TokenStats
             src20Total={src20Total}
             handleType={handleType}
@@ -688,12 +686,12 @@ export default function WalletDashboardDetails({
     <div class="flex flex-col w-full gap-3 mobileMd:gap-6">
       <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
         <div class="flex flex-col w-full mobileLg:w-1/2 tablet:w-2/3">
-          <div className={backgroundContainer}>
+          <div className={containerBackground}>
             <DashboardProfile />
           </div>
         </div>
         <div class="flex flex-col w-full mobileLg:w-1/2 tablet:w-1/3">
-          <div className={backgroundContainer}>
+          <div className={containerBackground}>
             <WalletOverview
               walletData={walletData}
               onSend={() => setIsSendModalOpen(true)}

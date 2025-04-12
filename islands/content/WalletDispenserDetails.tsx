@@ -1,18 +1,14 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
-import { StampImage } from "$content";
-import {
-  backgroundContainer,
-  buttonPurpleFlat,
-  dataValueXs,
-  subTitleGrey,
-  titleGreyDL,
-  tooltipIcon,
-} from "$components/shared/WalletStyles.ts";
 import { StampRow } from "$globals";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { StatItem, StatTitle } from "$components/shared/WalletComponents.tsx";
+import { StampImage } from "$content";
+import { containerBackground } from "$layout";
+import { subtitleGrey, titleGreyLD, valueXs } from "$text";
+import { Button } from "$button";
+import { tooltipIcon } from "$notification";
 
 interface WalletDispenserDetailsProps {
   walletData: WalletOverviewInfo;
@@ -319,7 +315,7 @@ function DispenserStats({
           label="ESCROW"
           value={
             <>
-              <span class={dataValueXs}>
+              <span class={valueXs}>
                 {firstDispenser.escrow_quantity.toString()}
               </span>
             </>
@@ -329,7 +325,7 @@ function DispenserStats({
           label="GIVE"
           value={
             <>
-              <span class={dataValueXs}>
+              <span class={valueXs}>
                 {firstDispenser.give_quantity.toString()}
               </span>
             </>
@@ -340,7 +336,7 @@ function DispenserStats({
           label="REMAIN"
           value={
             <>
-              <span class={dataValueXs}>
+              <span class={valueXs}>
                 {firstDispenser.give_remaining.toString()}
               </span>
             </>
@@ -372,14 +368,15 @@ function DispenserStats({
       {firstDispenser?.give_remaining > 0 && (
         <>
           <div className="flex justify-end pt-1.5">
-            <button
-              class={buttonPurpleFlat}
+            <Button
+              variant="outline"
+              color="purple"
+              size="lg"
               onClick={handleOpenBuyModal}
             >
               BUY
-            </button>
+            </Button>
           </div>
-
           {showBuyModal && (
             <BuyStampModal
               stamp={firstDispenser.stamp}
@@ -457,20 +454,20 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   return (
     <div class="flex flex-col">
       <div class="flex pb-1.5 mobileLg:pb-3">
-        <p class={titleGreyDL}>DISPENSER</p>
+        <p class={titleGreyLD}>DISPENSER</p>
       </div>
-      <div class="flex gap-3 mobileMd:gap-6">
+      <div class="flex gap-6">
         <div class="flex">
           <p
-            class={`${subTitleGrey} hidden mobileMd:block mobileLg:hidden desktop:block`}
+            class={`${subtitleGrey} hidden mobileMd:block mobileLg:hidden desktop:block`}
           >
             {walletData.address}
           </p>
-          <p class={`${subTitleGrey} hidden tablet:block desktop:hidden`}>
+          <p class={`${subtitleGrey} hidden tablet:block desktop:hidden`}>
             {abbreviateAddress(walletData.address, 14)}
           </p>
           <p
-            class={`${subTitleGrey} block mobileMd:hidden mobileLg:block tablet:hidden`}
+            class={`${subtitleGrey} block mobileMd:hidden mobileLg:block tablet:hidden`}
           >
             {abbreviateAddress(walletData.address, 10)}
           </p>
@@ -517,16 +514,16 @@ export default function WalletDispenserDetails({
   const stampData = firstDispenser?.stamp;
 
   return (
-    <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-      <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-2/3 gap-3 mobileMd:gap-6">
-        <div className={backgroundContainer}>
+    <div class="flex flex-col mobileLg:flex-row gap-6">
+      <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-2/3 gap-6">
+        <div className={containerBackground}>
           <WalletOverview walletData={walletData} />
           <DispenserStats
             dispensers={walletData.dispensers}
             btcPrice={walletData.btcPrice}
           />
         </div>
-        <div className={backgroundContainer}>
+        <div className={containerBackground}>
           <StampStats
             dispensers={walletData.dispensers}
             walletData={walletData}
@@ -535,7 +532,7 @@ export default function WalletDispenserDetails({
       </div>
       {stampData && (
         <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-1/3">
-          <div className={backgroundContainer}>
+          <div className={containerBackground}>
             <StampImage
               stamp={stampData}
               className="w-full h-full"

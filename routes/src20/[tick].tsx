@@ -3,7 +3,7 @@ import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20DetailHeader } from "$header";
 import { DataTableBase, HoldersTable } from "$table";
-import ChartWidget from "$islands/src20/ChartWidget.tsx";
+import ChartWidget from "$islands/layout/ChartWidget.tsx";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {

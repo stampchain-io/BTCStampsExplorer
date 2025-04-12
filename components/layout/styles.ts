@@ -83,3 +83,14 @@ export type LayoutStyles = {
   modalBgTop: string;
   modalSearch: string;
 };
+
+/* ===== ALIGNMENT UTILITIES ===== */
+// Used in WalletComponents.tsx
+export const alignmentClasses = {
+  left: "text-left",
+  center: "text-center",
+  right: "text-right",
+} as const;
+
+// Type for alignment options
+export type AlignmentType = keyof typeof alignmentClasses;

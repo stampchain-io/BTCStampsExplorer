@@ -17,8 +17,8 @@ import { DEFAULT_PAGINATION } from "$server/services/routeValidationService.ts";
 import { WalletOverviewInfo } from "$types/wallet.d.ts";
 import { WalletProfileHeader } from "$header";
 import { WalletProfileContent } from "$content";
-import WalletProfileDetails from "$islands/Wallet/details/WalletProfileDetails.tsx";
-import WalletDispenserDetails from "$islands/Wallet/details/WalletDispenserDetails.tsx";
+import WalletProfileDetails from "$islands/content/WalletProfileDetails.tsx";
+import WalletDispenserDetails from "$islands/content/WalletDispenserDetails.tsx";
 
 /* ===== SERVER HANDLER ===== */
 /**

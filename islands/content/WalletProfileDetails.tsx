@@ -1,14 +1,10 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import {
-  backgroundContainer,
-  dataLabelSm,
-  subTitleGrey,
-  titleGreyDL,
-  tooltipIcon,
-} from "$components/shared/WalletStyles.ts";
 import { StatItem, StatTitle } from "$components/shared/WalletComponents.tsx";
+import { containerBackground } from "$layout";
+import { labelSm, subtitleGrey, titleGreyLD } from "$text";
+import { tooltipIcon } from "$notification";
 
 interface WalletProfileDetailsProps {
   walletData: WalletOverviewInfo;
@@ -85,22 +81,22 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   return (
     <div class="flex flex-col">
       <div class="flex pb-1.5 mobileLg:pb-3">
-        <p class={titleGreyDL}>ANONYMOUS</p>
+        <p class={titleGreyLD}>ANONYMOUS</p>
       </div>
       <div class="flex gap-3 mobileMd:gap-6">
         <div class="flex">
           <p
-            class={`${subTitleGrey} hidden mobileMd:block mobileLg:hidden tablet:block`}
+            class={`${subtitleGrey} hidden mobileMd:block mobileLg:hidden tablet:block`}
           >
             {walletData.address}
           </p>
           <p
-            class={`${subTitleGrey} hidden mobileLg:block tablet:hidden`}
+            class={`${subtitleGrey} hidden mobileLg:block tablet:hidden`}
           >
             {abbreviateAddress(walletData.address, 10)}
           </p>
           <p
-            class={`${subTitleGrey} block mobileMd:hidden`}
+            class={`${subtitleGrey} block mobileMd:hidden`}
           >
             {abbreviateAddress(walletData.address, 14)}
           </p>
@@ -153,7 +149,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
             </div>
           )
           : (
-            <p class={dataLabelSm}>
+            <p class={labelSm}>
               NO BITNAMES
             </p>
           )}
@@ -263,9 +259,9 @@ function WalletStats(
   };
 
   return (
-    <div class="flex flex-col w-full mobileMd:flex-row tablet:flex-col gap-3 mobileMd:gap-6">
+    <div class="flex flex-col w-full mobileMd:flex-row tablet:flex-col gap-6">
       <div class="w-full mobileMd:w-1/2 tablet:w-full">
-        <div className={backgroundContainer}>
+        <div className={containerBackground}>
           <TokenStats
             src20Total={src20Total}
             handleType={handleType}
@@ -275,7 +271,7 @@ function WalletStats(
         </div>
       </div>
       <div class="w-full mobileMd:w-1/2 tablet:w-full">
-        <div className={backgroundContainer}>
+        <div className={containerBackground}>
           <StampStats
             stampsTotal={stampsTotal}
             stampsCreated={stampsCreated}
@@ -298,9 +294,9 @@ export default function WalletProfileDetails({
   setShowItem,
 }: WalletProfileDetailsProps) {
   return (
-    <div class="flex flex-col tablet:flex-row gap-3 mobileMd:gap-6">
+    <div class="flex flex-col tablet:flex-row gap-6">
       <div className="flex flex-col h-fit w-full tablet:w-2/3">
-        <div className={backgroundContainer}>
+        <div className={containerBackground}>
           <WalletOverview walletData={walletData} />
         </div>
       </div>

@@ -137,11 +137,6 @@ import * as $WIP_artist_ArtistCollectionWIP from "./islands/WIP/artist/ArtistCol
 import * as $WIP_artist_CollectionCreateButtonWIP from "./islands/WIP/artist/CollectionCreateButtonWIP.tsx";
 import * as $WIP_artist_CollectionOverviewArtistContentWIP from "./islands/WIP/artist/CollectionOverviewArtistContentWIP.tsx";
 import * as $WIP_test_ReviewDogTest from "./islands/WIP/test/ReviewDogTest.tsx";
-import * as $Wallet_details_WalletDashboardDetails from "./islands/Wallet/details/WalletDashboardDetails.tsx";
-import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletDetails.tsx";
-import * as $Wallet_details_WalletDispenserDetails from "./islands/Wallet/details/WalletDispenserDetails.tsx";
-import * as $Wallet_details_WalletProfileDetails from "./islands/Wallet/details/WalletProfileDetails.tsx";
-import * as $Wallet_details_styles from "./islands/Wallet/details/styles.ts";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
 import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
@@ -153,7 +148,11 @@ import * as $card_styles from "./islands/card/styles.ts";
 import * as $content_CollectionDetailContent from "./islands/content/CollectionDetailContent.tsx";
 import * as $content_StampOverviewContent from "./islands/content/StampOverviewContent.tsx";
 import * as $content_WalletDashboardContent from "./islands/content/WalletDashboardContent.tsx";
+import * as $content_WalletDashboardDetails from "./islands/content/WalletDashboardDetails.tsx";
+import * as $content_WalletDetails from "./islands/content/WalletDetails.tsx";
+import * as $content_WalletDispenserDetails from "./islands/content/WalletDispenserDetails.tsx";
 import * as $content_WalletProfileContent from "./islands/content/WalletProfileContent.tsx";
+import * as $content_WalletProfileDetails from "./islands/content/WalletProfileDetails.tsx";
 import * as $content_blockContent_BlockSelector from "./islands/content/blockContent/BlockSelector.tsx";
 import * as $content_blockContent_BlockTransactions from "./islands/content/blockContent/BlockTransactions.tsx";
 import * as $content_faqContent_AccordionBase from "./islands/content/faqContent/AccordionBase.tsx";
@@ -184,6 +183,7 @@ import * as $header_StampOverviewHeader from "./islands/header/StampOverviewHead
 import * as $header_WalletDashboardHeader from "./islands/header/WalletDashboardHeader.tsx";
 import * as $header_WalletProfileHeader from "./islands/header/WalletProfileHeader.tsx";
 import * as $header_index from "./islands/header/index.ts";
+import * as $layout_ChartWidget from "./islands/layout/ChartWidget.tsx";
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
@@ -235,7 +235,6 @@ import * as $section_howto_HowToTransferBitname from "./islands/section/howto/Ho
 import * as $section_howto_HowToTransferStamp from "./islands/section/howto/HowToTransferStamp.tsx";
 import * as $section_howto_HowToTransferToken from "./islands/section/howto/HowToTransferToken.tsx";
 import * as $section_index from "./islands/section/index.ts";
-import * as $src20_ChartWidget from "./islands/src20/ChartWidget.tsx";
 import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
 import * as $table_HoldersPieChart from "./islands/table/HoldersPieChart.tsx";
 import * as $table_HoldersTableBase from "./islands/table/HoldersTableBase.tsx";
@@ -421,14 +420,6 @@ const manifest = {
     "./islands/WIP/artist/CollectionOverviewArtistContentWIP.tsx":
       $WIP_artist_CollectionOverviewArtistContentWIP,
     "./islands/WIP/test/ReviewDogTest.tsx": $WIP_test_ReviewDogTest,
-    "./islands/Wallet/details/WalletDashboardDetails.tsx":
-      $Wallet_details_WalletDashboardDetails,
-    "./islands/Wallet/details/WalletDetails.tsx": $Wallet_details_WalletDetails,
-    "./islands/Wallet/details/WalletDispenserDetails.tsx":
-      $Wallet_details_WalletDispenserDetails,
-    "./islands/Wallet/details/WalletProfileDetails.tsx":
-      $Wallet_details_WalletProfileDetails,
-    "./islands/Wallet/details/styles.ts": $Wallet_details_styles,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
     "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
@@ -442,7 +433,13 @@ const manifest = {
     "./islands/content/StampOverviewContent.tsx": $content_StampOverviewContent,
     "./islands/content/WalletDashboardContent.tsx":
       $content_WalletDashboardContent,
+    "./islands/content/WalletDashboardDetails.tsx":
+      $content_WalletDashboardDetails,
+    "./islands/content/WalletDetails.tsx": $content_WalletDetails,
+    "./islands/content/WalletDispenserDetails.tsx":
+      $content_WalletDispenserDetails,
     "./islands/content/WalletProfileContent.tsx": $content_WalletProfileContent,
+    "./islands/content/WalletProfileDetails.tsx": $content_WalletProfileDetails,
     "./islands/content/blockContent/BlockSelector.tsx":
       $content_blockContent_BlockSelector,
     "./islands/content/blockContent/BlockTransactions.tsx":
@@ -482,6 +479,7 @@ const manifest = {
     "./islands/header/WalletDashboardHeader.tsx": $header_WalletDashboardHeader,
     "./islands/header/WalletProfileHeader.tsx": $header_WalletProfileHeader,
     "./islands/header/index.ts": $header_index,
+    "./islands/layout/ChartWidget.tsx": $layout_ChartWidget,
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
@@ -545,7 +543,6 @@ const manifest = {
     "./islands/section/howto/HowToTransferToken.tsx":
       $section_howto_HowToTransferToken,
     "./islands/section/index.ts": $section_index,
-    "./islands/src20/ChartWidget.tsx": $src20_ChartWidget,
     "./islands/table/DataTableBase.tsx": $table_DataTableBase,
     "./islands/table/HoldersPieChart.tsx": $table_HoldersPieChart,
     "./islands/table/HoldersTableBase.tsx": $table_HoldersTableBase,

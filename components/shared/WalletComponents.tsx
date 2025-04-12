@@ -1,12 +1,6 @@
 import { ComponentChildren } from "preact";
-import {
-  alignmentClasses,
-  type AlignmentType,
-  dataLabel,
-  dataLabelSm,
-  dataValueSm,
-  dataValueXl,
-} from "$components/shared/WalletStyles.ts";
+import { alignmentClasses, type AlignmentType } from "$layout";
+import { labelLg, labelSm, valueSm, valueXl } from "$text";
 
 interface StatBaseProps {
   label: string | ComponentChildren;
@@ -36,14 +30,14 @@ export function StatItem({
   const alignmentClass = alignmentClasses[align];
   const content = (
     <div class={`flex flex-col -space-y-1 ${customClass || ""}`}>
-      <p class={`${dataLabelSm} ${alignmentClass}`}>
+      <h5 class={`${labelSm} ${alignmentClass}`}>
         {label}
-      </p>
-      <p
-        class={`${dataValueSm} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
+      </h5>
+      <h6
+        class={`${valueSm} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
       >
         {value}
-      </p>
+      </h6>
     </div>
   );
 
@@ -66,14 +60,14 @@ export function StatTitle({
   const alignmentClass = alignmentClasses[align];
   const content = (
     <div class="flex flex-col -space-y-1">
-      <p class={`${dataLabel} ${alignmentClass}`}>
+      <h5 class={`${labelLg} ${alignmentClass}`}>
         {label}
-      </p>
-      <p
-        class={`${dataValueXl} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
+      </h5>
+      <h6
+        class={`${valueXl} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
       >
         {value}
-      </p>
+      </h6>
     </div>
   );
 

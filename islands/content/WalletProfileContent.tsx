@@ -12,7 +12,7 @@ import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { StampRow } from "$globals";
-import { dataLabel } from "$components/shared/WalletStyles.ts";
+import { label } from "$text";
 
 const ItemHeader = ({
   title = "STAMP",
@@ -567,7 +567,7 @@ export default function WalletProfileContent({
           {stamps.data?.length
             ? <StampGallery {...stampGallery} />
             : (
-              <p class={`${dataLabel} -mt-1.5 mobileLg:-mt-3`}>
+              <p class={`${label} -mt-1.5 mobileLg:-mt-3`}>
                 NO STAMPS IN THE WALLET
               </p>
             )}
@@ -614,7 +614,7 @@ export default function WalletProfileContent({
               />
             )
             : (
-              <p class={`${dataLabel} -mt-1.5 mobileLg:-mt-3`}>
+              <p class={`${label} -mt-1.5 mobileLg:-mt-3`}>
                 NO TOKENS IN THE WALLET
               </p>
             )}

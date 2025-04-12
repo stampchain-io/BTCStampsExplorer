@@ -3,7 +3,7 @@
 import { SRC20CardBase, SRC20CardBaseProps } from "$card";
 import { labelSm, textSm } from "$text";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
-import ChartWidget from "$islands/src20/ChartWidget.tsx";
+import ChartWidget from "$islands/layout/ChartWidget.tsx";
 
 /* ===== COMPONENT ===== */
 export function SRC20CardMinted(props: SRC20CardBaseProps) {

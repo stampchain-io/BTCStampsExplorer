@@ -74,6 +74,7 @@ export const labelLg = `${labelFont} text-lg ${cursor}`;
 export const labelXl = `${labelFont} text-xl ${cursor}`;
 
 /* ===== VALUE STYLES ===== */
+export const valueXs = `${valueFont} text-xs ${cursor}`;
 export const valueSm = `${valueFont} text-sm ${cursor}`;
 export const value = `${valueFont} text-base ${cursor}`;
 export const valueLg = `${valueFont} text-lg ${cursor}`;
