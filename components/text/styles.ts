@@ -60,6 +60,7 @@ export const textSm = `${textFont} text-sm`;
 export const text = `${textFont} text-base`;
 export const textLg = `${textFont} text-lg`;
 export const textXl = `${textFont} text-xl`;
+export const text2xl = `${textFont} text-2xl`;
 export const textLinkUnderline =
   `font-bold text-base text-stamp-grey-light animated-underline ${transition}`;
 

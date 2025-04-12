@@ -1,5 +1,7 @@
 import { useState } from "preact/hooks";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
+import { containerBackground } from "$layout";
+import { text, text2xl } from "$text";
 
 export default function BlockTransactions() {
   const { fees } = useFeePolling();
@@ -11,15 +13,17 @@ export default function BlockTransactions() {
   };
 
   return (
-    <div class="text-[#D9D9D9] flex flex-col gap-8 bg-[#2B183F] p-2 tablet:p-5 transition-all">
+    <div
+      class={`${containerBackground} text-stamp-grey-light gap-6 transition-all`}
+    >
       <div className="flex justify-between">
-        <p className="text-[26px]">Transactions</p>
+        <h4 className={text2xl}>TRANSACTIONS</h4>
         <div className="flex items-center gap-3">
-          <p>Expand</p>
+          <h6 className={text}>EXPAND</h6>
           <img
             src="/img/icon_arrow_top.png"
             alt=""
-            className={`w-10 h-5 cursor-pointer ${
+            className={`w-8 h-4 cursor-pointer ${
               isExpanded ? "" : "rotate-180"
             }`}
             onClick={() => handleExpand()}

@@ -1,7 +1,8 @@
 /* ===== FAQ PAGE ===== */
 import { Head as _Head } from "$fresh/runtime.ts";
 import { body, gapSection } from "$layout";
-import { FAQ_CONTENT, FaqAccordion, FaqHeader } from "$faq";
+import { FaqAccordion } from "$content";
+import { FAQ_CONTENT, FaqHeader } from "$faq";
 import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== PAGE COMPONENT ===== */

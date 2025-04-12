@@ -1,5 +1,5 @@
 /* ===== FAQ ACCORDION CONTENT COMPONENT ===== */
-import { Accordion } from "$islands/faq/AccordionBase.tsx";
+import { Accordion } from "$content";
 import type { FAQ_CONTENT } from "$faq";
 
 /* ===== INTERFACE ===== */

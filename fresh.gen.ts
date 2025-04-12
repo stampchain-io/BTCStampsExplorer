@@ -82,6 +82,8 @@ import * as $api_v2_trx_stampdetach from "./routes/api/v2/trx/stampdetach.ts";
 import * as $api_v2_trx_utxoquery from "./routes/api/v2/trx/utxoquery.ts";
 import * as $api_v2_utxo_ancestors_address_ from "./routes/api/v2/utxo/ancestors/[address].ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
+import * as $block_block_index_ from "./routes/block/[block_index].tsx";
+import * as $block_index from "./routes/block/index.tsx";
 import * as $collection_id_ from "./routes/collection/[id].tsx";
 import * as $collection_overview_ from "./routes/collection/[overview].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
@@ -141,8 +143,6 @@ import * as $Wallet_details_styles from "./islands/Wallet/details/styles.ts";
 import * as $about_AboutContact from "./islands/about/AboutContact.tsx";
 import * as $about_AboutDonate from "./islands/about/AboutDonate.tsx";
 import * as $about_types from "./islands/about/types.ts";
-import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
-import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
 import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
@@ -159,14 +159,17 @@ import * as $collection_artist_CollectionCreateButtonWIP from "./islands/collect
 import * as $collection_artist_CollectionOverviewArtistContentWIP from "./islands/collection/artist/CollectionOverviewArtistContentWIP.tsx";
 import * as $collection_details_CollectionDetailsContent from "./islands/collection/details/CollectionDetailsContent.tsx";
 import * as $collection_index_1 from "./islands/collection/index.ts";
+import * as $content_blockContent_BlockSelector from "./islands/content/blockContent/BlockSelector.tsx";
+import * as $content_blockContent_BlockTransactions from "./islands/content/blockContent/BlockTransactions.tsx";
+import * as $content_faqContent_AccordionBase from "./islands/content/faqContent/AccordionBase.tsx";
+import * as $content_faqContent_FaqAccordion from "./islands/content/faqContent/FaqAccordion.tsx";
+import * as $content_index from "./islands/content/index.ts";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Layout from "./islands/datacontrol/Layout.ts";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
-import * as $faq_AccordionBase from "./islands/faq/AccordionBase.tsx";
-import * as $faq_FaqAccordion from "./islands/faq/FaqAccordion.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $form_InputField from "./islands/form/InputField.tsx";
 import * as $form_SRC20InputField from "./islands/form/SRC20InputField.tsx";
@@ -358,6 +361,8 @@ const manifest = {
     "./routes/api/v2/utxo/ancestors/[address].ts":
       $api_v2_utxo_ancestors_address_,
     "./routes/api/v2/version.ts": $api_v2_version,
+    "./routes/block/[block_index].tsx": $block_block_index_,
+    "./routes/block/index.tsx": $block_index,
     "./routes/collection/[id].tsx": $collection_id_,
     "./routes/collection/[overview].tsx": $collection_overview_,
     "./routes/collection/index.tsx": $collection_index,
@@ -426,8 +431,6 @@ const manifest = {
     "./islands/about/AboutContact.tsx": $about_AboutContact,
     "./islands/about/AboutDonate.tsx": $about_AboutDonate,
     "./islands/about/types.ts": $about_types,
-    "./islands/block/BlockSelector.tsx": $block_BlockSelector,
-    "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
     "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
@@ -448,14 +451,21 @@ const manifest = {
     "./islands/collection/details/CollectionDetailsContent.tsx":
       $collection_details_CollectionDetailsContent,
     "./islands/collection/index.ts": $collection_index_1,
+    "./islands/content/blockContent/BlockSelector.tsx":
+      $content_blockContent_BlockSelector,
+    "./islands/content/blockContent/BlockTransactions.tsx":
+      $content_blockContent_BlockTransactions,
+    "./islands/content/faqContent/AccordionBase.tsx":
+      $content_faqContent_AccordionBase,
+    "./islands/content/faqContent/FaqAccordion.tsx":
+      $content_faqContent_FaqAccordion,
+    "./islands/content/index.ts": $content_index,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
     "./islands/datacontrol/Layout.ts": $datacontrol_Layout,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
-    "./islands/faq/AccordionBase.tsx": $faq_AccordionBase,
-    "./islands/faq/FaqAccordion.tsx": $faq_FaqAccordion,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/form/InputField.tsx": $form_InputField,
     "./islands/form/SRC20InputField.tsx": $form_SRC20InputField,
