@@ -21,7 +21,7 @@ interface NavLink {
 
 /* ===== TOOLS CONFIGURATION ===== */
 const toolLinks = [
-  { title: "STAMPING", href: "/tool/stamp/stamp" },
+  { title: "STAMPING", href: "/tool/stamp/stamping" },
   { title: "TRANSFER STAMP", href: "/tool/stamp/transfer" },
   { title: "DEPLOY TOKEN", href: "/tool/src20/deploy" },
   { title: "MINT TOKEN", href: "/tool/src20/mint" },
@@ -40,7 +40,7 @@ const desktopNavLinks: NavLink[] = [
     subLinks: [
       { title: "ALL", href: "/stamp?type=classic" },
       { title: "COLLECTIONS", href: "/collection" },
-      { title: "STAMPING", href: "/tool/stamp/stamp" },
+      { title: "STAMPING", href: "/tool/stamp/stamping" },
       { title: "TRANSFER", href: "/tool/stamp/transfer" },
     ],
   },

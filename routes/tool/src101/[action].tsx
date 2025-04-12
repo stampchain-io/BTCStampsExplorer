@@ -3,7 +3,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { body, gapSection } from "$layout";
 import { SRC101RegisterTool } from "$tool";
-import { HowToRegisterBitnameModule } from "$howto";
+import { HowToRegisterBitnameModule } from "$section";
 import { SRC101RegistersGallery } from "$gallery";
 
 /* ===== TYPES ===== */

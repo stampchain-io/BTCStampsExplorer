@@ -10,7 +10,7 @@ import {
   HowToDeployTokenModule,
   HowToMintTokenModule,
   HowToTransferTokenModule,
-} from "$howto";
+} from "$section";
 import {
   SRC20DeploysGallery,
   SRC20MintsGallery,

@@ -12,8 +12,7 @@ import {
   SRC20Gallery,
   StampSalesGallery,
 } from "$gallery";
-import { StampChainModule } from "$islands/modules/StampChain.tsx";
-import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
+import { GetStampingModule, StampChainModule } from "$section";
 
 // Define the shape of pageData from StampController.getHomePageData()
 interface StampControllerData {

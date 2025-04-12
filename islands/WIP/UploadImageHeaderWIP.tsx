@@ -1,3 +1,4 @@
+/* NOT IN USE */
 import { useEffect, useState } from "preact/hooks";
 import { initialWallet } from "$client/wallet/wallet.ts";
 import { text, titlePurpleLD } from "$text";

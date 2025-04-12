@@ -6,7 +6,7 @@ import { StampController } from "$server/controller/stampController.ts";
 import { body, gapSection } from "$layout";
 import { StampGallery } from "$gallery";
 import { StampingTool } from "$tool";
-import { HowToStampModule } from "$howto";
+import { HowToStampModule } from "$section";
 
 /* ===== TYPES ===== */
 interface StampPageData {

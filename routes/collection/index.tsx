@@ -6,14 +6,12 @@ import {
   SUBPROTOCOLS,
 } from "$globals";
 import { FreshContext, Handlers } from "$fresh/server.ts";
-import { StampGallery } from "$gallery";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { RecursiveLayeringModule } from "$islands/modules/RecursiveLayering.tsx";
-import { NamedAssetsModule } from "$islands/modules/NamedAssets.tsx";
-import { ArtistGallery, CollectionGallery } from "$gallery";
 import { CollectionRow } from "$server/types/collection.d.ts";
 import { body, gapSection } from "$layout";
+import { NamedAssetsModule, RecursiveLayeringModule } from "$section";
+import { ArtistGallery, CollectionGallery, StampGallery } from "$gallery";
 
 /* ===== TYPES ===== */
 type CollectionLandingPageProps = {

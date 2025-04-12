@@ -132,6 +132,7 @@ import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $WIP_StampChainSelectedWIP from "./islands/WIP/StampChainSelectedWIP.tsx";
+import * as $WIP_UploadImageHeaderWIP from "./islands/WIP/UploadImageHeaderWIP.tsx";
 import * as $WIP_artist_ArtistCollectionWIP from "./islands/WIP/artist/ArtistCollectionWIP.tsx";
 import * as $WIP_artist_CollectionCreateButtonWIP from "./islands/WIP/artist/CollectionCreateButtonWIP.tsx";
 import * as $WIP_artist_CollectionOverviewArtistContentWIP from "./islands/WIP/artist/CollectionOverviewArtistContentWIP.tsx";
@@ -201,16 +202,8 @@ import * as $header_Header from "./islands/header/Header.tsx";
 import * as $header_SRC20DetailHeader from "./islands/header/SRC20DetailHeader.tsx";
 import * as $header_SRC20OverviewHeader from "./islands/header/SRC20OverviewHeader.tsx";
 import * as $header_StampOverviewHeader from "./islands/header/StampOverviewHeader.tsx";
-import * as $header_UploadImageHeader from "./islands/header/UploadImageHeader.tsx";
 import * as $header_index from "./islands/header/index.ts";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
-import * as $howto_HowToDeployToken from "./islands/howto/HowToDeployToken.tsx";
-import * as $howto_HowToMintToken from "./islands/howto/HowToMintToken.tsx";
-import * as $howto_HowToRegisterBitname from "./islands/howto/HowToRegisterBitname.tsx";
-import * as $howto_HowToStamp from "./islands/howto/HowToStamp.tsx";
-import * as $howto_HowToTransferBitname from "./islands/howto/HowToTransferBitname.tsx";
-import * as $howto_HowToTransferStamp from "./islands/howto/HowToTransferStamp.tsx";
-import * as $howto_HowToTransferToken from "./islands/howto/HowToTransferToken.tsx";
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
@@ -229,14 +222,21 @@ import * as $modal_SendBTCModal from "./islands/modal/SendBTCModal.tsx";
 import * as $modal_SendStampModalWIP from "./islands/modal/SendStampModalWIP.tsx";
 import * as $modal_WalletProviderBase from "./islands/modal/WalletProviderBase.tsx";
 import * as $modal_index from "./islands/modal/index.ts";
-import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
-import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
-import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
-import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $search_SRC20Search from "./islands/search/SRC20Search.tsx";
 import * as $search_StampSearch from "./islands/search/StampSearch.tsx";
 import * as $search_index from "./islands/search/index.ts";
 import * as $search_styles from "./islands/search/styles.ts";
+import * as $section_cta_GetStamping from "./islands/section/cta/GetStamping.tsx";
+import * as $section_cta_NamedAssets from "./islands/section/cta/NamedAssets.tsx";
+import * as $section_cta_RecursiveLayering from "./islands/section/cta/RecursiveLayering.tsx";
+import * as $section_cta_StampChain from "./islands/section/cta/StampChain.tsx";
+import * as $section_howto_HowToDeployToken from "./islands/section/howto/HowToDeployToken.tsx";
+import * as $section_howto_HowToMintToken from "./islands/section/howto/HowToMintToken.tsx";
+import * as $section_howto_HowToRegisterBitname from "./islands/section/howto/HowToRegisterBitname.tsx";
+import * as $section_howto_HowToStamp from "./islands/section/howto/HowToStamp.tsx";
+import * as $section_howto_HowToTransferBitname from "./islands/section/howto/HowToTransferBitname.tsx";
+import * as $section_howto_HowToTransferStamp from "./islands/section/howto/HowToTransferStamp.tsx";
+import * as $section_howto_HowToTransferToken from "./islands/section/howto/HowToTransferToken.tsx";
 import * as $section_index from "./islands/section/index.ts";
 import * as $src20_ChartWidget from "./islands/src20/ChartWidget.tsx";
 import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
@@ -415,6 +415,7 @@ const manifest = {
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
     "./islands/WIP/StampChainSelectedWIP.tsx": $WIP_StampChainSelectedWIP,
+    "./islands/WIP/UploadImageHeaderWIP.tsx": $WIP_UploadImageHeaderWIP,
     "./islands/WIP/artist/ArtistCollectionWIP.tsx":
       $WIP_artist_ArtistCollectionWIP,
     "./islands/WIP/artist/CollectionCreateButtonWIP.tsx":
@@ -502,16 +503,8 @@ const manifest = {
     "./islands/header/SRC20DetailHeader.tsx": $header_SRC20DetailHeader,
     "./islands/header/SRC20OverviewHeader.tsx": $header_SRC20OverviewHeader,
     "./islands/header/StampOverviewHeader.tsx": $header_StampOverviewHeader,
-    "./islands/header/UploadImageHeader.tsx": $header_UploadImageHeader,
     "./islands/header/index.ts": $header_index,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
-    "./islands/howto/HowToDeployToken.tsx": $howto_HowToDeployToken,
-    "./islands/howto/HowToMintToken.tsx": $howto_HowToMintToken,
-    "./islands/howto/HowToRegisterBitname.tsx": $howto_HowToRegisterBitname,
-    "./islands/howto/HowToStamp.tsx": $howto_HowToStamp,
-    "./islands/howto/HowToTransferBitname.tsx": $howto_HowToTransferBitname,
-    "./islands/howto/HowToTransferStamp.tsx": $howto_HowToTransferStamp,
-    "./islands/howto/HowToTransferToken.tsx": $howto_HowToTransferToken,
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
@@ -530,14 +523,27 @@ const manifest = {
     "./islands/modal/SendStampModalWIP.tsx": $modal_SendStampModalWIP,
     "./islands/modal/WalletProviderBase.tsx": $modal_WalletProviderBase,
     "./islands/modal/index.ts": $modal_index,
-    "./islands/modules/GetStamping.tsx": $modules_GetStamping,
-    "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
-    "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
-    "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/search/SRC20Search.tsx": $search_SRC20Search,
     "./islands/search/StampSearch.tsx": $search_StampSearch,
     "./islands/search/index.ts": $search_index,
     "./islands/search/styles.ts": $search_styles,
+    "./islands/section/cta/GetStamping.tsx": $section_cta_GetStamping,
+    "./islands/section/cta/NamedAssets.tsx": $section_cta_NamedAssets,
+    "./islands/section/cta/RecursiveLayering.tsx":
+      $section_cta_RecursiveLayering,
+    "./islands/section/cta/StampChain.tsx": $section_cta_StampChain,
+    "./islands/section/howto/HowToDeployToken.tsx":
+      $section_howto_HowToDeployToken,
+    "./islands/section/howto/HowToMintToken.tsx": $section_howto_HowToMintToken,
+    "./islands/section/howto/HowToRegisterBitname.tsx":
+      $section_howto_HowToRegisterBitname,
+    "./islands/section/howto/HowToStamp.tsx": $section_howto_HowToStamp,
+    "./islands/section/howto/HowToTransferBitname.tsx":
+      $section_howto_HowToTransferBitname,
+    "./islands/section/howto/HowToTransferStamp.tsx":
+      $section_howto_HowToTransferStamp,
+    "./islands/section/howto/HowToTransferToken.tsx":
+      $section_howto_HowToTransferToken,
     "./islands/section/index.ts": $section_index,
     "./islands/src20/ChartWidget.tsx": $src20_ChartWidget,
     "./islands/table/DataTableBase.tsx": $table_DataTableBase,

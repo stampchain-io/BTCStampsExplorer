@@ -2,7 +2,7 @@ import { SRC20Row, WalletDataTypes } from "$globals";
 import { useEffect, useState } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
-
+import { textLg } from "$text";
 type SRC20BalanceTableProps = {
   data: SRC20Row[];
 };
@@ -143,9 +143,9 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
           </div>
         )
         : (
-          <div className={"text-white text-center text-3xl"}>
-            Please connect your wallet to see your stamps
-          </div>
+          <h3 className={textLg}>
+            CONNECT YOUR WALLET TO SEE YOUR STAMPS
+          </h3>
         )}
     </>
   );

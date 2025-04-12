@@ -4,7 +4,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { body, gapSection } from "$layout";
 import { StampTransferTool } from "$tool";
 import { StampTransfersGallery } from "$gallery";
-import { HowToTransferStampModule } from "$howto";
+import { HowToTransferStampModule } from "$section";
 
 /* ===== TYPES ===== */
 interface ToolStampPageProps {
