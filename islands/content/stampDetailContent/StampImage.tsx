@@ -246,8 +246,8 @@ function RightPanel(
 
   /* ===== RENDER ===== */
   return (
-    <div className="flex justify-between pt-[10px] mobileMd:pt-[22px] pb-2 mobileMd:pb-5 px-6 dark-gradient rounded-lg">
-      <div className="flex gap-3">
+    <div className="flex justify-between py-3 px-6 dark-gradient rounded-lg">
+      <div className="flex gap-5 tablet:gap-3">
         <div
           ref={copyButtonRef}
           class="relative"
@@ -257,7 +257,7 @@ function RightPanel(
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
-            className="w-7 h-7 mobileLg:w-8 mobileLg:h-8 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer mb-0.5"
+            className="w-7 h-7 tablet:w-6 tablet:h-6 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer mb-0.5"
             onClick={copyLink}
             role="button"
             aria-label="Copy Link"
@@ -286,7 +286,7 @@ function RightPanel(
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
-            className="w-7 h-7 mobileLg:w-8 mobileLg:h-8 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+            className="w-7 h-7 tablet:w-6 tablet:h-6 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
             onClick={shareToX}
             role="button"
             aria-label="Share on X"
@@ -310,7 +310,7 @@ function RightPanel(
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
-            className="w-6 h-6 mobileLg:w-[28px] mobileLg:h-[28px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer mt-[2px]"
+            className="w-6 h-6 tablet:w-5 tablet:h-5 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer mt-[2px]"
             onClick={shareContent}
             role="button"
             aria-label="Share Content"
@@ -337,7 +337,7 @@ function RightPanel(
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 32 32"
-              class="w-7 h-7 mobileLg:w-8 mobileLg:h-8 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+              class="w-7 h-7 tablet:w-6 tablet:h-6 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
@@ -365,7 +365,7 @@ function RightPanel(
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
-            class="w-7 h-7 mobileLg:w-8 mobileLg:h-8 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+            class="w-7 h-7 tablet:w-6 tablet:h-6 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();

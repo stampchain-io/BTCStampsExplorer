@@ -57,16 +57,16 @@ export function SRC20CardBase(
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* ===== LEFT SECTION - IMAGE AND TITLE ===== */}
-      <div class="cursor-pointer flex gap-[18px] mobileMd:gap-[30px]">
+      <div class="cursor-pointer flex gap-5">
         <img
           src={imageUrl}
-          class="w-[72px] h-[72px] mobileLg:w-[92px] mobileLg:h-[92px] rounded"
+          class="w-[72px] h-[72px] rounded-sm"
           onClick={() => onImageClick?.(imageUrl)}
           alt={unicodeEscapeToEmoji(src20.tick)}
         />
         <div class="flex flex-col">
           {/* ===== TITLE AND SOCIAL LINKS ===== */}
-          <p class="text-2xl mobileLg:text-4xl font-black uppercase flex gap-4 relative z-[20]">
+          <h5 class="font-extrabold text-xl uppercase tracking-wide flex gap-4 relative z-[20]">
             {(() => {
               const { text, emoji } = splitTextAndEmojis(
                 unicodeEscapeToEmoji(src20.tick),
@@ -112,46 +112,46 @@ export function SRC20CardBase(
                 </a>
               )}
             </div>
-          </p>
+          </h5>
 
           {/* ===== CONDITIONAL CONTENT SECTIONS ===== */}
           {/* ===== SUPPLY AND LIMIT INFO ===== */}
           {(fromPage === "src20" || fromPage === "home") && (
             <div class="flex flex-col pt-0.75 mobileLg:pt-1.5 -space-y-0.5">
-              <p class={labelSm}>
+              <h6 class={labelSm}>
                 SUPPLY{" "}
                 <span class={textSm}>
                   {Number(src20.max).toLocaleString()}
                 </span>
-              </p>
+              </h6>
 
-              <p class={labelSm}>
+              <h6 class={labelSm}>
                 LIMIT{" "}
                 <span class={textSm}>
                   {Number(src20.lim).toLocaleString()}
                 </span>
-              </p>
+              </h6>
             </div>
           )}
 
           {/* ===== WALLET AMOUNT INFO ===== */}
           {fromPage === "wallet" && (
             <div class="flex flex-col pt-0.75 mobileLg:pt-1.5 -space-y-0.5">
-              <p class={labelSm}>
+              <h6 class={labelSm}>
                 AMOUNT
-              </p>
-              <p class={textSm}>
+              </h6>
+              <h6 class={textSm}>
                 {stripTrailingZeros(Number(src20.amt).toFixed(2))}
-              </p>
+              </h6>
             </div>
           )}
 
           {/* ===== PROGRESS BAR ===== */}
           {fromPage === "stamping/src20" && (
             <div class="flex flex-col pt-1.5 mobileLg:pt-3 gap-1">
-              <p class={labelSm}>
+              <h6 class={labelSm}>
                 PROGRESS <span class={textSm}>{progress}%</span>
-              </p>
+              </h6>
               <div class="relative min-w-[144px] mobileLg:min-w-[192px] h-1 mobileLg:h-1.5 bg-stamp-grey rounded-full">
                 <div
                   class="absolute left-0 top-0 h-1 mobileLg:h-1.5 bg-stamp-purple-dark rounded-full"
