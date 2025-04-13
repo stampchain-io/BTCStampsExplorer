@@ -1,4 +1,4 @@
-/* ===== SRC20 HOLDER TABLE COMPONENT ===== */
+/* ===== SRC20 HOLDERS TABLE COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { ScrollContainer } from "$layout";
 import {

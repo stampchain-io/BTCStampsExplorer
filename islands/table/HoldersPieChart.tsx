@@ -1,5 +1,7 @@
+/* ===== HOLDERS PIE CHART COMPONENT ===== */
 import { Chart } from "fresh_charts/island.tsx";
 
+/* ===== TYPES ===== */
 interface PieChartProps {
   holders: Array<{
     address: string | null;
@@ -8,11 +10,14 @@ interface PieChartProps {
   }>;
 }
 
+/* ===== COMPONENT ===== */
 export const HoldersPieChart = ({ holders }: PieChartProps) => {
+  /* ===== EMPTY STATE ===== */
   if (!holders?.length) {
     return <div class="text-center py-4">No holder data available</div>;
   }
 
+  /* ===== HELPER FUNCTIONS ===== */
   const generateColors = (count: number) => {
     // Convert hex to RGB for easier interpolation
     const startColor = { r: 0xaa, g: 0x00, b: 0xff };
@@ -34,7 +39,9 @@ export const HoldersPieChart = ({ holders }: PieChartProps) => {
     });
   };
 
+  /* ===== CHART RENDERING ===== */
   try {
+    /* ===== CHART CONFIGURATION ===== */
     const DoughnutConfig = {
       type: "doughnut" as const,
       width: 300,
@@ -82,12 +89,14 @@ export const HoldersPieChart = ({ holders }: PieChartProps) => {
       },
     };
 
+    /* ===== RENDER ===== */
     return (
       <div class="flex items-center justify-center w-[300px] h-[300px] p-6">
         <Chart {...DoughnutConfig} />
       </div>
     );
   } catch (error) {
+    /* ===== ERROR STATE ===== */
     console.error("Error rendering chart:", error);
     return <div class="text-center py-6">Error rendering chart</div>;
   }

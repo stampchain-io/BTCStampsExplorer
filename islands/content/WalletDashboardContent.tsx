@@ -1,3 +1,4 @@
+/* ===== WALLET DASHBOARD CONTENT COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { Search } from "$islands/datacontrol/Search.tsx";
@@ -13,6 +14,7 @@ import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { StampRow } from "$globals";
 
+/* ===== ITEM HEADER SUBCOMPONENT ===== */
 const ItemHeader = ({
   title = "STAMP",
   sortBy = "ASC" as const,
@@ -42,9 +44,9 @@ const ItemHeader = ({
   handleOpenFilter: (open: boolean) => void;
   handleOpen: (type: string) => void;
   setOpenSettingModal?: (open: boolean) => void;
-  // We add onChangeSort to get a new sort direction ("ASC"/"DESC").
   onChangeSort?: (newSortBy: "ASC" | "DESC") => void;
 }) => {
+  /* ===== RENDER HEADER ===== */
   return (
     <div class="flex flex-row justify-between items-center gap-3 w-full relative">
       <div class="flex items-end">
@@ -104,6 +106,7 @@ const ItemHeader = ({
   );
 };
 
+/* ===== DISPENSER ITEM SUBCOMPONENT ===== */
 function DispenserItem({
   dispensers = [],
   pagination,
@@ -116,7 +119,7 @@ function DispenserItem({
     onPageChange?: (page: number) => void;
   };
 }) {
-  // If no dispensers, show empty state
+  /* ===== EMPTY STATE HANDLING ===== */
   if (!dispensers?.length) {
     return (
       <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
@@ -125,7 +128,7 @@ function DispenserItem({
     );
   }
 
-  // Filter dispensers by open/closed status
+  /* ===== DISPENSER FILTERING ===== */
   const dispensersWithStamps = dispensers.filter((d) => d.stamp);
   const openDispensers = dispensersWithStamps.filter((d) =>
     d.give_remaining > 0
@@ -144,6 +147,7 @@ function DispenserItem({
     );
   }
 
+  /* ===== RENDER DISPENSER ITEM ===== */
   return (
     <div class="relative shadow-md">
       <div class="hidden mobileLg:flex flex-col gap-6 -mt-6">
@@ -227,15 +231,18 @@ function DispenserItem({
   );
 }
 
+/* ===== DISPENSER ROW SUBCOMPONENT ===== */
 function DispenserRow(
   { dispenser, view }: { dispenser: Dispenser; view: "mobile" | "tablet" },
 ) {
+  /* ===== STATE ===== */
   const imageSize = view === "mobile"
     ? "w-[146px] h-[146px]"
     : "w-[172px] h-[172px]";
   const [loading, setLoading] = useState(true);
   const [src, setSrc] = useState("");
 
+  /* ===== IMAGE FETCHING ===== */
   const fetchStampImage = async () => {
     setLoading(true);
     const res = await getStampImageSrc(dispenser.stamp as StampRow);
@@ -245,10 +252,12 @@ function DispenserRow(
     setLoading(false);
   };
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     fetchStampImage();
   }, []);
 
+  /* ===== RENDER DISPENSER ROW ===== */
   if (!dispenser.stamp) {
     return null;
   }
@@ -398,6 +407,7 @@ function DispenserRow(
   );
 }
 
+/* ===== MAIN WALLET DASHBOARD COMPONENT ===== */
 const WalletDashboardContent = ({
   stamps,
   src20,
@@ -408,27 +418,26 @@ const WalletDashboardContent = ({
   src20SortBy = "DESC",
   dispensersSortBy = "DESC",
 }: WalletContentProps) => {
+  /* ===== STATE ===== */
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
-
-  // Track sorting state for all sections
   const [sortStamps, setSortStamps] = useState<"ASC" | "DESC">(stampsSortBy);
   const [sortTokens, setSortTokens] = useState<"ASC" | "DESC">(src20SortBy);
   const [sortDispensers, setSortDispensers] = useState<"ASC" | "DESC">(
     dispensersSortBy,
   );
 
-  // Toggle states for search / filter / setting modals
+  /* ===== TOGGLE STATES ===== */
   const [openS, setOpenS] = useState<boolean>(false);
   const [openT, setOpenT] = useState<boolean>(false);
   const [openD, setOpenD] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openSetting, setOpenSetting] = useState<boolean>(false);
 
-  // Calculate dispenser counts
+  /* ===== COMPUTED VALUES ===== */
   const openDispensersCount =
     dispensers.data.filter((d) => d.give_remaining > 0).length;
 
-  // Scroll into the correct section if anchor is set
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     if (anchor) {
       const sectionMap = {
@@ -447,6 +456,16 @@ const WalletDashboardContent = ({
     }
   }, [anchor, stamps, src20, dispensers]);
 
+  useEffect(() => {
+    const currentUrl = globalThis.location.href;
+    const url = new URL(currentUrl);
+    const filterByValue = url.searchParams.get("filterBy") || "";
+    if (filterByValue === "Transfer") {
+      setOpenSettingModal(true);
+    }
+  }, []);
+
+  /* ===== EVENT HANDLERS ===== */
   const handleOpenSettingModal = () => {
     setOpenSettingModal(!openSettingModal);
   };
@@ -473,7 +492,7 @@ const WalletDashboardContent = ({
     }
   };
 
-  // Handle sort changes for each section
+  /* ===== SORT HANDLERS ===== */
   const handleChangeSort = (newSort: "ASC" | "DESC") => {
     setSortStamps(newSort);
     const url = new URL(globalThis.location.href);
@@ -504,17 +523,7 @@ const WalletDashboardContent = ({
     globalThis.location.href = url.toString();
   };
 
-  // If pressing "transfer" in the Setting filter, open the stamp transfer modal
-  useEffect(() => {
-    const currentUrl = globalThis.location.href;
-    const url = new URL(currentUrl);
-    const filterByValue = url.searchParams.get("filterBy") || "";
-    if (filterByValue === "Transfer") {
-      setOpenSettingModal(true);
-    }
-  }, []);
-
-  // Build the stampGallery config
+  /* ===== GALLERY CONFIGURATION ===== */
   const stampGallery = {
     title: "",
     type: "all",
@@ -550,6 +559,7 @@ const WalletDashboardContent = ({
     },
   };
 
+  /* ===== RENDER ===== */
   return (
     <>
       {/* Stamps Section */}

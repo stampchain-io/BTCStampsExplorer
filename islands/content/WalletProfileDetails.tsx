@@ -1,3 +1,4 @@
+/* ===== WALLET PROFILE DETAILS COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
@@ -6,6 +7,7 @@ import { containerBackground } from "$layout";
 import { labelSm, subtitleGrey, titleGreyLD } from "$text";
 import { tooltipIcon } from "$notification";
 
+/* ===== TYPES ===== */
 interface WalletProfileDetailsProps {
   walletData: WalletOverviewInfo;
   stampsTotal: number;
@@ -14,13 +16,18 @@ interface WalletProfileDetailsProps {
   setShowItem: (type: string) => void;
 }
 
+/* ===== WALLET OVERVIEW SUBCOMPONENT ===== */
 function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
+  /* ===== STATE ===== */
   const [showCopied, setShowCopied] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [allowTooltip, setAllowTooltip] = useState(true);
+
+  /* ===== REFS ===== */
   const copyButtonRef = useRef<HTMLDivElement>(null);
   const tooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     return () => {
       if (tooltipTimeoutRef.current) {
@@ -29,6 +36,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
     };
   }, []);
 
+  /* ===== EVENT HANDLERS ===== */
   const handleCopyMouseEnter = () => {
     if (allowTooltip) {
       if (tooltipTimeoutRef.current) {
@@ -72,12 +80,14 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
     }
   };
 
+  /* ===== COMPUTED VALUES ===== */
   const bitNames = Array.isArray(walletData.src101?.names)
     ? walletData.src101.names.filter((name): name is string =>
       typeof name === "string"
     )
     : [];
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col">
       <div class="flex pb-1.5 mobileLg:pb-3">
@@ -175,6 +185,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   );
 }
 
+/* ===== TOKEN STATS SUBCOMPONENT ===== */
 function TokenStats(
   { src20Total, _handleType, src20Value = 0, _walletData }: {
     src20Total: number;
@@ -183,8 +194,10 @@ function TokenStats(
     walletData: WalletOverviewInfo;
   },
 ) {
+  /* ===== COMPUTED VALUES ===== */
   const totalValue = src20Value || 0;
 
+  /* ===== RENDER ===== */
   return (
     <div className="flex flex-col gap-1.5 mobileLg:gap-3">
       <div className="flex pb-1.5 mobileLg:pb-3">
@@ -210,6 +223,7 @@ function TokenStats(
   );
 }
 
+/* ===== STAMP STATS SUBCOMPONENT ===== */
 function StampStats(
   { stampsTotal, _stampsCreated, _handleType, _stampValue = 0, _dispensers }: {
     stampsTotal: number;
@@ -219,6 +233,7 @@ function StampStats(
     dispensers: { open: number; closed: number; total: number };
   },
 ) {
+  /* ===== RENDER ===== */
   return (
     <div className="flex flex-col gap-1.5 mobileLg:gap-3">
       <div className="flex pb-1.5 mobileLg:pb-3">
@@ -235,6 +250,7 @@ function StampStats(
   );
 }
 
+/* ===== WALLET STATS SUBCOMPONENT ===== */
 function WalletStats(
   {
     stampsTotal,
@@ -254,10 +270,12 @@ function WalletStats(
     walletData: WalletOverviewInfo;
   },
 ) {
+  /* ===== EVENT HANDLERS ===== */
   const handleType = (type: string) => {
     setShowItem(type);
   };
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col w-full mobileMd:flex-row tablet:flex-col gap-6">
       <div class="w-full mobileMd:w-1/2 tablet:w-full">
@@ -286,6 +304,7 @@ function WalletStats(
   );
 }
 
+/* ===== MAIN WALLET PROFILE DETAILS COMPONENT ===== */
 export default function WalletProfileDetails({
   walletData,
   stampsTotal,
@@ -293,6 +312,7 @@ export default function WalletProfileDetails({
   stampsCreated,
   setShowItem,
 }: WalletProfileDetailsProps) {
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col tablet:flex-row gap-6">
       <div className="flex flex-col h-fit w-full tablet:w-2/3">

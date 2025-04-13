@@ -1,3 +1,4 @@
+/* ===== DATA TABLE BASE COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { ScrollContainer } from "$layout";
 import {
@@ -15,8 +16,10 @@ import {
   textLoader,
 } from "$table";
 
+/* ===== CONSTANTS ===== */
 const PAGE_SIZE = 20;
 
+/* ===== COMPONENT ===== */
 export default function DataTableBase({
   type,
   configs,
@@ -24,6 +27,7 @@ export default function DataTableBase({
   tick,
   initialCounts = {},
 }: TableProps) {
+  /* ===== STATE ===== */
   const [selectedTab, setSelectedTab] = useState<string>(configs[0].id);
   const [tabData, setTabData] = useState<TabData>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -31,6 +35,7 @@ export default function DataTableBase({
   const [hasMore, setHasMore] = useState(true);
   const [totalCounts, setTotalCounts] = useState(initialCounts);
 
+  /* ===== DATA HANDLERS ===== */
   const mapDispensesWithRates = (dispenses: any[], dispensers: any[]) => {
     if (!dispenses || !dispensers) return [];
 
@@ -109,6 +114,7 @@ export default function DataTableBase({
     }
   };
 
+  /* ===== RENDER HELPERS ===== */
   const renderTabContent = () => {
     if (type === "stamps") {
       switch (selectedTab) {
@@ -141,6 +147,7 @@ export default function DataTableBase({
     return null;
   };
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     if (!selectedTab) return;
     setPage(1);
@@ -148,6 +155,7 @@ export default function DataTableBase({
     fetchData(1, selectedTab, true);
   }, [selectedTab]);
 
+  /* ===== EVENT HANDLERS ===== */
   const handleScroll = (e: Event) => {
     const target = e.target as HTMLDivElement;
     const scrollPosition = target.scrollTop + target.clientHeight;
@@ -163,6 +171,7 @@ export default function DataTableBase({
     }
   };
 
+  /* ===== DATA INITIALIZATION ===== */
   useEffect(() => {
     if (Object.keys(initialCounts).length > 0) return;
 
@@ -221,6 +230,7 @@ export default function DataTableBase({
     fetchCounts();
   }, [type, cpid, tick]);
 
+  /* ===== HELPER FUNCTIONS ===== */
   const getTabAlignment = (id: string, totalTabs: number) => {
     // For 3 tabs
     if (totalTabs === 3) {
@@ -259,8 +269,10 @@ export default function DataTableBase({
     }
   };
 
+  /* ===== RENDER ===== */
   return (
     <div class={container}>
+      {/* ===== TABS SECTION ===== */}
       <div class="flex justify-between items-start w-full mb-6">
         {configs.map(({ id }) => {
           const count = totalCounts[id as keyof typeof totalCounts];
@@ -288,9 +300,11 @@ export default function DataTableBase({
           );
         })}
       </div>
+      {/* ===== TABLE CONTENT ===== */}
       <ScrollContainer class="max-h-48" onScroll={handleScroll}>
         <div class="">
           {renderTabContent()}
+          {/* ===== LOADING INDICATOR ===== */}
           {isLoading && (
             <div class={textLoader}>
               <span>L</span>

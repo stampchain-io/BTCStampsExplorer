@@ -1,3 +1,4 @@
+/* ===== WALLET DASHBOARD DETAILS COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
@@ -8,6 +9,7 @@ import { containerBackground } from "$layout";
 import { titleGreyLD } from "$text";
 import { tooltipIcon } from "$notification";
 
+/* ===== TYPES ===== */
 interface WalletDashboardDetailsProps {
   walletData: WalletOverviewInfo;
   stampsTotal: number;
@@ -16,6 +18,7 @@ interface WalletDashboardDetailsProps {
   setShowItem: (type: string) => void;
 }
 
+/* ===== WALLET OVERVIEW SUBCOMPONENT ===== */
 function WalletOverview(
   { walletData, onSend, onReceive }: {
     walletData: WalletOverviewInfo;
@@ -23,30 +26,36 @@ function WalletOverview(
     onReceive: () => void;
   },
 ) {
+  /* ===== STATE ===== */
   const [hideBalance, setHideBalance] = useState<boolean>(false);
   const [showCopied, setShowCopied] = useState(false);
-  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
-  const [allowTooltip, setAllowTooltip] = useState(true);
-  const copyButtonRef = useRef<HTMLDivElement>(null);
-  const tooltipTimeoutRef = useRef<number | null>(null);
-  const [isSendTooltipVisible, setIsSendTooltipVisible] = useState(false);
-  const [allowSendTooltip, setAllowSendTooltip] = useState(true);
-  const sendButtonRef = useRef<HTMLDivElement>(null);
-  const sendTooltipTimeoutRef = useRef<number | null>(null);
-  const [isReceiveTooltipVisible, setIsReceiveTooltipVisible] = useState(false);
-  const [allowReceiveTooltip, setAllowReceiveTooltip] = useState(true);
-  const receiveButtonRef = useRef<HTMLDivElement>(null);
-  const receiveTooltipTimeoutRef = useRef<number | null>(null);
-  const [isHistoryTooltipVisible, setIsHistoryTooltipVisible] = useState(false);
-  const [allowHistoryTooltip, setAllowHistoryTooltip] = useState(true);
-  const historyButtonRef = useRef<HTMLDivElement>(null);
-  const historyTooltipTimeoutRef = useRef<number | null>(null);
-  const [isBalanceTooltipVisible, setIsBalanceTooltipVisible] = useState(false);
-  const [allowBalanceTooltip, setAllowBalanceTooltip] = useState(true);
-  const balanceButtonRef = useRef<HTMLButtonElement>(null);
-  const balanceTooltipTimeoutRef = useRef<number | null>(null);
   const [tooltipText, setTooltipText] = useState("HIDE BALANCE");
 
+  /* ===== TOOLTIP STATES ===== */
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+  const [allowTooltip, setAllowTooltip] = useState(true);
+  const [isSendTooltipVisible, setIsSendTooltipVisible] = useState(false);
+  const [allowSendTooltip, setAllowSendTooltip] = useState(true);
+  const [isReceiveTooltipVisible, setIsReceiveTooltipVisible] = useState(false);
+  const [allowReceiveTooltip, setAllowReceiveTooltip] = useState(true);
+  const [isHistoryTooltipVisible, setIsHistoryTooltipVisible] = useState(false);
+  const [allowHistoryTooltip, setAllowHistoryTooltip] = useState(true);
+  const [isBalanceTooltipVisible, setIsBalanceTooltipVisible] = useState(false);
+  const [allowBalanceTooltip, setAllowBalanceTooltip] = useState(true);
+
+  /* ===== REFS ===== */
+  const copyButtonRef = useRef<HTMLDivElement>(null);
+  const tooltipTimeoutRef = useRef<number | null>(null);
+  const sendButtonRef = useRef<HTMLDivElement>(null);
+  const sendTooltipTimeoutRef = useRef<number | null>(null);
+  const receiveButtonRef = useRef<HTMLDivElement>(null);
+  const receiveTooltipTimeoutRef = useRef<number | null>(null);
+  const historyButtonRef = useRef<HTMLDivElement>(null);
+  const historyTooltipTimeoutRef = useRef<number | null>(null);
+  const balanceButtonRef = useRef<HTMLButtonElement>(null);
+  const balanceTooltipTimeoutRef = useRef<number | null>(null);
+
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     return () => {
       if (tooltipTimeoutRef.current) {
@@ -67,6 +76,7 @@ function WalletOverview(
     };
   }, []);
 
+  /* ===== EVENT HANDLERS ===== */
   const handleCopyMouseEnter = () => {
     if (allowTooltip) {
       if (tooltipTimeoutRef.current) {
@@ -207,6 +217,7 @@ function WalletOverview(
     setAllowBalanceTooltip(true);
   };
 
+  /* ===== RENDER ===== */
   return (
     <div className="flex flex-col">
       <div className="flex justify-between">
@@ -408,7 +419,9 @@ function WalletOverview(
   );
 }
 
+/* ===== DASHBOARD PROFILE SUBCOMPONENT ===== */
 function DashboardProfile() {
+  /* ===== RENDER ===== */
   return (
     <div className="flex flex-col">
       <div className="flex">
@@ -483,6 +496,7 @@ function DashboardProfile() {
   );
 }
 
+/* ===== WALLET STATS SUBCOMPONENT ===== */
 function WalletStats(
   {
     stampsTotal,
@@ -502,10 +516,12 @@ function WalletStats(
     src20Value?: number;
   },
 ) {
+  /* ===== EVENT HANDLERS ===== */
   const handleType = (type: string) => {
     setShowItem(type);
   };
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
       <div class="flex flex-col w-full">
@@ -543,6 +559,7 @@ function WalletStats(
   );
 }
 
+/* ===== STAMP STATS SUBCOMPONENT ===== */
 function StampStats(
   { stampsTotal, stampsCreated, stampValue = 0 }: {
     stampsTotal: number;
@@ -551,6 +568,7 @@ function StampStats(
     stampValue?: number;
   },
 ) {
+  /* ===== RENDER ===== */
   return (
     <div className="flex flex-col gap-1.5 mobileLg:gap-3">
       <div className="flex pb-1.5 mobileLg:pb-3">
@@ -582,12 +600,14 @@ function StampStats(
   );
 }
 
+/* ===== DISPENSER STATS SUBCOMPONENT ===== */
 function DispenserStats(
   { dispensers = { open: 0, closed: 0, total: 0 } }: {
     handleType: (type: string) => void;
     dispensers?: { open: number; closed: number; total: number };
   },
 ) {
+  /* ===== RENDER ===== */
   return (
     <div className="flex flex-col gap-1.5 mobileLg:gap-3">
       <div className="flex pb-1.5 mobileLg:pb-3">
@@ -605,6 +625,7 @@ function DispenserStats(
   );
 }
 
+/* ===== TOKEN STATS SUBCOMPONENT ===== */
 function TokenStats(
   { src20Total, src20Value = 0 }: {
     src20Total: number;
@@ -612,8 +633,10 @@ function TokenStats(
     src20Value?: number;
   },
 ) {
+  /* ===== COMPUTED VALUES ===== */
   const totalValue = src20Value || 0;
 
+  /* ===== RENDER ===== */
   return (
     <div className="flex flex-col gap-1.5 mobileLg:gap-3">
       <div className="flex pb-1.5 mobileLg:pb-3">
@@ -671,6 +694,7 @@ function TokenStats(
   );
 }
 
+/* ===== MAIN WALLET DASHBOARD DETAILS COMPONENT ===== */
 export default function WalletDashboardDetails({
   walletData,
   stampsTotal,
@@ -678,10 +702,12 @@ export default function WalletDashboardDetails({
   stampsCreated,
   setShowItem,
 }: WalletDashboardDetailsProps) {
+  /* ===== STATE ===== */
   const [fee, setFee] = useState<number>(walletData.fee || 0);
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col w-full gap-3 mobileMd:gap-6">
       <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">

@@ -16,6 +16,7 @@ import {
 import { Button } from "$button";
 import { tooltipIcon } from "$notification";
 
+/* ===== MAIN WALLET DETAILS COMPONENT ===== */
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
     walletData: WalletOverviewInfo;
@@ -43,17 +44,22 @@ function WalletDetails(
   );
 }
 
+/* ===== WALLET OVERVIEW SUBCOMPONENT ===== */
 function WalletOverview(
   { walletData }: {
     walletData: WalletOverviewInfo;
   },
 ) {
+  /* ===== STATE ===== */
   const [showCopied, setShowCopied] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [allowTooltip, setAllowTooltip] = useState(true);
+
+  /* ===== REFS ===== */
   const copyButtonRef = useRef<HTMLDivElement>(null);
   const tooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     return () => {
       if (tooltipTimeoutRef.current) {
@@ -62,6 +68,7 @@ function WalletOverview(
     };
   }, []);
 
+  /* ===== EVENT HANDLERS ===== */
   const handleCopyMouseEnter = () => {
     if (allowTooltip) {
       if (tooltipTimeoutRef.current) {
@@ -105,6 +112,7 @@ function WalletOverview(
     }
   };
 
+  /* ===== COMPUTED VALUES ===== */
   const displayPrice = walletData.dispensers?.items?.[0]?.satoshirate
     ? parseInt(walletData.dispensers.items[0].satoshirate.toString(), 10) /
       100000000
@@ -115,6 +123,7 @@ function WalletOverview(
   console.log("walletData:", walletData);
   console.log("dispensers:", walletData.dispensers);
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
       <div class="flex flex-col w-full tablet:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
@@ -183,6 +192,7 @@ function WalletOverview(
   );
 }
 
+/* ===== DISPENSER STATS SUBCOMPONENT ===== */
 function DispenserStats({
   dispensers,
   btcPrice,
@@ -192,10 +202,12 @@ function DispenserStats({
   btcPrice: number;
   walletData: WalletOverviewInfo;
 }) {
+  /* ===== VALIDATION ===== */
   if (!walletData.address.startsWith("1D") && !walletData.dispensers?.total) {
     return null;
   }
 
+  /* ===== COMPUTED VALUES ===== */
   const firstDispenser = dispensers?.items?.[0];
   const stampData = firstDispenser?.stamp;
 
@@ -205,6 +217,7 @@ function DispenserStats({
     ? stampData.creator_name
     : abbreviateAddress(stampData.creator, 8);
 
+  /* ===== RENDER ===== */
   return (
     <div className="flex flex-col pt-6">
       {/* Stamp Info Section */}
@@ -286,6 +299,7 @@ function DispenserStats({
   );
 }
 
+/* ===== WALLET STATS SUBCOMPONENT ===== */
 function WalletStats(
   {
     stampsTotal,
@@ -305,10 +319,12 @@ function WalletStats(
     walletData: WalletOverviewInfo;
   },
 ) {
+  /* ===== EVENT HANDLERS ===== */
   const handleType = (type: string) => {
     setShowItem(type);
   };
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col mobileMd:flex-row w-full gap-3 mobileMd:gap-6">
       <StampStats
@@ -328,6 +344,7 @@ function WalletStats(
   );
 }
 
+/* ===== STAMP STATS SUBCOMPONENT ===== */
 function StampStats(
   { stampsTotal, stampsCreated, handleType, stampValue = 0, dispensers }: {
     stampsTotal: number;
@@ -337,6 +354,7 @@ function StampStats(
     dispensers: { open: number; closed: number; total: number };
   },
 ) {
+  /* ===== RENDER ===== */
   return (
     <div
       className={`${containerBackground} gap-6`}
@@ -373,6 +391,7 @@ function StampStats(
   );
 }
 
+/* ===== TOKEN STATS SUBCOMPONENT ===== */
 function TokenStats(
   { src20Total, handleType, src20Value = 0, walletData }: {
     src20Total: number;
@@ -381,8 +400,10 @@ function TokenStats(
     walletData: WalletOverviewInfo;
   },
 ) {
+  /* ===== COMPUTED VALUES ===== */
   const totalValue = src20Value || 0;
 
+  /* ===== RENDER ===== */
   return (
     <div
       className={`${containerBackground} gap-6`}
@@ -468,19 +489,30 @@ function TokenStats(
   );
 }
 
+/* ===== TYPES ===== */
 interface StatTitleProps {
   label: string;
   value: string | ComponentChildren;
   align?: "left" | "center" | "right";
 }
 
+interface StatItemProps {
+  label: string;
+  value: string | ComponentChildren;
+  align?: "left" | "center" | "right";
+  class?: string;
+}
+
+/* ===== STAT TITLE SUBCOMPONENT ===== */
 function StatTitle({ label, value, align = "left" }: StatTitleProps) {
+  /* ===== COMPUTED VALUES ===== */
   const alignmentClass = {
     left: "text-left",
     center: "text-center",
     right: "text-right",
   }[align];
 
+  /* ===== RENDER ===== */
   return (
     <div class={`${containerColData} `}>
       <p
@@ -497,22 +529,18 @@ function StatTitle({ label, value, align = "left" }: StatTitleProps) {
   );
 }
 
-interface StatItemProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: "left" | "center" | "right";
-  class?: string;
-}
-
+/* ===== STAT ITEM SUBCOMPONENT ===== */
 function StatItem(
   { label, value, align = "left", class: customClass }: StatItemProps,
 ) {
+  /* ===== COMPUTED VALUES ===== */
   const alignmentClass = {
     left: "text-left",
     center: "text-center",
     right: "text-right",
   }[align];
 
+  /* ===== RENDER ===== */
   return (
     <div class={`${containerBackground} gap-6 ${customClass || ""}`}>
       <h5

@@ -1,3 +1,4 @@
+/* ===== WALLET DISPENSER DETAILS COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
@@ -10,6 +11,7 @@ import { subtitleGrey, titleGreyLD, valueXs } from "$text";
 import { Button } from "$button";
 import { tooltipIcon } from "$notification";
 
+/* ===== TYPES ===== */
 interface WalletDispenserDetailsProps {
   walletData: WalletOverviewInfo;
   stampsTotal: number;
@@ -18,6 +20,7 @@ interface WalletDispenserDetailsProps {
   setShowItem: (type: string) => void;
 }
 
+/* ===== STAMP STATS SUBCOMPONENT ===== */
 function StampStats({
   dispensers,
   walletData,
@@ -25,6 +28,7 @@ function StampStats({
   dispensers: WalletOverviewInfo["dispensers"];
   walletData: WalletOverviewInfo;
 }) {
+  /* ===== TOOLTIP STATES ===== */
   const [isDivisibleTooltipVisible, setIsDivisibleTooltipVisible] = useState(
     false,
   );
@@ -33,8 +37,11 @@ function StampStats({
   const [isUnlockedTooltipVisible, setIsUnlockedTooltipVisible] = useState(
     false,
   );
+
+  /* ===== REFS ===== */
   const tooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     return () => {
       if (tooltipTimeoutRef.current) {
@@ -43,6 +50,7 @@ function StampStats({
     };
   }, []);
 
+  /* ===== TOOLTIP HANDLERS ===== */
   const handleDivisibleMouseEnter = () => {
     if (tooltipTimeoutRef.current) {
       globalThis.clearTimeout(tooltipTimeoutRef.current);
@@ -107,10 +115,12 @@ function StampStats({
     setIsUnlockedTooltipVisible(false);
   };
 
+  /* ===== VALIDATION ===== */
   if (!walletData.address.startsWith("1D") && !walletData.dispensers?.total) {
     return null;
   }
 
+  /* ===== COMPUTED VALUES ===== */
   const firstDispenser = dispensers?.items?.[0];
   const stampData = firstDispenser?.stamp as StampRow;
 
@@ -140,6 +150,7 @@ function StampStats({
     ? editionCount.toString()
     : parseInt(editionCount.toString()).toString();
 
+  /* ===== RENDER ===== */
   return (
     <div className="flex flex-col gap-1.5 mobileLg:gap-3">
       <div className="flex pb-1.5 mobileLg:pb-3">
@@ -270,6 +281,7 @@ function StampStats({
   );
 }
 
+/* ===== DISPENSER STATS SUBCOMPONENT ===== */
 function DispenserStats({
   dispensers,
   btcPrice,
@@ -277,11 +289,15 @@ function DispenserStats({
   dispensers: WalletOverviewInfo["dispensers"];
   btcPrice: number;
 }) {
+  /* ===== STATE ===== */
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [fee, setFee] = useState(1); // Default fee
+
+  /* ===== COMPUTED VALUES ===== */
   const firstDispenser = dispensers?.items?.[0];
   if (!firstDispenser) return null;
 
+  /* ===== EVENT HANDLERS ===== */
   const handleOpenBuyModal = () => {
     setShowBuyModal(true);
   };
@@ -290,6 +306,7 @@ function DispenserStats({
     setShowBuyModal(false);
   };
 
+  /* ===== RENDER ===== */
   return (
     <div className="flex flex-col gap-1.5 mobileLg:gap-3 pt-3 mobileLg:pt-6">
       {/* Open / close */}
@@ -393,13 +410,18 @@ function DispenserStats({
   );
 }
 
+/* ===== WALLET OVERVIEW SUBCOMPONENT ===== */
 function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
+  /* ===== STATE ===== */
   const [showCopied, setShowCopied] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [allowTooltip, setAllowTooltip] = useState(true);
+
+  /* ===== REFS ===== */
   const copyButtonRef = useRef<HTMLDivElement>(null);
   const tooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== EFFECTS ===== */
   useEffect(() => {
     return () => {
       if (tooltipTimeoutRef.current) {
@@ -408,6 +430,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
     };
   }, []);
 
+  /* ===== EVENT HANDLERS ===== */
   const handleCopyMouseEnter = () => {
     if (allowTooltip) {
       if (tooltipTimeoutRef.current) {
@@ -451,6 +474,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
     }
   };
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col">
       <div class="flex pb-1.5 mobileLg:pb-3">
@@ -507,12 +531,15 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   );
 }
 
+/* ===== MAIN COMPONENT ===== */
 export default function WalletDispenserDetails({
   walletData,
 }: WalletDispenserDetailsProps) {
+  /* ===== COMPUTED VALUES ===== */
   const firstDispenser = walletData.dispensers?.items?.[0];
   const stampData = firstDispenser?.stamp;
 
+  /* ===== RENDER ===== */
   return (
     <div class="flex flex-col mobileLg:flex-row gap-6">
       <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-2/3 gap-6">
