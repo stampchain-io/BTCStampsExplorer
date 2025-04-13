@@ -1,4 +1,4 @@
-/* ===== ABOUT DONATE COMPONENT ===== */
+/* ===== DONATE CTA COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { StampCard } from "$card";
 import { StampRow } from "$globals";

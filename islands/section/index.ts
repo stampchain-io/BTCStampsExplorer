@@ -21,7 +21,8 @@ export { default as StampTransfersGallery } from "$islands/section/gallery/Stamp
 export { default as SRC20DeploysGallery } from "$islands/section/gallery/SRC20Deploys.tsx";
 export { default as SRC20MintsGallery } from "$islands/section/gallery/SRC20Mints.tsx";
 export { default as SRC20TransfersGallery } from "$islands/section/gallery/SRC20Transfers.tsx";
-export { default as SRC101RegistersGallery } from "$islands/section/gallery/SRC101RegistersWIP.tsx";
+/* export { default as SRC101RegistersGallery } from "$islands/section/gallery/SRC101Registers.tsx"; */
+
 /* ===== HOW TO ===== */
 export * from "$islands/section/howto/HowToStamp.tsx";
 export * from "$islands/section/howto/HowToTransferStamp.tsx";
@@ -31,10 +32,10 @@ export * from "$islands/section/howto/HowToTransferToken.tsx";
 export * from "$islands/section/howto/HowToRegisterBitname.tsx";
 
 /* ===== CTA ===== */
-export * from "$islands/section/cta/StampChain.tsx";
-export * from "$islands/section/cta/GetStamping.tsx";
-export * from "$islands/section/cta/NamedAssets.tsx";
-export * from "$islands/section/cta/RecursiveLayering.tsx";
+export * from "$islands/section/cta/StampchainContactCta.tsx";
+export * from "$islands/section/cta/GetStampingCta.tsx";
+export * from "$islands/section/cta/StampPoshCta.tsx";
+export * from "$islands/section/cta/RecursiveContactCta.tsx";
 /* I have no idea why, but these two files cannot be barrel exported */
 /* It breaks the display of the tools */
 /* Direct path import in /routes/about/index.tsx instead */

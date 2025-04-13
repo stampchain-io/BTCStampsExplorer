@@ -1,9 +1,9 @@
-/* ===== STAMPCHAIN MODULE COMPONENT ===== */
+/* ===== STAMPCHAIN CONTACT CTA COMPONENT ===== */
 import { Button } from "$button";
 import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */
-export const StampChainModule = () => {
+export const StampchainContactCta = () => {
   /* ===== RENDER ===== */
   return (
     <div class="grid grid-cols-1 desktop:grid-cols-3 gap-7 items-end

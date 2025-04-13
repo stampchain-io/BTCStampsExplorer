@@ -1,9 +1,9 @@
-/* ===== RECURSIVE LAYERING MODULE COMPONENT ===== */
+/* ===== RECURSIVE CONTACT CTA COMPONENT ===== */
 import { Button } from "$button";
 import { subtitleGrey, text } from "$text";
 
 /* ===== COMPONENT ===== */
-export const RecursiveLayeringModule = () => {
+export const RecursiveContactCta = () => {
   /* ===== RENDER ===== */
   return (
     <>

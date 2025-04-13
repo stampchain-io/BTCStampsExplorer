@@ -1,4 +1,4 @@
-/* ===== RECENT SALES COMPONENT ===== */
+/* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
 import { useEffect, useState } from "preact/hooks";
 import type { StampRow } from "$globals";

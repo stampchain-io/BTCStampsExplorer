@@ -1,4 +1,4 @@
-/* ===== COLLECTION SECTION COMPONENT ===== */
+/* ===== COLLECTION GALLERY COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { Collection, CollectionGalleryProps } from "$globals";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";

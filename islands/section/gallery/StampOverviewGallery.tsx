@@ -1,4 +1,4 @@
-/* @baba-rename to HomeContnet ??? HomeGallery ??? */
+/* ===== STAMP OVERVIEW GALLERY COMPONENT ===== */
 import {
   Collection,
   CollectionGalleryProps,
@@ -9,6 +9,7 @@ import {
 import { CollectionGallery, StampGallery } from "$section";
 import { titlePurpleDL } from "$text";
 
+/* ===== TYPES ===== */
 interface StampOverviewGalleryProps {
   stamps_art?: StampRow[];
   stamps_posh?: StampRow[];
@@ -16,12 +17,14 @@ interface StampOverviewGalleryProps {
   collectionData?: Collection[];
 }
 
+/* ===== COMPONENT ===== */
 export function StampOverviewGallery({
   stamps_src721 = [],
   stamps_art = [],
   stamps_posh = [],
   collectionData = [],
 }: StampOverviewGalleryProps) {
+  /* ===== SECTION CONFIGURATIONS ===== */
   const LatestArtStampsSection: StampGalleryProps[] = [
     {
       subTitle: "ON-CHAIN MARVELS",
@@ -125,12 +128,13 @@ export function StampOverviewGallery({
     },
   };
 
+  /* ===== RENDER ===== */
   return (
     <div className="
         flex flex-col max-w-desktop w-full mx-auto
         gap-12 mobileLg:gap-24 desktop:gap-36
       ">
-      {/* LATEST ART STAMPS */}
+      {/* ===== LATEST ART STAMPS SECTION ===== */}
       <div className="flex flex-col">
         <div className="w-full">
           <h1 className={titlePurpleDL}>
@@ -145,15 +149,15 @@ export function StampOverviewGallery({
         </div>
       </div>
 
-      {/* FEATURED ARTISTS */}
+      {/* ===== FEATURED ARTISTS SECTION ===== */}
       <CollectionGallery {...FeaturedArtistsSection} />
 
-      {/* COLLECTIONS */}
+      {/* ===== COLLECTIONS SECTION ===== */}
       {CollectionsSection.map((section, index) => (
         <StampGallery key={index} {...section} />
       ))}
 
-      {/* CUTTING EDGE */}
+      {/* ===== CUTTING EDGE SECTION ===== */}
       <CollectionGallery {...CuttingEdgeSection} />
     </div>
   );

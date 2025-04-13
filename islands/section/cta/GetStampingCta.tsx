@@ -1,4 +1,4 @@
-/* ===== GET STAMPING MODULE COMPONENT ===== */
+/* ===== GET STAMPING CTA COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { gapGrid } from "$layout";
@@ -6,7 +6,7 @@ import { Button } from "$button";
 import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */
-export function GetStampingModule() {
+export function GetStampingCta() {
   /* ===== STATE ===== */
   const [btcPrice, setBtcPrice] = useState(0);
   const [recommendedFee, setRecommendedFee] = useState(6);

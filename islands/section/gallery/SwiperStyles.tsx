@@ -1,3 +1,4 @@
+/* ===== SWIPER STYLES COMPONENT ===== */
 export default function SwiperStyles() {
   return (
     <link

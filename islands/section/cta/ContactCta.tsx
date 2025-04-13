@@ -1,5 +1,5 @@
 /* TODO @REINAMORA:  Update the contact form to be able to send emails */
-/* ===== ABOUT CONTACT COMPONENT ===== */
+/* ===== CONTACT CTA COMPONENT ===== */
 import { useState } from "preact/hooks";
 import { InputField } from "$form";
 import { ButtonProcessing } from "$button";

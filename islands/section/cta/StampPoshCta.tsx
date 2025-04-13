@@ -1,9 +1,9 @@
-/* ===== NAMED ASSETS MODULE COMPONENT ===== */
+/* ===== STAMP POSH CTA COMPONENT ===== */
 import { subtitleGrey, text } from "$text";
 import { Button } from "$button";
 
 /* ===== COMPONENT ===== */
-export const NamedAssetsModule = () => {
+export const StampPoshCta = () => {
   return (
     <>
       {/* ===== CONTENT SECTION ===== */}

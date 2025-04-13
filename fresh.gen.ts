@@ -113,6 +113,7 @@ import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
+import * as $src20_minting from "./routes/src20/minting.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_art from "./routes/stamp/art.tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
@@ -131,11 +132,6 @@ import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
-import * as $WIP_StampChainSelectedWIP from "./islands/WIP/StampChainSelectedWIP.tsx";
-import * as $WIP_UploadImageHeaderWIP from "./islands/WIP/UploadImageHeaderWIP.tsx";
-import * as $WIP_artist_ArtistCollectionWIP from "./islands/WIP/artist/ArtistCollectionWIP.tsx";
-import * as $WIP_artist_CollectionCreateButtonWIP from "./islands/WIP/artist/CollectionCreateButtonWIP.tsx";
-import * as $WIP_artist_CollectionOverviewArtistContentWIP from "./islands/WIP/artist/CollectionOverviewArtistContentWIP.tsx";
 import * as $WIP_test_ReviewDogTest from "./islands/WIP/test/ReviewDogTest.tsx";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
@@ -208,15 +204,14 @@ import * as $search_index from "./islands/search/index.ts";
 import * as $search_styles from "./islands/search/styles.ts";
 import * as $section_cta_ContactCta from "./islands/section/cta/ContactCta.tsx";
 import * as $section_cta_DonateCta from "./islands/section/cta/DonateCta.tsx";
-import * as $section_cta_GetStamping from "./islands/section/cta/GetStamping.tsx";
-import * as $section_cta_NamedAssets from "./islands/section/cta/NamedAssets.tsx";
-import * as $section_cta_RecursiveLayering from "./islands/section/cta/RecursiveLayering.tsx";
-import * as $section_cta_StampChain from "./islands/section/cta/StampChain.tsx";
+import * as $section_cta_GetStampingCta from "./islands/section/cta/GetStampingCta.tsx";
+import * as $section_cta_RecursiveContactCta from "./islands/section/cta/RecursiveContactCta.tsx";
+import * as $section_cta_StampPoshCta from "./islands/section/cta/StampPoshCta.tsx";
+import * as $section_cta_StampchainContactCta from "./islands/section/cta/StampchainContactCta.tsx";
 import * as $section_gallery_ArtistGallery from "./islands/section/gallery/ArtistGallery.tsx";
 import * as $section_gallery_Carousel from "./islands/section/gallery/Carousel.tsx";
 import * as $section_gallery_CollectionGallery from "./islands/section/gallery/CollectionGallery.tsx";
 import * as $section_gallery_Partners from "./islands/section/gallery/Partners.tsx";
-import * as $section_gallery_SRC101RegistersWIP from "./islands/section/gallery/SRC101RegistersWIP.tsx";
 import * as $section_gallery_SRC20Deploys from "./islands/section/gallery/SRC20Deploys.tsx";
 import * as $section_gallery_SRC20Gallery from "./islands/section/gallery/SRC20Gallery.tsx";
 import * as $section_gallery_SRC20Mints from "./islands/section/gallery/SRC20Mints.tsx";
@@ -391,6 +386,7 @@ const manifest = {
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/src20/[tick].tsx": $src20_tick_,
     "./routes/src20/index.tsx": $src20_index,
+    "./routes/src20/minting.tsx": $src20_minting,
     "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/art.tsx": $stamp_art,
     "./routes/stamp/index.tsx": $stamp_index,
@@ -411,14 +407,6 @@ const manifest = {
   islands: {
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
-    "./islands/WIP/StampChainSelectedWIP.tsx": $WIP_StampChainSelectedWIP,
-    "./islands/WIP/UploadImageHeaderWIP.tsx": $WIP_UploadImageHeaderWIP,
-    "./islands/WIP/artist/ArtistCollectionWIP.tsx":
-      $WIP_artist_ArtistCollectionWIP,
-    "./islands/WIP/artist/CollectionCreateButtonWIP.tsx":
-      $WIP_artist_CollectionCreateButtonWIP,
-    "./islands/WIP/artist/CollectionOverviewArtistContentWIP.tsx":
-      $WIP_artist_CollectionOverviewArtistContentWIP,
     "./islands/WIP/test/ReviewDogTest.tsx": $WIP_test_ReviewDogTest,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
@@ -504,19 +492,18 @@ const manifest = {
     "./islands/search/styles.ts": $search_styles,
     "./islands/section/cta/ContactCta.tsx": $section_cta_ContactCta,
     "./islands/section/cta/DonateCta.tsx": $section_cta_DonateCta,
-    "./islands/section/cta/GetStamping.tsx": $section_cta_GetStamping,
-    "./islands/section/cta/NamedAssets.tsx": $section_cta_NamedAssets,
-    "./islands/section/cta/RecursiveLayering.tsx":
-      $section_cta_RecursiveLayering,
-    "./islands/section/cta/StampChain.tsx": $section_cta_StampChain,
+    "./islands/section/cta/GetStampingCta.tsx": $section_cta_GetStampingCta,
+    "./islands/section/cta/RecursiveContactCta.tsx":
+      $section_cta_RecursiveContactCta,
+    "./islands/section/cta/StampPoshCta.tsx": $section_cta_StampPoshCta,
+    "./islands/section/cta/StampchainContactCta.tsx":
+      $section_cta_StampchainContactCta,
     "./islands/section/gallery/ArtistGallery.tsx":
       $section_gallery_ArtistGallery,
     "./islands/section/gallery/Carousel.tsx": $section_gallery_Carousel,
     "./islands/section/gallery/CollectionGallery.tsx":
       $section_gallery_CollectionGallery,
     "./islands/section/gallery/Partners.tsx": $section_gallery_Partners,
-    "./islands/section/gallery/SRC101RegistersWIP.tsx":
-      $section_gallery_SRC101RegistersWIP,
     "./islands/section/gallery/SRC20Deploys.tsx": $section_gallery_SRC20Deploys,
     "./islands/section/gallery/SRC20Gallery.tsx": $section_gallery_SRC20Gallery,
     "./islands/section/gallery/SRC20Mints.tsx": $section_gallery_SRC20Mints,

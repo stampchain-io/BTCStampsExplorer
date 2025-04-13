@@ -1,4 +1,4 @@
-/* ===== COLLECTION OVERVIEW SECTION COMPONENT ===== */
+/* ===== ARTIST GALLERY COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { Collection, CollectionGalleryProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
