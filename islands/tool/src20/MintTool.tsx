@@ -291,7 +291,7 @@ export function SRC20MintTool({
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>MINT</h1>
+      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>MINT</h1>
 
       {/* ===== ERROR MESSAGE DISPLAY ===== */}
       {error && (

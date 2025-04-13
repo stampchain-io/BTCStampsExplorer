@@ -1320,7 +1320,7 @@ export function StampingTool() {
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>STAMP</h1>
+      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>STAMP</h1>
 
       {isConnected && addressError && (
         <div class="w-full text-red-500 text-center font-bold">

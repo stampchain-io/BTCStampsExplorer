@@ -1,13 +1,13 @@
 /* ===== HOW TO TRANSFER BITNAME COMPONENT ===== */
 import { ReadAllButton } from "$button";
-import { subtitleGrey, text, titleGreyDL } from "$text";
+import { subtitleGrey, text, titleGreyLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export const SRC101TransferHowto = () => {
   return (
     <div class="flex flex-col gap-6">
       <div class="flex flex-col">
-        <h3 class={titleGreyDL}>HOW-TO</h3>
+        <h3 class={titleGreyLD}>HOW-TO</h3>
         <h2 class={subtitleGrey}>TRANSFER A TOKEN</h2>
         <p class={text}>
           <ul class="list-disc pl-5 space-y-2">

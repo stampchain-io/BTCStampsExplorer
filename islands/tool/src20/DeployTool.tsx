@@ -252,7 +252,7 @@ export function SRC20DeployTool(
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>DEPLOY</h1>
+      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>DEPLOY</h1>
 
       <form
         class={`${containerBackground} mb-6`}

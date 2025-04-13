@@ -1,9 +1,9 @@
 /* ===== TEXT STYLES MODULE ===== */
 
 /* ===== BASE STYLES ===== */
-const logoFont = "font-black italic text-4xl tracking-wide";
+const logoFont = "font-black italic text-4xl tracking-wide inline-block w-fit";
 const titleFont =
-  "font-black text-3xl mobileMd:text-4xl tracking-wide inline-block";
+  "font-black text-3xl mobileMd:text-4xl tracking-wide inline-block w-fit";
 const subtitleFont = "font-extralight text-2xl mobileMd:text-3xl mb-2";
 const textFont = "font-normal text-stamp-grey-light";
 const labelFont = "font-light text-stamp-grey-darker";
@@ -32,7 +32,7 @@ export const navLinkPurpleThick =
 export const navLinkGrey =
   `font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey tracking-wide ${transition} ${cursor}`; // used in header - mobile menu
 export const navLinkGreyLD =
-  `font-extrabold text-2xl gray-gradient1-hover tracking-wide inline-block ${transition} ${cursor}`; // used in header - mobile menu
+  `font-extrabold text-2xl gray-gradient1-hover tracking-wide inline-block w-fit ${transition} ${cursor}`; // used in header - mobile menu
 
 /* ===== TITLE STYLES ===== */
 export const titleGreyLD = `${titleFont} gray-gradient1 ${cursor}`;
@@ -49,7 +49,7 @@ export const subtitlePurple =
 export const headingGrey2 =
   `font-black text-3xl mobileLg:text-4xl text-stamp-grey-light tracking-wide ${cursor}`; // was used in about donate section - rename
 export const headingGreyLDLink =
-  `font-bold text-xl gray-gradient1-hover tracking-wide inline-block relative ${transition}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
+  `font-bold text-xl gray-gradient1-hover tracking-wide inline-block w-fit relative ${transition}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
 export const headingGrey =
   "font-bold text-2xl mobileMd:text-3xl text-stamp-grey tracking-wide cursor-default select-none";
 

@@ -509,10 +509,10 @@ export function StampTradeTool() {
   return (
     <div className={`${bodyTool}`}>
       {/* ===== SELLER SECTION ===== */}
-      <h1 className={`${titlePurpleLD} mobileMd:text-center`}>
+      <h1 className={`${titlePurpleLD} mobileMd:mx-auto`}>
         ATTACH TO UTXO
       </h1>
-      <h2 className={`${subtitlePurple} mobileMd:text-center`}>SELLER</h2>
+      <h2 className={`${subtitlePurple} mobileMd:mx-auto`}>SELLER</h2>
 
       {/* ===== CREATE PSBT FORM ===== */}
       <div className={containerBackground}>
@@ -755,7 +755,7 @@ export function StampTradeTool() {
       {/* ===== BUYER SECTION ===== */}
       {/* ===== COMPLETE SWAP FORM ===== */}
       <div className={containerBackground}>
-        <h2 className={`${subtitlePurple} mobileMd:text-center`}>BUYER</h2>
+        <h2 className={`${subtitlePurple} mobileMd:mx-auto`}>BUYER</h2>
         <h3 className=" font-bold text-xl text-stamp-purple mb-2">
           COMPLETE SWAP
         </h3>

@@ -42,7 +42,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
 
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>FAIRMINT</h1>
+      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>FAIRMINT</h1>
 
       <form class={`${containerBackground} mb-6`}>
         {/* ===== TOKEN SELECTION ===== */}

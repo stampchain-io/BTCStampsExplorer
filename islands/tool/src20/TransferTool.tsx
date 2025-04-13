@@ -204,7 +204,7 @@ export function SRC20TransferTool(
 
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>TRANSFER</h1>
+      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>TRANSFER</h1>
 
       {/* ===== FORM  ===== */}
       <form

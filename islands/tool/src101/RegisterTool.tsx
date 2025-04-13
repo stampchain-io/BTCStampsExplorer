@@ -163,7 +163,7 @@ export function SRC101RegisterTool({
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:text-center mb-1`}>REGISTER</h1>
+      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>REGISTER</h1>
 
       <form
         class={`${containerBackground} gap-5`}
