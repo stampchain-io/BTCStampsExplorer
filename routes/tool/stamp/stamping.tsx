@@ -4,7 +4,7 @@ import type { StampRow } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { StampingTool } from "$tool";
-import { HowToStampModule, StampGallery } from "$section";
+import { StampGallery, StampingHowto } from "$section";
 import { body, gapSection } from "$layout";
 
 /* ===== TYPES ===== */
@@ -75,7 +75,7 @@ export default function ToolStampingPage({ data }: PageProps<StampPageData>) {
         className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
       >
         <div className="flex w-full tablet:w-1/2">
-          <HowToStampModule />
+          <StampingHowto />
         </div>
         <div className="flex flex-col w-full tablet:w-1/2 items-start tablet:items-end gap-6">
           <StampGallery {...latestStampsSection} />

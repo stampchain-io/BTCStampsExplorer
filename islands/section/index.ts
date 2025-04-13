@@ -24,12 +24,12 @@ export { default as SRC20TransfersGallery } from "$islands/section/gallery/SRC20
 /* export { default as SRC101RegistersGallery } from "$islands/section/gallery/SRC101Registers.tsx"; */
 
 /* ===== HOW TO ===== */
-export * from "$islands/section/howto/HowToStamp.tsx";
-export * from "$islands/section/howto/HowToTransferStamp.tsx";
-export * from "$islands/section/howto/HowToDeployToken.tsx";
-export * from "$islands/section/howto/HowToMintToken.tsx";
-export * from "$islands/section/howto/HowToTransferToken.tsx";
-export * from "$islands/section/howto/HowToRegisterBitname.tsx";
+export * from "$islands/section/howto/StampingHowto.tsx";
+export * from "$islands/section/howto/StampTransferHowto.tsx";
+export * from "$islands/section/howto/SRC20DeployHowto.tsx";
+export * from "$islands/section/howto/SRC20MintHowto.tsx";
+export * from "$islands/section/howto/SRC20TransferHowto.tsx";
+export * from "$islands/section/howto/SRC101RegisterHowto.tsx";
 
 /* ===== CTA ===== */
 export * from "$islands/section/cta/StampchainContactCta.tsx";

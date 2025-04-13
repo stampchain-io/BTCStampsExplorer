@@ -8,10 +8,10 @@ import { Micro5FontLoader } from "$layout";
 import { HomeHeader } from "$header";
 import {
   CarouselHome,
-  GetStampingModule,
+  GetStampingCta,
   PartnersGallery,
   SRC20Gallery,
-  StampChainModule,
+  StampchainContactCta,
   StampOverviewGallery,
   StampSalesGallery,
 } from "$section";
@@ -119,7 +119,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
           {/* Lazy load below-the-fold content */}
           <div style="margin-top: -48px; content-visibility: auto; contain-intrinsic-size: 0 800px;">
-            <GetStampingModule />
+            <GetStampingCta />
             <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
               <StampSalesGallery
                 title="RECENT SALES"
@@ -138,19 +138,19 @@ export default function Home({ data }: PageProps<HomePageData>) {
               <SRC20Gallery
                 title="SRC-20 TOKENS"
                 subTitle="TOP TICKERS"
-                type="all"
+                viewType="minted"
                 fromPage="home"
               />
               <SRC20Gallery
                 title="SRC-20 TOKENS"
                 subTitle="TRENDING MINTS"
-                type="trending"
+                viewType="minting"
                 fromPage="home"
               />
             </div>
           </div>
           <div class="flex flex-col gap-6 mobileLg:gap-12">
-            <StampChainModule />
+            <StampchainContactCta />
             <PartnersGallery />
           </div>
         </div>

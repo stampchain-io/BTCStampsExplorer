@@ -2,7 +2,7 @@
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */
-export const HowToRegisterBitnameModule = () => {
+export const SRC101RegisterHowto = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col">

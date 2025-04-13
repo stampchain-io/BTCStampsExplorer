@@ -7,11 +7,11 @@ import type { SRC20MintStatus } from "$lib/types/src20.d.ts";
 import { body, gapSection } from "$layout";
 import { SRC20DeployTool, SRC20MintTool, SRC20TransferTool } from "$tool";
 import {
-  HowToDeployTokenModule,
-  HowToMintTokenModule,
-  HowToTransferTokenModule,
+  SRC20DeployHowto,
   SRC20DeploysGallery,
+  SRC20MintHowto,
   SRC20MintsGallery,
+  SRC20TransferHowto,
   SRC20TransfersGallery,
 } from "$section";
 
@@ -123,11 +123,11 @@ export default function ToolSrc20Page(
   const renderLeftSidebar = () => {
     switch (selectedTab) {
       case "mint":
-        return <HowToMintTokenModule />;
+        return <SRC20MintHowto />;
       case "deploy":
-        return <HowToDeployTokenModule />;
+        return <SRC20DeployHowto />;
       case "transfer":
-        return <HowToTransferTokenModule />;
+        return <SRC20TransferHowto />;
       default:
         return null;
     }

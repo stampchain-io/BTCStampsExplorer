@@ -222,13 +222,13 @@ import * as $section_gallery_StampSales from "./islands/section/gallery/StampSal
 import * as $section_gallery_StampTransfers from "./islands/section/gallery/StampTransfers.tsx";
 import * as $section_gallery_SwiperStyles from "./islands/section/gallery/SwiperStyles.tsx";
 import * as $section_gallery_Team from "./islands/section/gallery/Team.tsx";
-import * as $section_howto_HowToDeployToken from "./islands/section/howto/HowToDeployToken.tsx";
-import * as $section_howto_HowToMintToken from "./islands/section/howto/HowToMintToken.tsx";
-import * as $section_howto_HowToRegisterBitname from "./islands/section/howto/HowToRegisterBitname.tsx";
-import * as $section_howto_HowToStamp from "./islands/section/howto/HowToStamp.tsx";
-import * as $section_howto_HowToTransferBitname from "./islands/section/howto/HowToTransferBitname.tsx";
-import * as $section_howto_HowToTransferStamp from "./islands/section/howto/HowToTransferStamp.tsx";
-import * as $section_howto_HowToTransferToken from "./islands/section/howto/HowToTransferToken.tsx";
+import * as $section_howto_SRC101RegisterHowto from "./islands/section/howto/SRC101RegisterHowto.tsx";
+import * as $section_howto_SRC101TransferHowto from "./islands/section/howto/SRC101TransferHowto.tsx";
+import * as $section_howto_SRC20DeployHowto from "./islands/section/howto/SRC20DeployHowto.tsx";
+import * as $section_howto_SRC20MintHowto from "./islands/section/howto/SRC20MintHowto.tsx";
+import * as $section_howto_SRC20TransferHowto from "./islands/section/howto/SRC20TransferHowto.tsx";
+import * as $section_howto_StampTransferHowto from "./islands/section/howto/StampTransferHowto.tsx";
+import * as $section_howto_StampingHowto from "./islands/section/howto/StampingHowto.tsx";
 import * as $section_index from "./islands/section/index.ts";
 import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
 import * as $table_HoldersPieChart from "./islands/table/HoldersPieChart.tsx";
@@ -517,18 +517,18 @@ const manifest = {
       $section_gallery_StampTransfers,
     "./islands/section/gallery/SwiperStyles.tsx": $section_gallery_SwiperStyles,
     "./islands/section/gallery/Team.tsx": $section_gallery_Team,
-    "./islands/section/howto/HowToDeployToken.tsx":
-      $section_howto_HowToDeployToken,
-    "./islands/section/howto/HowToMintToken.tsx": $section_howto_HowToMintToken,
-    "./islands/section/howto/HowToRegisterBitname.tsx":
-      $section_howto_HowToRegisterBitname,
-    "./islands/section/howto/HowToStamp.tsx": $section_howto_HowToStamp,
-    "./islands/section/howto/HowToTransferBitname.tsx":
-      $section_howto_HowToTransferBitname,
-    "./islands/section/howto/HowToTransferStamp.tsx":
-      $section_howto_HowToTransferStamp,
-    "./islands/section/howto/HowToTransferToken.tsx":
-      $section_howto_HowToTransferToken,
+    "./islands/section/howto/SRC101RegisterHowto.tsx":
+      $section_howto_SRC101RegisterHowto,
+    "./islands/section/howto/SRC101TransferHowto.tsx":
+      $section_howto_SRC101TransferHowto,
+    "./islands/section/howto/SRC20DeployHowto.tsx":
+      $section_howto_SRC20DeployHowto,
+    "./islands/section/howto/SRC20MintHowto.tsx": $section_howto_SRC20MintHowto,
+    "./islands/section/howto/SRC20TransferHowto.tsx":
+      $section_howto_SRC20TransferHowto,
+    "./islands/section/howto/StampTransferHowto.tsx":
+      $section_howto_StampTransferHowto,
+    "./islands/section/howto/StampingHowto.tsx": $section_howto_StampingHowto,
     "./islands/section/index.ts": $section_index,
     "./islands/table/DataTableBase.tsx": $table_DataTableBase,
     "./islands/table/HoldersPieChart.tsx": $table_HoldersPieChart,

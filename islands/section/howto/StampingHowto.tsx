@@ -3,7 +3,7 @@ import { ReadAllButton } from "$button";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */
-export const HowToStampModule = () => {
+export const StampingHowto = () => {
   return (
     <div class="flex flex-col gap-6">
       <div class="flex flex-col">

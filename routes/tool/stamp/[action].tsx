@@ -2,7 +2,7 @@
 /*@baba-71-82*/
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { StampTransferTool } from "$tool";
-import { HowToTransferStampModule, StampTransfersGallery } from "$section";
+import { StampTransferHowto, StampTransfersGallery } from "$section";
 import { body, gapSection } from "$layout";
 
 /* ===== TYPES ===== */
@@ -56,7 +56,7 @@ export default function ToolStampPage(
     console.log("Rendering Left Sidebar for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
-        return <HowToTransferStampModule />;
+        return <StampTransferHowto />;
       default:
         return <div>No sidebar content available for this tab.</div>;
     }

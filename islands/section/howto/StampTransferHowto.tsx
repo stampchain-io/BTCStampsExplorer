@@ -1,14 +1,14 @@
-/* ===== HOW TO TRANSFER BITNAME COMPONENT ===== */
+/* ===== HOW TO TRANSFER STAMP COMPONENT ===== */
 import { ReadAllButton } from "$button";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */
-export const HowToTransferBitnameModule = () => {
+export const StampTransferHowto = () => {
   return (
-    <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col">
         <h3 class={titleGreyDL}>HOW-TO</h3>
-        <h2 class={subtitleGrey}>TRANSFER A TOKEN</h2>
+        <h2 class={subtitleGrey}>TRANSFER A STAMP</h2>
         <p class={text}>
           <ul class="list-disc pl-5 space-y-2">
             <li>
@@ -43,13 +43,13 @@ export const HowToTransferBitnameModule = () => {
           </ul>
         </p>
         <p class={text}>
-          Reducing the fee may slow down the transfer process.<br />
-          Fees are shown in BTC by default, but you can change to USDT using the
-          toggle switch.<br />
-          All related costs are listed in the <b>details</b> section.<br />
+          All related costs are listed under the <b>details</b> section. <br />
+          Lowering the fee may delay your art being stamped.<br />
+          Fees are displayed in BTC by default, but you can switch to USDT using
+          the <b>toggle</b>.<br />
         </p>
       </div>
-      <ReadAllButton href="/howto/transferbitname" />
+      <ReadAllButton href="/howto/transferstamp" />
     </div>
   );
 };

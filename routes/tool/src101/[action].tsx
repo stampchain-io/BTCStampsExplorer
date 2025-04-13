@@ -3,7 +3,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { body, gapSection } from "$layout";
 import { SRC101RegisterTool } from "$tool";
-import { HowToRegisterBitnameModule, SRC101RegistersGallery } from "$section";
+import { SRC101RegisterHowto } from "$section";
 
 /* ===== TYPES ===== */
 interface ToolsSrc101PageProps {
@@ -66,7 +66,7 @@ export default function ToolsSrc101Page(
         className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
       >
         <div class="w-full tablet:w-full">
-          <HowToRegisterBitnameModule />
+          <SRC101RegisterHowto />
         </div>
         <div class="w-full tablet:w-1/2 hidden">
           <SRC101RegistersGallery />

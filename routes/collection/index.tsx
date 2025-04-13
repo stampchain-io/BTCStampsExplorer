@@ -13,9 +13,9 @@ import { body, gapSection } from "$layout";
 import {
   ArtistGallery,
   CollectionGallery,
-  NamedAssetsModule,
-  RecursiveLayeringModule,
+  RecursiveContactCta,
   StampGallery,
+  StampPoshCta,
 } from "$section";
 
 /* ===== TYPES ===== */
@@ -219,12 +219,12 @@ export default function CollectionLandingPage(
       />
       <div class="relative">
         <CollectionGallery {...EspeciallyPoshSection} />
-        <NamedAssetsModule />
+        <StampPoshCta />
       </div>
       <StampGallery {...CollectionsSection[1]} />
       <div class="relative">
         <CollectionGallery {...CuttingEdgeSection} />
-        <RecursiveLayeringModule />
+        <RecursiveContactCta />
       </div>
       <ArtistGallery {...PopularArtistGallery} />
     </div>

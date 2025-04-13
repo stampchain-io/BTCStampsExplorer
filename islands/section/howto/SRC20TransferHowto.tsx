@@ -3,7 +3,7 @@ import { ReadAllButton } from "$button";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */
-export const HowToTransferTokenModule = () => {
+export const SRC20TransferHowto = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col">
