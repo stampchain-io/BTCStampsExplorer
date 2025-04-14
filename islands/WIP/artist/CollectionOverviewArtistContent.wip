@@ -1,6 +1,6 @@
 /* ===== COLLECTION OVERVIEW ARTIST CONTENT COMPONENT ===== */
 import { Collection } from "$globals";
-import { CollectionOverviewCard } from "$components/collection/CollectionOverviewCard.tsx";
+import { CollectionCard } from "$components/card/CollectionCard.tsx";
 
 /* ===== TYPES ===== */
 type CollectionOverviewArtistContentProps = {
@@ -20,7 +20,7 @@ export function CollectionOverviewArtistContent(
             <>
               {collection.stamp_count != 0
                 ? (
-                  <CollectionOverviewCard
+                  <CollectionCard
                     key={collection.collection_id}
                     collection={collection}
                   />

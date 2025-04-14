@@ -6,7 +6,7 @@ import {
   MINT_IMPORTANT_NOTES,
   MINT_STEPS,
   StepList,
-} from "$howto";
+} from "$section";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {

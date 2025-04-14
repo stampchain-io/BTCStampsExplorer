@@ -8,7 +8,7 @@ import {
   TEMPLATE_IMPORTANT_NOTES,
   TEMPLATE_SETUP_STEPS, // Optional: Only if using BulletList
   TEMPLATE_STEPS,
-} from "$howto";
+} from "$section";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {

@@ -5,7 +5,16 @@ import { JSX } from "preact";
 export interface IconVariants {
   name: string;
   weight: "light" | "normal" | "bold";
-  size: "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl" | "xsResponsive";
+  size:
+    | "xxxs"
+    | "xxs"
+    | "xs"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "xxl"
+    | "xsResponsive";
   color: "grey" | "purple" | "custom";
   type: "icon" | "iconLink" | "iconButton";
   className?: string;
@@ -32,6 +41,7 @@ export const iconStyles = {
 
   /* ===== SIZE VARIANTS ===== */
   size: {
+    xxxs: "w-3 h-3",
     xxs: "w-4 h-4",
     xs: "w-5 h-5",
     sm: "w-6 h-6",

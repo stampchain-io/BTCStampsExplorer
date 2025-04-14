@@ -14,6 +14,7 @@ export { default as SwiperStyles } from "$islands/section/gallery/SwiperStyles.t
 /* ===== BANNER IMAGES ===== */
 export * from "$islands/section/gallery/Partners.tsx";
 export { default as TeamGallery } from "$islands/section/gallery/Team.tsx";
+export * from "$components/section/gallery/CollectionsBanner.tsx";
 
 /* ===== RECENT/LATEST ===== */
 export * from "$islands/section/gallery/StampSales.tsx";
@@ -30,6 +31,12 @@ export * from "$islands/section/howto/SRC20DeployHowto.tsx";
 export * from "$islands/section/howto/SRC20MintHowto.tsx";
 export * from "$islands/section/howto/SRC20TransferHowto.tsx";
 export * from "$islands/section/howto/SRC101RegisterHowto.tsx";
+/* ===== HOW TO BASE TEMPLATES ===== */
+export * from "$components/section/howto/data.ts";
+export * from "$components/section/howto/ArticleBase.tsx";
+export * from "$components/section/howto/ListBase.tsx";
+export * from "$components/section/howto/AuthorBase.tsx";
+export * from "$components/section/howto/ArticlesOverviewBase.tsx";
 
 /* ===== CTA ===== */
 export * from "$islands/section/cta/StampchainContactCta.tsx";

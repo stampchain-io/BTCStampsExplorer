@@ -1,5 +1,5 @@
 /* ===== HOW-TO GUIDES DATA AND CONFIGURATION ===== */
-import { ListProps } from "$howto";
+import { ListProps } from "$section";
 
 /* ===== NAVIGATION AND ARTICLE LINKS ===== */
 export interface ArticleLinks {

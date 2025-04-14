@@ -385,18 +385,7 @@ export function SRC20DeployTool(
               </div>
             </div>
 
-            {/* Limit and supply inputs */}
-            <SRC20InputField
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              placeholder="Limit per mint"
-              value={formState.lim}
-              onChange={(e) => handleInputChange(e, "lim")}
-              onBlur={() => handleInputBlur("lim")}
-              error={formState.limError}
-            />
-
+            {/* Supply and limit inputs */}
             <SRC20InputField
               type="text"
               inputMode="numeric"
@@ -406,6 +395,17 @@ export function SRC20DeployTool(
               onChange={(e) => handleInputChange(e, "max")}
               onBlur={() => handleInputBlur("max")}
               error={formState.maxError}
+            />
+
+            <SRC20InputField
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              placeholder="Limit per mint"
+              value={formState.lim}
+              onChange={(e) => handleInputChange(e, "lim")}
+              onBlur={() => handleInputBlur("lim")}
+              error={formState.limError}
             />
           </div>
         </div>
@@ -461,6 +461,7 @@ export function SRC20DeployTool(
       <div className={containerBackground}>
         <FeeCalculatorSimple
           fee={formState.fee}
+          dec={formState.dec}
           ticker={formState.token}
           limit={formState.lim}
           supply={formState.max}

@@ -6,7 +6,7 @@ import {
   StepList,
   TRANSFER_TOKEN_IMPORTANT_NOTES,
   TRANSFER_TOKEN_STEPS,
-} from "$howto";
+} from "$section";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {

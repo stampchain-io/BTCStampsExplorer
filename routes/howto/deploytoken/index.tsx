@@ -6,7 +6,7 @@ import {
   DEPLOY_STEPS,
   List,
   StepList,
-} from "$howto";
+} from "$section";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {

@@ -11,7 +11,7 @@ function abbreviateCollectionName(name: string): string {
 }
 
 /* ===== COMPONENT ===== */
-export function CollectionOverviewCard(
+export function CollectionCard(
   { collection }: { collection: Collection },
 ) {
   return (

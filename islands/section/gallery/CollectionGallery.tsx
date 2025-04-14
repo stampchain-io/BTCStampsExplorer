@@ -3,7 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 import { Collection, CollectionGalleryProps } from "$globals";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
-import { CollectionListCard } from "$collection";
+import { CollectionsBanner } from "$section";
 import { subtitleGrey, titleGreyLD } from "$text";
 
 /* ===== STATE ===== */
@@ -68,7 +68,7 @@ export default function CollectionGallery({
           collection: Collection,
           key: number,
         ) => (
-          <CollectionListCard
+          <CollectionsBanner
             key={collection.collection_id}
             collection={collection}
             isDarkMode={key % 2 ? false : true}

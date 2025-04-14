@@ -143,9 +143,7 @@
     "$form": "./components/form/index.ts",
     "$search": "./islands/search/index.ts",
     "$notification": "./components/notification/index.ts",
-    "$table": "./islands/table/index.ts",
-    "$collection": "./components/collection/index.ts",
-    "$howto": "./components/howto/index.ts"
+    "$table": "./islands/table/index.ts"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

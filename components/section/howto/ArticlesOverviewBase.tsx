@@ -1,6 +1,6 @@
 /* ===== ARTICLES OVERVIEW COMPONENT ===== */
 import { gapGrid } from "$layout";
-import { ARTICLE_LINKS } from "$components/howto/data.ts"; // needs direct import - cannot use "$howto"
+import { ARTICLE_LINKS } from "$components/section/howto/data.ts"; // needs direct import - cannot use "$howto"
 import { Button } from "$button";
 import { headingGreyLDLink, subtitleGrey, text, titleGreyDL } from "$text";
 

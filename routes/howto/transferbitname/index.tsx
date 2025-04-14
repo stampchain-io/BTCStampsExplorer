@@ -6,7 +6,7 @@ import {
   StepList,
   TRANSFER_BITNAME_IMPORTANT_NOTES,
   TRANSFER_BITNAME_STEPS,
-} from "$howto";
+} from "$section";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {

@@ -16,14 +16,14 @@ const nameClassName = `hidden mobileLg:block
 `;
 
 /* ===== TYPES ===== */
-interface CollectionListCardProps {
+interface CollectionsBannerProps {
   collection: Collection;
   isDarkMode: boolean;
 }
 
 /* ===== COMPONENT ===== */
-export function CollectionListCard(
-  { collection, isDarkMode }: CollectionListCardProps,
+export function CollectionsBanner(
+  { collection, isDarkMode }: CollectionsBannerProps,
 ) {
   /* ===== STATE ===== */
   const [isHovered, setIsHovered] = useState(false);

@@ -8,7 +8,7 @@ import {
   LEATHER_CONNECT_SUPPORTED_WALLETS,
   List,
   StepList,
-} from "$howto";
+} from "$section";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {

@@ -3,7 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 import { Collection, CollectionGalleryProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { ViewAllButton } from "$button";
-import { CollectionOverviewCard } from "$collection";
+import { CollectionCard } from "$card";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
 
@@ -68,7 +68,7 @@ export default function ArtistGallery({
         {collectionArray.slice(0, displayCount).map((
           collection: Collection,
         ) => (
-          <CollectionOverviewCard
+          <CollectionCard
             key={collection.collection_id}
             collection={collection}
           />

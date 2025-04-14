@@ -6,7 +6,7 @@ import {
   STAMP_IMPORTANT_NOTES,
   STAMP_STEPS,
   StepList,
-} from "$howto";
+} from "$section";
 
 /* ===== INTRODUCTION COMPONENT ===== */
 function IntroSection() {

@@ -1,7 +1,7 @@
 /* ===== ARTICLE COMPONENT ===== */
 import { body, bodyArticle, gapSection } from "$layout";
 import { headingGrey, subtitleGrey, text, titleGreyDL } from "$text";
-import { ArticlesOverview } from "$components/howto/ArticlesOverviewBase.tsx";
+import { ArticlesOverview } from "$section";
 
 /* ===== TYPES ===== */
 interface ArticleProps {
