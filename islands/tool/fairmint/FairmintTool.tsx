@@ -1,7 +1,7 @@
 /* ===== FAIRMINT CONTENT COMPONENT ===== */
 import { useState } from "preact/hooks";
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
-import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
+import { FeeCalculatorAdvanced } from "$islands/section/FeeCalculatorAdvanced.tsx";
 import { StatusMessages } from "$notification";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { bodyTool, containerBackground, containerColForm } from "$layout";
@@ -97,7 +97,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
 
       {/* ===== FEE CALCULATOR ===== */}
       <div className={containerBackground}>
-        <ComplexFeeCalculator
+        <FeeCalculatorAdvanced
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="fairmint"

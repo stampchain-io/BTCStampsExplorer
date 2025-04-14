@@ -1,9 +1,9 @@
-import { FeeCalculatorBase } from "$components/shared/fee/FeeCalculatorBase.tsx";
-import type { ComplexFeeProps } from "$lib/types/base.d.ts";
+import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
+import type { AdvancedFeeCalculatorProps } from "$lib/types/base.d.ts";
 import { useEffect } from "preact/hooks";
 import { logger } from "$lib/utils/logger.ts";
 
-export function ComplexFeeCalculator({
+export function FeeCalculatorAdvanced({
   fee,
   handleChangeFee,
   type,
@@ -21,7 +21,7 @@ export function ComplexFeeCalculator({
   onTosChange,
   bitname = "",
   ...baseProps
-}: ComplexFeeProps) {
+}: AdvancedFeeCalculatorProps) {
   const feeDetails = providedFeeDetails?.hasExactFees
     ? {
       minerFee: Number(providedFeeDetails.minerFee) || 0,

@@ -6,7 +6,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { getWalletProvider } from "$client/wallet/walletHelper.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
-import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
+import { FeeCalculatorAdvanced } from "$islands/section/FeeCalculatorAdvanced.tsx";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
@@ -1473,7 +1473,7 @@ export function StampingTool() {
       </form>
 
       <div className={containerBackground}>
-        <ComplexFeeCalculator
+        <FeeCalculatorAdvanced
           fee={fee}
           handleChangeFee={handleChangeFee}
           type="stamp"

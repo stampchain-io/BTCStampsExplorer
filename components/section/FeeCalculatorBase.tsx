@@ -8,7 +8,7 @@ import {
 } from "$lib/utils/formatUtils.ts";
 import type { BaseFeeCalculatorProps } from "$lib/types/base.d.ts";
 import { tooltipButton, tooltipImage } from "$notification";
-import { buttonPurpleFlat, buttonPurpleOutline } from "$button";
+import { buttonPurpleFlat, buttonPurpleOutline, sliderKnob } from "$button";
 
 interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   isModal?: boolean;
@@ -77,6 +77,8 @@ export function FeeCalculatorBase({
   const [currencyTooltipText, setCurrencyTooltipText] = useState("BTC");
   const currencyTooltipTimeoutRef = useRef<number | null>(null);
   const [allowCurrencyTooltip, setAllowCurrencyTooltip] = useState(true);
+  const [canHoverSelected, setCanHoverSelected] = useState(true);
+  const [allowHover, setAllowHover] = useState(true);
 
   useEffect(() => {
     logger.debug("ui", {
@@ -180,16 +182,23 @@ export function FeeCalculatorBase({
   // Fee selector component
   const renderFeeSelector = () => (
     <div className={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
-      <p className="font-light text-base text-stamp-grey-light mb-0">
+      <h6 className="font-light text-base text-stamp-grey-light">
         <span className="text-stamp-grey-darker">FEE</span>{" "}
-        <span className="font-bold">{fee}</span> SAT/vB
-      </p>
-      {fees?.recommendedFee && (
-        <p className="font-light text-sm text-stamp-grey-light mb-3 text-nowrap">
-          <span className="text-stamp-grey-darker">RECOMMENDED</span>{" "}
-          <span className="font-medium">{fees.recommendedFee}</span> SAT/vB
-        </p>
-      )}
+        <span className="font-bold">
+          {fee === 0 ? <span className="animate-pulse">XX</span> : fee} SAT/vB
+        </span>
+      </h6>
+      <h6 className="font-light text-sm text-stamp-grey-light mb-3 text-nowrap">
+        <span className="text-stamp-grey-darker">RECOMMENDED</span>{" "}
+        <span className="font-medium">
+          {fees?.recommendedFee
+            ? (
+              fees.recommendedFee
+            )
+            : <span className="animate-pulse">XX</span>}
+        </span>{" "}
+        SAT/vB
+      </h6>
       <div
         className="relative w-full group"
         onMouseMove={handleMouseMove}
@@ -213,7 +222,8 @@ export function FeeCalculatorBase({
             handleChangeFee(
               sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
             )}
-          className="w-full h-1 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+          className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey
+           ${sliderKnob}`}
         />
         <div
           className={`${tooltipImage} ${
@@ -471,6 +481,17 @@ export function FeeCalculatorBase({
     );
   };
 
+  const handleCheckboxMouseEnter = () => {
+    if (allowHover) {
+      setCanHoverSelected(true);
+    }
+  };
+
+  const handleCheckboxMouseLeave = () => {
+    setCanHoverSelected(true);
+    setAllowHover(true);
+  };
+
   return (
     <div className={`text-[#999999] ${className}`}>
       <div className="flex">
@@ -559,57 +580,99 @@ export function FeeCalculatorBase({
               onChange={(e) => {
                 const target = e.target as HTMLInputElement;
                 onTosChange(target.checked);
+                setAllowHover(false);
+                setCanHoverSelected(false);
               }}
               className="absolute w-0 h-0 opacity-0"
             />
             <label
               htmlFor="tosAgreed"
-              className="flex items-center cursor-pointer"
+              className="flex items-center cursor-pointer group"
+              onMouseEnter={handleCheckboxMouseEnter}
+              onMouseLeave={handleCheckboxMouseLeave}
             >
               <div
-                className={`w-3 h-3 mr-2 flex items-center justify-center transition-colors duration-300 ${
-                  tosAgreed ? "bg-stamp-grey-darker" : "bg-stamp-grey-light"
-                } rounded-[2px]`}
+                className={`
+                  w-3 h-3 mr-2 
+                  flex items-center justify-center 
+                  rounded-sm
+                  transition-all duration-300 ease-in-out
+                  border
+                  relative
+                  overflow-hidden
+                  ${
+                  tosAgreed
+                    ? canHoverSelected
+                      ? "bg-stamp-grey-darker border-stamp-grey-darker group-hover:bg-stamp-grey-light group-hover:border-stamp-grey-light"
+                      : "bg-stamp-grey-darker border-stamp-grey-darker"
+                    : canHoverSelected
+                    ? "bg-stamp-grey-light border-stamp-grey-light group-hover:bg-stamp-grey-darker group-hover:border-stamp-grey-darker"
+                    : "bg-stamp-grey-light border-stamp-grey-light"
+                }
+                `}
               >
-                {tosAgreed && (
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="w-2 h-2"
-                  >
-                    <path
-                      fill="#333333"
-                      d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"
-                    />
-                  </svg>
-                )}
+                <div
+                  className={`
+                    absolute 
+                    inset-0.5
+                    transform transition-all duration-300 ease-in-out
+                    ${tosAgreed ? "scale-100" : "scale-0"}
+                    ${
+                    canHoverSelected
+                      ? "bg-stamp-grey-darkest group-hover:bg-stamp-grey-darkest/50"
+                      : "bg-stamp-grey-darkest"
+                  }
+                  `}
+                />
               </div>
               <span
-                className={`text-xs font-medium transition-colors duration-300 ${
+                className={`
+                  text-xs font-medium select-none
+                  transition-colors duration-300 
+                  ${
                   tosAgreed ? "text-stamp-grey-darker" : "text-stamp-grey-light"
-                }`}
+                }
+                  ${
+                  tosAgreed
+                    ? canHoverSelected
+                      ? "group-hover:text-stamp-grey-light"
+                      : ""
+                    : canHoverSelected
+                    ? "group-hover:text-stamp-grey-darker"
+                    : ""
+                }
+                `}
               >
                 I AGREE TO THE{" "}
                 <span className="text-stamp-purple">
                   <span className="mobileLg:hidden">
                     <a
                       href="/termsofservice"
-                      className={`hover:text-stamp-purple-bright transition-colors duration-300 ${
+                      className={`
+                        transition-colors duration-300 
+                        ${
                         tosAgreed
                           ? "text-stamp-purple-dark"
                           : "text-stamp-purple"
-                      }`}
+                      }
+                        hover:text-stamp-purple-bright
+                      `}
                     >
-                      ToS
+                      TERMS
                     </a>
                   </span>
                   <span className="hidden mobileLg:inline">
                     <a
                       href="/termsofservice"
-                      className={`hover:text-stamp-purple-bright transition-colors duration-300 ${
+                      className={`
+                        transition-colors duration-300 
+                        ${
                         tosAgreed
                           ? "text-stamp-purple-dark"
                           : "text-stamp-purple"
-                      }`}
+                      }
+                        hover:text-stamp-purple-bright
+                      `}
                     >
                       TERMS OF SERVICE
                     </a>

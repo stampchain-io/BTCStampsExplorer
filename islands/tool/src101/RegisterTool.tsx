@@ -5,7 +5,7 @@ import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
-import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { bodyTool, containerBackground } from "$layout";
 import { titlePurpleLD } from "$text";
 import { Button } from "$button";
@@ -272,7 +272,7 @@ export function SRC101RegisterTool({
 
       {/* ===== FEE CALCULATOR AND STATUS MESSAGES ===== */}
       <div className={containerBackground}>
-        <BasicFeeCalculator
+        <FeeCalculatorSimple
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src101"

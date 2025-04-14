@@ -1,4 +1,4 @@
-import { useLoading } from "$islands/loading/LoadingProvider.tsx";
+import { useLoading } from "./LoadingProvider.tsx
 
 const LoadingContent = () => {
   const { loading } = useLoading();

@@ -4,7 +4,7 @@ import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { StampRow } from "$globals";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
-import { StatItem, StatTitle } from "$components/shared/WalletComponents.tsx";
+import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { StampImage } from "$content";
 import { containerBackground } from "$layout";
 import { subtitleGrey, titleGreyLD, valueXs } from "$text";

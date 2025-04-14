@@ -3,7 +3,7 @@ import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { SRC20MintStatus } from "$types/src20.d.ts";
 import {
@@ -433,7 +433,7 @@ export function SRC20MintTool({
 
       {/* ===== FEE CALCULATOR ===== */}
       <div className={containerBackground}>
-        <BasicFeeCalculator
+        <FeeCalculatorSimple
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20"

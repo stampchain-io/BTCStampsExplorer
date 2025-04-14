@@ -2,7 +2,7 @@
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import {
@@ -295,7 +295,7 @@ export function SRC20TransferTool(
 
       {/* ===== FEE CALCULATOR ===== */}
       <div className={containerBackground}>
-        <BasicFeeCalculator
+        <FeeCalculatorSimple
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20"

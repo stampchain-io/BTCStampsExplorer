@@ -3,7 +3,7 @@ import { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
-import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { SelectField } from "../../form/SelectField.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import type { StampRow } from "$globals";
@@ -307,7 +307,7 @@ export function StampTransferTool({}: Props) {
 
       {/* ===== FEE CALCULATOR SECTION ===== */}
       <div class={containerBackground}>
-        <BasicFeeCalculator
+        <FeeCalculatorSimple
           fee={formState.fee}
           handleChangeFee={internalHandleChangeFee}
           type="transfer"

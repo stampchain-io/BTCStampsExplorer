@@ -6,7 +6,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
-import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import {
   bodyTool,
   containerBackground,
@@ -459,7 +459,7 @@ export function SRC20DeployTool(
 
       {/* ===== FEE CALCULATOR AND STATUS MESSAGES ===== */}
       <div className={containerBackground}>
-        <BasicFeeCalculator
+        <FeeCalculatorSimple
           fee={formState.fee}
           ticker={formState.token}
           limit={formState.lim}

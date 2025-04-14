@@ -4,7 +4,7 @@ import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { StatItem, StatTitle } from "$components/shared/WalletComponents.tsx";
+import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { containerBackground } from "$layout";
 import { titleGreyLD } from "$text";
 import { tooltipIcon } from "$notification";

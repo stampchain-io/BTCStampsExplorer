@@ -1,7 +1,7 @@
 /* ===== SEND BTC MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalLayout } from "$layout";
 import { inputField } from "$form";
@@ -377,7 +377,7 @@ function SendBTCModal(
       </div>
 
       {/* ===== FEE CALCULATOR ===== */}
-      <BasicFeeCalculator
+      <FeeCalculatorSimple
         isModal={true}
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}

@@ -1,9 +1,9 @@
-import { FeeCalculatorBase } from "./FeeCalculatorBase.tsx";
+import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
-import type { BasicFeeProps } from "$lib/types/base.d.ts";
+import type { SimpleFeeCalculatorProps } from "$lib/types/base.d.ts";
 import type { Output } from "$types/index.d.ts";
 
-export function BasicFeeCalculator({
+export function FeeCalculatorSimple({
   fee,
   _type,
   amount,
@@ -23,7 +23,7 @@ export function BasicFeeCalculator({
   transferDetails,
   mintDetails,
   ...baseProps
-}: BasicFeeProps) {
+}: SimpleFeeCalculatorProps) {
   const outputs: Output[] = outputTypes.map((type) => ({
     type,
     script: "",

@@ -10,14 +10,14 @@ export * from "./utils.d.ts";
 export * from "./stamp.d.ts";
 
 export {
+  type AdvancedFeeCalculatorProps,
   type AncestorInfo,
   type BaseFeeCalculatorProps,
-  type BasicFeeProps,
-  type ComplexFeeProps,
   type FeeDetails,
   type FeeEstimationParams,
   type FeeEstimationResult,
   type ScriptType,
+  type SimpleFeeCalculatorProps,
   type TransactionInput,
   type TransactionOutput,
   type UTXO,

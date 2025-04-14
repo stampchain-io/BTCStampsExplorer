@@ -163,7 +163,6 @@ import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
-import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $form_InputField from "./islands/form/InputField.tsx";
 import * as $form_SRC20InputField from "./islands/form/SRC20InputField.tsx";
 import * as $form_SelectDate from "./islands/form/SelectDate.tsx";
@@ -183,8 +182,6 @@ import * as $layout_ChartWidget from "./islands/layout/ChartWidget.tsx";
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
-import * as $loading_LoadingContent from "./islands/loading/LoadingContent.tsx";
-import * as $loading_LoadingProvider from "./islands/loading/LoadingProvider.tsx";
 import * as $modal_BuyStampModal from "./islands/modal/BuyStampModal.tsx";
 import * as $modal_ConnectWalletModal from "./islands/modal/ConnectWalletModal.tsx";
 import * as $modal_ConnectedModalWIP from "./islands/modal/ConnectedModalWIP.tsx";
@@ -202,6 +199,7 @@ import * as $search_SRC20Search from "./islands/search/SRC20Search.tsx";
 import * as $search_StampSearch from "./islands/search/StampSearch.tsx";
 import * as $search_index from "./islands/search/index.ts";
 import * as $search_styles from "./islands/search/styles.ts";
+import * as $section_FeeCalculatorAdvanced from "./islands/section/FeeCalculatorAdvanced.tsx";
 import * as $section_cta_ContactCta from "./islands/section/cta/ContactCta.tsx";
 import * as $section_cta_DonateCta from "./islands/section/cta/DonateCta.tsx";
 import * as $section_cta_GetStampingCta from "./islands/section/cta/GetStampingCta.tsx";
@@ -449,7 +447,6 @@ const manifest = {
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
-    "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/form/InputField.tsx": $form_InputField,
     "./islands/form/SRC20InputField.tsx": $form_SRC20InputField,
     "./islands/form/SelectDate.tsx": $form_SelectDate,
@@ -471,8 +468,6 @@ const manifest = {
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
-    "./islands/loading/LoadingContent.tsx": $loading_LoadingContent,
-    "./islands/loading/LoadingProvider.tsx": $loading_LoadingProvider,
     "./islands/modal/BuyStampModal.tsx": $modal_BuyStampModal,
     "./islands/modal/ConnectWalletModal.tsx": $modal_ConnectWalletModal,
     "./islands/modal/ConnectedModalWIP.tsx": $modal_ConnectedModalWIP,
@@ -490,6 +485,8 @@ const manifest = {
     "./islands/search/StampSearch.tsx": $search_StampSearch,
     "./islands/search/index.ts": $search_index,
     "./islands/search/styles.ts": $search_styles,
+    "./islands/section/FeeCalculatorAdvanced.tsx":
+      $section_FeeCalculatorAdvanced,
     "./islands/section/cta/ContactCta.tsx": $section_cta_ContactCta,
     "./islands/section/cta/DonateCta.tsx": $section_cta_DonateCta,
     "./islands/section/cta/GetStampingCta.tsx": $section_cta_GetStampingCta,

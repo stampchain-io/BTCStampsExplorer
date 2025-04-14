@@ -7,7 +7,7 @@ export { default as CollectionGallery } from "$islands/section/gallery/Collectio
 export { default as ArtistGallery } from "$islands/section/gallery/ArtistGallery.tsx";
 
 /* ===== CAROUSEL ===== */
-export * from "$components/shared/CarouselHome.tsx";
+export * from "$components/section/gallery/CarouselHome.tsx";
 export { default as CarouselGallery } from "$islands/section/gallery/Carousel.tsx";
 export { default as SwiperStyles } from "$islands/section/gallery/SwiperStyles.tsx";
 
