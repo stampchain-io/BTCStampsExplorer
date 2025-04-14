@@ -33,40 +33,54 @@ export default function SRC20TransfersGallery(): JSX.Element {
     fetchRecentTransactions();
   }, []);
 
-  /* ===== LOADING STATE ===== */
-  if (isLoading) {
-    return <div class="animate-pulse">Loading recent transfers...</div>;
-  }
-
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col items-start tablet:items-end">
+    <div class="flex flex-col w-full items-start tablet:items-end">
       {/* ===== TITLE SECTION ===== */}
-      <h4 class={`${titlePurpleLD} tablet:hidden`}>
-        RECENT TRANSFERS
-      </h4>
-      <h4 class={`hidden tablet:block ${titlePurpleDL}`}>
-        RECENT TRANSFERS
-      </h4>
-      {transactions.length > 0 && (
-        <h3 class={subtitlePurple}>
-          BLOCK #{transactions[0].block_index}
-        </h3>
-      )}
-      {/* ===== STAMPS GRID SECTION ===== */}
-      <div class="grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-6">
-        {transactions.map((stamp, index) => (
-          <StampCard
-            key={index}
-            stamp={stamp.stamp_url ? stamp : {
-              ...stamp,
-              stamp_url: `https://stampchain.io/stamps/${stamp.tx_hash}.svg`,
-            }}
-            isRecentSale={false}
-            showDetails={false}
-          />
-        ))}
+      <div class="w-full">
+        <h4 class={`${titlePurpleLD} tablet:hidden`}>
+          RECENT TRANSFERS
+        </h4>
+        <h4 class={`hidden tablet:block w-full text-right ${titlePurpleDL}`}>
+          RECENT TRANSFERS
+        </h4>
       </div>
+
+      {/* Show block title with loading state */}
+      <h3 class={`w-full text-right ${subtitlePurple}`}>
+        {isLoading ? <span class="animate-pulse">BLOCK #XXX,XXX</span> : (
+          transactions.length > 0 && `BLOCK #${transactions[0].block_index}`
+        )}
+      </h3>
+
+      {/* ===== LOADING OR CONTENT ===== */}
+      {isLoading
+        ? (
+          <div class="w-full grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-6">
+            {[...Array(5)].map((_, index) => (
+              <div
+                key={index}
+                class="loading-skeleton aspect-square rounded"
+              />
+            ))}
+          </div>
+        )
+        : (
+          <div class="w-full grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-6">
+            {transactions.map((stamp, index) => (
+              <StampCard
+                key={index}
+                stamp={stamp.stamp_url ? stamp : {
+                  ...stamp,
+                  stamp_url:
+                    `https://stampchain.io/stamps/${stamp.tx_hash}.svg`,
+                }}
+                isRecentSale={false}
+                showDetails={false}
+              />
+            ))}
+          </div>
+        )}
     </div>
   );
 }

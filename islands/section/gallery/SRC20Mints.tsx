@@ -31,51 +31,59 @@ export default function SRC20MintsGallery() {
     fetchTrendingActiveMintingTokens();
   }, []);
 
-  /* ===== LOADING STATE ===== */
-  if (isLoading) {
-    return <div class="animate-pulse">Loading trending tokens...</div>;
-  }
-
-  /* ===== EMPTY STATE ===== */
-  if (!transactions || transactions.length === 0) {
-    return <div></div>;
-  }
-
   /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col items-start tablet:items-end">
+    <div class="flex flex-col w-full items-start tablet:items-end">
       {/* ===== TITLE SECTION ===== */}
-      <div>
+      <div class="w-full">
         <h4 class={`${titlePurpleLD} tablet:hidden`}>
           TRENDING
         </h4>
-        <h4 class={`hidden tablet:block ${titlePurpleDL}`}>
+        <h4 class={`hidden tablet:block w-full text-right ${titlePurpleDL}`}>
           TRENDING
         </h4>
       </div>
-      <h3 class={subtitlePurple}>POPULAR TOKENS</h3>
-      {/* ===== TOKENS LIST SECTION ===== */}
-      <div class="w-full flex flex-col gap-6">
-        {transactions.map((src20) => (
-          src20.progress !== "100"
-            ? (
-              <SRC20CardMinting
-                key={src20.tick}
-                src20={src20}
-                fromPage="stamping/src20"
-                onImageClick={() => {}}
+      <h3 class={`w-full text-right ${subtitlePurple}`}>
+        {isLoading ? <span class="animate-pulse">POPULAR TOKENS</span> : (
+          "POPULAR TOKENS"
+        )}
+      </h3>
+
+      {/* ===== LOADING OR CONTENT ===== */}
+      {isLoading
+        ? (
+          <div class="w-full flex flex-col gap-6">
+            {[...Array(5)].map((_, index) => (
+              <div
+                key={index}
+                class="loading-skeleton w-full h-12 rounded"
               />
-            )
-            : (
-              <SRC20CardMinted
-                key={src20.tick}
-                src20={src20}
-                fromPage="stamping/src20"
-                onImageClick={() => {}}
-              />
-            )
-        ))}
-      </div>
+            ))}
+          </div>
+        )
+        : (
+          <div class="w-full flex flex-col gap-6">
+            {transactions.map((src20) => (
+              src20.progress !== "100"
+                ? (
+                  <SRC20CardMinting
+                    key={src20.tick}
+                    src20={src20}
+                    fromPage="stamping/src20"
+                    onImageClick={() => {}}
+                  />
+                )
+                : (
+                  <SRC20CardMinted
+                    key={src20.tick}
+                    src20={src20}
+                    fromPage="stamping/src20"
+                    onImageClick={() => {}}
+                  />
+                )
+            ))}
+          </div>
+        )}
     </div>
   );
 }

@@ -82,7 +82,7 @@ export default function StampGallery({
     })
     : stamps || [];
 
-  // Apply layout-specific styling
+  // Apply layout-specific styling - @baba-check gap
   const containerClass = layout === "grid" ? gridClass : "flex flex-col gap-4"; // Row layout default styling
   const seeAllLink = viewAllLink ||
     (type === "all" ? "/stamp" : `/stamp?type=${type}`);
@@ -244,24 +244,34 @@ export default function StampGallery({
         )
         : (
           <div class={containerClass}>
-            {isLoading ? <div>Loading...</div> : (
-              filteredStamps.slice(0, displayCount).map((stamp: StampRow) => (
-                <div
-                  key={isRecentSales && stamp.sale_data
-                    ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
-                    : stamp.tx_hash}
-                >
-                  <StampCard
-                    stamp={stamp}
-                    isRecentSale={isRecentSales}
-                    showDetails={showDetails}
-                    showEdition={showEdition}
-                    showMinDetails={showMinDetails}
-                    variant={variant}
+            {isLoading
+              ? (
+                // Grid view loading skeleton
+                [...Array(displayCount)].map((_, index) => (
+                  <div
+                    key={index}
+                    class="loading-skeleton aspect-square rounded"
                   />
-                </div>
-              ))
-            )}
+                ))
+              )
+              : (
+                filteredStamps.slice(0, displayCount).map((stamp: StampRow) => (
+                  <div
+                    key={isRecentSales && stamp.sale_data
+                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
+                      : stamp.tx_hash}
+                  >
+                    <StampCard
+                      stamp={stamp}
+                      isRecentSale={isRecentSales}
+                      showDetails={showDetails}
+                      showEdition={showEdition}
+                      showMinDetails={showMinDetails}
+                      variant={variant}
+                    />
+                  </div>
+                ))
+              )}
           </div>
         )}
 

@@ -69,7 +69,6 @@ export default function ToolsSrc101Page(
           <SRC101RegisterHowto />
         </div>
         <div class="w-full tablet:w-1/2 hidden">
-          <SRC101RegistersGallery />
         </div>
       </div>
     </div>
