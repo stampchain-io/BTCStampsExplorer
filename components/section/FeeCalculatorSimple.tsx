@@ -50,6 +50,8 @@ export function FeeCalculatorSimple({
       feeDetails={{
         minerFee: estimatedFee,
         hasExactFees: true,
+        totalValue: estimatedFee,
+        dustValue: 0,
       }}
     />
   );

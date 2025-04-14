@@ -81,6 +81,13 @@ export interface TransferDetails {
   token: string;
 }
 
+// New separate interface for stamp transfers
+export interface StampTransferDetails {
+  address: string;
+  stamp: string;
+  editions: number;
+}
+
 export interface MintDetails {
   amount: number;
   token: string;
@@ -100,6 +107,7 @@ export interface BaseFeeCalculatorProps {
   onTosChange?: (agreed: boolean) => void;
   feeDetails?: FeeDetails;
   transferDetails?: TransferDetails;
+  stampTransferDetails?: StampTransferDetails;
   mintDetails?: MintDetails;
 }
 

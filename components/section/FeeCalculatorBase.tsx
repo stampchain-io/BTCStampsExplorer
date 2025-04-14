@@ -9,6 +9,7 @@ import {
 import type { BaseFeeCalculatorProps } from "$lib/types/base.d.ts";
 import { tooltipButton, tooltipImage } from "$notification";
 import { buttonPurpleFlat, buttonPurpleOutline, sliderKnob } from "$button";
+import { labelXs, textXs } from "$text";
 
 interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   isModal?: boolean;
@@ -29,6 +30,23 @@ interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   ticker?: string;
   limit?: number;
   supply?: number;
+  transferDetails?: {
+    address: string;
+    token: string;
+    amount: number;
+    stamp?: string;
+    editions?: number;
+  };
+  src20TransferDetails?: {
+    address: string;
+    token: string;
+    amount: number;
+  };
+  stampTransferDetails?: {
+    address: string;
+    stamp: string;
+    editions: number;
+  };
 }
 
 export function FeeCalculatorBase({
@@ -44,7 +62,13 @@ export function FeeCalculatorBase({
   tosAgreed = false,
   onTosChange = () => {},
   feeDetails,
-  transferDetails,
+  transferDetails = {
+    address: "",
+    token: "",
+    amount: 0,
+    stamp: "",
+    editions: 0,
+  },
   mintDetails,
   isModal = false,
   disabled = false,
@@ -64,6 +88,16 @@ export function FeeCalculatorBase({
   ticker = "", // SRC20 Deploy
   limit = 0, // SRC20 Deploy
   supply = 0, // SRC20 Deploy
+  src20TransferDetails = {
+    address: "",
+    token: "",
+    amount: 0,
+  },
+  stampTransferDetails = {
+    address: "",
+    stamp: "",
+    editions: 0,
+  },
 }: ExtendedBaseFeeCalculatorProps) {
   const { fees } = useFeePolling();
   const [visible, setVisible] = useState(false);
@@ -183,13 +217,14 @@ export function FeeCalculatorBase({
   const renderFeeSelector = () => (
     <div className={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
       <h6 className="font-light text-base text-stamp-grey-light">
-        <span className="text-stamp-grey-darker">FEE</span>{" "}
+        <span className="text-stamp-grey-darker pr-2">FEE</span>
         <span className="font-bold">
-          {fee === 0 ? <span className="animate-pulse">XX</span> : fee} SAT/vB
-        </span>
+          {fee === 0 ? <span className="animate-pulse">XX</span> : fee}
+        </span>{" "}
+        SAT/vB
       </h6>
       <h6 className="font-light text-sm text-stamp-grey-light mb-3 text-nowrap">
-        <span className="text-stamp-grey-darker">RECOMMENDED</span>{" "}
+        <span className="text-stamp-grey-darker pr-2">RECOMMENDED</span>
         <span className="font-medium">
           {fees?.recommendedFee
             ? (
@@ -243,61 +278,67 @@ export function FeeCalculatorBase({
 
   // Estimate details component
   const renderDetails = () => {
-    const detailsTitle = "text-stamp-grey-darker font-light";
-    const detailsText = "text-xs font-medium text-stamp-grey-light mb-0";
-
     return (
       <div className={`${visible ? "visible" : "invisible"} gap-1 mt-1.5`}>
         {/* File Type - Only show for stamp type */}
         {type === "stamp" && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>FILE</span>&nbsp;&nbsp;{fileType
-              ? fileType
-                .toUpperCase()
-              : "***"}
-          </p>
+          <h6 className={textXs}>
+            <span className={labelXs}>FILE</span>&nbsp;&nbsp;
+            {fileType
+              ? fileType.toUpperCase()
+              : <span className="animate-pulse">***</span>}
+          </h6>
         )}
 
         {/* Editions - Only show for stamp type */}
         {type === "stamp" && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>
+          <h6 className={textXs}>
+            <span className={labelXs}>
               EDITIONS
-            </span>&nbsp;&nbsp;{issuance || "***"}
-          </p>
+            </span>&nbsp;&nbsp;
+            {issuance ? issuance : <span className="animate-pulse">***</span>}
+          </h6>
         )}
 
         {/* File Size */}
         {type === "stamp" && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>SIZE</span>&nbsp;&nbsp;{fileSize ||
-              "***"} <span className="font-light">BYTES</span>
-          </p>
+          <h6 className={textXs}>
+            <span className={labelXs}>SIZE</span>&nbsp;&nbsp;
+            {fileSize ? fileSize : <span className="animate-pulse">***</span>}
+            {" "}
+            <span className="font-light">BYTES</span>
+          </h6>
         )}
 
         {/* Sats Per Byte */}
-        <p className={detailsText}>
-          <span className={detailsTitle}>SATS PER BYTE</span>&nbsp;&nbsp;{fee}
-        </p>
+        <h6 className={textXs}>
+          <span className={labelXs}>SATS PER BYTE</span>&nbsp;&nbsp;{fee}
+        </h6>
 
         {/* Miner Fee */}
-        {!!feeDetails?.minerFee && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>
-              MINER FEE
-            </span>&nbsp;&nbsp;{coinType === "BTC"
-              ? formatSatoshisToBTC(feeDetails.minerFee, {
-                includeSymbol: false,
-              })
-              : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice)}{" "}
-            <span className="font-light">{coinType}</span>
-          </p>
-        )}
+        <h6 className={textXs}>
+          <span className={labelXs}>
+            MINER FEE
+          </span>&nbsp;&nbsp;
+          {feeDetails?.minerFee
+            ? (
+              <>
+                {coinType === "BTC"
+                  ? formatSatoshisToBTC(feeDetails.minerFee, {
+                    includeSymbol: false,
+                  })
+                  : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice)}
+                {" "}
+              </>
+            )
+            : <span className="animate-pulse">0.00000000</span>}{" "}
+          <span className="font-light">{coinType}</span>
+        </h6>
 
         {/* Service Fee */}
         {serviceFee > 0 && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>
+          <h6 className={textXs}>
+            <span className={labelXs}>
               {isModal ? "SERVICE FEE" : "MINTING FEE"}
             </span>&nbsp;&nbsp;
             {coinType === "BTC"
@@ -314,169 +355,217 @@ export function FeeCalculatorBase({
                   <span className="font-light">USDT</span>
                 </>
               )}
-          </p>
+          </h6>
         )}
 
         {/* Dust Value */}
         {!!feeDetails?.dustValue && feeDetails?.dustValue > 0 && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>
+          <h6 className={textXs}>
+            <span className={labelXs}>
               DUST
-            </span>&nbsp;&nbsp;{coinType === "BTC"
-              ? formatSatoshisToBTC(feeDetails.dustValue, {
-                includeSymbol: false,
-              })
-              : formatSatoshisToUSD(feeDetails.dustValue, BTCPrice)}{" "}
-            <span className="font-light">{coinType}</span>
-          </p>
-        )}
-
-        {/* Total */}
-        {!!feeDetails?.totalValue && feeDetails?.totalValue > 0 && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>
-              TOTAL
-            </span>&nbsp;&nbsp;{coinType === "BTC"
-              ? formatSatoshisToBTC(feeDetails.totalValue, {
-                includeSymbol: false,
-              })
-              : formatSatoshisToUSD(feeDetails.totalValue, BTCPrice)}{" "}
-            <span className="font-light">{coinType}</span>
-          </p>
+            </span>&nbsp;&nbsp;
+            {feeDetails?.dustValue
+              ? (
+                <>
+                  {coinType === "BTC"
+                    ? formatSatoshisToBTC(feeDetails.dustValue, {
+                      includeSymbol: false,
+                    })
+                    : formatSatoshisToUSD(feeDetails.dustValue, BTCPrice)}{" "}
+                  <span className="font-light">{coinType}</span>
+                </>
+              )
+              : <span className="animate-pulse">0.00000000</span>}
+          </h6>
         )}
 
         {/* Bitname TLD */}
         {!!bitname && bitname.split(".")[1] && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>TLD</span>&nbsp;&nbsp;
+          <h6 className={textXs}>
+            <span className={labelXs}>TLD</span>&nbsp;&nbsp;
             {`.${bitname.split(".")[1]}`}
-          </p>
+          </h6>
         )}
 
         {/* Bitname domain */}
         {fromPage === "src101_bitname" && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>NAME</span>&nbsp;&nbsp;{bitname
-              .split(
-                ".",
-              )[0] || "***"}
-          </p>
+          <h6 className={textXs}>
+            <span className={labelXs}>NAME</span>&nbsp;&nbsp;
+            {bitname.split(".")[0]
+              ? (
+                bitname.split(".")[0]
+              )
+              : <span className="animate-pulse">*******</span>}
+          </h6>
         )}
 
         {/* Donate amount */}
-        {fromPage === "donate" &&
-          (
-            <p className={detailsText}>
-              <span className={detailsTitle}>
-                DONATION AMOUNT
-              </span>&nbsp;&nbsp;{amount
-                ? (amount / 100000000).toFixed(8)
-                : "***"} BTC
-            </p>
-          )}
+        {fromPage === "donate" && (
+          <h6 className={textXs}>
+            <span className={labelXs}>
+              DONATION AMOUNT
+            </span>&nbsp;&nbsp;
+            {amount
+              ? (amount / 100000000).toFixed(8)
+              : <span className="animate-pulse">0.00000000</span>} BTC
+          </h6>
+        )}
 
         {/* Receive amount on donate */}
-        {fromPage === "donate" &&
-          (
-            <p className={detailsText}>
-              <span className={detailsTitle}>
-                RECEIVE
-              </span>&nbsp;&nbsp;{receive || "***"} USDSTAMPS
-            </p>
-          )}
+        {fromPage === "donate" && (
+          <h6 className={textXs}>
+            <span className={labelXs}>
+              RECEIVE
+            </span>&nbsp;&nbsp;
+            {receive ? receive : <span className="animate-pulse">******</span>}
+            {" "}
+            USDSTAMPS
+          </h6>
+        )}
 
         {/** Stamp Buy Modal */}
-        {fromPage === "stamp_buy" &&
-          (
-            <p className={detailsText}>
-              <span className={detailsTitle}>
-                STAMP PRICE
-              </span>&nbsp;&nbsp;{price
-                ? formatBTCAmount(
-                  typeof price === "number" ? price : 0,
-                  { excludeSuffix: true },
-                )
-                : "***"} BTC
-            </p>
-          )}
+        {fromPage === "stamp_buy" && (
+          <h6 className={textXs}>
+            <span className={labelXs}>
+              STAMP PRICE
+            </span>&nbsp;&nbsp;
+            {price
+              ? formatBTCAmount(typeof price === "number" ? price : 0, {
+                excludeSuffix: true,
+              })
+              : <span className="animate-pulse">0.00000000</span>} BTC
+          </h6>
+        )}
 
         {/** Stamp Buy Modal */}
-        {fromPage === "stamp_buy" &&
-          (
-            <p className={detailsText}>
-              <span className={detailsTitle}>
-                EDITIONS
-              </span>&nbsp;&nbsp;{edition || "***"}
-            </p>
-          )}
+        {fromPage === "stamp_buy" && (
+          <h6 className={textXs}>
+            <span className={labelXs}>
+              EDITIONS
+            </span>&nbsp;&nbsp;
+            {edition ? edition : <span className="animate-pulse">***</span>}
+          </h6>
+        )}
 
         {/** SRC20 DEPLOY */}
         {fromPage === "src20_deploy" &&
           (
-            <p className={detailsText}>
-              <span className={detailsTitle}>
+            <h6 className={textXs}>
+              <span className={labelXs}>
                 TICKER
-              </span>&nbsp;&nbsp;{ticker || "***"}
-            </p>
+              </span>&nbsp;&nbsp;
+              {ticker ? ticker : <span className="animate-pulse">*****</span>}
+            </h6>
           )}
         {fromPage === "src20_deploy" &&
           (
-            <p className={detailsText}>
-              <span className={detailsTitle}>
+            <h6 className={textXs}>
+              <span className={labelXs}>
                 LIMIT
-              </span>&nbsp;&nbsp;{limit || "***"}
-            </p>
+              </span>&nbsp;&nbsp;
+              {limit ? limit : <span className="animate-pulse">0</span>}
+            </h6>
           )}
         {fromPage === "src20_deploy" &&
           (
-            <p className={detailsText}>
-              <span className={detailsTitle}>
+            <h6 className={textXs}>
+              <span className={labelXs}>
                 SUPPLY
-              </span>&nbsp;&nbsp;{supply || "***"}
-            </p>
+              </span>&nbsp;&nbsp;
+              {supply ? supply : <span className="animate-pulse">0</span>}
+            </h6>
           )}
 
-        {/* Transfer Details */}
+        {/* SRC20 Transfer Details */}
         {fromPage === "src20_transfer" && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>
-              RECEIPIENT ADDY
-            </span>&nbsp;&nbsp;{transferDetails?.address || "******"}
-          </p>
+          <>
+            <h6 className={textXs}>
+              <span className={labelXs}>RECIPIENT ADDY</span>&nbsp;&nbsp;
+              {src20TransferDetails?.address || (
+                <span className="animate-pulse">************</span>
+              )}
+            </h6>
+            <h6 className={textXs}>
+              <span className={labelXs}>TOKEN TICKER</span>&nbsp;&nbsp;
+              {src20TransferDetails?.token || (
+                <span className="animate-pulse">*****</span>
+              )}
+            </h6>
+            <h6 className={textXs}>
+              <span className={labelXs}>AMOUNT</span>&nbsp;&nbsp;
+              {src20TransferDetails?.amount || (
+                <span className="animate-pulse">0</span>
+              )}
+            </h6>
+          </>
         )}
 
-        {fromPage === "src20_transfer" && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>
-              TOKEN TICKER
-            </span>&nbsp;&nbsp;{transferDetails?.token || "***"}
-          </p>
-        )}
-
-        {fromPage === "src20_transfer" && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>
-              AMOUNT
-            </span>&nbsp;&nbsp;{transferDetails?.amount || "***"}
-          </p>
+        {/* Stamp Transfer Details */}
+        {fromPage === "stamp_transfer" && (
+          <>
+            <h6 className={textXs}>
+              <span className={labelXs}>STAMP</span>&nbsp;&nbsp;
+              {stampTransferDetails?.stamp || (
+                <span className="animate-pulse">******</span>
+              )}
+            </h6>
+            <h6 className={textXs}>
+              <span className={labelXs}>EDITIONS</span>&nbsp;&nbsp;
+              {stampTransferDetails?.editions || (
+                <span className="animate-pulse">***</span>
+              )}
+            </h6>
+            <h6 className={textXs}>
+              <span className={labelXs}>RECIPIENT ADDY</span>&nbsp;&nbsp;
+              {stampTransferDetails?.address || (
+                <span className="animate-pulse">************</span>
+              )}
+            </h6>
+          </>
         )}
 
         {/* Mint Details */}
         {fromPage === "src20_mint" && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>
+          <h6 className={textXs}>
+            <span className={labelXs}>
               TOKEN TICKER
-            </span>&nbsp;&nbsp;{mintDetails?.token || "***"}
-          </p>
+            </span>&nbsp;&nbsp;
+            {mintDetails?.token
+              ? mintDetails.token
+              : <span className="animate-pulse">*****</span>}
+          </h6>
         )}
 
-        {fromPage === "src20_mint" && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>
-              AMOUNT
-            </span>&nbsp;&nbsp;{mintDetails?.amount || "***"}
-          </p>
-        )}
+        {fromPage === "src20_mint" &&
+          (
+            <h6 className={textXs}>
+              <span className={labelXs}>
+                AMOUNT
+              </span>&nbsp;&nbsp;
+              {mintDetails?.amount
+                ? mintDetails.amount
+                : <span className="animate-pulse">0</span>}
+            </h6>
+          )}
+
+        {/* TOTAL - Moved to the end */}
+        <h6 className={textXs}>
+          <span className={labelXs}>
+            TOTAL
+          </span>&nbsp;&nbsp;
+          {feeDetails?.totalValue
+            ? (
+              <>
+                {coinType === "BTC"
+                  ? formatSatoshisToBTC(feeDetails.totalValue, {
+                    includeSymbol: false,
+                  })
+                  : formatSatoshisToUSD(feeDetails.totalValue, BTCPrice)}
+              </>
+            )
+            : <span className="animate-pulse">0.00000000</span>}{" "}
+          <span className="font-light">{coinType}</span>
+        </h6>
       </div>
     );
   };
@@ -527,30 +616,41 @@ export function FeeCalculatorBase({
         )}
       </div>
 
-      <p className="mt-4 text-xl text-stamp-grey-light font-light">
-        <span className="text-stamp-grey-darker">ESTIMATE</span>{" "}
-        {coinType === "BTC"
+      <h6 className="mt-4 text-xl text-stamp-grey-light font-light">
+        <span className="text-stamp-grey-darker pr-2">ESTIMATE</span>
+        {(feeDetails?.minerFee || feeDetails?.dustValue)
           ? (
-            <>
-              <span className="font-bold">
-                {formatSatoshisToBTC(
-                  (feeDetails?.minerFee || 0) + (feeDetails?.dustValue || 0),
-                  { includeSymbol: false },
-                )}
-              </span>{" "}
-              <span className="font-light">BTC</span>
-            </>
+            coinType === "BTC"
+              ? (
+                <>
+                  <span className="font-bold">
+                    {formatSatoshisToBTC(
+                      (feeDetails?.minerFee || 0) +
+                        (feeDetails?.dustValue || 0),
+                      { includeSymbol: false },
+                    )}
+                  </span>{" "}
+                  <span className="font-light">BTC</span>
+                </>
+              )
+              : (
+                <>
+                  <span className="font-bold">
+                    {(((feeDetails?.minerFee || 0) +
+                      (feeDetails?.dustValue || 0)) /
+                      1e8 * BTCPrice).toFixed(2)}
+                  </span>{" "}
+                  <span className="font-light">{coinType}</span>
+                </>
+              )
           )
           : (
             <>
-              <span className="font-bold">
-                {(((feeDetails?.minerFee || 0) + (feeDetails?.dustValue || 0)) /
-                  1e8 * BTCPrice).toFixed(2)}
-              </span>{" "}
+              <span className="font-bold animate-pulse">0.00000000</span>{" "}
               <span className="font-light">{coinType}</span>
             </>
           )}
-      </p>
+      </h6>
 
       <div
         onClick={() => setVisible(!visible)}
@@ -570,7 +670,7 @@ export function FeeCalculatorBase({
 
       {renderDetails()}
 
-      <div className="flex flex-col items-end gap-4 pt-6">
+      <div className="flex flex-col items-end gap-4 pt-3">
         {!isModal && (
           <div className="relative flex items-center">
             <input
@@ -643,7 +743,7 @@ export function FeeCalculatorBase({
                 }
                 `}
               >
-                I AGREE TO THE{" "}
+                AGREE TO THE{" "}
                 <span className="text-stamp-purple">
                   <span className="mobileLg:hidden">
                     <a

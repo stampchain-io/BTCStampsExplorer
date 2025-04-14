@@ -132,6 +132,15 @@ export function StampTransferTool({}: Props) {
     }
   }, [selectedStamp?.tx_hash]);
 
+  // Add at the top level of the component
+  useEffect(() => {
+    console.log("Values updated:", {
+      recipientAddress: formState.recipientAddress,
+      stamp: selectedStamp?.stamp,
+      quantity: quantity,
+    });
+  }, [formState.recipientAddress, selectedStamp?.stamp, quantity]);
+
   /* ===== EVENT HANDLERS ===== */
   const handleStampSelect = (e: Event) => {
     e.preventDefault(); // Prevent form submission
@@ -320,6 +329,12 @@ export function StampTransferTool({}: Props) {
           outputTypes={["P2WPKH"]}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
+          fromPage="stamp_transfer"
+          stampTransferDetails={{
+            address: formState.recipientAddress || "",
+            stamp: selectedStamp?.stamp || "",
+            editions: quantity || 0,
+          }}
         />
       </div>
 

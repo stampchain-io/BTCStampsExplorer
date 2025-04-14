@@ -299,6 +299,7 @@ export function SRC20TransferTool(
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20"
+          fromPage="src20_transfer"
           fileType="application/json"
           fileSize={undefined}
           issuance={undefined}

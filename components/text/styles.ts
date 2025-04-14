@@ -68,6 +68,7 @@ export const textLinkUnderline =
 // Use the specific link styles created or just add "animated-underline" to the class name to apply an animated underline effect
 
 /* ===== LABEL STYLES ===== */
+export const labelXs = `${labelFont} text-xs ${cursor}`;
 export const labelSm = `${labelFont} text-sm ${cursor}`;
 export const label = `${labelFont} text-base ${cursor}`; // = old dataLabel name
 export const labelLg = `${labelFont} text-lg ${cursor}`;
