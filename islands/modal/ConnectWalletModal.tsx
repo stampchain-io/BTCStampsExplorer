@@ -3,6 +3,7 @@ import { ComponentChildren } from "preact";
 import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
 import { WalletProviderBase } from "$islands/modal/WalletProviderBase.tsx";
 import { showConnectWalletModal } from "$client/wallet/wallet.ts";
+import { subtitlePurple, titlePurpleLD } from "$text";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -32,9 +33,9 @@ export const ConnectWalletModal = (
       // }`}
       // onClick={handleCloseModal}
     >
-      <div class="relative flex flex-col w-full max-w-2xl h-auto p-3 mobileMd:p-6 dark-gradient-modal rounded-lg overflow-hidden">
+      <div class="relative flex flex-col w-[340px] tablet:w-[640px] h-fit dark-gradient-modal rounded-xl shadow-md p-6 overflow-hidden">
         {
-          /* Close button - currently commented out
+          /* Close button - should be swapped to a close icon
         <img
           onClick={closeModal}
           src="/img/wallet/icon-close.svg"
@@ -44,15 +45,15 @@ export const ConnectWalletModal = (
         }
 
         {/* ===== HEADER SECTION ===== */}
-        <h3 class="text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center mobileLg:text-left">
+        <h3 class={titlePurpleLD}>
           CONNECT
         </h3>
-        <h4 class="text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-highlight text-center mobileLg:text-left pb-1.5 mobileLg:pb-3 mobileMd:pb-6">
+        <h4 class={`${subtitlePurple} text-left pb-3`}>
           YOUR WALLET
         </h4>
 
         {/* ===== WALLET PROVIDERS GRID ===== */}
-        <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-3 mobileMd:gap-6 items-center">
+        <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-6 items-center">
           {Object.keys(WALLET_PROVIDERS).map((providerKey) => (
             <WalletProviderBase
               key={providerKey}

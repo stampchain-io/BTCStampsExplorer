@@ -1,3 +1,4 @@
+/* ===== WALLET PROVIDER MODAL COMPONENT ===== */
 import { useState } from "preact/hooks";
 import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
 import { unisatProvider } from "$client/wallet/unisat.ts";
@@ -7,12 +8,15 @@ import { okxProvider } from "$client/wallet/okx.ts";
 import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
 import { phantomProvider } from "$client/wallet/phantom.ts";
 import { showConnectWalletModal } from "$client/wallet/wallet.ts";
+import { containerCard } from "$layout";
 
+/* ===== TYPES ===== */
 interface WalletProviderBaseProps {
   providerKey: WalletProviderKey;
   toggleModal: () => void;
 }
 
+/* ===== WALLET CONNECTORS CONFIG ===== */
 const walletConnectors = {
   unisat: unisatProvider.connectUnisat,
   leather: leatherProvider.connectLeather,
@@ -21,14 +25,18 @@ const walletConnectors = {
   phantom: phantomProvider.connectPhantom,
 } as const;
 
+/* ===== MODAL COMPONENT ===== */
 export function WalletProviderBase(
   { providerKey, toggleModal }: WalletProviderBaseProps,
 ) {
+  /* ===== HOOKS ===== */
   const { addToast = () => {} } = useToast() ?? {};
   const providerInfo = WALLET_PROVIDERS[providerKey];
 
+  /* ===== STATE ===== */
   const [isHovered, setIsHovered] = useState(false);
 
+  /* ===== EVENT HANDLERS ===== */
   const handleConnect = async () => {
     try {
       const connectFunction = walletConnectors[providerKey];
@@ -50,26 +58,30 @@ export function WalletProviderBase(
     }
   };
 
+  /* ===== RENDER ===== */
   return (
     <div
       onClick={handleConnect}
       role="button"
       aria-label={`Connect to ${providerInfo.name}`}
-      className="cursor-pointer flex justify-between items-center p-4 dark-gradient rounded-lg transition-colors ease-in-out duration-150 border-2 border-transparent hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
+      className={`flex justify-between items-center p-4 ${containerCard}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <p
-        className={`text-xl mobileLg:text-2xl uppercase font-black ${
-          isHovered ? "text-[#AA00FF]" : "purple-gradient3"
+      {/* ===== PROVIDER NAME ===== */}
+      <h6
+        className={`font-extrabold text-lg uppercase tracking-wide ${
+          isHovered ? "text-stamp-purple-bright" : "gray-gradient3"
         }`}
       >
         {providerInfo.name}
-      </p>
+      </h6>
+
+      {/* ===== PROVIDER LOGO ===== */}
       <img
         src={providerInfo.logo.small}
         alt={providerInfo.name}
-        className="w-8 h-8 mobileLg:w-10 mobileLg:h-10"
+        className="w-8 h-8"
       />
     </div>
   );

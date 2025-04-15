@@ -17,7 +17,7 @@ const AnimationLayout = (
   return (
     <>
       <div
-        class={`unfolding ${status ? "out" : ""}`}
+        class={`scaleUpDown ${status ? "out" : ""}`}
         id="animation-modal-container"
         onClick={handleClickOutside}
       >

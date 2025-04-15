@@ -103,7 +103,7 @@ export const ConnectButton = () => {
   /* ===== COMPONENT RENDER ===== */
   return (
     <div
-      class="relative "
+      class="relative z-10"
       ref={modalRef}
     >
       {/* ===== CONNECT WALLET BUTTON ===== */}
