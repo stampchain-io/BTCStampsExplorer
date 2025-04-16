@@ -6,6 +6,7 @@ import { MetaTags } from "$components/layout/MetaTags.tsx";
 import { Footer, NavigatorProvider } from "$layout";
 import { Header } from "$header";
 import FontLoader from "$islands/layout/FontLoader.tsx";
+import GlobalModalContainer from "$islands/modal/GlobalModalContainer.tsx";
 
 export default function App({ Component, state }: PageProps<unknown>) {
   if (state?.skipAppLayout) {
@@ -78,9 +79,11 @@ export default function App({ Component, state }: PageProps<unknown>) {
             .loading-skeleton {
               background: linear-gradient(
                 110deg,
-                #1f002e 30%,
-                #14001f 40%,
-                #1f002e 50%
+                #14001f 30%,
+                #1b0029 40%,
+                #220033 50%,
+                #1b0029 60%,
+                #14001f 70%                
               );
               background-size: 200% 100%;
               animation: shimmer 1.5s infinite linear;
@@ -135,27 +138,25 @@ export default function App({ Component, state }: PageProps<unknown>) {
       </Head>
 
       <body class="!relative min-h-screen overflow-x-hidden overflow-hidden">
+        {/* Background gradients */}
         {state?.route !== "/"
           ? <div class="bgGradientTop contain-layout" />
           : (
             <>
               <div class="bgGradientTop contain-layout block" />
-              {/* <div class="bgGradientTopLeft desktop:block hidden" /> */}
-              {/* <div class="bgGradientTopRight desktop:block hidden" /> */}
             </>
           )}
         <div class="bgGradientBottom contain-layout" />
-
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1] contain-paint" />
 
+        {/* Main content */}
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
           <ToastProvider>
             <NavigatorProvider>
               <div class="flex flex-col min-h-screen">
                 <Header />
                 <main
-                  class="flex flex-col flex-grow w-full max-w-desktop mx-auto
-                  px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop"
+                  class="flex flex-col flex-grow w-full max-w-desktop mx-auto px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop"
                   f-client-nav
                 >
                   <Partial name="body">
@@ -167,6 +168,9 @@ export default function App({ Component, state }: PageProps<unknown>) {
             </NavigatorProvider>
           </ToastProvider>
         </div>
+
+        {/* Modal container as an island */}
+        <GlobalModalContainer />
       </body>
     </html>
   );

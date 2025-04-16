@@ -1,7 +1,6 @@
 /* ===== RECEIVE ADDRESS MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import QRCode from "qrcode";
-import { ModalLayout } from "$layout";
 import { tooltipIcon } from "$notification";
 
 /* ===== TYPES ===== */
@@ -39,7 +38,6 @@ function RecieveAddyModal({ onClose, address, title = "RECEIVE" }: Props) {
       .catch((err: Error) => console.error(err));
   }, [address]);
 
-  // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       if (copyTooltipTimeoutRef.current) {
@@ -77,20 +75,18 @@ function RecieveAddyModal({ onClose, address, title = "RECEIVE" }: Props) {
     try {
       await navigator.clipboard.writeText(address);
       setCopyTooltipText("ADDY COPIED");
-      setIsCopyTooltipVisible(true); // Show immediately
+      setIsCopyTooltipVisible(true);
       setAllowCopyTooltip(false);
 
       if (copyTooltipTimeoutRef.current) {
         globalThis.clearTimeout(copyTooltipTimeoutRef.current);
       }
 
-      // Hide after 1.5s
       copyTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsCopyTooltipVisible(false);
-        // Reset text after fade animation completes
         globalThis.setTimeout(() => {
           setCopyTooltipText("COPY ADDY");
-        }, 300); // matches transition duration
+        }, 300);
       }, 1500);
     } catch (err) {
       console.error("Failed to copy:", err);
@@ -99,7 +95,11 @@ function RecieveAddyModal({ onClose, address, title = "RECEIVE" }: Props) {
 
   /* ===== RENDER ===== */
   return (
-    <ModalLayout onClose={onClose} title={title}>
+    <div class="flex flex-col items-center">
+      <h2 class="text-2xl mobileLg:text-3xl font-bold mb-6 mobileLg:mb-8">
+        {title}
+      </h2>
+
       {/* ===== QR CODE SECTION ===== */}
       <div class="flex flex-col -mt-3 mobileLg:-mt-4 items-center">
         {qrCodeDataUrl && (
@@ -143,7 +143,7 @@ function RecieveAddyModal({ onClose, address, title = "RECEIVE" }: Props) {
           </div>
         </div>
       </div>
-    </ModalLayout>
+    </div>
   );
 }
 

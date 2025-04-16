@@ -184,10 +184,11 @@ import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
 import * as $modal_BuyStampModal from "./islands/modal/BuyStampModal.tsx";
 import * as $modal_ConnectWalletModal from "./islands/modal/ConnectWalletModal.tsx";
-import * as $modal_ConnectedModalWIP from "./islands/modal/ConnectedModalWIP.tsx";
 import * as $modal_DetailSRC101Modal from "./islands/modal/DetailSRC101Modal.tsx";
 import * as $modal_DonateStampModal from "./islands/modal/DonateStampModal.tsx";
 import * as $modal_FilterSRC20Modal from "./islands/modal/FilterSRC20Modal.tsx";
+import * as $modal_GlobalModalContainer from "./islands/modal/GlobalModalContainer.tsx";
+import * as $modal_ModalOverlay from "./islands/modal/ModalOverlay.tsx";
 import * as $modal_PreviewCodeModal from "./islands/modal/PreviewCodeModal.tsx";
 import * as $modal_PreviewImageModal from "./islands/modal/PreviewImageModal.tsx";
 import * as $modal_RecieveAddyModal from "./islands/modal/RecieveAddyModal.tsx";
@@ -195,6 +196,7 @@ import * as $modal_SendBTCModal from "./islands/modal/SendBTCModal.tsx";
 import * as $modal_SendStampModalWIP from "./islands/modal/SendStampModalWIP.tsx";
 import * as $modal_WalletProviderBase from "./islands/modal/WalletProviderBase.tsx";
 import * as $modal_index from "./islands/modal/index.ts";
+import * as $modal_states from "./islands/modal/states.ts";
 import * as $search_SRC20Search from "./islands/search/SRC20Search.tsx";
 import * as $search_StampSearch from "./islands/search/StampSearch.tsx";
 import * as $search_index from "./islands/search/index.ts";
@@ -470,10 +472,11 @@ const manifest = {
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
     "./islands/modal/BuyStampModal.tsx": $modal_BuyStampModal,
     "./islands/modal/ConnectWalletModal.tsx": $modal_ConnectWalletModal,
-    "./islands/modal/ConnectedModalWIP.tsx": $modal_ConnectedModalWIP,
     "./islands/modal/DetailSRC101Modal.tsx": $modal_DetailSRC101Modal,
     "./islands/modal/DonateStampModal.tsx": $modal_DonateStampModal,
     "./islands/modal/FilterSRC20Modal.tsx": $modal_FilterSRC20Modal,
+    "./islands/modal/GlobalModalContainer.tsx": $modal_GlobalModalContainer,
+    "./islands/modal/ModalOverlay.tsx": $modal_ModalOverlay,
     "./islands/modal/PreviewCodeModal.tsx": $modal_PreviewCodeModal,
     "./islands/modal/PreviewImageModal.tsx": $modal_PreviewImageModal,
     "./islands/modal/RecieveAddyModal.tsx": $modal_RecieveAddyModal,
@@ -481,6 +484,7 @@ const manifest = {
     "./islands/modal/SendStampModalWIP.tsx": $modal_SendStampModalWIP,
     "./islands/modal/WalletProviderBase.tsx": $modal_WalletProviderBase,
     "./islands/modal/index.ts": $modal_index,
+    "./islands/modal/states.ts": $modal_states,
     "./islands/search/SRC20Search.tsx": $search_SRC20Search,
     "./islands/search/StampSearch.tsx": $search_StampSearch,
     "./islands/search/index.ts": $search_index,

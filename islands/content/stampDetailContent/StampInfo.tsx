@@ -24,6 +24,7 @@ import {
 import { Button } from "$button";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import { tooltipIcon } from "$notification";
+import { openModal } from "$islands/modal/states.ts";
 
 /* ===== TYPES ===== */
 interface StampInfoProps {
@@ -45,15 +46,23 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     setFee(newFee);
   };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
   const toggleModal = (dispenser?: Dispenser) => {
     if (dispenser) {
       setSelectedDispenser(dispenser);
     }
-    setIsModalOpen(!isModalOpen);
+
+    // Create modal content
+    const modalContent = (
+      <BuyStampModal
+        stamp={stamp}
+        fee={fee}
+        handleChangeFee={handleChangeFee}
+        dispenser={selectedDispenser || lowestPriceDispenser}
+      />
+    );
+
+    // Show modal with animation
+    openModal(modalContent, "scaleUpDown");
   };
 
   const createdDate = (() => {
@@ -1019,17 +1028,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </div>
           </div>
         </div>
-
-        {isModalOpen && (
-          <BuyStampModal
-            stamp={stamp}
-            fee={fee}
-            handleChangeFee={handleChangeFee}
-            toggleModal={() => setIsModalOpen(false)}
-            handleCloseModal={handleCloseModal}
-            dispenser={selectedDispenser || lowestPriceDispenser}
-          />
-        )}
       </div>
     </>
   );

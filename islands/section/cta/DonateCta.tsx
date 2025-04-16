@@ -10,6 +10,7 @@ import { tooltipIcon } from "$notification";
 import { Button } from "$button";
 import { Icon } from "$icon";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import ModalOverlay from "$islands/modal/ModalOverlay.tsx";
 
 /* ===== CONSTANTS ===== */
 const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
@@ -409,11 +410,16 @@ export default function DonateCta() {
           />
         )}
         {isReceiveModalOpen && (
-          <RecieveAddyModal
-            onClose={() => setIsReceiveModalOpen(false)}
-            address={DONATE_ADDRESS}
-            title="DONATE"
-          />
+          <ModalOverlay
+            handleClose={() => setIsReceiveModalOpen(false)}
+            animation="scaleDownUp"
+          >
+            <RecieveAddyModal
+              onClose={() => setIsReceiveModalOpen(false)}
+              address={DONATE_ADDRESS}
+              title="RECEIVE"
+            />
+          </ModalOverlay>
         )}
       </section>
     </>

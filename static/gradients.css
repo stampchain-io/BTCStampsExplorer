@@ -101,12 +101,12 @@
 /* Background Gradient Colors */
 .dark-gradient {
   /* TODO: Migrate to Tailwind: bg-stamp-dark */
-  background: linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff);
+  background: linear-gradient(to bottom right, #0e0014, #14001f, #1b0029);
 }
 
 .dark-gradient-modal {
   /* TODO: Migrate to Tailwind: bg-stamp-dark */
-  background: linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff), #000000;
+  background: linear-gradient(to bottom right, #0e0014, #14001f, #1b0029, #220033);
 }
 
 .purple-bg-gradient {

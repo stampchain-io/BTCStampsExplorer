@@ -1,22 +1,14 @@
 // KEEP file for reference on the handleUpdateDisplayName to move into the new wallet / dashboard page
 // UPDATE COMMENTARY
 import { useEffect, useRef, useState } from "preact/hooks";
-import { ComponentChildren } from "preact";
-import {
-  showConnectWalletModal,
-  walletContext,
-} from "$client/wallet/wallet.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { WalletProviderBase } from "$islands/modal/WalletProviderBase.tsx";
 import { WalletProviderKey } from "$lib/utils/constants.ts";
-import { AnimationLayout } from "$layout";
 import { Button } from "$button";
 import { navLinkPurple, valueDarkSm } from "$text";
-/* ===== WALLET MODAL COMPONENT INTERFACE ===== */
-interface Props {
-  connectors?: ComponentChildren[];
-}
+import { closeModal, openModal } from "$islands/modal/states.ts"; // use direct import paths
 
 /* ===== MAIN WALLET MODAL COMPONENT ===== */
 export const ConnectButton = () => {
@@ -27,15 +19,9 @@ export const ConnectButton = () => {
     "tapwallet",
     "phantom",
   ];
-  const connectorComponents = connectors.map((key) => (extraProps: any) => (
-    <WalletProviderBase providerKey={key} {...extraProps} />
-  ));
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { wallet, isConnected, disconnect } = walletContext;
   const { address } = wallet;
-  const modalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [path, setPath] = useState<string | null>(null);
 
@@ -45,49 +31,31 @@ export const ConnectButton = () => {
   }, []);
 
   /* ===== MODAL VISIBILITY HANDLER ===== */
-  useEffect(() => {
-    if (showConnectWalletModal.value) {
-      setIsModalOpen(true);
-    }
-  }, [showConnectWalletModal.value]);
+  const handleOpenModal = () => {
+    if (!isConnected) {
+      try {
+        // Create the providers array first
+        const providerComponents = connectors.map((key) => (
+          <WalletProviderBase
+            key={key}
+            providerKey={key}
+            toggleModal={closeModal}
+          />
+        ));
 
-  /* ===== CLICK OUTSIDE HANDLER ===== */
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node)
-      ) {
-        setIsPopupOpen(false);
+        // Create modal content with the array directly
+        const modalContent = (
+          <ConnectWalletModal
+            connectors={providerComponents}
+            handleClose={closeModal}
+          />
+        );
+
+        // Open modal
+        openModal(modalContent, "scaleUpDown");
+      } catch (error) {
+        console.error("Error in handleOpenModal:", error);
       }
-    };
-
-    if (isPopupOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isPopupOpen]);
-
-  /* ===== MODAL TOGGLE FUNCTION ===== */
-  const toggleModal = () => {
-    if (isConnected) {
-      console.log("connected");
-      // setIsPopupOpen(!isPopupOpen);
-    } else {
-      setIsModalOpen(!isModalOpen);
-      showConnectWalletModal.value = true;
-    }
-  };
-
-  /* ===== MODAL CLOSE HANDLER ===== */
-  const handleCloseModal = (event: MouseEvent) => {
-    if (event.target === event.currentTarget) {
-      setIsModalOpen(false);
     }
   };
 
@@ -102,10 +70,7 @@ export const ConnectButton = () => {
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div
-      class="relative z-10"
-      ref={modalRef}
-    >
+    <div class="relative z-10">
       {/* ===== CONNECT WALLET BUTTON ===== */}
       {!(isConnected && address) && (
         <div className="relative">
@@ -114,7 +79,7 @@ export const ConnectButton = () => {
               variant="outlineGradient"
               color="purpleGradient"
               size="lg"
-              onClick={toggleModal}
+              onClick={handleOpenModal}
               ref={buttonRef}
             >
               CONNECT
@@ -125,7 +90,7 @@ export const ConnectButton = () => {
               variant="text"
               color="custom"
               size="md"
-              onClick={toggleModal}
+              onClick={handleOpenModal}
               ref={buttonRef}
               class="!justify-end gray-gradient3-hover"
             >
@@ -204,25 +169,6 @@ export const ConnectButton = () => {
             </div>
           </div>
         </>
-      )}
-
-      {/* ===== CONNECT WALLET MODAL ===== */}
-      {isModalOpen && (
-        <AnimationLayout
-          handleClose={() => {
-            setIsModalOpen(false);
-            showConnectWalletModal.value = false;
-          }}
-        >
-          <ConnectWalletModal
-            connectors={connectorComponents}
-            toggleModal={() => {
-              setIsModalOpen(false);
-              showConnectWalletModal.value = false;
-            }}
-            handleCloseModal={handleCloseModal}
-          />
-        </AnimationLayout>
       )}
     </div>
   );

@@ -105,13 +105,13 @@ export const buttonStyles: ButtonVariants = {
       text-[var(--default-color)] hover:text-black
     `,
     outlineGradient: `
-      relative !bg-[#2b1132] !p-[2px] rounded-md !border-0
+      relative !bg-[linear-gradient(to_right,#1a0824,#210925)] !p-[2px] rounded-md !border-0
       before:absolute before:inset-0 before:rounded-md before:z-[1]
       before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
       before:[--angle:0deg] before:animate-rotate
       hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
       before:transition-colors before:duration-300
-      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#2b1132] [&>*]:!border-0
+      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[linear-gradient(to_right,#1a0824,#210925)] [&>*]:!border-0
       [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
       [&>*]:font-bold [&>*]:tracking-wider 
       [&>*]:text-[var(--default-color)] hover:[&>*]:text-[var(--hover-color)]

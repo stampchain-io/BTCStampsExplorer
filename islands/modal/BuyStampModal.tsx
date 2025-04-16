@@ -8,14 +8,13 @@ import { ModalLayout } from "$layout";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { inputFieldSquare } from "$form";
+import { closeModal } from "$islands/modal/states.ts";
 
 /* ===== TYPES ===== */
 interface Props {
   stamp: StampRow;
   fee: number;
   handleChangeFee: (fee: number) => void;
-  toggleModal: () => void;
-  handleCloseModal: () => void;
   dispenser: any;
 }
 
@@ -24,8 +23,6 @@ const BuyStampModal = ({
   stamp,
   fee: initialFee,
   handleChangeFee,
-  toggleModal,
-  handleCloseModal,
   dispenser,
 }: Props) => {
   /* ===== CONTEXT ===== */
@@ -107,22 +104,11 @@ const BuyStampModal = ({
     await handleSubmit(async () => {
       // Convert fee rate from sat/vB to sat/kB
       const feeRateKB = formState.fee * 1000;
-      console.log("Fee rate conversion:", {
-        satVB: formState.fee,
-        satKB: feeRateKB,
-      });
 
       const options = {
         return_psbt: true,
         fee_per_kb: feeRateKB,
       };
-
-      console.log("Creating dispense transaction:", {
-        address: wallet.address,
-        dispenser: dispenser.source,
-        quantity: quantity,
-        feeRate: options.fee_per_kb,
-      });
 
       const response = await fetch("/api/v2/create/dispense", {
         method: "POST",
@@ -143,7 +129,6 @@ const BuyStampModal = ({
       }
 
       const responseData = await response.json();
-      console.log("Dispense response:", responseData);
 
       if (!responseData?.psbt || !responseData?.inputsToSign) {
         throw new Error("Invalid response: Missing PSBT or inputsToSign");
@@ -161,7 +146,7 @@ const BuyStampModal = ({
         setSuccessMessage(
           `Transaction broadcasted successfully. TXID: ${signResult.txid}`,
         );
-        setTimeout(toggleModal, 5000);
+        setTimeout(() => closeModal(), 5000);
       } else if (signResult.cancelled) {
         throw new Error("Transaction signing was cancelled.");
       } else {
@@ -178,7 +163,7 @@ const BuyStampModal = ({
           message: "Modal closing",
           component: "BuyStampModal",
         });
-        handleCloseModal();
+        closeModal();
       }}
       title="BUY"
     >
@@ -192,22 +177,22 @@ const BuyStampModal = ({
           />
         </div>
         <div className="flex flex-col w-full">
-          <p className="text-3xl mobileLg:text-4xl gray-gradient1 font-black">
+          <h5 className="text-3xl gray-gradient1 font-extrabold">
             <span className="text-stamp-grey-light font-light">
               #
             </span>
             {stamp.stamp}
-          </p>
+          </h5>
 
           {/* ===== QUANTITY SELECTION ===== */}
           <div className="flex flex-row pt-3 w-full justify-between items-center">
             <div className="flex flex-col items-start -space-y-0.5">
-              <p className="text-xl mobileLg:text-2xl font-bold text-stamp-grey">
+              <h5 className="text-lg font-bold text-stamp-grey">
                 EDITIONS
-              </p>
-              <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
+              </h5>
+              <h6 className="text-sm font-medium text-stamp-grey-darker">
                 MAX {maxQuantity}
-              </p>
+              </h6>
             </div>
             <div className="flex flex-col items-end">
               <input
@@ -255,7 +240,7 @@ const BuyStampModal = ({
             message: "Cancel clicked",
             component: "BuyStampModal",
           });
-          handleCloseModal();
+          closeModal();
         }}
         buttonName="BUY"
         className="pt-9 mobileLg:pt-12"

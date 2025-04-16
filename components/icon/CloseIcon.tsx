@@ -4,8 +4,7 @@ import type { IconVariants } from "$icon";
 
 /* ===== TYPES ===== */
 interface CloseIconProps {
-  isOpen: boolean;
-  onClick: () => void;
+  onClick: (e?: MouseEvent) => void;
   size: IconVariants["size"];
   weight: IconVariants["weight"];
   color: "greyGradient" | "purpleGradient";
@@ -21,8 +20,9 @@ export function CloseIcon({
   className = "",
 }: CloseIconProps) {
   /* ===== EVENT HANDLERS ===== */
-  const handleClick: IconVariants["onClick"] = (e) => {
-    onClick();
+  const handleClick = (e: MouseEvent) => {
+    e.stopPropagation();
+    onClick(e);
   };
 
   /* ===== STYLES ===== */
@@ -51,12 +51,12 @@ export function CloseIcon({
           {color === "purpleGradient" && (
             <linearGradient
               id="purpleGradient"
-              gradientTransform="rotate(45)"
+              gradientTransform="rotate(130)"
             >
-              <stop offset="0%" stop-color="#660099" />
+              <stop offset="0%" stop-color="#AA00FF" />
               <stop offset="40%" stop-color="#8800CC" />
               <stop offset="70%" stop-color="#8800CC" />
-              <stop offset="100%" stop-color="#AA00FF" />
+              <stop offset="100%" stop-color="#660099" />
             </linearGradient>
           )}
         </defs>

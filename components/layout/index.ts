@@ -26,4 +26,3 @@ export * from "$islands/layout/FontLoader.tsx";
 
 /* ===== MODAL ===== */
 export * from "$components/layout/ModalLayout.tsx";
-export { default as AnimationLayout } from "$components/layout/AnimationLayout.tsx";
