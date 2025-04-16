@@ -345,7 +345,7 @@ export function Header() {
         <div className="flex flex-col h-full">
           <div className="flex pt-[30px] px-9">
             <CloseIcon
-              size="md"
+              size="sm"
               weight="bold"
               color="greyGradient"
               isOpen={open}

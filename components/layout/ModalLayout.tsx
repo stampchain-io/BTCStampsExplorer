@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
 import { closeModal } from "$islands/modal/states.ts";
+import { titlePurpleLD } from "$text";
 import { CloseIcon } from "$icon";
 
 interface ModalLayoutProps {
@@ -11,6 +12,7 @@ interface ModalLayoutProps {
   children: preact.ComponentChildren;
   className?: string;
   contentClassName?: string;
+  hideHeader?: boolean;
 }
 
 export function ModalLayout({
@@ -19,6 +21,7 @@ export function ModalLayout({
   children,
   className = "",
   contentClassName = "",
+  hideHeader = false,
 }: ModalLayoutProps) {
   const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
   const [allowCloseTooltip, setAllowCloseTooltip] = useState(true);
@@ -91,38 +94,42 @@ export function ModalLayout({
   return (
     <div
       className={`
-        relative 
-        w-[360px] mobileLg:w-[420px] 
-        p-6 rounded-lg 
-        dark-gradient-modal
+        relative w-[340px] mobileLg:w-[360px] 
+        p-6 rounded-lg dark-gradient-modal
         ${className}
       `}
       onClick={(e) => e.stopPropagation()}
     >
       <div class={`relative ${contentClassName}`}>
-        <div
-          class="absolute top-0 right-0 -mr-1.5 -mt-1.5 ms-auto cursor-pointer"
-          onMouseEnter={handleCloseMouseEnter}
-          onMouseLeave={handleCloseMouseLeave}
-        >
-          <CloseIcon
-            size="sm"
-            weight="bold"
-            color="purpleGradient"
-            onClick={() => handleClose()}
-          />
-          <div
-            class={`${tooltipIcon} ${
-              isCloseTooltipVisible ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            {closeTooltipText}
-          </div>
-        </div>
+        {!hideHeader && (
+          <>
+            <div
+              class="absolute top-0 right-0 -mr-1.5 -mt-1.5 ms-auto cursor-pointer"
+              onMouseEnter={handleCloseMouseEnter}
+              onMouseLeave={handleCloseMouseLeave}
+            >
+              <CloseIcon
+                size="sm"
+                weight="bold"
+                color="purpleGradient"
+                onClick={() => handleClose()}
+              />
+              <div
+                class={`${tooltipIcon} ${
+                  isCloseTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {closeTooltipText}
+              </div>
+            </div>
 
-        <p class="font-black text-4xl mobileMd:text-center purple-gradient3 pt-6 pb-12">
-          {title}
-        </p>
+            <div class="w-full text-center">
+              <h2 class={`${titlePurpleLD} pt-6 pb-9`}>
+                {title}
+              </h2>
+            </div>
+          </>
+        )}
 
         {children}
       </div>

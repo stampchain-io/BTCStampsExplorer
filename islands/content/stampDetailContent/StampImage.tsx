@@ -13,6 +13,7 @@ import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
+import { openModal } from "$islands/modal/states.ts";
 
 /* ===== RIGHT PANEL SUBCOMPONENT ===== */
 function RightPanel(
@@ -398,7 +399,6 @@ export function StampImage(
 ) {
   /* ===== STATE & REFS ===== */
   const [loading, setLoading] = useState<boolean>(true);
-  const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const imgScopeRef = useRef<HTMLDivElement | null>(null);
   const [transform, setTransform] = useState("");
   const [src, setSrc] = useState("");
@@ -424,19 +424,18 @@ export function StampImage(
     };
   }, []);
 
-  const handleCloseCodeModal = () => {
-    setIsCodeModalOpen(false);
-  };
-  const toggleCodeModal = () => {
-    setIsCodeModalOpen(!isCodeModalOpen);
-  };
-
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState(false);
-  const handleCloseFullScreenModal = () => {
-    setIsFullScreenModalOpen(false);
-  };
   const toggleFullScreenModal = () => {
-    setIsFullScreenModalOpen(!isFullScreenModalOpen);
+    const modalContent = (
+      <PreviewImageModal
+        src={src}
+        contentType={stamp.stamp_mimetype === "text/html"
+          ? "html"
+          : stamp.stamp_mimetype === "text/plain"
+          ? "text"
+          : "image"}
+      />
+    );
+    openModal(modalContent, "zoomInOut");
   };
 
   const fetchStampImage = async () => {
@@ -583,6 +582,19 @@ export function StampImage(
 
   const handleAudioEnded = () => {
     setIsPlaying(false);
+  };
+
+  // Keep the state for tracking if modal should be shown
+  const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+
+  // Update the toggleCodeModal function to use the new pattern
+  const toggleCodeModal = () => {
+    const modalContent = (
+      <PreviewCodeModal
+        src={htmlContent || src}
+      />
+    );
+    openModal(modalContent, "zoomInOut");
   };
 
   if (loading) {
@@ -774,27 +786,6 @@ export function StampImage(
               </div>
             </div>
           )
-      )}
-
-      {isCodeModalOpen && (
-        <PreviewCodeModal
-          src={htmlContent || src}
-          toggleModal={toggleCodeModal}
-          handleCloseModal={handleCloseCodeModal}
-          stamp_url={stamp.stamp_url}
-        />
-      )}
-
-      {isFullScreenModalOpen && (
-        <PreviewImageModal
-          src={src}
-          handleCloseModal={handleCloseFullScreenModal}
-          contentType={stamp.stamp_mimetype === "text/html"
-            ? "html"
-            : stamp.stamp_mimetype === "text/plain"
-            ? "text"
-            : "image"}
-        />
       )}
     </>
   );

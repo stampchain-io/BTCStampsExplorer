@@ -48,6 +48,8 @@ export const subtitlePurple =
 /* ===== HEADING STYLES ===== */
 export const headingGrey2 =
   `font-black text-3xl mobileLg:text-4xl text-stamp-grey-light tracking-wide ${cursor}`; // was used in about donate section - rename
+export const headingGreyLD =
+  `font-bold text-xl gray-gradient1 tracking-wide inline-block w-fit relative ${cursor}`;
 export const headingGreyLDLink =
   `font-bold text-xl gray-gradient1-hover tracking-wide inline-block w-fit relative ${transition}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
 export const headingGrey =
@@ -79,7 +81,8 @@ export const valueXs = `${valueFont} text-xs ${cursor}`;
 export const valueSm = `${valueFont} text-sm ${cursor}`;
 export const value = `${valueFont} text-base ${cursor}`;
 export const valueLg = `${valueFont} text-lg ${cursor}`;
-export const valueXl = `${valueFont} text-xl ${cursor}`;
+export const valueXl =
+  `font-black text-xl text-stamp-grey-light -mt-1  ${cursor}`;
 export const value2xl =
   `font-black text-2xl text-stamp-grey-light -mt-1 ${cursor}`;
 export const value3xl =

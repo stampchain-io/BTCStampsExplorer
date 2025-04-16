@@ -692,7 +692,7 @@ export function FeeCalculatorBase({
 
       {renderDetails()}
 
-      <div className="flex flex-col items-end gap-4 pt-9">
+      <div className="flex flex-col items-end gap-4 pt-12">
         {!isModal && (
           <div className="relative flex items-center">
             <input

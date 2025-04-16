@@ -22,7 +22,7 @@ export {
   closeModal,
   DEFAULT_MODAL_ANIMATION,
   globalModal,
-  showModal,
+  openModal,
 } from "$islands/modal/states.ts";
 
 /*{ default as PreviewImageModal }*/

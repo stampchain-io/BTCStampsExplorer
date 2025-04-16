@@ -7,9 +7,10 @@ import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { StampImage } from "$content";
 import { containerBackground } from "$layout";
-import { subtitleGrey, titleGreyLD, valueXs } from "$text";
+import { headingGreyLD, textXs, titleGreyLD } from "$text";
 import { Button } from "$button";
 import { tooltipIcon } from "$notification";
+import { openModal } from "$islands/modal/states.ts";
 
 /* ===== TYPES ===== */
 interface WalletDispenserDetailsProps {
@@ -289,21 +290,19 @@ function DispenserStats({
   dispensers: WalletOverviewInfo["dispensers"];
   btcPrice: number;
 }) {
-  /* ===== STATE ===== */
-  const [showBuyModal, setShowBuyModal] = useState(false);
-  const [fee, setFee] = useState(1); // Default fee
-
-  /* ===== COMPUTED VALUES ===== */
+  const [fee, setFee] = useState(1);
   const firstDispenser = dispensers?.items?.[0];
-  if (!firstDispenser) return null;
 
-  /* ===== EVENT HANDLERS ===== */
   const handleOpenBuyModal = () => {
-    setShowBuyModal(true);
-  };
-
-  const handleCloseBuyModal = () => {
-    setShowBuyModal(false);
+    const modalContent = (
+      <BuyStampModal
+        stamp={firstDispenser.stamp}
+        fee={fee}
+        handleChangeFee={setFee}
+        dispenser={firstDispenser}
+      />
+    );
+    openModal(modalContent, "scaleUpDown");
   };
 
   /* ===== RENDER ===== */
@@ -332,7 +331,7 @@ function DispenserStats({
           label="ESCROW"
           value={
             <>
-              <span class={valueXs}>
+              <span class={textXs}>
                 {firstDispenser.escrow_quantity.toString()}
               </span>
             </>
@@ -342,7 +341,7 @@ function DispenserStats({
           label="GIVE"
           value={
             <>
-              <span class={valueXs}>
+              <span class={textXs}>
                 {firstDispenser.give_quantity.toString()}
               </span>
             </>
@@ -353,7 +352,7 @@ function DispenserStats({
           label="REMAIN"
           value={
             <>
-              <span class={valueXs}>
+              <span class={textXs}>
                 {firstDispenser.give_remaining.toString()}
               </span>
             </>
@@ -381,30 +380,18 @@ function DispenserStats({
         />
       </div>
 
-      {/* Buy Button and Modal */}
+      {/* Buy Button */}
       {firstDispenser?.give_remaining > 0 && (
-        <>
-          <div className="flex justify-end pt-1.5">
-            <Button
-              variant="outline"
-              color="purple"
-              size="lg"
-              onClick={handleOpenBuyModal}
-            >
-              BUY
-            </Button>
-          </div>
-          {showBuyModal && (
-            <BuyStampModal
-              stamp={firstDispenser.stamp}
-              fee={fee}
-              handleChangeFee={setFee}
-              toggleModal={handleCloseBuyModal}
-              handleCloseModal={handleCloseBuyModal}
-              dispenser={firstDispenser}
-            />
-          )}
-        </>
+        <div className="flex justify-end pt-1.5">
+          <Button
+            variant="outline"
+            color="purple"
+            size="lg"
+            onClick={handleOpenBuyModal}
+          >
+            BUY
+          </Button>
+        </div>
       )}
     </div>
   );
@@ -483,15 +470,15 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
       <div class="flex gap-6">
         <div class="flex">
           <p
-            class={`${subtitleGrey} hidden mobileMd:block mobileLg:hidden desktop:block`}
+            class={`${headingGreyLD} hidden mobileMd:block mobileLg:hidden desktop:block`}
           >
             {walletData.address}
           </p>
-          <p class={`${subtitleGrey} hidden tablet:block desktop:hidden`}>
+          <p class={`${headingGreyLD} hidden tablet:block desktop:hidden`}>
             {abbreviateAddress(walletData.address, 14)}
           </p>
           <p
-            class={`${subtitleGrey} block mobileMd:hidden mobileLg:block tablet:hidden`}
+            class={`${headingGreyLD} block mobileMd:hidden mobileLg:block tablet:hidden`}
           >
             {abbreviateAddress(walletData.address, 10)}
           </p>

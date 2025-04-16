@@ -1,6 +1,6 @@
 import { ComponentChildren } from "preact";
 import { alignmentClasses, type AlignmentType } from "$layout";
-import { labelLg, labelSm, valueSm, valueXl } from "$text";
+import { labelSm, textSm, value2xl } from "$text";
 
 interface StatBaseProps {
   label: string | ComponentChildren;
@@ -34,7 +34,7 @@ export function StatItem({
         {label}
       </h5>
       <h6
-        class={`${valueSm} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
+        class={`${textSm} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
       >
         {value}
       </h6>
@@ -60,11 +60,11 @@ export function StatTitle({
   const alignmentClass = alignmentClasses[align];
   const content = (
     <div class="flex flex-col -space-y-1">
-      <h5 class={`${labelLg} ${alignmentClass}`}>
+      <h5 class={`${labelSm} ${alignmentClass}`}>
         {label}
       </h5>
       <h6
-        class={`${valueXl} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
+        class={`${value2xl} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
       >
         {value}
       </h6>
