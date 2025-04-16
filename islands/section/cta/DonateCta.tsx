@@ -10,7 +10,7 @@ import { tooltipIcon } from "$notification";
 import { Button } from "$button";
 import { Icon } from "$icon";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import ModalOverlay from "$islands/modal/ModalOverlay.tsx";
+import { openModal } from "$islands/modal/states.ts";
 
 /* ===== CONSTANTS ===== */
 const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
@@ -24,14 +24,12 @@ const DONATE_STAMP: DonateStampData = {
 
 /* ===== STATE ===== */
 export default function DonateCta() {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [fee, setFee] = useState<number>(0);
   const [monthlyDonations, setMonthlyDonations] = useState<number>(0);
   const [isReceiveTooltipVisible, setIsReceiveTooltipVisible] = useState<
     boolean
   >(false);
   const [allowReceiveTooltip, setAllowReceiveTooltip] = useState<boolean>(true);
-  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState<boolean>(false);
   const [currentMonth, setCurrentMonth] = useState<string>("");
   const [dispenser, setDispenser] = useState(null);
 
@@ -263,11 +261,25 @@ export default function DonateCta() {
   };
 
   const handleOpen = () => {
-    setIsOpen(!isOpen);
+    const modalContent = (
+      <DonateStampModal
+        stamp={DONATE_STAMP as unknown as StampRow}
+        fee={fee}
+        handleChangeFee={handleChangeFee}
+        dispenser={dispenser}
+      />
+    );
+    openModal(modalContent, "scaleUpDown");
   };
 
-  const handleCloseModal = () => {
-    setIsOpen(false);
+  const handleOpenReceiveModal = () => {
+    const modalContent = (
+      <RecieveAddyModal
+        address={DONATE_ADDRESS}
+        title="DONATE"
+      />
+    );
+    openModal(modalContent, "scaleUpDown");
   };
 
   /* ===== SUBCOMPONENTS ===== */
@@ -364,7 +376,7 @@ export default function DonateCta() {
                   color="purple"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);
-                    setIsReceiveModalOpen(true);
+                    handleOpenReceiveModal();
                   }}
                 />
                 <div
@@ -397,30 +409,6 @@ export default function DonateCta() {
             <DonateStampCard onClick={handleOpen} />
           </div>
         </div>
-
-        {/* ===== MODALS ===== */}
-        {isOpen && (
-          <DonateStampModal
-            stamp={DONATE_STAMP as unknown as StampRow}
-            fee={fee}
-            handleChangeFee={handleChangeFee}
-            toggleModal={handleOpen}
-            handleCloseModal={handleCloseModal}
-            dispenser={dispenser}
-          />
-        )}
-        {isReceiveModalOpen && (
-          <ModalOverlay
-            handleClose={() => setIsReceiveModalOpen(false)}
-            animation="scaleDownUp"
-          >
-            <RecieveAddyModal
-              onClose={() => setIsReceiveModalOpen(false)}
-              address={DONATE_ADDRESS}
-              title="RECEIVE"
-            />
-          </ModalOverlay>
-        )}
       </section>
     </>
   );

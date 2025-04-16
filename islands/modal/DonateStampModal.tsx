@@ -8,14 +8,13 @@ import { ModalLayout } from "$layout";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipImage } from "$notification";
+import { closeModal } from "$islands/modal/states.ts";
 
 /* ===== TYPES ===== */
 interface Props {
   stamp: StampRow;
   fee: number;
   handleChangeFee: (fee: number) => void;
-  toggleModal: () => void;
-  handleCloseModal: () => void;
   dispenser: any;
 }
 
@@ -24,8 +23,6 @@ const DonateStampModal = ({
   stamp,
   fee: initialFee,
   handleChangeFee,
-  toggleModal,
-  handleCloseModal,
   dispenser,
 }: Props) => {
   /* ===== CONTEXT ===== */
@@ -128,6 +125,14 @@ const DonateStampModal = ({
     setIsAmountTooltipVisible(false);
   };
 
+  const handleCloseModal = () => {
+    logger.debug("ui", {
+      message: "Modal closing",
+      component: "DonateStampModal",
+    });
+    closeModal();
+  };
+
   /* ===== TRANSACTION HANDLING ===== */
   const handleBuyClick = async () => {
     await handleSubmit(async () => {
@@ -175,7 +180,7 @@ const DonateStampModal = ({
         setSuccessMessage(
           `Transaction broadcasted successfully. TXID: ${signResult.txid}`,
         );
-        setTimeout(toggleModal, 5000);
+        setTimeout(closeModal, 5000);
       } else if (signResult.cancelled) {
         throw new Error("Transaction signing was cancelled.");
       } else {
@@ -201,13 +206,7 @@ const DonateStampModal = ({
   /* ===== RENDER ===== */
   return (
     <ModalLayout
-      onClose={() => {
-        logger.debug("ui", {
-          message: "Modal closing",
-          component: "DonateStampModal",
-        });
-        handleCloseModal();
-      }}
+      onClose={handleCloseModal}
       title="DONATE"
     >
       {/* ===== PRICE DISPLAY ===== */}
@@ -312,7 +311,7 @@ const DonateStampModal = ({
             message: "Cancel clicked",
             component: "DonateStampModal",
           });
-          handleCloseModal();
+          closeModal();
         }}
         buttonName="DONATE"
         className="pt-9 mobileLg:pt-12"

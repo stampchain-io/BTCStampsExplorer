@@ -41,7 +41,7 @@ export const ConnectWalletModal = ({
     <ModalLayout
       title="CONNECT"
       onClose={handleModalClose}
-      className="w-[342px] mobileLg:w-[640px]"
+      className="w-[340px] mobileLg:w-[640px]"
     >
       <h4 class={`${subtitlePurple} text-center -mt-9 pb-3`}>
         YOUR WALLET
