@@ -1,19 +1,31 @@
 /* ===== SRC101 DETAIL MODAL COMPONENT ===== */
 import { ModalLayout } from "$layout";
+import { closeModal } from "$islands/modal/states.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 /* ===== TYPES ===== */
-interface PropTypes {
-  handleClose: () => void;
+interface Props {
   img: string;
   name: string;
   owner: string;
 }
 
 /* ===== COMPONENT ===== */
-const DetailSRC101Modal = ({ handleClose, img, name, owner }: PropTypes) => {
+const DetailSRC101Modal = ({ img, name, owner }: Props) => {
+  const handleCloseModal = () => {
+    logger.debug("ui", {
+      message: "Modal closing",
+      component: "DetailSRC101Modal",
+    });
+    closeModal();
+  };
+
   /* ===== RENDER ===== */
   return (
-    <ModalLayout onClose={handleClose} title={`${name}.btc`}>
+    <ModalLayout
+      onClose={handleCloseModal}
+      title={`${name}.btc`}
+    >
       <div class="flex flex-col justify-center gap-1">
         {/* ===== IMAGE SECTION ===== */}
         <div class="w-full">
@@ -23,12 +35,14 @@ const DetailSRC101Modal = ({ handleClose, img, name, owner }: PropTypes) => {
         {/* ===== DETAILS SECTION ===== */}
         <div class="w-full flex flex-col gap-1">
           <div class="flex gap-2">
-            <span class="text-stamp-grey-darker text-lg">Name</span>
-            <span class="text-white text-xl">{name}</span>
+            <span class="font-light text-stamp-grey-darker text-sm">NAME</span>
+            <span class="font-bold text-stamp-grey-light text-lg">{name}</span>
           </div>
           <div class="flex gap-2">
-            <span class="text-stamp-grey-darker text-lg">Owner</span>
-            <span class="text-white text-xl truncate">{owner}</span>
+            <span class="font-light text-stamp-grey-darker text-sm">OWNER</span>
+            <span class="font-bold text-stamp-grey-light text-lg truncate">
+              {owner}
+            </span>
           </div>
         </div>
       </div>

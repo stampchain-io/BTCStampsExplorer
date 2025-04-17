@@ -11,6 +11,7 @@ import { titlePurpleLD } from "$text";
 import { Button } from "$button";
 import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
 import { StatusMessages, tooltipButton } from "$notification";
+import { openModal } from "$islands/modal/states.ts";
 
 /* ===== COMPONENT INTERFACE ===== */
 interface SRC101RegisterToolProps {
@@ -39,7 +40,6 @@ export function SRC101RegisterTool({
   const { wallet, isConnected } = walletContext;
   const [isExist, setIsExist] = useState(true);
   const [checkStatus, setCheckStatus] = useState(false);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [modalData, setModalData] = useState<SRC101Balance | null>(null);
   const [openTldDropdown, setOpenTldDropdown] = useState<boolean>(false);
   const [isSelectingTld, setIsSelectingTld] = useState(false);
@@ -113,8 +113,15 @@ export function SRC101RegisterTool({
   }
 
   /* ===== MODAL HANDLERS ===== */
-  const handleClose = () => {
-    setIsOpen(false);
+  const handleOpenDetailModal = (data: SRC101Balance) => {
+    const modalContent = (
+      <DetailSRC101Modal
+        img={data.img}
+        name={data.tokenid_utf8}
+        owner={data.owner}
+      />
+    );
+    openModal(modalContent, "zoomInOut");
   };
 
   /* ===== SUBMISSION HANDLERS ===== */
@@ -144,12 +151,10 @@ export function SRC101RegisterTool({
       if (res.status === 200) {
         if (jsonData?.data.length) {
           setIsExist(true);
-          setIsOpen(true);
-          // setModalData(jsonData.data[0]);
+          handleOpenDetailModal(jsonData.data[0]);
           return false;
         } else {
           setIsExist(false);
-          setIsOpen(false);
           setModalData(null);
           return true;
         }
@@ -298,15 +303,6 @@ export function SRC101RegisterTool({
           apiError={apiError}
         />
       </div>
-
-      {isOpen && modalData && (
-        <DetailSRC101Modal
-          handleClose={handleClose}
-          name={modalData.tokenid_utf8}
-          img={modalData.img}
-          owner={modalData.owner}
-        />
-      )}
     </div>
   );
 }
