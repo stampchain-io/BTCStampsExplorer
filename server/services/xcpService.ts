@@ -8,12 +8,8 @@ import { getTxInfo } from "$lib/utils/utxoUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
 
+// Only include active, working counterparty nodes
 export const xcp_v2_nodes = [
-  // {
-  //   name: "stampchain.io",
-  //   url:
-  //     "https://k6e0ufzq8h.execute-api.us-east-1.amazonaws.com/beta/counterpartyproxy/v2",
-  // },
   {
     name: "counterparty.io",
     url: "https://api.counterparty.io:4000/v2",
@@ -72,9 +68,10 @@ export function normalizeFeeRate(params: {
 export async function fetchXcpV2WithCache<T>(
   endpoint: string,
   queryParams: URLSearchParams,
+  customCacheTimeout?: number,
 ): Promise<T> {
   const cacheKey = `api:v2:${endpoint}:${queryParams.toString()}`;
-  const cacheTimeout = 1000 * 60 * 5; // 5 minutes
+  const cacheTimeout = customCacheTimeout || 1000 * 60 * 5; // 5 minutes default, can be overridden
 
   await logger.info("api", {
     message: "Fetching XCP V2 with cache",
@@ -1765,10 +1762,14 @@ export class XcpManager {
     const queryParams = new URLSearchParams();
 
     try {
+      // Using the cache function with a short timeout for health checks
+      // Health checks should be cached for less time than regular API calls
+      const cacheTime = cacheTimeout || 60000; // Default to 1 minute cache for health checks
+      
       const response = await this.fetchXcpV2WithCache<{ result: { status: string } }>(
         endpoint,
         queryParams,
-        cacheTimeout
+        cacheTime
       );
 
       return response?.result?.status === "Healthy";

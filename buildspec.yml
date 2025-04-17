@@ -1,0 +1,48 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: latest
+    commands:
+      - echo "Installing build dependencies..."
+      - yum -y install jq
+  pre_build:
+    commands:
+      - echo "Environment verification..."
+      - export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - export AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID:-$(aws sts get-caller-identity --query Account --output text)}
+      - export ECR_REPOSITORY_NAME=${ECR_REPOSITORY_NAME:-btc-stamps-explorer}
+      - export BASE_REPOSITORY_NAME=${ECR_REPOSITORY_NAME}-base
+      - export ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+      - echo "ECR URI $ECR_URI"
+      
+      # Create repositories if they don't exist
+      - aws ecr describe-repositories --repository-names $ECR_REPOSITORY_NAME || aws ecr create-repository --repository-name $ECR_REPOSITORY_NAME
+      - aws ecr describe-repositories --repository-names $BASE_REPOSITORY_NAME || aws ecr create-repository --repository-name $BASE_REPOSITORY_NAME
+      
+      # Login to ECR
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_URI
+      
+      # Use the pre-cached base image from ECR to avoid Docker Hub rate limits
+      - echo "Using pre-cached base image from ECR to avoid Docker Hub rate limits..."
+  build:
+    commands:
+      - echo "Build started on $(date)"
+      # Modify Dockerfile to use our ECR cached base image before building
+      - sed -i "s|FROM denoland/deno:alpine-2.2.3|FROM $ECR_URI/$BASE_REPOSITORY_NAME:alpine-2.2.3|g" Dockerfile || echo "Dockerfile substitution failed, trying original build"
+      - docker build --platform=linux/amd64 -t $ECR_URI/$ECR_REPOSITORY_NAME:latest .
+  post_build:
+    commands:
+      - echo "Build completed on $(date)"
+      - docker push $ECR_URI/$ECR_REPOSITORY_NAME:latest
+      - echo '[{"name":"stamps-app-container","imageUri":"'$ECR_URI/$ECR_REPOSITORY_NAME:latest'"}]' > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
+  discard-paths: yes
+
+cache:
+  paths:
+    - '/root/.docker/**/*'

@@ -8,7 +8,8 @@ ENV HOME=/app \
     XDG_CONFIG_HOME=/app/.config \
     XDG_CACHE_HOME=/app/.cache \
     XDG_DATA_HOME=/app/.local/share \
-    NPM_CONFIG_CACHE=/app/.npm
+    NPM_CONFIG_CACHE=/app/.npm \
+    REDIS_LOG_LEVEL=DEBUG
 
 # Install additional tools
 RUN apk add --no-cache bash
