@@ -8,6 +8,7 @@ import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { containerBackground } from "$layout";
 import { titleGreyLD } from "$text";
 import { tooltipIcon } from "$notification";
+import { openModal } from "$islands/modal/states.ts";
 
 /* ===== TYPES ===== */
 interface WalletDashboardDetailsProps {
@@ -222,18 +223,18 @@ function WalletOverview(
     <div className="flex flex-col">
       <div className="flex justify-between">
         <div className={`${hideBalance ? "blur-sm" : ""}`}>
-          <p class="text-stamp-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl select-none">
+          <h6 class="text-stamp-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl select-none">
             <span class="font-bold">
               {hideBalance ? "*********" : walletData.balance}
             </span>{" "}
             BTC
-          </p>
-          <p class="text-stamp-grey font-extralight text-base mobileMd:text-lg mobileLg:text-xl select-none pt-[3px]">
+          </h6>
+          <h6 class="text-stamp-grey font-extralight text-base mobileMd:text-lg mobileLg:text-xl select-none pt-[3px]">
             <span class="font-medium">
               {hideBalance ? "*****" : walletData.usdValue.toLocaleString()}
             </span>{" "}
             USD
-          </p>
+          </h6>
         </div>
         <button
           ref={balanceButtonRef}
@@ -291,15 +292,15 @@ function WalletOverview(
       </div>
 
       <div class="flex items-center pt-3 mobileMd:pt-6 text-base mobileLg:text-lg text-stamp-purple font-medium select-none">
-        <p class="hidden tablet:block">
+        <h6 class="hidden tablet:block">
           {abbreviateAddress(walletData.address, 12)}
-        </p>
-        <p class="hidden mobileLg:block tablet:hidden">
+        </h6>
+        <h6 class="hidden mobileLg:block tablet:hidden">
           {abbreviateAddress(walletData.address, 10)}
-        </p>
-        <p class="block mobileLg:hidden">
+        </h6>
+        <h6 class="block mobileLg:hidden">
           {abbreviateAddress(walletData.address, 8)}
-        </p>
+        </h6>
       </div>
       <div class="flex pt-[3px] mobileMd:pt-1.5 gap-3 mobileLg:gap-[9px]">
         <div
@@ -433,30 +434,30 @@ function DashboardProfile() {
           />
         </div>
         <div class="flex ml-1.5 mobileMd:ml-0 mt-1.5 mobileMd:-mt-2 mobileLg:mt-0">
-          <p class={titleGreyLD}>
+          <h5 class={titleGreyLD}>
             ANONYMOUS
-          </p>
+          </h5>
         </div>
       </div>
       <div class="flex justify-between">
         <div class="flex flex-col gap-0.5">
-          <p class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
             anonymous.btc
-          </p>
-          <p class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          </h6>
+          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
             kevin.btc
-          </p>
-          <p class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          </h6>
+          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
             pepe.btc
-          </p>
-          <p class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          </h6>
+          <h6 class="text-stamp-grey font-light text-base mobileLg:text-lg">
             satoshi.btc
-          </p>
+          </h6>
         </div>
         <div class="flex">
-          <p class="text-stamp-grey-darker font-medium text-sm mobileLg:text-base">
+          <h6 class="text-stamp-grey-darker font-medium text-sm mobileLg:text-base">
             website // X
-          </p>
+          </h6>
         </div>
       </div>
       <div class="flex justify-end">
@@ -704,8 +705,28 @@ export default function WalletDashboardDetails({
 }: WalletDashboardDetailsProps) {
   /* ===== STATE ===== */
   const [fee, setFee] = useState<number>(walletData.fee || 0);
-  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
-  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
+
+  /* ===== MODAL HANDLERS ===== */
+  const handleOpenSendModal = () => {
+    const modalContent = (
+      <SendBTCModal
+        fee={fee}
+        balance={walletData.balance}
+        handleChangeFee={setFee}
+      />
+    );
+    openModal(modalContent, "scaleUpDown");
+  };
+
+  const handleOpenReceiveModal = () => {
+    const modalContent = (
+      <RecieveAddyModal
+        address={walletData.address}
+        title="RECEIVE"
+      />
+    );
+    openModal(modalContent, "scaleUpDown");
+  };
 
   /* ===== RENDER ===== */
   return (
@@ -720,8 +741,8 @@ export default function WalletDashboardDetails({
           <div className={containerBackground}>
             <WalletOverview
               walletData={walletData}
-              onSend={() => setIsSendModalOpen(true)}
-              onReceive={() => setIsReceiveModalOpen(true)}
+              onSend={handleOpenSendModal}
+              onReceive={handleOpenReceiveModal}
             />
           </div>
         </div>
@@ -738,22 +759,6 @@ export default function WalletDashboardDetails({
           src20Value={walletData.src20Value}
         />
       </div>
-
-      {isSendModalOpen && (
-        <SendBTCModal
-          fee={fee}
-          balance={walletData.balance}
-          handleChangeFee={setFee}
-          onClose={() => setIsSendModalOpen(false)}
-        />
-      )}
-
-      {isReceiveModalOpen && (
-        <RecieveAddyModal
-          onClose={() => setIsReceiveModalOpen(false)}
-          address={walletData.address}
-        />
-      )}
     </div>
   );
 }

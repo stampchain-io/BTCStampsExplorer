@@ -6,19 +6,18 @@ import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalLayout } from "$layout";
 import { inputField } from "$form";
 import { tooltipIcon } from "$notification";
+import { closeModal } from "$islands/modal/states.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 /* ===== TYPES ===== */
-interface SendBTCModalProps {
+interface Props {
   fee: number;
   balance: number;
   handleChangeFee: (fee: number) => void;
-  onClose: () => void;
 }
 
 /* ===== COMPONENT ===== */
-function SendBTCModal(
-  { fee: initialFee, balance, handleChangeFee, onClose }: SendBTCModalProps,
-) {
+function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
   /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
 
@@ -137,6 +136,14 @@ function SendBTCModal(
   };
 
   /* ===== EVENT HANDLERS ===== */
+  const handleCloseModal = () => {
+    logger.debug("ui", {
+      message: "Modal closing",
+      component: "SendBTCModal",
+    });
+    closeModal();
+  };
+
   const handleSendSubmit = async () => {
     await handleSubmit(async () => {
       // Implement send transaction logic here
@@ -181,7 +188,7 @@ function SendBTCModal(
         setSuccessMessage(
           `Transaction sent successfully. TXID: ${signResult.txid}`,
         );
-        setTimeout(onClose, 5000);
+        setTimeout(closeModal, 5000);
       } else if (signResult.cancelled) {
         throw new Error("Transaction signing was cancelled.");
       } else {
@@ -289,7 +296,10 @@ function SendBTCModal(
 
   /* ===== RENDER ===== */
   return (
-    <ModalLayout onClose={onClose} title="SEND">
+    <ModalLayout
+      onClose={handleCloseModal}
+      title="SEND"
+    >
       {/* ===== AMOUNT INPUT SECTION ===== */}
       <div class="flex flex-col gap-6 -mt-3">
         <div class="flex flex-col items-center text-center">
@@ -386,7 +396,7 @@ function SendBTCModal(
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
         onSubmit={handleSendSubmit}
-        onCancel={onClose}
+        onCancel={handleCloseModal}
         buttonName="SEND"
         className="pt-9 mobileLg:pt-12"
         userAddress={wallet?.address}
