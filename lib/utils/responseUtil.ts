@@ -24,7 +24,7 @@ export class ResponseUtil {
     options: ResponseOptions = { forceNoCache: true },
   ): Response {
     if (new Error().stack?.includes("/api/")) {
-      console.warn("Warning: Use ApiResponseUtil.success for API routes");
+      // console.warn("Warning: Use ApiResponseUtil.success for API routes");
       return ApiResponseUtil.success(data, options);
     }
     return WebResponseUtil.success(data, options);
@@ -37,7 +37,7 @@ export class ResponseUtil {
     options: ResponseOptions = {},
   ): Response {
     if (new Error().stack?.includes("/api/")) {
-      console.warn("Warning: Use ApiResponseUtil.custom for API routes");
+      // console.warn("Warning: Use ApiResponseUtil.custom for API routes");
       return ApiResponseUtil.custom(body, status, options);
     }
     return WebResponseUtil.custom(body, status, options);
@@ -46,7 +46,7 @@ export class ResponseUtil {
   /** @deprecated Use ApiResponseUtil.badRequest for API routes */
   static badRequest(message: string, options: ResponseOptions = {}): Response {
     if (new Error().stack?.includes("/api/")) {
-      console.warn("Warning: Use ApiResponseUtil.badRequest for API routes");
+      // console.warn("Warning: Use ApiResponseUtil.badRequest for API routes");
       return ApiResponseUtil.badRequest(message, undefined, options);
     }
     return WebResponseUtil.badRequest(message, options);
@@ -58,7 +58,7 @@ export class ResponseUtil {
     options: ResponseOptions = {},
   ): Response {
     if (new Error().stack?.includes("/api/")) {
-      console.warn("Warning: Use ApiResponseUtil.notFound for API routes");
+      // console.warn("Warning: Use ApiResponseUtil.notFound for API routes");
       return ApiResponseUtil.notFound(message, undefined, options);
     }
     return WebResponseUtil.notFound(message, options);
@@ -71,7 +71,7 @@ export class ResponseUtil {
     options: ResponseOptions = {},
   ): Response {
     if (new Error().stack?.includes("/api/")) {
-      console.warn("Warning: Use ApiResponseUtil.internalError for API routes");
+      // console.warn("Warning: Use ApiResponseUtil.internalError for API routes");
       return ApiResponseUtil.internalError(error, message, options);
     }
     return WebResponseUtil.internalError(error, message, options);

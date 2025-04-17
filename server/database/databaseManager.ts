@@ -24,6 +24,7 @@ interface DatabaseConfig {
   ELASTICACHE_ENDPOINT: string;
   DENO_ENV: string;
   CACHE?: string;
+  REDIS_LOG_LEVEL?: string;
 }
 
 async function shouldInitializeRedis(): Promise<boolean> {
@@ -43,10 +44,67 @@ class DatabaseManager {
   private redisAvailableAtStartup = false;
   private inMemoryCache: { [key: string]: { data: any; expiry: number } } = {};
 
+  // Cache statistics tracking
+  private cacheStats = {
+    hits: 0,
+    misses: 0, 
+    sets: 0,
+    errors: 0,
+    lastReported: Date.now()
+  };
+
   constructor(private config: DatabaseConfig) {
     this.MAX_RETRIES = this.config.DB_MAX_RETRIES || 5;
     this.setupLogging();
     this.logger = getLogger();
+    
+    // Start periodic cache stats reporting every 5 minutes
+    this.startCacheStatsReporting();
+  }
+  
+  private startCacheStatsReporting() {
+    const REPORT_INTERVAL = 5 * 60 * 1000; // 5 minutes
+    setInterval(() => {
+      this.reportCacheStats();
+    }, REPORT_INTERVAL);
+  }
+  
+  private reportCacheStats() {
+    const now = Date.now();
+    const elapsedSeconds = ((now - this.cacheStats.lastReported) / 1000).toFixed(1);
+    const total = this.cacheStats.hits + this.cacheStats.misses;
+    const hitRate = total > 0 ? (this.cacheStats.hits / total * 100).toFixed(2) : "0.00";
+    
+    // Always log stats to stderr for CloudWatch visibility, but respect log level for stdout
+    const logLevel = (this.config.REDIS_LOG_LEVEL || "DEBUG").toUpperCase();
+    const isInfoEnabled = ["DEBUG", "INFO", "TRACE"].includes(logLevel);
+    
+    const statsMessage = `
+*************************************************************************
+                     REDIS CACHE STATISTICS
+*************************************************************************
+Period:             ${elapsedSeconds} seconds
+Cache hits:         ${this.cacheStats.hits}
+Cache misses:       ${this.cacheStats.misses}
+Cache sets:         ${this.cacheStats.sets}
+Cache errors:       ${this.cacheStats.errors}
+Hit rate:           ${hitRate}%
+Redis available:    ${this.redisAvailable ? "YES" : "NO"}
+Redis log level:    ${logLevel}
+*************************************************************************`;
+    
+    // Always log stats to stderr for CloudWatch, but control console.log by log level
+    if (isInfoEnabled) {
+      console.log(statsMessage);
+    }
+    console.error(statsMessage);  // Always log to stderr for CloudWatch visibility
+    
+    // Reset the counters but keep the timestamp
+    this.cacheStats.hits = 0;
+    this.cacheStats.misses = 0;
+    this.cacheStats.sets = 0;
+    this.cacheStats.errors = 0;
+    this.cacheStats.lastReported = now;
   }
 
   public async initialize(): Promise<void> {
@@ -59,9 +117,15 @@ class DatabaseManager {
   }
 
   private setupLogging(): void {
+    // Get Redis log level from environment or config, default to DEBUG
+    const redisLogLevel = this.config.REDIS_LOG_LEVEL || Deno.env.get("REDIS_LOG_LEVEL") || "DEBUG";
+    const level = redisLogLevel.toUpperCase();
+    
+    console.log(`Setting up Redis logging with log level: ${level}`);
+    
     setup({
       handlers: {
-        console: new ConsoleHandler("DEBUG"),
+        console: new ConsoleHandler(level),
         file: new FileHandler("WARN", {
           filename: "./db.log",
           formatter: (logRecord: LogRecord) =>
@@ -70,7 +134,7 @@ class DatabaseManager {
       },
       loggers: {
         default: {
-          level: "DEBUG",
+          level: level,
           handlers: ["console", "file"],
         },
       },
@@ -182,20 +246,82 @@ class DatabaseManager {
 
   private async connectToRedis(): Promise<void> {
     const REDIS_CONNECTION_TIMEOUT = 5000; // 5 seconds timeout
+    const logLevel = (this.config.REDIS_LOG_LEVEL || "DEBUG").toUpperCase();
+    const isInfoEnabled = ["DEBUG", "INFO", "TRACE"].includes(logLevel);
+    const isDebugEnabled = ["DEBUG", "TRACE"].includes(logLevel);
 
     try {
+      const redisEndpoint = this.config.ELASTICACHE_ENDPOINT;
+      // Add very prominent logging that will be visible in all environments
+      const connectionMessage = `
+*************************************************************************
+🔴 REDIS CONNECTION ATTEMPT: Connecting to Redis at ${redisEndpoint}:6379 with TLS
+*************************************************************************`;
+      
+      // Always log connection attempts to stderr, but respect log level for stdout
+      if (isInfoEnabled) {
+        console.log(connectionMessage);
+      }
+      console.error(connectionMessage); // Always log to stderr to ensure visibility in CloudWatch
+      this.logger.info(`Attempting to connect to Redis at ${redisEndpoint}:6379 with TLS`);
+      
       this.redisClient = await deadline(
         connect({
-          hostname: this.config.ELASTICACHE_ENDPOINT,
+          hostname: redisEndpoint,
           port: 6379,
           tls: true,
         }),
         REDIS_CONNECTION_TIMEOUT,
       );
+      
+      // Test Redis connection by writing and reading a value
+      const testKey = "redis_test_connection";
+      const testValue = `connection_test_${Date.now()}`;
+      await this.redisClient.set(testKey, testValue, { ex: 60 });
+      const retrievedValue = await this.redisClient.get(testKey);
+      
+      const successMessage = `
+*************************************************************************
+✅ REDIS CONNECTION SUCCESSFUL - Test Key: ${testKey}
+   - Write Value: ${testValue}
+   - Read Value:  ${retrievedValue}
+   - Match:       ${retrievedValue === testValue ? 'YES' : 'NO'}
+   - Log Level:   ${logLevel}
+*************************************************************************`;
+      
+      // Log success based on log level
+      if (isInfoEnabled) {
+        console.log(successMessage);
+      }
+      console.error(successMessage); // Always log to stderr to ensure visibility in CloudWatch
+      
+      if (retrievedValue === testValue) {
+        this.logger.info("✅ Redis connection test successful - write and read operations working");
+        
+        // Extra debugging info
+        if (isDebugEnabled) {
+          this.logger.debug(`Redis connection details - endpoint: ${redisEndpoint}, port: 6379, tls: true`);
+        }
+      } else {
+        const warningMessage = `⚠️ Redis connection test partially failed - wrote '${testValue}' but read '${retrievedValue}'`;
+        console.warn(warningMessage);
+        console.error(warningMessage);
+        this.logger.warn(warningMessage);
+      }
+      
       this.logger.info("Connected to Redis successfully");
       this.redisAvailable = true;
       this.redisRetryCount = 0;
     } catch (error) {
+      // Create very visible error message - always log errors regardless of level
+      const errorMessage = `
+*************************************************************************
+❌ REDIS CONNECTION ERROR: ${error.message}
+*************************************************************************`;
+      
+      console.error(errorMessage);
+      this.logger.error(`❌ Redis connection error: ${error.message}`);
+      
       if (error instanceof DeadlineError) {
         throw new Error("Redis connection timed out");
       }
@@ -258,16 +384,67 @@ class DatabaseManager {
   }
 
   private async getCachedData(key: string): Promise<unknown | null> {
+    // Enhanced logging to track cache operations
+    const shortKey = key.substring(0, 20);
+    const logLevel = (this.config.REDIS_LOG_LEVEL || "DEBUG").toUpperCase();
+    const isDebugEnabled = ["DEBUG", "TRACE"].includes(logLevel);
+    const isInfoEnabled = ["DEBUG", "INFO", "TRACE"].includes(logLevel);
+    
     if (this.redisClient) {
       try {
+        // Start timing for cache performance tracking
+        const startTime = performance.now();
         const data = await this.redisClient.get(key);
-        return data ? JSON.parse(data) : null;
+        const endTime = performance.now();
+        const duration = (endTime - startTime).toFixed(2);
+        
+        if (data) {
+          // Track cache hits in stats
+          this.cacheStats.hits++;
+          
+          // Make cache hits visible in logs based on log level
+          if (isDebugEnabled) {
+            const hitMessage = `🎯 REDIS CACHE HIT [${duration}ms]: ${shortKey}...`;
+            console.log(hitMessage);
+            // Log sample of cache hits to stderr for CloudWatch visibility at INFO level
+            if (isInfoEnabled && Math.random() < 0.1) {
+              console.error(`STATS: ${hitMessage}`);
+            }
+          }
+          return JSON.parse(data);
+        } else {
+          // Track cache misses in stats
+          this.cacheStats.misses++;
+          
+          // Make cache misses visible based on log level
+          if (isDebugEnabled) {
+            const missMessage = `⚠️ REDIS CACHE MISS [${duration}ms]: ${shortKey}...`;
+            console.log(missMessage);
+            // Log more cache misses to help debug cache effectiveness
+            if (isInfoEnabled && Math.random() < 0.2) {
+              console.error(`STATS: ${missMessage}`);
+            }
+          }
+          return null;
+        }
       } catch (error) {
+        // Track errors in stats - always log errors
+        this.cacheStats.errors++;
+        
+        const errorMessage = `❌ REDIS READ ERROR for key ${shortKey}: ${error.message}`;
+        console.error(errorMessage);
         this.logger.error("Failed to read from Redis cache:", error);
         if (this.redisAvailableAtStartup) {
           this.connectToRedisInBackground();
         }
         this.redisAvailable = false;
+      }
+    } else {
+      // Only log client availability issues at INFO level or more verbose
+      if (isInfoEnabled) {
+        const noClientMessage = `❓ REDIS CLIENT NOT AVAILABLE for key: ${shortKey}...`;
+        console.log(noClientMessage);
+        console.error(`STATS: ${noClientMessage}`);
       }
     }
     return this.getInMemoryCachedData(key);
@@ -278,20 +455,73 @@ class DatabaseManager {
     data: unknown,
     expiry: number | "never",
   ): Promise<void> {
+    const shortKey = key.substring(0, 20);
+    const logLevel = (this.config.REDIS_LOG_LEVEL || "DEBUG").toUpperCase();
+    const isDebugEnabled = ["DEBUG", "TRACE"].includes(logLevel);
+    const isInfoEnabled = ["DEBUG", "INFO", "TRACE"].includes(logLevel);
+    
     if (this.redisClient) {
       try {
+        // Start timing for cache performance tracking
+        const startTime = performance.now();
         const value = JSON.stringify(data);
+        const valueSize = value.length;
+        
         if (expiry === "never") {
           await this.redisClient.set(key, value);
+          const endTime = performance.now();
+          const duration = (endTime - startTime).toFixed(2);
+          
+          // Track in stats
+          this.cacheStats.sets++;
+          
+          // Only log at appropriate levels
+          if (isDebugEnabled) {
+            const setMessage = `💾 REDIS CACHE SET [${duration}ms] (permanent, ${valueSize} bytes): ${shortKey}...`;
+            console.log(setMessage);
+            
+            // Log sample of sets to stderr for CloudWatch visibility
+            if (isInfoEnabled && Math.random() < 0.1) {
+              console.error(`STATS: ${setMessage}`);
+            }
+          }
         } else {
           await this.redisClient.set(key, value, { ex: expiry });
+          const endTime = performance.now();
+          const duration = (endTime - startTime).toFixed(2);
+          
+          // Track in stats
+          this.cacheStats.sets++;
+          
+          // Only log at appropriate levels
+          if (isDebugEnabled) {
+            const setMessage = `💾 REDIS CACHE SET [${duration}ms] (${expiry}s, ${valueSize} bytes): ${shortKey}...`;
+            console.log(setMessage);
+            
+            // Log sample of sets to stderr for CloudWatch visibility
+            if (isInfoEnabled && Math.random() < 0.1) {
+              console.error(`STATS: ${setMessage}`);
+            }
+          }
         }
       } catch (error) {
+        // Track errors in stats - always log errors regardless of level
+        this.cacheStats.errors++;
+        
+        const errorMessage = `❌ REDIS WRITE ERROR for key ${shortKey}: ${error.message}`;
+        console.error(errorMessage);
         this.logger.error("Failed to write to Redis cache:", error);
         if (this.redisAvailableAtStartup) {
           this.connectToRedisInBackground();
         }
         this.redisAvailable = false;
+      }
+    } else {
+      // Only log client unavailability at appropriate levels
+      if (isInfoEnabled) {
+        const noClientMessage = `❓ REDIS CLIENT NOT AVAILABLE for SET, using in-memory cache: ${shortKey}...`;
+        console.log(noClientMessage);
+        console.error(`STATS: ${noClientMessage}`);
       }
     }
     this.setInMemoryCachedData(key, data, expiry);
@@ -373,6 +603,16 @@ const dbConfig: DatabaseConfig = {
   ELASTICACHE_ENDPOINT: Deno.env.get("ELASTICACHE_ENDPOINT") || "",
   DENO_ENV: Deno.env.get("DENO_ENV") || "development",
   CACHE: Deno.env.get("CACHE") || "true",
+  REDIS_LOG_LEVEL: Deno.env.get("REDIS_LOG_LEVEL") || "DEBUG",
 };
+
+// Log the ElastiCache configuration at startup for troubleshooting
+console.log("=== CACHE CONFIGURATION ===");
+console.log(`ELASTICACHE_ENDPOINT: ${dbConfig.ELASTICACHE_ENDPOINT || 'Not set'}`);
+console.log(`DENO_ENV: ${dbConfig.DENO_ENV}`);
+console.log(`CACHE enabled: ${dbConfig.CACHE}`);
+console.log(`REDIS_LOG_LEVEL: ${dbConfig.REDIS_LOG_LEVEL}`);
+console.log(`SKIP_REDIS_CONNECTION: ${(globalThis as any).SKIP_REDIS_CONNECTION ? 'true' : 'false'}`);
+console.log("===========================");
 
 export const dbManager = new DatabaseManager(dbConfig);
