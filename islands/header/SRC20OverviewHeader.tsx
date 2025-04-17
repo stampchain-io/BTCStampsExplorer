@@ -6,27 +6,25 @@ import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { SRC20SearchClient } from "$search";
 import FilterSRC20Modal from "$islands/modal/FilterSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
+import { openModal } from "$islands/modal/states.ts";
 
 /* ===== COMPONENT ===== */
-export const SRC20OverviewHeader = (
-  { filterBy, sortBy }: {
-    filterBy: SRC20_FILTER_TYPES | SRC20_FILTER_TYPES[];
-    sortBy: "ASC" | "DESC" | undefined;
-  },
-) => {
+export const SRC20OverviewHeader = ({
+  filterBy,
+  sortBy,
+}: {
+  filterBy: SRC20_FILTER_TYPES | SRC20_FILTER_TYPES[];
+  sortBy: "ASC" | "DESC" | undefined;
+}) => {
   /* ===== STATE ===== */
   const [isOpen1, setIsOpen1] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
   const [filterValue, setFilterValue] = useState([]);
 
   /* ===== EVENT HANDLERS ===== */
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
+  const handleOpenFilterModal = (filterOptions) => {
+    const modalContent = <FilterSRC20Modal filterOptions={filterOptions} />;
+    openModal(modalContent, "zoomInOut");
   };
 
   const handleOpen1 = (open: boolean) => {
@@ -42,7 +40,7 @@ export const SRC20OverviewHeader = (
   /* ===== EFFECTS ===== */
   useEffect(() => {
     if (filterValue.length) {
-      handleOpenModal();
+      handleOpenFilterModal(filterValue);
     }
   }, [filterValue]);
 
@@ -86,15 +84,6 @@ export const SRC20OverviewHeader = (
           <SRC20SearchClient open2={isOpen2} handleOpen2={handleOpen2} />
         </div>
       </div>
-
-      {/* ===== FILTER MODAL ===== */}
-      {openModal &&
-        (
-          <FilterSRC20Modal
-            filterOptions={filterValue}
-            handleCloseModal={handleCloseModal}
-          />
-        )}
     </div>
   );
 };

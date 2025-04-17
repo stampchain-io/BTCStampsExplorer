@@ -1,4 +1,5 @@
 /* ===== FILTER SRC20 MODAL COMPONENT ===== */
+// @bbaba+@reinamora - are the
 // deno-lint-ignore-file
 import { useState } from "preact/hooks";
 import { ModalLayout } from "$layout";
@@ -10,8 +11,11 @@ import {
   STAMP_FILTER_TYPES,
   WALLET_FILTER_TYPES,
 } from "$globals";
-import { Button } from "$components/button/ButtonOLD.tsx";
+import { Button } from "$button";
 import { SelectDate } from "$form";
+import { closeModal } from "$islands/modal/states.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { subtitlePurple } from "$text";
 
 /* ===== TYPES ===== */
 type FilterTypes =
@@ -21,15 +25,12 @@ type FilterTypes =
   | COLLECTION_FILTER_TYPES
   | LISTING_FILTER_TYPES;
 
-interface FilterSRC20ModalPropTypes {
-  handleCloseModal: () => void;
+interface Props {
   filterOptions: FilterTypes;
 }
 
 /* ===== COMPONENT ===== */
-const FilterSRC20Modal = (
-  { handleCloseModal, filterOptions }: FilterSRC20ModalPropTypes,
-) => {
+const FilterSRC20Modal = ({ filterOptions }: Props) => {
   /* ===== STATE ===== */
   const [title, setTitle] = useState("");
   const [progress, setProgress] = useState({ min: "", max: "" });
@@ -81,6 +82,14 @@ const FilterSRC20Modal = (
     } else if (type === "price_min") {
       setPrice({ ...price, min: e.target.value });
     }
+  };
+
+  const handleCloseModal = () => {
+    logger.debug("ui", {
+      message: "Modal closing",
+      component: "FilterSRC20Modal",
+    });
+    closeModal();
   };
 
   /* ===== FORM SUBMISSION ===== */
@@ -169,66 +178,73 @@ const FilterSRC20Modal = (
     }
 
     window.location.href = url.toString();
+    closeModal();
   };
 
   /* ===== FILTER CONTENT RENDERING ===== */
   const renderContent = () => {
     switch (filterOptions[filterOptions.length - 1]) {
       case "minting":
-        setTitle("Filter Minting");
+        setTitle("PROGRESS");
         return (
           <>
             <InputField
               type="text"
-              placeholder="Min Progress"
+              placeholder="MIN MINT PROGRESS IN PERCENT"
               value={progress.min}
               onChange={(e) => handleChange(e, "progress_min")}
             />
 
             <InputField
               type="text"
-              placeholder="Transaction Count"
+              placeholder="MAX MINT PROGRESS IN PERCENT"
+              value={progress.max}
+              onChange={(e) => handleChange(e, "progress_max")}
+            />
+          </>
+        );
+        break;
+      case "trending mints":
+        setTitle("TRENDING");
+        return (
+          <>
+            <InputField
+              type="text"
+              placeholder="MIN AMOUNT OF TRANSACTIONS"
+              value={transactionCount.min}
+              onChange={(e) => handleChange(e, "min_tx")}
+            />
+            <InputField
+              type="text"
+              placeholder="MAX AMOUNT OF TRANSACTIONS"
               value={transactionCount.max}
               onChange={(e) => handleChange(e, "max_tx")}
             />
           </>
         );
         break;
-      case "trending mints":
-        setTitle("Filter Trending Mints");
-        return (
-          <>
-            <InputField
-              type="text"
-              placeholder="Min Transaction Count"
-              value={transactionCount.min}
-              onChange={(e) => handleChange(e, "min_tx")}
-            />
-          </>
-        );
-        break;
       case "deploy":
-        setTitle("Filter Deploy Date");
+        setTitle("DEPLOYED");
         return (
           <>
-            <SelectDate setDateRange={setDateRange} />
+            <SelectDate setDateRange={setDateRange} isUppercase={true} />
           </>
         );
         break;
       case "supply":
-        setTitle("Filter Supply");
+        setTitle("SUPPLY");
         return (
           <>
             <InputField
               type="text"
-              placeholder="Min Supply"
+              placeholder="MIN SUPPLY"
               value={supply.min}
               onChange={(e) => handleChange(e, "supply_min")}
             />
 
             <InputField
               type="text"
-              placeholder="Max Supply"
+              placeholder="MAX SUPPLY"
               value={supply.max}
               onChange={(e) => handleChange(e, "supply_max")}
             />
@@ -236,19 +252,19 @@ const FilterSRC20Modal = (
         );
         break;
       case "marketcap":
-        setTitle("Filter Marketcap");
+        setTitle("MARKETCAP");
         return (
           <>
             <InputField
               type="text"
-              placeholder="Min Marketcap"
+              placeholder="MIN MARKETCAP"
               value={marketcap.min}
               onChange={(e) => handleChange(e, "marketcap_min")}
             />
 
             <InputField
               type="text"
-              placeholder="Max Marketcap"
+              placeholder="MAX MARKETCAP"
               value={marketcap.max}
               onChange={(e) => handleChange(e, "marketcap_max")}
             />
@@ -256,19 +272,19 @@ const FilterSRC20Modal = (
         );
         break;
       case "holders":
-        setTitle("Filter Holder");
+        setTitle("HOLDERS");
         return (
           <>
             <InputField
               type="text"
-              placeholder="Min Holders"
+              placeholder="MIN HOLDERS AMOUNT"
               value={holder.min}
               onChange={(e) => handleChange(e, "holder_min")}
             />
 
             <InputField
               type="text"
-              placeholder="Max Holders"
+              placeholder="MAX HOLDERS AMOUNT"
               value={holder.max}
               onChange={(e) => handleChange(e, "holder_max")}
             />
@@ -276,19 +292,19 @@ const FilterSRC20Modal = (
         );
         break;
       case "volume":
-        setTitle("Filter Volume");
+        setTitle("VOLUME");
         return (
           <>
             <InputField
               type="text"
-              placeholder="Min Volume"
+              placeholder="MIN"
               value={volume.min}
               onChange={(e) => handleChange(e, "volume_min")}
             />
 
             <InputField
               type="text"
-              placeholder="Max Volume"
+              placeholder="MAX"
               value={volume.max}
               onChange={(e) => handleChange(e, "volume_max")}
             />
@@ -296,16 +312,22 @@ const FilterSRC20Modal = (
         );
         break;
       case "price change":
-        setTitle("Filter Price");
+        setTitle("PRICE CHANGE");
         return (
           <>
-            <SelectDate setDateRange={setDateRange} />
+            <SelectDate setDateRange={setDateRange} isUppercase={true} />
 
             <InputField
               type="text"
-              placeholder="Price Chnage Percentage"
+              placeholder="MIN PERCENT CHANGE"
               value={price.min}
               onChange={(e) => handleChange(e, "price_min")}
+            />
+            <InputField
+              type="text"
+              placeholder="MAX PERCENT CHANGE"
+              value={price.max}
+              onChange={(e) => handleChange(e, "price_max")}
             />
           </>
         );
@@ -315,14 +337,23 @@ const FilterSRC20Modal = (
 
   /* ===== RENDER ===== */
   return (
-    <>
-      <ModalLayout onClose={handleCloseModal} title={title}>
-        <div className="flex flex-col items-center justify-center gap-5">
-          {renderContent()}
-          <Button onClick={handleSubmit} class="w-full">Submit</Button>
-        </div>
-      </ModalLayout>
-    </>
+    <ModalLayout
+      onClose={handleCloseModal}
+      title={title}
+    >
+      <div className="flex flex-col items-center justify-center gap-5">
+        {renderContent()}
+
+        <Button
+          variant="outline"
+          color="purple"
+          size="lg"
+          onClick={handleSubmit}
+        >
+          SUBMIT
+        </Button>
+      </div>
+    </ModalLayout>
   );
 };
 

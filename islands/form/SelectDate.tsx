@@ -1,11 +1,13 @@
 import { useEffect, useRef } from "preact/hooks";
 import flatpickr from "flatpickr";
 import { inputField } from "$form";
+
 interface PropTypes {
   setDateRange: (date: Date[]) => void;
+  isUppercase?: boolean;
 }
 
-const SelectDate = ({ setDateRange }: PropTypes) => {
+const SelectDate = ({ setDateRange, isUppercase = true }: PropTypes) => {
   const calendarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,7 +24,8 @@ const SelectDate = ({ setDateRange }: PropTypes) => {
 
   return (
     <input
-      className={inputField}
+      className={`${inputField} ${isUppercase ? "uppercase" : ""}`}
+      placeholder="SELECT DATE"
       ref={calendarRef}
     />
   );
