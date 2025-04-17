@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 import { Button } from "$components/button/ButtonOLD.tsx";
 import { ModalSearchBase } from "$components/layout/ModalSearchBase.tsx";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
+import { textSm } from "$text";
 
 export function StampSearchClient({
   showButton = true,
@@ -10,7 +11,6 @@ export function StampSearchClient({
   showButton?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [visible, setVisible] = useState<boolean>(false);
 
   // Helper functions
   const isHexString = (str: string): boolean => {
@@ -197,6 +197,7 @@ export function StampSearchClient({
           }}
           inputRef={inputRef}
           onSearch={handleSearch}
+          autoFocus={true}
         />
       </ModalSearchBase>
     );
@@ -220,8 +221,6 @@ export function StampSearchClient({
     <div class="relative">
       {showButton && (
         <Button
-          onMouseEnter={() => setVisible(true)}
-          onMouseLeave={() => setVisible(false)}
           variant="icon"
           icon={
             <svg
@@ -239,16 +238,6 @@ export function StampSearchClient({
           aria-label="Search"
         />
       )}
-
-      {visible && (
-        <div
-          role="tooltip"
-          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-lg shadow-md"
-        >
-          Filters
-          <div className="tooltip-arrow" />
-        </div>
-      )}
     </div>
   );
 }
@@ -260,6 +249,7 @@ function SearchContent({
   setError,
   inputRef,
   onSearch,
+  autoFocus = false,
 }: {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
@@ -267,8 +257,16 @@ function SearchContent({
   setError: (error: string) => void;
   inputRef: preact.RefObject<HTMLInputElement>;
   onSearch: () => void;
+  autoFocus?: boolean;
 }) {
-  // Add effect to log error state changes
+  useEffect(() => {
+    if (autoFocus) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
+  }, [autoFocus]);
+
   useEffect(() => {
     console.log("Error state changed:", searchState.value.error);
   }, [searchState.value.error]);
@@ -295,11 +293,15 @@ function SearchContent({
         value={searchState.value.term}
         onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
         onKeyDown={handleKeyDown}
-        class={`relative z-[2] h-12 w-full !bg-[#221724] pl-[24px] pr-[52px] text-sm font-mediun text-stamp-grey-light placeholder:!bg-[#221724] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
+        autoFocus={autoFocus}
+        class={`relative z-[2] h-12 w-full !bg-[#221826] pl-[18px] pr-[52px] font-mediun text-sm text-stamp-grey-light placeholder:!bg-[#221826] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
           searchState.value.error ? "rounded-t-md" : "rounded-md"
         }`}
       />
-      <div class="absolute z-[3] right-4 top-[14px] pointer-events-none">
+      <div
+        class="absolute z-[3] right-4 top-[14px] cursor-pointer"
+        onClick={onSearch}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 32 32"
@@ -314,7 +316,7 @@ function SearchContent({
         </svg>
       </div>
       {searchState.value.error && (
-        <ul class="!bg-gradient-to-b !from-[#221724] !via-[#201521] !to-[#2A1D2C] rounded-b-md z-[2] overflow-y-auto">
+        <ul class="!bg-[#221826] rounded-b-md z-[2] overflow-y-auto">
           <li class="flex flex-col items-center justify-end pt-1.5 pb-3 px-[18px]">
             <img
               src="/img/broken.png"
@@ -329,8 +331,8 @@ function SearchContent({
                     index === 0
                       ? "text-base font-light text-stamp-grey-light"
                       : index === searchState.value.error.split("\n").length - 1
-                      ? "text-sm font-normal text-stamp-grey-light"
-                      : "text-xs font-normal text-stamp-grey pt-0.5 pb-1"
+                      ? textSm
+                      : `${textSm} pt-0.5 pb-1`
                   } break-all overflow-hidden`}
                 >
                   {text}

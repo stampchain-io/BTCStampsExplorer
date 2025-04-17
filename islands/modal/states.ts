@@ -27,9 +27,16 @@ export const globalModal = signal<GlobalModalState>({
   animation: "scaleUpDown",
 });
 
-export const searchState = signal({
+interface SearchState {
+  term: string;
+  error: string;
+  results?: Array<{ tick: string }>;
+}
+
+export const searchState = signal<SearchState>({
   term: "",
   error: "",
+  results: [],
 });
 
 /* ===== MODAL ACTIONS ===== */
