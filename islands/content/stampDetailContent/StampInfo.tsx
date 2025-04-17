@@ -120,6 +120,11 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const lockedTooltipTimeoutRef = useRef<number | null>(null);
   const unlockedTooltipTimeoutRef = useRef<number | null>(null);
 
+  const [isOpen2, setIsOpen2] = useState(false);
+  const handleOpen2 = (open: boolean) => {
+    setIsOpen2(open);
+  };
+
   /* ===== EFFECTS ===== */
   // Cleanup effect
   useEffect(() => {
@@ -418,8 +423,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   };
 
   /* ===== STATE ===== */
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-
   // Add this state for HTML title
   const [htmlStampTitle, setHtmlStampTitle] = useState<string | null>(null);
 
@@ -693,11 +696,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   return (
     <>
       <StampSearchClient
-        open2={isSearchOpen}
-        handleOpen2={setIsSearchOpen}
         showButton={false}
       />
-
       <div className={"flex flex-col gap-6"}>
         <div
           className={containerBackground}

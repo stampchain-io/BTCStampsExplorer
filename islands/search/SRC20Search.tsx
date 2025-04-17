@@ -1,5 +1,5 @@
 /*@baba-styles is not config properly*/
-import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { Button } from "$components/button/ButtonOLD.tsx";
 import { ModalSearchBase } from "$components/layout/ModalSearchBase.tsx";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
@@ -128,10 +128,7 @@ export function SRC20SearchClient({
 }
 
 function SearchContent({
-  searchTerm,
   setSearchTerm,
-  error,
-  results,
   inputRef,
   onSearch,
   autoFocus = false,

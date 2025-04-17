@@ -1,5 +1,5 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
-import { useState } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import {
   Deployment,
@@ -94,9 +94,6 @@ export function SRC20DetailHeader({
   marketInfo,
   _align,
 }: SRC20DetailHeaderProps) {
-  /* ===== STATE ===== */
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-
   /* ===== COMPUTED VALUES ===== */
   // Process tick value (handle emoji)
   const tickValue = deployment.tick
@@ -137,12 +134,7 @@ export function SRC20DetailHeader({
   /* ===== RENDER ===== */
   return (
     <>
-      <SRC20SearchClient
-        open2={isSearchOpen}
-        handleOpen2={setIsSearchOpen}
-        showButton={false}
-      />
-
+      <SRC20SearchClient showButton={false} />
       <div class="flex w-full flex-col gap-6">
         {/* ===== TOKEN INFO CARD ===== */}
         <div class="relative w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg">

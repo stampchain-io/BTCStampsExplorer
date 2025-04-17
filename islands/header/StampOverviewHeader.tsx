@@ -73,8 +73,6 @@ export const StampOverviewHeader = (
             class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
           >
             <StampSearchClient
-              open2={isOpen2}
-              handleOpen2={handleOpen2}
               showButton={true}
             />
           </div>
