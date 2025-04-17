@@ -1,3 +1,4 @@
+/* @baba - move to layout folder */
 import { ComponentChildren } from "preact";
 import { alignmentClasses, type AlignmentType } from "$layout";
 import { labelSm, textSm, value2xl } from "$text";

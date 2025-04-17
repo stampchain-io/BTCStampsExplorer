@@ -2,10 +2,11 @@
   /* Common variables */
   --animation-timing: cubic-bezier(0.165, 0.840, 0.440, 1.000);
   --animation-bg: rgba(66, 66, 66, .3);
-  --animation-delay: .1s;
-  --animation-duration: .3s;
-  --animation-fade-duration: .5s;
-  --animation-cleanup-delay: .6s;
+  --animation-duration-background: .5s;
+  --animation-delay-background: 0s;
+  --animation-duration-modal: .3s;
+  --animation-delay-modal: .1s;
+  --animation-cleanup-delay: .5s;
 
   /* Base modal container styles */
   position: fixed;
@@ -24,7 +25,7 @@
 
     .animation-modal-background {
       background: var(--animation-bg);
-      animation: fadeIn var(--animation-fade-duration) var(--animation-timing) forwards;
+      animation: fadeIn var(--animation-duration-background) var(--animation-timing) forwards;
 
       .animation-modal {
         opacity: 0;
@@ -32,16 +33,16 @@
     }
 
     +.content {
-      animation: scaleBack var(--animation-fade-duration) var(--animation-timing) forwards;
+      animation: scaleBack var(--animation-duration-background) var(--animation-timing) forwards;
     }
 
     &.out {
       .animation-modal-background {
-        animation: fadeOut var(--animation-fade-duration) var(--animation-delay) var(--animation-timing) forwards;
+        animation: fadeOut var(--animation-duration-background) var(--animation-delay-background) var(--animation-timing) forwards;
       }
 
       +.content {
-        animation: scaleForward var(--animation-fade-duration) var(--animation-delay) var(--animation-timing) forwards;
+        animation: scaleForward var(--animation-duration-background) var(--animation-delay-background) var(--animation-timing) forwards;
       }
     }
   }
@@ -49,42 +50,46 @@
   /* Specific animation variants */
   &.scaleUpDown {
     .animation-modal {
-      animation: scaleBottomUp var(--animation-duration) var(--animation-delay) var(--animation-timing) forwards;
+      animation: scaleBottomUp var(--animation-duration-modal) var(--animation-delay-modal) var(--animation-timing) forwards;
     }
 
     &.out {
       animation: scaleBottomDown 0s var(--animation-cleanup-delay) linear forwards;
 
       .animation-modal {
-        animation: scaleBottomDown var(--animation-duration) var(--animation-timing) forwards;
+        animation: scaleBottomDown var(--animation-duration-modal) var(--animation-timing) forwards;
       }
     }
   }
 
   &.scaleDownUp {
+    .animation-modal-background {
+      vertical-align: top;
+    }
+
     .animation-modal {
-      animation: scaleTopDown var(--animation-duration) var(--animation-delay) var(--animation-timing) forwards;
+      animation: scaleTopDown var(--animation-duration-modal) var(--animation-delay-modal) var(--animation-timing) forwards;
     }
 
     &.out {
       animation: scaleTopUp 0s var(--animation-cleanup-delay) linear forwards;
 
       .animation-modal {
-        animation: scaleTopUp var(--animation-duration) var(--animation-timing) forwards;
+        animation: scaleTopUp var(--animation-duration-modal) var(--animation-timing) forwards;
       }
     }
   }
 
   &.zoomInOut {
     .animation-modal {
-      animation: zoomIn var(--animation-duration) var(--animation-delay) var(--animation-timing) forwards;
+      animation: zoomIn var(--animation-duration-modal) var(--animation-delay-modal) var(--animation-timing) forwards;
     }
 
     &.out {
       animation: zoomOut 0s var(--animation-cleanup-delay) linear forwards;
 
       .animation-modal {
-        animation: zoomOut var(--animation-duration) var(--animation-timing) forwards;
+        animation: zoomOut var(--animation-duration-modal) var(--animation-timing) forwards;
       }
     }
   }
@@ -107,7 +112,7 @@
 
 @keyframes scaleBottomUp {
   0% {
-    transform: scale(.8) translateY(1000px);
+    transform: scale(.9) translateY(1000px);
     opacity: 0;
   }
 
@@ -119,19 +124,19 @@
 
 @keyframes scaleBottomDown {
   0% {
-    transform: scale(1) translateY(0px);
+    transform: scale(.9) translateY(0px);
     opacity: 1;
   }
 
   100% {
-    transform: scale(.8) translateY(1000px);
+    transform: scale(1) translateY(1000px);
     opacity: 0;
   }
 }
 
 @keyframes scaleTopDown {
   0% {
-    transform: scale(.8) translateY(-1000px);
+    transform: scale(.9) translateY(-200px);
     opacity: 0;
   }
 
@@ -148,14 +153,14 @@
   }
 
   100% {
-    transform: scale(.8) translateY(-1000px);
+    transform: scale(.9) translateY(-200px);
     opacity: 0;
   }
 }
 
 @keyframes zoomIn {
   0% {
-    transform: scale(0);
+    transform: scale(.3);
     opacity: 0;
   }
 
@@ -172,7 +177,7 @@
   }
 
   100% {
-    transform: scale(0);
+    transform: scale(.3);
     opacity: 0;
   }
 }
@@ -203,13 +208,13 @@
   }
 
   100% {
-    transform: scale(.98);
+    transform: scale(.9);
   }
 }
 
 @keyframes scaleForward {
   0% {
-    transform: scale(.98);
+    transform: scale(.9);
   }
 
   100% {

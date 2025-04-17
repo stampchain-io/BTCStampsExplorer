@@ -1,8 +1,7 @@
 /* ===== STAMP OVERVIEW HEADER COMPONENT ===== */
 /* TODO (@baba) - update filter and styling */
 import { useState } from "preact/hooks";
-import { STAMP_FILTER_TYPES, STAMP_TYPES as _STAMP_TYPES } from "$globals";
-import { useNavigator as _useNavigator } from "$layout";
+import { STAMP_FILTER_TYPES } from "$globals";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { StampSearchClient } from "$search";
@@ -25,11 +24,11 @@ export const StampOverviewHeader = (
   /* ===== EVENT HANDLERS ===== */
   const handleOpen1 = (open: boolean) => {
     setIsOpen1(open);
-    setIsOpen2(false); // Close search when filter opens
+    setIsOpen2(false);
   };
 
   const handleOpen2 = (open: boolean) => {
-    setIsOpen1(false); // Close filter when search opens
+    setIsOpen1(false);
     setIsOpen2(open);
   };
 
@@ -60,7 +59,6 @@ export const StampOverviewHeader = (
               "sold",
             ]}
             dropdownPosition="right-[-84px] mobileLg:right-[-96px]"
-            open2={isOpen2}
           />
 
           {/* Sort Component - Hidden when filter is open */}
@@ -74,7 +72,11 @@ export const StampOverviewHeader = (
           <div
             class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
           >
-            <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
+            <StampSearchClient
+              open2={isOpen2}
+              handleOpen2={handleOpen2}
+              showButton={true}
+            />
           </div>
         </div>
       </div>

@@ -9,13 +9,12 @@ import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { inputField, inputFieldSquare, SelectField } from "$form";
+import { closeModal } from "$islands/modal/states.ts";
 
 /* ===== TYPES ===== */
 interface Props {
   fee: number;
   handleChangeFee: (fee: number) => void;
-  toggleModal: () => void;
-  handleCloseModal: () => void;
   stamps: {
     data: StampRow[];
     pagination: {
@@ -31,8 +30,6 @@ interface Props {
 function SendStampModal({
   fee: initialFee,
   handleChangeFee = () => {},
-  toggleModal,
-  handleCloseModal,
   stamps,
 }: Props) {
   /* ===== CONTEXT ===== */
@@ -83,6 +80,14 @@ function SendStampModal({
   }, [formState, selectedStamp, quantity]);
 
   /* ===== EVENT HANDLERS ===== */
+  const handleCloseModal = () => {
+    logger.debug("ui", {
+      message: "Modal closing",
+      component: "SendStampModal",
+    });
+    closeModal();
+  };
+
   const handleTransferSubmit = async () => {
     try {
       await logger.debug("stamps", {
@@ -220,7 +225,7 @@ function SendStampModal({
             setSuccessMessage(
               `Transfer initiated successfully. TXID: ${signResult.txid}`,
             );
-            setTimeout(toggleModal, 5000);
+            setTimeout(closeModal, 5000);
           } else if (signResult.cancelled) {
             throw new Error("Transaction signing was cancelled.");
           } else {
@@ -378,7 +383,7 @@ function SendStampModal({
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
         onSubmit={handleTransferSubmit}
-        onCancel={toggleModal}
+        onCancel={handleCloseModal}
         buttonName="TRANSFER"
         className="pt-9 mobileLg:pt-12"
         userAddress={wallet?.address}
@@ -403,3 +408,16 @@ function SendStampModal({
 }
 
 export default SendStampModal;
+
+/* ===== INTEGRATION ===== */
+// When this modal is to be integrated into its parent component, the parent should follow this pattern:
+// const handleOpenSendStampModal = () => {
+//  const modalContent = (
+//     <SendStampModal
+//       fee={fee}
+//      handleChangeFee={handleChangeFee}
+//       stamps={stamps}
+//     />
+//   );
+//   openModal(modalContent, "scaleUpDown");
+// };
