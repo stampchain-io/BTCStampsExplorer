@@ -12,7 +12,7 @@ declare module "$islands/modal/states" {
   }
 }
 
-export function SRC20SearchClient({
+export function SearchSRC20Modal({
   showButton = true,
 }: {
   showButton?: boolean;

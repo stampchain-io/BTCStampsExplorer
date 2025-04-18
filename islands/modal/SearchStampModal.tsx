@@ -5,7 +5,7 @@ import { ModalSearchBase } from "$components/layout/ModalSearchBase.tsx";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { textSm } from "$text";
 
-export function StampSearchClient({
+export function SearchStampModal({
   showButton = true,
 }: {
   showButton?: boolean;

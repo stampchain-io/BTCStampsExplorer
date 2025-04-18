@@ -192,15 +192,12 @@ import * as $modal_ModalOverlay from "./islands/modal/ModalOverlay.tsx";
 import * as $modal_PreviewCodeModal from "./islands/modal/PreviewCodeModal.tsx";
 import * as $modal_PreviewImageModal from "./islands/modal/PreviewImageModal.tsx";
 import * as $modal_RecieveAddyModal from "./islands/modal/RecieveAddyModal.tsx";
+import * as $modal_SearchSRC20Modal from "./islands/modal/SearchSRC20Modal.tsx";
+import * as $modal_SearchStampModal from "./islands/modal/SearchStampModal.tsx";
 import * as $modal_SendBTCModal from "./islands/modal/SendBTCModal.tsx";
 import * as $modal_SendStampModalWIP from "./islands/modal/SendStampModalWIP.tsx";
 import * as $modal_WalletProviderBase from "./islands/modal/WalletProviderBase.tsx";
-import * as $modal_index from "./islands/modal/index.ts";
 import * as $modal_states from "./islands/modal/states.ts";
-import * as $search_SRC20Search from "./islands/search/SRC20Search.tsx";
-import * as $search_StampSearch from "./islands/search/StampSearch.tsx";
-import * as $search_index from "./islands/search/index.ts";
-import * as $search_styles from "./islands/search/styles.ts";
 import * as $section_FeeCalculatorAdvanced from "./islands/section/FeeCalculatorAdvanced.tsx";
 import * as $section_cta_ContactCta from "./islands/section/cta/ContactCta.tsx";
 import * as $section_cta_DonateCta from "./islands/section/cta/DonateCta.tsx";
@@ -480,15 +477,12 @@ const manifest = {
     "./islands/modal/PreviewCodeModal.tsx": $modal_PreviewCodeModal,
     "./islands/modal/PreviewImageModal.tsx": $modal_PreviewImageModal,
     "./islands/modal/RecieveAddyModal.tsx": $modal_RecieveAddyModal,
+    "./islands/modal/SearchSRC20Modal.tsx": $modal_SearchSRC20Modal,
+    "./islands/modal/SearchStampModal.tsx": $modal_SearchStampModal,
     "./islands/modal/SendBTCModal.tsx": $modal_SendBTCModal,
     "./islands/modal/SendStampModalWIP.tsx": $modal_SendStampModalWIP,
     "./islands/modal/WalletProviderBase.tsx": $modal_WalletProviderBase,
-    "./islands/modal/index.ts": $modal_index,
     "./islands/modal/states.ts": $modal_states,
-    "./islands/search/SRC20Search.tsx": $search_SRC20Search,
-    "./islands/search/StampSearch.tsx": $search_StampSearch,
-    "./islands/search/index.ts": $search_index,
-    "./islands/search/styles.ts": $search_styles,
     "./islands/section/FeeCalculatorAdvanced.tsx":
       $section_FeeCalculatorAdvanced,
     "./islands/section/cta/ContactCta.tsx": $section_cta_ContactCta,

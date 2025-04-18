@@ -10,7 +10,7 @@ import {
   formatDate,
   formatNumber,
 } from "$lib/utils/formatUtils.ts";
-import { SRC20SearchClient } from "$search";
+import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 
 /* ===== TYPES ===== */
 export interface SRC20DetailHeaderProps {
@@ -133,7 +133,7 @@ export function SRC20DetailHeader({
   /* ===== RENDER ===== */
   return (
     <>
-      <SRC20SearchClient showButton={false} />
+      <SearchSRC20Modal showButton={false} />
       <div class="flex w-full flex-col gap-6">
         {/* ===== TOKEN INFO CARD ===== */}
         <div class="relative w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg">

@@ -3,7 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 import { SRC20_FILTER_TYPES } from "$globals";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { SRC20SearchClient } from "$search";
+import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import FilterSRC20Modal from "$islands/modal/FilterSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
 import { openModal } from "$islands/modal/states.ts";
@@ -86,7 +86,7 @@ export const SRC20OverviewHeader = ({
           <div
             class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
           >
-            <SRC20SearchClient showButton={true} />
+            <SearchSRC20Modal showButton={true} />
           </div>
         </div>
       </div>

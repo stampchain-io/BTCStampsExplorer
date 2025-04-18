@@ -9,7 +9,7 @@ import {
 } from "$lib/utils/formatUtils.ts";
 import { getSRC101Data, getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { Src101Detail, StampRow } from "$globals";
-import { StampSearchClient } from "$search";
+import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
 import { containerBackground, containerColData } from "$layout";
 import {
@@ -690,7 +690,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   /* ===== RENDER ===== */
   return (
     <>
-      <StampSearchClient showButton={false} />
+      <SearchStampModal showButton={false} />
       <div className={"flex flex-col gap-6"}>
         <div
           className={containerBackground}

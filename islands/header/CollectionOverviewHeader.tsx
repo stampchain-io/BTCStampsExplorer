@@ -1,5 +1,5 @@
 /* ===== COLLECTION OVERVIEW HEADER COMPONENT ===== */
-import { StampSearchClient } from "$search";
+import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { titlePurpleLD } from "$text";
 
 /* ===== COMPONENT ===== */
@@ -9,7 +9,7 @@ function CollectionOverviewHeader() {
       <h1 className={titlePurpleLD}>
         COLLECTIONS
       </h1>
-      <StampSearchClient showButton={true} />
+      <SearchStampModal showButton={true} />
     </div>
   );
 }

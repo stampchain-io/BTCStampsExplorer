@@ -7,7 +7,7 @@ import { StampCard } from "$card";
 import { StampGalleryProps, StampRow } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { StampSearchClient } from "$search";
+import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
@@ -195,7 +195,7 @@ export default function StampGallery({
                 <Sort initSort={sortBy} />
               </div>
               <div>
-                <StampSearchClient showButton={true} />
+                <SearchStampModal showButton={true} />
               </div>
             </div>
           )}

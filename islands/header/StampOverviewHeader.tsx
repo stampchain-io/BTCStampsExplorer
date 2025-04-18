@@ -4,7 +4,7 @@ import { useState } from "preact/hooks";
 import { STAMP_FILTER_TYPES } from "$globals";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { StampSearchClient } from "$search";
+import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { titlePurpleLD } from "$text";
 
 /* ===== TYPES ===== */
@@ -63,7 +63,7 @@ export const StampOverviewHeader = (
 
           {/* Search Component - Hidden when filter is open */}
           <div class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}>
-            <StampSearchClient showButton={true} />
+            <SearchStampModal showButton={true} />
           </div>
         </div>
       </div>
