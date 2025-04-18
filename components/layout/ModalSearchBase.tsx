@@ -38,7 +38,8 @@ export function ModalSearchBase({
   useEffect(() => {
     const handleKeyboardShortcut = (e: KeyboardEvent) => {
       console.log("Keyboard event in ModalSearchBase:", e.key); // Debug log
-      if (e.key === "Escape") {
+      if (e.key === "Escape" || (e.key === "s" && (e.ctrlKey || e.metaKey))) {
+        e.preventDefault(); // Prevent default browser save behavior
         handleClose();
       }
     };

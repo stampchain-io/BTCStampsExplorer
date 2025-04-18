@@ -216,7 +216,7 @@ function SearchContent({
                         : index ===
                             searchState.value.error.split("\n").length - 1
                         ? textSm
-                        : "font-medium text-sm text-stamp-grey-darker pt-0.5 pb-1"
+                        : "font-medium text-sm text-stamp-grey pt-0.5 pb-1"
                     } break-all overflow-hidden`}
                   >
                     {text}

@@ -1,11 +1,13 @@
 #animation-modal-container {
   /* Common variables */
-  --animation-timing: cubic-bezier(0.165, 0.840, 0.440, 1.000);
+  /*  --animation-duration-modal: 0s;
+--animation-delay-background: 0s;
+--animation-delay-modal: 0s;
+defined individually 
+  */
+  --animation-timing: cubic-bezier(0.250, 0.100, 0.250, 1.000);
   --animation-bg: rgba(66, 66, 66, .3);
   --animation-duration-background: .5s;
-  --animation-delay-background: 0s;
-  --animation-duration-modal: .3s;
-  --animation-delay-modal: .1s;
   --animation-cleanup-delay: .5s;
 
   /* Base modal container styles */
@@ -38,11 +40,11 @@
 
     &.out {
       .animation-modal-background {
-        animation: fadeModalOut var(--animation-duration-background) var(--animation-delay-background) var(--animation-timing) forwards;
+        animation: fadeModalOut var(--animation-duration-background) var(--animation-timing) forwards;
       }
 
       +.content {
-        animation: scaleContentForward var(--animation-duration-background) var(--animation-delay-background) var(--animation-timing) forwards;
+        animation: scaleContentForward var(--animation-duration-background) var(--animation-timing) forwards;
       }
     }
   }
@@ -50,14 +52,14 @@
   /* Specific animation variants */
   &.scaleUpDown {
     .animation-modal {
-      animation: scaleBottomUp var(--animation-duration-modal) var(--animation-delay-modal) var(--animation-timing) forwards;
+      animation: scaleBottomUp 0.3s var(--animation-timing) forwards;
     }
 
     &.out {
       animation: scaleBottomDown 0s var(--animation-cleanup-delay) linear forwards;
 
       .animation-modal {
-        animation: scaleBottomDown var(--animation-duration-modal) var(--animation-timing) forwards;
+        animation: scaleBottomDown 0.5s var(--animation-timing) forwards;
       }
     }
   }
@@ -68,28 +70,28 @@
     }
 
     .animation-modal {
-      animation: scaleTopDown var(--animation-duration-modal) var(--animation-delay-modal) var(--animation-timing) forwards;
+      animation: scaleTopDown 0.3s var(--animation-timing) forwards;
     }
 
     &.out {
       animation: scaleTopUp 0s var(--animation-cleanup-delay) linear forwards;
 
       .animation-modal {
-        animation: scaleTopUp var(--animation-duration-modal) var(--animation-timing) forwards;
+        animation: scaleTopUp 0.5s var(--animation-timing) forwards;
       }
     }
   }
 
   &.zoomInOut {
     .animation-modal {
-      animation: zoomCenterIn var(--animation-duration-modal) var(--animation-delay-modal) var(--animation-timing) forwards;
+      animation: zoomCenterIn 0.4s var(--animation-timing) forwards;
     }
 
     &.out {
       animation: zoomCenterOut 0s var(--animation-cleanup-delay) linear forwards;
 
       .animation-modal {
-        animation: zoomCenterOut var(--animation-duration-modal) var(--animation-timing) forwards;
+        animation: zoomCenterOut 0.4s var(--animation-timing) forwards;
       }
     }
   }
@@ -112,48 +114,48 @@
 
 @keyframes scaleBottomUp {
   0% {
-    transform: scale(.9) translateY(1000px);
+    transform: scale(.95) translateY(100vh);
     opacity: 0;
   }
 
   100% {
-    transform: scale(1) translateY(0px);
+    transform: scale(1) translateY(0);
     opacity: 1;
   }
 }
 
 @keyframes scaleBottomDown {
   0% {
-    transform: scale(.9) translateY(0px);
+    transform: scale(.95) translateY(0);
     opacity: 1;
   }
 
   100% {
-    transform: scale(1) translateY(1000px);
+    transform: scale(1) translateY(100vh);
     opacity: 0;
   }
 }
 
 @keyframes scaleTopDown {
   0% {
-    transform: scale(.9) translateY(-200px);
+    transform: scale(.95) translateY(-100vh);
     opacity: 0;
   }
 
   100% {
-    transform: scale(1) translateY(0px);
+    transform: scale(1) translateY(0);
     opacity: 1;
   }
 }
 
 @keyframes scaleTopUp {
   0% {
-    transform: scale(1) translateY(0px);
+    transform: scale(1) translateY(0);
     opacity: 1;
   }
 
   100% {
-    transform: scale(.9) translateY(-200px);
+    transform: scale(.95) translateY(-100vh);
     opacity: 0;
   }
 }
@@ -208,13 +210,13 @@
   }
 
   100% {
-    transform: scale(.9);
+    transform: scale(.95);
   }
 }
 
 @keyframes scaleContentForward {
   0% {
-    transform: scale(.9);
+    transform: scale(.95);
   }
 
   100% {
@@ -542,7 +544,7 @@
 
 @keyframes moveUp {
   0% {
-    transform: translateY(150px);
+    transform: translateY(100vh);
   }
 
   100% {
@@ -552,11 +554,11 @@
 
 @keyframes moveDown {
   0% {
-    transform: translateY(0px);
+    transform: translateY(0);
   }
 
   100% {
-    transform: translateY(150px);
+    transform: translateY(100vh);
   }
 }
 
