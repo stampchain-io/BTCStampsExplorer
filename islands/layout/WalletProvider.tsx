@@ -7,13 +7,17 @@ import { leatherProvider } from "$client/wallet/leather.ts";
 import { okxProvider } from "$client/wallet/okx.ts";
 import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
 import { phantomProvider } from "$client/wallet/phantom.ts";
-import { showConnectWalletModal } from "$client/wallet/wallet.ts";
+import { showConnectWalletModal as _showConnectWalletModal } from "$client/wallet/wallet.ts";
 import { containerCard } from "$layout";
 
 /* ===== TYPES ===== */
 interface WalletProviderProps {
   providerKey: WalletProviderKey;
-  toggleModal: () => void;
+  onSuccess: () => void;
+  onConnected?: {
+    content: preact.ComponentChildren;
+    animation?: "scaleUpDown" | "scaleDownUp" | "zoomInOut";
+  };
 }
 
 /* ===== WALLET CONNECTORS CONFIG ===== */
@@ -27,7 +31,7 @@ const walletConnectors = {
 
 /* ===== MODAL COMPONENT ===== */
 export function WalletProvider(
-  { providerKey, toggleModal }: WalletProviderProps,
+  { providerKey, onSuccess, onConnected }: WalletProviderProps,
 ) {
   /* ===== HOOKS ===== */
   const { addToast = () => {} } = useToast() ?? {};
@@ -48,8 +52,12 @@ export function WalletProvider(
         addToast(message, type);
         console.log(message);
       });
-      toggleModal();
-      showConnectWalletModal.value = false;
+
+      onSuccess();
+
+      if (onConnected) {
+        openModal(onConnected.content, onConnected.animation || "scaleDownUp");
+      }
     } catch (error) {
       const errorMessage =
         `Failed to connect to ${providerKey} wallet: ${error.message}`;

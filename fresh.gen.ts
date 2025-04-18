@@ -183,6 +183,7 @@ import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_ModalOverlay from "./islands/layout/ModalOverlay.tsx";
 import * as $layout_ModalProvider from "./islands/layout/ModalProvider.tsx";
+import * as $layout_ModalStack from "./islands/layout/ModalStack.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
 import * as $layout_WalletProvider from "./islands/layout/WalletProvider.tsx";
 import * as $modal_BuyStampModal from "./islands/modal/BuyStampModal.tsx";
@@ -468,6 +469,7 @@ const manifest = {
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/ModalOverlay.tsx": $layout_ModalOverlay,
     "./islands/layout/ModalProvider.tsx": $layout_ModalProvider,
+    "./islands/layout/ModalStack.tsx": $layout_ModalStack,
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
     "./islands/layout/WalletProvider.tsx": $layout_WalletProvider,
     "./islands/modal/BuyStampModal.tsx": $modal_BuyStampModal,

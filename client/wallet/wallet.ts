@@ -1,7 +1,7 @@
 import { signal } from "@preact/signals";
 import { logger } from "$lib/utils/logger.ts";
 import { openModal } from "$islands/modal/states.ts";
-import { foregroundConnectWalletModal } from "$islands/button/ConnectButton.tsx";
+import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 
 import { Wallet } from "$types/index.d.ts";
 import {
@@ -148,7 +148,7 @@ export const walletContext: WalletContext = {
     return await broadcastPSBT(walletContext.wallet, psbtHex);
   },
   showConnectModal: () => {
-    const { modalContent } = foregroundConnectWalletModal();
+    const { modalContent } = stackConnectWalletModal();
     openModal(modalContent, "scaleUpDown");
   },
 };

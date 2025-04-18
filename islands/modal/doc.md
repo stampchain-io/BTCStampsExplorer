@@ -12,6 +12,7 @@
 * - ModalOverlay.tsx: Handles modal animations and backdrop
 * - ModalProvider.tsx: Root-level provider that manages modal state
 * - states.ts: Centralized state management for modals
+* - ModalStack.tsx: Manages modal stacking and transformations
 *
 * Integration
 * ----------
@@ -32,6 +33,18 @@
 *   openModal(modalContent, "scaleDownUp");
 * };
 * ```
+*
+* Modal Stacking
+* -------------
+* The system supports stacking of multiple modals:
+*
+*
+* 2. Stacking Approach:
+*    - Modals stack on top of each other
+*    - Managed through ModalStack.tsx
+*    - Useful for temporary overlays or confirmations
+*    - Each modal in the stack can have its own animation
+*      - looks cleanest with the same animation on background and foreground stacked modal
 *
 * Animation Types
 * -------------
@@ -58,6 +71,7 @@
 * 1. Import required components:
 *    ```tsx
 *    import { openModal, closeModal } from "$islands/modal/states.ts";
+*    import { foregroundConnectWalletModal } from "$islands/modal/ModalStack.tsx";
 *    ```
 *
 * 2. Create modal content:
@@ -74,6 +88,22 @@
 *    openModal(modalContent, "scaleUpDown");
 *    ```
 *
+* 4. Transform between modals:
+*    ```tsx
+*    // Example: Opening wallet connect from buy modal
+*    const handleBuyClick = async () => {
+*      if (!wallet?.address) {
+*        const { modalContent } = foregroundConnectWalletModal(() => {
+*          // Transform back to buy modal after connection
+*          openModal(<BuyStampModal {...props} />, "scaleDownUp");
+*        });
+*        openModal(modalContent, "scaleUpDown");
+*        return;
+*      }
+*      // ... rest of buy logic
+*    };
+*    ```
+*
 * MODAL COMPONENTS
 * ===============
 *
@@ -82,6 +112,7 @@
 * - ModalBase.tsx: Primary base component for most modals
 * - ModalSearchBase.tsx: Specialized base for search-related modals
 * - WalletProvider.tsx: Base component for wallet connection functionality
+* - ModalStack.tsx: Manages modal transformations and stacking
 *
 * Active Modals
 * ------------
@@ -143,7 +174,7 @@
 *
 * IMPORTS
 * =======
-* The modals need to be imported directly and cannot use barrel imports, since this creates a wierd bug
+* The modals need to be imported directly and cannot use barrel imports, since this creates a weird bug
 *  - the database content gets stuck in perpetual loading and buttons become inactive and do not work
 *
 *

@@ -9,7 +9,7 @@ import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { inputFieldSquare } from "$form";
 import { closeModal, openModal } from "$islands/modal/states.ts";
-import { foregroundConnectWalletModal } from "$islands/button/ConnectButton.tsx";
+import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -104,7 +104,7 @@ const BuyStampModal = ({
   const handleBuyClick = async () => {
     // Check if wallet is connected first
     if (!wallet || !wallet.address) {
-      const { modalContent } = foregroundConnectWalletModal(() => {
+      const { modalContent } = stackConnectWalletModal(() => {
         // After successful connection, reopen the BuyStampModal
         openModal(
           <BuyStampModal
