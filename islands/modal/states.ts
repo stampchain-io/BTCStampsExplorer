@@ -64,6 +64,13 @@ export function closeModal() {
   };
 }
 
+export function closeForegroundModal() {
+  globalModal.value = {
+    ...globalModal.value,
+    isOpen: false,
+  };
+}
+
 /* ===== EXPORTS ===== */
 export const modal = {
   globalModal,
@@ -74,3 +81,5 @@ export const modal = {
 
 // Default export for convenience
 export default modal;
+
+/* ===== MODAL STACKS ===== */

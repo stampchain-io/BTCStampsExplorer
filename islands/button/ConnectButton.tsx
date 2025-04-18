@@ -4,11 +4,15 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
-import { WalletProvider } from "$islands/modal/WalletProvider.tsx";
+import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { WalletProviderKey } from "$lib/utils/constants.ts";
 import { Button } from "$button";
 import { navLinkPurple, valueDarkSm } from "$text";
-import { closeModal, openModal } from "$islands/modal/states.ts"; // use direct import paths
+import {
+  closeForegroundModal,
+  closeModal,
+  openModal,
+} from "$islands/modal/states.ts"; // use direct import paths
 
 /* ===== MAIN WALLET MODAL COMPONENT ===== */
 export const ConnectButton = () => {
@@ -172,6 +176,38 @@ export const ConnectButton = () => {
       )}
     </div>
   );
+};
+
+// Export this function to be used by other components
+export const foregroundConnectWalletModal = (onConnected?: () => void) => {
+  const connectors: WalletProviderKey[] = [
+    "unisat",
+    "leather",
+    "okx",
+    "tapwallet",
+    "phantom",
+  ];
+
+  const providerComponents = connectors.map((key) => (
+    <WalletProvider
+      key={key}
+      providerKey={key}
+      onSuccess={() => {
+        if (onConnected) {
+          onConnected();
+        }
+      }}
+    />
+  ));
+
+  const modalContent = (
+    <ConnectWalletModal
+      connectors={providerComponents}
+      handleClose={closeForegroundModal}
+    />
+  );
+
+  return { modalContent };
 };
 
 /*

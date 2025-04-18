@@ -8,7 +8,8 @@ import { ModalBase } from "$layout";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { inputFieldSquare } from "$form";
-import { closeModal } from "$islands/modal/states.ts";
+import { closeModal, openModal } from "$islands/modal/states.ts";
+import { foregroundConnectWalletModal } from "$islands/button/ConnectButton.tsx";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -101,6 +102,26 @@ const BuyStampModal = ({
 
   /* ===== TRANSACTION HANDLING ===== */
   const handleBuyClick = async () => {
+    // Check if wallet is connected first
+    if (!wallet || !wallet.address) {
+      const { modalContent } = foregroundConnectWalletModal(() => {
+        // After successful connection, reopen the BuyStampModal
+        openModal(
+          <BuyStampModal
+            stamp={stamp}
+            fee={initialFee}
+            handleChangeFee={handleChangeFee}
+            dispenser={dispenser}
+          />,
+          "scaleUpDown",
+        );
+      });
+
+      // Open the connect modal
+      openModal(modalContent, "scaleUpDown");
+      return;
+    }
+
     await handleSubmit(async () => {
       // Convert fee rate from sat/vB to sat/kB
       const feeRateKB = formState.fee * 1000;
