@@ -19,17 +19,10 @@ export const StampOverviewHeader = (
 ) => {
   /* ===== STATE MANAGEMENT ===== */
   const [isOpen1, setIsOpen1] = useState(false);
-  const [isOpen2, setIsOpen2] = useState(false);
 
   /* ===== EVENT HANDLERS ===== */
   const handleOpen1 = (open: boolean) => {
     setIsOpen1(open);
-    setIsOpen2(false);
-  };
-
-  const handleOpen2 = (open: boolean) => {
-    setIsOpen1(false);
-    setIsOpen2(open);
   };
 
   /* ===== RENDER ===== */
@@ -69,12 +62,8 @@ export const StampOverviewHeader = (
           </div>
 
           {/* Search Component - Hidden when filter is open */}
-          <div
-            class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
-          >
-            <StampSearchClient
-              showButton={true}
-            />
+          <div class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}>
+            <StampSearchClient showButton={true} />
           </div>
         </div>
       </div>

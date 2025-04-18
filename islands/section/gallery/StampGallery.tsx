@@ -40,15 +40,7 @@ export default function StampGallery({
     displayCounts?.mobileSm || 16,
   );
 
-  const [isOpen1, setIsOpen1] = useState(false);
-  const [isOpen2, setIsOpen2] = useState(false);
-
   /* ===== EVENT HANDLERS ===== */
-  const handleOpen2 = (open: boolean) => {
-    setIsOpen1(false);
-    setIsOpen2(open);
-  };
-
   const handlePageChange = (page: number) => {
     pagination?.onPageChange?.(page);
   };
@@ -199,15 +191,11 @@ export default function StampGallery({
         {fromPage === "collection" &&
           (
             <div class="flex gap-1 items-center">
-              <div
-                class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
-              >
+              <div>
                 <Sort initSort={sortBy} />
               </div>
-              <div
-                class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
-              >
-                <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
+              <div>
+                <StampSearchClient showButton={true} />
               </div>
             </div>
           )}

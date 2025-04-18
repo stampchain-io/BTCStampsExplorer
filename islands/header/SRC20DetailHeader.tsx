@@ -1,5 +1,4 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
-import { useEffect } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import {
   Deployment,

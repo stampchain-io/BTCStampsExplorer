@@ -120,11 +120,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const lockedTooltipTimeoutRef = useRef<number | null>(null);
   const unlockedTooltipTimeoutRef = useRef<number | null>(null);
 
-  const [isOpen2, setIsOpen2] = useState(false);
-  const handleOpen2 = (open: boolean) => {
-    setIsOpen2(open);
-  };
-
   /* ===== EFFECTS ===== */
   // Cleanup effect
   useEffect(() => {
@@ -695,9 +690,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   /* ===== RENDER ===== */
   return (
     <>
-      <StampSearchClient
-        showButton={false}
-      />
+      <StampSearchClient showButton={false} />
       <div className={"flex flex-col gap-6"}>
         <div
           className={containerBackground}
