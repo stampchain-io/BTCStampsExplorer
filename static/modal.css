@@ -25,7 +25,7 @@
 
     .animation-modal-background {
       background: var(--animation-bg);
-      animation: fadeIn var(--animation-duration-background) var(--animation-timing) forwards;
+      animation: fadeModalIn var(--animation-duration-background) var(--animation-timing) forwards;
 
       .animation-modal {
         opacity: 0;
@@ -33,16 +33,16 @@
     }
 
     +.content {
-      animation: scaleBack var(--animation-duration-background) var(--animation-timing) forwards;
+      animation: scaleContentBack var(--animation-duration-background) var(--animation-timing) forwards;
     }
 
     &.out {
       .animation-modal-background {
-        animation: fadeOut var(--animation-duration-background) var(--animation-delay-background) var(--animation-timing) forwards;
+        animation: fadeModalOut var(--animation-duration-background) var(--animation-delay-background) var(--animation-timing) forwards;
       }
 
       +.content {
-        animation: scaleForward var(--animation-duration-background) var(--animation-delay-background) var(--animation-timing) forwards;
+        animation: scaleContentForward var(--animation-duration-background) var(--animation-delay-background) var(--animation-timing) forwards;
       }
     }
   }
@@ -82,14 +82,14 @@
 
   &.zoomInOut {
     .animation-modal {
-      animation: zoomIn var(--animation-duration-modal) var(--animation-delay-modal) var(--animation-timing) forwards;
+      animation: zoomCenterIn var(--animation-duration-modal) var(--animation-delay-modal) var(--animation-timing) forwards;
     }
 
     &.out {
-      animation: zoomOut 0s var(--animation-cleanup-delay) linear forwards;
+      animation: zoomCenterOut 0s var(--animation-cleanup-delay) linear forwards;
 
       .animation-modal {
-        animation: zoomOut var(--animation-duration-modal) var(--animation-timing) forwards;
+        animation: zoomCenterOut var(--animation-duration-modal) var(--animation-timing) forwards;
       }
     }
   }
@@ -158,7 +158,7 @@
   }
 }
 
-@keyframes zoomIn {
+@keyframes zoomCenterIn {
   0% {
     transform: scale(.3);
     opacity: 0;
@@ -170,7 +170,7 @@
   }
 }
 
-@keyframes zoomOut {
+@keyframes zoomCenterOut {
   0% {
     transform: scale(1);
     opacity: 1;
@@ -182,7 +182,7 @@
   }
 }
 
-@keyframes fadeIn {
+@keyframes fadeModalIn {
   0% {
     background: rgba(66, 66, 66, 0);
   }
@@ -192,7 +192,7 @@
   }
 }
 
-@keyframes fadeOut {
+@keyframes fadeModalOut {
   0% {
     background: var(--animation-bg);
   }
@@ -202,7 +202,7 @@
   }
 }
 
-@keyframes scaleBack {
+@keyframes scaleContentBack {
   0% {
     transform: scale(1);
   }
@@ -212,7 +212,7 @@
   }
 }
 
-@keyframes scaleForward {
+@keyframes scaleContentForward {
   0% {
     transform: scale(.9);
   }
@@ -263,7 +263,7 @@
     }
 
     +.content {
-      animation: scaleBack .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+      animation: scaleContentBack .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
     }
 
     &.out {
@@ -278,7 +278,7 @@
       }
 
       +.content {
-        animation: scaleForward .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+        animation: scaleContentForward .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
       }
     }
   }

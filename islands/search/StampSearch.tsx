@@ -1,5 +1,5 @@
 /* @baba - commentary + global styles */
-import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { Button } from "$components/button/ButtonOLD.tsx";
 import { ModalSearchBase } from "$components/layout/ModalSearchBase.tsx";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
@@ -243,10 +243,7 @@ export function StampSearchClient({
 }
 
 function SearchContent({
-  searchTerm,
   setSearchTerm,
-  error,
-  setError,
   inputRef,
   onSearch,
   autoFocus = false,
@@ -329,10 +326,10 @@ function SearchContent({
                   key={index}
                   class={`${
                     index === 0
-                      ? "text-base font-light text-stamp-grey-light"
+                      ? "font-light text-base text-stamp-grey-light"
                       : index === searchState.value.error.split("\n").length - 1
                       ? textSm
-                      : `${textSm} pt-0.5 pb-1`
+                      : "font-medium text-sm text-stamp-grey-darker pt-0.5 pb-1"
                   } break-all overflow-hidden`}
                 >
                   {text}

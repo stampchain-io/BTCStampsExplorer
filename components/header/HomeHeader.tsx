@@ -52,6 +52,7 @@ export function HomeHeader() {
           pointer-events-none
           opacity-0
           animate-slide-down
+          z-[-10]
         "
         style="
           animation-duration: 500ms;
@@ -118,21 +119,21 @@ export function HomeHeader() {
           font-medium 
           text-stamp-grey-light
           text-base
+          mobileLg:text-xl
           mobileMd:max-w-[380px]
-          mobileLg:max-w-[515px] mobileLg:text-xl
+          mobileLg:max-w-[515px] 
           tablet:max-w-[550px]
           opacity-0
           animate-fade-in
         "
-        style="
+        style={`
           animation-delay: 700ms;
           animation-duration: 500ms;
           animation-fill-mode: forwards;
-        "
+        `}
       >
         Welcome to the forefront of digital collectibles, where each stamp is a
-        unique piece of art intertwined with the immutability of the
-        blockchains.
+        unique piece of art intertwined with the immutability of the blockchain.
       </p>
     </header>
   );
