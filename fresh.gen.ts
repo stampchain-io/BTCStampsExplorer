@@ -181,14 +181,15 @@ import * as $header_index from "./islands/header/index.ts";
 import * as $layout_ChartWidget from "./islands/layout/ChartWidget.tsx";
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
+import * as $layout_ModalOverlay from "./islands/layout/ModalOverlay.tsx";
+import * as $layout_ModalProvider from "./islands/layout/ModalProvider.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
+import * as $layout_WalletProvider from "./islands/layout/WalletProvider.tsx";
 import * as $modal_BuyStampModal from "./islands/modal/BuyStampModal.tsx";
 import * as $modal_ConnectWalletModal from "./islands/modal/ConnectWalletModal.tsx";
 import * as $modal_DetailSRC101Modal from "./islands/modal/DetailSRC101Modal.tsx";
 import * as $modal_DonateStampModal from "./islands/modal/DonateStampModal.tsx";
 import * as $modal_FilterSRC20Modal from "./islands/modal/FilterSRC20Modal.tsx";
-import * as $modal_GlobalModalContainer from "./islands/modal/GlobalModalContainer.tsx";
-import * as $modal_ModalOverlay from "./islands/modal/ModalOverlay.tsx";
 import * as $modal_PreviewCodeModal from "./islands/modal/PreviewCodeModal.tsx";
 import * as $modal_PreviewImageModal from "./islands/modal/PreviewImageModal.tsx";
 import * as $modal_RecieveAddyModal from "./islands/modal/RecieveAddyModal.tsx";
@@ -196,7 +197,6 @@ import * as $modal_SearchSRC20Modal from "./islands/modal/SearchSRC20Modal.tsx";
 import * as $modal_SearchStampModal from "./islands/modal/SearchStampModal.tsx";
 import * as $modal_SendBTCModal from "./islands/modal/SendBTCModal.tsx";
 import * as $modal_SendStampModalWIP from "./islands/modal/SendStampModalWIP.tsx";
-import * as $modal_WalletProviderBase from "./islands/modal/WalletProviderBase.tsx";
 import * as $modal_states from "./islands/modal/states.ts";
 import * as $section_FeeCalculatorAdvanced from "./islands/section/FeeCalculatorAdvanced.tsx";
 import * as $section_cta_ContactCta from "./islands/section/cta/ContactCta.tsx";
@@ -466,14 +466,15 @@ const manifest = {
     "./islands/layout/ChartWidget.tsx": $layout_ChartWidget,
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
     "./islands/layout/Footer.tsx": $layout_Footer,
+    "./islands/layout/ModalOverlay.tsx": $layout_ModalOverlay,
+    "./islands/layout/ModalProvider.tsx": $layout_ModalProvider,
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
+    "./islands/layout/WalletProvider.tsx": $layout_WalletProvider,
     "./islands/modal/BuyStampModal.tsx": $modal_BuyStampModal,
     "./islands/modal/ConnectWalletModal.tsx": $modal_ConnectWalletModal,
     "./islands/modal/DetailSRC101Modal.tsx": $modal_DetailSRC101Modal,
     "./islands/modal/DonateStampModal.tsx": $modal_DonateStampModal,
     "./islands/modal/FilterSRC20Modal.tsx": $modal_FilterSRC20Modal,
-    "./islands/modal/GlobalModalContainer.tsx": $modal_GlobalModalContainer,
-    "./islands/modal/ModalOverlay.tsx": $modal_ModalOverlay,
     "./islands/modal/PreviewCodeModal.tsx": $modal_PreviewCodeModal,
     "./islands/modal/PreviewImageModal.tsx": $modal_PreviewImageModal,
     "./islands/modal/RecieveAddyModal.tsx": $modal_RecieveAddyModal,
@@ -481,7 +482,6 @@ const manifest = {
     "./islands/modal/SearchStampModal.tsx": $modal_SearchStampModal,
     "./islands/modal/SendBTCModal.tsx": $modal_SendBTCModal,
     "./islands/modal/SendStampModalWIP.tsx": $modal_SendStampModalWIP,
-    "./islands/modal/WalletProviderBase.tsx": $modal_WalletProviderBase,
     "./islands/modal/states.ts": $modal_states,
     "./islands/section/FeeCalculatorAdvanced.tsx":
       $section_FeeCalculatorAdvanced,

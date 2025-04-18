@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import QRCode from "qrcode";
 import { tooltipIcon } from "$notification";
-import { ModalLayout } from "$layout";
+import { ModalBase } from "$layout";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
 
@@ -97,7 +97,7 @@ function RecieveAddyModal({ address, title = "RECEIVE" }: Props) {
 
   /* ===== RENDER ===== */
   return (
-    <ModalLayout
+    <ModalBase
       onClose={() => {
         logger.debug("ui", {
           message: "Modal closing",
@@ -152,7 +152,7 @@ function RecieveAddyModal({ address, title = "RECEIVE" }: Props) {
           </div>
         </div>
       </div>
-    </ModalLayout>
+    </ModalBase>
   );
 }
 

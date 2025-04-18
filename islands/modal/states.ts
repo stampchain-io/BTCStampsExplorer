@@ -1,3 +1,5 @@
+/* ===== STATES ===== */
+/* @baba - refactor and move to shared states file in /layout/ */
 import { signal } from "@preact/signals";
 import type { ComponentChildren } from "preact";
 

@@ -1,10 +1,10 @@
 import { Fragment } from "preact";
 import { closeModal, globalModal } from "$islands/modal/states.ts";
-import ModalOverlay from "$islands/modal/ModalOverlay.tsx";
+import ModalOverlay from "$islands/layout/ModalOverlay.tsx";
 
-export default function GlobalModalContainer() {
+export default function ModalProvider() {
   // Debug logging
-  console.log("GlobalModalContainer rendering:", globalModal.value);
+  console.log("ModalProvider rendering:", globalModal.value);
 
   return (
     <Fragment>

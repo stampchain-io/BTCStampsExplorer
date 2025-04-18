@@ -1,6 +1,6 @@
 /* ===== PREVIEW CODE MODAL COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { ModalLayout } from "$layout";
+import { ModalBase } from "$layout";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
 
@@ -96,7 +96,7 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
 
   /* ===== RENDER ===== */
   return (
-    <ModalLayout
+    <ModalBase
       onClose={() => {
         logger.debug("ui", {
           message: "Preview code modal closing",
@@ -115,6 +115,6 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
           {formattedSrc}
         </code>
       </div>
-    </ModalLayout>
+    </ModalBase>
   );
 }

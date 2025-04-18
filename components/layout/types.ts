@@ -1,6 +1,3 @@
-import { signal } from "@preact/signals";
-import type { ComponentChildren } from "preact";
-
 /* ===== DONATE CTA ===== */
 export interface TxOutput {
   scriptpubkey_address: string;

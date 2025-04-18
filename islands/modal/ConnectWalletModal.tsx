@@ -2,7 +2,7 @@
 import { ComponentChildren } from "preact";
 import { showConnectWalletModal } from "$client/wallet/wallet.ts";
 import { subtitlePurple } from "$text";
-import { ModalLayout } from "$layout";
+import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
 
 /* ===== TYPES ===== */
@@ -38,7 +38,7 @@ export const ConnectWalletModal = ({
 
   /* ===== RENDER ===== */
   return (
-    <ModalLayout
+    <ModalBase
       title="CONNECT"
       onClose={handleModalClose}
       className="w-[340px] mobileLg:w-[640px]"
@@ -51,6 +51,6 @@ export const ConnectWalletModal = ({
       <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-6 items-center">
         {connectors}
       </div>
-    </ModalLayout>
+    </ModalBase>
   );
 };

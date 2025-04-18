@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
-import { WalletProviderBase } from "$islands/modal/WalletProviderBase.tsx";
+import { WalletProvider } from "$islands/modal/WalletProvider.tsx";
 import { WalletProviderKey } from "$lib/utils/constants.ts";
 import { Button } from "$button";
 import { navLinkPurple, valueDarkSm } from "$text";
@@ -36,7 +36,7 @@ export const ConnectButton = () => {
       try {
         // Create the providers array first
         const providerComponents = connectors.map((key) => (
-          <WalletProviderBase
+          <WalletProvider
             key={key}
             providerKey={key}
             toggleModal={closeModal}

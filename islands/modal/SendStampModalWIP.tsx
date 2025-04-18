@@ -2,7 +2,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
-import { ModalLayout } from "$layout";
+import { ModalBase } from "$layout";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import type { StampRow } from "$globals";
 import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
@@ -299,7 +299,7 @@ function SendStampModal({
 
   /* ===== RENDER ===== */
   return (
-    <ModalLayout onClose={handleCloseModal} title="TRANSFER">
+    <ModalBase onClose={handleCloseModal} title="TRANSFER">
       {/* ===== STAMP SELECTION SECTION ===== */}
       <div className="flex w-full gap-3 mobileMd:gap-6">
         {/* ===== STAMP PREVIEW ===== */}
@@ -403,7 +403,7 @@ function SendStampModal({
           {successMessage}
         </div>
       )}
-    </ModalLayout>
+    </ModalBase>
   );
 }
 

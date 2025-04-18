@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
-import { ModalLayout } from "$layout";
+import { ModalBase } from "$layout";
 import { inputField } from "$form";
 import { tooltipIcon } from "$notification";
 import { closeModal } from "$islands/modal/states.ts";
@@ -296,7 +296,7 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
 
   /* ===== RENDER ===== */
   return (
-    <ModalLayout
+    <ModalBase
       onClose={handleCloseModal}
       title="SEND"
     >
@@ -410,7 +410,7 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
       {error && <div class="text-red-500 mt-2">{error}</div>}
       {successMessage && <div class="text-green-500 mt-2">{successMessage}
       </div>}
-    </ModalLayout>
+    </ModalBase>
   );
 }
 

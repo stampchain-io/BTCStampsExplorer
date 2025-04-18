@@ -11,7 +11,7 @@ import { showConnectWalletModal } from "$client/wallet/wallet.ts";
 import { containerCard } from "$layout";
 
 /* ===== TYPES ===== */
-interface WalletProviderBaseProps {
+interface WalletProviderProps {
   providerKey: WalletProviderKey;
   toggleModal: () => void;
 }
@@ -26,8 +26,8 @@ const walletConnectors = {
 } as const;
 
 /* ===== MODAL COMPONENT ===== */
-export function WalletProviderBase(
-  { providerKey, toggleModal }: WalletProviderBaseProps,
+export function WalletProvider(
+  { providerKey, toggleModal }: WalletProviderProps,
 ) {
   /* ===== HOOKS ===== */
   const { addToast = () => {} } = useToast() ?? {};

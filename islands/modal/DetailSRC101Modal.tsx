@@ -1,5 +1,5 @@
 /* ===== SRC101 DETAIL MODAL COMPONENT ===== */
-import { ModalLayout } from "$layout";
+import { ModalBase } from "$layout";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
 
@@ -22,7 +22,7 @@ const DetailSRC101Modal = ({ img, name, owner }: Props) => {
 
   /* ===== RENDER ===== */
   return (
-    <ModalLayout
+    <ModalBase
       onClose={handleCloseModal}
       title={`${name}.btc`}
     >
@@ -46,7 +46,7 @@ const DetailSRC101Modal = ({ img, name, owner }: Props) => {
           </div>
         </div>
       </div>
-    </ModalLayout>
+    </ModalBase>
   );
 };
 

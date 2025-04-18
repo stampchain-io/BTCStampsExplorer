@@ -2,7 +2,7 @@
 // @bbaba+@reinamora - are the
 // deno-lint-ignore-file
 import { useState } from "preact/hooks";
-import { ModalLayout } from "$layout";
+import { ModalBase } from "$layout";
 import { InputField } from "$form";
 import {
   COLLECTION_FILTER_TYPES,
@@ -337,7 +337,7 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
 
   /* ===== RENDER ===== */
   return (
-    <ModalLayout
+    <ModalBase
       onClose={handleCloseModal}
       title={title}
     >
@@ -353,7 +353,7 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
           SUBMIT
         </Button>
       </div>
-    </ModalLayout>
+    </ModalBase>
   );
 };
 

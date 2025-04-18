@@ -4,7 +4,7 @@ import type { StampRow } from "$globals";
 import { StampImage } from "$content";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
-import { ModalLayout } from "$layout";
+import { ModalBase } from "$layout";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { inputFieldSquare } from "$form";
@@ -157,7 +157,7 @@ const BuyStampModal = ({
 
   /* ===== RENDER ===== */
   return (
-    <ModalLayout
+    <ModalBase
       onClose={() => {
         logger.debug("ui", {
           message: "Modal closing",
@@ -254,7 +254,7 @@ const BuyStampModal = ({
       {successMessage && (
         <div className="text-green-500 mt-2">{successMessage}</div>
       )}
-    </ModalLayout>
+    </ModalBase>
   );
 };
 

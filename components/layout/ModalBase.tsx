@@ -6,7 +6,7 @@ import { closeModal } from "$islands/modal/states.ts";
 import { titlePurpleLD } from "$text";
 import { CloseIcon } from "$icon";
 
-interface ModalLayoutProps {
+interface ModalBaseProps {
   onClose?: () => void;
   title: string;
   children: preact.ComponentChildren;
@@ -15,14 +15,14 @@ interface ModalLayoutProps {
   hideHeader?: boolean;
 }
 
-export function ModalLayout({
+export function ModalBase({
   onClose,
   title,
   children,
   className = "",
   contentClassName = "",
   hideHeader = false,
-}: ModalLayoutProps) {
+}: ModalBaseProps) {
   const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
   const [allowCloseTooltip, setAllowCloseTooltip] = useState(true);
   const [closeTooltipText, setCloseTooltipText] = useState("CLOSE");
@@ -52,8 +52,8 @@ export function ModalLayout({
 
   const handleClose = () => {
     logger.debug("ui", {
-      message: "Modal closing from ModalLayout",
-      component: "ModalLayout",
+      message: "Modal closing from ModalBase",
+      component: "ModalBase",
     });
 
     // First trigger the animation by setting status to true in ModalOverlay

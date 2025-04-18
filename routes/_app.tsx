@@ -6,7 +6,7 @@ import { MetaTags } from "$components/layout/MetaTags.tsx";
 import { Footer, NavigatorProvider } from "$layout";
 import { Header } from "$header";
 import FontLoader from "$islands/layout/FontLoader.tsx";
-import GlobalModalContainer from "$islands/modal/GlobalModalContainer.tsx";
+import ModalProvider from "$islands/layout/ModalProvider.tsx";
 
 export default function App({ Component, state }: PageProps<unknown>) {
   if (state?.skipAppLayout) {
@@ -168,9 +168,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
             </NavigatorProvider>
           </ToastProvider>
         </div>
-
-        {/* Modal container as an island */}
-        <GlobalModalContainer />
+        <ModalProvider />
       </body>
     </html>
   );

@@ -25,4 +25,5 @@ export * from "$islands/layout/NavigatorProvider.tsx";
 export * from "$islands/layout/FontLoader.tsx";
 
 /* ===== MODAL ===== */
-export * from "$components/layout/ModalLayout.tsx";
+export * from "$components/layout/ModalBase.tsx";
+export * from "$components/layout/ModalSearchBase.tsx";

@@ -1,7 +1,7 @@
 /* @baba - commentary + global styles */
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { Button } from "$components/button/ButtonOLD.tsx";
-import { ModalSearchBase } from "$components/layout/ModalSearchBase.tsx";
+import { ModalSearchBase } from "$layout";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { textSm } from "$text";
 

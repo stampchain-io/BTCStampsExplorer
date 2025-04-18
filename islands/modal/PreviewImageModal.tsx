@@ -1,7 +1,7 @@
 /* ===== PREVIEW IMAGE MODAL COMPONENT ===== */
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 import { StampTextContent } from "$content";
-import { ModalLayout } from "$components/layout/ModalLayout.tsx";
+import { ModalBase } from "../../components/layout/ModalBase.tsx";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
 
@@ -28,7 +28,7 @@ const PreviewImageModal = ({
 
   /* ===== RENDER ===== */
   return (
-    <ModalLayout
+    <ModalBase
       onClose={() => {
         logger.debug("ui", {
           message: "Preview image modal closing",
@@ -73,7 +73,7 @@ const PreviewImageModal = ({
             />
           )}
       </div>
-    </ModalLayout>
+    </ModalBase>
   );
 };
 
