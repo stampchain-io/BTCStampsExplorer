@@ -13,7 +13,7 @@ export function CarouselHome({ carouselStamps }: CarouselHomeProps) {
   return (
     <>
       <SwiperStyles />
-      <div class="max-w-desktop w-full mx-auto p-3 tablet:p-6 desktop:p-12">
+      <div class="max-w-desktop w-full mx-auto p-3 tablet:p-6">
         <div class="
           w-full
           max-w-[500px] h-[260px]

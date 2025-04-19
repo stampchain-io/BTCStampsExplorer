@@ -24,21 +24,23 @@ export const SATS_PER_KB_MULTIPLIER = 1000; // 1 KB = 1000 vBytes
 export const BIG_LIMIT = 200;
 export const SMALL_LIMIT = 50;
 export const SATOSHIS_PER_BTC = 100000000;
-export const CAROUSEL_STAMP_IDS = [
-  771859,
-  746290,
-  722318,
-  764500,
-  757268,
-];
-
-export const NOT_AVAILABLE_IMAGE = "/icon/stamp-no-image.svg";
 
 export const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
 export const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
 export const MEMPOOL_API_BASE_URL = "https://mempool.space/api";
 export const BLOCKSTREAM_API_BASE_URL = "https://blockstream.info/api";
 export const COINGECKO_API_BASE_URL = "https://api.coingecko.com/api/v3";
+
+export const NOT_AVAILABLE_IMAGE = "/icon/stamp-no-image.svg";
+export const ERROR_IMAGE = "/icon/error-image.svg";
+
+export const CAROUSEL_STAMP_IDS = [
+  897330,
+  631735,
+  857476,
+  892092,
+  872458,
+];
 
 export type WalletProviderKey =
   | "unisat"

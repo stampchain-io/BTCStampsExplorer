@@ -308,7 +308,7 @@ export default {
         },
         ".hover-dark-gradient": {
           background:
-            "linear-gradient(191.03deg, rgba(10, 0, 15, 0) 41.63%, rgba(20, 0, 31, 0.5) 58.37%, #1F002E 75.11%)",
+            "linear-gradient(180deg, rgba(10, 0, 15, 0) 55%, rgba(20, 0, 31, 0.5) 70%, #1F002E 85%)",
         },
         ".hover-gradient": {
           background:

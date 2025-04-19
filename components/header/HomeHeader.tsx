@@ -132,7 +132,7 @@ export function HomeHeader() {
           animation-fill-mode: forwards;
         `}
       >
-        elcome to the forefront of digital collectibles, where each stamp is a
+        Welcome to the forefront of digital collectibles, where each stamp is a
         unique piece of art intertwined with the immutability of the blockchain.
       </p>
     </header>
