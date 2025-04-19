@@ -5,20 +5,14 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
-import { WalletProviderKey } from "$lib/utils/constants.ts";
+import { DEFAULT_WALLET_CONNECTORS } from "$lib/utils/constants.ts";
 import { Button } from "$button";
 import { navLinkPurple, valueDarkSm } from "$text";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 
 /* ===== MAIN WALLET MODAL COMPONENT ===== */
 export const ConnectButton = () => {
-  const connectors: WalletProviderKey[] = [
-    "unisat",
-    "leather",
-    "okx",
-    "tapwallet",
-    "phantom",
-  ];
+  const connectors = DEFAULT_WALLET_CONNECTORS;
 
   const { wallet, isConnected, disconnect } = walletContext;
   const { address } = wallet;

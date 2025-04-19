@@ -1,16 +1,10 @@
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
-import { WalletProviderKey } from "$lib/utils/constants.ts";
+import { DEFAULT_WALLET_CONNECTORS } from "$lib/utils/constants.ts";
 import { closeForegroundModal } from "$islands/modal/states.ts";
 
 export const stackConnectWalletModal = (onConnected?: () => void) => {
-  const connectors: WalletProviderKey[] = [
-    "unisat",
-    "leather",
-    "okx",
-    "tapwallet",
-    "phantom",
-  ];
+  const connectors = DEFAULT_WALLET_CONNECTORS;
 
   const providerComponents = connectors.map((key) => (
     <WalletProvider

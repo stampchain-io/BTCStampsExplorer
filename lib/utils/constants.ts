@@ -32,7 +32,7 @@ export const CAROUSEL_STAMP_IDS = [
   757268,
 ];
 
-export const NOT_AVAILABLE_IMAGE = "/not-available.webp";
+export const NOT_AVAILABLE_IMAGE = "/icon/stamp-no-image.svg";
 
 export const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
 export const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
@@ -46,6 +46,14 @@ export type WalletProviderKey =
   | "okx"
   | "tapwallet"
   | "phantom";
+
+export const DEFAULT_WALLET_CONNECTORS: WalletProviderKey[] = [
+  "unisat",
+  "leather",
+  "okx",
+  "tapwallet",
+  "phantom",
+];
 
 export const WALLET_PROVIDERS: Record<
   WalletProviderKey,
