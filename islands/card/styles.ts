@@ -32,25 +32,25 @@ export const TEXT_STYLES = {
   },
   minimal: {
     hashSymbol: {
-      base: "font-light text-stamp-grey-darker",
+      base:
+        "font-light text-stamp-grey-light group-hover:text-stamp-purple-bright",
       sizes:
-        "text-xs mobileSm:text-xs mobileLg:text-xl tablet:text-xl desktop:text-xl",
+        "text-xs mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl",
     },
     stampNumber: {
-      base: "font-black gray-gradient1 truncate",
+      base:
+        "font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate transition-colors duration-200",
       sizes:
-        "text-sm mobileSm:text-sm mobileLg:text-xl tablet:text-xl desktop:text-xl",
+        "text-sm mobileSm:text-base mobileLg:text-xl tablet:text-xl desktop:text-xl",
     },
     price: {
-      base: "font-medium text-stamp-grey-light truncate text-nowrap",
-      sizes:
-        "text-[10px] mobileSm:text-[10px] mobileLg:text-base tablet:text-base desktop:text-base",
+      base: "font-normal text-stamp-grey truncate text-nowrap",
+      sizes: "text-[10px] mobileMd:text-xs mobileLg:text-sm",
     },
   },
   greyGradient: {
     hashSymbol: {
-      base:
-        "font-light text-stamp-grey group-hover:text-stamp-purple-highlight",
+      base: "font-light text-stamp-grey group-hover:text-stamp-purple-bright",
       sizes:
         "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl",
     },

@@ -1,159 +1,68 @@
 /* ===== SRC20 CARD MINTED COMPONENT ===== */
 /*@baba-check styles*/
-import { SRC20CardBase, SRC20CardBaseProps } from "$card";
-import { labelSm, textSm } from "$text";
+import { SRC20CardBase, SRC20CardBaseProps } from "./SRC20CardBase.tsx";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
+import { labelSm, textSm } from "$text";
+import { cellAlign, tableValue } from "$components/table/TableStyles.ts";
 
 /* ===== COMPONENT ===== */
-export function SRC20CardMinted(props: SRC20CardBaseProps) {
-  /* ===== PROPS EXTRACTION ===== */
-  const { src20, fromPage } = props;
-
-  /* ===== RENDER ===== */
+export function SRC20CardMinted(
+  { src20, fromPage, onImageClick, totalColumns }: SRC20CardBaseProps,
+) {
   return (
-    <SRC20CardBase {...props}>
-      {/* ===== SRC20 PAGE CONTENT ===== */}
-      {fromPage === "src20" && (
-        <>
-          {/* ===== PRICE INFO SECTION ===== */}
-          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
-            <div class="hidden min-[720px]:flex flex-col justify-center text-center -space-y-0.5 ">
-              <p class={labelSm}>
-                PRICE{" "}
-                <span class={textSm}>
-                  {Math.round((src20.floor_unit_price ?? 0) * 1e8)
-                    .toLocaleString()}
-                </span>{" "}
-                <span class="text-stamp-grey-light">SATS</span>
-              </p>
-              <p class={labelSm}>
-                CHANGE <span class={textSm}>N/A</span>
-                <span class="text-stamp-grey-light">%</span>
-              </p>
-              <p class={labelSm}>
-                VOLUME{" "}
-                <span class={textSm}>
-                  {Math.round(src20.volume24 ?? 0).toLocaleString()}
-                </span>{" "}
-                <span class="text-stamp-grey-light">BTC</span>
-              </p>
-            </div>
-          </div>
+    <SRC20CardBase
+      src20={src20}
+      fromPage={fromPage}
+      onImageClick={onImageClick}
+      totalColumns={totalColumns}
+    >
+      {/* Deploy Cell */}
+      <td class={`${cellAlign(1, totalColumns)} ${tableValue}`}>
+        {formatDate(new Date(src20.block_time), {
+          month: "numeric",
+          day: "numeric",
+          year: "numeric",
+        }).toUpperCase()}
+      </td>
 
-          {/* ===== TOKEN INFO SECTION ===== */}
-          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
-            <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
-              <p class={labelSm}>
-                HOLDERS{" "}
-                <span class={textSm}>
-                  {Number(src20.holders).toLocaleString()}
-                </span>
-              </p>
-              <p class={labelSm}>
-                DEPLOY{" "}
-                <span class={textSm}>
-                  {formatDate(new Date(src20.block_time), {
-                    month: "short",
-                    year: "numeric",
-                  }).toUpperCase()}
-                </span>
-              </p>
-              <p class={labelSm}>
-                CREATOR{" "}
-                <span class={textSm}>
-                  {src20.creator_name ||
-                    abbreviateAddress(src20.destination)}
-                </span>
-              </p>
-            </div>
-          </div>
+      {/* Holders Cell */}
+      <td class={`${cellAlign(2, totalColumns)} ${tableValue}`}>
+        {Number(src20.holders).toLocaleString()}
+      </td>
 
-          {/* ===== CHART SECTION ===== */}
-          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
-            <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
-              <ChartWidget
-                fromPage="home"
-                data={src20.chart}
-                tick={src20.tick}
-              />
-            </div>
-          </div>
-        </>
-      )}
+      {/* Price Cell */}
+      <td class={`${cellAlign(3, totalColumns)} ${tableValue}`}>
+        {Math.round((src20.floor_unit_price ?? 0) * 1e8).toLocaleString()}
+        <span class="text-stamp-grey-light ml-1">SATS</span>
+      </td>
 
-      {/* ===== HOME PAGE CONTENT ===== */}
-      {fromPage === "home" && (
-        <>
-          {/* ===== TOKEN INFO SECTION ===== */}
-          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
-            <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
-              <p class={labelSm}>
-                HOLDERS{" "}
-                <span class={textSm}>
-                  {Number(src20.holders).toLocaleString()}
-                </span>
-              </p>
-              <p class={labelSm}>
-                DEPLOY{" "}
-                <span class={textSm}>
-                  {formatDate(new Date(src20.block_time), {
-                    month: "short",
-                    year: "numeric",
-                  }).toUpperCase()}
-                </span>
-              </p>
-              <p class={labelSm}>
-                CREATOR{" "}
-                <span class={textSm}>
-                  {src20.creator_name ||
-                    abbreviateAddress(src20.destination)}
-                </span>
-              </p>
-            </div>
-          </div>
-        </>
-      )}
+      {/* Change Cell */}
+      <td class={`${cellAlign(4, totalColumns)} ${tableValue}`}>
+        <span class="text-stamp-grey-light">N/A%</span>
+      </td>
 
-      {/* ===== WALLET PAGE CONTENT ===== */}
-      {fromPage === "wallet" && (
-        <>
-          {/* ===== PRICE INFO SECTION ===== */}
-          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
-            <div class="hidden min-[640px]:flex flex-col justify-center text-center -space-y-0.5 ">
-              <p class={labelSm}>
-                PRICE{" "}
-                <span class={textSm}>
-                  {Math.round((src20.floor_unit_price ?? 0) * 1e8)
-                    .toLocaleString()}
-                </span>{" "}
-                <span class="text-stamp-grey-light">SATS</span>
-              </p>
-              <p class={labelSm}>
-                CHANGE <span class={textSm}>N/A</span>
-                <span class="text-stamp-grey-light">%</span>
-              </p>
-              <p class={labelSm}>
-                VOLUME <span class={textSm}>N/A</span>{" "}
-                <span class="text-stamp-grey-light">BTC</span>
-              </p>
-            </div>
-          </div>
+      {/* Volume Cell */}
+      <td class={`${cellAlign(5, totalColumns)} ${tableValue}`}>
+        {Math.round(src20.volume24 ?? 0).toLocaleString()}
+        <span class="text-stamp-grey-light ml-1">BTC</span>
+      </td>
 
-          {/* ===== VALUE SECTION ===== */}
-          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
-            <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
-              <p class={labelSm}>
-                VALUE{" "}
-              </p>
-              <p class={textSm}>
-                {Math.round((src20.value ?? 0) * 1e8).toLocaleString()}{" "}
-                <span class="text-stamp-grey-light">SATS</span>
-              </p>
-            </div>
-          </div>
-        </>
-      )}
+      {/* Market Cap Cell */}
+      <td class={`${cellAlign(6, totalColumns)} ${tableValue}`}>
+        {Math.round((src20.market_cap ?? 0) * 1e8).toLocaleString()}
+        <span class="text-stamp-grey-light ml-1">SATS</span>
+      </td>
+
+      {/* Chart Cell */}
+      <td class={`${cellAlign(7, totalColumns)} ${tableValue}`}>
+        <ChartWidget
+          fromPage="home"
+          data={src20.chart}
+          tick={src20.tick}
+        />
+      </td>
     </SRC20CardBase>
   );
 }

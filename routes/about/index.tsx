@@ -6,8 +6,12 @@ import DonateCta from "$islands/section/cta/DonateCta.tsx";
 import ContactCta from "$islands/section/cta/ContactCta.tsx";
 import { PartnersGallery, TeamGallery } from "$section";
 
+console.log("About page importing DonateCta");
+
 /* ===== PAGE COMPONENT ===== */
 export default function AboutPage() {
+  console.log("About page rendering");
+
   return (
     <div className={`${body} ${gapSectionSlim}`}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}
@@ -39,7 +43,9 @@ export default function AboutPage() {
 
       {/* ===== DONATE SECTION ===== */}
       <div id="donate"></div>
+      {console.log("About to render DonateCta")}
       <DonateCta />
+      {console.log("DonateCta rendered")}
 
       {/* ===== CONTACT SECTION ===== */}
       <div id="contact"></div>
