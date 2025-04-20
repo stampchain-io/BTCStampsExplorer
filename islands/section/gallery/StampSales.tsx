@@ -4,6 +4,7 @@ import { useEffect, useState } from "preact/hooks";
 import type { StampRow } from "$globals";
 import { StampGallery } from "$section";
 import { titlePurpleLD } from "$text";
+import { loaderSpinXsPurple } from "$layout";
 
 /* ===== TYPES ===== */
 interface DisplayCountBreakpoints {
@@ -155,9 +156,16 @@ export function StampSalesGallery({
       >
         {title}
       </h3>
-      <div class="flex flex-col gap-12">
+      <div class="flex flex-col">
         <StampGallery {...sectionProps} />
-        {isLoading && <div class="text-sm text-gray-400">Refreshing...</div>}
+        {isLoading && (
+          <div class="flex items-center gap-3 -mt-[30px] -mb-[30px]">
+            <div class={loaderSpinXsPurple} />
+            <div class="animate-pulse font-medium text-sm text-stamp-purple">
+              REFRESHING
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

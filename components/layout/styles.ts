@@ -47,10 +47,16 @@ export const modalBgCenter =
 // Internal loader style
 const loaderSpin = "animate-spin rounded-full border-b-[3px]";
 // Loader styles
-export const loaderSpinSmGrey = `${loaderSpin} w-5 h-5 border-stamp-grey`;
+export const loaderSpinXsGrey =
+  `animate-spin rounded-full border-b-[2px] w-3 h-3 border-stamp-grey`;
+export const loaderSpinSmGrey =
+  `animate-spin rounded-full border-b-[2px] w-5 h-5 border-stamp-grey`;
 export const loaderSpinGrey = `${loaderSpin} w-7 h-7 border-stamp-grey`;
 export const loaderSpinLgGrey = `${loaderSpin} w-10 h-10 border-stamp-grey`;
-export const loaderSpinSmPurple = `${loaderSpin} w-5 h-5 border-stamp-purple`;
+export const loaderSpinXsPurple =
+  `animate-spin rounded-full border-b-[2px] w-3 h-3 border-stamp-purple`;
+export const loaderSpinSmPurple =
+  `animate-spin rounded-full border-b-[2px] w-5 h-5 border-stamp-purple`;
 export const loaderSpinPurple = `${loaderSpin} w-7 h-7 border-stamp-purple`;
 export const loaderSpinLgPurple = `${loaderSpin} w-10 h-10 border-stamp-purple`;
 

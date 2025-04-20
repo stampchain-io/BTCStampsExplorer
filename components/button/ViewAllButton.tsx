@@ -17,7 +17,7 @@ export function ViewAllButton({ href }: ViewAllButtonProps) {
         href={href}
         target="_top"
       >
-        VIEW ALL
+        VIEW
       </Button>
     </div>
   );

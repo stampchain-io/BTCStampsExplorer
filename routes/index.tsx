@@ -103,7 +103,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
           <HomeHeader />
 
           {/* Important but can be deferred slightly */}
-          <div style="content-visibility: auto; margin-top:-96px;">
+          <div style="content-visibility:auto; margin-top:-96px; margin-bottom:-48px;">
             <CarouselHome carouselStamps={carouselStamps} />
           </div>
 
