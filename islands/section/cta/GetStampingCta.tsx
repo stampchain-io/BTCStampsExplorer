@@ -90,7 +90,7 @@ export function GetStampingCta() {
           <Button
             variant="outline"
             color="grey"
-            size="lg"
+            size="md"
             href="/faq"
           >
             FAQ
@@ -98,7 +98,7 @@ export function GetStampingCta() {
           <Button
             variant="flat"
             color="grey"
-            size="lg"
+            size="md"
             href="/stamping/stamp"
           >
             STAMP

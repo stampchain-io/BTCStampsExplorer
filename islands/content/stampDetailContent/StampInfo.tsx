@@ -13,12 +13,11 @@ import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
 import { containerBackground, containerColData } from "$layout";
 import {
-  label,
   labelSm,
   textSm,
   textXl,
   titleGreyLD,
-  value3xl,
+  value2xl,
   valueDark,
 } from "$text";
 import { Button } from "$button";
@@ -758,7 +757,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             )}
 
             <div className="flex flex-col items-start pt-1.5 mobileLg:pt-3">
-              <h6 className={label}>BY</h6>
+              <h6 className={labelSm}>BY</h6>
               <a
                 className="font-bold text-lg gray-gradient3-hover tracking-wide -mt-1"
                 href={`/wallet/${stamp.creator}`}
@@ -773,7 +772,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             ? (
               <div className="flex flex-col w-full pt-6 mobileLg:pt-12">
                 <div
-                  className={`flex w-full gap-3 mobileLg:gap-6 mb-3 mobileLg:mb-6 items-end ${
+                  className={`flex w-full gap-6 mb-3 items-end ${
                     dispensers?.length >= 2 ? "justify-between" : "justify-end"
                   }`}
                 >
@@ -796,13 +795,13 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
                   <div className="text-right">
                     {displayPriceUSD && (
-                      <h6 className={label}>
+                      <h6 className={labelSm}>
                         {displayPriceUSD.toLocaleString("en-US", {
                           maximumFractionDigits: 2,
                         })} <span className="font-light">USD</span>
                       </h6>
                     )}
-                    <h6 className={value3xl}>
+                    <h6 className={value2xl}>
                       {formatBTCAmount(
                         typeof displayPrice === "number" ? displayPrice : 0,
                         { excludeSuffix: true },
@@ -814,7 +813,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 {(dispensers?.length >= 2)
                   ? (
                     showListings && (
-                      <div className="w-full mb-3 mobileLg:mb-6">
+                      <div className="w-full mb-6">
                         {isLoadingDispensers
                           ? <h6>LOADING</h6>
                           : (
@@ -836,7 +835,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   <Button
                     variant="outline"
                     color="purple"
-                    size="lg"
+                    size="md"
                     onClick={() =>
                       toggleModal(selectedDispenser || lowestPriceDispenser)}
                   >
@@ -850,9 +849,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
         <div className={containerBackground}>
           {!isSrc20Stamp() && (
-            <div className="flex flex-col pb-3 mobileLg:pb-6">
-              <h6 className={label}>{editionLabel}</h6>
-              <h6 className={value3xl}>{editionCount}{" "}</h6>
+            <div className="flex flex-col pb-3">
+              <h6 className={labelSm}>{editionLabel}</h6>
+              <h6 className={value2xl}>{editionCount}{" "}</h6>
             </div>
           )}
 

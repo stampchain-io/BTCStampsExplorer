@@ -49,7 +49,7 @@ export const StampchainContactCta = () => {
         <Button
           variant="outline"
           color="grey"
-          size="lg"
+          size="md"
           href="/about/#contact"
         >
           CONTACT
@@ -57,7 +57,7 @@ export const StampchainContactCta = () => {
         <Button
           variant="flat"
           color="grey"
-          size="lg"
+          size="md"
           href="/about"
         >
           ABOUT

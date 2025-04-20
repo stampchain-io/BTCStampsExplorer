@@ -13,7 +13,7 @@ export function ViewAllButton({ href }: ViewAllButtonProps) {
       <Button
         variant="outline"
         color="purple"
-        size="lg"
+        size="md"
         href={href}
         target="_top"
       >

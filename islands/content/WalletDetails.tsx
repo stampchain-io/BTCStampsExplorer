@@ -289,7 +289,7 @@ function DispenserStats({
           <Button
             variant="outline"
             color="purple"
-            size="lg"
+            size="md"
           >
             BUY
           </Button>

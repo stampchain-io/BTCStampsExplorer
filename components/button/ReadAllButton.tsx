@@ -13,11 +13,11 @@ export function ReadAllButton({ href = "/howto" }: ReadAllButtonProps) {
       <Button
         variant="outline"
         color="grey"
-        size="lg"
+        size="md"
         href={href}
         target="_top"
       >
-        READ MORE
+        MORE
       </Button>
     </div>
   );

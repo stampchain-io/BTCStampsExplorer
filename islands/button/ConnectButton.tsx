@@ -72,7 +72,7 @@ export const ConnectButton = () => {
             <Button
               variant="outlineGradient"
               color="purpleGradient"
-              size="lg"
+              size="md"
               onClick={handleOpenModal}
               ref={buttonRef}
             >

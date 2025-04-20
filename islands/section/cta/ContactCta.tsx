@@ -113,7 +113,7 @@ const ContactCta = () => {
                   type="submit"
                   variant="outline"
                   color="grey"
-                  size="lg"
+                  size="md"
                   isSubmitting={isSubmitting}
                 >
                   SEND

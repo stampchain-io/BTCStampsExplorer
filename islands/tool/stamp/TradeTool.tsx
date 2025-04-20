@@ -541,7 +541,7 @@ export function StampTradeTool() {
           <Button
             variant="flat"
             color="purple"
-            size="lg"
+            size="md"
             onClick={handleCreatePSBT}
             disabled={isSubmitting}
           >
@@ -592,7 +592,7 @@ export function StampTradeTool() {
                 <Button
                   variant="outline"
                   color="purple"
-                  size="lg"
+                  size="md"
                   onClick={handleQueryAssets}
                   disabled={isLoadingAssets || !isConnected}
                 >
@@ -680,7 +680,7 @@ export function StampTradeTool() {
               <Button
                 variant="outline"
                 color="purple"
-                size="lg"
+                size="md"
                 onClick={handleQueryUtxos}
                 disabled={isLoadingUtxos || !isConnected}
               >
@@ -721,7 +721,7 @@ export function StampTradeTool() {
           <Button
             variant="flat"
             color="purple"
-            size="lg"
+            size="md"
             onClick={handleUtxoAttach}
             disabled={isSubmitting}
           >
@@ -785,7 +785,7 @@ export function StampTradeTool() {
           <Button
             variant="flat"
             color="purple"
-            size="lg"
+            size="md"
             onClick={handleCompleteSwap}
             disabled={isSubmitting}
           >

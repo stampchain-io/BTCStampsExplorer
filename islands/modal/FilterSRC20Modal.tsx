@@ -347,7 +347,7 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
         <Button
           variant="outline"
           color="purple"
-          size="lg"
+          size="md"
           onClick={handleSubmit}
         >
           SUBMIT

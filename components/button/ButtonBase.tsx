@@ -288,7 +288,7 @@ export function ButtonProcessing({
  * Button Components
  *
  * @example Normal Button
- * <Button variant="outline" color="grey" size="lg">
+ * <Button variant="outline" color="grey" size="md">
  *   CLICK ME
  * </Button>
  *
@@ -321,7 +321,7 @@ export function ButtonProcessing({
  * <ButtonProcessing
  *   variant="outline"
  *   color="grey"
- *   size="lg"
+ *   size="md"
  *   isSubmitting={false}
  * >
  *   SUBMIT
@@ -344,7 +344,7 @@ export function ButtonProcessing({
  *     <ButtonProcessing
  *       variant="outline"
  *       color="grey"
- *       size="lg"
+ *       size="md"
  *       isSubmitting={isSubmitting}
  *       isActive={isActive}
  *       {...activeHandlers}

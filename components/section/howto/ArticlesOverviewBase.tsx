@@ -42,7 +42,7 @@ export function ArticlesOverview() {
           </p>
           {/* ===== FAQ BUTTON ===== */}
           <div class="w-full flex justify-end mt-1">
-            <Button variant="outline" color="grey" size="lg" href="/faq">
+            <Button variant="outline" color="grey" size="md" href="/faq">
               FAQ
             </Button>
           </div>
