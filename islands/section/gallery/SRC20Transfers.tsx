@@ -48,7 +48,7 @@ export default function SRC20TransfersGallery(): JSX.Element {
 
       {/* Show block title with loading state */}
       <h3 class={`w-full text-right ${subtitlePurple}`}>
-        {isLoading ? <span class="animate-pulse">BLOCK #XXXXXX</span> : (
+        {isLoading ? <span class="animate-pulse">BLOCK #XXX,XXX</span> : (
           transactions.length > 0 && `BLOCK #${transactions[0].block_index}`
         )}
       </h3>
@@ -56,7 +56,7 @@ export default function SRC20TransfersGallery(): JSX.Element {
       {/* ===== LOADING OR CONTENT ===== */}
       {isLoading
         ? (
-          <div class="w-full grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-5 desktop:grid-cols-6 gap-6">
+          <div class="w-full grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-6">
             {[...Array(5)].map((_, index) => (
               <div
                 key={index}
@@ -66,7 +66,7 @@ export default function SRC20TransfersGallery(): JSX.Element {
           </div>
         )
         : (
-          <div class="w-full grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-5 desktop:grid-cols-6 gap-6">
+          <div class="w-full grid grid-cols-4 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-4 gap-6">
             {transactions.map((stamp, index) => (
               <StampCard
                 key={index}

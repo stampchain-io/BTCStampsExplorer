@@ -198,7 +198,7 @@ const BuyStampModal = ({
           />
         </div>
         <div className="flex flex-col w-full">
-          <h5 className="font-black text-2xl gray-gradient1 inline-block w-fit">
+          <h5 className="text-3xl gray-gradient1 font-extrabold">
             <span className="text-stamp-grey-light font-light">
               #
             </span>
@@ -208,7 +208,7 @@ const BuyStampModal = ({
           {/* ===== QUANTITY SELECTION ===== */}
           <div className="flex flex-row pt-3 w-full justify-between items-center">
             <div className="flex flex-col items-start -space-y-0.5">
-              <h5 className="text-lg font-semibold text-stamp-grey">
+              <h5 className="text-lg font-bold text-stamp-grey">
                 EDITIONS
               </h5>
               <h6 className="text-sm font-medium text-stamp-grey-darker">

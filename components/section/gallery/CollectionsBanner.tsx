@@ -5,14 +5,15 @@ import { useState } from "preact/hooks";
 /* ===== STYLES ===== */
 const containerClassName =
   `border-2 border-stamp-grey-darker rounded-md relative overflow-hidden
-  w-full h-[80px] mobileMd:h-[100px] mobileLg:h-[110px] desktop:h-[120px]`;
+  w-full h-[92px] mobileMd:h-[116px] mobileLg:h-[130px] tablet:h-[148px] desktop:h-[160px]`;
 const imageContentClassName =
   "bg-center bg-no-repeat bg-[length:100%] w-full h-full grayscale transition-all duration-300";
 const gradientContentClassName =
   "w-full h-full bg-gradient-to-tr absolute left-0 top-0";
-const nameClassName =
-  `hidden mobileMd:block absolute mobileMd:left-3 mobileMd:bottom-1 tablet:left-3 tablet:bottom-1 desktop:left-3 desktop:bottom-1
-  font-black text-base mobileLg:text-lg uppercase`;
+const nameClassName = `hidden mobileLg:block
+  text-xl desktop:text-2xl font-black uppercase
+  absolute mobileLg:left-[14px] mobileLg:bottom-[9px] tablet:left-3 tablet:bottom-[6px] desktop:left-[18px] desktop:bottom-3
+`;
 
 /* ===== TYPES ===== */
 interface CollectionsBannerProps {

@@ -26,9 +26,9 @@ export function StampOverviewContent({
 }: StampOverviewContentProps) {
   /* ===== RENDER ===== */
   return (
-    <div class="w-full pt-3 pb-12 mobileMd:pb-[72px]">
+    <div class="w-full pt-3 pb-12 mobileMd:pt-6 mobileMd:pb-[72px]">
       {/* ===== STAMPS GRID ===== */}
-      <div class="grid grid-cols-2 min-[500px]:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 min-[1280px]:grid-cols-6 desktop:grid-cols-7 gap-6 w-full auto-rows-fr">
+      <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-3 mobileMd:gap-6 w-full auto-rows-fr">
         {stamps.map((stamp) => (
           <StampCard
             key={isRecentSales && stamp.sale_data
