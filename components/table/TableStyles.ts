@@ -1,5 +1,5 @@
 // Table styling
-// Title/counts tab styles
+// @baba - should be able to delete !!!
 export const container = "dark-gradient rounded-lg p-3 mobileMd:p-6";
 export const dataLabel =
   "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";

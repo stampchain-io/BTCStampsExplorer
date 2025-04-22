@@ -6,7 +6,7 @@ import { subtitlePurple, titlePurpleLD } from "$text";
 import { ViewAllButton } from "$button";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Timeframe } from "$layout";
-import { SRC20MintedTable, SRC20MintingTable } from "$table";
+import { SRC20Card, SRC20CardMinting } from "$card";
 import { useSignal } from "@preact/signals";
 
 /* ===== COLUMN CONFIGURATIONS ===== */
@@ -167,7 +167,7 @@ export function SRC20Gallery({
 
       {viewType === "minted"
         ? (
-          <SRC20MintedTable
+          <SRC20Card
             data={data}
             fromPage={fromPage}
             timeframe={timeframe}
@@ -175,7 +175,7 @@ export function SRC20Gallery({
           />
         )
         : (
-          <SRC20MintingTable
+          <SRC20CardMinting
             data={data}
             fromPage={fromPage}
             timeframe={timeframe}

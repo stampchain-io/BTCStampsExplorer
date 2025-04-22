@@ -7,19 +7,19 @@ import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { rowTable } from "$layout";
 import { labelXs, valueDark, valueSm } from "$text";
 
-interface SRC20MintedTableProps {
+interface SRC20CardProps {
   data: SRC20Row[];
   fromPage: "src20" | "wallet" | "stamping/src20" | "home";
   timeframe: Timeframe;
   onImageClick: (imgSrc: string) => void;
 }
 
-export function SRC20MintedTable({
+export function SRC20Card({
   data,
   fromPage,
   timeframe,
   onImageClick,
-}: SRC20MintedTableProps) {
+}: SRC20CardProps) {
   const headers = [
     "TOKEN",
     "DEPLOY",
@@ -166,7 +166,7 @@ export function SRC20MintedTable({
             : (
               <tr>
                 <td colSpan={headers.length} class={`${valueDark} w-full`}>
-                  NO MINTED TOKENS
+                  NO TOKENS TO DISPLAY
                 </td>
               </tr>
             )}

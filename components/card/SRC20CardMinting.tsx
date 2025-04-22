@@ -7,19 +7,19 @@ import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { rowCardHover } from "$layout";
 
-interface SRC20MintingTableProps {
+interface SRC20CardMintingProps {
   data: SRC20Row[];
   fromPage: "src20" | "wallet" | "stamping/src20" | "home";
   timeframe: Timeframe;
   onImageClick: (imgSrc: string) => void;
 }
 
-export function SRC20MintingTable({
+export function SRC20CardMinting({
   data,
   fromPage,
   timeframe,
   onImageClick,
-}: SRC20MintingTableProps) {
+}: SRC20CardMintingProps) {
   const headers = [
     "TOKEN",
     "MINTS",

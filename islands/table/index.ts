@@ -4,8 +4,6 @@ export * from "$components/table/HoldersTable.tsx";
 
 export * from "$components/table/src20DataTable/SRC20Transfers.tsx";
 export * from "$components/table/src20DataTable/SRC20Mints.tsx";
-export * from "$components/table/src20DataTable/SRC20Minted.tsx";
-export * from "$components/table/src20DataTable/SRC20Minting.tsx";
 
 export * from "$components/table/stampDataTable/StampListingsAll.tsx";
 export { StampListingsOpenTable } from "$components/table/stampDataTable/StampListingsOpen.tsx";

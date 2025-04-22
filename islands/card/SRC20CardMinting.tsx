@@ -4,8 +4,8 @@ import { SRC20CardBase, SRC20CardBaseProps } from "./SRC20CardBase.tsx";
 import { formatDate } from "$lib/utils/formatUtils.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { Button } from "$button";
-import { labelSm, textSm } from "$text";
-import { cellAlign, tableValue } from "$components/table/TableStyles.ts";
+import { labelSm, textSm, valueSm } from "$text";
+import { cellAlign } from "$components/layout/types.ts";
 
 /* ===== COMPONENT ===== */
 export function SRC20CardMinting(
@@ -30,7 +30,7 @@ export function SRC20CardMinting(
       totalColumns={totalColumns}
     >
       {/* Deploy Cell */}
-      <td class={`${cellAlign(1, totalColumns)} ${tableValue}`}>
+      <td class={`${cellAlign(1, totalColumns)} ${valueSm}`}>
         {formatDate(new Date(src20.block_time), {
           month: "numeric",
           day: "numeric",
@@ -39,23 +39,23 @@ export function SRC20CardMinting(
       </td>
 
       {/* Holders Cell */}
-      <td class={`${cellAlign(2, totalColumns)} ${tableValue}`}>
+      <td class={`${cellAlign(2, totalColumns)} ${valueSm}`}>
         {Number(src20.holders).toLocaleString()}
       </td>
 
       {/* TRENDING */}
-      <td class={`${cellAlign(3, totalColumns)} ${tableValue}`}>
+      <td class={`${cellAlign(3, totalColumns)} ${valueSm}`}>
         {src20.top_mints_percentage?.toFixed(1) || "N/A"}
         <span class="text-stamp-grey-light">%</span>
       </td>
 
       {/* MINTS */}
-      <td class={`${cellAlign(4, totalColumns)} ${tableValue}`}>
+      <td class={`${cellAlign(4, totalColumns)} ${valueSm}`}>
         {src20.mint_count || "N/A"}
       </td>
 
       {/* Progress Cell */}
-      <td class={`${cellAlign(5, totalColumns)} ${tableValue}`}>
+      <td class={`${cellAlign(5, totalColumns)} ${valueSm}`}>
         <div class="flex flex-col gap-1">
           <div class="text-right">
             {Number(src20.progress)}

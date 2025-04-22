@@ -105,17 +105,17 @@ export const value3xlTransparent = `font-black text-3xl -mt-1 ${cursor}`; // use
 export const valueSmPurple =
   `font-medium text-xs text-stamp-purple text-center whitespace-nowrap ${cursor}`; // used in team banner gallery
 export const value2xlPurpleGlow =
-  "font-black text-2xl text-black text-stroke-glow-small";
+  "font-black text-2xl text-black text-stroke-glow-small"; // used in about header
 export const value5xlPurpleGlow =
-  "font-black text-5xl text-black text-stroke-glow-small";
+  "font-black text-5xl text-black text-stroke-glow-small"; // used in about header
 export const value7xlPurpleGlow =
-  "font-black text-7xl text-black text-stroke-glow-large";
+  "font-black text-7xl text-black text-stroke-glow-large"; // used in about header
 // Dark variants
 export const valueDarkXs =
   `font-medium text-xs text-stamp-grey-darker tracking-tighter ${cursor}`; // used for addy styling in mobile/table header
 export const valueDarkSm =
   `font-medium text-sm text-stamp-grey-darker tracking-tighter ${cursor}`; // used for addy styling in desktop header
-export const valueDark = `font-bold text-base text-stamp-grey-darker ${cursor}`;
+export const valueDark = `font-bold text-base text-stamp-grey-darker ${cursor}`; // used in tables
 
 /* ===== TOOLTIP STYLES ===== */
 // One text style for tooltips - defined in /notifications/styles.ts
@@ -126,10 +126,9 @@ export const valueDark = `font-bold text-base text-stamp-grey-darker ${cursor}`;
 /* ===== SPECIAL TEXT STYLES ===== */
 export const tagline =
   `font-regular text-xs bg-gradient-to-r from-[#660099] via-[#8800CC] to-[#AA00FF] text-transparent bg-clip-text ${cursor}`; // used in footer
-export const copyright =
-  `font-normal text-xs mobileMd:text-sm tablet:text-xs ${cursor}`; // transparent text - ued with the overlayPurple class - used in footer
+export const copyright = `font-normal text-xs ${cursor}`; // transparent text - combined with the overlayPurple class - used in footer
 export const loaderText =
-  `font-medium text-base text-stamp-grey uppercase text-center py-3 animated-text-loader ${cursor}`;
+  `font-medium text-sm text-stamp-grey uppercase text-center py-3 animated-text-loader ${cursor}`; // table more rows loader
 
 // Captions - used for stamp/token cards
 // Errors - used for error messages - to be defined in /notifications/styles.ts
@@ -139,7 +138,7 @@ export const loaderText =
 // Add any new styles you cannot categorize here
 
 /* ===== LEGACY STYLES ===== */
-// Update the legacy styles to new styles
+// @baba - should be able to delete !!!
 export const dataLabel =
   "text-base mobileLg:text-lg font-light text-red-500 uppercase"; // check where used
 export const dataValue =

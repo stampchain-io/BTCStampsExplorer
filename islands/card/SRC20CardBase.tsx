@@ -3,10 +3,8 @@
 import { useState } from "preact/hooks";
 import { SRC20Row } from "$globals";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
-import { labelSm, textSm } from "$text";
-import { TableColumn, Timeframe } from "$components/layout/types.ts";
-import { cellAlign, row, tableValue } from "$components/table/TableStyles.ts";
+import { Timeframe } from "$components/layout/types.ts";
+import { cellAlign } from "$components/layout/types.ts";
 
 /* ===== HELPER FUNCTIONS ===== */
 function splitTextAndEmojis(text: string): { text: string; emoji: string } {

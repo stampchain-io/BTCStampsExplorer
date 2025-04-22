@@ -12,7 +12,7 @@ export default function Error404Page() {
         <title>404 - Page not found</title>
       </Head>
 
-      <div class="flex flex-col justify-center items-center mx-auto">
+      <div class="flex flex-col justify-center items-center mx-auto my-auto">
         <div class="flex flex-col justify-center items-center">
           <div class={titleGreyLD}>WHOOPS</div>
           <div class={subtitleGrey}>SOMETHING WENT WRONG</div>

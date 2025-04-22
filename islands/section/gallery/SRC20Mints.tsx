@@ -1,7 +1,7 @@
 /* ===== SRC20 RECENT MINTS GALLERY COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import type { SRC20Row } from "$globals";
-import { SRC20CardMinted, SRC20CardMinting } from "$card";
+import { SRC20Card, SRC20CardMinting } from "$card";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 /* ===== COMPONENT ===== */
@@ -74,7 +74,7 @@ export default function SRC20MintsGallery() {
                   />
                 )
                 : (
-                  <SRC20CardMinted
+                  <SRC20Card
                     key={src20.tick}
                     src20={src20}
                     fromPage="stamping/src20"

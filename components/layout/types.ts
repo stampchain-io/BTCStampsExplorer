@@ -17,8 +17,9 @@ export interface DonateStampData {
   stamp_url: string;
   tx_hash: string;
 }
+/* ===== ===== ===== ===== ===== ===== */
 
-/* ===== SRC20 TABLE ===== */
+/* ===== SRC20 TOKEN CARDS TABLE ===== */
 export type SRC20ViewType = "minted" | "minting";
 export type Timeframe = "24H" | "3D" | "7D" | "1M" | "ALL";
 
@@ -62,3 +63,69 @@ export const MINTING_COLUMNS: TableColumn[] = [
   { key: "progress", label: "PROGRESS" },
   { key: "mint", label: "MINT" },
 ];
+/* ===== ===== ===== ===== ===== ===== */
+
+/* ===== DATA TABLE ===== */
+export type TableType = "stamps" | "src20" | "src101" | "vault";
+
+export interface TableProps {
+  type: TableType;
+  configs: Array<{ id: string }>;
+  cpid?: string;
+  tick?: string;
+  initialCounts?: {
+    dispensers?: number;
+    sales?: number;
+    transfers?: number;
+    mints?: number;
+  };
+}
+
+export interface TabData {
+  dispensers?: any[];
+  dispenses?: any[];
+  sends?: any[];
+  mints?: any[];
+  transfers?: any[];
+  [key: string]: any[] | undefined;
+}
+
+export interface FetchResponse {
+  data: any[];
+  total: number;
+}
+
+/* ===== TABLE STYLING CONSTANTS ===== */
+export const defaultColGroup = {
+  columns: 5,
+  width: "w-[20%]",
+};
+
+export const cellAlignment = {
+  first: "text-left",
+  middle: "text-center",
+  last: "text-right",
+};
+
+/* ===== TABLE STYLING UTILITIES ===== */
+export const colGroup = (customColumns?: Array<{ width: string }>) => {
+  if (customColumns) {
+    return customColumns.map((col, i) => ({
+      key: i,
+      className: col.width,
+    }));
+  }
+
+  return Array(defaultColGroup.columns)
+    .fill(null)
+    .map((_, i) => ({
+      key: i,
+      className: defaultColGroup.width,
+    }));
+};
+
+export const cellAlign = (index: number, total: number) => {
+  if (index === 0) return cellAlignment.first;
+  if (index === total - 1) return cellAlignment.last;
+  return cellAlignment.middle;
+};
