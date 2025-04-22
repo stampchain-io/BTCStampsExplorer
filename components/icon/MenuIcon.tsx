@@ -29,7 +29,7 @@ export const HamburgerMenuIcon = (
         {`
         /* Base button styles */
         .hamburger-menu {
-          width: 26px;
+          width: 24px;
           cursor: pointer;
           z-index: 100;
         }
@@ -37,7 +37,7 @@ export const HamburgerMenuIcon = (
         /* Shared line styles */
         .hamburger-menu span {
           display: block;
-          height: 3px;
+          height: 2px;
           border-radius: 1px;
           background: linear-gradient(90deg, #AA00FF, #8800CC, #AA00FF);
           position: relative;

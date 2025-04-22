@@ -1,16 +1,9 @@
 /* ===== SRC20 HOLDERS TABLE COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { ScrollContainer } from "$layout";
-import {
-  cellAlign,
-  colGroup,
-  row,
-  tableLabel,
-  tableValue,
-  tableValueLink,
-  textLoader,
-} from "$table";
+import { rowTable, ScrollContainer } from "$layout";
+import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { labelXs, loaderText, valueSm, valueSmLink } from "$text";
 
 /* ===== TYPES ===== */
 interface Holder {
@@ -79,10 +72,10 @@ const HoldersTableBase = (
   /* ===== RENDER ===== */
   return (
     <ScrollContainer
-      class="h-48 mobileLg:h-64 mt-3 mobileMd:mt-6 w-full"
+      class="h-[188px] mobileLg:h-[248px] mt-6 w-full"
       onScroll={handleScroll}
     >
-      <table className={tableValue}>
+      <table className={`${valueSm} w-full`}>
         {/* ===== TABLE STRUCTURE ===== */}
         <colgroup>
           {colGroup([
@@ -104,7 +97,7 @@ const HoldersTableBase = (
               <th
                 key={i}
                 scope="col"
-                class={`${tableLabel} ${cellAlign(i, headers.length)}`}
+                class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
               >
                 {header}
               </th>
@@ -113,11 +106,11 @@ const HoldersTableBase = (
         </thead>
 
         {/* ===== TABLE CONTENT ===== */}
-        <tbody className={tableValue}>
+        <tbody className={valueSm}>
           {!isLoading && data.map((holder, index) => {
             if (!holder.address) {
               return (
-                <tr className={row}>
+                <tr className={rowTable}>
                   <td class={cellAlign(0, headers.length)}>UNKNOWN</td>
                   <td class={cellAlign(1, headers.length)}>
                     {holder.amt}
@@ -130,12 +123,12 @@ const HoldersTableBase = (
             }
 
             return (
-              <tr key={index} className={row}>
+              <tr key={index} className={rowTable}>
                 <td class={cellAlign(0, headers.length)}>
                   <a
                     target="_top"
                     href={`/wallet/${holder.address}`}
-                    className={tableValueLink}
+                    className={valueSmLink}
                   >
                     <span className="mobileLg:hidden">
                       {abbreviateAddress(holder.address, 8)}
@@ -159,7 +152,7 @@ const HoldersTableBase = (
           {isLoading && (
             <tr colSpan={3}>
               <td colSpan={3}>
-                <div class={textLoader}>
+                <div class={loaderText}>
                   <span>L</span>
                   <span>O</span>
                   <span>A</span>

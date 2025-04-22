@@ -152,11 +152,11 @@ export const buttonStyles: ButtonVariants = {
 
   /* ===== SIZE STYLES ===== */
   size: {
-    xs: "h-7 px-3 text-[10px] font-semibold",
-    sm: "h-8 px-4 text-xs",
-    md: "h-9 px-4 text-sm",
-    lg: "h-10 px-4 text-sm",
-    xl: "h-11 px-5 text-base",
+    xs: "h-[30px] px-3 text-[10px] font-semibold",
+    sm: "h-[34px] px-4 text-xs",
+    md: "h-[38px] px-4 text-sm",
+    lg: "h-[42px] px-4 text-sm",
+    xl: "h-[46px] px-5 text-base",
   },
 
   /* ===== TEXT SIZE STYLES - ONLY USED FOR TEXT BUTTONS ===== */
@@ -198,10 +198,11 @@ export const buttonStyles: ButtonVariants = {
 
 /* ===== ADDITIONAL STYLES ===== */
 /* ===== TEMPORARY STYLES ===== */
+/* @baba - update feeCalculatorBase buttons */
 export const buttonPurpleOutline =
-  "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm font-bold tracking-wider text-stamp-purple h-10 px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors duration-300";
+  "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm font-bold tracking-wider text-stamp-purple h-[38px] px-4 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors duration-300";
 export const buttonPurpleFlat =
-  "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm font-bold tracking-wider text-black h-10 px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors duration-300";
+  "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm font-bold tracking-wider text-black h-[38px] px-4 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors duration-300";
 
 /* ===== TOGGLE SWITCH BUTTON STYLES ===== */
 export const toggleButton =

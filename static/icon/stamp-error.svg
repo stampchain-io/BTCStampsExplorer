@@ -65,7 +65,8 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.242px;line-height:0;font-family:'Work Sans';;text-align:start;letter-spacing:0.305179px;word-spacing:0px;text-anchor:start;display:inline;fill:#990000;fill-opacity:1;stroke:#990000;stroke-width:0.0254316;stroke-dasharray:none;stroke-opacity:1"
+       class="animate-pulse"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.242px;line-height:0;font-family:'Work Sans';;text-align:start;letter-spacing:0.305px;word-spacing:0px;text-anchor:start;display:inline;fill:#990000;fill-opacity:1;stroke:#990000;stroke-width:0.0255;stroke-dasharray:none;stroke-opacity:1"
        x="11.259371"
        y="23.5557"
        dx="0"

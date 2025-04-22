@@ -25,7 +25,7 @@ export function ArticlesOverview() {
                 key={`${title}-${href}`}
                 href={href}
                 f-partial={href}
-                class={`${headingGreyLDLink} pb-1`}
+                class={`${headingGreyLDLink} pb-1 tablet:pb-0`}
               >
                 {title}
               </a>

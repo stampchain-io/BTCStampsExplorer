@@ -12,14 +12,7 @@ import { Src101Detail, StampRow } from "$globals";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
 import { containerBackground, containerColData } from "$layout";
-import {
-  labelSm,
-  textSm,
-  textXl,
-  titleGreyLD,
-  value2xl,
-  valueDark,
-} from "$text";
+import { labelSm, textSm, titleGreyLD, value3xl, valueDark } from "$text";
 import { Button } from "$button";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import { tooltipIcon } from "$notification";
@@ -740,12 +733,11 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </h6>
             )}
 
-            <h5 className={`${textXl} -mt-1.5 block`}>
+            <h5 className="-mt-1.5 font-light text-xl text-stamp-grey block">
               {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
                 (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) && (
                 <>
-                  <span className="font-light">#</span>
-                  <span className="font-light">{stamp.stamp}</span>
+                  #{stamp.stamp}
                 </>
               )}
             </h5>
@@ -779,7 +771,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   {dispensers?.length >= 2 && (
                     <button
                       onClick={() => setShowListings(!showListings)}
-                      className="pb-1.5"
+                      className="pb-0.5"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -801,7 +793,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                         })} <span className="font-light">USD</span>
                       </h6>
                     )}
-                    <h6 className={value2xl}>
+                    <h6 className={value3xl}>
                       {formatBTCAmount(
                         typeof displayPrice === "number" ? displayPrice : 0,
                         { excludeSuffix: true },
@@ -812,7 +804,14 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
                 {(dispensers?.length >= 2)
                   ? (
-                    showListings && (
+                    <div
+                      className={`overflow-hidden transition-all duration-500 ease-in-out
+                      ${
+                        showListings
+                          ? "max-h-[300px] opacity-100"
+                          : "max-h-0 opacity-0"
+                      }`}
+                    >
                       <div className="w-full mb-6">
                         {isLoadingDispensers
                           ? <h6>LOADING</h6>
@@ -827,7 +826,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                             />
                           )}
                       </div>
-                    )
+                    </div>
                   )
                   : null}
 
@@ -851,7 +850,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           {!isSrc20Stamp() && (
             <div className="flex flex-col pb-3">
               <h6 className={labelSm}>{editionLabel}</h6>
-              <h6 className={value2xl}>{editionCount}{" "}</h6>
+              <h6 className={value3xl}>{editionCount}{" "}</h6>
             </div>
           )}
 
@@ -1007,6 +1006,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 {createdDate}
               </h6>
             </div>
+            {/* @baba - fix logic handling for no tx hash */}
             <div className={`${containerColData} flex-1 items-end`}>
               <h6 className={labelSm}>TX HASH</h6>
               <a
@@ -1015,7 +1015,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 rel="noopener noreferrer"
                 className={`${textSm} hover:text-stamp-grey transition-colors duration-300`}
               >
-                {abbreviateAddress(stamp.tx_hash, 4)}
+                {stamp.tx_hash !== null
+                  ? abbreviateAddress(stamp.tx_hash, 4)
+                  : "N/A"}
               </a>
             </div>
           </div>

@@ -10,15 +10,26 @@ interface ReadAllButtonProps {
 export function ReadAllButton({ href = "/howto" }: ReadAllButtonProps) {
   return (
     <div className="flex justify-end tablet:justify-start mt-0.5 tablet:mt-1">
-      <Button
-        variant="outline"
-        color="grey"
-        size="md"
+      <a
         href={href}
         target="_top"
+        class="font-semibold text-base text-stamp-grey-light hover:text-stamp-grey animated-underline"
       >
-        MORE
-      </Button>
+        Read the full guide
+      </a>
     </div>
   );
 }
+
+/* ===== BUTTON ===== */
+/*
+<Button
+variant="outline"
+color="grey"
+size="lg"
+href={href}
+target="_top"
+>
+READ MORE
+</Button>
+*/

@@ -3,7 +3,7 @@ import { Icon } from "$icon";
 import {
   copyright,
   logoPurpleDL,
-  navLinkPurple,
+  navLinkTransparentPurple,
   overlayPurple,
   tagline,
 } from "$text";
@@ -53,7 +53,7 @@ const socialLinks = [
         type="iconLink"
         name="twitter"
         weight="light"
-        size="lg"
+        size="md"
         color="purple"
         href="https://x.com/Stampchain"
         target="_blank"
@@ -66,7 +66,7 @@ const socialLinks = [
         type="iconLink"
         name="telegram"
         weight="light"
-        size="lg"
+        size="md"
         color="purple"
         href="https://t.me/BitcoinStamps"
         target="_blank"
@@ -79,7 +79,7 @@ const socialLinks = [
         type="iconLink"
         name="discord"
         weight="light"
-        size="lg"
+        size="md"
         color="purple"
         href="https://discord.gg/BRYRt4bH"
         target="_blank"
@@ -92,7 +92,7 @@ const socialLinks = [
         type="iconLink"
         name="github"
         weight="light"
-        size="lg"
+        size="md"
         color="purple"
         href="https://github.com/stampchain-io/"
         target="_blank"
@@ -109,7 +109,7 @@ export function Footer() {
       flex flex-col tablet:flex-row justify-between max-w-desktop w-full mx-auto 
       px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
       pt-24 pb-6 tablet:pt-24 tablet:pb-6
-      gap-2 mobileLg:gap-3 tablet:gap-4
+      gap-2 mobileMd:gap-3 tablet:gap-4
     ">
       {/* ===== BACKGROUND LOGO ===== */}
       <img
@@ -171,7 +171,7 @@ export function Footer() {
                   key={link.href}
                   href={link.href}
                   f-partial={link.isExternal ? "" : link.href}
-                  className={`${navLinkPurple}`}
+                  className={`${navLinkTransparentPurple}`}
                   target={link.isExternal ? "_blank" : undefined}
                   rel={link.isExternal ? "noopener noreferrer" : undefined}
                 >
@@ -189,7 +189,7 @@ export function Footer() {
                   key={link.href}
                   href={link.href}
                   f-partial={link.isExternal ? "" : link.href}
-                  className={`${navLinkPurple}`}
+                  className={`${navLinkTransparentPurple}`}
                   target={link.isExternal ? "_blank" : undefined}
                   rel={link.isExternal ? "noopener noreferrer" : undefined}
                 >
@@ -209,7 +209,7 @@ export function Footer() {
                 key={link.href}
                 href={link.href}
                 f-partial={link.isExternal ? "" : link.href}
-                className={`${navLinkPurple}`}
+                className={`${navLinkTransparentPurple}`}
                 target={link.isExternal ? "_blank" : undefined}
                 rel={link.isExternal ? "noopener noreferrer" : undefined}
               >

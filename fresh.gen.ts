@@ -91,6 +91,7 @@ import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $dashboard_address_ from "./routes/dashboard/[address].tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
+import * as $explorer_index from "./routes/explorer/index.tsx";
 import * as $faq_index from "./routes/faq/index.tsx";
 import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/sharedBlockWithStampsHandler.ts";
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
@@ -142,6 +143,7 @@ import * as $card_StampCard from "./islands/card/StampCard.tsx";
 import * as $card_index from "./islands/card/index.ts";
 import * as $card_styles from "./islands/card/styles.ts";
 import * as $content_CollectionDetailContent from "./islands/content/CollectionDetailContent.tsx";
+import * as $content_ExplorerContent from "./islands/content/ExplorerContent.tsx";
 import * as $content_StampOverviewContent from "./islands/content/StampOverviewContent.tsx";
 import * as $content_WalletDashboardContent from "./islands/content/WalletDashboardContent.tsx";
 import * as $content_WalletDashboardDetails from "./islands/content/WalletDashboardDetails.tsx";
@@ -171,6 +173,7 @@ import * as $header_AboutHeader from "./islands/header/AboutHeader.tsx";
 import * as $header_BlockHeader from "./islands/header/BlockHeader.tsx";
 import * as $header_CollectionDetailHeader from "./islands/header/CollectionDetailHeader.tsx";
 import * as $header_CollectionOverviewHeader from "./islands/header/CollectionOverviewHeader.tsx";
+import * as $header_ExplorerHeader from "./islands/header/ExplorerHeader.tsx";
 import * as $header_Header from "./islands/header/Header.tsx";
 import * as $header_SRC20DetailHeader from "./islands/header/SRC20DetailHeader.tsx";
 import * as $header_SRC20OverviewHeader from "./islands/header/SRC20OverviewHeader.tsx";
@@ -360,6 +363,7 @@ const manifest = {
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/dashboard/[address].tsx": $dashboard_address_,
     "./routes/docs/index.tsx": $docs_index,
+    "./routes/explorer/index.tsx": $explorer_index,
     "./routes/faq/index.tsx": $faq_index,
     "./routes/handlers/sharedBlockWithStampsHandler.ts":
       $handlers_sharedBlockWithStampsHandler,
@@ -416,6 +420,7 @@ const manifest = {
     "./islands/card/styles.ts": $card_styles,
     "./islands/content/CollectionDetailContent.tsx":
       $content_CollectionDetailContent,
+    "./islands/content/ExplorerContent.tsx": $content_ExplorerContent,
     "./islands/content/StampOverviewContent.tsx": $content_StampOverviewContent,
     "./islands/content/WalletDashboardContent.tsx":
       $content_WalletDashboardContent,
@@ -457,6 +462,7 @@ const manifest = {
       $header_CollectionDetailHeader,
     "./islands/header/CollectionOverviewHeader.tsx":
       $header_CollectionOverviewHeader,
+    "./islands/header/ExplorerHeader.tsx": $header_ExplorerHeader,
     "./islands/header/Header.tsx": $header_Header,
     "./islands/header/SRC20DetailHeader.tsx": $header_SRC20DetailHeader,
     "./islands/header/SRC20OverviewHeader.tsx": $header_SRC20OverviewHeader,

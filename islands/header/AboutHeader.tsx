@@ -3,13 +3,13 @@ import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
 import { loaderSpinLgPurple } from "$layout";
 import {
-  dataLabelPurple,
-  dataValuePurple,
-  dataValuePurpleSm,
-  dataValuePurpleXl,
+  labelSmPurple,
   subtitlePurple,
   text,
   titlePurpleLD,
+  value2xlPurpleGlow,
+  value5xlPurpleGlow,
+  value7xlPurpleGlow,
 } from "$text";
 
 /* ===== STATE ===== */
@@ -109,18 +109,18 @@ export default function AboutHeader() {
           {/* ===== STATISTICS SECTION ===== */}
           {/* ===== GENESIS STAMP INFO ===== */}
           <div class="flex flex-col col-span-12 mobileLg:col-span-6 desktop:col-span-4 w-full h-full justify-center items-center pl-24 mobileLg:pl-0 mt-12 mobileLg:mt-auto">
-            <p className={`${dataLabelPurple} !mb-1.5`}>
+            <p className={`${labelSmPurple} !mb-1.5`}>
               GENESIS STAMP
             </p>
             <div class="flex flex-col items-center">
-              <h6 class={dataValuePurple}>
+              <h6 class={value5xlPurpleGlow}>
                 {new Date("2023-03-07T01:19:09Z").toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "numeric",
                   day: "numeric",
                 })}
               </h6>
-              <h6 class={dataValuePurpleSm}>
+              <h6 class={value2xlPurpleGlow}>
                 {new Date("2023-03-07T01:19:09Z").toLocaleTimeString("en-US", {
                   hour: "numeric",
                   minute: "2-digit",
@@ -134,13 +134,13 @@ export default function AboutHeader() {
         {/* ===== TOTAL STAMPS SECTION ===== */}
         <div class="grid grid-cols-12 mt-24">
           <div class="col-span-8 flex flex-col justify-center items-center">
-            <h5 class={dataLabelPurple}>
+            <h5 class={labelSmPurple}>
               STAMPS STAMPED
             </h5>
             {isLoading
               ? <div class={`${loaderSpinLgPurple} mt-6`} />
               : (
-                <h6 class={dataValuePurpleXl}>
+                <h6 class={value7xlPurpleGlow}>
                   {totalStampsCount.toLocaleString("en-US")}
                 </h6>
               )}
@@ -152,13 +152,13 @@ export default function AboutHeader() {
         <div class="grid grid-cols-12 mt-24">
           <div class="col-span-6"></div>
           <div class="col-span-6 flex flex-col justify-center items-center">
-            <h5 class={dataLabelPurple}>
+            <h5 class={labelSmPurple}>
               TOKENS DEPLOYED
             </h5>
             {isLoading
               ? <div class={`${loaderSpinLgPurple} mt-6`} />
               : (
-                <h6 class={dataValuePurpleXl}>
+                <h6 class={value7xlPurpleGlow}>
                   {totalTokensCount.toLocaleString("en-US")}
                 </h6>
               )}
@@ -167,10 +167,10 @@ export default function AboutHeader() {
 
         {/* ===== OG TOKEN SECTION ===== */}
         <div class="flex flex-col justify-center items-center mobileLg:mt-36 mt-24">
-          <h5 class={dataLabelPurple}>
+          <h5 class={labelSmPurple}>
             OG TOKEN
           </h5>
-          <h6 class={dataValuePurple}>
+          <h6 class={value5xlPurpleGlow}>
             KEVIN
           </h6>
         </div>

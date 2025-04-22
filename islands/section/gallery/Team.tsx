@@ -1,6 +1,6 @@
 /* ===== TEAM GALLERY COMPONENT ===== */
 import { gapGrid } from "$layout";
-import { aboutSubTitlePurple, aboutTitlePurpleLD, subtitlePurple } from "$text";
+import { headingPurpleLD, subtitlePurple, valueSmPurple } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function TeamGallery() {
@@ -23,10 +23,10 @@ export default function TeamGallery() {
               {/* ===== MIKE IN SPACE CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/code.png" />
-                <h5 className={aboutTitlePurpleLD}>
+                <h5 className={headingPurpleLD}>
                   MIKE IN SPACE
                 </h5>
-                <h6 className={aboutSubTitlePurple}>
+                <h6 className={valueSmPurple}>
                   CODE{" "}
                   <span className="mobileMd:hidden">
                     <br />
@@ -38,10 +38,10 @@ export default function TeamGallery() {
               {/* ===== REINAMORA CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/backend.png" />
-                <h5 className={aboutTitlePurpleLD}>
+                <h5 className={headingPurpleLD}>
                   REINAMORA
                 </h5>
-                <h6 className={aboutSubTitlePurple}>
+                <h6 className={valueSmPurple}>
                   BACKEND{" "}
                   <span className="mobileMd:hidden">
                     <br />
@@ -53,10 +53,10 @@ export default function TeamGallery() {
               {/* ===== ARWYN CARD ===== */}
               <div className="flex flex-col items-center">
                 <img src="/img/about/memetic.png" />
-                <h5 className={aboutTitlePurpleLD}>
+                <h5 className={headingPurpleLD}>
                   ARWYN
                 </h5>
-                <h6 className={aboutSubTitlePurple}>
+                <h6 className={valueSmPurple}>
                   MEMETIC{" "}
                   <span className="mobileMd:hidden">
                     <br />

@@ -6,7 +6,7 @@ import {
   logoPurpleLDLink,
   navLinkGrey,
   navLinkGreyLD,
-  navLinkPurpleThick,
+  navLinkPurple,
 } from "$text";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
@@ -36,35 +36,41 @@ const desktopNavLinks: NavLink[] = [
       default: "ART STAMPS",
       tablet: "STAMPS",
     },
-    href: "#",
-    subLinks: [
-      { title: "ALL", href: "/stamp?type=classic" },
-      { title: "COLLECTIONS", href: "/collection" },
-      { title: "STAMPING", href: "/tool/stamp/stamping" },
-      { title: "TRANSFER", href: "/tool/stamp/transfer" },
-    ],
+    href: "/stamp?type=classic",
+  },
+  {
+    title: {
+      default: "COLLECTIONS",
+      tablet: "COLLECTIONS",
+    },
+    href: "/collection",
   },
   {
     title: {
       default: "SRC-20 TOKENS",
       tablet: "TOKENS",
     },
-    href: "#",
-    subLinks: [
-      { title: "ALL", href: "/src20" },
-      { title: "TRENDING", href: "/src20?type=trending" },
-      { title: "DEPLOY", href: "/tool/src20/deploy" },
-      { title: "MINT", href: "/tool/src20/mint" },
-      { title: "TRANSFER", href: "/tool/src20/transfer" },
-    ],
+    href: "/src20",
   },
   {
     title: {
-      default: "BITNAME DOMAINS",
-      tablet: "BITNAME",
+      default: "EXPLORER",
+      tablet: "EXPLORER",
+    },
+    href: "/explorer",
+  },
+  {
+    title: {
+      default: "TOOLS",
+      tablet: "TOOLS",
     },
     href: "#",
     subLinks: [
+      { title: "STAMPING", href: "/tool/stamp/stamping" },
+      { title: "TRANSFER", href: "/tool/stamp/transfer" },
+      { title: "DEPLOY", href: "/tool/src20/deploy" },
+      { title: "MINT", href: "/tool/src20/mint" },
+      { title: "TRANSFER", href: "/tool/src20/transfer" },
       { title: "REGISTER", href: "/tool/src101/mint" },
     ],
   },
@@ -85,8 +91,8 @@ const mobileNavLinks: NavLink[] = [
     href: "/src20",
   },
   {
-    title: "TRENDING TOKENS",
-    href: "/src20?type=trending",
+    title: "EXPLORER",
+    href: "/explorer",
   },
 ];
 
@@ -256,17 +262,17 @@ export function Header() {
                   ? ` ${
                     // Title of menus
                     link.subLinks ? navLinkGrey : navLinkGreyLD}`
-                  : navLinkPurpleThick
+                  : navLinkPurple
               }`}
             >
               {/* Hidden tablet version of title */}
-              <span className="hidden">
+              <span className="tablet:block min-[1180px]:hidden">
                 {typeof link.title === "string"
                   ? link.title
                   : link.title.tablet}
               </span>
               {/* Visible default version of title */}
-              <span className="">
+              <span className="hidden min-[1180px]:block">
                 {typeof link.title === "string"
                   ? link.title
                   : link.title.default}
@@ -286,7 +292,7 @@ export function Header() {
                         onClick={() => {
                           setCurrentPath(subLink?.href ? subLink?.href : null);
                         }}
-                        className={`font-bold transition-colors duration-300 ${
+                        className={`font-semibold text-center text-xs transition-colors duration-300 ${
                           currentPath === subLink.href
                             ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                             : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -325,7 +331,7 @@ export function Header() {
       </div>
 
       {/* ===== DESKTOP NAVIGATION ===== */}
-      <div className="hidden tablet:flex justify-between items-center gap-9">
+      <div className="hidden tablet:flex justify-between items-center gap-6">
         {renderNavLinks()}
         <ConnectButton />
       </div>
@@ -356,7 +362,7 @@ export function Header() {
               }}
             />
           </div>
-          <div className="flex flex-col flex-1 items-start p-9 gap-4">
+          <div className="flex flex-col flex-1 items-start p-9 gap-3">
             {renderNavLinks(true)}
           </div>
 
@@ -366,7 +372,7 @@ export function Header() {
             <div className="flex w-full justify-between py-6 px-9">
               <div className="flex justify-start items-end -ml-1">
                 <GearIcon
-                  size="lg"
+                  size="md"
                   weight="normal"
                   color="greyLogicDL"
                   isOpen={toolsOpen}
@@ -453,3 +459,46 @@ Map through dropdown items
 ))}
 </div>
   */
+
+/* ===== OLD DESKTOP MENUS===== */
+/*
+const desktopNavLinks: NavLink[] = [
+  {
+    title: {
+      default: "ART STAMPS",
+      tablet: "STAMPS",
+    },
+    href: "#",
+    subLinks: [
+      { title: "ALL", href: "/stamp?type=classic" },
+      { title: "COLLECTIONS", href: "/collection" },
+      { title: "STAMPING", href: "/tool/stamp/stamping" },
+      { title: "TRANSFER", href: "/tool/stamp/transfer" },
+    ],
+  },
+  {
+    title: {
+      default: "SRC-20 TOKENS",
+      tablet: "TOKENS",
+    },
+    href: "#",
+    subLinks: [
+      { title: "ALL", href: "/src20" },
+      { title: "TRENDING", href: "/src20?type=trending" },
+      { title: "DEPLOY", href: "/tool/src20/deploy" },
+      { title: "MINT", href: "/tool/src20/mint" },
+      { title: "TRANSFER", href: "/tool/src20/transfer" },
+    ],
+  },
+  {
+    title: {
+      default: "BITNAME DOMAINS",
+      tablet: "BITNAME",
+    },
+    href: "#",
+    subLinks: [
+      { title: "REGISTER", href: "/tool/src101/mint" },
+    ],
+  },
+];
+*/

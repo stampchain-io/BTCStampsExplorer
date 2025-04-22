@@ -4,7 +4,7 @@
 // Global sizes
 const inputFieldHeight = "h-10";
 const inputFieldWidth = "!w-10";
-const inputFieldHeightLarge = "h-12";
+const inputFieldHeightLarge = "h-11";
 
 // Input field styles
 const inputFieldStyle = `p-3 w-full
@@ -21,7 +21,7 @@ export const inputField = `
 
 // Outline input - most styling of this input field is done in the outlineGradient constant
 export const inputFieldOutline = `
-  ${inputFieldHeightLarge} w-full
+  ${inputFieldHeight} w-full
 `;
 
 // Textarea

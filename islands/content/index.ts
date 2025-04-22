@@ -18,7 +18,8 @@ export { default as WalletProfileContent } from "$islands/content/WalletProfileC
 export * from "$islands/content/faqContent/AccordionBase.tsx";
 export * from "$islands/content/faqContent/FaqAccordion.tsx";
 
-/* ===== BLOCK ===== */
+/* ===== EXPLORER ===== */
+export * from "$islands/content/ExplorerContent.tsx";
 /*@baba-refactor block content (page is WIP) */
 export { default as BlockSelector } from "$islands/content/blockContent/BlockSelector.tsx";
 export { default as BlockTransactions } from "$islands/content/blockContent/BlockTransactions.tsx";

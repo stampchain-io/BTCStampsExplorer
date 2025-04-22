@@ -4,7 +4,7 @@
 // Main body styles
 export const body = "flex flex-col w-full";
 export const bodyTool = `
-  ${body} mobileMd:max-w-[480px] mobileMd:mx-auto
+  ${body} mobileMd:max-w-[420px] mobileMd:mx-auto
 `;
 export const bodyArticle = `
   ${body} tablet:max-w-[922px] tablet:mx-auto
@@ -30,6 +30,10 @@ export const containerRowForm = "flex w-full gap-5"; // Form input fields specif
 /* ===== ROW STYLES ===== */
 export const rowForm = "flex w-full";
 export const rowResponsiveForm = "flex flex-col mobileMd:flex-row w-full gap-5";
+export const rowTable =
+  "h-7 hover:bg-stamp-purple-bright/15 transition-colors duration-100";
+export const rowCardHover =
+  "p-3 border-y-2 border-x-0 border-transparent group-hover:border-stamp-purple-bright";
 
 /* ===== COL STYLES ===== */
 
@@ -44,6 +48,7 @@ export const modalBgCenter =
   "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#000000] bg-opacity-70 backdrop-filter backdrop-blur-md";
 
 /* ===== LOADER STYLES ===== */
+// Text loader styles are defined in /text/styles.ts
 // Internal loader style
 const loaderSpin = "animate-spin rounded-full border-b-[3px]";
 // Loader styles
@@ -52,13 +57,13 @@ export const loaderSpinXsGrey =
 export const loaderSpinSmGrey =
   `animate-spin rounded-full border-b-[2px] w-5 h-5 border-stamp-grey`;
 export const loaderSpinGrey = `${loaderSpin} w-7 h-7 border-stamp-grey`;
-export const loaderSpinLgGrey = `${loaderSpin} w-10 h-10 border-stamp-grey`;
+export const loaderSpinLgGrey = `${loaderSpin} w-9 h-9 border-stamp-grey`;
 export const loaderSpinXsPurple =
   `animate-spin rounded-full border-b-[2px] w-3 h-3 border-stamp-purple`;
 export const loaderSpinSmPurple =
   `animate-spin rounded-full border-b-[2px] w-5 h-5 border-stamp-purple`;
 export const loaderSpinPurple = `${loaderSpin} w-7 h-7 border-stamp-purple`;
-export const loaderSpinLgPurple = `${loaderSpin} w-10 h-10 border-stamp-purple`;
+export const loaderSpinLgPurple = `${loaderSpin} w-9 h-9 border-stamp-purple`;
 
 /* ===== LEGACY STYLES - not checked yet ===== */
 export const modalBgTop =

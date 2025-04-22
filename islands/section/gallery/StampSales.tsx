@@ -159,7 +159,7 @@ export function StampSalesGallery({
       <div class="flex flex-col">
         <StampGallery {...sectionProps} />
         {isLoading && (
-          <div class="flex items-center gap-3 -mt-7 mb-2">
+          <div class="flex items-center gap-3 -mt-[29px] mb-[9px]">
             <div class={loaderSpinXsPurple} />
             <div class="animate-pulse font-medium text-sm text-stamp-purple">
               REFRESHING

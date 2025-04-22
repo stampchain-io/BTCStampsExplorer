@@ -26,5 +26,6 @@ export { default as AboutHeader } from "$islands/header/AboutHeader.tsx";
 /* ===== FAQ ===== */
 export * from "$components/header/FaqHeader.tsx";
 
-/* ===== BLOCK ===== */
+/* ===== EXPLORER ===== */
+export * from "$islands/header/ExplorerHeader.tsx";
 export { default as BlockHeader } from "$islands/header/BlockHeader.tsx";

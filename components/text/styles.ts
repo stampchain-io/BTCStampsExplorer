@@ -1,13 +1,12 @@
 /* ===== TEXT STYLES MODULE ===== */
 
 /* ===== BASE STYLES ===== */
-const logoFont = "font-black italic text-4xl tracking-wide inline-block w-fit";
-const titleFont =
-  "font-black text-3xl mobileMd:text-4xl tracking-wide inline-block w-fit";
-const subtitleFont = "font-extralight text-2xl mobileMd:text-3xl mb-2";
+const logoFont = "font-black italic text-3xl tracking-wide inline-block w-fit";
+const titleFont = "font-black text-3xl tracking-wide inline-block w-fit";
+const subtitleFont = "font-extralight text-2xl mb-2";
 const textFont = "font-normal text-stamp-grey-light";
-const labelFont = "font-light text-stamp-grey-darker";
-const valueFont = "font-bold text-stamp-grey-light";
+const labelFont = "font-light text-stamp-grey-darker tracking-wide";
+const valueFont = "font-normal text-stamp-grey-light";
 const cursor = "cursor-default select-none whitespace-nowrap";
 const transition = "transition-colors duration-300";
 
@@ -25,14 +24,19 @@ export const logoPurpleLDLink =
   `${logoFont} purple-gradient4-hover ${transition}`; // used in header
 
 /* ===== NAVIGATION STYLES ===== */
+// Header - Desktop
 export const navLinkPurple =
-  `font-medium tablet:font-bold text-sm hover:text-stamp-purple-bright ${transition} ${cursor}`; // transparent text - ued with the overlayPurple class -  used in footer
-export const navLinkPurpleThick =
-  `font-extrabold text-stamp-purple group-hover:text-stamp-purple-bright tracking-wide ${transition} ${cursor}`; // used in header - desktop menu
+  `font-extrabold text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wide ${transition} ${cursor}`;
+export const navSublinkPurple =
+  `font-semibold text-stamp-purple text-xs hover:text-stamp-purple-bright ${transition} ${cursor}`; // used in ConnectButton.tsx for connected sunmenu links - header uses custom styles
+// Header - Mobile/tablet
 export const navLinkGrey =
-  `font-extrabold text-lg text-stamp-grey-darker group-hover:text-stamp-grey tracking-wide ${transition} ${cursor}`; // used in header - mobile menu
+  `font-bold text-lg text-stamp-grey-darker group-hover:text-stamp-grey tracking-wide ${transition} ${cursor}`;
 export const navLinkGreyLD =
-  `font-extrabold text-2xl gray-gradient1-hover tracking-wide inline-block w-fit ${transition} ${cursor}`; // used in header - mobile menu
+  `font-extrabold text-xl gray-gradient1-hover tracking-wide inline-block w-fit ${transition} ${cursor}`;
+// Footer - transparent text - ued with the overlayPurple class
+export const navLinkTransparentPurple =
+  `font-semibold text-xs hover:text-stamp-purple-bright ${transition} ${cursor}`;
 
 /* ===== TITLE STYLES ===== */
 export const titleGreyLD = `${titleFont} gray-gradient1 ${cursor}`;
@@ -51,9 +55,11 @@ export const headingGrey2 =
 export const headingGreyLD =
   `font-bold text-xl gray-gradient1 tracking-wide inline-block w-fit relative ${cursor}`;
 export const headingGreyLDLink =
-  `font-bold text-xl gray-gradient1-hover tracking-wide inline-block w-fit relative ${transition}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
+  `font-bold text-lg gray-gradient1-hover tracking-wide inline-block w-fit relative ${transition}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
 export const headingGrey =
-  "font-bold text-2xl mobileMd:text-3xl text-stamp-grey tracking-wide cursor-default select-none";
+  "font-bold text-2xl text-stamp-grey cursor-default select-none"; // used in howto overview and detail pages / donate CTA
+export const headingPurpleLD =
+  "font-black text-sm mobileMd:text-lg purple-gradient3 tracking-wide inline-block w-fit text-center mt-3 mobileMd:mt-4 mobileLg:mt-5 mb-1 mobileMd:mb-0"; // used specifically in team banner gallery
 
 /* ===== BODY TEXT STYLES ===== */
 export const textXxs = `${textFont} text-[10px]`;
@@ -75,10 +81,15 @@ export const labelSm = `${labelFont} text-sm ${cursor}`;
 export const label = `${labelFont} text-base ${cursor}`; // = old dataLabel name
 export const labelLg = `${labelFont} text-lg ${cursor}`;
 export const labelXl = `${labelFont} text-xl ${cursor}`;
+export const labelSmPurple =
+  `font-light text-sm text-stamp-purple-bright tracking-wide mb-0.5 ${cursor}`;
 
 /* ===== VALUE STYLES ===== */
+// Grey variants
 export const valueXs = `${valueFont} text-xs ${cursor}`;
 export const valueSm = `${valueFont} text-sm ${cursor}`;
+export const valueSmLink =
+  `${valueFont} text-sm hover:text-stamp-purple-bright transition-colors duration-300 cursor-pointer w-full ${cursor}`;
 export const value = `${valueFont} text-base ${cursor}`;
 export const valueLg = `${valueFont} text-lg ${cursor}`;
 export const valueXl =
@@ -87,9 +98,24 @@ export const value2xl =
   `font-black text-2xl text-stamp-grey-light -mt-1 ${cursor}`;
 export const value3xl =
   `font-black text-3xl text-stamp-grey-light -mt-1 ${cursor}`;
-export const valueDark = `font-bold text-base text-stamp-grey-darker ${cursor}`;
+// Transparent variants
+export const value2xlTransparent = `font-black text-2xl -mt-1 ${cursor}`;
+export const value3xlTransparent = `font-black text-3xl -mt-1 ${cursor}`; // used in DataTableBase.tsx
+// Purple variants
+export const valueSmPurple =
+  `font-medium text-xs text-stamp-purple text-center whitespace-nowrap ${cursor}`; // used in team banner gallery
+export const value2xlPurpleGlow =
+  "font-black text-2xl text-black text-stroke-glow-small";
+export const value5xlPurpleGlow =
+  "font-black text-5xl text-black text-stroke-glow-small";
+export const value7xlPurpleGlow =
+  "font-black text-7xl text-black text-stroke-glow-large";
+// Dark variants
+export const valueDarkXs =
+  `font-medium text-xs text-stamp-grey-darker tracking-tighter ${cursor}`; // used for addy styling in mobile/table header
 export const valueDarkSm =
-  `font-medium text-sm text-stamp-grey-darker tracking-tighter ${cursor}`; // used for addy styling in mobile/table/desktop header
+  `font-medium text-sm text-stamp-grey-darker tracking-tighter ${cursor}`; // used for addy styling in desktop header
+export const valueDark = `font-bold text-base text-stamp-grey-darker ${cursor}`;
 
 /* ===== TOOLTIP STYLES ===== */
 // One text style for tooltips - defined in /notifications/styles.ts
@@ -99,9 +125,11 @@ export const valueDarkSm =
 
 /* ===== SPECIAL TEXT STYLES ===== */
 export const tagline =
-  `font-regular text-sm bg-gradient-to-r from-[#660099] via-[#8800CC] to-[#AA00FF] text-transparent bg-clip-text ${cursor}`; // used in footer
+  `font-regular text-xs bg-gradient-to-r from-[#660099] via-[#8800CC] to-[#AA00FF] text-transparent bg-clip-text ${cursor}`; // used in footer
 export const copyright =
   `font-normal text-xs mobileMd:text-sm tablet:text-xs ${cursor}`; // transparent text - ued with the overlayPurple class - used in footer
+export const loaderText =
+  `font-medium text-base text-stamp-grey uppercase text-center py-3 animated-text-loader ${cursor}`;
 
 // Captions - used for stamp/token cards
 // Errors - used for error messages - to be defined in /notifications/styles.ts
@@ -112,32 +140,16 @@ export const copyright =
 
 /* ===== LEGACY STYLES ===== */
 // Update the legacy styles to new styles
-// About page
-export const dataLabelPurple =
-  "font-light text-base text-stamp-purple-highlight mb-0.5";
-export const dataValuePurpleSm =
-  "text-2xl mobileLg:text-3xl font-black text-black text-stroke-glow-small";
-export const dataValuePurple =
-  "text-4xl mobileLg:text-5xl desktop:text-6xl font-black text-black text-stroke-glow-small";
-export const dataValuePurpleXl =
-  "text-6xl mobileLg:text-7xl desktop:text-8xl font-black text-black text-stroke-glow-large";
-export const aboutTitlePurpleLD =
-  "text-sm mobileMd:text-lg mobileLg:text-xl font-black purple-gradient1 text-center mt-3 mobileMd:mt-4 mobileLg:mt-5 mb-1 mobileMd:mb-0";
-export const aboutSubTitlePurple =
-  "text-xs mobileMd:text-base font-medium text-stamp-purple text-center whitespace-nowrap";
 export const dataLabel =
   "text-base mobileLg:text-lg font-light text-red-500 uppercase"; // check where used
 export const dataValue =
   "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase"; // check where used
 export const dataValueLg =
   "text-xl mobileLg:text-2xl font-medium text-stamp-grey-light uppercase"; // check where used
-
 // Tables
 export const dataValueXL =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
 export const dataValueXLlink = "text-3xl mobileLg:text-4xl font-black -mt-1";
-export const textLoader =
-  "text-sm mobileLg:text-base font-medium text-stamp-grey uppercase text-center py-3 animated-text-loader";
 
 /* ===== TYPE DEFINITIONS ===== */
 export type TextStyles = {
@@ -148,9 +160,10 @@ export type TextStyles = {
   logoPurpleLDLink: string;
   // Navigation styles
   navLinkPurple: string;
-  navLinkPurpleThick: string;
+  navSublinkPurple: string;
   navLinkGrey: string;
   navLinkGreyLD: string;
+  navLinkTransparentPurple: string;
   // Title styles
   titleGreyLD: string;
   titleGreyDL: string;
@@ -161,8 +174,10 @@ export type TextStyles = {
   subtitlePurple: string;
   // Heading styles
   headingGrey2: string;
+  headingGreyLD: string;
   headingGreyLDLink: string;
   headingGrey: string;
+  headingPurpleLD: string;
   // Body text styles
   textXxs: string;
   textXs: string;
@@ -172,33 +187,39 @@ export type TextStyles = {
   textXl: string;
   textLinkUnderline: string;
   // Label styles
+  labelXs: string;
   labelSm: string;
   label: string;
   labelLg: string;
   labelXl: string;
+  labelSmPurple: string;
   // Value styles
+  valueXs: string;
   valueSm: string;
+  valueSmLink: string;
   value: string;
   valueLg: string;
   valueXl: string;
   value2xl: string;
   value3xl: string;
+  value2xlTransparent: string;
+  value3xlTransparent: string;
+  valueSmPurple: string;
+  value2xlPurpleGlow: string;
+  value5xlPurpleGlow: string;
+  value7xlPurpleGlow: string;
   valueDarkSm: string;
+  valueDarkXs: string;
+  valueDark: string;
   // Special text styles
   tagline: string;
   copyright: string;
+  loaderText: string;
   // Legacy styles
-  dataLabelPurple: string;
-  dataValuePurpleSm: string;
-  dataValuePurple: string;
-  dataValuePurpleXl: string;
-  aboutTitlePurpleLD: string;
-  aboutSubTitlePurple: string;
   dataLabel: string;
   dataValue: string;
   dataValueLg: string;
   // Table styles
   dataValueXL: string;
   dataValueXLlink: string;
-  textLoader: string;
 };

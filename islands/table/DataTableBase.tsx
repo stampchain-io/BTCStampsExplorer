@@ -1,20 +1,16 @@
 /* ===== DATA TABLE BASE COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { ScrollContainer } from "$layout";
+import { TabData, TableProps, TableType } from "$components/layout/types.ts";
 import {
   container,
-  dataLabel,
-  dataValueXLlink,
   SRC20MintsTable,
   SRC20TransfersTable,
   StampListingsAllTable,
   StampSalesTable,
   StampTransfersTable,
-  TabData,
-  TableProps,
-  TableType,
-  textLoader,
 } from "$table";
+import { labelSm, loaderText, value3xlTransparent } from "$text";
 
 /* ===== CONSTANTS ===== */
 const PAGE_SIZE = 20;
@@ -285,12 +281,12 @@ export default function DataTableBase({
               onClick={() => setSelectedTab(id)}
             >
               <span
-                class={`${dataLabel} group-hover:text-stamp-grey-light`}
+                class={`${labelSm} group-hover:text-stamp-grey-light`}
               >
                 {getTabLabel(type, id)}
               </span>
               <div
-                class={`${dataValueXLlink} text-stamp-grey-darker ${
+                class={`${value3xlTransparent} text-stamp-grey-darker ${
                   selectedTab === id ? "text-stamp-grey-light" : ""
                 } group-hover:text-stamp-grey-light`}
               >
@@ -306,7 +302,7 @@ export default function DataTableBase({
           {renderTabContent()}
           {/* ===== LOADING INDICATOR ===== */}
           {isLoading && (
-            <div class={textLoader}>
+            <div class={loaderText}>
               <span>L</span>
               <span>O</span>
               <span>A</span>

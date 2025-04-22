@@ -7,7 +7,7 @@ import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { DEFAULT_WALLET_CONNECTORS } from "$lib/utils/constants.ts";
 import { Button } from "$button";
-import { navLinkPurple, valueDarkSm } from "$text";
+import { navSublinkPurple, valueDarkSm, valueDarkXs } from "$text";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 
 /* ===== MAIN WALLET MODAL COMPONENT ===== */
@@ -136,26 +136,26 @@ export const ConnectButton = () => {
 
           {/* ===== DESKTOP DROPDOWN MENU ===== */}
           <div class="hidden tablet:flex items-center relative group">
-            <div class="font-extrabold text-base text-transparent bg-clip-text bg-gradient-to-r from-stamp-purple to-stamp-purple-bright group-hover:text-stamp-purple-bright tracking-wider cursor-pointer select-none">
+            <div class="font-extrabold text-sm text-transparent bg-clip-text bg-gradient-to-r from-stamp-purple to-stamp-purple-bright group-hover:text-stamp-purple-bright tracking-wider cursor-pointer select-none">
               CONNECTED
             </div>
 
-            <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-20
-                        pt-1 pb-3.5 
-                        backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
-              <div class="flex flex-col px-[18px] gap-1 whitespace-nowrap">
-                <h6 class={`${valueDarkSm} pb-0.5`}>
+            <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 z-20
+                        min-w-[calc(100%+36px)] pt-1 pb-3.5 rounded-b-lg
+                        backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30">
+              <div class="flex flex-col px-[18px] gap-1 text-center whitespace-nowrap">
+                <h6 class={`${valueDarkXs} py-0.5`}>
                   {abbreviateAddress(address, 6)}
                 </h6>
                 <a
                   href={`/wallet/${address}`}
-                  class={`${navLinkPurple} text-stamp-purple`}
+                  class={`${navSublinkPurple}`}
                 >
                   DASHBOARD
                 </a>
                 <a
                   onClick={() => walletSignOut()}
-                  class={`${navLinkPurple} text-stamp-purple`}
+                  class={`${navSublinkPurple}`}
                 >
                   DISCONNECT
                 </a>

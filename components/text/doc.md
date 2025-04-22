@@ -106,7 +106,7 @@
  * Interactive Elements
  * ------------------
  * Navigation:
- * - navLinkPurple: Purple colored text with hover color change - used in Footer navigation
+ * - navLinkTransparentPurple: Purple colored text with hover color change - used in Footer navigation
  * - navLinkGreyLD: Light to dark grey gradient text - used in Mobile menu items
  * 
  * Links:
@@ -138,10 +138,10 @@
  * @example
  * // Header navigation
  * <nav className="flex gap-4">
- *   <a href="/explore" className={navLinkPurpleThick}>
+ *   <a href="/explore" className={navLinkPurple}>
  *     Explore
  *   </a>
- *   <a href="/create" className={navLinkPurpleThick}>
+ *   <a href="/create" className={navLinkPurple}>
  *     Create
  *   </a>
  * </nav>

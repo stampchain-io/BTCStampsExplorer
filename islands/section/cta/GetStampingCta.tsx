@@ -76,9 +76,7 @@ export function GetStampingCta() {
             whooping 65kB.
           </p>
           <p>
-            <span className={textLg}>
-              <b>Time to get stamping !</b>
-            </span>
+            <b>Time to get stamping !</b>
           </p>
         </div>
       </div>
@@ -111,13 +109,13 @@ export function GetStampingCta() {
           <p>
             <span className="text-stamp-grey-darker">FEE</span>&nbsp;
             {isLoading
-              ? <span class="loading-skeleton w-12 h-6 inline-block" />
+              ? <span className="animate-pulse">XX</span>
               : <span className="font-medium">{displayFee}</span>} SAT/vB
           </p>
           <p>
             <span className="text-stamp-grey-darker">BTC</span>&nbsp;
             {isLoading
-              ? <span class="loading-skeleton w-20 h-6 inline-block" />
+              ? <span className="animate-pulse">XX,XXX</span>
               : <span className="font-medium">{displayPrice}</span>} USD
           </p>
         </div>

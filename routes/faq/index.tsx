@@ -34,7 +34,7 @@ export default function FaqPage() {
           </div>
 
           {/* ===== ACCORDION SUBSECTION ===== */}
-          <div className="grid grid-cols-1 tablet:grid-cols-2 gap-3 tablet:gap-x-grid-desktop tablet:gap-y-3">
+          <div className="grid grid-cols-1 tablet:grid-cols-2 gap-3 tablet:gap-9 tablet:gap-y-3">
             {section.items.map((item) => (
               <FaqAccordion key={item.title} item={item} />
             ))}

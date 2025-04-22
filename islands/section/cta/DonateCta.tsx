@@ -5,7 +5,13 @@ import { StampRow } from "$globals";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
 import DonateStampModal from "$islands/modal/DonateStampModal.tsx";
 import { DonateStampData, Transaction, TxOutput } from "$layout";
-import { headingGrey, label, subtitlePurple, text, titlePurpleLD } from "$text";
+import {
+  headingGrey,
+  labelSm,
+  subtitlePurple,
+  text,
+  titlePurpleLD,
+} from "$text";
 import { tooltipIcon } from "$notification";
 import { Button } from "$button";
 import { Icon } from "$icon";
@@ -327,7 +333,7 @@ export default function DonateCta() {
             </p>
             <div className="grid grid-cols-12 mt-6 mb-6">
               <div className="col-span-6 flex flex-col justify-center items-center">
-                <h6 className={`${label} mb-0`}>
+                <h6 className={`${labelSm} mb-0`}>
                   MONTHLY EXPENSES
                 </h6>
                 <h6 className={headingGrey}>
@@ -335,7 +341,7 @@ export default function DonateCta() {
                 </h6>
               </div>
               <div className="col-span-6 flex flex-col justify-center items-center">
-                <h6 className={label}>
+                <h6 className={labelSm}>
                   <span className="hidden min-[420px]:inline">
                     {currentMonth}
                   </span>{" "}

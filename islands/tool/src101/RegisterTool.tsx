@@ -190,7 +190,7 @@ export function SRC101RegisterTool({
               type="text"
               placeholder="bitname"
               id="search-dropdown"
-              class={inputFieldOutline}
+              class={`${inputFieldOutline} pt-1`}
               required
               value={formState.toAddress || ""}
               onChange={(e) => handleInputChange(e, "toAddress")}
@@ -210,7 +210,7 @@ export function SRC101RegisterTool({
                   setAllowTldTooltip(false);
                   setIsTldTooltipVisible(false);
                 }}
-                className="h-12 min-w-20 mt-[1px] px-5 rounded-md bg-transparent font-bold text-base text-stamp-grey text-right hover:text-stamp-grey-light tracking-wider transition-colors duration-300 focus-visible:!outline-none"
+                className="h-11 min-w-20 mt-[1px] px-5 rounded-md bg-transparent font-bold text-base text-stamp-grey text-right hover:text-stamp-grey-light tracking-wider transition-colors duration-300 focus-visible:!outline-none"
                 onMouseEnter={handleTldMouseEnter}
                 onMouseLeave={handleTldMouseLeave}
                 aria-label="Select top level domain"
@@ -265,7 +265,7 @@ export function SRC101RegisterTool({
               type="button"
               variant="outline"
               color="purple"
-              size="lg"
+              size="md"
               onClick={checkAvailability}
               aria-label="Check bitname availability"
             >
