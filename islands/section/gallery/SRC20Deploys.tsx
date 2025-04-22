@@ -56,7 +56,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
       {/* ===== LOADING OR CONTENT ===== */}
       {isLoading
         ? (
-          <div class="w-full grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-3 desktop:grid-cols-4 gap-6">
+          <div class="w-full grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-5 gap-6">
             {[...Array(5)].map((_, index) => (
               <div
                 key={index}
@@ -66,7 +66,7 @@ export default function SRC20DeploysGallery(): JSX.Element {
           </div>
         )
         : (
-          <div class="w-full grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-3 desktop:grid-cols-4 gap-6">
+          <div class="w-full grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-4 desktop:grid-cols-5 gap-6">
             {transactions.map((stamp, index) => (
               <StampCard
                 key={index}

@@ -117,20 +117,21 @@ export default function CollectionLandingPage(
       layout: "grid",
       showDetails: false,
       gridClass: `
-        grid w-full
-        gap-3
-        mobileMd:gap-6
-        grid-cols-2
-        mobileLg:grid-cols-3
-        tablet:grid-cols-4
-        desktop:grid-cols-5
-        auto-rows-fr
-      `,
+      grid w-full gap-6
+      grid-cols-3
+      mobileSm:grid-cols-3
+      mobileMd:grid-cols-4
+      mobileLg:grid-cols-5
+      tablet:grid-cols-6
+      desktop:grid-cols-7
+      auto-rows-fr
+    `,
       displayCounts: {
-        "mobileSm": 6, // 2 columns x 3 rows
-        "mobileLg": 9, // 3 columns x 3 rows
-        "tablet": 12, // 4 columns x 3 rows
-        "desktop": 20, // 5 columns x 4 rows
+        "mobileSm": 6, // 3 columns x 2 rows
+        "mobileMd": 8, // 4 columns x 2 rows
+        "mobileLg": 10, // 5 columns x 2 rows
+        "tablet": 12, // 6 columns x 2 rows
+        "desktop": 14, // 87columns x 2 rows
       },
       viewAllLink: "/collection/overview/posh",
     },
@@ -141,21 +142,21 @@ export default function CollectionLandingPage(
       layout: "grid",
       showDetails: false,
       gridClass: `
-        grid w-full
-        gap-3
-        mobileMd:gap-6
-        grid-cols-3
-        mobileSm:grid-cols-3
-        mobileLg:grid-cols-4
-        tablet:grid-cols-5
-        desktop:grid-cols-6
+        grid w-full gap-6
+        grid-cols-4
+        mobileSm:grid-cols-4
+        mobileMd:grid-cols-5
+        mobileLg:grid-cols-6
+        tablet:grid-cols-7
+        desktop:grid-cols-8
         auto-rows-fr
       `,
       displayCounts: {
-        "mobileSm": 6, // 3 columns x 2 rows
-        "mobileLg": 8, // 4 columns x 2 rows
-        "tablet": 10, // 5 columns x 2 rows
-        "desktop": 12, // 6 columns x 2 rows
+        "mobileSm": 8, // 4 columns x 2 rows
+        "mobileMd": 10, // 5 columns x 2 rows
+        "mobileLg": 12, // 6 columns x 2 rows
+        "tablet": 14, // 7 columns x 2 rows
+        "desktop": 16, // 8 columns x 2 rows
       },
       viewAllLink: "/collection/overview/recursive",
     },
@@ -166,14 +167,16 @@ export default function CollectionLandingPage(
     subTitle: "STAMP COLLECTIONS",
     collections: collections,
     gridClass: `
-      grid gap-3 mobileLg:gap-6
-      grid-cols-2 tablet:grid-cols-3
+      grid gap-6
+      grid-cols-3 
+      tablet:grid-cols-4 
+      desktop:grid-cols-5
     `,
     displayCounts: {
-      "mobileSm": 2, // 2 columns x 1 rows
-      "mobileLg": 2, // 2 columns x 1 rows
-      "tablet": 3, // 3 columns x 1 rows
-      "desktop": 3, // 3 columns x 1 rows
+      "mobileSm": 3, // 2 columns x 1 rows
+      "mobileLg": 3, // 2 columns x 1 rows
+      "tablet": 4, // 3 columns x 1 rows
+      "desktop": 5, // 4 columns x 1 rows
     },
   };
 
@@ -182,14 +185,16 @@ export default function CollectionLandingPage(
     subTitle: "SRC-721r COLLECTIONS",
     collections: collections,
     gridClass: `
-      grid gap-3 mobileLg:gap-6
-      grid-cols-2 tablet:grid-cols-3 desktop:grid-cols-4
+      grid gap-6
+      grid-cols-3 
+      tablet:grid-cols-4 
+      desktop:grid-cols-5
     `,
     displayCounts: {
-      "mobileSm": 2, // 2 columns x 1 rows
-      "mobileLg": 2, // 2 columns x 1 rows
-      "tablet": 3, // 3 columns x 1 rows
-      "desktop": 4, // 4 columns x 1 rows
+      "mobileSm": 3, // 2 columns x 1 rows
+      "mobileLg": 3, // 2 columns x 1 rows
+      "tablet": 4, // 3 columns x 1 rows
+      "desktop": 5, // 4 columns x 1 rows
     },
   };
 

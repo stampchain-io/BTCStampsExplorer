@@ -113,7 +113,7 @@ export function Footer() {
     ">
       {/* ===== BACKGROUND LOGO ===== */}
       <img
-        src="/img/home/stampchain-logo-480.svg"
+        src="/img/stampchain-logo-480.svg"
         alt=""
         className="
           absolute z-[-999]

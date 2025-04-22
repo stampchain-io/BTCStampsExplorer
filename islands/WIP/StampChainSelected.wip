@@ -52,7 +52,7 @@ export const HomeStampChainSelected = () => {
             </div>
           </div>
         </div>
-        <img src="/img/home/stamp.png" alt="Stamp" />
+        <img src="/img/stampchain-logo-480.svg" alt="Stamp" />
       </div>
     </div>
   );

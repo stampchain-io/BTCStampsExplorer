@@ -260,7 +260,7 @@ export function FeeCalculatorBase({
             handleChangeFee(
               sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
             )}
-          className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey
+          className={`w-full h-1.5 tablet:h-1 rounded-lg appearance-none cursor-pointer bg-stamp-grey
            ${sliderKnob}`}
         />
         <div

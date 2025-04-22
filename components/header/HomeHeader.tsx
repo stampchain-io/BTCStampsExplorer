@@ -41,7 +41,7 @@ export function HomeHeader() {
       overflow-visible
     ">
       <img
-        src="/img/home/stampchain-logo-480.svg"
+        src="/img/stampchain-logo-480.svg"
         alt=""
         class="
           absolute

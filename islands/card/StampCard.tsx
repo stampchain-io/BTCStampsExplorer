@@ -13,10 +13,13 @@ import {
 
 import { StampRow } from "$globals";
 import { StampTextContent } from "$content";
-import { BREAKPOINTS } from "$lib/utils/constants.ts";
+import {
+  BREAKPOINTS,
+  ERROR_IMAGE,
+  NOT_AVAILABLE_IMAGE,
+} from "$lib/utils/constants.ts";
 import { useEffect, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { ABBREVIATION_LENGTHS, TEXT_STYLES } from "$card";
 
@@ -110,7 +113,7 @@ export function StampCard({
             <div class="stamp-container">
               <div class="relative z-10 aspect-square">
                 <img
-                  src={NOT_AVAILABLE_IMAGE}
+                  src={ERROR_IMAGE}
                   alt="Invalid SVG"
                   class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
                 />
@@ -267,10 +270,10 @@ export function StampCard({
     }
 
     // Handle floor price or recent sale price
-    const price = stamp.floorPrice !== "priceless"
+    const price = stamp.floorPrice !== "N/A"
       ? stamp.floorPrice
       : stamp.recentSalePrice;
-    if (price !== "priceless" && !isNaN(Number(price))) {
+    if (price !== "N/A" && !isNaN(Number(price))) {
       return {
         text: `${stripTrailingZeros(Number(price).toFixed(8))} BTC`,
         style: TEXT_STYLES.price,
