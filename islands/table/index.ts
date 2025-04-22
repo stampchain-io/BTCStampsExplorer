@@ -12,7 +12,6 @@ export { StampListingsOpenTable } from "$components/table/stampDataTable/StampLi
 export type { Dispenser } from "$components/table/stampDataTable/StampListingsOpen.tsx";
 export * from "$components/table/stampDataTable/StampSales.tsx";
 export * from "$components/table/stampDataTable/StampTransfers.tsx";
-export * from "$components/table/stampDataTable/StampVaults.tsx";
 
 export { default as DataTableBase } from "$islands/table/DataTableBase.tsx";
 export { default as HoldersTableBase } from "$islands/table/HoldersTableBase.tsx";

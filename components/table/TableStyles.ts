@@ -8,88 +8,15 @@ export const dataValue =
 export const dataValueXL =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
 export const dataValueXLlink = "text-3xl mobileLg:text-4xl font-black -mt-1";
-export const textLoader =
-  "text-sm mobileLg:text-base font-medium text-stamp-grey uppercase text-center py-3 animated-text-loader";
 // Content styles
 export const tableStatus =
   "text-base mobileLg:text-lg font-light text-stamp-grey-light";
 export const tableLabel =
   "text-sm font-light text-stamp-grey-darker uppercase pb-1.5";
-export const tableValue = "text-sm font-normal text-stamp-grey-light w-full";
+export const tableValue = "text-xs font-normal text-stamp-grey-light w-full";
 export const tableValueLink =
   "text-sm font-normal text-stamp-grey-light w-full hover:text-stamp-purple-bright transition-colors duration-300 cursor-pointer";
 export const row =
-  "h-8 hover:bg-stamp-purple-bright/15 transition-colors duration-100";
+  "h-7 hover:bg-stamp-purple-bright/15 transition-colors duration-100";
 export const rowCardHover =
   "p-3 border-y-2 border-x-0 border-transparent group-hover:border-stamp-purple-bright";
-
-// Table types
-export type TableType = "stamps" | "src20" | "src101" | "vault";
-
-// Table title tabs
-// Table type/counts
-export interface TableProps {
-  type: TableType;
-  configs: Array<{ id: string }>;
-  cpid?: string;
-  tick?: string;
-  initialCounts?: {
-    dispensers?: number;
-    sales?: number;
-    transfers?: number;
-    mints?: number;
-  };
-}
-
-export interface TabData {
-  dispensers?: any[];
-  dispenses?: any[];
-  sends?: any[];
-  mints?: any[];
-  transfers?: any[];
-  [key: string]: any[] | undefined;
-}
-
-export interface FetchResponse {
-  data: any[];
-  total: number;
-}
-
-// Table content
-// Default column group
-export const defaultColGroup = {
-  columns: 5,
-  width: "w-[20%]",
-};
-
-// Cell alignment
-export const cellAlignment = {
-  first: "text-left",
-  middle: "text-center",
-  last: "text-right",
-};
-
-// Helper functions
-// Column group
-export const colGroup = (customColumns?: Array<{ width: string }>) => {
-  if (customColumns) {
-    return customColumns.map((col, i) => ({
-      key: i,
-      className: col.width,
-    }));
-  }
-
-  return Array(defaultColGroup.columns)
-    .fill(null)
-    .map((_, i) => ({
-      key: i,
-      className: defaultColGroup.width,
-    }));
-};
-
-// Cell alignment
-export const cellAlign = (index: number, total: number) => {
-  if (index === 0) return cellAlignment.first;
-  if (index === total - 1) return cellAlignment.last;
-  return cellAlignment.middle;
-};

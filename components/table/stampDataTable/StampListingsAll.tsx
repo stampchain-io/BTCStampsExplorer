@@ -2,15 +2,9 @@ import {
   abbreviateAddress,
   formatSatoshisToBTC,
 } from "$lib/utils/formatUtils.ts";
-import {
-  cellAlign,
-  colGroup,
-  row,
-  tableLabel,
-  tableStatus,
-  tableValue,
-  tableValueLink,
-} from "$table";
+import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { rowTable } from "$layout";
+import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface Dispenser {
   source: string;
@@ -39,7 +33,7 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
 
   return (
     <div class="w-[660px] min-[660px]:w-full">
-      <table class={tableValue}>
+      <table class={`${valueSm} w-full`}>
         <colgroup>
           {colGroup([
             { width: "w-[16%]" },
@@ -57,7 +51,7 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
               {headers.map((header, i) => (
                 <th
                   key={i}
-                  class={`${tableLabel} ${cellAlign(i, headers.length)}`}
+                  class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
                 >
                   {header}
                 </th>
@@ -72,7 +66,7 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
               const isEmpty = dispenser.give_remaining === 0;
               const rowDispensersRemain = `${
                 isEmpty ? "text-stamp-grey-darker" : ""
-              } ${row}`;
+              } ${rowTable}`;
 
               return (
                 <tr
@@ -102,7 +96,7 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
                         globalThis.location.href =
                           `/wallet/${dispenser.source}`;
                       }}
-                      className={`${tableValueLink} ${
+                      className={`${valueSmLink} ${
                         isEmpty
                           ? "!text-stamp-grey-darker hover:!text-stamp-purple-bright"
                           : ""
@@ -139,7 +133,7 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
             : (
               <tr>
                 <td
-                  class={`${tableStatus} w-full`}
+                  class={`${valueDark} w-full`}
                 >
                   NO LISTINGS AT THE MOMENT
                 </td>

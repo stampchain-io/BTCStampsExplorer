@@ -1,14 +1,8 @@
-import {
-  cellAlign,
-  colGroup,
-  row,
-  tableLabel,
-  tableStatus,
-  tableValue,
-  tableValueLink,
-} from "$table";
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { SRC20Row } from "$globals";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { rowTable } from "$layout";
+import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface SRC20MintsProps {
   mints: SRC20Row[];
@@ -19,7 +13,7 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
 
   return (
     <div class="w-[500px] min-[500px]:w-full">
-      <table class={tableValue}>
+      <table class={valueSm}>
         <colgroup>
           {colGroup().map((col) => (
             <col key={col.key} className={col.className} />
@@ -31,7 +25,7 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
               {headers.map((header, i) => (
                 <th
                   key={i}
-                  class={`${tableLabel} ${cellAlign(i, headers.length)}`}
+                  class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
                 >
                   {header}
                 </th>
@@ -43,7 +37,7 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
         <tbody>
           {mints?.length
             ? mints?.map((mint) => (
-              <tr key={mint.tx_hash} class={row}>
+              <tr key={mint.tx_hash} class={rowTable}>
                 <td class={cellAlign(0, headers.length)}>
                   {mint.amt}
                 </td>
@@ -54,7 +48,7 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
                       e.preventDefault();
                       globalThis.location.href = `/wallet/${mint.destination}`;
                     }}
-                    className={tableValueLink}
+                    className={valueSmLink}
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(mint.destination, 4)}
@@ -78,7 +72,7 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
                         "_blank",
                       );
                     }}
-                    className={tableValueLink}
+                    className={valueSmLink}
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(mint.tx_hash, 4)}
@@ -96,7 +90,7 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
             : (
               <tr>
                 <td
-                  class={`${tableStatus} w-full`}
+                  class={`${valueDark} w-full`}
                 >
                   NO MINTS YET
                 </td>

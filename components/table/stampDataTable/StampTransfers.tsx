@@ -1,13 +1,7 @@
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
-import {
-  cellAlign,
-  colGroup,
-  row,
-  tableLabel,
-  tableStatus,
-  tableValue,
-  tableValueLink,
-} from "$table";
+import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { rowTable } from "$layout";
+import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface SendRow {
   source: string;
@@ -27,7 +21,7 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
 
   return (
     <div class="w-[500px] min-[500px]:w-full">
-      <table class={tableValue}>
+      <table class={`${valueSm} w-full`}>
         <colgroup>
           {colGroup().map((col) => (
             <col key={col.key} className={col.className} />
@@ -39,7 +33,7 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
               {headers.map((header, i) => (
                 <th
                   key={i}
-                  class={`${tableLabel} ${cellAlign(i, headers.length)}`}
+                  class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
                 >
                   {header}
                 </th>
@@ -51,7 +45,7 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
         <tbody>
           {sends.length
             ? sends?.map((send, index) => (
-              <tr key={`${send.tx_hash}-${index}`} class={row}>
+              <tr key={`${send.tx_hash}-${index}`} class={rowTable}>
                 <td class={cellAlign(0, headers.length)}>
                   {send.source
                     ? (
@@ -61,7 +55,7 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
                           e.preventDefault();
                           globalThis.location.href = `/wallet/${send.source}`;
                         }}
-                        className={tableValueLink}
+                        className={valueSmLink}
                       >
                         <span className="tablet:hidden">
                           {abbreviateAddress(send.source, 4)}
@@ -83,7 +77,7 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
                           globalThis.location.href =
                             `/wallet/${send.destination}`;
                         }}
-                        className={tableValueLink}
+                        className={valueSmLink}
                       >
                         <span className="tablet:hidden">
                           {abbreviateAddress(send.destination, 4)}
@@ -109,7 +103,7 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
                         "_blank",
                       );
                     }}
-                    className={tableValueLink}
+                    className={valueSmLink}
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(send.tx_hash, 4)}
@@ -129,7 +123,7 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
             : (
               <tr>
                 <td
-                  class={`${tableStatus} w-full`}
+                  class={`${valueDark} w-full`}
                 >
                   NO TRANSFERS
                 </td>

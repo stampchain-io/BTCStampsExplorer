@@ -6,7 +6,7 @@ const titleFont = "font-black text-3xl tracking-wide inline-block w-fit";
 const subtitleFont = "font-extralight text-2xl mb-2";
 const textFont = "font-normal text-stamp-grey-light";
 const labelFont = "font-light text-stamp-grey-darker tracking-wide";
-const valueFont = "font-normal text-stamp-grey-light";
+const valueFont = "font-medium text-stamp-grey-light";
 const cursor = "cursor-default select-none whitespace-nowrap";
 const transition = "transition-colors duration-300";
 

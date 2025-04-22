@@ -1,5 +1,6 @@
 import { HoldersPieChart, HoldersTableBase } from "$table";
-import { label, value3xl } from "$text";
+import { containerBackground } from "$layout";
+import { labelSm, value3xl } from "$text";
 
 interface Holder {
   address: string | null;
@@ -23,9 +24,9 @@ export function HoldersTable({ holders = [] }: HoldersTableProps) {
   const totalHolders = holders.length;
 
   return (
-    <div className="relative flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
+    <div className={containerBackground}>
       <div className="text-left tablet:text-right">
-        <h5 className={label}>HOLDERS</h5>
+        <h5 className={labelSm}>HOLDERS</h5>
         <h6 className={value3xl}>
           {totalHolders}
         </h6>

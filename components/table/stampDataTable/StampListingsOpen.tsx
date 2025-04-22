@@ -1,6 +1,7 @@
 import { formatNumber, formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
-import { ScrollContainer } from "$layout";
-import { cellAlign, colGroup, row, tableLabel, tableValue } from "$table";
+import { rowTable, ScrollContainer } from "$layout";
+import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { labelXs, valueSm } from "$text";
 
 export interface Dispenser {
   source: string;
@@ -35,9 +36,9 @@ export function StampListingsOpenTable({
 
   return (
     <div class="relative w-full">
-      <ScrollContainer class="max-h-48">
+      <ScrollContainer class="max-h-[164px]">
         <div class="w-full">
-          <table class={tableValue}>
+          <table class={`${valueSm} w-full`}>
             <colgroup>
               {colGroup([
                 {
@@ -67,7 +68,7 @@ export function StampListingsOpenTable({
                 {headers.map((header, i) => (
                   <th
                     key={i}
-                    class={`${tableLabel} ${cellAlign(i, headers.length)}`}
+                    class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
                   >
                     {header}
                   </th>
@@ -81,7 +82,7 @@ export function StampListingsOpenTable({
                   (dispenser.satoshirate / 100000000) === floorPrice;
                 const rowDispensers = `${
                   isEmpty ? "text-stamp-grey-darker" : ""
-                } ${row} cursor-pointer group ${
+                } ${rowTable} cursor-pointer group ${
                   selectedDispenser?.source === dispenser.source ||
                     (!selectedDispenser && isFloorPrice)
                     ? "text-stamp-grey-light"

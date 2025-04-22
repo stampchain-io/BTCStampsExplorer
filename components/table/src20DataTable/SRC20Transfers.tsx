@@ -1,14 +1,8 @@
-import {
-  cellAlign,
-  colGroup,
-  row,
-  tableLabel,
-  tableStatus,
-  tableValue,
-  tableValueLink,
-} from "$table";
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { SRC20Row } from "$globals";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { rowTable } from "$layout";
+import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface SRC20TransfersProps {
   sends: SRC20Row[];
@@ -19,7 +13,7 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
 
   return (
     <div class="w-[500px] min-[500px]:w-full">
-      <table class={tableValue}>
+      <table class={valueSm}>
         <colgroup>
           {colGroup().map((col) => (
             <col key={col.key} className={col.className} />
@@ -32,7 +26,7 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
                 {headers.map((header, i) => (
                   <th
                     key={i}
-                    class={`${tableLabel} ${cellAlign(i, headers.length)}`}
+                    class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
                   >
                     {header}
                   </th>
@@ -44,7 +38,7 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
         <tbody>
           {sends?.length
             ? sends?.map((send) => (
-              <tr key={send.tx_hash} class={row}>
+              <tr key={send.tx_hash} class={rowTable}>
                 <td class={cellAlign(0, headers.length)}>
                   <a
                     href={`/wallet/${send.creator}`}
@@ -52,7 +46,7 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
                       e.preventDefault();
                       globalThis.location.href = `/wallet/${send.creator}`;
                     }}
-                    className={tableValueLink}
+                    className={valueSmLink}
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(send.creator, 4)}
@@ -69,7 +63,7 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
                       e.preventDefault();
                       globalThis.location.href = `/wallet/${send.destination}`;
                     }}
-                    className={tableValueLink}
+                    className={valueSmLink}
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(send.destination, 4)}
@@ -96,7 +90,7 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
                         "_blank",
                       );
                     }}
-                    className={tableValueLink}
+                    className={valueSmLink}
                   >
                     <span class="tablet:hidden">
                       {abbreviateAddress(send.tx_hash, 4)}
@@ -111,7 +105,7 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
             : (
               <tr>
                 <td
-                  class={`${tableStatus} w-full`}
+                  class={`${valueDark} w-full`}
                 >
                   NO TRANSFERS
                 </td>

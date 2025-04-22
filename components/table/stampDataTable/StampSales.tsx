@@ -3,15 +3,9 @@ import {
   formatDate,
   formatSatoshisToBTC,
 } from "$lib/utils/formatUtils.ts";
-import {
-  cellAlign,
-  colGroup,
-  row,
-  tableLabel,
-  tableStatus,
-  tableValue,
-  tableValueLink,
-} from "$table";
+import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { rowTable } from "$layout";
+import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface Dispense {
   source: string;
@@ -31,7 +25,7 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
 
   return (
     <div class="w-[500px] min-[500px]:w-full">
-      <table class={tableValue}>
+      <table class={`${valueSm} w-full`}>
         <colgroup>
           {colGroup().map((col) => (
             <col key={col.key} className={col.className} />
@@ -43,7 +37,7 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
               {headers.map((header, i) => (
                 <th
                   key={i}
-                  class={`${tableLabel} ${cellAlign(i, headers.length)}`}
+                  class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
                 >
                   {header}
                 </th>
@@ -55,7 +49,7 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
         <tbody>
           {dispenses.length
             ? dispenses?.map((dispense, index) => (
-              <tr key={`${dispense.tx_hash}-${index}`} class={row}>
+              <tr key={`${dispense.tx_hash}-${index}`} class={rowTable}>
                 <td class={cellAlign(0, headers.length)}>
                   <a
                     href={`/wallet/${dispense.source}`}
@@ -63,7 +57,7 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
                       e.preventDefault();
                       globalThis.location.href = `/wallet/${dispense.source}`;
                     }}
-                    className={tableValueLink}
+                    className={valueSmLink}
                   >
                     <span className="tablet:hidden">
                       {abbreviateAddress(dispense.source, 4)}
@@ -81,7 +75,7 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
                       globalThis.location.href =
                         `/wallet/${dispense.destination}`;
                     }}
-                    className={tableValueLink}
+                    className={valueSmLink}
                   >
                     <span className="tablet:hidden">
                       {abbreviateAddress(dispense.destination, 4)}
@@ -109,7 +103,7 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
             : (
               <tr>
                 <td
-                  class={`${tableStatus} w-full`}
+                  class={`${valueDark} w-full`}
                 >
                   NO SALES YET
                 </td>

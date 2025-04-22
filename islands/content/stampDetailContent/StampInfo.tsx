@@ -1,5 +1,5 @@
 /* ===== STAMP INFO COMPONENT ===== */
-/*@baba-750+764+815+icons*/
+/*@baba-750+764+815+icons - refactor to StatItems */
 import { useEffect, useRef, useState } from "preact/hooks";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import {
@@ -12,7 +12,7 @@ import { Src101Detail, StampRow } from "$globals";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
 import { containerBackground, containerColData } from "$layout";
-import { labelSm, textSm, titleGreyLD, value3xl, valueDark } from "$text";
+import { labelSm, titleGreyLD, value3xl, valueDark, valueSm } from "$text";
 import { Button } from "$button";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import { tooltipIcon } from "$notification";
@@ -857,7 +857,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           <div className="flex flex-row">
             <div className={`${containerColData} flex-1 items-start`}>
               <h6 className={labelSm}>TYPE</h6>
-              <h6 className={textSm}>
+              <h6 className={valueSm}>
                 {isSrc20Stamp()
                   ? "SRC-20"
                   : isSrc101Stamp()
@@ -873,7 +873,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   ? "DURATION"
                   : "DIMENSIONS"}
               </h6>
-              <h6 className={textSm}>
+              <h6 className={valueSm}>
                 {isSrc20Stamp()
                   ? stamp.stamp_base64 &&
                       JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
@@ -994,7 +994,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           <div className="flex flex-row pt-1.5 mobileLg:pt-3">
             <div className={`${containerColData} flex-1 items-start`}>
               <h6 className={labelSm}>SIZE</h6>
-              <h6 className={textSm}>
+              <h6 className={valueSm}>
                 {fileSize !== null ? formatFileSize(fileSize) : "N/A"}
               </h6>
             </div>
@@ -1002,7 +1002,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               <h6 className={labelSm}>
                 {isSrc20Stamp() ? "SENT" : "CREATED"}
               </h6>
-              <h6 className={textSm}>
+              <h6 className={valueSm}>
                 {createdDate}
               </h6>
             </div>
@@ -1013,7 +1013,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${textSm} hover:text-stamp-grey transition-colors duration-300`}
+                className={`${valueSm} hover:text-stamp-grey transition-colors duration-300`}
               >
                 {stamp.tx_hash !== null
                   ? abbreviateAddress(stamp.tx_hash, 4)
