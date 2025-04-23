@@ -21,7 +21,7 @@ export const containerBackground =
 export const containerCard =
   "dark-gradient rounded-lg border-2 border-transparent hover:border-stamp-purple-bright hover:shadow-[0px_0px_20px_#9900EE] transition-colors ease-in-out duration-100 cursor-pointer";
 export const containerCardTable =
-  "dark-gradient hover:shadow-[0px_0px_20px_#9900EE] transition-colors ease-in-out duration-300 cursor-pointer group"; // used for src20 tokencards - the border styling is handled in the table cells
+  "dark-gradient hover:shadow-[0px_0px_20px_#9900EE] transition-colors ease-in-out duration-100 cursor-pointer group"; // used for src20 tokencards - the border styling is handled below
 
 export const containerColData = "flex flex-col -space-y-1"; // Data specific (global)
 export const containerColForm = "flex flex-col w-full gap-5"; // Form input fields specific
@@ -32,8 +32,12 @@ export const rowForm = "flex w-full";
 export const rowResponsiveForm = "flex flex-col mobileMd:flex-row w-full gap-5";
 export const rowTable =
   "h-7 hover:bg-stamp-purple-bright/15 transition-colors duration-100";
-export const rowCardHover =
-  "p-3 border-y-2 border-x-0 border-transparent group-hover:border-stamp-purple-bright";
+export const rowCardBorderLeft =
+  "p-3 pl-4 rounded-l-lg border-y-2 border-l-2 border-r-0 border-transparent group-hover:border-stamp-purple-bright transition-colors ease-in-out duration-100";
+export const rowCardBorderRight =
+  "p-3 pr-4 rounded-r-lg border-y-2 border-r-2 border-l-0  border-transparent group-hover:border-stamp-purple-bright transition-colors ease-in-out duration-100";
+export const rowCardBorderCenter =
+  "p-3 border-y-2 border-x-0 border-transparent group-hover:border-stamp-purple-bright transition-colors ease-in-out duration-100";
 
 /* ===== COL STYLES ===== */
 
@@ -91,6 +95,10 @@ export type LayoutStyles = {
   // Row styles
   rowForm: string;
   rowResponsiveForm: string;
+  rowTable: string;
+  rowCardBorderLeft: string;
+  rowCardBorderRight: string;
+  rowCardBorderCenter: string;
 
   // Loader styles
   loaderSpinGrey: string;

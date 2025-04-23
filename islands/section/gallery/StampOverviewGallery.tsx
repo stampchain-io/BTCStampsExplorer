@@ -149,16 +149,20 @@ export function StampOverviewGallery({
         </div>
       </div>
 
-      {/* ===== FEATURED ARTISTS SECTION ===== */}
-      <CollectionGallery {...FeaturedArtistsSection} />
+      {
+        /* ===== FEATURED ARTISTS SECTION =====
+      <CollectionGallery {...FeaturedArtistsSection} />*/
+      }
 
       {/* ===== COLLECTIONS SECTION ===== */}
       {CollectionsSection.map((section, index) => (
         <StampGallery key={index} {...section} />
       ))}
 
-      {/* ===== CUTTING EDGE SECTION ===== */}
-      <CollectionGallery {...CuttingEdgeSection} />
+      {
+        /* ===== CUTTING EDGE SECTION =====
+      <CollectionGallery {...CuttingEdgeSection} />*/
+      }
     </div>
   );
 }

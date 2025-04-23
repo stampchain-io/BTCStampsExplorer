@@ -152,7 +152,7 @@ export const buttonStyles: ButtonVariants = {
 
   /* ===== SIZE STYLES ===== */
   size: {
-    xs: "h-[30px] px-3 text-[10px] font-semibold",
+    xs: "h-[30px] px-4 text-xs",
     sm: "h-[34px] px-4 text-xs",
     md: "h-[38px] px-4 text-sm",
     lg: "h-[42px] px-4 text-sm",
