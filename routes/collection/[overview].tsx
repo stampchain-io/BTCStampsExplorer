@@ -1,5 +1,4 @@
 /* ===== COLLECTION OVERVIEW PAGE ===== */
-/*@baba-199*/
 import { STAMP_FILTER_TYPES } from "$globals";
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
@@ -43,7 +42,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
         ? "ASC"
         : "DESC";
       const page = parseInt(url.searchParams.get("page") || "1");
-      const requestedPageSize = parseInt(url.searchParams.get("limit") || "24");
+      const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
 
       switch (overview) {
@@ -153,6 +152,7 @@ export default function CollectionOverviewPage(
     collections,
     page,
     pages,
+    page_size,
   } = data;
 
   /* ===== HELPERS ===== */
@@ -162,11 +162,13 @@ export default function CollectionOverviewPage(
         return (
           <>
             <ArtistGallery collections={collections || []} />
-            <Pagination
-              page={page}
-              totalPages={pages}
-              prefix=""
-            />
+            <div class="mt-12 mobileLg:mt-[72px]">
+              <Pagination
+                page={page}
+                totalPages={pages}
+                prefix=""
+              />
+            </div>
           </>
         );
 
@@ -178,11 +180,11 @@ export default function CollectionOverviewPage(
               <StampOverviewContent
                 stamps={stamps || []}
                 isRecentSales={false}
-              />
-              <Pagination
-                page={page}
-                totalPages={pages}
-                prefix=""
+                pagination={{
+                  page,
+                  totalPages: pages,
+                  prefix: "",
+                }}
               />
             </div>
           </div>
@@ -192,7 +194,7 @@ export default function CollectionOverviewPage(
 
   /* ===== COMPONENT ===== */
   return (
-    <div class="flex flex-col gap-9">
+    <div class="flex flex-col">
       <CollectionOverviewHeader />
       {collectionOverviewContent()}
     </div>

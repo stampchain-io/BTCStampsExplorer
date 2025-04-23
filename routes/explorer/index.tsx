@@ -37,7 +37,7 @@ export const handler: Handlers = {
       const selectedTab =
         (url.searchParams.get("type") || "all") as STAMP_TYPES;
       const page = parseInt(url.searchParams.get("page") || "1");
-      const requestedPageSize = parseInt(url.searchParams.get("limit") || "24");
+      const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
       const recentSales = url.searchParams.get("recentSales") === "true";
 
@@ -115,7 +115,7 @@ export function ExplorerPage(props: StampPageProps) {
 
   /* ===== RENDER ===== */
   return (
-    <div class="w-full" f-client-nav data-partial="/stamp">
+    <div class="w-full" f-client-nav data-partial="/explorer">
       {/* Header Component with Filter Controls */}
       <ExplorerHeader
         filterBy={filterBy as STAMP_FILTER_TYPES[]}

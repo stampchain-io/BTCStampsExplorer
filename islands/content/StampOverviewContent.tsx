@@ -1,5 +1,4 @@
 /* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
-/*@baba-29+31*/
 import { StampRow } from "$globals";
 import { StampCard } from "$card";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
@@ -26,7 +25,7 @@ export function StampOverviewContent({
 }: StampOverviewContentProps) {
   /* ===== RENDER ===== */
   return (
-    <div class="w-full pt-3 pb-12 mobileMd:pt-6 mobileMd:pb-[72px]">
+    <div class="w-full pt-3">
       {/* ===== STAMPS GRID ===== */}
       <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-3 mobileMd:gap-6 w-full auto-rows-fr">
         {stamps.map((stamp) => (
@@ -45,7 +44,7 @@ export function StampOverviewContent({
 
       {/* ===== PAGINATION ===== */}
       {pagination && pagination.totalPages > 1 && (
-        <div class="mt-9 mobileLg:mt-[72px]">
+        <div class="mt-12 mobileLg:mt-[72px]">
           <Pagination
             page={pagination.page}
             totalPages={pagination.totalPages}

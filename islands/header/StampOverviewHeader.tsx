@@ -38,7 +38,7 @@ export const StampOverviewHeader = (
 
       {/* Controls Section */}
       <div className="flex flex-col">
-        <div className="flex relative items-start justify-between gap-3 tablet:gap-1">
+        <div className="flex relative items-start justify-between gap-4 tablet:gap-3">
           {/* Filter Component */}
           <Filter
             initFilter={filterBy}

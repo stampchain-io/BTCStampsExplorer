@@ -1,5 +1,4 @@
 /* ===== EXPLORER HEADER COMPONENT ===== */
-/* TODO (@baba) - update filter and styling */
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { titlePurpleLD } from "$text";
@@ -15,13 +14,13 @@ export const ExplorerHeader = (
 ) => {
   /* ===== RENDER ===== */
   return (
-    <div class="relative flex flex-row justify-between items-start w-full gap-3">
+    <div class="flex flex-row justify-between items-start w-full">
       {/* Responsive Title Section */}
       <h1 className={titlePurpleLD}>EXPLORER</h1>
 
       {/* Controls Section */}
       <div className="flex flex-col">
-        <div className="flex relative items-start justify-between gap-3 tablet:gap-1">
+        <div className="flex relative items-start justify-between gap-4 tablet:gap-3">
           {/* Sort Component */}
           <div>
             <Sort initSort={sortBy} />

@@ -231,7 +231,7 @@ export default function CollectionLandingPage(
         /*
         <CollectionGallery {...EspeciallyPoshSection} />
         <CollectionGallery {...CuttingEdgeSection} />
-      <ArtistGallery {...PopularArtistGallery} />
+        <ArtistGallery {...PopularArtistGallery} />
       */
       }
     </div>

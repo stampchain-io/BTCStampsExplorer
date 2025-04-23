@@ -37,7 +37,7 @@ export const handler: Handlers = {
       const selectedTab =
         (url.searchParams.get("type") || "all") as STAMP_TYPES;
       const page = parseInt(url.searchParams.get("page") || "1");
-      const requestedPageSize = parseInt(url.searchParams.get("limit") || "24");
+      const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
       const recentSales = url.searchParams.get("recentSales") === "true";
 

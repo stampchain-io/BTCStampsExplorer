@@ -5,7 +5,7 @@ import { titlePurpleLD } from "$text";
 /* ===== COMPONENT ===== */
 function CollectionOverviewHeader() {
   return (
-    <div class="flex justify-between items-center w-full">
+    <div class="flex flex-row justify-between items-start w-full">
       <h1 className={titlePurpleLD}>
         COLLECTIONS
       </h1>

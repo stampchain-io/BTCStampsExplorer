@@ -1,5 +1,4 @@
 /* ===== STAMP GALLERY COMPONENT ===== */
-/* TODO (@baba)-update styling and refactor into a base slideshow component*/
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { ViewAllButton } from "$button";
@@ -183,7 +182,7 @@ export default function StampGallery({
           )}
           {subTitle && (
             <div
-              class={`flex flex-col items-start ${
+              class={`flex flex-col items-start pb-1 ${
                 alignRight && "tablet:items-end"
               }`}
             >
@@ -273,7 +272,7 @@ export default function StampGallery({
       {viewAllLink && <ViewAllButton href={seeAllLink} />}
 
       {pagination && pagination.totalPages > 1 && (
-        <div class="mt-9 mobileLg:mt-[72px]">
+        <div class="mt-12 mobileLg:mt-[72px]">
           <Pagination
             page={pagination.page}
             totalPages={pagination.totalPages}
