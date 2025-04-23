@@ -1,3 +1,4 @@
+/* ===== ROOT APP LAYOUT ROUTE ===== */
 import { type PageProps } from "$fresh/server.ts";
 import { Partial } from "$fresh/runtime.ts";
 import { Head } from "$fresh/runtime.ts";
@@ -8,17 +9,22 @@ import { Header } from "$header";
 import FontLoader from "$islands/layout/FontLoader.tsx";
 import ModalProvider from "$islands/layout/ModalProvider.tsx";
 
+/* ===== ROOT COMPONENT ===== */
 export default function App({ Component, state }: PageProps<unknown>) {
+  /* ===== LAYOUT BYPASS CHECK ===== */
   if (state?.skipAppLayout) {
     return <Component />;
   }
 
+  /* ===== RENDER ===== */
   return (
     <html lang="en">
+      {/* ===== HEAD SECTION ===== */}
       <Head>
+        {/* ===== META TAGS ===== */}
         <MetaTags />
 
-        {/* Preconnect to critical domains first */}
+        {/* ===== RESOURCE PRELOADING ===== */}
         <link
           rel="preconnect"
           href="https://esm.sh"
@@ -26,7 +32,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
           as="script"
         />
 
-        {/* Critical CSS first */}
+        {/* ===== CRITICAL CSS ===== */}
         <link rel="preload" href="/styles.css" as="style" />
         <link rel="stylesheet" href="/styles.css" />
         <link rel="preload" href="/gradients.css" as="style" />
@@ -36,10 +42,10 @@ export default function App({ Component, state }: PageProps<unknown>) {
         <link rel="preload" href="/slick.css" as="style" />
         <link rel="stylesheet" href="/slick.css" />
 
-        {/* Main font loader */}
+        {/* ===== FONT LOADING ===== */}
         <FontLoader />
 
-        {/* Optimize text rendering */}
+        {/* ===== CRITICAL STYLES ===== */}
         <style>
           {`
             .text-fill-transparent {
@@ -55,7 +61,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
           `}
         </style>
 
-        {/* Add font-display swap to prevent FOUT */}
+        {/* ===== FONT FACE DEFINITIONS ===== */}
         <style>
           {`
             @font-face {
@@ -73,7 +79,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
           `}
         </style>
 
-        {/* Add loading skeleton styles specific to content */}
+        {/* ===== LOADING SKELETON STYLES ===== */}
         <style>
           {`
             .loading-skeleton {
@@ -88,8 +94,6 @@ export default function App({ Component, state }: PageProps<unknown>) {
               background-size: 200% 100%;
               animation: shimmer 1.5s infinite linear;
             }
-
-
 
             /* Match StampCard grid layout */
             .stamp-grid-skeleton {
@@ -123,13 +127,12 @@ export default function App({ Component, state }: PageProps<unknown>) {
           `}
         </style>
 
-        {/* Load non-critical CSS */}
+        {/* ===== NON-CRITICAL CSS ===== */}
         <link
           rel="stylesheet"
           href="/carousel.css"
           media="(min-width: 1px)"
         />
-
         <link
           rel="stylesheet"
           href="/flatpickr.css"
@@ -137,8 +140,9 @@ export default function App({ Component, state }: PageProps<unknown>) {
         />
       </Head>
 
+      {/* ===== BODY SECTION ===== */}
       <body class="!relative min-h-screen overflow-x-hidden overflow-hidden">
-        {/* Background gradients */}
+        {/* ===== BACKGROUND LAYERS ===== */}
         {state?.route !== "/"
           ? <div class="bgGradientTop contain-layout" />
           : (
@@ -149,11 +153,13 @@ export default function App({ Component, state }: PageProps<unknown>) {
         <div class="bgGradientBottom contain-layout" />
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1] contain-paint" />
 
-        {/* Main content */}
+        {/* ===== MAIN CONTENT WRAPPER ===== */}
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
+          {/* ===== PROVIDERS ===== */}
           <ToastProvider>
             <NavigatorProvider>
               <div class="flex flex-col min-h-screen">
+                {/* ===== LAYOUT STRUCTURE ===== */}
                 <Header />
                 <main
                   class="flex flex-col flex-grow w-full max-w-desktop mx-auto px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop"
@@ -168,6 +174,8 @@ export default function App({ Component, state }: PageProps<unknown>) {
             </NavigatorProvider>
           </ToastProvider>
         </div>
+
+        {/* ===== MODAL LAYER ===== */}
         <ModalProvider />
       </body>
     </html>

@@ -207,7 +207,7 @@ export function SRC20Gallery({
 
         {/* ===== PAGINATION ===== */}
         {pagination && pagination.totalPages > 1 && (
-          <div class="mt-9 mobileLg:mt-[72px]">
+          <div class="mt-12 mobileLg:mt-[72px]">
             <Pagination
               page={pagination.page}
               totalPages={pagination.totalPages}

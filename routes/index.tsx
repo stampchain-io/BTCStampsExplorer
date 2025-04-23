@@ -1,3 +1,4 @@
+/* ===== HOME PAGE ROUTE ===== */
 import { StampRow } from "$globals";
 import type { Collection } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
@@ -16,6 +17,7 @@ import {
   StampSalesGallery,
 } from "$section";
 
+/* ===== TYPES ===== */
 // Define the shape of pageData from StampController.getHomePageData()
 interface StampControllerData {
   carouselStamps: StampRow[];
@@ -29,25 +31,30 @@ interface HomePageData extends StampControllerData {
   error?: string;
 }
 
+/* ===== SERVER HANDLER ===== */
 export const handler: Handlers<HomePageData> = {
   async GET(req: Request, ctx) {
+    /* ===== REQUEST VALIDATION ===== */
     const headers = Object.fromEntries(req.headers);
     if (headers["sec-fetch-dest"] && headers["sec-fetch-dest"] !== "document") {
       return ResponseUtil.custom(null, 204);
     }
 
     try {
+      /* ===== DATA FETCHING ===== */
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 2000);
 
       const pageData = await StampController.getHomePageData();
       clearTimeout(timeout);
 
+      /* ===== RESPONSE CONFIGURATION ===== */
       const response = await ctx.render(pageData);
       response.headers.set("Cache-Control", "public, max-age=300"); // 5 min cache
       response.headers.set("Priority", "high"); // Signal high priority to CDN
       return response;
     } catch (error) {
+      /* ===== ERROR HANDLING ===== */
       console.error("Handler error:", error);
       // Return minimal data for fast initial render
       return ctx.render({
@@ -62,7 +69,9 @@ export const handler: Handlers<HomePageData> = {
   },
 };
 
+/* ===== PAGE COMPONENT ===== */
 export default function Home({ data }: PageProps<HomePageData>) {
+  /* ===== DATA EXTRACTION ===== */
   const {
     carouselStamps = [],
     stamps_art = [],
@@ -71,16 +80,18 @@ export default function Home({ data }: PageProps<HomePageData>) {
     collectionData = [],
   } = data || {};
 
+  /* ===== RENDER ===== */
   return (
     <>
+      {/* ===== CRITICAL RESOURCES ===== */}
       {/* Preload carousel CSS for above-fold content */}
       <link rel="preload" href="/carousel.css" as="style" />
       <link rel="stylesheet" href="/carousel.css" />
-
       {/* Load Micro5 font only when needed */}
       <Micro5FontLoader />
 
       <div>
+        {/* ===== HERO BACKGROUND ===== */}
         <img
           src="/img/stamps-collage-purpleOverlay-4000.webp"
           alt="About Bitcoin Stamps and contact Stampchain"
@@ -98,16 +109,17 @@ export default function Home({ data }: PageProps<HomePageData>) {
         "
         />
 
+        {/* ===== MAIN CONTENT ===== */}
         <div class="layout-container flex flex-col gap-24 mobileLg:gap-36 mt-0 min-[420px]:mt-3 mobileMd:mt-6 tablet:mt-3">
-          {/* Critical above-fold content */}
+          {/* ===== CRITICAL ABOVE FOLD CONTENT ===== */}
           <HomeHeader />
 
-          {/* Important but can be deferred slightly */}
+          {/* ===== DEFERRED IMPORTANT CONTENT ===== */}
           <div style="content-visibility:auto; margin-top:-96px; margin-bottom:-48px;">
             <CarouselHome carouselStamps={carouselStamps} />
           </div>
 
-          {/* Defer non-critical content */}
+          {/* ===== NON-CRITICAL CONTENT ===== */}
           <div style="content-visibility: auto; contain-intrinsic-size: 0 500px;">
             <StampOverviewGallery
               stamps_art={stamps_art}
@@ -117,9 +129,10 @@ export default function Home({ data }: PageProps<HomePageData>) {
             />
           </div>
 
-          {/* Lazy load below-the-fold content */}
+          {/* ===== BELOW FOLD CONTENT - LAZY LOAD ===== */}
           <div style="margin-top: -48px; content-visibility: auto; contain-intrinsic-size: 0 800px;">
             <GetStampingCta />
+
             <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
               <StampSalesGallery
                 title="RECENT SALES"
@@ -134,6 +147,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
                 }}
               />
             </div>
+
             <div class="flex flex-row pt-12 mobileLg:pt-24 desktop:pt-36 gap-12 mobileLg:gap-[72px]">
               <SRC20Gallery
                 title="SRC-20 TOKENS"
@@ -149,6 +163,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
               />
             </div>
           </div>
+
           <div class="flex flex-col gap-6 mobileLg:gap-12">
             <StampchainContactCta />
             <PartnersGallery />

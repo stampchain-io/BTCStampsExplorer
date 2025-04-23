@@ -1,4 +1,5 @@
 /* ===== ARTIST GALLERY COMPONENT ===== */
+/* @baba - not updated */
 import { useEffect, useState } from "preact/hooks";
 import { Collection, CollectionGalleryProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
