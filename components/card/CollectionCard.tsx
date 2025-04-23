@@ -16,7 +16,7 @@ export function CollectionCard(
 ) {
   return (
     <a
-      href={`/collection/details/${collection.collection_name}`}
+      href={`/collection/detail/${collection.collection_name}`}
       className={`${containerBackground} gap-6 hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent group`}
     >
       {/* ===== CARD HEADER ===== */}

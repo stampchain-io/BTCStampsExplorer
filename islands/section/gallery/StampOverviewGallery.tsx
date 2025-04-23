@@ -76,7 +76,7 @@ export function StampOverviewGallery({
       layout: "grid",
       showDetails: false,
       showEdition: false,
-      viewAllLink: "/collection/overview/posh",
+      viewAllLink: "/collection/posh",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-6 desktop:grid-cols-7
@@ -97,7 +97,7 @@ export function StampOverviewGallery({
       fromPage: "home",
       layout: "grid",
       showDetails: false,
-      viewAllLink: "/collection/overview/recursive",
+      viewAllLink: "/collection/recursive",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-6

@@ -31,7 +31,7 @@ export function CollectionsBanner(
   /* ===== COMPONENT ===== */
   return (
     <a
-      href={`/collection/details/${collection.collection_name}`}
+      href={`/collection/detail/${collection.collection_name}`}
       class={`${containerClassName} ${isHovered ? "shadow-collection" : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

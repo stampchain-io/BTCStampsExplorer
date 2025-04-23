@@ -1,6 +1,6 @@
 /* ===== COLLECTION LANDING PAGE ===== */
 import {
-  CollectionGalleryProps,
+  _CollectionGalleryProps,
   StampGalleryProps,
   StampRow,
   SUBPROTOCOLS,
@@ -11,12 +11,13 @@ import { StampController } from "$server/controller/stampController.ts";
 import { CollectionRow } from "$server/types/collection.d.ts";
 import { body, gapSection } from "$layout";
 import {
-  ArtistGallery,
-  CollectionGallery,
+  _ArtistGallery,
+  _CollectionGallery,
   RecursiveContactCta,
   StampGallery,
   StampPoshCta,
 } from "$section";
+import { CollectionOverviewHeader } from "$header";
 
 /* ===== TYPES ===== */
 type CollectionLandingPageProps = {
@@ -101,7 +102,7 @@ export default function CollectionLandingPage(
   props: CollectionLandingPageProps,
 ) {
   const {
-    collections,
+    _collections,
     sortBy,
     stamps_src721 = [],
     stamps_posh = [],
@@ -110,29 +111,29 @@ export default function CollectionLandingPage(
   /* ===== SECTION CONFIGURATIONS ===== */
   const CollectionsSection: StampGalleryProps[] = [
     {
-      title: "COLLECTIONS",
       subTitle: "FRESH POSH STAMPS",
       type: "posh",
       stamps: stamps_posh,
       layout: "grid",
       showDetails: false,
       gridClass: `
-        grid w-full
-        gap-3
-        mobileMd:gap-6
+        grid w-full gap-6
         grid-cols-2
-        mobileLg:grid-cols-3
-        tablet:grid-cols-4
-        desktop:grid-cols-5
+        mobileSm:grid-cols-2
+        mobileMd:grid-cols-3
+        mobileLg:grid-cols-4
+        tablet:grid-cols-5
+        desktop:grid-cols-6
         auto-rows-fr
       `,
       displayCounts: {
-        "mobileSm": 6, // 2 columns x 3 rows
-        "mobileLg": 9, // 3 columns x 3 rows
-        "tablet": 12, // 4 columns x 3 rows
-        "desktop": 20, // 5 columns x 4 rows
+        "mobileSm": 8, // 2 columns x 4 rows
+        "mobileMd": 12, // 3 columns x 4 rows
+        "mobileLg": 16, // 4 columns x 4 rows
+        "tablet": 20, // 5 columns x 4 rows
+        "desktop": 24, // 6 columns x 4 rows
       },
-      viewAllLink: "/collection/overview/posh",
+      viewAllLink: "/collection/posh",
     },
     {
       subTitle: "RECENT RECURSIVE",
@@ -141,26 +142,27 @@ export default function CollectionLandingPage(
       layout: "grid",
       showDetails: false,
       gridClass: `
-        grid w-full
-        gap-3
-        mobileMd:gap-6
+        grid w-full gap-6
         grid-cols-3
         mobileSm:grid-cols-3
-        mobileLg:grid-cols-4
-        tablet:grid-cols-5
-        desktop:grid-cols-6
+        mobileMd:grid-cols-4
+        mobileLg:grid-cols-5
+        tablet:grid-cols-6
+        desktop:grid-cols-8
         auto-rows-fr
       `,
       displayCounts: {
         "mobileSm": 6, // 3 columns x 2 rows
-        "mobileLg": 8, // 4 columns x 2 rows
-        "tablet": 10, // 5 columns x 2 rows
-        "desktop": 12, // 6 columns x 2 rows
+        "mobileMd": 8, // 4 columns x 2 rows
+        "mobileLg": 10, // 5 columns x 2 rows
+        "tablet": 12, // 6 columns x 2 rows
+        "desktop": 16, // 8 columns x 2 rows
       },
-      viewAllLink: "/collection/overview/recursive",
+      viewAllLink: "/collection/recursive",
     },
   ];
-
+  {
+    /*
   const EspeciallyPoshSection: CollectionGalleryProps = {
     title: "ESPECIALLY POSH",
     subTitle: "STAMP COLLECTIONS",
@@ -208,25 +210,30 @@ export default function CollectionLandingPage(
       "desktop": 5, // 1 columns x 5 rows
     },
   };
-
+    */
+  }
   /* ===== COMPONENT ===== */
   return (
     <div className={`${body} ${gapSection}`}>
-      <StampGallery
-        fromPage="collection"
-        sortBy={sortBy}
-        {...CollectionsSection[0]}
-      />
-      <div class="relative">
-        <CollectionGallery {...EspeciallyPoshSection} />
+      <div>
+        <CollectionOverviewHeader />
+        <StampGallery
+          sortBy={sortBy}
+          {...CollectionsSection[0]}
+        />
         <StampPoshCta />
       </div>
-      <StampGallery {...CollectionsSection[1]} />
-      <div class="relative">
-        <CollectionGallery {...CuttingEdgeSection} />
+      <div>
+        <StampGallery {...CollectionsSection[1]} />
         <RecursiveContactCta />
       </div>
+      {
+        /*
+        <CollectionGallery {...EspeciallyPoshSection} />
+        <CollectionGallery {...CuttingEdgeSection} />
       <ArtistGallery {...PopularArtistGallery} />
+      */
+      }
     </div>
   );
 }

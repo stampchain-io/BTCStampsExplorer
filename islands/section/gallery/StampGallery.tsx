@@ -88,16 +88,22 @@ export default function StampGallery({
         if (width >= BREAKPOINTS.desktop) {
           setDisplayCount(
             displayCounts.desktop || displayCounts.tablet ||
-              displayCounts.mobileLg || displayCounts.mobileSm || stamps.length,
+              displayCounts.mobileLg || displayCounts.mobileMd ||
+              displayCounts.mobileSm || stamps.length,
           );
         } else if (width >= BREAKPOINTS.tablet) {
           setDisplayCount(
             displayCounts.tablet || displayCounts.mobileLg ||
-              displayCounts.mobileSm || stamps.length,
+              displayCounts.mobileMd || displayCounts.mobileSm || stamps.length,
           );
         } else if (width >= BREAKPOINTS.mobileLg) {
           setDisplayCount(
-            displayCounts.mobileLg || displayCounts.mobileSm || stamps.length,
+            displayCounts.mobileLg || displayCounts.mobileMd ||
+              displayCounts.mobileSm || stamps.length,
+          );
+        } else if (width >= BREAKPOINTS.mobileMd) {
+          setDisplayCount(
+            displayCounts.mobileMd || displayCounts.mobileSm || stamps.length,
           );
         } else {
           setDisplayCount(displayCounts.mobileSm || stamps.length);
@@ -203,7 +209,7 @@ export default function StampGallery({
 
       {/* ===== STAMP CONTENT ===== */}
       {((viewAllLink && viewAllLink !== "/stamp/art" &&
-          viewAllLink !== "/collection/overview/posh" && fromPage == "home") ||
+          viewAllLink !== "/collection/posh" && fromPage == "home") ||
           fromPage === "stamp_detail")
         ? (
           <div class="swiper-container overflow-hidden">

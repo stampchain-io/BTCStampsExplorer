@@ -74,7 +74,7 @@ export default function ArtistGallery({
           />
         ))}
       </div>
-      <ViewAllButton href="/collection/overview/artist" />
+      <ViewAllButton href="/collection/artist" />
     </div>
   );
 }

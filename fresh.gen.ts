@@ -84,8 +84,8 @@ import * as $api_v2_utxo_ancestors_address_ from "./routes/api/v2/utxo/ancestors
 import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $block_block_index_ from "./routes/block/[block_index].tsx";
 import * as $block_index from "./routes/block/index.tsx";
-import * as $collection_id_ from "./routes/collection/[id].tsx";
 import * as $collection_overview_ from "./routes/collection/[overview].tsx";
+import * as $collection_detail_id_ from "./routes/collection/detail/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
@@ -356,8 +356,8 @@ const manifest = {
     "./routes/api/v2/version.ts": $api_v2_version,
     "./routes/block/[block_index].tsx": $block_block_index_,
     "./routes/block/index.tsx": $block_index,
-    "./routes/collection/[id].tsx": $collection_id_,
     "./routes/collection/[overview].tsx": $collection_overview_,
+    "./routes/collection/detail/[id].tsx": $collection_detail_id_,
     "./routes/collection/index.tsx": $collection_index,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
