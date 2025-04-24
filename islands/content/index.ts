@@ -7,6 +7,9 @@ export * from "$islands/content/stampDetailContent/StampInfo.tsx";
 
 export { default as StampTextContent } from "$islands/content/stampDetailContent/StampTextContent.tsx";
 
+/* ===== SRC20 ===== */
+export * from "$islands/content/SRC20OverviewContent.tsx";
+
 /* ===== COLLECTION ===== */
 export * from "$islands/content/CollectionDetailContent.tsx";
 

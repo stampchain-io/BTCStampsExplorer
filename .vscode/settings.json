@@ -43,5 +43,14 @@
   },
   "[css]": {
     "editor.defaultFormatter": "vscode.css-language-features"
-  }
+  },
+  "folder-color.pathColors": [
+    {
+      "folderPath": "BTCStampsExplorer/routes/",
+      "color": "foldercolorizer.color_9900cc"
+    },
+    {
+      "folderPath": "BTCStampsExplorer/routes/[...path].ts/"
+    }
+  ]
 }

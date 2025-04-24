@@ -3,7 +3,7 @@ import { SRC20Row } from "$globals";
 import { formatDate } from "$lib/utils/formatUtils.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { Timeframe } from "$layout";
-import { labelSm, textSm, valueDark } from "$text";
+import { labelXs, textSm, valueDark } from "$text";
 import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import {
@@ -23,7 +23,7 @@ interface SRC20CardMintingProps {
 export function SRC20CardMinting({
   data,
   _fromPage,
-  _timeframe,
+  timeframe,
   onImageClick,
 }: SRC20CardMintingProps) {
   const headers = [
@@ -76,7 +76,7 @@ export function SRC20CardMinting({
           {headers.map((header, i) => (
             <th
               key={header}
-              class={`${labelSm} ${cellAlign(i, headers.length)} ${
+              class={`${labelXs} ${cellAlign(i, headers.length)} ${
                 i === 1 ? "hidden min-[600px]:table-cell" : "" // MINTS
               } ${i === 3 ? "hidden min-[600px]:table-cell" : "" // TRENDING
               } ${i === 4 ? "hidden tablet:table-cell" : "" // DEPLOY
@@ -84,6 +84,7 @@ export function SRC20CardMinting({
               }`}
             >
               {header}
+              {header === "TRENDING" && ` ${timeframe}`}
             </th>
           ))}
         </tr>
@@ -118,7 +119,7 @@ export function SRC20CardMinting({
               return (
                 <tr
                   key={src20.tx_hash}
-                  class={containerCardTable}
+                  class={`${containerCardTable} cursor-pointer group`}
                 >
                   {/* TOKEN */}
                   <td
@@ -157,7 +158,7 @@ export function SRC20CardMinting({
                                       }
                                     }}
                                   >
-                                    <span class="gray-gradient1 group-hover:text-stamp-purple-bright">
+                                    <span class="gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] inline-block transition-colors duration-300">
                                       {text.toUpperCase()}
                                     </span>
                                   </a>

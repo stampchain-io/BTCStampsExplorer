@@ -2,8 +2,7 @@
 /*@baba-149*/
 import { Handlers } from "$fresh/server.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
-import { SRC20OverviewHeader } from "$header";
-import { SRC20Gallery } from "$section";
+import { SRC20OverviewContent } from "$content";
 
 /* ===== HELPERS ===== */
 const getNumericParam = (url: URL, param: string, defaultValue: number) =>
@@ -108,7 +107,7 @@ export const handler: Handlers = {
 };
 
 /* ===== PAGE COMPONENT ===== */
-export default function SRC20OverviewlPage({ data }: any) {
+export default function SRC20OverviewPage({ data }: any) {
   if (!data || !data.src20s) {
     return <div>Error: No data received</div>;
   }
@@ -123,26 +122,12 @@ export default function SRC20OverviewlPage({ data }: any) {
   } = data;
 
   return (
-    <div class="flex flex-col">
-      <SRC20OverviewHeader
-        filterBy={filterBy}
-        sortBy={sortBy}
-        title="Minted SRC-20 Tokens"
-      />
-      <SRC20Gallery
-        viewType="minted"
-        fromPage="src20"
-        initialData={src20s}
-        pagination={{
-          page,
-          totalPages,
-          onPageChange: (newPage: number) => {
-            const url = new URL(globalThis.location.href);
-            url.searchParams.set("page", newPage.toString());
-            globalThis.location.href = url.toString();
-          },
-        }}
-      />
-    </div>
+    <SRC20OverviewContent
+      initialData={src20s}
+      page={page}
+      totalPages={totalPages}
+      filterBy={filterBy}
+      sortBy={sortBy}
+    />
   );
 }
