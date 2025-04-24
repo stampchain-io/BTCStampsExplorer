@@ -31,23 +31,57 @@ export function SRC20OverviewContent({
   const [_currentTimeframe, setCurrentTimeframe] = useState<
     "24H" | "3D" | "7D"
   >(timeframe);
-  const [selectedFilter, setSelectedFilter] = useState<
-    "DEPLOY" | "HOLDERS" | null
-  >("DEPLOY");
+  const [currentSort, setCurrentSort] = useState<{
+    filter: "TRENDING" | "DEPLOY" | "HOLDERS" | null;
+    direction: "asc" | "desc";
+  }>({
+    filter: null,
+    direction: "desc",
+  });
+
+  // Get the current data based on view type and sorting
+  const getCurrentData = () => {
+    const baseData = viewType === "minted" ? mintedData.data : mintingData.data;
+
+    if (!currentSort.filter) return baseData;
+
+    return sortData(baseData, currentSort.filter, currentSort.direction);
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (
+    filter: "TRENDING" | "DEPLOY" | "HOLDERS" | null,
+    direction: "asc" | "desc",
+  ) => {
+    setCurrentSort({ filter, direction });
+    const dataToSort = viewType === "minted"
+      ? mintedData.data
+      : mintingData.data;
+    const newSortedData = sortData(dataToSort, filter, direction);
+    // Update your data display with newSortedData
+  };
+
+  // Handle view type changes
+  const handleViewTypeChange = () => {
+    setCurrentSort({ filter: null, direction: "desc" }); // Reset sort when changing views
+    setViewType((prev) => prev === "minted" ? "minting" : "minted");
+  };
+
+  const currentData = getCurrentData();
 
   return (
     <div class="w-full">
       <SRC20OverviewHeader
-        onViewTypeChange={() =>
-          setViewType((prev) => prev === "minted" ? "minting" : "minted")}
+        onViewTypeChange={handleViewTypeChange}
         viewType={viewType}
         onTimeframeChange={setCurrentTimeframe}
-        onFilterChange={setSelectedFilter}
+        onFilterChange={handleFilterChange}
+        currentSort={currentSort}
       />
       <SRC20Gallery
         viewType={viewType}
         fromPage="src20"
-        initialData={viewType === "minted" ? mintedData.data : mintingData.data}
+        initialData={currentData}
         timeframe={_currentTimeframe}
         pagination={{
           page: viewType === "minted" ? mintedData.page : mintingData.page,
@@ -65,3 +99,34 @@ export function SRC20OverviewContent({
     </div>
   );
 }
+
+const sortData = (
+  data: SRC20Row[],
+  filter: "TRENDING" | "DEPLOY" | "HOLDERS" | null,
+  direction: "asc" | "desc",
+) => {
+  if (!filter) return data;
+
+  const sortedArray = [...data];
+
+  switch (filter) {
+    case "HOLDERS":
+      return sortedArray.sort((a, b) => {
+        const aHolders = Number(a.holders) || 0;
+        const bHolders = Number(b.holders) || 0;
+        return direction === "asc" ? aHolders - bHolders : bHolders - aHolders;
+      });
+
+    case "DEPLOY":
+      return sortedArray.sort((a, b) => {
+        const aTime = new Date(a.block_time).getTime();
+        const bTime = new Date(b.block_time).getTime();
+        return direction === "asc"
+          ? aTime - bTime // Oldest first (ascending)
+          : bTime - aTime; // Newest first (descending)
+      });
+
+    default:
+      return data;
+  }
+};

@@ -9,13 +9,25 @@ interface SRC20OverviewHeaderProps {
   onViewTypeChange?: () => void;
   viewType: "minted" | "minting";
   onTimeframeChange?: (timeframe: "24H" | "3D" | "7D") => void;
-  onFilterChange?: (filter: "DEPLOY" | "HOLDERS" | null) => void;
+  onFilterChange?: (
+    filter: "TRENDING" | "DEPLOY" | "HOLDERS" | null,
+    direction: "asc" | "desc",
+  ) => void;
+  currentSort?: {
+    filter: "TRENDING" | "DEPLOY" | "HOLDERS" | null;
+    direction: "asc" | "desc";
+  };
 }
 
 /* ===== COMPONENT ===== */
 export const SRC20OverviewHeader = (
-  { onViewTypeChange, viewType, onTimeframeChange, onFilterChange }:
-    SRC20OverviewHeaderProps,
+  {
+    onViewTypeChange,
+    viewType,
+    onTimeframeChange,
+    onFilterChange,
+    currentSort,
+  }: SRC20OverviewHeaderProps,
 ) => {
   // Separate hover states for each group
   const [mintingHover, setMintingHover] = useState({
@@ -36,9 +48,15 @@ export const SRC20OverviewHeader = (
   const [selectedTimeframe, setSelectedTimeframe] = useState<
     "24H" | "3D" | "7D"
   >("24H");
-  const [selectedFilter, setSelectedFilter] = useState<
-    "DEPLOY" | "HOLDERS" | null
-  >("DEPLOY");
+
+  // Add sort state
+  const [sortConfig, setSortConfig] = useState<{
+    filter: "TRENDING" | "DEPLOY" | "HOLDERS" | null;
+    direction: "asc" | "desc";
+  }>({
+    filter: null,
+    direction: "desc",
+  });
 
   // Separate handlers for each group
   const handleMintingMouseEnter = () => {
@@ -52,19 +70,11 @@ export const SRC20OverviewHeader = (
   };
 
   const handleMintingClick = () => {
-    // Update minting hover state
     setMintingHover({ canHoverSelected: false, allowHover: false });
-
-    // Reset filter to default (DEPLOY)
     setFilterHover({ canHoverSelected: true, allowHover: true });
-    setSelectedFilter("DEPLOY");
-
-    // Reset timeframe to default (24H)
     setTimeframeHover({ canHoverSelected: true, allowHover: true });
     setSelectedTimeframe("24H");
     onTimeframeChange?.("24H");
-
-    // Call the view change handler
     onViewTypeChange?.();
   };
 
@@ -78,11 +88,17 @@ export const SRC20OverviewHeader = (
     setFilterHover({ canHoverSelected: true, allowHover: true });
   };
 
-  const handleFilterClick = (filter: "DEPLOY" | "HOLDERS") => {
+  const handleFilterClick = (filter: "TRENDING" | "DEPLOY" | "HOLDERS") => {
     setFilterHover({ canHoverSelected: false, allowHover: false });
-    const newFilter = selectedFilter === filter ? null : filter;
-    setSelectedFilter(newFilter);
-    onFilterChange?.(newFilter);
+
+    // Toggle sort direction if same filter clicked
+    if (currentSort?.filter === filter) {
+      const newDirection = currentSort.direction === "desc" ? "asc" : "desc";
+      onFilterChange?.(filter, newDirection);
+    } else {
+      // New filter selected, default to desc
+      onFilterChange?.(filter, "desc");
+    }
   };
 
   const handleTimeframeMouseEnter = () => {
@@ -108,8 +124,8 @@ export const SRC20OverviewHeader = (
     return "outlineFlat";
   };
 
-  const getFilterVariant = (filter: "DEPLOY" | "HOLDERS") => {
-    if (filter === selectedFilter) {
+  const getFilterVariant = (filter: "TRENDING" | "DEPLOY" | "HOLDERS") => {
+    if (filter === currentSort?.filter) {
       return filterHover.canHoverSelected ? "flatOutline" : "outlineFlat";
     }
     return "outlineFlat";
@@ -150,29 +166,36 @@ export const SRC20OverviewHeader = (
       {/* ===== FILTER AND TIMEFRAME BUTTONS ===== */}
       <div className="flex justify-between w-full">
         {/* Filter Buttons */}
-        <div className="flex gap-4 tablet:gap-3">
-          {(["DEPLOY", "HOLDERS"] as const).map((filter) => (
+        <div className="flex gap-3">
+          {(["TRENDING", "DEPLOY", "HOLDERS"] as const).map((filter) => (
             <Button
               key={filter}
               variant={getFilterVariant(filter)}
-              color="greyDark"
+              color="purpleDark"
               size="xs"
               onClick={() => handleFilterClick(filter)}
               onMouseEnter={handleFilterMouseEnter}
               onMouseLeave={handleFilterMouseLeave}
             >
               {filter}
+              {
+                /*o{sortConfig.filter === filter && (
+                <span className="ml-1">
+                  {sortConfig.direction === "asc" ? "↑" : "↓"}
+                </span>
+              )}*/
+              }
             </Button>
           ))}
         </div>
 
         {/* Timeframe Buttons */}
-        <div className="flex gap-4 tablet:gap-3">
+        <div className="flex gap-3">
           {(["24H", "3D", "7D"] as const).map((timeframe) => (
             <Button
               key={timeframe}
               variant={getTimeframeVariant(timeframe)}
-              color="greyDark"
+              color="purpleDark"
               size="xs"
               onClick={() => handleTimeframeClick(timeframe)}
               onMouseEnter={handleTimeframeMouseEnter}
