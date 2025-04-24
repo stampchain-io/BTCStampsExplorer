@@ -75,3 +75,16 @@ export const StampStyles = {
   titlePurpleDL:
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1",
 };
+
+export const StampDetailStyles = {
+  defaultHomeGridClass:
+    "grid w-full gap-3 mobileMd:gap-6 grid-cols-3 mobileMd:grid-cols-3 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-7 auto-rows-fr",
+  defaultDetailGridClass:
+    "grid w-full gap-3 mobileLg:gap-6 grid-cols-2 mobileSm:grid-cols-3 mobileLg:grid-cols-4 desktop:grid-cols-6",
+  inputField:
+    "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light",
+  modalBgCenter:
+    "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black bg-opacity-70 backdrop-filter backdrop-blur-md",
+  tooltipIcon:
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300",
+};

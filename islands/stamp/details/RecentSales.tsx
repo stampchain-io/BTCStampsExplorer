@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import type { StampRow } from "$globals";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { StampDetailStyles } from "$islands/stamp/styles.ts";
 
 interface DisplayCountBreakpoints {
   mobileSm: number;
@@ -89,22 +90,11 @@ export function RecentSales({
 
   const defaultDetailDisplayCounts: DisplayCountBreakpoints = {
     mobileSm: 3,
+    mobileMd: 3,
     mobileLg: 4,
     tablet: 4,
     desktop: 6,
   };
-
-  const defaultHomeGridClass = `
-    grid w-full gap-3 mobileMd:gap-6
-    grid-cols-3 mobileMd:grid-cols-3 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-7
-    auto-rows-fr
-  `;
-
-  const defaultDetailGridClass = `
-    grid w-full gap-3 mobileLg:gap-6
-    grid-cols-2 mobileSm:grid-cols-3 
-    mobileLg:grid-cols-4 desktop:grid-cols-6
-  `;
 
   const sectionProps = variant === "home"
     ? {
@@ -118,7 +108,7 @@ export function RecentSales({
       viewAllLink: "/stamp?recentSales=true",
       showMinDetails: true,
       variant: "grey" as const,
-      gridClass: gridClass || defaultHomeGridClass,
+      gridClass: gridClass || StampDetailStyles.defaultHomeGridClass,
       displayCounts: displayCounts || defaultHomeDisplayCounts,
     }
     : {
@@ -129,7 +119,7 @@ export function RecentSales({
       isRecentSales: true,
       showDetails: false,
       showMinDetails: true,
-      gridClass: gridClass || defaultDetailGridClass,
+      gridClass: gridClass || StampDetailStyles.defaultDetailGridClass,
       displayCounts: displayCounts || defaultDetailDisplayCounts,
     };
 

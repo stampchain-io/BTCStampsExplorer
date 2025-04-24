@@ -7,6 +7,7 @@ import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.ts
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { StampDetailStyles } from "$islands/stamp/styles.ts";
 
 interface Props {
   stamp: StampRow;
@@ -142,24 +143,6 @@ const StampBuyModal = ({
     });
   };
 
-  const inputField =
-    "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
-
-  // Add debug logging
-  useEffect(() => {
-    logger.debug("ui", {
-      message: "StampBuyModal mounted",
-      component: "StampBuyModal",
-    });
-
-    return () => {
-      logger.debug("ui", {
-        message: "StampBuyModal unmounting",
-        component: "StampBuyModal",
-      });
-    };
-  }, []);
-
   return (
     <ModalLayout
       onClose={() => {
@@ -203,7 +186,7 @@ const StampBuyModal = ({
                 max={maxQuantity}
                 value={quantity}
                 onChange={handleQuantityChange}
-                className={`${inputField} !w-[42px] mobileLg:!w-12 !h-[42px] mobileLg:!h-12 text-center`}
+                className={`${StampDetailStyles.inputField} !w-[42px] mobileLg:!w-12 !h-[42px] mobileLg:!h-12 text-center`}
               />
             </div>
           </div>
