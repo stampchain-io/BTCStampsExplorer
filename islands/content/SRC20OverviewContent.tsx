@@ -11,6 +11,7 @@ interface SRC20OverviewContentProps {
   totalPages: number;
   filterBy: any[];
   sortBy: "ASC" | "DESC";
+  timeframe: "24H" | "3D" | "7D";
 }
 
 /* ===== COMPONENT ===== */
@@ -20,8 +21,14 @@ export function SRC20OverviewContent({
   totalPages,
   _filterBy,
   _sortBy,
+  timeframe,
 }: SRC20OverviewContentProps) {
   const [viewType, setViewType] = useState<"minted" | "minting">("minted");
+  const [_currentTimeframe, setCurrentTimeframe] = useState<
+    "24H" | "3D" | "7D"
+  >(
+    timeframe,
+  );
 
   const handleViewTypeChange = () => {
     setViewType(viewType === "minted" ? "minting" : "minted");
@@ -32,11 +39,13 @@ export function SRC20OverviewContent({
       <SRC20OverviewHeader
         onViewTypeChange={handleViewTypeChange}
         viewType={viewType}
+        onTimeframeChange={setCurrentTimeframe}
       />
       <SRC20Gallery
         viewType={viewType}
         fromPage="src20"
         initialData={initialData}
+        timeframe={_currentTimeframe}
         pagination={{
           page,
           totalPages,

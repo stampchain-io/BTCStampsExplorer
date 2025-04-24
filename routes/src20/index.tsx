@@ -5,7 +5,7 @@ import { SRC20Service } from "$server/services/src20/index.ts";
 import { SRC20OverviewContent } from "$content";
 
 /* ===== HELPERS ===== */
-const getNumericParam = (url: URL, param: string, defaultValue: number) =>
+const _getNumericParam = (url: URL, param: string, defaultValue: number) =>
   Number(url.searchParams.get(param)) || defaultValue;
 
 /* ===== SERVER HANDLER ===== */
@@ -18,6 +18,7 @@ export const handler: Handlers = {
       const sortBy = url.searchParams.get("sortBy") || "ASC";
       const page = Number(url.searchParams.get("page")) || 1;
       const limit = Number(url.searchParams.get("limit")) || 11;
+      const timeframe = url.searchParams.get("timeframe") || "24H";
 
       // Market data is always included for minted tokens
       const marketInfo = await SRC20Service.MarketService
@@ -98,6 +99,7 @@ export const handler: Handlers = {
         limit: resultData.limit || limit,
         filterBy,
         sortBy,
+        timeframe,
       });
     } catch (error) {
       console.error(error);
@@ -119,6 +121,7 @@ export default function SRC20OverviewPage({ data }: any) {
     totalPages = 1,
     filterBy = [],
     sortBy = "ASC",
+    timeframe = "24H",
   } = data;
 
   return (
@@ -128,6 +131,7 @@ export default function SRC20OverviewPage({ data }: any) {
       totalPages={totalPages}
       filterBy={filterBy}
       sortBy={sortBy}
+      timeframe={timeframe}
     />
   );
 }

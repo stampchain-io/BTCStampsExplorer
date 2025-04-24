@@ -27,6 +27,7 @@ interface SRC20GalleryProps {
   };
   address?: string;
   useClientFetch?: boolean;
+  timeframe: "24H" | "3D" | "7D";
 }
 
 /* ===== IMAGE MODAL COMPONENT ===== */
@@ -64,12 +65,11 @@ export function SRC20Gallery({
   pagination,
   address,
   useClientFetch = fromPage === "home" || fromPage === "wallet",
+  timeframe,
 }: SRC20GalleryProps) {
   const [data, setData] = useState<SRC20Row[]>(initialData || []);
   const [isLoading, setIsLoading] = useState(!initialData);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [timeframe, setTimeframe] = useState<Timeframe>("24H");
-  const imageModalSrc = useSignal<string>("");
 
   useEffect(() => {
     if (!initialData?.length && useClientFetch) {
@@ -90,6 +90,10 @@ export function SRC20Gallery({
               : `/api/internal/src20/trending?type=market`;
           } else if (fromPage === "wallet" && address) {
             endpoint = `/api/v2/src20/balance/${address}`;
+          } else if (fromPage === "src20") {
+            endpoint = viewType === "minting"
+              ? `/api/internal/src20/trending?type=minting&transactionCount=1000`
+              : `/api/v2/src20/index`;
           }
 
           if (endpoint) {
@@ -133,11 +137,11 @@ export function SRC20Gallery({
   };
 
   const handleTimeframeChange = (newTimeframe: Timeframe) => {
-    setTimeframe(newTimeframe);
+    // Implementation of handleTimeframeChange
   };
 
   const handleImageClick = (imgSrc: string) => {
-    imageModalSrc.value = imgSrc;
+    // Implementation of handleImageClick
   };
 
   if (isLoading || isTransitioning) {
@@ -182,19 +186,6 @@ export function SRC20Gallery({
             onImageClick={handleImageClick}
           />
         )}
-
-      {imageModalSrc.value && (
-        <div
-          class="fixed flex items-center justify-center inset-0 bg-black/50 backdrop-blur z-50"
-          onClick={() => imageModalSrc.value = ""}
-        >
-          <img
-            src={imageModalSrc.value}
-            class="max-w-[90vw] max-h-[90vh] rounded-lg"
-            alt="Token preview"
-          />
-        </div>
-      )}
 
       {fromPage === "home" && (
         <div class="flex justify-end -mt-3 mobileMd:-mt-6">

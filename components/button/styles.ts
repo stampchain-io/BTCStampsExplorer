@@ -14,7 +14,14 @@ export interface ButtonVariants {
     string
   >;
   color: Record<
-    "grey" | "purple" | "purpleGradient" | "greyGradient" | "test" | "custom",
+    | "grey"
+    | "greyDark"
+    | "greyGradient"
+    | "purple"
+    | "purpleDark"
+    | "purpleGradient"
+    | "test"
+    | "custom",
     string
   >;
   size: Record<
@@ -125,9 +132,24 @@ export const buttonStyles: ButtonVariants = {
       [--default-color:#999999]
       [--hover-color:#CCCCCC]
     `,
+    greyDark: `
+      [--default-color:#666666]
+      [--hover-color:#666666]
+    `,
+    greyGradient: `
+      [--color-dark:#666666]
+      [--color-medium:#999999]
+      [--color-light:#CCCCCC]
+      [--default-color:var(--color-medium)]
+      [--hover-color:var(--color-light)]
+    `,
     purple: `
       [--default-color:#8800CC]
       [--hover-color:#AA00FF]
+    `,
+    purpleDark: `
+      [--default-color:#660099]
+      [--hover-color:#660099]
     `,
     purpleGradient: `
       [--color-dark:#660099]
@@ -136,23 +158,16 @@ export const buttonStyles: ButtonVariants = {
       [--default-color:var(--color-medium)]
       [--hover-color:var(--color-light)]
     `,
-    greyGradient: `
-      [--color-dark:#666666]
-      [--color-medium:#999999]
-      [--color-light:#CCCCCC]
-      [--default-color:var(--color-medium)]
-      [--hover-color:var(--color-light)]
-  `,
     test: `
       [--default-color:#00CC00]
       [--hover-color:#CC0000]
-  `,
+    `,
     custom: "",
   },
 
   /* ===== SIZE STYLES ===== */
   size: {
-    xs: "h-[30px] px-4 text-xs",
+    xs: "h-[30px] px-[14px] text-xs",
     sm: "h-[34px] px-4 text-xs",
     md: "h-[38px] px-4 text-sm",
     lg: "h-[42px] px-4 text-sm",
