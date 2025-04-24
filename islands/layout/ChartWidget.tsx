@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import Highcharts from "highcharts/highstock";
-import { loaderSpinSmPurple } from "$layout";
+import { loaderSpinXsPurple } from "$layout";
 // ✅ Define TypeScript Props Interface
 interface ChartWidgetProps {
   data: [number, number][];
@@ -128,7 +128,7 @@ const ChartWidget = (
 
   return (
     <div className="p-4">
-      {loading ? <div class={loaderSpinSmPurple} /> : <></>}
+      {loading ? <div class={loaderSpinXsPurple} /> : <></>}
       <div id={tick ? `chart-container-${tick}` : "chart-container"} />
     </div>
   );

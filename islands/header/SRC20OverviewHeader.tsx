@@ -9,11 +9,13 @@ interface SRC20OverviewHeaderProps {
   onViewTypeChange?: () => void;
   viewType: "minted" | "minting";
   onTimeframeChange?: (timeframe: "24H" | "3D" | "7D") => void;
+  onFilterChange?: (filter: "DEPLOY" | "HOLDERS" | null) => void;
 }
 
 /* ===== COMPONENT ===== */
 export const SRC20OverviewHeader = (
-  { onViewTypeChange, viewType, onTimeframeChange }: SRC20OverviewHeaderProps,
+  { onViewTypeChange, viewType, onTimeframeChange, onFilterChange }:
+    SRC20OverviewHeaderProps,
 ) => {
   // Separate hover states for each group
   const [mintingHover, setMintingHover] = useState({
@@ -78,7 +80,9 @@ export const SRC20OverviewHeader = (
 
   const handleFilterClick = (filter: "DEPLOY" | "HOLDERS") => {
     setFilterHover({ canHoverSelected: false, allowHover: false });
-    setSelectedFilter(selectedFilter === filter ? null : filter);
+    const newFilter = selectedFilter === filter ? null : filter;
+    setSelectedFilter(newFilter);
+    onFilterChange?.(newFilter);
   };
 
   const handleTimeframeMouseEnter = () => {

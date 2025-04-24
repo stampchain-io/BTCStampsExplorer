@@ -7,7 +7,6 @@ import { ViewAllButton } from "$button";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Timeframe } from "$layout";
 import { SRC20Card, SRC20CardMinting } from "$card";
-import { useSignal } from "@preact/signals";
 
 /* ===== COLUMN CONFIGURATIONS ===== */
 
@@ -90,10 +89,6 @@ export function SRC20Gallery({
               : `/api/internal/src20/trending?type=market`;
           } else if (fromPage === "wallet" && address) {
             endpoint = `/api/v2/src20/balance/${address}`;
-          } else if (fromPage === "src20") {
-            endpoint = viewType === "minting"
-              ? `/api/internal/src20/trending?type=minting&transactionCount=1000`
-              : `/api/v2/src20/index`;
           }
 
           if (endpoint) {
@@ -126,6 +121,12 @@ export function SRC20Gallery({
     useClientFetch,
   ]);
 
+  useEffect(() => {
+    if (initialData?.length) {
+      setData(initialData);
+    }
+  }, [initialData]);
+
   const handlePageChange = (page: number) => {
     if (pagination?.onPageChange) {
       pagination.onPageChange(page);
@@ -136,17 +137,22 @@ export function SRC20Gallery({
     }
   };
 
-  const handleTimeframeChange = (newTimeframe: Timeframe) => {
-    // Implementation of handleTimeframeChange
+  const _handleTimeframeChange = (newTimeframe: Timeframe) => {
   };
 
-  const handleImageClick = (imgSrc: string) => {
-    // Implementation of handleImageClick
+  const handleImageClick = (_imgSrc: string) => {
   };
 
   if (isLoading || isTransitioning) {
     return <div class="src20-skeleton loading-skeleton h-[400px]" />;
   }
+
+  console.log("Gallery Pagination:", {
+    hasPagination: !!pagination,
+    totalPages: pagination?.totalPages,
+    currentPage: pagination?.page,
+    shouldShow: pagination && pagination.totalPages > 1,
+  });
 
   return (
     <div class="w-full">
@@ -198,7 +204,7 @@ export function SRC20Gallery({
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-12 mobileLg:mt-[72px]">
           <Pagination
-            currentPage={pagination.page}
+            page={pagination.page}
             totalPages={pagination.totalPages}
             prefix={fromPage === "wallet" ? "src20" : ""}
             onPageChange={handlePageChange}
