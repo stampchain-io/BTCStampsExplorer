@@ -4,7 +4,7 @@ import { body, gapSectionSlim } from "$layout";
 import { AboutHeader } from "$header";
 import DonateCta from "$islands/section/cta/DonateCta.tsx";
 import ContactCta from "$islands/section/cta/ContactCta.tsx";
-import { PartnersGallery, TeamGallery } from "$section";
+import { PartnersBanner, TeamBanner } from "$section";
 
 console.log("About page importing DonateCta");
 
@@ -36,10 +36,10 @@ export default function AboutPage() {
       <AboutHeader />
 
       {/* ===== TEAM SECTION ===== */}
-      <TeamGallery />
+      <TeamBanner />
 
       {/* ===== PARTNERS SECTION ===== */}
-      <PartnersGallery />
+      <PartnersBanner />
 
       {/* ===== DONATE SECTION ===== */}
       <div id="donate"></div>

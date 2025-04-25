@@ -12,8 +12,8 @@ export { default as CarouselGallery } from "$islands/section/gallery/Carousel.ts
 export { default as SwiperStyles } from "$islands/section/gallery/SwiperStyles.tsx";
 
 /* ===== BANNER IMAGES ===== */
-export * from "$islands/section/gallery/Partners.tsx";
-export { default as TeamGallery } from "$islands/section/gallery/Team.tsx";
+export * from "$islands/section/gallery/PartnersBanner.tsx";
+export { default as TeamBanner } from "$islands/section/gallery/TeamBanner.tsx";
 export * from "$components/section/gallery/CollectionsBanner.tsx";
 
 /* ===== RECENT/LATEST ===== */

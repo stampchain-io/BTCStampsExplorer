@@ -213,7 +213,7 @@ import * as $section_cta_StampchainContactCta from "./islands/section/cta/Stampc
 import * as $section_gallery_ArtistGallery from "./islands/section/gallery/ArtistGallery.tsx";
 import * as $section_gallery_Carousel from "./islands/section/gallery/Carousel.tsx";
 import * as $section_gallery_CollectionGallery from "./islands/section/gallery/CollectionGallery.tsx";
-import * as $section_gallery_Partners from "./islands/section/gallery/Partners.tsx";
+import * as $section_gallery_PartnersBanner from "./islands/section/gallery/PartnersBanner.tsx";
 import * as $section_gallery_SRC20Deploys from "./islands/section/gallery/SRC20Deploys.tsx";
 import * as $section_gallery_SRC20Gallery from "./islands/section/gallery/SRC20Gallery.tsx";
 import * as $section_gallery_SRC20Mints from "./islands/section/gallery/SRC20Mints.tsx";
@@ -223,7 +223,7 @@ import * as $section_gallery_StampOverviewGallery from "./islands/section/galler
 import * as $section_gallery_StampSales from "./islands/section/gallery/StampSales.tsx";
 import * as $section_gallery_StampTransfers from "./islands/section/gallery/StampTransfers.tsx";
 import * as $section_gallery_SwiperStyles from "./islands/section/gallery/SwiperStyles.tsx";
-import * as $section_gallery_Team from "./islands/section/gallery/Team.tsx";
+import * as $section_gallery_TeamBanner from "./islands/section/gallery/TeamBanner.tsx";
 import * as $section_howto_SRC101RegisterHowto from "./islands/section/howto/SRC101RegisterHowto.tsx";
 import * as $section_howto_SRC101TransferHowto from "./islands/section/howto/SRC101TransferHowto.tsx";
 import * as $section_howto_SRC20DeployHowto from "./islands/section/howto/SRC20DeployHowto.tsx";
@@ -508,7 +508,8 @@ const manifest = {
     "./islands/section/gallery/Carousel.tsx": $section_gallery_Carousel,
     "./islands/section/gallery/CollectionGallery.tsx":
       $section_gallery_CollectionGallery,
-    "./islands/section/gallery/Partners.tsx": $section_gallery_Partners,
+    "./islands/section/gallery/PartnersBanner.tsx":
+      $section_gallery_PartnersBanner,
     "./islands/section/gallery/SRC20Deploys.tsx": $section_gallery_SRC20Deploys,
     "./islands/section/gallery/SRC20Gallery.tsx": $section_gallery_SRC20Gallery,
     "./islands/section/gallery/SRC20Mints.tsx": $section_gallery_SRC20Mints,
@@ -521,7 +522,7 @@ const manifest = {
     "./islands/section/gallery/StampTransfers.tsx":
       $section_gallery_StampTransfers,
     "./islands/section/gallery/SwiperStyles.tsx": $section_gallery_SwiperStyles,
-    "./islands/section/gallery/Team.tsx": $section_gallery_Team,
+    "./islands/section/gallery/TeamBanner.tsx": $section_gallery_TeamBanner,
     "./islands/section/howto/SRC101RegisterHowto.tsx":
       $section_howto_SRC101RegisterHowto,
     "./islands/section/howto/SRC101TransferHowto.tsx":

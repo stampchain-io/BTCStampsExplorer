@@ -15,20 +15,20 @@ interface Partner {
 const partners: Partner[] = [
   {
     name: "Bitfinity",
-    largeImage: "/img/home/partner/bitfinity-partnercard-large.png",
-    smallImage: "/img/home/partner/bitfinity-partnercard-small.png",
+    largeImage: "/img/banner/bitfinity-wide.webp",
+    smallImage: "/img/banner/bitfinity-square.webp",
     url: "https://bitfinity.network/",
   },
   {
     name: "R8",
-    largeImage: "/img/home/partner/r8-partnercard-large.png",
-    smallImage: "/img/home/partner/r8-partnercard-small.png",
+    largeImage: "/img/banner/r8-wide.webp",
+    smallImage: "/img/banner/r8-square.webp",
     url: "https://www.revolvedex.com/",
   },
   {
     name: "Bitname",
-    largeImage: "/img/home/partner/bitname-partnercard-large.png",
-    smallImage: "/img/home/partner/bitname-partnercard-small.png",
+    largeImage: "/img/banner/bitname-wide.webp",
+    smallImage: "/img/banner/bitname-square.webp",
     url: "https://bitname.pro",
   },
 ];
@@ -66,7 +66,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
         src={largeImage}
         alt={`${name} banner`}
         loading="lazy"
-        class={`hidden mobileMd:block absolute inset-0 w-full cursor-pointer transition-all duration-300 ${
+        class={`hidden mobileMd:block absolute inset-0 w-full cursor-pointer transition-all duration-150 ${
           isHovered ? "grayscale-0" : "grayscale"
         }`}
       />
@@ -74,14 +74,14 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
         src={smallImage}
         alt={`${name} banner`}
         loading="lazy"
-        class={`block mobileMd:hidden absolute inset-0 w-full cursor-pointer transition-all duration-300 ${
+        class={`block mobileMd:hidden absolute inset-0 w-full cursor-pointer transition-all duration-150 ${
           isHovered ? "grayscale-0" : "grayscale"
         }`}
       />
 
       {/* ===== GRADIENT OVERLAY ===== */}
       <div
-        class={`w-full h-full bg-gradient-to-tr from-[#666666FF] via-[#9999997F] to-[#CCCCCC00] absolute left-0 top-0 transition-opacity duration-300 ${
+        class={`w-full h-full bg-gradient-to-tr from-[#666666FF] via-[#9999997F] to-[#CCCCCC00] absolute left-0 top-0 transition-opacity duration-150 ${
           isHovered ? "!hidden" : ""
         }`}
       />
@@ -98,7 +98,7 @@ function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
 }
 
 /* ===== COMPONENT ===== */
-export function PartnersGallery() {
+export function PartnersBanner() {
   /* ===== RENDER ===== */
   return (
     <div class="flex flex-col max-w-desktop w-full mx-auto mb-4">

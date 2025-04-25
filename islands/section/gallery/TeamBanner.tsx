@@ -3,7 +3,7 @@ import { gapGrid } from "$layout";
 import { headingPurpleLD, subtitlePurple, valueSmPurple } from "$text";
 
 /* ===== COMPONENT ===== */
-export default function TeamGallery() {
+export default function TeamBanner() {
   /* ===== RENDER ===== */
   return (
     <>
@@ -22,7 +22,7 @@ export default function TeamGallery() {
             >
               {/* ===== MIKE IN SPACE CARD ===== */}
               <div className="flex flex-col items-center">
-                <img src="/img/about/code.png" />
+                <img src="/img/banner/mike.png" />
                 <h5 className={headingPurpleLD}>
                   MIKE IN SPACE
                 </h5>
@@ -37,7 +37,7 @@ export default function TeamGallery() {
 
               {/* ===== REINAMORA CARD ===== */}
               <div className="flex flex-col items-center">
-                <img src="/img/about/backend.png" />
+                <img src="/img/banner/kevin.png" />
                 <h5 className={headingPurpleLD}>
                   REINAMORA
                 </h5>
@@ -52,7 +52,7 @@ export default function TeamGallery() {
 
               {/* ===== ARWYN CARD ===== */}
               <div className="flex flex-col items-center">
-                <img src="/img/about/memetic.png" />
+                <img src="/img/banner/arwyn.png" />
                 <h5 className={headingPurpleLD}>
                   ARWYN
                 </h5>

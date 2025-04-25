@@ -10,7 +10,7 @@ import { HomeHeader } from "$header";
 import {
   CarouselHome,
   GetStampingCta,
-  PartnersGallery,
+  PartnersBanner,
   SRC20Gallery,
   StampchainContactCta,
   StampOverviewGallery,
@@ -166,7 +166,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
           <div class="flex flex-col gap-6 mobileLg:gap-12">
             <StampchainContactCta />
-            <PartnersGallery />
+            <PartnersBanner />
           </div>
         </div>
       </div>
