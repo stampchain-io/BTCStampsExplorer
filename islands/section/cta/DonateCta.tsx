@@ -367,7 +367,7 @@ export default function DonateCta() {
               dev wallet.
             </p>
 
-            <div className="flex justify-start gap-4 items-center mt-3">
+            <div className="flex justify-start gap-6 items-center mt-3">
               <div
                 ref={receiveButtonRef}
                 class="relative group order-1 tablet:order-2"

@@ -9,11 +9,13 @@ import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
 import { phantomProvider } from "$client/wallet/phantom.ts";
 import { showConnectWalletModal as _showConnectWalletModal } from "$client/wallet/wallet.ts";
 import { containerCard } from "$layout";
+import { closeForegroundModal, closeModal } from "$islands/modal/states.ts";
 
 /* ===== TYPES ===== */
 interface WalletProviderProps {
   providerKey: WalletProviderKey;
-  onSuccess: () => void;
+  isStacked?: boolean;
+  onSuccess?: () => void;
   onConnected?: {
     content: preact.ComponentChildren;
     animation?: "scaleUpDown" | "scaleDownUp" | "zoomInOut";
@@ -31,7 +33,7 @@ const walletConnectors = {
 
 /* ===== MODAL COMPONENT ===== */
 export function WalletProvider(
-  { providerKey, onSuccess, onConnected }: WalletProviderProps,
+  { providerKey, isStacked, onSuccess, onConnected }: WalletProviderProps,
 ) {
   /* ===== HOOKS ===== */
   const { addToast = () => {} } = useToast() ?? {};
@@ -48,15 +50,34 @@ export function WalletProvider(
         throw new Error(`Unsupported wallet provider: ${providerKey}`);
       }
 
+      // First connect the wallet
       await connectFunction((message: string, type: string) => {
         addToast(message, type);
         console.log(message);
       });
 
-      onSuccess();
+      // Trigger animation
+      const modalContainer = document.getElementById(
+        "animation-modal-container",
+      );
+      if (modalContainer) {
+        modalContainer.classList.add("out");
+      }
 
-      if (onConnected) {
-        openModal(onConnected.content, onConnected.animation || "scaleDownUp");
+      // If we have onSuccess, we're in a stacked state
+      if (onSuccess) {
+        setTimeout(() => {
+          closeForegroundModal();
+          // Call onSuccess AFTER closing the foreground modal
+          setTimeout(() => {
+            if (onSuccess) onSuccess();
+          }, 1); // Small delay to ensure proper sequencing
+        }, 600);
+      } else {
+        // Single modal - just close it
+        setTimeout(() => {
+          closeModal();
+        }, 600);
       }
     } catch (error) {
       const errorMessage =

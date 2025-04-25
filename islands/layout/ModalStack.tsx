@@ -11,9 +11,20 @@ export const stackConnectWalletModal = (onConnected?: () => void) => {
       key={key}
       providerKey={key}
       onSuccess={() => {
-        if (onConnected) {
-          onConnected();
+        // First trigger the animation
+        const modalContainer = document.getElementById(
+          "animation-modal-container",
+        );
+        if (modalContainer) {
+          modalContainer.classList.add("out");
         }
+
+        // Then wait for animation and transform
+        setTimeout(() => {
+          if (onConnected) {
+            onConnected();
+          }
+        }, 600);
       }}
     />
   ));

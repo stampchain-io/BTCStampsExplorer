@@ -41,10 +41,10 @@ function RecieveAddyModal({ address, title = "RECEIVE" }: Props) {
         type: "square",
         gradient: {
           type: "linear",
-          rotation: 105,
+          rotation: 45,
           colorStops: [
             { offset: 0, color: "#CCCCCC" },
-            { offset: 1, color: "#AAAAAA" },
+            { offset: 1, color: "#999999" },
           ],
         },
       },

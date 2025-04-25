@@ -8,7 +8,12 @@ import {
 } from "$lib/utils/formatUtils.ts";
 import type { BaseFeeCalculatorProps } from "$lib/types/base.d.ts";
 import { tooltipButton, tooltipImage } from "$notification";
-import { buttonPurpleFlat, buttonPurpleOutline, sliderKnob } from "$button";
+import {
+  buttonPurpleFlat,
+  buttonPurpleOutline,
+  sliderBar,
+  sliderKnob,
+} from "$button";
 import { Icon } from "$icon";
 import { labelXs, textXs } from "$text";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
@@ -261,8 +266,7 @@ export function FeeCalculatorBase({
             handleChangeFee(
               sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
             )}
-          className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey
-           ${sliderKnob}`}
+          className={`${sliderBar} ${sliderKnob}`}
         />
         <div
           className={`${tooltipImage} ${
@@ -416,8 +420,20 @@ export function FeeCalculatorBase({
                 DONATION AMOUNT
               </span>&nbsp;&nbsp;
               {amount
-                ? (amount / 100000000).toFixed(8)
-                : <span className="animate-pulse">0.00000000</span>} BTC
+                ? (
+                  <>
+                    {coinType === "BTC"
+                      ? formatSatoshisToBTC(amount, { includeSymbol: false })
+                      : formatSatoshisToUSD(amount, BTCPrice)}{" "}
+                    <span className="font-light">{coinType}</span>
+                  </>
+                )
+                : (
+                  <>
+                    <span className="animate-pulse">0.00000000</span>{" "}
+                    <span className="font-light">{coinType}</span>
+                  </>
+                )}
             </h6>
           )}
 
@@ -440,10 +456,22 @@ export function FeeCalculatorBase({
                 STAMP PRICE
               </span>&nbsp;&nbsp;
               {price
-                ? formatBTCAmount(typeof price === "number" ? price : 0, {
-                  excludeSuffix: true,
-                })
-                : <span className="animate-pulse">0.00000000</span>} BTC
+                ? (
+                  <>
+                    {coinType === "BTC"
+                      ? formatSatoshisToBTC(price * 1e8, {
+                        includeSymbol: false,
+                      })
+                      : formatSatoshisToUSD(price * 1e8, BTCPrice)}{" "}
+                    <span className="font-light">{coinType}</span>
+                  </>
+                )
+                : (
+                  <>
+                    <span className="animate-pulse">0.00000000</span>{" "}
+                    <span className="font-light">{coinType}</span>
+                  </>
+                )}
             </h6>
           )}
 

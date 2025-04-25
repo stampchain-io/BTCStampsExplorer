@@ -9,7 +9,7 @@ import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { StampImage } from "$content";
-import { sliderKnob } from "$button";
+import { sliderBar, sliderKnob } from "$button";
 import { tooltipImage } from "$notification";
 import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 
@@ -274,8 +274,7 @@ const DonateStampModal = ({
                     Math.max(1, sliderPosToAmount(parseFloat(target.value))),
                   );
                 }}
-                className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey 
-                ${sliderKnob}`}
+                className={`${sliderBar} ${sliderKnob}`}
               />
               <div
                 className={`${tooltipImage} ${

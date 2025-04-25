@@ -1,5 +1,3 @@
-export * from "$components/table/TableStyles.ts";
-
 export * from "$components/table/HoldersTable.tsx";
 
 export * from "$components/table/src20DataTable/SRC20Transfers.tsx";

@@ -51,6 +51,18 @@
     },
     {
       "folderPath": "BTCStampsExplorer/routes/[...path].ts/"
+    },
+    {
+      "folderPath": "BTCStampsExplorer/islands/",
+      "color": "foldercolorizer.color_9966cc"
+    },
+    {
+      "folderPath": "BTCStampsExplorer/components/",
+      "color": "foldercolorizer.color_ff99ff"
+    },
+    {
+      "folderPath": "BTCStampsExplorer/static/img/",
+      "color": "foldercolorizer.color_996666"
     }
   ]
 }

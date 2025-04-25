@@ -6,9 +6,7 @@ import { subtitlePurple, titlePurpleLD } from "$text";
 import { ViewAllButton } from "$button";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Timeframe } from "$layout";
-import { SRC20Card, SRC20CardMinting } from "$card";
-
-/* ===== COLUMN CONFIGURATIONS ===== */
+import { SRC20CardSm, SRC20CardSmMinting } from "$card";
 
 /* ===== TYPES ===== */
 interface SRC20GalleryProps {
@@ -177,7 +175,7 @@ export function SRC20Gallery({
       {subTitle && (
         <h2
           class={`${subtitlePurple} mb-6 ${
-            viewType === "minting" ? "tablet:text-right text-left" : ""
+            viewType === "minting" ? "text-left tablet:text-right" : ""
           }`}
         >
           {subTitle}
@@ -186,7 +184,7 @@ export function SRC20Gallery({
 
       {viewType === "minted"
         ? (
-          <SRC20Card
+          <SRC20CardSm
             data={data}
             fromPage={fromPage}
             timeframe={timeframe}
@@ -194,7 +192,7 @@ export function SRC20Gallery({
           />
         )
         : (
-          <SRC20CardMinting
+          <SRC20CardSmMinting
             data={data}
             fromPage={fromPage}
             timeframe={timeframe}

@@ -1,9 +1,8 @@
 /* ===== DATA TABLE BASE COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { ScrollContainer } from "$layout";
+import { containerBackground, ScrollContainer } from "$layout";
 import { TabData, TableProps, TableType } from "$components/layout/types.ts";
 import {
-  container,
   SRC20MintsTable,
   SRC20TransfersTable,
   StampListingsAllTable,
@@ -267,7 +266,7 @@ export default function DataTableBase({
 
   /* ===== RENDER ===== */
   return (
-    <div class={container}>
+    <div class={containerBackground}>
       {/* ===== TABS SECTION ===== */}
       <div class="flex justify-between items-start w-full mb-6">
         {configs.map(({ id }) => {

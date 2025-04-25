@@ -47,7 +47,9 @@ const MintProgress = (
           PROGRESS
           <span class={`${valueXl} pl-3`}>
             {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0]}
-            %
+            <span class="font-light">
+              %
+            </span>
           </span>
         </h5>
         {/* Progress bar */}
