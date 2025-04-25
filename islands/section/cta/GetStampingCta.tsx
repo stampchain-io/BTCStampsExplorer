@@ -104,8 +104,8 @@ export function GetStampingCta() {
         </div>
 
         {/* ===== PRICE/FEE INFO ===== */}
-        <div className="flex justify-end gap-6
-        font-light text-base text-stamp-grey">
+        <div className="flex justify-end gap-5
+        font-light text-sm text-stamp-grey">
           <p>
             <span className="text-stamp-grey-darker">FEE</span>&nbsp;
             {isLoading

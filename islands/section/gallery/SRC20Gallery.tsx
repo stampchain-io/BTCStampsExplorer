@@ -27,6 +27,12 @@ interface SRC20GalleryProps {
   address?: string;
   useClientFetch?: boolean;
   timeframe: "24H" | "3D" | "7D";
+  serverData?: {
+    data: SRC20Row[];
+    total: number;
+    page: number;
+    totalPages: number;
+  };
 }
 
 /* ===== IMAGE MODAL COMPONENT ===== */
@@ -63,14 +69,20 @@ export function SRC20Gallery({
   initialData,
   pagination,
   address,
-  useClientFetch = fromPage === "home" || fromPage === "wallet",
+  useClientFetch = fromPage === "wallet",
   timeframe,
+  serverData,
 }: SRC20GalleryProps) {
   const [data, setData] = useState<SRC20Row[]>(initialData || []);
-  const [isLoading, setIsLoading] = useState(!initialData);
+  const [isLoading, setIsLoading] = useState(!initialData && !serverData);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
+    if (serverData) {
+      setData(serverData.data);
+      return;
+    }
+
     if (!initialData?.length && useClientFetch) {
       setIsTransitioning(true);
       setIsLoading(true);
@@ -83,11 +95,7 @@ export function SRC20Gallery({
             timeframe: timeframe,
           });
 
-          if (fromPage === "home") {
-            endpoint = viewType === "minting"
-              ? `/api/internal/src20/trending?type=minting&transactionCount=1000`
-              : `/api/internal/src20/trending?type=market`;
-          } else if (fromPage === "wallet" && address) {
+          if (fromPage === "wallet" && address) {
             endpoint = `/api/v2/src20/balance/${address}`;
           }
 
@@ -119,6 +127,7 @@ export function SRC20Gallery({
     fromPage,
     address,
     useClientFetch,
+    serverData,
   ]);
 
   useEffect(() => {

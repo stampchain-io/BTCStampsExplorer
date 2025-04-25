@@ -4,6 +4,7 @@ import type { Collection } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 import { Micro5FontLoader } from "$layout";
 import { HomeHeader } from "$header";
@@ -29,6 +30,20 @@ interface StampControllerData {
 
 interface HomePageData extends StampControllerData {
   error?: string;
+  src20Data?: {
+    minted: {
+      data: SRC20Row[];
+      total: number;
+      page: number;
+      totalPages: number;
+    };
+    minting: {
+      data: SRC20Row[];
+      total: number;
+      page: number;
+      totalPages: number;
+    };
+  };
 }
 
 /* ===== SERVER HANDLER ===== */
@@ -45,11 +60,32 @@ export const handler: Handlers<HomePageData> = {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 2000);
 
-      const pageData = await StampController.getHomePageData();
+      const [pageData, mintedData, mintingData] = await Promise.all([
+        StampController.getHomePageData(),
+        Src20Controller.fetchFullyMintedByMarketCapV2(5, 1),
+        Src20Controller.fetchTrendingActiveMintingTokensV2(5, 1, 1000),
+      ]);
+
       clearTimeout(timeout);
 
       /* ===== RESPONSE CONFIGURATION ===== */
-      const response = await ctx.render(pageData);
+      const response = await ctx.render({
+        ...pageData,
+        src20Data: {
+          minted: {
+            data: mintedData.data,
+            total: mintedData.total,
+            page: mintedData.page,
+            totalPages: mintedData.totalPages,
+          },
+          minting: {
+            data: mintingData.data,
+            total: mintingData.total,
+            page: mintingData.page,
+            totalPages: mintingData.totalPages,
+          },
+        },
+      });
       response.headers.set("Cache-Control", "public, max-age=300"); // 5 min cache
       response.headers.set("Priority", "high"); // Signal high priority to CDN
       return response;
@@ -64,6 +100,10 @@ export const handler: Handlers<HomePageData> = {
         stamps_posh: [],
         collectionData: [],
         error: "Failed to load complete data",
+        src20Data: {
+          minted: { data: [], total: 0, page: 1, totalPages: 0 },
+          minting: { data: [], total: 0, page: 1, totalPages: 0 },
+        },
       });
     }
   },
@@ -78,6 +118,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
     stamps_src721 = [],
     stamps_posh = [],
     collectionData = [],
+    src20Data,
   } = data || {};
 
   /* ===== RENDER ===== */
@@ -154,12 +195,16 @@ export default function Home({ data }: PageProps<HomePageData>) {
                 subTitle="TOP TICKERS"
                 viewType="minted"
                 fromPage="home"
+                serverData={src20Data?.minted}
+                useClientFetch={false}
               />
               <SRC20Gallery
                 title="SRC-20 TOKENS"
                 subTitle="TRENDING MINTS"
                 viewType="minting"
                 fromPage="home"
+                serverData={src20Data?.minting}
+                useClientFetch={false}
               />
             </div>
           </div>
