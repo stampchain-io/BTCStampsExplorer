@@ -5,12 +5,14 @@ import { JSX } from "preact";
 export interface ButtonVariants {
   base: string;
   variant: Record<
-    | "outline"
+    | "text"
     | "flat"
+    | "outline"
     | "flatOutline"
     | "outlineFlat"
     | "outlineGradient"
-    | "text",
+    | "flatOutlineSelector"
+    | "outlineFlatSelector",
     string
   >;
   color: Record<
@@ -91,15 +93,15 @@ export const buttonStyles: ButtonVariants = {
       font-semibold tracking-wide
       text-[var(--default-color)] hover:text-[var(--hover-color)]
     `,
-    outline: `
-      bg-transparent
-      border-[var(--default-color)] hover:border-[var(--hover-color)]
-      text-[var(--default-color)] hover:text-[var(--hover-color)]
-    `,
     flat: `
       bg-[var(--default-color)] hover:bg-[var(--hover-color)]
       border-[var(--default-color)] hover:border-[var(--hover-color)]
       text-black
+    `,
+    outline: `
+      bg-transparent
+      border-[var(--default-color)] hover:border-[var(--hover-color)]
+      text-[var(--default-color)] hover:text-[var(--hover-color)]
     `,
     flatOutline: `
       bg-[var(--default-color)] hover:bg-transparent 
@@ -124,6 +126,14 @@ export const buttonStyles: ButtonVariants = {
       [&>*]:text-[var(--default-color)] hover:[&>*]:text-[var(--hover-color)]
       [&>*]:transition-colors [&>*]:duration-100
     `,
+    flatOutlineSelector: `
+      bg-[var(--hover-color)] border-[var(--hover-color)] text-black
+      hover:bg-[var(--hover-color)] hover:border-[var(--hover-color)] hover:text-black
+    `,
+    outlineFlatSelector: `
+      bg-transparent border-[var(--default-color)] text-[var(--default-color)]
+      hover:bg-[var(--hover-color)] hover:border-[var(--hover-color)] hover:text-black
+    `,
   },
 
   /* ===== COLOR STYLES ===== */
@@ -134,7 +144,7 @@ export const buttonStyles: ButtonVariants = {
     `,
     greyDark: `
       [--default-color:#666666]
-      [--hover-color:#666666]
+      [--hover-color:#999999]
     `,
     greyGradient: `
       [--color-dark:#666666]
@@ -149,7 +159,7 @@ export const buttonStyles: ButtonVariants = {
     `,
     purpleDark: `
       [--default-color:#660099]
-      [--hover-color:#660099]
+      [--hover-color:#8800CC]
     `,
     purpleGradient: `
       [--color-dark:#660099]

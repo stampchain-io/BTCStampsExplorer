@@ -35,7 +35,7 @@ export function SRC20OverviewContent({
     filter: "TRENDING" | "DEPLOY" | "HOLDERS" | null;
     direction: "asc" | "desc";
   }>({
-    filter: null,
+    filter: "TRENDING",
     direction: "desc",
   });
 
@@ -63,8 +63,8 @@ export function SRC20OverviewContent({
 
   // Handle view type changes
   const handleViewTypeChange = () => {
-    setCurrentSort({ filter: null, direction: "desc" }); // Reset sort when changing views
     setViewType((prev) => prev === "minted" ? "minting" : "minted");
+    setCurrentSort({ filter: "TRENDING", direction: "desc" });
   };
 
   const currentData = getCurrentData();

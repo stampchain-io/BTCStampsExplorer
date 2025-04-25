@@ -1,4 +1,5 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
+/* @baba - update search button styling */
 import { useState } from "preact/hooks";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
@@ -70,8 +71,13 @@ export const SRC20OverviewHeader = (
   };
 
   const handleMintingClick = () => {
+    // Update minting hover state
     setMintingHover({ canHoverSelected: false, allowHover: false });
-    setFilterHover({ canHoverSelected: true, allowHover: true });
+
+    // Reset filter hover state
+    setFilterHover({ canHoverSelected: false, allowHover: true });
+
+    // Reset timeframe to default (24H)
     setTimeframeHover({ canHoverSelected: true, allowHover: true });
     setSelectedTimeframe("24H");
     onTimeframeChange?.("24H");
@@ -119,16 +125,16 @@ export const SRC20OverviewHeader = (
 
   const getTimeframeVariant = (timeframe: "24H" | "3D" | "7D") => {
     if (timeframe === selectedTimeframe) {
-      return timeframeHover.canHoverSelected ? "flatOutline" : "outlineFlat";
+      return "flatOutlineSelector";
     }
-    return "outlineFlat";
+    return "outlineFlatSelector";
   };
 
   const getFilterVariant = (filter: "TRENDING" | "DEPLOY" | "HOLDERS") => {
     if (filter === currentSort?.filter) {
-      return filterHover.canHoverSelected ? "flatOutline" : "outlineFlat";
+      return "flatOutlineSelector";
     }
-    return "outlineFlat";
+    return "outlineFlatSelector";
   };
 
   /* ===== RENDER ===== */
@@ -144,7 +150,6 @@ export const SRC20OverviewHeader = (
         {/* ===== CONTROLS SECTION ===== */}
         <div className="flex flex-col">
           <div className="flex relative items-start justify-between gap-4 tablet:gap-3">
-            <SearchSRC20Modal showButton={true} />
             <Button
               variant={viewType === "minting"
                 ? mintingHover.canHoverSelected ? "flatOutline" : "outlineFlat"
@@ -159,6 +164,11 @@ export const SRC20OverviewHeader = (
             >
               MINTING
             </Button>
+            <div class="w-[34px] h-[34px] px-[5px] rounded-md bg-transparent border-2 border-stamp-purple hover:border-stamp-purple-bright">
+              <div class="-mt-0.5">
+                <SearchSRC20Modal showButton={true} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -176,15 +186,34 @@ export const SRC20OverviewHeader = (
               onClick={() => handleFilterClick(filter)}
               onMouseEnter={handleFilterMouseEnter}
               onMouseLeave={handleFilterMouseLeave}
+              class={filter === "DEPLOY"
+                ? "relative w-[84px]"
+                : filter === "HOLDERS"
+                ? "relative w-[94px]"
+                : filter === "TRENDING" && filter === currentSort?.filter
+                ? "cursor-default"
+                : ""}
             >
-              {filter}
-              {
-                /*o{sortConfig.filter === filter && (
-                <span className="ml-1">
-                  {sortConfig.direction === "asc" ? "↑" : "↓"}
-                </span>
-              )}*/
-              }
+              {(filter === "HOLDERS" || filter === "DEPLOY")
+                ? (
+                  <div className="relative">
+                    <span
+                      className={`transition-opacity duration-150 ${
+                        filter === currentSort?.filter
+                          ? "group-hover:opacity-0"
+                          : ""
+                      }`}
+                    >
+                      {filter}
+                    </span>
+                    {filter === currentSort?.filter && (
+                      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                        SORT
+                      </span>
+                    )}
+                  </div>
+                )
+                : filter}
             </Button>
           ))}
         </div>
@@ -200,6 +229,7 @@ export const SRC20OverviewHeader = (
               onClick={() => handleTimeframeClick(timeframe)}
               onMouseEnter={handleTimeframeMouseEnter}
               onMouseLeave={handleTimeframeMouseLeave}
+              class={timeframe === selectedTimeframe ? "cursor-default" : ""}
             >
               {timeframe}
             </Button>

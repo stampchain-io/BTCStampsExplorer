@@ -90,7 +90,7 @@ export function Button({
     active: isActive || undefined,
   });
 
-  const combinedClass = `${buttonClass} ${className ?? ""}`;
+  const combinedClass = `${buttonClass} ${className ?? ""} group`;
 
   // Special handling for outlineGradient variant
   if (variant === "outlineGradient") {
