@@ -1,14 +1,17 @@
 /* ===== DONATE STAMP MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { StampRow } from "$globals";
-import { StampImage } from "$content";
-import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
-import { ModalBase } from "$layout";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
+import { ModalBase } from "$layout";
+import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
+import { handleModalClose } from "$components/layout/ModalBase.tsx";
+import { closeModal, openModal } from "$islands/modal/states.ts";
+import { StampImage } from "$content";
+import { sliderKnob } from "$button";
 import { tooltipImage } from "$notification";
-import { closeModal } from "$islands/modal/states.ts";
+import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -34,6 +37,7 @@ const DonateStampModal = ({
   const [totalPrice, setTotalPrice] = useState(0);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isAmountTooltipVisible, setIsAmountTooltipVisible] = useState(false);
+  const [tosAgreed, setTosAgreed] = useState(false);
 
   /* ===== REFS ===== */
   const amountTooltipTimeoutRef = useRef<number | null>(null);
@@ -125,16 +129,28 @@ const DonateStampModal = ({
     setIsAmountTooltipVisible(false);
   };
 
-  const handleCloseModal = () => {
-    logger.debug("ui", {
-      message: "Modal closing",
-      component: "DonateStampModal",
-    });
-    closeModal();
-  };
-
   /* ===== TRANSACTION HANDLING ===== */
   const handleBuyClick = async () => {
+    // Check if wallet is connected first
+    if (!wallet || !wallet.address) {
+      const { modalContent } = stackConnectWalletModal(() => {
+        // Open the Donate Stamp Modal
+        openModal(
+          <DonateStampModal
+            stamp={stamp}
+            fee={initialFee}
+            handleChangeFee={handleChangeFee}
+            dispenser={dispenser}
+          />,
+          "scaleUpDown",
+        );
+      });
+
+      // Open the Connect Wallet Modal
+      openModal(modalContent, "scaleUpDown");
+      return;
+    }
+
     await handleSubmit(async () => {
       // Convert fee rate from sat/vB to sat/kB
       const feeRateKB = formState.fee * 1000;
@@ -205,16 +221,13 @@ const DonateStampModal = ({
 
   /* ===== RENDER ===== */
   return (
-    <ModalBase
-      onClose={handleCloseModal}
-      title="DONATE"
-    >
+    <ModalBase title="DONATE">
       {/* ===== PRICE DISPLAY ===== */}
       <div className="mb-6">
-        <p className="text-3xl mobileLg:text-4xl font-bold text-stamp-grey-light text-center">
+        <h6 className="font-extrabold text-3xl text-stamp-grey-light text-center">
           {(totalPrice / 100000000).toFixed(8)}{" "}
-          <span className="font-extralight">BTCc</span>
-        </p>
+          <span className="font-extralight">BTC</span>
+        </h6>
       </div>
 
       {/* ===== STAMP DETAILS ===== */}
@@ -229,16 +242,14 @@ const DonateStampModal = ({
 
         {/* ===== QUANTITY SELECTION ===== */}
         <div className="flex flex-col w-full">
-          <div className="flex flex-col items-start -space-y-0.5">
-            <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey-light">
-              <span className="font-light text-stamp-grey-darker">RECEIVE</span>
-              <br />
-              {quantity * 1000}{" "}
-              <span className="font-light">
-                USDSTAMPS
-              </span>
+          <div className="flex flex-col items-start pt-0.5 -space-y-0.5">
+            <h6 className="font-light text-sm text-stamp-grey-darker">
+              RECEIVE
+            </h6>
+            <h6 className="font-light text-lg text-stamp-grey-light">
+              <span className="font-bold">{quantity * 1000}</span> USDSTAMPS
               {quantity * 1000 > 1 ? "" : ""}
-            </p>
+            </h6>
           </div>
 
           {/* ===== AMOUNT SLIDER ===== */}
@@ -263,7 +274,8 @@ const DonateStampModal = ({
                     Math.max(1, sliderPosToAmount(parseFloat(target.value))),
                   );
                 }}
-                className="w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+                className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey 
+                ${sliderKnob}`}
               />
               <div
                 className={`${tooltipImage} ${
@@ -295,23 +307,15 @@ const DonateStampModal = ({
         }}
         type="buy"
         fromPage="donate"
+        tosAgreed={tosAgreed}
+        onTosChange={setTosAgreed}
         amount={totalPrice}
         receive={quantity * 1000}
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
-        onSubmit={() => {
-          logger.debug("ui", {
-            message: "Submit clicked",
-            component: "DonateStampModal",
-          });
-          handleBuyClick();
-        }}
+        onSubmit={() => handleBuyClick()}
         onCancel={() => {
-          logger.debug("ui", {
-            message: "Cancel clicked",
-            component: "DonateStampModal",
-          });
-          closeModal();
+          handleModalClose();
         }}
         buttonName="DONATE"
         className="pt-9 mobileLg:pt-12"
@@ -321,9 +325,9 @@ const DonateStampModal = ({
       />
 
       {/* ===== STATUS MESSAGES ===== */}
-      {error && <div className="text-red-500 mt-2">{error}</div>}
+      {error && <div className="text-xs text-red-500 mt-2">{error}</div>}
       {successMessage && (
-        <div className="text-green-500 mt-2">{successMessage}</div>
+        <div className="text-xs text-green-500 mt-2">{successMessage}</div>
       )}
     </ModalBase>
   );

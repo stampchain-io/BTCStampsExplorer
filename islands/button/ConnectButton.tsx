@@ -72,7 +72,8 @@ export const ConnectButton = () => {
             <Button
               variant="outlineGradient"
               color="purpleGradient"
-              size="md"
+              size="sm"
+              class="!w-[100px]"
               onClick={handleOpenModal}
               ref={buttonRef}
             >

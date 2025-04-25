@@ -375,10 +375,10 @@ export default function DonateCta() {
                 onMouseLeave={handleReceiveMouseLeave}
               >
                 <Icon
-                  type="iconButton"
+                  type="iconLink"
                   name="donate"
                   weight="normal"
-                  size="xl"
+                  size="sm"
                   color="purple"
                   onClick={() => {
                     setIsReceiveTooltipVisible(false);
@@ -397,7 +397,7 @@ export default function DonateCta() {
               {/* Address Text - second on mobile, first on tablet+ */}
               <a
                 href={`/wallet/${DONATE_ADDRESS}`}
-                class="font-medium text-lg text-stamp-purple hover:text-stamp-purple-bright transition-colors duration-300 order-2 tablet:order-1"
+                class="font-medium text-base text-stamp-purple hover:text-stamp-purple-bright transition-colors duration-300 order-2 tablet:order-1"
               >
                 <span className="hidden tablet:block">{DONATE_ADDRESS}</span>
                 <span className="hidden mobileMd:block tablet:hidden">

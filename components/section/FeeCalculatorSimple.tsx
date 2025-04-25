@@ -6,7 +6,7 @@ import type { Output } from "$types/index.d.ts";
 export function FeeCalculatorSimple({
   fee,
   _type,
-  amount,
+  amount, // Donation amount
   receive, //Receive amount on donate
   fromPage,
   price, // Stamp Buy Modal
@@ -32,6 +32,9 @@ export function FeeCalculatorSimple({
 
   const estimatedFee = estimateFee(outputs, fee, utxoAncestors?.length || 1);
 
+  // Calculate total value including donation amount and miner fee
+  const totalValue = (amount || 0) + estimatedFee;
+
   return (
     <FeeCalculatorBase
       amount={amount}
@@ -50,7 +53,7 @@ export function FeeCalculatorSimple({
       feeDetails={{
         minerFee: estimatedFee,
         hasExactFees: true,
-        totalValue: estimatedFee,
+        totalValue: totalValue,
         dustValue: 0,
       }}
     />

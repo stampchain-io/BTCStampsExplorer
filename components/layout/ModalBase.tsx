@@ -56,19 +56,17 @@ export function ModalBase({
       component: "ModalBase",
     });
 
-    // First trigger the animation by setting status to true in ModalOverlay
     const modalContainer = document.getElementById("animation-modal-container");
     if (modalContainer) {
       modalContainer.classList.add("out");
     }
 
-    // Then wait for animation to complete before closing
     setTimeout(() => {
       if (onClose) {
         onClose();
       }
       closeModal();
-    }, 600); // matches --animation-cleanup-delay from modal.css
+    }, 600);
   };
 
   useEffect(() => {
@@ -136,3 +134,19 @@ export function ModalBase({
     </div>
   );
 }
+
+export const handleModalClose = () => {
+  logger.debug("ui", {
+    message: "Modal closing from ModalBase",
+    component: "ModalBase",
+  });
+
+  const modalContainer = document.getElementById("animation-modal-container");
+  if (modalContainer) {
+    modalContainer.classList.add("out");
+  }
+
+  setTimeout(() => {
+    closeModal();
+  }, 600);
+};

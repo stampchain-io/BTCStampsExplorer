@@ -8,7 +8,7 @@ import {
   validateStampContent,
 } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-import TextContentIsland from "../../content/stampDetailContent/StampTextContent.tsx";
+import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { logger } from "$lib/utils/logger.ts";

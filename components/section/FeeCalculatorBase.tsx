@@ -11,6 +11,7 @@ import { tooltipButton, tooltipImage } from "$notification";
 import { buttonPurpleFlat, buttonPurpleOutline, sliderKnob } from "$button";
 import { Icon } from "$icon";
 import { labelXs, textXs } from "$text";
+import { handleModalClose } from "$components/layout/ModalBase.tsx";
 
 interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   isModal?: boolean;
@@ -692,128 +693,125 @@ export function FeeCalculatorBase({
 
       {renderDetails()}
 
-      <div className="flex flex-col items-end gap-4 pt-12">
-        {!isModal && (
-          <div className="relative flex items-center">
-            <input
-              type="checkbox"
-              id="tosAgreed"
-              checked={tosAgreed}
-              onChange={(e) => {
-                const target = e.target as HTMLInputElement;
-                onTosChange(target.checked);
-                setAllowHover(false);
-                setCanHoverSelected(false);
-              }}
-              className="absolute w-0 h-0 opacity-0"
-            />
-            <label
-              htmlFor="tosAgreed"
-              className="flex items-center cursor-pointer group"
-              onMouseEnter={handleCheckboxMouseEnter}
-              onMouseLeave={handleCheckboxMouseLeave}
+      <div className="flex flex-col items-end gap-4 pt-10">
+        <div className="relative flex items-center">
+          <input
+            type="checkbox"
+            id="tosAgreed"
+            checked={tosAgreed}
+            onChange={(e) => {
+              const target = e.target as HTMLInputElement;
+              onTosChange(target.checked);
+              setAllowHover(false);
+              setCanHoverSelected(false);
+            }}
+            className="absolute w-0 h-0 opacity-0"
+          />
+          <label
+            htmlFor="tosAgreed"
+            className="flex items-center cursor-pointer group"
+            onMouseEnter={handleCheckboxMouseEnter}
+            onMouseLeave={handleCheckboxMouseLeave}
+          >
+            <div
+              className={`
+                w-4 h-4 tablet:w-3 tablet:h-3 mr-3 tablet:mr-2 
+                flex items-center justify-center 
+                rounded-sm
+                transition-all duration-300 ease-in-out
+                border
+                relative
+                overflow-hidden
+                ${
+                tosAgreed
+                  ? canHoverSelected
+                    ? "bg-stamp-grey-darker border-stamp-grey-darker group-hover:bg-stamp-grey-light group-hover:border-stamp-grey-light"
+                    : "bg-stamp-grey-darker border-stamp-grey-darker"
+                  : canHoverSelected
+                  ? "bg-stamp-grey-light border-stamp-grey-light group-hover:bg-stamp-grey-darker group-hover:border-stamp-grey-darker"
+                  : "bg-stamp-grey-light border-stamp-grey-light"
+              }
+              `}
             >
               <div
                 className={`
-                  w-4 h-4 tablet:w-3 tablet:h-3 mr-3 tablet:mr-2 
-                  flex items-center justify-center 
-                  rounded-sm
-                  transition-all duration-300 ease-in-out
-                  border
-                  relative
-                  overflow-hidden
+                  absolute 
+                  inset-0.5
+                  transform transition-all duration-300 ease-in-out
+                  ${tosAgreed ? "scale-100" : "scale-0"}
                   ${
-                  tosAgreed
-                    ? canHoverSelected
-                      ? "bg-stamp-grey-darker border-stamp-grey-darker group-hover:bg-stamp-grey-light group-hover:border-stamp-grey-light"
-                      : "bg-stamp-grey-darker border-stamp-grey-darker"
-                    : canHoverSelected
-                    ? "bg-stamp-grey-light border-stamp-grey-light group-hover:bg-stamp-grey-darker group-hover:border-stamp-grey-darker"
-                    : "bg-stamp-grey-light border-stamp-grey-light"
+                  canHoverSelected
+                    ? "bg-stamp-grey-darkest group-hover:bg-stamp-grey-darkest/50"
+                    : "bg-stamp-grey-darkest"
                 }
                 `}
-              >
-                <div
-                  className={`
-                    absolute 
-                    inset-0.5
-                    transform transition-all duration-300 ease-in-out
-                    ${tosAgreed ? "scale-100" : "scale-0"}
-                    ${
-                    canHoverSelected
-                      ? "bg-stamp-grey-darkest group-hover:bg-stamp-grey-darkest/50"
-                      : "bg-stamp-grey-darkest"
-                  }
-                  `}
-                />
-              </div>
-              <span
-                className={`
-                  text-xs font-medium select-none
-                  transition-colors duration-300 
-                  ${
-                  tosAgreed ? "text-stamp-grey-darker" : "text-stamp-grey-light"
-                }
-                  ${
-                  tosAgreed
-                    ? canHoverSelected
-                      ? "group-hover:text-stamp-grey-light"
-                      : ""
-                    : canHoverSelected
-                    ? "group-hover:text-stamp-grey-darker"
-                    : ""
-                }
-                `}
-              >
-                AGREE TO THE{" "}
-                <span className="text-stamp-purple">
-                  <span className="tablet:hidden">
-                    <a
-                      href="/termsofservice"
-                      className={`
-                        transition-colors duration-300 
-                        ${
-                        tosAgreed
-                          ? "text-stamp-purple-dark"
-                          : "text-stamp-purple"
-                      }
-                        hover:text-stamp-purple-bright
-                      `}
-                    >
-                      TERMS
-                    </a>
-                  </span>
-                  <span className="hidden tablet:inline">
-                    <a
-                      href="/termsofservice"
-                      className={`
-                        transition-colors duration-300 
-                        ${
-                        tosAgreed
-                          ? "text-stamp-purple-dark"
-                          : "text-stamp-purple"
-                      }
-                        hover:text-stamp-purple-bright
-                      `}
-                    >
-                      TERMS OF SERVICE
-                    </a>
-                  </span>
+              />
+            </div>
+            <span
+              className={`
+                text-xs font-medium select-none
+                transition-colors duration-300 
+                ${
+                tosAgreed ? "text-stamp-grey-darker" : "text-stamp-grey-light"
+              }
+                ${
+                tosAgreed
+                  ? canHoverSelected ? "group-hover:text-stamp-grey-light" : ""
+                  : canHoverSelected
+                  ? "group-hover:text-stamp-grey-darker"
+                  : ""
+              }
+              `}
+            >
+              AGREE TO THE{" "}
+              <span className="text-stamp-purple">
+                <span className="tablet:hidden">
+                  <a
+                    href="/termsofservice"
+                    className={`
+                      transition-colors duration-300 
+                      ${
+                      tosAgreed ? "text-stamp-purple-dark" : "text-stamp-purple"
+                    }
+                      hover:text-stamp-purple-bright
+                    `}
+                  >
+                    TERMS
+                  </a>
+                </span>
+                <span className="hidden tablet:inline">
+                  <a
+                    href="/termsofservice"
+                    className={`
+                      transition-colors duration-300 
+                      ${
+                      tosAgreed ? "text-stamp-purple-dark" : "text-stamp-purple"
+                    }
+                      hover:text-stamp-purple-bright
+                    `}
+                  >
+                    TERMS OF SERVICE
+                  </a>
                 </span>
               </span>
-            </label>
-          </div>
-        )}
+            </span>
+          </label>
+        </div>
 
         <div className="flex justify-end gap-6">
-          {isModal && onCancel && (
+          {onCancel && (
             <button
               className={`${buttonPurpleOutline} ${
-                (disabled || isSubmitting || (!isModal && !tosAgreed))
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
-              onClick={onCancel}
+              onClick={() => {
+                logger.debug("ui", {
+                  message: "Cancel clicked",
+                  component: "FeeCalculatorBase",
+                });
+                handleModalClose();
+                onCancel();
+              }}
               disabled={isSubmitting}
             >
               {cancelText}
@@ -821,12 +819,12 @@ export function FeeCalculatorBase({
           )}
           <button
             className={`${buttonPurpleFlat} ${
-              (disabled || isSubmitting || (!isModal && !tosAgreed))
-                ? "opacity-40 cursor-not-allowed"
+              (disabled || isSubmitting || !tosAgreed)
+                ? "opacity-50 cursor-not-allowed"
                 : ""
             }`}
             onClick={onSubmit}
-            disabled={disabled || isSubmitting || (!isModal && !tosAgreed)}
+            disabled={disabled || isSubmitting || !tosAgreed}
           >
             {isSubmitting ? "PROCESSING" : confirmText || buttonName}
           </button>

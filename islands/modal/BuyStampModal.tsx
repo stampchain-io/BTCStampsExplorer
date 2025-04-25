@@ -1,15 +1,16 @@
 /* ===== BUY STAMP MODAL COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import type { StampRow } from "$globals";
-import { StampImage } from "$content";
-import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
-import { ModalBase } from "$layout";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { inputFieldSquare } from "$form";
-import { closeModal, openModal } from "$islands/modal/states.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
+import { ModalBase } from "$layout";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
+import { handleModalClose } from "$components/layout/ModalBase.tsx";
+import { closeModal, openModal } from "$islands/modal/states.ts";
+import { StampImage } from "$content";
+import { inputFieldSquare } from "$form";
+import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -198,8 +199,8 @@ const BuyStampModal = ({
           />
         </div>
         <div className="flex flex-col w-full">
-          <h5 className="text-3xl gray-gradient1 font-extrabold">
-            <span className="text-stamp-grey-light font-light">
+          <h5 className="font-extrabold text-3xl gray-gradient1">
+            <span className="font-light text-stamp-grey-light">
               #
             </span>
             {stamp.stamp}
@@ -208,10 +209,10 @@ const BuyStampModal = ({
           {/* ===== QUANTITY SELECTION ===== */}
           <div className="flex flex-row pt-3 w-full justify-between items-center">
             <div className="flex flex-col items-start -space-y-0.5">
-              <h5 className="text-lg font-bold text-stamp-grey">
+              <h5 className="font-bold text-lg text-stamp-grey">
                 EDITIONS
               </h5>
-              <h6 className="text-sm font-medium text-stamp-grey-darker">
+              <h6 className="font-medium text-sm text-stamp-grey-darker">
                 MAX {maxQuantity}
               </h6>
             </div>
@@ -257,11 +258,7 @@ const BuyStampModal = ({
           handleBuyClick();
         }}
         onCancel={() => {
-          logger.debug("ui", {
-            message: "Cancel clicked",
-            component: "BuyStampModal",
-          });
-          closeModal();
+          handleModalClose();
         }}
         buttonName="BUY"
         className="pt-9 mobileLg:pt-12"
