@@ -135,6 +135,9 @@ import * as $DateRangePicker from "./islands/DateRangePicker.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
+import * as $Toast_messageUtils from "./islands/Toast/messageUtils.ts";
+import * as $Toast_messages from "./islands/Toast/messages.ts";
+import * as $Toast_toastUtils from "./islands/Toast/toastUtils.ts";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
 import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
@@ -179,7 +182,10 @@ import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $datacontrol_faq from "./islands/datacontrol/faq.ts";
+<<<<<<< HEAD
 import * as $datacontrol_howto from "./islands/datacontrol/howto.ts";
+=======
+>>>>>>> 6ccc621d (fresh gen auto update)
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
@@ -417,6 +423,9 @@ const manifest = {
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
+    "./islands/Toast/messageUtils.ts": $Toast_messageUtils,
+    "./islands/Toast/messages.ts": $Toast_messages,
+    "./islands/Toast/toastUtils.ts": $Toast_toastUtils,
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
     "./islands/Wallet/ConnectedModal.tsx": $Wallet_ConnectedModal,
     "./islands/Wallet/ConnectorsModal.tsx": $Wallet_ConnectorsModal,
@@ -477,7 +486,10 @@ const manifest = {
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/datacontrol/faq.ts": $datacontrol_faq,
+<<<<<<< HEAD
     "./islands/datacontrol/howto.ts": $datacontrol_howto,
+=======
+>>>>>>> 6ccc621d (fresh gen auto update)
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/home/FontLoader.tsx": $home_FontLoader,
