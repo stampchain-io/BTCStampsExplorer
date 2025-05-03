@@ -152,7 +152,6 @@ import * as $Wallet_details_WalletProfileDetails from "./islands/Wallet/details/
 import * as $Wallet_details_WalletReceiveModal from "./islands/Wallet/details/WalletReceiveModal.tsx";
 import * as $Wallet_details_WalletSendBTCModal from "./islands/Wallet/details/WalletSendBTCModal.tsx";
 import * as $Wallet_details_WalletSendStampModal from "./islands/Wallet/details/WalletSendStampModal.tsx";
-import * as $Wallet_details_styles from "./islands/Wallet/details/styles.ts";
 import * as $about_AboutContact from "./islands/about/AboutContact.tsx";
 import * as $about_AboutDonate from "./islands/about/AboutDonate.tsx";
 import * as $about_AboutHeader from "./islands/about/AboutHeader.tsx";
@@ -444,7 +443,6 @@ const manifest = {
       $Wallet_details_WalletSendBTCModal,
     "./islands/Wallet/details/WalletSendStampModal.tsx":
       $Wallet_details_WalletSendStampModal,
-    "./islands/Wallet/details/styles.ts": $Wallet_details_styles,
     "./islands/about/AboutContact.tsx": $about_AboutContact,
     "./islands/about/AboutDonate.tsx": $about_AboutDonate,
     "./islands/about/AboutHeader.tsx": $about_AboutHeader,

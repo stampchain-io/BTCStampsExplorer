@@ -2,7 +2,7 @@ export const ModulesStyles = {
   titleGreyDL:
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3",
   titleGreyLD:
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xlfont-black gray-gradient1",
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient1",
   titlePurpleDL:
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1",
   titlePurpleLD:

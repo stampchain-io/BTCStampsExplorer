@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 
-import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { SRC20InputField } from "$islands/stamping/src20/SRC20InputField.tsx";
 import { logger } from "$lib/utils/logger.ts";

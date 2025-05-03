@@ -70,8 +70,3 @@ export const ABBREVIATION_LENGTHS = {
   mobileMd: 6,
   mobileSm: 6,
 } as const;
-
-export const StampStyles = {
-  titlePurpleDL:
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1",
-};

@@ -2,7 +2,19 @@ import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
-import { DetailStyles } from "./styles.ts";
+import {
+  buttonPurpleFlat,
+  dataColumn,
+  dataLabel,
+  dataLabelSm,
+  dataValueLg,
+  dataValueSm,
+  dataValueXl,
+  subTitleGrey,
+  titleGreyDL,
+  tooltipIcon,
+  walletDataContainer,
+} from "$components/shared/WalletStyles.ts";
 
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
@@ -93,12 +105,12 @@ function WalletOverview(
     }
   };
 
-  const displayPrice = walletData.dispensers?.items?.[0]?.satoshirate
-    ? parseInt(walletData.dispensers.items[0].satoshirate.toString(), 10) /
-      100000000
-    : 0;
+  // const displayPrice = walletData.dispensers?.items?.[0]?.satoshirate
+  //   ? parseInt(walletData.dispensers.items[0].satoshirate.toString(), 10) /
+  //     100000000
+  //   : 0;
 
-  const displayPriceUSD = displayPrice * walletData.btcPrice;
+  // const displayPriceUSD = displayPrice * walletData.btcPrice;
 
   console.log("walletData:", walletData);
   console.log("dispensers:", walletData.dispensers);
@@ -107,7 +119,7 @@ function WalletOverview(
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
       <div class="flex flex-col w-full tablet:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
         <div class="flex">
-          <p class={DetailStyles.titleGreyDL}>
+          <p class={titleGreyDL}>
             {walletData.address.startsWith("1D") ||
                 walletData.dispensers?.total > 0
               ? "DISPENSER"
@@ -117,12 +129,12 @@ function WalletOverview(
         <div class="flex gap-3 mobileMd:gap-6">
           <div class="flex">
             <p
-              class={`${DetailStyles.subTitleGrey} hidden mobileMd:block mobileLg:hidden desktop:block`}
+              class={`${subTitleGrey} hidden mobileMd:block mobileLg:hidden desktop:block`}
             >
               {walletData.address}
             </p>
             <p
-              class={`${DetailStyles.subTitleGrey} block mobileMd:hidden mobileLg:block desktop:hidden`}
+              class={`${subTitleGrey} block mobileMd:hidden mobileLg:block desktop:hidden`}
             >
               {abbreviateAddress(walletData.address, 14)}
             </p>
@@ -145,14 +157,14 @@ function WalletOverview(
               <path d="M27 4H11C10.7348 4 10.4804 4.10536 10.2929 4.29289C10.1054 4.48043 10 4.73478 10 5V10H5C4.73478 10 4.48043 10.1054 4.29289 10.2929C4.10536 10.4804 4 10.7348 4 11V27C4 27.2652 4.10536 27.5196 4.29289 27.7071C4.48043 27.8946 4.73478 28 5 28H21C21.2652 28 21.5196 27.8946 21.7071 27.7071C21.8946 27.5196 22 27.2652 22 27V22H27C27.2652 22 27.5196 21.8946 27.7071 21.7071C27.8946 21.5196 28 21.2652 28 21V5C28 4.73478 27.8946 4.48043 27.7071 4.29289C27.5196 4.10536 27.2652 4 27 4ZM20 26H6V12H20V26ZM26 20H22V11C22 10.7348 21.8946 10.4804 21.7071 10.2929C21.5196 10.1054 21.2652 10 21 10H12V6H26V20Z" />
             </svg>
             <div
-              class={`${DetailStyles.tooltipIcon} ${
+              class={`${tooltipIcon} ${
                 isTooltipVisible ? "opacity-100" : "opacity-0"
               }`}
             >
               COPY ADDY
             </div>
             <div
-              class={`${DetailStyles.tooltipIcon} ${
+              class={`${tooltipIcon} ${
                 showCopied ? "opacity-100" : "opacity-0"
               }`}
             >
@@ -197,7 +209,7 @@ function DispenserStats({
     <div className="flex flex-col pt-6">
       {/* Stamp Info Section */}
       <div>
-        <p className={`${DetailStyles.dataValueLg} whitespace-nowrap overflow-hidden`}>
+        <p className={`${dataValueLg} whitespace-nowrap overflow-hidden`}>
           <>
             <span className="font-light">STAMP #</span>
             <span className="font-black">{stampData.stamp}</span>
@@ -211,7 +223,7 @@ function DispenserStats({
         )}
 
         <div className="flex flex-col items-start pt-1.5 mobileLg:pt-3">
-          <p className={DetailStyles.dataLabelSm}>BY</p>
+          <p className={dataLabelSm}>BY</p>
           <a
             className="text-sm mobileLg:text-base font-black gray-gradient3-hover -mt-1"
             href={`/wallet/${stampData.creator}`}
@@ -259,7 +271,7 @@ function DispenserStats({
           align="right"
         />
         <div className="flex justify-end pt-6">
-          <button className={DetailStyles.buttonPurpleFlat}>
+          <button className={buttonPurpleFlat}>
             BUY
           </button>
         </div>
@@ -321,7 +333,7 @@ function StampStats(
 ) {
   return (
     <div
-      className={DetailStyles.walletDataContainer}
+      className={walletDataContainer}
       onClick={() => handleType("stamp")}
     >
       <div className="flex">
@@ -367,7 +379,7 @@ function TokenStats(
 
   return (
     <div
-      className={DetailStyles.walletDataContainer}
+      className={walletDataContainer}
       onClick={() => handleType("token")}
     >
       <div className="flex justify-between">
@@ -464,14 +476,14 @@ function StatTitle({ label, value, align = "left" }: StatTitleProps) {
   }[align];
 
   return (
-    <div class={`${DetailStyles.dataColumn} `}>
+    <div class={`${dataColumn} `}>
       <p
-        class={`${DetailStyles.dataLabel} ${alignmentClass}`}
+        class={`${dataLabel} ${alignmentClass}`}
       >
         {label}
       </p>
       <p
-        class={`${DetailStyles.dataValueXl} ${alignmentClass}`}
+        class={`${dataValueXl} ${alignmentClass}`}
       >
         {value}
       </p>
@@ -496,14 +508,14 @@ function StatItem(
   }[align];
 
   return (
-    <div class={`${DetailStyles.dataColumn} ${customClass || ""}`}>
+    <div class={`${dataColumn} ${customClass || ""}`}>
       <p
-        class={`${DetailStyles.dataLabelSm}  ${alignmentClass}`}
+        class={`${dataLabelSm}  ${alignmentClass}`}
       >
         {label}
       </p>
       <p
-        class={`${DetailStyles.dataValueSm} ${alignmentClass}`}
+        class={`${dataValueSm} ${alignmentClass}`}
       >
         {value}
       </p>

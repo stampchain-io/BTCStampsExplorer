@@ -67,9 +67,13 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
           </div>
 
           {/* Graph */}
-           <div class="flex flex-col -mb-3 mobileLg:-mb-6">
+          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
             <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
-              <ChartWidget fromPage="home" data={src20.chart} tick={src20.tick} />
+              <ChartWidget
+                fromPage="home"
+                data={src20.chart}
+                tick={src20.tick}
+              />
             </div>
           </div>
         </>
@@ -78,7 +82,7 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
       {fromPage === "home" && (
         <>
           {/* Holders, Deploy, Creator group */}
-          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
+          <div class="flex-col -mb-3 mobileLg:-mb-6 desktop:flex hidden">
             <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
               <p class={BaseCardStyles.dataLabelSm}>
                 HOLDERS{" "}

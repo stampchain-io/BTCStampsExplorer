@@ -1,7 +1,8 @@
+import { JSX } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import QRCode from "qrcode";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
-import {BTCModalStyles} from "./styles.ts"
+import { tooltipIcon } from "$components/shared/WalletStyles.ts";
 
 interface Props {
   onClose: () => void;
@@ -121,7 +122,7 @@ function WalletReceiveModal({ onClose, address, title = "RECEIVE" }: Props) {
             <path d="M27 4H11C10.7348 4 10.4804 4.10536 10.2929 4.29289C10.1054 4.48043 10 4.73478 10 5V10H5C4.73478 10 4.48043 10.1054 4.29289 10.2929C4.10536 10.4804 4 10.7348 4 11V27C4 27.2652 4.10536 27.5196 4.29289 27.7071C4.48043 27.8946 4.73478 28 5 28H21C21.2652 28 21.5196 27.8946 21.7071 27.7071C21.8946 27.5196 22 27.2652 22 27V22H27C27.2652 22 27.5196 21.8946 27.7071 21.7071C27.8946 21.5196 28 21.2652 28 21V5C28 4.73478 27.8946 4.48043 27.7071 4.29289C27.5196 4.10536 27.2652 4 27 4ZM20 26H6V12H20V26ZM26 20H22V11C22 10.7348 21.8946 10.4804 21.7071 10.2929C21.5196 10.1054 21.2652 10 21 10H12V6H26V20Z" />
           </svg>
           <div
-            class={`${BTCModalStyles.tooltipIcon} ${
+            class={`${tooltipIcon} ${
               isCopyTooltipVisible ? "opacity-100" : "opacity-0"
             }`}
           >
@@ -133,24 +134,22 @@ function WalletReceiveModal({ onClose, address, title = "RECEIVE" }: Props) {
   );
 }
 
-function formatAddress(address: string): JSX.Element[] {
+function formatAddress(address: string): JSX.Element {
   const groups = address.match(/.{1,4}/g) ?? [address];
-  return groups.map((group, index) => [
-    index % 2 === 0 ? <span key={index}>{group}</span> : (
-      <span
-        key={index}
-        class="text-base mobileLg:text-xl text-stamp-purple font-bold"
-      >
-        {group}
-      </span>
-    ),
-    // Add line break after every 4th group (16 characters)
-    index < groups.length - 1 && (
-      (index + 1) % 4 === 0
-        ? <br key={`break-${index}`} />
-        : <span key={`space-${index}`}>&nbsp;</span>
-    ),
-  ]).flat();
+
+  return (
+    <>
+      {groups.map((group, index) => (
+        <span
+          key={index}
+          class={index % 2 !== 0 ? "text-stamp-purple font-bold" : ""}
+        >
+          {group}
+          {(index + 1) % 4 === 0 && index < groups.length - 1 ? <br /> : " "}
+        </span>
+      ))}
+    </>
+  );
 }
 
 export default WalletReceiveModal;
