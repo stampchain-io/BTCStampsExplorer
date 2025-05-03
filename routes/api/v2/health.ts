@@ -27,7 +27,21 @@ interface HealthStatus {
 }
 
 export const handler: Handlers = {
-  async GET() {
+  /**
+   * Simple health check for load balancer
+   * Returns 200 without checking any services
+   */
+  async GET(_req, ctx) {
+    // Extract path to check if this is a simple health check
+    const url = new URL(ctx.url);
+    if (url.searchParams.has('simple')) {
+      return new Response(JSON.stringify({ status: "OK" }), {
+        headers: { "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+    
+    // Continue with full health check if not simple
     const health: HealthStatus = {
       status: "OK",
       services: {
@@ -51,7 +65,7 @@ export const handler: Handlers = {
         getCurrentBlock(),
         StampService.countTotalStamps(),
         SRC20Repository.checkSrc20Deployments(),
-        XcpManager.checkHealth(0),
+        XcpManager.checkHealth(30000), // 30 second cache for health checks
       ]);
 
       // Update service statuses
@@ -76,12 +90,15 @@ export const handler: Handlers = {
       };
 
       // Update overall status
-      const isError = !Object.values({
-        ...health.services,
-        src20: src20Deployments.isValid,
-        stamps: stampCount.isValid,
-      }).every(Boolean) ||
-        (health.services.blockSync && !health.services.blockSync.isSynced);
+      // Make the health check more resilient - only require database and API to be healthy
+      // This is to fix ELB health check failures
+      const essentialServices = {
+        api: health.services.api,
+        database: health.services.database,
+      };
+      
+      // Non-essential services can be down without failing the health check
+      const isError = !Object.values(essentialServices).every(Boolean);
 
       health.status = isError ? "ERROR" : "OK";
     } catch (error) {

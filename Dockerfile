@@ -10,11 +10,7 @@ ENV HOME=/app \
     XDG_CACHE_HOME=/app/.cache \
     XDG_DATA_HOME=/app/.local/share \
     NPM_CONFIG_CACHE=/app/.npm \
-    # Skip Redis during build but enable at runtime
-    SKIP_REDIS=true \
-    SKIP_REDIS_CONNECTION=true \
-    SKIP_REDIS_TLS=true \
-    CACHE=false
+    REDIS_LOG_LEVEL=DEBUG
 
 # Install additional tools
 RUN apk add --no-cache bash

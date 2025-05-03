@@ -69,17 +69,17 @@ deno task validate:schema
 
 ## Production Deployment
 
-1. **Build the project:**
-   ```sh
-   deno task build
-   ```
+### 1. Local or Server Deployment
 
-2. **Start production server:**
-   ```sh
-   deno task start
-   ```
+```sh
+# Build the project:
+deno task build
 
-Docker deployment is also supported:
+# Start production server:
+deno task start
+```
+
+### 2. Docker Deployment
 
 ```sh
 docker build -t btc-stamps-explorer:2.2.3 .
@@ -87,11 +87,60 @@ docker run -p 8000:8000 btc-stamps-explorer:2.2.3
 ```
 
 The container uses:
-
-- Deno 2.2.3 Alpine base image
+- Ubuntu 22.04 base image
+- Deno 2.2.3
 - Production environment
 - Port 8000
 - Required permissions for network, file system, and environment variables
+
+### 3. AWS Deployment
+
+The project includes an AWS deployment pipeline using:
+- Amazon ECR (Elastic Container Registry)
+- Amazon ECS (Elastic Container Service)
+- AWS CodeBuild
+
+#### AWS Deployment Options:
+
+1. **Local Build & Deploy**:
+   ```sh
+   # Build locally and deploy to AWS
+   ./scripts/aws-deploy.sh --build --deploy
+   ```
+
+2. **Cloud Build & Deploy**:
+   ```sh
+   # Trigger AWS CodeBuild to build and deploy
+   ./scripts/aws-deploy.sh --codebuild --deploy
+   ```
+
+3. **Fix Network Configuration**:
+   ```sh
+   # Update ECS service networking
+   ./scripts/aws-deploy.sh --fix-networking
+   ```
+
+4. **Diagnose AWS Issues**:
+   ```sh
+   # Run diagnostics on AWS setup
+   ./scripts/aws-deploy.sh --diagnose
+   ```
+
+#### AWS Deployment Architecture:
+
+```
+┌───────────┐     ┌───────────┐     ┌───────────┐     ┌───────────┐
+│   Local   │     │    AWS    │     │    ECR    │     │    ECS    │
+│  Machine  │────▶│ CodeBuild │────▶│ Container │────▶│  Service  │
+└───────────┘     └───────────┘     │ Registry  │     └───────────┘
+                                    └───────────┘
+```
+
+Required AWS Resources:
+- ECR Repository: `btc-stamps-explorer`
+- CodeBuild Project: `stamps-app-build`
+- ECS Cluster: `stamps-app-prod`
+- ECS Service: `stamps-app-service`
 
 For development with Docker:
 

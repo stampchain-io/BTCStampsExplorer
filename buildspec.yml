@@ -1,38 +1,48 @@
 version: 0.2
+
 phases:
   install:
     runtime-versions:
       docker: latest
     commands:
-      - echo "Installing dependencies using amazonlinux2-x86_64-standard:4.0 (amd64 architecture)"
-      - echo "Image will be compatible with ECS Fargate without platform flag"
+      - echo "Installing build dependencies..."
+      - yum -y install jq
   pre_build:
     commands:
-      - echo "Setting AWS account ID and image name"
-      - export ECR_REPO=stamps-app/front-end
-      - export FULL_ECR_REPO_URL=$AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$ECR_REPO
-      # Login to ECR to push images
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
-      # Pull existing latest image to use as cache and avoid rate limits
-      - echo "Trying to pull existing latest image to use as cache..."
-      - docker pull $FULL_ECR_REPO_URL:latest || echo "No latest image found, will build from scratch"
+      - echo "Environment verification..."
+      - export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - export AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID:-$(aws sts get-caller-identity --query Account --output text)}
+      - export ECR_REPOSITORY_NAME=${ECR_REPOSITORY_NAME:-btc-stamps-explorer}
+      - export BASE_REPOSITORY_NAME=${ECR_REPOSITORY_NAME}-base
+      - export ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+      - echo "ECR URI $ECR_URI"
+      
+      # Create repositories if they don't exist
+      - aws ecr describe-repositories --repository-names $ECR_REPOSITORY_NAME || aws ecr create-repository --repository-name $ECR_REPOSITORY_NAME
+      - aws ecr describe-repositories --repository-names $BASE_REPOSITORY_NAME || aws ecr create-repository --repository-name $BASE_REPOSITORY_NAME
+      
+      # Login to ECR
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_URI
+      
+      # Use the pre-cached base image from ECR to avoid Docker Hub rate limits
+      - echo "Using pre-cached base image from ECR to avoid Docker Hub rate limits..."
   build:
     commands:
-      - echo "Building the Docker image"
-      - if [ -z "$VERSION_TAG" ]; then export IMAGE_TAG="prod-$(date +%Y%m%d%H%M%S)-fallback"; else export IMAGE_TAG="$VERSION_TAG"; fi
-      - echo "Using IMAGE_TAG=$IMAGE_TAG"
-      - echo "Building Docker image for amd64 (default for this CodeBuild environment)..."
-      # Using the --cache-from flag to use the pulled image as cache
-      - docker build --cache-from $FULL_ECR_REPO_URL:latest -t $FULL_ECR_REPO_URL:$IMAGE_TAG .
-      - docker tag $FULL_ECR_REPO_URL:$IMAGE_TAG $FULL_ECR_REPO_URL:latest
+      - echo "Build started on $(date)"
+      # Modify Dockerfile to use our ECR cached base image before building
+      - sed -i "s|FROM denoland/deno:alpine-2.2.3|FROM $ECR_URI/$BASE_REPOSITORY_NAME:alpine-2.2.3|g" Dockerfile || echo "Dockerfile substitution failed, trying original build"
+      - docker build --platform=linux/amd64 -t $ECR_URI/$ECR_REPOSITORY_NAME:latest .
   post_build:
     commands:
-      - echo "Pushing the Docker image"
-      - docker push $FULL_ECR_REPO_URL:$IMAGE_TAG
-      - docker push $FULL_ECR_REPO_URL:latest
-      - echo "Completed pushing Docker image"
-      - echo $IMAGE_TAG > image_tag.txt
+      - echo "Build completed on $(date)"
+      - docker push $ECR_URI/$ECR_REPOSITORY_NAME:latest
+      - echo '[{"name":"stamps-app-container","imageUri":"'$ECR_URI/$ECR_REPOSITORY_NAME:latest'"}]' > imagedefinitions.json
+
 artifacts:
   files:
-    - image_tag.txt
+    - imagedefinitions.json
   discard-paths: yes
+
+cache:
+  paths:
+    - '/root/.docker/**/*'

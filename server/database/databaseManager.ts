@@ -53,6 +53,7 @@ interface DatabaseConfig {
   ELASTICACHE_ENDPOINT: string;
   DENO_ENV: string;
   CACHE?: string;
+  REDIS_LOG_LEVEL?: string;
 }
 
 async function shouldInitializeRedis(): Promise<boolean> {
@@ -100,7 +101,7 @@ class DatabaseManager {
   private #setupLogging(): void {
     setup({
       handlers: {
-        console: new ConsoleHandler("DEBUG"),
+        console: new ConsoleHandler(level),
         file: new FileHandler("WARN", {
           filename: "./db.log",
           formatter: (logRecord: LogRecord) =>
@@ -109,7 +110,7 @@ class DatabaseManager {
       },
       loggers: {
         default: {
-          level: "DEBUG",
+          level: level,
           handlers: ["console", "file"],
         },
       },
@@ -691,6 +692,16 @@ const dbConfig: DatabaseConfig = {
   ELASTICACHE_ENDPOINT: Deno.env.get("ELASTICACHE_ENDPOINT") || "",
   DENO_ENV: Deno.env.get("DENO_ENV") || "development",
   CACHE: Deno.env.get("CACHE") || "true",
+  REDIS_LOG_LEVEL: Deno.env.get("REDIS_LOG_LEVEL") || "DEBUG",
 };
+
+// Log the ElastiCache configuration at startup for troubleshooting
+console.log("=== CACHE CONFIGURATION ===");
+console.log(`ELASTICACHE_ENDPOINT: ${dbConfig.ELASTICACHE_ENDPOINT || 'Not set'}`);
+console.log(`DENO_ENV: ${dbConfig.DENO_ENV}`);
+console.log(`CACHE enabled: ${dbConfig.CACHE}`);
+console.log(`REDIS_LOG_LEVEL: ${dbConfig.REDIS_LOG_LEVEL}`);
+console.log(`SKIP_REDIS_CONNECTION: ${(globalThis as any).SKIP_REDIS_CONNECTION ? 'true' : 'false'}`);
+console.log("===========================");
 
 export const dbManager = new DatabaseManager(dbConfig);

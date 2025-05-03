@@ -18,24 +18,4 @@ openapitools.json
 package-lock.json
 app.log
 logs/
-
-# Deployment logs and backups
-deployment_logs/
-stack_backups/
-repo_backup_*/
-backup_copilot/
-
-# Temporary files
-*.log
-image_tag.txt
-task_def_arn.txt
-task_def_template.json
-
-# Task definition files generated during deployment
-task-def-*.json
-task-def.json
-*-task-def.json
-*-task-def-*.json
-current-version-tag.txt
-current-latest-tag.txt
-current-image-tag.txt
+source.zip
