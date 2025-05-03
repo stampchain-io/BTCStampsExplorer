@@ -459,7 +459,7 @@ export function StampImage(
 
   const fetchHtmlContent = async () => {
     try {
-      const response = await fetch(src);
+      const response = await fetch(stamp.stamp_url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
