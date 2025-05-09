@@ -1,6 +1,6 @@
-import beautify  from 'js-beautify'
+import beautify from "js-beautify";
 
-export const formatHtmlFromUrl = (htmlContent: string):string => {
+export const formatHtmlFromUrl = (htmlContent: string): string => {
   try {
     const formattedHTML = beautify.html(htmlContent, {
       indent_size: 2,
@@ -10,7 +10,7 @@ export const formatHtmlFromUrl = (htmlContent: string):string => {
     });
     return formattedHTML;
   } catch (error) {
-    console.log("Format Error: ", error)
+    console.log("Format Error: ", error);
     return null;
   }
 };

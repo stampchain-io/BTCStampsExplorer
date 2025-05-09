@@ -1,4 +1,16 @@
 #animation-modal-container {
+  /* Common variables */
+  /*  --animation-duration-modal: 0s;
+--animation-delay-background: 0s;
+--animation-delay-modal: 0s;
+defined individually 
+  */
+  --animation-timing: cubic-bezier(0.250, 0.100, 0.250, 1.000);
+  --animation-bg: rgba(66, 66, 66, .3);
+  --animation-duration-background: .5s;
+  --animation-cleanup-delay: .5s;
+
+  /* Base modal container styles */
   position: fixed;
   display: table;
   height: 100%;
@@ -6,10 +18,216 @@
   top: 0;
   left: 0;
   transform: scale(0);
-  z-index: 1;
+  z-index: 50;
 
+  /* Common styles for all scale/zoom animations */
+  &[class*="scale"],
+  &.zoomInOut {
+    transform: scale(1);
+
+    .animation-modal-background {
+      background: var(--animation-bg);
+      animation: fadeModalIn var(--animation-duration-background) var(--animation-timing) forwards;
+
+      .animation-modal {
+        opacity: 0;
+      }
+    }
+
+    +.content {
+      animation: scaleContentBack var(--animation-duration-background) var(--animation-timing) forwards;
+    }
+
+    &.out {
+      .animation-modal-background {
+        animation: fadeModalOut var(--animation-duration-background) var(--animation-timing) forwards;
+      }
+
+      +.content {
+        animation: scaleContentForward var(--animation-duration-background) var(--animation-timing) forwards;
+      }
+    }
+  }
+
+  /* Specific animation variants */
+  &.scaleUpDown {
+    .animation-modal {
+      animation: scaleBottomUp 0.3s var(--animation-timing) forwards;
+    }
+
+    &.out {
+      animation: scaleBottomDown 0s var(--animation-cleanup-delay) linear forwards;
+
+      .animation-modal {
+        animation: scaleBottomDown 0.5s var(--animation-timing) forwards;
+      }
+    }
+  }
+
+  &.scaleDownUp {
+    .animation-modal-background {
+      vertical-align: top;
+    }
+
+    .animation-modal {
+      animation: scaleTopDown 0.3s var(--animation-timing) forwards;
+    }
+
+    &.out {
+      animation: scaleTopUp 0s var(--animation-cleanup-delay) linear forwards;
+
+      .animation-modal {
+        animation: scaleTopUp 0.5s var(--animation-timing) forwards;
+      }
+    }
+  }
+
+  &.zoomInOut {
+    .animation-modal {
+      animation: zoomCenterIn 0.4s var(--animation-timing) forwards;
+    }
+
+    &.out {
+      animation: zoomCenterOut 0s var(--animation-cleanup-delay) linear forwards;
+
+      .animation-modal {
+        animation: zoomCenterOut 0.4s var(--animation-timing) forwards;
+      }
+    }
+  }
+
+  .animation-modal-background {
+    display: table-cell;
+    background: rgba(66, 66, 66, .3);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    text-align: center;
+    vertical-align: middle;
+
+    .animation-modal {
+      display: inline-block;
+      position: relative;
+      text-align: left;
+    }
+  }
+}
+
+@keyframes scaleBottomUp {
+  0% {
+    transform: scale(.95) translateY(100vh);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleBottomDown {
+  0% {
+    transform: scale(.95) translateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) translateY(100vh);
+    opacity: 0;
+  }
+}
+
+@keyframes scaleTopDown {
+  0% {
+    transform: scale(.95) translateY(-100vh);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleTopUp {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(.95) translateY(-100vh);
+    opacity: 0;
+  }
+}
+
+@keyframes zoomCenterIn {
+  0% {
+    transform: scale(.3);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomCenterOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(.3);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeModalIn {
+  0% {
+    background: rgba(66, 66, 66, 0);
+  }
+
+  100% {
+    background: var(--animation-bg);
+  }
+}
+
+@keyframes fadeModalOut {
+  0% {
+    background: var(--animation-bg);
+  }
+
+  100% {
+    background: rgba(66, 66, 66, 0);
+  }
+}
+
+@keyframes scaleContentBack {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(.95);
+  }
+}
+
+@keyframes scaleContentForward {
+  0% {
+    transform: scale(.95);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ===== UNFOLDING ===== */
+/*
   &.unfolding {
-    transform: scaleY(.01) scaleX(0);
+    transform: scaleY(0.75) scaleX(0.75);
     animation: unfoldIn 1s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
 
     .animation-modal-background {
@@ -29,8 +247,10 @@
         }
       }
     }
-  }
+  }*/
 
+/* ===== REVEALING ===== */
+/*
   &.revealing {
     transform: scale(1);
 
@@ -45,7 +265,7 @@
     }
 
     +.content {
-      animation: scaleBack .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+      animation: scaleContentBack .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
     }
 
     &.out {
@@ -60,7 +280,7 @@
       }
 
       +.content {
-        animation: scaleForward .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+        animation: scaleContentForward .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
       }
     }
   }
@@ -93,8 +313,10 @@
         animation: slideDownLarge .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
       }
     }
-  }
+  }*/
 
+/* ===== BLOW UP ===== */
+/*
   &.blow {
     z-index: 0;
     transform: scale(1);
@@ -124,7 +346,9 @@
       }
     }
   }
-
+*/
+/* ===== ROAD RUNNER ===== */
+/*
   &.meep {
     transform: scale(1);
 
@@ -150,8 +374,9 @@
       }
     }
   }
-
-  &.sketch {
+*/
+/* ===== SKETCH ===== */
+/* &.sketch {
     transform: scale(1);
 
     .animation-modal-background {
@@ -200,7 +425,10 @@
       }
     }
   }
+*/
 
+/* ===== BOND ===== */
+/*
   &.bond {
     transform: scale(1);
 
@@ -248,41 +476,10 @@
       }
     }
   }
+  */
 
-  .animation-modal-background {
-    display: table-cell;
-    background: rgba(0, 0, 0, 0.8);
-    text-align: center;
-    vertical-align: middle;
 
-    .animation-modal {
-      background: linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff),
-        #000000;
-      display: inline-block;
-      border-radius: 3px;
-      position: relative;
-      width: 672px;
-      height: 424px;
-
-      .modal-svg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        border-radius: 3px;
-
-        rect {
-          stroke: #fff;
-          stroke-width: 2px;
-          stroke-dasharray: 778;
-          stroke-dashoffset: 778;
-        }
-      }
-    }
-  }
-}
-
+/*
 @keyframes unfoldIn {
   0% {
     transform: scaleY(.005) scaleX(0);
@@ -308,90 +505,6 @@
 
   100% {
     transform: scaleY(.005) scaleX(0);
-  }
-}
-
-@keyframes zoomIn {
-  0% {
-    transform: scale(0);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes zoomOut {
-  0% {
-    transform: scale(1);
-  }
-
-  100% {
-    transform: scale(0);
-  }
-}
-
-@keyframes fadeIn {
-  0% {
-    background: rgba(0, 0, 0, .0);
-  }
-
-  100% {
-    background: rgba(0, 0, 0, .7);
-  }
-}
-
-@keyframes fadeOut {
-  0% {
-    background: rgba(0, 0, 0, .7);
-  }
-
-  100% {
-    background: rgba(0, 0, 0, .0);
-  }
-}
-
-@keyframes scaleUp {
-  0% {
-    transform: scale(.8) translateY(1000px);
-    opacity: 0;
-  }
-
-  100% {
-    transform: scale(1) translateY(0px);
-    opacity: 1;
-  }
-}
-
-@keyframes scaleDown {
-  0% {
-    transform: scale(1) translateY(0px);
-    opacity: 1;
-  }
-
-  100% {
-    transform: scale(.8) translateY(1000px);
-    opacity: 0;
-  }
-}
-
-@keyframes scaleBack {
-  0% {
-    transform: scale(1);
-  }
-
-  100% {
-    transform: scale(.85);
-  }
-}
-
-@keyframes scaleForward {
-  0% {
-    transform: scale(.85);
-  }
-
-  100% {
-    transform: scale(1);
   }
 }
 
@@ -431,7 +544,7 @@
 
 @keyframes moveUp {
   0% {
-    transform: translateY(150px);
+    transform: translateY(100vh);
   }
 
   100% {
@@ -441,11 +554,11 @@
 
 @keyframes moveDown {
   0% {
-    transform: translateY(0px);
+    transform: translateY(0);
   }
 
   100% {
-    transform: translateY(150px);
+    transform: translateY(100vh);
   }
 }
 
@@ -497,8 +610,9 @@
     transform: scale(0);
     opacity: 0;
   }
-}
+}*/
 
+/*
 @keyframes roadRunnerIn {
   0% {
     transform: translateX(-1500px) skewX(30deg) scaleX(1.3);
@@ -653,4 +767,4 @@
   100% {
     transform: scale(0);
   }
-}
+}*/

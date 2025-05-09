@@ -476,7 +476,7 @@ export class StampController {
         stampCategories,
       ] = await Promise.all([
         this.getMultipleStampCategories([
-          { idents: ["SRC-721"], limit: 12, sortBy: sortBy },
+          { idents: ["SRC-721"], limit: 16, sortBy: sortBy },
         ]),
       ]);
       // Fetch the "posh" collection to get its collection_id
@@ -490,10 +490,10 @@ export class StampController {
         const poshStampsResult = await this.getStamps({
           collectionId: poshCollectionId,
           page: 1,
-          limit: 12, // Limit to 8 stamps
-          sortBy: sortBy, // Adjust sort order if needed
+          limit: 24,
+          sortBy: sortBy,
         });
-        stamps_posh = poshStampsResult.data; // Extract the stamps array
+        stamps_posh = poshStampsResult.data;
       } else {
         logger.warn("stamps", {
           message: "Posh collection not found"

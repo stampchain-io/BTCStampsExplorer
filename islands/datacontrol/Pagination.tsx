@@ -1,25 +1,36 @@
 import { useEffect, useState } from "preact/hooks";
 import { PaginationProps } from "$types/pagination.d.ts";
 
-const MOBILE_MAX_PAGE_RANGE = 2;
+// Update pagination range constants
+const MOBILESM_MAX_PAGE_RANGE = 0;
+const MOBILEMD_MAX_PAGE_RANGE = 2;
+const TABLET_MAX_PAGE_RANGE = 3;
 const DESKTOP_MAX_PAGE_RANGE = 4;
 
-const _navArrow = `
+const navArrow = `
   flex items-center justify-center
-  bg-stamp-purple-dark hover:bg-stamp-primary-hover rounded-md
-  w-7 h-7 mobileLg:h-9 mobileLg:w-9`;
+  w-9 h-9 rounded-md hover:bg-stamp-purple-bright`;
 const navContent = `
   flex items-center justify-center
-  w-7 h-7 mobileLg:h-12 mobileLg:w-12 mobileLg:px-3 px-0 rounded-md hover:bg-stamp-primary-hover
-  text-sm leading-[16.5px] mobileLg:text-base mobileLg:leading-[19px]
-  font-medium text-black`;
+  h-9 desktop:pt-0.5 px-[14px] rounded-md hover:bg-stamp-purple-bright
+  font-medium text-black text-sm leading-[16.5px]`;
 
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(false);
+// Update useIsMobile to handle multiple breakpoints
+const useScreenSize = () => {
+  const [screenSize, setScreenSize] = useState("mobileSm");
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(globalThis.innerWidth < 768);
+      const width = globalThis.innerWidth;
+      if (width < 568) {
+        setScreenSize("mobileSm");
+      } else if (width < 768) {
+        setScreenSize("mobileMd");
+      } else if (width < 1024) {
+        setScreenSize("mobileLg");
+      } else {
+        setScreenSize("tablet");
+      }
     };
 
     handleResize();
@@ -27,7 +38,7 @@ const useIsMobile = () => {
     return () => globalThis.removeEventListener("resize", handleResize);
   }, []);
 
-  return isMobile;
+  return screenSize;
 };
 
 export function Pagination({
@@ -36,10 +47,25 @@ export function Pagination({
   prefix = "",
   onPageChange,
 }: PaginationProps) {
-  const isMobile = useIsMobile();
-  const maxPageRange = isMobile
-    ? MOBILE_MAX_PAGE_RANGE
-    : DESKTOP_MAX_PAGE_RANGE;
+  const screenSize = useScreenSize();
+
+  // Update maxPageRange logic based on screen size
+  const getMaxPageRange = (size: string) => {
+    switch (size) {
+      case "mobileSm":
+        return MOBILESM_MAX_PAGE_RANGE;
+      case "mobileMd":
+        return MOBILEMD_MAX_PAGE_RANGE;
+      case "mobileLg":
+        return TABLET_MAX_PAGE_RANGE;
+      case "tablet":
+        return DESKTOP_MAX_PAGE_RANGE;
+      default:
+        return MOBILESM_MAX_PAGE_RANGE;
+    }
+  };
+
+  const maxPageRange = getMaxPageRange(screenSize);
 
   const handlePageChange = (newPage: number) => {
     if (onPageChange) {
@@ -58,9 +84,11 @@ export function Pagination({
 
   const renderPageButton = (pageNum: number, icon?: string) => {
     const isCurrentPage = pageNum === page;
+    // Use navArrow class for caret buttons, otherwise use navContent
+    const baseClass = icon ? navArrow : navContent;
     const buttonClass = isCurrentPage
-      ? `${navContent} bg-stamp-purple`
-      : `${navContent} bg-stamp-purple-dark`;
+      ? `${baseClass} bg-stamp-purple`
+      : `${baseClass} bg-stamp-purple-dark`;
 
     return (
       <button
@@ -73,7 +101,7 @@ export function Pagination({
             <img
               src={`/img/datacontrol/${icon}.svg`}
               alt={`arrow ${icon.toLowerCase()}`}
-              class="w-[14px] h-[14px] mobileLg:w-[18px] mobileLg:h-[18px]"
+              class="w-4 h-4"
             />
           )
           : <span>{pageNum}</span>}
@@ -97,7 +125,7 @@ export function Pagination({
 
   return (
     <nav aria-label="Page navigation" class="flex items-center justify-center">
-      <ul class="inline-flex items-center -space-x-px gap-[9px] mobileLg:gap-3">
+      <ul class="inline-flex items-center -space-x-px gap-3">
         {/* First and Previous */}
         {page > 1 && (
           <>

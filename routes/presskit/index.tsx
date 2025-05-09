@@ -1,4 +1,4 @@
-import { Micro5FontLoader } from "$islands/home/FontLoader.tsx";
+import { Micro5FontLoader } from "$layout";
 
 export default function PressKit() {
   return (

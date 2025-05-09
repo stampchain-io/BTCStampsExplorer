@@ -16,30 +16,49 @@ const BROADCAST_ENDPOINTS = [
 export async function broadcastTransaction(
   signedPsbtHex: string,
 ): Promise<string> {
-  // Convert PSBT to raw transaction
+  // We need a special case for build mode, but this never runs in production
+  if (Deno.args.includes("build")) {
+    logger.warn("broadcast", {
+      message: "Running in build mode - broadcast functionality disabled",
+    });
+    return "BUILD_MODE_DUMMY_TXID";
+  }
+  
+  // Regular implementation that works at runtime
   let rawTxHex: string;
-  try {
-    const psbt = Psbt.fromHex(signedPsbtHex);
-
-    // Validate that the PSBT is signed
-    if (!psbt.validateSignaturesOfAllInputs(() => true)) {
-      throw new Error("PSBT is not fully signed");
-    }
-
-    // Finalize and extract
-    psbt.finalizeAllInputs();
-    rawTxHex = psbt.extractTransaction().toHex();
-
+  
+  // Simple check to detect if this might already be a raw transaction
+  const isPossiblyRawTx = /^[0-9a-f]+$/i.test(signedPsbtHex) && !signedPsbtHex.includes("70736274");
+  if (isPossiblyRawTx) {
     logger.debug("broadcast", {
-      message: "Converted PSBT to raw transaction",
-      data: { rawTxLength: rawTxHex.length },
+      message: "Input appears to be a raw transaction, skipping PSBT conversion",
     });
-  } catch (error) {
-    logger.error("broadcast", {
-      message: "Failed to convert PSBT to raw transaction",
-      error,
-    });
-    throw new Error(`Failed to convert PSBT: ${error.message}`);
+    rawTxHex = signedPsbtHex;
+  } else {
+    try {
+      // Use directly imported Psbt from bitcoinjs-lib
+      const psbt = Psbt.fromHex(signedPsbtHex);
+
+      // Validate that the PSBT is signed
+      if (!psbt.validateSignaturesOfAllInputs(() => true)) {
+        throw new Error("PSBT is not fully signed");
+      }
+
+      // Finalize and extract
+      psbt.finalizeAllInputs();
+      rawTxHex = psbt.extractTransaction().toHex();
+
+      logger.debug("broadcast", {
+        message: "Converted PSBT to raw transaction",
+        data: { rawTxLength: rawTxHex.length },
+      });
+    } catch (error) {
+      logger.error("broadcast", {
+        message: "Failed to convert PSBT to raw transaction",
+        error,
+      });
+      throw new Error(`Failed to convert PSBT: ${error.message}`);
+    }
   }
 
   let lastError: Error | null = null;

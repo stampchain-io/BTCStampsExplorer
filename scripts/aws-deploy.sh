@@ -454,13 +454,17 @@ if [ "$CODEBUILD" = true ]; then
         if [ "$BUILD_STATUS" = "SUCCEEDED" ]; then
             echo -e "${GREEN}Build completed successfully!${NC}"
             
-            # Store service name with explicit quoting to prevent errors
-            export SERVICE_NAME="$ECS_SERVICE_NAME"
-            export CLUSTER_NAME="$ECS_CLUSTER_NAME"
-            export REPO_NAME="$ECR_REPOSITORY_NAME"
+            # Store service name with explicit quoting to prevent errors - ensure variables persist for deployment
+            # These variables need to be available for the deploy section
+            ECS_SERVICE_NAME="${ECS_SERVICE_NAME:-stamps-app-service}"
+            ECS_CLUSTER_NAME="${ECS_CLUSTER_NAME:-stamps-app-prod}"
+            ECR_REPOSITORY_NAME="${ECR_REPOSITORY_NAME:-btc-stamps-explorer}"
             
             # Debug echo to help troubleshoot
-            echo "DEBUG: Service=${SERVICE_NAME}, Cluster=${CLUSTER_NAME}"
+            echo "DEBUG: Service=${ECS_SERVICE_NAME}, Cluster=${ECS_CLUSTER_NAME}, Repository=${ECR_REPOSITORY_NAME}"
+            
+            # Set deploy flag to true after successful build to ensure deployment happens
+            DEPLOY=true
         else
             echo -e "${RED}Build failed with status: ${BUILD_STATUS}${NC}"
             echo -e "${YELLOW}Continuing with deployment of existing ECR image...${NC}"
@@ -469,6 +473,16 @@ if [ "$CODEBUILD" = true ]; then
     else
         echo -e "${RED}Failed to start build in CodeBuild. Continuing with deployment...${NC}"
         DEPLOY=true
+    fi
+    
+    # Make sure variables are properly set for deployment after CodeBuild, even if build failed
+    if [ "$CODEBUILD" = true ]; then
+        # Ensure ECS service variables are set correctly
+        echo -e "${GREEN}Verifying deployment variables after CodeBuild...${NC}"
+        ECS_SERVICE_NAME="${ECS_SERVICE_NAME:-stamps-app-service}"
+        ECS_CLUSTER_NAME="${ECS_CLUSTER_NAME:-stamps-app-prod}"
+        ECR_REPOSITORY_NAME="${ECR_REPOSITORY_NAME:-btc-stamps-explorer}"
+        echo "DEBUG: Final variables for deployment - Service=${ECS_SERVICE_NAME}, Cluster=${ECS_CLUSTER_NAME}, Repository=${ECR_REPOSITORY_NAME}"
     fi
     
 # Build and push Docker image locally if requested

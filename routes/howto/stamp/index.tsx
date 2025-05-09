@@ -1,28 +1,62 @@
-import { HowToLayout } from "$components/howto/HowToLayout.tsx";
-import { Step, StepProps } from "$components/howto/Step.tsx";
-import { STAMP_STEPS, STAMP_IMPORTANT_NOTES } from "$islands/datacontrol/howto.ts";
+/* ===== STAMPING GUIDE HOW-TO PAGE ===== */
+import {
+  Article,
+  AuthorSection,
+  List,
+  STAMP_IMPORTANT_NOTES,
+  STAMP_STEPS,
+  StepList,
+} from "$section";
 
+/* ===== INTRODUCTION COMPONENT ===== */
+function IntroSection() {
+  return (
+    <div class="flex justify-between">
+      <div class="w-3/4">
+        <p>
+          This guide needs to be created.
+        </p>
+        <p>
+          NOTE: Before starting, please ensure that your wallet is connected to
+          stampchain.io and has sufficient funds.
+        </p>
+      </div>
+      <AuthorSection
+        name="TonyNL"
+        twitter="tonynlbtc"
+        website="https://linktr.ee/tonynl"
+      />
+    </div>
+  );
+}
+
+/* ===== STEPS COMPONENT ===== */
+function StampSteps() {
+  return (
+    <StepList hasImportantNotes={STAMP_IMPORTANT_NOTES?.length > 0}>
+      {STAMP_STEPS.map((step) => (
+        <List
+          key={step.number}
+          title={step.title}
+          image={step.image}
+          description={step.description}
+        />
+      ))}
+    </StepList>
+  );
+}
+
+/* ===== MAIN PAGE COMPONENT ===== */
 export default function StampingGuide() {
   return (
-    <HowToLayout
+    <Article
       title="HOW-TO"
       subtitle="STAMP YOUR ART"
       headerImage="/img/how-tos/stamping/00.png"
       importantNotes={STAMP_IMPORTANT_NOTES}
     >
-      <p class="mb-6 mobileLg:mb-12">
-        Stamp your art
-        <br />
-        <br />
-        NOTE: Before starting, please ensure that your wallet is connected to
-        stampchain.io and has sufficient funds.
-      </p>
-      <br />
-      <h2 class="text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-extralight text-stamp-grey-light">
-        <ul class="space-y-9 mobileLg:space-y-12">
-          {STAMP_STEPS.map((step, index) => <Step key={index} {...step} />)}
-        </ul>
-      </h2>
-    </HowToLayout>
+      <IntroSection />
+      <StampSteps />
+    </Article>
   );
 }

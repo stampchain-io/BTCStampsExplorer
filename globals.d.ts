@@ -114,7 +114,7 @@ export interface DisplayCountBreakpoints {
   "desktop": number; // 1440px+
 }
 
-export interface StampSectionProps {
+export interface StampGalleryProps {
   title?: string;
   subTitle?: string;
   type?: string;
@@ -135,15 +135,7 @@ export interface StampSectionProps {
   sortBy?: "ASC" | "DESC" | undefined;
 }
 
-export interface CollectionSectionProps {
-  title?: string;
-  subTitle?: string;
-  collections: Collection[];
-  gridClass?: string;
-  displayCounts?: DisplayCountBreakpoints;
-}
-
-export interface CollectionOverviewSectionProps {
+export interface CollectionGalleryProps {
   title?: string;
   subTitle?: string;
   collections: Collection[];
@@ -702,6 +694,7 @@ export interface WalletDataTypes {
 declare global {
   interface GlobalThis {
     SKIP_REDIS_CONNECTION: boolean | undefined;
+    DENO_BUILD_MODE: boolean | undefined;
     LeatherProvider: {
       request: (method: string, params?: any) => Promise<any>;
       // Add other known properties and methods of LeatherProvider here

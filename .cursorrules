@@ -112,7 +112,7 @@ directory_structure:
         - can_use_hooks_and_state
       examples:
         - "BlockInfo.tsx - state and useEffect"
-        - "SRC20TokenMintingCard.tsx"
+        - "SRC20CardMinting.tsx"
         - "SRC20DetailsTab.tsx"
       patterns:
         - group_by_feature:
@@ -888,7 +888,7 @@ src20_optimization:
     
     current_state:
       client_side:
-        - component: "SRC20Section.tsx"
+        - component: "SRC20Gallery.tsx"
           benefits:
             - "Real-time updates without full page reload"
             - "Smooth UI transitions"
@@ -976,7 +976,7 @@ src20_optimization:
             - "Add cache invalidation strategy"
     
     component_specific_plans:
-      SRC20Section:
+      SRC20Gallery:
         current: "Client-side fetching"
         proposed:
           initial_load:

@@ -1,0 +1,61 @@
+import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
+import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
+import type { SimpleFeeCalculatorProps } from "$lib/types/base.d.ts";
+import type { Output } from "$types/index.d.ts";
+
+export function FeeCalculatorSimple({
+  fee,
+  _type,
+  amount, // Donation amount
+  receive, //Receive amount on donate
+  fromPage,
+  price, // Stamp Buy Modal
+  edition, // Stamp Buy Modal
+  ticker, // SRC20 DEPLOY
+  limit, // SRC20 DEPLOY
+  supply, // SRC20 DEPLOY
+  recipientAddress,
+  userAddress,
+  inputType = "P2WPKH",
+  outputTypes = ["P2WPKH"],
+  utxoAncestors,
+  bitname,
+  transferDetails,
+  mintDetails,
+  ...baseProps
+}: SimpleFeeCalculatorProps) {
+  const outputs: Output[] = outputTypes.map((type) => ({
+    type,
+    script: "",
+    value: amount || 0,
+  }));
+
+  const estimatedFee = estimateFee(outputs, fee, utxoAncestors?.length || 1);
+
+  // Calculate total value including donation amount and miner fee
+  const totalValue = (amount || 0) + estimatedFee;
+
+  return (
+    <FeeCalculatorBase
+      amount={amount}
+      receive={receive}
+      fromPage={fromPage}
+      price={price}
+      edition={edition}
+      ticker={ticker}
+      limit={limit}
+      supply={supply}
+      {...baseProps}
+      fee={fee}
+      bitname={bitname}
+      transferDetails={transferDetails}
+      mintDetails={mintDetails}
+      feeDetails={{
+        minerFee: estimatedFee,
+        hasExactFees: true,
+        totalValue: totalValue,
+        dustValue: 0,
+      }}
+    />
+  );
+}

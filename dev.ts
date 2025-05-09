@@ -1,6 +1,9 @@
-#!/usr/bin/env -S deno run -A --watch=static/,routes/
+#!/usr/bin/env -S deno run -A --watch=routes/
 // Set SKIP_REDIS_CONNECTION before ANY imports
 (globalThis as any).SKIP_REDIS_CONNECTION = true;
+
+// Set development environment
+Deno.env.set("DENO_ENV", "development");
 
 import "preact/debug";
 import dev from "$fresh/dev.ts";

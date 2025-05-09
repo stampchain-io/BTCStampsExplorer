@@ -14,7 +14,6 @@
       "attachSimplePort": 9229,
       "restart": true,
       "outputCapture": "std",
-      "preLaunchTask": "run-local-script",
       "postDebugTask": "deno: cleanup-ports",
       "env": {
         "DENO_ENV": "development",

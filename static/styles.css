@@ -129,6 +129,10 @@ body {
   @apply [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
 }
 
+.scrollbar-black {
+  @apply [&::-webkit-scrollbar-track]:bg-[#000000]/20 [&::-webkit-scrollbar-thumb]:bg-[#666666] [&::-webkit-scrollbar-thumb:hover]:bg-[#999999];
+}
+
 .scrollbar-purple {
   @apply [&::-webkit-scrollbar-track]:bg-[#AA00FF] [&::-webkit-scrollbar-thumb]:bg-[#8800CC] [&::-webkit-scrollbar-thumb:hover]:bg-[#660099];
 }
@@ -309,13 +313,13 @@ body {
     radial-gradient(ellipse 80% 30% at 120% 25%,
       rgba(80, 0, 120, 0.3),
       transparent),
-    radial-gradient(ellipse 25% 30% at 70% 120%,
+    radial-gradient(ellipse 35% 30% at 66% 120%,
       var(--gradient-orange),
       transparent),
-    radial-gradient(ellipse 50% 60% at 70% 100%,
+    radial-gradient(ellipse 65% 60% at 66% 100%,
       var(--gradient-purple),
       transparent),
-    radial-gradient(ellipse 25% 80% at 70% 120%,
+    radial-gradient(ellipse 45% 80% at 66% 120%,
       var(--gradient-cyan),
       transparent 80%),
     linear-gradient(rgba(0, 0, 0, 1),
@@ -524,33 +528,6 @@ body {
   outline-style: none !important;
 }
 
-/* Animated underline for links */
-.animated-underline {
-  font-weight: 700;
-  text-decoration: none;
-  background-image: linear-gradient(#CCCCCC, #CCCCCC);
-  background-position: 0% 100%;
-  background-repeat: no-repeat;
-  background-size: 100% 2px;
-  transition: background-size .3s, color .6s;
-  padding-bottom: 3px;
-  text-shadow:
-    -3px 0 #000,
-    /* Left */
-    3px 0 #000,
-    /* Right */
-    0 -3px #000,
-    /* Top */
-    0 3px #000;
-  /* Bottom */
-}
-
-.animated-underline:hover,
-.animated-underline:focus {
-  background-size: 0% 2px;
-  color: #999999;
-}
-
 /* Animated loader text */
 .animated-text-loader span {
   display: inline-block;
@@ -625,6 +602,80 @@ body {
   100% {
     transform: translateX(-100%);
   }
+}
+
+/* Custom text styles */
+/* Space between paragraphs */
+@layer base {
+  p {
+    margin-bottom: 18px;
+  }
+
+  /* Remove margin from last paragraph in a container */
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Bold text */
+b,
+strong {
+  font-weight: 600;
+}
+
+/* Animated underline for links */
+/* Animate right to left - background-position controls the direction of the animation */
+.animated-underline {
+  font-weight: 700;
+  text-decoration: none;
+  background-image: linear-gradient(#CCCCCC, #CCCCCC);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+  transition: background-size .3s, color .6s;
+  padding-bottom: 3px;
+  text-shadow:
+    -3px 0 #000,
+    /* Left */
+    3px 0 #000,
+    /* Right */
+    0 -3px #000,
+    /* Top */
+    0 3px #000;
+  /* Bottom */
+}
+
+.animated-underline:hover,
+.animated-underline:focus {
+  background-size: 0% 2px;
+  color: #999999;
+}
+
+/* Animate left to right */
+.animated-underline-thin {
+  font-weight: 400;
+  text-decoration: none;
+  background-image: linear-gradient(#CCCCCC, #CCCCCC);
+  background-position: 100% 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  transition: background-size .3s, color .6s;
+  padding-bottom: 2px;
+  text-shadow:
+    -2px 0 #000,
+    /* Left */
+    2px 0 #000,
+    /* Right */
+    0 -2px #000,
+    /* Top */
+    0 2px #000;
+  /* Bottom */
+}
+
+.animated-underline-thin:hover,
+.animated-underline-thin:focus {
+  background-size: 0% 1px;
+  color: #999999;
 }
 
 /* SRC20 Chart Styles */
