@@ -215,7 +215,7 @@ export class StampMintService {
 
       // Add data outputs
       for (let i = 0; i < cip33Addresses.length; i++) {
-        const dustValue = TX_CONSTANTS.DUST_SIZE + i;
+        const dustValue = TX_CONSTANTS.DUST_SIZE;
         vouts.push({
           value: dustValue,
           address: cip33Addresses[i],
