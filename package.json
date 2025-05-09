@@ -14,7 +14,7 @@
     "tiny-secp256k1": "2.2.3"
   },
   "devDependencies": {
-    "@redocly/cli": "^1.25.15",
+    "@redocly/cli": "^1.34.3",
     "dredd": "^14.1.0",
     "hooks": "^0.3.2",
     "js-yaml": "^4.1.0",
