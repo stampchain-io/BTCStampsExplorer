@@ -81,6 +81,13 @@ export interface TransferDetails {
   token: string;
 }
 
+// New separate interface for stamp transfers
+export interface StampTransferDetails {
+  address: string;
+  stamp: string;
+  editions: number;
+}
+
 export interface MintDetails {
   amount: number;
   token: string;
@@ -100,10 +107,11 @@ export interface BaseFeeCalculatorProps {
   onTosChange?: (agreed: boolean) => void;
   feeDetails?: FeeDetails;
   transferDetails?: TransferDetails;
+  stampTransferDetails?: StampTransferDetails;
   mintDetails?: MintDetails;
 }
 
-export interface BasicFeeProps
+export interface SimpleFeeCalculatorProps
   extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
   type: "send" | "transfer" | "buy";
   _type?: string;
@@ -123,18 +131,18 @@ export interface BasicFeeProps
   supply?: number;
 }
 
-export interface ComplexFeeProps extends BaseFeeCalculatorProps {
+export interface AdvancedFeeCalculatorProps extends BaseFeeCalculatorProps {
   type: string;
-  fileType?: string;
-  fileSize?: number;
+  fileType?: string | undefined;
+  fileSize?: number | undefined;
   issuance?: number;
-  serviceFee?: number;
-  userAddress?: string;
+  serviceFee?: number | null;
+  userAddress?: string | undefined;
   outputTypes?: ScriptType[];
   utxoAncestors?: AncestorInfo[];
   feeDetails?: FeeDetails;
   effectiveFeeRate?: number;
-  onRefresh?: () => Promise<void>;
+  onRefresh: () => Promise<void>;
   disabled?: boolean;
   inputType?: string;
   bitname?: string;

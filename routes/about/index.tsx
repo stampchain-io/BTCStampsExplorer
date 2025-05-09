@@ -1,12 +1,16 @@
-import AboutHeader from "$islands/about/AboutHeader.tsx";
-import AboutTeam from "$islands/about/AboutTeam.tsx";
-import { PartnersModule } from "$islands/modules/Partners.tsx";
-import AboutDonate from "$islands/about/AboutDonate.tsx";
-import AboutContact from "$islands/about/AboutContact.tsx";
+/* ===== ABOUT PAGE ===== */
+/* ContactCta + DonateCta MUST use direct path imports - CANNOT use barrel file exports */
+import { body, gapSectionSlim } from "$layout";
+import { AboutHeader } from "$header";
+import DonateCta from "$islands/section/cta/DonateCta.tsx";
+import ContactCta from "$islands/section/cta/ContactCta.tsx";
+import { PartnersBanner, TeamBanner } from "$section";
 
-export default function About() {
+/* ===== PAGE COMPONENT ===== */
+export default function AboutPage() {
   return (
-    <div>
+    <div className={`${body} ${gapSectionSlim}`}>
+      {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
         alt="About Bitcoin Stamps and contact Stampchain"
@@ -24,23 +28,22 @@ export default function About() {
         "
       />
 
-      <div className="flex flex-col gap-12 mobileLg:gap-24">
-        <AboutHeader />
+      {/* ===== ABOUT SECTION ===== */}
+      <AboutHeader />
 
-        {/* Team */}
-        <AboutTeam />
+      {/* ===== TEAM SECTION ===== */}
+      <TeamBanner />
 
-        {/* Partners */}
-        <PartnersModule />
+      {/* ===== PARTNERS SECTION ===== */}
+      <PartnersBanner />
 
-        {/* Donate */}
-        <div id="donate"></div>
-        <AboutDonate />
+      {/* ===== DONATE SECTION ===== */}
+      <div id="donate"></div>
+      <DonateCta />
 
-        {/* Contact */}
-        <div id="contact"></div>
-        <AboutContact />
-      </div>
+      {/* ===== CONTACT SECTION ===== */}
+      <div id="contact"></div>
+      <ContactCta />
     </div>
   );
 }

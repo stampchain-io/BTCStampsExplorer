@@ -1,7 +1,39 @@
 import "$/server/config/env.ts";
 
 import { Client } from "mysql/mod.ts";
-import { connect, Redis } from "redis";
+// Conditionally import Redis based on build mode
+let connect, Redis;
+if (Deno.args.includes("build")) {
+  console.log("[REDIS IMPORT] Skipping Redis import in build mode");
+  // Create dummy implementations for build
+  connect = () => Promise.resolve({
+    ping: () => Promise.resolve("PONG (memory)"),
+    set: () => Promise.resolve("OK"),
+    get: () => Promise.resolve(null),
+    keys: () => Promise.resolve([]),
+    del: () => Promise.resolve(0)
+  });
+  Redis = class DummyRedis {};
+} else {
+  // Use the Deno Redis client in non-build mode
+  try {
+    const redis = await import("redis");
+    connect = redis.connect;
+    Redis = redis.Redis;
+    console.log("[REDIS IMPORT] Successfully imported Redis client");
+  } catch (e) {
+    console.log("[REDIS IMPORT ERROR] " + e.message);
+    // Fallback to dummy implementations
+    connect = () => Promise.resolve({
+      ping: () => Promise.resolve("PONG (memory)"),
+      set: () => Promise.resolve("OK"),
+      get: () => Promise.resolve(null),
+      keys: () => Promise.resolve([]),
+      del: () => Promise.resolve(0)
+    });
+    Redis = class DummyRedis {};
+  }
+}
 import { crypto } from "@std/crypto";
 import {
   ConsoleHandler,
@@ -10,9 +42,6 @@ import {
   LogRecord,
   setup,
 } from "@std/log";
-import {
-  deadline,
-} from "@std/async";
 
 interface DatabaseConfig {
   DB_HOST: string;
@@ -28,101 +57,49 @@ interface DatabaseConfig {
 }
 
 async function shouldInitializeRedis(): Promise<boolean> {
-  return !(globalThis as any).SKIP_REDIS_CONNECTION;
+  // Never initialize Redis during build
+  if (Deno.args.includes("build")) {
+    console.log("[REDIS] Build mode detected, skipping Redis initialization");
+    return false;
+  }
+  
+  // Otherwise check global flag
+  const skip = !!(globalThis as any).SKIP_REDIS_CONNECTION;
+  console.log(`[REDIS] shouldInitializeRedis check: SKIP_REDIS_CONNECTION=${skip}`);
+  return !skip;
 }
 
 class DatabaseManager {
-  private pool: Client[] = [];
-  private redisClient: Redis | undefined;
-  private isConnectingRedis = false;
-  private redisRetryCount = 0;
-  private redisAvailable = false;
-  private readonly MAX_RETRIES: number;
-  private readonly RETRY_INTERVAL = 500;
-  private readonly MAX_POOL_SIZE = 10;
-  private logger: ReturnType<typeof getLogger>;
-  private redisAvailableAtStartup = false;
-  private inMemoryCache: { [key: string]: { data: any; expiry: number } } = {};
-
-  // Cache statistics tracking
-  private cacheStats = {
-    hits: 0,
-    misses: 0, 
-    sets: 0,
-    errors: 0,
-    lastReported: Date.now()
-  };
+  #pool: Client[] = [];
+  #redisClient: Redis | undefined;
+  #isConnectingRedis = false;
+  #redisRetryCount = 0;
+  #redisAvailable = false;
+  readonly #MAX_RETRIES: number;
+  readonly #RETRY_INTERVAL = 500;
+  readonly #MAX_POOL_SIZE = 10;
+  #logger: ReturnType<typeof getLogger>;
+  #redisAvailableAtStartup = false;
+  #inMemoryCache: { [key: string]: { data: any; expiry: number } } = {};
+  #lastCacheStatusLog: number = 0;
 
   constructor(private config: DatabaseConfig) {
-    this.MAX_RETRIES = this.config.DB_MAX_RETRIES || 5;
-    this.setupLogging();
-    this.logger = getLogger();
-    
-    // Start periodic cache stats reporting every 5 minutes
-    this.startCacheStatsReporting();
-  }
-  
-  private startCacheStatsReporting() {
-    const REPORT_INTERVAL = 5 * 60 * 1000; // 5 minutes
-    setInterval(() => {
-      this.reportCacheStats();
-    }, REPORT_INTERVAL);
-  }
-  
-  private reportCacheStats() {
-    const now = Date.now();
-    const elapsedSeconds = ((now - this.cacheStats.lastReported) / 1000).toFixed(1);
-    const total = this.cacheStats.hits + this.cacheStats.misses;
-    const hitRate = total > 0 ? (this.cacheStats.hits / total * 100).toFixed(2) : "0.00";
-    
-    // Always log stats to stderr for CloudWatch visibility, but respect log level for stdout
-    const logLevel = (this.config.REDIS_LOG_LEVEL || "DEBUG").toUpperCase();
-    const isInfoEnabled = ["DEBUG", "INFO", "TRACE"].includes(logLevel);
-    
-    const statsMessage = `
-*************************************************************************
-                     REDIS CACHE STATISTICS
-*************************************************************************
-Period:             ${elapsedSeconds} seconds
-Cache hits:         ${this.cacheStats.hits}
-Cache misses:       ${this.cacheStats.misses}
-Cache sets:         ${this.cacheStats.sets}
-Cache errors:       ${this.cacheStats.errors}
-Hit rate:           ${hitRate}%
-Redis available:    ${this.redisAvailable ? "YES" : "NO"}
-Redis log level:    ${logLevel}
-*************************************************************************`;
-    
-    // Always log stats to stderr for CloudWatch, but control console.log by log level
-    if (isInfoEnabled) {
-      console.log(statsMessage);
-    }
-    console.error(statsMessage);  // Always log to stderr for CloudWatch visibility
-    
-    // Reset the counters but keep the timestamp
-    this.cacheStats.hits = 0;
-    this.cacheStats.misses = 0;
-    this.cacheStats.sets = 0;
-    this.cacheStats.errors = 0;
-    this.cacheStats.lastReported = now;
+    this.#MAX_RETRIES = this.config.DB_MAX_RETRIES || 5;
+    this.#setupLogging();
+    this.#logger = getLogger();
   }
 
   public async initialize(): Promise<void> {
     if (await shouldInitializeRedis()) {
       await this.initializeRedisConnection();
-      this.redisAvailableAtStartup = this.redisAvailable;
+      this.#redisAvailableAtStartup = this.#redisAvailable;
     } else {
-      this.logger.info("Skipping Redis initialization due to SKIP_REDIS_CONNECTION flag");
+      this.#logger.info("Skipping Redis initialization due to SKIP_REDIS_CONNECTION flag");
     }
   }
 
-  private setupLogging(): void {
-    // Get Redis log level from environment or config, default to DEBUG
-    const redisLogLevel = this.config.REDIS_LOG_LEVEL || Deno.env.get("REDIS_LOG_LEVEL") || "DEBUG";
-    const level = redisLogLevel.toUpperCase();
-    
-    console.log(`Setting up Redis logging with log level: ${level}`);
-    
+  private #setupLogging(): void {
+    const level = this.config.REDIS_LOG_LEVEL || "INFO";
     setup({
       handlers: {
         console: new ConsoleHandler(level),
@@ -140,15 +117,15 @@ Redis log level:    ${logLevel}
       },
     });
 
-    this.logger = getLogger();
+    this.#logger = getLogger();
   }
 
   getClient(): Promise<Client> {
-    if (this.pool.length > 0) {
-      return Promise.resolve(this.pool.pop() as Client);
+    if (this.#pool.length > 0) {
+      return Promise.resolve(this.#pool.pop() as Client);
     }
 
-    if (this.pool.length < this.MAX_POOL_SIZE) {
+    if (this.#pool.length < this.#MAX_POOL_SIZE) {
       return this.createConnection();
     }
 
@@ -156,38 +133,38 @@ Redis log level:    ${logLevel}
   }
 
   releaseClient(client: Client): void {
-    this.pool.push(client);
+    this.#pool.push(client);
   }
 
   async closeClient(client: Client): Promise<void> {
     await client.close();
-    const index = this.pool.indexOf(client);
+    const index = this.#pool.indexOf(client);
     if (index > -1) {
-      this.pool.splice(index, 1);
+      this.#pool.splice(index, 1);
     }
   }
 
   async closeAllClients(): Promise<void> {
-    await Promise.all(this.pool.map((client) => this.closeClient(client)));
+    await Promise.all(this.#pool.map((client) => this.closeClient(client)));
   }
 
   async executeQuery<T>(query: string, params: unknown[]): Promise<T> {
-    for (let attempt = 1; attempt <= this.MAX_RETRIES; attempt++) {
+    for (let attempt = 1; attempt <= this.#MAX_RETRIES; attempt++) {
       try {
         const client = await this.getClient();
         const result = await client.execute(query, params);
         this.releaseClient(client);
         return result as T;
       } catch (error) {
-        this.logger.error(
+        this.#logger.error(
           `Error executing query on attempt ${attempt}:`,
           error,
         );
-        if (attempt === this.MAX_RETRIES) {
+        if (attempt === this.#MAX_RETRIES) {
           throw error;
         }
       }
-      await new Promise((resolve) => setTimeout(resolve, this.RETRY_INTERVAL));
+      await new Promise((resolve) => setTimeout(resolve, this.#RETRY_INTERVAL));
     }
     throw new Error("Max retries reached");
   }
@@ -226,130 +203,197 @@ Redis log level:    ${logLevel}
   }
 
   private async initializeRedisConnection(): Promise<void> {
+    console.log(`[REDIS INIT] SKIP_REDIS_CONNECTION=${globalThis.SKIP_REDIS_CONNECTION}, ELASTICACHE_ENDPOINT=${this.config.ELASTICACHE_ENDPOINT}`);
+    console.log(`[REDIS INIT] CACHE=${this.config.CACHE}, DENO_ENV=${this.config.DENO_ENV}`);
+    
     if (globalThis.SKIP_REDIS_CONNECTION) {
-      this.logger.info("Skipping Redis connection for build process");
+      const skipMsg = "Skipping Redis connection for build process";
+      this.#logger.info(skipMsg);
+      console.log(`[REDIS INIT] ${skipMsg}`);
       return;
     }
 
-    this.logger.info("Initializing Redis connection...");
+    const initMsg = `Initializing Redis connection to ${this.config.ELASTICACHE_ENDPOINT}...`;
+    this.#logger.info(initMsg);
+    console.log(`[REDIS INIT] ${initMsg}`);
+    
     try {
       await this.connectToRedis();
+      const successMsg = "Redis connection successful - cache system ready";
+      this.#logger.info(successMsg);
+      console.log(`[REDIS INIT SUCCESS] ${successMsg}`);
+      console.log(`[REDIS INIT] redisAvailable=${this.#redisAvailable}, redisClient initialized=${!!this.#redisClient}`);
     } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") {
-        this.logger.error("Redis connection timed out:", error);
+      let errorMsg = "";
+      if (error instanceof Error) {
+        errorMsg = error.name === "AbortError" 
+          ? "Redis connection timed out" 
+          : `Failed to connect to Redis at startup: ${error.name} - ${error.message}`;
       } else {
-        this.logger.error("Failed to connect to Redis at startup:", error);
+        errorMsg = "Failed to connect to Redis at startup: Unknown error";
       }
-      this.logger.info("Continuing without Redis.");
+      
+      this.#logger.error(errorMsg);
+      console.log(`[REDIS INIT ERROR] ${errorMsg}`);
+      
+      if (error instanceof Error && error.stack) {
+        console.log(`[REDIS INIT ERROR] Stack trace: ${error.stack}`);
+      }
+      
+      const fallbackMsg = "Continuing with in-memory cache. Redis not available.";
+      this.#logger.info(fallbackMsg);
+      console.log(`[REDIS INIT] ${fallbackMsg}`);
     }
   }
 
   private async connectToRedis(): Promise<void> {
-    const REDIS_CONNECTION_TIMEOUT = 5000; // 5 seconds timeout
-    const logLevel = (this.config.REDIS_LOG_LEVEL || "DEBUG").toUpperCase();
-    const isInfoEnabled = ["DEBUG", "INFO", "TRACE"].includes(logLevel);
-    const isDebugEnabled = ["DEBUG", "TRACE"].includes(logLevel);
+    // Safely obtain and parse environment variables with defaults
+    const REDIS_CONNECTION_TIMEOUT = parseInt(Deno.env.get("REDIS_TIMEOUT") || "15000");
+    const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
+    const SKIP_REDIS_TLS = Deno.env.get("SKIP_REDIS_TLS") === "true"; // Only skip if explicitly set to true
+    const REDIS_MAX_RETRIES = parseInt(Deno.env.get("REDIS_MAX_RETRIES") || "10");
+    
+    // Early console log to ensure we can see Redis connection attempts in logs
+    console.log(`[REDIS CONFIG] ELASTICACHE_ENDPOINT=${this.config.ELASTICACHE_ENDPOINT}, SKIP_REDIS_TLS=${SKIP_REDIS_TLS}, TIMEOUT=${REDIS_CONNECTION_TIMEOUT}ms`);
+    console.log(`[REDIS CONFIG] USING OFFICIAL JSR REDIS CLIENT (@db/redis)`);
+    console.log(`[REDIS CONFIG] DENO_ENV=${this.config.DENO_ENV}, CACHE=${this.config.CACHE}`);
 
     try {
-      const redisEndpoint = this.config.ELASTICACHE_ENDPOINT;
-      // Add very prominent logging that will be visible in all environments
-      const connectionMessage = `
-*************************************************************************
-🔴 REDIS CONNECTION ATTEMPT: Connecting to Redis at ${redisEndpoint}:6379 with TLS
-*************************************************************************`;
+      // Log at the highest visibility level for production debugging
+      console.log(`[REDIS CONNECTION] Attempting Redis connection to ${this.config.ELASTICACHE_ENDPOINT}:6379`);
+      console.log(`[REDIS CONNECTION] TLS=${!SKIP_REDIS_TLS}, TIMEOUT=${REDIS_CONNECTION_TIMEOUT}ms`);
       
-      // Always log connection attempts to stderr, but respect log level for stdout
-      if (isInfoEnabled) {
-        console.log(connectionMessage);
+      if (!this.config.ELASTICACHE_ENDPOINT) {
+        const errMsg = "ELASTICACHE_ENDPOINT is empty or not set";
+        console.log(`[REDIS ERROR] ${errMsg}`);
+        throw new Error(errMsg);
       }
-      console.error(connectionMessage); // Always log to stderr to ensure visibility in CloudWatch
-      this.logger.info(`Attempting to connect to Redis at ${redisEndpoint}:6379 with TLS`);
       
-      this.redisClient = await deadline(
-        connect({
-          hostname: redisEndpoint,
+      // Try TCP connection first to verify connectivity
+      try {
+        console.log(`[REDIS CONNECTION] Testing TCP connectivity...`);
+        const tcpStart = Date.now();
+        const conn = await Deno.connect({
+          hostname: this.config.ELASTICACHE_ENDPOINT,
           port: 6379,
-          tls: true,
-        }),
-        REDIS_CONNECTION_TIMEOUT,
-      );
-      
-      // Test Redis connection by writing and reading a value
-      const testKey = "redis_test_connection";
-      const testValue = `connection_test_${Date.now()}`;
-      await this.redisClient.set(testKey, testValue, { ex: 60 });
-      const retrievedValue = await this.redisClient.get(testKey);
-      
-      const successMessage = `
-*************************************************************************
-✅ REDIS CONNECTION SUCCESSFUL - Test Key: ${testKey}
-   - Write Value: ${testValue}
-   - Read Value:  ${retrievedValue}
-   - Match:       ${retrievedValue === testValue ? 'YES' : 'NO'}
-   - Log Level:   ${logLevel}
-*************************************************************************`;
-      
-      // Log success based on log level
-      if (isInfoEnabled) {
-        console.log(successMessage);
+        });
+        console.log(`[REDIS CONNECTION] TCP connection successful (${Date.now() - tcpStart}ms)`);
+        conn.close();
+      } catch (tcpError) {
+        console.error(`[REDIS CONNECTION] TCP CONNECTION FAILED: ${tcpError instanceof Error ? tcpError.message : String(tcpError)}`);
+        throw new Error(`TCP connection failed: ${tcpError instanceof Error ? tcpError.message : String(tcpError)}`);
       }
-      console.error(successMessage); // Always log to stderr to ensure visibility in CloudWatch
       
-      if (retrievedValue === testValue) {
-        this.logger.info("✅ Redis connection test successful - write and read operations working");
+      // JSR Redis client connection options
+      const connectionOptions = {
+        hostname: this.config.ELASTICACHE_ENDPOINT,
+        port: 6379,
+        tls: !SKIP_REDIS_TLS,
+        connectTimeout: REDIS_CONNECTION_TIMEOUT,
+        retryStrategy: (times) => {
+          // Exponential backoff with max 3 seconds
+          const delay = Math.min(Math.pow(2, times) * 50, 3000);
+          console.log(`[REDIS RETRY] Retry attempt #${times}, delay: ${delay}ms`);
+          return delay;
+        },
+        reconnectOnError: (err) => {
+          // Only reconnect on specific network-related errors
+          const shouldReconnect = 
+            err.message.includes('ECONNRESET') || 
+            err.message.includes('connection') || 
+            err.message.includes('network') ||
+            err.message.includes('timeout');
+          console.log(`[REDIS RECONNECT] Error: ${err.message}, Should reconnect: ${shouldReconnect}`);
+          return shouldReconnect;
+        }
+      };
+      
+      console.log(`[REDIS CONNECTION] Options: ${JSON.stringify(connectionOptions)}`);
+      
+      const connectionStart = Date.now();
+      // Connect with the JSR Redis client
+      this.#redisClient = await connect(connectionOptions);
+      console.log(`[REDIS CONNECTION] Connection established (${Date.now() - connectionStart}ms)`);
+      
+      // Test connection by setting a test key
+      console.log(`[REDIS CONNECTION] Testing with PING command...`);
+      const pingStart = Date.now();
+      const pingResult = await this.#redisClient.ping();
+      console.log(`[REDIS CONNECTION] PING returned "${pingResult}" (${Date.now() - pingStart}ms)`);
+      
+      console.log(`[REDIS CONNECTION] Setting test key...`);
+      const setStart = Date.now();
+      await this.#redisClient.set("redis_connection_test", "success", { ex: 10 });
+      console.log(`[REDIS CONNECTION] SET operation successful (${Date.now() - setStart}ms)`);
+      
+      console.log(`[REDIS CONNECTION] Getting test key...`);
+      const getStart = Date.now();
+      const value = await this.#redisClient.get("redis_connection_test");
+      console.log(`[REDIS CONNECTION] GET returned "${value}" (${Date.now() - getStart}ms)`);
+      
+      if (value !== "success") {
+        throw new Error(`Test key verification failed: expected "success" but got "${value}"`);
+      }
+      
+      console.log(`[REDIS CONNECTION SUCCESS] ✅ Connected to Redis successfully with verified read/write`);
+      this.#logger.info("✅ Connected to Redis successfully with verified read/write");
+      this.#redisAvailable = true;
+      this.#redisRetryCount = 0;
+    } catch (error) {
+      let errorMessage = "Unknown Redis connection error";
+      if (error instanceof Error) {
+        errorMessage = `Redis connection error: ${error.name} - ${error.message}`;
+        console.log(`[REDIS CONNECTION ERROR] ${errorMessage}`);
+        this.#logger.error(errorMessage);
         
-        // Extra debugging info
-        if (isDebugEnabled) {
-          this.logger.debug(`Redis connection details - endpoint: ${redisEndpoint}, port: 6379, tls: true`);
+        if (error.stack) {
+          console.log(`[REDIS CONNECTION ERROR] Stack trace: ${error.stack}`);
         }
       } else {
-        const warningMessage = `⚠️ Redis connection test partially failed - wrote '${testValue}' but read '${retrievedValue}'`;
-        console.warn(warningMessage);
-        console.error(warningMessage);
-        this.logger.warn(warningMessage);
+        console.log(`[REDIS CONNECTION ERROR] Non-Error object:`, error);
       }
       
-      this.logger.info("Connected to Redis successfully");
-      this.redisAvailable = true;
-      this.redisRetryCount = 0;
-    } catch (error) {
-      // Create very visible error message - always log errors regardless of level
-      const errorMessage = `
-*************************************************************************
-❌ REDIS CONNECTION ERROR: ${error.message}
-*************************************************************************`;
-      
-      console.error(errorMessage);
-      this.logger.error(`❌ Redis connection error: ${error.message}`);
-      
-      if (error instanceof DeadlineError) {
-        throw new Error("Redis connection timed out");
-      }
-      throw error;
+      throw new Error(errorMessage);
     }
   }
 
-  private async connectToRedisInBackground(): Promise<void> {
-    if (this.isConnectingRedis) return;
+  async #connectToRedisInBackground(): Promise<void> {
+    if (this.#isConnectingRedis) {
+      console.log(`[REDIS RECONNECT] Already attempting to reconnect, skipping duplicate request`);
+      return;
+    }
 
-    this.isConnectingRedis = true;
+    this.#isConnectingRedis = true;
+    console.log(`[REDIS RECONNECT] Starting background reconnection attempt #${this.#redisRetryCount + 1}/${this.#MAX_RETRIES}`);
+    
     try {
+      console.log(`[REDIS RECONNECT] Attempting to reconnect to Redis at ${this.config.ELASTICACHE_ENDPOINT}:6379`);
       await this.connectToRedis();
+      console.log(`[REDIS RECONNECT SUCCESS] ✅ Successfully reconnected to Redis`);
+      // Reset retry counter on success
+      this.#redisRetryCount = 0;
     } catch (error) {
-      this.logger.error("Failed to connect to Redis:", error);
-      if (this.redisRetryCount < this.MAX_RETRIES) {
-        this.redisRetryCount++;
+      const errorMsg = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+      this.#logger.error(`Failed to reconnect to Redis: ${errorMsg}`);
+      console.log(`[REDIS RECONNECT ERROR] Failed attempt #${this.#redisRetryCount + 1}: ${errorMsg}`);
+      
+      if (this.#redisRetryCount < this.#MAX_RETRIES) {
+        this.#redisRetryCount++;
+        const backoffTime = this.#RETRY_INTERVAL * Math.pow(1.5, this.#redisRetryCount - 1); // Exponential backoff
+        console.log(`[REDIS RECONNECT] Will retry in ${backoffTime}ms (attempt ${this.#redisRetryCount + 1}/${this.#MAX_RETRIES})`);
+        
         setTimeout(
-          () => this.connectToRedisInBackground(),
-          this.RETRY_INTERVAL,
+          () => this.#connectToRedisInBackground(),
+          backoffTime,
         );
       } else {
-        this.logger.error(
-          "Max retries reached, giving up on Redis connection.",
-        );
+        const giveUpMsg = `Max retries (${this.#MAX_RETRIES}) reached, giving up on Redis connection until next trigger.`;
+        this.#logger.error(giveUpMsg);
+        console.log(`[REDIS RECONNECT FAILED] ${giveUpMsg}`);
+        console.log(`[REDIS RECONNECT FAILED] Will continue with in-memory cache only`);
       }
     } finally {
-      this.isConnectingRedis = false;
+      this.#isConnectingRedis = false;
     }
   }
 
@@ -367,86 +411,132 @@ Redis log level:    ${logLevel}
     fetchData: () => Promise<T>,
     cacheDuration: number | "never",
   ): Promise<T> {
-    if (!this.redisAvailable) {
-      if (this.redisAvailableAtStartup) {
-        this.connectToRedisInBackground();
+    // Log cache status periodically (once per minute) to track Redis availability
+    const now = Date.now();
+    if (!this.#lastCacheStatusLog || now - this.#lastCacheStatusLog > 60000) {
+      this.#lastCacheStatusLog = now;
+      const status = `Cache status: Redis ${this.#redisAvailable ? 'AVAILABLE' : 'UNAVAILABLE'}, fallback=${!this.#redisAvailable}, endpoint=${this.config.ELASTICACHE_ENDPOINT}`;
+      this.#logger.info(status);
+      console.log(`[REDIS CACHE STATUS] ${status}`);
+      
+      // Add detailed Redis client status information
+      console.log(`[REDIS CACHE STATUS] Redis client initialized: ${!!this.#redisClient}`);
+      
+      // Log cache statistics
+      const inMemoryKeys = Object.keys(this.#inMemoryCache).length;
+      console.log(`[REDIS CACHE STATUS] In-memory cache entries: ${inMemoryKeys}`);
+      
+      // Test connectivity with simple ping if redis is supposed to be available
+      if (this.#redisClient && this.#redisAvailable) {
+        this.#redisClient.ping()
+          .then(result => console.log(`[REDIS CACHE STATUS] PING test: ${result}`))
+          .catch(err => console.log(`[REDIS CACHE STATUS] PING test failed: ${err instanceof Error ? err.message : err}`));
       }
+    }
+    
+    const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
+    
+    if (!this.#redisAvailable) {
+      if (this.#redisAvailableAtStartup) {
+        const reconnectMsg = "Redis was available at startup but is now unavailable. Attempting reconnection...";
+        this.#logger.info(reconnectMsg);
+        console.log(`[REDIS RECONNECT] ${reconnectMsg}`);
+        this.#connectToRedisInBackground();
+      }
+      
+      const fallbackMsg = `Using in-memory cache fallback for key: ${key.substring(0, 10)}... (type: ${typeof fetchData}, cacheDuration: ${cacheDuration})`;
+      this.#logger.debug(fallbackMsg);
+      if (REDIS_DEBUG) {
+        console.log(`[REDIS FALLBACK] ${fallbackMsg}`);
+      }
+      
       return this.handleInMemoryCache(key, fetchData, cacheDuration);
     }
-    const cachedData = await this.getCachedData(key);
-    if (cachedData) {
-      return cachedData as T;
+    
+    if (REDIS_DEBUG) {
+      console.log(`[REDIS CACHE] Attempting to get data for key: ${key}`);
     }
-
-    const data = await fetchData();
-    await this.setCachedData(key, data, cacheDuration);
-    return data;
+    
+    try {
+      const cachedData = await this.getCachedData(key);
+      if (cachedData) {
+        if (REDIS_DEBUG) {
+          console.log(`[REDIS CACHE HIT] Found data for key: ${key}`);
+        }
+        return cachedData as T;
+      }
+      
+      if (REDIS_DEBUG) {
+        console.log(`[REDIS CACHE MISS] No data found for key: ${key}, fetching fresh data`);
+      }
+      
+      const data = await fetchData();
+      
+      if (REDIS_DEBUG) {
+        console.log(`[REDIS CACHE SET] Setting data for key: ${key}, expiry: ${cacheDuration}`);
+      }
+      
+      await this.setCachedData(key, data, cacheDuration);
+      return data;
+    } catch (error) {
+      console.log(`[REDIS CACHE ERROR] Error in handleCache for key ${key}: ${error}`);
+      // Fall back to in-memory cache on error
+      return this.handleInMemoryCache(key, fetchData, cacheDuration);
+    }
   }
 
   private async getCachedData(key: string): Promise<unknown | null> {
-    // Enhanced logging to track cache operations
-    const shortKey = key.substring(0, 20);
-    const logLevel = (this.config.REDIS_LOG_LEVEL || "DEBUG").toUpperCase();
-    const isDebugEnabled = ["DEBUG", "TRACE"].includes(logLevel);
-    const isInfoEnabled = ["DEBUG", "INFO", "TRACE"].includes(logLevel);
+    const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
     
-    if (this.redisClient) {
+    if (this.#redisClient) {
       try {
-        // Start timing for cache performance tracking
-        const startTime = performance.now();
-        const data = await this.redisClient.get(key);
-        const endTime = performance.now();
-        const duration = (endTime - startTime).toFixed(2);
+        const startTime = Date.now();
+        const data = await this.#redisClient.get(key);
+        const duration = Date.now() - startTime;
+        
+        if (REDIS_DEBUG) {
+          console.log(`[REDIS GET] Key: ${key.substring(0, 10)}... - ${data ? 'HIT' : 'MISS'} (${duration}ms)`);
+        }
+        
+        if (duration > 500) {
+          // Log slow Redis operations
+          console.log(`[REDIS SLOW] Slow Redis GET operation detected: ${duration}ms for key ${key.substring(0, 10)}...`);
+        }
         
         if (data) {
-          // Track cache hits in stats
-          this.cacheStats.hits++;
-          
-          // Make cache hits visible in logs based on log level
-          if (isDebugEnabled) {
-            const hitMessage = `🎯 REDIS CACHE HIT [${duration}ms]: ${shortKey}...`;
-            console.log(hitMessage);
-            // Log sample of cache hits to stderr for CloudWatch visibility at INFO level
-            if (isInfoEnabled && Math.random() < 0.1) {
-              console.error(`STATS: ${hitMessage}`);
-            }
+          try {
+            const parsedData = JSON.parse(data);
+            return parsedData;
+          } catch (parseError) {
+            console.log(`[REDIS PARSE ERROR] Failed to parse data for key ${key.substring(0, 10)}...: ${parseError instanceof Error ? parseError.message : parseError}`);
+            return null;
           }
-          return JSON.parse(data);
-        } else {
-          // Track cache misses in stats
-          this.cacheStats.misses++;
-          
-          // Make cache misses visible based on log level
-          if (isDebugEnabled) {
-            const missMessage = `⚠️ REDIS CACHE MISS [${duration}ms]: ${shortKey}...`;
-            console.log(missMessage);
-            // Log more cache misses to help debug cache effectiveness
-            if (isInfoEnabled && Math.random() < 0.2) {
-              console.error(`STATS: ${missMessage}`);
-            }
-          }
-          return null;
         }
+        return null;
       } catch (error) {
-        // Track errors in stats - always log errors
-        this.cacheStats.errors++;
+        const errorMsg = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+        this.#logger.error(`Failed to read from Redis cache: ${errorMsg}`);
+        console.log(`[REDIS ERROR] Failed to get key ${key.substring(0, 10)}...: ${errorMsg}`);
         
-        const errorMessage = `❌ REDIS READ ERROR for key ${shortKey}: ${error.message}`;
-        console.error(errorMessage);
-        this.logger.error("Failed to read from Redis cache:", error);
-        if (this.redisAvailableAtStartup) {
-          this.connectToRedisInBackground();
+        // Check if connection was lost
+        if (error instanceof Error && 
+            (error.message.includes("connection") || 
+             error.message.includes("network") || 
+             error.message.includes("ECONNRESET") ||
+             error.message.includes("closed"))) {
+          console.log(`[REDIS CONNECTION ISSUE] Possible connection loss detected: ${error.message}`);
+          this.#redisAvailable = false;
+          
+          if (this.#redisAvailableAtStartup) {
+            console.log(`[REDIS RECONNECT] Scheduling reconnection attempt in background...`);
+            this.#connectToRedisInBackground();
+          }
         }
-        this.redisAvailable = false;
       }
-    } else {
-      // Only log client availability issues at INFO level or more verbose
-      if (isInfoEnabled) {
-        const noClientMessage = `❓ REDIS CLIENT NOT AVAILABLE for key: ${shortKey}...`;
-        console.log(noClientMessage);
-        console.error(`STATS: ${noClientMessage}`);
-      }
+    } else if (REDIS_DEBUG) {
+      console.log(`[REDIS CLIENT MISSING] Redis client unavailable for key: ${key.substring(0, 10)}...`);
     }
+    
     return this.getInMemoryCachedData(key);
   }
 
@@ -455,76 +545,76 @@ Redis log level:    ${logLevel}
     data: unknown,
     expiry: number | "never",
   ): Promise<void> {
-    const shortKey = key.substring(0, 20);
-    const logLevel = (this.config.REDIS_LOG_LEVEL || "DEBUG").toUpperCase();
-    const isDebugEnabled = ["DEBUG", "TRACE"].includes(logLevel);
-    const isInfoEnabled = ["DEBUG", "INFO", "TRACE"].includes(logLevel);
+    const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
     
-    if (this.redisClient) {
+    // Always set in-memory cache as fallback regardless of Redis status
+    this.setInMemoryCachedData(key, data, expiry);
+    
+    if (this.#redisClient) {
       try {
-        // Start timing for cache performance tracking
-        const startTime = performance.now();
-        const value = JSON.stringify(data);
-        const valueSize = value.length;
+        // Serialize the data
+        let value: string;
+        try {
+          value = JSON.stringify(data);
+          
+          // Log data size for performance monitoring
+          const byteSize = new TextEncoder().encode(value).length;
+          if (byteSize > 100 * 1024) { // 100KB or larger
+            console.log(`[REDIS LARGE DATA] Large value detected for key ${key.substring(0, 10)}...: ${byteSize / 1024} KB`);
+          }
+          
+          if (REDIS_DEBUG) {
+            console.log(`[REDIS SET] Key: ${key.substring(0, 10)}..., Size: ${byteSize} bytes, Expiry: ${expiry}`);
+          }
+        } catch (serializeError) {
+          console.log(`[REDIS SERIALIZE ERROR] Failed to serialize data for key ${key.substring(0, 10)}...: ${serializeError instanceof Error ? serializeError.message : serializeError}`);
+          return; // Skip Redis set but keep in-memory cache
+        }
+        
+        // Measure Redis operation time
+        const startTime = Date.now();
         
         if (expiry === "never") {
-          await this.redisClient.set(key, value);
-          const endTime = performance.now();
-          const duration = (endTime - startTime).toFixed(2);
-          
-          // Track in stats
-          this.cacheStats.sets++;
-          
-          // Only log at appropriate levels
-          if (isDebugEnabled) {
-            const setMessage = `💾 REDIS CACHE SET [${duration}ms] (permanent, ${valueSize} bytes): ${shortKey}...`;
-            console.log(setMessage);
-            
-            // Log sample of sets to stderr for CloudWatch visibility
-            if (isInfoEnabled && Math.random() < 0.1) {
-              console.error(`STATS: ${setMessage}`);
-            }
-          }
+          await this.#redisClient.set(key, value);
         } else {
-          await this.redisClient.set(key, value, { ex: expiry });
-          const endTime = performance.now();
-          const duration = (endTime - startTime).toFixed(2);
-          
-          // Track in stats
-          this.cacheStats.sets++;
-          
-          // Only log at appropriate levels
-          if (isDebugEnabled) {
-            const setMessage = `💾 REDIS CACHE SET [${duration}ms] (${expiry}s, ${valueSize} bytes): ${shortKey}...`;
-            console.log(setMessage);
-            
-            // Log sample of sets to stderr for CloudWatch visibility
-            if (isInfoEnabled && Math.random() < 0.1) {
-              console.error(`STATS: ${setMessage}`);
-            }
-          }
+          await this.#redisClient.set(key, value, { ex: expiry });
+        }
+        
+        const duration = Date.now() - startTime;
+        if (duration > 500) {
+          // Log slow operations
+          console.log(`[REDIS SLOW] Slow Redis SET operation detected: ${duration}ms for key ${key.substring(0, 10)}...`);
+        } else if (REDIS_DEBUG) {
+          console.log(`[REDIS SET] Completed in ${duration}ms`);
         }
       } catch (error) {
-        // Track errors in stats - always log errors regardless of level
-        this.cacheStats.errors++;
+        const errorMsg = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+        this.#logger.error(`Failed to write to Redis cache: ${errorMsg}`);
+        console.log(`[REDIS ERROR] Failed to set key ${key.substring(0, 10)}...: ${errorMsg}`);
         
-        const errorMessage = `❌ REDIS WRITE ERROR for key ${shortKey}: ${error.message}`;
-        console.error(errorMessage);
-        this.logger.error("Failed to write to Redis cache:", error);
-        if (this.redisAvailableAtStartup) {
-          this.connectToRedisInBackground();
+        // Detailed error inspection
+        if (error instanceof Error && error.stack) {
+          console.log(`[REDIS ERROR STACK] ${error.stack}`);
         }
-        this.redisAvailable = false;
+        
+        // Check if connection was lost
+        if (error instanceof Error && 
+            (error.message.includes("connection") || 
+             error.message.includes("network") || 
+             error.message.includes("ECONNRESET") ||
+             error.message.includes("closed"))) {
+          console.log(`[REDIS CONNECTION ISSUE] Possible connection loss detected: ${error.message}`);
+          this.#redisAvailable = false;
+          
+          if (this.#redisAvailableAtStartup) {
+            console.log(`[REDIS RECONNECT] Scheduling reconnection attempt in background...`);
+            this.#connectToRedisInBackground();
+          }
+        }
       }
-    } else {
-      // Only log client unavailability at appropriate levels
-      if (isInfoEnabled) {
-        const noClientMessage = `❓ REDIS CLIENT NOT AVAILABLE for SET, using in-memory cache: ${shortKey}...`;
-        console.log(noClientMessage);
-        console.error(`STATS: ${noClientMessage}`);
-      }
+    } else if (REDIS_DEBUG) {
+      console.log(`[REDIS CLIENT MISSING] Redis client unavailable for setting key: ${key.substring(0, 10)}...`);
     }
-    this.setInMemoryCachedData(key, data, expiry);
   }
 
   private handleInMemoryCache<T>(
@@ -544,11 +634,11 @@ Redis log level:    ${logLevel}
   }
 
   private getInMemoryCachedData(key: string): unknown | null {
-    const item = this.inMemoryCache[key];
+    const item = this.#inMemoryCache[key];
     if (item && item.expiry > Date.now()) {
       return item.data;
     }
-    delete this.inMemoryCache[key];
+    delete this.#inMemoryCache[key];
     return null;
   }
 
@@ -558,26 +648,26 @@ Redis log level:    ${logLevel}
     expiry: number | "never",
   ): void {
     const expiryTime = expiry === "never" ? Infinity : Date.now() + expiry;
-    this.inMemoryCache[key] = { data, expiry: expiryTime };
+    this.#inMemoryCache[key] = { data, expiry: expiryTime };
   }
 
   public async invalidateCacheByPattern(pattern: string): Promise<void> {
-    if (this.redisClient) {
+    if (this.#redisClient) {
       try {
-        const keys = await this.redisClient.keys(pattern);
+        const keys = await this.#redisClient.keys(pattern);
         if (keys.length > 0) {
-          await this.redisClient.del(...keys);
-          this.logger.info(`Cache invalidated for pattern: ${pattern}`);
+          await this.#redisClient.del(...keys);
+          this.#logger.info(`Cache invalidated for pattern: ${pattern}`);
         }
       } catch (error) {
-        this.logger.error(
+        this.#logger.error(
           "Failed to invalidate Redis cache by pattern:",
           error,
         );
-        if (this.redisAvailableAtStartup) {
-          this.connectToRedisInBackground();
+        if (this.#redisAvailableAtStartup) {
+          this.#connectToRedisInBackground();
         }
-        this.redisAvailable = false;
+        this.#redisAvailable = false;
       }
     }
     this.invalidateInMemoryCacheByPattern(pattern);
@@ -585,9 +675,9 @@ Redis log level:    ${logLevel}
 
   private invalidateInMemoryCacheByPattern(pattern: string): void {
     const regex = new RegExp(pattern);
-    for (const key in this.inMemoryCache) {
+    for (const key in this.#inMemoryCache) {
       if (regex.test(key)) {
-        delete this.inMemoryCache[key];
+        delete this.#inMemoryCache[key];
       }
     }
   }

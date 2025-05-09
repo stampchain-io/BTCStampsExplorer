@@ -101,12 +101,12 @@
 /* Background Gradient Colors */
 .dark-gradient {
   /* TODO: Migrate to Tailwind: bg-stamp-dark */
-  background: linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff);
+  background: linear-gradient(to bottom right, #0e0014, #14001f, #1b0029);
 }
 
 .dark-gradient-modal {
   /* TODO: Migrate to Tailwind: bg-stamp-dark */
-  background: linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff), #000000;
+  background: linear-gradient(to bottom right, #0e0014, #14001f, #1b0029, #220033);
 }
 
 .purple-bg-gradient {
@@ -114,9 +114,8 @@
   background: linear-gradient(to right, #8800cc, #7700aa, #660099);
 }
 
-/* Hoverable Text Gradient Colors */
-.purple-hover-gradient {
-  /* TODO: Migrate to Tailwind: bg-text-purple-hover bg-clip-text text-fill-transparent */
+/* Hoverable Text Gradient Colors - used for logo in header*/
+.purple-gradient2-hover {
   background: linear-gradient(90deg,
       #440066 0%,
       #660099 50%,
@@ -129,13 +128,37 @@
   transition: background 0.3s ease-in-out;
 }
 
-.purple-hover-gradient:hover {
-  /* TODO: Migrate to Tailwind: hover:bg-text-purple-hover bg-clip-text text-fill-transparent */
+.purple-gradient2-hover:hover {
   background: linear-gradient(90deg,
       #440066 0%,
       #660099 25%,
       #8800cc 50%,
       #aa00ff 75%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.purple-gradient4-hover {
+  background: linear-gradient(90deg,
+      #aa00ff 30%,
+      #8800cc 60%,
+      #660099 90%,
+      #440066 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  transition: background 0.3s ease-in-out;
+}
+
+.purple-gradient4-hover:hover {
+  background: linear-gradient(90deg,
+      #aa00ff 50%,
+      #8800cc 80%,
+      #660099 90%,
+      #440066 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

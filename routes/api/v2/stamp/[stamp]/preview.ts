@@ -14,18 +14,24 @@ export const handler: Handlers = {
 
       const { stamp_url, stamp_mimetype } = stampData;
 
-      if (stamp_mimetype?.startsWith("image/") && stamp_mimetype !== "image/svg+xml") {
+      if (
+        stamp_mimetype?.startsWith("image/") &&
+        stamp_mimetype !== "image/svg+xml"
+      ) {
         return new Response(null, {
           status: 302,
           headers: { Location: stamp_url },
         });
       }
 
-      const client = new screenshotone.Client("OUs5bLzPfWlwdQ", "WUlkCqVvQdlPxQ");
+      const client = new screenshotone.Client(
+        "OUs5bLzPfWlwdQ",
+        "WUlkCqVvQdlPxQ",
+      );
 
       const options = screenshotone.TakeOptions.url(stamp_url)
-          .delay(3)
-          .blockAds(true);
+        .delay(3)
+        .blockAds(true);
 
       const url = await client.generateTakeURL(options);
 

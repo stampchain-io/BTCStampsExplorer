@@ -9,7 +9,29 @@ import {
 } from "$types/index.d.ts";
 
 export class QuicknodeService {
-  private static readonly QUICKNODE_URL = `${serverConfig.QUICKNODE_ENDPOINT}/${serverConfig.QUICKNODE_API_KEY}`;
+  // Instead of storing the full URL with API key as a static property,
+  // construct it only when needed and never expose it
+  private static getQuickNodeUrl(): string {
+    const endpoint = serverConfig.QUICKNODE_ENDPOINT;
+    const apiKey = serverConfig.QUICKNODE_API_KEY;
+    
+    if (!endpoint || !apiKey) {
+      throw new Error("QuickNode API configuration is missing or invalid");
+    }
+    
+    // Ensure the endpoint doesn't already contain a protocol
+    const formattedEndpoint = endpoint.replace(/^https?:\/\//, '');
+    
+    // Return the properly formatted URL
+    return `https://${formattedEndpoint}/${apiKey}`;
+  }
+  
+  // For logging and error reporting, use this safe version that hides the API key
+  private static getSafeEndpointForLogs(): string {
+    const endpoint = serverConfig.QUICKNODE_ENDPOINT;
+    if (!endpoint) return "undefined-endpoint";
+    return endpoint.replace(/^https?:\/\//, '');
+  }
 
   static async fetchQuicknode(
     method: string,
@@ -17,7 +39,16 @@ export class QuicknodeService {
     retries = 0,
   ) {
     try {
-      const response = await fetch(this.QUICKNODE_URL, {
+      // Log the request without exposing sensitive information
+      console.log("Fetching from QuickNode:", { 
+        method, 
+        paramsCount: params.length,
+        endpoint: this.getSafeEndpointForLogs() 
+      });
+      
+      // Get the URL only when needed, never store it
+      const quicknodeUrl = this.getQuickNodeUrl();
+      const response = await fetch(quicknodeUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,12 +82,21 @@ export class QuicknodeService {
       const result = await response.json();
       return result;
     } catch (error) {
+      // Log detailed error information without exposing sensitive data
+      console.error("QuickNode fetch error:", {
+        error: error instanceof Error ? error.message : String(error),
+        method,
+        paramsCount: params.length,
+        endpoint: this.getSafeEndpointForLogs(), 
+        retryCount: retries,
+      });
+      
       if (retries < MAX_XCP_RETRIES) {
-        console.log(`Retrying... (${retries + 1}/${MAX_XCP_RETRIES})`);
+        console.log(`Retrying QuickNode request... (${retries + 1}/${MAX_XCP_RETRIES})`);
         await new Promise((resolve) => setTimeout(resolve, 1000));
         return await this.fetchQuicknode(method, params, retries + 1);
       } else {
-        console.error("Max retries reached. Returning null.");
+        console.error("Max retries reached. Giving up on QuickNode request.");
         throw error;
       }
     }

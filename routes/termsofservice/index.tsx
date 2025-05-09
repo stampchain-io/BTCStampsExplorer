@@ -1,74 +1,77 @@
-import { CourierFontLoader } from "$islands/home/FontLoader.tsx";
+/* ===== TERMS OF SERVICE PAGE ===== */
+import { body, CourierFontLoader, gapGrid } from "$layout";
+import { subtitleGrey, text, textSm, titleGreyLD } from "$text";
 
-export default function TermsOfService() {
-  const titleGreyDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
-  const subTitleGrey =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
-  const bodyTextLight =
-    "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
+/* ===== PAGE COMPONENT ===== */
+export default function TermsOfServicePage() {
   return (
     <>
       <CourierFontLoader />
-      <div className="flex flex-col gap-16 tablet:gap-16 pt-0 mobileLg:pt-3 tablet:pt-3">
-        <section className="flex flex-col gap-6">
-          <h1 className={titleGreyDL}>TERMS OF SERVICE</h1>
-          <div className="flex flex-col tablet:flex-row tablet:justify-between tablet:items-end -mt-6">
-            <p className={subTitleGrey}>
+      <div className={`${body} ${gapGrid}`}>
+        {/* ===== HEADER SECTION ===== */}
+        <section>
+          <h1 className={titleGreyLD}>TERMS OF SERVICE</h1>
+          <div className="flex flex-col tablet:flex-row tablet:justify-between tablet:items-end">
+            <h2 className={subtitleGrey}>
               AGREEMENT TO OUR LEGAL TERMS
-            </p>
-            <p className="text-lg mobileLg:text-xl font-light text-stamp-grey mb-2 mobileLg:mb-[13px]">
-              LAST UPDATED{" "}
-              <span className="font-medium text-stamp-grey-light">
+            </h2>
+            <h5 className="text-lg mobileLg:text-xl font-light text-stamp-grey pb-4 mobileLg:pb-2">
+              LAST UPDATED
+              <span className="pl-3 font-medium text-stamp-grey-light">
                 SEPTEMBER 11 2024
               </span>
-            </p>
+            </h5>
           </div>
-          <p className={`${bodyTextLight} font-courier-prime`}>
-            We are Stampchain ("Company," "we," "us," "our"). We operate the
-            website https://stampchain.io (the "Site"), as well as any other
-            related products and services that refer or link to these legal
-            terms (the "Legal Terms") (collectively, the "Services").
-            <br />
-            <br />
-            These Legal Terms constitute a legally binding agreement made
-            between you, whether personally or on behalf of an entity ("you"),
-            and Stampchain, concerning your access to and use of the Services.
-            You agree that by accessing the Services, you have read, understood,
-            and agreed to be bound by all of these Legal Terms.
-            <br />
-            <br />
-            <b className="text-lg mobileLg:text-xl">
+          <div
+            className={`flex flex-col ${textSm} font-courier-prime leading-6`}
+          >
+            <p>
+              We are Stampchain ("Company," "we," "us," "our"). We operate the
+              website https://stampchain.io (the "Site"), as well as any other
+              related products and services that refer or link to these legal
+              terms (the "Legal Terms") (collectively, the "Services").
+            </p>
+            <p>
+              These Legal Terms constitute a legally binding agreement made
+              between you, whether personally or on behalf of an entity ("you"),
+              and Stampchain, concerning your access to and use of the Services.
+              You agree that by accessing the Services, you have read,
+              understood, and agreed to be bound by all of these Legal Terms.
+            </p>
+            <p className={`${text} !font-semibold`}>
               IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE
               EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST
               DISCONTINUE USE IMMEDIATELY.
-            </b>
-            <br />
-            <br />
-            Supplemental terms and conditions or documents that may be posted on
-            the Services from time to time are hereby expressly incorporated
-            herein by reference. We reserve the right, in our sole discretion,
-            to make changes or modifications to these Legal Terms from time to
-            time. We will alert you about any changes by updating the "Last
-            updated" date of these Legal Terms, and you waive any right to
-            receive specific notice of each such change.
-            <br />
-            It is your responsibility to periodically review these Legal Terms
-            to stay informed of updates. You will be subject to, and will be
-            deemed to have been made aware of and to have accepted, the changes
-            in any revised Legal Terms by your continued use of the Services
-            after the date such revised Legal Terms are posted.
-            <br />
-            The Services are intended for users who are at least 18 years old.
-            Persons under the age of 18 are not permitted to use or register for
-            the Services.
-            <br />
-            <br />
-            We recommend that you print a copy of these Legal Terms for your
-            records.
-          </p>
-          <p className="mt-3 mobileLg:mt-6 text-base mobileMd:text-lg mobileLg:text-xl text-stamp-grey-light font-courier-prime">
-            <span className="text-2xl mobileMd:text-3xl mobileLg:text-4xl">
+            </p>
+            <p>
+              Supplemental terms and conditions or documents that may be posted
+              on the Services from time to time are hereby expressly
+              incorporated herein by reference. We reserve the right, in our
+              sole discretion, to make changes or modifications to these Legal
+              Terms from time to time. We will alert you about any changes by
+              updating the "Last updated" date of these Legal Terms, and you
+              waive any right to receive specific notice of each such change.
+              <br />
+              It is your responsibility to periodically review these Legal Terms
+              to stay informed of updates. You will be subject to, and will be
+              deemed to have been made aware of and to have accepted, the
+              changes in any revised Legal Terms by your continued use of the
+              Services after the date such revised Legal Terms are posted.
+              <br />
+              The Services are intended for users who are at least 18 years old.
+              Persons under the age of 18 are not permitted to use or register
+              for the Services.
+            </p>
+            <p>
+              We recommend that you print a copy of these Legal Terms for your
+              records.
+            </p>
+          </div>
+        </section>
+        {/* ===== TABLE OF CONTENTS SECTION ===== */}
+        <section>
+          <p className="font-semibold text-lg text-stamp-grey-light font-courier-prime">
+            <span className="text-2xl">
               TABLE OF CONTENTS<br />
             </span>
             1. OUR SERVICES<br />
@@ -100,9 +103,12 @@ export default function TermsOfService() {
           </p>
         </section>
 
+        {/* ===== TERMS CONTENT SECTION ===== */}
         <div
-          className={`${bodyTextLight} flex flex-col space-y-12 font-courier-prime`}
+          className={`flex flex-col space-y-9 tablet:space-y-6 ${textSm} font-courier-prime leading-6`}
         >
+          {/* ===== TERMS DESCRIPTION SECTION ===== */}
+          {/* ===== 1. OUR SERVICES ===== */}
           <section>
             1. OUR SERVICES<br />
             The information provided when using the Services is not intended for
@@ -122,6 +128,7 @@ export default function TermsOfService() {
             violate the Gramm-Leach-Bliley Act (GLBA).
           </section>
 
+          {/* ===== 2. INTELLECTUAL PROPERTY RIGHTS ===== */}
           <section>
             2. INTELLECTUAL PROPERTY RIGHTS<br />
             Our intellectual property<br />
@@ -186,9 +193,10 @@ export default function TermsOfService() {
             information. You are solely responsible for your Submissions and you
             expressly agree to reimburse us for any and all losses that we may
             suffer because of your breach of (a) this section, (b) any third
-            party’s intellectual property rights, or (c) applicable law.
+            party's intellectual property rights, or (c) applicable law.
           </section>
 
+          {/* ===== 3. USER REPRESENTATIONS ===== */}
           <section>
             3. USER REPRESENTATIONS<br />
             By using the Services, you represent and warrant that: (1) you have
@@ -204,6 +212,7 @@ export default function TermsOfService() {
             use of the Services (or any portion thereof).
           </section>
 
+          {/* ===== 4. PRODUCTS ===== */}
           <section>
             4. PRODUCTS<br />
             All products are subject to availability. We reserve the right to
@@ -211,6 +220,7 @@ export default function TermsOfService() {
             products are subject to change.
           </section>
 
+          {/* ===== 5. PURCHASES AND PAYMENT ===== */}
           <section>
             5. PURCHASES AND PAYMENT<br />
             We accept the following forms of payment: - Bitcoin You agree to
@@ -236,11 +246,13 @@ export default function TermsOfService() {
             by dealers, resellers, or distributors.
           </section>
 
+          {/* ===== 6. REFUNDS POLICY ===== */}
           <section>
             6. REFUNDS POLICY<br />
             All sales are final and no refund will be issued.
           </section>
 
+          {/* ===== 7. PROHIBITED ACTIVITIES ===== */}
           <section>
             7. PROHIBITED ACTIVITIES<br />
             You may not access or use the Services for any purpose other than
@@ -266,7 +278,7 @@ export default function TermsOfService() {
             transmit (or attempt to upload or to transmit) viruses, Trojan
             horses, or other material, including excessive use of capital
             letters and spamming (continuous posting of repetitive text), that
-            interferes with any party’s uninterrupted use and enjoyment of the
+            interferes with any party's uninterrupted use and enjoyment of the
             Services or modifies, impairs, disrupts, alters, or interferes with
             the use, features, functions, operation, or maintenance of the
             Services. Engage in any automated use of the system, such as using
@@ -305,6 +317,7 @@ export default function TermsOfService() {
             or commercial enterprise.
           </section>
 
+          {/* ===== 8. USER GENERATED CONTRIBUTIONS ===== */}
           <section>
             8. USER GENERATED CONTRIBUTIONS<br />
             The Services does not offer users to submit or post content. We may
@@ -357,6 +370,7 @@ export default function TermsOfService() {
             Services.
           </section>
 
+          {/* ===== 9. CONTRIBUTION LICENSE ===== */}
           <section>
             9. CONTRIBUTION LICENSE<br />
             You and Services agree that we may access, store, process, and use
@@ -375,6 +389,7 @@ export default function TermsOfService() {
             from any legal action against us regarding your Contributions.
           </section>
 
+          {/* ===== 10. THIRD-PARTY WEBSITES AND CONTENT ===== */}
           <section>
             10. THIRD-PARTY WEBSITES AND CONTENT<br />
             The Services may contain (or you may be sent via the Site) links to
@@ -412,6 +427,7 @@ export default function TermsOfService() {
             Websites.
           </section>
 
+          {/* ===== 11. ADVERTISERS ===== */}
           <section>
             11. ADVERTISERS<br />
             We allow advertisers to display their advertisements and other
@@ -421,6 +437,7 @@ export default function TermsOfService() {
             advertisers.
           </section>
 
+          {/* ===== 12. SERVICES MANAGEMENT ===== */}
           <section>
             12. SERVICES MANAGEMENT<br />
             We reserve the right, but not the obligation, to: (1) monitor the
@@ -439,6 +456,7 @@ export default function TermsOfService() {
             functioning of the Services.
           </section>
 
+          {/* ===== 13. PRIVACY POLICY ===== */}
           <section>
             13. PRIVACY POLICY<br />
             We care about data privacy and security. Please review our Privacy
@@ -454,6 +472,7 @@ export default function TermsOfService() {
             the United States.
           </section>
 
+          {/* ===== 14. TERM AND TERMINATION ===== */}
           <section>
             14. TERM AND TERMINATION<br />
             These Legal Terms shall remain in full force and effect while you
@@ -475,6 +494,7 @@ export default function TermsOfService() {
             limitation pursuing civil, criminal, and injunctive redress.
           </section>
 
+          {/* ===== 15. MODIFICATIONS AND INTERRUPTIONS ===== */}
           <section>
             15. MODIFICATIONS AND INTERRUPTIONS<br />
             We reserve the right to change, modify, or remove the contents of
@@ -497,6 +517,7 @@ export default function TermsOfService() {
             therewith.
           </section>
 
+          {/* ===== 16. GOVERNING LAW ===== */}
           <section>
             16. GOVERNING LAW<br />
             These Legal Terms and your use of the Services are governed by and
@@ -506,6 +527,7 @@ export default function TermsOfService() {
             principles.
           </section>
 
+          {/* ===== 17. DISPUTE RESOLUTION ===== */}
           <section>
             17. DISPUTE RESOLUTION<br />
             Informal Negotiations To expedite resolution and control the cost of
@@ -523,7 +545,7 @@ export default function TermsOfService() {
             WITHOUT THIS PROVISION, YOU WOULD HA VE THE RIGHT TO SUE IN COURT
             AND HA VE A JURY TRIAL. The arbitration shall be commenced and
             conducted under the Commercial Arbitration Rules of the American
-            Arbitration Association ("AAA") and, where appropriate, the AAA’s
+            Arbitration Association ("AAA") and, where appropriate, the AAA's
             Supplementary Procedures for Consumer Related Disputes ("AAA
             Consumer Rules"), both of which are available at the American
             Arbitration Association (AAA) website. Your arbitration fees and
@@ -580,6 +602,7 @@ export default function TermsOfService() {
             agree to submit to the personal jurisdiction of that court.
           </section>
 
+          {/* ===== 18. CORRECTIONS ===== */}
           <section>
             18. CORRECTIONS<br />
             There may be information on the Services that contains typographical
@@ -590,6 +613,7 @@ export default function TermsOfService() {
             notice.
           </section>
 
+          {/* ===== 19. DISCLAIMER ===== */}
           <section>
             19. DISCLAIMER<br />
             THE SERVICES ARE PROVIDED ON AN AS-IS AND AS-A V AILABLE BASIS. YOU
@@ -625,6 +649,7 @@ export default function TermsOfService() {
             APPROPRIATE.
           </section>
 
+          {/* ===== 20. LIMITATIONS OF LIABILITY ===== */}
           <section>
             20. LIMITATIONS OF LIABILITY<br />
             IN NO EVENT WILL WE OR OUR DIRECTORS, EMPLOYEES, OR AGENTS BE LIABLE
@@ -644,12 +669,13 @@ export default function TermsOfService() {
             AND YOU MAY HA VE ADDITIONAL RIGHTS.
           </section>
 
+          {/* ===== 21. INDEMNIFICATION ===== */}
           <section>
             21. INDEMNIFICATION<br />
             You agree to defend, indemnify, and hold us harmless, including our
             subsidiaries, affiliates, and all of our respective officers,
             agents, partners, and employees, from and against any loss, damage,
-            liability, claim, or demand, including reasonable attorneys’ fees
+            liability, claim, or demand, including reasonable attorneys' fees
             and expenses, made by any third party due to or arising out of: (1)
             use of the Services; (2) breach of these Legal Terms; (3) any breach
             of your representations and warranties set forth in these Legal
@@ -665,6 +691,7 @@ export default function TermsOfService() {
             indemnification upon becoming aware of it.
           </section>
 
+          {/* ===== 22. USER DATA ===== */}
           <section>
             22. USER DATA<br />
             We will maintain certain data that you transmit to the Services for
@@ -678,6 +705,7 @@ export default function TermsOfService() {
             such loss or corruption of such data.
           </section>
 
+          {/* ===== 23. ELECTRONIC COMMUNICATIONS ===== */}
           <section>
             23. ELECTRONIC COMMUNICATIONS, TRANSACTIONS, AND SIGNATURES<br />
             Visiting the Services, sending us emails, and completing online
@@ -696,6 +724,7 @@ export default function TermsOfService() {
             of credits by any means other than electronic means.
           </section>
 
+          {/* ===== 24. CALIFORNIA USERS AND RESIDENTS ===== */}
           <section>
             24. CALIFORNIA USERS AND RESIDENTS<br />
             If any complaint with us is not satisfactorily resolved, you can
@@ -705,6 +734,7 @@ export default function TermsOfService() {
             95834 or by telephone at (800) 952-5210 or (916) 445-1254.
           </section>
 
+          {/* ===== 25. MISCELLANEOUS ===== */}
           <section>
             25. MISCELLANEOUS<br />
             These Legal Terms and any policies or operating rules posted by us
@@ -730,22 +760,24 @@ export default function TermsOfService() {
             parties hereto to execute these Legal Terms.
           </section>
 
+          {/* ===== 26. CONTACT US ===== */}
           <section id="content-no.26">
             26. CONTACT US<br />
             In order to resolve a complaint regarding the Services or to receive
             further information regarding use of the Services, please{" "}
             <a
               href="/about#contact"
-              className={`${bodyTextLight} animated-underline`}
+              className={`${textSm} animated-underline`}
             >
               send us an email
             </a>.
           </section>
 
-          <b className="mt-3">
+          {/* ===== FOOTER NOTE ===== */}
+          <p className="mt-3 !font-semibold">
             These terms of use were created using Termly's Terms and Conditions
             Generator.
-          </b>
+          </p>
         </div>
       </div>
     </>

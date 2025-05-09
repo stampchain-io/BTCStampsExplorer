@@ -7,7 +7,7 @@ import {
   WALLET_FILTER_TYPES,
 } from "$globals";
 import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
-import { Button } from "$components/shared/Button.tsx";
+import { Button } from "$components/button/ButtonOLD.tsx";
 
 type FilterTypes =
   | SRC20_FILTER_TYPES

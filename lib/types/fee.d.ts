@@ -16,7 +16,7 @@ export interface BaseFeeCalculatorProps {
   feeDetails?: FeeDetails;
 }
 
-export interface BasicFeeProps
+export interface SimpleFeeCalculatorProps
   extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
   type: "send" | "transfer" | "buy";
   amount?: number;
@@ -27,7 +27,7 @@ export interface BasicFeeProps
   utxoAncestors?: AncestorInfo[];
 }
 
-export interface ComplexFeeProps
+export interface AdvancedFeeCalculatorProps
   extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
   type: "stamp" | "src20" | "fairmint" | "transfer" | "src20-transfer";
   fileType?: string;

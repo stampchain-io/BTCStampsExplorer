@@ -16,18 +16,6 @@
         "close": true
       },
       "problemMatcher": []
-    },
-    {
-      "label": "run-local-script",
-      "type": "shell",
-      "command": "bash",
-      "args": ["${workspaceFolder}/scripts/local.sh"],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "echo": false,
-        "close": true
-      }
     }
   ]
 }

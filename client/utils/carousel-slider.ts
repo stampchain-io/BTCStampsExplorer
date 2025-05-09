@@ -44,8 +44,8 @@ const CAROUSEL_CONFIG = {
 
   // Animation settings
   ANIMATION: {
-    SPEED: 600,
-    AUTOPLAY: 3000,
+    SPEED: 500,
+    AUTOPLAY: 5000,
   },
 
   DEBUG: {
