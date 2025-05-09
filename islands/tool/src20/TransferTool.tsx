@@ -213,18 +213,6 @@ export function SRC20TransferTool(
         aria-label="Transfer SRC20 tokens"
         novalidate
       >
-        {/* ===== FORM INPUTS ===== */}
-
-        <SRC20InputField
-          type="text"
-          placeholder="Recipient address"
-          value={formState.toAddress}
-          onChange={(e) => handleInputChange(e, "toAddress")}
-          onBlur={() => handleInputBlur("toAddress")}
-          error={formState.toAddressError}
-          aria-label="Recipient address"
-        />
-
         {/* ===== TOKEN AND AMOUNT INPUTS ===== */}
         <div class={rowResponsiveForm}>
           {/* Token Input with Dropdown */}
@@ -287,6 +275,17 @@ export function SRC20TransferTool(
             aria-label="Amount to transfer"
           />
         </div>
+
+        {/* ===== RECIPIENT ADDRESS INPUT ===== */}
+        <SRC20InputField
+          type="text"
+          placeholder="Recipient address"
+          value={formState.toAddress}
+          onChange={(e) => handleInputChange(e, "toAddress")}
+          onBlur={() => handleInputBlur("toAddress")}
+          error={formState.toAddressError}
+          aria-label="Recipient address"
+        />
       </form>
 
       {/* ===== FEE CALCULATOR ===== */}
