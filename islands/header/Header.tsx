@@ -1,7 +1,10 @@
 /* ===== HEADER COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
 import { ConnectButton } from "$islands/button/ConnectButton.tsx";
-import { CloseIcon, GearIcon, HamburgerMenuIcon } from "$icon";
+// Import main icons from the barrel file
+import { CloseIcon, GearIcon } from "$icon";
+// Import HamburgerMenuIcon directly to ensure it's available
+import { HamburgerMenuIcon } from "$components/icon/MenuIcon.tsx";
 import {
   logoPurpleLDLink,
   navLinkGrey,
@@ -186,18 +189,20 @@ export function Header() {
       );
     };
   }, [open]);
+  
+  /* This effect has been removed to simplify the code */
 
   /* ===== MENU CLOSE FUNCTION ===== */
   const closeMenu = () => {
+    // Close menu by updating state
+    setOpen(false);
+    
+    // Close tools section after drawer is closed
     setTimeout(() => {
-      setOpen(false);
-      // Close tools section after drawer is closed
-      setTimeout(() => {
-        if (toolsOpen) {
-          setToolsOpen(false);
-        }
-      }, 500); // Wait for drawer close animation to finish
-    }, 500);
+      if (toolsOpen) {
+        setToolsOpen(false);
+      }
+    }, 500); // Wait for drawer close animation to finish
   };
 
   /* ===== MENU TOGGLE FUNCTION ===== */
@@ -342,9 +347,9 @@ export function Header() {
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[380px] h-screen z-30
            bg-gradient-to-b from-[#000000]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
            shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
-           transition-transform duration-500 ease-in-out will-change-transform
+           transition-transform duration-500 ease-in-out
            overflow-y-auto overflow-x-hidden scrollbar-black
-         ${open ? "translate-x-0" : "translate-x-full"}`}
+           ${open ? "translate-x-0" : "translate-x-full"}`}
         id="navbar-collapse"
       >
         {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}

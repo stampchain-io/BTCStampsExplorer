@@ -99,6 +99,7 @@ class DatabaseManager {
   }
 
   private #setupLogging(): void {
+    const level = this.config.REDIS_LOG_LEVEL || "INFO";
     setup({
       handlers: {
         console: new ConsoleHandler(level),

@@ -157,7 +157,7 @@ interface MintRequest {
   locked: boolean;
   filename: string;
   file: string;
-  satsPerKB: number;
+  satsPerVB: number;  // Changed from satsPerKB to satsPerVB for consistency
   service_fee: string | null;
   service_fee_address: string | null;
   assetName?: string;
@@ -266,10 +266,11 @@ interface FileValidationResult {
 const PREVIEW_SIZE_CLASSES =
   "w-[100px] h-[100px] mobileMd:w-[100px] mobileMd:h-[100px]" as const;
 
-/* ===== MAIN COMPONENT IMPLEMENTATION ===== */
+/* ===== WRAPPER COMPONENT - HANDLES CONFIG LOADING ===== */
 export function StampingTool() {
   const { config, isLoading } = useConfig<Config>();
-
+  
+  /* ===== EARLY RETURN CONDITIONS ===== */
   if (isLoading) {
     return <div>Loading configuration...</div>;
   }
@@ -277,12 +278,23 @@ export function StampingTool() {
   if (!config) {
     return <div>Error: Configuration not loaded</div>;
   }
+  
+  // Once we have the config, render the main component
+  return <StampingToolMain config={config} />;
+}
 
-  /* ===== WALLET AND ADDRESS STATE ===== */
+/* ===== MAIN COMPONENT IMPLEMENTATION ===== */
+// This component contains all hooks and is only rendered when config is available
+function StampingToolMain({ config }: { config: Config }) {
+  // Context and props
   const { wallet, isConnected } = walletContext;
   const address = isConnected ? wallet.address : undefined;
-
-  /* ===== FILE AND FORM STATE ===== */
+  
+  // Fee polling
+  const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
+  
+  /* ===== ALL STATE DEFINITIONS ===== */
+  // File and form state
   type FileType = File | null;
   const [file, setFile] = useState<FileType>(null);
   const [fee, setFee] = useState<number>(0);
@@ -292,26 +304,63 @@ export function StampingTool() {
   const [isLocked, setIsLocked] = useState(true);
   const [isPoshStamp, setIsPoshStamp] = useState(false);
   const [stampName, setStampName] = useState("");
-
-  /* ===== FEE AND VALIDATION STATE ===== */
-  const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
+  
+  // Validation state
   const [fileError, setFileError] = useState<string>("");
   const [issuanceError, setIssuanceError] = useState<string>("");
   const [stampNameError, setStampNameError] = useState<string>("");
   const [apiError, setApiError] = useState<string>("");
-  const [submissionMessage, setSubmissionMessage] = useState<
-    SubmissionMessage | null
-  >(null);
+  const [submissionMessage, setSubmissionMessage] = useState<SubmissionMessage | null>(null);
   const [isSearching, setIsSearching] = useState(false);
-  const [addressError, setAddressError] = useState<string | undefined>(
-    undefined,
-  );
+  const [addressError, setAddressError] = useState<string | undefined>(undefined);
   const [txDetails, setTxDetails] = useState<MintResponse | null>(null);
+  
+  // Fee details state
+  const [feeDetails, setFeeDetails] = useState<FeeDetails>({
+    minerFee: 0,
+    dustValue: 0,
+    totalValue: 0,
+    hasExactFees: false,
+  });
 
-  /* ===== TOOLTIP STATE AND REFS ===== */
+  // Tooltip state and refs
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isUploadTooltipVisible, setIsUploadTooltipVisible] = useState(false);
   const uploadTooltipTimeoutRef = useRef<number | null>(null);
+  
+  // Modal state
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState(false);
+  const [tosAgreed, setTosAgreed] = useState(false);
+  
+  // Advanced options state
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  
+  // Tooltips state
+  const [tooltipText, setTooltipText] = useState("SIMPLE SETTINGS");
+  const [isAdvancedTooltipVisible, setIsAdvancedTooltipVisible] = useState(false);
+  const [allowAdvancedTooltip, setAllowAdvancedTooltip] = useState(true);
+  const advancedTooltipTimeoutRef = useRef<number | null>(null);
+  
+  // POSH tooltip state
+  const [poshTooltipText, setPoshTooltipText] = useState("POSH");
+  const [isPoshTooltipVisible, setIsPoshTooltipVisible] = useState(false);
+  const [allowPoshTooltip, setAllowPoshTooltip] = useState(true);
+  const poshButtonRef = useRef<HTMLButtonElement>(null);
+  const poshTooltipTimeoutRef = useRef<number | null>(null);
+  
+  // Lock tooltip state
+  const [lockTooltipText, setLockTooltipText] = useState("LOCK");
+  const [isLockTooltipVisible, setIsLockTooltipVisible] = useState(false);
+  const [allowLockTooltip, setAllowLockTooltip] = useState(true);
+  const lockButtonRef = useRef<HTMLDivElement>(null);
+  const lockTooltipTimeoutRef = useRef<number | null>(null);
+  
+  // Preview tooltip state
+  const [previewTooltipText, setPreviewTooltipText] = useState("FULLSCREEN");
+  const [isPreviewTooltipVisible, setIsPreviewTooltipVisible] = useState(false);
+  const [allowPreviewTooltip, setAllowPreviewTooltip] = useState(true);
+  const previewButtonRef = useRef<HTMLDivElement>(null);
+  const previewTooltipTimeoutRef = useRef<number | null>(null);
 
   /* ===== EFFECT HOOKS ===== */
   useEffect(() => {
@@ -384,7 +433,7 @@ export function StampingTool() {
           const mintRequest = {
             sourceWallet: address,
             file: fileData,
-            satsPerKB: fee * 1000,
+            satsPerVB: fee, // Send fee as satsPerVB for direct use
             locked: isLocked,
             qty: issuance,
             filename: file.name,
@@ -444,43 +493,68 @@ export function StampingTool() {
 
   // Update the fee recalculation effect
   useEffect(() => {
-    if (txDetails && fee) {
+    // This effect should run when any of the fee-related parameters change
+    const prepareTxWithNewFee = async () => {
+      if (!isConnected || !wallet.address || !file) {
+        return;
+      }
+      
       try {
-        // Use the API-provided miner fee instead of calculating it
-        const minerFee = txDetails.est_miner_fee;
-
+        const fileData = await toBase64(file);
+        
+        const mintRequest = {
+          sourceWallet: address,
+          file: fileData,
+          satsPerVB: fee, // Use the current fee setting
+          locked: isLocked,
+          qty: issuance,
+          filename: file.name,
+          ...(isPoshStamp && stampName ? { assetName: stampName } : {}),
+          dryRun: true,
+        };
+        
+        logger.debug("stamps", {
+          message: "Recalculating fees with new fee rate",
+          data: {
+            feeRate: fee,
+            previousMinerFee: feeDetails.minerFee,
+            previousDustValue: feeDetails.dustValue,
+            previousTotalValue: feeDetails.totalValue,
+          },
+        });
+        
+        const response = await axiod.post("/api/v2/olga/mint", mintRequest);
+        const data = response.data as MintResponse;
+        
+        setTxDetails(data);
         setFeeDetails({
-          minerFee,
-          dustValue: txDetails.total_dust_value || 0,
-          // Add API-provided miner fee to total output value
-          totalValue: (txDetails.total_output_value || 0) + minerFee,
+          minerFee: Number(data.est_miner_fee) || 0,
+          dustValue: Number(data.total_dust_value) || 0,
+          totalValue: Number(data.total_output_value) || 0,
           hasExactFees: true,
         });
-
+        
         logger.debug("stamps", {
-          message: "Fee calculation updated",
+          message: "Fee calculation updated with new fee rate",
           data: {
-            estimatedSize: txDetails.est_tx_size,
+            estimatedSize: data.est_tx_size,
             feeRate: fee,
-            minerFee,
-            outputValue: txDetails.total_output_value,
-            totalWithFee: txDetails.total_output_value + minerFee,
+            minerFee: data.est_miner_fee,
+            outputValue: data.total_output_value,
+            totalWithFee: data.total_output_value + data.est_miner_fee,
           },
         });
       } catch (error) {
         logger.error("stamps", {
-          message: "Fee calculation failed",
+          message: "Fee recalculation failed",
           error,
         });
-        setFeeDetails({
-          minerFee: 0,
-          dustValue: 0,
-          totalValue: 0,
-          hasExactFees: false,
-        });
       }
-    }
-  }, [fee, txDetails]);
+    };
+    
+    // Call the function when fee changes
+    prepareTxWithNewFee();
+  }, [fee, isConnected, wallet.address, file, isLocked, issuance, isPoshStamp, stampName]);
 
   /* ===== WALLET ADDRESS VALIDATION ===== */
   const validateWalletAddress = (address: string) => {
@@ -499,7 +573,6 @@ export function StampingTool() {
   };
 
   /* ===== ADVANCED OPTIONS HANDLERS ===== */
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const handleShowAdvancedOptions = () => {
     setAllowAdvancedTooltip(false);
     setIsAdvancedTooltipVisible(false);
@@ -707,7 +780,7 @@ export function StampingTool() {
           locked: isLocked,
           filename: file.name,
           file: fileData,
-          satsPerKB: fee * 1000, // Convert sat/vB to satsPerKB
+          satsPerVB: fee, // Send fee directly as satsPerVB
           service_fee: config?.MINTING_SERVICE_FEE,
           service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
         };
@@ -761,31 +834,56 @@ export function StampingTool() {
             result,
             resultType: typeof result,
             error: result?.error,
+            hasSignatures: result?.signed === true,
+            cancelled: result?.cancelled === true,
+            txid: result?.txid,
           },
         });
 
-        if (!result || !result.signed) {
+        if (!result) {
+          logger.error("stamps", {
+            message: "Wallet provider returned null or undefined response",
+          });
+          setApiError("Wallet provider error: No response received");
+          setSubmissionMessage(null);
+          return;
+        }
+        
+        if (!result.signed) {
           // If result contains an error message, use it directly
-          if (result?.error) {
+          if (result.error) {
             logger.debug("stamps", {
               message: "Using error from result",
               error: result.error,
             });
-            setApiError(result.error);
+            
+            // Improved error messages for common wallet errors
+            if (result.error.includes("insufficient funds")) {
+              setApiError("Insufficient funds in wallet to cover transaction fees");
+            } else if (result.error.includes("timeout") || result.error.includes("timed out")) {
+              setApiError("Wallet connection timed out. Please try again");
+            } else {
+              setApiError(result.error);
+            }
             setSubmissionMessage(null);
             return;
           }
 
-          if (result?.cancelled) {
+          if (result.cancelled) {
             logger.debug("stamps", {
-              message: "Transaction was cancelled",
+              message: "Transaction was cancelled by user",
             });
             setApiError("Transaction was cancelled");
             setSubmissionMessage(null);
             return;
           }
 
-          setApiError("Failed to sign PSBT");
+          // Generic error fallback with helpful suggestion
+          logger.error("stamps", {
+            message: "Unknown PSBT signing failure",
+            data: { result },
+          });
+          setApiError("Failed to sign transaction. Please check wallet connection and try again");
           setSubmissionMessage(null);
           return;
         }
@@ -836,7 +934,6 @@ export function StampingTool() {
     }
   };
 
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState(false);
   const handleCloseFullScreenModal = () => {
     setIsFullScreenModalOpen(false);
   };
@@ -844,15 +941,6 @@ export function StampingTool() {
     if (!file) return;
     setIsFullScreenModalOpen(!isFullScreenModalOpen);
   };
-
-  const [feeDetails, setFeeDetails] = useState<FeeDetails>({
-    minerFee: 0,
-    dustValue: 0,
-    totalValue: 0,
-    hasExactFees: false,
-  });
-
-  const [tosAgreed, setTosAgreed] = useState(false);
 
   // Update the useEffect to monitor validation state
   useEffect(() => {
@@ -1088,12 +1176,6 @@ export function StampingTool() {
     </div>
   );
 
-  const [tooltipText, setTooltipText] = useState("SIMPLE SETTINGS");
-  const [isAdvancedTooltipVisible, setIsAdvancedTooltipVisible] = useState(
-    false,
-  );
-  const [allowAdvancedTooltip, setAllowAdvancedTooltip] = useState(true);
-  const advancedTooltipTimeoutRef = useRef<number | null>(null);
 
   const handleAdvancedMouseEnter = () => {
     if (allowAdvancedTooltip) {
@@ -1128,14 +1210,7 @@ export function StampingTool() {
     };
   }, []);
 
-  // Add new state variable for POSH tooltip
-  const [poshTooltipText, setPoshTooltipText] = useState("POSH");
-  const [isPoshTooltipVisible, setIsPoshTooltipVisible] = useState(false);
-  const [allowPoshTooltip, setAllowPoshTooltip] = useState(true);
-  const poshTooltipTimeoutRef = useRef<number | null>(null);
-
   // Add a ref to get the button's position
-  const poshButtonRef = useRef<HTMLButtonElement>(null);
 
   // Update the mouse enter handler to position the tooltip
   const handlePoshMouseEnter = () => {
@@ -1198,12 +1273,6 @@ export function StampingTool() {
     />
   );
 
-  // Add state for lock tooltip text (near other tooltip states)
-  const [lockTooltipText, setLockTooltipText] = useState("LOCK");
-  const [isLockTooltipVisible, setIsLockTooltipVisible] = useState(false);
-  const [allowLockTooltip, setAllowLockTooltip] = useState(true);
-  const lockButtonRef = useRef<HTMLDivElement>(null);
-  const lockTooltipTimeoutRef = useRef<number | null>(null);
 
   // Update handlers
   const handleLockMouseEnter = () => {
@@ -1248,14 +1317,6 @@ export function StampingTool() {
     };
   }, []);
 
-  // Add state for preview tooltip text (with other tooltip states)
-  const [previewTooltipText, setPreviewTooltipText] = useState("FULLSCREEN");
-  const [isPreviewTooltipVisible, setIsPreviewTooltipVisible] = useState(false);
-  const [allowPreviewTooltip, setAllowPreviewTooltip] = useState(true);
-  const previewButtonRef = useRef<HTMLDivElement>(null);
-
-  // Add ref for timeout
-  const previewTooltipTimeoutRef = useRef<number | null>(null);
 
   // Update the handlePreviewMouseEnter to include timeout
   const handlePreviewMouseEnter = () => {
@@ -1494,7 +1555,7 @@ export function StampingTool() {
         />
 
         <StatusMessages
-          submissionMessage={submissionMessage ?? ""}
+          submissionMessage={submissionMessage}
           apiError={apiError}
         />
       </div>

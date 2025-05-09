@@ -353,16 +353,22 @@ export default function StampDetailPage(props: StampDetailPageProps) {
       <div class={body}>
         <div class="grid grid-cols-1 min-[880px]:grid-cols-2 desktop:grid-cols-3 gap-6">
           <div class="desktop:col-span-1">
-            <StampImage
-              stamp={stamp}
-              flag={true}
-            />
+            {stamp &&
+              (
+                <StampImage
+                  stamp={stamp}
+                  flag
+                />
+              )}
           </div>
           <div class="desktop:col-span-2">
-            <StampInfo
-              stamp={stamp}
-              lowestPriceDispenser={lowestPriceDispenser}
-            />
+            {stamp &&
+              (
+                <StampInfo
+                  stamp={stamp}
+                  lowestPriceDispenser={lowestPriceDispenser}
+                />
+              )}
           </div>
         </div>
 

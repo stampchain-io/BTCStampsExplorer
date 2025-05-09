@@ -31,6 +31,11 @@ export default function App({ Component, state }: PageProps<unknown>) {
           crossOrigin="anonymous"
           as="script"
         />
+        <link
+          rel="preload"
+          href="/static/icon/menu.svg" 
+          as="image"
+        />
 
         {/* ===== CRITICAL CSS ===== */}
         <link rel="preload" href="/styles.css" as="style" />
@@ -58,6 +63,8 @@ export default function App({ Component, state }: PageProps<unknown>) {
               -webkit-font-smoothing: antialiased;
               -moz-osx-font-smoothing: grayscale;
             }
+            
+            /* Mobile menu is handled with CSS classes in the component */
           `}
         </style>
 

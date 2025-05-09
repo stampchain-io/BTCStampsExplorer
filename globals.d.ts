@@ -694,6 +694,7 @@ export interface WalletDataTypes {
 declare global {
   interface GlobalThis {
     SKIP_REDIS_CONNECTION: boolean | undefined;
+    DENO_BUILD_MODE: boolean | undefined;
     LeatherProvider: {
       request: (method: string, params?: any) => Promise<any>;
       // Add other known properties and methods of LeatherProvider here

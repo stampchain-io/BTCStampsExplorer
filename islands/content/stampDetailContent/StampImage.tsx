@@ -648,11 +648,11 @@ export function StampImage(
                   width="100%"
                   height="100%"
                   scrolling="no"
-                  className={`${className} rounded absolute top-0 left-0 pointer-events-none`}
+                  className={`${className || ''} rounded absolute top-0 left-0 pointer-events-none`}
                   sandbox="allow-scripts allow-same-origin"
-                  src={src}
+                  src={src || ''}
                   loading="lazy"
-                  style={{ transform }}
+                  style={{ transform: transform || 'none' }}
                   onError={handleImageError}
                   title="Stamp"
                 />

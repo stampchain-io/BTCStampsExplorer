@@ -126,11 +126,12 @@ export function StampTransferTool({}: Props) {
   // Reset loading state when selected stamp changes
   useEffect(() => {
     setIsImageLoading(true);
+    setShowFallbackIcon(false); // Reset the fallback icon state
 
     if (selectedStamp) {
       setMaxQuantity(selectedStamp?.unbound_quantity);
     }
-  }, [selectedStamp?.tx_hash]);
+  }, [selectedStamp]); // Watch the entire stamp object, not just tx_hash
 
   // Add at the top level of the component
   useEffect(() => {
@@ -152,12 +153,23 @@ export function StampTransferTool({}: Props) {
     );
 
     if (selectedItem) {
-      setSelectedStamp(selectedItem);
+      console.log("Selected new stamp:", {
+        stamp: selectedItem.stamp,
+        url: selectedItem.stamp_url,
+        time: new Date().toISOString()
+      });
+      
+      // Create a fresh copy of the stamp object to ensure React detects the change
+      setSelectedStamp({...selectedItem});
       setFormState((prev) => ({
         ...prev,
         stampId: selectedItem.stamp,
         cpid: selectedItem.cpid,
       }));
+      
+      // Explicitly reset image states
+      setIsImageLoading(true);
+      setShowFallbackIcon(false);
     }
   };
 
@@ -203,8 +215,18 @@ export function StampTransferTool({}: Props) {
       );
     }
 
-    // Construct stamp URL using tx_hash
-    const stampUrl = `https://stampchain.io/s/${selectedStamp.tx_hash}`;
+    // Use the /s/ endpoint with transaction hash for proper recursive stamp rendering
+    // Add cache-busting timestamp parameter to force a fresh image load
+    const timestamp = Date.now();
+    const stampUrl = `/s/${selectedStamp.tx_hash}?t=${timestamp}`;
+    
+    // Debug logging
+    console.log("Rendering stamp:", {
+      stamp_id: selectedStamp.stamp,
+      tx_hash: selectedStamp.tx_hash,
+      url: stampUrl,
+      timestamp
+    });
 
     return (
       <div class="relative w-full h-full">
@@ -227,13 +249,18 @@ export function StampTransferTool({}: Props) {
           )
           : (
             <img
+              key={`stamp-${selectedStamp.tx_hash}-${timestamp}`}
               src={stampUrl}
               alt={`Stamp #${selectedStamp.stamp}`}
               class={`w-full h-full object-contain pixelart transition-opacity duration-300 ${
                 isImageLoading ? "opacity-0" : "opacity-100"
               }`}
-              onLoad={() => setIsImageLoading(false)}
+              onLoad={() => {
+                console.log("Image loaded successfully:", stampUrl);
+                setIsImageLoading(false);
+              }}
               onError={(e) => {
+                console.error("Image failed to load:", stampUrl);
                 setIsImageLoading(false);
                 setShowFallbackIcon(true);
               }}
@@ -243,14 +270,7 @@ export function StampTransferTool({}: Props) {
     );
   };
 
-  // Reset loading state when selected stamp changes
-  useEffect(() => {
-    setIsImageLoading(true);
-
-    if (selectedStamp) {
-      setMaxQuantity(selectedStamp?.unbound_quantity);
-    }
-  }, [selectedStamp?.tx_hash]);
+  // Duplicate effect removed - using the one defined above
 
   /* ===== RENDER ===== */
   return (

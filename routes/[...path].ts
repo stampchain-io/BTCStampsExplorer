@@ -5,12 +5,35 @@ export const handler: Handlers = {
     const url = new URL(req.url);
     const pathname = url.pathname;
 
-    // Skip handling for home routes
-    if (pathname === "/" || pathname === "/home") {
+    // Skip handling for known routes
+    if (
+      // Home routes
+      pathname === "/" || 
+      pathname === "/home" || 
+      // Fresh.js internal paths - MUST be allowed to pass through
+      pathname.startsWith("/_frsh/") ||
+      // Main application routes
+      pathname.startsWith("/stamp/") || 
+      pathname.startsWith("/src20/") ||
+      pathname.startsWith("/block/") ||
+      pathname.startsWith("/explorer/") ||
+      pathname.startsWith("/collection/") ||
+      pathname.startsWith("/wallet/") ||
+      pathname.startsWith("/dashboard/") ||
+      pathname.startsWith("/tool/") ||
+      pathname.startsWith("/howto/") ||
+      pathname.startsWith("/faq/") ||
+      pathname.startsWith("/about/") ||
+      pathname.startsWith("/termsofservice/") ||
+      pathname.startsWith("/docs/") ||
+      pathname.startsWith("/presskit/") ||
+      pathname.startsWith("/media/") ||
+      pathname === "/upload"
+    ) {
       return ctx.next();
     }
 
-    // Early return for known unhandled routes
+    // Early return for known API routes
     if (
       pathname.startsWith("/content/") ||
       pathname.startsWith("/s/") ||
