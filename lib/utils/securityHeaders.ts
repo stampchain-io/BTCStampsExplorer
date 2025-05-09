@@ -14,7 +14,6 @@ export const getSecurityHeaders = (
     "'self'",
     "*.stampchain.io",
     "*.bitcoinstamps.xyz",
-    "*.cloudflareinsights.com",
     "*.cloudflare.com",
     "*.esm.sh",
   ];
