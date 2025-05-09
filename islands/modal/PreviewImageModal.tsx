@@ -50,7 +50,14 @@ const PreviewImageModal = ({
               scrolling="no"
               className="rounded-sm mobileMd:rounded-md aspect-square"
               sandbox="allow-scripts allow-same-origin"
-              src={imageUrl}
+              srcDoc={`
+                <script>
+                  window.backgroundColor = "f7931a";
+                  window.maxWidth = 640;
+                  window.maxHeight = 640;
+                </script>
+                <iframe src="${imageUrl}" width="100%" height="100%" style="border:none;"></iframe>
+              `}
               loading="lazy"
               title="Stamp Preview"
             />
