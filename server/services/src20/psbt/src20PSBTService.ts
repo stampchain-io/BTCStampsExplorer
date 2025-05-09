@@ -110,12 +110,12 @@ export class SRC20PSBTService {
         // First output is the recipient
         {
           script: address.toOutputScript(toAddress, network),
-          value: this.DUST_SIZE,
+          value: TX_CONSTANTS.SRC20_DUST,
         },
         // Then add all CIP33 data outputs
-        ...chunks.map((chunk, i) => ({
+        ...chunks.map((chunk) => ({
           script: address.toOutputScript(chunk, network),
-          value: this.DUST_SIZE + i,
+          value: TX_CONSTANTS.SRC20_DUST, // Use constant dust value
         }))
       ];
   
@@ -153,7 +153,7 @@ export class SRC20PSBTService {
       });
   
       // Add change output if needed
-      if (change > this.DUST_SIZE) {
+      if (change > TX_CONSTANTS.SRC20_DUST) {
         psbt.addOutput({
           script: address.toOutputScript(effectiveChangeAddress, network),
           value: BigInt(change)
@@ -163,7 +163,7 @@ export class SRC20PSBTService {
       // 6. Calculate actual transaction fee from input/output values
       const totalInputValue = inputs.reduce((sum, input) => sum + Number(input.value), 0);
       const totalOutputAmount = outputs.reduce((sum, out) => sum + out.value, 0) + 
-                               (change > this.DUST_SIZE ? change : 0);
+                               (change > TX_CONSTANTS.SRC20_DUST ? change : 0);
       const actualFee = totalInputValue - totalOutputAmount;
       const dustTotal = outputs.reduce((sum, out) => sum + out.value, 0);
   
