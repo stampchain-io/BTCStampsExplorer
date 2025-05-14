@@ -224,7 +224,38 @@ export class SRC20QueryService {
   }
 
   static async fetchSrc20MintProgress(tick: string) {
-    return await SRC20Repository.fetchSrc20MintProgress(tick);
+    try {
+      const result = await SRC20Repository.fetchSrc20MintProgress(tick);
+      
+      // If no data is found, return default values
+      if (!result) {
+        return {
+          max_supply: "0",
+          total_minted: "0",
+          limit: "0",
+          total_mints: 0,
+          progress: "0",
+          decimals: 0,
+          tx_hash: "",
+          tick: tick || "",
+        };
+      }
+      
+      return result;
+    } catch (error) {
+      console.error(`Error fetching mint progress for tick ${tick}:`, error);
+      // Return default values on error
+      return {
+        max_supply: "0",
+        total_minted: "0",
+        limit: "0",
+        total_mints: 0,
+        progress: "0",
+        decimals: 0,
+        tx_hash: "",
+        tick: tick || "",
+      };
+    }
   }
 
   private static mapTransactionData(rows: any[]) {
@@ -617,16 +648,22 @@ export class SRC20QueryService {
         if (mintProgress) {
           batch.forEach((row, index) => {
             const progress = mintProgress[index];
-            if (progress) {
-              enriched[i + index] = {
-                ...enriched[i + index],
-                mint_progress: {
-                  progress: row.progress || progress.progress || "0",
-                  current: progress.total_minted || 0,
-                  max: progress.max_supply || 0
-                }
-              };
-            }
+            // Always add mint_progress with default values even if progress is null
+            enriched[i + index] = {
+              ...enriched[i + index],
+              mint_progress: {
+                progress: row.progress || (progress?.progress) || "0",
+                current: (progress?.total_minted) || 0,
+                max: (progress?.max_supply) || 0,
+                total_minted: (progress?.total_minted) || "0",
+                max_supply: (progress?.max_supply) || "0",
+                limit: (progress?.limit) || "0",
+                total_mints: (progress?.total_mints) || 0,
+                decimals: (progress?.decimals) || 0,
+                tx_hash: (progress?.tx_hash) || (row.tx_hash) || "",
+                tick: (progress?.tick) || (row.tick) || ""
+              }
+            };
           });
         }
       }

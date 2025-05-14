@@ -79,6 +79,7 @@ export class Src20Controller {
           const mintProgressData = await Promise.all(
             ticks.map(tick => 
               SRC20Service.QueryService.fetchSrc20MintProgress(tick)
+                .catch(() => null)
             )
           );
           
@@ -88,10 +89,23 @@ export class Src20Controller {
           );
 
           // Enrich data with mint progress
-          processedData = processedData.map(row => ({
-            ...row,
-            mint_progress: mintProgressMap.get(row.tick) || null
-          }));
+          processedData = processedData.map(row => {
+            const defaultMintProgress = {
+              max_supply: "0",
+              total_minted: "0",
+              limit: "0",
+              total_mints: 0,
+              progress: "0",
+              decimals: 0,
+              tx_hash: row.tx_hash || "",
+              tick: row.tick || "",
+            };
+            
+            return {
+              ...row,
+              mint_progress: mintProgressMap.get(row.tick) || defaultMintProgress
+            };
+          });
         }
       }
 
@@ -211,9 +225,21 @@ export class Src20Controller {
         };
       }
 
+      // Create safe mint_status with default values if mintStatusData is null
+      const safeMinStatus = mintStatusData || {
+        max_supply: "0",
+        total_minted: "0",
+        limit: "0",
+        total_mints: 0,
+        progress: "0",
+        decimals: 0,
+        tx_hash: deploymentData.data[0]?.tx_hash || "",
+        tick: tick || "",
+      };
+
       return {
         last_block: lastBlockData.last_block,
-        mint_status: mintStatusData,
+        mint_status: safeMinStatus,
         data: deploymentData.data[0],
       };
     } catch (error) {
@@ -276,10 +302,17 @@ export class Src20Controller {
           })
           : [],
         mint_status: {
-          ...mintProgressResponse,
+          // Use safe spread operator with fallback to empty object
+          ...(mintProgressResponse || {}),
+          // Ensure all properties have safe defaults
           max_supply: mintProgressResponse?.max_supply?.toString() || "0",
           total_minted: mintProgressResponse?.total_minted?.toString() || "0",
           limit: mintProgressResponse?.limit?.toString() || "0",
+          progress: mintProgressResponse?.progress || "0",
+          total_mints: mintProgressResponse?.total_mints || 0,
+          decimals: mintProgressResponse?.decimals || 0,
+          tx_hash: mintProgressResponse?.tx_hash || deployment?.tx_hash || "",
+          tick: tick || "",
         },
         total_transactions: totalCount,
         marketInfo: marketInfoForTick,
@@ -388,7 +421,7 @@ export class Src20Controller {
           holders: enrichedItem?.holders || 0,
           mcap: enrichedItem?.market_data?.mcap || 0,
           floor_unit_price: enrichedItem?.market_data?.floor_unit_price || 0,
-          progress: enrichedItem?.mint_progress?.progress || null,
+          progress: enrichedItem?.mint_progress?.progress || "0",
           mint_count: row.mint_count,
           top_mints_percentage: row.top_mints_percentage
             ? Number(row.top_mints_percentage)

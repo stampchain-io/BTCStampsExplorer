@@ -11,7 +11,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
   const mintHref = `/stamping/src20/mint?tick=${
     encodeURIComponent(src20.tick)
   }&trxType=olga`;
-  const progressWidth = `${src20.progress}%`;
+  const progressWidth = `${src20.progress || src20?.mint_progress?.progress || "0"}%`;
 
   const handleMintClick = () => {
     globalThis.location.href = mintHref;
@@ -53,18 +53,18 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
               <p class={dataLabelSm}>
                 TOP MINTS{" "}
                 <span class={dataValueSm}>
-                  {src20.top_mints_percentage?.toFixed(1) || "N/A"}%
+                  {src20.top_mints_percentage?.toFixed(1) || "0"}%
                 </span>
               </p>
               <div class="flex flex-col gap-1">
                 <p class={dataLabelSm}>
-                  PROGRESS <span class={dataValueSm}>{src20.progress}</span>
+                  PROGRESS <span class={dataValueSm}>{src20.progress || "0"}</span>
                   <span class="text-stamp-grey-light">%</span>
                 </p>
                 <div class="relative min-w-[144px] mobileLg:min-w-[192px] h-1 mobileLg:h-1.5 bg-stamp-grey rounded-full">
                   <div
                     class="absolute left-0 top-0 h-1 mobileLg:h-1.5 bg-stamp-purple-dark rounded-full"
-                    style={{ width: progressWidth }}
+                    style={{ width: progressWidth || "0%" }}
                   />
                 </div>
               </div>
@@ -80,20 +80,20 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
             <p class={dataLabelSm}>
               HOLDERS{" "}
               <span class={dataValueSm}>
-                {Number(src20?.mint_progress?.total_mints).toLocaleString()}
+                {Number(src20?.mint_progress?.total_mints || 0).toLocaleString()}
               </span>
             </p>
             <p class={dataLabelSm}>
               TOP MINTS{" "}
               <span class={dataValueSm}>
-                {src20.top_mints_percentage?.toFixed(1) || "N/A"}%
+                {src20.top_mints_percentage?.toFixed(1) || "0"}%
               </span>
             </p>
             <div class="flex flex-col gap-1">
               <p class={dataLabelSm}>
                 PROGRESS{" "}
                 <span class={dataValueSm}>
-                  {src20?.mint_progress?.progress}
+                  {src20?.mint_progress?.progress || "0"}
                 </span>
                 <span class="text-stamp-grey-light">%</span>
               </p>
@@ -120,7 +120,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
             <p class={dataLabelSm}>
               TOP MINTS{" "}
               <span class={dataValueSm}>
-                {src20.top_mints_percentage?.toFixed(1) || "N/A"}%
+                {src20.top_mints_percentage?.toFixed(1) || "0"}%
               </span>
             </p>
           </div>

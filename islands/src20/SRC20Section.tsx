@@ -165,8 +165,11 @@ export function SRC20Section({
         />
 
         <div class="flex flex-col gap-6">
-          {data.map((src20) => (
-            parseFloat(src20?.progress || "0") >= 100
+          {data.map((src20) => {
+            // Calculate progress from either direct progress or mint_progress
+            const progressValue = parseFloat(src20?.progress || src20?.mint_progress?.progress || "0");
+            
+            return progressValue >= 100
               ? (
                 <SRC20TokenOutmintedCard
                   src20={src20}
@@ -180,8 +183,8 @@ export function SRC20Section({
                   fromPage={fromPage}
                   onImageClick={handleImageClick}
                 />
-              )
-          ))}
+              );
+          })}
         </div>
 
         {fromPage === "home" && (
