@@ -30,7 +30,7 @@ phases:
     commands:
       - echo "Build started on $(date)"
       # Modify Dockerfile to use our ECR cached base image before building
-      - sed -i "s|FROM denoland/deno:alpine-2.2.3|FROM $ECR_URI/$BASE_REPOSITORY_NAME:alpine-2.2.3|g" Dockerfile || echo "Dockerfile substitution failed, trying original build"
+      - sed -i "s|FROM denoland/deno:alpine-2.3.1|FROM $ECR_URI/$BASE_REPOSITORY_NAME:alpine-2.3.1|g" Dockerfile || echo "Dockerfile substitution failed, trying original build"
       - docker build --platform=linux/amd64 -t $ECR_URI/$ECR_REPOSITORY_NAME:latest .
   post_build:
     commands:
