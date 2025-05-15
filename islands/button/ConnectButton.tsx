@@ -33,7 +33,6 @@ export const ConnectButton = () => {
           <WalletProvider
             key={key}
             providerKey={key}
-            toggleModal={closeModal}
           />
         ));
 
