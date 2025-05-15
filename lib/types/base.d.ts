@@ -113,7 +113,7 @@ export interface BaseFeeCalculatorProps {
 
 export interface SimpleFeeCalculatorProps
   extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
-  type: "send" | "transfer" | "buy";
+  type: "send" | "transfer" | "buy" | "src20";
   _type?: string;
   amount?: number;
   recipientAddress?: string;
