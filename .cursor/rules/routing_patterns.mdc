@@ -1,0 +1,16 @@
+---
+description: "Patterns for API versioning, dynamic routes, and general routing structure in Fresh."
+globs: ["routes/**/*.{ts,tsx}", "routes/_app.tsx", "routes/_middleware.ts", "fresh.config.ts"]
+alwaysApply: false
+---
+
+
+# Adding specific route patterns from your codebase
+routing_patterns:
+  api_versioning:
+    - v2_endpoints: "/api/v2/[...path].ts"
+    - internal_endpoints: "/api/internal/"
+  dynamic_routes:
+    - address: "[address].ts"
+    - block: "[block_index].ts"
+    - wildcard: "[...path].ts"

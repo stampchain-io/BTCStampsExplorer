@@ -1,0 +1,22 @@
+---
+description: "Defines testing frameworks, Deno tasks for running tests, and patterns for test structure (e.g., API versioning, SRC20 transactions, Dredd tests)."
+globs: ["tests/**/*.ts", "*.test.ts", "deno.json", "dredd.yml"]
+alwaysApply: false
+---
+
+
+# Testing patterns from your test files
+testing:
+  frameworks:
+    - use_deno_testing
+    - write_unit_tests
+    - implement_component_tests
+  commands:
+    test_version: "deno test -A --log-level=debug --no-check tests/versioning/versionChain.test.ts"
+    test_src20: "deno test --allow-net tests/src20/createTransaction.test.ts tests/src20/api-compatibility.ts tests/src20/performance.test.ts --no-check --allow-read --allow-env --allow-write"
+    test_src20_watch: "deno test --allow-net tests/src20/createTransaction.test.ts tests/src20/api-compatibility.ts tests/src20/performance.test.ts --no-check --allow-read --allow-env --allow-write --watch"
+    dredd: "deno task dredd"
+  patterns:
+    - test_api_versioning
+    - test_src20_transactions
+    - implement_dredd_tests
