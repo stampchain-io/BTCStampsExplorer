@@ -1,0 +1,91 @@
+---
+description: "Overview of the project's main directory structure and the purpose of key folders."
+globs: []
+alwaysApply: true
+---
+
+
+directory_structure:
+  root: "BTCStampsExplorer"
+  directories:
+    routes:
+      description: "Handles application routing, API endpoints, and middleware. Contains page components and API logic."
+      special_files:
+        - _app.tsx # Main application shell/context provider.
+        - _404.tsx # Custom 404 page.
+        - _middleware.ts # Root middleware for routes.
+      subdirectories:
+        - api/ # API endpoints (e.g., api/v2/, api/internal/).
+        - "[feature_name]/" # Feature-based route groups (e.g., src20/, stamp/, collection/).
+        - handlers/ # Route-specific handlers, often for form submissions or complex logic.
+      patterns:
+        - feature_based_grouping
+        - version_prefixing (for API routes)
+        - use_middleware_for_shared_logic
+
+    islands:
+      description: "Client-side interactive UI components (Preact components with client-side hydration). Grouped by UI element type or feature."
+      rules:
+        - include_browser_javascript
+        - can_use_hooks_and_state
+      examples:
+        # From original rule, likely feature-specific islands
+        - "SRC20CardMinting.tsx (likely in a feature-specific subdir like islands/src20/cards/)"
+        - "SRC20DetailsTab.tsx (likely in a feature-specific subdir like islands/src20/details/)"
+        # General UI element islands
+        - "header/Header.tsx"
+        - "modal/ActionModal.tsx"
+        - "Toast/Toast.tsx"
+      patterns:
+        - group_by_ui_element_type_at_top_level (e.g., islands/button/, islands/card/)
+        - feature_specific_subdirectories_possible (e.g., islands/src20/)
+
+    components:
+      description: "Server-side rendered UI components (pure Preact components). Grouped by UI element type."
+      rules:
+        - no_client_javascript
+        - server_rendered_html
+      subdirectories:
+        - layout/ # For layout structure components (e.g., MainLayout.tsx).
+        - "[ui_element_type]/" # (e.g., components/button/, components/icon/).
+      patterns:
+        - group_by_ui_element_type
+        - separate_layout_components
+
+    lib:
+      description: "Shared library code, utilities, types, and hooks used across the application."
+      subdirectories:
+        - types/ # Core application type definitions (interfaces, enums).
+        - utils/ # General utility functions and helpers.
+        - hooks/ # Custom Preact hooks (if any client-side logic resides here, though islands are preferred).
+
+    server:
+      description: "Backend-specific logic, including services, controllers, database interactions, and server-side types/config."
+      subdirectories:
+        - services/ # Business logic layer (e.g., src20Service.ts, marketService.ts).
+        - controller/ # Request/response handling for complex API endpoints.
+        - database/ # Database connection, queries, and models.
+        - types/ # Server-specific type definitions.
+        - config/ # Server-side configurations.
+
+    static:
+      description: "Static assets like images, fonts, and global CSS files."
+      patterns:
+        - referenced_in_html_or_css
+
+    utils: # Root-level utils
+      description: "Standalone utility scripts, often for one-off tasks or specific decoding/processing logic."
+      examples:
+        - check_deno_version.ts
+        - decodeSrc20MsigTx.ts
+
+    tests:
+      description: "Automated tests for the application (unit, integration, etc.)."
+      patterns:
+        - group_by_feature_or_module_tested (e.g., tests/versioning/, tests/src20/).
+
+    client: # Root-level client directory
+      description: "May contain client-specific non-island code or entry points. (Purpose to be verified based on content)."
+
+    hooks: # Root-level hooks directory
+      description: "May contain globally shared Preact hooks. (Purpose to be verified based on content)."
