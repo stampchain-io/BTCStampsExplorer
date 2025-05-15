@@ -1,5 +1,6 @@
 import type { BufferLike } from "$types/utils.d.ts";
-import type { MarketListingSummary } from "$types/marketData.d.ts";
+import type { MarketListingAggregated } from "$types/marketData.d.ts";
+import type { SRC20Row } from "$globals";
 
 type INETWORK = "mainnet" | "testnet";
 
@@ -103,7 +104,7 @@ export interface SRC20TickPageData {
   holders: SRC20HolderData[];
   mint_status: SRC20MintStatus;
   total_transactions: number;
-  marketInfo?: MarketListingSummary;
+  marketInfo?: MarketListingAggregated;
 }
 
 export interface SRC20BalanceRequestParams {
@@ -116,4 +117,12 @@ export interface SRC20BalanceRequestParams {
   sortField?: string;
   includePagination?: boolean;
   includeMintData?: boolean;
+}
+
+// Add EnrichedSRC20Row type
+export interface EnrichedSRC20Row extends SRC20Row {
+  market_data?: MarketListingAggregated;
+  chart?: any; // Define a proper chart data type if available, using 'any' for now
+  // holders is inherited from SRC20Row
+  // deploy_img, deploy_tx, stamp_url are inherited from SRC20Row
 }
