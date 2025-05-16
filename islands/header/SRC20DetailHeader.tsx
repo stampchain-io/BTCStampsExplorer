@@ -7,6 +7,8 @@ import {
   formatNumber,
 } from "$lib/utils/formatUtils.ts";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
+import { labelSm, titleGreyLD } from "$text";
+import { alignmentClasses, type AlignmentType } from "$layout";
 import type { MarketListingAggregated } from "$globals";
 
 /* ===== TYPES ===== */
@@ -21,7 +23,7 @@ export interface SRC20DetailHeaderProps {
   _totalMints: number;
   _totalTransfers: number;
   marketInfo?: MarketListingAggregated;
-  _align?: "left" | "center" | "right";
+  _align?: AlignmentType;
 }
 
 /* ===== STAT ITEM COMPONENT ===== */
@@ -31,15 +33,11 @@ function StatItem(
     value: string | number;
     currency?: string;
     direction: string;
-    align?: "left" | "center" | "right";
+    align?: AlignmentType;
     large?: boolean;
   },
 ) {
-  const alignmentClass = {
-    left: "text-left",
-    center: "text-center",
-    right: "text-right",
-  }[align];
+  const alignmentClass = alignmentClasses[align];
 
   /* ===== RENDER STAT ITEM ===== */
   return (
@@ -50,14 +48,14 @@ function StatItem(
           : "gap-1.5 items-center justify-end"
       } ${alignmentClass}`}
     >
-      <p
+      <h6
         class={`${
           large ? "text-base mobileLg:text-lg" : "text-sm mobileLg:text-base"
         } font-light text-stamp-grey-darker uppercase`}
       >
         {label}
-      </p>
-      <p
+      </h6>
+      <h6
         class={`${
           large
             ? "text-3xl mobileLg:text-4xl font-black -mt-0.5"
@@ -76,7 +74,7 @@ function StatItem(
             </span>
           )
           : ""}
-      </p>
+      </h6>
     </div>
   );
 }
@@ -119,10 +117,6 @@ export function SRC20DetailHeader({
   // Format Satoshi value with commas (no decimals needed)
   const floorUnitPriceSatsFormatted = floorUnitPriceSats.toLocaleString();
 
-  /* ===== STYLING ===== */
-  const titleGreyLDClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient1";
-
   /* ===== RENDER ===== */
   return (
     <>
@@ -142,9 +136,9 @@ export function SRC20DetailHeader({
               <div class="relative z-10">
                 {/* Token name and social links */}
                 <div class="flex">
-                  <p class={titleGreyLDClassName + " uppercase"}>
+                  <h1 class={titleGreyLD}>
                     {tickValue}
-                  </p>
+                  </h1>
                   <div class="flex gap-3 items-center">
                     {deployment.email && (
                       <a href={deployment.email} target="_blank">
@@ -169,13 +163,13 @@ export function SRC20DetailHeader({
                   </div>
                 </div>
                 {/* Creator information */}
-                <p class="text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase pt-1.5">
+                <h6 className={labelSm}>
                   CREATOR
-                </p>
-                <p className="text-xl mobileLg:text-2xl font-black gray-gradient3 -mt-1">
+                </h6>
+                <h5 className="text-xl mobileLg:text-2xl font-black gray-gradient3 -mt-1">
                   {deployment.creator_name ||
                     abbreviateAddress(deployment.destination)}
-                </p>
+                </h5>
               </div>
             </div>
 
@@ -238,12 +232,12 @@ export function SRC20DetailHeader({
           </div>
           {
             /*
-          <p class="text-sm text-[#CCCCCC] font-medium">
+          <h6 class="text-sm text-[#CCCCCC] font-medium">
             This is an SRC-20 token, there are many like it, but this one is{" "}
             {deployment.tick.toUpperCase()}. This was deployed on block{" "}
             {deployment.block_index}{" "}
             without a description on the deploy. We hope you enjoy.
-          </p>
+          </h6>
           */
           }
         </div>
