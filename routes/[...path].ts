@@ -8,12 +8,12 @@ export const handler: Handlers = {
     // Skip handling for known routes
     if (
       // Home routes
-      pathname === "/" || 
-      pathname === "/home" || 
+      pathname === "/" ||
+      pathname === "/home" ||
       // Fresh.js internal paths - MUST be allowed to pass through
       pathname.startsWith("/_frsh/") ||
       // Main application routes
-      pathname.startsWith("/stamp/") || 
+      pathname.startsWith("/stamp/") ||
       pathname.startsWith("/src20/") ||
       pathname.startsWith("/block/") ||
       pathname.startsWith("/explorer/") ||

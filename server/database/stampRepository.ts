@@ -297,7 +297,7 @@ export class StampRepository {
     const resultTotal = await dbManager.executeQueryWithCache(
       queryTotal,
       queryParams,
-      1000 * 60 * 3
+      60 * 3 // 3 minute cache in seconds
     );
 
     return resultTotal;
@@ -519,7 +519,7 @@ export class StampRepository {
       blockIdentifier,
       allColumns = false,
       noPagination = false,
-      cacheDuration = 1000 * 60 * 3,
+      cacheDuration = 60 * 3, // Default 3 minute cache in seconds
       collectionId,
       sortColumn = "tx_index",
       filterBy,
@@ -849,7 +849,7 @@ export class StampRepository {
     }
   }
 
-  static async getALLCPIDs(cacheDuration: number | "never" = 1000 * 60 * 3) {
+  static async getALLCPIDs(cacheDuration: number | "never" = 60 * 3) {
     const query = `
       SELECT DISTINCT cpid, stamp
       FROM ${STAMP_TABLE}
@@ -951,7 +951,7 @@ export class StampRepository {
     const result = await dbManager.executeQueryWithCache(
       query,
       [address],
-      1000 * 60 * 3 // 3 minute cache
+      60 * 3 // 3 minute cache in seconds
     );
 
     return {
@@ -970,6 +970,7 @@ export class StampRepository {
     const result = await dbManager.executeQueryWithCache(
       query,
       [tx_index],
+      DEFAULT_CACHE_DURATION
     );
 
     return {

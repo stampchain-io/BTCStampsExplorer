@@ -1,10 +1,13 @@
 /* ===== STATUS MESSAGES ===== */
 /*@baba-move file*/
 interface StatusMessagesProps {
-  submissionMessage?: {
-    message: string;
-    txid?: string;
-  } | string | null;
+  submissionMessage?:
+    | {
+      message: string;
+      txid?: string;
+    }
+    | string
+    | null;
   apiError?: string | null;
   fileUploadError?: string | null;
   walletError?: string | null;
@@ -17,15 +20,17 @@ export function StatusMessages({
   walletError,
 }: StatusMessagesProps) {
   // Handle different submissionMessage types
-  const messageText = typeof submissionMessage === 'string' 
-    ? submissionMessage 
-    : submissionMessage?.message || '';
-    
-  const txid = typeof submissionMessage === 'object' ? submissionMessage?.txid : undefined;
-  
+  const messageText = typeof submissionMessage === "string"
+    ? submissionMessage
+    : submissionMessage?.message || "";
+
+  const txid = typeof submissionMessage === "object"
+    ? submissionMessage?.txid
+    : undefined;
+
   // Only render submission message if there's actual content
   const hasSubmissionMessage = !!messageText;
-  
+
   return (
     <>
       {hasSubmissionMessage && (

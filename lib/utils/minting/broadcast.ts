@@ -23,15 +23,17 @@ export async function broadcastTransaction(
     });
     return "BUILD_MODE_DUMMY_TXID";
   }
-  
+
   // Regular implementation that works at runtime
   let rawTxHex: string;
-  
+
   // Simple check to detect if this might already be a raw transaction
-  const isPossiblyRawTx = /^[0-9a-f]+$/i.test(signedPsbtHex) && !signedPsbtHex.includes("70736274");
+  const isPossiblyRawTx = /^[0-9a-f]+$/i.test(signedPsbtHex) &&
+    !signedPsbtHex.includes("70736274");
   if (isPossiblyRawTx) {
     logger.debug("broadcast", {
-      message: "Input appears to be a raw transaction, skipping PSBT conversion",
+      message:
+        "Input appears to be a raw transaction, skipping PSBT conversion",
     });
     rawTxHex = signedPsbtHex;
   } else {

@@ -157,7 +157,7 @@ interface MintRequest {
   locked: boolean;
   filename: string;
   file: string;
-  satsPerVB: number;  // Changed from satsPerKB to satsPerVB for consistency
+  satsPerVB: number; // Changed from satsPerKB to satsPerVB for consistency
   service_fee: string | null;
   service_fee_address: string | null;
   assetName?: string;
@@ -269,7 +269,7 @@ const PREVIEW_SIZE_CLASSES =
 /* ===== WRAPPER COMPONENT - HANDLES CONFIG LOADING ===== */
 export function StampingTool() {
   const { config, isLoading } = useConfig<Config>();
-  
+
   /* ===== EARLY RETURN CONDITIONS ===== */
   if (isLoading) {
     return <div>Loading configuration...</div>;
@@ -278,7 +278,7 @@ export function StampingTool() {
   if (!config) {
     return <div>Error: Configuration not loaded</div>;
   }
-  
+
   // Once we have the config, render the main component
   return <StampingToolMain config={config} />;
 }
@@ -289,10 +289,10 @@ function StampingToolMain({ config }: { config: Config }) {
   // Context and props
   const { wallet, isConnected } = walletContext;
   const address = isConnected ? wallet.address : undefined;
-  
+
   // Fee polling
   const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
-  
+
   /* ===== ALL STATE DEFINITIONS ===== */
   // File and form state
   type FileType = File | null;
@@ -304,17 +304,21 @@ function StampingToolMain({ config }: { config: Config }) {
   const [isLocked, setIsLocked] = useState(true);
   const [isPoshStamp, setIsPoshStamp] = useState(false);
   const [stampName, setStampName] = useState("");
-  
+
   // Validation state
   const [fileError, setFileError] = useState<string>("");
   const [issuanceError, setIssuanceError] = useState<string>("");
   const [stampNameError, setStampNameError] = useState<string>("");
   const [apiError, setApiError] = useState<string>("");
-  const [submissionMessage, setSubmissionMessage] = useState<SubmissionMessage | null>(null);
+  const [submissionMessage, setSubmissionMessage] = useState<
+    SubmissionMessage | null
+  >(null);
   const [isSearching, setIsSearching] = useState(false);
-  const [addressError, setAddressError] = useState<string | undefined>(undefined);
+  const [addressError, setAddressError] = useState<string | undefined>(
+    undefined,
+  );
   const [txDetails, setTxDetails] = useState<MintResponse | null>(null);
-  
+
   // Fee details state
   const [feeDetails, setFeeDetails] = useState<FeeDetails>({
     minerFee: 0,
@@ -327,34 +331,36 @@ function StampingToolMain({ config }: { config: Config }) {
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isUploadTooltipVisible, setIsUploadTooltipVisible] = useState(false);
   const uploadTooltipTimeoutRef = useRef<number | null>(null);
-  
+
   // Modal state
   const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState(false);
   const [tosAgreed, setTosAgreed] = useState(false);
-  
+
   // Advanced options state
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
-  
+
   // Tooltips state
   const [tooltipText, setTooltipText] = useState("SIMPLE SETTINGS");
-  const [isAdvancedTooltipVisible, setIsAdvancedTooltipVisible] = useState(false);
+  const [isAdvancedTooltipVisible, setIsAdvancedTooltipVisible] = useState(
+    false,
+  );
   const [allowAdvancedTooltip, setAllowAdvancedTooltip] = useState(true);
   const advancedTooltipTimeoutRef = useRef<number | null>(null);
-  
+
   // POSH tooltip state
   const [poshTooltipText, setPoshTooltipText] = useState("POSH");
   const [isPoshTooltipVisible, setIsPoshTooltipVisible] = useState(false);
   const [allowPoshTooltip, setAllowPoshTooltip] = useState(true);
   const poshButtonRef = useRef<HTMLButtonElement>(null);
   const poshTooltipTimeoutRef = useRef<number | null>(null);
-  
+
   // Lock tooltip state
   const [lockTooltipText, setLockTooltipText] = useState("LOCK");
   const [isLockTooltipVisible, setIsLockTooltipVisible] = useState(false);
   const [allowLockTooltip, setAllowLockTooltip] = useState(true);
   const lockButtonRef = useRef<HTMLDivElement>(null);
   const lockTooltipTimeoutRef = useRef<number | null>(null);
-  
+
   // Preview tooltip state
   const [previewTooltipText, setPreviewTooltipText] = useState("FULLSCREEN");
   const [isPreviewTooltipVisible, setIsPreviewTooltipVisible] = useState(false);
@@ -498,10 +504,10 @@ function StampingToolMain({ config }: { config: Config }) {
       if (!isConnected || !wallet.address || !file) {
         return;
       }
-      
+
       try {
         const fileData = await toBase64(file);
-        
+
         const mintRequest = {
           sourceWallet: address,
           file: fileData,
@@ -512,7 +518,7 @@ function StampingToolMain({ config }: { config: Config }) {
           ...(isPoshStamp && stampName ? { assetName: stampName } : {}),
           dryRun: true,
         };
-        
+
         logger.debug("stamps", {
           message: "Recalculating fees with new fee rate",
           data: {
@@ -522,10 +528,10 @@ function StampingToolMain({ config }: { config: Config }) {
             previousTotalValue: feeDetails.totalValue,
           },
         });
-        
+
         const response = await axiod.post("/api/v2/olga/mint", mintRequest);
         const data = response.data as MintResponse;
-        
+
         setTxDetails(data);
         setFeeDetails({
           minerFee: Number(data.est_miner_fee) || 0,
@@ -533,7 +539,7 @@ function StampingToolMain({ config }: { config: Config }) {
           totalValue: Number(data.total_output_value) || 0,
           hasExactFees: true,
         });
-        
+
         logger.debug("stamps", {
           message: "Fee calculation updated with new fee rate",
           data: {
@@ -551,10 +557,19 @@ function StampingToolMain({ config }: { config: Config }) {
         });
       }
     };
-    
+
     // Call the function when fee changes
     prepareTxWithNewFee();
-  }, [fee, isConnected, wallet.address, file, isLocked, issuance, isPoshStamp, stampName]);
+  }, [
+    fee,
+    isConnected,
+    wallet.address,
+    file,
+    isLocked,
+    issuance,
+    isPoshStamp,
+    stampName,
+  ]);
 
   /* ===== WALLET ADDRESS VALIDATION ===== */
   const validateWalletAddress = (address: string) => {
@@ -848,7 +863,7 @@ function StampingToolMain({ config }: { config: Config }) {
           setSubmissionMessage(null);
           return;
         }
-        
+
         if (!result.signed) {
           // If result contains an error message, use it directly
           if (result.error) {
@@ -856,11 +871,16 @@ function StampingToolMain({ config }: { config: Config }) {
               message: "Using error from result",
               error: result.error,
             });
-            
+
             // Improved error messages for common wallet errors
             if (result.error.includes("insufficient funds")) {
-              setApiError("Insufficient funds in wallet to cover transaction fees");
-            } else if (result.error.includes("timeout") || result.error.includes("timed out")) {
+              setApiError(
+                "Insufficient funds in wallet to cover transaction fees",
+              );
+            } else if (
+              result.error.includes("timeout") ||
+              result.error.includes("timed out")
+            ) {
               setApiError("Wallet connection timed out. Please try again");
             } else {
               setApiError(result.error);
@@ -883,7 +903,9 @@ function StampingToolMain({ config }: { config: Config }) {
             message: "Unknown PSBT signing failure",
             data: { result },
           });
-          setApiError("Failed to sign transaction. Please check wallet connection and try again");
+          setApiError(
+            "Failed to sign transaction. Please check wallet connection and try again",
+          );
           setSubmissionMessage(null);
           return;
         }
@@ -1176,7 +1198,6 @@ function StampingToolMain({ config }: { config: Config }) {
     </div>
   );
 
-
   const handleAdvancedMouseEnter = () => {
     if (allowAdvancedTooltip) {
       setTooltipText(
@@ -1273,7 +1294,6 @@ function StampingToolMain({ config }: { config: Config }) {
     />
   );
 
-
   // Update handlers
   const handleLockMouseEnter = () => {
     if (allowLockTooltip && showAdvancedOptions) {
@@ -1316,7 +1336,6 @@ function StampingToolMain({ config }: { config: Config }) {
       }
     };
   }, []);
-
 
   // Update the handlePreviewMouseEnter to include timeout
   const handlePreviewMouseEnter = () => {

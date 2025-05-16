@@ -358,7 +358,7 @@ export class StampService {
     }
   }
 
-  static async countTotalStamps(): Promise<boolean> {
+  static async countTotalStamps(): Promise<{ isValid: boolean; count: number }> {
     return await StampRepository.countTotalStamps();
   }
 
