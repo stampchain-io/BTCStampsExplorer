@@ -33,7 +33,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
         />
         <link
           rel="preload"
-          href="/static/icon/menu.svg" 
+          href="/icon/menu.svg"
           as="image"
         />
 
