@@ -1,0 +1,17 @@
+---
+description: "Guidelines for state management, preferring Preact Signals and server-side state, and using Fresh context where appropriate."
+globs: ["islands/**/*.tsx", "*Context.tsx", "lib/hooks/**/*.ts"]
+alwaysApply: false
+---
+
+
+# State management based on your implementation
+state_management:
+  preferences:
+    - use_preact_signals
+    - prefer_server_side_state
+    - use_islands_sparingly
+  patterns:
+    - isolate_client_state
+    - use_fresh_context
+    - implement_handlers

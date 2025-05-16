@@ -1,0 +1,21 @@
+---
+description: "Rules and naming conventions for creating server-side (components) and client-side (islands) UI components in Preact/Fresh."
+globs: ["components/**/*.tsx", "islands/**/*.tsx"]
+alwaysApply: false
+---
+
+
+# Component patterns based on your actual components
+component_patterns:
+  rules:
+    - use_function_declarations
+    - implement_props_interfaces
+    - use_preact_children_type
+    - use_fresh_handlers
+  naming:
+    - prefix_feature_components
+    - use_descriptive_suffixes
+  layouts:
+    - HowToLayout
+    - CollectionLayout
+    - StampLayout

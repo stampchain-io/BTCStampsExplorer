@@ -36,14 +36,41 @@ export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
   );
 
   try {
-    const url = apiBaseUrl
-      ? new URL("/api/internal/btcPrice", apiBaseUrl).toString()
-      : "/api/internal/btcPrice";
+    const path = "/api/internal/btcPrice";
+    let finalUrl: string;
 
-    console.log(`[${requestId}] Constructed URL: ${url}`);
+    if (apiBaseUrl) {
+      finalUrl = new URL(path, apiBaseUrl).toString();
+    } else {
+      const env = Deno.env.get("DENO_ENV");
+      let baseUrlFromEnv: string | undefined;
 
-    console.log(`[${requestId}] Making fetch request...`);
-    const response = await fetch(url);
+      if (env === "development") {
+        baseUrlFromEnv = Deno.env.get("DEV_BASE_URL");
+      } else { // 'production' or other fallback
+        baseUrlFromEnv = Deno.env.get("BASE_URL");
+      }
+
+      if (baseUrlFromEnv) {
+        finalUrl = new URL(path, baseUrlFromEnv).toString();
+      } else {
+        // Fallback for local development if DEV_BASE_URL is not set.
+        if (env === "development") {
+          finalUrl = new URL(path, "http://localhost:8000").toString(); // Assuming default Fresh port
+          console.warn(
+            `[${requestId}] DEV_BASE_URL not set for server-side fetch, defaulting to http://localhost:8000 for path: ${path}. Please ensure DEV_BASE_URL is configured in your environment for robustness.`,
+          );
+        } else {
+          console.error(
+            `[${requestId}] Critical: API base URL (BASE_URL or DEV_BASE_URL) is not defined. Cannot fetch BTC price for path: ${path}. Ensure BASE_URL is set for production.`,
+          );
+          return btcPriceCache?.price || 0; // Return cached or 0
+        }
+      }
+    }
+
+    console.log(`[${requestId}] Constructed URL for fetch: ${finalUrl}`);
+    const response = await fetch(finalUrl);
     console.log(
       `[${requestId}] Response status: ${response.status} ${response.statusText}`,
     );

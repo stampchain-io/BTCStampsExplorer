@@ -59,6 +59,29 @@ export type LISTING_FILTER_TYPES =
   | "psbt"
   | "dispensers";
 
+// START ADDED TYPE
+export interface MarketListingAggregated {
+  tick: string;
+  floor_unit_price: number;
+  mcap: number;
+  volume24: number;
+  stamp_url?: string | null;
+  tx_hash: string;
+  holder_count: number;
+  market_data: {
+    stampscan: {
+      price: number;
+      volume24: number;
+    };
+    openstamp: {
+      price: number;
+      volume24: number;
+    };
+  };
+  change24?: number; // Added for step 6
+}
+// END ADDED TYPE
+
 import Big from "big";
 
 export interface BlockRow {
@@ -187,6 +210,12 @@ export interface SRC20Row {
   };
 }
 
+// Add EnrichedSRC20Row type
+export interface EnrichedSRC20Row extends SRC20Row {
+  market_data?: MarketListingAggregated; // MarketListingAggregated is already defined above
+  chart?: any;
+}
+
 interface SendRow {
   source: string;
   destination: string;
@@ -295,6 +324,7 @@ export interface Src20Detail {
   block_time: string;
   creator_name: string | null;
   destination_name: string;
+  // market_data and chart removed from here, will be on EnrichedSRC20Row for relevant responses
 }
 
 export interface Src20SnapShotDetail {
@@ -499,7 +529,7 @@ export interface PaginatedSrc20ResponseBody {
   page: number;
   limit: number;
   totalPages: number;
-  data: Src20Detail[];
+  data: EnrichedSRC20Row[]; // CHANGED from Src20Detail[] to EnrichedSRC20Row[]
 }
 
 export interface PaginatedSrc101ResponseBody {

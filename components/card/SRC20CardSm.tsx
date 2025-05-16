@@ -1,4 +1,4 @@
-import { SRC20Row } from "$globals";
+// import { SRC20Row } from "$globals";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import { Timeframe } from "$layout";
@@ -10,9 +10,10 @@ import {
   rowCardBorderRight,
 } from "$layout";
 import { labelXs, textSm, valueDark } from "$text";
+import type { EnrichedSRC20Row } from "$globals";
 
 interface SRC20CardSmProps {
-  data: SRC20Row[];
+  data: EnrichedSRC20Row[];
   fromPage: "src20" | "wallet" | "stamping/src20" | "home";
   timeframe: Timeframe;
   onImageClick: (imgSrc: string) => void;
@@ -20,13 +21,14 @@ interface SRC20CardSmProps {
 
 export function SRC20CardSm({
   data,
-  fromPage,
   timeframe,
   onImageClick,
 }: SRC20CardSmProps) {
   const headers = [
     "TOKEN",
     "PRICE",
+    "MCAP",
+    "VOLUME (24H)",
     "CHANGE",
     "", // CHART
   ];
@@ -47,10 +49,12 @@ export function SRC20CardSm({
     <table class={`w-full ${textSm} border-separate border-spacing-y-3`}>
       <colgroup>
         {colGroup([
-          { width: "w-[25%]" }, // TOKEN
-          { width: "w-[18%]" }, // PRICE
-          { width: "w-[18%]" }, // CHANGE
-          { width: "w-[39%]" }, // CHART
+          { width: "w-[20%]" }, // TOKEN
+          { width: "w-[15%]" }, // PRICE
+          { width: "w-[15%]" }, // MCAP
+          { width: "w-[15%]" }, // VOLUME (24H)
+          { width: "w-[15%]" }, // CHANGE
+          { width: "w-[20%]" }, // CHART
         ]).map((col) => <col key={col.key} className={col.className} />)}
       </colgroup>
       <thead>
@@ -59,7 +63,11 @@ export function SRC20CardSm({
             <th
               key={header}
               class={`${labelXs} ${cellAlign(i, headers.length)}
-              ${i === 2 ? "hidden mobileMd:table-cell" : "" // CHANGE
+              ${
+                (header === "CHANGE" || header === "MCAP" ||
+                    header === "VOLUME (24H)")
+                  ? "hidden mobileMd:table-cell"
+                  : ""
               }
               `}
             >
@@ -72,11 +80,38 @@ export function SRC20CardSm({
       <tbody>
         {data.length
           ? (
-            data.map((src20) => {
+            data.map((src20, index) => {
               const imageUrl = src20.stamp_url ||
                 src20.deploy_img ||
                 `/content/${src20.tx_hash}.svg` ||
                 `/content/${src20.deploy_tx}`;
+
+              // --- BEGIN DEBUG LOGS ---
+              if (index < 3) { // Log only for the first 3 items to avoid spam
+                console.log(
+                  `[SRC20CardSm] Debugging item ${index}, Tick: ${src20.tick}`,
+                );
+                console.log(
+                  `  Raw src20.market_data:`,
+                  JSON.stringify(src20.market_data),
+                );
+                const priceBTC = src20.market_data?.floor_unit_price;
+                console.log(
+                  `  src20.market_data?.floor_unit_price (BTC):`,
+                  priceBTC,
+                );
+                const priceSATSBeforeRound = (priceBTC ?? 0) * 1e8;
+                console.log(
+                  `  Price in SATS (before round):`,
+                  priceSATSBeforeRound,
+                );
+                const priceSATSAfterRound = Math.round(priceSATSBeforeRound);
+                console.log(
+                  `  Price in SATS (after round):`,
+                  priceSATSAfterRound,
+                );
+              }
+              // --- END DEBUG LOGS ---
 
               return (
                 <tr
@@ -145,22 +180,71 @@ export function SRC20CardSm({
                       cellAlign(1, headers.length)
                     } ${rowCardBorderCenter}`}
                   >
-                    {Math.round((src20.floor_unit_price ?? 0) * 1e8)
-                      .toLocaleString()}
-                    <span class="text-stamp-grey-light ml-1">SATS</span>
+                    {(() => {
+                      const priceInBtc = src20.market_data?.floor_unit_price ??
+                        0;
+                      if (priceInBtc === 0) {
+                        return "0 SATS";
+                      }
+                      const priceInSatsExact = priceInBtc * 1e8;
+                      const priceInSatsRounded = Math.round(priceInSatsExact);
+                      if (priceInSatsRounded === 0) {
+                        return "< 1 SATS";
+                      }
+                      return priceInSatsRounded.toLocaleString() + " SATS";
+                    })()}
                   </td>
-                  {/* CHANGE */}
+                  {/* MCAP */}
                   <td
                     class={`${
                       cellAlign(2, headers.length)
                     } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
                   >
-                    <span class="text-stamp-grey-light">N/A%</span>
+                    {src20.market_data?.mcap !== undefined &&
+                        src20.market_data?.mcap !== null
+                      ? src20.market_data.mcap.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8,
+                      }) + " BTC"
+                      : "N/A"}
+                  </td>
+                  {/* VOLUME (24H) */}
+                  <td
+                    class={`${
+                      cellAlign(3, headers.length)
+                    } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
+                  >
+                    {src20.market_data?.volume24 !== undefined &&
+                        src20.market_data?.volume24 !== null
+                      ? src20.market_data.volume24.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8,
+                      }) + " BTC"
+                      : "N/A"}
+                  </td>
+                  {/* CHANGE */}
+                  <td
+                    class={`${
+                      cellAlign(4, headers.length)
+                    } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
+                  >
+                    {src20.market_data?.change24 !== undefined &&
+                        src20.market_data?.change24 !== null
+                      ? (
+                        <span
+                          class={src20.market_data.change24 >= 0
+                            ? "text-green-500"
+                            : "text-red-500"}
+                        >
+                          {src20.market_data.change24.toFixed(2)}%
+                        </span>
+                      )
+                      : <span class="text-stamp-grey-light">N/A%</span>}
                   </td>
                   {/* CHART */}
                   <td
                     class={`${
-                      cellAlign(3, headers.length)
+                      cellAlign(5, headers.length)
                     } ${rowCardBorderRight}`}
                   >
                     <ChartWidget

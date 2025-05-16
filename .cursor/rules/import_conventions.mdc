@@ -1,0 +1,53 @@
+---
+description: "Details conventions for module imports, including aliases, JSR preference, and import priorities."
+globs: []
+alwaysApply: true
+---
+
+
+# Expanding import conventions based on your actual imports
+import_conventions:
+  patterns:
+    - use_npm_prefix: "for npm packages"
+    - use_dollar_prefix: "for project modules ($)"
+    - follow_deno_std: "for standard library"
+    - use_import_map: "in deno.json (source of truth for versions)" # Emphasized deno.json for versions
+    - prefer_jsr:
+        description: "Use JSR imports when available"
+        examples:
+          - "@std/assert": "jsr:/@std/assert@^1.0.9"
+          - "@std/async": "jsr:/@std/async@^1.0.5"
+          - "@std/crypto": "jsr:@std/crypto@^1.0.3"
+          - "@std/dotenv": "jsr:/@std/dotenv@^0.225.2"
+    - import_priority:
+      - jsr: "First choice for standard libraries and packages"
+      - deno.land/x: "Second choice if not on JSR"
+      - npm: "Last resort or for specific packages"
+  project_aliases:
+    core:
+      - "$/" # Root
+      - "$client/"
+      - "$components/" # General server-side components
+      - "$islands/" # General client-side islands
+      - "$lib/"
+      - "$routes/" # Added from deno.json
+      - "$server/" # Added from deno.json
+    feature_specific: # Could also be module-specific
+      - "$handlers/"
+      - "$constants" # Path: ./lib/utils/constants.ts
+      - "$types/" # Path: ./lib/types/
+    ui_element_aliases: # New category for specific UI component/module aliases from deno.json
+      - "$layout" # Path: ./components/layout/index.ts
+      - "$header" # Path: ./islands/header/index.ts
+      - "$content" # Path: ./islands/content/index.ts
+      - "$section" # Path: ./islands/section/index.ts
+      - "$card" # Path: ./islands/card/index.ts
+      - "$tool" # Path: ./islands/tool/index.ts
+      - "$text" # Path: ./components/text/styles.ts
+      - "$button" # Path: ./components/button/index.ts
+      - "$icon" # Path: ./components/icon/index.ts
+      - "$form" # Path: ./components/form/index.ts
+      - "$notification" # Path: ./components/notification/index.ts
+      - "$table" # Path: ./islands/table/index.ts
+    utility:
+      - "$globals" # Path: ./globals.d.ts

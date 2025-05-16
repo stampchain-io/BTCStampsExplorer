@@ -1,0 +1,18 @@
+---
+description: "Practices for error handling, including Fresh error boundaries, logging, HTTP status codes, and async error management."
+globs: ["routes/**/*.{ts,tsx}", "server/**/*.{ts,tsx}", "*middleware*.ts"]
+alwaysApply: false
+---
+
+
+# Error handling patterns from your codebase
+error_handling:
+  practices:
+    - use_fresh_error_boundaries
+    - implement_proper_logging
+    - return_http_status_codes
+    - handle_async_errors_with_trycatch
+  api_responses:
+    - use_response_util
+    - implement_status_codes
+    - provide_error_messages

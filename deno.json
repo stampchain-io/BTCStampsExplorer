@@ -11,7 +11,7 @@
     "check": "deno task check:fmt && deno task check:lint && deno task check:types",
     "check:debug": "deno task check:fmt:debug && deno task check:lint:debug && deno task check:types:debug",
     "start": "deno task check_version && deno run -A main.ts",
-    "dev": "deno run --inspect --allow-all --watch --watch-exclude=dist/,node_modules/,_fresh/,.git/,coverage/,tmp/,tests/ --no-clear-screen dev.ts --host",
+    "dev": "deno run --inspect --allow-all --watch --watch-exclude=dist/,node_modules/,_fresh/,.git/,coverage/,tmp/,tests/,fresh.gen.ts --no-clear-screen dev.ts --host",
     "dev:nowatch": "deno run --inspect --allow-all --watch=routes/ --watch-exclude=dist/,node_modules/,_fresh/,.git/,coverage/,tmp/,tests/,static/ --no-clear-screen dev.ts --host",
     "build": "deno run --unstable-byonm -A main.ts build",
     "dev:build": "deno task build && deno task dev",

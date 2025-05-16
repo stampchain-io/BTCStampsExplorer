@@ -463,8 +463,8 @@ export function SRC20DeployTool(
           fee={formState.fee}
           dec={formState.dec}
           ticker={formState.token}
-          limit={formState.lim}
-          supply={formState.max}
+          limit={Number(formState.lim) || 0}
+          supply={Number(formState.max) || 0}
           fromPage="src20_deploy"
           handleChangeFee={handleChangeFee}
           type="src20"

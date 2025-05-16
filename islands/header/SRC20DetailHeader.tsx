@@ -1,16 +1,13 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import {
-  Deployment,
-  MarketListingSummary,
-  MintStatus,
-} from "$types/index.d.ts";
+import { Deployment, MintStatus } from "$types/index.d.ts";
 import {
   abbreviateAddress,
   formatDate,
   formatNumber,
 } from "$lib/utils/formatUtils.ts";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
+import type { MarketListingAggregated } from "$globals";
 import { labelSm, titleGreyLD } from "$text";
 import { alignmentClasses, type AlignmentType } from "$layout";
 
@@ -25,6 +22,8 @@ export interface SRC20DetailHeaderProps {
   _mintStatus: MintStatus;
   _totalMints: number;
   _totalTransfers: number;
+  marketInfo?: MarketListingAggregated;
+  _align?: "left" | "center" | "right";
   marketInfo?: MarketListingSummary;
   _align?: AlignmentType;
 }
@@ -85,11 +84,7 @@ function StatItem(
 /* ===== COMPONENT ===== */
 export function SRC20DetailHeader({
   deployment,
-  _mintStatus,
-  _totalMints,
-  _totalTransfers,
   marketInfo,
-  _align,
 }: SRC20DetailHeaderProps) {
   /* ===== COMPUTED VALUES ===== */
   // Process tick value (handle emoji)
@@ -110,7 +105,7 @@ export function SRC20DetailHeader({
 
   // Market data formatting
   const floorUnitPriceBTC = marketInfo?.floor_unit_price ?? 0;
-  const sum1dBTC = marketInfo?.sum_1d ?? 0;
+  const sum1dBTC = marketInfo?.volume24 ?? 0;
   const mcapBTC = marketInfo?.mcap ?? 0;
 
   // Convert floorUnitPrice from BTC to Satoshis

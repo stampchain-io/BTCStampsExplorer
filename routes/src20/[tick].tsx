@@ -19,16 +19,19 @@ export const handler: Handlers = {
       const baseUrl = `${url.protocol}//${url.host}`;
 
       /* ===== DATA FETCHING ===== */
-      const [body, transferCount, mintCount] = await Promise.all([
-        Src20Controller.fetchSrc20TickPageData(decodedTick),
-        fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`)
-          .then((r) => r.json()),
-        fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`)
-          .then((r) => r.json()),
-        fetch(
-          `https://api.stampscan.xyz/utxo/combinedListings?tick=${encodedTick}`,
-        ).then((r) => r.json()),
-      ]);
+      const [body, transferCount, mintCount, combinedListings] = await Promise
+        .all([
+          Src20Controller.fetchSrc20TickPageData(decodedTick),
+          fetch(
+            `${baseUrl}/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`,
+          )
+            .then((r) => r.json()),
+          fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`)
+            .then((r) => r.json()),
+          fetch(
+            `https://api.stampscan.xyz/utxo/combinedListings?tick=${encodedTick}`,
+          ).then((r) => r.json()),
+        ]);
 
       if (!body) {
         return ctx.renderNotFound();

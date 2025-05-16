@@ -1,0 +1,19 @@
+---
+description: "Information on environment variables (e.g., DENO_ENV, SKIP_REDIS_CONNECTION) and different runtime environments (development, production)."
+globs: ["deno.json", "main.ts", "dev.ts", "Dockerfile", "*.yml"]
+alwaysApply: true
+---
+
+
+# Environment and configuration
+environment:
+  development:
+    base_url: "https://dev.stampchain.io"
+    skip_redis: true
+  production:
+    base_url: "https://stampchain.io"
+    skip_redis: false
+  variables:
+    - DENO_ENV
+    - DEV_BASE_URL
+    - SKIP_REDIS_CONNECTION

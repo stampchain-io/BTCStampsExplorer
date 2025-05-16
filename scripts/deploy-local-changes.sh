@@ -2,6 +2,16 @@
 # deploy-local-changes.sh - Deploy uncommitted local changes to AWS
 # Usage: ./scripts/deploy-local-changes.sh [--skip-build]
 
+# Attempt to load .env file if it exists and export its variables
+if [ -f .env ]; then
+  echo -e "${BLUE}Loading environment variables from .env file...${NC}"
+  set -a # Automatically export all variables subsequently defined
+  source .env
+  set +a # Stop automatically exporting variables
+else
+  echo -e "${YELLOW}Warning: .env file not found. Proceeding with existing environment variables.${NC}"
+fi
+
 set -e
 
 # Color codes for better readability
@@ -43,6 +53,16 @@ if [ $? -ne 0 ]; then
 fi
 echo -e "${GREEN}AWS Account ID: ${AWS_ACCOUNT_ID}${NC}"
 
+# DEBUGGING: Print S3_BUCKET value at the start of the script's understanding
+echo -e "${YELLOW}DEBUG (script entry): S3_BUCKET as seen by script = [${S3_BUCKET}]${NC}"
+
+# Load AWS configuration
+AWS_REGION=${AWS_REGION:-"us-east-1"}
+ECR_REPOSITORY_NAME=${ECR_REPOSITORY_NAME:-"btc-stamps-explorer"}
+# S3_BUCKET is expected to be in the environment. The script already has S3_BUCKET=${S3_BUCKET} implicitly or explicitly.
+ECS_CLUSTER_NAME=${ECS_CLUSTER_NAME:-"stamps-app-prod"}
+ECS_SERVICE_NAME=${ECS_SERVICE_NAME:-"stamps-app-service"}
+
 # Check if we have uncommitted changes
 echo -e "${YELLOW}Checking for uncommitted changes...${NC}"
 if git diff --quiet && git diff --staged --quiet; then
@@ -70,7 +90,9 @@ echo -e "${GREEN}Successfully created source package at: ${ZIP_FILE}${NC}"
 echo -e "${YELLOW}Uploading source package to S3...${NC}"
 # Use the expected location for CodeBuild
 S3_KEY="source.zip"
+echo -e "${YELLOW}DEBUG (pre-short): S3_BUCKET for short derivation = [${S3_BUCKET}]${NC}"
 S3_BUCKET_SHORT=$(echo "$S3_BUCKET" | sed 's/-[0-9]*$//')
+echo -e "${YELLOW}DEBUG (post-short): S3_BUCKET_SHORT = [${S3_BUCKET_SHORT}]${NC}"
 aws s3 cp $ZIP_FILE s3://${S3_BUCKET_SHORT}/${S3_KEY}
 
 echo -e "${GREEN}Successfully uploaded to s3://${S3_BUCKET_SHORT}/${S3_KEY}${NC}"

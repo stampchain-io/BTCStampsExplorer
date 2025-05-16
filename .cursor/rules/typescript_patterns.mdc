@@ -1,0 +1,26 @@
+---
+description: "Specifies TypeScript compiler options, strictness settings, and project-specific TypeScript usage patterns."
+globs: ["*.{ts,tsx}", "deno.json"] # tsconfig.json is not typical in Deno projects unless for editor integration
+alwaysApply: true
+---
+
+
+typescript_patterns:
+  src20:
+    - use_typescript_interfaces_for_tokens
+    - implement_strict_type_checking
+  compiler_options:
+    # JSX and Preact settings from deno.json
+    jsx: "react-jsx"
+    jsxImportSource: "preact"
+    # Strictness settings (already matched deno.json)
+    strict: true
+    noUnusedLocals: true
+    noUnusedParameters: true
+    noImplicitReturns: true
+    exactOptionalPropertyTypes: true
+    noFallthroughCasesInSwitch: true
+    # Specific type definitions to include from deno.json
+    types: 
+      - "npm:@types/node"
+      - "npm:@types/bitcoinjs-lib"

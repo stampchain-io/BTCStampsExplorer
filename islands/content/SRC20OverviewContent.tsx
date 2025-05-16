@@ -1,19 +1,20 @@
 /* ===== SRC20 OVERVIEW CONTENT COMPONENT ===== */
 import { useState } from "preact/hooks";
-import { SRC20Row } from "$globals";
+// import { SRC20Row } from "$globals"; // Removed unused import
 import { SRC20Gallery } from "$section";
 import { SRC20OverviewHeader } from "$header";
+import type { EnrichedSRC20Row } from "$globals"; // CHANGED: Import from $globals
 
 /* ===== TYPES ===== */
 interface SRC20OverviewContentProps {
   mintedData: {
-    data: SRC20Row[];
+    data: EnrichedSRC20Row[];
     total: number;
     page: number;
     totalPages: number;
   };
   mintingData: {
-    data: SRC20Row[];
+    data: EnrichedSRC20Row[];
     total: number;
     page: number;
     totalPages: number;
@@ -54,11 +55,11 @@ export function SRC20OverviewContent({
     direction: "asc" | "desc",
   ) => {
     setCurrentSort({ filter, direction });
-    const dataToSort = viewType === "minted"
-      ? mintedData.data
-      : mintingData.data;
-    const newSortedData = sortData(dataToSort, filter, direction);
-    // Update your data display with newSortedData
+    // const dataToSort = viewType === "minted"
+    //   ? mintedData.data
+    //   : mintingData.data;
+    // const newSortedData = sortData(dataToSort, filter, direction); // Removed as unused
+    // Update your data display with newSortedData // Comment remains, but newSortedData is gone
   };
 
   // Handle view type changes
@@ -101,7 +102,7 @@ export function SRC20OverviewContent({
 }
 
 const sortData = (
-  data: SRC20Row[],
+  data: EnrichedSRC20Row[],
   filter: "TRENDING" | "DEPLOY" | "HOLDERS" | null,
   direction: "asc" | "desc",
 ) => {

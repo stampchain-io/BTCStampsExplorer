@@ -1,0 +1,28 @@
+---
+description: "Outlines common development tasks, scripts for running, building, and previewing the application."
+globs: ["deno.json"]
+alwaysApply: true
+---
+development_workflow:
+  environments:
+    development:
+      command: "deno task dev"
+      options: "--inspect --allow-all --watch --no-clear-screen"
+      excludes:
+        - "dist/"
+        - "node_modules/"
+        - "_fresh/"
+        - ".git/"
+        - "coverage/"
+        - "tmp/"
+        - "tests/"
+        - "fresh.gen.ts"
+    production:
+      command: "deno task start"
+      prerequisites: "check_version"
+  other_tasks:
+    build: "deno run --unstable-byonm -A main.ts build"
+    preview: "deno run -A main.ts"
+    update_fresh: "deno run -A -r https://fresh.deno.dev/update ."
+    cleanup: "deno run --allow-run scripts/cleanup.ts"
+    dev_safe: "deno task cleanup && deno task dev"

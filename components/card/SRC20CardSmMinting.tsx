@@ -1,5 +1,4 @@
 /* reinamora - update Trending calculations */
-import { SRC20Row } from "$globals";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { Timeframe } from "$layout";
 import { labelXs, textSm, valueDark } from "$text";
@@ -11,9 +10,10 @@ import {
   rowCardBorderLeft,
   rowCardBorderRight,
 } from "$layout";
+import type { EnrichedSRC20Row } from "$globals";
 
 interface SRC20CardSmMintingProps {
-  data: SRC20Row[];
+  data: EnrichedSRC20Row[];
   fromPage: "src20" | "wallet" | "stamping/src20" | "home";
   timeframe: Timeframe;
   onImageClick: (imgSrc: string) => void;
@@ -21,8 +21,6 @@ interface SRC20CardSmMintingProps {
 
 export function SRC20CardSmMinting({
   data,
-  _fromPage,
-  _timeframe,
   onImageClick,
 }: SRC20CardSmMintingProps) {
   const headers = [
@@ -153,7 +151,8 @@ export function SRC20CardSmMinting({
                       cellAlign(1, headers.length)
                     } ${rowCardBorderCenter} hidden min-[600px]:table-cell`}
                   >
-                    {src20.mint_count || "N/A"}
+                    {src20.mint_progress?.total_mints?.toLocaleString() ||
+                      "N/A"}
                   </td>
                   {/* PROGRESS */}
                   <td

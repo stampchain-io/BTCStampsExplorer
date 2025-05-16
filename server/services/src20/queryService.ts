@@ -602,13 +602,17 @@ export class SRC20QueryService {
             marketData.map(item => [item.tick, item])
           );
           batch.forEach((row, index) => {
-            const market = marketMap.get(row.tick);
+            const tickForLookup = row.tick.toUpperCase();
+            const market = marketMap.get(tickForLookup);
             if (market) {
               enriched[i + index] = {
                 ...row,
                 market_data: market,
                 holders: row.holders || market.holders || 0
               };
+            } else {
+              // Optional: Log if a tick is not found in the market map, can be noisy
+              // console.log(`[enrichData] Market data not found for tick: '${row.tick}' (lookup key: '${tickForLookup}')`);
             }
           });
         }

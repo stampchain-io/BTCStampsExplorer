@@ -17,43 +17,61 @@ import "$server/database/index.ts";
 // but the runtime will use the real implementations
 if (Deno.args.includes("build")) {
   globalThis.DENO_BUILD_MODE = true;
-  
+
   // Override import.meta.resolve to handle certain modules differently during build
   const originalResolve = import.meta.resolve;
-  import.meta.resolve = function(specifier: string, parent?: string): string {
+  import.meta.resolve = function (specifier: string): string {
     // Redirect broadcast.ts to broadcast.build.ts
-    if (specifier === "$lib/utils/minting/broadcast.ts" || 
-        specifier === "./broadcast.ts" ||
-        specifier.endsWith("/broadcast.ts")) {
-      console.log("[BUILD] Redirecting import of broadcast.ts to broadcast.build.ts");
-      return originalResolve(specifier.replace(/broadcast\.ts$/, "broadcast.build.ts"), parent);
+    if (
+      specifier === "$lib/utils/minting/broadcast.ts" ||
+      specifier === "./broadcast.ts" ||
+      specifier.endsWith("/broadcast.ts")
+    ) {
+      console.log(
+        "[BUILD] Redirecting import of broadcast.ts to broadcast.build.ts",
+      );
+      return originalResolve(
+        specifier.replace(/broadcast\.ts$/, "broadcast.build.ts"),
+      );
     }
-    
+
     // Handle bitcoinjs-lib imports
     if (specifier === "bitcoinjs-lib") {
-      console.log("[BUILD] Redirecting import of bitcoinjs-lib to stub implementation");
-      return originalResolve("$server/services/stubs/bitcoinjs-lib.build.ts", parent || import.meta.url);
+      console.log(
+        "[BUILD] Redirecting import of bitcoinjs-lib to stub implementation",
+      );
+      return originalResolve(
+        "$server/services/stubs/bitcoinjs-lib.build.ts",
+      );
     }
-    
-    // Handle tiny-secp256k1 imports directly
-    if (specifier === "tiny-secp256k1") {
-      console.log("[BUILD] Redirecting import of tiny-secp256k1 to stub implementation");
-      return originalResolve("$server/services/stubs/tiny-secp256k1.build.ts", parent || import.meta.url);
+
+    // Handle tiny-secp256k1 and secp256k1 imports
+    if (
+      specifier === "node:module" ||
+      specifier === "tiny-secp256k1" ||
+      specifier === "secp256k1" ||
+      specifier.endsWith("secp256k1.node")
+    ) {
+      if (Deno.args.includes("build")) {
+        console.log("[BUILD] Redirecting crypto module to stub implementation");
+        return originalResolve(
+          "$server/services/stubs/tiny-secp256k1.build.ts",
+        );
+      } else {
+        console.log("[DEV] Redirecting crypto module to WASM fallback");
+        return originalResolve(
+          "tiny-secp256k1/lib/esm/index.js",
+        );
+      }
     }
-    
-    // Handle secp256k1 native module imports
-    if (specifier === "node:module" || 
-        specifier === "secp256k1" || 
-        specifier.endsWith("secp256k1.node")) {
-      console.log("[BUILD] Redirecting import of secp256k1 native module to stub implementation");
-      return originalResolve("$server/services/stubs/tiny-secp256k1.build.ts", parent || import.meta.url);
-    }
-    
-    return originalResolve(specifier, parent);
+
+    return originalResolve(specifier);
   };
-  
+
   // Also set a global flag to indicate we're in build mode
-  console.log("[BUILD] Running in build mode with stub implementations for crypto modules");
+  console.log(
+    "[BUILD] Running in build mode with stub implementations for crypto modules",
+  );
 } else {
   globalThis.DENO_BUILD_MODE = false;
 }

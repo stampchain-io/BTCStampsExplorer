@@ -1,0 +1,29 @@
+---
+description: "Details Fresh framework specific features, plugins (like Tailwind), and configurations used in the project."
+globs: ["fresh.config.ts", "tailwind.config.ts", "routes/**/*.{ts,tsx}", "islands/**/*.tsx", "components/**/*.tsx"]
+alwaysApply: true
+---
+
+
+fresh_specific:
+  features:
+    - use_preact_signals
+    - configure_typescript
+    - use_tailwind_support
+    - use_jsx_runtime
+    - use_plugin_system
+  plugins:
+    - tailwind:
+        # fresh.config.ts uses $fresh/plugins/tailwind.ts
+        # The plugin implicitly looks for tailwind.config.ts
+        config_file: "tailwind.config.ts"
+        # Content paths are defined in tailwind.config.ts
+        content_paths: 
+          - "{routes,islands,components,lib}/**/*.{ts,tsx}"
+          - "./static/**/*.{html,js}"
+        customizations: # Added section to highlight Tailwind customization
+          notes: |
+            Tailwind CSS setup is extensively customized via tailwind.config.ts.
+            This includes many theme extensions (colors, fonts, spacing, etc.) 
+            and custom utility classes added via an inline plugin.
+            Refer to tailwind.config.ts for all specific theme values and utilities.

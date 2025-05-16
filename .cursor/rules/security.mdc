@@ -1,0 +1,18 @@
+---
+description: "Security requirements and practices, including CSRF protection, security headers, input sanitization, and API security measures."
+globs: ["routes/**/*.{ts,tsx}", "server/**/*.{ts,tsx}", "*middleware*.ts", "fresh.config.ts"]
+alwaysApply: false
+---
+
+
+# Security implementations from your codebase
+security:
+  requirements:
+    - implement_csrf_protection
+    - use_fresh_security_headers
+    - sanitize_user_input
+    - follow_owasp_guidelines
+  api_security:
+    - version_headers
+    - proper_cors_config
+    - rate_limiting
