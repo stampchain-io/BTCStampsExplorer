@@ -24,6 +24,7 @@ import {
   tooltipButtonInCollapsible,
   tooltipImage,
 } from "$notification";
+import { openModal } from "$islands/modal/states.ts";
 
 /* ===== LOGGING UTILITY ===== */
 const log = (message: string, data?: unknown) => {
@@ -1579,12 +1580,13 @@ function StampingToolMain({ config }: { config: Config }) {
         />
       </div>
 
-      {isFullScreenModalOpen && (
+      {isFullScreenModalOpen && openModal(
         <PreviewImageModal
           src={file}
           handleCloseModal={handleCloseFullScreenModal}
           contentType={file?.type?.startsWith("text/html") ? "html" : "image"}
-        />
+        />,
+        "zoomInOut",
       )}
 
       <div
