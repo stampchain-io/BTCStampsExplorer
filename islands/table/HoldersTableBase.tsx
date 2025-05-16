@@ -3,7 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 import { rowTable, ScrollContainer } from "$layout";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { labelXs, loaderText, valueSm, valueSmLink } from "$text";
+import { labelXs, loaderText, textSm, textSmLink } from "$text";
 
 /* ===== TYPES ===== */
 interface Holder {
@@ -75,7 +75,7 @@ const HoldersTableBase = (
       class="h-[188px] mobileLg:h-[248px] mt-6 w-full"
       onScroll={handleScroll}
     >
-      <table className={`${valueSm} w-full`}>
+      <table className={`${textSm} w-full`}>
         {/* ===== TABLE STRUCTURE ===== */}
         <colgroup>
           {colGroup([
@@ -106,7 +106,7 @@ const HoldersTableBase = (
         </thead>
 
         {/* ===== TABLE CONTENT ===== */}
-        <tbody className={valueSm}>
+        <tbody className={textSm}>
           {!isLoading && data.map((holder, index) => {
             if (!holder.address) {
               return (
@@ -128,7 +128,7 @@ const HoldersTableBase = (
                   <a
                     target="_top"
                     href={`/wallet/${holder.address}`}
-                    className={valueSmLink}
+                    className={textSmLink}
                   >
                     <span className="mobileLg:hidden">
                       {abbreviateAddress(holder.address, 8)}

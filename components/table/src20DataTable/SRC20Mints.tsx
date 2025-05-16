@@ -12,8 +12,8 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
   const headers = ["AMOUNT", "ADDRESS", "DATE", "TX HASH", "BLOCK"];
 
   return (
-    <div class="w-[500px] min-[500px]:w-full">
-      <table class={valueSm}>
+    <div class="w-[660px] min-[660px]:w-full">
+      <table class={`${valueSm} w-full`}>
         <colgroup>
           {colGroup().map((col) => (
             <col key={col.key} className={col.className} />
