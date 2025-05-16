@@ -67,6 +67,8 @@ export const headingPurpleLD =
 export const textXxs = `${textFont} text-[10px]`;
 export const textXs = `${textFont} text-xs`;
 export const textSm = `${textFont} text-sm`;
+export const textSmLink =
+  `${textFont} text-sm hover:text-stamp-purple-bright ${transition} cursor-pointer ${cursor}`;
 export const text = `${textFont} text-base`;
 export const textLg = `${textFont} text-lg`;
 export const textXl = `${textFont} text-xl`;
@@ -91,7 +93,7 @@ export const labelSmPurple =
 export const valueXs = `${valueFont} text-xs ${cursor}`;
 export const valueSm = `${valueFont} text-sm ${cursor}`;
 export const valueSmLink =
-  `${valueFont} text-sm hover:text-stamp-purple-bright transition-colors duration-300 cursor-pointer w-full ${cursor}`;
+  `${valueFont} text-sm hover:text-stamp-purple-bright ${transition} cursor-pointer w-full ${cursor}`;
 export const value = `${valueFont} text-base ${cursor}`;
 export const valueLg = `${valueFont} text-lg ${cursor}`;
 export const valueXl =
@@ -184,6 +186,7 @@ export type TextStyles = {
   textXxs: string;
   textXs: string;
   textSm: string;
+  textSmLink: string;
   text: string;
   textLg: string;
   textXl: string;

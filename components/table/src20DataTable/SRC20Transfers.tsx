@@ -12,8 +12,8 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
   const headers = ["FROM", "TO", "AMOUNT", "DATE", "TX HASH"];
 
   return (
-    <div class="w-[500px] min-[500px]:w-full">
-      <table class={valueSm}>
+    <div class="w-[660px] min-[660px]:w-full">
+      <table class={`${valueSm} w-full`}>
         <colgroup>
           {colGroup().map((col) => (
             <col key={col.key} className={col.className} />

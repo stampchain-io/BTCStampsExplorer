@@ -7,8 +7,9 @@ import {
   formatNumber,
 } from "$lib/utils/formatUtils.ts";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
-import { labelSm, titleGreyLD } from "$text";
+import { labelSm, titleGreyLD, valueSm } from "$text";
 import { alignmentClasses, type AlignmentType } from "$layout";
+import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import type { MarketListingAggregated } from "$globals";
 
 /* ===== TYPES ===== */
@@ -24,59 +25,6 @@ export interface SRC20DetailHeaderProps {
   _totalTransfers: number;
   marketInfo?: MarketListingAggregated;
   _align?: AlignmentType;
-}
-
-/* ===== STAT ITEM COMPONENT ===== */
-function StatItem(
-  { label, value, direction, currency, align = "left", large = false }: {
-    label: string;
-    value: string | number;
-    currency?: string;
-    direction: string;
-    align?: AlignmentType;
-    large?: boolean;
-  },
-) {
-  const alignmentClass = alignmentClasses[align];
-
-  /* ===== RENDER STAT ITEM ===== */
-  return (
-    <div
-      class={`flex ${
-        direction === "col"
-          ? "flex-col -space-y-1"
-          : "gap-1.5 items-center justify-end"
-      } ${alignmentClass}`}
-    >
-      <h6
-        class={`${
-          large ? "text-base mobileLg:text-lg" : "text-sm mobileLg:text-base"
-        } font-light text-stamp-grey-darker uppercase`}
-      >
-        {label}
-      </h6>
-      <h6
-        class={`${
-          large
-            ? "text-3xl mobileLg:text-4xl font-black -mt-0.5"
-            : "text-sm mobileLg:text-base"
-        } ${
-          direction === "col"
-            ? "text-stamp-grey-light"
-            : "text-stamp-grey-light"
-        }`}
-      >
-        {value}
-        {currency
-          ? (
-            <span class="font-light">
-              &nbsp;{currency}
-            </span>
-          )
-          : ""}
-      </h6>
-    </div>
-  );
 }
 
 /* ===== COMPONENT ===== */
@@ -129,14 +77,14 @@ export function SRC20DetailHeader({
             <div className="flex gap-[18px] mobileMd:gap-[30px]">
               <img
                 src={`/content/${deployment.tx_hash}.svg`}
-                class="max-w-[83px] mobileMd:max-w-[91px] mobileLg:max-w-[103px] rounded relative z-10"
+                class="max-w-[80px] rounded-sm relative z-10"
                 alt={`${deployment.tick} token image`}
                 loading="lazy"
               />
               <div class="relative z-10">
                 {/* Token name and social links */}
                 <div class="flex">
-                  <h1 class={titleGreyLD}>
+                  <h1 class={`${titleGreyLD} uppercase`}>
                     {tickValue}
                   </h1>
                   <div class="flex gap-3 items-center">
@@ -166,7 +114,7 @@ export function SRC20DetailHeader({
                 <h6 className={labelSm}>
                   CREATOR
                 </h6>
-                <h5 className="text-xl mobileLg:text-2xl font-black gray-gradient3 -mt-1">
+                <h5 className="font-bold text-lg gray-gradient3-hover tracking-wide -mt-1">
                   {deployment.creator_name ||
                     abbreviateAddress(deployment.destination)}
                 </h5>
@@ -176,130 +124,108 @@ export function SRC20DetailHeader({
             {/* ===== DEPLOYMENT DETAILS ===== */}
             <div class="flex flex-col gap-0 justify-end ml-auto">
               <div class="hidden mobileLg:flex flex-col ml-20 mb-0 -space-y-0.5 items-center">
-                <StatItem
-                  label="DEPLOY"
-                  value={deployDate.toUpperCase()}
-                  direction="row"
-                  align="center"
-                />
-                <StatItem
-                  label="BLOCK #"
-                  value={deployment.block_index}
-                  direction="row"
-                  align="center"
-                />
-                <StatItem
-                  label="TX ID"
-                  value={abbreviateAddress(deployment.tx_hash)}
-                  direction="row"
-                  align="center"
-                />
+                <div class="flex items-center gap-1.5">
+                  <h5 className={labelSm}>
+                    DEPLOY
+                  </h5>
+                  <h6 className={valueSm}>
+                    {deployDate.toUpperCase()}
+                  </h6>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <h5 className={labelSm}>
+                    BLOCK #
+                  </h5>
+                  <h6 className={valueSm}>
+                    {deployment.block_index}
+                  </h6>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <h5 className={labelSm}>
+                    TX ID
+                  </h5>
+                  <h6 className={valueSm}>
+                    {abbreviateAddress(deployment.tx_hash)}
+                  </h6>
+                </div>
               </div>
             </div>
 
             {/* ===== TOKEN PARAMETERS ===== */}
             <div class="flex flex-col gap-0 justify-end items-end ml-auto">
               <div class="flex flex-col -space-y-0.5 text-right">
-                <StatItem
-                  label="DECIMALS"
-                  value={deployment.deci}
-                  direction="row"
-                />
-                <StatItem
-                  label="LIMIT"
-                  value={formatNumber(deployment.lim, 0)}
-                  direction="row"
-                />
-                <div class="hidden">
-                  <StatItem
-                    label="SUPPLY"
-                    value={formatNumber(deployment.max, 0)}
-                    direction="col"
-                    align="right"
-                    large
-                  />
+                <div class="flex items-center gap-1.5 justify-end">
+                  <h5 className={labelSm}>
+                    DECIMALS
+                  </h5>
+                  <h6 className={valueSm}>
+                    {deployment.deci}
+                  </h6>
                 </div>
-                <div>
-                  <StatItem
-                    label="SUPPLY"
-                    value={formatNumber(deployment.max, 0)}
-                    direction="row"
-                    align="right"
-                  />
+                <div class="flex items-center gap-1.5 justify-end">
+                  <h5 className={labelSm}>
+                    LIMIT
+                  </h5>
+                  <h6 className={valueSm}>
+                    {formatNumber(deployment.lim, 0)}
+                  </h6>
+                </div>
+                <div class="flex items-center gap-1.5 justify-end">
+                  <h5 className={labelSm}>
+                    SUPPLY
+                  </h5>
+                  <h6 className={valueSm}>
+                    {formatNumber(deployment.max, 0)}
+                  </h6>
                 </div>
               </div>
             </div>
           </div>
-          {
-            /*
-          <h6 class="text-sm text-[#CCCCCC] font-medium">
-            This is an SRC-20 token, there are many like it, but this one is{" "}
-            {deployment.tick.toUpperCase()}. This was deployed on block{" "}
-            {deployment.block_index}{" "}
-            without a description on the deploy. We hope you enjoy.
-          </h6>
-          */
-          }
         </div>
 
         {/* ===== MARKET INFORMATION CARD ===== */}
-        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
+        <div class="flex flex-col dark-gradient rounded-lg p-6">
           {/* Market cap */}
           <div className="flex flex-col">
-            <StatItem
+            <StatTitle
               label="MARKET CAP"
-              value={mcapBTCFormatted}
-              currency="BTC"
-              direction="col"
-              large
+              value={`${mcapBTCFormatted} BTC`}
             />
           </div>
 
           {/* ===== VOLUME STATS ===== */}
-          <div class="flex flex-wrap justify-between pt-3 mobileLg:pt-6">
+          <div class="flex flex-wrap justify-between pt-6">
             <StatItem
               label="24H VOLUME"
-              value={sum1dBTCFormatted}
-              currency="BTC"
-              direction="col"
+              value={`${sum1dBTCFormatted} BTC`}
               align="left"
             />
             <StatItem
               label="3 DAY VOLUME"
-              value="N/A" // FIXME: not available from API request
-              currency="BTC"
-              direction="col"
+              value="N/A BTC"
               align="center"
             />
             <StatItem
               label="7 DAY VOLUME"
-              value={sum7dBTCFormatted}
-              currency="BTC"
-              direction="col"
+              value={`${sum7dBTCFormatted} BTC`}
               align="right"
             />
           </div>
 
           {/* ===== PRICE STATS ===== */}
-          <div class="flex flex-wrap justify-between pt-1.5 mobileLg:pt-3">
+          <div class="flex flex-wrap justify-between pt-3">
             <StatItem
               label="PRICE"
-              value={floorUnitPriceSatsFormatted}
-              currency="SATS"
-              direction="col"
+              value={`${floorUnitPriceSatsFormatted} SATS`}
             />
             <StatItem
               label="24H CHANGE"
-              value="N/A" // FIXME: not available from API request
-              currency="%"
-              direction="col"
+              value="N/A %"
               align="center"
             />
             <StatItem
               label="7 DAY CHANGE"
-              value="N/A" // FIXME: not available from API request
-              currency="%"
-              direction="col"
+              value="N/A %"
               align="right"
             />
           </div>
