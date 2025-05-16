@@ -39,7 +39,7 @@ export const NOT_AVAILABLE_IMAGE = "/icon/stamp-no-image.svg";
 export const ERROR_IMAGE = "/icon/error-image.svg";
 
 export const CAROUSEL_STAMP_IDS = [
-  897330,
+  923260,
   631735,
   857476,
   892092,
