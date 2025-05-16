@@ -66,8 +66,23 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
 
   if (stamp.stamp_url.includes("json")) {
     const res = await fetch(stamp.stamp_url);
-    const jsonData = await res.json();
-    return jsonData?.img.length ? jsonData.img[0] : "";
+    try {
+      const jsonData = await res.json();
+      if (
+        jsonData && jsonData.img && Array.isArray(jsonData.img) &&
+        jsonData.img.length > 0
+      ) {
+        return jsonData.img[0];
+      }
+      return NOT_AVAILABLE_IMAGE;
+    } catch (error) {
+      console.error(
+        "Failed to parse JSON from stamp_url or access img property:",
+        stamp.stamp_url,
+        error,
+      );
+      return NOT_AVAILABLE_IMAGE;
+    }
   } else {
     // Extract filename from full URL if present
     const urlParts = stamp.stamp_url.split("/stamps/");
