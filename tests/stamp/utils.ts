@@ -19,7 +19,7 @@ export function base64ToArrayBuffer(base64: string): ArrayBuffer {
  */
 export function arrayBufferToBase64(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
-  let binary = '';
+  let binary = "";
   for (let i = 0; i < bytes.byteLength; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
@@ -47,7 +47,8 @@ export function createTestGIF(): string {
  * @returns A base64 encoded minimal SVG
  */
 export function createTestSVG(): string {
-  const svg = '<svg width="1" height="1" xmlns="http://www.w3.org/2000/svg"></svg>';
+  const svg =
+    '<svg width="1" height="1" xmlns="http://www.w3.org/2000/svg"></svg>';
   return btoa(svg);
 }
 
@@ -56,7 +57,8 @@ export function createTestSVG(): string {
  * @returns A base64 encoded minimal HTML
  */
 export function createTestHTML(): string {
-  const html = "<!DOCTYPE html><html><head><title>Test</title></head><body>Test</body></html>";
+  const html =
+    "<!DOCTYPE html><html><head><title>Test</title></head><body>Test</body></html>";
   return btoa(html);
 }
 
@@ -70,8 +72,8 @@ export function createFileOfSize(sizeInKB: number): string {
   for (let i = 0; i < bytes.length; i++) {
     bytes[i] = 65 + (i % 26); // Fill with repeating alphabet characters
   }
-  
-  let binary = '';
+
+  let binary = "";
   for (let i = 0; i < bytes.byteLength; i++) {
     binary += String.fromCharCode(bytes[i]);
   }

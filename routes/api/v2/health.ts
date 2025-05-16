@@ -34,13 +34,13 @@ export const handler: Handlers = {
   async GET(_req, ctx) {
     // Extract path to check if this is a simple health check
     const url = new URL(ctx.url);
-    if (url.searchParams.has('simple')) {
+    if (url.searchParams.has("simple")) {
       return new Response(JSON.stringify({ status: "OK" }), {
         headers: { "Content-Type": "application/json" },
         status: 200,
       });
     }
-    
+
     // Continue with full health check if not simple
     const health: HealthStatus = {
       status: "OK",
@@ -65,7 +65,7 @@ export const handler: Handlers = {
         getCurrentBlock(),
         StampService.countTotalStamps(),
         SRC20Repository.checkSrc20Deployments(),
-        XcpManager.checkHealth(30000), // 30 second cache for health checks
+        XcpManager.checkHealth(30), // 30 seconds cache for health checks (was 30000ms)
       ]);
 
       // Update service statuses
@@ -96,7 +96,7 @@ export const handler: Handlers = {
         api: health.services.api,
         database: health.services.database,
       };
-      
+
       // Non-essential services can be down without failing the health check
       const isError = !Object.values(essentialServices).every(Boolean);
 

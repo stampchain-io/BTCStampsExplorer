@@ -66,7 +66,7 @@ export class FileOperations {
       const result = await dbManager.executeQueryWithCache(
         query,
         [tick],
-        1000 * 60 * 5,
+        60 * 5 // Cache for 5 minutes in seconds
       ); // Cache for 5 minutes
 
       if ((result as any).rows.length > 0) {

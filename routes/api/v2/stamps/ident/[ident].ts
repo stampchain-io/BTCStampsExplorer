@@ -62,12 +62,12 @@ export const handler: Handlers<IdentHandlerContext> = {
 
       const body: PaginatedIdResponseBody = {
         page: result.page || DEFAULT_PAGINATION.page,
-        limit: result.limit || DEFAULT_PAGINATION.limit,
-        totalPages: result.totalPages,
+        limit: result.page_size || DEFAULT_PAGINATION.limit,
+        totalPages: result.pages,
         total: result.total,
         last_block: result.last_block,
-        ident: ident.toUpperCase(),
-        data: result.data,
+        ident: ident.toUpperCase() as SUBPROTOCOLS,
+        stamps: result.stamps,
       };
 
       return ResponseUtil.success(body);
@@ -78,13 +78,5 @@ export const handler: Handlers<IdentHandlerContext> = {
         `Error: stamps with ident: ${ident} not found`,
       );
     }
-  },
-};
-
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "1mb",
-    },
   },
 };

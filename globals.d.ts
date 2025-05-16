@@ -654,7 +654,7 @@ export interface AddressHandlerContext {
 
 export interface TickHandlerContext {
   params: {
-    tick: string | number;
+    tick: string;
     op?: string; // future use for mint/transfer deploy is defined in routes
   };
 }
@@ -729,6 +729,37 @@ declare global {
       request: (method: string, params?: any) => Promise<any>;
       // Add other known properties and methods of LeatherProvider here
     };
+    mockTxData: {
+      vout: Array<{
+        scriptPubKey: {
+          type: string;
+          hex: string;
+        };
+      }>;
+    };
   }
 }
+
+declare namespace NodeJS {
+  interface ProcessEnv {
+    DENO_ENV?: "development" | "production" | "test";
+    DEV_BASE_URL?: string;
+    SKIP_REDIS_CONNECTION?: "true" | "false";
+    // Add other environment variables here if needed
+  }
+}
+
+// Add mockTxData to globalThis for testing purposes
+// declare global {
+//   // eslint-disable-next-line no-var
+//   var mockTxData: {
+//     vout: Array<{
+//       scriptPubKey: {
+//         type: string;
+//         hex: string;
+//       };
+//     }>;
+//   };
+// }
+
 export {};

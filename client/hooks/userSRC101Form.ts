@@ -3,7 +3,6 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import axiod from "axiod";
 import { useConfig } from "$client/hooks/useConfig.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
 
@@ -101,8 +100,23 @@ export function useSRC101Form(
 
   useEffect(() => {
     const fetchPrice = async () => {
-      const price = await fetchBTCPriceInUSD();
-      setFormState((prev) => ({ ...prev, BTCPrice: price }));
+      try {
+        // Fetch from the dedicated BTC price endpoint
+        const response = await fetch("/api/internal/btcPrice");
+        if (!response.ok) {
+          console.error(
+            `Error fetching BTC price: ${response.status} ${response.statusText}`,
+          );
+          throw new Error("Failed to fetch BTC price");
+        }
+        const data = await response.json();
+        // Adjust parsing for the structure of /api/internal/btcPrice response
+        const price = (data.data && data.data.price) || 0;
+        setFormState((prev) => ({ ...prev, BTCPrice: price }));
+      } catch (error) {
+        console.error("Error fetching BTC price from client-side hook:", error);
+        setFormState((prev) => ({ ...prev, BTCPrice: 0 }));
+      }
     };
     fetchPrice();
   }, []);

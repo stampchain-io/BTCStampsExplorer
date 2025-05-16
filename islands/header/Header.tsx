@@ -189,14 +189,14 @@ export function Header() {
       );
     };
   }, [open]);
-  
+
   /* This effect has been removed to simplify the code */
 
   /* ===== MENU CLOSE FUNCTION ===== */
   const closeMenu = () => {
     // Close menu by updating state
     setOpen(false);
-    
+
     // Close tools section after drawer is closed
     setTimeout(() => {
       if (toolsOpen) {

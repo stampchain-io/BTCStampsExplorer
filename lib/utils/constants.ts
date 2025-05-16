@@ -19,10 +19,14 @@ export const SRC101_ALL_TABLE = "SRC101";
 export const SRC101_OWNERS_TABLE = "owners";
 export const SRC101_RECIPIENTS_TABLE = "recipients";
 export const SRC101_PRICE_TABLE = "src101price";
-export const DEFAULT_CACHE_DURATION = 1000 * 60 * 60 * 12; // 12 hours
+export const DEFAULT_CACHE_DURATION = 60 * 60 * 12; // 12 hours in seconds
 export const SATS_PER_KB_MULTIPLIER = 1000; // 1 KB = 1000 vBytes
 export const BIG_LIMIT = 200;
-export const SMALL_LIMIT = 50;
+export const SMALL_LIMIT = 20;
+export const DEFAULT_LIMIT = 50;
+export const DEFAULT_PAGE_SIZE = 50;
+export const RATE_LIMIT_REQUESTS = 100;
+export const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
 export const SATOSHIS_PER_BTC = 100000000;
 
 export const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
