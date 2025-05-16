@@ -71,7 +71,7 @@ export async function fetchXcpV2WithCache<T>(
   customCacheTimeout?: number,
 ): Promise<T> {
   const cacheKey = `api:v2:${endpoint}:${queryParams.toString()}`;
-  const cacheTimeout = customCacheTimeout || 1000 * 60 * 5; // 5 minutes default, can be overridden
+  const cacheTimeout = customCacheTimeout || 60 * 5; // 5 minutes default, in seconds
 
   await logger.info("api", {
     message: "Fetching XCP V2 with cache",

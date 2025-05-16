@@ -552,6 +552,16 @@ class DatabaseManager {
     
     if (this.#redisClient) {
       try {
+        // If expiry is 0 (or less), it implies "no cache" or "real-time data".
+        // Setting with { ex: 0 } is problematic for Redis.
+        // We will skip the Redis set operation for such cases.
+        if (typeof expiry === 'number' && expiry <= 0) {
+          if (REDIS_DEBUG) {
+            console.log(`[REDIS SET SKIPPED] Key: ${key.substring(0, 10)}... due to non-positive expiry: ${expiry}`);
+          }
+          return; // Do not set in Redis if expiry is 0 or less and is a number
+        }
+
         // Serialize the data
         let value: string;
         try {
@@ -564,7 +574,8 @@ class DatabaseManager {
           }
           
           if (REDIS_DEBUG) {
-            console.log(`[REDIS SET] Key: ${key.substring(0, 10)}..., Size: ${byteSize} bytes, Expiry: ${expiry}`);
+            // Changed log message to be more explicit about what's being attempted
+            console.log(`[REDIS SET ATTEMPT] Key: ${key.substring(0, 10)}..., Value Size: ${byteSize} bytes, Expiry Opts: ${expiry === "never" ? "none" : `{ ex: ${expiry} }`}`);
           }
         } catch (serializeError) {
           console.log(`[REDIS SERIALIZE ERROR] Failed to serialize data for key ${key.substring(0, 10)}...: ${serializeError instanceof Error ? serializeError.message : serializeError}`);
@@ -577,6 +588,7 @@ class DatabaseManager {
         if (expiry === "never") {
           await this.#redisClient.set(key, value);
         } else {
+          // At this point, expiry is a positive number
           await this.#redisClient.set(key, value, { ex: expiry });
         }
         
@@ -585,12 +597,12 @@ class DatabaseManager {
           // Log slow operations
           console.log(`[REDIS SLOW] Slow Redis SET operation detected: ${duration}ms for key ${key.substring(0, 10)}...`);
         } else if (REDIS_DEBUG) {
-          console.log(`[REDIS SET] Completed in ${duration}ms`);
+          console.log(`[REDIS SET SUCCESS] Key: ${key.substring(0, 10)}... completed in ${duration}ms`);
         }
       } catch (error) {
         const errorMsg = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
         this.#logger.error(`Failed to write to Redis cache: ${errorMsg}`);
-        console.log(`[REDIS ERROR] Failed to set key ${key.substring(0, 10)}...: ${errorMsg}`);
+        console.log(`[REDIS ERROR ON SET] Failed for key ${key.substring(0, 10)}...: ${errorMsg}`);
         
         // Detailed error inspection
         if (error instanceof Error && error.stack) {
@@ -603,17 +615,17 @@ class DatabaseManager {
              error.message.includes("network") || 
              error.message.includes("ECONNRESET") ||
              error.message.includes("closed"))) {
-          console.log(`[REDIS CONNECTION ISSUE] Possible connection loss detected: ${error.message}`);
+          console.log(`[REDIS CONNECTION ISSUE DURING SET] Possible connection loss detected: ${error.message}`);
           this.#redisAvailable = false;
           
           if (this.#redisAvailableAtStartup) {
-            console.log(`[REDIS RECONNECT] Scheduling reconnection attempt in background...`);
+            console.log(`[REDIS RECONNECT DURING SET] Scheduling reconnection attempt in background...`);
             this.#connectToRedisInBackground();
           }
         }
       }
     } else if (REDIS_DEBUG) {
-      console.log(`[REDIS CLIENT MISSING] Redis client unavailable for setting key: ${key.substring(0, 10)}...`);
+      console.log(`[REDIS CLIENT MISSING FOR SET] Redis client unavailable for setting key: ${key.substring(0, 10)}...`);
     }
   }
 

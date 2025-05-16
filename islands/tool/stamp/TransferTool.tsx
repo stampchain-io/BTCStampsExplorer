@@ -156,17 +156,17 @@ export function StampTransferTool({}: Props) {
       console.log("Selected new stamp:", {
         stamp: selectedItem.stamp,
         url: selectedItem.stamp_url,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
       });
-      
+
       // Create a fresh copy of the stamp object to ensure React detects the change
-      setSelectedStamp({...selectedItem});
+      setSelectedStamp({ ...selectedItem });
       setFormState((prev) => ({
         ...prev,
         stampId: selectedItem.stamp,
         cpid: selectedItem.cpid,
       }));
-      
+
       // Explicitly reset image states
       setIsImageLoading(true);
       setShowFallbackIcon(false);
@@ -219,13 +219,13 @@ export function StampTransferTool({}: Props) {
     // Add cache-busting timestamp parameter to force a fresh image load
     const timestamp = Date.now();
     const stampUrl = `/s/${selectedStamp.tx_hash}?t=${timestamp}`;
-    
+
     // Debug logging
     console.log("Rendering stamp:", {
       stamp_id: selectedStamp.stamp,
       tx_hash: selectedStamp.tx_hash,
       url: stampUrl,
-      timestamp
+      timestamp,
     });
 
     return (

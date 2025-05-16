@@ -52,7 +52,7 @@ export class CollectionRepository {
     const results = await dbManager.executeQueryWithCache(
       query,
       queryParams,
-      1000 * 60 * 5, // 5 minutes cache
+      60 * 5 // 5 minutes cache in seconds
     );
 
     return {
@@ -81,7 +81,7 @@ export class CollectionRepository {
     const result = await dbManager.executeQueryWithCache(
       query,
       queryParams,
-      1000 * 60 * 30,
+      60 * 30 // 30 minutes cache in seconds
     ) as { rows: [{ total: number }] };
 
     return result.rows[0].total;
@@ -156,7 +156,7 @@ export class CollectionRepository {
     return await dbManager.executeQueryWithCache(
       query,
       queryParams,
-      1000 * 60 * 5, // 5 minutes cache
+      60 * 5 // 5 minutes cache in seconds
     );
   }
 }

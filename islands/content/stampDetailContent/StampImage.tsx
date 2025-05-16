@@ -648,7 +648,9 @@ export function StampImage(
                   width="100%"
                   height="100%"
                   scrolling="no"
-                  className={`${className || ''} rounded absolute top-0 left-0 pointer-events-none`}
+                  className={`${
+                    className || ""
+                  } rounded absolute top-0 left-0 pointer-events-none`}
                   sandbox="allow-scripts allow-same-origin"
                   srcDoc={`
                     <script>
@@ -656,10 +658,12 @@ export function StampImage(
                       window.maxWidth = 640;
                       window.maxHeight = 640;
                     </script>
-                    <iframe src="${src || ''}" width="100%" height="100%" style="border:none;"></iframe>
+                    <iframe src="${
+                    src || ""
+                  }" width="100%" height="100%" style="border:none;"></iframe>
                   `}
                   loading="lazy"
-                  style={{ transform: transform || 'none' }}
+                  style={{ transform: transform || "none" }}
                   onError={handleImageError}
                   title="Stamp"
                 />

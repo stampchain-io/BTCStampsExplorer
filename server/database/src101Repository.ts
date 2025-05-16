@@ -33,7 +33,7 @@ export class SRC101Repository {
     const rows = (await dbManager.executeQueryWithCache(
       sqlQuery,
       [deploy_hash],
-      1000 * 60 * 2, // Cache duration
+      60 * 2, // Cache duration in seconds
     )).rows;
     const result = {};
     rows.forEach(row => {
@@ -86,7 +86,7 @@ export class SRC101Repository {
     var results = (await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2,
+      60 * 2,
     )).rows;
     return results[0].total;
   }
@@ -176,7 +176,7 @@ export class SRC101Repository {
     return (await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2,
+      60 * 2,
     )).rows.map((result) => {
       return {
         ...result,
@@ -231,7 +231,7 @@ export class SRC101Repository {
     var results = (await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2,
+      60 * 2,
     )).rows;
     return results[0].total;
   }
@@ -249,7 +249,7 @@ export class SRC101Repository {
     const recipients = (await dbManager.executeQueryWithCache(
       sqlQuery,
       [deploy_hash],
-      1000 * 60 * 2, // Cache duration
+      60 * 2, // Cache duration in seconds
     )).rows.map((result) => (
       result["address"],
     ));
@@ -288,7 +288,7 @@ export class SRC101Repository {
     const results = (await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2, // Cache duration
+      60 * 2, // Cache duration in seconds
     )).rows.map((result) => {
       result["mintstart"] = Number.parseInt(result["mintstart"].toString())
       result["mintend"] = Number.parseInt(result["mintend"].toString())
@@ -313,7 +313,7 @@ export class SRC101Repository {
     const total = (await dbManager.executeQueryWithCache(
       sqlQuery,
       [deploy_hash],
-      1000 * 60 * 2, // Cache duration
+      60 * 2, // Cache duration in seconds
     )).rows[0]["COUNT(*)"];
     return total
   }
@@ -403,7 +403,7 @@ export class SRC101Repository {
     return (await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2,
+      60 * 2,
     )).rows.map((result) => {
       result["mintstart"] = result["mintstart"] ? Number.parseInt(result["mintstart"].toString()) : 0
       result["mintend"] = result["mintend"] ? Number.parseInt(result["mintend"].toString()) : 0
@@ -434,7 +434,7 @@ export class SRC101Repository {
       const total = (await dbManager.executeQueryWithCache(
         sqlQuery,
         queryParams,
-        1000 * 60 * 2, // Cache duration
+        60 * 2, // Cache duration in seconds
       )).rows[0]["COUNT(*)"];
       return total
     }
@@ -469,7 +469,7 @@ export class SRC101Repository {
     const results = (await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2, // Cache duration
+      60 * 2, // Cache duration in seconds
     )).rows.map((result) => ({
       ...result,
     }));;
@@ -510,7 +510,7 @@ export class SRC101Repository {
       const results = (await dbManager.executeQueryWithCache(
         sqlQuery,
         queryParams,
-        1000 * 60 * 2, // Cache duration
+        60 * 2, // Cache duration in seconds
       )).rows;
       return results[0].total;
     }
@@ -567,7 +567,7 @@ export class SRC101Repository {
     const results = (await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2, // Cache duration
+      60 * 2, // Cache duration in seconds
     )).rows;
     return results;
   }
@@ -615,7 +615,7 @@ export class SRC101Repository {
     const results = (await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2, // Cache duration
+      60 * 2, // Cache duration in seconds
     )).rows.map((result) => ({
       ...result,
     }));;
@@ -663,7 +663,7 @@ export class SRC101Repository {
     const results = (await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2, // Cache duration
+      60 * 2, // Cache duration in seconds
     )).rows.map((result) => ({
       ...result,
     }));;
@@ -715,7 +715,7 @@ export class SRC101Repository {
     const results = (await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2, // Cache duration
+      60 * 2, // Cache duration in seconds
     )).rows.map((result) => ({
       ...result,
     }));;
