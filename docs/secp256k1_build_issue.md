@@ -5,7 +5,7 @@ This document tracks findings related to the `module "/app/build/secp256k1.node"
 ## Analysis of Build Files:
 
 1.  **`Dockerfile`:**
-    *   Base Image: `denoland/deno:alpine-2.3.1`. Alpine Linux is minimal.
+    *   Base Image: `denoland/deno:alpine-2.3.3`. Alpine Linux is minimal.
     *   Installed tools: Only `bash` is explicitly added via `apk add`. No common native module build tools (like `make`, `g++`, `python`) are installed.
     *   Build Command: `RUN deno run --allow-all main.ts build --lock-write`
     *   Cache Command: `RUN DENO_DIR=/app/.deno NPM_CONFIG_CACHE=/app/.npm deno cache --reload main.ts`
