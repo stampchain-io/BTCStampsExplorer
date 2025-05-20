@@ -9,7 +9,7 @@
  * The detail folder contains the [id].tsx Collection Details page
  * - I attempted having the [id].tsx file in the route folder, but it overrules the [overview].tsx file
  *   and posh, recursive and artists pages display in the [id].tsx file instead
- *   I tried several approaches, but couldn't properly redirect to or use the [overview].tsx file
+ *   I tried several approaches, but couldn't properly redirect to or use the [id].tsx file
  *
  *
  * Barrel files
