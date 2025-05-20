@@ -503,10 +503,8 @@ function StampingToolMain({ config }: { config: Config }) {
         return;
       }
 
-
       try {
         const fileData = await toBase64(file);
-
 
         const mintRequest = {
           sourceWallet: address,
@@ -521,7 +519,6 @@ function StampingToolMain({ config }: { config: Config }) {
           dryRun: true,
         };
 
-
         logger.debug("stamps", {
           message: "Recalculating fees with new fee rate",
           data: {
@@ -532,19 +529,15 @@ function StampingToolMain({ config }: { config: Config }) {
           },
         });
 
-
         const response = await axiod.post("/api/v2/olga/mint", mintRequest);
         const data = response.data as MintResponse;
 
-
-        setTxDetails(data);
         setFeeDetails({
           minerFee: Number(data.est_miner_fee) || 0,
           dustValue: Number(data.total_dust_value) || 0,
           totalValue: Number(data.total_output_value) || 0,
           hasExactFees: true,
         });
-
 
         logger.debug("stamps", {
           message: "Fee calculation updated with new fee rate",
@@ -572,27 +565,24 @@ function StampingToolMain({ config }: { config: Config }) {
       }
     };
 
-
     // Call the function when fee changes
     prepareTxWithNewFee();
   }, [
-    
     fee,
-   
+
     isConnected,
-   
+
     wallet.address,
-   
+
     file,
-   
+
     isLocked,
-   
+
     issuance,
-   
+
     isPoshStamp,
-   
+
     stampName,
-  ,
   ]);
 
   /* ===== WALLET ADDRESS VALIDATION ===== */
@@ -891,7 +881,6 @@ function StampingToolMain({ config }: { config: Config }) {
           return;
         }
 
-
         if (!result.signed) {
           // If result contains an error message, use it directly
           if (result.error) {
@@ -900,20 +889,14 @@ function StampingToolMain({ config }: { config: Config }) {
               error: result.error,
             });
 
-
             // Improved error messages for common wallet errors
             if (result.error.includes("insufficient funds")) {
               setApiError(
-                
                 "Insufficient funds in wallet to cover transaction fees",
-              ,
               );
             } else if (
-              
               result.error.includes("timeout") ||
-             
               result.error.includes("timed out")
-            
             ) {
               setApiError("Wallet connection timed out. Please try again");
             } else {
@@ -938,9 +921,7 @@ function StampingToolMain({ config }: { config: Config }) {
             data: { result },
           });
           setApiError(
-            
             "Failed to sign transaction. Please check wallet connection and try again",
-          ,
           );
           setSubmissionMessage(null);
           return;
@@ -1613,11 +1594,12 @@ function StampingToolMain({ config }: { config: Config }) {
         />
       </div>
 
-      {isFullScreenModalOpen && file && (
+      {isFullScreenModalOpen && openModal(
         <PreviewImageModal
-          src={file}
-          contentType={file.type?.startsWith("text/html") ? "html" : "image"}
-        />
+          src={file!}
+          contentType={file?.type?.startsWith("text/html") ? "html" : "image"}
+        />,
+        "zoomInOut",
       )}
 
       <div
@@ -1666,73 +1648,4 @@ function StampingToolMain({ config }: { config: Config }) {
       </div>
     </div>
   );
-}
-
-{/* FIXME: FINALIZE OPTIMIZATION ROUTINE */}
-{
-  /* <div
-        class="bg-[#6E6E6E] w-full"
-      >
-        <p class="text-[#F5F5F5] text-[22px] font-semibold px-6 py-[15px]">
-          Optimization
-        </p>
-        <hr />
-        <div class="grid grid-cols-2 tablet:grid-cols-4 justify-between gap-4 py-6 px-6">
-          <div class="flex items-center">
-            <input
-              id="default-radio-1"
-              type="radio"
-              name="radio"
-              class="w-5 h-5 focus:ring-blue-500 focus:ring-2"
-            />
-            <label
-              for="default-radio-1"
-              class="ms-2 text-[18px] font-semibold text-[#F5F5F5]"
-            >
-              None
-            </label>
-          </div>
-          <div class="flex items-center">
-            <input
-              id="default-radio-2"
-              type="radio"
-              name="radio"
-              class="w-5 h-5 focus:ring-blue-500 focus:ring-2"
-            />
-            <label
-              for="default-radio-2"
-              class="ms-2 text-[18px] font-semibold text-[#F5F5F5]"
-            >
-              Max compression
-            </label>
-          </div>
-          <div class="flex items-center">
-            <input
-              id="default-radio-2"
-              type="radio"
-              name="radio"
-              class="w-5 h-5 focus:ring-blue-500 focus:ring-2"
-            />
-            <label
-              for="default-radio-2"
-              class="ms-2 text-[18px] font-semibold text-[#F5F5F5]"
-            >
-              Balanced
-            </label>
-          </div>
-          <div class="flex items-center">
-            <input
-              id="default-radio-2"
-              type="radio"
-              name="radio"
-              class="w-5 h-5 focus:ring-blue-500 focus:ring-2"
-            />
-            <label
-              for="default-radio-2"
-              class="ms-2 text-[18px] font-semibold text-[#F5F5F5]"
-            >
-              Max quality
-            </label>
-          </div>
-        </div> */
 }
