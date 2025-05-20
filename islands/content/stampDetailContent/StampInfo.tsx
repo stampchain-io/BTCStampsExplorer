@@ -12,7 +12,14 @@ import { Src101Detail, StampRow } from "$globals";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
 import { containerBackground, containerColData } from "$layout";
-import { labelSm, titleGreyLD, value3xl, valueDark, valueSm } from "$text";
+import {
+  headingGreyDLLink,
+  labelSm,
+  titleGreyLD,
+  value3xl,
+  valueDark,
+  valueSm,
+} from "$text";
 import { Button } from "$button";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import { tooltipIcon } from "$notification";
@@ -748,10 +755,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </h6>
             )}
 
-            <div className="flex flex-col items-start pt-1.5 mobileLg:pt-3">
+            <div className="flex flex-col items-start pt-3">
               <h6 className={labelSm}>BY</h6>
               <a
-                className="font-bold text-lg gray-gradient3-hover tracking-wide -mt-1"
+                className={headingGreyDLLink}
                 href={`/wallet/${stamp.creator}`}
                 target="_parent"
               >
@@ -992,7 +999,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </div>
           </div>
 
-          <div className="flex flex-row pt-1.5 mobileLg:pt-3">
+          <div className="flex flex-row pt-3">
             <div className={`${containerColData} flex-1 items-start`}>
               <h6 className={labelSm}>SIZE</h6>
               <h6 className={valueSm}>
