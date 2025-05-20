@@ -210,8 +210,8 @@ import * as $section_cta_GetStampingCta from "./islands/section/cta/GetStampingC
 import * as $section_cta_RecursiveContactCta from "./islands/section/cta/RecursiveContactCta.tsx";
 import * as $section_cta_StampPoshCta from "./islands/section/cta/StampPoshCta.tsx";
 import * as $section_cta_StampchainContactCta from "./islands/section/cta/StampchainContactCta.tsx";
-import * as $section_gallery_ArtistGallery from "./islands/section/gallery/ArtistGallery.tsx";
 import * as $section_gallery_Carousel from "./islands/section/gallery/Carousel.tsx";
+import * as $section_gallery_CollectionDetailGallery from "./islands/section/gallery/CollectionDetailGallery.tsx";
 import * as $section_gallery_CollectionGallery from "./islands/section/gallery/CollectionGallery.tsx";
 import * as $section_gallery_PartnersBanner from "./islands/section/gallery/PartnersBanner.tsx";
 import * as $section_gallery_SRC20Deploys from "./islands/section/gallery/SRC20Deploys.tsx";
@@ -503,9 +503,9 @@ const manifest = {
     "./islands/section/cta/StampPoshCta.tsx": $section_cta_StampPoshCta,
     "./islands/section/cta/StampchainContactCta.tsx":
       $section_cta_StampchainContactCta,
-    "./islands/section/gallery/ArtistGallery.tsx":
-      $section_gallery_ArtistGallery,
     "./islands/section/gallery/Carousel.tsx": $section_gallery_Carousel,
+    "./islands/section/gallery/CollectionDetailGallery.tsx":
+      $section_gallery_CollectionDetailGallery,
     "./islands/section/gallery/CollectionGallery.tsx":
       $section_gallery_CollectionGallery,
     "./islands/section/gallery/PartnersBanner.tsx":

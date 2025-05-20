@@ -6,7 +6,7 @@ import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { CollectionRow } from "$server/types/collection.d.ts";
 import { StampOverviewContent } from "$content";
-import { ArtistGallery } from "$section";
+import { CollectionDetailGallery } from "$section";
 import { CollectionOverviewHeader } from "$header";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
@@ -161,7 +161,7 @@ export default function CollectionOverviewPage(
       case "artist":
         return (
           <>
-            <ArtistGallery collections={collections || []} />
+            <CollectionDetailGallery collections={collections || []} />
             <div class="mt-12 mobileLg:mt-[72px]">
               <Pagination
                 page={page}

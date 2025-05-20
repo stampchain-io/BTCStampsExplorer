@@ -11,8 +11,7 @@ import { StampController } from "$server/controller/stampController.ts";
 import { CollectionRow } from "$server/types/collection.d.ts";
 import { body, gapSection } from "$layout";
 import {
-  _CollectionGallery,
-  ArtistGallery,
+  CollectionDetailGallery,
   RecursiveContactCta,
   StampGallery,
   StampPoshCta,
@@ -111,7 +110,7 @@ export default function CollectionLandingPage(
   } = props.data;
 
   /* ===== SECTION CONFIGURATIONS ===== */
-  const CollectionsSection: StampGalleryProps[] = [
+  const CollectionSection: StampGalleryProps[] = [
     {
       subTitle: "FRESH POSH STAMPS",
       type: "posh",
@@ -164,7 +163,7 @@ export default function CollectionLandingPage(
     },
   ];
 
-  const PopularArtistGallery: CollectionGalleryProps = {
+  const CollectionDetailSection: CollectionGalleryProps = {
     title: "POPULAR ARTIST",
     subTitle: "COLLECTIONS",
     collections: collections,
@@ -223,15 +222,15 @@ export default function CollectionLandingPage(
         <CollectionOverviewHeader />
         <StampGallery
           sortBy={sortBy}
-          {...CollectionsSection[0]}
+          {...CollectionSection[0]}
         />
         <StampPoshCta />
       </div>
       <div>
-        <StampGallery {...CollectionsSection[1]} />
+        <StampGallery {...CollectionSection[1]} />
         <RecursiveContactCta />
       </div>
-      <ArtistGallery {...PopularArtistGallery} />
+      <CollectionDetailGallery {...CollectionDetailSection} />
       {
         /*
         <CollectionGallery {...EspeciallyPoshSection} />
