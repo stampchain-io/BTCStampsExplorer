@@ -7,6 +7,7 @@ import { ViewAllButton } from "$button";
 import { CollectionCard } from "$card";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
+import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 /* ===== STATE ===== */
 export default function ArtistGallery({
@@ -15,12 +16,23 @@ export default function ArtistGallery({
   collections,
   gridClass,
   displayCounts,
+  pagination,
 }: CollectionGalleryProps) {
   const { width } = useWindowSize();
   const collectionArray = Array.isArray(collections) ? collections : [];
   const [displayCount, setDisplayCount] = useState(collectionArray.length);
 
   /* ===== EVENT HANDLERS ===== */
+  const handlePageChange = (page: number) => {
+    if (pagination?.onPageChange) {
+      pagination.onPageChange(page);
+    } else {
+      const url = new URL(globalThis.location.href);
+      url.searchParams.set("page", page.toString());
+      globalThis.location.href = url.toString();
+    }
+  };
+
   useEffect(() => {
     const updateDisplayCount = () => {
       if (displayCounts) {
@@ -76,6 +88,17 @@ export default function ArtistGallery({
         ))}
       </div>
       <ViewAllButton href="/collection/artist" />
+
+      {pagination && pagination.totalPages > 1 && (
+        <div class="mt-12 mobileLg:mt-[72px]">
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            prefix={pagination.prefix || ""}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

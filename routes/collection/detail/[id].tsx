@@ -95,7 +95,6 @@ export default function CollectionDetailPage(
     stamps,
     page,
     pages,
-    page_size,
     collection,
   } = props.data;
 
@@ -106,10 +105,13 @@ export default function CollectionDetailPage(
       <CollectionDetailContent stamps={stamps} />
       <Pagination
         page={page}
-        pages={pages}
-        page_size={page_size}
-        type={"collection/" + id}
-        data_length={stamps.length}
+        totalPages={pages}
+        prefix={`collection/${id}`}
+        onPageChange={(newPage) => {
+          const url = new URL(globalThis.location.href);
+          url.searchParams.set("page", newPage.toString());
+          globalThis.location.href = url.toString();
+        }}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 /* ===== COLLECTION LANDING PAGE ===== */
 import {
-  _CollectionGalleryProps,
+  CollectionGalleryProps,
   StampGalleryProps,
   StampRow,
   SUBPROTOCOLS,
@@ -11,8 +11,8 @@ import { StampController } from "$server/controller/stampController.ts";
 import { CollectionRow } from "$server/types/collection.d.ts";
 import { body, gapSection } from "$layout";
 import {
-  _ArtistGallery,
   _CollectionGallery,
+  ArtistGallery,
   RecursiveContactCta,
   StampGallery,
   StampPoshCta,
@@ -104,7 +104,7 @@ export default function CollectionLandingPage(
   props: CollectionLandingPageProps,
 ) {
   const {
-    _collections,
+    collections,
     sortBy,
     stamps_src721 = [],
     stamps_posh = [],
@@ -163,6 +163,23 @@ export default function CollectionLandingPage(
       viewAllLink: "/collection/recursive",
     },
   ];
+
+  const PopularArtistGallery: CollectionGalleryProps = {
+    title: "POPULAR ARTIST",
+    subTitle: "COLLECTIONS",
+    collections: collections,
+    gridClass: `
+      grid gap-3 mobileLg:gap-6
+      grid-cols-1
+    `,
+    displayCounts: {
+      "mobileSm": 5, // 1 columns x 5 rows
+      "mobileLg": 5, // 1 columns x 5 rows
+      "tablet": 5, // 1 columns x 5 rows
+      "desktop": 5, // 1 columns x 5 rows
+    },
+  };
+
   {
     /*
   const EspeciallyPoshSection: CollectionGalleryProps = {
@@ -196,24 +213,9 @@ export default function CollectionLandingPage(
       "desktop": 4, // 4 columns x 1 rows
     },
   };
-
-  const PopularArtistGallery: CollectionGalleryProps = {
-    title: "POPULAR ARTIST",
-    subTitle: "COLLECTIONS",
-    collections: collections,
-    gridClass: `
-      grid gap-3 mobileLg:gap-6
-      grid-cols-1
-    `,
-    displayCounts: {
-      "mobileSm": 5, // 1 columns x 5 rows
-      "mobileLg": 5, // 1 columns x 5 rows
-      "tablet": 5, // 1 columns x 5 rows
-      "desktop": 5, // 1 columns x 5 rows
-    },
-  };
     */
   }
+
   /* ===== COMPONENT ===== */
   return (
     <div className={`${body} ${gapSection}`}>
@@ -229,11 +231,11 @@ export default function CollectionLandingPage(
         <StampGallery {...CollectionsSection[1]} />
         <RecursiveContactCta />
       </div>
+      <ArtistGallery {...PopularArtistGallery} />
       {
         /*
         <CollectionGallery {...EspeciallyPoshSection} />
         <CollectionGallery {...CuttingEdgeSection} />
-        <ArtistGallery {...PopularArtistGallery} />
       */
       }
     </div>

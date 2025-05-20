@@ -164,6 +164,7 @@ export interface CollectionGalleryProps {
   collections: Collection[];
   gridClass?: string;
   displayCounts?: DisplayCountBreakpoints;
+  pagination?: Pagination;
 }
 
 export interface SRC20Row {
