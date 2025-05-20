@@ -1,4 +1,4 @@
-/* ===== ARTIST GALLERY COMPONENT ===== */
+/* ===== COLLECTION DETAIL GALLERY COMPONENT ===== */
 /* @baba - not updated */
 import { useEffect, useState } from "preact/hooks";
 import { Collection, CollectionGalleryProps } from "$globals";
@@ -10,7 +10,7 @@ import { subtitlePurple, titlePurpleLD } from "$text";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 /* ===== STATE ===== */
-export default function ArtistGallery({
+export default function CollectionDetailGallery({
   title,
   subTitle,
   collections,
