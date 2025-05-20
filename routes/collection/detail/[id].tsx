@@ -103,16 +103,17 @@ export default function CollectionDetailPage(
     <div class="flex flex-col gap-6">
       <CollectionDetailHeader collection={collection} stamps={stamps} />
       <CollectionDetailContent stamps={stamps} />
-      <Pagination
-        page={page}
-        totalPages={pages}
-        prefix={`collection/${id}`}
-        onPageChange={(newPage) => {
-          const url = new URL(globalThis.location.href);
-          url.searchParams.set("page", newPage.toString());
-          globalThis.location.href = url.toString();
-        }}
-      />
+      <div class="mt-12 mobileLg:mt-[72px]">
+        <Pagination
+          page={page}
+          totalPages={pages}
+          onPageChange={(newPage) => {
+            const url = new URL(globalThis.location.href);
+            url.searchParams.set("page", newPage.toString());
+            globalThis.location.href = url.toString();
+          }}
+        />
+      </div>
     </div>
   );
 }
