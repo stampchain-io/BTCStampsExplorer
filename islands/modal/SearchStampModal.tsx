@@ -197,7 +197,7 @@ export function SearchStampModal({
           }}
           inputRef={inputRef}
           onSearch={handleSearch}
-          autoFocus={true}
+          autoFocus
         />
       </ModalSearchBase>
     );

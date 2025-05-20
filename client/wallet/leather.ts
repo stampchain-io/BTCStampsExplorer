@@ -5,6 +5,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
 import { handleWalletError } from "./walletHelper.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
+import type { BaseToast } from "$lib/utils/toastSignal.ts";
 
 interface LeatherAddress {
   symbol: "BTC" | "STX";
@@ -15,7 +16,7 @@ interface LeatherAddress {
   tweakedPublicKey?: string;
 }
 
-type AddToastFunction = (message: string, type: string) => void;
+type AddToastFunction = (message: string, type: BaseToast["type"]) => void;
 
 export const isLeatherInstalled = signal<boolean>(false);
 
@@ -214,19 +215,32 @@ export const signPSBT = async (
     }
 
     if (result.result) {
+      // Prioritize txid if available, as it implies successful broadcast
+      if (result.result.txid) {
+        logger.info("ui", {
+          message: "PSBT signed and broadcast successfully by Leather",
+          data: { txid: result.result.txid, hexProvided: !!result.result.hex },
+        });
+        // Construct the base response
+        const responsePayload: SignPSBTResult = {
+          signed: true,
+          txid: result.result.txid,
+        };
+        // Conditionally add the psbt property only if result.result.hex is a string
+        if (
+          typeof result.result.hex === "string" && result.result.hex.length > 0
+        ) {
+          responsePayload.psbt = result.result.hex;
+        }
+        return responsePayload;
+      }
+      // If only hex is available (e.g., broadcast was false or txid not part of this specific response)
       if (result.result.hex) {
         logger.info("ui", {
-          message: "PSBT signed successfully",
+          message: "PSBT signed successfully by Leather (hex only)",
           data: { hasHex: true, hasTxid: false },
         });
         return { signed: true, psbt: result.result.hex };
-      }
-      if (result.result.txid) {
-        logger.info("ui", {
-          message: "PSBT signed and broadcast successfully",
-          data: { hasHex: false, hasTxid: true, txid: result.result.txid },
-        });
-        return { signed: true, txid: result.result.txid };
       }
     }
 

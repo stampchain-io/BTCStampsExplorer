@@ -37,7 +37,7 @@ const PreviewImageModal = ({
         closeModal();
       }}
       title=""
-      hideHeader={true}
+      hideHeader
       className="!w-[min(calc(100vh-48px),calc(100vw-48px))] !h-[min(calc(100vh-48px),calc(100vw-48px))] mobileLg:!w-[min(calc(100vh-96px),calc(100vw-96px))] mobileLg:!h-[min(calc(100vh-96px),calc(100vw-96px))]"
     >
       <div class="flex flex-col h-full w-full stamp-container">

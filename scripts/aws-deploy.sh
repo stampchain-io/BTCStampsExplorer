@@ -99,7 +99,7 @@ usage() {
     echo -e "  --diagnose          Diagnose ECR connectivity issues and verify VPC endpoint configuration"
     echo -e "  --skip-build        Skip building Docker image (alias for backward compatibility)"
     echo -e "  --cache-deno-image  Cache Deno image from Docker Hub to ECR (version specified with --deno-version)"
-    echo -e "  --deno-version      Deno version to cache (default: 2.3.1, use with --cache-deno-image)"
+    echo -e "  --deno-version      Deno version to cache (default: 2.3.3, use with --cache-deno-image)"
     echo -e "  --list-images       List all available images in ECR repository with timestamps"
     echo -e "  --auto-tag-images   Automatically tag all untagged images with date-based tags"
     echo -e "  --select-image      Select a specific image tag to deploy instead of latest"
@@ -155,7 +155,7 @@ CACHE_DENO_IMAGE=false
 LIST_IMAGES=false
 AUTO_TAG_IMAGES=false
 SELECT_IMAGE=""
-DENO_VERSION="2.3.1"
+DENO_VERSION="2.3.3"
 
 for arg in "$@"; do
     case $arg in

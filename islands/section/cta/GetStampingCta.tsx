@@ -3,10 +3,10 @@ import { useEffect, useState } from "preact/hooks";
 import { formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { gapGrid } from "$layout";
 import { Button } from "$button";
-import { subtitleGrey, text, textLg, titleGreyDL } from "$text";
+import { subtitleGrey, text, titleGreyDL } from "$text";
 
 /* ===== COMPONENT ===== */
-export function GetStampingCta() {
+export default function GetStampingCta() {
   /* ===== STATE ===== */
   const [btcPrice, setBtcPrice] = useState(0);
   const [recommendedFee, setRecommendedFee] = useState(6);

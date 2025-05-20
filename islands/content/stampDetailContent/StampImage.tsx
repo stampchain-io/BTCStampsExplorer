@@ -24,33 +24,6 @@ function RightPanel(
     showCodeButton: boolean;
   },
 ) {
-  if (stamp.ident === "SRC-20") {
-    return null;
-  }
-
-  /* ===== SHARING CONFIGURATION ===== */
-  const url = `https://stampchain.io/stamp/${stamp.stamp}`;
-  const text = "Check out what I found @Stampchain";
-
-  const shareContent = async () => {
-    const shareData = {
-      title: text,
-      text: text,
-      url: url,
-    };
-
-    try {
-      setIsShareTooltipVisible(false);
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        alert("Sharing is not supported in your browser.");
-      }
-    } catch (error) {
-      console.error("Error sharing:", error);
-    }
-  };
-
   /* ===== STATE & REFS ===== */
   const [showCopied, setShowCopied] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
@@ -98,6 +71,33 @@ function RightPanel(
       }
     };
   }, []);
+
+  if (stamp.ident === "SRC-20") {
+    return null;
+  }
+
+  /* ===== SHARING CONFIGURATION ===== */
+  const url = `https://stampchain.io/stamp/${stamp.stamp}`;
+  const text = "Check out what I found @Stampchain";
+
+  const shareContent = async () => {
+    const shareData = {
+      title: text,
+      text: text,
+      url: url,
+    };
+
+    try {
+      setIsShareTooltipVisible(false);
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        alert("Sharing is not supported in your browser.");
+      }
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  };
 
   /* ===== EVENT HANDLERS ===== */
   const handleXMouseEnter = () => {
@@ -584,9 +584,6 @@ export function StampImage(
     setIsPlaying(false);
   };
 
-  // Keep the state for tracking if modal should be shown
-  const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
-
   // Update the toggleCodeModal function to use the new pattern
   const toggleCodeModal = () => {
     const modalContent = (
@@ -652,16 +649,7 @@ export function StampImage(
                     className || ""
                   } rounded absolute top-0 left-0 pointer-events-none`}
                   sandbox="allow-scripts allow-same-origin"
-                  srcDoc={`
-                    <script>
-                      window.backgroundColor = "f7931a";
-                      window.maxWidth = 640;
-                      window.maxHeight = 640;
-                    </script>
-                    <iframe src="${
-                    src || ""
-                  }" width="100%" height="100%" style="border:none;"></iframe>
-                  `}
+                  src={src || ""}
                   loading="lazy"
                   style={{ transform: transform || "none" }}
                   onError={handleImageError}
@@ -676,7 +664,7 @@ export function StampImage(
               stamp={stamp}
               toggleCodeModal={toggleCodeModal}
               toggleFullScreenModal={toggleFullScreenModal}
-              showCodeButton={true}
+              showCodeButton
             />
           )}
         </div>
@@ -715,6 +703,7 @@ export function StampImage(
                   <source src={src} type={stamp.stamp_mimetype} />
                 </audio>
                 <button
+                  type="button"
                   onClick={togglePlayback}
                   className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-stamp-grey-darker hover:text-stamp-grey-light w-[10%] aspect-square"
                 >

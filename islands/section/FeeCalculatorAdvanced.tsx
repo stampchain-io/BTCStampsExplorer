@@ -86,7 +86,7 @@ export function FeeCalculatorAdvanced({
       fileType={fileType}
       fileSize={fileSize}
       issuance={issuance}
-      serviceFee={serviceFee}
+      serviceFee={serviceFee ?? undefined}
       BTCPrice={BTCPrice}
       isSubmitting={isSubmitting}
       onSubmit={onSubmit}

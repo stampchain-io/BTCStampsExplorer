@@ -111,11 +111,11 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           userAddress={wallet?.address}
-          utxoAncestors={formState.utxoAncestors}
+          utxoAncestors={formState.utxoAncestors || []}
           feeDetails={{
-            minerFee: formState.psbtFees?.estMinerFee || 0,
-            dustValue: formState.psbtFees?.totalDustValue || 0,
-            hasExactFees: !!formState.psbtFees?.hasExactFees,
+            minerFee: formState.psbtFeeDetails?.estMinerFee || 0,
+            dustValue: formState.psbtFeeDetails?.totalDustValue || 0,
+            hasExactFees: !!formState.psbtFeeDetails?.hasExactFees,
           }}
         />
 

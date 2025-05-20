@@ -45,13 +45,15 @@ import { serverConfig } from "$server/config/config.ts";
 import { IPrepareSRC101TX, PSBTInput, VOUT } from "$types/index.d.ts";
 import * as msgpack from "msgpack";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 export class SRC101MultisigPSBTService {
   private static readonly RECIPIENT_DUST = 789;
   private static readonly MULTISIG_DUST = 809;
   private static readonly CHANGE_DUST = 1000;
   private static readonly THIRD_PUBKEY = "020202020202020202020202020202020202020202020202020202020202020202";
+  private static commonUtxoService = new CommonUTXOService();
 
   static async preparePSBT({
     network,
@@ -64,17 +66,17 @@ export class SRC101MultisigPSBTService {
     enableRBF = true,
   }: IPrepareSRC101TX) {
     try {
-      console.log("Starting prepareSr101TX");
+      logger.info("src101-psbt-service", { message: "Starting preparePSBT for SRC101 Multisig"});
       const psbtNetwork = network === "testnet"
         ? bitcoin.networks.testnet
         : bitcoin.networks.bitcoin;
-      console.log("Using network:", psbtNetwork);
-      console.log("Using sourceAddress:", sourceAddress);
-      console.log("Using changeAddress:", changeAddress);
-      console.log("Using recAddress:", recAddress);
-      console.log("Using recVault:", recVault);
-      console.log("Using feeRate:", feeRate);
-      console.log("Using transferString:", transferString);
+      logger.debug("src101-psbt-service", { message: "Using network", network: psbtNetwork });
+      logger.debug("src101-psbt-service", { message: "Using sourceAddress", sourceAddress });
+      logger.debug("src101-psbt-service", { message: "Using changeAddress", changeAddress });
+      logger.debug("src101-psbt-service", { message: "Using recAddress", recAddress });
+      logger.debug("src101-psbt-service", { message: "Using recVault", recVault });
+      logger.debug("src101-psbt-service", { message: "Using feeRate", feeRate });
+      logger.debug("src101-psbt-service", { message: "Using transferString", transferString });
 
       const psbt = new bitcoin.Psbt({ network: psbtNetwork });
 
@@ -168,16 +170,13 @@ export class SRC101MultisigPSBTService {
 
       // Add inputs to PSBT
       for (const input of inputs) {
-        const txDetails = await QuicknodeService.getTransaction(input.txid);
-        if (!txDetails?.vout) throw new Error(`Transaction details not found for txid: ${input.txid}`);
-
-        const inputDetails = txDetails.vout[input.vout];
-        if (!inputDetails) throw new Error(`No vout found at index ${input.vout} for transaction ${input.txid}`);
-
-        const isWitnessUtxo = inputDetails.scriptPubKey?.type?.startsWith("witness");
-        if (typeof isWitnessUtxo === "undefined") {
-          throw new Error(`scriptPubKey.type is undefined for txid: ${input.txid}, vout: ${input.vout}`);
+        if (!input.script) {
+          logger.error("src101-psbt-service", { message: "Input UTXO is missing script for SRC101 Multisig.", input });
+          throw new Error(`Input UTXO ${input.txid}:${input.vout} is missing script (scriptPubKey).`);
         }
+        const isWitnessUtxo = input.scriptType?.startsWith("witness") || 
+                              input.scriptType?.toUpperCase().includes("P2W") || 
+                              (input.scriptType === "P2SH" && input.redeemScriptType?.isWitness);
 
         const psbtInput: PSBTInput = {
           hash: input.txid,
@@ -187,14 +186,19 @@ export class SRC101MultisigPSBTService {
 
         if (isWitnessUtxo) {
           psbtInput.witnessUtxo = {
-            script: hex2bin(inputDetails.scriptPubKey.hex),
+            script: hex2bin(input.script),
             value: BigInt(input.value),
           };
         } else {
-          psbtInput.nonWitnessUtxo = hex2bin(txDetails.hex);
+          const rawTxHex = await SRC101MultisigPSBTService.commonUtxoService.getRawTransactionHex(input.txid);
+          if (!rawTxHex) {
+            logger.error("src101-psbt-service", { message: "Failed to fetch raw tx hex for non-witness input in SRC101 Multisig", txid: input.txid });
+            throw new Error(`Failed to fetch raw transaction for non-witness input ${input.txid}`);
+          }
+          psbtInput.nonWitnessUtxo = hex2bin(rawTxHex);
         }
 
-        psbt.addInput(psbtInput);
+        psbt.addInput(psbtInput as any);
       }
 
       // Calculate total input and output values
@@ -234,8 +238,8 @@ export class SRC101MultisigPSBTService {
         });
       }
 
-      // Convert values to strings for logging
-      console.log("Final transaction details:", {
+      logger.debug("src101-psbt-service", {
+        message: "Final transaction details for SRC101 Multisig PSBT",
         inputs: inputs.map(utxo => ({
           ...utxo,
           value: BigInt(utxo.value).toString()
@@ -262,7 +266,7 @@ export class SRC101MultisigPSBTService {
         }),
       };
     } catch (error) {
-      console.error("Error in prepareSrc101TX:", error);
+      logger.error("src101-psbt-service", { message: "Error in preparePSBT for SRC101 Multisig", error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }

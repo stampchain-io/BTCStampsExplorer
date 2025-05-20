@@ -40,7 +40,7 @@ export * from "$components/section/howto/ArticlesOverviewBase.tsx";
 
 /* ===== CTA ===== */
 export * from "$islands/section/cta/StampchainContactCta.tsx";
-export * from "$islands/section/cta/GetStampingCta.tsx";
+export { default as GetStampingCta } from "$islands/section/cta/GetStampingCta.tsx";
 export * from "$islands/section/cta/StampPoshCta.tsx";
 export * from "$islands/section/cta/RecursiveContactCta.tsx";
 /* I have no idea why, but these two files cannot be barrel exported */

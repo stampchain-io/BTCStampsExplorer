@@ -37,9 +37,9 @@ export const handler: Handlers = {
         return ctx.renderNotFound();
       }
       /* @fullman */
-      const highchartsData = combinedListings.map((item, index) => [
-        new Date(item.create_time).getTime(),
-        item.price,
+      const highchartsData = combinedListings.map((item, _index) => [
+        new Date(item.date).getTime(),
+        item.unit_price_btc * 100000000, // Convert BTC to sats
       ]).sort((a, b) => a[0] - b[0]);
 
       /* ===== RESPONSE FORMATTING ===== */

@@ -162,9 +162,19 @@ export default function PressKit() {
               </p>
             </div>
 
-            <button className="bg-[#999999] text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]">
-              DOWNLOAD
-            </button>
+            <div className="mt-5 flex flex-col items-center">
+              <img
+                src="/img/stampchain_assets/STAMPCHAIN_animated_logo.gif"
+                alt="Stampchain Logo Animated"
+                className="max-w-full h-auto"
+              />
+              <button
+                type="button"
+                className="bg-[#999999] text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]"
+              >
+                DOWNLOAD
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-col items-center tablet:items-end gap-6 tablet:gap-12 w-full tablet:w-1/2">

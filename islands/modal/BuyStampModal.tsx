@@ -11,6 +11,7 @@ import { closeModal, openModal } from "$islands/modal/states.ts";
 import { StampImage } from "$content";
 import { inputFieldSquare } from "$form";
 import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
+import { showToast } from "$lib/utils/toastSignal.ts";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -48,21 +49,18 @@ const BuyStampModal = ({
     handleChangeFee: internalHandleChangeFee,
     handleSubmit,
     isSubmitting,
-    error,
-    successMessage,
-    setSuccessMessage,
+    error: formHookError,
+    setError: setFormHookError,
   } = useTransactionForm({
     type: "buy",
     initialFee,
   });
 
   /* ===== EFFECTS ===== */
-  // Sync external fee state with internal state
   useEffect(() => {
     handleChangeFee(formState.fee);
   }, [formState.fee]);
 
-  // Update quantity and price when dispenser changes
   useEffect(() => {
     if (dispenser) {
       const maxQty = Math.floor(
@@ -74,13 +72,11 @@ const BuyStampModal = ({
     }
   }, [dispenser, quantity]);
 
-  // Debug logging
   useEffect(() => {
     logger.debug("ui", {
       message: "BuyStampModal mounted",
       component: "BuyStampModal",
     });
-
     return () => {
       logger.debug("ui", {
         message: "BuyStampModal unmounting",
@@ -88,6 +84,13 @@ const BuyStampModal = ({
       });
     };
   }, []);
+
+  useEffect(() => {
+    if (formHookError) {
+      showToast(formHookError, "error", false);
+      setFormHookError(null);
+    }
+  }, [formHookError, setFormHookError]);
 
   /* ===== EVENT HANDLERS ===== */
   const handleQuantityChange = (e: Event) => {
@@ -103,10 +106,8 @@ const BuyStampModal = ({
 
   /* ===== TRANSACTION HANDLING ===== */
   const handleBuyClick = async () => {
-    // Check if wallet is connected first
     if (!wallet || !wallet.address) {
       const { modalContent } = stackConnectWalletModal(() => {
-        // After successful connection, reopen the BuyStampModal
         openModal(
           <BuyStampModal
             stamp={stamp}
@@ -117,20 +118,13 @@ const BuyStampModal = ({
           "scaleUpDown",
         );
       });
-
-      // Open the connect modal
       openModal(modalContent, "scaleUpDown");
       return;
     }
 
     await handleSubmit(async () => {
-      // Convert fee rate from sat/vB to sat/kB
       const feeRateKB = formState.fee * 1000;
-
-      const options = {
-        return_psbt: true,
-        fee_per_kb: feeRateKB,
-      };
+      const options = { return_psbt: true, fee_per_kb: feeRateKB };
 
       const response = await fetch("/api/v2/create/dispense", {
         method: "POST",
@@ -144,19 +138,28 @@ const BuyStampModal = ({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || "Failed to create dispense transaction.",
-        );
+        const errorData = await response.json().catch(() => ({
+          error: "Failed to parse error from server.",
+        }));
+        const detailedError = errorData.error ||
+          "Failed to create dispense transaction (unknown server error).";
+        logger.error("ui", {
+          message: "API error creating dispense transaction",
+          details: detailedError,
+          status: response.status,
+        });
+        throw new Error("Failed to prepare transaction. Please try again.");
       }
 
       const responseData = await response.json();
-
       if (!responseData?.psbt || !responseData?.inputsToSign) {
-        throw new Error("Invalid response: Missing PSBT or inputsToSign");
+        logger.error("ui", {
+          message: "Invalid API response: Missing PSBT or inputsToSign",
+          data: responseData,
+        });
+        throw new Error("Received invalid transaction data from server.");
       }
 
-      // PSBT is already in hex format with witness data from backend
       const signResult = await walletContext.signPSBT(
         wallet,
         responseData.psbt,
@@ -164,15 +167,79 @@ const BuyStampModal = ({
         true, // Enable RBF
       );
 
-      if (signResult.signed && signResult.txid) {
-        setSuccessMessage(
-          `Transaction broadcasted successfully. TXID: ${signResult.txid}`,
-        );
-        setTimeout(() => closeModal(), 5000);
+      if (signResult.signed) {
+        if (signResult.txid) {
+          showToast(
+            `Transaction broadcasted! TXID: ${
+              signResult.txid.substring(0, 10)
+            }...`,
+            "success",
+            false,
+          );
+          closeModal();
+        } else if (signResult.psbt) {
+          try {
+            showToast("Transaction signed. Broadcasting...", "info", true);
+            const broadcastTxid = await walletContext.broadcastPSBT(
+              signResult.psbt,
+            );
+            if (broadcastTxid && typeof broadcastTxid === "string") {
+              showToast(
+                `Transaction broadcasted! TXID: ${
+                  broadcastTxid.substring(0, 10)
+                }...`,
+                "success",
+                false,
+              );
+              closeModal();
+            } else {
+              logger.error("ui", {
+                message: "Broadcast did not return a valid TXID after signing",
+                broadcastResult: broadcastTxid,
+                psbtHex: signResult.psbt,
+              });
+              throw new Error(
+                "Broadcast failed after signing. Please check transaction status.",
+              );
+            }
+          } catch (broadcastError: unknown) {
+            const beMsg = broadcastError instanceof Error
+              ? broadcastError.message
+              : String(broadcastError);
+            logger.error("ui", {
+              message: "Error broadcasting signed PSBT",
+              error: beMsg,
+              psbtHex: signResult.psbt,
+            });
+            throw new Error(
+              `Broadcast failed: ${beMsg.substring(0, 50)}${
+                beMsg.length > 50 ? "..." : ""
+              }`,
+            );
+          }
+        } else {
+          logger.error("ui", {
+            message: "Signed but no TXID or PSBT hex returned to modal",
+            signResult,
+          });
+          throw new Error(
+            "Signing reported success, but critical data missing.",
+          );
+        }
       } else if (signResult.cancelled) {
-        throw new Error("Transaction signing was cancelled.");
+        showToast("Transaction signing was cancelled.", "info", true);
       } else {
-        throw new Error(`Failed to sign PSBT: ${signResult.error}`);
+        const signErrorMsg = signResult.error || "Unknown signing error";
+        logger.error("ui", {
+          message: "PSBT Signing failed",
+          error: signErrorMsg,
+          details: signResult,
+        });
+        throw new Error(
+          `Signing failed: ${signErrorMsg.substring(0, 50)}${
+            signErrorMsg.length > 50 ? "..." : ""
+          }`,
+        );
       }
     });
   };
@@ -262,16 +329,10 @@ const BuyStampModal = ({
         }}
         buttonName="BUY"
         className="pt-9 mobileLg:pt-12"
-        userAddress={wallet?.address ?? ""}
-        inputType="P2WPKH"
+        _userAddress={wallet?.address ?? ""}
+        _inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
       />
-
-      {/* ===== STATUS MESSAGES ===== */}
-      {error && <div className="text-red-500 mt-2">{error}</div>}
-      {successMessage && (
-        <div className="text-green-500 mt-2">{successMessage}</div>
-      )}
     </ModalBase>
   );
 };

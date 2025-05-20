@@ -1,10 +1,13 @@
-import { useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useState } from "preact/hooks";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import {
   showConnectWalletModal,
   walletContext,
 } from "$client/wallet/wallet.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { FeeDetails } from "$lib/types/base.d.ts";
+import axiod from "axiod";
+import { debounce } from "$lib/utils/debounce.ts";
 
 interface TransactionFormState {
   fee: number;
@@ -14,19 +17,119 @@ interface TransactionFormState {
   addressError?: string;
   amount?: string;
   amountError?: string;
+  assetId?: string;
+  estimatedTxFees: FeeDetails | null;
+  apiError: string | null;
 }
 
 interface UseTransactionFormProps {
   type: "send" | "transfer" | "buy";
   initialFee?: number;
+  initialAssetId?: string;
+  initialAmount?: string;
 }
 
+interface DebouncedCallParams {
+  sourceAddress: string;
+  feeRate: number;
+  recipientAddress?: string;
+  assetId?: string;
+  amount?: string;
+}
+
+const calculateEstimatedFeesDebounced = debounce(
+  async (
+    params: DebouncedCallParams,
+    setFormState: (
+      fn: (prev: TransactionFormState) => TransactionFormState,
+    ) => void,
+  ) => {
+    if (
+      !params.sourceAddress || !params.recipientAddress || !params.assetId ||
+      !params.amount || params.feeRate <= 0
+    ) {
+      setFormState((prev) => ({
+        ...prev,
+        estimatedTxFees: prev.estimatedTxFees
+          ? {
+            ...prev.estimatedTxFees,
+            hasExactFees: false,
+            minerFee: 0,
+            dustValue: 0,
+            totalValue: 0,
+          }
+          : null,
+      }));
+      return;
+    }
+    try {
+      logger.debug("ui", {
+        message: "Requesting transfer fee estimate (dry run)",
+        params,
+      });
+      const response = await axiod.post("/api/v2/create/send", {
+        address: params.sourceAddress,
+        destination: params.recipientAddress,
+        asset: params.assetId,
+        quantity: Number(params.amount),
+        options: { fee_per_kb: params.feeRate * 1000 },
+        dryRun: true,
+      });
+
+      if (response.data && typeof response.data.estimatedFee === "number") {
+        setFormState((prev) => ({
+          ...prev,
+          estimatedTxFees: {
+            minerFee: response.data.estimatedFee || 0,
+            dustValue: 0,
+            totalValue: response.data.estimatedFee || 0,
+            hasExactFees: true,
+            estimatedSize: response.data.estimatedVsize || 0,
+            effectiveFeeRate: params.feeRate,
+            totalVsize: response.data.estimatedVsize || 0,
+          },
+          apiError: null,
+        }));
+      } else {
+        throw new Error(
+          "Invalid fee estimation response from /api/v2/create/send",
+        );
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error
+        ? error.message
+        : "Fee estimation failed for transfer";
+      logger.error("ui", {
+        message: "Transfer fee estimation error",
+        error: errorMsg,
+        paramsSent: params,
+      });
+      setFormState((prev) => ({
+        ...prev,
+        estimatedTxFees: {
+          minerFee: 0,
+          dustValue: 0,
+          totalValue: 0,
+          hasExactFees: false,
+          effectiveFeeRate: 0,
+          estimatedSize: 0,
+          totalVsize: 0,
+        },
+        apiError: errorMsg,
+      }));
+    }
+  },
+  750,
+);
+
 export function useTransactionForm(
-  { type, initialFee = 0 }: UseTransactionFormProps,
+  { type, initialFee = 1, initialAssetId = "", initialAmount = "1" }:
+    UseTransactionFormProps,
 ) {
   const { fees, loading: feeLoading, fetchFees } = useFeePolling(300000);
+  const { wallet, isConnected } = walletContext;
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [formState, setFormState] = useState<TransactionFormState>({
@@ -35,33 +138,78 @@ export function useTransactionForm(
     BTCPrice: 0,
     recipientAddress: "",
     addressError: "",
-    amount: "",
+    amount: initialAmount,
     amountError: "",
+    assetId: initialAssetId,
+    estimatedTxFees: null,
+    apiError: null,
   });
 
-  // Initialize with recommended fee
   useEffect(() => {
-    if (fees?.recommendedFee) {
-      handleChangeFee(Math.round(fees.recommendedFee));
+    if (fees && !feeLoading) {
+      logger.debug("ui", {
+        message:
+          "useTransactionForm: Updating fee and BTCPrice from useFeePolling",
+        data: fees,
+      });
+      const recommendedFee = Math.round(fees.recommendedFee);
+      const currentBtcPrice = fees.btcPrice;
+      setFormState((prev) => ({
+        ...prev,
+        fee: recommendedFee > 0 ? recommendedFee : prev.fee,
+        BTCPrice: currentBtcPrice > 0 ? currentBtcPrice : prev.BTCPrice,
+      }));
+    } else if (!feeLoading && !fees) {
+      logger.warn("ui", {
+        message:
+          "useTransactionForm: Fee polling from useFeePolling returned no fees object (null).",
+      });
     }
-  }, [fees?.recommendedFee]);
+  }, [fees, feeLoading]);
 
-  // Fetch BTC price
   useEffect(() => {
-    const fetchPrice = async () => {
-      const price = await fetchBTCPriceInUSD();
-      setFormState((prev) => ({ ...prev, BTCPrice: price }));
-    };
-    fetchPrice();
-  }, []);
+    if (isConnected && wallet.address) {
+      const paramsForDebounce: DebouncedCallParams = {
+        sourceAddress: wallet.address,
+        feeRate: formState.fee,
+      };
+      if (formState.recipientAddress) {
+        paramsForDebounce.recipientAddress = formState.recipientAddress;
+      }
+      if (formState.assetId) paramsForDebounce.assetId = formState.assetId;
+      if (formState.amount) paramsForDebounce.amount = formState.amount;
 
-  const handleChangeFee = (newFee: number) => {
+      if (
+        paramsForDebounce.recipientAddress && paramsForDebounce.assetId &&
+        paramsForDebounce.amount && paramsForDebounce.feeRate > 0
+      ) {
+        calculateEstimatedFeesDebounced(paramsForDebounce, setFormState);
+      } else {
+        setFormState((prev) => ({
+          ...prev,
+          estimatedTxFees: prev.estimatedTxFees
+            ? { ...prev.estimatedTxFees, hasExactFees: false }
+            : null,
+        }));
+      }
+    }
+    return () => calculateEstimatedFeesDebounced.cancel();
+  }, [
+    isConnected,
+    wallet.address,
+    formState.recipientAddress,
+    formState.assetId,
+    formState.amount,
+    formState.fee,
+  ]);
+
+  const handleChangeFee = useCallback((newFee: number) => {
     setFormState((prev) => ({
       ...prev,
       fee: newFee,
       feeError: "",
     }));
-  };
+  }, [setFormState]);
 
   const validateForm = () => {
     let isValid = true;
@@ -86,26 +234,28 @@ export function useTransactionForm(
     return isValid;
   };
 
-  const handleSubmit = async (submitCallback: () => Promise<void>) => {
-    if (!walletContext.isConnected) {
+  const handleSubmit = async (
+    actualSubmitCallback: () => Promise<void>,
+  ) => {
+    if (!isConnected) {
       showConnectWalletModal.value = true;
       return;
     }
-
-    setError(null);
+    setSubmissionError(null);
     setSuccessMessage(null);
-
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     setIsSubmitting(true);
-
     try {
-      await submitCallback();
+      await actualSubmitCallback();
     } catch (err) {
-      console.error("Transaction error:", err);
-      setError(err instanceof Error ? err.message : "An error occurred");
+      const errorMsg = err instanceof Error
+        ? err.message
+        : "An error occurred during submission";
+      logger.error("ui", {
+        message: `Error in handleSubmit for ${type}`,
+        error: errorMsg,
+      });
+      setSubmissionError(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -117,8 +267,11 @@ export function useTransactionForm(
     handleChangeFee,
     handleSubmit,
     isSubmitting,
-    error,
-    setError,
+    error: submissionError,
+    setError: setSubmissionError,
+    apiError: formState.apiError,
+    setApiError: (msg: string | null) =>
+      setFormState((prev) => ({ ...prev, apiError: msg })),
     successMessage,
     setSuccessMessage,
     fetchFees,

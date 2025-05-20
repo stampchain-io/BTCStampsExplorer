@@ -8,29 +8,77 @@ const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
 const MEMPOOL_API_BASE_URL = "https://mempool.space/api";
 const BLOCKSTREAM_API_BASE_URL = "https://blockstream.info/api";
 
+async function fetchFromBlockstream(tx: string) {
+  const response = await fetch(`${BLOCKSTREAM_API_BASE_URL}/tx/${tx}`);
+  if (!response.ok) {
+    console.warn(
+      `Blockstream failed for tx ${tx}: ${response.status} ${response.statusText}`,
+    );
+    return null;
+  }
+  try {
+    return await response.json();
+  } catch (e) {
+    console.warn(`Blockstream failed to parse JSON for tx ${tx}:`, e);
+    return null;
+  }
+}
+
+async function fetchFromMempool(tx: string) {
+  const response = await fetch(`${MEMPOOL_API_BASE_URL}/tx/${tx}`);
+  if (!response.ok) {
+    console.warn(
+      `Mempool.space failed for tx ${tx}: ${response.status} ${response.statusText}`,
+    );
+    return null;
+  }
+  try {
+    return await response.json();
+  } catch (e) {
+    console.warn(`Mempool.space failed to parse JSON for tx ${tx}:`, e);
+    return null;
+  }
+}
+
 export async function getTxInfo(tx: string): Promise<number | string> {
-  const endpoint = `${BLOCKSTREAM_API_BASE_URL}/tx/${tx}`;
-  let timestamp: number | string = "N/A";
+  let data;
+  let apiUsed = "";
 
   try {
-    const response = await fetch(endpoint);
-    if (!response.ok) {
-      console.error(`Failed to fetch transaction data: ${response.statusText}`);
+    apiUsed = "Blockstream";
+    data = await fetchFromBlockstream(tx);
+
+    if (!data) {
+      apiUsed = "Mempool.space";
+      console.log(`getTxInfo: Falling back to Mempool.space for tx: ${tx}`);
+      data = await fetchFromMempool(tx);
+    }
+
+    if (!data) {
+      console.error(
+        `getTxInfo: Failed to fetch transaction data from all providers for tx: ${tx}`,
+      );
       return "N/A";
     }
 
-    const data = await response.json();
-    if (data.status && data.status.block_time) {
-      timestamp = data.status.block_time * 1000;
+    // Both Blockstream and Mempool.space have tx.status.block_time
+    if (data.status && typeof data.status.block_time === "number") {
+      return data.status.block_time * 1000; // Convert to milliseconds
     } else {
-      console.warn("Block time not found in the API response.");
+      console.warn(
+        `getTxInfo: Block time not found or invalid in API response from ${apiUsed} for tx: ${tx}. Response data:`,
+        data,
+      );
       return "N/A";
     }
   } catch (error) {
-    console.error("Error fetching transaction data:", error);
+    // This catch is for unexpected errors during the try block, not for fetch failures handled above.
+    console.error(
+      `getTxInfo: Unexpected error fetching transaction data for tx: ${tx} (last API attempted: ${apiUsed}):`,
+      error,
+    );
     return "N/A";
   }
-  return timestamp;
 }
 
 export function isValidBitcoinAddress(address: string): boolean {
@@ -126,17 +174,15 @@ function formatUTXOs(data: any[], address: string): UTXO[] | null {
         txid,
         vout,
         value,
-        address: address,
         script,
-        size: tx.size ?? estimateInputSize(script),
-        status: {
-          confirmed: tx.status?.confirmed ?? tx.confirmations > 0,
-          block_height: tx.status?.block_height ?? tx.block_height ?? undefined,
-          block_hash: tx.status?.block_hash ?? tx.block_hash ?? undefined,
-          block_time: tx.status?.block_time ??
-            (tx.confirmed ? new Date(tx.confirmed).getTime() : undefined),
-        },
-        index: tx.tx_index ?? vout,
+        vsize: tx.size ?? estimateInputSize(script),
+        ancestorCount: tx.ancestor_count,
+        ancestorSize: tx.ancestor_size,
+        ancestorFees: tx.ancestor_fees,
+        weight: tx.weight,
+        scriptType: tx.script_type,
+        scriptDesc: tx.script_desc,
+        coinbase: tx.is_coinbase,
       };
 
       console.debug("Formatted UTXO:", formattedUtxo);
@@ -420,16 +466,21 @@ Retries: ${retries}
             };
 
             const formattedUtxos = formatUTXOs([utxoData], address);
-            return {
-              utxo: formattedUtxos?.[0],
-              ancestor: includeAncestors
-                ? {
-                  fees: tx.ancestor_fees || 0,
-                  vsize: tx.ancestor_size || 0,
-                  effectiveRate: tx.effective_fee_rate || 0,
-                }
-                : undefined,
-            } as TxInfo;
+            console.debug(">>> MEMPOOL: Formatted UTXOs:", formattedUtxos);
+
+            const utxoValue = formattedUtxos?.[0];
+            const txInfoResult: TxInfo = {};
+            if (utxoValue) {
+              txInfoResult.utxo = utxoValue;
+            }
+            if (includeAncestors) {
+              txInfoResult.ancestor = {
+                fees: tx.ancestor_fees || 0,
+                vsize: tx.ancestor_size || 0,
+                effectiveRate: tx.effective_fee_rate || 0,
+              };
+            }
+            return txInfoResult;
           } else {
             // Bulk UTXO fetch - return all UTXOs
             const response = await fetch(
@@ -474,12 +525,14 @@ Retries: ${retries}
             const formattedUtxos = formatUTXOs([utxoData], address);
             console.debug(">>> BLOCKSTREAM: Formatted UTXOs:", formattedUtxos);
 
-            const result: TxInfo = {
-              utxo: formattedUtxos?.[0],
-            };
+            const utxoValueBs = formattedUtxos?.[0];
+            const resultBs: TxInfo = {};
+            if (utxoValueBs) {
+              resultBs.utxo = utxoValueBs;
+            }
 
             if (includeAncestors) {
-              result.ancestor = {
+              resultBs.ancestor = {
                 fees: tx.fee || 0,
                 vsize: tx.weight ? Math.ceil(tx.weight / 4) : 0,
                 effectiveRate: tx.fee && tx.weight
@@ -488,7 +541,7 @@ Retries: ${retries}
               };
             }
 
-            return result;
+            return resultBs;
           } else {
             const response = await fetch(
               `${BLOCKSTREAM_API_BASE_URL}/address/${address}/utxo`,
@@ -532,7 +585,12 @@ Retries: ${retries}
             const formattedUtxos = formatUTXOs([utxoData], address);
             console.debug(">>> BLOCKCHAIN: Formatted UTXOs:", formattedUtxos);
 
-            return { utxo: formattedUtxos?.[0] };
+            const utxoValueBc = formattedUtxos?.[0];
+            const resultBc: TxInfo = {};
+            if (utxoValueBc) {
+              resultBc.utxo = utxoValueBc;
+            }
+            return resultBc;
           } else {
             // Bulk UTXO fetch - return all UTXOs
             const response = await fetch(
@@ -586,7 +644,12 @@ Retries: ${retries}
             const formattedUtxos = formatUTXOs([utxoData], address);
             console.debug(">>> BLOCKCYPHER: Formatted UTXOs:", formattedUtxos);
 
-            return { utxo: formattedUtxos?.[0] };
+            const utxoValueBcy = formattedUtxos?.[0];
+            const resultBcy: TxInfo = {};
+            if (utxoValueBcy) {
+              resultBcy.utxo = utxoValueBcy;
+            }
+            return resultBcy;
           } else {
             // Bulk UTXO fetch - return all UTXOs
             const response = await fetch(

@@ -45,13 +45,16 @@ import { serverConfig } from "$server/config/config.ts";
 import { IPrepareSRC20TX, PSBTInput, VOUT } from "$types/index.d.ts";
 import * as msgpack from "msgpack";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { Psbt } from "npm:bitcoinjs-lib";
 
 export class SRC20MultisigPSBTService {
   private static readonly RECIPIENT_DUST = BigInt(789);
   private static readonly MULTISIG_DUST = BigInt(809);
   private static readonly CHANGE_DUST = BigInt(1000);
   private static readonly THIRD_PUBKEY = "020202020202020202020202020202020202020202020202020202020202020202";
+  private static commonUtxoService = new CommonUTXOService();
 
   static async preparePSBT({
     network,
@@ -62,11 +65,11 @@ export class SRC20MultisigPSBTService {
     enableRBF = true,
   }: IPrepareSRC20TX) {
     try {
-      console.log("Starting prepareSrc20TX");
+      logger.info("src20-psbt-service", { message: "Starting preparePSBT for Multisig SRC20" });
       const psbtNetwork = network === "testnet"
         ? bitcoin.networks.testnet
         : bitcoin.networks.bitcoin;
-      console.log("Using network:", psbtNetwork);
+      logger.debug("src20-psbt-service", { message: "Using network", network: psbtNetwork });
 
       const psbt = new bitcoin.Psbt({ network: psbtNetwork });
 
@@ -162,16 +165,13 @@ export class SRC20MultisigPSBTService {
 
       // Add inputs to PSBT
       for (const input of inputs) {
-        const txDetails = await QuicknodeService.getTransaction(input.txid);
-        if (!txDetails?.vout) throw new Error(`Transaction details not found for txid: ${input.txid}`);
-
-        const inputDetails = txDetails.vout[input.vout];
-        if (!inputDetails) throw new Error(`No vout found at index ${input.vout} for transaction ${input.txid}`);
-
-        const isWitnessUtxo = inputDetails.scriptPubKey?.type?.startsWith("witness");
-        if (typeof isWitnessUtxo === "undefined") {
-          throw new Error(`scriptPubKey.type is undefined for txid: ${input.txid}, vout: ${input.vout}`);
+        if (!input.script) {
+          logger.error("src20-psbt-service", { message: "Input UTXO is missing script for Multisig.", input });
+          throw new Error(`Input UTXO ${input.txid}:${input.vout} is missing script (scriptPubKey).`);
         }
+        const isWitnessUtxo = input.scriptType?.startsWith("witness") || 
+                              input.scriptType?.toUpperCase().includes("P2W") || 
+                              (input.scriptType === "P2SH" && input.redeemScriptType?.isWitness);
 
         const psbtInput: PSBTInput = {
           hash: input.txid,
@@ -181,14 +181,19 @@ export class SRC20MultisigPSBTService {
 
         if (isWitnessUtxo) {
           psbtInput.witnessUtxo = {
-            script: hex2bin(inputDetails.scriptPubKey.hex),
+            script: hex2bin(input.script),
             value: BigInt(input.value),
           };
         } else {
-          psbtInput.nonWitnessUtxo = hex2bin(txDetails.hex);
+          const rawTxHex = await SRC20MultisigPSBTService.commonUtxoService.getRawTransactionHex(input.txid);
+          if (!rawTxHex) {
+            logger.error("src20-psbt-service", { message: "Failed to fetch raw tx hex for non-witness input in Multisig", txid: input.txid });
+            throw new Error(`Failed to fetch raw transaction for non-witness input ${input.txid}`);
+          }
+          psbtInput.nonWitnessUtxo = hex2bin(rawTxHex);
         }
 
-        psbt.addInput(psbtInput);
+        psbt.addInput(psbtInput as any);
       }
 
       // Calculate total input and output values
@@ -228,8 +233,8 @@ export class SRC20MultisigPSBTService {
         });
       }
 
-      // Convert values to strings for logging
-      console.log("Final transaction details:", {
+      logger.debug("src20-psbt-service", {
+        message: "Final transaction details for Multisig PSBT", 
         inputs: inputs.map(utxo => ({
           ...utxo,
           value: BigInt(utxo.value).toString()
@@ -256,7 +261,7 @@ export class SRC20MultisigPSBTService {
         }),
       };
     } catch (error) {
-      console.error("Error in prepareSrc20TX:", error);
+      logger.error("src20-psbt-service", { message: "Error in preparePSBT for Multisig SRC20", error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }

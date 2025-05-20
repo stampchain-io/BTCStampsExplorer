@@ -8,6 +8,9 @@ interface SelectFieldProps {
   error?: string;
   disabled?: boolean;
   options: StampRow[];
+  value?: string | number | null;
+  placeholder?: string;
+  className?: string;
 }
 
 export function SelectField({
@@ -16,28 +19,36 @@ export function SelectField({
   error,
   disabled = false,
   options,
+  value,
+  placeholder,
+  className,
 }: SelectFieldProps) {
   return (
-    <div class="w-full">
+    <div class={`w-full ${className || ""}`}>
       <select
         onChange={onChange}
         onClick={onClick}
         disabled={disabled}
         class={inputField}
+        value={value?.toString() ?? ""}
       >
-        {options.length
+        {placeholder && (
+          <option value="" disabled={options.length > 0}>{placeholder}</option>
+        )}
+
+        {options.length > 0
           ? options.map((item) => (
             <option
-              key={item.tx_hash}
-              value={item.tx_hash}
+              key={item.tx_hash || item.cpid || item.stamp?.toString()}
+              value={item.stamp?.toString()}
               className="font-light uppercase"
             >
               #{item.stamp}
             </option>
           ))
-          : <option className="font-light uppercase">NO STAMPS</option>}
+          : !placeholder && <option value="" disabled>NO STAMPS</option>}
       </select>
-      {error && <p class="text-red-500 mt-2">{error}</p>}
+      {error && <p class="text-red-500 mt-2 text-xs">{error}</p>}
     </div>
   );
 }

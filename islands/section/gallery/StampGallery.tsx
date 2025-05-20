@@ -200,7 +200,7 @@ export default function StampGallery({
                 <Sort initSort={sortBy} />
               </div>
               <div>
-                <SearchStampModal showButton={true} />
+                <SearchStampModal showButton />
               </div>
             </div>
           )}

@@ -45,6 +45,7 @@ interface BlockCypherAddressBalanceResponse {
 export interface BTCBalance {
   confirmed: number;
   unconfirmed: number;
+  total: number;
   txCount?: number;
   unconfirmedTxCount?: number;
 }

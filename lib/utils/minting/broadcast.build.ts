@@ -9,9 +9,9 @@ import { logger } from "$lib/utils/logger.ts";
  * @param {string} _signedPsbtHex - The signed PSBT hex string (unused in stub)
  * @returns {Promise<string>} A dummy transaction ID for testing
  */
-export async function broadcastTransaction(
+export function broadcastTransaction(
   _signedPsbtHex: string,
-): Promise<string> {
+): string {
   // Check if we're in a build context
   const isBuild = Deno.args.includes("build");
 

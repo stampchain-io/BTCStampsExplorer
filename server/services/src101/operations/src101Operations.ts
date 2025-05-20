@@ -1,5 +1,6 @@
 import { SRC101Service } from "$server/services/src101/index.ts";
 import type { IDeploySRC101, IMintSRC101, ITransferSRC101, ISetrecordSRC101, IRenewSRC101, IPrepareSRC101TX } from "$types/index.d.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 interface SRC101Operation {
   op: string;
@@ -31,8 +32,12 @@ export class SRC101OperationService {
       const { psbtHex, inputsToSign } = await SRC101Service.MultisigPSBTService.preparePSBT(prepare);
       return { hex: psbtHex, inputsToSign };
     } catch (error) {
-      console.error(error);
-      return { error: error.message };
+      logger.error("src101-operation-service", {
+        message: "Error in executeSRC101Operation", 
+        error: error instanceof Error ? error.message : String(error),
+        params
+      });
+      return { error: error instanceof Error ? error.message : "Unknown error in SRC101 operation" };
     }
   }
 
