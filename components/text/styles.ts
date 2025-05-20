@@ -56,6 +56,8 @@ export const headingGreyLD =
   `font-bold text-xl gray-gradient1 tracking-wide inline-block w-fit relative ${cursor}`;
 export const headingGreyLDLink =
   `font-bold text-lg gray-gradient1-hover tracking-wide inline-block w-fit relative ${transition}`; // used in media page / keep reading in howto pages / accordion titles (custom code)
+export const headingGreyDLLink =
+  `font-bold text-lg gray-gradient3-hover tracking-wide inline-block w-fit relative -mt-1 ${transition}`; // used in collection and stamp detail pages
 export const headingGrey =
   "font-bold text-2xl text-stamp-grey cursor-default select-none"; // used in howto overview and detail pages / donate CTA
 export const headingPurpleLD =
@@ -175,6 +177,7 @@ export type TextStyles = {
   headingGrey2: string;
   headingGreyLD: string;
   headingGreyLDLink: string;
+  headingGreyDLLink: string;
   headingGrey: string;
   headingPurpleLD: string;
   // Body text styles
