@@ -14,6 +14,6 @@ export interface PaginatedResponse<T> {
 export interface PaginationProps {
   page: number;
   totalPages: number;
-  prefix: string;
+  prefix?: string;
   onPageChange?: (page: number) => void;
 }
