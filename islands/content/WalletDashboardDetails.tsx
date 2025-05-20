@@ -237,6 +237,7 @@ function WalletOverview(
           </h6>
         </div>
         <button
+          type="button"
           ref={balanceButtonRef}
           class="mb-7 mobileMd:mb-[34px]"
           onClick={() => {

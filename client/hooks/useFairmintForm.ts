@@ -19,6 +19,11 @@ interface FairmintFormState {
   BTCPrice: number;
   jsonSize: number;
   utxoAncestors?: AncestorInfo[];
+  psbtFeeDetails?: {
+    estMinerFee: number;
+    totalDustValue: number;
+    hasExactFees: boolean;
+  };
 }
 
 export function useFairmintForm(fairminters: any[]) {
@@ -134,21 +139,41 @@ export function useFairmintForm(fairminters: any[]) {
       });
 
       logger.debug("ui", {
-        message: "Received API response",
+        message: "Received API response from /api/v2/fairmint/compose",
         context: "useFairmintForm",
         response: response.data,
       });
 
-      const psbtBase64 = response.data?.result?.psbt;
+      // Populate psbtFeeDetails from the response
+      if (response.data?.result) {
+        setFormState((prev) => ({
+          ...prev,
+          psbtFeeDetails: {
+            estMinerFee: response.data.result.estimatedFee || 0,
+            totalDustValue: response.data.result.totalOutputValue &&
+                response.data.result.totalInputValue
+              ? Number(
+                BigInt(response.data.result.totalInputValue) -
+                  BigInt(response.data.result.totalOutputValue) -
+                  BigInt(response.data.result.estimatedFee || 0),
+              )
+              : 0,
+            hasExactFees: response.data.result.estimatedFee !== undefined,
+          },
+        }));
+      }
+
+      const psbtBase64 = response.data?.result?.psbtHex ||
+        response.data?.result?.psbt;
 
       if (!psbtBase64 || typeof psbtBase64 !== "string") {
         throw new Error("Invalid response from server: PSBT not found.");
       }
 
-      // Convert the PSBT from Base64 to Hex
+      // Convert the PSBT from Base64 to Uint8Array
       const psbtUint8Array = decodeBase64(psbtBase64);
-      const psbtHexArray = encodeHex(psbtUint8Array);
-      const psbtHex = new TextDecoder().decode(new Uint8Array(psbtHexArray));
+      // Convert Uint8Array to Hex String
+      const psbtHex = encodeHex(psbtUint8Array);
 
       logger.debug("ui", {
         message: "Processing PSBT",

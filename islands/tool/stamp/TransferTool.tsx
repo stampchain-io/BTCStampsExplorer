@@ -1,11 +1,10 @@
-/* ===== TRANSFER STAMP CONTENT COMPONENT ===== */
+/* ===== TRANSFER TOOL COMPONENT ===== */
 import { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { SelectField } from "../../form/SelectField.tsx";
-import { logger } from "$lib/utils/logger.ts";
 import type { StampRow } from "$globals";
 import {
   bodyTool,
@@ -27,6 +26,8 @@ interface Props {
 
 /* ===== COMPONENT ===== */
 export function StampTransferTool({}: Props) {
+  console.log("TRANSFERTOOL: Component rendering - TOP LEVEL");
+
   /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
 
@@ -65,6 +66,7 @@ export function StampTransferTool({}: Props) {
     error,
     setError,
     successMessage,
+    setSuccessMessage,
   } = useTransactionForm({
     type: "transfer",
     initialFee: 1,
@@ -125,13 +127,25 @@ export function StampTransferTool({}: Props) {
 
   // Reset loading state when selected stamp changes
   useEffect(() => {
-    setIsImageLoading(true);
-    setShowFallbackIcon(false); // Reset the fallback icon state
-
+    console.log(
+      "[TransferTool] Effect triggered by selectedStamp?.tx_hash change. New tx_hash:",
+      selectedStamp?.tx_hash,
+    );
     if (selectedStamp) {
-      setMaxQuantity(selectedStamp?.unbound_quantity);
+      console.log(
+        "[TransferTool] Effect: selectedStamp is present. Setting isImageLoading=true, showFallbackIcon=false.",
+      );
+      setIsImageLoading(true);
+      setShowFallbackIcon(false);
+      setMaxQuantity(selectedStamp.unbound_quantity);
+    } else {
+      console.log(
+        "[TransferTool] Effect: selectedStamp is null/undefined. Setting loader/fallback for empty state.",
+      );
+      setIsImageLoading(false); // No image to load
+      setShowFallbackIcon(true); // Show placeholder for no selection
     }
-  }, [selectedStamp]); // Watch the entire stamp object, not just tx_hash
+  }, [selectedStamp?.tx_hash]); // Depend on tx_hash (or a unique ID) instead of the whole object
 
   // Add at the top level of the component
   useEffect(() => {
@@ -144,8 +158,8 @@ export function StampTransferTool({}: Props) {
 
   /* ===== EVENT HANDLERS ===== */
   const handleStampSelect = (e: Event) => {
-    e.preventDefault(); // Prevent form submission
-    e.stopPropagation(); // Stop event bubbling
+    e.preventDefault();
+    e.stopPropagation();
 
     const value = (e.currentTarget as HTMLSelectElement).value;
     const selectedItem = stamps.data.find(
@@ -153,23 +167,26 @@ export function StampTransferTool({}: Props) {
     );
 
     if (selectedItem) {
-      console.log("Selected new stamp:", {
-        stamp: selectedItem.stamp,
-        url: selectedItem.stamp_url,
-        time: new Date().toISOString(),
-      });
+      console.log(
+        "[TransferTool] handleStampSelect: New item selected from dropdown",
+        {
+          stamp_id: selectedItem.stamp,
+          tx_hash: selectedItem.tx_hash,
+          currentIsImageLoadingState: isImageLoading,
+          currentShowFallbackState: showFallbackIcon,
+        },
+      );
 
-      // Create a fresh copy of the stamp object to ensure React detects the change
+      // Set loading to true FIRST to ensure UI shows loader before src changes
+      setIsImageLoading(true);
+      setShowFallbackIcon(false);
       setSelectedStamp({ ...selectedItem });
+
       setFormState((prev) => ({
         ...prev,
         stampId: selectedItem.stamp,
         cpid: selectedItem.cpid,
       }));
-
-      // Explicitly reset image states
-      setIsImageLoading(true);
-      setShowFallbackIcon(false);
     }
   };
 
@@ -184,20 +201,150 @@ export function StampTransferTool({}: Props) {
   };
 
   const handleTransferSubmit = async () => {
+    console.log("TRANSFERTOOL: handleTransferSubmit Fired!");
     try {
-      await logger.debug("stamps", {
-        message: "Starting transfer submit",
+      console.log("TRANSFERTOOL: Starting transfer submit", {
         selectedStamp,
         formState,
         quantity,
       });
-      await handleSubmit(() => Promise.resolve());
+
+      await handleSubmit(async () => {
+        console.log("TRANSFERTOOL: handleSubmit's actualSubmitCallback Fired!");
+        if (!selectedStamp) {
+          console.error("TRANSFERTOOL: Transfer failed - no stamp selected");
+          throw new Error("Please select a stamp to transfer.");
+        }
+        if (!wallet?.address) {
+          console.error("TRANSFERTOOL: Transfer failed - no wallet connected");
+          throw new Error("No wallet connected.");
+        }
+        if (
+          !formState.recipientAddress ||
+          typeof formState.recipientAddress !== "string" ||
+          !formState.recipientAddress.trim()
+        ) {
+          console.error(
+            "TRANSFERTOOL: Invalid or empty formState.recipientAddress",
+            formState.recipientAddress,
+          );
+          throw new Error(
+            "Recipient address is required and must be a valid string.",
+          );
+        }
+        console.log(
+          "TRANSFERTOOL: Value of formState.recipientAddress BEFORE creating requestBody:",
+          formState.recipientAddress,
+        );
+        if (!quantity || quantity <= 0) {
+          console.error("TRANSFERTOOL: Transfer failed - invalid quantity", {
+            quantity,
+          });
+          throw new Error("Invalid quantity specified.");
+        }
+
+        const feeRateKB = formState.fee * 1000; // Assuming formState.fee is in sat/vB
+
+        const requestBody = {
+          address: wallet.address,
+          destination: formState.recipientAddress,
+          asset: selectedStamp.cpid,
+          quantity: quantity,
+          satsPerVB: formState.fee,
+          options: {
+            return_psbt: true,
+            fee_per_kb: feeRateKB,
+            allow_unconfirmed_inputs: true, // Or your preferred setting
+            // Add other necessary options based on XcpManager.composeSend or similar
+          },
+        };
+
+        console.log(
+          "TRANSFERTOOL: Preparing stamp transfer request (TransferTool)",
+          {
+            satsPerVB_being_sent: formState.fee,
+            requestBody_being_sent: requestBody,
+            endpoint: "/api/v2/create/send",
+          },
+        );
+        console.log(
+          "TRANSFERTOOL: About to fetch /api/v2/create/send. Body (stringified):",
+          JSON.stringify(requestBody),
+        );
+
+        const response = await fetch("/api/v2/create/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody),
+        });
+        console.log(
+          "TRANSFERTOOL: Response received from /api/v2/create/send. Status:",
+          response.status,
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({
+            error: "Failed to parse error from server on non-ok response",
+          }));
+          console.error("TRANSFERTOOL: Error from /api/v2/create/send", {
+            status: response.status,
+            errorData,
+          });
+          throw new Error(errorData.error || "API call failed");
+        }
+        const responseData = await response.json();
+        console.log("TRANSFERTOOL: Response JSON parsed:", responseData);
+
+        if (!responseData?.psbtHex || !responseData?.inputsToSign) {
+          console.error(
+            "TRANSFERTOOL: Invalid response structure from /api/v2/create/send",
+            { responseData },
+          );
+          throw new Error(
+            "Invalid response from server: Missing psbtHex or inputsToSign.",
+          );
+        }
+
+        console.log("TRANSFERTOOL: About to call walletContext.signPSBT", {
+          psbtHex: responseData.psbtHex,
+          inputsToSign: responseData.inputsToSign,
+        });
+        const signResult = await walletContext.signPSBT(
+          wallet,
+          responseData.psbtHex,
+          responseData.inputsToSign,
+          true,
+        );
+        console.log("TRANSFERTOOL: signPSBT result:", signResult);
+
+        if (signResult.signed && signResult.txid) {
+          console.log(
+            "TRANSFERTOOL: Transfer successful! TXID:",
+            signResult.txid,
+          );
+          setSuccessMessage(`Transfer successful! TXID: ${signResult.txid}`);
+        } else if (signResult.cancelled) {
+          console.warn(
+            "TRANSFERTOOL: Stamp transfer signing was cancelled by user",
+          );
+          throw new Error("Transaction signing was cancelled.");
+        } else {
+          console.error(
+            "TRANSFERTOOL: Failed to sign PSBT for stamp transfer",
+            { error: signResult.error },
+          );
+          throw new Error(`Failed to sign transaction: ${signResult.error}`);
+        }
+      });
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError(String(error)); // Fallback in case it's not an instance of Error
-      }
+      console.error(
+        "TRANSFERTOOL: Error in handleTransferSubmit outer scope:",
+        error,
+      );
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
+      setError(errorMessage);
     }
   };
 
@@ -215,62 +362,73 @@ export function StampTransferTool({}: Props) {
       );
     }
 
-    // Use the /s/ endpoint with transaction hash for proper recursive stamp rendering
-    // Add cache-busting timestamp parameter to force a fresh image load
     const timestamp = Date.now();
     const stampUrl = `/s/${selectedStamp.tx_hash}?t=${timestamp}`;
 
-    // Debug logging
-    console.log("Rendering stamp:", {
+    console.log("Rendering stamp (renderStampContent call):", {
       stamp_id: selectedStamp.stamp,
       tx_hash: selectedStamp.tx_hash,
       url: stampUrl,
-      timestamp,
+      isImageLoadingState: isImageLoading,
+      showFallbackIconState: showFallbackIcon,
     });
 
     return (
       <div class="relative w-full h-full">
+        {/* <div class="relative w-full h-full flex items-center justify-center bg-stamp-grey rounded"> */}
+        {/* Image - always rendered, visibility controlled by class */}
+        <img
+          key={`stamp-${selectedStamp.tx_hash}`}
+          src={stampUrl}
+          alt={`Stamp #${selectedStamp.stamp}`}
+          class={`w-full h-full object-contain pixelart transition-opacity duration-300 ${
+            (isImageLoading || showFallbackIcon) ? "opacity-0" : "opacity-100"
+          }`}
+          onLoad={() => {
+            console.log("[TransferTool] Image loaded successfully:", stampUrl);
+            setIsImageLoading(false);
+            setShowFallbackIcon(false);
+          }}
+          onError={(_e) => {
+            console.error("[TransferTool] Image failed to load:", stampUrl, _e);
+            setIsImageLoading(false);
+            setShowFallbackIcon(true);
+          }}
+        />
+
+        {/* Loader - shown when isImageLoading is true */}
         {isImageLoading && (
           <div class="absolute inset-0 flex items-center justify-center">
             <div class={loaderSpinGrey} />
           </div>
         )}
-        {showFallbackIcon
-          ? (
-            <div class="flex items-center justify-center w-full h-full">
-              <Icon
-                type="icon"
-                name="image"
-                weight="normal"
-                size="xxl"
-                color="grey"
-              />
-            </div>
-          )
-          : (
-            <img
-              key={`stamp-${selectedStamp.tx_hash}-${timestamp}`}
-              src={stampUrl}
-              alt={`Stamp #${selectedStamp.stamp}`}
-              class={`w-full h-full object-contain pixelart transition-opacity duration-300 ${
-                isImageLoading ? "opacity-0" : "opacity-100"
-              }`}
-              onLoad={() => {
-                console.log("Image loaded successfully:", stampUrl);
-                setIsImageLoading(false);
-              }}
-              onError={(e) => {
-                console.error("Image failed to load:", stampUrl);
-                setIsImageLoading(false);
-                setShowFallbackIcon(true);
-              }}
+
+        {/* Fallback Icon - shown if !isImageLoading and showFallbackIcon is true */}
+        {!isImageLoading && showFallbackIcon && (
+          <div class="absolute inset-0 flex items-center justify-center w-full h-full">
+            <Icon
+              type="icon"
+              name="image"
+              weight="normal"
+              size="xxl"
+              color="grey"
             />
-          )}
+          </div>
+        )}
       </div>
     );
   };
 
-  // Duplicate effect removed - using the one defined above
+  // Log props before rendering FeeCalculatorSimple
+  console.log("TRANSFERTOOL: Props for FeeCalculatorSimple:", {
+    isSubmitting,
+    tosAgreed,
+    userAddress: wallet?.address || "",
+    buttonName_prop_to_fee_calc: wallet?.address
+      ? "TRANSFER"
+      : "CONNECT WALLET",
+    formState_fee_for_fee_calc: formState.fee,
+  });
 
   /* ===== RENDER ===== */
   return (
@@ -282,7 +440,9 @@ export function StampTransferTool({}: Props) {
         class={`${containerBackground} mb-6`}
         onSubmit={(e) => {
           e.preventDefault();
-          handleTransferSubmit();
+          // If we want the form submit to also try, but FeeCalc is primary:
+          // console.log("FORM SUBMIT (TransferTool): onSubmit triggered!");
+          // handleTransferSubmit();
         }}
         aria-label="Transfer stamp"
         novalidate
@@ -296,6 +456,7 @@ export function StampTransferTool({}: Props) {
             <SelectField
               options={stamps.data}
               onChange={handleStampSelect}
+              value={selectedStamp?.stamp?.toString() ?? null}
             />
 
             <div class="flex w-full justify-end items-center gap-5">
@@ -322,11 +483,17 @@ export function StampTransferTool({}: Props) {
         <div class={rowForm}>
           <input
             value={formState.recipientAddress}
-            onInput={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+            onInput={(e: JSX.TargetedEvent<HTMLInputElement>) => {
+              const newValue = e.currentTarget.value;
+              console.log(
+                "TRANSFERTOOL: Recipient Address Input onInput. New value:",
+                newValue,
+              );
               setFormState((prev) => ({
                 ...prev,
-                recipientAddress: e.currentTarget.value,
-              }))}
+                recipientAddress: newValue,
+              }));
+            }}
             placeholder="Recipient address"
             class={inputField}
             aria-label="Recipient address"
@@ -342,7 +509,12 @@ export function StampTransferTool({}: Props) {
           type="transfer"
           BTCPrice={formState.BTCPrice}
           isSubmitting={isSubmitting}
-          onSubmit={handleTransferSubmit}
+          onSubmit={() => {
+            console.log(
+              "FEE_CALCULATOR_SUBMIT (TransferTool): onSubmit triggered!",
+            );
+            handleTransferSubmit();
+          }}
           buttonName={wallet?.address ? "TRANSFER" : "CONNECT WALLET"}
           userAddress={wallet?.address || ""}
           inputType="P2WPKH"
@@ -352,7 +524,7 @@ export function StampTransferTool({}: Props) {
           fromPage="stamp_transfer"
           stampTransferDetails={{
             address: formState.recipientAddress || "",
-            stamp: selectedStamp?.stamp || "",
+            stamp: selectedStamp?.stamp?.toString() || "",
             editions: quantity || 0,
           }}
         />

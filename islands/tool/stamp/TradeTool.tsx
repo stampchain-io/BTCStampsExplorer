@@ -609,6 +609,7 @@ export function StampTradeTool() {
                 </div>
                 {availableAssets.map((asset) => (
                   <button
+                    type="button"
                     key={asset.cpid}
                     onClick={() => handleAssetSelection(asset)}
                     className="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-red-500 last:border-b-0"
@@ -696,6 +697,7 @@ export function StampTradeTool() {
                 </div>
                 {availableUtxos.map((utxo) => (
                   <button
+                    type="button"
                     key={`${utxo.txid}:${utxo.vout}`}
                     onClick={() => handleUtxoSelection(utxo)}
                     className="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-gray-700 last:border-b-0"

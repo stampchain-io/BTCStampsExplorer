@@ -1,61 +1,57 @@
 import { useCallback, useEffect, useState } from "preact/hooks";
-import { getCurrentBlock, getRecommendedFees } from "$lib/utils/mempool.ts";
+import axiod from "axiod"; // For making HTTP requests
 
-interface Fees {
-  economyFee: number;
-  fastestFee: number;
-  halfHourFee: number;
-  hourFee: number;
-  recommendedFee: number; // Keep this spelling to match previous usage
-  block: number;
-  _economyFee: number;
-  _fastestFee: number;
-  _halfHourFee: number;
-  _hourFee: number;
+// Simplified interface to match /api/internal/fees response
+interface PolledFeeData {
+  recommendedFee: number;
+  btcPrice: number;
+  // We can also include the debug_feesResponse if needed for deeper client-side debugging
+  debug_feesResponse?: any;
 }
 
 export const useFeePolling = (intervalDuration = 300000) => {
-  const [fees, setFees] = useState<Fees | null>(null);
+  // State now holds PolledFeeData or null
+  const [fees, setFees] = useState<PolledFeeData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchFees = useCallback(async () => {
+  const fetchFeesAndPrice = useCallback(async () => {
+    setLoading(true); // Set loading true at the start of a fetch attempt
     try {
-      const newFees = await getRecommendedFees();
-      const block = await getCurrentBlock();
-
-      if (newFees && block) {
-        const allFees: Fees = {
-          ...newFees,
-          _economyFee: newFees.economyFee,
-          _fastestFee: newFees.fastestFee,
-          _halfHourFee: newFees.halfHourFee,
-          _hourFee: newFees.hourFee,
-          economyFee: newFees.economyFee,
-          fastestFee: newFees.fastestFee,
-          recommendedFee: newFees.minimumFee,
-          block: block,
-        };
-        setFees(allFees);
+      const response = await axiod.get<PolledFeeData>("/api/internal/fees");
+      if (response.data && typeof response.data.recommendedFee === "number") {
+        setFees(response.data);
+      } else {
+        // Handle cases where data might be missing or not as expected
+        console.error(
+          "Error fetching or parsing fees: Invalid data structure received",
+          response.data,
+        );
+        // Optionally set fees to a default error state or keep previous state
+        // For now, we'll set to null to indicate an issue if data is invalid
+        setFees(null);
       }
-      setLoading(false);
     } catch (error) {
-      console.error("Error fetching fees:", error);
+      console.error("Error fetching fees from /api/internal/fees:", error);
+      setFees(null); // Set to null or a default error state on fetch failure
+    } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchFees();
-    const intervalId = setInterval(fetchFees, intervalDuration);
+    fetchFeesAndPrice(); // Initial fetch
+    const intervalId = setInterval(fetchFeesAndPrice, intervalDuration);
 
-    return () => clearInterval(intervalId);
-  }, [fetchFees, intervalDuration]);
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
+  }, [fetchFeesAndPrice, intervalDuration]);
 
+  // The returned object now directly provides recommendedFee and btcPrice from the API
   return {
-    fees,
+    fees, // This object contains recommendedFee and btcPrice
     loading,
-    fetchFees,
-    satsPerVB: fees?.minimumFee,
-    satsPerKB: fees?.minimumFee * 1000,
+    fetchFees: fetchFeesAndPrice, // Expose the renamed fetch function
+    // satsPerVB and satsPerKB can be derived directly from fees.recommendedFee if needed by consumers
+    // For example, if a component needs satsPerVB:
+    // const satsPerVB = fees?.recommendedFee;
   };
 };

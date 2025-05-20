@@ -82,7 +82,10 @@ export function SearchSRC20Modal({
           results={searchState.value.results || []}
           inputRef={inputRef}
           onSearch={handleSearch}
-          autoFocus={true}
+          setError={(error) => {
+            searchState.value = { ...searchState.value, error };
+          }}
+          autoFocus
         />
       </ModalSearchBase>
     );
@@ -139,6 +142,7 @@ function SearchContent({
   results: Array<{ tick: string }>;
   inputRef: preact.RefObject<HTMLInputElement>;
   onSearch: () => void;
+  setError: (error: string) => void;
   autoFocus?: boolean;
 }) {
   // Auto-focus effect

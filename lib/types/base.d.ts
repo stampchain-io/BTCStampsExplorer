@@ -15,6 +15,8 @@ export interface UTXO {
   coinbase?: boolean;
 }
 
+export type BasicUTXO = Pick<UTXO, "txid" | "vout" | "value">;
+
 export interface AncestorInfo {
   fees: number;
   vsize: number;
@@ -67,9 +69,11 @@ export type ScriptType = "P2PKH" | "P2WPKH" | "P2WSH" | "P2SH" | "P2TR";
 
 export interface FeeDetails {
   minerFee: number;
-  dustValue: number;
-  hasExactFees: boolean;
-  totalValue?: number;
+  serviceFee?: number;
+  itemPrice?: number;
+  totalValue: number;
+  hasExactFees?: boolean;
+  dustValue?: number;
   effectiveFeeRate?: number;
   estimatedSize?: number;
   totalVsize?: number;
@@ -116,9 +120,9 @@ export interface SimpleFeeCalculatorProps
   type: "send" | "transfer" | "buy" | "src20";
   _type?: string;
   amount?: number;
-  recipientAddress?: string;
-  userAddress?: string;
-  inputType?: ScriptType;
+  _recipientAddress?: string;
+  _userAddress?: string;
+  _inputType?: ScriptType;
   outputTypes?: ScriptType[];
   utxoAncestors?: AncestorInfo[];
   bitname?: string;
@@ -129,6 +133,9 @@ export interface SimpleFeeCalculatorProps
   ticker?: string;
   limit?: number;
   supply?: number;
+  transferDetails?: TransferDetails;
+  mintDetails?: MintDetails;
+  serviceFeeSats?: number;
 }
 
 export interface AdvancedFeeCalculatorProps extends BaseFeeCalculatorProps {

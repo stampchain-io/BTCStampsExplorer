@@ -418,7 +418,7 @@ export class StampController {
         this.getMultipleStampCategories([
           { idents: ["STAMP", "SRC-721"], limit: 8, type: "stamps", sortBy: "DESC" },
           { idents: ["SRC-721"], limit: 12, type: "stamps", sortBy: "DESC"  },
-          { idents: ["STAMP"], limit: 20, type: "stamps", sortBy: "DESC" }, // Art stamps with DESC order
+          { idents: ["STAMP"], limit: 24, type: "stamps", sortBy: "DESC" }, // Art stamps with DESC order
         ]),
         CollectionController.getCollectionStamps({
           limit: 4,

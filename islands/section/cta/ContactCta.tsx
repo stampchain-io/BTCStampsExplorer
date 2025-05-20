@@ -16,8 +16,9 @@ const ContactCta = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   /* ===== EVENT HANDLERS ===== */
-  const handleSubmit = async (e: Event) => {
+  const handleSubmit = (e: Event) => {
     e.preventDefault();
+    // Basic validation
     setIsSubmitting(true);
     setError(
       "Contact form is not setup properly - leave a message on Telegram instead",

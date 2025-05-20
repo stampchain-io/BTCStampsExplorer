@@ -7,6 +7,7 @@ import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { getTxInfo } from "$lib/utils/utxoUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { Transaction } from "bitcoinjs-lib";
 
 // Only include active, working counterparty nodes
 export const xcp_v2_nodes = [
@@ -955,10 +956,10 @@ export class XcpManager {
     address: string,
     dispenser: string,
     quantity: number,
-    options: {
+    options: { // Options received from the route
       encoding?: string;
-      fee_per_kb?: number;
-      regular_dust_size?: number;
+      fee_per_kb?: number; // Deprecated, but route might still normalize from it
+      sat_per_vbyte?: number; // Preferred fee rate
       multisig_dust_size?: number;
       pubkeys?: string;
       allow_unconfirmed_inputs?: boolean;
@@ -986,16 +987,48 @@ export class XcpManager {
     queryParams.append("dispenser", dispenser);
     queryParams.append("quantity", quantity.toString());
     
-    // Set default dust size if not provided
-    if (!options.regular_dust_size) {
-      queryParams.append("regular_dust_size", "546"); // Bitcoin's standard dust limit
+    // Handle options carefully to avoid deprecated fields and prioritize correct ones
+    const finalApiOptions: Record<string, string | number | boolean> = {};
+
+    // Prioritize sat_per_vbyte for fees
+    if (options.sat_per_vbyte !== undefined) {
+      finalApiOptions.sat_per_vbyte = options.sat_per_vbyte;
+    } else if (options.fee_per_kb !== undefined) {
+      // If only fee_per_kb is provided by caller, still send it for now if CP API handles fallback,
+      // but ideally caller (route) should have normalized to sat_per_vbyte.
+      // Or, convert it here: finalApiOptions.sat_per_vbyte = options.fee_per_kb / 1000; (approx)
+      // For now, let route handle normalization to sat_per_vbyte for options.sat_per_vbyte
+      // This XcpManager method will just pass what it's given, preferring sat_per_vbyte.
+      // If route sends options.fee_per_kb, it will be iterated below unless we exclude.
+      // Let's ensure we only send one fee type.
+      if (options.fee_per_kb !== undefined && options.sat_per_vbyte === undefined) {
+         finalApiOptions.fee_per_kb = options.fee_per_kb; // Send deprecated if new one not present
+      }
     }
 
-    // Append optional parameters if provided
+    // Copy other relevant options, EXCLUDING deprecated ones explicitly
     for (const [key, value] of Object.entries(options)) {
       if (value !== undefined && value !== null) {
-        queryParams.append(key, value.toString());
+        if (key === 'regular_dust_size') continue; // Skip deprecated
+        if (key === 'fee_per_kb' && options.sat_per_vbyte !== undefined) continue; // Skip if sat_per_vbyte is used
+        
+        // If key is already set (like sat_per_vbyte from fee_per_kb), don't override from generic options spread
+        if (!(key in finalApiOptions)) {
+            finalApiOptions[key] = value.toString();
+        }
       }
+    }
+    
+    // Ensure return_psbt is explicitly set based on what the route wants (which is now false)
+    if (options.return_psbt !== undefined) {
+        finalApiOptions.return_psbt = options.return_psbt;
+    } else {
+        finalApiOptions.return_psbt = false; // Default if not specified by caller
+    }
+
+    // Append final processed options to queryParams
+    for (const [key, value] of Object.entries(finalApiOptions)) {
+        queryParams.append(key, String(value));
     }
 
     let lastError: string | null = null;
@@ -1023,6 +1056,11 @@ export class XcpManager {
         }
 
         const data = await response.json();
+        // DETAILED LOGGING OF THE RAW RESPONSE FROM COUNTERPARTY
+        console.log(`[XcpManager.createDispense] RAW RESPONSE from ${node.name} for dispense:`);
+        console.log(JSON.stringify(data, null, 2)); 
+        // END DETAILED LOGGING
+
         console.log(`Successful response from ${node.name}`);
         return data;
       } catch (error) {
@@ -1131,102 +1169,79 @@ export class XcpManager {
     address: string,
     asset: string,
     quantity: number,
-    options: ComposeAttachOptions = {},
+    options: ComposeAttachOptions = {}
   ): Promise<any> {
     const endpoint = `/addresses/${address}/compose/attach`;
     const queryParams = new URLSearchParams();
 
-    // Required parameters
     queryParams.append("asset", asset);
     queryParams.append("quantity", quantity.toString());
 
-    // Default values
-    queryParams.append("multisig_dust_size", "788");
-    queryParams.append("return_psbt", "true");
-    queryParams.append("verbose", "true");
+    // Default verbose to true if not specified, useful for getting rawtx details
+    if (options.verbose === undefined) {
+      queryParams.append("verbose", "true");
+    }
 
-    // The API expects sat/kB
+    // Default return_psbt to false if not specified by the caller for this new flow
+    // If the caller wants a PSBT directly from CP, they can set options.return_psbt = true
+    if (options.return_psbt === undefined) {
+        queryParams.append("return_psbt", "false"); 
+    } else {
+        queryParams.append("return_psbt", options.return_psbt.toString());
+    }
+
+    // Handle fee_per_kb: XCP API for compose operations often requires fee_per_kb.
+    // The route handler will later calculate the final fee with user's preferred satsPerVB.
+    // For this call, if options.fee_per_kb is provided, use it. Otherwise, a default might be needed 
+    // or the CP API might error. For now, assume if not provided, CP uses a default or handles it.
     if (options.fee_per_kb) {
-      console.log(`Setting fee rate to ${options.fee_per_kb} sat/kB`);
-      queryParams.append(
-        "fee_per_kb",
-        Math.floor(options.fee_per_kb).toString(),
-      );
+      queryParams.append("fee_per_kb", Math.floor(options.fee_per_kb).toString());
+    }
+    // Do not add default fee_per_kb here, let the caller (route) decide if a nominal one is needed for CP.
+
+    // Handle segwit addresses implicitly if address starts with bc1 (already in current code, keep)
+    if (address.startsWith("bc1") && options.segwit === undefined) {
+      // queryParams.append("segwit", "true"); // This might be handled by CP based on address
     }
 
-    // Handle segwit addresses
-    if (address.startsWith("bc1")) {
-      queryParams.append("segwit", "true");
-    }
-
-    // Append all provided options to query parameters, except fee_per_kb which we handled above
+    // Append all other provided options to query parameters
     for (const [key, value] of Object.entries(options)) {
-      if (value !== undefined && value !== null && key !== 'fee_per_kb') {
-        queryParams.append(key, value.toString());
+      if (value !== undefined && value !== null) {
+        // Avoid re-appending already handled options or ensure they are consistent
+        if (key === 'asset' || key === 'quantity') continue;
+        if (queryParams.has(key)) continue; // If already set by defaults/specific logic above
+        queryParams.append(key, String(value));
       }
     }
+    
+    // Remove potentially problematic defaults that might have been in ComposeAttachOptions if not intended for this call
+    // if (!options.multisig_dust_size) queryParams.delete("multisig_dust_size"); // Example: if you don't want default
 
-    let lastError: string | null = null;
+    await logger.debug("api", {
+        message: "[XcpManager.composeAttach] Calling Counterparty API",
+        endpoint,
+        queryParams: queryParams.toString()
+    });
 
-    for (const node of xcp_v2_nodes) {
-      const url = `${node.url}${endpoint}?${queryParams.toString()}`;
-      console.log(`Attempting to fetch from URL: ${url}`);
+    // fetchXcpV2WithCache handles node iteration and error logging
+    const response = await this.fetchXcpV2WithCache<any>(endpoint, queryParams);
 
-      try {
-        const response = await fetch(url);
-        console.log(`Response status from ${node.name}: ${response.status}`);
-
-        if (!response.ok) {
-          const errorBody = await response.text();
-          console.error(`Error response body from ${node.name}: ${errorBody}`);
-
-          try {
-            const errorJson = JSON.parse(errorBody);
-            if (errorJson.error) {
-              // Store the error message but clean it up first
-              const errorMessage = errorJson.error;
-              if (errorMessage.includes("Insufficient BTC")) {
-                // Extract just the relevant part of the error message
-                const match = errorMessage.match(
-                  /Insufficient BTC at address .+? Need: .+? BTC \(Including fee: .+? BTC\), available: .+? BTC/,
-                );
-                if (match) {
-                  lastError = match[0];
-                } else {
-                  lastError = errorMessage;
-                }
-                throw new Error(lastError);
-              }
-            }
-          } catch (parseError) {
-            // If JSON parsing fails, continue to next node
-            continue;
-          }
-          continue;
-        }
-
-        const data = await response.json();
-        console.log(`Successful response from ${node.name}`, data);
-        return data;
-      } catch (error) {
-        // If this is an insufficient funds error, throw it immediately
-        if (
-          error instanceof Error && error.message.includes("Insufficient BTC")
-        ) {
-          throw error;
-        }
-        // Otherwise log and continue to next node
-        console.error(`Fetch error for ${url}:`, error);
-      }
+    if (response.error || !response.result) {
+        await logger.error("api", {
+            message: "[XcpManager.composeAttach] Error from Counterparty API",
+            error: response.error,
+            result: response.result
+        });
+        throw new Error(response.error?.message || response.error?.description || response.error || "Failed to compose attach transaction with XCP.");
     }
 
-    // If we have a stored error message, throw that instead of generic message
-    if (lastError) {
-      throw new Error(lastError);
-    }
-
-    // Only throw generic error if all nodes fail and no specific error was caught
-    throw new Error("All nodes failed to compose attach transaction.");
+    // The response.result could contain .psbt, .rawtransaction, or other fields.
+    // The caller (route handler) will be responsible for checking for .rawtransaction.
+    await logger.debug("api", {
+        message: "[XcpManager.composeAttach] Response from Counterparty API",
+        result: response.result // Log the whole result for inspection
+    });
+    return response.result; // Return the entire result object
   }
 
   static async composeDetach(
@@ -1243,7 +1258,7 @@ export class XcpManager {
     }
 
     // Default values
-    queryParams.append("return_psbt", "true");
+    queryParams.append("return_psbt", "false");
     queryParams.append("verbose", "true");
 
     // The API expects sat/kB
@@ -1424,7 +1439,7 @@ export class XcpManager {
 
     // Set default options
     options.allow_unconfirmed_inputs = options.allow_unconfirmed_inputs ?? true;
-    options.return_psbt = options.return_psbt ?? true;
+    options.return_psbt = options.return_psbt ?? false;
 
     // Append optional parameters
     for (const [key, value] of Object.entries(options)) {

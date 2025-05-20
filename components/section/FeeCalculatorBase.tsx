@@ -2,11 +2,14 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { logger } from "$lib/utils/logger.ts";
 import {
-  formatBTCAmount,
   formatSatoshisToBTC,
   formatSatoshisToUSD,
 } from "$lib/utils/formatUtils.ts";
-import type { BaseFeeCalculatorProps } from "$lib/types/base.d.ts";
+import type {
+  BaseFeeCalculatorProps,
+  FeeDetails,
+  MintDetails,
+} from "$lib/types/base.d.ts";
 import { tooltipButton, tooltipImage } from "$notification";
 import {
   buttonPurpleFlat,
@@ -27,8 +30,7 @@ interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   fileType?: string | undefined;
   fileSize?: number | undefined;
   issuance?: number | undefined;
-  serviceFee?: number;
-  bitname?: string;
+  bitname: string | undefined;
   amount?: number;
   receive?: number;
   fromPage?: string;
@@ -37,13 +39,6 @@ interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   ticker?: string;
   limit?: number;
   supply?: number;
-  transferDetails?: {
-    address: string;
-    token: string;
-    amount: number;
-    stamp?: string;
-    editions?: number;
-  };
   src20TransferDetails?: {
     address: string;
     token: string;
@@ -55,6 +50,9 @@ interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
     editions: number;
   };
   dec?: number;
+  onTosChange?: (agreed: boolean) => void;
+  feeDetails?: FeeDetails;
+  mintDetails?: MintDetails;
 }
 
 export function FeeCalculatorBase({
@@ -70,13 +68,6 @@ export function FeeCalculatorBase({
   tosAgreed = false,
   onTosChange = () => {},
   feeDetails,
-  transferDetails = {
-    address: "",
-    token: "",
-    amount: 0,
-    stamp: "",
-    editions: 0,
-  },
   mintDetails,
   isModal = false,
   disabled = false,
@@ -86,16 +77,15 @@ export function FeeCalculatorBase({
   fileType,
   fileSize,
   issuance,
-  serviceFee = 0,
   bitname,
-  amount = 0, //Donate Amount
-  receive = 0, // Donate receive
+  amount: _amount = 0,
+  receive = 0,
   fromPage = "",
-  price = 0, // Stamp Buy
-  edition = 0, // Stamp Buy
-  ticker = "", // SRC20 Deploy
-  limit = 0, // SRC20 Deploy
-  supply = 0, // SRC20 Deploy
+  price: _price = 0,
+  edition = 0,
+  ticker = "",
+  limit = 0,
+  supply = 0,
   src20TransferDetails = {
     address: "",
     token: "",
@@ -289,7 +279,7 @@ export function FeeCalculatorBase({
     return (
       <div
         className={`transition-all duration-300 ease-in-out overflow-hidden ${
-          visible ? "max-h-[180px] opacity-100" : "max-h-0 opacity-0"
+          visible ? "max-h-[220px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <div className="gap-1 mt-1.5">
@@ -348,26 +338,18 @@ export function FeeCalculatorBase({
             <span className="font-light">{coinType}</span>
           </h6>
 
-          {/* Service Fee */}
-          {serviceFee > 0 && (
+          {/* Service Fee - Display if available in feeDetails */}
+          {feeDetails?.serviceFee && feeDetails.serviceFee > 0 && (
             <h6 className={textXs}>
               <span className={labelXs}>
-                {isModal ? "SERVICE FEE" : "MINTING FEE"}
+                SERVICE FEE
               </span>&nbsp;&nbsp;
               {coinType === "BTC"
-                ? (
-                  <>
-                    {formatSatoshisToBTC(serviceFee * 1e8, {
-                      includeSymbol: false,
-                    })} <span className="font-light">BTC</span>
-                  </>
-                )
-                : (
-                  <>
-                    {(serviceFee * BTCPrice).toFixed(2)}{" "}
-                    <span className="font-light">USDT</span>
-                  </>
-                )}
+                ? formatSatoshisToBTC(feeDetails.serviceFee, {
+                  includeSymbol: false,
+                })
+                : formatSatoshisToUSD(feeDetails.serviceFee, BTCPrice)}{" "}
+              <span className="font-light">{coinType}</span>
             </h6>
           )}
 
@@ -405,9 +387,9 @@ export function FeeCalculatorBase({
           {fromPage === "src101_bitname" && (
             <h6 className={textXs}>
               <span className={labelXs}>NAME</span>&nbsp;&nbsp;
-              {bitname.split(".")[0]
+              {bitname?.split(".")[0]
                 ? (
-                  bitname.split(".")[0]
+                  bitname?.split(".")[0]
                 )
                 : <span className="animate-pulse">*******</span>}
             </h6>
@@ -419,12 +401,15 @@ export function FeeCalculatorBase({
               <span className={labelXs}>
                 DONATION AMOUNT
               </span>&nbsp;&nbsp;
-              {amount
+              {feeDetails?.itemPrice !== undefined
                 ? (
                   <>
                     {coinType === "BTC"
-                      ? formatSatoshisToBTC(amount, { includeSymbol: false })
-                      : formatSatoshisToUSD(amount, BTCPrice)}{" "}
+                      ? formatSatoshisToBTC(feeDetails.itemPrice, {
+                        includeSymbol: false,
+                      })
+                      : formatSatoshisToUSD(feeDetails.itemPrice, BTCPrice)}
+                    {" "}
                     <span className="font-light">{coinType}</span>
                   </>
                 )
@@ -455,14 +440,15 @@ export function FeeCalculatorBase({
               <span className={labelXs}>
                 STAMP PRICE
               </span>&nbsp;&nbsp;
-              {price
+              {feeDetails?.itemPrice !== undefined
                 ? (
                   <>
                     {coinType === "BTC"
-                      ? formatSatoshisToBTC(price * 1e8, {
+                      ? formatSatoshisToBTC(feeDetails.itemPrice, {
                         includeSymbol: false,
                       })
-                      : formatSatoshisToUSD(price * 1e8, BTCPrice)}{" "}
+                      : formatSatoshisToUSD(feeDetails.itemPrice, BTCPrice)}
+                    {" "}
                     <span className="font-light">{coinType}</span>
                   </>
                 )
@@ -668,17 +654,15 @@ export function FeeCalculatorBase({
 
       <h6 className="mt-4 text-xl text-stamp-grey-light font-light">
         <span className="text-stamp-grey-darker pr-2">ESTIMATE</span>
-        {(feeDetails?.minerFee || feeDetails?.dustValue)
+        {feeDetails?.totalValue !== undefined
           ? (
             coinType === "BTC"
               ? (
                 <>
                   <span className="font-bold">
-                    {formatSatoshisToBTC(
-                      (feeDetails?.minerFee || 0) +
-                        (feeDetails?.dustValue || 0),
-                      { includeSymbol: false },
-                    )}
+                    {formatSatoshisToBTC(feeDetails.totalValue, {
+                      includeSymbol: false,
+                    })}
                   </span>{" "}
                   <span className="font-light">BTC</span>
                 </>
@@ -686,9 +670,7 @@ export function FeeCalculatorBase({
               : (
                 <>
                   <span className="font-bold">
-                    {(((feeDetails?.minerFee || 0) +
-                      (feeDetails?.dustValue || 0)) /
-                      1e8 * BTCPrice).toFixed(2)}
+                    {(feeDetails.totalValue / 1e8 * BTCPrice).toFixed(2)}
                   </span>{" "}
                   <span className="font-light">{coinType}</span>
                 </>
@@ -851,7 +833,14 @@ export function FeeCalculatorBase({
                 ? "opacity-50 cursor-not-allowed"
                 : ""
             }`}
-            onClick={onSubmit}
+            onClick={() => {
+              console.log(
+                "FEE_CALCULATOR_BASE: Internal button onClick fired! About to call props.onSubmit.",
+              );
+              if (onSubmit) {
+                onSubmit();
+              }
+            }}
             disabled={disabled || isSubmitting || !tosAgreed}
           >
             {isSubmitting ? "PROCESSING" : confirmText || buttonName}

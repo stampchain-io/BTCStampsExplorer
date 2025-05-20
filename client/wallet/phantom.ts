@@ -6,11 +6,12 @@ import { handleWalletError } from "./walletHelper.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { broadcastTransaction } from "$lib/utils/minting/broadcast.ts";
+import type { BaseToast } from "$lib/utils/toastSignal.ts";
 
 export const isPhantomInstalled = signal<boolean>(false);
 
 export const connectPhantom = async (
-  addToast: (message: string, type: string) => void,
+  addToast: (message: string, type: BaseToast["type"]) => void,
 ) => {
   try {
     const provider = getProvider();
@@ -166,9 +167,8 @@ const signPSBT = async (
           signed: true,
           psbt: signedPsbtHex,
           txid,
-          broadcast: true,
         };
-      } catch (broadcastError) {
+      } catch (broadcastError: unknown) {
         logger.error("ui", {
           message: "Transaction broadcast failed",
           error: broadcastError,
@@ -176,9 +176,11 @@ const signPSBT = async (
         return {
           signed: true,
           psbt: signedPsbtHex,
-          error:
-            `Transaction signed but broadcast failed: ${broadcastError.message}`,
-          broadcast: false,
+          error: `Transaction signed but broadcast failed: ${
+            broadcastError instanceof Error
+              ? broadcastError.message
+              : String(broadcastError)
+          }`,
         };
       }
     }

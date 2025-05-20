@@ -92,6 +92,7 @@ export function Pagination({
 
     return (
       <button
+        type="button"
         class={buttonClass}
         onClick={() => handlePageChange(pageNum)}
         disabled={isCurrentPage}

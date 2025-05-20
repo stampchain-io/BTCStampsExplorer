@@ -5,7 +5,6 @@ import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { containerBackground, containerColData } from "$layout";
 import {
-  label,
   labelSm,
   subtitleGrey,
   titleGreyLD,
@@ -118,7 +117,7 @@ function WalletOverview(
       100000000
     : 0;
 
-  const displayPriceUSD = displayPrice * walletData.btcPrice;
+  const _displayPriceUSD = displayPrice * walletData.btcPrice;
 
   console.log("walletData:", walletData);
   console.log("dispensers:", walletData.dispensers);
@@ -225,10 +224,8 @@ function DispenserStats({
         <p
           className={`${valueLg} whitespace-nowrap overflow-hidden`}
         >
-          <>
-            <span className="font-light">STAMP #</span>
-            <span className="font-black">{stampData.stamp}</span>
-          </>
+          <span className="font-light">STAMP #</span>
+          <span className="font-black">{stampData.stamp}</span>
         </p>
 
         {stampData.cpid && (

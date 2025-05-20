@@ -1,6 +1,6 @@
 import * as bitcoin from "bitcoinjs-lib";
 const { networks, address, Psbt, payments } = bitcoin;
-import { UTXO } from "$types/index.d.ts";
+import { UTXO, AncestorInfo } from "$types/index.d.ts";
 import { PSBTInput } from "$types/index.d.ts";
 import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
 import {
@@ -12,11 +12,10 @@ import * as msgpack from "msgpack";
 import { TransactionService } from "$server/services/transaction/index.ts";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
-import { UTXOService } from "$server/services/transaction/utxoService.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 
 interface PSBTParams {
   sourceAddress: string;
@@ -35,6 +34,7 @@ interface PSBTParams {
     script: string;
     address: string;
   }>;
+  isDryRun?: boolean;
 }
 
 interface PSBTResponse {
@@ -67,6 +67,7 @@ interface PSBTResponse {
 export class SRC20PSBTService {
   private static readonly DUST_SIZE = 420;
   private static readonly STAMP_PREFIX = "stamp:";
+  private static commonUtxoService = new CommonUTXOService();
 
   // Add constants for witness sizes
   private static readonly WITNESS_SIZES = {
@@ -85,101 +86,101 @@ export class SRC20PSBTService {
     service_fee,
     service_fee_address,
     changeAddress,
-    utxoAncestors = [],
     trxType = "olga",
+    isDryRun = false,
   }: PSBTParams) {
-    logger.debug("stamps", {
+    logger.debug("src20-psbt-service", {
       message: "preparePSBT called",
       data: {
         sourceAddress,
         toAddress,
         satsPerVB,
         trxType,
-        action: src20Action.op,
+        action: (src20Action as {op?: string}).op,
+        isDryRun,
       }
     });
     try {
       const effectiveChangeAddress = changeAddress || sourceAddress;
       const network = networks.bitcoin;
       
-      // 1. First prepare the action data and get CIP33 addresses
       const { chunks } = await this.prepareActionData(src20Action);
   
-      // 2. Construct all outputs with their exact scripts and values
       const outputs = [
-        // First output is the recipient
-        {
-          script: address.toOutputScript(toAddress, network),
-          value: TX_CONSTANTS.SRC20_DUST,
-        },
-        // Then add all CIP33 data outputs
-        ...chunks.map((chunk) => ({
-          script: address.toOutputScript(chunk, network),
-          value: TX_CONSTANTS.SRC20_DUST, // Use constant dust value
-        }))
+        { script: address.toOutputScript(toAddress, network), value: TX_CONSTANTS.SRC20_DUST, },
+        ...chunks.map((chunk) => ({ script: address.toOutputScript(chunk, network), value: TX_CONSTANTS.SRC20_DUST, }))
       ];
   
-      // 3. Calculate total output value needed
       const totalOutputValue = outputs.reduce((sum, out) => sum + out.value, 0);
   
-      // 4. Select UTXOs with the target fee rate
-      const { inputs, change } = await TransactionService.UTXOService.selectUTXOsForTransaction(
+      const { inputs, change } = await TransactionService.utxoServiceInstance.selectUTXOsForTransaction(
         sourceAddress,
         outputs,
         satsPerVB,
         0,
         1.5,
-        { filterStampUTXOs: true }
+        { 
+          filterStampUTXOs: true, 
+          includeAncestors: !isDryRun
+        }
       );
   
-      // 5. Create PSBT with actual inputs and outputs
       const psbt = new Psbt({ network });
   
-      // Add inputs
       for (const input of inputs) {
-        const txDetails = await QuicknodeService.getTransaction(input.txid);
-        if (!txDetails) {
-          throw new Error(`Failed to fetch transaction details for ${input.txid}`);
+        if (!input.script) {
+          logger.error("src20-psbt-service", { message: "Input UTXO is missing script.", input });
+          throw new Error(`Input UTXO ${input.txid}:${input.vout} is missing script (scriptPubKey).`);
         }
-        psbt.addInput(this.createPsbtInput(input, txDetails));
+        const psbtInputArgs: PSBTInput = {
+          hash: input.txid,
+          index: input.vout,
+          sequence: 0xfffffffd, 
+        };
+        const scriptTypeInfo = getScriptTypeInfo(input.script);
+        const isWitness = scriptTypeInfo.isWitness || 
+                          (scriptTypeInfo.type === "P2SH" && scriptTypeInfo.redeemScriptType?.isWitness) ||
+                          input.scriptType?.startsWith("witness") ||
+                          input.scriptType?.toUpperCase().includes("P2W");
+        if (isWitness) {
+          psbtInputArgs.witnessUtxo = {
+            script: new Uint8Array(hex2bin(input.script)),
+            value: BigInt(input.value),
+          };
+        } else {
+          const rawTxHex = await SRC20PSBTService.commonUtxoService.getRawTransactionHex(input.txid);
+          if (!rawTxHex) {
+            logger.error("src20-psbt-service", { message: "Failed to fetch raw tx hex for non-witness input", txid: input.txid });
+            throw new Error(`Failed to fetch raw transaction for non-witness input ${input.txid}`);
+          }
+          psbtInputArgs.nonWitnessUtxo = new Uint8Array(hex2bin(rawTxHex));
+        }
+        psbt.addInput(psbtInputArgs as any);
       }
-  
-      // Add all outputs
       outputs.forEach(output => {
-        psbt.addOutput({
-          script: output.script,
-          value: BigInt(output.value)
-        });
+        psbt.addOutput({ script: output.script, value: BigInt(output.value) });
       });
-  
-      // Add change output if needed
       if (change > TX_CONSTANTS.SRC20_DUST) {
-        psbt.addOutput({
-          script: address.toOutputScript(effectiveChangeAddress, network),
-          value: BigInt(change)
-        });
+        psbt.addOutput({ script: address.toOutputScript(effectiveChangeAddress, network), value: BigInt(change) });
       }
-  
-      // 6. Calculate actual transaction fee from input/output values
-      const totalInputValue = inputs.reduce((sum, input) => sum + Number(input.value), 0);
-      const totalOutputAmount = outputs.reduce((sum, out) => sum + out.value, 0) + 
-                               (change > TX_CONSTANTS.SRC20_DUST ? change : 0);
-      const actualFee = totalInputValue - totalOutputAmount;
-      const dustTotal = outputs.reduce((sum, out) => sum + out.value, 0);
-  
-      // Log exact values for debugging
-      logger.debug("stamps", {
+      const finalTotalInputValue = inputs.reduce((sum, input) => sum + Number(input.value), 0);
+      const finalTotalOutputAmount = outputs.reduce((sum, out) => sum + out.value, 0) + (change > TX_CONSTANTS.SRC20_DUST ? change : 0);
+      const actualFee = finalTotalInputValue - finalTotalOutputAmount;
+      const finalDustTotal = outputs.reduce((sum, out) => sum + out.value, 0);
+      const estimatedSize = Math.ceil(actualFee / satsPerVB);
+
+      logger.debug("src20-psbt-service", {
         message: "Transaction details",
         data: {
-          totalInputValue,
-          totalOutputAmount,
+          finalTotalInputValue,
+          finalTotalOutputAmount,
           actualFee,
-          dustTotal,
+          finalDustTotal,
           changeAmount: change,
           feeBreakdown: {
             minerFee: actualFee,
-            dustValue: dustTotal,
-            total: actualFee + dustTotal
+            dustValue: finalDustTotal,
+            total: actualFee + finalDustTotal
           },
           outputs: outputs.map(o => o.value),
           change,
@@ -189,11 +190,11 @@ export class SRC20PSBTService {
   
       return {
         psbt,
-        estimatedTxSize: Math.ceil(actualFee / satsPerVB),
-        totalInputValue,
-        totalOutputValue: totalOutputAmount,
+        estimatedTxSize: estimatedSize,
+        totalInputValue: finalTotalInputValue,
+        totalOutputValue: finalTotalOutputAmount,
         totalChangeOutput: change,
-        totalDustValue: dustTotal,
+        totalDustValue: finalDustTotal,
         estMinerFee: actualFee,
         feeDetails: {
           baseFee: actualFee,
@@ -201,10 +202,10 @@ export class SRC20PSBTService {
           effectiveFeeRate: satsPerVB,
           ancestorCount: 0,
           totalVsize: Math.ceil(actualFee / satsPerVB),
-          total: actualFee + dustTotal,
+          total: actualFee + finalDustTotal,
           minerFee: actualFee,
-          dustValue: dustTotal,
-          totalValue: actualFee + dustTotal
+          dustValue: finalDustTotal,
+          totalValue: actualFee + finalDustTotal
         },
         changeAddress: effectiveChangeAddress,
         inputs: inputs.map((input, index) => ({
@@ -214,7 +215,11 @@ export class SRC20PSBTService {
         }))
       };
     } catch (error) {
-      throw error.message
+      logger.error("src20-psbt-service", {
+        message: "Error in prepareActionData",
+        error: error instanceof Error ? error.message : String(error)
+      });
+      throw error;
     }
   }
 
@@ -273,7 +278,7 @@ export class SRC20PSBTService {
         chunks: cip33Addresses
       };
     } catch (error) {
-      logger.error("stamps", {
+      logger.error("src20-psbt-service", {
         message: "Error in prepareActionData",
         error: error instanceof Error ? error.message : String(error)
       });
@@ -307,43 +312,6 @@ export class SRC20PSBTService {
       value,
       isReal: false
     };
-  }
-
-  private static createPsbtInput(input: UTXO, txDetails: any): PSBTInput {
-    logger.debug("stamps", {
-      message: "Creating PSBT input",
-      data: {
-        txid: input.txid,
-        vout: input.vout,
-        value: Number(input.value),
-        address: input.address,
-        script: input.script,
-      }
-    });
-
-    const inputDetails = txDetails.vout[input.vout];
-    if (!inputDetails) {
-      throw new Error(`Invalid input: no details found for vout ${input.vout}`);
-    }
-
-    const psbtInput: PSBTInput = {
-      hash: input.txid,
-      index: input.vout,
-      sequence: 0xfffffffd, // Enable RBF
-    };
-
-    const scriptType = getScriptTypeInfo(input.script);
-    
-    if (scriptType.isWitness) {
-      psbtInput.witnessUtxo = {
-        script: new Uint8Array(hex2bin(inputDetails.scriptPubKey.hex)),
-        value: BigInt(input.value),
-      };
-    } else {
-      psbtInput.nonWitnessUtxo = new Uint8Array(hex2bin(txDetails.hex));
-    }
-
-    return psbtInput;
   }
 
   private static createOutputMatchingInputType(

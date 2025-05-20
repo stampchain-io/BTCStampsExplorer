@@ -737,6 +737,7 @@ declare global {
         };
       }>;
     };
+    Buffer?: typeof import("node:buffer").Buffer;
   }
 }
 

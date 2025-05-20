@@ -42,19 +42,11 @@ export const handler: Handlers<StampData> = {
     try {
       const { id } = ctx.params;
       const url = new URL(req.url);
-      const baseUrl = `${url.protocol}//${url.host}`;
-
       // Get stamp details first
       const stampData = await StampController.getStampDetailsById(id);
       if (!stampData?.data?.stamp) {
         return ctx.renderNotFound();
       }
-
-      const encodedCpid = encodeURIComponent(stampData.data.stamp.cpid);
-      const countParams = new URLSearchParams({
-        limit: "20",
-        sort: "DESC",
-      });
 
       // Use the CPID from stamp data for other queries
       const [

@@ -40,7 +40,7 @@ export function SRC101RegisterTool({
   const { wallet, isConnected } = walletContext;
   const [isExist, setIsExist] = useState(true);
   const [checkStatus, setCheckStatus] = useState(false);
-  const [modalData, setModalData] = useState<SRC101Balance | null>(null);
+  const [_modalData, setModalData] = useState<SRC101Balance | null>(null);
   const [openTldDropdown, setOpenTldDropdown] = useState<boolean>(false);
   const [isSelectingTld, setIsSelectingTld] = useState(false);
   const tldDropdownRef = useRef<HTMLDivElement>(null);
@@ -160,7 +160,7 @@ export function SRC101RegisterTool({
         }
       }
       return false;
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       return false;
     }
   };

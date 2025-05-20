@@ -683,7 +683,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   return (
     <>
       <SearchStampModal showButton={false} />
-      <div className={"flex flex-col gap-6"}>
+      <div className="flex flex-col gap-6">
         <div
           className={containerBackground}
         >
@@ -770,6 +770,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 >
                   {dispensers?.length >= 2 && (
                     <button
+                      type="button"
                       onClick={() => setShowListings(!showListings)}
                       className="pb-0.5"
                     >
@@ -850,7 +851,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           {!isSrc20Stamp() && (
             <div className="flex flex-col pb-3">
               <h6 className={labelSm}>{editionLabel}</h6>
-              <h6 className={value3xl}>{editionCount}{" "}</h6>
+              <h6 className={value3xl}>{editionCount}</h6>
             </div>
           )}
 

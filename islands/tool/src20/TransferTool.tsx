@@ -32,11 +32,9 @@ export function SRC20TransferTool(
     handleChangeFee,
     handleInputChange,
     handleSubmit,
-    fetchFees,
     config,
     isSubmitting,
     submissionMessage,
-    walletError,
     apiError,
     handleInputBlur,
   } = useSRC20Form("transfer", trxType);
@@ -175,7 +173,7 @@ export function SRC20TransferTool(
     if (!isNaN(inputAmount) && !isNaN(maxAmount) && inputAmount > maxAmount) {
       handleInputChange({
         target: { value: maxAmount.toString() },
-      } as Event, "amt");
+      } as any as Event, "amt");
       return;
     }
 
@@ -183,14 +181,13 @@ export function SRC20TransferTool(
   };
 
   /* ===== TOKEN CHANGE HANDLER ===== */
-  const handleTokenChange = (e) => {
+  const handleTokenChange = (e: Event) => {
+    const target = e.target as HTMLInputElement;
     console.log("Token input event:", {
       type: e.type,
-      target: e.target.value,
-      nativeEvent: e.nativeEvent,
+      targetValue: target.value,
     });
-    const newValue = (e.target as HTMLInputElement).value
-      .toUpperCase();
+    const newValue = target.value.toUpperCase();
     if (newValue !== formState.token && !isSelecting) {
       handleInputChange(e, "token");
       setOpenDrop(true);
@@ -246,7 +243,6 @@ export function SRC20TransferTool(
               onChange={handleTokenChange}
               onFocus={handleTokenFieldFocus}
               onBlur={handleTokenBlur}
-              ref={tokenInputRef}
               isUppercase
               aria-label="Select token"
             />
@@ -298,36 +294,21 @@ export function SRC20TransferTool(
         <FeeCalculatorSimple
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
-          type="src20"
-          fromPage="src20_transfer"
-          fileType="application/json"
-          fileSize={undefined}
-          issuance={undefined}
-          serviceFee={undefined}
           BTCPrice={formState.BTCPrice}
-          onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           buttonName={isConnected ? "TRANSFER" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
+          type="src20"
+          fromPage="src20_transfer"
+          userAddress={wallet?.address || ""}
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
-          userAddress={wallet?.address}
-          disabled={undefined}
-          effectiveFeeRate={undefined}
-          utxoAncestors={undefined}
           transferDetails={{
             address: formState.toAddress,
             token: formState.token,
-            amount: formState.amt,
-          }}
-          feeDetails={{
-            minerFee: formState.psbtFees?.estMinerFee || 0,
-            dustValue: formState.psbtFees?.totalDustValue || 0,
-            hasExactFees: true,
-            totalValue: formState.psbtFees?.totalValue || 0,
-            estimatedSize: formState.psbtFees?.est_tx_size || 0,
+            amount: Number(formState.amt) || 0,
           }}
         />
 
@@ -335,7 +316,6 @@ export function SRC20TransferTool(
         <StatusMessages
           submissionMessage={submissionMessage}
           apiError={apiError}
-          walletError={walletError}
         />
       </div>
     </div>

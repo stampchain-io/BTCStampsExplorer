@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import axiod from "axiod";
 import { useConfig } from "$client/hooks/useConfig.ts";
@@ -8,6 +8,7 @@ import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
 import { debounce } from "$lib/utils/debounce.ts";
 import { showNotification } from "$lib/utils/notificationUtils.ts";
+
 interface PSBTFees {
   estMinerFee: number;
   totalDustValue: number;
@@ -17,6 +18,10 @@ interface PSBTFees {
   estimatedSize?: number;
   totalVsize?: number;
   est_tx_size?: number;
+  hex?: string;
+  inputsToSign?: Array<
+    { index: number; address?: string; sighashTypes?: number[] }
+  >;
 }
 
 interface SRC20FormState {
@@ -43,19 +48,6 @@ interface SRC20FormState {
   file: File | null;
   psbtFees?: PSBTFees;
   maxAmount?: string;
-}
-
-interface TxDetails {
-  hex: string;
-  est_tx_size: number;
-  input_value: number;
-  total_dust_value: number;
-  est_miner_fee: number;
-  fee: number;
-  change_value: number;
-  inputsToSign: number[];
-  sourceAddress: string;
-  changeAddress: string;
 }
 
 export class SRC20FormController {
@@ -134,15 +126,16 @@ export class SRC20FormController {
           const newState = {
             ...prev,
             psbtFees: {
-              estMinerFee: Number(response.data.est_miner_fee),
-              totalDustValue: Number(response.data.total_dust_value),
+              estMinerFee: Number(response.data.est_miner_fee) || 0,
+              totalDustValue: Number(response.data.total_dust_value) || 0,
               hasExactFees: true,
-              totalValue: Number(response.data.est_miner_fee) +
-                Number(response.data.total_dust_value),
+              totalValue: (Number(response.data.est_miner_fee) || 0) +
+                (Number(response.data.total_dust_value) || 0),
               effectiveFeeRate:
                 Number(response.data.feeDetails?.effectiveFeeRate) || 0,
-              estimatedSize: Number(response.data.est_tx_size),
-              totalVsize: Number(response.data.feeDetails?.totalVsize),
+              estimatedSize: Number(response.data.est_tx_size) ||
+                Number(response.data.feeDetails?.estimatedSize) || 0,
+              totalVsize: Number(response.data.feeDetails?.totalVsize) || 0,
               hex: response.data.hex,
               inputsToSign: response.data.inputsToSign,
             },
@@ -229,14 +222,14 @@ export function useSRC20Form(
   });
 
   const { config } = useConfig<Config>();
-  const { fees, fetchFees } = useFeePolling(300000); // 5 minutes
+  const { fees, loading: feesLoading, fetchFees } = useFeePolling(300000);
   const [apiError, setApiError] = useState<string>("");
 
   const [formState, setFormState] = useState<SRC20FormState>({
     toAddress: "",
     token: initialToken || "",
     amt: "",
-    fee: 0,
+    fee: 1,
     feeError: "",
     BTCPrice: 0,
     jsonSize: 0,
@@ -259,7 +252,8 @@ export function useSRC20Form(
       totalDustValue: 0,
       hasExactFees: false,
       totalValue: 0,
-      est_tx_size: 0,
+      effectiveFeeRate: 0,
+      estimatedSize: 0,
     },
   });
 
@@ -274,34 +268,20 @@ export function useSRC20Form(
   const { wallet } = walletContext;
 
   useEffect(() => {
-    if (fees) {
+    if (fees && !feesLoading) {
+      logger.debug("ui", {
+        message: "useSRC20Form: Updating fee and BTCPrice from useFeePolling",
+        data: fees,
+      });
       const recommendedFee = Math.round(fees.recommendedFee);
-      setFormState((prev) => ({ ...prev, fee: recommendedFee }));
+      const currentBtcPrice = fees.btcPrice;
+      setFormState((prev) => ({
+        ...prev,
+        fee: recommendedFee > 0 ? recommendedFee : prev.fee,
+        BTCPrice: currentBtcPrice > 0 ? currentBtcPrice : prev.BTCPrice,
+      }));
     }
-  }, [fees]);
-
-  useEffect(() => {
-    const fetchPrice = async () => {
-      try {
-        // Fetch from the dedicated BTC price endpoint
-        const response = await fetch("/api/internal/btcPrice");
-        if (!response.ok) {
-          console.error(
-            `Error fetching BTC price: ${response.status} ${response.statusText}`,
-          );
-          throw new Error("Failed to fetch BTC price");
-        }
-        const data = await response.json();
-        // Adjust parsing for the structure of /api/internal/btcPrice response
-        const price = (data.data && data.data.price) || 0;
-        setFormState((prev) => ({ ...prev, BTCPrice: price }));
-      } catch (error) {
-        console.error("Error fetching BTC price from client-side hook:", error);
-        setFormState((prev) => ({ ...prev, BTCPrice: 0 }));
-      }
-    };
-    fetchPrice();
-  }, []);
+  }, [fees, feesLoading]);
 
   function validateFormState(
     formState: SRC20FormState,
@@ -617,18 +597,19 @@ export function useSRC20Form(
         error: error instanceof Error ? error.message : String(error),
         details: error,
       });
-      const apiError = (error as any).response?.data?.error;
-      setApiError(
-        apiError || error.message || "An unexpected error occurred",
-      );
+      const resolvedApiError = error instanceof Error
+        ? error.message
+        : (error as any).response?.data?.error ||
+          "An unexpected error occurred";
+      setApiError(resolvedApiError);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleChangeFee = (newFee: number) => {
+  const handleChangeFee = useCallback((newFee: number) => {
     setFormState((prev) => ({ ...prev, fee: newFee }));
-  };
+  }, [setFormState]);
 
   return {
     formState,
@@ -643,5 +624,6 @@ export function useSRC20Form(
     setApiError,
     apiError,
     handleInputBlur,
+    isLoadingFees: feesLoading,
   };
 }

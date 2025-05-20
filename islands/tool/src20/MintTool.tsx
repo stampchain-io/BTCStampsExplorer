@@ -98,7 +98,6 @@ export function SRC20MintTool({
     handleChangeFee,
     handleInputChange,
     handleSubmit,
-    fetchFees,
     config,
     isSubmitting,
     submissionMessage,
@@ -159,7 +158,6 @@ export function SRC20MintTool({
       return;
     }
 
-    // Don't show results if field is empty and not focused
     if (!searchTerm.trim()) {
       setSearchResults([]);
       setOpenDrop(false);
@@ -270,19 +268,10 @@ export function SRC20MintTool({
   }
 
   /* ===== FEE CALCULATOR PREPARATION ===== */
-  const feeDetailsForCalculator = {
-    minerFee: formState.psbtFees?.estMinerFee || 0,
-    dustValue: formState.psbtFees?.totalDustValue || 0,
-    hasExactFees: true,
-    totalValue: formState.psbtFees?.totalValue || 0,
-    estimatedSize: formState.psbtFees?.est_tx_size || 0,
-  };
-
   logger.debug("stamps", {
-    message: "Fee details for calculator",
+    message: "Fee details for calculator (MintTool)",
     data: {
       psbtFees: formState.psbtFees,
-      calculatorInput: feeDetailsForCalculator,
       formState: {
         fee: formState.fee,
         BTCPrice: formState.BTCPrice,
@@ -440,16 +429,11 @@ export function SRC20MintTool({
           handleChangeFee={handleChangeFee}
           type="src20"
           fromPage="src20_mint"
-          fileType="application/json"
-          fileSize={undefined}
-          issuance={undefined}
-          serviceFee={undefined}
           BTCPrice={formState.BTCPrice}
           mintDetails={{
             token: formState.token,
-            amount: formState.amt,
+            amount: Number(formState.amt) || 0,
           }}
-          onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           buttonName={isConnected ? "MINT" : "CONNECT WALLET"}
@@ -457,11 +441,7 @@ export function SRC20MintTool({
           onTosChange={setTosAgreed}
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
-          userAddress={wallet?.address}
-          disabled={undefined}
-          effectiveFeeRate={undefined}
-          utxoAncestors={undefined}
-          feeDetails={feeDetailsForCalculator}
+          userAddress={wallet?.address || ""}
         />
 
         {/* ===== STATUS MESSAGES ===== */}

@@ -4,7 +4,6 @@ import { useConfig } from "$client/hooks/useConfig.ts";
 import axiod from "axiod";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { getWalletProvider } from "$client/wallet/walletHelper.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { FeeCalculatorAdvanced } from "$islands/section/FeeCalculatorAdvanced.tsx";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
@@ -157,10 +156,13 @@ interface MintRequest {
   locked: boolean;
   filename: string;
   file: string;
-  satsPerVB: number; // Changed from satsPerKB to satsPerVB for consistency
+  satsPerVB: number;
   service_fee: string | null;
   service_fee_address: string | null;
   assetName?: string;
+  divisible: boolean;
+  isPoshStamp: boolean;
+  dryRun?: boolean;
 }
 
 /* ===== ERROR HANDLING UTILITY ===== */
@@ -253,7 +255,7 @@ function extractErrorMessage(error: unknown): string {
 
 interface SubmissionMessage {
   message: string;
-  txid?: string | undefined;
+  txid?: string;
 }
 
 interface FileValidationResult {
@@ -286,17 +288,11 @@ export function StampingTool() {
 /* ===== MAIN COMPONENT IMPLEMENTATION ===== */
 // This component contains all hooks and is only rendered when config is available
 function StampingToolMain({ config }: { config: Config }) {
-  // Context and props
   const { wallet, isConnected } = walletContext;
   const address = isConnected ? wallet.address : undefined;
+  const { fees, loading, fetchFees } = useFeePolling(300000);
 
-  // Fee polling
-  const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
-
-  /* ===== ALL STATE DEFINITIONS ===== */
-  // File and form state
-  type FileType = File | null;
-  const [file, setFile] = useState<FileType>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [fee, setFee] = useState<number>(0);
   const [issuance, setIssuance] = useState("1");
   const [BTCPrice, setBTCPrice] = useState<number>(60000);
@@ -304,6 +300,7 @@ function StampingToolMain({ config }: { config: Config }) {
   const [isLocked, setIsLocked] = useState(true);
   const [isPoshStamp, setIsPoshStamp] = useState(false);
   const [stampName, setStampName] = useState("");
+  const [isDivisible, _setIsDivisible] = useState(false);
 
   // Validation state
   const [fileError, setFileError] = useState<string>("");
@@ -317,7 +314,6 @@ function StampingToolMain({ config }: { config: Config }) {
   const [addressError, setAddressError] = useState<string | undefined>(
     undefined,
   );
-  const [txDetails, setTxDetails] = useState<MintResponse | null>(null);
 
   // Fee details state
   const [feeDetails, setFeeDetails] = useState<FeeDetails>({
@@ -373,24 +369,20 @@ function StampingToolMain({ config }: { config: Config }) {
     if (fees && !loading) {
       const recommendedFee = Math.round(fees.recommendedFee);
       logger.debug("stamps", {
-        message: "Setting initial fee",
+        message: "Setting initial fee and BTC price from polled data",
         data: {
           recommendedFee,
           currentFee: fee,
+          polledBtcPrice: (fees as any).btcPrice,
           hasFile: !!file,
         },
       });
       setFee(recommendedFee);
+      if (typeof (fees as any).btcPrice === "number") {
+        setBTCPrice((fees as any).btcPrice);
+      }
     }
   }, [fees, loading]);
-
-  useEffect(() => {
-    const fetchPrice = async () => {
-      const price = await fetchBTCPriceInUSD();
-      setBTCPrice(price);
-    };
-    fetchPrice();
-  }, []);
 
   useEffect(() => {
     setIsLocked(true);
@@ -436,22 +428,27 @@ function StampingToolMain({ config }: { config: Config }) {
             dataLength: fileData.length,
           });
 
-          const mintRequest = {
-            sourceWallet: address,
-            file: fileData,
-            satsPerVB: fee, // Send fee as satsPerVB for direct use
-            locked: isLocked,
-            qty: issuance,
-            filename: file.name,
-            ...(isPoshStamp && stampName ? { assetName: stampName } : {}),
-            dryRun: true,
-          };
+          const dryRunPayload:
+            & Omit<MintRequest, "service_fee" | "service_fee_address">
+            & { dryRun: true } = {
+              sourceWallet: address,
+              file: fileData,
+              satsPerVB: fee,
+              locked: isLocked,
+              qty: issuance,
+              filename: file.name,
+              divisible: isDivisible,
+              isPoshStamp: isPoshStamp,
+              dryRun: true,
+            };
+          if (stampName) {
+            (dryRunPayload as MintRequest).assetName = stampName;
+          }
 
-          log("Sending mint request", {
-            request: { ...mintRequest, file: "[REDACTED]" },
+          log("Sending mint request (dry run)", {
+            request: { ...dryRunPayload, file: "[REDACTED]" },
           });
-
-          const response = await axiod.post("/api/v2/olga/mint", mintRequest);
+          const response = await axiod.post("/api/v2/olga/mint", dryRunPayload);
           const data = response.data as MintResponse;
 
           // Add debug logging here
@@ -466,7 +463,6 @@ function StampingToolMain({ config }: { config: Config }) {
             },
           });
 
-          setTxDetails(data);
           setFeeDetails({
             minerFee: Number(data.est_miner_fee) || 0,
             dustValue: Number(data.total_dust_value) || 0,
@@ -475,10 +471,11 @@ function StampingToolMain({ config }: { config: Config }) {
           });
         } catch (error) {
           logger.error("stamps", {
-            message: "Transaction preparation failed",
+            message: "Transaction preparation failed (initial dry run)",
             error: error instanceof Error ? error.message : String(error),
           });
-
+          const extractedMessage = extractErrorMessage(error);
+          setApiError(extractedMessage);
           setFeeDetails({
             hasExactFees: false,
             minerFee: 0,
@@ -515,7 +512,9 @@ function StampingToolMain({ config }: { config: Config }) {
           locked: isLocked,
           qty: issuance,
           filename: file.name,
-          ...(isPoshStamp && stampName ? { assetName: stampName } : {}),
+          divisible: isDivisible,
+          assetName: stampName || undefined,
+          isPoshStamp: isPoshStamp,
           dryRun: true,
         };
 
@@ -532,7 +531,6 @@ function StampingToolMain({ config }: { config: Config }) {
         const response = await axiod.post("/api/v2/olga/mint", mintRequest);
         const data = response.data as MintResponse;
 
-        setTxDetails(data);
         setFeeDetails({
           minerFee: Number(data.est_miner_fee) || 0,
           dustValue: Number(data.total_dust_value) || 0,
@@ -552,8 +550,16 @@ function StampingToolMain({ config }: { config: Config }) {
         });
       } catch (error) {
         logger.error("stamps", {
-          message: "Fee recalculation failed",
+          message: "Fee recalculation failed (dry run)",
           error,
+        });
+        const extractedMessage = extractErrorMessage(error);
+        setApiError(extractedMessage);
+        setFeeDetails({
+          hasExactFees: false,
+          minerFee: 0,
+          dustValue: 0,
+          totalValue: 0,
         });
       }
     };
@@ -789,25 +795,30 @@ function StampingToolMain({ config }: { config: Config }) {
         });
 
         log("Preparing mint request");
-        const mintRequest: MintRequest = {
+        const finalMintPayload: MintRequest = {
           sourceWallet: address,
           qty: issuance,
           locked: isLocked,
           filename: file.name,
           file: fileData,
-          satsPerVB: fee, // Send fee directly as satsPerVB
+          satsPerVB: fee,
+          divisible: isDivisible,
+          isPoshStamp: isPoshStamp,
           service_fee: config?.MINTING_SERVICE_FEE,
           service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
         };
-
-        if (isPoshStamp && stampName) {
-          mintRequest.assetName = stampName;
+        if (stampName) {
+          finalMintPayload.assetName = stampName;
         }
 
-        log("Mint request prepared", mintRequest);
-
-        log("Sending mint request to API");
-        const response = await axiod.post("/api/v2/olga/mint", mintRequest);
+        log("Mint request prepared (final)", {
+          payload: finalMintPayload,
+          file: "[REDACTED]",
+        });
+        const response = await axiod.post(
+          "/api/v2/olga/mint",
+          finalMintPayload,
+        );
 
         log("Received response from API", response);
 
@@ -820,8 +831,6 @@ function StampingToolMain({ config }: { config: Config }) {
         if (!mintResponse.hex) {
           throw new Error("Invalid response structure: missing hex field");
         }
-
-        setTxDetails(mintResponse);
 
         const walletProvider = getWalletProvider(
           wallet.provider,
@@ -928,7 +937,6 @@ function StampingToolMain({ config }: { config: Config }) {
           setSubmissionMessage({
             message:
               "Transaction signed and broadcasted successfully. Please check your wallet or a block explorer for confirmation.",
-            txid: undefined,
           });
           setApiError("");
         }
@@ -941,7 +949,6 @@ function StampingToolMain({ config }: { config: Config }) {
         });
         setApiError(errorMsg);
         setSubmissionMessage(null);
-        setTxDetails(null); // Reset transaction details on error
       }
     } catch (error: any) {
       logger.error("stamps", {
@@ -1579,11 +1586,10 @@ function StampingToolMain({ config }: { config: Config }) {
         />
       </div>
 
-      {isFullScreenModalOpen && (
+      {isFullScreenModalOpen && file && (
         <PreviewImageModal
           src={file}
-          handleCloseModal={handleCloseFullScreenModal}
-          contentType={file?.type?.startsWith("text/html") ? "html" : "image"}
+          contentType={file.type?.startsWith("text/html") ? "html" : "image"}
         />
       )}
 

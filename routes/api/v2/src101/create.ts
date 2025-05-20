@@ -75,24 +75,34 @@ export const handler: Handlers = {
             changeAddress: effectiveChangeAddress,
           },
         );
-        logger.debug("stamps", {
+        logger.debug("api-src101-create", {
           message: "Multisig transaction result",
           result: JSON.stringify(result, null, 2),
         });
 
         if ("error" in result) {
-          logger.error("stamps", {
-            message: "Operation error",
+          logger.error("api-src101-create", {
+            message: "Operation error from service",
             error: result.error,
           });
-          response = ResponseUtil.badRequest(result.error);
+          if (
+            typeof result.error === "string" &&
+            (result.error.toLowerCase().includes("insufficient funds") ||
+              result.error.toLowerCase().includes("no utxos available"))
+          ) {
+            response = ResponseUtil.badRequest(result.error);
+          } else {
+            response = ResponseUtil.badRequest(
+              result.error || "Operation failed",
+            );
+          }
         } else {
           response = ResponseUtil.success(result, { forceNoCache: true });
         }
 
         console.log("response", response);
 
-        logger.debug("stamps", {
+        logger.debug("api-src101-create", {
           message: "Final multisig response",
           response: JSON.stringify(response, null, 2),
         });
@@ -101,12 +111,25 @@ export const handler: Handlers = {
         return ResponseUtil.badRequest("Not supported yet");
       }
     } catch (error: unknown) {
-      console.error("Error processing request:", error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
+      logger.error("api-src101-create", {
+        message: "Error processing SRC101 create request",
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       if (error instanceof SyntaxError) {
         return ResponseUtil.badRequest("Invalid JSON in request body");
       }
+      if (
+        errorMessage.toLowerCase().includes("insufficient funds") ||
+        errorMessage.toLowerCase().includes("no utxos available")
+      ) {
+        return ResponseUtil.badRequest(errorMessage);
+      }
       return ResponseUtil.badRequest(
-        error instanceof Error ? error.message : "Unknown error occurred",
+        errorMessage || "Unknown error occurred processing SRC101 request",
       );
     }
   },

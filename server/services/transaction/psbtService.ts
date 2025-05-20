@@ -1,13 +1,18 @@
-import { Psbt, Transaction, payments, networks } from "bitcoinjs-lib";
-import { UTXOService } from "./utxoService.ts";
-import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
+import { Buffer } from "node:buffer";
+import { Psbt, Transaction, payments, networks, address as bjsAddress } from "bitcoinjs-lib";
+import { getUTXOForAddress as getUTXOForAddressFromUtils } from "$lib/utils/utxoUtils.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { getScriptTypeInfo, ScriptType as BjsScriptType } from "$lib/utils/scriptTypeUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
-import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
+import { hex2bin, bytesToHex } from "$lib/utils/binary/baseUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { bigIntSerializer } from "$lib/utils/formatUtils.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { UTXO, AncestorInfo } from "$types/index.d.ts";
+import { TransactionService } from "$server/services/transaction/index.ts";
+import { estimateTransactionSize, calculateTransactionFee, InputTypeForSizeEstimation, OutputTypeForSizeEstimation } from "$lib/utils/minting/transactionSizes.ts";
+import type { Output, ScriptType } from "$lib/types/index.d.ts";
 
 export function formatPsbtForLogging(psbt: bitcoin.Psbt) {
   return {
@@ -25,6 +30,8 @@ export function formatPsbtForLogging(psbt: bitcoin.Psbt) {
 }
 
 export class PSBTService {
+  private static commonUtxoService = new CommonUTXOService();
+
   static async createPSBT(
     utxo: string,
     salePrice: number,
@@ -37,7 +44,7 @@ export class PSBTService {
     const psbt = new Psbt({ network });
 
     // Fetch specific UTXO details (no ancestor info needed)
-    const txInfo = await getUTXOForAddress(sellerAddress, txid, vout);
+    const txInfo = await getUTXOForAddressFromUtils(sellerAddress, txid, vout);
     if (!txInfo?.utxo) {
       throw new Error(`Invalid UTXO details for ${txid}:${vout}`);
     }
@@ -146,7 +153,7 @@ export class PSBTService {
       const vout = parseInt(voutStr, 10);
 
       // Use getUTXOForAddress with specific UTXO lookup and failover
-      const txInfo = await getUTXOForAddress(address, txid, vout);
+      const txInfo = await getUTXOForAddressFromUtils(address, txid, vout);
       if (!txInfo?.utxo) return false;
 
       // Get the scriptPubKey hex
@@ -220,7 +227,7 @@ export class PSBTService {
     );
 
     // Validate seller's UTXO
-    const sellerUtxoInfo = await getUTXOForAddress(
+    const sellerUtxoInfo = await getUTXOForAddressFromUtils(
       sellerAddress,
       sellerInputTxid,
       sellerInputVout,
@@ -235,7 +242,7 @@ export class PSBTService {
     const buyerVout = parseInt(buyerVoutStr, 10);
 
     // Validate buyer's UTXO
-    const buyerUtxoInfo = await getUTXOForAddress(
+    const buyerUtxoInfo = await getUTXOForAddressFromUtils(
       buyerAddress,
       buyerTxid,
       buyerVout,
@@ -308,232 +315,403 @@ export class PSBTService {
     return psbt.toHex();
   }
 
+  /**
+   * @deprecated This will be removed in a future release. Please migrate to the buildPsbtFromUserFundedRawHex function.
+   */
   static async processCounterpartyPSBT(
     psbtBase64: string,
-    address: string, 
-    feeRateKB: number,
+    userAddress: string,
+    targetFeeRateSatVb: number,
+    isDryRun = false,
     options?: {
-      validateInputs?: boolean;
-      validateFees?: boolean;
+      serviceFeeDetails?: { fee: number; address: string };
     }
   ): Promise<{
-    psbt: string;
-    inputsToSign: { index: number }[];
+    psbtHex?: string;
+    inputsToSign?: { index: number; address?: string; sighashTypes?: number[] }[];
+    estimatedFee?: number;
+    estimatedVsize?: number;
+    totalInputValue?: bigint;
+    totalOutputValue?: bigint;
+    finalUserChange?: bigint;
   }> {
-    await logger.info("api", {
-      message: "Processing Counterparty PSBT",
-      data: { address, feeRateKB, options }
-    });
+    console.log("\n[PSBTService] === Entered processCounterpartyPSBT function v2.0 (Robust Fee/Change/ServiceFee) ===");
+    console.log(`[PSBTService] Initial psbtBase64 (len): ${psbtBase64.length}, userAddress: ${userAddress}, targetFeeRateSatVb: ${targetFeeRateSatVb}`);
+    if (options?.serviceFeeDetails) {
+        console.log("[PSBTService] Service Fee Details:", options.serviceFeeDetails);
+    }
 
     try {
       const psbt = Psbt.fromBase64(psbtBase64);
-      await logger.debug("api", { 
-        message: "Raw PSBT Data", 
-        data: JSON.parse(JSON.stringify(psbt.data, bigIntSerializer))
-      });
+      const network = this.getAddressNetwork(userAddress);
 
-      const tx = psbt.data.globalMap.unsignedTx.tx;
-      await logger.debug("api", { 
-        message: "Transaction Data", 
-        data: JSON.parse(JSON.stringify(tx, bigIntSerializer))
-      });
+      console.log(`[PSBTService] PSBT parsed. Initial input count: ${psbt.inputCount}, output count: ${psbt.txOutputs.length}`);
 
-      if (!tx || !tx.ins || !tx.outs) {
-        throw new Error("Invalid transaction structure in PSBT");
+      const originalTx = psbt.data.globalMap.unsignedTx.tx;
+      if (!originalTx || !originalTx.ins || !originalTx.outs) {
+        throw new Error("Invalid transaction structure in PSBT from Counterparty");
       }
 
-      // Add UTXO details for each input
-      const ancestorInfos = [];
-      for (const [index, input] of tx.ins.entries()) {
-        const inputTxid = Array.from(input.hash)
-          .reverse()
-          .map(b => b.toString(16).padStart(2, "0"))
-          .join("");
-        const inputVout = input.index;
-        console.log(
-          `Processing input ${index}: txid=${inputTxid}, vout=${inputVout}`,
-        );
-
-        // Fetch UTXO details WITH ancestor info
-        const txInfo = await getUTXOForAddress(
-          address,
-          inputTxid,
-          inputVout,
-          true,
-        );
-        if (!txInfo?.utxo) {
-          throw new Error(
-            `UTXO details not found for input ${index}: ${inputTxid}:${inputVout}`,
-          );
-        }
-
-        const utxoDetails = txInfo.utxo;
-        const ancestorInfo = txInfo.ancestor;
-        ancestorInfos.push(ancestorInfo);
-
-        console.log(`UTXO Details for input ${index}:`, utxoDetails);
-        if (ancestorInfo) {
-          console.log(`Ancestor info for input ${index}:`, ancestorInfo);
-        }
-
-        if (!utxoDetails.script) {
-          throw new Error(`Missing script for input ${index}`);
-        }
-
-        // Update input with witness UTXO using Uint8Array
-        psbt.updateInput(index, {
-          witnessUtxo: {
-            script: new Uint8Array(hex2bin(utxoDetails.script)),
-            value: BigInt(utxoDetails.value),
-          },
+      // 1. Enrich Inputs (fetch full UTXO details)
+      let totalInputValue = BigInt(0);
+      for (const [index, inputDetail] of psbt.data.inputs.entries()) {
+        // If witnessUtxo is already present and seems valid, we might trust it.
+        // However, CP might provide minimal PSBTs, so re-fetching is safer.
+        const txIn = originalTx.ins[index];
+        const inputTxid = Buffer.from(txIn.hash).reverse().toString('hex');
+        const inputVout = txIn.index;
+        
+        console.log(`[PSBTService] Enriching input ${index}: ${inputTxid}:${inputVout}`);
+        const utxoDetails = await this.commonUtxoService.getSpecificUTXO(inputTxid, inputVout, { 
+            includeAncestorDetails: !isDryRun, 
+            forcePublicAPI: true // Consider if always forcing public is needed or use smart fallback
         });
 
-        console.log(`Updated input ${index} with witness data`);
-      }
-
-      // Verify all inputs have UTXO data
-      tx.ins.forEach((_, index) => {
-        const inputData = psbt.data.inputs[index];
-        console.log(`Input ${index} data:`, inputData);
-
-        if (!inputData.witnessUtxo && !inputData.nonWitnessUtxo) {
-          throw new Error(
-            `Missing UTXO details for input at index ${index}`,
-          );
+        if (!utxoDetails || !utxoDetails.script || utxoDetails.value === undefined) {
+          throw new Error(`UTXO details/script not found for input ${index}: ${inputTxid}:${inputVout}.`);
         }
-      });
 
-      // Calculate and validate fees using BigInt
-      const totalIn = tx.ins.reduce((sum, _, index) => {
-        const witnessUtxo = psbt.data.inputs[index]?.witnessUtxo;
-        return sum + BigInt(witnessUtxo?.value || 0);
-      }, BigInt(0));
+        totalInputValue += BigInt(utxoDetails.value);
+        const scriptTypeInfo = getScriptTypeInfo(utxoDetails.script);
+        const updateData: any = { sighashType: Transaction.SIGHASH_ALL };
 
-      const vsize = BigInt(tx.virtualSize());
-      const requestedFeeRateVB = BigInt(Math.ceil(feeRateKB / SATS_PER_KB_MULTIPLIER));
-      const targetFee = vsize * requestedFeeRateVB;
-
-      // Find the change output (usually the last non-OP_RETURN output)
-      const changeOutputIndex = tx.outs.findIndex((output, index, arr) => {
-        // Skip OP_RETURN outputs
-        if (output.script[0] === 0x6a) return false;
-        // If this is the last non-OP_RETURN output, it's likely the change
-        return !arr.slice(index + 1).some(out => out.script[0] !== 0x6a);
-      });
-
-      if (changeOutputIndex === -1) {
-        throw new Error("No change output found to adjust fee");
+        if (scriptTypeInfo.isWitness || (scriptTypeInfo.type === "P2SH" && scriptTypeInfo.redeemScriptType?.isWitness)) {
+          updateData.witnessUtxo = {
+            script: hex2bin(utxoDetails.script),
+            value: BigInt(utxoDetails.value),
+          };
+        } else {
+          const rawTxHex = await this.commonUtxoService.getRawTransactionHex(inputTxid);
+          if (!rawTxHex) throw new Error(`Failed to fetch raw tx hex for non-witness input ${inputTxid}`);
+          updateData.nonWitnessUtxo = hex2bin(rawTxHex);
+        }
+        if (scriptTypeInfo.type === "P2SH" && scriptTypeInfo.redeemScript) {
+          updateData.redeemScript = hex2bin(scriptTypeInfo.redeemScript.hex);
+        }
+        psbt.updateInput(index, updateData);
+        console.log(`[PSBTService] Input ${index} enriched. Value: ${utxoDetails.value}`);
       }
+      console.log(`[PSBTService] All inputs enriched. Total Input Value: ${totalInputValue.toString()}`);
 
-      // Calculate the required change value to achieve target fee using BigInt
-      const nonChangeOutputsTotal = tx.outs.reduce((sum, output, index) => 
-        index !== changeOutputIndex ? sum + BigInt(output.value) : sum, BigInt(0));
-      
-      const newChangeValue = totalIn - nonChangeOutputsTotal - targetFee;
+      // 2. Identify outputs to preserve from original PSBT (excluding any potential old change to userAddress)
+      // And calculate their total value.
+      let totalValueToPreservedOutputs = BigInt(0);
+      const outputsToPreserve: { address?: string; script: Buffer; value: bigint }[] = [];
 
-      if (newChangeValue < BigInt(546)) { // Dust limit
-        throw new Error(`Cannot achieve target fee rate: change would be dust (${newChangeValue} sats)`);
-      }
-
-      // Update the change output with the new value
-      tx.outs[changeOutputIndex].value = Number(newChangeValue);
-
-      // Recalculate actual fee after adjustment
-      const totalOut = tx.outs.reduce((sum, output) => sum + BigInt(output.value), BigInt(0));
-      const actualFee = totalIn - totalOut;
-
-      await logger.info("api", {
-        message: "Fee Adjustment",
-        data: JSON.parse(JSON.stringify({
-          originalChangeValue: tx.outs[changeOutputIndex].value,
-          newChangeValue: newChangeValue,
-          targetFee: targetFee,
-          targetFeeRate: requestedFeeRateVB,
-          actualFee: actualFee,
-          actualFeeRate: Number(actualFee)/Number(vsize)
-        }, bigIntSerializer))
-      });
-
-      // Validate fees if requested
-      if (options?.validateFees) {
-        // Check ancestor fee rates
-        for (const [index, ancestorInfo] of ancestorInfos.entries()) {
-          if (ancestorInfo) {
-            const ancestorFees = BigInt(ancestorInfo.fees);
-            const ancestorVsize = BigInt(ancestorInfo.vsize);
-            const effectiveFeeRate = Number(actualFee + ancestorFees) /
-              Number(vsize + ancestorVsize);
-
-            await logger.debug("api", {
-              message: `Ancestor Fee Analysis for Input ${index}`,
-              data: JSON.parse(JSON.stringify({
-                ancestorFees: ancestorFees,
-                ancestorVsize: ancestorVsize,
-                currentTxFee: actualFee,
-                currentTxVsize: vsize,
-                totalFees: actualFee + ancestorFees,
-                totalVsize: vsize + ancestorVsize,
-                effectiveFeeRate,
-                targetFeeRate: requestedFeeRateVB
-              }, bigIntSerializer))
-            });
-
-            // If ancestors require higher fee rate, adjust the fee again
-            if (effectiveFeeRate < Number(requestedFeeRateVB)) {
-              const requiredFee = BigInt(Math.ceil(
-                Number(requestedFeeRateVB) * Number(vsize + ancestorVsize) -
-                Number(ancestorFees)
-              ));
-
-              const adjustedChangeValue = totalIn - nonChangeOutputsTotal - requiredFee;
-              if (adjustedChangeValue < BigInt(546)) {
-                throw new Error(
-                  `Cannot achieve target fee rate with ancestors: change would be dust (${adjustedChangeValue} sats)`
-                );
-              }
-
-              // Update change output with adjusted value
-              tx.outs[changeOutputIndex].value = Number(adjustedChangeValue);
-              await logger.info("api", {
-                message: "Adjusted for ancestors",
-                data: JSON.parse(JSON.stringify({
-                  newChangeValue: adjustedChangeValue,
-                  requiredFee: requiredFee
-                }, bigIntSerializer))
-              });
+      for (const output of originalTx.outs) {
+          let isChangeToUser = false;
+          try {
+            const outputAddress = bjsAddress.fromOutputScript(output.script, network);
+            if (outputAddress === userAddress) {
+                isChangeToUser = true;
             }
+          } catch (e) { /* Not an address output or not parsable, definitely not change to userAddress */ }
+
+          if (!isChangeToUser) {
+            outputsToPreserve.push({ script: Buffer.from(output.script), value: BigInt(output.value) });
+            totalValueToPreservedOutputs += BigInt(output.value);
+            console.log(`[PSBTService] Preserving original output: value=${output.value}, script=${bytesToHex(output.script)}`);
+          } else {
+            console.log(`[PSBTService] Ignoring original output to user (potential old change): value=${output.value}, script=${bytesToHex(output.script)}`);
           }
+      }
+      
+      let totalValueToOthers = totalValueToPreservedOutputs;
+
+      // 3. Add service fee output if applicable
+      if (options?.serviceFeeDetails && options.serviceFeeDetails.fee > 0 && options.serviceFeeDetails.address) {
+        const serviceFeeScript = bjsAddress.toOutputScript(options.serviceFeeDetails.address, network);
+        outputsToPreserve.push({
+          script: serviceFeeScript,
+          value: BigInt(options.serviceFeeDetails.fee),
+        });
+        totalValueToOthers += BigInt(options.serviceFeeDetails.fee);
+        console.log(`[PSBTService] Added service fee output: ${options.serviceFeeDetails.fee} sats to ${options.serviceFeeDetails.address}`);
+      }
+      
+      // Clear existing outputs from PSBT object to rebuild cleanly
+      while (psbt.txOutputs.length > 0) {
+        psbt.txOutputs.pop();
+      }
+      if (psbt.data.globalMap.unsignedTx) {
+          psbt.data.globalMap.unsignedTx.tx.outs = [];
+      }
+
+      // Add preserved and service fee outputs to PSBT for size estimation
+      outputsToPreserve.forEach(out => {
+        psbt.addOutput({ script: out.script, value: out.value });
+      });
+      
+      // Add a dummy change output for size estimation - use a non-dust value
+      psbt.addOutput({ address: userAddress, value: BigInt(2000) }); // e.g., 2000 sats
+
+      // Finalize inputs for accurate size calculation
+      for (let i = 0; i < psbt.inputCount; i++) {
+        try {
+          psbt.finalizeInput(i);
+          console.log(`[PSBTService] Successfully finalized input #${i} for size estimation.`);
+        } catch (e) {
+            // This can happen if, for example, a script type needs a redeemScript that wasn't provided
+            // For standard P2WPKH from buyerUtxoDetails, this should generally be fine.
+            // console.warn(`[PSBTService] Non-critical error during psbt.finalizeInput(${i}) for size estimation: ${e.message}`);
+            console.error(`[PSBTService] CRITICAL error during psbt.finalizeInput(${i}) for input ${psbt.txInputs[i].hash.toString('hex')}:${psbt.txInputs[i].index}: ${e.message}`);
+            throw new Error(`Failed to finalize input #${i} for PSBT construction: ${e.message}`);
+        }
+      }
+      
+      const tempTx = psbt.extractTransaction(true);
+      const estimatedVsize = BigInt(tempTx.virtualSize());
+      let calculatedMinerFee = estimatedVsize * BigInt(Math.ceil(targetFeeRateSatVb));
+      console.log(`[PSBTService] Fee estimation: VSize=${estimatedVsize}, Rate=${targetFeeRateSatVb} sat/vB, MinerFee=${calculatedMinerFee}`);
+      
+      // Remove dummy change output and rebuild outputs correctly
+      psbt.txOutputs.pop(); // remove dummy change
+      if (psbt.data.globalMap.unsignedTx) {
+        psbt.data.globalMap.unsignedTx.tx.outs.pop();
+      }
+
+
+      let actualUserChange = totalInputValue - totalValueToOthers - calculatedMinerFee;
+      console.log(`[PSBTService] User change calculation: totalIn=${totalInputValue}, totalToOthers=${totalValueToOthers}, minerFee=${calculatedMinerFee}, change=${actualUserChange}`);
+
+      if (actualUserChange >= TX_CONSTANTS.DUST_SIZE) {
+        psbt.addOutput({ address: userAddress, value: actualUserChange });
+        console.log(`[PSBTService] Added actual user change output: ${actualUserChange} sats to ${userAddress}`);
+      } else if (actualUserChange > 0) {
+        calculatedMinerFee += actualUserChange;
+        actualUserChange = BigInt(0);
+        console.log(`[PSBTService] User change ${actualUserChange} is below dust, adding to fee. New miner fee: ${calculatedMinerFee}`);
+      } else if (actualUserChange < 0) {
+        throw new Error(
+          `Insufficient funds: Input ${totalInputValue}, To Others ${totalValueToOthers}, Miner Fee ${calculatedMinerFee}. Deficit: ${-actualUserChange}`,
+        );
+      }
+      
+      if (isDryRun) {
+        return {
+          estimatedFee: Number(calculatedMinerFee),
+          estimatedVsize: Number(estimatedVsize),
+          totalInputValue: totalInputValue,
+          totalOutputValue: totalValueToOthers,
+          finalUserChange: actualUserChange,
+        };
+      }
+      
+      psbt.setMaximumFeeRate(Math.ceil(targetFeeRateSatVb * 1.5)); // Safety margin
+
+      // Finalize inputs AGAIN on the final PSBT structure before returning to client
+      // This ensures the PSBT is ready for the client to sign.
+      console.log("[PSBTService] Finalizing inputs on the final PSBT structure...");
+      for (let i = 0; i < psbt.inputCount; i++) {
+        try {
+          psbt.finalizeInput(i);
+          console.log(`[PSBTService] Successfully finalized input #${i} on final PSBT.`);
+        } catch (e) {
+          // If this finalization fails, it's a more critical issue for client signing.
+          console.error(`[PSBTService] CRITICAL error during FINAL psbt.finalizeInput(${i}) for input ${psbt.txInputs[i].hash.toString('hex')}:${psbt.txInputs[i].index}: ${e.message}`);
+          throw new Error(`Failed to finalize input #${i} on the final PSBT: ${e.message}`);
         }
       }
 
-      // Identify inputs to sign
-      const inputsToSign = tx.ins.map((_, index) => ({ index }));
-      await logger.debug("api", {
-        message: "Inputs to sign",
-        data: inputsToSign
-      });
+      const finalPsbtHex = psbt.toHex();
+      
+      // For verification, re-parse and log details - Keep this section for debugging for now
+      console.log("[PSBTService] ------------- VERIFYING FINAL psbtHex ON SERVER (processCounterpartyPSBT v2.0) ------------- ");
+      // (Optional: Add verification log similar to buildPsbtFromUserFundedRawHex if needed)
+      console.log("[PSBTService] ------------------------------------------------------------------------------------\n");
 
-      // Convert updated PSBT to hex
-      const updatedPsbtHex = psbt.toHex();
-      await logger.debug("api", {
-        message: "Updated PSBT Hex",
-        data: updatedPsbtHex
-      });
 
       return {
-        psbt: updatedPsbtHex,
+        psbtHex: finalPsbtHex,
         inputsToSign,
+        estimatedFee: Number(calculatedMinerFee),
+        estimatedVsize: Number(estimatedVsize),
+        totalInputValue,
+        totalOutputValue: totalValueToOthers,
+        finalUserChange: actualUserChange,
       };
+
     } catch (error) {
-      await logger.error("api", {
-        message: "Error processing Counterparty PSBT",
-        error: error instanceof Error ? error.message : "Unknown error"
+      console.error("[PSBTService] === ERROR in processCounterpartyPSBT v2.0 ===");
+      await logger.error("psbt-service", {
+        message: "Error processing Counterparty PSBT v2.0",
+        error: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
       });
       throw new Error(
-        `Failed to process PSBT: ${
+        `Failed to process PSBT (v2.0): ${
           error instanceof Error ? error.message : "Unknown error"
         }`,
       );
     }
   }
+
+  public static async buildPsbtFromUserFundedRawHex(
+    counterpartyTxHex: string,
+    userAddress: string,
+    targetFeeRateSatVb: number,
+    options: {
+      dispenserDestinationAddress: string;
+      dispenserPaymentAmount: number;
+      serviceFeeDetails?: { fee: number; address: string };
+    }
+  ): Promise<{
+    psbtHex: string;
+    inputsToSign: { index: number; address?: string; sighashTypes?: number[] }[];
+    estimatedFee: number;
+    estimatedVsize: number;
+    finalBuyerChange: number;
+  }> {
+    console.log("[PSBTService] Entered buildPsbtFromUserFundedRawHex v8.1 (Robust Fee/Change, No Server Finalize)");
+    console.log(
+      `  Params: userAddress=${userAddress}, targetFeeRateSatVb=${targetFeeRateSatVb}, counterpartyTxHex (len)=${counterpartyTxHex.length}`,
+    );
+    console.log("  Options:", options);
+
+    const network = networks.bitcoin;
+    const psbt = new Psbt({ network });
+    const inputsToSign: { index: number; address?: string; sighashTypes?: number[] }[] = [];
+
+    try {
+      const cpTx = Transaction.fromHex(counterpartyTxHex);
+
+      // Allow multiple inputs from the Counterparty transaction hex
+      if (!cpTx.ins || cpTx.ins.length === 0) {
+        throw new Error(
+          `Counterparty transaction hex must have at least one input, found ${cpTx.ins?.length || 0}`,
+        );
+      }
+      if (!cpTx.outs || cpTx.outs.length === 0) {
+        throw new Error("Counterparty transaction hex has no outputs.");
+      }
+
+      // Process all inputs from the Counterparty transaction
+      let totalBuyerInputValue = BigInt(0);
+      for (const [index, cpInput] of cpTx.ins.entries()) {
+        const inputTxid = Buffer.from(cpInput.hash).reverse().toString("hex");
+        const inputVout = cpInput.index;
+
+        console.log(`[PSBTService] Processing input ${index} from CP Hex: ${inputTxid}:${inputVout}`);
+
+        const utxoDetails = await this.commonUtxoService.getSpecificUTXO(
+          inputTxid,
+          inputVout,
+          { includeAncestorDetails: false }, // Do not force public API here
+        );
+
+        if (!utxoDetails || !utxoDetails.script || utxoDetails.value === undefined) {
+          throw new Error(
+            `Failed to fetch UTXO details for input ${index}: ${inputTxid}:${inputVout}`,
+          );
+        }
+        const inputValue = BigInt(utxoDetails.value);
+        totalBuyerInputValue += inputValue;
+        console.log(
+          `[PSBTService] Fetched UTXO details for input ${index}: script=${utxoDetails.script}, value=${inputValue}`,
+        );
+
+        psbt.addInput({
+          hash: inputTxid,
+          index: inputVout,
+          sequence: cpInput.sequence,
+          witnessUtxo: {
+            script: hex2bin(utxoDetails.script),
+            value: inputValue,
+          },
+        });
+        // Assuming all inputs from cpTx are to be signed by the userAddress
+        inputsToSign.push({ index, address: userAddress, sighashTypes: [Transaction.SIGHASH_ALL] });
+      }
+
+      let totalValueToOthers = BigInt(0);
+      const finalOutputs: { address?: string; script?: Buffer; value: bigint }[] = [];
+
+      // 1. Dispenser payment output
+      finalOutputs.push({
+        address: options.dispenserDestinationAddress,
+        value: BigInt(options.dispenserPaymentAmount),
+      });
+      totalValueToOthers += BigInt(options.dispenserPaymentAmount);
+
+      // 2. OP_RETURN output from cpTx
+      const opReturnOutput = cpTx.outs.find(out => out.script.length > 0 && out.script[0] === 0x6a);
+      if (opReturnOutput) {
+        finalOutputs.push({ script: Buffer.from(opReturnOutput.script), value: BigInt(opReturnOutput.value) });
+      }
+      
+      // 3. Service fee output
+      if (options.serviceFeeDetails && options.serviceFeeDetails.fee > 0 && options.serviceFeeDetails.address) {
+        finalOutputs.push({
+          address: options.serviceFeeDetails.address,
+          value: BigInt(options.serviceFeeDetails.fee),
+        });
+        totalValueToOthers += BigInt(options.serviceFeeDetails.fee);
+      }
+
+      // ESTIMATE SIZE AND FEE
+      const outputsForEstimation: Output[] = [];
+      // 1. Dispenser payment output (assume P2WPKH for estimation)
+      outputsForEstimation.push({ type: "P2WPKH" as ScriptType, value: Number(options.dispenserPaymentAmount) });
+      // 2. OP_RETURN output (if present) - estimateFee handles type via determineOutputType
+      if (opReturnOutput) {
+        outputsForEstimation.push({ script: opReturnOutput.script.toString('hex'), value: Number(opReturnOutput.value) });
+      }
+      // 3. Service fee output (if present, assume P2WPKH for estimation)
+      if (options.serviceFeeDetails && options.serviceFeeDetails.fee > 0) {
+        outputsForEstimation.push({ type: "P2WPKH" as ScriptType, value: options.serviceFeeDetails.fee });
+      }
+      // 4. Change output (assume P2WPKH, value doesn't matter as much for size here)
+      outputsForEstimation.push({ type: "P2WPKH" as ScriptType, value: 1000 }); // Dummy value for size estimation
+
+      const estimatedMinerFeeFull = estimateFee(outputsForEstimation, targetFeeRateSatVb, 1); // 1 input
+      let calculatedMinerFee = BigInt(estimatedMinerFeeFull);
+      const estimatedVsize = Math.ceil(estimatedMinerFeeFull / targetFeeRateSatVb); // Back-calculate VSize from fee and rate
+      
+      console.log(`[PSBTService] Fee Est (using estimateFee): totalValueToOthers=${totalValueToOthers}, estimatedVsize=${estimatedVsize}, targetFeeRateSatVb=${targetFeeRateSatVb}, calculatedMinerFee=${calculatedMinerFee}`);
+
+      let actualBuyerChange = totalBuyerInputValue - totalValueToOthers - calculatedMinerFee;
+      console.log(`[PSBTService] Buyer's available for change & fee: ${totalBuyerInputValue - totalValueToOthers}. Calculated change (before dust check): ${actualBuyerChange}`);
+
+      // Add final outputs to PSBT
+      finalOutputs.forEach(out => {
+         if (out.address) psbt.addOutput({ address: out.address, value: out.value });
+         else if (out.script) psbt.addOutput({ script: out.script, value: out.value });
+      });
+
+      if (actualBuyerChange >= TX_CONSTANTS.DUST_SIZE) {
+        psbt.addOutput({ address: userAddress, value: actualBuyerChange });
+      } else if (actualBuyerChange > 0) {
+        calculatedMinerFee += actualBuyerChange;
+        actualBuyerChange = BigInt(0);
+      } else if (actualBuyerChange < 0) {
+        throw new Error(
+          `Insufficient funds: Input ${totalBuyerInputValue}, To Others ${totalValueToOthers}, Miner Fee ${calculatedMinerFee}. Deficit: ${-actualBuyerChange}`,
+        );
+      }
+      
+      // DO NOT CALL FINALIZEINPUT on server for this version
+      // The PSBT will be finalized by the client's wallet.
+
+      const finalPsbtHex = psbt.toHex();
+      console.log("[PSBTService] PSBT constructed (v8.1 - no server finalize). Ready for client.");
+
+      return {
+        psbtHex: finalPsbtHex,
+        inputsToSign,
+        estimatedFee: Number(calculatedMinerFee),
+        estimatedVsize: Number(estimatedVsize),
+        finalBuyerChange: Number(actualBuyerChange),
+      };
+    } catch (error) {
+      console.error("[PSBTService] ERROR in buildPsbtFromUserFundedRawHex v8.1:", error);
+      await logger.error("psbt-service", {
+        message: "Error in buildPsbtFromUserFundedRawHex v8.1",
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      throw error;
+    }
+  }
+
+  /* static async processCounterpartyPSBT( ... ) { ... } // Commented out for now, will be refactored/consolidated later */
 }
