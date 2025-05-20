@@ -49,6 +49,7 @@ export function Setting({
             {filterButtons.map((filter) => (
               <button
                 key={filter}
+                type="button"
                 class={`cursor-pointer text-xs tablet:text-sm font-black ${
                   localFilters.includes(filter)
                     ? "text-stamp-purple-bright "

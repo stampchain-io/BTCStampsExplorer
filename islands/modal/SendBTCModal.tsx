@@ -8,6 +8,7 @@ import { inputField } from "$form";
 import { tooltipIcon } from "$notification";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { showToast } from "$lib/utils/toastSignal.ts";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -28,6 +29,7 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
   const [maxTooltipText, setMaxTooltipText] = useState("EMPTY YOUR WALLET");
   const [isMaxMode, setIsMaxMode] = useState(false);
   const [_windowWidth, setWindowWidth] = useState(globalThis.innerWidth);
+  const [tosAgreed, setTosAgreed] = useState(false);
 
   /* ===== REFS ===== */
   const maxTooltipTimeoutRef = useRef<number | null>(null);
@@ -39,22 +41,18 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
     handleChangeFee: internalHandleChangeFee,
     handleSubmit,
     isSubmitting,
-    error,
-    setError,
-    successMessage,
-    setSuccessMessage,
+    error: formHookError,
+    setError: setFormHookError,
   } = useTransactionForm({
     type: "send",
     initialFee,
   });
 
   /* ===== EFFECTS ===== */
-  // Sync external fee state with internal state
   useEffect(() => {
     handleChangeFee(formState.fee);
   }, [formState.fee]);
 
-  // Cleanup timeouts
   useEffect(() => {
     return () => {
       if (maxTooltipTimeoutRef.current) {
@@ -63,32 +61,23 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
     };
   }, []);
 
-  // Update amount when fee changes in max mode
   useEffect(() => {
     if (!isMaxMode || balance == null) return;
-
     try {
       const maxAmountBTC = calculateMaxAmount(formState.fee, balance);
-
       if (!maxAmountBTC) {
-        setError("Insufficient balance to cover network fees");
+        setFormHookError("Insufficient balance to cover network fees");
         return;
       }
-
-      setFormState((prev) => ({
-        ...prev,
-        amount: maxAmountBTC,
-      }));
+      setFormState((prev) => ({ ...prev, amount: maxAmountBTC }));
     } catch (error) {
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to calculate maximum amount",
-      );
+      const errorMsg = error instanceof Error
+        ? error.message
+        : "Failed to calculate max amount";
+      setFormHookError(errorMsg);
     }
-  }, [formState.fee, balance, isMaxMode]);
+  }, [formState.fee, balance, isMaxMode, setFormState, setFormHookError]);
 
-  // Reset tooltip state
   useEffect(() => {
     if (!isMaxMode) {
       setMaxTooltipText("EMPTY YOUR WALLET");
@@ -97,20 +86,23 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
     }
   }, [isMaxMode, formState.fee]);
 
-  // Handle window resize
   useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(globalThis.innerWidth);
-    };
-
+    const handleResize = () => setWindowWidth(globalThis.innerWidth);
     globalThis.addEventListener("resize", handleResize);
     return () => globalThis.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    if (formHookError) {
+      showToast(formHookError, "error", false);
+      setFormHookError(null);
+    }
+  }, [formHookError, setFormHookError]);
+
   /* ===== HELPER FUNCTIONS ===== */
   const calculateMaxAmount = (feeRate: number, balanceAmount: number) => {
     const estimatedVSize = 141;
-    const feeInSatoshis = Math.ceil((feeRate * estimatedVSize) / 1000);
+    const feeInSatoshis = Math.ceil(feeRate * estimatedVSize);
     const feeInBTC = feeInSatoshis / 100000000;
     return balanceAmount > feeInBTC
       ? (balanceAmount - feeInBTC).toFixed(8)
@@ -137,19 +129,15 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
 
   /* ===== EVENT HANDLERS ===== */
   const handleCloseModal = () => {
-    logger.debug("ui", {
-      message: "Modal closing",
-      component: "SendBTCModal",
-    });
+    logger.debug("ui", { message: "Modal closing", component: "SendBTCModal" });
     closeModal();
   };
 
   const handleSendSubmit = async () => {
     await handleSubmit(async () => {
-      // Implement send transaction logic here
       const options = {
         return_psbt: true,
-        fee_per_kb: formState.fee,
+        fee_per_kb: formState.fee * 1000,
       };
 
       const requestBody = {
@@ -166,93 +154,166 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || "Failed to create send transaction.",
-        );
+        const errorData = await response.json().catch(() => ({
+          error: "Failed to parse server error.",
+        }));
+        const detail = errorData.error || "Failed to create send transaction.";
+        logger.error("ui", {
+          message: "SendBTC API error",
+          detail,
+          requestBody,
+        });
+        throw new Error("Transaction creation failed. Please try again.");
       }
 
       const responseData = await response.json();
       if (!responseData?.result?.psbt) {
-        throw new Error("Failed to create send transaction.");
+        logger.error("ui", {
+          message: "SendBTC API invalid response",
+          responseData,
+        });
+        throw new Error("Received invalid transaction data from server.");
       }
 
       const signResult = await walletContext.signPSBT(
         wallet,
         responseData.result.psbt,
-        [], // Empty array for inputs to sign
-        true, // Enable RBF
+        [],
+        true,
       );
 
-      if (signResult.signed && signResult.txid) {
-        setSuccessMessage(
-          `Transaction sent successfully. TXID: ${signResult.txid}`,
-        );
-        setTimeout(closeModal, 5000);
+      if (signResult.signed) {
+        if (signResult.txid) {
+          showToast(
+            `Transaction sent! TXID: ${signResult.txid.substring(0, 10)}...`,
+            "success",
+            false,
+          );
+          setTimeout(closeModal, 1000);
+        } else if (signResult.psbt) {
+          try {
+            showToast("Transaction signed. Broadcasting...", "info", true);
+            const broadcastTxid = await walletContext.broadcastPSBT(
+              signResult.psbt,
+            );
+            if (broadcastTxid && typeof broadcastTxid === "string") {
+              showToast(
+                `Transaction broadcasted! TXID: ${
+                  broadcastTxid.substring(0, 10)
+                }...`,
+                "success",
+                false,
+              );
+              setTimeout(closeModal, 1000);
+            } else {
+              logger.error("ui", {
+                message: "Broadcast did not return valid TXID (SendBTC)",
+                broadcastResult: broadcastTxid,
+                psbt: signResult.psbt,
+              });
+              throw new Error(
+                "Broadcast failed after signing. Check status or try again.",
+              );
+            }
+          } catch (broadcastError: unknown) {
+            const beMsg = broadcastError instanceof Error
+              ? broadcastError.message
+              : String(broadcastError);
+            logger.error("ui", {
+              message: "Error broadcasting signed PSBT (SendBTC)",
+              error: beMsg,
+              psbt: signResult.psbt,
+            });
+            throw new Error(
+              `Broadcast error: ${beMsg.substring(0, 50)}${
+                beMsg.length > 50 ? "..." : ""
+              }`,
+            );
+          }
+        } else {
+          logger.error("ui", {
+            message: "Signed but no TXID or PSBT hex (SendBTC)",
+            result: signResult,
+          });
+          throw new Error(
+            "Signing reported success, but critical data missing.",
+          );
+        }
       } else if (signResult.cancelled) {
-        throw new Error("Transaction signing was cancelled.");
+        showToast("Transaction signing was cancelled.", "info", true);
       } else {
-        throw new Error(`Failed to sign PSBT: ${signResult.error}`);
+        const signError = signResult.error || "Unknown signing error";
+        logger.error("ui", {
+          message: "PSBT signing failed (SendBTC)",
+          error: signError,
+        });
+        throw new Error(
+          `Signing failed: ${signError.substring(0, 50)}${
+            signError.length > 50 ? "..." : ""
+          }`,
+        );
       }
     });
   };
 
   const handleMaxClick = () => {
-    if (balance == null) return;
-
+    if (balance == null || formState.fee == null) {
+      showToast(
+        "Balance or fee rate not available to calculate max amount.",
+        "info",
+      );
+      return;
+    }
     try {
       const maxAmountBTC = calculateMaxAmount(formState.fee, balance);
-
       if (!maxAmountBTC) {
-        setError("Insufficient balance to cover network fees");
+        showToast(
+          "Insufficient balance to cover network fees.",
+          "error",
+          false,
+        );
         return;
       }
-
       setIsMaxMode(true);
       setFormState((prev) => ({
         ...prev,
         amount: maxAmountBTC,
+        amountError: "",
       }));
-
-      // Initial tooltip display on click
       setMaxTooltipText("WALLET EMPTIED");
       setIsMaxTooltipVisible(true);
-      setAllowMaxTooltip(true); // Allow tooltip to show on subsequent hovers
-
+      setAllowMaxTooltip(true);
       if (maxTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(maxTooltipTimeoutRef.current);
+        clearTimeout(maxTooltipTimeoutRef.current);
       }
-
-      maxTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsMaxTooltipVisible(false);
-      }, 1500);
-    } catch (error) {
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to calculate maximum amount",
+      maxTooltipTimeoutRef.current = setTimeout(
+        () => setIsMaxTooltipVisible(false),
+        1500,
       );
+    } catch (error) {
+      const errorMsg = error instanceof Error
+        ? error.message
+        : "Failed to calculate max amount";
+      showToast(errorMsg, "error", false);
     }
   };
 
   const handleMaxMouseEnter = () => {
     if (allowMaxTooltip) {
-      // Show different tooltip text based on max mode
       setMaxTooltipText(isMaxMode ? "WALLET EMPTIED" : "EMPTY YOUR WALLET");
-
       if (maxTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(maxTooltipTimeoutRef.current);
+        clearTimeout(maxTooltipTimeoutRef.current);
       }
-
-      maxTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsMaxTooltipVisible(true);
-      }, 1500);
+      maxTooltipTimeoutRef.current = setTimeout(
+        () => setIsMaxTooltipVisible(true),
+        1500,
+      );
     }
   };
 
   const handleMaxMouseLeave = () => {
     if (maxTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(maxTooltipTimeoutRef.current);
+      clearTimeout(maxTooltipTimeoutRef.current);
     }
     setIsMaxTooltipVisible(false);
     setAllowMaxTooltip(true);
@@ -261,36 +322,23 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
   const handleAmountInput = (e: Event) => {
     const inputValue = (e.target as HTMLInputElement).value;
     const maxAmountBTC = calculateMaxAmount(formState.fee, balance ?? 0);
-
-    // Only disable max mode if the new value is different from the calculated max amount
     if (maxAmountBTC && inputValue !== maxAmountBTC) {
       setIsMaxMode(false);
       setAllowMaxTooltip(true);
     }
-
-    // Special handling for deleting "0."
     if (formState.amount === "0." && inputValue === "0") {
-      setFormState((prev) => ({
-        ...prev,
-        amount: "",
-      }));
+      setFormState((prev) => ({ ...prev, amount: "" }));
       return;
     }
-
-    // Handle initial "0" or "." input
     if (inputValue === "0" || inputValue === ".") {
-      setFormState((prev) => ({
-        ...prev,
-        amount: "0.",
-      }));
+      setFormState((prev) => ({ ...prev, amount: "0." }));
       return;
     }
-
-    // Regular input handling with validation
     const sanitizedValue = sanitizeAmountInput(inputValue);
     setFormState((prev) => ({
       ...prev,
       amount: sanitizedValue,
+      amountError: "",
     }));
   };
 
@@ -323,7 +371,7 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
                       ? { one: 14, other: 19 }
                       : { one: 19, other: 27 };
                     const baseWidth = !value
-                      ? other // Use 'other' width (24px) for empty/placeholder
+                      ? other
                       : value.split("").reduce((total, char) => {
                         return total +
                           (char === "1" || char === "." ? one : other);
@@ -388,28 +436,23 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
 
       {/* ===== FEE CALCULATOR ===== */}
       <FeeCalculatorSimple
-        isModal={true}
         fee={formState.fee}
+        amount={Number(formState.amount) || 0}
         handleChangeFee={internalHandleChangeFee}
         type="send"
-        amount={formState.amount ? parseFloat(formState.amount) : 0}
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
         onSubmit={handleSendSubmit}
         onCancel={handleCloseModal}
-        buttonName="SEND"
-        className="pt-9 mobileLg:pt-12"
-        userAddress={wallet?.address}
-        recipientAddress={formState.recipientAddress}
-        inputType="P2WPKH"
+        buttonName={isSubmitting ? "BROADCASTING..." : "SEND"}
+        tosAgreed={tosAgreed}
+        onTosChange={setTosAgreed}
+        className="mt-auto"
+        _userAddress={wallet?.address ?? ""}
+        _recipientAddress={formState.recipientAddress ?? ""}
+        _inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
-        tosAgreed={true}
       />
-
-      {/* ===== STATUS MESSAGES ===== */}
-      {error && <div class="text-red-500 mt-2">{error}</div>}
-      {successMessage && <div class="text-green-500 mt-2">{successMessage}
-      </div>}
     </ModalBase>
   );
 }

@@ -1,6 +1,7 @@
 import { SRC20Service } from "$server/services/src20/index.ts";
 import type { IDeploySRC20, IMintSRC20, ITransferSRC20, IPrepareSRC20TX } from "$types/index.d.ts";
 import { SRC20MultisigPSBTService } from "$server/services/src20/psbt/src20MultisigPSBTService.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 interface SRC20Operation {
   op: string;
@@ -43,8 +44,12 @@ export class SRC20OperationService {
         change_value: result.change,
       };
     } catch (error) {
-      console.error(error);
-      return { error: error.message };
+      logger.error("src20-operation-service", {
+        message: "Error in executeSRC20Operation",
+        error: error instanceof Error ? error.message : String(error),
+        params
+      });
+      return { error: error instanceof Error ? error.message : "Unknown error in SRC20 operation" };
     }
   }
 

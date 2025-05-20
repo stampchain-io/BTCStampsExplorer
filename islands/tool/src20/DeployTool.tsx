@@ -36,7 +36,6 @@ export function SRC20DeployTool(
     handleChangeFee,
     handleInputChange,
     handleSubmit,
-    fetchFees,
     config,
     isSubmitting,
     submissionMessage,
@@ -461,19 +460,13 @@ export function SRC20DeployTool(
       <div className={containerBackground}>
         <FeeCalculatorSimple
           fee={formState.fee}
-          dec={formState.dec}
           ticker={formState.token}
           limit={Number(formState.lim) || 0}
           supply={Number(formState.max) || 0}
           fromPage="src20_deploy"
           handleChangeFee={handleChangeFee}
           type="src20"
-          fileType="application/json"
-          fileSize={0}
-          issuance={0}
-          serviceFee={0}
           BTCPrice={formState.BTCPrice}
-          onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmitWithUpload}
           buttonName={isConnected ? "DEPLOY" : "CONNECT WALLET"}
@@ -482,16 +475,6 @@ export function SRC20DeployTool(
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
           userAddress={wallet?.address ?? ""}
-          disabled={false}
-          effectiveFeeRate={0}
-          utxoAncestors={[]}
-          feeDetails={{
-            minerFee: formState.psbtFees?.estMinerFee || 0,
-            dustValue: formState.psbtFees?.totalDustValue || 0,
-            hasExactFees: true,
-            totalValue: formState.psbtFees?.totalValue || 0,
-            estimatedSize: formState.psbtFees?.est_tx_size || 0,
-          }}
         />
 
         <StatusMessages

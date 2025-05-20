@@ -4,7 +4,10 @@ import ModalOverlay from "$islands/layout/ModalOverlay.tsx";
 
 export default function ModalProvider() {
   // Debug logging
-  console.log("ModalProvider rendering:", globalModal.value);
+  console.log(
+    "ModalProvider rendering with globalModal.value:",
+    globalModal.value,
+  );
 
   return (
     <Fragment>

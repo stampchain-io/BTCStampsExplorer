@@ -45,17 +45,19 @@ export const handler: Handlers = {
       const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
       const selectedTab = url.searchParams.get("ident") || "all";
       const page = parseInt(url.searchParams.get("page") || "1");
-      const page_size = parseInt(url.searchParams.get("limit") || "20");
+      const limit = parseInt(url.searchParams.get("limit") || "60");
 
       const result = await StampController.getCollectionPageData({ sortBy });
       const collectionsData = await CollectionController.getCollectionStamps({
-        limit: page_size,
+        limit: limit,
         page: page,
         creator: "",
         sortBy,
       });
 
-      let collections: CollectionRow[] = [];
+      const collections: CollectionRow[] = [];
+      let totalPages = 1;
+      let totalCollections = 0;
       const type: "stamps" | "cursed" | "all" = "all";
       const ident: SUBPROTOCOLS[] = selectedTab === "all"
         ? ["STAMP", "SRC-721", "SRC-20"] as SUBPROTOCOLS[]
@@ -65,7 +67,7 @@ export const handler: Handlers = {
         collectionsData?.data.map(async (item) => {
           const collectionResult = await StampController.getStamps({
             page,
-            limit: page_size,
+            limit: limit,
             sortBy,
             type,
             filterBy,

@@ -63,7 +63,7 @@ export const StampOverviewHeader = (
 
           {/* Search Component - Hidden when filter is open */}
           <div class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}>
-            <SearchStampModal showButton={true} />
+            <SearchStampModal showButton />
           </div>
         </div>
       </div>

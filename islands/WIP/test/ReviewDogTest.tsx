@@ -8,10 +8,10 @@ export default function ReviewDogTest() {
   };
 
   return (
-    <div>
+    <div class="p-4 space-y-4">
       <h1>Review Dog Test Component</h1>
       <p>Count: {count}</p>
-      <button onClick={increment}>
+      <button type="button" onClick={increment}>
         Increment
       </button>
     </div>

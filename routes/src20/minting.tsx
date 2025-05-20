@@ -50,21 +50,21 @@ export default function SRC20MintingPage({ data }: any) {
     src20s = [],
     page = 1,
     totalPages = 1,
-    filterBy = [],
-    sortBy = "ASC",
+    // filterBy = [], // Removed as filterBy prop on SRC20OverviewHeader is commented out
+    // sortBy = "ASC", // Removed as sortBy prop on SRC20OverviewHeader is commented out
   } = data;
 
   return (
     <div class="flex flex-col">
-      <SRC20OverviewHeader
-        filterBy={filterBy}
-        sortBy={sortBy}
-        title="Minting SRC-20 Tokens"
+      <SRC20OverviewHeader viewType="minting" // Removed other props like onFilterChange, onTimeframeChange, currentSort, etc.,
+        // as this page is not set up to handle that interactivity.
+        // If SRC20OverviewHeader requires them, its usage here or the component itself needs adjustment.
       />
       <SRC20Gallery
         viewType="minting"
         fromPage="src20"
         initialData={src20s}
+        timeframe="24H"
         pagination={{
           page,
           totalPages,
@@ -74,6 +74,7 @@ export default function SRC20MintingPage({ data }: any) {
             globalThis.location.href = url.toString();
           },
         }}
+        useClientFetch={false} // Explicitly set for a server-rendered context
       />
     </div>
   );

@@ -103,6 +103,7 @@ export function ToggleSwitchButton({
   /* ===== COMPONENT RENDER ===== */
   return (
     <button
+      type="button"
       ref={actualRef}
       class={`${toggleButton} ${className}`}
       onClick={handleClick}

@@ -12,7 +12,22 @@ export type LogNamespace =
   | "cache"
   | "auth"
   | "system"
-  | "ui";
+  | "ui"
+  | "src20"
+  | "stamp-create"
+  | "src20-transfer"
+  | "src20-deploy"
+  | "src20-mint"
+  | "quicknode-service"
+  | "common-utxo-service"
+  | "transaction-utxo-service"
+  | "psbt-service"
+  | "api-utxo-query"
+  | "api-src20-create"
+  | "src101-psbt-service"
+  | "src20-operation-service"
+  | "src101-operation-service"
+  | "api-src101-create";
 
 declare global {
   interface Window {
@@ -38,22 +53,22 @@ function isServer(): boolean {
 
 function initializeClientDebug() {
   if (!isServer()) {
-    const existingNamespaces = globalThis.__DEBUG?.namespaces;
+    const existingNamespaces = (globalThis as any).__DEBUG?.namespaces;
 
-    globalThis.__DEBUG = {
+    (globalThis as any).__DEBUG = {
       namespaces: existingNamespaces || "stamps,ui,debug,all",
-      enabled: globalThis.__DEBUG?.enabled ?? true,
+      enabled: (globalThis as any).__DEBUG?.enabled ?? true,
     };
   }
 }
 
 function shouldLog(namespace: LogNamespace): boolean {
   if (!isServer()) {
-    if (!globalThis.__DEBUG?.enabled) return false;
+    if (!(globalThis as any).__DEBUG?.enabled) return false;
 
-    const namespaces = (globalThis.__DEBUG.namespaces || "")
+    const namespaces = ((globalThis as any).__DEBUG.namespaces || "")
       .split(",")
-      .map((n) => n.trim().toLowerCase());
+      .map((n: string) => n.trim().toLowerCase());
 
     return namespaces.includes("all") ||
       namespaces.includes(namespace.toLowerCase());
@@ -108,6 +123,9 @@ function formatLog(level: LogLevel, namespace: LogNamespace, msg: LogMessage) {
   };
 }
 
+const bigIntReplacer = (_key: string, value: any) =>
+  typeof value === "bigint" ? value.toString() : value;
+
 export const logger = {
   debug: (namespace: LogNamespace, msg: LogMessage) => {
     initializeClientDebug();
@@ -120,7 +138,7 @@ export const logger = {
       return;
     }
 
-    const formatted = JSON.stringify(logData, null, 2);
+    const formatted = JSON.stringify(logData, bigIntReplacer, 2);
 
     // Always write to file on server if namespace is enabled
     if (shouldLog(namespace)) {
@@ -138,7 +156,7 @@ export const logger = {
       return;
     }
 
-    const formatted = JSON.stringify(logData, null, 2);
+    const formatted = JSON.stringify(logData, bigIntReplacer, 2);
     console.error(formatted);
     writeToFile(formatted);
   },
@@ -154,7 +172,7 @@ export const logger = {
       return;
     }
 
-    const formatted = JSON.stringify(logData, null, 2);
+    const formatted = JSON.stringify(logData, bigIntReplacer, 2);
     if (shouldLog(namespace)) {
       console.info(formatted);
     }
@@ -170,7 +188,7 @@ export const logger = {
       return;
     }
 
-    const formatted = JSON.stringify(logData, null, 2);
+    const formatted = JSON.stringify(logData, bigIntReplacer, 2);
     console.warn(formatted);
     writeToFile(formatted);
   },

@@ -1,29 +1,44 @@
 import { Handlers } from "$fresh/server.ts";
-import { TX, TXError } from "$globals";
+import { TXError } from "$globals";
+import { AncestorInfo, InputData } from "$types/index.d.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
-import { InputData } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { normalizeFeeRate } from "$server/services/xcpService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 
 type TrxType = "multisig" | "olga";
 
-// Extend InputData to include all possible fee rate inputs
-interface AncestorInfo {
-  txid: string;
-  vout: number;
-  weight?: number;
-}
-
-interface ExtendedInputData extends Omit<InputData, "feeRate"> {
-  feeRate?: number;
-  satsPerVB?: number;
-  satsPerKB?: number;
+interface ExtendedInputData
+  extends Omit<InputData, "feeRate" | "satsPerKB" | "satsPerVB"> {
+  feeRate?: number | string;
+  satsPerVB?: number | string;
+  satsPerKB?: number | string;
   utxoAncestors?: AncestorInfo[];
+  service_fee?: number | string;
+  service_fee_address?: string;
+  dryRun?: boolean;
+  trxType?: TrxType;
 }
 
-export const handler: Handlers<TX | TXError> = {
+interface SRC20CreateResponse {
+  hex?: string;
+  est_tx_size?: number;
+  input_value?: number;
+  total_dust_value?: number;
+  est_miner_fee?: number;
+  fee?: number;
+  change_value?: number;
+  inputsToSign?: Array<
+    { index: number; address: string; sighashType?: number }
+  >;
+  sourceAddress?: string;
+  changeAddress?: string;
+  feeDetails?: any;
+  cpid?: string;
+}
+
+export const handler: Handlers<SRC20CreateResponse | TXError> = {
   async POST(req: Request) {
     try {
       const rawBody = await req.text();
@@ -31,34 +46,57 @@ export const handler: Handlers<TX | TXError> = {
         return ResponseUtil.badRequest("Empty request body");
       }
 
-      let body: ExtendedInputData & { trxType?: TrxType };
+      let body: ExtendedInputData;
       try {
         body = JSON.parse(rawBody);
       } catch (_e) {
         return ResponseUtil.badRequest("Invalid JSON in request body");
       }
 
-      // Normalize fee rate
-      const normalizedFees = normalizeFeeRate({
-        satsPerKB: body.satsPerKB,
-        satsPerVB: body.satsPerVB,
-        feeRate: body.feeRate,
-      });
-
-      // Validate addresses and operation
-      const effectiveSourceAddress = body.sourceAddress || body.fromAddress ||
-        body.changeAddress;
-      const effectiveChangeAddress = body.changeAddress || body.sourceAddress ||
-        body.fromAddress;
-
-      if (!effectiveSourceAddress) {
-        return ResponseUtil.badRequest("Source address is required");
+      if (
+        !body.op || !body.tick ||
+        !(body.sourceAddress || body.fromAddress || body.changeAddress)
+      ) {
+        return ApiResponseUtil.badRequest(
+          "Missing required SRC20 operation fields: op, tick, or an address.",
+        );
       }
 
-      // Validate operation
+      const isEffectivelyDryRun = body.dryRun === true;
+
+      const feeInput: { satsPerKB?: number; satsPerVB?: number } = {};
+      if (body.satsPerKB !== undefined) {
+        feeInput.satsPerKB = typeof body.satsPerKB === "string"
+          ? parseInt(body.satsPerKB)
+          : body.satsPerKB;
+      }
+      if (body.satsPerVB !== undefined) {
+        feeInput.satsPerVB = typeof body.satsPerVB === "string"
+          ? parseInt(body.satsPerVB)
+          : body.satsPerVB;
+      }
+      if (
+        body.feeRate !== undefined && feeInput.satsPerKB === undefined &&
+        feeInput.satsPerVB === undefined
+      ) {
+        feeInput.satsPerKB = typeof body.feeRate === "string"
+          ? parseInt(body.feeRate)
+          : body.feeRate;
+      }
+      const normalizedFees = normalizeFeeRate(feeInput);
+
+      const effectiveSourceAddress = body.sourceAddress || body.fromAddress ||
+        body.changeAddress!;
+      const effectiveChangeAddress = body.changeAddress || body.sourceAddress ||
+        "";
+
+      const opForValidation = body.op.toLowerCase() as
+        | "deploy"
+        | "transfer"
+        | "mint";
       const validationError = await SRC20Service.UtilityService
         .validateOperation(
-          body.op.toLowerCase(),
+          opForValidation,
           {
             sourceAddress: effectiveSourceAddress,
             changeAddress: effectiveChangeAddress,
@@ -70,15 +108,10 @@ export const handler: Handlers<TX | TXError> = {
             toAddress: body.toAddress,
           },
         );
-
-      if (validationError) {
-        return validationError;
-      }
-
-      // Use single path for PSBT creation
+      if (validationError) return validationError as Response;
       if (body.trxType === "multisig") {
         return ResponseUtil.badRequest(
-          "Multisig transactions should use /api/v2/src20/multisig/[operation] endpoint",
+          "Multisig transactions should use dedicated endpoint",
         );
       }
 
@@ -98,37 +131,66 @@ export const handler: Handlers<TX | TXError> = {
           ...(body.email && { email: body.email }),
         },
         satsPerVB: normalizedFees.normalizedSatsPerVB,
-        service_fee: body.service_fee || 0,
+        service_fee: body.service_fee !== undefined
+          ? (typeof body.service_fee === "string"
+            ? parseInt(body.service_fee)
+            : body.service_fee)
+          : 0,
         service_fee_address: body.service_fee_address || "",
         changeAddress: effectiveChangeAddress,
         trxType: body.trxType || "olga",
+        isDryRun: isEffectivelyDryRun,
       });
 
-      // Return consistent response format
-      return ApiResponseUtil.success({
+      const responsePayload: SRC20CreateResponse = {
         hex: psbtResult.psbt?.toHex(),
         est_tx_size: psbtResult.estimatedTxSize,
         input_value: psbtResult.totalInputValue,
         total_dust_value: psbtResult.totalDustValue,
         est_miner_fee: psbtResult.estMinerFee,
-        fee: psbtResult.feeDetails.totalValue,
+        fee: psbtResult.feeDetails?.totalValue,
         change_value: psbtResult.totalChangeOutput,
         inputsToSign: psbtResult.inputs,
         sourceAddress: effectiveSourceAddress,
         changeAddress: psbtResult.changeAddress,
-        feeDetails: {
-          ...psbtResult.feeDetails,
-          minerFee: psbtResult.estMinerFee,
-          dustValue: psbtResult.totalDustValue,
-          totalValue: psbtResult.estMinerFee + psbtResult.totalDustValue,
-        },
-      });
+        feeDetails: psbtResult.feeDetails,
+        cpid: body.tick,
+      };
+
+      if (isEffectivelyDryRun) {
+        delete responsePayload.hex;
+        delete responsePayload.inputsToSign;
+      }
+      return ApiResponseUtil.success(responsePayload);
     } catch (error) {
-      logger.error("stamps", {
-        message: "Error processing request",
-        error: error instanceof Error ? error.message : String(error),
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
+      logger.error("api-src20-create", {
+        message: "Error processing SRC20 create request",
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined,
       });
-      return ApiResponseUtil.internalError(error, error as string);
+
+      if (
+        errorMessage.toLowerCase().includes("insufficient funds") ||
+        errorMessage.toLowerCase().includes("no utxos available") ||
+        errorMessage.includes("UTXO selection failed")
+      ) {
+        return ApiResponseUtil.badRequest(errorMessage);
+      }
+
+      if (
+        errorMessage.includes("Invalid address") ||
+        errorMessage.includes("Invalid operation parameters")
+      ) {
+        return ApiResponseUtil.badRequest(errorMessage);
+      }
+
+      return ApiResponseUtil.internalError(
+        error as Error,
+        "Failed to process SRC20 request",
+      );
     }
   },
 };

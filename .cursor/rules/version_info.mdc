@@ -7,6 +7,6 @@ alwaysApply: true
 
 # Adding version control information for better AI context
 version_info:
-  deno: "2.3.1"
+  deno: "2.3.3"
   fresh: "1.7.3"
   project: "BTCStampsExplorer"

@@ -4,6 +4,8 @@ import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
 import { handleWalletError } from "./walletHelper.ts";
 import { logger } from "$lib/utils/logger.ts";
+import type { BaseToast } from "$lib/utils/toastSignal.ts";
+
 export const isUnisatInstalled = signal<boolean>(false);
 
 export const checkUnisat = () => {
@@ -18,7 +20,7 @@ const getProvider = () => {
 };
 
 export const connectUnisat = async (
-  addToast: (message: string, type: "error" | "success") => void,
+  addToast: (message: string, type: BaseToast["type"]) => void,
 ) => {
   const unisat = getProvider();
   if (!unisat) {

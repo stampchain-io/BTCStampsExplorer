@@ -6,7 +6,7 @@ import {
   StampRow,
 } from "$globals";
 
-import { CollectionGallery, StampGallery } from "$section";
+import { StampGallery } from "$section";
 import { titlePurpleDL } from "$text";
 
 /* ===== TYPES ===== */
@@ -50,7 +50,7 @@ export function StampOverviewGallery({
     },
   ];
 
-  const FeaturedArtistsSection: CollectionGalleryProps = {
+  const _FeaturedArtistsSection: CollectionGalleryProps = {
     title: "FEATURED ARTISTS",
     subTitle: "RECURSIVE COLLECTIONS",
     collections: collectionData,
@@ -112,7 +112,7 @@ export function StampOverviewGallery({
     },
   ];
 
-  const CuttingEdgeSection: CollectionGalleryProps = {
+  const _CuttingEdgeSection: CollectionGalleryProps = {
     title: "CUTTING EDGE",
     subTitle: "RECURSIVE COLLECTIONS",
     collections: collectionData,

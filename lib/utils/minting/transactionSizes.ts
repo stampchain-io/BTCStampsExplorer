@@ -1,15 +1,23 @@
 import { TX_CONSTANTS } from "./constants.ts";
-import type { ScriptType } from "$types/index.d.ts";
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import type {
+  // InputTypeForSizeEstimation, // Removed as unused
+  // OutputTypeForSizeEstimation, // Removed as unused
+  ScriptType,
+  // ScriptTypeInfo, // Removed as unused
+} from "$lib/types/transaction.d.ts";
+import { getScriptTypeInfo as getScriptTypeInfoFromUtils } from "$lib/utils/scriptTypeUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 
-interface TransactionSizeOptions {
-  inputs: Array<{
-    type: ScriptType;
-    isWitness?: boolean;
-    size?: number;
-    ancestor?: { txid: string; vout: number; weight?: number };
-  }>;
+// Using imported types for the options if they resolve correctly
+interface InternalTransactionSizeOptions {
+  inputs: Array<
+    {
+      type: ScriptType;
+      isWitness?: boolean;
+      size?: number;
+      ancestor?: { txid: string; vout: number; weight?: number };
+    }
+  >;
   outputs: Array<{ type: ScriptType }>;
   includeChangeOutput?: boolean;
   changeOutputType?: ScriptType;
@@ -19,23 +27,30 @@ function calculateWitnessWeight(
   input: { type: ScriptType; isWitness?: boolean },
 ) {
   if (!input.isWitness) return 0;
-
-  const stack = TX_CONSTANTS.WITNESS_STACK[input.type];
-  if (!stack) return 0;
-
-  switch (input.type) {
-    case "P2WPKH":
-      return stack.itemsCount + // witness stack count
-        stack.lengthBytes + // length bytes for items
-        stack.signature + // signature
-        stack.pubkey; // pubkey
-    case "P2WSH":
-      return stack.size;
-    case "P2TR":
-      return stack.size;
-    default:
+  if (
+    input.type === "P2WPKH" || input.type === "P2WSH" || input.type === "P2TR"
+  ) {
+    const stack = TX_CONSTANTS.WITNESS_STACK[input.type];
+    if (!stack) {
+      logger.warn("system", {
+        message: `No WITNESS_STACK entry for type: ${input.type}`,
+      });
       return 0;
+    }
+    switch (input.type) {
+      case "P2WPKH":
+        return stack.itemsCount + stack.lengthBytes + stack.signature +
+          stack.pubkey;
+      case "P2WSH":
+      case "P2TR":
+        return stack.size;
+    }
   }
+  logger.warn("system", {
+    message:
+      `calculateWitnessWeight called for unhandled witness type: ${input.type}`,
+  });
+  return 0;
 }
 
 export function estimateTransactionSize({
@@ -43,144 +58,102 @@ export function estimateTransactionSize({
   outputs,
   includeChangeOutput = true,
   changeOutputType = "P2WPKH",
-}: TransactionSizeOptions): number {
-  // Base transaction weight (version + locktime)
+}: InternalTransactionSizeOptions): number {
   let weight = (TX_CONSTANTS.VERSION + TX_CONSTANTS.LOCKTIME) * 4;
 
-  const hasWitness = inputs.some((input) =>
-    getScriptTypeInfo(input.type).isWitness
-  );
+  const hasWitness = inputs.some((input) => {
+    // If InputTypeForSizeEstimation provides isWitness directly, use it.
+    // Otherwise, use getScriptTypeInfo if input only has `type: ScriptType`.
+    // The InputTypeForSizeEstimation defined in transaction.d.ts has isWitness?: boolean
+    return getScriptTypeInfoFromUtils(input.type).isWitness;
+  });
+
   if (hasWitness) {
     weight += (TX_CONSTANTS.MARKER + TX_CONSTANTS.FLAG) * 4;
   }
 
-  logger.debug("stamps", {
-    message: "Base transaction components",
-    data: {
-      version: TX_CONSTANTS.VERSION * 4,
-      locktime: TX_CONSTANTS.LOCKTIME * 4,
-      witnessOverhead: hasWitness
-        ? (TX_CONSTANTS.MARKER + TX_CONSTANTS.FLAG) * 4
-        : 0,
-      totalBase: weight,
-    },
-  });
-
-  // Calculate input weights
   const inputWeights = inputs.map((input) => {
-    const scriptInfo = getScriptTypeInfo(input.type);
     let inputWeight = 0;
-
-    if (scriptInfo.isWitness) {
-      // Non-witness data (weight units = bytes * 4)
-      const outpointWeight = 36 * 4; // (txid + vout) * 4
-      const sequenceWeight = 4 * 4; // nSequence * 4
-      const scriptSigWeight = 1 * 4; // Empty scriptSig length * 4
-
-      // Witness data (weight units = bytes * 1)
-      const witnessWeight = calculateWitnessWeight(input);
-
+    if (input.isWitness) {
+      const outpointWeight = 36 * 4;
+      const sequenceWeight = 4 * 4;
+      const scriptSigWeight = 1 * 4;
+      const witnessWeightVal = calculateWitnessWeight({
+        type: input.type,
+        isWitness: true,
+      });
       inputWeight = outpointWeight + sequenceWeight + scriptSigWeight +
-        witnessWeight;
-
-      logger.debug("stamps", {
-        message: `Witness input weight breakdown for ${input.type}`,
-        data: {
-          nonWitnessWeight: outpointWeight + sequenceWeight + scriptSigWeight,
-          witnessWeight,
-          witnessDetails: TX_CONSTANTS.WITNESS_STACK[input.type],
-          total: inputWeight,
-        },
-      });
+        witnessWeightVal;
     } else {
-      // Non-witness inputs use TX_CONSTANTS sizes
-      inputWeight = TX_CONSTANTS[input.type].size * 4;
-      logger.debug("stamps", {
-        message: `Non-witness input weight for ${input.type}`,
-        data: {
-          scriptSize: TX_CONSTANTS[input.type].size,
-          weight: inputWeight,
-        },
-      });
+      const size = TX_CONSTANTS[
+        input.type as Exclude<
+          ScriptType,
+          "OP_RETURN" | "UNKNOWN" | "P2WPKH" | "P2WSH" | "P2TR"
+        >
+      ]?.size;
+      if (size === undefined) {
+        logger.warn("system", {
+          message:
+            `No size in TX_CONSTANTS for non-witness type: ${input.type}, using P2PKH default`,
+        });
+        inputWeight = TX_CONSTANTS.P2PKH.size * 4;
+      } else {
+        inputWeight = size * 4;
+      }
     }
     return inputWeight;
   });
 
-  const totalInputWeight = inputWeights.reduce(
-    (sum, weight) => sum + weight,
-    0,
-  );
+  const totalInputWeight = inputWeights.reduce((sum, w) => sum + w, 0);
 
-  // Calculate output weights using TX_CONSTANTS
   const outputWeights = outputs.map((output) => {
-    const scriptInfo = getScriptTypeInfo(output.type);
-    const baseWeight = 9 * 4; // value (8) + script length (1) * 4
-
+    const baseWeight = 9 * 4;
     let scriptWeight = 0;
-    if (scriptInfo.isWitness) {
-      // Use TX_CONSTANTS for witness output sizes
-      scriptWeight = (output.type === "P2WPKH" ? 22 : 34) * 4;
-    } else {
-      scriptWeight = TX_CONSTANTS[output.type].size * 4;
+    const size =
+      TX_CONSTANTS[output.type as Exclude<ScriptType, "OP_RETURN" | "UNKNOWN">]
+        ?.size;
+    if (size !== undefined) {
+      scriptWeight = size * 4;
+    } else { // Fallback for types like OP_RETURN or if not in constants
+      logger.warn("system", {
+        message:
+          `No size in TX_CONSTANTS for output type: ${output.type}, using P2PKH default size component`,
+      });
+      scriptWeight = TX_CONSTANTS.P2PKH.size * 4; // Default placeholder
+      if (output.type === "OP_RETURN") scriptWeight = (1 + 40) * 4; // Approx. OP_RETURN with 40 bytes data
     }
-
-    logger.debug("stamps", {
-      message: `Output weight breakdown for ${output.type}`,
-      data: {
-        baseWeight,
-        scriptWeight,
-        total: baseWeight + scriptWeight,
-      },
-    });
-
     return baseWeight + scriptWeight;
   });
 
-  const totalOutputWeight = outputWeights.reduce(
-    (sum, weight) => sum + weight,
-    0,
-  );
-
-  // Add change output using TX_CONSTANTS
+  const totalOutputWeight = outputWeights.reduce((sum, w) => sum + w, 0);
   let changeWeight = 0;
-  if (includeChangeOutput) {
-    const baseWeight = 9 * 4; // value + script length
-    const scriptSize = changeOutputType === "P2WPKH" ? 22 : 34;
+  if (includeChangeOutput && changeOutputType) {
+    const baseWeight = 9 * 4;
+    let scriptSize = 0;
+    const size = TX_CONSTANTS[
+      changeOutputType as Exclude<ScriptType, "OP_RETURN" | "UNKNOWN">
+    ]?.size;
+    if (size !== undefined) {
+      scriptSize = size;
+    } else {
+      logger.warn("system", {
+        message:
+          `No size in TX_CONSTANTS for changeOutput type: ${changeOutputType}, using P2WPKH default size component`,
+      });
+      scriptSize = TX_CONSTANTS.P2WPKH.size; // Default if not found (e.g. P2WPKH size)
+    }
     changeWeight = baseWeight + (scriptSize * 4);
-
-    logger.debug("stamps", {
-      message: "Change output weight breakdown",
-      data: {
-        type: changeOutputType,
-        baseWeight,
-        scriptWeight: scriptSize * 4,
-        total: changeWeight,
-      },
-    });
   }
 
   const totalWeight = weight + totalInputWeight + totalOutputWeight +
     changeWeight;
   const vsize = TX_CONSTANTS.weightToVsize(totalWeight);
-
-  logger.debug("stamps", {
-    message: "Final weight calculation breakdown",
-    data: {
-      baseWeight: weight,
-      inputWeight: totalInputWeight,
-      outputWeight: totalOutputWeight,
-      changeWeight,
-      totalWeight,
-      vsize,
-      effectiveRate: `${vsize} vbytes`,
-      inputBreakdown: inputWeights,
-      outputBreakdown: outputWeights,
-      hasWitness,
-      witnessInputCount: inputs.filter((input) =>
-        getScriptTypeInfo(input.type).isWitness
-      ).length,
-    },
-  });
-
   return vsize;
+}
+
+export function calculateTransactionFee(
+  vsize: number,
+  feeRateSatsPerVB: number,
+): number {
+  return Math.ceil(vsize * feeRateSatsPerVB);
 }
