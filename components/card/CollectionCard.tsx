@@ -2,7 +2,7 @@
 import { Collection } from "$globals";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { containerBackground } from "$layout";
-import { labelSm, textSm } from "$text";
+import { labelSm, valueSm } from "$text";
 
 /* ===== HELPERS ===== */
 function abbreviateCollectionName(name: string): string {
@@ -21,7 +21,7 @@ export function CollectionCard(
     >
       {/* ===== CARD HEADER ===== */}
       <div className="flex w-full gap-6">
-        <div className="min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[112px] mobileMd:min-h-[112px] mobileMd:max-w-[112px] mobileMd:max-h-[112px] rounded aspect-stamp image-rendering-pixelated overflow-hidden">
+        <div className="min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[98px] mobileMd:min-h-[98px] mobileMd:max-w-[98px] mobileMd:max-h-[98px] rounded aspect-stamp image-rendering-pixelated overflow-hidden">
           <div className="relative flex items-center justify-center w-full h-full">
             <img
               src={collection.first_stamp_image || collection.img}
@@ -33,7 +33,7 @@ export function CollectionCard(
         <div className="w-full">
           <div className="flex flex-col justify-between w-full">
             {/* check code */}
-            <h2 className="font-black text-2xl mobileMd:text-3xl gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] inline-block">
+            <h2 className="font-black text-2xl gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] tracking-wide inline-block w-fit">
               <span className="min-[420px]:hidden">
                 {abbreviateCollectionName(collection.collection_name)
                   .toUpperCase()}
@@ -45,7 +45,7 @@ export function CollectionCard(
 
             <h5 className={`${labelSm} pt-0.75 mobileLg:pt-1.5`}>
               BY{" "}
-              <span className={`${textSm} normal-case`}>
+              <span className={`${valueSm} normal-case`}>
                 {collection.creators
                   ? (
                     <>
@@ -70,12 +70,12 @@ export function CollectionCard(
           <div className="flex flex-col mobileLg:flex-row justify-between w-full">
             <h5 className={`${labelSm} -mt-0.5`}>
               STAMPS{" "}
-              <span className={textSm}>
+              <span className={valueSm}>
                 {collection.stamp_count}
               </span>
             </h5>
             <h5 className={`${labelSm} -mt-0.5 hidden mobileLg:block`}>
-              VOLUME <span className={textSm}>N/A</span>{"  "}
+              VOLUME <span className={valueSm}>N/A</span>{"  "}
               <span className="text-stamp-grey-light">BTC</span>
             </h5>
           </div>
@@ -84,13 +84,13 @@ export function CollectionCard(
               <span className="min-[400px]:hidden">PRICE</span>
               <span className="hidden min-[400px]:inline">FLOOR PRICE</span>
               {" "}
-              <span className={textSm}>N/A</span>{" "}
+              <span className={valueSm}>N/A</span>{" "}
               <span className="text-stamp-grey-light">BTC</span>
             </h5>
             <h5 className={`${labelSm} -mt-0.5`}>
-              <span className="min-[400px]:hidden">CAP</span>
+              <span className="min-[400px]:hidden">MCAP</span>
               <span className="hidden min-[400px]:inline">MARKETCAP</span>{" "}
-              <span className={textSm}>N/A</span>{" "}
+              <span className={valueSm}>N/A</span>{" "}
               <span className="text-stamp-grey-light">BTC</span>
             </h5>
           </div>
