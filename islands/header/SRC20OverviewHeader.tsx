@@ -132,7 +132,7 @@ export const SRC20OverviewHeader = (
 
   /* ===== RENDER ===== */
   return (
-    <div class="relative flex flex-col w-full gap-3">
+    <div class="relative flex flex-col w-full gap-1">
       <div class="flex flex-row justify-between items-start w-full">
         {/* ===== RESPONSIVE TITLE ===== */}
         <h1 className={`${titlePurpleLD} block mobileLg:hidden`}>TOKENS</h1>
@@ -143,6 +143,9 @@ export const SRC20OverviewHeader = (
         {/* ===== CONTROLS SECTION ===== */}
         <div className="flex flex-col">
           <div className="flex relative items-start justify-between gap-4 tablet:gap-3">
+            <div class="-mt-0.5">
+              <SearchSRC20Modal showButton />
+            </div>
             <Button
               variant={viewType === "minting"
                 ? mintingHover.canHoverSelected ? "flatOutline" : "outlineFlat"
@@ -150,24 +153,19 @@ export const SRC20OverviewHeader = (
                 ? "outlineFlat"
                 : "flatOutline"}
               color="purple"
-              size="sm"
+              size="xs"
               onClick={handleMintingClick}
               onMouseEnter={handleMintingMouseEnter}
               onMouseLeave={handleMintingMouseLeave}
             >
               MINTING
             </Button>
-            <div class="w-[34px] h-[34px] px-[5px] rounded-md bg-transparent border-2 border-stamp-purple hover:border-stamp-purple-bright">
-              <div class="-mt-0.5">
-                <SearchSRC20Modal showButton />
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
       {/* ===== FILTER AND TIMEFRAME BUTTONS ===== */}
-      <div className="flex justify-between w-full">
+      <div className="flex flex-col tablet:flex-row justify-between w-full">
         {/* Filter Buttons */}
         <div className="flex gap-3">
           {(["TRENDING", "DEPLOY", "HOLDERS"] as const).map((filter) => (
@@ -212,7 +210,7 @@ export const SRC20OverviewHeader = (
         </div>
 
         {/* Timeframe Buttons */}
-        <div className="flex gap-3">
+        <div className="flex pt-3 tablet:pt-0 gap-3">
           {(["24H", "3D", "7D"] as const).map((timeframe) => (
             <Button
               key={timeframe}
