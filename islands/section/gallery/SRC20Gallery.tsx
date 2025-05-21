@@ -1,5 +1,6 @@
 /* ===== SRC20 GALLERY COMPONENT ===== */
 // deno-lint-ignore-file react-rules-of-hooks
+// @baba - add token cards specific to wallet page
 import { useEffect, useState } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { SRC20Row } from "$globals";
@@ -7,7 +8,12 @@ import { subtitlePurple, titlePurpleLD } from "$text";
 import { ViewAllButton } from "$button";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Timeframe } from "$layout";
-import { SRC20CardSm, SRC20CardSmMinting } from "$card";
+import {
+  SRC20Card,
+  SRC20CardMinting,
+  SRC20CardSm,
+  SRC20CardSmMinting,
+} from "$card";
 
 /* ===== TYPES ===== */
 interface SRC20GalleryProps {
@@ -160,7 +166,27 @@ export function SRC20Gallery({
 
       {viewType === "minted"
         ? (
-          <SRC20CardSm
+          fromPage === "src20"
+            ? (
+              <SRC20Card
+                data={data}
+                fromPage={fromPage}
+                timeframe={timeframe}
+                onImageClick={handleImageClick}
+              />
+            )
+            : (
+              <SRC20CardSm
+                data={data}
+                fromPage={fromPage}
+                timeframe={timeframe}
+                onImageClick={handleImageClick}
+              />
+            )
+        )
+        : fromPage === "src20"
+        ? (
+          <SRC20CardMinting
             data={data}
             fromPage={fromPage}
             timeframe={timeframe}
