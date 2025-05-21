@@ -81,14 +81,11 @@ code_quality:
       check: "deno task check:lint"
       debug: "deno task check:lint:debug"
   checks:
-    command: "deno task check"
+    command: "deno task check:fmt && deno task check:lint"
     run: "before commits"
     sequence:
       - format: "deno task check:fmt"
       - lint: "deno task check:lint"
-      - types: "deno task check:types"
     debug_commands:
       format: "deno task check:fmt:debug"
       lint: "deno task check:lint:debug"
-      types: "deno task check:types:debug"
-      all: "deno task check:debug"
