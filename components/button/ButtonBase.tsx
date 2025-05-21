@@ -199,7 +199,7 @@ export function ButtonIcon({
     role,
     ariaLabel,
     dataType,
-    className: `${buttonClass} p-0 aspect-square`,
+    className: `${buttonClass} ${className ?? ""} p-0 aspect-square`,
     ref,
     ...props,
   });
@@ -263,7 +263,7 @@ export function ButtonProcessing({
     role,
     ariaLabel,
     dataType,
-    className: buttonClass,
+    className: `${buttonClass} ${className ?? ""}`,
     ref,
     ...props,
   });

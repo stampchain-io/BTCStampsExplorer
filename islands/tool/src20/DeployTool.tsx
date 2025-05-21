@@ -55,9 +55,6 @@ export function SRC20DeployTool(
   const [tooltipText, setTooltipText] = useState("OPTIONAL FIELDS");
   const { wallet, isConnected } = walletContext;
 
-  if (!config) {
-    return <div>Error: Failed to load configuration</div>;
-  }
 
   /* ===== FILE HANDLING ===== */
   const handleFileChange = (e: Event) => {
@@ -247,6 +244,10 @@ export function SRC20DeployTool(
       }
     };
   }, []);
+
+  if (!config) {
+    return <div>Error: Failed to load configuration</div>;
+  }
 
   /* ===== COMPONENT RENDER ===== */
   return (

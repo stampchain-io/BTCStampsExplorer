@@ -14,7 +14,7 @@ interface ToolStampPageProps {
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
-  GET(req, ctx) {
+  GET(_req, ctx) {
     console.log("Handler called for [action] route");
     const data = {
       selectedTab: "transfer", // Example data

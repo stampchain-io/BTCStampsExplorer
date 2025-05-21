@@ -8,7 +8,7 @@ const WalletDashboardHeader = () => {
         /*
         import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
         <div class="flex gap-3 justify-between h-9 items-center">
-        <SearchStampModal showButton={true} />
+        <SearchStampModal showButton />
         </div>
         */
       }

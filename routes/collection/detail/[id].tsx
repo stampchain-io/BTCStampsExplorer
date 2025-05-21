@@ -91,7 +91,7 @@ export default function CollectionDetailPage(
   props: CollectionDetailsPageProps,
 ) {
   const {
-    id,
+    id: _id,
     stamps,
     page,
     pages,

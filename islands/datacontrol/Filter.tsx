@@ -142,12 +142,6 @@ export function Filter({
   const modalBgTop =
     "fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-70 backdrop-filter backdrop-blur-md overflow-y-auto mobileLg:hidden";
   const modalFilter = "w-[90%] max-w-[360px] my-12";
-  const animatedFilterField = `
-    relative rounded-md
-    before:absolute before:inset-[-2px] before:rounded-md before:z-[1]
-    before:bg-[conic-gradient(from_var(--angle),#666666,#999999,#CCCCCC,#999999,#666666)]
-    before:[--angle:0deg] before:animate-rotate
-  `;
   const animatedBorderGrey = `
   relative rounded-md !bg-[#080808] p-[2px]
   before:absolute before:inset-0 before:rounded-md before:z-[1]
@@ -180,6 +174,7 @@ export function Filter({
               </p>
               {filterButtons.map((filter) => (
                 <button
+                  type="button"
                   key={filter}
                   class={`text-base font-extrabold leading-normal cursor-pointer ${
                     localFilters.includes(filter)
@@ -235,6 +230,7 @@ export function Filter({
                   </p>
                   {filterButtons.map((filter) => (
                     <button
+                      type="button"
                       key={filter}
                       class={`w-full text-base font-extrabold cursor-pointer py-1 ${
                         localFilters.includes(filter)

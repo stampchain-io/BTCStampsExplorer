@@ -8,7 +8,7 @@ import {
 } from "$lib/utils/formatUtils.ts";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import { labelSm, titleGreyLD, valueSm } from "$text";
-import { alignmentClasses, type AlignmentType } from "$layout";
+import type { AlignmentType } from "$layout";
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import type { MarketListingAggregated } from "$globals";
 

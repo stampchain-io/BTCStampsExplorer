@@ -2,9 +2,8 @@
 /*@baba-check styles*/
 import { SRC20CardBase, SRC20CardBaseProps } from "./SRC20CardBase.tsx";
 import { formatDate } from "$lib/utils/formatUtils.ts";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { Button } from "$button";
-import { labelSm, textSm, valueSm } from "$text";
+import { valueSm } from "$text";
 import { cellAlign } from "$components/layout/types.ts";
 
 /* ===== COMPONENT ===== */

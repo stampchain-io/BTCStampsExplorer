@@ -376,7 +376,7 @@ function SendStampModal({
 
       {/* ===== FEE CALCULATOR ===== */}
       <FeeCalculatorSimple
-        isModal={true}
+        isModal
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="transfer"
@@ -389,7 +389,7 @@ function SendStampModal({
         userAddress={wallet?.address}
         inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
-        tosAgreed={true}
+        tosAgreed
       />
 
       {/* ===== STATUS MESSAGES ===== */}
