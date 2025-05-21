@@ -43,13 +43,25 @@ export function SRC20CardSmMinting({
   }
 
   return (
-    <table class={`w-full ${textSm} border-separate border-spacing-y-3`}>
+    <table class={`w-full ${textSm} border-separate border-spacing-y-3 -mt-8`}>
       <colgroup>
         {colGroup([
-          { width: "w-[25%]" }, // TOKEN
-          { width: "w-[18%]" }, // MINTS
-          { width: "w-[18%]" }, // PROGRESS
-          { width: "w-[39%]" }, // MINT button
+          {
+            width:
+              "w-[33%] min-[600px]:w-[25%] tablet:w-[40%] min-[1280px]:w-[25%]",
+          }, // TOKEN
+          {
+            width:
+              "hidden min-[600px]:w-[18%] tablet:hidden min-[1280px]:w-[14%]",
+          }, // MINTS
+          {
+            width:
+              "w-[34%] min-[600px]:w-[18%] tablet:w-[30%] min-[1280px]:w-[22%]",
+          }, // PROGRESS
+          {
+            width:
+              "w-[33%] min-[600px]:w-[39%] tablet:w-[30%] min-[1280px]:w-[39%]",
+          }, // MINT button
         ]).map((col) => <col key={col.key} className={col.className} />)}
       </colgroup>
       <thead>
@@ -58,7 +70,9 @@ export function SRC20CardSmMinting({
             <th
               key={header}
               class={`${labelXs} ${cellAlign(i, headers.length)} ${
-                i === 1 ? "hidden min-[600px]:table-cell" : "" // MINTS
+                i === 1
+                  ? "hidden min-[600px]:table-cell tablet:hidden min-[1280px]:table-cell"
+                  : "" // MINTS
               }`}
             >
               {header}
@@ -149,10 +163,9 @@ export function SRC20CardSmMinting({
                   <td
                     class={`${
                       cellAlign(1, headers.length)
-                    } ${rowCardBorderCenter} hidden min-[600px]:table-cell`}
+                    } ${rowCardBorderCenter} hidden min-[600px]:table-cell tablet:hidden min-[1280px]:table-cell`}
                   >
-                    {src20.mint_progress?.total_mints?.toLocaleString() ||
-                      "N/A"}
+                    {src20.mint_count || "N/A"}
                   </td>
                   {/* PROGRESS */}
                   <td
@@ -161,7 +174,7 @@ export function SRC20CardSmMinting({
                     } ${rowCardBorderCenter}`}
                   >
                     <div class="flex items-center justify-center w-full">
-                      <div class="flex flex-col w-[100px] min-[420px]:w-[120px] mobileLg:w-[160px] gap-1">
+                      <div class="flex flex-col w-[100px] min-[420px]:w-[120px] mobileLg:w-[160px] tablet:w-[120px] desktop:w-[160px] gap-1">
                         <div class="!text-xs text-center">
                           {Number(src20.progress)}
                           <span class="text-stamp-grey-light">%</span>
@@ -183,8 +196,9 @@ export function SRC20CardSmMinting({
                   >
                     <Button
                       variant="outline"
-                      color="purple"
+                      color="custom"
                       size="xs"
+                      class="[--default-color:#999999] [--hover-color:#AA00FF]"
                       href={mintHref}
                       onClick={handleMintClick}
                     >
