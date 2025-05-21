@@ -3,7 +3,7 @@ import { SRC20Row } from "$globals";
 import { formatDate } from "$lib/utils/formatUtils.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { Timeframe } from "$layout";
-import { labelXs, textSm, valueDark } from "$text";
+import { labelXs, textSm, valueDarkSm } from "$text";
 import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import {
@@ -248,7 +248,7 @@ export function SRC20CardMinting({
           )
           : (
             <tr>
-              <td colSpan={headers.length} class={`${valueDark} w-full`}>
+              <td colSpan={headers.length} class={`${valueDarkSm} w-full`}>
                 NO MINTING TOKENS
               </td>
             </tr>
