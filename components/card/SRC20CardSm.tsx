@@ -1,7 +1,5 @@
 // import { SRC20Row } from "$globals";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import ChartWidget from "$islands/layout/ChartWidget.tsx";
-import { Timeframe } from "$layout";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import {
   containerCardTable,
@@ -15,22 +13,19 @@ import type { EnrichedSRC20Row } from "$globals";
 interface SRC20CardSmProps {
   data: EnrichedSRC20Row[];
   fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  timeframe: Timeframe;
   onImageClick: (imgSrc: string) => void;
 }
 
 export function SRC20CardSm({
   data,
-  timeframe,
   onImageClick,
 }: SRC20CardSmProps) {
   const headers = [
     "TOKEN",
     "PRICE",
-    "MCAP",
-    "VOLUME (24H)",
-    "CHANGE",
-    "", // CHART
+    "CHANGE 24H",
+    "VOLUME 24H",
+    "MARKETCAP",
   ];
 
   function splitTextAndEmojis(text: string): { text: string; emoji: string } {
@@ -46,15 +41,23 @@ export function SRC20CardSm({
   }
 
   return (
-    <table class={`w-full ${textSm} border-separate border-spacing-y-3`}>
+    <table class={`w-full ${textSm} border-separate border-spacing-y-3 -mt-8`}>
       <colgroup>
         {colGroup([
-          { width: "w-[20%]" }, // TOKEN
-          { width: "w-[15%]" }, // PRICE
-          { width: "w-[15%]" }, // MCAP
-          { width: "w-[15%]" }, // VOLUME (24H)
-          { width: "w-[15%]" }, // CHANGE
-          { width: "w-[20%]" }, // CHART
+          {
+            width:
+              "w-[45%] min-[420px]:w-[35%] mobileMd:w-[20%] tablet:w-[30%] desktop:w-[20%]",
+          }, // TOKEN
+          {
+            width:
+              "w-[35%] min-[420px]:w-[40%] mobileMd:w-[20%] tablet:w-[25%] desktop:w-[20%]",
+          }, // PRICE
+          {
+            width:
+              "w-[20%] min-[420px]:w-[25%] mobileMd:w-[20%] tablet:w-[20%] desktop:w-[20%]",
+          }, // CHANGE
+          { width: "hidden mobileMd:w-[20%] tablet:w-[25%] desktop:w-[20%]" }, // VOLUME (24H)
+          { width: "hidden mobileMd:w-[20%] tablet:hidden desktop:w-[20%]" }, // MARKETCAP
         ]).map((col) => <col key={col.key} className={col.className} />)}
       </colgroup>
       <thead>
@@ -64,15 +67,17 @@ export function SRC20CardSm({
               key={header}
               class={`${labelXs} ${cellAlign(i, headers.length)}
               ${
-                (header === "CHANGE" || header === "MCAP" ||
-                    header === "VOLUME (24H)")
-                  ? "hidden mobileMd:table-cell"
+                header === "MARKETCAP"
+                  ? "hidden mobileMd:table-cell tablet:hidden desktop:table-cell"
+                  : header === "VOLUME 24H"
+                  ? "hidden mobileMd:table-cell mobileMd:text-center tablet:text-right desktop:text-center"
+                  : header === "CHANGE 24H"
+                  ? "text-right mobileMd:text-center"
                   : ""
               }
               `}
             >
               {header}
-              {header === "CHANGE" && ` ${timeframe}`}
             </th>
           ))}
         </tr>
@@ -194,39 +199,11 @@ export function SRC20CardSm({
                       return priceInSatsRounded.toLocaleString() + " SATS";
                     })()}
                   </td>
-                  {/* MCAP */}
+                  {/* CHANGE 24H */}
                   <td
-                    class={`${
-                      cellAlign(2, headers.length)
-                    } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
-                  >
-                    {src20.market_data?.mcap !== undefined &&
-                        src20.market_data?.mcap !== null
-                      ? src20.market_data.mcap.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 8,
-                      }) + " BTC"
-                      : "N/A"}
-                  </td>
-                  {/* VOLUME (24H) */}
-                  <td
-                    class={`${
-                      cellAlign(3, headers.length)
-                    } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
-                  >
-                    {src20.market_data?.volume24 !== undefined &&
-                        src20.market_data?.volume24 !== null
-                      ? src20.market_data.volume24.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 8,
-                      }) + " BTC"
-                      : "N/A"}
-                  </td>
-                  {/* CHANGE */}
-                  <td
-                    class={`${
-                      cellAlign(4, headers.length)
-                    } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
+                    class={`text-right mobileMd:text-center 
+                      ${rowCardBorderRight} 
+                      mobileMd:${rowCardBorderCenter} mobileMd:pr-3 mobileMd:border-r-0 mobileMd:rounded-r-none`}
                   >
                     {src20.market_data?.change24 !== undefined &&
                         src20.market_data?.change24 !== null
@@ -241,18 +218,37 @@ export function SRC20CardSm({
                       )
                       : <span class="text-stamp-grey-light">N/A%</span>}
                   </td>
-                  {/* CHART */}
+                  {/* VOLUME 24H */}
                   <td
-                    class={`${
-                      cellAlign(5, headers.length)
-                    } ${rowCardBorderRight}`}
+                    class={`mobileMd:text-center tablet:text-right desktop:text-center
+                    ${rowCardBorderCenter}
+                     hidden mobileMd:table-cell mobileMd:pr-3 mobileMd:border-r-0 mobileMd:rounded-r-none
+                     tablet:${rowCardBorderRight} tablet:pr-4 tablet:rounded-r-lg tablet:border-r-2
+                     desktop:${rowCardBorderCenter} desktop:pr-3 desktop:border-r-0 desktop:rounded-r-none`}
                   >
-                    <ChartWidget
-                      fromPage="home"
-                      data={src20.chart}
-                      tick={src20.tick}
-                      data-chart-widget
-                    />
+                    {src20.market_data?.volume24 !== undefined &&
+                        src20.market_data?.volume24 !== null
+                      ? src20.market_data.volume24.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8,
+                      }) + " BTC"
+                      : "N/A"}
+                  </td>
+                  {/* MARKETCAP */}
+                  <td
+                    class={`
+                      ${cellAlign(4, headers.length)}
+                      ${rowCardBorderRight}
+                      hidden mobileMd:table-cell tablet:hidden desktop:table-cell
+                    `}
+                  >
+                    {src20.market_data?.mcap !== undefined &&
+                        src20.market_data?.mcap !== null
+                      ? src20.market_data.mcap.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8,
+                      }) + " BTC"
+                      : "N/A"}
                   </td>
                 </tr>
               );

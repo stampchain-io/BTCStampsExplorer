@@ -189,23 +189,27 @@ export default function Home({ data }: PageProps<HomePageData>) {
               />
             </div>
 
-            <div class="flex flex-row pt-12 mobileLg:pt-24 desktop:pt-36 gap-12 mobileLg:gap-[72px]">
-              <SRC20Gallery
-                title="SRC-20 TOKENS"
-                subTitle="TOP TICKERS"
-                viewType="minted"
-                fromPage="home"
-                serverData={src20Data?.minted}
-                useClientFetch={false}
-              />
-              <SRC20Gallery
-                title="SRC-20 TOKENS"
-                subTitle="TRENDING MINTS"
-                viewType="minting"
-                fromPage="home"
-                serverData={src20Data?.minting}
-                useClientFetch={false}
-              />
+            <div class="flex flex-col tablet:flex-row pt-12 mobileLg:pt-24 desktop:pt-36 gap-12 mobileLg:gap-[72px]">
+              <div class="w-full tablet:w-1/2">
+                <SRC20Gallery
+                  title="SRC-20 TOKENS"
+                  subTitle="TOP TICKERS"
+                  viewType="minted"
+                  fromPage="home"
+                  serverData={src20Data?.minted}
+                  useClientFetch={false}
+                />
+              </div>
+              <div class="w-full tablet:w-1/2">
+                <SRC20Gallery
+                  title="SRC-20 TOKENS"
+                  subTitle="TRENDING MINTS"
+                  viewType="minting"
+                  fromPage="home"
+                  serverData={src20Data?.minting}
+                  useClientFetch={false}
+                />
+              </div>
             </div>
           </div>
 
