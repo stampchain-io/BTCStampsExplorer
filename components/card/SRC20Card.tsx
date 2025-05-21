@@ -52,14 +52,14 @@ export function SRC20Card({
     <table class={`w-full ${textSm} border-separate border-spacing-y-3`}>
       <colgroup>
         {colGroup([
-          { width: "w-[40%] mobileMd:w-[27%] mobileLg:w-[23%] tablet:w-[16%]" }, // TOKEN
-          { width: "w-[20%] mobileMd:w-[12%] mobileLg:w-[4%] tablet:w-[8%]" }, // PRICE
-          { width: "hidden mobileMd:w-[8%] mobileLg:w-[4%] tablet:w-[8%]" }, // CHANGE
+          { width: "w-[40%] mobileMd:w-[25%] mobileLg:w-[19%] tablet:w-[16%]" }, // TOKEN
+          { width: "w-[30%] mobileMd:w-[16%] mobileLg:w-[12%] tablet:w-[8%]" }, // PRICE
+          { width: "w-[30%] mobileMd:w-[8%] mobileLg:w-[4%] tablet:w-[8%]" }, // CHANGE
           { width: "hidden mobileMd:w-[8%] mobileLg:w-[16%] tablet:w-[10%]" }, // VOLUME
           { width: "hidden mobileLg:w-[16%] tablet:w-[10%]" }, // MARKETCAP
           { width: "hidden tablet:w-[12%]" }, // DEPLOY
-          { width: "hidden mobileLg:w-[15%] tablet:w-[10%]" }, // HOLDERS
-          { width: "w-[40%] mobileMd:w-[18%] mobileLg:w-[24%] tablet:w-[26%]" }, // CHART
+          { width: "hidden mobileLg:w-[13%] tablet:w-[10%]" }, // HOLDERS
+          { width: "hidden mobileMd:w-[16%] mobileLg:w-[22%] tablet:w-[26%]" }, // CHART
         ]).map((col) => <col key={col.key} className={col.className} />)}
       </colgroup>
       <thead>
@@ -68,7 +68,7 @@ export function SRC20Card({
             <th
               key={header}
               class={`${labelXs} ${cellAlign(i, headers.length)}
-              ${i === 2 ? "hidden mobileMd:table-cell" : "" // CHANGE
+              ${i === 7 ? "hidden mobileMd:table-cell" : "" // CHART
               }${i === 3 ? "hidden mobileMd:table-cell" : "" // VOLUME
               } ${i === 4 ? "hidden mobileLg:table-cell" : "" // MARKETCAP
               } ${i === 5 ? "hidden tablet:table-cell" : "" // DEPLOY
@@ -176,7 +176,7 @@ export function SRC20Card({
                   <td
                     class={`${
                       cellAlign(2, headers.length)
-                    } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
+                    } ${rowCardBorderCenter}`}
                   >
                     {(src20 as any).change24 !== undefined &&
                         (src20 as any).change24 !== null
@@ -245,7 +245,7 @@ export function SRC20Card({
                   <td
                     class={`${
                       cellAlign(7, headers.length)
-                    } ${rowCardBorderRight} !py-0`}
+                    } ${rowCardBorderRight} hidden mobileMd:table-cell !py-0`}
                   >
                     {console.log(
                       "Chart data for",
