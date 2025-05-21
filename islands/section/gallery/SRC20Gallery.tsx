@@ -56,6 +56,69 @@ export function SRC20Gallery({
   const [data, setData] = useState<SRC20Row[]>(initialData || []);
   const [isLoading, setIsLoading] = useState(!initialData && !serverData);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [enriched, setEnriched] = useState(false);
+
+  // Helper to fetch chart data for a tick
+  async function fetchChartData(tick: string): Promise<[number, number][]> {
+    try {
+      const url = `https://api.stampscan.xyz/utxo/combinedListings?tick=${
+        encodeURIComponent(tick)
+      }`;
+      const resp = await fetch(url);
+      if (!resp.ok) return [];
+      const chartRaw = await resp.json();
+      console.log("Raw chart data for", tick, chartRaw);
+      const mapped: [number, number][] = (chartRaw || [])
+        .map((item: any) => {
+          const ts = new Date(item.date).getTime();
+          const price = Number(item.unit_price_btc) * 100_000_000;
+          if (isNaN(ts) || isNaN(price)) return null;
+          return [ts, price];
+        })
+        .filter(Boolean);
+      return mapped.sort((a, b) => a[0] - b[0]);
+    } catch {
+      return [];
+    }
+  }
+
+  // Enrich tokens with chart data (SSR-friendly: only runs on server or initial render)
+  useEffect(() => {
+    if (
+      !enriched &&
+      viewType === "minted" &&
+      fromPage === "src20" &&
+      data.length > 0
+    ) {
+      // Only enrich tokens that do not already have chart data
+      const tokensToEnrich = data.filter((token: any) =>
+        !token.chart || token.chart.length === 0
+      );
+      if (tokensToEnrich.length === 0) {
+        setEnriched(true);
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      console.log(
+        "Enriching tokens with chart data:",
+        tokensToEnrich.map((t) => t.tick),
+      );
+      Promise.all(
+        data.map(async (token: any) => {
+          if (token.chart && token.chart.length > 0) return token;
+          return {
+            ...token,
+            chart: await fetchChartData(token.tick),
+          };
+        }),
+      ).then((enrichedTokens) => {
+        setData(enrichedTokens);
+        setEnriched(true);
+        setIsLoading(false);
+      });
+    }
+  }, [data, viewType, fromPage, enriched]);
 
   useEffect(() => {
     if (serverData) {

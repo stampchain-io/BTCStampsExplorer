@@ -177,7 +177,7 @@ export function SRC20Card({
                       cellAlign(3, headers.length)
                     } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
                   >
-                    {Math.round(src20.volume24 ?? 0).toLocaleString()}
+                    {Math.round((src20 as any).volume24 ?? 0).toLocaleString()}
                     <span class="text-stamp-grey-light ml-1">BTC</span>
                   </td>
                   {/* MARKETCAP */}
@@ -186,7 +186,7 @@ export function SRC20Card({
                       cellAlign(4, headers.length)
                     } ${rowCardBorderCenter} hidden mobileLg:table-cell`}
                   >
-                    {Math.round((src20.market_cap ?? 0) * 1e8)
+                    {Math.round(((src20 as any).market_cap ?? 0) * 1e8)
                       .toLocaleString()}
                     <span class="text-stamp-grey-light ml-1">SATS</span>
                   </td>
@@ -216,11 +216,16 @@ export function SRC20Card({
                   <td
                     class={`${
                       cellAlign(7, headers.length)
-                    } ${rowCardBorderRight}`}
+                    } ${rowCardBorderRight} !py-0`}
                   >
+                    {console.log(
+                      "Chart data for",
+                      src20.tick,
+                      (src20 as any).chart,
+                    )}
                     <ChartWidget
                       fromPage="home"
-                      data={src20.chart}
+                      data={(src20 as any).chart}
                       tick={src20.tick}
                       data-chart-widget
                     />

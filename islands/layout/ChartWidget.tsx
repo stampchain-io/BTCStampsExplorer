@@ -14,23 +14,28 @@ const ChartWidget = (
   const [loading, setLoading] = useState(true);
   const chartType: "line" | "candlestick" = "line";
 
+  // Sanitize tick for use in HTML id
+  const safeTick = tick.replace(/[^a-zA-Z0-9_-]/g, "");
+  const containerId = safeTick
+    ? `chart-container-${safeTick}`
+    : "chart-container";
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     setLoading(true); // ✅ Show loading state
 
     setTimeout(() => {
-      const container = document.getElementById(
-        tick ? `chart-container-${tick}` : "chart-container",
-      );
+      const container = document.getElementById(containerId);
       if (!container) return;
 
-      fromPage === "home"
-        ? Highcharts.stockChart(container, {
+      console.log("Initializing Highcharts for", containerId, data);
+      if (fromPage === "home") {
+        Highcharts.stockChart(containerId, {
           chart: {
-            backgroundColor: null,
-            width: 200,
-            height: 80,
+            backgroundColor: "transparent",
+            width: 160,
+            height: 40,
             style: {
               overflow: "hidden", // Ensures no extra content is visible
             },
@@ -71,10 +76,11 @@ const ChartWidget = (
               },
             },
           ],
-        })
-        : Highcharts.stockChart(container, {
+        });
+      } else {
+        Highcharts.stockChart(containerId, {
           chart: {
-            backgroundColor: null,
+            backgroundColor: "transparent",
           },
           credits: { enabled: false }, // ✅ Remove Highcharts watermark
           rangeSelector: {
@@ -121,15 +127,20 @@ const ChartWidget = (
             },
           ],
         });
-
+      }
+      console.log("Highcharts initialized for", containerId);
       setLoading(false); // ✅ Hide loading after chart renders
     }, 1000); // Simulate loading delay
   }, [data]);
 
+  if (!data || data.length === 0) {
+    return <div className="text-sm text-stamp-grey">NO CHART DATA</div>;
+  }
+
   return (
-    <div className="p-4">
+    <div>
       {loading ? <div class={loaderSpinXsPurple} /> : null}
-      <div id={tick ? `chart-container-${tick}` : "chart-container"} />
+      <div id={containerId} />
     </div>
   );
 };
