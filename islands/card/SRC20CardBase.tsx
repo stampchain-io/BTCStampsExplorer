@@ -52,7 +52,6 @@ export function SRC20CardBase({
     `/content/${src20.tx_hash}.svg` ||
     `/content/${src20.deploy_tx}`;
 
-
   return (
     <tr
       class="dark-gradient !rounded-xl border-2 border-transparent hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] p-12"

@@ -82,7 +82,6 @@ export function SRC20MintingTable({
                   `/content/${src20.tx_hash}.svg` ||
                   `/content/${src20.deploy_tx}`;
 
-
                 const mintHref = `/tool/src20/mint?tick=${
                   encodeURIComponent(src20.tick)
                 }&trxType=olga`;

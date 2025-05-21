@@ -121,7 +121,6 @@ export function useSRC101Form(
     fetchPrice();
   }, []);
 
-
   const handleInputChange = (e: Event, field: string) => {
     const value = (e.target as HTMLInputElement).value;
     let newValue = value;

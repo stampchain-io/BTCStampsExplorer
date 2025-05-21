@@ -34,7 +34,6 @@ interface SRC20GalleryProps {
   };
 }
 
-
 /* ===== COMPONENT ===== */
 export function SRC20Gallery({
   title,
