@@ -28,7 +28,7 @@ export const ExplorerHeader = (
 
           {/* Search Component */}
           <div>
-            <SearchStampModal showButton={true} />
+            <SearchStampModal showButton />
           </div>
         </div>
       </div>

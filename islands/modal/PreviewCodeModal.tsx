@@ -105,7 +105,7 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
         closeModal();
       }}
       title=""
-      hideHeader={true}
+      hideHeader
       className="w-[calc(100vw-48px)] h-[calc(100vh-48px)] mobileLg:w-[calc(100vw-96px)] mobileLg:h-[calc(100vh-96px)] max-w-[800px]"
       contentClassName="h-full bg-[#FAFAFA] rounded-md overflow-auto scrollbar-grey"
     >

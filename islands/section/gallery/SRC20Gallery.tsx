@@ -1,4 +1,5 @@
 /* ===== SRC20 GALLERY COMPONENT ===== */
+// deno-lint-ignore-file react-rules-of-hooks
 import { useEffect, useState } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { SRC20Row } from "$globals";
@@ -33,30 +34,6 @@ interface SRC20GalleryProps {
   };
 }
 
-/* ===== IMAGE MODAL COMPONENT ===== */
-const ImageModal = (
-  { imgSrc, isOpen, onClose }: {
-    imgSrc: string | null;
-    isOpen: boolean;
-    onClose: () => void;
-  },
-) => {
-  if (!isOpen) return null;
-
-  return (
-    <div
-      onClick={onClose}
-      class="fixed z-20 inset-0 bg-blue-500 bg-opacity-50 flex justify-center items-center"
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        class="bg-red-500 p-2 rounded-lg"
-      >
-        {imgSrc && <img class="w-60 h-60 rounded" src={imgSrc} alt="Token" />}
-      </div>
-    </div>
-  );
-};
 
 /* ===== COMPONENT ===== */
 export function SRC20Gallery({
@@ -144,7 +121,7 @@ export function SRC20Gallery({
     }
   };
 
-  const _handleTimeframeChange = (newTimeframe: Timeframe) => {
+  const _handleTimeframeChange = (_newTimeframe: Timeframe) => {
   };
 
   const handleImageClick = (_imgSrc: string) => {

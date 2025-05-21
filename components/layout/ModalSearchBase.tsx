@@ -4,14 +4,9 @@ import { useEffect } from "preact/hooks";
 interface ModalSearchBaseProps {
   children: preact.ComponentChildren;
   onClose?: () => void;
-  onSearch?: () => void;
 }
 
-export function ModalSearchBase({
-  children,
-  onClose,
-  onSearch,
-}: ModalSearchBaseProps) {
+export function ModalSearchBase({ children, onClose }: ModalSearchBaseProps) {
   console.log("ModalSearchBase rendered"); // Debug log
 
   const handleClose = () => {

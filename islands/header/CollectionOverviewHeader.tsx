@@ -9,7 +9,7 @@ function CollectionOverviewHeader() {
       <h1 className={titlePurpleLD}>
         COLLECTIONS
       </h1>
-      <SearchStampModal showButton={true} />
+      <SearchStampModal showButton />
     </div>
   );
 }

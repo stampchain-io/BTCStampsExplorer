@@ -21,7 +21,7 @@ interface SRC20CardProps {
 
 export function SRC20Card({
   data,
-  fromPage,
+  fromPage: _fromPage,
   timeframe,
   onImageClick,
 }: SRC20CardProps) {

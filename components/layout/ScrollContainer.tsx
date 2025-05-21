@@ -1,3 +1,4 @@
+// deno-lint-ignore-file react-no-danger
 const scrollbarPadding = `
   (function() {
     const container = document.currentScript.previousElementSibling;

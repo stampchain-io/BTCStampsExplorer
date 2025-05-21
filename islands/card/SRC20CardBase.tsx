@@ -26,7 +26,9 @@ function splitTextAndEmojis(text: string): { text: string; emoji: string } {
 /* ===== TYPES ===== */
 export interface SRC20CardBaseProps {
   src20: SRC20Row;
+  // fromPage is reserved for future use
   fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
+  // timeframe is reserved for future use
   timeframe?: Timeframe;
   onImageClick?: (imgSrc: string) => void;
   children?: preact.ComponentChildren;
@@ -36,8 +38,8 @@ export interface SRC20CardBaseProps {
 /* ===== COMPONENT ===== */
 export function SRC20CardBase({
   src20,
-  fromPage = "src20",
-  timeframe = "24H",
+  fromPage: _fromPage = "src20",
+  timeframe: _timeframe = "24H",
   onImageClick,
   children,
   totalColumns,
@@ -50,7 +52,6 @@ export function SRC20CardBase({
     `/content/${src20.tx_hash}.svg` ||
     `/content/${src20.deploy_tx}`;
 
-  const href = `/src20/${encodeURIComponent(unicodeEscapeToEmoji(src20.tick))}`;
 
   return (
     <tr

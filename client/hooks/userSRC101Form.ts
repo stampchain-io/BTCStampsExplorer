@@ -121,56 +121,6 @@ export function useSRC101Form(
     fetchPrice();
   }, []);
 
-  function validateFormState(
-    formState: SRC101FormState,
-    action: string,
-  ): { isValid: boolean; error?: string } {
-    // Basic validations
-    if (!formState.token) {
-      return { isValid: false, error: "Token is required" };
-    }
-    if (formState.fee <= 0) {
-      return { isValid: false, error: "Fee must be greater than 0" };
-    }
-
-    // Action-specific validations
-    switch (action) {
-      case "deploy":
-        if (!formState.max || !formState.lim || !formState.dec) {
-          return {
-            isValid: false,
-            error: "Max, limit and decimals are required for deploy",
-          };
-        }
-        try {
-          const maxValue = BigInt(formState.max);
-          const limValue = BigInt(formState.lim);
-          if (limValue > maxValue) {
-            return { isValid: false, error: "Limit cannot exceed max supply" };
-          }
-        } catch {
-          return { isValid: false, error: "Invalid max or limit value" };
-        }
-        break;
-
-      case "transfer":
-        if (!formState.toAddress) {
-          return { isValid: false, error: "Recipient address is required" };
-        }
-        if (!formState.amt) {
-          return { isValid: false, error: "Amount is required" };
-        }
-        break;
-
-      case "mint":
-        if (!formState.amt) {
-          return { isValid: false, error: "Amount is required" };
-        }
-        break;
-    }
-
-    return { isValid: true };
-  }
 
   const handleInputChange = (e: Event, field: string) => {
     const value = (e.target as HTMLInputElement).value;
