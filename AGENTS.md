@@ -31,7 +31,9 @@ avoid duplication and keeps this guide concise.
 
 ## 3. Development Workflow
 - **Start development server**: `deno task dev`
-- **Run formatting, linting, and type checks**: `deno task check`
+- **Run linting**: `deno task check:lint`
+- **Run formatting checks**: `deno task check:fmt` (use `deno fmt` to fix issues)
+- **Run type checks**: `deno task check:types`
 - **Build production bundle**: `deno task build`
 - **Start production server**: `deno task start`
 - **Generate API docs**: `deno task docs`
@@ -70,9 +72,8 @@ Use `deno task dev:safe` to clean up before running the dev server.
   SRC20‑related components prefixed `SRC20*`.
 
 ## 7. Code Quality
-- All commits must pass `deno task check`.
-  - `check:fmt` – formatting.
-  - `check:lint` – linting (Fresh & recommended rules).
+- Run `deno task check:lint` and `deno task check:fmt` before committing.
+- Additional tasks:
   - `check:types` – type checking.
 - Excluded paths: `server/`, `_fresh/`, `node_modules/`, `dist/`, and
   other generated files (see `deno.json`).
@@ -124,7 +125,7 @@ Use `deno task dev:safe` to clean up before running the dev server.
   optimizations.
 
 ## 14. Commit and Pull Request Guidelines
-- Run `deno task check` and relevant tests before committing.
+- Run `deno task check:lint` and `deno task check:fmt` and relevant tests before committing.
 - Ensure OpenAPI schema (`schema.yml`) stays in sync with API changes.
 - Provide clear commit messages and reference related tasks or issues
   when applicable.
