@@ -68,11 +68,12 @@ export function SRC20Card({
             <th
               key={header}
               class={`${labelXs} ${cellAlign(i, headers.length)}
-              ${i === 7 ? "hidden mobileMd:table-cell" : "" // CHART
+              ${i === 2 ? "text-right mobileMd:text-center" : "" // CHANGE
               }${i === 3 ? "hidden mobileMd:table-cell" : "" // VOLUME
               } ${i === 4 ? "hidden mobileLg:table-cell" : "" // MARKETCAP
               } ${i === 5 ? "hidden tablet:table-cell" : "" // DEPLOY
               } ${i === 6 ? "hidden mobileLg:table-cell" : "" // HOLDERS
+              }${i === 7 ? "hidden mobileMd:table-cell" : "" // CHART
               }
               `}
             >
@@ -174,9 +175,9 @@ export function SRC20Card({
                   </td>
                   {/* CHANGE */}
                   <td
-                    class={`${
-                      cellAlign(2, headers.length)
-                    } ${rowCardBorderCenter}`}
+                    class={`text-right mobileMd:text-center 
+                      ${rowCardBorderRight} 
+                      mobileMd:${rowCardBorderCenter} mobileMd:pr-3 mobileMd:border-r-0 mobileMd:rounded-r-none`}
                   >
                     {(src20 as any).change24 !== undefined &&
                         (src20 as any).change24 !== null
