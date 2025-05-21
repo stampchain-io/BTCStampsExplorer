@@ -233,8 +233,9 @@ export function SRC20CardMinting({
                   >
                     <Button
                       variant="outline"
-                      color="purple"
+                      color="custom"
                       size="xs"
+                      class="[--default-color:#999999] [--hover-color:#AA00FF]"
                       href={mintHref}
                       onClick={handleMintClick}
                     >
