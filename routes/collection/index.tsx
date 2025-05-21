@@ -55,8 +55,6 @@ export const handler: Handlers = {
       });
 
       const collections: CollectionRow[] = [];
-      let totalPages = 1;
-      let totalCollections = 0;
       const type: "stamps" | "cursed" | "all" = "all";
       const ident: SUBPROTOCOLS[] = selectedTab === "all"
         ? ["STAMP", "SRC-721", "SRC-20"] as SUBPROTOCOLS[]

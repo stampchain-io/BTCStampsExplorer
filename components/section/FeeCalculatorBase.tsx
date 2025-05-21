@@ -628,6 +628,7 @@ export function FeeCalculatorBase({
             }`}
           >
             <button
+              type="button"
               className="min-w-10 h-5 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
               onClick={handleCoinToggle}
               onMouseEnter={handleCurrencyMouseEnter}
@@ -811,6 +812,7 @@ export function FeeCalculatorBase({
         <div className="flex justify-end gap-6">
           {onCancel && (
             <button
+              type="button"
               className={`${buttonPurpleOutline} ${
                 isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
@@ -828,6 +830,7 @@ export function FeeCalculatorBase({
             </button>
           )}
           <button
+            type="button"
             className={`${buttonPurpleFlat} ${
               (disabled || isSubmitting || !tosAgreed)
                 ? "opacity-50 cursor-not-allowed"

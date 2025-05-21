@@ -227,7 +227,7 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
         setTitle("DEPLOYED");
         return (
           <>
-            <SelectDate setDateRange={setDateRange} isUppercase={true} />
+            <SelectDate setDateRange={setDateRange} isUppercase />
           </>
         );
         break;
@@ -315,7 +315,7 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
         setTitle("PRICE CHANGE");
         return (
           <>
-            <SelectDate setDateRange={setDateRange} isUppercase={true} />
+            <SelectDate setDateRange={setDateRange} isUppercase />
 
             <InputField
               type="text"

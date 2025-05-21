@@ -566,14 +566,14 @@ const WalletDashboardContent = ({
       <div class="mt-6 mobileLg:mt-12 desktop:mt-24" id="stamps-section">
         <ItemHeader
           title="STAMPS"
-          sort={true}
+          sort
           sortBy={sortStamps}
           onChangeSort={handleChangeSort}
           isOpen={openS}
           handleOpen={handleOpen}
-          search={true}
+          search
           filter={false}
-          setting={true}
+          setting
           isOpenFilter={false}
           isOpenSetting={openSetting}
           handleOpenFilter={() => {}}
@@ -591,12 +591,12 @@ const WalletDashboardContent = ({
       <div class="mt-12 mobileLg:mt-24 desktop:mt-36" id="src20-section">
         <ItemHeader
           title="TOKENS"
-          sort={true}
+          sort
           sortBy={sortTokens}
           onChangeSort={handleTokenSort}
           isOpen={openT}
           handleOpen={handleOpen}
-          search={true}
+          search
           filter={false}
           setting={false}
           isOpenFilter={false}
@@ -635,7 +635,7 @@ const WalletDashboardContent = ({
         <div class="mt-48">
           <ItemHeader
             title="LISTINGS"
-            sort={true}
+            sort
             sortBy={sortDispensers}
             onChangeSort={handleDispenserSort}
             isOpen={openD}

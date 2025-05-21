@@ -1,10 +1,9 @@
-import { assertEquals, assertExists, assertNotEquals } from "@std/assert";
+import { assertEquals, assertExists } from "@std/assert";
 import {
   StampMintService,
   StampValidationService,
 } from "../../server/services/stamp/index.ts";
 import { Psbt } from "bitcoinjs-lib";
-import { base64ToArrayBuffer } from "./utils.ts";
 
 // Configuration for tests
 const CONFIG = {

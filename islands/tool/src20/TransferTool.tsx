@@ -53,10 +53,6 @@ export function SRC20TransferTool(
   /* ===== WALLET CONTEXT ===== */
   const { wallet, isConnected } = walletContext;
 
-  /* ===== CONFIG CHECK ===== */
-  if (!config) {
-    return <div>Error: Failed to load configuration</div>;
-  }
 
   /* ===== CLICK OUTSIDE HANDLER ===== */
   useEffect(() => {
@@ -198,6 +194,10 @@ export function SRC20TransferTool(
   useEffect(() => {
     console.log("Token input ref:", tokenInputRef.current);
   }, []);
+
+  if (!config) {
+    return <div>Error: Failed to load configuration</div>;
+  }
 
   return (
     <div class={bodyTool}>

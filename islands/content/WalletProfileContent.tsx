@@ -420,7 +420,7 @@ export default function WalletProfileContent({
   dispensersSortBy = "DESC",
 }: WalletContentProps) {
   /* ===== STATE ===== */
-  const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
+  const [_openSettingModal, setOpenSettingModal] = useState<boolean>(false);
 
   /* ===== SORT STATE ===== */
   const [sortStamps, setSortStamps] = useState<"ASC" | "DESC">(stampsSortBy);
@@ -561,12 +561,12 @@ export default function WalletProfileContent({
       <div class="mt-3 mobileLg:mt-6" id="stamps-section">
         <ItemHeader
           title="STAMPS"
-          sort={true}
+          sort
           sortBy={sortStamps}
           onChangeSort={handleChangeSort}
           isOpen={openS}
           handleOpen={handleOpen}
-          search={true}
+          search
           filter={false}
           setting={false}
           isOpenFilter={false}
@@ -590,12 +590,12 @@ export default function WalletProfileContent({
       <div class="mt-6 mobileLg:mt-12" id="src20-section">
         <ItemHeader
           title="TOKENS"
-          sort={true}
+          sort
           sortBy={sortTokens}
           onChangeSort={handleTokenSort}
           isOpen={openT}
           handleOpen={handleOpen}
-          search={true}
+          search
           filter={false}
           setting={false}
           isOpenFilter={false}
@@ -638,7 +638,7 @@ export default function WalletProfileContent({
         <div class="mt-3 mobileLg:mt-6" id="listings-section">
           <ItemHeader
             title="LISTINGS"
-            sort={true}
+            sort
             sortBy={sortDispensers}
             onChangeSort={handleDispenserSort}
             isOpen={openD}
@@ -672,7 +672,7 @@ export default function WalletProfileContent({
 
       {
         /* Modal for sending stamps
-      {openSettingModal && (
+      {_openSettingModal && (
         <WalletSendStampModal
           stamps={stamps}
           fee={0}

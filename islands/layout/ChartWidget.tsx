@@ -12,7 +12,7 @@ const ChartWidget = (
   { data, fromPage = "detail", tick = "" }: ChartWidgetProps,
 ) => {
   const [loading, setLoading] = useState(true);
-  const [chartType, setChartType] = useState<"line" | "candlestick">("line");
+  const chartType: "line" | "candlestick" = "line";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -111,7 +111,7 @@ const ChartWidget = (
           },
           series: [
             {
-              type: chartType, // ✅ Dynamic chart type (line/candlestick)
+              type: chartType, // Chart type constant
               name: "Price in SAT",
               color: "#8800CC",
               data: data,
@@ -124,11 +124,11 @@ const ChartWidget = (
 
       setLoading(false); // ✅ Hide loading after chart renders
     }, 1000); // Simulate loading delay
-  }, [data, chartType]); // ✅ Re-render when data or chartType changes
+  }, [data]);
 
   return (
     <div className="p-4">
-      {loading ? <div class={loaderSpinXsPurple} /> : <></>}
+      {loading ? <div class={loaderSpinXsPurple} /> : null}
       <div id={tick ? `chart-container-${tick}` : "chart-container"} />
     </div>
   );

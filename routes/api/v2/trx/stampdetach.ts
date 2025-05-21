@@ -109,7 +109,7 @@ export const handler: Handlers = {
         // For simplicity, if `destination` is present, use it. Otherwise, this will need to be revisited.
         const userAddressForPsbtProcessing = destination || ""; // THIS IS A SIMPLIFICATION AND MIGHT BE WRONG for change
         if (!userAddressForPsbtProcessing) {
-          // TODO (@stampchain): We need a reliable way to get the source address of the UTXO if destination is not provided for change.
+          // TODO(@stampchain): We need a reliable way to get the source address of the UTXO if destination is not provided for change.
           // This is a critical point for detach if change needs to go back to original owner.
           // For now, this path might lead to issues if change is generated and destination is empty.
           console.warn(

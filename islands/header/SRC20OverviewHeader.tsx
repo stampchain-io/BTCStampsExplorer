@@ -51,13 +51,6 @@ export const SRC20OverviewHeader = (
   >("24H");
 
   // Add sort state
-  const [sortConfig, setSortConfig] = useState<{
-    filter: "TRENDING" | "DEPLOY" | "HOLDERS" | null;
-    direction: "asc" | "desc";
-  }>({
-    filter: null,
-    direction: "desc",
-  });
 
   // Separate handlers for each group
   const handleMintingMouseEnter = () => {
@@ -166,7 +159,7 @@ export const SRC20OverviewHeader = (
             </Button>
             <div class="w-[34px] h-[34px] px-[5px] rounded-md bg-transparent border-2 border-stamp-purple hover:border-stamp-purple-bright">
               <div class="-mt-0.5">
-                <SearchSRC20Modal showButton={true} />
+                <SearchSRC20Modal showButton />
               </div>
             </div>
           </div>

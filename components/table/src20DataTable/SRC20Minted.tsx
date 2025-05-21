@@ -1,5 +1,5 @@
 import { SRC20Row } from "$globals";
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+import { formatDate } from "$lib/utils/formatUtils.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import { Timeframe } from "$layout";
@@ -16,7 +16,7 @@ interface SRC20MintedTableProps {
 
 export function SRC20MintedTable({
   data,
-  fromPage,
+  fromPage: _fromPage,
   timeframe,
   onImageClick,
 }: SRC20MintedTableProps) {

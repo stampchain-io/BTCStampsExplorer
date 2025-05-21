@@ -81,7 +81,7 @@ export default function PressKit() {
               </p>
             </div>
 
-            <button className="bg-[#999999] text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]">
+            <button type="button" className="bg-[#999999] text-[#080808] text-xl font-extrabold rounded-md w-[160px] h-[60px]">
               DOWNLOAD
             </button>
           </div>

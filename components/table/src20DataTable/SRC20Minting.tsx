@@ -1,5 +1,5 @@
 import { SRC20Row } from "$globals";
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+import { formatDate } from "$lib/utils/formatUtils.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { Timeframe } from "$layout";
 import { labelSm, textSm, valueDark } from "$text";
@@ -16,8 +16,8 @@ interface SRC20MintingTableProps {
 
 export function SRC20MintingTable({
   data,
-  fromPage,
-  timeframe,
+  fromPage: _fromPage,
+  timeframe: _timeframe,
   onImageClick,
 }: SRC20MintingTableProps) {
   const headers = [
@@ -82,10 +82,6 @@ export function SRC20MintingTable({
                   `/content/${src20.tx_hash}.svg` ||
                   `/content/${src20.deploy_tx}`;
 
-                const progress = Math.min(
-                  (Number(src20.minted) / Number(src20.max)) * 100,
-                  100,
-                );
 
                 const mintHref = `/tool/src20/mint?tick=${
                   encodeURIComponent(src20.tick)
