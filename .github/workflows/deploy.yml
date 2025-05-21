@@ -53,6 +53,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deno-
 
+      - name: Run lint check
+        id: lintcheck
+        run: deno task check:lint
+        continue-on-error: true
+
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1
         with:
@@ -204,12 +209,19 @@ jobs:
           
           echo "Starting lint checks..."
           process_files lint
-          
+
           exit 0
+
+      - name: Actionlint
+        id: actionlint
+        uses: reviewdog/action-actionlint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
 
       # Fail the workflow if any checks failed
       - name: Check for failures
-        if: steps.fmt.outcome == 'failure' || steps.lint.outcome == 'failure'
+        if: steps.lintcheck.outcome == 'failure' || steps.actionlint.outcome == 'failure'
         run: exit 1
 
       # Build check
