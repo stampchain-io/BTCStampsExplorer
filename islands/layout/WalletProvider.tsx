@@ -84,30 +84,28 @@ export function WalletProvider(
   /* ===== RENDER ===== */
   return (
     <div
-      className={`${containerCard} group w-full cursor-pointer`}
       onClick={handleConnect}
+      role="button"
+      aria-label={`Connect to ${providerInfo.name}`}
+      className={`flex justify-between items-center p-4 ${containerCard}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex items-center space-x-4">
-        <div className="flex-shrink-0">
-          <img
-            src={providerInfo.logo.small}
-            alt={`${providerInfo.name} logo`}
-            className={`w-8 h-8 mobileLg:w-10 mobileLg:h-10 transition-all duration-300 ease-in-out transform ${
-              isHovered ? "scale-110" : ""
-            }`}
-          />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-base mobileLg:text-lg font-bold text-white truncate group-hover:text-stamp-purple-bright">
-            {providerInfo.name}
-          </p>
-        </div>
-        <div className="inline-flex items-center text-xs mobileLg:text-sm font-medium text-stamp-grey-dark group-hover:text-stamp-purple-bright">
-          CONNECT
-        </div>
-      </div>
+      {/* ===== PROVIDER NAME ===== */}
+      <h6
+        className={`font-extrabold text-lg uppercase tracking-wide ${
+          isHovered ? "text-stamp-purple-bright" : "gray-gradient3"
+        }`}
+      >
+        {providerInfo.name}
+      </h6>
+
+      {/* ===== PROVIDER LOGO ===== */}
+      <img
+        src={providerInfo.logo.small}
+        alt={providerInfo.name}
+        className="w-8 h-8"
+      />
     </div>
   );
 }
