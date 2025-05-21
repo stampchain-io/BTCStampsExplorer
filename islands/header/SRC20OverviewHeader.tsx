@@ -132,7 +132,7 @@ export const SRC20OverviewHeader = (
 
   /* ===== RENDER ===== */
   return (
-    <div class="relative flex flex-col w-full gap-1">
+    <div class="relative flex flex-col w-full gap-1.5">
       <div class="flex flex-row justify-between items-start w-full">
         {/* ===== RESPONSIVE TITLE ===== */}
         <h1 className={`${titlePurpleLD} block mobileLg:hidden`}>TOKENS</h1>
@@ -143,9 +143,7 @@ export const SRC20OverviewHeader = (
         {/* ===== CONTROLS SECTION ===== */}
         <div className="flex flex-col">
           <div className="flex relative items-start justify-between gap-4 tablet:gap-3">
-            <div class="-mt-0.5">
-              <SearchSRC20Modal showButton />
-            </div>
+            <SearchSRC20Modal showButton />
             <Button
               variant={viewType === "minting"
                 ? mintingHover.canHoverSelected ? "flatOutline" : "outlineFlat"
@@ -154,6 +152,7 @@ export const SRC20OverviewHeader = (
                 : "flatOutline"}
               color="purple"
               size="xs"
+              class="mt-0.5"
               onClick={handleMintingClick}
               onMouseEnter={handleMintingMouseEnter}
               onMouseLeave={handleMintingMouseLeave}
