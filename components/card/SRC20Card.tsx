@@ -10,7 +10,7 @@ import {
   rowCardBorderLeft,
   rowCardBorderRight,
 } from "$layout";
-import { labelXs, textSm, valueDark } from "$text";
+import { labelXs, textSm, valueDarkSm } from "$text";
 
 interface SRC20CardProps {
   data: SRC20Row[];
@@ -265,7 +265,7 @@ export function SRC20Card({
           )
           : (
             <tr>
-              <td colSpan={headers.length} class={`${valueDark} w-full`}>
+              <td colSpan={headers.length} class={`${valueDarkSm} w-full`}>
                 NO TOKENS TO DISPLAY
               </td>
             </tr>
