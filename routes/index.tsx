@@ -5,8 +5,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-
-import { Micro5FontLoader } from "$layout";
+import { gapSectionSlim, Micro5FontLoader } from "$layout";
 import { HomeHeader } from "$header";
 import {
   CarouselHome,
@@ -189,7 +188,9 @@ export default function Home({ data }: PageProps<HomePageData>) {
               />
             </div>
 
-            <div class="flex flex-col tablet:flex-row pt-12 mobileLg:pt-24 desktop:pt-36 gap-12 mobileLg:gap-[72px]">
+            <div
+              class={`flex flex-col tablet:flex-row pt-12 mobileLg:pt-24 desktop:pt-36 ${gapSectionSlim}`}
+            >
               <div class="w-full tablet:w-1/2">
                 <SRC20Gallery
                   title="SRC-20 TOKENS"
@@ -198,6 +199,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
                   fromPage="home"
                   serverData={src20Data?.minted}
                   useClientFetch={false}
+                  timeframe="24H"
                 />
               </div>
               <div class="w-full tablet:w-1/2">
@@ -208,6 +210,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
                   fromPage="home"
                   serverData={src20Data?.minting}
                   useClientFetch={false}
+                  timeframe="24H"
                 />
               </div>
             </div>
