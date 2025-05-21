@@ -77,6 +77,9 @@ Use `deno task dev:safe` to clean up before running the dev server.
   - `check:types` – type checking.
 - Excluded paths: `server/`, `_fresh/`, `node_modules/`, `dist/`, and
   other generated files (see `deno.json`).
+- CI runs `deno task check:fmt` and `deno task check:lint` with Reviewdog to
+  annotate formatting and lint issues and executes `actionlint` to validate
+  GitHub Actions workflows.
 
 ## 8. Testing
 - Use the built‑in Deno test runner.
