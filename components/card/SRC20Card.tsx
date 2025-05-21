@@ -159,9 +159,18 @@ export function SRC20Card({
                       cellAlign(1, headers.length)
                     } ${rowCardBorderCenter}`}
                   >
-                    {Math.round((src20.floor_unit_price ?? 0) * 1e8)
-                      .toLocaleString()}
-                    <span class="text-stamp-grey-light ml-1">SATS</span>
+                    {(() => {
+                      const priceInBtc = src20.floor_unit_price ?? 0;
+                      if (priceInBtc === 0) {
+                        return "0 SATS";
+                      }
+                      const priceInSatsExact = priceInBtc * 1e8;
+                      const priceInSatsRounded = Math.round(priceInSatsExact);
+                      if (priceInSatsRounded === 0) {
+                        return "< 1 SATS";
+                      }
+                      return priceInSatsRounded.toLocaleString() + " SATS";
+                    })()}
                   </td>
                   {/* CHANGE */}
                   <td
@@ -169,7 +178,18 @@ export function SRC20Card({
                       cellAlign(2, headers.length)
                     } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
                   >
-                    <span class="text-stamp-grey-light">N/A%</span>
+                    {(src20 as any).change24 !== undefined &&
+                        (src20 as any).change24 !== null
+                      ? (
+                        <span
+                          class={(src20 as any).change24 >= 0
+                            ? "text-green-500"
+                            : "text-red-500"}
+                        >
+                          {(src20 as any).change24.toFixed(2)}%
+                        </span>
+                      )
+                      : <span class="text-stamp-grey-light">N/A%</span>}
                   </td>
                   {/* VOLUME */}
                   <td
@@ -177,8 +197,13 @@ export function SRC20Card({
                       cellAlign(3, headers.length)
                     } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
                   >
-                    {Math.round((src20 as any).volume24 ?? 0).toLocaleString()}
-                    <span class="text-stamp-grey-light ml-1">BTC</span>
+                    {(src20 as any).volume24 !== undefined &&
+                        (src20 as any).volume24 !== null
+                      ? (src20 as any).volume24.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8,
+                      }) + " BTC"
+                      : "N/A"}
                   </td>
                   {/* MARKETCAP */}
                   <td
@@ -186,9 +211,13 @@ export function SRC20Card({
                       cellAlign(4, headers.length)
                     } ${rowCardBorderCenter} hidden mobileLg:table-cell`}
                   >
-                    {Math.round(((src20 as any).market_cap ?? 0) * 1e8)
-                      .toLocaleString()}
-                    <span class="text-stamp-grey-light ml-1">SATS</span>
+                    {(src20 as any).market_cap !== undefined &&
+                        (src20 as any).market_cap !== null
+                      ? (src20 as any).market_cap.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8,
+                      }) + " BTC"
+                      : "N/A"}
                   </td>
 
                   {/* DEPLOY */}
