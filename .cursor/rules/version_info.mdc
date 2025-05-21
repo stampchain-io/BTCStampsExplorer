@@ -4,6 +4,11 @@ globs: []
 alwaysApply: true
 ---
 
+# Reference
+# The main developer guidelines live in `AGENTS.md` at the repository root.
+# This file supplements those instructions with explicit version data for AI
+# context.
+
 
 # Adding version control information for better AI context
 version_info:
