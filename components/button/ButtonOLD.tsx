@@ -18,7 +18,7 @@ interface ButtonProps
 
 const ICON_STYLE = "flex items-end justify-end group cursor-pointer";
 const ICON_CLASS =
-  "w-5 h-5 mt-1.5 tablet:mt-2 fill-stamp-purple group-hover:fill-stamp-purple-bright cursor-pointer";
+  "w-5 h-5 mt-2 fill-stamp-purple group-hover:fill-stamp-purple-bright cursor-pointer";
 
 export function Button({
   icon,
