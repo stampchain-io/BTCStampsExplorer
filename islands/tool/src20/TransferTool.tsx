@@ -53,7 +53,6 @@ export function SRC20TransferTool(
   /* ===== WALLET CONTEXT ===== */
   const { wallet, isConnected } = walletContext;
 
-
   /* ===== CLICK OUTSIDE HANDLER ===== */
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

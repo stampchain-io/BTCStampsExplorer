@@ -102,7 +102,6 @@ export function SRC20CardMinting({
                 encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
               }`;
 
-
               const mintHref = `/tool/src20/mint?tick=${
                 encodeURIComponent(src20.tick)
               }&trxType=olga`;

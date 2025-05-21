@@ -55,7 +55,6 @@ export function SRC20DeployTool(
   const [tooltipText, setTooltipText] = useState("OPTIONAL FIELDS");
   const { wallet, isConnected } = walletContext;
 
-
   /* ===== FILE HANDLING ===== */
   const handleFileChange = (e: Event) => {
     const file = (e.target as HTMLInputElement).files?.[0] || null;
