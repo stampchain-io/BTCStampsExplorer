@@ -1,5 +1,5 @@
 /* ===== HEADER COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { ConnectButton } from "$islands/button/ConnectButton.tsx";
 // Import main icons from the barrel file
 import { CloseIcon, GearIcon } from "$icon";
@@ -104,6 +104,11 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState<string | null>(null);
   const [toolsOpen, setToolsOpen] = useState(false);
+  // Add tooltip state for close button
+  const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
+  const [allowCloseTooltip, setAllowCloseTooltip] = useState(true);
+  const [closeTooltipText, setCloseTooltipText] = useState("CLOSE");
+  const closeTooltipTimeoutRef = useRef<number | null>(null);
 
   /* ===== PATH TRACKING EFFECT ===== */
   useEffect(() => {
@@ -190,7 +195,39 @@ export function Header() {
     };
   }, [open]);
 
-  /* This effect has been removed to simplify the code */
+  // Add cleanup effect for tooltip timeout
+  useEffect(() => {
+    return () => {
+      if (closeTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(closeTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleCloseMouseEnter = () => {
+    if (allowCloseTooltip) {
+      setCloseTooltipText("CLOSE");
+
+      if (closeTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(closeTooltipTimeoutRef.current);
+      }
+
+      closeTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsCloseTooltipVisible(true);
+      }, 1500);
+    }
+  };
+
+  const handleCloseMouseLeave = () => {
+    if (closeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(closeTooltipTimeoutRef.current);
+    }
+    setIsCloseTooltipVisible(false);
+    setAllowCloseTooltip(true);
+  };
+
+  const tooltipIcon =
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
 
   /* ===== MENU CLOSE FUNCTION ===== */
   const closeMenu = () => {
@@ -344,10 +381,10 @@ export function Header() {
       {/* ===== MOBILE NAVIGATION DRAWER ===== */}
       <div
         className={`flex tablet:hidden flex-col justify-between
-           fixed top-0 right-0 left-auto w-full min-[420px]:w-[380px] h-screen z-30
-           bg-gradient-to-b from-[#000000]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
+           fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-screen z-30
+           bg-gradient-to-b from-[#0e0014]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
            shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
-           transition-transform duration-500 ease-in-out
+           transition-transform duration-500 ease-in-out will-change-transform
            overflow-y-auto overflow-x-hidden scrollbar-black
            ${open ? "translate-x-0" : "translate-x-full"}`}
         id="navbar-collapse"
@@ -355,24 +392,36 @@ export function Header() {
         {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
         <div className="flex flex-col h-full">
           <div className="flex pt-[30px] px-9">
-            <CloseIcon
-              size="sm"
-              weight="bold"
-              color="greyGradient"
-              isOpen={open}
-              onClick={() => {
-                if (open) {
-                  closeMenu();
-                }
-              }}
-            />
+            <div className="relative">
+              <div
+                className={`${tooltipIcon} ${
+                  isCloseTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {closeTooltipText}
+              </div>
+              <CloseIcon
+                size="sm"
+                weight="bold"
+                color="greyGradient"
+                onClick={() => {
+                  if (open) {
+                    closeMenu();
+                  }
+                }}
+                onMouseEnter={handleCloseMouseEnter}
+                onMouseLeave={handleCloseMouseLeave}
+                aria-label="Close menu"
+              />
+            </div>
           </div>
-          <div className="flex flex-col flex-1 items-start p-9 gap-3">
+          <div className="flex flex-col flex-1 items-start p-9 gap-5">
             {renderNavLinks(true)}
           </div>
 
           <div className="flex flex-col w-full sticky bottom-0
-          bg-gradient-to-b from-[#000000]/33 via-[#000000]/66 to-[#000000]/100">
+          bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
+          shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
             {/* Tools section with gear icon */}
             <div className="flex w-full justify-between py-6 px-9">
               <div className="flex justify-start items-end -ml-1">
