@@ -1,4 +1,4 @@
-import { Button } from "$components/shared/Button.tsx";
+import { Button } from "$components/button/ButtonOLD.tsx";
 import { BadgeIcon, FilterIcon } from "$islands/filter/FilterComponents.tsx";
 
 // Define the filter types
@@ -19,7 +19,7 @@ export function FilterButton(
     <div
       class={`relative flex flex-col items-center gap-1 rounded-md h-fit border-stamp-purple-bright text-stamp-purple-bright group`}
     >
-      <BadgeIcon text={count.toString()} />
+      <BadgeIcon text={count !== undefined ? count.toString() : ""} />
       <Button
         variant="icon"
         class="transform transition-all duration-300"

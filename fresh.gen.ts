@@ -191,7 +191,6 @@ import * as $header_index from "./islands/header/index.ts";
 import * as $layout_ChartWidget from "./islands/layout/ChartWidget.tsx";
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
-import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $layout_ModalOverlay from "./islands/layout/ModalOverlay.tsx";
 import * as $layout_ModalProvider from "./islands/layout/ModalProvider.tsx";
 import * as $layout_ModalStack from "./islands/layout/ModalStack.tsx";
@@ -241,7 +240,6 @@ import * as $section_howto_StampingHowto from "./islands/section/howto/StampingH
 import * as $section_index from "./islands/section/index.ts";
 import * as $sort_MultiSort from "./islands/sort/MultiSort.tsx";
 import * as $sort_SortButton from "./islands/sort/SortButton.tsx";
-import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
 import * as $table_HoldersPieChart from "./islands/table/HoldersPieChart.tsx";
 import * as $table_HoldersTableBase from "./islands/table/HoldersTableBase.tsx";
@@ -492,7 +490,6 @@ const manifest = {
     "./islands/layout/ChartWidget.tsx": $layout_ChartWidget,
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
     "./islands/layout/Footer.tsx": $layout_Footer,
-    "./islands/layout/Header.tsx": $layout_Header,
     "./islands/layout/ModalOverlay.tsx": $layout_ModalOverlay,
     "./islands/layout/ModalProvider.tsx": $layout_ModalProvider,
     "./islands/layout/ModalStack.tsx": $layout_ModalStack,
@@ -556,7 +553,6 @@ const manifest = {
     "./islands/section/index.ts": $section_index,
     "./islands/sort/MultiSort.tsx": $sort_MultiSort,
     "./islands/sort/SortButton.tsx": $sort_SortButton,
-    "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/table/DataTableBase.tsx": $table_DataTableBase,
     "./islands/table/HoldersPieChart.tsx": $table_HoldersPieChart,
     "./islands/table/HoldersTableBase.tsx": $table_HoldersTableBase,

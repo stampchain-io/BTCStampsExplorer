@@ -6,6 +6,11 @@ import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "$globals";
 import { StampOverviewContent } from "$content";
 import { StampOverviewHeader } from "$header";
+import {
+  queryParamsToFilters,
+  queryParamsToServicePayload,
+  StampFilters,
+} from "$islands/filter/FilterOptionsStamp.tsx";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
@@ -65,7 +70,7 @@ export const handler: Handlers = {
         }
 
         // Fetch stamps with filters
-        result = await StampController.getStamps({
+        const payload = {
           page,
           limit: page_size,
           sortBy: sortBy as "DESC" | "ASC",
@@ -113,7 +118,6 @@ export function StampOverviewPage(props: StampPageProps) {
     stamps,
     page,
     totalPages,
-    filterBy,
     sortBy,
     selectedTab,
     filters,
@@ -127,8 +131,7 @@ export function StampOverviewPage(props: StampPageProps) {
     <div class="w-full" f-client-nav data-partial="/stamp">
       {/* Header Component with Filter Controls */}
       <StampOverviewHeader
-      filters={filters}
-        filterBy={filterBy as STAMP_FILTER_TYPES[]}
+        currentFilters={filters as StampFilters}
         sortBy={sortBy}
         search={search}
       />
