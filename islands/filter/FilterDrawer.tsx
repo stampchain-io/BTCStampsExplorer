@@ -16,8 +16,8 @@ import {
 // Import SRC20 filter content
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
 import { FilterType } from "$islands/filter/FilterButton.tsx";
-import { CloseIcon } from "$islands/filter/FilterComponents.tsx";
-import { button } from "$islands/filter/FilterStyles.ts";
+import { Icon } from "$icon";
+import { Button } from "$button";
 
 // Define a type for all possible filter types
 type AllFilters = StampFilters | SRC20Filters;
@@ -367,10 +367,10 @@ const FilterDrawer = (
       id={drawerId}
       ref={drawerRef}
       class={`fixed top-0 z-40 h-screen
-        bg-gradient-to-b from-[#000000]/80 to-[#000000] 
-        transition-transform duration-500 ease-in-out
-        will-change-transform
-        
+        bg-gradient-to-b from-[#0e0014]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
+        transition-transform duration-500 ease-in-out will-change-transform
+        overflow-y-auto overflow-x-hidden scrollbar-black
+
         left-0 right-auto w-full min-[420px]:w-[340px] shadow-[12px_0_12px_-6px_rgba(0,0,0,0.5)]
         tablet:right-0 tablet:left-auto tablet:w-[320px] tablet:shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
         ${
@@ -379,80 +379,89 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}
-      <div className="h-[calc(100vh-92px)] tablet:h-[calc(100vh-88px)] p-6 overflow-y-auto scrollbar-black">
-        <div className="flex flex-col mb-8 tablet:mb-6">
-          <div className="flex justify-between ">
-            <p className="tablet:hidden font-black text-3xl gray-gradient1 cursor-default select-none">
-              FILTERS
-            </p>
-            <button
-              onClick={handleCloseDrawer}
+      <div className="h-[calc(100vh-92px)] tablet:h-[calc(100vh-88px)] overflow-y-auto scrollbar-black">
+        <div className="flex justify-end tablet:justify-start pt-[30px] px-9">
+          <div className="relative">
+            <div
+              className={`${tooltipIcon} ${
+                isCloseTooltipVisible ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {closeTooltipText}
+            </div>
+            <Icon
+              type="iconLink"
+              name="close"
+              weight="bold"
+              size="xs"
+              color="grey"
+              onClick={() => {
+                if (open) {
+                  closeMenu();
+                }
+              }}
               onMouseEnter={handleCloseMouseEnter}
               onMouseLeave={handleCloseMouseLeave}
-              className="relative tablet:hidden top-0 left-0 flex items-center justify-center"
-              aria-label="Close filter menu"
-            >
-              <div
-                className={`${tooltipIcon} ${
-                  isCloseTooltipVisible ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                {closeTooltipText}
-              </div>
-              <CloseIcon />
-            </button>
-            <p className="hidden tablet:block font-black text-2xl gray-gradient1 cursor-default select-none">
-              FILTERS
-            </p>
+              aria-label="Close menu"
+            />
           </div>
         </div>
 
         {/* Filter content based on type */}
-        {type === "stamp" && (
-          <FilterContentStamp
-            initialFilters={currentFilters as StampFilters}
-            onFiltersChange={(filters) => {
-              console.log(
-                "filters changed in FilterDrawer:",
-                JSON.stringify(filters, null, 2),
-              );
-              setCurrentFilters(filters);
-            }}
-          />
-        )}
-        {type === "src20" && (
-          <FilterContentSRC20
-            initialFilters={currentFilters as SRC20Filters}
-            onFiltersChange={(filters) => {
-              console.log("FilterDrawer - SRC20 filters changed:", filters);
-              setCurrentFilters(filters);
-            }}
-          />
-        )}
-        {/* Add more filter content components for other types as needed */}
+        <div className="flex flex-col p-9 gap-5">
+          {type === "stamp" && (
+            <FilterContentStamp
+              initialFilters={currentFilters as StampFilters}
+              onFiltersChange={(filters) => {
+                console.log(
+                  "filters changed in FilterDrawer:",
+                  JSON.stringify(filters, null, 2),
+                );
+                setCurrentFilters(filters);
+              }}
+            />
+          )}
+          {type === "src20" && (
+            <FilterContentSRC20
+              initialFilters={currentFilters as SRC20Filters}
+              onFiltersChange={(filters) => {
+                console.log("FilterDrawer - SRC20 filters changed:", filters);
+                setCurrentFilters(filters);
+              }}
+            />
+          )}
+          {/* Add more filter content components for other types as needed */}
+        </div>
       </div>
       {/* Sticky buttons */}
-      <div className="flex justify-between sticky bottom-0 p-6 gap-6 bg-[#000000]/80 shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
-        <button
+      <div className="flex justify-between w-full sticky bottom-0 px-9 py-6 gap-6
+       bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
+        shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
+        <Button
+          variant="outline"
+          color="grey"
+          size="sm"
           onClick={() => {
             isClearingRef.current = true; // Set the flag before clearing
             setCurrentFilters(emptyFilters);
-
             // Reset the flag after a short delay
             setTimeout(() => {
               isClearingRef.current = false;
             }, 100);
           }}
-          className={`w-full ${button("outlineGrey", "lg")}`}
+          class="w-full"
         >
           CLEAR
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="flat"
+          color="grey"
+          size="sm"
           onClick={handleApplyFilters}
-          className={`w-full ${button("flatGrey", "lg")}`}
+          class="w-full"
         >
           APPLY
-        </button>
+        </Button>
       </div>
     </div>
   );

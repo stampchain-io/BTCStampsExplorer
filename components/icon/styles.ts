@@ -23,6 +23,12 @@ export interface IconVariants {
   onClick?: JSX.MouseEventHandler<
     HTMLButtonElement | HTMLAnchorElement | HTMLImageElement | SVGElement
   >;
+  onMouseEnter?: JSX.MouseEventHandler<
+    HTMLButtonElement | HTMLAnchorElement | HTMLImageElement | SVGElement
+  >;
+  onMouseLeave?: JSX.MouseEventHandler<
+    HTMLButtonElement | HTMLAnchorElement | HTMLImageElement | SVGElement
+  >;
   href?: string;
   target?: string;
   rel?: string;

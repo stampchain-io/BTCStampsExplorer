@@ -63,7 +63,7 @@ export const labelGreySemiboldSmLogic = (
   canHoverSelected: boolean,
 ): string => `
   inline-block ml-4 tablet:ml-3 mt-0.5 tablet:mt-0
-  font-semibold text-base tablet:text-sm
+  font-semibold text-base tablet:text-xs
   transition-colors duration-300
   cursor-pointer select-none
   ${
@@ -78,6 +78,7 @@ export const labelGreySemiboldSmLogic = (
 `;
 
 // Button styles
+/*
 export const buttonStyles = {
   base:
     "inline-flex items-center justify-center border-2 rounded-md font-bold text-sm tablet:text-sm tracking-wider transition-colors duration-300",
@@ -118,3 +119,4 @@ export const button = (
 
 // Example usage:
 // className={button('outlineGrey', 'lg')}
+*/

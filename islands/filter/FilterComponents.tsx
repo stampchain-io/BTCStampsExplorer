@@ -126,11 +126,11 @@ export const CollapsibleSection = ({
           <button
             onClick={handleClick}
             onMouseLeave={handleMouseLeave}
-            className="flex items-center w-full justify-between py-4 tablet:py-3 transition-colors duration-300 group"
+            className="flex items-center w-full justify-between py-4 tablet:py-2 transition-colors duration-300 group"
           >
             <span
               className={`
-                font-light text-xl tablet:text-lg transition-colors duration-300
+                font-light tablet:font-bold text-xl tablet:text-sm transition-colors duration-300
                 ${
                 expanded
                   ? `text-stamp-grey ${
@@ -172,7 +172,7 @@ export const CollapsibleSection = ({
               expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
             }`}
           >
-            <div className="-mt-1 tablet:-mt-1.5 pb-3 pl-0.5">
+            <div className="-mt-1 tablet:-mt-1 pb-3 pl-0.5">
               {children}
             </div>
           </div>

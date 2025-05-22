@@ -9,6 +9,9 @@ interface CloseIconProps {
   weight: IconVariants["weight"];
   color: "greyGradient" | "purpleGradient";
   className?: string;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  "aria-label"?: string;
 }
 
 /* ===== COMPONENT ===== */
@@ -18,6 +21,9 @@ export function CloseIcon({
   size,
   color,
   className = "",
+  onMouseEnter,
+  onMouseLeave,
+  "aria-label": ariaLabel,
 }: CloseIconProps) {
   /* ===== EVENT HANDLERS ===== */
   const handleClick = (e: MouseEvent) => {
@@ -69,7 +75,9 @@ export function CloseIcon({
         color="custom"
         className={`${colorClasses} ${className}`.trim()}
         onClick={handleClick}
-        ariaLabel="Close Filter"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        ariaLabel={ariaLabel || "Close"}
       />
     </>
   );
