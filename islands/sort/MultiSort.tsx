@@ -1,47 +1,81 @@
 import { useEffect, useState } from "preact/hooks";
 import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
-import { Button } from "$components/button/ButtonOLD.tsx";
+import { Button } from "$components/shared/Button.tsx";
 
 interface SortProps {
   initSort?: "ASC" | "DESC" | undefined;
   onChangeSort?: (newSort: "ASC" | "DESC") => void;
   sortParam?: string;
+  searchparams: URLSearchParams;
 }
 
-export function Sort(
-  { initSort = "ASC", onChangeSort, sortParam = "sortBy" }: SortProps,
+export function MultiSort(
+  { initSort = "ASC", onChangeSort, sortParam = "sortBy", searchparams }:
+    SortProps,
 ) {
-  const [visible, setVisible] = useState<boolean>(false);
-  const [sort, setSort] = useState<"ASC" | "DESC">(initSort || "ASC");
+  const [open, setOpen] = useState<boolean>(false);
+  const [sort, setSort] = useState<"ASC" | "DESC">(
+    searchparams.get("sortOrder")?.includes("asc") ? "ASC" : "DESC",
+  );
+  const [option, setOption] = useState<"stamp" | "price">(
+    searchparams.get("sortOrder")?.includes("index") ? "stamp" : "price",
+  );
+
   const { updateURL } = useURLUpdate();
 
-  useEffect(() => {
-    if (initSort) {
-      setSort(initSort);
-    }
-  }, [initSort]);
+  const handleOption = (selected: "stamp" | "price") => {
+    setOption(selected);
+    setOpen(false);
+  };
+
+  // useEffect(() => {
+  //   if (initSort) {
+  //     setSort(initSort);
+  //   }
+  // }, [initSort]);
 
   useEffect(() => {
     updateURL({ [sortParam]: sort });
   }, [sort, sortParam]);
 
-  const handleSort = () => {
-    const newSort = sort === "ASC" ? "DESC" : "ASC";
+  const handleMultiSort = () => {
+    const url = new URL(globalThis.location.href);
+    const currentSort = url.searchParams.get("sortOrder");
+
+    // Define sort mapping for each option
+    const sortMap: Record<string, { asc: string; desc: string }> = {
+      stamp: { asc: "index_asc", desc: "index_desc" },
+      price: { asc: "price_asc", desc: "price_desc" },
+    };
+
+    if (!option || !sortMap[option]) return;
+
+    // Toggle sorting order
+    const isAscending = currentSort === sortMap[option].asc;
+    const newParam = isAscending ? sortMap[option].desc : sortMap[option].asc;
+    const newSort = isAscending ? "DESC" : "ASC";
+
+    // Update state and trigger callback
     setSort(newSort);
     onChangeSort?.(newSort);
 
     // Update URL and reload page
-    const url = new URL(globalThis.location.href);
-    url.searchParams.set(sortParam, newSort);
+    url.searchParams.set("sortOrder", newParam);
     globalThis.location.href = url.toString();
   };
 
   return (
-    <div class="relative">
+    <div class="row flex relative">
       <Button
-        onMouseEnter={() => setVisible(true)}
-        onMouseLeave={() => setVisible(false)}
+        onClick={() => setOpen(!open)}
+        data-dropdown-toggle="sort-dropdown"
+        class="flex items-center justify-center bg-transparent hover:bg-transparent text-stamp-grey border-r-0 w-auto h-[30px] mobileLg:h-9 p-0 px-1 border-2 border-stamp-purple hover:border-stamp-purple-bright group cursor-pointer rounded-md rounded-r-none"
+      >
+        {option}
+      </Button>
+      <Button
         variant="icon"
+        class="rounded-md rounded-l-none"
         icon={sort === "DESC"
           ? (
             <svg
@@ -64,17 +98,38 @@ export function Sort(
             </svg>
           )}
         iconAlt={`Sort ${sort === "DESC" ? "ascending" : "descending"}`}
-        onClick={handleSort}
+        onClick={handleMultiSort}
       />
-      {visible && (
-        <div
-          role="tooltip"
-          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-lg shadow-md"
+      <div
+        id="sort-dropdown"
+        class={`z-10 ${
+          open ? "" : "hidden"
+        } bg-stamp-purple-darkest border-2 border-stamp-purple hover:border-stamp-purple-bright rounded-lg shadow-sm w-[11.8rem] absolute top-9`}
+      >
+        <ul
+          class="py-2 text-sm text-gray-700 dark:text-gray-200"
+          aria-labelledby="dropdownDefaultButton"
         >
-          Sort
-          <div className="tooltip-arrow" />
-        </div>
-      )}
+          <li>
+            <a
+              href="#"
+              class="block px-4 py-2 hover:bg-stamp-primary-light text-stamp-grey"
+              onClick={() => handleOption("stamp")}
+            >
+              Stamp
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="block px-4 py-2 hover:bg-stamp-primary-light text-stamp-grey"
+              onClick={() => handleOption("price")}
+            >
+              Price
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

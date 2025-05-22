@@ -29,6 +29,7 @@ export const handler: Handlers = {
     try {
       /* ===== QUERY PARAMETERS ===== */
       const sortBy = url.searchParams.get("sortBy") || "DESC";
+      const sortOrder = url.searchParams.get("sortOrder") || "index_desc";
       const filterBy = url.searchParams.get("filterBy")
         ? (url.searchParams.get("filterBy")?.split(",").filter(
           Boolean,
@@ -68,12 +69,17 @@ export const handler: Handlers = {
           page,
           limit: page_size,
           sortBy: sortBy as "DESC" | "ASC",
+          sortOrder: sortOrder,
           type: selectedTab,
           filterBy,
           ident,
           collectionId,
           url: url.origin,
-        });
+          ...queryParamsToServicePayload(url.search),
+        };
+        console.log("stamp controller payload", payload);
+
+        result = await StampController.getStamps(payload);
       }
 
       /* ===== RESPONSE FORMATTING ===== */
@@ -86,6 +92,8 @@ export const handler: Handlers = {
         selectedTab: recentSales ? "recent_sales" : selectedTab,
         page,
         limit: page_size,
+        filters: queryParamsToFilters(url.search),
+        search: url.search,
       };
 
       return ctx.render({
@@ -108,8 +116,9 @@ export function StampOverviewPage(props: StampPageProps) {
     filterBy,
     sortBy,
     selectedTab,
+    filters,
+    search,
   } = props.data;
-
   const stampsArray = Array.isArray(stamps) ? stamps : [];
   const isRecentSales = selectedTab === "recent_sales";
 
@@ -118,8 +127,10 @@ export function StampOverviewPage(props: StampPageProps) {
     <div class="w-full" f-client-nav data-partial="/stamp">
       {/* Header Component with Filter Controls */}
       <StampOverviewHeader
+      filters={filters}
         filterBy={filterBy as STAMP_FILTER_TYPES[]}
         sortBy={sortBy}
+        search={search}
       />
 
       {/* Main Content with Pagination */}

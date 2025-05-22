@@ -1,9 +1,8 @@
 /* ===== WALLET DASHBOARD CONTENT COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { Search } from "$islands/datacontrol/Search.tsx";
+import { SortButton } from "$islands/sort/SortButton.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { Filter } from "$islands/datacontrol/Filter.tsx";
+import { FilterOld } from "$islands/datacontrol/FilterOld.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { SRC20Gallery, StampGallery } from "$section";
@@ -25,7 +24,6 @@ const ItemHeader = ({
   isOpenFilter = false,
   handleOpenFilter = () => {},
   sort = true,
-  search = true,
   filter = true,
   setting = false,
   setOpenSettingModal = () => {},
@@ -35,7 +33,6 @@ const ItemHeader = ({
   sortBy: "ASC" | "DESC";
   isOpen: boolean;
   sort: boolean;
-  search: boolean;
   filter: boolean;
   setting: boolean;
   isOpenFilter: boolean;
@@ -69,7 +66,7 @@ const ItemHeader = ({
           />
         )}
         {filter && (
-          <Filter
+          <FilterOld
             initFilter={[]}
             open={isOpenFilter}
             handleOpen={handleOpenFilter}
@@ -78,7 +75,7 @@ const ItemHeader = ({
           />
         )}
         {sort && (
-          <Sort
+          <SortButton
             initSort={sortBy}
             onChangeSort={onChangeSort}
             sortParam={title === "STAMPS"
@@ -86,19 +83,6 @@ const ItemHeader = ({
               : title === "TOKENS"
               ? "src20SortBy"
               : "dispensersSortBy"}
-          />
-        )}
-        {search && (
-          <Search
-            open={isOpen}
-            handleOpen={() => handleOpen(title)}
-            placeholder="Stamp Name, Stamp Hash, or Address"
-            searchEndpoint="/wallet/search?q="
-            onResultClick={() => {}}
-            resultDisplay={(result) => {
-              console.log(result);
-              return result.toString();
-            }}
           />
         )}
       </div>
@@ -483,13 +467,7 @@ const WalletDashboardContent = ({
   };
 
   const handleOpen = (type: string) => {
-    if (type === "STAMPS") {
-      setOpenS(!openS);
-    } else if (type === "TOKENS") {
-      setOpenT(!openT);
-    } else {
-      setOpenD(!openD);
-    }
+    // This function is kept for compatibility but no longer needs to handle search toggles
   };
 
   /* ===== SORT HANDLERS ===== */
@@ -569,7 +547,7 @@ const WalletDashboardContent = ({
           sort
           sortBy={sortStamps}
           onChangeSort={handleChangeSort}
-          isOpen={openS}
+          isOpen={false}
           handleOpen={handleOpen}
           search
           filter={false}
@@ -594,7 +572,7 @@ const WalletDashboardContent = ({
           sort
           sortBy={sortTokens}
           onChangeSort={handleTokenSort}
-          isOpen={openT}
+          isOpen={false}
           handleOpen={handleOpen}
           search
           filter={false}
@@ -638,9 +616,8 @@ const WalletDashboardContent = ({
             sort
             sortBy={sortDispensers}
             onChangeSort={handleDispenserSort}
-            isOpen={openD}
+            isOpen={false}
             handleOpen={handleOpen}
-            search={false}
             filter={false}
             setting={false}
             isOpenFilter={openFilter}
