@@ -53,7 +53,13 @@ export function filtersToQueryParams(search: string, filters: StampFilters) {
 
   // FILETYPE
   if (filters.fileType.length > 0) {
-    queryParams.set("filetype", filters.fileType.join(","));
+    // Convert 'jpg' to 'jpeg' and 'mp3' to 'mpeg' in the URL parameters
+    const fileTypes = filters.fileType.map((type) => {
+      if (type === "jpg") return "jpeg";
+      if (type === "mp3") return "mpeg";
+      return type;
+    });
+    queryParams.set("filetype", fileTypes.join(","));
   } else {
     queryParams.delete("filetype");
   }
