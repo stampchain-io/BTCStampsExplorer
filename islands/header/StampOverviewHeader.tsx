@@ -8,6 +8,7 @@ import {
   defaultFilters,
   StampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
+import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
 
 /* ===== TYPES ===== */
 type StampOverviewHeaderProps = {
@@ -61,6 +62,14 @@ export const StampOverviewHeader = (
           <SearchStampModal showButton />
         </div>
       </div>
+
+      {/* Filter Drawer */}
+      <FilterDrawer
+        open={isOpen1}
+        setOpen={handleOpen1}
+        searchparams={new URLSearchParams()}
+        type="stamp"
+      />
     </div>
   );
 };
