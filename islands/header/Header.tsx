@@ -415,7 +415,7 @@ export function Header() {
               />
             </div>
           </div>
-          <div className="flex flex-col flex-1 items-start p-9 gap-5">
+          <div className="flex flex-col flex-1 items-start p-9 gap-4">
             {renderNavLinks(true)}
           </div>
 
@@ -423,7 +423,7 @@ export function Header() {
           bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
           shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
             {/* Tools section with gear icon */}
-            <div className="flex w-full justify-between py-6 px-9">
+            <div className="flex w-full justify-between pt-3 pb-8 px-9">
               <div className="flex justify-start items-end -ml-1">
                 <GearIcon
                   size="md"

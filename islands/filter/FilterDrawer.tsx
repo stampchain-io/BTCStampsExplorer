@@ -16,7 +16,7 @@ import {
 // Import SRC20 filter content
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
 import { FilterType } from "$islands/filter/FilterButton.tsx";
-import { Icon } from "$icon";
+import { CloseIcon, Icon } from "$icon";
 import { Button } from "$button";
 
 // Define a type for all possible filter types
@@ -389,12 +389,27 @@ const FilterDrawer = (
             >
               {closeTooltipText}
             </div>
+
+            {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
+            <CloseIcon
+              size="sm"
+              weight="bold"
+              color="greyGradient"
+              className="tablet:hidden"
+              onClick={handleCloseDrawer}
+              onMouseEnter={handleCloseMouseEnter}
+              onMouseLeave={handleCloseMouseLeave}
+              aria-label="Close"
+            />
+
+            {/* Tablet+ Icon - hidden on mobile, shows on tablet+ */}
             <Icon
               type="iconLink"
               name="close"
               weight="bold"
               size="xs"
               color="grey"
+              className="hidden tablet:block"
               onClick={() => {
                 if (open) {
                   closeMenu();
@@ -408,7 +423,7 @@ const FilterDrawer = (
         </div>
 
         {/* Filter content based on type */}
-        <div className="flex flex-col p-9 gap-5">
+        <div className="flex flex-col p-9">
           {type === "stamp" && (
             <FilterContentStamp
               initialFilters={currentFilters as StampFilters}

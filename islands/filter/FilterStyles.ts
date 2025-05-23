@@ -26,9 +26,9 @@ export const checkboxIcon = (
 ): string => `
   appearance-none
   relative
-  size-4 tablet:size-3.5
+  size-4 tablet:size-3
   rounded-full
-  border-2
+  border-2 tablet:border-1
   cursor-pointer
   transition-colors duration-300
   ${
@@ -42,7 +42,7 @@ export const checkboxIcon = (
 }
     after:content-['']
     after:block
-    after:size-2 tablet:after:size-1.5
+    after:size-2 tablet:after:size-1
     after:rounded-full
     after:absolute
     after:top-1/2 after:left-1/2

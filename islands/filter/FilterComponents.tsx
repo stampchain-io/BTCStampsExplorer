@@ -95,14 +95,12 @@ export const BadgeIcon = ({
 // CollapsibleSection Component
 export const CollapsibleSection = ({
   title,
-
   expanded,
   toggle,
   children,
   variant,
 }: {
   title: string;
-  section: string;
   expanded: boolean;
   toggle: () => void;
   children: ComponentChildren;
@@ -126,11 +124,11 @@ export const CollapsibleSection = ({
           <button
             onClick={handleClick}
             onMouseLeave={handleMouseLeave}
-            className="flex items-center w-full justify-between py-4 tablet:py-2 transition-colors duration-300 group"
+            className="flex items-center w-full justify-between pb-4 tablet:pb-3 transition-colors duration-300 group"
           >
             <span
               className={`
-                font-light tablet:font-bold text-xl tablet:text-sm transition-colors duration-300
+                font-light tablet:font-normal text-xl tablet:text-sm transition-colors duration-300
                 ${
                 expanded
                   ? `text-stamp-grey ${
