@@ -472,44 +472,40 @@ export function FeeCalculatorBase({
           )}
 
           {/** SRC20 DEPLOY */}
-          {fromPage === "src20_deploy" &&
-            (
-              <h6 className={textXs}>
-                <span className={labelXs}>
-                  TICKER
-                </span>&nbsp;&nbsp;
-                {ticker ? ticker : <span className="animate-pulse">*****</span>}
-              </h6>
-            )}
-          {fromPage === "src20_deploy" &&
-            (
-              <h6 className={textXs}>
-                <span className={labelXs}>
-                  SUPPLY
-                </span>&nbsp;&nbsp;
-                {supply ? supply : <span className="animate-pulse">0</span>}
-              </h6>
-            )}
-          {fromPage === "src20_deploy" &&
-            (
-              <h6 className={textXs}>
-                <span className={labelXs}>
-                  LIMIT
-                </span>&nbsp;&nbsp;
-                {limit ? limit : <span className="animate-pulse">0</span>}
-              </h6>
-            )}
-          {fromPage === "src20_deploy" &&
-            (
-              <h6 className={textXs}>
-                <span className={labelXs}>
-                  DECIMALS
-                </span>&nbsp;&nbsp;
-                {dec !== undefined
-                  ? dec
-                  : <span className="animate-pulse">0</span>}
-              </h6>
-            )}
+          {fromPage === "src20_deploy" && (
+            <h6 className={textXs}>
+              <span className={labelXs}>
+                TICKER
+              </span>&nbsp;&nbsp;
+              {ticker ? ticker : <span className="animate-pulse">*****</span>}
+            </h6>
+          )}
+          {fromPage === "src20_deploy" && (
+            <h6 className={textXs}>
+              <span className={labelXs}>
+                SUPPLY
+              </span>&nbsp;&nbsp;
+              {supply ? supply : <span className="animate-pulse">0</span>}
+            </h6>
+          )}
+          {fromPage === "src20_deploy" && (
+            <h6 className={textXs}>
+              <span className={labelXs}>
+                LIMIT
+              </span>&nbsp;&nbsp;
+              {limit ? limit : <span className="animate-pulse">0</span>}
+            </h6>
+          )}
+          {fromPage === "src20_deploy" && (
+            <h6 className={textXs}>
+              <span className={labelXs}>
+                DECIMALS
+              </span>&nbsp;&nbsp;
+              {dec !== undefined
+                ? dec
+                : <span className="animate-pulse">0</span>}
+            </h6>
+          )}
 
           {/* SRC20 Transfer Details */}
           {fromPage === "src20_transfer" && (
@@ -571,17 +567,16 @@ export function FeeCalculatorBase({
             </h6>
           )}
 
-          {fromPage === "src20_mint" &&
-            (
-              <h6 className={textXs}>
-                <span className={labelXs}>
-                  AMOUNT
-                </span>&nbsp;&nbsp;
-                {mintDetails?.amount
-                  ? mintDetails.amount
-                  : <span className="animate-pulse">0</span>}
-              </h6>
-            )}
+          {fromPage === "src20_mint" && (
+            <h6 className={textXs}>
+              <span className={labelXs}>
+                AMOUNT
+              </span>&nbsp;&nbsp;
+              {mintDetails?.amount
+                ? mintDetails.amount
+                : <span className="animate-pulse">0</span>}
+            </h6>
+          )}
 
           {/* TOTAL */}
           <h6 className={textXs}>
