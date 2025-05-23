@@ -331,7 +331,7 @@ export function SRC20DeployTool(
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              placeholder="Decimals"
+              placeholder="18"
               value={formState.dec}
               onChange={(e) => handleInputChange(e, "dec")}
             />
@@ -463,6 +463,7 @@ export function SRC20DeployTool(
           ticker={formState.token}
           limit={Number(formState.lim) || 0}
           supply={Number(formState.max) || 0}
+          dec={Number(formState.dec) || 18}
           fromPage="src20_deploy"
           handleChangeFee={handleChangeFee}
           type="src20"

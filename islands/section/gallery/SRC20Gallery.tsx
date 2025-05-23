@@ -1,5 +1,4 @@
 /* ===== SRC20 GALLERY COMPONENT ===== */
-// deno-lint-ignore-file react-rules-of-hooks
 // @baba - add token cards specific to wallet page
 import { useEffect, useState } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
