@@ -56,7 +56,7 @@ export const checkboxIcon = (
 // Text styles
 // Label - Filter
 export const labelGreyLightXs =
-  "flex justify-end mt-0.5 tablet:mt-1 -mb-5 font-light tablet:font-regular text-sm tablet:text-xs text-stamp-grey-darker tracking-wider cursor-default";
+  "flex justify-end mt-1 tablet:mt-0 -mb-6 tablet:-mb-4 font-light tablet:font-light text-sm tablet:text-xs text-stamp-grey-darker tracking-wider cursor-default";
 
 export const labelGreySemiboldSmLogic = (
   checked: boolean,

@@ -812,7 +812,7 @@ export const FilterContentStamp = ({
 
         {/* Custom range option */}
         <Radio
-          label="STAMP RANGE"
+          label="CUSTOM RANGE"
           value="custom"
           name="range"
           checked={!filters.range &&

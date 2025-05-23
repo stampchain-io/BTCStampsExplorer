@@ -372,7 +372,7 @@ const FilterDrawer = (
         overflow-y-auto overflow-x-hidden scrollbar-black
 
         left-0 right-auto w-full min-[420px]:w-[340px] shadow-[12px_0_12px_-6px_rgba(0,0,0,0.5)]
-        tablet:right-0 tablet:left-auto tablet:w-[320px] tablet:shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
+        tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
         ${
         open ? "translate-x-0" : "-translate-x-full tablet:translate-x-full"
       }`}
@@ -380,7 +380,7 @@ const FilterDrawer = (
     >
       {/* Scrollable content area */}
       <div className="h-[calc(100vh-92px)] tablet:h-[calc(100vh-88px)] overflow-y-auto scrollbar-black">
-        <div className="flex justify-end tablet:justify-start pt-[30px] px-9">
+        <div className="flex tablet:justify-start pt-[30px] px-9 tablet:px-6">
           <div className="relative">
             <div
               className={`${tooltipIcon} ${
@@ -391,39 +391,42 @@ const FilterDrawer = (
             </div>
 
             {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
-            <CloseIcon
-              size="sm"
-              weight="bold"
-              color="greyGradient"
-              className="tablet:hidden"
-              onClick={handleCloseDrawer}
-              onMouseEnter={handleCloseMouseEnter}
-              onMouseLeave={handleCloseMouseLeave}
-              aria-label="Close"
-            />
-
+            <div className="flex flex-row tablet:hidden justify-between items-center w-full">
+              <h6 className="font-extrabold text-2xl gray-gradient3 select-none">
+                FILTERS
+              </h6>
+              <CloseIcon
+                size="sm"
+                weight="bold"
+                color="greyGradient"
+                onClick={handleCloseDrawer}
+                onMouseEnter={handleCloseMouseEnter}
+                onMouseLeave={handleCloseMouseLeave}
+                aria-label="Close"
+              />
+            </div>
             {/* Tablet+ Icon - hidden on mobile, shows on tablet+ */}
-            <Icon
-              type="iconLink"
-              name="close"
-              weight="bold"
-              size="xs"
-              color="grey"
-              className="hidden tablet:block"
-              onClick={() => {
-                if (open) {
-                  closeMenu();
-                }
-              }}
-              onMouseEnter={handleCloseMouseEnter}
-              onMouseLeave={handleCloseMouseLeave}
-              aria-label="Close menu"
-            />
+            <div className="hidden tablet:flex flex-row gap-3">
+              <Icon
+                type="iconLink"
+                name="close"
+                weight="bold"
+                size="xs"
+                color="grey"
+                onClick={handleCloseDrawer}
+                onMouseEnter={handleCloseMouseEnter}
+                onMouseLeave={handleCloseMouseLeave}
+                aria-label="Close menu"
+              />
+              <h6 className="font-normal text-lg gray-gradient3 -mt-1 cursor-default select-none">
+                FILTERS
+              </h6>
+            </div>
           </div>
         </div>
 
         {/* Filter content based on type */}
-        <div className="flex flex-col p-9">
+        <div className="flex flex-col py-9 tablet:py-6 px-9 tablet:px-6">
           {type === "stamp" && (
             <FilterContentStamp
               initialFilters={currentFilters as StampFilters}
@@ -449,7 +452,7 @@ const FilterDrawer = (
         </div>
       </div>
       {/* Sticky buttons */}
-      <div className="flex justify-between w-full sticky bottom-0 px-9 py-6 gap-6
+      <div className="flex justify-between w-full sticky bottom-0 py-6 px-9 tablet:px-6 gap-6
        bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
         shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
         <Button
