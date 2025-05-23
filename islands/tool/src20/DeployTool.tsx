@@ -301,7 +301,7 @@ export function SRC20DeployTool(
               {formState.file === null && (
                 <label
                   for="upload"
-                  class="cursor-pointer bg-conic-pattern bg-[length:4px_4px] h-full flex flex-col items-center justify-center gap-3"
+                  class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
                 >
                   <Icon
                     type="icon"
@@ -331,7 +331,7 @@ export function SRC20DeployTool(
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              placeholder="18"
+              placeholder="Decimals"
               value={formState.dec}
               onChange={(e) => handleInputChange(e, "dec")}
             />
