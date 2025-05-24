@@ -97,7 +97,7 @@ export default function GetStampingCta() {
             variant="flat"
             color="grey"
             size="md"
-            href="/tools/stamp/stamping"
+            href="/tool/stamp/create"
           >
             STAMP
           </Button>
