@@ -1,8 +1,8 @@
 /* ===== STAMP TOOLS PAGE ===== */
 /*@baba-71-82*/
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { StampTransferTool } from "$tool";
-import { StampTransferHowto, StampTransfersGallery } from "$section";
+import { StampSendTool } from "$tool";
+import { StampSendHowTo, StampSendsGallery } from "$section";
 import { body, gapSection } from "$layout";
 
 /* ===== TYPES ===== */
@@ -46,7 +46,7 @@ export default function ToolStampPage(
     console.log("Rendering Content for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
-        return <StampTransferTool trxType={trxType} />;
+        return <StampSendTool trxType={trxType} />;
       default:
         return <div>No content available for this tab.</div>;
     }
@@ -56,17 +56,17 @@ export default function ToolStampPage(
     console.log("Rendering Left Sidebar for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
-        return <StampTransferHowto />;
+        return <StampSendHowTo />;
       default:
         return <div>No sidebar content available for this tab.</div>;
     }
   };
 
-  const renderRightSidebar = () => {
+  const _renderRightSidebar = () => {
     console.log("Rendering Right Sidebar for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
-        return <StampTransfersGallery />;
+        return <StampSendsGallery />;
       default:
         return <div>No sidebar content available for this tab.</div>;
     }
@@ -78,17 +78,16 @@ export default function ToolStampPage(
       <div className={`flex w-full`}>
         {renderContent()}
       </div>
-
-      <div
-        className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
-      >
-        <div className="flex w-full tablet:w-1/2">
-          {renderLeftSidebar()}
-        </div>
+      <div className="flex w-full">
+        {renderLeftSidebar()}
+      </div>
+      {
+        /*
         <div className="flex w-full tablet:w-1/2">
           {renderRightSidebar()}
         </div>
-      </div>
+        */
+      }
     </div>
   );
 }

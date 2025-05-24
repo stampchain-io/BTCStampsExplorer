@@ -103,10 +103,10 @@ import * as $howto_leatherconnect_index from "./routes/howto/leatherconnect/inde
 import * as $howto_leathercreate_index from "./routes/howto/leathercreate/index.tsx";
 import * as $howto_minttoken_index from "./routes/howto/minttoken/index.tsx";
 import * as $howto_registerbitname_index from "./routes/howto/registerbitname/index.tsx";
+import * as $howto_sendstamp_index from "./routes/howto/sendstamp/index.tsx";
 import * as $howto_stamp_index from "./routes/howto/stamp/index.tsx";
 import * as $howto_template_index from "./routes/howto/template/index.tsx";
 import * as $howto_transferbitname_index from "./routes/howto/transferbitname/index.tsx";
-import * as $howto_transferstamp_index from "./routes/howto/transferstamp/index.tsx";
 import * as $howto_transfertoken_index from "./routes/howto/transfertoken/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $media_index from "./routes/media/index.tsx";
@@ -221,7 +221,7 @@ import * as $section_gallery_SRC20Transfers from "./islands/section/gallery/SRC2
 import * as $section_gallery_StampGallery from "./islands/section/gallery/StampGallery.tsx";
 import * as $section_gallery_StampOverviewGallery from "./islands/section/gallery/StampOverviewGallery.tsx";
 import * as $section_gallery_StampSales from "./islands/section/gallery/StampSales.tsx";
-import * as $section_gallery_StampTransfers from "./islands/section/gallery/StampTransfers.tsx";
+import * as $section_gallery_StampSends from "./islands/section/gallery/StampSends.tsx";
 import * as $section_gallery_SwiperStyles from "./islands/section/gallery/SwiperStyles.tsx";
 import * as $section_gallery_TeamBanner from "./islands/section/gallery/TeamBanner.tsx";
 import * as $section_howto_SRC101RegisterHowto from "./islands/section/howto/SRC101RegisterHowto.tsx";
@@ -229,7 +229,7 @@ import * as $section_howto_SRC101TransferHowto from "./islands/section/howto/SRC
 import * as $section_howto_SRC20DeployHowto from "./islands/section/howto/SRC20DeployHowto.tsx";
 import * as $section_howto_SRC20MintHowto from "./islands/section/howto/SRC20MintHowto.tsx";
 import * as $section_howto_SRC20TransferHowto from "./islands/section/howto/SRC20TransferHowto.tsx";
-import * as $section_howto_StampTransferHowto from "./islands/section/howto/StampTransferHowto.tsx";
+import * as $section_howto_StampSendHowTo from "./islands/section/howto/StampSendHowTo.tsx";
 import * as $section_howto_StampingHowto from "./islands/section/howto/StampingHowto.tsx";
 import * as $section_index from "./islands/section/index.ts";
 import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
@@ -244,9 +244,9 @@ import * as $tool_src101_RegisterTool from "./islands/tool/src101/RegisterTool.t
 import * as $tool_src20_DeployTool from "./islands/tool/src20/DeployTool.tsx";
 import * as $tool_src20_MintTool from "./islands/tool/src20/MintTool.tsx";
 import * as $tool_src20_TransferTool from "./islands/tool/src20/TransferTool.tsx";
+import * as $tool_stamp_SendTool from "./islands/tool/stamp/SendTool.tsx";
 import * as $tool_stamp_StampingTool from "./islands/tool/stamp/StampingTool.tsx";
 import * as $tool_stamp_TradeTool from "./islands/tool/stamp/TradeTool.tsx";
-import * as $tool_stamp_TransferTool from "./islands/tool/stamp/TransferTool.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -378,10 +378,10 @@ const manifest = {
     "./routes/howto/leathercreate/index.tsx": $howto_leathercreate_index,
     "./routes/howto/minttoken/index.tsx": $howto_minttoken_index,
     "./routes/howto/registerbitname/index.tsx": $howto_registerbitname_index,
+    "./routes/howto/sendstamp/index.tsx": $howto_sendstamp_index,
     "./routes/howto/stamp/index.tsx": $howto_stamp_index,
     "./routes/howto/template/index.tsx": $howto_template_index,
     "./routes/howto/transferbitname/index.tsx": $howto_transferbitname_index,
-    "./routes/howto/transferstamp/index.tsx": $howto_transferstamp_index,
     "./routes/howto/transfertoken/index.tsx": $howto_transfertoken_index,
     "./routes/index.tsx": $index,
     "./routes/media/index.tsx": $media_index,
@@ -519,8 +519,7 @@ const manifest = {
     "./islands/section/gallery/StampOverviewGallery.tsx":
       $section_gallery_StampOverviewGallery,
     "./islands/section/gallery/StampSales.tsx": $section_gallery_StampSales,
-    "./islands/section/gallery/StampTransfers.tsx":
-      $section_gallery_StampTransfers,
+    "./islands/section/gallery/StampSends.tsx": $section_gallery_StampSends,
     "./islands/section/gallery/SwiperStyles.tsx": $section_gallery_SwiperStyles,
     "./islands/section/gallery/TeamBanner.tsx": $section_gallery_TeamBanner,
     "./islands/section/howto/SRC101RegisterHowto.tsx":
@@ -532,8 +531,7 @@ const manifest = {
     "./islands/section/howto/SRC20MintHowto.tsx": $section_howto_SRC20MintHowto,
     "./islands/section/howto/SRC20TransferHowto.tsx":
       $section_howto_SRC20TransferHowto,
-    "./islands/section/howto/StampTransferHowto.tsx":
-      $section_howto_StampTransferHowto,
+    "./islands/section/howto/StampSendHowTo.tsx": $section_howto_StampSendHowTo,
     "./islands/section/howto/StampingHowto.tsx": $section_howto_StampingHowto,
     "./islands/section/index.ts": $section_index,
     "./islands/table/DataTableBase.tsx": $table_DataTableBase,
@@ -548,9 +546,9 @@ const manifest = {
     "./islands/tool/src20/DeployTool.tsx": $tool_src20_DeployTool,
     "./islands/tool/src20/MintTool.tsx": $tool_src20_MintTool,
     "./islands/tool/src20/TransferTool.tsx": $tool_src20_TransferTool,
+    "./islands/tool/stamp/SendTool.tsx": $tool_stamp_SendTool,
     "./islands/tool/stamp/StampingTool.tsx": $tool_stamp_StampingTool,
     "./islands/tool/stamp/TradeTool.tsx": $tool_stamp_TradeTool,
-    "./islands/tool/stamp/TransferTool.tsx": $tool_stamp_TransferTool,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
