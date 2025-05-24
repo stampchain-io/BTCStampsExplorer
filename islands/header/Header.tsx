@@ -25,7 +25,7 @@ interface NavLink {
 
 /* ===== TOOLS CONFIGURATION ===== */
 const toolLinks = [
-  { title: "CREATE STAMP", href: "/tool/stamp/stamping" },
+  { title: "CREATE STAMP", href: "/tool/stamp/create" },
   { title: "SEND STAMP", href: "/tool/stamp/send" },
   { title: "DEPLOY TOKEN", href: "/tool/src20/deploy" },
   { title: "MINT TOKEN", href: "/tool/src20/mint" },
@@ -70,7 +70,7 @@ const desktopNavLinks: NavLink[] = [
     },
     href: "#",
     subLinks: [
-      { title: "CREATE", href: "/tool/stamp/stamping" },
+      { title: "CREATE", href: "/tool/stamp/create" },
       { title: "SEND", href: "/tool/stamp/send" },
       { title: "DEPLOY", href: "/tool/src20/deploy" },
       { title: "MINT", href: "/tool/src20/mint" },
@@ -303,7 +303,7 @@ export function Header() {
                             STAMPS
                           </h6>
                           {link.subLinks?.filter((subLink) =>
-                            subLink.href === "/tool/stamp/stamping" ||
+                            subLink.href === "/tool/stamp/create" ||
                             subLink.href === "/tool/stamp/send"
                           ).map((subLink) => (
                             <a
