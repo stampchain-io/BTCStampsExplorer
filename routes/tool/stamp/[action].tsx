@@ -15,6 +15,11 @@ interface ToolStampPageProps {
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
   GET(_req, ctx) {
+    // Skip handling for the stamping path - let the dedicated redirect handle it
+    if (ctx.params.action === "stamping") {
+      return ctx.next();
+    }
+
     console.log("Handler called for [action] route");
     const data = {
       selectedTab: "transfer", // Example data
