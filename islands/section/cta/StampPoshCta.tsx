@@ -48,7 +48,7 @@ export const StampPoshCta = () => {
         variant="flat"
         color="grey"
         size="md"
-        href="/tool/stamp/stamping"
+        href="/tool/stamp/create"
         class="float-right mt-6"
       >
         STAMP
