@@ -169,9 +169,9 @@ export default function HowToPage() {
         </div>
       </section>
 
-      {/* ===== ART STAMPING GUIDE ===== */}
+      {/* ===== CREATE A STAMP GUIDE ===== */}
       <section>
-        <h2 className={`${headingGrey} mb-4`}>STAMPING ART</h2>
+        <h2 className={`${headingGrey} mb-4`}>CREATE A STAMP</h2>
         <div
           className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
         >

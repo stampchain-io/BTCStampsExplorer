@@ -6,7 +6,7 @@ import { StampCard } from "$card";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 /* ===== COMPONENT ===== */
-export default function StampTransfersGallery(): JSX.Element {
+export default function StampSendsGallery(): JSX.Element {
   /* ===== STATE ===== */
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<StampTransaction[]>([]);
