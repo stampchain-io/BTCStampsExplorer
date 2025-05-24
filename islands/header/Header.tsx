@@ -6,6 +6,7 @@ import { CloseIcon, GearIcon } from "$icon";
 // Import HamburgerMenuIcon directly to ensure it's available
 import { HamburgerMenuIcon } from "$components/icon/MenuIcon.tsx";
 import {
+  labelXs,
   logoPurpleLDLink,
   navLinkGrey,
   navLinkGreyLD,
@@ -24,8 +25,8 @@ interface NavLink {
 
 /* ===== TOOLS CONFIGURATION ===== */
 const toolLinks = [
-  { title: "STAMPING", href: "/tool/stamp/stamping" },
-  { title: "TRANSFER STAMP", href: "/tool/stamp/transfer" },
+  { title: "CREATE STAMP", href: "/tool/stamp/stamping" },
+  { title: "SEND STAMP", href: "/tool/stamp/send" },
   { title: "DEPLOY TOKEN", href: "/tool/src20/deploy" },
   { title: "MINT TOKEN", href: "/tool/src20/mint" },
   { title: "TRANSFER TOKEN", href: "/tool/src20/transfer" },
@@ -69,8 +70,8 @@ const desktopNavLinks: NavLink[] = [
     },
     href: "#",
     subLinks: [
-      { title: "STAMPING", href: "/tool/stamp/stamping" },
-      { title: "TRANSFER", href: "/tool/stamp/transfer" },
+      { title: "CREATE", href: "/tool/stamp/stamping" },
+      { title: "SEND", href: "/tool/stamp/send" },
       { title: "DEPLOY", href: "/tool/src20/deploy" },
       { title: "MINT", href: "/tool/src20/mint" },
       { title: "TRANSFER", href: "/tool/src20/transfer" },
@@ -286,28 +287,130 @@ export function Header() {
 
             {/* Dropdown menu - only rendered on desktop */}
             {link.subLinks && (
-              isMobile
-                ? null
-                : (
-                  <div className="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
-                    {link.subLinks?.map((subLink) => (
-                      <a
-                        key={subLink.href}
-                        href={subLink.href}
-                        onClick={() => {
-                          setCurrentPath(subLink?.href ? subLink?.href : null);
-                        }}
-                        className={`font-semibold text-center text-xs transition-colors duration-300 ${
-                          currentPath === subLink.href
-                            ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
-                            : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
-                        }`}
-                      >
-                        {subLink.title}
-                      </a>
-                    ))}
-                  </div>
-                )
+              isMobile ? null : (
+                // Check if this is the TOOLS dropdown for special 3-column layout
+                (typeof link.title === "string"
+                    ? link.title
+                    : link.title.default) === "TOOLS"
+                  ? (
+                    <div className="hidden group-hover:flex absolute top-full -right-[18px] min-w-[300px] z-10 pt-1 pb-3.5 px-[18px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
+                      <div className="grid grid-cols-3 gap-4 w-full">
+                        {/* Column 1: Left aligned - Stamp tools */}
+                        <div className="flex flex-col space-y-1 text-left">
+                          <h6
+                            class={labelXs}
+                          >
+                            STAMPS
+                          </h6>
+                          {link.subLinks?.filter((subLink) =>
+                            subLink.href === "/tool/stamp/stamping" ||
+                            subLink.href === "/tool/stamp/send"
+                          ).map((subLink) => (
+                            <a
+                              key={subLink.href}
+                              href={subLink.href}
+                              onClick={() => {
+                                setCurrentPath(
+                                  subLink?.href ? subLink?.href : null,
+                                );
+                              }}
+                              className={`font-semibold text-xs transition-colors duration-300 ${
+                                currentPath === subLink.href
+                                  ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
+                                  : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
+                              }`}
+                            >
+                              {subLink.title}
+                            </a>
+                          ))}
+                        </div>
+
+                        {/* Column 2: Center aligned - Token tools */}
+                        <div className="flex flex-col space-y-1 text-center">
+                          <h6
+                            class={labelXs}
+                          >
+                            TOKENS
+                          </h6>
+                          {link.subLinks?.filter((subLink) =>
+                            subLink.href === "/tool/src20/deploy" ||
+                            subLink.href === "/tool/src20/mint" ||
+                            subLink.href === "/tool/src20/transfer"
+                          ).map((subLink) => (
+                            <a
+                              key={subLink.href}
+                              href={subLink.href}
+                              onClick={() => {
+                                setCurrentPath(
+                                  subLink?.href ? subLink?.href : null,
+                                );
+                              }}
+                              className={`font-semibold text-xs transition-colors duration-300 ${
+                                currentPath === subLink.href
+                                  ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
+                                  : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
+                              }`}
+                            >
+                              {subLink.title}
+                            </a>
+                          ))}
+                        </div>
+
+                        {/* Column 3: Right aligned - Register */}
+                        <div className="flex flex-col space-y-1 text-right">
+                          <h6
+                            class={labelXs}
+                          >
+                            BITNAME
+                          </h6>
+                          {link.subLinks?.filter((subLink) =>
+                            subLink.href === "/tool/src101/mint"
+                          ).map((subLink) => (
+                            <a
+                              key={subLink.href}
+                              href={subLink.href}
+                              onClick={() => {
+                                setCurrentPath(
+                                  subLink?.href ? subLink?.href : null,
+                                );
+                              }}
+                              className={`font-semibold text-xs transition-colors duration-300 ${
+                                currentPath === subLink.href
+                                  ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
+                                  : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
+                              }`}
+                            >
+                              {subLink.title}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                  : (
+                    // Default single-column layout for other dropdowns
+                    <div className="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
+                      {link.subLinks?.map((subLink) => (
+                        <a
+                          key={subLink.href}
+                          href={subLink.href}
+                          onClick={() => {
+                            setCurrentPath(
+                              subLink?.href ? subLink?.href : null,
+                            );
+                          }}
+                          className={`font-semibold text-center text-xs transition-colors duration-300 ${
+                            currentPath === subLink.href
+                              ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
+                              : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
+                          }`}
+                        >
+                          {subLink.title}
+                        </a>
+                      ))}
+                    </div>
+                  )
+              )
             )}
           </div>
         ))}

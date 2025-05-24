@@ -145,7 +145,7 @@ export const ConnectButton = () => {
                         backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30">
               <div class="flex flex-col px-[18px] gap-1 text-center whitespace-nowrap">
                 <h6 class={`${valueDarkXs} py-0.5`}>
-                  {abbreviateAddress(address, 6)}
+                  {abbreviateAddress(address, 5)}
                 </h6>
                 <a
                   href={`/wallet/${address}`}
