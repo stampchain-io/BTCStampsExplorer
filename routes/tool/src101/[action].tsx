@@ -61,16 +61,15 @@ export default function ToolsSrc101Page(
       <div className={`flex w-full`}>
         {renderContent()}
       </div>
-
-      <div
-        className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
-      >
-        <div class="w-full tablet:w-full">
-          <SRC101RegisterHowto />
-        </div>
-        <div class="w-full tablet:w-1/2 hidden">
-        </div>
+      <div class="flex w-full">
+        <SRC101RegisterHowto />
       </div>
+      {
+        /*
+        <div class="w-full tablet:w-1/2">
+        </div>
+        */
+      }
     </div>
   );
 }

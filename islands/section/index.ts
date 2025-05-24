@@ -18,7 +18,7 @@ export * from "$components/section/gallery/CollectionsBanner.tsx";
 
 /* ===== RECENT/LATEST ===== */
 export * from "$islands/section/gallery/StampSales.tsx";
-export { default as StampTransfersGallery } from "$islands/section/gallery/StampTransfers.tsx";
+export { default as StampSendsGallery } from "$islands/section/gallery/StampSends.tsx";
 export { default as SRC20DeploysGallery } from "$islands/section/gallery/SRC20Deploys.tsx";
 export { default as SRC20MintsGallery } from "$islands/section/gallery/SRC20Mints.tsx";
 export { default as SRC20TransfersGallery } from "$islands/section/gallery/SRC20Transfers.tsx";
@@ -26,7 +26,7 @@ export { default as SRC20TransfersGallery } from "$islands/section/gallery/SRC20
 
 /* ===== HOW TO ===== */
 export * from "$islands/section/howto/StampingHowto.tsx";
-export * from "$islands/section/howto/StampTransferHowto.tsx";
+export * from "$islands/section/howto/StampSendHowTo.tsx";
 export * from "$islands/section/howto/SRC20DeployHowto.tsx";
 export * from "$islands/section/howto/SRC20MintHowto.tsx";
 export * from "$islands/section/howto/SRC20TransferHowto.tsx";
