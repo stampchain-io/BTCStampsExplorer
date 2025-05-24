@@ -380,8 +380,8 @@ const FilterDrawer = (
     >
       {/* Scrollable content area */}
       <div className="h-[calc(100vh-92px)] tablet:h-[calc(100vh-88px)] overflow-y-auto scrollbar-black">
-        <div className="flex tablet:justify-start pt-[30px] px-9 tablet:px-6">
-          <div className="relative">
+        <div className="w-full pt-[30px] px-9 tablet:px-6">
+          <div className="relative w-full">
             <div
               className={`${tooltipIcon} ${
                 isCloseTooltipVisible ? "opacity-100" : "opacity-0"
@@ -391,8 +391,8 @@ const FilterDrawer = (
             </div>
 
             {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
-            <div className="flex flex-row tablet:hidden justify-between items-center w-full">
-              <h6 className="font-extrabold text-2xl gray-gradient3 select-none">
+            <div className="flex flex-row tablet:hidden justify-between items-center w-ful">
+              <h6 className="font-extrabold text-2xl gray-gradient1 mt-[1px] select-none">
                 FILTERS
               </h6>
               <CloseIcon
@@ -406,7 +406,7 @@ const FilterDrawer = (
               />
             </div>
             {/* Tablet+ Icon - hidden on mobile, shows on tablet+ */}
-            <div className="hidden tablet:flex flex-row gap-3">
+            <div className="hidden tablet:flex flex-row justify-between items-center w-full">
               <Icon
                 type="iconLink"
                 name="close"
@@ -418,7 +418,7 @@ const FilterDrawer = (
                 onMouseLeave={handleCloseMouseLeave}
                 aria-label="Close menu"
               />
-              <h6 className="font-normal text-lg gray-gradient3 -mt-1 cursor-default select-none">
+              <h6 className="font-normal text-lg gray-gradient1 mt-[-1px] select-none">
                 FILTERS
               </h6>
             </div>
@@ -426,7 +426,7 @@ const FilterDrawer = (
         </div>
 
         {/* Filter content based on type */}
-        <div className="flex flex-col py-9 tablet:py-6 px-9 tablet:px-6">
+        <div className="flex flex-col pt-6 pb-9 px-9 tablet:pt-5 tablet:pb-6 tablet:px-6">
           {type === "stamp" && (
             <FilterContentStamp
               initialFilters={currentFilters as StampFilters}

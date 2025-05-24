@@ -77,10 +77,9 @@ export const BadgeIcon = ({
     <span
       className={`
         flex items-center justify-center
-        absolute top-0 left-0 z-10
-        transform -translate-x-1/2 -translate-y-1/2 
-        size-6 rounded-full
-        font-bold text-xs text-stamp-grey group-hover:text-black tracking-wider
+        absolute top-[-4px] left-[-12px] z-10
+        size-5 rounded-full
+        font-bold text-[10px] text-stamp-grey group-hover:text-black tracking-wider
         bg-stamp-purple group-hover:bg-stamp-purple-bright
         transition-all duration-300
         ${text === "0" ? "opacity-0" : "opacity-100"}
@@ -124,11 +123,11 @@ export const CollapsibleSection = ({
           <button
             onClick={handleClick}
             onMouseLeave={handleMouseLeave}
-            className="flex items-center w-full justify-between pb-4 tablet:pb-3 transition-colors duration-300 group"
+            className="flex items-center w-full justify-between pt-1 pb-4 tablet:pt-1 tablet:pb-3 transition-colors duration-300 group"
           >
             <span
               className={`
-                font-light tablet:font-normal text-xl tablet:text-sm transition-colors duration-300
+                font-light tablet:font-normal text-lg tablet:text-sm transition-colors duration-300
                 ${
                 expanded
                   ? `text-stamp-grey ${
@@ -170,7 +169,7 @@ export const CollapsibleSection = ({
               expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
             }`}
           >
-            <div className="-mt-1 tablet:-mt-1 pb-3 pl-0.5">
+            <div className="-mt-2 tablet:-mt-1 pb-4 pl-0.5">
               {children}
             </div>
           </div>

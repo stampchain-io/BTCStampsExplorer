@@ -28,7 +28,7 @@ export const checkboxIcon = (
   relative
   size-4 tablet:size-3
   rounded-full
-  border-2 tablet:border-1
+  border-2
   cursor-pointer
   transition-colors duration-300
   ${
@@ -56,13 +56,13 @@ export const checkboxIcon = (
 // Text styles
 // Label - Filter
 export const labelGreyLightXs =
-  "flex justify-end mt-1 tablet:mt-0 -mb-6 tablet:-mb-4 font-light tablet:font-light text-sm tablet:text-xs text-stamp-grey-darker tracking-wider cursor-default";
+  "flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4 font-light text-xs tablet:text-[10px] text-stamp-grey-darker tracking-wider cursor-default";
 
 export const labelGreySemiboldSmLogic = (
   checked: boolean,
   canHoverSelected: boolean,
 ): string => `
-  inline-block ml-4 tablet:ml-3 mt-0.5 tablet:mt-0
+  inline-block ml-3 tablet:ml-[9px] mt-0.5 tablet:mt-0
   font-semibold text-base tablet:text-xs
   transition-colors duration-300
   cursor-pointer select-none

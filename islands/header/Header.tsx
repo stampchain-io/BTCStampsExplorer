@@ -415,7 +415,7 @@ export function Header() {
               />
             </div>
           </div>
-          <div className="flex flex-col flex-1 items-start p-9 gap-4">
+          <div className="flex flex-col flex-1 items-start p-9 gap-5">
             {renderNavLinks(true)}
           </div>
 
