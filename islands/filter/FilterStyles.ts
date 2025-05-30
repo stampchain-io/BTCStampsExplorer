@@ -62,7 +62,7 @@ export const labelGreySemiboldSmLogic = (
   checked: boolean,
   canHoverSelected: boolean,
 ): string => `
-  inline-block ml-3 tablet:ml-[9px] mt-0.5 tablet:mt-0
+  inline-block ml-3 tablet:ml-[9px]
   font-semibold text-base tablet:text-xs
   transition-colors duration-300
   cursor-pointer select-none
