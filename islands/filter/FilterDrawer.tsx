@@ -277,56 +277,6 @@ const FilterDrawer = (
     setOpen(false);
   };
 
-  // Handle body scroll lock when drawer is open
-  useEffect(() => {
-    // Function to lock scrolling
-    const lockScroll = () => {
-      // Save current scroll position
-      const scrollY = globalThis.scrollY;
-      document.body.style.position = "fixed";
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = "100%";
-      document.body.style.overflow = "hidden";
-    };
-
-    // Function to unlock scrolling
-    const unlockScroll = () => {
-      // Get the scroll position we saved
-      const scrollY = document.body.style.top;
-
-      // Restore body styles
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
-
-      // Restore scroll position
-      if (scrollY) {
-        globalThis.scrollTo(0, parseInt(scrollY || "0") * -1);
-      }
-    };
-
-    if (open) {
-      // When opening, lock scrolling immediately
-      lockScroll();
-    } else {
-      // When closing, use a timeout to match the drawer animation
-      const timer = setTimeout(() => {
-        unlockScroll();
-      }, 400); // Match your drawer transition duration
-
-      // Clean up the timer if the component unmounts or open changes
-      return () => clearTimeout(timer);
-    }
-
-    // Clean up when component unmounts or open changes to true
-    return () => {
-      if (!open) {
-        unlockScroll();
-      }
-    };
-  }, [open]);
-
   const handleApplyFilters = () => {
     // Convert filters to query params string
     const existingParams = new URLSearchParams(window.location.search);
@@ -353,14 +303,29 @@ const FilterDrawer = (
     }
 
     // Construct the new URL with the query params
-    const newUrl = window.location.pathname +
+    const newUrl = globalThis.location.pathname +
       (queryParams ? `?${queryParams}` : "");
     console.log("Navigating to new URL:", newUrl);
 
     // Update URL and close drawer
-    window.location.href = newUrl;
+    globalThis.location.href = newUrl;
     setOpen(false);
   };
+
+  // Scroll lock
+  useEffect(() => {
+    if (open) {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      return;
+    } else {
+      const timer = setTimeout(() => {
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
+      }, 400); // Match drawer transition duration
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
 
   return (
     <div
