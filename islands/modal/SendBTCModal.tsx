@@ -448,9 +448,9 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
         tosAgreed={tosAgreed}
         onTosChange={setTosAgreed}
         className="mt-auto"
-        _userAddress={wallet?.address ?? ""}
-        _recipientAddress={formState.recipientAddress ?? ""}
-        _inputType="P2WPKH"
+        userAddress={wallet?.address ?? ""}
+        recipientAddress={formState.recipientAddress ?? ""}
+        inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
       />
     </ModalBase>
