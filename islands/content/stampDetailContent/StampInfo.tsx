@@ -499,6 +499,11 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       );
 
       if (!response.ok) {
+        // 404 is expected when no dispensers exist - don't throw for this case
+        if (response.status === 404) {
+          setDispensers([]);
+          return;
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -508,7 +513,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       const openDispensers = data.data.filter((d: any) => d.status === "open");
 
       setDispensers(openDispensers);
-    } catch (error) {
+    } catch (error: any) {
+      // Log all other errors (non-404)
       console.error("Error fetching dispensers:", error);
       setDispensers([]);
     } finally {
@@ -568,27 +574,30 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       btcPrice
     : stamp.floorPriceUSD;
 
-  // Add debug effect to track price updates
+  // Debug effects for development only
   useEffect(() => {
-    console.log("Price update:", {
-      selectedDispenser,
-      satoshirate: selectedDispenser?.satoshirate,
-      displayPrice,
-      displayPriceUSD,
-      btcPrice,
-    });
+    if (globalThis.location?.hostname === "localhost") {
+      console.log("Price update:", {
+        selectedDispenser,
+        satoshirate: selectedDispenser?.satoshirate,
+        displayPrice,
+        displayPriceUSD,
+        btcPrice,
+      });
+    }
   }, [selectedDispenser, btcPrice]);
 
-  // Add debug logs to track state changes
   useEffect(() => {
-    console.log("Price calculation values:", {
-      selectedDispenser,
-      satoshirate: selectedDispenser?.satoshirate,
-      floorPrice: stamp.floorPrice,
-      btcPrice,
-      calculatedDisplayPrice: displayPrice,
-      calculatedDisplayPriceUSD: displayPriceUSD,
-    });
+    if (globalThis.location?.hostname === "localhost") {
+      console.log("Price calculation values:", {
+        selectedDispenser,
+        satoshirate: selectedDispenser?.satoshirate,
+        floorPrice: stamp.floorPrice,
+        btcPrice,
+        calculatedDisplayPrice: displayPrice,
+        calculatedDisplayPriceUSD: displayPriceUSD,
+      });
+    }
   }, [selectedDispenser, btcPrice, stamp.floorPrice]);
 
   // Add handler for dispenser selection
@@ -600,25 +609,29 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     setSelectedDispenser(updatedDispenser);
   };
 
-  // At the top of component, add logging for initial check
+  // Development-only logging for initial checks
   const hasMultipleDispensers = dispensers?.length >= 2;
-  console.log("Initial checks:", {
-    dispensersLength: dispensers?.length,
-    hasMultipleDispensers,
-    showListings,
-    hasFloorPrice: !!stamp.floorPrice,
-    dispensers: dispensers,
-  });
-
-  // Add this useEffect to track dispensers state
-  useEffect(() => {
-    console.log("Dispensers state changed:", {
+  if (globalThis.location?.hostname === "localhost") {
+    console.log("Initial checks:", {
       dispensersLength: dispensers?.length,
-      hasDispensers: dispensers?.length > 0,
-      hasMultiple: dispensers?.length >= 2,
-      rawDispensers: dispensers,
-      floorPrice: stamp.floorPrice,
+      hasMultipleDispensers,
+      showListings,
+      hasFloorPrice: !!stamp.floorPrice,
+      dispensers: dispensers,
     });
+  }
+
+  // Development-only useEffect to track dispensers state
+  useEffect(() => {
+    if (globalThis.location?.hostname === "localhost") {
+      console.log("Dispensers state changed:", {
+        dispensersLength: dispensers?.length,
+        hasDispensers: dispensers?.length > 0,
+        hasMultiple: dispensers?.length >= 2,
+        rawDispensers: dispensers,
+        floorPrice: stamp.floorPrice,
+      });
+    }
   }, [dispensers]);
 
   // Add new state for media duration

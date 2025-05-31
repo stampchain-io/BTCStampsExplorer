@@ -70,6 +70,20 @@ export default function DataTableBase({
         const response = await fetch(
           `/api/v2/stamps/${encodedCpid}/${operation}?${params}`,
         );
+
+        // Handle 404 responses (no data found) gracefully
+        if (!response.ok) {
+          if (response.status === 404) {
+            setTabData((prev) => ({
+              ...prev,
+              [operation]: isTabChange ? [] : prev[operation] || [],
+            }));
+            setHasMore(false);
+            return;
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
 
         setTabData((prev) => ({
@@ -188,11 +202,16 @@ export default function DataTableBase({
               fetch(`/api/v2/stamps/${encodedCpid}/sends?${countParams}`),
             ]);
 
-          const [dispensersData, salesData, transfersData] = await Promise.all([
-            dispensersCount.json(),
-            salesCount.json(),
-            transfersCount.json(),
-          ]);
+          // Handle 404s gracefully for count fetching
+          const dispensersData = dispensersCount.ok
+            ? await dispensersCount.json()
+            : { total: 0 };
+          const salesData = salesCount.ok
+            ? await salesCount.json()
+            : { total: 0 };
+          const transfersData = transfersCount.ok
+            ? await transfersCount.json()
+            : { total: 0 };
 
           setTotalCounts({
             dispensers: dispensersData.total || 0,

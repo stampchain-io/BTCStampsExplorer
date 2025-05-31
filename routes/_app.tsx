@@ -31,11 +31,6 @@ export default function App({ Component, state }: PageProps<unknown>) {
           crossOrigin="anonymous"
           as="script"
         />
-        <link
-          rel="preload"
-          href="/icon/menu.svg"
-          as="image"
-        />
 
         {/* ===== CRITICAL CSS ===== */}
         <link rel="preload" href="/styles.css" as="style" />
