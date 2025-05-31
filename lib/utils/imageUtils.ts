@@ -135,30 +135,70 @@ export function handleImageError(e: Event) {
   }
 }
 
+// Trusted domains for external references in SVGs
+const TRUSTED_DOMAINS = [
+  "ordinals.com",
+  "stampchain.io",
+  "www.w3.org", // Standard SVG and XML namespaces
+];
+
 export function isValidSVG(svgContent: string): boolean {
   const parser = new DOMParser();
   const doc = parser.parseFromString(svgContent, "image/svg+xml");
 
   // Check for parsing errors
   const parserError = doc.querySelector("parsererror");
-  if (parserError) return false;
+  if (parserError) {
+    return false;
+  }
 
-  // Check for potentially dangerous elements
+  // Check for potentially dangerous elements (but allow trusted domains)
   const dangerous = doc.querySelectorAll(
     "foreignObject, use[href*='http'], image[href*='http'], a[href*='http']",
   );
-  if (dangerous.length > 0) return false;
 
-  // Check all elements for event handlers and external references
+  // Check if external references are from trusted domains
+  for (const element of dangerous) {
+    const href = element.getAttribute("href") ||
+      element.getAttribute("xlink:href");
+    if (href && href.startsWith("http")) {
+      try {
+        const url = new URL(href);
+        if (!TRUSTED_DOMAINS.includes(url.hostname)) {
+          return false;
+        }
+      } catch (e) {
+        return false;
+      }
+    }
+  }
+
+  // Check all elements for event handlers and untrusted external references
   const allElements = doc.getElementsByTagName("*");
   for (const element of allElements) {
     const attributes = element.attributes;
     for (const attr of attributes) {
       // Check for event handlers
-      if (attr.name.startsWith("on")) return false;
+      if (attr.name.startsWith("on")) {
+        return false;
+      }
 
-      // Only block absolute URLs and data URIs
-      if (attr.value.match(/^(http|data):/i)) {
+      // Check for external URLs - allow trusted domains
+      // Skip namespace declarations (xmlns attributes)
+      if (attr.value.match(/^https?:/i) && !attr.name.startsWith("xmlns")) {
+        try {
+          const url = new URL(attr.value);
+          if (!TRUSTED_DOMAINS.includes(url.hostname)) {
+            return false;
+          }
+        } catch {
+          // Invalid URL, block it
+          return false;
+        }
+      }
+
+      // Block data URIs (keep existing behavior)
+      if (attr.value.match(/^data:/i)) {
         return false;
       }
     }
@@ -202,28 +242,13 @@ export const validateStampContent = async (src: string): Promise<{
       return { isValid: false, error: "Invalid content" };
     }
 
-    // For SVG content, do additional validation only if it contains data URLs
+    // For SVG content, use the comprehensive SVG validation
     if (src.endsWith(".svg") || content.trim().startsWith("<svg")) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(content, "image/svg+xml");
-
-      // Check for parsing errors
-      const parserError = doc.querySelector("parsererror");
-      if (parserError) {
-        return { isValid: false, error: "Invalid SVG format" };
-      }
-
-      // Only validate data URLs if they exist in the SVG
-      const allElements = doc.getElementsByTagName("*");
-      for (const element of allElements) {
-        const attributes = element.attributes;
-        for (const attr of attributes) {
-          if (attr.value.startsWith("data:")) {
-            if (!isValidDataUrl(attr.value)) {
-              return { isValid: false, error: "Invalid data URL in SVG" };
-            }
-          }
-        }
+      if (!isValidSVG(content)) {
+        return {
+          isValid: false,
+          error: "SVG contains unsafe content or untrusted external references",
+        };
       }
     }
 
