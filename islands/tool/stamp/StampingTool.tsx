@@ -467,7 +467,8 @@ function StampingToolMain({ config }: { config: Config }) {
           setFeeDetails({
             minerFee: Number(data.est_miner_fee) || 0,
             dustValue: Number(data.total_dust_value) || 0,
-            totalValue: Number(data.total_output_value) || 0,
+            totalValue: (Number(data.est_miner_fee) || 0) +
+              (Number(data.total_dust_value) || 0),
             hasExactFees: true,
           });
         } catch (error) {
@@ -535,7 +536,8 @@ function StampingToolMain({ config }: { config: Config }) {
         setFeeDetails({
           minerFee: Number(data.est_miner_fee) || 0,
           dustValue: Number(data.total_dust_value) || 0,
-          totalValue: Number(data.total_output_value) || 0,
+          totalValue: (Number(data.est_miner_fee) || 0) +
+            (Number(data.total_dust_value) || 0),
           hasExactFees: true,
         });
 
