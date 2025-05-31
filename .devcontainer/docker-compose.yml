@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/app:cached
+      - deno-cache:/app/.deno
+      - npm-cache:/app/.npm
+      - node_modules:/app/node_modules
+    command: sleep infinity
+    environment:
+      - DENO_ENV=development
+      - SKIP_REDIS_CONNECTION=false
+      - DB_HOST=mysql
+      - DB_USER=btcstamps
+      - DB_PASSWORD=btcstamps_dev
+      - DB_PORT=3306
+      - DB_NAME=btc_stamps
+      - DB_MAX_RETRIES=5
+      - ELASTICACHE_ENDPOINT=redis
+      - ELASITCACHE_PORT=6379
+      - CACHE=true
+      - CSRF_SECRET_KEY=dev_secret_key_change_in_production
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - btcstamps-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8000/api/v2/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  mysql:
+    image: mariadb:10.6
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=btc_stamps
+      - MYSQL_USER=btcstamps
+      - MYSQL_PASSWORD=btcstamps_dev
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    networks:
+      - btcstamps-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "btcstamps", "-pbtcstamps_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=1000
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --requirepass redis_dev_password
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - btcstamps-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_dev_password", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    environment:
+      - REDIS_PASSWORD=redis_dev_password
+
+networks:
+  btcstamps-network:
+    driver: bridge
+
+volumes:
+  deno-cache:
+  npm-cache:
+  node_modules:
+  mysql-data:
+  redis-data:

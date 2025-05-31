@@ -1,0 +1,88 @@
+{
+  "name": "BTCStampsExplorer Development",
+  "image": "denoland/deno:alpine-2.3.3",
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": {
+      "label": "BTC Stamps Explorer",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "cp .env.sample .env && deno cache main.ts dev.ts",
+  "postStartCommand": "git checkout dev",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "denoland.vscode-deno",
+        "ms-vscode.vscode-typescript-next",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "mikestead.dotenv",
+        "github.copilot",
+        "github.copilot-chat",
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens",
+        "streetsidesoftware.code-spell-checker"
+      ],
+      "settings": {
+        "deno.enable": true,
+        "deno.lint": true,
+        "deno.unstable": true,
+        "deno.suggest.imports.hosts": {
+          "https://deno.land": true
+        },
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "denoland.vscode-deno",
+        "editor.tabSize": 2,
+        "files.eol": "\n",
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "tailwindCSS.includeLanguages": {
+          "typescript": "javascript",
+          "typescriptreact": "javascript"
+        },
+        "tailwindCSS.emmetCompletions": true,
+        "[typescript]": {
+          "editor.defaultFormatter": "denoland.vscode-deno"
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "denoland.vscode-deno"
+        }
+      }
+    }
+  },
+  "containerEnv": {
+    "DENO_ENV": "development",
+    "SKIP_REDIS_CONNECTION": "true",
+    "DENO_DIR": "/app/.deno",
+    "NODE_DEBUG": "*",
+    "XDG_CONFIG_HOME": "/app/.config",
+    "XDG_CACHE_HOME": "/app/.cache",
+    "XDG_DATA_HOME": "/app/.local/share",
+    "NPM_CONFIG_CACHE": "/app/.npm",
+    "REDIS_LOG_LEVEL": "DEBUG",
+    "CACHE": "false"
+  },
+  "remoteUser": "deno",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
+  "workspaceFolder": "/app",
+  "mounts": [
+    "source=deno-cache,target=/app/.deno,type=volume",
+    "source=npm-cache,target=/app/.npm,type=volume"
+  ],
+  "runArgs": [
+    "--init"
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest",
+      "ppa": false
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    }
+  },
+  "initializeCommand": "git config --global --add safe.directory ${localWorkspaceFolder}",
+  "updateContentCommand": "deno cache --reload main.ts dev.ts"
+}
