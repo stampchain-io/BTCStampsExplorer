@@ -32,11 +32,6 @@ export function filtersToQueryParams(
   search: string,
   filters: StampFilters,
 ) {
-  console.log(
-    "Converting filters to query params:",
-    JSON.stringify(filters, null, 2),
-  );
-
   const queryParams = new URLSearchParams(search);
 
   // MARKET
@@ -99,7 +94,6 @@ export function filtersToQueryParams(
   }
 
   const result = queryParams.toString();
-  console.log("Final query params:", result);
   return result;
 }
 
@@ -129,7 +123,6 @@ export function filtersToServicePayload(filters: StampFilters) {
     marketMax: filters.marketMax || undefined,
   };
 
-  console.log("Filter payload:", result);
   return result;
 }
 
@@ -210,7 +203,8 @@ export function queryParamsToFilters(query: string): StampFilters {
     filtersPartial.rangeMax = rangeMax;
   }
 
-  return { ...defaultFilters, ...filtersPartial };
+  const result = { ...defaultFilters, ...filtersPartial };
+  return result;
 }
 
 export function queryParamsToServicePayload(query: string) {

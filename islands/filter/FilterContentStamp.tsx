@@ -668,7 +668,8 @@ export const FilterContentStamp = ({
         <Checkbox
           key="jpg"
           label="JPG/JPEG"
-          checked={filters.fileType.includes("jpg")}
+          checked={filters.fileType.includes("jpg") ||
+            filters.fileType.includes("jpeg")}
           onChange={() => toggleFileType("jpg")}
         />
 
@@ -735,7 +736,8 @@ export const FilterContentStamp = ({
         <Checkbox
           key="mp3"
           label="MP3/MPEG"
-          checked={filters.fileType.includes("mp3")}
+          checked={filters.fileType.includes("mp3") ||
+            filters.fileType.includes("mpeg")}
           onChange={() => toggleFileType("mp3")}
         />
 

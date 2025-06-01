@@ -23,32 +23,38 @@ import { Button } from "$button";
 type AllFilters = StampFilters | SRC20Filters;
 
 const FilterDrawer = (
-  { open, setOpen, searchparams, type = "stamp" }: {
+  { open, setOpen, type = "stamp" }: {
     open: boolean;
     setOpen: (status: boolean) => void;
-    searchparams: URLSearchParams;
     type?: FilterType;
   },
 ) => {
   // Parse the current URL parameters to initialize filters
   const getInitialFilters = (): AllFilters => {
-    const searchString = searchparams.toString();
-    console.log("FilterDrawer - searchString:", searchString);
+    if (typeof globalThis.location === "undefined") {
+      // SSR: return default filters
+      return getEmptyFilters();
+    }
+    const searchString = globalThis.location.search.startsWith("?")
+      ? globalThis.location.search.slice(1)
+      : globalThis.location.search;
 
+    let filters;
     switch (type) {
       case "src20": {
-        const src20Filters = src20QueryParamsToFilters(searchString);
-        console.log("FilterDrawer - src20Filters:", src20Filters);
-        return src20Filters;
+        filters = src20QueryParamsToFilters(searchString);
+        break;
       }
       case "src101": {
-        // For future implementation
-        return src20QueryParamsToFilters(searchString); // Temporary fallback
+        filters = src20QueryParamsToFilters(searchString); // Temporary fallback
+        break;
       }
       default: {
-        return stampQueryParamsToFilters(searchString);
+        filters = stampQueryParamsToFilters(searchString);
+        break;
       }
     }
+    return filters;
   };
 
   // Get empty filters for the CLEAR button
@@ -85,15 +91,14 @@ const FilterDrawer = (
     getInitialFilters(),
   );
 
-  // Add a ref to track if we're clearing filters
-  const isClearingRef = useRef(false);
-
   // Modify the useEffect
   useEffect(() => {
-    if (!isClearingRef.current) {
-      setCurrentFilters(getInitialFilters());
-    }
-  }, [searchparams.toString(), type]);
+    const newFilters = getInitialFilters();
+    setCurrentFilters(newFilters);
+  }, [type]);
+
+  // Add a ref to track if we're clearing filters
+  const isClearingRef = useRef(false);
 
   // Handle browser resize
   useEffect(() => {
@@ -220,49 +225,11 @@ const FilterDrawer = (
 
   // Modify the open/close handlers
   const handleCloseDrawerUpdate = () => {
-    console.log("APPLY button clicked");
-    console.log("Filter type:", type);
-    console.log(
-      "Current filters before query params:",
-      JSON.stringify(currentFilters, null, 2),
-    );
-
-    // Add type-specific logging that handles both filter types
-    if (type === "src20") {
-      // Log SRC20-specific properties
-      const src20Filters = currentFilters as SRC20Filters;
-      console.log(
-        "SRC20 status filters:",
-        JSON.stringify(src20Filters.status, null, 2),
-      );
-      console.log(
-        "SRC20 details filters:",
-        JSON.stringify(src20Filters.details, null, 2),
-      );
-      console.log(
-        "SRC20 market filters:",
-        JSON.stringify(src20Filters.market, null, 2),
-      );
-    } else {
-      // Log Stamp-specific properties
-      const stampFilters = currentFilters as StampFilters;
-      console.log("Market filters:", stampFilters.market);
-      console.log("Market min value:", stampFilters.marketMin);
-      console.log("Market max value:", stampFilters.marketMax);
-      console.log("Market min type:", typeof stampFilters.marketMin);
-      console.log("Market max type:", typeof stampFilters.marketMax);
-    }
-
     const queryString = getFiltersToQueryParams(
       globalThis.location.search,
       currentFilters,
     );
 
-    console.log("Generated query string:", queryString);
-    console.log("Current URL:", globalThis.location.href);
-    console.log("New URL:", globalThis.location.pathname + "?" + queryString);
-
-    // Add a try-catch to catch any errors during URL navigation
     try {
       globalThis.location.href = globalThis.location.pathname + "?" +
         queryString;
@@ -292,20 +259,17 @@ const FilterDrawer = (
         baseParams,
         currentFilters as StampFilters,
       );
-      console.log("Applying stamp filters, generated query:", queryParams);
     } else if (type === "src20") {
       // Convert src20 filters to query params
       queryParams = src20FiltersToQueryParams(
         baseParams,
         currentFilters as SRC20Filters,
       );
-      console.log("Applying src20 filters, generated query:", queryParams);
     }
 
     // Construct the new URL with the query params
     const newUrl = globalThis.location.pathname +
       (queryParams ? `?${queryParams}` : "");
-    console.log("Navigating to new URL:", newUrl);
 
     // Update URL and close drawer
     globalThis.location.href = newUrl;
@@ -395,10 +359,6 @@ const FilterDrawer = (
             <FilterContentStamp
               initialFilters={currentFilters as StampFilters}
               onFiltersChange={(filters) => {
-                console.log(
-                  "filters changed in FilterDrawer:",
-                  JSON.stringify(filters, null, 2),
-                );
                 setCurrentFilters(filters);
               }}
             />
@@ -407,7 +367,6 @@ const FilterDrawer = (
             <FilterContentSRC20
               initialFilters={currentFilters as SRC20Filters}
               onFiltersChange={(filters) => {
-                console.log("FilterDrawer - SRC20 filters changed:", filters);
                 setCurrentFilters(filters);
               }}
             />
