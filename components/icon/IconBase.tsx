@@ -43,6 +43,7 @@ export function Icon(props: IconVariants) {
       tools: "gear", // alias mapping
       close: "x", // alias mapping
       expand: "plus", // alias mapping
+      search: "magnifingGlass", // alias mapping
       donate: "handcoins", // alias mapping
       share: "share",
       copy: "copy",
@@ -125,7 +126,7 @@ export function BadgeIcon({ text, className = "" }: BadgeVariants) {
         size-5 rounded-full
         font-bold text-[10px] text-stamp-grey group-hover:text-black tracking-wider
         bg-stamp-purple group-hover:bg-stamp-purple-bright
-        transition-all duration-300
+        transition-all duration-300 cursor-pointer
         ${text === "0" ? "opacity-0" : "opacity-100"}
         ${className}
       `}

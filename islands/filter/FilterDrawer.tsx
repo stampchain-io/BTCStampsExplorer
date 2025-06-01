@@ -15,7 +15,7 @@ import {
 } from "$islands/filter/FilterOptionsSRC20.tsx";
 // Import SRC20 filter content
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
-import { FilterType } from "$islands/filter/FilterButton.tsx";
+import { FilterType } from "$islands/button/FilterButton.tsx";
 import { CloseIcon, Icon } from "$icon";
 import { Button } from "$button";
 

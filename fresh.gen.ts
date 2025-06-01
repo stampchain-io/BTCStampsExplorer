@@ -164,7 +164,7 @@ import * as $datacontrol_FilterOld from "./islands/datacontrol/FilterOld.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_faq from "./islands/datacontrol/faq.ts";
-import * as $filter_FilterButton from "./islands/filter/FilterButton.tsx";
+import * as $filter_FilterButton from "./islands/button/FilterButton.tsx";
 import * as $filter_FilterComponents from "./islands/filter/FilterComponents.tsx";
 import * as $filter_FilterContentSRC20 from "./islands/filter/FilterContentSRC20.tsx";
 import * as $filter_FilterContentStamp from "./islands/filter/FilterContentStamp.tsx";

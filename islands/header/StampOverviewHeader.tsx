@@ -1,7 +1,7 @@
 /* ===== STAMP OVERVIEW HEADER COMPONENT ===== */
 /* TODO (@baba) - update filter and styling */
 import { useState } from "preact/hooks";
-import { FilterButton } from "$islands/filter/FilterButton.tsx";
+import { FilterButton } from "$islands/button/FilterButton.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { titlePurpleLD } from "$text";
 import {
@@ -50,15 +50,13 @@ export const StampOverviewHeader = (
 
       {/* Controls Section */}
       <div className="flex flex-col">
-        <div className="flex relative items-start justify-between gap-4 tablet:gap-3">
-          {/* Filter Component */}
+        <div className="flex relative items-start justify-between gap-[18px] tablet:gap-3">
           <FilterButton
             count={countActiveStampFilters(currentFilters)}
             open={isOpen1}
             setOpen={handleOpen1}
             type="stamp"
           />
-
           <SearchStampModal showButton />
         </div>
       </div>

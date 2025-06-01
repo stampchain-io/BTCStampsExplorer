@@ -15,17 +15,15 @@ export function FilterButton(
   const drawerTarget = `drawer-form-${type}`;
 
   return (
-    <div
-      class={`relative flex flex-col items-center gap-1 rounded-md h-fit border-stamp-purple-bright text-stamp-purple-bright group`}
-    >
+    <div class="group">
       <BadgeIcon text={count !== undefined ? count.toString() : ""} />
       <Icon
         type="iconLink"
         name="filter"
         weight="bold"
-        size="xs"
+        size="sm"
         color="purple"
-        className="mt-1.5 w-[22px] h-[22px]"
+        className="mt-[5px] group-hover:fill-stamp-purple-bright transition-all duration-300"
         onClick={() => setOpen(!open)}
         data-drawer-target={drawerTarget}
         data-drawer-show={drawerTarget}
