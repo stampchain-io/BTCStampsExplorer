@@ -115,16 +115,15 @@ export function Icon(props: IconVariants) {
 // Gradient close menu icon is defined in: CloseIcon.tsx
 // Animated gear icon code is in: GearIcon.tsx
 
-/* ===== BADGE ICON COMPONENT - UPDATE WHEN FILTER IS IMPLEMENTED ===== */
+/* ===== BADGE ICON COMPONENT ===== */
 export function BadgeIcon({ text, className = "" }: BadgeVariants) {
   return (
     <span
       className={`
         flex items-center justify-center
-        absolute top-0 left-0 z-10
-        transform -translate-x-1/2 -translate-y-1/2 
-        size-6 rounded-full
-        font-bold text-xs text-stamp-grey group-hover:text-black tracking-wider
+        absolute top-[-4px] left-[-12px] z-10
+        size-5 rounded-full
+        font-bold text-[10px] text-stamp-grey group-hover:text-black tracking-wider
         bg-stamp-purple group-hover:bg-stamp-purple-bright
         transition-all duration-300
         ${text === "0" ? "opacity-0" : "opacity-100"}

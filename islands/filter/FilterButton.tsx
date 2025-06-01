@@ -1,5 +1,4 @@
-import { Button } from "$components/button/ButtonOLD.tsx";
-import { BadgeIcon, FilterIcon } from "$islands/filter/FilterComponents.tsx";
+import { BadgeIcon, Icon } from "$components/icon/IconBase.tsx";
 
 // Define the filter types
 export type FilterType = "stamp" | "src20" | "src101";
@@ -20,11 +19,14 @@ export function FilterButton(
       class={`relative flex flex-col items-center gap-1 rounded-md h-fit border-stamp-purple-bright text-stamp-purple-bright group`}
     >
       <BadgeIcon text={count !== undefined ? count.toString() : ""} />
-      <Button
-        variant="icon"
-        class="transform transition-all duration-300"
+      <Icon
+        type="iconLink"
+        name="filter"
+        weight="bold"
+        size="xs"
+        color="purple"
+        className="mt-1.5 w-[22px] h-[22px]"
         onClick={() => setOpen(!open)}
-        icon={<FilterIcon />}
         data-drawer-target={drawerTarget}
         data-drawer-show={drawerTarget}
         aria-controls={drawerTarget}

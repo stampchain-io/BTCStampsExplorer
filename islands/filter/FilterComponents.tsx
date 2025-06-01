@@ -27,6 +27,7 @@ export const ChevronIcon = (size: "sm" | "md" | "lg") => {
 };
 
 // Filter icon component
+/*
 export const FilterIcon = () => {
   return (
     <svg
@@ -40,6 +41,7 @@ export const FilterIcon = () => {
     </svg>
   );
 };
+*/
 
 // Close icon component
 export const CloseIcon = () => (
@@ -66,6 +68,7 @@ export const CloseIcon = () => (
 );
 
 // Badge Icon Component
+/*
 export const BadgeIcon = ({
   text,
   className = "",
@@ -90,6 +93,7 @@ export const BadgeIcon = ({
     </span>
   );
 };
+*/
 
 // CollapsibleSection Component
 export const CollapsibleSection = ({
