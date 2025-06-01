@@ -53,6 +53,7 @@ export function Icon(props: IconVariants) {
       locked: "lockClosed", // alias mapping
       unlocked: "lockOpen", // alias mapping
       keyburned: "flame", // alias mapping
+      filter: "funnel", // alias mapping
       divisible: "percent", // alias mapping
       caretUp: "caretUp",
       caretDown: "caretDown",
