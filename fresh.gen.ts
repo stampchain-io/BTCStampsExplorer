@@ -239,7 +239,6 @@ import * as $section_howto_SRC20TransferHowto from "./islands/section/howto/SRC2
 import * as $section_howto_StampTransferHowto from "./islands/section/howto/StampTransferHowto.tsx";
 import * as $section_howto_StampingHowto from "./islands/section/howto/StampingHowto.tsx";
 import * as $section_index from "./islands/section/index.ts";
-import * as $sort_MultiSort from "./islands/sort/MultiSort.tsx";
 import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
 import * as $table_HoldersPieChart from "./islands/table/HoldersPieChart.tsx";
 import * as $table_HoldersTableBase from "./islands/table/HoldersTableBase.tsx";
@@ -552,7 +551,6 @@ const manifest = {
       $section_howto_StampTransferHowto,
     "./islands/section/howto/StampingHowto.tsx": $section_howto_StampingHowto,
     "./islands/section/index.ts": $section_index,
-    "./islands/sort/MultiSort.tsx": $sort_MultiSort,
     "./islands/table/DataTableBase.tsx": $table_DataTableBase,
     "./islands/table/HoldersPieChart.tsx": $table_HoldersPieChart,
     "./islands/table/HoldersTableBase.tsx": $table_HoldersTableBase,
