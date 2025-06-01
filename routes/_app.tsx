@@ -9,6 +9,7 @@ import { Header } from "$header";
 import FontLoader from "$islands/layout/FontLoader.tsx";
 import ModalProvider from "$islands/layout/ModalProvider.tsx";
 import PageVisibilityManager from "$islands/layout/PageVisibilityManager.tsx";
+import AnimationControlsManager from "$islands/layout/AnimationControlsManager.tsx";
 
 /* ===== ROOT COMPONENT ===== */
 export default function App({ Component, state }: PageProps<unknown>) {
@@ -98,7 +99,9 @@ export default function App({ Component, state }: PageProps<unknown>) {
               animation: shimmer 1.5s infinite linear;
             }
 
-            /* Animation control classes for performance optimization */
+            /* ===== COMPREHENSIVE ANIMATION PERFORMANCE CONTROLS ===== */
+            
+            /* Loading skeleton controls */
             .loading-skeleton.paused {
               animation-play-state: paused;
             }
@@ -116,6 +119,72 @@ export default function App({ Component, state }: PageProps<unknown>) {
             .loading-skeleton.completed {
               animation: none;
               background: #14001f; /* Static background color */
+            }
+            
+            /* Global animation controls based on page visibility */
+            .page-hidden * {
+              animation-play-state: paused !important;
+            }
+            
+            .page-hidden .animate-pulse,
+            .page-hidden .animate-spin,
+            .page-hidden .animate-bounce,
+            .page-hidden .animate-ping {
+              animation-play-state: paused !important;
+            }
+            
+            /* Reduced motion support (accessibility) */
+            .reduced-motion *,
+            .reduced-motion *::before,
+            .reduced-motion *::after {
+              animation-duration: 0.01ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: 0.01ms !important;
+              scroll-behavior: auto !important;
+            }
+            
+            /* Performance-based animation controls */
+            .performance-low * {
+              animation-duration: 0.1s !important;
+              transition-duration: 0.1s !important;
+            }
+            
+            .performance-low .animate-pulse,
+            .performance-low .animate-spin {
+              animation: none !important;
+            }
+            
+            .performance-medium * {
+              animation-duration: 0.3s !important;
+              transition-duration: 0.3s !important;
+            }
+            
+            /* Intersection observer based controls */
+            .animation-paused {
+              animation-play-state: paused !important;
+            }
+            
+            .animation-running {
+              animation-play-state: running !important;
+            }
+            
+            /* Specific component animation controls */
+            .page-hidden .swiper-slide,
+            .page-hidden .carousel-slider {
+              animation-play-state: paused !important;
+            }
+            
+            .page-hidden .modal-content {
+              animation-play-state: paused !important;
+            }
+            
+            /* Transition optimizations for low performance */
+            .performance-low .transition-all {
+              transition: none !important;
+            }
+            
+            .performance-low .hover\\:scale-105:hover {
+              transform: none !important;
             }
 
             /* Match StampCard grid layout */
@@ -203,6 +272,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
 
         {/* ===== PERFORMANCE OPTIMIZATION ===== */}
         <PageVisibilityManager />
+        <AnimationControlsManager />
       </body>
     </html>
   );
