@@ -109,6 +109,7 @@ export function Header() {
   const [allowCloseTooltip, setAllowCloseTooltip] = useState(true);
   const [closeTooltipText, setCloseTooltipText] = useState("CLOSE");
   const closeTooltipTimeoutRef = useRef<number | null>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   // Scroll lock
   useEffect(() => {
@@ -123,6 +124,41 @@ export function Header() {
       }, 400); // Match drawer transition duration
       return () => clearTimeout(timer);
     }
+  }, [open]);
+
+  // Add combined handler for keyboard shortcuts and click outside
+  useEffect(() => {
+    const handleCloseEvents = (e: KeyboardEvent | MouseEvent) => {
+      // Handle keyboard shortcuts
+      if (e.type === "keydown") {
+        const keyEvent = e as KeyboardEvent;
+        // Close on Escape key
+        if (keyEvent.key === "Escape" && open) {
+          e.preventDefault();
+          closeMenu();
+        }
+      }
+
+      // Handle click outside
+      if (e.type === "mousedown" && open) {
+        // Check if the click was outside the drawer
+        if (
+          drawerRef.current && !drawerRef.current.contains(e.target as Node)
+        ) {
+          closeMenu();
+        }
+      }
+    };
+
+    // Add event listeners
+    document.addEventListener("keydown", handleCloseEvents);
+    document.addEventListener("mousedown", handleCloseEvents);
+
+    // Clean up event listeners
+    return () => {
+      document.removeEventListener("keydown", handleCloseEvents);
+      document.removeEventListener("mousedown", handleCloseEvents);
+    };
   }, [open]);
 
   /* ===== PATH TRACKING EFFECT ===== */
@@ -345,6 +381,7 @@ export function Header() {
 
       {/* ===== MOBILE NAVIGATION DRAWER ===== */}
       <div
+        ref={drawerRef}
         className={`flex tablet:hidden flex-col justify-between
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-screen z-30
            bg-gradient-to-b from-[#0e0014]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
