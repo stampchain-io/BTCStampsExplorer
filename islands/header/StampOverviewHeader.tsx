@@ -3,7 +3,7 @@
 import { useState } from "preact/hooks";
 import { FilterButton } from "$islands/button/FilterButton.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
-import { SortButton } from "$islands/sort/SortButton.tsx";
+import { SortButton } from "$islands/button/SortButton.tsx";
 import { titlePurpleLD } from "$text";
 import {
   defaultFilters,

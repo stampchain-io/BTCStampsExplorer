@@ -5,7 +5,7 @@ import { ViewAllButton } from "$button";
 import { StampCard } from "$card";
 import { StampGalleryProps, StampRow } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
-import { SortButton } from "$islands/sort/SortButton.tsx";
+import { SortButton } from "$islands/button/SortButton.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";

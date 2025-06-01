@@ -136,6 +136,7 @@ import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $WIP_test_ReviewDogTest from "./islands/WIP/test/ReviewDogTest.tsx";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
+import * as $button_SortButton from "./islands/button/SortButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
 import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
 import * as $card_SRC20CardMinted from "./islands/card/SRC20CardMinted.tsx";
@@ -239,7 +240,6 @@ import * as $section_howto_StampTransferHowto from "./islands/section/howto/Stam
 import * as $section_howto_StampingHowto from "./islands/section/howto/StampingHowto.tsx";
 import * as $section_index from "./islands/section/index.ts";
 import * as $sort_MultiSort from "./islands/sort/MultiSort.tsx";
-import * as $sort_SortButton from "./islands/sort/SortButton.tsx";
 import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
 import * as $table_HoldersPieChart from "./islands/table/HoldersPieChart.tsx";
 import * as $table_HoldersTableBase from "./islands/table/HoldersTableBase.tsx";
@@ -422,6 +422,7 @@ const manifest = {
     "./islands/WIP/test/ReviewDogTest.tsx": $WIP_test_ReviewDogTest,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/FilterButton.tsx": $button_FilterButton,
+    "./islands/button/SortButton.tsx": $button_SortButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
     "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
     "./islands/card/SRC20CardMinted.tsx": $card_SRC20CardMinted,
@@ -552,7 +553,6 @@ const manifest = {
     "./islands/section/howto/StampingHowto.tsx": $section_howto_StampingHowto,
     "./islands/section/index.ts": $section_index,
     "./islands/sort/MultiSort.tsx": $sort_MultiSort,
-    "./islands/sort/SortButton.tsx": $sort_SortButton,
     "./islands/table/DataTableBase.tsx": $table_DataTableBase,
     "./islands/table/HoldersPieChart.tsx": $table_HoldersPieChart,
     "./islands/table/HoldersTableBase.tsx": $table_HoldersTableBase,

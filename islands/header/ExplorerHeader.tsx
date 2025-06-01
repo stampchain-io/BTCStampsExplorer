@@ -1,5 +1,5 @@
 /* ===== EXPLORER HEADER COMPONENT ===== */
-import { SortButton } from "$islands/sort/SortButton.tsx";
+import { SortButton } from "$islands/button/SortButton.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { titlePurpleLD } from "$text";
 

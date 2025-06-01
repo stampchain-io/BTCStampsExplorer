@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 import { Icon } from "$components/icon/IconBase.tsx";
 
 interface SortProps {
@@ -7,18 +7,15 @@ interface SortProps {
 
 export function SortButton({ searchParams }: SortProps) {
   // Initialize sort based on URL parameter
-  const [sort, setSort] = useState<"ASC" | "DESC">(
-    searchParams?.get("sortOrder")?.includes("asc") ? "ASC" : "DESC",
-  );
-
-  // Update sort state when URL changes
-  useEffect(() => {
+  const [sort, setSort] = useState<"ASC" | "DESC">(() => {
+    // Use the current URL if available, otherwise fallback to searchParams
     if (typeof globalThis !== "undefined" && globalThis?.location) {
       const currentSort = new URL(globalThis.location.href)
         .searchParams.get("sortOrder");
-      setSort(currentSort?.includes("asc") ? "ASC" : "DESC");
+      return currentSort?.includes("asc") ? "ASC" : "DESC";
     }
-  }, []);
+    return searchParams?.get("sortOrder")?.includes("asc") ? "ASC" : "DESC";
+  });
 
   const handleSort = () => {
     const url = new URL(globalThis.location.href);

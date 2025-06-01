@@ -1,6 +1,6 @@
 /* ===== WALLET DASHBOARD CONTENT COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { SortButton } from "$islands/sort/SortButton.tsx";
+import { SortButton } from "$islands/button/SortButton.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { FilterOld } from "$islands/datacontrol/FilterOld.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
