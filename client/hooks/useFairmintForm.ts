@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { useConfig } from "$client/hooks/useConfig.ts";
-import { useFeePolling } from "$client/hooks/useFeePolling.ts";
+import { useFees } from "$fees";
 import {
   showConnectWalletModal,
   walletContext,
@@ -28,7 +28,7 @@ interface FairmintFormState {
 
 export function useFairmintForm(fairminters: any[]) {
   const { config, isLoading: configLoading } = useConfig<Config>();
-  const { fees, loading: feeLoading, fetchFees } = useFeePolling(300000);
+  const { fees, loading: feeLoading, fetchFees } = useFees();
   const [isLoading, setIsLoading] = useState(configLoading || feeLoading);
 
   const [formState, setFormState] = useState<FairmintFormState>({

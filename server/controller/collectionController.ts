@@ -23,11 +23,14 @@ export class CollectionController {
   ): Promise<PaginatedCollectionResponseBody> {
     try {
       const { limit = 50, page = 1, creator, sortBy } = params;
+      
+      // Apply minimum stamp count filter at database level
       const collectionsResult = await CollectionService.getCollectionDetails({
         limit,
         page,
         creator,
-        sortBy
+        sortBy,
+        minStampCount: 2
       });
 
       if (!collectionsResult.data || !Array.isArray(collectionsResult.data)) {
@@ -36,80 +39,79 @@ export class CollectionController {
         );
       }
 
-      // Filter out collections with less than 2 stamps
-      const validCollections = collectionsResult.data.filter(
-        (collection: Collection) => collection.stamp_count >= 2
-      );
-
-      const collectionIds = validCollections.map(
+      const collectionIds = collectionsResult.data.map(
         (collection: Collection) => collection.collection_id,
       );
-
-      // Calculate total limit based on number of collections
-      const totalLimit = collectionIds.length * 12;
-
-      console.log('Fetching stamps for collections:', {
-        collectionIds,
-        totalLimit,
-        collectionStampLimit: 12
-      });
-
-      const stampResults = await StampController.getStamps({
-        collectionId: collectionIds,
-        noPagination: false,
-        type: "all",
-        sortBy: "ASC",
-        allColumns: false,
-        limit: totalLimit,
-        collectionStampLimit: 12,
-        groupBy: "collection_id",
-        groupBySubquery: true
-      });
-
-      if (!stampResults.data || !Array.isArray(stampResults.data)) {
-        throw new Error(
-          "Unexpected data structure from StampController.getStamps",
-        );
-      }
 
       // Create a map to store stamps by collection ID
       const stampsByCollection = new Map<string, string[]>();
 
-      // Group stamps by collection ID
-      stampResults.data.forEach(async (stamp: { 
-        collection_id: string; 
-        tx_hash: string;
-        stamp_mimetype: string;
-      }) => {
-        if (!stamp.tx_hash || !stamp.stamp_mimetype) {
-          return;
-        }
-        
-        const collectionId = stamp.collection_id?.toUpperCase();
-        if (!collectionId) {
-          return;
+      // Only fetch stamps if we have collections
+      if (collectionIds.length > 0) {
+        // Calculate total limit based on number of collections
+        const totalLimit = collectionIds.length * 12;
+
+        console.log('Fetching stamps for collections:', {
+          collectionIds,
+          totalLimit,
+          collectionStampLimit: 12
+        });
+
+        const stampResults = await StampController.getStamps({
+          collectionId: collectionIds,
+          noPagination: false,
+          type: "all",
+          sortBy: "ASC",
+          allColumns: false,
+          limit: totalLimit,
+          collectionStampLimit: 12,
+          groupBy: "collection_id",
+          groupBySubquery: true
+        });
+
+        if (!stampResults.data || !Array.isArray(stampResults.data)) {
+          throw new Error(
+            "Unexpected data structure from StampController.getStamps",
+          );
         }
 
-        if (!stampsByCollection.has(collectionId)) {
-          stampsByCollection.set(collectionId, []);
-        }
+        // Group stamps by collection ID
+        for (const stamp of stampResults.data) {
+          if (!stamp.tx_hash || !stamp.stamp_mimetype) {
+            continue;
+          }
+          
+          const collectionId = stamp.collection_id?.toUpperCase();
+          if (!collectionId) {
+            continue;
+          }
 
-        const stamps = stampsByCollection.get(collectionId)!;
-        const imageUrl = await getStampImageSrc(stamp);
-        if (stamps.length < 12 && !stamps.includes(imageUrl)) {
-          stamps.push(imageUrl);
+          if (!stampsByCollection.has(collectionId)) {
+            stampsByCollection.set(collectionId, []);
+          }
+
+          const stamps = stampsByCollection.get(collectionId)!;
+          const imageUrl = await getStampImageSrc(stamp);
+          if (stamps.length < 12 && !stamps.includes(imageUrl)) {
+            stamps.push(imageUrl);
+          }
         }
-      });
+      }
 
       // Map collections with their stamps
-      const collections: Collection[] = validCollections.map(
+      const collections: Collection[] = collectionsResult.data.map(
         (collection: Collection) => {
           const collectionId = collection.collection_id.toUpperCase();
           const stamps = stampsByCollection.get(collectionId) || [];
           
+          // Use the second stamp if available, otherwise fall back to the first stamp
+          const firstStampImage = stamps[1] || stamps[0] || null;
+          
+
+          
           return {
             ...collection,
-            first_stamp_image: stamps[1] || null,
+            first_stamp_image: firstStampImage,
             stamp_images: stamps,
           };
         }
@@ -118,7 +120,7 @@ export class CollectionController {
       return {
         ...collectionsResult,
         data: collections,
-        total: validCollections.length, // Update total count to reflect filtered collections
+        // No need to update total - it's already correct from database filtering
       };
     } catch (error) {
       console.error("Error in CollectionController.getCollectionStamps:", error);

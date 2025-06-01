@@ -8,6 +8,7 @@ import { Footer, NavigatorProvider } from "$layout";
 import { Header } from "$header";
 import FontLoader from "$islands/layout/FontLoader.tsx";
 import ModalProvider from "$islands/layout/ModalProvider.tsx";
+import PageVisibilityManager from "$islands/layout/PageVisibilityManager.tsx";
 
 /* ===== ROOT COMPONENT ===== */
 export default function App({ Component, state }: PageProps<unknown>) {
@@ -97,6 +98,26 @@ export default function App({ Component, state }: PageProps<unknown>) {
               animation: shimmer 1.5s infinite linear;
             }
 
+            /* Animation control classes for performance optimization */
+            .loading-skeleton.paused {
+              animation-play-state: paused;
+            }
+
+            .loading-skeleton.running {
+              animation-play-state: running;
+            }
+
+            /* Pause animations when page is hidden (Page Visibility API) */
+            .page-hidden .loading-skeleton {
+              animation-play-state: paused;
+            }
+
+            /* Stop animations when loading is complete */
+            .loading-skeleton.completed {
+              animation: none;
+              background: #14001f; /* Static background color */
+            }
+
             /* Match StampCard grid layout */
             .stamp-grid-skeleton {
               display: grid;
@@ -179,6 +200,9 @@ export default function App({ Component, state }: PageProps<unknown>) {
 
         {/* ===== MODAL LAYER ===== */}
         <ModalProvider />
+
+        {/* ===== PERFORMANCE OPTIMIZATION ===== */}
+        <PageVisibilityManager />
       </body>
     </html>
   );

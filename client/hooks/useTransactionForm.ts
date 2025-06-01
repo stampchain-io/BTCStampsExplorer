@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "preact/hooks";
-import { useFeePolling } from "$client/hooks/useFeePolling.ts";
+import { useFees } from "$fees";
 import {
   showConnectWalletModal,
   walletContext,
@@ -126,7 +126,7 @@ export function useTransactionForm(
   { type, initialFee = 1, initialAssetId = "", initialAmount = "1" }:
     UseTransactionFormProps,
 ) {
-  const { fees, loading: feeLoading, fetchFees } = useFeePolling(300000);
+  const { fees, loading: feeLoading, fetchFees } = useFees();
   const { wallet, isConnected } = walletContext;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);

@@ -4,7 +4,7 @@ import { useConfig } from "$client/hooks/useConfig.ts";
 import axiod from "axiod";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { getWalletProvider } from "$client/wallet/walletHelper.ts";
-import { useFeePolling } from "$client/hooks/useFeePolling.ts";
+import { useFees } from "$fees";
 import { FeeCalculatorAdvanced } from "$islands/section/FeeCalculatorAdvanced.tsx";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { Config } from "$globals";
@@ -291,7 +291,7 @@ export function StampingTool() {
 function StampingToolMain({ config }: { config: Config }) {
   const { wallet, isConnected } = walletContext;
   const address = isConnected ? wallet.address : undefined;
-  const { fees, loading, fetchFees } = useFeePolling(300000);
+  const { fees, loading, fetchFees } = useFees();
 
   const [file, setFile] = useState<File | null>(null);
   const [fee, setFee] = useState<number>(0);

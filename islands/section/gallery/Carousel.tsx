@@ -1,8 +1,9 @@
 /* ===== CAROUSEL GALLERY COMPONENT ===== */
 /* TODO (@baba)-update styling */
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { StampRow } from "$globals";
+import { ComponentChildren } from "preact";
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import {
@@ -19,6 +20,9 @@ interface CarouselProps {
   class?: string;
 }
 
+// Cache for validation results to prevent re-validation
+const validationCache = new Map<string, boolean>();
+
 /* ===== COMPONENT ===== */
 export default function CarouselGallery(props: CarouselProps) {
   /* ===== PROPS EXTRACTION ===== */
@@ -26,15 +30,34 @@ export default function CarouselGallery(props: CarouselProps) {
 
   /* ===== COMPUTED VALUES ===== */
   const isMobile = globalThis.innerWidth < 768;
-  const duplicatedStamps = isMobile
-    ? [...stamps, ...[stamps[2]]]
-    : [...stamps, ...stamps];
+
+  // Memoize duplicatedStamps to prevent infinite re-renders
+  // For Swiper loop mode, we need enough slides: minimum 2x slidesPerView
+  const duplicatedStamps = useMemo(() => {
+    if (stamps.length === 0) return [];
+
+    // Mobile needs 3 slides per view, desktop needs 5
+    const minSlidesNeeded = isMobile ? 6 : 10; // 2x slidesPerView for proper loop
+
+    // If we have enough stamps, just duplicate them
+    if (stamps.length >= (isMobile ? 3 : 5)) {
+      return [...stamps, ...stamps];
+    }
+
+    // If we don't have enough stamps, repeat them until we have enough
+    const result = [...stamps];
+    while (result.length < minSlidesNeeded) {
+      result.push(...stamps);
+    }
+
+    return result;
+  }, [stamps, isMobile]);
 
   /* ===== STATE ===== */
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [validatedContent, setValidatedContent] = useState<
-    Record<string, JSX.Element>
+    Record<string, ComponentChildren>
   >({});
 
   /* ===== EVENT HANDLERS ===== */
@@ -45,9 +68,14 @@ export default function CarouselGallery(props: CarouselProps) {
   /* ===== VALIDATION EFFECT ===== */
   useEffect(() => {
     const validateStamps = async () => {
-      const validated: Record<string, JSX.Element> = {};
+      const validated: Record<string, ComponentChildren> = {};
 
       for (const stamp of duplicatedStamps) {
+        // Skip if already validated
+        if (validatedContent[stamp.tx_hash]) {
+          continue;
+        }
+
         // Get proper stamp URL using getStampImageSrc
         const src = await getStampImageSrc(stamp);
 
@@ -70,11 +98,20 @@ export default function CarouselGallery(props: CarouselProps) {
           continue;
         }
 
-        // Handle SVG content
+        // Handle SVG content with caching
         if (stamp.stamp_mimetype === "image/svg+xml") {
-          const { isValid } = await validateStampContent(
-            `/content/${stamp.tx_hash}.svg`,
-          );
+          const svgSrc = `/content/${stamp.tx_hash}.svg`;
+
+          // Check cache first
+          let isValid = validationCache.get(svgSrc);
+
+          if (isValid === undefined) {
+            // Only validate if not in cache
+            const validationResult = await validateStampContent(svgSrc);
+            isValid = validationResult.isValid;
+            validationCache.set(svgSrc, isValid);
+          }
+
           if (!isValid) {
             validated[stamp.tx_hash] = (
               <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
@@ -89,11 +126,15 @@ export default function CarouselGallery(props: CarouselProps) {
           }
         }
       }
-      setValidatedContent(validated);
+
+      // Only update state if we have new validated content
+      if (Object.keys(validated).length > 0) {
+        setValidatedContent((prev) => ({ ...prev, ...validated }));
+      }
     };
 
     validateStamps();
-  }, [duplicatedStamps]);
+  }, [duplicatedStamps]); // Now properly memoized
 
   /* ===== CAROUSEL EFFECT ===== */
   useEffect(() => {

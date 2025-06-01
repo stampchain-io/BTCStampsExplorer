@@ -39,7 +39,7 @@
         "no-node-buffer",
         "prefer-native-node-imports"
       ],
-      "exclude": ["no-explicit-any"]
+      "exclude": ["no-explicit-any", "react-no-danger"]
     },
     "exclude": [
       "**/_fresh/**/*",
@@ -142,7 +142,8 @@
     "$icon": "./components/icon/index.ts",
     "$form": "./components/form/index.ts",
     "$notification": "./components/notification/index.ts",
-    "$table": "./islands/table/index.ts"
+    "$table": "./islands/table/index.ts",
+    "$fees": "./lib/hooks/useFees.ts"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
