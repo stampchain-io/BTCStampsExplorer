@@ -23,7 +23,7 @@ export function FilterButton(
         weight="bold"
         size="custom"
         color="purple"
-        className="mt-[5px] w-[24px] h-[24px] tablet:w-[22px] tablet:h-[22px] group-hover:fill-stamp-purple-bright transition-all duration-300"
+        className="mt-[6px] w-[23px] h-[23px] tablet:w-[21px] tablet:h-[21px] group-hover:fill-stamp-purple-bright transition-all duration-300"
         onClick={() => setOpen(!open)}
         data-drawer-target={drawerTarget}
         data-drawer-show={drawerTarget}
