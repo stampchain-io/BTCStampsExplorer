@@ -52,7 +52,7 @@ export const Accordion = (
             type="iconLink"
             name="expand"
             weight="bold"
-            size="xsResponsive"
+            size="xsR"
             color="custom"
           />
         </span>

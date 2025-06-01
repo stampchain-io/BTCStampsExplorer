@@ -14,7 +14,7 @@ export interface IconVariants {
     | "lg"
     | "xl"
     | "xxl"
-    | "xsResponsive"
+    | "xsR"
     | "smR"
     | "custom";
   color: "grey" | "purple" | "custom";
@@ -57,7 +57,7 @@ export const iconStyles = {
     lg: "w-8 h-8",
     xl: "w-9 h-9",
     xxl: "w-10 h-10",
-    xsResponsive: "w-5 h-5 tablet:w-4 tablet:h-4",
+    xsR: "w-5 h-5 tablet:w-4 tablet:h-4",
     smR: "w-6 h-6 tablet:w-5 tablet:h-5",
     custom: "",
   },
