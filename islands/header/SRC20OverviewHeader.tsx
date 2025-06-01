@@ -142,7 +142,7 @@ export const SRC20OverviewHeader = (
 
         {/* ===== CONTROLS SECTION ===== */}
         <div className="flex flex-col">
-          <div className="flex relative items-start justify-between gap-4 tablet:gap-3">
+          <div className="flex relative items-start justify-between gap-[18px] tablet:gap-3">
             <SearchSRC20Modal showButton />
             <Button
               variant={viewType === "minting"
