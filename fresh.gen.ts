@@ -135,6 +135,7 @@ import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $WIP_test_ReviewDogTest from "./islands/WIP/test/ReviewDogTest.tsx";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
+import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
 import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
 import * as $card_SRC20CardMinted from "./islands/card/SRC20CardMinted.tsx";
@@ -164,7 +165,6 @@ import * as $datacontrol_FilterOld from "./islands/datacontrol/FilterOld.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_faq from "./islands/datacontrol/faq.ts";
-import * as $filter_FilterButton from "./islands/button/FilterButton.tsx";
 import * as $filter_FilterComponents from "./islands/filter/FilterComponents.tsx";
 import * as $filter_FilterContentSRC20 from "./islands/filter/FilterContentSRC20.tsx";
 import * as $filter_FilterContentStamp from "./islands/filter/FilterContentStamp.tsx";
@@ -421,6 +421,7 @@ const manifest = {
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
     "./islands/WIP/test/ReviewDogTest.tsx": $WIP_test_ReviewDogTest,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
+    "./islands/button/FilterButton.tsx": $button_FilterButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
     "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
     "./islands/card/SRC20CardMinted.tsx": $card_SRC20CardMinted,
@@ -461,7 +462,6 @@ const manifest = {
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/faq.ts": $datacontrol_faq,
-    "./islands/filter/FilterButton.tsx": $filter_FilterButton,
     "./islands/filter/FilterComponents.tsx": $filter_FilterComponents,
     "./islands/filter/FilterContentSRC20.tsx": $filter_FilterContentSRC20,
     "./islands/filter/FilterContentStamp.tsx": $filter_FilterContentStamp,

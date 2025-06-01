@@ -112,9 +112,9 @@ export function SearchSRC20Modal({
           type="iconLink"
           name="search"
           weight="bold"
-          size="xs"
+          size="custom"
           color="purple"
-          className="mt-1.5 w-[23px] h-[23px]"
+          className="mt-[6px] w-[23px] h-[23px] tablet:w-5 tablet:h-5"
           onClick={handleOpenSearch}
           role="button"
         />

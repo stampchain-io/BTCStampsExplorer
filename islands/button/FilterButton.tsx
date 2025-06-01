@@ -21,9 +21,9 @@ export function FilterButton(
         type="iconLink"
         name="filter"
         weight="bold"
-        size="sm"
+        size="custom"
         color="purple"
-        className="mt-[5px] group-hover:fill-stamp-purple-bright transition-all duration-300"
+        className="mt-[5px] w-[24px] h-[24px] tablet:w-[22px] tablet:h-[22px] group-hover:fill-stamp-purple-bright transition-all duration-300"
         onClick={() => setOpen(!open)}
         data-drawer-target={drawerTarget}
         data-drawer-show={drawerTarget}
