@@ -31,8 +31,8 @@ export const StampOverviewHeader = (
   function countActiveStampFilters(filters: StampFilters): number {
     let count = 0;
     if (filters.market.length > 0) count++;
-    if (filters.fileType.length > 0) count++;
-    if (filters.editions.length > 0) count++;
+    count += filters.fileType.length;
+    count += filters.editions.length;
     if (filters.range !== null) count++;
     if (filters.marketMin || filters.marketMax) count++;
     if (filters.rangeMin || filters.rangeMax) count++;

@@ -529,13 +529,34 @@ export const FilterContentStamp = ({
   // Fix: Add a dedicated file type toggle function
   const toggleFileType = (type: STAMP_FILETYPES) => {
     setFilters((prevFilters) => {
-      const newFileTypes = [...prevFilters.fileType];
-      const index = newFileTypes.indexOf(type);
+      let newFileTypes = [...prevFilters.fileType];
 
-      if (index === -1) {
-        newFileTypes.push(type);
+      if (type === "jpg") {
+        // Remove both 'jpg' and 'jpeg' if either is present
+        if (newFileTypes.includes("jpg") || newFileTypes.includes("jpeg")) {
+          newFileTypes = newFileTypes.filter(
+            (t) => t !== "jpg" && t !== "jpeg",
+          );
+        } else {
+          newFileTypes.push("jpg");
+        }
+      } else if (type === "mp3") {
+        // Remove both 'mp3' and 'mpeg' if either is present
+        if (newFileTypes.includes("mp3") || newFileTypes.includes("mpeg")) {
+          newFileTypes = newFileTypes.filter(
+            (t) => t !== "mp3" && t !== "mpeg",
+          );
+        } else {
+          newFileTypes.push("mp3");
+        }
       } else {
-        newFileTypes.splice(index, 1);
+        // Default toggle for other types
+        const index = newFileTypes.indexOf(type);
+        if (index === -1) {
+          newFileTypes.push(type);
+        } else {
+          newFileTypes.splice(index, 1);
+        }
       }
 
       const newFilters = {
