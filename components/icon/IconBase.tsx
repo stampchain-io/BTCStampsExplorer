@@ -56,6 +56,8 @@ export function Icon(props: IconVariants) {
       keyburned: "flame", // alias mapping
       filter: "funnel", // alias mapping
       divisible: "percent", // alias mapping
+      sortAsc: "sortAsc",
+      sortDesc: "sortDesc",
       caretUp: "caretUp",
       caretDown: "caretDown",
       caretLeft: "caretLeft",
