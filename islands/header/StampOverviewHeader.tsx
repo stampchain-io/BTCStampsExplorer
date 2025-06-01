@@ -3,6 +3,7 @@
 import { useState } from "preact/hooks";
 import { FilterButton } from "$islands/button/FilterButton.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
+import { SortButton } from "$islands/sort/SortButton.tsx";
 import { titlePurpleLD } from "$text";
 import {
   defaultFilters,
@@ -57,6 +58,7 @@ export const StampOverviewHeader = (
             setOpen={handleOpen1}
             type="stamp"
           />
+          <SortButton />
           <SearchStampModal showButton />
         </div>
       </div>
