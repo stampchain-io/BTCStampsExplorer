@@ -411,9 +411,10 @@ class DatabaseManager {
     fetchData: () => Promise<T>,
     cacheDuration: number | "never",
   ): Promise<T> {
-    // Log cache status periodically (once per minute) to track Redis availability
+    // Log cache status periodically (once per 5 minutes in dev, 1 minute in prod) to track Redis availability
     const now = Date.now();
-    if (!this.#lastCacheStatusLog || now - this.#lastCacheStatusLog > 60000) {
+    const logInterval = this.config.DENO_ENV === "production" ? 60000 : 300000; // 5 minutes in dev, 1 minute in prod
+    if (!this.#lastCacheStatusLog || now - this.#lastCacheStatusLog > logInterval) {
       this.#lastCacheStatusLog = now;
       const status = `Cache status: Redis ${this.#redisAvailable ? 'AVAILABLE' : 'UNAVAILABLE'}, fallback=${!this.#redisAvailable}, endpoint=${this.config.ELASTICACHE_ENDPOINT}`;
       this.#logger.info(status);
@@ -446,7 +447,8 @@ class DatabaseManager {
       
       const fallbackMsg = `Using in-memory cache fallback for key: ${key.substring(0, 10)}... (type: ${typeof fetchData}, cacheDuration: ${cacheDuration})`;
       this.#logger.debug(fallbackMsg);
-      if (REDIS_DEBUG) {
+      // Only log fallback messages in production or when explicitly debugging
+      if (REDIS_DEBUG && this.config.DENO_ENV === "production") {
         console.log(`[REDIS FALLBACK] ${fallbackMsg}`);
       }
       
@@ -494,7 +496,7 @@ class DatabaseManager {
         const data = await this.#redisClient.get(key);
         const duration = Date.now() - startTime;
         
-        if (REDIS_DEBUG) {
+        if (REDIS_DEBUG && this.config.DENO_ENV === "production") {
           console.log(`[REDIS GET] Key: ${key.substring(0, 10)}... - ${data ? 'HIT' : 'MISS'} (${duration}ms)`);
         }
         

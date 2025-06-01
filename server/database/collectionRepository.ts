@@ -8,9 +8,10 @@ export class CollectionRepository {
       page?: number;
       creator?: string;
       sortBy?: string;
+      minStampCount?: number;
     },
   ) {
-    const { limit = SMALL_LIMIT, page = 1, creator, sortBy = "DESC" } = options;
+    const { limit = SMALL_LIMIT, page = 1, creator, sortBy = "DESC", minStampCount } = options;
     const offset = (page - 1) * limit;
 
     let query = `
@@ -43,6 +44,15 @@ export class CollectionRepository {
 
     query += `
       GROUP BY c.collection_id, c.collection_name, c.collection_description
+    `;
+
+    // Add HAVING clause for minimum stamp count filter
+    if (minStampCount !== undefined && minStampCount > 0) {
+      query += ` HAVING COUNT(DISTINCT cs.stamp) >= ?`;
+      queryParams.push(minStampCount);
+    }
+
+    query += `
       ORDER BY c.collection_name ${sortBy}
       LIMIT ? OFFSET ?
     `;
@@ -67,15 +77,40 @@ export class CollectionRepository {
 
   static async getTotalCollectionsByCreatorFromDb(
     creator?: string,
+    minStampCount?: number,
   ) {
-    let query =
-      `SELECT COUNT(DISTINCT c.collection_id) as total FROM collections c`;
+    let query: string;
     const queryParams: any[] = [];
 
-    if (creator) {
-      query +=
-        ` JOIN collection_creators cc ON c.collection_id = cc.collection_id WHERE cc.creator_address = ?`;
-      queryParams.push(creator);
+    if (minStampCount !== undefined && minStampCount > 0) {
+      // Use subquery to count collections with minimum stamp count
+      query = `
+        SELECT COUNT(*) as total FROM (
+          SELECT c.collection_id
+          FROM collections c
+          LEFT JOIN collection_creators cc ON c.collection_id = cc.collection_id
+          LEFT JOIN collection_stamps cs ON c.collection_id = cs.collection_id
+      `;
+
+      if (creator) {
+        query += ` WHERE cc.creator_address = ?`;
+        queryParams.push(creator);
+      }
+
+      query += `
+          GROUP BY c.collection_id
+          HAVING COUNT(DISTINCT cs.stamp) >= ?
+        ) as filtered_collections
+      `;
+      queryParams.push(minStampCount);
+    } else {
+      // Original query for all collections
+      query = `SELECT COUNT(DISTINCT c.collection_id) as total FROM collections c`;
+
+      if (creator) {
+        query += ` JOIN collection_creators cc ON c.collection_id = cc.collection_id WHERE cc.creator_address = ?`;
+        queryParams.push(creator);
+      }
     }
 
     const result = await dbManager.executeQueryWithCache(

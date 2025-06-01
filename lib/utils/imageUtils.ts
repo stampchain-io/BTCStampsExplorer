@@ -64,9 +64,26 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
     return NOT_AVAILABLE_IMAGE;
   }
 
-  if (stamp.stamp_url.includes("json")) {
-    const res = await fetch(stamp.stamp_url);
+  // SRC-20 stamps have JSON metadata but also have SVG images
+  // The SVG is at /stamps/txhash.svg (managed by Cloudflare CDN)
+  if (stamp.ident === "SRC-20" && stamp.stamp_url.includes("json")) {
+    // Extract the transaction hash from the JSON URL and construct SVG URL
+    const urlParts = stamp.stamp_url.split("/stamps/");
+    if (urlParts.length > 1) {
+      const filename = urlParts[1].replace(".json", ".svg");
+      return `/stamps/${filename}`;
+    }
+    return NOT_AVAILABLE_IMAGE;
+  }
+
+  // SRC-101 stamps may contain image URLs in their JSON metadata
+  if (stamp.stamp_url.includes("json") && stamp.ident === "SRC-101") {
     try {
+      const res = await fetch(stamp.stamp_url);
+      if (!res.ok) {
+        return NOT_AVAILABLE_IMAGE;
+      }
+
       const jsonData = await res.json();
       if (
         jsonData && jsonData.img && Array.isArray(jsonData.img) &&
@@ -75,14 +92,15 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
         return jsonData.img[0];
       }
       return NOT_AVAILABLE_IMAGE;
-    } catch (error) {
-      console.error(
-        "Failed to parse JSON from stamp_url or access img property:",
-        stamp.stamp_url,
-        error,
-      );
+    } catch (_error) {
+      // Silently handle JSON parsing errors - just return placeholder
+      // This prevents console spam for malformed JSON
       return NOT_AVAILABLE_IMAGE;
     }
+  } else if (stamp.stamp_url.includes("json")) {
+    // For other JSON stamps (pure data, etc.), just show placeholder
+    // These are data stamps, not image stamps
+    return NOT_AVAILABLE_IMAGE;
   } else {
     // Extract filename from full URL if present
     const urlParts = stamp.stamp_url.split("/stamps/");

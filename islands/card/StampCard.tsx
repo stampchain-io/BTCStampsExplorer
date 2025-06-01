@@ -5,11 +5,7 @@ import {
   formatSupplyValue,
   stripTrailingZeros,
 } from "$lib/utils/formatUtils.ts";
-import {
-  getStampImageSrc,
-  handleImageError,
-  validateStampContent,
-} from "$lib/utils/imageUtils.ts";
+import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
 
 import { StampRow } from "$globals";
 import { StampTextContent } from "$content";
@@ -17,7 +13,6 @@ import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { useEffect, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-import { logger } from "$lib/utils/logger.ts";
 import { ABBREVIATION_LENGTHS, TEXT_STYLES } from "$card";
 
 /* ===== TYPES ===== */
@@ -84,28 +79,78 @@ export function StampCard({
   // Validate SVG content when source changes
   useEffect(() => {
     const validateContent = async () => {
-      if (stamp.stamp_mimetype === "image/svg+xml") {
-        const { isValid, error } = await validateStampContent(src);
-        if (isValid) {
-          setValidatedContent(
-            <div class="stamp-container">
-              <div class="relative z-10 aspect-square">
-                <img
-                  src={src}
-                  loading="lazy"
-                  alt={`Stamp No. ${stamp.stamp}`}
-                  class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-                  onError={handleImageError}
-                />
-              </div>
-            </div>,
-          );
-        } else {
-          logger.debug("stamps", {
-            message: "SVG validation failed",
-            error,
-            stamp: stamp.stamp,
-          });
+      if (stamp.stamp_mimetype === "image/svg+xml" && src) {
+        try {
+          // Fetch the SVG content
+          const response = await fetch(src);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch SVG: ${response.status}`);
+          }
+
+          const svgContent = await response.text();
+
+          // Check if SVG has external ordinals.com references
+          if (svgContent.includes("ordinals.com/content/")) {
+            // Rewrite external references to use our proxy
+            let rewrittenSVG = svgContent.replace(
+              /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
+              "/api/proxy/ordinals/$1",
+            );
+
+            // Ensure SVG fills container by removing fixed dimensions and adding proper styling
+            if (rewrittenSVG.includes("<svg")) {
+              // Remove width and height attributes
+              rewrittenSVG = rewrittenSVG.replace(
+                /<svg([^>]*)\s+width="([^"]*)"([^>]*)/,
+                "<svg$1$3",
+              ).replace(
+                /<svg([^>]*)\s+height="([^"]*)"([^>]*)/,
+                "<svg$1$3",
+              );
+
+              // Add viewBox if not present (using the original dimensions)
+              if (!rewrittenSVG.includes("viewBox")) {
+                rewrittenSVG = rewrittenSVG.replace(
+                  /<svg([^>]*)>/,
+                  '<svg$1 viewBox="0 0 460 500">',
+                );
+              }
+
+              // Add responsive styling to fill container properly
+              rewrittenSVG = rewrittenSVG.replace(
+                /<svg([^>]*)>/,
+                '<svg$1 style="max-width: 100%; max-height: 100%; width: auto; height: auto; display: block;">',
+              );
+            }
+
+            setValidatedContent(
+              <div class="stamp-container">
+                <div class="relative z-10 aspect-square flex items-center justify-center">
+                  <div
+                    class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                    dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
+                  />
+                </div>
+              </div>,
+            );
+          } else {
+            // No external references, use original src
+            setValidatedContent(
+              <div class="stamp-container">
+                <div class="relative z-10 aspect-square">
+                  <img
+                    src={src}
+                    loading="lazy"
+                    alt={`Stamp No. ${stamp.stamp}`}
+                    class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                    onError={handleImageError}
+                  />
+                </div>
+              </div>,
+            );
+          }
+        } catch (error) {
+          // Fallback to NOT_AVAILABLE_IMAGE
           setValidatedContent(
             <div class="stamp-container">
               <div class="relative z-10 aspect-square">

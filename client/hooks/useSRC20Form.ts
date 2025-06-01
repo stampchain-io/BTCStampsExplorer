@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import axiod from "axiod";
 import { useConfig } from "$client/hooks/useConfig.ts";
-import { useFeePolling } from "$client/hooks/useFeePolling.ts";
+import { useFees } from "$fees";
 // import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts"; // No longer used directly
 import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
@@ -222,7 +222,7 @@ export function useSRC20Form(
   });
 
   const { config } = useConfig<Config>();
-  const { fees, loading: feesLoading, fetchFees } = useFeePolling(300000);
+  const { fees, loading: feesLoading, fetchFees } = useFees();
   const [apiError, setApiError] = useState<string>("");
 
   const [formState, setFormState] = useState<SRC20FormState>({

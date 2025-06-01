@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { useFeePolling } from "$client/hooks/useFeePolling.ts";
+import { useFees } from "$fees";
 import { logger } from "$lib/utils/logger.ts";
 import {
   formatSatoshisToBTC,
@@ -98,7 +98,7 @@ export function FeeCalculatorBase({
   },
   dec,
 }: ExtendedBaseFeeCalculatorProps) {
-  const { fees } = useFeePolling();
+  const { fees } = useFees();
   const [visible, setVisible] = useState(false);
   const [coinType, setCoinType] = useState("BTC");
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
