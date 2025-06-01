@@ -43,7 +43,7 @@ export class StampController {
     limit = BIG_LIMIT,
     sortBy = "ASC",
     type = "all",
-    filterBy = [],
+    filterBy = [] as STAMP_FILTER_TYPES[],
     ident,
     collectionId,
     identifier,
@@ -61,6 +61,8 @@ export class StampController {
     cacheType = RouteType.STAMP_LIST,
     enrichWithAssetInfo = false,
     isSearchQuery = false,
+    skipDispenserLookup = false,
+    skipPriceCalculation = false,
     url,
   } = {}) {
     try {
@@ -133,28 +135,31 @@ export class StampController {
       });
 
       // Process stamps with floor prices and asset info if needed
-      const btcPrice = await fetchBTCPriceInUSD(url?.origin);
+      const btcPrice = skipPriceCalculation ? 0 : await fetchBTCPriceInUSD(url?.origin);
       const processedStamps = await Promise.all(
         stampResult.stamps.map(async (stamp) => {
           if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
             return stamp;
           }
           
-          // Get all dispensers to check both open and closed
-          const allDispensers = await DispenserManager.getDispensersByCpid(stamp.cpid);
-          const openDispensers = allDispensers.dispensers.filter(d => d.give_remaining > 0);
-          const closedDispensers = allDispensers.dispensers.filter(d => d.give_remaining === 0);
-          
           let floorPrice: number | "priceless" = "priceless";
           
-          if (openDispensers.length > 0) {
-            // Use floor price from open dispensers
-            floorPrice = this.calculateFloorPrice(openDispensers);
-          } else if (closedDispensers.length > 0) {
-            // If no open dispensers, use most recent closed dispenser price
-            const sortedClosedDispensers = closedDispensers.sort((a, b) => b.block_index - a.block_index);
-            const recentPrice = Number(formatSatoshisToBTC(sortedClosedDispensers[0].satoshirate, { includeSymbol: false }));
-            floorPrice = recentPrice || "priceless";
+          // Skip expensive dispenser lookups if requested (for collection pages)
+          if (!skipDispenserLookup) {
+            // Get all dispensers to check both open and closed
+            const allDispensers = await DispenserManager.getDispensersByCpid(stamp.cpid);
+            const openDispensers = allDispensers.dispensers.filter(d => d.give_remaining > 0);
+            const closedDispensers = allDispensers.dispensers.filter(d => d.give_remaining === 0);
+            
+            if (openDispensers.length > 0) {
+              // Use floor price from open dispensers
+              floorPrice = this.calculateFloorPrice(openDispensers);
+            } else if (closedDispensers.length > 0) {
+              // If no open dispensers, use most recent closed dispenser price
+              const sortedClosedDispensers = closedDispensers.sort((a, b) => b.block_index - a.block_index);
+              const recentPrice = Number(formatSatoshisToBTC(sortedClosedDispensers[0].satoshirate, { includeSymbol: false }));
+              floorPrice = recentPrice || "priceless";
+            }
           }
 
           // If enrichment is requested and it's a single stamp query
@@ -164,16 +169,16 @@ export class StampController {
             return {
               ...enrichedStamp,
               floorPrice,
-              floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPrice : null,
-              marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null,
+              floorPriceUSD: skipPriceCalculation ? null : (typeof floorPrice === 'number' ? floorPrice * btcPrice : null),
+              marketCapUSD: skipPriceCalculation ? null : (typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null),
             };
           }
           
           return {
             ...stamp,
             floorPrice,
-            floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPrice : null,
-            marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null,
+            floorPriceUSD: skipPriceCalculation ? null : (typeof floorPrice === 'number' ? floorPrice * btcPrice : null),
+            marketCapUSD: skipPriceCalculation ? null : (typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null),
           };
         })
       );
@@ -492,6 +497,8 @@ export class StampController {
           page: 1,
           limit: 24,
           sortBy: sortBy,
+          skipDispenserLookup: true, // Skip expensive dispenser API calls for collection overview
+          skipPriceCalculation: true, // Skip BTC price fetching for collection overview
         });
         stamps_posh = poshStampsResult.data;
       } else {
