@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { ComponentChildren, JSX } from "preact";
-import {
-  checkboxIcon,
-  formatNumber,
-  handleIcon,
-  labelGreySemiboldSmLogic,
-} from "$islands/filter/FilterStyles.ts";
+import { formatNumberWithCommas } from "$lib/utils/formatUtils.ts";
+import { handleIcon } from "$components/icon/styles.ts";
+import { labelLogicResponsive } from "$text";
+import { inputCheckbox } from "$form";
 
 // Chevron icon component - with three size variants
 export const ChevronIcon = (size: "sm" | "md" | "lg") => {
@@ -209,7 +207,7 @@ export const CollapsibleSection = ({
 
             <span
               className={`${
-                labelGreySemiboldSmLogic(expanded, canHoverSelected)
+                labelLogicResponsive(expanded, canHoverSelected)
               } font-light`}
             >
               {title}
@@ -337,7 +335,7 @@ export const RangeSlider = ({
       tickMarkPositions: ["left-0", "left-[33%]", "left-[66%]", "right-0"],
       formatValue: (value: number) => {
         if (value === Infinity) return "NO LIMIT";
-        return formatNumber(value);
+        return formatNumberWithCommas(value);
       },
     },
     // Price configuration
@@ -382,7 +380,7 @@ export const RangeSlider = ({
       ],
       formatValue: (value: number) => {
         if (value === Infinity) return "NO LIMIT";
-        return formatNumber(value);
+        return formatNumberWithCommas(value);
       },
     },
   };
@@ -802,12 +800,12 @@ export const Checkbox = ({
         onClick={handleChange}
       >
         <input
-          className={checkboxIcon(checked, canHoverSelected)}
+          className={inputCheckbox(checked, canHoverSelected)}
           type="checkbox"
           checked={checked}
           readOnly
         />
-        <label className={labelGreySemiboldSmLogic(checked, canHoverSelected)}>
+        <label className={labelLogicResponsive(checked, canHoverSelected)}>
           {label}
         </label>
       </div>
@@ -851,14 +849,14 @@ export const Radiobutton = (
       onClick={handleChange}
     >
       <input
-        className={checkboxIcon(checked, canHoverSelected)}
+        className={inputCheckbox(checked, canHoverSelected)}
         type="radio"
         name={name}
         value={value}
         checked={checked}
         readOnly
       />
-      <label className={labelGreySemiboldSmLogic(checked, canHoverSelected)}>
+      <label className={labelLogicResponsive(checked, canHoverSelected)}>
         {label}
       </label>
     </div>

@@ -172,7 +172,6 @@ import * as $filter_FilterContentStamp from "./islands/filter/FilterContentStamp
 import * as $filter_FilterDrawer from "./islands/filter/FilterDrawer.tsx";
 import * as $filter_FilterOptionsSRC20 from "./islands/filter/FilterOptionsSRC20.tsx";
 import * as $filter_FilterOptionsStamp from "./islands/filter/FilterOptionsStamp.tsx";
-import * as $filter_FilterStyles from "./islands/filter/FilterStyles.ts";
 import * as $form_InputField from "./islands/form/InputField.tsx";
 import * as $form_SRC20InputField from "./islands/form/SRC20InputField.tsx";
 import * as $form_SelectDate from "./islands/form/SelectDate.tsx";
@@ -468,7 +467,6 @@ const manifest = {
     "./islands/filter/FilterDrawer.tsx": $filter_FilterDrawer,
     "./islands/filter/FilterOptionsSRC20.tsx": $filter_FilterOptionsSRC20,
     "./islands/filter/FilterOptionsStamp.tsx": $filter_FilterOptionsStamp,
-    "./islands/filter/FilterStyles.ts": $filter_FilterStyles,
     "./islands/form/InputField.tsx": $form_InputField,
     "./islands/form/SRC20InputField.tsx": $form_SRC20InputField,
     "./islands/form/SelectDate.tsx": $form_SelectDate,

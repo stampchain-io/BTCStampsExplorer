@@ -115,37 +115,3 @@ export const handleIcon = `
   [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
 `;
-
-/* ===== CHECKBOX ===== */
-export const checkboxIcon = (
-  checked: boolean,
-  canHoverSelected: boolean,
-): string => `
-  appearance-none
-  relative
-  size-4 tablet:size-3.5
-  rounded-full
-  border-2
-  cursor-pointer
-  transition-colors duration-300
-  ${
-  checked
-    ? canHoverSelected
-      ? "border-stamp-grey-light after:bg-stamp-grey-light group-hover:border-stamp-grey group-hover:after:bg-stamp-grey"
-      : "border-stamp-grey-light after:bg-stamp-grey-light"
-    : canHoverSelected
-    ? "border-stamp-grey group-hover:border-stamp-grey-light"
-    : "border-stamp-grey"
-}
-  after:content-['']
-  after:block
-  after:size-2 tablet:after:size-1.5
-  after:rounded-full
-  after:absolute
-  after:top-1/2 after:left-1/2
-  after:-translate-x-1/2 after:-translate-y-1/2
-  after:scale-0
-  checked:after:scale-100
-  after:transition-all
-  after:duration-100
-`;

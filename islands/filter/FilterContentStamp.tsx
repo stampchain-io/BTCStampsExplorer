@@ -5,11 +5,8 @@ import {
   STAMP_MARKET,
   STAMP_RANGES,
 } from "$globals";
-import {
-  checkboxIcon,
-  labelGreyLightXs,
-  labelGreySemiboldSmLogic,
-} from "$islands/filter/FilterStyles.ts";
+import { inputCheckbox } from "$form";
+import { labelLogicResponsive, labelXsR } from "$text";
 import {
   Checkbox,
   CollapsibleSection,
@@ -322,14 +319,14 @@ const Radio = ({ label, value, checked, onChange, name }: RadioProps) => {
       onClick={handleChange}
     >
       <input
-        className={checkboxIcon(checked, canHover)}
+        className={inputCheckbox(checked, canHover)}
         type="radio"
         name={name}
         value={value}
         checked={checked}
         readOnly
       />
-      <label className={labelGreySemiboldSmLogic(checked, canHover)}>
+      <label className={labelLogicResponsive(checked, canHover)}>
         {label}
       </label>
     </div>
@@ -634,6 +631,8 @@ export const FilterContentStamp = ({
           checked={filters.market.includes("sales")}
           onChange={() => toggleMarket("sales")}
         />
+        {
+          /*
         <Radio
           label="UTXO BOUND"
           value="atomic"
@@ -641,8 +640,6 @@ export const FilterContentStamp = ({
           checked={filters.market.includes("psbt")}
           onChange={() => toggleMarket("psbt")}
         />
-        {
-          /*
           <Radio
             label="DISPENSERS"
             value="dispensers"
@@ -683,7 +680,9 @@ export const FilterContentStamp = ({
         variant="collapsibleTitle"
       >
         {/* Category: PIXEL */}
-        <div className={labelGreyLightXs}>
+        <div
+          className={`${labelXsR} flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`}
+        >
           PIXELS
         </div>
         <Checkbox
@@ -726,7 +725,9 @@ export const FilterContentStamp = ({
         />
 
         {/* Category: VECTOR */}
-        <div className={labelGreyLightXs}>
+        <div
+          className={`${labelXsR} flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`}
+        >
           VECTOR
         </div>
         <Checkbox
@@ -751,7 +752,9 @@ export const FilterContentStamp = ({
         }
 
         {/* Category: AUDIO */}
-        <div className={labelGreyLightXs}>
+        <div
+          className={`${labelXsR} flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`}
+        >
           AUDIO
         </div>
         <Checkbox
@@ -763,7 +766,7 @@ export const FilterContentStamp = ({
         />
 
         {/* Category: ENCODING */}
-        <div className={labelGreyLightXs}>
+        <div className={labelXsR}>
           ENCODING
         </div>
         <Checkbox

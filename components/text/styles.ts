@@ -85,8 +85,27 @@ export const labelSm = `${labelFont} text-sm ${cursor}`;
 export const label = `${labelFont} text-base ${cursor}`; // = old dataLabel name
 export const labelLg = `${labelFont} text-lg ${cursor}`;
 export const labelXl = `${labelFont} text-xl ${cursor}`;
+export const labelXsR = `${labelFont} text-xs tablet:text-[10px] ${cursor}`;
 export const labelSmPurple =
   `font-light text-sm text-stamp-purple-bright tracking-wide mb-0.5 ${cursor}`;
+export const labelLogicResponsive = (
+  checked: boolean,
+  canHoverSelected: boolean,
+): string => `
+  inline-block ml-3 tablet:ml-[9px]
+  font-semibold text-base tablet:text-xs
+  transition-colors duration-300
+  cursor-pointer select-none
+  ${
+  checked
+    ? canHoverSelected
+      ? "text-stamp-grey-light group-hover:text-stamp-grey"
+      : "text-stamp-grey-light"
+    : canHoverSelected
+    ? "text-stamp-grey group-hover:text-stamp-grey-light"
+    : "text-stamp-grey"
+}
+`;
 
 /* ===== VALUE STYLES ===== */
 // Grey variants
@@ -197,7 +216,9 @@ export type TextStyles = {
   label: string;
   labelLg: string;
   labelXl: string;
+  labelXsR: string;
   labelSmPurple: string;
+  labelLogicResponsive: string;
   // Value styles
   valueXs: string;
   valueSm: string;
