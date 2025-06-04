@@ -308,7 +308,7 @@ const FilterDrawer = (
     >
       {/* Scrollable content area */}
       <div className="h-[calc(100vh-92px)] tablet:h-[calc(100vh-88px)] overflow-y-auto scrollbar-black">
-        <div className="w-full pt-[30px] px-9 tablet:px-6">
+        <div className="w-full pt-[25px] mobileLg:pt-[37px] tablet:pt-[38px] px-9 tablet:px-6">
           <div className="relative w-full">
             <div
               className={`${tooltipIcon} ${
@@ -346,7 +346,7 @@ const FilterDrawer = (
                 onMouseLeave={handleCloseMouseLeave}
                 aria-label="Close menu"
               />
-              <h6 className="font-normal text-lg gray-gradient1 mt-[-1px] select-none">
+              <h6 className="font-normal text-lg gray-gradient1 mt-[2px] select-none">
                 FILTERS
               </h6>
             </div>
