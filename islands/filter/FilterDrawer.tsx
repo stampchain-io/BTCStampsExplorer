@@ -307,7 +307,7 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}
-      <div className="h-[calc(100vh-92px)] tablet:h-[calc(100vh-88px)] overflow-y-auto scrollbar-black">
+      <div className="h-[calc(100vh-110px)] tablet:h-[calc(100vh-82px)] overflow-y-auto scrollbar-black">
         <div className="w-full pt-[25px] mobileLg:pt-[37px] tablet:pt-[38px] px-9 tablet:px-6">
           <div className="relative w-full">
             <div
@@ -375,17 +375,16 @@ const FilterDrawer = (
         </div>
       </div>
       {/* Sticky buttons */}
-      <div className="flex justify-between w-full sticky bottom-0 py-6 px-9 tablet:px-6 gap-6
+      <div className="flex justify-between w-full sticky bottom-0 py-9 tablet:py-6 px-9 tablet:px-6 gap-6
        bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
         shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
         <Button
           variant="outline"
           color="grey"
-          size="sm"
+          size="mdR"
           onClick={() => {
-            isClearingRef.current = true; // Set the flag before clearing
+            isClearingRef.current = true;
             setCurrentFilters(emptyFilters);
-            // Reset the flag after a short delay
             setTimeout(() => {
               isClearingRef.current = false;
             }, 100);
@@ -397,7 +396,7 @@ const FilterDrawer = (
         <Button
           variant="flat"
           color="grey"
-          size="sm"
+          size="mdR"
           onClick={handleApplyFilters}
           class="w-full"
         >
