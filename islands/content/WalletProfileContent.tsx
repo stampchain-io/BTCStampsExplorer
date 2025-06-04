@@ -18,10 +18,8 @@ import { label } from "$text";
 const ItemHeader = ({
   title = "STAMP",
   sortBy = "ASC" as const,
-  isOpen = false,
   isOpenSetting = false,
   handleOpenSetting = () => {},
-  handleOpen = () => {},
   isOpenFilter = false,
   handleOpenFilter = () => {},
   sort = true,
@@ -32,7 +30,6 @@ const ItemHeader = ({
 }: {
   title: string;
   sortBy: "ASC" | "DESC";
-  isOpen: boolean;
   sort: boolean;
   filter: boolean;
   setting: boolean;
@@ -40,7 +37,6 @@ const ItemHeader = ({
   isOpenSetting: boolean;
   handleOpenSetting: (open: boolean) => void;
   handleOpenFilter: (open: boolean) => void;
-  handleOpen: (type: string) => void;
   setOpenSettingModal?: (open: boolean) => void;
   onChangeSort?: (newSortBy: "ASC" | "DESC") => void;
 }) => {
@@ -414,9 +410,6 @@ export default function WalletProfileContent({
   );
 
   /* ===== TOGGLE STATES ===== */
-  const [openS, setOpenS] = useState<boolean>(false);
-  const [openT, setOpenT] = useState<boolean>(false);
-  const [openD, setOpenD] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openSetting, setOpenSetting] = useState<boolean>(false);
 
@@ -459,10 +452,6 @@ export default function WalletProfileContent({
 
   const handleOpenFilter = () => {
     setOpenFilter(!openFilter);
-  };
-
-  const handleOpen = (type: string) => {
-    // This function is kept for compatibility but no longer needs to handle search toggles
   };
 
   /* ===== SORT HANDLERS ===== */
@@ -539,12 +528,9 @@ export default function WalletProfileContent({
       <div class="mt-3 mobileLg:mt-6" id="stamps-section">
         <ItemHeader
           title="STAMPS"
-          sort
+          sort={true}
           sortBy={sortStamps}
           onChangeSort={handleChangeSort}
-          isOpen={false}
-          handleOpen={handleOpen}
-          search
           filter={false}
           setting={false}
           isOpenFilter={false}
@@ -568,12 +554,9 @@ export default function WalletProfileContent({
       <div class="mt-6 mobileLg:mt-12" id="src20-section">
         <ItemHeader
           title="TOKENS"
-          sort
+          sort={true}
           sortBy={sortTokens}
           onChangeSort={handleTokenSort}
-          isOpen={false}
-          handleOpen={handleOpen}
-          search
           filter={false}
           setting={false}
           isOpenFilter={false}
@@ -616,11 +599,9 @@ export default function WalletProfileContent({
         <div class="mt-3 mobileLg:mt-6" id="listings-section">
           <ItemHeader
             title="LISTINGS"
-            sort
+            sort={true}
             sortBy={sortDispensers}
             onChangeSort={handleDispenserSort}
-            isOpen={false}
-            handleOpen={handleOpen}
             filter={false}
             setting={false}
             isOpenFilter={openFilter}

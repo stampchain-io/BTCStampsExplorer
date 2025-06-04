@@ -102,12 +102,14 @@ export const CollapsibleSection = ({
   toggle,
   children,
   variant,
+  section: _section,
 }: {
   title: string;
   expanded: boolean;
   toggle: () => void;
   children: ComponentChildren;
   variant: "collapsibleTitle" | "collapsibleSubTitle" | "collapsibleLabel";
+  section?: string;
 }): JSX.Element => {
   const [canHoverSelected, setCanHoverSelected] = useState(true);
 

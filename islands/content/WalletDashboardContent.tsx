@@ -17,10 +17,8 @@ import { StampRow } from "$globals";
 const ItemHeader = ({
   title = "STAMP",
   sortBy = "ASC" as const,
-  isOpen = false,
   isOpenSetting = false,
   handleOpenSetting = () => {},
-  handleOpen = () => {},
   isOpenFilter = false,
   handleOpenFilter = () => {},
   sort = true,
@@ -31,15 +29,13 @@ const ItemHeader = ({
 }: {
   title: string;
   sortBy: "ASC" | "DESC";
-  isOpen: boolean;
+  isOpenSetting: boolean;
+  handleOpenSetting: (open: boolean) => void;
+  isOpenFilter: boolean;
+  handleOpenFilter: (open: boolean) => void;
   sort: boolean;
   filter: boolean;
   setting: boolean;
-  isOpenFilter: boolean;
-  isOpenSetting: boolean;
-  handleOpenSetting: (open: boolean) => void;
-  handleOpenFilter: (open: boolean) => void;
-  handleOpen: (type: string) => void;
   setOpenSettingModal?: (open: boolean) => void;
   onChangeSort?: (newSortBy: "ASC" | "DESC") => void;
 }) => {
@@ -403,7 +399,6 @@ const WalletDashboardContent = ({
   dispensersSortBy = "DESC",
 }: WalletContentProps) => {
   /* ===== STATE ===== */
-  const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
   const [sortStamps, setSortStamps] = useState<"ASC" | "DESC">(stampsSortBy);
   const [sortTokens, setSortTokens] = useState<"ASC" | "DESC">(src20SortBy);
   const [sortDispensers, setSortDispensers] = useState<"ASC" | "DESC">(
@@ -411,9 +406,6 @@ const WalletDashboardContent = ({
   );
 
   /* ===== TOGGLE STATES ===== */
-  const [openS, setOpenS] = useState<boolean>(false);
-  const [openT, setOpenT] = useState<boolean>(false);
-  const [openD, setOpenD] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openSetting, setOpenSetting] = useState<boolean>(false);
 
@@ -445,29 +437,17 @@ const WalletDashboardContent = ({
     const url = new URL(currentUrl);
     const filterByValue = url.searchParams.get("filterBy") || "";
     if (filterByValue === "Transfer") {
-      setOpenSettingModal(true);
+      setOpenSetting(true);
     }
   }, []);
 
   /* ===== EVENT HANDLERS ===== */
-  const handleOpenSettingModal = () => {
-    setOpenSettingModal(!openSettingModal);
-  };
-
   const handleOpenSetting = () => {
     setOpenSetting(!openSetting);
   };
 
-  const handleCloseSettingModal = () => {
-    setOpenSettingModal(false);
-  };
-
   const handleOpenFilter = () => {
     setOpenFilter(!openFilter);
-  };
-
-  const handleOpen = (type: string) => {
-    // This function is kept for compatibility but no longer needs to handle search toggles
   };
 
   /* ===== SORT HANDLERS ===== */
@@ -544,19 +524,18 @@ const WalletDashboardContent = ({
       <div class="mt-6 mobileLg:mt-12 desktop:mt-24" id="stamps-section">
         <ItemHeader
           title="STAMPS"
-          sort
+          sort={true}
           sortBy={sortStamps}
           onChangeSort={handleChangeSort}
-          isOpen={false}
-          handleOpen={handleOpen}
-          search
           filter={false}
-          setting
+          setting={openSetting}
           isOpenFilter={false}
           isOpenSetting={openSetting}
           handleOpenFilter={() => {}}
           handleOpenSetting={handleOpenSetting}
-          setOpenSettingModal={setOpenSettingModal}
+          setOpenSettingModal={(open) => {
+            setOpenSetting(open);
+          }}
         />
         <div class="mt-3 mobileLg:mt-6">
           {stamps.data?.length
@@ -569,12 +548,9 @@ const WalletDashboardContent = ({
       <div class="mt-12 mobileLg:mt-24 desktop:mt-36" id="src20-section">
         <ItemHeader
           title="TOKENS"
-          sort
+          sort={true}
           sortBy={sortTokens}
           onChangeSort={handleTokenSort}
-          isOpen={false}
-          handleOpen={handleOpen}
-          search
           filter={false}
           setting={false}
           isOpenFilter={false}
@@ -586,7 +562,7 @@ const WalletDashboardContent = ({
           {src20.data?.length
             ? (
               <SRC20Gallery
-                type="all"
+                viewType="minted"
                 fromPage="wallet"
                 initialData={src20.data}
                 pagination={{
@@ -601,7 +577,7 @@ const WalletDashboardContent = ({
                   },
                 }}
                 address={address}
-                sortBy={sortTokens}
+                timeframe="24H"
               />
             )
             : <p class="text-gray-500">NO AVAILABLE TOKEN</p>}
@@ -613,11 +589,9 @@ const WalletDashboardContent = ({
         <div class="mt-48">
           <ItemHeader
             title="LISTINGS"
-            sort
+            sort={true}
             sortBy={sortDispensers}
             onChangeSort={handleDispenserSort}
-            isOpen={false}
-            handleOpen={handleOpen}
             filter={false}
             setting={false}
             isOpenFilter={openFilter}
@@ -645,7 +619,9 @@ const WalletDashboardContent = ({
       )}
 
       {/* Modal for sending stamps */}
-      {openSettingModal && (
+      {
+        /*
+        openSettingModal && (
         <WalletSendStampModal
           stamps={stamps}
           fee={0}
@@ -653,7 +629,8 @@ const WalletDashboardContent = ({
           toggleModal={handleOpenSettingModal}
           handleCloseModal={handleCloseSettingModal}
         />
-      )}
+      )}*/
+      }
     </>
   );
 };

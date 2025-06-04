@@ -53,7 +53,7 @@ const FilterDrawer = (
         filters = src20QueryParamsToFilters(searchString);
         break;
       }
-      case "src101": {
+      case "explorer": {
         filters = src20QueryParamsToFilters(searchString); // Temporary fallback
         break;
       }
@@ -70,27 +70,11 @@ const FilterDrawer = (
     switch (type) {
       case "src20":
         return { ...src20DefaultFilters };
-      case "src101":
+      case "explorer":
         // For future implementation
         return { ...src20DefaultFilters }; // Temporary fallback
       default:
         return { ...stampDefaultFilters };
-    }
-  };
-
-  // Get the appropriate filters to query params function based on type
-  const getFiltersToQueryParams = (
-    search: string,
-    filters: AllFilters,
-  ): string => {
-    switch (type) {
-      case "src20":
-        return src20FiltersToQueryParams(search, filters as SRC20Filters);
-      case "src101":
-        // For future implementation
-        return src20FiltersToQueryParams(search, filters as SRC20Filters); // Temporary fallback
-      default:
-        return stampFiltersToQueryParams(search, filters as StampFilters);
     }
   };
 
@@ -186,7 +170,7 @@ const FilterDrawer = (
       document.removeEventListener("keydown", handleCloseEvents);
       document.removeEventListener("mousedown", handleCloseEvents);
     };
-  }, [open, currentFilters]);
+  }, [open]); // Remove currentFilters from dependencies
 
   // Add tooltip state for close button
   const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
@@ -217,48 +201,31 @@ const FilterDrawer = (
   // Get the appropriate drawer ID based on type
   const drawerId = `drawer-form-${type}`;
 
-  // Modify the open/close handlers
-  const handleCloseDrawerUpdate = () => {
-    const queryString = getFiltersToQueryParams(
-      globalThis.location.search,
-      currentFilters,
-    );
-
-    try {
-      globalThis.location.href = globalThis.location.pathname + "?" +
-        queryString;
-      setOpen(false);
-    } catch (error) {
-      console.error("Error navigating to new URL:", error);
-    }
-  };
-
   // Close the drawer with no updates
   const handleCloseDrawer = () => {
     setOpen(false);
   };
 
   const handleApplyFilters = () => {
-    // Convert filters to query params string
-    const existingParams = new URLSearchParams(window.location.search);
+    const existingParams = new URLSearchParams(globalThis.location.search);
     const baseParams = existingParams.get("type")
       ? `type=${existingParams.get("type")}`
       : "";
 
-    // Create query string from current filters
-    let queryParams;
+    let queryParams: string;
     if (type === "stamp") {
-      // Convert stamp filters to query params
       queryParams = stampFiltersToQueryParams(
         baseParams,
         currentFilters as StampFilters,
       );
     } else if (type === "src20") {
-      // Convert src20 filters to query params
       queryParams = src20FiltersToQueryParams(
         baseParams,
         currentFilters as SRC20Filters,
       );
+    } else {
+      // Handle explorer case or throw error - @baba - add explorer filter
+      throw new Error(`Unsupported filter type: ${type}`);
     }
 
     // Construct the new URL with the query params

@@ -1,7 +1,7 @@
 import { BadgeIcon, Icon } from "$components/icon/IconBase.tsx";
 
 // Define the filter types
-export type FilterType = "stamp" | "src20" | "src101";
+export type FilterType = "stamp" | "src20" | "explorer";
 
 export function FilterButton(
   { count, open, setOpen, type = "stamp" }: {

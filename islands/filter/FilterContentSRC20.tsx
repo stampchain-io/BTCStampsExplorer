@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { SRC20_FILTER_TYPES } from "$globals";
+import { _SRC20_FILTER_TYPES } from "$globals";
 import { SRC20Filters } from "$islands/filter/FilterOptionsSRC20.tsx";
 import {
   CollapsibleSection,
@@ -28,6 +28,16 @@ function hasActiveFilters(section: string, filters: SRC20Filters) {
   }
 }
 
+type SectionKey =
+  | "status"
+  | "market"
+  | "details"
+  | "holdersRange"
+  | "volumePeriod"
+  | "priceChangePeriod";
+
+type PeriodType = "24h" | "3d" | "7d";
+
 export const FilterContentSRC20 = ({
   initialFilters,
   onFiltersChange,
@@ -37,10 +47,10 @@ export const FilterContentSRC20 = ({
 }) => {
   console.log("FilterContentSRC20 - initialFilters:", initialFilters);
   const [filters, setFilters] = useState(initialFilters);
-  const [volumePeriod, setVolumePeriod] = useState(
+  const [volumePeriod, setVolumePeriod] = useState<PeriodType>(
     initialFilters.market.volumePeriod || "24h",
   );
-  const [priceChangePeriod, setPriceChangePeriod] = useState(
+  const [priceChangePeriod, setPriceChangePeriod] = useState<PeriodType>(
     initialFilters.market.priceChangePeriod || "24h",
   );
 
@@ -53,11 +63,13 @@ export const FilterContentSRC20 = ({
   // Add this effect to update the period states when initialFilters changes
   useEffect(() => {
     if (initialFilters.market.volumePeriod) {
-      setVolumePeriod(initialFilters.market.volumePeriod);
+      setVolumePeriod(initialFilters.market.volumePeriod as PeriodType);
     }
 
     if (initialFilters.market.priceChangePeriod) {
-      setPriceChangePeriod(initialFilters.market.priceChangePeriod);
+      setPriceChangePeriod(
+        initialFilters.market.priceChangePeriod as PeriodType,
+      );
     }
   }, [initialFilters]);
 
@@ -70,7 +82,7 @@ export const FilterContentSRC20 = ({
     priceChangePeriod: false,
   });
 
-  const toggleSection = (section: string) => {
+  const toggleSection = (section: SectionKey) => {
     setExpandedSections({
       ...expandedSections,
       [section]: !expandedSections[section],
@@ -295,8 +307,9 @@ export const FilterContentSRC20 = ({
           >
             <RangeButtons
               selected={volumePeriod}
-              onChange={(newPeriod) => {
-                setVolumePeriod(newPeriod);
+              onChange={(newPeriod: string) => {
+                const period = newPeriod as PeriodType;
+                setVolumePeriod(period);
 
                 // Update the parent's filter state
                 setFilters((prevFilters) => {
@@ -304,7 +317,7 @@ export const FilterContentSRC20 = ({
                     ...prevFilters,
                     market: {
                       ...prevFilters.market,
-                      volumePeriod: newPeriod,
+                      volumePeriod: period,
                     },
                   };
                   onFiltersChange(newFilters);
@@ -326,8 +339,9 @@ export const FilterContentSRC20 = ({
           >
             <RangeButtons
               selected={priceChangePeriod}
-              onChange={(newPeriod) => {
-                setPriceChangePeriod(newPeriod);
+              onChange={(newPeriod: string) => {
+                const period = newPeriod as PeriodType;
+                setPriceChangePeriod(period);
 
                 // Update the parent's filter state
                 setFilters((prevFilters) => {
@@ -335,7 +349,7 @@ export const FilterContentSRC20 = ({
                     ...prevFilters,
                     market: {
                       ...prevFilters.market,
-                      priceChangePeriod: newPeriod,
+                      priceChangePeriod: period,
                     },
                   };
                   onFiltersChange(newFilters);

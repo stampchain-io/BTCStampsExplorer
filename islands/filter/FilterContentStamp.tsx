@@ -184,7 +184,7 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
 
   // Collect all file types
   const filetypeFilters = Object.entries(filterPayload).reduce(
-    (acc, [key, value]) => {
+    (acc, [_key, value]) => {
       if (value.filetypeFilters.length > 0) {
         acc.push(...value.filetypeFilters);
       }
@@ -396,7 +396,7 @@ export const FilterContentStamp = ({
     }
   }, [initialFilters]);
 
-  const handleFilterChange = (
+  const _handleFilterChange = (
     category: keyof typeof defaultFilters,
     value: unknown,
   ) => {
@@ -450,7 +450,7 @@ export const FilterContentStamp = ({
     };
   }, [isDraggingPrice, isDraggingRange]);
 
-  const handlePriceRangeChange = (min: number, max: number) => {
+  const _handlePriceRangeChange = (min: number, max: number) => {
     setFilters((prevFilters) => {
       const newFilters = {
         ...prevFilters,
