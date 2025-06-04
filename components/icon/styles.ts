@@ -14,6 +14,7 @@ export interface IconVariants {
     | "lg"
     | "xl"
     | "xxl"
+    | "xxsR"
     | "xsR"
     | "smR"
     | "custom";
@@ -57,6 +58,7 @@ export const iconStyles = {
     lg: "w-8 h-8",
     xl: "w-9 h-9",
     xxl: "w-10 h-10",
+    xxsR: "w-4 h-4 tablet:w-3 tablet:h-3",
     xsR: "w-5 h-5 tablet:w-4 tablet:h-4",
     smR: "w-6 h-6 tablet:w-5 tablet:h-5",
     custom: "",
