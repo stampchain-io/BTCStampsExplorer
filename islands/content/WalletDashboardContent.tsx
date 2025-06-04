@@ -2,7 +2,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { FilterOld } from "$islands/datacontrol/FilterOld.tsx";
+import { FilterOld } from "$islands/WIP/FilterOld.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { SRC20Gallery, StampGallery } from "$section";
