@@ -46,8 +46,8 @@ export const StampOverviewHeader = (
       class={`relative flex flex-row justify-between items-start w-full gap-3`}
     >
       {/* Responsive Title Section */}
-      <h1 className={`${titlePurpleLD} block mobileLg:hidden`}>STAMPS</h1>
-      <h1 className={`${titlePurpleLD} hidden mobileLg:block`}>ART STAMPS</h1>
+      <h1 className={`${titlePurpleLD} block mobileMd:hidden`}>STAMPS</h1>
+      <h1 className={`${titlePurpleLD} hidden mobileMd:block`}>ART STAMPS</h1>
 
       {/* Controls Section */}
       <div className="flex flex-col">
