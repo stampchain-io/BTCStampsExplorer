@@ -18,6 +18,14 @@ import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
 import { FilterType } from "$islands/button/FilterButton.tsx";
 import { CloseIcon, Icon } from "$icon";
 import { Button } from "$button";
+import { tooltipIcon } from "$notification";
+
+// Tooltip component
+const Tooltip = ({ visible, text }: { visible: boolean; text: string }) => (
+  <div className={`${tooltipIcon} ${visible ? "opacity-100" : "opacity-0"}`}>
+    {text}
+  </div>
+);
 
 // Define a type for all possible filter types
 type AllFilters = StampFilters | SRC20Filters;
@@ -186,23 +194,12 @@ const FilterDrawer = (
   const [closeTooltipText, setCloseTooltipText] = useState("CLOSE");
   const closeTooltipTimeoutRef = useRef<number | null>(null);
 
-  // Add cleanup effect for tooltip timeout
-  useEffect(() => {
-    return () => {
-      if (closeTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(closeTooltipTimeoutRef.current);
-      }
-    };
-  }, []);
-
   const handleCloseMouseEnter = () => {
     if (allowCloseTooltip) {
       setCloseTooltipText("CLOSE");
-
       if (closeTooltipTimeoutRef.current) {
         globalThis.clearTimeout(closeTooltipTimeoutRef.current);
       }
-
       closeTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsCloseTooltipVisible(true);
       }, 1500);
@@ -216,9 +213,6 @@ const FilterDrawer = (
     setIsCloseTooltipVisible(false);
     setAllowCloseTooltip(true);
   };
-
-  const tooltipIcon =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
 
   // Get the appropriate drawer ID based on type
   const drawerId = `drawer-form-${type}`;
@@ -310,42 +304,46 @@ const FilterDrawer = (
       <div className="h-[calc(100vh-110px)] tablet:h-[calc(100vh-82px)] overflow-y-auto scrollbar-black">
         <div className="w-full pt-[25px] mobileLg:pt-[37px] tablet:pt-[38px] px-9 tablet:px-6">
           <div className="relative w-full">
-            <div
-              className={`${tooltipIcon} ${
-                isCloseTooltipVisible ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              {closeTooltipText}
-            </div>
-
             {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
-            <div className="flex flex-row tablet:hidden justify-between items-center w-ful">
+            <div className="flex flex-row tablet:hidden justify-between items-center w-full">
               <h6 className="font-extrabold text-2xl gray-gradient1 mt-[1px] select-none">
                 FILTERS
               </h6>
-              <CloseIcon
-                size="sm"
-                weight="bold"
-                color="greyGradient"
-                onClick={handleCloseDrawer}
-                onMouseEnter={handleCloseMouseEnter}
-                onMouseLeave={handleCloseMouseLeave}
-                aria-label="Close"
-              />
+              <div className="relative">
+                <Tooltip
+                  visible={isCloseTooltipVisible}
+                  text={closeTooltipText}
+                />
+                <CloseIcon
+                  size="sm"
+                  weight="bold"
+                  color="greyGradient"
+                  onClick={handleCloseDrawer}
+                  onMouseEnter={handleCloseMouseEnter}
+                  onMouseLeave={handleCloseMouseLeave}
+                  aria-label="Close"
+                />
+              </div>
             </div>
             {/* Tablet+ Icon - hidden on mobile, shows on tablet+ */}
             <div className="hidden tablet:flex flex-row justify-between items-center w-full">
-              <Icon
-                type="iconLink"
-                name="close"
-                weight="bold"
-                size="xs"
-                color="grey"
-                onClick={handleCloseDrawer}
-                onMouseEnter={handleCloseMouseEnter}
-                onMouseLeave={handleCloseMouseLeave}
-                aria-label="Close menu"
-              />
+              <div className="relative">
+                <Tooltip
+                  visible={isCloseTooltipVisible}
+                  text={closeTooltipText}
+                />
+                <Icon
+                  type="iconLink"
+                  name="close"
+                  weight="bold"
+                  size="xs"
+                  color="grey"
+                  onClick={handleCloseDrawer}
+                  onMouseEnter={handleCloseMouseEnter}
+                  onMouseLeave={handleCloseMouseLeave}
+                  aria-label="Close menu"
+                />
+              </div>
               <h6 className="font-normal text-lg gray-gradient1 mt-[2px] select-none">
                 FILTERS
               </h6>

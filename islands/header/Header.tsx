@@ -1,16 +1,15 @@
 /* ===== HEADER COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { ConnectButton } from "$islands/button/ConnectButton.tsx";
-// Import main icons from the barrel file
 import { CloseIcon, GearIcon } from "$icon";
-// Import HamburgerMenuIcon directly to ensure it's available
-import { HamburgerMenuIcon } from "$components/icon/MenuIcon.tsx";
+import { HamburgerMenuIcon } from "$components/icon/MenuIcon.tsx"; // Import HamburgerMenuIcon directly to ensure it's available
 import {
   logoPurpleLDLink,
   navLinkGrey,
   navLinkGreyLD,
   navLinkPurple,
 } from "$text";
+import { tooltipIcon } from "$notification";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
@@ -226,9 +225,6 @@ export function Header() {
     setIsCloseTooltipVisible(false);
     setAllowCloseTooltip(true);
   };
-
-  const tooltipIcon =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
 
   /* ===== MENU CLOSE FUNCTION ===== */
   const closeMenu = () => {
