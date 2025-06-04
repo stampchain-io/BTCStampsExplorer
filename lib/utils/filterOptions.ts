@@ -1,7 +1,7 @@
 import {
-  STAMP_FILTER_TYPES,
-  STAMP_SUFFIX_FILTERS,
-  SUBPROTOCOLS,
+  _STAMP_FILTER_TYPES,
+  _STAMP_SUFFIX_FILTERS,
+  _SUBPROTOCOLS,
 } from "$globals";
 
 export const filterOptions = {
