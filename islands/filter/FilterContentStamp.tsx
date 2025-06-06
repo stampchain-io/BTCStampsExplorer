@@ -6,12 +6,9 @@ import {
   STAMP_RANGES,
 } from "$globals";
 import { inputCheckbox } from "$form";
-import { labelLogicResponsive, labelXsR } from "$text";
-import {
-  Checkbox,
-  CollapsibleSection,
-  RangeSlider,
-} from "$islands/filter/FilterComponents.tsx";
+import { labelLogicResponsive, labelXsPosition, labelXsR } from "$text";
+import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
+import { Checkbox, RangeSlider } from "$islands/filter/FilterComponents.tsx";
 import { StampFilters } from "$islands/filter/FilterOptionsStamp.tsx";
 
 const defaultFilters: StampFilters = {
@@ -680,9 +677,7 @@ export const FilterContentStamp = ({
         variant="collapsibleTitle"
       >
         {/* Category: PIXEL */}
-        <div
-          className={`${labelXsR} flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`}
-        >
+        <div className={`${labelXsR} ${labelXsPosition}`}>
           PIXELS
         </div>
         <Checkbox
@@ -725,9 +720,7 @@ export const FilterContentStamp = ({
         />
 
         {/* Category: VECTOR */}
-        <div
-          className={`${labelXsR} flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`}
-        >
+        <div className={`${labelXsR} ${labelXsPosition}`}>
           VECTOR
         </div>
         <Checkbox
@@ -752,9 +745,7 @@ export const FilterContentStamp = ({
         }
 
         {/* Category: AUDIO */}
-        <div
-          className={`${labelXsR} flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`}
-        >
+        <div className={`${labelXsR} ${labelXsPosition}`}>
           AUDIO
         </div>
         <Checkbox
@@ -766,7 +757,7 @@ export const FilterContentStamp = ({
         />
 
         {/* Category: ENCODING */}
-        <div className={labelXsR}>
+        <div className={`${labelXsR} ${labelXsPosition}`}>
           ENCODING
         </div>
         <Checkbox

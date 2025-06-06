@@ -189,6 +189,7 @@ import * as $header_WalletDashboardHeader from "./islands/header/WalletDashboard
 import * as $header_WalletProfileHeader from "./islands/header/WalletProfileHeader.tsx";
 import * as $header_index from "./islands/header/index.ts";
 import * as $layout_ChartWidget from "./islands/layout/ChartWidget.tsx";
+import * as $layout_CollapsibleSection from "./islands/layout/CollapsibleSection.tsx";
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_ModalOverlay from "./islands/layout/ModalOverlay.tsx";
@@ -486,6 +487,7 @@ const manifest = {
     "./islands/header/WalletProfileHeader.tsx": $header_WalletProfileHeader,
     "./islands/header/index.ts": $header_index,
     "./islands/layout/ChartWidget.tsx": $layout_ChartWidget,
+    "./islands/layout/CollapsibleSection.tsx": $layout_CollapsibleSection,
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/ModalOverlay.tsx": $layout_ModalOverlay,

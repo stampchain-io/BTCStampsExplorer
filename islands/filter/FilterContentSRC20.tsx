@@ -1,8 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { _SRC20_FILTER_TYPES } from "$globals";
 import { SRC20Filters } from "$islands/filter/FilterOptionsSRC20.tsx";
+import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import {
-  CollapsibleSection,
   Radiobutton,
   RangeButtons,
   RangeSlider,

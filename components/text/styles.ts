@@ -82,10 +82,12 @@ export const textLinkUnderline =
 /* ===== LABEL STYLES ===== */
 export const labelXs = `${labelFont} text-xs ${cursor}`;
 export const labelSm = `${labelFont} text-sm ${cursor}`;
-export const label = `${labelFont} text-base ${cursor}`; // = old dataLabel name
+export const label = `${labelFont} text-base ${cursor}`; // old dataLabel name
 export const labelLg = `${labelFont} text-lg ${cursor}`;
 export const labelXl = `${labelFont} text-xl ${cursor}`;
-export const labelXsR = `${labelFont} text-xs tablet:text-[10px] ${cursor}`;
+export const labelXsR = `${labelFont} text-xs tablet:text-[10px] ${cursor}`; // used for the filter labels
+export const labelXsPosition =
+  `flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`; // used for the filter label positioning
 export const labelSmPurple =
   `font-light text-sm text-stamp-purple-bright tracking-wide mb-0.5 ${cursor}`;
 export const labelLogicResponsive = (
@@ -217,6 +219,7 @@ export type TextStyles = {
   labelLg: string;
   labelXl: string;
   labelXsR: string;
+  labelXsPosition: string;
   labelSmPurple: string;
   labelLogicResponsive: string;
   // Value styles
