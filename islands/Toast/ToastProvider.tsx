@@ -42,7 +42,10 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
     // Subscribe to the global toast signal
     // The return value of signal.subscribe is the unsubscribe function
     const unsubscribe = toastSignal.subscribe((toastMsg: BaseToast | null) => {
-      console.log("ToastProvider received from signal:", toastMsg);
+      // Development-only logging
+      if (globalThis.location?.hostname === "localhost") {
+        console.log("ToastProvider received from signal:", toastMsg);
+      }
       if (toastMsg) {
         internalAddToast(
           toastMsg.message,

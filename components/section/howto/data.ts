@@ -14,9 +14,8 @@ export const ARTICLE_LINKS: ArticleLinks[] = [
   { title: "MINT A TOKEN", href: "/howto/minttoken" },
   { title: "TRANSFER TOKENS", href: "/howto/transfertoken" },
   { title: "STAMP ART", href: "/howto/stamp" },
-  { title: "TRANSFER A STAMP", href: "/howto/transferstamp" },
+  { title: "SEND A STAMP", href: "/howto/sendstamp" },
   { title: "REGISTER BITNAME DOMAIN", href: "/howto/registerbitname" },
-  { title: "TRANSFER A BITNAME DOMAIN", href: "/howto/transferbitname" },
 ];
 
 /* ===== EXAMPLE STEPS CONFIGURATION ===== */
@@ -376,17 +375,17 @@ export const TRANSFER_BITNAME_IMPORTANT_NOTES = [
   " Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
 ];
 
-/* ===== STAMP TRANSFER GUIDE ===== */
-export const TRANSFER_STAMP_STEPS: ListProps[] = [
+/* ===== STAMP SEND GUIDE ===== */
+export const SEND_STAMP_STEPS: ListProps[] = [
   {
-    title: "NAVIGATE TO MINT PAGE",
-    image: "/img/how-tos/stamping/01.png",
+    title: "NAVIGATE TO SEND STAMP PAGE",
+    image: "/img/how-tos/sendstamp/01.png",
     description:
       "Go to the main menu at the top right and click on MINT option.",
   },
   {
     title: "COMPLETE THE INFORMATION",
-    image: "/img/how-tos/stamping/02.png",
+    image: "/img/how-tos/sendstamp/02.png",
     description:
       `Click the icon to upload your ticker artwork in a supported format. The size must be 420x420 pixels\n
       The token ticker name must be unique and no longer than 5 characters.\n
@@ -400,18 +399,18 @@ export const TRANSFER_STAMP_STEPS: ListProps[] = [
   },
   {
     title: "CHECK THE INFORMATION",
-    image: "/img/how-tos/stamping/03.png",
+    image: "/img/how-tos/sendstamp/03.png",
     description: "Check that all the information is correct.",
   },
   {
     title: "CONFIRM TRANSACTION",
-    image: "/img/how-tos/stamping/04.png",
+    image: "/img/how-tos/sendstamp/04.png",
     description:
       "Your wallet will pop up and you have to sign for the transaction.",
   },
 ];
 
-export const TRANSFER_STAMP_IMPORTANT_NOTES = [
+export const SEND_STAMP_IMPORTANT_NOTES = [
   "Lowering the fee might slow down the stamping process.",
   " Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
 ];

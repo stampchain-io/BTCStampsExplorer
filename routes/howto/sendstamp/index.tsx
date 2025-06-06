@@ -1,11 +1,11 @@
-/* ===== TRANSFER STAMP HOW-TO PAGE ===== */
+/* ===== SEND STAMP HOW-TO PAGE ===== */
 import {
   Article,
   AuthorSection,
   List,
+  SEND_STAMP_IMPORTANT_NOTES,
+  SEND_STAMP_STEPS,
   StepList,
-  TRANSFER_STAMP_IMPORTANT_NOTES,
-  TRANSFER_STAMP_STEPS,
 } from "$section";
 
 /* ===== INTRODUCTION COMPONENT ===== */
@@ -31,10 +31,10 @@ function IntroSection() {
 }
 
 /* ===== STEPS COMPONENT ===== */
-function TransferSteps() {
+function SendSteps() {
   return (
-    <StepList hasImportantNotes={TRANSFER_STAMP_IMPORTANT_NOTES?.length > 0}>
-      {TRANSFER_STAMP_STEPS.map((step) => (
+    <StepList hasImportantNotes={SEND_STAMP_IMPORTANT_NOTES?.length > 0}>
+      {SEND_STAMP_STEPS.map((step) => (
         <List
           key={step.number}
           title={step.title}
@@ -47,16 +47,16 @@ function TransferSteps() {
 }
 
 /* ===== MAIN PAGE COMPONENT ===== */
-export default function TransferStamp() {
+export default function SendStamp() {
   return (
     <Article
       title="HOW-TO"
-      subtitle="TRANSFER STAMPS"
-      headerImage="/img/how-tos/stamping/00.png"
-      importantNotes={TRANSFER_STAMP_IMPORTANT_NOTES}
+      subtitle="SEND A STAMP"
+      headerImage="/img/how-tos/sendstamp/00.png"
+      importantNotes={SEND_STAMP_IMPORTANT_NOTES}
     >
       <IntroSection />
-      <TransferSteps />
+      <SendSteps />
     </Article>
   );
 }

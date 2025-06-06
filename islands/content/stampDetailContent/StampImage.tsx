@@ -2,11 +2,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { VNode } from "preact";
 import { StampRow } from "$globals";
-import {
-  getStampImageSrc,
-  handleImageError,
-  validateStampContent,
-} from "$lib/utils/imageUtils.ts";
+import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
@@ -71,10 +67,6 @@ function RightPanel(
       }
     };
   }, []);
-
-  if (stamp.ident === "SRC-20") {
-    return null;
-  }
 
   /* ===== SHARING CONFIGURATION ===== */
   const url = `https://stampchain.io/stamp/${stamp.stamp}`;
@@ -448,7 +440,10 @@ export function StampImage(
   };
 
   useEffect(() => {
-    fetchStampImage();
+    fetchStampImage().catch((error) => {
+      console.error("Error fetching stamp image:", error);
+      setLoading(false); // Ensure loading is set to false even on error
+    });
   }, []);
 
   const isHtml = stamp.stamp_mimetype === "text/html";
@@ -478,39 +473,99 @@ export function StampImage(
   };
 
   const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
+  const [isValidating, setIsValidating] = useState<boolean>(false);
 
   useEffect(() => {
     const validateContent = async () => {
       if (stamp.stamp_mimetype === "image/svg+xml" && src) {
-        const { isValid, error } = await validateStampContent(src);
-        if (isValid) {
-          setValidatedContent(
-            <div className="stamp-container">
+        setIsValidating(true);
+
+        try {
+          // Fetch the SVG content
+          const response = await fetch(src);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch SVG: ${response.status}`);
+          }
+
+          const svgContent = await response.text();
+
+          // Check if SVG has external ordinals.com references
+          if (svgContent.includes("ordinals.com/content/")) {
+            // Rewrite external references to use our proxy
+            let rewrittenSVG = svgContent.replace(
+              /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
+              "/api/proxy/ordinals/$1",
+            );
+
+            // Ensure SVG fills container by removing fixed dimensions and adding proper styling
+            if (rewrittenSVG.includes("<svg")) {
+              // Remove width and height attributes
+              rewrittenSVG = rewrittenSVG.replace(
+                /<svg([^>]*)\s+width="([^"]*)"([^>]*)/,
+                "<svg$1$3",
+              ).replace(
+                /<svg([^>]*)\s+height="([^"]*)"([^>]*)/,
+                "<svg$1$3",
+              );
+
+              // Add viewBox if not present (using the original dimensions)
+              if (!rewrittenSVG.includes("viewBox")) {
+                rewrittenSVG = rewrittenSVG.replace(
+                  /<svg([^>]*)>/,
+                  '<svg$1 viewBox="0 0 460 500">',
+                );
+              }
+
+              // Add responsive styling to fill container properly
+              rewrittenSVG = rewrittenSVG.replace(
+                /<svg([^>]*)>/,
+                '<svg$1 style="max-width: 100%; max-height: 100%; width: auto; height: auto; display: block;">',
+              );
+            }
+
+            setValidatedContent(
+              <div
+                className="max-w-none object-contain rounded pixelart stamp-image h-full w-full flex items-center justify-center"
+                dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              />,
+            );
+          } else {
+            // No external references, use original src
+            setValidatedContent(
               <img
-                src={src}
+                width="100%"
                 loading="lazy"
-                alt={`Stamp No. ${stamp.stamp}`}
                 className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                src={src}
                 onError={handleImageError}
-              />
-            </div>,
-          );
-        } else {
-          logger.debug("ui", {
-            message: "SVG validation failed",
-            error,
-            stamp: stamp.stamp,
-          });
+                alt={`Stamp No. ${stamp.stamp}`}
+              />,
+            );
+          }
+        } catch (error) {
+          // Fallback to original src
           setValidatedContent(
-            <div className="stamp-container">
-              <img
-                src={NOT_AVAILABLE_IMAGE}
-                alt="Invalid SVG"
-                className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-              />
-            </div>,
+            <img
+              width="100%"
+              loading="lazy"
+              className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+              src={src}
+              onError={handleImageError}
+              alt={`Stamp No. ${stamp.stamp}`}
+            />,
           );
         }
+
+        setIsValidating(false);
+      } else {
+        setIsValidating(false);
       }
     };
     validateContent();
@@ -594,7 +649,10 @@ export function StampImage(
     openModal(modalContent, "zoomInOut");
   };
 
-  if (loading) {
+  const isLoadingOrValidating = loading ||
+    (stamp.stamp_mimetype === "image/svg+xml" && isValidating);
+
+  if (isLoadingOrValidating) {
     return (
       <div className="flex flex-col gap-3 mobileMd:gap-6">
         <div className="relative p-3 mobileMd:p-6 dark-gradient rounded-lg">
@@ -748,7 +806,7 @@ export function StampImage(
             <div className="flex flex-col gap-6">
               <div className="relative p-6 dark-gradient rounded-lg">
                 <div className="stamp-container">
-                  <div className="relative z-10 aspect-square">
+                  <div className="relative z-10 aspect-square flex items-center justify-center">
                     {validatedContent || (
                       <img
                         width="100%"
@@ -772,7 +830,7 @@ export function StampImage(
           )
           : (
             <div className="stamp-container">
-              <div className="relative z-10 aspect-square">
+              <div className="relative z-10 aspect-square flex items-center justify-center">
                 {validatedContent || (
                   <img
                     width="100%"

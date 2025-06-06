@@ -10,7 +10,6 @@ export function FeeCalculatorAdvanced({
   fileType,
   fileSize,
   issuance,
-  serviceFee,
   utxoAncestors = [],
   feeDetails: providedFeeDetails,
   BTCPrice,
@@ -86,7 +85,6 @@ export function FeeCalculatorAdvanced({
       fileType={fileType}
       fileSize={fileSize}
       issuance={issuance}
-      serviceFee={serviceFee ?? undefined}
       BTCPrice={BTCPrice}
       isSubmitting={isSubmitting}
       onSubmit={onSubmit}

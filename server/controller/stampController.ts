@@ -48,7 +48,7 @@ export class StampController {
     sortBy = "ASC",
     sortOrder = "index_asc",
     type = "all",
-    filterBy = [],
+    filterBy = [] as STAMP_FILTER_TYPES[],
     ident,
     collectionId,
     identifier,
@@ -577,6 +577,8 @@ export class StampController {
           page: 1,
           limit: 24,
           sortBy: sortBy,
+          skipDispenserLookup: true, // Skip expensive dispenser API calls for collection overview
+          skipPriceCalculation: true, // Skip BTC price fetching for collection overview
         });
         stamps_posh = poshStampsResult.data;
       } else {

@@ -220,7 +220,6 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     : stamp?.cpid?.startsWith("A")
     ? `Bitcoin Stamp #${stamp?.stamp || ""} - stampchain.io`
     : stamp?.cpid || "Stamp Not Found";
-  const stampImageUrl = stamp.stamp_url;
 
   // Update the getMetaImageInfo and add dimension handling
   const getMetaImageInfo = (stamp: StampRow | undefined, baseUrl: string) => {
@@ -313,7 +312,15 @@ export default function StampDetailPage(props: StampDetailPageProps) {
           content={metaDescription}
           key="og-description"
         />
-        <meta property="og:image" content={stampImageUrl} key="og-image" />
+        <meta property="og:image" content={metaInfo.url} key="og-image" />
+        {/* Add fallback image for SVGs in case preview fails */}
+        {stamp?.stamp_mimetype === "image/svg+xml" && (
+          <meta
+            property="og:image"
+            content={stamp.stamp_url}
+            key="og-image-fallback"
+          />
+        )}
         <meta property="og:type" content="website" key="og-type" />
         <meta
           name="twitter:card"
@@ -327,6 +334,14 @@ export default function StampDetailPage(props: StampDetailPageProps) {
           key="twitter-description"
         />
         <meta name="twitter:image" content={metaInfo.url} key="twitter-image" />
+        {/* Add fallback image for SVGs in case preview fails */}
+        {stamp?.stamp_mimetype === "image/svg+xml" && (
+          <meta
+            name="twitter:image"
+            content={stamp.stamp_url}
+            key="twitter-image-fallback"
+          />
+        )}
         {/* Only add dimension meta tags if we have the dimensions */}
         {metaInfo.width && metaInfo.height && (
           <>

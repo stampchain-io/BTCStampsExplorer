@@ -329,8 +329,8 @@ const BuyStampModal = ({
         }}
         buttonName="BUY"
         className="pt-9 mobileLg:pt-12"
-        _userAddress={wallet?.address ?? ""}
-        _inputType="P2WPKH"
+        userAddress={wallet?.address ?? ""}
+        inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
       />
     </ModalBase>

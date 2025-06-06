@@ -301,7 +301,7 @@ export function SRC20DeployTool(
               {formState.file === null && (
                 <label
                   for="upload"
-                  class="cursor-pointer bg-conic-pattern bg-[length:4px_4px] h-full flex flex-col items-center justify-center gap-3"
+                  class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
                 >
                   <Icon
                     type="icon"
@@ -463,6 +463,7 @@ export function SRC20DeployTool(
           ticker={formState.token}
           limit={Number(formState.lim) || 0}
           supply={Number(formState.max) || 0}
+          dec={Number(formState.dec) || 18}
           fromPage="src20_deploy"
           handleChangeFee={handleChangeFee}
           type="src20"

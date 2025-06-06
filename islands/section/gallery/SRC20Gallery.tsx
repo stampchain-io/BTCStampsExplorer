@@ -1,5 +1,4 @@
 /* ===== SRC20 GALLERY COMPONENT ===== */
-// deno-lint-ignore-file react-rules-of-hooks
 // @baba - add token cards specific to wallet page
 import { useEffect, useState } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
@@ -14,6 +13,7 @@ import {
   SRC20CardSm,
   SRC20CardSmMinting,
 } from "$card";
+import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 
 /* ===== TYPES ===== */
 interface SRC20GalleryProps {
@@ -195,8 +195,14 @@ export function SRC20Gallery({
   const handleImageClick = (_imgSrc: string) => {
   };
 
+  // Always call hooks at the top level
+  const skeletonClasses = useLoadingSkeleton(
+    isLoading || isTransitioning,
+    "src20-skeleton h-[400px]",
+  );
+
   if (isLoading || isTransitioning) {
-    return <div class="src20-skeleton loading-skeleton h-[400px]" />;
+    return <div class={skeletonClasses} />;
   }
 
   console.log("Gallery Pagination:", {

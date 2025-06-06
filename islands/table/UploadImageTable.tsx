@@ -1,8 +1,9 @@
 import { SRC20Row, WalletDataTypes } from "$globals";
-import { useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { textLg } from "$text";
+import { walletSignal } from "$client/wallet/wallet.ts";
 type SRC20BalanceTableProps = {
   data: SRC20Row[];
 };
@@ -33,7 +34,10 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
 
   const [modalImg, setModalImg] = useState<string>("");
   const [isModalOpen, setModalOpen] = useState(false);
-  const [wallet, setWallet] = useState<WalletDataTypes>({} as WalletDataTypes);
+
+  // PERFORMANCE OPTIMIZATION: Use wallet signal instead of polling localStorage
+  // This eliminates the 1-second polling that was consuming CPU resources
+  const wallet = walletSignal.value as WalletDataTypes;
 
   const handleCloseModal = () => {
     setModalOpen(false);
@@ -43,17 +47,6 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
     setModalImg(imgSrc);
     setModalOpen(!isModalOpen);
   };
-
-  const getAccount = () => {
-    setWallet(JSON.parse(localStorage.getItem("wallet") as any));
-    // setWallet({ address: "bc1qqz5tvzm3uw3w4lruga8aylsk9fs93y0w8fysfe" });
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => getAccount(), 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <>

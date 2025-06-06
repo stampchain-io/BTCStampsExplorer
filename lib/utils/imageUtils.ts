@@ -64,9 +64,26 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
     return NOT_AVAILABLE_IMAGE;
   }
 
-  if (stamp.stamp_url.includes("json")) {
-    const res = await fetch(stamp.stamp_url);
+  // SRC-20 stamps have JSON metadata but also have SVG images
+  // The SVG is at /stamps/txhash.svg (managed by Cloudflare CDN)
+  if (stamp.ident === "SRC-20" && stamp.stamp_url.includes("json")) {
+    // Extract the transaction hash from the JSON URL and construct SVG URL
+    const urlParts = stamp.stamp_url.split("/stamps/");
+    if (urlParts.length > 1) {
+      const filename = urlParts[1].replace(".json", ".svg");
+      return `/stamps/${filename}`;
+    }
+    return NOT_AVAILABLE_IMAGE;
+  }
+
+  // SRC-101 stamps may contain image URLs in their JSON metadata
+  if (stamp.stamp_url.includes("json") && stamp.ident === "SRC-101") {
     try {
+      const res = await fetch(stamp.stamp_url);
+      if (!res.ok) {
+        return NOT_AVAILABLE_IMAGE;
+      }
+
       const jsonData = await res.json();
       if (
         jsonData && jsonData.img && Array.isArray(jsonData.img) &&
@@ -75,14 +92,15 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
         return jsonData.img[0];
       }
       return NOT_AVAILABLE_IMAGE;
-    } catch (error) {
-      console.error(
-        "Failed to parse JSON from stamp_url or access img property:",
-        stamp.stamp_url,
-        error,
-      );
+    } catch (_error) {
+      // Silently handle JSON parsing errors - just return placeholder
+      // This prevents console spam for malformed JSON
       return NOT_AVAILABLE_IMAGE;
     }
+  } else if (stamp.stamp_url.includes("json")) {
+    // For other JSON stamps (pure data, etc.), just show placeholder
+    // These are data stamps, not image stamps
+    return NOT_AVAILABLE_IMAGE;
   } else {
     // Extract filename from full URL if present
     const urlParts = stamp.stamp_url.split("/stamps/");
@@ -135,30 +153,70 @@ export function handleImageError(e: Event) {
   }
 }
 
+// Trusted domains for external references in SVGs
+const TRUSTED_DOMAINS = [
+  "ordinals.com",
+  "stampchain.io",
+  "www.w3.org", // Standard SVG and XML namespaces
+];
+
 export function isValidSVG(svgContent: string): boolean {
   const parser = new DOMParser();
   const doc = parser.parseFromString(svgContent, "image/svg+xml");
 
   // Check for parsing errors
   const parserError = doc.querySelector("parsererror");
-  if (parserError) return false;
+  if (parserError) {
+    return false;
+  }
 
-  // Check for potentially dangerous elements
+  // Check for potentially dangerous elements (but allow trusted domains)
   const dangerous = doc.querySelectorAll(
     "foreignObject, use[href*='http'], image[href*='http'], a[href*='http']",
   );
-  if (dangerous.length > 0) return false;
 
-  // Check all elements for event handlers and external references
+  // Check if external references are from trusted domains
+  for (const element of dangerous) {
+    const href = element.getAttribute("href") ||
+      element.getAttribute("xlink:href");
+    if (href && href.startsWith("http")) {
+      try {
+        const url = new URL(href);
+        if (!TRUSTED_DOMAINS.includes(url.hostname)) {
+          return false;
+        }
+      } catch (e) {
+        return false;
+      }
+    }
+  }
+
+  // Check all elements for event handlers and untrusted external references
   const allElements = doc.getElementsByTagName("*");
   for (const element of allElements) {
     const attributes = element.attributes;
     for (const attr of attributes) {
       // Check for event handlers
-      if (attr.name.startsWith("on")) return false;
+      if (attr.name.startsWith("on")) {
+        return false;
+      }
 
-      // Only block absolute URLs and data URIs
-      if (attr.value.match(/^(http|data):/i)) {
+      // Check for external URLs - allow trusted domains
+      // Skip namespace declarations (xmlns attributes)
+      if (attr.value.match(/^https?:/i) && !attr.name.startsWith("xmlns")) {
+        try {
+          const url = new URL(attr.value);
+          if (!TRUSTED_DOMAINS.includes(url.hostname)) {
+            return false;
+          }
+        } catch {
+          // Invalid URL, block it
+          return false;
+        }
+      }
+
+      // Block data URIs (keep existing behavior)
+      if (attr.value.match(/^data:/i)) {
         return false;
       }
     }
@@ -202,28 +260,13 @@ export const validateStampContent = async (src: string): Promise<{
       return { isValid: false, error: "Invalid content" };
     }
 
-    // For SVG content, do additional validation only if it contains data URLs
+    // For SVG content, use the comprehensive SVG validation
     if (src.endsWith(".svg") || content.trim().startsWith("<svg")) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(content, "image/svg+xml");
-
-      // Check for parsing errors
-      const parserError = doc.querySelector("parsererror");
-      if (parserError) {
-        return { isValid: false, error: "Invalid SVG format" };
-      }
-
-      // Only validate data URLs if they exist in the SVG
-      const allElements = doc.getElementsByTagName("*");
-      for (const element of allElements) {
-        const attributes = element.attributes;
-        for (const attr of attributes) {
-          if (attr.value.startsWith("data:")) {
-            if (!isValidDataUrl(attr.value)) {
-              return { isValid: false, error: "Invalid data URL in SVG" };
-            }
-          }
-        }
+      if (!isValidSVG(content)) {
+        return {
+          isValid: false,
+          error: "SVG contains unsafe content or untrusted external references",
+        };
       }
     }
 

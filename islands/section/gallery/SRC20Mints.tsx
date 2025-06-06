@@ -56,7 +56,7 @@ export default function SRC20MintsGallery() {
             {[...Array(5)].map((_, index) => (
               <div
                 key={index}
-                class="loading-skeleton w-full h-12 rounded"
+                class="loading-skeleton running w-full h-12 rounded"
               />
             ))}
           </div>

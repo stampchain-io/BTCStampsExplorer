@@ -2,9 +2,21 @@ import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import axiod from "axiod";
 import { useConfig } from "$client/hooks/useConfig.ts";
-import { useFeePolling } from "$client/hooks/useFeePolling.ts";
+import { useFees } from "$fees";
 import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
+
+interface PSBTFees {
+  estMinerFee: number;
+  totalDustValue: number;
+  hasExactFees: boolean;
+  totalValue: number;
+  est_tx_size: number;
+  hex?: string;
+  inputsToSign?: Array<
+    { index: number; address?: string; sighashTypes?: number[] }
+  >;
+}
 
 interface SRC101FormState {
   toAddress: string;
@@ -46,7 +58,7 @@ export function useSRC101Form(
   });
 
   const { config } = useConfig<Config>();
-  const { fees, fetchFees } = useFeePolling(300000); // 5 minutes
+  const { fees, fetchFees } = useFees();
   const [apiError, setApiError] = useState<string>("");
 
   const [formState, setFormState] = useState<SRC101FormState>({
@@ -327,9 +339,10 @@ export function useSRC101Form(
       });
 
       const apiError = (error as any).response?.data?.error;
-      setApiError(
-        apiError || error.message || "An unexpected error occurred",
-      );
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "An unexpected error occurred";
+      setApiError(apiError || errorMessage);
     } finally {
       setIsSubmitting(false);
     }

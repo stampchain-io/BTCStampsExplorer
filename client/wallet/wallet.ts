@@ -21,13 +21,6 @@ declare global {
   }
 }
 
-interface GlobalWithDebug {
-  __DEBUG?: {
-    namespaces: string;
-    enabled: boolean;
-  };
-}
-
 // Move interfaces and variables to the top
 interface WalletProviders {
   LeatherProvider?: any;
@@ -59,8 +52,6 @@ interface WalletContext {
 
 // Initialize wallet state
 export const initialWallet: Wallet = {
-  address: undefined,
-  publicKey: undefined,
   accounts: [],
   btcBalance: {
     confirmed: 0,
@@ -68,10 +59,6 @@ export const initialWallet: Wallet = {
     total: 0,
   },
   stampBalance: [],
-  type: undefined,
-  provider: undefined,
-  network: undefined,
-  addressType: undefined,
 };
 
 let initialWalletState;
@@ -160,34 +147,40 @@ export function getGlobalWallets(): WalletProviders {
     return {};
   }
 
-  // Only log wallet availability on client-side
-  const global = globalThis as unknown as {
-    LeatherProvider?: unknown;
-    okxwallet?: { bitcoin?: unknown };
-    unisat?: unknown;
-    tapwallet?: unknown;
-    phantom?: { bitcoin?: { isPhantom?: boolean } };
-  };
+  try {
+    // Only log wallet availability on client-side
+    const global = globalThis as unknown as {
+      LeatherProvider?: unknown;
+      okxwallet?: { bitcoin?: unknown };
+      unisat?: unknown;
+      tapwallet?: unknown;
+      phantom?: { bitcoin?: { isPhantom?: boolean } };
+    };
 
-  logger.debug("ui", {
-    message: "Checking wallet providers (client-side)",
-    data: {
-      hasLeather: Boolean(global.LeatherProvider),
-      hasOKX: Boolean(global.okxwallet?.bitcoin),
-      hasUnisat: Boolean(global.unisat),
-      hasTapWallet: Boolean(global.tapwallet),
-      hasPhantom: Boolean(global.phantom?.bitcoin?.isPhantom),
-      timestamp: new Date().toISOString(),
-    },
-  });
+    logger.debug("ui", {
+      message: "Checking wallet providers (client-side)",
+      data: {
+        hasLeather: Boolean(global.LeatherProvider),
+        hasOKX: Boolean(global.okxwallet?.bitcoin),
+        hasUnisat: Boolean(global.unisat),
+        hasTapWallet: Boolean(global.tapwallet),
+        hasPhantom: Boolean(global.phantom?.bitcoin?.isPhantom),
+        timestamp: new Date().toISOString(),
+      },
+    });
 
-  return {
-    LeatherProvider: global.LeatherProvider,
-    okxwallet: global.okxwallet,
-    unisat: global.unisat,
-    tapwallet: global.tapwallet,
-    phantom: global.phantom,
-  };
+    return {
+      LeatherProvider: global.LeatherProvider,
+      okxwallet: global.okxwallet,
+      unisat: global.unisat,
+      tapwallet: global.tapwallet,
+      phantom: global.phantom,
+    };
+  } catch (_error) {
+    // Silently handle wallet detection errors to prevent console spam
+    // This can happen when browser extensions are not properly loaded
+    return {};
+  }
 }
 
 // Update wallet availability checks

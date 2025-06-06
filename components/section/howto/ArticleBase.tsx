@@ -1,6 +1,6 @@
 /* ===== ARTICLE COMPONENT ===== */
 import { body, bodyArticle, gapSection } from "$layout";
-import { headingGrey, subtitleGrey, text, titleGreyDL } from "$text";
+import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
 import { ArticlesOverview } from "$section";
 
 /* ===== TYPES ===== */
@@ -23,7 +23,7 @@ export function Article(
         {/* ===== MAIN CONTENT SECTION ===== */}
         <section>
           {/* ===== HEADER ===== */}
-          <h1 className={titleGreyDL}>{title}</h1>
+          <h1 className={titleGreyLD}>{title}</h1>
           <h2 className={subtitleGrey}>{subtitle}</h2>
 
           {/* ===== FEATURED IMAGE ===== */}

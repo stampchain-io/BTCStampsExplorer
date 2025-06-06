@@ -24,12 +24,20 @@ export const handler: Handlers = {
         });
       }
 
+      // For SVGs, try the original URL first (screenshot service may handle it)
+      let processedUrl = stamp_url;
+      if (stamp_mimetype === "image/svg+xml") {
+        // Use the original SVG URL - if it fails, the screenshot service will return an error
+        // and social media platforms will fall back to other meta tags
+        processedUrl = stamp_url;
+      }
+
       const client = new screenshotone.Client(
         "OUs5bLzPfWlwdQ",
         "WUlkCqVvQdlPxQ",
       );
 
-      const options = screenshotone.TakeOptions.url(stamp_url)
+      const options = screenshotone.TakeOptions.url(processedUrl)
         .delay(3)
         .blockAds(true);
 

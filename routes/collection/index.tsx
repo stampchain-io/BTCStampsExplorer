@@ -1,9 +1,9 @@
 /* ===== COLLECTION LANDING PAGE ===== */
 import {
   CollectionGalleryProps,
+  STAMP_FILTER_TYPES,
   StampGalleryProps,
   StampRow,
-  SUBPROTOCOLS,
 } from "$globals";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
@@ -41,7 +41,9 @@ export const handler: Handlers = {
       const sortBy = url.searchParams.get("sortBy")?.toUpperCase() == "ASC"
         ? "ASC"
         : "DESC";
-      const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
+      const filterBy = url.searchParams.get("filterBy")?.split(",").filter(
+        Boolean,
+      ) as STAMP_FILTER_TYPES[] || [];
       const selectedTab = url.searchParams.get("ident") || "all";
       const page = parseInt(url.searchParams.get("page") || "1");
       const limit = parseInt(url.searchParams.get("limit") || "60");
@@ -56,27 +58,39 @@ export const handler: Handlers = {
 
       const collections: CollectionRow[] = [];
       const type: "stamps" | "cursed" | "all" = "all";
-      const ident: SUBPROTOCOLS[] = selectedTab === "all"
-        ? ["STAMP", "SRC-721", "SRC-20"] as SUBPROTOCOLS[]
-        : ["STAMP", "SRC-721"] as SUBPROTOCOLS[];
 
-      await Promise.all(
-        collectionsData?.data.map(async (item) => {
+      // Process collections sequentially to avoid overwhelming the counterparty API
+      for (const item of collectionsData?.data || []) {
+        try {
           const collectionResult = await StampController.getStamps({
             page,
             limit: limit,
             sortBy,
             type,
             filterBy,
-            ident,
             collectionId: item.collection_id,
-          });
+            skipDispenserLookup: true,
+            skipPriceCalculation: true,
+          } as any); // Temporary type assertion to bypass TypeScript issue
           collections.push({
             ...item,
             img: collectionResult.data?.[0]?.stamp_url,
           });
-        }),
-      );
+
+          // Add a small delay between requests (reduced since we're skipping dispenser calls)
+          await new Promise((resolve) => setTimeout(resolve, 50));
+        } catch (error) {
+          console.warn(
+            `Failed to load collection ${item.collection_id}:`,
+            error,
+          );
+          // Add collection without image if it fails
+          collections.push({
+            ...item,
+            img: "",
+          });
+        }
+      }
       const data = {
         collections: collections,
         page: collectionsData.page,

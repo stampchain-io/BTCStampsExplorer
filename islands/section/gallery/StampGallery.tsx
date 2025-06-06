@@ -10,6 +10,7 @@ import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
+import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 
 /* ===== COMPONENT ===== */
 export default function StampGallery({
@@ -239,13 +240,19 @@ export default function StampGallery({
           <div class={containerClass}>
             {isLoading
               ? (
-                // Grid view loading skeleton
-                [...Array(displayCount)].map((_, index) => (
-                  <div
-                    key={index}
-                    class="loading-skeleton aspect-square rounded"
-                  />
-                ))
+                // Grid view loading skeleton with optimized animation control
+                [...Array(displayCount)].map((_, index) => {
+                  const skeletonClasses = useLoadingSkeleton(
+                    isLoading,
+                    "aspect-square rounded",
+                  );
+                  return (
+                    <div
+                      key={index}
+                      class={skeletonClasses}
+                    />
+                  );
+                })
               )
               : (
                 filteredStamps.slice(0, displayCount).map((stamp: StampRow) => (

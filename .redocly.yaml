@@ -16,4 +16,4 @@ apis:
       no-invalid-media-type-examples: warn
     theme:
       openapi:
-        hideLogo: true
+        hideLogo: true 

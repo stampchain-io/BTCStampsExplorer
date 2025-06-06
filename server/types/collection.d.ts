@@ -14,6 +14,7 @@ export interface CollectionQueryParams {
   page?: number;
   creator?: string;
   sortBy?: string;
+  minStampCount?: number;
 }
 
 export interface PaginatedCollectionResponseBody {

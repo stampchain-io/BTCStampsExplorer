@@ -1,13 +1,13 @@
 /* ===== BLOCK TRANSACTIONS COMPONENT ===== */
 import { useState } from "preact/hooks";
-import { useFeePolling } from "$client/hooks/useFeePolling.ts";
+import { useFees } from "$fees";
 import { containerBackground } from "$layout";
 import { text, text2xl } from "$text";
 
 /* ===== MAIN COMPONENT ===== */
 export default function BlockTransactions() {
   /* ===== HOOKS ===== */
-  const { fees } = useFeePolling();
+  const { fees } = useFees();
 
   /* ===== STATE ===== */
   const [isExpanded, setIsExpanded] = useState(true);

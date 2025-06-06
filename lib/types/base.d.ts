@@ -115,14 +115,13 @@ export interface BaseFeeCalculatorProps {
   mintDetails?: MintDetails;
 }
 
-export interface SimpleFeeCalculatorProps
-  extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
+export interface SimpleFeeCalculatorProps extends BaseFeeCalculatorProps {
   type: "send" | "transfer" | "buy" | "src20";
   _type?: string;
   amount?: number;
-  _recipientAddress?: string;
-  _userAddress?: string;
-  _inputType?: ScriptType;
+  recipientAddress?: string;
+  userAddress?: string;
+  inputType?: ScriptType;
   outputTypes?: ScriptType[];
   utxoAncestors?: AncestorInfo[];
   bitname?: string;

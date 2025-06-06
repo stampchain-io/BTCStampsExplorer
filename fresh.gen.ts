@@ -17,6 +17,7 @@ import * as $api_internal_debug_headers from "./routes/api/internal/debug-header
 import * as $api_internal_fees from "./routes/api/internal/fees.ts";
 import * as $api_internal_src20_trending from "./routes/api/internal/src20/trending.ts";
 import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
+import * as $api_proxy_ordinals_path_ from "./routes/api/proxy/ordinals/[...path].ts";
 import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
@@ -103,10 +104,10 @@ import * as $howto_leatherconnect_index from "./routes/howto/leatherconnect/inde
 import * as $howto_leathercreate_index from "./routes/howto/leathercreate/index.tsx";
 import * as $howto_minttoken_index from "./routes/howto/minttoken/index.tsx";
 import * as $howto_registerbitname_index from "./routes/howto/registerbitname/index.tsx";
+import * as $howto_sendstamp_index from "./routes/howto/sendstamp/index.tsx";
 import * as $howto_stamp_index from "./routes/howto/stamp/index.tsx";
 import * as $howto_template_index from "./routes/howto/template/index.tsx";
 import * as $howto_transferbitname_index from "./routes/howto/transferbitname/index.tsx";
-import * as $howto_transferstamp_index from "./routes/howto/transferstamp/index.tsx";
 import * as $howto_transfertoken_index from "./routes/howto/transfertoken/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $media_index from "./routes/media/index.tsx";
@@ -127,6 +128,7 @@ import * as $tool_src101_action_ from "./routes/tool/src101/[action].tsx";
 import * as $tool_src20_action_ from "./routes/tool/src20/[action].tsx";
 import * as $tool_src20_src20RedirectWIP from "./routes/tool/src20/src20RedirectWIP.tsx";
 import * as $tool_stamp_action_ from "./routes/tool/stamp/[action].tsx";
+import * as $tool_stamp_create from "./routes/tool/stamp/create.tsx";
 import * as $tool_stamp_stamping from "./routes/tool/stamp/stamping.tsx";
 import * as $tool_stamp_trade from "./routes/tool/stamp/trade.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
@@ -188,6 +190,7 @@ import * as $header_StampOverviewHeader from "./islands/header/StampOverviewHead
 import * as $header_WalletDashboardHeader from "./islands/header/WalletDashboardHeader.tsx";
 import * as $header_WalletProfileHeader from "./islands/header/WalletProfileHeader.tsx";
 import * as $header_index from "./islands/header/index.ts";
+import * as $layout_AnimationControlsManager from "./islands/layout/AnimationControlsManager.tsx";
 import * as $layout_ChartWidget from "./islands/layout/ChartWidget.tsx";
 import * as $layout_CollapsibleSection from "./islands/layout/CollapsibleSection.tsx";
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
@@ -196,6 +199,7 @@ import * as $layout_ModalOverlay from "./islands/layout/ModalOverlay.tsx";
 import * as $layout_ModalProvider from "./islands/layout/ModalProvider.tsx";
 import * as $layout_ModalStack from "./islands/layout/ModalStack.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
+import * as $layout_PageVisibilityManager from "./islands/layout/PageVisibilityManager.tsx";
 import * as $layout_WalletProvider from "./islands/layout/WalletProvider.tsx";
 import * as $modal_BuyStampModal from "./islands/modal/BuyStampModal.tsx";
 import * as $modal_ConnectWalletModal from "./islands/modal/ConnectWalletModal.tsx";
@@ -228,7 +232,7 @@ import * as $section_gallery_SRC20Transfers from "./islands/section/gallery/SRC2
 import * as $section_gallery_StampGallery from "./islands/section/gallery/StampGallery.tsx";
 import * as $section_gallery_StampOverviewGallery from "./islands/section/gallery/StampOverviewGallery.tsx";
 import * as $section_gallery_StampSales from "./islands/section/gallery/StampSales.tsx";
-import * as $section_gallery_StampTransfers from "./islands/section/gallery/StampTransfers.tsx";
+import * as $section_gallery_StampSends from "./islands/section/gallery/StampSends.tsx";
 import * as $section_gallery_SwiperStyles from "./islands/section/gallery/SwiperStyles.tsx";
 import * as $section_gallery_TeamBanner from "./islands/section/gallery/TeamBanner.tsx";
 import * as $section_howto_SRC101RegisterHowto from "./islands/section/howto/SRC101RegisterHowto.tsx";
@@ -236,7 +240,7 @@ import * as $section_howto_SRC101TransferHowto from "./islands/section/howto/SRC
 import * as $section_howto_SRC20DeployHowto from "./islands/section/howto/SRC20DeployHowto.tsx";
 import * as $section_howto_SRC20MintHowto from "./islands/section/howto/SRC20MintHowto.tsx";
 import * as $section_howto_SRC20TransferHowto from "./islands/section/howto/SRC20TransferHowto.tsx";
-import * as $section_howto_StampTransferHowto from "./islands/section/howto/StampTransferHowto.tsx";
+import * as $section_howto_StampSendHowTo from "./islands/section/howto/StampSendHowTo.tsx";
 import * as $section_howto_StampingHowto from "./islands/section/howto/StampingHowto.tsx";
 import * as $section_index from "./islands/section/index.ts";
 import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
@@ -252,9 +256,9 @@ import * as $tool_src101_RegisterTool from "./islands/tool/src101/RegisterTool.t
 import * as $tool_src20_DeployTool from "./islands/tool/src20/DeployTool.tsx";
 import * as $tool_src20_MintTool from "./islands/tool/src20/MintTool.tsx";
 import * as $tool_src20_TransferTool from "./islands/tool/src20/TransferTool.tsx";
+import * as $tool_stamp_SendTool from "./islands/tool/stamp/SendTool.tsx";
 import * as $tool_stamp_StampingTool from "./islands/tool/stamp/StampingTool.tsx";
 import * as $tool_stamp_TradeTool from "./islands/tool/stamp/TradeTool.tsx";
-import * as $tool_stamp_TransferTool from "./islands/tool/stamp/TransferTool.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -275,6 +279,7 @@ const manifest = {
     "./routes/api/internal/fees.ts": $api_internal_fees,
     "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,
     "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
+    "./routes/api/proxy/ordinals/[...path].ts": $api_proxy_ordinals_path_,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
     "./routes/api/v2/balance/getStampsBalance.ts":
@@ -386,10 +391,10 @@ const manifest = {
     "./routes/howto/leathercreate/index.tsx": $howto_leathercreate_index,
     "./routes/howto/minttoken/index.tsx": $howto_minttoken_index,
     "./routes/howto/registerbitname/index.tsx": $howto_registerbitname_index,
+    "./routes/howto/sendstamp/index.tsx": $howto_sendstamp_index,
     "./routes/howto/stamp/index.tsx": $howto_stamp_index,
     "./routes/howto/template/index.tsx": $howto_template_index,
     "./routes/howto/transferbitname/index.tsx": $howto_transferbitname_index,
-    "./routes/howto/transferstamp/index.tsx": $howto_transferstamp_index,
     "./routes/howto/transfertoken/index.tsx": $howto_transfertoken_index,
     "./routes/index.tsx": $index,
     "./routes/media/index.tsx": $media_index,
@@ -410,6 +415,7 @@ const manifest = {
     "./routes/tool/src20/[action].tsx": $tool_src20_action_,
     "./routes/tool/src20/src20RedirectWIP.tsx": $tool_src20_src20RedirectWIP,
     "./routes/tool/stamp/[action].tsx": $tool_stamp_action_,
+    "./routes/tool/stamp/create.tsx": $tool_stamp_create,
     "./routes/tool/stamp/stamping.tsx": $tool_stamp_stamping,
     "./routes/tool/stamp/trade.tsx": $tool_stamp_trade,
     "./routes/upload/index.tsx": $upload_index,
@@ -486,6 +492,8 @@ const manifest = {
     "./islands/header/WalletDashboardHeader.tsx": $header_WalletDashboardHeader,
     "./islands/header/WalletProfileHeader.tsx": $header_WalletProfileHeader,
     "./islands/header/index.ts": $header_index,
+    "./islands/layout/AnimationControlsManager.tsx":
+      $layout_AnimationControlsManager,
     "./islands/layout/ChartWidget.tsx": $layout_ChartWidget,
     "./islands/layout/CollapsibleSection.tsx": $layout_CollapsibleSection,
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
@@ -494,6 +502,7 @@ const manifest = {
     "./islands/layout/ModalProvider.tsx": $layout_ModalProvider,
     "./islands/layout/ModalStack.tsx": $layout_ModalStack,
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
+    "./islands/layout/PageVisibilityManager.tsx": $layout_PageVisibilityManager,
     "./islands/layout/WalletProvider.tsx": $layout_WalletProvider,
     "./islands/modal/BuyStampModal.tsx": $modal_BuyStampModal,
     "./islands/modal/ConnectWalletModal.tsx": $modal_ConnectWalletModal,
@@ -534,8 +543,7 @@ const manifest = {
     "./islands/section/gallery/StampOverviewGallery.tsx":
       $section_gallery_StampOverviewGallery,
     "./islands/section/gallery/StampSales.tsx": $section_gallery_StampSales,
-    "./islands/section/gallery/StampTransfers.tsx":
-      $section_gallery_StampTransfers,
+    "./islands/section/gallery/StampSends.tsx": $section_gallery_StampSends,
     "./islands/section/gallery/SwiperStyles.tsx": $section_gallery_SwiperStyles,
     "./islands/section/gallery/TeamBanner.tsx": $section_gallery_TeamBanner,
     "./islands/section/howto/SRC101RegisterHowto.tsx":
@@ -547,8 +555,7 @@ const manifest = {
     "./islands/section/howto/SRC20MintHowto.tsx": $section_howto_SRC20MintHowto,
     "./islands/section/howto/SRC20TransferHowto.tsx":
       $section_howto_SRC20TransferHowto,
-    "./islands/section/howto/StampTransferHowto.tsx":
-      $section_howto_StampTransferHowto,
+    "./islands/section/howto/StampSendHowTo.tsx": $section_howto_StampSendHowTo,
     "./islands/section/howto/StampingHowto.tsx": $section_howto_StampingHowto,
     "./islands/section/index.ts": $section_index,
     "./islands/table/DataTableBase.tsx": $table_DataTableBase,
@@ -564,9 +571,9 @@ const manifest = {
     "./islands/tool/src20/DeployTool.tsx": $tool_src20_DeployTool,
     "./islands/tool/src20/MintTool.tsx": $tool_src20_MintTool,
     "./islands/tool/src20/TransferTool.tsx": $tool_src20_TransferTool,
+    "./islands/tool/stamp/SendTool.tsx": $tool_stamp_SendTool,
     "./islands/tool/stamp/StampingTool.tsx": $tool_stamp_StampingTool,
     "./islands/tool/stamp/TradeTool.tsx": $tool_stamp_TradeTool,
-    "./islands/tool/stamp/TransferTool.tsx": $tool_stamp_TransferTool,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
