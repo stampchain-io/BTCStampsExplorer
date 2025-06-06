@@ -543,7 +543,6 @@ export class StampRepository {
     limit?: number;
     page?: number;
     sortBy?: "ASC" | "DESC";
-    sortOrder?: string;
     type?: STAMP_TYPES;
     ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
     identifier?: string | number | (string | number)[];
@@ -578,7 +577,6 @@ export class StampRepository {
       limit = 100,
       page = 0,
       sortBy = "DESC",
-      sortOrder,
       type,
       ident,
       identifier,
@@ -709,8 +707,7 @@ export class StampRepository {
         ? `WHERE ${whereConditions.join(" AND ")}`
         : "";
 
-    const order = sortOrder?.includes("asc") ? "ASC" : "DESC"
-    // const order = sortBy.toUpperCase() === "DESC" ? "DESC" : "ASC";
+    const order = sortBy.toUpperCase() === "DESC" ? "DESC" : "ASC";
     const orderClause = `ORDER BY st.${sortColumn} ${order}`;
 
     let limitClause = "";

@@ -38,7 +38,7 @@ Deno.test("filterToQueryParams - does not encode false values", () => {
       min: "",
       max: "",
     },
-    sortOrder: "",
+    sortBy: "",
   })).toEqual("");
 });
 
@@ -76,8 +76,8 @@ Deno.test("filterToQueryParams - encode string values", () => {
       min: "",
       max: "",
     },
-    sortOrder: "price_asc",
-  })).toEqual("search=my+test&sortOrder=price_asc");
+    sortBy: "ASC",
+  })).toEqual("search=my+test&sortBy=ASC");
 });
 
 Deno.test("filterToQueryParams - encode boolean values", () => {
@@ -114,7 +114,7 @@ Deno.test("filterToQueryParams - encode boolean values", () => {
       min: "",
       max: "",
     },
-    sortOrder: "",
+    sortBy: "",
   })).toEqual("buyNow%5Batomic%5D=true&fileType%5Bsvg%5D=true");
 });
 
@@ -147,7 +147,7 @@ Deno.test("queryParamsToFilters empty", () => {
       min: "",
     },
     search: "",
-    sortOrder: "",
+    sortBy: "",
     stampRange: {
       max: "",
       min: "",
@@ -189,7 +189,7 @@ Deno.test("queryParamsToFilters stampRangePreset", () => {
       min: "",
     },
     search: "",
-    sortOrder: "",
+    sortBy: "",
     stampRange: {
       max: "",
       min: "",
@@ -231,7 +231,7 @@ Deno.test("queryParamsToFilters file type filters", () => {
       min: "",
     },
     search: "",
-    sortOrder: "",
+    sortBy: "",
     stampRange: {
       max: "",
       min: "",
@@ -273,7 +273,7 @@ Deno.test("queryParamsToFilters stamp range min max", () => {
       min: "",
     },
     search: "",
-    sortOrder: "",
+    sortBy: "",
     stampRange: {
       max: "444",
       min: "50",

@@ -67,7 +67,6 @@ export const StampOverviewHeader = (
       <FilterDrawer
         open={isOpen1}
         setOpen={handleOpen1}
-        searchparams={new URLSearchParams()}
         type="stamp"
       />
     </div>

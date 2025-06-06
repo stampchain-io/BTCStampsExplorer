@@ -15,10 +15,10 @@ export function MultiSort(
 ) {
   const [open, setOpen] = useState<boolean>(false);
   const [sort, setSort] = useState<"ASC" | "DESC">(
-    searchparams.get("sortOrder")?.includes("asc") ? "ASC" : "DESC",
+    searchparams.get(sortParam)?.includes("asc") ? "ASC" : "DESC",
   );
   const [option, setOption] = useState<"stamp" | "price">(
-    searchparams.get("sortOrder")?.includes("index") ? "stamp" : "price",
+    searchparams.get(sortParam)?.includes("index") ? "stamp" : "price",
   );
 
   const { updateURL } = useURLUpdate();
@@ -40,7 +40,7 @@ export function MultiSort(
 
   const handleMultiSort = () => {
     const url = new URL(globalThis.location.href);
-    const currentSort = url.searchParams.get("sortOrder");
+    const currentSort = url.searchParams.get(sortParam);
 
     // Define sort mapping for each option
     const sortMap: Record<string, { asc: string; desc: string }> = {
@@ -60,7 +60,7 @@ export function MultiSort(
     onChangeSort?.(newSort);
 
     // Update URL and reload page
-    url.searchParams.set("sortOrder", newParam);
+    url.searchParams.set(sortParam, newParam);
     globalThis.location.href = url.toString();
   };
 

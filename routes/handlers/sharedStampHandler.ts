@@ -44,12 +44,8 @@ function getCacheType(path: string, isIndex: boolean): RouteType {
 }
 
 function getSortParameter(url: URL): string | null {
-  // Check for both sort and sort_order parameters
-  const sort = url.searchParams.get("sort");
-  const sortOrder = url.searchParams.get("sort_order");
-
-  // Prefer 'sort' if both are present, otherwise use whichever exists
-  return sort ?? sortOrder ?? null;
+  const sortBy = url.searchParams.get("sortBy");
+  return sortBy;
 }
 
 export const createStampHandler = (

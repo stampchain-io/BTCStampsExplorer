@@ -4,18 +4,26 @@ import { tooltipIcon } from "$notification";
 
 interface SortProps {
   searchParams?: URLSearchParams | undefined;
+  initSort?: "ASC" | "DESC" | undefined;
+  sortParam?: string;
 }
 
-export function SortButton({ searchParams }: SortProps) {
-  // Initialize sort based on URL parameter
+export function SortButton(
+  { searchParams, initSort, sortParam = "sortBy" }: SortProps,
+) {
+  // Initialize sort based on URL parameter or initSort prop
   const [sort, setSort] = useState<"ASC" | "DESC">(() => {
-    // Use the current URL if available, otherwise fallback to searchParams
+    // Use initSort prop if provided
+    if (initSort) {
+      return initSort;
+    }
+    // Otherwise use the current URL if available, or fallback to searchParams
     if (typeof globalThis !== "undefined" && globalThis?.location) {
       const currentSort = new URL(globalThis.location.href)
-        .searchParams.get("sortOrder");
-      return currentSort?.includes("asc") ? "ASC" : "DESC";
+        .searchParams.get(sortParam);
+      return currentSort === "ASC" ? "ASC" : "DESC";
     }
-    return searchParams?.get("sortOrder")?.includes("asc") ? "ASC" : "DESC";
+    return searchParams?.get(sortParam) === "ASC" ? "ASC" : "DESC";
   });
 
   // Add tooltip state
@@ -25,11 +33,10 @@ export function SortButton({ searchParams }: SortProps) {
 
   const handleSort = () => {
     const url = new URL(globalThis.location.href);
-    const currentSort = url.searchParams.get("sortOrder") || "index_desc";
+    const currentSort = url.searchParams.get(sortParam) || "DESC";
 
-    // Toggle between index_asc and index_desc
-    const isAscending = currentSort === "index_asc";
-    const newParam = isAscending ? "index_desc" : "index_asc";
+    // Toggle between ASC and DESC
+    const isAscending = currentSort === "ASC";
     const newSort = isAscending ? "DESC" : "ASC";
 
     setSort(newSort);
@@ -37,7 +44,7 @@ export function SortButton({ searchParams }: SortProps) {
     setAllowTooltip(false);
 
     // Update URL and reload page
-    url.searchParams.set("sortOrder", newParam);
+    url.searchParams.set(sortParam, newSort);
     globalThis.location.href = url.toString();
   };
 
