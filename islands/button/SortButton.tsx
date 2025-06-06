@@ -6,10 +6,11 @@ interface SortProps {
   searchParams?: URLSearchParams | undefined;
   initSort?: "ASC" | "DESC" | undefined;
   sortParam?: string;
+  onChangeSort?: (newSort: "ASC" | "DESC") => void;
 }
 
 export function SortButton(
-  { searchParams, initSort, sortParam = "sortBy" }: SortProps,
+  { searchParams, initSort, sortParam = "sortBy", onChangeSort }: SortProps,
 ) {
   // Initialize sort based on URL parameter or initSort prop
   const [sort, setSort] = useState<"ASC" | "DESC">(() => {
@@ -42,6 +43,9 @@ export function SortButton(
     setSort(newSort);
     setIsTooltipVisible(false);
     setAllowTooltip(false);
+
+    // Call the onChangeSort callback if provided
+    onChangeSort?.(newSort);
 
     // Update URL and reload page
     url.searchParams.set(sortParam, newSort);
