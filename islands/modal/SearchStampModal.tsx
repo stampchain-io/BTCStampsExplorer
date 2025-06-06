@@ -1,9 +1,10 @@
 /* @baba - commentary + global styles */
-import { useCallback, useEffect, useRef } from "preact/hooks";
+import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 import { ModalSearchBase } from "$layout";
 import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
 import { textSm } from "$text";
 import { Icon } from "$icon";
+import { tooltipIcon } from "$notification";
 
 export function SearchStampModal({
   showButton = true,
@@ -11,6 +12,11 @@ export function SearchStampModal({
   showButton?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Add tooltip state
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+  const [allowTooltip, setAllowTooltip] = useState(true);
+  const tooltipTimeoutRef = useRef<number | null>(null);
 
   // Helper functions
   const isHexString = (str: string): boolean => {
@@ -217,8 +223,37 @@ export function SearchStampModal({
       document.removeEventListener("keydown", handleKeyboardShortcut);
   }, []);
 
+  // Add tooltip handlers
+  const handleMouseEnter = () => {
+    if (allowTooltip) {
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsTooltipVisible(true);
+      }, 1500);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (tooltipTimeoutRef.current) {
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
+    }
+    setIsTooltipVisible(false);
+    setAllowTooltip(true);
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <div class="relative">
+    <div className="relative">
       {showButton && (
         <Icon
           type="iconLink"
@@ -227,10 +262,23 @@ export function SearchStampModal({
           size="custom"
           color="purple"
           className="mt-[7px] w-[23px] h-[23px] tablet:w-5 tablet:h-5"
-          onClick={handleOpenSearch}
+          onClick={() => {
+            handleOpenSearch();
+            setIsTooltipVisible(false);
+            setAllowTooltip(false);
+          }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
           role="button"
         />
       )}
+      <div
+        className={`${tooltipIcon} ${
+          isTooltipVisible ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        SEARCH
+      </div>
     </div>
   );
 }

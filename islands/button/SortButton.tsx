@@ -1,5 +1,6 @@
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { Icon } from "$components/icon/IconBase.tsx";
+import { tooltipIcon } from "$notification";
 
 interface SortProps {
   searchParams?: URLSearchParams | undefined;
@@ -17,6 +18,11 @@ export function SortButton({ searchParams }: SortProps) {
     return searchParams?.get("sortOrder")?.includes("asc") ? "ASC" : "DESC";
   });
 
+  // Add tooltip state
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+  const [allowTooltip, setAllowTooltip] = useState(true);
+  const tooltipTimeoutRef = useRef<number | null>(null);
+
   const handleSort = () => {
     const url = new URL(globalThis.location.href);
     const currentSort = url.searchParams.get("sortOrder") || "index_desc";
@@ -27,22 +33,64 @@ export function SortButton({ searchParams }: SortProps) {
     const newSort = isAscending ? "DESC" : "ASC";
 
     setSort(newSort);
+    setIsTooltipVisible(false);
+    setAllowTooltip(false);
 
     // Update URL and reload page
     url.searchParams.set("sortOrder", newParam);
     globalThis.location.href = url.toString();
   };
 
+  // Add tooltip handlers
+  const handleMouseEnter = () => {
+    if (allowTooltip) {
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsTooltipVisible(true);
+      }, 1500);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (tooltipTimeoutRef.current) {
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
+    }
+    setIsTooltipVisible(false);
+    setAllowTooltip(true);
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (tooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <Icon
-      type="iconLink"
-      name={sort === "DESC" ? "sortAsc" : "sortDesc"}
-      weight="bold"
-      size="custom"
-      color="purple"
-      className="mt-[5px] w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px] transform transition-all duration-300"
-      ariaLabel={`Sort ${sort === "DESC" ? "ascending" : "descending"}`}
-      onClick={handleSort}
-    />
+    <div className="relative">
+      <Icon
+        type="iconLink"
+        name={sort === "DESC" ? "sortAsc" : "sortDesc"}
+        weight="bold"
+        size="custom"
+        color="purple"
+        className="mt-[5px] w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px] transform transition-all duration-300"
+        ariaLabel={`Sort ${sort === "DESC" ? "ascending" : "descending"}`}
+        onClick={handleSort}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      />
+      <div
+        className={`${tooltipIcon} ${
+          isTooltipVisible ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        SORT
+      </div>
+    </div>
   );
 }
