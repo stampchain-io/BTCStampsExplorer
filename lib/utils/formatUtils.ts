@@ -230,3 +230,12 @@ export function decodeBase64(base64String: string) {
   const decodedText = new TextDecoder().decode(utf8Array);
   return decodedText;
 }
+
+/**
+ * Formats a number by adding commas as thousand separators
+ * @param num The number to format
+ * @returns Formatted string with commas
+ */
+export function formatNumberWithCommas(num: number): string {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

@@ -9,10 +9,14 @@ import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import {
   PaginatedStampBalanceResponseBody,
   ProcessedHolder,
+  StampRow,
   STAMP_FILTER_TYPES,
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
-  StampRow,
+  STAMP_FILETYPES,
+  STAMP_EDITIONS,
+  STAMP_MARKET,
+  STAMP_RANGES,
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
@@ -41,7 +45,7 @@ export class StampController {
   static async getStamps({
     page = 1,
     limit = BIG_LIMIT,
-    sortBy = "ASC",
+    sortBy = "DESC",
     type = "all",
     filterBy = [] as STAMP_FILTER_TYPES[],
     ident,
@@ -61,155 +65,229 @@ export class StampController {
     cacheType = RouteType.STAMP_LIST,
     enrichWithAssetInfo = false,
     isSearchQuery = false,
-    skipDispenserLookup = false,
-    skipPriceCalculation = false,
     url,
+    filetypeFilters,
+    editionFilters,
+    rangeFilters,
+    rangeMin,
+    rangeMax,
+    marketFilters,
+    marketMin,
+    marketMax,
+  }: {
+    page?: number;
+    limit?: number;
+    sortBy?: "ASC" | "DESC";
+    /**
+     * If suffix filters and ident are provided, filterBy and type will be ignored
+     */
+    suffixFilters?: string[];
+    ident?: SUBPROTOCOLS[];
+    url?: string;
+    isSearchQuery?: boolean;
+    enrichWithAssetInfo?: boolean;
+    skipTotalCount?: boolean;
+    collectionId?: string | undefined;
+    type?: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
+    allColumns?: boolean
+    identifier?: string | number | (string | number)[];
+    noPagination?: boolean
+    cacheDuration?: number
+    filterBy?: STAMP_FILTER_TYPES[];
+    filetypeFilters?: STAMP_FILETYPES[];
+    editionFilters?: STAMP_EDITIONS[];
+    rangeFilters?: STAMP_RANGES;
+    rangeMin?: string;
+    rangeMax?: string;
+    marketFilters?: STAMP_MARKET[];
+    marketMin?: string;
+    marketMax?: string;
   } = {}) {
-    try {
-      const filterByArray = typeof filterBy === "string"
-        ? filterBy.split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
-        : filterBy;
+    console.log("stamp controller payload", {
+      page,
+      limit,
+      sortBy,
+      type,
+      filterBy,
+      ident,
+      collectionId,
+      url,
+      filetypeFilters,
+      editionFilters,
+      rangeFilters,
+      rangeMin,
+      rangeMax,
+      marketFilters,
+      marketMin,
+      marketMax
+    });
+    
+    console.log("About to call repository with rangeFilters:", rangeFilters);
+    
+    const filterByArray = typeof filterBy === "string"
+      ? filterBy.split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
+      : filterBy;
 
-      // Initialize ident based on type
-      let finalIdent: SUBPROTOCOLS[] = ident || [];
-      if ((!ident || ident.length === 0) && type) {
-        if (type === "classic") {
-          finalIdent = ["STAMP"];
-        } else if (type === "posh") {
-          finalIdent = [];
-        } else if (type === "stamps") {
-          finalIdent = ["STAMP", "SRC-721"];
-        } else if (type === "src20") {
-          finalIdent = ["SRC-20"];
-        } else if (type === "all") {
-          finalIdent = []; // We'll handle 'all' in the repository
-        } else {
-          finalIdent = [];
-        }
+    // Initialize ident based on type
+    let finalIdent: SUBPROTOCOLS[] = ident || [];
+    if ((!ident || ident.length === 0) && type) {
+      if (type === "classic") {
+        finalIdent = ["STAMP"];
+      } else if (type === "posh") {
+        finalIdent = [];
+      } else if (type === "stamps") {
+        finalIdent = ["STAMP", "SRC-721"];
+      } else if (type === "src20") {
+        finalIdent = ["SRC-20"];
+      } else if (type === "all") {
+        finalIdent = []; // We'll handle 'all' in the repository
+      } else {
+        finalIdent = [];
       }
-
-      let filterSuffixFilters: STAMP_SUFFIX_FILTERS[] = [];
-      if (filterByArray.length > 0) {
-        // Extract ident and suffixFilters from filterBy
-        const identFromFilter = filterByArray.flatMap((filter) =>
-          filterOptions[filter]?.ident || []
-        );
-        filterSuffixFilters = filterByArray.flatMap((filter) =>
-          filterOptions[filter]?.suffixFilters || []
-        ) as STAMP_SUFFIX_FILTERS[];
-
-        // Combine ident from type and filterBy, removing duplicates
-        if (identFromFilter.length > 0) {
-          finalIdent = Array.from(new Set([...finalIdent, ...identFromFilter]));
-        }
-
-        // When filterBy is defined, suffixFilters are limited to those in filterOptions
-        suffixFilters = filterSuffixFilters;
-      } else if (!suffixFilters || suffixFilters.length === 0) {
-        // If suffixFilters are not provided, use all possible suffixes
-        suffixFilters = []; // No suffix filter applied
-      }
-
-      const stampResult = await StampService.getStamps({
-        page,
-        limit,
-        sortBy,
-        type,
-        ident: finalIdent,
-        suffixFilters,
-        allColumns,
-        includeSecondary,
-        collectionId,
-        identifier,
-        blockIdentifier,
-        cacheDuration,
-        noPagination,
-        filterBy: filterByArray,
-        sortColumn,
-        collectionStampLimit,
-        groupBy,
-        groupBySubquery,
-        skipTotalCount,
-        cacheType,
-        isSearchQuery
-      });
-
-      // Process stamps with floor prices and asset info if needed
-      const btcPrice = skipPriceCalculation ? 0 : await fetchBTCPriceInUSD(url?.origin);
-      const processedStamps = await Promise.all(
-        stampResult.stamps.map(async (stamp) => {
-          if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
-            return stamp;
-          }
-          
-          let floorPrice: number | "priceless" = "priceless";
-          
-          // Skip expensive dispenser lookups if requested (for collection pages)
-          if (!skipDispenserLookup) {
-            // Get all dispensers to check both open and closed
-            const allDispensers = await DispenserManager.getDispensersByCpid(stamp.cpid);
-            const openDispensers = allDispensers.dispensers.filter(d => d.give_remaining > 0);
-            const closedDispensers = allDispensers.dispensers.filter(d => d.give_remaining === 0);
-            
-            if (openDispensers.length > 0) {
-              // Use floor price from open dispensers
-              floorPrice = this.calculateFloorPrice(openDispensers);
-            } else if (closedDispensers.length > 0) {
-              // If no open dispensers, use most recent closed dispenser price
-              const sortedClosedDispensers = closedDispensers.sort((a, b) => b.block_index - a.block_index);
-              const recentPrice = Number(formatSatoshisToBTC(sortedClosedDispensers[0].satoshirate, { includeSymbol: false }));
-              floorPrice = recentPrice || "priceless";
-            }
-          }
-
-          // If enrichment is requested and it's a single stamp query
-          if (enrichWithAssetInfo && identifier && !Array.isArray(identifier)) {
-            const asset = await XcpManager.getAssetInfo(stamp.cpid);
-            const enrichedStamp = this.enrichStampWithAssetData(stamp, asset);
-            return {
-              ...enrichedStamp,
-              floorPrice,
-              floorPriceUSD: skipPriceCalculation ? null : (typeof floorPrice === 'number' ? floorPrice * btcPrice : null),
-              marketCapUSD: skipPriceCalculation ? null : (typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null),
-            };
-          }
-          
-          return {
-            ...stamp,
-            floorPrice,
-            floorPriceUSD: skipPriceCalculation ? null : (typeof floorPrice === 'number' ? floorPrice * btcPrice : null),
-            marketCapUSD: skipPriceCalculation ? null : (typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null),
-          };
-        })
-      );
-
-      // Build response based on query type
-      const baseResponse = {
-        data: identifier && !Array.isArray(identifier) 
-          ? { stamp: processedStamps[0] }  // Single stamp response
-          : processedStamps,               // Multiple stamps response
-        last_block: stampResult.last_block,
-      };
-
-      // Add pagination data for index/collection routes
-      if (!identifier || Array.isArray(identifier)) {
-        return {
-          ...baseResponse,
-          page: stampResult.page,
-          limit: stampResult.page_size,
-          totalPages: stampResult.pages,
-          total: skipTotalCount ? undefined : stampResult.total,
-        };
-      }
-
-      return baseResponse;
-    } catch (error) {
-      logger.error("stamps", {
-        message: "Error in StampController.getStamps",
-        error: error instanceof Error ? error.message : String(error)
-      });
-      throw error;
     }
+
+    let filterSuffixFilters: STAMP_SUFFIX_FILTERS[] = [];
+    if (filterByArray.length > 0) {
+      // Extract ident and suffixFilters from filterBy
+      const identFromFilter = filterByArray.flatMap((filter) =>
+        filterOptions[filter]?.ident || []
+      );
+      filterSuffixFilters = filterByArray.flatMap((filter) =>
+        filterOptions[filter]?.suffixFilters || []
+      ) as STAMP_SUFFIX_FILTERS[];
+
+      // Combine ident from type and filterBy, removing duplicates
+      if (identFromFilter.length > 0) {
+        finalIdent = Array.from(new Set([...finalIdent, ...identFromFilter]));
+      }
+
+      // When filterBy is defined, suffixFilters are limited to those in filterOptions
+      suffixFilters = filterSuffixFilters;
+    } else if (!suffixFilters || suffixFilters.length === 0) {
+      // If suffixFilters are not provided, use all possible suffixes
+      suffixFilters = []; // No suffix filter applied
+    }
+
+    // If rangeFilters is undefined but url is provided, check for range parameters
+    if (!rangeFilters && url) {
+      try {
+        const urlObj = new URL(url);
+        const rangeMin = urlObj.searchParams.get("range[stampRange][min]");
+        const rangeMax = urlObj.searchParams.get("range[stampRange][max]");
+        
+        if (rangeMin || rangeMax) {
+          console.log("Controller detected custom range params:", { rangeMin, rangeMax });
+          rangeFilters = {
+            stampRange: {
+              min: rangeMin || "",
+              max: rangeMax || ""
+            }
+          };
+          console.log("Controller set rangeFilters:", rangeFilters);
+        }
+      } catch (error) {
+        console.error("Error parsing URL in controller:", error);
+      }
+    }
+
+    const stampResult = await StampService.getStamps({
+      page,
+      limit,
+      sortBy,
+      type,
+      ident: finalIdent,
+      suffixFilters,
+      allColumns,
+      includeSecondary,
+      collectionId,
+      identifier,
+      blockIdentifier,
+      cacheDuration,
+      noPagination,
+      sortColumn,
+      collectionStampLimit,
+      groupBy,
+      groupBySubquery,
+      skipTotalCount,
+      cacheType,
+      isSearchQuery,
+      filterBy: filterByArray,
+      filetypeFilters,
+      editionFilters,
+      rangeFilters,
+      rangeMin,
+      rangeMax,
+      marketFilters,
+      marketMin,
+      marketMax
+    });
+
+    // Process stamps with floor prices and asset info if needed
+    const btcPrice = await fetchBTCPriceInUSD(url?.origin);
+    const processedStamps = await Promise.all(
+      stampResult.stamps.map(async (stamp) => {
+        if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
+          return stamp;
+        }
+        
+        // Get all dispensers to check both open and closed
+        const allDispensers = await DispenserManager.getDispensersByCpid(stamp.cpid);
+        const openDispensers = allDispensers.dispensers.filter(d => d.give_remaining > 0);
+        const closedDispensers = allDispensers.dispensers.filter(d => d.give_remaining === 0);
+        
+        let floorPrice: number | "priceless" = "priceless";
+        
+        if (openDispensers.length > 0) {
+          // Use floor price from open dispensers
+          floorPrice = this.calculateFloorPrice(openDispensers);
+        } else if (closedDispensers.length > 0) {
+          // If no open dispensers, use most recent closed dispenser price
+          const sortedClosedDispensers = closedDispensers.sort((a, b) => b.block_index - a.block_index);
+          const recentPrice = Number(formatSatoshisToBTC(sortedClosedDispensers[0].satoshirate, { includeSymbol: false }));
+          floorPrice = recentPrice || "priceless";
+        }
+
+        // If enrichment is requested and it's a single stamp query
+        if (enrichWithAssetInfo && identifier && !Array.isArray(identifier)) {
+          const asset = await XcpManager.getAssetInfo(stamp.cpid);
+          const enrichedStamp = this.enrichStampWithAssetData(stamp, asset);
+          return {
+            ...enrichedStamp,
+            floorPrice,
+            floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPrice : null,
+            marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null,
+          };
+        }
+        
+        return {
+          ...stamp,
+          floorPrice,
+          floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPrice : null,
+          marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null,
+        };
+      })
+    );
+
+    // Build response based on query type
+    const baseResponse = {
+      data: identifier && !Array.isArray(identifier) 
+        ? { stamp: processedStamps[0] }  // Single stamp response
+        : processedStamps,               // Multiple stamps response
+      last_block: stampResult.last_block,
+    };
+
+    // Add pagination data for index/collection routes
+    if (!identifier || Array.isArray(identifier)) {
+      return {
+        ...baseResponse,
+        page: stampResult.page,
+        limit: stampResult.page_size,
+        totalPages: stampResult.pages,
+        total: skipTotalCount ? undefined : stampResult.total,
+      };
+    }
+
+    return baseResponse;
   }
 
   // This becomes a wrapper around getStamps for backward compatibility
@@ -333,8 +411,6 @@ export class StampController {
       throw error;
     }
   }
-
-
 
   static async getStampBalancesByAddress(
     address: string,

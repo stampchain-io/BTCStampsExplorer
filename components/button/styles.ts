@@ -27,7 +27,7 @@ export interface ButtonVariants {
     string
   >;
   size: Record<
-    "xs" | "sm" | "md" | "lg" | "xl",
+    "xs" | "sm" | "md" | "lg" | "xl" | "smR" | "mdR",
     string
   >;
   textSize: Record<
@@ -182,6 +182,8 @@ export const buttonStyles: ButtonVariants = {
     md: "h-[38px] px-4 text-sm",
     lg: "h-[42px] px-4 text-sm",
     xl: "h-[46px] px-5 text-base",
+    smR: "h-[34px] tablet:h-[30px] px-4 text-xs",
+    mdR: "h-[38px] tablet:h-[34px] px-4 text-sm tablet:text-xs",
   },
 
   /* ===== TEXT SIZE STYLES - ONLY USED FOR TEXT BUTTONS ===== */

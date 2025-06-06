@@ -98,40 +98,35 @@ export const ConnectButton = () => {
       {isConnected && address && (
         <>
           {/* ===== MOBILE/TABLET MENU ===== */}
-          <div class="tablet:hidden flex gap-5 text-right">
-            <div class="flex flex-col justify-end">
-              <h6 class={valueDarkSm}>
-                {abbreviateAddress(address, 8)}
-              </h6>
-            </div>
+          <div class="flex flex-col tablet:hidden w-full justify-between gap-3 text-right group">
+            <h6 class={valueDarkSm}>
+              {abbreviateAddress(address, 6)}
+            </h6>
+            <Button
+              variant="text"
+              color="custom"
+              size="md"
+              onClick={() => {
+                if (isConnected && address) {
+                  globalThis.location.href = `/wallet/${address}`;
+                }
+              }}
+              ref={buttonRef}
+              class="!justify-end gray-gradient3-hover"
+            >
+              DASHBOARD
+            </Button>
 
-            <div class="flex flex-col w-fulljustify-between gap-3 group">
-              <Button
-                variant="text"
-                color="custom"
-                size="md"
-                onClick={() => {
-                  if (isConnected && address) {
-                    globalThis.location.href = `/wallet/${address}`;
-                  }
-                }}
-                ref={buttonRef}
-                class="!justify-end gray-gradient3-hover"
-              >
-                DASHBOARD
-              </Button>
-
-              <Button
-                variant="text"
-                color="custom"
-                size="md"
-                onClick={() => walletSignOut()}
-                ref={buttonRef}
-                class="!justify-end gray-gradient3-hover"
-              >
-                DISCONNECT
-              </Button>
-            </div>
+            <Button
+              variant="text"
+              color="custom"
+              size="md"
+              onClick={() => walletSignOut()}
+              ref={buttonRef}
+              class="!justify-end gray-gradient3-hover"
+            >
+              DISCONNECT
+            </Button>
           </div>
 
           {/* ===== DESKTOP DROPDOWN MENU ===== */}

@@ -1,21 +1,24 @@
 /* ===== STAMP OVERVIEW HEADER COMPONENT ===== */
 /* TODO (@baba) - update filter and styling */
 import { useState } from "preact/hooks";
-import { STAMP_FILTER_TYPES } from "$globals";
-import { Filter } from "$islands/datacontrol/Filter.tsx";
-import { Sort } from "$islands/datacontrol/Sort.tsx";
+import { FilterButton } from "$islands/button/FilterButton.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
+import { SortButton } from "$islands/button/SortButton.tsx";
 import { titlePurpleLD } from "$text";
+import {
+  defaultFilters,
+  StampFilters,
+} from "$islands/filter/FilterOptionsStamp.tsx";
+import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
 
 /* ===== TYPES ===== */
 type StampOverviewHeaderProps = {
-  filterBy: STAMP_FILTER_TYPES[];
-  sortBy: "ASC" | "DESC" | undefined;
+  currentFilters?: StampFilters;
 };
 
 /* ===== COMPONENT ===== */
 export const StampOverviewHeader = (
-  { filterBy, sortBy }: StampOverviewHeaderProps,
+  { currentFilters = defaultFilters }: StampOverviewHeaderProps,
 ) => {
   /* ===== STATE MANAGEMENT ===== */
   const [isOpen1, setIsOpen1] = useState(false);
@@ -25,48 +28,47 @@ export const StampOverviewHeader = (
     setIsOpen1(open);
   };
 
+  /* ===== HELPER FUNCTION ===== */
+  function countActiveStampFilters(filters: StampFilters): number {
+    let count = 0;
+    if (filters.market.length > 0) count++;
+    count += filters.fileType.length;
+    count += filters.editions.length;
+    if (filters.range !== null) count++;
+    if (filters.marketMin || filters.marketMax) count++;
+    if (filters.rangeMin || filters.rangeMax) count++;
+    return count;
+  }
+
   /* ===== RENDER ===== */
   return (
     <div
-      class={`relative flex flex-row justify-between items-start w-full gap-3 ${
-        isOpen1 ? "-mb-[150px] mobileMd:-mb-[146px] mobileLg:-mb-[160px]" : ""
-      }`}
+      class={`relative flex flex-row justify-between items-start w-full gap-3`}
     >
       {/* Responsive Title Section */}
-      <h1 className={`${titlePurpleLD} block mobileLg:hidden`}>STAMPS</h1>
-      <h1 className={`${titlePurpleLD} hidden mobileLg:block`}>ART STAMPS</h1>
+      <h1 className={`${titlePurpleLD} block mobileMd:hidden`}>STAMPS</h1>
+      <h1 className={`${titlePurpleLD} hidden mobileMd:block`}>ART STAMPS</h1>
 
       {/* Controls Section */}
       <div className="flex flex-col">
-        <div className="flex relative items-start justify-between gap-4 tablet:gap-3">
-          {/* Filter Component */}
-          <Filter
-            initFilter={filterBy}
+        <div className="flex relative items-start justify-between gap-[18px] tablet:gap-3">
+          <FilterButton
+            count={countActiveStampFilters(currentFilters)}
             open={isOpen1}
-            handleOpen={handleOpen1}
-            filterButtons={[
-              "pixel",
-              "vector",
-              "for sale",
-              "trending sales",
-              "sold",
-            ]}
-            dropdownPosition="right-[-84px] mobileLg:right-[-96px]"
+            setOpen={handleOpen1}
+            type="stamp"
           />
-
-          {/* Sort Component - Hidden when filter is open */}
-          <div
-            class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
-          >
-            <Sort initSort={sortBy} />
-          </div>
-
-          {/* Search Component - Hidden when filter is open */}
-          <div class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}>
-            <SearchStampModal showButton />
-          </div>
+          <SortButton />
+          <SearchStampModal showButton />
         </div>
       </div>
+
+      {/* Filter Drawer */}
+      <FilterDrawer
+        open={isOpen1}
+        setOpen={handleOpen1}
+        type="stamp"
+      />
     </div>
   );
 };
