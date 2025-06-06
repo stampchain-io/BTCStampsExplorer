@@ -13,7 +13,7 @@ export function SortButton(
   { searchParams, initSort, sortParam = "sortBy", onChangeSort }: SortProps,
 ) {
   // Initialize sort based on URL parameter or initSort prop
-  const [sort, setSort] = useState<"ASC" | "DESC">(() => {
+  const sort = (() => {
     // Use initSort prop if provided
     if (initSort) {
       return initSort;
@@ -25,7 +25,7 @@ export function SortButton(
       return currentSort === "ASC" ? "ASC" : "DESC";
     }
     return searchParams?.get(sortParam) === "ASC" ? "ASC" : "DESC";
-  });
+  })();
 
   // Add tooltip state
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
@@ -37,10 +37,9 @@ export function SortButton(
     const currentSort = url.searchParams.get(sortParam) || "DESC";
 
     // Toggle between ASC and DESC
-    const isAscending = currentSort === "ASC";
-    const newSort = isAscending ? "DESC" : "ASC";
+    const newSort = currentSort === "ASC" ? "DESC" : "ASC";
 
-    setSort(newSort);
+    // Don't update state before page reload
     setIsTooltipVisible(false);
     setAllowTooltip(false);
 
