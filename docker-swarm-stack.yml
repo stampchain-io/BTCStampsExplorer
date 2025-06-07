@@ -1,0 +1,182 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    networks:
+      - db_mysql_cluster_network
+    volumes:
+      - redis-data:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  btcstamps-explorer:
+    image: ${DOCKER_IMAGE:-mortylen/btcstampsexplorer:latest}
+    networks:
+      - db_mysql_cluster_network
+      - traefik_proxy_traefik_net
+    environment:
+      # Application Environment
+      - DENO_ENV=production
+      - NODE_ENV=production
+      
+      # Database Configuration
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME:-stamps}
+      
+      # Redis Configuration
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_TIMEOUT=${REDIS_TIMEOUT:-15000}
+      - REDIS_MAX_RETRIES=${REDIS_MAX_RETRIES:-10}
+      - REDIS_DEBUG=${REDIS_DEBUG:-true}
+      - SKIP_REDIS=${SKIP_REDIS:-false}
+      - SKIP_REDIS_CONNECTION=${SKIP_REDIS_CONNECTION:-false}
+      - SKIP_REDIS_TLS=${SKIP_REDIS_TLS:-true}
+      - CACHE=${CACHE:-true}
+      
+      # Bitcoin/Blockchain Configuration
+      - QUICKNODE_ENDPOINT=${QUICKNODE_ENDPOINT}
+      - QUICKNODE_AUTH_TOKEN=${QUICKNODE_AUTH_TOKEN}
+      - MEMPOOL_API_URL=${MEMPOOL_API_URL:-https://mempool.space/api}
+      - BTC_NETWORK=${BTC_NETWORK:-mainnet}
+      
+      # API Configuration
+      - API_BASE_URL=${API_BASE_URL}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-true}
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-900000}
+      
+      # Security
+      - JWT_SECRET=${JWT_SECRET}
+      - CSRF_SECRET=${CSRF_SECRET}
+      - SESSION_SECRET=${SESSION_SECRET}
+      
+      # Application Features
+      - ENABLE_WALLET_FEATURES=${ENABLE_WALLET_FEATURES:-true}
+      - ENABLE_MINING=${ENABLE_MINING:-true}
+      - ENABLE_SRC20=${ENABLE_SRC20:-true}
+      - ENABLE_SRC101=${ENABLE_SRC101:-true}
+      
+      # Monitoring & Logging
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - ENABLE_METRICS=${ENABLE_METRICS:-false}
+      - SENTRY_DSN=${SENTRY_DSN}
+      
+      # Performance
+      - MAX_CONCURRENT_REQUESTS=${MAX_CONCURRENT_REQUESTS:-50}
+      - REQUEST_TIMEOUT=${REQUEST_TIMEOUT:-30000}
+      
+    deploy:
+      replicas: ${REPLICAS:-2}
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 300s
+      update_config:
+        parallelism: 1
+        delay: 30s
+        failure_action: rollback
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: pause
+        order: stop-first
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+      labels:
+        # Traefik Configuration
+        - traefik.enable=true
+        - traefik.constraint-label=traefik-proxy
+        
+        # HTTP Router
+        - traefik.http.routers.btcstamps-http.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.btcstamps-http.entrypoints=web
+        - traefik.http.routers.btcstamps-http.middlewares=https-redirect
+        
+        # HTTPS Router
+        - traefik.http.routers.btcstamps-https.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.btcstamps-https.entrypoints=websecure
+        - traefik.http.routers.btcstamps-https.tls=true
+        - traefik.http.routers.btcstamps-https.tls.certresolver=le
+        
+        # Service Configuration
+        - traefik.http.services.btcstamps.loadbalancer.server.port=8000
+        - traefik.http.services.btcstamps.loadbalancer.healthcheck.path=/api/v2/health
+        - traefik.http.services.btcstamps.loadbalancer.healthcheck.interval=30s
+        - traefik.http.services.btcstamps.loadbalancer.healthcheck.timeout=10s
+        
+        # Middlewares
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        
+        # Security Headers
+        - traefik.http.middlewares.secure-headers.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,DELETE
+        - traefik.http.middlewares.secure-headers.headers.accesscontrolalloworiginlist=${CORS_ORIGINS}
+        - traefik.http.middlewares.secure-headers.headers.accesscontrolmaxage=100
+        - traefik.http.middlewares.secure-headers.headers.addvaryheader=true
+        - traefik.http.middlewares.secure-headers.headers.referrerpolicy=strict-origin-when-cross-origin
+        - traefik.http.middlewares.secure-headers.headers.contenttypenosniff=true
+        - traefik.http.middlewares.secure-headers.headers.customrequestheaders.X-Forwarded-Proto=https
+        
+        # Rate Limiting (if needed)
+        - traefik.http.middlewares.rate-limit.ratelimit.average=${RATE_LIMIT_AVERAGE:-100}
+        - traefik.http.middlewares.rate-limit.ratelimit.burst=${RATE_LIMIT_BURST:-50}
+        
+        # Apply middlewares to HTTPS router
+        - traefik.http.routers.btcstamps-https.middlewares=secure-headers@docker
+        
+        # Network
+        - traefik.docker.network=traefik_proxy_traefik_net
+    
+    depends_on:
+      - redis
+    
+    healthcheck:
+      test: ["CMD", "deno", "run", "--allow-net", "healthcheck.ts"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  db_mysql_cluster_network:
+    external: true
+  traefik_proxy_traefik_net:
+    external: true
+
+volumes:
+  redis-data:
+    driver: local

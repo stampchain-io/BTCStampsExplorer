@@ -1,0 +1,243 @@
+version: '3.8'
+
+# Production Docker Swarm Stack for BTC Stamps Explorer
+# Optimized for high availability and performance
+
+services:
+  redis:
+    image: redis:7-alpine
+    networks:
+      - db_mysql_cluster_network
+    volumes:
+      - redis-data:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  btcstamps-explorer:
+    image: ${DOCKER_IMAGE:-mortylen/btcstampsexplorer:latest}
+    networks:
+      - db_mysql_cluster_network
+      - traefik_proxy_traefik_net
+    environment:
+      # Core Application
+      - DENO_ENV=production
+      - NODE_ENV=production
+      - PORT=8000
+      
+      # Database Configuration
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME:-stamps}
+      - DB_POOL_SIZE=${DB_POOL_SIZE:-20}
+      - DB_CONNECTION_TIMEOUT=${DB_CONNECTION_TIMEOUT:-60000}
+      
+      # Redis Configuration
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_TIMEOUT=${REDIS_TIMEOUT:-30000}
+      - REDIS_MAX_RETRIES=${REDIS_MAX_RETRIES:-5}
+      - REDIS_RETRY_DELAY=${REDIS_RETRY_DELAY:-1000}
+      - REDIS_DEBUG=${REDIS_DEBUG:-false}
+      - SKIP_REDIS=${SKIP_REDIS:-false}
+      - SKIP_REDIS_CONNECTION=${SKIP_REDIS_CONNECTION:-false}
+      - SKIP_REDIS_TLS=${SKIP_REDIS_TLS:-true}
+      - CACHE=${CACHE:-true}
+      - CACHE_TTL=${CACHE_TTL:-3600}
+      
+      # Blockchain/Bitcoin Configuration
+      - QUICKNODE_ENDPOINT=${QUICKNODE_ENDPOINT}
+      - QUICKNODE_AUTH_TOKEN=${QUICKNODE_AUTH_TOKEN}
+      - QUICKNODE_TIMEOUT=${QUICKNODE_TIMEOUT:-30000}
+      - MEMPOOL_API_URL=${MEMPOOL_API_URL:-https://mempool.space/api}
+      - BTC_NETWORK=${BTC_NETWORK:-mainnet}
+      - BLOCK_CONFIRMATIONS=${BLOCK_CONFIRMATIONS:-6}
+      
+      # API & Web Configuration
+      - API_BASE_URL=${API_BASE_URL}
+      - CORS_ORIGINS=${CORS_ORIGINS:-https://${DOMAIN}}
+      - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-true}
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-1000}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-900000}
+      - MAX_REQUEST_SIZE=${MAX_REQUEST_SIZE:-10mb}
+      
+      # Security Configuration
+      - JWT_SECRET=${JWT_SECRET}
+      - CSRF_SECRET=${CSRF_SECRET}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - SECURE_COOKIES=${SECURE_COOKIES:-true}
+      - HTTPS_ONLY=${HTTPS_ONLY:-true}
+      
+      # Feature Flags
+      - ENABLE_WALLET_FEATURES=${ENABLE_WALLET_FEATURES:-true}
+      - ENABLE_MINING=${ENABLE_MINING:-true}
+      - ENABLE_SRC20=${ENABLE_SRC20:-true}
+      - ENABLE_SRC101=${ENABLE_SRC101:-true}
+      - ENABLE_TRADING=${ENABLE_TRADING:-true}
+      - ENABLE_DISPENSERS=${ENABLE_DISPENSERS:-true}
+      
+      # Performance & Optimization
+      - MAX_CONCURRENT_REQUESTS=${MAX_CONCURRENT_REQUESTS:-100}
+      - REQUEST_TIMEOUT=${REQUEST_TIMEOUT:-30000}
+      - WORKER_THREADS=${WORKER_THREADS:-4}
+      - MEMORY_LIMIT=${MEMORY_LIMIT:-1536}
+      
+      # Monitoring & Logging
+      - LOG_LEVEL=${LOG_LEVEL:-warn}
+      - ENABLE_METRICS=${ENABLE_METRICS:-true}
+      - METRICS_PORT=${METRICS_PORT:-9090}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-production}
+      - SENTRY_RELEASE=${SENTRY_RELEASE:-${IMAGE_TAG}}
+      
+      # External Services
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL}
+      
+    deploy:
+      replicas: ${REPLICAS:-3}
+      placement:
+        constraints:
+          - node.role == worker
+        preferences:
+          - spread: node.labels.zone
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 5
+        window: 300s
+      update_config:
+        parallelism: 1
+        delay: 60s
+        failure_action: rollback
+        monitor: 120s
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 30s
+        failure_action: pause
+        monitor: 60s
+        order: stop-first
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.5'
+        reservations:
+          memory: 1.5G
+          cpus: '0.75'
+      labels:
+        # Traefik Configuration
+        - traefik.enable=true
+        - traefik.constraint-label=traefik-proxy
+        
+        # HTTP to HTTPS Redirect
+        - traefik.http.routers.btcstamps-http.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.btcstamps-http.entrypoints=web
+        - traefik.http.routers.btcstamps-http.middlewares=https-redirect@docker
+        
+        # Main HTTPS Router
+        - traefik.http.routers.btcstamps-https.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.btcstamps-https.entrypoints=websecure
+        - traefik.http.routers.btcstamps-https.tls=true
+        - traefik.http.routers.btcstamps-https.tls.certresolver=le
+        - traefik.http.routers.btcstamps-https.middlewares=security-headers@docker,rate-limit@docker
+        
+        # WWW Redirect (if applicable)
+        - traefik.http.routers.btcstamps-www.rule=Host(`www.${DOMAIN}`)
+        - traefik.http.routers.btcstamps-www.entrypoints=websecure
+        - traefik.http.routers.btcstamps-www.tls=true
+        - traefik.http.routers.btcstamps-www.tls.certresolver=le
+        - traefik.http.routers.btcstamps-www.middlewares=www-redirect@docker
+        
+        # Service Configuration
+        - traefik.http.services.btcstamps.loadbalancer.server.port=8000
+        - traefik.http.services.btcstamps.loadbalancer.healthcheck.path=/api/v2/health
+        - traefik.http.services.btcstamps.loadbalancer.healthcheck.interval=30s
+        - traefik.http.services.btcstamps.loadbalancer.healthcheck.timeout=10s
+        - traefik.http.services.btcstamps.loadbalancer.sticky.cookie=true
+        - traefik.http.services.btcstamps.loadbalancer.sticky.cookie.name=btcstamps-server
+        
+        # Middlewares
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        
+        - traefik.http.middlewares.www-redirect.redirectregex.regex=^https://www\.(.+)
+        - traefik.http.middlewares.www-redirect.redirectregex.replacement=https://$${1}
+        - traefik.http.middlewares.www-redirect.redirectregex.permanent=true
+        
+        # Security Headers
+        - traefik.http.middlewares.security-headers.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,DELETE,PATCH
+        - traefik.http.middlewares.security-headers.headers.accesscontrolalloworiginlist=${CORS_ORIGINS}
+        - traefik.http.middlewares.security-headers.headers.accesscontrolmaxage=86400
+        - traefik.http.middlewares.security-headers.headers.addvaryheader=true
+        - traefik.http.middlewares.security-headers.headers.referrerpolicy=strict-origin-when-cross-origin
+        - traefik.http.middlewares.security-headers.headers.contenttypenosniff=true
+        - traefik.http.middlewares.security-headers.headers.framedeny=true
+        - traefik.http.middlewares.security-headers.headers.sslredirect=true
+        - traefik.http.middlewares.security-headers.headers.stsincludesubdomains=true
+        - traefik.http.middlewares.security-headers.headers.stspreload=true
+        - traefik.http.middlewares.security-headers.headers.stsseconds=31536000
+        - traefik.http.middlewares.security-headers.headers.customrequestheaders.X-Forwarded-Proto=https
+        - traefik.http.middlewares.security-headers.headers.customrequestheaders.X-Real-IP=
+        
+        # Rate Limiting
+        - traefik.http.middlewares.rate-limit.ratelimit.average=${RATE_LIMIT_AVERAGE:-100}
+        - traefik.http.middlewares.rate-limit.ratelimit.burst=${RATE_LIMIT_BURST:-200}
+        - traefik.http.middlewares.rate-limit.ratelimit.period=${RATE_LIMIT_PERIOD:-1m}
+        
+        # Compression
+        - traefik.http.middlewares.gzip.compress=true
+        
+        # Network
+        - traefik.docker.network=traefik_proxy_traefik_net
+        
+        # Monitoring Labels
+        - prometheus.enable=true
+        - prometheus.port=9090
+        - prometheus.path=/metrics
+    
+    depends_on:
+      - redis
+    
+    healthcheck:
+      test: ["CMD", "deno", "run", "--allow-net", "healthcheck.ts"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 90s
+
+networks:
+  db_mysql_cluster_network:
+    external: true
+  traefik_proxy_traefik_net:
+    external: true
+
+volumes:
+  redis-data:
+    driver: local
