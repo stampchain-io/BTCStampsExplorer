@@ -75,6 +75,7 @@ build_image() {
     log_info "Build context: $BUILD_CONTEXT"
     log_info "Dockerfile: $DOCKERFILE"
     
+    
     # Build with progress output
     docker build \
         --tag "$full_tag" \

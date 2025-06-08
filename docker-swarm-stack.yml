@@ -3,36 +3,59 @@ version: '3.8'
 services:
   redis:
     image: redis:7-alpine
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     networks:
       - db_mysql_cluster_network
+      - redis_network
     volumes:
       - redis-data:/data
     deploy:
       replicas: 1
       placement:
         constraints:
-          - node.role == manager
+          - node.role == worker
       restart_policy:
         condition: on-failure
         delay: 5s
         max_attempts: 3
+        window: 120s
       resources:
         limits:
-          memory: 256M
+          cpus: '0.5'
+          memory: 512M
         reservations:
-          memory: 128M
+          cpus: '0.25'
+          memory: 256M
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 20s
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   btcstamps-explorer:
-    image: ${DOCKER_IMAGE:-mortylen/btcstampsexplorer:latest}
+    image: ${DOCKER_IMAGE:-mortylen/btcstampsexplorer:dev}
     networks:
       - db_mysql_cluster_network
       - traefik_proxy_traefik_net
+      - redis_network
     environment:
       # Application Environment
       - DENO_ENV=production
@@ -48,6 +71,7 @@ services:
       # Redis Configuration
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_TIMEOUT=${REDIS_TIMEOUT:-15000}
       - REDIS_MAX_RETRIES=${REDIS_MAX_RETRIES:-10}
       - REDIS_DEBUG=${REDIS_DEBUG:-true}
@@ -55,6 +79,7 @@ services:
       - SKIP_REDIS_CONNECTION=${SKIP_REDIS_CONNECTION:-false}
       - SKIP_REDIS_TLS=${SKIP_REDIS_TLS:-true}
       - CACHE=${CACHE:-true}
+      - ELASTICACHE_ENDPOINT=redis
       
       # Bitcoin/Blockchain Configuration
       - QUICKNODE_ENDPOINT=${QUICKNODE_ENDPOINT}
@@ -165,17 +190,26 @@ services:
       - redis
     
     healthcheck:
-      test: ["CMD", "deno", "run", "--allow-net", "healthcheck.ts"]
+      test: ["CMD", "deno", "run", "--allow-net", "--allow-env", "healthcheck.ts"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 40s
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
   db_mysql_cluster_network:
     external: true
   traefik_proxy_traefik_net:
     external: true
+  redis_network:
+    driver: overlay
+    internal: true
 
 volumes:
   redis-data:
