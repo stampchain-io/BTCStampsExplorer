@@ -5,7 +5,7 @@ import { ViewAllButton } from "$button";
 import { StampCard } from "$card";
 import { StampGalleryProps, StampRow } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
-import { Sort } from "$islands/datacontrol/Sort.tsx";
+import { SortButton } from "$islands/button/SortButton.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
@@ -198,7 +198,7 @@ export default function StampGallery({
           (
             <div class="flex gap-1 items-center">
               <div>
-                <Sort initSort={sortBy} />
+                <SortButton initSort={sortBy} />
               </div>
               <div>
                 <SearchStampModal showButton />

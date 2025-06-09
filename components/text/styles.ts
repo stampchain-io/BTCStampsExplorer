@@ -82,11 +82,32 @@ export const textLinkUnderline =
 /* ===== LABEL STYLES ===== */
 export const labelXs = `${labelFont} text-xs ${cursor}`;
 export const labelSm = `${labelFont} text-sm ${cursor}`;
-export const label = `${labelFont} text-base ${cursor}`; // = old dataLabel name
+export const label = `${labelFont} text-base ${cursor}`; // old dataLabel name
 export const labelLg = `${labelFont} text-lg ${cursor}`;
 export const labelXl = `${labelFont} text-xl ${cursor}`;
+export const labelXsR = `${labelFont} text-xs tablet:text-[10px] ${cursor}`; // used for the filter file type labels
+export const labelXsPosition =
+  `flex justify-end mt-1 tablet:mt-0 -mb-5 tablet:-mb-4`; // used for the filter file type label positioning
 export const labelSmPurple =
   `font-light text-sm text-stamp-purple-bright tracking-wide mb-0.5 ${cursor}`;
+export const labelLogicResponsive = ( // used for the filter labels
+  checked: boolean,
+  canHoverSelected: boolean,
+): string => `
+  inline-block ml-3 tablet:ml-[9px]
+  font-semibold text-base tablet:text-xs
+  transition-colors duration-300
+  cursor-pointer select-none
+  ${
+  checked
+    ? canHoverSelected
+      ? "text-stamp-grey-light group-hover:text-stamp-grey"
+      : "text-stamp-grey-light"
+    : canHoverSelected
+    ? "text-stamp-grey group-hover:text-stamp-grey-light"
+    : "text-stamp-grey"
+}
+`;
 
 /* ===== VALUE STYLES ===== */
 // Grey variants
@@ -141,19 +162,6 @@ export const loaderText =
 /* ===== UNCATEGORIZED STYLES ===== */
 // Add any new styles you cannot categorize here
 
-/* ===== LEGACY STYLES ===== */
-// @baba - should be able to delete !!!
-export const dataLabel =
-  "text-base mobileLg:text-lg font-light text-red-500 uppercase"; // check where used
-export const dataValue =
-  "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase"; // check where used
-export const dataValueLg =
-  "text-xl mobileLg:text-2xl font-medium text-stamp-grey-light uppercase"; // check where used
-// Tables
-export const dataValueXL =
-  "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
-export const dataValueXLlink = "text-3xl mobileLg:text-4xl font-black -mt-1";
-
 /* ===== TYPE DEFINITIONS ===== */
 export type TextStyles = {
   // Logo styles
@@ -197,7 +205,10 @@ export type TextStyles = {
   label: string;
   labelLg: string;
   labelXl: string;
+  labelXsR: string;
+  labelXsPosition: string;
   labelSmPurple: string;
+  labelLogicResponsive: string;
   // Value styles
   valueXs: string;
   valueSm: string;
@@ -220,11 +231,4 @@ export type TextStyles = {
   tagline: string;
   copyright: string;
   loaderText: string;
-  // Legacy styles
-  dataLabel: string;
-  dataValue: string;
-  dataValueLg: string;
-  // Table styles
-  dataValueXL: string;
-  dataValueXLlink: string;
 };

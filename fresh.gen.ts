@@ -135,8 +135,11 @@ import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
+import * as $WIP_FilterOld from "./islands/WIP/FilterOld.tsx";
 import * as $WIP_test_ReviewDogTest from "./islands/WIP/test/ReviewDogTest.tsx";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
+import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
+import * as $button_SortButton from "./islands/button/SortButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
 import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
 import * as $card_SRC20CardMinted from "./islands/card/SRC20CardMinted.tsx";
@@ -162,12 +165,15 @@ import * as $content_index from "./islands/content/index.ts";
 import * as $content_stampDetailContent_StampImage from "./islands/content/stampDetailContent/StampImage.tsx";
 import * as $content_stampDetailContent_StampInfo from "./islands/content/stampDetailContent/StampInfo.tsx";
 import * as $content_stampDetailContent_StampTextContent from "./islands/content/stampDetailContent/StampTextContent.tsx";
-import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
-import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
-import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $datacontrol_faq from "./islands/datacontrol/faq.ts";
+import * as $filter_FilterComponents from "./islands/filter/FilterComponents.tsx";
+import * as $filter_FilterContentSRC20 from "./islands/filter/FilterContentSRC20.tsx";
+import * as $filter_FilterContentStamp from "./islands/filter/FilterContentStamp.tsx";
+import * as $filter_FilterDrawer from "./islands/filter/FilterDrawer.tsx";
+import * as $filter_FilterOptionsSRC20 from "./islands/filter/FilterOptionsSRC20.tsx";
+import * as $filter_FilterOptionsStamp from "./islands/filter/FilterOptionsStamp.tsx";
 import * as $form_InputField from "./islands/form/InputField.tsx";
 import * as $form_SRC20InputField from "./islands/form/SRC20InputField.tsx";
 import * as $form_SelectDate from "./islands/form/SelectDate.tsx";
@@ -186,6 +192,7 @@ import * as $header_WalletProfileHeader from "./islands/header/WalletProfileHead
 import * as $header_index from "./islands/header/index.ts";
 import * as $layout_AnimationControlsManager from "./islands/layout/AnimationControlsManager.tsx";
 import * as $layout_ChartWidget from "./islands/layout/ChartWidget.tsx";
+import * as $layout_CollapsibleSection from "./islands/layout/CollapsibleSection.tsx";
 import * as $layout_FontLoader from "./islands/layout/FontLoader.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_ModalOverlay from "./islands/layout/ModalOverlay.tsx";
@@ -239,6 +246,7 @@ import * as $section_index from "./islands/section/index.ts";
 import * as $table_DataTableBase from "./islands/table/DataTableBase.tsx";
 import * as $table_HoldersPieChart from "./islands/table/HoldersPieChart.tsx";
 import * as $table_HoldersTableBase from "./islands/table/HoldersTableBase.tsx";
+import * as $table_Tables from "./islands/table/Tables.tsx";
 import * as $table_UploadImageTable from "./islands/table/UploadImageTable.tsx";
 import * as $table_index from "./islands/table/index.ts";
 import * as $tool_StatusMessages from "./islands/tool/StatusMessages.tsx";
@@ -416,8 +424,11 @@ const manifest = {
   islands: {
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
+    "./islands/WIP/FilterOld.tsx": $WIP_FilterOld,
     "./islands/WIP/test/ReviewDogTest.tsx": $WIP_test_ReviewDogTest,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
+    "./islands/button/FilterButton.tsx": $button_FilterButton,
+    "./islands/button/SortButton.tsx": $button_SortButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
     "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
     "./islands/card/SRC20CardMinted.tsx": $card_SRC20CardMinted,
@@ -454,12 +465,15 @@ const manifest = {
       $content_stampDetailContent_StampInfo,
     "./islands/content/stampDetailContent/StampTextContent.tsx":
       $content_stampDetailContent_StampTextContent,
-    "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
-    "./islands/datacontrol/Search.tsx": $datacontrol_Search,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
-    "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/datacontrol/faq.ts": $datacontrol_faq,
+    "./islands/filter/FilterComponents.tsx": $filter_FilterComponents,
+    "./islands/filter/FilterContentSRC20.tsx": $filter_FilterContentSRC20,
+    "./islands/filter/FilterContentStamp.tsx": $filter_FilterContentStamp,
+    "./islands/filter/FilterDrawer.tsx": $filter_FilterDrawer,
+    "./islands/filter/FilterOptionsSRC20.tsx": $filter_FilterOptionsSRC20,
+    "./islands/filter/FilterOptionsStamp.tsx": $filter_FilterOptionsStamp,
     "./islands/form/InputField.tsx": $form_InputField,
     "./islands/form/SRC20InputField.tsx": $form_SRC20InputField,
     "./islands/form/SelectDate.tsx": $form_SelectDate,
@@ -481,6 +495,7 @@ const manifest = {
     "./islands/layout/AnimationControlsManager.tsx":
       $layout_AnimationControlsManager,
     "./islands/layout/ChartWidget.tsx": $layout_ChartWidget,
+    "./islands/layout/CollapsibleSection.tsx": $layout_CollapsibleSection,
     "./islands/layout/FontLoader.tsx": $layout_FontLoader,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/ModalOverlay.tsx": $layout_ModalOverlay,
@@ -546,6 +561,7 @@ const manifest = {
     "./islands/table/DataTableBase.tsx": $table_DataTableBase,
     "./islands/table/HoldersPieChart.tsx": $table_HoldersPieChart,
     "./islands/table/HoldersTableBase.tsx": $table_HoldersTableBase,
+    "./islands/table/Tables.tsx": $table_Tables,
     "./islands/table/UploadImageTable.tsx": $table_UploadImageTable,
     "./islands/table/index.ts": $table_index,
     "./islands/tool/StatusMessages.tsx": $tool_StatusMessages,
