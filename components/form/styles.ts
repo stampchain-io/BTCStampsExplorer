@@ -30,6 +30,40 @@ export const inputTextarea = `
   ${inputFieldStyle}
 `;
 
+// Checkbox - used for both checkboxes and radiobuttons
+export const inputCheckbox = (
+  checked: boolean,
+  canHoverSelected: boolean,
+): string => `
+  appearance-none
+  relative
+  size-4 tablet:size-3
+  rounded-full
+  border-2
+  cursor-pointer
+  transition-colors duration-300
+  ${
+  checked
+    ? canHoverSelected
+      ? "border-stamp-grey-light after:bg-stamp-grey-light group-hover:border-stamp-grey group-hover:after:bg-stamp-grey"
+      : "border-stamp-grey-light after:bg-stamp-grey-light"
+    : canHoverSelected
+    ? "border-stamp-grey group-hover:border-stamp-grey-light"
+    : "border-stamp-grey"
+}
+    after:content-['']
+    after:block
+    after:size-2 tablet:after:size-1
+    after:rounded-full
+    after:absolute
+    after:top-1/2 after:left-1/2
+    after:-translate-x-1/2 after:-translate-y-1/2
+    after:scale-0
+    checked:after:scale-100
+    after:transition-all
+    after:duration-100
+  `;
+
 /* ===== NOT IN USE NOR UPDATED ===== */
 // Input styles
 export const inputFieldSquare = `
@@ -50,21 +84,6 @@ export const inputSelect = `
   bg-[right_0.5rem_center]
   bg-[length:1.5em_1.5em]
   pr-10
-`;
-export const inputCheckbox = `
-  h-4 w-4
-  rounded
-  border-stamp-grey
-  text-stamp-purple
-  focus:ring-stamp-purple
-  focus:ring-offset-0
-`;
-export const inputRadio = `
-  h-4 w-4
-  border-stamp-grey
-  text-stamp-purple
-  focus:ring-stamp-purple
-  focus:ring-offset-0
 `;
 /* ===== ===== ===== */
 

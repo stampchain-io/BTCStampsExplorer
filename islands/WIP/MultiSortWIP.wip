@@ -1,0 +1,118 @@
+import { useEffect, useState } from "preact/hooks";
+import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
+import { Icon } from "$components/icon/IconBase.tsx";
+
+interface SortProps {
+  initSort?: "ASC" | "DESC" | undefined;
+  onChangeSort?: (newSort: "ASC" | "DESC") => void;
+  sortParam?: string;
+  searchparams: URLSearchParams;
+}
+
+export function MultiSort(
+  { initSort = "ASC", onChangeSort, sortParam = "sortBy", searchparams }:
+    SortProps,
+) {
+  const [open, setOpen] = useState<boolean>(false);
+  const [sort, setSort] = useState<"ASC" | "DESC">(
+    searchparams.get(sortParam)?.includes("asc") ? "ASC" : "DESC",
+  );
+  const [option, setOption] = useState<"stamp" | "price">(
+    searchparams.get(sortParam)?.includes("index") ? "stamp" : "price",
+  );
+
+  const { updateURL } = useURLUpdate();
+
+  const handleOption = (selected: "stamp" | "price") => {
+    setOption(selected);
+    setOpen(false);
+  };
+
+  // useEffect(() => {
+  //   if (initSort) {
+  //     setSort(initSort);
+  //   }
+  // }, [initSort]);
+
+  useEffect(() => {
+    updateURL({ [sortParam]: sort });
+  }, [sort, sortParam]);
+
+  const handleMultiSort = () => {
+    const url = new URL(globalThis.location.href);
+    const currentSort = url.searchParams.get(sortParam);
+
+    // Define sort mapping for each option
+    const sortMap: Record<string, { asc: string; desc: string }> = {
+      stamp: { asc: "index_asc", desc: "index_desc" },
+      price: { asc: "price_asc", desc: "price_desc" },
+    };
+
+    if (!option || !sortMap[option]) return;
+
+    // Toggle sorting order
+    const isAscending = currentSort === sortMap[option].asc;
+    const newParam = isAscending ? sortMap[option].desc : sortMap[option].asc;
+    const newSort = isAscending ? "DESC" : "ASC";
+
+    // Update state and trigger callback
+    setSort(newSort);
+    onChangeSort?.(newSort);
+
+    // Update URL and reload page
+    url.searchParams.set(sortParam, newParam);
+    globalThis.location.href = url.toString();
+  };
+
+  return (
+    <div class="row flex relative">
+      <Button
+        onClick={() => setOpen(!open)}
+        data-dropdown-toggle="sort-dropdown"
+        class="flex items-center justify-center bg-transparent hover:bg-transparent text-stamp-grey border-r-0 w-auto h-[30px] mobileLg:h-9 p-0 px-1 border-2 border-stamp-purple hover:border-stamp-purple-bright group cursor-pointer rounded-md rounded-r-none"
+      >
+        {option}
+      </Button>
+      <Icon
+        type="iconLink"
+        name={sort === "DESC" ? "sortAsc" : "sortDesc"}
+        weight="bold"
+        size="custom"
+        color="purple"
+        className="mt-[5px] w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px] transform transition-all duration-300"
+        ariaLabel={`Sort ${sort === "DESC" ? "ascending" : "descending"}`}
+        onClick={handleMultiSort}
+      />
+      <div
+        id="sort-dropdown"
+        class={`z-10 ${
+          open ? "" : "hidden"
+        } bg-stamp-purple-darkest border-2 border-stamp-purple hover:border-stamp-purple-bright rounded-lg shadow-sm w-[11.8rem] absolute top-9`}
+      >
+        <ul
+          class="py-2 text-sm text-gray-700 dark:text-gray-200"
+          aria-labelledby="dropdownDefaultButton"
+        >
+          <li>
+            <a
+              href="#"
+              class="block px-4 py-2 hover:bg-stamp-primary-light text-stamp-grey"
+              onClick={() => handleOption("stamp")}
+            >
+              Stamp
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="block px-4 py-2 hover:bg-stamp-primary-light text-stamp-grey"
+              onClick={() => handleOption("price")}
+            >
+              Price
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+}

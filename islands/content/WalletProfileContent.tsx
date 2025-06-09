@@ -1,9 +1,8 @@
 /* ===== WALLET PROFILE CONTENT COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { Search } from "$islands/datacontrol/Search.tsx";
+import { SortButton } from "$islands/button/SortButton.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { Filter } from "$islands/datacontrol/Filter.tsx";
+import { FilterOld } from "$islands/WIP/FilterOld.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { SRC20Gallery, StampGallery } from "$section";
@@ -19,14 +18,11 @@ import { label } from "$text";
 const ItemHeader = ({
   title = "STAMP",
   sortBy = "ASC" as const,
-  isOpen = false,
   isOpenSetting = false,
   handleOpenSetting = () => {},
-  handleOpen = () => {},
   isOpenFilter = false,
   handleOpenFilter = () => {},
   sort = true,
-  search = true,
   filter = true,
   setting = false,
   setOpenSettingModal = () => {},
@@ -34,16 +30,13 @@ const ItemHeader = ({
 }: {
   title: string;
   sortBy: "ASC" | "DESC";
-  isOpen: boolean;
   sort: boolean;
-  search: boolean;
   filter: boolean;
   setting: boolean;
   isOpenFilter: boolean;
   isOpenSetting: boolean;
   handleOpenSetting: (open: boolean) => void;
   handleOpenFilter: (open: boolean) => void;
-  handleOpen: (type: string) => void;
   setOpenSettingModal?: (open: boolean) => void;
   onChangeSort?: (newSortBy: "ASC" | "DESC") => void;
 }) => {
@@ -70,7 +63,7 @@ const ItemHeader = ({
           />
         )}
         {filter && (
-          <Filter
+          <FilterOld
             initFilter={[]}
             open={isOpenFilter}
             handleOpen={handleOpenFilter}
@@ -79,7 +72,7 @@ const ItemHeader = ({
           />
         )}
         {sort && (
-          <Sort
+          <SortButton
             initSort={sortBy}
             onChangeSort={onChangeSort}
             sortParam={title === "STAMPS"
@@ -87,19 +80,6 @@ const ItemHeader = ({
               : title === "TOKENS"
               ? "src20SortBy"
               : "dispensersSortBy"}
-          />
-        )}
-        {search && (
-          <Search
-            open={isOpen}
-            handleOpen={() => handleOpen(title)}
-            placeholder="Stamp Name, Stamp Hash, or Address"
-            searchEndpoint="/wallet/search?q="
-            onResultClick={() => {}}
-            resultDisplay={(result) => {
-              console.log(result);
-              return result.toString();
-            }}
           />
         )}
       </div>
@@ -430,9 +410,6 @@ export default function WalletProfileContent({
   );
 
   /* ===== TOGGLE STATES ===== */
-  const [openS, setOpenS] = useState<boolean>(false);
-  const [openT, setOpenT] = useState<boolean>(false);
-  const [openD, setOpenD] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openSetting, setOpenSetting] = useState<boolean>(false);
 
@@ -475,16 +452,6 @@ export default function WalletProfileContent({
 
   const handleOpenFilter = () => {
     setOpenFilter(!openFilter);
-  };
-
-  const handleOpen = (type: string) => {
-    if (type === "STAMPS") {
-      setOpenS(!openS);
-    } else if (type === "TOKENS") {
-      setOpenT(!openT);
-    } else {
-      setOpenD(!openD);
-    }
   };
 
   /* ===== SORT HANDLERS ===== */
@@ -561,12 +528,9 @@ export default function WalletProfileContent({
       <div class="mt-3 mobileLg:mt-6" id="stamps-section">
         <ItemHeader
           title="STAMPS"
-          sort
+          sort={true}
           sortBy={sortStamps}
           onChangeSort={handleChangeSort}
-          isOpen={openS}
-          handleOpen={handleOpen}
-          search
           filter={false}
           setting={false}
           isOpenFilter={false}
@@ -590,12 +554,9 @@ export default function WalletProfileContent({
       <div class="mt-6 mobileLg:mt-12" id="src20-section">
         <ItemHeader
           title="TOKENS"
-          sort
+          sort={true}
           sortBy={sortTokens}
           onChangeSort={handleTokenSort}
-          isOpen={openT}
-          handleOpen={handleOpen}
-          search
           filter={false}
           setting={false}
           isOpenFilter={false}
@@ -638,12 +599,9 @@ export default function WalletProfileContent({
         <div class="mt-3 mobileLg:mt-6" id="listings-section">
           <ItemHeader
             title="LISTINGS"
-            sort
+            sort={true}
             sortBy={sortDispensers}
             onChangeSort={handleDispenserSort}
-            isOpen={openD}
-            handleOpen={handleOpen}
-            search={false}
             filter={false}
             setting={false}
             isOpenFilter={openFilter}

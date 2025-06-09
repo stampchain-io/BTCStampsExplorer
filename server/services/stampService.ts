@@ -5,6 +5,10 @@ import {
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
   SUBPROTOCOLS,
+  STAMP_FILETYPES,
+  STAMP_EDITIONS,
+  STAMP_MARKET,
+  STAMP_RANGES,
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
@@ -118,41 +122,113 @@ export class StampService {
     cacheDuration?: number | "never";
     collectionId?: string | string[];
     sortColumn?: string;
-    filterBy?: STAMP_FILTER_TYPES[];
-    suffixFilters?: STAMP_SUFFIX_FILTERS[];
     groupBy?: string;
     groupBySubquery?: boolean;
     skipTotalCount?: boolean;
     cacheType?: RouteType;
     creatorAddress?: string;
+    filterBy?: STAMP_FILTER_TYPES[];
+    suffixFilters?: STAMP_SUFFIX_FILTERS[];
+    filetypeFilters?: STAMP_FILETYPES[];
+    editionFilters?: STAMP_EDITIONS[];
+    rangeFilters?: STAMP_RANGES;
+    rangeMin?: string;
+    rangeMax?: string;
+    marketFilters?: STAMP_MARKET[];
+    marketMin?: string;
+    marketMax?: string;
   }) {
-    // Create a new options object instead of modifying the input
+    // Extract range parameters from URL if not already set
+    let rangeFilters = options.rangeFilters;
+    
+    if (!rangeFilters && options.url) {
+      try {
+        const url = new URL(options.url);
+        const rangeMin = url.searchParams.get("range[stampRange][min]");
+        const rangeMax = url.searchParams.get("range[stampRange][max]");
+        
+        if (rangeMin || rangeMax) {
+          console.log("Service extracting range params:", { rangeMin, rangeMax });
+          rangeFilters = {
+            stampRange: {
+              min: rangeMin || "",
+              max: rangeMax || ""
+            }
+          };
+          console.log("Service created rangeFilters:", rangeFilters);
+        }
+      } catch (error) {
+        console.error("Error extracting range from URL:", error);
+      }
+    }
+
     const queryOptions = {
       ...options,
       // Add collection query defaults if needed
       ...(options.collectionId && (!options.groupBy || !options.groupBySubquery) ? {
         groupBy: "collection_id",
         groupBySubquery: true
-      } : {})
+      } : {}),
     };
+
+    if (options.url) {
+      const url = new URL(options.url);
+      console.log("All URL params in service:", Object.fromEntries(url.searchParams.entries()));
+      console.log("Range params:", {
+        min: url.searchParams.get("range[stampRange][min]"),
+        max: url.searchParams.get("range[stampRange][max]")
+      });
+    }
+
+    console.log("About to call repository with rangeFilters:", rangeFilters);
 
     const [result, lastBlock] = await Promise.all([
       StampRepository.getStamps({
         ...queryOptions,
         includeSecondary: options.includeSecondary,
         cacheType: options.cacheType,
-        cacheDuration: options.cacheDuration
+        cacheDuration: options.cacheDuration,
+        filetypeFilters: options.filetypeFilters,
+        editionFilters: options.editionFilters,
+        rangeFilters: rangeFilters,
+        rangeMin: options.rangeMin,
+        rangeMax: options.rangeMax,
+        marketFilters: options.marketFilters,
+        marketMin: options.marketMin,
+        marketMax: options.marketMax,
       }),
       BlockService.getLastBlock(),
     ]);
 
     if (!result) {
-      throw new Error("No stamps found");
+      throw new Error("NO STAMPS FOUND");
+    }
+
+    // Get initial results
+    const initialResult = result;
+
+    // If we have market filters, filter the results
+    if (options.marketFilters?.length) {
+      const filteredStamps = [];
+      
+      for (const stamp of initialResult.stamps) {
+        const marketData = await this.getMarketData(stamp.cpid, options.marketFilters);
+        if (marketData.matches) {
+          filteredStamps.push(stamp);
+        }
+      }
+
+      // Update the results with filtered stamps
+      initialResult.stamps = filteredStamps;
+      if (!options.skipTotalCount) {
+        initialResult.total = filteredStamps.length;
+        initialResult.pages = Math.ceil(initialResult.total / (options.limit || 24));
+      }
     }
 
     // Build base response
     const response = {
-      stamps: result.stamps,
+      stamps: initialResult.stamps,
       last_block: lastBlock,
     };
 
@@ -160,10 +236,10 @@ export class StampService {
     if ((options.collectionId && options.groupBy === "collection_id") || !options.skipTotalCount) {
       return {
         ...response,
-        page: result.page,
-        page_size: result.page_size,
-        pages: result.pages,
-        total: result.total,
+        page: initialResult.page,
+        page_size: initialResult.page_size,
+        pages: initialResult.pages,
+        total: initialResult.total,
       };
     }
 
@@ -364,5 +440,40 @@ export class StampService {
 
   static async getSpecificStamp(tx_index: string): Promise<{ stamp_url: string, stamp_mimetype: string }> {
     return await StampRepository.getSpecificStamp(tx_index);
+  }
+
+  private static async getMarketData(cpid: string, marketFilters: STAMP_MARKET[]) {
+    const matches = await Promise.all(
+      marketFilters.map(async (type) => {
+        switch (type) {
+          case "listings": {
+            const listings = await DispenserManager.getDispensersByCpid(cpid);
+            return listings.dispensers.some(d => d.give_remaining > 0);
+          }
+          case "sales": {
+            const sales = await XcpManager.fetchDispenseEvents(100);
+            return sales.some(sale => sale.params.asset === cpid);
+          }
+          case "psbt": {
+            const psbt = await XcpManager.getPsbt(cpid);
+            return psbt.some(psbt => psbt.status === 'active');
+          }
+          { /* case "dispensers": {
+            const dispensers = await DispenserManager.getDispensersByCpid(cpid);
+            return dispensers.dispensers.some(d => d.give_remaining > 0);
+          }
+          case "atomic": {
+            const atomicSwaps = await XcpManager.getAtomicSwaps(cpid);
+            return atomicSwaps.some(swap => swap.status === 'open');
+          } */}
+          default:
+            return false;
+        }
+      })
+    );
+
+    return {
+      matches: matches.some(Boolean)
+    };
   }
 }

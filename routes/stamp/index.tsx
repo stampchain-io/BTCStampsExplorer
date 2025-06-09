@@ -6,6 +6,11 @@ import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "$globals";
 import { StampOverviewContent } from "$content";
 import { StampOverviewHeader } from "$header";
+import {
+  queryParamsToFilters,
+  queryParamsToServicePayload,
+  StampFilters,
+} from "$islands/filter/FilterOptionsStamp.tsx";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
@@ -64,7 +69,7 @@ export const handler: Handlers = {
         }
 
         // Fetch stamps with filters
-        result = await StampController.getStamps({
+        const payload = {
           page,
           limit: page_size,
           sortBy: sortBy as "DESC" | "ASC",
@@ -73,7 +78,11 @@ export const handler: Handlers = {
           ident,
           collectionId,
           url: url.origin,
-        });
+          ...queryParamsToServicePayload(url.search),
+        };
+        console.log("stamp controller payload", payload);
+
+        result = await StampController.getStamps(payload);
       }
 
       /* ===== RESPONSE FORMATTING ===== */
@@ -86,6 +95,8 @@ export const handler: Handlers = {
         selectedTab: recentSales ? "recent_sales" : selectedTab,
         page,
         limit: page_size,
+        filters: queryParamsToFilters(url.search),
+        search: url.search,
       };
 
       return ctx.render({
@@ -105,11 +116,11 @@ export function StampOverviewPage(props: StampPageProps) {
     stamps,
     page,
     totalPages,
-    filterBy,
     sortBy,
     selectedTab,
+    filters,
+    search,
   } = props.data;
-
   const stampsArray = Array.isArray(stamps) ? stamps : [];
   const isRecentSales = selectedTab === "recent_sales";
 
@@ -118,8 +129,9 @@ export function StampOverviewPage(props: StampPageProps) {
     <div class="w-full" f-client-nav data-partial="/stamp">
       {/* Header Component with Filter Controls */}
       <StampOverviewHeader
-        filterBy={filterBy as STAMP_FILTER_TYPES[]}
+        currentFilters={filters as StampFilters}
         sortBy={sortBy}
+        search={search}
       />
 
       {/* Main Content with Pagination */}

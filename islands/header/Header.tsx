@@ -1,10 +1,8 @@
 /* ===== HEADER COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { ConnectButton } from "$islands/button/ConnectButton.tsx";
-// Import main icons from the barrel file
 import { CloseIcon, GearIcon } from "$icon";
-// Import HamburgerMenuIcon directly to ensure it's available
-import { HamburgerMenuIcon } from "$components/icon/MenuIcon.tsx";
+import { HamburgerMenuIcon } from "$components/icon/MenuIcon.tsx"; // Import HamburgerMenuIcon directly to ensure it's available
 import {
   labelXs,
   logoPurpleLDLink,
@@ -12,6 +10,7 @@ import {
   navLinkGreyLD,
   navLinkPurple,
 } from "$text";
+import { tooltipIcon } from "$notification";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
@@ -105,6 +104,62 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState<string | null>(null);
   const [toolsOpen, setToolsOpen] = useState(false);
+  // Add tooltip state for close button
+  const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
+  const [allowCloseTooltip, setAllowCloseTooltip] = useState(true);
+  const [closeTooltipText, setCloseTooltipText] = useState("CLOSE");
+  const closeTooltipTimeoutRef = useRef<number | null>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll lock
+  useEffect(() => {
+    if (open) {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      return;
+    } else {
+      const timer = setTimeout(() => {
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
+      }, 400); // Match drawer transition duration
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
+
+  // Add combined handler for keyboard shortcuts and click outside
+  useEffect(() => {
+    const handleCloseEvents = (e: KeyboardEvent | MouseEvent) => {
+      // Handle keyboard shortcuts
+      if (e.type === "keydown") {
+        const keyEvent = e as KeyboardEvent;
+        // Close on Escape key
+        if (keyEvent.key === "Escape" && open) {
+          e.preventDefault();
+          closeMenu();
+        }
+      }
+
+      // Handle click outside
+      if (e.type === "mousedown" && open) {
+        // Check if the click was outside the drawer
+        if (
+          drawerRef.current && !drawerRef.current.contains(e.target as Node)
+        ) {
+          closeMenu();
+        }
+      }
+    };
+
+    // Add event listeners
+    document.addEventListener("keydown", handleCloseEvents);
+    document.addEventListener("mousedown", handleCloseEvents);
+
+    // Clean up event listeners
+    return () => {
+      document.removeEventListener("keydown", handleCloseEvents);
+      document.removeEventListener("mousedown", handleCloseEvents);
+    };
+  }, [open]);
 
   /* ===== PATH TRACKING EFFECT ===== */
   useEffect(() => {
@@ -124,56 +179,6 @@ export function Header() {
     };
   }, []);
 
-  /* ===== BODY SCROLL LOCK HANDLER ===== */
-  useEffect(() => {
-    // Function to lock scrolling
-    const lockScroll = () => {
-      // Save current scroll position
-      const scrollY = globalThis.scrollY;
-      document.body.style.position = "fixed";
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = "100%";
-      document.body.style.overflow = "hidden";
-    };
-
-    // Function to unlock scrolling
-    const unlockScroll = () => {
-      // Get the scroll position we saved
-      const scrollY = document.body.style.top;
-
-      // Restore body styles
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
-
-      // Restore scroll position
-      if (scrollY) {
-        globalThis.scrollTo(0, parseInt(scrollY || "0") * -1);
-      }
-    };
-
-    if (open) {
-      // When opening, lock scrolling immediately
-      lockScroll();
-    } else {
-      // When closing, use a timeout to match the drawer animation
-      const timer = setTimeout(() => {
-        unlockScroll();
-      }, 500); // Match your drawer transition duration
-
-      // Clean up the timer if the component unmounts or open changes
-      return () => clearTimeout(timer);
-    }
-
-    // Clean up when component unmounts or open changes to true
-    return () => {
-      if (!open) {
-        unlockScroll();
-      }
-    };
-  }, [open]);
-
   /* ===== ORIENTATION CHANGE HANDLER ===== */
   useEffect(() => {
     const handleOrientationChange = () => {
@@ -191,7 +196,36 @@ export function Header() {
     };
   }, [open]);
 
-  /* This effect has been removed to simplify the code */
+  // Add cleanup effect for tooltip timeout
+  useEffect(() => {
+    return () => {
+      if (closeTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(closeTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleCloseMouseEnter = () => {
+    if (allowCloseTooltip) {
+      setCloseTooltipText("CLOSE");
+
+      if (closeTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(closeTooltipTimeoutRef.current);
+      }
+
+      closeTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsCloseTooltipVisible(true);
+      }, 1500);
+    }
+  };
+
+  const handleCloseMouseLeave = () => {
+    if (closeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(closeTooltipTimeoutRef.current);
+    }
+    setIsCloseTooltipVisible(false);
+    setAllowCloseTooltip(true);
+  };
 
   /* ===== MENU CLOSE FUNCTION ===== */
   const closeMenu = () => {
@@ -446,11 +480,12 @@ export function Header() {
 
       {/* ===== MOBILE NAVIGATION DRAWER ===== */}
       <div
+        ref={drawerRef}
         className={`flex tablet:hidden flex-col justify-between
-           fixed top-0 right-0 left-auto w-full min-[420px]:w-[380px] h-screen z-30
-           bg-gradient-to-b from-[#000000]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
+           fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-screen z-30
+           bg-gradient-to-b from-[#0e0014]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
            shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
-           transition-transform duration-500 ease-in-out
+           transition-transform duration-500 ease-in-out will-change-transform
            overflow-y-auto overflow-x-hidden scrollbar-black
            ${open ? "translate-x-0" : "translate-x-full"}`}
         id="navbar-collapse"
@@ -458,26 +493,38 @@ export function Header() {
         {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
         <div className="flex flex-col h-full">
           <div className="flex pt-[30px] px-9">
-            <CloseIcon
-              size="sm"
-              weight="bold"
-              color="greyGradient"
-              isOpen={open}
-              onClick={() => {
-                if (open) {
-                  closeMenu();
-                }
-              }}
-            />
+            <div className="relative">
+              <div
+                className={`${tooltipIcon} ${
+                  isCloseTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {closeTooltipText}
+              </div>
+              <CloseIcon
+                size="sm"
+                weight="bold"
+                color="greyGradient"
+                onClick={() => {
+                  if (open) {
+                    closeMenu();
+                  }
+                }}
+                onMouseEnter={handleCloseMouseEnter}
+                onMouseLeave={handleCloseMouseLeave}
+                aria-label="Close menu"
+              />
+            </div>
           </div>
-          <div className="flex flex-col flex-1 items-start p-9 gap-3">
+          <div className="flex flex-col flex-1 items-start p-9 gap-5">
             {renderNavLinks(true)}
           </div>
 
           <div className="flex flex-col w-full sticky bottom-0
-          bg-gradient-to-b from-[#000000]/33 via-[#000000]/66 to-[#000000]/100">
+          bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
+          shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
             {/* Tools section with gear icon */}
-            <div className="flex w-full justify-between py-6 px-9">
+            <div className="flex w-full justify-between pt-3 pb-8 px-9">
               <div className="flex justify-start items-end -ml-1">
                 <GearIcon
                   size="md"

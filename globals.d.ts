@@ -1,6 +1,15 @@
 // General Types ---------------------------------------------------------------
-export type ROOT_DOMAIN_TYPES = ".btc" | ".sats" | ".xbt" | ".x" | ".pink";
-export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721" | "SRC-101";
+export type ROOT_DOMAIN_TYPES =
+  | ".btc"
+  | ".sats"
+  | ".xbt"
+  | ".x"
+  | ".pink";
+export type SUBPROTOCOLS =
+  | "STAMP"
+  | "SRC-20"
+  | "SRC-721"
+  | "SRC-101";
 export type STAMP_TYPES = // These just reformat to variations of SUBPROTOCOLS
   | "all"
   | "stamps"
@@ -32,7 +41,6 @@ export type SRC20_TYPES =
   | "mint"
   | "transfer"
   | "trending";
-
 export type SRC20_FILTER_TYPES =
   | "minting"
   | "trending mints"
@@ -53,7 +61,6 @@ export type COLLECTION_FILTER_TYPES =
   | "posh"
   | "recursive"
   | "artists";
-
 export type LISTING_FILTER_TYPES =
   | "all"
   | "psbt"
@@ -81,6 +88,145 @@ export interface MarketListingAggregated {
   change24?: number; // Added for step 6
 }
 // END ADDED TYPE
+
+// NEW SUGGESTIONS
+// Filter types - Stamp
+export type STAMP_MARKET =
+  | "atomic" // Unused in the UI
+  | "dispensers" // Unused in the UI
+  | "listings" // Maps to dispensers - also named "for sale" - should be updated to include atomic and dispensers -v3
+  | "sales" // Named "sold" previously - NOT CORRECTLY UPDATED
+  | "psbt"; // aka "utxo bound" in UI - NOT CORRECTLY UPDATED
+
+export type STAMP_FILETYPES =
+  | "jpg" // Maps to StampTableV4.stamp_mimetype = 'image/jpeg'
+  | "jpeg" // Grouped with jpg
+  | "png" // Maps to StampTableV4.stamp_mimetype = 'image/png'
+  | "gif" // Maps to StampTableV4.stamp_mimetype = 'image/gif'
+  | "webp" // Maps to StampTableV4.stamp_mimetype = 'image/webp'
+  | "avif" // Maps to StampTableV4.stamp_mimetype = 'image/avif'
+  | "bmp" // Maps to StampTableV4.stamp_mimetype = 'image/bmp'
+  | "svg" // Maps to StampTableV4.stamp_mimetype = 'image/svg+xml'
+  | "html" // Maps to StampTableV4.stamp_mimetype = 'text/html'
+  | "txt" // Maps to StampTableV4.stamp_mimetype = 'text/plain' - Unused in the UI
+  | "mp3" // Maps to StampTableV4.stamp_mimetype = 'audio/mpeg'
+  | "mpeg" // Grouped with mp3
+  | "legacy" // Maps to StampTableV4.block_index < 833000
+  | "olga"; // Maps to StampTableV4.block_index >= 833000
+
+export type STAMP_EDITIONS =
+  | "single" // Maps to StampTableV4.supply = 1
+  | "multiple" // Maps to StampTableV4.supply > 1
+  | "locked" // Maps to StampTableV4.locked = 1
+  | "unlocked" // Maps to StampTableV4.locked = 0
+  | "divisible"; // Maps to StampTableV4.divisible = 1
+
+export type STAMP_RANGES =
+  | "100" // stamp < 100
+  | "1000" // stamp < 1000
+  | "5000" // stamp < 5000
+  | "10000" // stamp < 10000
+  | "custom"; // NEEDS TO BE CORRECTLY UPDATED
+
+// Filter types - SRC20
+export type SRC20_STATUS =
+  | "fully minted" // Compare SRC20Valid with mint_status where progress = 100%
+  | "minting" // Compare SRC20Valid with mint_status where progress < 100%
+  | "trending mints"; // Requires aggregation of recent mint transactions
+
+export type SRC20_DETAILS =
+  | "deploy" // Maps to SRC20Valid.op = 'deploy'
+  | "supply" // Maps to SRC20Valid.max field
+  | "holders"; // Maps to src20_token_stats.holders_count
+// Include "Holders" min/max values (when user applied)
+// details: {
+// deploy: boolean;
+// supply: boolean;
+// holders: boolean;
+// holdersRange?: {
+//  min: number;
+//  max: number;
+//  };
+// supplyRange?: {
+//   min: string | number;
+//   max: string | number;
+// };
+
+export type SRC20_MARKET =
+  | "marketcap" // Calculated field: floor_price * total_supply
+  | "volume" // Calculated from recent transactions
+  | "price change"; // Calculated from price history
+// Include "volume" and "price change" periods - default value = 24H
+// market: {
+// marketcap: boolean;
+// marketcapRange?: {
+//   min: number;
+//   max: number;
+// };
+// volume: boolean;
+// volumePeriod?: "24h" | "3d" | "7d";
+// priceChange: boolean;
+// priceChangePeriod?: "24h" | "3d" | "7d";
+// priceChangeRange?: {
+//   min: number; // Percentage
+//   max: number; // Percentage
+// };
+// };
+
+// Full Filter Interfaces
+export interface StampFilters {
+  market: STAMP_MARKET[];
+  marketMin?: string;
+  marketMax?: string;
+  filetype?: STAMP_FILETYPES[];
+  editions?: STAMP_EDITIONS[];
+  range: STAMP_RANGES | null;
+  rangeMin: string;
+  rangeMax: string;
+  search?: string;
+}
+
+export interface SRC20Filters {
+  status?: SRC20_STATUS[];
+  details?: {
+    deploy?: boolean;
+    supply?: boolean;
+    holders?: boolean;
+    holdersRange?: {
+      min: number;
+      max: number;
+    };
+    supplyRange?: {
+      min: string | number;
+      max: string | number;
+    };
+  };
+  market?: {
+    marketcap?: boolean;
+    marketcapRange?: {
+      min: number;
+      max: number;
+    };
+    volume?: boolean;
+    volumePeriod?: "24h" | "3d" | "7d";
+    priceChange?: boolean;
+    priceChangePeriod?: "24h" | "3d" | "7d";
+    priceChangeRange?: {
+      min: number; // Percentage
+      max: number; // Percentage
+    };
+  };
+  search?: string; // Maps to tick or tick_hash
+}
+
+// Utility type for handling emoji ticks
+export interface EmojiTickHandling {
+  ensureUnicodeEscape: (tick: string) => string; // For DB operations
+  convertToEmoji: (tick: string) => string; // For display
+  isEmojiFormat: (tick: string) => boolean;
+  isUnicodeEscapeFormat: (tick: string) => boolean;
+  isURLEncodedFormat: (tick: string) => boolean;
+}
 
 import Big from "big";
 
@@ -601,6 +747,7 @@ export type StampPageProps = {
     selectedTab: "all" | "classic" | "posh" | "recent_sales";
     sortBy: "ASC" | "DESC";
     filterBy: STAMP_FILTER_TYPES[];
+    search: string;
   };
 };
 

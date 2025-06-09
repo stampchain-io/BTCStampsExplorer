@@ -1,13 +1,3 @@
-// TODO(@baba): Update and delete this component to use the new button component
-// "icon" variant is used in:
-// Sort.tsx
-// StampSearch.tsx
-// Search.tsx
-// Filter.tsx
-// Setting.tsx
-// FilterModal.tsx
-// SRC20Search.tsx
-
 import { JSX } from "preact";
 
 interface ButtonProps
