@@ -95,12 +95,12 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       const feeInputArgs: { satsPerKB?: number; satsPerVB?: number } = {};
       if (body.satsPerKB !== undefined) {
         feeInputArgs.satsPerKB = typeof body.satsPerKB === "string"
-          ? parseInt(body.satsPerKB, 10)
+          ? parseFloat(body.satsPerKB)
           : body.satsPerKB;
       }
       if (body.satsPerVB !== undefined) {
         feeInputArgs.satsPerVB = typeof body.satsPerVB === "string"
-          ? parseInt(body.satsPerVB, 10)
+          ? parseFloat(body.satsPerVB)
           : body.satsPerVB;
       }
 
@@ -109,7 +109,7 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
         feeInputArgs.satsPerVB === undefined
       ) {
         feeInputArgs.satsPerKB = typeof body.feeRate === "string"
-          ? parseInt(body.feeRate, 10)
+          ? parseFloat(body.feeRate)
           : body.feeRate;
       }
       normalizedFees = normalizeFeeRate(feeInputArgs);

@@ -67,12 +67,12 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
       const feeInput: { satsPerKB?: number; satsPerVB?: number } = {};
       if (body.satsPerKB !== undefined) {
         feeInput.satsPerKB = typeof body.satsPerKB === "string"
-          ? parseInt(body.satsPerKB)
+          ? parseFloat(body.satsPerKB)
           : body.satsPerKB;
       }
       if (body.satsPerVB !== undefined) {
         feeInput.satsPerVB = typeof body.satsPerVB === "string"
-          ? parseInt(body.satsPerVB)
+          ? parseFloat(body.satsPerVB)
           : body.satsPerVB;
       }
       if (
@@ -80,7 +80,7 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
         feeInput.satsPerVB === undefined
       ) {
         feeInput.satsPerKB = typeof body.feeRate === "string"
-          ? parseInt(body.feeRate)
+          ? parseFloat(body.feeRate)
           : body.feeRate;
       }
       const normalizedFees = normalizeFeeRate(feeInput);

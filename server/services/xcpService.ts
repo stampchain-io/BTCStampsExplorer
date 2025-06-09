@@ -53,8 +53,8 @@ export function normalizeFeeRate(params: {
       throw new Error("Either satsPerKB or satsPerVB must be provided");
     }
 
-    if (normalizedSatsPerVB < 1) {
-      throw new Error("Fee rate must be greater than 1 sat/vB");
+    if (normalizedSatsPerVB < 0.1) {
+      throw new Error("Fee rate must be at least 0.1 sat/vB");
     }
 
     return {

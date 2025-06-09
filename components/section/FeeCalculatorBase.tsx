@@ -201,15 +201,34 @@ export function FeeCalculatorBase({
   };
 
   // Helper functions to convert between slider position and fee value
-  const feeToSliderPos = (fee: number) =>
-    fee <= 10 ? (fee / 10) * 33.33 : 33.33 + ((fee - 10) / 254) * 66.67;
+  // New structure: 0.1-5.0 (0.1 increments) takes 25% of slider, 5-10 (0.5 increments) takes 15%, 10-264 (1.0 increments) takes 60%
+  const feeToSliderPos = (fee: number) => {
+    if (fee <= 5) {
+      // 0.1 to 5.0 sat/vB maps to 0-25% of slider
+      return ((fee - 0.1) / 4.9) * 25;
+    } else if (fee <= 10) {
+      // 5.0 to 10.0 sat/vB maps to 25-40% of slider
+      return 25 + ((fee - 5) / 5) * 15;
+    } else {
+      // 10.0 to 264 sat/vB maps to 40-100% of slider
+      return 40 + ((fee - 10) / 254) * 60;
+    }
+  };
 
   const sliderPosToFee = (pos: number) => {
-    if (pos <= 33.33) {
-      return Math.round((pos / 33.33) * 10 * 2) / 2; // 0-10 with 0.5 steps
+    if (pos <= 25) {
+      // 0-25% of slider: 0.1 to 5.0 sat/vB with 0.1 increments
+      const value = 0.1 + (pos / 25) * 4.9;
+      return Math.round(value * 10) / 10; // Round to 1 decimal place
+    } else if (pos <= 40) {
+      // 25-40% of slider: 5.0 to 10.0 sat/vB with 0.5 increments
+      const value = 5 + ((pos - 25) / 15) * 5;
+      return Math.round(value * 2) / 2; // Round to 0.5 increments
+    } else {
+      // 40-100% of slider: 10 to 264 sat/vB with 1.0 increments
+      const value = 10 + ((pos - 40) / 60) * 254;
+      return Math.min(264, Math.round(value)); // Round to whole number
     }
-    const value = 10 + ((pos - 33.33) / 66.67) * 254;
-    return Math.min(264, Math.round(value)); // 10-264 with 1.0 steps
   };
 
   // Fee selector component
