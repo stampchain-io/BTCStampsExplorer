@@ -59,8 +59,8 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.25px;font-family:'Work Sans';text-align:start;text-anchor:start;letter-spacing:0.11em;display:inline;fill:#009900;stroke:#009900;stroke-width:0.025;stroke-dasharray:none;stroke-opacity:1"
-       x="10.362842"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.25px;font-family:'Work Sans';text-align:start;letter-spacing:0.075em;text-anchor:start;display:inline;fill:#009900;stroke:#009900;stroke-width:0.025;stroke-dasharray:none;stroke-opacity:1"
+       x="10.626127"
        y="23.5557"
        id="text">LIBRARY</text>
   </g>
