@@ -214,6 +214,13 @@ export function StampCard({
       return (
         <div class="stamp-audio-container relative w-full h-full flex items-center justify-center">
           <div class="absolute inset-0 flex items-center justify-center">
+            {/* Fallback image for audio files */}
+            <img
+              src={NOT_AVAILABLE_IMAGE}
+              alt="Audio Placeholder"
+              class="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
+              draggable={false}
+            />
             <audio
               ref={audioRef}
               class="hidden"
@@ -223,14 +230,18 @@ export function StampCard({
             </audio>
             <button
               type="button"
-              onClick={togglePlayback}
-              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-stamp-grey-darker hover:text-stamp-grey-light w-[40px] h-[40px] md:w-[10%] md:aspect-square"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                togglePlayback();
+              }}
+              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-stamp-grey hover:text-stamp-purple-bright w-[42px] tablet:w-[36px] aspect-square flex items-center justify-center"
             >
-              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[170%] h-[170%] bg-stamp-grey-darker opacity-30 rounded-full" />
+              <div class="absolute top-0 left-0 w-full h-full bg-stamp-grey-darker opacity-50 rounded-full pointer-events-none" />
               {isPlaying
                 ? (
                   <svg
-                    class="w-full h-full"
+                    class="w-6 h-6 tablet:w-5 tablet:h-5 relative z-10"
                     viewBox="0 0 32 32"
                     fill="currentColor"
                   >
@@ -239,7 +250,7 @@ export function StampCard({
                 )
                 : (
                   <svg
-                    class="w-full h-full"
+                    class="w-6 h-6 tablet:w-5 tablet:h-5 relative z-10"
                     viewBox="0 0 32 32"
                     fill="currentColor"
                   >
