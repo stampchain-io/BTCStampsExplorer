@@ -1,4 +1,5 @@
 /* ===== STAMP CARD COMPONENT ===== */
+/* @baba-update audio icon size (custom) - 247*/
 /*@baba-check styles+icon*/
 import {
   abbreviateAddress,
@@ -14,6 +15,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { AUDIO_FILE_IMAGE, NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { ABBREVIATION_LENGTHS, TEXT_STYLES } from "$card";
+import { Icon } from "$icon";
 
 /* ===== TYPES ===== */
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
@@ -235,28 +237,17 @@ export function StampCard({
                 e.preventDefault();
                 togglePlayback();
               }}
-              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-stamp-grey hover:text-stamp-purple-bright w-[42px] tablet:w-[36px] aspect-square flex items-center justify-center"
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[40px] tablet:w-[34px] aspect-square flex items-center justify-center group/button"
             >
-              <div class="absolute top-0 left-0 w-full h-full bg-black opacity-50 rounded-full pointer-events-none" />
-              {isPlaying
-                ? (
-                  <svg
-                    class="w-6 h-6 tablet:w-5 tablet:h-5 relative z-10"
-                    viewBox="0 0 32 32"
-                    fill="currentColor"
-                  >
-                    <path d="M27 6V26C27 26.5304 26.7893 27.0391 26.4142 27.4142C26.0391 27.7893 25.5304 28 25 28H20C19.4696 28 18.9609 27.7893 18.5858 27.4142C18.2107 27.0391 18 26.5304 18 26V6C18 5.46957 18.2107 4.96086 18.5858 4.58579C18.9609 4.21071 19.4696 4 20 4H25C25.5304 4 26.0391 4.21071 26.4142 4.58579C26.7893 4.96086 27 5.46957 27 6ZM12 4H7C6.46957 4 5.96086 4.21071 5.58579 4.58579C5.21071 4.96086 5 5.46957 5 6V26C5 26.5304 5.21071 27.0391 5.58579 27.4142C5.96086 27.7893 6.46957 28 7 28H12C12.5304 28 13.0391 27.7893 13.4142 27.4142C13.7893 27.0391 14 26.5304 14 26V6C14 5.46957 13.7893 4.96086 13.4142 4.58579C13.0391 4.21071 12.5304 4 12 4Z" />
-                  </svg>
-                )
-                : (
-                  <svg
-                    class="w-6 h-6 tablet:w-5 tablet:h-5 relative z-10"
-                    viewBox="0 0 32 32"
-                    fill="currentColor"
-                  >
-                    <path d="M30 16C30.0008 16.3395 29.9138 16.6735 29.7473 16.9694C29.5808 17.2654 29.3406 17.5132 29.05 17.6888L11.04 28.7063C10.7364 28.8922 10.3886 28.9937 10.0326 29.0003C9.67661 29.0069 9.32532 28.9183 9.015 28.7438C8.70764 28.5719 8.4516 28.3213 8.2732 28.0177C8.09481 27.7141 8.00051 27.3684 8 27.0163V4.98376C8.00051 4.63162 8.09481 4.28597 8.2732 3.98235C8.4516 3.67874 8.70764 3.42812 9.015 3.25626C9.32532 3.0817 9.67661 2.99314 10.0326 2.99973C10.3886 3.00632 10.7364 3.10783 11.04 3.29376L29.05 14.3113C29.3406 14.4869 29.5808 14.7347 29.7473 15.0306C29.9138 15.3265 30.0008 15.6605 30 16Z" />
-                  </svg>
-                )}
+              <div className="absolute inset-0 bg-black opacity-50 rounded-full" />
+              <Icon
+                name={isPlaying ? "pause" : "play"}
+                type="iconLink"
+                weight="bold"
+                size="xxl"
+                color="grey"
+                className="w-5 h-5 tablet:w-4 tablet:h-4 relative z-10 group-hover/button:fill-stamp-purple-bright"
+              />
             </button>
           </div>
         </div>

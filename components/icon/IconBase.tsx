@@ -50,6 +50,8 @@ export function Icon(props: IconVariants) {
       image: "image",
       fullscreen: "cornersOut", // alias mapping - change to previewImage
       previewCode: "code", // alias mapping
+      play: "play",
+      pause: "pause",
       locked: "lockClosed", // alias mapping
       unlocked: "lockOpen", // alias mapping
       keyburned: "flame", // alias mapping
