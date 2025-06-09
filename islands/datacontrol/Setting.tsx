@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { Button } from "$components/button/ButtonOLD.tsx";
+import { Icon } from "$icon";
 
 interface SettingProps {
   initFilter: string[];
@@ -63,14 +63,17 @@ export function Setting({
           </>
         )
         : (
-          <Button
+          <Icon
+            type="iconLink"
+            name="gear"
+            weight="bold"
+            size="custom"
+            color="purple"
+            className="mt-[5px] w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px] transform transition-all duration-300"
+            ariaLabel="Settings"
+            onClick={() => handleOpen(true)}
             onMouseEnter={() => setVisible(true)}
             onMouseLeave={() => setVisible(false)}
-            variant="icon"
-            icon="/img/wallet/icon_setting.svg"
-            iconAlt="Tools icon"
-            class="bg-stamp-purple rounded-md cursor-pointer"
-            onClick={() => handleOpen(true)}
           />
         )}
       {visible && (
