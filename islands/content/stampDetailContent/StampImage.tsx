@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { VNode } from "preact";
 import { StampRow } from "$globals";
 import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { AUDIO_FILE_IMAGE, NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
@@ -751,8 +751,14 @@ export function StampImage(
       {src !== NOT_AVAILABLE_IMAGE && isAudio && (
         <div className={`${className} flex flex-col gap-3 mobileMd:gap-6`}>
           <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
-            <div className="stamp-container">
-              <div className="relative pt-[100%] flex items-center justify-center">
+            <div className="stamp-container relative">
+              <img
+                src={AUDIO_FILE_IMAGE}
+                alt="Audio File"
+                className="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
+                draggable={false}
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
                 <audio
                   ref={audioRef}
                   className="hidden"
@@ -763,9 +769,9 @@ export function StampImage(
                 <button
                   type="button"
                   onClick={togglePlayback}
-                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-stamp-grey-darker hover:text-stamp-grey-light w-[10%] aspect-square"
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-stamp-grey hover:text-stamp-grey-light w-[8%] aspect-square"
                 >
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[170%] h-[170%] bg-stamp-grey-darker opacity-30 rounded-full" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[170%] h-[170%] bg-black opacity-50 rounded-full" />
                   {isPlaying
                     ? (
                       <svg

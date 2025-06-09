@@ -237,7 +237,7 @@ export function StampCard({
               }}
               class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-stamp-grey hover:text-stamp-purple-bright w-[42px] tablet:w-[36px] aspect-square flex items-center justify-center"
             >
-              <div class="absolute top-0 left-0 w-full h-full bg-stamp-grey-darker opacity-50 rounded-full pointer-events-none" />
+              <div class="absolute top-0 left-0 w-full h-full bg-black opacity-50 rounded-full pointer-events-none" />
               {isPlaying
                 ? (
                   <svg
