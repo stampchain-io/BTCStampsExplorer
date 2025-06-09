@@ -59,9 +59,9 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2px;font-family:'Work Sans';text-align:start;text-anchor:start;letter-spacing:0.01em;display:inline;fill:#CC8800;fill-opacity:1;stroke:#CC8800;stroke-width:0.025;stroke-dasharray:none;stroke-opacity:1"
-       x="10.362435"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.25px;font-family:'Work Sans';text-align:start;letter-spacing:0.075em;text-anchor:start;display:inline;fill:#cc8800;fill-opacity:1;stroke:#cc8800;stroke-width:0.025;stroke-dasharray:none;stroke-opacity:1"
+       x="12.19775"
        y="23.393473"
-       id="text">AUDIO FILE</text>
+       id="text">AUDIO</text>
   </g>
 </svg>
