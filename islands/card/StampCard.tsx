@@ -244,9 +244,9 @@ export function StampCard({
                 name={isPlaying ? "pause" : "play"}
                 type="iconLink"
                 weight="bold"
-                size="xxl"
+                size="xsResponsive"
                 color="grey"
-                className="w-5 h-5 tablet:w-4 tablet:h-4 relative z-10 group-hover/button:fill-stamp-purple-bright"
+                className="relative z-10 group-hover/button:fill-stamp-purple-bright"
               />
             </button>
           </div>
