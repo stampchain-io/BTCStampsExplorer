@@ -13,11 +13,11 @@
     <linearGradient
        id="linearGradientBase">
       <stop
-         style="stop-color:#666666;stop-opacity:1;"
+         style="stop-color:#006600;stop-opacity:1;"
          offset="0"
          id="stop1" />
       <stop
-         style="stop-color:#333333;stop-opacity:1;"
+         style="stop-color:#003300;stop-opacity:1;"
          offset="1"
          id="stop2" />
     </linearGradient>
@@ -33,7 +33,7 @@
   <rect
      width="100%"
      height="100%"
-     fill="#333333"
+     fill="#003300"
      id="background"
      style="fill-opacity:1;fill:url(#linearGradient)" />
   <g
@@ -45,23 +45,23 @@
       <path
          id="handle"
          d="m 14.700824,15.765136 -1.021031,-4.766335 c -0.04276,-0.200795 -0.04011,-0.408603 0.0079,-0.608252 0.04783,-0.199644 0.13966,-0.38608 0.268752,-0.5456881 0.12914,-0.1596088 0.292276,-0.2883576 0.477554,-0.3768389 0.185233,-0.088474 0.387922,-0.1344537 0.593185,-0.1345699 h 0.918812 c 0.205354,2.69e-5 0.408089,0.045941 0.593416,0.1343871 0.185322,0.088443 0.34855,0.2171775 0.477735,0.3767998 0.129186,0.159616 0.221067,0.346085 0.268938,0.545773 0.04788,0.19969 0.0505,0.407551 0.0079,0.608389 l -1.02103,4.766335"
-         stroke="#999999"
+         stroke="#009900"
          stroke-width="0.407"
          stroke-linecap="round"
          stroke-linejoin="round" />
       <path
          id="rubber"
          d="m 20.080898,15.765136 h -9.188123 c -0.253723,0 -0.459405,0.205678 -0.459405,0.459408 v 2.29703 c 0,0.25373 0.205682,0.459407 0.459405,0.459407 h 9.188123 c 0.253729,0 0.459404,-0.205677 0.459404,-0.459407 v -2.29703 c 0,-0.25373 -0.205675,-0.459408 -0.459404,-0.459408 z"
-         stroke="#999999"
+         stroke="#009900"
          stroke-width="0.407"
          stroke-linecap="round"
          stroke-linejoin="round" />
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.25px;font-family:'Work Sans';text-align:start;text-anchor:start;display:inline;fill:#999999;stroke:#999999;stroke-width:0.025;stroke-dasharray:none;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.25px;font-family:'Work Sans';text-align:start;text-anchor:start;letter-spacing:0.11em;display:inline;fill:#009900;stroke:#009900;stroke-width:0.025;stroke-dasharray:none;stroke-opacity:1"
        x="10.362842"
        y="23.5557"
-       id="text">NO IMAGE</text>
+       id="text">LIBRARY</text>
   </g>
 </svg>
