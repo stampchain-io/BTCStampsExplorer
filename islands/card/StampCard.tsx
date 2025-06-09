@@ -1,4 +1,5 @@
 /* ===== STAMP CARD COMPONENT ===== */
+/* @baba-update audio icon size (custom) - 247*/
 /*@baba-check styles+icon*/
 import {
   abbreviateAddress,
@@ -10,10 +11,11 @@ import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
 import { StampRow } from "$globals";
 import { StampTextContent } from "$content";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { AUDIO_FILE_IMAGE, NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { ABBREVIATION_LENGTHS, TEXT_STYLES } from "$card";
+import { Icon } from "$icon";
 
 /* ===== TYPES ===== */
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
@@ -193,15 +195,60 @@ export function StampCard({
     }
 
     if (stamp.stamp_mimetype?.startsWith("audio/")) {
+      // Custom overlay audio player (like StampImage)
+      const [isPlaying, setIsPlaying] = useState(false);
+      const audioRef = useRef<HTMLAudioElement>(null);
+
+      const togglePlayback = () => {
+        if (!audioRef.current) return;
+        if (isPlaying) {
+          audioRef.current.pause();
+        } else {
+          audioRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+      };
+
+      const handleAudioEnded = () => {
+        setIsPlaying(false);
+      };
+
       return (
         <div class="stamp-audio-container relative w-full h-full flex items-center justify-center">
           <div class="absolute inset-0 flex items-center justify-center">
+            {/* Fallback image for audio files */}
+            <img
+              src={AUDIO_FILE_IMAGE}
+              alt="Audio File"
+              class="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
+              draggable={false}
+            />
             <audio
-              controls
-              class="stamp-audio-player"
+              ref={audioRef}
+              class="hidden"
+              onEnded={handleAudioEnded}
             >
               <source src={src} type={stamp.stamp_mimetype} />
             </audio>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                togglePlayback();
+              }}
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[40px] tablet:w-[34px] aspect-square flex items-center justify-center group/button"
+            >
+              <div className="absolute inset-0 bg-black opacity-50 rounded-full" />
+              <Icon
+                name={isPlaying ? "pause" : "play"}
+                type="iconLink"
+                weight="bold"
+                size="xsResponsive"
+                color="grey"
+                className="relative z-10 group-hover/button:fill-stamp-purple-bright"
+              />
+            </button>
           </div>
         </div>
       );

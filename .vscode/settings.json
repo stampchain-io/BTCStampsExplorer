@@ -47,7 +47,7 @@
   "folder-color.pathColors": [
     {
       "folderPath": "BTCStampsExplorer/routes/",
-      "color": "foldercolorizer.color_9900cc"
+      "color": "foldercolorizer.color_6699ff"
     },
     {
       "folderPath": "BTCStampsExplorer/routes/[...path].ts/"
@@ -61,8 +61,11 @@
       "color": "foldercolorizer.color_ff99ff"
     },
     {
-      "folderPath": "BTCStampsExplorer/static/img/",
-      "color": "foldercolorizer.color_996666"
+      "folderPath": "BTCStampsExplorer/static/",
+      "color": "foldercolorizer.color_99cc66"
+    },
+    {
+      "folderPath": "BTCStampsExplorer/static/swagger/"
     }
   ]
 }
