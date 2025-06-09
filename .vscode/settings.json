@@ -61,12 +61,11 @@
       "color": "foldercolorizer.color_ff99ff"
     },
     {
-      "folderPath": "BTCStampsExplorer/static/img/",
-      "color": "foldercolorizer.color_996666"
-    },
-    {
       "folderPath": "BTCStampsExplorer/static/",
       "color": "foldercolorizer.color_99cc66"
+    },
+    {
+      "folderPath": "BTCStampsExplorer/static/swagger/"
     }
   ]
 }

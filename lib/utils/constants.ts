@@ -36,6 +36,7 @@ export const BLOCKSTREAM_API_BASE_URL = "https://blockstream.info/api";
 export const COINGECKO_API_BASE_URL = "https://api.coingecko.com/api/v3";
 
 export const NOT_AVAILABLE_IMAGE = "/icon/stamp-no-image.svg";
+export const AUDIO_FILE_IMAGE = "/static/icon/stamp-audio";
 export const ERROR_IMAGE = "/icon/error-image.svg";
 
 export const CAROUSEL_STAMP_IDS = [

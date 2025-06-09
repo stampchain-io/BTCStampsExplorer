@@ -12,7 +12,7 @@ import { StampTextContent } from "$content";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { AUDIO_FILE_IMAGE, NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { ABBREVIATION_LENGTHS, TEXT_STYLES } from "$card";
 
 /* ===== TYPES ===== */
@@ -216,8 +216,8 @@ export function StampCard({
           <div class="absolute inset-0 flex items-center justify-center">
             {/* Fallback image for audio files */}
             <img
-              src={NOT_AVAILABLE_IMAGE}
-              alt="Audio Placeholder"
+              src={AUDIO_FILE_IMAGE}
+              alt="Audio File"
               class="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
               draggable={false}
             />
