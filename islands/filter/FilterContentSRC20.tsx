@@ -252,7 +252,7 @@ export const FilterContentSRC20 = ({
           <CollapsibleSection
             title=""
             section="holdersRange"
-            expanded={true}
+            expanded
             toggle={() => {}}
             variant="collapsibleLabel"
           >
@@ -301,7 +301,7 @@ export const FilterContentSRC20 = ({
           <CollapsibleSection
             title=""
             section="volumePeriod"
-            expanded={true}
+            expanded
             toggle={() => {}}
             variant="collapsibleLabel"
           >
@@ -333,7 +333,7 @@ export const FilterContentSRC20 = ({
           <CollapsibleSection
             title=""
             section="priceChangePeriod"
-            expanded={true}
+            expanded
             toggle={() => {}}
             variant="collapsibleLabel"
           >

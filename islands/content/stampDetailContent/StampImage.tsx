@@ -551,7 +551,7 @@ export function StampImage(
               />,
             );
           }
-        } catch (error) {
+        } catch (_error) {
           // Fallback to original src
           setValidatedContent(
             <img

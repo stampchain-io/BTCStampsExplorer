@@ -524,7 +524,7 @@ const WalletDashboardContent = ({
       <div class="mt-6 mobileLg:mt-12 desktop:mt-24" id="stamps-section">
         <ItemHeader
           title="STAMPS"
-          sort={true}
+          sort
           sortBy={sortStamps}
           onChangeSort={handleChangeSort}
           filter={false}
@@ -548,7 +548,7 @@ const WalletDashboardContent = ({
       <div class="mt-12 mobileLg:mt-24 desktop:mt-36" id="src20-section">
         <ItemHeader
           title="TOKENS"
-          sort={true}
+          sort
           sortBy={sortTokens}
           onChangeSort={handleTokenSort}
           filter={false}
@@ -589,7 +589,7 @@ const WalletDashboardContent = ({
         <div class="mt-48">
           <ItemHeader
             title="LISTINGS"
-            sort={true}
+            sort
             sortBy={sortDispensers}
             onChangeSort={handleDispenserSort}
             filter={false}

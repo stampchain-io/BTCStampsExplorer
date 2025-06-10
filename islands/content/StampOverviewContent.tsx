@@ -36,7 +36,7 @@ export function StampOverviewContent({
                   : stamp.tx_hash}
                 stamp={stamp}
                 isRecentSale={isRecentSales}
-                showDetails={true}
+                showDetails
                 variant="grey"
                 fromPage={fromPage}
               />

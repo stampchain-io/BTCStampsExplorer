@@ -1,21 +1,18 @@
 /* ===== STAMP CARD COMPONENT ===== */
 /* @baba-update audio icon size (custom) - 247*/
 /*@baba-check styles+icon*/
-import {
-  abbreviateAddress,
-  formatSupplyValue,
-  stripTrailingZeros,
-} from "$lib/utils/formatUtils.ts";
-import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
-
-import { StampRow } from "$globals";
-import { StampTextContent } from "$content";
-import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { AUDIO_FILE_IMAGE, NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-import { ABBREVIATION_LENGTHS, TEXT_STYLES } from "$card";
+import { VNode } from "preact";
+import { StampRow } from "$globals";
 import { Icon } from "$icon";
+import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
+
+import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
+import { formatSupplyValue } from "$lib/utils/formatUtils.ts";
+import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { AUDIO_FILE_IMAGE, NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { TEXT_STYLES } from "$card";
 
 /* ===== TYPES ===== */
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
@@ -46,23 +43,30 @@ export function StampCard({
   fromPage?: string;
 }) {
   /* ===== STATE ===== */
-  const { width } = useWindowSize();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [src, setSrc] = useState<string>("");
-  const [validatedContent, setValidatedContent] = useState<preact.VNode | null>(
-    null,
-  );
+  const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
 
-  /* ===== HELPER FUNCTIONS ===== */
-  const getAbbreviationLength = () => {
-    if (width >= BREAKPOINTS.desktop) return ABBREVIATION_LENGTHS.desktop;
-    if (width >= BREAKPOINTS.tablet) return ABBREVIATION_LENGTHS.tablet;
-    if (width >= BREAKPOINTS.mobileLg) return ABBREVIATION_LENGTHS.mobileLg;
-    if (width >= BREAKPOINTS.mobileMd) return ABBREVIATION_LENGTHS.mobileMd;
-    return ABBREVIATION_LENGTHS.mobileSm;
+  // Audio-related state (always declared to avoid conditional hooks)
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  /* ===== HANDLERS ===== */
+  const handleImageError = (e: Event) => {
+    if (e.currentTarget instanceof HTMLImageElement) {
+      e.currentTarget.src = NOT_AVAILABLE_IMAGE;
+    }
   };
 
-  /* ===== DATA FETCHING ===== */
+  const getAbbreviationLength = () => {
+    if (typeof globalThis !== "undefined" && globalThis.innerWidth) {
+      if (globalThis.innerWidth < 768) return 4;
+      if (globalThis.innerWidth < 1024) return 6;
+      return 8;
+    }
+    return 6;
+  };
+
   const fetchStampImage = async () => {
     setLoading(true);
     const res = await getStampImageSrc(stamp as StampRow);
@@ -151,7 +155,7 @@ export function StampCard({
               </div>,
             );
           }
-        } catch (error) {
+        } catch (_error) {
           // Fallback to NOT_AVAILABLE_IMAGE
           setValidatedContent(
             <div class="stamp-container">
@@ -195,10 +199,7 @@ export function StampCard({
     }
 
     if (stamp.stamp_mimetype?.startsWith("audio/")) {
-      // Custom overlay audio player (like StampImage)
-      const [isPlaying, setIsPlaying] = useState(false);
-      const audioRef = useRef<HTMLAudioElement>(null);
-
+      // Audio player functionality
       const togglePlayback = () => {
         if (!audioRef.current) return;
         if (isPlaying) {
