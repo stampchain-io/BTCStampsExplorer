@@ -92,7 +92,7 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
         return jsonData.img[0];
       }
       return NOT_AVAILABLE_IMAGE;
-    } catch (_error) {
+    } catch (_e) {
       // Silently handle JSON parsing errors - just return placeholder
       // This prevents console spam for malformed JSON
       return NOT_AVAILABLE_IMAGE;
@@ -185,7 +185,7 @@ export function isValidSVG(svgContent: string): boolean {
         if (!TRUSTED_DOMAINS.includes(url.hostname)) {
           return false;
         }
-      } catch (e) {
+      } catch {
         return false;
       }
     }
@@ -347,8 +347,8 @@ export function detectContentType(
       isGzipped: false,
       isJavaScript: false,
     };
-  } catch (e) {
-    console.error("Error detecting content type:", e);
+  } catch (error) {
+    console.error("Error detecting content type:", error);
     return {
       mimeType: "application/octet-stream",
       isGzipped: false,

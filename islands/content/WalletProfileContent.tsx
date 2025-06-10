@@ -528,7 +528,7 @@ export default function WalletProfileContent({
       <div class="mt-3 mobileLg:mt-6" id="stamps-section">
         <ItemHeader
           title="STAMPS"
-          sort={true}
+          sort
           sortBy={sortStamps}
           onChangeSort={handleChangeSort}
           filter={false}
@@ -554,7 +554,7 @@ export default function WalletProfileContent({
       <div class="mt-6 mobileLg:mt-12" id="src20-section">
         <ItemHeader
           title="TOKENS"
-          sort={true}
+          sort
           sortBy={sortTokens}
           onChangeSort={handleTokenSort}
           filter={false}
@@ -599,7 +599,7 @@ export default function WalletProfileContent({
         <div class="mt-3 mobileLg:mt-6" id="listings-section">
           <ItemHeader
             title="LISTINGS"
-            sort={true}
+            sort
             sortBy={sortDispensers}
             onChangeSort={handleDispenserSort}
             filter={false}

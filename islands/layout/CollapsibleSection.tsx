@@ -35,6 +35,7 @@ export const CollapsibleSection = ({
       return (
         <div>
           <button
+            type="button"
             onClick={handleClick}
             onMouseLeave={handleMouseLeave}
             className="flex items-center w-full justify-between pt-1 pb-4 tablet:pt-1 tablet:pb-3 transition-colors duration-300 group"
@@ -101,6 +102,7 @@ export const CollapsibleSection = ({
       return (
         <div>
           <button
+            type="button"
             onClick={handleClick}
             onMouseLeave={handleMouseLeave}
             className="flex items-center w-full mt-2 tablet:mt-1.5 group transition-colors duration-300"
