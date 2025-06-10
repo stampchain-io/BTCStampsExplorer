@@ -53,6 +53,7 @@ export const RangeButtons = ({
     <div className="flex justify-between">
       {periods.map((period) => (
         <button
+          type="button"
           key={period}
           className={getButtonClass(period)}
           onClick={() => handleClick(period)}

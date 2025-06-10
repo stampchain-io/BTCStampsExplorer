@@ -246,10 +246,11 @@ export const useEnhancedLoadingSkeleton = (
   elementRef?: RefObject<HTMLElement>,
 ) => {
   const { shouldAnimate } = useAnimationControls();
-  const viewportData = elementRef ? useInViewportAnimation(elementRef) : null;
+  // Always call the hook, but conditionally use the result
+  const viewportData = useInViewportAnimation(elementRef || { current: null });
 
   const shouldShowAnimation = shouldAnimate &&
-    (viewportData ? viewportData.shouldAnimate : true);
+    (elementRef ? viewportData.shouldAnimate : true);
 
   return {
     className: `${baseClasses} ${
