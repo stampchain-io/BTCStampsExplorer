@@ -850,7 +850,7 @@ export function StampImage(
       )}
 
       {src !== NOT_AVAILABLE_IMAGE && !isHtml && !isPlainText && !isAudio && (
-        flag
+        flag && stamp.ident !== "SRC-20"
           ? (
             <div className="flex flex-col gap-6">
               <div className="relative p-6 dark-gradient rounded-lg">
