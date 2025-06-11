@@ -17,6 +17,7 @@ export interface IconVariants {
     | "xxsR"
     | "xsR"
     | "smR"
+    | "mdR"
     | "custom";
   color: "grey" | "purple" | "custom";
   type: "icon" | "iconLink" | "iconButton";
@@ -58,9 +59,10 @@ export const iconStyles = {
     lg: "w-8 h-8",
     xl: "w-9 h-9",
     xxl: "w-10 h-10",
-    xxsR: "w-4 h-4 tablet:w-3 tablet:h-3",
-    xsR: "w-5 h-5 tablet:w-4 tablet:h-4",
-    smR: "w-6 h-6 tablet:w-5 tablet:h-5",
+    xxsR: "w-4 h-4 tablet:w-[14px] tablet:h-[14px]",
+    xsR: "w-5 h-5 tablet:w-[18px] tablet:h-[18px]",
+    smR: "w-6 h-6 tablet:w-[22px] tablet:h-[22px]",
+    mdR: "w-7 h-7 tablet:w-[26px] tablet:h-[26px]",
     custom: "",
   },
 
