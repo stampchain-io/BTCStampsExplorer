@@ -925,7 +925,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   <Icon
                     type="icon"
                     name="divisible"
-                    weight="bold"
+                    weight="normal"
                     size="custom"
                     color="custom"
                     className="w-[23px] h-[23px] fill-stamp-grey-darker"
@@ -949,7 +949,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   <Icon
                     type="icon"
                     name="keyburned"
-                    weight="bold"
+                    weight="normal"
                     size="xs"
                     color="custom"
                     className="fill-stamp-grey-darker mb-0.5"
@@ -974,7 +974,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     <Icon
                       type="icon"
                       name="locked"
-                      weight="bold"
+                      weight="normal"
                       size="xs"
                       color="custom"
                       className="fill-stamp-grey-darker"
@@ -998,7 +998,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     <Icon
                       type="icon"
                       name="unlocked"
-                      weight="bold"
+                      weight="normal"
                       size="xs"
                       color="custom"
                       className="fill-stamp-grey-darker"

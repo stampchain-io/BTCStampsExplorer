@@ -242,7 +242,7 @@ function RightPanel(
   /* ===== RENDER ===== */
   return (
     <div className="flex justify-between py-3 px-6 dark-gradient rounded-lg">
-      <div className="flex gap-5 tablet:gap-3">
+      <div className="flex gap-[18px] tablet:gap-3">
         <div
           ref={copyButtonRef}
           class="relative"
@@ -252,7 +252,7 @@ function RightPanel(
           <Icon
             type="iconLink"
             name="copy"
-            weight="bold"
+            weight="normal"
             size="mdR"
             color="grey"
             onClick={copyLink}
@@ -280,7 +280,7 @@ function RightPanel(
           <Icon
             type="iconLink"
             name="twitter"
-            weight="bold"
+            weight="normal"
             size="mdR"
             color="grey"
             onClick={shareToX}
@@ -304,7 +304,7 @@ function RightPanel(
           <Icon
             type="iconLink"
             name="share"
-            weight="bold"
+            weight="normal"
             size="smR"
             color="grey"
             onClick={shareContent}
@@ -331,7 +331,7 @@ function RightPanel(
             <Icon
               type="iconLink"
               name="previewCode"
-              weight="bold"
+              weight="normal"
               size="custom"
               color="grey"
               className="w-[26px] h-[26px] tablet:w-[22px] tablet:h-[22px]"
@@ -360,7 +360,7 @@ function RightPanel(
           <Icon
             type="iconLink"
             name="fullscreen"
-            weight="bold"
+            weight="normal"
             size="mdR"
             color="grey"
             onClick={() => {
