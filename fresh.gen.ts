@@ -139,6 +139,8 @@ import * as $WIP_FilterOld from "./islands/WIP/FilterOld.tsx";
 import * as $WIP_test_ReviewDogTest from "./islands/WIP/test/ReviewDogTest.tsx";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
+import * as $button_PaginationButton from "./islands/button/PaginationButton.tsx";
+import * as $button_RangeButton from "./islands/button/RangeButton.tsx";
 import * as $button_SortButton from "./islands/button/SortButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
 import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
@@ -174,6 +176,7 @@ import * as $filter_FilterContentStamp from "./islands/filter/FilterContentStamp
 import * as $filter_FilterDrawer from "./islands/filter/FilterDrawer.tsx";
 import * as $filter_FilterOptionsSRC20 from "./islands/filter/FilterOptionsSRC20.tsx";
 import * as $filter_FilterOptionsStamp from "./islands/filter/FilterOptionsStamp.tsx";
+import * as $form_Checkbox from "./islands/form/Checkbox.tsx";
 import * as $form_InputField from "./islands/form/InputField.tsx";
 import * as $form_SRC20InputField from "./islands/form/SRC20InputField.tsx";
 import * as $form_SelectDate from "./islands/form/SelectDate.tsx";
@@ -428,6 +431,8 @@ const manifest = {
     "./islands/WIP/test/ReviewDogTest.tsx": $WIP_test_ReviewDogTest,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/FilterButton.tsx": $button_FilterButton,
+    "./islands/button/PaginationButton.tsx": $button_PaginationButton,
+    "./islands/button/RangeButton.tsx": $button_RangeButton,
     "./islands/button/SortButton.tsx": $button_SortButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
     "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
@@ -474,6 +479,7 @@ const manifest = {
     "./islands/filter/FilterDrawer.tsx": $filter_FilterDrawer,
     "./islands/filter/FilterOptionsSRC20.tsx": $filter_FilterOptionsSRC20,
     "./islands/filter/FilterOptionsStamp.tsx": $filter_FilterOptionsStamp,
+    "./islands/form/Checkbox.tsx": $form_Checkbox,
     "./islands/form/InputField.tsx": $form_InputField,
     "./islands/form/SRC20InputField.tsx": $form_SRC20InputField,
     "./islands/form/SelectDate.tsx": $form_SelectDate,
