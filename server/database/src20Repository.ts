@@ -207,6 +207,7 @@ export class SRC20Repository {
       const query = `
         WITH base_query AS (
           SELECT 
+            (@row_number:=@row_number + 1) AS row_num,
             src20.tx_hash,
             src20.block_index,
             src20.p,
@@ -224,6 +225,7 @@ export class SRC20Repository {
           FROM ${SRC20_TABLE} src20
           LEFT JOIN creator creator_info ON src20.creator = creator_info.address
           LEFT JOIN creator destination_info ON src20.destination = destination_info.address
+          CROSS JOIN (SELECT @row_number := ?) AS init
           ${whereClause}
           ORDER BY src20.block_index ${validOrder}
         ),
@@ -251,7 +253,7 @@ export class SRC20Repository {
           WHERE dep.op = 'DEPLOY'
         )
         SELECT 
-          (@row_number:=@row_number + 1) AS row_num,
+          b.row_num,
           b.tx_hash,
           b.block_index,
           b.p,
@@ -271,7 +273,6 @@ export class SRC20Repository {
         FROM base_query b
         LEFT JOIN holders h ON h.tick = b.tick
         LEFT JOIN mint_progress mp ON mp.tick = b.tick
-        CROSS JOIN (SELECT @row_number := ?) AS init
         ${limitOffsetClause}
       `;
 
