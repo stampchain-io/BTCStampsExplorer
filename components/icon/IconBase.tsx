@@ -45,6 +45,7 @@ export function Icon(props: IconVariants) {
       expand: "plus", // alias mapping
       search: "magnifingGlass", // alias mapping
       donate: "handcoins", // alias mapping
+      dispenserListings: "listStar",
       share: "share",
       copy: "copy",
       upload: "image", // alias mapping
