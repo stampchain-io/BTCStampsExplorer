@@ -49,6 +49,7 @@ export function Icon(props: IconVariants) {
       copy: "copy",
       upload: "image", // alias mapping
       image: "image",
+      imageExternal: "imageExternal",
       fullscreen: "cornersOut", // alias mapping - change to previewImage
       previewCode: "code", // alias mapping
       play: "play",

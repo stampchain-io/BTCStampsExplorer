@@ -52,6 +52,9 @@ function RightPanel(
   const fullscreenButtonRef = useRef<HTMLDivElement>(null);
   const fullscreenTooltipTimeoutRef = useRef<number | null>(null);
 
+  const [isToolsTooltipVisible, setIsToolsTooltipVisible] = useState(false);
+  const toolsTooltipTimeoutRef = useRef<number | null>(null);
+
   /* ===== EFFECTS ===== */
   useEffect(() => {
     return () => {
@@ -239,6 +242,22 @@ function RightPanel(
     setAllowFullscreenTooltip(true);
   };
 
+  const handleToolsMouseEnter = () => {
+    if (toolsTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(toolsTooltipTimeoutRef.current);
+    }
+    toolsTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+      setIsToolsTooltipVisible(true);
+    }, 1500);
+  };
+
+  const handleToolsMouseLeave = () => {
+    if (toolsTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(toolsTooltipTimeoutRef.current);
+    }
+    setIsToolsTooltipVisible(false);
+  };
+
   /* ===== RENDER ===== */
   return (
     <div className="flex justify-between py-3 px-6 dark-gradient rounded-lg">
@@ -305,11 +324,12 @@ function RightPanel(
             type="iconLink"
             name="share"
             weight="normal"
-            size="smR"
+            size="custom"
             color="grey"
+            className="w-6 h-6 tablet:w-[22px] tablet:h-[22px]"
             onClick={shareContent}
             role="button"
-            ariaLabel="Share Content"
+            ariaLabel="Share content"
           />
           <div
             class={`${tooltipIcon} ${
@@ -320,7 +340,7 @@ function RightPanel(
           </div>
         </div>
       </div>
-      <div className="flex gap-4">
+      <div className="flex gap-[18px] tablet:gap-3">
         {showCodeButton && (
           <div
             ref={codeButtonRef}
@@ -334,13 +354,13 @@ function RightPanel(
               weight="normal"
               size="custom"
               color="grey"
-              className="w-[26px] h-[26px] tablet:w-[22px] tablet:h-[22px]"
+              className="w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px]"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
               }}
               role="button"
-              ariaLabel="View Code"
+              ariaLabel="View html code"
             />
             <div
               class={`${tooltipIcon} ${
@@ -352,6 +372,37 @@ function RightPanel(
           </div>
         )}
         <div
+          class="relative"
+          onMouseEnter={handleToolsMouseEnter}
+          onMouseLeave={handleToolsMouseLeave}
+        >
+          <Icon
+            type="iconLink"
+            name="imageExternal"
+            weight="normal"
+            size="mdR"
+            color="grey"
+            onClick={() =>
+              globalThis.open(
+                `/s/${stamp.cpid}`,
+                "targetWindow",
+                `top=0,left=${
+                  globalThis.screen.availWidth - 600
+                },width=600,height=600,
+                toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no`,
+              )}
+            role="button"
+            ariaLabel="View raw original image in external window"
+          />
+          <div
+            class={`${tooltipIcon} ${
+              isToolsTooltipVisible ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            VIEW ORIGINAL
+          </div>
+        </div>
+        <div
           ref={fullscreenButtonRef}
           class="relative"
           onMouseEnter={handleFullscreenMouseEnter}
@@ -361,21 +412,22 @@ function RightPanel(
             type="iconLink"
             name="fullscreen"
             weight="normal"
-            size="mdR"
+            size="custom"
             color="grey"
+            className="w-7 h-7 tablet:w-[26px] tablet:h-[26px] -mt-[1px] tablet:mt-0"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();
             }}
             role="button"
-            ariaLabel="View Fullscreen"
+            ariaLabel="View image in fullscreen"
           />
           <div
             class={`${tooltipIcon} ${
               isFullscreenTooltipVisible ? "opacity-100" : "opacity-0"
             }`}
           >
-            FULLSCREEN
+            VIEW FULLSCREEN
           </div>
         </div>
       </div>
