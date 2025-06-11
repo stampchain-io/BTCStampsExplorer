@@ -12,6 +12,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
 import { openModal } from "$islands/modal/states.ts";
 import { Icon } from "$icon";
+import { body, containerDetailImage, gapSectionSlim } from "$layout";
 
 /* ===== RIGHT PANEL SUBCOMPONENT ===== */
 function RightPanel(
@@ -260,7 +261,7 @@ function RightPanel(
 
   /* ===== RENDER ===== */
   return (
-    <div className="flex justify-between py-3 px-6 dark-gradient rounded-lg">
+    <div className={`${containerDetailImage} flex justify-between`}>
       <div className="flex gap-[18px] tablet:gap-3">
         <div
           ref={copyButtonRef}
@@ -708,8 +709,8 @@ export function StampImage(
 
   if (isLoadingOrValidating) {
     return (
-      <div className="flex flex-col gap-3 mobileMd:gap-6">
-        <div className="relative p-3 mobileMd:p-6 dark-gradient rounded-lg">
+      <div class={`${body} ${gapSectionSlim}`}>
+        <div className={containerDetailImage}>
           <div className="stamp-container">
             <div className="relative z-10 aspect-square animate-pulse">
               <div class="flex items-center justify-center bg-[#220033CC] max-w-none object-contain rounded-lg pixelart stamp-image">
@@ -745,12 +746,8 @@ export function StampImage(
       )}
 
       {src !== NOT_AVAILABLE_IMAGE && isHtml && (
-        <div className={`${className} flex flex-col gap-3 mobileMd:gap-6`}>
-          <div
-            className={`relative ${
-              flag ? "dark-gradient rounded-lg p-3 mobileMd:p-6" : ""
-            }`}
-          >
+        <div className={`${className} ${body} ${gapSectionSlim}`}>
+          <div className={`relative ${flag ? containerDetailImage : ""}`}>
             <div className="stamp-container">
               <div className="relative pt-[100%]">
                 <iframe
@@ -783,8 +780,8 @@ export function StampImage(
       )}
 
       {src !== NOT_AVAILABLE_IMAGE && isPlainText && (
-        <div className="flex flex-col gap-3 mobileMd:gap-6">
-          <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
+        <div class={`${body} ${gapSectionSlim}`}>
+          <div className={containerDetailImage}>
             <div className="stamp-container">
               <div className="relative aspect-square">
                 <TextContentIsland src={src} />
@@ -803,8 +800,8 @@ export function StampImage(
       )}
 
       {src !== NOT_AVAILABLE_IMAGE && isAudio && (
-        <div className={`${className} flex flex-col gap-3 mobileMd:gap-6`}>
-          <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
+        <div className={`${className} ${body} ${gapSectionSlim}`}>
+          <div className={containerDetailImage}>
             <div className="stamp-container relative group">
               <img
                 src={AUDIO_FILE_IMAGE}
@@ -850,10 +847,10 @@ export function StampImage(
       )}
 
       {src !== NOT_AVAILABLE_IMAGE && !isHtml && !isPlainText && !isAudio && (
-        flag && stamp.ident !== "SRC-20"
+        flag
           ? (
-            <div className="flex flex-col gap-6">
-              <div className="relative p-6 dark-gradient rounded-lg">
+            <div class={`${body} ${gapSectionSlim}`}>
+              <div className={containerDetailImage}>
                 <div className="stamp-container">
                   <div className="relative z-10 aspect-square flex items-center justify-center">
                     {validatedContent || (
@@ -869,27 +866,31 @@ export function StampImage(
                   </div>
                 </div>
               </div>
-              <RightPanel
-                stamp={stamp}
-                toggleCodeModal={toggleCodeModal}
-                toggleFullScreenModal={toggleFullScreenModal}
-                showCodeButton={false}
-              />
+              {stamp.ident !== "SRC-20" && (
+                <RightPanel
+                  stamp={stamp}
+                  toggleCodeModal={toggleCodeModal}
+                  toggleFullScreenModal={toggleFullScreenModal}
+                  showCodeButton={false}
+                />
+              )}
             </div>
           )
           : (
-            <div className="stamp-container">
-              <div className="relative z-10 aspect-square flex items-center justify-center">
-                {validatedContent || (
-                  <img
-                    width="100%"
-                    loading="lazy"
-                    className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-                    src={src}
-                    onError={handleImageError}
-                    alt="Stamp"
-                  />
-                )}
+            <div className={containerDetailImage}>
+              <div className="stamp-container">
+                <div className="relative z-10 aspect-square flex items-center justify-center">
+                  {validatedContent || (
+                    <img
+                      width="100%"
+                      loading="lazy"
+                      className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                      src={src}
+                      onError={handleImageError}
+                      alt="Stamp"
+                    />
+                  )}
+                </div>
               </div>
             </div>
           )

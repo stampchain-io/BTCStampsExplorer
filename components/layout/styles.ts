@@ -18,6 +18,7 @@ export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 /* ===== CONTAINER STYLES ===== */
 export const containerBackground =
   "flex flex-col w-full dark-gradient rounded-lg p-6";
+export const containerDetailImage = "relative dark-gradient rounded-lg p-6";
 export const containerCard =
   "dark-gradient rounded-lg border-2 border-transparent hover:border-stamp-purple-bright hover:shadow-[0px_0px_20px_#9900EE] transition-colors ease-in-out duration-100 cursor-pointer";
 export const containerCardTable =
@@ -86,6 +87,7 @@ export type LayoutStyles = {
 
   // Container styles
   containerBackground: string;
+  containerDetailImage: string;
   containerCard: string;
   containerCardTable: string;
   containerColData: string;

@@ -11,7 +11,12 @@ import { getSRC101Data, getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { Src101Detail, StampRow } from "$globals";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
-import { containerBackground, containerColData } from "$layout";
+import {
+  body,
+  containerBackground,
+  containerColData,
+  gapSectionSlim,
+} from "$layout";
 import {
   headingGreyDLLink,
   labelSm,
@@ -702,7 +707,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   return (
     <>
       <SearchStampModal showButton={false} />
-      <div className="flex flex-col gap-6">
+      <div className={`${body} ${gapSectionSlim}`}>
         <div
           className={containerBackground}
         >
