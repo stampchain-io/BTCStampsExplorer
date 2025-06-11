@@ -78,6 +78,28 @@ export const RangeSlider = ({
   initialMin?: number;
   initialMax?: number;
 }) => {
+  // State for dynamic stamp count (only used for range variant)
+  const [currentStampCount, setCurrentStampCount] = useState<number | null>(
+    null,
+  );
+
+  // Fetch current stamp count for range variant
+  useEffect(() => {
+    if (variant === "range") {
+      fetch("/api/v2/health")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.services?.stats?.totalStamps) {
+            setCurrentStampCount(data.services.stats.totalStamps);
+          }
+        })
+        .catch((error) => {
+          console.warn("Failed to fetch current stamp count:", error);
+          // Fallback to default estimate
+          setCurrentStampCount(1100000);
+        });
+    }
+  }, [variant]);
   // Define range configurations for different variants
   const rangeConfigs = {
     // Holders configuration
@@ -95,6 +117,23 @@ export const RangeSlider = ({
         if (value === Infinity) return "NO LIMIT";
         return formatNumberWithCommas(value);
       },
+      // Breakpoints for smart snapping
+      breakpoints: [
+        0,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500,
+        1000,
+        2500,
+        5000,
+        10000,
+        25000,
+        50000,
+        100000,
+      ],
     },
     // Price configuration
     price: {
@@ -119,17 +158,32 @@ export const RangeSlider = ({
           value < 0.0001 ? 6 : value < 0.01 ? 5 : 3,
         );
       },
+      // Breakpoints for smart snapping
+      breakpoints: [
+        0,
+        0.00001,
+        0.0001,
+        0.0005,
+        0.001,
+        0.005,
+        0.01,
+        0.05,
+        0.1,
+        0.5,
+        1.0,
+      ],
     },
     // range configuration
     range: {
       min: 0,
       max: Infinity,
+      // Dynamic segments based on current stamp ecosystem (~1.1M stamps)
       segments: [
-        { end: 100, proportion: 1 / 3 }, // First third covers 0-100
-        { end: 10000, proportion: 1 / 3 }, // Second third covers 100-10000
-        { end: 100000, proportion: 1 / 3 }, // Last third covers 10000-100000
+        { end: 10000, proportion: 1 / 3 }, // First third: early stamps (0-10K)
+        { end: 500000, proportion: 1 / 3 }, // Second third: mid-range (10K-500K)
+        { end: 1200000, proportion: 1 / 3 }, // Third third: recent stamps (500K-1.2M)
       ],
-      tickMarks: ["0", "100", "10,000", "∞"],
+      tickMarks: ["0", "10K", "500K", "∞"],
       tickMarkPositions: [
         "left-0",
         "left-[33%]",
@@ -138,13 +192,93 @@ export const RangeSlider = ({
       ],
       formatValue: (value: number) => {
         if (value === Infinity) return "NO LIMIT";
+        // Dynamic formatting based on value size
+        if (value >= 1000000) {
+          return `${(value / 1000000).toFixed(value % 1000000 === 0 ? 0 : 1)}M`;
+        } else if (value >= 1000) {
+          const kValue = value / 1000;
+          return `${kValue % 1 === 0 ? kValue.toFixed(0) : kValue.toFixed(1)}K`;
+        }
         return formatNumberWithCommas(value);
       },
+      // Dynamic breakpoints based on current stamp ecosystem
+      breakpoints: [
+        // Fine control for early stamps (0-1K)
+        0,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500,
+        // 1K-10K range (every 1K for precision)
+        1000,
+        2000,
+        3000,
+        4000,
+        5000,
+        6000,
+        7000,
+        8000,
+        9000,
+        10000,
+        // 10K-100K range (every 5K-10K)
+        15000,
+        20000,
+        25000,
+        30000,
+        40000,
+        50000,
+        60000,
+        70000,
+        80000,
+        90000,
+        100000,
+        // 100K-1M range (every 50K-100K)
+        150000,
+        200000,
+        250000,
+        300000,
+        400000,
+        500000,
+        600000,
+        700000,
+        800000,
+        900000,
+        1000000,
+        // 1M+ range (dynamically updated based on current ecosystem)
+        1250000,
+        1500000,
+        1750000,
+        2000000,
+        2500000,
+        3000000,
+        4000000,
+        5000000,
+      ],
     },
   };
 
   // Get the configuration for the current variant
   const config = rangeConfigs[variant];
+
+  // For range variant, filter breakpoints based on current stamp count
+  const getFilteredBreakpoints = () => {
+    if (variant !== "range" || currentStampCount === null) {
+      return config.breakpoints;
+    }
+
+    // Add 20% buffer for new stamps being created
+    const maxWithBuffer = Math.ceil(currentStampCount * 1.2);
+
+    // Filter breakpoints to only include those that make sense for current ecosystem
+    return config.breakpoints.filter((breakpoint) =>
+      breakpoint <= maxWithBuffer
+    );
+  };
+
+  // Use filtered breakpoints for snapping
+  const activeBreakpoints = getFilteredBreakpoints();
 
   // Track both current and pending values
   const [minValue, setMinValue] = useState(initialMin || config.min);
@@ -235,12 +369,110 @@ export const RangeSlider = ({
     }
   };
 
+  // Smart breakpoint snapping function
+  const snapToBreakpoint = (value: number): number => {
+    if (value === Infinity) return Infinity;
+
+    // Find the closest breakpoint using filtered breakpoints
+    const breakpoints = activeBreakpoints;
+    let closest = breakpoints[0];
+    let minDiff = Math.abs(value - closest);
+
+    for (const breakpoint of breakpoints) {
+      const diff = Math.abs(value - breakpoint);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = breakpoint;
+      }
+    }
+
+    return closest;
+  };
+
   // Calculate minimum step size based on variant
   const getMinStep = () => {
     if (variant === "price") {
       return 0.000001; // Smallest step for price
     }
     return 1; // Default step for holders and range
+  };
+
+  // Handle track clicks to move nearest handle
+  const handleTrackClick = (e: Event) => {
+    if (!sliderRef.current || isDragging) return;
+
+    const mouseEvent = e as MouseEvent;
+    const rect = sliderRef.current.getBoundingClientRect();
+    const clickX = mouseEvent.clientX - rect.left;
+    const clickPercent = (clickX / rect.width) * 100;
+
+    // Clamp to valid range
+    const clampedPercent = Math.max(0, Math.min(100, clickPercent));
+
+    // Convert to value and snap to breakpoint
+    const rawValue = positionToValue(clampedPercent);
+    const snappedValue = snapToBreakpoint(rawValue);
+
+    // Determine which handle is closer
+    const minPos = valueToPosition(minValue);
+    const maxPos = valueToPosition(maxValue);
+    const distToMin = Math.abs(clampedPercent - minPos);
+    const distToMax = Math.abs(clampedPercent - maxPos);
+
+    const minStep = getMinStep();
+
+    if (distToMin <= distToMax) {
+      // Move min handle
+      const newMin = maxValue === Infinity
+        ? snappedValue
+        : Math.min(snappedValue, maxValue - minStep * 10);
+
+      setPendingMin(newMin);
+      setMinValue(newMin);
+      setLastChangedHandle("min");
+
+      // Trigger onChange immediately for track clicks
+      if (variant === "price") {
+        const finalMin = newMin < 0.0001
+          ? Number(newMin.toFixed(6))
+          : newMin < 0.01
+          ? Number(newMin.toFixed(5))
+          : Number(newMin.toFixed(3));
+        onChange?.(finalMin, maxValue);
+      } else {
+        onChange?.(
+          Math.round(newMin),
+          maxValue === Infinity ? Infinity : Math.round(maxValue),
+        );
+      }
+    } else {
+      // Move max handle
+      if (clampedPercent >= 99.5) {
+        setPendingMax(Infinity);
+        setMaxValue(Infinity);
+        setLastChangedHandle("max");
+        onChange?.(minValue, Infinity);
+        return;
+      }
+
+      const newMax = Math.max(snappedValue, minValue + minStep * 10);
+
+      setPendingMax(newMax);
+      setMaxValue(newMax);
+      setLastChangedHandle("max");
+
+      // Trigger onChange immediately for track clicks
+      if (variant === "price") {
+        const finalMax = newMax < 0.0001
+          ? Number(newMax.toFixed(6))
+          : newMax < 0.01
+          ? Number(newMax.toFixed(5))
+          : Number(newMax.toFixed(3));
+        onChange?.(minValue, finalMax);
+      } else {
+        onChange?.(Math.round(minValue), Math.round(newMax));
+      }
+    }
   };
 
   // Modify the handle functions while preserving decimal precision
@@ -380,12 +612,13 @@ export const RangeSlider = ({
       </div>
 
       <div
-        className="relative h-5 tablet:h-4 rounded-full bg-stamp-grey-darkest border-2 border-stamp-grey-darkest"
+        className="relative h-5 tablet:h-4 rounded-full bg-stamp-grey-darkest border-2 border-stamp-grey-darkest cursor-pointer"
         ref={sliderRef}
+        onClick={handleTrackClick}
       >
         {/* Track fill with dynamic gradient */}
         <div
-          className="absolute top-0 bottom-0 h-4 tablet:h-3 rounded-full transition-colors duration-300"
+          className="absolute top-0 bottom-0 h-4 tablet:h-3 rounded-full transition-colors duration-300 pointer-events-none"
           style={trackGradientFill(hoveredHandle)}
         />
 
