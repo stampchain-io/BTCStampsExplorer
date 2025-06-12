@@ -72,6 +72,65 @@ function setupMockFetch() {
   globalThis.fetch = (
     _url: string | URL | Request,
   ): Promise<Response> => {
+    const urlString = typeof _url === "string" ? _url : _url.toString();
+
+    // Check for invalid URLs that should fail
+    if (
+      urlString.includes("invalid-url-that-does-not-exist.com") ||
+      urlString.includes("definitely-invalid-url-12345.nonexistent")
+    ) {
+      return Promise.reject(new Error("Connection refused"));
+    }
+
+    // Handle CoinGecko API calls for BTCPriceService
+    if (urlString.includes("api.coingecko.com/api/v3/simple/price")) {
+      const coinGeckoResponse = {
+        bitcoin: {
+          usd: 45000,
+        },
+      };
+      const responseText = JSON.stringify(coinGeckoResponse);
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        json: () => Promise.resolve(coinGeckoResponse),
+        text: () => Promise.resolve(responseText),
+        headers: new Headers({
+          "content-type": "application/json",
+        }),
+        url: urlString,
+        redirected: false,
+        type: "basic",
+        bodyUsed: false,
+        body: null,
+        clone: () => {
+          throw new Error("Mock response clone not implemented");
+        },
+        arrayBuffer: () => {
+          return Promise.reject(
+            new Error("Mock response arrayBuffer not implemented"),
+          );
+        },
+        blob: () => {
+          return Promise.reject(
+            new Error("Mock response blob not implemented"),
+          );
+        },
+        formData: () => {
+          return Promise.reject(
+            new Error("Mock response formData not implemented"),
+          );
+        },
+        bytes: () => {
+          return Promise.reject(
+            new Error("Mock response bytes not implemented"),
+          );
+        },
+      } as Response);
+    }
+
+    // Default response for internal API endpoints
     const responseText = JSON.stringify(MOCK_BTC_PRICE_RESPONSE);
     return Promise.resolve({
       ok: true,
@@ -82,7 +141,7 @@ function setupMockFetch() {
       headers: new Headers({
         "content-type": "application/json",
       }),
-      url: typeof _url === "string" ? _url : _url.toString(),
+      url: urlString,
       redirected: false,
       type: "basic",
       bodyUsed: false,
