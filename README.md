@@ -5,6 +5,10 @@ This is the official API and block explorer for
 for exploring Bitcoin Stamps transactions and metadata, working in conjunction
 with the [Bitcoin Stamps Indexer](https://github.com/stampchain-io/btc_stamps).
 
+## Security
+
+This is a Deno project. For security information including how npm development dependencies are handled, see [SECURITY.md](./SECURITY.md).
+
 ## Features
 
 - Full Bitcoin Stamps block explorer
