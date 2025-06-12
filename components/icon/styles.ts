@@ -20,7 +20,13 @@ export interface IconVariants {
     | "mdR"
     | "custom";
   color: "grey" | "purple" | "custom";
-  type: "icon" | "iconLink" | "iconButton";
+  type:
+    | "icon"
+    | "iconLink"
+    | "iconButton"
+    | "strokeIcon"
+    | "strokeIconLink"
+    | "strokeIconButton";
   className?: string;
   role?: JSX.AriaRole;
   ariaLabel?: string;
@@ -43,6 +49,21 @@ export interface BadgeVariants {
   text: string;
   className?: string;
 }
+
+/* ===== STROKE WIDTH DEFINITIONS ===== */
+export const strokeWidthMap = {
+  light: 3.3,
+  normal: 3,
+  bold: 5.5,
+} as const;
+
+/* ===== GLOBAL SVG ATTRIBUTES ===== */
+export const globalSvgAttributes = {
+  xmlns: "http://www.w3.org/2000/svg",
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  viewBox: "0 0 32 32",
+} as const;
 
 /* ===== ICON STYLE DEFINITIONS ===== */
 export const iconStyles = {
@@ -74,33 +95,77 @@ export const iconStyles = {
   //   - the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
 
   icon: {
-    grey: "fill-stamp-grey",
-    purple: "fill-stamp-purple",
+    grey: "fill-stamp-grey stroke-stamp-grey",
+    purple: "fill-stamp-purple stroke-stamp-purple",
     custom: "",
+  },
+
+  /* ===== STROKE-BASED ICON STYLES ===== */
+  strokeIcon: {
+    grey:
+      "stroke-stamp-grey hover:stroke-stamp-grey-light fill-none [stroke-linecap:round] [stroke-linejoin:round]",
+    purple:
+      "stroke-stamp-purple hover:stroke-stamp-purple-bright fill-none [stroke-linecap:round] [stroke-linejoin:round]",
+    custom: "fill-none [stroke-linecap:round] [stroke-linejoin:round]",
+  },
+
+  /* ===== STROKE WIDTH VARIANTS ===== */
+  strokeWidth: {
+    light: "[stroke-width:var(--stroke-width-light)]",
+    normal: "[stroke-width:var(--stroke-width-normal)]",
+    bold: "[stroke-width:var(--stroke-width-bold)]",
   },
 
   /* ===== ICON LINK STYLES ===== */
   iconLink: {
-    grey: "fill-stamp-grey hover:fill-stamp-grey-light cursor-pointer",
-    purple: "fill-stamp-purple hover:fill-stamp-purple-bright cursor-pointer",
+    grey:
+      "fill-stamp-grey hover:fill-stamp-grey-light stroke-stamp-grey hover:stroke-stamp-grey-light cursor-pointer",
+    purple:
+      "fill-stamp-purple hover:fill-stamp-purple-bright stroke-stamp-purple hover:stroke-stamp-purple-bright cursor-pointer",
     custom: "",
+  },
+
+  /* ===== STROKE-BASED ICON LINK STYLES ===== */
+  strokeIconLink: {
+    grey:
+      "stroke-stamp-grey hover:stroke-stamp-grey-light fill-none cursor-pointer",
+    purple:
+      "stroke-stamp-purple hover:stroke-stamp-purple-bright fill-none cursor-pointer",
+    custom: "fill-none",
   },
 
   /* ===== ICON BUTTON STYLES ===== */
   iconButton: {
     grey: `
-      fill-stamp-grey hover:fill-stamp-grey-light 
+      fill-stamp-grey hover:fill-stamp-grey-light stroke-stamp-grey hover:stroke-stamp-grey-light
       bg-[#333333]/40 hover:bg-[#333333]/20 
       tablet:bg-transparent tablet:hover:bg-transparent 
       rounded-md p-1.5 cursor-pointer
     `,
     purple: `
-      fill-stamp-purple hover:fill-stamp-purple-bright 
+      fill-stamp-purple hover:fill-stamp-purple-bright stroke-stamp-purple hover:stroke-stamp-purple-bright
       bg-[#333333]/40 hover:bg-[#333333]/20 
       tablet:bg-transparent tablet:hover:bg-transparent 
       rounded-md p-1.5 cursor-pointer
     `,
     custom: "",
+  },
+
+  /* ===== STROKE-BASED ICON BUTTON STYLES ===== */
+  strokeIconButton: {
+    grey: `
+      stroke-stamp-grey hover:stroke-stamp-grey-light fill-none
+      bg-[#333333]/40 hover:bg-[#333333]/20 
+      tablet:bg-transparent tablet:hover:bg-transparent 
+      rounded-md p-1.5 cursor-pointer
+    `,
+    purple: `
+      stroke-stamp-purple hover:stroke-stamp-purple-bright fill-none
+      bg-[#333333]/40 hover:bg-[#333333]/20 
+      tablet:bg-transparent tablet:hover:bg-transparent 
+      rounded-md p-1.5 cursor-pointer
+    `,
+    custom: "fill-none",
   },
 } as const;
 
