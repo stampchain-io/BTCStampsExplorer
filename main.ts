@@ -38,6 +38,7 @@ import manifest from "$/fresh.gen.ts";
 import config from "$/fresh.config.ts";
 import "$server/database/index.ts"; // Ensures dbManager instance is created via its module execution
 import { dbManager } from "$server/database/databaseManager.ts"; // Explicit import for direct use
+import { BackgroundFeeService } from "$server/services/fee/backgroundFeeService.ts";
 
 // Set DENO_BUILD_MODE globally, to be accessible within the resolver
 (globalThis as any).DENO_BUILD_MODE = Deno.args.includes("build");
@@ -104,6 +105,13 @@ if (import.meta.main) {
       console.log(`[MAIN] Attempting dbManager.initialize() at ${Date.now()}`);
       await dbManager.initialize();
       console.log(`[MAIN] dbManager.initialize() completed at ${Date.now()}`);
+
+      // Start background fee cache warming service
+      const baseUrl = Deno.env.get("DEV_BASE_URL") || "https://stampchain.io";
+      BackgroundFeeService.start(baseUrl);
+      console.log(
+        `[MAIN] Background fee service started with baseUrl: ${baseUrl}`,
+      );
     } catch (e) {
       if (e instanceof Error) {
         console.error(

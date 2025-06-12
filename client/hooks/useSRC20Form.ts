@@ -222,7 +222,15 @@ export function useSRC20Form(
   });
 
   const { config } = useConfig<Config>();
-  const { fees, loading: feesLoading, fetchFees } = useFees();
+  const {
+    fees,
+    loading: feesLoading,
+    fetchFees,
+    feeSource,
+    isUsingFallback,
+    lastGoodDataAge,
+    forceRefresh,
+  } = useFees();
   const [apiError, setApiError] = useState<string>("");
 
   const [formState, setFormState] = useState<SRC20FormState>({
@@ -270,18 +278,84 @@ export function useSRC20Form(
   useEffect(() => {
     if (fees && !feesLoading) {
       logger.debug("ui", {
-        message: "useSRC20Form: Updating fee and BTCPrice from useFeePolling",
+        message: "useSRC20Form: Updating fee and BTCPrice from fee signal",
         data: fees,
+        feeSource,
+        isUsingFallback,
+        lastGoodDataAge,
       });
+
       const recommendedFee = Math.round(fees.recommendedFee);
       const currentBtcPrice = fees.btcPrice;
+
+      // Apply component-level fallbacks if needed
+      let finalFee = recommendedFee;
+      let finalBtcPrice = currentBtcPrice;
+      let feeError = "";
+
+      // If fee is invalid or too low, use conservative fallback
+      if (recommendedFee <= 0) {
+        finalFee = 10; // Conservative 10 sats/vB fallback
+        feeError = "Fee estimation unavailable - using conservative rate";
+        logger.warn("ui", {
+          message: "useSRC20Form: Using conservative fee fallback",
+          originalFee: recommendedFee,
+          fallbackFee: finalFee,
+          feeSource: feeSource.source,
+        });
+      } else if (isUsingFallback && feeSource.confidence === "low") {
+        feeError = "Using estimated fees (network data unavailable)";
+      }
+
+      // If BTC price is invalid, keep previous value or use 0
+      if (currentBtcPrice <= 0) {
+        finalBtcPrice = formState.BTCPrice > 0 ? formState.BTCPrice : 0;
+        logger.warn("ui", {
+          message:
+            "useSRC20Form: BTC price unavailable, keeping previous value",
+          currentPrice: currentBtcPrice,
+          fallbackPrice: finalBtcPrice,
+        });
+      }
+
       setFormState((prev) => ({
         ...prev,
-        fee: recommendedFee > 0 ? recommendedFee : prev.fee,
-        BTCPrice: currentBtcPrice > 0 ? currentBtcPrice : prev.BTCPrice,
+        fee: finalFee,
+        BTCPrice: finalBtcPrice,
+        feeError,
+      }));
+
+      // Log fallback usage for monitoring
+      if (isUsingFallback) {
+        logger.info("ui", {
+          message: "useSRC20Form: Using fallback fee data",
+          source: feeSource.source,
+          confidence: feeSource.confidence,
+          dataAge: lastGoodDataAge,
+          fee: finalFee,
+        });
+      }
+    } else if (!feesLoading && !fees) {
+      // Complete fallback when no fee data is available
+      logger.warn("ui", {
+        message:
+          "useSRC20Form: No fee data available, using conservative fallback",
+      });
+
+      setFormState((prev) => ({
+        ...prev,
+        fee: prev.fee > 0 ? prev.fee : 10, // Keep existing or use 10 sats/vB
+        feeError: "Fee estimation unavailable - using conservative rate",
       }));
     }
-  }, [fees, feesLoading]);
+  }, [
+    fees,
+    feesLoading,
+    feeSource,
+    isUsingFallback,
+    lastGoodDataAge,
+    formState.BTCPrice,
+  ]);
 
   function validateFormState(
     formState: SRC20FormState,
@@ -618,6 +692,7 @@ export function useSRC20Form(
     handleInputChange,
     handleSubmit,
     fetchFees,
+    forceRefresh,
     config,
     isSubmitting,
     submissionMessage,
@@ -625,5 +700,9 @@ export function useSRC20Form(
     apiError,
     handleInputBlur,
     isLoadingFees: feesLoading,
+    // Fee source information for UI feedback
+    feeSource,
+    isUsingFallback,
+    lastGoodDataAge,
   };
 }
