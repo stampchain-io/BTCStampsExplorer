@@ -92,12 +92,35 @@ export function createMockFetch(
     // Check if we have a mock response for this URL
     for (const [pattern, response] of Object.entries(responses)) {
       if (url.includes(pattern)) {
+        const responseText = JSON.stringify(response);
         return {
           ok: true,
           json: async () => response,
+          text: async () => responseText,
           status: 200,
           statusText: "OK",
-        } as Response;
+          headers: new Headers({ "content-type": "application/json" }),
+          url: url,
+          redirected: false,
+          type: "basic",
+          bodyUsed: false,
+          clone: () => {
+            throw new Error("Mock response clone not implemented");
+          },
+          arrayBuffer: async () => {
+            throw new Error("Mock response arrayBuffer not implemented");
+          },
+          blob: async () => {
+            throw new Error("Mock response blob not implemented");
+          },
+          formData: async () => {
+            throw new Error("Mock response formData not implemented");
+          },
+          bytes: async () => {
+            throw new Error("Mock response bytes not implemented");
+          },
+          body: null,
+        } as unknown as Response;
       }
     }
 

@@ -5,7 +5,7 @@ import { Src20Service } from "$server/services/src20/queryService.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { paginate } from "$lib/utils/paginationUtils.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
+import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import {
   PaginatedStampBalanceResponseBody,
   ProcessedHolder,
@@ -223,7 +223,9 @@ export class StampController {
     });
 
     // Process stamps with floor prices and asset info if needed
-    const btcPrice = await fetchBTCPriceInUSD(url?.origin);
+    const btcPriceData = await BTCPriceService.getPrice();
+    const btcPrice = btcPriceData.price;
+    console.log(`[StampController] BTC price: $${btcPrice} from ${btcPriceData.source}`);
     const processedStamps = await Promise.all(
       stampResult.stamps.map(async (stamp) => {
         if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
