@@ -26,7 +26,7 @@ jobs:
 
       # Cache npm dependencies
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -44,7 +44,7 @@ jobs:
           deno-version: v2.3.3
           
       - name: Cache Deno dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.deno
@@ -72,6 +72,7 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # shellcheck disable=SC2317
           # Enable debug output and error handling
           set -x
           set -e
@@ -93,6 +94,7 @@ jobs:
           ls -la ./scripts/
           
           # Error handling function
+          # shellcheck disable=SC2317
           error() {
             echo "ERROR: $*" >&2
             exit 1
@@ -200,7 +202,6 @@ jobs:
               rm -rf "$batch_dir"
               rm -f "$temp_dir/${check_type}_${batch_num}.json"
               
-              rm -f "${check_type}_${batch_num}.json"
               ((batch_num++))
               
               # Add a small delay between batches to avoid rate limiting
