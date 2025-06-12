@@ -8,29 +8,17 @@ import {
 import { BLOCKCYPHER_API_BASE_URL } from "$lib/utils/constants.ts";
 import { getBTCBalanceFromMempool } from "$lib/utils/mempool.ts";
 
-// Cache for BTC price with TTL
-let btcPriceCache: {
-  price: number;
-  timestamp: number;
-} | null = null;
-
-const CACHE_TTL = 10 * 60 * 1000; // 5 minutes in milliseconds
-
+/**
+ * Fetch BTC price in USD using the centralized Redis-cached endpoint
+ * This eliminates client-side caching in favor of server-side Redis caching (5-minute TTL)
+ */
 export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
   const requestId = `btc-price-${Date.now()}-${
     Math.random().toString(36).substr(2, 9)
   }`;
 
-  // Check cache first
-  if (btcPriceCache && Date.now() - btcPriceCache.timestamp < CACHE_TTL) {
-    console.log(
-      `[${requestId}] Using cached BTC price: ${btcPriceCache.price}`,
-    );
-    return btcPriceCache.price;
-  }
-
   console.log(
-    `[${requestId}] Cache miss, fetching BTC price, apiBaseUrl: ${
+    `[${requestId}] Fetching BTC price from centralized endpoint, apiBaseUrl: ${
       apiBaseUrl || "none"
     }`,
   );
@@ -64,7 +52,7 @@ export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
           console.error(
             `[${requestId}] Critical: API base URL (BASE_URL or DEV_BASE_URL) is not defined. Cannot fetch BTC price for path: ${path}. Ensure BASE_URL is set for production.`,
           );
-          return btcPriceCache?.price || 0; // Return cached or 0
+          return 0; // Return 0 instead of cached price
         }
       }
     }
@@ -79,7 +67,7 @@ export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
       console.warn(
         `[${requestId}] BTC price endpoint returned ${response.status}: ${response.statusText}`,
       );
-      return btcPriceCache?.price || 0; // Return cached price if available, otherwise 0
+      return 0; // Return 0 instead of cached price
     }
 
     const text = await response.text();
@@ -91,16 +79,10 @@ export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
     const price = formatUSDValue(data.data?.price || 0);
     console.log(`[${requestId}] Formatted price: ${price}`);
 
-    // Update cache
-    btcPriceCache = {
-      price,
-      timestamp: Date.now(),
-    };
-
     return price;
   } catch (error) {
     console.error(`[${requestId}] Error fetching BTC price:`, error);
-    return btcPriceCache?.price || 0; // Return cached price if available, otherwise 0
+    return 0; // Return 0 instead of cached price
   }
 }
 
@@ -114,9 +96,13 @@ async function getBTCBalanceFromBlockCypher(
     if (!response.ok) return null;
 
     const data = await response.json() as BlockCypherAddressBalanceResponse;
+    const confirmed = data.balance || 0;
+    const unconfirmed = data.unconfirmed_balance || 0;
+
     return {
-      confirmed: data.balance || 0,
-      unconfirmed: data.unconfirmed_balance || 0,
+      confirmed,
+      unconfirmed,
+      total: confirmed + unconfirmed,
       txCount: data.n_tx || 0,
       unconfirmedTxCount: data.unconfirmed_n_tx || 0,
     };

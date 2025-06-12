@@ -101,11 +101,15 @@ export const getBTCBalanceFromMempool = async (
     }
 
     const data = await response.json() as MempoolAddressResponse;
+    const confirmed = data.chain_stats.funded_txo_sum -
+      data.chain_stats.spent_txo_sum;
+    const unconfirmed = data.mempool_stats.funded_txo_sum -
+      data.mempool_stats.spent_txo_sum;
+
     return {
-      confirmed: data.chain_stats.funded_txo_sum -
-        data.chain_stats.spent_txo_sum,
-      unconfirmed: data.mempool_stats.funded_txo_sum -
-        data.mempool_stats.spent_txo_sum,
+      confirmed,
+      unconfirmed,
+      total: confirmed + unconfirmed,
       txCount: data.chain_stats.tx_count,
       unconfirmedTxCount: data.mempool_stats.tx_count,
     };

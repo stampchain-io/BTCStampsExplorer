@@ -24,6 +24,7 @@ import { Button } from "$button";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import { tooltipIcon } from "$notification";
 import { openModal } from "$islands/modal/states.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 
 /* ===== TYPES ===== */
 interface StampInfoProps {
@@ -546,15 +547,12 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   // Add btcPrice state with proper initialization
   const [btcPrice, setBtcPrice] = useState<number | null>(null);
 
-  // Fetch BTC price when component mounts
+  // Fetch BTC price when component mounts using centralized Redis-cached endpoint
   useEffect(() => {
     const fetchBTCPrice = async () => {
       try {
-        const response = await fetch(
-          "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
-        );
-        const data = await response.json();
-        setBtcPrice(data.bitcoin.usd);
+        const price = await fetchBTCPriceInUSD();
+        setBtcPrice(price);
       } catch (error) {
         console.error("Error fetching BTC price:", error);
         setBtcPrice(null);

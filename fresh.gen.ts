@@ -8,13 +8,16 @@ import * as $_app from "./routes/_app.tsx";
 import * as $_middleware from "./routes/_middleware.ts";
 import * as $about_index from "./routes/about/index.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
+import * as $api_internal_background_fee_status from "./routes/api/internal/background-fee-status.ts";
 import * as $api_internal_bitcoinNotifications from "./routes/api/internal/bitcoinNotifications.ts";
 import * as $api_internal_btcPrice from "./routes/api/internal/btcPrice.ts";
 import * as $api_internal_carousel from "./routes/api/internal/carousel.ts";
 import * as $api_internal_creatorName from "./routes/api/internal/creatorName.ts";
 import * as $api_internal_csrfToken from "./routes/api/internal/csrfToken.ts";
 import * as $api_internal_debug_headers from "./routes/api/internal/debug-headers.ts";
+import * as $api_internal_fee_security from "./routes/api/internal/fee-security.ts";
 import * as $api_internal_fees from "./routes/api/internal/fees.ts";
+import * as $api_internal_monitoring from "./routes/api/internal/monitoring.ts";
 import * as $api_internal_src20_trending from "./routes/api/internal/src20/trending.ts";
 import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
 import * as $api_proxy_ordinals_path_ from "./routes/api/proxy/ordinals/[...path].ts";
@@ -272,6 +275,8 @@ const manifest = {
     "./routes/_middleware.ts": $_middleware,
     "./routes/about/index.tsx": $about_index,
     "./routes/api/[...path].ts": $api_path_,
+    "./routes/api/internal/background-fee-status.ts":
+      $api_internal_background_fee_status,
     "./routes/api/internal/bitcoinNotifications.ts":
       $api_internal_bitcoinNotifications,
     "./routes/api/internal/btcPrice.ts": $api_internal_btcPrice,
@@ -279,7 +284,9 @@ const manifest = {
     "./routes/api/internal/creatorName.ts": $api_internal_creatorName,
     "./routes/api/internal/csrfToken.ts": $api_internal_csrfToken,
     "./routes/api/internal/debug-headers.ts": $api_internal_debug_headers,
+    "./routes/api/internal/fee-security.ts": $api_internal_fee_security,
     "./routes/api/internal/fees.ts": $api_internal_fees,
+    "./routes/api/internal/monitoring.ts": $api_internal_monitoring,
     "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,
     "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
     "./routes/api/proxy/ordinals/[...path].ts": $api_proxy_ordinals_path_,
