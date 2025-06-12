@@ -1,6 +1,18 @@
 import { assert, assertEquals, assertExists } from "@std/assert";
 import { fetchBTCPriceInUSD } from "../lib/utils/balanceUtils.ts";
 
+// Import BTCPriceService at top level to avoid dynamic import leak
+let BTCPriceService: any;
+try {
+  const module = await import("../server/services/price/btcPriceService.ts");
+  BTCPriceService = module.BTCPriceService;
+} catch (error) {
+  console.warn(
+    "BTCPriceService not available for testing:",
+    error instanceof Error ? error.message : String(error),
+  );
+}
+
 // Test configuration
 const TEST_CONFIG = {
   isCI: Deno.env.get("CI") === "true",
@@ -18,25 +30,18 @@ const TEST_CONFIG = {
 if (TEST_CONFIG.isCI) {
   setupMockFetch();
   // In CI, also mock BTCPriceService.getPrice to always return the mock price
-  (async () => {
-    try {
-      const { BTCPriceService } = await import(
-        "../server/services/price/btcPriceService.ts"
-      );
-      BTCPriceService.getPrice = () =>
-        Promise.resolve({
-          price: 45000,
-          source: "default",
-          confidence: "high",
-          timestamp: Date.now(),
-          details: { bitcoin: { usd: 45000 } },
-          fallbackUsed: false,
-          errors: [],
-        });
-    } catch (_e) {
-      // Ignore if import fails (not needed for endpoint-only tests)
-    }
-  })();
+  if (BTCPriceService) {
+    BTCPriceService.getPrice = () =>
+      Promise.resolve({
+        price: 45000,
+        source: "default",
+        confidence: "high",
+        timestamp: Date.now(),
+        details: { bitcoin: { usd: 45000 } },
+        fallbackUsed: false,
+        errors: [],
+      });
+  }
 }
 
 // Mock BTC price data
@@ -507,10 +512,12 @@ Deno.test("BTC Price Caching System - Integration Tests", async (t) => {
       console.log("Testing BTCPriceService integration...");
 
       try {
-        // Dynamic import to avoid issues if service isn't available
-        const { BTCPriceService } = await import(
-          "../server/services/price/btcPriceService.ts"
-        );
+        if (!BTCPriceService) {
+          console.log(
+            "⚠️  BTCPriceService not available - skipping integration test",
+          );
+          return;
+        }
 
         // Test that service and endpoint return consistent data
         const servicePrice = await BTCPriceService.getPrice();
