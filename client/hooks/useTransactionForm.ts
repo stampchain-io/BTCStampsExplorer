@@ -126,7 +126,15 @@ export function useTransactionForm(
   { type, initialFee = 1, initialAssetId = "", initialAmount = "1" }:
     UseTransactionFormProps,
 ) {
-  const { fees, loading: feeLoading, fetchFees } = useFees();
+  const {
+    fees,
+    loading: feeLoading,
+    fetchFees,
+    feeSource,
+    isUsingFallback,
+    lastGoodDataAge,
+    forceRefresh,
+  } = useFees();
   const { wallet, isConnected } = walletContext;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
@@ -149,23 +157,82 @@ export function useTransactionForm(
     if (fees && !feeLoading) {
       logger.debug("ui", {
         message:
-          "useTransactionForm: Updating fee and BTCPrice from useFeePolling",
+          "useTransactionForm: Updating fee and BTCPrice from fee signal",
         data: fees,
+        feeSource,
+        isUsingFallback,
+        lastGoodDataAge,
       });
+
       const recommendedFee = Math.round(fees.recommendedFee);
       const currentBtcPrice = fees.btcPrice;
+
+      // Apply component-level fallbacks if needed
+      let finalFee = recommendedFee;
+      let finalBtcPrice = currentBtcPrice;
+
+      // If fee is invalid or too low, use conservative fallback
+      if (recommendedFee <= 0) {
+        finalFee = 10; // Conservative 10 sats/vB fallback
+        logger.warn("ui", {
+          message: "useTransactionForm: Using conservative fee fallback",
+          originalFee: recommendedFee,
+          fallbackFee: finalFee,
+          feeSource: feeSource.source,
+        });
+      }
+
+      // If BTC price is invalid, keep previous value or use 0
+      if (currentBtcPrice <= 0) {
+        finalBtcPrice = formState.BTCPrice > 0 ? formState.BTCPrice : 0;
+        logger.warn("ui", {
+          message:
+            "useTransactionForm: BTC price unavailable, keeping previous value",
+          currentPrice: currentBtcPrice,
+          fallbackPrice: finalBtcPrice,
+        });
+      }
+
       setFormState((prev) => ({
         ...prev,
-        fee: recommendedFee > 0 ? recommendedFee : prev.fee,
-        BTCPrice: currentBtcPrice > 0 ? currentBtcPrice : prev.BTCPrice,
+        fee: finalFee,
+        BTCPrice: finalBtcPrice,
+        feeError: isUsingFallback && feeSource.confidence === "low"
+          ? "Using estimated fees (network data unavailable)"
+          : "",
       }));
+
+      // Log fallback usage for monitoring
+      if (isUsingFallback) {
+        logger.info("ui", {
+          message: "useTransactionForm: Using fallback fee data",
+          source: feeSource.source,
+          confidence: feeSource.confidence,
+          dataAge: lastGoodDataAge,
+          fee: finalFee,
+        });
+      }
     } else if (!feeLoading && !fees) {
+      // Complete fallback when no fee data is available
       logger.warn("ui", {
         message:
-          "useTransactionForm: Fee polling from useFeePolling returned no fees object (null).",
+          "useTransactionForm: No fee data available, using conservative fallback",
       });
+
+      setFormState((prev) => ({
+        ...prev,
+        fee: prev.fee > 0 ? prev.fee : 10, // Keep existing or use 10 sats/vB
+        feeError: "Fee estimation unavailable - using conservative rate",
+      }));
     }
-  }, [fees, feeLoading]);
+  }, [
+    fees,
+    feeLoading,
+    feeSource,
+    isUsingFallback,
+    lastGoodDataAge,
+    formState.BTCPrice,
+  ]);
 
   useEffect(() => {
     if (isConnected && wallet.address) {
@@ -275,6 +342,11 @@ export function useTransactionForm(
     successMessage,
     setSuccessMessage,
     fetchFees,
+    forceRefresh,
     isLoading: feeLoading,
+    // Fee source information for UI feedback
+    feeSource,
+    isUsingFallback,
+    lastGoodDataAge,
   };
 }

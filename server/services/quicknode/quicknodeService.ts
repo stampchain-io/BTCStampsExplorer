@@ -8,6 +8,21 @@ import {
   GetTransaction,
 } from "$types/index.d.ts";
 
+// Interface for QuickNode estimatesmartfee response
+interface EstimateSmartFeeResponse {
+  feerate?: number; // Fee rate in BTC/kB
+  blocks?: number;  // Number of blocks for which estimate is valid
+  errors?: string[]; // Any errors encountered
+}
+
+// Interface for our normalized fee response
+interface NormalizedFeeEstimate {
+  feeRateSatsPerVB: number; // Converted to sats/vB
+  blocks: number;
+  source: 'quicknode';
+  confidence: 'high' | 'medium' | 'low';
+}
+
 export class QuicknodeService {
   // Instead of storing the full URL with API key as a static property,
   // construct it only when needed and never expose it
@@ -162,5 +177,123 @@ export class QuicknodeService {
     const hex = await this.getRawTx(txHash);
     const txData = await this.getDecodedTx(hex);
     return { ...txData, hex };
+  }
+
+  /**
+   * Estimate smart fee using QuickNode's Bitcoin Core RPC
+   * @param confTarget Confirmation target in blocks (default: 6)
+   * @param estimateMode Fee estimate mode: 'economical' or 'conservative' (default: 'economical')
+   * @returns Normalized fee estimate in sats/vB or null if failed
+   */
+  static async estimateSmartFee(
+    confTarget: number = 6,
+    estimateMode: 'economical' | 'conservative' = 'economical'
+  ): Promise<NormalizedFeeEstimate | null> {
+    const method = "estimatesmartfee";
+    const params = [confTarget, estimateMode];
+    
+    try {
+      console.log(`[QuickNode] Estimating smart fee for ${confTarget} blocks (${estimateMode} mode)`);
+      
+      const result = await this.fetchQuicknode(method, params);
+      
+      if (!result?.result) {
+        console.error("[QuickNode] estimatesmartfee: No result in response");
+        return null;
+      }
+
+      const feeData: EstimateSmartFeeResponse = result.result;
+      
+      // Check for errors in the response
+      if (feeData.errors && feeData.errors.length > 0) {
+        console.error("[QuickNode] estimatesmartfee errors:", feeData.errors);
+        return null;
+      }
+
+      // Validate feerate exists and is a valid number
+      if (typeof feeData.feerate !== 'number' || feeData.feerate <= 0) {
+        console.error("[QuickNode] estimatesmartfee: Invalid or missing feerate", feeData);
+        return null;
+      }
+
+      // Convert BTC/kB to sats/vB
+      // 1 BTC = 100,000,000 satoshis
+      // 1 kB = 1000 vB (virtual bytes)
+      // Formula: (feerate_btc_per_kb * 100000000) / 1000
+      const feeRateSatsPerVB = Math.round((feeData.feerate * 100000000) / 1000);
+      
+      // Ensure minimum fee rate of 1 sat/vB
+      const normalizedFeeRate = Math.max(feeRateSatsPerVB, 1);
+      
+      // Determine confidence based on confirmation target
+      let confidence: 'high' | 'medium' | 'low';
+      if (confTarget <= 2) {
+        confidence = 'high';
+      } else if (confTarget <= 6) {
+        confidence = 'medium';
+      } else {
+        confidence = 'low';
+      }
+
+      const estimate: NormalizedFeeEstimate = {
+        feeRateSatsPerVB: normalizedFeeRate,
+        blocks: feeData.blocks || confTarget,
+        source: 'quicknode',
+        confidence
+      };
+
+      console.log(`[QuickNode] Fee estimate successful:`, {
+        originalBtcPerKb: feeData.feerate,
+        convertedSatsPerVb: normalizedFeeRate,
+        blocks: estimate.blocks,
+        confidence: estimate.confidence
+      });
+
+      return estimate;
+      
+    } catch (error) {
+      console.error("[QuickNode] estimateSmartFee failed:", {
+        error: error instanceof Error ? error.message : String(error),
+        confTarget,
+        estimateMode,
+        endpoint: this.getSafeEndpointForLogs()
+      });
+      return null;
+    }
+  }
+
+  /**
+   * Get multiple fee estimates for different confirmation targets
+   * Useful for providing fast/normal/economy options
+   */
+  static async getMultipleFeeEstimates(): Promise<{
+    fast: NormalizedFeeEstimate | null;    // 1-2 blocks
+    normal: NormalizedFeeEstimate | null;  // 6 blocks  
+    economy: NormalizedFeeEstimate | null; // 144 blocks
+  }> {
+    try {
+      console.log("[QuickNode] Fetching multiple fee estimates");
+      
+      // Fetch all estimates in parallel
+      const [fastEstimate, normalEstimate, economyEstimate] = await Promise.all([
+        this.estimateSmartFee(1, 'conservative'),  // Fast: 1 block, conservative
+        this.estimateSmartFee(6, 'economical'),   // Normal: 6 blocks, economical
+        this.estimateSmartFee(144, 'economical')  // Economy: 144 blocks, economical
+      ]);
+
+      return {
+        fast: fastEstimate,
+        normal: normalEstimate,
+        economy: economyEstimate
+      };
+      
+    } catch (error) {
+      console.error("[QuickNode] getMultipleFeeEstimates failed:", error);
+      return {
+        fast: null,
+        normal: null,
+        economy: null
+      };
+    }
   }
 } 

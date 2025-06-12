@@ -1,0 +1,146 @@
+name: Fee System Tests
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'tests/fee-*.test.ts'
+      - 'tests/redis-*.test.ts'
+      - 'tests/quicknode-*.test.ts'
+      - 'server/services/fee/**'
+      - 'server/services/quicknode/**'
+      - 'lib/utils/feeSignal.ts'
+      - 'lib/utils/localStorage.ts'
+      - 'lib/utils/monitoring.ts'
+      - 'routes/api/internal/fees.ts'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'tests/fee-*.test.ts'
+      - 'tests/redis-*.test.ts'
+      - 'tests/quicknode-*.test.ts'
+      - 'server/services/fee/**'
+      - 'server/services/quicknode/**'
+      - 'lib/utils/feeSignal.ts'
+      - 'lib/utils/localStorage.ts'
+      - 'lib/utils/monitoring.ts'
+      - 'routes/api/internal/fees.ts'
+
+jobs:
+  fee-system-tests:
+    name: Fee System Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # Test environment variables
+      DENO_ENV: test
+      CSRF_SECRET_KEY: "test-csrf-secret-key-for-ci"
+      REDIS_URL: "redis://localhost:6379"
+      ELASTICACHE_ENDPOINT: "localhost:6379"
+      SKIP_REDIS_CONNECTION: "false"
+      
+      # Mock API keys for testing (not real keys)
+      QUICKNODE_API_KEY: "test-quicknode-key"
+      QUICKNODE_ENDPOINT: "test-endpoint.quiknode.pro"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.3.3
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-fee-tests-${{ hashFiles('**/deps.ts', 'deno.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-fee-tests-
+            ${{ runner.os }}-deno-
+
+      - name: Wait for Redis
+        run: |
+          echo "Waiting for Redis to be ready..."
+          timeout 30 bash -c 'until redis-cli -h localhost -p 6379 ping; do sleep 1; done'
+          echo "Redis is ready!"
+
+      - name: Run Core Fee Tests
+        run: |
+          echo "Running core fee fallback and QuickNode tests..."
+          deno task test:fees
+        continue-on-error: false
+
+      - name: Run Redis Integration Tests
+        run: |
+          echo "Running Redis integration tests..."
+          deno task test:redis-fees
+        continue-on-error: false
+
+      - name: Run Security Tests
+        run: |
+          echo "Running security validation tests..."
+          deno task test:security
+        continue-on-error: false
+
+      - name: Run Performance Tests
+        run: |
+          echo "Running performance and migration tests..."
+          deno task test:performance
+        continue-on-error: false
+
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "Fee system test execution completed"
+          echo "Check individual test steps for detailed results"
+
+  # Optional: Run tests without Redis to verify fallback behavior
+  fee-system-tests-no-redis:
+    name: Fee System Tests (No Redis)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    env:
+      DENO_ENV: test
+      CSRF_SECRET_KEY: "test-csrf-secret-key-for-ci"
+      SKIP_REDIS_CONNECTION: "true"
+      QUICKNODE_API_KEY: "test-quicknode-key"
+      QUICKNODE_ENDPOINT: "test-endpoint.quiknode.pro"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.3.3
+
+      - name: Run Core Fee Tests (No Redis)
+        run: |
+          echo "Running fee tests without Redis to verify fallback behavior..."
+          deno task test:fees
+        continue-on-error: false
+
+      - name: Run Redis Tests (Fallback Mode)
+        run: |
+          echo "Running Redis tests in fallback mode..."
+          deno task test:redis-fees
+        continue-on-error: false 

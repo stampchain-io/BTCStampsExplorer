@@ -2,19 +2,32 @@ import { useEffect, useState } from "preact/hooks";
 import {
   type FeeData,
   feeSignal,
+  forceRefreshFees,
   getCurrentFees,
   getError,
+  getFeeSource,
+  getLastGoodDataAge,
   isLoading,
+  isUsingFallback,
   refreshFees,
   subscribeFees,
 } from "$lib/utils/feeSignal.ts";
 
-// Hook interface matching the old useFeePolling for backward compatibility
+// Hook interface for fee data access with enhanced fallback capabilities
 interface UseFeeResult {
   fees: FeeData | null;
   loading: boolean;
   error: string | null;
   fetchFees: () => Promise<void>;
+  // Enhanced functionality
+  feeSource: {
+    source: string;
+    confidence: string;
+    fallbackUsed: boolean;
+  };
+  isUsingFallback: boolean;
+  lastGoodDataAge: number | null;
+  forceRefresh: () => Promise<void>;
 }
 
 /**
@@ -50,6 +63,10 @@ export const useFees = (): UseFeeResult => {
     loading,
     error,
     fetchFees: refreshFees,
+    feeSource: getFeeSource(),
+    isUsingFallback: isUsingFallback(),
+    lastGoodDataAge: getLastGoodDataAge(),
+    forceRefresh: forceRefreshFees,
   };
 };
 
@@ -69,6 +86,10 @@ export const useFeesSignal = () => {
     loading: feeSignal.value.loading,
     error: feeSignal.value.error,
     fetchFees: refreshFees,
+    feeSource: getFeeSource(),
+    isUsingFallback: isUsingFallback(),
+    lastGoodDataAge: getLastGoodDataAge(),
+    forceRefresh: forceRefreshFees,
   };
 };
 
