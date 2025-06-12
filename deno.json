@@ -29,6 +29,16 @@
     "test:version": "deno test -A --log-level=debug --no-check tests/versioning/versionChain.test.ts",
     "test:src20": "deno test --allow-net tests/src20/createTransaction.test.ts tests/src20/api-compatibility.ts tests/src20/performance.test.ts --no-check --allow-read --allow-env --allow-write",
     "test:src20:watch": "deno test --allow-net tests/src20/createTransaction.test.ts tests/src20/api-compatibility.ts tests/src20/performance.test.ts --no-check --allow-read --allow-env --allow-write --watch",
+    "test:fees": "deno test --allow-net tests/fee-fallback.test.ts tests/quicknode-fees.test.ts tests/redis-fee-system.test.ts --no-check --allow-read --allow-env --allow-write",
+    "test:fees:watch": "deno test --allow-net tests/fee-fallback.test.ts tests/quicknode-fees.test.ts tests/redis-fee-system.test.ts --no-check --allow-read --allow-env --allow-write --watch",
+    "test:redis-fees": "deno test --allow-net tests/redis-fee-system.test.ts --no-check --allow-read --allow-env --allow-write",
+    "test:redis-fees:watch": "deno test --allow-net tests/redis-fee-system.test.ts --no-check --allow-read --allow-env --allow-write --watch",
+    "test:security": "deno test --allow-net tests/fee-security.test.ts --no-check --allow-read --allow-env --allow-write",
+    "test:security:watch": "deno test --allow-net tests/fee-security.test.ts --no-check --allow-read --allow-env --allow-write --watch",
+    "test:performance": "deno test --allow-net tests/fee-performance.test.ts --no-check --allow-read --allow-env --allow-write",
+    "test:performance:watch": "deno test --allow-net tests/fee-performance.test.ts --no-check --allow-read --allow-env --allow-write --watch",
+    "test:btc-price": "deno test --allow-net tests/btc-price-caching.test.ts --no-check --allow-read --allow-env --allow-write",
+    "test:btc-price:watch": "deno test --allow-net tests/btc-price-caching.test.ts --no-check --allow-read --allow-env --allow-write --watch",
     "analyze:types": "deno run --allow-run --allow-write scripts/analyze-type-errors.ts"
   },
   "lint": {

@@ -7,28 +7,34 @@ on:
       - 'tests/fee-*.test.ts'
       - 'tests/redis-*.test.ts'
       - 'tests/quicknode-*.test.ts'
+      - 'tests/btc-price-*.test.ts'
       - 'server/services/fee/**'
       - 'server/services/quicknode/**'
       - 'lib/utils/feeSignal.ts'
       - 'lib/utils/localStorage.ts'
       - 'lib/utils/monitoring.ts'
+      - 'lib/utils/balanceUtils.ts'
       - 'routes/api/internal/fees.ts'
+      - 'routes/api/internal/btcPrice.ts'
   pull_request:
     branches: [main, dev]
     paths:
       - 'tests/fee-*.test.ts'
       - 'tests/redis-*.test.ts'
       - 'tests/quicknode-*.test.ts'
+      - 'tests/btc-price-*.test.ts'
       - 'server/services/fee/**'
       - 'server/services/quicknode/**'
       - 'lib/utils/feeSignal.ts'
       - 'lib/utils/localStorage.ts'
       - 'lib/utils/monitoring.ts'
+      - 'lib/utils/balanceUtils.ts'
       - 'routes/api/internal/fees.ts'
+      - 'routes/api/internal/btcPrice.ts'
 
 jobs:
   fee-system-tests:
-    name: Fee System Tests
+    name: Fee System Tests (with Redis)
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -44,19 +50,17 @@ jobs:
           --health-retries 5
 
     env:
-      # Test environment variables
+      CI: true
       DENO_ENV: test
-      CSRF_SECRET_KEY: "test-csrf-secret-key-for-ci"
-      REDIS_URL: "redis://localhost:6379"
-      ELASTICACHE_ENDPOINT: "localhost:6379"
-      SKIP_REDIS_CONNECTION: "false"
-      
-      # Mock API keys for testing (not real keys)
-      QUICKNODE_API_KEY: "test-quicknode-key"
-      QUICKNODE_ENDPOINT: "test-endpoint.quiknode.pro"
+      SKIP_REDIS_CONNECTION: false
+      REDIS_URL: redis://localhost:6379
+      # Mock API keys for testing
+      QUICKNODE_API_KEY: test-quicknode-key
+      ANTHROPIC_API_KEY: test-anthropic-key
+      PERPLEXITY_API_KEY: test-perplexity-key
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Deno
@@ -64,68 +68,51 @@ jobs:
         with:
           deno-version: v2.3.3
 
-      - name: Cache Deno dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.deno
-            ~/.cache/deno
-          key: ${{ runner.os }}-deno-fee-tests-${{ hashFiles('**/deps.ts', 'deno.json') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-fee-tests-
-            ${{ runner.os }}-deno-
-
       - name: Wait for Redis
         run: |
-          echo "Waiting for Redis to be ready..."
           timeout 30 bash -c 'until redis-cli -h localhost -p 6379 ping; do sleep 1; done'
-          echo "Redis is ready!"
 
-      - name: Run Core Fee Tests
+      - name: Run Fee System Tests
         run: |
-          echo "Running core fee fallback and QuickNode tests..."
+          echo "Running fee system tests with Redis..."
           deno task test:fees
-        continue-on-error: false
 
-      - name: Run Redis Integration Tests
+      - name: Run Redis Fee Tests
         run: |
-          echo "Running Redis integration tests..."
+          echo "Running Redis-specific fee tests..."
           deno task test:redis-fees
-        continue-on-error: false
 
       - name: Run Security Tests
         run: |
           echo "Running security validation tests..."
           deno task test:security
-        continue-on-error: false
 
       - name: Run Performance Tests
         run: |
-          echo "Running performance and migration tests..."
+          echo "Running performance benchmark tests..."
           deno task test:performance
-        continue-on-error: false
 
-      - name: Test Summary
-        if: always()
+      - name: Run BTC Price Caching Tests
         run: |
-          echo "Fee system test execution completed"
-          echo "Check individual test steps for detailed results"
+          echo "Running BTC price caching tests..."
+          deno task test:btc-price
 
-  # Optional: Run tests without Redis to verify fallback behavior
-  fee-system-tests-no-redis:
-    name: Fee System Tests (No Redis)
+  fee-system-fallback-tests:
+    name: Fee System Fallback Tests (no Redis)
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
 
     env:
+      CI: true
       DENO_ENV: test
-      CSRF_SECRET_KEY: "test-csrf-secret-key-for-ci"
-      SKIP_REDIS_CONNECTION: "true"
-      QUICKNODE_API_KEY: "test-quicknode-key"
-      QUICKNODE_ENDPOINT: "test-endpoint.quiknode.pro"
+      SKIP_REDIS_CONNECTION: true
+      # Mock API keys for testing
+      QUICKNODE_API_KEY: test-quicknode-key
+      ANTHROPIC_API_KEY: test-anthropic-key
+      PERPLEXITY_API_KEY: test-perplexity-key
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Deno
@@ -133,14 +120,12 @@ jobs:
         with:
           deno-version: v2.3.3
 
-      - name: Run Core Fee Tests (No Redis)
+      - name: Run Fee Fallback Tests
         run: |
-          echo "Running fee tests without Redis to verify fallback behavior..."
+          echo "Running fee system tests without Redis (fallback mode)..."
           deno task test:fees
-        continue-on-error: false
 
-      - name: Run Redis Tests (Fallback Mode)
+      - name: Run BTC Price Fallback Tests
         run: |
-          echo "Running Redis tests in fallback mode..."
-          deno task test:redis-fees
-        continue-on-error: false 
+          echo "Running BTC price caching tests in fallback mode..."
+          deno task test:btc-price 
