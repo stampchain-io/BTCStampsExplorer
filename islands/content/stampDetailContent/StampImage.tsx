@@ -270,8 +270,8 @@ function RightPanel(
           onMouseLeave={handleCopyMouseLeave}
         >
           <Icon
-            type="iconLink"
-            name="copy"
+            type="strokeIcon"
+            name="copy2"
             weight="normal"
             size="mdR"
             color="grey"
@@ -298,8 +298,8 @@ function RightPanel(
           onMouseLeave={handleXMouseLeave}
         >
           <Icon
-            type="iconLink"
-            name="twitter"
+            type="strokeIcon"
+            name="twitter2"
             weight="normal"
             size="mdR"
             color="grey"
@@ -322,8 +322,8 @@ function RightPanel(
           onMouseLeave={handleShareMouseLeave}
         >
           <Icon
-            type="iconLink"
-            name="share"
+            type="strokeIcon"
+            name="share2"
             weight="normal"
             size="custom"
             color="grey"
@@ -378,7 +378,7 @@ function RightPanel(
           onMouseLeave={handleToolsMouseLeave}
         >
           <Icon
-            type="iconLink"
+            type="strokeIcon"
             name="imageExternal"
             weight="normal"
             size="mdR"
@@ -410,12 +410,11 @@ function RightPanel(
           onMouseLeave={handleFullscreenMouseLeave}
         >
           <Icon
-            type="iconLink"
-            name="fullscreen"
+            type="strokeIcon"
+            name="image2"
             weight="normal"
-            size="custom"
+            size="mdR"
             color="grey"
-            className="w-7 h-7 tablet:w-[26px] tablet:h-[26px] -mt-[1px] tablet:mt-0"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();
