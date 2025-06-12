@@ -22,11 +22,11 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Cache npm dependencies
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -44,7 +44,7 @@ jobs:
           deno-version: v2.3.3
           
       - name: Cache Deno dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.deno
@@ -52,6 +52,16 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('**/deps.ts') }}
           restore-keys: |
             ${{ runner.os }}-deno-
+
+      - name: Run format check
+        id: fmtcheck
+        run: deno task check:fmt
+        continue-on-error: true
+
+      - name: Run lint check
+        id: lintcheck
+        run: deno task check:lint
+        continue-on-error: true
 
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1
@@ -62,6 +72,7 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # shellcheck disable=SC2317
           # Enable debug output and error handling
           set -x
           set -e
@@ -83,6 +94,7 @@ jobs:
           ls -la ./scripts/
           
           # Error handling function
+          # shellcheck disable=SC2317
           error() {
             echo "ERROR: $*" >&2
             exit 1
@@ -190,7 +202,6 @@ jobs:
               rm -rf "$batch_dir"
               rm -f "$temp_dir/${check_type}_${batch_num}.json"
               
-              rm -f "${check_type}_${batch_num}.json"
               ((batch_num++))
               
               # Add a small delay between batches to avoid rate limiting
@@ -204,12 +215,19 @@ jobs:
           
           echo "Starting lint checks..."
           process_files lint
-          
+
           exit 0
+
+      - name: Actionlint
+        id: actionlint
+        uses: reviewdog/action-actionlint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
 
       # Fail the workflow if any checks failed
       - name: Check for failures
-        if: steps.fmt.outcome == 'failure' || steps.lint.outcome == 'failure'
+        if: steps.fmtcheck.outcome == 'failure' || steps.lintcheck.outcome == 'failure' || steps.actionlint.outcome == 'failure'
         run: exit 1
 
       # Build check
