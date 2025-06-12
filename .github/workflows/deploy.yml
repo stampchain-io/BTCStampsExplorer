@@ -24,12 +24,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Cache npm dependencies
+      # Setup Node.js (no cache due to gitignored package-lock.json)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+
+      # Manual npm cache based on package.json (since package-lock.json is gitignored)
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
       - name: Install npm dependencies
         run: npm install  # Using npm install since package-lock.json is gitignored due to dev tool conflicts
