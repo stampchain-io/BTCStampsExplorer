@@ -6,14 +6,35 @@ export const handler: Handlers = {
     try {
       const status = BackgroundFeeService.getStatus();
 
+      // Enhanced status with separate services information
+      const enhancedStatus = {
+        services: {
+          fees: {
+            isRunning: status.isRunning,
+            intervalId: status.intervalId,
+            retryCount: status.retryCount,
+            cacheInfo: status.feeCacheInfo,
+            uptime: status.intervalId ? "Active" : "Inactive",
+          },
+          btcPrice: {
+            isRunning: status.isRunning,
+            intervalId: status.priceIntervalId,
+            retryCount: status.priceRetryCount,
+            cacheInfo: status.priceCacheInfo,
+            uptime: status.priceIntervalId ? "Active" : "Inactive",
+          },
+        },
+        overall: {
+          isRunning: status.isRunning,
+          bothServicesActive: status.intervalId !== null &&
+            status.priceIntervalId !== null,
+        },
+        timestamp: new Date().toISOString(),
+      };
+
       return Response.json({
         success: true,
-        data: {
-          isRunning: status.isRunning,
-          retryCount: status.retryCount,
-          cacheInfo: status.cacheInfo,
-          uptime: status.intervalId ? "Active" : "Inactive",
-        },
+        data: enhancedStatus,
         timestamp: Date.now(),
       });
     } catch (error) {
@@ -36,14 +57,37 @@ export const handler: Handlers = {
 
         return Response.json({
           success: true,
-          message: "Cache warming forced successfully",
+          message:
+            "Cache warming forced successfully for both fees and BTC price",
+          timestamp: Date.now(),
+        });
+      }
+
+      if (action === "force-warm-price") {
+        await BackgroundFeeService.forceWarmPrice();
+
+        return Response.json({
+          success: true,
+          message: "BTC price cache force-warmed successfully",
+          timestamp: Date.now(),
+        });
+      }
+
+      if (action === "force-warm-fee") {
+        const baseUrl = body.baseUrl || "https://stampchain.io";
+        await BackgroundFeeService.forceWarmFee(baseUrl);
+
+        return Response.json({
+          success: true,
+          message: "Fee cache force-warmed successfully",
           timestamp: Date.now(),
         });
       }
 
       return Response.json({
         success: false,
-        error: "Invalid action. Supported actions: force-warm",
+        error:
+          "Invalid action. Supported actions: force-warm, force-warm-price, force-warm-fee",
         timestamp: Date.now(),
       }, { status: 400 });
     } catch (error) {

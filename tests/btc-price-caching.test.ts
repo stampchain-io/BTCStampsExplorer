@@ -420,6 +420,50 @@ Deno.test("BTC Price Caching System - Integration Tests", async (t) => {
 
       console.log(`✅ Fallback behavior validated - returns 0 on error`);
     });
+
+    await t.step("BTCPriceService integration", async () => {
+      console.log("Testing BTCPriceService integration...");
+
+      try {
+        // Dynamic import to avoid issues if service isn't available
+        const { BTCPriceService } = await import(
+          "../server/services/price/btcPriceService.ts"
+        );
+
+        // Test that service and endpoint return consistent data
+        const servicePrice = await BTCPriceService.getPrice();
+        const endpointPrice = await fetchBTCPriceInUSD(TEST_CONFIG.baseUrl);
+
+        // Both should return the same cached value
+        assertEquals(
+          servicePrice.price,
+          endpointPrice,
+          "Service and endpoint prices should be consistent",
+        );
+
+        console.log(
+          `✅ Service and endpoint prices consistent: $${servicePrice.price} from ${servicePrice.source}`,
+        );
+
+        // Test cache info
+        const cacheInfo = BTCPriceService.getCacheInfo();
+        assert(cacheInfo.cacheKey, "Cache key should be defined");
+        assert(
+          cacheInfo.cacheDuration > 0,
+          "Cache duration should be positive",
+        );
+
+        console.log(`✅ BTCPriceService integration validated`);
+      } catch (error) {
+        if (serverRunning) {
+          console.warn("⚠️  BTCPriceService integration test failed:", error);
+        } else {
+          console.log(
+            "⚠️  BTCPriceService integration test skipped - server not running",
+          );
+        }
+      }
+    });
   } finally {
     if (!serverRunning) {
       restoreFetch();

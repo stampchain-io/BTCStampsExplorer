@@ -41,32 +41,22 @@ export const handler: Handlers = {
       const result = await BTCPriceService.getPrice(initialSource);
       console.log(`[${requestId}] BTCPriceService result:`, result);
 
-      if ("error" in result) {
-        console.error(`[${requestId}] Price service error:`, result.error);
-        return ApiResponseUtil.internalError(result.error);
-      }
-
-      if (!result.price) {
+      if (!result.price && result.source !== "default") {
         console.error(`[${requestId}] No price data available`);
         return ApiResponseUtil.internalError("No price data available");
       }
 
-      const btcPrice = "bitcoin" in result.price
-        ? result.price.bitcoin.usd
-        : result.price.price;
-
-      console.log(`[${requestId}] Extracted BTC price: ${btcPrice}`);
-
       const formattedResult = {
         data: {
-          price: btcPrice,
+          price: result.price,
           source: result.source,
-          details: result.price,
+          confidence: result.confidence,
+          details: result.details,
         },
       };
 
       console.log(
-        `[${requestId}] Sending response with price: ${btcPrice} from ${result.source}`,
+        `[${requestId}] Sending response with price: ${result.price} from ${result.source}`,
       );
       return ApiResponseUtil.success(formattedResult, {
         routeType: RouteType.PRICE,
