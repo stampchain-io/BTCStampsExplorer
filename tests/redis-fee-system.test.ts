@@ -170,9 +170,13 @@ Deno.test("Redis Fee System Tests", async (t) => {
             confidence: feeData.confidence,
           });
         } else {
+          // Consume the response body to prevent resource leak
+          await feeResponse.text();
           console.log("Fee endpoint not available for integration test");
         }
       } else {
+        // Consume the response body to prevent resource leak
+        await csrfResponse.text();
         console.log("CSRF endpoint not available for integration test");
       }
     } catch (error) {
