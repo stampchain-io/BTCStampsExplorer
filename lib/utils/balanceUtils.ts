@@ -9,10 +9,15 @@ import { BLOCKCYPHER_API_BASE_URL } from "$lib/utils/constants.ts";
 import { getBTCBalanceFromMempool } from "$lib/utils/mempool.ts";
 
 /**
+ * @deprecated Use BTCPriceService.getPrice() for server-side or /api/internal/btcPrice for client-side
  * Fetch BTC price in USD using the centralized Redis-cached endpoint
- * This eliminates client-side caching in favor of server-side Redis caching (5-minute TTL)
+ * This function is kept for backward compatibility but should be migrated to BTCPriceService
  */
 export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
+  console.warn(
+    "fetchBTCPriceInUSD is deprecated. Use BTCPriceService.getPrice() or /api/internal/btcPrice",
+  );
+
   const requestId = `btc-price-${Date.now()}-${
     Math.random().toString(36).substr(2, 9)
   }`;
@@ -23,66 +28,46 @@ export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
     }`,
   );
 
-  try {
-    const path = "/api/internal/btcPrice";
-    let finalUrl: string;
-
-    if (apiBaseUrl) {
-      finalUrl = new URL(path, apiBaseUrl).toString();
-    } else {
-      const env = Deno.env.get("DENO_ENV");
-      let baseUrlFromEnv: string | undefined;
-
-      if (env === "development") {
-        baseUrlFromEnv = Deno.env.get("DEV_BASE_URL");
-      } else { // 'production' or other fallback
-        baseUrlFromEnv = Deno.env.get("BASE_URL");
+  // Fallback implementation for compatibility
+  if (typeof window !== "undefined" || !apiBaseUrl) {
+    // Client-side or no baseUrl: use centralized endpoint
+    try {
+      const baseUrl = apiBaseUrl ||
+        (typeof window !== "undefined"
+          ? window.location.origin
+          : "http://localhost:8000");
+      const response = await fetch(`${baseUrl}/api/internal/btcPrice`);
+      if (response.ok) {
+        const data = await response.json();
+        const price = formatUSDValue(data.data?.price || 0);
+        console.log(
+          `[${requestId}] BTC price from centralized endpoint: $${price}`,
+        );
+        return price;
       }
-
-      if (baseUrlFromEnv) {
-        finalUrl = new URL(path, baseUrlFromEnv).toString();
-      } else {
-        // Fallback for local development if DEV_BASE_URL is not set.
-        if (env === "development") {
-          finalUrl = new URL(path, "http://localhost:8000").toString(); // Assuming default Fresh port
-          console.warn(
-            `[${requestId}] DEV_BASE_URL not set for server-side fetch, defaulting to http://localhost:8000 for path: ${path}. Please ensure DEV_BASE_URL is configured in your environment for robustness.`,
-          );
-        } else {
-          console.error(
-            `[${requestId}] Critical: API base URL (BASE_URL or DEV_BASE_URL) is not defined. Cannot fetch BTC price for path: ${path}. Ensure BASE_URL is set for production.`,
-          );
-          return 0; // Return 0 instead of cached price
-        }
-      }
+    } catch (error) {
+      console.error(`[${requestId}] Error fetching BTC price:`, error);
     }
-
-    console.log(`[${requestId}] Constructed URL for fetch: ${finalUrl}`);
-    const response = await fetch(finalUrl);
-    console.log(
-      `[${requestId}] Response status: ${response.status} ${response.statusText}`,
-    );
-
-    if (!response.ok) {
-      console.warn(
-        `[${requestId}] BTC price endpoint returned ${response.status}: ${response.statusText}`,
+    return 0;
+  } else {
+    // Server-side with baseUrl: use service directly (requires dynamic import to avoid circular dependency)
+    try {
+      const { BTCPriceService } = await import(
+        "$server/services/price/btcPriceService.ts"
       );
-      return 0; // Return 0 instead of cached price
+      const btcPriceData = await BTCPriceService.getPrice();
+      const price = formatUSDValue(btcPriceData.price);
+      console.log(
+        `[${requestId}] BTC price from BTCPriceService: $${price} from ${btcPriceData.source}`,
+      );
+      return price;
+    } catch (error) {
+      console.error(
+        `[${requestId}] Error fetching BTC price from BTCPriceService:`,
+        error,
+      );
+      return 0;
     }
-
-    const text = await response.text();
-    console.log(`[${requestId}] Raw response:`, text);
-
-    const data = JSON.parse(text);
-    console.log(`[${requestId}] Parsed data:`, data);
-
-    const price = formatUSDValue(data.data?.price || 0);
-    console.log(`[${requestId}] Formatted price: ${price}`);
-
-    return price;
-  } catch (error) {
-    console.error(`[${requestId}] Error fetching BTC price:`, error);
-    return 0; // Return 0 instead of cached price
   }
 }
 
@@ -153,7 +138,39 @@ export async function getBTCBalanceInfo(
     };
 
     if (options.includeUSD) {
-      const btcPrice = await fetchBTCPriceInUSD(options.apiBaseUrl);
+      // NEW: Use centralized service approach
+      let btcPrice = 0;
+
+      if (typeof window !== "undefined") {
+        // Client-side: use the centralized endpoint
+        try {
+          const response = await fetch("/api/internal/btcPrice");
+          if (response.ok) {
+            const data = await response.json();
+            btcPrice = formatUSDValue(data.data?.price || 0);
+          }
+        } catch (error) {
+          console.warn(
+            "Failed to fetch BTC price for balance calculation:",
+            error,
+          );
+        }
+      } else {
+        // Server-side: use the service directly
+        try {
+          const { BTCPriceService } = await import(
+            "$server/services/price/btcPriceService.ts"
+          );
+          const btcPriceData = await BTCPriceService.getPrice();
+          btcPrice = formatUSDValue(btcPriceData.price);
+        } catch (error) {
+          console.warn(
+            "Failed to fetch BTC price from BTCPriceService for balance calculation:",
+            error,
+          );
+        }
+      }
+
       info.btcPrice = btcPrice;
       info.usdValue = formatUSDValue(confirmedBTC * btcPrice);
     }
