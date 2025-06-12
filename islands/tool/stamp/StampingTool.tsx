@@ -24,6 +24,7 @@ import {
   tooltipImage,
 } from "$notification";
 import { openModal } from "$islands/modal/states.ts";
+import { showToast } from "$lib/utils/toastSignal.ts";
 
 /* ===== LOGGING UTILITY ===== */
 const log = (message: string, data?: unknown) => {
@@ -893,18 +894,23 @@ function StampingToolMain({ config }: { config: Config }) {
 
             // Improved error messages for common wallet errors
             if (result.error.includes("insufficient funds")) {
-              setApiError(
+              showToast(
                 "Insufficient funds in wallet to cover transaction fees",
+                "error",
+                false,
               );
             } else if (
               result.error.includes("timeout") ||
               result.error.includes("timed out")
             ) {
-              setApiError("Wallet connection timed out. Please try again");
+              showToast(
+                "Wallet connection timed out. Please try again",
+                "error",
+                false,
+              );
             } else {
-              setApiError(result.error);
+              showToast(result.error, "error", false);
             }
-            setSubmissionMessage(null);
             return;
           }
 
@@ -912,8 +918,7 @@ function StampingToolMain({ config }: { config: Config }) {
             logger.debug("stamps", {
               message: "Transaction was cancelled by user",
             });
-            setApiError("Transaction was cancelled");
-            setSubmissionMessage(null);
+            showToast("Transaction signing was cancelled", "info", true);
             return;
           }
 
@@ -922,10 +927,11 @@ function StampingToolMain({ config }: { config: Config }) {
             message: "Unknown PSBT signing failure",
             data: { result },
           });
-          setApiError(
+          showToast(
             "Failed to sign transaction. Please check wallet connection and try again",
+            "error",
+            false,
           );
-          setSubmissionMessage(null);
           return;
         }
 
@@ -935,19 +941,21 @@ function StampingToolMain({ config }: { config: Config }) {
             message: "Transaction signed and broadcast successfully",
             data: { txid: result.txid },
           });
-          setSubmissionMessage({
-            message: "Transaction broadcasted successfully.",
-            txid: result.txid,
-          });
+          showToast(
+            `Transaction broadcasted! TXID: ${result.txid.substring(0, 10)}...`,
+            "success",
+            false,
+          );
           setApiError(""); // Clear any previous errors
         } else {
           logger.debug("stamps", {
             message: "Transaction signed successfully, but txid not returned",
           });
-          setSubmissionMessage({
-            message:
-              "Transaction signed and broadcasted successfully. Please check your wallet or a block explorer for confirmation.",
-          });
+          showToast(
+            "Transaction signed and broadcasted successfully. Please check your wallet or a block explorer for confirmation.",
+            "success",
+            false,
+          );
           setApiError("");
         }
       } catch (error) {
