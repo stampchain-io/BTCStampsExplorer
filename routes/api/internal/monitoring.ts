@@ -8,7 +8,7 @@ import {
 } from "$lib/utils/monitoring.ts";
 
 export const handler: Handlers = {
-  async GET(req) {
+  GET(req) {
     const url = new URL(req.url);
     const action = url.searchParams.get("action") || "summary";
 

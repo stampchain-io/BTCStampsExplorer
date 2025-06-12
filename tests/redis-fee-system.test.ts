@@ -253,7 +253,7 @@ Deno.test("Redis Fee System Tests", async (t) => {
       // If successful, monitoring should have recorded success
       assertExists(feeData);
       console.log("Monitoring integration test: success case handled");
-    } catch (error) {
+    } catch (_error) {
       // If failed, monitoring should have recorded failure
       console.log("Monitoring integration test: error case handled");
     }
@@ -312,7 +312,7 @@ Deno.test("Redis Fee System Tests", async (t) => {
     status = BackgroundFeeService.getStatus();
     assertEquals(status.isRunning, true);
     assertExists(status.intervalId);
-    assertExists(status.cacheInfo);
+    assertExists(status.feeCacheInfo);
 
     // Test force warm
     await BackgroundFeeService.forceWarm(baseUrl);
@@ -346,10 +346,10 @@ Deno.test("Redis Infrastructure Tests", async (t) => {
 
       assertEquals(result.test, testData.test);
       console.log("Redis cache basic functionality test passed");
-    } catch (error) {
+    } catch (_error) {
       console.log(
         "Redis cache test failed (expected if Redis not available):",
-        error instanceof Error ? error.message : String(error),
+        _error instanceof Error ? _error.message : String(_error),
       );
     }
   });
@@ -379,10 +379,10 @@ Deno.test("Redis Infrastructure Tests", async (t) => {
 
       assertEquals(result.test, freshData.test);
       console.log("Cache expiry test passed");
-    } catch (error) {
+    } catch (_error) {
       console.log(
         "Cache expiry test failed (expected if Redis not available):",
-        error instanceof Error ? error.message : String(error),
+        _error instanceof Error ? _error.message : String(_error),
       );
     }
   });

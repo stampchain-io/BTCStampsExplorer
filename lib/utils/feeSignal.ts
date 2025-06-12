@@ -354,7 +354,7 @@ export const getLastGoodDataAge = (): number | null => {
 };
 
 // Force refresh with fallback handling
-export const forceRefreshFees = async (): Promise<void> => {
+export const forceRefreshFees = (): Promise<void> => {
   // Reset retry count and try fresh fetch
   feeSignal.value = {
     ...feeSignal.value,

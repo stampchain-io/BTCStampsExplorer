@@ -437,24 +437,25 @@ export class FeeService {
   /**
    * Invalidate fee cache (useful for testing or manual refresh)
    */
-  static async invalidateCache(): Promise<void> {
+  static invalidateCache(): Promise<void> {
     try {
       // Note: dbManager doesn't expose a direct cache invalidation method
       // but we can set a very short expiry to effectively invalidate
-      await dbManager.handleCache(
+      return dbManager.handleCache(
         this.CACHE_KEY,
         () => Promise.resolve(null),
         1, // 1 second expiry
-      );
-      
-      logger.info("stamps", {
-        message: "Fee cache invalidated",
+      ).then(() => {
+        logger.info("stamps", {
+          message: "Fee cache invalidated",
+        });
       });
-    } catch (error) {
+    } catch (_error) {
       logger.error("stamps", {
         message: "Failed to invalidate fee cache",
-        error: error instanceof Error ? error.message : String(error),
+        error: _error instanceof Error ? _error.message : String(_error),
       });
+      return Promise.resolve();
     }
   }
 

@@ -61,7 +61,10 @@ Deno.test("Fee System Performance and Migration Tests", async (t) => {
     console.log("Redis cache performance test passed");
   });
 
-  await t.step("localStorage fallback performance comparison", async () => {
+  await t.step("localStorage fallback performance comparison", () => {
+    // This test is mostly for documentation purposes - localStorage is now
+    // only used as a last-resort emergency fallback, so its performance
+    // is less critical
     // Simulate localStorage operations
     const iterations = 1000;
     const testData = {
@@ -249,7 +252,8 @@ Deno.test("Fee System Performance and Migration Tests", async (t) => {
     console.log("Background service performance test passed");
   });
 
-  await t.step("Security validation performance impact", async () => {
+  await t.step("Security validation performance impact", () => {
+    // Test the performance impact of security validation
     const iterations = 100;
     const testFeeData = {
       recommendedFee: 10,
@@ -423,7 +427,8 @@ Deno.test("Fee System Performance and Migration Tests", async (t) => {
     console.log("End-to-end system integration test passed");
   });
 
-  await t.step("Attack simulation and security response", async () => {
+  await t.step("Attack simulation and security response", () => {
+    // Test the security system's response to various attack scenarios
     console.log("Testing security response to simulated attacks...");
 
     // Clear events for clean test

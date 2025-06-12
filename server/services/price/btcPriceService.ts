@@ -210,12 +210,15 @@ export class BTCPriceService {
   /**
    * Invalidate price cache (useful for testing or manual refresh)
    */
-  static async invalidateCache(): Promise<void> {
+  static invalidateCache(): Promise<void> {
     try {
-      await dbManager.invalidateCache(this.CACHE_KEY);
-      console.log("[BTCPriceService] BTC price cache invalidated");
-    } catch (error) {
-      console.error("[BTCPriceService] Failed to invalidate BTC price cache:", error);
+      return dbManager.invalidateCache(this.CACHE_KEY)
+        .then(() => {
+          console.log("[BTCPriceService] BTC price cache invalidated");
+        });
+    } catch (_error) {
+      console.error("[BTCPriceService] Failed to invalidate BTC price cache:", _error);
+      return Promise.resolve();
     }
   }
 

@@ -34,7 +34,7 @@ export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
     try {
       const baseUrl = apiBaseUrl ||
         (typeof window !== "undefined"
-          ? window.location.origin
+          ? globalThis.location.origin
           : "http://localhost:8000");
       const response = await fetch(`${baseUrl}/api/internal/btcPrice`);
       if (response.ok) {
