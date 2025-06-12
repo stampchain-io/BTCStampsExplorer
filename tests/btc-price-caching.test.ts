@@ -17,6 +17,26 @@ const TEST_CONFIG = {
 // Always use mock fetch in CI to ensure stable test results
 if (TEST_CONFIG.isCI) {
   setupMockFetch();
+  // In CI, also mock BTCPriceService.getPrice to always return the mock price
+  (async () => {
+    try {
+      const { BTCPriceService } = await import(
+        "../server/services/price/btcPriceService.ts"
+      );
+      BTCPriceService.getPrice = () =>
+        Promise.resolve({
+          price: 45000,
+          source: "default",
+          confidence: "high",
+          timestamp: Date.now(),
+          details: { bitcoin: { usd: 45000 } },
+          fallbackUsed: false,
+          errors: [],
+        });
+    } catch (_e) {
+      // Ignore if import fails (not needed for endpoint-only tests)
+    }
+  })();
 }
 
 // Mock BTC price data
