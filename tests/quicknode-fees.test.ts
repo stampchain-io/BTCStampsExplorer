@@ -22,7 +22,7 @@ Deno.test("QuickNode Fee Estimation Service", async (t) => {
         },
       };
 
-      QuicknodeService.fetchQuicknode = async () => mockResponse;
+      QuicknodeService.fetchQuicknode = () => Promise.resolve(mockResponse);
 
       const result = await QuicknodeService.estimateSmartFee(6);
 
@@ -55,7 +55,7 @@ Deno.test("QuickNode Fee Estimation Service", async (t) => {
           },
         };
 
-        QuicknodeService.fetchQuicknode = async () => mockResponse;
+        QuicknodeService.fetchQuicknode = () => Promise.resolve(mockResponse);
 
         const result = await QuicknodeService.estimateSmartFee(
           testCase.confTarget,
@@ -71,21 +71,21 @@ Deno.test("QuickNode Fee Estimation Service", async (t) => {
 
   await t.step("should handle API errors gracefully", async () => {
     // Test network error
-    QuicknodeService.fetchQuicknode = async () => {
-      throw new Error("Network timeout");
+    QuicknodeService.fetchQuicknode = () => {
+      return Promise.reject(new Error("Network timeout"));
     };
 
     let result = await QuicknodeService.estimateSmartFee(6);
     assertEquals(result, null);
 
     // Test empty response
-    QuicknodeService.fetchQuicknode = async () => null;
+    QuicknodeService.fetchQuicknode = () => Promise.resolve(null);
 
     result = await QuicknodeService.estimateSmartFee(6);
     assertEquals(result, null);
 
     // Test response without result
-    QuicknodeService.fetchQuicknode = async () => ({});
+    QuicknodeService.fetchQuicknode = () => Promise.resolve({});
 
     result = await QuicknodeService.estimateSmartFee(6);
     assertEquals(result, null);
@@ -101,7 +101,8 @@ Deno.test("QuickNode Fee Estimation Service", async (t) => {
       },
     };
 
-    QuicknodeService.fetchQuicknode = async () => mockResponseWithErrors;
+    QuicknodeService.fetchQuicknode = () =>
+      Promise.resolve(mockResponseWithErrors);
 
     const result = await QuicknodeService.estimateSmartFee(6);
     assertEquals(result, null);
@@ -124,7 +125,7 @@ Deno.test("QuickNode Fee Estimation Service", async (t) => {
         },
       };
 
-      QuicknodeService.fetchQuicknode = async () => mockResponse;
+      QuicknodeService.fetchQuicknode = () => Promise.resolve(mockResponse);
 
       const result = await QuicknodeService.estimateSmartFee(6);
       assertEquals(
@@ -141,17 +142,17 @@ Deno.test("QuickNode Fee Estimation Service", async (t) => {
     for (const mode of modes) {
       let capturedParams: any[] = [];
 
-      QuicknodeService.fetchQuicknode = async (
+      QuicknodeService.fetchQuicknode = (
         _method: string,
         params: any[],
       ) => {
         capturedParams = params;
-        return {
+        return Promise.resolve({
           result: {
             feerate: 0.00015,
             blocks: 6,
           },
-        };
+        });
       };
 
       await QuicknodeService.estimateSmartFee(6, mode);
@@ -169,7 +170,7 @@ Deno.test("QuickNode Fee Estimation Service", async (t) => {
       { confTarget: 144, mode: "economical" },
     ];
 
-    QuicknodeService.fetchQuicknode = async (
+    QuicknodeService.fetchQuicknode = (
       _method: string,
       params: any[],
     ) => {
@@ -179,12 +180,12 @@ Deno.test("QuickNode Fee Estimation Service", async (t) => {
 
       callCount++;
 
-      return {
+      return Promise.resolve({
         result: {
           feerate: 0.00015,
           blocks: params[0],
         },
-      };
+      });
     };
 
     const result = await QuicknodeService.getMultipleFeeEstimates();
@@ -205,7 +206,7 @@ Deno.test("QuickNode Fee Estimation Service", async (t) => {
     async () => {
       let callCount = 0;
 
-      QuicknodeService.fetchQuicknode = async (
+      QuicknodeService.fetchQuicknode = (
         _method: string,
         params: any[],
       ) => {
@@ -213,15 +214,15 @@ Deno.test("QuickNode Fee Estimation Service", async (t) => {
 
         // Fail the first call (fast estimate)
         if (callCount === 1) {
-          throw new Error("Network error");
+          return Promise.reject(new Error("Network error"));
         }
 
-        return {
+        return Promise.resolve({
           result: {
             feerate: 0.00015,
             blocks: params[0],
           },
-        };
+        });
       };
 
       const result = await QuicknodeService.getMultipleFeeEstimates();
