@@ -14,6 +14,11 @@ const TEST_CONFIG = {
   },
 };
 
+// Always use mock fetch in CI to ensure stable test results
+if (TEST_CONFIG.isCI) {
+  setupMockFetch();
+}
+
 // Mock BTC price data
 const MOCK_BTC_PRICE_RESPONSE = {
   data: {
