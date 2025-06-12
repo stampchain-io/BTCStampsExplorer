@@ -28,7 +28,15 @@ interface FairmintFormState {
 
 export function useFairmintForm(fairminters: any[]) {
   const { config, isLoading: configLoading } = useConfig<Config>();
-  const { fees, loading: feeLoading, fetchFees } = useFees();
+  const {
+    fees,
+    loading: feeLoading,
+    fetchFees,
+    feeSource,
+    isUsingFallback,
+    lastGoodDataAge,
+    forceRefresh,
+  } = useFees();
   const [isLoading, setIsLoading] = useState(configLoading || feeLoading);
 
   const [formState, setFormState] = useState<FairmintFormState>({
@@ -58,10 +66,55 @@ export function useFairmintForm(fairminters: any[]) {
 
   useEffect(() => {
     if (fees && !feeLoading) {
+      logger.debug("ui", {
+        message: "useFairmintForm: Updating fee from fee signal",
+        data: fees,
+        feeSource,
+        isUsingFallback,
+        lastGoodDataAge,
+      });
+
       const recommendedFee = Math.round(fees.recommendedFee);
-      setFormState((prev) => ({ ...prev, fee: recommendedFee }));
+
+      // Apply component-level fallbacks if needed
+      let finalFee = recommendedFee;
+
+      // If fee is invalid or too low, use conservative fallback
+      if (recommendedFee <= 0) {
+        finalFee = 10; // Conservative 10 sats/vB fallback
+        logger.warn("ui", {
+          message: "useFairmintForm: Using conservative fee fallback",
+          originalFee: recommendedFee,
+          fallbackFee: finalFee,
+          feeSource: feeSource.source,
+        });
+      }
+
+      setFormState((prev) => ({ ...prev, fee: finalFee }));
+
+      // Log fallback usage for monitoring
+      if (isUsingFallback) {
+        logger.info("ui", {
+          message: "useFairmintForm: Using fallback fee data",
+          source: feeSource.source,
+          confidence: feeSource.confidence,
+          dataAge: lastGoodDataAge,
+          fee: finalFee,
+        });
+      }
+    } else if (!feeLoading && !fees) {
+      // Complete fallback when no fee data is available
+      logger.warn("ui", {
+        message:
+          "useFairmintForm: No fee data available, using conservative fallback",
+      });
+
+      setFormState((prev) => ({
+        ...prev,
+        fee: prev.fee > 0 ? prev.fee : 10, // Keep existing or use 10 sats/vB
+      }));
     }
-  }, [fees, feeLoading]);
+  }, [fees, feeLoading, feeSource, isUsingFallback, lastGoodDataAge]);
 
   const handleAssetChange = (e: Event) => {
     const selectedAsset = (e.target as HTMLSelectElement).value;
@@ -233,10 +286,15 @@ export function useFairmintForm(fairminters: any[]) {
     handleSubmit,
     handleChangeFee,
     fetchFees,
+    forceRefresh,
     isLoading,
     isSubmitting,
     submissionMessage,
     apiError,
     feeEstimationParams,
+    // Fee source information for UI feedback
+    feeSource,
+    isUsingFallback,
+    lastGoodDataAge,
   };
 }

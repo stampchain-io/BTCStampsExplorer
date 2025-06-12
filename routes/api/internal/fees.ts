@@ -1,66 +1,81 @@
 import { Handlers } from "$fresh/server.ts";
-import { getRecommendedFees } from "$lib/utils/mempool.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
+import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
+import { RateLimitMiddleware } from "$server/middleware/rateLimitMiddleware.ts";
+import { FeeService } from "$server/services/fee/feeService.ts";
 
 export const handler: Handlers = {
   async GET(req) {
-    let debugData: any = null; // To store data for debugging
-    try {
-      const url = new URL(req.url);
-      const [feesResponse, btcPrice] = await Promise.all([
-        getRecommendedFees(),
-        fetchBTCPriceInUSD(url.origin),
-      ]);
+    // CSRF Protection for fee endpoints
+    const csrfError = await InternalRouteGuard.requireCSRF(req);
+    if (csrfError) {
+      console.log("[fees.ts] CSRF validation failed");
+      return csrfError;
+    }
 
-      debugData = feesResponse; // Store for debugging output
-      // Server-side log still useful if it works
+    // Rate limiting for fee endpoints
+    const rateLimitError = await RateLimitMiddleware.checkFeeRateLimit(req);
+    if (rateLimitError) {
+      console.log("[fees.ts] Rate limit exceeded");
+      return rateLimitError;
+    }
+
+    const startTime = Date.now();
+
+    try {
+      console.log("[fees.ts] Starting Redis-cached fee estimation");
+
+      // Use the new FeeService with Redis caching
+      const baseUrl = new URL(req.url).origin;
+      const feeData = await FeeService.getFeeData(baseUrl);
+
+      const duration = Date.now() - startTime;
       console.log(
-        "[fees.ts] Full feesResponse from getRecommendedFees:",
-        JSON.stringify(feesResponse),
+        `[fees.ts] Fee estimation completed in ${duration}ms using ${feeData.source} source (Redis-cached)`,
       );
 
-      let recommendedFee = 6; // Default fallback
-      if (
-        feesResponse && typeof feesResponse.fastestFee === "number" &&
-        feesResponse.fastestFee >= 1
-      ) {
-        recommendedFee = feesResponse.fastestFee;
-      } else if (
-        feesResponse && typeof feesResponse.halfHourFee === "number" &&
-        feesResponse.halfHourFee >= 1
-      ) {
-        // As an alternative fallback, consider halfHourFee if fastest is too low or invalid
-        recommendedFee = feesResponse.halfHourFee;
-        console.log(
-          `[fees.ts] Using halfHourFee (${recommendedFee}) as fastestFee was not suitable.`,
-        );
-      } else {
-        console.log(
-          `[fees.ts] feesResponse.fastestFee was not suitable, using default fallback: ${recommendedFee}. Response: ${
-            JSON.stringify(feesResponse)
-          }`,
-        );
-      }
+      // Add rate limit headers to response
+      const rateLimitHeaders = RateLimitMiddleware.getRateLimitHeaders(
+        req,
+        60,
+        60 * 1000,
+      );
 
-      return Response.json({
-        recommendedFee,
-        btcPrice: btcPrice || 0,
-        debug_feesResponse: debugData ??
-          "Error: feesResponse was null or undefined before sending to client", // Add for client-side inspection
+      return Response.json(feeData, {
+        headers: rateLimitHeaders,
       });
     } catch (error) {
-      console.error("Fees API error:", error);
-      const errorMessage = error instanceof Error
-        ? error.message
-        : "Unknown error occurred";
+      const duration = Date.now() - startTime;
+      console.error(`[fees.ts] Critical error after ${duration}ms:`, error);
+
+      // Add rate limit headers to error response
+      const rateLimitHeaders = RateLimitMiddleware.getRateLimitHeaders(
+        req,
+        60,
+        60 * 1000,
+      );
+
+      // Emergency fallback - this should rarely happen as FeeService has its own fallbacks
       return Response.json({
-        recommendedFee: 1, // Ensure at least 1 on error
+        recommendedFee: 10, // Conservative fallback
         btcPrice: 0,
+        source: "default",
+        confidence: "low",
+        timestamp: Date.now(),
+        fallbackUsed: true,
+        errors: [
+          `Critical error: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`,
+        ],
+        emergencyFallback: true,
         debug_feesResponse: {
-          error: errorMessage,
-          note: "Error occurred during fees API processing",
-        }, // Add error info for client
-      }, { status: 500 });
+          static_fallback: true,
+          reason: "FeeService critical failure",
+        },
+      }, {
+        status: 500,
+        headers: rateLimitHeaders,
+      });
     }
   },
 };
