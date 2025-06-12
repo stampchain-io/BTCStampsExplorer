@@ -50,24 +50,46 @@ export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
     }
     return 0;
   } else {
-    // Server-side with baseUrl: use service directly (requires dynamic import to avoid circular dependency)
+    // Server-side with baseUrl: try the provided URL first, then fallback to service
     try {
-      const { BTCPriceService } = await import(
-        "$server/services/price/btcPriceService.ts"
-      );
-      const btcPriceData = await BTCPriceService.getPrice();
-      const price = formatUSDValue(btcPriceData.price);
-      console.log(
-        `[${requestId}] BTC price from BTCPriceService: $${price} from ${btcPriceData.source}`,
-      );
-      return price;
+      const response = await fetch(`${apiBaseUrl}/api/internal/btcPrice`);
+      if (response.ok) {
+        const data = await response.json();
+        const price = formatUSDValue(data.data?.price || 0);
+        console.log(
+          `[${requestId}] BTC price from centralized endpoint: $${price}`,
+        );
+        return price;
+      }
     } catch (error) {
       console.error(
-        `[${requestId}] Error fetching BTC price from BTCPriceService:`,
+        `[${requestId}] Error fetching BTC price from provided URL:`,
         error,
       );
-      return 0;
+      // If the provided URL fails, fallback to BTCPriceService only for valid-looking URLs
+      if (
+        apiBaseUrl.startsWith("http://localhost") ||
+        apiBaseUrl.startsWith("https://")
+      ) {
+        try {
+          const { BTCPriceService } = await import(
+            "$server/services/price/btcPriceService.ts"
+          );
+          const btcPriceData = await BTCPriceService.getPrice();
+          const price = formatUSDValue(btcPriceData.price);
+          console.log(
+            `[${requestId}] BTC price from BTCPriceService fallback: $${price} from ${btcPriceData.source}`,
+          );
+          return price;
+        } catch (serviceError) {
+          console.error(
+            `[${requestId}] Error fetching BTC price from BTCPriceService fallback:`,
+            serviceError,
+          );
+        }
+      }
     }
+    return 0;
   }
 }
 
