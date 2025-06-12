@@ -86,17 +86,17 @@ export function restoreLocalStorage(original: Storage): void {
 export function createMockFetch(
   responses: Record<string, unknown>,
 ): typeof fetch {
-  return async (input: string | Request | URL): Promise<Response> => {
+  return (input: string | Request | URL): Promise<Response> => {
     const url = typeof input === "string" ? input : input.toString();
 
     // Check if we have a mock response for this URL
     for (const [pattern, response] of Object.entries(responses)) {
       if (url.includes(pattern)) {
         const responseText = JSON.stringify(response);
-        return {
+        return Promise.resolve({
           ok: true,
-          json: async () => response,
-          text: async () => responseText,
+          json: () => Promise.resolve(response),
+          text: () => Promise.resolve(responseText),
           status: 200,
           statusText: "OK",
           headers: new Headers({ "content-type": "application/json" }),
@@ -107,20 +107,28 @@ export function createMockFetch(
           clone: () => {
             throw new Error("Mock response clone not implemented");
           },
-          arrayBuffer: async () => {
-            throw new Error("Mock response arrayBuffer not implemented");
+          arrayBuffer: () => {
+            return Promise.reject(
+              new Error("Mock response arrayBuffer not implemented"),
+            );
           },
-          blob: async () => {
-            throw new Error("Mock response blob not implemented");
+          blob: () => {
+            return Promise.reject(
+              new Error("Mock response blob not implemented"),
+            );
           },
-          formData: async () => {
-            throw new Error("Mock response formData not implemented");
+          formData: () => {
+            return Promise.reject(
+              new Error("Mock response formData not implemented"),
+            );
           },
-          bytes: async () => {
-            throw new Error("Mock response bytes not implemented");
+          bytes: () => {
+            return Promise.reject(
+              new Error("Mock response bytes not implemented"),
+            );
           },
           body: null,
-        } as unknown as Response;
+        } as unknown as Response);
       }
     }
 

@@ -186,7 +186,7 @@ export function cleanupExpiredStorage(keys: string[], maxAge: number): number {
           globalThis.localStorage.removeItem(key);
           cleanedCount++;
         }
-      } catch (parseError) {
+      } catch (_parseError) {
         // Invalid JSON, remove it
         globalThis.localStorage.removeItem(key);
         cleanedCount++;

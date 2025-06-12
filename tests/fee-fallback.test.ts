@@ -55,7 +55,7 @@ Deno.test("Fee Fallback System - QuickNode Fee Estimation", async (t) => {
 
     // Mock the fetchQuicknode method
     const originalFetch = QuicknodeService.fetchQuicknode;
-    QuicknodeService.fetchQuicknode = async () => mockResponse;
+    QuicknodeService.fetchQuicknode = () => Promise.resolve(mockResponse);
 
     try {
       const result = await QuicknodeService.estimateSmartFee(6);
@@ -86,7 +86,7 @@ Deno.test("Fee Fallback System - QuickNode Fee Estimation", async (t) => {
       };
 
       const originalFetch = QuicknodeService.fetchQuicknode;
-      QuicknodeService.fetchQuicknode = async () => mockResponse;
+      QuicknodeService.fetchQuicknode = () => Promise.resolve(mockResponse);
 
       try {
         const result = await QuicknodeService.estimateSmartFee(
@@ -105,8 +105,8 @@ Deno.test("Fee Fallback System - QuickNode Fee Estimation", async (t) => {
   await t.step("should handle QuickNode API errors gracefully", async () => {
     // Mock API error
     const originalFetch = QuicknodeService.fetchQuicknode;
-    QuicknodeService.fetchQuicknode = async () => {
-      throw new Error("Network error");
+    QuicknodeService.fetchQuicknode = () => {
+      return Promise.reject(new Error("Network error"));
     };
 
     try {
@@ -127,7 +127,7 @@ Deno.test("Fee Fallback System - QuickNode Fee Estimation", async (t) => {
     };
 
     const originalFetch = QuicknodeService.fetchQuicknode;
-    QuicknodeService.fetchQuicknode = async () => mockResponse;
+    QuicknodeService.fetchQuicknode = () => Promise.resolve(mockResponse);
 
     try {
       const result = await QuicknodeService.estimateSmartFee(6);
@@ -202,8 +202,8 @@ Deno.test("Fee Fallback System - Integration Tests", async (t) => {
 
       // Mock fetch to simulate network failure
       const originalFetch = globalThis.fetch;
-      globalThis.fetch = async () => {
-        throw new Error("Network error");
+      globalThis.fetch = () => {
+        return Promise.reject(new Error("Network error"));
       };
 
       try {
@@ -218,14 +218,16 @@ Deno.test("Fee Fallback System - Integration Tests", async (t) => {
   await t.step("should validate fee data structure", async () => {
     // Mock fetch to return invalid data structure
     const originalFetch = globalThis.fetch;
-    globalThis.fetch = async () => ({
-      ok: true,
-      json: async () => ({
-        // Missing fastestFee property
-        halfHourFee: 10,
-        hourFee: 8,
-      }),
-    } as Response);
+    globalThis.fetch = () =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            // Missing fastestFee property
+            halfHourFee: 10,
+            hourFee: 8,
+          }),
+      } as Response);
 
     try {
       const result = await getRecommendedFees();
@@ -244,21 +246,22 @@ Deno.test("Fee Fallback System - Integration Tests", async (t) => {
 
     // Mock fetch to fail first 2 times, succeed on 3rd
     const originalFetch = globalThis.fetch;
-    globalThis.fetch = async () => {
+    globalThis.fetch = () => {
       attemptCount++;
       if (attemptCount < 3) {
-        throw new Error(`Attempt ${attemptCount} failed`);
+        return Promise.reject(new Error(`Attempt ${attemptCount} failed`));
       }
-      return {
+      return Promise.resolve({
         ok: true,
-        json: async () => ({
-          fastestFee: 15,
-          halfHourFee: 12,
-          hourFee: 10,
-          economyFee: 8,
-          minimumFee: 1,
-        }),
-      } as Response;
+        json: () =>
+          Promise.resolve({
+            fastestFee: 15,
+            halfHourFee: 12,
+            hourFee: 10,
+            economyFee: 8,
+            minimumFee: 1,
+          }),
+      } as Response);
     };
 
     try {
@@ -280,16 +283,18 @@ Deno.test("Fee Fallback System - Performance Tests", async (t) => {
 
       // Mock successful response
       const originalFetch = globalThis.fetch;
-      globalThis.fetch = async () => ({
-        ok: true,
-        json: async () => ({
-          fastestFee: 15,
-          halfHourFee: 12,
-          hourFee: 10,
-          economyFee: 8,
-          minimumFee: 1,
-        }),
-      } as Response);
+      globalThis.fetch = () =>
+        Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              fastestFee: 15,
+              halfHourFee: 12,
+              hourFee: 10,
+              economyFee: 8,
+              minimumFee: 1,
+            }),
+        } as Response);
 
       try {
         const result = await getRecommendedFees();
@@ -317,20 +322,24 @@ Deno.test("Fee Fallback System - Performance Tests", async (t) => {
 
       // Mock successful response with slight delay
       const originalFetch = globalThis.fetch;
-      globalThis.fetch = async () => {
+      globalThis.fetch = () => {
         // Shorter delay in CI to avoid timeouts
         const delay = isCI ? 50 : 100;
-        await new Promise((resolve) => setTimeout(resolve, delay));
-        return {
-          ok: true,
-          json: async () => ({
-            fastestFee: 15,
-            halfHourFee: 12,
-            hourFee: 10,
-            economyFee: 8,
-            minimumFee: 1,
-          }),
-        } as Response;
+        return new Promise((resolve) =>
+          setTimeout(() => {
+            resolve({
+              ok: true,
+              json: () =>
+                Promise.resolve({
+                  fastestFee: 15,
+                  halfHourFee: 12,
+                  hourFee: 10,
+                  economyFee: 8,
+                  minimumFee: 1,
+                }),
+            } as Response);
+          }, delay)
+        );
       };
 
       try {

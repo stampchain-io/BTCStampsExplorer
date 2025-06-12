@@ -44,46 +44,44 @@ async function isServerRunning(baseUrl: string): Promise<boolean> {
 
 // Helper function to setup mock fetch for tests
 function setupMockFetch() {
-  globalThis.fetch = async (
-    input: string | Request | URL,
+  globalThis.fetch = (
+    _url: string | URL | Request,
   ): Promise<Response> => {
-    const url = typeof input === "string" ? input : input.toString();
-
-    // Handle localhost:8000 requests (successful)
-    if (url.includes("localhost:8000")) {
-      const responseText = JSON.stringify(MOCK_BTC_PRICE_RESPONSE);
-      return {
-        ok: true,
-        json: async () => MOCK_BTC_PRICE_RESPONSE,
-        text: async () => responseText,
-        status: 200,
-        statusText: "OK",
-        headers: new Headers({ "content-type": "application/json" }),
-        url: url,
-        redirected: false,
-        type: "basic",
-        bodyUsed: false,
-        clone: () => {
-          throw new Error("Mock response clone not implemented");
-        },
-        arrayBuffer: async () => {
-          throw new Error("Mock response arrayBuffer not implemented");
-        },
-        blob: async () => {
-          throw new Error("Mock response blob not implemented");
-        },
-        formData: async () => {
-          throw new Error("Mock response formData not implemented");
-        },
-        bytes: async () => {
-          throw new Error("Mock response bytes not implemented");
-        },
-        body: null,
-      } as unknown as Response;
-    }
-
-    // Handle invalid URLs (should throw network error)
-    throw new Error(`Network error: Connection refused for ${url}`);
+    const responseText = JSON.stringify(MOCK_BTC_PRICE_RESPONSE);
+    return Promise.resolve({
+      ok: true,
+      status: 200,
+      statusText: "OK",
+      json: () => Promise.resolve(MOCK_BTC_PRICE_RESPONSE),
+      text: () => Promise.resolve(responseText),
+      headers: new Headers({
+        "content-type": "application/json",
+      }),
+      url: typeof _url === "string" ? _url : _url.toString(),
+      redirected: false,
+      type: "basic",
+      bodyUsed: false,
+      body: null,
+      clone: () => {
+        throw new Error("Mock response clone not implemented");
+      },
+      arrayBuffer: () => {
+        return Promise.reject(
+          new Error("Mock response arrayBuffer not implemented"),
+        );
+      },
+      blob: () => {
+        return Promise.reject(new Error("Mock response blob not implemented"));
+      },
+      formData: () => {
+        return Promise.reject(
+          new Error("Mock response formData not implemented"),
+        );
+      },
+      bytes: () => {
+        return Promise.reject(new Error("Mock response bytes not implemented"));
+      },
+    } as Response);
   };
 }
 
