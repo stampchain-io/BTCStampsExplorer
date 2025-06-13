@@ -150,7 +150,7 @@ function RecieveAddyModal({ address, title = "RECEIVE" }: Props) {
             onMouseLeave={handleCopyMouseLeave}
           >
             <Icon
-              type="iconLink"
+              type="iconButton"
               name="copy"
               weight="light"
               size="sm"

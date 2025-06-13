@@ -3,6 +3,7 @@ import { JSX } from "preact";
 
 /* ===== TYPE DEFINITIONS ===== */
 export interface IconVariants {
+  type: "icon" | "iconButton";
   name: string;
   weight: "light" | "normal" | "bold";
   size:
@@ -20,13 +21,6 @@ export interface IconVariants {
     | "mdR"
     | "custom";
   color: "grey" | "purple" | "custom";
-  type:
-    | "icon"
-    | "iconLink"
-    | "iconButton"
-    | "strokeIcon"
-    | "strokeIconLink"
-    | "strokeIconButton";
   className?: string;
   role?: JSX.AriaRole;
   ariaLabel?: string;
@@ -50,25 +44,40 @@ export interface BadgeVariants {
   className?: string;
 }
 
-/* ===== STROKE WIDTH DEFINITIONS ===== */
-export const strokeWidthMap = {
-  light: 3.3,
-  normal: 3,
-  bold: 5.5,
-} as const;
-
 /* ===== GLOBAL SVG ATTRIBUTES ===== */
 export const globalSvgAttributes = {
   xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 32 32",
   strokeLinecap: "round" as const,
   strokeLinejoin: "round" as const,
-  viewBox: "0 0 32 32",
 } as const;
 
 /* ===== ICON STYLE DEFINITIONS ===== */
 export const iconStyles = {
   /* ===== BASE STYLES ===== */
   base: "inline-block transition-colors duration-300",
+
+  /* ===== ICON VARIANTS & COLOR STYLES ===== */
+  icon: {
+    grey: "stroke-stamp-grey-darker fill-none",
+    purple: "stroke-stamp-purple fill-none",
+    custom: "",
+  },
+
+  iconButton: {
+    grey:
+      "stroke-stamp-grey hover:stroke-stamp-grey-light cursor-pointer fill-none",
+    purple:
+      "stroke-stamp-purple hover:stroke-stamp-purple-bright cursor-pointer fill-none",
+    custom: "",
+  },
+
+  /* ===== WEIGHT VARIANTS ===== */
+  weight: {
+    light: "[stroke-width:1.75]",
+    normal: "[stroke-width:2.25]",
+    bold: "[stroke-width:3.5]",
+  },
 
   /* ===== SIZE VARIANTS ===== */
   size: {
@@ -149,23 +158,6 @@ export const iconStyles = {
       rounded-md p-1.5 cursor-pointer
     `,
     custom: "",
-  },
-
-  /* ===== STROKE-BASED ICON BUTTON STYLES ===== */
-  strokeIconButton: {
-    grey: `
-      stroke-stamp-grey hover:stroke-stamp-grey-light fill-none
-      bg-[#333333]/40 hover:bg-[#333333]/20 
-      tablet:bg-transparent tablet:hover:bg-transparent 
-      rounded-md p-1.5 cursor-pointer
-    `,
-    purple: `
-      stroke-stamp-purple hover:stroke-stamp-purple-bright fill-none
-      bg-[#333333]/40 hover:bg-[#333333]/20 
-      tablet:bg-transparent tablet:hover:bg-transparent 
-      rounded-md p-1.5 cursor-pointer
-    `,
-    custom: "fill-none",
   },
 } as const;
 

@@ -270,13 +270,12 @@ function RightPanel(
           onMouseLeave={handleCopyMouseLeave}
         >
           <Icon
-            type="strokeIcon"
-            name="copy2"
+            type="iconButton"
+            name="copy"
             weight="normal"
             size="mdR"
             color="grey"
             onClick={copyLink}
-            role="button"
           />
           <div
             class={`${tooltipIcon} ${
@@ -298,14 +297,13 @@ function RightPanel(
           onMouseLeave={handleXMouseLeave}
         >
           <Icon
-            type="strokeIcon"
-            name="twitter2"
+            type="iconButton"
+            name="twitter"
             weight="normal"
             size="mdR"
             color="grey"
             onClick={shareToX}
-            role="button"
-            aria-label="Share on X"
+            ariaLabel="Share on X"
           />
           <div
             class={`${tooltipIcon} ${
@@ -322,14 +320,13 @@ function RightPanel(
           onMouseLeave={handleShareMouseLeave}
         >
           <Icon
-            type="strokeIcon"
-            name="share2"
+            type="iconButton"
+            name="share"
             weight="normal"
             size="custom"
             color="grey"
-            className="w-6 h-6 tablet:w-[22px] tablet:h-[22px]"
+            className="w-[24px] h-[24px] tablet:w-6 tablet:h-6 mt-[1px]"
             onClick={shareContent}
-            role="button"
             ariaLabel="Share content"
           />
           <div
@@ -350,17 +347,15 @@ function RightPanel(
             onMouseLeave={handleCodeMouseLeave}
           >
             <Icon
-              type="iconLink"
+              type="iconButton"
               name="previewCode"
               weight="normal"
-              size="custom"
+              size="mdR"
               color="grey"
-              className="w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px]"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
               }}
-              role="button"
               ariaLabel="View html code"
             />
             <div
@@ -378,8 +373,8 @@ function RightPanel(
           onMouseLeave={handleToolsMouseLeave}
         >
           <Icon
-            type="strokeIcon"
-            name="imageExternal"
+            type="iconButton"
+            name="previewImageRaw"
             weight="normal"
             size="mdR"
             color="grey"
@@ -392,15 +387,14 @@ function RightPanel(
                 },width=600,height=600,
                 toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no`,
               )}
-            role="button"
-            ariaLabel="View raw original image in external window"
+            ariaLabel="View raw stamp image in external window"
           />
           <div
             class={`${tooltipIcon} ${
               isToolsTooltipVisible ? "opacity-100" : "opacity-0"
             }`}
           >
-            VIEW ORIGINAL
+            VIEW EXTERNALLY
           </div>
         </div>
         <div
@@ -410,8 +404,8 @@ function RightPanel(
           onMouseLeave={handleFullscreenMouseLeave}
         >
           <Icon
-            type="strokeIcon"
-            name="image2"
+            type="iconButton"
+            name="previewImage"
             weight="normal"
             size="mdR"
             color="grey"
@@ -419,7 +413,6 @@ function RightPanel(
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();
             }}
-            role="button"
             ariaLabel="View image in fullscreen"
           />
           <div
@@ -824,11 +817,11 @@ export function StampImage(
                   <div className="absolute inset-0 bg-black opacity-50 rounded-full" />
                   <Icon
                     name={isPlaying ? "pause" : "play"}
-                    type="iconLink"
+                    type="iconButton"
                     weight="bold"
                     size="xxl"
-                    color="grey"
-                    className="p-[25%] relative z-10"
+                    color="custom"
+                    className="p-[25%] relative z-10 fill-stamp-grey stroke-stamp-grey group-hover/button:fill-stamp-purple-bright group-hover/button:stroke-stamp-purple-bright"
                   />
                 </button>
               </div>

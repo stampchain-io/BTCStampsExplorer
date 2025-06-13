@@ -33,21 +33,21 @@ export function GearIcon({
   const colorClasses = color === "greyLogicDL"
     ? `${
       isOpen
-        ? "fill-stamp-grey-light hover:fill-stamp-grey-darker" // Gear icon color when open
-        : "fill-stamp-grey-darker hover:fill-stamp-grey-light" // Gear icon color when closed
+        ? "stroke-stamp-grey-light hover:stroke-stamp-grey-darker" // Gear icon color when open
+        : "stroke-stamp-grey-darker hover:stroke-stamp-grey-light" // Gear icon color when closed
     }`
     : color === "greyLogicLD"
     ? `${
       isOpen
-        ? "fill-stamp-grey-darker hover:fill-stamp-grey-light" // Gear icon color when open
-        : "fill-stamp-grey-light hover:fill-stamp-grey-darker" // Gear icon color when closed
+        ? "stroke-stamp-grey-darker hover:stroke-stamp-grey-light" // Gear icon color when open
+        : "stroke-stamp-grey-light hover:stroke-stamp-grey-darker" // Gear icon color when closed
     }`
     : "";
 
   /* ===== RENDER ICON ===== */
   return (
     <Icon
-      type="iconLink"
+      type="iconButton"
       name="tools"
       weight={weight}
       size={size}

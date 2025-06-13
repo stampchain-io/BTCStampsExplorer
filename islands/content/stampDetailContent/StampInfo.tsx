@@ -794,7 +794,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 >
                   {dispensers?.length >= 2 && (
                     <Icon
-                      type="iconLink"
+                      type="iconButton"
                       name="dispenserListings"
                       weight="normal"
                       size="mdR"
@@ -802,7 +802,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       ariaLabel="Listings"
                       onClick={() => setShowListings(!showListings)}
                       className="pb-0.5"
-                      role="button"
                     />
                   )}
 
@@ -928,8 +927,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     name="divisible"
                     weight="normal"
                     size="custom"
-                    color="custom"
-                    className="w-[23px] h-[23px] fill-stamp-grey-darker"
+                    color="grey"
+                    className="w-[23px] h-[23px]"
                     ariaLabel="Divisible"
                   />
                   <div
@@ -952,8 +951,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                     name="keyburned"
                     weight="normal"
                     size="xs"
-                    color="custom"
-                    className="fill-stamp-grey-darker mb-0.5"
+                    color="grey"
+                    className="mb-0.5"
                     ariaLabel="Keyburned"
                   />
                   <div
@@ -977,8 +976,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       name="locked"
                       weight="normal"
                       size="xs"
-                      color="custom"
-                      className="fill-stamp-grey-darker"
+                      color="grey"
                       ariaLabel="Locked"
                     />
                     <div
@@ -1001,8 +999,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       name="unlocked"
                       weight="normal"
                       size="xs"
-                      color="custom"
-                      className="fill-stamp-grey-darker"
+                      color="grey"
                       ariaLabel="Unlocked"
                     />
                     <div
