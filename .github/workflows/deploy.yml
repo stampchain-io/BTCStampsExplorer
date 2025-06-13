@@ -247,21 +247,78 @@ jobs:
 
           exit 0
 
-      - name: Actionlint
+      - name: Actionlint with PR Comments
         id: actionlint
         run: |
-          echo "Running actionlint directly..."
+          echo "Running actionlint with PR comment generation..."
           # Install actionlint
           curl -sSfL https://raw.githubusercontent.com/rhymond/actionlint/main/scripts/download-actionlint.bash | bash
           
-          # Run actionlint on workflow files
-          if ./actionlint .github/workflows/*.yml; then
+          # Run actionlint and capture output
+          actionlint_output=$(./actionlint .github/workflows/*.yml 2>&1 || true)
+          
+          if [ -z "$actionlint_output" ]; then
             echo "✅ All workflow files passed actionlint checks"
+            # Create success comment for PR
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              echo "## ✅ Actionlint Results" >> actionlint_comment.md
+              echo "All GitHub Actions workflow files passed validation!" >> actionlint_comment.md
+            fi
           else
-            echo "⚠️ Some workflow files have actionlint issues (non-blocking)"
-            exit 0  # Don't fail the workflow for actionlint issues
+            echo "⚠️ Actionlint found issues:"
+            echo "$actionlint_output"
+            # Create detailed comment for PR
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              echo "## ⚠️ Actionlint Results" >> actionlint_comment.md
+              echo "" >> actionlint_comment.md
+              echo "Found issues in GitHub Actions workflow files:" >> actionlint_comment.md
+              echo "" >> actionlint_comment.md
+              echo '```' >> actionlint_comment.md
+              echo "$actionlint_output" >> actionlint_comment.md
+              echo '```' >> actionlint_comment.md
+            fi
           fi
         continue-on-error: true
+
+      - name: Comment PR with Actionlint Results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (fs.existsSync('actionlint_comment.md')) {
+              const comment = fs.readFileSync('actionlint_comment.md', 'utf8');
+              
+              // Find existing actionlint comment
+              const comments = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+              });
+              
+              const existingComment = comments.data.find(comment => 
+                comment.body.includes('## ✅ Actionlint Results') || 
+                comment.body.includes('## ⚠️ Actionlint Results')
+              );
+              
+              if (existingComment) {
+                // Update existing comment
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existingComment.id,
+                  body: comment
+                });
+              } else {
+                // Create new comment
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: comment
+                });
+              }
+            }
 
       # Fail the workflow if any checks failed
       - name: Check for failures
