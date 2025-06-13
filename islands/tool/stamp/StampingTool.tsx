@@ -942,7 +942,7 @@ function StampingToolMain({ config }: { config: Config }) {
             data: { txid: result.txid },
           });
           showToast(
-            `Transaction broadcasted! TXID: ${result.txid.substring(0, 10)}...`,
+            `Broadcasted: ${result.txid.substring(0, 10)}...`,
             "success",
             false,
           );

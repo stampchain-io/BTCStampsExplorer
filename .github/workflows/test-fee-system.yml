@@ -101,7 +101,7 @@ jobs:
               break
             else
               echo "⚠️ Dependency caching failed, attempt $i"
-              if [ $i -eq 3 ]; then
+              if [ "$i" -eq 3 ]; then
                 echo "⚠️ Proceeding without full dependency cache (tests may be slower)"
               else
                 sleep 10
@@ -171,7 +171,7 @@ jobs:
               break
             else
               echo "⚠️ Dependency caching failed, attempt $i"
-              if [ $i -eq 3 ]; then
+              if [ "$i" -eq 3 ]; then
                 echo "⚠️ Proceeding without full dependency cache (tests may be slower)"
               else
                 sleep 10

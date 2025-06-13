@@ -1,0 +1,25 @@
+{
+  "id": "btc-stamps-explorer-env",
+  "name": "BTC Stamps Explorer Environment",
+  "values": [
+    {
+      "key": "dev_base_url",
+      "value": "http://host.docker.internal:8000",
+      "description": "Development server URL",
+      "enabled": true
+    },
+    {
+      "key": "prod_base_url", 
+      "value": "https://stampchain.io",
+      "description": "Production server URL",
+      "enabled": true
+    },
+    {
+      "key": "base_url",
+      "value": "{{dev_base_url}}",
+      "description": "Current base URL (defaults to dev)",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+} 

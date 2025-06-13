@@ -1,0 +1,457 @@
+{
+  "info": {
+    "name": "BTC Stamps Explorer API - Simple Dual Endpoint Testing",
+    "description": "Simplified dual endpoint testing with reliable comparison logic",
+    "version": "2.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Initialize test session if not exists",
+          "if (!pm.environment.get('test_session_id')) {",
+          "    const sessionId = 'test_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);",
+          "    pm.environment.set('test_session_id', sessionId);",
+          "    console.log('🚀 Starting new test session:', sessionId);",
+          "}",
+          "",
+          "// Set request start time",
+          "pm.globals.set('request_start_time', Date.now());"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check Comparison",
+      "item": [
+        {
+          "name": "Health Check - Development",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/health",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const healthDevResponseTime = Date.now() - pm.globals.get('request_start_time');",
+                  "",
+                  "console.log('📥 Dev Health Response:', {",
+                  "    status: pm.response.code,",
+                  "    responseTime: healthDevResponseTime + 'ms',",
+                  "    size: pm.response.responseSize + ' bytes'",
+                  "});",
+                  "",
+                  "// Store dev response",
+                  "pm.environment.set('health_dev_status', pm.response.code);",
+                  "pm.environment.set('health_dev_time', healthDevResponseTime);",
+                  "pm.environment.set('health_dev_body', pm.response.text());",
+                  "",
+                  "pm.test('Dev health status is valid', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 500]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Dev health has valid JSON', function () {",
+                  "        pm.expect(() => pm.response.json()).to.not.throw();",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Health Check - Production",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/health",
+              "host": ["{{prod_base_url}}"],
+              "path": ["api", "v2", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const healthProdResponseTime = Date.now() - pm.globals.get('request_start_time');",
+                  "",
+                  "console.log('📥 Prod Health Response:', {",
+                  "    status: pm.response.code,",
+                  "    responseTime: healthProdResponseTime + 'ms',",
+                  "    size: pm.response.responseSize + ' bytes'",
+                  "});",
+                  "",
+                  "// Store prod response",
+                  "pm.environment.set('health_prod_status', pm.response.code);",
+                  "pm.environment.set('health_prod_time', healthProdResponseTime);",
+                  "pm.environment.set('health_prod_body', pm.response.text());",
+                  "",
+                  "pm.test('Prod health status is valid', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 500]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Prod health has valid JSON', function () {",
+                  "        pm.expect(() => pm.response.json()).to.not.throw();",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Health Check - Compare Results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/health",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Get stored responses",
+                  "const devStatus = parseInt(pm.environment.get('health_dev_status'));",
+                  "const prodStatus = parseInt(pm.environment.get('health_prod_status'));",
+                  "const devTime = parseInt(pm.environment.get('health_dev_time'));",
+                  "const prodTime = parseInt(pm.environment.get('health_prod_time'));",
+                  "const devBody = pm.environment.get('health_dev_body');",
+                  "const prodBody = pm.environment.get('health_prod_body');",
+                  "",
+                  "console.log('\\n' + '='.repeat(60));",
+                  "console.log('🔍 HEALTH ENDPOINT COMPARISON');",
+                  "console.log('='.repeat(60));",
+                  "",
+                  "// Status comparison",
+                  "console.log('Status Codes:');",
+                  "console.log('  Dev:', devStatus, '| Prod:', prodStatus);",
+                  "if (devStatus === prodStatus) {",
+                  "    console.log('  ✅ Status codes match');",
+                  "} else {",
+                  "    console.log('  ⚠️ Status codes differ');",
+                  "}",
+                  "",
+                  "// Performance comparison",
+                  "console.log('\\nResponse Times:');",
+                  "console.log('  Dev:', devTime + 'ms | Prod:', prodTime + 'ms');",
+                  "const timeDiff = Math.abs(devTime - prodTime);",
+                  "const faster = devTime < prodTime ? 'Dev' : 'Prod';",
+                  "console.log('  Difference:', timeDiff + 'ms (' + faster + ' faster)');",
+                  "",
+                  "// Body comparison (if both are 200)",
+                  "if (devStatus === 200 && prodStatus === 200) {",
+                  "    try {",
+                  "        const devJson = JSON.parse(devBody);",
+                  "        const prodJson = JSON.parse(prodBody);",
+                  "        ",
+                  "        console.log('\\nResponse Body Comparison:');",
+                  "        const bodyMatch = JSON.stringify(devJson) === JSON.stringify(prodJson);",
+                  "        if (bodyMatch) {",
+                  "            console.log('  ✅ Response bodies are identical');",
+                  "        } else {",
+                  "            console.log('  ⚠️ Response bodies differ');",
+                  "            console.log('  Dev keys:', Object.keys(devJson));",
+                  "            console.log('  Prod keys:', Object.keys(prodJson));",
+                  "        }",
+                  "    } catch (e) {",
+                  "        console.log('\\nResponse Body Comparison:');",
+                  "        console.log('  ⚠️ Could not parse JSON for comparison');",
+                  "    }",
+                  "}",
+                  "",
+                  "console.log('='.repeat(60));",
+                  "",
+                  "// Test assertions",
+                  "pm.test('Status codes match', function () {",
+                  "    pm.expect(devStatus).to.equal(prodStatus);",
+                  "});",
+                  "",
+                  "pm.test('Performance difference is reasonable', function () {",
+                  "    const maxTime = Math.max(devTime, prodTime);",
+                  "    const threshold = maxTime * 0.5; // 50% threshold",
+                  "    pm.expect(timeDiff).to.be.below(threshold);",
+                  "});",
+                  "",
+                  "if (devStatus === 200 && prodStatus === 200) {",
+                  "    pm.test('Response bodies match', function () {",
+                  "        try {",
+                  "            const devJson = JSON.parse(devBody);",
+                  "            const prodJson = JSON.parse(prodBody);",
+                  "            pm.expect(JSON.stringify(devJson)).to.equal(JSON.stringify(prodJson));",
+                  "        } catch (e) {",
+                  "            pm.expect(devBody).to.equal(prodBody);",
+                  "        }",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Version Comparison",
+      "item": [
+        {
+          "name": "Version - Development",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/version",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "version"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const versionDevResponseTime = Date.now() - pm.globals.get('request_start_time');",
+                  "",
+                  "console.log('📥 Dev Version Response:', {",
+                  "    status: pm.response.code,",
+                  "    responseTime: versionDevResponseTime + 'ms'",
+                  "});",
+                  "",
+                  "pm.environment.set('version_dev_status', pm.response.code);",
+                  "pm.environment.set('version_dev_time', versionDevResponseTime);",
+                  "pm.environment.set('version_dev_body', pm.response.text());",
+                  "",
+                  "pm.test('Dev version status is valid', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 500]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Version - Production",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/version",
+              "host": ["{{prod_base_url}}"],
+              "path": ["api", "v2", "version"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const versionProdResponseTime = Date.now() - pm.globals.get('request_start_time');",
+                  "",
+                  "console.log('📥 Prod Version Response:', {",
+                  "    status: pm.response.code,",
+                  "    responseTime: versionProdResponseTime + 'ms'",
+                  "});",
+                  "",
+                  "pm.environment.set('version_prod_status', pm.response.code);",
+                  "pm.environment.set('version_prod_time', versionProdResponseTime);",
+                  "pm.environment.set('version_prod_body', pm.response.text());",
+                  "",
+                  "pm.test('Prod version status is valid', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 500]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Version - Compare Results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/version",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "version"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const devStatus = parseInt(pm.environment.get('version_dev_status'));",
+                  "const prodStatus = parseInt(pm.environment.get('version_prod_status'));",
+                  "const devTime = parseInt(pm.environment.get('version_dev_time'));",
+                  "const prodTime = parseInt(pm.environment.get('version_prod_time'));",
+                  "const devBody = pm.environment.get('version_dev_body');",
+                  "const prodBody = pm.environment.get('version_prod_body');",
+                  "",
+                  "console.log('\\n' + '='.repeat(60));",
+                  "console.log('🔍 VERSION ENDPOINT COMPARISON');",
+                  "console.log('='.repeat(60));",
+                  "",
+                  "console.log('Status Codes:');",
+                  "console.log('  Dev:', devStatus, '| Prod:', prodStatus);",
+                  "if (devStatus === prodStatus) {",
+                  "    console.log('  ✅ Status codes match');",
+                  "} else {",
+                  "    console.log('  ⚠️ Status codes differ');",
+                  "}",
+                  "",
+                  "console.log('\\nResponse Times:');",
+                  "console.log('  Dev:', devTime + 'ms | Prod:', prodTime + 'ms');",
+                  "const timeDiff = Math.abs(devTime - prodTime);",
+                  "const faster = devTime < prodTime ? 'Dev' : 'Prod';",
+                  "console.log('  Difference:', timeDiff + 'ms (' + faster + ' faster)');",
+                  "",
+                  "if (devStatus === 200 && prodStatus === 200) {",
+                  "    try {",
+                  "        const devJson = JSON.parse(devBody);",
+                  "        const prodJson = JSON.parse(prodBody);",
+                  "        ",
+                  "        console.log('\\nResponse Body Comparison:');",
+                  "        const bodyMatch = JSON.stringify(devJson) === JSON.stringify(prodJson);",
+                  "        if (bodyMatch) {",
+                  "            console.log('  ✅ Response bodies are identical');",
+                  "        } else {",
+                  "            console.log('  ⚠️ Response bodies differ');",
+                  "            console.log('  Dev version:', devJson.version || 'N/A');",
+                  "            console.log('  Prod version:', prodJson.version || 'N/A');",
+                  "        }",
+                  "    } catch (e) {",
+                  "        console.log('\\nResponse Body Comparison:');",
+                  "        console.log('  ⚠️ Could not parse JSON for comparison');",
+                  "    }",
+                  "}",
+                  "",
+                  "console.log('='.repeat(60));",
+                  "",
+                  "pm.test('Status codes match', function () {",
+                  "    pm.expect(devStatus).to.equal(prodStatus);",
+                  "});",
+                  "",
+                  "if (devStatus === 200 && prodStatus === 200) {",
+                  "    pm.test('Response bodies match', function () {",
+                  "        try {",
+                  "            const devJson = JSON.parse(devBody);",
+                  "            const prodJson = JSON.parse(prodBody);",
+                  "            pm.expect(JSON.stringify(devJson)).to.equal(JSON.stringify(prodJson));",
+                  "        } catch (e) {",
+                  "            pm.expect(devBody).to.equal(prodBody);",
+                  "        }",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Final Report",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dev_base_url}}/api/v2/health",
+          "host": ["{{dev_base_url}}"],
+          "path": ["api", "v2", "health"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const sessionId = pm.environment.get('test_session_id');",
+              "",
+              "console.log('\\n' + '='.repeat(80));",
+              "console.log('📊 FINAL DUAL ENDPOINT COMPARISON REPORT');",
+              "console.log('='.repeat(80));",
+              "console.log('Session ID:', sessionId);",
+              "console.log('Generated:', new Date().toISOString());",
+              "",
+              "// Health endpoint summary",
+              "const healthDevStatus = pm.environment.get('health_dev_status');",
+              "const healthProdStatus = pm.environment.get('health_prod_status');",
+              "const healthMatch = healthDevStatus === healthProdStatus;",
+              "",
+              "// Version endpoint summary",
+              "const versionDevStatus = pm.environment.get('version_dev_status');",
+              "const versionProdStatus = pm.environment.get('version_prod_status');",
+              "const versionMatch = versionDevStatus === versionProdStatus;",
+              "",
+              "console.log('\\n📋 ENDPOINT SUMMARY:');",
+              "console.log('  Health:', healthMatch ? '✅ Match' : '⚠️ Differ', `(${healthDevStatus} vs ${healthProdStatus})`);",
+              "console.log('  Version:', versionMatch ? '✅ Match' : '⚠️ Differ', `(${versionDevStatus} vs ${versionProdStatus})`);",
+              "",
+              "const totalEndpoints = 2;",
+              "const matchingEndpoints = (healthMatch ? 1 : 0) + (versionMatch ? 1 : 0);",
+              "const successRate = (matchingEndpoints / totalEndpoints) * 100;",
+              "",
+              "console.log('\\n📈 OVERALL RESULTS:');",
+              "console.log('  Total Endpoints Tested:', totalEndpoints);",
+              "console.log('  Matching Responses:', matchingEndpoints);",
+              "console.log('  Success Rate:', successRate.toFixed(1) + '%');",
+              "",
+              "console.log('='.repeat(80));",
+              "",
+              "// Final test",
+              "pm.test('All endpoints have matching responses', function () {",
+              "    pm.expect(matchingEndpoints).to.equal(totalEndpoints);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+} 

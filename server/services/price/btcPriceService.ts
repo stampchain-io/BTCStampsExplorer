@@ -5,7 +5,7 @@ import { COINGECKO_API_BASE_URL } from "$lib/utils/constants.ts";
 
 export interface BTCPriceData {
   price: number;
-  source: "quicknode" | "coingecko" | "cached" | "default";
+  source: "quicknode" | "coingecko" | "binance" | "cached" | "default";
   confidence: "high" | "medium" | "low";
   timestamp: number;
   details?: any;
@@ -17,7 +17,11 @@ export class BTCPriceService {
   private static readonly CACHE_KEY = "btc_price_data";
   private static readonly CACHE_CONFIG = getCacheConfig(RouteType.PRICE);
   private static sourceCounter = 0;
-  private static readonly SOURCES = ["quicknode", "coingecko"] as const;
+  
+  // Updated sources array - QuickNode disabled (no longer subscribed to cg_simplePrice addon)
+  // Binance added as free alternative API for price fetching
+  private static readonly SOURCES = ["coingecko", "binance"] as const;
+  // To re-enable QuickNode when subscription is restored: ["quicknode", "coingecko", "binance"]
 
   /**
    * Get BTC price with Redis caching and comprehensive fallback
@@ -112,18 +116,23 @@ export class BTCPriceService {
    */
   private static async fetchFromSource(source: string): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
     switch (source) {
-      case "quicknode":
-        return await this.fetchFromQuickNode();
+      // QuickNode disabled - no longer subscribed to cg_simplePrice addon
+      // case "quicknode":
+      //   return await this.fetchFromQuickNode();
       case "coingecko":
         return await this.fetchFromCoinGecko();
+      case "binance":
+        return await this.fetchFromBinance();
       default:
         throw new Error(`Unknown price source: ${source}`);
     }
   }
 
   /**
-   * Fetch from QuickNode
+   * Fetch from QuickNode (DISABLED - no longer subscribed to cg_simplePrice addon)
+   * Keeping this method commented out in case subscription is restored
    */
+  /* 
   private static async fetchFromQuickNode(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
     try {
       const params = ["bitcoin", "usd", true, true, true];
@@ -159,6 +168,7 @@ export class BTCPriceService {
       throw error;
     }
   }
+  */
 
   /**
    * Fetch from CoinGecko
@@ -186,6 +196,36 @@ export class BTCPriceService {
       };
     } catch (error) {
       console.error("[BTCPriceService] CoinGecko price fetch failed:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch from Binance (Free API - no authentication required)
+   */
+  private static async fetchFromBinance(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
+    try {
+      const response = await fetch(
+        "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
+      );
+      
+      if (!response.ok) {
+        console.error(`[BTCPriceService] Binance API error: ${response.status} ${response.statusText}`);
+        throw new Error(`Binance API returned ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const price = parseFloat(data.price);
+      console.log(`[BTCPriceService] Binance price result: $${price}`);
+      
+      return {
+        price,
+        source: "binance",
+        confidence: "high",
+        details: data,
+      };
+    } catch (error) {
+      console.error("[BTCPriceService] Binance price fetch failed:", error);
       throw error;
     }
   }

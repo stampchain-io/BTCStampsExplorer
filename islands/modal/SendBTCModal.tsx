@@ -198,9 +198,7 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
             );
             if (broadcastTxid && typeof broadcastTxid === "string") {
               showToast(
-                `Transaction broadcasted! TXID: ${
-                  broadcastTxid.substring(0, 10)
-                }...`,
+                `Broadcasted! : ${broadcastTxid.substring(0, 10)}...`,
                 "success",
                 false,
               );

@@ -247,14 +247,14 @@ export function useFairmintForm(fairminters: any[]) {
           context: "useFairmintForm",
           txid,
         });
-        setSubmissionMessage({ message: "Transaction broadcasted.", txid });
+        setSubmissionMessage({ message: " Broadcasted.", txid });
       } else {
         logger.error("ui", {
           message: "Transaction signing failed",
           context: "useFairmintForm",
           error,
         });
-        setSubmissionMessage({ message: `Transaction failed: ${error}` });
+        setSubmissionMessage({ message: `Failed: ${error}` });
       }
     } catch (error: unknown) {
       logger.error("ui", {
