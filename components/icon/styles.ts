@@ -73,9 +73,9 @@ export const iconStyles = {
 
   iconButton: {
     grey:
-      "stroke-stamp-grey hover:stroke-stamp-grey-light cursor-pointer fill-none",
+      "stroke-stamp-grey hover:stroke-stamp-grey-light fill-none hover:fill-none cursor-pointer",
     purple:
-      "stroke-stamp-purple hover:stroke-stamp-purple-bright cursor-pointer fill-none",
+      "stroke-stamp-purple hover:stroke-stamp-purple-bright fill-none hover:fill-none cursor-pointer",
     custom: "",
   },
 
@@ -83,7 +83,7 @@ export const iconStyles = {
   weight: {
     light: "[stroke-width:1.75]",
     normal: "[stroke-width:2.25]",
-    bold: "[stroke-width:3.5]",
+    bold: "[stroke-width:3]",
   },
 
   /* ===== SIZE VARIANTS ===== */

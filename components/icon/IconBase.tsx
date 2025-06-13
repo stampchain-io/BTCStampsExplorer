@@ -58,10 +58,13 @@ export function Icon(props: IconVariants) {
       listAsc: "listAsc",
       listDesc: "listDesc",
       dispenserListings: "listStar", // alias mapping
+      sortAsc: "listAsc", // alias mapping
+      sortDesc: "listDesc", // alias mapping
       tools: "gear", // alias mapping
       close: "x", // alias mapping
       expand: "plus", // alias mapping
       search: "magnifingGlass", // alias mapping
+      filter: "funnel", // alias mapping
       donate: "coinsHand", // alias mapping
       share: "share",
       copy: "copy",
@@ -76,10 +79,8 @@ export function Icon(props: IconVariants) {
       locked: "lockClosed", // alias mapping
       unlocked: "lockOpen", // alias mapping
       keyburned: "flame", // alias mapping
-      filter: "funnel", // alias mapping
       divisible: "percent", // alias mapping
-      sortAsc: "sortAsc",
-      sortDesc: "sortDesc",
+
       caretUp: "caretUp",
       caretDown: "caretDown",
       caretLeft: "caretLeft",
