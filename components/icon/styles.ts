@@ -5,7 +5,7 @@ import { JSX } from "preact";
 export interface IconVariants {
   type: "icon" | "iconButton";
   name: string;
-  weight: "light" | "normal" | "bold";
+  weight: "light" | "normal" | "bold" | "custom";
   size:
     | "xxxs"
     | "xxs"
@@ -84,6 +84,7 @@ export const iconStyles = {
     light: "[stroke-width:1.75]",
     normal: "[stroke-width:2.25]",
     bold: "[stroke-width:3]",
+    custom: "",
   },
 
   /* ===== SIZE VARIANTS ===== */
