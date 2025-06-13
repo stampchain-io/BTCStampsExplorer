@@ -83,7 +83,7 @@ export function SortButton(
   return (
     <div className="relative">
       <Icon
-        type="iconLink"
+        type="iconButton"
         name={sort === "DESC" ? "sortAsc" : "sortDesc"}
         weight="bold"
         size="custom"

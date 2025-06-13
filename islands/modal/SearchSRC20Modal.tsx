@@ -144,7 +144,7 @@ export function SearchSRC20Modal({
     <div className="relative">
       {showButton && (
         <Icon
-          type="iconLink"
+          type="iconButton"
           name="search"
           weight="bold"
           size="custom"
@@ -236,8 +236,8 @@ function SearchContent({
           color="custom"
           className={`w-5 h-5 ${
             searchState.value.error
-              ? "fill-stamp-grey-light"
-              : "fill-stamp-grey"
+              ? "stroke-stamp-grey-light"
+              : "stroke-stamp-grey"
           }`}
         />
       </div>

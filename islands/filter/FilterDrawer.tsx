@@ -300,7 +300,7 @@ const FilterDrawer = (
                   text={closeTooltipText}
                 />
                 <Icon
-                  type="iconLink"
+                  type="iconButton"
                   name="close"
                   weight="bold"
                   size="xs"

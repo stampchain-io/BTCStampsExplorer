@@ -58,6 +58,13 @@ export const iconStyles = {
   base: "inline-block transition-colors duration-300",
 
   /* ===== ICON VARIANTS & COLOR STYLES ===== */
+
+  // Note: Two-tone colors are built into the icon styles below
+  // Custom color allows for special icons with advanced coloring:
+  // - Gear icon in collapsible menu (mobile menu drawer) has conditional color based on menu state
+  // - Close icon in mobile menu drawer has custom gradient fill options (grey/purple)
+  //   - the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
+
   icon: {
     grey: "stroke-stamp-grey-darker fill-none",
     purple: "stroke-stamp-purple fill-none",
@@ -93,70 +100,6 @@ export const iconStyles = {
     xsR: "w-5 h-5 tablet:w-[18px] tablet:h-[18px]",
     smR: "w-6 h-6 tablet:w-[22px] tablet:h-[22px]",
     mdR: "w-7 h-7 tablet:w-[26px] tablet:h-[26px]",
-    custom: "",
-  },
-
-  /* ===== COLOR VARIANTS ===== */
-  // Note: Two-tone colors are built into the icon styles below
-  // Custom color allows for special icons with advanced coloring:
-  // - Gear icon in collapsible menu (mobile menu drawer) has conditional color based on menu state
-  // - Close icon in mobile menu drawer has custom gradient fill options (grey/purple)
-  //   - the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
-
-  icon: {
-    grey: "fill-stamp-grey stroke-stamp-grey",
-    purple: "fill-stamp-purple stroke-stamp-purple",
-    custom: "",
-  },
-
-  /* ===== STROKE-BASED ICON STYLES ===== */
-  strokeIcon: {
-    grey:
-      "stroke-stamp-grey hover:stroke-stamp-grey-light fill-none [stroke-linecap:round] [stroke-linejoin:round]",
-    purple:
-      "stroke-stamp-purple hover:stroke-stamp-purple-bright fill-none [stroke-linecap:round] [stroke-linejoin:round]",
-    custom: "fill-none [stroke-linecap:round] [stroke-linejoin:round]",
-  },
-
-  /* ===== STROKE WIDTH VARIANTS ===== */
-  strokeWidth: {
-    light: "[stroke-width:var(--stroke-width-light)]",
-    normal: "[stroke-width:var(--stroke-width-normal)]",
-    bold: "[stroke-width:var(--stroke-width-bold)]",
-  },
-
-  /* ===== ICON LINK STYLES ===== */
-  iconLink: {
-    grey:
-      "fill-stamp-grey hover:fill-stamp-grey-light stroke-stamp-grey hover:stroke-stamp-grey-light cursor-pointer",
-    purple:
-      "fill-stamp-purple hover:fill-stamp-purple-bright stroke-stamp-purple hover:stroke-stamp-purple-bright cursor-pointer",
-    custom: "",
-  },
-
-  /* ===== STROKE-BASED ICON LINK STYLES ===== */
-  strokeIconLink: {
-    grey:
-      "stroke-stamp-grey hover:stroke-stamp-grey-light fill-none cursor-pointer",
-    purple:
-      "stroke-stamp-purple hover:stroke-stamp-purple-bright fill-none cursor-pointer",
-    custom: "fill-none",
-  },
-
-  /* ===== ICON BUTTON STYLES ===== */
-  iconButton: {
-    grey: `
-      fill-stamp-grey hover:fill-stamp-grey-light stroke-stamp-grey hover:stroke-stamp-grey-light
-      bg-[#333333]/40 hover:bg-[#333333]/20 
-      tablet:bg-transparent tablet:hover:bg-transparent 
-      rounded-md p-1.5 cursor-pointer
-    `,
-    purple: `
-      fill-stamp-purple hover:fill-stamp-purple-bright stroke-stamp-purple hover:stroke-stamp-purple-bright
-      bg-[#333333]/40 hover:bg-[#333333]/20 
-      tablet:bg-transparent tablet:hover:bg-transparent 
-      rounded-md p-1.5 cursor-pointer
-    `,
     custom: "",
   },
 } as const;
