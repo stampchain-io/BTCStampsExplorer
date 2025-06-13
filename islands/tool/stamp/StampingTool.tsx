@@ -1201,7 +1201,7 @@ function StampingToolMain({ config }: { config: Config }) {
           >
             <Icon
               type="icon"
-              name="upload"
+              name="stamp"
               weight="normal"
               size="xxl"
               color="grey"
@@ -1513,7 +1513,7 @@ function StampingToolMain({ config }: { config: Config }) {
               {isLocked
                 ? (
                   <Icon
-                    type="iconLink"
+                    type="iconButton"
                     name="locked"
                     weight="bold"
                     size="xs"
@@ -1523,7 +1523,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 )
                 : (
                   <Icon
-                    type="iconLink"
+                    type="iconButton"
                     name="unlocked"
                     weight="bold"
                     size="xs"
@@ -1558,8 +1558,8 @@ function StampingToolMain({ config }: { config: Config }) {
               onMouseLeave={handlePreviewMouseLeave}
             >
               <Icon
-                type="iconLink"
-                name="fullscreen"
+                type="iconButton"
+                name="previewImage"
                 weight="bold"
                 size="xs"
                 color="custom"

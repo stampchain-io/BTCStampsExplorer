@@ -50,7 +50,7 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
+        type="iconButton"
         name="twitter"
         weight="light"
         size="md"
@@ -63,7 +63,7 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
+        type="iconButton"
         name="telegram"
         weight="light"
         size="md"
@@ -76,7 +76,7 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
+        type="iconButton"
         name="discord"
         weight="light"
         size="md"
@@ -89,7 +89,7 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
+        type="iconButton"
         name="github"
         weight="light"
         size="md"

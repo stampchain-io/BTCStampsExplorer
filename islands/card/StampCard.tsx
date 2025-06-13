@@ -243,11 +243,11 @@ export function StampCard({
               <div className="absolute inset-0 bg-black opacity-50 rounded-full" />
               <Icon
                 name={isPlaying ? "pause" : "play"}
-                type="iconLink"
+                type="iconButton"
                 weight="bold"
                 size="xsResponsive"
-                color="grey"
-                className="relative z-10 group-hover/button:fill-stamp-purple-bright"
+                color="custom"
+                className="relative z-10 fill-stamp-grey stroke-stamp-grey group-hover/button:fill-stamp-purple-bright group-hover/button:stroke-stamp-purple-bright"
               />
             </button>
           </div>
