@@ -134,7 +134,7 @@ _fresh/
 # Task files
 tasks.json
 
-# Package lock file - ignoring due to dredd dependency conflicts in Deno project
+# Package lock file - ignoring to maintain clean Deno project structure
 # Dev tools only, doesn't affect production security
 package-lock.json
 tasks/ 

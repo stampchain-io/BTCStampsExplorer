@@ -266,6 +266,16 @@ jobs:
       - name: Build project
         run: deno task build
 
+      # Simple unit test coverage
+      - name: Run Unit Tests with Coverage
+        run: |
+          echo "Running unit tests with coverage..."
+          mkdir -p coverage
+          deno test --coverage=coverage/ tests/unit/ --no-check || true
+          echo "Generating coverage summary..."
+          deno coverage coverage/ || true
+        continue-on-error: true
+
       # Commented out for future implementation
       # - name: Type check
       #   run: deno task check:types

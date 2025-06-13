@@ -17,7 +17,7 @@ Some npm packages are used for **development tooling only**:
 - `autoprefixer` - CSS processing
 - `postcss` - CSS processing
 
-**Note**: API testing (`dredd`) and OpenAPI validation (`@redocly/cli`) are run via `npx` to avoid dependency conflicts while maintaining functionality.
+**Note**: API testing (`newman`) and OpenAPI validation (`@redocly/cli`) are run via Docker to avoid dependency conflicts while maintaining functionality.
 
 **These tools do not affect production security** as they:
 
