@@ -170,9 +170,7 @@ const BuyStampModal = ({
       if (signResult.signed) {
         if (signResult.txid) {
           showToast(
-            `Transaction broadcasted! TXID: ${
-              signResult.txid.substring(0, 10)
-            }...`,
+            `Broadcasted: ${signResult.txid.substring(0, 10)}...`,
             "success",
             false,
           );
@@ -185,9 +183,7 @@ const BuyStampModal = ({
             );
             if (broadcastTxid && typeof broadcastTxid === "string") {
               showToast(
-                `Transaction broadcasted! TXID: ${
-                  broadcastTxid.substring(0, 10)
-                }...`,
+                ` Broadcasted: ${broadcastTxid.substring(0, 10)}...`,
                 "success",
                 false,
               );
