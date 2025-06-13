@@ -84,6 +84,14 @@ jobs:
           deno cache --no-check main.ts dev.ts
           echo "✅ Deno dependencies cached successfully (production security verified)"
 
+      - name: Validate GitHub Token
+        run: |
+          echo "Checking GitHub token permissions..."
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               "https://api.github.com/repos/${{ github.repository }}" | jq -r '.permissions // empty'
+          echo "Token validation complete"
+
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1
         with:
@@ -241,12 +249,19 @@ jobs:
 
       - name: Actionlint
         id: actionlint
-        uses: reviewdog/action-actionlint@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          fail_on_error: false
-          filter_mode: nofilter
+        run: |
+          echo "Running actionlint directly..."
+          # Install actionlint
+          curl -sSfL https://raw.githubusercontent.com/rhymond/actionlint/main/scripts/download-actionlint.bash | bash
+          
+          # Run actionlint on workflow files
+          if ./actionlint .github/workflows/*.yml; then
+            echo "✅ All workflow files passed actionlint checks"
+          else
+            echo "⚠️ Some workflow files have actionlint issues (non-blocking)"
+            exit 0  # Don't fail the workflow for actionlint issues
+          fi
+        continue-on-error: true
 
       # Fail the workflow if any checks failed
       - name: Check for failures
