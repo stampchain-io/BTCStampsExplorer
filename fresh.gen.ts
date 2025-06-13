@@ -10,6 +10,7 @@ import * as $about_index from "./routes/about/index.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
 import * as $api_internal_background_fee_status from "./routes/api/internal/background-fee-status.ts";
 import * as $api_internal_bitcoinNotifications from "./routes/api/internal/bitcoinNotifications.ts";
+import * as $api_internal_btc_price_status from "./routes/api/internal/btc-price-status.ts";
 import * as $api_internal_btcPrice from "./routes/api/internal/btcPrice.ts";
 import * as $api_internal_carousel from "./routes/api/internal/carousel.ts";
 import * as $api_internal_creatorName from "./routes/api/internal/creatorName.ts";
@@ -279,6 +280,7 @@ const manifest = {
       $api_internal_background_fee_status,
     "./routes/api/internal/bitcoinNotifications.ts":
       $api_internal_bitcoinNotifications,
+    "./routes/api/internal/btc-price-status.ts": $api_internal_btc_price_status,
     "./routes/api/internal/btcPrice.ts": $api_internal_btcPrice,
     "./routes/api/internal/carousel.ts": $api_internal_carousel,
     "./routes/api/internal/creatorName.ts": $api_internal_creatorName,

@@ -38,7 +38,7 @@ avoid duplication and keeps this guide concise.
 - **Start production server**: `deno task start`
 - **Generate API docs**: `deno task docs`
 - **Validate OpenAPI schema**: `deno task validate:schema`
-- **Run Dredd tests**: `deno task dredd`
+- **Run Newman API tests**: `deno task test:api`
 - **Update Fresh**: `deno task update`
 
 Use `deno task dev:safe` to clean up before running the dev server.
@@ -87,7 +87,7 @@ Use `deno task dev:safe` to clean up before running the dev server.
   - `deno task test:version` – versioning tests.
   - `deno task test:src20` – SRC‑20 API tests.
   - `deno task test:src20:watch` – watch mode for SRC‑20 tests.
-- Dredd integration tests are defined via `dredd.yml`.
+- Newman integration tests are defined via Postman collections and run through Docker.
 
 ## 9. Error Handling & Security
 - Use Fresh error boundaries for UI errors and return appropriate HTTP

@@ -194,7 +194,7 @@ const DonateStampModal = ({
 
       if (signResult.signed && signResult.txid) {
         setSuccessMessage(
-          `Transaction broadcasted successfully. TXID: ${signResult.txid}`,
+          `Broadcasted: ${signResult.txid}`,
         );
         setTimeout(closeModal, 5000);
       } else if (signResult.cancelled) {
