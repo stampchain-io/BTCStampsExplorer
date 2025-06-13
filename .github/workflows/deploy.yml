@@ -16,6 +16,8 @@ jobs:
       id-token: write    # Needed for auth with Deno Deploy
       contents: read     # Needed to clone the repository
       pull-requests: write  # Needed for PR comments
+      issues: write      # Needed for reviewdog comment management
+      checks: write      # Needed for reviewdog check runs
 
     env:
       CSRF_SECRET_KEY: "12323"  # Placeholder key
@@ -243,6 +245,8 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
+          fail_on_error: false
+          filter_mode: nofilter
 
       # Fail the workflow if any checks failed
       - name: Check for failures
