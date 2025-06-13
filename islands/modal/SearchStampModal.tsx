@@ -259,9 +259,9 @@ export function SearchStampModal({
           type="iconButton"
           name="search"
           weight="bold"
-          size="custom"
+          size="smR"
           color="purple"
-          className="mt-[7px] w-[23px] h-[23px] tablet:w-5 tablet:h-5"
+          className="mt-[7px]"
           onClick={() => {
             handleOpenSearch();
             setIsTooltipVisible(false);
