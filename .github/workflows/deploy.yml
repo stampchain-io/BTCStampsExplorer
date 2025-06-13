@@ -251,10 +251,33 @@ jobs:
         id: actionlint
         run: |
           echo "Running actionlint with PR comment generation..."
-          # Install actionlint
+          
+          # Install actionlint with explicit path handling
+          echo "Downloading actionlint..."
           curl -sSfL https://raw.githubusercontent.com/rhymond/actionlint/main/scripts/download-actionlint.bash | bash
           
+          # Make sure actionlint is executable and in PATH
+          if [ -f "./actionlint" ]; then
+            chmod +x ./actionlint
+            echo "✅ actionlint installed successfully"
+          else
+            echo "❌ actionlint installation failed, trying alternative method..."
+            # Alternative installation method
+            ACTIONLINT_VERSION=$(curl -s https://api.github.com/repos/rhymond/actionlint/releases/latest | grep -o '"tag_name": "[^"]*' | grep -o '[^"]*$')
+            curl -sSfL "https://github.com/rhymond/actionlint/releases/download/${ACTIONLINT_VERSION}/actionlint_$(echo $(uname -s) | tr '[:upper:]' '[:lower:]')_amd64.tar.gz" | tar -xz
+            chmod +x actionlint
+          fi
+          
+          # Verify installation
+          if [ ! -f "./actionlint" ]; then
+            echo "ERROR: Failed to install actionlint"
+            echo "## ❌ Actionlint Installation Failed" >> actionlint_comment.md
+            echo "Could not install actionlint tool for workflow validation." >> actionlint_comment.md
+            exit 0
+          fi
+          
           # Run actionlint and capture output
+          echo "Running actionlint on workflow files..."
           actionlint_output=$(./actionlint .github/workflows/*.yml 2>&1 || true)
           
           if [ -z "$actionlint_output" ]; then
