@@ -812,7 +812,7 @@ export function StampImage(
                 <button
                   type="button"
                   onClick={togglePlayback}
-                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[10%] h-[10%] rounded-full flex items-center justify-center group"
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[10%] h-[10%] rounded-full flex items-center justify-center group/button"
                 >
                   <div className="absolute inset-0 bg-black opacity-50 rounded-full" />
                   <Icon
@@ -821,7 +821,7 @@ export function StampImage(
                     weight="bold"
                     size="xxl"
                     color="custom"
-                    className="p-[25%] relative z-10 fill-stamp-grey stroke-stamp-grey group-hover/button:fill-stamp-purple-bright group-hover/button:stroke-stamp-purple-bright"
+                    className="p-[25%] relative z-10 fill-stamp-grey group-hover/button:fill-stamp-grey-light transition-all duration-300"
                   />
                 </button>
               </div>
