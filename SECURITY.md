@@ -12,10 +12,12 @@ This is a **Deno project**. The production application runs entirely on Deno wit
 
 Some npm packages are used for **development tooling only**:
 
-- `dredd` - API testing (local development only)
-- `@redocly/cli` - OpenAPI validation
 - `tailwindcss` - CSS processing
 - `husky` - Git hooks
+- `autoprefixer` - CSS processing
+- `postcss` - CSS processing
+
+**Note**: API testing (`dredd`) and OpenAPI validation (`@redocly/cli`) are run via `npx` to avoid dependency conflicts while maintaining functionality.
 
 **These tools do not affect production security** as they:
 

@@ -1,4 +1,3 @@
-
 deno task check:fmt
 if [ $? -ne 0 ]; then
   echo "Formatting failed. Please run 'deno fmt .' to fix."
@@ -12,4 +11,4 @@ if [ $? -ne 0 ]; then
 fi
 
 # All good!
-exit 0 
+exit 0

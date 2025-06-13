@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  dredd:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: >
+      sh -c "
+        npm install -g dredd@14.1.0 &&
+        npm install --no-audit --legacy-peer-deps hooks@0.3.2 js-yaml@4.1.0 &&
+        dredd
+      "
+    environment:
+      - NODE_ENV=test 
