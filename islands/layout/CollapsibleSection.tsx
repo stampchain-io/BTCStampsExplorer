@@ -64,13 +64,13 @@ export const CollapsibleSection = ({
               <div
                 className={`${
                   expanded
-                    ? `fill-stamp-grey ${
+                    ? `stroke-stamp-grey ${
                       canHoverSelected
-                        ? "group-hover:fill-stamp-grey-light"
+                        ? "group-hover:stroke-stamp-grey-light"
                         : ""
                     }`
-                    : `fill-stamp-grey-light ${
-                      canHoverSelected ? "group-hover:fill-stamp-grey" : ""
+                    : `stroke-stamp-grey-light ${
+                      canHoverSelected ? "group-hover:stroke-stamp-grey" : ""
                     }`
                 } transition-colors duration-300`}
               >
@@ -112,11 +112,13 @@ export const CollapsibleSection = ({
                 expanded ? "scale-y-[-1]" : "mb-0.5"
               } ${
                 expanded
-                  ? `fill-stamp-grey-light ${
-                    canHoverSelected ? "group-hover:fill-stamp-grey" : ""
+                  ? `stroke-stamp-grey-light ${
+                    canHoverSelected ? "group-hover:stroke-stamp-grey" : ""
                   }`
-                  : `fill-stamp-grey ${
-                    canHoverSelected ? "group-hover:fill-stamp-grey-light" : ""
+                  : `stroke-stamp-grey ${
+                    canHoverSelected
+                      ? "group-hover:stroke-stamp-grey-light"
+                      : ""
                   }`
               } transition-colors duration-300`}
             >
