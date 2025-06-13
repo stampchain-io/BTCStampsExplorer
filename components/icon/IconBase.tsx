@@ -80,7 +80,6 @@ export function Icon(props: IconVariants) {
       unlocked: "lockOpen", // alias mapping
       keyburned: "flame", // alias mapping
       divisible: "percent", // alias mapping
-
       caretUp: "caretUp",
       caretDown: "caretDown",
       caretLeft: "caretLeft",
