@@ -29,7 +29,7 @@ export const HamburgerMenuIcon = (
         {`
         /* Base button styles */
         .hamburger-menu {
-          width: 20px;
+          width: 18px;
           cursor: pointer;
           z-index: 100;
         }

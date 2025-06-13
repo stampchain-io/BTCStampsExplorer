@@ -85,10 +85,10 @@ export function SortButton(
       <Icon
         type="iconButton"
         name={sort === "DESC" ? "sortAsc" : "sortDesc"}
-        weight="bold"
+        weight="custom"
         size="custom"
         color="purple"
-        className="mt-[4px] tablet:mt-[5px] w-[28px] h-[28px] tablet:w-[25px] tablet:h-[25px] transform transition-all duration-300"
+        className="mt-[4px] tablet:mt-[5px] w-[28px] h-[28px] tablet:w-[25px] tablet:h-[25px] transform transition-all duration-300 [stroke-width:2.5]"
         ariaLabel={`Sort ${sort === "DESC" ? "ascending" : "descending"}`}
         onClick={handleSort}
         onMouseEnter={handleMouseEnter}
