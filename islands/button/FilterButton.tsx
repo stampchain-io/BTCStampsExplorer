@@ -54,7 +54,7 @@ export function FilterButton(
     <div class="group relative">
       <BadgeIcon text={count !== undefined ? count.toString() : ""} />
       <Icon
-        type="iconLink"
+        type="iconButton"
         name="filter"
         weight="bold"
         size="custom"

@@ -64,7 +64,7 @@ export function Setting({
         )
         : (
           <Icon
-            type="iconLink"
+            type="iconButton"
             name="gear"
             weight="bold"
             size="custom"
