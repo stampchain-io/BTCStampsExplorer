@@ -69,11 +69,14 @@ export function Icon(props: IconVariants) {
       images: "images",
       previewImage: "image",
       previewCode: "imageCode",
-      previewImageRaw: "imageExternal",
-      upload: "image",
+      previewImageRaw: "imageOut",
+      externalImage: "imageOut",
+      uploadImage: "image",
+      collection: "images",
       // Coins Icons
-      send: "coinsIn",
-      receive: "coinsOut",
+      coins: "coins",
+      send: "coinsOut",
+      receive: "coinsIn",
       donate: "coinsHand",
       // Media Icons
       play: "play",
@@ -92,6 +95,11 @@ export function Icon(props: IconVariants) {
       keyburned: "flame",
       divisible: "percent",
       atom: "atom",
+      history: "clockCounterClockwise",
+      pageOut: "pageOut",
+      pageIn: "pageIn",
+      cornersOut: "cornersOut",
+      cornersIn: "cornersIn",
       template: "template", // alias mappings
     };
 
