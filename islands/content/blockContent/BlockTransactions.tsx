@@ -3,6 +3,7 @@ import { useState } from "preact/hooks";
 import { useFees } from "$fees";
 import { containerBackground } from "$layout";
 import { text, text2xl } from "$text";
+import { Icon } from "$icon";
 
 /* ===== MAIN COMPONENT ===== */
 export default function BlockTransactions() {
@@ -27,12 +28,13 @@ export default function BlockTransactions() {
         <h4 className={text2xl}>TRANSACTIONS</h4>
         <div className="flex items-center gap-3">
           <h6 className={text}>EXPAND</h6>
-          <img
-            src="/img/icon_arrow_top.png"
-            alt=""
-            className={`w-8 h-4 cursor-pointer ${
-              isExpanded ? "" : "rotate-180"
-            }`}
+          <Icon
+            type="icon"
+            name="caretUp"
+            size="md"
+            color="purple"
+            weight="normal"
+            className={`cursor-pointer ${isExpanded ? "" : "rotate-180"}`}
             onClick={() => handleExpand()}
           />
         </div>
