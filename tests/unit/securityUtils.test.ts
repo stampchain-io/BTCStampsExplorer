@@ -1,16 +1,14 @@
 import { assert, assertEquals } from "@std/assert";
 
-// Mock the securityUtils module to avoid the env import issue
-const mockGenerateCSRFToken = async (): Promise<string> => {
-  const mockToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjAwMDAwMDB9.mock_signature";
-  return mockToken;
+// Mock functions to simulate the actual implementations
+const mockGenerateCSRFToken = (): Promise<string> => {
+  return Promise.resolve("mock-csrf-token-123");
 };
 
-const mockValidateCSRFToken = async (token: string): Promise<boolean> => {
-  // Simple mock validation - just check if it looks like a JWT
-  const parts = token.split(".");
-  return parts.length === 3 && parts[0].length > 0;
+// Mock validation function
+// In real implementation, this would check against stored tokens
+const mockValidateCSRFToken = (token: string): Promise<boolean> => {
+  return Promise.resolve(token === "mock-csrf-token-123");
 };
 
 Deno.test("securityUtils - mock generateCSRFToken creates token", async () => {

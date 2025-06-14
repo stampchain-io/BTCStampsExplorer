@@ -60,9 +60,8 @@ Deno.test("ApiResponseUtil - created returns 201", async () => {
   assertEquals(body, data);
 });
 
-Deno.test("ApiResponseUtil - noContent returns 204", async () => {
+Deno.test("ApiResponseUtil - noContent returns 204", () => {
   const response = ApiResponseUtil.noContent();
-
   assertEquals(response.status, 204);
   assertEquals(response.body, null);
 });

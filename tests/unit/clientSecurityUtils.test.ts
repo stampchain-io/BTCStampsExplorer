@@ -3,12 +3,12 @@ import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 
 // Mock fetch for testing
 function mockFetch(response: any, ok = true, status = 200) {
-  globalThis.fetch = async () => {
-    return {
+  globalThis.fetch = () => {
+    return Promise.resolve({
       ok,
       status,
-      json: async () => response,
-    } as Response;
+      json: () => Promise.resolve(response),
+    } as Response);
   };
 }
 
@@ -56,7 +56,7 @@ Deno.test("clientSecurityUtils - getCSRFToken handles missing token", async () =
 
 Deno.test("clientSecurityUtils - getCSRFToken handles network error", async () => {
   // Mock fetch to throw network error
-  globalThis.fetch = async () => {
+  globalThis.fetch = () => {
     throw new Error("Network error");
   };
 
@@ -73,14 +73,14 @@ Deno.test("clientSecurityUtils - getCSRFToken handles network error", async () =
 
 Deno.test("clientSecurityUtils - getCSRFToken handles JSON parse error", async () => {
   // Mock fetch with invalid JSON response
-  globalThis.fetch = async () => {
-    return {
+  globalThis.fetch = () => {
+    return Promise.resolve({
       ok: true,
       status: 200,
-      json: async () => {
+      json: () => {
         throw new Error("Invalid JSON");
       },
-    } as unknown as Response;
+    } as unknown as Response);
   };
 
   await assertRejects(
