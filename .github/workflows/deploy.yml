@@ -271,10 +271,22 @@ jobs:
         run: |
           echo "Running unit tests with coverage..."
           mkdir -p coverage
-          deno test --coverage=coverage/ tests/unit/ --no-check || true
+          deno test --coverage=coverage/ tests/unit/ --no-check --allow-env
           echo "Generating coverage summary..."
-          deno coverage coverage/ || true
-        continue-on-error: true
+          deno coverage coverage/
+          echo "Generating LCOV report for Codecov..."
+          deno coverage coverage/ --lcov > coverage.lcov
+
+      # Upload coverage to Codecov
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: stampchain-io/BTCStampsExplorer
+          files: ./coverage.lcov
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
 
       # Commented out for future implementation
       # - name: Type check

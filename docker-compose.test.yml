@@ -1,15 +1,150 @@
-version: '3.8'
 services:
-  dredd:
-    image: node:18-alpine
+  newman:
+    image: node:22-alpine
     working_dir: /app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - .:/app
+      - ./reports:/app/reports
+    environment:
+      - NODE_ENV=test
+    command: sh scripts/run-newman-enhanced.sh
+
+  # Simple collection testing
+  newman-simple:
+    image: node:22-alpine
+    working_dir: /app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+      - ./reports:/app/reports
+    environment:
+      - NODE_ENV=test
+    command: sh scripts/run-newman-simple.sh
+
+  # Advanced collection testing
+  newman-advanced:
+    image: node:22-alpine
+    working_dir: /app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+      - ./reports:/app/reports
+    environment:
+      - NODE_ENV=test
     command: >
       sh -c "
-        npm install -g dredd@14.1.0 &&
-        npm install --no-audit --legacy-peer-deps hooks@0.3.2 js-yaml@4.1.0 &&
-        dredd
+        echo '=== Newman Advanced API Testing ===' &&
+        echo 'Node version:' && node --version &&
+        echo 'NPM version:' && npm --version &&
+        
+        echo '=== Installing Newman ===' &&
+        npm install -g newman newman-reporter-html &&
+        echo 'Newman version:' && newman --version &&
+        
+        ping -c 1 host.docker.internal || echo 'host.docker.internal not reachable' &&
+        wget -q --spider http://host.docker.internal:8000/api/v2/stamps?limit=1 && echo 'Development server is reachable' || echo 'Development server is NOT reachable' &&
+        wget -q --spider https://stampchain.io/api/v2/stamps?limit=1 && echo 'Production server is reachable' || echo 'Production server is NOT reachable' &&
+        
+        mkdir -p reports/newman-advanced &&
+        
+        newman run postman-collection-advanced.json \\
+          --environment postman-environment.json \\
+          --reporters cli,html,json \\
+          --reporter-html-export reports/newman-advanced/advanced-report.html \\
+          --reporter-json-export reports/newman-advanced/advanced-results.json \\
+          --timeout-request 30000 \\
+          --color auto \\
+          --verbose \\
+          --disable-unicode &&
+        
+        echo 'Advanced test complete. Reports in: reports/newman-advanced/' &&
+        ls -la reports/newman-advanced/
       "
+
+  # Performance testing
+  newman-performance:
+    image: node:22-alpine
+    working_dir: /app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+      - ./reports:/app/reports
     environment:
-      - NODE_ENV=test 
+      - NODE_ENV=test
+    command: >
+      sh -c "
+        echo '=== Newman Performance API Testing ===' &&
+        echo 'Node version:' && node --version &&
+        echo 'NPM version:' && npm --version &&
+        
+        echo '=== Installing Newman ===' &&
+        npm install -g newman newman-reporter-html &&
+        echo 'Newman version:' && newman --version &&
+        
+        ping -c 1 host.docker.internal || echo 'host.docker.internal not reachable' &&
+        wget -q --spider http://host.docker.internal:8000/api/v2/stamps?limit=1 && echo 'Development server is reachable' || echo 'Development server is NOT reachable' &&
+        wget -q --spider https://stampchain.io/api/v2/stamps?limit=1 && echo 'Production server is reachable' || echo 'Production server is NOT reachable' &&
+        
+        mkdir -p reports/newman-performance &&
+        
+        newman run postman-collection-enhanced.json \\
+          --environment postman-environment.json \\
+          --reporters cli,html,json \\
+          --reporter-html-export reports/newman-performance/performance-report.html \\
+          --reporter-json-export reports/newman-performance/performance-results.json \\
+          --timeout-request 30000 \\
+          --delay-request 100 \\
+          --iteration-count 3 \\
+          --color auto \\
+          --verbose \\
+          --disable-unicode &&
+        
+        echo 'Performance test complete. Reports in: reports/newman-performance/' &&
+        ls -la reports/newman-performance/
+      "
+
+  # Parallel testing
+  newman-parallel:
+    image: node:22-alpine
+    working_dir: /app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+      - ./reports:/app/reports
+    environment:
+      - NODE_ENV=test
+    command: >
+      sh -c "
+        echo '=== Newman Parallel API Testing ===' &&
+        echo 'Node version:' && node --version &&
+        echo 'NPM version:' && npm --version &&
+        
+        echo '=== Installing Newman ===' &&
+        npm install -g newman newman-reporter-html &&
+        echo 'Newman version:' && newman --version &&
+        
+        ping -c 1 host.docker.internal || echo 'host.docker.internal not reachable' &&
+        wget -q --spider http://host.docker.internal:8000/api/v2/stamps?limit=1 && echo 'Development server is reachable' || echo 'Development server is NOT reachable' &&
+        wget -q --spider https://stampchain.io/api/v2/stamps?limit=1 && echo 'Production server is reachable' || echo 'Production server is NOT reachable' &&
+        
+        mkdir -p reports/newman-parallel &&
+        
+        newman run postman-collection-enhanced.json \\
+          --environment postman-environment.json \\
+          --reporters cli,html,json \\
+          --reporter-html-export reports/newman-parallel/parallel-report.html \\
+          --reporter-json-export reports/newman-parallel/parallel-results.json \\
+          --timeout-request 30000 \\
+          --iteration-count 2 \\
+          --color auto \\
+          --disable-unicode &&
+        
+        echo 'Parallel test complete. Reports in: reports/newman-parallel/' &&
+        ls -la reports/newman-parallel/
+      " 
