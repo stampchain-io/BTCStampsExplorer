@@ -10,6 +10,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { inputField, inputFieldSquare, SelectField } from "$form";
 import { closeModal } from "$islands/modal/states.ts";
+import { Icon } from "$icon";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -301,7 +302,7 @@ function SendStampModal({
   return (
     <ModalBase onClose={handleCloseModal} title="TRANSFER">
       {/* ===== STAMP SELECTION SECTION ===== */}
-      <div className="flex w-full gap-3 mobileMd:gap-6">
+      <div className="flex w-full gap-6">
         {/* ===== STAMP PREVIEW ===== */}
         <div className="flex items-center justify-center rounded min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker">
           {selectedStamp
@@ -315,10 +316,12 @@ function SendStampModal({
               />
             )
             : (
-              <img
-                src="/img/stamping/image-upload.svg"
-                class="-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"
-                alt=""
+              <Icon
+                type="icon"
+                name="uploadImage"
+                weight="normal"
+                size="mdR"
+                color="grey"
               />
             )}
         </div>

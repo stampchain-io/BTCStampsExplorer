@@ -444,7 +444,13 @@ export function StampCard({
         {/* ===== ATOM ICON ===== */}
         {fromPage && fromPage === "stamp" && (
           <div className="absolute top-0 right-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-[#1F002E] p-[3px] desktop:block hidden">
-            <img className="" src="/img/stamp/atom.svg" />
+            <Icon
+              type="icon"
+              name="atom"
+              weight="normal"
+              size="xs"
+              color="grey"
+            />
           </div>
         )}
 

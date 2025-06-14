@@ -11,6 +11,7 @@ import { labelSm, titleGreyLD, valueSm } from "$text";
 import type { AlignmentType } from "$layout";
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import type { MarketListingAggregated } from "$globals";
+import { Icon } from "$icon";
 
 /* ===== TYPES ===== */
 export interface SRC20DetailHeaderProps {
@@ -89,24 +90,48 @@ export function SRC20DetailHeader({
                   </h1>
                   <div class="flex gap-3 items-center">
                     {deployment.email && (
-                      <a href={deployment.email} target="_blank">
-                        <img src="/img/src20/details/EnvelopeSimple.svg" />
-                      </a>
+                      <Icon
+                        type="iconButton"
+                        name="email"
+                        weight="normal"
+                        size="xxs"
+                        color="grey"
+                        href={deployment.email}
+                        target="_blank"
+                      />
                     )}
                     {deployment.web && (
-                      <a href={deployment.web} target="_blank">
-                        <img src="/img/src20/details/Globe.svg" />
-                      </a>
+                      <Icon
+                        type="iconButton"
+                        name="website"
+                        weight="normal"
+                        size="xxs"
+                        color="grey"
+                        href={deployment.web}
+                        target="_blank"
+                      />
                     )}
                     {deployment.tg && (
-                      <a href={deployment.tg} target="_blank">
-                        <img src="/img/src20/details/TelegramLogo.svg" />
-                      </a>
+                      <Icon
+                        type="iconButton"
+                        name="telegram"
+                        weight="normal"
+                        size="xxs"
+                        color="grey"
+                        href={deployment.tg}
+                        target="_blank"
+                      />
                     )}
                     {deployment.x && (
-                      <a href={deployment.x} target="_blank">
-                        <img src="/img/src20/details/XLogo.svg" />
-                      </a>
+                      <Icon
+                        type="iconButton"
+                        name="twitter"
+                        weight="normal"
+                        size="xxs"
+                        color="grey"
+                        href={deployment.x}
+                        target="_blank"
+                      />
                     )}
                   </div>
                 </div>
