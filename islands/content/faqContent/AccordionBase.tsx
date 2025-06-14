@@ -44,12 +44,12 @@ export const Accordion = (
         <span
           className={`transition-transform duration-300 ${
             isOpen
-              ? "fill-stamp-grey-light rotate-45"
-              : "fill-stamp-grey-darker group-hover:fill-stamp-grey-light transition-colors duration-100 rotate-0"
+              ? "stroke-stamp-grey-light rotate-45"
+              : "stroke-stamp-grey-darker group-hover:stroke-stamp-grey-light transition-colors duration-100 rotate-0"
           }`}
         >
           <Icon
-            type="iconLink"
+            type="iconButton"
             name="expand"
             weight="bold"
             size="xsR"

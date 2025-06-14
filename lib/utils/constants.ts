@@ -35,10 +35,10 @@ export const MEMPOOL_API_BASE_URL = "https://mempool.space/api";
 export const BLOCKSTREAM_API_BASE_URL = "https://blockstream.info/api";
 export const COINGECKO_API_BASE_URL = "https://api.coingecko.com/api/v3";
 
-export const AUDIO_FILE_IMAGE = "/icon/stamp-audio.svg";
-export const LIBRARY_FILE_IMAGE = "/icon/stamp-library.svg";
-export const NOT_AVAILABLE_IMAGE = "/icon/stamp-no-image.svg";
-export const ERROR_IMAGE = "/icon/stamp-error.svg";
+export const AUDIO_FILE_IMAGE = "/img/placeholder/stamp-audio.svg";
+export const LIBRARY_FILE_IMAGE = "/img/placeholder/stamp-library.svg";
+export const NOT_AVAILABLE_IMAGE = "/img/placeholder/stamp-no-image.svg";
+export const ERROR_IMAGE = "/img/placeholder/stamp-error.svg";
 
 export const CAROUSEL_STAMP_IDS = [
   923260,

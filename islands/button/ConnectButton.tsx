@@ -350,7 +350,6 @@ const WalletPopup = (
         onClick={() => {}}
       >
         Add address
-        <img src="/img/wallet/icon_plus.svg" alt="" />
       </p>
       <hr />
       <button

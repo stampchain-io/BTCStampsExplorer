@@ -243,11 +243,11 @@ export function StampCard({
               <div className="absolute inset-0 bg-black opacity-50 rounded-full" />
               <Icon
                 name={isPlaying ? "pause" : "play"}
-                type="iconLink"
+                type="iconButton"
                 weight="bold"
-                size="xsResponsive"
-                color="grey"
-                className="relative z-10 group-hover/button:fill-stamp-purple-bright"
+                size="xsR"
+                color="custom"
+                className="relative z-10 fill-stamp-grey group-hover/button:fill-stamp-purple-bright"
               />
             </button>
           </div>
@@ -444,7 +444,13 @@ export function StampCard({
         {/* ===== ATOM ICON ===== */}
         {fromPage && fromPage === "stamp" && (
           <div className="absolute top-0 right-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-[#1F002E] p-[3px] desktop:block hidden">
-            <img className="" src="/img/stamp/atom.svg" />
+            <Icon
+              type="icon"
+              name="atom"
+              weight="normal"
+              size="xs"
+              color="grey"
+            />
           </div>
         )}
 

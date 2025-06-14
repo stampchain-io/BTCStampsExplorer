@@ -50,7 +50,7 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
+        type="iconButton"
         name="twitter"
         weight="light"
         size="md"
@@ -63,7 +63,7 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
+        type="iconButton"
         name="telegram"
         weight="light"
         size="md"
@@ -76,7 +76,7 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
+        type="iconButton"
         name="discord"
         weight="light"
         size="md"
@@ -89,7 +89,7 @@ const socialLinks = [
   {
     icon: (
       <Icon
-        type="iconLink"
+        type="iconButton"
         name="github"
         weight="light"
         size="md"
@@ -113,7 +113,7 @@ export function Footer() {
     ">
       {/* ===== BACKGROUND LOGO ===== */}
       <img
-        src="/img/home/stampchain-logo-480.svg"
+        src="/img/logo/stampchain-logo-480.svg"
         alt=""
         className="
           absolute z-[-999]
@@ -146,7 +146,7 @@ export function Footer() {
         </div>
 
         {/* ===== SOCIAL MEDIA ICONS ===== */}
-        <div className="flex gap-4 mt-3 mobileMd:mt-0 tablet:mt-3">
+        <div className="flex gap-6 tablet:gap-4 mt-3 mobileMd:mt-0 tablet:mt-3">
           {socialLinks.map((link) => (
             <a
               key={link.href}
@@ -220,7 +220,7 @@ export function Footer() {
             <h6
               className={`${copyright} hidden mobileMd:block tablet:hidden`}
             >
-              <span className="italic">STAMPCHAIN</span> @ 2025
+              <span className="italic">STAMPCHAIN</span> &copy; 2025
             </h6>
           </div>
         </div>
@@ -228,7 +228,7 @@ export function Footer() {
         {/* ===== COPYRIGHT SECTION - BASE/MOBILESM + TABLET/DESKTOP ===== */}
         <div className="flex flex-row mobileMd:hidden tablet:block w-full justify-center tablet:justify-end tablet:text-right mt-3 tablet:mt-4">
           <h6 className={`${copyright}`}>
-            <span className="italic">STAMPCHAIN</span> @ 2025
+            <span className="italic">STAMPCHAIN</span> &copy; 2025
           </h6>
         </div>
       </div>

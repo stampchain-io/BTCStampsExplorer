@@ -13,6 +13,7 @@ import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { StampRow } from "$globals";
 import { label } from "$text";
+import { Icon } from "$icon";
 
 /* ===== ITEM HEADER SUBCOMPONENT ===== */
 const ItemHeader = ({
@@ -322,15 +323,19 @@ function DispenserRow(
               </span>
             </p>
             <div class="flex flex-row gap-[9px] mobileLg:gap-3">
-              <img
-                src="/img/wallet/icon-copy.svg"
-                class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] cursor-pointer"
-                alt="Copy"
+              <Icon
+                type="iconButton"
+                name="copy"
+                weight="normal"
+                size="xs"
+                color="grey"
               />
-              <img
-                src="/img/wallet/icon-history.svg"
-                class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] cursor-pointer"
-                alt="History"
+              <Icon
+                type="iconButton"
+                name="history"
+                weight="normal"
+                size="xs"
+                color="grey"
               />
             </div>
           </div>

@@ -22,7 +22,7 @@ export default function TeamBanner() {
             >
               {/* ===== MIKE IN SPACE CARD ===== */}
               <div className="flex flex-col items-center">
-                <img src="/img/banner/mike.png" />
+                <img src="/img/profile/mike.png" />
                 <h5 className={headingPurpleLD}>
                   MIKE IN SPACE
                 </h5>
@@ -37,7 +37,7 @@ export default function TeamBanner() {
 
               {/* ===== REINAMORA CARD ===== */}
               <div className="flex flex-col items-center">
-                <img src="/img/banner/kevin.png" />
+                <img src="/img/profile/kevin.png" />
                 <h5 className={headingPurpleLD}>
                   REINAMORA
                 </h5>
@@ -52,7 +52,7 @@ export default function TeamBanner() {
 
               {/* ===== ARWYN CARD ===== */}
               <div className="flex flex-col items-center">
-                <img src="/img/banner/arwyn.png" />
+                <img src="/img/profile/arwyn.png" />
                 <h5 className={headingPurpleLD}>
                   ARWYN
                 </h5>

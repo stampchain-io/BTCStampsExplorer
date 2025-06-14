@@ -15,20 +15,20 @@ interface Partner {
 const partners: Partner[] = [
   {
     name: "Bitfinity",
-    largeImage: "/img/banner/bitfinity-wide.webp",
-    smallImage: "/img/banner/bitfinity-square.webp",
+    largeImage: "/img/partner/bitfinity-wide.webp",
+    smallImage: "/img/partner/bitfinity-square.webp",
     url: "https://bitfinity.network/",
   },
   {
     name: "R8",
-    largeImage: "/img/banner/r8-wide.webp",
-    smallImage: "/img/banner/r8-square.webp",
+    largeImage: "/img/partner/r8-wide.webp",
+    smallImage: "/img/partner/r8-square.webp",
     url: "https://www.revolvedex.com/",
   },
   {
     name: "Bitname",
-    largeImage: "/img/banner/bitname-wide.webp",
-    smallImage: "/img/banner/bitname-square.webp",
+    largeImage: "/img/partner/bitname-wide.webp",
+    smallImage: "/img/partner/bitname-square.webp",
     url: "https://bitname.pro",
   },
 ];

@@ -1,5 +1,7 @@
 /* ===== STAMPCHAIN SELECTED COMPONENT ===== */
 /* WIP - never finished never used - an early figma mockup */
+import { Icon } from "$icon";
+
 export const HomeStampChainSelected = () => {
   return (
     <div>
@@ -36,7 +38,14 @@ export const HomeStampChainSelected = () => {
               BY <span className="font-bold">VIVA LA VANDAL</span>
             </p>
             <div className="flex gap-4 mobileLg:gap-12 mt-2 mobileLg:mt-5 font-extrabold">
-              <img src="/img/home/fullscreen.png" alt="Fullscreen" />
+              <Icon
+                type="iconButton"
+                name="previewImage"
+                size="mdR"
+                color="grey"
+                weight="normal"
+                ariaLabel="Fullscreen"
+              />
               <a
                 href="#"
                 className="border-2 border-stamp-primary text-stamp-primary w-[136px] h-[60px] flex justify-center items-center rounded-md"
@@ -52,7 +61,13 @@ export const HomeStampChainSelected = () => {
             </div>
           </div>
         </div>
-        <img src="/img/home/stamp.png" alt="Stamp" />
+        <Icon
+          type="icon"
+          name="stamp"
+          size="custom"
+          color="grey"
+          weight="normal"
+        />
       </div>
     </div>
   );

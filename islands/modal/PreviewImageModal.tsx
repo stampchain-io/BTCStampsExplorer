@@ -38,7 +38,7 @@ const PreviewImageModal = ({
       }}
       title=""
       hideHeader
-      className="!w-[min(calc(100vh-48px),calc(100vw-48px))] !h-[min(calc(100vh-48px),calc(100vw-48px))] mobileLg:!w-[min(calc(100vh-96px),calc(100vw-96px))] mobileLg:!h-[min(calc(100vh-96px),calc(100vw-96px))]"
+      className="!w-[min(calc(100vh-48px),calc(100vw-48px))] !h-[min(calc(100vh-48px),calc(100vw-48px))] mobileLg:!w-[min(calc(100vh-96px),calc(100vw-96px))] mobileLg:!h-[min(calc(100vh-96px),calc(100vw-96px))] !p-3 min-[420px]:!p-6"
     >
       <div class="flex flex-col h-full w-full stamp-container">
         {/* ===== CONTENT RENDERING ===== */}
@@ -48,16 +48,9 @@ const PreviewImageModal = ({
               width="100%"
               height="100%"
               scrolling="no"
-              className="rounded-sm mobileMd:rounded-md aspect-square"
+              className="rounded-sm mobileMd:rounded-md w-full h-full"
               sandbox="allow-scripts allow-same-origin"
-              srcDoc={`
-                <script>
-                  window.backgroundColor = "f7931a";
-                  window.maxWidth = 640;
-                  window.maxHeight = 640;
-                </script>
-                <iframe src="${imageUrl}" width="100%" height="100%" style="border:none;"></iframe>
-              `}
+              src={imageUrl}
               loading="lazy"
               title="Stamp Preview"
             />
