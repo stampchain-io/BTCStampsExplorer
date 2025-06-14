@@ -220,7 +220,7 @@ export function Footer() {
             <h6
               className={`${copyright} hidden mobileMd:block tablet:hidden`}
             >
-              <span className="italic">STAMPCHAIN</span> @ 2025
+              <span className="italic">STAMPCHAIN</span> &copy; 2025
             </h6>
           </div>
         </div>
@@ -228,7 +228,7 @@ export function Footer() {
         {/* ===== COPYRIGHT SECTION - BASE/MOBILESM + TABLET/DESKTOP ===== */}
         <div className="flex flex-row mobileMd:hidden tablet:block w-full justify-center tablet:justify-end tablet:text-right mt-3 tablet:mt-4">
           <h6 className={`${copyright}`}>
-            <span className="italic">STAMPCHAIN</span> @ 2025
+            <span className="italic">STAMPCHAIN</span> &copy; 2025
           </h6>
         </div>
       </div>
