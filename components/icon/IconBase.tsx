@@ -73,6 +73,7 @@ export function Icon(props: IconVariants) {
       externalImage: "imageOut",
       uploadImage: "image",
       collection: "images",
+      profile: "imageProfile",
       // Coins Icons
       coins: "coins",
       send: "coinsOut",
@@ -96,6 +97,8 @@ export function Icon(props: IconVariants) {
       divisible: "percent",
       atom: "atom",
       history: "clockCounterClockwise",
+      view: "eye",
+      hide: "eyeSlash",
       pageOut: "pageOut",
       pageIn: "pageIn",
       cornersOut: "cornersOut",
