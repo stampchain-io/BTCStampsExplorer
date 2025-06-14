@@ -305,7 +305,7 @@ export function SRC20DeployTool(
                 >
                   <Icon
                     type="icon"
-                    name="upload"
+                    name="uploadImage"
                     weight="normal"
                     size="xxl"
                     color="grey"
