@@ -23,18 +23,11 @@ export function Icon(props: IconVariants) {
   } = props;
 
   /* ===== STYLES ===== */
-  const getIconStyles = () => {
-    if (type === "icon") {
-      return iconStyles.icon[color].replace("stroke-1", "");
-    } else if (type === "iconButton") {
-      return iconStyles.iconButton[color];
-    }
-    return "";
-  };
-
-  const combinedClasses = `${iconStyles.base} ${
-    iconStyles.size[size]
-  } ${getIconStyles()} ${iconStyles.weight[weight]} ${className}`;
+  const combinedClasses = `${iconStyles.base} ${iconStyles.size[size]} ${
+    type === "icon"
+      ? iconStyles.icon[color].replace("stroke-1", "")
+      : iconStyles.iconButton[color]
+  } ${iconStyles.weight[weight]} group ${className}`;
 
   const commonProps = {
     className: combinedClasses,
@@ -48,75 +41,109 @@ export function Icon(props: IconVariants) {
   const getIconPath = () => {
     // Map icon names to their path names
     const iconNameMap = {
+      // Social Media Icons
       twitter: "twitter",
       telegram: "telegram",
       github: "github",
       discord: "discord",
       instagram: "instagram",
-      website: "globe", // alias mapping
+      website: "globe",
+      email: "envelope",
+      // List Icons
       list: "list",
       listAsc: "listAsc",
       listDesc: "listDesc",
-      dispenserListings: "listStar", // alias mapping
-      sortAsc: "listAsc", // alias mapping
-      sortDesc: "listDesc", // alias mapping
-      tools: "gear", // alias mapping
-      close: "x", // alias mapping
-      expand: "plus", // alias mapping
-      search: "magnifingGlass", // alias mapping
-      filter: "funnel", // alias mapping
-      donate: "coinsHand", // alias mapping
+      dispenserListings: "listStar",
+      sortAsc: "listAsc",
+      sortDesc: "listDesc",
+      // Tools Icons
+      tools: "gear",
+      close: "x",
+      expand: "plus",
+      search: "magnifingGlass",
+      filter: "funnel",
       share: "share",
       copy: "copy",
+      // Image Icons
       image: "image",
       images: "images",
-      previewImage: "image", // alias mapping
-      previewCode: "imageCode", // alias mapping
-      previewImageRaw: "imageExternal", // alias mapping
-      upload: "image", // alias mapping
+      previewImage: "image",
+      previewCode: "imageCode",
+      previewImageRaw: "imageExternal",
+      upload: "image",
+      // Coins Icons
+      send: "coinsIn",
+      receive: "coinsOut",
+      donate: "coinsHand",
+      // Media Icons
       play: "play",
       pause: "pause",
-      locked: "lockClosed", // alias mapping
-      unlocked: "lockOpen", // alias mapping
-      keyburned: "flame", // alias mapping
-      divisible: "percent", // alias mapping
+      // Security Icons
+      locked: "lockClosed",
+      unlocked: "lockOpen",
+      // Caret Icons
       caretUp: "caretUp",
       caretDown: "caretDown",
       caretLeft: "caretLeft",
       caretRight: "caretRight",
       caretDoubleLeft: "caretDoubleLeft",
       caretDoubleRight: "caretDoubleRight",
-      template: "template",
+      // Misc Icons
+      keyburned: "flame",
+      divisible: "percent",
+      atom: "atom",
+      template: "template", // alias mappings
     };
 
-    const iconName = iconNameMap[name as keyof typeof iconNameMap] || "";
-    if (!iconName) return "";
-
-    const pathKey = iconName as keyof typeof iconPaths;
-    return iconPaths[pathKey] || "";
+    const iconName = iconNameMap[name as keyof typeof iconNameMap];
+    return iconName ? iconPaths[iconName as keyof typeof iconPaths] || "" : "";
   };
 
   const renderPaths = () => {
-    const pathData = getIconPath() as string | string[];
+    const pathData = getIconPath() as
+      | string
+      | string[]
+      | (string | { path: string; style: string })[];
 
-    // Handle array of paths
+    // Handle array of paths - can include path objects with custom styles
     if (Array.isArray(pathData)) {
-      return pathData.map((path, index) => <path key={index} d={path} />);
+      return pathData.map((pathItem, index) => {
+        // Handle path object with custom styling
+        if (typeof pathItem === "object" && pathItem.path && pathItem.style) {
+          // Extract stroke colors and convert to fill
+          const iconStyleClass = iconStyles[type][color];
+          const baseStroke = iconStyleClass.match(/(?:^|\s)(stroke-[a-z0-9-]+)/)
+            ?.[1];
+          const hoverStroke = iconStyleClass.match(
+            /group-hover:(stroke-[a-z0-9-]+)/,
+          )?.[1];
+
+          const fillColor = [
+            baseStroke?.replace("stroke-", "fill-"),
+            hoverStroke &&
+            `group-hover:${hoverStroke.replace("stroke-", "fill-")}`,
+          ].filter(Boolean).join(" ");
+
+          return (
+            <path
+              key={index}
+              d={pathItem.path}
+              className={`${pathItem.style} ${fillColor}`}
+            />
+          );
+        }
+        // Handle regular string path
+        return <path key={index} d={pathItem as string} />;
+      });
     }
 
     // Handle single path
-    return <path d={pathData} />;
+    return <path d={pathData as string} />;
   };
 
   /* ===== SVG ELEMENT ===== */
   const svgElement = (
-    <svg
-      xmlns={globalSvgAttributes.xmlns}
-      viewBox={globalSvgAttributes.viewBox}
-      strokeLinecap={globalSvgAttributes.strokeLinecap}
-      strokeLinejoin={globalSvgAttributes.strokeLinejoin}
-      {...commonProps}
-    >
+    <svg {...globalSvgAttributes} {...commonProps}>
       {renderPaths()}
     </svg>
   );

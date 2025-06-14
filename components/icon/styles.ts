@@ -73,9 +73,9 @@ export const iconStyles = {
 
   iconButton: {
     grey:
-      "stroke-stamp-grey hover:stroke-stamp-grey-light fill-none hover:fill-none cursor-pointer",
+      "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer",
     purple:
-      "stroke-stamp-purple hover:stroke-stamp-purple-bright fill-none hover:fill-none cursor-pointer",
+      "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer",
     custom: "",
   },
 
