@@ -143,7 +143,7 @@ export function Icon(props: IconVariants) {
 
   /* ===== SVG ELEMENT ===== */
   const svgElement = (
-    <svg {...globalSvgAttributes} {...commonProps}>
+    <svg {...commonProps} {...globalSvgAttributes}>
       {renderPaths()}
     </svg>
   );

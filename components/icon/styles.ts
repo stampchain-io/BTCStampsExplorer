@@ -48,8 +48,8 @@ export interface BadgeVariants {
 export const globalSvgAttributes = {
   xmlns: "http://www.w3.org/2000/svg",
   viewBox: "0 0 32 32",
-  strokeLinecap: "round" as const,
-  strokeLinejoin: "round" as const,
+  "stroke-linecap": "round" as const,
+  "stroke-linejoin": "round" as const,
 } as const;
 
 /* ===== ICON STYLE DEFINITIONS ===== */
