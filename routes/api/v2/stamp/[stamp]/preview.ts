@@ -53,7 +53,7 @@ export const handler: Handlers = {
       console.error("Preview generation error:", error);
       return new Response(null, {
         status: 302,
-        headers: { Location: "/static/images/default-preview.png" },
+        headers: { Location: "/static/img/broken.png" },
       });
     }
   },

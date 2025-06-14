@@ -421,7 +421,7 @@ function DashboardProfile() {
       <div className="flex">
         <div className="flex items-center justify-center relative -top-3 -left-3 mobileMd:-top-6 mobileMd:-left-6 w-[58px] h-[58px] mobileLg:w-[76px] mobileLg:h-[76px] bg-stamp-purple rounded-full">
           <img
-            src="/img/home/carousel_default.png"
+            src="/img/banner/kevin.png"
             alt="Avatar"
             class="w-[54px] h-[54px] mobileLg:w-[72px] mobileLg:h-[72px] rounded-full"
           />
