@@ -83,12 +83,12 @@ export function SortButton(
   return (
     <div className="relative">
       <Icon
-        type="iconLink"
+        type="iconButton"
         name={sort === "DESC" ? "sortAsc" : "sortDesc"}
         weight="bold"
         size="custom"
         color="purple"
-        className="mt-[5px] w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px] transform transition-all duration-300"
+        className="mt-[4px] tablet:mt-[5px] w-[28px] h-[28px] tablet:w-[25px] tablet:h-[25px] transform transition-all duration-300"
         ariaLabel={`Sort ${sort === "DESC" ? "ascending" : "descending"}`}
         onClick={handleSort}
         onMouseEnter={handleMouseEnter}

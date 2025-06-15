@@ -9,7 +9,7 @@ import { StampController } from "$server/controller/stampController.ts";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { DOMParser } from "dom";
-import { body } from "$layout";
+import { body, gapSectionSlim } from "$layout";
 import { StampImage, StampInfo } from "$content";
 import { StampGallery } from "$section";
 import { DataTableBase, HoldersTable } from "$table";
@@ -357,8 +357,8 @@ export default function StampDetailPage(props: StampDetailPageProps) {
         )}
       </Head>
 
-      <div class={body}>
-        <div class="grid grid-cols-1 min-[880px]:grid-cols-2 desktop:grid-cols-3 gap-6">
+      <div class={`${body} ${gapSectionSlim}`}>
+        <div class="grid grid-cols-1 min-[880px]:grid-cols-2 desktop:grid-cols-3 gap-6 mobileLg:gap-9">
           <div class="desktop:col-span-1">
             {stamp &&
               (
@@ -383,13 +383,15 @@ export default function StampDetailPage(props: StampDetailPageProps) {
           <HoldersTable holders={holders || []} />
         )}
 
-        <DataTableBase
-          type="stamps"
-          configs={tableConfigs}
-          cpid={stamp.cpid}
-        />
+        {stamp.ident !== "SRC-20" && (
+          <DataTableBase
+            type="stamps"
+            configs={tableConfigs}
+            cpid={stamp.cpid}
+          />
+        )}
 
-        <div class="pt-12 mobileLg:pt-24 desktop:pt-36">
+        <div class="pt-6 mobileLg:pt-12">
           <StampGallery {...latestStampsSection} />
         </div>
       </div>

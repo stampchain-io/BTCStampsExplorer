@@ -231,7 +231,6 @@ export function useTransactionForm(
     feeSource,
     isUsingFallback,
     lastGoodDataAge,
-    formState.BTCPrice,
   ]);
 
   useEffect(() => {

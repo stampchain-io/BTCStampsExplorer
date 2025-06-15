@@ -1,6 +1,7 @@
 /* ===== COLLECTION CREATE BUTTON COMPONENT ===== */
 // WIP - UNUSED
 import { useState } from "preact/hooks";
+import { Icon } from "$icon";
 
 export function CollectionCreateButton() {
   const [_name, setName] = useState("");
@@ -18,7 +19,13 @@ export function CollectionCreateButton() {
   return (
     <div class="group relative">
       <div class="bg-[#5503A6] p-4 border border-[#8A8989] min-w-[210px] w-[210px] h-[50px] rounded cursor-pointer mb-3 text-[#F5F5F5] flex justify-between items-center gap-2">
-        <img src="/img/icon_create.png" class="w-4 h-4" />
+        <Icon
+          type="iconButton"
+          name="collection"
+          size="xs"
+          color="grey"
+          weight="normal"
+        />
         <p>Create a collection</p>
       </div>
       <div class="bg-[#3E2F4C] text-[#F5F5F5] p-6 rounded absolute hidden group-hover:flex z-[100] flex-col gap-5 w-[calc(100vw-16px)] tablet:w-[650px]">

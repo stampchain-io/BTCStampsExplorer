@@ -354,7 +354,6 @@ export function useSRC20Form(
     feeSource,
     isUsingFallback,
     lastGoodDataAge,
-    formState.BTCPrice,
   ]);
 
   function validateFormState(

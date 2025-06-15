@@ -5,6 +5,7 @@ import { SRC20Row } from "$globals";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { Timeframe } from "$components/layout/types.ts";
 import { cellAlign } from "$components/layout/types.ts";
+import { _Icon } from "$icon";
 
 /* ===== HELPER FUNCTIONS ===== */
 function splitTextAndEmojis(text: string): { text: string; emoji: string } {
@@ -105,56 +106,47 @@ const SocialLinks = ({ src20 }: { src20: SRC20Row }) => {
   return (
     <div class="flex gap-2 items-center">
       {src20.email && (
-        <a
+        <Icon
+          type="iconButton"
+          name="email"
+          weight="normal"
+          size="xxs"
+          color="grey"
           href={src20.email}
           target="_blank"
-          class="hover:opacity-80 transition-opacity"
-        >
-          <img
-            width="20px"
-            src="/img/src20/details/EnvelopeSimple.svg"
-            alt="Email"
-          />
-        </a>
+        />
       )}
       {src20.web && (
-        <a
+        <Icon
+          type="iconButton"
+          name="website"
+          weight="normal"
+          size="xxs"
+          color="grey"
           href={src20.web}
           target="_blank"
-          class="hover:opacity-80 transition-opacity"
-        >
-          <img
-            width="20px"
-            src="/img/src20/details/Globe.svg"
-            alt="Website"
-          />
-        </a>
+        />
       )}
       {src20.tg && (
-        <a
+        <Icon
+          type="iconButton"
+          name="telegram"
+          weight="normal"
+          size="xxs"
+          color="grey"
           href={src20.tg}
-          target="_blank"
-          class="hover:opacity-80 transition-opacity"
-        >
-          <img
-            width="20px"
-            src="/img/src20/details/TelegramLogo.svg"
-            alt="Telegram"
-          />
-        </a>
+        />
       )}
       {src20.x && (
-        <a
+        <Icon
+          type="iconButton"
+          name="twitter"
+          weight="normal"
+          size="xxs"
+          color="grey"
           href={src20.x}
           target="_blank"
-          class="hover:opacity-80 transition-opacity"
-        >
-          <img
-            width="20px"
-            src="/img/src20/details/XLogo.svg"
-            alt="X"
-          />
-        </a>
+        />
       )}
     </div>
   );

@@ -39,11 +39,15 @@ export function Setting({
       {open
         ? (
           <>
-            <img
-              class="cursor-pointer absolute top-5 right-2"
-              src="/img/stamp/navigator-close.png"
-              alt="Navigator close"
+            <Icon
+              type="iconButton"
+              name="x"
+              size="smR"
+              color="custom"
+              weight="normal"
+              className="absolute top-5 right-2"
               onClick={() => handleOpen(false)}
+              ariaLabel="Close"
             />
             <p className="text-lg font-black text-[#AA00FF] mb-1">TOOLS</p>
             {filterButtons.map((filter) => (
@@ -64,7 +68,7 @@ export function Setting({
         )
         : (
           <Icon
-            type="iconLink"
+            type="iconButton"
             name="gear"
             weight="bold"
             size="custom"

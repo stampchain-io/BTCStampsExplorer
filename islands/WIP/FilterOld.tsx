@@ -190,7 +190,7 @@ export function FilterOld({
           )
           : (
             <Icon
-              type="iconLink"
+              type="iconButton"
               name="filter"
               weight="bold"
               size="custom"

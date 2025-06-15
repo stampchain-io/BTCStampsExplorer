@@ -5,6 +5,7 @@ import { SRC20Row } from "$globals";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { labelSm, textSm } from "$text";
+import { Icon } from "$icon";
 
 /* ===== HELPER FUNCTIONS ===== */
 function splitTextAndEmojis(text: string): { text: string; emoji: string } {
@@ -89,27 +90,48 @@ export function SRC20CardBase(
             <div class="flex gap-2">
               {/* ===== SOCIAL ICONS ===== */}
               {src20.email != null && (
-                <a href={src20.email} target="_blank">
-                  <img
-                    width="20px"
-                    src="/img/src20/details/EnvelopeSimple.svg"
-                  />
-                </a>
+                <Icon
+                  type="iconButton"
+                  name="email"
+                  weight="normal"
+                  size="xxs"
+                  color="grey"
+                  href={src20.email}
+                  target="_blank"
+                />
               )}
               {src20.web != null && (
-                <a href={src20.web} target="_blank">
-                  <img width="20px" src="/img/src20/details/Globe.svg" />
-                </a>
+                <Icon
+                  type="iconButton"
+                  name="website"
+                  weight="normal"
+                  size="xxs"
+                  color="grey"
+                  href={src20.web}
+                  target="_blank"
+                />
               )}
               {src20.tg != null && (
-                <a href={src20.tg} target="_blank">
-                  <img width="20px" src="/img/src20/details/TelegramLogo.svg" />
-                </a>
+                <Icon
+                  type="iconButton"
+                  name="telegram"
+                  weight="normal"
+                  size="xxs"
+                  color="grey"
+                  href={src20.tg}
+                  target="_blank"
+                />
               )}
               {src20.x != null && (
-                <a href={src20.x} target="_blank">
-                  <img width="20px" src="/img/src20/details/XLogo.svg" />
-                </a>
+                <Icon
+                  type="iconButton"
+                  name="twitter"
+                  weight="normal"
+                  size="xxs"
+                  color="grey"
+                  href={src20.x}
+                  target="_blank"
+                />
               )}
             </div>
           </h5>

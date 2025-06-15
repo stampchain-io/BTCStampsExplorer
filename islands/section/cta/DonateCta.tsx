@@ -375,7 +375,7 @@ export default function DonateCta() {
                 onMouseLeave={handleReceiveMouseLeave}
               >
                 <Icon
-                  type="iconLink"
+                  type="iconButton"
                   name="donate"
                   weight="normal"
                   size="sm"
