@@ -1,0 +1,80 @@
+# Performance Optimization PRD - BTCStampsExplorer Client-Side Resource Consumption
+
+## Project Overview
+Optimize BTCStampsExplorer to reduce client-side resource consumption while maintaining all existing functionality and visual appearance. Users report high browser resource usage when the application window is open.
+
+## Problem Statement
+Users experience high CPU/GPU usage and battery drain when BTCStampsExplorer is open in their browser, even when not actively interacting with the site. Analysis has identified several resource-intensive operations running continuously.
+
+## Technical Requirements
+
+### Critical Performance Issues (Phase 1)
+1. **Infinite Skeleton Animation Optimization**
+   - Stop shimmer animations when loading completes
+   - Pause animations when elements are not in viewport
+   - Maintain visual loading states and user experience
+   - Implement Page Visibility API to pause when tab is inactive
+
+2. **localStorage Polling Optimization**
+   - Replace 1-second localStorage polling in UploadImageTable
+   - Implement event-driven wallet state management
+   - Maintain real-time wallet connection status
+   - Preserve all existing wallet functionality
+
+3. **Animation Performance Controls**
+   - Add animation-play-state controls for CSS animations
+   - Implement intersection observer for viewport-based animation control
+   - Maintain smooth visual transitions and loading states
+
+### Moderate Performance Issues (Phase 2)
+4. **Fee Polling Consolidation**
+   - Create global fee state management service
+   - Eliminate duplicate fee polling across components
+   - Maintain real-time fee updates for all components
+   - Preserve existing fee calculation accuracy
+
+5. **Auto-Refresh Optimization**
+   - Implement smart refresh for StampSales component
+   - Pause auto-refresh when page is not visible
+   - Add user activity detection
+   - Maintain real-time sales data updates
+
+6. **GPU Optimization**
+   - Consolidate multiple gradient background layers
+   - Optimize CSS compositing layers
+   - Maintain exact visual appearance
+   - Preserve all gradient effects
+
+### Performance Monitoring (Phase 3)
+7. **Performance Tracking Implementation**
+   - Add performance monitoring and metrics
+   - Implement resource usage tracking
+   - Create performance regression detection
+   - Add user-facing performance indicators
+
+## Technical Constraints
+- **Zero Functionality Loss**: All existing features must work identically
+- **Visual Consistency**: Maintain exact visual appearance and animations
+- **Fresh Framework**: Work within Deno Fresh 2.3.1 architecture
+- **Preact Compatibility**: Ensure all optimizations work with Preact islands
+- **Cloudflare Integration**: Consider existing Cloudflare optimizations
+
+## Success Criteria
+- Reduce idle CPU usage by 70%+ when tab is inactive
+- Eliminate unnecessary polling and continuous operations
+- Maintain sub-100ms response times for all user interactions
+- Pass all existing functionality tests
+- Zero visual regression in UI/UX
+
+## Implementation Strategy
+- Implement changes incrementally with testing at each phase
+- Use feature flags for gradual rollout if needed
+- Maintain backward compatibility
+- Focus on highest-impact, lowest-risk changes first
+
+## Testing Requirements
+- Performance benchmarking before and after changes
+- Cross-browser compatibility testing
+- Mobile device performance testing
+- User acceptance testing for functionality preservation
+- Automated regression testing for visual consistency 
