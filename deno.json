@@ -56,6 +56,8 @@
     "test:src20:watch": "deno test --allow-net tests/src20/createTransaction.test.ts tests/src20/api-compatibility.ts tests/src20/performance.test.ts --no-check --allow-read --allow-env --allow-write --watch",
     "test:fees": "deno test --allow-net tests/fee-fallback.test.ts tests/quicknode-fees.test.ts tests/redis-fee-system.test.ts --no-check --allow-read --allow-env --allow-write",
     "test:fees:watch": "deno test --allow-net tests/fee-fallback.test.ts tests/quicknode-fees.test.ts tests/redis-fee-system.test.ts --no-check --allow-read --allow-env --allow-write --watch",
+    "test:fee-signal": "deno test tests/unit/feeSignal.test.ts tests/unit/useFees.test.tsx tests/integration/feeInfiniteLoopPrevention.test.ts --no-check --allow-env",
+    "test:fee-signal:watch": "deno test tests/unit/feeSignal.test.ts tests/unit/useFees.test.tsx tests/integration/feeInfiniteLoopPrevention.test.ts --no-check --allow-env --watch",
     "test:redis-fees": "deno test --allow-net tests/redis-fee-system.test.ts --no-check --allow-read --allow-env --allow-write",
     "test:redis-fees:watch": "deno test --allow-net tests/redis-fee-system.test.ts --no-check --allow-read --allow-env --allow-write --watch",
     "test:security": "deno test --allow-net tests/fee-security.test.ts --no-check --allow-read --allow-env --allow-write",
