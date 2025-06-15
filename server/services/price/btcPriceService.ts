@@ -252,7 +252,7 @@ export class BTCPriceService {
    */
   static invalidateCache(): Promise<void> {
     try {
-      return dbManager.invalidateCache(this.CACHE_KEY)
+      return dbManager.invalidateCacheByPattern(this.CACHE_KEY)
         .then(() => {
           console.log("[BTCPriceService] BTC price cache invalidated");
         });
