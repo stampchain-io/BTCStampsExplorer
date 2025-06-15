@@ -138,7 +138,13 @@ Deno.test("BTCPriceService - Core Functionality", async (t) => {
     );
 
     // Check source types
-    const validSources = ["quicknode", "coingecko", "cached", "default"];
+    const validSources = [
+      "quicknode",
+      "coingecko",
+      "binance",
+      "cached",
+      "default",
+    ];
     assert(
       validSources.includes(priceData.source),
       `Source should be one of ${validSources.join(", ")}`,
