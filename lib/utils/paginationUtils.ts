@@ -15,8 +15,12 @@ export function getPaginationParams(
   }
 
   const prefix = type ? `${type}_` : "";
-  const limit = Number(url.searchParams.get(`${prefix}limit`)) || defaultLimit;
-  const page = Number(url.searchParams.get(`${prefix}page`)) || 1;
+  const limitParam = url.searchParams.get(`${prefix}limit`);
+  const pageParam = url.searchParams.get(`${prefix}page`);
+
+  // Parse parameters, but don't apply defaults yet
+  const limit = limitParam ? Number(limitParam) : defaultLimit;
+  const page = pageParam ? Number(pageParam) : 1;
 
   // Validate numeric parameters
   if (isNaN(limit) || limit < 1) {

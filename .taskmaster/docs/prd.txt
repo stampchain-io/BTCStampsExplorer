@@ -1,0 +1,84 @@
+# Redis Caching Issues Fix - Product Requirements Document
+
+## Project Overview
+Fix critical Redis caching implementation issues in the BTCStampsExplorer Deno Fresh application that prevent proper caching of data containing BigInt values and ensure proper handling of zero-duration cache configurations.
+
+## Problem Statement
+The current Redis caching implementation in `server/database/databaseManager.ts` has two main issues:
+
+1. **BigInt Serialization Issue**: The `setCachedData()` method uses plain `JSON.stringify(data)` which throws TypeError when data contains BigInt values, preventing caching and causing fallback to in-memory cache only.
+
+2. **Zero Expiry Configuration**: While the code correctly handles zero-duration cache configurations by skipping Redis SET operations, this needs verification and potential optimization.
+
+## Technical Requirements
+
+### Core Issues to Address
+1. **BigInt Serialization Fix**
+   - Replace `JSON.stringify(data)` with `jsonStringifyWithBigInt(data)` in `setCachedData()`
+   - Import and use existing `bigIntSerializer` from `$lib/utils/formatUtils.ts`
+   - Ensure BigInt values are properly serialized as strings for Redis storage
+   - Maintain backward compatibility with existing cached data
+
+2. **Zero Duration Cache Handling**
+   - Verify current implementation correctly handles RouteType configurations with duration: 0
+   - Ensure DYNAMIC, STAMP_DISPENSER, STAMP_DISPENSE, STAMP_SEND routes work properly
+   - Optimize performance by avoiding unnecessary serialization attempts for zero-duration caches
+
+3. **Error Handling and Logging**
+   - Improve error messages for serialization failures
+   - Add specific logging for BigInt serialization issues
+   - Ensure graceful fallback to in-memory cache when Redis operations fail
+
+### Technical Stack
+- **Framework**: Deno Fresh 2.3.1
+- **Database**: MySQL with Redis caching layer
+- **Cache**: Redis (AWS ElastiCache) with in-memory fallback
+- **Language**: TypeScript
+
+### Files to Modify
+- `server/database/databaseManager.ts` - Main Redis caching implementation
+- `lib/utils/formatUtils.ts` - BigInt serialization utilities (already exists)
+- Potentially affected services that cache BigInt data:
+  - PSBT services (`server/services/*/psbt/*.ts`)
+  - Transaction services
+  - Any service using BigInt values in cached responses
+
+### Testing Requirements
+1. **Unit Tests**
+   - Test BigInt serialization/deserialization in Redis cache
+   - Test zero-duration cache configuration handling
+   - Test error handling for malformed BigInt data
+
+2. **Integration Tests**
+   - Test caching behavior with real BigInt data from PSBT operations
+   - Verify fallback behavior when Redis is unavailable
+   - Test cache invalidation with BigInt-containing data
+
+3. **Performance Tests**
+   - Measure serialization performance impact
+   - Verify cache hit/miss rates remain optimal
+   - Test memory usage with BigInt serialization
+
+## Success Criteria
+1. BigInt values can be successfully cached and retrieved from Redis
+2. Zero-duration cache configurations work without errors
+3. No regression in caching performance or functionality
+4. Proper error handling and logging for cache operations
+5. All existing tests pass
+6. New tests cover BigInt serialization scenarios
+
+## Implementation Priority
+**High Priority** - This affects core caching functionality and could impact application performance and reliability.
+
+## Dependencies
+- Existing `formatUtils.ts` BigInt serialization utilities
+- Redis connection and configuration
+- Database manager caching infrastructure
+
+## Acceptance Criteria
+- [ ] BigInt values are properly serialized when caching to Redis
+- [ ] Zero-duration cache routes continue to work correctly
+- [ ] Error handling gracefully manages serialization failures
+- [ ] Performance impact is minimal (< 5% overhead)
+- [ ] All existing functionality remains intact
+- [ ] Comprehensive test coverage for new functionality 

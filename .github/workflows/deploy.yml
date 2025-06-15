@@ -92,160 +92,165 @@ jobs:
                "https://api.github.com/repos/${{ github.repository }}" | jq -r '.permissions // empty'
           echo "Token validation complete"
 
-      - name: Install reviewdog
-        uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest
-
-      - name: Run reviewdog
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Run Deno format check with PR annotations
+      - name: Deno Format Check with Annotations
+        if: github.event_name == 'pull_request'
         run: |
-          # Enable debug output and error handling
-          set -x
-          set -e
+          # Run deno fmt check and capture output
+          deno fmt --check 2>&1 | tee fmt-output.txt || true
           
-          # Function to cleanup on error
-          # shellcheck disable=SC2317
-          cleanup() {
-            echo "Error occurred. Cleaning up..."
-            pkill -f reviewdog || true
-            exit 1
-          }
-          trap cleanup ERR
-          
-          # Set timeout for each reviewdog process
-          timeout_duration=60  # Increased timeout
-          
-          # Debug: Show environment
-          echo "Current directory: $(pwd)"
-          echo "Files in scripts directory:"
-          ls -la ./scripts/
-          
-          # Error handling function
-          # shellcheck disable=SC2317
-          error() {
-            echo "ERROR: $*" >&2
-            exit 1
-          }
-
-          # Function to process files in batches with rate limit handling
-          process_files() {
-            local check_type=$1
-            local batch_size=3  # Minimal batch size for stability
-            local batch_num=1
-            local retry_delay=15  # Retry delay for rate limits
-            local max_files=30   # Further reduced file limit for testing
+          # Parse output and create annotations
+          if grep -q "Found" fmt-output.txt; then
+            echo "::group::Format Issues Found"
+            cat fmt-output.txt
+            echo "::endgroup::"
             
-            # Create temporary directory
-            temp_dir=$(mktemp -d) || error "Failed to create temp directory"
-            trap 'rm -rf "$temp_dir"' EXIT
-            
-            # Use shell globbing for file discovery
-            shopt -s globstar nullglob
-            local files=()
-            
-            if [ "$check_type" = "fmt" ]; then
-              while IFS= read -r -d $'\0' file; do
-                [[ "$file" == *"/node_modules/"* ]] && continue
-                [[ "$file" == *"/_fresh/"* ]] && continue
-                [[ "$file" == */dist/* ]] && continue
-                [[ "$file" == */.git/* ]] && continue
-                files+=("$file")
-              done < <(find . -maxdepth 3 -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -print0)
-            else
-              while IFS= read -r -d $'\0' file; do
-                [[ "$file" == *"/node_modules/"* ]] && continue
-                [[ "$file" == *"/_fresh/"* ]] && continue
-                [[ "$file" == */dist/* ]] && continue
-                [[ "$file" == */.git/* ]] && continue
-                files+=("$file")
-              done < <(find . -maxdepth 3 -type f \( -name "*.ts" -o -name "*.tsx" \) -print0)
-            fi
-            
-            # Get total files and limit if needed
-            total_files=${#files[@]}
-            if [ "$total_files" -gt "$max_files" ]; then
-              total_files=$max_files
-            fi
-            
-            # Process files in batches
-            for ((i = 0; i < total_files; i += batch_size)); do
-              echo "Processing $check_type batch $batch_num..."
-              
-              # Create batch directory
-              batch_dir="$temp_dir/batch_$batch_num"
-              mkdir -p "$batch_dir"
-              
-              # Process current batch
-              for ((j = i; j < i + batch_size && j < total_files; j++)); do
-                file="${files[$j]}"
-                if [ -f "$file" ]; then
-                  out_file="$batch_dir/$(basename "$file").out"
-                  if [ "$check_type" = "fmt" ]; then
-                    deno fmt --check "$file" > "$out_file" 2>&1 || true
-                  else
-                    deno lint --json "$file" > "$out_file" 2>&1 || true
-                  fi
-                fi
-              done
-              
-              # Combine batch outputs
-              {
-                for f in "$batch_dir"/*.out; do
-                  [ -f "$f" ] && cat "$f"
-                done
-              } | ./scripts/transform-deno-output.sh "$check_type" > "$temp_dir/${check_type}_${batch_num}.json"
-              
-              # Run reviewdog on batch with retries
-              if [ -s "$temp_dir/${check_type}_${batch_num}.json" ]; then
-                local attempts=0
-                local max_attempts=3
-                
-                while [ $attempts -lt $max_attempts ]; do
-                  echo "Running reviewdog on ${check_type} batch $batch_num (attempt $((attempts + 1)))..."
-                  
-                  if timeout $timeout_duration reviewdog \
-                    -f=rdjson \
-                    -name="${check_type}" \
-                    -reporter=github-pr-review \
-                    < "$temp_dir/${check_type}_${batch_num}.json"; then
-                    break  # Success, exit retry loop
-                  else
-                    local exit_code=$?
-                    # Check if it's a rate limit error
-                    if grep -q "API rate limit exceeded" "$temp_dir/${check_type}_${batch_num}.json"; then
-                      echo "Rate limit exceeded. Waiting ${retry_delay} seconds before retry..."
-                      sleep $retry_delay
-                      retry_delay=$((retry_delay * 2))  # Exponential backoff
-                    else
-                      echo "Error running reviewdog (exit code: $exit_code)"
-                      break  # Exit on non-rate-limit errors
-                    fi
-                  fi
-                  ((attempts++))
-                done
+            # Extract file paths and create problem matchers
+            grep -E "^\s+\S+\.(ts|tsx|js|jsx)" fmt-output.txt | while read -r file; do
+              file=$(echo "$file" | xargs)  # Trim whitespace
+              if [ -f "$file" ]; then
+                echo "::error file=$file,title=Format Issue::File needs formatting. Run 'deno fmt' to fix."
               fi
-              
-              # Cleanup batch files
-              rm -rf "$batch_dir"
-              rm -f "$temp_dir/${check_type}_${batch_num}.json"
-              
-              ((batch_num++))
-              
-              # Add a small delay between batches to avoid rate limiting
-              sleep 5
             done
-          }
-          
-          # Process fmt and lint separately
-          echo "Starting fmt checks..."
-          process_files fmt
-          
-          echo "Starting lint checks..."
-          process_files lint
+          fi
 
-          exit 0
+      # Run Deno lint with detailed output
+      - name: Deno Lint Check with Annotations
+        if: github.event_name == 'pull_request'
+        run: |
+          # Run deno lint and capture JSON output
+          deno lint --json 2>&1 | tee lint-output.json || true
+          
+          # Check if we have valid JSON output
+          if [ -s lint-output.json ] && jq empty lint-output.json 2>/dev/null; then
+            # Parse JSON and create annotations
+            jq -r '.diagnostics[]? | 
+              "::error file=\(.filename),line=\(.range.start.line),col=\(.range.start.col),title=\(.code)::\(.message)"' \
+              lint-output.json || true
+              
+            # Also show a summary
+            error_count=$(jq '.diagnostics | length' lint-output.json 2>/dev/null || echo "0")
+            if [ "$error_count" -gt 0 ]; then
+              echo "::warning::Found $error_count linting issue(s)"
+            fi
+          else
+            # Fallback to text output if JSON fails
+            deno lint 2>&1 | tee lint-output.txt || true
+            echo "::group::Lint Issues"
+            cat lint-output.txt
+            echo "::endgroup::"
+          fi
+
+      # Create a summary comment for PR
+      - name: Create PR Comment with Issues
+        if: github.event_name == 'pull_request' && (steps.fmtcheck.outcome == 'failure' || steps.lintcheck.outcome == 'failure')
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            let comment = '## 🔍 Code Quality Check Results\n\n';
+            
+            // Check format issues
+            if ('${{ steps.fmtcheck.outcome }}' === 'failure') {
+              comment += '### ❌ Format Issues Found\n\n';
+              comment += 'Run `deno fmt` to automatically fix formatting issues.\n\n';
+              
+              try {
+                const fmtOutput = fs.readFileSync('fmt-output.txt', 'utf8');
+                const files = fmtOutput.match(/^\s+\S+\.(ts|tsx|js|jsx)$/gm);
+                if (files && files.length > 0) {
+                  comment += '<details><summary>Files needing formatting (' + files.length + ')</summary>\n\n';
+                  comment += '```\n';
+                  files.forEach(file => {
+                    comment += file.trim() + '\n';
+                  });
+                  comment += '```\n</details>\n\n';
+                }
+              } catch (e) {
+                console.log('Could not read format output');
+              }
+            } else {
+              comment += '### ✅ Format Check Passed\n\n';
+            }
+            
+            // Check lint issues
+            if ('${{ steps.lintcheck.outcome }}' === 'failure') {
+              comment += '### ❌ Lint Issues Found\n\n';
+              
+              try {
+                const lintOutput = fs.readFileSync('lint-output.json', 'utf8');
+                const lintData = JSON.parse(lintOutput);
+                
+                if (lintData.diagnostics && lintData.diagnostics.length > 0) {
+                  // Group by file
+                  const byFile = {};
+                  lintData.diagnostics.forEach(diag => {
+                    if (!byFile[diag.filename]) {
+                      byFile[diag.filename] = [];
+                    }
+                    byFile[diag.filename].push(diag);
+                  });
+                  
+                  comment += '<details><summary>Lint issues by file</summary>\n\n';
+                  
+                  Object.entries(byFile).forEach(([file, issues]) => {
+                    comment += `**${file}** (${issues.length} issue${issues.length > 1 ? 's' : ''})\n\n`;
+                    issues.forEach(issue => {
+                      const line = issue.range.start.line;
+                      const col = issue.range.start.col;
+                      comment += `- Line ${line}:${col} - \`${issue.code}\`: ${issue.message}\n`;
+                    });
+                    comment += '\n';
+                  });
+                  
+                  comment += '</details>\n\n';
+                }
+              } catch (e) {
+                // Fallback to text output
+                try {
+                  const lintText = fs.readFileSync('lint-output.txt', 'utf8');
+                  comment += '<details><summary>Lint output</summary>\n\n```\n';
+                  comment += lintText.substring(0, 3000); // Limit size
+                  if (lintText.length > 3000) {
+                    comment += '\n... (truncated)';
+                  }
+                  comment += '\n```\n</details>\n\n';
+                } catch (e2) {
+                  console.log('Could not read lint output');
+                }
+              }
+            } else {
+              comment += '### ✅ Lint Check Passed\n\n';
+            }
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Code Quality Check Results')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
 
       - name: Actionlint
         id: actionlint
@@ -253,7 +258,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-check
-          fail_on_error: false
+          fail_level: error
           filter_mode: nofilter
         continue-on-error: true
 
@@ -271,10 +276,22 @@ jobs:
         run: |
           echo "Running unit tests with coverage..."
           mkdir -p coverage
-          deno test --coverage=coverage/ tests/unit/ --no-check || true
+          deno test --coverage=coverage/ tests/unit/ --no-check --allow-env
           echo "Generating coverage summary..."
-          deno coverage coverage/ || true
-        continue-on-error: true
+          deno coverage coverage/
+          echo "Generating LCOV report for Codecov..."
+          deno coverage coverage/ --lcov > coverage.lcov
+
+      # Upload coverage to Codecov
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: stampchain-io/BTCStampsExplorer
+          files: ./coverage.lcov
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
 
       # Commented out for future implementation
       # - name: Type check

@@ -3,7 +3,11 @@ description: "Guidelines for API documentation (OpenAPI, Redocly, Swagger), vali
 globs: ["schema.yml", "*.md", "swagger.js", ".redocly.yaml", "dredd.yml"]
 alwaysApply: false
 ---
-
+---
+description: "Guidelines for API documentation (OpenAPI, Redocly, Swagger), validation tasks, and documentation formats."
+globs: ["schema.yml", "*.md", "swagger.js", ".redocly.yaml", "postman-collection*.json"]
+alwaysApply: true
+---
 
 # Documentation patterns
 documentation:
@@ -14,7 +18,7 @@ documentation:
     generation_script: "deno task docs"
   validation:
     - validate_schema: "deno task validate:schema"
-    - run_dredd_tests: "deno task dredd"
+    - run_newman_tests: "deno task test:api"
   formats:
     - markdown
     - yaml
