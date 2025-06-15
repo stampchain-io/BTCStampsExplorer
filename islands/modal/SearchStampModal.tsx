@@ -256,12 +256,12 @@ export function SearchStampModal({
     <div className="relative">
       {showButton && (
         <Icon
-          type="iconLink"
+          type="iconButton"
           name="search"
           weight="bold"
-          size="custom"
+          size="smR"
           color="purple"
-          className="mt-[7px] w-[23px] h-[23px] tablet:w-5 tablet:h-5"
+          className="mt-[7px]"
           onClick={() => {
             handleOpenSearch();
             setIsTooltipVisible(false);
@@ -348,8 +348,8 @@ function SearchContent({
           color="custom"
           className={`w-5 h-5 ${
             searchState.value.error
-              ? "fill-stamp-grey-light"
-              : "fill-stamp-grey"
+              ? "stroke-stamp-grey-light"
+              : "stroke-stamp-grey"
           }`}
         />
       </div>

@@ -7,7 +7,7 @@ interface MetaTagsProps {
 export function MetaTags({
   title = "Bitcoin Stamps",
   description = "Unprunable UTXO Art, Because Sats Don't Exist",
-  image = "/img/stamp.jpg",
+  image = "/img/logo/stampchain-logo-opengraph.jpg",
 }: MetaTagsProps) {
   return (
     <>
@@ -20,8 +20,16 @@ export function MetaTags({
       <meta name="author" content="Stampchain.io" />
 
       {/* Icons */}
-      <link rel="icon" type="image/jpeg" href="/img/icon.jpg" sizes="any" />
-      <link rel="apple-touch-icon" href="/img/icon.jpg" />
+      <link
+        rel="icon"
+        type="image/jpeg"
+        href="/img/logo/stampchain-logo-favicon.jpg"
+        sizes="any"
+      />
+      <link
+        rel="apple-touch-icon"
+        href="/img/logo/stampchain-logo-favicon.jpg"
+      />
       <link rel="canonical" href="https://stampchain.io" />
 
       {/* OpenGraph tags */}

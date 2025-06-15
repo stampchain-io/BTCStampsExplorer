@@ -54,12 +54,12 @@ export function FilterButton(
     <div class="group relative">
       <BadgeIcon text={count !== undefined ? count.toString() : ""} />
       <Icon
-        type="iconLink"
+        type="iconButton"
         name="filter"
         weight="bold"
-        size="custom"
+        size="smR"
         color="purple"
-        className="mt-[6px] w-[23px] h-[23px] tablet:w-[21px] tablet:h-[21px] group-hover:fill-stamp-purple-bright transition-all duration-300"
+        className="mt-[6px] group-hover:stroke-stamp-purple-bright transition-all duration-300"
         onClick={() => {
           setOpen(!open);
           setIsTooltipVisible(false);
