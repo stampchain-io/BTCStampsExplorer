@@ -130,18 +130,22 @@ Deno.test("constants - API base URLs", () => {
 });
 
 Deno.test("constants - image paths", () => {
-  assertEquals(AUDIO_FILE_IMAGE, "/icon/stamp-audio.svg", "Audio file image");
+  assertEquals(
+    AUDIO_FILE_IMAGE,
+    "/img/placeholder/stamp-audio.svg",
+    "Audio file image",
+  );
   assertEquals(
     LIBRARY_FILE_IMAGE,
-    "/icon/stamp-library.svg",
+    "/img/placeholder/stamp-library.svg",
     "Library file image",
   );
   assertEquals(
     NOT_AVAILABLE_IMAGE,
-    "/icon/stamp-no-image.svg",
+    "/img/placeholder/stamp-no-image.svg",
     "Not available image",
   );
-  assertEquals(ERROR_IMAGE, "/icon/stamp-error.svg", "Error image");
+  assertEquals(ERROR_IMAGE, "/img/placeholder/stamp-error.svg", "Error image");
 
   // Verify all are SVG files
   assert(AUDIO_FILE_IMAGE.endsWith(".svg"), "Audio image is SVG");
