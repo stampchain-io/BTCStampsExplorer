@@ -5,6 +5,8 @@ import { dbManager } from "$server/database/databaseManager.ts";
 
 // Test suite for Redis-based fee system
 Deno.test("Redis Fee System Tests", async (t) => {
+  // Add a small delay between tests to allow any pending HTTP requests to complete
+  const cleanupDelay = () => new Promise((resolve) => setTimeout(resolve, 100));
   await t.step(
     "FeeService.getCacheInfo() returns correct configuration",
     () => {
@@ -46,6 +48,9 @@ Deno.test("Redis Fee System Tests", async (t) => {
       // Verify confidence is valid
       const validConfidence = ["high", "medium", "low"];
       assertEquals(validConfidence.includes(feeData.confidence), true);
+
+      // Allow any pending HTTP requests to complete
+      await cleanupDelay();
     },
   );
 
@@ -331,11 +336,16 @@ Deno.test("Redis Fee System Tests", async (t) => {
     assertEquals(status.retryCount, 0);
 
     console.log("Background fee service test completed");
+
+    // Allow any pending HTTP requests to complete before next test
+    await cleanupDelay();
   });
 });
 
 // Test Redis connection and basic functionality
 Deno.test("Redis Infrastructure Tests", async (t) => {
+  // Add a small delay between tests to allow any pending HTTP requests to complete
+  const cleanupDelay = () => new Promise((resolve) => setTimeout(resolve, 100));
   await t.step("Database manager cache functionality", async () => {
     const testKey = "test_fee_cache_key";
     const testData = { test: "data", timestamp: Date.now() };
@@ -389,5 +399,8 @@ Deno.test("Redis Infrastructure Tests", async (t) => {
         _error instanceof Error ? _error.message : String(_error),
       );
     }
+
+    // Allow any pending HTTP requests to complete
+    await cleanupDelay();
   });
 });
