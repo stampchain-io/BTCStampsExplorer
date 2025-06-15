@@ -31,13 +31,13 @@ export class BitcoinNotificationService {
 
   private static async handleNewBlock(data: BlockNotification) {
     console.log(`Processing new block notification: ${data.blockHeight}`);
-    await dbManager.invalidateCache('last_block');
-    await dbManager.invalidateCache(`block_${data.blockHeight}`);
-    await dbManager.invalidateCache('block_*');
+    await dbManager.invalidateCacheByPattern('last_block');
+    await dbManager.invalidateCacheByPattern(`block_${data.blockHeight}`);
+    await dbManager.invalidateCacheByPattern('block_*');
   }
 
   private static async handlePriceUpdate(data: PriceNotification) {
     console.log(`Processing price update notification: $${data.price}`);
-    await dbManager.invalidateCache('btc_price*');
+    await dbManager.invalidateCacheByPattern('btc_price*');
   }
 } 

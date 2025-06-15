@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import {
   type FeeData,
   feeSignal,
@@ -34,21 +34,44 @@ interface UseFeeResult {
  * Hook for accessing global fee state
  * Uses a single shared polling service for optimal performance
  * Automatically manages subscription lifecycle
+ * Optimized to reduce unnecessary re-renders
  */
 export const useFees = (): UseFeeResult => {
   const [fees, setFees] = useState<FeeData | null>(getCurrentFees());
   const [loading, setLoading] = useState<boolean>(isLoading());
   const [error, setError] = useState<string | null>(getError());
 
+  // Use refs to track previous values and avoid unnecessary updates
+  const prevDataRef = useRef<FeeData | null>(fees);
+  const prevLoadingRef = useRef<boolean>(loading);
+  const prevErrorRef = useRef<string | null>(error);
+
   useEffect(() => {
     // Subscribe to fee updates
     const unsubscribe = subscribeFees();
 
-    // Subscribe to signal changes
+    // Subscribe to signal changes with optimized updates
     const signalUnsubscribe = feeSignal.subscribe((feeState) => {
-      setFees(feeState.data);
-      setLoading(feeState.loading);
-      setError(feeState.error);
+      // Only update fees if the data has actually changed
+      const dataChanged =
+        JSON.stringify(feeState.data) !== JSON.stringify(prevDataRef.current);
+      if (dataChanged) {
+        console.log("[useFees] Fee data changed, updating state");
+        prevDataRef.current = feeState.data;
+        setFees(feeState.data);
+      }
+
+      // Only update loading if it actually changed
+      if (feeState.loading !== prevLoadingRef.current) {
+        prevLoadingRef.current = feeState.loading;
+        setLoading(feeState.loading);
+      }
+
+      // Only update error if it actually changed
+      if (feeState.error !== prevErrorRef.current) {
+        prevErrorRef.current = feeState.error;
+        setError(feeState.error);
+      }
     });
 
     // Cleanup subscriptions
@@ -56,7 +79,7 @@ export const useFees = (): UseFeeResult => {
       unsubscribe();
       signalUnsubscribe();
     };
-  }, []);
+  }, []); // Empty dependency array - only subscribe once
 
   return {
     fees,

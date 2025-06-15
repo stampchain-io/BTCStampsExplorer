@@ -362,8 +362,8 @@ export function StampSendTool({}: Props) {
       );
     }
 
-    const timestamp = Date.now();
-    const stampUrl = `/s/${selectedStamp.tx_hash}?t=${timestamp}`;
+    // Use a stable timestamp based on selectedStamp to prevent infinite re-renders
+    const stampUrl = `/s/${selectedStamp.tx_hash}`;
 
     console.log("Rendering stamp (renderStampContent call):", {
       stamp_id: selectedStamp.stamp,
