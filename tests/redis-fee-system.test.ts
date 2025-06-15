@@ -190,6 +190,9 @@ Deno.test("Redis Fee System Tests", async (t) => {
         error instanceof Error ? error.message : String(error),
       );
     }
+
+    // Allow any pending HTTP requests to complete
+    await cleanupDelay();
   });
 
   await t.step("Redis cache performance test", async () => {
@@ -305,6 +308,9 @@ Deno.test("Redis Fee System Tests", async (t) => {
       results.length,
       "requests",
     );
+
+    // Allow any pending HTTP requests to complete
+    await cleanupDelay();
   });
 
   await t.step("Background fee service functionality", async () => {
@@ -327,6 +333,9 @@ Deno.test("Redis Fee System Tests", async (t) => {
     await BackgroundFeeService.forceWarm(baseUrl);
     console.log("Background service force warm completed");
 
+    // Allow time for any HTTP requests from forceWarm to complete
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     // Test stopping the service
     BackgroundFeeService.stop();
 
@@ -337,8 +346,8 @@ Deno.test("Redis Fee System Tests", async (t) => {
 
     console.log("Background fee service test completed");
 
-    // Allow any pending HTTP requests to complete before next test
-    await cleanupDelay();
+    // Allow any remaining HTTP requests to complete before next test
+    await new Promise((resolve) => setTimeout(resolve, 500));
   });
 });
 
