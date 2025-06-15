@@ -1,5 +1,7 @@
 # BITCOIN STAMPS EXPLORER AND API
 
+[![codecov](https://codecov.io/gh/stampchain-io/btc_stamps/graph/badge.svg?token=OB2OS37L5H)](https://codecov.io/gh/stampchain-io/btc_stamps)
+
 This is the official API and block explorer for
 [Bitcoin Stamps](https://stampchain.io/). It provides a comprehensive interface
 for exploring Bitcoin Stamps transactions and metadata, working in conjunction

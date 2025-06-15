@@ -63,8 +63,8 @@
     "test:performance:watch": "deno test --allow-net tests/fee-performance.test.ts --no-check --allow-read --allow-env --allow-write --watch",
     "test:btc-price": "deno test --allow-net tests/btc-price-caching.test.ts --no-check --allow-read --allow-env --allow-write",
     "test:btc-price:watch": "deno test --allow-net tests/btc-price-caching.test.ts --no-check --allow-read --allow-env --allow-write --watch",
-    "test:unit": "deno test tests/unit/ --no-check",
-    "test:unit:coverage": "mkdir -p coverage && deno test --coverage=coverage/ tests/unit/ --no-check && deno coverage coverage/",
+    "test:unit": "deno test tests/unit/ --no-check --allow-env",
+    "test:unit:coverage": "mkdir -p coverage && deno test --coverage=coverage/ tests/unit/ --no-check --allow-env && deno coverage coverage/",
     "analyze:types": "deno run --allow-run --allow-write scripts/analyze-type-errors.ts"
   },
   "lint": {
