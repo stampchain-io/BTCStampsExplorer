@@ -108,10 +108,19 @@ export class FeeSecurityService {
       }
     }
 
-    // Determine action based on risk level
+    // Determine action based on risk level and source type
     let action: SecurityValidationResult["action"] = "allow";
-    if (riskLevel === "high" || riskLevel === "critical") {
-      action = "block";
+    
+    // Be more lenient with fallback sources to prevent infinite loops
+    const isFallbackSource = feeData?.fallbackUsed === true || 
+                            source === "default" || 
+                            source === "cached" ||
+                            source === "quicknode";
+    
+    if (riskLevel === "critical") {
+      action = "block"; // Always block critical issues
+    } else if (riskLevel === "high") {
+      action = isFallbackSource ? "warn" : "block"; // Allow fallback sources with warnings
     } else if (riskLevel === "medium") {
       action = "warn";
     }
@@ -317,7 +326,12 @@ export class FeeSecurityService {
    * Detect suspicious patterns in fee data
    */
   private static detectSuspiciousPatterns(feeData: any, source: string): boolean {
-    // Check for impossible fee combinations
+    // Skip suspicious pattern detection for fallback sources to prevent infinite loops
+    if (feeData.fallbackUsed === true || source === "default" || source === "cached") {
+      return false; // Allow fallback data without suspicion checks
+    }
+
+    // Check for impossible fee combinations (only if all fees are defined)
     if (feeData.fastestFee && feeData.halfHourFee && feeData.hourFee) {
       if (
         feeData.fastestFee < feeData.halfHourFee ||
@@ -327,8 +341,17 @@ export class FeeSecurityService {
       }
     }
 
-    // Check for repeated identical values (possible static/fake data)
-    if (feeData.fastestFee === feeData.halfHourFee && feeData.halfHourFee === feeData.hourFee) {
+    // Check for repeated identical values (only if all fees are defined and non-zero)
+    if (
+      feeData.fastestFee && 
+      feeData.halfHourFee && 
+      feeData.hourFee &&
+      feeData.fastestFee > 0 &&
+      feeData.halfHourFee > 0 &&
+      feeData.hourFee > 0 &&
+      feeData.fastestFee === feeData.halfHourFee && 
+      feeData.halfHourFee === feeData.hourFee
+    ) {
       return true; // All fees identical (suspicious)
     }
 

@@ -104,6 +104,7 @@ const fetchFees = async (retryCount = 0): Promise<void> => {
   const startTime = Date.now();
 
   // Set loading state
+  console.log("[feeSignal] Setting loading state", { retryCount });
   feeSignal.value = {
     ...feeSignal.value,
     loading: true,
@@ -156,6 +157,11 @@ const fetchFees = async (retryCount = 0): Promise<void> => {
       // Primary caching is now handled by Redis on the server side
       saveFeeDataToStorage(fullFeeData);
 
+      console.log("[feeSignal] Setting successful fee data", {
+        recommendedFee: fullFeeData.recommendedFee,
+        btcPrice: fullFeeData.btcPrice,
+        source: fullFeeData.source,
+      });
       feeSignal.value = {
         data: fullFeeData,
         loading: false,
@@ -245,6 +251,11 @@ const fetchFees = async (retryCount = 0): Promise<void> => {
       console.log("[feeSignal] Using static emergency fallback data");
     }
 
+    console.log("[feeSignal] Setting fallback data", {
+      source: fallbackData.source,
+      recommendedFee: fallbackData.recommendedFee,
+      btcPrice: fallbackData.btcPrice,
+    });
     feeSignal.value = {
       data: fallbackData,
       loading: false,
@@ -355,6 +366,7 @@ export const getLastGoodDataAge = (): number | null => {
 
 // Force refresh with fallback handling
 export const forceRefreshFees = (): Promise<void> => {
+  console.log("[feeSignal] Force refresh requested");
   // Reset retry count and try fresh fetch
   feeSignal.value = {
     ...feeSignal.value,

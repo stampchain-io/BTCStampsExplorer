@@ -180,6 +180,8 @@ export class BTCPriceService {
       );
       
       if (!response.ok) {
+        // Consume the response body to prevent resource leak
+        await response.text();
         console.error(`[BTCPriceService] CoinGecko API error: ${response.status} ${response.statusText}`);
         throw new Error(`CoinGecko API returned ${response.status}`);
       }
@@ -210,6 +212,8 @@ export class BTCPriceService {
       );
       
       if (!response.ok) {
+        // Consume the response body to prevent resource leak
+        await response.text();
         console.error(`[BTCPriceService] Binance API error: ${response.status} ${response.statusText}`);
         throw new Error(`Binance API returned ${response.status}`);
       }
@@ -252,7 +256,7 @@ export class BTCPriceService {
    */
   static invalidateCache(): Promise<void> {
     try {
-      return dbManager.invalidateCache(this.CACHE_KEY)
+      return dbManager.invalidateCacheByPattern(this.CACHE_KEY)
         .then(() => {
           console.log("[BTCPriceService] BTC price cache invalidated");
         });

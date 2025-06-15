@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import axiod from "axiod";
 import { useConfig } from "$client/hooks/useConfig.ts";
@@ -231,6 +231,7 @@ export function useSRC20Form(
     lastGoodDataAge,
     forceRefresh,
   } = useFees();
+  const { wallet } = walletContext;
   const [apiError, setApiError] = useState<string>("");
 
   const [formState, setFormState] = useState<SRC20FormState>({
@@ -273,20 +274,32 @@ export function useSRC20Form(
     } | null
   >(null);
 
-  const { wallet } = walletContext;
+  // Separate state to track user vs automatic fee changes
+  const [userFee, setUserFee] = useState<number | null>(null);
+  // Separate state to track BTC price to avoid circular dependency
+  const [lastValidBTCPrice, setLastValidBTCPrice] = useState<number>(0);
+
+  // Memoize the fee data to prevent object reference changes
+  const memoizedFeeData = useMemo(() => {
+    if (!fees) return null;
+    return {
+      recommendedFee: fees.recommendedFee,
+      btcPrice: fees.btcPrice,
+    };
+  }, [fees?.recommendedFee, fees?.btcPrice]);
 
   useEffect(() => {
-    if (fees && !feesLoading) {
+    if (memoizedFeeData && !feesLoading) {
       logger.debug("ui", {
         message: "useSRC20Form: Updating fee and BTCPrice from fee signal",
-        data: fees,
-        feeSource,
-        isUsingFallback,
-        lastGoodDataAge,
+        data: memoizedFeeData,
+        feeSource: feeSource.source,
+        isUsingFallback: isUsingFallback,
+        lastGoodDataAge: lastGoodDataAge,
       });
 
-      const recommendedFee = Math.round(fees.recommendedFee);
-      const currentBtcPrice = fees.btcPrice;
+      const recommendedFee = Math.round(memoizedFeeData.recommendedFee);
+      const currentBtcPrice = memoizedFeeData.btcPrice;
 
       // Apply component-level fallbacks if needed
       let finalFee = recommendedFee;
@@ -309,18 +322,21 @@ export function useSRC20Form(
 
       // If BTC price is invalid, keep previous value or use 0
       if (currentBtcPrice <= 0) {
-        finalBtcPrice = formState.BTCPrice > 0 ? formState.BTCPrice : 0;
+        finalBtcPrice = lastValidBTCPrice > 0 ? lastValidBTCPrice : 0;
         logger.warn("ui", {
           message:
             "useSRC20Form: BTC price unavailable, keeping previous value",
           currentPrice: currentBtcPrice,
           fallbackPrice: finalBtcPrice,
         });
+      } else {
+        // Update last valid BTC price when we have a valid one
+        setLastValidBTCPrice(currentBtcPrice);
       }
 
       setFormState((prev) => ({
         ...prev,
-        fee: finalFee,
+        fee: userFee !== null ? userFee : finalFee, // Use userFee if set, otherwise use signal fee
         BTCPrice: finalBtcPrice,
         feeError,
       }));
@@ -335,7 +351,7 @@ export function useSRC20Form(
           fee: finalFee,
         });
       }
-    } else if (!feesLoading && !fees) {
+    } else if (!feesLoading && !memoizedFeeData) {
       // Complete fallback when no fee data is available
       logger.warn("ui", {
         message:
@@ -344,16 +360,15 @@ export function useSRC20Form(
 
       setFormState((prev) => ({
         ...prev,
-        fee: prev.fee > 0 ? prev.fee : 10, // Keep existing or use 10 sats/vB
+        fee: userFee !== null ? userFee : (prev.fee > 0 ? prev.fee : 10), // Keep user fee or existing/fallback
+        BTCPrice: prev.BTCPrice > 0 ? prev.BTCPrice : 0,
         feeError: "Fee estimation unavailable - using conservative rate",
       }));
     }
   }, [
-    fees,
+    memoizedFeeData,
     feesLoading,
-    feeSource,
-    isUsingFallback,
-    lastGoodDataAge,
+    userFee,
   ]);
 
   function validateFormState(
@@ -441,7 +456,7 @@ export function useSRC20Form(
     };
   }, [
     wallet?.address,
-    formState.fee,
+    userFee, // Use userFee instead of formState.fee to avoid circular dependency
     formState.token,
     formState.amt,
     formState.toAddress,
@@ -681,8 +696,9 @@ export function useSRC20Form(
   };
 
   const handleChangeFee = useCallback((newFee: number) => {
+    setUserFee(newFee); // Track that user manually set the fee
     setFormState((prev) => ({ ...prev, fee: newFee }));
-  }, [setFormState]);
+  }, []);
 
   return {
     formState,
