@@ -59,10 +59,13 @@ function SendStampModal({
   });
 
   /* ===== EFFECTS ===== */
-  // Sync external fee state with internal state
+  // Sync external fee state with internal state - FIXED to prevent infinite loop
   useEffect(() => {
-    handleChangeFee(formState.fee);
-  }, [formState.fee]);
+    // Only sync if external fee differs significantly to avoid infinite loop
+    if (Math.abs(initialFee - formState.fee) > 0.1) {
+      handleChangeFee(formState.fee);
+    }
+  }, [formState.fee, initialFee]);
 
   // Update max quantity and fetch stamp image when stamp is selected
   useEffect(() => {

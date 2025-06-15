@@ -14,6 +14,7 @@
     "dev": "deno run --inspect --allow-all --watch --watch-exclude=dist/,node_modules/,_fresh/,.git/,coverage/,tmp/,tests/,fresh.gen.ts --no-clear-screen dev.ts --host",
     "dev:nowatch": "deno run --inspect --allow-all --watch=routes/ --watch-exclude=dist/,node_modules/,_fresh/,.git/,coverage/,tmp/,tests/,static/ --no-clear-screen dev.ts --host",
     "build": "deno run --unstable-byonm -A main.ts build",
+    "build:fast": "deno run --unstable-byonm -A --no-check main.ts build",
     "dev:build": "deno task build && deno task dev",
     "docs": "deno run --allow-read --allow-write swagger.js",
     "fakebuild": "echo 'fake build'",

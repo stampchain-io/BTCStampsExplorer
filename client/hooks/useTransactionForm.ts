@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { useFees } from "$fees";
 import {
   showConnectWalletModal,
@@ -140,6 +140,11 @@ export function useTransactionForm(
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  // Separate state to track user vs automatic fee changes
+  const [userFee, setUserFee] = useState<number | null>(null);
+  // Separate state to track BTC price to avoid circular dependency
+  const [lastValidBTCPrice, setLastValidBTCPrice] = useState<number>(0);
+
   const [formState, setFormState] = useState<TransactionFormState>({
     fee: initialFee,
     feeError: "",
@@ -153,19 +158,28 @@ export function useTransactionForm(
     apiError: null,
   });
 
+  // Memoize the fee data to prevent object reference changes
+  const memoizedFeeData = useMemo(() => {
+    if (!fees) return null;
+    return {
+      recommendedFee: fees.recommendedFee,
+      btcPrice: fees.btcPrice,
+    };
+  }, [fees?.recommendedFee, fees?.btcPrice]);
+
   useEffect(() => {
-    if (fees && !feeLoading) {
+    if (memoizedFeeData && !feeLoading) {
       logger.debug("ui", {
         message:
           "useTransactionForm: Updating fee and BTCPrice from fee signal",
-        data: fees,
-        feeSource,
-        isUsingFallback,
-        lastGoodDataAge,
+        data: memoizedFeeData,
+        feeSource: feeSource.source,
+        isUsingFallback: isUsingFallback,
+        lastGoodDataAge: lastGoodDataAge,
       });
 
-      const recommendedFee = Math.round(fees.recommendedFee);
-      const currentBtcPrice = fees.btcPrice;
+      const recommendedFee = Math.round(memoizedFeeData.recommendedFee);
+      const currentBtcPrice = memoizedFeeData.btcPrice;
 
       // Apply component-level fallbacks if needed
       let finalFee = recommendedFee;
@@ -184,18 +198,22 @@ export function useTransactionForm(
 
       // If BTC price is invalid, keep previous value or use 0
       if (currentBtcPrice <= 0) {
-        finalBtcPrice = formState.BTCPrice > 0 ? formState.BTCPrice : 0;
+        finalBtcPrice = lastValidBTCPrice > 0 ? lastValidBTCPrice : 0;
         logger.warn("ui", {
           message:
             "useTransactionForm: BTC price unavailable, keeping previous value",
           currentPrice: currentBtcPrice,
           fallbackPrice: finalBtcPrice,
         });
+      } else {
+        // Update last valid BTC price when we have a valid one
+        setLastValidBTCPrice(currentBtcPrice);
       }
 
+      // Only update fee automatically if user hasn't manually set one
       setFormState((prev) => ({
         ...prev,
-        fee: finalFee,
+        fee: userFee !== null ? userFee : finalFee, // Use userFee if set, otherwise use signal fee
         BTCPrice: finalBtcPrice,
         feeError: isUsingFallback && feeSource.confidence === "low"
           ? "Using estimated fees (network data unavailable)"
@@ -212,7 +230,7 @@ export function useTransactionForm(
           fee: finalFee,
         });
       }
-    } else if (!feeLoading && !fees) {
+    } else if (!feeLoading && !memoizedFeeData) {
       // Complete fallback when no fee data is available
       logger.warn("ui", {
         message:
@@ -221,16 +239,14 @@ export function useTransactionForm(
 
       setFormState((prev) => ({
         ...prev,
-        fee: prev.fee > 0 ? prev.fee : 10, // Keep existing or use 10 sats/vB
+        fee: userFee !== null ? userFee : (prev.fee > 0 ? prev.fee : 10), // Keep user fee or existing/fallback
         feeError: "Fee estimation unavailable - using conservative rate",
       }));
     }
   }, [
-    fees,
+    memoizedFeeData,
     feeLoading,
-    feeSource,
-    isUsingFallback,
-    lastGoodDataAge,
+    userFee,
   ]);
 
   useEffect(() => {
@@ -266,16 +282,17 @@ export function useTransactionForm(
     formState.recipientAddress,
     formState.assetId,
     formState.amount,
-    formState.fee,
+    userFee, // Use userFee instead of formState.fee to avoid circular dependency
   ]);
 
   const handleChangeFee = useCallback((newFee: number) => {
+    setUserFee(newFee); // Track that user manually set the fee
     setFormState((prev) => ({
       ...prev,
       fee: newFee,
       feeError: "",
     }));
-  }, [setFormState]);
+  }, []);
 
   const validateForm = () => {
     let isValid = true;
