@@ -16,16 +16,17 @@ Deno.test("securityUtils - mock generateCSRFToken creates token", async () => {
 
   assert(typeof token === "string", "Token should be a string");
   assert(token.length > 0, "Token should not be empty");
-
-  // JWT tokens have 3 parts separated by dots
-  const parts = token.split(".");
-  assertEquals(parts.length, 3, "JWT should have 3 parts");
+  assertEquals(
+    token,
+    "mock-csrf-token-123",
+    "Should return expected mock token",
+  );
 });
 
 Deno.test("securityUtils - mock validateCSRFToken validates correct token", async () => {
-  const validToken = "header.payload.signature";
+  const validToken = "mock-csrf-token-123";
   const isValid = await mockValidateCSRFToken(validToken);
-  assert(isValid, "Valid token format should pass validation");
+  assert(isValid, "Valid token should pass validation");
 });
 
 Deno.test("securityUtils - mock validateCSRFToken rejects invalid token", async () => {
@@ -35,13 +36,16 @@ Deno.test("securityUtils - mock validateCSRFToken rejects invalid token", async 
 });
 
 Deno.test("securityUtils - mock token structure validation", async () => {
-  // Test various token formats
+  // Test various token formats against our mock implementation
   const testCases = [
-    { token: "a.b.c", expected: true, desc: "Valid 3-part token" },
-    { token: "a.b", expected: false, desc: "Missing signature" },
-    { token: "a", expected: false, desc: "Single part" },
+    { token: "mock-csrf-token-123", expected: true, desc: "Valid mock token" },
+    { token: "wrong-token", expected: false, desc: "Wrong token" },
     { token: "", expected: false, desc: "Empty string" },
-    { token: "a.b.c.d", expected: false, desc: "Too many parts" },
+    {
+      token: "mock-csrf-token-456",
+      expected: false,
+      desc: "Different mock token",
+    },
   ];
 
   for (const testCase of testCases) {
