@@ -7,6 +7,7 @@ import {
 } from "$icon";
 // Only import the icons that are actually used in the codebase
 import {
+  caretDown,
   caretUp,
   clockCounterClockwise,
   coinsIn,
@@ -110,6 +111,7 @@ export function Icon(props: IconVariants) {
       eyeSlash,
       clockCounterClockwise,
       caretUp,
+      caretDown,
       percent,
       flame,
     };
