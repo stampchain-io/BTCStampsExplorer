@@ -5,41 +5,7 @@ import {
   iconStyles,
   IconVariants,
 } from "$icon";
-// Only import the icons that are actually used in the codebase
-import {
-  caretDown,
-  caretUp,
-  clockCounterClockwise,
-  coinsIn,
-  coinsOut,
-  copy,
-  discord,
-  envelope,
-  eye,
-  eyeSlash,
-  flame,
-  funnel,
-  gear,
-  github,
-  globe,
-  image,
-  imageCode,
-  imageOut,
-  images,
-  listAsc,
-  listDesc,
-  listStar,
-  lockClosed,
-  lockOpen,
-  magnifingGlass,
-  percent,
-  plus,
-  share,
-  stamp,
-  telegram,
-  twitter,
-  x,
-} from "$icon";
+import * as iconPaths from "$components/icon/paths.ts";
 
 /* ===== COMPONENT ===== */
 export function Icon(props: IconVariants) {
@@ -73,113 +39,69 @@ export function Icon(props: IconVariants) {
 
   /* ===== HELPERS ===== */
   const getIconPath = () => {
-    // Create icon paths object from selective imports
-    const iconPaths = {
-      // Social Media
-      twitter,
-      telegram,
-      discord,
-      github,
-      envelope,
-      globe,
-      // UI/Tools
-      x,
-      gear,
-      plus,
-      funnel,
-      magnifingGlass,
-      copy,
-      share,
-      // List Icons
-      listAsc,
-      listDesc,
-      listStar,
-      // Images
-      image,
-      images,
-      imageCode,
-      imageOut,
-      stamp,
-      // Coins
-      coinsOut,
-      coinsIn,
-      // Security
-      lockClosed,
-      lockOpen,
-      // Misc
-      eye,
-      eyeSlash,
-      clockCounterClockwise,
-      caretUp,
-      caretDown,
-      percent,
-      flame,
-    };
-
-    // Map icon names to their path names
     const iconNameMap = {
-      // Social Media Icons
+      // General Icons used across the app
+      // - Social Media Icons
       twitter: "twitter",
       telegram: "telegram",
       github: "github",
       discord: "discord",
-      instagram: "instagram",
       website: "globe",
       email: "envelope",
-      // List Icons
-      list: "list",
-      listAsc: "listAsc",
-      listDesc: "listDesc",
-      dispenserListings: "listStar",
-      sortAsc: "listAsc",
-      sortDesc: "listDesc",
-      // Tools Icons
-      tools: "gear",
+
+      // UI Icons
       close: "x",
       expand: "plus",
       search: "magnifingGlass",
       filter: "funnel",
-      share: "share",
-      copy: "copy",
-      // Image Icons
-      image: "image",
-      images: "images",
-      previewImage: "image",
-      previewCode: "imageCode",
-      previewImageRaw: "imageOut",
-      externalImage: "imageOut",
-      uploadImage: "image",
-      collection: "images",
-      profile: "imageProfile",
-      // Coins Icons
-      coins: "coins",
-      send: "coinsOut",
-      receive: "coinsIn",
-      donate: "coinsHand",
-      // Media Icons
-      play: "play",
-      pause: "pause",
-      // Security Icons
-      locked: "lockClosed",
-      unlocked: "lockOpen",
-      // Caret Icons
+      listAsc: "listAsc",
+      listDesc: "listDesc",
+      sortAsc: "listAsc",
+      sortDesc: "listDesc",
+      tools: "gear",
+
+      // - Caret Icons
       caretUp: "caretUp",
       caretDown: "caretDown",
       caretLeft: "caretLeft",
       caretRight: "caretRight",
       caretDoubleLeft: "caretDoubleLeft",
       caretDoubleRight: "caretDoubleRight",
-      // Misc Icons
+
+      // Stamp Specific
+      // - Image Right Panel Icons
+      share: "share",
+      copy: "copy",
+      // twitter is used too
+      previewImage: "image",
+      previewCode: "imageCode",
+      previewImageRaw: "imageOut",
+      // - Media Icons
+      play: "play",
+      pause: "pause",
+      // - Status Icons
+      locked: "lockClosed",
+      unlocked: "lockOpen",
       keyburned: "flame",
       divisible: "percent",
       atom: "atom",
-      history: "clockCounterClockwise",
+      dispenserListings: "listStar",
+
+      // Wallet Specific Icons
       view: "eye",
       hide: "eyeSlash",
-      pageOut: "pageOut",
-      pageIn: "pageIn",
-      cornersOut: "cornersOut",
-      cornersIn: "cornersIn",
+      collection: "images",
+      profile: "imageProfile",
+      send: "coinsOut",
+      receive: "coinsIn",
+      history: "clockCounterClockwise",
+      // copy is used too
+
+      // Misc Icons
+      // - Tools, loader placeholder and donate CTA icons
+      donate: "coinsHand",
+      stamp: "stamp",
+      uploadImage: "image",
     };
 
     const iconName = iconNameMap[name as keyof typeof iconNameMap];
