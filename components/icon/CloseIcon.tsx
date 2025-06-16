@@ -33,9 +33,9 @@ export function CloseIcon({
 
   /* ===== STYLES ===== */
   const colorClasses = color === "greyGradient"
-    ? `fill-[url(#greyGradient)] hover:fill-stamp-grey-light transform transition-colors duration-300`
+    ? `stroke-[url(#greyGradient)] hover:stroke-stamp-grey-light transform transition-colors duration-300`
     : color === "purpleGradient"
-    ? `fill-[url(#purpleGradient)] hover:fill-stamp-purple-bright transform transition-colors duration-300`
+    ? `stroke-[url(#purpleGradient)] hover:stroke-stamp-purple-bright transform transition-colors duration-300`
     : "";
 
   /* ===== RENDER ICON ===== */

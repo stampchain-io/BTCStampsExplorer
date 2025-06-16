@@ -195,7 +195,7 @@ export function FilterOld({
               weight="bold"
               size="custom"
               color="purple"
-              className="mt-[6px] w-[23px] h-[23px] tablet:w-[21px] tablet:h-[21px] group-hover:fill-stamp-purple-bright transition-all duration-300"
+              className="mt-[6px] w-[23px] h-[23px] tablet:w-[21px] tablet:h-[21px] group-hover:stroke-stamp-purple-bright transition-all duration-300"
               onClick={() => handleOpen(true)}
             />
           )}

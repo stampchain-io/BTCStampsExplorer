@@ -1518,7 +1518,7 @@ function StampingToolMain({ config }: { config: Config }) {
                     weight="bold"
                     size="xs"
                     color="custom"
-                    className="fill-stamp-purple-dark group-hover:fill-stamp-purple cursor-pointer"
+                    className="stroke-stamp-purple-dark group-hover:stroke-stamp-purple cursor-pointer"
                   />
                 )
                 : (
@@ -1528,7 +1528,7 @@ function StampingToolMain({ config }: { config: Config }) {
                     weight="bold"
                     size="xs"
                     color="custom"
-                    className="fill-stamp-purple-bright group-hover:fill-stamp-purple-dark cursor-pointer"
+                    className="stroke-stamp-purple-bright group-hover:stroke-stamp-purple-dark cursor-pointer"
                   />
                 )}
             </div>
@@ -1563,7 +1563,7 @@ function StampingToolMain({ config }: { config: Config }) {
                 weight="bold"
                 size="xs"
                 color="custom"
-                className="fill-stamp-purple-dark group-hover:fill-stamp-purple cursor-pointer"
+                className="stroke-stamp-purple-dark group-hover:stroke-stamp-purple cursor-pointer"
               />
               <div
                 class={`${tooltipButton} ${
