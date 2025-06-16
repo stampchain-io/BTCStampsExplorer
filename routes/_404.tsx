@@ -19,7 +19,7 @@ export default function Error404Page() {
         </div>
         <img
           class="w-[240px] tablet:w-[280px] mt-1 mb-3 pixelart"
-          src="/img/broken.png"
+          src="/img/placeholder/broken.png"
           alt="Bitcoin Stamps"
         />
         <div class={subtitleGrey}>SORRY ABOUT THAT</div>
