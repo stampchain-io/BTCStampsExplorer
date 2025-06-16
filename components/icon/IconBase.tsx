@@ -5,7 +5,40 @@ import {
   iconStyles,
   IconVariants,
 } from "$icon";
-import * as iconPaths from "$components/icon/paths.ts";
+// Only import the icons that are actually used in the codebase
+import {
+  caretUp,
+  clockCounterClockwise,
+  coinsIn,
+  coinsOut,
+  copy,
+  discord,
+  envelope,
+  eye,
+  eyeSlash,
+  flame,
+  funnel,
+  gear,
+  github,
+  globe,
+  image,
+  imageCode,
+  imageOut,
+  images,
+  listAsc,
+  listDesc,
+  listStar,
+  lockClosed,
+  lockOpen,
+  magnifingGlass,
+  percent,
+  plus,
+  share,
+  stamp,
+  telegram,
+  twitter,
+  x,
+} from "$icon";
 
 /* ===== COMPONENT ===== */
 export function Icon(props: IconVariants) {
@@ -39,6 +72,48 @@ export function Icon(props: IconVariants) {
 
   /* ===== HELPERS ===== */
   const getIconPath = () => {
+    // Create icon paths object from selective imports
+    const iconPaths = {
+      // Social Media
+      twitter,
+      telegram,
+      discord,
+      github,
+      envelope,
+      globe,
+      // UI/Tools
+      x,
+      gear,
+      plus,
+      funnel,
+      magnifingGlass,
+      copy,
+      share,
+      // List Icons
+      listAsc,
+      listDesc,
+      listStar,
+      // Images
+      image,
+      images,
+      imageCode,
+      imageOut,
+      stamp,
+      // Coins
+      coinsOut,
+      coinsIn,
+      // Security
+      lockClosed,
+      lockOpen,
+      // Misc
+      eye,
+      eyeSlash,
+      clockCounterClockwise,
+      caretUp,
+      percent,
+      flame,
+    };
+
     // Map icon names to their path names
     const iconNameMap = {
       // Social Media Icons
@@ -103,7 +178,6 @@ export function Icon(props: IconVariants) {
       pageIn: "pageIn",
       cornersOut: "cornersOut",
       cornersIn: "cornersIn",
-      template: "template", // alias mappings
     };
 
     const iconName = iconNameMap[name as keyof typeof iconNameMap];
