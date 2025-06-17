@@ -360,7 +360,7 @@ function StampingToolMain({ config }: { config: Config }) {
   const lockTooltipTimeoutRef = useRef<number | null>(null);
 
   // Preview tooltip state
-  const [previewTooltipText, setPreviewTooltipText] = useState("FULLSCREEN");
+  const [previewTooltipText, setPreviewTooltipText] = useState("PREVIEW STAMP");
   const [isPreviewTooltipVisible, setIsPreviewTooltipVisible] = useState(false);
   const [allowPreviewTooltip, setAllowPreviewTooltip] = useState(true);
   const previewButtonRef = useRef<HTMLDivElement>(null);
@@ -1201,7 +1201,7 @@ function StampingToolMain({ config }: { config: Config }) {
           >
             <Icon
               type="icon"
-              name="stamp"
+              name="uploadImage"
               weight="normal"
               size="xxl"
               color="grey"
@@ -1366,7 +1366,7 @@ function StampingToolMain({ config }: { config: Config }) {
   const handlePreviewMouseEnter = () => {
     if (allowPreviewTooltip && showAdvancedOptions) {
       // Set tooltip text when mouse enters
-      setPreviewTooltipText("FULLSCREEN");
+      setPreviewTooltipText("PREVIEW STAMP");
 
       const buttonRect = previewButtonRef.current?.getBoundingClientRect();
       if (buttonRect) {
