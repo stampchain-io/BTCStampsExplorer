@@ -72,7 +72,7 @@ export const iconStyles = {
       "stroke-stamp-grey-darker fill-none [&_path[class*='fill-stroke']]:fill-stamp-grey-darker",
     purple:
       "stroke-stamp-purple fill-none [&_path[class*='fill-stroke']]:fill-stamp-purple",
-    custom: "",
+    custom: "fill-none",
   },
 
   iconButton: {
@@ -80,7 +80,7 @@ export const iconStyles = {
       "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey [&:hover_path[class*='fill-stroke']]:fill-stamp-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey-light",
     purple:
       "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple [&:hover_path[class*='fill-stroke']]:fill-stamp-purple-bright [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple-bright",
-    custom: "",
+    custom: "fill-none",
   },
 
   /* ===== WEIGHT VARIANTS ===== */

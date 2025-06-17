@@ -103,7 +103,7 @@ export function Pagination({
             <Icon
               type="icon"
               name={iconName}
-              weight="normal"
+              weight="bold"
               size="xxs"
               color="custom"
               className="stroke-black"
