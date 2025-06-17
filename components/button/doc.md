@@ -1,5 +1,5 @@
 
-/* ===== BUTTON COMPONENT DOCUMENTATION ===== */
+/* ===== BUTTON MANAGEMENT SYSTEM DOCUMENTATION ===== */
 /* =====  @baba - UPDATE NEEDED !!! ===== */
 /**
  * Button Components

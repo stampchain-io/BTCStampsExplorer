@@ -66,6 +66,9 @@
     },
     {
       "folderPath": "BTCStampsExplorer/static/swagger/"
+    },
+    {
+      "folderPath": "BTCStampsExplorer/leather-output.txt/"
     }
   ]
 }
