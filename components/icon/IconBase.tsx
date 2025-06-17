@@ -39,71 +39,69 @@ export function Icon(props: IconVariants) {
 
   /* ===== HELPERS ===== */
   const getIconPath = () => {
-    // Map icon names to their path names
     const iconNameMap = {
-      // Social Media Icons
+      // General Icons used across the app
+      // - Social Media Icons
       twitter: "twitter",
       telegram: "telegram",
       github: "github",
       discord: "discord",
-      instagram: "instagram",
       website: "globe",
       email: "envelope",
-      // List Icons
-      list: "list",
-      listAsc: "listAsc",
-      listDesc: "listDesc",
-      dispenserListings: "listStar",
-      sortAsc: "listAsc",
-      sortDesc: "listDesc",
-      // Tools Icons
-      tools: "gear",
+
+      // UI Icons
       close: "x",
       expand: "plus",
       search: "magnifingGlass",
       filter: "funnel",
-      share: "share",
-      copy: "copy",
-      // Image Icons
-      image: "image",
-      images: "images",
-      previewImage: "image",
-      previewCode: "imageCode",
-      previewImageRaw: "imageOut",
-      externalImage: "imageOut",
-      uploadImage: "image",
-      collection: "images",
-      profile: "imageProfile",
-      // Coins Icons
-      coins: "coins",
-      send: "coinsOut",
-      receive: "coinsIn",
-      donate: "coinsHand",
-      // Media Icons
-      play: "play",
-      pause: "pause",
-      // Security Icons
-      locked: "lockClosed",
-      unlocked: "lockOpen",
-      // Caret Icons
+      listAsc: "listAsc",
+      listDesc: "listDesc",
+      sortAsc: "listAsc",
+      sortDesc: "listDesc",
+      tools: "gear",
+
+      // - Caret Icons
       caretUp: "caretUp",
       caretDown: "caretDown",
       caretLeft: "caretLeft",
       caretRight: "caretRight",
       caretDoubleLeft: "caretDoubleLeft",
       caretDoubleRight: "caretDoubleRight",
-      // Misc Icons
+
+      // Stamp Specific
+      // - Image Right Panel Icons
+      share: "share",
+      copy: "copy",
+      // twitter is used too
+      previewImage: "image",
+      previewCode: "imageCode",
+      previewImageRaw: "imageOut",
+      // - Media Icons
+      play: "play",
+      pause: "pause",
+      // - Status Icons
+      locked: "lockClosed",
+      unlocked: "lockOpen",
       keyburned: "flame",
       divisible: "percent",
       atom: "atom",
-      history: "clockCounterClockwise",
+      dispenserListings: "listStar",
+
+      // Wallet Specific Icons
       view: "eye",
       hide: "eyeSlash",
-      pageOut: "pageOut",
-      pageIn: "pageIn",
-      cornersOut: "cornersOut",
-      cornersIn: "cornersIn",
-      template: "template", // alias mappings
+      collection: "images",
+      profile: "imageProfile",
+      send: "coinsOut",
+      receive: "coinsIn",
+      history: "clockCounterClockwise",
+      // copy is used too
+
+      // Misc Icons
+      // - Tools, loader placeholder and donate CTA icons
+      donate: "coinsHand",
+      stamp: "stamp",
+      uploadImage: "image",
     };
 
     const iconName = iconNameMap[name as keyof typeof iconNameMap];
@@ -201,74 +199,3 @@ export function BadgeIcon({ text, className = "" }: BadgeVariants) {
     </span>
   );
 }
-
-/* ===== ICON COMPONENT DOCUMENTATION ===== */
-/**
- * Icon Component
- *
- * How to add a new icon type:
- *
- * FILL-BASED ICONS (Traditional):
- * 1. Add the icon paths to paths.ts as consts using the "Template icon" code - add all three weights
- * - Name the path according to its Figma name or what it depicts
- * - Provide all three weights: light, normal, bold
- * - SVG viewBox should be 32x32
- * - Export path data only, not full SVG element
- * - Icons used on the site are from Figma Phosphor Icon Set
- * - https://www.figma.com/community/file/903830135544202908/phosphor-icons
- *
- * STROKE-BASED ICONS (New):
- * 1. Add the icon paths to paths.ts as a single const (no weight variants)
- * - Export as an array of strings for multiple paths: export const iconName = ["path1", "path2"];
- * - Export as a single string for single path: export const iconName = "path";
- * - Stroke width is controlled by weight prop
- * - Add the icon name to strokeBasedIcons array in getIconPath()
- *
- * 2. Add the icon name to getIconPath() - iconNameMap function copying the "template" code
- * - Initial name (eg: "website") defines the icon name and default aria label, and the icon type to be assigned the icon when inserting it
- * - Secondary name (eg: "globe") is used to map the icon name to the correct path name
- * - A custom aria-label can be added when inserting the icon, see the examples below
- *
- * @example
- * // Basic icon usage
- * <Icon
- *   type="icon"
- *   name="twitter"
- *   weight="light"
- *   size="sm"
- *   color="grey"
- * />
- *
- * // Icon with stroke-width control
- * <Icon
- *   type="icon"
- *   name="images"
- *   weight="bold"
- *   size="md"
- *   color="purple"
- * />
- *
- * // Icon as a button/link
- * <Icon
- *   type="iconButton"
- *   name="twitter"
- *   weight="light"
- *   size="md"
- *   color="purple"
- *   href="https://twitter.com"
- *   target="_blank"
- *   ariaLabel="Connect with us on Twitter"
- * />
- *
- * // Icon with custom styling
- * <Icon
- *   type="icon"
- *   name="close"
- *   weight="bold"
- *   size="lg"
- *   color="custom"
- *   className="stroke-red-500 hover:stroke-green-500"
- *   onClick={() => handleClose()}
- *   ariaLabel="Close Dialog"
- * />
- */

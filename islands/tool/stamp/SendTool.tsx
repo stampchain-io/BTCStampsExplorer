@@ -354,7 +354,7 @@ export function StampSendTool({}: Props) {
       return (
         <Icon
           type="icon"
-          name="image"
+          name="uploadImage"
           weight="normal"
           size="xxl"
           color="grey"

@@ -323,7 +323,7 @@ export function SRC20MintTool({
               : (
                 <Icon
                   type="icon"
-                  name="image"
+                  name="uploadImage"
                   weight="normal"
                   size="xxl"
                   color="grey"

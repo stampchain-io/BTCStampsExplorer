@@ -710,7 +710,7 @@ export function FeeCalculatorBase({
           weight="bold"
           size="xxxs"
           color="custom"
-          className={` fill-stamp-grey-darker group-hover:fill-stamp-grey-light transition-all duration-300 transform ${
+          className={` stroke-stamp-grey-darker group-hover:stroke-stamp-grey-light transition-all duration-300 transform ${
             visible ? "scale-y-[-1]" : ""
           }`}
         />

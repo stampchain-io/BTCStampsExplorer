@@ -247,7 +247,7 @@ function SearchContent({
           <ul class="!bg-[#221826] rounded-b-md z-[2] overflow-y-auto">
             <li class="flex flex-col items-center justify-end pt-1.5 pb-3 px-[18px]">
               <img
-                src="/img/broken.png"
+                src="/img/placeholder/broken.png"
                 alt="No results"
                 class="w-[84px] pb-3"
               />

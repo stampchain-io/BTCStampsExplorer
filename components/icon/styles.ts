@@ -19,6 +19,9 @@ export interface IconVariants {
     | "xsR"
     | "smR"
     | "mdR"
+    | "lgR"
+    | "xlR"
+    | "xxlR"
     | "custom";
   color: "grey" | "purple" | "custom";
   className?: string;
@@ -58,7 +61,6 @@ export const iconStyles = {
   base: "inline-block transition-colors duration-300",
 
   /* ===== ICON VARIANTS & COLOR STYLES ===== */
-
   // Note: Two-tone colors are built into the icon styles below
   // Custom color allows for special icons with advanced coloring:
   // - Gear icon in collapsible menu (mobile menu drawer) has conditional color based on menu state
@@ -66,17 +68,19 @@ export const iconStyles = {
   //   - the gradient defs have to be included in the file, since creating a global gradient file for them requires moving them up in the DOM tree (I abandoned this approach)
 
   icon: {
-    grey: "stroke-stamp-grey-darker fill-none",
-    purple: "stroke-stamp-purple fill-none",
-    custom: "",
+    grey:
+      "stroke-stamp-grey-darker fill-none [&_path[class*='fill-stroke']]:fill-stamp-grey-darker",
+    purple:
+      "stroke-stamp-purple fill-none [&_path[class*='fill-stroke']]:fill-stamp-purple",
+    custom: "fill-none",
   },
 
   iconButton: {
     grey:
-      "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer",
+      "stroke-stamp-grey hover:stroke-stamp-grey-light group-hover:stroke-stamp-grey-light fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-grey [&:hover_path[class*='fill-stroke']]:fill-stamp-grey-light [&:group-hover_path[class*='fill-stroke']]:fill-stamp-grey-light",
     purple:
-      "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer",
-    custom: "",
+      "stroke-stamp-purple hover:stroke-stamp-purple-bright group-hover:stroke-stamp-purple-bright fill-none hover:fill-none group-hover:fill-none cursor-pointer [&_path[class*='fill-stroke']]:fill-stamp-purple [&:hover_path[class*='fill-stroke']]:fill-stamp-purple-bright [&:group-hover_path[class*='fill-stroke']]:fill-stamp-purple-bright",
+    custom: "fill-none",
   },
 
   /* ===== WEIGHT VARIANTS ===== */
@@ -101,6 +105,9 @@ export const iconStyles = {
     xsR: "w-5 h-5 tablet:w-[18px] tablet:h-[18px]",
     smR: "w-6 h-6 tablet:w-[22px] tablet:h-[22px]",
     mdR: "w-7 h-7 tablet:w-[26px] tablet:h-[26px]",
+    lgR: "w-8 h-8 tablet:w-[30px] tablet:h-[30px]",
+    xlR: "w-9 h-9 tablet:w-[34px] tablet:h-[34px]",
+    xxlR: "w-10 h-10 tablet:w-[38px] tablet:h-[38px]",
     custom: "",
   },
 } as const;

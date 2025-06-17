@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { PaginationProps } from "$types/pagination.d.ts";
+import { Icon } from "$icon";
 
 // Update pagination range constants
 const MOBILESM_MAX_PAGE_RANGE = 0;
@@ -82,10 +83,10 @@ export function Pagination({
     globalThis.location.href = url.toString();
   };
 
-  const renderPageButton = (pageNum: number, icon?: string) => {
+  const renderPageButton = (pageNum: number, iconName?: string) => {
     const isCurrentPage = pageNum === page;
     // Use navArrow class for caret buttons, otherwise use navContent
-    const baseClass = icon ? navArrow : navContent;
+    const baseClass = iconName ? navArrow : navContent;
     const buttonClass = isCurrentPage
       ? `${baseClass} bg-stamp-purple`
       : `${baseClass} bg-stamp-purple-dark`;
@@ -97,12 +98,15 @@ export function Pagination({
         onClick={() => handlePageChange(pageNum)}
         disabled={isCurrentPage}
       >
-        {icon
+        {iconName
           ? (
-            <img
-              src={`/img/datacontrol/${icon}.svg`}
-              alt={`arrow ${icon.toLowerCase()}`}
-              class="w-4 h-4"
+            <Icon
+              type="icon"
+              name={iconName}
+              weight="bold"
+              size="xxs"
+              color="custom"
+              className="stroke-black"
             />
           )
           : <span>{pageNum}</span>}
@@ -130,8 +134,8 @@ export function Pagination({
         {/* First and Previous */}
         {page > 1 && (
           <>
-            {renderPageButton(1, "CaretDoubleLeft")}
-            {renderPageButton(page - 1, "CaretLeft")}
+            {renderPageButton(1, "caretDoubleLeft")}
+            {renderPageButton(page - 1, "caretLeft")}
           </>
         )}
 
@@ -161,8 +165,8 @@ export function Pagination({
         {/* Next and Last */}
         {page < totalPages && (
           <>
-            {renderPageButton(page + 1, "CaretRight")}
-            {renderPageButton(totalPages, "CaretDoubleRight")}
+            {renderPageButton(page + 1, "caretRight")}
+            {renderPageButton(totalPages, "caretDoubleRight")}
           </>
         )}
       </ul>

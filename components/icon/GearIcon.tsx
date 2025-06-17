@@ -52,7 +52,8 @@ export function GearIcon({
       weight={weight}
       size={size}
       color="custom"
-      className={`${colorClasses} ${className}`.trim()}
+      className={`fill-none ${colorClasses} ${className}`
+        .trim()}
       onClick={handleClick}
     />
   );
