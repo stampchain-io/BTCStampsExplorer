@@ -507,12 +507,27 @@ export function StampImage(
 
   const fetchHtmlContent = async () => {
     try {
-      const response = await fetch(src);
+      // Use the API endpoint to get raw stamp content instead of the rendered webpage
+      const response = await fetch(`/api/v2/stamps/${stamp.stamp}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const content = await response.text();
-      setHtmlContent(content);
+      const stampData = await response.json();
+
+      // Decode the base64 stamp content to get the raw HTML with proper UTF-8 handling
+      if (stampData.data?.stamp?.stamp_base64) {
+        // Properly decode base64 with UTF-8 support for emojis
+        const binaryString = atob(stampData.data.stamp.stamp_base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const decodedContent = new TextDecoder("utf-8").decode(bytes);
+        setHtmlContent(decodedContent);
+      } else {
+        console.log("No stamp_base64 found in API response:", stampData);
+        setHtmlContent(null);
+      }
     } catch (error) {
       console.error("Failed to fetch HTML content:", error);
       setHtmlContent(null);

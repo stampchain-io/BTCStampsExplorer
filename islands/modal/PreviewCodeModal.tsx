@@ -27,43 +27,14 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
     }
 
     try {
-      // Store pre tag contents to restore later
-      const preTags: string[] = [];
-      let formatted = html.replace(/<pre[\s\S]*?<\/pre>/g, (match) => {
-        preTags.push(match);
-        return `###PRE_TAG_${preTags.length - 1}###`;
-      });
-
-      // Apply formatting to non-pre content
-      formatted = formatted
-        .replace(/;/g, ";\n")
-        .replace(/</g, "\n<")
-        .replace(/>/g, ">\n")
-        .replace(/\{/g, " {\n")
-        .replace(/\}/g, "\n}\n");
-
-      // Format script tags (excluding pre content)
-      if (formatted.includes("<script")) {
-        formatted = formatted.replace(
-          /(<script.*?>)([\s\S]*?)(<\/script>)/g,
-          (_match, openTag, content, closeTag) => {
-            const formattedScript = content
-              .replace(/([{}\[\]])/g, "$1\n")
-              .replace(/;/g, ";\n")
-              .replace(/,\s*/g, ",\n")
-              .replace(/\) {/g, ") {\n")
-              .replace(/\n\n+/g, "\n");
-
-            return `${openTag}\n${formattedScript}\n${closeTag}`;
-          },
-        );
-      }
-
-      // Restore pre tags
-      formatted = formatted.replace(
-        /###PRE_TAG_(\d+)###/g,
-        (_, index) => preTags[index],
-      );
+      // Better HTML formatting approach
+      let formatted = html
+        .replace(/></g, ">\n<") // Add line breaks between tags
+        .replace(/(<style[^>]*>)/gi, "$1\n") // Add line break after opening <style> tag
+        .replace(/(<script[^>]*>)/gi, "$1\n") // Add line break after opening <script> tag
+        .replace(/\{/g, " {\n") // Format CSS opening braces
+        .replace(/\}/g, "\n}\n") // Format CSS closing braces
+        .replace(/;/g, ";\n"); // Format CSS properties
 
       let indent = 0;
       let result = "";
@@ -72,17 +43,27 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
         line = line.trim();
         if (!line) return;
 
-        if (line.match(/^<\//) || line === "}" || line === "]") {
+        // Detect different types of lines
+        const isClosingTag = line.match(/^<\/\w+>$/);
+        const isOpeningTag = line.match(/^<\w+[^>]*>$/) && !line.match(/\/>$/);
+        const isSelfClosingTag = line.match(/\/>$/);
+        const isDoctype = line.match(/^<!DOCTYPE/i);
+        const isComment = line.match(/^<!--/) || line.match(/-->$/);
+        const isCSSClosing = line === "}";
+        const isCSSOpening = line.endsWith("{");
+
+        // Decrease indent for closing elements BEFORE applying
+        if (isClosingTag || isCSSClosing) {
           indent = Math.max(0, indent - 2);
         }
 
-        const lineIndent = indent;
-        result += " ".repeat(lineIndent) + line + "\n";
+        // Apply indentation
+        result += " ".repeat(indent) + line + "\n";
 
+        // Increase indent for opening elements AFTER applying
         if (
-          (line.match(/^<[^/]/) && !line.match(/\/>/) &&
-            !line.includes("</")) ||
-          line.endsWith("{") || line.endsWith("[")
+          (isOpeningTag && !isSelfClosingTag && !isDoctype && !isComment) ||
+          isCSSOpening
         ) {
           indent += 2;
         }
@@ -111,7 +92,7 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
     >
       {/* ===== CODE DISPLAY ===== */}
       <div className="flex flex-col w-full h-full p-6 mobileMd:p-9">
-        <code className="whitespace-pre-wrap text-xs text-stamp-grey-darkest leading-tight">
+        <code className="whitespace-pre-wrap text-xs text-stamp-grey-darkest leading-tight pb-6 mobileMd:pb-9">
           {formattedSrc}
         </code>
       </div>
