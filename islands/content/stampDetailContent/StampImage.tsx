@@ -4,7 +4,11 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { VNode } from "preact";
 import { StampRow } from "$globals";
 import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
-import { AUDIO_FILE_IMAGE, NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import {
+  AUDIO_FILE_IMAGE,
+  LIBRARY_FILE_IMAGE,
+  NOT_AVAILABLE_IMAGE,
+} from "$lib/utils/constants.ts";
 import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
@@ -471,6 +475,8 @@ export function StampImage(
           ? "html"
           : stamp.stamp_mimetype === "text/plain"
           ? "text"
+          : stamp.stamp_mimetype?.startsWith("audio/")
+          ? "audio"
           : "image"}
       />
     );
@@ -496,6 +502,10 @@ export function StampImage(
   const isHtml = stamp.stamp_mimetype === "text/html";
   const isPlainText = stamp.stamp_mimetype === "text/plain";
   const isAudio = stamp.stamp_mimetype?.startsWith("audio/");
+  const isLibraryFile = stamp.stamp_mimetype === "text/css" ||
+    stamp.stamp_mimetype === "text/javascript" ||
+    stamp.stamp_mimetype === "application/javascript" ||
+    stamp.stamp_mimetype === "application/gzip";
 
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
 
@@ -853,10 +863,53 @@ export function StampImage(
         </div>
       )}
 
-      {src !== NOT_AVAILABLE_IMAGE && !isHtml && !isPlainText && !isAudio && (
-        flag
-          ? (
-            <div class={`${body} ${gapSectionSlim}`}>
+      {src !== NOT_AVAILABLE_IMAGE && isLibraryFile && (
+        <div className={`${className} ${body} ${gapSectionSlim}`}>
+          <div className={containerDetailImage}>
+            <div className="stamp-container relative group">
+              <img
+                src={LIBRARY_FILE_IMAGE}
+                alt="Library File"
+                className="absolute top-0 left-0 w-full h-full object-contain rounded pixelart stamp-image pointer-events-none select-none"
+                draggable={false}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {src !== NOT_AVAILABLE_IMAGE && !isHtml && !isPlainText && !isAudio &&
+        !isLibraryFile && (
+          flag
+            ? (
+              <div class={`${body} ${gapSectionSlim}`}>
+                <div className={containerDetailImage}>
+                  <div className="stamp-container">
+                    <div className="relative z-10 aspect-square flex items-center justify-center">
+                      {validatedContent || (
+                        <img
+                          width="100%"
+                          loading="lazy"
+                          className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                          src={src}
+                          onError={handleImageError}
+                          alt="Stamp"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {stamp.ident !== "SRC-20" && (
+                  <RightPanel
+                    stamp={stamp}
+                    toggleCodeModal={toggleCodeModal}
+                    toggleFullScreenModal={toggleFullScreenModal}
+                    showCodeButton={false}
+                  />
+                )}
+              </div>
+            )
+            : (
               <div className={containerDetailImage}>
                 <div className="stamp-container">
                   <div className="relative z-10 aspect-square flex items-center justify-center">
@@ -873,35 +926,8 @@ export function StampImage(
                   </div>
                 </div>
               </div>
-              {stamp.ident !== "SRC-20" && (
-                <RightPanel
-                  stamp={stamp}
-                  toggleCodeModal={toggleCodeModal}
-                  toggleFullScreenModal={toggleFullScreenModal}
-                  showCodeButton={false}
-                />
-              )}
-            </div>
-          )
-          : (
-            <div className={containerDetailImage}>
-              <div className="stamp-container">
-                <div className="relative z-10 aspect-square flex items-center justify-center">
-                  {validatedContent || (
-                    <img
-                      width="100%"
-                      loading="lazy"
-                      className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-                      src={src}
-                      onError={handleImageError}
-                      alt="Stamp"
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          )
-      )}
+            )
+        )}
     </>
   );
 }
