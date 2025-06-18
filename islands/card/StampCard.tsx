@@ -11,7 +11,11 @@ import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { formatSupplyValue } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { AUDIO_FILE_IMAGE, NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import {
+  AUDIO_FILE_IMAGE,
+  LIBRARY_FILE_IMAGE,
+  NOT_AVAILABLE_IMAGE,
+} from "$lib/utils/constants.ts";
 import { TEXT_STYLES } from "$card";
 
 /* ===== TYPES ===== */
@@ -50,6 +54,12 @@ export function StampCard({
   // Audio-related state (always declared to avoid conditional hooks)
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Library file detection
+  const isLibraryFile = stamp.stamp_mimetype === "text/css" ||
+    stamp.stamp_mimetype === "text/javascript" ||
+    stamp.stamp_mimetype === "application/javascript" ||
+    stamp.stamp_mimetype === "application/gzip";
 
   /* ===== HANDLERS ===== */
   const handleImageError = (e: Event) => {
@@ -290,30 +300,17 @@ export function StampCard({
       );
     }
 
-    // Handle JavaScript content
-    if (stamp.stamp_mimetype === "application/javascript") {
-      // Create a container for the script's output
+    // Handle Library Files (CSS, JS, GZIP)
+    if (isLibraryFile) {
       return (
-        <div class="relative w-full h-full">
-          <div class="relative pt-[100%]">
-            <div
-              id={`js-output-${stamp.stamp}`}
-              class="absolute top-0 left-0 w-full h-full"
-            >
-              <script
-                src={src}
-                async
-                defer
-                onError={(e) => {
-                  console.error("Script error (detailed):", {
-                    error: e,
-                    target: e.target,
-                    src: (e.target as HTMLScriptElement).src,
-                  });
-                  handleImageError(e);
-                }}
-              />
-            </div>
+        <div class="stamp-container relative">
+          <div class="relative z-10 aspect-square">
+            <img
+              src={LIBRARY_FILE_IMAGE}
+              alt="Library File"
+              class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+              loading="lazy"
+            />
           </div>
         </div>
       );
