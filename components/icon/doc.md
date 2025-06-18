@@ -9,7 +9,7 @@ The icon management system offers a light-weight versatile solution for handling
 - **styles.ts**: Style definitions for the icons
 - **paths.ts**: SVG paths for supported icons
 - **IconBase.tsx**: Handles icon selection and integration - combining styles with paths. Contains additional icon styles (e.g. BadgeIcon)
-- **Close/GearIcon.tsx**: More complex custom icons - using gradient and conditional logic for coloring 
+- **Close/GearIcon/LoadingIcon.tsx**: More complex custom icons - using special styling, gradient or conditional logic for coloring 
 - **index.ts**: Bullet loader file
 - **doc.md**: This documentation
 - **MenuIcon.tsx**: Doesn't use the icon management system - it's a HTML/CSS icon and not SVG
@@ -231,5 +231,5 @@ Now you can use the icon anywhere in the app:
 
 ---
 
-**Last Updated:** June 17, 2025  
+**Last Updated:** June 18, 2025  
 **Author:** baba

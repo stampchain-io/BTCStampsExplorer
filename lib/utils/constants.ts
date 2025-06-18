@@ -39,6 +39,7 @@ export const AUDIO_FILE_IMAGE = "/img/placeholder/stamp-audio.svg";
 export const LIBRARY_FILE_IMAGE = "/img/placeholder/stamp-library.svg";
 export const NOT_AVAILABLE_IMAGE = "/img/placeholder/stamp-no-image.svg";
 export const ERROR_IMAGE = "/img/placeholder/stamp-error.svg";
+// LOADING_IMAGE = "components/icon/LoadingIcon.tsx"
 
 export const CAROUSEL_STAMP_IDS = [
   42158,
