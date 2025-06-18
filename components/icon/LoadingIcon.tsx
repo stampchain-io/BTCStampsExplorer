@@ -1,5 +1,5 @@
 /* ===== LOADING ICON COMPONENT ===== */
-import { Icon } from "$icon";
+import { Icon } from "$components/icon/IconBase.tsx";
 
 interface LoadingIconProps {
   className?: string;
@@ -18,7 +18,7 @@ export function LoadingIcon({
         className={`relative z-10 aspect-square animate-pulse ${wrapperClassName}`}
       >
         <div
-          className={`flex items-center justify-center bg-[#220033CC] max-w-none object-contain rounded ${containerClassName}`}
+          className={`flex items-center justify-center bg-[#220033CC] max-w-none object-contain rounded pixelart stamp-image ${containerClassName}`}
         >
           <Icon
             type="icon"
