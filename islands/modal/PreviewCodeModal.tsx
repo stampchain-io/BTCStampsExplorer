@@ -28,7 +28,7 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
 
     try {
       // Better HTML formatting approach
-      let formatted = html
+      const formatted = html
         .replace(/></g, ">\n<") // Add line breaks between tags
         .replace(/(<style[^>]*>)/gi, "$1\n") // Add line break after opening <style> tag
         .replace(/(<script[^>]*>)/gi, "$1\n") // Add line break after opening <script> tag
