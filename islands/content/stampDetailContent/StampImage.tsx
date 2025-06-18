@@ -728,7 +728,9 @@ export function StampImage(
     return (
       <div class={`${body} ${gapSectionSlim}`}>
         <div className={containerDetailImage}>
-          <LoadingIcon containerClassName="rounded-lg" />
+          <div className="stamp-container">
+            <LoadingIcon containerClassName="rounded-lg" />
+          </div>
         </div>
       </div>
     );
