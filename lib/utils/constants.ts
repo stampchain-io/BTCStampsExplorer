@@ -41,11 +41,11 @@ export const NOT_AVAILABLE_IMAGE = "/img/placeholder/stamp-no-image.svg";
 export const ERROR_IMAGE = "/img/placeholder/stamp-error.svg";
 
 export const CAROUSEL_STAMP_IDS = [
-  923260,
-  631735,
-  857476,
-  892092,
-  872458,
+  42158,
+  336082,
+  57356,
+  368359,
+  74607,
 ];
 
 export type WalletProviderKey =

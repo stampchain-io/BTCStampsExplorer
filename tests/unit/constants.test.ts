@@ -156,7 +156,7 @@ Deno.test("constants - image paths", () => {
 
 Deno.test("constants - carousel stamp IDs", () => {
   assertEquals(CAROUSEL_STAMP_IDS.length, 5, "Should have 5 carousel stamps");
-  assertEquals(CAROUSEL_STAMP_IDS, [923260, 631735, 857476, 892092, 872458]);
+  assertEquals(CAROUSEL_STAMP_IDS, [42158, 336082, 57356, 368359, 74607]);
 
   // Verify all are positive numbers
   for (const id of CAROUSEL_STAMP_IDS) {

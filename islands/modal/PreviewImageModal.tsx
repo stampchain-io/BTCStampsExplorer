@@ -4,11 +4,12 @@ import { StampTextContent } from "$content";
 import { ModalBase } from "../../components/layout/ModalBase.tsx";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { AUDIO_FILE_IMAGE } from "$lib/utils/constants.ts";
 
 /* ===== TYPES ===== */
 interface PreviewImageModalProps {
   src: string | File;
-  contentType?: "html" | "text" | "image";
+  contentType?: "html" | "text" | "image" | "audio";
 }
 
 /* ===== COMPONENT ===== */
@@ -60,6 +61,14 @@ const PreviewImageModal = ({
             <div className="w-full h-full rounded-sm mobileMd:rounded-md aspect-square">
               <StampTextContent src={imageUrl} />
             </div>
+          )
+          : contentType === "audio"
+          ? (
+            <img
+              className="rounded-sm mobileMd:rounded-md stamp-image aspect-square"
+              src={AUDIO_FILE_IMAGE}
+              alt="Audio File Preview"
+            />
           )
           : (
             <img
