@@ -863,14 +863,6 @@ export function StampImage(
               />
             </div>
           </div>
-          {flag && (
-            <RightPanel
-              stamp={stamp}
-              toggleCodeModal={toggleCodeModal}
-              toggleFullScreenModal={toggleFullScreenModal}
-              showCodeButton={false}
-            />
-          )}
         </div>
       )}
 
