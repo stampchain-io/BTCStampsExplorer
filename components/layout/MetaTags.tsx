@@ -1,3 +1,8 @@
+import {
+  STAMPCHAIN_FAVICON_IMAGE,
+  STAMPCHAIN_OPENGRAPH_IMAGE,
+} from "$constants";
+
 interface MetaTagsProps {
   title?: string;
   description?: string;
@@ -7,7 +12,7 @@ interface MetaTagsProps {
 export function MetaTags({
   title = "Bitcoin Stamps",
   description = "Unprunable UTXO Art, Because Sats Don't Exist",
-  image = "/img/logo/stampchain-logo-opengraph.jpg",
+  image = STAMPCHAIN_OPENGRAPH_IMAGE,
 }: MetaTagsProps) {
   return (
     <>
@@ -23,12 +28,12 @@ export function MetaTags({
       <link
         rel="icon"
         type="image/jpeg"
-        href="/img/logo/stampchain-logo-favicon.jpg"
+        href={STAMPCHAIN_FAVICON_IMAGE}
         sizes="any"
       />
       <link
         rel="apple-touch-icon"
-        href="/img/logo/stampchain-logo-favicon.jpg"
+        href={STAMPCHAIN_FAVICON_IMAGE}
       />
       <link rel="canonical" href="https://stampchain.io" />
 
