@@ -102,7 +102,7 @@ export function WalletProvider(
 
       {/* ===== PROVIDER LOGO ===== */}
       <img
-        src={providerInfo.logo.small}
+        src={providerInfo.logo}
         alt={providerInfo.name}
         className="w-8 h-8"
       />
