@@ -15,8 +15,6 @@ import {
   DEFAULT_WALLET_CONNECTORS,
   ERROR_IMAGE,
   LIBRARY_FILE_IMAGE,
-  LOGO,
-  LOGO_STAMPCHAIN,
   MAX_XCP_RETRIES,
   MEMPOOL_API_BASE_URL,
   NOT_AVAILABLE_IMAGE,
@@ -29,28 +27,13 @@ import {
   SRC20_BALANCE_TABLE,
   SRC20_TABLE,
   STAMP_TABLE,
+  STAMPCHAIN_FAVICON_IMAGE,
+  STAMPCHAIN_LOGO_IMAGE,
+  STAMPCHAIN_OPENGRAPH_IMAGE,
   SUPPORTED_UNICODE_FROM_INDEXER_CODE,
   WALLET_PROVIDERS,
   type WalletProviderKey,
 } from "$lib/utils/constants.ts";
-
-Deno.test("constants - logo paths", () => {
-  assertEquals(LOGO_STAMPCHAIN, "/img/stampchain.png", "LOGO_STAMPCHAIN path");
-  assertEquals(LOGO, LOGO_STAMPCHAIN, "LOGO should equal LOGO_STAMPCHAIN");
-});
-
-Deno.test("constants - numeric values", () => {
-  assertEquals(MAX_XCP_RETRIES, 5, "MAX_XCP_RETRIES");
-  assertEquals(DEFAULT_CACHE_DURATION, 60 * 60 * 12, "12 hours in seconds");
-  assertEquals(SATS_PER_KB_MULTIPLIER, 1000, "1 KB = 1000 vBytes");
-  assertEquals(BIG_LIMIT, 200, "BIG_LIMIT");
-  assertEquals(SMALL_LIMIT, 20, "SMALL_LIMIT");
-  assertEquals(DEFAULT_LIMIT, 50, "DEFAULT_LIMIT");
-  assertEquals(DEFAULT_PAGE_SIZE, 50, "DEFAULT_PAGE_SIZE");
-  assertEquals(RATE_LIMIT_REQUESTS, 100, "RATE_LIMIT_REQUESTS");
-  assertEquals(RATE_LIMIT_WINDOW, 60 * 1000, "1 minute in milliseconds");
-  assertEquals(SATOSHIS_PER_BTC, 100000000, "Satoshis per Bitcoin");
-});
 
 Deno.test("constants - breakpoints", () => {
   assertEquals(BREAKPOINTS.desktop, 1440, "Desktop breakpoint");
@@ -83,6 +66,19 @@ Deno.test("constants - table names", () => {
   assert(BLOCK_TABLE.length > 0, "BLOCK_TABLE not empty");
   assert(SRC20_TABLE.length > 0, "SRC20_TABLE not empty");
   assert(SRC20_BALANCE_TABLE.length > 0, "SRC20_BALANCE_TABLE not empty");
+});
+
+Deno.test("constants - numeric values", () => {
+  assertEquals(MAX_XCP_RETRIES, 5, "MAX_XCP_RETRIES");
+  assertEquals(DEFAULT_CACHE_DURATION, 60 * 60 * 12, "12 hours in seconds");
+  assertEquals(SATS_PER_KB_MULTIPLIER, 1000, "1 KB = 1000 vBytes");
+  assertEquals(BIG_LIMIT, 200, "BIG_LIMIT");
+  assertEquals(SMALL_LIMIT, 20, "SMALL_LIMIT");
+  assertEquals(DEFAULT_LIMIT, 50, "DEFAULT_LIMIT");
+  assertEquals(DEFAULT_PAGE_SIZE, 50, "DEFAULT_PAGE_SIZE");
+  assertEquals(RATE_LIMIT_REQUESTS, 100, "RATE_LIMIT_REQUESTS");
+  assertEquals(RATE_LIMIT_WINDOW, 60 * 1000, "1 minute in milliseconds");
+  assertEquals(SATOSHIS_PER_BTC, 100000000, "Satoshis per Bitcoin");
 });
 
 Deno.test("constants - API base URLs", () => {
@@ -130,28 +126,62 @@ Deno.test("constants - API base URLs", () => {
 });
 
 Deno.test("constants - image paths", () => {
+  // Stampchain Logo Images
+  assertEquals(
+    STAMPCHAIN_LOGO_IMAGE,
+    "/img/logo/stampchain-logo-480.svg",
+    "Stampchain logo image",
+  );
+  assertEquals(
+    STAMPCHAIN_FAVICON_IMAGE,
+    "/img/logo/stampchain-logo-favicon.jpg",
+    "Stampchain favicon image",
+  );
+  assertEquals(
+    STAMPCHAIN_OPENGRAPH_IMAGE,
+    "/img/logo/stampchain-logo-opengraph.jpg",
+    "Stampchain OpenGraph image",
+  );
+
+  // Placeholder Images
   assertEquals(
     AUDIO_FILE_IMAGE,
     "/img/placeholder/stamp-audio.svg",
-    "Audio file image",
+    "Audio file placeholder image",
   );
   assertEquals(
     LIBRARY_FILE_IMAGE,
     "/img/placeholder/stamp-library.svg",
-    "Library file image",
+    "Library file placeholder image",
   );
   assertEquals(
     NOT_AVAILABLE_IMAGE,
     "/img/placeholder/stamp-no-image.svg",
-    "Not available image",
+    "Not available placeholder image",
   );
-  assertEquals(ERROR_IMAGE, "/img/placeholder/stamp-error.svg", "Error image");
+  assertEquals(
+    ERROR_IMAGE,
+    "/img/placeholder/stamp-error.svg",
+    "Error placeholder image",
+  );
 
-  // Verify all are SVG files
-  assert(AUDIO_FILE_IMAGE.endsWith(".svg"), "Audio image is SVG");
-  assert(LIBRARY_FILE_IMAGE.endsWith(".svg"), "Library image is SVG");
-  assert(NOT_AVAILABLE_IMAGE.endsWith(".svg"), "Not available image is SVG");
-  assert(ERROR_IMAGE.endsWith(".svg"), "Error image is SVG");
+  // Verify file extensions
+  assert(STAMPCHAIN_LOGO_IMAGE.endsWith(".svg"), "Stampchain logo is SVG");
+  assert(
+    STAMPCHAIN_FAVICON_IMAGE.endsWith(".jpg"),
+    "Stampchain favicon is JPG",
+  );
+  assert(
+    STAMPCHAIN_OPENGRAPH_IMAGE.endsWith(".jpg"),
+    "Stampchain OpenGraph is JPG",
+  );
+  assert(AUDIO_FILE_IMAGE.endsWith(".svg"), "Audio placeholder is SVG");
+  assert(LIBRARY_FILE_IMAGE.endsWith(".svg"), "Library placeholder is SVG");
+  assert(
+    NOT_AVAILABLE_IMAGE.endsWith(".svg"),
+    "Not available placeholder is SVG",
+  );
+  assert(ERROR_IMAGE.endsWith(".svg"), "Error placeholder is SVG");
 });
 
 Deno.test("constants - carousel stamp IDs", () => {
@@ -189,10 +219,10 @@ Deno.test("constants - wallet providers", () => {
   for (const [key, provider] of Object.entries(WALLET_PROVIDERS)) {
     assert("name" in provider, `${key} should have name`);
     assert("logo" in provider, `${key} should have logo`);
-    assert("full" in provider.logo, `${key} should have full logo`);
-    assert("small" in provider.logo, `${key} should have small logo`);
     assert(typeof provider.name === "string", `${key} name should be string`);
+    assert(typeof provider.logo === "string", `${key} logo should be string`);
     assert(provider.name.length > 0, `${key} name should not be empty`);
+    assert(provider.logo.length > 0, `${key} logo should not be empty`);
   }
 });
 
