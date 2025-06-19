@@ -118,7 +118,7 @@ export default function CarouselGallery(props: CarouselProps) {
                 <img
                   src={ERROR_IMAGE}
                   alt="Invalid SVG"
-                  className="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded pixelart"
+                  className="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded"
                   onLoad={handleLoad}
                 />
               </a>
@@ -176,7 +176,7 @@ export default function CarouselGallery(props: CarouselProps) {
                             src={`/content/${stamp.tx_hash}.${extension}`}
                             alt={`Stamp #${stamp.stamp}`}
                             loading="lazy"
-                            class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded"
+                            class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded pixelart stamp-image"
                             onLoad={handleLoad}
                           />
                         )}
