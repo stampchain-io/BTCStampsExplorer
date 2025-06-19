@@ -597,7 +597,7 @@ export function StampImage(
 
             setValidatedContent(
               <div
-                className="max-w-none object-contain rounded h-full w-full flex items-center justify-center"
+                className="max-w-none object-contain rounded pixelart stamp-image h-full w-full flex items-center justify-center"
                 dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
                 style={{
                   width: "100%",
@@ -863,6 +863,14 @@ export function StampImage(
               />
             </div>
           </div>
+          {flag && (
+            <RightPanel
+              stamp={stamp}
+              toggleCodeModal={toggleCodeModal}
+              toggleFullScreenModal={toggleFullScreenModal}
+              showCodeButton={false}
+            />
+          )}
         </div>
       )}
 
