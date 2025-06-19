@@ -143,7 +143,7 @@ export function StampCard({
               <div class="stamp-container">
                 <div class="relative z-10 aspect-square flex items-center justify-center">
                   <div
-                    class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                    class="max-w-none object-contain rounded h-full w-full"
                     dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
                   />
                 </div>
