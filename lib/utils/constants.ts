@@ -51,6 +51,7 @@ export const LIBRARY_FILE_IMAGE = "/img/placeholder/stamp-library.svg";
 export const ERROR_IMAGE = "/img/placeholder/stamp-error.svg";
 
 /* ===== CAROUSEL STAMPS ===== */
+// Update constants.test.ts to reflect these defs
 export const CAROUSEL_STAMP_IDS = [
   42158,
   336082,
@@ -77,42 +78,27 @@ export const DEFAULT_WALLET_CONNECTORS: WalletProviderKey[] = [
 
 export const WALLET_PROVIDERS: Record<
   WalletProviderKey,
-  { name: string; logo: { full: string; small: string } }
+  { name: string; logo: string }
 > = {
   unisat: {
     name: "Unisat",
-    logo: {
-      full: "/img/wallet/unisat/logo_unisat_full_white.png",
-      small: "/img/wallet/unisat/logo_unisat.png",
-    },
+    logo: "/img/wallet/unisat/logo_unisat.png",
   },
   leather: {
     name: "Leather",
-    logo: {
-      full: "/img/wallet/leather/logo_leather.svg",
-      small: "/img/wallet/leather/logo_leather.svg",
-    },
+    logo: "/img/wallet/leather/logo_leather.svg",
   },
   okx: {
     name: "OKX",
-    logo: {
-      full: "/img/wallet/okx/logo_okx.svg",
-      small: "/img/wallet/okx/logo_okx.svg",
-    },
+    logo: "/img/wallet/okx/logo_okx.svg",
   },
   tapwallet: {
     name: "TapWallet",
-    logo: {
-      small: "/img/wallet/tapwallet/logo_tapwallet.png",
-      full: "/img/wallet/tapwallet/logo_tapwallet.png",
-    },
+    logo: "/img/wallet/tapwallet/logo_tapwallet.png",
   },
   phantom: {
     name: "Phantom",
-    logo: {
-      full: "/img/wallet/phantom/logo_phantom.svg",
-      small: "/img/wallet/phantom/logo_phantom.svg",
-    },
+    logo: "/img/wallet/phantom/logo_phantom.svg",
   },
 };
 
