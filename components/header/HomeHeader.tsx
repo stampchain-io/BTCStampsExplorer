@@ -1,4 +1,5 @@
 import { ComponentChildren } from "preact";
+import { STAMPCHAIN_LOGO_IMAGE } from "$constants";
 
 function TitleText({
   children,
@@ -41,7 +42,7 @@ export function HomeHeader() {
       overflow-visible
     ">
       <img
-        src="/img/logo/stampchain-logo-480.svg"
+        src={STAMPCHAIN_LOGO_IMAGE}
         alt=""
         class="
           absolute

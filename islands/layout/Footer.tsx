@@ -1,5 +1,6 @@
 /* ===== FOOTER COMPONENT ===== */
 import { Icon } from "$icon";
+import { STAMPCHAIN_LOGO_IMAGE } from "$constants";
 import {
   copyright,
   logoPurpleDL,
@@ -113,7 +114,7 @@ export function Footer() {
     ">
       {/* ===== BACKGROUND LOGO ===== */}
       <img
-        src="/img/logo/stampchain-logo-480.svg"
+        src={STAMPCHAIN_LOGO_IMAGE}
         alt=""
         className="
           absolute z-[-999]
@@ -147,15 +148,10 @@ export function Footer() {
 
         {/* ===== SOCIAL MEDIA ICONS ===== */}
         <div className="flex gap-6 tablet:gap-4 mt-3 mobileMd:mt-0 tablet:mt-3">
-          {socialLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+          {socialLinks.map((link, index) => (
+            <div key={index}>
               {link.icon}
-            </a>
+            </div>
           ))}
         </div>
       </div>
