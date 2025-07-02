@@ -158,6 +158,7 @@ docs/
 logs/*
 coverage.lcov
 .claude/
+scripts/validate-expected-changes.js
 remove_sensitive_data.sh
 emergency_fix.sh
 emergency_cleanup.sh

@@ -1,0 +1,338 @@
+{
+  "info": {
+    "name": "BTC Stamps Explorer API - Comprehensive Testing",
+    "description": "Complete API testing covering all endpoints with regression detection",
+    "version": "3.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "test_address",
+      "value": "bc1qh52hsgrlhkgky3t3pkzsj4qtl6n6lzcsglad6u",
+      "type": "string"
+    },
+    {
+      "key": "test_stamp_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "test_block",
+      "value": "779652",
+      "type": "string"
+    },
+    {
+      "key": "test_tick",
+      "value": "STAMP",
+      "type": "string"
+    },
+    {
+      "key": "test_tx_hash",
+      "value": "8cb2ef23cdc9ba58e87b51325e38e10e90eeaa37b991c5f4df8c59ce08497cf7",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "System Endpoints",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has required fields\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('status');",
+                  "    pm.expect(jsonData).to.have.property('services');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "health"]
+            }
+          }
+        },
+        {
+          "name": "Version",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has version\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('version');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/version",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "version"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stamps Endpoints",
+      "item": [
+        {
+          "name": "Get Stamps List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps?limit=5&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "stamps"],
+              "query": [
+                {"key": "limit", "value": "5"},
+                {"key": "page", "value": "1"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Stamp by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps/{{test_stamp_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "stamps", "{{test_stamp_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Stamps by Block",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps/block/{{test_block}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "stamps", "block", "{{test_block}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Stamps by Ident",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps/ident/STAMP",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "stamps", "ident", "STAMP"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Balance Endpoints",
+      "item": [
+        {
+          "name": "Get Address Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/balance/{{test_address}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "balance", "{{test_address}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Stamps Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps/balance/{{test_address}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "stamps", "balance", "{{test_address}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SRC-20 Endpoints",
+      "item": [
+        {
+          "name": "Get SRC20 List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20?limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {"key": "limit", "value": "5"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC20 Tick List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/tick",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "src20", "tick"]
+            }
+          }
+        },
+        {
+          "name": "Get SRC20 by Tick",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/tick/{{test_tick}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "src20", "tick", "{{test_tick}}"]
+            }
+          }
+        },
+        {
+          "name": "Get SRC20 Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/balance/{{test_address}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "src20", "balance", "{{test_address}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Block Endpoints",
+      "item": [
+        {
+          "name": "Get Block Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/block/{{test_block}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "block", "{{test_block}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Block Count",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/block/block_count/10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "block", "block_count", "10"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cursed Stamps",
+      "item": [
+        {
+          "name": "Get Cursed List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/cursed?limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "cursed"],
+              "query": [
+                {"key": "limit", "value": "5"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Collections",
+      "item": [
+        {
+          "name": "Get Collections",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/collections",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "collections"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dispensers",
+      "item": [
+        {
+          "name": "Get Stamp Dispensers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps/{{test_stamp_id}}/dispensers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "stamps", "{{test_stamp_id}}", "dispensers"]
+            }
+          }
+        },
+        {
+          "name": "Get Stamp Dispenses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps/{{test_stamp_id}}/dispenses",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "stamps", "{{test_stamp_id}}", "dispenses"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

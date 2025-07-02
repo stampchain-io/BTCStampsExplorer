@@ -9,6 +9,7 @@ import {
 } from "$server/services/routeValidationService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
+import { isValidBitcoinAddress } from "$lib/utils/scriptTypeUtils.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(req: Request, ctx): Promise<Response> {
@@ -20,6 +21,15 @@ export const handler: Handlers<AddressHandlerContext> = {
       if (!paramsValidation.isValid) {
         return paramsValidation.error ??
           new Response("Invalid parameters", { status: 400 });
+      }
+
+      // Validate Bitcoin address format
+      if (!isValidBitcoinAddress(address)) {
+        return ResponseUtil.badRequest(
+          `Invalid Bitcoin address format: ${address}`,
+          undefined,
+          { routeType: RouteType.BALANCE },
+        );
       }
 
       // Get pagination params

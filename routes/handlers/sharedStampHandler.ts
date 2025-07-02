@@ -4,6 +4,7 @@ import { RouteType } from "$server/services/cacheService.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { validateSortDirection } from "$server/services/validationService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { getIdentifierType } from "$lib/utils/identifierUtils.ts";
 import {
   STAMP_EDITIONS,
   STAMP_FILESIZES,
@@ -247,6 +248,17 @@ export const createStampHandler = (
         return ApiResponseUtil.success(result, { routeType: cacheType });
       } else {
         const { id } = ctx.params;
+
+        // Validate stamp ID format before processing
+        const identifierType = getIdentifierType(id);
+        if (identifierType === "invalid") {
+          return ApiResponseUtil.badRequest(
+            `Invalid stamp identifier: ${id}. Must be a valid stamp number, transaction hash, or CPID.`,
+            undefined,
+            { routeType: getCacheType(new URL(req.url).pathname, false) },
+          );
+        }
+
         const path = new URL(req.url).pathname;
 
         if (path.includes("/holders")) {
