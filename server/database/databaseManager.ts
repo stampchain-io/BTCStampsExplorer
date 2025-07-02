@@ -837,3 +837,6 @@ console.log(`SKIP_REDIS_CONNECTION: ${(globalThis as any).SKIP_REDIS_CONNECTION 
 console.log("===========================");
 
 export const dbManager = new DatabaseManager(dbConfig);
+
+// Export the class for testing and other uses
+export { DatabaseManager };
