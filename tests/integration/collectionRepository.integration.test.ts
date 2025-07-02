@@ -5,6 +5,7 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { afterAll, beforeAll, describe, it } from "@std/testing/bdd";
 import { CollectionRepository } from "$server/database/collectionRepository.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 import collectionFixtures from "../fixtures/collectionData.json" with {
   type: "json",
 };
@@ -19,9 +20,12 @@ describe("CollectionRepository Integration Tests", { skip: skipInCI }, () => {
     // await seedTestData();
   });
 
-  // Optional: Clean up after tests
+  // Clean up after tests - close database connections
   afterAll(async () => {
-    // Could clean up test data here
+    // Close all database connections to prevent TCP leaks
+    await dbManager.closeAllClients();
+
+    // Could also clean up test data here if needed
     // await cleanupTestData();
   });
 

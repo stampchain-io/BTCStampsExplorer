@@ -5,6 +5,7 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { afterAll, beforeAll, describe, it } from "@std/testing/bdd";
 import { StampRepository } from "$server/database/stampRepository.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 import stampFixtures from "../fixtures/stampData.json" with { type: "json" };
 
 // Skip in CI if no test database is available
@@ -17,9 +18,12 @@ describe("StampRepository Integration Tests", { skip: skipInCI }, () => {
     // await seedTestData();
   });
 
-  // Optional: Clean up after tests
+  // Clean up after tests - close database connections
   afterAll(async () => {
-    // Could clean up test data here
+    // Close all database connections to prevent TCP leaks
+    await dbManager.closeAllClients();
+
+    // Could also clean up test data here if needed
     // await cleanupTestData();
   });
 
