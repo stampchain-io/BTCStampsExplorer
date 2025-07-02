@@ -23,10 +23,29 @@ mkdir -p "$REPORT_DIR"
 # Set timestamp for unique report names
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
+# Install dependencies if not already installed (for Docker)
+if ! command -v newman &> /dev/null; then
+    echo "Installing Newman..."
+    npm install -g newman newman-reporter-html newman-reporter-json
+fi
+
+# Install jq and bc if not available (for Alpine Linux in Docker)
+if ! command -v jq &> /dev/null || ! command -v bc &> /dev/null; then
+    echo "Installing required tools..."
+    apk add --no-cache jq bc 2>/dev/null || true
+fi
+
+# Check if environment file exists
+ENV_FILE="postman-environment-comprehensive.json"
+if [ ! -f "$ENV_FILE" ]; then
+    echo "Warning: $ENV_FILE not found, using minimal environment"
+    ENV_FILE=""
+fi
+
 # Run the pagination validation tests
 echo "Running pagination boundary tests..."
-npx newman run postman-collection-pagination-validation.json \
-    --environment postman-environment-comprehensive.json \
+newman run postman-collection-pagination-validation.json \
+    ${ENV_FILE:+--environment "$ENV_FILE"} \
     --env-var "base_url=$BASE_URL" \
     --env-var "current_env=${CURRENT_ENV:-prod}" \
     --iteration-data postman-data-pagination-tests.json \
@@ -44,9 +63,9 @@ if [ -f "$REPORT_DIR/pagination-validation-${TIMESTAMP}.json" ]; then
     echo "Analyzing test results..."
     
     # Extract key metrics
-    TOTAL_TESTS=$(jq '.run.stats.assertions.total' "$REPORT_DIR/pagination-validation-${TIMESTAMP}.json")
-    FAILED_TESTS=$(jq '.run.stats.assertions.failed' "$REPORT_DIR/pagination-validation-${TIMESTAMP}.json")
-    RESPONSE_TIME_AVG=$(jq '.run.timings.responseAverage' "$REPORT_DIR/pagination-validation-${TIMESTAMP}.json")
+    TOTAL_TESTS=$(jq -r '.run.stats.assertions.total // 0' "$REPORT_DIR/pagination-validation-${TIMESTAMP}.json")
+    FAILED_TESTS=$(jq -r '.run.stats.assertions.failed // 0' "$REPORT_DIR/pagination-validation-${TIMESTAMP}.json")
+    RESPONSE_TIME_AVG=$(jq -r '.run.timings.responseAverage // 0' "$REPORT_DIR/pagination-validation-${TIMESTAMP}.json")
     
     echo "Test Summary:"
     echo "- Total Tests: $TOTAL_TESTS"
@@ -60,7 +79,7 @@ if [ -f "$REPORT_DIR/pagination-validation-${TIMESTAMP}.json" ]; then
   "environment": "$BASE_URL",
   "total_tests": $TOTAL_TESTS,
   "failed_tests": $FAILED_TESTS,
-  "success_rate": $(echo "scale=2; ($TOTAL_TESTS - $FAILED_TESTS) * 100 / $TOTAL_TESTS" | bc),
+  "success_rate": $([ "$TOTAL_TESTS" -gt 0 ] && echo "scale=2; ($TOTAL_TESTS - $FAILED_TESTS) * 100 / $TOTAL_TESTS" | bc || echo 0),
   "avg_response_time": $RESPONSE_TIME_AVG
 }
 EOF
@@ -83,10 +102,12 @@ else
 fi
 
 # Performance threshold check
-if [ $(echo "$RESPONSE_TIME_AVG > 2000" | bc) -eq 1 ]; then
-    echo "⚠️  Warning: Average response time exceeds 2000ms threshold"
-    if [ "$CI" = "true" ]; then
-        echo "::warning::Performance degradation detected - average response time: ${RESPONSE_TIME_AVG}ms"
+if [ "${RESPONSE_TIME_AVG:-0}" != "0" ]; then
+    if [ $(echo "$RESPONSE_TIME_AVG > 2000" | bc 2>/dev/null || echo 0) -eq 1 ]; then
+        echo "⚠️  Warning: Average response time exceeds 2000ms threshold"
+        if [ "$CI" = "true" ]; then
+            echo "::warning::Performance degradation detected - average response time: ${RESPONSE_TIME_AVG}ms"
+        fi
     fi
 fi
 

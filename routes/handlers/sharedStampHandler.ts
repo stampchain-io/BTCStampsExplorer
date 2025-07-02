@@ -5,6 +5,7 @@ import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { validateSortDirection } from "$server/services/validationService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { getIdentifierType } from "$lib/utils/identifierUtils.ts";
+import { MAX_PAGINATION_LIMIT } from "$lib/utils/constants.ts";
 import {
   STAMP_EDITIONS,
   STAMP_FILESIZES,
@@ -114,8 +115,10 @@ export const createStampHandler = (
         }
 
         const { limit, page } = pagination;
-        const maxLimit = 100;
-        const effectiveLimit = Math.min(limit ?? maxLimit, maxLimit);
+        const effectiveLimit = Math.min(
+          limit ?? MAX_PAGINATION_LIMIT,
+          MAX_PAGINATION_LIMIT,
+        );
 
         // Get and validate sort parameter using new helper
         const sortParam = getSortParameter(url);

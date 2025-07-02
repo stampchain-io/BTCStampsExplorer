@@ -2085,11 +2085,13 @@ components:
     Limit:
       in: query
       name: limit
-      example: 1
+      example: 50
       schema:
         type: integer
         minimum: 1
-      description: The maximum number of items to return per page.
+        maximum: 1000
+        default: 50
+      description: The maximum number of items to return per page. Maximum allowed is 1000.
 
     Page:
       in: query
