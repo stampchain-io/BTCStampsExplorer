@@ -1,0 +1,177 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'tests/integration/**'
+      - 'server/**'
+      - 'routes/**'
+      - 'lib/**'
+      - 'deno.json'
+      - '.github/workflows/integration-tests.yml'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'tests/integration/**'
+      - 'server/**'
+      - 'routes/**'
+      - 'lib/**'
+      - 'deno.json'
+      - '.github/workflows/integration-tests.yml'
+  workflow_run:
+    workflows: ["Unit Tests with Fixtures"]
+    types:
+      - completed
+    branches:
+      - main
+      - dev
+
+jobs:
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Only run if unit tests passed (when triggered by workflow_run)
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testpassword
+          MYSQL_DATABASE: stamps_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      CI: true
+      DENO_ENV: test
+      # Database configuration for integration tests
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: testpassword
+      DB_NAME: stamps_test
+      # Redis configuration
+      REDIS_URL: redis://localhost:6379
+      ELASTICACHE_ENDPOINT: localhost:6379
+      SKIP_REDIS_CONNECTION: false
+      # Mock API keys for testing
+      QUICKNODE_API_KEY: test-quicknode-key
+      ANTHROPIC_API_KEY: test-anthropic-key
+      PERPLEXITY_API_KEY: test-perplexity-key
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.3.3
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-integration-${{ hashFiles('**/deno.json', '**/import_map.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-integration-
+            ${{ runner.os }}-deno-
+
+      - name: Wait for MySQL
+        run: |
+          echo "Waiting for MySQL to be ready..."
+          timeout 60 bash -c 'until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -ptestpassword --silent; do 
+            echo "MySQL not ready yet, waiting..."
+            sleep 2
+          done'
+          echo "MySQL is ready!"
+
+      - name: Setup test database schema
+        run: |
+          echo "Setting up test database schema..."
+          mysql -h 127.0.0.1 -P 3306 -u root -ptestpassword stamps_test < scripts/test-schema.sql || echo "No schema file found, skipping..."
+
+      - name: Verify Redis Connection
+        run: |
+          echo "Verifying Redis connection..."
+          redis-cli -h localhost -p 6379 ping
+          redis-cli -h localhost -p 6379 info server | head -5
+
+      - name: Cache dependencies
+        run: |
+          echo "Caching dependencies..."
+          deno cache --no-check main.ts dev.ts
+
+      - name: Run integration tests with coverage
+        run: |
+          echo "Running integration tests with real database and Redis..."
+          mkdir -p coverage
+          deno test --coverage=coverage/ tests/integration/ --no-check --allow-env --allow-read --allow-write --allow-net
+          
+          # Generate coverage report
+          echo "Generating coverage report..."
+          deno coverage coverage/
+          
+          # Generate LCOV report for Codecov
+          echo "Generating LCOV report..."
+          deno coverage coverage/ --lcov > coverage-integration.lcov
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: stampchain-io/BTCStampsExplorer
+          files: ./coverage-integration.lcov
+          flags: integrationtests
+          name: integration-tests-coverage
+          fail_ci_if_error: false
+
+      - name: Generate test summary
+        if: always()
+        run: |
+          echo "## Integration Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Environment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Database: MySQL 8.0 (test database)" >> $GITHUB_STEP_SUMMARY
+          echo "- Cache: Redis 7 (test instance)" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment: CI test environment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### Test Coverage" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Integration tests cover:" >> $GITHUB_STEP_SUMMARY
+          echo "- Database connections and queries" >> $GITHUB_STEP_SUMMARY
+          echo "- Redis caching functionality" >> $GITHUB_STEP_SUMMARY
+          echo "- API endpoint behavior" >> $GITHUB_STEP_SUMMARY
+          echo "- End-to-end workflows" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check test output
+        if: failure()
+        run: |
+          echo "❌ Integration tests failed. Please check the test output above."
+          echo "Common issues:"
+          echo "- Database connection problems"
+          echo "- Missing test data or schema"
+          echo "- Redis connection issues"
+          echo "- Network timeouts" 

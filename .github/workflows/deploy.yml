@@ -271,17 +271,32 @@ jobs:
       - name: Build project
         run: deno task build
 
-      # Simple unit test coverage
+      # Unit tests with mock database and fixtures
       - name: Run Unit Tests with Coverage
         run: |
-          echo "Running unit tests with coverage..."
+          echo "Running unit tests with mock database and fixtures..."
           mkdir -p coverage
           export DENO_ENV=test
-          deno test --coverage=coverage/ tests/unit/ --no-check --allow-env --allow-read
+          export SKIP_REDIS_CONNECTION=true
+          
+          # Verify fixtures are available
+          echo "Verifying test fixtures..."
+          ls -la tests/fixtures/ || echo "Warning: fixtures directory not found"
+          
+          # Run unit tests with coverage
+          deno test --coverage=coverage/ tests/unit/ --no-check --allow-env --allow-read --allow-write
+          
           echo "Generating coverage summary..."
           deno coverage coverage/
           echo "Generating LCOV report for Codecov..."
           deno coverage coverage/ --lcov > coverage.lcov
+          
+          # Show test summary
+          echo ""
+          echo "Unit Test Summary:"
+          echo "- Using mock database manager for repository tests"
+          echo "- Using test fixtures from tests/fixtures/"
+          echo "- Redis connection skipped for unit tests"
 
       # Upload coverage to Codecov
       - name: Upload coverage reports to Codecov
