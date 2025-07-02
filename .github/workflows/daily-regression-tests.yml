@@ -163,7 +163,7 @@ jobs:
           node scripts/analyze-newman-regression.js || true
           
           # Run expected changes validation
-          node scripts/validate-expected-changes.js || true
+          node scripts/validate-expected-changes.cjs || true
           
           # Enhanced historical analysis if requested
           if [ "${{ env.FULL_ANALYSIS }}" = "true" ]; then
@@ -415,7 +415,7 @@ EOF
             1. Download test artifacts from the workflow run
             2. Review \`expected-changes-validation.json\` for details
             3. Check HTML reports for specific failures
-            4. Update \`scripts/validate-expected-changes.js\` if changes are expected
+            4. Update \`scripts/validate-expected-changes.cjs\` if changes are expected
             
             ---
             *This issue was automatically created by the daily regression testing workflow.*

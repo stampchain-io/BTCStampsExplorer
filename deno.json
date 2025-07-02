@@ -94,7 +94,9 @@
       "**/tmp/**/*",
       "**/.cache/**/*",
       "**/build/**/*",
-      "**/vendor/**/*"
+      "**/vendor/**/*",
+      "scripts/*.js",
+      "scripts/*.cjs"
     ],
     "include": [
       "routes/",
@@ -106,7 +108,7 @@
       "tests/"
     ]
   },
-  "exclude": ["**/_fresh/*", "**/server/**/*"],
+  "exclude": ["**/_fresh/*", "**/server/**/*", "scripts/*.js", "scripts/*.cjs"],
   "nodeModulesDir": "auto",
   "imports": {
     "stream": "node:stream",
@@ -232,7 +234,9 @@
       ".idea/**/*",
       ".github/**/*",
       ".git/**/*",
-      ".env*"
+      ".env*",
+      "scripts/*.js",
+      "scripts/*.cjs"
     ],
     "useTabs": false,
     "lineWidth": 80,

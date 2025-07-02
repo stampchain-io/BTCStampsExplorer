@@ -1,0 +1,42 @@
+{
+  "expectedChanges": {
+    "allowedNewFields": [
+      "marketData",
+      "dispenserInfo",
+      "cacheStatus",
+      "timestamp",
+      "lastUpdated"
+    ],
+    "allowedFieldModifications": {
+      "pagination": [
+        "total",
+        "pages",
+        "hasNext",
+        "hasPrev"
+      ],
+      "status": [
+        "new",
+        "updated",
+        "active",
+        "inactive"
+      ]
+    },
+    "ignoreResponseFields": [
+      "responseTime",
+      "timestamp",
+      "cacheAge"
+    ]
+  },
+  "schemaValidation": {
+    "enforceRequired": true,
+    "enforceTypes": true,
+    "allowAdditionalProperties": true,
+    "ignoreEndpoints": [
+      "/api/v2/error"
+    ]
+  },
+  "performance": {
+    "warningThreshold": 2000,
+    "criticalThreshold": 5000
+  }
+}
