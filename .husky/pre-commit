@@ -1,3 +1,41 @@
+# Security check: Detect exposed secrets and local paths
+echo "🔒 Checking for secrets and local paths..."
+
+# Flag to track if we found any issues
+FOUND_ISSUES=0
+
+# Check staged files for potential secrets and local paths
+for file in $(git diff --cached --name-only); do
+    if [ -f "$file" ]; then
+        # Check for common secret patterns
+        if git diff --cached "$file" | grep -E "(API_KEY|SECRET|PASSWORD|TOKEN|PRIVATE)" | grep -v "^[[:space:]]*#" | grep -q "="; then
+            echo "❌ Potential secret found in $file"
+            echo "   Please review and ensure no actual secrets are committed"
+            FOUND_ISSUES=1
+        fi
+        
+        # Check for absolute local paths outside repository
+        if git diff --cached "$file" | grep -E "^[+].*(/Users/|/home/|C:\\\\|/tmp/|/var/)" | grep -v "BTCStampsExplorer" | grep -q .; then
+            echo "❌ Local file path detected in $file"
+            echo "   Please remove absolute paths outside the repository"
+            FOUND_ISSUES=1
+        fi
+        
+        # Check for common sensitive file patterns
+        if git diff --cached "$file" | grep -E "(\.env\.local|\.log|settings\.local|config\.local)" | grep -q .; then
+            echo "⚠️  Potential local config file reference in $file"
+            echo "   Please verify this should be committed"
+        fi
+    fi
+done
+
+if [ $FOUND_ISSUES -eq 1 ]; then
+    echo "❌ Security check failed - commit aborted"
+    exit 1
+fi
+
+echo "✅ Security checks passed"
+
 deno task check:fmt
 if [ $? -ne 0 ]; then
   echo "Formatting failed. Please run 'deno fmt .' to fix."
