@@ -293,28 +293,40 @@ export class MockDatabaseManager {
     const src20Data = src20Fixtures.src20Valid ||
       src20Fixtures.src20Transactions || [];
 
-    // Special handling for mint progress queries
+    // Special handling for mint progress queries (fetchSrc20MintProgress)
     if (
-      normalizedQuery.includes("dep.tick = ?") &&
-      normalizedQuery.includes("op = 'deploy'")
+      normalizedQuery.includes("src20_token_stats") ||
+      (normalizedQuery.includes("dep.tick") &&
+        normalizedQuery.includes("dep.max") &&
+        normalizedQuery.includes("dep.deci") &&
+        normalizedQuery.includes("op = 'deploy'"))
     ) {
-      // For mint progress queries, return a DEPLOY transaction if available
-      const deployTx = src20Data.find((tx: any) => tx.op === "DEPLOY");
-      if (deployTx && deployTx.tick) {
-        return {
-          rows: [{
-            max: deployTx.max || "1000000",
-            deci: deployTx.deci || 18,
-            lim: deployTx.lim || "1000",
-            tx_hash: deployTx.tx_hash || "mock_tx_hash",
-            tick: deployTx.tick, // Use actual tick from fixture
-            total_minted: "500000",
-            holders_count: 100,
-            total_mints: 50,
-          }],
-        };
+      // Get the requested tick from params
+      const requestedTick = params[0] as string;
+
+      // For mint progress queries, only return data for ticks that exist in fixtures
+      // The fixture has a DEPLOY transaction with tick "!"
+      if (requestedTick === "!" || requestedTick === "\\U00000021") {
+        const deployTx = src20Data.find((tx: any) =>
+          tx.op === "DEPLOY" && tx.tick === "!"
+        );
+        if (deployTx) {
+          return {
+            rows: [{
+              max: deployTx.max || "1000000",
+              deci: deployTx.deci || 18,
+              lim: deployTx.lim || "1000",
+              tx_hash: deployTx.tx_hash || "mock_tx_hash",
+              tick: deployTx.tick, // This should be "!"
+              total_minted: "500000",
+              holders_count: 100,
+              total_mints: 50,
+            }],
+          };
+        }
       }
-      // Return empty if no DEPLOY found or tick is missing
+
+      // For any other tick (including NOPE!, undefined, etc.), return empty rows
       return { rows: [] };
     }
 

@@ -19,12 +19,14 @@ Deno.test("SRC20Repository Unit Tests with DI", async (t) => {
 
   // Teardown after each test
   function teardown() {
+    // Clear mock data FIRST before restoring
+    if (mockDb) {
+      mockDb.clearQueryHistory();
+      mockDb.clearMockResponses();
+    }
+
     // Restore original database
     SRC20Repository.setDatabase(originalDb);
-
-    // Clear mock data
-    mockDb.clearQueryHistory();
-    mockDb.clearMockResponses();
   }
 
   await t.step(
@@ -137,30 +139,90 @@ Deno.test("SRC20Repository Unit Tests with DI", async (t) => {
   });
 
   await t.step(
-    "fetchSrc20MintProgress - handles mint progress queries",
+    "fetchSrc20MintProgress - returns null for non-existent tokens",
     async () => {
       setup();
 
-      // Test 1: When no DEPLOY transaction exists (returns null)
-      const result1 = await SRC20Repository.fetchSrc20MintProgress(
-        "NONEXISTENT",
+      // Explicitly set the mock to return empty rows
+      mockDb.setMockResponse(
+        `
+      SELECT 
+        dep.max,
+        dep.deci,
+        dep.lim,
+        dep.tx_hash,
+        dep.tick,
+        COALESCE(stats.total_minted, 0) as total_minted,
+        COALESCE(stats.holders_count, 0) as holders_count,
+        (SELECT COUNT(*) FROM SRC20Valid WHERE tick = dep.tick AND op = 'MINT') AS total_mints
+      FROM SRC20Valid AS dep
+      LEFT JOIN src20_token_stats stats ON stats.tick = dep.tick
+      WHERE 
+        dep.tick = ? AND
+        dep.op = 'DEPLOY'
+      LIMIT 1;
+    `,
+        ["NOPE!"],
+        { rows: [] },
       );
-      assertEquals(result1, null);
 
-      // Test 2: When DEPLOY transaction exists in fixtures
-      // Let the mock use its default behavior with fixture data
-      const result2 = await SRC20Repository.fetchSrc20MintProgress("!");
+      const result = await SRC20Repository.fetchSrc20MintProgress("NOPE!");
+      assertEquals(result, null, "Should return null for non-existent token");
 
-      // The method can return null or data depending on fixtures
-      if (result2 !== null) {
-        assertExists(result2.max_supply);
-        assertExists(result2.total_minted);
-        assertExists(result2.progress);
-        assertExists(result2.decimals);
-        // Only check tick if it exists - mock might not provide it correctly
-        if (result2.tick) {
-          assertEquals(typeof result2.tick, "string");
-        }
+      teardown();
+    },
+  );
+
+  await t.step(
+    "fetchSrc20MintProgress - returns data for existing tokens",
+    async () => {
+      setup();
+
+      // Explicitly set the mock to return data for "!"
+      mockDb.setMockResponse(
+        `
+      SELECT 
+        dep.max,
+        dep.deci,
+        dep.lim,
+        dep.tx_hash,
+        dep.tick,
+        COALESCE(stats.total_minted, 0) as total_minted,
+        COALESCE(stats.holders_count, 0) as holders_count,
+        (SELECT COUNT(*) FROM SRC20Valid WHERE tick = dep.tick AND op = 'MINT') AS total_mints
+      FROM SRC20Valid AS dep
+      LEFT JOIN src20_token_stats stats ON stats.tick = dep.tick
+      WHERE 
+        dep.tick = ? AND
+        dep.op = 'DEPLOY'
+      LIMIT 1;
+    `,
+        ["!"],
+        {
+          rows: [{
+            max: "1000000",
+            deci: 18,
+            lim: 1000,
+            tx_hash:
+              "56a96c01d4dc11ed62566bd258a9549e971afedc9270b44a014220e931c4945d",
+            tick: "!",
+            total_minted: "500000",
+            holders_count: 100,
+            total_mints: 50,
+          }],
+        },
+      );
+
+      const result = await SRC20Repository.fetchSrc20MintProgress("!");
+
+      assertExists(result, "Should return data for existing token");
+      if (result) {
+        assertEquals(result.tick, "!", "Tick should match");
+        assertExists(result.max_supply);
+        assertExists(result.total_minted);
+        assertExists(result.progress);
+        assertExists(result.decimals);
+        assertExists(result.tx_hash);
       }
 
       teardown();
