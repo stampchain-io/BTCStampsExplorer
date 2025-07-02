@@ -5,13 +5,13 @@
 **Date Added**: 2025-01-13  
 **Priority**: Medium  
 **Category**: Architecture / Testing  
-**Status**: IN PROGRESS (87% Complete)
+**Status**: IN PROGRESS (90% Complete)
 
 ### Description
 All repository classes (StampRepository, MarketDataRepository, SRC20Repository, etc.) currently use static methods and import dbManager directly as a singleton, making unit testing with mocks difficult.
 
 ### Current State
-**UPDATE 2025-01-14**: Migration 87% complete! 
+**UPDATE 2025-01-14**: Migration 90% complete! 
 - ✅ All repositories now have `setDatabase()` methods 
 - ✅ All repository methods updated to use `this.db` 
 - ✅ MockDatabaseManager created and uses existing fixtures
@@ -20,7 +20,7 @@ All repository classes (StampRepository, MarketDataRepository, SRC20Repository, 
 - ✅ stampRepository.working.test.ts fully converted to DI (21/21 tests passing)
 - ✅ marketDataRepository.unit.test.ts created with DI pattern (8/8 tests passing)
 - ✅ src20Repository.unit.test.ts created with DI pattern (10/10 tests passing)
-- ⏳ collectionRepository.unit.test.ts created with DI pattern (8/13 tests passing - 62%)
+- ✅ collectionRepository.unit.test.ts created with DI pattern (13/13 tests passing)
 - ✅ Mock properly filters stamp types and handles all query patterns
 - ✅ CI configuration updated with separate unit/integration test workflows
 - ⏳ Remaining unit tests: BlockRepository, SRC101Repository
