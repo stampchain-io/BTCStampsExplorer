@@ -1,0 +1,584 @@
+{
+  "info": {
+    "name": "BTC Stamps Explorer API - Enhanced Dual Endpoint Testing",
+    "description": "Sophisticated API testing with dual endpoint comparison, response validation, and performance monitoring",
+    "version": "2.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "comparison_results",
+      "value": "[]",
+      "type": "any"
+    },
+    {
+      "key": "performance_metrics",
+      "value": "{}",
+      "type": "any"
+    },
+    {
+      "key": "test_session_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Enhanced Pre-request Script for Dual Endpoint Testing",
+          "// Generate unique test session ID",
+          "if (!pm.collectionVariables.get('test_session_id')) {",
+          "    const sessionId = 'test_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);",
+          "    pm.collectionVariables.set('test_session_id', sessionId);",
+          "    console.log('🚀 Starting new test session:', sessionId);",
+          "}",
+          "",
+          "// Initialize comparison results array if not exists",
+          "if (!pm.collectionVariables.get('comparison_results')) {",
+          "    pm.collectionVariables.set('comparison_results', JSON.stringify([]));",
+          "}",
+          "",
+          "// Initialize performance metrics if not exists",
+          "if (!pm.collectionVariables.get('performance_metrics')) {",
+          "    pm.collectionVariables.set('performance_metrics', JSON.stringify({}));",
+          "}",
+          "",
+          "// Set request start time for performance tracking",
+          "pm.globals.set('request_start_time', Date.now());",
+          "",
+          "// Enhanced URL parameter handling",
+          "const url = pm.request.url;",
+          "if (url && url.query) {",
+          "    url.query.each((param) => {",
+          "        if (param.key === 'limit' && !param.value) {",
+          "            param.value = '1'; // Default limit for testing",
+          "        }",
+          "        if (param.key === 'page' && !param.value) {",
+          "            param.value = '1'; // Default page for testing",
+          "        }",
+          "    });",
+          "}",
+          "",
+          "// Log request details",
+          "console.log('📤 Request:', {",
+          "    method: pm.request.method,",
+          "    url: pm.request.url.toString(),",
+          "    headers: pm.request.headers.toObject()",
+          "});"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+                     "// Enhanced Test Script for Dual Endpoint Comparison",
+           "const requestEndTime = Date.now();",
+           "const requestStartTime = pm.globals.get('request_start_time');",
+           "const currentResponseTime = requestEndTime - requestStartTime;",
+          "",
+          "// Get current environment variables",
+          "const devBaseUrl = pm.environment.get('dev_base_url');",
+          "const prodBaseUrl = pm.environment.get('prod_base_url');",
+          "const currentBaseUrl = pm.environment.get('base_url');",
+          "",
+                     "// Determine if this is dev or prod request",
+           "const requestUrl = pm.request.url.toString();",
+           "const isDev = requestUrl.includes('host.docker.internal') || requestUrl.includes('localhost');",
+           "const requestType = isDev ? 'development' : 'production';",
+          "",
+                     "console.log(`📥 Response from ${requestType}:`, {",
+           "    status: pm.response.code,",
+           "    responseTime: currentResponseTime + 'ms',",
+           "    size: pm.response.responseSize + ' bytes'",
+           "});",
+          "",
+          "// Store response data for comparison",
+          "const responseData = {",
+          "    type: requestType,",
+          "    url: pm.request.url.toString(),",
+          "    method: pm.request.method,",
+          "    status: pm.response.code,",
+                     "    responseTime: currentResponseTime,",
+          "    headers: pm.response.headers.toObject(),",
+          "    body: pm.response.text(),",
+          "    timestamp: new Date().toISOString()",
+          "};",
+          "",
+          "// Get existing results",
+          "let comparisonResults = JSON.parse(pm.collectionVariables.get('comparison_results') || '[]');",
+          "let performanceMetrics = JSON.parse(pm.collectionVariables.get('performance_metrics') || '{}');",
+          "",
+                     "// Find matching request for comparison",
+           "const endpointPath = pm.request.url.getPath();",
+           "const requestKey = `${pm.request.method}_${endpointPath}`;",
+           "let existingResult = comparisonResults.find(r => r.requestKey === requestKey);",
+          "",
+          "if (!existingResult) {",
+                     "    existingResult = {",
+           "        requestKey: requestKey,",
+           "        endpoint: endpointPath,",
+           "        method: pm.request.method,",
+           "        dev: null,",
+           "        prod: null,",
+           "        comparison: null",
+           "    };",
+          "    comparisonResults.push(existingResult);",
+          "}",
+          "",
+          "// Store response data",
+          "existingResult[requestType] = responseData;",
+          "",
+          "// Perform comparison if both responses exist",
+          "if (existingResult.dev && existingResult.prod) {",
+          "    console.log('🔍 Performing dual endpoint comparison...');",
+          "    ",
+          "    const comparison = performDualComparison(existingResult.dev, existingResult.prod);",
+          "    existingResult.comparison = comparison;",
+          "    ",
+          "    // Log comparison results",
+          "    if (comparison.identical) {",
+          "        console.log('✅ Responses are identical');",
+          "    } else {",
+          "        console.log('⚠️ Differences found:', comparison.differences);",
+          "    }",
+          "}",
+          "",
+                     "// Update performance metrics",
+           "if (!performanceMetrics[requestKey]) {",
+           "    performanceMetrics[requestKey] = { dev: [], prod: [] };",
+           "}",
+           "if (!performanceMetrics[requestKey][requestType]) {",
+           "    performanceMetrics[requestKey][requestType] = [];",
+           "}",
+           "performanceMetrics[requestKey][requestType].push(currentResponseTime);",
+          "",
+          "// Save updated results",
+          "pm.collectionVariables.set('comparison_results', JSON.stringify(comparisonResults));",
+          "pm.collectionVariables.set('performance_metrics', JSON.stringify(performanceMetrics));",
+          "",
+          "// Basic response validation",
+          "pm.test('Response status is valid', function () {",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 500]);",
+          "});",
+          "",
+                     "pm.test('Response time is acceptable', function () {",
+           "    pm.expect(currentResponseTime).to.be.below(30000); // 30 seconds max",
+           "});",
+          "",
+          "if (pm.response.code === 200) {",
+          "    pm.test('Response has valid JSON', function () {",
+          "        pm.expect(() => pm.response.json()).to.not.throw();",
+          "    });",
+          "}",
+          "",
+          "// Enhanced comparison function",
+          "function performDualComparison(devResponse, prodResponse) {",
+          "    const comparison = {",
+          "        identical: true,",
+          "        differences: [],",
+          "        statusMatch: devResponse.status === prodResponse.status,",
+          "        performanceDiff: Math.abs(devResponse.responseTime - prodResponse.responseTime),",
+          "        timestamp: new Date().toISOString()",
+          "    };",
+          "    ",
+          "    // Status code comparison",
+          "    if (devResponse.status !== prodResponse.status) {",
+          "        comparison.identical = false;",
+          "        comparison.differences.push({",
+          "            type: 'status_code',",
+          "            dev: devResponse.status,",
+          "            prod: prodResponse.status",
+          "        });",
+          "    }",
+          "    ",
+          "    // Response body comparison (if both are 200)",
+          "    if (devResponse.status === 200 && prodResponse.status === 200) {",
+          "        try {",
+          "            const devBody = JSON.parse(devResponse.body);",
+          "            const prodBody = JSON.parse(prodResponse.body);",
+          "            ",
+          "            const bodyComparison = compareObjects(devBody, prodBody, '');",
+          "            if (bodyComparison.length > 0) {",
+          "                comparison.identical = false;",
+          "                comparison.differences.push({",
+          "                    type: 'response_body',",
+          "                    details: bodyComparison",
+          "                });",
+          "            }",
+          "        } catch (e) {",
+          "            // Handle non-JSON responses",
+          "            if (devResponse.body !== prodResponse.body) {",
+          "                comparison.identical = false;",
+          "                comparison.differences.push({",
+          "                    type: 'response_body_text',",
+          "                    message: 'Non-JSON responses differ'",
+          "                });",
+          "            }",
+          "        }",
+          "    }",
+          "    ",
+          "    // Performance comparison (warn if >10% difference)",
+          "    const perfThreshold = Math.max(devResponse.responseTime, prodResponse.responseTime) * 0.1;",
+          "    if (comparison.performanceDiff > perfThreshold) {",
+          "        comparison.differences.push({",
+          "            type: 'performance',",
+          "            dev: devResponse.responseTime + 'ms',",
+          "            prod: prodResponse.responseTime + 'ms',",
+          "            difference: comparison.performanceDiff + 'ms'",
+          "        });",
+          "    }",
+          "    ",
+          "    return comparison;",
+          "}",
+          "",
+          "// Deep object comparison function",
+          "function compareObjects(obj1, obj2, path) {",
+          "    const differences = [];",
+          "    ",
+          "    // Handle null/undefined cases",
+          "    if (obj1 === null && obj2 === null) return differences;",
+          "    if (obj1 === null || obj2 === null) {",
+          "        differences.push({ path, dev: obj1, prod: obj2, type: 'null_mismatch' });",
+          "        return differences;",
+          "    }",
+          "    ",
+          "    // Handle primitive types",
+          "    if (typeof obj1 !== 'object' || typeof obj2 !== 'object') {",
+          "        if (obj1 !== obj2) {",
+          "            differences.push({ path, dev: obj1, prod: obj2, type: 'value_mismatch' });",
+          "        }",
+          "        return differences;",
+          "    }",
+          "    ",
+          "    // Handle arrays",
+          "    if (Array.isArray(obj1) && Array.isArray(obj2)) {",
+          "        if (obj1.length !== obj2.length) {",
+          "            differences.push({ path, dev: obj1.length, prod: obj2.length, type: 'array_length_mismatch' });",
+          "        }",
+          "        ",
+          "        const maxLength = Math.max(obj1.length, obj2.length);",
+          "        for (let i = 0; i < maxLength; i++) {",
+          "            const newPath = path ? `${path}[${i}]` : `[${i}]`;",
+          "            differences.push(...compareObjects(obj1[i], obj2[i], newPath));",
+          "        }",
+          "        return differences;",
+          "    }",
+          "    ",
+          "    // Handle objects",
+          "    const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);",
+          "    ",
+          "    for (const key of allKeys) {",
+          "        const newPath = path ? `${path}.${key}` : key;",
+          "        ",
+          "        if (!(key in obj1)) {",
+          "            differences.push({ path: newPath, dev: undefined, prod: obj2[key], type: 'missing_in_dev' });",
+          "        } else if (!(key in obj2)) {",
+          "            differences.push({ path: newPath, dev: obj1[key], prod: undefined, type: 'missing_in_prod' });",
+          "        } else {",
+          "            differences.push(...compareObjects(obj1[key], obj2[key], newPath));",
+          "        }",
+          "    }",
+          "    ",
+          "    return differences;",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Dual Endpoint Tests",
+      "description": "Tests that run against both development and production endpoints for comparison",
+      "item": [
+        {
+          "name": "Health Check - Development",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/health",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Set environment to development for this request",
+                  "pm.environment.set('base_url', pm.environment.get('dev_base_url'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Health Check - Production",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/health",
+              "host": ["{{prod_base_url}}"],
+              "path": ["api", "v2", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Set environment to production for this request",
+                  "pm.environment.set('base_url', pm.environment.get('prod_base_url'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API Version - Development",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/version",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "version"]
+            }
+          }
+        },
+        {
+          "name": "API Version - Production",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/version",
+              "host": ["{{prod_base_url}}"],
+              "path": ["api", "v2", "version"]
+            }
+          }
+        },
+        {
+          "name": "Stamps List - Development",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps?limit=1",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "stamps"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Stamps List - Production",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/stamps?limit=1",
+              "host": ["{{prod_base_url}}"],
+              "path": ["api", "v2", "stamps"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRC20 List - Development",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src20?limit=1",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRC20 List - Production",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src20?limit=1",
+              "host": ["{{prod_base_url}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Generate Comparison Report",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dev_base_url}}/api/v2/health",
+          "host": ["{{dev_base_url}}"],
+          "path": ["api", "v2", "health"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Generate comprehensive comparison report",
+              "const comparisonResults = JSON.parse(pm.collectionVariables.get('comparison_results') || '[]');",
+              "const performanceMetrics = JSON.parse(pm.collectionVariables.get('performance_metrics') || '{}');",
+              "const sessionId = pm.collectionVariables.get('test_session_id');",
+              "",
+              "console.log('\\n' + '='.repeat(80));",
+              "console.log('🔍 DUAL ENDPOINT COMPARISON REPORT');",
+              "console.log('='.repeat(80));",
+              "console.log('Session ID:', sessionId);",
+              "console.log('Generated:', new Date().toISOString());",
+              "console.log('Total Endpoints Tested:', comparisonResults.length);",
+              "",
+              "let identicalCount = 0;",
+              "let differenceCount = 0;",
+              "",
+              "comparisonResults.forEach((result, index) => {",
+              "    console.log(`\\n${index + 1}. ${result.method} ${result.endpoint}`);",
+              "    console.log('   ' + '-'.repeat(50));",
+              "    ",
+              "    if (result.dev && result.prod) {",
+              "        console.log(`   Dev Status: ${result.dev.status} (${result.dev.responseTime}ms)`);",
+              "        console.log(`   Prod Status: ${result.prod.status} (${result.prod.responseTime}ms)`);",
+              "        ",
+              "        if (result.comparison) {",
+              "            if (result.comparison.identical) {",
+              "                console.log('   ✅ IDENTICAL');",
+              "                identicalCount++;",
+              "            } else {",
+              "                console.log('   ⚠️ DIFFERENCES FOUND:');",
+              "                differenceCount++;",
+              "                result.comparison.differences.forEach(diff => {",
+              "                    console.log(`      - ${diff.type}: ${JSON.stringify(diff)}`);",
+              "                });",
+              "            }",
+              "        }",
+              "    } else {",
+              "        console.log('   ❌ INCOMPLETE - Missing response from one endpoint');",
+              "        if (!result.dev) console.log('      Missing: Development');",
+              "        if (!result.prod) console.log('      Missing: Production');",
+              "    }",
+              "});",
+              "",
+              "console.log('\\n' + '='.repeat(80));",
+              "console.log('📊 SUMMARY');",
+              "console.log('='.repeat(80));",
+              "console.log(`Identical Responses: ${identicalCount}`);",
+              "console.log(`Different Responses: ${differenceCount}`);",
+              "console.log(`Success Rate: ${((identicalCount / (identicalCount + differenceCount)) * 100).toFixed(1)}%`);",
+              "",
+              "// Performance analysis",
+              "console.log('\\n📈 PERFORMANCE ANALYSIS');",
+              "console.log('-'.repeat(40));",
+              "Object.keys(performanceMetrics).forEach(endpoint => {",
+              "    const metrics = performanceMetrics[endpoint];",
+              "    if (metrics.dev.length > 0 && metrics.prod.length > 0) {",
+              "        const devAvg = metrics.dev.reduce((a, b) => a + b, 0) / metrics.dev.length;",
+              "        const prodAvg = metrics.prod.reduce((a, b) => a + b, 0) / metrics.prod.length;",
+              "        const diff = Math.abs(devAvg - prodAvg);",
+              "        const faster = devAvg < prodAvg ? 'Dev' : 'Prod';",
+              "        ",
+              "        console.log(`${endpoint}:`);",
+              "        console.log(`  Dev: ${devAvg.toFixed(0)}ms | Prod: ${prodAvg.toFixed(0)}ms`);",
+              "        console.log(`  Difference: ${diff.toFixed(0)}ms (${faster} faster)`);",
+              "    }",
+              "});",
+              "",
+              "console.log('\\n' + '='.repeat(80));",
+              "",
+              "// Set test results",
+              "pm.test('All endpoints have identical responses', function () {",
+              "    pm.expect(differenceCount).to.equal(0);",
+              "});",
+              "",
+              "pm.test('All endpoints responded successfully', function () {",
+              "    const incompleteTests = comparisonResults.filter(r => !r.dev || !r.prod);",
+              "    pm.expect(incompleteTests.length).to.equal(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+} 

@@ -43,10 +43,12 @@ class EndpointCoverageValidator {
 
   loadNewmanCollection() {
     try {
-      const collectionContent = fs.readFileSync('postman-collection-full-regression.json', 'utf8');
+      // Allow override via environment variable
+      const collectionFile = process.env.NEWMAN_COLLECTION || 'postman-collection-full-regression.json';
+      const collectionContent = fs.readFileSync(collectionFile, 'utf8');
       return JSON.parse(collectionContent);
     } catch (error) {
-      console.error('❌ Error loading Newman collection:', error.message);
+      console.error(`❌ Error loading Newman collection (${process.env.NEWMAN_COLLECTION || 'postman-collection-full-regression.json'}):`, error.message);
       process.exit(1);
     }
   }
