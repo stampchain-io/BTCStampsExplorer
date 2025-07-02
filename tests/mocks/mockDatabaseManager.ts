@@ -130,7 +130,9 @@ export class MockDatabaseManager {
     // SRC-20 queries
     if (
       normalizedQuery.includes("from src20valid") ||
-      normalizedQuery.includes("from balances")
+      normalizedQuery.includes("from balances") ||
+      normalizedQuery.includes("src20_balance") ||
+      normalizedQuery.includes("src20valid") // Also match table name without FROM
     ) {
       return this.getSrc20Data(normalizedQuery, params);
     }
@@ -267,40 +269,96 @@ export class MockDatabaseManager {
    * Get SRC-20 data from fixtures
    */
   private getSrc20Data(query: string, params: unknown[]): QueryResult {
+    const normalizedQuery = query.toLowerCase();
     const src20Fixtures = src20FixturesData as any;
+
+    // Handle balance queries
+    if (
+      normalizedQuery.includes("src20_balance") ||
+      normalizedQuery.includes("balances")
+    ) {
+      // Return mock balance data
+      return {
+        rows: [{
+          address: "bc1test",
+          p: "src-20",
+          tick: "PEPE",
+          amt: "1000000",
+          block_time: "2024-01-01T00:00:00Z",
+          last_update: "2024-01-01T00:00:00Z",
+        }],
+      };
+    }
+
     const src20Data = src20Fixtures.src20Valid ||
       src20Fixtures.src20Transactions || [];
+
+    // Special handling for mint progress queries
+    if (
+      normalizedQuery.includes("dep.tick = ?") &&
+      normalizedQuery.includes("op = 'deploy'")
+    ) {
+      // For mint progress queries, return a DEPLOY transaction if available
+      const deployTx = src20Data.find((tx: any) => tx.op === "DEPLOY");
+      if (deployTx && deployTx.tick) {
+        return {
+          rows: [{
+            max: deployTx.max || "1000000",
+            deci: deployTx.deci || 18,
+            lim: deployTx.lim || "1000",
+            tx_hash: deployTx.tx_hash || "mock_tx_hash",
+            tick: deployTx.tick, // Use actual tick from fixture
+            total_minted: "500000",
+            holders_count: 100,
+            total_mints: 50,
+          }],
+        };
+      }
+      // Return empty if no DEPLOY found or tick is missing
+      return { rows: [] };
+    }
 
     // Filter based on query parameters
     let filtered = [...src20Data];
 
     // Apply filters based on params
-    if (query.includes("where")) {
+    if (normalizedQuery.includes("where")) {
       // Filter by tick
-      if (query.includes("tick =")) {
-        const tickParam = params.find((p) => typeof p === "string");
-        if (tickParam) {
-          filtered = filtered.filter((tx) => tx.tick === tickParam);
+      if (
+        normalizedQuery.includes("tick =") ||
+        normalizedQuery.includes("tick in")
+      ) {
+        const tickParams = params.filter((p) =>
+          typeof p === "string" && p.length > 2
+        );
+        if (tickParams.length > 0) {
+          filtered = filtered.filter((tx) => tickParams.includes(tx.tick));
         }
       }
 
       // Filter by op
-      if (query.includes("op =")) {
-        const opIndex = params.findIndex((p) =>
+      if (
+        normalizedQuery.includes("op =") || normalizedQuery.includes("op in")
+      ) {
+        const opParams = params.filter((p) =>
           typeof p === "string" &&
           ["DEPLOY", "MINT", "TRANSFER"].includes(p as string)
         );
-        if (opIndex >= 0) {
-          filtered = filtered.filter((tx) => tx.op === params[opIndex]);
+        if (opParams.length > 0) {
+          filtered = filtered.filter((tx) => opParams.includes(tx.op));
         }
       }
     }
 
     // Apply limit
-    if (query.includes("limit")) {
-      const limitIndex = params.length - 2;
-      const limit = params[limitIndex] as number || 50;
-      filtered = filtered.slice(0, limit);
+    if (normalizedQuery.includes("limit")) {
+      const limitIndex = params.findIndex((p) =>
+        typeof p === "number" && p > 0 && p < 1000
+      );
+      if (limitIndex >= 0) {
+        const limit = params[limitIndex] as number;
+        filtered = filtered.slice(0, limit);
+      }
     }
 
     return { rows: filtered };
@@ -394,8 +452,21 @@ export class MockDatabaseManager {
       return { rows: [{ total: stamps.length }] };
     }
 
-    if (normalizedQuery.includes("from src20valid")) {
+    if (
+      normalizedQuery.includes("from src20valid") ||
+      normalizedQuery.includes("src20valid")
+    ) {
       // Return total SRC-20 transactions
+      const src20Data = src20Fixtures.src20Valid ||
+        src20Fixtures.src20Transactions || [];
+      return { rows: [{ total: src20Data.length }] };
+    }
+
+    if (
+      normalizedQuery.includes("src20_balance") ||
+      normalizedQuery.includes("balances")
+    ) {
+      // For balance count queries, return based on fixture data
       const src20Data = src20Fixtures.src20Valid ||
         src20Fixtures.src20Transactions || [];
       return { rows: [{ total: src20Data.length }] };
