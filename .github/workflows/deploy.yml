@@ -276,7 +276,8 @@ jobs:
         run: |
           echo "Running unit tests with coverage..."
           mkdir -p coverage
-          DENO_ENV=test deno test --coverage=coverage/ tests/unit/ --no-check --allow-env --allow-read
+          export DENO_ENV=test
+          deno test --coverage=coverage/ tests/unit/ --no-check --allow-env --allow-read
           echo "Generating coverage summary..."
           deno coverage coverage/
           echo "Generating LCOV report for Codecov..."
