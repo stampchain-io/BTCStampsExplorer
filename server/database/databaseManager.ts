@@ -253,11 +253,12 @@ class DatabaseManager {
     );
   }
 
-  private createConnection(): Promise<Client> {
+  private async createConnection(): Promise<Client> {
     const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = this.config;
     const charset = 'utf8mb4';
     
-    return new Client().connect({
+    const client = new Client();
+    await client.connect({
       hostname: DB_HOST,
       port: DB_PORT,
       username: DB_USER,
@@ -268,6 +269,16 @@ class DatabaseManager {
       idleTimeout: 0, // Disable idle timeout
       timeout: 60000, // 60 second query timeout
     });
+    
+    // Set session timezone to UTC to ensure consistent timestamp handling
+    try {
+      await client.execute("SET time_zone = '+00:00'", []);
+      this.#logger.debug("Set MySQL session timezone to UTC");
+    } catch (error) {
+      this.#logger.warn("Failed to set session timezone", error);
+    }
+    
+    return client;
   }
   
   private startKeepAlive(): void {

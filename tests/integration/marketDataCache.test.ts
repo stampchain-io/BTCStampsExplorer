@@ -212,7 +212,7 @@ Deno.test("Market Data Cache Integration Tests", async (t) => {
         smd.floor_price_btc,
         smd.holder_count,
         smd.volume_24h_btc,
-        TIMESTAMPDIFF(MINUTE, smd.last_updated, NOW()) as cache_age_minutes
+        TIMESTAMPDIFF(MINUTE, smd.last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM StampTableV4 s
       LEFT JOIN stamp_market_data smd ON s.cpid = smd.cpid
       WHERE s.collection_id = ?
