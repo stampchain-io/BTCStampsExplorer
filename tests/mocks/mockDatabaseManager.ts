@@ -10,6 +10,9 @@ import src20FixturesData from "../fixtures/src20Data.json" with {
 import collectionFixturesData from "../fixtures/collectionData.json" with {
   type: "json",
 };
+import blockFixturesData from "../fixtures/blockData.json" with {
+  type: "json",
+};
 
 interface QueryResult {
   rows: any[];
@@ -611,23 +614,110 @@ export class MockDatabaseManager {
   }
 
   /**
-   * Get block data - return mock block data
+   * Get block data from fixtures
    */
-  private getBlockData(_query: string, _params: unknown[]): QueryResult {
-    // Return mock block data
-    const mockBlock = {
-      block_index: 827424,
-      block_time: "2024-01-26T10:36:03.000Z",
-      block_hash:
-        "00000000000000000000c2a3b5e8f6d4a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
-      previous_block_hash:
-        "00000000000000000000b1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2",
-      ledger_hash: "abcdef1234567890",
-      txlist_hash: "1234567890abcdef",
-      messages_hash: "fedcba0987654321",
-    };
+  private getBlockData(query: string, params: unknown[]): QueryResult {
+    const normalizedQuery = query.toLowerCase();
+    const blockFixtures = blockFixturesData as any;
+    const blocks = blockFixtures.blocks || [];
+    const stampCounts = blockFixtures.stampCounts || [];
 
-    return { rows: [mockBlock] };
+    // Handle MAX(block_index) query for getLastBlockFromDb
+    if (normalizedQuery.includes("max(block_index)")) {
+      if (blocks.length > 0) {
+        const maxBlockIndex = Math.max(
+          ...blocks.map((b: any) => b.block_index),
+        );
+        return { rows: [{ last_block: maxBlockIndex }] };
+      }
+      return { rows: [{ last_block: null }] };
+    }
+
+    // Handle query by block index or hash for getBlockInfoFromDb
+    if (normalizedQuery.includes("where")) {
+      if (
+        normalizedQuery.includes("block_index = ?") && params[0] !== undefined
+      ) {
+        const blockIndex = Number(params[0]);
+        const block = blocks.find((b: any) => b.block_index === blockIndex);
+        return { rows: block ? [block] : [] };
+      } else if (normalizedQuery.includes("block_hash = ?") && params[0]) {
+        const blockHash = params[0] as string;
+        const block = blocks.find((b: any) => b.block_hash === blockHash);
+        if (
+          normalizedQuery.includes("select block_index") &&
+          normalizedQuery.includes("from blocks") &&
+          normalizedQuery.includes("limit 1")
+        ) {
+          // This is for _getBlockIndexByHash - returns as number[]
+          return block ? [block.block_index] as any : [] as any;
+        }
+        return { rows: block ? [block] : [] };
+      }
+    }
+
+    // Handle getLastXBlocksFromDb - ORDER BY block_index DESC LIMIT ?
+    if (
+      normalizedQuery.includes("order by block_index desc") &&
+      normalizedQuery.includes("limit") &&
+      !normalizedQuery.includes("where")
+    ) {
+      const limit = params[0] as number || 10;
+      const sortedBlocks = [...blocks].sort((a, b) =>
+        b.block_index - a.block_index
+      );
+      const limitedBlocks = sortedBlocks.slice(0, limit);
+
+      // This query also includes stamp counts, so we need to add tx_count
+      if (
+        normalizedQuery.includes("select") &&
+        normalizedQuery.includes("block_index")
+      ) {
+        const result = limitedBlocks.map((block: any) => {
+          const stampData = stampCounts.find((sc: any) =>
+            sc.block_index === block.block_index
+          );
+          return {
+            ...block,
+            tx_count: stampData ? stampData.tx_count : 0,
+          };
+        });
+        return { rows: result };
+      }
+
+      return { rows: limitedBlocks };
+    }
+
+    // Handle getRelatedBlocksWithStampsFromDb - blocks around a specific block
+    if (
+      normalizedQuery.includes("where block_index >= ? - 2") &&
+      normalizedQuery.includes("and block_index <= ? + 2")
+    ) {
+      // The params are both the same block_index, and SQL does the arithmetic
+      const centerIndex = params[0] as number;
+      const startIndex = centerIndex - 2;
+      const endIndex = centerIndex + 2;
+
+      const relatedBlocks = blocks.filter((b: any) =>
+        b.block_index >= startIndex && b.block_index <= endIndex
+      );
+
+      // Add stamp counts if this is a stamp count query
+      if (normalizedQuery.includes("count(*) as stampcount")) {
+        const stampCountData = stampCounts.filter((sc: any) =>
+          sc.block_index >= startIndex && sc.block_index <= endIndex
+        ).map((sc: any) => ({
+          block_index: sc.block_index,
+          stampcount: sc.stampcount || sc.tx_count || 0,
+        }));
+        return { rows: stampCountData };
+      }
+
+      return { rows: relatedBlocks };
+    }
+
+    // Default - return all blocks
+    return { rows: blocks };
   }
 
   /**
