@@ -1484,7 +1484,7 @@ export class StampRepository {
       queryParams.push(Number(filters.minDataQualityScore));
     }
     if (filters.maxCacheAgeMinutes) {
-      whereConditions.push("TIMESTAMPDIFF(MINUTE, smd.last_updated, NOW()) <= ?");
+      whereConditions.push("TIMESTAMPDIFF(MINUTE, smd.last_updated, UTC_TIMESTAMP()) <= ?");
       queryParams.push(Number(filters.maxCacheAgeMinutes));
     }
     if (filters.priceSource) {
