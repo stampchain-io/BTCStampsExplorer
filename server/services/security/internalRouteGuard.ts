@@ -6,6 +6,17 @@ import { logger } from "$lib/utils/logger.ts";
 export class InternalRouteGuard {
   // For routes that require CSRF
   static async requireCSRF(req: Request) {
+    // Skip CSRF check in development environment for easier testing
+    const isDevelopment = Deno.env.get("DENO_ENV") === "development";
+    
+    if (isDevelopment) {
+      logger.debug("stamps", {
+        message: "Development environment - CSRF check skipped",
+        headers: Object.fromEntries(req.headers.entries()),
+      });
+      return null; // Skip CSRF validation in development
+    }
+    
     const csrfToken = req.headers.get("X-CSRF-Token") || req.headers.get("x-csrf-token");
     
     logger.debug("stamps", {

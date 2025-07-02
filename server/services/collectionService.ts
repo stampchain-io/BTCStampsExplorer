@@ -10,15 +10,27 @@ export class CollectionService {
   static async getCollectionDetails(
     params: CollectionQueryParams,
   ): Promise<PaginatedCollectionResponseBody> {
-    const { limit = 50, page = 1, creator, sortBy, minStampCount } = params;
+    const { limit = 50, page = 1, creator, sortBy, minStampCount, includeMarketData = false } = params;
 
     const [collectionsResult, totalCollections, lastBlock] = await Promise.all([
-      CollectionRepository.getCollectionDetails({ limit, page, creator, sortBy, minStampCount }),
+      includeMarketData 
+        ? CollectionRepository.getCollectionDetailsWithMarketData({ limit, page, creator, sortBy, minStampCount, includeMarketData })
+        : CollectionRepository.getCollectionDetails({ limit, page, creator, sortBy, minStampCount }),
       CollectionRepository.getTotalCollectionsByCreatorFromDb(creator, minStampCount),
       BlockController.getLastBlock(),
     ]);
 
     const collectionsData = collectionsResult.rows;
+
+    // Transform creator addresses and names into arrays
+    collectionsData.forEach((collection: any) => {
+      if (collection.creators && typeof collection.creators === 'string') {
+        collection.creators = collection.creators.split(',');
+      }
+      if (collection.creator_names && typeof collection.creator_names === 'string') {
+        collection.creator_names = collection.creator_names.split(',').filter((name: string) => name && name !== 'null');
+      }
+    });
 
     // Compute pagination details
     const pagination = paginate(totalCollections, page, limit);

@@ -144,8 +144,8 @@ import * as $WIP_test_ReviewDogTest from "./islands/WIP/test/ReviewDogTest.tsx";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
 import * as $button_PaginationButton from "./islands/button/PaginationButton.tsx";
-import * as $button_RangeButton from "./islands/button/RangeButton.tsx";
 import * as $button_SortButton from "./islands/button/SortButton.tsx";
+import * as $button_ToggleButton from "./islands/button/ToggleButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
 import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
 import * as $card_SRC20CardMinted from "./islands/card/SRC20CardMinted.tsx";
@@ -441,8 +441,8 @@ const manifest = {
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/FilterButton.tsx": $button_FilterButton,
     "./islands/button/PaginationButton.tsx": $button_PaginationButton,
-    "./islands/button/RangeButton.tsx": $button_RangeButton,
     "./islands/button/SortButton.tsx": $button_SortButton,
+    "./islands/button/ToggleButton.tsx": $button_ToggleButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
     "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
     "./islands/card/SRC20CardMinted.tsx": $card_SRC20CardMinted,

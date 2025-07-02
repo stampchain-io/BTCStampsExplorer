@@ -6,8 +6,9 @@ import { validateSortDirection } from "$server/services/validationService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import {
   STAMP_EDITIONS,
+  STAMP_FILESIZES,
   STAMP_FILETYPES,
-  STAMP_MARKET,
+  STAMP_MARKETPLACE,
   STAMP_RANGES,
 } from "$globals";
 
@@ -74,9 +75,9 @@ export const createStampHandler = (
       console.log("Range parameter:", url.searchParams.get("range[sub]"));
       console.log(
         "Filetype parameter:",
-        url.searchParams.get("filetypeFilters"),
+        url.searchParams.get("filetype"),
       );
-      console.log("Edition parameter:", url.searchParams.get("editionFilters"));
+      console.log("Edition parameter:", url.searchParams.get("editions"));
       const cacheType = getCacheType(url.pathname, routeConfig.isIndex);
       const requestQuery = url.searchParams.get("q");
 
@@ -123,35 +124,82 @@ export const createStampHandler = (
         }
 
         // Extract filters
-        const filetypeFilters = url.searchParams.get("filetype")?.split(",")
+        const fileType = url.searchParams.get("filetype")?.split(",")
           .filter(Boolean) as STAMP_FILETYPES[] | undefined;
-        const editionFilters = url.searchParams.get("editions")?.split(",")
+        const editions = url.searchParams.get("editions")?.split(",")
           .filter(Boolean) as STAMP_EDITIONS[] | undefined;
 
-        // Add market filter extraction
-        const marketParam = url.searchParams.get("market");
-        const marketFilters = marketParam?.split(",").filter(Boolean) as
-          | STAMP_MARKET[]
-          | undefined;
-        const marketMin = url.searchParams.get("marketMin") || undefined;
-        const marketMax = url.searchParams.get("marketMax") || undefined;
+        // Extract new marketplace filters
+        const market = url.searchParams.get("market") as
+          | Extract<STAMP_MARKETPLACE, "listings" | "sales">
+          | "" || "";
+        const dispensers = url.searchParams.get("dispensers") === "true";
+        const atomics = url.searchParams.get("atomics") === "true";
+        const listings = url.searchParams.get("listings") as
+          | Extract<
+            STAMP_MARKETPLACE,
+            "all" | "bargain" | "affordable" | "premium" | "custom"
+          >
+          | "" || "";
+        const listingsMin = url.searchParams.get("listingsMin") || undefined;
+        const listingsMax = url.searchParams.get("listingsMax") || undefined;
+        const sales = url.searchParams.get("sales") as
+          | Extract<
+            STAMP_MARKETPLACE,
+            "recent" | "premium" | "custom" | "volume"
+          >
+          | "" || "";
+        const salesMin = url.searchParams.get("salesMin") || undefined;
+        const salesMax = url.searchParams.get("salesMax") || undefined;
+        const volume =
+          url.searchParams.get("volume") as "24h" | "7d" | "30d" | "" || "";
+        const volumeMin = url.searchParams.get("volumeMin") || undefined;
+        const volumeMax = url.searchParams.get("volumeMax") || undefined;
+
+        // Extract file size filters
+        const fileSize =
+          url.searchParams.get("fileSize") as STAMP_FILESIZES | null || null;
+        const fileSizeMin = url.searchParams.get("fileSizeMin") || undefined;
+        const fileSizeMax = url.searchParams.get("fileSizeMax") || undefined;
 
         // Extract range filters
         const rangePreset = url.searchParams.get("rangePreset") || "";
         const rangeMin = url.searchParams.get("rangeMin") || "";
         const rangeMax = url.searchParams.get("rangeMax") || "";
 
-        let rangeFilters: STAMP_RANGES | undefined = undefined;
+        let range: STAMP_RANGES | undefined = undefined;
 
-        // Set rangeFilters based on preset or custom values
+        // Set range based on preset or custom values
         if (
           rangePreset &&
           ["100", "1000", "5000", "10000"].includes(rangePreset as any)
         ) {
-          rangeFilters = rangePreset as STAMP_RANGES;
+          range = rangePreset as STAMP_RANGES;
         } else if (rangeMin || rangeMax) {
-          rangeFilters = "custom";
+          range = "custom";
         }
+
+        // Extract market data filters (Task 42)
+        const minHolderCount = url.searchParams.get("minHolderCount") ||
+          undefined;
+        const maxHolderCount = url.searchParams.get("maxHolderCount") ||
+          undefined;
+        const minDistributionScore =
+          url.searchParams.get("minDistributionScore") || undefined;
+        const maxTopHolderPercentage =
+          url.searchParams.get("maxTopHolderPercentage") || undefined;
+        const minFloorPriceBTC = url.searchParams.get("minFloorPriceBTC") ||
+          undefined;
+        const maxFloorPriceBTC = url.searchParams.get("maxFloorPriceBTC") ||
+          undefined;
+        const minVolume24h = url.searchParams.get("minVolume24h") || undefined;
+        const minPriceChange24h = url.searchParams.get("minPriceChange24h") ||
+          undefined;
+        const minDataQualityScore =
+          url.searchParams.get("minDataQualityScore") || undefined;
+        const maxCacheAgeMinutes = url.searchParams.get("maxCacheAgeMinutes") ||
+          undefined;
+        const priceSource = url.searchParams.get("priceSource") || undefined;
 
         // Important part: Pass the min/max values directly to the controller
         const result = await StampController.getStamps({
@@ -161,16 +209,38 @@ export const createStampHandler = (
           type: routeConfig.type,
           allColumns: false,
           skipTotalCount: false,
-          includeSecondary: true,
-          cacheType,
-          filetypeFilters,
-          editionFilters,
-          marketFilters,
-          marketMin,
-          marketMax,
-          rangeFilters,
-          rangeMin,
-          rangeMax,
+          ...(fileType && { fileType }),
+          ...(editions && { editions }),
+          ...(market && { market }),
+          ...(dispensers !== undefined && { dispensers }),
+          ...(atomics !== undefined && { atomics }),
+          ...(listings && { listings }),
+          ...(listingsMin && { listingsMin }),
+          ...(listingsMax && { listingsMax }),
+          ...(sales && { sales }),
+          ...(salesMin && { salesMin }),
+          ...(salesMax && { salesMax }),
+          ...(volume && { volume }),
+          ...(volumeMin && { volumeMin }),
+          ...(volumeMax && { volumeMax }),
+          ...(fileSize !== null && { fileSize }),
+          ...(fileSizeMin && { fileSizeMin }),
+          ...(fileSizeMax && { fileSizeMax }),
+          ...(range && { range }),
+          ...(rangeMin && { rangeMin }),
+          ...(rangeMax && { rangeMax }),
+          // Market data filters (Task 42)
+          ...(minHolderCount && { minHolderCount }),
+          ...(maxHolderCount && { maxHolderCount }),
+          ...(minDistributionScore && { minDistributionScore }),
+          ...(maxTopHolderPercentage && { maxTopHolderPercentage }),
+          ...(minFloorPriceBTC && { minFloorPriceBTC }),
+          ...(maxFloorPriceBTC && { maxFloorPriceBTC }),
+          ...(minVolume24h && { minVolume24h }),
+          ...(minPriceChange24h && { minPriceChange24h }),
+          ...(minDataQualityScore && { minDataQualityScore }),
+          ...(maxCacheAgeMinutes && { maxCacheAgeMinutes }),
+          ...(priceSource && { priceSource }),
         });
 
         // Return the normal result
@@ -303,8 +373,8 @@ export const createStampHandler = (
       console.error("Error in stamp handler:", error);
       const errorMessage = routeConfig.isIndex
         ? `Error fetching paginated ${routeConfig.type}`
-        : `Error fetching stamp details for ID ${id}`;
-      return ApiResponseUtil.error(errorMessage);
+        : `Error fetching stamp details for ID ${ctx.params.id}`;
+      return ApiResponseUtil.success({ error: errorMessage }, { status: 500 });
     }
   },
 });

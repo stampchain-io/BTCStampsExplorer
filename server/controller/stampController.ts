@@ -15,8 +15,9 @@ import {
   STAMP_TYPES,
   STAMP_FILETYPES,
   STAMP_EDITIONS,
-  STAMP_MARKET,
+  STAMP_MARKETPLACE,
   STAMP_RANGES,
+  STAMP_FILESIZES,
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
@@ -57,7 +58,7 @@ export class StampController {
     allColumns = false,
     includeSecondary = true,
     sortColumn = "tx_index",
-    suffixFilters,
+    suffix,
     collectionStampLimit = 12,
     groupBy,
     groupBySubquery,
@@ -66,22 +67,46 @@ export class StampController {
     enrichWithAssetInfo = false,
     isSearchQuery = false,
     url,
-    filetypeFilters,
-    editionFilters,
-    rangeFilters,
+    fileType,
+    editions,
+    range,
     rangeMin,
     rangeMax,
-    marketFilters,
-    marketMin,
-    marketMax,
+    market,
+    dispensers,
+    atomics,
+    listings,
+    listingsMin,
+    listingsMax,
+    sales,
+    salesMin,
+    salesMax,
+    volume,
+    volumeMin,
+    volumeMax,
+    fileSize,
+    fileSizeMin,
+    fileSizeMax,
+    // Market Data Filters (Task 42)
+    minHolderCount,
+    maxHolderCount,
+    minDistributionScore,
+    maxTopHolderPercentage,
+    minFloorPriceBTC,
+    maxFloorPriceBTC,
+    minVolume24h,
+    minPriceChange24h,
+    minDataQualityScore,
+    maxCacheAgeMinutes,
+    priceSource,
   }: {
     page?: number;
     limit?: number;
     sortBy?: "ASC" | "DESC";
     /**
-     * If suffix filters and ident are provided, filterBy and type will be ignored
+     * If suffix and ident are provided, filterBy and type will be ignored
      */
-    suffixFilters?: string[];
+    suffix?: string[];
     ident?: SUBPROTOCOLS[];
     url?: string;
     isSearchQuery?: boolean;
@@ -94,14 +119,38 @@ export class StampController {
     noPagination?: boolean
     cacheDuration?: number
     filterBy?: STAMP_FILTER_TYPES[];
-    filetypeFilters?: STAMP_FILETYPES[];
-    editionFilters?: STAMP_EDITIONS[];
-    rangeFilters?: STAMP_RANGES;
+    fileType?: STAMP_FILETYPES[];
+    editions?: STAMP_EDITIONS[];
+    range?: STAMP_RANGES;
     rangeMin?: string;
     rangeMax?: string;
-    marketFilters?: STAMP_MARKET[];
-    marketMin?: string;
-    marketMax?: string;
+    market?: Extract<STAMP_MARKETPLACE, "listings" | "sales"> | "";
+    dispensers?: boolean;
+    atomics?: boolean;
+    listings?: Extract<STAMP_MARKETPLACE, "all" | "bargain" | "affordable" | "premium" | "custom"> | "";
+    listingsMin?: string;
+    listingsMax?: string;
+    sales?: Extract<STAMP_MARKETPLACE, "recent" | "premium" | "custom" | "volume"> | "";
+    salesMin?: string;
+    salesMax?: string;
+    volume?: "24h" | "7d" | "30d" | "";
+    volumeMin?: string;
+    volumeMax?: string;
+    fileSize?: STAMP_FILESIZES | null;
+    fileSizeMin?: string;
+    fileSizeMax?: string;
+    // Market Data Filters (Task 42)
+    minHolderCount?: string;
+    maxHolderCount?: string;
+    minDistributionScore?: string;
+    maxTopHolderPercentage?: string;
+    minFloorPriceBTC?: string;
+    maxFloorPriceBTC?: string;
+    minVolume24h?: string;
+    minPriceChange24h?: string;
+    minDataQualityScore?: string;
+    maxCacheAgeMinutes?: string;
+    priceSource?: string;
   } = {}) {
     console.log("stamp controller payload", {
       page,
@@ -112,17 +161,29 @@ export class StampController {
       ident,
       collectionId,
       url,
-      filetypeFilters,
-      editionFilters,
-      rangeFilters,
+      fileType,
+      editions,
+      range,
       rangeMin,
       rangeMax,
-      marketFilters,
-      marketMin,
-      marketMax
+      market,
+      dispensers,
+      atomics,
+      listings,
+      listingsMin,
+      listingsMax,
+      sales,
+      salesMin,
+      salesMax,
+      volume,
+      volumeMin,
+      volumeMax,
+      fileSize,
+      fileSizeMin,
+      fileSizeMax
     });
     
-    console.log("About to call repository with rangeFilters:", rangeFilters);
+    console.log("About to call repository with range:", range);
     
     const filterByArray = typeof filterBy === "string"
       ? filterBy.split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
@@ -146,13 +207,13 @@ export class StampController {
       }
     }
 
-    let filterSuffixFilters: STAMP_SUFFIX_FILTERS[] = [];
+    let filterSuffix: STAMP_SUFFIX_FILTERS[] = [];
     if (filterByArray.length > 0) {
-      // Extract ident and suffixFilters from filterBy
+      // Extract ident and suffix from filterBy
       const identFromFilter = filterByArray.flatMap((filter) =>
         filterOptions[filter]?.ident || []
       );
-      filterSuffixFilters = filterByArray.flatMap((filter) =>
+      filterSuffix = filterByArray.flatMap((filter) =>
         filterOptions[filter]?.suffixFilters || []
       ) as STAMP_SUFFIX_FILTERS[];
 
@@ -161,15 +222,15 @@ export class StampController {
         finalIdent = Array.from(new Set([...finalIdent, ...identFromFilter]));
       }
 
-      // When filterBy is defined, suffixFilters are limited to those in filterOptions
-      suffixFilters = filterSuffixFilters;
-    } else if (!suffixFilters || suffixFilters.length === 0) {
-      // If suffixFilters are not provided, use all possible suffixes
-      suffixFilters = []; // No suffix filter applied
+      // When filterBy is defined, suffix are limited to those in filterOptions
+      suffix = filterSuffix;
+    } else if (!suffix || suffix.length === 0) {
+      // If suffix are not provided, use all possible suffixes
+      suffix = []; // No suffix filter applied
     }
 
-    // If rangeFilters is undefined but url is provided, check for range parameters
-    if (!rangeFilters && url) {
+    // If range is undefined but url is provided, check for range parameters
+    if (!range && url) {
       try {
         const urlObj = new URL(url);
         const rangeMin = urlObj.searchParams.get("range[stampRange][min]");
@@ -177,26 +238,35 @@ export class StampController {
         
         if (rangeMin || rangeMax) {
           console.log("Controller detected custom range params:", { rangeMin, rangeMax });
-          rangeFilters = {
+          range = {
             stampRange: {
               min: rangeMin || "",
               max: rangeMax || ""
             }
           };
-          console.log("Controller set rangeFilters:", rangeFilters);
+          console.log("Controller set range:", range);
         }
       } catch (error) {
         console.error("Error parsing URL in controller:", error);
       }
     }
 
+    // Fetch BTC price once for all stamps
+    const btcPriceData = await BTCPriceService.getPrice();
+    const btcPrice = btcPriceData.price;
+    console.log(`[StampController] BTC price: $${btcPrice} from ${btcPriceData.source}`);
+
+    // For collection pages and stamp lists, use market data cache
+    const useMarketData = !identifier || Array.isArray(identifier) || collectionId;
+    
+    // Always include market data when available
     const stampResult = await StampService.getStamps({
       page,
       limit,
       sortBy,
       type,
       ident: finalIdent,
-      suffixFilters,
+      suffix,
       allColumns,
       includeSecondary,
       collectionId,
@@ -212,63 +282,59 @@ export class StampController {
       cacheType,
       isSearchQuery,
       filterBy: filterByArray,
-      filetypeFilters,
-      editionFilters,
-      rangeFilters,
+      fileType,
+      editions,
+      range,
       rangeMin,
       rangeMax,
-      marketFilters,
-      marketMin,
-      marketMax
+      market,
+      dispensers,
+      atomics,
+      listings,
+      listingsMin,
+      listingsMax,
+      sales,
+      salesMin,
+      salesMax,
+      volume,
+      volumeMin,
+      volumeMax,
+      fileSize,
+      fileSizeMin,
+      fileSizeMax,
+      // Market Data Filters (Task 42)
+      minHolderCount,
+      maxHolderCount,
+      minDistributionScore,
+      maxTopHolderPercentage,
+      minFloorPriceBTC,
+      maxFloorPriceBTC,
+      minVolume24h,
+      minPriceChange24h,
+      minDataQualityScore,
+      maxCacheAgeMinutes,
+      priceSource,
+      includeMarketData: useMarketData,
+      btcPriceUSD: btcPrice
     });
 
-    // Process stamps with floor prices and asset info if needed
-    const btcPriceData = await BTCPriceService.getPrice();
-    const btcPrice = btcPriceData.price;
-    console.log(`[StampController] BTC price: $${btcPrice} from ${btcPriceData.source}`);
-    const processedStamps = await Promise.all(
-      stampResult.stamps.map(async (stamp) => {
-        if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
-          return stamp;
-        }
-        
-        // Get all dispensers to check both open and closed
-        const allDispensers = await DispenserManager.getDispensersByCpid(stamp.cpid);
-        const openDispensers = allDispensers.dispensers.filter(d => d.give_remaining > 0);
-        const closedDispensers = allDispensers.dispensers.filter(d => d.give_remaining === 0);
-        
-        let floorPrice: number | "priceless" = "priceless";
-        
-        if (openDispensers.length > 0) {
-          // Use floor price from open dispensers
-          floorPrice = this.calculateFloorPrice(openDispensers);
-        } else if (closedDispensers.length > 0) {
-          // If no open dispensers, use most recent closed dispenser price
-          const sortedClosedDispensers = closedDispensers.sort((a, b) => b.block_index - a.block_index);
-          const recentPrice = Number(formatSatoshisToBTC(sortedClosedDispensers[0].satoshirate, { includeSymbol: false }));
-          floorPrice = recentPrice || "priceless";
-        }
+    // Process stamps - only fetch additional asset info for single stamp detail pages
+    let processedStamps = stampResult.stamps;
+    if (enrichWithAssetInfo && identifier && !Array.isArray(identifier)) {
+      // Only enrich with asset info for detail pages
+      const stamp = stampResult.stamps[0];
+      if (stamp && (stamp.ident === "STAMP" || stamp.ident === "SRC-721")) {
+        const asset = await XcpManager.getAssetInfo(stamp.cpid);
+        processedStamps = [this.enrichStampWithAssetData(stamp, asset)];
+      }
+    }
 
-        // If enrichment is requested and it's a single stamp query
-        if (enrichWithAssetInfo && identifier && !Array.isArray(identifier)) {
-          const asset = await XcpManager.getAssetInfo(stamp.cpid);
-          const enrichedStamp = this.enrichStampWithAssetData(stamp, asset);
-          return {
-            ...enrichedStamp,
-            floorPrice,
-            floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPrice : null,
-            marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null,
-          };
-        }
-        
-        return {
-          ...stamp,
-          floorPrice,
-          floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPrice : null,
-          marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null,
-        };
-      })
-    );
+    // Get cache status from the first stamp with market data
+    let cacheStatus = 'unknown';
+    if (useMarketData && processedStamps.length > 0) {
+      const firstStampWithData = processedStamps.find(s => s.cacheStatus);
+      cacheStatus = firstStampWithData?.cacheStatus || 'unknown';
+    }
 
     // Build response based on query type
     const baseResponse = {
@@ -276,6 +342,11 @@ export class StampController {
         ? { stamp: processedStamps[0] }  // Single stamp response
         : processedStamps,               // Multiple stamps response
       last_block: stampResult.last_block,
+      metadata: {
+        btcPrice: btcPrice,
+        cacheStatus: cacheStatus,
+        source: btcPriceData.source
+      }
     };
 
     // Add pagination data for index/collection routes
@@ -523,17 +594,31 @@ export class StampController {
         });
         poshStamps = poshResult.data;
       }
-      const collectionData = []
-      await Promise.all(
-        collections?.data.map(async (item) => {
-          const result = await this.getStamps({
-            collectionId: item.collection_id,
-            ident: ["STAMP", "SRC-721", "SRC-20"],
-            sortBy: "DESC"
-          });
-          collectionData.push({ ...item, img: result.data?.[0]?.stamp_url });
-        }),
-      );
+      // Get stamp URLs for collections more efficiently
+      const collectionData = collections?.data ? await (async () => {
+        // Get all collection IDs
+        const collectionIds = collections.data.map(item => item.collection_id);
+        
+        // Fetch first stamp for each collection in a single request if possible
+        const firstStamps = await Promise.all(
+          collectionIds.map(async (collectionId) => {
+            const result = await this.getStamps({
+              collectionId,
+              limit: 1,
+              sortBy: "DESC",
+              skipTotalCount: true,
+              includeMarketData: false // Just need the image URL
+            });
+            return result.data?.[0];
+          })
+        );
+        
+        // Map collection data with images
+        return collections.data.map((item, index) => ({
+          ...item,
+          img: firstStamps[index]?.stamp_url || null
+        }));
+      })() : [];
 
       return {
         carouselStamps: carouselData.data ?? [],
@@ -555,6 +640,11 @@ export class StampController {
   static async getCollectionPageData(params) {
     try {
       const {sortBy} = params
+      
+      // Fetch BTC price once
+      const btcPriceData = await BTCPriceService.getPrice();
+      const btcPrice = btcPriceData.price;
+      
       const [
         stampCategories,
       ] = await Promise.all([
@@ -569,14 +659,14 @@ export class StampController {
       let stamps_posh = [];
       if (poshCollection) {
         const poshCollectionId = poshCollection.collection_id;
-        // Fetch stamps from the "posh" collection with limit and sortBy
+        // Fetch stamps from the "posh" collection with cached market data
         const poshStampsResult = await this.getStamps({
           collectionId: poshCollectionId,
           page: 1,
           limit: 24,
           sortBy: sortBy,
-          skipDispenserLookup: true, // Skip expensive dispenser API calls for collection overview
-          skipPriceCalculation: true, // Skip BTC price fetching for collection overview
+          includeMarketData: true, // Use cached market data
+          btcPriceUSD: btcPrice
         });
         stamps_posh = poshStampsResult.data;
       } else {
@@ -587,10 +677,14 @@ export class StampController {
       return {
         stamps_src721: stampCategories[0].stamps,
         stamps_posh,
+        metadata: {
+          btcPrice: btcPrice,
+          source: btcPriceData.source
+        }
       };
     } catch (error) {
       logger.error("stamps", {
-        message: "Error in getHomePageData",
+        message: "Error in getCollectionPageData",
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -977,7 +1071,7 @@ export class StampController {
   }
 
   /**
-   * Calculate total value of stamps in a wallet
+   * Calculate total value of stamps in a wallet using cached market data
    * This is a specialized method for the wallet page that won't affect API endpoints
    */
   static async calculateWalletStampValues(stamps: StampBalance[]): Promise<{
@@ -988,72 +1082,42 @@ export class StampController {
       const stampValues: { [cpid: string]: string | number } = {};
       let totalValue = 0;
 
-      // Process stamps in batches to avoid too many concurrent requests
-      const BATCH_SIZE = 10;
-      for (let i = 0; i < stamps.length; i += BATCH_SIZE) {
-        const batch = stamps.slice(i, i + BATCH_SIZE);
-        
-        // Process each stamp in the batch concurrently
-        const batchResults = await Promise.all(
-          batch.map(async (stamp) => {
-            try {
-              // Get all dispensers for the stamp
-              const allDispensersResponse = await DispenserManager.getDispensersByCpid(
-                stamp.cpid,
-                undefined,
-                undefined,
-                undefined,
-                "all"
-              );
-              
-              // Filter open and closed dispensers
-              const openDispensers = allDispensersResponse.dispensers.filter(d => d.give_remaining > 0);
-              const closedDispensers = allDispensersResponse.dispensers.filter(d => d.give_remaining === 0);
-              
-              let unitPrice = 0;
-              if (openDispensers.length > 0) {
-                // Use floor price if there are open dispensers
-                const floorPrice = this.calculateFloorPrice(openDispensers);
-                unitPrice = typeof floorPrice === 'number' ? floorPrice : 0;
-              } else if (closedDispensers.length > 0) {
-                // Use most recent closed dispenser price if no open dispensers
-                // Sort by block_index in descending order to get most recent first
-                const sortedClosedDispensers = closedDispensers.sort((a, b) => b.block_index - a.block_index);
-                unitPrice = sortedClosedDispensers[0].btcrate || 0;
-              }
+      // Get BTC price once
+      const btcPriceData = await BTCPriceService.getPrice();
+      const btcPrice = btcPriceData.price;
 
-              // Calculate total value for this stamp based on quantity owned
-              const totalStampValue = unitPrice * stamp.balance;
-              
-              return {
-                cpid: stamp.cpid,
-                value: totalStampValue
-              };
-            } catch (error) {
-              logger.error("calculateWalletStampValues", {
-                message: "Error processing individual stamp",
-                error: error instanceof Error ? error.message : String(error),
-                cpid: stamp.cpid,
-                quantity: stamp.balance
-              });
-              return { cpid: stamp.cpid, value: 0 };
-            }
-          })
-        );
+      // Get all stamp CPIDs
+      const cpids = stamps.map(s => s.cpid);
+      
+      // Fetch stamps with market data in a single request
+      const stampsResult = await StampService.getStamps({
+        identifier: cpids,
+        allColumns: false,
+        noPagination: true,
+        skipTotalCount: true,
+        includeMarketData: true,
+        btcPriceUSD: btcPrice
+      });
 
-        // Add batch results to totals
-        batchResults.forEach(({ cpid, value }) => {
-          stampValues[cpid] = value;
-          if (typeof value === 'number') {
-            totalValue += value;
-          }
-        });
+      // Create a map of stamps by CPID for quick lookup
+      const stampsByCpid = new Map(
+        stampsResult.stamps.map(stamp => [stamp.cpid, stamp])
+      );
 
-        // Optional: Add a small delay between batches to prevent rate limiting
-        if (i + BATCH_SIZE < stamps.length) {
-          await new Promise(resolve => setTimeout(resolve, 100));
+      // Calculate values using cached market data
+      stamps.forEach((walletStamp) => {
+        const stampData = stampsByCpid.get(walletStamp.cpid);
+        if (stampData && stampData.marketData) {
+          const unitPrice = stampData.marketData.floorPriceBTC || 
+                           stampData.marketData.recentSalePriceBTC || 
+                           0;
+          const totalStampValue = unitPrice * walletStamp.balance;
+          stampValues[walletStamp.cpid] = totalStampValue;
+          totalValue += totalStampValue;
+        } else {
+          stampValues[walletStamp.cpid] = 0;
         }
-      }
+      });
 
       return { stampValues, totalValue };
     } catch (error) {

@@ -94,8 +94,8 @@ export const labelLogicResponsive = ( // used for the filter labels
   checked: boolean,
   canHoverSelected: boolean,
 ): string => `
-  inline-block ml-3 tablet:ml-[9px]
-  font-semibold text-base tablet:text-xs
+  inline-block ml-3 tablet:ml-[9px] pt-[1px] tablet:pt-0
+  font-semibold text-sm tablet:text-xs
   transition-colors duration-300
   cursor-pointer select-none
   ${

@@ -7,12 +7,49 @@ import {
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { BlockService } from "$server/services/blockService.ts";
-import { SRC20MarketService } from "$server/services/src20/marketService.ts";
 import { MarketListingAggregated } from "$types/index.d.ts";
+import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
+import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
 import { WalletData } from "$lib/types/index.d.ts";
 import { formatAmount } from "$lib/utils/formatUtils.ts";
 
 export class Src20Controller {
+  /**
+   * Convert SRC20MarketData from cache to MarketListingAggregated format
+   * This maintains compatibility with existing API consumers
+   */
+  private static convertToMarketListingFormat(data: SRC20MarketData): MarketListingAggregated & { 
+    change24?: number;
+    volume7d?: number;
+    change7d?: number;
+  } {
+    // Use floor price or regular price (keep in BTC for the floor_unit_price field)
+    const priceInBTC = data.floorPriceBTC || data.priceBTC || 0;
+    const priceInSats = priceInBTC * 1e8;
+    
+    return {
+      tick: data.tick,
+      floor_unit_price: priceInBTC, // Keep in BTC as SRC20Card expects
+      mcap: data.marketCapBTC,
+      volume24: data.volume24hBTC,
+      stamp_url: null, // Not available in cache yet
+      tx_hash: "", // Not available in cache yet
+      holder_count: data.holderCount,
+      change24: data.priceChange24hPercent, // Add the 24h change from cache
+      volume7d: data.volume7dBTC, // Add the 7d volume from cache
+      change7d: data.priceChange7dPercent, // Add the 7d change from cache
+      market_data: {
+        stampscan: {
+          price: priceInSats, // Keep in sats for compatibility
+          volume24: data.volume24hBTC / 2, // Split volume between sources
+        },
+        openstamp: {
+          price: priceInSats, // Keep in sats for compatibility
+          volume24: data.volume24hBTC / 2, // Split volume between sources
+        },
+      },
+    };
+  }
   static async getTotalCountValidSrc20Tx(
     params: { tick?: string; op?: string | string[] },
     excludeFullyMinted = false,
@@ -235,12 +272,12 @@ export class Src20Controller {
         balanceResponse,
         mintProgressResponse,
         allSrc20DataResponse,
-        marketData,
+        cachedMarketData,
       ] = await Promise.all([
         this.handleSrc20BalanceRequest(balanceParams),
         SRC20Service.QueryService.fetchSrc20MintProgress(tick), // tick is unicode
         SRC20Service.QueryService.fetchAllSrc20DataForTick(tick),
-        SRC20MarketService.fetchMarketListingSummary(),
+        MarketDataRepository.getSRC20MarketData(tick),
       ]);
 
       // Check if deployment is null
@@ -248,10 +285,10 @@ export class Src20Controller {
         throw new Error(`Deployment data not found for tick: ${tick}`);
       }
 
-      // Extract market info for the current tick
-      const marketInfoForTick = marketData.find(
-        (item) => item.tick.toUpperCase() === tick.toUpperCase(),
-      );
+      // Convert cached market data to the expected format
+      const marketInfoForTick = cachedMarketData 
+        ? this.convertToMarketListingFormat(cachedMarketData)
+        : undefined;
 
       const { deployment, total_mints, total_transfers } = allSrc20DataResponse;
 
@@ -301,18 +338,63 @@ export class Src20Controller {
   static async fetchFullyMintedByMarketCapV2(
     limit: number = 50,
     page: number = 1,
+    sortBy: string = "TRENDING",
+    sortDirection: string = "desc",
   ): Promise<PaginatedSrc20ResponseBody> {
     try {
-      // First fetch market data to get top ticks by market cap
-      const marketData = await SRC20MarketService.fetchMarketListingSummary();
+      // First fetch market data from cache to get top ticks by market cap
+      const cachedMarketData = await MarketDataRepository.getAllSRC20MarketData(1000);
       
-      // Sort by market cap and get top ticks
-      const sortedTicks = marketData
-        .sort((a, b) => b.mcap - a.mcap)
-        .slice(0, 1000)
-        .map(item => item.tick);
+      console.log(`Cached market data count: ${cachedMarketData.length}`);
+      if (cachedMarketData.length > 0) {
+        console.log("Sample cached data:", cachedMarketData[0]);
+      }
+      
+      // Convert to MarketListingAggregated format for compatibility
+      const convertedMarketData = cachedMarketData.map(data => 
+        this.convertToMarketListingFormat(data)
+      );
+      
+      if (convertedMarketData.length > 0) {
+        console.log("Sample converted data:", convertedMarketData[0]);
+      }
+      
+      // Market data is already sorted by market cap, just get the ticks
+      const sortedTicks = cachedMarketData.map(item => item.tick);
 
-      if (sortedTicks.length === 0) {
+      // When sorting by HOLDERS or other fields, we need to get ALL fully minted tokens
+      // not just the ones in the market data cache
+      let ticksToFetch = sortedTicks;
+      
+      // If we have no cached market data, fall back to external API
+      let marketDataToUse = convertedMarketData;
+      if (cachedMarketData.length === 0) {
+        console.log("No cached market data found, falling back to external API");
+        marketDataToUse = undefined; // This will trigger fetchMarketListingSummary in enrichData
+      }
+      
+      if (sortBy !== "TRENDING" && sortBy !== "VOLUME") {
+        // For non-market-based sorts, fetch all fully minted tokens
+        const allFullyMintedResult = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
+          {
+            limit: 10000,
+            page: 1,
+            op: "DEPLOY",
+            sortBy: "DESC"
+          },
+          {
+            onlyFullyMinted: true,
+            includeMarketData: false,
+            enrichWithProgress: false
+          }
+        );
+        
+        if (allFullyMintedResult.data && Array.isArray(allFullyMintedResult.data)) {
+          ticksToFetch = allFullyMintedResult.data.map(item => item.tick);
+        }
+      }
+
+      if (ticksToFetch.length === 0) {
         return {
           data: [],
           total: 0,
@@ -323,12 +405,12 @@ export class Src20Controller {
         };
       }
 
-      // Fetch SRC20 data for these ticks
-      const result = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
+      // Fetch ALL SRC20 data first (without pagination) to sort properly
+      const allDataResult = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
         {
-          tick: sortedTicks,
-          limit,
-          page,
+          tick: ticksToFetch,
+          limit: 10000, // Get all data for proper sorting
+          page: 1,
           op: "DEPLOY",
           sortBy: "DESC"
         },
@@ -336,11 +418,59 @@ export class Src20Controller {
           onlyFullyMinted: true,
           includeMarketData: true,
           enrichWithProgress: true,
-          prefetchedMarketData: marketData
+          prefetchedMarketData: marketDataToUse
         }
       );
 
-      return result as PaginatedSrc20ResponseBody;
+      // Transform data to ensure market fields are properly exposed for the UI
+      let allData: any[] = [];
+      if (allDataResult.data && Array.isArray(allDataResult.data)) {
+        allData = allDataResult.data.map(item => ({
+          ...item,
+          floor_unit_price: item.market_data?.floor_unit_price || 0,
+          market_cap: item.market_data?.mcap || 0,
+          mcap: item.market_data?.mcap || 0,
+          volume24: item.market_data?.volume24 || 0,
+          change24: item.market_data?.change24 || 0, // Use the change24 from market data
+          holders: item.holders || item.market_data?.holder_count || 0
+        }));
+
+        // Apply server-side sorting based on sortBy parameter
+        if (sortBy === "HOLDERS") {
+          allData.sort((a, b) => {
+            const aHolders = Number(a.holders) || 0;
+            const bHolders = Number(b.holders) || 0;
+            return sortDirection === "asc" ? aHolders - bHolders : bHolders - aHolders;
+          });
+        } else if (sortBy === "DEPLOY") {
+          allData.sort((a, b) => {
+            const aTime = new Date(a.block_time).getTime();
+            const bTime = new Date(b.block_time).getTime();
+            return sortDirection === "asc" ? aTime - bTime : bTime - aTime;
+          });
+        } else if (sortBy === "VOLUME") {
+          allData.sort((a, b) => {
+            const aVolume = a.volume24 || 0;
+            const bVolume = b.volume24 || 0;
+            return sortDirection === "asc" ? aVolume - bVolume : bVolume - aVolume;
+          });
+        }
+        // Default "TRENDING" is already sorted by market cap
+      }
+
+      // Now paginate the sorted data
+      const startIndex = (page - 1) * limit;
+      const paginatedData = allData.slice(startIndex, startIndex + limit);
+      const totalPages = Math.ceil(allData.length / limit);
+
+      return {
+        data: paginatedData,
+        total: allData.length,
+        page,
+        totalPages,
+        limit,
+        last_block: await BlockService.getLastBlock()
+      };
     } catch (error) {
       console.error("Error in fetchFullyMintedByMarketCapV2:", error);
       throw error;
@@ -352,19 +482,28 @@ export class Src20Controller {
     limit: number,
     page: number,
     transactionCount: number,
+    sortBy: string = "TRENDING",
+    sortDirection: string = "desc",
   ) {
 
     try {
-      const trendingData = await SRC20Service.QueryService.fetchTrendingActiveMintingTokens(
-        limit,
-        page,
+      // Get ALL trending data first for proper sorting
+      const allTrendingData = await SRC20Service.QueryService.fetchTrendingActiveMintingTokens(
+        10000, // Get all data
+        1,
         transactionCount,
       );
+
+      // Get cached market data for minting tokens as well
+      const cachedMarketData = await MarketDataRepository.getAllSRC20MarketData(1000);
+      const convertedMarketData = cachedMarketData.length > 0 
+        ? cachedMarketData.map(data => this.convertToMarketListingFormat(data))
+        : undefined;
 
       // Use V2 endpoint for enriched data with market info
       const enrichedData = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
         {
-          tick: trendingData.data.map(row => row.tick),
+          tick: allTrendingData.data.map(row => row.tick),
           includeMarketData: true,
           enrichWithProgress: true,
         },
@@ -372,12 +511,13 @@ export class Src20Controller {
           excludeFullyMinted: true,
           includeMarketData: true,
           enrichWithProgress: true,
-          batchSize: 10
+          batchSize: 50,
+          prefetchedMarketData: convertedMarketData
         }
       );
 
       // Merge trending data with enriched data
-      const enrichedResult = trendingData.data.map(row => {
+      let allEnrichedResult = allTrendingData.data.map(row => {
         const enrichedItem = Array.isArray(enrichedData.data) 
           ? enrichedData.data.find(item => item.tick === row.tick)
           : enrichedData.data;
@@ -387,7 +527,10 @@ export class Src20Controller {
           ...enrichedItem,
           holders: enrichedItem?.holders || 0,
           mcap: enrichedItem?.market_data?.mcap || 0,
+          market_cap: enrichedItem?.market_data?.mcap || 0, // Add market_cap for display
           floor_unit_price: enrichedItem?.market_data?.floor_unit_price || 0,
+          volume24: enrichedItem?.market_data?.volume24 || 0, // Add volume24
+          change24: enrichedItem?.market_data?.change24 || 0, // Use the change24 from market data
           progress: enrichedItem?.mint_progress?.progress || null,
           mint_count: row.mint_count,
           top_mints_percentage: row.top_mints_percentage
@@ -398,11 +541,38 @@ export class Src20Controller {
         };
       });
 
+      // Apply server-side sorting
+      if (sortBy === "HOLDERS") {
+        allEnrichedResult.sort((a, b) => {
+          const aHolders = Number(a.holders) || 0;
+          const bHolders = Number(b.holders) || 0;
+          return sortDirection === "asc" ? aHolders - bHolders : bHolders - aHolders;
+        });
+      } else if (sortBy === "DEPLOY") {
+        allEnrichedResult.sort((a, b) => {
+          const aTime = new Date(a.block_time).getTime();
+          const bTime = new Date(b.block_time).getTime();
+          return sortDirection === "asc" ? aTime - bTime : bTime - aTime;
+        });
+      } else if (sortBy === "VOLUME") {
+        allEnrichedResult.sort((a, b) => {
+          const aVolume = a.volume24 || 0;
+          const bVolume = b.volume24 || 0;
+          return sortDirection === "asc" ? aVolume - bVolume : bVolume - aVolume;
+        });
+      }
+      // Default "TRENDING" keeps the original trending order
+
+      // Now paginate the sorted data
+      const startIndex = (page - 1) * limit;
+      const paginatedData = allEnrichedResult.slice(startIndex, startIndex + limit);
+      const totalPages = Math.ceil(allEnrichedResult.length / limit);
+
       return {
-        data: enrichedResult,
-        total: trendingData.total,
+        data: paginatedData,
+        total: allEnrichedResult.length,
         page,
-        totalPages: Math.ceil(trendingData.total / limit),
+        totalPages,
         limit
       };
     } catch (error) {

@@ -8,7 +8,8 @@ interface SendRow {
   destination: string;
   quantity: number;
   tx_hash: string;
-  block_time: string;
+  block_time: number | null;
+  block_index?: number;
   cpid?: string;
 }
 
@@ -114,9 +115,11 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
                   </a>
                 </td>
                 <td class={cellAlign(4, headers.length)}>
-                  {formatDate(
-                    new Date(send.block_time),
-                  )}
+                  {send.block_time
+                    ? formatDate(new Date(send.block_time))
+                    : send.block_index
+                    ? `Block #${send.block_index.toLocaleString()}`
+                    : "N/A"}
                 </td>
               </tr>
             ))

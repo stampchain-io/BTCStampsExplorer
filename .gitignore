@@ -139,3 +139,25 @@ tasks.json
 package-lock.json
 tasks/ 
 .roo/
+
+# Added by Task Master AI
+dev-debug.log
+# Dependency directories
+# Environment variables
+.vscode
+# OS specific
+
+.cursor/mcp.json
+.cursor/
+.taskmaster/config.json
+mcp.json
+docs/delegation/
+docs/delegation/archive/
+# Security: Exclude files that may contain local paths
+docs/
+logs/*
+coverage.lcov
+.claude/
+remove_sensitive_data.sh
+emergency_fix.sh
+emergency_cleanup.sh

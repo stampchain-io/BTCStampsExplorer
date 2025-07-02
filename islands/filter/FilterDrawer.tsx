@@ -19,6 +19,7 @@ import { FilterType } from "$islands/button/FilterButton.tsx";
 import { CloseIcon, Icon } from "$icon";
 import { Button } from "$button";
 import { tooltipIcon } from "$notification";
+import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 
 // Tooltip component
 const Tooltip = ({ visible, text }: { visible: boolean; text: string }) => (
@@ -37,6 +38,8 @@ const FilterDrawer = (
     type?: FilterType;
   },
 ) => {
+  const { isMobile } = useBreakpoints();
+
   // Parse the current URL parameters to initialize filters
   const getInitialFilters = (): AllFilters => {
     if (typeof globalThis.location === "undefined") {
@@ -171,6 +174,54 @@ const FilterDrawer = (
       document.removeEventListener("mousedown", handleCloseEvents);
     };
   }, [open]); // Remove currentFilters from dependencies
+
+  // Mobile single-section logic: Only allow one collapsible section open at a time on mobile
+  useEffect(() => {
+    if (!isMobile() || !open) return;
+
+    const handleSectionToggle = (event: Event) => {
+      const target = event.target as HTMLElement;
+
+      // Only target main section toggle buttons
+      const sectionButton = target.closest("button[data-section-toggle]");
+
+      if (!sectionButton || !drawerRef.current?.contains(sectionButton)) return;
+
+      // Check if the current section is about to be opened (currently closed)
+      const currentSection = sectionButton.nextElementSibling;
+      const isCurrentlyExpanded = currentSection?.getAttribute(
+        "data-section-expanded",
+      ) === "true";
+
+      // Only close other sections if we're opening this one (not closing it)
+      if (!isCurrentlyExpanded) {
+        // Find all other main section toggle buttons and close their sections
+        const allSectionButtons = drawerRef.current.querySelectorAll(
+          "button[data-section-toggle]",
+        );
+        allSectionButtons.forEach((button) => {
+          if (button !== sectionButton) {
+            const nextSibling = button.nextElementSibling;
+            if (nextSibling?.getAttribute("data-section-expanded") === "true") {
+              // This section is expanded, close it
+              (button as HTMLButtonElement).click();
+            }
+          }
+        });
+      }
+    };
+
+    // Use capture phase to handle this before the section's own click handler
+    drawerRef.current?.addEventListener("click", handleSectionToggle, true);
+
+    return () => {
+      drawerRef.current?.removeEventListener(
+        "click",
+        handleSectionToggle,
+        true,
+      );
+    };
+  }, [isMobile, open]);
 
   // Add tooltip state for close button
   const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);

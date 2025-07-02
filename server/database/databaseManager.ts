@@ -82,6 +82,8 @@ class DatabaseManager {
   #redisAvailableAtStartup = false;
   #inMemoryCache: { [key: string]: { data: any; expiry: number } } = {};
   #lastCacheStatusLog: number = 0;
+  #keepAliveInterval: number | undefined;
+  readonly #KEEP_ALIVE_INTERVAL = 30000; // 30 seconds
 
   constructor(private config: DatabaseConfig) {
     this.#MAX_RETRIES = this.config.DB_MAX_RETRIES || 5;
@@ -90,6 +92,9 @@ class DatabaseManager {
   }
 
   public async initialize(): Promise<void> {
+    // Start MySQL keep-alive mechanism
+    this.startKeepAlive();
+    
     if (await shouldInitializeRedis()) {
       await this.initializeRedisConnection();
       this.#redisAvailableAtStartup = this.#redisAvailable;
@@ -100,19 +105,30 @@ class DatabaseManager {
 
   private #setupLogging(): void {
     const level = this.config.REDIS_LOG_LEVEL || "INFO";
+    const isTest = this.config.DENO_ENV === "test";
+    
+    // Only include file handler if not in test mode
+    const handlers: any = {
+      console: new ConsoleHandler(level),
+    };
+    
+    const handlerNames = ["console"];
+    
+    if (!isTest) {
+      handlers.file = new FileHandler("WARN", {
+        filename: "./db.log",
+        formatter: (logRecord: LogRecord) =>
+          `${logRecord.levelName} ${logRecord.msg}`,
+      });
+      handlerNames.push("file");
+    }
+    
     setup({
-      handlers: {
-        console: new ConsoleHandler(level),
-        file: new FileHandler("WARN", {
-          filename: "./db.log",
-          formatter: (logRecord: LogRecord) =>
-            `${logRecord.levelName} ${logRecord.msg}`,
-        }),
-      },
+      handlers: handlers,
       loggers: {
         default: {
           level: level,
-          handlers: ["console", "file"],
+          handlers: handlerNames,
         },
       },
     });
@@ -145,26 +161,74 @@ class DatabaseManager {
   }
 
   async closeAllClients(): Promise<void> {
+    // Stop keep-alive interval
+    if (this.#keepAliveInterval) {
+      clearInterval(this.#keepAliveInterval);
+      this.#keepAliveInterval = undefined;
+    }
+    
     await Promise.all(this.#pool.map((client) => this.closeClient(client)));
   }
 
   async executeQuery<T>(query: string, params: unknown[]): Promise<T> {
     for (let attempt = 1; attempt <= this.#MAX_RETRIES; attempt++) {
+      let client: Client | null = null;
       try {
-        const client = await this.getClient();
+        client = await this.getClient();
+        
+        // Test connection before executing query
+        try {
+          await client.execute("SELECT 1", []);
+        } catch (pingError) {
+          this.#logger.warn("Connection ping failed, removing from pool");
+          if (client) {
+            await this.closeClient(client);
+            client = null;
+          }
+          // Get a new connection
+          client = await this.getClient();
+        }
+        
         const result = await client.execute(query, params);
         this.releaseClient(client);
         return result as T;
       } catch (error) {
+        // Check if it's a connection timeout error
+        if (error instanceof Error && 
+            (error.message.includes("disconnected by the server") || 
+             error.message.includes("wait_timeout") ||
+             error.message.includes("interactive_timeout") ||
+             error.message.includes("connection") ||
+             error.message.includes("PROTOCOL_CONNECTION_LOST") ||
+             error.message.includes("ECONNRESET") ||
+             error.message.includes("ETIMEDOUT"))) {
+          this.#logger.warn(
+            `Connection error detected on attempt ${attempt}: ${error.message}`,
+          );
+          // Remove the bad connection from the pool
+          if (client) {
+            await this.closeClient(client);
+            client = null;
+          }
+        } else {
+          // For non-connection errors, return to pool
+          if (client) {
+            this.releaseClient(client);
+          }
+        }
+        
         this.#logger.error(
           `Error executing query on attempt ${attempt}:`,
           error,
         );
+        
         if (attempt === this.#MAX_RETRIES) {
           throw error;
         }
       }
-      await new Promise((resolve) => setTimeout(resolve, this.#RETRY_INTERVAL));
+      // Exponential backoff for retries
+      const backoffTime = this.#RETRY_INTERVAL * Math.pow(1.5, attempt - 1);
+      await new Promise((resolve) => setTimeout(resolve, backoffTime));
     }
     throw new Error("Max retries reached");
   }
@@ -191,7 +255,8 @@ class DatabaseManager {
 
   private createConnection(): Promise<Client> {
     const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = this.config;
-    const charset= 'utf8mb4'
+    const charset = 'utf8mb4';
+    
     return new Client().connect({
       hostname: DB_HOST,
       port: DB_PORT,
@@ -199,7 +264,59 @@ class DatabaseManager {
       db: DB_NAME,
       password: DB_PASSWORD,
       charset: charset,
+      // Additional connection options to prevent timeouts
+      idleTimeout: 0, // Disable idle timeout
+      timeout: 60000, // 60 second query timeout
     });
+  }
+  
+  private startKeepAlive(): void {
+    // Clear any existing interval
+    if (this.#keepAliveInterval) {
+      clearInterval(this.#keepAliveInterval);
+    }
+    
+    // Set up keep-alive interval to ping connections
+    this.#keepAliveInterval = setInterval(async () => {
+      try {
+        // Get a snapshot of current pool size
+        const poolSize = this.#pool.length;
+        
+        if (poolSize > 0) {
+          this.#logger.debug(`Running keep-alive on ${poolSize} connections`);
+          
+          // Test each connection in the pool
+          const connectionsToRemove: Client[] = [];
+          
+          for (const client of this.#pool) {
+            try {
+              // Execute a simple query to keep connection alive
+              await client.execute("SELECT 1", []);
+            } catch (error) {
+              this.#logger.warn("Keep-alive failed for connection, marking for removal", error);
+              connectionsToRemove.push(client);
+            }
+          }
+          
+          // Remove bad connections
+          for (const badClient of connectionsToRemove) {
+            await this.closeClient(badClient);
+          }
+          
+          // Log pool health
+          const remainingConnections = this.#pool.length;
+          if (connectionsToRemove.length > 0) {
+            this.#logger.info(
+              `Keep-alive removed ${connectionsToRemove.length} bad connections, ${remainingConnections} remaining`
+            );
+          }
+        }
+      } catch (error) {
+        this.#logger.error("Error in keep-alive routine:", error);
+      }
+    }, this.#KEEP_ALIVE_INTERVAL);
+    
+    this.#logger.info("MySQL keep-alive mechanism started");
   }
 
   private async initializeRedisConnection(): Promise<void> {

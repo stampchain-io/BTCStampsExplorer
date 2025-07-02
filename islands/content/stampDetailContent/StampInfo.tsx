@@ -29,7 +29,6 @@ import { Button } from "$button";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import { tooltipIcon } from "$notification";
 import { openModal } from "$islands/modal/states.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { Icon } from "$icon";
 
 /* ===== TYPES ===== */
@@ -550,23 +549,11 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     null,
   );
 
-  // Add btcPrice state with proper initialization
-  const [btcPrice, setBtcPrice] = useState<number | null>(null);
-
-  // Fetch BTC price when component mounts using centralized Redis-cached endpoint
-  useEffect(() => {
-    const fetchBTCPrice = async () => {
-      try {
-        const price = await fetchBTCPriceInUSD();
-        setBtcPrice(price);
-      } catch (error) {
-        console.error("Error fetching BTC price:", error);
-        setBtcPrice(null);
-      }
-    };
-
-    fetchBTCPrice();
-  }, []);
+  // Calculate BTC price from stamp data if available
+  const btcPrice =
+    stamp.floorPriceUSD && stamp.floorPrice && stamp.floorPrice !== "priceless"
+      ? stamp.floorPriceUSD / stamp.floorPrice
+      : null;
 
   // First, ensure our calculations are correct
   const displayPrice = selectedDispenser

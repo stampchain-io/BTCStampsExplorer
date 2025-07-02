@@ -22,7 +22,7 @@ export class CollectionController {
     params: CollectionQueryParams,
   ): Promise<PaginatedCollectionResponseBody> {
     try {
-      const { limit = 50, page = 1, creator, sortBy } = params;
+      const { limit = 50, page = 1, creator, sortBy, includeMarketData = true } = params;
       
       // Apply minimum stamp count filter at database level
       const collectionsResult = await CollectionService.getCollectionDetails({
@@ -30,7 +30,8 @@ export class CollectionController {
         page,
         creator,
         sortBy,
-        minStampCount: 2
+        minStampCount: 2,
+        includeMarketData
       });
 
       if (!collectionsResult.data || !Array.isArray(collectionsResult.data)) {

@@ -53,18 +53,49 @@ export function SRC20DetailHeader({
   // Market data formatting
   const floorUnitPriceBTC = marketInfo?.floor_unit_price ?? 0;
   const sum1dBTC = marketInfo?.volume24 ?? 0;
+  const sum7dBTC = (marketInfo as any)?.volume7d ?? 0;
   const mcapBTC = marketInfo?.mcap ?? 0;
+  const change24h = (marketInfo as any)?.change24 ?? null;
+  const change7d = (marketInfo as any)?.change7d ?? null;
 
-  // Convert floorUnitPrice from BTC to Satoshis
-  const floorUnitPriceSats = Math.round(floorUnitPriceBTC * 1e8);
+  // Convert floorUnitPrice from BTC to Satoshis with smart formatting
+  const floorUnitPriceSats = floorUnitPriceBTC * 1e8;
 
-  // Format BTC values to 8 decimal places
-  const sum1dBTCFormatted = formatNumber(sum1dBTC, 4);
-  const sum7dBTCFormatted = formatNumber(sum1dBTC * 7, 4);
-  const mcapBTCFormatted = formatNumber(mcapBTC, 4);
+  // Smart price formatting
+  const formatPrice = (sats: number): string => {
+    if (sats === 0) return "0 SATS";
+    if (sats < 0.0001) return sats.toFixed(6) + " SATS";
+    if (sats < 1) return sats.toFixed(4) + " SATS";
+    if (sats < 10) return sats.toFixed(2) + " SATS";
+    if (sats < 100) return sats.toFixed(1) + " SATS";
+    if (sats < 1000) return Math.round(sats).toLocaleString() + " SATS";
+    return Math.round(sats).toLocaleString() + " SATS";
+  };
 
-  // Format Satoshi value with commas (no decimals needed)
-  const floorUnitPriceSatsFormatted = floorUnitPriceSats.toLocaleString();
+  // Smart BTC volume formatting
+  const formatBTCVolume = (btc: number): string => {
+    if (btc === 0) return "0 BTC";
+    if (btc < 0.0001) return btc.toFixed(6) + " BTC";
+    if (btc < 0.01) return btc.toFixed(4) + " BTC";
+    if (btc < 0.1) return btc.toFixed(3) + " BTC";
+    if (btc < 1) return btc.toFixed(2) + " BTC";
+    if (btc < 100) return btc.toFixed(2) + " BTC";
+    return Math.round(btc).toLocaleString() + " BTC";
+  };
+
+  // Smart market cap formatting
+  const formatMarketCap = (btc: number): string => {
+    if (btc === 0) return "0 BTC";
+    if (btc < 1) return btc.toFixed(2) + " BTC";
+    if (btc < 100) return btc.toFixed(2) + " BTC";
+    if (btc < 1000) return btc.toFixed(1) + " BTC";
+    return Math.round(btc).toLocaleString() + " BTC";
+  };
+
+  const floorUnitPriceSatsFormatted = formatPrice(floorUnitPriceSats);
+  const sum1dBTCFormatted = formatBTCVolume(sum1dBTC);
+  const sum7dBTCFormatted = formatBTCVolume(sum7dBTC);
+  const mcapBTCFormatted = formatMarketCap(mcapBTC);
 
   /* ===== RENDER ===== */
   return (
@@ -241,16 +272,38 @@ export function SRC20DetailHeader({
           <div class="flex flex-wrap justify-between pt-3">
             <StatItem
               label="PRICE"
-              value={`${floorUnitPriceSatsFormatted} SATS`}
+              value={floorUnitPriceSatsFormatted}
             />
             <StatItem
               label="24H CHANGE"
-              value="N/A %"
+              value={change24h !== null
+                ? (
+                  <span
+                    class={change24h >= 0 ? "text-green-500" : "text-red-500"}
+                  >
+                    {change24h >= 0 ? "+" : ""}
+                    {change24h.toFixed(2)}%
+                  </span>
+                )
+                : (
+                  "N/A %"
+                )}
               align="center"
             />
             <StatItem
               label="7 DAY CHANGE"
-              value="N/A %"
+              value={change7d !== null
+                ? (
+                  <span
+                    class={change7d >= 0 ? "text-green-500" : "text-red-500"}
+                  >
+                    {change7d >= 0 ? "+" : ""}
+                    {change7d.toFixed(2)}%
+                  </span>
+                )
+                : (
+                  "N/A %"
+                )}
               align="right"
             />
           </div>

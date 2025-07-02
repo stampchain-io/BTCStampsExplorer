@@ -31,12 +31,31 @@ export const StampOverviewHeader = (
   /* ===== HELPER FUNCTION ===== */
   function countActiveStampFilters(filters: StampFilters): number {
     let count = 0;
-    if (filters.market.length > 0) count++;
-    count += filters.fileType.length;
-    count += filters.editions.length;
-    if (filters.range !== null) count++;
-    if (filters.marketMin || filters.marketMax) count++;
-    if (filters.rangeMin || filters.rangeMax) count++;
+
+    // Marketplace filter group - count as 1 if any marketplace filters are active
+    const hasMarketplaceFilters = filters.market !== "" ||
+      filters.dispensers ||
+      filters.atomics ||
+      filters.listings !== "" ||
+      filters.sales !== "" ||
+      filters.listingsMin ||
+      filters.listingsMax ||
+      filters.salesMin ||
+      filters.salesMax ||
+      filters.volume !== "" ||
+      filters.volumeMin ||
+      filters.volumeMax;
+
+    if (hasMarketplaceFilters) count++;
+
+    // Other filter categories
+    if (filters.fileType.length > 0) count++;
+    if (filters.editions.length > 0) count++;
+    if (filters.range !== null || filters.rangeMin || filters.rangeMax) count++;
+    if (
+      filters.fileSize !== null || filters.fileSizeMin || filters.fileSizeMax
+    ) count++;
+
     return count;
   }
 

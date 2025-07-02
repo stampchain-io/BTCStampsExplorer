@@ -27,7 +27,8 @@ export interface ButtonVariants {
     string
   >;
   size: Record<
-    "xs" | "sm" | "md" | "lg" | "xl" | "smR" | "mdR",
+    // when adding new sizes, update the ToggleButton.tsx file too
+    "xs" | "sm" | "md" | "lg" | "xl" | "xsR" | "smR" | "mdR" | "lgR",
     string
   >;
   textSize: Record<
@@ -182,8 +183,10 @@ export const buttonStyles: ButtonVariants = {
     md: "h-[38px] px-4 text-sm",
     lg: "h-[42px] px-4 text-sm",
     xl: "h-[46px] px-5 text-base",
+    xsR: "h-[30px] tablet:h-[26px] px-[14px] text-xs",
     smR: "h-[34px] tablet:h-[30px] px-4 text-xs",
     mdR: "h-[38px] tablet:h-[34px] px-4 text-sm tablet:text-xs",
+    lgR: "h-[42px] tablet:h-[38px] px-4 text-sm",
   },
 
   /* ===== TEXT SIZE STYLES - ONLY USED FOR TEXT BUTTONS ===== */

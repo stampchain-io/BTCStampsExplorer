@@ -1,13 +1,14 @@
 // TODO: Move to /server
 
 import { StampService } from "$server/services/stampService.ts";
-import { dbManager } from "$server/database/databaseManager.ts";
+import { dbManager, Row } from "$server/database/databaseManager.ts";
 import { DispenserFilter, DispenseEvent, XcpBalance } from "$types/index.d.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
-import { getTxInfo } from "$lib/utils/utxoUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { Transaction } from "bitcoinjs-lib";
+import { formatBTCAmount, formatBTCBalance } from "$lib/utils/balanceUtils.ts";
+import { env } from "$server/config/env.ts";
 
 // Only include active, working counterparty nodes
 export const xcp_v2_nodes = [
@@ -313,6 +314,7 @@ export class DispenserManager {
         const dispenses = response.result.map((dispense: any) => ({
           tx_hash: dispense.tx_hash,
           block_index: dispense.block_index,
+          block_time: dispense.block_time ? dispense.block_time * 1000 : null, // Convert to milliseconds
           cpid: cpid,
           source: dispense.source,
           destination: dispense.destination,
@@ -790,6 +792,7 @@ export class XcpManager {
     while (true) {
       const queryParams = new URLSearchParams({
         limit: apiLimit.toString(),
+        verbose: "true",
       });
       if (cursor) {
         queryParams.set("cursor", cursor);
@@ -806,18 +809,19 @@ export class XcpManager {
           break;
         }
 
-        const sends = await Promise.all(
-          response.result.map(async (send: any) => ({
+        // Map the sends with block_time from the API response
+        const sends = response.result.map((send: any) => {
+          return {
             tx_hash: send.tx_hash,
             block_index: send.block_index,
-            block_time: await getTxInfo(send.tx_hash), // Fetch block time
+            block_time: send.block_time ? send.block_time * 1000 : null, // Convert to milliseconds
             source: send.source,
             destination: send.destination,
             quantity: send.quantity,
             asset: cpid,
             status: send.status,
-          }))
-        );
+          };
+        });
 
         allSends = allSends.concat(sends);
         processedCount += sends.length;

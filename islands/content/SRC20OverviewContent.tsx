@@ -20,6 +20,8 @@ interface SRC20OverviewContentProps {
     totalPages: number;
   };
   timeframe: "24H" | "3D" | "7D";
+  sortBy?: string;
+  sortDirection?: string;
 }
 
 /* ===== COMPONENT ===== */
@@ -27,6 +29,8 @@ export function SRC20OverviewContent({
   mintedData,
   mintingData,
   timeframe,
+  sortBy = "TRENDING",
+  sortDirection = "desc",
 }: SRC20OverviewContentProps) {
   const [viewType, setViewType] = useState<"minted" | "minting">("minted");
   const [_currentTimeframe, setCurrentTimeframe] = useState<
@@ -36,17 +40,13 @@ export function SRC20OverviewContent({
     filter: "TRENDING" | "DEPLOY" | "HOLDERS" | null;
     direction: "asc" | "desc";
   }>({
-    filter: "TRENDING",
-    direction: "desc",
+    filter: sortBy as "TRENDING" | "DEPLOY" | "HOLDERS",
+    direction: sortDirection as "asc" | "desc",
   });
 
-  // Get the current data based on view type and sorting
+  // Get the current data based on view type (sorting is done server-side)
   const getCurrentData = () => {
-    const baseData = viewType === "minted" ? mintedData.data : mintingData.data;
-
-    if (!currentSort.filter) return baseData;
-
-    return sortData(baseData, currentSort.filter, currentSort.direction);
+    return viewType === "minted" ? mintedData.data : mintingData.data;
   };
 
   // Handle filter changes
@@ -55,11 +55,13 @@ export function SRC20OverviewContent({
     direction: "asc" | "desc",
   ) => {
     setCurrentSort({ filter, direction });
-    // const dataToSort = viewType === "minted"
-    //   ? mintedData.data
-    //   : mintingData.data;
-    // const newSortedData = sortData(dataToSort, filter, direction); // Removed as unused
-    // Update your data display with newSortedData // Comment remains, but newSortedData is gone
+
+    // Redirect to the same page with sort parameters
+    const url = new URL(globalThis.location.href);
+    url.searchParams.set("sortBy", filter || "TRENDING");
+    url.searchParams.set("sortDirection", direction);
+    url.searchParams.set("page", "1"); // Reset to page 1 when sorting changes
+    globalThis.location.href = url.toString();
   };
 
   // Handle view type changes
@@ -100,34 +102,3 @@ export function SRC20OverviewContent({
     </div>
   );
 }
-
-const sortData = (
-  data: EnrichedSRC20Row[],
-  filter: "TRENDING" | "DEPLOY" | "HOLDERS" | null,
-  direction: "asc" | "desc",
-) => {
-  if (!filter) return data;
-
-  const sortedArray = [...data];
-
-  switch (filter) {
-    case "HOLDERS":
-      return sortedArray.sort((a, b) => {
-        const aHolders = Number(a.holders) || 0;
-        const bHolders = Number(b.holders) || 0;
-        return direction === "asc" ? aHolders - bHolders : bHolders - aHolders;
-      });
-
-    case "DEPLOY":
-      return sortedArray.sort((a, b) => {
-        const aTime = new Date(a.block_time).getTime();
-        const bTime = new Date(b.block_time).getTime();
-        return direction === "asc"
-          ? aTime - bTime // Oldest first (ascending)
-          : bTime - aTime; // Newest first (descending)
-      });
-
-    default:
-      return data;
-  }
-};

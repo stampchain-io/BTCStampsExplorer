@@ -1,12 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
-import { _SRC20_FILTER_TYPES } from "$globals";
 import { SRC20Filters } from "$islands/filter/FilterOptionsSRC20.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
-import {
-  Radiobutton,
-  RangeButtons,
-  RangeSlider,
-} from "$islands/filter/FilterComponents.tsx";
+import { Radiobutton, RangeSlider } from "$islands/filter/FilterComponents.tsx";
+import { ToggleButton } from "$button";
 
 // Helper function to check if a section has active filters
 function hasActiveFilters(section: string, filters: SRC20Filters) {
@@ -305,9 +301,10 @@ export const FilterContentSRC20 = ({
             toggle={() => {}}
             variant="collapsibleLabel"
           >
-            <RangeButtons
+            <ToggleButton
+              options={["24h", "3d", "7d"]}
               selected={volumePeriod}
-              onChange={(newPeriod: string) => {
+              onChange={(newPeriod: string | string[]) => {
                 const period = newPeriod as PeriodType;
                 setVolumePeriod(period);
 
@@ -324,6 +321,8 @@ export const FilterContentSRC20 = ({
                   return newFilters;
                 });
               }}
+              mode="single"
+              spacing="even"
             />
           </CollapsibleSection>
         )}
@@ -337,9 +336,10 @@ export const FilterContentSRC20 = ({
             toggle={() => {}}
             variant="collapsibleLabel"
           >
-            <RangeButtons
+            <ToggleButton
+              options={["24h", "3d", "7d"]}
               selected={priceChangePeriod}
-              onChange={(newPeriod: string) => {
+              onChange={(newPeriod: string | string[]) => {
                 const period = newPeriod as PeriodType;
                 setPriceChangePeriod(period);
 
@@ -356,6 +356,8 @@ export const FilterContentSRC20 = ({
                   return newFilters;
                 });
               }}
+              mode="single"
+              spacing="even"
             />
           </CollapsibleSection>
         )}
