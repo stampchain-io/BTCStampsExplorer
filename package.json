@@ -31,6 +31,7 @@
     "test:api:comprehensive:market": "NEWMAN_FOLDER='Market Data' docker-compose -f docker-compose.test.yml run --rm newman-comprehensive",
     "test:api:comprehensive:regression": "npm run test:api:comprehensive && npm run test:api:report:regression",
     "test:api:report:regression": "node scripts/analyze-newman-regression.js",
+    "test:api:validate:expected": "node scripts/validate-expected-changes.js",
     "prepare": "husky"
   },
   "dependencies": {
