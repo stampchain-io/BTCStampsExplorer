@@ -224,6 +224,200 @@
       ]
     },
     {
+      "name": "Simple Health Check Comparison",
+      "item": [
+        {
+          "name": "Simple Health Check - Development",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/health?simple",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "health"],
+              "query": [
+                {
+                  "key": "simple",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.globals.set('request_start_time', Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const simpleHealthDevResponseTime = Date.now() - pm.globals.get('request_start_time');",
+                  "",
+                  "console.log('📥 Dev Simple Health Response:', {",
+                  "    status: pm.response.code,",
+                  "    responseTime: simpleHealthDevResponseTime + 'ms',",
+                  "    size: pm.response.responseSize + ' bytes'",
+                  "});",
+                  "",
+                  "// Store dev response",
+                  "pm.environment.set('simple_health_dev_status', pm.response.code);",
+                  "pm.environment.set('simple_health_dev_time', simpleHealthDevResponseTime);",
+                  "pm.environment.set('simple_health_dev_body', pm.response.text());",
+                  "",
+                  "pm.test('Dev simple health status is 200', function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test('Dev simple health response is fast (<100ms)', function () {",
+                  "    pm.expect(simpleHealthDevResponseTime).to.be.below(100);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Dev simple health has valid JSON', function () {",
+                  "        const json = pm.response.json();",
+                  "        pm.expect(json).to.have.property('status', 'OK');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Simple Health Check - Production",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/health?simple",
+              "host": ["{{prod_base_url}}"],
+              "path": ["api", "v2", "health"],
+              "query": [
+                {
+                  "key": "simple",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.globals.set('request_start_time', Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const simpleHealthProdResponseTime = Date.now() - pm.globals.get('request_start_time');",
+                  "",
+                  "console.log('📥 Prod Simple Health Response:', {",
+                  "    status: pm.response.code,",
+                  "    responseTime: simpleHealthProdResponseTime + 'ms',",
+                  "    size: pm.response.responseSize + ' bytes'",
+                  "});",
+                  "",
+                  "// Store prod response",
+                  "pm.environment.set('simple_health_prod_status', pm.response.code);",
+                  "pm.environment.set('simple_health_prod_time', simpleHealthProdResponseTime);",
+                  "pm.environment.set('simple_health_prod_body', pm.response.text());",
+                  "",
+                  "pm.test('Prod simple health status is 200', function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "",
+                  "pm.test('Prod simple health response is fast (<100ms)', function () {",
+                  "    pm.expect(simpleHealthProdResponseTime).to.be.below(100);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Prod simple health has valid JSON', function () {",
+                  "        const json = pm.response.json();",
+                  "        pm.expect(json).to.have.property('status', 'OK');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Simple Health Check Comparison Results",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "console.log('\\n' + '='.repeat(60));",
+                  "console.log('🏥 SIMPLE HEALTH CHECK COMPARISON RESULTS');",
+                  "console.log('='.repeat(60));",
+                  "",
+                  "const devStatus = pm.environment.get('simple_health_dev_status');",
+                  "const prodStatus = pm.environment.get('simple_health_prod_status');",
+                  "const devTime = pm.environment.get('simple_health_dev_time');",
+                  "const prodTime = pm.environment.get('simple_health_prod_time');",
+                  "const devBody = pm.environment.get('simple_health_dev_body');",
+                  "const prodBody = pm.environment.get('simple_health_prod_body');",
+                  "",
+                  "console.log('\\nStatus Comparison:');",
+                  "console.log(`  Dev:  ${devStatus}`);",
+                  "console.log(`  Prod: ${prodStatus}`);",
+                  "console.log(`  Match: ${devStatus === prodStatus ? '✅' : '❌'}`);",
+                  "",
+                  "console.log('\\nPerformance Comparison:');",
+                  "console.log(`  Dev:  ${devTime}ms`);",
+                  "console.log(`  Prod: ${prodTime}ms`);",
+                  "console.log(`  Difference: ${Math.abs(devTime - prodTime)}ms`);",
+                  "",
+                  "// Test that both simple health checks are fast",
+                  "pm.test('Both simple health checks are fast (<100ms)', function () {",
+                  "    pm.expect(devTime).to.be.below(100);",
+                  "    pm.expect(prodTime).to.be.below(100);",
+                  "});",
+                  "",
+                  "console.log('='.repeat(60));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://postman-echo.com/get",
+              "protocol": "https",
+              "host": ["postman-echo", "com"],
+              "path": ["get"]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Version Comparison",
       "item": [
         {
