@@ -100,23 +100,26 @@ export class MockDatabaseManager {
       return this.mockResponses.get(mockKey)!;
     }
 
-    // Collection queries - check BEFORE count queries since collection queries may have COUNT in SELECT
+    // Count queries - Check BEFORE collection queries since count queries may contain "from collections"
+    const hasCountClause = normalizedQuery.includes("count(*)") ||
+      normalizedQuery.includes("count(distinct");
+    const hasAsTotal = normalizedQuery.includes("as total");
+    const noHex = !normalizedQuery.includes("hex(");
+    const noGroupConcat = !normalizedQuery.includes("group_concat");
+
+    const isCountQuery = hasCountClause && hasAsTotal && noHex && noGroupConcat;
+
+    if (isCountQuery) {
+      return this.getCountData(normalizedQuery, params);
+    }
+
+    // Collection queries - check AFTER count queries
     if (
       normalizedQuery.includes("from collections") ||
       normalizedQuery.includes("collections c") ||
       normalizedQuery.includes("hex(c.collection_id)") // Specific to collection queries
     ) {
       return this.getCollectionData(normalizedQuery, params);
-    }
-
-    // Count queries - simple count queries that are not part of complex SELECTs
-    if (
-      (normalizedQuery.includes("count(*)") ||
-        normalizedQuery.includes("count(distinct")) &&
-      normalizedQuery.includes("as total") &&
-      !normalizedQuery.includes("hex(") // Exclude collection queries with count in SELECT
-    ) {
-      return this.getCountData(normalizedQuery, params);
     }
 
     // Stamp queries (non-count)
@@ -389,6 +392,77 @@ export class MockDatabaseManager {
     const normalizedQuery = query.toLowerCase();
     const collectionFixtures = collectionFixturesData as any;
 
+    // Check if there's a specific mock response set for collection queries
+    const mockKey = this.generateMockKey(query, params);
+    if (this.mockResponses.has(mockKey)) {
+      const mockResponse = this.mockResponses.get(mockKey)!;
+      // Special handling for getCollectionDetails - apply post-processing
+      if (
+        normalizedQuery.includes("hex(c.collection_id)") && mockResponse.rows
+      ) {
+        return {
+          ...mockResponse,
+          rows: mockResponse.rows,
+        };
+      }
+      return mockResponse;
+    }
+
+    // Handle collection by name - check this BEFORE general collection details
+    if (normalizedQuery.includes("where c.collection_name = ?")) {
+      const collectionName = params[0] as string;
+      const collections = collectionFixtures.collections || [];
+
+      const collection = collections.find(
+        (c: any) => c.collection_name === collectionName,
+      );
+
+      if (collection) {
+        const collectionCreators = collectionFixtures.collectionCreators || [];
+        const collectionStamps = collectionFixtures.collectionStamps || [];
+
+        const creators = collectionCreators
+          .filter((cc: any) => cc.collection_id === collection.collection_id)
+          .map((cc: any) => cc.creator_address);
+
+        const stamps = collectionStamps
+          .filter((cs: any) => cs.collection_id === collection.collection_id)
+          .map((cs: any) => cs.stamp);
+
+        // Check if this is a detailed query with HEX() and GROUP_CONCAT
+        if (
+          normalizedQuery.includes("hex(c.collection_id)") &&
+          normalizedQuery.includes("group_concat")
+        ) {
+          return {
+            rows: [{
+              collection_id: collection.collection_id,
+              collection_name: collection.collection_name,
+              collection_description: collection.collection_description,
+              creators: creators.join(","),
+              stamp_count: stamps.length.toString(),
+              stamp_numbers: stamps.join(","),
+              total_editions: (stamps.length * 100).toString(),
+            }],
+          };
+        }
+
+        // Simple collection by name query
+        return {
+          rows: [{
+            collection_id: collection.collection_id,
+            collection_name: collection.collection_name,
+            collection_description: collection.collection_description,
+            creators: creators.join(","),
+            stamp_count: stamps.length.toString(),
+            total_editions: (stamps.length * 100).toString(),
+          }],
+        };
+      }
+      // Return empty rows for non-existent collections
+      return { rows: [] };
+    }
+
     // Handle collection details queries with joins
     if (
       normalizedQuery.includes("hex(c.collection_id)") &&
@@ -397,6 +471,11 @@ export class MockDatabaseManager {
       const collections = collectionFixtures.collections || [];
       const collectionCreators = collectionFixtures.collectionCreators || [];
       const collectionStamps = collectionFixtures.collectionStamps || [];
+
+      // Check if this is a market data query
+      const includesMarketData =
+        normalizedQuery.includes("cmd.min_floor_price_btc") ||
+        normalizedQuery.includes("stamp_market_data");
 
       // Transform collection data with creators and stamps
       const transformedCollections = collections.map((collection: any) => {
@@ -410,7 +489,7 @@ export class MockDatabaseManager {
           .filter((cs: any) => cs.collection_id === collection.collection_id)
           .map((cs: any) => cs.stamp);
 
-        return {
+        const baseData = {
           collection_id: collection.collection_id,
           collection_name: collection.collection_name,
           collection_description: collection.collection_description,
@@ -419,6 +498,29 @@ export class MockDatabaseManager {
           stamp_count: stamps.length.toString(),
           total_editions: (stamps.length * 100).toString(), // Mock total editions
         };
+
+        // Add market data fields if query includes them
+        if (includesMarketData) {
+          return {
+            ...baseData,
+            minFloorPriceBTC: "0.001",
+            maxFloorPriceBTC: "0.01",
+            avgFloorPriceBTC: "0.005",
+            medianFloorPriceBTC: null,
+            totalVolume24hBTC: "0.5",
+            stampsWithPricesCount: stamps.length.toString(),
+            minHolderCount: "5",
+            maxHolderCount: "20",
+            avgHolderCount: "12.5",
+            medianHolderCount: null,
+            totalUniqueHolders: "50",
+            avgDistributionScore: "0.75",
+            totalStampsCount: stamps.length.toString(),
+            marketDataLastUpdated: "2024-01-01T00:00:00Z",
+          };
+        }
+
+        return baseData;
       });
 
       // Apply filters
@@ -459,39 +561,6 @@ export class MockDatabaseManager {
       }
 
       return { rows: filteredData };
-    }
-
-    // Handle collection by name
-    if (normalizedQuery.includes("where c.collection_name = ?")) {
-      const collectionName = params[0] as string;
-      const collection = collectionFixtures.collections.find(
-        (c: any) => c.collection_name === collectionName,
-      );
-
-      if (collection) {
-        const collectionCreators = collectionFixtures.collectionCreators || [];
-        const collectionStamps = collectionFixtures.collectionStamps || [];
-
-        const creators = collectionCreators
-          .filter((cc: any) => cc.collection_id === collection.collection_id)
-          .map((cc: any) => cc.creator_address);
-
-        const stamps = collectionStamps
-          .filter((cs: any) => cs.collection_id === collection.collection_id)
-          .map((cs: any) => cs.stamp);
-
-        return {
-          rows: [{
-            collection_id: collection.collection_id,
-            collection_name: collection.collection_name,
-            collection_description: collection.collection_description,
-            creators: creators.join(","),
-            stamp_count: stamps.length.toString(),
-            total_editions: (stamps.length * 100).toString(),
-          }],
-        };
-      }
-      return { rows: [] };
     }
 
     // Handle collection names query
