@@ -68,6 +68,11 @@
     "test:btc-price:watch": "deno test --allow-net tests/btc-price-caching.test.ts --no-check --allow-read --allow-env --allow-write --watch",
     "test:unit": "DENO_ENV=test deno test tests/unit/ --no-check --allow-env --allow-read",
     "test:unit:coverage": "DENO_ENV=test mkdir -p coverage && deno test --coverage=coverage/ tests/unit/ --no-check --allow-env --allow-read && deno coverage coverage/",
+    "test:integration": "DENO_ENV=test deno test tests/integration/ --no-check --allow-env --allow-read --allow-write --allow-net",
+    "test:integration:watch": "DENO_ENV=test deno test tests/integration/ --no-check --allow-env --allow-read --allow-write --allow-net --watch",
+    "test:integration:coverage": "DENO_ENV=test mkdir -p coverage && deno test --coverage=coverage/ tests/integration/ --no-check --allow-env --allow-read --allow-write --allow-net && deno coverage coverage/",
+    "test:all": "deno task test:unit && deno task test:integration",
+    "test:fixtures": "deno run --allow-read --allow-write --allow-env --allow-net tests/fixtures/generateFixtures.ts",
     "analyze:types": "deno run --allow-run --allow-write scripts/analyze-type-errors.ts"
   },
   "lint": {

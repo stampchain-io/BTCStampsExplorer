@@ -52,16 +52,16 @@ async function generateStampFixtures() {
         s.ident, s.stamp_hash, s.file_hash,
         m.floor_price_btc, m.holder_count, m.volume_24h_btc, m.last_updated
       FROM StampTableV4 s
-      JOIN market_data_cache m ON s.cpid = m.cpid
+      JOIN stamp_market_data m ON s.cpid = m.cpid
       WHERE m.floor_price_btc IS NOT NULL
       LIMIT 5
     `;
 
     // Get creators with names
     const creatorsQuery = `
-      SELECT DISTINCT address, creator_name
-      FROM creator_names
-      WHERE creator_name IS NOT NULL
+      SELECT DISTINCT address, creator
+      FROM creator
+      WHERE creator IS NOT NULL
       LIMIT 5
     `;
 
@@ -109,7 +109,7 @@ async function generateMarketDataFixtures() {
     // Get stamp market data
     const stampMarketDataQuery = `
       SELECT *
-      FROM market_data_cache
+      FROM stamp_market_data
       WHERE cpid IS NOT NULL 
       AND floor_price_btc IS NOT NULL
       LIMIT 10
@@ -118,7 +118,7 @@ async function generateMarketDataFixtures() {
     // Get SRC20 market data
     const src20MarketDataQuery = `
       SELECT *
-      FROM src20_market_data_cache
+      FROM src20_market_data
       WHERE tick IS NOT NULL
       AND market_cap_btc > 0
       ORDER BY market_cap_btc DESC
@@ -128,23 +128,32 @@ async function generateMarketDataFixtures() {
     // Get collection market data
     const collectionMarketDataQuery = `
       SELECT *
-      FROM collection_market_data_cache
+      FROM collection_market_data
       WHERE collection_id IS NOT NULL
       LIMIT 5
     `;
 
-    // Get holder data
-    const holderDataQuery = `
-      SELECT *
-      FROM stamp_holder_cache
-      WHERE cpid IN (
-        SELECT cpid FROM market_data_cache 
-        WHERE holder_count > 10 
-        LIMIT 1
-      )
-      ORDER BY rank_position ASC
-      LIMIT 20
+    // Get holder data - first get a cpid, then get holders
+    const cpidQuery = `
+      SELECT cpid 
+      FROM stamp_market_data 
+      WHERE holder_count > 10 
+      LIMIT 1
     `;
+
+    const cpidResult = await dbManager.executeQuery(cpidQuery);
+    let holderDataQuery = `SELECT * FROM stamp_holder_cache LIMIT 0`; // default empty
+
+    if (cpidResult.rows.length > 0) {
+      const cpid = cpidResult.rows[0].cpid;
+      holderDataQuery = `
+        SELECT *
+        FROM stamp_holder_cache
+        WHERE cpid = '${cpid}'
+        ORDER BY rank_position ASC
+        LIMIT 20
+      `;
+    }
 
     const stampMarketData = await dbManager.executeQuery(stampMarketDataQuery);
     const src20MarketData = await dbManager.executeQuery(src20MarketDataQuery);
@@ -180,6 +189,140 @@ async function generateMarketDataFixtures() {
   }
 }
 
+async function generateCollectionFixtures() {
+  console.log("\nGenerating collection fixtures from database...");
+
+  try {
+    // Get collections
+    const collectionsQuery = `
+      SELECT 
+        HEX(c.collection_id) as collection_id,
+        c.collection_name,
+        c.collection_description
+      FROM collections c
+      LIMIT 10
+    `;
+
+    // Get collection creators - join with limited collections
+    const collectionCreatorsQuery = `
+      SELECT 
+        HEX(cc.collection_id) as collection_id,
+        cc.creator_address
+      FROM collection_creators cc
+      INNER JOIN (
+        SELECT collection_id FROM collections ORDER BY collection_id LIMIT 10
+      ) c ON cc.collection_id = c.collection_id
+    `;
+
+    // Get collection stamps - join with limited collections
+    const collectionStampsQuery = `
+      SELECT 
+        HEX(cs.collection_id) as collection_id,
+        cs.stamp
+      FROM collection_stamps cs
+      INNER JOIN (
+        SELECT collection_id FROM collections ORDER BY collection_id LIMIT 10
+      ) c ON cs.collection_id = c.collection_id
+      LIMIT 50
+    `;
+
+    const collections = await dbManager.executeQuery(collectionsQuery);
+    const collectionCreators = await dbManager.executeQuery(
+      collectionCreatorsQuery,
+    );
+    const collectionStamps = await dbManager.executeQuery(
+      collectionStampsQuery,
+    );
+
+    const fixtures = {
+      collections: collections.rows,
+      collectionCreators: collectionCreators.rows,
+      collectionStamps: collectionStamps.rows,
+      generatedAt: new Date().toISOString(),
+    };
+
+    // Save to file
+    const fixturesPath = "./tests/fixtures/collectionData.json";
+    await Deno.writeTextFile(
+      fixturesPath,
+      JSON.stringify(fixtures, null, 2),
+    );
+
+    console.log(`✅ Collection fixtures saved to ${fixturesPath}`);
+    console.log(`   - Collections: ${collections.rows.length}`);
+    console.log(`   - Collection creators: ${collectionCreators.rows.length}`);
+    console.log(`   - Collection stamps: ${collectionStamps.rows.length}`);
+  } catch (error) {
+    console.error("Error generating collection fixtures:", error);
+  }
+}
+
+async function generateSrc20Fixtures() {
+  console.log("\nGenerating SRC-20 fixtures from database...");
+
+  try {
+    // Get SRC-20 valid transactions
+    const src20TransactionsQuery = `
+      SELECT *
+      FROM SRC20Valid
+      WHERE tick IS NOT NULL
+      LIMIT 20
+    `;
+
+    // Get SRC-20 all transactions
+    const src20AllQuery = `
+      SELECT *
+      FROM SRC20
+      WHERE tick IS NOT NULL
+      LIMIT 20
+    `;
+
+    // Get SRC-20 token stats
+    const tokenStatsQuery = `
+      SELECT *
+      FROM src20_token_stats
+      LIMIT 10
+    `;
+
+    // Get SRC-20 metadata
+    const metadataQuery = `
+      SELECT *
+      FROM src20_metadata
+      LIMIT 10
+    `;
+
+    const src20Transactions = await dbManager.executeQuery(
+      src20TransactionsQuery,
+    );
+    const src20All = await dbManager.executeQuery(src20AllQuery);
+    const tokenStats = await dbManager.executeQuery(tokenStatsQuery);
+    const metadata = await dbManager.executeQuery(metadataQuery);
+
+    const fixtures = {
+      src20Valid: src20Transactions.rows,
+      src20All: src20All.rows,
+      tokenStats: tokenStats.rows,
+      metadata: metadata.rows,
+      generatedAt: new Date().toISOString(),
+    };
+
+    // Save to file
+    const fixturesPath = "./tests/fixtures/src20Data.json";
+    await Deno.writeTextFile(
+      fixturesPath,
+      JSON.stringify(fixtures, null, 2),
+    );
+
+    console.log(`✅ SRC-20 fixtures saved to ${fixturesPath}`);
+    console.log(`   - SRC-20 valid records: ${src20Transactions.rows.length}`);
+    console.log(`   - SRC-20 all records: ${src20All.rows.length}`);
+    console.log(`   - Token stats: ${tokenStats.rows.length}`);
+    console.log(`   - Metadata: ${metadata.rows.length}`);
+  } catch (error) {
+    console.error("Error generating SRC-20 fixtures:", error);
+  }
+}
+
 // Main execution
 async function main() {
   console.log("🚀 Starting fixture generation...\n");
@@ -187,6 +330,8 @@ async function main() {
   try {
     await generateStampFixtures();
     await generateMarketDataFixtures();
+    await generateCollectionFixtures();
+    await generateSrc20Fixtures();
 
     console.log("\n✨ All fixtures generated successfully!");
   } catch (error) {
