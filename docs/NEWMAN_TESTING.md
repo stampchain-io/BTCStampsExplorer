@@ -41,10 +41,17 @@ deno task test:api:performance
 
 ## Available Test Collections
 
-### 1. Enhanced Collection (`postman-collection-enhanced.json`)
-- **Purpose**: Comprehensive dual endpoint testing
+### 1. Full Regression Collection (`postman-collection-full-regression.json`)
+- **Purpose**: Complete API testing with regression detection
+- **Features**: Dual endpoint comparison, error scenarios, performance tracking
+- **Endpoints**: All 46 API endpoints (92+ tests total)
+- **Comparison**: Development vs Production for every endpoint
+- **Coverage**: 100% endpoint coverage with positive and negative test cases
+
+### 2. Enhanced Collection (`postman-collection-enhanced.json`)
+- **Purpose**: Basic dual endpoint testing (legacy)
 - **Features**: Pre-request scripts, test scripts, response comparison
-- **Endpoints**: All 46+ API endpoints
+- **Endpoints**: 4 endpoints only (being phased out)
 - **Comparison**: Development vs Production
 - **Performance**: Response time tracking and analysis
 
