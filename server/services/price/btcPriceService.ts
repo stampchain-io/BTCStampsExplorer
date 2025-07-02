@@ -85,7 +85,14 @@ export class BTCPriceService {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         errors.push(`${source}: ${errorMessage}`);
-        console.warn(`[BTCPriceService] BTC price source (${source}) failed: ${errorMessage}`);
+        
+        // Only log simple message for expected errors with fallbacks
+        const isRateLimitError = errorMessage.includes('429');
+        if (isRateLimitError) {
+          console.log(`[BTCPriceService] ${source} rate limited, trying next source...`);
+        } else {
+          console.warn(`[BTCPriceService] ${source} failed: ${errorMessage}`);
+        }
       }
     }
 
@@ -182,7 +189,11 @@ export class BTCPriceService {
       if (!response.ok) {
         // Consume the response body to prevent resource leak
         await response.text();
-        console.error(`[BTCPriceService] CoinGecko API error: ${response.status} ${response.statusText}`);
+        
+        // Less verbose logging for rate limits
+        if (response.status === 429) {
+          throw new Error(`CoinGecko API rate limit (${response.status})`);
+        }
         throw new Error(`CoinGecko API returned ${response.status}`);
       }
       
@@ -197,7 +208,7 @@ export class BTCPriceService {
         details: data,
       };
     } catch (error) {
-      console.error("[BTCPriceService] CoinGecko price fetch failed:", error);
+      // Re-throw with message only, no stack trace logging
       throw error;
     }
   }
@@ -214,7 +225,11 @@ export class BTCPriceService {
       if (!response.ok) {
         // Consume the response body to prevent resource leak
         await response.text();
-        console.error(`[BTCPriceService] Binance API error: ${response.status} ${response.statusText}`);
+        
+        // Less verbose logging for rate limits
+        if (response.status === 429) {
+          throw new Error(`Binance API rate limit (${response.status})`);
+        }
         throw new Error(`Binance API returned ${response.status}`);
       }
       
@@ -229,7 +244,7 @@ export class BTCPriceService {
         details: data,
       };
     } catch (error) {
-      console.error("[BTCPriceService] Binance price fetch failed:", error);
+      // Re-throw with message only, no stack trace logging
       throw error;
     }
   }

@@ -5,7 +5,7 @@ import { WalletOverviewInfo, WalletPageProps } from "$lib/types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { SRC20MarketService } from "$server/services/src20/marketService.ts";
+import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { enrichTokensWithMarketData } from "$server/services/src20Service.ts";
 import { PaginatedResponse } from "$lib/types/pagination.d.ts";
 import { DispenserRow, SRC20Row, StampRow } from "$globals";
@@ -105,7 +105,7 @@ export const handler: Handlers = {
         ),
 
         StampController.getStampsCreatedCount(address),
-        SRC20MarketService.fetchMarketListingSummary(),
+        MarketDataRepository.getAllSRC20MarketData(1000),
       ]);
 
       /* ===== DATA PROCESSING ===== */

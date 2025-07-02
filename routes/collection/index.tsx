@@ -8,7 +8,9 @@ import {
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { CollectionRow } from "$server/types/collection.d.ts";
+import {
+  CollectionWithOptionalMarketData,
+} from "$server/types/collection.d.ts";
 import { body, gapSection } from "$layout";
 import {
   CollectionDetailGallery,
@@ -21,7 +23,7 @@ import { CollectionOverviewHeader } from "$header";
 /* ===== TYPES ===== */
 type CollectionLandingPageProps = {
   data: {
-    collections: CollectionRow[];
+    collections: CollectionWithOptionalMarketData[];
     total: number;
     _page: number;
     _pages: number;
@@ -54,43 +56,11 @@ export const handler: Handlers = {
         page: page,
         creator: "",
         sortBy,
+        includeMarketData: true,
       });
 
-      const collections: CollectionRow[] = [];
-      const type: "stamps" | "cursed" | "all" = "all";
-
-      // Process collections sequentially to avoid overwhelming the counterparty API
-      for (const item of collectionsData?.data || []) {
-        try {
-          const collectionResult = await StampController.getStamps({
-            page,
-            limit: limit,
-            sortBy,
-            type,
-            filterBy,
-            collectionId: item.collection_id,
-            skipDispenserLookup: true,
-            skipPriceCalculation: true,
-          } as any); // Temporary type assertion to bypass TypeScript issue
-          collections.push({
-            ...item,
-            img: collectionResult.data?.[0]?.stamp_url,
-          });
-
-          // Add a small delay between requests (reduced since we're skipping dispenser calls)
-          await new Promise((resolve) => setTimeout(resolve, 50));
-        } catch (error) {
-          console.warn(
-            `Failed to load collection ${item.collection_id}:`,
-            error,
-          );
-          // Add collection without image if it fails
-          collections.push({
-            ...item,
-            img: "",
-          });
-        }
-      }
+      const collections: CollectionWithOptionalMarketData[] =
+        collectionsData?.data || [];
       const data = {
         collections: collections,
         page: collectionsData.page,

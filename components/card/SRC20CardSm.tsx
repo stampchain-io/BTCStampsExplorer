@@ -191,12 +191,30 @@ export function SRC20CardSm({
                       if (priceInBtc === 0) {
                         return "0 SATS";
                       }
-                      const priceInSatsExact = priceInBtc * 1e8;
-                      const priceInSatsRounded = Math.round(priceInSatsExact);
-                      if (priceInSatsRounded === 0) {
-                        return "< 1 SATS";
+                      const priceInSats = priceInBtc * 1e8;
+
+                      // Smart formatting based on price level
+                      if (priceInSats < 0.0001) {
+                        // For extremely small values, show with high precision
+                        return priceInSats.toFixed(6) + " SATS";
+                      } else if (priceInSats < 1) {
+                        // For values less than 1 sat, show 4 decimal places
+                        return priceInSats.toFixed(4) + " SATS";
+                      } else if (priceInSats < 10) {
+                        // For values 1-10 sats, show 2 decimal places
+                        return priceInSats.toFixed(2) + " SATS";
+                      } else if (priceInSats < 100) {
+                        // For values 10-100 sats, show 1 decimal place
+                        return priceInSats.toFixed(1) + " SATS";
+                      } else if (priceInSats < 1000) {
+                        // For values 100-1000 sats, show whole numbers
+                        return Math.round(priceInSats).toLocaleString() +
+                          " SATS";
+                      } else {
+                        // For values above 1000 sats, use comma formatting
+                        return Math.round(priceInSats).toLocaleString() +
+                          " SATS";
                       }
-                      return priceInSatsRounded.toLocaleString() + " SATS";
                     })()}
                   </td>
                   {/* CHANGE 24H */}
@@ -226,13 +244,35 @@ export function SRC20CardSm({
                      tablet:${rowCardBorderRight} tablet:pr-4 tablet:rounded-r-lg tablet:border-r-2
                      desktop:${rowCardBorderCenter} desktop:pr-3 desktop:border-r-0 desktop:rounded-r-none`}
                   >
-                    {src20.market_data?.volume24 !== undefined &&
-                        src20.market_data?.volume24 !== null
-                      ? src20.market_data.volume24.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 8,
-                      }) + " BTC"
-                      : "N/A"}
+                    {(() => {
+                      const volume = src20.market_data?.volume24;
+                      if (volume === undefined || volume === null) {
+                        return "N/A";
+                      }
+
+                      // Smart formatting based on volume level
+                      if (volume === 0) {
+                        return "0 BTC";
+                      } else if (volume < 0.0001) {
+                        // For very small volumes, show 6 decimals
+                        return volume.toFixed(6) + " BTC";
+                      } else if (volume < 0.01) {
+                        // For small volumes, show 4 decimals
+                        return volume.toFixed(4) + " BTC";
+                      } else if (volume < 0.1) {
+                        // For medium-small volumes, show 3 decimals
+                        return volume.toFixed(3) + " BTC";
+                      } else if (volume < 1) {
+                        // For sub-1 BTC volumes, show 2 decimals
+                        return volume.toFixed(2) + " BTC";
+                      } else if (volume < 100) {
+                        // For 1-100 BTC, show 2 decimals
+                        return volume.toFixed(2) + " BTC";
+                      } else {
+                        // For large volumes, show whole numbers with commas
+                        return Math.round(volume).toLocaleString() + " BTC";
+                      }
+                    })()}
                   </td>
                   {/* MARKETCAP */}
                   <td
@@ -242,13 +282,29 @@ export function SRC20CardSm({
                       hidden mobileMd:table-cell tablet:hidden desktop:table-cell
                     `}
                   >
-                    {src20.market_data?.mcap !== undefined &&
-                        src20.market_data?.mcap !== null
-                      ? src20.market_data.mcap.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 8,
-                      }) + " BTC"
-                      : "N/A"}
+                    {(() => {
+                      const marketCap = src20.market_data?.mcap;
+                      if (marketCap === undefined || marketCap === null) {
+                        return "N/A";
+                      }
+
+                      // Smart formatting for market cap
+                      if (marketCap === 0) {
+                        return "0 BTC";
+                      } else if (marketCap < 1) {
+                        // For small market caps, show 2 decimals
+                        return marketCap.toFixed(2) + " BTC";
+                      } else if (marketCap < 100) {
+                        // For medium market caps, show 2 decimals
+                        return marketCap.toFixed(2) + " BTC";
+                      } else if (marketCap < 1000) {
+                        // For larger market caps, show 1 decimal
+                        return marketCap.toFixed(1) + " BTC";
+                      } else {
+                        // For very large market caps, show whole numbers with commas
+                        return Math.round(marketCap).toLocaleString() + " BTC";
+                      }
+                    })()}
                   </td>
                 </tr>
               );

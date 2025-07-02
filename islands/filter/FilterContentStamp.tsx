@@ -1,22 +1,41 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import {
   STAMP_EDITIONS,
+  STAMP_FILESIZES,
   STAMP_FILETYPES,
-  STAMP_MARKET,
+  STAMP_MARKETPLACE as _STAMP_MARKETPLACE,
   STAMP_RANGES,
 } from "$globals";
 import { inputCheckbox } from "$form";
 import { labelLogicResponsive, labelXsPosition, labelXsR } from "$text";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import { Checkbox, RangeSlider } from "$islands/filter/FilterComponents.tsx";
+import { ToggleButton } from "$button";
 import { StampFilters } from "$islands/filter/FilterOptionsStamp.tsx";
 
 const defaultFilters: StampFilters = {
-  market: [],
-  marketMin: "",
-  marketMax: "",
+  // Market Place
+  market: "",
+  dispensers: false,
+  atomics: false,
+  listings: "",
+  listingsMin: "",
+  listingsMax: "",
+  sales: "",
+  salesMin: "",
+  salesMax: "",
+  volume: "",
+  volumeMin: "",
+  volumeMax: "",
+  // File Type
   fileType: [],
+  // File Size
+  fileSize: null,
+  fileSizeMin: "",
+  fileSizeMax: "",
+  // Editions
   editions: [],
+  // Range
   range: null,
   rangeMin: "",
   rangeMax: "",
@@ -25,24 +44,70 @@ const defaultFilters: StampFilters = {
 export function filtersToQueryParams(search: string, filters: StampFilters) {
   const queryParams = new URLSearchParams(search);
 
-  // MARKET
-  if (filters.market.length > 0) {
-    queryParams.set("market", filters.market.join(","));
+  // MARKET TYPE
+  if (filters.market) {
+    queryParams.set("market", filters.market);
   } else {
     queryParams.delete("market");
   }
 
-  // Handle market price range
-  if (filters.marketMin) {
-    queryParams.set("marketMin", filters.marketMin);
+  // LISTINGS OPTIONS
+  if (filters.dispensers) {
+    queryParams.set("dispensers", "true");
   } else {
-    queryParams.delete("marketMin");
+    queryParams.delete("dispensers");
   }
 
-  if (filters.marketMax) {
-    queryParams.set("marketMax", filters.marketMax);
+  if (filters.atomics) {
+    queryParams.set("atomics", "true");
   } else {
-    queryParams.delete("marketMax");
+    queryParams.delete("atomics");
+  }
+
+  if (filters.listings) {
+    queryParams.set("listings", filters.listings);
+  } else {
+    queryParams.delete("listings");
+  }
+
+  // SALES OPTIONS
+  if (filters.sales) {
+    queryParams.set("sales", filters.sales);
+  } else {
+    queryParams.delete("sales");
+  }
+
+  // Handle listings price range - only include min/max for custom preset
+  if (filters.listings === "custom" && filters.listingsMin) {
+    queryParams.set("listingsMin", filters.listingsMin);
+  } else {
+    queryParams.delete("listingsMin");
+  }
+
+  if (filters.listings === "custom" && filters.listingsMax) {
+    queryParams.set("listingsMax", filters.listingsMax);
+  } else {
+    queryParams.delete("listingsMax");
+  }
+
+  // Handle sales price range - only include min/max for custom preset
+  if (filters.sales === "custom" && filters.salesMin) {
+    queryParams.set("salesMin", filters.salesMin);
+  } else {
+    queryParams.delete("salesMin");
+  }
+
+  if (filters.sales === "custom" && filters.salesMax) {
+    queryParams.set("salesMax", filters.salesMax);
+  } else {
+    queryParams.delete("salesMax");
+  }
+
+  // Volume period
+  if (filters.volume) {
+    queryParams.set("volume", filters.volume);
+  } else {
+    queryParams.delete("volume");
   }
 
   // FILETYPE
@@ -90,115 +155,107 @@ export function filtersToQueryParams(search: string, filters: StampFilters) {
 export function filtersToServicePayload(filters: typeof defaultFilters) {
   const filterPayload = {
     vector: {
-      filetypeFilters: [] as STAMP_FILETYPES[],
+      fileType: [] as STAMP_FILETYPES[],
       ident: ["STAMP"],
     },
     pixel: {
-      filetypeFilters: [] as STAMP_FILETYPES[],
+      fileType: [] as STAMP_FILETYPES[],
       ident: ["STAMP, SRC-721"],
     },
     recursive: {
-      filetypeFilters: [] as STAMP_FILETYPES[],
+      fileType: [] as STAMP_FILETYPES[],
       ident: ["SRC-721"],
     },
     audio: {
-      filetypeFilters: [] as STAMP_FILETYPES[],
+      fileType: [] as STAMP_FILETYPES[],
       ident: ["STAMP"],
     },
     encoding: {
-      filetypeFilters: [] as STAMP_FILETYPES[],
+      fileType: [] as STAMP_FILETYPES[],
       ident: ["STAMP"],
     },
   };
 
   // JPG/JPEG (combined)
   if (filters.fileType.includes("jpg")) {
-    filterPayload.pixel.filetypeFilters.push("jpg");
-    filterPayload.pixel.filetypeFilters.push("jpeg");
+    filterPayload.pixel.fileType.push("jpg");
+    filterPayload.pixel.fileType.push("jpeg");
   }
 
   // PNG
   if (filters.fileType.includes("png")) {
-    filterPayload.pixel.filetypeFilters.push("png");
+    filterPayload.pixel.fileType.push("png");
   }
 
   // GIF
   if (filters.fileType.includes("gif")) {
-    filterPayload.pixel.filetypeFilters.push("gif");
+    filterPayload.pixel.fileType.push("gif");
   }
 
   // WEBP
   if (filters.fileType.includes("webp")) {
-    filterPayload.pixel.filetypeFilters.push("webp");
+    filterPayload.pixel.fileType.push("webp");
   }
 
   // AVIF
   if (filters.fileType.includes("avif")) {
-    filterPayload.pixel.filetypeFilters.push("avif");
+    filterPayload.pixel.fileType.push("avif");
   }
 
   // BMP
   if (filters.fileType.includes("bmp")) {
-    filterPayload.pixel.filetypeFilters.push("bmp");
+    filterPayload.pixel.fileType.push("bmp");
   }
 
   // SVG
   if (filters.fileType.includes("svg")) {
-    filterPayload.vector.filetypeFilters.push("svg");
-    filterPayload.recursive.filetypeFilters.push("svg");
+    filterPayload.vector.fileType.push("svg");
+    filterPayload.recursive.fileType.push("svg");
   }
 
   // HTML
   if (filters.fileType.includes("html")) {
-    filterPayload.vector.filetypeFilters.push("html");
-    filterPayload.recursive.filetypeFilters.push("html");
+    filterPayload.vector.fileType.push("html");
+    filterPayload.recursive.fileType.push("html");
   }
 
   // TXT
   // if (filters.fileType.includes("txt")) {
-  //   filterPayload.vector.filetypeFilters.push("txt");
-  //   filterPayload.recursive.filetypeFilters.push("txt");
+  //   filterPayload.vector.fileType.push("txt");
+  //   filterPayload.recursive.fileType.push("txt");
   // }
 
   // MP3/MPEG (combined)
   if (filters.fileType.includes("mp3")) {
-    filterPayload.audio.filetypeFilters.push("mp3");
-    filterPayload.audio.filetypeFilters.push("mpeg");
+    filterPayload.audio.fileType.push("mp3");
+    filterPayload.audio.fileType.push("mpeg");
   }
 
   // LEGACY
   if (filters.fileType.includes("legacy")) {
-    filterPayload.encoding.filetypeFilters.push("legacy");
+    filterPayload.encoding.fileType.push("legacy");
   }
 
   // OLGA
   if (filters.fileType.includes("olga")) {
-    filterPayload.encoding.filetypeFilters.push("olga");
+    filterPayload.encoding.fileType.push("olga");
   }
 
   // Collect all file types
-  const filetypeFilters = Object.entries(filterPayload).reduce(
+  const fileType = Object.entries(filterPayload).reduce(
     (acc, [_key, value]) => {
-      if (value.filetypeFilters.length > 0) {
-        acc.push(...value.filetypeFilters);
+      if (value.fileType.length > 0) {
+        acc.push(...value.fileType);
       }
       return acc;
     },
     [] as STAMP_FILETYPES[],
   );
 
-  // Collect edition filters
-  const editionFilters: STAMP_EDITIONS[] = [];
-  if (filters.editions.includes("single")) editionFilters.push("single");
-  if (filters.editions.includes("multiple")) editionFilters.push("multiple");
-  if (filters.editions.includes("locked")) editionFilters.push("locked");
-  if (filters.editions.includes("unlocked")) editionFilters.push("unlocked");
-  if (filters.editions.includes("divisible")) editionFilters.push("divisible");
-
   return {
     ident: [],
-    filetypeFilters: Array.from(new Set(filetypeFilters)),
-    editionFilters: editionFilters.length > 0 ? editionFilters : undefined,
+    fileType: Array.from(new Set(fileType)),
+    editions: filters.editions.length > 0 ? filters.editions : undefined,
   };
 }
 
@@ -212,9 +269,21 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
 
 export const allQueryKeysFromFilters = [
   "market",
-  "marketMin",
-  "marketMax",
+  "dispensers",
+  "atomics",
+  "listings",
+  "listingsMin",
+  "listingsMax",
+  "sales",
+  "salesMin",
+  "salesMax",
+  "volume",
+  "volumeMin",
+  "volumeMax",
   "filetype",
+  "fileSize",
+  "fileSizeMin",
+  "fileSizeMax",
   "editions",
   "range",
   "rangeMin",
@@ -226,27 +295,119 @@ export function queryParamsToFilters(query: string): StampFilters {
   // Initialize with default filters
   const filters = { ...defaultFilters };
 
-  // ONLY handle flat filetype parameter
-  const flatFiletype = params.get("filetype");
-  if (flatFiletype) {
-    filters.fileType = flatFiletype.split(",") as STAMP_FILETYPES[];
-  }
-
-  // Parse market parameter (comma-separated string to array)
+  // Parse market type parameter
   const marketParam = params.get("market");
-  if (marketParam) {
-    filters.market = marketParam.split(",") as STAMP_MARKET[];
+  if (
+    marketParam &&
+    (marketParam === "listings" || marketParam === "sales")
+  ) {
+    filters.market = marketParam;
   }
 
-  // Parse market price range
-  const marketMin = params.get("marketMin");
-  if (marketMin) {
-    filters.marketMin = marketMin;
+  // Parse dispensers and atomics
+  const dispensersParam = params.get("dispensers");
+  if (dispensersParam === "true") {
+    filters.dispensers = true;
   }
 
-  const marketMax = params.get("marketMax");
-  if (marketMax) {
-    filters.marketMax = marketMax;
+  const atomicsParam = params.get("atomics");
+  if (atomicsParam === "true") {
+    filters.atomics = true;
+  }
+
+  // Parse listings type
+  const listingsParam = params.get("listings");
+  if (
+    listingsParam &&
+    ["all", "bargain", "affordable", "premium", "custom"].includes(
+      listingsParam,
+    )
+  ) {
+    filters.listings = listingsParam as
+      | "all"
+      | "bargain"
+      | "affordable"
+      | "premium"
+      | "custom";
+  }
+
+  // Parse listings price range
+  const listingsMin = params.get("listingsMin");
+  if (listingsMin) {
+    filters.listingsMin = listingsMin;
+  }
+
+  const listingsMax = params.get("listingsMax");
+  if (listingsMax) {
+    filters.listingsMax = listingsMax;
+  }
+
+  // Parse sales type
+  const salesParam = params.get("sales");
+  if (
+    salesParam &&
+    ["recent", "premium", "custom", "volume"].includes(salesParam)
+  ) {
+    filters.sales = salesParam as
+      | "recent"
+      | "premium"
+      | "custom"
+      | "volume";
+  }
+
+  // Parse sales price range
+  const salesMin = params.get("salesMin");
+  if (salesMin) {
+    filters.salesMin = salesMin;
+  }
+
+  const salesMax = params.get("salesMax");
+  if (salesMax) {
+    filters.salesMax = salesMax;
+  }
+
+  // Parse volume parameters
+  const volume = params.get("volume");
+  if (volume) {
+    filters.volume = volume as "24h" | "7d" | "30d" | "";
+  }
+
+  const volumeMin = params.get("volumeMin");
+  if (volumeMin) {
+    filters.volumeMin = volumeMin;
+  }
+
+  const volumeMax = params.get("volumeMax");
+  if (volumeMax) {
+    filters.volumeMax = volumeMax;
+  }
+
+  // Parse filetype parameter
+  const filetypeParam = params.get("filetype");
+  if (filetypeParam) {
+    filters.fileType = filetypeParam.split(",") as STAMP_FILETYPES[];
+  }
+
+  // Parse file size parameters
+  const fileSize = params.get("fileSize");
+  if (fileSize) {
+    filters.fileSize = fileSize as STAMP_FILESIZES;
+  }
+
+  const fileSizeMin = params.get("fileSizeMin");
+  if (fileSizeMin) {
+    filters.fileSizeMin = fileSizeMin;
+  }
+
+  const fileSizeMax = params.get("fileSizeMax");
+  if (fileSizeMax) {
+    filters.fileSizeMax = fileSizeMax;
+  }
+
+  // Parse editions parameter (comma-separated string to array)
+  const editionsParam = params.get("editions");
+  if (editionsParam) {
+    filters.editions = editionsParam.split(",") as STAMP_EDITIONS[];
   }
 
   // Parse range parameters (flat structure)
@@ -265,27 +426,33 @@ export function queryParamsToFilters(query: string): StampFilters {
     filters.rangeMax = rangeMax;
   }
 
-  // Parse editions parameter (comma-separated string to array)
-  const editionsParam = params.get("editions");
-  if (editionsParam) {
-    filters.editions = editionsParam.split(",") as STAMP_EDITIONS[];
-  }
-
   return filters;
 }
 
 export function queryParamsToServicePayload(search: string) {
   const filters = queryParamsToFilters(search);
   // Convert filters to service payload format
-  // This will depend on what your service expects
   return {
-    fileTypes: filters.fileType,
     market: filters.market,
+    dispensers: filters.dispensers,
+    atomics: filters.atomics,
+    listings: filters.listings,
+    listingsMin: filters.listingsMin,
+    listingsMax: filters.listingsMax,
+    sales: filters.sales,
+    salesMin: filters.salesMin,
+    salesMax: filters.salesMax,
+    volume: filters.volume,
+    volumeMin: filters.volumeMin,
+    volumeMax: filters.volumeMax,
+    fileTypes: filters.fileType,
+    fileSize: filters.fileSize,
+    fileSizeMin: filters.fileSizeMin,
+    fileSizeMax: filters.fileSizeMax,
     editions: filters.editions,
     range: filters.range,
-    priceRange: filters.market.length > 0
-      ? { min: filters.marketMin, max: filters.marketMax }
-      : undefined,
+    rangeMin: filters.rangeMin,
+    rangeMax: filters.rangeMax,
   };
 }
 
@@ -334,11 +501,20 @@ const Radio = ({ label, value, checked, onChange, name }: RadioProps) => {
 function hasActiveFilters(section: string, filters: StampFilters): boolean {
   switch (section) {
     case "market":
-      return filters.market.length > 0;
+      return filters.market !== "" || filters.dispensers ||
+        filters.atomics ||
+        filters.listings !== "" || filters.sales !== "";
     case "priceRange":
-      return filters.marketMin !== "" || filters.marketMax !== "";
+      return filters.listingsMin !== "" || filters.listingsMax !== "" ||
+        filters.salesMin !== "" || filters.salesMax !== "";
+    case "volume":
+      return filters.volume !== "";
     case "fileType":
       return filters.fileType.length > 0;
+    case "fileSize":
+      return filters.fileSize !== null ||
+        filters.fileSizeMin !== "" ||
+        filters.fileSizeMax !== "";
     case "editions":
       return filters.editions.length > 0;
     case "range":
@@ -360,6 +536,7 @@ export const FilterContentStamp = ({
   const [filters, setFilters] = useState(initialFilters);
   const [expandedSections, setExpandedSections] = useState({
     fileType: hasActiveFilters("fileType", filters),
+    fileSize: hasActiveFilters("fileSize", filters),
     editions: hasActiveFilters("editions", filters),
     range: hasActiveFilters("range", filters),
     market: hasActiveFilters("market", filters),
@@ -389,24 +566,6 @@ export const FilterContentStamp = ({
       }));
     }
   }, [initialFilters]);
-
-  const _handleFilterChange = (
-    category: keyof typeof defaultFilters,
-    value: unknown,
-  ) => {
-    setFilters((prevFilters) => {
-      const newFilters = {
-        ...prevFilters,
-        [category]: Array.isArray(value)
-          ? [...value]
-          : typeof value === "object"
-          ? { ...prevFilters[category], ...value }
-          : value,
-      };
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
-  };
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections({
@@ -443,18 +602,6 @@ export const FilterContentStamp = ({
       globalThis.removeEventListener("mouseleave", handleMouseUp);
     };
   }, [isDraggingPrice, isDraggingRange]);
-
-  const _handlePriceRangeChange = (min: number, max: number) => {
-    setFilters((prevFilters) => {
-      const newFilters = {
-        ...prevFilters,
-        marketMin: min === 0 ? "" : min.toString(),
-        marketMax: max === Infinity ? "" : max.toString(),
-      };
-      onFiltersChange(newFilters);
-      return newFilters;
-    });
-  };
 
   const handleRangeChange = (value: string | null) => {
     setFilters((prevFilters) => {
@@ -583,23 +730,169 @@ export const FilterContentStamp = ({
     });
   };
 
-  // Helper function to toggle market type
-  const toggleMarket = (type: STAMP_MARKET) => {
+  // Helper function to toggle main market type (LISTINGS vs SALES)
+  const toggleMarketType = (type: "listings" | "sales") => {
     setFilters((prevFilters) => {
-      // For radio buttons, we either select the new type or clear if it's already selected
-      const newMarket = prevFilters.market.includes(type) ? [] : [type];
-
-      const newFilters = {
+      const newFilters: StampFilters = {
         ...prevFilters,
-        market: newMarket,
+        market: prevFilters.market === type ? "" : type,
+        // Reset all sub-options when switching main type
+        dispensers: type === "listings" || type === "sales" ? true : false, // Auto-select DISPENSERS for both listings and sales
+        atomics: false,
+        listings: type === "listings" ? "all" : "", // Auto-select "all" when dispensers selected
+        sales: type === "sales" ? "recent" : "", // Auto-select "recent" for sales
+        listingsMin: "",
+        listingsMax: "",
+        salesMin: "",
+        salesMax: "",
+        volume: "",
       };
 
-      // If no market types are selected, reset price range
-      if (newMarket.length === 0) {
-        newFilters.marketMin = "";
-        newFilters.marketMax = "";
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
+  // Helper function to toggle dispensers/atomics
+  const toggleListingOption = (option: "dispensers" | "atomics") => {
+    setFilters((prevFilters) => {
+      const newValue = !prevFilters[option];
+      const newFilters: StampFilters = {
+        ...prevFilters,
+        [option]: newValue,
+        // Auto-select "all" when first dispenser/atomic is selected
+        listings: (newValue ||
+            prevFilters[option === "dispensers" ? "atomics" : "dispensers"])
+          ? (prevFilters.listings || "all")
+          : (!prevFilters[
+              option === "dispensers" ? "atomics" : "dispensers"
+            ]
+            ? ""
+            : prevFilters.listings),
+      } as StampFilters;
+
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
+  // Helper function to handle listing price type
+  const handleListingPriceType = (
+    type: "all" | "bargain" | "affordable" | "premium" | "custom",
+  ) => {
+    setFilters((prevFilters) => {
+      const newFilters = {
+        ...prevFilters,
+        // "all" cannot be deselected - clicking it again keeps it selected
+        listings: type === "all"
+          ? "all"
+          : (prevFilters.listings === type ? "all" : type),
+        // Clear custom price range if switching away from custom
+        listingsMin: type === "custom" ? prevFilters.listingsMin : "",
+        listingsMax: type === "custom" ? prevFilters.listingsMax : "",
+      } as StampFilters;
+
+      // Set predefined price ranges
+      if (type === "bargain") {
+        newFilters.listingsMin = "0";
+        newFilters.listingsMax = "0.0025";
+      } else if (type === "affordable") {
+        newFilters.listingsMin = "0.005";
+        newFilters.listingsMax = "0.01";
+      } else if (type === "premium") {
+        newFilters.listingsMin = "0.1";
+        newFilters.listingsMax = "";
       }
 
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
+  // Helper function to handle sales type
+  const handleSalesType = (
+    type: "recent" | "premium" | "custom" | "volume",
+  ) => {
+    setFilters((prevFilters) => {
+      const newFilters = {
+        ...prevFilters,
+        sales: type === "recent"
+          ? "recent"
+          : (prevFilters.sales === type ? "recent" : type),
+        // Clear price range and volume based on selection
+        salesMin: type === "custom" ? prevFilters.salesMin : "",
+        salesMax: type === "custom" ? prevFilters.salesMax : "",
+        volume: type === "volume"
+          ? ("24h" as "24h" | "7d" | "30d" | "")
+          : ("" as "24h" | "7d" | "30d" | ""),
+      } as StampFilters;
+
+      // Set predefined price range for premium sales
+      if (type === "premium") {
+        newFilters.salesMin = "0.1";
+        newFilters.salesMax = "";
+      }
+
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
+  // Handler for volume changes
+  const handleVolumeChange = (period: string) => {
+    setFilters((prevFilters) => {
+      const newFilters = {
+        ...prevFilters,
+        volume: period as "24h" | "7d" | "30d",
+      };
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
+  const handleFileSizeChange = (sizeType: STAMP_FILESIZES | null) => {
+    setFilters((prevFilters) => {
+      const newFilters = {
+        ...prevFilters,
+        fileSize: prevFilters.fileSize === sizeType ? null : sizeType,
+        // Clear custom range if switching to preset
+        fileSizeMin: sizeType !== "custom" ? "" : prevFilters.fileSizeMin,
+        fileSizeMax: sizeType !== "custom" ? "" : prevFilters.fileSizeMax,
+      };
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
+  const handleFileSizeRangeChange = (min: number, max: number) => {
+    if (min !== undefined && max !== undefined) {
+      setFilters((prevFilters) => {
+        const newFilters = {
+          ...prevFilters,
+          fileSizeMin: min.toString(),
+          fileSizeMax: max === Infinity ? "1048576" : max.toString(),
+        };
+        onFiltersChange(newFilters);
+        return newFilters;
+      });
+    }
+  };
+
+  const handlePriceRangeChange = (min: number, max: number) => {
+    setFilters((prevFilters) => {
+      const newFilters = {
+        ...prevFilters,
+        // Update the appropriate price range based on current market type
+        ...(prevFilters.market === "listings"
+          ? {
+            listingsMin: min.toString(),
+            listingsMax: max === Infinity ? "" : max.toString(),
+          }
+          : {
+            salesMin: min.toString(),
+            salesMax: max === Infinity ? "" : max.toString(),
+          }),
+      };
       onFiltersChange(newFilters);
       return newFilters;
     });
@@ -614,59 +907,199 @@ export const FilterContentStamp = ({
         toggle={() => toggleSection("market")}
         variant="collapsibleTitle"
       >
-        <Radio
-          label="LISTINGS"
-          value="listings"
-          name="market"
-          checked={filters.market.includes("listings")}
-          onChange={() => toggleMarket("listings")}
-        />
-        <Radio
-          label="SALES"
-          value="sales"
-          name="market"
-          checked={filters.market.includes("sales")}
-          onChange={() => toggleMarket("sales")}
-        />
-        {
-          /*
-        <Radio
-          label="UTXO BOUND"
-          value="atomic"
-          name="market"
-          checked={filters.market.includes("psbt")}
-          onChange={() => toggleMarket("psbt")}
-        />
-          <Radio
-            label="DISPENSERS"
-            value="dispensers"
-            checked={filters.market.includes("dispensers")}
-            onChange={() => toggleMarket("dispensers")}
+        {/* Top Level: LISTINGS vs SALES */}
+        <div className="my-2">
+          <ToggleButton
+            options={["listings", "sales"]}
+            selected={filters.market}
+            onChange={(value) =>
+              toggleMarketType(value as "listings" | "sales")}
+            mode="single"
+            size="mdR"
+            spacing="evenFullwidth"
           />
-        */
-        }
+        </div>
 
-        {
-          /* Price Range Slider - only show if any market type is selected
-        {filters.market.length > 0 && (
-          <CollapsibleSection
-            title="Price Range"
-            section="priceRange"
-            expanded={true}
-            toggle={() => {}}
-            variant="collapsibleLabel"
-          >
-            <RangeSlider
-              variant="price"
-              onChange={handlePriceRangeChange}
-              initialMin={filters.marketMin ? parseFloat(filters.marketMin) : 0}
-              initialMax={filters.marketMax
-                ? parseFloat(filters.marketMax)
-                : Infinity}
+        {/* LISTINGS Section */}
+        {filters.market === "listings" && (
+          <div>
+            {/* Dispensers and Atomics buttons */}
+            <div className="my-4">
+              <ToggleButton
+                options={["dispensers", "atomics"]}
+                selected={[
+                  ...(filters.dispensers ? ["dispensers"] : []),
+                  ...(filters.atomics ? ["atomics"] : []),
+                ]}
+                onChange={(values) => {
+                  const selectedArray = Array.isArray(values) ? values : [];
+                  const newDispensers = selectedArray.includes("dispensers");
+                  const newAtomics = selectedArray.includes("atomics");
+
+                  // Prevent deselecting dispensers - it should always stay selected
+                  if (
+                    newDispensers !== filters.dispensers &&
+                    newDispensers === true
+                  ) {
+                    toggleListingOption("dispensers");
+                  }
+                  if (newAtomics !== filters.atomics) {
+                    toggleListingOption("atomics");
+                  }
+                }}
+                mode="multi"
+                size="smR"
+                spacing="evenFullwidth"
+                disabledOptions={["atomics"]}
+              />
+            </div>
+
+            {/* Price options */}
+            {(filters.dispensers || filters.atomics) && (
+              <div>
+                <Radio
+                  label="ALL"
+                  value="all"
+                  name="listingPrice"
+                  checked={filters.listings === "all"}
+                  onChange={() => handleListingPriceType("all")}
+                />
+                <div className={`${labelXsR} ${labelXsPosition}`}>
+                  PRICE RANGE
+                </div>
+                <Radio
+                  label="BARGAIN"
+                  value="bargain"
+                  name="listingPrice"
+                  checked={filters.listings === "bargain"}
+                  onChange={() => handleListingPriceType("bargain")}
+                />
+                <Radio
+                  label="AFFORDABLE"
+                  value="affordable"
+                  name="listingPrice"
+                  checked={filters.listings === "affordable"}
+                  onChange={() => handleListingPriceType("affordable")}
+                />
+                <Radio
+                  label="PREMIUM"
+                  value="premium"
+                  name="listingPrice"
+                  checked={filters.listings === "premium"}
+                  onChange={() => handleListingPriceType("premium")}
+                />
+                <Radio
+                  label="CUSTOM PRICE"
+                  value="custom"
+                  name="listingPrice"
+                  checked={filters.listings === "custom"}
+                  onChange={() => handleListingPriceType("custom")}
+                />
+
+                {/* Custom price range slider */}
+                {filters.listings === "custom" && (
+                  <div className="mt-3 pl-0.5">
+                    <RangeSlider
+                      variant="price"
+                      onChange={handlePriceRangeChange}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* SALES Section */}
+        {filters.market === "sales" && (
+          <div>
+            {/* Dispensers and Atomics buttons */}
+            <div className="my-4">
+              <ToggleButton
+                options={["dispensers", "atomics"]}
+                selected={[
+                  ...(filters.dispensers ? ["dispensers"] : []),
+                  ...(filters.atomics ? ["atomics"] : []),
+                ]}
+                onChange={(values) => {
+                  const selectedArray = Array.isArray(values) ? values : [];
+                  const newDispensers = selectedArray.includes("dispensers");
+                  const newAtomics = selectedArray.includes("atomics");
+
+                  // Prevent deselecting dispensers - it should always stay selected
+                  if (
+                    newDispensers !== filters.dispensers &&
+                    newDispensers === true
+                  ) {
+                    toggleListingOption("dispensers");
+                  }
+                  if (newAtomics !== filters.atomics) {
+                    toggleListingOption("atomics");
+                  }
+                }}
+                mode="multi"
+                size="smR"
+                spacing="evenFullwidth"
+                disabledOptions={["atomics"]}
+              />
+            </div>
+
+            <Radio
+              label="RECENT"
+              value="recent"
+              name="salesType"
+              checked={filters.sales === "recent"}
+              onChange={() => handleSalesType("recent")}
             />
-          </CollapsibleSection>
-        )} */
-        }
+            <Radio
+              label="TRENDING"
+              value="volume"
+              name="salesType"
+              checked={filters.sales === "volume"}
+              onChange={() => handleSalesType("volume")}
+            />
+            <div className={`${labelXsR} ${labelXsPosition}`}>
+              PRICE RANGE
+            </div>
+            <Radio
+              label="PREMIUM"
+              value="premium"
+              name="salesType"
+              checked={filters.sales === "premium"}
+              onChange={() => handleSalesType("premium")}
+            />
+            <Radio
+              label="CUSTOM PRICE"
+              value="custom"
+              name="salesType"
+              checked={filters.sales === "custom"}
+              onChange={() => handleSalesType("custom")}
+            />
+
+            {/* Custom price range slider for sales */}
+            {filters.sales === "custom" && (
+              <div className="mt-3 pl-0.5">
+                <RangeSlider
+                  variant="price"
+                  onChange={handlePriceRangeChange}
+                />
+              </div>
+            )}
+
+            {/* Volume Period Selection - only show if TRENDING is selected */}
+            {filters.sales === "volume" && (
+              <div className="mt-3 pl-0.5">
+                <ToggleButton
+                  options={["24h", "7d", "30d"]}
+                  selected={filters.volume}
+                  onChange={(value) => handleVolumeChange(value as string)}
+                  mode="single"
+                  spacing="evenFullwidth"
+                />
+              </div>
+            )}
+          </div>
+        )}
       </CollapsibleSection>
 
       <CollapsibleSection
@@ -775,6 +1208,65 @@ export const FilterContentStamp = ({
       </CollapsibleSection>
 
       <CollapsibleSection
+        title="FILE SIZE"
+        section="fileSize"
+        expanded={expandedSections.fileSize}
+        toggle={() => toggleSection("fileSize")}
+        variant="collapsibleTitle"
+      >
+        <Radio
+          label="< 1KB"
+          value="<1kb"
+          checked={filters.fileSize === "<1kb"}
+          onChange={() => handleFileSizeChange("<1kb")}
+          name="fileSize"
+        />
+        <Radio
+          label="1KB - 7KB"
+          value="1kb-7kb"
+          checked={filters.fileSize === "1kb-7kb"}
+          onChange={() => handleFileSizeChange("1kb-7kb")}
+          name="fileSize"
+        />
+        <Radio
+          label="7KB - 32KB"
+          value="7kb-32kb"
+          checked={filters.fileSize === "7kb-32kb"}
+          onChange={() => handleFileSizeChange("7kb-32kb")}
+          name="fileSize"
+        />
+        <Radio
+          label="32KB - 64KB"
+          value="32kb-64kb"
+          checked={filters.fileSize === "32kb-64kb"}
+          onChange={() => handleFileSizeChange("32kb-64kb")}
+          name="fileSize"
+        />
+        <Radio
+          label="CUSTOM FILE SIZE"
+          value="custom"
+          checked={filters.fileSize === "custom"}
+          onChange={() => handleFileSizeChange("custom")}
+          name="fileSize"
+        />
+
+        {filters.fileSize === "custom" && (
+          <div className="mt-2">
+            <RangeSlider
+              variant="fileSize"
+              onChange={handleFileSizeRangeChange}
+              initialMin={filters.fileSizeMin
+                ? parseInt(filters.fileSizeMin)
+                : 0}
+              initialMax={filters.fileSizeMax
+                ? parseInt(filters.fileSizeMax)
+                : Infinity}
+            />
+          </div>
+        )}
+      </CollapsibleSection>
+
+      <CollapsibleSection
         title="EDITIONS"
         section="editions"
         expanded={expandedSections.editions}
@@ -846,15 +1338,8 @@ export const FilterContentStamp = ({
           variant="collapsibleLabel"
         >
           <RangeSlider
-            key={`range-${filters.rangeMin || "0"}-${
-              filters.rangeMax || "max"
-            }`}
             variant="range"
             onChange={handleRangeSliderChange}
-            initialMin={filters.rangeMin ? parseInt(filters.rangeMin) : 0}
-            initialMax={filters.rangeMax
-              ? parseInt(filters.rangeMax)
-              : Infinity}
           />
         </CollapsibleSection>
       </CollapsibleSection>

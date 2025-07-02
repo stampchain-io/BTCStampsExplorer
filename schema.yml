@@ -534,12 +534,74 @@ paths:
       operationId: getSrc20Transactions
       tags:
         - SRC-20
-      summary: Get paginated valid SRC-20 transactions
-      description: Retrieves a paginated list of valid SRC-20 transactions with optional limit and page parameters.
+      summary: Get paginated valid SRC-20 transactions with market data filtering
+      description: |
+        Retrieves a paginated list of valid SRC-20 transactions with optional market data filtering.
+        The new filters allow querying based on holder metrics, price ranges, volume, and data quality.
       parameters:
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Page"
         - $ref: "#/components/parameters/Sort"
+        # Market Data Filters for SRC-20 (Task 42)
+        - name: minHolderCount
+          in: query
+          description: Minimum number of holders for the SRC-20 token
+          schema:
+            type: integer
+            minimum: 0
+          example: 10
+        - name: maxHolderCount
+          in: query
+          description: Maximum number of holders for the SRC-20 token
+          schema:
+            type: integer
+            minimum: 0
+          example: 1000
+        - name: minFloorPriceBTC
+          in: query
+          description: Minimum floor price in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 0.00001
+        - name: maxFloorPriceBTC
+          in: query
+          description: Maximum floor price in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 0.1
+        - name: minVolume24h
+          in: query
+          description: Minimum 24-hour trading volume in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 0.001
+        - name: minPriceChange24h
+          in: query
+          description: Minimum 24-hour price change percentage
+          schema:
+            type: number
+            format: float
+          example: -10
+        - name: minDataQualityScore
+          in: query
+          description: Minimum data quality score (0-10)
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10
+          example: 7
+        - name: primaryExchange
+          in: query
+          description: Filter by primary exchange source
+          schema:
+            type: string
+          example: "openstamp"
       responses:
         "200":
           description: Successful response with paginated SRC-20 transactions
@@ -1346,12 +1408,98 @@ paths:
       operationId: getStamps
       tags:
         - Stamps
-      summary: Get paginated stamps
-      description: Retrieve a paginated list of stamps.
+      summary: Get paginated stamps with advanced filtering
+      description: |
+        Retrieve a paginated list of stamps with advanced market data filtering capabilities.
+        The new market data filters allow querying based on holder metrics, price ranges,
+        volume, and data quality - features enabled by the market data cache system.
       parameters:
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Page"
         - $ref: "#/components/parameters/Sort"
+        # Market Data Filters (Task 42)
+        - name: minHolderCount
+          in: query
+          description: Minimum number of holders for the stamp
+          schema:
+            type: integer
+            minimum: 0
+          example: 10
+        - name: maxHolderCount
+          in: query
+          description: Maximum number of holders for the stamp
+          schema:
+            type: integer
+            minimum: 0
+          example: 1000
+        - name: minDistributionScore
+          in: query
+          description: Minimum holder distribution score (0-100, higher = more distributed)
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+          example: 50
+        - name: maxTopHolderPercentage
+          in: query
+          description: Maximum percentage held by top holder (0-100)
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+          example: 25
+        - name: minFloorPriceBTC
+          in: query
+          description: Minimum floor price in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 0.001
+        - name: maxFloorPriceBTC
+          in: query
+          description: Maximum floor price in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 1.0
+        - name: minVolume24h
+          in: query
+          description: Minimum 24-hour trading volume in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 0.01
+        - name: minPriceChange24h
+          in: query
+          description: Minimum 24-hour price change percentage (can be negative)
+          schema:
+            type: number
+            format: float
+          example: -10
+        - name: minDataQualityScore
+          in: query
+          description: Minimum data quality score (0-10, higher = better quality)
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10
+          example: 7
+        - name: maxCacheAgeMinutes
+          in: query
+          description: Maximum age of cached market data in minutes
+          schema:
+            type: integer
+            minimum: 0
+          example: 60
+        - name: priceSource
+          in: query
+          description: Filter by price data source (comma-separated for multiple)
+          schema:
+            type: string
+          example: "counterparty,openstamp"
       responses:
         "200":
           description: Successful response with paginated stamps.
@@ -3137,6 +3285,327 @@ components:
           type: number
         feeRate:
           type: number
+
+    # Market Data Cache Schemas
+    StampMarketData:
+      type: object
+      description: Market data for individual stamps from the cache
+      properties:
+        cpid:
+          type: string
+          description: Counterparty ID of the stamp
+        floorPriceBTC:
+          type: number
+          nullable: true
+          description: Floor price in BTC from dispensers
+        recentSalePriceBTC:
+          type: number
+          nullable: true
+          description: Most recent sale price in BTC
+        openDispensersCount:
+          type: integer
+          description: Number of open dispensers
+        closedDispensersCount:
+          type: integer
+          description: Number of closed dispensers
+        totalDispensersCount:
+          type: integer
+          description: Total number of dispensers
+        holderCount:
+          type: integer
+          description: Number of addresses holding this stamp
+        uniqueHolderCount:
+          type: integer
+          description: Number of unique holders (excluding duplicates)
+        topHolderPercentage:
+          type: number
+          description: Percentage held by the top holder
+        holderDistributionScore:
+          type: number
+          description: Distribution score from 0-100
+        volume24hBTC:
+          type: number
+          description: 24-hour trading volume in BTC
+        volume7dBTC:
+          type: number
+          description: 7-day trading volume in BTC
+        volume30dBTC:
+          type: number
+          description: 30-day trading volume in BTC
+        totalVolumeBTC:
+          type: number
+          description: All-time trading volume in BTC
+        priceSource:
+          type: string
+          nullable: true
+          description: Source of the price data
+        volumeSources:
+          type: object
+          nullable: true
+          description: Breakdown of volume by source
+        dataQualityScore:
+          type: number
+          description: Data quality score from 0-10
+        confidenceLevel:
+          type: number
+          description: Confidence level from 0-10
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        lastPriceUpdate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last price update timestamp
+        updateFrequencyMinutes:
+          type: integer
+          description: Update frequency in minutes
+
+    SRC20MarketData:
+      type: object
+      description: Market data for SRC-20 tokens from the cache
+      properties:
+        tick:
+          type: string
+          description: Token ticker symbol
+        priceBTC:
+          type: number
+          nullable: true
+          description: Current price in BTC
+        priceUSD:
+          type: number
+          nullable: true
+          description: Current price in USD
+        floorPriceBTC:
+          type: number
+          nullable: true
+          description: Floor price in BTC
+        marketCapBTC:
+          type: number
+          description: Market capitalization in BTC
+        marketCapUSD:
+          type: number
+          description: Market capitalization in USD
+        volume24hBTC:
+          type: number
+          description: 24-hour trading volume in BTC
+        holderCount:
+          type: integer
+          description: Number of token holders
+        circulatingSupply:
+          type: string
+          description: Circulating supply (string for precision)
+        priceChange24hPercent:
+          type: number
+          description: 24-hour price change percentage
+        primaryExchange:
+          type: string
+          nullable: true
+          description: Primary exchange for trading
+        exchangeSources:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: List of exchange sources
+        dataQualityScore:
+          type: number
+          description: Data quality score from 0-10
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    CollectionMarketData:
+      type: object
+      description: Aggregated market data for collections
+      properties:
+        collectionId:
+          type: string
+          description: Collection identifier
+        minFloorPriceBTC:
+          type: number
+          nullable: true
+          description: Minimum floor price in the collection
+        maxFloorPriceBTC:
+          type: number
+          nullable: true
+          description: Maximum floor price in the collection
+        avgFloorPriceBTC:
+          type: number
+          nullable: true
+          description: Average floor price in the collection
+        medianFloorPriceBTC:
+          type: number
+          nullable: true
+          description: Median floor price in the collection
+        totalVolume24hBTC:
+          type: number
+          description: Total 24-hour volume for the collection
+        stampsWithPricesCount:
+          type: integer
+          description: Number of stamps with price data
+        minHolderCount:
+          type: integer
+          description: Minimum holder count in the collection
+        maxHolderCount:
+          type: integer
+          description: Maximum holder count in the collection
+        avgHolderCount:
+          type: number
+          description: Average holder count
+        medianHolderCount:
+          type: integer
+          description: Median holder count
+        totalUniqueHolders:
+          type: integer
+          description: Total unique holders across collection
+        avgDistributionScore:
+          type: number
+          description: Average distribution score
+        totalStampsCount:
+          type: integer
+          description: Total number of stamps in collection
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    CacheStatus:
+      type: string
+      enum: [fresh, stale, expired]
+      description: Cache status indicator
+
+    MarketDataCacheInfo:
+      type: object
+      description: Information about cache status
+      properties:
+        status:
+          $ref: "#/components/schemas/CacheStatus"
+        ageMinutes:
+          type: integer
+          description: Age of the cached data in minutes
+        nextUpdateIn:
+          type: integer
+          description: Minutes until next update
+
+    StampWithMarketData:
+      allOf:
+        - $ref: "#/components/schemas/StampRow"
+        - type: object
+          properties:
+            marketData:
+              $ref: "#/components/schemas/StampMarketData"
+              nullable: true
+            marketDataMessage:
+              type: string
+              nullable: true
+              description: Message when market data is null
+            cacheInfo:
+              $ref: "#/components/schemas/MarketDataCacheInfo"
+
+    SRC20WithMarketData:
+      allOf:
+        - $ref: "#/components/schemas/Src20Detail"
+        - type: object
+          properties:
+            marketData:
+              $ref: "#/components/schemas/SRC20MarketData"
+              nullable: true
+            marketDataMessage:
+              type: string
+              nullable: true
+              description: Message when market data is null
+            cacheInfo:
+              $ref: "#/components/schemas/MarketDataCacheInfo"
+
+    CollectionWithMarketData:
+      allOf:
+        - $ref: "#/components/schemas/Collection"
+        - type: object
+          properties:
+            marketData:
+              $ref: "#/components/schemas/CollectionMarketData"
+              nullable: true
+            marketDataMessage:
+              type: string
+              nullable: true
+              description: Message when market data is null
+            cacheInfo:
+              $ref: "#/components/schemas/MarketDataCacheInfo"
+
+    StampHolderCache:
+      type: object
+      description: Cached holder information for stamps
+      properties:
+        id:
+          type: integer
+          description: Unique identifier
+        cpid:
+          type: string
+          description: Counterparty ID of the stamp
+        address:
+          type: string
+          description: Holder's Bitcoin address
+        quantity:
+          type: number
+          description: Amount held by this address
+        percentage:
+          type: number
+          description: Percentage of total supply held
+        rankPosition:
+          type: integer
+          description: Holder's rank by quantity
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    MarketDataSource:
+      type: object
+      description: Market data from various sources for transparency
+      properties:
+        id:
+          type: integer
+          description: Unique identifier
+        assetType:
+          type: string
+          enum: [stamp, src20]
+          description: Type of asset
+        assetId:
+          type: string
+          description: Asset identifier (cpid for stamps, tick for src20)
+        source:
+          type: string
+          description: Data source name
+        priceBTC:
+          type: number
+          nullable: true
+          description: Price in BTC
+        priceUSD:
+          type: number
+          nullable: true
+          description: Price in USD
+        volume24hBTC:
+          type: number
+          description: 24-hour volume in BTC
+        holderCount:
+          type: integer
+          description: Number of holders
+        marketCapBTC:
+          type: number
+          description: Market cap in BTC
+        sourceConfidence:
+          type: number
+          description: Confidence score (0-10)
+        apiResponseTimeMs:
+          type: integer
+          description: API response time in milliseconds
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Last update timestamp
 
   responses:
     NotFound:

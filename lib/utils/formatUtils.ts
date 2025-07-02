@@ -239,3 +239,83 @@ export function decodeBase64(base64String: string) {
 export function formatNumberWithCommas(num: number): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+/**
+ * Formats BTC value for market data display with appropriate precision
+ * @param btc The BTC value to format
+ * @param options Formatting options
+ * @returns Formatted BTC string
+ */
+export function formatBTC(btc: number | null | undefined, options: {
+  includeSymbol?: boolean;
+  decimals?: number;
+  fallback?: string;
+} = {}): string {
+  const {
+    includeSymbol = false,
+    decimals = 8,
+    fallback = "N/A",
+  } = options;
+
+  if (btc === null || btc === undefined) return fallback;
+
+  // For very small values, use more decimals
+  let actualDecimals = decimals;
+  if (btc < 0.0001 && btc > 0) {
+    actualDecimals = 8;
+  } else if (btc < 0.01) {
+    actualDecimals = 6;
+  } else if (btc < 1) {
+    actualDecimals = 4;
+  } else {
+    actualDecimals = 2;
+  }
+
+  const formatted = btc.toFixed(actualDecimals).replace(/\.?0+$/, "");
+  return includeSymbol ? `${formatted} BTC` : formatted;
+}
+
+/**
+ * Formats 24h volume for display
+ * @param volume The volume in BTC
+ * @returns Formatted volume string
+ */
+export function formatVolume(volume: number | null | undefined): string {
+  if (volume === null || volume === undefined) return "N/A";
+
+  if (volume < 0.0001) return "<0.0001";
+  if (volume < 0.01) return volume.toFixed(4);
+  if (volume < 1) return volume.toFixed(3);
+  if (volume < 100) return volume.toFixed(2);
+
+  return formatNumberWithCommas(Math.round(volume));
+}
+
+/**
+ * Formats percentage change
+ * @param percentage The percentage value
+ * @returns Formatted percentage string with + or - sign
+ */
+export function formatPercentage(
+  percentage: number | null | undefined,
+): string {
+  if (percentage === null || percentage === undefined) return "N/A";
+
+  const sign = percentage >= 0 ? "+" : "";
+  return `${sign}${percentage.toFixed(2)}%`;
+}
+
+/**
+ * Formats market cap
+ * @param marketCap The market cap in BTC
+ * @returns Formatted market cap string
+ */
+export function formatMarketCap(marketCap: number | null | undefined): string {
+  if (marketCap === null || marketCap === undefined) return "N/A";
+
+  if (marketCap < 0.01) return formatBTC(marketCap, { decimals: 6 });
+  if (marketCap < 1) return formatBTC(marketCap, { decimals: 4 });
+  if (marketCap < 1000) return formatBTC(marketCap, { decimals: 2 });
+
+  return `${formatNumberWithCommas(Math.round(marketCap))}`;
+}
