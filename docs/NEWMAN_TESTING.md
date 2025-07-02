@@ -28,6 +28,12 @@ npm run test:api:advanced
 
 # Run performance testing with multiple iterations
 npm run test:api:performance
+
+# Run comprehensive regression testing (NEW - 100% coverage)
+npm run test:api:comprehensive
+
+# Run comprehensive with regression analysis
+npm run test:api:comprehensive:regression
 ```
 
 ### Using Deno Tasks
@@ -41,12 +47,13 @@ deno task test:api:performance
 
 ## Available Test Collections
 
-### 1. Full Regression Collection (`postman-collection-full-regression.json`)
+### 1. Full Regression Collection (`postman-collection-full-regression.json`) 🆕
 - **Purpose**: Complete API testing with regression detection
 - **Features**: Dual endpoint comparison, error scenarios, performance tracking
 - **Endpoints**: All 46 API endpoints (92+ tests total)
 - **Comparison**: Development vs Production for every endpoint
 - **Coverage**: 100% endpoint coverage with positive and negative test cases
+- **Documentation**: See [NEWMAN_COMPREHENSIVE_TESTING.md](./NEWMAN_COMPREHENSIVE_TESTING.md) for detailed usage
 
 ### 2. Enhanced Collection (`postman-collection-enhanced.json`)
 - **Purpose**: Basic dual endpoint testing (legacy)
