@@ -1,6 +1,11 @@
 /* ===== COLLECTION OVERVIEW CARD COMPONENT ===== */
 import { Collection } from "$globals";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatBTC,
+  formatMarketCap,
+  formatVolume,
+} from "$lib/utils/formatUtils.ts";
 import { containerBackground } from "$layout";
 import { labelSm, valueSm } from "$text";
 
@@ -46,21 +51,29 @@ export function CollectionCard(
             <h5 className={`${labelSm} pt-0.75 mobileLg:pt-1.5`}>
               BY{" "}
               <span className={`${valueSm} normal-case`}>
-                {collection.creators
+                {collection.creators && collection.creators.length > 0
                   ? (
                     <>
-                      <span className="mobileMd:hidden">
-                        {abbreviateAddress(collection.creators[0], 4)}
-                      </span>
-                      <span className="hidden mobileMd:inline mobileLg:hidden">
-                        {abbreviateAddress(collection.creators[0], 7)}
-                      </span>
-                      <span className="hidden mobileLg:inline tablet:hidden">
-                        {abbreviateAddress(collection.creators[0], 9)}
-                      </span>
-                      <span className="hidden tablet:inline">
-                        {collection.creators[0]}
-                      </span>
+                      {/* Use creator name if available, otherwise fall back to address */}
+                      {collection.creator_names &&
+                          collection.creator_names.length > 0
+                        ? <span>{collection.creator_names[0]}</span>
+                        : (
+                          <>
+                            <span className="mobileMd:hidden">
+                              {abbreviateAddress(collection.creators[0], 4)}
+                            </span>
+                            <span className="hidden mobileMd:inline mobileLg:hidden">
+                              {abbreviateAddress(collection.creators[0], 7)}
+                            </span>
+                            <span className="hidden mobileLg:inline tablet:hidden">
+                              {abbreviateAddress(collection.creators[0], 9)}
+                            </span>
+                            <span className="hidden tablet:inline">
+                              {collection.creators[0]}
+                            </span>
+                          </>
+                        )}
                     </>
                   )
                   : "N/A"}
@@ -75,7 +88,12 @@ export function CollectionCard(
               </span>
             </h5>
             <h5 className={`${labelSm} -mt-0.5 hidden mobileLg:block`}>
-              VOLUME <span className={valueSm}>N/A</span>{"  "}
+              VOLUME{" "}
+              <span className={valueSm}>
+                {collection.marketData?.totalVolume24hBTC !== undefined
+                  ? formatVolume(collection.marketData.totalVolume24hBTC)
+                  : "N/A"}
+              </span>{"  "}
               <span className="text-stamp-grey-light">BTC</span>
             </h5>
           </div>
@@ -84,13 +102,27 @@ export function CollectionCard(
               <span className="min-[400px]:hidden">PRICE</span>
               <span className="hidden min-[400px]:inline">FLOOR PRICE</span>
               {" "}
-              <span className={valueSm}>N/A</span>{" "}
+              <span className={valueSm}>
+                {collection.marketData?.minFloorPriceBTC !== null &&
+                    collection.marketData?.minFloorPriceBTC !== undefined
+                  ? formatBTC(collection.marketData.minFloorPriceBTC)
+                  : "N/A"}
+              </span>{" "}
               <span className="text-stamp-grey-light">BTC</span>
             </h5>
             <h5 className={`${labelSm} -mt-0.5`}>
               <span className="min-[400px]:hidden">MCAP</span>
               <span className="hidden min-[400px]:inline">MARKETCAP</span>{" "}
-              <span className={valueSm}>N/A</span>{" "}
+              <span className={valueSm}>
+                {collection.marketData?.minFloorPriceBTC !== null &&
+                    collection.marketData?.minFloorPriceBTC !== undefined &&
+                    collection.total_editions
+                  ? formatMarketCap(
+                    collection.marketData.minFloorPriceBTC *
+                      collection.total_editions,
+                  )
+                  : "N/A"}
+              </span>{" "}
               <span className="text-stamp-grey-light">BTC</span>
             </h5>
           </div>

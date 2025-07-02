@@ -1,70 +1,10 @@
-// TODO(@baba): Move code to global file
-import { useEffect, useRef, useState } from "preact/hooks";
+// TODO(@baba): Move checkbox + radiobuttons to form folder + rename file to RangeSlider.tsx and move to form folder
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { ComponentChildren } from "preact";
 import { formatNumberWithCommas } from "$lib/utils/formatUtils.ts";
 import { handleIcon } from "$icon";
 import { labelLogicResponsive } from "$text";
 import { inputCheckbox } from "$form";
-
-// Range Buttons Component
-export const RangeButtons = ({
-  selected,
-  onChange,
-}: {
-  selected: string;
-  onChange: (period: string) => void;
-}) => {
-  const [canHoverSelected, setCanHoverSelected] = useState(true);
-  const periods = ["24h", "3d", "7d", "1m"];
-
-  const handleClick = (period: string) => {
-    onChange(period);
-    // Disable hover effects after click
-    setCanHoverSelected(false);
-  };
-
-  const handleMouseLeave = () => {
-    // Re-enable hover effects when mouse leaves
-    setCanHoverSelected(true);
-  };
-
-  // Custom button class function
-  const getButtonClass = (period: string) => {
-    const isSelected = selected === period;
-
-    // Base button styles
-    const customButtonClass =
-      "inline-flex items-center justify-center border-2 rounded-md text-sm tablet:text-xs font-extrabold tracking-wider transition-colors duration-300 h-9 tablet:h-8 px-3.5 tablet:px-3";
-
-    if (isSelected) {
-      // Selected state - always disable pointer events to prevent hover effects
-      return `${customButtonClass} bg-stamp-grey-light border-stamp-grey-light text-black pointer-events-none`;
-    } else {
-      // Normal state - conditionally apply hover effects
-      return `${customButtonClass} bg-transparent border-stamp-grey text-stamp-grey ${
-        canHoverSelected
-          ? "hover:bg-stamp-grey-light hover:border-stamp-grey-light hover:text-black"
-          : ""
-      }`;
-    }
-  };
-
-  return (
-    <div className="flex justify-between">
-      {periods.map((period) => (
-        <button
-          type="button"
-          key={period}
-          className={getButtonClass(period)}
-          onClick={() => handleClick(period)}
-          onMouseLeave={handleMouseLeave}
-        >
-          {period.toUpperCase()}
-        </button>
-      ))}
-    </div>
-  );
-};
 
 // Range Slider Component
 export const RangeSlider = ({
@@ -73,7 +13,7 @@ export const RangeSlider = ({
   initialMin,
   initialMax,
 }: {
-  variant: "holders" | "price" | "range";
+  variant: "holders" | "price" | "range" | "fileSize";
   onChange?: (min: number, max: number) => void;
   initialMin?: number;
   initialMax?: number;
@@ -82,6 +22,12 @@ export const RangeSlider = ({
   const [currentStampCount, setCurrentStampCount] = useState<number | null>(
     null,
   );
+
+  // State for inline editing
+  const [editingMin, setEditingMin] = useState(false);
+  const [editingMax, setEditingMax] = useState(false);
+  const [tempMinValue, setTempMinValue] = useState<string>("");
+  const [tempMaxValue, setTempMaxValue] = useState<string>("");
 
   // Fetch current stamp count for range variant
   useEffect(() => {
@@ -156,22 +102,8 @@ export const RangeSlider = ({
         return value.toFixed(
           // Use appropriate decimal places based on value range
           value < 0.0001 ? 6 : value < 0.01 ? 5 : 3,
-        );
+        ) + " ₿";
       },
-      // Breakpoints for smart snapping
-      breakpoints: [
-        0,
-        0.00001,
-        0.0001,
-        0.0005,
-        0.001,
-        0.005,
-        0.01,
-        0.05,
-        0.1,
-        0.5,
-        1.0,
-      ],
     },
     // range configuration
     range: {
@@ -257,6 +189,28 @@ export const RangeSlider = ({
         5000000,
       ],
     },
+    // fileSize configuration
+    fileSize: {
+      min: 0,
+      max: 65536, // 64KB max
+      segments: [
+        { end: 1024, proportion: 1 / 3 }, // First third: 0-1KB
+        { end: 7168, proportion: 1 / 3 }, // Second third: 1KB-7KB
+        { end: 65536, proportion: 1 / 3 }, // Third third: 7KB-64KB
+      ],
+      tickMarks: ["0", "1KB", "7KB", "64KB"],
+      tickMarkPositions: [
+        "left-0",
+        "left-[33%]",
+        "left-[66%]",
+        "right-0",
+      ],
+      formatValue: (value: number) => {
+        if (value >= 65536) return "64 KB";
+        if (value < 1024) return `${value} B`;
+        return `${(value / 1024).toFixed(1)} KB`;
+      },
+    },
   };
 
   // Get the configuration for the current variant
@@ -264,21 +218,30 @@ export const RangeSlider = ({
 
   // For range variant, filter breakpoints based on current stamp count
   const getFilteredBreakpoints = () => {
+    const breakpoints = "breakpoints" in config ? config.breakpoints : [];
+
+    if (variant === "fileSize" || variant === "price" || !breakpoints.length) {
+      return []; // fileSize and price don't use breakpoints
+    }
+
     if (variant !== "range" || currentStampCount === null) {
-      return config.breakpoints;
+      return breakpoints;
     }
 
     // Add 20% buffer for new stamps being created
     const maxWithBuffer = Math.ceil(currentStampCount * 1.2);
 
     // Filter breakpoints to only include those that make sense for current ecosystem
-    return config.breakpoints.filter((breakpoint) =>
+    return breakpoints.filter((breakpoint: number) =>
       breakpoint <= maxWithBuffer
     );
   };
 
-  // Use filtered breakpoints for snapping
-  const activeBreakpoints = getFilteredBreakpoints();
+  // Use filtered breakpoints for snapping - recalculate when currentStampCount changes
+  const activeBreakpoints = useMemo(() => getFilteredBreakpoints(), [
+    currentStampCount,
+    variant,
+  ]);
 
   // Track both current and pending values
   const [minValue, setMinValue] = useState(initialMin || config.min);
@@ -330,12 +293,14 @@ export const RangeSlider = ({
   // Modify the positionToValue function to handle price variant better
   const positionToValue = (position: number): number => {
     // Special case for the last step (position 100 or very close to it)
-    if (position >= 99.5) return Infinity;
+    if (position >= 99.5) {
+      return variant === "fileSize" ? config.max : Infinity;
+    }
 
     // Calculate which segment this position falls into
     const segment0End = config.segments[0].proportion * 100;
     const segment1End = segment0End + config.segments[1].proportion * 100;
-    const segment2End = 99; // Cap at 99 to leave room for infinity at 100
+    const segment2End = variant === "fileSize" ? 100 : 99; // For fileSize, use full range
 
     if (position <= segment0End) {
       // First segment
@@ -365,7 +330,7 @@ export const RangeSlider = ({
         : Number(value.toFixed(0));
     } else {
       // Beyond segment2End (should be handled by the special case above)
-      return Infinity;
+      return variant === "fileSize" ? config.max : Infinity;
     }
   };
 
@@ -397,9 +362,123 @@ export const RangeSlider = ({
     return 1; // Default step for holders and range
   };
 
+  // Helper functions for inline editing
+  const startEditing = (type: "min" | "max") => {
+    // First, finish editing the other field if it's currently being edited
+    if (type === "min" && editingMax) {
+      finishEditing("max");
+    } else if (type === "max" && editingMin) {
+      finishEditing("min");
+    }
+
+    const currentValue = type === "min" ? minValue : maxValue;
+
+    if (type === "min") {
+      setEditingMin(true);
+      const valueString = currentValue === 0
+        ? ""
+        : (variant === "price" && currentValue.toString().includes("e"))
+        ? currentValue.toFixed(8).replace(/\.?0+$/, "")
+        : currentValue.toString();
+      setTempMinValue(valueString);
+    } else {
+      setEditingMax(true);
+      const valueString = currentValue === Infinity
+        ? ""
+        : (variant === "price" && currentValue.toString().includes("e"))
+        ? currentValue.toFixed(8).replace(/\.?0+$/, "")
+        : currentValue.toString();
+      setTempMaxValue(valueString);
+    }
+  };
+
+  const handleNumericInput = (value: string): string => {
+    // For price variant, allow decimal numbers
+    if (variant === "price") {
+      // Convert scientific notation to decimal if present
+      if (value.includes("e") || value.includes("E")) {
+        const num = parseFloat(value);
+        if (!isNaN(num)) {
+          value = num.toFixed(8);
+        }
+      }
+
+      // Handle initial decimal point input - add leading zero
+      if (value === ".") {
+        return "0.";
+      }
+
+      // Allow digits and decimal point only
+      let sanitized = value.replace(/[^0-9.]/g, "");
+      const parts = sanitized.split(".");
+
+      // Ensure only one decimal point
+      if (parts.length > 2) {
+        sanitized = parts[0] + "." + parts[1];
+      }
+
+      // Limit decimal places to 8 for price precision
+      if (parts.length === 2 && parts[1].length > 8) {
+        sanitized = parts[0] + "." + parts[1].slice(0, 8);
+      }
+
+      // Limit total length to 10 characters for price precision
+      return sanitized.slice(0, 10);
+    } else {
+      // For holders and range variants, only allow integers
+      return value.replace(/\D/g, "");
+    }
+  };
+
+  const finishEditing = (type: "min" | "max") => {
+    const inputValue = type === "min" ? tempMinValue : tempMaxValue;
+    const numValue = parseFloat(inputValue);
+
+    if (type === "min") {
+      setEditingMin(false);
+      if (!isNaN(numValue) && numValue >= config.min) {
+        const clampedValue = maxValue === Infinity
+          ? numValue
+          : Math.min(numValue, maxValue - getMinStep());
+        setMinValue(clampedValue);
+        setPendingMin(clampedValue);
+        onChange?.(clampedValue, maxValue);
+      }
+    } else {
+      setEditingMax(false);
+      if (inputValue === "" || inputValue.toLowerCase() === "no limit") {
+        const maxValue = variant === "fileSize" ? config.max : Infinity;
+        setMaxValue(maxValue);
+        setPendingMax(maxValue);
+        onChange?.(minValue, maxValue);
+      } else if (!isNaN(numValue) && numValue > minValue) {
+        const clampedValue = variant === "fileSize"
+          ? Math.min(numValue, config.max)
+          : numValue;
+        setMaxValue(clampedValue);
+        setPendingMax(clampedValue);
+        onChange?.(minValue, clampedValue);
+      }
+    }
+  };
+
+  const cancelEditing = (type: "min" | "max") => {
+    if (type === "min") {
+      setEditingMin(false);
+      setTempMinValue("");
+    } else {
+      setEditingMax(false);
+      setTempMaxValue("");
+    }
+  };
+
   // Handle track clicks to move nearest handle
   const handleTrackClick = (e: Event) => {
     if (!sliderRef.current || isDragging) return;
+
+    // Finish any active editing when track is clicked
+    if (editingMin) finishEditing("min");
+    if (editingMax) finishEditing("max");
 
     const mouseEvent = e as MouseEvent;
     const rect = sliderRef.current.getBoundingClientRect();
@@ -409,9 +488,11 @@ export const RangeSlider = ({
     // Clamp to valid range
     const clampedPercent = Math.max(0, Math.min(100, clickPercent));
 
-    // Convert to value and snap to breakpoint
+    // Convert to value and snap to breakpoint (except for fileSize and price)
     const rawValue = positionToValue(clampedPercent);
-    const snappedValue = snapToBreakpoint(rawValue);
+    const snappedValue = variant === "fileSize" || variant === "price"
+      ? rawValue
+      : snapToBreakpoint(rawValue);
 
     // Determine which handle is closer
     const minPos = valueToPosition(minValue);
@@ -448,10 +529,11 @@ export const RangeSlider = ({
     } else {
       // Move max handle
       if (clampedPercent >= 99.5) {
-        setPendingMax(Infinity);
-        setMaxValue(Infinity);
+        const maxValue = variant === "fileSize" ? config.max : Infinity;
+        setPendingMax(maxValue);
+        setMaxValue(maxValue);
         setLastChangedHandle("max");
-        onChange?.(minValue, Infinity);
+        onChange?.(minValue, maxValue);
         return;
       }
 
@@ -477,14 +559,22 @@ export const RangeSlider = ({
 
   // Modify the handle functions while preserving decimal precision
   const handleMinInput = (e: Event) => {
+    // Finish any active editing when slider is used
+    if (editingMin) finishEditing("min");
+    if (editingMax) finishEditing("max");
+
     setIsDragging(true);
     const sliderValue = parseInt((e.target as HTMLInputElement).value);
-    const newMin = positionToValue(sliderValue);
+    const rawValue = positionToValue(sliderValue);
+    const snappedValue = variant === "fileSize" || variant === "price"
+      ? rawValue
+      : snapToBreakpoint(rawValue);
 
     const minStep = getMinStep();
-    const clampedMin = pendingMax === Infinity
-      ? newMin
-      : Math.min(newMin, pendingMax - minStep * 10);
+    const maxLimit = variant === "fileSize"
+      ? config.max
+      : (pendingMax === Infinity ? snappedValue : pendingMax);
+    const clampedMin = Math.min(snappedValue, maxLimit - minStep * 10);
 
     setPendingMin(clampedMin);
     setMinValue(clampedMin);
@@ -492,19 +582,27 @@ export const RangeSlider = ({
   };
 
   const handleMaxInput = (e: Event) => {
+    // Finish any active editing when slider is used
+    if (editingMin) finishEditing("min");
+    if (editingMax) finishEditing("max");
+
     setIsDragging(true);
     const sliderValue = parseInt((e.target as HTMLInputElement).value);
-    const newMax = positionToValue(sliderValue);
+    const rawValue = positionToValue(sliderValue);
 
     if (sliderValue >= 99.5) {
-      setPendingMax(Infinity);
-      setMaxValue(Infinity);
+      const maxValue = variant === "fileSize" ? config.max : Infinity;
+      setPendingMax(maxValue);
+      setMaxValue(maxValue);
       setLastChangedHandle("max");
       return;
     }
 
+    const snappedValue = variant === "fileSize" || variant === "price"
+      ? rawValue
+      : snapToBreakpoint(rawValue);
     const minStep = getMinStep();
-    const clampedMax = Math.max(newMax, pendingMin + minStep * 10);
+    const clampedMax = Math.max(snappedValue, pendingMin + minStep * 10);
 
     setPendingMax(clampedMax);
     setMaxValue(clampedMax);
@@ -533,9 +631,12 @@ export const RangeSlider = ({
 
           onChange?.(finalMin, finalMax);
         } else {
+          const finalMax = variant === "fileSize" && pendingMax >= config.max
+            ? config.max
+            : (pendingMax === Infinity ? Infinity : Math.round(pendingMax));
           onChange?.(
             Math.round(pendingMin),
-            pendingMax === Infinity ? Infinity : Math.round(pendingMax),
+            finalMax,
           );
         }
       }
@@ -554,7 +655,10 @@ export const RangeSlider = ({
   const trackGradientFill = (hoveredHandle: "min" | "max" | null) => {
     // Calculate percentages based on our non-linear scale
     const minPercent = valueToPosition(minValue);
-    const maxPercent = maxValue === Infinity ? 100 : valueToPosition(maxValue);
+    const maxPercent = (variant === "fileSize" && maxValue >= config.max) ||
+        maxValue === Infinity
+      ? 100
+      : valueToPosition(maxValue);
 
     // Calculate dynamic offsets based on handle positions
     const minHandleOffset = (minPercent / 100) * 3; // 0% to 3% based on position
@@ -586,28 +690,190 @@ export const RangeSlider = ({
   };
 
   return (
-    <div className="w-full">
+    <div className={`w-full ${variant === "price" ? "mt-0 mb-2" : ""}`}>
       <div className="flex w-full justify-center pb-1.5 tablet:pb-1">
-        <div className="flex items-center text-sm tablet:text-xs font-regular cursor-default select-none">
-          <div
-            className={`min-w-12 text-right ${
-              hoveredHandle === "min"
-                ? "text-stamp-grey-light"
-                : "text-stamp-grey"
-            } transition-colors duration-300`}
-          >
-            {config.formatValue(minValue)}
-          </div>
+        <div className="flex items-center text-sm tablet:text-xs font-regular">
+          {/* Min Value - Clickable/Editable */}
+          {editingMin
+            ? (
+              <input
+                type="text"
+                inputMode={variant === "price" ? "decimal" : "numeric"}
+                pattern={variant === "price" ? "[0-9]*[.]?[0-9]*" : "[0-9]*"}
+                value={tempMinValue}
+                onInput={(e) => {
+                  const inputValue = (e.target as HTMLInputElement).value;
+
+                  // Handle "0." to empty conversion for price variant
+                  if (
+                    variant === "price" && tempMinValue === "0." &&
+                    inputValue === "0"
+                  ) {
+                    setTempMinValue("");
+                    return;
+                  }
+
+                  // Handle "0" to "0." conversion for price variant
+                  if (
+                    variant === "price" &&
+                    (inputValue === "0" || inputValue === ".")
+                  ) {
+                    setTempMinValue("0.");
+                    return;
+                  }
+
+                  const sanitizedValue = handleNumericInput(inputValue);
+                  setTempMinValue(sanitizedValue);
+                }}
+                onBlur={() => finishEditing("min")}
+                onKeyDown={(e) => {
+                  // Allow control keys
+                  if (
+                    [
+                      "Backspace",
+                      "Delete",
+                      "Tab",
+                      "Escape",
+                      "Enter",
+                      "Home",
+                      "End",
+                      "ArrowLeft",
+                      "ArrowRight",
+                      "ArrowUp",
+                      "ArrowDown",
+                    ].includes(e.key)
+                  ) {
+                    if (e.key === "Enter") finishEditing("min");
+                    if (e.key === "Escape") cancelEditing("min");
+                    return;
+                  }
+
+                  // For price variant, only allow digits and decimal point
+                  if (variant === "price") {
+                    if (!/^[0-9.]$/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  } else {
+                    // For holders/range variants, only allow digits
+                    if (!/^[0-9]$/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  }
+                }}
+                placeholder="0"
+                tabIndex={1}
+                className={`${
+                  variant === "price"
+                    ? "w-[84px] tablet:w-[72px]"
+                    : "w-[72px] tablet:w-16"
+                } text-right bg-transparent text-stamp-grey-light placeholder:text-stamp-grey-light px-1 text-sm tablet:text-xs outline-none focus:outline-none focus:ring-0 border-0 border-b-[1px] border-stamp-grey-light focus:border-b-[1px] focus:border-stamp-grey-light no-outline`}
+                autoFocus
+              />
+            )
+            : (
+              <div
+                className={`${
+                  variant === "price"
+                    ? "w-[84px] tablet:w-[72px]"
+                    : "w-[72px] tablet:w-16"
+                } text-right cursor-pointer select-none ${
+                  hoveredHandle === "min"
+                    ? "text-stamp-grey-light"
+                    : "text-stamp-grey"
+                } hover:text-stamp-grey-light transition-colors duration-300`}
+                onClick={() => startEditing("min")}
+              >
+                {config.formatValue(minValue)}
+              </div>
+            )}
+
           <span className="mx-2 text-stamp-grey">-</span>
-          <div
-            className={`min-w-12 text-left ${
-              hoveredHandle === "max"
-                ? "text-stamp-grey-light"
-                : "text-stamp-grey"
-            } transition-colors duration-300`}
-          >
-            {config.formatValue(maxValue)}
-          </div>
+
+          {/* Max Value - Clickable/Editable */}
+          {editingMax
+            ? (
+              <input
+                type="text"
+                inputMode={variant === "price" ? "decimal" : "numeric"}
+                pattern={variant === "price" ? "[0-9]*[.]?[0-9]*" : "[0-9]*"}
+                value={tempMaxValue}
+                onInput={(e) => {
+                  const inputValue = (e.target as HTMLInputElement).value;
+
+                  // Handle "0." to empty conversion for price variant
+                  if (
+                    variant === "price" && tempMaxValue === "0." &&
+                    inputValue === "0"
+                  ) {
+                    setTempMaxValue("");
+                    return;
+                  }
+
+                  // Handle "0" to "0." conversion for price variant
+                  if (
+                    variant === "price" &&
+                    (inputValue === "0" || inputValue === ".")
+                  ) {
+                    setTempMaxValue("0.");
+                    return;
+                  }
+
+                  const sanitizedValue = handleNumericInput(inputValue);
+                  setTempMaxValue(sanitizedValue);
+                }}
+                onBlur={() => finishEditing("max")}
+                onKeyDown={(e) => {
+                  // Allow control keys
+                  if (
+                    [
+                      "Backspace",
+                      "Delete",
+                      "Tab",
+                      "Escape",
+                      "Enter",
+                      "Home",
+                      "End",
+                      "ArrowLeft",
+                      "ArrowRight",
+                      "ArrowUp",
+                      "ArrowDown",
+                    ].includes(e.key)
+                  ) {
+                    if (e.key === "Enter") finishEditing("max");
+                    if (e.key === "Escape") cancelEditing("max");
+                    return;
+                  }
+
+                  // For price variant, only allow digits and decimal point
+                  if (variant === "price") {
+                    if (!/^[0-9.]$/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  } else {
+                    // For holders/range variants, only allow digits
+                    if (!/^[0-9]$/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  }
+                }}
+                placeholder="NO LIMIT"
+                tabIndex={2}
+                className="w-[72px] tablet:w-16 text-left bg-transparent text-stamp-grey-light placeholder:text-stamp-grey-light px-1 text-sm tablet:text-xs outline-none focus:outline-none focus:ring-0 border-0 border-b-[1px] border-stamp-grey-light focus:border-b-[1px] focus:border-stamp-grey-light no-outline"
+                autoFocus
+              />
+            )
+            : (
+              <div
+                className={`w-[72px] tablet:w-16 text-left cursor-pointer select-none ${
+                  hoveredHandle === "max"
+                    ? "text-stamp-grey-light"
+                    : "text-stamp-grey"
+                } hover:text-stamp-grey-light transition-colors duration-300`}
+                onClick={() => startEditing("max")}
+              >
+                {config.formatValue(maxValue)}
+              </div>
+            )}
         </div>
       </div>
 
@@ -633,6 +899,7 @@ export const RangeSlider = ({
           onInput={handleMinInput}
           onMouseEnter={() => setHoveredHandle("min")}
           onMouseLeave={() => setHoveredHandle(null)}
+          tabIndex={3}
           className={`${handleIcon} ${
             lastChangedHandle === "min" ? "z-20" : "z-10"
           }`}
@@ -649,6 +916,7 @@ export const RangeSlider = ({
           onInput={handleMaxInput}
           onMouseEnter={() => setHoveredHandle("max")}
           onMouseLeave={() => setHoveredHandle(null)}
+          tabIndex={4}
           className={`${handleIcon} ${
             lastChangedHandle === "max" ? "z-20" : "z-10"
           }`}

@@ -89,14 +89,27 @@ export interface MarketListingAggregated {
 }
 // END ADDED TYPE
 
-// NEW SUGGESTIONS
 // Filter types - Stamp
-export type STAMP_MARKET =
-  | "atomic" // Unused in the UI
-  | "dispensers" // Unused in the UI
-  | "listings" // Maps to dispensers - also named "for sale" - should be updated to include atomic and dispensers -v3
-  | "sales" // Named "sold" previously - NOT CORRECTLY UPDATED
-  | "psbt"; // aka "utxo bound" in UI - NOT CORRECTLY UPDATED
+export type STAMP_MARKETPLACE =
+  // Main market types
+  | "listings"
+  | "sales"
+  // Market sub-options
+  | "dispensers"
+  | "atomics"
+  // Listing price types
+  | "all" // Default - show all listings
+  | "bargain" // <0.0025 BTC
+  | "affordable" // 0.005-0.01 BTC
+  | "premium" // >0.1 BTC
+  // Sales types
+  | "recent"
+  | "premium" // >0.1 BTC
+  | "volume" // Maps to volume_24h_btc, volume_7d_btc, volume_30d_btc database fields
+  // Shared options
+  | "custom" // Custom price range
+  // Unused filter types
+  | "psbt"; // aka "utxo bound"
 
 export type STAMP_FILETYPES =
   | "jpg" // Maps to StampTableV4.stamp_mimetype = 'image/jpeg'
@@ -127,6 +140,13 @@ export type STAMP_RANGES =
   | "5000" // stamp < 5000
   | "10000" // stamp < 10000
   | "custom"; // NEEDS TO BE CORRECTLY UPDATED
+
+export type STAMP_FILESIZES =
+  | "<1kb" // < 1,024 bytes
+  | "1kb-7kb" // 1,024 - 7,168 bytes
+  | "7kb-32kb" // 7,168 - 32,768 bytes
+  | "32kb-64kb" // 32,768 - 65,536 bytes
+  | "custom"; // User-defined range
 
 // Filter types - SRC20
 export type SRC20_STATUS =
@@ -175,15 +195,57 @@ export type SRC20_MARKET =
 
 // Full Filter Interfaces
 export interface StampFilters {
-  market: STAMP_MARKET[];
-  marketMin?: string;
-  marketMax?: string;
-  filetype?: STAMP_FILETYPES[];
-  editions?: STAMP_EDITIONS[];
+  // Market Place filters
+  market: Extract<STAMP_MARKETPLACE, "listings" | "sales"> | "";
+  dispensers: boolean;
+  atomics: boolean;
+
+  // Listings price range
+  listings:
+    | Extract<
+      STAMP_MARKETPLACE,
+      "all" | "bargain" | "affordable" | "premium" | "custom"
+    >
+    | "";
+  listingsMin: string;
+  listingsMax: string;
+
+  // SALES options
+  sales:
+    | Extract<STAMP_MARKETPLACE, "recent" | "premium" | "custom" | "volume">
+    | "";
+  salesMin: string;
+  salesMax: string;
+
+  // Volume (for trending sales)
+  volume: "24h" | "7d" | "30d" | "";
+  volumeMin: string;
+  volumeMax: string;
+
+  // Other existing filters
+  fileType: STAMP_FILETYPES[];
+  fileSize: STAMP_FILESIZES | null;
+  fileSizeMin: string;
+  fileSizeMax: string;
+  editions: STAMP_EDITIONS[];
   range: STAMP_RANGES | null;
   rangeMin: string;
   rangeMax: string;
-  search?: string;
+
+  // Market Data Filters (Task 42)
+  minHolderCount?: string;
+  maxHolderCount?: string;
+  minDistributionScore?: string;
+  maxTopHolderPercentage?: string;
+  minFloorPriceBTC?: string;
+  maxFloorPriceBTC?: string;
+  minVolume24h?: string;
+  minPriceChange24h?: string;
+  minDataQualityScore?: string;
+  maxCacheAgeMinutes?: string;
+  priceSource?: string;
+
+  [key: string]: any; // Keep index signature for flexibility
 }
 
 export interface SRC20Filters {
@@ -217,6 +279,26 @@ export interface SRC20Filters {
     };
   };
   search?: string; // Maps to tick or tick_hash
+}
+
+// Market Data Filters Interface for Task 42
+export interface MarketDataFilters {
+  // Holder metrics
+  minHolderCount?: number;
+  maxHolderCount?: number;
+  minDistributionScore?: number; // 0-100
+  maxTopHolderPercentage?: number; // 0-100
+
+  // Market metrics
+  minFloorPriceBTC?: number;
+  maxFloorPriceBTC?: number;
+  minVolume24h?: number;
+  minPriceChange24h?: number; // Percentage
+
+  // Data quality
+  minDataQualityScore?: number; // 0-10
+  maxCacheAgeMinutes?: number;
+  priceSource?: string[]; // Filter by price source
 }
 
 // Utility type for handling emoji ticks
@@ -747,6 +829,7 @@ export type StampPageProps = {
     selectedTab: "all" | "classic" | "posh" | "recent_sales";
     sortBy: "ASC" | "DESC";
     filterBy: STAMP_FILTER_TYPES[];
+    filters: StampFilters;
     search: string;
   };
 };
@@ -835,11 +918,29 @@ export interface Collection {
   collection_name: string;
   collection_description: string;
   creators: string[];
+  creator_names?: string[]; // Human-readable creator names
   stamp_count: number;
   total_editions: number;
   first_stamp_image?: string | null;
   stamp_images?: string[] | null;
   img: string;
+  // Market data fields
+  marketData?: {
+    minFloorPriceBTC: number | null;
+    maxFloorPriceBTC: number | null;
+    avgFloorPriceBTC: number | null;
+    medianFloorPriceBTC: number | null;
+    totalVolume24hBTC: number;
+    stampsWithPricesCount: number;
+    minHolderCount: number;
+    maxHolderCount: number;
+    avgHolderCount: number;
+    medianHolderCount: number;
+    totalUniqueHolders: number;
+    avgDistributionScore: number;
+    totalStampsCount: number;
+    lastUpdated: Date | string;
+  } | null;
 }
 
 export interface SRC20SnapshotRequestParams {

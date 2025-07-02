@@ -66,8 +66,8 @@
     "test:performance:watch": "deno test --allow-net tests/fee-performance.test.ts --no-check --allow-read --allow-env --allow-write --watch",
     "test:btc-price": "deno test --allow-net tests/btc-price-caching.test.ts --no-check --allow-read --allow-env --allow-write",
     "test:btc-price:watch": "deno test --allow-net tests/btc-price-caching.test.ts --no-check --allow-read --allow-env --allow-write --watch",
-    "test:unit": "deno test tests/unit/ --no-check --allow-env",
-    "test:unit:coverage": "mkdir -p coverage && deno test --coverage=coverage/ tests/unit/ --no-check --allow-env && deno coverage coverage/",
+    "test:unit": "DENO_ENV=test deno test tests/unit/ --no-check --allow-env --allow-read",
+    "test:unit:coverage": "DENO_ENV=test mkdir -p coverage && deno test --coverage=coverage/ tests/unit/ --no-check --allow-env --allow-read && deno coverage coverage/",
     "analyze:types": "deno run --allow-run --allow-write scripts/analyze-type-errors.ts"
   },
   "lint": {
@@ -190,7 +190,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "strict": true,
-    "types": ["npm:@types/node", "npm:@types/bitcoinjs-lib"],
+    "types": ["npm:@types/node"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,

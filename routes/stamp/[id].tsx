@@ -3,8 +3,6 @@
 import { StampRow } from "$globals";
 import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
-import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
@@ -41,9 +39,15 @@ export const handler: Handlers<StampData> = {
   async GET(req: Request, ctx) {
     try {
       const { id } = ctx.params;
-      const url = new URL(req.url);
-      // Get stamp details first
-      const stampData = await StampController.getStampDetailsById(id);
+      // Get stamp details first with market data
+      const stampData = await StampController.getStampDetailsById(
+        id,
+        "all",
+        RouteType.STAMP_DETAIL,
+        undefined,
+        true,
+        false,
+      );
       if (!stampData?.data?.stamp) {
         return ctx.renderNotFound();
       }
@@ -73,27 +77,24 @@ export const handler: Handlers<StampData> = {
       // Only fetch dispensers for STAMP or SRC-721
       let dispensers = [];
       let lowestPriceDispenser = null;
-      let floorPrice = null;
 
       if (
         stampData.data.stamp.ident === "STAMP" ||
         stampData.data.stamp.ident === "SRC-721"
       ) {
-        // Fetch dispensers separately
+        // Fetch dispensers separately for display on detail page
         const dispensersData = await DispenserManager.getDispensersByCpid(
           stampData.data.stamp.cpid,
         );
         dispensers = dispensersData?.dispensers || [];
         lowestPriceDispenser = findLowestPriceDispenser(dispensers);
-        floorPrice = calculateFloorPrice(lowestPriceDispenser);
       }
 
-      const btcPrice = await fetchBTCPriceInUSD(url.origin);
-      const stampWithPrices = addPricesToStamp(
-        stampData.data.stamp,
-        floorPrice,
-        btcPrice,
-      );
+      // Use market data from cache if available
+      const stamp = stampData.data.stamp;
+
+      // Stamp should already have market data from controller
+      const stampWithPrices = stamp;
 
       let htmlTitle = null;
       if (
@@ -160,31 +161,6 @@ function findLowestPriceDispenser(dispensers: any[]) {
     },
     null,
   );
-}
-
-function calculateFloorPrice(dispenser: any) {
-  return dispenser
-    ? Number(
-      formatSatoshisToBTC(dispenser.satoshirate, {
-        includeSymbol: false,
-      }),
-    )
-    : null;
-}
-
-function addPricesToStamp(
-  stamp: any,
-  floorPrice: number | null,
-  btcPrice: number,
-) {
-  return {
-    ...stamp,
-    floorPrice,
-    floorPriceUSD: floorPrice !== null ? floorPrice * btcPrice : null,
-    marketCapUSD: typeof stamp.marketCap === "number"
-      ? stamp.marketCap * btcPrice
-      : null,
-  };
 }
 
 /* ===== PAGE COMPONENT ===== */

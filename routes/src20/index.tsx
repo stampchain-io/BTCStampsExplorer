@@ -15,11 +15,24 @@ export const handler: Handlers = {
         | "24H"
         | "3D"
         | "7D";
+      const sortBy = url.searchParams.get("sortBy") || "TRENDING";
+      const sortDirection = url.searchParams.get("sortDirection") || "desc";
 
-      // Use controller methods with their built-in sorting
+      // Use controller methods with sorting parameters
       const [mintedData, mintingData] = await Promise.all([
-        Src20Controller.fetchFullyMintedByMarketCapV2(limit, page),
-        Src20Controller.fetchTrendingActiveMintingTokensV2(limit, page, 1000),
+        Src20Controller.fetchFullyMintedByMarketCapV2(
+          limit,
+          page,
+          sortBy,
+          sortDirection,
+        ),
+        Src20Controller.fetchTrendingActiveMintingTokensV2(
+          limit,
+          page,
+          1000,
+          sortBy,
+          sortDirection,
+        ),
       ]);
 
       // Debug pagination data
@@ -53,6 +66,8 @@ export const handler: Handlers = {
         },
         limit,
         timeframe,
+        sortBy,
+        sortDirection,
       });
     } catch (error) {
       console.error(error);
@@ -71,6 +86,8 @@ export default function SRC20OverviewPage({ data }: any) {
     mintedData,
     mintingData,
     timeframe = "24H",
+    sortBy = "TRENDING",
+    sortDirection = "desc",
   } = data;
 
   return (
@@ -78,6 +95,8 @@ export default function SRC20OverviewPage({ data }: any) {
       mintedData={mintedData}
       mintingData={mintingData}
       timeframe={timeframe}
+      sortBy={sortBy}
+      sortDirection={sortDirection}
     />
   );
 }

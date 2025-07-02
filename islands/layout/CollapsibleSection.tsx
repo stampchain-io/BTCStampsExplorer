@@ -38,7 +38,8 @@ export const CollapsibleSection = ({
             type="button"
             onClick={handleClick}
             onMouseLeave={handleMouseLeave}
-            className="flex items-center w-full justify-between pt-1 pb-4 tablet:pt-1 tablet:pb-3 transition-colors duration-300 group"
+            className="flex items-center w-full justify-between pt-2 pb-4 tablet:pt-2 tablet:pb-3 transition-colors duration-300 group"
+            data-section-toggle
           >
             <span
               className={`
@@ -89,6 +90,7 @@ export const CollapsibleSection = ({
             className={`overflow-hidden transition-all duration-300 ${
               expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
             }`}
+            data-section-expanded={expanded}
           >
             <div className="-mt-2 tablet:-mt-1 pb-4 pl-0.5">
               {children}
@@ -144,6 +146,7 @@ export const CollapsibleSection = ({
             className={`overflow-hidden transition-all duration-300 ${
               expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
             }`}
+            data-section-expanded={expanded}
           >
             <div className="pt-3.5 pl-0.5">
               {children}
@@ -159,6 +162,7 @@ export const CollapsibleSection = ({
           className={`overflow-hidden transition-all duration-300 ease-in-out ${
             expanded ? "max-h-[100px] opacity-100" : "max-h-0 opacity-0"
           }`}
+          data-section-expanded={expanded}
         >
           <div className="pt-2 pl-0.5">
             {children}

@@ -1,6 +1,12 @@
 /* ===== COLLECTION DETAILS HEADER COMPONENT ===== */
 import { Collection, StampRow } from "$globals";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatBTC,
+  formatMarketCap,
+  formatNumberWithCommas,
+  formatVolume,
+} from "$lib/utils/formatUtils.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { containerBackground, containerColData } from "$layout";
@@ -56,11 +62,14 @@ export const CollectionDetailHeader = (
               <div>
                 <a
                   className={headingGreyDLLink}
-                  href={`/wallet/${collection.creators}`}
+                  href={`/wallet/${collection.creators?.[0] || ""}`}
                   target="_parent"
                 >
-                  {collection.creators
-                    ? abbreviateAddress(collection.creators, 6)
+                  {collection.creators && collection.creators.length > 0
+                    ? (collection.creator_names &&
+                        collection.creator_names.length > 0
+                      ? collection.creator_names[0]
+                      : abbreviateAddress(collection.creators[0], 6))
                     : "N/A"}
                 </a>
               </div>
@@ -89,7 +98,13 @@ export const CollectionDetailHeader = (
             MARKETCAP
           </h5>
           <h6 className={value3xl}>
-            N/A <span className="font-light">BTC</span>
+            {collection.marketData?.minFloorPriceBTC !== null &&
+                collection.total_editions
+              ? formatMarketCap(
+                collection.marketData.minFloorPriceBTC *
+                  collection.total_editions,
+              )
+              : "N/A"} <span className="font-light">BTC</span>
           </h6>
         </div>
         <div class="flex flex-wrap justify-between pt-3">
@@ -97,7 +112,13 @@ export const CollectionDetailHeader = (
             <h5 className={labelSm}>
               HOLDERS
             </h5>
-            <h6 className={valueSm}>N/A</h6>
+            <h6 className={valueSm}>
+              {collection.marketData?.totalUniqueHolders
+                ? formatNumberWithCommas(
+                  collection.marketData.totalUniqueHolders,
+                )
+                : "N/A"}
+            </h6>
           </div>
           <div className="hidden min-[520px]:block text-center -space-y-0.5">
             <h5 className={labelSm}>
@@ -119,19 +140,31 @@ export const CollectionDetailHeader = (
             <h5 className={labelSm}>
               FLOOR PRICE
             </h5>
-            <h6 className={valueSm}>N/A BTC</h6>
+            <h6 className={valueSm}>
+              {collection.marketData?.minFloorPriceBTC !== null
+                ? `${formatBTC(collection.marketData.minFloorPriceBTC)} BTC`
+                : "N/A BTC"}
+            </h6>
           </div>
           <div className="hidden min-[520px]:block text-center -space-y-0.5">
             <h5 className={labelSm}>
-              7D VOLUME
+              24H VOLUME
             </h5>
-            <h6 className={valueSm}>N/A BTC</h6>
+            <h6 className={valueSm}>
+              {collection.marketData?.totalVolume24hBTC !== undefined
+                ? `${formatVolume(collection.marketData.totalVolume24hBTC)} BTC`
+                : "N/A BTC"}
+            </h6>
           </div>
           <div className="text-right -space-y-0.5">
             <h5 className={labelSm}>
-              TOTAL VOLUME
+              AVG PRICE
             </h5>
-            <h6 className={valueSm}>N/A BTC</h6>
+            <h6 className={valueSm}>
+              {collection.marketData?.avgFloorPriceBTC !== null
+                ? `${formatBTC(collection.marketData.avgFloorPriceBTC)} BTC`
+                : "N/A BTC"}
+            </h6>
           </div>
         </div>
       </div>

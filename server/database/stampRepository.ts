@@ -9,8 +9,9 @@ import {
   StampFilters,
   STAMP_FILETYPES,
   STAMP_EDITIONS,
-  STAMP_MARKET,
-  STAMP_RANGES
+  STAMP_MARKETPLACE,
+  STAMP_RANGES,
+  STAMP_FILESIZES
 } from "$globals";
 import { XcpBalance } from "$types/index.d.ts";
 import { summarize_issuances } from "./index.ts";
@@ -41,11 +42,11 @@ export class StampRepository {
     blockIdentifier?: number | string,
     collectionId?: string | string[],
     filterBy?: STAMP_FILTER_TYPES[],
-    suffixFilters?: STAMP_SUFFIX_FILTERS[],
+    suffix?: STAMP_SUFFIX_FILTERS[],
     isSearchQuery?: boolean,
     filters?: StampFilters,
-    editionFilters?: STAMP_EDITIONS[],
-    rangeFilters?: STAMP_RANGES,
+    editions?: STAMP_EDITIONS[],
+    range?: STAMP_RANGES,
     rangeMin?: string,
     rangeMax?: string
   ) {
@@ -188,18 +189,18 @@ export class StampRepository {
       }
     }
 
-    // File suffix condition from suffixFilters
-    if (suffixFilters && suffixFilters.length > 0) {
+    // File suffix condition from suffix
+    if (suffix && suffix.length > 0) {
       // Extract different filter types
-      const fileExtensions = suffixFilters.filter(filter => 
+      const fileExtensions = suffix.filter(filter => 
         !["legacy", "olga", "single", "multiple", "locked", "unlocked", "divisible"].includes(filter)
       );
       
-      const encodingFilters = suffixFilters.filter(filter => 
+      const encodingFilters = suffix.filter(filter => 
         filter === "legacy" || filter === "olga"
       );
       
-      const editionFilters = suffixFilters.filter(filter => 
+      const editions = suffix.filter(filter => 
         ["single", "multiple", "locked", "unlocked", "divisible"].includes(filter)
       ) as STAMP_EDITIONS[];
       
@@ -220,8 +221,8 @@ export class StampRepository {
       }
       
       // Process edition filters
-      if (editionFilters.length > 0) {
-        this.buildEditionsFilterConditions(editionFilters, whereConditions, queryParams);
+      if (editions.length > 0) {
+        this.buildEditionsFilterConditions(editions, whereConditions, queryParams);
       }
     }
 
@@ -272,14 +273,14 @@ export class StampRepository {
     }
 
     // Handle edition filters if not using the full filters object
-    if (editionFilters && editionFilters.length > 0 && !filters) {
-      this.buildEditionsFilterConditions(editionFilters, whereConditions, queryParams);
+    if (editions && editions.length > 0 && !filters) {
+      this.buildEditionsFilterConditions(editions, whereConditions, queryParams);
     }
 
     // Handle range filters
-    if (rangeFilters) {
+    if (range) {
       this.buildRangeFilterConditions(
-        rangeFilters, 
+        range, 
         whereConditions, 
         queryParams, 
         rangeMin, 
@@ -295,8 +296,8 @@ export class StampRepository {
     blockIdentifier?: number | string;
     collectionId?: string | string[];
     filterBy?: STAMP_FILTER_TYPES[];
-    suffixFilters?: STAMP_SUFFIX_FILTERS[];
-    filetypeFilters?: STAMP_FILETYPES[];
+    suffix?: STAMP_SUFFIX_FILTERS[];
+    fileType?: STAMP_FILETYPES[];
     creatorAddress?: string;
   }) {
     const {
@@ -306,13 +307,13 @@ export class StampRepository {
       blockIdentifier,
       collectionId,
       filterBy,
-      suffixFilters = [],
-      filetypeFilters = [],
+      suffix = [],
+      fileType = [],
       creatorAddress,
     } = options;
 
     // Combine filters
-    const combinedFilters = [...suffixFilters, ...filetypeFilters];
+    const combinedFilters = [...suffix, ...fileType];
 
     const whereConditions: string[] = [];
     const queryParams: (string | number)[] = [];
@@ -562,15 +563,27 @@ export class StampRepository {
     isSearchQuery?: boolean;
     filters?: StampFilters;
     filterBy?: STAMP_FILTER_TYPES[];
-    suffixFilters?: STAMP_SUFFIX_FILTERS[];
-    filetypeFilters?: STAMP_FILETYPES[];
-    editionFilters?: STAMP_EDITIONS[];
-    rangeFilters?: STAMP_RANGES;
+    suffix?: STAMP_SUFFIX_FILTERS[];
+    fileType?: STAMP_FILETYPES[];
+    editions?: STAMP_EDITIONS[];
+    range?: STAMP_RANGES;
     rangeMin?: string;
     rangeMax?: string;
-    marketFilters?: STAMP_MARKET[];
-    marketMin?: string;
-    marketMax?: string;
+    market?: Extract<STAMP_MARKETPLACE, "listings" | "sales"> | "";
+    dispensers?: boolean;
+    atomics?: boolean;
+    listings?: Extract<STAMP_MARKETPLACE, "all" | "bargain" | "affordable" | "premium" | "custom"> | "";
+    listingsMin?: string;
+    listingsMax?: string;
+    sales?: Extract<STAMP_MARKETPLACE, "recent" | "premium" | "custom" | "volume"> | "";
+    salesMin?: string;
+    salesMax?: string;
+    volume?: "24h" | "7d" | "30d" | "";
+    volumeMin?: string;
+    volumeMax?: string;
+    fileSize?: STAMP_FILESIZES | null;
+    fileSizeMin?: string;
+    fileSizeMax?: string;
   }) {
     // Extract all parameters including both filter types
     const {
@@ -596,19 +609,31 @@ export class StampRepository {
       isSearchQuery = false,
       filters,
       filterBy = [],
-      suffixFilters = [],
-      filetypeFilters = [],
-      editionFilters = [],
-      rangeFilters,
+      suffix = [],
+      fileType = [],
+      editions = [],
+      range,
       rangeMin,
       rangeMax,
-      marketFilters,
-      marketMin,
-      marketMax,
+      market,
+      dispensers,
+      atomics,
+      listings,
+      listingsMin,
+      listingsMax,
+      sales,
+      salesMin,
+      salesMax,
+      volume,
+      volumeMin,
+      volumeMax,
+      fileSize,
+      fileSizeMin,
+      fileSizeMax,
     } = options;
 
     // Combine both filter types for processing
-    const combinedFilters = [...suffixFilters, ...filetypeFilters];
+    const combinedFilters = [...suffix, ...fileType];
 
     // Rest of the method remains the same, but use combinedFilters instead
     const whereConditions: string[] = [];
@@ -626,8 +651,8 @@ export class StampRepository {
       combinedFilters,
       isSearchQuery,
       filters,
-      editionFilters,
-      rangeFilters,
+      editions,
+      range,
       rangeMin,
       rangeMax
     );
@@ -638,18 +663,18 @@ export class StampRepository {
     }
 
     // Use either the object or direct parameters
-    let effectiveRangeFilters = rangeFilters;
+    let effectiveRange = range;
     
-    // If no rangeFilters but direct parameters are provided, use those
-    if (!effectiveRangeFilters && (rangeMin || rangeMax)) {
-      effectiveRangeFilters = {
+    // If no range but direct parameters are provided, use those
+    if (!effectiveRange && (rangeMin || rangeMax)) {
+      effectiveRange = {
         sub: "stamp range",
         stampRange: {
           min: rangeMin || "",
           max: rangeMax || ""
         }
       } as STAMP_RANGES;
-      console.log("Repository created range filters:", effectiveRangeFilters);
+      console.log("Repository created range filters:", effectiveRange);
     }
 
     // Core stamp fields that are always needed
@@ -720,10 +745,32 @@ export class StampRepository {
       queryParams.push(limit, offset);
     }
 
+    // Check if any market data filters are present (Task 42)
+    const hasMarketDataFilters = !!(
+      filters?.minHolderCount || 
+      filters?.maxHolderCount ||
+      filters?.minDistributionScore ||
+      filters?.maxTopHolderPercentage ||
+      filters?.minFloorPriceBTC ||
+      filters?.maxFloorPriceBTC ||
+      filters?.minVolume24h ||
+      filters?.minPriceChange24h ||
+      filters?.minDataQualityScore ||
+      filters?.maxCacheAgeMinutes ||
+      filters?.priceSource
+    );
+
     // Build join clause
     let joinClause = `
       LEFT JOIN creator AS cr ON st.creator = cr.address
     `;
+
+    // Add market data join if needed
+    if (hasMarketDataFilters) {
+      joinClause += `
+        LEFT JOIN stamp_market_data smd ON st.cpid = smd.cpid
+      `;
+    }
 
     // Include collection_stamps join only if collectionId is provided
     if (collectionId) {
@@ -738,6 +785,13 @@ export class StampRepository {
         JOIN collection_stamps cs1 ON st.stamp = cs1.stamp
         LEFT JOIN creator AS cr ON st.creator = cr.address
       `;
+      
+      // Add market data join if needed for collections
+      if (hasMarketDataFilters) {
+        joinClause += `
+          LEFT JOIN stamp_market_data smd ON st.cpid = smd.cpid
+        `;
+      }
     }
 
     let groupByClause = "";
@@ -836,8 +890,8 @@ export class StampRepository {
         blockIdentifier,
         collectionId,
         filterBy,
-        suffixFilters,
-        filetypeFilters,
+        suffix,
+        fileType,
       });
       total = totalResult.rows[0]?.total || 0;
       totalPages = noPagination ? 1 : Math.ceil(total / limit);
@@ -1177,9 +1231,9 @@ export class StampRepository {
     whereConditions: string[],
     queryParams: (string | number)[]
   ) {
-    // Handle filetype filters (including encoding filters)
-    if (filters.filetype && filters.filetype.length > 0) {
-      this.buildFileTypeFilterConditions(filters.filetype, whereConditions, queryParams);
+    // Handle fileType filters (including encoding filters)
+    if (filters.fileType && filters.fileType.length > 0) {
+      this.buildFileTypeFilterConditions(filters.fileType, whereConditions, queryParams);
     }
     
     // Handle editions filters
@@ -1196,6 +1250,9 @@ export class StampRepository {
     if (filters.market) {
       this.buildMarketFilterConditions(filters.market, undefined, undefined, whereConditions, queryParams);
     }
+    
+    // Handle new market data filters (Task 42)
+    this.buildMarketDataFilterConditions(filters, whereConditions, queryParams);
     
     // Handle search text
     if (filters.search) {
@@ -1266,27 +1323,27 @@ export class StampRepository {
   }
 
   private static buildRangeFilterConditions(
-    rangeFilters: STAMP_RANGES,
+    range: STAMP_RANGES,
     whereConditions: string[],
     queryParams: (string | number)[],
     rangeMin?: string,
     rangeMax?: string
   ) {
-    console.log("[RANGE DEBUG] Starting buildRangeFilterConditions with:", rangeFilters);
-    console.log("[RANGE DEBUG] Type of rangeFilters:", typeof rangeFilters);
+    console.log("[RANGE DEBUG] Starting buildRangeFilterConditions with:", range);
+    console.log("[RANGE DEBUG] Type of range:", typeof range);
     console.log("[RANGE DEBUG] Initial whereConditions:", whereConditions);
     console.log("[RANGE DEBUG] Custom range values:", { min: rangeMin, max: rangeMax });
 
     // Handle preset ranges first
-    if (rangeFilters && rangeFilters !== "custom") {
-      console.log("[RANGE DEBUG] Processing preset range:", rangeFilters);
+    if (range && range !== "custom") {
+      console.log("[RANGE DEBUG] Processing preset range:", range);
       whereConditions.push("(st.stamp < ?)");
-      queryParams.push(rangeFilters);
+      queryParams.push(range);
       return; // Exit early for preset ranges
     }
 
     // Handle custom range
-    if (rangeFilters === "custom" || (rangeMin || rangeMax)) {
+    if (range === "custom" || (rangeMin || rangeMax)) {
       console.log("[RANGE DEBUG] Handling custom range");
       if (rangeMin && rangeMax) {
         whereConditions.push("(st.stamp BETWEEN ? AND ?)");
@@ -1305,7 +1362,7 @@ export class StampRepository {
   }
 
   private static buildMarketFilterConditions(
-    marketFilters: STAMP_MARKET[],
+    marketFilters: STAMP_MARKETPLACE[],
     marketMin?: string,
     marketMax?: string,
     whereConditions: string[],
@@ -1360,6 +1417,76 @@ export class StampRepository {
     if (marketMax) {
       whereConditions.push("st.market_price <= ?");
       queryParams.push(marketMax);
+    }
+  }
+
+  /**
+   * Builds SQL conditions for filtering stamps by market data metrics (Task 42)
+   * @param filters StampFilters object containing market data filter options
+   * @param whereConditions Array of SQL conditions to append to
+   * @param queryParams Array of parameters to append to
+   */
+  private static buildMarketDataFilterConditions(
+    filters: StampFilters,
+    whereConditions: string[],
+    queryParams: (string | number)[]
+  ) {
+    // Note: These filters require joining with stamp_market_data table
+    // The join should be handled in the main query when any market data filter is present
+    
+    // Holder metrics
+    if (filters.minHolderCount) {
+      whereConditions.push("smd.holder_count >= ?");
+      queryParams.push(Number(filters.minHolderCount));
+    }
+    if (filters.maxHolderCount) {
+      whereConditions.push("smd.holder_count <= ?");
+      queryParams.push(Number(filters.maxHolderCount));
+    }
+    if (filters.minDistributionScore) {
+      whereConditions.push("smd.holder_distribution_score >= ?");
+      queryParams.push(Number(filters.minDistributionScore));
+    }
+    if (filters.maxTopHolderPercentage) {
+      whereConditions.push("smd.top_holder_percentage <= ?");
+      queryParams.push(Number(filters.maxTopHolderPercentage));
+    }
+    
+    // Market metrics
+    if (filters.minFloorPriceBTC) {
+      whereConditions.push("smd.floor_price_btc >= ?");
+      queryParams.push(Number(filters.minFloorPriceBTC));
+    }
+    if (filters.maxFloorPriceBTC) {
+      whereConditions.push("smd.floor_price_btc <= ?");
+      queryParams.push(Number(filters.maxFloorPriceBTC));
+    }
+    if (filters.minVolume24h) {
+      whereConditions.push("smd.volume_24h_btc >= ?");
+      queryParams.push(Number(filters.minVolume24h));
+    }
+    if (filters.minPriceChange24h) {
+      // Note: Price change is available in src20_market_data, not stamp_market_data
+      // This might require a different join or approach
+      console.log("Warning: minPriceChange24h filter requires src20_market_data join");
+    }
+    
+    // Data quality
+    if (filters.minDataQualityScore) {
+      whereConditions.push("smd.data_quality_score >= ?");
+      queryParams.push(Number(filters.minDataQualityScore));
+    }
+    if (filters.maxCacheAgeMinutes) {
+      whereConditions.push("TIMESTAMPDIFF(MINUTE, smd.last_updated, NOW()) <= ?");
+      queryParams.push(Number(filters.maxCacheAgeMinutes));
+    }
+    if (filters.priceSource) {
+      const sources = filters.priceSource.split(',').map(s => s.trim());
+      if (sources.length > 0) {
+        const placeholders = sources.map(() => "?").join(",");
+        whereConditions.push(`smd.price_source IN (${placeholders})`);
+        queryParams.push(...sources);
+      }
     }
   }
 }

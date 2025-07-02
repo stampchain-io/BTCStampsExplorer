@@ -21,9 +21,13 @@ export const handler: Handlers = {
 
       const { limit, page } = pagination;
 
+      const includeMarketData =
+        url.searchParams.get("includeMarketData") === "true";
+
       const result = await CollectionController.getCollectionDetails({
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
+        includeMarketData,
       });
 
       // Check for empty result

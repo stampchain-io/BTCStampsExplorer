@@ -587,7 +587,7 @@ export class SRC20QueryService {
         // Fetch market data and mint progress in parallel
         const [marketData, mintProgress] = await Promise.all([
           options.includeMarketData
-            ? options.prefetchedMarketData || await SRC20MarketService.fetchMarketListingSummary()
+            ? options.prefetchedMarketData || (console.log("Fetching market data from external API"), await SRC20MarketService.fetchMarketListingSummary())
             : null,
           options.enrichWithProgress
             ? Promise.all(ticks.map(tick => 
@@ -599,7 +599,7 @@ export class SRC20QueryService {
         // Enrich market data and holders
         if (marketData) {
           const marketMap = new Map(
-            marketData.map(item => [item.tick, item])
+            marketData.map(item => [item.tick.toUpperCase(), item])
           );
           batch.forEach((row, index) => {
             const tickForLookup = row.tick.toUpperCase();
@@ -608,11 +608,11 @@ export class SRC20QueryService {
               enriched[i + index] = {
                 ...row,
                 market_data: market,
-                holders: row.holders || market.holders || 0
+                holders: row.holders || market.holder_count || 0
               };
             } else {
               // Optional: Log if a tick is not found in the market map, can be noisy
-              // console.log(`[enrichData] Market data not found for tick: '${row.tick}' (lookup key: '${tickForLookup}')`);
+              console.log(`[enrichData] Market data not found for tick: '${row.tick}' (lookup key: '${tickForLookup}')`);
             }
           });
         }

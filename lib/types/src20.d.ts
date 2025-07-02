@@ -1,5 +1,9 @@
 import type { BufferLike } from "$types/utils.d.ts";
-import type { MarketListingAggregated } from "$types/marketData.d.ts";
+import type {
+  CacheStatus,
+  MarketListingAggregated,
+  SRC20MarketData,
+} from "$types/marketData.d.ts";
 import type { SRC20Row } from "$globals";
 
 type INETWORK = "mainnet" | "testnet";
@@ -125,4 +129,54 @@ export interface EnrichedSRC20Row extends SRC20Row {
   chart?: any; // Define a proper chart data type if available, using 'any' for now
   // holders is inherited from SRC20Row
   // deploy_img, deploy_tx, stamp_url are inherited from SRC20Row
+}
+
+/**
+ * Extended SRC20 interface that includes optional market data from cache
+ * Used when SRC20 tokens are fetched with market data
+ */
+export interface SRC20WithOptionalMarketData extends SRC20Row {
+  // Optional market data fields
+  marketData?: SRC20MarketData | null;
+  marketDataMessage?: string;
+  cacheStatus?: CacheStatus;
+  cacheAgeMinutes?: number;
+
+  // Legacy fields for backward compatibility
+  market_data?: MarketListingAggregated;
+  priceBTC?: number | null;
+  priceUSD?: number | null;
+  marketCapUSD?: number | null;
+  volume24h?: number | null;
+}
+
+/**
+ * Query parameters for SRC20 endpoints with market data
+ */
+export interface SRC20MarketDataQueryParams {
+  includeMarketData?: boolean;
+  marketDataOnly?: boolean; // Only return tokens with market data
+  minMarketCap?: number;
+  minVolume24h?: number;
+  sortByMarketCap?: "asc" | "desc";
+}
+
+/**
+ * Paginated SRC20 response with market data
+ */
+export interface PaginatedSRC20WithMarketDataResponse {
+  page: number;
+  limit: number;
+  totalPages: number;
+  total: number;
+  last_block: number;
+  data: SRC20WithOptionalMarketData[];
+  marketDataSummary?: {
+    tokensWithData: number;
+    tokensWithoutData: number;
+    totalMarketCapBTC: number;
+    totalMarketCapUSD: number;
+    totalVolume24hBTC: number;
+    cacheStatus: CacheStatus;
+  };
 }

@@ -13,7 +13,7 @@ interface Dispense {
   dispense_quantity: number;
   satoshirate: number;
   tx_hash: string;
-  block_time: string;
+  block_time: number | null;
 }
 
 interface StampSalesProps {
@@ -96,7 +96,9 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
                   })}
                 </td>
                 <td class={cellAlign(4, headers.length)}>
-                  {formatDate(new Date(dispense.block_time))}
+                  {dispense.block_time
+                    ? formatDate(new Date(dispense.block_time))
+                    : "N/A"}
                 </td>
               </tr>
             ))
