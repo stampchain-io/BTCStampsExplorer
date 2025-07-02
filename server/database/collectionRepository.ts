@@ -2,6 +2,13 @@ import { SMALL_LIMIT, STAMP_TABLE } from "$constants";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { Collection } from "$globals";
 export class CollectionRepository {
+  // Dependency injection support
+  private static db: typeof dbManager = dbManager;
+  
+  static setDatabase(database: typeof dbManager): void {
+    this.db = database;
+  }
+
   static async getCollectionDetails(
     options: {
       limit?: number;
@@ -59,7 +66,7 @@ export class CollectionRepository {
 
     queryParams.push(limit, offset);
 
-    const results = await dbManager.executeQueryWithCache(
+    const results = await this.db.executeQueryWithCache(
       query,
       queryParams,
       60 * 5 // 5 minutes cache in seconds
@@ -113,7 +120,7 @@ export class CollectionRepository {
       }
     }
 
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       queryParams,
       60 * 30 // 30 minutes cache in seconds
@@ -147,7 +154,7 @@ export class CollectionRepository {
       GROUP BY c.collection_id, c.collection_name
     `;
 
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       [collectionName],
       "never",
@@ -188,7 +195,7 @@ export class CollectionRepository {
 
     queryParams.push(limit, offset);
 
-    return await dbManager.executeQueryWithCache(
+    return await this.db.executeQueryWithCache(
       query,
       queryParams,
       60 * 5 // 5 minutes cache in seconds
@@ -315,7 +322,7 @@ export class CollectionRepository {
 
     queryParams.push(limit, offset);
 
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       queryParams,
       60 * 5 // 5 minutes cache in seconds

@@ -20,6 +20,13 @@ import {
 import { dbManager } from "$server/database/databaseManager.ts";
 
 export class SRC101Repository {
+  // Dependency injection support
+  private static db: typeof dbManager = dbManager;
+  
+  static setDatabase(database: typeof dbManager): void {
+    this.db = database;
+  }
+
   static async getSrc101Price(
     deploy_hash: String,
   ){
@@ -30,7 +37,7 @@ export class SRC101Repository {
       ${SRC101_PRICE_TABLE}
     WHERE deploy_hash = ?;
     `;
-    const rows = (await dbManager.executeQueryWithCache(
+    const rows = (await this.db.executeQueryWithCache(
       sqlQuery,
       [deploy_hash],
       60 * 2, // Cache duration in seconds
@@ -83,7 +90,7 @@ export class SRC101Repository {
     if (whereConditions.length > 0) {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
-    var results = (await dbManager.executeQueryWithCache(
+    var results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2,
@@ -173,7 +180,7 @@ export class SRC101Repository {
 
     queryParams.unshift(offset);
 
-    return (await dbManager.executeQueryWithCache(
+    return (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2,
@@ -228,7 +235,7 @@ export class SRC101Repository {
     if (whereConditions.length > 0) {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
-    var results = (await dbManager.executeQueryWithCache(
+    var results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2,
@@ -246,7 +253,7 @@ export class SRC101Repository {
       ${SRC101_RECIPIENTS_TABLE}
     WHERE deploy_hash = ?;
     `;
-    const recipients = (await dbManager.executeQueryWithCache(
+    const recipients = (await this.db.executeQueryWithCache(
       sqlQuery,
       [deploy_hash],
       60 * 2, // Cache duration in seconds
@@ -285,7 +292,7 @@ export class SRC101Repository {
     LIMIT 1;
     `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
@@ -310,7 +317,7 @@ export class SRC101Repository {
       ${SRC101_OWNERS_TABLE}
     WHERE deploy_hash = ?;
     `;
-    const total = (await dbManager.executeQueryWithCache(
+    const total = (await this.db.executeQueryWithCache(
       sqlQuery,
       [deploy_hash],
       60 * 2, // Cache duration in seconds
@@ -400,7 +407,7 @@ export class SRC101Repository {
 
     queryParams.unshift(offset);
     
-    return (await dbManager.executeQueryWithCache(
+    return (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2,
@@ -431,7 +438,7 @@ export class SRC101Repository {
         WHERE ${whereClauses.join(" AND ")}
       `;
   
-      const total = (await dbManager.executeQueryWithCache(
+      const total = (await this.db.executeQueryWithCache(
         sqlQuery,
         queryParams,
         60 * 2, // Cache duration in seconds
@@ -466,7 +473,7 @@ export class SRC101Repository {
       ${params.limit ? `LIMIT ? OFFSET ?` : ""}
     `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
@@ -507,7 +514,7 @@ export class SRC101Repository {
       WHERE ${whereClauses.join(" AND ")}
     `;
   
-      const results = (await dbManager.executeQueryWithCache(
+      const results = (await this.db.executeQueryWithCache(
         sqlQuery,
         queryParams,
         60 * 2, // Cache duration in seconds
@@ -564,7 +571,7 @@ export class SRC101Repository {
     ${limitOffsetClause}
   `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
@@ -612,7 +619,7 @@ export class SRC101Repository {
       ${limit ? `LIMIT ? OFFSET ?` : ""}
     `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
@@ -660,7 +667,7 @@ export class SRC101Repository {
       ORDER BY last_update ${validOrder}
     `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
@@ -712,7 +719,7 @@ export class SRC101Repository {
       ${params.limit ? `LIMIT ? OFFSET ?` : ""}
     `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds

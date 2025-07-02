@@ -27,6 +27,13 @@ import type { StampFilters } from "$globals";
  * collections, and holder information with proper cache freshness calculations.
  */
 export class MarketDataRepository {
+  // Dependency injection support
+  private static db: typeof dbManager = dbManager;
+  
+  static setDatabase(database: typeof dbManager): void {
+    this.db = database;
+  }
+
   /**
    * Get market data for a single stamp by CPID
    * @param cpid - The CPID of the stamp
@@ -63,7 +70,7 @@ export class MarketDataRepository {
     `;
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         [cpid],
         DEFAULT_CACHE_DURATION
@@ -163,7 +170,7 @@ export class MarketDataRepository {
     queryParams.push(limit, offset);
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         queryParams,
         DEFAULT_CACHE_DURATION
@@ -290,7 +297,7 @@ export class MarketDataRepository {
     `;
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         [tick],
         DEFAULT_CACHE_DURATION
@@ -340,7 +347,7 @@ export class MarketDataRepository {
     `;
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         [collectionId],
         DEFAULT_CACHE_DURATION
@@ -381,7 +388,7 @@ export class MarketDataRepository {
     `;
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         [cpid],
         DEFAULT_CACHE_DURATION
@@ -449,7 +456,7 @@ export class MarketDataRepository {
     `;
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         cpids,
         DEFAULT_CACHE_DURATION
@@ -606,7 +613,7 @@ export class MarketDataRepository {
       LIMIT ?
     `;
 
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       [limit],
       DEFAULT_CACHE_DURATION

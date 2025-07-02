@@ -29,6 +29,13 @@ import { getMimeType, getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 
 export class StampRepository {
+  // Dependency injection support
+  private static db: typeof dbManager = dbManager;
+  
+  static setDatabase(database: typeof dbManager): void {
+    this.db = database;
+  }
+
   static sanitize(input: string): string {
     return input.replace(/[^\w.-]/gi, "");
   }
@@ -364,7 +371,7 @@ export class StampRepository {
       ${whereClause}
     `;
 
-    const resultTotal = await dbManager.executeQueryWithCache(
+    const resultTotal = await this.db.executeQueryWithCache(
       queryTotal,
       queryParams,
       60 * 3 // 3 minute cache in seconds
@@ -404,7 +411,7 @@ export class StampRepository {
         WHERE st.cpid IN (${assets.map(() => "?").join(",")})
       `;
 
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         assets,
         DEFAULT_CACHE_DURATION
@@ -483,7 +490,7 @@ export class StampRepository {
         whereClause,
       });
 
-      const data = await dbManager.executeQueryWithCache(
+      const data = await this.db.executeQueryWithCache(
         query,
         params,
         DEFAULT_CACHE_DURATION
@@ -872,7 +879,7 @@ export class StampRepository {
     console.log("[SQL DEBUG] With parameters:", queryParams);
 
     // Execute the data query
-    const dataResult = await dbManager.executeQueryWithCache(
+    const dataResult = await this.db.executeQueryWithCache(
       query,
       queryParams,
       cacheDuration
@@ -951,7 +958,7 @@ export class StampRepository {
         OFFSET ${offset}
       `;
 
-      const balances = await dbManager.executeQueryWithCache(
+      const balances = await this.db.executeQueryWithCache(
         query,
         assets,
         DEFAULT_CACHE_DURATION
@@ -1013,7 +1020,7 @@ export class StampRepository {
       ORDER BY cpid ASC
     `;
 
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       [],
       cacheDuration
@@ -1033,7 +1040,7 @@ export class StampRepository {
       WHERE address = ?
     `;
 
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       [address],
       "never"
@@ -1057,7 +1064,7 @@ export class StampRepository {
     `;
 
     try {
-      const result = await dbManager.executeQuery(query, [
+      const result = await this.db.executeQuery(query, [
         address,
         newName,
         newName,
@@ -1104,7 +1111,7 @@ export class StampRepository {
       AND st.ident IN ('STAMP', 'SRC-721')
     `;
 
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       [address],
       60 * 3 // 3 minute cache in seconds
@@ -1123,7 +1130,7 @@ export class StampRepository {
     `;
 
 
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       [tx_index],
       DEFAULT_CACHE_DURATION

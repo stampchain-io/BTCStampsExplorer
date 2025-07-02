@@ -11,6 +11,13 @@ import { dbManager } from "$server/database/databaseManager.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 
 export class SRC20Repository {
+  // Dependency injection support
+  private static db: typeof dbManager = dbManager;
+  
+  static setDatabase(database: typeof dbManager): void {
+    this.db = database;
+  }
+
   /**
    * Ensures a tick is in unicode escape format for DB operations
    * Accepts either emoji or unicode escape format and returns unicode escape
@@ -115,7 +122,7 @@ export class SRC20Repository {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
 
-    return await dbManager.executeQueryWithCache(
+    return await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2,
@@ -278,7 +285,7 @@ export class SRC20Repository {
 
       const fullQueryParams = [rowNumberInit, ...queryParams];
 
-      const results = await dbManager.executeQueryWithCache(
+      const results = await this.db.executeQueryWithCache(
         query,
         fullQueryParams,
         1000 * 60 * 5, // Cache duration
@@ -356,7 +363,7 @@ export class SRC20Repository {
       ${limitOffsetClause}
     `;
 
-    const results = await dbManager.executeQueryWithCache(
+    const results = await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2, // Cache duration
@@ -431,7 +438,7 @@ export class SRC20Repository {
     }
         `;
 
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2, // Cache duration: 2 minutes
@@ -460,7 +467,7 @@ export class SRC20Repository {
       LIMIT 1;
     `;
 
-    const data = await dbManager.executeQueryWithCache(
+    const data = await this.db.executeQueryWithCache(
       query,
       [unicodeTick],
       1000 * 60 * 2,
@@ -538,7 +545,7 @@ export class SRC20Repository {
       transactionCount, // Number of recent mint transactions to consider
       transactionCount, // For top_mints_percentage calculation
     ];
-    const results = await dbManager.executeQueryWithCache(
+    const results = await this.db.executeQueryWithCache(
       query,
       queryParams,
       1000 * 60 * 10, // Cache duration
@@ -565,7 +572,7 @@ export class SRC20Repository {
       LIMIT 1
     `;
     const params = [unicodeTick, unicodeTick, unicodeTick];
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       params,
       1000 * 60 * 10,
@@ -606,7 +613,7 @@ export class SRC20Repository {
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'TRANSFER') AS total_transfers
     `;
     const params = [unicodeTick, unicodeTick];
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       params,
       1000 * 60 * 2, // Cache duration
@@ -654,7 +661,7 @@ export class SRC20Repository {
     const queryParams = [searchParam, searchParam, searchParam, searchParam, startSearchParam];
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         sqlQuery,
         queryParams,
         1000 * 60 * 2 // Cache duration: 2 minutes
