@@ -1,0 +1,1623 @@
+{
+  "info": {
+    "name": "BTC Stamps Explorer API - Pagination & Validation Tests",
+    "description": "Comprehensive test suite for pagination boundary testing, data validation, and edge cases across all API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Pagination Boundary Tests",
+      "item": [
+        {
+          "name": "Stamps - Pagination Tests",
+          "item": [
+            {
+              "name": "Stamps - Zero Limit",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=0",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "limit", "value": "0"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Zero limit should return error or default', function() {",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                      "    if (pm.response.code === 400) {",
+                      "        pm.expect(responseData).to.have.property('error');",
+                      "    } else {",
+                      "        // Should use default limit if 0 is ignored",
+                      "        pm.expect(responseData.data).to.be.an('array');",
+                      "        pm.expect(responseData.data.length).to.be.at.least(1);",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Stamps - Negative Limit",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=-10",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "limit", "value": "-10"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Negative limit should return error', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "    pm.expect(responseData.error.toLowerCase()).to.include('invalid');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Stamps - Maximum Limit (1000)",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=1000",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "limit", "value": "1000"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Maximum limit should be handled', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                      "    const responseData = pm.response.json();",
+                      "    if (pm.response.code === 200) {",
+                      "        pm.expect(responseData.data).to.be.an('array');",
+                      "        pm.expect(responseData.data.length).to.be.at.most(1000);",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Stamps - Excessive Limit (10000)",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=10000",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "limit", "value": "10000"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Excessive limit should be capped or rejected', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                      "    const responseData = pm.response.json();",
+                      "    if (pm.response.code === 200) {",
+                      "        // Should cap at reasonable limit",
+                      "        pm.expect(responseData.data.length).to.be.at.most(1000);",
+                      "    } else {",
+                      "        pm.expect(responseData).to.have.property('error');",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Stamps - String Limit Value",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=abc",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "limit", "value": "abc"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('String limit should return error', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Stamps - Negative Page",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?page=-1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [
+                    {"key": "page", "value": "-1"},
+                    {"key": "limit", "value": "10"}
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Negative page should return error', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Stamps - Out of Range Page",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?page=999999&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [
+                    {"key": "page", "value": "999999"},
+                    {"key": "limit", "value": "10"}
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Out of range page should return empty results', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData.data).to.be.an('array').that.is.empty;",
+                      "    pm.expect(responseData).to.have.property('pagination');",
+                      "    pm.expect(responseData.pagination.page).to.equal(999999);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Stamps - Float Page Value",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?page=2.5&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [
+                    {"key": "page", "value": "2.5"},
+                    {"key": "limit", "value": "10"}
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Float page should be handled', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                      "    const responseData = pm.response.json();",
+                      "    if (pm.response.code === 200) {",
+                      "        // Should truncate to integer",
+                      "        pm.expect(responseData.pagination.page).to.be.oneOf([2, 3]);",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "SRC20 - Pagination Tests",
+          "item": [
+            {
+              "name": "SRC20 - Zero Limit",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src20?limit=0",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src20"],
+                  "query": [{"key": "limit", "value": "0"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Zero limit should return error or default', function() {",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "SRC20 - Maximum Limit Test",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src20?limit=500",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src20"],
+                  "query": [{"key": "limit", "value": "500"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Large limit should be handled', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData.data).to.be.an('array');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "SRC20 Balance - Pagination",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src20/balance/{{test_address}}?limit=10&page=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src20", "balance", "{{test_address}}"],
+                  "query": [
+                    {"key": "limit", "value": "10"},
+                    {"key": "page", "value": "1"}
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('SRC20 balance pagination should work', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                      "    if (pm.response.code === 200) {",
+                      "        const responseData = pm.response.json();",
+                      "        pm.expect(responseData).to.have.property('data');",
+                      "        pm.expect(responseData).to.have.property('pagination');",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "SRC101 - Pagination Tests",
+          "item": [
+            {
+              "name": "SRC101 - List with Pagination",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src101?limit=20&page=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src101"],
+                  "query": [
+                    {"key": "limit", "value": "20"},
+                    {"key": "page", "value": "1"}
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('SRC101 list should support pagination', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('data');",
+                      "    pm.expect(responseData).to.have.property('pagination');",
+                      "    pm.expect(responseData.pagination).to.have.all.keys('page', 'limit', 'totalPages', 'total');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "SRC101 - Invalid Limit",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src101?limit=-5",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src101"],
+                  "query": [{"key": "limit", "value": "-5"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Negative limit should return error', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Collections - Pagination Tests",
+          "item": [
+            {
+              "name": "Collections - List Pagination",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/collections?limit=10&page=2",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "collections"],
+                  "query": [
+                    {"key": "limit", "value": "10"},
+                    {"key": "page", "value": "2"}
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Collections should support pagination', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('pagination');",
+                      "    pm.expect(responseData.pagination.page).to.equal(2);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Cursed - Pagination Tests",
+          "item": [
+            {
+              "name": "Cursed - Boundary Limit",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/cursed?limit=999",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "cursed"],
+                  "query": [{"key": "limit", "value": "999"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Large limit should be capped', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData.data.length).to.be.at.most(100);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Data Validation Tests",
+      "item": [
+        {
+          "name": "SQL Injection Tests",
+          "item": [
+            {
+              "name": "Stamps - SQL Injection in ID",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps/1'; DROP TABLE stamps; --",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps", "1'; DROP TABLE stamps; --"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('SQL injection should be rejected', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "SRC20 - SQL Injection in Tick",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src20/tick/PEPE' OR '1'='1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src20", "tick", "PEPE' OR '1'='1"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('SQL injection should be handled safely', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 404]);",
+                      "    // Should not cause server error",
+                      "    pm.expect(pm.response.code).to.not.equal(500);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Address - SQL Injection",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/balance/1' UNION SELECT * FROM users--",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "balance", "1' UNION SELECT * FROM users--"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('SQL injection in address should fail', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Block - SQL Injection",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/block/1 OR 1=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "block", "1 OR 1=1"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('SQL injection in block should fail', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "SRC101 - SQL Injection in Deploy Hash",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src101/abc123' OR '1'='1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src101", "abc123' OR '1'='1"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('SQL injection in deploy hash should fail', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                      "    pm.expect(pm.response.code).to.not.equal(500);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Special Characters Tests",
+          "item": [
+            {
+              "name": "SRC20 - Unicode Emoji Tick",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src20/tick/🔥",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src20", "tick", "🔥"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Unicode emoji should be handled', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                      "    pm.expect(pm.response.code).to.not.equal(500);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Address - Special Characters",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/balance/<script>alert('xss')</script>",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "balance", "<script>alert('xss')</script>"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('XSS attempt should be rejected', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Stamps - URL Encoded Characters",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps/ident/%2F%2E%2E%2Fetc%2Fpasswd",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps", "ident", "%2F%2E%2E%2Fetc%2Fpasswd"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Path traversal attempt should fail', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                      "    pm.expect(pm.response.code).to.not.equal(500);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Collections - Special Characters in Creator",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/collections/creator/test@#$%^&*()",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "collections", "creator", "test@#$%^&*()"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Special characters in creator should be handled', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 404]);",
+                      "    pm.expect(pm.response.code).to.not.equal(500);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Type Tests",
+          "item": [
+            {
+              "name": "Block - String Instead of Number",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/block/abc",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "block", "abc"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('String block index should return error', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Block Count - Negative Number",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/block/block_count/-10",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "block", "block_count", "-10"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Negative block count should return error', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Stamps - Boolean as ID",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps/true",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps", "true"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Boolean as ID should return error', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "SRC101 - Invalid Token ID Type",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src101/{{test_deploy_hash}}/invalid-token-id",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src101", "{{test_deploy_hash}}", "invalid-token-id"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Invalid token ID type should return error', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "SRC20 - Float Amount in Balance",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src20/balance/{{test_address}}?min_balance=10.5",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src20", "balance", "{{test_address}}"],
+                  "query": [{"key": "min_balance", "value": "10.5"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Float balance filter should be handled', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Field Validation Tests",
+          "item": [
+            {
+              "name": "Invalid Bitcoin Address Format",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/balance/invalid_btc_address_12345",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "balance", "invalid_btc_address_12345"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Invalid Bitcoin address should return error', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "    pm.expect(responseData.error.toLowerCase()).to.include('address');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Invalid Transaction Hash Format",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src20/tx/not-a-valid-tx-hash",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src20", "tx", "not-a-valid-tx-hash"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Invalid transaction hash should return error', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Timestamp Format Validation",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?from_timestamp=invalid-date",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "from_timestamp", "value": "invalid-date"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Invalid timestamp should return error', function() {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('error');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cross-Environment Consistency",
+      "item": [
+        {
+          "name": "Pagination Consistency Check",
+          "item": [
+            {
+              "name": "Compare Stamps Pagination - Dev vs Prod",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "// This test requires running against both environments",
+                      "// Store results from dev environment for comparison",
+                      "if (pm.environment.get('current_env') === 'dev') {",
+                      "    pm.environment.set('dev_stamps_total', pm.response.json().pagination?.total || 0);",
+                      "    pm.environment.set('dev_stamps_pages', pm.response.json().pagination?.pages || 0);",
+                      "} else {",
+                      "    // Compare with production",
+                      "    const devTotal = pm.environment.get('dev_stamps_total');",
+                      "    const prodTotal = pm.response.json().pagination?.total || 0;",
+                      "    ",
+                      "    pm.test('Total counts should be reasonably close', function() {",
+                      "        // Allow for some difference due to data changes",
+                      "        const difference = Math.abs(devTotal - prodTotal);",
+                      "        const percentDiff = (difference / prodTotal) * 100;",
+                      "        pm.expect(percentDiff).to.be.below(10); // Less than 10% difference",
+                      "    });",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=50&page=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [
+                    {"key": "limit", "value": "50"},
+                    {"key": "page", "value": "1"}
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Compare SRC20 Data Structure",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Response structure should be consistent', function() {",
+                      "    const responseData = pm.response.json();",
+                      "    ",
+                      "    // Check pagination structure",
+                      "    pm.expect(responseData).to.have.property('pagination');",
+                      "    pm.expect(responseData.pagination).to.have.all.keys('page', 'limit', 'totalPages', 'total');",
+                      "    ",
+                      "    // Check data structure",
+                      "    pm.expect(responseData).to.have.property('data');",
+                      "    pm.expect(responseData.data).to.be.an('array');",
+                      "    ",
+                      "    if (responseData.data.length > 0) {",
+                      "        const firstItem = responseData.data[0];",
+                      "        // Store structure for comparison",
+                      "        pm.environment.set('src20_structure', JSON.stringify(Object.keys(firstItem)));",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src20?limit=5",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src20"],
+                  "query": [{"key": "limit", "value": "5"}]
+                }
+              }
+            },
+            {
+              "name": "Timestamp Format Consistency",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Timestamp formats should be consistent', function() {",
+                      "    const responseData = pm.response.json();",
+                      "    ",
+                      "    if (responseData.data && responseData.data.length > 0) {",
+                      "        const item = responseData.data[0];",
+                      "        ",
+                      "        // Check timestamp fields",
+                      "        const timestampFields = ['block_time', 'created_at', 'updated_at', 'timestamp'];",
+                      "        timestampFields.forEach(field => {",
+                      "            if (item[field]) {",
+                      "                // Verify ISO 8601 format",
+                      "                pm.expect(item[field]).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/);",
+                      "            }",
+                      "        });",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "limit", "value": "1"}]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Response Time Consistency",
+          "item": [
+            {
+              "name": "Measure Stamps Endpoint Performance",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Response time should be acceptable', function() {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000); // 2 seconds",
+                      "});",
+                      "",
+                      "// Store response time for comparison",
+                      "const envPrefix = pm.environment.get('current_env') === 'dev' ? 'dev' : 'prod';",
+                      "pm.environment.set(`${envPrefix}_stamps_response_time`, pm.response.responseTime);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=100",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "limit", "value": "100"}]
+                }
+              }
+            },
+            {
+              "name": "Measure SRC20 Endpoint Performance",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('SRC20 response time should be acceptable', function() {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(1500);",
+                      "});",
+                      "",
+                      "// Log if response is slow",
+                      "if (pm.response.responseTime > 1000) {",
+                      "    console.log(`Slow SRC20 response: ${pm.response.responseTime}ms`);",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/src20?limit=50",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "src20"],
+                  "query": [{"key": "limit", "value": "50"}]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Edge Cases",
+      "item": [
+        {
+          "name": "Concurrent Request Tests",
+          "item": [
+            {
+              "name": "Stamps - Rapid Pagination",
+              "event": [
+                {
+                  "listen": "pre-request",
+                  "script": {
+                    "exec": [
+                      "// Set up for concurrent testing",
+                      "pm.variables.set('test_timestamp', Date.now());"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Rapid requests should all succeed', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('data');",
+                      "    pm.expect(responseData).to.have.property('pagination');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=10&page={{$randomInt}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [
+                    {"key": "limit", "value": "10"},
+                    {"key": "page", "value": "{{$randomInt}}"}
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Boundary Value Tests",
+          "item": [
+            {
+              "name": "Stamps - Page Zero",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?page=0&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [
+                    {"key": "page", "value": "0"},
+                    {"key": "limit", "value": "10"}
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Page zero should be handled', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                      "    if (pm.response.code === 200) {",
+                      "        // Should treat as page 1",
+                      "        const responseData = pm.response.json();",
+                      "        pm.expect(responseData.pagination.page).to.be.oneOf([0, 1]);",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Stamps - Limit One",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "limit", "value": "1"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Limit one should return single item', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData.data).to.have.lengthOf(1);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Empty Result Set Handling",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?ident=INVALID_PROTOCOL_999",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "ident", "value": "INVALID_PROTOCOL_999"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Empty results should have correct structure', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData.data).to.be.an('array').that.is.empty;",
+                      "    pm.expect(responseData.pagination).to.exist;",
+                      "    pm.expect(responseData.pagination.total).to.equal(0);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Complex Filter Combinations",
+          "item": [
+            {
+              "name": "Valid Ident Values Test",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?ident={{test_ident}}&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [
+                    {"key": "ident", "value": "{{test_ident}}"},
+                    {"key": "limit", "value": "10"}
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "pre-request",
+                  "script": {
+                    "exec": [
+                      "// Test each valid ident value",
+                      "const validIdents = ['STAMP', 'SRC-20', 'SRC-721'];",
+                      "const randomIdent = validIdents[Math.floor(Math.random() * validIdents.length)];",
+                      "pm.variables.set('test_ident', randomIdent);"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Valid ident values should return results', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData.data).to.be.an('array');",
+                      "    ",
+                      "    // All returned items should have the requested ident",
+                      "    const requestedIdent = pm.variables.get('test_ident');",
+                      "    if (responseData.data.length > 0) {",
+                      "        responseData.data.forEach(item => {",
+                      "            pm.expect(item.ident).to.equal(requestedIdent);",
+                      "        });",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Multiple Filters with Pagination",
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=5&page=1&sort=desc&order_by=stamp&ident=SRC-20",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [
+                    {"key": "limit", "value": "5"},
+                    {"key": "page", "value": "1"},
+                    {"key": "sort", "value": "desc"},
+                    {"key": "order_by", "value": "stamp"},
+                    {"key": "ident", "value": "SRC-20"}
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Complex filters should work together', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    const responseData = pm.response.json();",
+                      "    pm.expect(responseData).to.have.property('pagination');",
+                      "    pm.expect(responseData.pagination.limit).to.equal(5);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Security Tests",
+      "item": [
+        {
+          "name": "Authorization Boundary Tests",
+          "item": [
+            {
+              "name": "Access Without Auth Headers",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Public endpoints should work without auth', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Rate Limiting Tests",
+          "item": [
+            {
+              "name": "Rapid Request Burst",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "// This would be run multiple times in quick succession",
+                      "pm.test('Should handle rapid requests', function() {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 429]);",
+                      "    if (pm.response.code === 429) {",
+                      "        pm.expect(pm.response.headers.get('Retry-After')).to.exist;",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "limit", "value": "1"}]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "CORS Validation",
+          "item": [
+            {
+              "name": "CORS Headers Check",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('CORS headers should be present', function() {",
+                      "    pm.expect(pm.response.headers.has('Access-Control-Allow-Origin')).to.be.true;",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "OPTIONS",
+                "header": [
+                  {"key": "Origin", "value": "http://localhost:3000"},
+                  {"key": "Access-Control-Request-Method", "value": "GET"}
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Performance Tests",
+      "item": [
+        {
+          "name": "Pagination Performance",
+          "item": [
+            {
+              "name": "Deep Pagination Performance",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Deep pagination should not timeout', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                      "});",
+                      "",
+                      "// Store metrics",
+                      "pm.environment.set('deep_pagination_time', pm.response.responseTime);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?page=100&limit=50",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [
+                    {"key": "page", "value": "100"},
+                    {"key": "limit", "value": "50"}
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Large Limit Performance",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Large result set should not timeout', function() {",
+                      "    pm.expect(pm.response.code).to.equal(200);",
+                      "    pm.expect(pm.response.responseTime).to.be.below(10000);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{"key": "Accept", "value": "application/json"}],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/stamps?limit=500",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v2", "stamps"],
+                  "query": [{"key": "limit", "value": "500"}]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request script",
+          "console.log('Running pagination test:', pm.info.requestName);",
+          "",
+          "// Set base URL based on environment",
+          "if (!pm.environment.get('base_url')) {",
+          "    pm.environment.set('base_url', pm.environment.get('dev_base_url'));",
+          "}",
+          "",
+          "// Set default test data if not present",
+          "if (!pm.environment.get('test_address')) {",
+          "    pm.environment.set('test_address', '1GotRejB6XsGgMsM79TvcypeanDJRJbMtg');",
+          "}",
+          "",
+          "if (!pm.environment.get('test_deploy_hash')) {",
+          "    pm.environment.set('test_deploy_hash', 'a1234567890abcdef');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "// Check for common issues",
+          "pm.test('No 500 errors', function() {",
+          "    pm.expect(pm.response.code).to.not.equal(500);",
+          "});",
+          "",
+          "// Log response time for performance tracking",
+          "if (pm.response.responseTime > 1000) {",
+          "    console.log('Slow response:', pm.info.requestName, pm.response.responseTime + 'ms');",
+          "}",
+          "",
+          "// Check for proper error format",
+          "if (pm.response.code >= 400) {",
+          "    pm.test('Error responses should have proper format', function() {",
+          "        const responseData = pm.response.json();",
+          "        pm.expect(responseData).to.have.property('error');",
+          "        pm.expect(responseData.error).to.be.a('string');",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://stampchain.io",
+      "type": "string"
+    },
+    {
+      "key": "test_stamp_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "test_address",
+      "value": "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg",
+      "type": "string"
+    },
+    {
+      "key": "test_block",
+      "value": "780000",
+      "type": "string"
+    },
+    {
+      "key": "test_tick",
+      "value": "STAMP",
+      "type": "string"
+    },
+    {
+      "key": "test_deploy_hash",
+      "value": "a1234567890abcdef",
+      "type": "string"
+    }
+  ]
+}

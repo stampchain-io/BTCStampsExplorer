@@ -5,8 +5,11 @@ on:
     branches: [main, dev]
     paths:
       - 'postman-collection-full-regression.json'
+      - 'postman-collection-pagination-validation.json'
       - 'postman-environment-comprehensive.json'
+      - 'postman-data-pagination-tests.json'
       - 'scripts/run-newman-comprehensive.sh'
+      - 'scripts/run-newman-pagination-validation.sh'
       - 'scripts/analyze-newman-regression.js'
       - 'server/**'
       - 'routes/**'
@@ -16,8 +19,11 @@ on:
     branches: [main, dev]
     paths:
       - 'postman-collection-full-regression.json'
+      - 'postman-collection-pagination-validation.json'
       - 'postman-environment-comprehensive.json'
+      - 'postman-data-pagination-tests.json'
       - 'scripts/run-newman-comprehensive.sh'
+      - 'scripts/run-newman-pagination-validation.sh'
       - 'scripts/analyze-newman-regression.js'
       - 'server/**'
       - 'routes/**'
@@ -335,6 +341,49 @@ jobs:
           fi
           
           echo "✅ All checks passed"
+
+  pagination-validation:
+    name: Pagination & Data Validation Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Newman
+        run: |
+          npm install -g newman newman-reporter-html newman-reporter-json
+
+      - name: Run Pagination Validation Tests
+        id: pagination-test
+        run: |
+          echo "## Pagination Validation Test Run" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Collection: postman-collection-pagination-validation.json" >> $GITHUB_STEP_SUMMARY
+          echo "- Test Data: postman-data-pagination-tests.json" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Run pagination validation tests
+          ./scripts/run-newman-pagination-validation.sh || PAGINATION_EXIT_CODE=$?
+          
+          exit ${PAGINATION_EXIT_CODE:-0}
+        continue-on-error: true
+
+      - name: Upload pagination test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pagination-validation-reports-${{ github.run_number }}
+          path: reports/newman-pagination-validation/
+          retention-days: 30
 
   performance-benchmark:
     name: API Performance Benchmarking
