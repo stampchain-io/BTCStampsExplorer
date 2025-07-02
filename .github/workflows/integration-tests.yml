@@ -174,4 +174,40 @@ jobs:
           echo "- Database connection problems"
           echo "- Missing test data or schema"
           echo "- Redis connection issues"
-          echo "- Network timeouts" 
+          echo "- Network timeouts"
+
+  newman-api-tests:
+    name: Newman API Regression Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: integration-tests
+    if: success()
+    
+    env:
+      CI: true
+      NODE_ENV: test
+      # Use production API for comparison in CI
+      DEV_BASE_URL: https://stampchain.io
+      PROD_BASE_URL: https://stampchain.io
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Newman Tests
+        run: |
+          echo "Running Newman API regression tests..."
+          docker-compose -f docker-compose.test.yml run --rm newman-comprehensive
+          
+      - name: Upload Newman Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-integration-reports-${{ github.run_number }}
+          path: reports/newman-comprehensive/
+          retention-days: 7 

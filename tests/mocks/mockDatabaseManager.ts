@@ -100,10 +100,21 @@ export class MockDatabaseManager {
       return this.mockResponses.get(mockKey)!;
     }
 
-    // Count queries - Check BEFORE stamp queries since count queries may also include table names
+    // Collection queries - check BEFORE count queries since collection queries may have COUNT in SELECT
     if (
-      normalizedQuery.includes("count(*)") ||
-      normalizedQuery.includes("count(*) as total")
+      normalizedQuery.includes("from collections") ||
+      normalizedQuery.includes("collections c") ||
+      normalizedQuery.includes("hex(c.collection_id)") // Specific to collection queries
+    ) {
+      return this.getCollectionData(normalizedQuery, params);
+    }
+
+    // Count queries - simple count queries that are not part of complex SELECTs
+    if (
+      (normalizedQuery.includes("count(*)") ||
+        normalizedQuery.includes("count(distinct")) &&
+      normalizedQuery.includes("as total") &&
+      !normalizedQuery.includes("hex(") // Exclude collection queries with count in SELECT
     ) {
       return this.getCountData(normalizedQuery, params);
     }
@@ -135,11 +146,6 @@ export class MockDatabaseManager {
       normalizedQuery.includes("src20valid") // Also match table name without FROM
     ) {
       return this.getSrc20Data(normalizedQuery, params);
-    }
-
-    // Collection queries
-    if (normalizedQuery.includes("from collections")) {
-      return this.getCollectionData(normalizedQuery, params);
     }
 
     // Creator queries
@@ -379,8 +385,138 @@ export class MockDatabaseManager {
   /**
    * Get collection data from fixtures
    */
-  private getCollectionData(_query: string, _params: unknown[]): QueryResult {
+  private getCollectionData(query: string, params: unknown[]): QueryResult {
+    const normalizedQuery = query.toLowerCase();
     const collectionFixtures = collectionFixturesData as any;
+
+    // Handle collection details queries with joins
+    if (
+      normalizedQuery.includes("hex(c.collection_id)") &&
+      normalizedQuery.includes("collections c")
+    ) {
+      const collections = collectionFixtures.collections || [];
+      const collectionCreators = collectionFixtures.collectionCreators || [];
+      const collectionStamps = collectionFixtures.collectionStamps || [];
+
+      // Transform collection data with creators and stamps
+      const transformedCollections = collections.map((collection: any) => {
+        // Find creators for this collection
+        const creators = collectionCreators
+          .filter((cc: any) => cc.collection_id === collection.collection_id)
+          .map((cc: any) => cc.creator_address);
+
+        // Find stamps for this collection
+        const stamps = collectionStamps
+          .filter((cs: any) => cs.collection_id === collection.collection_id)
+          .map((cs: any) => cs.stamp);
+
+        return {
+          collection_id: collection.collection_id,
+          collection_name: collection.collection_name,
+          collection_description: collection.collection_description,
+          creators: creators.join(","),
+          stamp_numbers: stamps.join(","),
+          stamp_count: stamps.length.toString(),
+          total_editions: (stamps.length * 100).toString(), // Mock total editions
+        };
+      });
+
+      // Apply filters
+      let filteredData = transformedCollections;
+
+      // Filter by creator if specified
+      if (
+        normalizedQuery.includes("where cc.creator_address = ?") && params[0]
+      ) {
+        const creatorAddress = params[0];
+        filteredData = filteredData.filter((c: any) =>
+          c.creators.includes(creatorAddress)
+        );
+      }
+
+      // Filter by minimum stamp count if HAVING clause is present
+      if (normalizedQuery.includes("having count(distinct cs.stamp) >= ?")) {
+        const minStampCountIndex = params.findIndex((p: any, idx: number) =>
+          typeof p === "number" &&
+          idx > 0 && // Skip first param if it's for creator filter
+          p > 0
+        );
+        if (minStampCountIndex >= 0) {
+          const minStampCount = params[minStampCountIndex] as number;
+          filteredData = filteredData.filter((c: any) =>
+            parseInt(c.stamp_count) >= minStampCount
+          );
+        }
+      }
+
+      // Handle pagination
+      const limitMatch = normalizedQuery.match(/limit\s+\?/i);
+      const offsetMatch = normalizedQuery.match(/offset\s+\?/i);
+      if (limitMatch && offsetMatch) {
+        const limit = params[params.length - 2] as number;
+        const offset = params[params.length - 1] as number;
+        filteredData = filteredData.slice(offset, offset + limit);
+      }
+
+      return { rows: filteredData };
+    }
+
+    // Handle collection by name
+    if (normalizedQuery.includes("where c.collection_name = ?")) {
+      const collectionName = params[0] as string;
+      const collection = collectionFixtures.collections.find(
+        (c: any) => c.collection_name === collectionName,
+      );
+
+      if (collection) {
+        const collectionCreators = collectionFixtures.collectionCreators || [];
+        const collectionStamps = collectionFixtures.collectionStamps || [];
+
+        const creators = collectionCreators
+          .filter((cc: any) => cc.collection_id === collection.collection_id)
+          .map((cc: any) => cc.creator_address);
+
+        const stamps = collectionStamps
+          .filter((cs: any) => cs.collection_id === collection.collection_id)
+          .map((cs: any) => cs.stamp);
+
+        return {
+          rows: [{
+            collection_id: collection.collection_id,
+            collection_name: collection.collection_name,
+            collection_description: collection.collection_description,
+            creators: creators.join(","),
+            stamp_count: stamps.length.toString(),
+            total_editions: (stamps.length * 100).toString(),
+          }],
+        };
+      }
+      return { rows: [] };
+    }
+
+    // Handle collection names query
+    if (
+      normalizedQuery.includes("select") &&
+      normalizedQuery.includes("collection_name")
+    ) {
+      const collections = collectionFixtures.collections || [];
+      const names = collections.map((c: any) => ({
+        collection_name: c.collection_name,
+      }));
+
+      // Handle pagination
+      const limitMatch = normalizedQuery.match(/limit\s+\?/i);
+      const offsetMatch = normalizedQuery.match(/offset\s+\?/i);
+      if (limitMatch && offsetMatch) {
+        const limit = params[params.length - 2] as number;
+        const offset = params[params.length - 1] as number;
+        return { rows: names.slice(offset, offset + limit) };
+      }
+
+      return { rows: names };
+    }
+
+    // Default - return all collections
     const collections = collectionFixtures.collections || [];
     return { rows: collections };
   }
@@ -428,7 +564,7 @@ export class MockDatabaseManager {
   /**
    * Get count data - return appropriate counts based on query
    */
-  private getCountData(query: string, _params: unknown[]): QueryResult {
+  private getCountData(query: string, params: unknown[]): QueryResult {
     const normalizedQuery = query.toLowerCase();
     const src20Fixtures = src20FixturesData as any;
     const collectionFixtures = collectionFixturesData as any;
@@ -484,9 +620,52 @@ export class MockDatabaseManager {
       return { rows: [{ total: src20Data.length }] };
     }
 
-    if (normalizedQuery.includes("from collections")) {
-      // Return total collections
-      return { rows: [{ total: collectionFixtures.collections?.length || 0 }] };
+    if (
+      normalizedQuery.includes("from collections") ||
+      normalizedQuery.includes("count(distinct c.collection_id)")
+    ) {
+      const collections = collectionFixtures.collections || [];
+      const collectionCreators = collectionFixtures.collectionCreators || [];
+
+      // Check if filtering by creator
+      if (
+        normalizedQuery.includes("join collection_creators") &&
+        params.length > 0
+      ) {
+        const creatorAddress = params[0];
+        const creatorCollectionIds = collectionCreators
+          .filter((cc: any) => cc.creator_address === creatorAddress)
+          .map((cc: any) => cc.collection_id);
+
+        const filteredCollections = collections.filter((c: any) =>
+          creatorCollectionIds.includes(c.collection_id)
+        );
+
+        return { rows: [{ total: filteredCollections.length }] };
+      }
+
+      // Check for minimum stamp count filter (with subquery)
+      if (normalizedQuery.includes("having count(distinct cs.stamp) >= ?")) {
+        const collectionStamps = collectionFixtures.collectionStamps || [];
+        const minStampCount = params[params.length - 1] as number;
+
+        // Count stamps per collection
+        const collectionStampCounts = new Map<string, number>();
+        collectionStamps.forEach((cs: any) => {
+          const count = collectionStampCounts.get(cs.collection_id) || 0;
+          collectionStampCounts.set(cs.collection_id, count + 1);
+        });
+
+        // Filter collections by minimum stamp count
+        const filteredCount = collections.filter((c: any) => {
+          const stampCount = collectionStampCounts.get(c.collection_id) || 0;
+          return stampCount >= minStampCount;
+        }).length;
+
+        return { rows: [{ total: filteredCount }] };
+      }
+
+      return { rows: [{ total: collections.length }] };
     }
 
     // Default count
