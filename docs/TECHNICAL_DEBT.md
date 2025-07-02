@@ -5,13 +5,13 @@
 **Date Added**: 2025-01-13  
 **Priority**: Medium  
 **Category**: Architecture / Testing  
-**Status**: IN PROGRESS (90% Complete)
+**Status**: IN PROGRESS (93% Complete)
 
 ### Description
 All repository classes (StampRepository, MarketDataRepository, SRC20Repository, etc.) currently use static methods and import dbManager directly as a singleton, making unit testing with mocks difficult.
 
 ### Current State
-**UPDATE 2025-01-14**: Migration 90% complete! 
+**UPDATE 2025-01-14**: Migration 93% complete! 
 - ✅ All repositories now have `setDatabase()` methods 
 - ✅ All repository methods updated to use `this.db` 
 - ✅ MockDatabaseManager created and uses existing fixtures
@@ -21,9 +21,10 @@ All repository classes (StampRepository, MarketDataRepository, SRC20Repository, 
 - ✅ marketDataRepository.unit.test.ts created with DI pattern (8/8 tests passing)
 - ✅ src20Repository.unit.test.ts created with DI pattern (10/10 tests passing)
 - ✅ collectionRepository.unit.test.ts created with DI pattern (13/13 tests passing)
+- ✅ blockRepository.unit.test.ts created with DI pattern (11/11 tests passing)
 - ✅ Mock properly filters stamp types and handles all query patterns
 - ✅ CI configuration updated with separate unit/integration test workflows
-- ⏳ Remaining unit tests: BlockRepository, SRC101Repository
+- ⏳ Remaining unit tests: SRC101Repository
 
 ### Completed Work
 1. **Subtask 1.1 & 1.2**: All repositories (StampRepository, MarketDataRepository, SRC20Repository, CollectionRepository, BlockRepository, SRC101Repository) now have:
@@ -55,8 +56,6 @@ All repository classes (StampRepository, MarketDataRepository, SRC20Repository, 
 
 ### Remaining Work
 1. **Complete Subtask 1.5**: Create remaining unit tests:
-   - CollectionRepository unit tests (subtask 2.6)
-   - BlockRepository unit tests (subtask 3.6)
    - SRC101Repository unit tests (subtask 4.6)
 
 2. **New Task 6**: Create DatabaseManager integration tests:
