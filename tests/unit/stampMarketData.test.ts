@@ -122,7 +122,10 @@ Deno.test("Stamp Market Data Unit Tests", async (t) => {
 
     assertExists(result.marketData);
     assertEquals(result.marketData.floorPriceBTC, 0.00015);
-    assertEquals(result.marketData.floorPriceUSD, 0.00015 * 95000);
+    assertEquals(
+      result.marketData.floorPriceUSD,
+      0.00015 * btcPriceFixture.btc_usd,
+    );
     assertEquals(result.marketData.holderCount, 42);
   });
 
