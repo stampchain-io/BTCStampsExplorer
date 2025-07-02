@@ -1,0 +1,118 @@
+{
+  "generatedAt": "2025-07-02T06:03:34.805Z",
+  "responses": {
+    "coingecko": {
+      "success": {
+        "status": 200,
+        "data": {
+          "bitcoin": {
+            "usd": 106641
+          }
+        },
+        "headers": {
+          "access-control-allow-headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+          "access-control-allow-methods": "POST, PUT, DELETE, GET, OPTIONS",
+          "access-control-allow-origin": "*",
+          "access-control-expose-headers": "link, per-page, total",
+          "access-control-request-method": "*",
+          "age": "37",
+          "alt-svc": "h3=\":443\"; ma=86400",
+          "alternate-protocol": "443:npn-spdy/2",
+          "cache-control": "max-age=30, public, must-revalidate, s-maxage=60",
+          "cf-cache-status": "HIT",
+          "cf-ray": "958bf0d77c1cd9dd-MIA",
+          "content-type": "application/json; charset=utf-8",
+          "date": "Wed, 02 Jul 2025 06:03:34 GMT",
+          "etag": "W/\"ce9604b07b71a54d1f3084ae3a7ff9d6\"",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "server": "cloudflare",
+          "strict-transport-security": "max-age=15724800; includeSubdomains",
+          "vary": "Accept-Encoding, Origin",
+          "x-content-type-options": "nosniff",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-request-id": "f7730c4f-19ca-43da-979d-3ba66bf9c463",
+          "x-runtime": "0.004855",
+          "x-xss-protection": "0"
+        }
+      },
+      "rateLimit": {
+        "status": 429,
+        "statusText": "Too Many Requests",
+        "headers": {
+          "content-type": "application/json",
+          "x-ratelimit-limit": "30",
+          "x-ratelimit-remaining": "0",
+          "x-ratelimit-reset": "1751436274943"
+        },
+        "body": {
+          "error": "Rate limit exceeded"
+        }
+      }
+    },
+    "binance": {
+      "success": {
+        "status": 200,
+        "data": {
+          "symbol": "BTCUSDT",
+          "price": "106669.01000000"
+        },
+        "headers": {
+          "access-control-allow-methods": "GET, HEAD, OPTIONS",
+          "access-control-allow-origin": "*",
+          "cache-control": "no-cache, no-store, must-revalidate",
+          "content-length": "46",
+          "content-security-policy": "default-src 'self'",
+          "content-type": "application/json;charset=UTF-8",
+          "date": "Wed, 02 Jul 2025 06:03:35 GMT",
+          "expires": "0",
+          "pragma": "no-cache",
+          "server": "nginx",
+          "strict-transport-security": "max-age=31536000; includeSubdomains",
+          "via": "1.1 7d306155ab8019f7c5a3e7c3468732de.cloudfront.net (CloudFront)",
+          "x-amz-cf-id": "KO_4zv8LMQDOyx0B_cm0lnoiqKMG9h_Q5QhbjELFMBomIr4uM4Sjqw==",
+          "x-amz-cf-pop": "MIA3-C5",
+          "x-cache": "Miss from cloudfront",
+          "x-content-security-policy": "default-src 'self'",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "SAMEORIGIN",
+          "x-mbx-used-weight": "2",
+          "x-mbx-used-weight-1m": "2",
+          "x-mbx-uuid": "0441b692-39d6-4315-81d2-dc8f194d3d1e",
+          "x-webkit-csp": "default-src 'self'",
+          "x-xss-protection": "1; mode=block"
+        }
+      },
+      "rateLimit": {
+        "status": 429,
+        "statusText": "Too Many Requests",
+        "headers": {
+          "content-type": "application/json",
+          "x-mbx-used-weight": "1200",
+          "x-mbx-used-weight-1m": "1200",
+          "retry-after": "60"
+        },
+        "body": {
+          "code": -1003,
+          "msg": "Too many requests."
+        }
+      }
+    },
+    "errors": {
+      "serverError": {
+        "status": 500,
+        "statusText": "Internal Server Error",
+        "body": "Server error"
+      },
+      "networkError": {
+        "message": "Network request failed",
+        "code": "ECONNREFUSED"
+      },
+      "invalidJson": {
+        "status": 200,
+        "body": "invalid json response {"
+      }
+    }
+  }
+}
