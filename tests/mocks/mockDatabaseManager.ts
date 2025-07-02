@@ -100,7 +100,15 @@ export class MockDatabaseManager {
       return this.mockResponses.get(mockKey)!;
     }
 
-    // Stamp queries
+    // Count queries - Check BEFORE stamp queries since count queries may also include table names
+    if (
+      normalizedQuery.includes("count(*)") ||
+      normalizedQuery.includes("count(*) as total")
+    ) {
+      return this.getCountData(normalizedQuery, params);
+    }
+
+    // Stamp queries (non-count)
     if (
       normalizedQuery.includes("from stamps") ||
       normalizedQuery.includes("from stampstablev4") ||
@@ -140,11 +148,6 @@ export class MockDatabaseManager {
     // Block queries
     if (normalizedQuery.includes("from blocks")) {
       return this.getBlockData(normalizedQuery, params);
-    }
-
-    // Count queries
-    if (normalizedQuery.includes("count(*)")) {
-      return this.getCountData(normalizedQuery, params);
     }
 
     // INSERT/UPDATE queries
@@ -362,7 +365,9 @@ export class MockDatabaseManager {
 
     if (
       normalizedQuery.includes("from stamps") ||
-      normalizedQuery.includes("stampstablev4")
+      normalizedQuery.includes("stampstablev4") ||
+      normalizedQuery.includes("stamptablev4") ||
+      normalizedQuery.includes("count(*) as total") // Common count pattern
     ) {
       const stampFixtures = stampFixturesData as any;
       let stamps = [

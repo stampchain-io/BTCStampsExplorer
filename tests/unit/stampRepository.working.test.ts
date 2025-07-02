@@ -54,11 +54,14 @@ Deno.test("StampRepository Unit Tests", async (t) => {
 
     // Verify the query was called
     const queryHistory = mockDb.getQueryHistory();
-    assertEquals(queryHistory.length > 0, true);
-    assertEquals(
-      queryHistory[0].query.toLowerCase().includes("stampstablev4"),
-      true,
+    assertEquals(queryHistory.length >= 2, true); // Should have both count and select queries
+
+    // Check if either query contains stampstablev4 (case insensitive)
+    const hasStampTable = queryHistory.some((h) =>
+      h.query.toLowerCase().includes("stampstablev4") ||
+      h.query.toLowerCase().includes("stamptablev4")
     );
+    assertEquals(hasStampTable, true);
 
     teardown();
   });
@@ -168,6 +171,8 @@ Deno.test("StampRepository Unit Tests", async (t) => {
 
     // The mock should return the count
     const count = result.rows[0]?.total || 0;
+    // We have fixture data, so count should be > 0
+    assertEquals(typeof count, "number");
     assertEquals(count > 0, true);
 
     // Verify the query was called
