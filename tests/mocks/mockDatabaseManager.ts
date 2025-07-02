@@ -31,13 +31,7 @@ export class MockDatabaseManager {
     // Log the query for verification in tests
     this.queryHistory.push({ query, params });
 
-    // Check if there's a specific mock response set for this query
-    const mockKey = this.generateMockKey(query, params);
-    if (this.mockResponses.has(mockKey)) {
-      return Promise.resolve(this.mockResponses.get(mockKey) as T);
-    }
-
-    // Otherwise, return data based on query patterns
+    // Get mock data (which checks for custom responses first)
     const result = this.getMockDataForQuery(query, params);
     return Promise.resolve(result as T);
   }
@@ -99,7 +93,12 @@ export class MockDatabaseManager {
    */
   private getMockDataForQuery(query: string, params: unknown[]): QueryResult {
     const normalizedQuery = query.toLowerCase();
-    console.log("[MOCK DB] Query:", normalizedQuery);
+
+    // Check if there's a specific mock response set first
+    const mockKey = this.generateMockKey(query, params);
+    if (this.mockResponses.has(mockKey)) {
+      return this.mockResponses.get(mockKey)!;
+    }
 
     // Stamp queries
     if (
@@ -148,6 +147,13 @@ export class MockDatabaseManager {
       return this.getCountData(normalizedQuery, params);
     }
 
+    // INSERT/UPDATE queries
+    if (
+      normalizedQuery.includes("insert") || normalizedQuery.includes("update")
+    ) {
+      return this.getMutationResult(normalizedQuery, params);
+    }
+
     // Default empty result
     return { rows: [] };
   }
@@ -164,28 +170,40 @@ export class MockDatabaseManager {
       ...stampFixtures.stampsWithMarketData,
     ];
 
-    // Filter by CPID if present
-    if (query.includes("where") && query.includes("cpid")) {
-      const cpidIndex = params.findIndex((p) =>
-        typeof p === "string" && p.length > 0
-      );
-      if (cpidIndex >= 0) {
-        const cpid = params[cpidIndex];
-        stamps = stamps.filter((s) => s.cpid === cpid);
-      }
-    }
+    const normalizedQuery = query.toLowerCase();
 
-    // Filter by stamp number if present
-    if (query.includes("where") && query.includes("stamp =")) {
-      const stampIndex = params.findIndex((p) => typeof p === "number");
-      if (stampIndex >= 0) {
-        const stampNum = params[stampIndex];
-        stamps = stamps.filter((s) => s.stamp === stampNum);
+    // Filter by stamp type based on WHERE clause
+    if (normalizedQuery.includes("where")) {
+      // Regular stamps filter: (st.stamp >= 0 AND st.ident != 'SRC-20')
+      if (
+        normalizedQuery.includes("st.stamp >= 0") &&
+        normalizedQuery.includes("st.ident != 'src-20'")
+      ) {
+        stamps = stamps.filter((s) => s.stamp >= 0 && s.ident !== "SRC-20");
+      } // Cursed stamps filter: (st.stamp < 0)
+      else if (normalizedQuery.includes("st.stamp < 0")) {
+        stamps = stamps.filter((s) => s.stamp < 0);
+      } // Filter by CPID if present
+      else if (normalizedQuery.includes("cpid")) {
+        const cpidIndex = params.findIndex((p) =>
+          typeof p === "string" && p.length > 0
+        );
+        if (cpidIndex >= 0) {
+          const cpid = params[cpidIndex];
+          stamps = stamps.filter((s) => s.cpid === cpid);
+        }
+      } // Filter by stamp number if present
+      else if (normalizedQuery.includes("stamp =")) {
+        const stampIndex = params.findIndex((p) => typeof p === "number");
+        if (stampIndex >= 0) {
+          const stampNum = params[stampIndex];
+          stamps = stamps.filter((s) => s.stamp === stampNum);
+        }
       }
     }
 
     // Apply limit if present
-    if (query.includes("limit")) {
+    if (normalizedQuery.includes("limit")) {
       const limitMatch = query.match(/limit\s+(\d+|\?)/i);
       if (limitMatch) {
         const limitIndex = params.length - 2; // Usually second to last param
@@ -339,7 +357,6 @@ export class MockDatabaseManager {
    */
   private getCountData(query: string, _params: unknown[]): QueryResult {
     const normalizedQuery = query.toLowerCase();
-    const stampFixtures = stampFixturesData as any;
     const src20Fixtures = src20FixturesData as any;
     const collectionFixtures = collectionFixturesData as any;
 
@@ -347,11 +364,29 @@ export class MockDatabaseManager {
       normalizedQuery.includes("from stamps") ||
       normalizedQuery.includes("stampstablev4")
     ) {
-      // Return total stamp count
-      const totalStamps = stampFixtures.regularStamps.length +
-        stampFixtures.cursedStamps.length +
-        stampFixtures.src20Stamps.length;
-      return { rows: [{ total: totalStamps }] };
+      const stampFixtures = stampFixturesData as any;
+      let stamps = [
+        ...stampFixtures.regularStamps,
+        ...stampFixtures.cursedStamps,
+        ...stampFixtures.src20Stamps,
+        ...stampFixtures.stampsWithMarketData,
+      ];
+
+      // Apply same filters as getStampData for consistent counting
+      if (normalizedQuery.includes("where")) {
+        if (
+          normalizedQuery.includes("st.stamp >= 0") &&
+          normalizedQuery.includes("st.ident != 'src-20'")
+        ) {
+          stamps = stamps.filter((s: any) =>
+            s.stamp >= 0 && s.ident !== "SRC-20"
+          );
+        } else if (normalizedQuery.includes("st.stamp < 0")) {
+          stamps = stamps.filter((s: any) => s.stamp < 0);
+        }
+      }
+
+      return { rows: [{ total: stamps.length }] };
     }
 
     if (normalizedQuery.includes("from src20valid")) {
@@ -401,5 +436,17 @@ export class MockDatabaseManager {
         ? query.toLowerCase().includes(queryPattern.toLowerCase())
         : queryPattern.test(query);
     }).length;
+  }
+
+  /**
+   * Get result for INSERT/UPDATE/DELETE queries
+   */
+  private getMutationResult(_query: string, _params: unknown[]): QueryResult {
+    // Return a successful mutation result by default
+    return {
+      rows: [],
+      affectedRows: 1,
+      insertId: 1,
+    };
   }
 }
