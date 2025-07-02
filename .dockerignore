@@ -1,1 +1,16 @@
-node_modules/
+# Ignore node modules and other build artifacts
+node_modules
+.npm
+.deno
+npm-debug.log
+.DS_Store
+.git
+.github
+tmp/
+
+# Local build output directory that might contain problematic native modules
+build/
+
+# Ignore platform-specific artifacts that could cause issues
+**/*.arm64
+**/*.aarch64

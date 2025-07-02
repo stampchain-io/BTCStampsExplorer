@@ -1,4 +1,3 @@
-// api/v2/stamps/[id].ts
-import { getStampByIdOrIdentifier } from "$lib/controller/sharedHandlers.ts";
+import { createStampHandler } from "$handlers/sharedStampHandler.ts";
 
-export const handler = getStampByIdOrIdentifier;
+export const handler = createStampHandler({ type: "stamps", isIndex: false });

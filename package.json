@@ -1,0 +1,42 @@
+{
+  "name": "btcstampsexplorer",
+  "description": "This is the API for https://stampchain.io/ and the open source block explorer for Bitcoin Stamps.",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "validate:schema": "npx @redocly/cli@latest lint --config .redocly.yaml --format stylish ./schema.yml",
+    "validate:ci": "npm run validate:schema",
+    "test:api": "docker-compose -f docker-compose.test.yml run --rm newman",
+    "test:api:simple": "docker-compose -f docker-compose.test.yml run --rm newman-simple",
+    "test:api:advanced": "docker-compose -f docker-compose.test.yml run --rm newman-advanced",
+    "test:api:parallel": "docker-compose -f docker-compose.test.yml run --rm newman-parallel",
+    "test:api:performance": "docker-compose -f docker-compose.test.yml run --rm newman-performance",
+    "test:api:enhanced": "NEWMAN_COLLECTION=postman-collection-enhanced.json NEWMAN_REPORTERS=cli,html,json,enhanced docker-compose -f docker-compose.test.yml run --rm newman",
+    "test:api:folder": "NEWMAN_FOLDER=${FOLDER:-} docker-compose -f docker-compose.test.yml run --rm newman",
+    "test:api:verbose": "NEWMAN_VERBOSE=true docker-compose -f docker-compose.test.yml run --rm newman",
+    "test:api:bail": "NEWMAN_BAIL=true docker-compose -f docker-compose.test.yml run --rm newman",
+    "test:api:iterations": "NEWMAN_ITERATIONS=${ITERATIONS:-3} docker-compose -f docker-compose.test.yml run --rm newman",
+    "test:api:timeout": "NEWMAN_TIMEOUT=${TIMEOUT:-60000} docker-compose -f docker-compose.test.yml run --rm newman",
+    "test:api:dev-only": "PROD_BASE_URL=http://host.docker.internal:8000 docker-compose -f docker-compose.test.yml run --rm newman",
+    "test:api:prod-only": "DEV_BASE_URL=https://stampchain.io docker-compose -f docker-compose.test.yml run --rm newman",
+    "test:api:all": "npm run test:api:simple && npm run test:api:advanced && npm run test:api:performance",
+    "test:api:clean": "rm -rf reports/newman* && docker-compose -f docker-compose.test.yml run --rm newman",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "bitcoinjs-lib": "7.0.0-rc.0",
+    "readable-stream": "4.3.0",
+    "tiny-secp256k1": "^2.2.3"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  },
+  "main": "swagger.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

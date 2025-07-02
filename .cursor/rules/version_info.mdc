@@ -1,0 +1,17 @@
+---
+description: "Provides Deno and Fresh version information for project context."
+globs: []
+alwaysApply: true
+---
+
+# Reference
+# The main developer guidelines live in `AGENTS.md` at the repository root.
+# This file supplements those instructions with explicit version data for AI
+# context.
+
+
+# Adding version control information for better AI context
+version_info:
+  deno: "2.3.3"
+  fresh: "1.7.3"
+  project: "BTCStampsExplorer"

@@ -1,0 +1,91 @@
+---
+description: "Standards for code formatting, linting rules, and automated checks. Includes relevant Deno tasks."
+globs: ["deno.json", "*.{ts,tsx,js,jsx,json}"] 
+alwaysApply: true
+---
+
+code_quality:
+  formatting:
+    line_width: 80
+    indent: 2
+    use_spaces: true
+    single_quote: false
+    proseWrap: "preserve"
+    commands:
+      check: "deno task check:fmt"
+      debug: "deno task check:fmt:debug"
+    excludes:
+      - "**/_fresh/**/*"
+      - "**/server/**/*"
+      - "**/node_modules/**/*"
+      - "**/dist/**/*"
+      - "**/.git/**/*"
+      - "**/coverage/**/*"
+      - "**/tmp/**/*"
+      - "**/.cache/**/*"
+      - "**/.*/"
+      - "**/.*"
+      - "**/build/**/*"
+      - "**/vendor/**/*"
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/schema.yml"
+      - "**/swagger/**/*.yml"
+      - "**/swagger/**/*.yaml"
+      - "**/.redocly.*"
+      - "**/*.css"
+      - "**/*.md"
+      - "**/*.html"
+      - "**/static/**/*"
+      - ".vscode/**/*"
+      - ".idea/**/*"
+      - ".github/**/*"
+      - ".git/**/*"
+      - ".env*"
+    file_types:
+      include: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"]
+    ci:
+      workflow: "github-actions"
+      step_name: "Check formatting"
+      command: "deno task check:fmt"
+  linting:
+    rules:
+      tags:
+        - "fresh"
+        - "recommended"
+      include:
+        - "ban-untagged-todo"
+        - "no-node-buffer"
+        - "prefer-native-node-imports"
+      exclude:
+        - "no-explicit-any"
+    include_paths:
+      - "routes/"
+      - "components/"
+      - "islands/"
+      - "lib/"
+      - "utils/"
+      - "client/"
+      - "tests/"
+    exclude_paths:
+      - "**/_fresh/**/*"
+      - "**/node_modules/**/*"
+      - "**/dist/**/*"
+      - "**/.git/**/*"
+      - "**/coverage/**/*"
+      - "**/tmp/**/*"
+      - "**/.cache/**/*"
+      - "**/build/**/*"
+      - "**/vendor/**/*"
+    commands:
+      check: "deno task check:lint"
+      debug: "deno task check:lint:debug"
+  checks:
+    command: "deno task check:fmt && deno task check:lint"
+    run: "before commits"
+    sequence:
+      - format: "deno task check:fmt"
+      - lint: "deno task check:lint"
+    debug_commands:
+      format: "deno task check:fmt:debug"
+      lint: "deno task check:lint:debug"

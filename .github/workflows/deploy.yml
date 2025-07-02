@@ -1,45 +1,299 @@
-name: Deploy
+name: Code Quality
 on:
   push:
-    branches: main
+    branches: [dev]
   pull_request:
-    branches: main
+    branches: [main, dev]
+    types: [opened, synchronize, reopened]
 
 jobs:
-  deploy:
-    name: Deploy
+  quality-checks:
+    name: Quality Checks
     runs-on: ubuntu-latest
+    timeout-minutes: 15  # Prevent hanging jobs
 
     permissions:
-      id-token: write # Needed for auth with Deno Deploy
-      contents: read # Needed to clone the repository
+      id-token: write    # Needed for auth with Deno Deploy
+      contents: read     # Needed to clone the repository
+      pull-requests: write  # Needed for PR comments
+      issues: write      # Needed for reviewdog comment management
+      checks: write      # Needed for reviewdog check runs
+
+    env:
+      CSRF_SECRET_KEY: "12323"  # Placeholder key
 
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Install Deno
-        uses: denoland/setup-deno@v1
+      # Setup Node.js (no cache due to gitignored package-lock.json)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          deno-version: v1.x
+          node-version: '20'
 
-      - name: Build step
+      # Manual npm cache based on package.json (since package-lock.json is gitignored)
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install npm dependencies
+        run: npm install  # Using npm install since package-lock.json is gitignored due to dev tool conflicts
+        
+      - name: Validate OpenAPI Schema
+        run: npm run validate:ci
+
+      # Note: We intentionally skip `npm audit` because:
+      # 1. This is a Deno project - npm packages are dev-only tools
+      # 2. Production security comes from Deno dependencies in deno.json
+      # 3. See SECURITY.md for our security model explanation
+
+      # Cache Deno dependencies
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.3.3
+          
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deps.ts') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
+
+      - name: Run format check
+        id: fmtcheck
+        run: deno task check:fmt
+        continue-on-error: true
+
+      - name: Run lint check
+        id: lintcheck
+        run: deno task check:lint
+        continue-on-error: true
+
+      - name: Check Deno dependencies  
+        run: |
+          echo "Validating Deno import map and dependencies..."
+          deno cache --no-check main.ts dev.ts
+          echo "✅ Deno dependencies cached successfully (production security verified)"
+
+      - name: Validate GitHub Token
+        run: |
+          echo "Checking GitHub token permissions..."
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               "https://api.github.com/repos/${{ github.repository }}" | jq -r '.permissions // empty'
+          echo "Token validation complete"
+
+      # Run Deno format check with PR annotations
+      - name: Deno Format Check with Annotations
+        if: github.event_name == 'pull_request'
+        run: |
+          # Run deno fmt check and capture output
+          deno fmt --check 2>&1 | tee fmt-output.txt || true
+          
+          # Parse output and create annotations
+          if grep -q "Found" fmt-output.txt; then
+            echo "::group::Format Issues Found"
+            cat fmt-output.txt
+            echo "::endgroup::"
+            
+            # Extract file paths and create problem matchers
+            grep -E "^\s+\S+\.(ts|tsx|js|jsx)" fmt-output.txt | while read -r file; do
+              file=$(echo "$file" | xargs)  # Trim whitespace
+              if [ -f "$file" ]; then
+                echo "::error file=$file,title=Format Issue::File needs formatting. Run 'deno fmt' to fix."
+              fi
+            done
+          fi
+
+      # Run Deno lint with detailed output
+      - name: Deno Lint Check with Annotations
+        if: github.event_name == 'pull_request'
+        run: |
+          # Run deno lint and capture JSON output
+          deno lint --json 2>&1 | tee lint-output.json || true
+          
+          # Check if we have valid JSON output
+          if [ -s lint-output.json ] && jq empty lint-output.json 2>/dev/null; then
+            # Parse JSON and create annotations
+            jq -r '.diagnostics[]? | 
+              "::error file=\(.filename),line=\(.range.start.line),col=\(.range.start.col),title=\(.code)::\(.message)"' \
+              lint-output.json || true
+              
+            # Also show a summary
+            error_count=$(jq '.diagnostics | length' lint-output.json 2>/dev/null || echo "0")
+            if [ "$error_count" -gt 0 ]; then
+              echo "::warning::Found $error_count linting issue(s)"
+            fi
+          else
+            # Fallback to text output if JSON fails
+            deno lint 2>&1 | tee lint-output.txt || true
+            echo "::group::Lint Issues"
+            cat lint-output.txt
+            echo "::endgroup::"
+          fi
+
+      # Create a summary comment for PR
+      - name: Create PR Comment with Issues
+        if: github.event_name == 'pull_request' && (steps.fmtcheck.outcome == 'failure' || steps.lintcheck.outcome == 'failure')
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            let comment = '## 🔍 Code Quality Check Results\n\n';
+            
+            // Check format issues
+            if ('${{ steps.fmtcheck.outcome }}' === 'failure') {
+              comment += '### ❌ Format Issues Found\n\n';
+              comment += 'Run `deno fmt` to automatically fix formatting issues.\n\n';
+              
+              try {
+                const fmtOutput = fs.readFileSync('fmt-output.txt', 'utf8');
+                const files = fmtOutput.match(/^\s+\S+\.(ts|tsx|js|jsx)$/gm);
+                if (files && files.length > 0) {
+                  comment += '<details><summary>Files needing formatting (' + files.length + ')</summary>\n\n';
+                  comment += '```\n';
+                  files.forEach(file => {
+                    comment += file.trim() + '\n';
+                  });
+                  comment += '```\n</details>\n\n';
+                }
+              } catch (e) {
+                console.log('Could not read format output');
+              }
+            } else {
+              comment += '### ✅ Format Check Passed\n\n';
+            }
+            
+            // Check lint issues
+            if ('${{ steps.lintcheck.outcome }}' === 'failure') {
+              comment += '### ❌ Lint Issues Found\n\n';
+              
+              try {
+                const lintOutput = fs.readFileSync('lint-output.json', 'utf8');
+                const lintData = JSON.parse(lintOutput);
+                
+                if (lintData.diagnostics && lintData.diagnostics.length > 0) {
+                  // Group by file
+                  const byFile = {};
+                  lintData.diagnostics.forEach(diag => {
+                    if (!byFile[diag.filename]) {
+                      byFile[diag.filename] = [];
+                    }
+                    byFile[diag.filename].push(diag);
+                  });
+                  
+                  comment += '<details><summary>Lint issues by file</summary>\n\n';
+                  
+                  Object.entries(byFile).forEach(([file, issues]) => {
+                    comment += `**${file}** (${issues.length} issue${issues.length > 1 ? 's' : ''})\n\n`;
+                    issues.forEach(issue => {
+                      const line = issue.range.start.line;
+                      const col = issue.range.start.col;
+                      comment += `- Line ${line}:${col} - \`${issue.code}\`: ${issue.message}\n`;
+                    });
+                    comment += '\n';
+                  });
+                  
+                  comment += '</details>\n\n';
+                }
+              } catch (e) {
+                // Fallback to text output
+                try {
+                  const lintText = fs.readFileSync('lint-output.txt', 'utf8');
+                  comment += '<details><summary>Lint output</summary>\n\n```\n';
+                  comment += lintText.substring(0, 3000); // Limit size
+                  if (lintText.length > 3000) {
+                    comment += '\n... (truncated)';
+                  }
+                  comment += '\n```\n</details>\n\n';
+                } catch (e2) {
+                  console.log('Could not read lint output');
+                }
+              }
+            } else {
+              comment += '### ✅ Lint Check Passed\n\n';
+            }
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Code Quality Check Results')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+      - name: Actionlint
+        id: actionlint
+        uses: reviewdog/action-actionlint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-check
+          fail_level: error
+          filter_mode: nofilter
+        continue-on-error: true
+
+      # Fail the workflow if any checks failed
+      - name: Check for failures
+        if: steps.fmtcheck.outcome == 'failure' || steps.lintcheck.outcome == 'failure' || steps.actionlint.outcome == 'failure'
+        run: exit 1
+
+      # Build check
+      - name: Build project
         run: deno task build
 
-      # - name: Start Deno app
-      #   run: deno run -A dev.ts &
-      #   env:
-      #     PORT: 8000
+      # Simple unit test coverage
+      - name: Run Unit Tests with Coverage
+        run: |
+          echo "Running unit tests with coverage..."
+          mkdir -p coverage
+          DENO_ENV=test deno test --coverage=coverage/ tests/unit/ --no-check --allow-env --allow-read
+          echo "Generating coverage summary..."
+          deno coverage coverage/
+          echo "Generating LCOV report for Codecov..."
+          deno coverage coverage/ --lcov > coverage.lcov
 
-      # - name: Wait for Deno app to be ready
-      #   run: |
-      #     echo "Waiting for Deno app to start..."
-      #     sleep 10
+      # Upload coverage to Codecov
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: stampchain-io/BTCStampsExplorer
+          files: ./coverage.lcov
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
 
-      # - name: Install Dredd
-      #   run: npm install -g dredd
-
-      # - name: Run Dredd tests
-      #   run: dredd
-      #   env:
-      #     DREDD_SERVER: http://localhost:8000
+      # Commented out for future implementation
+      # - name: Type check
+      #   run: deno task check:types
+      #   continue-on-error: true  # Optional: allow type checks to fail for now

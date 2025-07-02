@@ -1,0 +1,16 @@
+runner:
+  denofmt:
+    cmd: deno fmt --check . 2>&1 | ./scripts/transform-deno-output.sh fmt
+    format: rdjson
+    level: warning
+    name: deno-fmt
+  denolint:
+    cmd: deno lint --json . 2>&1 | ./scripts/transform-deno-output.sh lint
+    format: rdjson
+    level: warning
+    name: deno-lint
+
+github:
+  reporter: github-pr-review
+  filter_mode: added
+  fail_on_error: false

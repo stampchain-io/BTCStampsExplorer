@@ -1,0 +1,58 @@
+name: Docker Build Test
+
+on:
+  workflow_run:
+    workflows: ["Code Quality"]
+    types:
+      - completed
+    branches:
+      - main
+      - dev
+
+jobs:
+  docker-build-test:
+    # Only run if the Code Quality workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: stamps-app:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test container startup
+        run: |
+          # Run container in detached mode without port binding
+          docker run -d \
+            --name test-container \
+            stamps-app:test  # Not binding port for CI, but still exposed in Dockerfile
+
+          # Wait briefly to check for immediate crashes
+          sleep 5
+
+          # Check if container is still running
+          if ! docker ps | grep test-container > /dev/null; then
+            echo "Container crashed during startup"
+            docker logs test-container
+            exit 1
+          fi
+
+          echo "Container built and started successfully"
+          
+          # Show logs
+          docker logs test-container
+
+          # Clean up
+          docker stop test-container
+          docker rm test-container

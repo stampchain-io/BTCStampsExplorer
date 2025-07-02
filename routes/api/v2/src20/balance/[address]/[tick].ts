@@ -1,32 +1,77 @@
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
-import { Client } from "$mysql/mod.ts";
-import { AddressTickHandlerContext, Src20BalanceResponseBody } from "globals";
-import { ResponseUtil } from "utils/responseUtil.ts"; // Import the responseUtil helper
+import { Handlers } from "$fresh/server.ts";
+import { AddressTickHandlerContext } from "$globals";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import {
+  checkEmptyResult,
+  DEFAULT_PAGINATION,
+  validateRequiredParams,
+  validateSortParam,
+} from "$server/services/routeValidationService.ts";
 
-export const handler = async (
-  _req: Request,
-  ctx: AddressTickHandlerContext,
-): Promise<Response> => {
-  const { address, tick } = ctx.params;
-  try {
-    const client = await getClient();
-    const last_block = await CommonClass.get_last_block_with_client(client);
-    const src20 = await Src20Class.get_src20_balance_with_client(
-      client as Client,
-      address,
-      tick.toString(),
-    );
+export const handler: Handlers<AddressTickHandlerContext> = {
+  async GET(req, ctx) {
+    try {
+      const { address, tick } = ctx.params;
 
-    if (!src20) {
-      return ResponseUtil.error(`Error: SRC20 balance not found`, 404);
+      // Validate required parameters
+      const paramsValidation = validateRequiredParams({ address, tick });
+      if (!paramsValidation.isValid) {
+        return paramsValidation.error!;
+      }
+
+      const url = new URL(req.url);
+      const params = url.searchParams;
+      const includePagination = params.get("includePagination") === "true";
+
+      // Get pagination parameters if pagination is included
+      let paginationParams: { limit?: number; page?: number } = {};
+      if (includePagination) {
+        const pagination = getPaginationParams(url);
+
+        // Check if pagination validation failed
+        if (pagination instanceof Response) {
+          return pagination;
+        }
+
+        const { limit, page } = pagination;
+        paginationParams = { limit, page };
+      }
+
+      // Validate sort parameter
+      const sortValidation = validateSortParam(url);
+      if (!sortValidation.isValid) {
+        return sortValidation.error!;
+      }
+
+      const balanceParams = {
+        address,
+        tick: decodeURIComponent(String(tick)),
+        includePagination,
+        limit: paginationParams.limit || DEFAULT_PAGINATION.limit,
+        page: paginationParams.page || DEFAULT_PAGINATION.page,
+        amt: Number(params.get("amt")) || undefined,
+        sortBy: sortValidation.data,
+      };
+
+      const result = await Src20Controller.handleSrc20BalanceRequest(
+        balanceParams,
+      );
+
+      // Check for empty result
+      const emptyCheck = checkEmptyResult(result, "balance data");
+      if (emptyCheck) {
+        return emptyCheck;
+      }
+
+      return ResponseUtil.success(result);
+    } catch (error) {
+      console.error("Error in GET handler:", error);
+      return ResponseUtil.internalError(
+        error,
+        "Error processing SRC20 balance request",
+      );
     }
-
-    const body: Src20BalanceResponseBody = {
-      last_block: last_block.rows[0]["last_block"],
-      data: src20,
-    };
-    return ResponseUtil.success(body);
-  } catch (_error) {
-    return ResponseUtil.error(`Error: Internal server error`);
-  }
+  },
 };

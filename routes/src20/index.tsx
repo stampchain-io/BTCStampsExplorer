@@ -1,65 +1,102 @@
-import { HandlerContext } from "$fresh/server.ts";
+/* ===== SRC20 OVERVIEW PAGE ===== */
+/*@baba-149*/
+import { Handlers } from "$fresh/server.ts";
+import { SRC20OverviewContent } from "$content";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
-import { paginate } from "utils/util.ts";
-import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
-import { SRC20DeployTable } from "$islands/src20/SRC20DeployTable.tsx";
-
-//TODO: Add pagination
-
-export const handler = {
-  async GET(req: Request, ctx: HandlerContext) {
+/* ===== SERVER HANDLER ===== */
+export const handler: Handlers = {
+  async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
-      const limit = Number(url.searchParams.get("limit")) || 1000;
       const page = Number(url.searchParams.get("page")) || 1;
+      const limit = Number(url.searchParams.get("limit")) || 20;
+      const timeframe = (url.searchParams.get("timeframe") || "24H") as
+        | "24H"
+        | "3D"
+        | "7D";
+      const sortBy = url.searchParams.get("sortBy") || "TRENDING";
+      const sortDirection = url.searchParams.get("sortDirection") || "desc";
 
-      const client = await getClient();
-      const data = await Src20Class.get_valid_src20_tx_with_client(
-        client,
-        null,
-        null,
-        "DEPLOY",
+      // Use controller methods with sorting parameters
+      const [mintedData, mintingData] = await Promise.all([
+        Src20Controller.fetchFullyMintedByMarketCapV2(
+          limit,
+          page,
+          sortBy,
+          sortDirection,
+        ),
+        Src20Controller.fetchTrendingActiveMintingTokensV2(
+          limit,
+          page,
+          1000,
+          sortBy,
+          sortDirection,
+        ),
+      ]);
+
+      // Debug pagination data
+      console.log("Debug Pagination:", {
+        minted: {
+          dataLength: mintedData.data.length,
+          total: mintedData.total,
+          page: mintedData.page,
+          totalPages: mintedData.totalPages,
+        },
+        minting: {
+          dataLength: mintingData.data.length,
+          total: mintingData.total,
+          page: mintingData.page,
+          totalPages: mintingData.totalPages,
+        },
+      });
+
+      return ctx.render({
+        mintedData: {
+          data: mintedData.data,
+          total: mintedData.total,
+          page: mintedData.page,
+          totalPages: mintedData.totalPages,
+        },
+        mintingData: {
+          data: mintingData.data,
+          total: mintingData.total,
+          page: mintingData.page,
+          totalPages: mintingData.totalPages,
+        },
         limit,
-        page,
-      );
-      const total = await Src20Class.get_total_valid_src20_tx_with_client(
-        client,
-        null,
-        "DEPLOY",
-      );
-      const last_block = await CommonClass.get_last_block_with_client(client);
-
-      const pagination = paginate(total.rows[0]["total"], page, limit);
-
-      const body = {
-        ...pagination,
-        last_block: last_block.rows[0]["last_block"],
-        data: data.rows.map((row) => {
-          return {
-            ...row,
-            max: row.max ? row.max.toString() : null,
-            lim: row.lim ? row.lim.toString() : null,
-            amt: row.amt ? row.amt.toString() : null,
-          };
-        }),
-      };
-      return await ctx.render(body);
+        timeframe,
+        sortBy,
+        sortDirection,
+      });
     } catch (error) {
       console.error(error);
-      const body = { error: `Error: Internal server error` };
-      return ctx.render(body);
+      return ctx.render({ error: `Error: Internal server error` });
     }
   },
 };
 
-export function SRC20Page(props) {
-  const { data, total, page, pages, limit } = props.data;
+/* ===== PAGE COMPONENT ===== */
+export default function SRC20OverviewPage({ data }: any) {
+  if (!data || (!data.mintedData && !data.mintingData)) {
+    return <div>Error: No data received</div>;
+  }
+
+  const {
+    mintedData,
+    mintingData,
+    timeframe = "24H",
+    sortBy = "TRENDING",
+    sortDirection = "desc",
+  } = data;
+
   return (
-    <div class="flex flex-col gap-8">
-      <SRC20Header />
-      <SRC20DeployTable data={data} />
-    </div>
+    <SRC20OverviewContent
+      mintedData={mintedData}
+      mintingData={mintingData}
+      timeframe={timeframe}
+      sortBy={sortBy}
+      sortDirection={sortDirection}
+    />
   );
 }
-export default SRC20Page;

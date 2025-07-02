@@ -1,0 +1,321 @@
+import { BigFloat } from "bigfloat/mod.ts";
+import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
+
+// Helper constant for satoshi conversion
+
+export function abbreviateAddress(address: string, length = 4): string {
+  if (!address) return "";
+  return `${address.slice(0, length)}...${address.slice(-length)}`;
+}
+
+export function formatBTCAmount(
+  btc: number,
+  options: {
+    includeSymbol?: boolean;
+    decimals?: number;
+    stripZeros?: boolean;
+    excludeSuffix?: boolean;
+  } = {},
+): string {
+  const {
+    includeSymbol = true,
+    decimals = 8,
+    stripZeros = true,
+    excludeSuffix = false,
+  } = options;
+
+  const formatted = btc.toFixed(decimals);
+  const result = stripZeros ? stripTrailingZeros(formatted) : formatted;
+  return includeSymbol && !excludeSuffix ? `${result} BTC` : result;
+}
+
+export function formatSatoshisToBTC(
+  satoshis: number,
+  options: {
+    includeSymbol?: boolean;
+    decimals?: number;
+    stripZeros?: boolean;
+  } = {},
+): string {
+  // Check if the number already appears to be in BTC (has decimal places)
+  const isAlreadyBTC = satoshis.toString().includes(".");
+  const btcValue = isAlreadyBTC ? satoshis : satoshis / SATOSHIS_PER_BTC;
+
+  return formatBTCAmount(btcValue, options);
+}
+
+export function formatSatoshisToUSD(
+  satoshis: number,
+  btcPrice: number,
+  options: {
+    decimals?: number;
+    includeSymbol?: boolean;
+  } = {},
+): string {
+  const { decimals = 2, includeSymbol = false } = options;
+
+  // Convert satoshis to BTC then to USD
+  const btcValue = satoshis / SATOSHIS_PER_BTC;
+  const usdValue = btcValue * btcPrice;
+
+  // Format with specified decimal places
+  const formatted = usdValue.toFixed(decimals);
+
+  // Return with or without symbol
+  return includeSymbol ? `$${formatted}` : formatted;
+}
+
+export function formatNumber(value: number, decimals: number = 8): string {
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+interface DateFormatOptions {
+  timeZone?: boolean;
+  month?: "short" | "long" | "numeric" | "2-digit";
+  year?: "numeric" | "2-digit";
+  day?: "numeric" | "2-digit";
+  includeRelative?: boolean;
+}
+
+export function formatDate(
+  date: Date,
+  options: DateFormatOptions = {},
+): string {
+  // Check for invalid date
+  if (!date || isNaN(date.getTime())) {
+    return "INVALID";
+  }
+
+  const locale = navigator.language || "en-US";
+  const formatOptions: Intl.DateTimeFormatOptions = {};
+
+  // Add timeZone if requested (default: true)
+  if (options.timeZone !== false) {
+    formatOptions.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  }
+
+  // Add other format options if provided
+  if (options.month) formatOptions.month = options.month;
+  if (options.year) formatOptions.year = options.year;
+  if (options.day) formatOptions.day = options.day;
+
+  const formattedDate = date.toLocaleDateString(locale, formatOptions);
+
+  // Add relative time if requested
+  if (options.includeRelative) {
+    return `${formattedDate} (${dayjs(date).fromNow()})`;
+  }
+
+  return formattedDate;
+}
+
+export function stripTrailingZeros(num: number | string): string {
+  const str = num.toString();
+  const parts = str.split(".");
+  if (parts.length === 1) {
+    return str; // No decimal point, return as is
+  }
+  const integerPart = parts[0];
+  const decimalPart = parts[1].replace(/0+$/, "");
+  return decimalPart.length > 0 ? `${integerPart}.${decimalPart}` : integerPart;
+}
+
+export function bigFloatToString(
+  value: BigFloat,
+  precision: number = 3,
+): string {
+  const stringValue = value.toString();
+  const [integerPart, fractionalPart] = stringValue.split(".");
+
+  if (!fractionalPart) {
+    return integerPart;
+  }
+
+  const roundedFractionalPart = fractionalPart.slice(0, precision);
+  const result = `${integerPart}.${roundedFractionalPart}`;
+
+  // Remove trailing zeros
+  return result.replace(/\.?0+$/, "");
+}
+
+export function formatSupplyValue(
+  supply: number | string | undefined,
+  divisible: boolean,
+): string {
+  if (supply === undefined) return "0";
+
+  if (typeof supply === "string") {
+    supply = parseInt(supply);
+  }
+  return divisible ? (supply / 100000000).toFixed(2) : supply.toString();
+}
+
+export function isIntOr32ByteHex(value: string) {
+  const isInt = Number.isInteger(value) ||
+    (typeof value === "string" && Number.isInteger(Number(value)));
+
+  const is32ByteHex = typeof value === "string" &&
+    /^[0-9a-fA-F]{64}$/.test(value);
+
+  return isInt || is32ByteHex;
+}
+
+export function categorizeInput(
+  value: string | number,
+): "number" | "hex_string" | "none" {
+  if (
+    (typeof value === "string" && /^\d+$/.test(value)) ||
+    Number.isInteger(value)
+  ) {
+    return "number";
+  }
+
+  if (typeof value === "string" && /^[0-9a-fA-F]+$/.test(value)) {
+    return "hex_string";
+  }
+
+  return "none";
+}
+
+export function formatBigInt(value: bigint): string {
+  return value.toString();
+}
+
+export function bigIntSerializer(_key: string, value: unknown): unknown {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+  return value;
+}
+
+export function jsonStringifyWithBigInt(obj: object): string {
+  return JSON.stringify(obj, bigIntSerializer);
+}
+
+export function formatUSDValue(value: number): number {
+  // Round to 2 decimal places and ensure it's a number
+  return Number(value.toFixed(2));
+}
+
+/**
+ * Formats a numeric string by removing leading zeros before the decimal
+ * and trailing zeros after the decimal point
+ * @param value The string value to format
+ * @returns Formatted string without unnecessary zeros
+ */
+export function formatAmount(value: string): string {
+  const [whole, decimal = ""] = value.replace(/^0+/, "").split(".");
+  const trimmedDecimal = decimal.replace(/0+$/, "");
+  return trimmedDecimal ? `${whole}.${trimmedDecimal}` : whole;
+}
+
+export function decodeBase64(base64String: string) {
+  // Use atob to decode the base64 string to a binary string
+  const binaryString = atob(base64String);
+
+  // Convert the binary string to a Uint8Array
+  const utf8Array = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    utf8Array[i] = binaryString.charCodeAt(i);
+  }
+
+  // Decode the Uint8Array back to a UTF-8 string
+  const decodedText = new TextDecoder().decode(utf8Array);
+  return decodedText;
+}
+
+/**
+ * Formats a number by adding commas as thousand separators
+ * @param num The number to format
+ * @returns Formatted string with commas
+ */
+export function formatNumberWithCommas(num: number): string {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+/**
+ * Formats BTC value for market data display with appropriate precision
+ * @param btc The BTC value to format
+ * @param options Formatting options
+ * @returns Formatted BTC string
+ */
+export function formatBTC(btc: number | null | undefined, options: {
+  includeSymbol?: boolean;
+  decimals?: number;
+  fallback?: string;
+} = {}): string {
+  const {
+    includeSymbol = false,
+    decimals = 8,
+    fallback = "N/A",
+  } = options;
+
+  if (btc === null || btc === undefined) return fallback;
+
+  // For very small values, use more decimals
+  let actualDecimals = decimals;
+  if (btc < 0.0001 && btc > 0) {
+    actualDecimals = 8;
+  } else if (btc < 0.01) {
+    actualDecimals = 6;
+  } else if (btc < 1) {
+    actualDecimals = 4;
+  } else {
+    actualDecimals = 2;
+  }
+
+  const formatted = btc.toFixed(actualDecimals).replace(/\.?0+$/, "");
+  return includeSymbol ? `${formatted} BTC` : formatted;
+}
+
+/**
+ * Formats 24h volume for display
+ * @param volume The volume in BTC
+ * @returns Formatted volume string
+ */
+export function formatVolume(volume: number | null | undefined): string {
+  if (volume === null || volume === undefined) return "N/A";
+
+  if (volume < 0.0001) return "<0.0001";
+  if (volume < 0.01) return volume.toFixed(4);
+  if (volume < 1) return volume.toFixed(3);
+  if (volume < 100) return volume.toFixed(2);
+
+  return formatNumberWithCommas(Math.round(volume));
+}
+
+/**
+ * Formats percentage change
+ * @param percentage The percentage value
+ * @returns Formatted percentage string with + or - sign
+ */
+export function formatPercentage(
+  percentage: number | null | undefined,
+): string {
+  if (percentage === null || percentage === undefined) return "N/A";
+
+  const sign = percentage >= 0 ? "+" : "";
+  return `${sign}${percentage.toFixed(2)}%`;
+}
+
+/**
+ * Formats market cap
+ * @param marketCap The market cap in BTC
+ * @returns Formatted market cap string
+ */
+export function formatMarketCap(marketCap: number | null | undefined): string {
+  if (marketCap === null || marketCap === undefined) return "N/A";
+
+  if (marketCap < 0.01) return formatBTC(marketCap, { decimals: 6 });
+  if (marketCap < 1) return formatBTC(marketCap, { decimals: 4 });
+  if (marketCap < 1000) return formatBTC(marketCap, { decimals: 2 });
+
+  return `${formatNumberWithCommas(Math.round(marketCap))}`;
+}

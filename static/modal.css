@@ -1,0 +1,770 @@
+#animation-modal-container {
+  /* Common variables */
+  /*  --animation-duration-modal: 0s;
+--animation-delay-background: 0s;
+--animation-delay-modal: 0s;
+defined individually 
+  */
+  --animation-timing: cubic-bezier(0.250, 0.100, 0.250, 1.000);
+  --animation-bg: rgba(66, 66, 66, .3);
+  --animation-duration-background: .5s;
+  --animation-cleanup-delay: .5s;
+
+  /* Base modal container styles */
+  position: fixed;
+  display: table;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  transform: scale(0);
+  z-index: 50;
+
+  /* Common styles for all scale/zoom animations */
+  &[class*="scale"],
+  &.zoomInOut {
+    transform: scale(1);
+
+    .animation-modal-background {
+      background: var(--animation-bg);
+      animation: fadeModalIn var(--animation-duration-background) var(--animation-timing) forwards;
+
+      .animation-modal {
+        opacity: 0;
+      }
+    }
+
+    +.content {
+      animation: scaleContentBack var(--animation-duration-background) var(--animation-timing) forwards;
+    }
+
+    &.out {
+      .animation-modal-background {
+        animation: fadeModalOut var(--animation-duration-background) var(--animation-timing) forwards;
+      }
+
+      +.content {
+        animation: scaleContentForward var(--animation-duration-background) var(--animation-timing) forwards;
+      }
+    }
+  }
+
+  /* Specific animation variants */
+  &.scaleUpDown {
+    .animation-modal {
+      animation: scaleBottomUp 0.3s var(--animation-timing) forwards;
+    }
+
+    &.out {
+      animation: scaleBottomDown 0s var(--animation-cleanup-delay) linear forwards;
+
+      .animation-modal {
+        animation: scaleBottomDown 0.5s var(--animation-timing) forwards;
+      }
+    }
+  }
+
+  &.scaleDownUp {
+    .animation-modal-background {
+      vertical-align: top;
+    }
+
+    .animation-modal {
+      animation: scaleTopDown 0.3s var(--animation-timing) forwards;
+    }
+
+    &.out {
+      animation: scaleTopUp 0s var(--animation-cleanup-delay) linear forwards;
+
+      .animation-modal {
+        animation: scaleTopUp 0.5s var(--animation-timing) forwards;
+      }
+    }
+  }
+
+  &.zoomInOut {
+    .animation-modal {
+      animation: zoomCenterIn 0.4s var(--animation-timing) forwards;
+    }
+
+    &.out {
+      animation: zoomCenterOut 0s var(--animation-cleanup-delay) linear forwards;
+
+      .animation-modal {
+        animation: zoomCenterOut 0.4s var(--animation-timing) forwards;
+      }
+    }
+  }
+
+  .animation-modal-background {
+    display: table-cell;
+    background: rgba(66, 66, 66, .3);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    text-align: center;
+    vertical-align: middle;
+
+    .animation-modal {
+      display: inline-block;
+      position: relative;
+      text-align: left;
+    }
+  }
+}
+
+@keyframes scaleBottomUp {
+  0% {
+    transform: scale(.95) translateY(100vh);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleBottomDown {
+  0% {
+    transform: scale(.95) translateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) translateY(100vh);
+    opacity: 0;
+  }
+}
+
+@keyframes scaleTopDown {
+  0% {
+    transform: scale(.95) translateY(-100vh);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleTopUp {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(.95) translateY(-100vh);
+    opacity: 0;
+  }
+}
+
+@keyframes zoomCenterIn {
+  0% {
+    transform: scale(.3);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomCenterOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(.3);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeModalIn {
+  0% {
+    background: rgba(66, 66, 66, 0);
+  }
+
+  100% {
+    background: var(--animation-bg);
+  }
+}
+
+@keyframes fadeModalOut {
+  0% {
+    background: var(--animation-bg);
+  }
+
+  100% {
+    background: rgba(66, 66, 66, 0);
+  }
+}
+
+@keyframes scaleContentBack {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(.95);
+  }
+}
+
+@keyframes scaleContentForward {
+  0% {
+    transform: scale(.95);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ===== UNFOLDING ===== */
+/*
+  &.unfolding {
+    transform: scaleY(0.75) scaleX(0.75);
+    animation: unfoldIn 1s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+    .animation-modal-background {
+      .animation-modal {
+        transform: scale(0);
+        animation: zoomIn .5s .8s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+      }
+    }
+
+    &.out {
+      transform: scale(1);
+      animation: unfoldOut 1s .3s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+      .animation-modal-background {
+        .animation-modal {
+          animation: zoomOut .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+        }
+      }
+    }
+  }*/
+
+/* ===== REVEALING ===== */
+/*
+  &.revealing {
+    transform: scale(1);
+
+    .animation-modal-background {
+      background: rgba(0, 0, 0, .0);
+      animation: fadeIn .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+      .animation-modal {
+        opacity: 0;
+        animation: scaleUp .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+      }
+    }
+
+    +.content {
+      animation: scaleContentBack .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+    }
+
+    &.out {
+      animation: quickScaleDown 0s .5s linear forwards;
+
+      .animation-modal-background {
+        animation: fadeOut .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+        .animation-modal {
+          animation: scaleDown .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+        }
+      }
+
+      +.content {
+        animation: scaleContentForward .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+      }
+    }
+  }
+
+  &.uncovering {
+    z-index: 0;
+    transform: scale(1);
+
+    .animation-modal-background {
+      background: rgba(0, 0, 0, .6);
+
+      .animation-modal {
+        animation: moveUp .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+      }
+    }
+
+    +.content {
+      z-index: 1;
+      animation: slideUpLarge .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+    }
+
+    &.out {
+      .animation-modal-background {
+        .animation-modal {
+          animation: moveDown .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+        }
+      }
+
+      +.content {
+        animation: slideDownLarge .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+      }
+    }
+  }*/
+
+/* ===== BLOW UP ===== */
+/*
+  &.blow {
+    z-index: 0;
+    transform: scale(1);
+
+    .animation-modal-background {
+      background: rgba(0, 0, 0, .7);
+
+      .animation-modal {
+        animation: blowUpModal .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+      }
+    }
+
+    +.content {
+      z-index: 1;
+      animation: blowUpContent .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+    }
+
+    &.out {
+      .animation-modal-background {
+        .animation-modal {
+          animation: blowUpModalTwo .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+        }
+      }
+
+      +.content {
+        animation: blowUpContentTwo .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+      }
+    }
+  }
+*/
+/* ===== ROAD RUNNER ===== */
+/*
+  &.meep {
+    transform: scale(1);
+
+    .animation-modal-background {
+      background: rgba(0, 0, 0, .0);
+      animation: fadeIn .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+      .animation-modal {
+        transform: translateX(-1500px);
+        animation: roadRunnerIn .3s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+      }
+    }
+
+    &.out {
+      animation: quickScaleDown 0s .5s linear forwards;
+
+      .animation-modal-background {
+        animation: fadeOut .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+        .animation-modal {
+          animation: roadRunnerOut .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+        }
+      }
+    }
+  }
+*/
+/* ===== SKETCH ===== */
+/* &.sketch {
+    transform: scale(1);
+
+    .animation-modal-background {
+      background: rgba(0, 0, 0, 0.8);
+      animation: fadeIn .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+      .animation-modal {
+        background-color: transparent;
+        animation: modalFadeIn .5s .8s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+        h2,
+        p {
+          opacity: 0;
+          position: relative;
+          animation: modalContentFadeIn .5s 1s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+        }
+
+        .modal-svg {
+          rect {
+            animation: sketchIn .5s .3s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+          }
+        }
+      }
+    }
+
+    &.out {
+      animation: quickScaleDown 0s .5s linear forwards;
+
+      .animation-modal-background {
+        animation: fadeOut .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+        .animation-modal {
+          animation: modalFadeOut .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+          h2,
+          p {
+            animation: modalContentFadeOut .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+          }
+
+          .modal-svg {
+            rect {
+              animation: sketchOut .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+            }
+          }
+        }
+      }
+    }
+  }
+*/
+
+/* ===== BOND ===== */
+/*
+  &.bond {
+    transform: scale(1);
+
+    .animation-modal-background {
+      background: rgba(0, 0, 0, .0);
+      animation: fadeIn .5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+      .animation-modal {
+        height: 75px;
+        width: 75px;
+        border-radius: 75px;
+        overflow: hidden;
+        animation: bondJamesBond 1.5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+        h2,
+        h3,
+        h4,
+        p,
+        img {
+          opacity: 0;
+          position: relative;
+          animation: modalContentFadeIn .5s 1.4s linear forwards;
+        }
+      }
+    }
+
+    &.out {
+      animation: slowFade .5s 1.5s linear forwards;
+
+      .animation-modal-background {
+        background-color: rgba(0, 0, 0, .7);
+        animation: fadeToRed 2s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+        .animation-modal {
+          border-radius: 3px;
+          height: 162px;
+          width: 227px;
+          animation: killShot 1s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+
+          h2,
+          p {
+            animation: modalContentFadeOut .5s .5 cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+          }
+        }
+      }
+    }
+  }
+  */
+
+
+/*
+@keyframes unfoldIn {
+  0% {
+    transform: scaleY(.005) scaleX(0);
+  }
+
+  50% {
+    transform: scaleY(.005) scaleX(1);
+  }
+
+  100% {
+    transform: scaleY(1) scaleX(1);
+  }
+}
+
+@keyframes unfoldOut {
+  0% {
+    transform: scaleY(1) scaleX(1);
+  }
+
+  50% {
+    transform: scaleY(.005) scaleX(1);
+  }
+
+  100% {
+    transform: scaleY(.005) scaleX(0);
+  }
+}
+
+@keyframes quickScaleDown {
+  0% {
+    transform: scale(1);
+  }
+
+  99.9% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(0);
+  }
+}
+
+@keyframes slideUpLarge {
+  0% {
+    transform: translateY(0%);
+  }
+
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes slideDownLarge {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes moveUp {
+  0% {
+    transform: translateY(100vh);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes moveDown {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes blowUpContent {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  99.9% {
+    transform: scale(2);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(0);
+  }
+}
+
+@keyframes blowUpContentTwo {
+  0% {
+    transform: scale(2);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes blowUpModal {
+  0% {
+    transform: scale(0);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes blowUpModalTwo {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}*/
+
+/*
+@keyframes roadRunnerIn {
+  0% {
+    transform: translateX(-1500px) skewX(30deg) scaleX(1.3);
+  }
+
+  70% {
+    transform: translateX(30px) skewX(0deg) scaleX(.9);
+  }
+
+  100% {
+    transform: translateX(0px) skewX(0deg) scaleX(1);
+  }
+}
+
+@keyframes roadRunnerOut {
+  0% {
+    transform: translateX(0px) skewX(0deg) scaleX(1);
+  }
+
+  30% {
+    transform: translateX(-30px) skewX(-5deg) scaleX(.9);
+  }
+
+  100% {
+    transform: translateX(1500px) skewX(30deg) scaleX(1.3);
+  }
+}
+
+@keyframes sketchIn {
+  0% {
+    stroke-dashoffset: 778;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes sketchOut {
+  0% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: 778;
+  }
+}
+
+@keyframes modalFadeIn {
+  0% {
+    background: transparent;
+  }
+
+  100% {
+    background: linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff),
+      #000000;
+  }
+}
+
+@keyframes modalFadeOut {
+  0% {
+    background: linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff),
+      #000000;
+  }
+
+  100% {
+    background: transparent;
+  }
+}
+
+@keyframes modalContentFadeIn {
+  0% {
+    opacity: 0;
+    top: -20px;
+  }
+
+  100% {
+    opacity: 1;
+    top: 0;
+  }
+}
+
+@keyframes modalContentFadeOut {
+  0% {
+    opacity: 1;
+    top: 0px;
+  }
+
+  100% {
+    opacity: 0;
+    top: -20px;
+  }
+}
+
+@keyframes bondJamesBond {
+  0% {
+    transform: translateX(1000px);
+  }
+
+  80% {
+    transform: translateX(0px);
+    border-radius: 75px;
+    height: 75px;
+    width: 75px;
+  }
+
+  90% {
+    border-radius: 3px;
+    height: 444px;
+    width: 692px;
+  }
+
+  100% {
+    border-radius: 3px;
+    height: 424px;
+    width: 672px;
+  }
+}
+
+@keyframes killShot {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(300px) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeToRed {
+  0% {
+    background-color: rgba(black, .6);
+  }
+
+  100% {
+    background-color: rgba(red, .8);
+  }
+}
+
+@keyframes slowFade {
+  0% {
+    opacity: 1;
+  }
+
+  99.9% {
+    opacity: 0;
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(0);
+  }
+}*/

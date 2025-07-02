@@ -1,0 +1,19 @@
+extends:
+  - recommended
+apis:
+  main:
+    root: schema.yml
+    rules:
+      operation-2xx-response:
+        severity: error
+        excludePaths:
+          - '/api/v2/error#get'
+      operation-4xx-response: warn
+      no-path-trailing-slash: warn
+      no-server-example.com: warn
+      no-empty-servers: warn
+      operation-operationId-unique: warn
+      no-invalid-media-type-examples: warn
+    theme:
+      openapi:
+        hideLogo: true 

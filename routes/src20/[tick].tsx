@@ -1,175 +1,119 @@
-import { HandlerContext } from "$fresh/server.ts";
-import { SRC20TickHeader } from "$components/src20/SRC20TickHeader.tsx";
-import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
-import { SRC20DetailsTab } from "$islands/src20/SRC20DetailsTab.tsx";
+/* ===== SRC20 DETAIL PAGE ===== */
+import { Handlers } from "$fresh/server.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { SRC20DetailHeader } from "$header";
+import { DataTableBase, HoldersTable } from "$table";
+import ChartWidget from "$islands/layout/ChartWidget.tsx";
 
-import {
-  CommonClass,
-  getClient,
-  Src20Class,
-} from "../../lib/database/index.ts";
-import { BigFloat, set_precision } from "bigfloat/mod.ts";
-import { convertEmojiToTick } from "utils/util.ts";
-
-export const handler: Handlers<StampRow> = {
-  async GET(req: Request, ctx: HandlerContext) {
+/* ===== SERVER HANDLER ===== */
+export const handler: Handlers = {
+  async GET(_req, ctx) {
     try {
-      let { tick } = ctx.params;
-      tick = convertEmojiToTick(tick);
-      const url = new URL(req.url);
-      const limit = Number(url.searchParams.get("limit")) || 200;
-      const page = Number(url.searchParams.get("page")) || 1;
+      /* ===== TOKEN IDENTIFICATION ===== */
+      const rawTick = ctx.params.tick;
+      const decodedTick = decodeURIComponent(rawTick);
+      const encodedTick = encodeURIComponent(rawTick);
 
-      const client = await getClient();
-      const deployment = await Src20Class
-        .get_valid_src20_tx_with_client(
-          client,
-          null,
-          [tick],
-          "DEPLOY",
-        );
+      // Get the base URL from the request
+      const url = new URL(_req.url);
+      const baseUrl = `${url.protocol}//${url.host}`;
 
-      const mint_status = await Src20Class
-        .get_src20_minting_progress_by_tick_with_client_new(
-          client,
-          tick,
-        );
-      const mints = await Src20Class
-        .get_valid_src20_tx_with_client(
-          client,
-          null,
-          tick,
-          "MINT",
-          limit,
-          page,
-          "DESC",
-        );
-      const sends = await Src20Class
-        .get_valid_src20_tx_with_client(
-          client,
-          null,
-          tick,
-          "TRANSFER",
-          limit,
-          page,
-          "DESC",
-        );
-      const total_holders = await Src20Class
-        .get_total_src20_holders_by_tick_with_client(
-          client,
-          tick,
-          1,
-        );
-      const holders = await Src20Class.get_src20_balance_with_client(
-        client,
-        null,
-        tick,
-        0,
-        limit,
-        page,
-      );
+      /* ===== DATA FETCHING ===== */
+      const [body, transferCount, mintCount, combinedListings] = await Promise
+        .all([
+          Src20Controller.fetchSrc20TickPageData(decodedTick),
+          fetch(
+            `${baseUrl}/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`,
+          )
+            .then((r) => r.json()),
+          fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`)
+            .then((r) => r.json()),
+          fetch(
+            `https://api.stampscan.xyz/utxo/combinedListings?tick=${encodedTick}`,
+          ).then((r) => r.json()),
+        ]);
 
-      const total_sends = await Src20Class
-        .get_total_valid_src20_tx_with_client(
-          client,
-          tick,
-          "TRANSFER",
-        );
-      const total_mints = await Src20Class
-        .get_total_valid_src20_tx_with_client(
-          client,
-          tick,
-          "MINT",
-        );
+      if (!body) {
+        return ctx.renderNotFound();
+      }
+      /* @fullman */
+      const highchartsData = combinedListings.map((item, _index) => [
+        new Date(item.date).getTime(),
+        item.unit_price_btc * 100000000, // Convert BTC to sats
+      ]).sort((a, b) => a[0] - b[0]);
 
-      const last_block = await CommonClass.get_last_block_with_client(client);
-
-      set_precision(-4);
-      const body = {
-        last_block: last_block.rows[0]["last_block"],
-        deployment: deployment.rows.map((row) => {
-          return {
-            ...row,
-            max: row.max ? row.max.toString() : null,
-            lim: row.lim ? row.lim.toString() : null,
-            amt: row.amt ? row.amt.toString() : null,
-          };
-        })[0],
-        sends: sends.rows.map((row) => {
-          return {
-            ...row,
-            amt: row.amt ? new BigFloat(row.amt).toString() : null,
-          };
-        }),
-        total_sends: total_sends.rows[0]["total"],
-        mints: mints.rows.map((row) => {
-          return {
-            ...row,
-            amt: row.amt ? new BigFloat(row.amt).toString() : null,
-          };
-        }),
-        total_mints: total_mints.rows[0]["total"],
-        total_holders: total_holders.rows[0]["total"],
-        holders: holders.rows.map((row) => {
-          const percentage = new BigFloat(row.amt).mul(100).div(
-            mint_status.total_minted,
-          );
-          const amt = new BigFloat(row.amt);
-          set_precision(-2);
-          return {
-            ...row,
-            amt: amt.toString(),
-            percentage: parseFloat(percentage.toString()).toFixed(2),
-          };
-        }),
-        mint_status: {
-          ...mint_status,
-          max_supply: mint_status.max_supply.toString(),
-          total_minted: mint_status.total_minted.toString(),
-          limit: mint_status.limit.toString(),
-        },
+      /* ===== RESPONSE FORMATTING ===== */
+      body.initialCounts = {
+        transfers: transferCount.total || 0,
+        mints: mintCount.total || 0,
       };
+      body.highcharts = highchartsData || [];
+
       return await ctx.render(body);
     } catch (error) {
-      console.error(error);
-      return ctx.renderNotFound();
+      console.error("Error in SRC20 detail page:", error);
+      if ((error as Error).message?.includes("not found")) {
+        return ctx.renderNotFound();
+      }
+      return ctx.render({
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
     }
   },
 };
 
-export const SRC20TickPage = (props) => {
+/* ===== TYPES ===== */
+interface SRC20DetailPageProps {
+  data: SRC20DetailPageData | { error: string };
+}
+
+/* ===== PAGE COMPONENT ===== */
+function SRC20DetailPage(props: SRC20DetailPageProps) {
+  /* ===== ERROR HANDLING ===== */
+  if ("error" in props.data) {
+    return (
+      <div class="text-center text-red-500">
+        {props.data.error}
+      </div>
+    );
+  }
+
   const {
     deployment,
-    sends,
-    mints,
-    total_holders,
     holders,
     mint_status,
     total_mints,
-    last_block,
-    total_sends,
+    total_transfers,
+    marketInfo,
+    highcharts,
   } = props.data;
-  console.log({ deployment });
 
+  const tick = deployment.tick;
+
+  /* ===== TABLE CONFIGURATION ===== */
+  const tableConfigs = [
+    { id: "mints", label: "MINTS" },
+    { id: "transfers", label: "TRANSFERS" },
+  ];
+
+  /* ===== RENDER ===== */
   return (
-    <div class="flex flex-col gap-8">
-      <SRC20Header />
-      <SRC20TickHeader
+    <div class="flex flex-col gap-6">
+      <SRC20DetailHeader
         deployment={deployment}
-        mint_status={mint_status}
-        total_holders={total_holders}
-        total_mints={total_mints}
-        total_sends={total_sends}
+        mintStatus={mint_status}
+        totalMints={total_mints}
+        totalTransfers={total_transfers}
+        marketInfo={marketInfo}
       />
-      <div class="w-full flex flex-col md:flex-row gap-4 items-center justify-center">
-        <div class="w-full md:w-2/5 h-full">
-          <SRC20DetailsTab holders={holders} sends={sends} mints={mints} />
-        </div>
-        <div class="relative w-full md:w-3/5">
-        </div>
-      </div>
+      <ChartWidget data={highcharts} />
+      <HoldersTable holders={holders} />
+      <DataTableBase
+        type="src20"
+        configs={tableConfigs}
+        tick={tick}
+      />
     </div>
   );
-};
-
-export default SRC20TickPage;
+}
+export default SRC20DetailPage;

@@ -3,50 +3,26 @@
  * https://github.com/Jpja/Electrum-Counterparty/blob/master/js/xcp/cip33.js
  */
 export class CIP33 {
-  static readonly dust_limit = 330;
-
-  static sat_to_btc(sat: number) {
-    if (sat >= 1e5) return "err";
-
-    return "0." + sat.toString().padStart(8, "0");
-  }
-
-  static unicode_to_hex(str: string) {
-    return str.split("").map((c) =>
-      c.charCodeAt(0).toString(16).padStart(2, "0")
-    ).join("");
-  }
-
-  static unicode_to_base64(str: string) {
-    return btoa(
-      encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_match, p1) => {
-        return String.fromCharCode(parseInt(p1, 16));
-      }),
-    );
-  }
-
-  static hex_to_utf8(hex: string) {
-    let str = "";
-    for (let i = 0; i < hex.length; i += 2) {
-      str += "%" + hex.substr(i, 2);
-    }
-    return decodeURIComponent(str);
-  }
-
   static base64_to_hex(str: string) {
-    return atob(str).split("")
-      .map((c) => c.charCodeAt(0).toString(16).padStart(2, "0"))
+    const binaryString = atob(str);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
   }
 
   static hex_to_base64(str: string) {
-    const hex = str.match(/.{1,2}/g)!.map((byte) =>
-      String.fromCharCode(parseInt(byte, 16))
-    ).join("");
-    return btoa(hex);
+    const bytes = new Uint8Array(
+      str.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)),
+    );
+    const binaryString = String.fromCharCode(...bytes);
+    return btoa(binaryString);
   }
 
-  static file_to_addresses(file_hex: string, network = "bitcoin") {
+  static file_to_addresses(file_hex: string, network = "bitcoin"): string[] {
     let file_size: string | number = file_hex.length / 2;
     file_size = file_size.toString(16).padStart(4, "0");
     const hex = file_size + file_hex;
@@ -62,7 +38,9 @@ export class CIP33 {
       addresses.push(this.cip33_hex_to_bech32(element, network));
     }
 
-    return addresses;
+    return addresses.filter((address): address is string =>
+      address !== undefined
+    );
   }
 
   static addresses_to_hex(addresses: string[]) {
@@ -218,14 +196,6 @@ export class CIP33 {
       hex += parseInt(element, 2).toString(16).padStart(2, "0");
     }
     return hex;
-  }
-
-  static cip33_hexToBase64(str: string) {
-    let bString = "";
-    for (let i = 0; i < str.length; i += 2) {
-      bString += String.fromCharCode(parseInt(str.slice(i, i + 2), 16));
-    }
-    return btoa(bString);
   }
 }
 

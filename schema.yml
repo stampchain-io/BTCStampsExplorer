@@ -2,48 +2,346 @@ openapi: 3.0.3
 info:
   title: Stampchain - OpenAPI 3.0
   description: Stampchain API UI
-  version: 2.0.0
+  version: 2.2.0
+  license:
+    name: GNU Affero General Public License v3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+  contact:
+    name: Stampchain Support
+    url: https://stampchain.io
+    email: api@stampchain.io
+tags:
+  - name: System
+    description: System-level endpoints for health and version checks
+  - name: Documentation
+    description: API documentation endpoints
+  - name: Balance
+    description: STAMPS, SRC-101, and SRC-20 balance-related endpoints
+  - name: Blocks
+    description: Block-related endpoints
+  - name: Collections
+    description: Collection management endpoints
+  - name: Cursed Stamps
+    description: Endpoints for managing cursed stamps
+  - name: SRC-20
+    description: SRC-20 token related endpoints
+  - name: SRC-101
+    description: SRC-101 token related endpoints
+  - name: Stamps
+    description: Stamp management endpoints
+  - name: Dispensers
+    description: Dispenser management endpoints
+  - name: Minting
+    description: Token and stamp minting endpoints
+  - name: UTXO
+    description: UTXO management endpoints
 externalDocs:
   description: Find out more about Stampchain
-  url: 'http://stampchain.io'
+  url: "http://stampchain.io"
 servers:
-  - url: 'https://stampchain.io'
-    description:  Production server (uses live data)
-  - url: "https://bitcoinstamps.xyz"
+  - url: "https://stampchain.io"
     description: Production server (uses live data)
-  - url: 'http://localhost:8000'
-paths:
+  - url: "https://dev.stampchain.io"
+    description: Production server (uses live data)
 
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /api/v2/health:
+    get:
+      operationId: getHealthStatus
+      tags:
+        - System
+      summary: Health check endpoint
+      description: |
+        Checks if the API service is running and responding correctly. 
+        Validates the status of core services including the API, indexer, and mempool connectivity.
+        Also provides block synchronization status between the indexer and network.
+      responses:
+        "200":
+          description: Detailed health status of the system and its services
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: ["OK", "ERROR"]
+                    description: Overall system health status
+                  services:
+                    type: object
+                    properties:
+                      api:
+                        type: boolean
+                        description: API service connectivity
+                      indexer:
+                        type: boolean
+                        description: Indexer service connectivity
+                      mempool:
+                        type: boolean
+                        description: Mempool API connectivity
+                      database:
+                        type: boolean
+                        description: Database connectivity
+                      xcp:
+                        type: boolean
+                        description: Counterparty node connectivity
+                      blockSync:
+                        type: object
+                        description: Block synchronization information
+                        properties:
+                          indexed:
+                            type: integer
+                            description: Last indexed block height
+                          network:
+                            type: integer
+                            description: Current network block height
+                          isSynced:
+                            type: boolean
+                            description: Whether the indexer is in sync with the network (allowing 1 block lag)
+                      stats:
+                        type: object
+                        description: System-wide statistics
+                        properties:
+                          src20Deployments:
+                            type: integer
+                            description: Total number of SRC-20 tokens deployed
+                          totalStamps:
+                            type: integer
+                            description: Total number of stamps in the system
+              example:
+                status: "OK"
+                services:
+                  api: true
+                  indexer: true
+                  mempool: true
+                  database: true
+                  blockSync:
+                    indexed: 800000
+                    network: 800001
+                    isSynced: true
+                  stats:
+                    src20Deployments: 100000
+                    totalStamps: 1000000
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/docs:
+    get:
+      operationId: getApiDocs
+      tags:
+        - Documentation
+      summary: API documentation
+      description: Returns the OpenAPI documentation. Can be filtered by path or tag.
+      parameters:
+        - in: query
+          name: path
+          schema:
+            type: string
+          description: Optional path to filter documentation for a specific endpoint
+          example: "/api/v2/olga/mint"
+        - in: query
+          name: tag
+          schema:
+            type: string
+          description: Optional tag to filter documentation by category
+          example: "Minting"
+      responses:
+        "200":
+          description: Successful response with API documentation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - description: Full API documentation (no filters)
+                    type: object
+                    required:
+                      - openapi
+                      - info
+                      - paths
+                    properties:
+                      openapi:
+                        type: string
+                        description: OpenAPI version
+                        example: "3.0.3"
+                      info:
+                        type: object
+                        description: API information
+                        required:
+                          - title
+                          - version
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          version:
+                            type: string
+                      paths:
+                        type: object
+                        description: Formatted endpoint documentation
+                      tags:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            description:
+                              type: string
+                      servers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                            description:
+                              type: string
+                  - description: Filtered documentation response
+                    type: object
+                    required:
+                      - documentation
+                    properties:
+                      documentation:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                            - path
+                            - method
+                          properties:
+                            path:
+                              type: string
+                              description: Endpoint path
+                            method:
+                              type: string
+                              description: HTTP method
+                              enum: [GET, POST, PUT, DELETE, PATCH]
+                            summary:
+                              type: string
+                              description: Brief description of the endpoint
+                            description:
+                              type: string
+                              description: Detailed endpoint description
+                            tags:
+                              type: array
+                              items:
+                                type: string
+                              description: Associated tags
+                            parameters:
+                              type: array
+                              description: Endpoint parameters
+                              items:
+                                type: object
+                            requestBody:
+                              type: object
+                              nullable: true
+                              description: Request body schema if applicable
+                            responses:
+                              type: array
+                              description: Possible responses
+                              items:
+                                type: object
+                                properties:
+                                  code:
+                                    type: string
+                                    description: HTTP status code
+                                  description:
+                                    type: string
+                                    description: Response description
+                                  content:
+                                    type: object
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/version:
+    get:
+      operationId: getApiVersion
+      tags:
+        - System
+      summary: Get API version
+      description: Returns the current version of the API being used.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/error:
+    get:
+      operationId: testErrorResponse
+      tags:
+        - System
+      summary: Test error endpoint
+      description: Test endpoint that always returns an error response. Used for testing error handling and responses.
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseBody"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/balance/{address}:
     get:
-      summary: Get balance by address
+      operationId: getAddressBalance
+      tags:
+        - Balance
+      summary: Get combined stamp and SRC-20 balances
+      description: |
+        Convenience endpoint that combines stamp and SRC-20 balance data in a single request.
+        For better performance and pagination control, consider using the dedicated endpoints:
+        - /api/v2/stamps/balance/{address}
+        - /api/v2/src20/balance/{address}
       parameters:
         - in: path
           name: address
           required: true
-          example: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+          example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
           schema:
             type: string
-          description: The address of the wallet
-      responses: 
-        '200':
-          description: Successful response
+          description: The Bitcoin address to query
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+      responses:
+        "200":
+          description: Successful response with combined balances
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedBalanceResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/PaginatedBalanceResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/block/{block_index}:
     get:
+      operationId: getBlockInfo
+      tags:
+        - Blocks
       summary: Get block info by block index or block hash
+      description: Retrieves detailed information about a specific block, including transactions, stamps, and other block-related data.
       parameters:
         - in: path
           name: block_index
@@ -53,32 +351,36 @@ paths:
             type: string
           description: The block index or block hash
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BlockInfoResponseBody'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/BlockInfoResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/block/block_count/{number}:
     get:
+      operationId: getLastBlocks
+      tags:
+        - Blocks
       summary: Get last x blocks
+      description: Returns information about the most recent blocks, with the number of blocks specified in the request.
       parameters:
         - in: path
           name: number
           required: true
-          example: 2
+          example: 1
           schema:
             type: integer
-          description: The number of last blocks
+          description: The number of last blocks to retrieve
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
@@ -86,48 +388,96 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BlockRow"
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
-
-  /api/v2/cursed:
+  /api/v2/collections:
     get:
-      summary: Get paginated cursed stamps
+      operationId: getCollections
+      tags:
+        - Collections
+      summary: Get paginated collections
+      description: Retrieves a paginated list of all stamp collections.
       parameters:
-        - in: query
-          name: limit
-          example: 2
-          schema:
-            type: integer
-          description: 'The maximum number of stamps to retrieve (default: 50)'
-        - in: query
-          name: page
-          schema:
-            type: integer
-          description: 'The page number of the results (default: 0)'
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedStampResponseBody'
-        '500':
-          description: Internal Server Error
+                $ref: "#/components/schemas/PaginatedCollectionResponseBody"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/collections/creator/{creator}:
+    get:
+      operationId: getCollectionsByCreator
+      tags:
+        - Collections
+      summary: Get collections by creator
+      description: Retrieves a paginated list of stamp collections for a specific creator.
+      parameters:
+        - in: path
+          name: creator
+          required: true
+          example: "bc1qefhvcqwuz6g6qy6nck5dq2el2r37pky73tqxkc"
+          schema:
+            type: string
+          description: "Creator address to filter collections by"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+      responses:
+        "200":
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/PaginatedCollectionResponseBody"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/cursed:
+    get:
+      operationId: getCursedStamps
+      tags:
+        - Cursed Stamps
+      summary: Get paginated cursed stamps
+      description: Retrieves a paginated list of cursed stamps. Cursed stamps are stamps with negative stamp numbers that have been identified as invalid or problematic.
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedStampResponseBody"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/cursed/{id}:
     get:
+      operationId: getCursedStampById
+      tags:
+        - Cursed Stamps
       summary: Get stamp by ID {tx_hash, stamp, cpid}
       description: |
-        Cursed stamps simply have a negative stamp number. This is equivalent to /api/v2/stamps/{id} 
+        Retrieves a specific cursed stamp by its identifier. Cursed stamps simply have a negative stamp number. 
+        This endpoint is equivalent to /api/v2/stamps/{id} but specifically for cursed stamps.
       parameters:
         - in: path
           name: id
@@ -137,22 +487,26 @@ paths:
             type: string
           description: Stamp number, cpid, or stamp_hash
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/StampResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/cursed/block/{block_index}:
     get:
+      operationId: getCursedStampsByBlock
+      tags:
+        - Cursed Stamps
       summary: Get cursed stamps by block index
+      description: Retrieves all cursed stamps that were created or identified in a specific block.
       parameters:
         - in: path
           name: block_index
@@ -162,58 +516,112 @@ paths:
             type: integer
           description: The block index
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampBlockResponseBody'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/StampBlockResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src20:
     get:
-      summary: Get paginated valid SRC-20 transactions
-      description: Retrieve paginated valid SRC-20 transactions with optional limit and page parameters
+      operationId: getSrc20Transactions
+      tags:
+        - SRC-20
+      summary: Get paginated valid SRC-20 transactions with market data filtering
+      description: |
+        Retrieves a paginated list of valid SRC-20 transactions with optional market data filtering.
+        The new filters allow querying based on holder metrics, price ranges, volume, and data quality.
       parameters:
-        - in: query
-          name: limit
-          example: 2
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Sort"
+        # Market Data Filters for SRC-20 (Task 42)
+        - name: minHolderCount
+          in: query
+          description: Minimum number of holders for the SRC-20 token
           schema:
             type: integer
-            minimum: 1
-            default: 50
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
+            minimum: 0
+          example: 10
+        - name: maxHolderCount
+          in: query
+          description: Maximum number of holders for the SRC-20 token
           schema:
             type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
+            minimum: 0
+          example: 1000
+        - name: minFloorPriceBTC
+          in: query
+          description: Minimum floor price in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 0.00001
+        - name: maxFloorPriceBTC
+          in: query
+          description: Maximum floor price in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 0.1
+        - name: minVolume24h
+          in: query
+          description: Minimum 24-hour trading volume in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 0.001
+        - name: minPriceChange24h
+          in: query
+          description: Minimum 24-hour price change percentage
+          schema:
+            type: number
+            format: float
+          example: -10
+        - name: minDataQualityScore
+          in: query
+          description: Minimum data quality score (0-10)
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10
+          example: 7
+        - name: primaryExchange
+          in: query
+          description: Filter by primary exchange source
+          schema:
+            type: string
+          example: "openstamp"
       responses:
-        '200':
+        "200":
           description: Successful response with paginated SRC-20 transactions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
-
+                $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src20/balance/{address}:
     get:
+      operationId: getSrc20AddressBalance
+      tags:
+        - SRC-20
+        - Balance
       summary: Get SRC-20 balances by BTC wallet address
+      description: Retrieves all SRC-20 token balances for a specific Bitcoin address.
       parameters:
         - in: path
           name: address
@@ -222,44 +630,30 @@ paths:
           schema:
             type: string
           description: The address of the wallet
-        - in: query
-          name: limit
-          example: 2
-          schema:
-            type: integer
-            minimum: 1
-            default: 200
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc20BalanceResponseBody'
-        '404':
-          description: Address Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/PaginatedSrc20BalanceResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src20/balance/{address}/{tick}:
     get:
+      operationId: getSrc20AddressTickBalance
+      tags:
+        - SRC-20
+        - Balance
       summary: Get SRC-20 balance by address and tick
+      description: Retrieves the balance of a specific SRC-20 token (identified by tick) for a given Bitcoin address.
       parameters:
         - in: path
           name: address
@@ -276,31 +670,29 @@ paths:
             type: string
           description: The tick value
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src20BalanceResponseBody'
-        '404':
-          description: Address/Tick Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/Src20BalanceResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src20/balance/snapshot/{tick}:
     get:
-      summary: | 
-        Get SRC-20 balance snapshot by tick, based upon current block height.
+      operationId: getSrc20TickSnapshot
+      tags:
+        - SRC-20
+        - Balance
+      summary: Get SRC-20 balance snapshot by tick on current block height
       description: |
-        Retrieve a snapshot of all owners for the SRC-20 tick value based upon the current block height.
+        Retrieves a snapshot of all owners for the SRC-20 tick value based upon the current block height.
+        This provides a complete overview of token distribution at the current point in time.
       parameters:
         - in: path
           name: tick
@@ -309,39 +701,29 @@ paths:
           schema:
             type: string
           description: The SRC20 tick value
-        - in: query
-          name: limit
-          example: 2
-          schema:
-            type: integer
-            minimum: 1
-            default: 200
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src20SnapshotResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/Src20SnapshotResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src20/block/{block_index}:
     get:
+      operationId: getSrc20BlockTransactions
+      tags:
+        - SRC-20
       summary: Get paginated valid SRC-20 transactions from a specific block
+      description: Retrieves all SRC-20 transactions that occurred in a specific block. Results can be filtered and paginated.
       parameters:
         - in: path
           name: block_index
@@ -356,51 +738,30 @@ paths:
           schema:
             type: string
           description: The operation type, if applicable.
-        - in: query
-          name: limit
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 1000
-          description: The maximum number of items to return, default is 1000.
-        - in: query
-          name: page
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 1
-          description: The page number for pagination, default is 1.
-        - in: query
-          name: sort
-          required: false
-          schema:
-            type: string
-            default: 'ASC'
-          description: The sorting order, can be 'ASC' or 'DESC', default is 'ASC'.
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Sort"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
-
+                $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src20/block/{block_index}/{tick}:
     get:
+      operationId: getSrc20BlockTickTransactions
+      tags:
+        - SRC-20
       summary: Fetches SRC20 transactions for a given block and tick
-      description: >
-        Retrieves SRC20 transactions filtered by block index and tick value,
-        with additional optional filtering and pagination parameters.
+      description: Retrieves SRC20 transactions filtered by block index and tick value, with additional optional filtering and pagination parameters.
       parameters:
         - in: path
           name: block_index
@@ -422,95 +783,59 @@ paths:
           required: false
           schema:
             type: string
+            enum: [TRANSFER, MINT, DEPLOY]
           description: The operation type, if applicable.
-        - in: query
-          name: limit
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 1000
-          description: The maximum number of items to return, default is 1000.
-        - in: query
-          name: page
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 1
-          description: The page number for pagination, default is 1.
-        - in: query
-          name: sort
-          required: false
-          schema:
-            type: string
-            default: 'ASC'
-          description: The sorting order, can be 'ASC' or 'DESC', default is 'ASC'.
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
       responses:
-        '200':
+        "200":
           description: Successful response with the list of valid SRC-20 transactions.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src20/tick:
     get:
+      operationId: getSrc20TickOperations
+      tags:
+        - SRC-20
       summary: Get paginated valid SRC-20 transactions by operation type
       description: Retrieve paginated valid SRC-20 transactions by operation type (DEPLOY, MINT, TRANSFER)
       parameters:
         - in: query
-          name: limit
-          schema:
-            type: integer
-            example: 2
-            minimum: 1
-            default: 50
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
-        - in: query
           name: op
           schema:
             type: string
-            default: DEPLOY
+            default: "DEPLOY"
             enum: [TRANSFER, MINT, DEPLOY]
           description: The operation type [TRANSFER, MINT, DEPLOY(DEFAULT)]
-        - in: query
-          name: sort
-          schema:
-            type: string
-            default: DESC
-            enum: [ASC, DESC]
-          description: Sort order [ASC, DESC]
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Sort"
       responses:
-        '200':
+        "200":
           description: Successful response with paginated SRC-20 transactions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src20/tick/{tick}:
     get:
+      operationId: getSrc20TickData
+      tags:
+        - SRC-20
       summary: Get paginated tick data
       description: Retrieve paginated tick data for a specific tick
       parameters:
@@ -522,45 +847,33 @@ paths:
           schema:
             type: string
         - in: query
-          name: limit
-          description: 'Number of records per page (default: 50)'
-          schema:
-            type: integer
-        - in: query
-          name: page
-          description: 'Page number (default: 1)'
-          schema:
-            type: integer
-        - in: query
           name: op
           schema:
             type: string
-            default: null
+            default: "DEPLOY"
             enum: [TRANSFER, MINT, DEPLOY]
           description: The operation type [TRANSFER, MINT, DEPLOY]
-        - in: query
-          name: sort
-          schema:
-            type: string
-            default: ASC
-            enum: [ASC, DESC]
-          description: Sort order [ASC, DESC]
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedTickResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/PaginatedTickResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src20/tick/{tick}/deploy:
     get:
+      operationId: getSrc20TickDeployInfo
+      tags:
+        - SRC-20
       summary: Get deployment details for a specific tick
       description: Retrieve deployment details for a specific tick in the tick API.
       parameters:
@@ -572,23 +885,26 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Successful response with deployment details.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TickResponseBody'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/TickResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src20/tx/{tx_hash}:
     get:
-      summary: Get information about a specific transaction.
+      operationId: getSrc20TransactionInfo
+      tags:
+        - SRC-20
+      summary: Get information about a specific transaction
+      description: Retrieves detailed information about a specific SRC-20 transaction by its transaction hash.
       parameters:
         - in: path
           name: tx_hash
@@ -598,295 +914,450 @@ paths:
             type: string
           description: The hash of the transaction.
       responses:
-        '200':
+        "200":
           description: Successful response with transaction information.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src20ResponseBody'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/Src20ResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
-
-
-
-
-  /api/v2/stamps:
+  /api/v2/src101:
     get:
-      summary: Get paginated stamps
-      description: Retrieve a paginated list of stamps.
+      operationId: getSrc101Transactions
+      tags:
+        - SRC-101
+      summary: Get paginated valid SRC-101 transactions
+      description: Retrieve paginated valid SRC-101 transactions with optional limit and page parameters
       parameters:
-        - in: query
-          name: limit
-          example: 2
-          schema:
-            type: integer
-          description: The maximum number of stamps to return per page. Defaults to 50.
-        - in: query
-          name: page
-          schema:
-            type: integer
-          description: The page number to retrieve. Defaults to 1.
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
       responses:
-        '200':
-          description: Successful response with paginated stamps.
+        "200":
+          description: Successful response with paginated SRC-101 transactions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedStampResponseBody'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
-
-  /api/v2/stamps/{id}:
+  /api/v2/src101/tx:
     get:
-      summary: Get stamp by ID {tx_hash, stamp, cpid}
-      description: Retrieve a stamp by its ID one of tx_hash, stamp number, or cpid
+      operationId: getSrc101TransactionList
+      tags:
+        - SRC-101
+      summary: Get paginated SRC-101 transactions
+      description: Retrieve paginated SRC-101 transactions with optional filtering by block index, operation type, and validation status.
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - in: query
+          name: block_index
+          schema:
+            type: integer
+          description: Filter transactions by block index
+        - in: query
+          name: op
+          schema:
+            type: string
+            enum: [mint, transfer]
+          description: Filter by operation type, either "mint" or "transfer"
+        - in: query
+          name: deploy_hash
+          schema:
+            type: string
+          description: Filter by deployment transaction hash
+        - in: query
+          name: valid
+          schema:
+            type: integer
+            enum: [0, 1]
+          description: Filter by validation status (1 for valid, 0 for invalid)
+      responses:
+        "200":
+          description: Successful response with paginated SRC-101 transactions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/src101/tx/{tx_hash}:
+    get:
+      operationId: getSrc101TransactionByHash
+      tags:
+        - SRC-101
+      summary: Get SRC-101 transaction by hash
+      description: Retrieve detailed information about a specific SRC-101 transaction using its transaction hash.
       parameters:
         - in: path
-          name: id
+          name: tx_hash
           required: true
-          example: "5faa1aa3012c89b598372153371f835a88739e5539c9c709924ce189fb9c7863"
-          description: ID {tx_hash, stamp, cpid} of the stamp
+          example: "bc1ppwujuuj8ejh4qu5lpfftgmfg3yue7ml7ge8vgzyqzmpu5rc9ttmsrkaeh8"
+          schema:
+            type: string
+          description: The hash of the transaction
+      responses:
+        "200":
+          description: Successful response with transaction details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/src101/{deploy_hash}/deploy:
+    get:
+      operationId: getSrc101DeployInfo
+      tags:
+        - SRC-101
+      summary: Get SRC-101 deployment details
+      description: Retrieve comprehensive deployment information for a specific SRC-101 token using its deployment transaction hash.
+      parameters:
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+          schema:
+            type: string
+          description: The hash of the deploy transaction
+      responses:
+        "200":
+          description: Successful response with deployment details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/src101/{deploy_hash}:
+    get:
+      operationId: getSrc101Owner
+      tags:
+        - SRC-101
+      summary: Get SRC-101 from owners table
+      description: Return all src101 data that matches the rule by filtering
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+          schema:
+            type: string
+          description: The hash of the deploy transaction
+        - in: query
+          name: expire
+          schema:
+            type: integer
+          description: 0 is false, 1 is true. false means there are no expired domain names
+      responses:
+        "200":
+          description: Successful response with deployment details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/src101/{deploy_hash}/total:
+    get:
+      operationId: getSrc101TotalSupply
+      tags:
+        - SRC-101
+      summary: Get total supply for SRC-101 token
+      description: Retrieve the total supply and related statistics for a specific SRC-101 token using its deployment hash.
+      parameters:
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+          schema:
+            type: string
+          description: The hash of the deploy transaction
+      responses:
+        "200":
+          description: Successful response with total supply information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TotalSrc101ResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/src101/{deploy_hash}/address/{address_btc}:
+    get:
+      operationId: getSrc101TokensByAddress
+      tags:
+        - SRC-101
+      summary: Get tokenid of SRC-101 by address_btc
+      description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - in: query
+          name: prim
+          required: true
+          example: "false"
+          schema:
+            type: string
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+          description: The hash of the deploy transaction.
+          schema:
+            type: string
+        - in: path
+          name: address_btc
+          required: true
+          example: "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m"
           schema:
             type: string
       responses:
-        '200':
-          description: Successful response
+        "200":
+          description: Successful response with deployment details.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/TokenidSrc101ResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
-
-  /api/v2/stamps/balance/{address}:
+  /api/v2/src101/balance/{address}:
     get:
-      summary: Get stamp balances by address
-      description: Retrieve stamp balances for a specific address
+      operationId: getSrc101AddressBalance
+      tags:
+        - SRC-101
+        - Balance
+      summary: Get SRC-101 balances by address
+      description: Retrieve all SRC-101 token balances for a specific Bitcoin address, including details about each token held.
       parameters:
         - in: path
           name: address
           required: true
-          example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
-          description: The address to retrieve stamp balances for
+          example: "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m"
           schema:
             type: string
-        - in: query
-          name: limit
-          example: 2
-          description: 'The maximum number of stamp balances to retrieve. default: 50'
-          schema:
-            type: integer
-        - in: query
-          name: page
-          description: 'The page number of stamp balances to retrieve. default: 1'
-          schema:
-            type: integer
+          description: The Bitcoin address to query
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
       responses:
-        '200':
-          description: Successful response
+        "200":
+          description: Successful response with address balances
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedStampBalanceResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/PaginatedSrc101BalanceResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
-  /api/v2/stamps/block/{block_index}:
+  /api/v2/src101/{deploy_hash}/{tokenid}:
     get:
-      summary: Get stamps by block index
+      operationId: getSrc101TokenInfo
+      tags:
+        - SRC-101
+      summary: Get SRC-101 token information
+      description: Retrieve detailed information about a specific SRC-101 token using its deployment hash and token identifier.
       parameters:
         - in: path
-          name: block_index
+          name: deploy_hash
           required: true
-          example: "779652"
+          example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
           schema:
             type: string
-          description: The index of the block
+          description: The deployment transaction hash
+        - in: path
+          name: tokenid
+          required: true
+          example: "aXJvbmI=="
+          schema:
+            type: string
+          description: The unique token identifier
       responses:
-        '200':
-          description: Successful response
+        "200":
+          description: Successful response with token information
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampBlockResponseBody'
-        '404':
-          description: Block not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/Src101BalanceResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
-
-
-  /api/v2/stamps/ident/{ident}:
+  /api/v2/src101/index/{deploy_hash}/{index}:
     get:
-      summary: Get stamps by ident
-      description: Retrieve stamps based on the provided ident
+      operationId: getSrc101TokenByIndex
+      tags:
+        - SRC-101
+      summary: Get SRC-101 token by index
+      description: Retrieve token information using its deployment hash and numeric index. This endpoint provides an alternative way to access token data.
       parameters:
         - in: path
-          name: ident
+          name: deploy_hash
           required: true
-          example: "STAMP"
-          description: The ident value (SRC-721, STAMP)
+          example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
           schema:
             type: string
-        - in: query
-          name: limit
-          example: 2
-          description: 'The maximum number of stamps to retrieve (default: 50)'
-          schema:
-            type: integer
-        - in: query
-          name: page
-          description: 'The page number of stamps to retrieve (default: 1)'
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Successful response with the paginated stamps
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedIdResponseBody'
-        '404':
-          description: Stamps with the provided ident not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
-  /api/v2/stamps/dispensers:
-    get:
-      summary: Get all open dispensers 
-      description: Retrieve all open counterparty dispensers
-      parameters:
-        - in: query
-          name: limit
-          example: 2
-          schema:
-            type: integer
-            minimum: 1
-            default: 50
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedDispenserResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
-  /api/v2/stamps/dispensers/{id}:
-    get:
-      summary: Get open dispensers by stamp number, cpid, or stamp_hash
-      description: Retrieve open dispensers by stamp number, cpid, or stamp_hash
-      parameters:
+          description: The deployment transaction hash
         - in: path
-          name: id
+          name: index
           required: true
-          example: "A12190973650444749000"
-          description: Stamp number, cpid, or stamp_hash
+          example: 1
           schema:
-            type: string
+            type: number
+          description: The numeric index of the token
       responses:
-        '200':
-          description: Successful response
+        "200":
+          description: Successful response with token information
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DispenserResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/Src101BalanceResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
-  /api/v2/src20/create:
+  /api/v2/src101/create:
     post:
-      summary: Deploy, Mint, Transfer SRC-20 Tokens
+      operationId: createSrc101
+      tags:
+        - SRC-101
+      summary: Deploy, Mint, Transfer SRC-101, SetRecord, Renew
       description: |
         This returns a hex encoded serialized PSBT transaction ready for signing and broadcasting
-        via wallet or library. There is no validation that the input data provided
-        will conform to SRC-20 specifications or mint limit requirements. It is the 
-        users sole responsibility to confirm mint, deploy limits and confirm existing
-        balances prior to a transfer of tokens. The examples provided are for demonstration
-        purposes only.
+        via wallet or library.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              oneOf:
-                - $ref: '#/components/schemas/SRC20InputData'
-                - $ref: '#/components/schemas/SRC20TransferInputData'
+              discriminator:
+                propertyName: op
+                mapping:
+                  deploy: "#/components/schemas/SRC101DeployData"
+                  mint: "#/components/schemas/SRC101MintData"
+                  transfer: "#/components/schemas/SRC101TransferData"
+                  setrecord: "#/components/schemas/SRC101SetRecordData"
+                  renew: "#/components/schemas/SRC101RenewData"
             examples:
               deploy:
+                summary: Deploy example
                 value:
-                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  sourceAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  changeAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
                   op: "deploy"
-                  tick: "APIV2"
-                  feeRate: 12
-                  max: 2100000000
-                  lim: 100000
-                  dec: 18
+                  root: "btc"
+                  name: "BitNameService"
+                  lim: "10"
+                  owner: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  rec: ["bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"]
+                  tick: "btc"
+                  pri: { 0: 45000, 1: -1, 2: -1, 3: 900000, 4: 225000 }
+                  desc: "Bitname Service powered by BTC stamp."
+                  mintstart: "0"
+                  mintend: "18446744073709551615"
+                  wla: "0317ac27154373716ab3bce4f170211446e7598c69ae3a90f058c831c56308323c"
+                  imglp: "https://img.bitname.pro/img/"
+                  imgf: "png"
+                  idua: "999"
+                  feeRate: 96
               mint:
+                summary: Mint example
                 value:
-                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  sourceAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  changeAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  recAddress: "bc1qkt6zxc6dl9xuf2wm8txna2g96yac3spukxvvtk"
                   op: "mint"
-                  tick: "DOGE"
-                  feeRate: 150
-                  amt: 1000
+                  hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+                  toaddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  tokenid: ["YWJjZGVm"]
+                  dua: "999"
+                  prim: "true"
+                  coef: "1000"
+                  sig: ""
+                  feeRate: 24
               transfer:
+                summary: Transfer example
                 value:
-                  fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
-                  toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  sourceAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  changeAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  tokenid: "YWJjZGVm"
                   op: "transfer"
-                  tick: "STAMP"
-                  feeRate: 150
-                  amt: 100000
+                  "hash": "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+                  toaddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  tick: "bns"
+                  feeRate: 24
+              setrecord:
+                summary: Set record example
+                value:
+                  sourceAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  changeAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  op: "setrecord"
+                  hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+                  tokenid: "YWJjZGVm"
+                  type: "address"
+                  data: { "btc": "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9" }
+                  prim: "true"
+                  feeRate: 24
+              renew:
+                summary: Renew example
+                value:
+                  sourceAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  changeAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  recAddress: "bc1qkt6zxc6dl9xuf2wm8txna2g96yac3spukxvvtk"
+                  op: "renew"
+                  hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+                  tokenid: "YWJjZGVm"
+                  dua: "999"
+                  feeRate: 24
       responses:
-        '200':
+        "200":
           description: Successful response with the hex value.
           content:
             application/json:
@@ -896,37 +1367,627 @@ paths:
                   hex:
                     type: string
                     description: The hex encoded serialized psbt trx
+                  base64:
+                    type: string
+                    description: The base64 encoded serialized psbt trx
+                  input_value:
+                    type: integer
+                    description: The input value in sats
+                  total_dust_value:
+                    type: integer
+                    description: The total dust value in sats
+                  est_miner_fee:
+                    type: integer
+                    description: The estimated miner fee in sats
+                  est_tx_size:
+                    type: integer
+                    description: The estimated transaction size
+                  inputsToSign:
+                    type: array
+                    items:
+                      type: string
+                      description: The inputs to sign
+                  changeAddress:
+                    type: string
+                    description: The change address
                   fee:
                     type: integer
-                    description: The estimated miner fee
+                    description: The estimated miner fee in sats
                   change:
                     type: integer
                     description: The change value
-        '400':
+        "400":
           description: Bad request error response.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: The error message.
+                $ref: "#/components/schemas/ErrorResponseBody"
 
-  /api/v2/olga/mint:
+  /api/v2/stamps:
+    get:
+      operationId: getStamps
+      tags:
+        - Stamps
+      summary: Get paginated stamps with advanced filtering
+      description: |
+        Retrieve a paginated list of stamps with advanced market data filtering capabilities.
+        The new market data filters allow querying based on holder metrics, price ranges,
+        volume, and data quality - features enabled by the market data cache system.
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Sort"
+        # Market Data Filters (Task 42)
+        - name: minHolderCount
+          in: query
+          description: Minimum number of holders for the stamp
+          schema:
+            type: integer
+            minimum: 0
+          example: 10
+        - name: maxHolderCount
+          in: query
+          description: Maximum number of holders for the stamp
+          schema:
+            type: integer
+            minimum: 0
+          example: 1000
+        - name: minDistributionScore
+          in: query
+          description: Minimum holder distribution score (0-100, higher = more distributed)
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+          example: 50
+        - name: maxTopHolderPercentage
+          in: query
+          description: Maximum percentage held by top holder (0-100)
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+          example: 25
+        - name: minFloorPriceBTC
+          in: query
+          description: Minimum floor price in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 0.001
+        - name: maxFloorPriceBTC
+          in: query
+          description: Maximum floor price in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 1.0
+        - name: minVolume24h
+          in: query
+          description: Minimum 24-hour trading volume in BTC
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 0.01
+        - name: minPriceChange24h
+          in: query
+          description: Minimum 24-hour price change percentage (can be negative)
+          schema:
+            type: number
+            format: float
+          example: -10
+        - name: minDataQualityScore
+          in: query
+          description: Minimum data quality score (0-10, higher = better quality)
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10
+          example: 7
+        - name: maxCacheAgeMinutes
+          in: query
+          description: Maximum age of cached market data in minutes
+          schema:
+            type: integer
+            minimum: 0
+          example: 60
+        - name: priceSource
+          in: query
+          description: Filter by price data source (comma-separated for multiple)
+          schema:
+            type: string
+          example: "counterparty,openstamp"
+      responses:
+        "200":
+          description: Successful response with paginated stamps.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedStampResponseBody"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/stamps/{id}:
+    get:
+      operationId: getStampById
+      tags:
+        - Stamps
+      summary: Get stamp by ID
+      description: Retrieve a specific stamp using its ID (tx_hash, stamp number, or cpid).
+      parameters:
+        - in: path
+          name: id
+          required: true
+          example: "5faa1aa3012c89b598372153371f835a88739e5539c9c709924ce189fb9c7863"
+          description: ID (tx_hash, stamp, cpid) of the stamp
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StampResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/stamps/{id}/holders:
+    get:
+      operationId: getStampHolders
+      tags:
+        - Stamps
+      summary: Get holders for a specific stamp
+      description: Retrieve all current holders of a specific stamp.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          example: "792121"
+          schema:
+            type: string
+          description: Stamp number, cpid, or stamp_hash
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Pagination"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                            quantity:
+                              type: number
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/stamps/{id}/dispensers:
+    get:
+      operationId: getStampDispensersById
+      tags:
+        - Stamps
+        - Dispensers
+      summary: Get all dispensers for a specific stamp
+      description: Retrieve all dispensers (open and closed) for a specific stamp.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          example: "792121"
+          schema:
+            type: string
+          description: Stamp number, cpid, or stamp_hash
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Pagination"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/DispenserRow"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/stamps/{id}/sends:
+    get:
+      operationId: getStampSends
+      tags:
+        - Stamps
+      summary: Get send history for a specific stamp
+      description: Retrieve the complete transfer history for a specific stamp.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          example: "792121"
+          schema:
+            type: string
+          description: Stamp number, cpid, or stamp_hash
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Pagination"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            tx_hash:
+                              type: string
+                            block_index:
+                              type: number
+                            source:
+                              type: string
+                            destination:
+                              type: string
+                            quantity:
+                              type: number
+                            block_time:
+                              type: string
+                              format: date-time
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/stamps/{id}/dispenses:
+    get:
+      operationId: getStampDispenses
+      tags:
+        - Stamps
+        - Dispensers
+      summary: Get dispense history for a specific stamp
+      description: Retrieve the complete dispense history for a specific stamp.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          example: "792121"
+          schema:
+            type: string
+          description: Stamp number, cpid, or stamp_hash
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Pagination"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/DispenseRow"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/stamps/balance/{address}:
+    get:
+      operationId: getStampBalance
+      tags:
+        - Stamps
+        - Balance
+      summary: Get stamp balances by address
+      description: Retrieve all stamp balances for a specific Bitcoin address.
+      parameters:
+        - in: path
+          name: address
+          required: true
+          example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
+          description: The address to retrieve stamp balances for
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedStampBalanceResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/stamps/block/{block_index}:
+    get:
+      operationId: getStampsByBlock
+      tags:
+        - Stamps
+      summary: Get stamps by block index
+      description: Retrieve all stamps that were created in a specific block.
+      parameters:
+        - in: path
+          name: block_index
+          required: true
+          example: "779652"
+          schema:
+            type: string
+          description: The index of the block
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StampBlockResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/stamps/ident/{ident}:
+    get:
+      operationId: getStampsByIdent
+      tags:
+        - Stamps
+      summary: Get stamps by ident
+      description: Retrieve stamps based on their identifier type (SRC-721, STAMP).
+      parameters:
+        - in: path
+          name: ident
+          required: true
+          example: "STAMP"
+          description: The ident value (SRC-721, STAMP)
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+      responses:
+        "200":
+          description: Successful response with the paginated stamps
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedIdResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/src20/create:
     post:
-      summary: Mint an OLGA STAMP.
+      operationId: createSrc20Token
+      tags:
+        - Minting
+        - SRC-20
+      summary: Deploy, Mint, Transfer SRC-20 Tokens
       description: |
         This returns a hex encoded serialized PSBT transaction ready for signing and broadcasting
-        via wallet or library. There is no validation that the input data provided
-        will conform to all STAMP specifications. It is the users sole responsibility 
-        The examples provided are for demonstration purposes only.
+        via wallet or library.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MintStampInputData'
+              discriminator:
+                propertyName: op
+                mapping:
+                  deploy: "#/components/schemas/SRC20DeployData"
+                  mint: "#/components/schemas/SRC20MintData"
+                  transfer: "#/components/schemas/SRC20TransferData"
+            examples:
+              deploy:
+                summary: Deploy example
+                value:
+                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  op: "deploy"
+                  tick: "APIV2"
+                  satsPerVB: 12
+                  max: "2100000000"
+                  lim: "100000"
+                  dec: 18
+              mint:
+                summary: Mint example
+                value:
+                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  op: "mint"
+                  tick: "DOGE"
+                  satsPerVB: 20
+                  amt: "1000"
+              transfer:
+                summary: Transfer example
+                value:
+                  fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
+                  toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  changeAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
+                  op: "transfer"
+                  tick: "STAMP"
+                  satsPerVB: 20
+                  amt: "100000"
+      responses:
+        "200":
+          description: Successful response with the hex value.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hex:
+                    type: string
+                    description: The hex encoded serialized psbt trx
+                  input_value:
+                    type: integer
+                    description: The input value in sats
+                  total_dust_value:
+                    type: integer
+                    description: The total dust value in sats
+                  est_miner_fee:
+                    type: integer
+                    description: The estimated miner fee in sats
+                  est_tx_size:
+                    type: integer
+                    description: The estimated transaction size
+                  inputsToSign:
+                    type: array
+                    items:
+                      type: string
+                      description: The inputs to sign
+                  changeAddress:
+                    type: string
+                    description: The change address
+                  fee:
+                    type: integer
+                    description: The estimated miner fee in sats
+                  change:
+                    type: integer
+                    description: The change value
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/trx/stampattach:
+    post:
+      operationId: attachStampById
+      tags:
+        - Stamps
+      summary: Attach stamp by ID
+      description: |
+        Creates a PSBT transaction to attach a stamp using its identifier (cpid, stamp number, or tx_hash).
+        The stamp will be attached to the specified address. Optionally, a specific UTXO can be specified using inputs_set.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address
+                - identifier
+                - quantity
+                - options
+              properties:
+                address:
+                  type: string
+                  description: The Bitcoin address which owns the stamp
+                  example: "bc1q20d2cdvy2x83h3ssrz5lgryy4c9wqxsgc749ej"
+                identifier:
+                  type: string
+                  description: The stamp identifier (cpid, stamp number, or tx_hash)
+                  example: "11"
+                quantity:
+                  type: number
+                  description: The quantity of stamps to attach
+                  example: 1
+                inputs_set:
+                  type: string
+                  description: Specific UTXO to attach to (txid:vout format)
+                  example: "10f8e495a5088dd90a731f4b2657bfb4e94b1f59d3961cbc960900d4e5ba44e5:0"
+                options:
+                  type: object
+                  required:
+                    - satsPerVB
+                  properties:
+                    satsPerVB:
+                      type: number
+                      description: Fee rate in satoshis per virtual byte
+                      example: 20
+                    regular_dust_size:
+                      type: number
+                      description: Override the dust amount for regular outputs (in satoshis)
+                      default: 546
+                    return_psbt:
+                      type: boolean
+                      description: Return a PSBT instead of raw transaction
+                      default: true
+                    verbose:
+                      type: boolean
+                      description: Include additional transaction details
+                      default: true
+      responses:
+        "200":
+          description: Successful response with PSBT transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MintResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/olga/mint:
+    post:
+      operationId: mintStamp
+      tags:
+        - Minting
+        - Stamps
+      summary: Mint a new stamp
+      description: Creates a new stamp minting transaction that needs to be signed by the wallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MintStampInputData"
             examples:
               mint:
                 value:
@@ -935,56 +1996,119 @@ paths:
                   locked: true
                   filename: test.png
                   file: "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAG1BMVEUAAAALOzcKBiAJTzz/1lqZoxgIaSyfQuJmIslgvM+QAAAAAXRSTlMAQObYZgAAAMlJREFUeNp9kNVhAzEMQFVtYE+ge8HfxhsUFkjuFih4gPJ3Jz9mMPuJJVvjzkR0CBJf7CFQB05GKs75EVCwEbAa+3Wg9XmZ5rOz7gljoE9ZmSydzT67lqcdaWrhUCo8m8baKDEt7Qqz4wtVKTVHRI8R2N1bW7wqMb4GLya0KQOYVOUrXfIaHKWY1lsCTfKXyih0msQXeA1td/RoHGOk++8figPKo67o+dqappTnx8FakD2Vxf11QA78F+cZ6cC5BCrd0F+T8UDmIwdjIhoVAu1hnQAAAABJRU5ErkJggg=="
-                  satsPerKB: 20
-                  service_fee: null
-                  service_fee_address: null
+                  satsPerVB: 20
       responses:
-        '200':
-          description: Successful response with the psbt transaction
+        "200":
+          description: Successful response with PSBT transaction
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  hex:
-                    type: string
-                    description: The hex string of the psbt transaction
-                  cpid:
-                    type: string
-                    description: The asset name
-                  base64:
-                    type: string
-                    description: The base64 string of the psbt transaction
-                  est_tx_size:
-                    type: integer
-                    description: The estimated transaction size
-                  input_value:
-                    type: integer
-                    description: The total input value
-                  total_dust_value:
-                    type: integer
-                    description: The total dust value
-                  est_miner_fee:
-                    type: integer
-                    description: The estimated miner fee
-                  change_value:
-                    type: integer
-                    description: The change value
-        '400':
-          description: Bad request error response.
+                $ref: "#/components/schemas/MintResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/trx/stampdetach:
+    post:
+      operationId: detachStampFromUtxo
+      tags:
+        - Stamps
+        - UTXO
+      summary: Detach stamp from UTXO
+      description: |
+        Creates a PSBT transaction to detach a stamp from a specific UTXO.
+        If no destination is provided, the stamp will be detached to the address corresponding to the UTXO.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - utxo
+              properties:
+                utxo:
+                  type: string
+                  description: The UTXO from which to detach the stamp
+                  example: "10f8e495a5088dd90a731f4b2657bfb4e94b1f59d3961cbc960900d4e5ba44e5:0"
+                destination:
+                  type: string
+                  description: The address to detach the stamp to (optional)
+                  example: "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m"
+                options:
+                  type: object
+                  properties:
+                    satsPerVB:
+                      type: number
+                      description: Fee rate in satoshis per virtual byte
+                      example: 20
+                    regular_dust_size:
+                      type: number
+                      description: Override the dust amount for regular outputs (in satoshis)
+                    multisig_dust_size:
+                      type: number
+                      description: Override the dust amount for multisig outputs (in satoshis)
+                    return_psbt:
+                      type: boolean
+                      description: Return a PSBT instead of raw transaction
+                      default: true
+                    verbose:
+                      type: boolean
+                      description: Include additional transaction details
+                      default: true
+      responses:
+        "200":
+          description: Successful response with PSBT transaction
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: The error message.
-                required:
-                  - error
-  
+                $ref: "#/components/schemas/MintResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication
+
+  parameters:
+    Limit:
+      in: query
+      name: limit
+      example: 1
+      schema:
+        type: integer
+        minimum: 1
+      description: The maximum number of items to return per page.
+
+    Page:
+      in: query
+      name: page
+      example: 1
+      schema:
+        type: integer
+        minimum: 1
+      description: The page number to retrieve. Defaults to 1.
+
+    Sort:
+      in: query
+      name: sort
+      example: DESC
+      schema:
+        type: string
+        enum: [ASC, DESC]
+      description: The sort order for results. Accepts 'ASC' or 'DESC'.
+
   schemas:
     Pagination:
       type: object
@@ -1011,10 +2135,8 @@ components:
         block_hash:
           type: string
         block_time:
-          oneOf:
-            - type: number
-            - type: string
-              format: date-time
+          type: string
+          format: date-time
         previous_block_hash:
           type: string
         ledger_hash:
@@ -1023,11 +2145,8 @@ components:
           type: string
         messages_hash:
           type: string
-    SendsRow:
-      type: object
-      properties:
-        from: 
-          type: string
+        tx_count:
+          type: number
     DispenseRow:
       type: object
       properties:
@@ -1071,7 +2190,7 @@ components:
         dispenses:
           type: array
           items:
-            $ref: '#/components/schemas/DispenseRow'
+            $ref: "#/components/schemas/DispenseRow"
       required:
         - tx_hash
         - block_index
@@ -1087,8 +2206,8 @@ components:
       type: object
       properties:
         stamp:
-          oneOf:
-            - type: number
+          type: number
+          nullable: true
         block_index:
           type: number
         cpid:
@@ -1098,8 +2217,8 @@ components:
         divisible:
           type: number
         keyburn:
-          oneOf:
-            - type: number
+          type: number
+          nullable: true
         locked:
           type: number
         stamp_base64:
@@ -1109,90 +2228,131 @@ components:
         stamp_url:
           type: string
         supply:
-          oneOf:
-            - type: number
-            - type: string
+          type: number
           nullable: true
         tx_hash:
           type: string
+        tx_index:
+          type: number
         ident:
           $ref: "#/components/schemas/SUBPROTOCOLS"
         creator_name:
-          oneOf:
-            - type: string
+          type: string
+          nullable: true
         stamp_hash:
           type: string
         file_hash:
           type: string
-    SendRow:
+        floorPrice:
+          type: number
+          nullable: true
+          description: "Current floor price in BTC. Uses lowest open dispenser price, or most recent closed dispenser price if no open dispensers exist"
+        floorPriceUSD:
+          type: number
+          nullable: true
+          description: "Floor price converted to USD using current BTC/USD exchange rate"
+        marketCapUSD:
+          type: number
+          nullable: true
+          description: "Market capitalization in USD (supply * floorPrice * BTC/USD rate)"
+    StampRowSummary:
       type: object
       properties:
-        from:
-          type: string
-        to:
-          type: string
-        cpid:
-          oneOf:
-            - type: string
-            
-        tick:
-          oneOf:
-            - type: string
-            
-        memo:
-          type: string
-        quantity:
-          type: string
-          format: int64
-        tx_hash:
-          type: string
+        stamp:
+          type: number
+          nullable: true
         block_index:
           type: number
-    HolderRow:
-      type: object
-      properties:
-        address:
+        cpid:
           type: string
-        quantity:
-          type: number
+        creator:
+          type: string
         divisible:
           type: number
-    BlockInfo:
+        keyburn:
+          type: number
+          nullable: true
+        locked:
+          type: number
+        stamp_base64:
+          type: string
+        stamp_mimetype:
+          type: string
+        stamp_url:
+          type: string
+        supply:
+          type: number
+          nullable: true
+        tx_hash:
+          type: string
+        tx_index:
+          type: number
+        ident:
+          $ref: "#/components/schemas/SUBPROTOCOLS"
+        creator_name:
+          type: string
+          nullable: true
+        stamp_hash:
+          type: string
+        file_hash:
+          type: string
+        floorPrice:
+          type: number
+          nullable: true
+          description: "Current floor price in BTC. Uses lowest open dispenser price, or most recent closed dispenser price if no open dispensers exist"
+        floorPriceUSD:
+          type: number
+          nullable: true
+          description: "Floor price converted to USD using current BTC/USD exchange rate"
+        marketCapUSD:
+          type: number
+          nullable: true
+          description: "Market capitalization in USD (supply * floorPrice * BTC/USD rate)"
+    BlockStampRow:
       type: object
       properties:
-        block_info:
-          $ref: "#/components/schemas/BlockRow"
-    BtcInfo:
-      type: object
-      properties:
-        address:
+        stamp:
+          type: number
+          nullable: true
+        block_index:
+          type: number
+        cpid:
           type: string
-        balance:
-          type: number
-        txCount:
-          type: number
-        unconfirmedBalance:
-          type: number
-        unconfirmedTxCount:
-          type: number
-    XCPParams:
-      type: object
-      properties:
-        filters:
-          type: array
-          items:
-            type: object
-            properties:
-              field:
-                type: string
-              op:
-                type: string
-              value:
-                type: string
-        address:
+        creator:
           type: string
-        asset:
+        divisible:
+          type: number
+        keyburn:
+          type: number
+          nullable: true
+        locked:
+          type: number
+        stamp_base64:
           type: string
+        stamp_mimetype:
+          type: string
+        stamp_url:
+          type: string
+        supply:
+          type: number
+          nullable: true
+        block_time:
+          type: string
+          format: date-time
+        tx_hash:
+          type: string
+        tx_index:
+          type: number
+        ident:
+          $ref: "#/components/schemas/SUBPROTOCOLS"
+        creator_name:
+          type: string
+          nullable: true
+        stamp_hash:
+          type: string
+        file_hash:
+          type: string
+
     SRC20Balance:
       type: object
       properties:
@@ -1216,15 +2376,21 @@ components:
         deploy_img:
           type: string
           description: "The image associated with the deploy token"
-    Src20SnapShotDetail:
+
+    BtcInfo:
       type: object
       properties:
-        tick: 
-          type: string
         address:
           type: string
         balance:
-          type: string
+          type: number
+        txCount:
+          type: number
+        unconfirmedBalance:
+          type: number
+        unconfirmedTxCount:
+          type: number
+
     Src20Detail:
       type: object
       properties:
@@ -1241,8 +2407,8 @@ components:
         creator:
           type: string
         amt:
-          oneOf:
-            - type: number
+          type: number
+          nullable: true
         deci:
           type: number
         lim:
@@ -1253,9 +2419,10 @@ components:
           type: string
         block_time:
           type: string
+          format: date-time
         creator_name:
-          oneOf:
-            - type: string
+          type: string
+          nullable: true
         destination_name:
           type: string
     Src20SnapshotDetail:
@@ -1269,41 +2436,148 @@ components:
           oneOf:
             - type: number
             - type: string
-    
+    SRC101Balance:
+      type: object
+      properties:
+        address:
+          type: string
+        p:
+          type: string
+        deploy_hash:
+          type: string
+        tokenid:
+          type: string
+        tokenid_utf8:
+          type: string
+        expire_timestamp:
+          type: number
+        last_update:
+          type: number
+        address_btc:
+          type: string
+        address_eth:
+          type: string
+        txt_data:
+          type: string
+        img:
+          type: string
+    Src101Detail:
+      type: object
+      properties:
+        row_num:
+          type: number
+        tx_hash:
+          type: string
+        block_index:
+          type: number
+        p:
+          type: string
+        op:
+          type: string
+        root:
+          type: string
+        tick:
+          type: string
+        tick_hash:
+          type: string
+        name:
+          type: string
+        tokenid_origin:
+          type: string
+        tokenid:
+          type: string
+        tokenid_utf8:
+          type: string
+        description:
+          type: string
+        wla:
+          type: string
+        imglp:
+          type: string
+        imgf:
+          type: string
+        deploy_hash:
+          type: string
+        creator:
+          type: string
+        pri:
+          type: number
+        dua:
+          type: number
+        lim:
+          type: number
+        coef:
+          type: number
+        mintstart:
+          type: number
+          nullable: true
+        mintend:
+          type: number
+          nullable: true
+        owner:
+          type: string
+          nullable: true
+        toaddress:
+          type: string
+          nullable: true
+        destination:
+          type: string
+        destination_nvalue:
+          type: string
+        block_time:
+          type: string
+          format: date-time
+        status:
+          type: string
     StampBalance:
       type: object
       properties:
-        cpid:
-          type: string
         stamp:
           type: number
-        stamp_base64:
+        tx_hash:
           type: string
         stamp_url:
           type: string
         stamp_mimetype:
           type: string
-        tx_hash:
-          type: string
         divisible:
           type: number
         supply:
-          oneOf:
-            - type: number
-            - type: string
+          type: number
+          nullable: true
         locked:
           oneOf:
             - type: number
+              nullable: true
             - type: boolean
+              nullable: true
         creator:
           type: string
         creator_name:
-          oneOf:
-            - type: string
+          type: string
+          nullable: true
         balance:
           oneOf:
             - type: number
+              nullable: true
             - type: string
+              nullable: true
+          description: sum of unbound_quantity + quantity in each utxo component
+        address:
+          type: string
+        cpid:
+          type: string
+        unbounded_quantity:
+          type: number
+        utxos:
+          type: array
+          items:
+            type: object
+            properties:
+              utxo:
+                type: string
+              quantity:
+                type: number
     MintStatus:
       type: object
       properties:
@@ -1321,62 +2595,10 @@ components:
           oneOf:
             - type: number
 
-    SRC20TrxRequestParams:
-      type: object
-      properties:
-        block_index:
-          type: integer
-          format: int32
-          nullable: true
-          description: The index of the block.
-        tick:
-          type: string
-          nullable: true
-          description: The tick value, possibly represented as an emoji.
-        op:
-          type: string
-          nullable: true
-          description: The operation type, if applicable.
-        limit:
-          type: integer
-          format: int32
-          default: 1000
-          description: The maximum number of items to return.
-        page:
-          type: integer
-          format: int32
-          default: 1
-          description: The page number for pagination.
-        sort:
-          type: string
-          default: "ASC"
-          description: The sorting order, ASC or DESC.
-        tx_hash:
-          type: string
-          nullable: true
-          description: The transaction hash, if filtering by transaction.
-        address:
-          type: string
-          nullable: true
-          description: The address involved in the transactions.
-
-    PaginationQueryParams:
-      type: object
-      properties:
-        limit:
-          type: number
-        page:
-          type: number
-    PaginatedRequest:
-      type: object
-      properties:
-        query:
-          $ref: "#/components/schemas/PaginationQueryParams"
-
     PaginatedStampResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -1384,11 +2606,11 @@ components:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/StampRow"
+                $ref: "#/components/schemas/StampRowSummary"
     PaginatedStampBalanceResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -1400,7 +2622,7 @@ components:
     PaginatedSrc20ResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -1409,10 +2631,39 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Src20Detail"
+
+    TotalSrc101ResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: number
+
+    TokenidSrc101ResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: string
+
+    PaginatedSrc101ResponseBody:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - type: object
+          properties:
+            last_block:
+              type: number
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Src101Detail"
     PaginatedTickResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -1442,24 +2693,15 @@ components:
     Src20SnapshotResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             snapshot_block:
               type: number
             data:
-              $ref: "#/components/schemas/Src20SnapshotDetail"
-    StampsAndSrc20:
-      type: object
-      properties:
-        stamps:
-          type: array
-          items:
-            $ref: "#/components/schemas/StampRow"
-        src20:
-          type: array
-          items:
-            $ref: "#/components/schemas/SRC20Balance"
+              type: array
+              items:
+                $ref: "#/components/schemas/Src20SnapshotDetail"
     PaginatedSrc20BalanceResponseBody:
       type: object
       properties:
@@ -1476,10 +2718,26 @@ components:
           type: number
         data:
           $ref: "#/components/schemas/SRC20Balance"
+    Src101BalanceResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          $ref: "#/components/schemas/SRC101Balance"
+    PaginatedSrc101BalanceResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SRC101Balance"
     PaginatedBalanceResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -1487,9 +2745,16 @@ components:
             btc:
               $ref: "#/components/schemas/BtcInfo"
             data:
-              type: array
-              items:
-                $ref: "#/components/schemas/StampsAndSrc20"
+              type: object
+              properties:
+                stamps:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/StampRow"
+                src20:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/SRC20Balance"
     StampResponseBody:
       type: object
       properties:
@@ -1500,19 +2765,10 @@ components:
               $ref: "#/components/schemas/StampRow"
         last_block:
           type: number
-    StampsResponseBody:
-      type: object
-      properties:
-        last_block:
-          type: number
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/StampRow"
     PaginatedIdResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -1524,7 +2780,198 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/StampRow"
-    PaginatedDispenserResponseBody:
+    BlockInfoResponseBody:
+      type: object
+      properties:
+        block_info:
+          $ref: "#/components/schemas/BlockRow"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockStampRow"
+        last_block:
+          type: number
+    StampBlockResponseBody:
+      type: object
+      properties:
+        block_info:
+          $ref: "#/components/schemas/BlockRow"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockStampRow"
+        last_block:
+          type: number
+    SRC20DeployData:
+      type: object
+      required:
+        - toAddress
+        - changeAddress
+        - op
+        - tick
+        - max
+        - lim
+        - dec
+      oneOf:
+        - required: ["feeRate"]
+        - required: ["satsPerVB"]
+      properties:
+        toAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ["deploy"]
+        tick:
+          type: string
+        feeRate:
+          oneOf:
+            - type: number
+            - type: string
+        satsPerVB:
+          oneOf:
+            - type: number
+            - type: string
+        max:
+          type: string
+        lim:
+          type: string
+        dec:
+          type: number
+
+    SRC20MintData:
+      type: object
+      required:
+        - toAddress
+        - changeAddress
+        - op
+        - tick
+        - amt
+      oneOf:
+        - required: ["feeRate"]
+        - required: ["satsPerVB"]
+      properties:
+        toAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ["mint"]
+        tick:
+          type: string
+        feeRate:
+          oneOf:
+            - type: number
+            - type: string
+        satsPerVB:
+          oneOf:
+            - type: number
+            - type: string
+        amt:
+          oneOf:
+            - type: number
+            - type: string
+
+    SRC20TransferData:
+      type: object
+      required:
+        - fromAddress
+        - toAddress
+        - changeAddress
+        - op
+        - tick
+        - amt
+      oneOf:
+        - required: ["feeRate"]
+        - required: ["satsPerVB"]
+      properties:
+        fromAddress:
+          type: string
+        toAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ["transfer"]
+        tick:
+          type: string
+        feeRate:
+          oneOf:
+            - type: number
+            - type: string
+        satsPerVB:
+          oneOf:
+            - type: number
+            - type: string
+        amt:
+          oneOf:
+            - type: number
+            - type: string
+
+    MintStampInputData:
+      type: object
+      required:
+        - sourceWallet
+        - qty
+        - file
+      oneOf:
+        - required: ["feeRate"]
+        - required: ["satsPerVB"]
+        - required: ["satsPerKB"]
+      properties:
+        sourceWallet:
+          type: string
+          example: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        assetName:
+          type: string
+          nullable: true
+          example: "My Stamp"
+        qty:
+          type: number
+          example: 1
+        locked:
+          type: boolean
+          example: true
+        divisible:
+          type: boolean
+          default: false
+          example: false
+        filename:
+          type: string
+          example: "test.png"
+        file:
+          type: string
+          example: "iVBORw0KGgoAAAANSUhEUgAAA..."
+        feeRate:
+          type: number
+          description: "Fee rate in satoshis per virtual byte / backward compatible"
+          example: 20
+        satsPerVB:
+          oneOf:
+            - type: number
+            - type: string
+          example: 20
+        satsPerKB:
+          oneOf:
+            - type: number
+            - type: string
+          example: 2000
+        service_fee:
+          oneOf:
+            - type: number
+              nullable: true
+            - type: string
+              nullable: true
+          example: 1000
+        service_fee_address:
+          type: string
+          nullable: true
+          example: "bc1qxyz..."
+
+    PaginatedCollectionResponseBody:
       type: object
       properties:
         page:
@@ -1537,224 +2984,651 @@ components:
           type: integer
         last_block:
           type: integer
-        dispensers:
+        data:
           type: array
           items:
-            $ref: '#/components/schemas/DispenserRow'
-    DispenserResponseBody:
+            $ref: "#/components/schemas/Collection"
+
+    Collection:
       type: object
       properties:
-        dispensers:
+        collection_id:
+          type: string
+        collection_name:
+          type: string
+        collection_description:
+          type: string
+        creators:
           type: array
           items:
-            $ref: "#/components/schemas/DispenserRow"
-        last_block:
+            type: string
+        stamp_count:
+          type: integer
+        total_editions:
           type: number
+        stamps:
+          type: array
+          items:
+            type: integer
+            description: Array of stamp numbers in this collection
+
     ErrorResponseBody:
       type: object
       properties:
         error:
           type: string
-    PaginatedResponseBody:
-      oneOf:
-        - $ref: "#/components/schemas/PaginatedStampResponseBody"
-        - $ref: "#/components/schemas/ErrorResponseBody"
-    BlockInfoResponseBody:
-      type: object
-      properties:
-        block_info:
-          $ref: "#/components/schemas/BlockRow"
-        issuances:
-          type: array
-          items:
-            $ref: "#/components/schemas/StampRow"
-        last_block:
-          type: number
-    StampBlockResponseBody:
-      type: object
-      properties:
-        block_info:
-          $ref: "#/components/schemas/BlockRow"
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/StampRow"
-        last_block:
-          type: number
-    IdHandlerContext:
-      type: object
-      properties:
-        params:
-          type: object
-          properties:
-            id:
-              oneOf:
-                - type: string
-                - type: number
-    IdentHandlerContext:
-      type: object
-      properties:
-        params:
-          type: object
-          properties:
-            ident:
-              type: string
-    BlockHandlerContext:
-      type: object
-      properties:
-        params:
-          type: object
-          properties:
-            block_index:
-              oneOf:
-                - type: number
-                - type: string
-    AddressHandlerContext:
-      type: object
-      properties:
-        params:
-          type: object
-          properties:
-            address:
-              type: string
-    TickHandlerContext:
-      type: object
-      properties:
-        params:
-          type: object
-          properties:
-            tick:
-              oneOf:
-                - type: string
-                - type: number
-    BlockTickHandlerContext:
-      type: object
-      properties:
-        params:
-          type: object
-          properties:
-            block_index:
-              oneOf:
-                - type: number
-                - type: string
-            tick:
-              oneOf:
-                - type: string
-                - type: number
-    AddressTickHandlerContext:
-      type: object
-      properties:
-        params:
-          type: object
-          properties:
-            address:
-              type: string
-            tick:
-              oneOf:
-                - type: string
-                - type: number
-    TX:
-      type: object
-      properties:
-        hex:
-          type: string
-    TXError:
+          description: Error message describing what went wrong
+        status: # Changed from code to status
+          type: integer
+          description: HTTP status code
+      required:
+        - error
+        - status
+      example:
+        error: "Resource not found"
+        status: 404
+
+    ErrorResponse:
       type: object
       properties:
         error:
           type: string
-    SRC20InputData:
+          description: Error message describing what went wrong
+      required:
+        - error
+      example:
+        error: "Invalid fee rate"
+
+    MintResponse:
       type: object
       properties:
-        op:
+        hex:
           type: string
-        toAddress:
+          description: The hex encoded serialized psbt transaction
+        cpid:
+          type: string
+          description: The asset name or identifier
+        est_tx_size:
+          type: integer
+          description: Estimated size of the transaction in bytes
+        input_value:
+          type: integer
+          description: Total value of all inputs in satoshis
+        total_dust_value:
+          type: integer
+          description: Total dust value in satoshis
+        est_miner_fee:
+          type: integer
+          description: Estimated miner fee in satoshis
+        change_value:
+          type: integer
+          description: Value returned to change address in satoshis
+        txDetails:
+          type: array
+          description: Array of transaction inputs to sign
+          items:
+            type: object
+            properties:
+              txid:
+                type: string
+                description: Transaction ID of the input
+              vout:
+                type: integer
+                description: Output index in the previous transaction
+              signingIndex:
+                type: integer
+                description: Index for signing this input
+            required:
+              - txid
+              - vout
+              - signingIndex
+      required:
+        - hex
+        - cpid
+        - est_tx_size
+        - input_value
+        - total_dust_value
+        - est_miner_fee
+        - change_value
+        - txDetails
+
+    SRC101DeployData:
+      type: object
+      required:
+        - sourceAddress
+        - changeAddress
+        - op
+        - root
+        - name
+        - lim
+        - owner
+        - rec
+        - tick
+        - pri
+        - desc
+        - mintstart
+        - mintend
+        - wla
+        - imglp
+        - imgf
+        - idua
+        - feeRate
+      properties:
+        sourceAddress:
           type: string
         changeAddress:
           type: string
-        tick:
-          type: string
-        feeRate:
-          type: number
-        max:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
-        lim:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
-        dec:
-          type: number
-          nullable: true
-        amt:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
-    SRC20TransferInputData:
-      type: object
-      properties:
         op:
           type: string
-        toAddress:
+          enum: ["deploy"]
+        name:
+          type: string
+        root:
+          type: string
+        lim:
+          type: number
+        owner:
+          type: string
+        rec:
+          type: array
+        tick:
+          type: string
+        pri:
+          type: object
+        desc:
+          type: string
+        mintstart:
+          oneOf:
+            - type: number
+            - type: string
+        mintend:
+          oneOf:
+            - type: number
+            - type: string
+        wla:
+          type: string
+        imglp:
+          type: string
+        imgf:
+          type: string
+        idua:
+          oneOf:
+            - type: number
+            - type: string
+        feeRate:
+          type: number
+
+    SRC101MintData:
+      type: object
+      required:
+        - sourceAddress
+        - changeAddress
+        - op
+        - hash
+        - toaddress
+        - tokenid
+        - dua
+        - prim
+        - coef
+        - sig
+        - img
+        - feeRate
+      properties:
+        sourceAddress:
           type: string
         changeAddress:
           type: string
-        fromAddress:
-          oneOf:
-            - type: string
-              nullable: true
-        tick:
+        op:
+          type: string
+          enum: ["mint"]
+        hash:
+          type: string
+        toaddress:
+          type: string
+        tokenid:
+          type: array
+        dua:
+          type: number
+        prim:
+          type: string
+        coef:
+          type: number
+        sig:
+          type: string
+        img:
+          type: array
+        feeRate:
+          type: number
+
+    SRC101TransferData:
+      type: object
+      required:
+        - sourceAddress
+        - changeAddress
+        - op
+        - hash
+        - toaddress
+        - tokenid
+        - feeRate
+      properties:
+        sourceAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ["transfer"]
+        hash:
+          type: string
+        toaddress:
+          type: string
+        tokenid:
           type: string
         feeRate:
           type: number
-        max:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
-        lim:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
-        dec:
-          type: number
-          nullable: true
-        amt:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
-    MintStampInputData:
+
+    SRC101SetRecordData:
       type: object
+      required:
+        - sourceAddress
+        - changeAddress
+        - op
+        - hash
+        - tokenid
+        - type
+        - data
+        - prim
       properties:
-        sourceWallet:
+        sourceAddress:
           type: string
-        assetName:
-          oneOf:
-            - type: string
-          nullable: true
-        qty:
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ["setrecord"]
+        hash:
+          type: string
+        tokenid:
+          type: string
+        type:
+          type: string
+        prim:
+          type: string
+        data:
+          type: object
+        feeRate:
           type: number
-        locked:
-          type: boolean
-        divisible:
-          type: boolean
-        filename:
+
+    SRC101RenewData:
+      type: object
+      required:
+        - sourceAddress
+        - changeAddress
+        - op
+        - hash
+        - tokenid
+        - dua
+        - feeRate
+      properties:
+        sourceAddress:
           type: string
-        file:
+        changeAddress:
           type: string
-        satsPerKB:
+        op:
+          type: string
+          enum: ["renew"]
+        hash:
+          type: string
+        tokenid:
+          type: string
+        dua:
           type: number
-        service_fee:
-          oneOf:
-            - type: number
+        feeRate:
+          type: number
+
+    # Market Data Cache Schemas
+    StampMarketData:
+      type: object
+      description: Market data for individual stamps from the cache
+      properties:
+        cpid:
+          type: string
+          description: Counterparty ID of the stamp
+        floorPriceBTC:
+          type: number
           nullable: true
-        service_fee_address:
-          oneOf:
-            - type: string
+          description: Floor price in BTC from dispensers
+        recentSalePriceBTC:
+          type: number
           nullable: true
+          description: Most recent sale price in BTC
+        openDispensersCount:
+          type: integer
+          description: Number of open dispensers
+        closedDispensersCount:
+          type: integer
+          description: Number of closed dispensers
+        totalDispensersCount:
+          type: integer
+          description: Total number of dispensers
+        holderCount:
+          type: integer
+          description: Number of addresses holding this stamp
+        uniqueHolderCount:
+          type: integer
+          description: Number of unique holders (excluding duplicates)
+        topHolderPercentage:
+          type: number
+          description: Percentage held by the top holder
+        holderDistributionScore:
+          type: number
+          description: Distribution score from 0-100
+        volume24hBTC:
+          type: number
+          description: 24-hour trading volume in BTC
+        volume7dBTC:
+          type: number
+          description: 7-day trading volume in BTC
+        volume30dBTC:
+          type: number
+          description: 30-day trading volume in BTC
+        totalVolumeBTC:
+          type: number
+          description: All-time trading volume in BTC
+        priceSource:
+          type: string
+          nullable: true
+          description: Source of the price data
+        volumeSources:
+          type: object
+          nullable: true
+          description: Breakdown of volume by source
+        dataQualityScore:
+          type: number
+          description: Data quality score from 0-10
+        confidenceLevel:
+          type: number
+          description: Confidence level from 0-10
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        lastPriceUpdate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last price update timestamp
+        updateFrequencyMinutes:
+          type: integer
+          description: Update frequency in minutes
+
+    SRC20MarketData:
+      type: object
+      description: Market data for SRC-20 tokens from the cache
+      properties:
+        tick:
+          type: string
+          description: Token ticker symbol
+        priceBTC:
+          type: number
+          nullable: true
+          description: Current price in BTC
+        priceUSD:
+          type: number
+          nullable: true
+          description: Current price in USD
+        floorPriceBTC:
+          type: number
+          nullable: true
+          description: Floor price in BTC
+        marketCapBTC:
+          type: number
+          description: Market capitalization in BTC
+        marketCapUSD:
+          type: number
+          description: Market capitalization in USD
+        volume24hBTC:
+          type: number
+          description: 24-hour trading volume in BTC
+        holderCount:
+          type: integer
+          description: Number of token holders
+        circulatingSupply:
+          type: string
+          description: Circulating supply (string for precision)
+        priceChange24hPercent:
+          type: number
+          description: 24-hour price change percentage
+        primaryExchange:
+          type: string
+          nullable: true
+          description: Primary exchange for trading
+        exchangeSources:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: List of exchange sources
+        dataQualityScore:
+          type: number
+          description: Data quality score from 0-10
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    CollectionMarketData:
+      type: object
+      description: Aggregated market data for collections
+      properties:
+        collectionId:
+          type: string
+          description: Collection identifier
+        minFloorPriceBTC:
+          type: number
+          nullable: true
+          description: Minimum floor price in the collection
+        maxFloorPriceBTC:
+          type: number
+          nullable: true
+          description: Maximum floor price in the collection
+        avgFloorPriceBTC:
+          type: number
+          nullable: true
+          description: Average floor price in the collection
+        medianFloorPriceBTC:
+          type: number
+          nullable: true
+          description: Median floor price in the collection
+        totalVolume24hBTC:
+          type: number
+          description: Total 24-hour volume for the collection
+        stampsWithPricesCount:
+          type: integer
+          description: Number of stamps with price data
+        minHolderCount:
+          type: integer
+          description: Minimum holder count in the collection
+        maxHolderCount:
+          type: integer
+          description: Maximum holder count in the collection
+        avgHolderCount:
+          type: number
+          description: Average holder count
+        medianHolderCount:
+          type: integer
+          description: Median holder count
+        totalUniqueHolders:
+          type: integer
+          description: Total unique holders across collection
+        avgDistributionScore:
+          type: number
+          description: Average distribution score
+        totalStampsCount:
+          type: integer
+          description: Total number of stamps in collection
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    CacheStatus:
+      type: string
+      enum: [fresh, stale, expired]
+      description: Cache status indicator
+
+    MarketDataCacheInfo:
+      type: object
+      description: Information about cache status
+      properties:
+        status:
+          $ref: "#/components/schemas/CacheStatus"
+        ageMinutes:
+          type: integer
+          description: Age of the cached data in minutes
+        nextUpdateIn:
+          type: integer
+          description: Minutes until next update
+
+    StampWithMarketData:
+      allOf:
+        - $ref: "#/components/schemas/StampRow"
+        - type: object
+          properties:
+            marketData:
+              $ref: "#/components/schemas/StampMarketData"
+              nullable: true
+            marketDataMessage:
+              type: string
+              nullable: true
+              description: Message when market data is null
+            cacheInfo:
+              $ref: "#/components/schemas/MarketDataCacheInfo"
+
+    SRC20WithMarketData:
+      allOf:
+        - $ref: "#/components/schemas/Src20Detail"
+        - type: object
+          properties:
+            marketData:
+              $ref: "#/components/schemas/SRC20MarketData"
+              nullable: true
+            marketDataMessage:
+              type: string
+              nullable: true
+              description: Message when market data is null
+            cacheInfo:
+              $ref: "#/components/schemas/MarketDataCacheInfo"
+
+    CollectionWithMarketData:
+      allOf:
+        - $ref: "#/components/schemas/Collection"
+        - type: object
+          properties:
+            marketData:
+              $ref: "#/components/schemas/CollectionMarketData"
+              nullable: true
+            marketDataMessage:
+              type: string
+              nullable: true
+              description: Message when market data is null
+            cacheInfo:
+              $ref: "#/components/schemas/MarketDataCacheInfo"
+
+    StampHolderCache:
+      type: object
+      description: Cached holder information for stamps
+      properties:
+        id:
+          type: integer
+          description: Unique identifier
+        cpid:
+          type: string
+          description: Counterparty ID of the stamp
+        address:
+          type: string
+          description: Holder's Bitcoin address
+        quantity:
+          type: number
+          description: Amount held by this address
+        percentage:
+          type: number
+          description: Percentage of total supply held
+        rankPosition:
+          type: integer
+          description: Holder's rank by quantity
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    MarketDataSource:
+      type: object
+      description: Market data from various sources for transparency
+      properties:
+        id:
+          type: integer
+          description: Unique identifier
+        assetType:
+          type: string
+          enum: [stamp, src20]
+          description: Type of asset
+        assetId:
+          type: string
+          description: Asset identifier (cpid for stamps, tick for src20)
+        source:
+          type: string
+          description: Data source name
+        priceBTC:
+          type: number
+          nullable: true
+          description: Price in BTC
+        priceUSD:
+          type: number
+          nullable: true
+          description: Price in USD
+        volume24hBTC:
+          type: number
+          description: 24-hour volume in BTC
+        holderCount:
+          type: integer
+          description: Number of holders
+        marketCapBTC:
+          type: number
+          description: Market cap in BTC
+        sourceConfidence:
+          type: number
+          description: Confidence score (0-10)
+        apiResponseTimeMs:
+          type: integer
+          description: API response time in milliseconds
+        lastUpdated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "Resource not found"
+    BadRequest:
+      description: Bad Request - Invalid input parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "Invalid request parameters"
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "Internal server error"

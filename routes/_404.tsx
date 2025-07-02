@@ -1,25 +1,46 @@
+/* ===== ERROR 404 PAGE ===== */
 import { Head } from "$fresh/runtime.ts";
+import { subtitleGrey, titleGreyLD } from "$text";
+import { Button } from "$button";
 
-export default function Error404() {
+/* ===== PAGE COMPONENT ===== */
+export default function Error404Page() {
+  /* ===== RENDER ===== */
   return (
     <>
       <Head>
         <title>404 - Page not found</title>
       </Head>
-      <div class="px-4 py-8 mx-auto bg-[#86efac]">
-        <div class="max-w-screen-md mx-auto flex flex-col items-center justify-center">
-          <img
-            class="my-6"
-            src="img/stamp.jpg"
-            width="128"
-            height="128"
-            alt="Bitcoin Stamps"
-          />
-          <h1 class="text-4xl font-bold">404 - Page not found</h1>
-          <p class="my-4">
-            The page you were looking for doesn't exist.
-          </p>
-          <a href="/" class="underline">Go back home</a>
+
+      <div class="flex flex-col justify-center items-center mx-auto my-auto">
+        <div class="flex flex-col justify-center items-center">
+          <div class={titleGreyLD}>WHOOPS</div>
+          <div class={subtitleGrey}>SOMETHING WENT WRONG</div>
+        </div>
+        <img
+          class="w-[240px] tablet:w-[280px] mt-1 mb-3 pixelart"
+          src="/img/placeholder/broken.png"
+          alt="Bitcoin Stamps"
+        />
+        <div class={subtitleGrey}>SORRY ABOUT THAT</div>
+        <div class="flex gap-6 mt-3">
+          <Button
+            variant="outline"
+            color="grey"
+            size="md"
+            href="javascript:history.back()"
+          >
+            GO BACK
+          </Button>
+          <Button
+            variant="flat"
+            color="grey"
+            size="md"
+            href="/home"
+            target="_top"
+          >
+            HOME
+          </Button>
         </div>
       </div>
     </>

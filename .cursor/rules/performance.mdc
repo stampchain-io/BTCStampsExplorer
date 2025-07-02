@@ -1,0 +1,18 @@
+---
+description: "Details on performance optimization techniques used, such as Fresh streaming, partial hydration, asset optimization, caching, and image handling."
+globs: ["routes/**/*.{ts,tsx}", "islands/**/*.tsx", "server/services/**/*.ts", "fresh.config.ts"]
+alwaysApply: false
+---
+
+
+# Performance optimizations from your code
+performance:
+  optimizations:
+    - implement_fresh_streaming
+    - use_partial_hydration
+    - optimize_assets
+    - implement_caching
+  image_handling:
+    - use_webp_format
+    - include_size_data
+    - implement_lazy_loading
