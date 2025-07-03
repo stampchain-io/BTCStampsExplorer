@@ -119,7 +119,7 @@ export class SRC20TransactionService {
       changeAddress: body.changeAddress,
       tick: body.tick,
       feeRate: body.feeRate,
-      amt: body.amt.toString(),
+      amt: body.amt?.toString() ?? "",
     };
   }
 
@@ -129,7 +129,7 @@ export class SRC20TransactionService {
       fromAddress: body.fromAddress,
       tick: body.tick,
       feeRate: body.feeRate,
-      amt: body.amt.toString(),
+      amt: body.amt?.toString() ?? "",
     };
   }
 }

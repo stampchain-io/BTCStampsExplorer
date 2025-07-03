@@ -1,11 +1,10 @@
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Src20Detail, InputData } from "$globals";
+import { Src20Detail } from "$globals";
 import { crypto } from "@std/crypto";
 import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
 import { SRC20QueryService } from "./queryService.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$types/index.d.ts";
 import { InputData } from "$server/types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
 export class SRC20UtilityService {
@@ -141,6 +140,10 @@ export class SRC20UtilityService {
         return ResponseUtil.badRequest("Decimals must be between 0 and 18");
       }
     } catch (error) {
+      logger.error("src20-utility", { 
+        message: "Failed to parse numeric values for deploy validation", 
+        error: error instanceof Error ? error.message : String(error) 
+      });
       return ResponseUtil.badRequest("Invalid numeric values provided");
     }
 
