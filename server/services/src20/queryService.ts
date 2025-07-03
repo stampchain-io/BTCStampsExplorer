@@ -438,7 +438,7 @@ export class SRC20QueryService {
       // Apply date range filtering if specified
       if (sanitizedParams.dateFrom || sanitizedParams.dateTo) {
         formattedData = Array.isArray(formattedData) ? formattedData : [formattedData];
-        formattedData = formattedData.filter(item => {
+        formattedData = formattedData.filter((item: any) => {
           const itemDate = new Date(item.block_time);
           if (sanitizedParams.dateFrom && itemDate < new Date(sanitizedParams.dateFrom)) return false;
           if (sanitizedParams.dateTo && itemDate > new Date(sanitizedParams.dateTo)) return false;
@@ -468,7 +468,7 @@ export class SRC20QueryService {
 
           formattedData = Array.isArray(formattedData) ? formattedData : [formattedData];
 
-          formattedData = formattedData.filter(item => {
+          formattedData = formattedData.filter((item: any) => {
             if (!item.market_data) return false;
 
             const { floor_price = 0, volume_24h = 0 } = item.market_data;
@@ -485,7 +485,7 @@ export class SRC20QueryService {
         if (sanitizedParams.minSupply !== undefined ||
           sanitizedParams.maxSupply !== undefined)
         {
-          formattedData = formattedData.filter(item => {
+          formattedData = formattedData.filter((item: any) => {
             if (sanitizedParams.minSupply !== undefined && item.max < sanitizedParams.minSupply) return false;
             if (sanitizedParams.maxSupply !== undefined && item.max > sanitizedParams.maxSupply) return false;
             return true
@@ -495,7 +495,7 @@ export class SRC20QueryService {
         if (sanitizedParams.minHolder !== undefined ||
           sanitizedParams.maxHolder !== undefined)
         {
-          formattedData = formattedData.filter(item => {
+          formattedData = formattedData.filter((item: any) => {
             if (sanitizedParams.minHolder !== undefined && item.holders < sanitizedParams.minHolder) return false;
             if (sanitizedParams.maxHolder !== undefined && item.holders > sanitizedParams.maxHolder) return false;
             return true
@@ -505,7 +505,7 @@ export class SRC20QueryService {
         if (sanitizedParams.minProgress !== undefined ||
           sanitizedParams.maxProgress !== undefined)
         {
-          formattedData = formattedData.filter(item => {
+          formattedData = formattedData.filter((item: any) => {
             if (sanitizedParams.minProgress !== undefined && item.progress < sanitizedParams.minProgress) return false;
             if (sanitizedParams.maxProgress !== undefined && item.progress > sanitizedParams.maxProgress) return false;
             return true
@@ -515,7 +515,7 @@ export class SRC20QueryService {
         if (sanitizedParams.minTxCount !== undefined ||
           sanitizedParams.maxTxCount !== undefined)
         {
-          formattedData = formattedData.filter(item => {
+          formattedData = formattedData.filter((item: any) => {
             if (sanitizedParams.minTxCount !== undefined && item.mint_progress?.current < sanitizedParams.minTxCount) return false;
             if (sanitizedParams.maxTxCount !== undefined && item.mint_progress?.current > sanitizedParams.maxTxCount) return false;
             return true
