@@ -5,7 +5,7 @@ import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
 import { SRC20QueryService } from "./queryService.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { InputData } from "$server/types/index.d.ts";
+import { InputData } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
 export class SRC20UtilityService {
   static formatSRC20Row(row: Src20Detail) {

@@ -10,6 +10,8 @@ import {
 import { RouteType } from "$server/services/cacheService.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { isValidBitcoinAddress } from "$lib/utils/scriptTypeUtils.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(req: Request, ctx): Promise<Response> {
@@ -21,6 +23,16 @@ export const handler: Handlers<AddressHandlerContext> = {
       if (!paramsValidation.isValid) {
         return paramsValidation.error ??
           new Response("Invalid parameters", { status: 400 });
+      }
+
+      // Check for XSS attempts
+      const xssPattern = /<script|javascript:|on\w+=/i;
+      if (xssPattern.test(address)) {
+        return ResponseUtil.badRequest(
+          "Invalid input detected",
+          undefined,
+          { routeType: RouteType.BALANCE },
+        );
       }
 
       // Validate Bitcoin address format
@@ -43,20 +55,16 @@ export const handler: Handlers<AddressHandlerContext> = {
         page = DEFAULT_PAGINATION.page,
       } = pagination;
 
-      // Use full limit for both endpoints to ensure we get all available data
-      const [stampsRes, src20Res, btcInfo] = await Promise.all([
-        fetch(
-          `${url.origin}/api/v2/stamps/balance/${address}?limit=${limit}&page=${page}`,
-        ),
-        fetch(
-          `${url.origin}/api/v2/src20/balance/${address}?limit=${limit}&page=${page}`,
-        ),
+      // Call controllers directly instead of making HTTP requests to avoid DNS issues
+      const [stamps, src20, btcInfo] = await Promise.all([
+        StampController.getStampBalancesByAddress(address, limit, page),
+        Src20Controller.handleSrc20BalanceRequest({
+          address,
+          limit,
+          page,
+          includePagination: true,
+        }),
         getBTCBalanceInfo(address),
-      ]);
-
-      const [stamps, src20] = await Promise.all([
-        stampsRes.json(),
-        src20Res.json(),
       ]);
 
       // Check for empty results

@@ -133,6 +133,13 @@ export const createStampHandler = (
         const editions = url.searchParams.get("editions")?.split(",")
           .filter(Boolean) as STAMP_EDITIONS[] | undefined;
 
+        // Extract ident parameter
+        const identParam = url.searchParams.get("ident");
+        const ident = identParam
+          ? identParam.split(",")
+            .filter(Boolean) as string[] | undefined
+          : undefined;
+
         // Extract new marketplace filters
         const market = url.searchParams.get("market") as
           | Extract<STAMP_MARKETPLACE, "listings" | "sales">
@@ -205,6 +212,26 @@ export const createStampHandler = (
           undefined;
         const priceSource = url.searchParams.get("priceSource") || undefined;
 
+        // Check for timestamp parameters and validate if present
+        const fromTimestamp = url.searchParams.get("from_timestamp");
+        const toTimestamp = url.searchParams.get("to_timestamp");
+
+        if (fromTimestamp && isNaN(Date.parse(fromTimestamp))) {
+          return ApiResponseUtil.badRequest(
+            `Invalid timestamp format: ${fromTimestamp}. Must be a valid date string.`,
+            undefined,
+            { routeType: cacheType },
+          );
+        }
+
+        if (toTimestamp && isNaN(Date.parse(toTimestamp))) {
+          return ApiResponseUtil.badRequest(
+            `Invalid timestamp format: ${toTimestamp}. Must be a valid date string.`,
+            undefined,
+            { routeType: cacheType },
+          );
+        }
+
         // Important part: Pass the min/max values directly to the controller
         const result = await StampController.getStamps({
           page,
@@ -213,6 +240,7 @@ export const createStampHandler = (
           type: routeConfig.type,
           allColumns: false,
           skipTotalCount: false,
+          ...(ident && { ident }),
           ...(fileType && { fileType }),
           ...(editions && { editions }),
           ...(market && { market }),

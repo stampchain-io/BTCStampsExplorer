@@ -89,7 +89,7 @@ const handleAccountsChanged = async () => {
       balanceInfo,
     });
 
-    const _wallet: Wallet = {
+    const wallet: Wallet = {
       address,
       accounts,
       publicKey,
@@ -106,10 +106,10 @@ const handleAccountsChanged = async () => {
     logger.info("ui", {
       message: "Updated wallet information",
       context: "handleAccountsChanged",
-      wallet: _wallet,
+      wallet: wallet,
     });
 
-    walletContext.updateWallet(_wallet);
+    walletContext.updateWallet(wallet);
   } catch (error: unknown) {
     logger.error("ui", {
       message: "Error fetching account from OKX wallet",

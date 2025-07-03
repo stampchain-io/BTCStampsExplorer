@@ -171,12 +171,14 @@ Deno.test("StampRepository Unit Tests", async (t) => {
 
     // The mock should return the count
     const count = result.rows[0]?.total || 0;
+
     // We have fixture data, so count should be > 0
     assertEquals(typeof count, "number");
     assertEquals(count > 0, true);
 
     // Verify the query was called
     const queryHistory = mockDb.getQueryHistory();
+
     const countQuery = queryHistory.find((h) =>
       h.query.toLowerCase().includes("count(*)")
     );

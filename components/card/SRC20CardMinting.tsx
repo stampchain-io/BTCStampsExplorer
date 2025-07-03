@@ -174,7 +174,7 @@ export function SRC20CardMinting({
                       cellAlign(1, headers.length)
                     } ${rowCardBorderCenter} hidden min-[600px]:table-cell`}
                   >
-                    {src20.mint_count || "N/A"}
+                    {src20.mint_progress?.total_mints || "N/A"}
                   </td>
                   {/* PROGRESS */}
                   <td
@@ -203,7 +203,7 @@ export function SRC20CardMinting({
                       cellAlign(3, headers.length)
                     } ${rowCardBorderCenter} hidden min-[600px]:table-cell`}
                   >
-                    {src20.trending_rank ? `#${src20.trending_rank}` : "N/A"}
+                    {"N/A"}
                   </td>
                   {/* DEPLOY */}
                   <td

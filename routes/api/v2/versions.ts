@@ -22,11 +22,16 @@ const CHANGELOG = [
         "holderCount and uniqueHolderCount fields",
         "Advanced market data filtering parameters",
         "dataQualityScore for data reliability metrics",
+        "from_timestamp and to_timestamp query parameters for date filtering (validation only)",
       ],
       improved: [
         "Response performance with intelligent caching",
         "Pagination consistency across all endpoints",
         "List query performance by excluding stamp_base64 field from list responses",
+        "Input validation for ident parameter to return empty results for invalid values",
+        "Security validation for SQL injection attempts in SRC101 endpoints",
+        "XSS detection in address-related endpoints",
+        "Transaction hash format validation requiring 64-character hex strings",
       ],
       optimized: [
         "stamp_base64 field is now excluded from list endpoints for 50-70% smaller responses",

@@ -108,7 +108,6 @@ export class MarketDataRepositoryCI {
       collectionId,
       offset = 0,
       limit = MAX_PAGINATION_LIMIT,
-      filters,
       sortBy = 'block_index',
       sortOrder = 'DESC'
     } = options;

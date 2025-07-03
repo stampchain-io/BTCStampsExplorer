@@ -98,24 +98,24 @@ export const handleConnect = async (addresses: LeatherAddress[]) => {
 
   console.log(`Using BTC address type: ${btcAddress.type}`);
 
-  const _wallet = {} as Wallet;
-  _wallet.address = btcAddress.address;
-  _wallet.accounts = [btcAddress.address];
-  _wallet.publicKey = btcAddress.publicKey;
-  _wallet.addressType = btcAddress.type || "p2wpkh";
+  const wallet = {} as Wallet;
+  wallet.address = btcAddress.address;
+  wallet.accounts = [btcAddress.address];
+  wallet.publicKey = btcAddress.publicKey;
+  wallet.addressType = btcAddress.type || "p2wpkh";
 
   const addressInfo = await getBTCBalanceInfo(btcAddress.address);
 
-  _wallet.btcBalance = {
+  wallet.btcBalance = {
     confirmed: addressInfo?.balance ?? 0,
     unconfirmed: addressInfo?.unconfirmedBalance ?? 0,
     total: (addressInfo?.balance ?? 0) + (addressInfo?.unconfirmedBalance ?? 0),
   };
 
-  _wallet.network = "mainnet";
-  _wallet.provider = "leather";
+  wallet.network = "mainnet";
+  wallet.provider = "leather";
 
-  walletContext.updateWallet(_wallet);
+  walletContext.updateWallet(wallet);
 };
 
 const signMessage = async (message: string) => {

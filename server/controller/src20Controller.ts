@@ -3,14 +3,13 @@ import { SRC20Repository } from "$server/database/src20Repository.ts";
 import {
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
+  PaginatedSrc20ResponseBody,
 } from "$globals";
-import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
-import { StampService } from "$server/services/stampService.ts";
+import { SRC20BalanceRequestParams, SRC20TickPageData } from "$lib/types/src20.d.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { MarketListingAggregated } from "$types/index.d.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
-import { WalletData } from "$lib/types/index.d.ts";
 import { formatAmount } from "$lib/utils/formatUtils.ts";
 
 export class Src20Controller {
@@ -71,7 +70,7 @@ export class Src20Controller {
    * This method is kept for backward compatibility with existing API routes.
    */
   static async handleSrc20TransactionsRequest(
-    req: Request,
+    _req: Request,
     params: SRC20TrxRequestParams,
     excludeFullyMinted = false,
   ) {
@@ -111,21 +110,21 @@ export class Src20Controller {
       let processedData = rawData.length > 1 ? [...rawData]: rawData;
 
       if (balanceParams.includeMintData) {
-        const ticks = processedData.map(row => row.tick).filter(Boolean);
+        const ticks = processedData.map((row: any) => row.tick).filter(Boolean);
         if (ticks.length > 0) {
           const mintProgressData = await Promise.all(
-            ticks.map(tick => 
+            ticks.map((tick: string) => 
               SRC20Service.QueryService.fetchSrc20MintProgress(tick)
             )
           );
           
           // Create a map of tick to mint progress for efficient lookup
           const mintProgressMap = new Map(
-            mintProgressData.map((progress, index) => [ticks[index], progress])
+            mintProgressData.map((progress: any, index: number) => [ticks[index], progress])
           );
 
           // Enrich data with mint progress
-          processedData = processedData.map(row => ({
+          processedData = processedData.map((row: any) => ({
             ...row,
             mint_progress: mintProgressMap.get(row.tick) || null
           }));
@@ -220,7 +219,7 @@ export class Src20Controller {
     return { data, total, lastBlock };
   }
 
-  static async handleDeploymentRequest(tick: string, req: Request) {
+  static async handleDeploymentRequest(tick: string, _req: Request) {
     try {
       const [deploymentData, mintStatusData, lastBlockData] = await Promise.all(
         [
@@ -517,7 +516,7 @@ export class Src20Controller {
       );
 
       // Merge trending data with enriched data
-      let allEnrichedResult = allTrendingData.data.map(row => {
+      const allEnrichedResult = allTrendingData.data.map(row => {
         const enrichedItem = Array.isArray(enrichedData.data) 
           ? enrichedData.data.find(item => item.tick === row.tick)
           : enrichedData.data;
@@ -573,7 +572,8 @@ export class Src20Controller {
         total: allEnrichedResult.length,
         page,
         totalPages,
-        limit
+        limit,
+        last_block: await BlockService.getLastBlock()
       };
     } catch (error) {
       console.error("Error in fetchTrendingActiveMintingTokensV2:", error);

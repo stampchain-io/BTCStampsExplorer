@@ -118,8 +118,24 @@ export async function apiVersionMiddleware(
 ): Promise<Response> {
   const { req, state } = ctx;
   
+  // Handle case where req might be undefined
+  let headers: Headers;
+  if (req && req.headers) {
+    headers = req.headers;
+  } else if (ctx.state.request && ctx.state.request.headers) {
+    headers = ctx.state.request.headers;
+  } else {
+    logger.warn("api", {
+      message: "Request object or headers missing in apiVersionMiddleware",
+      contextKeys: Object.keys(ctx),
+      stateKeys: Object.keys(ctx.state || {})
+    });
+    // Use empty headers as fallback
+    headers = new Headers();
+  }
+  
   // Parse API version from headers
-  const version = parseApiVersion(req.headers);
+  const version = parseApiVersion(headers);
   const versionContext = getVersionContext(version);
   
   // Store version context in state for downstream use
@@ -127,8 +143,10 @@ export async function apiVersionMiddleware(
   state.versionContext = versionContext;
   
   // Log version usage
-  logger.info(`API request with version ${version}`, {
-    path: req.url,
+  const requestUrl = req?.url || ctx.state.request?.url || "unknown";
+  logger.info("api", {
+    message: `API request with version ${version}`,
+    path: requestUrl,
     deprecated: versionContext.isDeprecated
   });
 
@@ -148,7 +166,8 @@ export async function apiVersionMiddleware(
       `<https://stampchain.io/docs/api/migration>; rel="deprecation"`
     );
     
-    logger.warn(`Deprecated API version ${version} used`, {
+    logger.warn("api", {
+      message: `Deprecated API version ${version} used`,
       endOfLife: versionContext.endOfLife
     });
   }

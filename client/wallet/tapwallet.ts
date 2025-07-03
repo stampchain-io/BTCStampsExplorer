@@ -44,24 +44,24 @@ const handleAccountsChanged = async (accounts: string[]) => {
   }
 
   const tapwallet = (globalThis as any).tapwallet;
-  const _wallet = {} as Wallet;
-  _wallet.address = accounts[0];
-  _wallet.accounts = accounts;
+  const wallet = {} as Wallet;
+  wallet.address = accounts[0];
+  wallet.accounts = accounts;
 
   const publicKey = await tapwallet.getPublicKey();
-  _wallet.publicKey = publicKey;
+  wallet.publicKey = publicKey;
 
   const balance = await tapwallet.getBalance();
-  _wallet.btcBalance = {
+  wallet.btcBalance = {
     confirmed: balance.confirmed,
     unconfirmed: balance.unconfirmed,
     total: balance.confirmed + balance.unconfirmed,
   };
 
-  _wallet.network = await tapwallet.getNetwork();
-  _wallet.provider = "tapwallet";
+  wallet.network = await tapwallet.getNetwork();
+  wallet.provider = "tapwallet";
 
-  walletContext.updateWallet(_wallet);
+  walletContext.updateWallet(wallet);
 };
 
 const signMessage = async (message: string) => {

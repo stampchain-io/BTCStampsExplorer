@@ -2,6 +2,7 @@
 // @bbaba+@reinamora - are the
 // deno-lint-ignore-file
 import { useState } from "preact/hooks";
+import type { JSX } from "preact";
 import { ModalBase } from "$layout";
 import { InputField } from "$form";
 import {
@@ -15,7 +16,6 @@ import { Button } from "$button";
 import { SelectDate } from "$form";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { subtitlePurple } from "$text";
 
 /* ===== TYPES ===== */
 type FilterTypes =
@@ -50,7 +50,7 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
 
   /* ===== EVENT HANDLERS ===== */
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: JSX.TargetedEvent<HTMLInputElement>,
     type: string,
   ) => {
     if (type === "progress_min") {

@@ -65,8 +65,8 @@ export const script = {
 };
 
 export const crypto = {
-  sha256: (buffer) => new Uint8Array(32),
-  hash160: (buffer) => new Uint8Array(20),
+  sha256: (_buffer) => new Uint8Array(32),
+  hash160: (_buffer) => new Uint8Array(20),
 };
 
 export default {

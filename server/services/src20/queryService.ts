@@ -41,8 +41,8 @@ export class SRC20QueryService {
 
   static async fetchAndFormatSrc20Data(
     params: SRC20TrxRequestParams = {},
-    excludeFullyMinted: boolean = false,
-    onlyFullyMinted: boolean = false,
+    _excludeFullyMinted: boolean = false,
+    _onlyFullyMinted: boolean = false,
   ): Promise<PaginatedSrc20ResponseBody | Src20ResponseBody> {
     try {
       const sanitizedParams = {
@@ -88,10 +88,10 @@ export class SRC20QueryService {
       }
 
       const [data, totalResult, lastBlock] = await Promise.all([
-        SRC20Repository.getValidSrc20TxFromDb(queryParams, excludeFullyMinted),
+        SRC20Repository.getValidSrc20TxFromDb(queryParams, _excludeFullyMinted),
         SRC20Repository.getTotalCountValidSrc20TxFromDb(
           queryParams,
-          excludeFullyMinted,
+          _excludeFullyMinted,
         ),
         BlockService.getLastBlock(),
       ]);
@@ -429,7 +429,7 @@ export class SRC20QueryService {
       }
 
       // Map and format base data
-      let mappedData = this.mapTransactionData(data.rows);
+      const mappedData = this.mapTransactionData(data.rows);
       let formattedData = this.formatTransactionData(
         mappedData,
         queryParams

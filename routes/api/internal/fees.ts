@@ -13,7 +13,7 @@ export const handler: Handlers = {
     }
 
     // Rate limiting for fee endpoints
-    const rateLimitError = await RateLimitMiddleware.checkFeeRateLimit(req);
+    const rateLimitError = RateLimitMiddleware.checkFeeRateLimit(req);
     if (rateLimitError) {
       console.log("[fees.ts] Rate limit exceeded");
       return rateLimitError;

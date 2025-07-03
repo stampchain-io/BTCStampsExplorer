@@ -1,6 +1,6 @@
-// TODO: Move to /server
+// TODO(@team): Move to /server
 
-import { StampService } from "$server/services/stampService.ts";
+
 import { dbManager } from "$server/database/databaseManager.ts";
 import { DispenserFilter, DispenseEvent, XcpBalance, Dispenser } from "$types/index.d.ts";
 import type { Fairminter } from "$lib/types/services.d.ts";
@@ -159,7 +159,6 @@ export async function fetchXcpV2WithCache<T>(
 }
 
 export class DispenserManager {
-  private static fetchXcpV2WithCache = fetchXcpV2WithCache;
 
   static async getDispensersByCpid(
     cpid: string,
@@ -291,7 +290,9 @@ export class DispenserManager {
     const skipCount = (page - 1) * limit;
     let processedCount = 0;
 
-    logger.debug(`Fetching dispenses for CPID: ${cpid}, Page: ${page}, Limit: ${limit}`);
+    logger.debug("api", {
+        message: `Fetching dispenses for CPID: ${cpid}, Page: ${page}, Limit: ${limit}`
+    });
 
     while (true) {
       const queryParams = new URLSearchParams({
@@ -372,8 +373,8 @@ export class DispenserManager {
 
 // Update only the ComposeAttachOptions interface
 export interface ComposeAttachOptions {
-  // Required parameters
-  fee_per_kb: number;  // Changed from optional to required
+  // Fee parameters
+  fee_per_kb?: number;  // Optional - can be provided by caller or handled by API
 
   // Optional parameters
   destination_vout?: number;
@@ -405,8 +406,8 @@ export interface ComposeAttachOptions {
 
 // Also add ComposeDetachOptions since it's used in stampdetach.ts
 export interface ComposeDetachOptions {
-  // Required parameters
-  fee_per_kb: number;
+  // Fee parameters  
+  fee_per_kb?: number;
 
   // Optional parameters
   destination?: string;
@@ -504,7 +505,9 @@ export class XcpManager {
     const skipCount = (page - 1) * limit;
     let processedCount = 0;
 
-    logger.info(`Fetching ALL XCP holders for CPID: ${cpid} up to api limit: ${apiLimit}`);
+    logger.info("api", {
+        message: `Fetching ALL XCP holders for CPID: ${cpid} up to api limit: ${apiLimit}`
+    });
 
     while (true) {
       const queryParams = new URLSearchParams({
@@ -682,9 +685,9 @@ export class XcpManager {
     } catch (error) {
         await logger.error("api", {
             message: "Error fetching balances",
-            error: error.message,
+            error: error instanceof Error ? error.message : String(error),
             address,
-            stack: error.stack
+            stack: error instanceof Error ? error.stack : undefined
         });
         throw error;
     }
@@ -696,7 +699,7 @@ export class XcpManager {
   ): Promise<{ balances: XcpBalance[]; total: number }> {
     try {
       const MAX_RETRIES = 3;
-      let attempt = 0;
+      const attempt = 0;
       
       while (attempt < MAX_RETRIES) {
         await logger.info("api", {
@@ -750,7 +753,7 @@ export class XcpManager {
             address
           });
 
-          cursor = result.next_cursor;
+          cursor = result.next_cursor || null;
 
           // Break if we have all expected results or more
           // Note: We might get more than expected due to new transactions
@@ -776,21 +779,6 @@ export class XcpManager {
           });
           // Use actual aggregated count for total
           return { balances: allBalances, total: allBalances.length };
-        }
-
-        await logger.warn("api", {
-          message: "[XcpManager] Incomplete balance set",
-          currentCount: allBalances.length,
-          expectedTotal,
-          attempt: attempt + 1,
-          address,
-          retryDelay: 1000 * (attempt + 1)
-        });
-
-        attempt++;
-        
-        if (attempt < MAX_RETRIES) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
         }
       }
 
@@ -1087,7 +1075,7 @@ export class XcpManager {
             if (errorJson.error) {
               lastError = errorJson.error;
             }
-          } catch (e) {
+          } catch (_e) {
             lastError = errorBody;
           }
           continue; // Try the next node
@@ -1184,7 +1172,7 @@ export class XcpManager {
             if (errorJson.error) {
               lastError = errorJson.error;
             }
-          } catch (e) {
+          } catch (_e) {
             lastError = errorBody;
           }
           continue; // Try the next node
@@ -1333,7 +1321,7 @@ export class XcpManager {
             if (errorJson.error) {
               lastError = errorJson.error;
             }
-          } catch (e) {
+          } catch (_e) {
             lastError = errorBody;
           }
           continue;

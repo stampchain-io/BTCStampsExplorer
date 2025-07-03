@@ -1,5 +1,5 @@
 import { SRC101Service } from "$server/services/src101/index.ts";
-import type { IDeploySRC101, IMintSRC101, ITransferSRC101, ISetrecordSRC101, IRenewSRC101, IPrepareSRC101TX } from "$types/index.d.ts";
+import type { IDeploySRC101, IMintSRC101, ITransferSRC101, ISetrecordSRC101, IRenewSRC101, IPrepareSRC101TX } from "$server/types/services/src101.d.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 interface SRC101Operation {
@@ -41,7 +41,7 @@ export class SRC101OperationService {
     }
   }
 
-  static async mintSRC101(params: IMintSRC101) {
+  static mintSRC101(params: IMintSRC101) {
     return this.executeSRC101Operation(
       params,
       SRC101Service.UtilityService.validateMint,
@@ -66,11 +66,11 @@ export class SRC101OperationService {
       async (params) => {
         if(!params.recAddress){
           try{
-            const info = await SRC101Service.UtilityService.getDepoyDetails(params.hash);
+            const info = await SRC101Service.UtilityService.getDeployDetails(params.hash);
             params.recAddress = info[0].recipients[0];
           }
-          catch (error){
-            throw new Error(`cant getDepoyDetails ${params.hash}`);
+          catch (_error){
+            throw new Error(`cant getDeployDetails ${params.hash}`);
           }
         }
         //change tokenid to utf8 and clac price
@@ -86,7 +86,7 @@ export class SRC101OperationService {
               throw new Error(`Invalid price for token length ${length}: -1`);
             }
 
-            const price = prices.hasOwnProperty(length) ? prices[length] : prices[0];
+            const price = Object.prototype.hasOwnProperty.call(prices, length) ? prices[length] : prices[0];
 
             if (price === undefined) {
               throw new Error(`No default price (length 0) found for token length ${length}`);
@@ -129,7 +129,7 @@ export class SRC101OperationService {
       }),
       async () => {
       },
-      async (params) =>{
+      (params) =>{
         return params;
       },
     );
@@ -146,9 +146,9 @@ export class SRC101OperationService {
           toaddress,
           tokenid, 
         }),
-      async ({}) => {
+      async () => {
       },
-      async (params) =>{
+      (params) =>{
         return params;
       },
     );
@@ -167,9 +167,9 @@ export class SRC101OperationService {
           data, 
           prim, 
         }),
-      async ({}) => {
+      async () => {
       },
-      async (params) =>{
+      (params) =>{
         return params;
       },
     );
@@ -186,9 +186,9 @@ export class SRC101OperationService {
           tokenid, 
           dua, 
         }),
-      async ({}) => {
+      async () => {
       },
-      async (params) =>{
+      (params) =>{
         return params;
       },
     );

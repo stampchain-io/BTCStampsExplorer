@@ -1,12 +1,5 @@
 import { serverConfig } from "$server/config/config.ts";
 import { MAX_XCP_RETRIES, BLOCKCHAIN_API_BASE_URL } from "$lib/utils/constants.ts";
-import {
-  FetchQuicknodeFunction,
-  GetDecodedTx,
-  GetPublicKeyFromAddress,
-  GetRawTx,
-  GetTransaction,
-} from "$types/index.d.ts";
 
 // Interface for QuickNode estimatesmartfee response
 interface EstimateSmartFeeResponse {

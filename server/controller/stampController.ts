@@ -1,15 +1,14 @@
 import { StampService } from "$server/services/stampService.ts";
 import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
 import { HolderRow, SUBPROTOCOLS } from "$globals";
-import { Src20Service } from "$server/services/src20/queryService.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { BlockService } from "$server/services/blockService.ts";
-import { paginate } from "$lib/utils/paginationUtils.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import {
   PaginatedStampBalanceResponseBody,
   ProcessedHolder,
   StampRow,
+  StampBalance,
   STAMP_FILTER_TYPES,
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
@@ -19,17 +18,15 @@ import {
   STAMP_RANGES,
   STAMP_FILESIZES,
 } from "$globals";
-import { DispenserManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
-import { Dispense, Dispenser } from "$types/index.d.ts";
+import { Dispenser } from "$types/index.d.ts";
 import { CollectionController } from "./collectionController.ts";
-import { Src20Controller } from "./src20Controller.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { StampRepository } from "$server/database/stampRepository.ts";
-import { isCpid, getIdentifierType } from "$lib/utils/identifierUtils.ts";
+import { isCpid } from "$lib/utils/identifierUtils.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { detectContentType } from "$lib/utils/imageUtils.ts";
 import { getMimeType } from "$lib/utils/imageUtils.ts";
@@ -230,10 +227,10 @@ export class StampController {
     if (filterByArray.length > 0) {
       // Extract ident and suffix from filterBy
       const identFromFilter = filterByArray.flatMap((filter) =>
-        filterOptions[filter]?.ident || []
+        filter in filterOptions ? filterOptions[filter as keyof typeof filterOptions]?.ident || [] : []
       );
       filterSuffix = filterByArray.flatMap((filter) =>
-        filterOptions[filter]?.suffixFilters || []
+        filter in filterOptions ? filterOptions[filter as keyof typeof filterOptions]?.suffixFilters || [] : []
       ) as STAMP_SUFFIX_FILTERS[];
 
       // Combine ident from type and filterBy, removing duplicates
@@ -389,7 +386,7 @@ export class StampController {
   }
 
   // This becomes a wrapper around getStamps for backward compatibility
-  static async getStampDetailsById(
+  static getStampDetailsById(
     id: string, 
     stampType: STAMP_TYPES = "all",
     cacheType: RouteType = RouteType.STAMP_DETAIL,
@@ -731,7 +728,7 @@ export class StampController {
 
   private static async proxyContentRouteToStampsRoute(
     identifier: string,
-    stamp_url: string,
+    _stamp_url: string,
     baseUrl?: string,
     contentType: string = 'application/octet-stream'
   ) {
@@ -762,7 +759,7 @@ export class StampController {
 
   static async getStampFile(
     identifier: string,
-    routeType: RouteType,
+    _routeType: RouteType,
     baseUrl?: string,
     isFullPath = false
   ) {
@@ -786,7 +783,7 @@ export class StampController {
     }
   }
 
-  private static async handleFullPathStamp(identifier: string, baseUrl?: string) {
+  private static handleFullPathStamp(identifier: string, baseUrl?: string) {
     const [, extension] = identifier.split(".");
     const contentType = getMimeType(extension);
     
@@ -798,7 +795,7 @@ export class StampController {
     );
   }
 
-  private static async handleStampContent(result: any, identifier: string) {
+  private static handleStampContent(result: any, identifier: string) {
     const contentInfo = detectContentType(
       result.body,
       undefined,

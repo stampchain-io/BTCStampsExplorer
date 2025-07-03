@@ -1,6 +1,5 @@
-import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE, MAX_PAGINATION_LIMIT } from "$constants";
+import { DEFAULT_CACHE_DURATION, STAMP_TABLE, MAX_PAGINATION_LIMIT } from "$constants";
 import { SUBPROTOCOLS } from "$globals";
-import { BIG_LIMIT } from "$lib/utils/constants.ts";
 import {
   STAMP_FILTER_TYPES,
   STAMP_SUFFIX_FILTERS,
@@ -16,7 +15,6 @@ import {
 import { XcpBalance } from "$types/index.d.ts";
 import { summarize_issuances } from "./index.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
 import {
   isStampNumber,
@@ -25,7 +23,6 @@ import {
   isCpid,
   getIdentifierType,
 } from "$lib/utils/identifierUtils.ts";
-import { getMimeType, getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 
 export class StampRepository {
@@ -49,7 +46,7 @@ export class StampRepository {
     blockIdentifier?: number | string,
     collectionId?: string | string[],
     filterBy?: STAMP_FILTER_TYPES[],
-    suffix?: STAMP_SUFFIX_FILTERS[],
+    combinedFilters?: (STAMP_SUFFIX_FILTERS | STAMP_FILETYPES)[],
     isSearchQuery?: boolean,
     filters?: StampFilters,
     editions?: STAMP_EDITIONS[],
@@ -196,22 +193,30 @@ export class StampRepository {
       }
     }
 
-    // File suffix condition from suffix
-    if (suffix && suffix.length > 0) {
-      // Extract different filter types
-      const fileExtensions = suffix.filter(filter => 
-        !["legacy", "olga", "single", "multiple", "locked", "unlocked", "divisible"].includes(filter)
-      );
+    // Handle combined filters (both suffix and fileType filters)
+    if (combinedFilters && combinedFilters.length > 0) {
+      // Separate file extensions (STAMP_SUFFIX_FILTERS) from other types
+      const fileExtensions = combinedFilters.filter(filter => 
+        ["gif", "jpg", "png", "webp", "bmp", "jpeg", "svg", "html"].includes(filter as string)
+      ) as STAMP_SUFFIX_FILTERS[];
       
-      const encodingFilters = suffix.filter(filter => 
-        filter === "legacy" || filter === "olga"
-      );
+      // Separate encoding filters (legacy/olga)
+      const encodingFilters = combinedFilters.filter(filter => 
+        ["legacy", "olga"].includes(filter as string)
+      ) as STAMP_FILETYPES[];
       
-      const editions = suffix.filter(filter => 
-        ["single", "multiple", "locked", "unlocked", "divisible"].includes(filter)
+      // Separate edition filters 
+      const editionFilters = combinedFilters.filter(filter => 
+        ["single", "multiple", "locked", "unlocked", "divisible"].includes(filter as string)
       ) as STAMP_EDITIONS[];
       
-      // Process file extensions
+      // Separate other file type filters (mimetype-based)
+      const mimetypeFilters = combinedFilters.filter(filter => 
+        ["jpg", "jpeg", "png", "gif", "webp", "avif", "bmp", "svg", "html", "txt", "mp3", "mpeg"].includes(filter as string) &&
+        !["legacy", "olga", "single", "multiple", "locked", "unlocked", "divisible"].includes(filter as string)
+      ) as STAMP_FILETYPES[];
+      
+      // Process file extensions (URL-based filtering)
       if (fileExtensions.length > 0) {
         const suffixCondition = fileExtensions
           .map((suffix) => `st.stamp_url LIKE '%${suffix}'`)
@@ -219,17 +224,14 @@ export class StampRepository {
         whereConditions.push(`(${suffixCondition})`);
       }
       
-      // Process encoding filters
-      if (encodingFilters.length > 0) {
-        const encodingCondition = this.buildEncodingFilterSQL(encodingFilters);
-        if (encodingCondition) {
-          whereConditions.push(encodingCondition);
-        }
+      // Process mimetype and encoding filters
+      if (mimetypeFilters.length > 0 || encodingFilters.length > 0) {
+        this.buildFileTypeFilterConditions([...mimetypeFilters, ...encodingFilters], whereConditions, queryParams);
       }
       
       // Process edition filters
-      if (editions.length > 0) {
-        this.buildEditionsFilterConditions(editions, whereConditions, queryParams);
+      if (editionFilters.length > 0) {
+        this.buildEditionsFilterConditions(editionFilters, whereConditions, queryParams);
       }
     }
 
@@ -389,7 +391,7 @@ export class StampRepository {
    * @throws If there is an error retrieving the balances.
    */
   static async getCountStampBalancesByAddressFromDb(
-    address: string,
+    _address: string,
     xcpBalances: XcpBalance[]
   ) {
     try {
@@ -622,21 +624,21 @@ export class StampRepository {
       range,
       rangeMin,
       rangeMax,
-      market,
-      dispensers,
-      atomics,
-      listings,
-      listingsMin,
-      listingsMax,
-      sales,
-      salesMin,
-      salesMax,
-      volume,
-      volumeMin,
-      volumeMax,
-      fileSize,
-      fileSizeMin,
-      fileSizeMax,
+      market: _market,
+      dispensers: _dispensers,
+      atomics: _atomics,
+      listings: _listings,
+      listingsMin: _listingsMin,
+      listingsMax: _listingsMax,
+      sales: _sales,
+      salesMin: _salesMin,
+      salesMax: _salesMax,
+      volume: _volume,
+      volumeMin: _volumeMin,
+      volumeMax: _volumeMax,
+      fileSize: _fileSize,
+      fileSizeMin: _fileSizeMin,
+      fileSizeMax: _fileSizeMax,
     } = options;
 
     // Combine both filter types for processing
@@ -875,7 +877,7 @@ export class StampRepository {
     }
 
     // Near the end of the getStamps method, right before executing the query
-    if (Deno.env.get("DEBUG_SQL") === "true" || Deno.env.get("ENV") === "development") {
+    if (Deno.env.get("DEBUG_SQL") === "true" || Deno.env.get("DENO_ENV") === "development") {
       console.log("[SQL DEBUG] Final SQL query:", query);
       console.log("[SQL DEBUG] With parameters:", queryParams);
     }
@@ -925,7 +927,7 @@ export class StampRepository {
    * @returns An array of summarized stamp balances for the given address.
    */
   static async getStampBalancesByAddress(
-    address: string,
+    _address: string,
     limit: number,
     page: number,
     xcpBalances: XcpBalance[],
@@ -1153,7 +1155,7 @@ export class StampRepository {
   private static buildFileTypeFilterConditions(
     filetypes: STAMP_FILETYPES[],
     whereConditions: string[],
-    queryParams: (string | number)[]
+    _queryParams: (string | number)[] // Not used - filetype filters are static SQL conditions
   ) {
     // Separate encoding filters (legacy/olga) from mimetype filters
     const mimetypeFilters = filetypes.filter(type => 
@@ -1207,6 +1209,18 @@ export class StampRepository {
 
   /**
    * Builds SQL conditions for filtering stamps by encoding type (legacy or OLGA)
+   * 
+   * IMPORTANT: Legacy and OLGA are not database identifiers but encoding types:
+   * - "legacy" = multisig encoding used before block 833000 (pre-Taproot activation)
+   * - "olga" = P2WSH encoding used from block 833000 onwards (post-Taproot activation)
+   * 
+   * These filters work by checking the block_index of when the stamp was created:
+   * - legacy: st.block_index < 833000 (before Taproot activation)
+   * - olga: st.block_index >= 833000 (after Taproot activation)
+   * 
+   * This is consensus-critical logic - DO NOT modify the block height thresholds
+   * without understanding the Bitcoin protocol changes.
+   * 
    * @param filters Array of file type filters that may include "legacy" or "olga"
    * @returns SQL condition string for filtering by encoding based on block height
    */
@@ -1278,7 +1292,7 @@ export class StampRepository {
   private static buildEditionsFilterConditions(
     editions: STAMP_EDITIONS[],
     whereConditions: string[],
-    queryParams: (string | number)[]
+    _queryParams: (string | number)[] // Not used - edition filters are static SQL conditions
   ) {
     if (!editions || editions.length === 0) {
       return;

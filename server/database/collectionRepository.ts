@@ -263,7 +263,7 @@ export class CollectionRepository {
 
     // Join market data table if requested
     // Note: For now we'll aggregate stamp market data for collections
-    // TODO: When collection_market_data table is created, update this join
+    // TODO(@team): When collection_market_data table is created, update this join
     if (includeMarketData) {
       // Aggregate market data from individual stamps in the collection
       query += `

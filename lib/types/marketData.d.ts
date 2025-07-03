@@ -1,6 +1,9 @@
 import type { SRC20Row, StampRow } from "$globals";
 import type { CollectionRow } from "../../server/types/collection.d.ts";
 
+// Re-export for other modules
+export type { SRC20Row, StampRow };
+
 export interface MarketListingSummary {
   tick: string;
   floor_unit_price: number;

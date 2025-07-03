@@ -2,7 +2,9 @@ import "$/server/config/env.ts";
 
 import { Client } from "mysql/mod.ts";
 // Conditionally import Redis based on build mode
-let connect, Redis;
+// @ts-expect-error TS6133: Variables used conditionally for Redis client type and connection function
+// deno-lint-ignore no-unused-vars
+let connect: any, Redis: any;
 if (Deno.args.includes("build")) {
   console.log("[REDIS IMPORT] Skipping Redis import in build mode");
   // Create dummy implementations for build
@@ -19,10 +21,12 @@ if (Deno.args.includes("build")) {
   try {
     const redis = await import("redis");
     connect = redis.connect;
-    Redis = redis.Redis;
+    // Note: The deno redis module doesn't export a Redis class, just the connect function
+    Redis = null; // Not needed for this Redis client
     console.log("[REDIS IMPORT] Successfully imported Redis client");
-  } catch (e) {
-    console.log("[REDIS IMPORT ERROR] " + e.message);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.log("[REDIS IMPORT ERROR] " + error.message);
     // Fallback to dummy implementations
     connect = () => Promise.resolve({
       ping: () => Promise.resolve("PONG (memory)"),
@@ -56,7 +60,7 @@ interface DatabaseConfig {
   REDIS_LOG_LEVEL?: string;
 }
 
-async function shouldInitializeRedis(): Promise<boolean> {
+function shouldInitializeRedis(): boolean {
   // Never initialize Redis during build
   if (Deno.args.includes("build")) {
     console.log("[REDIS] Build mode detected, skipping Redis initialization");
@@ -71,7 +75,7 @@ async function shouldInitializeRedis(): Promise<boolean> {
 
 class DatabaseManager {
   #pool: Client[] = [];
-  #redisClient: Redis | undefined;
+  #redisClient: any | undefined; // Redis client type
   #isConnectingRedis = false;
   #redisRetryCount = 0;
   #redisAvailable = false;
@@ -95,7 +99,7 @@ class DatabaseManager {
     // Start MySQL keep-alive mechanism
     this.startKeepAlive();
     
-    if (await shouldInitializeRedis()) {
+    if (shouldInitializeRedis()) {
       await this.initializeRedisConnection();
       this.#redisAvailableAtStartup = this.#redisAvailable;
     } else {
@@ -103,13 +107,13 @@ class DatabaseManager {
     }
   }
 
-  private #setupLogging(): void {
+  #setupLogging(): void {
     const level = this.config.REDIS_LOG_LEVEL || "INFO";
     const isTest = this.config.DENO_ENV === "test";
     
     // Only include file handler if not in test mode
     const handlers: any = {
-      console: new ConsoleHandler(level),
+      console: new ConsoleHandler(level as any),
     };
     
     const handlerNames = ["console"];
@@ -127,7 +131,7 @@ class DatabaseManager {
       handlers: handlers,
       loggers: {
         default: {
-          level: level,
+          level: level as any,
           handlers: handlerNames,
         },
       },
@@ -179,7 +183,7 @@ class DatabaseManager {
         // Test connection before executing query
         try {
           await client.execute("SELECT 1", []);
-        } catch (pingError) {
+        } catch (_pingError) {
           this.#logger.warn("Connection ping failed, removing from pool");
           if (client) {
             await this.closeClient(client);
@@ -217,10 +221,18 @@ class DatabaseManager {
           }
         }
         
-        this.#logger.error(
-          `Error executing query on attempt ${attempt}:`,
-          error,
-        );
+        // Only log as error on final attempt
+        if (attempt === this.#MAX_RETRIES) {
+          this.#logger.error(
+            `Error executing query on attempt ${attempt}:`,
+            error,
+          );
+        } else {
+          this.#logger.warn(
+            `Query failed on attempt ${attempt}, retrying...`,
+            error instanceof Error ? error.message : String(error),
+          );
+        }
         
         if (attempt === this.#MAX_RETRIES) {
           throw error;
@@ -331,10 +343,10 @@ class DatabaseManager {
   }
 
   private async initializeRedisConnection(): Promise<void> {
-    console.log(`[REDIS INIT] SKIP_REDIS_CONNECTION=${globalThis.SKIP_REDIS_CONNECTION}, ELASTICACHE_ENDPOINT=${this.config.ELASTICACHE_ENDPOINT}`);
+    console.log(`[REDIS INIT] SKIP_REDIS_CONNECTION=${(globalThis as any).SKIP_REDIS_CONNECTION}, ELASTICACHE_ENDPOINT=${this.config.ELASTICACHE_ENDPOINT}`);
     console.log(`[REDIS INIT] CACHE=${this.config.CACHE}, DENO_ENV=${this.config.DENO_ENV}`);
     
-    if (globalThis.SKIP_REDIS_CONNECTION) {
+    if ((globalThis as any).SKIP_REDIS_CONNECTION) {
       const skipMsg = "Skipping Redis connection for build process";
       this.#logger.info(skipMsg);
       console.log(`[REDIS INIT] ${skipMsg}`);
@@ -377,9 +389,9 @@ class DatabaseManager {
   private async connectToRedis(): Promise<void> {
     // Safely obtain and parse environment variables with defaults
     const REDIS_CONNECTION_TIMEOUT = parseInt(Deno.env.get("REDIS_TIMEOUT") || "15000");
-    const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
+    // Note: REDIS_DEBUG not used in this function - only used in cache operations
     const SKIP_REDIS_TLS = Deno.env.get("SKIP_REDIS_TLS") === "true"; // Only skip if explicitly set to true
-    const REDIS_MAX_RETRIES = parseInt(Deno.env.get("REDIS_MAX_RETRIES") || "10");
+    // Note: REDIS_MAX_RETRIES not used in this function - class uses this.#MAX_RETRIES from DB_MAX_RETRIES
     
     // Early console log to ensure we can see Redis connection attempts in logs
     console.log(`[REDIS CONFIG] ELASTICACHE_ENDPOINT=${this.config.ELASTICACHE_ENDPOINT}, SKIP_REDIS_TLS=${SKIP_REDIS_TLS}, TIMEOUT=${REDIS_CONNECTION_TIMEOUT}ms`);
@@ -759,20 +771,19 @@ class DatabaseManager {
     }
   }
 
-  private handleInMemoryCache<T>(
+  private async handleInMemoryCache<T>(
     key: string,
     fetchData: () => Promise<T>,
     cacheDuration: number | "never",
   ): Promise<T> {
     const cachedData = this.getInMemoryCachedData(key);
     if (cachedData) {
-      return Promise.resolve(cachedData as T);
+      return cachedData as T;
     }
 
-    return fetchData().then((data) => {
-      this.setInMemoryCachedData(key, data, cacheDuration);
-      return data;
-    });
+    const data = await fetchData();
+    this.setInMemoryCachedData(key, data, cacheDuration);
+    return data;
   }
 
   private getInMemoryCachedData(key: string): unknown | null {

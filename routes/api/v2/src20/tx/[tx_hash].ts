@@ -19,6 +19,13 @@ export const handler: Handlers = {
         return paramsValidation.error!;
       }
 
+      // Validate transaction hash format (should be 64 character hex)
+      if (!/^[a-fA-F0-9]{64}$/.test(tx_hash)) {
+        return ResponseUtil.badRequest(
+          `Invalid transaction hash format: ${tx_hash}. Must be a 64-character hexadecimal string.`,
+        );
+      }
+
       const url = new URL(req.url);
 
       // Validate sort parameter

@@ -42,12 +42,13 @@ import { arc4 } from "$lib/utils/minting/transactionUtils.ts";
 import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { IPrepareSRC20TX, PSBTInput, VOUT } from "$types/index.d.ts";
+import { PSBTInput, VOUT } from "$types/index.d.ts";
+import { IPrepareSRC20TX } from "$server/types/services/src20.d.ts";
 import * as msgpack from "msgpack";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { Psbt } from "npm:bitcoinjs-lib";
+// import { Psbt } from "npm:bitcoinjs-lib";
 
 export class SRC20MultisigPSBTService {
   private static readonly RECIPIENT_DUST = BigInt(789);
@@ -79,7 +80,7 @@ export class SRC20MultisigPSBTService {
       ];
 
       // Select UTXOs first to get txid for encryption
-      const { inputs, change, fee } = await TransactionService.UTXOService.selectUTXOsForTransaction(
+      const { inputs, change: _change, fee } = await TransactionService.UTXOService.selectUTXOsForTransaction(
         changeAddress,
         vouts,
         feeRate,
@@ -93,7 +94,6 @@ export class SRC20MultisigPSBTService {
       }
 
       // Prepare and encrypt data using first input's txid
-      let transferDataBytes: Uint8Array;
       const stampPrefixBytes = new TextEncoder().encode("stamp:");
 
       const transferData = JSON.parse(transferString);
@@ -101,7 +101,7 @@ export class SRC20MultisigPSBTService {
       const { compressedData, compressed } = await SRC20Service.CompressionService
         .compressWithCheck(msgpackData);
 
-      transferDataBytes = compressed ? compressedData : new TextEncoder().encode(JSON.stringify(transferData));
+      const transferDataBytes = compressed ? compressedData : new TextEncoder().encode(JSON.stringify(transferData));
 
       // Add stamp prefix and length prefix
       const dataWithPrefix = new Uint8Array([...stampPrefixBytes, ...transferDataBytes]);

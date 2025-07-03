@@ -1,4 +1,3 @@
-import { bigFloatToString } from "$lib/utils/formatUtils.ts";
 import {
   BIG_LIMIT,
   SRC101_OWNERS_TABLE,
@@ -28,9 +27,9 @@ export class SRC101Repository {
   }
 
   static async getSrc101Price(
-    deploy_hash: String,
+    deploy_hash: string,
   ){
-    let sqlQuery = `
+    const sqlQuery = `
     SELECT 
       len, price
     FROM
@@ -90,7 +89,7 @@ export class SRC101Repository {
     if (whereConditions.length > 0) {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
-    var results = (await this.db.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2,
@@ -235,7 +234,7 @@ export class SRC101Repository {
     if (whereConditions.length > 0) {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
-    var results = (await this.db.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2,
@@ -243,7 +242,7 @@ export class SRC101Repository {
     return results[0].total;
   }
 
-  static async getDepoyDetails(
+  static async getDeployDetails(
     deploy_hash: string,
   ) {
     let sqlQuery = `
@@ -310,7 +309,7 @@ export class SRC101Repository {
   static async getTotalCount(
     deploy_hash: string,
   ) {
-    let sqlQuery = `
+    const sqlQuery = `
     SELECT 
       COUNT(*)
     FROM

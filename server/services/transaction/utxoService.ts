@@ -1,4 +1,4 @@
-import type { Output, UTXO, AncestorInfo, BasicUTXO } from "$types/index.d.ts";
+import type { Output, UTXO, AncestorInfo, BasicUTXO, ScriptType } from "$types/index.d.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import * as bitcoin from "bitcoinjs-lib";
@@ -187,18 +187,15 @@ export class UTXOService {
   
         const currentFee = BigInt(calculateMiningFee(
           selectedInputs.map(input => {
-            let scriptTypeForFeeCalc: string;
-            let scriptForFeeCalc: string | undefined = input.script;
-            let ancestorForFeeCalc: AncestorInfo | undefined = input.ancestor;
+            const scriptForFeeCalc: string | undefined = input.script;
+            const ancestorForFeeCalc: AncestorInfo | undefined = input.ancestor;
 
             if (!fetchFullDetails) {
-              scriptTypeForFeeCalc = "P2WPKH";
-              ancestorForFeeCalc = undefined;
               return {
                 type: "P2WPKH" as ScriptType,
                 size: TX_CONSTANTS.P2WPKH.size,
                 isWitness: true,
-                ancestor: ancestorForFeeCalc 
+                ancestor: undefined 
               };
             } else {
               if (!scriptForFeeCalc) throw new Error(`Script missing for selected input ${input.txid}:${input.vout} in final calculation`);
@@ -213,9 +210,9 @@ export class UTXOService {
           }),
           vouts.map(output => {
             let scriptTypeInfo;
-            if (output.script) {
+            if ('script' in output && output.script) {
                 scriptTypeInfo = getScriptTypeInfo(output.script);
-            } else if (output.address) {
+            } else if ('address' in output && output.address) {
                 scriptTypeInfo = getScriptTypeInfo(bitcoin.address.toOutputScript(output.address, bitcoin.networks.bitcoin));
             } else {
                 logger.warn("transaction-utxo-service", {message: "Output missing script/address for fee calc, defaulting P2WPKH"});

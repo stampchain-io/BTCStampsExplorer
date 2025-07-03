@@ -61,10 +61,10 @@ export const handler: Handlers = {
 
       // Prepare args for normalizeFeeRate carefully due to exactOptionalPropertyTypes
       const feeArgs: { satsPerKB?: number; satsPerVB?: number } = {};
-      if (options.fee_per_kb !== undefined) {
+      if (options?.fee_per_kb !== undefined) {
         feeArgs.satsPerKB = options.fee_per_kb;
       }
-      if (options.satsPerVB !== undefined) {
+      if (options?.satsPerVB !== undefined) {
         feeArgs.satsPerVB = options.satsPerVB;
       }
       const normalizedFees = normalizeFeeRate(feeArgs);
@@ -80,7 +80,7 @@ export const handler: Handlers = {
       const cpid = await StampController.resolveToCpid(identifier);
 
       const xcpApiCallOptions: any = {
-        ...options,
+        ...(options || {}),
         return_psbt: false, // Explicitly ask for raw tx from XCP Manager
         verbose: true,
         // Pass a fee_per_kb if CP API needs it for composition, even if we recalculate later.
@@ -122,7 +122,7 @@ export const handler: Handlers = {
       }[] = [];
       let sumOfUserInputs = BigInt(0);
 
-      const sequence = options.allow_unconfirmed_inputs === false
+      const sequence = options?.allow_unconfirmed_inputs === false
         ? 0xffffffff
         : 0xfffffffd; // RBF if true/undefined
 
@@ -251,10 +251,11 @@ export const handler: Handlers = {
       essentialCpOutputs.forEach((out) => psbt.addOutput(out));
 
       let totalValueToOutputsExcludingChange = cpOutputsTotalValue;
-      const feeService = body.service_fee ?? options.service_fee ??
+      const feeService = body.service_fee ?? options?.service_fee ??
         parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS, 10);
       const feeServiceAddress = body.service_fee_address ??
-        options.service_fee_address ?? serverConfig.MINTING_SERVICE_FEE_ADDRESS;
+        options?.service_fee_address ??
+        serverConfig.MINTING_SERVICE_FEE_ADDRESS;
       let actualServiceFeeAdded = BigInt(0);
 
       if (feeService > 0 && feeServiceAddress) {

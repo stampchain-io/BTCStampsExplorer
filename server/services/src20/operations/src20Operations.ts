@@ -1,7 +1,8 @@
 import { SRC20Service } from "$server/services/src20/index.ts";
-import type { IDeploySRC20, IMintSRC20, ITransferSRC20, IPrepareSRC20TX } from "$types/index.d.ts";
+import type { IDeploySRC20, IMintSRC20, ITransferSRC20, IPrepareSRC20TX } from "$server/types/services/src20.d.ts";
 import { SRC20MultisigPSBTService } from "$server/services/src20/psbt/src20MultisigPSBTService.ts";
 import { logger } from "$lib/utils/logger.ts";
+import type { TXError } from "$globals";
 
 interface SRC20Operation {
   op: string;

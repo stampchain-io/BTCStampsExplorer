@@ -131,13 +131,13 @@ Deno.test("SRC101Repository - getSrc101TXFromSRC101Table", async (t) => {
   });
 });
 
-Deno.test("SRC101Repository - getDepoyDetails", async (t) => {
+Deno.test("SRC101Repository - getDeployDetails", async (t) => {
   await t.step("should return deploy details with recipients", async () => {
     setup();
 
     const deployHash =
       "c1b1f1a1d1e1f1a1b1c1d1e1f1a1b1c1d1e1f1a1b1c1d1e1f1a1b1c1d1e1f1a1";
-    const result = await SRC101Repository.getDepoyDetails(deployHash);
+    const result = await SRC101Repository.getDeployDetails(deployHash);
 
     assertEquals(result.length, 1);
     assertEquals(result[0].op, "DEPLOY");
@@ -154,7 +154,7 @@ Deno.test("SRC101Repository - getDepoyDetails", async (t) => {
     async () => {
       setup();
 
-      const result = await SRC101Repository.getDepoyDetails("nonexistent");
+      const result = await SRC101Repository.getDeployDetails("nonexistent");
 
       assertEquals(result.length, 0);
 

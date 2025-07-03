@@ -78,7 +78,7 @@ Deno.test("SRC20Repository Unit Tests with DI", async (t) => {
     setup();
 
     const result = await SRC20Repository.getValidSrc20TxFromDb({
-      tick: "PEPE",
+      tick: "!", // Use a tick that exists in the fixture data
       limit: 10,
       page: 1,
     });
@@ -86,9 +86,9 @@ Deno.test("SRC20Repository Unit Tests with DI", async (t) => {
     assertExists(result);
     assertExists(result.rows);
 
-    // Check that all returned transactions are for PEPE tick
+    // Check that all returned transactions are for ! tick
     result.rows.forEach((tx: any) => {
-      assertEquals(tx.tick, "PEPE");
+      assertEquals(tx.tick, "!");
     });
 
     teardown();

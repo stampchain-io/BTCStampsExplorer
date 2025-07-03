@@ -4,6 +4,7 @@ import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20DetailHeader } from "$header";
 import { DataTableBase, HoldersTable } from "$table";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
+import type { SRC20TickPageData } from "$types/src20.d.ts";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
@@ -67,7 +68,7 @@ export const handler: Handlers = {
 
 /* ===== TYPES ===== */
 interface SRC20DetailPageProps {
-  data: SRC20DetailPageData | { error: string };
+  data: SRC20TickPageData | { error: string };
 }
 
 /* ===== PAGE COMPONENT ===== */

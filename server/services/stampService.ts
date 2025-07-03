@@ -13,14 +13,12 @@ import {
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
-import { BIG_LIMIT } from "$lib/utils/constants.ts";
-import { DispenserFilter } from "$types/index.d.ts";
+
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
-import { getMimeType, detectContentType } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
-import type { StampWithMarketData, StampMarketData } from "$lib/types/marketData.d.ts";
+import type { StampMarketData } from "$lib/types/marketData.d.ts";
 
 interface StampServiceOptions {
   cacheType: RouteType;
@@ -590,7 +588,7 @@ export class StampService {
 
     // Enrich each stamp with USD calculations and cache status
     return stampsWithMarketData.map(stampData => {
-      const { marketData, cacheStatus, cacheAgeMinutes, ...stamp } = stampData;
+      const { marketData, cacheStatus: _cacheStatus, cacheAgeMinutes: _cacheAgeMinutes, ...stamp } = stampData;
       return this.enrichStampWithMarketData(stamp, marketData, options.btcPriceUSD);
     });
   }

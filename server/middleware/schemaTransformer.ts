@@ -66,7 +66,7 @@ function deepClone<T>(obj: T): T {
   
   const clonedObj: any = {};
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       clonedObj[key] = deepClone(obj[key]);
     }
   }
@@ -90,7 +90,7 @@ function removeFields(obj: any, fieldsToRemove: Set<string>): void {
 
   // Recursively process nested objects and arrays
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       const value = obj[key];
       
       if (Array.isArray(value)) {
@@ -238,7 +238,7 @@ export function registerTransformationRule(
 export function validateResponseSchema(
   data: any,
   version: string,
-  endpoint: string
+  _endpoint: string
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
   const fieldsToStrip = getFieldsToStrip(version);
@@ -257,7 +257,7 @@ export function validateResponseSchema(
     
     // Check nested objects
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const value = obj[key];
         if (Array.isArray(value)) {
           value.forEach((item, index) => {
@@ -290,7 +290,8 @@ export function getVersionChangeSummary(
   transformedFields: string[];
 } {
   const fromConfig = TRANSFORMATION_REGISTRY[fromVersion];
-  const toConfig = TRANSFORMATION_REGISTRY[toVersion];
+  // TODO(@team): toConfig might need to be used for analyzing target version changes
+  const _toConfig = TRANSFORMATION_REGISTRY[toVersion];
   
   const summary = {
     addedFields: [] as string[],

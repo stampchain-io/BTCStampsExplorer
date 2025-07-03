@@ -50,7 +50,7 @@ export function SRC20CardMinting(
 
       {/* MINTS */}
       <td class={`${cellAlign(4, totalColumns)} ${valueSm}`}>
-        {src20.mint_count || "N/A"}
+        {src20.mint_progress?.total_mints || "N/A"}
       </td>
 
       {/* Progress Cell */}

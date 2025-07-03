@@ -35,10 +35,10 @@ export class SRC20Repository {
    * Converts DB response ticks to emoji format
    * @param data Object or array containing tick field(s)
    */
-  private static convertResponseToEmoji<T extends { tick: string }>(data: T[]): T[] {
+  private static convertResponseToEmoji<T extends { tick: string | null | undefined }>(data: T[]): T[] {
     return data.map(item => ({
       ...item,
-      tick: unicodeEscapeToEmoji(item.tick)
+      tick: item.tick ? unicodeEscapeToEmoji(item.tick) : item.tick
     }));
   }
 
@@ -46,11 +46,11 @@ export class SRC20Repository {
    * Converts a single DB response row to emoji format
    * @param row Object containing tick field
    */
-  private static convertSingleResponseToEmoji<T extends { tick: string }>(row: T | null): T | null {
+  private static convertSingleResponseToEmoji<T extends { tick: string | null | undefined }>(row: T | null): T | null {
     if (!row) return null;
     return {
       ...row,
-      tick: unicodeEscapeToEmoji(row.tick)
+      tick: row.tick ? unicodeEscapeToEmoji(row.tick) : row.tick
     };
   }
 
@@ -140,7 +140,7 @@ export class SRC20Repository {
       limit = 50, // Default limit
       page = 1, // Default page
       sortBy = "ASC",
-      filterBy,
+      _filterBy,
       tx_hash,
       address,
     } = params;

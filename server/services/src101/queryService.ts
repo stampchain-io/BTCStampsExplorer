@@ -70,11 +70,11 @@ export class SRC101QueryService {
     }
   }
 
-  static async getDepoyDetails(
+  static async getDeployDetails(
     deploy_hash: string,
   ){
     try{
-      return await SRC101Repository.getDepoyDetails(deploy_hash);
+      return await SRC101Repository.getDeployDetails(deploy_hash);
     } catch (error) {
       console.error("Error getting SRC101 owner:", error);
       throw error;

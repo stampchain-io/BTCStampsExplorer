@@ -11,8 +11,8 @@ export async function handler(
   req: Request,
   ctx: FreshContext,
 ) {
-  // Store request in context for middleware
-  ctx.req = req;
+  // Store request in state for middleware
+  ctx.state.request = req;
 
   // Apply API version middleware first
   const versionResponse = await apiVersionMiddleware(ctx, async () => {
@@ -31,17 +31,24 @@ export async function handler(
           const data = await clonedResponse.json();
           const transformed = transformResponseForVersion(
             data,
-            ctx.state.apiVersion,
+            ctx.state.apiVersion as string,
           );
 
           // Create new response with transformed data and all headers
           const newHeaders = new Headers(response.headers);
 
           // Add version-specific headers
-          newHeaders.set("API-Version", ctx.state.apiVersion);
+          newHeaders.set("API-Version", ctx.state.apiVersion as string);
 
-          if (ctx.state.versionContext) {
-            const { isDeprecated, endOfLife } = ctx.state.versionContext;
+          if (
+            ctx.state.versionContext &&
+            typeof ctx.state.versionContext === "object"
+          ) {
+            const versionContext = ctx.state.versionContext as {
+              isDeprecated?: boolean;
+              endOfLife?: string;
+            };
+            const { isDeprecated, endOfLife } = versionContext;
 
             if (isDeprecated) {
               newHeaders.set("Deprecation", "true");

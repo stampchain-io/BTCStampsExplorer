@@ -112,14 +112,17 @@ export class MockDatabaseManager {
     }
 
     // Count queries - Check BEFORE collection queries since count queries may contain "from collections"
+    // Only treat as count query if it's a simple SELECT COUNT query, not complex WITH clauses
     const hasCountClause = normalizedQuery.includes("count(*)") ||
       normalizedQuery.includes("count(distinct");
     const hasAsTotal = normalizedQuery.includes("as total");
     const noHex = !normalizedQuery.includes("hex(");
     const noGroupConcat = !normalizedQuery.includes("group_concat");
+    const noWithClause = !normalizedQuery.includes("with "); // Don't treat complex WITH queries as count queries
+    const isSimpleSelect = normalizedQuery.trim().startsWith("select"); // Must be a simple SELECT
 
     const isCountQuery = hasCountClause && (hasAsTotal || true) && noHex &&
-      noGroupConcat;
+      noGroupConcat && noWithClause && isSimpleSelect;
 
     if (isCountQuery) {
       return this.getCountData(normalizedQuery, params);
@@ -307,10 +310,12 @@ export class MockDatabaseManager {
     const normalizedQuery = query.toLowerCase();
     const src20Fixtures = src20FixturesData as any;
 
-    // Handle balance queries
+    // Handle balance queries - but only simple balance queries, not complex WITH clauses
     if (
-      normalizedQuery.includes("src20_balance") ||
-      normalizedQuery.includes("balances")
+      (normalizedQuery.includes("src20_balance") ||
+        normalizedQuery.includes("from balances")) &&
+      !normalizedQuery.includes("with ") && // Don't match complex WITH queries
+      normalizedQuery.trim().startsWith("select") // Must be a simple SELECT
     ) {
       // Return mock balance data
       return {
@@ -375,8 +380,7 @@ export class MockDatabaseManager {
         normalizedQuery.includes("tick =") ||
         normalizedQuery.includes("tick in")
       ) {
-        const tickParams = params.filter((p) =>
-          typeof p === "string" && p.length > 2
+        const tickParams = params.filter((p) => typeof p === "string" // Remove length restriction to allow single character ticks like "!" and "?"
         );
         if (tickParams.length > 0) {
           filtered = filtered.filter((tx) => tickParams.includes(tx.tick));
@@ -992,7 +996,9 @@ export class MockDatabaseManager {
     // Stamp count queries
     if (
       normalizedQuery.includes("from stamps") ||
-      normalizedQuery.includes("stampstablev4")
+      normalizedQuery.includes("stampstablev4") ||
+      normalizedQuery.includes("stamptablev4") || // Handle both variations
+      normalizedQuery.includes("from stamptablev4") // Handle exact table name with FROM
     ) {
       // Check if this is counting cursed vs regular stamps
       if (normalizedQuery.includes("stamp < 0")) {

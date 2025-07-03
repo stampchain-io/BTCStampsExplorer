@@ -104,7 +104,7 @@ export function StampTradeTool() {
     }
 
     setIsSubmitting(true);
-    setSubmissionMessage("Please wait...");
+    setSubmissionMessage({ message: "Please wait..." });
     setApiError(null);
 
     try {
@@ -151,14 +151,16 @@ export function StampTradeTool() {
       );
 
       if (walletResult.signed) {
-        setSubmissionMessage(
-          "PSBT signed successfully. Here's the signed PSBT hex:",
-        );
+        setSubmissionMessage({
+          message: "PSBT signed successfully. Here's the signed PSBT hex:",
+        });
         setTradeFormState((prev) => ({ ...prev, psbtHex: walletResult.psbt }));
       } else if (walletResult.cancelled) {
         setSubmissionMessage("PSBT signing cancelled by user.");
       } else {
-        setSubmissionMessage(`PSBT signing failed: ${walletResult.error}`);
+        setSubmissionMessage({
+          message: `PSBT signing failed: ${walletResult.error}`,
+        });
       }
     } catch (error) {
       console.error("Error creating or signing PSBT:", error);
@@ -296,7 +298,7 @@ export function StampTradeTool() {
     }
 
     setIsSubmitting(true);
-    setSubmissionMessage("Please wait...");
+    setSubmissionMessage({ message: "Please wait..." });
     setApiError("");
 
     try {
