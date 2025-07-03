@@ -622,7 +622,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => ({
+    )).rows.map((result: any) => ({
       ...result,
     }));;
     return results;
@@ -670,7 +670,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => ({
+    )).rows.map((result: any) => ({
       ...result,
     }));;
     return results[0].total;
@@ -722,7 +722,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => ({
+    )).rows.map((result: any) => ({
       ...result,
     }));;
     return results;

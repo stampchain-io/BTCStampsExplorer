@@ -210,7 +210,7 @@ export class SRC20QueryService {
 
       const balanceResponse = await this.fetchSrc20Balance(balanceParams);
 
-      const snapshotData = balanceResponse.map((row) => ({
+      const snapshotData = balanceResponse.map((row: any) => ({
         tick: row.tick,
         address: row.address,
         balance: stripTrailingZeros(row.amt.toString()),

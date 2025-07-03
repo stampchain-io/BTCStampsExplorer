@@ -240,7 +240,7 @@ export class SRC101MultisigPSBTService {
 
       logger.debug("src101-psbt-service", {
         message: "Final transaction details for SRC101 Multisig PSBT",
-        inputs: inputs.map(utxo => ({
+        inputs: inputs.map((utxo: any) => ({
           ...utxo,
           value: BigInt(utxo.value).toString()
         })),
@@ -257,7 +257,7 @@ export class SRC101MultisigPSBTService {
         psbtBase64: psbt.toBase64(),
         fee: fee.toString(),
         change: changeAmount.toString(),
-        inputsToSign: inputs.map((_, index) => ({ index })),
+        inputsToSign: inputs.map((_: any, index: any) => ({ index })),
         estimatedTxSize: estimateTransactionSize({
           inputs,
           outputs: vouts,

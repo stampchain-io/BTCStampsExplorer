@@ -77,9 +77,9 @@ export class SRC101OperationService {
         try{
           console.log("params.tokenid", params.tokenid);
           const prices = await SRC101Service.UtilityService.getSrc101Price(params.hash);
-          const tokenid_utf8 = params.tokenid.map((token) =>  SRC101Service.UtilityService.base64ToUtf8(token));
+          const tokenid_utf8 = params.tokenid.map((token: any) =>  SRC101Service.UtilityService.base64ToUtf8(token));
           let totalPrice = 0;
-          tokenid_utf8.forEach(id => {
+          tokenid_utf8.forEach((id: any) => {
             const length = id.length;
 
             if (prices[length] === -1) {
