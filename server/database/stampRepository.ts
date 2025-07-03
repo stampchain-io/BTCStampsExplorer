@@ -240,9 +240,9 @@ export class StampRepository {
       const filterConditions: string[] = [];
 
       filterBy.forEach((filter: any) => {
-        if (filterOptions[filter]) {
+        if ((filterOptions as any)[filter]) {
           const { suffixFilters: filterSuffixes, ident: filterIdent } =
-            filterOptions[filter];
+            (filterOptions as any)[filter];
 
           const suffixCondition =
             filterSuffixes && filterSuffixes.length > 0

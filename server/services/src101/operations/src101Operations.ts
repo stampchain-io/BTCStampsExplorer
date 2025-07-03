@@ -82,11 +82,11 @@ export class SRC101OperationService {
           tokenid_utf8.forEach((id: any) => {
             const length = id.length;
 
-            if (prices[length] === -1) {
+            if ((prices as any)[length] === -1) {
               throw new Error(`Invalid price for token length ${length}: -1`);
             }
 
-            const price = Object.prototype.hasOwnProperty.call(prices, length) ? prices[length] : prices[0];
+            const price = Object.prototype.hasOwnProperty.call(prices, length) ? (prices as any)[length] : (prices as any)[0];
 
             if (price === undefined) {
               throw new Error(`No default price (length 0) found for token length ${length}`);

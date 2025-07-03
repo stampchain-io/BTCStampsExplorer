@@ -41,7 +41,7 @@ export class SRC101Repository {
       [deploy_hash],
       60 * 2, // Cache duration in seconds
     )).rows;
-    const result = {};
+    const result: any = {};
     rows.forEach((row: any) => {
       result[row.len] = row.price;
     });
