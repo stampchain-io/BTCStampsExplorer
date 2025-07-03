@@ -65,7 +65,7 @@ async function checkFile(file: string): Promise<TypeCheckResult> {
 
     const errors = stderr
       .split("\n")
-      .filter((line) => line.includes("error:"))
+      .filter((line) => line.includes("[ERROR]"))
       .map((line) => line.trim());
 
     return {

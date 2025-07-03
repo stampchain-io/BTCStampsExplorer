@@ -1,2 +1,2 @@
-// Test file with TypeScript error
-const x: string = 123;
+// Test file with TypeScript error - modified
+const y: string = 456;
