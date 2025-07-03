@@ -250,7 +250,7 @@ export class Src20Controller {
       return {
         last_block: lastBlockData.last_block,
         mint_status: mintStatusData,
-        data: deploymentData.data[0],
+        data: (deploymentData.data as any[])[0],
       };
     } catch (error) {
       console.error("Error in handleDeploymentRequest:", error);
@@ -302,7 +302,7 @@ export class Src20Controller {
           ? balanceResponse.data.length
           : 0,
         holders: Array.isArray(balanceResponse.data)
-          ? balanceResponse.data.map((row) => {
+          ? balanceResponse.data.map((row: any) => {
             const amt = formatAmount(row.amt || "0");
             const totalMinted = formatAmount(
               mintProgressResponse?.total_minted || "1",
@@ -350,7 +350,7 @@ export class Src20Controller {
       }
       
       // Convert to MarketListingAggregated format for compatibility
-      const convertedMarketData = cachedMarketData.map(data => 
+      const convertedMarketData = cachedMarketData.map((data: any) => 
         this.convertToMarketListingFormat(data)
       );
       
@@ -496,7 +496,7 @@ export class Src20Controller {
       // Get cached market data for minting tokens as well
       const cachedMarketData = await MarketDataRepository.getAllSRC20MarketData(1000);
       const convertedMarketData = cachedMarketData.length > 0 
-        ? cachedMarketData.map(data => this.convertToMarketListingFormat(data))
+        ? cachedMarketData.map((data: any) => this.convertToMarketListingFormat(data))
         : undefined;
 
       // Use V2 endpoint for enriched data with market info

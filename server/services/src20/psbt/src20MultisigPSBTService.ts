@@ -197,11 +197,11 @@ export class SRC20MultisigPSBTService {
       }
 
       // Calculate total input and output values
-      const totalInputValue = inputs.reduce((sum, input) => 
+      const totalInputValue = inputs.reduce((sum: any, input: any) => 
         BigInt(sum) + BigInt(input.value), BigInt(0));
 
       // Calculate total output value before change
-      const outputsBeforeChange = vouts.reduce((sum, vout) => 
+      const outputsBeforeChange = vouts.reduce((sum: any, vout: any) => 
         BigInt(sum) + BigInt(vout.value), BigInt(0));
 
       // Calculate fee

@@ -158,10 +158,10 @@ export class SRC20PSBTService {
       if (change > TX_CONSTANTS.SRC20_DUST) {
         psbt.addOutput({ script: address.toOutputScript(effectiveChangeAddress, network), value: BigInt(change) });
       }
-      const finalTotalInputValue = inputs.reduce((sum, input) => sum + Number(input.value), 0);
-      const finalTotalOutputAmount = outputs.reduce((sum, out) => sum + out.value, 0) + (change > TX_CONSTANTS.SRC20_DUST ? change : 0);
+      const finalTotalInputValue = inputs.reduce((sum: any, input: any) => sum + Number(input.value), 0);
+      const finalTotalOutputAmount = outputs.reduce((sum: any, out: any) => sum + out.value, 0) + (change > TX_CONSTANTS.SRC20_DUST ? change : 0);
       const actualFee = finalTotalInputValue - finalTotalOutputAmount;
-      const finalDustTotal = outputs.reduce((sum, out) => sum + out.value, 0);
+      const finalDustTotal = outputs.reduce((sum: any, out: any) => sum + out.value, 0);
       const estimatedSize = Math.ceil(actualFee / satsPerVB);
 
       logger.debug("src20-psbt-service", {

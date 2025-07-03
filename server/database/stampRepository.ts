@@ -247,7 +247,7 @@ export class StampRepository {
           const suffixCondition =
             filterSuffixes && filterSuffixes.length > 0
               ? `(${filterSuffixes
-                  .map((suffix) => `st.stamp_url LIKE '%${suffix}'`)
+                  .map((suffix: any) => `st.stamp_url LIKE '%${suffix}'`)
                   .join(" OR ")})`
               : "";
 

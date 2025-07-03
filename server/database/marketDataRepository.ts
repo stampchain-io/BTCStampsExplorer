@@ -627,6 +627,6 @@ export class MarketDataRepository {
       .map((row: SRC20MarketDataRow & { cache_age_minutes: number }) => 
         this.parseSRC20MarketDataRow(row)
       )
-      .filter((data): data is SRC20MarketData => data !== null);
+      .filter((data: any): data is SRC20MarketData => data !== null);
   }
 }

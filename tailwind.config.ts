@@ -1,6 +1,5 @@
 import { type Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
-import type { PluginAPI } from "tailwindcss/types/config";
 
 export default {
   content: [
@@ -245,7 +244,7 @@ export default {
     },
   },
   plugins: [
-    plugin(function ({ addUtilities }: PluginAPI) {
+    plugin(function ({ addUtilities }: any) {
       addUtilities({
         ".optimize-text": {
           "will-change": "transform",

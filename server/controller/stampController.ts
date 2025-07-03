@@ -354,7 +354,7 @@ export class StampController {
     // Get cache status from the first stamp with market data
     let cacheStatus = 'unknown';
     if (useMarketData && processedStamps.length > 0) {
-      const firstStampWithData = processedStamps.find(s => s.cacheStatus);
+      const firstStampWithData = processedStamps.find((s: any) => s.cacheStatus);
       cacheStatus = firstStampWithData?.cacheStatus || 'unknown';
     }
 
@@ -659,7 +659,7 @@ export class StampController {
     }
   }
 
-  static async getCollectionPageData(params) {
+  static async getCollectionPageData(params: any) {
     try {
       const {sortBy} = params
       
@@ -920,7 +920,7 @@ export class StampController {
 
       // Create a map of stamps by CPID for faster lookup
       const stampsByCpid = new Map(
-        stampsData.data?.map(stamp => [stamp.cpid, stamp]) || []
+        stampsData.data?.map((stamp: any) => [stamp.cpid, stamp]) || []
       );
 
       // Merge stamp data into dispensers
@@ -1123,11 +1123,11 @@ export class StampController {
 
       // Create a map of stamps by CPID for quick lookup
       const stampsByCpid = new Map(
-        stampsResult.stamps.map(stamp => [stamp.cpid, stamp])
+        stampsResult.stamps.map((stamp: any) => [stamp.cpid, stamp])
       );
 
       // Calculate values using cached market data
-      stamps.forEach((walletStamp) => {
+      stamps.forEach((walletStamp: any) => {
         const stampData = stampsByCpid.get(walletStamp.cpid);
         if (stampData && stampData.marketData) {
           const unitPrice = stampData.marketData.floorPriceBTC || 

@@ -149,7 +149,7 @@ export class UTXOService {
     change: number;
     fee: number;
   }> {
-    const totalOutputValue = vouts.reduce((sum, vout) => 
+    const totalOutputValue = vouts.reduce((sum: any, vout: any) => 
       BigInt(sum) + BigInt(vout.value), BigInt(0));
     let totalInputValue = BigInt(0);
     const selectedInputs: UTXO[] = [];

@@ -42,7 +42,7 @@ export class SRC101Repository {
       60 * 2, // Cache duration in seconds
     )).rows;
     const result = {};
-    rows.forEach(row => {
+    rows.forEach((row: any) => {
       result[row.len] = row.price;
     });
     console.log("getSrc101Price.result", result);
@@ -183,7 +183,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2,
-    )).rows.map((result) => {
+    )).rows.map((result: any) => {
       return {
         ...result,
       };
@@ -256,9 +256,9 @@ export class SRC101Repository {
       sqlQuery,
       [deploy_hash],
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => (
-      result["address"],
-    ));
+    )).rows.map((result: any) => 
+      result["address"]
+    );
 
     const queryParams = [];
     let whereClause = "";
@@ -295,7 +295,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => {
+    )).rows.map((result: any) => {
       result["mintstart"] = Number.parseInt(result["mintstart"].toString())
       result["mintend"] = Number.parseInt(result["mintend"].toString())
       return ({
@@ -410,7 +410,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2,
-    )).rows.map((result) => {
+    )).rows.map((result: any) => {
       result["mintstart"] = result["mintstart"] ? Number.parseInt(result["mintstart"].toString()) : 0
       result["mintend"] = result["mintend"] ? Number.parseInt(result["mintend"].toString()) : 0
       return {
@@ -476,7 +476,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => ({
+    )).rows.map((result: any) => ({
       ...result,
     }));;
     return results;
