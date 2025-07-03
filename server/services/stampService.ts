@@ -264,11 +264,11 @@ export class StampService {
     let processedStamps = initialResult.stamps;
     if (options.includeMarketData && processedStamps.length > 0) {
       // Get market data for all stamps in a single query
-      const cpids = processedStamps.map(stamp => stamp.cpid).filter(Boolean);
+      const cpids = processedStamps.map((stamp: any) => stamp.cpid).filter(Boolean);
       const marketDataMap = await MarketDataRepository.getBulkStampMarketData(cpids);
       
       // Enrich each stamp with its market data
-      processedStamps = processedStamps.map(stamp => {
+      processedStamps = processedStamps.map((stamp: any) => {
         if (!stamp.cpid || (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721")) {
           return stamp;
         }
@@ -347,11 +347,11 @@ export class StampService {
     return await StampRepository.getALLCPIDs();
   }
 
-  static mapDispensesWithRates(dispenses, dispensers) {
+  static mapDispensesWithRates(dispenses: any, dispensers: any) {
     const dispenserRates = new Map(
-      dispensers.map((d) => [d.tx_hash, d.satoshirate]),
+      dispensers.map((d: any) => [d.tx_hash, d.satoshirate]),
     );
-    return dispenses.map((dispense) => ({
+    return dispenses.map((dispense: any) => ({
       ...dispense,
       satoshirate: dispenserRates.get(dispense.dispenser_tx_hash) || 0,
     }));
