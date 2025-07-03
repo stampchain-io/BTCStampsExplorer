@@ -49,6 +49,39 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Additional linting for staged server files (gradual approach)
+echo "🔍 Checking lint for staged server files..."
+STAGED_SERVER_FILES=$(git diff --cached --name-only | grep -E '^server/.*\.(ts|tsx)$' | tr '\n' ' ')
+
+if [ -n "$STAGED_SERVER_FILES" ]; then
+    echo "📝 Staged server files: $STAGED_SERVER_FILES"
+    
+    # Run lint on each server file with relaxed rules
+    LINT_FAILED=0
+    for file in $STAGED_SERVER_FILES; do
+        if [ -f "$file" ]; then
+            LINT_OUTPUT=$(deno lint --quiet --rules-tags=recommended --rules-exclude=no-explicit-any,ban-untagged-todo "$file" 2>&1)
+            if [ $? -ne 0 ]; then
+                echo "⚠️  Lint errors in $file:"
+                echo "$LINT_OUTPUT" | head -10
+                LINT_FAILED=1
+            fi
+        fi
+    done
+    
+    if [ $LINT_FAILED -eq 1 ]; then
+        echo ""
+        echo "❌ Server file linting failed. Please fix critical lint errors."
+        echo "💡 Tip: Common issues to fix:"
+        echo "   - Unused variables (prefix with _ if intentional)"
+        echo "   - Missing error handling"
+        echo "   - Use const instead of let where possible"
+        exit 1
+    else
+        echo "✅ Server files lint check passed"
+    fi
+fi
+
 # TypeScript type checking for staged files only
 echo "🔍 Checking TypeScript types for staged files..."
 

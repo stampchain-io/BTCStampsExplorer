@@ -106,10 +106,11 @@
       "lib/",
       "utils/",
       "client/",
+      "server/",
       "tests/"
     ]
   },
-  "exclude": ["**/_fresh/*", "**/server/**/*", "scripts/*.js", "scripts/*.cjs"],
+  "exclude": ["**/_fresh/*", "scripts/*.js", "scripts/*.cjs"],
   "nodeModulesDir": "auto",
   "imports": {
     "stream": "node:stream",
