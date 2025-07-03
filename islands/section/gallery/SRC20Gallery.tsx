@@ -189,10 +189,8 @@ export function SRC20Gallery({
     }
   };
 
-  const _handleTimeframeChange = (_newTimeframe: Timeframe) => {
-  };
-
   const handleImageClick = (_imgSrc: string) => {
+    // TODO: Implement image click handler
   };
 
   // Always call hooks at the top level

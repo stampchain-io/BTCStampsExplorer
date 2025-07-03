@@ -1,10 +1,5 @@
 /* ===== STAMP OVERVIEW GALLERY COMPONENT ===== */
-import {
-  Collection,
-  CollectionGalleryProps,
-  StampGalleryProps,
-  StampRow,
-} from "$globals";
+import { Collection, StampGalleryProps, StampRow } from "$globals";
 
 import { StampGallery } from "$section";
 import { titlePurpleDL } from "$text";
@@ -22,7 +17,7 @@ export function StampOverviewGallery({
   stamps_src721 = [],
   stamps_art = [],
   stamps_posh = [],
-  collectionData = [],
+  collectionData: _collectionData = [],
 }: StampOverviewGalleryProps) {
   /* ===== SECTION CONFIGURATIONS ===== */
   const LatestArtStampsSection: StampGalleryProps[] = [
@@ -49,22 +44,6 @@ export function StampOverviewGallery({
       },
     },
   ];
-
-  const _FeaturedArtistsSection: CollectionGalleryProps = {
-    title: "FEATURED ARTISTS",
-    subTitle: "RECURSIVE COLLECTIONS",
-    collections: collectionData,
-    gridClass: `
-      grid
-      grid-cols-2 tablet:grid-cols-3 gap-3 mobileLg:gap-6
-    `,
-    displayCounts: {
-      mobileSm: 2,
-      mobileLg: 2,
-      tablet: 3,
-      desktop: 3,
-    },
-  };
 
   const CollectionsSection: StampGalleryProps[] = [
     {
@@ -111,22 +90,6 @@ export function StampOverviewGallery({
       },
     },
   ];
-
-  const _CuttingEdgeSection: CollectionGalleryProps = {
-    title: "CUTTING EDGE",
-    subTitle: "RECURSIVE COLLECTIONS",
-    collections: collectionData,
-    gridClass: `
-      grid
-      grid-cols-2 tablet:grid-cols-3 gap-3 mobileLg:gap-6
-    `,
-    displayCounts: {
-      mobileSm: 2,
-      mobileLg: 2,
-      tablet: 3,
-      desktop: 3,
-    },
-  };
 
   /* ===== RENDER ===== */
   return (
