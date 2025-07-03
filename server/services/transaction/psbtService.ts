@@ -3,18 +3,16 @@ import { Psbt, Transaction, payments, networks, address as bjsAddress } from "bi
 import { getUTXOForAddress as getUTXOForAddressFromUtils } from "$lib/utils/utxoUtils.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
-import { getScriptTypeInfo, ScriptType as BjsScriptType } from "$lib/utils/scriptTypeUtils.ts";
-import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
+import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { hex2bin, bytesToHex } from "$lib/utils/binary/baseUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { bigIntSerializer } from "$lib/utils/formatUtils.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { UTXO, AncestorInfo } from "$types/index.d.ts";
-import { TransactionService } from "$server/services/transaction/index.ts";
-import { estimateTransactionSize, calculateTransactionFee, InputTypeForSizeEstimation, OutputTypeForSizeEstimation } from "$lib/utils/minting/transactionSizes.ts";
 import type { Output, ScriptType } from "$lib/types/index.d.ts";
 
-export function formatPsbtForLogging(psbt: bitcoin.Psbt) {
+// Type alias to avoid conflicts
+type BitcoinJsPsbt = typeof Psbt.prototype;
+
+export function formatPsbtForLogging(psbt: Psbt) {
   return {
       inputs: psbt.data.inputs.map(input => ({
           witnessUtxo: input.witnessUtxo ? {
@@ -94,7 +92,7 @@ export class PSBTService {
     return psbt.toHex();
   }
   // Change from standalone function to static class method
-  private static getPubkeyFromAddress(address: string): Uint8Array {
+  private static getPubkeyFromAddress(_address: string): Uint8Array {
     // Implementation depends on how you're managing keys
     throw new Error('Not implemented');
   }
@@ -102,20 +100,20 @@ export class PSBTService {
   // Make sure all helper functions are static class methods
   private static getAddressType(address: string, network: networks.Network): string {
     try {
-      bitcoin.address.toOutputScript(address, network);
+      bjsAddress.toOutputScript(address, network);
       return 'p2pkh';
-    } catch (error) {
+    } catch (_error) {
       try {
         payments.p2wpkh({ address, network });
         return 'p2wpkh';
-      } catch (error) {
+      } catch (_error) {
         try {
           payments.p2sh({
             redeem: payments.p2wpkh({ address, network }),
             network,
           });
           return 'p2sh-p2wpkh';
-        } catch (error) {
+        } catch (_error) {
           throw new Error('Unsupported address type');
         }
       }
@@ -136,13 +134,14 @@ export class PSBTService {
     }
   }
 
-  private static getAddressFromScript(script: Uint8Array, network: networks.Network): string {
-    const payment = payments.p2wpkh({ output: script, network });
-    if (!payment.address) {
-      throw new Error("Failed to derive address from script");
-    }
-    return payment.address;
-  }
+  // Unused - can be removed or implemented if needed later
+  // private static getAddressFromScript(script: Uint8Array, network: networks.Network): string {
+  //   const payment = payments.p2wpkh({ output: script, network });
+  //   if (!payment.address) {
+  //     throw new Error("Failed to derive address from script");
+  //   }
+  //   return payment.address;
+  // }
 
   static async validateUTXOOwnership(
     utxo: string,
@@ -154,7 +153,8 @@ export class PSBTService {
 
       // Use getUTXOForAddress with specific UTXO lookup and failover
       const txInfo = await getUTXOForAddressFromUtils(address, txid, vout);
-      if (!txInfo?.utxo) return false;
+      // Check if txInfo is the expected structure with utxo property
+      if (!txInfo || Array.isArray(txInfo) || !('utxo' in txInfo) || !txInfo.utxo) return false;
 
       // Get the scriptPubKey hex
       const scriptPubKeyHex = txInfo.utxo.script;
@@ -169,12 +169,12 @@ export class PSBTService {
       let derivedAddress: string;
       try {
         // Try P2PKH
-        derivedAddress = bitcoin.address.fromOutputScript(scriptPubKey, network);
-      } catch (e) {
+        derivedAddress = bjsAddress.fromOutputScript(Buffer.from(scriptPubKey), network);
+      } catch (_e) {
         try {
           // Try P2WPKH or other script types
-          derivedAddress = bitcoin.address.fromOutputScript(scriptPubKey, network);
-        } catch (e) {
+          derivedAddress = bjsAddress.fromOutputScript(Buffer.from(scriptPubKey), network);
+        } catch (_e) {
           // Unsupported script type
           throw new Error("Unsupported script type in UTXO");
         }
@@ -354,7 +354,7 @@ export class PSBTService {
 
       // 1. Enrich Inputs (fetch full UTXO details)
       let totalInputValue = BigInt(0);
-      for (const [index, inputDetail] of psbt.data.inputs.entries()) {
+      for (const [index, _inputDetail] of psbt.data.inputs.entries()) {
         // If witnessUtxo is already present and seems valid, we might trust it.
         // However, CP might provide minimal PSBTs, so re-fetching is safer.
         const txIn = originalTx.ins[index];
@@ -405,7 +405,7 @@ export class PSBTService {
             if (outputAddress === userAddress) {
                 isChangeToUser = true;
             }
-          } catch (e) { /* Not an address output or not parsable, definitely not change to userAddress */ }
+          } catch (_e) { /* Not an address output or not parsable, definitely not change to userAddress */ }
 
           if (!isChangeToUser) {
             outputsToPreserve.push({ script: Buffer.from(output.script), value: BigInt(output.value) });
