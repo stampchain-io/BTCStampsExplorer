@@ -11,8 +11,8 @@ services:
       - NODE_ENV=test
       - DEV_BASE_URL=${DEV_BASE_URL:-http://host.docker.internal:8000}
       - PROD_BASE_URL=${PROD_BASE_URL:-https://stampchain.io}
-      - NEWMAN_COLLECTION=${NEWMAN_COLLECTION:-postman-collection-comprehensive.json}
-      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-postman-environment.json}
+      - NEWMAN_COLLECTION=${NEWMAN_COLLECTION:-tests/postman/collections/comprehensive.json}
+      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-tests/postman/environments/comprehensive.json}
       - NEWMAN_REPORTERS=${NEWMAN_REPORTERS:-cli,html,json}
       - NEWMAN_ITERATIONS=${NEWMAN_ITERATIONS:-1}
       - NEWMAN_DELAY_REQUEST=${NEWMAN_DELAY_REQUEST:-0}
@@ -36,8 +36,8 @@ services:
       - NODE_ENV=test
       - DEV_BASE_URL=${DEV_BASE_URL:-http://host.docker.internal:8000}
       - PROD_BASE_URL=${PROD_BASE_URL:-https://stampchain.io}
-      - NEWMAN_COLLECTION=postman-collection-full-regression.json
-      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-postman-environment-comprehensive.json}
+      - NEWMAN_COLLECTION=tests/postman/collections/comprehensive.json
+      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-tests/postman/environments/comprehensive.json}
       - NEWMAN_REPORTERS=${NEWMAN_REPORTERS:-cli,html,json}
       - NEWMAN_ITERATIONS=${NEWMAN_ITERATIONS:-1}
       - NEWMAN_DELAY_REQUEST=${NEWMAN_DELAY_REQUEST:-0}
@@ -61,8 +61,8 @@ services:
       - NODE_ENV=test
       - BASE_URL=${BASE_URL:-https://stampchain.io}
       - CURRENT_ENV=${CURRENT_ENV:-prod}
-      - NEWMAN_COLLECTION=postman-collection-pagination-validation.json
-      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-postman-environment-comprehensive.json}
+      - NEWMAN_COLLECTION=tests/postman/collections/pagination-validation.json
+      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-tests/postman/environments/comprehensive.json}
       - NEWMAN_REPORTERS=${NEWMAN_REPORTERS:-cli,html,json}
       - NEWMAN_ITERATIONS=${NEWMAN_ITERATIONS:-1}
       - NEWMAN_DELAY_REQUEST=${NEWMAN_DELAY_REQUEST:-0}
@@ -113,8 +113,8 @@ services:
         
         mkdir -p reports/newman-advanced &&
         
-        newman run postman-collection-advanced.json \\
-          --environment postman-environment.json \\
+        newman run tests/postman/collections/comprehensive.json \\
+          --environment tests/postman/environments/comprehensive.json \\
           --reporters cli,html,json \\
           --reporter-html-export reports/newman-advanced/advanced-report.html \\
           --reporter-json-export reports/newman-advanced/advanced-results.json \\
@@ -154,8 +154,8 @@ services:
         
         mkdir -p reports/newman-performance &&
         
-        newman run postman-collection-enhanced.json \\
-          --environment postman-environment.json \\
+        newman run tests/postman/collections/comprehensive.json \\
+          --environment tests/postman/environments/comprehensive.json \\
           --reporters cli,html,json \\
           --reporter-html-export reports/newman-performance/performance-report.html \\
           --reporter-json-export reports/newman-performance/performance-results.json \\
@@ -197,8 +197,8 @@ services:
         
         mkdir -p reports/newman-parallel &&
         
-        newman run postman-collection-enhanced.json \\
-          --environment postman-environment.json \\
+        newman run tests/postman/collections/comprehensive.json \\
+          --environment tests/postman/environments/comprehensive.json \\
           --reporters cli,html,json \\
           --reporter-html-export reports/newman-parallel/parallel-report.html \\
           --reporter-json-export reports/newman-parallel/parallel-results.json \\
