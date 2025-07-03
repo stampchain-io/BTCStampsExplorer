@@ -22,7 +22,7 @@ interface SRC20CardMintingProps {
 
 export function SRC20CardMinting({
   data,
-  _fromPage,
+  fromPage: _fromPage,
   timeframe,
   onImageClick,
 }: SRC20CardMintingProps) {
