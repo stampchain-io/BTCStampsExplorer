@@ -1,5 +1,5 @@
 import { dbManager } from "$server/database/databaseManager.ts";
-import { DEFAULT_CACHE_DURATION } from "$constants";
+import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT } from "$constants";
 import {
   parseBTCDecimal,
   parseVolumeSources,
@@ -106,7 +106,7 @@ export class MarketDataRepository {
     const {
       collectionId,
       offset = 0,
-      limit = 100,
+      limit = MAX_PAGINATION_LIMIT,
       filters,
       sortBy = 'block_index',
       sortOrder = 'DESC'

@@ -191,6 +191,25 @@ export class StampController {
 
     // Initialize ident based on type
     let finalIdent: SUBPROTOCOLS[] = ident || [];
+    
+    // Validate ident parameter if provided
+    const VALID_IDENTS = ["STAMP", "SRC-20", "SRC-721"];
+    if (ident && ident.length > 0) {
+      // Check if all provided idents are valid
+      const invalidIdents = ident.filter(id => !VALID_IDENTS.includes(id));
+      if (invalidIdents.length > 0) {
+        // Return empty results for invalid ident values
+        return {
+          data: [],
+          total: 0,
+          page: page || 1,
+          limit: limit || 50,
+          totalPages: 0,
+          last_block: await BlockService.getLastBlock()
+        };
+      }
+    }
+    
     if ((!ident || ident.length === 0) && type) {
       if (type === "classic") {
         finalIdent = ["STAMP"];

@@ -21,9 +21,10 @@ chmod 755 reports/newman
 echo "=== Running Newman API Tests ==="
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 echo "Using timestamp: $TIMESTAMP"
+echo "Using collection: ${NEWMAN_COLLECTION:-postman-collection-enhanced.json}"
 
-newman run postman-collection-enhanced.json \
-  --environment postman-environment.json \
+newman run "${NEWMAN_COLLECTION:-postman-collection-enhanced.json}" \
+  --environment "${NEWMAN_ENVIRONMENT:-postman-environment.json}" \
   --reporters cli,html,json \
   --reporter-html-export reports/newman/$TIMESTAMP-report.html \
   --reporter-json-export reports/newman/$TIMESTAMP-results.json

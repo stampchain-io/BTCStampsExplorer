@@ -92,7 +92,10 @@ export class ApiResponseUtil {
 
   static success(data: unknown, options: ApiResponseOptions = {}): Response {
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify(
+        data,
+        (_key, value) => typeof value === "bigint" ? value.toString() : value,
+      ),
       {
         status: options.status || 200,
         headers: normalizeHeaders(this.createHeaders(options)),

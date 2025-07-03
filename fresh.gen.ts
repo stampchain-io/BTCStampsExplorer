@@ -8,6 +8,7 @@ import * as $_app from "./routes/_app.tsx";
 import * as $_middleware from "./routes/_middleware.ts";
 import * as $about_index from "./routes/about/index.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
+import * as $api_middleware from "./routes/api/_middleware.ts";
 import * as $api_internal_background_fee_status from "./routes/api/internal/background-fee-status.ts";
 import * as $api_internal_bitcoinNotifications from "./routes/api/internal/bitcoinNotifications.ts";
 import * as $api_internal_btc_price_status from "./routes/api/internal/btc-price-status.ts";
@@ -87,6 +88,7 @@ import * as $api_v2_trx_stampdetach from "./routes/api/v2/trx/stampdetach.ts";
 import * as $api_v2_trx_utxoquery from "./routes/api/v2/trx/utxoquery.ts";
 import * as $api_v2_utxo_ancestors_address_ from "./routes/api/v2/utxo/ancestors/[address].ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
+import * as $api_v2_versions from "./routes/api/v2/versions.ts";
 import * as $block_block_index_ from "./routes/block/[block_index].tsx";
 import * as $block_index from "./routes/block/index.tsx";
 import * as $collection_overview_ from "./routes/collection/[overview].tsx";
@@ -277,6 +279,7 @@ const manifest = {
     "./routes/_middleware.ts": $_middleware,
     "./routes/about/index.tsx": $about_index,
     "./routes/api/[...path].ts": $api_path_,
+    "./routes/api/_middleware.ts": $api_middleware,
     "./routes/api/internal/background-fee-status.ts":
       $api_internal_background_fee_status,
     "./routes/api/internal/bitcoinNotifications.ts":
@@ -381,6 +384,7 @@ const manifest = {
     "./routes/api/v2/utxo/ancestors/[address].ts":
       $api_v2_utxo_ancestors_address_,
     "./routes/api/v2/version.ts": $api_v2_version,
+    "./routes/api/v2/versions.ts": $api_v2_versions,
     "./routes/block/[block_index].tsx": $block_block_index_,
     "./routes/block/index.tsx": $block_index,
     "./routes/collection/[overview].tsx": $collection_overview_,

@@ -16,6 +16,7 @@ import blockFixturesData from "../fixtures/blockData.json" with {
 import src101FixturesData from "../fixtures/src101Data.json" with {
   type: "json",
 };
+import { MAX_PAGINATION_LIMIT } from "$constants";
 
 interface QueryResult {
   rows: any[];
@@ -246,7 +247,7 @@ export class MockDatabaseManager {
       const limitMatch = query.match(/limit\s+(\d+|\?)/i);
       if (limitMatch) {
         const limitIndex = params.length - 2; // Usually second to last param
-        const limit = params[limitIndex] as number || 100;
+        const limit = params[limitIndex] as number || MAX_PAGINATION_LIMIT;
         stamps = stamps.slice(0, limit);
       }
     }

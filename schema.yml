@@ -300,6 +300,173 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/v2/versions:
+    get:
+      operationId: getApiVersions
+      tags:
+        - System
+      summary: Get available API versions
+      description: |
+        Returns information about all available API versions, their status, and migration information.
+        
+        Use the API-Version header to request a specific API version:
+        - API-Version: 2.2 (stable, legacy)
+        - API-Version: 2.3 (current, with enhanced market data)
+        
+        Default version is 2.3 when no header is specified.
+      parameters:
+        - in: header
+          name: API-Version
+          schema:
+            type: string
+            example: "2.3"
+          description: Specify the API version to use
+      responses:
+        "200":
+          description: Available API versions and their status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: string
+                    description: Current/latest API version
+                    example: "2.3"
+                  requestedVersion:
+                    type: string
+                    description: Version used for this request
+                    example: "2.3"
+                  versions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        version:
+                          type: string
+                          example: "2.3"
+                        status:
+                          type: string
+                          enum: [current, supported, deprecated]
+                        releaseDate:
+                          type: string
+                          format: date
+                        endOfLife:
+                          type: string
+                          format: date
+                          nullable: true
+                        links:
+                          type: object
+                          properties:
+                            documentation:
+                              type: string
+                              format: uri
+                            changelog:
+                              type: string
+                              format: uri
+                            migration:
+                              type: string
+                              format: uri
+                              nullable: true
+                  headers:
+                    type: object
+                    description: Supported version headers
+                  links:
+                    type: object
+                    properties:
+                      changelog:
+                        type: string
+                        format: uri
+                      documentation:
+                        type: string
+                        format: uri
+                  deprecationNotice:
+                    type: object
+                    nullable: true
+                    description: Present if using deprecated version
+                    properties:
+                      message:
+                        type: string
+                      migrationGuide:
+                        type: string
+                        format: uri
+                      currentVersion:
+                        type: string
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/versions/changelog:
+    get:
+      operationId: getApiChangelog
+      tags:
+        - System
+      summary: Get API version changelog
+      description: |
+        Returns detailed changelog for all API versions including:
+        - New features and fields added
+        - Improvements and optimizations
+        - Bug fixes
+        - Deprecated features
+      responses:
+        "200":
+          description: API version changelog
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  changelog:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        version:
+                          type: string
+                          example: "2.3.0"
+                        releaseDate:
+                          type: string
+                          format: date
+                        status:
+                          type: string
+                          enum: [current, supported, deprecated]
+                        endOfLife:
+                          type: string
+                          format: date
+                          nullable: true
+                        changes:
+                          type: object
+                          properties:
+                            added:
+                              type: array
+                              items:
+                                type: string
+                            improved:
+                              type: array
+                              items:
+                                type: string
+                            fixed:
+                              type: array
+                              items:
+                                type: string
+                            deprecated:
+                              type: array
+                              items:
+                                type: string
+                  currentVersion:
+                    type: string
+                    example: "2.3"
+                  deprecationPolicy:
+                    type: object
+                    properties:
+                      notice:
+                        type: string
+                        example: "6 months"
+                      support:
+                        type: string
+                        example: "12 months after deprecation"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/v2/balance/{address}:
     get:
       operationId: getAddressBalance

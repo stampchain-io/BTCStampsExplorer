@@ -107,7 +107,7 @@ class EndpointCoverageValidator {
           path = path.replace(/{{[^}]+}}/g, match => {
             // Convert Newman variables to OpenAPI parameter format
             const param = match.replace(/[{}]/g, '');
-            return `:${param}`;
+            return `{${param}}`;
           });
           
           const method = item.request.method || 'GET';
@@ -170,7 +170,7 @@ class EndpointCoverageValidator {
     const normalizePath = (path) => {
       return path
         .replace(/^\/api/, '') // Remove /api prefix if present
-        .replace(/\{([^}]+)\}/g, ':$1') // Convert {param} to :param
+        .replace(/\{[^}]+\}/g, '{param}') // Replace all parameters with generic {param}
         .replace(/\/+/g, '/') // Remove duplicate slashes
         .replace(/\/$/, ''); // Remove trailing slash
     };

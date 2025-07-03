@@ -23,6 +23,7 @@ import {
   parseExchangeSources,
   getCacheStatus,
 } from "$lib/utils/marketData.ts";
+import { MAX_PAGINATION_LIMIT } from "$constants";
 
 // Interface for the database manager dependency
 interface IDbManager {
@@ -106,7 +107,7 @@ export class MarketDataRepositoryCI {
     const {
       collectionId,
       offset = 0,
-      limit = 100,
+      limit = MAX_PAGINATION_LIMIT,
       filters,
       sortBy = 'block_index',
       sortOrder = 'DESC'

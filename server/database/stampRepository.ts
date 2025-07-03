@@ -1,4 +1,4 @@
-import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "$constants";
+import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE, MAX_PAGINATION_LIMIT } from "$constants";
 import { SUBPROTOCOLS } from "$globals";
 import { BIG_LIMIT } from "$lib/utils/constants.ts";
 import {
@@ -594,7 +594,7 @@ export class StampRepository {
   }) {
     // Extract all parameters including both filter types
     const {
-      limit = 100,
+      limit = MAX_PAGINATION_LIMIT,
       page = 0,
       sortBy = "DESC",
       type,

@@ -55,6 +55,36 @@
       "key": "test_cursed_id",
       "value": "-1",
       "type": "string"
+    },
+    {
+      "key": "test_number",
+      "value": "10",
+      "type": "string"
+    },
+    {
+      "key": "test_ident",
+      "value": "STAMP",
+      "type": "string"
+    },
+    {
+      "key": "test_deploy_hash",
+      "value": "d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3",
+      "type": "string"
+    },
+    {
+      "key": "test_tokenid",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "test_index",
+      "value": "0",
+      "type": "string"
+    },
+    {
+      "key": "test_tick",
+      "value": "STAMP",
+      "type": "string"
     }
   ],
   "event": [
@@ -289,7 +319,7 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/block/block_count/10",
+              "raw": "{{dev_base_url}}/api/v2/block/block_count/{{test_number}}",
               "host": [
                 "{{dev_base_url}}"
               ],
@@ -298,7 +328,7 @@
                 "v2",
                 "block",
                 "block_count",
-                "10"
+                "{{test_number}}"
               ]
             }
           }
@@ -314,7 +344,7 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/block/block_count/10",
+              "raw": "{{prod_base_url}}/api/v2/block/block_count/{{test_number}}",
               "host": [
                 "{{prod_base_url}}"
               ],
@@ -323,7 +353,7 @@
                 "v2",
                 "block",
                 "block_count",
-                "10"
+                "{{test_number}}"
               ]
             }
           }
@@ -4915,7 +4945,7 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/ident/STAMP",
+              "raw": "{{dev_base_url}}/api/v2/stamps/ident/{{test_ident}}",
               "host": [
                 "{{dev_base_url}}"
               ],
@@ -4924,7 +4954,7 @@
                 "v2",
                 "stamps",
                 "ident",
-                "STAMP"
+                "{{test_ident}}"
               ]
             }
           }
@@ -4940,7 +4970,7 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/ident/STAMP",
+              "raw": "{{prod_base_url}}/api/v2/stamps/ident/{{test_ident}}",
               "host": [
                 "{{prod_base_url}}"
               ],
@@ -4949,7 +4979,7 @@
                 "v2",
                 "stamps",
                 "ident",
-                "STAMP"
+                "{{test_ident}}"
               ]
             }
           }
@@ -5047,6 +5077,875 @@
                 "api",
                 "v2",
                 "version"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC20 Balance Snapshot - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src20/balance/snapshot/{{test_tick}}",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "snapshot",
+                "{{test_tick}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC20 Balance Snapshot - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src20/balance/snapshot/{{test_tick}}",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "snapshot",
+                "{{test_tick}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC20 Block Tick - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src20/block/{{test_block}}/{{test_tick}}",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "block",
+                "{{test_block}}",
+                "{{test_tick}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC20 Block Tick - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src20/block/{{test_block}}/{{test_tick}}",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "block",
+                "{{test_block}}",
+                "{{test_tick}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SRC-101 Endpoints",
+      "item": [
+        {
+          "name": "Get SRC-101 Transaction - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src101/tx/{{test_tx_hash}}",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "tx",
+                "{{test_tx_hash}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 Transaction - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src101/tx/{{test_tx_hash}}",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "tx",
+                "{{test_tx_hash}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 Deploy Details - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/deploy",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}",
+                "deploy"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 Deploy Details - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/deploy",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}",
+                "deploy"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 from Owners - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 from Owners - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 Total Supply - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/total",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}",
+                "total"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 Total Supply - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/total",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}",
+                "total"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 by Address - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/address/{{test_address}}",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}",
+                "address",
+                "{{test_address}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 by Address - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/address/{{test_address}}",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}",
+                "address",
+                "{{test_address}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 Balance - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src101/balance/{{test_address}}",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "balance",
+                "{{test_address}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 Balance - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src101/balance/{{test_address}}",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "balance",
+                "{{test_address}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 Token Info - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/{{test_tokenid}}",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}",
+                "{{test_tokenid}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 Token Info - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/{{test_tokenid}}",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}",
+                "{{test_tokenid}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 by Index - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src101/index/{{test_deploy_hash}}/{{test_index}}",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "index",
+                "{{test_deploy_hash}}",
+                "{{test_index}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get SRC-101 by Index - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src101/index/{{test_deploy_hash}}/{{test_index}}",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "index",
+                "{{test_deploy_hash}}",
+                "{{test_index}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST Endpoints",
+      "item": [
+        {
+          "name": "Create SRC20 Token - Dev",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operation\": \"deploy\",\n  \"tick\": \"TEST\",\n  \"max\": \"1000000\",\n  \"lim\": \"1000\",\n  \"source_address\": \"{{test_address}}\",\n  \"sats_per_vb\": 12\n}"
+            },
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src20/create",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "create"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create SRC20 Token - Prod",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operation\": \"deploy\",\n  \"tick\": \"TEST\",\n  \"max\": \"1000000\",\n  \"lim\": \"1000\",\n  \"source_address\": \"{{test_address}}\",\n  \"sats_per_vb\": 12\n}"
+            },
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src20/create",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "create"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Attach Stamp - Dev",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"destination_address\": \"{{test_address}}\",\n  \"stamp_id\": \"{{test_stamp_id}}\",\n  \"quantity\": 1,\n  \"sats_per_vb\": 12\n}"
+            },
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/trx/stampattach",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "trx",
+                "stampattach"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Attach Stamp - Prod",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"destination_address\": \"{{test_address}}\",\n  \"stamp_id\": \"{{test_stamp_id}}\",\n  \"quantity\": 1,\n  \"sats_per_vb\": 12\n}"
+            },
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/trx/stampattach",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "trx",
+                "stampattach"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mint Stamp - Dev",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"stamp_base64\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\",\n  \"sats_per_vb\": 12\n}"
+            },
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/olga/mint",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "olga",
+                "mint"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mint Stamp - Prod",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"stamp_base64\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\",\n  \"sats_per_vb\": 12\n}"
+            },
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/olga/mint",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "olga",
+                "mint"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detach Stamp - Dev",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"stamp_id\": \"{{test_stamp_id}}\",\n  \"quantity\": 1,\n  \"sats_per_vb\": 12\n}"
+            },
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/trx/stampdetach",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "trx",
+                "stampdetach"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detach Stamp - Prod",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"stamp_id\": \"{{test_stamp_id}}\",\n  \"quantity\": 1,\n  \"sats_per_vb\": 12\n}"
+            },
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/trx/stampdetach",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "trx",
+                "stampdetach"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "System Endpoints",
+      "item": [
+        {
+          "name": "Get API Documentation - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/docs",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "docs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get API Documentation - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/docs",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "docs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Test Error Endpoint - Dev",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/error",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "error"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Test Error Endpoint - Prod",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/error",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "error"
               ]
             }
           }

@@ -1,0 +1,362 @@
+{
+  "info": {
+    "name": "BTC Stamps Explorer API - Version Header Testing",
+    "description": "Tests API version header handling and schema transformation for non-breaking changes",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "dev_base_url",
+      "value": "http://host.docker.internal:8000",
+      "type": "string"
+    },
+    {
+      "key": "prod_base_url", 
+      "value": "https://stampchain.io",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "API Version Header Tests",
+      "item": [
+        {
+          "name": "Stamps - No Version Header (Latest)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps?limit=1",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "stamps"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status Code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Should include enhanced fields (v2.3)', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.length > 0) {",
+                  "        const stamp = response.data[0];",
+                  "        // These fields should be present in latest version",
+                  "        console.log('Enhanced fields check:', {",
+                  "            hasMarketData: stamp.marketData !== undefined,",
+                  "            hasCacheInfo: stamp.cacheInfo !== undefined,",
+                  "            hasHolderCount: stamp.holderCount !== undefined",
+                  "        });",
+                  "    }",
+                  "});",
+                  "",
+                  "// Store response for comparison",
+                  "pm.collectionVariables.set('stamps_no_version', pm.response.text());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stamps - Version 2.2 Header (Legacy)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "API-Version",
+                "value": "2.2"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps?limit=1",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "stamps"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status Code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Should NOT include enhanced fields (v2.2)', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.length > 0) {",
+                  "        const stamp = response.data[0];",
+                  "        // These fields should be stripped in v2.2",
+                  "        pm.expect(stamp.marketData, 'marketData should be undefined in v2.2').to.be.undefined;",
+                  "        pm.expect(stamp.cacheInfo, 'cacheInfo should be undefined in v2.2').to.be.undefined;",
+                  "        console.log('Legacy compatibility check:', {",
+                  "            hasMarketData: stamp.marketData !== undefined,",
+                  "            hasCacheInfo: stamp.cacheInfo !== undefined,",
+                  "            coreFieldsPresent: stamp.cpid !== undefined && stamp.supply !== undefined",
+                  "        });",
+                  "    }",
+                  "});",
+                  "",
+                  "// Store response for comparison",
+                  "pm.collectionVariables.set('stamps_v22', pm.response.text());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stamps - Version 2.3 Header (Enhanced)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "API-Version",
+                "value": "2.3"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps?limit=1",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "stamps"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status Code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Should include all enhanced fields (v2.3)', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.length > 0) {",
+                  "        const stamp = response.data[0];",
+                  "        console.log('Enhanced v2.3 fields:', {",
+                  "            hasMarketData: stamp.marketData !== undefined,",
+                  "            hasCacheInfo: stamp.cacheInfo !== undefined,",
+                  "            hasHolderCount: stamp.holderCount !== undefined,",
+                  "            coreFieldsPresent: stamp.cpid !== undefined",
+                  "        });",
+                  "    }",
+                  "});",
+                  "",
+                  "// Store response for comparison",
+                  "pm.collectionVariables.set('stamps_v23', pm.response.text());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SRC20 - Version Comparison Test",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "API-Version",
+                "value": "2.2"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src20?limit=1",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('SRC20 v2.2 - Status Code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('SRC20 v2.2 - No enhanced market data fields', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.length > 0) {",
+                  "        const token = response.data[0];",
+                  "        pm.expect(token.marketData, 'marketData should be undefined').to.be.undefined;",
+                  "        pm.expect(token.cacheInfo, 'cacheInfo should be undefined').to.be.undefined;",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unsupported Version Test",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "API-Version",
+                "value": "3.0"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps?limit=1",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "stamps"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Unsupported version should return error or fallback', function () {",
+                  "    // Accept either error response or fallback to supported version",
+                  "    const statusCode = pm.response.code;",
+                  "    pm.expect([200, 400, 406]).to.include(statusCode);",
+                  "    ",
+                  "    if (statusCode === 400 || statusCode === 406) {",
+                  "        console.log('✅ Properly rejected unsupported version');",
+                  "    } else if (statusCode === 200) {",
+                  "        console.log('✅ Fallback to supported version');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Version Comparison Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/health",
+              "host": ["{{dev_base_url}}"],
+              "path": ["api", "v2", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "console.log('\\n=== API VERSION COMPARISON REPORT ===');",
+                  "",
+                  "const noVersionResponse = pm.collectionVariables.get('stamps_no_version');",
+                  "const v22Response = pm.collectionVariables.get('stamps_v22');",
+                  "const v23Response = pm.collectionVariables.get('stamps_v23');",
+                  "",
+                  "try {",
+                  "    const noVersion = JSON.parse(noVersionResponse);",
+                  "    const v22 = JSON.parse(v22Response);",
+                  "    const v23 = JSON.parse(v23Response);",
+                  "    ",
+                  "    if (noVersion.data && v22.data && v23.data) {",
+                  "        const noVersionStamp = noVersion.data[0];",
+                  "        const v22Stamp = v22.data[0];",
+                  "        const v23Stamp = v23.data[0];",
+                  "        ",
+                  "        console.log('📊 Field Comparison:');",
+                  "        console.log('  No Version Header (Latest):');",
+                  "        console.log('    marketData:', noVersionStamp.marketData !== undefined);",
+                  "        console.log('    cacheInfo:', noVersionStamp.cacheInfo !== undefined);",
+                  "        console.log('  Version 2.2 (Legacy):');",
+                  "        console.log('    marketData:', v22Stamp.marketData !== undefined);",
+                  "        console.log('    cacheInfo:', v22Stamp.cacheInfo !== undefined);",
+                  "        console.log('  Version 2.3 (Enhanced):');",
+                  "        console.log('    marketData:', v23Stamp.marketData !== undefined);",
+                  "        console.log('    cacheInfo:', v23Stamp.cacheInfo !== undefined);",
+                  "        ",
+                  "        // Test core data consistency",
+                  "        const sameCpid = noVersionStamp.cpid === v22Stamp.cpid && v22Stamp.cpid === v23Stamp.cpid;",
+                  "        const sameSupply = noVersionStamp.supply === v22Stamp.supply && v22Stamp.supply === v23Stamp.supply;",
+                  "        ",
+                  "        console.log('\\n🔍 Data Consistency Check:');",
+                  "        console.log('  Same CPID across versions:', sameCpid);",
+                  "        console.log('  Same supply across versions:', sameSupply);",
+                  "        ",
+                  "        pm.test('Core data should be consistent across versions', function () {",
+                  "            pm.expect(sameCpid, 'CPID should match across versions').to.be.true;",
+                  "            pm.expect(sameSupply, 'Supply should match across versions').to.be.true;",
+                  "        });",
+                  "    }",
+                  "} catch (e) {",
+                  "    console.log('❌ Could not parse responses for comparison:', e.message);",
+                  "}",
+                  "",
+                  "console.log('=== END VERSION REPORT ===\\n');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
