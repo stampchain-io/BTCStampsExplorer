@@ -113,12 +113,6 @@ function WalletOverview(
   };
 
   /* ===== COMPUTED VALUES ===== */
-  const displayPrice = walletData.dispensers?.items?.[0]?.satoshirate
-    ? parseInt(walletData.dispensers.items[0].satoshirate.toString(), 10) /
-      100000000
-    : 0;
-
-  const _displayPriceUSD = displayPrice * walletData.btcPrice;
 
   console.log("walletData:", walletData);
   console.log("dispensers:", walletData.dispensers);
