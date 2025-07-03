@@ -104,7 +104,9 @@ export class CommonUTXOService implements ICommonUTXOService {
           logger.warn("common-utxo-service", { message: "QuickNode returned unexpected response for getUTXOs", address, response: result });
         }
       } catch (error) {
-        logger.error("common-utxo-service", { message: "Error during QuickNode getUTXOs call", address, error: error.message, stack: error.stack });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack : undefined;
+        logger.error("common-utxo-service", { message: "Error during QuickNode getUTXOs call", address, error: errorMessage, stack: errorStack });
       }
     }
 
@@ -123,7 +125,9 @@ export class CommonUTXOService implements ICommonUTXOService {
       logger.warn("common-utxo-service", { message: "Public APIs returned non-array or null for getSpendableUTXOs", address, response: publicUtxosResult });
       return [];
     } catch (error) {
-      logger.error("common-utxo-service", { message: "Error fetching basic UTXOs from public APIs", address, error: error.message, stack: error.stack });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      logger.error("common-utxo-service", { message: "Error fetching basic UTXOs from public APIs", address, error: errorMessage, stack: errorStack });
       return [];
     }
   }
@@ -133,7 +137,8 @@ export class CommonUTXOService implements ICommonUTXOService {
     vout: number,
     options?: CommonUTXOFetchOptions,
   ): Promise<UTXO | null> {
-    const logContext = { txid, vout, options, quicknodeEnabled: this.isQuickNodeConfigured };
+    // Context for debugging if needed
+    // const logContext = { txid, vout, options, quicknodeEnabled: this.isQuickNodeConfigured };
     // logger.debug("common-utxo-service", { message: "getSpecificUTXO called for", txid, vout, options }); // Original debug line
 
     if (this.isQuickNodeConfigured && !options?.forcePublicAPI) {
@@ -173,7 +178,9 @@ export class CommonUTXOService implements ICommonUTXOService {
             logger.info("common-utxo-service", { message: "QuickNode did not find specific UTXO or returned no data (after detailed log)", txid, vout });
         }
       } catch (error) {
-        logger.error("common-utxo-service", { message: "Error during QuickNode getSpecificUTXO call (exception caught)", txid, vout, error: error.message, stack: error.stack });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack : undefined;
+        logger.error("common-utxo-service", { message: "Error during QuickNode getSpecificUTXO call (exception caught)", txid, vout, error: errorMessage, stack: errorStack });
       }
     }
 
