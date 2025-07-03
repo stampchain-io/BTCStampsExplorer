@@ -133,7 +133,7 @@ export class SRC101QueryService {
   }
 
   static async getTotalSrc101TokenidsCount(
-    params: Partial<SRC101TokenidsParams>,
+    params: SRC101TokenidsParams,
   ): Promise<number> {
     try {
       return await SRC101Repository.getTotalSrc101TokenidsCount(params);
