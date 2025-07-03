@@ -44,7 +44,7 @@ fi
 
 # Run the pagination validation tests
 echo "Running pagination boundary tests..."
-newman run postman-collection-pagination-validation.json \
+newman run tests/postman/collections/pagination-validation.json \
     ${ENV_FILE:+--environment "$ENV_FILE"} \
     --env-var "base_url=$BASE_URL" \
     --env-var "current_env=${CURRENT_ENV:-prod}" \

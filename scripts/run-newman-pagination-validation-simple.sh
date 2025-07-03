@@ -11,7 +11,7 @@ mkdir -p reports/newman-pagination-validation
 
 # Run tests
 echo "Running pagination validation tests..."
-newman run postman-collection-pagination-validation.json \
+newman run tests/postman/collections/pagination-validation.json \
   --env-var "base_url=${BASE_URL:-https://stampchain.io}" \
   --iteration-data postman-data-pagination-tests.json \
   --reporters cli,html,json \
