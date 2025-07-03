@@ -418,13 +418,13 @@ class DatabaseManager {
         port: 6379,
         tls: !SKIP_REDIS_TLS,
         connectTimeout: REDIS_CONNECTION_TIMEOUT,
-        retryStrategy: (times) => {
+        retryStrategy: (times: number) => {
           // Exponential backoff with max 3 seconds
           const delay = Math.min(Math.pow(2, times) * 50, 3000);
           console.log(`[REDIS RETRY] Retry attempt #${times}, delay: ${delay}ms`);
           return delay;
         },
-        reconnectOnError: (err) => {
+        reconnectOnError: (err: Error) => {
           // Only reconnect on specific network-related errors
           const shouldReconnect = 
             err.message.includes('ECONNRESET') || 
@@ -558,8 +558,8 @@ class DatabaseManager {
       // Test connectivity with simple ping if redis is supposed to be available
       if (this.#redisClient && this.#redisAvailable) {
         this.#redisClient.ping()
-          .then(result => console.log(`[REDIS CACHE STATUS] PING test: ${result}`))
-          .catch(err => console.log(`[REDIS CACHE STATUS] PING test failed: ${err instanceof Error ? err.message : err}`));
+          .then((result: string) => console.log(`[REDIS CACHE STATUS] PING test: ${result}`))
+          .catch((err: unknown) => console.log(`[REDIS CACHE STATUS] PING test failed: ${err instanceof Error ? err.message : err}`));
       }
     }
     
