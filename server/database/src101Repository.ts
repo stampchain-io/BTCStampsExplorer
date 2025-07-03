@@ -303,7 +303,7 @@ export class SRC101Repository {
         ...result,
         recipients,
       });
-    });;
+    });
     return results;
   }
 
