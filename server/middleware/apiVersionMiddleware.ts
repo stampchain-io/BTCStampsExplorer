@@ -1,5 +1,8 @@
-import { Context, Next } from "https://deno.land/x/fresh@1.6.8/server.ts";
 import { logger } from "../../lib/utils/logger.ts";
+
+// Use any types to avoid Fresh version compatibility issues
+type Context = any;
+type Next = any;
 
 /**
  * API Version Middleware
@@ -67,7 +70,7 @@ function parseApiVersion(headers: Headers): string {
   // Extract major.minor version (ignore patch)
   const versionMatch = versionHeader.match(/^(\d+\.\d+)/);
   if (!versionMatch) {
-    logger.warn(`Invalid API version format: ${versionHeader}`);
+    logger.warn("api", { message: `Invalid API version format: ${versionHeader}` });
     return VERSION_CONFIG.defaultVersion;
   }
 
@@ -75,7 +78,7 @@ function parseApiVersion(headers: Headers): string {
   
   // Check if version is supported
   if (!VERSION_CONFIG.supportedVersions.includes(requestedVersion)) {
-    logger.warn(`Unsupported API version requested: ${requestedVersion}`);
+    logger.warn("api", { message: `Unsupported API version requested: ${requestedVersion}` });
     return VERSION_CONFIG.defaultVersion;
   }
 
