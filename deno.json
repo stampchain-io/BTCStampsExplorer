@@ -73,7 +73,8 @@
     "test:integration:coverage": "DENO_ENV=test mkdir -p coverage && deno test --coverage=coverage/ tests/integration/ --no-check --allow-env --allow-read --allow-write --allow-net && deno coverage coverage/",
     "test:all": "deno task test:unit && deno task test:integration",
     "test:fixtures": "deno run --allow-read --allow-write --allow-env --allow-net tests/fixtures/generateFixtures.ts",
-    "analyze:types": "deno run --allow-run --allow-write scripts/analyze-type-errors.ts"
+    "analyze:types": "deno run --allow-run --allow-write scripts/analyze-type-errors.ts",
+    "check:types:staged": "deno run --allow-run --allow-read scripts/type-check-staged.ts"
   },
   "lint": {
     "rules": {
