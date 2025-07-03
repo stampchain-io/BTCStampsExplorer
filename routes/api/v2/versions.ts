@@ -26,6 +26,11 @@ const CHANGELOG = [
       improved: [
         "Response performance with intelligent caching",
         "Pagination consistency across all endpoints",
+        "List query performance by excluding stamp_base64 field from list responses",
+      ],
+      optimized: [
+        "stamp_base64 field is now excluded from list endpoints for 50-70% smaller responses",
+        "stamp_base64 remains available in single stamp detail endpoints (/stamps/[identifier])",
       ],
       fixed: [],
       deprecated: [],

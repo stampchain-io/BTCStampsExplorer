@@ -8,9 +8,12 @@ import { transformResponseForVersion } from "../../server/middleware/schemaTrans
  */
 
 export async function handler(
-  _req: Request,
+  req: Request,
   ctx: FreshContext,
 ) {
+  // Store request in context for middleware
+  ctx.req = req;
+
   // Apply API version middleware first
   const versionResponse = await apiVersionMiddleware(ctx, async () => {
     // Continue to next middleware/handler

@@ -875,8 +875,10 @@ export class StampRepository {
     }
 
     // Near the end of the getStamps method, right before executing the query
-    console.log("[SQL DEBUG] Final SQL query:", query);
-    console.log("[SQL DEBUG] With parameters:", queryParams);
+    if (Deno.env.get("DEBUG_SQL") === "true" || Deno.env.get("ENV") === "development") {
+      console.log("[SQL DEBUG] Final SQL query:", query);
+      console.log("[SQL DEBUG] With parameters:", queryParams);
+    }
 
     // Execute the data query
     const dataResult = await this.db.executeQueryWithCache(

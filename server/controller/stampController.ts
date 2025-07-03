@@ -278,6 +278,12 @@ export class StampController {
     // For collection pages and stamp lists, use market data cache
     const useMarketData = !identifier || Array.isArray(identifier) || collectionId;
     
+    // Determine if this is a detail view (single stamp) or list view
+    const isDetailView = identifier && !Array.isArray(identifier);
+    
+    // Only include heavy fields like stamp_base64 for detail views
+    const shouldIncludeSecondary = isDetailView ? includeSecondary : false;
+    
     // Always include market data when available
     const stampResult = await StampService.getStamps({
       page,
@@ -287,7 +293,7 @@ export class StampController {
       ident: finalIdent,
       suffix,
       allColumns,
-      includeSecondary,
+      includeSecondary: shouldIncludeSecondary,
       collectionId,
       identifier,
       blockIdentifier,

@@ -116,10 +116,10 @@ export async function apiVersionMiddleware(
   ctx: Context,
   next: Next
 ): Promise<Response> {
-  const { request, state } = ctx;
+  const { req, state } = ctx;
   
   // Parse API version from headers
-  const version = parseApiVersion(request.headers);
+  const version = parseApiVersion(req.headers);
   const versionContext = getVersionContext(version);
   
   // Store version context in state for downstream use
@@ -128,7 +128,7 @@ export async function apiVersionMiddleware(
   
   // Log version usage
   logger.info(`API request with version ${version}`, {
-    path: request.url,
+    path: req.url,
     deprecated: versionContext.isDeprecated
   });
 
