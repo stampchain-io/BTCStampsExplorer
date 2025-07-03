@@ -106,9 +106,9 @@ describe("Repository Behavior Tests with Fixtures", () => {
 
       const firstCollection = collectionData[0];
       assertExists(firstCollection.collection_id);
-      assertExists(firstCollection.min_floor_price_btc);
-      assertExists(firstCollection.max_floor_price_btc);
-      assertExists(firstCollection.avg_floor_price_btc);
+      assertExists(firstCollection.total_stamps);
+      assertExists(firstCollection.volume_24h_btc);
+      assertExists(firstCollection.last_updated);
     });
 
     it("should handle holder data structure", () => {
@@ -120,7 +120,7 @@ describe("Repository Behavior Tests with Fixtures", () => {
         const firstHolder = holderData[0];
         assertExists(firstHolder.cpid);
         assertExists(firstHolder.address);
-        assertExists(firstHolder.balance);
+        assertExists(firstHolder.quantity);
         assertExists(firstHolder.rank_position);
       }
     });

@@ -47,11 +47,13 @@ describe("StampRepository Unit Tests", () => {
       });
 
       assertExists(result);
-      assertEquals(Array.isArray(result), true);
-      assertEquals(result.length, 5);
+      assertEquals(Array.isArray(result.stamps), true);
+      assertEquals(result.stamps.length, 5);
+      assertEquals(result.page, 1);
+      assertEquals(result.page_size, 5);
 
-      if (result.length > 0) {
-        const firstStamp = result[0];
+      if (result.stamps.length > 0) {
+        const firstStamp = result.stamps[0];
         assertExists(firstStamp.stamp);
         assertExists(firstStamp.cpid);
         assertExists(firstStamp.tx_hash);
@@ -83,7 +85,7 @@ describe("StampRepository Unit Tests", () => {
 
       assertExists(result);
       // All stamps should have positive numbers
-      result.forEach((stamp) => {
+      result.stamps.forEach((stamp) => {
         assertEquals(stamp.stamp > 0, true);
       });
     });
@@ -112,7 +114,7 @@ describe("StampRepository Unit Tests", () => {
 
       assertExists(result);
       // All stamps should have negative numbers
-      result.forEach((stamp) => {
+      result.stamps.forEach((stamp) => {
         assertEquals(stamp.stamp < 0, true);
       });
     });
@@ -129,7 +131,10 @@ describe("StampRepository Unit Tests", () => {
         page: 1,
       });
 
-      assertEquals(result, []);
+      assertEquals(result.stamps, []);
+      assertEquals(result.page, 1);
+      assertEquals(result.page_size, 10);
+      assertEquals(result.total, 0);
     });
 
     it("should handle database errors gracefully", async () => {
@@ -139,12 +144,15 @@ describe("StampRepository Unit Tests", () => {
         () => Promise.reject(new Error("Database connection failed")),
       );
 
-      const result = await StampRepository.getStamps({
-        limit: 10,
-        page: 1,
-      });
-
-      assertEquals(result, []);
+      try {
+        await StampRepository.getStamps({
+          limit: 10,
+          page: 1,
+        });
+        assertEquals(false, true, "Expected error to be thrown");
+      } catch (error) {
+        assertEquals(error.message, "Database connection failed");
+      }
     });
   });
 
@@ -155,13 +163,13 @@ describe("StampRepository Unit Tests", () => {
         "executeQueryWithCache",
         () =>
           Promise.resolve({
-            rows: [{ count: "100000" }],
+            rows: [{ total: 100000 }],
             rowCount: 1,
           }),
       );
 
-      const count = await StampRepository.getTotalStampCountFromDb({});
-      assertEquals(count, 100000);
+      const result = await StampRepository.getTotalStampCountFromDb({});
+      assertEquals(result.rows[0].total, 100000);
     });
 
     it("should return count with type filter", async () => {
@@ -171,16 +179,16 @@ describe("StampRepository Unit Tests", () => {
         (query: string) => {
           // Check if query contains type filter
           if (query.includes("stamp >= 0")) {
-            return Promise.resolve({ rows: [{ count: "95000" }], rowCount: 1 });
+            return Promise.resolve({ rows: [{ total: 95000 }], rowCount: 1 });
           }
-          return Promise.resolve({ rows: [{ count: "5000" }], rowCount: 1 });
+          return Promise.resolve({ rows: [{ total: 5000 }], rowCount: 1 });
         },
       );
 
-      const regularCount = await StampRepository.getTotalStampCountFromDb({
+      const result = await StampRepository.getTotalStampCountFromDb({
         type: "stamps",
       });
-      assertEquals(regularCount, 95000);
+      assertEquals(result.rows[0].total, 95000);
     });
 
     it("should return 0 on error", async () => {
@@ -190,8 +198,12 @@ describe("StampRepository Unit Tests", () => {
         () => Promise.reject(new Error("Count failed")),
       );
 
-      const count = await StampRepository.getTotalStampCountFromDb({});
-      assertEquals(count, 0);
+      try {
+        await StampRepository.getTotalStampCountFromDb({});
+        assertEquals(false, true, "Expected error to be thrown");
+      } catch (error) {
+        assertEquals(error.message, "Count failed");
+      }
     });
   });
 
@@ -279,10 +291,12 @@ describe("StampRepository Unit Tests", () => {
         () => Promise.reject(new Error("Query failed")),
       );
 
-      const result = await StampRepository.getCreatorNameByAddress(
-        "bc1error",
-      );
-      assertEquals(result, null);
+      try {
+        await StampRepository.getCreatorNameByAddress("bc1error");
+        assertEquals(false, true, "Expected error to be thrown");
+      } catch (error) {
+        assertEquals(error.message, "Query failed");
+      }
     });
   });
 
@@ -364,7 +378,7 @@ describe("StampRepository Unit Tests", () => {
 
       assertExists(result);
       if (
-        result.length > 0 &&
+        result.stamps.length > 0 &&
         stampFixtures.stampsWithMarketData[0].floor_price_btc
       ) {
         // The fixture includes market data fields
