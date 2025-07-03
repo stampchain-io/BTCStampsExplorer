@@ -39,6 +39,10 @@ const CHANGELOG = [
       ],
       fixed: [],
       deprecated: [],
+      removed: [
+        "floorPrice, floorPriceUSD, marketCapUSD moved into marketData object in stamp detail endpoints",
+      ],
+      migrationGuide: "https://stampchain.io/docs/api/migration/v2.2-to-v2.3",
     },
   },
   {
@@ -131,7 +135,7 @@ export const handler: Handlers = {
     });
 
     // Add deprecated versions to the list
-    VERSION_CONFIG.deprecatedVersions.forEach((version) => {
+    VERSION_CONFIG.deprecatedVersions.forEach((version: any) => {
       if (!versions.some((v) => v.version === version)) {
         const changelogEntry = CHANGELOG.find((entry) =>
           entry.version.startsWith(version)
