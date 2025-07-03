@@ -14,7 +14,6 @@ import {
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 
-import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
@@ -359,51 +358,37 @@ export class StampService {
   }
 
   static async getRecentSales(page?: number, limit?: number) {
-    // Fetch dispense events and extract unique asset values
-    const dispenseEvents = await XcpManager.fetchDispenseEvents(500);
-    const uniqueAssets = [...new Set(dispenseEvents.map((event) => event.params.asset))];
-
-    const stampDetails = await this.getStamps({
-      identifier: uniqueAssets,
-      allColumns: false,
-      noPagination: true,
-      type: "all",
-      skipTotalCount: true,
-      creatorAddress: undefined
+    // Use local market data instead of fetching all dispense events
+    const pageNum = page || 1;
+    const pageLimit = limit || 50;
+    
+    // Query stamps with recent sales from market data cache
+    const result = await StampRepository.getRecentlyActiveSold({
+      page: pageNum,
+      limit: pageLimit,
+      includeMarketData: true
     });
 
-    const stampDetailsMap = new Map(
-      stampDetails.stamps.map((stamp) => [stamp.cpid, stamp])
-    );
+    // Transform the data to match the expected format
+    const recentSales = result.stamps.map((stamp) => {
+      // Calculate sale data from market data
+      const saleData = stamp.marketData ? {
+        btc_amount: stamp.marketData.recentSalePriceBTC || 0,
+        block_index: stamp.marketData.lastSaleBlockIndex || stamp.block_index,
+        // For tx_hash, we'll use the stamp's tx_hash as we don't have individual sale tx
+        tx_hash: stamp.tx_hash,
+      } : null;
 
-    const allRecentSales = dispenseEvents
-      .map((event) => {
-        const stamp = stampDetailsMap.get(event.params.asset);
-        if (!stamp) return null;
-        return {
-          ...stamp,
-          sale_data: {
-            btc_amount: Number(formatBTCAmount(event.params.btc_amount, { 
-              includeSymbol: false 
-            })),
-            block_index: event.block_index,
-            tx_hash: event.tx_hash,
-          },
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => b.sale_data.block_index - a.sale_data.block_index);
+      return {
+        ...stamp,
+        sale_data: saleData,
+      };
+    }).filter(stamp => stamp.sale_data !== null);
 
-    const total = allRecentSales.length;
-
-    if (page !== undefined && limit !== undefined) {
-      const startIndex = (page - 1) * limit;
-      const endIndex = startIndex + limit;
-      const paginatedSales = allRecentSales.slice(startIndex, endIndex);
-      return { recentSales: paginatedSales, total };
-    }
-
-    return { recentSales: allRecentSales, total };
+    return { 
+      recentSales, 
+      total: result.total 
+    };
   }
 
   static async getCreatorNameByAddress(

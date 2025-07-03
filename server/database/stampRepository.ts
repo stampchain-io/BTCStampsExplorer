@@ -239,7 +239,7 @@ export class StampRepository {
     if (filterBy && filterBy.length > 0 && !isSearchQuery) {
       const filterConditions: string[] = [];
 
-      filterBy.forEach((filter) => {
+      filterBy.forEach((filter: any) => {
         if (filterOptions[filter]) {
           const { suffixFilters: filterSuffixes, ident: filterIdent } =
             filterOptions[filter];
@@ -1143,6 +1143,120 @@ export class StampRepository {
     return {
       stamp_url: result.rows[0]?.stamp_url || 0,
       stamp_mimetype: result.rows[0]?.stamp_mimetype || 0
+    };
+  }
+
+  /**
+   * Get stamps with recent sales activity using market data cache
+   * Replaces the need to fetch all dispense events from XCP API
+   */
+  static async getRecentlyActiveSold({
+    page = 1,
+    limit = 50,
+    includeMarketData = true
+  }: {
+    page?: number;
+    limit?: number;
+    includeMarketData?: boolean;
+  }): Promise<{ stamps: any[], total: number }> {
+    const offset = (page - 1) * limit;
+    
+    // Query stamps with recent sales from market data
+    const query = `
+      SELECT 
+        s.stamp,
+        s.cpid,
+        s.stamp_url,
+        s.stamp_mimetype,
+        s.creator,
+        s.tx_hash,
+        s.block_index,
+        s.block_time,
+        s.ident,
+        s.supply,
+        s.divisible,
+        s.locked,
+        ${includeMarketData ? `
+        -- Market data fields
+        smd.recent_sale_price_btc,
+        smd.floor_price_btc,
+        smd.volume_24h_btc,
+        smd.volume_7d_btc,
+        smd.holder_count,
+        smd.last_price_update,
+        smd.last_sale_block_index,
+        smd.data_quality_score,
+        TIMESTAMPDIFF(MINUTE, smd.last_price_update, NOW()) as minutes_since_sale
+        ` : ''}
+      FROM ${STAMP_TABLE} s
+      INNER JOIN stamp_market_data smd ON s.cpid = smd.cpid
+      WHERE 
+        -- Must have a recent sale
+        smd.last_price_update IS NOT NULL
+        -- Ensure good data quality
+        AND smd.data_quality_score >= 7
+        -- Optional: Only show sales from last 30 days for relevance
+        AND smd.last_price_update > DATE_SUB(NOW(), INTERVAL 30 DAY)
+      ORDER BY 
+        smd.last_price_update DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM ${STAMP_TABLE} s
+      INNER JOIN stamp_market_data smd ON s.cpid = smd.cpid
+      WHERE 
+        smd.last_price_update IS NOT NULL
+        AND smd.data_quality_score >= 7
+        AND smd.last_price_update > DATE_SUB(NOW(), INTERVAL 30 DAY)
+    `;
+
+    const [result, countResult] = await Promise.all([
+      this.db.executeQueryWithCache(query, [limit, offset], 60), // 1 minute cache
+      this.db.executeQueryWithCache(countQuery, [], 300) // 5 minute cache for count
+    ]);
+
+    // Transform the data to include market data in expected format
+    const stamps = (result as any).rows.map((row: any) => {
+      const stamp = {
+        stamp: row.stamp,
+        cpid: row.cpid,
+        stamp_url: row.stamp_url,
+        stamp_mimetype: row.stamp_mimetype,
+        creator: row.creator,
+        tx_hash: row.tx_hash,
+        block_index: row.block_index,
+        block_time: row.block_time,
+        ident: row.ident,
+        supply: row.supply,
+        divisible: row.divisible,
+        locked: row.locked
+      };
+
+      if (includeMarketData) {
+        return {
+          ...stamp,
+          marketData: {
+            recentSalePriceBTC: row.recent_sale_price_btc ? parseFloat(row.recent_sale_price_btc) : null,
+            floorPriceBTC: row.floor_price_btc ? parseFloat(row.floor_price_btc) : null,
+            volume24hBTC: row.volume_24h_btc ? parseFloat(row.volume_24h_btc) : 0,
+            volume7dBTC: row.volume_7d_btc ? parseFloat(row.volume_7d_btc) : 0,
+            holderCount: row.holder_count || 0,
+            lastPriceUpdate: row.last_price_update,
+            lastSaleBlockIndex: row.last_sale_block_index,
+            minutesSinceSale: row.minutes_since_sale,
+            dataQualityScore: row.data_quality_score ? parseFloat(row.data_quality_score) : 0
+          }
+        };
+      }
+
+      return stamp;
+    });
+
+    return {
+      stamps,
+      total: (countResult as any).rows[0]?.total || 0
     };
   }
 
