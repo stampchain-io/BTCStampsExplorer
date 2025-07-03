@@ -17,7 +17,8 @@ import { XcpManager } from "$server/services/xcpService.ts";
 import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
-import type { StampMarketData } from "$lib/types/marketData.d.ts";
+import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
+import type { StampMarketData } from "$types/marketData.d.ts";
 
 interface StampServiceOptions {
   cacheType: RouteType;
@@ -357,10 +358,18 @@ export class StampService {
     }));
   }
 
-  static async getRecentSales(page?: number, limit?: number) {
+  static async getRecentSales(
+    page?: number, 
+    limit?: number,
+    options?: {
+      dayRange?: number;
+      includeFullDetails?: boolean;
+    }
+  ) {
     // Use local market data instead of fetching all dispense events
     const pageNum = page || 1;
     const pageLimit = limit || 50;
+    const dayRange = options?.dayRange || 30;
     
     // Query stamps with recent sales from market data cache
     const result = await StampRepository.getRecentlyActiveSold({
@@ -369,26 +378,63 @@ export class StampService {
       includeMarketData: true
     });
 
-    // Transform the data to match the expected format
-    const recentSales = result.stamps.map((stamp) => {
-      // Calculate sale data from market data
-      const saleData = stamp.marketData ? {
-        btc_amount: stamp.marketData.recentSalePriceBTC || 0,
-        block_index: stamp.marketData.lastSaleBlockIndex || stamp.block_index,
-        // For tx_hash, we'll use the stamp's tx_hash as we don't have individual sale tx
-        tx_hash: stamp.tx_hash,
-      } : null;
+    // Get current BTC price for USD conversion
+    const btcPriceData = await BTCPriceService.getPrice();
+    const btcPriceUSD = btcPriceData.price;
+
+    // Transform the data with enhanced transaction details
+    const recentSales = result.stamps.map((stamp: any) => {
+      const marketData = stamp.marketData;
+      if (!marketData) return null;
+
+      // Calculate time ago
+      const saleTime = new Date(marketData.lastPriceUpdate);
+      const timeAgo = this.getTimeAgo(saleTime);
+
+      // Use new transaction detail fields if available, fall back to existing data
+      const btcAmount = marketData.lastSaleBtcAmount || marketData.recentSalePriceBTC || 0;
+      const txHash = marketData.lastSaleTxHash || stamp.tx_hash;
+      const blockIndex = marketData.lastSaleBlockIndex || stamp.block_index;
+
+      const saleData = {
+        btc_amount: btcAmount,
+        block_index: blockIndex,
+        tx_hash: txHash,
+        // Enhanced transaction details
+        buyer_address: marketData.lastSaleBuyerAddress,
+        dispenser_address: marketData.lastSaleDispenserAddress,
+        time_ago: timeAgo,
+        btc_amount_satoshis: marketData.lastSaleBtcAmount ? Math.round(marketData.lastSaleBtcAmount * 100000000) : null,
+        dispenser_tx_hash: marketData.lastSaleDispenserTxHash,
+      };
 
       return {
         ...stamp,
         sale_data: saleData,
       };
-    }).filter(stamp => stamp.sale_data !== null);
+    }).filter((stamp: any) => stamp !== null && stamp.sale_data !== null);
 
     return { 
-      recentSales, 
-      total: result.total 
+      recentSales,
+      total: result.total,
+      btcPriceUSD,
+      metadata: {
+        dayRange,
+        lastUpdated: new Date().toISOString()
+      }
     };
+  }
+
+  /**
+   * Calculate time ago string from date
+   */
+  private static getTimeAgo(date: Date): string {
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
   }
 
   static async getCreatorNameByAddress(

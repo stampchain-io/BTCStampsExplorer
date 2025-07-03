@@ -1186,6 +1186,12 @@ export class StampRepository {
         smd.last_price_update,
         smd.last_sale_block_index,
         smd.data_quality_score,
+        -- New transaction detail fields
+        smd.last_sale_tx_hash,
+        smd.last_sale_buyer_address,
+        smd.last_sale_dispenser_address,
+        smd.last_sale_btc_amount,
+        smd.last_sale_dispenser_tx_hash,
         TIMESTAMPDIFF(MINUTE, smd.last_price_update, NOW()) as minutes_since_sale
         ` : ''}
       FROM ${STAMP_TABLE} s
@@ -1246,7 +1252,13 @@ export class StampRepository {
             lastPriceUpdate: row.last_price_update,
             lastSaleBlockIndex: row.last_sale_block_index,
             minutesSinceSale: row.minutes_since_sale,
-            dataQualityScore: row.data_quality_score ? parseFloat(row.data_quality_score) : 0
+            dataQualityScore: row.data_quality_score ? parseFloat(row.data_quality_score) : 0,
+            // New transaction detail fields
+            lastSaleTxHash: row.last_sale_tx_hash,
+            lastSaleBuyerAddress: row.last_sale_buyer_address,
+            lastSaleDispenserAddress: row.last_sale_dispenser_address,
+            lastSaleBtcAmount: row.last_sale_btc_amount ? parseFloat(row.last_sale_btc_amount) / 100000000 : null, // Convert satoshis to BTC
+            lastSaleDispenserTxHash: row.last_sale_dispenser_tx_hash
           }
         };
       }

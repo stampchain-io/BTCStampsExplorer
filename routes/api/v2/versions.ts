@@ -23,6 +23,11 @@ const CHANGELOG = [
         "Advanced market data filtering parameters",
         "dataQualityScore for data reliability metrics",
         "from_timestamp and to_timestamp query parameters for date filtering (validation only)",
+        "Enhanced transaction details in recent sales data including buyer_address, dispenser_address, time_ago, btc_amount_satoshis, and dispenser_tx_hash",
+        "dayRange query parameter for /api/v2/stamps/recentSales to filter sales by days (default: 30)",
+        "fullDetails query parameter for /api/v2/stamps/recentSales to enable enhanced transaction information",
+        "btcPriceUSD field in recent sales response for real-time USD conversions",
+        "metadata object in recent sales response with dayRange and lastUpdated timestamp",
       ],
       improved: [
         "Response performance with intelligent caching",
@@ -32,6 +37,9 @@ const CHANGELOG = [
         "Security validation for SQL injection attempts in SRC101 endpoints",
         "XSS detection in address-related endpoints",
         "Transaction hash format validation requiring 64-character hex strings",
+        "Recent sales performance by using local market data cache instead of external XCP API calls",
+        "Data accuracy with transaction-level details from stamp_market_data table",
+        "Time calculations with user-friendly relative timestamps (e.g., '2h ago', '5d ago')",
       ],
       optimized: [
         "stamp_base64 field is now excluded from list endpoints for 50-70% smaller responses",

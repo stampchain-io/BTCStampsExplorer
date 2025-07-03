@@ -20,9 +20,18 @@ export const handler: Handlers = {
       }
 
       const { limit, page } = pagination;
+
+      // Parse additional query parameters for enhanced functionality
+      const dayRange = parseInt(url.searchParams.get("dayRange") || "30");
+      const includeFullDetails = url.searchParams.get("fullDetails") === "true";
+
       const result = await StampController.getRecentSales(
         page || DEFAULT_PAGINATION.page,
         limit || DEFAULT_PAGINATION.limit,
+        {
+          dayRange,
+          includeFullDetails,
+        },
       );
 
       // Check for empty result

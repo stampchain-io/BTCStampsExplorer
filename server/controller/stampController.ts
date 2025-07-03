@@ -481,22 +481,34 @@ export class StampController {
       : "priceless";
   }
 
-  static async getRecentSales(page?: number, limit?: number) {
+  static async getRecentSales(
+    page?: number, 
+    limit?: number,
+    options?: {
+      dayRange?: number;
+      includeFullDetails?: boolean;
+    }
+  ) {
     try {
-      const { recentSales, total } = await StampService.getRecentSales(
+      const result = await StampService.getRecentSales(
         page,
         limit,
+        options
       );
+      
       const lastBlock = await BlockService.getLastBlock();
-      const totalPages = limit ? Math.ceil(total / limit) : 1;
+      const totalPages = limit ? Math.ceil(result.total / limit) : 1;
 
       return {
         page: page || 1,
-        limit: limit || total,
+        limit: limit || result.total,
         totalPages,
-        total,
+        total: result.total,
         last_block: lastBlock,
-        data: recentSales,
+        data: result.recentSales,
+        // Enhanced metadata
+        btcPriceUSD: result.btcPriceUSD,
+        metadata: result.metadata,
       };
     } catch (error) {
       logger.error("stamps", {

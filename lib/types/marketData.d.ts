@@ -87,6 +87,13 @@ export interface StampMarketDataRow {
   last_updated: Date;
   last_price_update: Date | null;
   update_frequency_minutes: number;
+  // New transaction detail fields
+  last_sale_tx_hash: string | null;
+  last_sale_buyer_address: string | null;
+  last_sale_dispenser_address: string | null;
+  last_sale_btc_amount: string | null; // BIGINT stored as string (satoshis)
+  last_sale_dispenser_tx_hash: string | null;
+  last_sale_block_index: number | null;
 }
 
 /**
@@ -163,6 +170,13 @@ export interface StampMarketData {
   lastUpdated: Date;
   lastPriceUpdate: Date | null;
   updateFrequencyMinutes: number;
+  // New transaction detail fields
+  lastSaleTxHash: string | null;
+  lastSaleBuyerAddress: string | null;
+  lastSaleDispenserAddress: string | null;
+  lastSaleBtcAmount: number | null; // Converted from satoshis to BTC
+  lastSaleDispenserTxHash: string | null;
+  lastSaleBlockIndex: number | null;
 }
 
 export interface SRC20MarketData {
@@ -337,4 +351,61 @@ export interface CollectionWithMarketData {
   collection: CollectionRow;
   stamps: StampWithMarketData[];
   aggregatedMarketData: CollectionMarketData | null;
+}
+
+/**
+ * Enhanced recent sales data structure
+ */
+export interface RecentSaleData {
+  // Stamp information
+  cpid: string;
+  stamp: number;
+  stampUrl: string;
+  stampMimetype: string;
+  creator: string;
+  creatorName?: string;
+
+  // Sale transaction details
+  sale: {
+    priceBtc: number;
+    priceUsd: number;
+    timestamp: string;
+    timeAgo: string;
+    txHash: string;
+    buyerAddress: string;
+    dispenserAddress?: string;
+    btcAmountSatoshis: number;
+    blockNumber: number;
+    dispenserTxHash?: string;
+  };
+}
+
+/**
+ * API response for enhanced recent sales
+ */
+export interface RecentSalesResponse {
+  recentSales: RecentSaleData[];
+  total: number;
+  btcPriceUSD: number;
+  metadata: {
+    dayRange: number;
+    lastUpdated: string;
+  };
+}
+
+/**
+ * Enhanced stamp interface with sale data for backward compatibility
+ */
+export interface StampWithEnhancedSaleData extends StampRow {
+  sale_data?: {
+    btc_amount: number;
+    block_index: number;
+    tx_hash: string;
+    buyer_address?: string;
+    dispenser_address?: string;
+    time_ago?: string;
+    btc_amount_satoshis?: number;
+    dispenser_tx_hash?: string;
+  };
+  marketData?: StampMarketData;
 }
