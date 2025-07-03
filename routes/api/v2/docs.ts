@@ -137,7 +137,7 @@ export const handler: Handlers = {
 
     // Return filtered documentation in the correct format
     return ResponseUtil.success({
-      documentation: filteredDocs.map((doc) => ({
+      documentation: filteredDocs.map((doc: any) => ({
         path: doc.path,
         method: doc.method,
         summary: doc.summary,
@@ -145,7 +145,7 @@ export const handler: Handlers = {
         tags: doc.tags,
         parameters: doc.parameters || [],
         requestBody: doc.requestBody,
-        responses: doc.responses.map((response) => ({
+        responses: doc.responses.map((response: any) => ({
           code: response.code,
           description: response.description,
           content: response.content,
