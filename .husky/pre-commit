@@ -14,10 +14,31 @@ for file in $(git diff --cached --name-only); do
             FOUND_ISSUES=1
         fi
         
-        # Check for absolute local paths outside repository
-        if git diff --cached "$file" | grep -E "^[+].*(/Users/|/home/|C:\\\\|/tmp/|/var/)" | grep -v "BTCStampsExplorer" | grep -q .; then
+        # CRITICAL: Check for absolute local paths - COMPREHENSIVE CHECK
+        # Look for any absolute paths that expose local directory structure
+        if git diff --cached "$file" | grep -E "^[+].*(/Users/[^/]+|/home/[^/]+|C:\\\\[^\\\\]+|/tmp/|/var/tmp/)" | grep -q .; then
             echo "❌ Local file path detected in $file"
+            echo "   Found absolute path that exposes local directory structure:"
+            git diff --cached "$file" | grep -E "^[+].*(/Users/[^/]+|/home/[^/]+|C:\\\\[^\\\\]+|/tmp/|/var/tmp/)" | head -3
             echo "   Please remove absolute paths outside the repository"
+            FOUND_ISSUES=1
+        fi
+        
+        # Additional check for personal directory patterns
+        if git diff --cached "$file" | grep -E "^[+].*(username|Documents/|Desktop/|Downloads/)" | grep -q .; then
+            echo "❌ Personal directory path detected in $file"
+            echo "   Found personal path reference:"
+            git diff --cached "$file" | grep -E "^[+].*(username|Documents/|Desktop/|Downloads/)" | head -3
+            echo "   Please remove personal directory references"
+            FOUND_ISSUES=1
+        fi
+        
+        # Check for file:// URLs with local paths
+        if git diff --cached "$file" | grep -E "^[+].*file:///Users/|file:///home/|file:///C:" | grep -q .; then
+            echo "❌ Local file:// URL detected in $file"
+            echo "   Found file URL with local path:"
+            git diff --cached "$file" | grep -E "^[+].*file:///Users/|file:///home/|file:///C:" | head -3
+            echo "   Please remove file URLs with local paths"
             FOUND_ISSUES=1
         fi
         
@@ -31,6 +52,8 @@ done
 
 if [ $FOUND_ISSUES -eq 1 ]; then
     echo "❌ Security check failed - commit aborted"
+    echo "🔧 To fix: Remove all absolute paths and personal directory references from staged files"
+    echo "🚨 CRITICAL: Local paths expose sensitive directory structure and must not be committed!"
     exit 1
 fi
 
