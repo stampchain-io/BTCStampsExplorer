@@ -69,7 +69,7 @@ export class BlockRepository {
         0,
       ) || { rows: [] };
 
-      const blocks = result.rows;
+      const blocks = (result as any).rows;
       const blockIndexes = blocks.map((block: any) => block.block_index);
 
       const tx_counts_result = await this.db.executeQueryWithCache<
@@ -85,7 +85,7 @@ export class BlockRepository {
         "never",
       ) || { rows: [] };
 
-      const tx_counts = tx_counts_result.rows;
+      const tx_counts = (tx_counts_result as any).rows;
 
       const tx_count_map = new Map(
         tx_counts.map((item: any) => [item.block_index, item.tx_count]),
@@ -148,10 +148,10 @@ export class BlockRepository {
     ]);
 
     const stampMap = new Map(
-      stamps.rows.map((row: any) => [row.block_index, row.stampcount]),
+      (stamps as any).rows.map((row: any) => [row.block_index, row.stampcount]),
     );
 
-    const result = blocks.rows.map((block: any) => ({
+    const result = (blocks as any).rows.map((block: any) => ({
       ...block,
       issuances: stampMap.get(block.block_index) ?? 0,
       sends: 0, // FIXME: need to add the send data
