@@ -420,7 +420,7 @@ export class StampRepository {
       );
 
       console.log(
-        `[StampRepository] Total count query returned: ${result.rows[0]?.total}`
+        `[StampRepository] Total count query returned: ${(result as any).rows[0]?.total}`
       );
       return result;
     } catch (error) {
@@ -500,17 +500,17 @@ export class StampRepository {
 
       await logger.debug("content" as LogNamespace, {
         message: "StampRepository query result",
-        hasData: !!data?.rows?.length,
-        cpid: data?.rows?.[0]?.cpid,
-        mimetype: data?.rows?.[0]?.stamp_mimetype,
+        hasData: !!(data as any)?.rows?.length,
+        cpid: (data as any)?.rows?.[0]?.cpid,
+        mimetype: (data as any)?.rows?.[0]?.stamp_mimetype,
         identifier,
       });
 
-      if (!data?.rows?.length) {
+      if (!(data as any)?.rows?.length) {
         return null;
       }
 
-      const row = data.rows[0];
+      const row = (data as any).rows[0];
 
       // Build filename from tx_hash and stamp_url if available
       const suffix = row.stamp_url ? row.stamp_url.split(".").pop() : null;
@@ -904,12 +904,12 @@ export class StampRepository {
         suffix,
         fileType,
       });
-      total = totalResult.rows[0]?.total || 0;
+      total = (totalResult as any).rows[0]?.total || 0;
       totalPages = noPagination ? 1 : Math.ceil(total / limit);
     }
 
     return {
-      stamps: dataResult.rows,
+      stamps: (dataResult as any).rows,
       page,
       page_size: limit,
       pages: totalPages,
@@ -1184,14 +1184,7 @@ export class StampRepository {
         smd.volume_7d_btc,
         smd.holder_count,
         smd.last_price_update,
-        smd.last_sale_block_index,
         smd.data_quality_score,
-        -- New transaction detail fields
-        smd.last_sale_tx_hash,
-        smd.last_sale_buyer_address,
-        smd.last_sale_dispenser_address,
-        smd.last_sale_btc_amount,
-        smd.last_sale_dispenser_tx_hash,
         TIMESTAMPDIFF(MINUTE, smd.last_price_update, NOW()) as minutes_since_sale
         ` : ''}
       FROM ${STAMP_TABLE} s
@@ -1250,15 +1243,15 @@ export class StampRepository {
             volume7dBTC: row.volume_7d_btc ? parseFloat(row.volume_7d_btc) : 0,
             holderCount: row.holder_count || 0,
             lastPriceUpdate: row.last_price_update,
-            lastSaleBlockIndex: row.last_sale_block_index,
             minutesSinceSale: row.minutes_since_sale,
             dataQualityScore: row.data_quality_score ? parseFloat(row.data_quality_score) : 0,
-            // New transaction detail fields
-            lastSaleTxHash: row.last_sale_tx_hash,
-            lastSaleBuyerAddress: row.last_sale_buyer_address,
-            lastSaleDispenserAddress: row.last_sale_dispenser_address,
-            lastSaleBtcAmount: row.last_sale_btc_amount ? parseFloat(row.last_sale_btc_amount) / 100000000 : null, // Convert satoshis to BTC
-            lastSaleDispenserTxHash: row.last_sale_dispenser_tx_hash
+            // Enhanced transaction detail fields - set to null since columns don't exist yet
+            lastSaleBlockIndex: null,
+            lastSaleTxHash: null,
+            lastSaleBuyerAddress: null,
+            lastSaleDispenserAddress: null,
+            lastSaleBtcAmount: null,
+            lastSaleDispenserTxHash: null
           }
         };
       }
