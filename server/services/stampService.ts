@@ -79,7 +79,7 @@ export class StampService {
         asset,
         last_block: stampResult.last_block,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in getStampDetailsById:", error);
       return null;
     }
@@ -185,7 +185,7 @@ export class StampService {
           };
           console.log("Service created range:", range);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error extracting range from URL:", error);
       }
     }
@@ -335,10 +335,10 @@ export class StampService {
         StampRepository.getCountStampBalancesByAddressFromDb(address, xcpBalances)
       ]);
 
-      const total = totalResult.rows[0]?.total || 0;
+      const total = (totalResult as any).rows[0]?.total || 0;
 
       return { stamps, total };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in getStampBalancesByAddress:", error);
       return { stamps: [], total: 0 };
     }
@@ -391,7 +391,7 @@ export class StampService {
       const saleTime = new Date(marketData.lastPriceUpdate);
       const timeAgo = this.getTimeAgo(saleTime);
 
-      // Use new transaction detail fields if available, fall back to existing data
+      // Use enhanced transaction detail fields if available, fall back to existing data
       const btcAmount = marketData.lastSaleBtcAmount || marketData.recentSalePriceBTC || 0;
       const txHash = marketData.lastSaleTxHash || stamp.tx_hash;
       const blockIndex = marketData.lastSaleBlockIndex || stamp.block_index;
@@ -400,12 +400,12 @@ export class StampService {
         btc_amount: btcAmount,
         block_index: blockIndex,
         tx_hash: txHash,
-        // Enhanced transaction details
-        buyer_address: marketData.lastSaleBuyerAddress,
-        dispenser_address: marketData.lastSaleDispenserAddress,
+        // Enhanced transaction details (will be null until database schema is updated)
+        buyer_address: marketData.lastSaleBuyerAddress || null,
+        dispenser_address: marketData.lastSaleDispenserAddress || null,
         time_ago: timeAgo,
         btc_amount_satoshis: marketData.lastSaleBtcAmount ? Math.round(marketData.lastSaleBtcAmount * 100000000) : null,
-        dispenser_tx_hash: marketData.lastSaleDispenserTxHash,
+        dispenser_tx_hash: marketData.lastSaleDispenserTxHash || null,
       };
 
       return {
@@ -512,7 +512,7 @@ export class StampService {
       }
 
       return result.stamps[0];
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error resolving CPID for ${id}:`, error);
       throw error;
     }

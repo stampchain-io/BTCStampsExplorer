@@ -24,7 +24,7 @@ export class SRC20QueryService {
       params,
       excludeFullyMinted,
     );
-    return result.rows[0].total;
+    return (result as any).rows[0].total;
   }
 
   /**
@@ -96,10 +96,10 @@ export class SRC20QueryService {
         BlockService.getLastBlock(),
       ]);
 
-      const total = totalResult.rows[0].total;
+      const total = (totalResult as any).rows[0].total;
 
       // Only map and format if we have data
-      if (!data.rows || data.rows.length === 0) {
+      if (!(data as any).rows || (data as any).rows.length === 0) {
         return {
           data: [],
           total: 0,
@@ -108,9 +108,9 @@ export class SRC20QueryService {
           limit,
           last_block: lastBlock,
         };
-      }
+              }
 
-      const mappedData = this.mapTransactionData(data.rows);
+      const mappedData = this.mapTransactionData((data as any).rows);
       const formattedData = this.formatTransactionData(
         mappedData,
         queryParams,
@@ -133,7 +133,7 @@ export class SRC20QueryService {
         last_block: lastBlock,
         data: Array.isArray(formattedData) ? formattedData : [formattedData],
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchAndFormatSrc20Data:", error);
       if (error.message.includes("Stamps Down")) {
         throw new Error("Stamps Down...");
@@ -157,7 +157,7 @@ export class SRC20QueryService {
         total_mints,
         total_transfers,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchAllSrc20DataForTick:", error);
       throw error;
     }
@@ -188,7 +188,7 @@ export class SRC20QueryService {
       }
 
       return params.address && params.tick ? src20[0] : src20;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchSrc20Balance:", error);
       console.error("Params:", params);
       // Return an empty response for any other errors as well
@@ -217,7 +217,7 @@ export class SRC20QueryService {
       }));
 
       return snapshotData;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchSrc20Snapshot:", error);
       throw error;
     }
@@ -255,7 +255,7 @@ export class SRC20QueryService {
   ): Promise<number> {
     try {
       return await SRC20Repository.getTotalSrc20BalanceCount(params);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error getting total SRC20 balance count:", error);
       throw error;
     }
@@ -292,7 +292,7 @@ export class SRC20QueryService {
         last_block: await BlockService.getLastBlock(),
         data: paginatedData,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchTrendingActiveMintingTokens:", error);
       throw error;
     }
@@ -547,7 +547,7 @@ export class SRC20QueryService {
         data: Array.isArray(formattedData) ? formattedData : [formattedData],
         performance: metrics
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchAndFormatSrc20DataV2:", error);
       metrics.duration = performance.now() - startTime;
       
@@ -636,7 +636,7 @@ export class SRC20QueryService {
       }
 
       return Array.isArray(data) ? enriched : enriched[0];
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in enrichData:", error);
       // On error, return original data without enrichment
       return data;
