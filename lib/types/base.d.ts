@@ -67,9 +67,9 @@ export interface FeeEstimationResult {
 
 export type ScriptType =
   | "P2PKH"
+  | "P2SH"
   | "P2WPKH"
   | "P2WSH"
-  | "P2SH"
   | "P2TR"
   | "OP_RETURN"
   | "UNKNOWN";
