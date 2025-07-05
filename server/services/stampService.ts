@@ -15,10 +15,11 @@ import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 
 import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import type { StampMarketData } from "$types/marketData.d.ts";
+import type { XcpBalance } from "$types/index.d.ts";
 
 interface StampServiceOptions {
   cacheType: RouteType;

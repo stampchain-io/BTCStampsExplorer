@@ -38,7 +38,7 @@ export class PSBTService {
     const [txid, voutStr] = utxo.split(":");
     const vout = parseInt(voutStr, 10);
 
-    const network = getAddressNetwork(sellerAddress);
+    const network = PSBTService.getAddressNetwork(sellerAddress);
     const psbt = new Psbt({ network });
 
     // Fetch specific UTXO details (no ancestor info needed)
@@ -76,7 +76,7 @@ export class PSBTService {
       value: salePriceSats,
     });
 
-    const addressType = getAddressType(sellerAddress, network);
+    const addressType = PSBTService.getAddressType(sellerAddress, network);
     
     if (addressType === 'p2sh-p2wpkh') {
       const p2wpkh = payments.p2wpkh({ address: sellerAddress, network });
@@ -197,7 +197,7 @@ export class PSBTService {
   ): Promise<string> {
     console.log(`Starting completePSBT with feeRate: ${feeRate} sat/vB`);
 
-    const network = getAddressNetwork(buyerAddress);
+    const network = PSBTService.getAddressNetwork(buyerAddress);
 
     // Parse the seller's PSBT
     const psbt = Psbt.fromHex(sellerPsbtHex, { network });
