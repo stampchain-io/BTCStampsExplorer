@@ -1,7 +1,7 @@
 import { dbManager } from "$server/database/databaseManager.ts";
 import { RouteType, getCacheConfig } from "$server/services/cacheService.ts";
 import { getRecommendedFees } from "$lib/utils/mempool.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
+import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 import { logger } from "$lib/utils/logger.ts";
 import {
@@ -45,7 +45,7 @@ export class FeeService {
   /**
    * Get fee data with Redis caching and comprehensive fallback
    */
-  static async getFeeData(baseUrl: string): Promise<FeeData> {
+  static async getFeeData(): Promise<FeeData> {
     const startTime = Date.now();
 
     try {
@@ -57,7 +57,7 @@ export class FeeService {
       // Use Redis cache with fallback chain
       const feeData = await dbManager.handleCache<FeeData>(
         this.CACHE_KEY,
-        () => this.fetchFreshFeeData(baseUrl),
+        () => this.fetchFreshFeeData(),
         this.CACHE_CONFIG.duration,
       );
 
@@ -86,7 +86,7 @@ export class FeeService {
   /**
    * Fetch fresh fee data from external sources with fallback chain
    */
-  private static async fetchFreshFeeData(baseUrl: string): Promise<FeeData> {
+  private static async fetchFreshFeeData(): Promise<FeeData> {
     const errors: string[] = [];
 
     logger.debug("stamps", {
@@ -94,7 +94,8 @@ export class FeeService {
     });
 
     // Get BTC price in parallel (don't let this block fee estimation)
-    const btcPricePromise = fetchBTCPriceInUSD(baseUrl)
+    const btcPricePromise = BTCPriceService.getPrice()
+      .then((priceData) => priceData.price)
       .catch((error) => {
         logger.warn("stamps", {
           message: "BTC price fetch failed",

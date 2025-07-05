@@ -25,8 +25,7 @@ export const handler: Handlers = {
       console.log("[fees.ts] Starting Redis-cached fee estimation");
 
       // Use the new FeeService with Redis caching
-      const baseUrl = new URL(req.url).origin;
-      const feeData = await FeeService.getFeeData(baseUrl);
+      const feeData = await FeeService.getFeeData();
 
       const duration = Date.now() - startTime;
       console.log(

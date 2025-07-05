@@ -5,7 +5,7 @@
 */
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
+
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
 import { ComposeAttachOptions } from "$server/services/xcpService.ts";
 import { normalizeFeeRate } from "$server/services/xcpService.ts";
@@ -74,8 +74,20 @@ export function StampTradeTool() {
   /* ===== EFFECTS ===== */
   useEffect(() => {
     const fetchPrice = async () => {
-      const price = await fetchBTCPriceInUSD();
-      setTradeFormState((prev) => ({ ...prev, BTCPrice: price }));
+      try {
+        const response = await fetch("/api/internal/btcPrice");
+        if (response.ok) {
+          const data = await response.json();
+          const price = data.data?.price || 0;
+          setTradeFormState((prev) => ({ ...prev, BTCPrice: price }));
+        } else {
+          console.warn("Failed to fetch BTC price");
+          setTradeFormState((prev) => ({ ...prev, BTCPrice: 0 }));
+        }
+      } catch (error) {
+        console.error("Error fetching BTC price:", error);
+        setTradeFormState((prev) => ({ ...prev, BTCPrice: 0 }));
+      }
     };
     fetchPrice();
   }, []);
