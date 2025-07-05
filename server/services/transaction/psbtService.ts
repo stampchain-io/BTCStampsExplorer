@@ -134,14 +134,14 @@ export class PSBTService {
     }
   }
 
-  // Unused - can be removed or implemented if needed later
-  // private static getAddressFromScript(script: Uint8Array, network: networks.Network): string {
-  //   const payment = payments.p2wpkh({ output: script, network });
-  //   if (!payment.address) {
-  //     throw new Error("Failed to derive address from script");
-  //   }
-  //   return payment.address;
-  // }
+  private static getAddressFromScript(script: Uint8Array, network: networks.Network): string {
+    try {
+      // Use bjsAddress.fromOutputScript which handles multiple script types
+      return bjsAddress.fromOutputScript(Buffer.from(script), network);
+    } catch (error: any) {
+      throw new Error(`Failed to derive address from script: ${error.message}`);
+    }
+  }
 
   static async validateUTXOOwnership(
     utxo: string,
@@ -221,7 +221,7 @@ export class PSBTService {
       throw new Error("Seller's witnessUtxo not found");
     }
 
-    const sellerAddress = getAddressFromScript(
+    const sellerAddress = PSBTService.getAddressFromScript(
       new Uint8Array(sellerWitnessUtxo.script), // Be explicit with Uint8Array
       network
     );
