@@ -168,7 +168,9 @@ export function StampTradeTool() {
         });
         setTradeFormState((prev) => ({ ...prev, psbtHex: walletResult.psbt }));
       } else if (walletResult.cancelled) {
-        setSubmissionMessage("PSBT signing cancelled by user.");
+        setSubmissionMessage({
+          message: "PSBT signing cancelled by user.",
+        });
       } else {
         setSubmissionMessage({
           message: `PSBT signing failed: ${walletResult.error}`,
@@ -376,7 +378,9 @@ export function StampTradeTool() {
         throw new Error(signResult.error || "Failed to sign PSBT");
       }
 
-      setSubmissionMessage("Swap completed and broadcast successfully!");
+      setSubmissionMessage({
+        message: "Swap completed and broadcast successfully!",
+      });
     } catch (error: unknown) {
       console.error("Complete swap error:", error);
       setApiError(
