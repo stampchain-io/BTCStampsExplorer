@@ -4,6 +4,7 @@ import {
   SRC20TrxRequestParams,
   PaginatedSrc20ResponseBody,
   Src20ResponseBody,
+  Src20BalanceResponseBody,
   Src20SnapShotDetail,
   SRC20SnapshotRequestParams,
 } from "$globals";

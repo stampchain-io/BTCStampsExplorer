@@ -8,20 +8,20 @@ export class FileOperations {
     tickHash: string,
     base64Data: string,
   ): Promise<boolean> {
+    const query = `
+      INSERT INTO ${SRC20_BACKGROUND_TABLE} (tick, tick_hash, base64)
+      VALUES (?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        tick_hash = VALUES(tick_hash),
+        base64 = VALUES(base64)
+    `;
+
     try {
       console.log("Starting database save operation:", {
         tick,
         tickHashLength: tickHash.length,
         dataLength: base64Data.length,
       });
-
-      const query = `
-        INSERT INTO ${SRC20_BACKGROUND_TABLE} (tick, tick_hash, base64)
-        VALUES (?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-          tick_hash = VALUES(tick_hash),
-          base64 = VALUES(base64)
-      `;
 
       console.log("Executing query:", query.replace(/\s+/g, ' ').trim());
 

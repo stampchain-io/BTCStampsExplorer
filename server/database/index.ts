@@ -2,7 +2,7 @@
 export type { DatabaseConfig } from "./databaseManager.ts";
 
 // Then check SKIP_REDIS_CONNECTION before any database imports
-if (!globalThis.SKIP_REDIS_CONNECTION) {
+if (!(globalThis as any).SKIP_REDIS_CONNECTION) {
   await import("./databaseManager.ts");
 }
 
