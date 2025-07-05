@@ -443,6 +443,9 @@ export interface SRC20Row {
 export interface EnrichedSRC20Row extends SRC20Row {
   market_data?: MarketListingAggregated; // MarketListingAggregated is already defined above
   chart?: any;
+  mint_count?: number | string; // Number of mints for this token
+  volume24?: number; // 24h trading volume
+  market_cap?: number; // Market capitalization
 }
 
 interface SendRow {
