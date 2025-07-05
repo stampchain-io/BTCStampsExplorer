@@ -1,7 +1,7 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
 import { useEffect, useState } from "preact/hooks";
-import type { StampRow } from "$globals";
+import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 import { StampGallery } from "$section";
 import { titlePurpleLD } from "$text";
 import { loaderSpinXsPurple } from "$layout";
@@ -15,16 +15,8 @@ interface DisplayCountBreakpoints {
   desktop: number;
 }
 
-interface RecentSaleStamp extends StampRow {
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-  };
-}
-
 interface StampSalesProps {
-  initialData?: RecentSaleStamp[];
+  initialData?: StampWithEnhancedSaleData[];
   title?: string;
   subTitle?: string;
   variant?: "home" | "detail";
@@ -42,7 +34,7 @@ export function StampSalesGallery({
   gridClass,
 }: StampSalesProps) {
   /* ===== STATE ===== */
-  const [recentSales, setRecentSales] = useState<RecentSaleStamp[]>(
+  const [recentSales, setRecentSales] = useState<StampWithEnhancedSaleData[]>(
     initialData,
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -58,12 +50,14 @@ export function StampSalesGallery({
         throw new Error("Failed to fetch recent sales");
       }
       const data = await response.json();
-      const salesWithData = (data.data || []).map((stamp: RecentSaleStamp) => {
-        if (!stamp.sale_data) {
-          console.warn(`Stamp ${stamp.tx_hash} missing sale_data`);
-        }
-        return stamp;
-      });
+      const salesWithData = (data.data || []).map(
+        (stamp: StampWithEnhancedSaleData) => {
+          if (!stamp.sale_data) {
+            console.warn(`Stamp ${stamp.tx_hash} missing sale_data`);
+          }
+          return stamp;
+        },
+      );
       setRecentSales(salesWithData);
     } catch (error) {
       console.error("Error fetching recent sales:", error);
