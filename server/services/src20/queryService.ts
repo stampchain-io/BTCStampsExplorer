@@ -7,6 +7,8 @@ import {
   Src20BalanceResponseBody,
   Src20SnapShotDetail,
   SRC20SnapshotRequestParams,
+  MarketListingAggregated,
+  SRC20Row,
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { SRC20UtilityService } from "./utilityService.ts";
@@ -14,6 +16,13 @@ import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { paginate } from "$lib/utils/paginationUtils.ts"
 import { Big } from "big";
 import { SRC20MarketService } from "./marketService.ts";
+
+// Define missing types
+interface PerformanceMetrics {
+  duration: number;
+  cacheHit: boolean;
+  dataSize: number;
+}
 
 // Change class name from Src20Service to SRC20QueryService
 export class SRC20QueryService {
