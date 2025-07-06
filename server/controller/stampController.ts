@@ -35,10 +35,6 @@ import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 import { decodeBase64 } from "$lib/utils/formatUtils.ts";
 
-interface StampControllerOptions {
-  cacheType: RouteType;
-}
-
 export class StampController {
   static async getStamps({
     page = 1,
@@ -111,10 +107,17 @@ export class StampController {
     skipTotalCount?: boolean;
     collectionId?: string | undefined;
     type?: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
-    allColumns?: boolean
+    allColumns?: boolean;
     identifier?: string | number | (string | number)[];
-    noPagination?: boolean
-    cacheDuration?: number
+    blockIdentifier?: string | number;
+    noPagination?: boolean;
+    cacheDuration?: number;
+    includeSecondary?: boolean;
+    sortColumn?: string;
+    collectionStampLimit?: number;
+    groupBy?: string;
+    groupBySubquery?: string;
+    cacheType?: RouteType;
     filterBy?: STAMP_FILTER_TYPES[];
     fileType?: STAMP_FILETYPES[];
     editions?: STAMP_EDITIONS[];
@@ -182,9 +185,11 @@ export class StampController {
     
     console.log("About to call repository with range:", range);
     
-    const filterByArray = typeof filterBy === "string"
-      ? filterBy.split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
-      : filterBy;
+    const filterByArray: STAMP_FILTER_TYPES[] = Array.isArray(filterBy) 
+      ? filterBy 
+      : typeof filterBy === "string" && filterBy
+        ? (filterBy as string).split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
+        : [];
 
     // Initialize ident based on type
     let finalIdent: SUBPROTOCOLS[] = ident || [];
@@ -245,22 +250,18 @@ export class StampController {
       suffix = []; // No suffix filter applied
     }
 
-    // If range is undefined but url is provided, check for range parameters
+    // Handle custom range - STAMP_RANGES expects string literals, not objects
+    let customRange: STAMP_RANGES | undefined = range;
     if (!range && url) {
       try {
         const urlObj = new URL(url);
-        const rangeMin = urlObj.searchParams.get("range[stampRange][min]");
-        const rangeMax = urlObj.searchParams.get("range[stampRange][max]");
+        const rangeMinParam = urlObj.searchParams.get("range[stampRange][min]");
+        const rangeMaxParam = urlObj.searchParams.get("range[stampRange][max]");
         
-        if (rangeMin || rangeMax) {
-          console.log("Controller detected custom range params:", { rangeMin, rangeMax });
-          range = {
-            stampRange: {
-              min: rangeMin || "",
-              max: rangeMax || ""
-            }
-          };
-          console.log("Controller set range:", range);
+        if (rangeMinParam || rangeMaxParam) {
+          console.log("Controller detected custom range params:", { rangeMinParam, rangeMaxParam });
+          customRange = "custom"; // Use the custom literal value
+          console.log("Controller set range:", customRange);
         }
       } catch (error) {
         console.error("Error parsing URL in controller:", error);
@@ -281,6 +282,13 @@ export class StampController {
     // Only include heavy fields like stamp_base64 for detail views
     const shouldIncludeSecondary = isDetailView ? includeSecondary : false;
     
+    // Convert boolean parameters to proper types for service call
+    const dispensersParam = typeof dispensers === "boolean" ? dispensers : undefined;
+    const atomicsParam = typeof atomics === "boolean" ? atomics : undefined;
+    
+    // Convert groupBySubquery to boolean
+    const groupBySubqueryParam = typeof groupBySubquery === "string" ? groupBySubquery === "true" : Boolean(groupBySubquery);
+    
     // Always include market data when available
     const stampResult = await StampService.getStamps({
       page,
@@ -288,30 +296,30 @@ export class StampController {
       sortBy,
       type,
       ident: finalIdent,
-      suffix,
+      suffix: suffix as STAMP_SUFFIX_FILTERS[],
       allColumns,
       includeSecondary: shouldIncludeSecondary,
       collectionId,
       identifier,
       blockIdentifier,
-      cacheDuration,
+      cacheDuration: cacheDuration || undefined,
       noPagination,
       sortColumn,
       collectionStampLimit,
       groupBy,
-      groupBySubquery,
+      groupBySubquery: groupBySubqueryParam,
       skipTotalCount,
       cacheType,
       isSearchQuery,
       filterBy: filterByArray,
       fileType,
       editions,
-      range,
+      range: customRange,
       rangeMin,
       rangeMax,
       market,
-      dispensers,
-      atomics,
+      dispensers: dispensersParam,
+      atomics: atomicsParam,
       listings,
       listingsMin,
       listingsMax,
@@ -336,7 +344,7 @@ export class StampController {
       minDataQualityScore,
       maxCacheAgeMinutes,
       priceSource,
-      includeMarketData: useMarketData,
+      includeMarketData: Boolean(useMarketData),
       btcPriceUSD: btcPrice
     });
 
@@ -373,12 +381,14 @@ export class StampController {
 
     // Add pagination data for index/collection routes
     if (!identifier || Array.isArray(identifier)) {
+      // Handle both paginated and non-paginated responses
+      const paginatedResult = stampResult as any;
       return {
         ...baseResponse,
-        page: stampResult.page,
-        limit: stampResult.page_size,
-        totalPages: stampResult.pages,
-        total: skipTotalCount ? undefined : stampResult.total,
+        page: paginatedResult.page || page,
+        limit: paginatedResult.page_size || limit,
+        totalPages: paginatedResult.pages || 0,
+        total: skipTotalCount ? undefined : (paginatedResult.total || 0),
       };
     }
 
@@ -390,7 +400,7 @@ export class StampController {
     id: string, 
     stampType: STAMP_TYPES = "all",
     cacheType: RouteType = RouteType.STAMP_DETAIL,
-    cacheDuration?: number | "never",
+    cacheDuration?: number,
     includeSecondary: boolean = true,
     isSearchQuery: boolean = false
   ) {
@@ -424,14 +434,14 @@ export class StampController {
       return sum + quantity;
     }, 0);
 
-    // Map holders with percentages
+    // Map holders with percentages - fix property name to match ProcessedHolder interface
     return holders.map((holder: HolderRow) => {
       const quantity = holder.divisible ? holder.quantity / 100000000 : holder.quantity;
       const percentage = totalQuantity > 0 ? (quantity / totalQuantity) * 100 : 0;
 
       return {
         address: holder.address,
-        amt: quantity,  // Renamed from quantity to amt to match HoldersGraph interface
+        quantity: quantity,  // Use quantity instead of amt to match ProcessedHolder interface
         percentage: Number(percentage.toFixed(2))  // Round to 2 decimal places
       };
     });
