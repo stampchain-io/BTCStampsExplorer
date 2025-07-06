@@ -140,7 +140,7 @@ export class SRC20Repository {
       limit = 50, // Default limit
       page = 1, // Default page
       sortBy = "ASC",
-      _filterBy,
+      filterBy: _filterBy,
       tx_hash,
       address,
     } = params;
@@ -156,20 +156,20 @@ export class SRC20Repository {
     if (tick !== undefined) {
       if (Array.isArray(tick)) {
         whereClauses.push(`src20.tick IN (${tick.map(() => "?").join(", ")})`);
-        queryParams.push(...tick.map(t => this.ensureUnicodeEscape(t)));
+        queryParams.push(...tick.map(t => this.ensureUnicodeEscape(t || "")));
       } else {
         whereClauses.push(`src20.tick = ?`);
-        queryParams.push(this.ensureUnicodeEscape(tick));
+        queryParams.push(this.ensureUnicodeEscape(tick || ""));
       }
     }
 
     if (op !== undefined) {
       if (Array.isArray(op)) {
         whereClauses.push(`src20.op IN (${op.map(() => "?").join(", ")})`);
-        queryParams.push(...op.map(o => this.ensureUnicodeEscape(o)));
+        queryParams.push(...op.map(o => this.ensureUnicodeEscape(o || "")));
       } else {
         whereClauses.push(`src20.op = ?`);
-        queryParams.push(this.ensureUnicodeEscape(op));
+        queryParams.push(this.ensureUnicodeEscape(op || ""));
       }
     }
 
@@ -289,7 +289,7 @@ export class SRC20Repository {
         query,
         fullQueryParams,
         1000 * 60 * 5, // Cache duration
-      );
+      ) as any;
 
       // Convert response ticks to emoji format
       return {
@@ -367,7 +367,7 @@ export class SRC20Repository {
       sqlQuery,
       queryParams,
       1000 * 60 * 2, // Cache duration
-    );
+    ) as any;
 
     // Retrieve transaction hashes for the ticks
     const ticksToQuery = results.rows
