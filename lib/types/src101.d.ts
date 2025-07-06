@@ -35,6 +35,8 @@ export interface SRC101InputData {
   sig?: string;
   img?: string[] | string;
   coef?: number;
+  type?: string;
+  data?: Record<string, any>;
 
   feeRate: number;
 
