@@ -58,7 +58,7 @@ export class Src20Controller {
         params,
         excludeFullyMinted,
       );
-      return result.rows[0].total;
+      return (result as any).rows[0].total;
     } catch (error) {
       console.error("Error getting total valid SRC20 transactions:", error);
       throw error;
@@ -107,7 +107,7 @@ export class Src20Controller {
       };
 
       // Process data with mint progress if requested
-      let processedData = rawData.length > 1 ? [...rawData]: rawData;
+      let processedData = Array.isArray(rawData) && rawData.length > 1 ? [...rawData]: rawData;
 
       if (balanceParams.includeMintData) {
         const ticks = processedData.map((row: any) => row.tick).filter(Boolean);

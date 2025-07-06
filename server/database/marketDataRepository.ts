@@ -63,6 +63,14 @@ export class MarketDataRepository {
         last_updated,
         last_price_update,
         update_frequency_minutes,
+        last_sale_tx_hash,
+        last_sale_buyer_address,
+        last_sale_dispenser_address,
+        last_sale_btc_amount,
+        last_sale_dispenser_tx_hash,
+        last_sale_block_index,
+        activity_level,
+        last_activity_time,
         TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM stamp_market_data
       WHERE cpid = ?
@@ -303,11 +311,11 @@ export class MarketDataRepository {
         DEFAULT_CACHE_DURATION
       );
 
-      if (!result.rows || result.rows.length === 0) {
+      if (!(result as any).rows || (result as any).rows.length === 0) {
         return null;
       }
 
-      const row = result.rows[0] as SRC20MarketDataRow & { cache_age_minutes: number };
+      const row = (result as any).rows[0] as SRC20MarketDataRow & { cache_age_minutes: number };
       
       // Parse the row data into the application format
       return this.parseSRC20MarketDataRow(row);
@@ -353,11 +361,11 @@ export class MarketDataRepository {
         DEFAULT_CACHE_DURATION
       );
 
-      if (!result.rows || result.rows.length === 0) {
+      if (!(result as any).rows || (result as any).rows.length === 0) {
         return null;
       }
 
-      const row = result.rows[0] as CollectionMarketDataRow & { cache_age_minutes: number };
+      const row = (result as any).rows[0] as CollectionMarketDataRow & { cache_age_minutes: number };
       
       // Parse the row data into the application format
       return this.parseCollectionMarketDataRow(row);
@@ -394,12 +402,12 @@ export class MarketDataRepository {
         DEFAULT_CACHE_DURATION
       );
 
-      if (!result.rows) {
+      if (!(result as any).rows) {
         return [];
       }
 
       // Parse each row into StampHolderCache format
-      return result.rows.map((row: StampHolderCacheRow) => ({
+      return (result as any).rows.map((row: StampHolderCacheRow) => ({
         id: row.id,
         cpid: row.cpid,
         address: row.address,
@@ -450,6 +458,14 @@ export class MarketDataRepository {
         last_updated,
         last_price_update,
         update_frequency_minutes,
+        last_sale_tx_hash,
+        last_sale_buyer_address,
+        last_sale_dispenser_address,
+        last_sale_btc_amount,
+        last_sale_dispenser_tx_hash,
+        last_sale_block_index,
+        activity_level,
+        last_activity_time,
         TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM stamp_market_data
       WHERE cpid IN (${placeholders})
@@ -509,6 +525,16 @@ export class MarketDataRepository {
         lastUpdated: new Date(row.last_updated),
         lastPriceUpdate: row.last_price_update ? new Date(row.last_price_update) : null,
         updateFrequencyMinutes: row.update_frequency_minutes || 60,
+        // Transaction detail fields
+        lastSaleTxHash: row.last_sale_tx_hash,
+        lastSaleBuyerAddress: row.last_sale_buyer_address,
+        lastSaleDispenserAddress: row.last_sale_dispenser_address,
+        lastSaleBtcAmount: row.last_sale_btc_amount ? parseBTCDecimal(row.last_sale_btc_amount) : null,
+        lastSaleDispenserTxHash: row.last_sale_dispenser_tx_hash,
+        lastSaleBlockIndex: row.last_sale_block_index,
+        // Activity tracking fields
+        activityLevel: row.activity_level,
+        lastActivityTime: row.last_activity_time,
       };
     } catch (error) {
       console.error("Error parsing stamp market data row:", error);
