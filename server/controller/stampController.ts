@@ -52,7 +52,7 @@ export class StampController {
     includeSecondary = true,
     sortColumn = "tx_index",
     suffix,
-    _collectionStampLimit = 12,
+    // _collectionStampLimit = 12, // Removed - not used and causes TS6133 error
     groupBy,
     groupBySubquery,
     skipTotalCount = false,
@@ -764,12 +764,12 @@ export class StampController {
       const response = await fetch(proxyPath);
       
       return new Response(response.body, {
-        headers: normalizeHeaders({
+        headers: Object.fromEntries(normalizeHeaders({
           ...Object.fromEntries(response.headers),
           "Content-Type": contentType,
           "X-API-Version": API_RESPONSE_VERSION,
           "Vary": "Accept-Encoding, X-API-Version, Origin",
-        }),
+        })),
       });
     } catch (error) {
       logger.error("content", {
@@ -867,10 +867,10 @@ export class StampController {
   private static handleBinaryContent(result: any, contentInfo: any) {
     return WebResponseUtil.stampResponse(result.body, contentInfo.mimeType, {
       binary: true,
-      headers: normalizeHeaders({
+      headers: Object.fromEntries(normalizeHeaders({
         "X-API-Version": API_RESPONSE_VERSION,
         ...(result.headers || {}),
-      })
+      }))
     });
   }
 
@@ -960,7 +960,7 @@ export class StampController {
         total: dispensersData.total
       };
     } catch (error) {
-      logger.error("getDispensersWithStampsByAddress", {
+      logger.error("stamps", {
         message: "Error fetching dispensers with stamps",
         error: error instanceof Error ? error.message : String(error),
         address
@@ -1064,7 +1064,7 @@ export class StampController {
   ) {
     try {
       const cpid = await this.resolveToCpid(id);
-      const { dispensers, total } = await StampService.getAllStampDispensers(cpid, { cacheType });
+      const { dispensers, total } = await StampService.getStampDispensers(cpid, { cacheType });
       return {
         data: dispensers,
         total
