@@ -40,7 +40,7 @@ export class SRC101Repository {
       sqlQuery,
       [deploy_hash],
       60 * 2, // Cache duration in seconds
-    )).rows;
+    ) as any).rows;
     const result: any = {};
     rows.forEach((row: any) => {
       result[row.len] = row.price;
@@ -93,7 +93,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2,
-    )).rows;
+    ) as any).rows;
     return results[0].total;
   }
 
@@ -183,7 +183,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2,
-    )).rows.map((result: any) => {
+    ) as any).rows.map((result: any) => {
       return {
         ...result,
       };
