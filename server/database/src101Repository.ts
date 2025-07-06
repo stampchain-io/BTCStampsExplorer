@@ -238,7 +238,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2,
-    )).rows;
+    ) as any).rows;
     return results[0].total;
   }
 
@@ -256,7 +256,7 @@ export class SRC101Repository {
       sqlQuery,
       [deploy_hash],
       60 * 2, // Cache duration in seconds
-    )).rows.map((result: any) => 
+    ) as any).rows.map((result: any) => 
       result["address"]
     );
 
@@ -295,7 +295,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result: any) => {
+    ) as any).rows.map((result: any) => {
       result["mintstart"] = Number.parseInt(result["mintstart"].toString())
       result["mintend"] = Number.parseInt(result["mintend"].toString())
       return ({
@@ -320,7 +320,7 @@ export class SRC101Repository {
       sqlQuery,
       [deploy_hash],
       60 * 2, // Cache duration in seconds
-    )).rows[0]["COUNT(*)"];
+    ) as any).rows[0]["COUNT(*)"];
     return total
   }
 
@@ -410,7 +410,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2,
-    )).rows.map((result: any) => {
+    ) as any).rows.map((result: any) => {
       result["mintstart"] = result["mintstart"] ? Number.parseInt(result["mintstart"].toString()) : 0
       result["mintend"] = result["mintend"] ? Number.parseInt(result["mintend"].toString()) : 0
       return {
@@ -441,7 +441,7 @@ export class SRC101Repository {
         sqlQuery,
         queryParams,
         60 * 2, // Cache duration in seconds
-      )).rows[0]["COUNT(*)"];
+      ) as any).rows[0]["COUNT(*)"];
       return total
     }
   }
@@ -460,8 +460,8 @@ export class SRC101Repository {
     const offset = params.limit && params.page ? Number(params.limit) * (Number(params.page) - 1) : 0;
     queryParams.push(params.limit, offset); // Add limit and offset at the end
 
-    const validOrder = ["ASC", "DESC"].includes(params.sort?.toUpperCase())
-      ? params.sort.toUpperCase()
+    const validOrder = ["ASC", "DESC"].includes(params.sort?.toUpperCase() || "")
+      ? (params.sort || "ASC").toUpperCase()
       : "ASC";
 
     const sqlQuery = `
@@ -476,7 +476,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result: any) => ({
+    ) as any).rows.map((result: any) => ({
       ...result,
     }));;
     return results;
@@ -517,7 +517,7 @@ export class SRC101Repository {
         sqlQuery,
         queryParams,
         60 * 2, // Cache duration in seconds
-      )).rows;
+      ) as any).rows;
       return results[0].total;
     }
 
@@ -558,8 +558,8 @@ export class SRC101Repository {
       queryParams.push(safeLimit, offset);
     }
 
-    const validOrder = ["ASC", "DESC"].includes(sort.toUpperCase())
-      ? sort.toUpperCase()
+    const validOrder = ["ASC", "DESC"].includes((sort || "DESC").toUpperCase())
+      ? (sort || "DESC").toUpperCase()
       : "DESC";
 
     const sqlQuery = `
@@ -574,7 +574,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows;
+    ) as any).rows;
     return results;
   }
 
@@ -622,7 +622,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result: any) => ({
+    ) as any).rows.map((result: any) => ({
       ...result,
     }));;
     return results;
@@ -655,8 +655,8 @@ export class SRC101Repository {
       queryParams.push(new Date().getTime() / 1000);
     }
 
-    const validOrder = ["ASC", "DESC"].includes(params.sort.toUpperCase())
-      ? params.sort.toUpperCase()
+    const validOrder = ["ASC", "DESC"].includes((params.sort || "ASC").toUpperCase())
+      ? (params.sort || "ASC").toUpperCase()
       : "ASC";
 
     const sqlQuery = `
@@ -670,7 +670,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result: any) => ({
+    ) as any).rows.map((result: any) => ({
       ...result,
     }));;
     return results[0].total;
@@ -706,8 +706,8 @@ export class SRC101Repository {
     const offset = params.limit && params.page ? Number(params.limit) * (Number(params.page) - 1) : 0;
     queryParams.push(params.limit, offset); // Add limit and offset at the end
 
-    const validOrder = ["ASC", "DESC"].includes(params.sort.toUpperCase())
-      ? params.sort.toUpperCase()
+    const validOrder = ["ASC", "DESC"].includes((params.sort || "ASC").toUpperCase())
+      ? (params.sort || "ASC").toUpperCase()
       : "ASC";
 
     const sqlQuery = `
@@ -722,7 +722,7 @@ export class SRC101Repository {
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result: any) => ({
+    ) as any).rows.map((result: any) => ({
       ...result,
     }));;
     return results;
