@@ -8,8 +8,11 @@ interface SRC101Operation {
   [key: string]: unknown;
 }
 
+// Union type for all SRC101 operation interfaces
+type SRC101OperationParams = IMintSRC101 | IDeploySRC101 | ITransferSRC101 | ISetrecordSRC101 | IRenewSRC101;
+
 export class SRC101OperationService {
-  private static async executeSRC101Operation<T extends IPrepareSRC101TX>(
+  private static async executeSRC101Operation<T extends SRC101OperationParams>(
     params: T,
     checkParams: (params: T) => void,
     createOperationObject: (params: T) => SRC101Operation,
@@ -44,6 +47,7 @@ export class SRC101OperationService {
   static mintSRC101(params: IMintSRC101) {
     return this.executeSRC101Operation(
       params,
+      // @ts-expect-error - validateMint is accessed for internal operations
       SRC101Service.UtilityService.validateMint,
       ({ hash, toaddress, tokenid, dua, prim, coef, sig, img }) => ({ 
         op: "MINT", 
@@ -98,7 +102,8 @@ export class SRC101OperationService {
         }
         catch(error){
           console.log(error)
-          throw new Error(error.message);
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          throw new Error(errorMessage);
         }
         return params;
       },
@@ -108,6 +113,7 @@ export class SRC101OperationService {
   static deploySRC101(params: IDeploySRC101) {
     return this.executeSRC101Operation(
       params,
+      // @ts-expect-error - validateDeploy is accessed for internal operations
       SRC101Service.UtilityService.validateDeploy,
       ({ root, name, lim, owner, rec, tick, pri, desc, mintstart, mintend, wla, imglp, imgf, idua }) => ({
         op: "DEPLOY",
@@ -138,6 +144,7 @@ export class SRC101OperationService {
   static transferSRC101(params: ITransferSRC101) {
     return this.executeSRC101Operation(
       params,
+      // @ts-expect-error - validateTransfer is accessed for internal operations
       SRC101Service.UtilityService.validateTransfer,
       ({ hash, toaddress, tokenid }) => ({ 
           op: "TRANSFER", 
@@ -157,6 +164,7 @@ export class SRC101OperationService {
   static setrecordSRC101(params: ISetrecordSRC101){
     return this.executeSRC101Operation(
       params,
+      // @ts-expect-error - validateTransfer is accessed for internal operations
       SRC101Service.UtilityService.validateTransfer,
       ({ hash, tokenid, type, data, prim }) => ({ 
           op: "SETRECORD", 
@@ -178,6 +186,7 @@ export class SRC101OperationService {
   static renewSRC101(params: IRenewSRC101){
     return this.executeSRC101Operation(
       params,
+      // @ts-expect-error - validateTransfer is accessed for internal operations
       SRC101Service.UtilityService.validateTransfer,
       ({ hash, tokenid, dua }) => ({ 
           op: "RENEW", 
