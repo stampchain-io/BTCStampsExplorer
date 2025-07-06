@@ -52,7 +52,7 @@ export class StampController {
     includeSecondary = true,
     sortColumn = "tx_index",
     suffix,
-    collectionStampLimit = 12,
+    _collectionStampLimit = 12,
     groupBy,
     groupBySubquery,
     skipTotalCount = false,
@@ -305,7 +305,7 @@ export class StampController {
       cacheDuration: cacheDuration || undefined,
       noPagination,
       sortColumn,
-      collectionStampLimit,
+      // collectionStampLimit, // Remove this property as it doesn't exist in the interface
       groupBy,
       groupBySubquery: groupBySubqueryParam,
       skipTotalCount,
@@ -402,20 +402,24 @@ export class StampController {
     cacheType: RouteType = RouteType.STAMP_DETAIL,
     cacheDuration?: number,
     includeSecondary: boolean = true,
-    isSearchQuery: boolean = false
+    _isSearchQuery: boolean = false
   ) {
-    return this.getStamps({
+    const params: any = {
       identifier: id,
       type: stampType,
       cacheType,
-      cacheDuration,
       allColumns: false,
       noPagination: true,
       skipTotalCount: true,
       enrichWithAssetInfo: true,
       includeSecondary,
-      isSearchQuery
-    });
+    };
+    
+    if (cacheDuration !== undefined) {
+      params.cacheDuration = cacheDuration;
+    }
+    
+    return this.getStamps(params);
   }
 
   private static enrichStampWithAssetData(stamp: StampRow, asset: any) {
@@ -651,7 +655,7 @@ export class StampController {
               limit: 1,
               sortBy: "DESC",
               skipTotalCount: true,
-              includeMarketData: false // Just need the image URL
+              // includeMarketData: false // Remove - property doesn't exist in interface
             });
             return result.data?.[0];
           })
@@ -693,7 +697,7 @@ export class StampController {
         stampCategories,
       ] = await Promise.all([
         this.getMultipleStampCategories([
-          { idents: ["SRC-721"], limit: 16, sortBy: sortBy },
+          { idents: ["SRC-721"], limit: 16, type: "stamps", sortBy: sortBy },
         ]),
       ]);
       // Fetch the "posh" collection to get its collection_id
