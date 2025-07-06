@@ -208,7 +208,7 @@ export class StampRepository {
       // Separate edition filters 
       const editionFilters = combinedFilters.filter(filter => 
         ["single", "multiple", "locked", "unlocked", "divisible"].includes(filter as string)
-      ) as STAMP_EDITIONS[];
+      ) as unknown as STAMP_EDITIONS[];
       
       // Separate other file type filters (mimetype-based)
       const mimetypeFilters = combinedFilters.filter(filter => 
@@ -682,7 +682,7 @@ export class StampRepository {
           min: rangeMin || "",
           max: rangeMax || ""
         }
-      } as STAMP_RANGES;
+      } as unknown as STAMP_RANGES;
       console.log("Repository created range filters:", effectiveRange);
     }
 
@@ -895,14 +895,14 @@ export class StampRepository {
 
     if (!skipTotalCount) {
       const totalResult = await this.getTotalStampCountFromDb({
-        type,
-        ident,
-        identifier,
-        blockIdentifier,
-        collectionId,
-        filterBy,
-        suffix,
-        fileType,
+        ...(type && { type }),
+        ...(ident && { ident }),
+        ...(identifier && { identifier }),
+        ...(blockIdentifier && { blockIdentifier }),
+        ...(collectionId && { collectionId }),
+        ...(filterBy && { filterBy }),
+        ...(suffix && { suffix }),
+        ...(fileType && { fileType }),
       });
       total = (totalResult as any).rows[0]?.total || 0;
       totalPages = noPagination ? 1 : Math.ceil(total / limit);
@@ -969,10 +969,10 @@ export class StampRepository {
       );
 
       console.log(
-        `[StampRepository] Query returned ${balances.rows.length} rows of ${assets.length} total stamps`
+        `[StampRepository] Query returned ${(balances as any).rows.length} rows of ${assets.length} total stamps`
       );
 
-      const grouped = balances.rows.reduce(
+      const grouped = (balances as any).rows.reduce(
         (acc: Record<string, StampBalance[]>, cur: StampBalance) => {
           acc[cur.cpid] = acc[cur.cpid] || [];
           acc[cur.cpid].push({ ...cur });
@@ -985,7 +985,7 @@ export class StampRepository {
         summarize_issuances(grouped[key])
       );
       // Use the passed xcpBalances for quantity info
-      return summarized.map((summary: StampBalance) => {
+      return summarized.map((summary: any) => {
         const xcp_balance = xcpBalances
           .filter((balance) => balance.cpid === summary.cpid)
           .reduce((acc, balance) => acc + balance.quantity, 0);
@@ -1030,9 +1030,9 @@ export class StampRepository {
       cacheDuration
     );
 
-    console.log(`Query result:`, result.rows);
+    console.log(`Query result:`, (result as any).rows);
 
-    return result.rows;
+    return (result as any).rows;
   }
 
   static async getCreatorNameByAddress(
@@ -1050,8 +1050,8 @@ export class StampRepository {
       "never"
     );
 
-    if (result && result.rows && result.rows.length > 0) {
-      return result.rows[0].creator;
+    if ((result as any) && (result as any).rows && (result as any).rows.length > 0) {
+      return (result as any).rows[0].creator;
     }
 
     return null;
@@ -1073,7 +1073,7 @@ export class StampRepository {
         newName,
         newName,
       ]);
-      return result.affectedRows > 0;
+      return (result as any).affectedRows > 0;
     } catch (error) {
       console.error("Error updating creator name:", error);
       return false;
@@ -1086,14 +1086,13 @@ export class StampRepository {
   }> {
     try {
       const result = await this.getTotalStampCountFromDb({
-        type: "all",
-        skipTotalCount: false,
+        type: "all" as STAMP_TYPES,
       });
       // If we can't get a count or it's 0, that indicates a database problem
-      if (!result?.rows?.[0]?.total) {
+      if (!(result as any)?.rows?.[0]?.total) {
         throw new Error("No stamps found in database");
       }
-      const total = result.rows[0].total;
+      const total = (result as any).rows[0].total;
       return {
         isValid: true,
         count: total,
@@ -1122,7 +1121,7 @@ export class StampRepository {
     );
 
     return {
-      total: result.rows[0]?.total || 0
+      total: (result as any).rows[0]?.total || 0
     };
   }
 
@@ -1141,8 +1140,8 @@ export class StampRepository {
     );
 
     return {
-      stamp_url: result.rows[0]?.stamp_url || 0,
-      stamp_mimetype: result.rows[0]?.stamp_mimetype || 0
+      stamp_url: (result as any).rows[0]?.stamp_url || 0,
+      stamp_mimetype: (result as any).rows[0]?.stamp_mimetype || 0
     };
   }
 
@@ -1390,7 +1389,7 @@ export class StampRepository {
     
     // Handle market filters
     if (filters.market) {
-      this.buildMarketFilterConditions(filters.market, undefined, undefined, whereConditions, queryParams);
+      this.buildMarketFilterConditions([filters.market] as STAMP_MARKETPLACE[], undefined, undefined, whereConditions, queryParams);
     }
     
     // Handle new market data filters (Task 42)
@@ -1629,6 +1628,18 @@ export class StampRepository {
         whereConditions.push(`smd.price_source IN (${placeholders})`);
         queryParams.push(...sources);
       }
+    }
+  }
+
+  private static buildSearchConditions(
+    search: string,
+    whereConditions: string[],
+    queryParams: (string | number)[]
+  ) {
+    if (search && search.trim()) {
+      whereConditions.push("(st.cpid LIKE ? OR st.creator LIKE ? OR st.tx_hash LIKE ?)");
+      const searchTerm = `%${search.trim()}%`;
+      queryParams.push(searchTerm, searchTerm, searchTerm);
     }
   }
 }
