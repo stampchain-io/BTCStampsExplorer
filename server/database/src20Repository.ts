@@ -444,7 +444,7 @@ export class SRC20Repository {
       1000 * 60 * 2, // Cache duration: 2 minutes
     );
 
-    return result.rows[0].total;
+    return (result as any).rows[0].total;
   }
 
   static async fetchSrc20MintProgress(tick: string) {
@@ -473,11 +473,11 @@ export class SRC20Repository {
       1000 * 60 * 2,
     );
 
-    if (data.rows.length === 0) {
+    if ((data as any).rows.length === 0) {
       return null;
     }
 
-    const row = data.rows[0];
+    const row = (data as any).rows[0];
     const max_supply = new BigFloat(row["max"]);
     const limit = new BigFloat(row["lim"]);
     const decimals = parseInt(row["deci"]);
@@ -552,8 +552,8 @@ export class SRC20Repository {
     );
     
     return {
-      rows: this.convertResponseToEmoji(results.rows),
-      total: results.rows.length
+      rows: this.convertResponseToEmoji((results as any).rows),
+      total: (results as any).rows.length
     };
   }
 
@@ -578,11 +578,11 @@ export class SRC20Repository {
       1000 * 60 * 10,
     );
 
-    if (!result.rows || result.rows.length === 0) {
+    if (!(result as any).rows || (result as any).rows.length === 0) {
       return null;
     }
 
-    const row = result.rows[0];
+    const row = (result as any).rows[0];
 
     return {
       deployment: this.convertSingleResponseToEmoji({
