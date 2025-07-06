@@ -114,12 +114,11 @@ export class SRC20QueryService {
       if (!(data as any).rows || (data as any).rows.length === 0) {
         return {
           data: [],
-          total: 0,
           page,
           totalPages: 0,
           limit,
           last_block: lastBlock,
-        };
+        } as PaginatedSrc20ResponseBody;
               }
 
       const mappedData = this.mapTransactionData((data as any).rows);
@@ -196,7 +195,9 @@ export class SRC20QueryService {
 
       if (!src20 || (Array.isArray(src20) && src20.length === 0)) {
         // Return an empty response instead of throwing an error
-        return params.address && params.tick ? {} : [];
+        return params.address && params.tick ? 
+          { last_block: 0, data: [] } as Src20BalanceResponseBody : 
+          { last_block: 0, data: [] } as Src20BalanceResponseBody;
       }
 
       return params.address && params.tick ? src20[0] : src20;
@@ -204,7 +205,9 @@ export class SRC20QueryService {
       console.error("Error in fetchSrc20Balance:", error);
       console.error("Params:", params);
       // Return an empty response for any other errors as well
-      return params.address && params.tick ? {} : [];
+      return params.address && params.tick ? 
+        { last_block: 0, data: [] } as Src20BalanceResponseBody : 
+        { last_block: 0, data: [] } as Src20BalanceResponseBody;
     }
   }
 
