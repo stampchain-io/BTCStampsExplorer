@@ -33,8 +33,8 @@ export class UTXOService {
     });
 
     let basicUtxos = await this.commonUtxoService.getSpendableUTXOs(address, undefined, {
-      includeAncestorDetails: options.includeAncestors,
-      confirmedOnly: undefined
+      includeAncestorDetails: options.includeAncestors || false,
+      confirmedOnly: false
     });
 
     if (options.excludeUtxos && options.excludeUtxos.length > 0) {
@@ -78,7 +78,7 @@ export class UTXOService {
         logger.error("transaction-utxo-service", { 
           message: "Error fetching stamps balance for UTXO exclusion (from basic list)", 
           address, 
-          error: error.message 
+          error: (error as any).message
         });
       }
     }
@@ -87,14 +87,14 @@ export class UTXOService {
 
   static estimateVoutSize(output: Output): number {
     let scriptSize = 0;
-    if (output.script) {
-      scriptSize = output.script.length / 2;
-    } else if (output.address) {
+    if ((output as any).script) {
+      scriptSize = (output as any).script.length / 2;
+    } else if ((output as any).address) {
       try {
-        const outputScript = bitcoin.address.toOutputScript(output.address, bitcoin.networks.bitcoin);
+        const outputScript = bitcoin.address.toOutputScript((output as any).address, bitcoin.networks.bitcoin);
         scriptSize = outputScript.length;
       } catch (e) { 
-        logger.warn("transaction-utxo-service", { message: "Could not determine script size for address", address: output.address, error: e.message });
+        logger.warn("transaction-utxo-service", { message: "Could not determine script size for address", address: (output as any).address, error: (e as any).message });
         scriptSize = 34;
       }
     }
@@ -126,9 +126,9 @@ export class UTXOService {
     });
 
     const basicUtxos = await this.getAddressUTXOs(address, {
-      includeAncestors: options.includeAncestors,
-      filterStampUTXOs: options.filterStampUTXOs,
-      excludeUtxos: options.excludeUtxos,
+      includeAncestors: options.includeAncestors || false,
+      filterStampUTXOs: options.filterStampUTXOs || false,
+      excludeUtxos: options.excludeUtxos || [],
     });
 
     if (!basicUtxos || basicUtxos.length === 0) {
@@ -165,7 +165,7 @@ export class UTXOService {
           const fullUtxo = await this.commonUtxoService.getSpecificUTXO(
             basicUtxo.txid,
             basicUtxo.vout,
-            { includeAncestorDetails: true, confirmedOnly: undefined }
+            { includeAncestorDetails: true, confirmedOnly: false }
           );
           if (!fullUtxo || !fullUtxo.script) {
             logger.warn("transaction-utxo-service", { message: "Failed to fetch full details for UTXO in selectUTXOsLogic, skipping.", txid: basicUtxo.txid, vout: basicUtxo.vout });
@@ -195,7 +195,7 @@ export class UTXOService {
                 type: "P2WPKH" as ScriptType,
                 size: TX_CONSTANTS.P2WPKH.size,
                 isWitness: true,
-                ancestor: undefined 
+                ancestor: undefined as any
               };
             } else {
               if (!scriptForFeeCalc) throw new Error(`Script missing for selected input ${input.txid}:${input.vout} in final calculation`);
@@ -204,7 +204,7 @@ export class UTXOService {
                 type: actualScriptTypeInfo.type as ScriptType,
                 size: actualScriptTypeInfo.size,
                 isWitness: actualScriptTypeInfo.isWitness,
-                ancestor: ancestorForFeeCalc
+                ancestor: ancestorForFeeCalc as any
               };
             }
           }),
@@ -247,10 +247,10 @@ export class UTXOService {
         }
       }
   
-      logger.warn("transaction-utxo-service", { message: "Insufficient funds to cover outputs and fees after processing all UTXOs", address: basicUtxos[0]?.address, fetchFullDetails });
+      logger.warn("transaction-utxo-service", { message: "Insufficient funds to cover outputs and fees after processing all UTXOs", address: (basicUtxos[0] as any)?.address, fetchFullDetails });
       throw new Error("Insufficient funds to cover outputs and fees");
     } catch (error) {
-      logger.error("transaction-utxo-service", { message: "Error in selectUTXOsLogic", error: error.message, stack: error.stack, fetchFullDetails });
+      logger.error("transaction-utxo-service", { message: "Error in selectUTXOsLogic", error: (error as any).message, stack: (error as any).stack, fetchFullDetails });
       throw error;
     }
   }
