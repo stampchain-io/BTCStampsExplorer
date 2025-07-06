@@ -86,14 +86,16 @@ export class SRC20QueryService {
         ...sanitizedParams,
         tick: Array.isArray(sanitizedParams.tick)
           ? sanitizedParams.tick[0]
-          : sanitizedParams.tick,
+          : (sanitizedParams.tick || null),
+        op: sanitizedParams.op || null,
+        tx_hash: sanitizedParams.tx_hash || null,
         limit,
         page,
         sortBy: sanitizedParams.sortBy || "ASC",
       };
 
-      // Remove the op property if it's undefined
-      if (queryParams.op === undefined) {
+      // Remove the op property if it's null
+      if (queryParams.op === null) {
         delete queryParams.op;
       }
 
