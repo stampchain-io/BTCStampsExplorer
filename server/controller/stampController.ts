@@ -19,9 +19,8 @@ import {
   STAMP_FILESIZES,
 } from "$globals";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
-import { Dispenser } from "$types/index.d.ts";
 import { CollectionController } from "./collectionController.ts";
-import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
+// import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts"; // Fixed: Removed unused import
 import { logger } from "$lib/utils/logger.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
@@ -52,13 +51,11 @@ export class StampController {
     includeSecondary = true,
     sortColumn = "tx_index",
     suffix,
-    // _collectionStampLimit = 12, // Removed - not used and causes TS6133 error
     groupBy,
     groupBySubquery,
     skipTotalCount = false,
     cacheType = RouteType.STAMP_LIST,
     enrichWithAssetInfo = false,
-    isSearchQuery = false,
     url,
     fileType,
     editions,
@@ -96,13 +93,9 @@ export class StampController {
     page?: number;
     limit?: number;
     sortBy?: "ASC" | "DESC";
-    /**
-     * If suffix and ident are provided, filterBy and type will be ignored
-     */
     suffix?: string[];
     ident?: SUBPROTOCOLS[];
     url?: string;
-    isSearchQuery?: boolean;
     enrichWithAssetInfo?: boolean;
     skipTotalCount?: boolean;
     collectionId?: string | undefined;
@@ -114,7 +107,6 @@ export class StampController {
     cacheDuration?: number;
     includeSecondary?: boolean;
     sortColumn?: string;
-    collectionStampLimit?: number;
     groupBy?: string;
     groupBySubquery?: string;
     cacheType?: RouteType;
@@ -305,12 +297,10 @@ export class StampController {
       cacheDuration: cacheDuration || undefined,
       noPagination,
       sortColumn,
-      // collectionStampLimit, // Remove this property as it doesn't exist in the interface
       groupBy,
       groupBySubquery: groupBySubqueryParam,
       skipTotalCount,
       cacheType,
-      isSearchQuery,
       filterBy: filterByArray,
       fileType,
       editions,
@@ -451,50 +441,6 @@ export class StampController {
     });
   }
 
-  private static calculateFloorPrice(openDispensers: Dispenser[]): number | "priceless" {
-    if (openDispensers.length === 0) return "priceless";
-    
-    const lowestBtcRate = Math.min(
-      ...openDispensers.map(dispenser => 
-        Number(formatSatoshisToBTC(dispenser.satoshirate, { includeSymbol: false }))
-      )
-    );
-    
-    return lowestBtcRate !== Infinity ? lowestBtcRate : "priceless";
-  }
-
-  private static calculateRecentSalePrice(dispensers: Dispenser[]): number | "priceless" {
-    if (dispensers.length === 0) return "priceless";
-
-    // Look at both open and closed dispensers to find the most recent
-    const closedDispensers = dispensers.filter(d => d.give_remaining === 0);
-    const openDispensers = dispensers.filter(d => d.give_remaining > 0);
-
-    // Get most recent from each category
-    const mostRecentClosed = closedDispensers.length > 0 
-      ? closedDispensers.reduce((prev, current) => 
-          (prev.block_index > current.block_index) ? prev : current
-        )
-      : null;
-
-    const mostRecentOpen = openDispensers.length > 0
-      ? openDispensers.reduce((prev, current) => 
-          (prev.block_index > current.block_index) ? prev : current
-        )
-      : null;
-
-    // Compare block indices to find the most recent overall
-    const mostRecent = !mostRecentClosed ? mostRecentOpen :
-                      !mostRecentOpen ? mostRecentClosed :
-                      mostRecentClosed.block_index > mostRecentOpen.block_index 
-                        ? mostRecentClosed 
-                        : mostRecentOpen;
-
-    return mostRecent ? 
-      Number(formatSatoshisToBTC(mostRecent.satoshirate, { includeSymbol: false })) 
-      : "priceless";
-  }
-
   static async getRecentSales(
     page?: number, 
     limit?: number,
@@ -517,10 +463,8 @@ export class StampController {
         page: page || 1,
         limit: limit || result.total,
         totalPages,
-        total: result.total,
         last_block: lastBlock,
         data: result.recentSales,
-        // Enhanced metadata
         btcPriceUSD: result.btcPriceUSD,
         metadata: result.metadata,
       };
@@ -564,7 +508,6 @@ export class StampController {
       return {
         page,
         limit,
-        total,
         totalPages: Math.ceil(total / limit),
         last_block: lastBlock,
         data: stamps,
@@ -597,7 +540,7 @@ export class StampController {
         return {
           types: category.idents,
           stamps: serviceResult?.stamps ?? [],
-          total: serviceResult?.total ?? 0,
+          total: (serviceResult as any)?.total ?? 0,
         };
       }),
     );
