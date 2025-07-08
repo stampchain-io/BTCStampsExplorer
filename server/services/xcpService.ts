@@ -1,14 +1,12 @@
-// TODO: Move to /server
+// TODO(@team): Move to /server
 
-import { StampService } from "$server/services/stampService.ts";
-import { dbManager, Row } from "$server/database/databaseManager.ts";
-import { DispenserFilter, DispenseEvent, XcpBalance } from "$types/index.d.ts";
+
+import { dbManager } from "$server/database/databaseManager.ts";
+import { DispenserFilter, DispenseEvent, XcpBalance, Dispenser } from "$types/index.d.ts";
+import type { Fairminter } from "$lib/types/services.d.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { Transaction } from "bitcoinjs-lib";
-import { formatBTCAmount, formatBTCBalance } from "$lib/utils/balanceUtils.ts";
-import { env } from "$server/config/env.ts";
 
 // Only include active, working counterparty nodes
 export const xcp_v2_nodes = [
@@ -63,7 +61,7 @@ export function normalizeFeeRate(params: {
       normalizedSatsPerKB: normalizedSatsPerVB * SATS_PER_KB_MULTIPLIER
     };
   } catch (error) {
-    throw error.message
+    throw error instanceof Error ? error.message : String(error);
   }
 }
 
@@ -132,11 +130,11 @@ export async function fetchXcpV2WithCache<T>(
           await logger.error("api", {
             message: "XCP node fetch error",
             node: node.name,
-            error: error.message,
+            error: error instanceof Error ? error.message : String(error),
             url,
-            stack: error.stack
+            stack: error instanceof Error ? error.stack : undefined
           });
-          errorMessage = error.message
+          errorMessage = error instanceof Error ? error.message : String(error)
           // Continue to the next node
         }
       }
@@ -161,7 +159,6 @@ export async function fetchXcpV2WithCache<T>(
 }
 
 export class DispenserManager {
-  private static fetchXcpV2WithCache = fetchXcpV2WithCache;
 
   static async getDispensersByCpid(
     cpid: string,
@@ -198,7 +195,11 @@ export class DispenserManager {
         }
 
         try {
-            const response = await fetchXcpV2WithCache(endpoint, queryParams);
+            const response = await fetchXcpV2WithCache<{
+                result: any[];
+                next_cursor: string | null;
+                result_count: number;
+            }>(endpoint, queryParams, cacheTimeout);
 
             if (!response || !Array.isArray(response.result)) {
                 break;
@@ -241,8 +242,8 @@ export class DispenserManager {
             await logger.error("api", {
                 message: "Error fetching dispensers",
                 cpid,
-                error: error.message,
-                stack: error.stack
+                error: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined
             });
             break;
         }
@@ -289,7 +290,9 @@ export class DispenserManager {
     const skipCount = (page - 1) * limit;
     let processedCount = 0;
 
-    logger.debug(`Fetching dispenses for CPID: ${cpid}, Page: ${page}, Limit: ${limit}`);
+    logger.debug("api", {
+        message: `Fetching dispenses for CPID: ${cpid}, Page: ${page}, Limit: ${limit}`
+    });
 
     while (true) {
       const queryParams = new URLSearchParams({
@@ -301,9 +304,14 @@ export class DispenserManager {
       }
 
       try {
-        const response = await fetchXcpV2WithCache(
+        const response = await fetchXcpV2WithCache<{
+          result: any[];
+          next_cursor: string | null;
+          result_count: number;
+        }>(
           endpoint,
-          queryParams
+          queryParams,
+          cacheTimeout
         );
 
         if (!response || !Array.isArray(response.result)) {
@@ -342,7 +350,7 @@ export class DispenserManager {
       } catch (error) {
         console.error(
           `Error fetching dispenses for cpid ${cpid}:`,
-          error,
+          error instanceof Error ? error.message : String(error),
         );
         break;
       }
@@ -365,8 +373,8 @@ export class DispenserManager {
 
 // Update only the ComposeAttachOptions interface
 export interface ComposeAttachOptions {
-  // Required parameters
-  fee_per_kb: number;  // Changed from optional to required
+  // Fee parameters
+  fee_per_kb?: number;  // Optional - can be provided by caller or handled by API
 
   // Optional parameters
   destination_vout?: number;
@@ -398,8 +406,8 @@ export interface ComposeAttachOptions {
 
 // Also add ComposeDetachOptions since it's used in stampdetach.ts
 export interface ComposeDetachOptions {
-  // Required parameters
-  fee_per_kb: number;
+  // Fee parameters  
+  fee_per_kb?: number;
 
   // Optional parameters
   destination?: string;
@@ -429,6 +437,23 @@ export interface ComposeDetachOptions {
   show_unconfirmed?: boolean;
 }
 
+export interface IssuanceOptions {
+  divisible?: boolean;
+  source?: string;
+  allow_unconfirmed_inputs?: boolean;
+  fee_per_kb?: number;
+  fee?: number;
+  encoding?: string;
+  pubkeys?: string;
+  return_psbt?: boolean;
+  extended_tx_info?: boolean;
+  old_style_api?: boolean;
+  verbose?: boolean;
+  show_unconfirmed?: boolean;
+  lock?: boolean;
+  description?: string;
+}
+
 export class XcpManager {
   private static fetchXcpV2WithCache = fetchXcpV2WithCache;
 
@@ -456,7 +481,7 @@ export class XcpManager {
 
       return response;
     } catch (error) {
-      console.error(`Error fetching asset info for cpid ${cpid}:`, error);
+      console.error(`Error fetching asset info for cpid ${cpid}:`, error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
@@ -480,7 +505,9 @@ export class XcpManager {
     const skipCount = (page - 1) * limit;
     let processedCount = 0;
 
-    logger.info(`Fetching ALL XCP holders for CPID: ${cpid} up to api limit: ${apiLimit}`);
+    logger.info("api", {
+        message: `Fetching ALL XCP holders for CPID: ${cpid} up to api limit: ${apiLimit}`
+    });
 
     while (true) {
       const queryParams = new URLSearchParams({
@@ -491,9 +518,14 @@ export class XcpManager {
       }
 
       try {
-        const response = await fetchXcpV2WithCache(
+        const response = await fetchXcpV2WithCache<{
+          result: any[];
+          next_cursor: string | null;
+          result_count: number;
+        }>(
           endpoint,
-          queryParams
+          queryParams,
+          cacheTimeout
         );
 
         if (!response || !Array.isArray(response.result)) {
@@ -522,7 +554,7 @@ export class XcpManager {
         }
         cursor = response.next_cursor;
       } catch (error) {
-        console.error(`Error fetching holders for cpid ${cpid}:`, error);
+        console.error(`Error fetching holders for cpid ${cpid}:`, error instanceof Error ? error.message : String(error));
         break;
       }
     }
@@ -653,9 +685,9 @@ export class XcpManager {
     } catch (error) {
         await logger.error("api", {
             message: "Error fetching balances",
-            error: error.message,
+            error: error instanceof Error ? error.message : String(error),
             address,
-            stack: error.stack
+            stack: error instanceof Error ? error.stack : undefined
         });
         throw error;
     }
@@ -667,7 +699,7 @@ export class XcpManager {
   ): Promise<{ balances: XcpBalance[]; total: number }> {
     try {
       const MAX_RETRIES = 3;
-      let attempt = 0;
+      const attempt = 0;
       
       while (attempt < MAX_RETRIES) {
         await logger.info("api", {
@@ -721,7 +753,7 @@ export class XcpManager {
             address
           });
 
-          cursor = result.next_cursor;
+          cursor = result.next_cursor || null;
 
           // Break if we have all expected results or more
           // Note: We might get more than expected due to new transactions
@@ -747,21 +779,6 @@ export class XcpManager {
           });
           // Use actual aggregated count for total
           return { balances: allBalances, total: allBalances.length };
-        }
-
-        await logger.warn("api", {
-          message: "[XcpManager] Incomplete balance set",
-          currentCount: allBalances.length,
-          expectedTotal,
-          attempt: attempt + 1,
-          address,
-          retryDelay: 1000 * (attempt + 1)
-        });
-
-        attempt++;
-        
-        if (attempt < MAX_RETRIES) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
         }
       }
 
@@ -799,9 +816,14 @@ export class XcpManager {
       }
 
       try {
-        const response = await fetchXcpV2WithCache(
+        const response = await fetchXcpV2WithCache<{
+          result: any[];
+          next_cursor: string | null;
+          result_count: number;
+        }>(
           endpoint,
-          queryParams
+          queryParams,
+          cacheTimeout
         );
 
         if (!response || !Array.isArray(response.result)) {
@@ -837,7 +859,7 @@ export class XcpManager {
         }
         cursor = response.next_cursor;
       } catch (error) {
-        console.error(`Error fetching sends for cpid ${cpid}:`, error);
+        console.error(`Error fetching sends for cpid ${cpid}:`, error instanceof Error ? error.message : String(error));
         break;
       }
     }
@@ -1053,7 +1075,7 @@ export class XcpManager {
             if (errorJson.error) {
               lastError = errorJson.error;
             }
-          } catch (e) {
+          } catch (_e) {
             lastError = errorBody;
           }
           continue; // Try the next node
@@ -1069,7 +1091,7 @@ export class XcpManager {
         return data;
       } catch (error) {
         console.error(`Fetch error for ${url}:`, error);
-        lastError = error.message;
+        lastError = error instanceof Error ? error.message : String(error);
       }
     }
 
@@ -1150,7 +1172,7 @@ export class XcpManager {
             if (errorJson.error) {
               lastError = errorJson.error;
             }
-          } catch (e) {
+          } catch (_e) {
             lastError = errorBody;
           }
           continue; // Try the next node
@@ -1161,7 +1183,7 @@ export class XcpManager {
         return data;
       } catch (error) {
         console.error(`Fetch error for ${url}:`, error);
-        lastError = error.message;
+        lastError = error instanceof Error ? error.message : String(error);
       }
     }
 
@@ -1299,7 +1321,7 @@ export class XcpManager {
             if (errorJson.error) {
               lastError = errorJson.error;
             }
-          } catch (e) {
+          } catch (_e) {
             lastError = errorBody;
           }
           continue;
@@ -1310,7 +1332,7 @@ export class XcpManager {
         return data;
       } catch (error) {
         console.error(`Fetch error for ${url}:`, error);
-        lastError = error.message;
+        lastError = error instanceof Error ? error.message : String(error);
       }
     }
 
@@ -1625,13 +1647,14 @@ export class XcpManager {
       return await this.fetchXcpV2WithCache<any>(endpoint, queryParams);
     } catch (error) {
       console.error("Error in createIssuance:", error);
-      if (error.message?.includes("Insufficient")) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage?.includes("Insufficient")) {
         throw error;
       }
-      if (error.message?.includes("invalid base58")) {
+      if (errorMessage?.includes("invalid base58")) {
         throw new Error("Invalid address format. Please use a supported Bitcoin address format.");
       }
-      throw new Error(error.message || "Failed to create issuance transaction");
+      throw new Error(errorMessage || "Failed to create issuance transaction");
     }
   }
 

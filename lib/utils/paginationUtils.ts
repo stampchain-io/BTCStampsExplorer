@@ -1,5 +1,6 @@
 import { PaginationQueryParams } from "$lib/types/pagination.d.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { MAX_PAGINATION_LIMIT } from "$lib/utils/constants.ts";
 
 export function getPaginationParams(
   url: URL,
@@ -25,6 +26,11 @@ export function getPaginationParams(
   // Validate numeric parameters
   if (isNaN(limit) || limit < 1) {
     return ResponseUtil.badRequest("Invalid limit parameter");
+  }
+  if (limit > MAX_PAGINATION_LIMIT) {
+    return ResponseUtil.badRequest(
+      `Limit cannot exceed ${MAX_PAGINATION_LIMIT}`,
+    );
   }
   if (isNaN(page) || page < 1) {
     return ResponseUtil.badRequest("Invalid page parameter");

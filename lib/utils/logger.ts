@@ -27,7 +27,9 @@ export type LogNamespace =
   | "src101-psbt-service"
   | "src20-operation-service"
   | "src101-operation-service"
-  | "api-src101-create";
+  | "api-src101-create"
+  | "broadcast"
+  | "src20-utility";
 
 declare global {
   interface Window {

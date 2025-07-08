@@ -11,6 +11,13 @@ import { dbManager } from "$server/database/databaseManager.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 
 export class SRC20Repository {
+  // Dependency injection support
+  private static db: typeof dbManager = dbManager;
+  
+  static setDatabase(database: typeof dbManager): void {
+    this.db = database;
+  }
+
   /**
    * Ensures a tick is in unicode escape format for DB operations
    * Accepts either emoji or unicode escape format and returns unicode escape
@@ -28,10 +35,10 @@ export class SRC20Repository {
    * Converts DB response ticks to emoji format
    * @param data Object or array containing tick field(s)
    */
-  private static convertResponseToEmoji<T extends { tick: string }>(data: T[]): T[] {
+  private static convertResponseToEmoji<T extends { tick: string | null | undefined }>(data: T[]): T[] {
     return data.map(item => ({
       ...item,
-      tick: unicodeEscapeToEmoji(item.tick)
+      tick: item.tick ? unicodeEscapeToEmoji(item.tick) : item.tick
     }));
   }
 
@@ -39,11 +46,11 @@ export class SRC20Repository {
    * Converts a single DB response row to emoji format
    * @param row Object containing tick field
    */
-  private static convertSingleResponseToEmoji<T extends { tick: string }>(row: T | null): T | null {
+  private static convertSingleResponseToEmoji<T extends { tick: string | null | undefined }>(row: T | null): T | null {
     if (!row) return null;
     return {
       ...row,
-      tick: unicodeEscapeToEmoji(row.tick)
+      tick: row.tick ? unicodeEscapeToEmoji(row.tick) : row.tick
     };
   }
 
@@ -115,7 +122,7 @@ export class SRC20Repository {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
 
-    return await dbManager.executeQueryWithCache(
+    return await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2,
@@ -133,7 +140,7 @@ export class SRC20Repository {
       limit = 50, // Default limit
       page = 1, // Default page
       sortBy = "ASC",
-      filterBy,
+      filterBy: _filterBy,
       tx_hash,
       address,
     } = params;
@@ -149,20 +156,20 @@ export class SRC20Repository {
     if (tick !== undefined) {
       if (Array.isArray(tick)) {
         whereClauses.push(`src20.tick IN (${tick.map(() => "?").join(", ")})`);
-        queryParams.push(...tick.map(t => this.ensureUnicodeEscape(t)));
+        queryParams.push(...tick.map(t => this.ensureUnicodeEscape(t || "")));
       } else {
         whereClauses.push(`src20.tick = ?`);
-        queryParams.push(this.ensureUnicodeEscape(tick));
+        queryParams.push(this.ensureUnicodeEscape(tick || ""));
       }
     }
 
     if (op !== undefined) {
       if (Array.isArray(op)) {
         whereClauses.push(`src20.op IN (${op.map(() => "?").join(", ")})`);
-        queryParams.push(...op.map(o => this.ensureUnicodeEscape(o)));
+        queryParams.push(...op.map(o => this.ensureUnicodeEscape(o || "")));
       } else {
         whereClauses.push(`src20.op = ?`);
-        queryParams.push(this.ensureUnicodeEscape(op));
+        queryParams.push(this.ensureUnicodeEscape(op || ""));
       }
     }
 
@@ -278,11 +285,11 @@ export class SRC20Repository {
 
       const fullQueryParams = [rowNumberInit, ...queryParams];
 
-      const results = await dbManager.executeQueryWithCache(
+      const results = await this.db.executeQueryWithCache(
         query,
         fullQueryParams,
         1000 * 60 * 5, // Cache duration
-      );
+      ) as any;
 
       // Convert response ticks to emoji format
       return {
@@ -356,11 +363,11 @@ export class SRC20Repository {
       ${limitOffsetClause}
     `;
 
-    const results = await dbManager.executeQueryWithCache(
+    const results = await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2, // Cache duration
-    );
+    ) as any;
 
     // Retrieve transaction hashes for the ticks
     const ticksToQuery = results.rows
@@ -431,13 +438,13 @@ export class SRC20Repository {
     }
         `;
 
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2, // Cache duration: 2 minutes
     );
 
-    return result.rows[0].total;
+    return (result as any).rows[0].total;
   }
 
   static async fetchSrc20MintProgress(tick: string) {
@@ -460,17 +467,17 @@ export class SRC20Repository {
       LIMIT 1;
     `;
 
-    const data = await dbManager.executeQueryWithCache(
+    const data = await this.db.executeQueryWithCache(
       query,
       [unicodeTick],
       1000 * 60 * 2,
     );
 
-    if (data.rows.length === 0) {
+    if ((data as any).rows.length === 0) {
       return null;
     }
 
-    const row = data.rows[0];
+    const row = (data as any).rows[0];
     const max_supply = new BigFloat(row["max"]);
     const limit = new BigFloat(row["lim"]);
     const decimals = parseInt(row["deci"]);
@@ -538,15 +545,15 @@ export class SRC20Repository {
       transactionCount, // Number of recent mint transactions to consider
       transactionCount, // For top_mints_percentage calculation
     ];
-    const results = await dbManager.executeQueryWithCache(
+    const results = await this.db.executeQueryWithCache(
       query,
       queryParams,
       1000 * 60 * 10, // Cache duration
     );
     
     return {
-      rows: this.convertResponseToEmoji(results.rows),
-      total: results.rows.length
+      rows: this.convertResponseToEmoji((results as any).rows),
+      total: (results as any).rows.length
     };
   }
 
@@ -565,17 +572,17 @@ export class SRC20Repository {
       LIMIT 1
     `;
     const params = [unicodeTick, unicodeTick, unicodeTick];
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       params,
       1000 * 60 * 10,
     );
 
-    if (!result.rows || result.rows.length === 0) {
+    if (!(result as any).rows || (result as any).rows.length === 0) {
       return null;
     }
 
-    const row = result.rows[0];
+    const row = (result as any).rows[0];
 
     return {
       deployment: this.convertSingleResponseToEmoji({
@@ -606,7 +613,7 @@ export class SRC20Repository {
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'TRANSFER') AS total_transfers
     `;
     const params = [unicodeTick, unicodeTick];
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       params,
       1000 * 60 * 2, // Cache duration
@@ -654,7 +661,7 @@ export class SRC20Repository {
     const queryParams = [searchParam, searchParam, searchParam, searchParam, startSearchParam];
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         sqlQuery,
         queryParams,
         1000 * 60 * 2 // Cache duration: 2 minutes

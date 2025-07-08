@@ -1,4 +1,3 @@
-import { bigFloatToString } from "$lib/utils/formatUtils.ts";
 import {
   BIG_LIMIT,
   SRC101_OWNERS_TABLE,
@@ -20,23 +19,30 @@ import {
 import { dbManager } from "$server/database/databaseManager.ts";
 
 export class SRC101Repository {
+  // Dependency injection support
+  private static db: typeof dbManager = dbManager;
+  
+  static setDatabase(database: typeof dbManager): void {
+    this.db = database;
+  }
+
   static async getSrc101Price(
-    deploy_hash: String,
+    deploy_hash: string,
   ){
-    let sqlQuery = `
+    const sqlQuery = `
     SELECT 
       len, price
     FROM
       ${SRC101_PRICE_TABLE}
     WHERE deploy_hash = ?;
     `;
-    const rows = (await dbManager.executeQueryWithCache(
+    const rows = (await this.db.executeQueryWithCache(
       sqlQuery,
       [deploy_hash],
       60 * 2, // Cache duration in seconds
-    )).rows;
-    const result = {};
-    rows.forEach(row => {
+    ) as any).rows;
+    const result: any = {};
+    rows.forEach((row: any) => {
       result[row.len] = row.price;
     });
     console.log("getSrc101Price.result", result);
@@ -83,11 +89,11 @@ export class SRC101Repository {
     if (whereConditions.length > 0) {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
-    var results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2,
-    )).rows;
+    ) as any).rows;
     return results[0].total;
   }
 
@@ -173,11 +179,11 @@ export class SRC101Repository {
 
     queryParams.unshift(offset);
 
-    return (await dbManager.executeQueryWithCache(
+    return (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2,
-    )).rows.map((result) => {
+    ) as any).rows.map((result: any) => {
       return {
         ...result,
       };
@@ -228,15 +234,15 @@ export class SRC101Repository {
     if (whereConditions.length > 0) {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
-    var results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2,
-    )).rows;
+    ) as any).rows;
     return results[0].total;
   }
 
-  static async getDepoyDetails(
+  static async getDeployDetails(
     deploy_hash: string,
   ) {
     let sqlQuery = `
@@ -246,13 +252,13 @@ export class SRC101Repository {
       ${SRC101_RECIPIENTS_TABLE}
     WHERE deploy_hash = ?;
     `;
-    const recipients = (await dbManager.executeQueryWithCache(
+    const recipients = (await this.db.executeQueryWithCache(
       sqlQuery,
       [deploy_hash],
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => (
-      result["address"],
-    ));
+    ) as any).rows.map((result: any) => 
+      result["address"]
+    );
 
     const queryParams = [];
     let whereClause = "";
@@ -285,36 +291,36 @@ export class SRC101Repository {
     LIMIT 1;
     `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => {
+    ) as any).rows.map((result: any) => {
       result["mintstart"] = Number.parseInt(result["mintstart"].toString())
       result["mintend"] = Number.parseInt(result["mintend"].toString())
       return ({
         ...result,
         recipients,
       });
-    });;
+    });
     return results;
   }
 
   static async getTotalCount(
     deploy_hash: string,
   ) {
-    let sqlQuery = `
+    const sqlQuery = `
     SELECT 
       COUNT(*)
     FROM
       ${SRC101_OWNERS_TABLE}
     WHERE deploy_hash = ?;
     `;
-    const total = (await dbManager.executeQueryWithCache(
+    const total = (await this.db.executeQueryWithCache(
       sqlQuery,
       [deploy_hash],
       60 * 2, // Cache duration in seconds
-    )).rows[0]["COUNT(*)"];
+    ) as any).rows[0]["COUNT(*)"];
     return total
   }
 
@@ -400,11 +406,11 @@ export class SRC101Repository {
 
     queryParams.unshift(offset);
     
-    return (await dbManager.executeQueryWithCache(
+    return (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2,
-    )).rows.map((result) => {
+    ) as any).rows.map((result: any) => {
       result["mintstart"] = result["mintstart"] ? Number.parseInt(result["mintstart"].toString()) : 0
       result["mintend"] = result["mintend"] ? Number.parseInt(result["mintend"].toString()) : 0
       return {
@@ -431,11 +437,11 @@ export class SRC101Repository {
         WHERE ${whereClauses.join(" AND ")}
       `;
   
-      const total = (await dbManager.executeQueryWithCache(
+      const total = (await this.db.executeQueryWithCache(
         sqlQuery,
         queryParams,
         60 * 2, // Cache duration in seconds
-      )).rows[0]["COUNT(*)"];
+      ) as any).rows[0]["COUNT(*)"];
       return total
     }
   }
@@ -454,8 +460,8 @@ export class SRC101Repository {
     const offset = params.limit && params.page ? Number(params.limit) * (Number(params.page) - 1) : 0;
     queryParams.push(params.limit, offset); // Add limit and offset at the end
 
-    const validOrder = ["ASC", "DESC"].includes(params.sort?.toUpperCase())
-      ? params.sort.toUpperCase()
+    const validOrder = ["ASC", "DESC"].includes(params.sort?.toUpperCase() || "")
+      ? (params.sort || "ASC").toUpperCase()
       : "ASC";
 
     const sqlQuery = `
@@ -466,11 +472,11 @@ export class SRC101Repository {
       ${params.limit ? `LIMIT ? OFFSET ?` : ""}
     `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => ({
+    ) as any).rows.map((result: any) => ({
       ...result,
     }));;
     return results;
@@ -507,11 +513,11 @@ export class SRC101Repository {
       WHERE ${whereClauses.join(" AND ")}
     `;
   
-      const results = (await dbManager.executeQueryWithCache(
+      const results = (await this.db.executeQueryWithCache(
         sqlQuery,
         queryParams,
         60 * 2, // Cache duration in seconds
-      )).rows;
+      ) as any).rows;
       return results[0].total;
     }
 
@@ -552,8 +558,8 @@ export class SRC101Repository {
       queryParams.push(safeLimit, offset);
     }
 
-    const validOrder = ["ASC", "DESC"].includes(sort.toUpperCase())
-      ? sort.toUpperCase()
+    const validOrder = ["ASC", "DESC"].includes((sort || "DESC").toUpperCase())
+      ? (sort || "DESC").toUpperCase()
       : "DESC";
 
     const sqlQuery = `
@@ -564,11 +570,11 @@ export class SRC101Repository {
     ${limitOffsetClause}
   `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows;
+    ) as any).rows;
     return results;
   }
 
@@ -612,11 +618,11 @@ export class SRC101Repository {
       ${limit ? `LIMIT ? OFFSET ?` : ""}
     `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => ({
+    ) as any).rows.map((result: any) => ({
       ...result,
     }));;
     return results;
@@ -649,8 +655,8 @@ export class SRC101Repository {
       queryParams.push(new Date().getTime() / 1000);
     }
 
-    const validOrder = ["ASC", "DESC"].includes(params.sort.toUpperCase())
-      ? params.sort.toUpperCase()
+    const validOrder = ["ASC", "DESC"].includes((params.sort || "ASC").toUpperCase())
+      ? (params.sort || "ASC").toUpperCase()
       : "ASC";
 
     const sqlQuery = `
@@ -660,11 +666,11 @@ export class SRC101Repository {
       ORDER BY last_update ${validOrder}
     `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => ({
+    ) as any).rows.map((result: any) => ({
       ...result,
     }));;
     return results[0].total;
@@ -700,8 +706,8 @@ export class SRC101Repository {
     const offset = params.limit && params.page ? Number(params.limit) * (Number(params.page) - 1) : 0;
     queryParams.push(params.limit, offset); // Add limit and offset at the end
 
-    const validOrder = ["ASC", "DESC"].includes(params.sort.toUpperCase())
-      ? params.sort.toUpperCase()
+    const validOrder = ["ASC", "DESC"].includes((params.sort || "ASC").toUpperCase())
+      ? (params.sort || "ASC").toUpperCase()
       : "ASC";
 
     const sqlQuery = `
@@ -712,11 +718,11 @@ export class SRC101Repository {
       ${params.limit ? `LIMIT ? OFFSET ?` : ""}
     `;
 
-    const results = (await dbManager.executeQueryWithCache(
+    const results = (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
       60 * 2, // Cache duration in seconds
-    )).rows.map((result) => ({
+    ) as any).rows.map((result: any) => ({
       ...result,
     }));;
     return results;

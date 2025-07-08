@@ -9,6 +9,7 @@ import {
   validateRequiredParams,
   validateSortParam,
 } from "$server/services/routeValidationService.ts";
+import { isValidSrc20Tick } from "$lib/utils/identifierUtils.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -19,6 +20,16 @@ export const handler: Handlers = {
       const paramsValidation = validateRequiredParams({ tick });
       if (!paramsValidation.isValid) {
         return paramsValidation.error!;
+      }
+
+      // Decode the tick parameter first
+      const decodedTick = decodeURIComponent(String(tick));
+
+      // Validate SRC20 tick format
+      if (!isValidSrc20Tick(decodedTick)) {
+        return ResponseUtil.badRequest(
+          `Invalid SRC20 tick format: ${decodedTick}. Must be 1-5 characters, alphanumeric and special characters allowed.`,
+        );
       }
 
       const url = new URL(req.url);
@@ -40,7 +51,7 @@ export const handler: Handlers = {
 
       // Ensure required pagination values
       const params = {
-        tick: decodeURIComponent(String(tick)),
+        tick: decodedTick,
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
         op: opParam,

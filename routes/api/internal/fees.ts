@@ -13,7 +13,7 @@ export const handler: Handlers = {
     }
 
     // Rate limiting for fee endpoints
-    const rateLimitError = await RateLimitMiddleware.checkFeeRateLimit(req);
+    const rateLimitError = RateLimitMiddleware.checkFeeRateLimit(req);
     if (rateLimitError) {
       console.log("[fees.ts] Rate limit exceeded");
       return rateLimitError;
@@ -25,8 +25,7 @@ export const handler: Handlers = {
       console.log("[fees.ts] Starting Redis-cached fee estimation");
 
       // Use the new FeeService with Redis caching
-      const baseUrl = new URL(req.url).origin;
-      const feeData = await FeeService.getFeeData(baseUrl);
+      const feeData = await FeeService.getFeeData();
 
       const duration = Date.now() - startTime;
       console.log(

@@ -1,5 +1,4 @@
 import { SRC20Row } from "$globals";
-import { SRC20Repository } from "$server/database/src20Repository.ts";
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
 
 export function enrichTokensWithMarketData(tokens: SRC20Row[], marketData: SRC20MarketData[]) {

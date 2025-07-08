@@ -300,6 +300,173 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/v2/versions:
+    get:
+      operationId: getApiVersions
+      tags:
+        - System
+      summary: Get available API versions
+      description: |
+        Returns information about all available API versions, their status, and migration information.
+        
+        Use the API-Version header to request a specific API version:
+        - API-Version: 2.2 (stable, legacy)
+        - API-Version: 2.3 (current, with enhanced market data)
+        
+        Default version is 2.3 when no header is specified.
+      parameters:
+        - in: header
+          name: API-Version
+          schema:
+            type: string
+            example: "2.3"
+          description: Specify the API version to use
+      responses:
+        "200":
+          description: Available API versions and their status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: string
+                    description: Current/latest API version
+                    example: "2.3"
+                  requestedVersion:
+                    type: string
+                    description: Version used for this request
+                    example: "2.3"
+                  versions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        version:
+                          type: string
+                          example: "2.3"
+                        status:
+                          type: string
+                          enum: [current, supported, deprecated]
+                        releaseDate:
+                          type: string
+                          format: date
+                        endOfLife:
+                          type: string
+                          format: date
+                          nullable: true
+                        links:
+                          type: object
+                          properties:
+                            documentation:
+                              type: string
+                              format: uri
+                            changelog:
+                              type: string
+                              format: uri
+                            migration:
+                              type: string
+                              format: uri
+                              nullable: true
+                  headers:
+                    type: object
+                    description: Supported version headers
+                  links:
+                    type: object
+                    properties:
+                      changelog:
+                        type: string
+                        format: uri
+                      documentation:
+                        type: string
+                        format: uri
+                  deprecationNotice:
+                    type: object
+                    nullable: true
+                    description: Present if using deprecated version
+                    properties:
+                      message:
+                        type: string
+                      migrationGuide:
+                        type: string
+                        format: uri
+                      currentVersion:
+                        type: string
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/versions/changelog:
+    get:
+      operationId: getApiChangelog
+      tags:
+        - System
+      summary: Get API version changelog
+      description: |
+        Returns detailed changelog for all API versions including:
+        - New features and fields added
+        - Improvements and optimizations
+        - Bug fixes
+        - Deprecated features
+      responses:
+        "200":
+          description: API version changelog
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  changelog:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        version:
+                          type: string
+                          example: "2.3.0"
+                        releaseDate:
+                          type: string
+                          format: date
+                        status:
+                          type: string
+                          enum: [current, supported, deprecated]
+                        endOfLife:
+                          type: string
+                          format: date
+                          nullable: true
+                        changes:
+                          type: object
+                          properties:
+                            added:
+                              type: array
+                              items:
+                                type: string
+                            improved:
+                              type: array
+                              items:
+                                type: string
+                            fixed:
+                              type: array
+                              items:
+                                type: string
+                            deprecated:
+                              type: array
+                              items:
+                                type: string
+                  currentVersion:
+                    type: string
+                    example: "2.3"
+                  deprecationPolicy:
+                    type: object
+                    properties:
+                      notice:
+                        type: string
+                        example: "6 months"
+                      support:
+                        type: string
+                        example: "12 months after deprecation"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/v2/balance/{address}:
     get:
       operationId: getAddressBalance
@@ -1806,6 +1973,47 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/v2/stamps/recent-sales:
+    get:
+      operationId: getRecentStampSales
+      tags:
+        - Stamps
+      summary: Get recent stamp sales with enhanced details
+      description: |
+        Retrieve recent stamp sales (dispenses) with enhanced transaction details and configurable time range.
+        This endpoint provides comprehensive information about stamp sales including transaction metadata,
+        block information, and optional full transaction details.
+      parameters:
+        - name: dayRange
+          in: query
+          description: Number of days to look back for sales (default 7, max 30)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 30
+            default: 7
+          example: 7
+        - name: fullDetails
+          in: query
+          description: Include full transaction details in response
+          schema:
+            type: boolean
+            default: false
+          example: false
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+      responses:
+        "200":
+          description: Successful response with recent stamp sales
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecentStampSalesResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/v2/src20/create:
     post:
       operationId: createSrc20Token
@@ -1839,6 +2047,13 @@ paths:
                   max: "2100000000"
                   lim: "100000"
                   dec: 18
+                  x: "bitcoin_stamps"
+                  web: "https://stampchain.io"
+                  email: "contact@stampchain.io"
+                  tg: "stampchain_official"
+                  description: "API Version 2 test token with full metadata"
+                  img: "ar:BNttzDav3jHVnNiV7nYbQv-GY0HQ"
+                  icon: "ipfs:QmXoypizjW3WknFiJnKLwHCNqzg"
               mint:
                 summary: Mint example
                 value:
@@ -2085,11 +2300,13 @@ components:
     Limit:
       in: query
       name: limit
-      example: 1
+      example: 50
       schema:
         type: integer
         minimum: 1
-      description: The maximum number of items to return per page.
+        maximum: 1000
+        default: 50
+      description: The maximum number of items to return per page. Maximum allowed is 1000.
 
     Page:
       in: query
@@ -2839,6 +3056,53 @@ components:
           type: string
         dec:
           type: number
+        # Optional metadata fields (database-aligned)
+        x:
+          type: string
+          maxLength: 32
+          pattern: "^[a-zA-Z0-9_]{1,32}$"
+          description: "Twitter/X username (max 32 chars, alphanumeric and underscore only)"
+          example: "bitcoin_stamps"
+        web:
+          type: string
+          maxLength: 255
+          pattern: "^https?://[^\\s/$.?#].[^\\s]*$"
+          description: "Website URL (max 255 chars)"
+          example: "https://stampchain.io"
+        email:
+          type: string
+          maxLength: 255
+          pattern: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+          description: "Contact email address (max 255 chars)"
+          example: "contact@stampchain.io"
+        tg:
+          type: string
+          maxLength: 32
+          pattern: "^[a-zA-Z0-9_]{1,32}$"
+          description: "Telegram handle (max 32 chars, alphanumeric and underscore only)"
+          example: "stampchain_official"
+        description:
+          type: string
+          maxLength: 255
+          description: "Token description (max 255 chars)"
+          example: "A revolutionary token on Bitcoin"
+        desc:
+          type: string
+          maxLength: 255
+          description: "Alternative description field (max 255 chars, short form key description)"
+          example: "A revolutionary token on Bitcoin"
+        img:
+          type: string
+          maxLength: 32
+          pattern: "^(ar|ipfs|fc|ord):[A-Za-z0-9_-]+$"
+          description: "Primary image with protocol prefix (max 32 chars). Format: protocol:hash. Supported protocols: ar (Arweave), ipfs (IPFS), fc (Filecoin), ord (Bitcoin Ordinals)"
+          example: "ar:BNttzDav3jHVnNiV7nYbQv-GY0HQ"
+        icon:
+          type: string
+          maxLength: 32
+          pattern: "^(ar|ipfs|fc|ord):[A-Za-z0-9_-]+$"
+          description: "Token icon with protocol prefix (max 32 chars). Format: protocol:hash. Supported protocols: ar (Arweave), ipfs (IPFS), fc (Filecoin), ord (Bitcoin Ordinals)"
+          example: "ipfs:QmXoypizjW3WknFiJnKLwHCNqzg"
 
     SRC20MintData:
       type: object
@@ -3361,6 +3625,39 @@ components:
         updateFrequencyMinutes:
           type: integer
           description: Update frequency in minutes
+        lastSaleTxHash:
+          type: string
+          nullable: true
+          description: Transaction hash of most recent sale
+        lastSaleBuyerAddress:
+          type: string
+          nullable: true
+          description: Buyer's address from most recent sale
+        lastSaleDispenserAddress:
+          type: string
+          nullable: true
+          description: Dispenser address used in most recent sale
+        lastSaleBtcAmount:
+          type: number
+          nullable: true
+          description: Amount in BTC from most recent sale
+        lastSaleDispenserTxHash:
+          type: string
+          nullable: true
+          description: Transaction hash that created the dispenser
+        lastSaleBlockIndex:
+          type: integer
+          nullable: true
+          description: Block number of most recent sale
+        activityLevel:
+          type: string
+          nullable: true
+          enum: [HOT, WARM, COOL, DORMANT, COLD]
+          description: Activity level based on trading frequency
+        lastActivityTime:
+          type: integer
+          nullable: true
+          description: Unix timestamp of last activity
 
     SRC20MarketData:
       type: object
@@ -3606,6 +3903,146 @@ components:
           type: string
           format: date-time
           description: Last update timestamp
+
+    RecentStampSalesResponseBody:
+      type: object
+      description: Response body for recent stamp sales
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/EnhancedStampSale"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+        metadata:
+          $ref: "#/components/schemas/RecentSalesMetadata"
+
+    EnhancedStampSale:
+      type: object
+      description: Enhanced stamp sale information with transaction details
+      properties:
+        tx_hash:
+          type: string
+          description: Transaction hash of the sale
+        block_index:
+          type: integer
+          description: Block index where sale occurred
+        timestamp:
+          type: string
+          format: date-time
+          description: Transaction timestamp
+        cpid:
+          type: string
+          description: Counterparty ID of the stamp
+        stamp_number:
+          type: integer
+          description: Stamp number
+        source:
+          type: string
+          description: Seller's address
+        destination:
+          type: string
+          description: Buyer's address
+        dispenser_tx_hash:
+          type: string
+          description: Original dispenser transaction hash
+        dispense_quantity:
+          type: integer
+          description: Quantity dispensed
+        btc_amount:
+          type: number
+          description: BTC amount paid
+        satoshi_rate:
+          type: number
+          description: Satoshi rate for the sale
+        btc_rate:
+          type: number
+          description: BTC rate for the sale
+        usd_price:
+          type: number
+          nullable: true
+          description: USD price at time of sale
+        btc_price_usd:
+          type: number
+          nullable: true
+          description: BTC price in USD at time of sale
+        transaction_details:
+          $ref: "#/components/schemas/TransactionDetails"
+          nullable: true
+          description: Full transaction details (when fullDetails=true)
+
+    TransactionDetails:
+      type: object
+      description: Detailed transaction information
+      properties:
+        size:
+          type: integer
+          description: Transaction size in bytes
+        weight:
+          type: integer
+          description: Transaction weight
+        fee:
+          type: integer
+          description: Transaction fee in satoshis
+        fee_rate:
+          type: number
+          description: Fee rate in sat/vB
+        input_count:
+          type: integer
+          description: Number of inputs
+        output_count:
+          type: integer
+          description: Number of outputs
+        confirmations:
+          type: integer
+          description: Number of confirmations
+        block_time:
+          type: integer
+          description: Block timestamp
+        block_hash:
+          type: string
+          description: Block hash
+
+    RecentSalesMetadata:
+      type: object
+      description: Metadata for recent sales query
+      properties:
+        dayRange:
+          type: integer
+          description: Number of days queried
+        fullDetails:
+          type: boolean
+          description: Whether full details were included
+        totalSales:
+          type: integer
+          description: Total number of sales found
+        totalVolumeBTC:
+          type: number
+          description: Total volume in BTC
+        totalVolumeUSD:
+          type: number
+          nullable: true
+          description: Total volume in USD
+        averagePriceBTC:
+          type: number
+          description: Average price in BTC
+        averagePriceUSD:
+          type: number
+          nullable: true
+          description: Average price in USD
+        uniqueStamps:
+          type: integer
+          description: Number of unique stamps sold
+        uniqueBuyers:
+          type: integer
+          description: Number of unique buyers
+        uniqueSellers:
+          type: integer
+          description: Number of unique sellers
+        queryTime:
+          type: string
+          format: date-time
+          description: Query execution time
 
   responses:
     NotFound:

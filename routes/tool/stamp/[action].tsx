@@ -2,7 +2,7 @@
 /*@baba-71-82*/
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { StampSendTool } from "$tool";
-import { StampSendHowTo, StampSendsGallery } from "$section";
+import { StampSendHowTo } from "$section";
 import { body, gapSection } from "$layout";
 
 /* ===== TYPES ===== */
@@ -67,15 +67,7 @@ export default function ToolStampPage(
     }
   };
 
-  const _renderRightSidebar = () => {
-    console.log("Rendering Right Sidebar for Tab:", selectedTab);
-    switch (selectedTab) {
-      case "transfer":
-        return <StampSendsGallery />;
-      default:
-        return <div>No sidebar content available for this tab.</div>;
-    }
-  };
+  // Note: Right sidebar rendering removed as it's not currently used in the UI
 
   /* ===== RENDER ===== */
   return (

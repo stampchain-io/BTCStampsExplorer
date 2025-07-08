@@ -94,9 +94,25 @@ export function getScriptTypeInfo(
   scriptOrAddress: string | Uint8Array | undefined | null,
 ): ScriptTypeInfo {
   const type = detectScriptType(scriptOrAddress);
+
+  // Handle cases where TX_CONSTANTS doesn't have the script type
+  const constants = TX_CONSTANTS as Record<string, unknown>;
+  const typeConstants = constants[type] as
+    | { size: number; isWitness: boolean }
+    | undefined;
+
+  if (typeConstants) {
+    return {
+      type,
+      ...typeConstants,
+    };
+  }
+
+  // Default values for unsupported script types
   return {
     type,
-    ...TX_CONSTANTS[type],
+    size: 0,
+    isWitness: false,
   };
 }
 

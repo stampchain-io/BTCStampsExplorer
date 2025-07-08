@@ -44,13 +44,13 @@ export class CollectionService {
   static async getTotalCollectionsByCreatorFromDb(
     creator?: string,
   ): Promise<number> {
-    return CollectionRepository.getTotalCollectionsByCreatorFromDb(creator);
+    return await CollectionRepository.getTotalCollectionsByCreatorFromDb(creator);
   }
 
   static async getCollectionByName(
     collectionName: string,
   ): Promise<Collection | null> {
-    return CollectionRepository.getCollectionByName(collectionName);
+    return await CollectionRepository.getCollectionByName(collectionName);
   }
 
   static async getCollectionNames(

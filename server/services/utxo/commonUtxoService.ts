@@ -4,7 +4,7 @@ import { QuicknodeUTXOService, UTXOOptions as QuicknodeInternalUTXOOptions } fro
 import {
   getUTXOForAddress as getUTXOsFromPublicAPIsForAddress
 } from "$lib/utils/utxoUtils.ts";
-import { detectScriptType, getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { detectScriptType } from "$lib/utils/scriptTypeUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { ICommonUTXOService, UTXOFetchOptions } from "./utxoServiceInterface.d.ts";
 import { BLOCKSTREAM_API_BASE_URL } from "$lib/utils/constants.ts";
@@ -55,7 +55,7 @@ export class CommonUTXOService implements ICommonUTXOService {
           // Fall through to public APIs
         }
       } catch (error) {
-        logger.error("common-utxo-service", { message: "Error during QuickNode getRawTransactionHex call", txid, error: error.message, stack: error.stack });
+        logger.error("common-utxo-service", { message: "Error during QuickNode getRawTransactionHex call", txid, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
         // Fall through to public APIs on error
       }
     }
@@ -71,7 +71,7 @@ export class CommonUTXOService implements ICommonUTXOService {
           logger.warn("common-utxo-service", { message: `Public API (Blockstream) failed to fetch raw tx hex ${txid}`, status: response.statusText, code: response.status });
         }
       } catch (error) {
-        logger.error("common-utxo-service", { message: "Error fetching rawTxHex from public APIs", txid, error: error.message, stack: error.stack });
+        logger.error("common-utxo-service", { message: "Error fetching rawTxHex from public APIs", txid, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       }
     }
 
@@ -104,7 +104,9 @@ export class CommonUTXOService implements ICommonUTXOService {
           logger.warn("common-utxo-service", { message: "QuickNode returned unexpected response for getUTXOs", address, response: result });
         }
       } catch (error) {
-        logger.error("common-utxo-service", { message: "Error during QuickNode getUTXOs call", address, error: error.message, stack: error.stack });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack : undefined;
+        logger.error("common-utxo-service", { message: "Error during QuickNode getUTXOs call", address, error: errorMessage, stack: errorStack });
       }
     }
 
@@ -123,7 +125,9 @@ export class CommonUTXOService implements ICommonUTXOService {
       logger.warn("common-utxo-service", { message: "Public APIs returned non-array or null for getSpendableUTXOs", address, response: publicUtxosResult });
       return [];
     } catch (error) {
-      logger.error("common-utxo-service", { message: "Error fetching basic UTXOs from public APIs", address, error: error.message, stack: error.stack });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      logger.error("common-utxo-service", { message: "Error fetching basic UTXOs from public APIs", address, error: errorMessage, stack: errorStack });
       return [];
     }
   }
@@ -133,7 +137,8 @@ export class CommonUTXOService implements ICommonUTXOService {
     vout: number,
     options?: CommonUTXOFetchOptions,
   ): Promise<UTXO | null> {
-    const logContext = { txid, vout, options, quicknodeEnabled: this.isQuickNodeConfigured };
+    // Context for debugging if needed
+    // const logContext = { txid, vout, options, quicknodeEnabled: this.isQuickNodeConfigured };
     // logger.debug("common-utxo-service", { message: "getSpecificUTXO called for", txid, vout, options }); // Original debug line
 
     if (this.isQuickNodeConfigured && !options?.forcePublicAPI) {
@@ -173,7 +178,9 @@ export class CommonUTXOService implements ICommonUTXOService {
             logger.info("common-utxo-service", { message: "QuickNode did not find specific UTXO or returned no data (after detailed log)", txid, vout });
         }
       } catch (error) {
-        logger.error("common-utxo-service", { message: "Error during QuickNode getSpecificUTXO call (exception caught)", txid, vout, error: error.message, stack: error.stack });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack : undefined;
+        logger.error("common-utxo-service", { message: "Error during QuickNode getSpecificUTXO call (exception caught)", txid, vout, error: errorMessage, stack: errorStack });
       }
     }
 
@@ -202,7 +209,7 @@ export class CommonUTXOService implements ICommonUTXOService {
             
             const formattedUtxo: UTXO = {
                 txid: txid, vout: vout, value: output.value, script: scriptFromBlockstream,
-                vsize: txData.weight ? Math.ceil(txData.weight / 4) : undefined,
+                vsize: txData.weight ? Math.ceil(txData.weight / 4) : 0,
                 weight: txData.weight,
                 scriptType: detectScriptType(scriptFromBlockstream),
             };
@@ -214,7 +221,7 @@ export class CommonUTXOService implements ICommonUTXOService {
             return null;
         }
     } catch (error) {
-      logger.error("common-utxo-service", { message: "Error fetching specific UTXO from public APIs", txid, vout, error: error.message, stack: error.stack });
+      logger.error("common-utxo-service", { message: "Error fetching specific UTXO from public APIs", txid, vout, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       return null;
     }
   }

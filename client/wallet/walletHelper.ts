@@ -179,9 +179,9 @@ export const signPSBT = async (
     if (result.signed) {
       return {
         signed: true,
-        psbt: result.psbt,
-        txid: result.txid,
-        error: result.error, // Include error if any
+        psbt: result.psbt || "",
+        txid: result.txid || "",
+        error: result.error || "",
       };
     } else if (result.cancelled) {
       return { signed: false, cancelled: true };

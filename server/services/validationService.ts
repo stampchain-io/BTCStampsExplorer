@@ -26,7 +26,7 @@ export function validateSortDirection(
 
   // If no sort parameter, return default
   if (!sortParam) {
-    return defaultDirection;
+    return defaultDirection || "DESC";
   }
 
   const normalizedSort = sortParam.toUpperCase() as SortDirection;

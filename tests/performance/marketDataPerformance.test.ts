@@ -241,7 +241,7 @@ Deno.test("Performance - Cache lookup efficiency", () => {
   // Map lookups should be very fast - under 1ms for 1000 lookups
   assertEquals(lookupTime < 1, true);
   assertEquals(results.length, 1000);
-  results.forEach((result) => assertExists(result));
+  results.forEach((result: any) => assertExists(result));
 });
 
 Deno.test("Performance - Complex aggregation calculations", () => {

@@ -3,15 +3,14 @@
 import { TransactionService } from "$server/services/transaction/index.ts";
 import { extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
 import * as bitcoin from "bitcoinjs-lib";
-import { generateRandomNumber } from "$lib/utils/numberUtils.ts";
-import type { stampMintData, stampMintCIP33, PSBTInput } from "$types/index.d.ts";
+import type { ScriptType } from "$types/index.d.ts";
 import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
-import { PSBTService, formatPsbtForLogging } from "$server/services/transaction/psbtService.ts";
+import { formatPsbtForLogging } from "$server/services/transaction/psbtService.ts";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
-import { calculateDust, calculateMiningFee, calculateP2WSHMiningFee } from "$lib/utils/minting/feeCalculations.ts";
+// Removed unused fee calculation imports
 import { TX_CONSTANTS} from "$lib/utils/minting/constants.ts";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
@@ -150,7 +149,7 @@ export class StampMintService {
     let totalOutputValue = 0;
     let psbt;
     let vouts: Array<{ value: number; address?: string; script?: Uint8Array }> = [];
-    let estMinerFee = 0;
+    const estMinerFee = 0;
     let totalDustValue = 0;
     
 
@@ -166,19 +165,18 @@ export class StampMintService {
       // Calculate size first
       const estimatedSize = estimateTransactionSize({
         inputs: [{ 
-          type: "P2WPKH",
+          type: "P2WPKH" as ScriptType,
           isWitness: true
         }],
         outputs: [
-          { type: "P2PKH", isWitness: false },
+          { type: "P2PKH" as ScriptType },
           ...cip33Addresses.map(() => ({ 
-            type: "P2WSH", 
-            isWitness: true 
+            type: "P2WSH" as ScriptType
           })),
-          { type: "P2WPKH", isWitness: true }
+          { type: "P2WPKH" as ScriptType }
         ],
         includeChangeOutput: true,
-        changeOutputType: "P2WPKH"
+        changeOutputType: "P2WPKH" as ScriptType
       });
 
       // Add detailed size logging
@@ -331,7 +329,7 @@ export class StampMintService {
         // Log before adding input
         const currentInputIndexForLog = psbt.inputCount;
         console.log(`[StampMintService] Preparing Minter Input #${currentInputIndexForLog} (from UTXO ${input.txid}:${input.vout})`);
-        console.log(`[StampMintService] Minter Input Data for addInput:`, JSON.stringify(psbtInputDataForStamp, (k,v) => typeof v === 'bigint' ? v.toString() : v));
+        console.log(`[StampMintService] Minter Input Data for addInput:`, JSON.stringify(psbtInputDataForStamp, (_k,v) => typeof v === 'bigint' ? v.toString() : v));
 
         psbt.addInput(psbtInputDataForStamp as any);
 
@@ -350,7 +348,7 @@ export class StampMintService {
             witnessScriptLen: addedInputData.witnessScript?.length,
             sighashType: addedInputData.sighashType,
             sequence: psbt.txInputs[currentInputIndexForLog]?.sequence
-        }, (k,v) => typeof v === 'bigint' ? v.toString() : v) : "Added input data not found (ERROR)");
+        }, (_k,v) => typeof v === 'bigint' ? v.toString() : v) : "Added input data not found (ERROR)");
       }
 
       // Recalculate finalTotalOutputValue to include change output
@@ -395,6 +393,14 @@ export class StampMintService {
     divisible = false,
     description,
     satsPerKB,
+  }: {
+    sourceWallet: string;
+    assetName: string;
+    qty: number;
+    locked?: boolean;
+    divisible?: boolean;
+    description: string;
+    satsPerKB: number;
   }) {
     try {
       // Add wallet validation

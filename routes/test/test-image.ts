@@ -46,12 +46,12 @@ export const handler: Handlers = {
     const denoEnv = Deno.env.get("DENO_ENV") || "unknown";
 
     // Log the environment
-    logger.debug("environment", {
+    logger.debug("system", {
       message: "Current DENO_ENV",
       denoEnv,
     });
 
-    logger.debug("images", {
+    logger.debug("content", {
       message: "Testing image endpoints and configurations",
       config: {
         IMAGES_SRC_PATH: serverConfig.IMAGES_SRC_PATH,

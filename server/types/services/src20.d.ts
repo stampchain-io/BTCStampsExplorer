@@ -25,6 +25,9 @@ export interface IDeploySRC20 extends Omit<IPrepareSRC20TX, "transferString"> {
   email?: string;
   tg?: string;
   description?: string;
+  desc?: string;
+  img?: string;
+  icon?: string;
 }
 
 export interface ITransferSRC20

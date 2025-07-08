@@ -1,0 +1,129 @@
+[
+  {
+    "test_name": "Valid Stamp IDs",
+    "test_stamp_id": "1",
+    "test_stamp_ident": "STAMP",
+    "expected_status": 200
+  },
+  {
+    "test_name": "SRC-20 Ident",
+    "test_stamp_id": "50000",
+    "test_stamp_ident": "SRC-20",
+    "expected_status": 200
+  },
+  {
+    "test_name": "SRC-721 Ident",
+    "test_stamp_id": "60000",
+    "test_stamp_ident": "SRC-721",
+    "expected_status": 200
+  },
+  {
+    "test_name": "High Stamp ID",
+    "test_stamp_id": "999999",
+    "test_stamp_ident": "INVALID_IDENT",
+    "expected_status": 404
+  },
+  {
+    "test_name": "Valid Bitcoin Address",
+    "test_address": "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg",
+    "expected_status": 200
+  },
+  {
+    "test_name": "Invalid Bitcoin Address",
+    "test_address": "invalid_btc_address_12345",
+    "expected_status": 400
+  },
+  {
+    "test_name": "Valid Block",
+    "test_block": "780000",
+    "expected_status": 200
+  },
+  {
+    "test_name": "Future Block",
+    "test_block": "9999999",
+    "expected_status": 404
+  },
+  {
+    "test_name": "Valid SRC20 Tick",
+    "test_tick": "STAMP",
+    "expected_status": 200
+  },
+  {
+    "test_name": "Unicode SRC20 Tick",
+    "test_tick": "🔥",
+    "expected_status": 404
+  },
+  {
+    "test_name": "Valid SRC101 Deploy Hash",
+    "test_deploy_hash": "a1234567890abcdef",
+    "expected_status": 200
+  },
+  {
+    "test_name": "Invalid SRC101 Deploy Hash",
+    "test_deploy_hash": "xyz123",
+    "expected_status": 404
+  },
+  {
+    "test_name": "Valid Transaction Hash",
+    "test_tx_hash": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+    "expected_status": 200
+  },
+  {
+    "test_name": "Invalid Transaction Hash",
+    "test_tx_hash": "not-a-valid-tx-hash",
+    "expected_status": 400
+  },
+  {
+    "test_name": "Valid Creator Address",
+    "test_creator": "1CounterpartyXXXXXXXXXXXXXXXUWLpVr",
+    "expected_status": 200
+  },
+  {
+    "test_name": "Pagination Limits",
+    "test_limits": [0, -1, 1, 10, 50, 100, 500, 1000, 10000],
+    "test_pages": [-1, 0, 1, 2, 10, 100, 999999]
+  },
+  {
+    "test_name": "SQL Injection Patterns",
+    "sql_patterns": [
+      "' OR '1'='1",
+      "'; DROP TABLE stamps; --",
+      "1' UNION SELECT * FROM users--",
+      "1 OR 1=1",
+      "abc123' OR '1'='1"
+    ]
+  },
+  {
+    "test_name": "XSS Patterns",
+    "xss_patterns": [
+      "<script>alert('xss')</script>",
+      "<img src=x onerror=alert(1)>",
+      "javascript:alert(1)",
+      "<svg/onload=alert(1)>"
+    ]
+  },
+  {
+    "test_name": "Path Traversal Patterns",
+    "path_patterns": [
+      "../../../etc/passwd",
+      "..\\..\\..\\windows\\system32",
+      "%2F%2E%2E%2Fetc%2Fpasswd",
+      "....//....//....//etc/passwd"
+    ]
+  },
+  {
+    "test_name": "Invalid Data Types",
+    "invalid_types": {
+      "strings_for_numbers": ["abc", "xyz", "test"],
+      "negative_numbers": [-1, -10, -100, -999],
+      "floats": [1.5, 2.7, 10.123],
+      "booleans": [true, false],
+      "special_chars": ["@#$%", "!@#$", "*&^%"]
+    }
+  },
+  {
+    "test_name": "Performance Test Cases",
+    "performance_limits": [1, 10, 50, 100, 250, 500],
+    "performance_pages": [1, 10, 50, 100, 200]
+  }
+]

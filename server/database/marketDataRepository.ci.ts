@@ -23,6 +23,7 @@ import {
   parseExchangeSources,
   getCacheStatus,
 } from "$lib/utils/marketData.ts";
+import { MAX_PAGINATION_LIMIT } from "$constants";
 
 // Interface for the database manager dependency
 interface IDbManager {
@@ -67,7 +68,7 @@ export class MarketDataRepositoryCI {
         last_updated,
         last_price_update,
         update_frequency_minutes,
-        TIMESTAMPDIFF(MINUTE, last_updated, NOW()) as cache_age_minutes
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM stamp_market_data
       WHERE cpid = ?
       LIMIT 1
@@ -106,8 +107,7 @@ export class MarketDataRepositoryCI {
     const {
       collectionId,
       offset = 0,
-      limit = 100,
-      filters,
+      limit = MAX_PAGINATION_LIMIT,
       sortBy = 'block_index',
       sortOrder = 'DESC'
     } = options;
@@ -136,7 +136,7 @@ export class MarketDataRepositoryCI {
         smd.last_updated as market_data_last_updated,
         smd.last_price_update,
         smd.update_frequency_minutes,
-        TIMESTAMPDIFF(MINUTE, smd.last_updated, NOW()) as cache_age_minutes
+        TIMESTAMPDIFF(MINUTE, smd.last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM stamps st
       LEFT JOIN creator cr ON st.creator = cr.address
       LEFT JOIN stamp_market_data smd ON st.cpid = smd.cpid
@@ -197,7 +197,7 @@ export class MarketDataRepositoryCI {
         exchange_sources,
         data_quality_score,
         last_updated,
-        TIMESTAMPDIFF(MINUTE, last_updated, NOW()) as cache_age_minutes
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM src20_market_data
       WHERE tick = ?
       LIMIT 1
@@ -243,7 +243,7 @@ export class MarketDataRepositoryCI {
         avg_distribution_score,
         total_stamps_count,
         last_updated,
-        TIMESTAMPDIFF(MINUTE, last_updated, NOW()) as cache_age_minutes
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM collection_market_data
       WHERE collection_id = ?
       LIMIT 1
@@ -345,7 +345,7 @@ export class MarketDataRepositoryCI {
         last_updated,
         last_price_update,
         update_frequency_minutes,
-        TIMESTAMPDIFF(MINUTE, last_updated, NOW()) as cache_age_minutes
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM stamp_market_data
       WHERE cpid IN (${placeholders})
     `;

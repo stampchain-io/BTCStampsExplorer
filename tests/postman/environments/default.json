@@ -16,8 +16,14 @@
     },
     {
       "key": "base_url",
-      "value": "{{dev_base_url}}",
+      "value": "http://host.docker.internal:8000",
       "description": "Current base URL (defaults to dev)",
+      "enabled": true
+    },
+    {
+      "key": "baseUrl",
+      "value": "http://host.docker.internal:8000",
+      "description": "Current base URL (defaults to dev) - camelCase alias",
       "enabled": true
     }
   ],

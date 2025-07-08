@@ -15,7 +15,7 @@ export class BackgroundFeeService {
   /**
    * Start the background services (fees + BTC price)
    */
-  static start(baseUrl: string): void {
+  static start(): void {
     if (this.isRunning) {
       logger.warn("stamps", {
         message: "Background services already running",
@@ -27,18 +27,17 @@ export class BackgroundFeeService {
       message: "Starting background cache warming services",
       feeInterval: this.CACHE_WARM_INTERVAL,
       priceInterval: this.PRICE_WARM_INTERVAL,
-      baseUrl,
     });
 
     this.isRunning = true;
 
     // Initial cache warming
-    this.warmFeeCache(baseUrl);
+    this.warmFeeCache();
     this.warmPriceCache();
 
     // Set up intervals for regular cache warming
     this.intervalId = setInterval(() => {
-      this.warmFeeCache(baseUrl);
+      this.warmFeeCache();
     }, this.CACHE_WARM_INTERVAL);
 
     this.priceIntervalId = setInterval(() => {
@@ -83,7 +82,7 @@ export class BackgroundFeeService {
   /**
    * Warm the fee cache by fetching fresh data
    */
-  private static async warmFeeCache(baseUrl: string): Promise<void> {
+  private static async warmFeeCache(): Promise<void> {
     const startTime = Date.now();
 
     try {
@@ -96,7 +95,7 @@ export class BackgroundFeeService {
       await FeeService.invalidateCache();
 
       // Fetch fresh fee data (this will populate the cache)
-      const feeData = await FeeService.getFeeData(baseUrl);
+      const feeData = await FeeService.getFeeData();
 
       const duration = Date.now() - startTime;
       this.retryCount = 0; // Reset retry count on success
@@ -228,13 +227,13 @@ export class BackgroundFeeService {
   /**
    * Force immediate cache warming (useful for testing or manual refresh)
    */
-  static async forceWarm(baseUrl: string): Promise<void> {
+  static async forceWarm(): Promise<void> {
     logger.info("stamps", {
       message: "Forcing immediate cache warming for fees and BTC price",
     });
 
     await Promise.all([
-      this.warmFeeCache(baseUrl),
+      this.warmFeeCache(),
       this.warmPriceCache(),
     ]);
   }
@@ -254,12 +253,12 @@ export class BackgroundFeeService {
    * Force an immediate fee cache warm (useful for testing or manual refresh)
    * @deprecated Use forceWarm() for both services or forceWarmPrice() for price only
    */
-  static async forceWarmFee(baseUrl: string): Promise<void> {
+  static async forceWarmFee(): Promise<void> {
     logger.info("stamps", {
       message: "Forcing immediate fee cache warm",
     });
 
-    await this.warmFeeCache(baseUrl);
+    await this.warmFeeCache();
   }
 
   /**

@@ -5,7 +5,7 @@
 */
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
+
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
 import { ComposeAttachOptions } from "$server/services/xcpService.ts";
 import { normalizeFeeRate } from "$server/services/xcpService.ts";
@@ -74,8 +74,20 @@ export function StampTradeTool() {
   /* ===== EFFECTS ===== */
   useEffect(() => {
     const fetchPrice = async () => {
-      const price = await fetchBTCPriceInUSD();
-      setTradeFormState((prev) => ({ ...prev, BTCPrice: price }));
+      try {
+        const response = await fetch("/api/internal/btcPrice");
+        if (response.ok) {
+          const data = await response.json();
+          const price = data.data?.price || 0;
+          setTradeFormState((prev) => ({ ...prev, BTCPrice: price }));
+        } else {
+          console.warn("Failed to fetch BTC price");
+          setTradeFormState((prev) => ({ ...prev, BTCPrice: 0 }));
+        }
+      } catch (error) {
+        console.error("Error fetching BTC price:", error);
+        setTradeFormState((prev) => ({ ...prev, BTCPrice: 0 }));
+      }
     };
     fetchPrice();
   }, []);
@@ -104,7 +116,7 @@ export function StampTradeTool() {
     }
 
     setIsSubmitting(true);
-    setSubmissionMessage("Please wait...");
+    setSubmissionMessage({ message: "Please wait..." });
     setApiError(null);
 
     try {
@@ -151,14 +163,18 @@ export function StampTradeTool() {
       );
 
       if (walletResult.signed) {
-        setSubmissionMessage(
-          "PSBT signed successfully. Here's the signed PSBT hex:",
-        );
+        setSubmissionMessage({
+          message: "PSBT signed successfully. Here's the signed PSBT hex:",
+        });
         setTradeFormState((prev) => ({ ...prev, psbtHex: walletResult.psbt }));
       } else if (walletResult.cancelled) {
-        setSubmissionMessage("PSBT signing cancelled by user.");
+        setSubmissionMessage({
+          message: "PSBT signing cancelled by user.",
+        });
       } else {
-        setSubmissionMessage(`PSBT signing failed: ${walletResult.error}`);
+        setSubmissionMessage({
+          message: `PSBT signing failed: ${walletResult.error}`,
+        });
       }
     } catch (error) {
       console.error("Error creating or signing PSBT:", error);
@@ -296,7 +312,7 @@ export function StampTradeTool() {
     }
 
     setIsSubmitting(true);
-    setSubmissionMessage("Please wait...");
+    setSubmissionMessage({ message: "Please wait..." });
     setApiError("");
 
     try {
@@ -362,7 +378,9 @@ export function StampTradeTool() {
         throw new Error(signResult.error || "Failed to sign PSBT");
       }
 
-      setSubmissionMessage("Swap completed and broadcast successfully!");
+      setSubmissionMessage({
+        message: "Swap completed and broadcast successfully!",
+      });
     } catch (error: unknown) {
       console.error("Complete swap error:", error);
       setApiError(

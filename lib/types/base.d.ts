@@ -65,7 +65,14 @@ export interface FeeEstimationResult {
   estimatedSize?: number;
 }
 
-export type ScriptType = "P2PKH" | "P2WPKH" | "P2WSH" | "P2SH" | "P2TR";
+export type ScriptType =
+  | "P2PKH"
+  | "P2SH"
+  | "P2WPKH"
+  | "P2WSH"
+  | "P2TR"
+  | "OP_RETURN"
+  | "UNKNOWN";
 
 export interface FeeDetails {
   minerFee: number;

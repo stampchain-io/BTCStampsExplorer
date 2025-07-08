@@ -1,7 +1,7 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
 import { useEffect, useState } from "preact/hooks";
-import type { StampRow } from "$globals";
+import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 import { StampGallery } from "$section";
 import { titlePurpleLD } from "$text";
 import { loaderSpinXsPurple } from "$layout";
@@ -15,16 +15,8 @@ interface DisplayCountBreakpoints {
   desktop: number;
 }
 
-interface RecentSaleStamp extends StampRow {
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-  };
-}
-
 interface StampSalesProps {
-  initialData?: RecentSaleStamp[];
+  initialData?: StampWithEnhancedSaleData[];
   title?: string;
   subTitle?: string;
   variant?: "home" | "detail";
@@ -42,7 +34,7 @@ export function StampSalesGallery({
   gridClass,
 }: StampSalesProps) {
   /* ===== STATE ===== */
-  const [recentSales, setRecentSales] = useState<RecentSaleStamp[]>(
+  const [recentSales, setRecentSales] = useState<StampWithEnhancedSaleData[]>(
     initialData,
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -58,12 +50,14 @@ export function StampSalesGallery({
         throw new Error("Failed to fetch recent sales");
       }
       const data = await response.json();
-      const salesWithData = (data.data || []).map((stamp: RecentSaleStamp) => {
-        if (!stamp.sale_data) {
-          console.warn(`Stamp ${stamp.tx_hash} missing sale_data`);
-        }
-        return stamp;
-      });
+      const salesWithData = (data.data || []).map(
+        (stamp: StampWithEnhancedSaleData) => {
+          if (!stamp.sale_data) {
+            console.warn(`Stamp ${stamp.tx_hash} missing sale_data`);
+          }
+          return stamp;
+        },
+      );
       setRecentSales(salesWithData);
     } catch (error) {
       console.error("Error fetching recent sales:", error);
@@ -119,11 +113,23 @@ export function StampSalesGallery({
   `;
 
   /* ===== SECTION PROPS ===== */
+  // Filter for hot stamps when activity data is available
+  const filteredStamps = variant === "home" && recentSales.length > 0
+    ? recentSales.filter((stamp) => {
+      // If activity_level is available, filter for HOT stamps
+      if (stamp.activity_level) {
+        return stamp.activity_level === "HOT";
+      }
+      // Fallback: show all recent sales if no activity data
+      return true;
+    })
+    : recentSales;
+
   const sectionProps = variant === "home"
     ? {
       subTitle: subTitle || "HOT STAMPS",
       type: "recent",
-      stamps: recentSales,
+      stamps: filteredStamps,
       fromPage: "home",
       layout: "grid" as const,
       isRecentSales: true,
@@ -157,7 +163,15 @@ export function StampSalesGallery({
         {title}
       </h3>
       <div class="flex flex-col">
-        <StampGallery {...sectionProps} />
+        {variant === "home" && filteredStamps.length === 0 && !isLoading && (
+          <div class="text-gray-400 text-center py-8">
+            <p class="text-lg">No hot stamps available at the moment.</p>
+            <p class="text-sm mt-2">Check back soon for trending activity!</p>
+          </div>
+        )}
+        {(filteredStamps.length > 0 || variant !== "home") && (
+          <StampGallery {...sectionProps} />
+        )}
         {isLoading && (
           <div class="flex items-center gap-3 -mt-[29px] mb-[9px]">
             <div class={loaderSpinXsPurple} />
