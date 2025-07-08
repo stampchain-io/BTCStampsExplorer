@@ -4,11 +4,11 @@ import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
-  checkEmptyResult,
   DEFAULT_PAGINATION,
   validateRequiredParams,
-  validateSortParam,
 } from "$server/services/routeValidationService.ts";
+import { RouteType } from "$server/services/cacheService.ts";
+import { validateSortDirection } from "$server/services/validationService.ts";
 
 export const handler: Handlers<AddressTickHandlerContext> = {
   async GET(req, ctx) {
@@ -23,54 +23,40 @@ export const handler: Handlers<AddressTickHandlerContext> = {
 
       const url = new URL(req.url);
       const params = url.searchParams;
-      const includePagination = params.get("includePagination") === "true";
+      const paginationParams = getPaginationParams(url);
 
-      // Get pagination parameters if pagination is included
-      let paginationParams: { limit?: number; page?: number } = {};
-      if (includePagination) {
-        const pagination = getPaginationParams(url);
-
-        // Check if pagination validation failed
-        if (pagination instanceof Response) {
-          return pagination;
-        }
-
-        const { limit, page } = pagination;
-        paginationParams = { limit, page };
+      // Check if pagination validation failed
+      if (paginationParams instanceof Response) {
+        return paginationParams;
       }
 
       // Validate sort parameter
-      const sortValidation = validateSortParam(url);
-      if (!sortValidation.isValid) {
-        return sortValidation.error!;
+      const sortParam = params.get("sort");
+      const sortValidation = validateSortDirection(sortParam);
+      if (sortValidation instanceof Response) {
+        return sortValidation;
       }
 
       const balanceParams = {
         address,
-        tick: decodeURIComponent(String(tick)),
-        includePagination,
+        tick,
+        includePagination: params.get("includePagination") !== "false",
         limit: paginationParams.limit || DEFAULT_PAGINATION.limit,
         page: paginationParams.page || DEFAULT_PAGINATION.page,
-        amt: Number(params.get("amt")) || undefined,
-        sortBy: sortValidation.data,
+        amt: Number(params.get("amt")) || 0,
+        sortBy: sortValidation,
       };
 
       const result = await Src20Controller.handleSrc20BalanceRequest(
         balanceParams,
       );
 
-      // Check for empty result
-      const emptyCheck = checkEmptyResult(result, "balance data");
-      if (emptyCheck) {
-        return emptyCheck;
-      }
-
-      return ResponseUtil.success(result);
+      return ResponseUtil.success(result, { routeType: RouteType.BALANCE });
     } catch (error) {
       console.error("Error in GET handler:", error);
       return ResponseUtil.internalError(
         error,
-        "Error processing SRC20 balance request",
+        "Error processing balance request",
       );
     }
   },
