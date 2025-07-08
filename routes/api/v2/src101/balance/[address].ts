@@ -2,6 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
 import { AddressHandlerContext } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { RouteType } from "$server/services/cacheService.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
   checkEmptyResult,
@@ -41,7 +42,7 @@ export const handler: Handlers<AddressHandlerContext> = {
         address,
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
-        sort: sortValidation.data,
+        sort: sortValidation.data || "ASC",
       };
 
       const result = await Src101Controller.handleSrc101BalanceRequest(
@@ -54,7 +55,7 @@ export const handler: Handlers<AddressHandlerContext> = {
         return emptyCheck;
       }
 
-      return ResponseUtil.success(result);
+      return ResponseUtil.success(result, { routeType: RouteType.BALANCE });
     } catch (error) {
       console.error(
         "Error in [deploy_hash]/address/[address_btc] handler:",

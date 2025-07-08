@@ -155,7 +155,7 @@ export class SRC20MarketService {
         return [];
       }
     } catch (error) {
-      console.error("[SRC20MarketService] Fetch Error from OpenStamp:", error.message);
+      console.error("[SRC20MarketService] Fetch Error from OpenStamp:", error instanceof Error ? error.message : String(error));
       return [];
     }
   }

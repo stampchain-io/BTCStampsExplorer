@@ -31,9 +31,27 @@ export class BitcoinNotificationService {
 
   private static async handleNewBlock(data: BlockNotification) {
     console.log(`Processing new block notification: ${data.blockHeight}`);
+    
+    // Block-specific cache invalidation
     await dbManager.invalidateCacheByPattern('last_block');
     await dbManager.invalidateCacheByPattern(`block_${data.blockHeight}`);
     await dbManager.invalidateCacheByPattern('block_*');
+    
+    // Balance caches - these change with new transactions in blocks
+    await dbManager.invalidateCacheByPattern('balance_*');
+    await dbManager.invalidateCacheByPattern('src20_balance_*');
+    await dbManager.invalidateCacheByPattern('src101_balance_*');
+    await dbManager.invalidateCacheByPattern('stamp_balance_*');
+    
+    // Market data caches - prices/volumes may change with new blocks
+    await dbManager.invalidateCacheByPattern('market_data_*');
+    await dbManager.invalidateCacheByPattern('src20_market_*');
+    
+    // Transaction-related caches
+    await dbManager.invalidateCacheByPattern('transaction_*');
+    await dbManager.invalidateCacheByPattern('stamp_*');
+    
+    console.log(`Cache invalidated for new block ${data.blockHeight}`);
   }
 
   private static async handlePriceUpdate(data: PriceNotification) {
