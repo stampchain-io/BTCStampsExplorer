@@ -88,6 +88,7 @@ export interface WalletOverviewInfo {
   btcPrice: number;
   usdValue: number;
   fee: number;
+  creatorName?: string;
   dispensers: {
     open: number;
     closed: number;

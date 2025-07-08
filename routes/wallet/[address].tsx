@@ -8,6 +8,7 @@ import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { enrichTokensWithMarketData } from "$server/services/src20Service.ts";
+import { StampService } from "$server/services/stampService.ts";
 import {
   PaginatedResponse,
   PaginationQueryParams,
@@ -73,6 +74,8 @@ export const handler: Handlers = {
         stampsCreatedCount,
         marketDataResponse,
         src101Response,
+        src101FetchResponse,
+        creatorNameResponse,
       ] = await Promise.allSettled([
         // Stamps with sorting and pagination
         StampController.getStampBalancesByAddress(
@@ -152,6 +155,9 @@ export const handler: Handlers = {
 
           return data;
         }),
+
+        // Fetch creator name
+        StampService.getCreatorNameByAddress(address),
       ]);
 
       /* ===== DATA PROCESSING ===== */
@@ -213,18 +219,23 @@ export const handler: Handlers = {
 
       // Process SRC-101 response to get all BitNames
       const src101Data =
-        src101Response.status === "fulfilled" && src101Response.value
+        src101FetchResponse.status === "fulfilled" && src101FetchResponse.value
           ? {
-            names: (src101Response.value.data || [])
+            names: (src101FetchResponse.value.data || [])
               .filter((item: any) => item?.tokenid_utf8)
               .map((item: any) => item.tokenid_utf8),
-            total: src101Response.value.last_block || 0,
+            total: src101FetchResponse.value.last_block || 0,
           }
           : { names: [], total: 0 };
 
       console.log("Final Processed SRC-101 Data:", src101Data);
 
       /* ===== WALLET DATA ASSEMBLY ===== */
+      // Get creator name from response
+      const creatorName = creatorNameResponse.status === "fulfilled"
+        ? creatorNameResponse.value
+        : null;
+
       // Build wallet data
       const walletData = {
         balance: btcInfo?.balance ?? 0,
@@ -232,6 +243,7 @@ export const handler: Handlers = {
         address,
         btcPrice: btcInfo?.btcPrice ?? 0,
         fee: 0,
+        creatorName,
         txCount: btcInfo?.txCount ?? 0,
         unconfirmedBalance: btcInfo?.unconfirmedBalance ?? 0,
         unconfirmedTxCount: btcInfo?.unconfirmedTxCount ?? 0,
@@ -279,7 +291,9 @@ export const handler: Handlers = {
               ),
             },
           },
-          src101: src101Response,
+          src101: src101Response.status === "fulfilled"
+            ? src101Response.value
+            : null,
         },
         walletData,
         stampsTotal: stampsData.total,
@@ -317,6 +331,7 @@ export const handler: Handlers = {
           address,
           btcPrice: 0,
           fee: 0,
+          creatorName: null,
           txCount: 0,
           unconfirmedBalance: 0,
           unconfirmedTxCount: 0,
