@@ -234,10 +234,10 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       }
 
       if (!mint_tx_details || !mint_tx_details.hex) {
-        console.error(
-          "Invalid mint_tx_details structure (missing hex for PSBT):",
+        logger.error("api", {
+          message: "Invalid mint_tx_details structure (missing hex for PSBT)",
           mint_tx_details,
-        );
+        });
         return ApiResponseUtil.badRequest(
           "Error generating mint transaction: PSBT hex missing",
         );
@@ -273,7 +273,11 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
         txDetails: txDetails,
       } as NormalizedMintResponse, { forceNoCache: true });
     } catch (error: unknown) {
-      console.error("Minting error in API route:", error);
+      logger.error("api", {
+        message: "Minting error in API route",
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       const errorMessage = error instanceof Error
         ? error.message
         : "An unexpected error occurred during minting";

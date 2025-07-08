@@ -75,7 +75,7 @@ export const handler: Handlers = {
       };
 
       try {
-        console.log("[Dispense Route] About to call XcpManager.createDispense");
+        // Call XcpManager.createDispense
         const xcpResponse = await XcpManager.createDispense(
           buyerAddress, // Source for XCP (often buyer if they pay fees)
           dispenser, // Dispenser ID
@@ -209,7 +209,6 @@ export const handler: Handlers = {
         });
       }
     } catch (error: unknown) {
-      console.error("Error processing dispense request (outer catch):", error);
       const errorMessage = error instanceof Error
         ? error.message
         : "Invalid request format or unexpected error";
