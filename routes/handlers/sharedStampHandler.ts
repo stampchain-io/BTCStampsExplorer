@@ -57,54 +57,8 @@ export const createStampHandler = (
   async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
-
-      // Log parameters for debugging
-      console.log("[Stamp Handler]", {
-        url: req.url,
-        pathname: url.pathname,
-        params: Object.fromEntries(
-          [...url.searchParams.entries()].filter(([key]) =>
-            key.includes("range") || key === "type"
-          ),
-        ),
-        headers: Object.fromEntries([...req.headers.entries()]),
-      });
-
-      console.log(
-        "All URL parameters:",
-        Object.fromEntries(url.searchParams.entries()),
-      );
-      console.log("Range parameter:", url.searchParams.get("range[sub]"));
-      console.log(
-        "Filetype parameter:",
-        url.searchParams.get("filetype"),
-      );
-      console.log("Edition parameter:", url.searchParams.get("editions"));
       const cacheType = getCacheType(url.pathname, routeConfig.isIndex);
       const requestQuery = url.searchParams.get("q");
-
-      console.log(
-        "URL parameters:",
-        Object.fromEntries(url.searchParams.entries()),
-      );
-      console.log("Range sub value:", url.searchParams.get("range[sub]"));
-
-      // Try different ways to extract the parameter
-      console.log(
-        "Direct parameter access:",
-        url.searchParams.get("range[sub]"),
-      );
-
-      // Try using entries to see all parameters
-      for (const [key, value] of url.searchParams.entries()) {
-        console.log(`Parameter: ${key} = ${value}`);
-        // Check if any key contains "range"
-        if (key.includes("range")) {
-          console.log("Found range-related parameter:", key, value);
-        }
-      }
-
-      console.log("Full URL being passed:", req.url);
 
       if (routeConfig.isIndex) {
         const pagination = getPaginationParams(url);
@@ -136,8 +90,7 @@ export const createStampHandler = (
         // Extract ident parameter
         const identParam = url.searchParams.get("ident");
         const ident = identParam
-          ? identParam.split(",")
-            .filter(Boolean) as string[] | undefined
+          ? identParam.split(",").filter(Boolean) as any
           : undefined;
 
         // Extract new marketplace filters
@@ -183,7 +136,7 @@ export const createStampHandler = (
         // Set range based on preset or custom values
         if (
           rangePreset &&
-          ["100", "1000", "5000", "10000"].includes(rangePreset as any)
+          ["100", "1000", "5000", "10000"].includes(rangePreset)
         ) {
           range = rangePreset as STAMP_RANGES;
         } else if (rangeMin || rangeMax) {
