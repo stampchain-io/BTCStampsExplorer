@@ -4,7 +4,7 @@
  * merge-src101-tests.js
  * 
  * Extracts SRC-101 test folder from postman-collection.json 
- * and merges it into postman-collection-full-regression.json
+ * and merges it into tests/postman/collections/comprehensive.json
  */
 
 const fs = require('fs');
@@ -21,7 +21,7 @@ function main() {
     
     // Load target collection (comprehensive regression)
     const targetCollection = JSON.parse(
-      fs.readFileSync('postman-collection-full-regression.json', 'utf8')
+      fs.readFileSync('tests/postman/collections/comprehensive.json', 'utf8')
     );
     
     console.log(`📊 Source collection has ${sourceCollection.item.length} folders`);
@@ -89,13 +89,13 @@ function main() {
     targetCollection.item.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     
     // Create backup
-    const backupName = `postman-collection-full-regression.backup-${Date.now()}.json`;
+    const backupName = `tests/postman/collections/comprehensive.backup-${Date.now()}.json`;
     fs.writeFileSync(backupName, JSON.stringify(targetCollection, null, 2));
     console.log(`💾 Created backup: ${backupName}`);
     
     // Write updated collection
     fs.writeFileSync(
-      'postman-collection-full-regression.json', 
+      'tests/postman/collections/comprehensive.json', 
       JSON.stringify(targetCollection, null, 2)
     );
     

@@ -146,7 +146,7 @@ function generateMarkdownReport() {
 
     console.log("## Configuration");
     console.log("");
-    console.log("- **Collection:** postman-collection-full-regression.json");
+    console.log("- **Collection:** tests/postman/collections/comprehensive.json");
     console.log("- **Environment:** postman-environment-comprehensive.json");
     console.log("- **Test Mode:** Comprehensive regression testing");
     console.log("- **Coverage Target:** 46/46 endpoints (100%)");

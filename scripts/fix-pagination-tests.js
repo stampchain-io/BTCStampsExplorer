@@ -13,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Read the collection file
-const collectionPath = path.join(__dirname, '..', 'postman-collection-pagination-validation.json');
+const collectionPath = path.join(__dirname, '..', 'tests', 'postman', 'collections', 'pagination-validation.json');
 const collection = JSON.parse(fs.readFileSync(collectionPath, 'utf8'));
 
 let fixCount = 0;
