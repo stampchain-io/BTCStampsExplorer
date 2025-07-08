@@ -28,6 +28,10 @@ const CHANGELOG = [
         "fullDetails query parameter for /api/v2/stamps/recentSales to enable enhanced transaction information",
         "btcPriceUSD field in recent sales response for real-time USD conversions",
         "metadata object in recent sales response with dayRange and lastUpdated timestamp",
+        "activityLevel field in StampMarketData (HOT, WARM, COOL, DORMANT, COLD) for trading activity indicators",
+        "lastActivityTime field in StampMarketData with Unix timestamp of last trading activity",
+        "Enhanced transaction details in StampMarketData including lastSaleTxHash, lastSaleBuyerAddress, lastSaleDispenserAddress",
+        "lastSaleBtcAmount, lastSaleDispenserTxHash, and lastSaleBlockIndex fields for complete sale information",
       ],
       improved: [
         "Response performance with intelligent caching",

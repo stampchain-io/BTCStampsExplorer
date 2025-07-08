@@ -603,7 +603,9 @@ export class SRC20QueryService {
         // Fetch market data and mint progress in parallel
         const [marketData, mintProgress] = await Promise.all([
           options.includeMarketData
-            ? options.prefetchedMarketData || (console.log("Fetching market data from external API"), await SRC20MarketService.fetchMarketListingSummary())
+            ? (options.prefetchedMarketData && options.prefetchedMarketData.length > 0) 
+              ? options.prefetchedMarketData 
+              : (console.log("No prefetched market data available, fetching from external API"), await SRC20MarketService.fetchMarketListingSummary())
             : null,
           options.enrichWithProgress
             ? Promise.all(ticks.map(tick => 
@@ -621,11 +623,8 @@ export class SRC20QueryService {
             const tickForLookup = row.tick.toUpperCase();
             const market = marketMap.get(tickForLookup);
             if (market) {
-              enriched[i + index] = {
-                ...row,
-                market_data: market,
-                holders: row.holders || market.holder_count || 0
-              };
+              (enriched[i + index] as any).market_data = market;
+              (enriched[i + index] as any).holders = row.holders || market.holder_count || 0;
             } else {
               // Optional: Log if a tick is not found in the market map, can be noisy
               console.log(`[enrichData] Market data not found for tick: '${row.tick}' (lookup key: '${tickForLookup}')`);
@@ -638,13 +637,10 @@ export class SRC20QueryService {
           batch.forEach((row, index) => {
             const progress = mintProgress[index];
             if (progress) {
-              enriched[i + index] = {
-                ...enriched[i + index],
-                mint_progress: {
-                  progress: row.progress || progress.progress || "0",
-                  current: progress.total_minted || 0,
-                  max: progress.max_supply || 0
-                }
+              (enriched[i + index] as any).mint_progress = {
+                progress: row.progress || progress.progress || "0",
+                current: (progress as any).total_minted || 0,
+                max: (progress as any).max_supply || 0
               };
             }
           });

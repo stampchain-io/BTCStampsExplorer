@@ -66,7 +66,7 @@ export class SRC20OperationService {
   static deploySRC20(params: IDeploySRC20) {
     return this.executeSRC20Operation(
       params,
-      ({ tick, max, lim, dec, x, web, email, tg, description }) => ({
+      ({ tick, max, lim, dec, x, web, email, tg, description, desc }) => ({
         op: "DEPLOY",
         p: "SRC-20",
         tick,
@@ -77,7 +77,7 @@ export class SRC20OperationService {
         ...(web && { web }),
         ...(email && { email }),
         ...(tg && { tg }),
-        ...(description && { description }),
+        ...((description || desc) && { description: description || desc }),
       }),
       async ({ tick }) => {
         const mintInfo = await SRC20Service.UtilityService.checkDeployedTick(tick);

@@ -28,7 +28,29 @@ export async function handler(
         if (contentType?.includes("application/json")) {
           // Clone the response to avoid consuming the body
           const clonedResponse = response.clone();
-          const data = await clonedResponse.json();
+
+          // Check if response body is readable
+          const reader = clonedResponse.body?.getReader();
+          if (!reader) {
+            console.warn(
+              "Response body is not readable, skipping transformation",
+            );
+            return response;
+          }
+          reader.releaseLock();
+
+          // Parse JSON with error handling
+          let data;
+          try {
+            data = await clonedResponse.json();
+          } catch (jsonError) {
+            console.warn(
+              "Failed to parse response as JSON, skipping transformation:",
+              jsonError,
+            );
+            return response;
+          }
+
           const transformed = transformResponseForVersion(
             data,
             ctx.state.apiVersion as string,

@@ -230,7 +230,7 @@ Deno.test({
                 max: "1000000",
                 lim: "1000",
                 dec: 18,
-                web: "https://bitcoinstamps.io",
+                web: "https://stampchain.io",
                 isEstimate: true,
               },
             );

@@ -854,7 +854,7 @@ export class StampRepository {
           ${subQuery}
           SELECT *
           FROM ValidStamps ranked_stamps
-          WHERE rn <= ${collectionStampLimit}
+          WHERE rn <= ${collectionStampLimit || 12}
           ORDER BY ${sortColumn} ${order}
           LIMIT ? OFFSET ?
         `;
@@ -1383,13 +1383,13 @@ export class StampRepository {
     }
     
     // Handle range filters
-    if (filters.range) {
-      this.buildRangeFilterConditions(filters.range, whereConditions, queryParams, undefined, undefined);
+    if (filters.range && filters.range !== null) {
+      this.buildRangeFilterConditions(filters.range, whereConditions, queryParams, filters.rangeMin || undefined, filters.rangeMax || undefined);
     }
     
     // Handle market filters
     if (filters.market) {
-      this.buildMarketFilterConditions([filters.market] as STAMP_MARKETPLACE[], undefined, undefined, whereConditions, queryParams);
+      this.buildMarketFilterConditions([filters.market] as STAMP_MARKETPLACE[], whereConditions, queryParams, undefined, undefined);
     }
     
     // Handle new market data filters (Task 42)
@@ -1475,6 +1475,12 @@ export class StampRepository {
     console.log("[RANGE DEBUG] Initial whereConditions:", whereConditions);
     console.log("[RANGE DEBUG] Custom range values:", { min: rangeMin, max: rangeMax });
 
+    // Early exit if range is undefined, null, or the string "undefined"
+    if (!range || range === undefined || range === null || (range as string) === "undefined") {
+      console.log("[RANGE DEBUG] Range is undefined/null/string-undefined, skipping");
+      return;
+    }
+
     // Handle preset ranges first
     if (range && range !== "custom") {
       console.log("[RANGE DEBUG] Processing preset range:", range);
@@ -1504,10 +1510,10 @@ export class StampRepository {
 
   private static buildMarketFilterConditions(
     marketFilters: STAMP_MARKETPLACE[],
-    marketMin?: string,
-    marketMax?: string,
     whereConditions: string[],
-    queryParams: (string | number)[]
+    queryParams: (string | number)[],
+    marketMin?: string,
+    marketMax?: string
   ) {
     if (!marketFilters?.length) return;
 

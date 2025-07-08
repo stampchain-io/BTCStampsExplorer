@@ -62,6 +62,11 @@ export interface MarketListingAggregated {
 }
 
 /**
+ * Activity level type for stamps
+ */
+export type ActivityLevel = "HOT" | "WARM" | "COOL" | "DORMANT" | "COLD";
+
+/**
  * Database row interface for stamp_market_data table
  * All DECIMAL columns are represented as strings to preserve precision
  */
@@ -94,6 +99,9 @@ export interface StampMarketDataRow {
   last_sale_btc_amount: string | null; // BIGINT stored as string (satoshis)
   last_sale_dispenser_tx_hash: string | null;
   last_sale_block_index: number | null;
+  // Activity tracking fields
+  activity_level: ActivityLevel | null;
+  last_activity_time: number | null; // Unix timestamp
 }
 
 /**
@@ -177,6 +185,9 @@ export interface StampMarketData {
   lastSaleBtcAmount: number | null; // Converted from satoshis to BTC
   lastSaleDispenserTxHash: string | null;
   lastSaleBlockIndex: number | null;
+  // Activity tracking fields
+  activityLevel: ActivityLevel | null;
+  lastActivityTime: number | null; // Unix timestamp
 }
 
 export interface SRC20MarketData {
@@ -408,4 +419,6 @@ export interface StampWithEnhancedSaleData extends StampRow {
     dispenser_tx_hash?: string;
   };
   marketData?: StampMarketData;
+  activity_level?: ActivityLevel;
+  last_activity_time?: number;
 }

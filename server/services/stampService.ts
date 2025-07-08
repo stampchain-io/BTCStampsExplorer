@@ -169,22 +169,22 @@ export class StampService {
   }) {
     // Extract range parameters from URL if not already set
     let range = options.range;
+    let rangeMin = options.rangeMin;
+    let rangeMax = options.rangeMax;
     
     if (!range && options.url) {
       try {
         const url = new URL(options.url);
-        const rangeMin = url.searchParams.get("range[stampRange][min]");
-        const rangeMax = url.searchParams.get("range[stampRange][max]");
+        const urlRangeMin = url.searchParams.get("range[stampRange][min]");
+        const urlRangeMax = url.searchParams.get("range[stampRange][max]");
         
-        if (rangeMin || rangeMax) {
-          console.log("Service extracting range params:", { rangeMin, rangeMax });
-          range = {
-            stampRange: {
-              min: rangeMin || "",
-              max: rangeMax || ""
-            }
-          };
-          console.log("Service created range:", range);
+        if (urlRangeMin || urlRangeMax) {
+          console.log("Service extracting range params:", { urlRangeMin, urlRangeMax });
+          // Set range to "custom" and pass min/max separately
+          range = "custom" as STAMP_RANGES;
+          rangeMin = urlRangeMin || rangeMin;
+          rangeMax = urlRangeMax || rangeMax;
+          console.log("Service set range to custom with:", { range, rangeMin, rangeMax });
         }
       } catch (error: any) {
         console.error("Error extracting range from URL:", error);
@@ -220,8 +220,8 @@ export class StampService {
         fileType: options.fileType,
         editions: options.editions,
         range: range,
-        rangeMin: options.rangeMin,
-        rangeMax: options.rangeMax,
+        rangeMin: rangeMin,
+        rangeMax: rangeMax,
         market: options.market,
         dispensers: options.dispensers,
         atomics: options.atomics,
@@ -412,6 +412,9 @@ export class StampService {
       return {
         ...stamp,
         sale_data: saleData,
+        // Include activity tracking data
+        activity_level: marketData.activityLevel || null,
+        last_activity_time: marketData.lastActivityTime || null,
       };
     }).filter((stamp: any) => stamp !== null && stamp.sale_data !== null);
 

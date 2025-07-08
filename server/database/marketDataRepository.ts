@@ -84,11 +84,11 @@ export class MarketDataRepository {
         DEFAULT_CACHE_DURATION
       );
 
-      if (!result.rows || result.rows.length === 0) {
+      if (!(result as any).rows || (result as any).rows.length === 0) {
         return null;
       }
 
-      const row = result.rows[0] as StampMarketDataRow & { cache_age_minutes: number };
+      const row = (result as any).rows[0] as StampMarketDataRow & { cache_age_minutes: number };
       
       // Parse the row data into the application format
       return this.parseStampMarketDataRow(row);
@@ -635,6 +635,7 @@ export class MarketDataRepository {
         last_updated,
         TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM src20_market_data
+
       ORDER BY CAST(market_cap_btc AS DECIMAL(20,8)) DESC
       LIMIT ?
     `;

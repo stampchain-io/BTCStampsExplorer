@@ -98,6 +98,7 @@ export class SRC20TransactionService {
 
   private static prepareDeploy(body: InputData): IDeploySRC20 {
     return {
+      network: "mainnet",
       toAddress: body.toAddress,
       changeAddress: body.changeAddress,
       tick: body.tick,
@@ -109,7 +110,7 @@ export class SRC20TransactionService {
       web: body.web ?? "",
       email: body.email ?? "",
       tg: body.tg ?? "",
-      description: body.description ?? "",
+      description: (body.description || body.desc) ?? "",
     };
   }
 
