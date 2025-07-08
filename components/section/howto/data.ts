@@ -45,7 +45,7 @@ export const EXAMPLE_STEPS: ListProps[] = [
 /* ===== TOKEN DEPLOYMENT GUIDE ===== */
 export const DEPLOY_STEPS: ListProps[] = [
   {
-    title: "NAVIGATE TO MINT PAGE",
+    title: "NAVIGATE TO DEPLOY PAGE",
     image: "/img/how-tos/deploy/01.png",
     description:
       "Go to the main menu at the top right and click on MINT option.",
@@ -54,7 +54,7 @@ export const DEPLOY_STEPS: ListProps[] = [
     title: "COMPLETE THE INFORMATION",
     image: "/img/how-tos/deploy/02.png",
     description:
-      `Click the icon to upload your ticker artwork in a supported format. The size must be 420x420 pixels\n
+      `Click the icon to upload your ticker artwork in a supported format. The size must be 420x420 pixels.\n
       The token ticker name must be unique and no longer than 5 characters.\n
       Use the TOGGLE to switch between Simple and Expert modes to customize XXXXXXXXXXXXX.\n
       Supply defines the number of tokens, between # and ###########.\n
@@ -71,7 +71,7 @@ export const DEPLOY_STEPS: ListProps[] = [
   },
   {
     title: "CONFIRM TRANSACTION",
-    image: "/img/how-tos/deploy/01.png",
+    image: "/img/how-tos/deploy/04.png",
     description:
       "Your wallet will pop up and you have to sign for the transaction.",
   },
@@ -231,7 +231,7 @@ export const MINT_STEPS: ListProps[] = [
   },
   {
     title: "COMPLETE THE INFORMATION",
-    image: "/img/how-tos/mintsrc20/00.png",
+    image: "/img/how-tos/mintsrc20/02.png",
     description:
       `Click the icon to upload your ticker artwork in a supported format. The size must be 420x420 pixels\n
       The token ticker name must be unique and no longer than 5 characters.\n
@@ -250,7 +250,7 @@ export const MINT_STEPS: ListProps[] = [
   },
   {
     title: "CONFIRM TRANSACTION",
-    image: "/img/how-tos/deploy/01.png",
+    image: "/img/how-tos/deploy/00.png",
     description:
       "Your wallet will pop up and you have to sign for the transaction.",
   },
@@ -261,33 +261,28 @@ export const MINT_IMPORTANT_NOTES = [];
 /* ===== BITNAME REGISTRATION GUIDE ===== */
 export const BITNAME_STEPS: ListProps[] = [
   {
-    title: "NAVIGATE TO MINT",
-    image: "/img/how-tos/mintsrc20/01.png",
+    title: "NAVIGATE TO REGISTER",
+    image: "/img/how-tos/bitname/01.png",
     description:
-      "Go to the main menu at the top right and click on MINT option.",
+      "Go to the main menu at the top right and click on Tools and select REGISTER option.",
   },
   {
     title: "COMPLETE THE INFORMATION",
-    image: "/img/how-tos/mintsrc20/00.png",
+    image: "/img/how-tos/bitname/02.png",
     description:
-      `Click the icon to upload your ticker artwork in a supported format. The size must be 420x420 pixels\n
+      `Type the name that you want to register.\n
       The token ticker name must be unique and no longer than 5 characters.\n
-      Use the TOGGLE to switch between Simple and Expert modes to customize XXXXXXXXXXXXX.\n
-      Supply defines the number of tokens, between # and ###########.\n
-      Decimals specify how many decimal places your token will have (similar to Satoshis for Bitcoin).\n
-      Limit per Mint sets the maximum number of tokens that can be minted in a single session.\n
-      In the Description field, provide details on the token's utility or purpose.\n
-      Fill in additional token information, such as your website, X (Twitter) handle, email, and Telegram.\n
+      Check availability by clicking on AVAILABILITY.\n
       FEES shows the suggested amount, adjustable via the slider.\nAll related costs are detailed in the DETAILS section.\nAccept the terms and conditions to activate the DEPLOY button.\nDEPLOY button will submit your transaction with all the provided details.`,
   },
   {
     title: "CHECK THE INFORMATION",
-    image: "/img/how-tos/mintsrc20/00.png",
+    image: "/img/how-tos/bitname/02.png",
     description: "Check that all the information is correct.",
   },
   {
     title: "CONFIRM TRANSACTION",
-    image: "/img/how-tos/deploy/01.png",
+    image: "/img/how-tos/bitname/03.png",
     description:
       "Your wallet will pop up and you have to sign for the transaction.",
   },
