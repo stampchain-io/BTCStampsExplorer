@@ -149,22 +149,23 @@ jobs:
       - name: Generate test summary
         if: always()
         run: |
-          echo "## Integration Test Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Test Environment" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Database: MySQL 8.0 (test database)" >> $GITHUB_STEP_SUMMARY
-          echo "- Cache: Redis 7 (test instance)" >> $GITHUB_STEP_SUMMARY
-          echo "- Environment: CI test environment" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          echo "### Test Coverage" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Integration tests cover:" >> $GITHUB_STEP_SUMMARY
-          echo "- Database connections and queries" >> $GITHUB_STEP_SUMMARY
-          echo "- Redis caching functionality" >> $GITHUB_STEP_SUMMARY
-          echo "- API endpoint behavior" >> $GITHUB_STEP_SUMMARY
-          echo "- End-to-end workflows" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Integration Test Summary"
+            echo ""
+            echo "### Test Environment"
+            echo ""
+            echo "- Database: MySQL 8.0 (test database)"
+            echo "- Cache: Redis 7 (test instance)"
+            echo "- Environment: CI test environment"
+            echo ""
+            echo "### Test Coverage"
+            echo ""
+            echo "Integration tests cover:"
+            echo "- Database connections and queries"
+            echo "- Redis caching functionality"
+            echo "- API endpoint behavior"
+            echo "- End-to-end workflows"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Check test output
         if: failure()
