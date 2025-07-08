@@ -37,13 +37,23 @@ function calculateWitnessWeight(
       });
       return 0;
     }
-    switch (input.type) {
-      case "P2WPKH":
-        return stack.itemsCount + stack.lengthBytes + stack.signature +
-          stack.pubkey;
-      case "P2WSH":
-      case "P2TR":
-        return stack.size;
+
+    // Type guard to handle union type properly
+    if (input.type === "P2WPKH" && "itemsCount" in stack) {
+      const p2wpkhStack = stack as {
+        readonly itemsCount: 1;
+        readonly lengthBytes: 2;
+        readonly signature: 72;
+        readonly pubkey: 33;
+      };
+      return p2wpkhStack.itemsCount + p2wpkhStack.lengthBytes +
+        p2wpkhStack.signature +
+        p2wpkhStack.pubkey;
+    } else if (
+      (input.type === "P2WSH" || input.type === "P2TR") && "size" in stack
+    ) {
+      const sizeStack = stack as { readonly size: number };
+      return sizeStack.size;
     }
   }
   logger.warn("system", {

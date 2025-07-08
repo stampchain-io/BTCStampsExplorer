@@ -13,14 +13,13 @@ import {
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
-import { BIG_LIMIT } from "$lib/utils/constants.ts";
-import { DispenserFilter } from "$types/index.d.ts";
-import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
+
 import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
-import { getMimeType, detectContentType } from "$lib/utils/imageUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
-import type { StampWithMarketData, StampMarketData } from "$lib/types/marketData.d.ts";
+import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
+import type { StampMarketData } from "$types/marketData.d.ts";
+import type { XcpBalance } from "$types/index.d.ts";
 
 interface StampServiceOptions {
   cacheType: RouteType;
@@ -81,7 +80,7 @@ export class StampService {
         asset,
         last_block: stampResult.last_block,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in getStampDetailsById:", error);
       return null;
     }
@@ -170,24 +169,24 @@ export class StampService {
   }) {
     // Extract range parameters from URL if not already set
     let range = options.range;
+    let rangeMin = options.rangeMin;
+    let rangeMax = options.rangeMax;
     
     if (!range && options.url) {
       try {
         const url = new URL(options.url);
-        const rangeMin = url.searchParams.get("range[stampRange][min]");
-        const rangeMax = url.searchParams.get("range[stampRange][max]");
+        const urlRangeMin = url.searchParams.get("range[stampRange][min]");
+        const urlRangeMax = url.searchParams.get("range[stampRange][max]");
         
-        if (rangeMin || rangeMax) {
-          console.log("Service extracting range params:", { rangeMin, rangeMax });
-          range = {
-            stampRange: {
-              min: rangeMin || "",
-              max: rangeMax || ""
-            }
-          };
-          console.log("Service created range:", range);
+        if (urlRangeMin || urlRangeMax) {
+          console.log("Service extracting range params:", { urlRangeMin, urlRangeMax });
+          // Set range to "custom" and pass min/max separately
+          range = "custom" as STAMP_RANGES;
+          rangeMin = urlRangeMin || rangeMin;
+          rangeMax = urlRangeMax || rangeMax;
+          console.log("Service set range to custom with:", { range, rangeMin, rangeMax });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error extracting range from URL:", error);
       }
     }
@@ -221,8 +220,8 @@ export class StampService {
         fileType: options.fileType,
         editions: options.editions,
         range: range,
-        rangeMin: options.rangeMin,
-        rangeMax: options.rangeMax,
+        rangeMin: rangeMin,
+        rangeMax: rangeMax,
         market: options.market,
         dispensers: options.dispensers,
         atomics: options.atomics,
@@ -267,11 +266,11 @@ export class StampService {
     let processedStamps = initialResult.stamps;
     if (options.includeMarketData && processedStamps.length > 0) {
       // Get market data for all stamps in a single query
-      const cpids = processedStamps.map(stamp => stamp.cpid).filter(Boolean);
+      const cpids = processedStamps.map((stamp: any) => stamp.cpid).filter(Boolean);
       const marketDataMap = await MarketDataRepository.getBulkStampMarketData(cpids);
       
       // Enrich each stamp with its market data
-      processedStamps = processedStamps.map(stamp => {
+      processedStamps = processedStamps.map((stamp: any) => {
         if (!stamp.cpid || (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721")) {
           return stamp;
         }
@@ -337,10 +336,10 @@ export class StampService {
         StampRepository.getCountStampBalancesByAddressFromDb(address, xcpBalances)
       ]);
 
-      const total = totalResult.rows[0]?.total || 0;
+      const total = (totalResult as any).rows[0]?.total || 0;
 
       return { stamps, total };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in getStampBalancesByAddress:", error);
       return { stamps: [], total: 0 };
     }
@@ -350,62 +349,96 @@ export class StampService {
     return await StampRepository.getALLCPIDs();
   }
 
-  static mapDispensesWithRates(dispenses, dispensers) {
+  static mapDispensesWithRates(dispenses: any, dispensers: any) {
     const dispenserRates = new Map(
-      dispensers.map((d) => [d.tx_hash, d.satoshirate]),
+      dispensers.map((d: any) => [d.tx_hash, d.satoshirate]),
     );
-    return dispenses.map((dispense) => ({
+    return dispenses.map((dispense: any) => ({
       ...dispense,
       satoshirate: dispenserRates.get(dispense.dispenser_tx_hash) || 0,
     }));
   }
 
-  static async getRecentSales(page?: number, limit?: number) {
-    // Fetch dispense events and extract unique asset values
-    const dispenseEvents = await XcpManager.fetchDispenseEvents(500);
-    const uniqueAssets = [...new Set(dispenseEvents.map((event) => event.params.asset))];
-
-    const stampDetails = await this.getStamps({
-      identifier: uniqueAssets,
-      allColumns: false,
-      noPagination: true,
-      type: "all",
-      skipTotalCount: true,
-      creatorAddress: undefined
+  static async getRecentSales(
+    page?: number, 
+    limit?: number,
+    options?: {
+      dayRange?: number;
+      includeFullDetails?: boolean;
+    }
+  ) {
+    // Use local market data instead of fetching all dispense events
+    const pageNum = page || 1;
+    const pageLimit = limit || 50;
+    const dayRange = options?.dayRange || 30;
+    
+    // Query stamps with recent sales from market data cache
+    const result = await StampRepository.getRecentlyActiveSold({
+      page: pageNum,
+      limit: pageLimit,
+      includeMarketData: true
     });
 
-    const stampDetailsMap = new Map(
-      stampDetails.stamps.map((stamp) => [stamp.cpid, stamp])
-    );
+    // Get current BTC price for USD conversion
+    const btcPriceData = await BTCPriceService.getPrice();
+    const btcPriceUSD = btcPriceData.price;
 
-    const allRecentSales = dispenseEvents
-      .map((event) => {
-        const stamp = stampDetailsMap.get(event.params.asset);
-        if (!stamp) return null;
-        return {
-          ...stamp,
-          sale_data: {
-            btc_amount: Number(formatBTCAmount(event.params.btc_amount, { 
-              includeSymbol: false 
-            })),
-            block_index: event.block_index,
-            tx_hash: event.tx_hash,
-          },
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => b.sale_data.block_index - a.sale_data.block_index);
+    // Transform the data with enhanced transaction details
+    const recentSales = result.stamps.map((stamp: any) => {
+      const marketData = stamp.marketData;
+      if (!marketData) return null;
 
-    const total = allRecentSales.length;
+      // Calculate time ago
+      const saleTime = new Date(marketData.lastPriceUpdate);
+      const timeAgo = this.getTimeAgo(saleTime);
 
-    if (page !== undefined && limit !== undefined) {
-      const startIndex = (page - 1) * limit;
-      const endIndex = startIndex + limit;
-      const paginatedSales = allRecentSales.slice(startIndex, endIndex);
-      return { recentSales: paginatedSales, total };
-    }
+      // Use enhanced transaction detail fields if available, fall back to existing data
+      const btcAmount = marketData.lastSaleBtcAmount || marketData.recentSalePriceBTC || 0;
+      const txHash = marketData.lastSaleTxHash || stamp.tx_hash;
+      const blockIndex = marketData.lastSaleBlockIndex || stamp.block_index;
 
-    return { recentSales: allRecentSales, total };
+      const saleData = {
+        btc_amount: btcAmount,
+        block_index: blockIndex,
+        tx_hash: txHash,
+        // Enhanced transaction details (will be null until database schema is updated)
+        buyer_address: marketData.lastSaleBuyerAddress || null,
+        dispenser_address: marketData.lastSaleDispenserAddress || null,
+        time_ago: timeAgo,
+        btc_amount_satoshis: marketData.lastSaleBtcAmount ? Math.round(marketData.lastSaleBtcAmount * 100000000) : null,
+        dispenser_tx_hash: marketData.lastSaleDispenserTxHash || null,
+      };
+
+      return {
+        ...stamp,
+        sale_data: saleData,
+        // Include activity tracking data
+        activity_level: marketData.activityLevel || null,
+        last_activity_time: marketData.lastActivityTime || null,
+      };
+    }).filter((stamp: any) => stamp !== null && stamp.sale_data !== null);
+
+    return { 
+      recentSales,
+      total: result.total,
+      btcPriceUSD,
+      metadata: {
+        dayRange,
+        lastUpdated: new Date().toISOString()
+      }
+    };
+  }
+
+  /**
+   * Calculate time ago string from date
+   */
+  private static getTimeAgo(date: Date): string {
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
   }
 
   static async getCreatorNameByAddress(
@@ -483,7 +516,7 @@ export class StampService {
       }
 
       return result.stamps[0];
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error resolving CPID for ${id}:`, error);
       throw error;
     }
@@ -590,7 +623,7 @@ export class StampService {
 
     // Enrich each stamp with USD calculations and cache status
     return stampsWithMarketData.map(stampData => {
-      const { marketData, cacheStatus, cacheAgeMinutes, ...stamp } = stampData;
+      const { marketData, cacheStatus: _cacheStatus, cacheAgeMinutes: _cacheAgeMinutes, ...stamp } = stampData;
       return this.enrichStampWithMarketData(stamp, marketData, options.btcPriceUSD);
     });
   }

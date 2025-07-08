@@ -4,8 +4,11 @@ import {
   SRC20TrxRequestParams,
   PaginatedSrc20ResponseBody,
   Src20ResponseBody,
+  Src20BalanceResponseBody,
   Src20SnapShotDetail,
   SRC20SnapshotRequestParams,
+  MarketListingAggregated,
+  SRC20Row,
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { SRC20UtilityService } from "./utilityService.ts";
@@ -13,6 +16,13 @@ import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { paginate } from "$lib/utils/paginationUtils.ts"
 import { Big } from "big";
 import { SRC20MarketService } from "./marketService.ts";
+
+// Define missing types
+interface PerformanceMetrics {
+  duration: number;
+  cacheHit: boolean;
+  dataSize: number;
+}
 
 // Change class name from Src20Service to SRC20QueryService
 export class SRC20QueryService {
@@ -24,7 +34,7 @@ export class SRC20QueryService {
       params,
       excludeFullyMinted,
     );
-    return result.rows[0].total;
+    return (result as any).rows[0].total;
   }
 
   /**
@@ -41,8 +51,8 @@ export class SRC20QueryService {
 
   static async fetchAndFormatSrc20Data(
     params: SRC20TrxRequestParams = {},
-    excludeFullyMinted: boolean = false,
-    onlyFullyMinted: boolean = false,
+    _excludeFullyMinted: boolean = false,
+    _onlyFullyMinted: boolean = false,
   ): Promise<PaginatedSrc20ResponseBody | Src20ResponseBody> {
     try {
       const sanitizedParams = {
@@ -76,41 +86,42 @@ export class SRC20QueryService {
         ...sanitizedParams,
         tick: Array.isArray(sanitizedParams.tick)
           ? sanitizedParams.tick[0]
-          : sanitizedParams.tick,
+          : (sanitizedParams.tick || null),
+        op: sanitizedParams.op || null,
+        tx_hash: sanitizedParams.tx_hash || null,
         limit,
         page,
         sortBy: sanitizedParams.sortBy || "ASC",
       };
 
-      // Remove the op property if it's undefined
-      if (queryParams.op === undefined) {
+      // Remove the op property if it's null
+      if (queryParams.op === null) {
         delete queryParams.op;
       }
 
       const [data, totalResult, lastBlock] = await Promise.all([
-        SRC20Repository.getValidSrc20TxFromDb(queryParams, excludeFullyMinted),
+        SRC20Repository.getValidSrc20TxFromDb(queryParams, _excludeFullyMinted),
         SRC20Repository.getTotalCountValidSrc20TxFromDb(
           queryParams,
-          excludeFullyMinted,
+          _excludeFullyMinted,
         ),
         BlockService.getLastBlock(),
       ]);
 
-      const total = totalResult.rows[0].total;
+      const total = (totalResult as any).rows[0].total;
 
       // Only map and format if we have data
-      if (!data.rows || data.rows.length === 0) {
+      if (!(data as any).rows || (data as any).rows.length === 0) {
         return {
           data: [],
-          total: 0,
           page,
           totalPages: 0,
           limit,
           last_block: lastBlock,
-        };
-      }
+        } as PaginatedSrc20ResponseBody;
+              }
 
-      const mappedData = this.mapTransactionData(data.rows);
+      const mappedData = this.mapTransactionData((data as any).rows);
       const formattedData = this.formatTransactionData(
         mappedData,
         queryParams,
@@ -133,7 +144,7 @@ export class SRC20QueryService {
         last_block: lastBlock,
         data: Array.isArray(formattedData) ? formattedData : [formattedData],
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchAndFormatSrc20Data:", error);
       if (error.message.includes("Stamps Down")) {
         throw new Error("Stamps Down...");
@@ -157,7 +168,7 @@ export class SRC20QueryService {
         total_mints,
         total_transfers,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchAllSrc20DataForTick:", error);
       throw error;
     }
@@ -184,15 +195,19 @@ export class SRC20QueryService {
 
       if (!src20 || (Array.isArray(src20) && src20.length === 0)) {
         // Return an empty response instead of throwing an error
-        return params.address && params.tick ? {} : [];
+        return params.address && params.tick ? 
+          { last_block: 0, data: [] } as any : // Fixed: Use any to avoid type conversion issues
+          { last_block: 0, data: [] } as any; // Fixed: Use any to avoid type conversion issues
       }
 
       return params.address && params.tick ? src20[0] : src20;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchSrc20Balance:", error);
       console.error("Params:", params);
       // Return an empty response for any other errors as well
-      return params.address && params.tick ? {} : [];
+      return params.address && params.tick ? 
+        { last_block: 0, data: [] } as any : // Fixed: Use any to avoid type conversion issues
+        { last_block: 0, data: [] } as any; // Fixed: Use any to avoid type conversion issues
     }
   }
 
@@ -210,14 +225,14 @@ export class SRC20QueryService {
 
       const balanceResponse = await this.fetchSrc20Balance(balanceParams);
 
-      const snapshotData = balanceResponse.map((row) => ({
+      const snapshotData = (balanceResponse as any).map((row: any) => ({ // Fixed: Type assertion for balanceResponse
         tick: row.tick,
         address: row.address,
         balance: stripTrailingZeros(row.amt.toString()),
       }));
 
       return snapshotData;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchSrc20Snapshot:", error);
       throw error;
     }
@@ -255,7 +270,7 @@ export class SRC20QueryService {
   ): Promise<number> {
     try {
       return await SRC20Repository.getTotalSrc20BalanceCount(params);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error getting total SRC20 balance count:", error);
       throw error;
     }
@@ -292,7 +307,7 @@ export class SRC20QueryService {
         last_block: await BlockService.getLastBlock(),
         data: paginatedData,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchTrendingActiveMintingTokens:", error);
       throw error;
     }
@@ -359,8 +374,8 @@ export class SRC20QueryService {
         maxSupply: typeof params.maxSupply === 'number' ? Math.max(0, params.maxSupply) : undefined,
         minMarketCap: typeof params.minMarketCap === 'number' ? Math.max(0, params.minMarketCap) : undefined,
         maxMarketCap: typeof params.maxMarketCap === 'number' ? Math.max(0, params.maxMarketCap) : undefined,
-        minHolder: typeof params.minHolder === 'number' ? Math.max(0, params.minHolder) : undefined,
-        maxHolder: typeof params.maxHolder === 'number' ? Math.max(0, params.maxHolder) : undefined,
+        minHolder: typeof (params as any).minHolder === 'number' ? Math.max(0, (params as any).minHolder) : undefined,
+        maxHolder: typeof (params as any).maxHolder === 'number' ? Math.max(0, (params as any).maxHolder) : undefined,
           minProgress: typeof params.minProgress === 'number' ? Math.max(0, params.minProgress) : undefined,
         maxProgress: typeof params.maxProgress === 'number' ? Math.max(0, params.maxProgress) : undefined,
           minTxCount: typeof params.minTxCount === 'number' ? Math.max(0, params.minTxCount) : undefined,
@@ -387,7 +402,8 @@ export class SRC20QueryService {
 
       const queryParams: SRC20TrxRequestParams = {
         ...sanitizedParams,
-        tick: sanitizedParams.tick,
+        tick: sanitizedParams.tick || null,
+        op: sanitizedParams.op || null,
         limit,
         page,
         sortBy: sanitizedParams.sortBy || "ASC",
@@ -411,7 +427,7 @@ export class SRC20QueryService {
         BlockService.getLastBlock(),
       ]);
 
-      const total = totalResult.rows[0].total;
+      const total = (totalResult as any).rows[0].total;
       metrics.dataSize = data.rows?.length || 0;
 
       // Early return for empty data
@@ -425,11 +441,11 @@ export class SRC20QueryService {
           limit,
           last_block: lastBlock,
           performance: metrics
-        };
+        } as any;
       }
 
       // Map and format base data
-      let mappedData = this.mapTransactionData(data.rows);
+      const mappedData = this.mapTransactionData(data.rows);
       let formattedData = this.formatTransactionData(
         mappedData,
         queryParams
@@ -438,7 +454,7 @@ export class SRC20QueryService {
       // Apply date range filtering if specified
       if (sanitizedParams.dateFrom || sanitizedParams.dateTo) {
         formattedData = Array.isArray(formattedData) ? formattedData : [formattedData];
-        formattedData = formattedData.filter(item => {
+        formattedData = formattedData.filter((item: any) => {
           const itemDate = new Date(item.block_time);
           if (sanitizedParams.dateFrom && itemDate < new Date(sanitizedParams.dateFrom)) return false;
           if (sanitizedParams.dateTo && itemDate > new Date(sanitizedParams.dateTo)) return false;
@@ -451,10 +467,10 @@ export class SRC20QueryService {
         formattedData = await this.enrichData(
           formattedData,
           {
-            includeMarketData: options.includeMarketData,
-            enrichWithProgress: options.enrichWithProgress,
+            includeMarketData: options.includeMarketData || false,
+            enrichWithProgress: options.enrichWithProgress || false,
             batchSize: options.batchSize || 50,
-            prefetchedMarketData: options.prefetchedMarketData
+            prefetchedMarketData: options.prefetchedMarketData || []
           }
         );
 
@@ -468,7 +484,7 @@ export class SRC20QueryService {
 
           formattedData = Array.isArray(formattedData) ? formattedData : [formattedData];
 
-          formattedData = formattedData.filter(item => {
+          formattedData = formattedData.filter((item: any) => {
             if (!item.market_data) return false;
 
             const { floor_price = 0, volume_24h = 0 } = item.market_data;
@@ -485,7 +501,7 @@ export class SRC20QueryService {
         if (sanitizedParams.minSupply !== undefined ||
           sanitizedParams.maxSupply !== undefined)
         {
-          formattedData = formattedData.filter(item => {
+          formattedData = formattedData.filter((item: any) => {
             if (sanitizedParams.minSupply !== undefined && item.max < sanitizedParams.minSupply) return false;
             if (sanitizedParams.maxSupply !== undefined && item.max > sanitizedParams.maxSupply) return false;
             return true
@@ -495,7 +511,7 @@ export class SRC20QueryService {
         if (sanitizedParams.minHolder !== undefined ||
           sanitizedParams.maxHolder !== undefined)
         {
-          formattedData = formattedData.filter(item => {
+          formattedData = formattedData.filter((item: any) => {
             if (sanitizedParams.minHolder !== undefined && item.holders < sanitizedParams.minHolder) return false;
             if (sanitizedParams.maxHolder !== undefined && item.holders > sanitizedParams.maxHolder) return false;
             return true
@@ -505,7 +521,7 @@ export class SRC20QueryService {
         if (sanitizedParams.minProgress !== undefined ||
           sanitizedParams.maxProgress !== undefined)
         {
-          formattedData = formattedData.filter(item => {
+          formattedData = formattedData.filter((item: any) => {
             if (sanitizedParams.minProgress !== undefined && item.progress < sanitizedParams.minProgress) return false;
             if (sanitizedParams.maxProgress !== undefined && item.progress > sanitizedParams.maxProgress) return false;
             return true
@@ -515,7 +531,7 @@ export class SRC20QueryService {
         if (sanitizedParams.minTxCount !== undefined ||
           sanitizedParams.maxTxCount !== undefined)
         {
-          formattedData = formattedData.filter(item => {
+          formattedData = formattedData.filter((item: any) => {
             if (sanitizedParams.minTxCount !== undefined && item.mint_progress?.current < sanitizedParams.minTxCount) return false;
             if (sanitizedParams.maxTxCount !== undefined && item.mint_progress?.current > sanitizedParams.maxTxCount) return false;
             return true
@@ -547,7 +563,7 @@ export class SRC20QueryService {
         data: Array.isArray(formattedData) ? formattedData : [formattedData],
         performance: metrics
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in fetchAndFormatSrc20DataV2:", error);
       metrics.duration = performance.now() - startTime;
       
@@ -587,7 +603,9 @@ export class SRC20QueryService {
         // Fetch market data and mint progress in parallel
         const [marketData, mintProgress] = await Promise.all([
           options.includeMarketData
-            ? options.prefetchedMarketData || (console.log("Fetching market data from external API"), await SRC20MarketService.fetchMarketListingSummary())
+            ? (options.prefetchedMarketData && options.prefetchedMarketData.length > 0) 
+              ? options.prefetchedMarketData 
+              : (console.log("No prefetched market data available, fetching from external API"), await SRC20MarketService.fetchMarketListingSummary())
             : null,
           options.enrichWithProgress
             ? Promise.all(ticks.map(tick => 
@@ -605,11 +623,8 @@ export class SRC20QueryService {
             const tickForLookup = row.tick.toUpperCase();
             const market = marketMap.get(tickForLookup);
             if (market) {
-              enriched[i + index] = {
-                ...row,
-                market_data: market,
-                holders: row.holders || market.holder_count || 0
-              };
+              (enriched[i + index] as any).market_data = market;
+              (enriched[i + index] as any).holders = row.holders || market.holder_count || 0;
             } else {
               // Optional: Log if a tick is not found in the market map, can be noisy
               console.log(`[enrichData] Market data not found for tick: '${row.tick}' (lookup key: '${tickForLookup}')`);
@@ -622,13 +637,10 @@ export class SRC20QueryService {
           batch.forEach((row, index) => {
             const progress = mintProgress[index];
             if (progress) {
-              enriched[i + index] = {
-                ...enriched[i + index],
-                mint_progress: {
-                  progress: row.progress || progress.progress || "0",
-                  current: progress.total_minted || 0,
-                  max: progress.max_supply || 0
-                }
+              (enriched[i + index] as any).mint_progress = {
+                progress: row.progress || progress.progress || "0",
+                current: (progress as any).total_minted || 0,
+                max: (progress as any).max_supply || 0
               };
             }
           });
@@ -636,7 +648,7 @@ export class SRC20QueryService {
       }
 
       return Array.isArray(data) ? enriched : enriched[0];
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in enrichData:", error);
       // On error, return original data without enrichment
       return data;

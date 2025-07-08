@@ -51,6 +51,10 @@ export interface InputData {
   email?: string;
   tg?: string;
   description?: string;
+  desc?: string;
+  img?: string;
+  icon?: string;
+  isEstimate?: boolean;
 }
 
 export interface SignPSBTResult {

@@ -1,0 +1,87 @@
+{
+  "id": "btc-stamps-explorer-comprehensive-env",
+  "name": "BTC Stamps Explorer Comprehensive Testing Environment",
+  "values": [
+    {
+      "key": "dev_base_url",
+      "value": "http://host.docker.internal:8000",
+      "description": "Development server URL (Docker internal)",
+      "enabled": true
+    },
+    {
+      "key": "prod_base_url", 
+      "value": "https://stampchain.io",
+      "description": "Production server URL",
+      "enabled": true
+    },
+    {
+      "key": "base_url",
+      "value": "http://host.docker.internal:8000",
+      "description": "Current base URL (defaults to dev)",
+      "enabled": true
+    },
+    {
+      "key": "baseUrl",
+      "value": "http://host.docker.internal:8000",
+      "description": "Current base URL (defaults to dev) - camelCase alias",
+      "enabled": true
+    },
+    {
+      "key": "api_key",
+      "value": "",
+      "description": "API key for authenticated endpoints",
+      "enabled": true
+    },
+    {
+      "key": "test_timeout",
+      "value": "30000",
+      "description": "Request timeout in milliseconds",
+      "enabled": true
+    },
+    {
+      "key": "enable_performance_monitoring",
+      "value": "true",
+      "description": "Enable performance threshold monitoring",
+      "enabled": true
+    },
+    {
+      "key": "performance_threshold_warning",
+      "value": "10",
+      "description": "Performance warning threshold percentage",
+      "enabled": true
+    },
+    {
+      "key": "performance_threshold_critical",
+      "value": "25",
+      "description": "Performance critical threshold percentage",
+      "enabled": true
+    },
+    {
+      "key": "test_data_source",
+      "value": "fixtures",
+      "description": "Data source: fixtures, live, or hybrid",
+      "enabled": true
+    },
+    {
+      "key": "enable_regression_detection",
+      "value": "true",
+      "description": "Enable automatic regression detection",
+      "enabled": true
+    },
+    {
+      "key": "allowed_field_additions",
+      "value": "marketData,dispenserInfo,cacheStatus",
+      "description": "Comma-separated list of allowed new fields",
+      "enabled": true
+    },
+    {
+      "key": "test_environment",
+      "value": "docker",
+      "description": "Test environment: local, docker, ci",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2025-07-02T18:00:00.000Z",
+  "_postman_exported_using": "Postman/11.0.0"
+}

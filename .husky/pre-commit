@@ -1,3 +1,65 @@
+# Security check: Detect exposed secrets and local paths
+echo "🔒 Checking for secrets and local paths..."
+
+# Flag to track if we found any issues
+FOUND_ISSUES=0
+
+# Check staged files for potential secrets and local paths
+for file in $(git diff --cached --name-only); do
+    if [ -f "$file" ]; then
+        # Check for common secret patterns
+        if git diff --cached "$file" | grep -E "(API_KEY|SECRET|PASSWORD|TOKEN|PRIVATE)" | grep -v "^[[:space:]]*#" | grep -q "="; then
+            echo "❌ Potential secret found in $file"
+            echo "   Please review and ensure no actual secrets are committed"
+            FOUND_ISSUES=1
+        fi
+        
+        # CRITICAL: Check for absolute local paths - COMPREHENSIVE CHECK
+        # Look for any absolute paths that expose local directory structure
+        if git diff --cached "$file" | grep -E "^[+].*(/Users/[^/]+|/home/[^/]+|C:\\\\[^\\\\]+|/tmp/|/var/tmp/)" | grep -q .; then
+            echo "❌ Local file path detected in $file"
+            echo "   Found absolute path that exposes local directory structure:"
+            git diff --cached "$file" | grep -E "^[+].*(/Users/[^/]+|/home/[^/]+|C:\\\\[^\\\\]+|/tmp/|/var/tmp/)" | head -3
+            echo "   Please remove absolute paths outside the repository"
+            FOUND_ISSUES=1
+        fi
+        
+        # Additional check for personal directory patterns
+        if git diff --cached "$file" | grep -E "^[+].*(username|Documents/|Desktop/|Downloads/)" | grep -q .; then
+            echo "❌ Personal directory path detected in $file"
+            echo "   Found personal path reference:"
+            git diff --cached "$file" | grep -E "^[+].*(username|Documents/|Desktop/|Downloads/)" | head -3
+            echo "   Please remove personal directory references"
+            FOUND_ISSUES=1
+        fi
+        
+        # Check for file:// URLs with local paths
+        if git diff --cached "$file" | grep -E "^[+].*file:///Users/|file:///home/|file:///C:" | grep -q .; then
+            echo "❌ Local file:// URL detected in $file"
+            echo "   Found file URL with local path:"
+            git diff --cached "$file" | grep -E "^[+].*file:///Users/|file:///home/|file:///C:" | head -3
+            echo "   Please remove file URLs with local paths"
+            FOUND_ISSUES=1
+        fi
+        
+        # Check for common sensitive file patterns
+        if git diff --cached "$file" | grep -E "(\.env\.local|\.log|settings\.local|config\.local)" | grep -q .; then
+            echo "⚠️  Potential local config file reference in $file"
+            echo "   Please verify this should be committed"
+        fi
+    fi
+done
+
+if [ $FOUND_ISSUES -eq 1 ]; then
+    echo "❌ Security check failed - commit aborted"
+    echo "🔧 To fix: Remove all absolute paths and personal directory references from staged files"
+    echo "🚨 CRITICAL: Local paths expose sensitive directory structure and must not be committed!"
+    exit 1
+fi
+
+echo "✅ Security checks passed"
+
+# Format and lint checks
 deno task check:fmt
 if [ $? -ne 0 ]; then
   echo "Formatting failed. Please run 'deno fmt .' to fix."
@@ -10,5 +72,81 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Additional linting for staged server files (gradual approach)
+echo "🔍 Checking lint for staged server files..."
+STAGED_SERVER_FILES=$(git diff --cached --name-only | grep -E '^server/.*\.(ts|tsx)$' | tr '\n' ' ')
+
+if [ -n "$STAGED_SERVER_FILES" ]; then
+    echo "📝 Staged server files: $STAGED_SERVER_FILES"
+    
+    # Run lint on each server file with relaxed rules
+    LINT_FAILED=0
+    for file in $STAGED_SERVER_FILES; do
+        if [ -f "$file" ]; then
+            LINT_OUTPUT=$(deno lint --quiet --rules-tags=recommended --rules-exclude=no-explicit-any,ban-untagged-todo "$file" 2>&1)
+            if [ $? -ne 0 ]; then
+                echo "⚠️  Lint errors in $file:"
+                echo "$LINT_OUTPUT" | head -10
+                LINT_FAILED=1
+            fi
+        fi
+    done
+    
+    if [ $LINT_FAILED -eq 1 ]; then
+        echo ""
+        echo "❌ Server file linting failed. Please fix critical lint errors."
+        echo "💡 Tip: Common issues to fix:"
+        echo "   - Unused variables (prefix with _ if intentional)"
+        echo "   - Missing error handling"
+        echo "   - Use const instead of let where possible"
+        exit 1
+    else
+        echo "✅ Server files lint check passed"
+    fi
+fi
+
+# TypeScript type checking for staged files only
+echo "🔍 Checking TypeScript types for staged files..."
+
+# Get staged TypeScript files
+STAGED_TS_FILES=$(git diff --cached --name-only | grep -E '\.(ts|tsx)$' | grep -v -E '(test|spec)\.(ts|tsx)$' | tr '\n' ' ')
+
+if [ -n "$STAGED_TS_FILES" ]; then
+    echo "📝 Staged TypeScript files: $STAGED_TS_FILES"
+    
+    # Check types for staged files only (allow some errors for gradual improvement)
+    echo "   Running incremental type check..."
+    
+    # Create a temporary file to capture type errors
+    TYPE_ERRORS=$(deno check $STAGED_TS_FILES 2>&1 || true)
+    
+    if echo "$TYPE_ERRORS" | grep -q "error:"; then
+        ERROR_COUNT=$(echo "$TYPE_ERRORS" | grep -c "error:" || echo "0")
+        echo "⚠️  Found $ERROR_COUNT TypeScript errors in staged files:"
+        echo "$TYPE_ERRORS" | head -20  # Show first 20 errors
+        
+        # Allow commit but warn about errors (gradual improvement approach)
+        echo ""
+        echo "📋 Type errors found but commit allowed (gradual improvement mode)"
+        echo "💡 Consider fixing these errors when convenient:"
+        echo "   - Run 'deno task analyze:types' to see all project errors"
+        echo "   - Focus on MISSING_TYPE and IMPLICIT_ANY errors first"
+        echo "   - Use 'deno check <file>' to check individual files"
+        echo ""
+        
+        # Optionally fail on critical errors (uncomment to be stricter)
+        # if [ $ERROR_COUNT -gt 10 ]; then
+        #     echo "❌ Too many type errors ($ERROR_COUNT) - commit blocked"
+        #     echo "   Please fix critical errors before committing"
+        #     exit 1
+        # fi
+    else
+        echo "✅ No TypeScript errors in staged files"
+    fi
+else
+    echo "📝 No TypeScript files staged for commit"
+fi
+
 # All good!
+echo "🎉 Pre-commit checks completed successfully"
 exit 0

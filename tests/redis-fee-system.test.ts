@@ -291,7 +291,7 @@ Deno.test("Redis Fee System Tests", async (t) => {
     assertEquals(results.length, 5);
 
     // All should have valid data
-    results.forEach((result, index) => {
+    results.forEach((result: any, index: any) => {
       assertExists(
         result.recommendedFee,
         `Result ${index} missing recommendedFee`,
@@ -301,7 +301,7 @@ Deno.test("Redis Fee System Tests", async (t) => {
 
     // All should return the same data (from cache)
     const firstResult = results[0];
-    results.forEach((result, index) => {
+    results.forEach((result: any, index: any) => {
       assertEquals(
         result.recommendedFee,
         firstResult.recommendedFee,

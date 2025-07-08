@@ -1,11 +1,6 @@
 /* ===== UPLOAD PAGE ===== */
 /* @baba+@reinamora - what is this page used for, should it be improved? */
-import { useEffect as _useEffect, useState as _useState } from "preact/hooks";
 import { paginate } from "$lib/utils/paginationUtils.ts";
-import {
-  initialWallet as _initialWallet,
-  walletContext,
-} from "$client/wallet/wallet.ts";
 
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
@@ -19,7 +14,6 @@ export const handler: Handlers = {
   async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
-      const { wallet: _wallet, isConnected: _isConnected } = walletContext;
       const limit = Number(url.searchParams.get("limit")) || 1000;
       const page = Number(url.searchParams.get("page")) || 1;
 

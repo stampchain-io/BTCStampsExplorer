@@ -5,7 +5,6 @@ import { SRC20Row } from "$globals";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { Timeframe } from "$components/layout/types.ts";
 import { cellAlign } from "$components/layout/types.ts";
-import { _Icon } from "$icon";
 
 /* ===== HELPER FUNCTIONS ===== */
 function splitTextAndEmojis(text: string): { text: string; emoji: string } {

@@ -1,5 +1,5 @@
 /* ===== HOME PAGE ROUTE ===== */
-import { StampRow } from "$globals";
+import { SRC20Row, StampRow } from "$globals";
 import type { Collection } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";

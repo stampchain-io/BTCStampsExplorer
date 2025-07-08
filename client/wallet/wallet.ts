@@ -76,9 +76,9 @@ export const walletSignal = signal<Wallet>(initialWalletState);
 export const isConnectedSignal = signal<boolean>(initialConnected);
 export const showConnectWalletModal = signal<boolean>(false);
 
-export const updateWallet = (_wallet: Wallet) => {
-  walletSignal.value = _wallet;
-  localStorage.setItem("wallet", JSON.stringify(_wallet));
+export const updateWallet = (wallet: Wallet) => {
+  walletSignal.value = wallet;
+  localStorage.setItem("wallet", JSON.stringify(wallet));
   isConnectedSignal.value = true;
 };
 

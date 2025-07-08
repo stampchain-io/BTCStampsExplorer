@@ -107,10 +107,9 @@ if (import.meta.main) {
       console.log(`[MAIN] dbManager.initialize() completed at ${Date.now()}`);
 
       // Start background fee cache warming service
-      const baseUrl = Deno.env.get("DEV_BASE_URL") || "https://stampchain.io";
-      BackgroundFeeService.start(baseUrl);
+      BackgroundFeeService.start();
       console.log(
-        `[MAIN] Background fee service started with baseUrl: ${baseUrl}`,
+        `[MAIN] Background fee service started`,
       );
     } catch (e) {
       if (e instanceof Error) {

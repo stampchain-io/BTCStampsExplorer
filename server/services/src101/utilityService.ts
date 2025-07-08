@@ -1,15 +1,15 @@
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+// import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts"; // Unused import - removed
 import { TXError } from "$globals";
-import { crypto } from "@std/crypto";
+// import { crypto } from "@std/crypto"; // Unused import - removed
 import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
 import { SRC101QueryService } from "./queryService.ts";
-import { BigFloat } from "bigfloat/mod.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { SRC101InputData } from "$server/types/index.d.ts";
+// import { BigFloat } from "bigfloat/mod.ts"; // Unused import - removed
+// import { ResponseUtil } from "$lib/utils/responseUtil.ts"; // Unused import - removed
+import { SRC101InputData } from "$types/index.d.ts"; // Fixed import path
 
 export class SRC101UtilityService {
-  static async getDepoyDetails(deploy_hash: string) {
-    const info = await SRC101QueryService.getDepoyDetails(deploy_hash);
+  static async getDeployDetails(deploy_hash: string) {
+    const info = await SRC101QueryService.getDeployDetails(deploy_hash);
     console.log(`checkDeployed.info: ${JSON.stringify(info)}`);
     if (!info) {
       throw new Error("Error: deploy_hash not found");
@@ -25,11 +25,13 @@ export class SRC101UtilityService {
     return prices;
   }
 
-  static async getSrc101Owner(deploy_hash: string, tokenid: string) {
+  static async getSrc101Owner(deploy_hash: string, tokenid: string | string[]) {
+    // If tokenid is an array, use the first element
+    const tokenIdString = Array.isArray(tokenid) ? tokenid[0] : tokenid;
+    
     const queryParams = {
       deploy_hash,
-      tokenid,
-      index : null,
+      tokenid: tokenIdString,
       limit: 1000,
       page: 1,
       sort: "ASC",
@@ -48,160 +50,170 @@ export class SRC101UtilityService {
     // Common validations for all operations
     console.log("body", body)
     if (body.toAddress && !isValidBitcoinAddress(body.toAddress)) {
-      return ResponseUtil.badRequest("Invalid or missing toAddress", 400);
+      return { error: "Invalid or missing toAddress" };
     }
 
     if (body.recAddress && !isValidBitcoinAddress(body.recAddress)) {
-      return ResponseUtil.badRequest("Invalid or missing recAddress", 400);
+      return { error: "Invalid or missing recAddress" };
     }
 
     // if (body.fromAddress && !isValidBitcoinAddress(body.fromAddress)) {
-    //   return ResponseUtil.badRequest("Invalid or missing fromAddress", 400);
+    //   return { error: "Invalid or missing fromAddress" };
     // }
 
     if (!body.changeAddress || !isValidBitcoinAddress(body.changeAddress)) {
-      return ResponseUtil.badRequest("Invalid or missing changeAddress", 400);
+      return { error: "Invalid or missing changeAddress" };
     }
     if (!body.sourceAddress || !isValidBitcoinAddress(body.sourceAddress)) {
-      return ResponseUtil.badRequest("Invalid or missing sourceAddress", 400);
+      return { error: "Invalid or missing sourceAddress" };
     }
 
     if (!body.feeRate || isNaN(Number(body.feeRate))) {
-      return ResponseUtil.badRequest("Invalid or missing feeRate", 400);
+      return { error: "Invalid or missing feeRate" };
     }
 
     // Operation-specific validations
     switch (operation) {
-      case "deploy":
-        const deployResult = await this.validateDeploy(body);
+      case "deploy": {
+        const deployResult = this.validateDeploy(body);
         if (deployResult) return deployResult;
         break;
+      }
 
-      case "mint":
+      case "mint": {
         const mintResult = await this.validateMint(body);
         if (mintResult) return mintResult;
         break;
+      }
 
-      case "transfer":
+      case "transfer": {
         const transferResult = await this.validateTransfer(body);
         if (transferResult) return transferResult;
         break;
+      }
 
-      case "setrecord":
+      case "setrecord": {
         const setrecordResult = await this.validateSetRecord(body);
         if (setrecordResult) return setrecordResult;
         break;
+      }
 
-      case "renew":
+      case "renew": {
         const renewResult = await this.validateRenew(body);
         if (renewResult) return renewResult;
         break;
+      }
 
       default:
-        return ResponseUtil.badRequest("Invalid operation", 400);
+        return { error: "Invalid operation" };
     }
   }
 
-  private static async validateDeploy(body: SRC101InputData): Promise<void | TXError> {
+  private static validateDeploy(body: SRC101InputData): void | TXError {
     // Validate deploy-specific parameters
 
     if(!body.root || typeof body.root !== 'string') {
-      return ResponseUtil.badRequest("root must be a string", 400);
+      return { error: "root must be a string" };
     }
 
     if(!body.name || typeof body.name !== 'string') {
-      return ResponseUtil.badRequest("name must be a string", 400);
+      return { error: "name must be a string" };
     }
 
     if(!body.tick || typeof body.tick !== 'string') {
-      return ResponseUtil.badRequest("tick must be a string", 400);
+      return { error: "tick must be a string" };
     }
 
     if(!body.desc || typeof body.desc !== 'string') {
-      return ResponseUtil.badRequest("desc must be a string", 400);
+      return { error: "desc must be a string" };
     }
 
     if(!body.wla || typeof body.wla !== 'string') {
-      return ResponseUtil.badRequest("wla must be a string", 400);
+      return { error: "wla must be a string" };
     }
 
     if (!Array.isArray(body.rec) || !body.rec.every(item => typeof item === 'string')){
-      return ResponseUtil.badRequest("rec must be a array and the address in the rec must be valid address", 400);
+      return { error: "rec must be a array and the address in the rec must be valid address" };
     }
 
     if (!SRC101UtilityService.validataDeploy_pri(body.pri)){
-      return ResponseUtil.badRequest("pri must be a json like {0:45000,1:-1,2:-1,3:900000,4:225000}", 400);
+      return { error: "pri must be a json like {0:45000,1:-1,2:-1,3:900000,4:225000}" };
     }
 
     if (!body.lim || isNaN(Number(body.lim))) {
-      return ResponseUtil.badRequest("lim must be a number", 400);
+      return { error: "lim must be a number" };
     }
     if (!body.mintstart || isNaN(Number(body.mintstart))) {
-      return ResponseUtil.badRequest("mintstart must be a number", 400);
+      return { error: "mintstart must be a number" };
     }
     if (!body.mintend || isNaN(Number(body.mintend))) {
-      return ResponseUtil.badRequest("mintend must be a number", 400);
+      return { error: "mintend must be a number" };
     }
     if (!body.idua || isNaN(Number(body.idua))) {
-      return ResponseUtil.badRequest("idua need and must be a number", 400);
+      return { error: "idua need and must be a number" };
     }
 
     if (!body.owner || !isValidBitcoinAddress(body.owner)) {
-      return ResponseUtil.badRequest("Invalid owner", 400);
+      return { error: "Invalid owner" };
     }
 
     if (!body.imglp || !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(body.imglp)) {
-      return ResponseUtil.badRequest("Invalid website URL", 400);
+      return { error: "Invalid website URL" };
     }
 
   }
 
   private static async validateMint(body: SRC101InputData): Promise<void | TXError> {
     if (!body.toaddress || !isValidBitcoinAddress(body.toaddress)) {
-      return ResponseUtil.badRequest("Invalid or missing toaddress", 400);
+      return { error: "Invalid or missing toaddress" };
     }
 
     if (!body.hash || !SRC101UtilityService.checkValidTxHash(body.hash)){
-      return ResponseUtil.badRequest("Invalid deployHash", 400);
+      return { error: "Invalid deployHash" };
     }
 
     //check tokenid
     if (!Array.isArray(body.tokenid)) {
-      return ResponseUtil.badRequest("tokenid must be an array", 400);
+      return { error: "tokenid must be an array" };
     }
     for (const item of body.tokenid) {
       if (typeof item !== "string") {
-        return ResponseUtil.badRequest("Each item in tokenid array must be a string", 400);
+        return { error: "Each item in tokenid array must be a string" };
       }
 
       if (!SRC101UtilityService.checkValidBase64String(item)) {
-        return ResponseUtil.badRequest(`Invalid Base64 string: ${item}`, 400);
+        return { error: `Invalid Base64 string: ${item}` };
       }
       const item_utf8 = SRC101UtilityService.base64ToUtf8(item);
       if ( !item_utf8 || SRC101UtilityService.checkContainsSpecial(item_utf8.replace('.btc',''))) {
-        return ResponseUtil.badRequest(`Contains special characters: ${item}`, 400);
+        return { error: `Contains special characters: ${item}` };
       }
 
       if (body.dua && isNaN(Number(body.dua))) {
-        return ResponseUtil.badRequest("dua must be a number", 400);
+        return { error: "dua must be a number" };
       }
 
       if (body.coef && isNaN(Number(body.coef))) {
-        return ResponseUtil.badRequest("coef must be a number, default 1000", 400);
+        return { error: "coef must be a number, default 1000" };
       }
     }
 
     const timestampInSeconds = Math.floor(Date.now() / 1000);
-    const info = await SRC101UtilityService.getDepoyDetails(body.hash);
+    const info = await SRC101UtilityService.getDeployDetails(body.hash);
     if (timestampInSeconds < info.mintstart || timestampInSeconds > info.mintend) {
-      return ResponseUtil.badRequest("Out of time", 400);
+      return { error: "Out of time" };
     }
   }
 
   private static async validateTransfer(body: SRC101InputData): Promise<void | TXError> {
     if (!body.toaddress || !isValidBitcoinAddress(body.toaddress)) {
-      return ResponseUtil.badRequest("Invalid or missing toaddress", 400);
+      return { error: "Invalid or missing toaddress" };
     }
+    
+    if (!body.hash || !body.tokenid) {
+      return { error: "Missing required fields: hash or tokenid" };
+    }
+    
     const info = await SRC101UtilityService.getSrc101Owner(
       body.hash,
       body.tokenid
@@ -209,46 +221,57 @@ export class SRC101UtilityService {
     console.log("validateTransfer", info)
     const timestampInSeconds = Math.floor(Date.now() / 1000);
     if (info.length == 0 || info[0].owner != body.sourceAddress) {
-      return ResponseUtil.badRequest("Invalid owner", 400);
+      return { error: "Invalid owner" };
     }
 
-    if (timestampInSeconds > info.expire_timestamp) {
-      return ResponseUtil.badRequest("Out of time", 400);
+    if (timestampInSeconds > info[0].expire_timestamp) {
+      return { error: "Out of time" };
     }
   }
 
   private static async validateSetRecord(body: SRC101InputData): Promise<void | TXError> {
+    if (!body.hash || !body.tokenid) {
+      return { error: "Missing required fields: hash or tokenid" };
+    }
+    
     const info = await SRC101UtilityService.getSrc101Owner(
       body.hash,
       body.tokenid
     );
     const timestampInSeconds = Math.floor(Date.now() / 1000);
     if (info.length == 0 || info[0].owner != body.sourceAddress) {
-      return ResponseUtil.badRequest("Invalid owner", 400);
+      return { error: "Invalid owner" };
     }
-    if (timestampInSeconds > info.expire_timestamp) {
-      return ResponseUtil.badRequest("Out of time", 400);
+    if (timestampInSeconds > info[0].expire_timestamp) {
+      return { error: "Out of time" };
     }
-    if(body.type != "address" && body.type != "txt"){
-      return ResponseUtil.badRequest("Unknow type", 400);
+    
+    // Check if type property exists in the interface or if it's part of extended data
+    const bodyWithType = body as SRC101InputData & { type?: string };
+    if(bodyWithType.type != "address" && bodyWithType.type != "txt"){
+      return { error: "Unknow type" };
     }
   }
 
   private static async validateRenew(body: SRC101InputData): Promise<void | TXError> {
+    if (!body.hash || !body.tokenid) {
+      return { error: "Missing required fields: hash or tokenid" };
+    }
+    
     const info = await SRC101UtilityService.getSrc101Owner(
       body.hash,
       body.tokenid
     );
     const timestampInSeconds = Math.floor(Date.now() / 1000);
     if (info.length == 0 || info[0].owner != body.sourceAddress) {
-      return ResponseUtil.badRequest("Invalid owner", 400);
+      return { error: "Invalid owner" };
     }
-    if (timestampInSeconds > info.expire_timestamp) {
-      return ResponseUtil.badRequest("Out of time", 400);
+    if (timestampInSeconds > info[0].expire_timestamp) {
+      return { error: "Out of time" };
     }
 
     if (!body.dua || isNaN(Number(body.dua))) {
-      return ResponseUtil.badRequest("dua must be a number", 400);
+      return { error: "dua must be a number" };
     }
   }
 
@@ -282,7 +305,7 @@ export class SRC101UtilityService {
       }
 
       return valid;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -303,7 +326,7 @@ export class SRC101UtilityService {
     }
   }
 
-  static base64ToUtf8(base64String: string): any {
+  static base64ToUtf8(base64String: string): string | null {
     try {
       const binaryString = atob(base64String);
       const byteArray = new Uint8Array(binaryString.length);
@@ -320,7 +343,7 @@ export class SRC101UtilityService {
   }
 
   static checkContainsSpecial(text: string): boolean {
-    const specialCharactersPattern = /[`~!@#$%\^\-\+&\*\(\)_\=＝\=|{}":;',\\\[\].·<>\/\?~！@#￥……&*（）——|{}【】《》'；：“”‘。，、？\s]/;
+    const specialCharactersPattern = /[`~!@#$%\^\-\+&\*\(\)_\=＝\=|{}":;',\\\[\].·<>\/\?~！@#￥……&*（）——|{}【】《》'；："":','\\\[\].·<>\/\?~！@#￥……&*（）——|{}【】《》'；：""'。，、？\s]/;
     const specialCategories = ["Zs", "Cf"];  // Space separator (Zs) and format (Cf)
 
     // Check if there's any special character

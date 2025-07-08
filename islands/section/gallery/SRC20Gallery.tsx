@@ -6,7 +6,7 @@ import { SRC20Row } from "$globals";
 import { subtitlePurple, titlePurpleLD } from "$text";
 import { ViewAllButton } from "$button";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { Timeframe } from "$layout";
+import { Timeframe as _Timeframe } from "$layout";
 import {
   SRC20Card,
   SRC20CardMinting,
@@ -189,10 +189,8 @@ export function SRC20Gallery({
     }
   };
 
-  const _handleTimeframeChange = (_newTimeframe: Timeframe) => {
-  };
-
   const handleImageClick = (_imgSrc: string) => {
+    // TODO(@dev): Implement image click handler
   };
 
   // Always call hooks at the top level

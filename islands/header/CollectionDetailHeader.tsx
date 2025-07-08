@@ -101,7 +101,7 @@ export const CollectionDetailHeader = (
             {collection.marketData?.minFloorPriceBTC !== null &&
                 collection.total_editions
               ? formatMarketCap(
-                collection.marketData.minFloorPriceBTC *
+                collection.marketData!.minFloorPriceBTC *
                   collection.total_editions,
               )
               : "N/A"} <span className="font-light">BTC</span>

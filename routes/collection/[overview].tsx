@@ -20,7 +20,6 @@ interface CollectionOverviewPageProps {
   collections?: CollectionRow[];
   page: number;
   pages: number;
-  _page_size: number;
   sortBy: string;
   filterBy: string[];
   partial?: boolean;
@@ -152,7 +151,6 @@ export default function CollectionOverviewPage(
     collections,
     page,
     pages,
-    _page_size,
   } = data;
 
   /* ===== HELPERS ===== */

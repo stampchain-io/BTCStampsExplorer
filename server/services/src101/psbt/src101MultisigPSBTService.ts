@@ -40,10 +40,11 @@ import { crypto } from "@std/crypto";
 import { TransactionService } from "$server/services/transaction/index.ts";
 import { arc4 } from "$lib/utils/minting/transactionUtils.ts";
 import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { SRC101Service } from "$server/services/src101/index.ts";
+// import { SRC101Service } from "$server/services/src101/index.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { IPrepareSRC101TX, PSBTInput, VOUT } from "$types/index.d.ts";
-import * as msgpack from "msgpack";
+import { PSBTInput, VOUT } from "$types/index.d.ts";
+import { IPrepareSRC101TX } from "$server/types/services/src101.d.ts";
+// import * as msgpack from "msgpack";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { logger } from "$lib/utils/logger.ts";
@@ -86,7 +87,7 @@ export class SRC101MultisigPSBTService {
       ];
 
       // Select UTXOs first to get txid for encryption
-      const { inputs, change, fee } = await TransactionService.UTXOService.selectUTXOsForTransaction(
+      const { inputs, change: _change, fee } = await TransactionService.UTXOService.selectUTXOsForTransaction(
         sourceAddress,
         vouts,
         feeRate,
@@ -100,13 +101,12 @@ export class SRC101MultisigPSBTService {
       }
 
       // Prepare and encrypt data using first input's txid
-      let transferDataBytes: Uint8Array;
       const stampPrefixBytes = new TextEncoder().encode("stamp:");
 
       const transferData = JSON.parse(transferString);
       console.log("transferData:", transferData)
 
-      transferDataBytes = new TextEncoder().encode(JSON.stringify(transferData));
+      const transferDataBytes = new TextEncoder().encode(JSON.stringify(transferData));
       console.log("transferDataBytes:", bin2hex(transferDataBytes))
 
       // Add stamp prefix and length prefix
@@ -202,11 +202,11 @@ export class SRC101MultisigPSBTService {
       }
 
       // Calculate total input and output values
-      const totalInputValue = inputs.reduce((sum, input) => 
+      const totalInputValue = inputs.reduce((sum: any, input: any) => 
         BigInt(sum) + BigInt(input.value), BigInt(0));
 
       // Calculate total output value before change
-      const outputsBeforeChange = vouts.reduce((sum, vout) => 
+      const outputsBeforeChange = vouts.reduce((sum: any, vout: any) => 
         BigInt(sum) + BigInt(vout.value), BigInt(0));
 
       // Calculate fee
@@ -240,7 +240,7 @@ export class SRC101MultisigPSBTService {
 
       logger.debug("src101-psbt-service", {
         message: "Final transaction details for SRC101 Multisig PSBT",
-        inputs: inputs.map(utxo => ({
+        inputs: inputs.map((utxo: any) => ({
           ...utxo,
           value: BigInt(utxo.value).toString()
         })),
@@ -257,7 +257,7 @@ export class SRC101MultisigPSBTService {
         psbtBase64: psbt.toBase64(),
         fee: fee.toString(),
         change: changeAmount.toString(),
-        inputsToSign: inputs.map((_, index) => ({ index })),
+        inputsToSign: inputs.map((_: any, index: any) => ({ index })),
         estimatedTxSize: estimateTransactionSize({
           inputs,
           outputs: vouts,

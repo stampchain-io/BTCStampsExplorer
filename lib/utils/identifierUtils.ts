@@ -64,6 +64,25 @@ export function getIdentifierType(
   return "invalid";
 }
 
+/**
+ * Validates if a string is a valid SRC20 tick format
+ * SRC20 ticks can be 1-5 characters, alphanumeric, symbols, and Unicode/emoji characters
+ */
+export function isValidSrc20Tick(value: unknown): boolean {
+  if (typeof value !== "string") return false;
+
+  // Check length in terms of Unicode code points (not UTF-16 code units)
+  const length = [...value].length;
+  if (length < 1 || length > 5) {
+    return false;
+  }
+
+  // Allow alphanumeric, common symbols, and any Unicode characters (including emojis)
+  // This regex allows any Unicode character except control characters
+  return /^[\p{L}\p{N}\p{S}\p{P}\p{Sm}\p{Sc}\p{Sk}\p{So}!@#$%^&*()_+\-=\[\]{}|;':",./<>?]+$/u
+    .test(value);
+}
+
 export async function calculateTransactionSize(
   txHash: string,
 ): Promise<number> {

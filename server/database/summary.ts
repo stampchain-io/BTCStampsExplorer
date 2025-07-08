@@ -1,3 +1,5 @@
+import type { StampRow } from "$globals";
+
 export const summarize_issuances = (issuances: StampRow[]) => {
   const summary = {
     ...issuances[0],

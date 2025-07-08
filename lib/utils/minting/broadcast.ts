@@ -2,10 +2,7 @@
 import { Psbt } from "bitcoinjs-lib";
 import { logger } from "$lib/utils/logger.ts";
 
-interface BroadcastResponse {
-  txid?: string;
-  error?: string;
-}
+// Removed unused interface: BroadcastResponse
 
 const BROADCAST_ENDPOINTS = [
   "https://mempool.space/api/tx",
@@ -59,7 +56,11 @@ export async function broadcastTransaction(
         message: "Failed to convert PSBT to raw transaction",
         error,
       });
-      throw new Error(`Failed to convert PSBT: ${error.message}`);
+      throw new Error(
+        `Failed to convert PSBT: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   }
 
@@ -110,7 +111,7 @@ export async function broadcastTransaction(
         message: `Broadcast attempt failed for ${endpoint}`,
         error,
       });
-      lastError = error;
+      lastError = error instanceof Error ? error : new Error(String(error));
       continue;
     }
   }

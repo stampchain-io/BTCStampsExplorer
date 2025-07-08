@@ -2,6 +2,7 @@
 // @bbaba+@reinamora - are the
 // deno-lint-ignore-file
 import { useState } from "preact/hooks";
+import type { JSX } from "preact";
 import { ModalBase } from "$layout";
 import { InputField } from "$form";
 import {
@@ -15,7 +16,6 @@ import { Button } from "$button";
 import { SelectDate } from "$form";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { subtitlePurple } from "$text";
 
 /* ===== TYPES ===== */
 type FilterTypes =
@@ -38,7 +38,7 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
     min: "",
     max: "",
   });
-  const [dateRange, setDateRange] = useState<Date[] | null>([
+  const [dateRange, setDateRange] = useState<(Date | null)[]>([
     null,
     null,
   ]);
@@ -50,37 +50,38 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
 
   /* ===== EVENT HANDLERS ===== */
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: JSX.TargetedEvent<HTMLInputElement>,
     type: string,
   ) => {
+    const target = e.target as HTMLInputElement;
     if (type === "progress_min") {
-      setProgress({ ...progress, min: e.target.value });
+      setProgress({ ...progress, min: target.value });
     } else if (type === "progress_max") {
-      setProgress({ ...progress, max: e.target.value });
+      setProgress({ ...progress, max: target.value });
     } else if (type === "min_tx") {
-      setTransactionCount({ ...transactionCount, min: e.target.value });
+      setTransactionCount({ ...transactionCount, min: target.value });
     } else if (type === "max_tx") {
-      setTransactionCount({ ...transactionCount, max: e.target.value });
+      setTransactionCount({ ...transactionCount, max: target.value });
     } else if (type === "supply_min") {
-      setSupply({ ...supply, min: e.target.value });
+      setSupply({ ...supply, min: target.value });
     } else if (type === "supply_max") {
-      setSupply({ ...supply, max: e.target.value });
+      setSupply({ ...supply, max: target.value });
     } else if (type === "marketcap_min") {
-      setMarketcap({ ...marketcap, min: e.target.value });
+      setMarketcap({ ...marketcap, min: target.value });
     } else if (type === "marketcap_max") {
-      setMarketcap({ ...marketcap, max: e.target.value });
+      setMarketcap({ ...marketcap, max: target.value });
     } else if (type === "holder_min") {
-      setHolder({ ...holder, min: e.target.value });
+      setHolder({ ...holder, min: target.value });
     } else if (type === "holder_max") {
-      setHolder({ ...holder, max: e.target.value });
+      setHolder({ ...holder, max: target.value });
     } else if (type === "volume_max") {
-      setVolume({ ...volume, max: e.target.value });
+      setVolume({ ...volume, max: target.value });
     } else if (type === "volume_min") {
-      setVolume({ ...volume, min: e.target.value });
+      setVolume({ ...volume, min: target.value });
     } else if (type === "price_max") {
-      setPrice({ ...price, max: e.target.value });
+      setPrice({ ...price, max: target.value });
     } else if (type === "price_min") {
-      setPrice({ ...price, min: e.target.value });
+      setPrice({ ...price, min: target.value });
     }
   };
 
@@ -118,10 +119,12 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
           "dateFrom",
           new Date(dateRange[0]).toISOString(),
         );
-        url.searchParams.set(
-          "dateTo",
-          new Date(dateRange[1]).toISOString(),
-        );
+        if (dateRange[1]) {
+          url.searchParams.set(
+            "dateTo",
+            new Date(dateRange[1]).toISOString(),
+          );
+        }
         break;
       case "supply":
         url.searchParams.set(
@@ -166,10 +169,12 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
         );
         break;
       case "price change":
-        url.searchParams.set(
-          "trendingDate",
-          new Date(priceDate).toISOString(),
-        );
+        if (dateRange[0]) {
+          url.searchParams.set(
+            "trendingDate",
+            new Date(dateRange[0]).toISOString(),
+          );
+        }
         url.searchParams.set(
           "priceMin",
           price.min,
@@ -183,9 +188,11 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
 
   /* ===== FILTER CONTENT RENDERING ===== */
   const renderContent = () => {
-    switch (filterOptions[filterOptions.length - 1]) {
+    const filterType = filterOptions[filterOptions.length - 1];
+
+    switch (filterType) {
       case "minting":
-        setTitle("PROGRESS");
+        if (title !== "PROGRESS") setTitle("PROGRESS");
         return (
           <>
             <InputField
@@ -203,9 +210,8 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
             />
           </>
         );
-        break;
       case "trending mints":
-        setTitle("TRENDING");
+        if (title !== "TRENDING") setTitle("TRENDING");
         return (
           <>
             <InputField
@@ -222,17 +228,15 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
             />
           </>
         );
-        break;
       case "deploy":
-        setTitle("DEPLOYED");
+        if (title !== "DEPLOYED") setTitle("DEPLOYED");
         return (
           <>
             <SelectDate setDateRange={setDateRange} isUppercase />
           </>
         );
-        break;
       case "supply":
-        setTitle("SUPPLY");
+        if (title !== "SUPPLY") setTitle("SUPPLY");
         return (
           <>
             <InputField
@@ -250,9 +254,8 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
             />
           </>
         );
-        break;
       case "marketcap":
-        setTitle("MARKETCAP");
+        if (title !== "MARKETCAP") setTitle("MARKETCAP");
         return (
           <>
             <InputField
@@ -270,9 +273,8 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
             />
           </>
         );
-        break;
       case "holders":
-        setTitle("HOLDERS");
+        if (title !== "HOLDERS") setTitle("HOLDERS");
         return (
           <>
             <InputField
@@ -290,9 +292,8 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
             />
           </>
         );
-        break;
       case "volume":
-        setTitle("VOLUME");
+        if (title !== "VOLUME") setTitle("VOLUME");
         return (
           <>
             <InputField
@@ -310,9 +311,8 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
             />
           </>
         );
-        break;
       case "price change":
-        setTitle("PRICE CHANGE");
+        if (title !== "PRICE CHANGE") setTitle("PRICE CHANGE");
         return (
           <>
             <SelectDate setDateRange={setDateRange} isUppercase />
@@ -331,7 +331,8 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
             />
           </>
         );
-        break;
+      default:
+        return null;
     }
   };
 

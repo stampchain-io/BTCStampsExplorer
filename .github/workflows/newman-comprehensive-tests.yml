@@ -1,0 +1,420 @@
+name: Newman Comprehensive API Tests
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'postman-collection-full-regression.json'
+      - 'postman-collection-pagination-validation.json'
+      - 'postman-environment-comprehensive.json'
+      - 'postman-data-pagination-tests.json'
+      - 'scripts/run-newman-comprehensive.sh'
+      - 'scripts/run-newman-pagination-validation.sh'
+      - 'scripts/analyze-newman-regression.js'
+      - 'server/**'
+      - 'routes/**'
+      - 'lib/**'
+      - '.github/workflows/newman-comprehensive-tests.yml'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'postman-collection-full-regression.json'
+      - 'postman-collection-pagination-validation.json'
+      - 'postman-environment-comprehensive.json'
+      - 'postman-data-pagination-tests.json'
+      - 'scripts/run-newman-comprehensive.sh'
+      - 'scripts/run-newman-pagination-validation.sh'
+      - 'scripts/analyze-newman-regression.js'
+      - 'server/**'
+      - 'routes/**'
+      - 'lib/**'
+      - '.github/workflows/newman-comprehensive-tests.yml'
+  workflow_dispatch:
+    inputs:
+      test_folder:
+        description: 'Specific test folder to run (e.g., "Stamps Endpoints")'
+        required: false
+        default: ''
+      iterations:
+        description: 'Number of iterations'
+        required: false
+        default: '1'
+      verbose:
+        description: 'Enable verbose output'
+        required: false
+        default: 'false'
+  schedule:
+    # Run daily at 2 AM UTC to catch regressions early
+    - cron: '0 2 * * *'
+
+jobs:
+  newman-comprehensive:
+    name: Newman Comprehensive API Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      
+    env:
+      CI: true
+      NODE_ENV: test
+      # Mock API keys for testing
+      QUICKNODE_API_KEY: test-quicknode-key
+      ANTHROPIC_API_KEY: test-anthropic-key
+      PERPLEXITY_API_KEY: test-perplexity-key
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-newman-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-newman-
+            ${{ runner.os }}-npm-
+
+      - name: Verify test files exist
+        run: |
+          echo "Verifying test collection and environment files..."
+          if [ ! -f "postman-collection-full-regression.json" ]; then
+            echo "❌ Error: postman-collection-full-regression.json not found"
+            echo "This file contains the comprehensive test collection (92+ tests)"
+            exit 1
+          fi
+          
+          if [ ! -f "postman-environment-comprehensive.json" ]; then
+            echo "❌ Error: postman-environment-comprehensive.json not found"
+            exit 1
+          fi
+          
+          echo "✅ Test files found"
+          echo "Collection size: $(wc -l < postman-collection-full-regression.json) lines"
+
+      - name: Setup Docker Compose
+        run: |
+          echo "Docker version:"
+          docker --version
+          docker-compose --version
+          
+          # Ensure reports directory exists
+          mkdir -p reports/newman-comprehensive
+          chmod -R 755 reports
+
+      - name: Configure test parameters
+        id: test-config
+        run: |
+          # Set test parameters based on workflow inputs or defaults
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "NEWMAN_FOLDER=${{ github.event.inputs.test_folder }}" >> $GITHUB_ENV
+            echo "NEWMAN_ITERATIONS=${{ github.event.inputs.iterations }}" >> $GITHUB_ENV
+            echo "NEWMAN_VERBOSE=${{ github.event.inputs.verbose }}" >> $GITHUB_ENV
+          else
+            echo "NEWMAN_ITERATIONS=1" >> $GITHUB_ENV
+            echo "NEWMAN_VERBOSE=false" >> $GITHUB_ENV
+          fi
+          
+          # Set production URL for CI
+          echo "PROD_BASE_URL=https://stampchain.io" >> $GITHUB_ENV
+          
+          # For PR tests, compare against production only
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "DEV_BASE_URL=https://stampchain.io" >> $GITHUB_ENV
+            echo "TEST_MODE=production-only" >> $GITHUB_ENV
+          else
+            # For main/dev branches, test against localhost (would need running server)
+            echo "DEV_BASE_URL=http://localhost:8000" >> $GITHUB_ENV
+            echo "TEST_MODE=comparison" >> $GITHUB_ENV
+          fi
+
+      - name: Run Newman Comprehensive Tests
+        id: newman-test
+        run: |
+          echo "## Newman Comprehensive Test Run" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Collection: postman-collection-full-regression.json (92+ tests)" >> $GITHUB_STEP_SUMMARY
+          echo "- Coverage: 46/46 endpoints (100%)" >> $GITHUB_STEP_SUMMARY
+          echo "- Mode: ${{ env.TEST_MODE }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Iterations: ${{ env.NEWMAN_ITERATIONS }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -n "${{ env.NEWMAN_FOLDER }}" ]; then
+            echo "- Folder: ${{ env.NEWMAN_FOLDER }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Run the tests
+          docker-compose -f docker-compose.test.yml run --rm newman-comprehensive || TEST_EXIT_CODE=$?
+          
+          # Check for test results
+          if [ -d "reports/newman-comprehensive" ]; then
+            echo "### Test Results" >> $GITHUB_STEP_SUMMARY
+            echo "Reports generated in: reports/newman-comprehensive/" >> $GITHUB_STEP_SUMMARY
+            ls -la reports/newman-comprehensive/ >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          exit ${TEST_EXIT_CODE:-0}
+        continue-on-error: true
+
+      - name: Analyze Regression Results
+        id: regression-analysis
+        if: always()
+        run: |
+          echo "Running regression analysis..."
+          
+          # Install dependencies for analysis script
+          npm install
+          
+          # Run the analysis
+          node scripts/analyze-newman-regression.js || ANALYSIS_EXIT_CODE=$?
+          
+          # Check if analysis report was created
+          if [ -f "reports/newman-comprehensive/*-analysis.json" ]; then
+            echo "✅ Regression analysis completed"
+            
+            # Extract summary for GitHub
+            LATEST_ANALYSIS=$(ls -t reports/newman-comprehensive/*-analysis.json | head -1)
+            if [ -f "$LATEST_ANALYSIS" ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### Regression Analysis Summary" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              
+              # Parse JSON and add to summary
+              node -e "
+                const fs = require('fs');
+                const analysis = JSON.parse(fs.readFileSync('$LATEST_ANALYSIS', 'utf8'));
+                console.log('- Breaking Changes: ' + analysis.summary.breaking);
+                console.log('- Non-Breaking Changes: ' + analysis.summary.nonBreaking);
+                console.log('- Performance Issues: ' + analysis.summary.performanceIssues);
+                console.log('- Performance Improvements: ' + analysis.summary.performanceImprovements);
+              " >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          
+          exit ${ANALYSIS_EXIT_CODE:-0}
+        continue-on-error: true
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-comprehensive-reports-${{ github.run_number }}
+          path: reports/newman-comprehensive/
+          retention-days: 30
+
+      - name: Create PR comment with results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            let comment = '## 🧪 Newman Comprehensive API Test Results\n\n';
+            
+            // Test execution status
+            const testStatus = '${{ steps.newman-test.outcome }}';
+            const analysisStatus = '${{ steps.regression-analysis.outcome }}';
+            
+            if (testStatus === 'success') {
+              comment += '### ✅ All API Tests Passed\n\n';
+              comment += '- **Coverage**: 46/46 endpoints (100%)\n';
+              comment += '- **Total Tests**: 92+\n';
+            } else if (testStatus === 'failure') {
+              comment += '### ❌ API Tests Failed\n\n';
+              comment += 'Some tests did not pass. Please check the detailed report.\n\n';
+            }
+            
+            // Regression analysis results
+            if (analysisStatus === 'success' || analysisStatus === 'failure') {
+              comment += '\n### 📊 Regression Analysis\n\n';
+              
+              try {
+                // Find the latest analysis file
+                const analysisFiles = fs.readdirSync('reports/newman-comprehensive/')
+                  .filter(f => f.endsWith('-analysis.json'))
+                  .sort((a, b) => b.localeCompare(a));
+                
+                if (analysisFiles.length > 0) {
+                  const latestAnalysis = JSON.parse(
+                    fs.readFileSync(`reports/newman-comprehensive/${analysisFiles[0]}`, 'utf8')
+                  );
+                  
+                  const summary = latestAnalysis.summary;
+                  
+                  if (summary.breaking > 0) {
+                    comment += `⚠️ **Breaking Changes Detected**: ${summary.breaking}\n\n`;
+                    
+                    // List breaking changes
+                    if (latestAnalysis.regressions.breaking.length > 0) {
+                      comment += '<details><summary>Breaking Changes Details</summary>\n\n';
+                      latestAnalysis.regressions.breaking.slice(0, 5).forEach(bc => {
+                        comment += `- **${bc.request}**: ${bc.assertion}\n`;
+                        comment += `  - Error: ${bc.error}\n`;
+                      });
+                      if (latestAnalysis.regressions.breaking.length > 5) {
+                        comment += `\n... and ${latestAnalysis.regressions.breaking.length - 5} more\n`;
+                      }
+                      comment += '\n</details>\n\n';
+                    }
+                  } else {
+                    comment += '✅ **No Breaking Changes**\n\n';
+                  }
+                  
+                  // Non-breaking changes
+                  if (summary.nonBreaking > 0) {
+                    comment += `ℹ️ **Non-Breaking Changes**: ${summary.nonBreaking}\n`;
+                    comment += 'These are typically new optional fields or formatting changes.\n\n';
+                  }
+                  
+                  // Performance
+                  if (summary.performanceIssues > 0) {
+                    comment += `⚡ **Performance Issues**: ${summary.performanceIssues}\n`;
+                  }
+                  if (summary.performanceImprovements > 0) {
+                    comment += `🚀 **Performance Improvements**: ${summary.performanceImprovements}\n`;
+                  }
+                }
+              } catch (e) {
+                comment += 'Could not parse regression analysis results.\n';
+                console.error('Error parsing analysis:', e);
+              }
+            }
+            
+            // Add links
+            comment += '\n### 📎 Resources\n\n';
+            comment += '- [Test Reports Artifact](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n';
+            comment += '- [Newman Testing Documentation](docs/NEWMAN_COMPREHENSIVE_TESTING.md)\n';
+            comment += '- [API Endpoint Coverage](docs/API_ENDPOINT_AUDIT.md)\n';
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Newman Comprehensive API Test Results')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+      - name: Check for critical issues
+        if: always()
+        run: |
+          # Fail the workflow if there were breaking changes
+          if [ "${{ steps.regression-analysis.outcome }}" == "failure" ]; then
+            echo "❌ Breaking changes detected in API responses"
+            exit 1
+          fi
+          
+          # Also fail if Newman tests failed
+          if [ "${{ steps.newman-test.outcome }}" == "failure" ]; then
+            echo "❌ Newman API tests failed"
+            exit 1
+          fi
+          
+          echo "✅ All checks passed"
+
+  pagination-validation:
+    name: Pagination & Data Validation Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Newman
+        run: |
+          npm install -g newman newman-reporter-html newman-reporter-json
+
+      - name: Run Pagination Validation Tests
+        id: pagination-test
+        run: |
+          echo "## Pagination Validation Test Run" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Collection: postman-collection-pagination-validation.json" >> $GITHUB_STEP_SUMMARY
+          echo "- Test Data: postman-data-pagination-tests.json" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Run pagination validation tests
+          ./scripts/run-newman-pagination-validation.sh || PAGINATION_EXIT_CODE=$?
+          
+          exit ${PAGINATION_EXIT_CODE:-0}
+        continue-on-error: true
+
+      - name: Upload pagination test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pagination-validation-reports-${{ github.run_number }}
+          path: reports/newman-pagination-validation/
+          retention-days: 30
+
+  performance-benchmark:
+    name: API Performance Benchmarking
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run performance benchmarks
+        run: |
+          echo "## Performance Benchmarking" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Iterations: 3" >> $GITHUB_STEP_SUMMARY
+          echo "- Delay between requests: 100ms" >> $GITHUB_STEP_SUMMARY
+          echo "- Focus: Critical endpoints only" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Run performance-focused tests
+          NEWMAN_ITERATIONS=3 \
+          NEWMAN_DELAY_REQUEST=100 \
+          NEWMAN_FOLDER="Stamps Endpoints" \
+          docker-compose -f docker-compose.test.yml run --rm newman-comprehensive
+
+      - name: Store performance results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-benchmark-${{ github.run_number }}
+          path: reports/newman-comprehensive/
+          retention-days: 90

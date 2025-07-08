@@ -1,16 +1,12 @@
 import { SRC101Service } from "$server/services/src101/index.ts";
-import { SRC101Repository } from "$server/database/src101Repository.ts";
 import {
   SRC101TokenidsParams,
   SRC101OwnerParams,
   SRC101TxParams,
   SRC101ValidTxTotalCountParams,
-  SRC101BalanceParams,
+  Src101BalanceParams,
 } from "$globals";
-import { StampService } from "$server/services/stampService.ts";
 import { BlockService } from "$server/services/blockService.ts";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { paginate } from "$lib/utils/paginationUtils.ts";
 
 export class Src101Controller{
   static async handleSrc101TXFromSRC101Table(
@@ -22,19 +18,16 @@ export class Src101Controller{
         SRC101Service.QueryService.getSrc101TXFromSRC101Table(params),
         SRC101Service.QueryService.getTotalSrc101TXFromSRC101TableCount(params),
       ]);
-      let restructuredResult: any = {
-        last_block: lastBlock,
-      };
       const limit = params.limit;
       const page = params.page;
-      restructuredResult = {
+      const restructuredResult: any = {
+        last_block: lastBlock,
         page,
         limit,
         totalPages: Math.ceil(totalCount / limit),
         total: totalCount,
-        ...restructuredResult,
+        data: txs,
       };
-      restructuredResult.data = txs;
       return restructuredResult;
     } catch (error) {
       console.error("Error processing SRC101 request:", error);
@@ -54,19 +47,16 @@ export class Src101Controller{
         SRC101Service.QueryService.getValidSrc101Tx(params),
         SRC101Service.QueryService.getTotalValidSrc101TxCount(params),
       ]);
-      let restructuredResult: any = {
-        last_block: lastBlock,
-      };
       const limit = params.limit;
       const page = params.page;
-      restructuredResult = {
+      const restructuredResult: any = {
+        last_block: lastBlock,
         page,
         limit,
         totalPages: Math.ceil(totalCount / limit),
         total: totalCount,
-        ...restructuredResult,
+        data: txs,
       };
-      restructuredResult.data = txs;
       return restructuredResult;
     } catch (error) {
       console.error("Error processing SRC101 Owner request:", error);
@@ -83,14 +73,13 @@ export class Src101Controller{
     try{
       const [lastBlock, details] = await Promise.all([
         BlockService.getLastBlock(),
-        SRC101Service.QueryService.getDepoyDetails(deploy_hash),
+        SRC101Service.QueryService.getDeployDetails(deploy_hash),
       ]);
   
-      let restructuredResult: any = {
+      const restructuredResult: any = {
         last_block: lastBlock,
+        data: details,
       };
-  
-      restructuredResult.data = details;
       return restructuredResult;
     } catch (error) {
       console.error("Error processing SRC101 Owner request:", error);
@@ -111,11 +100,10 @@ export class Src101Controller{
         SRC101Service.QueryService.getTotalCount(deploy_hash),
       ]);
   
-      let restructuredResult: any = {
+      const restructuredResult: any = {
         last_block: lastBlock,
+        data: totalCount,
       };
-  
-      restructuredResult.data = totalCount;
       return restructuredResult;
     } catch (error) {
       console.error("Error processing SRC101 Owner request:", error);
@@ -128,7 +116,7 @@ export class Src101Controller{
   }
 
   static async handleSrc101BalanceRequest(
-    params: SRC101BalanceParams,
+    params: Src101BalanceParams,
   ){
     try{
       const [lastBlock, balance, totalCount] = await Promise.all([
@@ -137,19 +125,16 @@ export class Src101Controller{
         SRC101Service.QueryService.getSrc101BalanceTotalCount(params),
       ]);
   
-      let restructuredResult: any = {
-        last_block: lastBlock,
-      };
       const limit = params.limit;
       const page = params.page;
-      restructuredResult = {
+      const restructuredResult: any = {
+        last_block: lastBlock,
         page,
         limit,
         totalPages: Math.ceil(totalCount / limit),
         total: totalCount,
-        ...restructuredResult,
+        data: balance,
       };
-      restructuredResult.data = balance;
       return restructuredResult;
     } catch (error) {
       console.error("Error processing SRC101 Owner request:", error);
@@ -172,19 +157,16 @@ export class Src101Controller{
         SRC101Service.QueryService.getSrc101OwnerCount(params),
       ]);
   
-      let restructuredResult: any = {
-        last_block: lastBlock,
-      };
       const limit = params.limit;
       const page = params.page;
-      restructuredResult = {
+      const restructuredResult: any = {
+        last_block: lastBlock,
         page,
         limit,
         totalPages: Math.ceil(totalCount / limit),
         total: totalCount,
-        ...restructuredResult,
+        data: owner,
       };
-      restructuredResult.data = owner;
       return restructuredResult;
     } catch (error) {
       console.error("Error processing SRC101 Owner request:", error);

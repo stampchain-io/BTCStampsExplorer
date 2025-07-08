@@ -3,23 +3,18 @@ import { Psbt, Transaction, payments, networks, address as bjsAddress } from "bi
 import { getUTXOForAddress as getUTXOForAddressFromUtils } from "$lib/utils/utxoUtils.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
-import { getScriptTypeInfo, ScriptType as BjsScriptType } from "$lib/utils/scriptTypeUtils.ts";
-import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
+import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { hex2bin, bytesToHex } from "$lib/utils/binary/baseUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { bigIntSerializer } from "$lib/utils/formatUtils.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { UTXO, AncestorInfo } from "$types/index.d.ts";
-import { TransactionService } from "$server/services/transaction/index.ts";
-import { estimateTransactionSize, calculateTransactionFee, InputTypeForSizeEstimation, OutputTypeForSizeEstimation } from "$lib/utils/minting/transactionSizes.ts";
-import type { Output, ScriptType } from "$lib/types/index.d.ts";
+import type { Output } from "$lib/types/index.d.ts";
 
-export function formatPsbtForLogging(psbt: bitcoin.Psbt) {
+export function formatPsbtForLogging(psbt: Psbt) {
   return {
       inputs: psbt.data.inputs.map(input => ({
           witnessUtxo: input.witnessUtxo ? {
               value: Number(input.witnessUtxo.value),
-              script: input.witnessUtxo.script.toString('hex')
+              script: input.witnessUtxo.script.toString()
           } : undefined,
       })),
       outputs: psbt.txOutputs.map(output => ({
@@ -40,14 +35,17 @@ export class PSBTService {
     const [txid, voutStr] = utxo.split(":");
     const vout = parseInt(voutStr, 10);
 
-    const network = getAddressNetwork(sellerAddress);
+    const network = PSBTService.getAddressNetwork(sellerAddress);
     const psbt = new Psbt({ network });
 
     // Fetch specific UTXO details (no ancestor info needed)
     const txInfo = await getUTXOForAddressFromUtils(sellerAddress, txid, vout);
-    if (!txInfo?.utxo) {
+    
+    // Type guard to check if txInfo has utxo property
+    if (!txInfo || Array.isArray(txInfo) || !('utxo' in txInfo) || !txInfo.utxo) {
       throw new Error(`Invalid UTXO details for ${txid}:${vout}`);
     }
+    
     const utxoDetails = txInfo.utxo;
     console.log("UTXO Details:", utxoDetails);
 
@@ -78,7 +76,7 @@ export class PSBTService {
       value: salePriceSats,
     });
 
-    const addressType = getAddressType(sellerAddress, network);
+    const addressType = PSBTService.getAddressType(sellerAddress, network);
     
     if (addressType === 'p2sh-p2wpkh') {
       const p2wpkh = payments.p2wpkh({ address: sellerAddress, network });
@@ -93,29 +91,24 @@ export class PSBTService {
     // Return the PSBT as a hex string
     return psbt.toHex();
   }
-  // Change from standalone function to static class method
-  private static getPubkeyFromAddress(address: string): Uint8Array {
-    // Implementation depends on how you're managing keys
-    throw new Error('Not implemented');
-  }
 
   // Make sure all helper functions are static class methods
   private static getAddressType(address: string, network: networks.Network): string {
     try {
-      bitcoin.address.toOutputScript(address, network);
+      bjsAddress.toOutputScript(address, network);
       return 'p2pkh';
-    } catch (error) {
+    } catch (_error) {
       try {
         payments.p2wpkh({ address, network });
         return 'p2wpkh';
-      } catch (error) {
+      } catch (_error) {
         try {
           payments.p2sh({
             redeem: payments.p2wpkh({ address, network }),
             network,
           });
           return 'p2sh-p2wpkh';
-        } catch (error) {
+        } catch (_error) {
           throw new Error('Unsupported address type');
         }
       }
@@ -137,11 +130,12 @@ export class PSBTService {
   }
 
   private static getAddressFromScript(script: Uint8Array, network: networks.Network): string {
-    const payment = payments.p2wpkh({ output: script, network });
-    if (!payment.address) {
-      throw new Error("Failed to derive address from script");
+    try {
+      // Use bjsAddress.fromOutputScript which handles multiple script types
+      return bjsAddress.fromOutputScript(Buffer.from(script), network);
+    } catch (error: any) {
+      throw new Error(`Failed to derive address from script: ${error.message}`);
     }
-    return payment.address;
   }
 
   static async validateUTXOOwnership(
@@ -154,7 +148,8 @@ export class PSBTService {
 
       // Use getUTXOForAddress with specific UTXO lookup and failover
       const txInfo = await getUTXOForAddressFromUtils(address, txid, vout);
-      if (!txInfo?.utxo) return false;
+      // Check if txInfo is the expected structure with utxo property
+      if (!txInfo || Array.isArray(txInfo) || !('utxo' in txInfo) || !txInfo.utxo) return false;
 
       // Get the scriptPubKey hex
       const scriptPubKeyHex = txInfo.utxo.script;
@@ -169,12 +164,12 @@ export class PSBTService {
       let derivedAddress: string;
       try {
         // Try P2PKH
-        derivedAddress = bitcoin.address.fromOutputScript(scriptPubKey, network);
-      } catch (e) {
+        derivedAddress = bjsAddress.fromOutputScript(Buffer.from(scriptPubKey), network);
+      } catch (_e) {
         try {
           // Try P2WPKH or other script types
-          derivedAddress = bitcoin.address.fromOutputScript(scriptPubKey, network);
-        } catch (e) {
+          derivedAddress = bjsAddress.fromOutputScript(Buffer.from(scriptPubKey), network);
+        } catch (_e) {
           // Unsupported script type
           throw new Error("Unsupported script type in UTXO");
         }
@@ -197,7 +192,7 @@ export class PSBTService {
   ): Promise<string> {
     console.log(`Starting completePSBT with feeRate: ${feeRate} sat/vB`);
 
-    const network = getAddressNetwork(buyerAddress);
+    const network = PSBTService.getAddressNetwork(buyerAddress);
 
     // Parse the seller's PSBT
     const psbt = Psbt.fromHex(sellerPsbtHex, { network });
@@ -221,7 +216,7 @@ export class PSBTService {
       throw new Error("Seller's witnessUtxo not found");
     }
 
-    const sellerAddress = getAddressFromScript(
+    const sellerAddress = PSBTService.getAddressFromScript(
       new Uint8Array(sellerWitnessUtxo.script), // Be explicit with Uint8Array
       network
     );
@@ -233,7 +228,7 @@ export class PSBTService {
       sellerInputVout,
     );
 
-    if (!sellerUtxoInfo || !sellerUtxoInfo.utxo) {
+    if (!sellerUtxoInfo || Array.isArray(sellerUtxoInfo) || !('utxo' in sellerUtxoInfo) || !sellerUtxoInfo.utxo) {
       throw new Error("Seller's UTXO not found or already spent");
     }
 
@@ -248,7 +243,7 @@ export class PSBTService {
       buyerVout,
     );
 
-    if (!buyerUtxoInfo || !buyerUtxoInfo.utxo) {
+    if (!buyerUtxoInfo || Array.isArray(buyerUtxoInfo) || !('utxo' in buyerUtxoInfo) || !buyerUtxoInfo.utxo) {
       throw new Error("Buyer's UTXO not found or already spent");
     }
 
@@ -283,8 +278,8 @@ export class PSBTService {
     // **Prepare Outputs Array for Fee Estimation**
     const outputs = psbt.txOutputs.map((output) => {
       return {
-        script: output.script.toString("hex"),
-        value: output.value,
+        script: output.script.toString(),
+        value: Number(output.value),
       };
     });
 
@@ -293,7 +288,7 @@ export class PSBTService {
       outputs,
       feeRate,
       psbt.txInputs.length,
-      getScriptTypeInfo(buyerUtxo.script).type
+      buyerUtxo.ancestor ? [buyerUtxo.ancestor] : undefined
     );
 
     // **Calculate Change**
@@ -347,14 +342,14 @@ export class PSBTService {
 
       console.log(`[PSBTService] PSBT parsed. Initial input count: ${psbt.inputCount}, output count: ${psbt.txOutputs.length}`);
 
-      const originalTx = psbt.data.globalMap.unsignedTx.tx;
+      const originalTx = psbt.data.globalMap.unsignedTx;
       if (!originalTx || !originalTx.ins || !originalTx.outs) {
         throw new Error("Invalid transaction structure in PSBT from Counterparty");
       }
 
       // 1. Enrich Inputs (fetch full UTXO details)
       let totalInputValue = BigInt(0);
-      for (const [index, inputDetail] of psbt.data.inputs.entries()) {
+      for (const [index, _inputDetail] of psbt.data.inputs.entries()) {
         // If witnessUtxo is already present and seems valid, we might trust it.
         // However, CP might provide minimal PSBTs, so re-fetching is safer.
         const txIn = originalTx.ins[index];
@@ -385,8 +380,11 @@ export class PSBTService {
           if (!rawTxHex) throw new Error(`Failed to fetch raw tx hex for non-witness input ${inputTxid}`);
           updateData.nonWitnessUtxo = hex2bin(rawTxHex);
         }
-        if (scriptTypeInfo.type === "P2SH" && scriptTypeInfo.redeemScript) {
-          updateData.redeemScript = hex2bin(scriptTypeInfo.redeemScript.hex);
+        if (scriptTypeInfo.type === "P2SH" && scriptTypeInfo.redeemScriptType) {
+          // Fix: Use redeemScriptType instead of redeemScript
+          if (scriptTypeInfo.redeemScriptType && 'hex' in scriptTypeInfo.redeemScriptType) {
+            updateData.redeemScript = hex2bin((scriptTypeInfo.redeemScriptType as any).hex);
+          }
         }
         psbt.updateInput(index, updateData);
         console.log(`[PSBTService] Input ${index} enriched. Value: ${utxoDetails.value}`);
@@ -405,7 +403,7 @@ export class PSBTService {
             if (outputAddress === userAddress) {
                 isChangeToUser = true;
             }
-          } catch (e) { /* Not an address output or not parsable, definitely not change to userAddress */ }
+          } catch (_e) { /* Not an address output or not parsable, definitely not change to userAddress */ }
 
           if (!isChangeToUser) {
             outputsToPreserve.push({ script: Buffer.from(output.script), value: BigInt(output.value) });
@@ -422,7 +420,7 @@ export class PSBTService {
       if (options?.serviceFeeDetails && options.serviceFeeDetails.fee > 0 && options.serviceFeeDetails.address) {
         const serviceFeeScript = bjsAddress.toOutputScript(options.serviceFeeDetails.address, network);
         outputsToPreserve.push({
-          script: serviceFeeScript,
+          script: Buffer.from(serviceFeeScript),
           value: BigInt(options.serviceFeeDetails.fee),
         });
         totalValueToOthers += BigInt(options.serviceFeeDetails.fee);
@@ -434,7 +432,7 @@ export class PSBTService {
         psbt.txOutputs.pop();
       }
       if (psbt.data.globalMap.unsignedTx) {
-          psbt.data.globalMap.unsignedTx.tx.outs = [];
+          psbt.data.globalMap.unsignedTx.outs = [];
       }
 
       // Add preserved and service fee outputs to PSBT for size estimation
@@ -454,8 +452,9 @@ export class PSBTService {
             // This can happen if, for example, a script type needs a redeemScript that wasn't provided
             // For standard P2WPKH from buyerUtxoDetails, this should generally be fine.
             // console.warn(`[PSBTService] Non-critical error during psbt.finalizeInput(${i}) for size estimation: ${e.message}`);
-            console.error(`[PSBTService] CRITICAL error during psbt.finalizeInput(${i}) for input ${psbt.txInputs[i].hash.toString('hex')}:${psbt.txInputs[i].index}: ${e.message}`);
-            throw new Error(`Failed to finalize input #${i} for PSBT construction: ${e.message}`);
+            const errorMessage = e instanceof Error ? e.message : String(e);
+            console.error(`[PSBTService] CRITICAL error during psbt.finalizeInput(${i}) for input ${psbt.txInputs[i].hash.toString()}: ${errorMessage}`);
+            throw new Error(`Failed to finalize input #${i} for PSBT construction: ${errorMessage}`);
         }
       }
       
@@ -467,7 +466,7 @@ export class PSBTService {
       // Remove dummy change output and rebuild outputs correctly
       psbt.txOutputs.pop(); // remove dummy change
       if (psbt.data.globalMap.unsignedTx) {
-        psbt.data.globalMap.unsignedTx.tx.outs.pop();
+        psbt.data.globalMap.unsignedTx.outs.pop();
       }
 
 
@@ -502,14 +501,19 @@ export class PSBTService {
       // Finalize inputs AGAIN on the final PSBT structure before returning to client
       // This ensures the PSBT is ready for the client to sign.
       console.log("[PSBTService] Finalizing inputs on the final PSBT structure...");
+      
+      // Create inputsToSign array for return value
+      const inputsToSign: { index: number; address?: string; sighashTypes?: number[] }[] = [];
       for (let i = 0; i < psbt.inputCount; i++) {
+        inputsToSign.push({ index: i, address: userAddress, sighashTypes: [Transaction.SIGHASH_ALL] });
         try {
           psbt.finalizeInput(i);
           console.log(`[PSBTService] Successfully finalized input #${i} on final PSBT.`);
         } catch (e) {
           // If this finalization fails, it's a more critical issue for client signing.
-          console.error(`[PSBTService] CRITICAL error during FINAL psbt.finalizeInput(${i}) for input ${psbt.txInputs[i].hash.toString('hex')}:${psbt.txInputs[i].index}: ${e.message}`);
-          throw new Error(`Failed to finalize input #${i} on the final PSBT: ${e.message}`);
+          const errorMessage = e instanceof Error ? e.message : String(e);
+          console.error(`[PSBTService] CRITICAL error during FINAL psbt.finalizeInput(${i}) for input ${psbt.txInputs[i].hash.toString()}:${psbt.txInputs[i].index}: ${errorMessage}`);
+          throw new Error(`Failed to finalize input #${i} on the final PSBT: ${errorMessage}`);
         }
       }
 
@@ -651,17 +655,17 @@ export class PSBTService {
       // ESTIMATE SIZE AND FEE
       const outputsForEstimation: Output[] = [];
       // 1. Dispenser payment output (assume P2WPKH for estimation)
-      outputsForEstimation.push({ type: "P2WPKH" as ScriptType, value: Number(options.dispenserPaymentAmount) });
+      outputsForEstimation.push({ value: Number(options.dispenserPaymentAmount) });
       // 2. OP_RETURN output (if present) - estimateFee handles type via determineOutputType
       if (opReturnOutput) {
-        outputsForEstimation.push({ script: opReturnOutput.script.toString('hex'), value: Number(opReturnOutput.value) });
+        outputsForEstimation.push({ script: opReturnOutput.script.toString(), value: Number(opReturnOutput.value) });
       }
       // 3. Service fee output (if present, assume P2WPKH for estimation)
       if (options.serviceFeeDetails && options.serviceFeeDetails.fee > 0) {
-        outputsForEstimation.push({ type: "P2WPKH" as ScriptType, value: options.serviceFeeDetails.fee });
+        outputsForEstimation.push({ value: options.serviceFeeDetails.fee });
       }
       // 4. Change output (assume P2WPKH, value doesn't matter as much for size here)
-      outputsForEstimation.push({ type: "P2WPKH" as ScriptType, value: 1000 }); // Dummy value for size estimation
+      outputsForEstimation.push({ value: 1000 }); // Dummy value for size estimation
 
       const estimatedMinerFeeFull = estimateFee(outputsForEstimation, targetFeeRateSatVb, 1); // 1 input
       let calculatedMinerFee = BigInt(estimatedMinerFeeFull);

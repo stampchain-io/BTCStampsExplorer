@@ -2,12 +2,11 @@ import { UTXO } from "$lib/types/index.d.ts";
 import { AncestorInfo } from "$lib/types/base.d.ts";
 import { CachedQuicknodeRPCService } from "$server/services/quicknode/cachedQuicknodeRpcService.ts";
 import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts"; // Import for conversion
-import { logger } from "$lib/utils/logger.ts"; // Already present in my model of the file
 import { address as bjsAddress, networks as bjsNetworks } from "bitcoinjs-lib"; // For toOutputScript & network
 import { bytesToHex } from "$lib/utils/binary/baseUtils.ts"; // For logging/comparison
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts"; // Added for getScriptTypeInfo
 
-// TODO: Utilize as primary utxo fetching source from utxoSer
+// TODO(@baba): Utilize as primary utxo fetching source from utxoService
 
 // Define options for fetching multiple UTXOs
 export interface UTXOOptions {
