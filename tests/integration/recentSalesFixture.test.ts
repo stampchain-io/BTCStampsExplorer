@@ -1,5 +1,5 @@
-import { assertEquals, assertExists } from "$std/assert/mod.ts";
-import { afterAll, beforeAll, describe, it } from "$std/testing/bdd.ts";
+import { assertEquals, assertExists } from "@std/assert";
+import { afterAll, beforeAll, describe, it } from "@std/testing/bdd";
 import { StampRepository } from "$server/database/stampRepository.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
@@ -359,7 +359,7 @@ describe("Recent Sales Fixture-Based Tests", () => {
   describe("Performance Characteristics", () => {
     it("should complete queries quickly using local data", async () => {
       const startTime = Date.now();
-      const _result = await StampRepository.getRecentlyActiveSold({
+      await StampRepository.getRecentlyActiveSold({
         page: 1,
         limit: 50,
       });
