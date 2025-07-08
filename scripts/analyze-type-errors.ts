@@ -30,7 +30,7 @@ async function runTypeCheck(): Promise<string> {
 
   try {
     const cmd = new Deno.Command("deno", {
-      args: ["check", "--quiet", "main.ts", "dev.ts"],
+      args: ["check", "main.ts", "dev.ts"],
       stdout: "piped",
       stderr: "piped",
     });
@@ -47,51 +47,36 @@ async function runTypeCheck(): Promise<string> {
 }
 
 function parseTypeErrors(output: string): AnalysisResult {
-  const lines = output.split("\n").filter((line) => line.trim().length > 0);
-
+  const lines = output.split("\n");
   const errorCategories = new Map<string, number>();
   const fileErrors = new Map<string, string[]>();
 
   let totalErrors = 0;
+  let currentErrorBlock: string[] = [];
+  let currentFileName = "";
 
-  for (const line of lines) {
-    let isError = false;
-    let fileName = "";
+  console.log("🔍 Debugging: Total lines to process:", lines.length);
 
-    // Check for [ERROR] lines with "at file://" pattern
-    if (line.includes("[ERROR]")) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Check for start of new error (TS#### [ERROR])
+    if (line.includes("[ERROR]") && line.match(/TS\d+/)) {
+      // Process previous error block if exists
+      if (currentErrorBlock.length > 0 && currentFileName) {
+        if (!fileErrors.has(currentFileName)) {
+          fileErrors.set(currentFileName, []);
+        }
+        fileErrors.get(currentFileName)!.push(...currentErrorBlock);
+        console.log("🔍 Added error block to file:", currentFileName);
+      }
+
+      // Start new error block
+      currentErrorBlock = [line];
+      currentFileName = "";
       totalErrors++;
-      isError = true;
 
-      // Look for "at file://..." pattern to extract file name
-      const fileMatch = line.match(/at file:\/\/[^\/]*\/(.+):(\d+):(\d+)/);
-      if (fileMatch) {
-        fileName = fileMatch[1];
-      }
-    }
-
-    // Check for error lines that start with file paths
-    if (
-      line.includes("TS") && line.includes(":") && !line.includes("[ERROR]")
-    ) {
-      const pathMatch = line.match(/^\s*(.+\.tsx?)\((\d+),(\d+)\):/);
-      if (pathMatch) {
-        fileName = pathMatch[1];
-        totalErrors++;
-        isError = true;
-      }
-    }
-
-    // Add to file errors if we found a file name
-    if (isError && fileName) {
-      if (!fileErrors.has(fileName)) {
-        fileErrors.set(fileName, []);
-      }
-      fileErrors.get(fileName)!.push(line);
-    }
-
-    // Categorize errors based on TypeScript error codes
-    if (isError) {
+      // Categorize error based on TypeScript error code
       if (line.includes("TS2339")) {
         errorCategories.set(
           "MISSING_PROPERTY",
@@ -112,6 +97,11 @@ function parseTypeErrors(output: string): AnalysisResult {
           "ASSIGNMENT_ERROR",
           (errorCategories.get("ASSIGNMENT_ERROR") || 0) + 1,
         );
+      } else if (line.includes("TS2375")) {
+        errorCategories.set(
+          "ASSIGNMENT_ERROR",
+          (errorCategories.get("ASSIGNMENT_ERROR") || 0) + 1,
+        );
       } else if (line.includes("TS2304")) {
         errorCategories.set(
           "UNDEFINED_NAME",
@@ -120,8 +110,38 @@ function parseTypeErrors(output: string): AnalysisResult {
       } else {
         errorCategories.set("OTHER", (errorCategories.get("OTHER") || 0) + 1);
       }
+    } else if (currentErrorBlock.length > 0) {
+      // Add line to current error block
+      currentErrorBlock.push(line);
+
+      // Check if this line contains the file path - look for lines starting with whitespace and "at file://"
+      if (line.trim().startsWith("at file://")) {
+        console.log("🔍 Found file path line:", line.trim());
+        // Extract the file path after the base directory
+        const fileMatch = line.match(
+          /at file:\/\/.*\/BTCStampsExplorer\/(.+):(\d+):(\d+)/,
+        );
+        if (fileMatch) {
+          currentFileName = fileMatch[1];
+          console.log("🔍 Extracted file name:", currentFileName);
+        } else {
+          console.log("🔍 File path regex did not match");
+        }
+      }
     }
   }
+
+  // Process final error block
+  if (currentErrorBlock.length > 0 && currentFileName) {
+    if (!fileErrors.has(currentFileName)) {
+      fileErrors.set(currentFileName, []);
+    }
+    fileErrors.get(currentFileName)!.push(...currentErrorBlock);
+    console.log("🔍 Added final error block to file:", currentFileName);
+  }
+
+  console.log("🔍 Total files with errors:", fileErrors.size);
+  console.log("🔍 Files found:", Array.from(fileErrors.keys()).slice(0, 5));
 
   // Convert to sorted arrays
   const sortedCategories: ErrorCategory[] = Array.from(
