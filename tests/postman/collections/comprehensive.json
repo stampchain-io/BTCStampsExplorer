@@ -6857,7 +6857,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"operation\": \"deploy\",\n  \"tick\": \"TEST\",\n  \"max\": \"1000000\",\n  \"lim\": \"1000\",\n  \"source_address\": \"{{test_address}}\",\n  \"sats_per_vb\": 12\n}"
+              "raw": "{\n  \"op\": \"deploy\",\n  \"tick\": \"TEST\",\n  \"max\": \"1000000\",\n  \"lim\": \"1000\",\n  \"dec\": 18,\n  \"toAddress\": \"{{test_address}}\",\n  \"changeAddress\": \"{{test_address}}\",\n  \"satsPerVB\": 12\n}"
             },
             "url": {
               "raw": "{{dev_base_url}}/api/v2/src20/create",
@@ -6889,7 +6889,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"operation\": \"deploy\",\n  \"tick\": \"TEST\",\n  \"max\": \"1000000\",\n  \"lim\": \"1000\",\n  \"source_address\": \"{{test_address}}\",\n  \"sats_per_vb\": 12\n}"
+              "raw": "{\n  \"op\": \"deploy\",\n  \"tick\": \"TEST\",\n  \"max\": \"1000000\",\n  \"lim\": \"1000\",\n  \"dec\": 18,\n  \"toAddress\": \"{{test_address}}\",\n  \"changeAddress\": \"{{test_address}}\",\n  \"satsPerVB\": 12\n}"
             },
             "url": {
               "raw": "{{prod_base_url}}/api/v2/src20/create",
@@ -6921,7 +6921,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"destination_address\": \"{{test_address}}\",\n  \"stamp_id\": \"{{test_stamp_id}}\",\n  \"quantity\": 1,\n  \"sats_per_vb\": 12\n}"
+              "raw": "{\n  \"address\": \"{{test_address}}\",\n  \"identifier\": \"{{test_stamp_id}}\",\n  \"quantity\": 1,\n  \"options\": {\n    \"fee_per_kb\": 12000\n  }\n}"
             },
             "url": {
               "raw": "{{dev_base_url}}/api/v2/trx/stampattach",
@@ -6953,7 +6953,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"destination_address\": \"{{test_address}}\",\n  \"stamp_id\": \"{{test_stamp_id}}\",\n  \"quantity\": 1,\n  \"sats_per_vb\": 12\n}"
+              "raw": "{\n  \"address\": \"{{test_address}}\",\n  \"identifier\": \"{{test_stamp_id}}\",\n  \"quantity\": 1,\n  \"options\": {\n    \"fee_per_kb\": 12000\n  }\n}"
             },
             "url": {
               "raw": "{{prod_base_url}}/api/v2/trx/stampattach",
@@ -6985,7 +6985,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"stamp_base64\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\",\n  \"sats_per_vb\": 12\n}"
+              "raw": "{\n  \"sourceWallet\": \"{{test_address}}\",\n  \"filename\": \"test.png\",\n  \"file\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\",\n  \"qty\": 1,\n  \"locked\": true,\n  \"divisible\": false,\n  \"satsPerVB\": 12\n}"
             },
             "url": {
               "raw": "{{dev_base_url}}/api/v2/olga/mint",
@@ -7017,7 +7017,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"stamp_base64\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\",\n  \"sats_per_vb\": 12\n}"
+              "raw": "{\n  \"sourceWallet\": \"{{test_address}}\",\n  \"filename\": \"test.png\",\n  \"file\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\",\n  \"qty\": 1,\n  \"locked\": true,\n  \"divisible\": false,\n  \"satsPerVB\": 12\n}"
             },
             "url": {
               "raw": "{{prod_base_url}}/api/v2/olga/mint",
@@ -7049,7 +7049,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"stamp_id\": \"{{test_stamp_id}}\",\n  \"quantity\": 1,\n  \"sats_per_vb\": 12\n}"
+              "raw": "{\n  \"utxo\": \"{{test_stamp_id}}:0\",\n  \"destination\": \"{{test_address}}\",\n  \"options\": {\n    \"fee_per_kb\": 12000\n  }\n}"
             },
             "url": {
               "raw": "{{dev_base_url}}/api/v2/trx/stampdetach",
@@ -7081,7 +7081,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"source_address\": \"{{test_address}}\",\n  \"stamp_id\": \"{{test_stamp_id}}\",\n  \"quantity\": 1,\n  \"sats_per_vb\": 12\n}"
+              "raw": "{\n  \"utxo\": \"{{test_stamp_id}}:0\",\n  \"destination\": \"{{test_address}}\",\n  \"options\": {\n    \"fee_per_kb\": 12000\n  }\n}"
             },
             "url": {
               "raw": "{{prod_base_url}}/api/v2/trx/stampdetach",
