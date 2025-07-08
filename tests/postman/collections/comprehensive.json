@@ -5087,6 +5087,1146 @@
               ]
             }
           }
+        },
+        {
+          "name": "Get Recent Sales - Dev (Default)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test basic endpoint response",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time is less than 5000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                  "});",
+                  "",
+                  "pm.test('Response has valid JSON structure', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('page');",
+                  "    pm.expect(jsonData).to.have.property('limit');",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "    pm.expect(jsonData).to.have.property('totalPages');",
+                  "    pm.expect(jsonData).to.have.property('last_block');",
+                  "});",
+                  "",
+                  "pm.test('Response has enhanced fields', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('btcPriceUSD');",
+                  "    pm.expect(jsonData).to.have.property('metadata');",
+                  "    pm.expect(jsonData.btcPriceUSD).to.be.a('number');",
+                  "    pm.expect(jsonData.metadata).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('Metadata has required fields', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.metadata).to.have.property('dayRange');",
+                  "    pm.expect(jsonData.metadata).to.have.property('lastUpdated');",
+                  "    pm.expect(jsonData.metadata.dayRange).to.equal(30); // Default",
+                  "});",
+                  "",
+                  "pm.test('Data array contains valid recent sales objects', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "    ",
+                  "    if (jsonData.data.length > 0) {",
+                  "        const sale = jsonData.data[0];",
+                  "        pm.expect(sale).to.have.property('stamp_id');",
+                  "        pm.expect(sale).to.have.property('lastSalePrice');",
+                  "        pm.expect(sale).to.have.property('lastSalePriceUSD');",
+                  "        pm.expect(sale).to.have.property('lastSaleDate');",
+                  "        pm.expect(sale).to.have.property('time_ago');",
+                  "        pm.expect(sale).to.have.property('btc_amount_satoshis');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Prod (Default)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test prod endpoint response",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time is less than 5000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                  "});",
+                  "",
+                  "pm.test('Response has valid JSON structure', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('page');",
+                  "    pm.expect(jsonData).to.have.property('limit');",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "    pm.expect(jsonData).to.have.property('totalPages');",
+                  "    pm.expect(jsonData).to.have.property('last_block');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Dev (Custom dayRange)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=7",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "7"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('dayRange parameter is respected', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.metadata.dayRange).to.equal(7);",
+                  "});",
+                  "",
+                  "pm.test('Response has valid structure', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('btcPriceUSD');",
+                  "    pm.expect(jsonData).to.have.property('metadata');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Prod (Custom dayRange)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?dayRange=7",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "7"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Recent Sales - Dev (fullDetails=true)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?fullDetails=true",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "fullDetails",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Full details are included', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.length > 0) {",
+                  "        const sale = jsonData.data[0];",
+                  "        pm.expect(sale).to.have.property('buyer_address');",
+                  "        pm.expect(sale).to.have.property('dispenser_address');",
+                  "        pm.expect(sale).to.have.property('transaction_hash');",
+                  "        pm.expect(sale).to.have.property('block_index');",
+                  "        pm.expect(sale).to.have.property('btc_amount_satoshis');",
+                  "        pm.expect(sale).to.have.property('time_ago');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Enhanced transaction details present', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.length > 0) {",
+                  "        const sale = jsonData.data[0];",
+                  "        pm.expect(sale.btc_amount_satoshis).to.be.a('number');",
+                  "        pm.expect(sale.time_ago).to.be.a('string');",
+                  "        pm.expect(sale.lastSalePriceUSD).to.be.a('number');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Prod (fullDetails=true)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?fullDetails=true",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "fullDetails",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Recent Sales - Dev (Pagination)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?page=1&limit=10",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Pagination parameters are respected', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.page).to.equal(1);",
+                  "    pm.expect(jsonData.limit).to.equal(10);",
+                  "    pm.expect(jsonData.data.length).to.be.at.most(10);",
+                  "});",
+                  "",
+                  "pm.test('Total and totalPages are numeric', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.total).to.be.a('number');",
+                  "    pm.expect(jsonData.totalPages).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Prod (Pagination)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?page=1&limit=10",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Recent Sales - Dev (Boundary dayRange)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=1",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Boundary dayRange is handled', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.metadata.dayRange).to.equal(1);",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Prod (Boundary dayRange)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?dayRange=1",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Recent Sales - Dev (Large dayRange)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=365",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "365"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Large dayRange is handled', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.metadata.dayRange).to.equal(365);",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable for large range', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(10000);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Prod (Large dayRange)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?dayRange=365",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "365"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Recent Sales - Dev (Combined Parameters)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=14&fullDetails=true&page=1&limit=5",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "14"
+                },
+                {
+                  "key": "fullDetails",
+                  "value": "true"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('All parameters are respected', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.metadata.dayRange).to.equal(14);",
+                  "    pm.expect(jsonData.page).to.equal(1);",
+                  "    pm.expect(jsonData.limit).to.equal(5);",
+                  "    pm.expect(jsonData.data.length).to.be.at.most(5);",
+                  "});",
+                  "",
+                  "pm.test('Full details are included with all params', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.length > 0) {",
+                  "        const sale = jsonData.data[0];",
+                  "        pm.expect(sale).to.have.property('buyer_address');",
+                  "        pm.expect(sale).to.have.property('dispenser_address');",
+                  "        pm.expect(sale).to.have.property('btc_amount_satoshis');",
+                  "        pm.expect(sale).to.have.property('time_ago');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Prod (Combined Parameters)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?dayRange=14&fullDetails=true&page=1&limit=5",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "14"
+                },
+                {
+                  "key": "fullDetails",
+                  "value": "true"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Recent Sales - Dev (Error: Invalid dayRange)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=invalid",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "invalid"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 (graceful handling)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Invalid dayRange falls back to default', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.metadata.dayRange).to.equal(30);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Dev (Error: Negative dayRange)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=-5",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "-5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 (graceful handling)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Negative dayRange falls back to default', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.metadata.dayRange).to.equal(30);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Dev (Performance Test)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?limit=50",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Performance: Response time under 3 seconds', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                  "});",
+                  "",
+                  "pm.test('Performance: Response size is reasonable', function () {",
+                  "    pm.expect(pm.response.responseSize).to.be.below(1000000); // 1MB",
+                  "});",
+                  "",
+                  "pm.test('Performance: Data consistency', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "    pm.expect(jsonData.data.length).to.be.at.most(50);",
+                  "    ",
+                  "    // Verify each item has required performance-critical fields",
+                  "    jsonData.data.forEach(function(sale, index) {",
+                  "        pm.expect(sale, `Sale ${index} missing stamp_id`).to.have.property('stamp_id');",
+                  "        pm.expect(sale, `Sale ${index} missing lastSalePrice`).to.have.property('lastSalePrice');",
+                  "        pm.expect(sale, `Sale ${index} missing lastSalePriceUSD`).to.have.property('lastSalePriceUSD');",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Prod (Performance Test)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?limit=50",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Performance: Response time under 3 seconds', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                  "});",
+                  "",
+                  "pm.test('Performance: Response size is reasonable', function () {",
+                  "    pm.expect(pm.response.responseSize).to.be.below(1000000); // 1MB",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Dev vs Prod Comparison",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=7&fullDetails=true&limit=10",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "7"
+                },
+                {
+                  "key": "fullDetails",
+                  "value": "true"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Store dev response for comparison",
+                  "pm.test('Store dev response', function () {",
+                  "    const devResponse = pm.response.json();",
+                  "    pm.collectionVariables.set('dev_recent_sales_response', JSON.stringify(devResponse));",
+                  "});",
+                  "",
+                  "pm.test('Dev response validation', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('btcPriceUSD');",
+                  "    pm.expect(jsonData).to.have.property('metadata');",
+                  "    pm.expect(jsonData.metadata.dayRange).to.equal(7);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Prod vs Dev Comparison",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?dayRange=7&fullDetails=true&limit=10",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "dayRange",
+                  "value": "7"
+                },
+                {
+                  "key": "fullDetails",
+                  "value": "true"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Compare prod response with dev response",
+                  "pm.test('Prod response validation', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('btcPriceUSD');",
+                  "    pm.expect(jsonData).to.have.property('metadata');",
+                  "    pm.expect(jsonData.metadata.dayRange).to.equal(7);",
+                  "});",
+                  "",
+                  "pm.test('Dev vs Prod structure comparison', function () {",
+                  "    const prodResponse = pm.response.json();",
+                  "    const devResponseStr = pm.collectionVariables.get('dev_recent_sales_response');",
+                  "    ",
+                  "    if (devResponseStr) {",
+                  "        const devResponse = JSON.parse(devResponseStr);",
+                  "        ",
+                  "        // Compare structure",
+                  "        pm.expect(prodResponse).to.have.property('data');",
+                  "        pm.expect(prodResponse).to.have.property('btcPriceUSD');",
+                  "        pm.expect(prodResponse).to.have.property('metadata');",
+                  "        pm.expect(prodResponse).to.have.property('page');",
+                  "        pm.expect(prodResponse).to.have.property('limit');",
+                  "        pm.expect(prodResponse).to.have.property('total');",
+                  "        pm.expect(prodResponse).to.have.property('totalPages');",
+                  "        pm.expect(prodResponse).to.have.property('last_block');",
+                  "        ",
+                  "        // Compare enhanced fields",
+                  "        pm.expect(prodResponse.metadata).to.have.property('dayRange');",
+                  "        pm.expect(prodResponse.metadata).to.have.property('lastUpdated');",
+                  "        pm.expect(prodResponse.btcPriceUSD).to.be.a('number');",
+                  "        ",
+                  "        // Compare data structure if data exists",
+                  "        if (prodResponse.data && prodResponse.data.length > 0) {",
+                  "            const prodSale = prodResponse.data[0];",
+                  "            pm.expect(prodSale).to.have.property('stamp_id');",
+                  "            pm.expect(prodSale).to.have.property('lastSalePrice');",
+                  "            pm.expect(prodSale).to.have.property('lastSalePriceUSD');",
+                  "            pm.expect(prodSale).to.have.property('lastSaleDate');",
+                  "            pm.expect(prodSale).to.have.property('time_ago');",
+                  "            pm.expect(prodSale).to.have.property('btc_amount_satoshis');",
+                  "            pm.expect(prodSale).to.have.property('buyer_address');",
+                  "            pm.expect(prodSale).to.have.property('dispenser_address');",
+                  "        }",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Sales - Dev (Schema Validation)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?fullDetails=true&limit=5",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps",
+                "recentSales"
+              ],
+              "query": [
+                {
+                  "key": "fullDetails",
+                  "value": "true"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Schema validation: Top-level structure', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const requiredTopLevel = ['data', 'page', 'limit', 'total', 'totalPages', 'last_block', 'btcPriceUSD', 'metadata'];",
+                  "    requiredTopLevel.forEach(function(field) {",
+                  "        pm.expect(jsonData, `Missing top-level field: ${field}`).to.have.property(field);",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('Schema validation: Metadata structure', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const requiredMetadata = ['dayRange', 'lastUpdated'];",
+                  "    requiredMetadata.forEach(function(field) {",
+                  "        pm.expect(jsonData.metadata, `Missing metadata field: ${field}`).to.have.property(field);",
+                  "    });",
+                  "    ",
+                  "    // Type validation",
+                  "    pm.expect(jsonData.metadata.dayRange).to.be.a('number');",
+                  "    pm.expect(jsonData.metadata.lastUpdated).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('Schema validation: Data array items', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.length > 0) {",
+                  "        const sale = jsonData.data[0];",
+                  "        const requiredSaleFields = [",
+                  "            'stamp_id', 'lastSalePrice', 'lastSalePriceUSD', 'lastSaleDate',",
+                  "            'time_ago', 'btc_amount_satoshis', 'buyer_address', 'dispenser_address'",
+                  "        ];",
+                  "        ",
+                  "        requiredSaleFields.forEach(function(field) {",
+                  "            pm.expect(sale, `Missing sale field: ${field}`).to.have.property(field);",
+                  "        });",
+                  "        ",
+                  "        // Type validation",
+                  "        pm.expect(sale.stamp_id).to.be.a('number');",
+                  "        pm.expect(sale.lastSalePrice).to.be.a('number');",
+                  "        pm.expect(sale.lastSalePriceUSD).to.be.a('number');",
+                  "        pm.expect(sale.lastSaleDate).to.be.a('string');",
+                  "        pm.expect(sale.time_ago).to.be.a('string');",
+                  "        pm.expect(sale.btc_amount_satoshis).to.be.a('number');",
+                  "        pm.expect(sale.buyer_address).to.be.a('string');",
+                  "        pm.expect(sale.dispenser_address).to.be.a('string');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Schema validation: BTC price and USD conversions', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.btcPriceUSD).to.be.a('number');",
+                  "    pm.expect(jsonData.btcPriceUSD).to.be.above(0);",
+                  "    ",
+                  "    if (jsonData.data && jsonData.data.length > 0) {",
+                  "        jsonData.data.forEach(function(sale, index) {",
+                  "            pm.expect(sale.lastSalePriceUSD, `Sale ${index} invalid USD price`).to.be.a('number');",
+                  "            pm.expect(sale.lastSalePriceUSD, `Sale ${index} negative USD price`).to.be.at.least(0);",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
