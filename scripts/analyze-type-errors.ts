@@ -55,11 +55,11 @@ function parseTypeErrors(output: string): AnalysisResult {
   let totalErrors = 0;
 
   for (const line of lines) {
-    if (line.includes("error:") || line.includes("[ERROR]")) {
+    if (line.includes("[ERROR]")) {
       totalErrors++;
 
-      // Extract file name
-      const fileMatch = line.match(/^([^:]+):/);
+      // Look for "at file://..." pattern to extract file name
+      const fileMatch = line.match(/at file:\/\/[^\/]*\/(.+):(\d+):(\d+)/);
       if (fileMatch) {
         const file = fileMatch[1];
         if (!fileErrors.has(file)) {
@@ -67,6 +67,20 @@ function parseTypeErrors(output: string): AnalysisResult {
         }
         fileErrors.get(file)!.push(line);
       }
+    }
+    
+    // Also look for lines that start with file paths and contain errors
+    if (line.includes("TS") && line.includes(":") && !line.includes("[ERROR]")) {
+      const pathMatch = line.match(/^\s*(.+\.tsx?)\((\d+),(\d+)\):/);
+      if (pathMatch) {
+        const file = pathMatch[1];
+        if (!fileErrors.has(file)) {
+          fileErrors.set(file, []);
+        }
+        fileErrors.get(file)!.push(line);
+        totalErrors++;
+      }
+    }
 
       // Categorize errors
       if (line.includes("TS2339")) {
