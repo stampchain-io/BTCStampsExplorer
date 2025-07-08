@@ -6,7 +6,7 @@
   "scripts": {
     "validate:schema": "npx @redocly/cli@latest lint --config .redocly.yaml --format stylish ./schema.yml",
     "validate:ci": "npm run validate:schema",
-    "test:api": "NEWMAN_COLLECTION=postman-collection-comprehensive.json docker-compose -f docker-compose.test.yml run --rm newman",
+    "test:api": "NEWMAN_COLLECTION=tests/postman/collections/comprehensive.json docker-compose -f docker-compose.test.yml run --rm newman",
     "test:api:smoke": "NEWMAN_COLLECTION=tests/postman/collections/smoke.json docker-compose -f docker-compose.test.yml run --rm newman",
     "test:api:regression": "NEWMAN_COLLECTION=tests/postman/collections/regression-v23.json NEWMAN_REPORTERS=cli,html,json docker-compose -f docker-compose.test.yml run --rm newman",
     "test:api:versioning": "NEWMAN_COLLECTION=tests/postman/collections/versioning.json NEWMAN_REPORTERS=cli,html,json docker-compose -f docker-compose.test.yml run --rm newman",
