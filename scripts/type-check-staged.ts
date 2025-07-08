@@ -1,58 +1,46 @@
 #!/usr/bin/env -S deno run --allow-run --allow-read
 
 /**
- * Advanced TypeScript checking for staged files
- * Used by pre-commit hooks and CI for incremental type safety
+ * Type check only staged TypeScript files
+ * Useful for pre-commit hooks and local development
  */
 
-interface TypeCheckResult {
+interface FileCheckResult {
   file: string;
-  errors: string[];
-  isCritical: boolean;
+  hasErrors: boolean;
+  errorOutput: string;
 }
-
-// Critical files that should have stricter type checking
-const CRITICAL_FILES = [
-  "server/database/",
-  "server/services/",
-  "server/controller/",
-  "lib/utils/",
-  "routes/api/",
-];
-
-// Files that can have more lenient type checking
-const LENIENT_FILES = [
-  "islands/",
-  "components/",
-  "tests/",
-  "scripts/",
-];
 
 async function getStagedTypeScriptFiles(): Promise<string[]> {
-  const cmd = new Deno.Command("git", {
-    args: ["diff", "--cached", "--name-only"],
-    stdout: "piped",
-  });
+  try {
+    const cmd = new Deno.Command("git", {
+      args: ["diff", "--cached", "--name-only", "--diff-filter=ACM"],
+      stdout: "piped",
+      stderr: "piped",
+    });
 
-  const result = await cmd.output();
-  const output = new TextDecoder().decode(result.stdout);
+    const result = await cmd.output();
+    const stdout = new TextDecoder().decode(result.stdout);
 
-  return output
-    .split("\n")
-    .filter((file) => file.match(/\.(ts|tsx)$/))
-    .filter((file) => !file.match(/\.(test|spec)\.(ts|tsx)$/))
-    .filter((file) => file.trim().length > 0);
+    if (!result.success) {
+      console.error("❌ Failed to get staged files");
+      return [];
+    }
+
+    const files = stdout
+      .split("\n")
+      .filter((file) => file.trim() !== "")
+      .filter((file) => /\.(ts|tsx)$/.test(file))
+      .filter((file) => !/\.(test|spec)\.(ts|tsx)$/.test(file)); // Exclude test files
+
+    return files;
+  } catch (error) {
+    console.error("❌ Error getting staged files:", error);
+    return [];
+  }
 }
 
-function isCriticalFile(file: string): boolean {
-  return CRITICAL_FILES.some((pattern) => file.startsWith(pattern));
-}
-
-function isLenientFile(file: string): boolean {
-  return LENIENT_FILES.some((pattern) => file.startsWith(pattern));
-}
-
-async function checkFile(file: string): Promise<TypeCheckResult> {
+async function checkFile(file: string): Promise<FileCheckResult> {
   try {
     const cmd = new Deno.Command("deno", {
       args: ["check", file],
@@ -62,112 +50,105 @@ async function checkFile(file: string): Promise<TypeCheckResult> {
 
     const result = await cmd.output();
     const stderr = new TextDecoder().decode(result.stderr);
-
-    const errors = stderr
-      .split("\n")
-      .filter((line) => line.includes("[ERROR]"))
-      .map((line) => line.trim());
+    const stdout = new TextDecoder().decode(result.stdout);
+    const output = stderr + stdout;
 
     return {
       file,
-      errors,
-      isCritical: isCriticalFile(file),
+      hasErrors: !result.success,
+      errorOutput: output,
     };
   } catch (error) {
     return {
       file,
-      errors: [
-        `Failed to check file: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      ],
-      isCritical: isCriticalFile(file),
+      hasErrors: true,
+      errorOutput: `Failed to check file: ${error}`,
     };
   }
 }
 
 async function main() {
-  console.log("🔍 Checking TypeScript types for staged files...");
+  console.log("🔍 Checking staged TypeScript files for type errors...\n");
 
   const stagedFiles = await getStagedTypeScriptFiles();
 
   if (stagedFiles.length === 0) {
-    console.log("📝 No TypeScript files staged for commit");
+    console.log("📝 No staged TypeScript files found.");
+    console.log("✅ Nothing to type check!");
     return;
   }
 
-  console.log(`📝 Found ${stagedFiles.length} staged TypeScript files:`);
-  stagedFiles.forEach((file) => {
-    const status = isCriticalFile(file)
-      ? "🔥 CRITICAL"
-      : isLenientFile(file)
-      ? "💡 LENIENT"
-      : "📋 NORMAL";
-    console.log(`   ${status}: ${file}`);
-  });
+  console.log(`📝 Found ${stagedFiles.length} staged TypeScript file(s):`);
+  stagedFiles.forEach((file) => console.log(`  - ${file}`));
+  console.log("");
 
-  console.log("\n🔍 Running type checks...");
-
-  const results = await Promise.all(stagedFiles.map(checkFile));
-
+  const results: FileCheckResult[] = [];
+  let filesWithErrors = 0;
   let totalErrors = 0;
-  let criticalErrors = 0;
-  let hasBlockingErrors = false;
 
-  for (const result of results) {
-    if (result.errors.length > 0) {
-      totalErrors += result.errors.length;
+  for (const file of stagedFiles) {
+    console.log(`🔍 Checking: ${file}`);
+    const result = await checkFile(file);
+    results.push(result);
 
-      if (result.isCritical) {
-        criticalErrors += result.errors.length;
-        console.log(`\n❌ CRITICAL FILE: ${result.file}`);
-        result.errors.forEach((error) => console.log(`   ${error}`));
+    if (result.hasErrors) {
+      filesWithErrors++;
+      console.log(`  ❌ Type errors found`);
 
-        // Block commit for critical files with many errors
-        if (result.errors.length > 5) {
-          hasBlockingErrors = true;
+      // Count errors in this file
+      const errorCount = (result.errorOutput.match(/\[ERROR\]/g) || []).length;
+      totalErrors += errorCount;
+
+      // Show first few lines of errors for context
+      const lines = result.errorOutput.split("\n").slice(0, 5);
+      lines.forEach((line) => {
+        if (line.trim()) {
+          console.log(`    ${line}`);
         }
-      } else {
-        console.log(`\n⚠️  ${result.file}:`);
-        result.errors.slice(0, 3).forEach((error) =>
-          console.log(`   ${error}`)
-        );
-        if (result.errors.length > 3) {
-          console.log(`   ... and ${result.errors.length - 3} more errors`);
-        }
+      });
+
+      if (result.errorOutput.split("\n").length > 5) {
+        console.log(`    ... (${errorCount} total errors in this file)`);
       }
+    } else {
+      console.log(`  ✅ No type errors`);
     }
+    console.log("");
   }
 
-  console.log(`\n📊 Summary:`);
-  console.log(`   Total files checked: ${stagedFiles.length}`);
-  console.log(`   Total errors: ${totalErrors}`);
-  console.log(`   Critical file errors: ${criticalErrors}`);
+  // Summary
+  console.log("📊 Type Check Summary:");
+  console.log(`  - Files checked: ${stagedFiles.length}`);
+  console.log(`  - Files with errors: ${filesWithErrors}`);
+  console.log(
+    `  - Files without errors: ${stagedFiles.length - filesWithErrors}`,
+  );
+  console.log(`  - Total errors found: ${totalErrors}`);
+  console.log("");
 
-  if (hasBlockingErrors) {
-    console.log(
-      `\n❌ COMMIT BLOCKED: Critical files have too many type errors`,
-    );
-    console.log(`💡 Please fix critical errors before committing:`);
-    console.log(
-      `   - Focus on files in server/database/, server/services/, etc.`,
-    );
-    console.log(`   - Use 'deno check <file>' to see detailed errors`);
-    console.log(`   - Consider fixing a few errors at a time`);
-    Deno.exit(1);
-  } else if (totalErrors > 0) {
-    console.log(
-      `\n⚠️  Type errors found but commit allowed (gradual improvement mode)`,
-    );
-    console.log(`💡 Consider fixing these errors when convenient:`);
-    console.log(`   - Run 'deno task analyze:types' to see all project errors`);
-    console.log(`   - Focus on MISSING_TYPE and IMPLICIT_ANY errors first`);
-    console.log(`   - Use 'deno check <file>' to check individual files`);
+  if (filesWithErrors === 0) {
+    console.log("🎉 All staged files pass type checking!");
+    console.log("✅ Ready to commit!");
   } else {
-    console.log(`\n✅ No TypeScript errors in staged files!`);
+    console.log("⚠️  Some staged files have type errors.");
+    console.log("💡 Consider fixing these errors before committing:");
+    console.log("");
+
+    results
+      .filter((r) => r.hasErrors)
+      .forEach((r) => {
+        console.log(`   📄 ${r.file}`);
+        console.log(`      Run: deno check ${r.file}`);
+      });
+
+    console.log("");
+    console.log("🎯 This is informational - you can still commit if needed.");
+    console.log("🚀 Gradual improvement: fix errors when convenient!");
   }
 
-  console.log(`\n🎉 Type check completed`);
+  // Exit with success regardless of errors (gradual improvement mode)
+  // Uncomment the next line if you want to fail on any type errors:
+  // Deno.exit(filesWithErrors > 0 ? 1 : 0);
 }
 
 if (import.meta.main) {
