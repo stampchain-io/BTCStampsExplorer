@@ -92,7 +92,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   return (
     <div class="flex flex-col">
       <div class="flex pb-1.5 mobileLg:pb-3">
-        <p class={titleGreyLD}>ANONYMOUS</p>
+        <p class={titleGreyLD}>{walletData.creatorName || "ANONYMOUS"}</p>
       </div>
       <div class="flex gap-3 mobileMd:gap-6">
         <div class="flex">
