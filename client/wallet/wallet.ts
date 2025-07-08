@@ -140,6 +140,40 @@ export const walletContext: WalletContext = {
   },
 };
 
+// Add SES error suppression for wallet extensions
+if (typeof globalThis !== "undefined" && "addEventListener" in globalThis) {
+  globalThis.addEventListener("error", (event) => {
+    // Suppress SES errors from wallet extensions
+    if (
+      event.error &&
+      (event.error.message?.includes("SES_UNCAUGHT_EXCEPTION") ||
+        event.filename?.includes("lockdown-install.js"))
+    ) {
+      event.preventDefault();
+      console.debug("wallet", {
+        message: "Suppressed SES error from wallet extension",
+        error: event.error?.message,
+        filename: event.filename,
+      });
+    }
+  });
+
+  globalThis.addEventListener("unhandledrejection", (event) => {
+    // Suppress SES promise rejections from wallet extensions
+    if (
+      event.reason &&
+      (event.reason.message?.includes("SES_UNCAUGHT_EXCEPTION") ||
+        event.reason.stack?.includes("lockdown-install.js"))
+    ) {
+      event.preventDefault();
+      console.debug("wallet", {
+        message: "Suppressed SES promise rejection from wallet extension",
+        reason: event.reason?.message,
+      });
+    }
+  });
+}
+
 // Provider checking functions
 export function getGlobalWallets(): WalletProviders {
   // Skip provider checks if we're not in a browser context
