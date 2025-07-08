@@ -1,5 +1,5 @@
-import { assertEquals, assertExists } from "$std/assert/mod.ts";
-import { afterEach, beforeEach, describe, it } from "$std/testing/bdd.ts";
+import { assertEquals, assertExists } from "@std/assert";
+import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { StampRepository } from "$server/database/stampRepository.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
