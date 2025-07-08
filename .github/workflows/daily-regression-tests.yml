@@ -11,17 +11,17 @@ on:
       send_notifications:
         description: 'Send failure notifications'
         required: false
-        default: 'true'
+        default: true
         type: boolean
       full_analysis:
         description: 'Run full analysis including historical trends'
         required: false
-        default: 'false'
+        default: false
         type: boolean
       skip_weekends:
         description: 'Skip weekend runs (for manual testing)'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
 jobs:
@@ -169,90 +169,14 @@ jobs:
           if [ "${{ env.FULL_ANALYSIS }}" = "true" ]; then
             echo "Running historical trend analysis..."
             
-            # Create trend analysis script inline for now
-            cat > analyze-trends.js << 'EOF'
-const fs = require('fs');
-const path = require('path');
-
-function analyzeTrends() {
-  const reportsDir = 'reports/daily-regression';
-  if (!fs.existsSync(reportsDir)) {
-    console.log('No historical reports found');
-    return;
-  }
-  
-  const reportDirs = fs.readdirSync(reportsDir)
-    .filter(dir => fs.statSync(path.join(reportsDir, dir)).isDirectory())
-    .sort()
-    .slice(-7); // Last 7 days
-  
-  console.log(`Analyzing trends across ${reportDirs.length} recent reports...`);
-  
-  const trends = {
-    totalTests: [],
-    failureRates: [],
-    performanceTrends: [],
-    dates: []
-  };
-  
-  reportDirs.forEach(dir => {
-    const dirPath = path.join(reportsDir, dir);
-    const files = fs.readdirSync(dirPath).filter(f => f.endsWith('-results.json'));
-    
-    if (files.length > 0) {
-      try {
-        const resultPath = path.join(dirPath, files[0]);
-        const results = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
-        
-        if (results.run && results.run.stats) {
-          const stats = results.run.stats;
-          trends.totalTests.push(stats.tests.total || 0);
-          trends.failureRates.push(((stats.tests.failed || 0) / (stats.tests.total || 1)) * 100);
-          trends.dates.push(dir);
-          
-          // Average response time
-          const avgResponseTime = results.run.timings?.responseAverage || 0;
-          trends.performanceTrends.push(avgResponseTime);
-        }
-      } catch (e) {
-        console.log(`Could not parse results for ${dir}: ${e.message}`);
-      }
-    }
-  });
-  
-  // Save trends report
-  const trendsReport = {
-    generatedAt: new Date().toISOString(),
-    period: `Last ${reportDirs.length} days`,
-    trends,
-    summary: {
-      avgFailureRate: trends.failureRates.reduce((a, b) => a + b, 0) / trends.failureRates.length || 0,
-      avgResponseTime: trends.performanceTrends.reduce((a, b) => a + b, 0) / trends.performanceTrends.length || 0,
-      testCountTrend: trends.totalTests.length > 1 ? 
-        (trends.totalTests[trends.totalTests.length - 1] - trends.totalTests[0]) : 0
-    }
-  };
-  
-  fs.writeFileSync('reports/trends-analysis.json', JSON.stringify(trendsReport, null, 2));
-  console.log('Trends analysis saved to reports/trends-analysis.json');
-  
-  return trendsReport;
-}
-
-try {
-  const trends = analyzeTrends();
-  if (trends) {
-    console.log('\n=== 7-Day Trends Summary ===');
-    console.log(`Average Failure Rate: ${trends.summary.avgFailureRate.toFixed(2)}%`);
-    console.log(`Average Response Time: ${trends.summary.avgResponseTime.toFixed(0)}ms`);
-    console.log(`Test Count Change: ${trends.summary.testCountTrend > 0 ? '+' : ''}${trends.summary.testCountTrend}`);
-  }
-} catch (e) {
-  console.error('Trend analysis failed:', e.message);
-}
-EOF
-            
-            node analyze-trends.js || true
+            # Use existing trend analysis script if available, or create a simple one
+            if [ -f "scripts/analyze-trends.js" ]; then
+              node scripts/analyze-trends.js || true
+            else
+              echo "Trend analysis script not found, generating basic summary..."
+              mkdir -p reports
+              echo '{"message": "Historical trend analysis requires scripts/analyze-trends.js"}' > reports/trends-analysis.json
+            fi
           fi
           
           echo "analysis_completed=true" >> $GITHUB_OUTPUT
@@ -262,16 +186,16 @@ EOF
         if: always()
         run: |
           # Create comprehensive daily summary
-          cat > daily_summary.md << 'EOF'
-# Daily Regression Test Summary
-          
-**Date**: $(date -u)  
-**Run ID**: ${{ github.run_id }}  
-**Commit**: ${{ github.sha }}  
-**Trigger**: ${{ github.event_name }}  
-
-## Test Execution Status
-EOF
+          {
+            echo "# Daily Regression Test Summary"
+            echo ""
+            echo "**Date**: $(date -u)"
+            echo "**Run ID**: ${{ github.run_id }}"
+            echo "**Commit**: ${{ github.sha }}"
+            echo "**Trigger**: ${{ github.event_name }}"
+            echo ""
+            echo "## Test Execution Status"
+          } > daily_summary.md
           
           if [ "${{ steps.regression-tests.outputs.test_exit_code }}" = "0" ]; then
             echo "✅ **All tests passed successfully**" >> daily_summary.md

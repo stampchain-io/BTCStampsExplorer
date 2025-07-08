@@ -152,32 +152,35 @@ jobs:
       - name: Run Newman Comprehensive Tests
         id: newman-test
         run: |
-          echo "## Newman Integration Test Run" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "⚠️ **Integration Test**: Tests live API endpoints with database access" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Test Configuration" >> $GITHUB_STEP_SUMMARY
-          echo "- Collection: tests/postman/collections/comprehensive.json (100+ tests)" >> $GITHUB_STEP_SUMMARY
-          echo "- Coverage: 46/46 endpoints (100%)" >> $GITHUB_STEP_SUMMARY
-          echo "- Mode: ${{ env.TEST_MODE }}" >> $GITHUB_STEP_SUMMARY
-          echo "- DEV_BASE_URL: ${{ env.DEV_BASE_URL }}" >> $GITHUB_STEP_SUMMARY
-          echo "- PROD_BASE_URL: ${{ env.PROD_BASE_URL }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Iterations: ${{ env.NEWMAN_ITERATIONS }}" >> $GITHUB_STEP_SUMMARY
-          
-          if [ -n "${{ env.NEWMAN_FOLDER }}" ]; then
-            echo "- Folder: ${{ env.NEWMAN_FOLDER }}" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          echo "" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Newman Integration Test Run"
+            echo ""
+            echo "⚠️ **Integration Test**: Tests live API endpoints with database access"
+            echo ""
+            echo "### Test Configuration"
+            echo "- Collection: tests/postman/collections/comprehensive.json (100+ tests)"
+            echo "- Coverage: 46/46 endpoints (100%)"
+            echo "- Mode: ${{ env.TEST_MODE }}"
+            echo "- DEV_BASE_URL: ${{ env.DEV_BASE_URL }}"
+            echo "- PROD_BASE_URL: ${{ env.PROD_BASE_URL }}"
+            echo "- Iterations: ${{ env.NEWMAN_ITERATIONS }}"
+            
+            if [ -n "${{ env.NEWMAN_FOLDER }}" ]; then
+              echo "- Folder: ${{ env.NEWMAN_FOLDER }}"
+            fi
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
           
           # Run the tests
           docker-compose -f docker-compose.test.yml run --rm newman-comprehensive || TEST_EXIT_CODE=$?
           
           # Check for test results
           if [ -d "reports/newman-comprehensive" ]; then
-            echo "### Test Results" >> $GITHUB_STEP_SUMMARY
-            echo "Reports generated in: reports/newman-comprehensive/" >> $GITHUB_STEP_SUMMARY
-            ls -la reports/newman-comprehensive/ >> $GITHUB_STEP_SUMMARY
+            {
+              echo "### Test Results"
+              echo "Reports generated in: reports/newman-comprehensive/"
+              ls -la reports/newman-comprehensive/
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
           
           exit ${TEST_EXIT_CODE:-0}
@@ -195,28 +198,30 @@ jobs:
           # Run the analysis
           node scripts/analyze-newman-regression.js || ANALYSIS_EXIT_CODE=$?
           
-          # Check if analysis report was created
-          if [ -f "reports/newman-comprehensive/*-analysis.json" ]; then
-            echo "✅ Regression analysis completed"
-            
-            # Extract summary for GitHub
-            LATEST_ANALYSIS=$(ls -t reports/newman-comprehensive/*-analysis.json | head -1)
-            if [ -f "$LATEST_ANALYSIS" ]; then
-              echo "" >> $GITHUB_STEP_SUMMARY
-              echo "### Regression Analysis Summary" >> $GITHUB_STEP_SUMMARY
-              echo "" >> $GITHUB_STEP_SUMMARY
+                      # Check if analysis report was created
+            if [ -f reports/newman-comprehensive/*-analysis.json ]; then
+              echo "✅ Regression analysis completed"
               
-              # Parse JSON and add to summary
-              node -e "
-                const fs = require('fs');
-                const analysis = JSON.parse(fs.readFileSync('$LATEST_ANALYSIS', 'utf8'));
-                console.log('- Breaking Changes: ' + analysis.summary.breaking);
-                console.log('- Non-Breaking Changes: ' + analysis.summary.nonBreaking);
-                console.log('- Performance Issues: ' + analysis.summary.performanceIssues);
-                console.log('- Performance Improvements: ' + analysis.summary.performanceImprovements);
-              " >> $GITHUB_STEP_SUMMARY
+              # Extract summary for GitHub
+              LATEST_ANALYSIS=$(ls -t reports/newman-comprehensive/*-analysis.json | head -1)
+              if [ -f "$LATEST_ANALYSIS" ]; then
+                {
+                  echo ""
+                  echo "### Regression Analysis Summary"
+                  echo ""
+                  
+                  # Parse JSON and add to summary
+                  node -e "
+                    const fs = require('fs');
+                    const analysis = JSON.parse(fs.readFileSync('$LATEST_ANALYSIS', 'utf8'));
+                    console.log('- Breaking Changes: ' + analysis.summary.breaking);
+                    console.log('- Non-Breaking Changes: ' + analysis.summary.nonBreaking);
+                    console.log('- Performance Issues: ' + analysis.summary.performanceIssues);
+                    console.log('- Performance Improvements: ' + analysis.summary.performanceImprovements);
+                  "
+                } >> "$GITHUB_STEP_SUMMARY"
+              fi
             fi
-          fi
           
           exit ${ANALYSIS_EXIT_CODE:-0}
         continue-on-error: true
