@@ -14,7 +14,7 @@ export const handler: Handlers = {
       let response: Response;
 
       const rawBody = await req.text();
-      console.log("SRC-101 request body:", rawBody);
+      // Parse SRC-101 request body
 
       const body: SRC101InputData & { trxType?: TrxType } = JSON.parse(rawBody);
       const trxType = body.trxType || "multisig";
@@ -49,7 +49,7 @@ export const handler: Handlers = {
             recAddress: effectiveRecAddress,
           },
         );
-      console.log("validate=====>", validationError);
+      // Validation failed
       if (validationError) {
         return ResponseUtil.badRequest(
           validationError.error || "Validation error",
@@ -100,7 +100,7 @@ export const handler: Handlers = {
           response = ResponseUtil.success(result, { forceNoCache: true });
         }
 
-        console.log("response", response);
+        // Return successful response
 
         logger.debug("api-src101-create", {
           message: "Final multisig response",

@@ -1,5 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { logger } from "$lib/utils/logger.ts";
 import {
   ComposeDetachOptions,
   normalizeFeeRate,
@@ -27,7 +28,11 @@ export const handler: Handlers = {
   async POST(req: Request) {
     try {
       const input: StampDetachInput = await req.json();
-      console.log("Received stamp detach input:", input);
+      logger.info("api", {
+        message: "Received stamp detach input",
+        utxo: input.utxo,
+        destination: input.destination,
+      });
 
       const { utxo, destination, options } = input;
 
@@ -43,12 +48,12 @@ export const handler: Handlers = {
         }
         normalizedFees = normalizeFeeRate(feeArgs);
         if (!normalizedFees || normalizedFees.normalizedSatsPerVB <= 0) {
-          return ResponseUtil.badRequest(
+          return ApiResponseUtil.badRequest(
             "Invalid fee rate calculated (must result in > 0 sats/vB).",
           );
         }
       } catch (error) {
-        return ResponseUtil.badRequest(
+        return ApiResponseUtil.badRequest(
           error instanceof Error ? error.message : "Invalid fee rate arguments",
         );
       }
@@ -73,7 +78,7 @@ export const handler: Handlers = {
 
         if (!response?.result?.psbt) {
           if (response?.error) {
-            return ResponseUtil.badRequest(response.error);
+            return ApiResponseUtil.badRequest(response.error);
           }
           throw new Error("Failed to compose detach transaction.");
         }
@@ -112,9 +117,7 @@ export const handler: Handlers = {
           // TODO(@stampchain): We need a reliable way to get the source address of the UTXO if destination is not provided for change.
           // This is a critical point for detach if change needs to go back to original owner.
           // For now, this path might lead to issues if change is generated and destination is empty.
-          console.warn(
-            "[StampDetach] User address for PSBT processing (change) is empty. This might lead to issues if change is generated.",
-          );
+          // Warning: User address for PSBT processing (change) is empty
         }
 
         // Process PSBT using shared service
@@ -133,13 +136,16 @@ export const handler: Handlers = {
         if (
           error instanceof Error && error.message.includes("Insufficient BTC")
         ) {
-          return ResponseUtil.badRequest(error.message);
+          return ApiResponseUtil.badRequest(error.message);
         }
         throw error;
       }
     } catch (error) {
-      console.error("Error processing stamp detach request:", error);
-      return ResponseUtil.internalError(
+      logger.error("api", {
+        message: "Error processing stamp detach request",
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return ApiResponseUtil.internalError(
         error,
         "Failed to process stamp detach request",
       );
