@@ -16,7 +16,7 @@ function IntroSection() {
         <p>
           SRC-20 is a fungible token protocol that records transactions directly
           on the Bitcoin blockchain, eliminating the need for Counterparty since
-          block 796,000 .
+          block 796,000.
         </p>
         <p>
           Drawing inspiration from BRC-20, SRC-20 leverages standard BTC miner
