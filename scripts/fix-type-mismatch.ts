@@ -5,8 +5,6 @@
  * Usage: deno run --allow-read --allow-write --allow-run scripts/fix-type-mismatch.ts
  */
 
-import { execSync } from "node:child_process";
-
 interface TypeMismatchError {
   file: string;
   line: number;
@@ -21,13 +19,16 @@ async function getTypeMismatchErrors(): Promise<TypeMismatchError[]> {
   console.log("🔍 Analyzing TYPE_MISMATCH errors...");
 
   try {
-    // Run TypeScript check and capture output
-    const output = execSync(
-      "deno check --unstable-byonm **/*.ts **/*.tsx 2>&1",
-      {
-        encoding: "utf8",
-      },
-    );
+    // Run TypeScript check and capture output using Deno.Command
+    const cmd = new Deno.Command("deno", {
+      args: ["check", "--unstable-byonm", "main.ts", "dev.ts"],
+      stdout: "piped",
+      stderr: "piped",
+    });
+
+    const result = await cmd.output();
+    const output = new TextDecoder().decode(result.stderr) +
+      new TextDecoder().decode(result.stdout);
 
     const errors: TypeMismatchError[] = [];
     const lines = output.split("\n");
