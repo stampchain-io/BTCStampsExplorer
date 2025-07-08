@@ -143,6 +143,8 @@ import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $WIP_FilterOld from "./islands/WIP/FilterOld.tsx";
 import * as $WIP_test_ReviewDogTest from "./islands/WIP/test/ReviewDogTest.tsx";
+import * as $badge_ActivityBadge from "./islands/badge/ActivityBadge.tsx";
+import * as $badge_index from "./islands/badge/index.ts";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
 import * as $button_FilterButton from "./islands/button/FilterButton.tsx";
 import * as $button_PaginationButton from "./islands/button/PaginationButton.tsx";
@@ -150,6 +152,7 @@ import * as $button_RangeButton from "./islands/button/RangeButton.tsx";
 import * as $button_SortButton from "./islands/button/SortButton.tsx";
 import * as $button_ToggleButton from "./islands/button/ToggleButton.tsx";
 import * as $button_buttonActions from "./islands/button/buttonActions.tsx";
+import * as $card_RecentSaleCard from "./islands/card/RecentSaleCard.tsx";
 import * as $card_SRC20CardBase from "./islands/card/SRC20CardBase.tsx";
 import * as $card_SRC20CardMinted from "./islands/card/SRC20CardMinted.tsx";
 import * as $card_SRC20CardMinting from "./islands/card/SRC20CardMinting.tsx";
@@ -177,6 +180,7 @@ import * as $content_stampDetailContent_StampTextContent from "./islands/content
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_faq from "./islands/datacontrol/faq.ts";
+import * as $error_ErrorDisplay from "./islands/error/ErrorDisplay.tsx";
 import * as $filter_FilterComponents from "./islands/filter/FilterComponents.tsx";
 import * as $filter_FilterContentSRC20 from "./islands/filter/FilterContentSRC20.tsx";
 import * as $filter_FilterContentStamp from "./islands/filter/FilterContentStamp.tsx";
@@ -231,10 +235,12 @@ import * as $section_cta_GetStampingCta from "./islands/section/cta/GetStampingC
 import * as $section_cta_RecursiveContactCta from "./islands/section/cta/RecursiveContactCta.tsx";
 import * as $section_cta_StampPoshCta from "./islands/section/cta/StampPoshCta.tsx";
 import * as $section_cta_StampchainContactCta from "./islands/section/cta/StampchainContactCta.tsx";
+import * as $section_feed_SalesActivityFeed from "./islands/section/feed/SalesActivityFeed.tsx";
 import * as $section_gallery_Carousel from "./islands/section/gallery/Carousel.tsx";
 import * as $section_gallery_CollectionDetailGallery from "./islands/section/gallery/CollectionDetailGallery.tsx";
 import * as $section_gallery_CollectionGallery from "./islands/section/gallery/CollectionGallery.tsx";
 import * as $section_gallery_PartnersBanner from "./islands/section/gallery/PartnersBanner.tsx";
+import * as $section_gallery_RecentSalesGallery from "./islands/section/gallery/RecentSalesGallery.tsx";
 import * as $section_gallery_SRC20Deploys from "./islands/section/gallery/SRC20Deploys.tsx";
 import * as $section_gallery_SRC20Gallery from "./islands/section/gallery/SRC20Gallery.tsx";
 import * as $section_gallery_SRC20Mints from "./islands/section/gallery/SRC20Mints.tsx";
@@ -443,6 +449,8 @@ const manifest = {
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
     "./islands/WIP/FilterOld.tsx": $WIP_FilterOld,
     "./islands/WIP/test/ReviewDogTest.tsx": $WIP_test_ReviewDogTest,
+    "./islands/badge/ActivityBadge.tsx": $badge_ActivityBadge,
+    "./islands/badge/index.ts": $badge_index,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
     "./islands/button/FilterButton.tsx": $button_FilterButton,
     "./islands/button/PaginationButton.tsx": $button_PaginationButton,
@@ -450,6 +458,7 @@ const manifest = {
     "./islands/button/SortButton.tsx": $button_SortButton,
     "./islands/button/ToggleButton.tsx": $button_ToggleButton,
     "./islands/button/buttonActions.tsx": $button_buttonActions,
+    "./islands/card/RecentSaleCard.tsx": $card_RecentSaleCard,
     "./islands/card/SRC20CardBase.tsx": $card_SRC20CardBase,
     "./islands/card/SRC20CardMinted.tsx": $card_SRC20CardMinted,
     "./islands/card/SRC20CardMinting.tsx": $card_SRC20CardMinting,
@@ -488,6 +497,7 @@ const manifest = {
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/faq.ts": $datacontrol_faq,
+    "./islands/error/ErrorDisplay.tsx": $error_ErrorDisplay,
     "./islands/filter/FilterComponents.tsx": $filter_FilterComponents,
     "./islands/filter/FilterContentSRC20.tsx": $filter_FilterContentSRC20,
     "./islands/filter/FilterContentStamp.tsx": $filter_FilterContentStamp,
@@ -548,6 +558,8 @@ const manifest = {
     "./islands/section/cta/StampPoshCta.tsx": $section_cta_StampPoshCta,
     "./islands/section/cta/StampchainContactCta.tsx":
       $section_cta_StampchainContactCta,
+    "./islands/section/feed/SalesActivityFeed.tsx":
+      $section_feed_SalesActivityFeed,
     "./islands/section/gallery/Carousel.tsx": $section_gallery_Carousel,
     "./islands/section/gallery/CollectionDetailGallery.tsx":
       $section_gallery_CollectionDetailGallery,
@@ -555,6 +567,8 @@ const manifest = {
       $section_gallery_CollectionGallery,
     "./islands/section/gallery/PartnersBanner.tsx":
       $section_gallery_PartnersBanner,
+    "./islands/section/gallery/RecentSalesGallery.tsx":
+      $section_gallery_RecentSalesGallery,
     "./islands/section/gallery/SRC20Deploys.tsx": $section_gallery_SRC20Deploys,
     "./islands/section/gallery/SRC20Gallery.tsx": $section_gallery_SRC20Gallery,
     "./islands/section/gallery/SRC20Mints.tsx": $section_gallery_SRC20Mints,

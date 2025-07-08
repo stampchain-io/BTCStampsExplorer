@@ -113,11 +113,23 @@ export function StampSalesGallery({
   `;
 
   /* ===== SECTION PROPS ===== */
+  // Filter for hot stamps when activity data is available
+  const filteredStamps = variant === "home" && recentSales.length > 0
+    ? recentSales.filter((stamp) => {
+      // If activity_level is available, filter for HOT stamps
+      if (stamp.activity_level) {
+        return stamp.activity_level === "HOT";
+      }
+      // Fallback: show all recent sales if no activity data
+      return true;
+    })
+    : recentSales;
+
   const sectionProps = variant === "home"
     ? {
       subTitle: subTitle || "HOT STAMPS",
       type: "recent",
-      stamps: recentSales,
+      stamps: filteredStamps,
       fromPage: "home",
       layout: "grid" as const,
       isRecentSales: true,
@@ -151,7 +163,15 @@ export function StampSalesGallery({
         {title}
       </h3>
       <div class="flex flex-col">
-        <StampGallery {...sectionProps} />
+        {variant === "home" && filteredStamps.length === 0 && !isLoading && (
+          <div class="text-gray-400 text-center py-8">
+            <p class="text-lg">No hot stamps available at the moment.</p>
+            <p class="text-sm mt-2">Check back soon for trending activity!</p>
+          </div>
+        )}
+        {(filteredStamps.length > 0 || variant !== "home") && (
+          <StampGallery {...sectionProps} />
+        )}
         {isLoading && (
           <div class="flex items-center gap-3 -mt-[29px] mb-[9px]">
             <div class={loaderSpinXsPurple} />
