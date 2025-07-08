@@ -1,38 +1,39 @@
-name: Newman Integration Tests (API)
+name: Newman Comprehensive Tests (Production Validation)
 
-# INTEGRATION TEST: This workflow tests live API endpoints and requires database access.
-# These are NOT unit tests - they hit actual API endpoints with real data.
-# Suitable for staging/production validation, not isolated testing.
+# This workflow validates production API endpoints on a schedule
+# It does NOT run on code changes because Newman tests don't add value in CI without a dev server
+# For local development: Use 'deno task check:api:comprehensive' to compare localhost vs production
 
 on:
-  push:
-    branches: [main, dev]
-    paths:
-      - 'tests/postman/collections/comprehensive.json'
-      - 'tests/postman/collections/pagination-validation.json'
-      - 'tests/postman/environments/comprehensive.json'
-      - 'tests/postman/data/pagination-tests.json'
-      - 'scripts/run-newman-comprehensive.sh'
-      - 'scripts/run-newman-pagination-validation.sh'
-      - 'scripts/analyze-newman-regression.js'
-      - 'server/**'
-      - 'routes/**'
-      - 'lib/**'
-      - '.github/workflows/newman-comprehensive-tests.yml'
-  pull_request:
-    branches: [main, dev]
-    paths:
-      - 'tests/postman/collections/comprehensive.json'
-      - 'tests/postman/collections/pagination-validation.json'
-      - 'tests/postman/environments/comprehensive.json'
-      - 'tests/postman/data/pagination-tests.json'
-      - 'scripts/run-newman-comprehensive.sh'
-      - 'scripts/run-newman-pagination-validation.sh'
-      - 'scripts/analyze-newman-regression.js'
-      - 'server/**'
-      - 'routes/**'
-      - 'lib/**'
-      - '.github/workflows/newman-comprehensive-tests.yml'
+  # Remove push/PR triggers - Newman tests don't add value in CI without dev server
+  # push:
+  #   branches: [main, dev]
+  #   paths:
+  #     - 'tests/postman/collections/comprehensive.json'
+  #     - 'tests/postman/collections/pagination-validation.json'
+  #     - 'tests/postman/environments/comprehensive.json'
+  #     - 'tests/postman/data/pagination-tests.json'
+  #     - 'scripts/run-newman-comprehensive.sh'
+  #     - 'scripts/run-newman-pagination-validation.sh'
+  #     - 'scripts/analyze-newman-regression.js'
+  #     - 'server/**'
+  #     - 'routes/**'
+  #     - 'lib/**'
+  #     - '.github/workflows/newman-comprehensive-tests.yml'
+  # pull_request:
+  #   branches: [main, dev]
+  #   paths:
+  #     - 'tests/postman/collections/comprehensive.json'
+  #     - 'tests/postman/collections/pagination-validation.json'
+  #     - 'tests/postman/environments/comprehensive.json'
+  #     - 'tests/postman/data/pagination-tests.json'
+  #     - 'scripts/run-newman-comprehensive.sh'
+  #     - 'scripts/run-newman-pagination-validation.sh'
+  #     - 'scripts/analyze-newman-regression.js'
+  #     - 'server/**'
+  #     - 'routes/**'
+  #     - 'lib/**'
+  #     - '.github/workflows/newman-comprehensive-tests.yml'
   workflow_dispatch:
     inputs:
       test_folder:
@@ -48,7 +49,7 @@ on:
         required: false
         default: 'false'
   schedule:
-    # Run daily at 2 AM UTC to catch regressions early
+    # Run daily at 2 AM UTC to validate production endpoints
     - cron: '0 2 * * *'
 
 jobs:
@@ -118,7 +119,8 @@ jobs:
         run: |
           echo "Docker version:"
           docker --version
-          docker-compose --version
+          echo "Docker Compose version:"
+          docker compose version
           
           # Ensure reports directory exists
           mkdir -p reports/newman-comprehensive
@@ -147,7 +149,7 @@ jobs:
           echo "TEST_MODE=ci-production-only" >> $GITHUB_ENV
           
           # Note: For local development with dev server running, users should run:
-          # DEV_BASE_URL=http://localhost:8000 PROD_BASE_URL=https://stampchain.io docker-compose -f docker-compose.test.yml run --rm newman-comprehensive
+          # DEV_BASE_URL=http://localhost:8000 PROD_BASE_URL=https://stampchain.io docker compose -f docker-compose.test.yml run --rm newman-comprehensive
 
       - name: Run Newman Comprehensive Tests
         id: newman-test
@@ -172,7 +174,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           
           # Run the tests
-          docker-compose -f docker-compose.test.yml run --rm newman-comprehensive || TEST_EXIT_CODE=$?
+          docker compose -f docker-compose.test.yml run --rm newman-comprehensive || TEST_EXIT_CODE=$?
           
           # Check for test results
           if [ -d "reports/newman-comprehensive" ]; then
@@ -431,7 +433,7 @@ jobs:
           NEWMAN_ITERATIONS=3 \
           NEWMAN_DELAY_REQUEST=100 \
           NEWMAN_FOLDER="Stamps Endpoints" \
-          docker-compose -f docker-compose.test.yml run --rm newman-comprehensive
+          docker compose -f docker-compose.test.yml run --rm newman-comprehensive
 
       - name: Store performance results
         if: always()

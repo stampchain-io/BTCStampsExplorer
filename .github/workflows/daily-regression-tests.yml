@@ -137,7 +137,7 @@ jobs:
           
           # Run the comprehensive tests
           set +e  # Don't exit on failure
-          docker-compose -f docker-compose.test.yml run --rm newman-comprehensive
+          docker compose -f docker-compose.test.yml run --rm newman-comprehensive
           TEST_EXIT_CODE=$?
           set -e
           
