@@ -31,7 +31,7 @@
     "test:api:advanced": "docker-compose -f docker-compose.test.yml run --rm newman-advanced",
     "test:api:parallel": "docker-compose -f docker-compose.test.yml run --rm newman-parallel",
     "test:api:performance": "docker-compose -f docker-compose.test.yml run --rm newman-performance",
-    "test:api:enhanced": "NEWMAN_COLLECTION=postman-collection-enhanced.json NEWMAN_REPORTERS=cli,html,json,enhanced docker-compose -f docker-compose.test.yml run --rm newman",
+    "test:api:enhanced": "NEWMAN_COLLECTION=tests/postman/collections/comprehensive.json NEWMAN_REPORTERS=cli,html,json,enhanced docker-compose -f docker-compose.test.yml run --rm newman",
     "test:api:folder": "NEWMAN_FOLDER=${FOLDER:-} docker-compose -f docker-compose.test.yml run --rm newman",
     "test:api:verbose": "NEWMAN_VERBOSE=true docker-compose -f docker-compose.test.yml run --rm newman",
     "test:api:bail": "NEWMAN_BAIL=true docker-compose -f docker-compose.test.yml run --rm newman",
