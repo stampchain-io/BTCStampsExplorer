@@ -1,7 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
-import { AddressTickHandlerContext } from "$globals";
+import { TickHandlerContext } from "$globals";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { RouteType } from "$server/services/cacheService.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
   checkEmptyResult,
@@ -10,7 +11,7 @@ import {
   validateSortParam,
 } from "$server/services/routeValidationService.ts";
 
-export const handler: Handlers<AddressTickHandlerContext> = {
+export const handler: Handlers<TickHandlerContext> = {
   async GET(req, ctx) {
     try {
       const { tick } = ctx.params;
@@ -42,7 +43,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
         amt: Number(url.searchParams.get("amt")) || 0,
-        sortBy: sortValidation.data,
+        sortBy: sortValidation.data || "DESC",
       };
 
       const result = await Src20Controller.handleSrc20SnapshotRequest(
@@ -55,12 +56,12 @@ export const handler: Handlers<AddressTickHandlerContext> = {
         return emptyCheck;
       }
 
-      return ResponseUtil.success(result);
+      return ResponseUtil.success(result, { routeType: RouteType.BALANCE });
     } catch (error) {
-      console.error("Error in GET handler:", error);
+      console.error("Error in snapshot handler:", error);
       return ResponseUtil.internalError(
         error,
-        "Error processing SRC20 snapshot request",
+        "Error processing snapshot request",
       );
     }
   },

@@ -3,6 +3,7 @@ import { StampController } from "$server/controller/stampController.ts";
 import { AddressHandlerContext } from "$globals";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { RouteType } from "$server/services/cacheService.ts";
 import {
   DEFAULT_PAGINATION,
   validateRequiredParams,
@@ -34,7 +35,7 @@ export const handler: Handlers<AddressHandlerContext> = {
         limit || DEFAULT_PAGINATION.limit,
         page || DEFAULT_PAGINATION.page,
       );
-      return ApiResponseUtil.success(body);
+      return ApiResponseUtil.success(body, { routeType: RouteType.BALANCE });
     } catch (error) {
       console.error("Error in stamp balance handler:", error);
       return ApiResponseUtil.internalError(
