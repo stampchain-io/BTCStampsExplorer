@@ -78,7 +78,7 @@ export class InternalRouteGuard {
   }
 
   // For webhook routes
-  static async requireAPIKey(req: Request) {
+  static requireAPIKey(req: Request) {
     const apiKey = req.headers.get("X-API-Key");
     const configApiKey = serverConfig.API_KEY;
 
@@ -141,7 +141,7 @@ export class InternalRouteGuard {
     return !!(headers.get("X-Amz-Cf-Id"));
   }
 
-  static async requireTrustedOrigin(req: Request) {
+  static requireTrustedOrigin(req: Request) {
     const requestId = `origin-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     console.log(`[${requestId}] Checking trusted origin...`);
 

@@ -52,15 +52,15 @@ const handleAccountsChanged = async (accounts: any[]) => {
     return;
   }
 
-  const _wallet = {} as Wallet;
-  _wallet.address = accounts[0]?.address;
-  _wallet.accounts = accounts.map((acc) => acc.address);
-  _wallet.publicKey = accounts[0]?.publicKey;
+  const wallet = {} as Wallet;
+  wallet.address = accounts[0]?.address;
+  wallet.accounts = accounts.map((acc) => acc.address);
+  wallet.publicKey = accounts[0]?.publicKey;
 
-  if (_wallet.address) {
-    const addressInfo = await getBTCBalanceInfo(_wallet.address);
+  if (wallet.address) {
+    const addressInfo = await getBTCBalanceInfo(wallet.address);
 
-    _wallet.btcBalance = {
+    wallet.btcBalance = {
       confirmed: addressInfo?.balance ?? 0,
       unconfirmed: addressInfo?.unconfirmedBalance ?? 0,
       total: (addressInfo?.balance ?? 0) +
@@ -68,10 +68,10 @@ const handleAccountsChanged = async (accounts: any[]) => {
     };
   }
 
-  _wallet.network = "mainnet";
-  _wallet.provider = "phantom";
+  wallet.network = "mainnet";
+  wallet.provider = "phantom";
 
-  walletContext.updateWallet(_wallet);
+  walletContext.updateWallet(wallet);
 };
 
 const signMessage = async (message: string) => {

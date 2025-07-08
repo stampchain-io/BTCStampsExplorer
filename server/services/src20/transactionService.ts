@@ -1,7 +1,7 @@
 import { TX, TXError } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { deploySRC20, mintSRC20, transferSRC20 } from "./index.ts";
-import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$types/index.d.ts";
+import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$server/types/services/src20.d.ts";
 import { InputData } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
 
@@ -98,6 +98,7 @@ export class SRC20TransactionService {
 
   private static prepareDeploy(body: InputData): IDeploySRC20 {
     return {
+      network: "mainnet",
       toAddress: body.toAddress,
       changeAddress: body.changeAddress,
       tick: body.tick,
@@ -109,7 +110,7 @@ export class SRC20TransactionService {
       web: body.web ?? "",
       email: body.email ?? "",
       tg: body.tg ?? "",
-      description: body.description ?? "",
+      description: (body.description || body.desc) ?? "",
     };
   }
 
@@ -119,7 +120,7 @@ export class SRC20TransactionService {
       changeAddress: body.changeAddress,
       tick: body.tick,
       feeRate: body.feeRate,
-      amt: body.amt.toString(),
+      amt: body.amt?.toString() ?? "",
     };
   }
 
@@ -129,7 +130,7 @@ export class SRC20TransactionService {
       fromAddress: body.fromAddress,
       tick: body.tick,
       feeRate: body.feeRate,
-      amt: body.amt.toString(),
+      amt: body.amt?.toString() ?? "",
     };
   }
 }

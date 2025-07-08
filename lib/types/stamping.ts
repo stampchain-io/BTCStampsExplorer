@@ -1,4 +1,4 @@
-import type { TransactionInput, TransactionOutput } from "./transaction.d.ts";
+import type { TransactionInput, TransactionOutput } from "./base.d.ts";
 
 // Import StampRow and SRC20Row from globals
 import type { SRC20Row, StampRow } from "$globals";

@@ -1,7 +1,7 @@
 /* ===== NOT IN USE ===== */
 import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { WalletOverviewInfo } from "$lib/types/index.d.ts";
+import { WalletData } from "$lib/types/index.d.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { containerBackground, containerColData } from "$layout";
 import {
@@ -19,7 +19,7 @@ import { Icon } from "$icon";
 /* ===== MAIN WALLET DETAILS COMPONENT ===== */
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
-    walletData: WalletOverviewInfo;
+    walletData: WalletData;
     stampsTotal: number;
     src20Total: number;
     stampsCreated: number;
@@ -47,7 +47,7 @@ function WalletDetails(
 /* ===== WALLET OVERVIEW SUBCOMPONENT ===== */
 function WalletOverview(
   { walletData }: {
-    walletData: WalletOverviewInfo;
+    walletData: WalletData;
   },
 ) {
   /* ===== STATE ===== */
@@ -113,12 +113,6 @@ function WalletOverview(
   };
 
   /* ===== COMPUTED VALUES ===== */
-  const displayPrice = walletData.dispensers?.items?.[0]?.satoshirate
-    ? parseInt(walletData.dispensers.items[0].satoshirate.toString(), 10) /
-      100000000
-    : 0;
-
-  const _displayPriceUSD = displayPrice * walletData.btcPrice;
 
   console.log("walletData:", walletData);
   console.log("dispensers:", walletData.dispensers);

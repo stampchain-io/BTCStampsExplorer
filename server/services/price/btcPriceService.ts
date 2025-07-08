@@ -1,4 +1,3 @@
-import { CachedQuicknodeRPCService } from "$server/services/quicknode/cachedQuicknodeRpcService.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { RouteType, getCacheConfig } from "$server/services/cacheService.ts";
 import { COINGECKO_API_BASE_URL } from "$lib/utils/constants.ts";

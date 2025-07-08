@@ -136,7 +136,7 @@ Deno.test("SRC20 API V1 vs V2 Response Compatibility", async (t) => {
         );
 
         // Compare essential data properties
-        v1Result.data.forEach((v1Item, index) => {
+        v1Result.data.forEach((v1Item: any, index: any) => {
           const v2Item = v2Result.data[index];
           assertEquals(
             Object.keys(v1Item).sort(),

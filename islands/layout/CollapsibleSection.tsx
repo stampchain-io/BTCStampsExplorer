@@ -10,7 +10,6 @@ export const CollapsibleSection = ({
   toggle,
   children,
   variant,
-  section: _section,
 }: {
   title: string;
   expanded: boolean;
@@ -173,8 +172,8 @@ export const CollapsibleSection = ({
 
     default: {
       // This exhaustiveness check ensures all variants are handled
-      const _exhaustiveCheck: never = variant;
-      return _exhaustiveCheck;
+      const exhaustiveCheck: never = variant;
+      return exhaustiveCheck;
     }
   }
 };

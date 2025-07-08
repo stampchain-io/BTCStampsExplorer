@@ -1,5 +1,5 @@
 import { dbManager } from "$server/database/databaseManager.ts";
-import { DEFAULT_CACHE_DURATION } from "$constants";
+import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT } from "$constants";
 import {
   parseBTCDecimal,
   parseVolumeSources,
@@ -27,6 +27,13 @@ import type { StampFilters } from "$globals";
  * collections, and holder information with proper cache freshness calculations.
  */
 export class MarketDataRepository {
+  // Dependency injection support
+  private static db: typeof dbManager = dbManager;
+  
+  static setDatabase(database: typeof dbManager): void {
+    this.db = database;
+  }
+
   /**
    * Get market data for a single stamp by CPID
    * @param cpid - The CPID of the stamp
@@ -56,24 +63,32 @@ export class MarketDataRepository {
         last_updated,
         last_price_update,
         update_frequency_minutes,
-        TIMESTAMPDIFF(MINUTE, last_updated, NOW()) as cache_age_minutes
+        last_sale_tx_hash,
+        last_sale_buyer_address,
+        last_sale_dispenser_address,
+        last_sale_btc_amount,
+        last_sale_dispenser_tx_hash,
+        last_sale_block_index,
+        activity_level,
+        last_activity_time,
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM stamp_market_data
       WHERE cpid = ?
       LIMIT 1
     `;
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         [cpid],
         DEFAULT_CACHE_DURATION
       );
 
-      if (!result.rows || result.rows.length === 0) {
+      if (!(result as any).rows || (result as any).rows.length === 0) {
         return null;
       }
 
-      const row = result.rows[0] as StampMarketDataRow & { cache_age_minutes: number };
+      const row = (result as any).rows[0] as StampMarketDataRow & { cache_age_minutes: number };
       
       // Parse the row data into the application format
       return this.parseStampMarketDataRow(row);
@@ -99,7 +114,7 @@ export class MarketDataRepository {
     const {
       collectionId,
       offset = 0,
-      limit = 100,
+      limit = MAX_PAGINATION_LIMIT,
       filters,
       sortBy = 'block_index',
       sortOrder = 'DESC'
@@ -130,7 +145,7 @@ export class MarketDataRepository {
         smd.last_updated as market_data_last_updated,
         smd.last_price_update,
         smd.update_frequency_minutes,
-        TIMESTAMPDIFF(MINUTE, smd.last_updated, NOW()) as cache_age_minutes
+        TIMESTAMPDIFF(MINUTE, smd.last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM stamps st
       LEFT JOIN creator cr ON st.creator = cr.address
       LEFT JOIN stamp_market_data smd ON st.cpid = smd.cpid
@@ -163,7 +178,7 @@ export class MarketDataRepository {
     queryParams.push(limit, offset);
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         queryParams,
         DEFAULT_CACHE_DURATION
@@ -283,24 +298,24 @@ export class MarketDataRepository {
         exchange_sources,
         data_quality_score,
         last_updated,
-        TIMESTAMPDIFF(MINUTE, last_updated, NOW()) as cache_age_minutes
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM src20_market_data
       WHERE tick = ?
       LIMIT 1
     `;
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         [tick],
         DEFAULT_CACHE_DURATION
       );
 
-      if (!result.rows || result.rows.length === 0) {
+      if (!(result as any).rows || (result as any).rows.length === 0) {
         return null;
       }
 
-      const row = result.rows[0] as SRC20MarketDataRow & { cache_age_minutes: number };
+      const row = (result as any).rows[0] as SRC20MarketDataRow & { cache_age_minutes: number };
       
       // Parse the row data into the application format
       return this.parseSRC20MarketDataRow(row);
@@ -333,24 +348,24 @@ export class MarketDataRepository {
         avg_distribution_score,
         total_stamps_count,
         last_updated,
-        TIMESTAMPDIFF(MINUTE, last_updated, NOW()) as cache_age_minutes
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM collection_market_data
       WHERE collection_id = ?
       LIMIT 1
     `;
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         [collectionId],
         DEFAULT_CACHE_DURATION
       );
 
-      if (!result.rows || result.rows.length === 0) {
+      if (!(result as any).rows || (result as any).rows.length === 0) {
         return null;
       }
 
-      const row = result.rows[0] as CollectionMarketDataRow & { cache_age_minutes: number };
+      const row = (result as any).rows[0] as CollectionMarketDataRow & { cache_age_minutes: number };
       
       // Parse the row data into the application format
       return this.parseCollectionMarketDataRow(row);
@@ -381,18 +396,18 @@ export class MarketDataRepository {
     `;
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         [cpid],
         DEFAULT_CACHE_DURATION
       );
 
-      if (!result.rows) {
+      if (!(result as any).rows) {
         return [];
       }
 
       // Parse each row into StampHolderCache format
-      return result.rows.map((row: StampHolderCacheRow) => ({
+      return (result as any).rows.map((row: StampHolderCacheRow) => ({
         id: row.id,
         cpid: row.cpid,
         address: row.address,
@@ -443,13 +458,21 @@ export class MarketDataRepository {
         last_updated,
         last_price_update,
         update_frequency_minutes,
-        TIMESTAMPDIFF(MINUTE, last_updated, NOW()) as cache_age_minutes
+        last_sale_tx_hash,
+        last_sale_buyer_address,
+        last_sale_dispenser_address,
+        last_sale_btc_amount,
+        last_sale_dispenser_tx_hash,
+        last_sale_block_index,
+        activity_level,
+        last_activity_time,
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM stamp_market_data
       WHERE cpid IN (${placeholders})
     `;
 
     try {
-      const result = await dbManager.executeQueryWithCache(
+      const result = await this.db.executeQueryWithCache(
         query,
         cpids,
         DEFAULT_CACHE_DURATION
@@ -502,6 +525,16 @@ export class MarketDataRepository {
         lastUpdated: new Date(row.last_updated),
         lastPriceUpdate: row.last_price_update ? new Date(row.last_price_update) : null,
         updateFrequencyMinutes: row.update_frequency_minutes || 60,
+        // Transaction detail fields
+        lastSaleTxHash: row.last_sale_tx_hash,
+        lastSaleBuyerAddress: row.last_sale_buyer_address,
+        lastSaleDispenserAddress: row.last_sale_dispenser_address,
+        lastSaleBtcAmount: row.last_sale_btc_amount ? parseBTCDecimal(row.last_sale_btc_amount) : null,
+        lastSaleDispenserTxHash: row.last_sale_dispenser_tx_hash,
+        lastSaleBlockIndex: row.last_sale_block_index,
+        // Activity tracking fields
+        activityLevel: row.activity_level,
+        lastActivityTime: row.last_activity_time,
       };
     } catch (error) {
       console.error("Error parsing stamp market data row:", error);
@@ -600,13 +633,14 @@ export class MarketDataRepository {
         exchange_sources,
         data_quality_score,
         last_updated,
-        TIMESTAMPDIFF(MINUTE, last_updated, NOW()) as cache_age_minutes
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
       FROM src20_market_data
+
       ORDER BY CAST(market_cap_btc AS DECIMAL(20,8)) DESC
       LIMIT ?
     `;
 
-    const result = await dbManager.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache(
       query,
       [limit],
       DEFAULT_CACHE_DURATION
@@ -620,6 +654,6 @@ export class MarketDataRepository {
       .map((row: SRC20MarketDataRow & { cache_age_minutes: number }) => 
         this.parseSRC20MarketDataRow(row)
       )
-      .filter((data): data is SRC20MarketData => data !== null);
+      .filter((data: any): data is SRC20MarketData => data !== null);
   }
 }

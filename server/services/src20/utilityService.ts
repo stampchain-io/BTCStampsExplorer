@@ -1,13 +1,14 @@
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Src20Detail, InputData } from "$globals";
+import { Src20Detail } from "$globals";
 import { crypto } from "@std/crypto";
 import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
 import { SRC20QueryService } from "./queryService.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$types/index.d.ts";
-import { InputData } from "$server/types/index.d.ts";
+import { InputData } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { validateImageReference } from "$lib/utils/imageProtocolUtils.ts";
+
 export class SRC20UtilityService {
   static formatSRC20Row(row: Src20Detail) {
     return {
@@ -103,7 +104,32 @@ export class SRC20UtilityService {
   }
 
   private static async validateDeploy(data: InputData): Promise<Response | null> {
-    // Skip deployed check for estimation
+    // Optional field validations - apply to both estimation and non-estimation
+    if (data.x && (typeof data.x !== 'string' || data.x.length > 32 || !/^[a-zA-Z0-9_]{1,32}$/.test(data.x))) {
+      return ResponseUtil.badRequest("Invalid x username (max 32 chars, alphanumeric and underscore only)");
+    }
+    if (data.web) {
+      if (typeof data.web !== 'string') {
+        return ResponseUtil.badRequest("Invalid website URL (must be string)");
+      }
+      if (data.web.length > 255) {
+        return ResponseUtil.badRequest("Invalid website URL (max 255 chars)");
+      }
+      if (!/^https?:\/\/.+/.test(data.web)) {
+        return ResponseUtil.badRequest("Invalid website URL (must start with http:// or https://)");
+      }
+    }
+    if (data.email && (typeof data.email !== 'string' || data.email.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))) {
+      return ResponseUtil.badRequest("Invalid email address (max 255 chars)");
+    }
+    if (data.tg && (typeof data.tg !== 'string' || data.tg.length > 32 || !/^[a-zA-Z0-9_]{1,32}$/.test(data.tg))) {
+      return ResponseUtil.badRequest("Invalid telegram username (max 32 chars, alphanumeric and underscore only)");
+    }
+    if ((data.description || data.desc) && (typeof (data.description || data.desc) !== 'string' || (data.description || data.desc)!.length > 255)) {
+      return ResponseUtil.badRequest("Invalid description (max 255 chars)");
+    }
+
+    // Skip deployed check for estimation only
     if (!data.isEstimate) {
       const { deployed } = await this.checkDeployedTick(data.tick);
       if (deployed) {
@@ -126,7 +152,7 @@ export class SRC20UtilityService {
     try {
       const maxValue = BigInt(data.max);
       const limValue = BigInt(data.lim);
-      const decValue = parseInt(data.dec);
+      const decValue = typeof data.dec === 'number' ? data.dec : parseInt(String(data.dec));
 
       if (maxValue <= 0n) {
         return ResponseUtil.badRequest("Max supply must be greater than 0");
@@ -141,20 +167,11 @@ export class SRC20UtilityService {
         return ResponseUtil.badRequest("Decimals must be between 0 and 18");
       }
     } catch (error) {
+      logger.error("src20-utility", { 
+        message: "Failed to parse numeric values for deploy validation", 
+        error: error instanceof Error ? error.message : String(error) 
+      });
       return ResponseUtil.badRequest("Invalid numeric values provided");
-    }
-
-    // Optional field validations - skip for estimation
-    if (!data.isEstimate) {
-      if (data.x && !/^[a-zA-Z0-9_]{1,15}$/.test(data.x)) {
-        return ResponseUtil.badRequest("Invalid x username");
-      }
-      if (data.web && !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(data.web)) {
-        return ResponseUtil.badRequest("Invalid website URL");
-      }
-      if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        return ResponseUtil.badRequest("Invalid email address");
-      }
     }
 
     return null;
@@ -197,5 +214,121 @@ export class SRC20UtilityService {
     }
 
     return null;
+  }
+
+  static validateSRC20Deployment(data: {
+    tick: string;
+    max: string;
+    lim: string;
+    dec?: number;
+    x?: string;
+    web?: string;
+    email?: string;
+    tg?: string;
+    description?: string;
+    desc?: string;
+    img?: string;
+    icon?: string;
+    isEstimate?: boolean;
+  }): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
+    
+    // Core field validation (existing logic)
+    if (!data.tick || typeof data.tick !== "string") {
+      errors.push("tick is required and must be a string");
+    } else if (data.tick.length > 32) {
+      errors.push("tick must be 32 characters or less");
+    }
+
+    if (!data.max || typeof data.max !== "string") {
+      errors.push("max is required and must be a string");
+    }
+
+    if (!data.lim || typeof data.lim !== "string") {
+      errors.push("lim is required and must be a string");
+    }
+
+    if (data.dec !== undefined) {
+      if (typeof data.dec !== "number" || data.dec < 0 || data.dec > 18) {
+        errors.push("dec must be a number between 0 and 18");
+      }
+    }
+
+    // Metadata validation (moved outside isEstimate check for consistent validation)
+    if (data.x !== undefined) {
+      if (typeof data.x !== "string") {
+        errors.push("x must be a string");
+      } else if (data.x.length > 32) {
+        errors.push("x must be 32 characters or less");
+      } else if (!/^[a-zA-Z0-9_]+$/.test(data.x)) {
+        errors.push("x must contain only alphanumeric characters and underscores");
+      }
+    }
+
+    if (data.tg !== undefined) {
+      if (typeof data.tg !== "string") {
+        errors.push("tg must be a string");
+      } else if (data.tg.length > 32) {
+        errors.push("tg must be 32 characters or less");
+      } else if (!/^[a-zA-Z0-9_]+$/.test(data.tg)) {
+        errors.push("tg must contain only alphanumeric characters and underscores");
+      }
+    }
+
+    if (data.web !== undefined) {
+      if (typeof data.web !== "string") {
+        errors.push("web must be a string");
+      } else if (data.web.length > 255) {
+        errors.push("web must be 255 characters or less");
+      } else if (!/^https?:\/\/.+/.test(data.web)) {
+        errors.push("web must be a valid HTTP/HTTPS URL");
+      }
+    }
+
+    if (data.email !== undefined) {
+      if (typeof data.email !== "string") {
+        errors.push("email must be a string");
+      } else if (data.email.length > 255) {
+        errors.push("email must be 255 characters or less");
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+        errors.push("email must be a valid email address");
+      }
+    }
+
+    // Handle description/desc fallback logic
+    const description = data.description || data.desc;
+    if (description !== undefined) {
+      if (typeof description !== "string") {
+        errors.push("description must be a string");
+      } else if (description.length > 255) {
+        errors.push("description must be 255 characters or less");
+      }
+    }
+
+    // Image field validation using protocol prefix system
+    if (data.img !== undefined) {
+      if (typeof data.img !== "string") {
+        errors.push("img must be a string");
+      } else if (data.img.length > 32) {
+        errors.push("img must be 32 characters or less");
+      } else if (!validateImageReference(data.img)) {
+        errors.push("img must be a valid image reference with protocol prefix (e.g., 'ar:hash', 'ipfs:hash', 'fc:hash')");
+      }
+    }
+
+    if (data.icon !== undefined) {
+      if (typeof data.icon !== "string") {
+        errors.push("icon must be a string");
+      } else if (data.icon.length > 32) {
+        errors.push("icon must be 32 characters or less");
+      } else if (!validateImageReference(data.icon)) {
+        errors.push("icon must be a valid image reference with protocol prefix (e.g., 'ar:hash', 'ipfs:hash', 'fc:hash')");
+      }
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
   }
 }

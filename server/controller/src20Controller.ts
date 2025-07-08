@@ -3,14 +3,13 @@ import { SRC20Repository } from "$server/database/src20Repository.ts";
 import {
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
+  PaginatedSrc20ResponseBody,
 } from "$globals";
-import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
-import { StampService } from "$server/services/stampService.ts";
+import { SRC20BalanceRequestParams, SRC20TickPageData } from "$lib/types/src20.d.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { MarketListingAggregated } from "$types/index.d.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
-import { WalletData } from "$lib/types/index.d.ts";
 import { formatAmount } from "$lib/utils/formatUtils.ts";
 
 export class Src20Controller {
@@ -59,7 +58,7 @@ export class Src20Controller {
         params,
         excludeFullyMinted,
       );
-      return result.rows[0].total;
+      return (result as any).rows[0].total;
     } catch (error) {
       console.error("Error getting total valid SRC20 transactions:", error);
       throw error;
@@ -71,7 +70,7 @@ export class Src20Controller {
    * This method is kept for backward compatibility with existing API routes.
    */
   static async handleSrc20TransactionsRequest(
-    req: Request,
+    _req: Request,
     params: SRC20TrxRequestParams,
     excludeFullyMinted = false,
   ) {
@@ -108,24 +107,24 @@ export class Src20Controller {
       };
 
       // Process data with mint progress if requested
-      let processedData = rawData.length > 1 ? [...rawData]: rawData;
+      let processedData: any = Array.isArray(rawData) && rawData.length > 1 ? [...rawData]: rawData;
 
-      if (balanceParams.includeMintData) {
-        const ticks = processedData.map(row => row.tick).filter(Boolean);
+      if (balanceParams.includeMintData && Array.isArray(processedData)) {
+        const ticks = processedData.map((row: any) => row.tick).filter(Boolean);
         if (ticks.length > 0) {
           const mintProgressData = await Promise.all(
-            ticks.map(tick => 
+            ticks.map((tick: string) => 
               SRC20Service.QueryService.fetchSrc20MintProgress(tick)
             )
           );
           
           // Create a map of tick to mint progress for efficient lookup
           const mintProgressMap = new Map(
-            mintProgressData.map((progress, index) => [ticks[index], progress])
+            mintProgressData.map((progress: any, index: number) => [ticks[index], progress])
           );
 
           // Enrich data with mint progress
-          processedData = processedData.map(row => ({
+          processedData = processedData.map((row: any) => ({
             ...row,
             mint_progress: mintProgressMap.get(row.tick) || null
           }));
@@ -196,7 +195,11 @@ export class Src20Controller {
   }) {
     const [src20_txs, totalResult, lastBlock, mint_status] = await Promise.all([
       SRC20Service.QueryService.fetchRawSrc20Data(params),
-      this.getTotalCountValidSrc20Tx({ tick: params.tick, op: params.op }),
+      this.getTotalCountValidSrc20Tx(
+        params.op 
+          ? { tick: params.tick, op: params.op }
+          : { tick: params.tick }
+      ),
       BlockService.getLastBlock(),
       SRC20Service.QueryService.fetchSrc20MintProgress(params.tick),
     ]);
@@ -220,7 +223,7 @@ export class Src20Controller {
     return { data, total, lastBlock };
   }
 
-  static async handleDeploymentRequest(tick: string, req: Request) {
+  static async handleDeploymentRequest(tick: string, _req: Request) {
     try {
       const [deploymentData, mintStatusData, lastBlockData] = await Promise.all(
         [
@@ -240,7 +243,7 @@ export class Src20Controller {
       );
 
       // If deploymentData is empty, it means the tick doesn't exist
-      if (!deploymentData.data || deploymentData.data.length === 0) {
+      if (!deploymentData.data || !Array.isArray(deploymentData.data) || deploymentData.data.length === 0) {
         return {
           last_block: lastBlockData.last_block,
           mint_status: null,
@@ -251,7 +254,7 @@ export class Src20Controller {
       return {
         last_block: lastBlockData.last_block,
         mint_status: mintStatusData,
-        data: deploymentData.data[0],
+        data: (deploymentData.data as any[])[0],
       };
     } catch (error) {
       console.error("Error in handleDeploymentRequest:", error);
@@ -303,7 +306,7 @@ export class Src20Controller {
           ? balanceResponse.data.length
           : 0,
         holders: Array.isArray(balanceResponse.data)
-          ? balanceResponse.data.map((row) => {
+          ? balanceResponse.data.map((row: any) => {
             const amt = formatAmount(row.amt || "0");
             const totalMinted = formatAmount(
               mintProgressResponse?.total_minted || "1",
@@ -313,14 +316,17 @@ export class Src20Controller {
           })
           : [],
         mint_status: {
-          ...mintProgressResponse,
           max_supply: mintProgressResponse?.max_supply?.toString() || "0",
           total_minted: mintProgressResponse?.total_minted?.toString() || "0",
           limit: mintProgressResponse?.limit?.toString() || "0",
+          total_mints: mintProgressResponse?.total_mints || 0,
+          progress: mintProgressResponse?.progress || "0",
+          decimals: mintProgressResponse?.decimals || 0,
+          tx_hash: mintProgressResponse?.tx_hash || "",
         },
         total_transactions: totalCount,
-        marketInfo: marketInfoForTick,
-      };
+        marketInfo: marketInfoForTick || undefined,
+      } as SRC20TickPageData;
     } catch (error) {
       console.error("Error in fetchSrc20TickPageData:", error);
       throw error;
@@ -351,7 +357,7 @@ export class Src20Controller {
       }
       
       // Convert to MarketListingAggregated format for compatibility
-      const convertedMarketData = cachedMarketData.map(data => 
+      const convertedMarketData = cachedMarketData.map((data: any) => 
         this.convertToMarketListingFormat(data)
       );
       
@@ -366,12 +372,12 @@ export class Src20Controller {
       // not just the ones in the market data cache
       let ticksToFetch = sortedTicks;
       
-      // If we have no cached market data, fall back to external API
-      let marketDataToUse = convertedMarketData;
-      if (cachedMarketData.length === 0) {
-        console.log("No cached market data found, falling back to external API");
-        marketDataToUse = undefined; // This will trigger fetchMarketListingSummary in enrichData
-      }
+      // Use cached market data when available, fall back to external API when not
+      let marketDataToUse = convertedMarketData.length > 0 ? convertedMarketData : undefined;
+              if (cachedMarketData.length === 0) {
+          console.log("No cached market data found, falling back to external API");
+          marketDataToUse = undefined; // This will trigger fetchMarketListingSummary in enrichData
+        }
       
       if (sortBy !== "TRENDING" && sortBy !== "VOLUME") {
         // For non-market-based sorts, fetch all fully minted tokens
@@ -397,12 +403,12 @@ export class Src20Controller {
       if (ticksToFetch.length === 0) {
         return {
           data: [],
-          total: 0,
           page,
           totalPages: 0,
           limit,
-          last_block: await BlockService.getLastBlock()
-        };
+          last_block: await BlockService.getLastBlock(),
+          total: 0,
+        } as PaginatedSrc20ResponseBody;
       }
 
       // Fetch ALL SRC20 data first (without pagination) to sort properly
@@ -418,7 +424,7 @@ export class Src20Controller {
           onlyFullyMinted: true,
           includeMarketData: true,
           enrichWithProgress: true,
-          prefetchedMarketData: marketDataToUse
+          ...(marketDataToUse && { prefetchedMarketData: marketDataToUse })
         }
       );
 
@@ -465,12 +471,12 @@ export class Src20Controller {
 
       return {
         data: paginatedData,
-        total: allData.length,
         page,
         totalPages,
         limit,
-        last_block: await BlockService.getLastBlock()
-      };
+        last_block: await BlockService.getLastBlock(),
+        total: allData.length,
+      } as PaginatedSrc20ResponseBody;
     } catch (error) {
       console.error("Error in fetchFullyMintedByMarketCapV2:", error);
       throw error;
@@ -497,27 +503,25 @@ export class Src20Controller {
       // Get cached market data for minting tokens as well
       const cachedMarketData = await MarketDataRepository.getAllSRC20MarketData(1000);
       const convertedMarketData = cachedMarketData.length > 0 
-        ? cachedMarketData.map(data => this.convertToMarketListingFormat(data))
+        ? cachedMarketData.map((data: any) => this.convertToMarketListingFormat(data))
         : undefined;
 
       // Use V2 endpoint for enriched data with market info
       const enrichedData = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
         {
           tick: allTrendingData.data.map(row => row.tick),
-          includeMarketData: true,
-          enrichWithProgress: true,
         },
         {
           excludeFullyMinted: true,
           includeMarketData: true,
           enrichWithProgress: true,
           batchSize: 50,
-          prefetchedMarketData: convertedMarketData
+          ...(convertedMarketData && { prefetchedMarketData: convertedMarketData })
         }
       );
 
       // Merge trending data with enriched data
-      let allEnrichedResult = allTrendingData.data.map(row => {
+      const allEnrichedResult = allTrendingData.data.map(row => {
         const enrichedItem = Array.isArray(enrichedData.data) 
           ? enrichedData.data.find(item => item.tick === row.tick)
           : enrichedData.data;
@@ -525,19 +529,19 @@ export class Src20Controller {
         return {
           ...row,
           ...enrichedItem,
-          holders: enrichedItem?.holders || 0,
-          mcap: enrichedItem?.market_data?.mcap || 0,
-          market_cap: enrichedItem?.market_data?.mcap || 0, // Add market_cap for display
-          floor_unit_price: enrichedItem?.market_data?.floor_unit_price || 0,
-          volume24: enrichedItem?.market_data?.volume24 || 0, // Add volume24
-          change24: enrichedItem?.market_data?.change24 || 0, // Use the change24 from market data
-          progress: enrichedItem?.mint_progress?.progress || null,
+          holders: (enrichedItem && 'holders' in enrichedItem) ? enrichedItem.holders : 0,
+          mcap: (enrichedItem && 'market_data' in enrichedItem) ? enrichedItem.market_data?.mcap || 0 : 0,
+          market_cap: (enrichedItem && 'market_data' in enrichedItem) ? enrichedItem.market_data?.mcap || 0 : 0, // Add market_cap for display
+          floor_unit_price: (enrichedItem && 'market_data' in enrichedItem) ? enrichedItem.market_data?.floor_unit_price || 0 : 0,
+          volume24: (enrichedItem && 'market_data' in enrichedItem) ? enrichedItem.market_data?.volume24 || 0 : 0, // Add volume24
+          change24: (enrichedItem && 'market_data' in enrichedItem) ? enrichedItem.market_data?.change24 || 0 : 0, // Use the change24 from market data
+          progress: (enrichedItem && 'mint_progress' in enrichedItem) ? enrichedItem.mint_progress?.progress || null : null,
           mint_count: row.mint_count,
           top_mints_percentage: row.top_mints_percentage
             ? Number(row.top_mints_percentage)
             : 0,
-          total_minted: enrichedItem?.mint_progress?.total_minted || "0",
-          max_supply: enrichedItem?.mint_progress?.max_supply || "0",
+          total_minted: (enrichedItem && 'mint_progress' in enrichedItem) ? enrichedItem.mint_progress?.total_minted || "0" : "0",
+          max_supply: (enrichedItem && 'mint_progress' in enrichedItem) ? enrichedItem.mint_progress?.max_supply || "0" : "0",
         };
       });
 
@@ -573,7 +577,8 @@ export class Src20Controller {
         total: allEnrichedResult.length,
         page,
         totalPages,
-        limit
+        limit,
+        last_block: await BlockService.getLastBlock()
       };
     } catch (error) {
       console.error("Error in fetchTrendingActiveMintingTokensV2:", error);

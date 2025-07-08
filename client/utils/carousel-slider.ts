@@ -2,7 +2,7 @@ import { Swiper } from "swiper";
 import { Autoplay, Pagination } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 
-type CarouselElement = HTMLElement | null;
+type CarouselElement = any;
 
 const CAROUSEL_CONFIG = {
   // Base dimensions
@@ -175,11 +175,11 @@ export default function createCarouselSlider(
 ): SwiperType | undefined {
   if (!el) return undefined;
 
-  const swiperEl = el.querySelector(".swiper") as HTMLElement;
+  const swiperEl = el.querySelector(".swiper") as any;
   if (!swiperEl) return undefined;
 
   const isMobile =
-    globalThis.innerWidth < CAROUSEL_CONFIG.BREAKPOINTS.MOBILE_LG;
+    (globalThis as any).innerWidth < CAROUSEL_CONFIG.BREAKPOINTS.MOBILE_LG;
 
   const swiper = new Swiper(swiperEl, {
     modules: [Autoplay, Pagination],
@@ -198,7 +198,6 @@ export default function createCarouselSlider(
       disableOnInteraction: false,
       pauseOnMouseEnter: false,
       waitForTransition: false,
-      enabled: true,
     },
 
     effect: "custom",
@@ -249,7 +248,7 @@ export default function createCarouselSlider(
       },
 
       progress: function (swiper: SwiperType) {
-        const containerWidth = el.offsetWidth;
+        const containerWidth = (el as any).offsetWidth;
         const isMobile = containerWidth < CAROUSEL_CONFIG.BREAKPOINTS.MOBILE_LG;
         const { baseWidth } = calculateDimensions(containerWidth);
         const centerX = containerWidth / 2;
@@ -262,9 +261,9 @@ export default function createCarouselSlider(
           centerX,
         );
 
-        requestAnimationFrame(() => {
+        (globalThis as any).requestAnimationFrame(() => {
           transforms.forEach(({ el, transform }) => {
-            Object.assign(el.style, transform);
+            Object.assign((el as any).style, transform);
           });
         });
       },
@@ -289,7 +288,7 @@ export default function createCarouselSlider(
           time: Date.now(),
         });
 
-        requestAnimationFrame(() => {
+        (globalThis as any).requestAnimationFrame(() => {
           swiper.slideTo(nextIndex, CAROUSEL_CONFIG.ANIMATION.SPEED);
         });
       },
@@ -301,7 +300,7 @@ export default function createCarouselSlider(
           autoplayRunning: swiper.autoplay.running,
           time: Date.now(),
         });
-        const paginationBullets = document.querySelectorAll(
+        const paginationBullets = (globalThis as any).document.querySelectorAll(
           ".swiper-pagination .swiper-pagination-bullet",
         );
 
@@ -309,20 +308,21 @@ export default function createCarouselSlider(
           ? CAROUSEL_CONFIG.SLIDES.COUNT.MOBILE
           : CAROUSEL_CONFIG.SLIDES.COUNT.DESKTOP;
 
-        paginationBullets.forEach((bullet, index) => {
+        paginationBullets.forEach((bullet: any, index: any) => {
+          const bulletElement = bullet as any;
           if (swiper.realIndex >= visibleSlides) {
             if (
               index >= visibleSlides
             ) {
-              bullet.style.display = "block";
+              bulletElement.style.display = "block";
             } else {
-              bullet.style.display = "none";
+              bulletElement.style.display = "none";
             }
           } else {
             if (index >= visibleSlides) {
-              bullet.style.display = "none";
+              bulletElement.style.display = "none";
             } else {
-              bullet.style.display = "block";
+              bulletElement.style.display = "block";
             }
           }
         });

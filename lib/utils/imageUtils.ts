@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 import { StampRow } from "$globals";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 export const mimeTypes: { [key: string]: string } = {
@@ -176,7 +177,7 @@ export function isValidSVG(svgContent: string): boolean {
   );
 
   // Check if external references are from trusted domains
-  for (const element of dangerous) {
+  for (const element of Array.from(dangerous)) {
     const href = element.getAttribute("href") ||
       element.getAttribute("xlink:href");
     if (href && href.startsWith("http")) {
@@ -193,9 +194,9 @@ export function isValidSVG(svgContent: string): boolean {
 
   // Check all elements for event handlers and untrusted external references
   const allElements = doc.getElementsByTagName("*");
-  for (const element of allElements) {
+  for (const element of Array.from(allElements)) {
     const attributes = element.attributes;
-    for (const attr of attributes) {
+    for (const attr of Array.from(attributes)) {
       // Check for event handlers
       if (attr.name.startsWith("on")) {
         return false;

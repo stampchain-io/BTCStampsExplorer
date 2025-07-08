@@ -43,6 +43,7 @@ interface SRC101FormState {
   psbtFees?: PSBTFees;
   maxAmount?: string;
   root: string;
+  utxoAncestors?: Array<any>; // Add missing utxoAncestors property
 }
 
 export function useSRC101Form(

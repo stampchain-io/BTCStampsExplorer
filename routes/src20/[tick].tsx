@@ -4,6 +4,7 @@ import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20DetailHeader } from "$header";
 import { DataTableBase, HoldersTable } from "$table";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
+import type { SRC20TickPageData } from "$types/src20.d.ts";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
@@ -37,10 +38,13 @@ export const handler: Handlers = {
         return ctx.renderNotFound();
       }
       /* @fullman */
-      const highchartsData = combinedListings.map((item, _index) => [
+      const highchartsData = combinedListings.map((
+        item: any,
+        _index: number,
+      ) => [
         new Date(item.date).getTime(),
         item.unit_price_btc * 100000000, // Convert BTC to sats
-      ]).sort((a, b) => a[0] - b[0]);
+      ]).sort((a: any, b: any) => a[0] - b[0]);
 
       /* ===== RESPONSE FORMATTING ===== */
       body.initialCounts = {
@@ -64,7 +68,7 @@ export const handler: Handlers = {
 
 /* ===== TYPES ===== */
 interface SRC20DetailPageProps {
-  data: SRC20DetailPageData | { error: string };
+  data: SRC20TickPageData | { error: string };
 }
 
 /* ===== PAGE COMPONENT ===== */

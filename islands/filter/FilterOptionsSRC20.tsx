@@ -1,5 +1,3 @@
-import { _SRC20_FILTER_TYPES } from "$globals";
-
 // Define a type for the SRC20 filters object
 export type SRC20Filters = {
   status: {

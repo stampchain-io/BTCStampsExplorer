@@ -1,4 +1,5 @@
 /* ===== RECEIVE ADDRESS MODAL COMPONENT ===== */
+import { JSX } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { tooltipIcon } from "$notification";
 import { ModalBase } from "$layout";

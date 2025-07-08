@@ -46,7 +46,7 @@ describe("StampRepository Integration Tests", () => {
       assertExists(result);
       if (result.length > 0) {
         // All stamps should have positive stamp numbers
-        result.forEach((stamp) => {
+        result.forEach((stamp: any) => {
           assertEquals(stamp.stamp > 0, true);
         });
       }
@@ -62,7 +62,7 @@ describe("StampRepository Integration Tests", () => {
       assertExists(result);
       if (result.length > 0) {
         // All stamps should have negative stamp numbers
-        result.forEach((stamp) => {
+        result.forEach((stamp: any) => {
           assertEquals(stamp.stamp < 0, true);
         });
       }
@@ -169,7 +169,7 @@ describe("StampRepository Integration Tests", () => {
       // Test with a known creator address if available
       const stamps = await StampRepository.getStamps({ limit: 10, page: 1 });
       if (stamps.length > 0) {
-        const stampWithCreator = stamps.find((s) => s.creator);
+        const stampWithCreator = stamps.find((s: any) => s.creator);
         if (stampWithCreator) {
           const creatorName = await StampRepository.getCreatorNameByAddress(
             stampWithCreator.creator,

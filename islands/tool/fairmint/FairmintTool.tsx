@@ -116,6 +116,8 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             minerFee: formState.psbtFeeDetails?.estMinerFee || 0,
             dustValue: formState.psbtFeeDetails?.totalDustValue || 0,
             hasExactFees: !!formState.psbtFeeDetails?.hasExactFees,
+            totalValue: (formState.psbtFeeDetails?.estMinerFee || 0) +
+              (formState.psbtFeeDetails?.totalDustValue || 0),
           }}
         />
 

@@ -19,6 +19,11 @@ interface ExtendedInputData
   service_fee_address?: string;
   dryRun?: boolean;
   trxType?: TrxType;
+  tg?: string;
+  description?: string;
+  desc?: string;
+  img?: string; // Simple protocol:hash format (max 32 chars)
+  icon?: string; // Simple protocol:hash format (max 32 chars)
 }
 
 interface SRC20CreateResponse {
@@ -103,16 +108,47 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
             tick: body.tick,
             max: body.max?.toString(),
             lim: body.lim?.toString(),
-            dec: body.dec?.toString(),
+            dec: body.dec !== undefined ? Number(body.dec) : undefined,
             amt: body.amt?.toString(),
             toAddress: body.toAddress,
-          },
+            x: body.x,
+            web: body.web,
+            email: body.email,
+            tg: body.tg,
+            description: body.description || body.desc,
+            img: body.img,
+            icon: body.icon,
+            isEstimate: isEffectivelyDryRun,
+          } as InputData,
         );
       if (validationError) return validationError as Response;
       if (body.trxType === "multisig") {
         return ResponseUtil.badRequest(
           "Multisig transactions should use dedicated endpoint",
         );
+      }
+
+      // Simple image validation
+      if (body.img) {
+        const { validateImageReference } = await import(
+          "$lib/utils/imageProtocolUtils.ts"
+        );
+        if (!validateImageReference(body.img)) {
+          return ResponseUtil.badRequest(
+            "Invalid img format. Use protocol:hash format (max 32 chars). Supported protocols: ar, ipfs, fc, ord",
+          );
+        }
+      }
+
+      if (body.icon) {
+        const { validateImageReference } = await import(
+          "$lib/utils/imageProtocolUtils.ts"
+        );
+        if (!validateImageReference(body.icon)) {
+          return ResponseUtil.badRequest(
+            "Invalid icon format. Use protocol:hash format (max 32 chars). Supported protocols: ar, ipfs, fc, ord",
+          );
+        }
       }
 
       const psbtResult = await SRC20Service.PSBTService.preparePSBT({
@@ -129,6 +165,11 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
           ...(body.x && { x: body.x }),
           ...(body.web && { web: body.web }),
           ...(body.email && { email: body.email }),
+          ...(body.tg && { tg: body.tg }),
+          ...((body.description || body.desc) &&
+            { description: body.description || body.desc }),
+          ...(body.img && { img: body.img }),
+          ...(body.icon && { icon: body.icon }),
         },
         satsPerVB: normalizedFees.normalizedSatsPerVB,
         service_fee: body.service_fee !== undefined

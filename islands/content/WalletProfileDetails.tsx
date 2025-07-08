@@ -186,7 +186,12 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
 
 /* ===== TOKEN STATS SUBCOMPONENT ===== */
 function TokenStats(
-  { src20Total, _handleType, src20Value = 0, _walletData }: {
+  {
+    src20Total,
+    handleType: _handleType,
+    src20Value = 0,
+    walletData: _walletData,
+  }: {
     src20Total: number;
     handleType: (type: string) => void;
     src20Value?: number;
@@ -224,7 +229,13 @@ function TokenStats(
 
 /* ===== STAMP STATS SUBCOMPONENT ===== */
 function StampStats(
-  { stampsTotal, _stampsCreated, _handleType, _stampValue = 0, _dispensers }: {
+  {
+    stampsTotal,
+    stampsCreated: _stampsCreated,
+    handleType: _handleType,
+    stampValue: _stampValue = 0,
+    dispensers: _dispensers,
+  }: {
     stampsTotal: number;
     stampsCreated: number;
     handleType: (type: string) => void;

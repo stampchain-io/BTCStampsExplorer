@@ -4,6 +4,8 @@ import { RouteType } from "$server/services/cacheService.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { validateSortDirection } from "$server/services/validationService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { getIdentifierType } from "$lib/utils/identifierUtils.ts";
+import { MAX_PAGINATION_LIMIT } from "$lib/utils/constants.ts";
 import {
   STAMP_EDITIONS,
   STAMP_FILESIZES,
@@ -113,8 +115,10 @@ export const createStampHandler = (
         }
 
         const { limit, page } = pagination;
-        const maxLimit = 100;
-        const effectiveLimit = Math.min(limit ?? maxLimit, maxLimit);
+        const effectiveLimit = Math.min(
+          limit ?? MAX_PAGINATION_LIMIT,
+          MAX_PAGINATION_LIMIT,
+        );
 
         // Get and validate sort parameter using new helper
         const sortParam = getSortParameter(url);
@@ -128,6 +132,13 @@ export const createStampHandler = (
           .filter(Boolean) as STAMP_FILETYPES[] | undefined;
         const editions = url.searchParams.get("editions")?.split(",")
           .filter(Boolean) as STAMP_EDITIONS[] | undefined;
+
+        // Extract ident parameter
+        const identParam = url.searchParams.get("ident");
+        const ident = identParam
+          ? identParam.split(",")
+            .filter(Boolean) as string[] | undefined
+          : undefined;
 
         // Extract new marketplace filters
         const market = url.searchParams.get("market") as
@@ -201,6 +212,26 @@ export const createStampHandler = (
           undefined;
         const priceSource = url.searchParams.get("priceSource") || undefined;
 
+        // Check for timestamp parameters and validate if present
+        const fromTimestamp = url.searchParams.get("from_timestamp");
+        const toTimestamp = url.searchParams.get("to_timestamp");
+
+        if (fromTimestamp && isNaN(Date.parse(fromTimestamp))) {
+          return ApiResponseUtil.badRequest(
+            `Invalid timestamp format: ${fromTimestamp}. Must be a valid date string.`,
+            undefined,
+            { routeType: cacheType },
+          );
+        }
+
+        if (toTimestamp && isNaN(Date.parse(toTimestamp))) {
+          return ApiResponseUtil.badRequest(
+            `Invalid timestamp format: ${toTimestamp}. Must be a valid date string.`,
+            undefined,
+            { routeType: cacheType },
+          );
+        }
+
         // Important part: Pass the min/max values directly to the controller
         const result = await StampController.getStamps({
           page,
@@ -209,6 +240,7 @@ export const createStampHandler = (
           type: routeConfig.type,
           allColumns: false,
           skipTotalCount: false,
+          ...(ident && { ident }),
           ...(fileType && { fileType }),
           ...(editions && { editions }),
           ...(market && { market }),
@@ -247,6 +279,17 @@ export const createStampHandler = (
         return ApiResponseUtil.success(result, { routeType: cacheType });
       } else {
         const { id } = ctx.params;
+
+        // Validate stamp ID format before processing
+        const identifierType = getIdentifierType(id);
+        if (identifierType === "invalid") {
+          return ApiResponseUtil.badRequest(
+            `Invalid stamp identifier: ${id}. Must be a valid stamp number, transaction hash, or CPID.`,
+            undefined,
+            { routeType: getCacheType(new URL(req.url).pathname, false) },
+          );
+        }
+
         const path = new URL(req.url).pathname;
 
         if (path.includes("/holders")) {

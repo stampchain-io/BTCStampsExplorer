@@ -52,8 +52,7 @@ export const handler: Handlers = {
       const action = body.action;
 
       if (action === "force-warm") {
-        const baseUrl = body.baseUrl || "https://stampchain.io";
-        await BackgroundFeeService.forceWarm(baseUrl);
+        await BackgroundFeeService.forceWarm();
 
         return Response.json({
           success: true,
@@ -74,8 +73,7 @@ export const handler: Handlers = {
       }
 
       if (action === "force-warm-fee") {
-        const baseUrl = body.baseUrl || "https://stampchain.io";
-        await BackgroundFeeService.forceWarmFee(baseUrl);
+        await BackgroundFeeService.forceWarmFee();
 
         return Response.json({
           success: true,

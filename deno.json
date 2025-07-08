@@ -54,6 +54,9 @@
     "test:version": "deno test -A --log-level=debug --no-check tests/versioning/versionChain.test.ts",
     "test:src20": "deno test --allow-net tests/src20/createTransaction.test.ts tests/src20/api-compatibility.ts tests/src20/performance.test.ts --no-check --allow-read --allow-env --allow-write",
     "test:src20:watch": "deno test --allow-net tests/src20/createTransaction.test.ts tests/src20/api-compatibility.ts tests/src20/performance.test.ts --no-check --allow-read --allow-env --allow-write --watch",
+    "test:src20:metadata": "deno test tests/unit/src20MetadataFields.test.ts --allow-all",
+    "test:src20:image-protocol": "deno test tests/unit/src20ImageProtocol.test.ts --allow-all",
+    "test:src20:metadata:watch": "DENO_ENV=test deno test tests/unit/src20MetadataFields.test.ts --no-check --allow-env --allow-read --allow-net --watch",
     "test:fees": "deno test --allow-net tests/fee-fallback.test.ts tests/quicknode-fees.test.ts tests/redis-fee-system.test.ts --no-check --allow-read --allow-env --allow-write",
     "test:fees:watch": "deno test --allow-net tests/fee-fallback.test.ts tests/quicknode-fees.test.ts tests/redis-fee-system.test.ts --no-check --allow-read --allow-env --allow-write --watch",
     "test:fee-signal": "deno test tests/unit/feeSignal.test.ts tests/unit/useFees.test.tsx tests/integration/feeInfiniteLoopPrevention.test.ts --no-check --allow-env",
@@ -66,9 +69,18 @@
     "test:performance:watch": "deno test --allow-net tests/fee-performance.test.ts --no-check --allow-read --allow-env --allow-write --watch",
     "test:btc-price": "deno test --allow-net tests/btc-price-caching.test.ts --no-check --allow-read --allow-env --allow-write",
     "test:btc-price:watch": "deno test --allow-net tests/btc-price-caching.test.ts --no-check --allow-read --allow-env --allow-write --watch",
-    "test:unit": "DENO_ENV=test deno test tests/unit/ --no-check --allow-env --allow-read",
-    "test:unit:coverage": "DENO_ENV=test mkdir -p coverage && deno test --coverage=coverage/ tests/unit/ --no-check --allow-env --allow-read && deno coverage coverage/",
-    "analyze:types": "deno run --allow-run --allow-write scripts/analyze-type-errors.ts"
+    "test:unit": "DENO_ENV=test deno test tests/unit/ --no-check --allow-env --allow-read --allow-net",
+    "test:unit:coverage": "DENO_ENV=test mkdir -p coverage && deno test --coverage=coverage/ tests/unit/ --no-check --allow-env --allow-read --allow-net && deno coverage coverage/",
+    "test:integration": "DENO_ENV=test deno test tests/integration/ --no-check --allow-env --allow-read --allow-write --allow-net",
+    "test:integration:watch": "DENO_ENV=test deno test tests/integration/ --no-check --allow-env --allow-read --allow-write --allow-net --watch",
+    "test:integration:coverage": "DENO_ENV=test mkdir -p coverage && deno test --coverage=coverage/ tests/integration/ --no-check --allow-env --allow-read --allow-write --allow-net && deno coverage coverage/",
+    "test:all": "deno task test:unit && deno task test:integration",
+    "test:fixtures": "deno run --allow-read --allow-write --allow-env --allow-net tests/fixtures/generateFixtures.ts",
+    "analyze:types": "deno run --allow-run --allow-write scripts/analyze-type-errors.ts",
+    "analyze:types:v2": "deno run --allow-run --allow-write scripts/analyze-type-errors-v2.ts",
+    "check:types:staged": "deno run --allow-run --allow-read scripts/type-check-staged.ts",
+    "type:prioritize": "deno run --allow-read --allow-write scripts/prioritize-type-fixes.ts",
+    "type:gradual": "deno run --allow-read --allow-write --allow-run scripts/setup-gradual-types.ts"
   },
   "lint": {
     "rules": {
@@ -89,7 +101,9 @@
       "**/tmp/**/*",
       "**/.cache/**/*",
       "**/build/**/*",
-      "**/vendor/**/*"
+      "**/vendor/**/*",
+      "scripts/*.js",
+      "scripts/*.cjs"
     ],
     "include": [
       "routes/",
@@ -98,10 +112,11 @@
       "lib/",
       "utils/",
       "client/",
+      "server/",
       "tests/"
     ]
   },
-  "exclude": ["**/_fresh/*", "**/server/**/*"],
+  "exclude": ["**/_fresh/*", "scripts/*.js", "scripts/*.cjs"],
   "nodeModulesDir": "auto",
   "imports": {
     "stream": "node:stream",
@@ -227,7 +242,9 @@
       ".idea/**/*",
       ".github/**/*",
       ".git/**/*",
-      ".env*"
+      ".env*",
+      "scripts/*.js",
+      "scripts/*.cjs"
     ],
     "useTabs": false,
     "lineWidth": 80,

@@ -25,6 +25,7 @@ export const BIG_LIMIT = 200;
 export const SMALL_LIMIT = 20;
 export const DEFAULT_LIMIT = 50;
 export const DEFAULT_PAGE_SIZE = 50;
+export const MAX_PAGINATION_LIMIT = 1000;
 export const RATE_LIMIT_REQUESTS = 100;
 export const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
 export const SATOSHIS_PER_BTC = 100000000;

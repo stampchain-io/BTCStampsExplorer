@@ -7,6 +7,14 @@ export const handler: Handlers<AddressHandlerContext> = {
   async GET(req, ctx) {
     try {
       const { deploy_hash } = ctx.params;
+
+      // Validate deploy_hash format (should be alphanumeric hash)
+      if (!/^[a-fA-F0-9]+$/.test(deploy_hash) || deploy_hash.length < 8) {
+        return ResponseUtil.badRequest(
+          `Invalid deploy hash format: ${deploy_hash}. Must be a valid hexadecimal hash.`,
+        );
+      }
+
       const url = new URL(req.url);
       const params = url.searchParams;
 

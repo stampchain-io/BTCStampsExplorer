@@ -54,6 +54,7 @@ export {
   type AdvancedFeeCalculatorProps,
   type AncestorInfo,
   type BaseFeeCalculatorProps,
+  type BasicUTXO,
   type FeeDetails,
   type FeeEstimationParams,
   type FeeEstimationResult,

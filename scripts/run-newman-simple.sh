@@ -16,7 +16,7 @@ mkdir -p reports/newman-simple
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 echo "Using timestamp: $TIMESTAMP"
 
-newman run postman-collection-simple.json \
+newman run tests/postman/collections/smoke.json \
   --environment postman-environment.json \
   --reporters cli,html,json \
   --reporter-html-export reports/newman-simple/$TIMESTAMP-report.html \

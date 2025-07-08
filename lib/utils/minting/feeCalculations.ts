@@ -34,7 +34,8 @@ export function estimateFee(
 ): number {
   // Consider ancestors in fee calculation
   const ancestorFees =
-    utxoAncestors?.reduce((sum, info) => sum + (info.fees || 0), 0) || 0;
+    utxoAncestors?.reduce((sum: any, info: any) => sum + (info.fees || 0), 0) ||
+    0;
   const baseEstimate = calculateBaseFee(outputs, feeRate, inputCount);
 
   return baseEstimate + ancestorFees;
