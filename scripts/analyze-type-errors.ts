@@ -55,34 +55,43 @@ function parseTypeErrors(output: string): AnalysisResult {
   let totalErrors = 0;
 
   for (const line of lines) {
+    let isError = false;
+    let fileName = "";
+
+    // Check for [ERROR] lines with "at file://" pattern
     if (line.includes("[ERROR]")) {
       totalErrors++;
+      isError = true;
 
       // Look for "at file://..." pattern to extract file name
       const fileMatch = line.match(/at file:\/\/[^\/]*\/(.+):(\d+):(\d+)/);
       if (fileMatch) {
-        const file = fileMatch[1];
-        if (!fileErrors.has(file)) {
-          fileErrors.set(file, []);
-        }
-        fileErrors.get(file)!.push(line);
-      }
-    }
-    
-    // Also look for lines that start with file paths and contain errors
-    if (line.includes("TS") && line.includes(":") && !line.includes("[ERROR]")) {
-      const pathMatch = line.match(/^\s*(.+\.tsx?)\((\d+),(\d+)\):/);
-      if (pathMatch) {
-        const file = pathMatch[1];
-        if (!fileErrors.has(file)) {
-          fileErrors.set(file, []);
-        }
-        fileErrors.get(file)!.push(line);
-        totalErrors++;
+        fileName = fileMatch[1];
       }
     }
 
-      // Categorize errors
+    // Check for error lines that start with file paths
+    if (
+      line.includes("TS") && line.includes(":") && !line.includes("[ERROR]")
+    ) {
+      const pathMatch = line.match(/^\s*(.+\.tsx?)\((\d+),(\d+)\):/);
+      if (pathMatch) {
+        fileName = pathMatch[1];
+        totalErrors++;
+        isError = true;
+      }
+    }
+
+    // Add to file errors if we found a file name
+    if (isError && fileName) {
+      if (!fileErrors.has(fileName)) {
+        fileErrors.set(fileName, []);
+      }
+      fileErrors.get(fileName)!.push(line);
+    }
+
+    // Categorize errors based on TypeScript error codes
+    if (isError) {
       if (line.includes("TS2339")) {
         errorCategories.set(
           "MISSING_PROPERTY",
