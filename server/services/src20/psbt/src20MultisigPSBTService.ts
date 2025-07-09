@@ -36,18 +36,18 @@ if (!Deno.args.includes("build")) {
   };
 }
 
-import { crypto } from "@std/crypto";
-import { TransactionService } from "$server/services/transaction/index.ts";
-import { arc4 } from "$lib/utils/minting/transactionUtils.ts";
 import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { SRC20Service } from "$server/services/src20/index.ts";
-import { serverConfig } from "$server/config/config.ts";
-import { PSBTInput, VOUT } from "$types/index.d.ts";
-import { IPrepareSRC20TX } from "$server/types/services/src20.d.ts";
-import * as msgpack from "msgpack";
-import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
+import { arc4 } from "$lib/utils/minting/transactionUtils.ts";
+import { serverConfig } from "$server/config/config.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
+import { TransactionService } from "$server/services/transaction/index.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { IPrepareSRC20TX } from "$server/types/services/src20.d.ts";
+import { PSBTInput, VOUT } from "$types/index.d.ts";
+import { crypto } from "@std/crypto";
+import * as msgpack from "msgpack";
 // import { Psbt } from "npm:bitcoinjs-lib";
 
 export class SRC20MultisigPSBTService {
@@ -182,7 +182,7 @@ export class SRC20MultisigPSBTService {
         if (isWitnessUtxo) {
           psbtInput.witnessUtxo = {
             script: new Uint8Array(hex2bin(input.script)),
-            value: Number(input.value),
+            value: BigInt(input.value),
           };
         } else {
           const rawTxHex = await SRC20MultisigPSBTService.commonUtxoService.getRawTransactionHex(input.txid);

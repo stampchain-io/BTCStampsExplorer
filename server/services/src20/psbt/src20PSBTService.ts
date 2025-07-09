@@ -1,15 +1,14 @@
+import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
+import { AncestorInfo, PSBTInput } from "$types/index.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 const { networks, address, Psbt } = bitcoin;
-import { AncestorInfo } from "$types/index.d.ts";
-import { PSBTInput } from "$types/index.d.ts";
-import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
 // Removed unused imports: calculateDust, calculateMiningFee, estimateTransactionSize, msgpack
-import { TransactionService } from "$server/services/transaction/index.ts";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
+import { TransactionService } from "$server/services/transaction/index.ts";
 // import { SRC20Service } from "$server/services/src20/index.ts"; // Removed - not used
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 
 interface PSBTParams {
@@ -103,7 +102,7 @@ export class SRC20PSBTService {
         if (isWitness) {
           psbtInputArgs.witnessUtxo = {
             script: new Uint8Array(hex2bin(input.script)),
-            value: Number(input.value),
+            value: BigInt(input.value),
           };
         } else {
           const rawTxHex = await SRC20PSBTService.commonUtxoService.getRawTransactionHex(input.txid);
