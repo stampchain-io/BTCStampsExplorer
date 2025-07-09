@@ -274,23 +274,16 @@ export const utxoTestScenarios: UTXOTestScenario[] = [
 export function validateUTXOFixture(fixture: UTXOFixture): boolean {
   // Validate basic structure
   if (!fixture.txid || !fixture.script || typeof fixture.value !== "bigint") {
-    console.log("Basic validation failed:", {
-      txid: !!fixture.txid,
-      script: !!fixture.script,
-      valueType: typeof fixture.value,
-    });
     return false;
   }
 
   // Validate txid format (64 hex characters)
   if (!/^[a-fA-F0-9]{64}$/.test(fixture.txid)) {
-    console.log("TXID validation failed:", fixture.txid);
     return false;
   }
 
   // Validate script hex format
   if (!/^[a-fA-F0-9]*$/.test(fixture.script)) {
-    console.log("Script hex format validation failed:", fixture.script);
     return false;
   }
 
@@ -307,7 +300,6 @@ export function validateUTXOFixture(fixture: UTXOFixture): boolean {
     case "p2tr":
       return fixture.script.length === 68; // 34 bytes * 2 hex chars
     default:
-      console.log("Unknown script type:", fixture.scriptType);
       return false;
   }
 }
