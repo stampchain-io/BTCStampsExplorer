@@ -52,6 +52,15 @@ export const handler: Handlers<StampData> = {
         return ctx.renderNotFound();
       }
 
+      // Debug log to verify market data
+      console.log("Stamp data fetched:", {
+        stamp: stampData.data.stamp.stamp,
+        cpid: stampData.data.stamp.cpid,
+        floorPrice: stampData.data.stamp.floorPrice,
+        floorPriceUSD: stampData.data.stamp.floorPriceUSD,
+        marketData: stampData.data.stamp.marketData,
+      });
+
       // Use the CPID from stamp data for other queries
       const [
         holders,
@@ -73,6 +82,13 @@ export const handler: Handlers<StampData> = {
           },
         ]),
       ]);
+
+      // Debug log to verify holders data structure
+      console.log("Holders data:", {
+        holdersLength: holders.data?.length,
+        firstHolder: holders.data?.[0],
+        holdersStructure: holders.data?.slice(0, 3),
+      });
 
       // Only fetch dispensers for STAMP or SRC-721
       let dispensers = [];

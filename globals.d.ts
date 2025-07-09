@@ -469,7 +469,8 @@ export interface HolderRow {
 
 export interface ProcessedHolder {
   address: string;
-  quantity: number;
+  amt: number;
+  percentage: number;
 }
 
 export interface DispenseRow {
