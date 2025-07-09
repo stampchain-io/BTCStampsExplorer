@@ -30,7 +30,7 @@ export const TX_CONSTANTS = {
 
   // Dust thresholds
   DUST_SIZE: 333,
-  SRC20_DUST: 420,
+  SRC20_DUST: 333,
 
   // Helper functions
   weightToVsize(weight: number): number {
