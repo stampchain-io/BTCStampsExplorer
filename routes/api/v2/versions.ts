@@ -104,7 +104,7 @@ export const handler: Handlers = {
     const path = url.pathname;
 
     // Changelog endpoint
-    if (path.endsWith("/changelog")) {
+    if (path === "/api/v2/versions/changelog") {
       return ApiResponseUtil.success({
         changelog: CHANGELOG,
         currentVersion: VERSION_CONFIG.defaultVersion,
@@ -116,7 +116,10 @@ export const handler: Handlers = {
     }
 
     // Version discovery endpoint
-    const currentVersion = ctx.state.apiVersion ||
+    const currentVersion: string =
+      (typeof ctx.state.apiVersion === "string"
+        ? ctx.state.apiVersion
+        : null) ||
       VERSION_CONFIG.defaultVersion;
 
     const versions = VERSION_CONFIG.supportedVersions.map((version) => {
@@ -135,19 +138,16 @@ export const handler: Handlers = {
           : "supported",
         releaseDate: changelogEntry?.releaseDate,
         endOfLife,
+        changes: changelogEntry?.changes,
         links: {
-          documentation: `https://stampchain.io/docs/api/v${version}`,
-          changelog:
-            `https://stampchain.io/api/v2/versions/changelog#${version}`,
-          migration: isDeprecated
-            ? `https://stampchain.io/docs/api/migration/${version}`
-            : undefined,
+          documentation: `/docs`,
+          changelog: `/api/v2/versions/changelog#${version}`,
         },
       };
     });
 
     // Add deprecated versions to the list
-    VERSION_CONFIG.deprecatedVersions.forEach((version: any) => {
+    VERSION_CONFIG.deprecatedVersions.forEach((version: string) => {
       if (!versions.some((v) => v.version === version)) {
         const changelogEntry = CHANGELOG.find((entry) =>
           entry.version.startsWith(version)
@@ -157,11 +157,10 @@ export const handler: Handlers = {
           status: "deprecated",
           releaseDate: changelogEntry?.releaseDate,
           endOfLife: VERSION_CONFIG.versionEndOfLife[version],
+          changes: changelogEntry?.changes,
           links: {
-            documentation: `https://stampchain.io/docs/api/v${version}`,
-            changelog:
-              `https://stampchain.io/api/v2/versions/changelog#${version}`,
-            migration: `https://stampchain.io/docs/api/migration/${version}`,
+            documentation: `/docs`,
+            changelog: `/api/v2/versions/changelog#${version}`,
           },
         });
       }
@@ -170,18 +169,23 @@ export const handler: Handlers = {
     // Sort versions by version number descending
     versions.sort((a, b) => b.version.localeCompare(a.version));
 
-    const response = {
+    const response: any = {
       current: VERSION_CONFIG.defaultVersion,
       requestedVersion: currentVersion,
       versions,
       headers: {
-        "API-Version": "Specify desired API version",
-        "Accept-Version": "Alternative version header",
-        "X-API-Version": "Legacy version header",
+        "API-Version": "Specify desired API version (e.g., '2.3')",
+        "Accept-Version": "Alternative version header (e.g., '2.2')",
+        "X-API-Version": "Legacy version header (e.g., '2.1')",
+      },
+      usage: {
+        example: "curl -H 'X-API-Version: 2.2' /api/v2/stamps",
+        note:
+          "Use any of the above headers to specify API version. Documentation at /docs applies to all versions.",
       },
       links: {
-        changelog: "https://stampchain.io/api/v2/versions/changelog",
-        documentation: "https://stampchain.io/docs/api",
+        changelog: "/api/v2/versions/changelog",
+        documentation: "/docs",
       },
     };
 
@@ -192,8 +196,7 @@ export const handler: Handlers = {
           `API version ${currentVersion} is deprecated and will be removed on ${
             VERSION_CONFIG.versionEndOfLife[currentVersion]
           }`,
-        migrationGuide:
-          `https://stampchain.io/docs/api/migration/${currentVersion}`,
+        migrationGuide: `/docs`,
         currentVersion: VERSION_CONFIG.defaultVersion,
       };
     }
