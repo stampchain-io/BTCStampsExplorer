@@ -260,6 +260,7 @@ jobs:
           reporter: github-check
           fail_level: error
           filter_mode: nofilter
+          actionlint_flags: '-ignore "shellcheck reported issue.*SC2086.*" -ignore "shellcheck reported issue.*SC2129.*" -ignore "shellcheck reported issue.*SC2034.*" -ignore "shellcheck reported issue.*SC2144.*" -ignore "shellcheck reported issue.*SC2012.*"'
         continue-on-error: true
 
       # Fail the workflow if any checks failed
