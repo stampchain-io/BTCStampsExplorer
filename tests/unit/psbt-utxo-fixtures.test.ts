@@ -399,7 +399,7 @@ describe("PSBT UTXO Fixtures Test Suite", () => {
   describe("UTXO Fixture Creation", () => {
     it("should create valid UTXO fixture from raw data", () => {
       const fixture = createUTXOFixture(
-        "abcd1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
+        "abcd1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
         0,
         12345678n,
         "0014abcdef1234567890abcdef1234567890abcdef12",
@@ -418,7 +418,7 @@ describe("PSBT UTXO Fixtures Test Suite", () => {
 
     it("should create fixture with custom options", () => {
       const fixture = createUTXOFixture(
-        "abcd1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
+        "abcd1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
         1,
         87654321n,
         "0014abcdef1234567890abcdef1234567890abcdef12",
