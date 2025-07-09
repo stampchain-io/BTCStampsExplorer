@@ -111,6 +111,12 @@ jobs:
           echo "Setting up test database schema..."
           mysql -h 127.0.0.1 -P 3306 -u root -ptestpassword stamps_test < scripts/test-schema.sql || echo "No schema file found, skipping..."
 
+      - name: Install Redis CLI
+        run: |
+          echo "Installing Redis CLI..."
+          sudo apt-get update
+          sudo apt-get install -y redis-tools
+
       - name: Verify Redis Connection
         run: |
           echo "Verifying Redis connection..."
