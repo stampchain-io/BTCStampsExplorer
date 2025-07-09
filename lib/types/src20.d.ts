@@ -1,10 +1,10 @@
-import type { BufferLike } from "$types/utils.d.ts";
+import type { SRC20Row } from "$globals";
 import type {
   CacheStatus,
   MarketListingAggregated,
   SRC20MarketData,
 } from "$types/marketData.d.ts";
-import type { SRC20Row } from "$globals";
+import type { BufferLike } from "$types/utils.d.ts";
 
 type INETWORK = "mainnet" | "testnet";
 
@@ -19,7 +19,7 @@ export interface PSBTInput {
   index: number;
   witnessUtxo?: {
     script: BufferLike;
-    value: number;
+    value: bigint;
   };
   nonWitnessUtxo?: BufferLike;
   redeemScript?: BufferLike;
