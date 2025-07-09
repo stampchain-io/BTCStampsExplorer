@@ -458,6 +458,7 @@ export function SRC20MintTool({
           type="src20"
           fromPage="src20_mint"
           BTCPrice={formState.BTCPrice}
+          amount={0}
           mintDetails={{
             token: formState.token,
             amount: Number(formState.amt) || 0,

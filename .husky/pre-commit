@@ -8,30 +8,34 @@ check_secrets() {
     echo "Checking for potential secrets..."
     
     # API keys and tokens - use simpler patterns
-    if echo "$files" | grep -qE "api.*key|secret|token|password|auth" | head -20; then
+    secret_matches=$(echo "$files" | grep -E "api.*key|secret|token|password|auth" | head -20)
+    if [ -n "$secret_matches" ]; then
         echo "⚠️  Potential secret patterns found:"
-        echo "$files" | grep -E "api.*key|secret|token|password|auth" | head -20 | sed 's/^/   /'
+        echo "$secret_matches" | sed 's/^/   /'
         found_issues=true
     fi
     
     # Common secret patterns - use simpler patterns
-    if echo "$files" | grep -qE "sk_|pk_|ghp_|gho_|ghu_|ghs_|ghr_|github_pat_" | head -20; then
+    api_key_matches=$(echo "$files" | grep -E "sk_|pk_|ghp_|gho_|ghu_|ghs_|ghr_|github_pat_" | head -20)
+    if [ -n "$api_key_matches" ]; then
         echo "⚠️  Potential API key patterns found:"
-        echo "$files" | grep -E "sk_|pk_|ghp_|gho_|ghu_|ghs_|ghr_|github_pat_" | head -20 | sed 's/^/   /'
+        echo "$api_key_matches" | sed 's/^/   /'
         found_issues=true
     fi
     
     # Personal directory paths - use simpler patterns
-    if echo "$files" | grep -qE "/Users/|/home/|C:\\\\Users" | head -20; then
+    path_matches=$(echo "$files" | grep -E "/Users/|/home/|C:\\\\Users" | head -20)
+    if [ -n "$path_matches" ]; then
         echo "⚠️  Personal directory paths detected:"
-        echo "$files" | grep -E "/Users/|/home/|C:\\\\Users" | head -20 | sed 's/^/   /'
+        echo "$path_matches" | sed 's/^/   /'
         found_issues=true
     fi
     
     # Local config files - use simpler patterns
-    if echo "$files" | grep -qE "\.env|config\.local|\.local" | head -20; then
+    config_matches=$(echo "$files" | grep -E "\.env|config\.local|\.local" | head -20)
+    if [ -n "$config_matches" ]; then
         echo "⚠️  Potential local config file references:"
-        echo "$files" | grep -E "\.env|config\.local|\.local" | head -20 | sed 's/^/   /'
+        echo "$config_matches" | sed 's/^/   /'
         found_issues=true
     fi
     
