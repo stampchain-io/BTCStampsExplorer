@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
-import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 import { RateLimitMiddleware } from "$server/middleware/rateLimitMiddleware.ts";
 import { FeeService } from "$server/services/fee/feeService.ts";
+import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
 export const handler: Handlers = {
   async GET(req) {
@@ -13,7 +13,7 @@ export const handler: Handlers = {
     }
 
     // Rate limiting for fee endpoints
-    const rateLimitError = RateLimitMiddleware.checkFeeRateLimit(req);
+    const rateLimitError = await RateLimitMiddleware.checkFeeRateLimit(req);
     if (rateLimitError) {
       console.log("[fees.ts] Rate limit exceeded");
       return rateLimitError;

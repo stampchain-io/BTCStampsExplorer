@@ -19,7 +19,7 @@ async function getTypeMismatchErrors(): Promise<TypeMismatchError[]> {
   console.log("🔍 Analyzing TYPE_MISMATCH errors...");
 
   try {
-    // Run TypeScript check and capture output using Deno.Command
+    // Run TypeScript check and capture output using Deno.Command (Deno-native approach)
     const cmd = new Deno.Command("deno", {
       args: ["check", "--unstable-byonm", "main.ts", "dev.ts"],
       stdout: "piped",

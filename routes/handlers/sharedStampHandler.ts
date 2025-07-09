@@ -1,11 +1,4 @@
 import { Handlers } from "$fresh/server.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { validateSortDirection } from "$server/services/validationService.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { getIdentifierType } from "$lib/utils/identifierUtils.ts";
-import { MAX_PAGINATION_LIMIT } from "$lib/utils/constants.ts";
 import {
   STAMP_EDITIONS,
   STAMP_FILESIZES,
@@ -13,6 +6,13 @@ import {
   STAMP_MARKETPLACE,
   STAMP_RANGES,
 } from "$globals";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { MAX_PAGINATION_LIMIT } from "$lib/utils/constants.ts";
+import { getIdentifierType } from "$lib/utils/identifierUtils.ts";
+import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { RouteType } from "$server/services/cacheService.ts";
+import { validateSortDirection } from "$server/services/validationService.ts";
 
 type StampHandlerConfig = {
   type: "stamps" | "cursed";
@@ -96,7 +96,7 @@ export const createStampHandler = (
         // Extract new marketplace filters
         const market = url.searchParams.get("market") as
           | Extract<STAMP_MARKETPLACE, "listings" | "sales">
-          | "" || "";
+          | "";
         const dispensers = url.searchParams.get("dispensers") === "true";
         const atomics = url.searchParams.get("atomics") === "true";
         const listings = url.searchParams.get("listings") as
@@ -104,7 +104,7 @@ export const createStampHandler = (
             STAMP_MARKETPLACE,
             "all" | "bargain" | "affordable" | "premium" | "custom"
           >
-          | "" || "";
+          | "";
         const listingsMin = url.searchParams.get("listingsMin") || undefined;
         const listingsMax = url.searchParams.get("listingsMax") || undefined;
         const sales = url.searchParams.get("sales") as
@@ -112,17 +112,21 @@ export const createStampHandler = (
             STAMP_MARKETPLACE,
             "recent" | "premium" | "custom" | "volume"
           >
-          | "" || "";
+          | "";
         const salesMin = url.searchParams.get("salesMin") || undefined;
         const salesMax = url.searchParams.get("salesMax") || undefined;
-        const volume =
-          url.searchParams.get("volume") as "24h" | "7d" | "30d" | "" || "";
+        const volume = url.searchParams.get("volume") as
+          | "24h"
+          | "7d"
+          | "30d"
+          | "";
         const volumeMin = url.searchParams.get("volumeMin") || undefined;
         const volumeMax = url.searchParams.get("volumeMax") || undefined;
 
         // Extract file size filters
-        const fileSize =
-          url.searchParams.get("fileSize") as STAMP_FILESIZES | null || null;
+        const fileSize = url.searchParams.get("fileSize") as
+          | STAMP_FILESIZES
+          | null;
         const fileSizeMin = url.searchParams.get("fileSizeMin") || undefined;
         const fileSizeMax = url.searchParams.get("fileSizeMax") || undefined;
 
