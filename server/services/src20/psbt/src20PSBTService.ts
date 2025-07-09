@@ -123,7 +123,8 @@ export class SRC20PSBTService {
       const finalTotalInputValue = inputs.reduce((sum: any, input: any) => sum + Number(input.value), 0);
       const finalTotalOutputAmount = outputs.reduce((sum: any, out: any) => sum + out.value, 0) + (change > TX_CONSTANTS.SRC20_DUST ? change : 0);
       const actualFee = finalTotalInputValue - finalTotalOutputAmount;
-      const finalDustTotal = outputs.reduce((sum: any, out: any) => sum + out.value, 0);
+      // Calculate dust total: only count P2WSH data outputs, not the recipient output
+      const finalDustTotal = chunks.length * TX_CONSTANTS.SRC20_DUST;
       const estimatedSize = Math.ceil(actualFee / satsPerVB);
 
       logger.debug("src20", {
@@ -142,6 +143,21 @@ export class SRC20PSBTService {
           outputs: outputs.map(o => o.value),
           change,
           inputValues: inputs.map(i => i.value)
+        }
+      });
+
+      // DEBUG: Log detailed dust calculation
+      logger.debug("src20", {
+        message: "DUST CALCULATION DEBUG",
+        data: {
+          totalOutputs: outputs.length,
+          outputValues: outputs.map((o, i) => ({ index: i, value: o.value, script: o.script.substring(0, 10) + '...' })),
+          chunks: chunks.length,
+          SRC20_DUST_CONSTANT: TX_CONSTANTS.SRC20_DUST,
+          calculatedDustTotal: finalDustTotal,
+          expectedDustTotal: chunks.length * TX_CONSTANTS.SRC20_DUST,
+          recipientOutputValue: TX_CONSTANTS.SRC20_DUST,
+          dataOutputsOnly: chunks.length * TX_CONSTANTS.SRC20_DUST
         }
       });
   
