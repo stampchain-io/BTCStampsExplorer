@@ -1,23 +1,24 @@
 /* ===== SRC20 TOKEN DEPLOYMENT COMPONENT ===== */
-import axiod from "axiod";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { ToggleSwitchButton } from "$button";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
-import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
 import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
+import { inputTextarea, SRC20InputField } from "$form";
+import { Icon } from "$icon";
 import {
   bodyTool,
   containerBackground,
   containerColForm,
   containerRowForm,
+  loaderSpinGrey,
 } from "$layout";
-import { Icon } from "$icon";
-import { inputTextarea, SRC20InputField } from "$form";
-import { titlePurpleLD } from "$text";
-import { ToggleSwitchButton } from "$button";
+import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
+import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages, tooltipButton, tooltipImage } from "$notification";
+import { titlePurpleLD } from "$text";
+import axiod from "axiod";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== INTERFACE DEFINITIONS ===== */
 interface UploadResponse extends APIResponse {
@@ -244,8 +245,21 @@ export function SRC20DeployTool(
     };
   }, []);
 
+  /* ===== CONFIG CHECK ===== */
   if (!config) {
-    return <div>Error: Failed to load configuration</div>;
+    return (
+      <div class={bodyTool}>
+        <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>DEPLOY</h1>
+        <div class={`${containerBackground} mb-6`}>
+          <div class="flex items-center justify-center p-8">
+            <div class={loaderSpinGrey}></div>
+            <span class="ml-3 text-stamp-grey-light">
+              Loading configuration...
+            </span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   /* ===== COMPONENT RENDER ===== */
@@ -430,6 +444,7 @@ export function SRC20DeployTool(
                 placeholder="X"
                 value={formState.x}
                 onChange={(e) => handleInputChange(e, "x")}
+                error={formState.xError}
               />
               <SRC20InputField
                 type="text"
@@ -443,7 +458,7 @@ export function SRC20DeployTool(
                 type="text"
                 placeholder="Telegram"
                 value={formState.tg || ""}
-                onChange={(e) => handleInputChange(e, "telegram")}
+                onChange={(e) => handleInputChange(e, "tg")}
               />
               <SRC20InputField
                 type="email"

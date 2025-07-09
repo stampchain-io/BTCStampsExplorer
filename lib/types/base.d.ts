@@ -139,6 +139,7 @@ export interface SimpleFeeCalculatorProps extends BaseFeeCalculatorProps {
   ticker?: string;
   limit?: number;
   supply?: number;
+  dec?: number; // Added missing decimals property for SRC20 deploy
   transferDetails?: TransferDetails;
   mintDetails?: MintDetails;
   serviceFeeSats?: number;

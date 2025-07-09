@@ -1,17 +1,17 @@
 /* ===== SRC101 BITNAME REGISTRATION COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
-import { walletContext } from "$client/wallet/wallet.ts";
-import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
-import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
-import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
-import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
-import { bodyTool, containerBackground } from "$layout";
-import { titlePurpleLD } from "$text";
 import { Button } from "$button";
+import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
+import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
-import { StatusMessages, tooltipButton } from "$notification";
+import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
+import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
+import { bodyTool, containerBackground, loaderSpinGrey } from "$layout";
+import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
+import { StatusMessages, tooltipButton } from "$notification";
+import { titlePurpleLD } from "$text";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== COMPONENT INTERFACE ===== */
 interface SRC101RegisterToolProps {
@@ -109,7 +109,19 @@ export function SRC101RegisterTool({
 
   /* ===== CONFIG CHECK ===== */
   if (!config) {
-    return <div>Error: Failed to load configuration</div>;
+    return (
+      <div class={bodyTool}>
+        <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>REGISTER</h1>
+        <div class={`${containerBackground} mb-6`}>
+          <div class="flex items-center justify-center p-8">
+            <div class={loaderSpinGrey}></div>
+            <span class="ml-3 text-stamp-grey-light">
+              Loading configuration...
+            </span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   /* ===== MODAL HANDLERS ===== */

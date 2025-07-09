@@ -1,21 +1,21 @@
-import { SRC20Repository } from "$server/database/src20Repository.ts";
-import { BlockService } from "$server/services/blockService.ts";
-import { 
-  SRC20TrxRequestParams,
+import {
+  MarketListingAggregated,
   PaginatedSrc20ResponseBody,
-  Src20ResponseBody,
   Src20BalanceResponseBody,
+  Src20ResponseBody,
+  SRC20Row,
   Src20SnapShotDetail,
   SRC20SnapshotRequestParams,
-  MarketListingAggregated,
-  SRC20Row,
+  SRC20TrxRequestParams,
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
-import { SRC20UtilityService } from "./utilityService.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
-import { paginate } from "$lib/utils/paginationUtils.ts"
+import { paginate } from "$lib/utils/paginationUtils.ts";
+import { SRC20Repository } from "$server/database/src20Repository.ts";
+import { BlockService } from "$server/services/blockService.ts";
 import { Big } from "big";
 import { SRC20MarketService } from "./marketService.ts";
+import { SRC20UtilityService } from "./utilityService.ts";
 
 // Define missing types
 interface PerformanceMetrics {
@@ -314,7 +314,35 @@ export class SRC20QueryService {
   }
 
   static async searchSrc20Data(query: string) {
-    return await SRC20Repository.searchValidSrc20TxFromDb(query);
+    try {
+      // Input validation and sanitization
+      if (!query || typeof query !== 'string') {
+        return [];
+      }
+
+      const sanitizedQuery = query.trim().replace(/[^\w-]/g, "");
+      if (!sanitizedQuery) {
+        return [];
+      }
+
+      // Fetch raw data from repository
+      const rawResults = await SRC20Repository.searchValidSrc20TxFromDb(sanitizedQuery);
+      
+      // Early return for empty results
+      if (!rawResults || rawResults.length === 0) {
+        return [];
+      }
+
+      // Map and format the data using existing utility methods
+      const mappedData = this.mapTransactionData(rawResults);
+      
+      // Return formatted results
+      return Array.isArray(mappedData) ? mappedData : [mappedData];
+    } catch (error: any) {
+      console.error("Error in searchSrc20Data:", error);
+      // Return empty array on error rather than throwing to prevent API failures
+      return [];
+    }
   }
 
   /**

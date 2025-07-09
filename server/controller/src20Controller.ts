@@ -1,16 +1,16 @@
-import { SRC20Service } from "$server/services/src20/index.ts";
-import { SRC20Repository } from "$server/database/src20Repository.ts";
 import {
-  SRC20SnapshotRequestParams,
-  SRC20TrxRequestParams,
-  PaginatedSrc20ResponseBody,
+    PaginatedSrc20ResponseBody,
+    SRC20SnapshotRequestParams,
+    SRC20TrxRequestParams,
 } from "$globals";
-import { SRC20BalanceRequestParams, SRC20TickPageData } from "$lib/types/src20.d.ts";
-import { BlockService } from "$server/services/blockService.ts";
-import { MarketListingAggregated } from "$types/index.d.ts";
-import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
+import { SRC20BalanceRequestParams, SRC20TickPageData } from "$lib/types/src20.d.ts";
 import { formatAmount } from "$lib/utils/formatUtils.ts";
+import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
+import { SRC20Repository } from "$server/database/src20Repository.ts";
+import { BlockService } from "$server/services/blockService.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
+import { MarketListingAggregated } from "$types/index.d.ts";
 
 export class Src20Controller {
   /**
@@ -373,11 +373,11 @@ export class Src20Controller {
       let ticksToFetch = sortedTicks;
       
       // Use cached market data when available, fall back to external API when not
-      let marketDataToUse = convertedMarketData.length > 0 ? convertedMarketData : undefined;
-              if (cachedMarketData.length === 0) {
-          console.log("No cached market data found, falling back to external API");
-          marketDataToUse = undefined; // This will trigger fetchMarketListingSummary in enrichData
-        }
+      let marketDataToUse = convertedMarketData.length > 0 ? convertedMarketData : null;
+      if (cachedMarketData.length === 0) {
+        console.log("No cached market data found, falling back to external API");
+        marketDataToUse = null; // This will trigger fetchMarketListingSummary in enrichData
+      }
       
       if (sortBy !== "TRENDING" && sortBy !== "VOLUME") {
         // For non-market-based sorts, fetch all fully minted tokens
@@ -504,44 +504,56 @@ export class Src20Controller {
       const cachedMarketData = await MarketDataRepository.getAllSRC20MarketData(1000);
       const convertedMarketData = cachedMarketData.length > 0 
         ? cachedMarketData.map((data: any) => this.convertToMarketListingFormat(data))
-        : undefined;
+        : null;
 
-      // Use V2 endpoint for enriched data with market info
-      const enrichedData = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
-        {
-          tick: allTrendingData.data.map(row => row.tick),
-        },
-        {
-          excludeFullyMinted: true,
-          includeMarketData: true,
-          enrichWithProgress: true,
-          batchSize: 50,
-          ...(convertedMarketData && { prefetchedMarketData: convertedMarketData })
-        }
+      // Get basic deployment data for all trending tokens
+      const enrichedData = await SRC20Service.QueryService.fetchAndFormatSrc20Data({
+        tick: allTrendingData.data.map(row => row.tick),
+        op: "DEPLOY",
+        limit: 1000,
+        page: 1
+      });
+
+      // Get mint progress for all tokens in parallel
+      const mintProgressPromises = allTrendingData.data.map(row => 
+        SRC20Service.QueryService.fetchSrc20MintProgress(row.tick).catch(() => null)
       );
 
-      // Merge trending data with enriched data
+      // Wait for all mint progress data to be fetched
+      const mintProgressData = await Promise.all(mintProgressPromises);
+
+      // Create a map of tick to mint progress for efficient lookup
+      const mintProgressMap = new Map(
+        mintProgressData.map((progress: any, index: number) => [allTrendingData.data[index].tick, progress])
+      );
+
+      // Create a map of deployment data for efficient lookup
+      const deploymentMap = new Map(
+        Array.isArray(enrichedData.data) 
+          ? enrichedData.data.map(item => [item.tick, item])
+          : []
+      );
+
+      // Merge trending data with deployment data and mint progress
       const allEnrichedResult = allTrendingData.data.map(row => {
-        const enrichedItem = Array.isArray(enrichedData.data) 
-          ? enrichedData.data.find(item => item.tick === row.tick)
-          : enrichedData.data;
+        const deploymentItem = deploymentMap.get(row.tick);
+        const mintProgress = mintProgressMap.get(row.tick);
+        const marketData = convertedMarketData?.find(market => market.tick.toUpperCase() === row.tick.toUpperCase());
         
         return {
           ...row,
-          ...enrichedItem,
-          holders: (enrichedItem && 'holders' in enrichedItem) ? enrichedItem.holders : 0,
-          mcap: (enrichedItem && 'market_data' in enrichedItem) ? enrichedItem.market_data?.mcap || 0 : 0,
-          market_cap: (enrichedItem && 'market_data' in enrichedItem) ? enrichedItem.market_data?.mcap || 0 : 0, // Add market_cap for display
-          floor_unit_price: (enrichedItem && 'market_data' in enrichedItem) ? enrichedItem.market_data?.floor_unit_price || 0 : 0,
-          volume24: (enrichedItem && 'market_data' in enrichedItem) ? enrichedItem.market_data?.volume24 || 0 : 0, // Add volume24
-          change24: (enrichedItem && 'market_data' in enrichedItem) ? enrichedItem.market_data?.change24 || 0 : 0, // Use the change24 from market data
-          progress: (enrichedItem && 'mint_progress' in enrichedItem) ? enrichedItem.mint_progress?.progress || null : null,
+          ...deploymentItem,
+          holders: deploymentItem?.holders || 0,
+          mcap: marketData?.mcap || 0,
+          market_cap: marketData?.mcap || 0,
+          floor_unit_price: marketData?.floor_unit_price || 0,
+          volume24: marketData?.volume24 || 0,
+          change24: marketData?.change24 || 0,
+          progress: mintProgress?.progress || null,
           mint_count: row.mint_count,
-          top_mints_percentage: row.top_mints_percentage
-            ? Number(row.top_mints_percentage)
-            : 0,
-          total_minted: (enrichedItem && 'mint_progress' in enrichedItem) ? enrichedItem.mint_progress?.total_minted || "0" : "0",
-          max_supply: (enrichedItem && 'mint_progress' in enrichedItem) ? enrichedItem.mint_progress?.max_supply || "0" : "0",
+          top_mints_percentage: row.top_mints_percentage ? Number(row.top_mints_percentage) : 0,
+          total_minted: mintProgress?.total_minted || "0",
+          max_supply: mintProgress?.max_supply || "0",
         };
       });
 
