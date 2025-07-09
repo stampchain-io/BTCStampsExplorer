@@ -160,6 +160,13 @@ remove_sensitive_data.sh
 emergency_fix.sh
 emergency_cleanup.sh
 
+# Task Master AI - Local configuration files (should not be committed)
+.taskmaster/docs/prd.txt
+.windsurf/mcp.json
+.roo/mcp.json
+.vscode/mcp.json
+.cursor/mcp.json
+
 # MCP Servers (external dependencies)
 stampchain-mcp/
 
