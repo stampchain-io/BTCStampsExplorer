@@ -1,74 +1,45 @@
 {
   "deno.enable": true,
   "deno.lint": true,
+  "deno.config": "./deno.json",
   "deno.importMap": "./deno.json",
   "deno.suggest.imports.hosts": {
     "https://deno.land": true,
     "https://cdn.nest.land": true,
-    "https://crux.land": true
+    "https://crux.land": true,
+    "https://esm.sh": true,
+    "https://jsr.io": true
   },
+  "deno.suggest.imports.autoDiscover": true,
   "deno.codeLens.test": true,
+  "deno.codeLens.testArgs": ["--allow-all", "--no-check"],
+  "typescript.suggest.autoImports": false,
+  "typescript.suggest.completeFunctionCalls": true,
+  "typescript.suggest.names": true,
+  "typescript.suggest.paths": true,
+  "typescript.validate.enable": false,
+  "javascript.suggest.autoImports": false,
+  "javascript.suggest.completeFunctionCalls": true,
+  "javascript.suggest.names": true,
+  "javascript.suggest.paths": true,
   "editor.defaultFormatter": "denoland.vscode-deno",
   "editor.formatOnSave": true,
-  "editor.indentSize": 2,
   "editor.tabSize": 2,
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.formatOnSave": true,
-    "editor.tabSize": 2
+  "editor.rulers": [80],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
   },
   "[typescript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.formatOnSave": true,
-    "editor.tabSize": 2
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.formatOnSave": true,
-    "editor.tabSize": 2
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "[javascript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.formatOnSave": true,
-    "editor.tabSize": 2
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
-  "[plaintext]": {
-    "editor.formatOnSave": false
-  },
-  "files.associations": {
-    ".cursorrules": "plaintext"
-  },
-  "[yaml]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[css]": {
-    "editor.defaultFormatter": "vscode.css-language-features"
-  },
-  "folder-color.pathColors": [
-    {
-      "folderPath": "BTCStampsExplorer/routes/",
-      "color": "foldercolorizer.color_6699ff"
-    },
-    {
-      "folderPath": "BTCStampsExplorer/routes/[...path].ts/"
-    },
-    {
-      "folderPath": "BTCStampsExplorer/islands/",
-      "color": "foldercolorizer.color_9966cc"
-    },
-    {
-      "folderPath": "BTCStampsExplorer/components/",
-      "color": "foldercolorizer.color_ff99ff"
-    },
-    {
-      "folderPath": "BTCStampsExplorer/static/",
-      "color": "foldercolorizer.color_99cc66"
-    },
-    {
-      "folderPath": "BTCStampsExplorer/static/swagger/"
-    },
-    {
-      "folderPath": "BTCStampsExplorer/leather-output.txt/"
-    }
-  ]
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  }
 }
