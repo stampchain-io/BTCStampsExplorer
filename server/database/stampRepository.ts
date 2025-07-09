@@ -1,29 +1,23 @@
-import { DEFAULT_CACHE_DURATION, STAMP_TABLE, MAX_PAGINATION_LIMIT } from "$constants";
-import { SUBPROTOCOLS } from "$globals";
+import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT, STAMP_TABLE } from "$constants";
 import {
-  STAMP_FILTER_TYPES,
-  STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES,
-  StampBalance,
-  StampFilters,
-  STAMP_FILETYPES,
-  STAMP_EDITIONS,
-  STAMP_MARKETPLACE,
-  STAMP_RANGES,
-  STAMP_FILESIZES
+    STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
+    STAMP_RANGES, STAMP_SUFFIX_FILTERS,
+    STAMP_TYPES,
+    StampBalance,
+    StampFilters, SUBPROTOCOLS
 } from "$globals";
-import { XcpBalance } from "$types/index.d.ts";
-import { summarize_issuances } from "./index.ts";
-import { dbManager } from "$server/database/databaseManager.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
 import {
-  isStampNumber,
-  isTxHash,
-  isStampHash,
-  isCpid,
-  getIdentifierType,
+    getIdentifierType,
+    isCpid,
+    isStampHash,
+    isStampNumber,
+    isTxHash,
 } from "$lib/utils/identifierUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
+import { XcpBalance } from "$types/index.d.ts";
+import { summarize_issuances } from "./index.ts";
 
 export class StampRepository {
   // Dependency injection support
@@ -1184,7 +1178,7 @@ export class StampRepository {
         smd.holder_count,
         smd.last_price_update,
         smd.data_quality_score,
-        TIMESTAMPDIFF(MINUTE, smd.last_price_update, NOW()) as minutes_since_sale
+        TIMESTAMPDIFF(MINUTE, smd.last_price_update, UTC_TIMESTAMP()) as minutes_since_sale
         ` : ''}
       FROM ${STAMP_TABLE} s
       INNER JOIN stamp_market_data smd ON s.cpid = smd.cpid
@@ -1194,7 +1188,7 @@ export class StampRepository {
         -- Ensure good data quality
         AND smd.data_quality_score >= 7
         -- Optional: Only show sales from last 30 days for relevance
-        AND smd.last_price_update > DATE_SUB(NOW(), INTERVAL 30 DAY)
+        AND smd.last_price_update > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 DAY)
       ORDER BY 
         smd.last_price_update DESC
       LIMIT ? OFFSET ?
@@ -1207,7 +1201,7 @@ export class StampRepository {
       WHERE 
         smd.last_price_update IS NOT NULL
         AND smd.data_quality_score >= 7
-        AND smd.last_price_update > DATE_SUB(NOW(), INTERVAL 30 DAY)
+        AND smd.last_price_update > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 DAY)
     `;
 
     const [result, countResult] = await Promise.all([

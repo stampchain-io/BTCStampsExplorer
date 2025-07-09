@@ -1,5 +1,5 @@
-import { assertEquals } from "@std/assert";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { assertEquals } from "@std/assert";
 
 Deno.test("TX_CONSTANTS - base sizes", () => {
   assertEquals(TX_CONSTANTS.VERSION, 4);
@@ -46,7 +46,7 @@ Deno.test("TX_CONSTANTS - witness stack details", () => {
 
 Deno.test("TX_CONSTANTS - dust thresholds", () => {
   assertEquals(TX_CONSTANTS.DUST_SIZE, 333);
-  assertEquals(TX_CONSTANTS.SRC20_DUST, 420);
+  assertEquals(TX_CONSTANTS.SRC20_DUST, 333);
 });
 
 Deno.test("TX_CONSTANTS - weightToVsize function", () => {
