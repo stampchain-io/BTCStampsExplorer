@@ -1,11 +1,9 @@
 /* ===== SRC20 TOKEN MINTING COMPONENT ===== */
-import axiod from "axiod";
-import { useEffect, useRef, useState } from "preact/hooks";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
-import { logger } from "$lib/utils/logger.ts";
-import { SRC20MintStatus } from "$types/src20.d.ts";
+import { SRC20InputField } from "$form";
+import { Icon } from "$icon";
 import {
   bodyTool,
   containerBackground,
@@ -14,10 +12,12 @@ import {
   imagePreviewTool,
   loaderSpinGrey,
 } from "$layout";
-import { SRC20InputField } from "$form";
-import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
-import { Icon } from "$icon";
+import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages } from "$notification";
+import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
+import { SRC20MintStatus } from "$types/src20.d.ts";
+import axiod from "axiod";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== MAIN COMPONENT INTERFACE ===== */
 interface SRC20MintToolProps {
@@ -98,7 +98,6 @@ export function SRC20MintTool({
     handleChangeFee,
     handleInputChange,
     handleSubmit,
-    config,
     isSubmitting,
     submissionMessage,
     apiError,
@@ -115,7 +114,7 @@ export function SRC20MintTool({
   /* ===== WALLET CONTEXT ===== */
   const { isConnected, wallet } = walletContext;
 
-  /* ===== TOKEN SEARCH STATE ===== */
+  /* ===== SEARCH & DROPDOWN STATE ===== */
   const [searchTerm, setSearchTerm] = useState("");
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -151,6 +150,33 @@ export function SRC20MintTool({
       });
     }
   }, [tick]);
+
+  /* ===== CUSTOM EVENT LISTENER FOR TRENDING TOKEN SELECTION ===== */
+  useEffect(() => {
+    const handleMintTokenSelected = (event: CustomEvent) => {
+      const { tick: selectedTick } = event.detail;
+      if (selectedTick) {
+        setOpenDrop(false);
+        setSearchTerm(selectedTick);
+        handleResultClick(selectedTick).then(() => {
+          setOpenDrop(false);
+          setSearchResults([]);
+        });
+      }
+    };
+
+    globalThis.addEventListener(
+      "mintTokenSelected",
+      handleMintTokenSelected as EventListener,
+    );
+
+    return () => {
+      globalThis.removeEventListener(
+        "mintTokenSelected",
+        handleMintTokenSelected as EventListener,
+      );
+    };
+  }, []);
 
   /* ===== TOKEN SEARCH EFFECT ===== */
   useEffect(() => {
@@ -261,11 +287,6 @@ export function SRC20MintTool({
       },
     });
   }, [formState.fee, formState.psbtFees]);
-
-  /* ===== CONFIG CHECK ===== */
-  if (!config) {
-    return <div>Error: Failed to load configuration</div>;
-  }
 
   /* ===== FEE CALCULATOR PREPARATION ===== */
   logger.debug("stamps", {
@@ -380,18 +401,25 @@ export function SRC20MintTool({
               />
 
               {/* Search results dropdown */}
-              {openDrop && searchResults.length > 0 && !isSelecting && (
-                <ul class="absolute top-[100%] left-0 max-h-[168px] w-full bg-stamp-grey-light rounded-b-md text-stamp-grey-darkest text-sm leading-none font-bold z-[11] overflow-y-auto scrollbar-grey">
+              {(() => {
+                const shouldShow = openDrop && searchResults.length > 0 &&
+                  !isSelecting;
+                return shouldShow;
+              })() && (
+                <ul class="absolute top-[100%] left-0 max-h-[168px] w-full bg-stamp-grey-light border border-stamp-grey rounded-b-md text-stamp-grey-darkest text-sm leading-none font-bold z-[11] overflow-y-auto scrollbar-grey shadow-lg">
                   {searchResults.map((result: SearchResult) => (
                     <li
                       key={result.tick}
-                      onClick={() => handleResultClick(result.tick)}
-                      class="p-1.5 pl-3 hover:bg-[#C3C3C3] uppercase cursor-pointer"
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // Prevent input blur
+                        handleResultClick(result.tick);
+                      }}
+                      class="p-3 pl-4 hover:bg-stamp-grey-darker hover:text-stamp-grey-light uppercase cursor-pointer border-b border-stamp-grey last:border-b-0 transition-colors duration-150"
                     >
-                      {result.tick}
-                      <h6 class="font-medium text-xs text-stamp-grey-darker">
+                      <div class="font-bold text-base">{result.tick}</div>
+                      <div class="font-medium text-xs text-stamp-grey-darker opacity-75 mt-1">
                         {(result.progress || 0).toFixed(1)}% minted
-                      </h6>
+                      </div>
                     </li>
                   ))}
                 </ul>

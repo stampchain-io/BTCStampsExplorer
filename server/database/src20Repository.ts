@@ -647,6 +647,8 @@ export class SRC20Repository {
         creator LIKE ? OR
         destination LIKE ?)
         AND dep.max IS NOT NULL
+        AND dep.op = 'DEPLOY'
+        AND (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) < dep.max
     ORDER BY
         CASE
             WHEN tick LIKE ? THEN 0

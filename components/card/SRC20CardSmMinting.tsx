@@ -1,16 +1,16 @@
 /* reinamora - update Trending calculations */
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Timeframe } from "$layout";
-import { labelXs, textSm, valueDarkSm } from "$text";
 import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import type { EnrichedSRC20Row } from "$globals";
 import {
   containerCardTable,
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
+  Timeframe,
 } from "$layout";
-import type { EnrichedSRC20Row } from "$globals";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { labelXs, textSm, valueDarkSm } from "$text";
 
 interface SRC20CardSmMintingProps {
   data: EnrichedSRC20Row[];
@@ -99,7 +99,28 @@ export function SRC20CardSmMinting({
 
               const handleMintClick = (event: MouseEvent) => {
                 event.preventDefault();
-                globalThis.location.href = mintHref;
+
+                // Check if we're already on the mint page
+                const currentPath = globalThis.location.pathname;
+                const isMintPage = currentPath.includes("/tool/src20/mint");
+
+                if (isMintPage) {
+                  // If we're on the mint page, update URL parameters to populate form
+                  const newUrl = new URL(globalThis.location.href);
+                  newUrl.searchParams.set("tick", src20.tick);
+                  newUrl.searchParams.set("trxType", "olga");
+                  globalThis.history.replaceState({}, "", newUrl.toString());
+
+                  // Trigger a custom event that the MintTool can listen to
+                  globalThis.dispatchEvent(
+                    new CustomEvent("mintTokenSelected", {
+                      detail: { tick: src20.tick },
+                    }),
+                  );
+                } else {
+                  // Otherwise, navigate to mint page with parameters
+                  globalThis.location.href = mintHref;
+                }
               };
 
               return (
