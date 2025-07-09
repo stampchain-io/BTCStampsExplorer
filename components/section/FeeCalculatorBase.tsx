@@ -1,25 +1,25 @@
-import { useEffect, useRef, useState } from "preact/hooks";
-import { useFees } from "$fees";
-import { logger } from "$lib/utils/logger.ts";
-import {
-  formatSatoshisToBTC,
-  formatSatoshisToUSD,
-} from "$lib/utils/formatUtils.ts";
-import type {
-  BaseFeeCalculatorProps,
-  FeeDetails,
-  MintDetails,
-} from "$lib/types/base.d.ts";
-import { tooltipButton, tooltipImage } from "$notification";
 import {
   buttonPurpleFlat,
   buttonPurpleOutline,
   sliderBar,
   sliderKnob,
 } from "$button";
-import { Icon } from "$icon";
-import { labelXs, textXs } from "$text";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
+import { useFees } from "$fees";
+import { Icon } from "$icon";
+import type {
+  BaseFeeCalculatorProps,
+  FeeDetails,
+  MintDetails,
+} from "$lib/types/base.d.ts";
+import {
+  formatSatoshisToBTC,
+  formatSatoshisToUSD,
+} from "$lib/utils/formatUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { tooltipButton, tooltipImage } from "$notification";
+import { labelXs, textXs } from "$text";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   isModal?: boolean;
@@ -78,7 +78,7 @@ export function FeeCalculatorBase({
   fileSize,
   issuance,
   bitname,
-  amount: _amount = 0,
+  amount: _amount = 0, // Aliased to prevent accidental rendering
   receive = 0,
   fromPage = "",
   price: _price = 0,
@@ -349,12 +349,16 @@ export function FeeCalculatorBase({
                     ? formatSatoshisToBTC(feeDetails.minerFee, {
                       includeSymbol: false,
                     })
-                    : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice)}
-                  {" "}
+                    : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice)}{" "}
+                  <span className="font-light">{coinType}</span>
                 </>
               )
-              : <span className="animate-pulse">0.00000000</span>}{" "}
-            <span className="font-light">{coinType}</span>
+              : (
+                <>
+                  <span className="animate-pulse">0.00000000</span>{" "}
+                  <span className="font-light">{coinType}</span>
+                </>
+              )}
           </h6>
 
           {/* Service Fee - Display if available in feeDetails */}
@@ -591,7 +595,7 @@ export function FeeCalculatorBase({
               <span className={labelXs}>
                 AMOUNT
               </span>&nbsp;&nbsp;
-              {mintDetails?.amount
+              {mintDetails?.amount !== undefined && mintDetails.amount > 0
                 ? mintDetails.amount
                 : <span className="animate-pulse">0</span>}
             </h6>

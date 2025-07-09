@@ -458,11 +458,23 @@ export function SRC20MintTool({
           type="src20"
           fromPage="src20_mint"
           BTCPrice={formState.BTCPrice}
-          amount={0}
           mintDetails={{
             token: formState.token,
             amount: Number(formState.amt) || 0,
           }}
+          feeDetails={formState.psbtFees
+            ? {
+              minerFee: formState.psbtFees.estMinerFee,
+              dustValue: formState.psbtFees.totalDustValue,
+              totalValue: formState.psbtFees.totalValue,
+              hasExactFees: formState.psbtFees.hasExactFees,
+              effectiveFeeRate: formState.psbtFees.effectiveFeeRate,
+              ...(formState.psbtFees.estimatedSize &&
+                { estimatedSize: formState.psbtFees.estimatedSize }),
+              ...(formState.psbtFees.totalVsize &&
+                { totalVsize: formState.psbtFees.totalVsize }),
+            } as any
+            : undefined}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           buttonName={isConnected ? "MINT" : "CONNECT WALLET"}

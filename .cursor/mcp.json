@@ -18,6 +18,11 @@
                 "AZURE_OPENAI_API_KEY": "AZURE_OPENAI_API_KEY_HERE",
                 "OLLAMA_API_KEY": "OLLAMA_API_KEY_HERE"
             }
+        },
+        "stampchain": {
+            "command": "node",
+            "args": ["/tmp/stampchain-mcp/dist/index.js"],
+            "cwd": "/tmp/stampchain-mcp"
         }
     }
 }
