@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
-import { walletContext } from "$client/wallet/wallet.ts";
-import axiod from "axiod";
 import { useConfig } from "$client/hooks/useConfig.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 import { useFees } from "$fees";
+import axiod from "axiod";
+import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 // import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts"; // No longer used directly
 import { Config } from "$globals";
-import { logger } from "$lib/utils/logger.ts";
 import { debounce } from "$lib/utils/debounce.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { showNotification } from "$lib/utils/notificationUtils.ts";
 
 interface PSBTFees {
@@ -42,6 +42,7 @@ interface SRC20FormState {
   limError: string;
   dec: string;
   x: string;
+  xError: string;
   tg: string;
   web: string;
   email: string;
@@ -221,7 +222,9 @@ export function useSRC20Form(
     initialToken,
   });
 
-  const { config } = useConfig<Config>();
+  const { config, isLoading: configLoading, error: configError } = useConfig<
+    Config
+  >();
   const {
     fees,
     loading: feesLoading,
@@ -252,6 +255,7 @@ export function useSRC20Form(
     limError: "",
     dec: "18",
     x: "",
+    xError: "",
     tg: "",
     web: "",
     email: "",
@@ -488,6 +492,9 @@ export function useSRC20Form(
       newValue = handleIntegerInput(value, field);
     } else if (field === "dec") {
       newValue = handleDecimalInput(value);
+    } else if (field === "x") {
+      // Handle X (Twitter) field validation
+      newValue = handleXFieldInput(value);
     }
 
     setFormState((prev) => ({
@@ -560,6 +567,38 @@ export function useSRC20Form(
       return sanitizedValue;
     }
     return formState.dec;
+  };
+
+  const handleXFieldInput = (value: string): string => {
+    const sanitizedValue = value.trim();
+    if (sanitizedValue === "") {
+      setFormState((prev) => ({ ...prev, xError: "" }));
+      return "";
+    }
+
+    // Remove @ symbol if user types it (common mistake)
+    const cleanValue = sanitizedValue.replace(/^@/, "");
+
+    // Validate: max 32 chars, alphanumeric and underscore only (matching backend validation)
+    if (cleanValue.length > 32) {
+      setFormState((prev) => ({
+        ...prev,
+        xError: "X username must be 32 characters or less",
+      }));
+      return value;
+    }
+
+    if (!/^[a-zA-Z0-9_]*$/.test(cleanValue)) {
+      setFormState((prev) => ({
+        ...prev,
+        xError:
+          "X username can only contain letters, numbers, and underscores (no @ symbol needed)",
+      }));
+      return value;
+    }
+
+    setFormState((prev) => ({ ...prev, xError: "" }));
+    return cleanValue;
   };
 
   const handleSubmit = async () => {
@@ -709,6 +748,8 @@ export function useSRC20Form(
     fetchFees,
     forceRefresh,
     config,
+    configLoading,
+    configError,
     isSubmitting,
     submissionMessage,
     setApiError,

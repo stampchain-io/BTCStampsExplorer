@@ -1,19 +1,20 @@
 /* ===== TRANSFER CONTENT COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
-import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
-import { logger } from "$lib/utils/logger.ts";
-import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
+import { SRC20InputField } from "$form";
 import {
   bodyTool,
   containerBackground,
   containerColForm,
+  loaderSpinGrey,
   rowResponsiveForm,
 } from "$layout";
-import { titlePurpleLD } from "$text";
-import { SRC20InputField } from "$form";
+import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages } from "$notification";
+import { titlePurpleLD } from "$text";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== INTERFACE DEFINITIONS ===== */
 interface Balance {
@@ -194,8 +195,21 @@ export function SRC20TransferTool(
     console.log("Token input ref:", tokenInputRef.current);
   }, []);
 
+  /* ===== CONFIG CHECK ===== */
   if (!config) {
-    return <div>Error: Failed to load configuration</div>;
+    return (
+      <div class={bodyTool}>
+        <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>TRANSFER</h1>
+        <div class={`${containerBackground} mb-6`}>
+          <div class="flex items-center justify-center p-8">
+            <div class={loaderSpinGrey}></div>
+            <span class="ml-3 text-stamp-grey-light">
+              Loading configuration...
+            </span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
