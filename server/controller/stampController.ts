@@ -265,8 +265,9 @@ export class StampController {
     const btcPrice = btcPriceData.price;
     console.log(`[StampController] BTC price: $${btcPrice} from ${btcPriceData.source}`);
 
-    // For collection pages and stamp lists, use market data cache
-    const useMarketData = !identifier || Array.isArray(identifier) || collectionId;
+    // Always include market data for stamps that support it (STAMP and SRC-721)
+    // This ensures floor prices are available on detail pages
+    const useMarketData = true;
     
     // Determine if this is a detail view (single stamp) or list view
     const isDetailView = identifier && !Array.isArray(identifier);
@@ -428,14 +429,14 @@ export class StampController {
       return sum + quantity;
     }, 0);
 
-    // Map holders with percentages - fix property name to match ProcessedHolder interface
+    // Map holders with percentages - use 'amt' to match UI component expectations
     return holders.map((holder: HolderRow) => {
       const quantity = holder.divisible ? holder.quantity / 100000000 : holder.quantity;
       const percentage = totalQuantity > 0 ? (quantity / totalQuantity) * 100 : 0;
 
       return {
         address: holder.address,
-        quantity: quantity,  // Use quantity instead of amt to match ProcessedHolder interface
+        amt: quantity,  // Use 'amt' to match HoldersPieChart and HoldersTableBase expectations
         percentage: Number(percentage.toFixed(2))  // Round to 2 decimal places
       };
     });
