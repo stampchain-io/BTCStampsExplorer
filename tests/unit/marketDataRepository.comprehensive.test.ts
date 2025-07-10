@@ -4,7 +4,7 @@
  * Ensures CI compatibility with proper mocking
  */
 
-import { assertEquals, assertExists } from "@std/assert";
+import { assert, assertEquals, assertExists } from "@std/assert";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 import { MarketDataRepository } from "../../server/database/marketDataRepository.ts";
 // Note: Type imports are not needed for this test file since we're testing behavior, not types
@@ -556,8 +556,22 @@ Deno.test("MarketDataRepository error handling", async (t) => {
     );
 
     const result = await MarketDataRepository.getStampMarketData(cpid);
-    // Should handle gracefully and return null for malformed data
-    assertEquals(result, null);
+    // Should handle gracefully and parse malformed data with appropriate defaults
+    assert(
+      result !== null,
+      "Should return parsed object even with malformed data",
+    );
+    assertEquals(result!.cpid, cpid);
+    assertEquals(
+      result!.floorPriceBTC,
+      null,
+      "Invalid number should parse to null",
+    );
+    assertEquals(result!.recentSalePriceBTC, null);
+    assert(
+      isNaN(result!.lastUpdated.getTime()),
+      "Invalid date should create Invalid Date",
+    );
   });
 
   await t.step("handles empty result sets gracefully", async () => {

@@ -89,6 +89,14 @@ export class MockDatabaseManager {
   }
 
   /**
+   * Get mock response for a query - public method for tests
+   */
+  getMockResponse(query: string, params: unknown[]): QueryResult | null {
+    const mockKey = this.generateMockKey(query, params);
+    return this.mockResponses.get(mockKey) || null;
+  }
+
+  /**
    * Generate a unique key for a query + params combination
    */
   private generateMockKey(query: string, params: unknown[]): string {

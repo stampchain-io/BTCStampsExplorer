@@ -95,23 +95,39 @@ export class PSBTService {
   // Make sure all helper functions are static class methods
   private static getAddressType(address: string, network: networks.Network): string {
     try {
+      // First check if it's a valid address
       bjsAddress.toOutputScript(address, network);
-      return 'p2pkh';
-    } catch (_error) {
-      try {
-        payments.p2wpkh({ address, network });
+      
+      // Check for P2WPKH (native segwit) - starts with bc1q for mainnet, tb1q for testnet
+      if ((network === networks.bitcoin && address.startsWith('bc1q')) ||
+          (network === networks.testnet && address.startsWith('tb1q'))) {
         return 'p2wpkh';
-      } catch (_error) {
+      }
+      
+      // Check for P2PKH (legacy) - starts with 1 for mainnet, m/n for testnet
+      if ((network === networks.bitcoin && address.startsWith('1')) ||
+          (network === networks.testnet && (address.startsWith('m') || address.startsWith('n')))) {
+        return 'p2pkh';
+      }
+      
+      // Check for P2SH - starts with 3 for mainnet, 2 for testnet
+      if ((network === networks.bitcoin && address.startsWith('3')) ||
+          (network === networks.testnet && address.startsWith('2'))) {
+        // Try to determine if it's P2SH-P2WPKH by checking with payments
         try {
           payments.p2sh({
             redeem: payments.p2wpkh({ address, network }),
             network,
           });
           return 'p2sh-p2wpkh';
-        } catch (_error) {
-          throw new Error('Unsupported address type');
+        } catch {
+          return 'p2sh';
         }
       }
+      
+      throw new Error('Unsupported address type');
+    } catch (_error) {
+      throw new Error('Unsupported address type');
     }
   }
 

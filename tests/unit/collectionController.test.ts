@@ -1,0 +1,578 @@
+/**
+ * @fileoverview Tests for CollectionController
+ * Aims for high coverage with mocked dependencies and fixtures
+ */
+
+import { assertEquals, assertExists, assertRejects } from "@std/assert";
+import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
+import { CollectionController } from "$server/controller/collectionController.ts";
+import { CollectionService } from "$server/services/collectionService.ts";
+import { StampController } from "$server/controller/stampController.ts";
+
+// Test fixtures
+const mockCollectionData = {
+  collection_id: "POSH",
+  name: "posh",
+  stamp_count: 100,
+  creator: "bc1qtest",
+  first_stamp_block: 800000,
+  last_stamp_block: 820000,
+  description: "Test Collection",
+  floor_price: 0.001,
+  volume_24h: 5.5,
+  market_cap: 150.75,
+};
+
+const mockStampData = [
+  {
+    tx_hash: "abc123",
+    stamp_mimetype: "image/png",
+    collection_id: "POSH",
+    cpid: "A123456789012345678901234567890123456789",
+    stamp_url: "https://example.com/stamp1.png",
+  },
+  {
+    tx_hash: "def456",
+    stamp_mimetype: "image/jpeg",
+    collection_id: "POSH",
+    cpid: "B123456789012345678901234567890123456789",
+    stamp_url: "https://example.com/stamp2.jpg",
+  },
+  {
+    tx_hash: "ghi789",
+    stamp_mimetype: "image/gif",
+    collection_id: "POSH",
+    cpid: "C123456789012345678901234567890123456789",
+    stamp_url: "https://example.com/stamp3.gif",
+  },
+];
+
+const mockPaginatedResponse = {
+  data: [mockCollectionData],
+  page: 1,
+  limit: 50,
+  totalPages: 1,
+  total: 1,
+  last_block: 820000,
+};
+
+// Mock the services
+const originalGetCollectionDetails = CollectionService.getCollectionDetails;
+const originalGetCollectionNames = CollectionService.getCollectionNames;
+const originalGetStamps = StampController.getStamps;
+
+describe("CollectionController", () => {
+  beforeEach(() => {
+    // Reset mocks before each test
+  });
+
+  afterEach(() => {
+    // Restore original methods
+    CollectionService.getCollectionDetails = originalGetCollectionDetails;
+    CollectionService.getCollectionNames = originalGetCollectionNames;
+    StampController.getStamps = originalGetStamps;
+  });
+
+  describe("getCollectionDetails", () => {
+    it("should return collection details successfully", async () => {
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve(mockPaginatedResponse);
+
+      const result = await CollectionController.getCollectionDetails({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(result.data.length, 1);
+      assertEquals(result.data[0].collection_id, "POSH");
+      assertEquals(result.data[0].name, "posh");
+      assertEquals(result.page, 1);
+      assertEquals(result.total, 1);
+    });
+
+    it("should handle service errors gracefully", async () => {
+      CollectionService.getCollectionDetails = () => {
+        throw new Error("Database connection failed");
+      };
+
+      await assertRejects(
+        () => CollectionController.getCollectionDetails({ page: 1, limit: 50 }),
+        Error,
+        "Database connection failed",
+      );
+    });
+
+    it("should pass through query parameters", async () => {
+      let capturedParams: any;
+      CollectionService.getCollectionDetails = (params) => {
+        capturedParams = params;
+        return Promise.resolve(mockPaginatedResponse);
+      };
+
+      await CollectionController.getCollectionDetails({
+        page: 2,
+        limit: 25,
+        creator: "bc1qtest",
+        sortBy: "stamp_count_desc",
+      });
+
+      assertEquals(capturedParams.page, 2);
+      assertEquals(capturedParams.limit, 25);
+      assertEquals(capturedParams.creator, "bc1qtest");
+      assertEquals(capturedParams.sortBy, "stamp_count_desc");
+    });
+
+    it("should handle empty results", async () => {
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve({
+          data: [],
+          page: 1,
+          limit: 50,
+          totalPages: 0,
+          total: 0,
+          last_block: 820000,
+        });
+
+      const result = await CollectionController.getCollectionDetails({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(result.data.length, 0);
+      assertEquals(result.total, 0);
+    });
+
+    it("should handle pagination parameters", async () => {
+      let capturedParams: any;
+      CollectionService.getCollectionDetails = (params) => {
+        capturedParams = params;
+        return Promise.resolve({
+          data: [],
+          page: params.page || 1,
+          limit: params.limit || 50,
+          totalPages: 0,
+          total: 0,
+          last_block: 820000,
+        });
+      };
+
+      await CollectionController.getCollectionDetails({
+        page: 5,
+        limit: 10,
+      });
+
+      assertEquals(capturedParams.page, 5);
+      assertEquals(capturedParams.limit, 10);
+    });
+  });
+
+  describe("getCollectionNames", () => {
+    it("should return collection names successfully", async () => {
+      const mockNamesResponse = {
+        data: [{ collection_id: "POSH", name: "posh" }],
+        page: 1,
+        limit: 50,
+        totalPages: 1,
+        total: 1,
+        last_block: 820000,
+      };
+
+      CollectionService.getCollectionNames = () =>
+        Promise.resolve(mockNamesResponse);
+
+      const result = await CollectionController.getCollectionNames({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(result.data.length, 1);
+      assertEquals(result.data[0].collection_id, "POSH");
+      assertEquals(result.data[0].name, "posh");
+    });
+
+    it("should handle service errors gracefully", async () => {
+      CollectionService.getCollectionNames = () => {
+        throw new Error("Service unavailable");
+      };
+
+      await assertRejects(
+        () => CollectionController.getCollectionNames({ page: 1, limit: 50 }),
+        Error,
+        "Service unavailable",
+      );
+    });
+
+    it("should pass query parameters correctly", async () => {
+      let capturedParams: any;
+      CollectionService.getCollectionNames = (params) => {
+        capturedParams = params;
+        return Promise.resolve({
+          data: [],
+          page: 1,
+          limit: 50,
+          totalPages: 0,
+          total: 0,
+          last_block: 820000,
+        });
+      };
+
+      await CollectionController.getCollectionNames({
+        page: 3,
+        limit: 100,
+        creator: "bc1qcreator",
+      });
+
+      assertEquals(capturedParams.page, 3);
+      assertEquals(capturedParams.limit, 100);
+      assertEquals(capturedParams.creator, "bc1qcreator");
+    });
+  });
+
+  describe("getCollectionStamps", () => {
+    it("should return collections with stamp images", async () => {
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve(mockPaginatedResponse);
+      StampController.getStamps = () =>
+        Promise.resolve({
+          data: mockStampData,
+          page: 1,
+          limit: 36,
+          totalPages: 1,
+          total: 3,
+        });
+
+      const result = await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(result.data.length, 1);
+      assertExists(result.data[0].stamp_images);
+      assertExists(result.data[0].first_stamp_image);
+      assertEquals(result.data[0].collection_id, "POSH");
+    });
+
+    it("should handle empty collection results", async () => {
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve({
+          data: [],
+          page: 1,
+          limit: 50,
+          totalPages: 0,
+          total: 0,
+          last_block: 820000,
+        });
+
+      const result = await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(result.data.length, 0);
+      assertEquals(result.total, 0);
+    });
+
+    it("should apply minimum stamp count filter", async () => {
+      let capturedParams: any;
+      CollectionService.getCollectionDetails = (params) => {
+        capturedParams = params;
+        return Promise.resolve(mockPaginatedResponse);
+      };
+
+      StampController.getStamps = () =>
+        Promise.resolve({
+          data: [],
+          page: 1,
+          limit: 12,
+          totalPages: 1,
+          total: 0,
+        });
+
+      await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(capturedParams.minStampCount, 2);
+    });
+
+    it("should group stamps by collection ID", async () => {
+      const multiCollectionData = [
+        { ...mockCollectionData, collection_id: "POSH" },
+        { ...mockCollectionData, collection_id: "COOL", name: "cool" },
+      ];
+
+      const multiStampData = [
+        { ...mockStampData[0], collection_id: "POSH" },
+        { ...mockStampData[1], collection_id: "COOL" },
+        { ...mockStampData[2], collection_id: "POSH" },
+      ];
+
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve({
+          ...mockPaginatedResponse,
+          data: multiCollectionData,
+          total: 2,
+        });
+
+      StampController.getStamps = () =>
+        Promise.resolve({
+          data: multiStampData,
+          page: 1,
+          limit: 24,
+          totalPages: 1,
+          total: 3,
+        });
+
+      const result = await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(result.data.length, 2);
+
+      // Find POSH collection
+      const poshCollection = result.data.find((c) =>
+        c.collection_id === "POSH"
+      );
+      assertExists(poshCollection);
+      assertEquals(poshCollection.stamp_images.length, 2);
+
+      // Find COOL collection
+      const coolCollection = result.data.find((c) =>
+        c.collection_id === "COOL"
+      );
+      assertExists(coolCollection);
+      assertEquals(coolCollection.stamp_images.length, 1);
+    });
+
+    it("should handle stamps without required fields", async () => {
+      const invalidStampData = [
+        { ...mockStampData[0], tx_hash: null }, // Missing tx_hash
+        { ...mockStampData[1], stamp_mimetype: null }, // Missing mimetype
+        { ...mockStampData[2], collection_id: null }, // Missing collection_id
+        mockStampData[0], // Valid stamp
+      ];
+
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve(mockPaginatedResponse);
+      StampController.getStamps = () =>
+        Promise.resolve({
+          data: invalidStampData,
+          page: 1,
+          limit: 12,
+          totalPages: 1,
+          total: 4,
+        });
+
+      const result = await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(result.data.length, 1);
+      // Should only have 1 valid stamp image (invalid ones filtered out)
+      assertEquals(result.data[0].stamp_images.length, 1);
+    });
+
+    it("should limit stamps per collection to 12", async () => {
+      const manyStamps = Array.from({ length: 20 }, (_, i) => ({
+        ...mockStampData[0],
+        tx_hash: `hash${i}`,
+        cpid: `STAMP${i}`,
+        stamp_url: `https://example.com/stamp${i}.png`,
+      }));
+
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve(mockPaginatedResponse);
+      StampController.getStamps = () =>
+        Promise.resolve({
+          data: manyStamps,
+          page: 1,
+          limit: 240, // 20 * 12
+          totalPages: 1,
+          total: 20,
+        });
+
+      const result = await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(result.data.length, 1);
+      // Should be limited to 12 stamps
+      assertEquals(result.data[0].stamp_images.length, 12);
+    });
+
+    it("should use second stamp as first_stamp_image when available", async () => {
+      const twoStamps = [mockStampData[0], mockStampData[1]];
+
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve(mockPaginatedResponse);
+      StampController.getStamps = () =>
+        Promise.resolve({
+          data: twoStamps,
+          page: 1,
+          limit: 12,
+          totalPages: 1,
+          total: 2,
+        });
+
+      const result = await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(result.data.length, 1);
+      // Should use second stamp (index 1) as first_stamp_image
+      assertEquals(
+        result.data[0].first_stamp_image,
+        result.data[0].stamp_images[1],
+      );
+    });
+
+    it("should fallback to first stamp when only one available", async () => {
+      const oneStamp = [mockStampData[0]];
+
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve(mockPaginatedResponse);
+      StampController.getStamps = () =>
+        Promise.resolve({
+          data: oneStamp,
+          page: 1,
+          limit: 12,
+          totalPages: 1,
+          total: 1,
+        });
+
+      const result = await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(result.data.length, 1);
+      // Should use first stamp when only one available
+      assertEquals(
+        result.data[0].first_stamp_image,
+        result.data[0].stamp_images[0],
+      );
+    });
+
+    it("should handle collections with no stamps", async () => {
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve(mockPaginatedResponse);
+      StampController.getStamps = () =>
+        Promise.resolve({
+          data: [],
+          page: 1,
+          limit: 12,
+          totalPages: 1,
+          total: 0,
+        });
+
+      const result = await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(result.data.length, 1);
+      assertEquals(result.data[0].stamp_images.length, 0);
+      assertEquals(result.data[0].first_stamp_image, null);
+    });
+
+    it("should handle invalid data structure from CollectionService", async () => {
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve({
+          data: "invalid", // Should be array
+          page: 1,
+          limit: 50,
+          totalPages: 1,
+          total: 1,
+          last_block: 820000,
+        });
+
+      await assertRejects(
+        () => CollectionController.getCollectionStamps({ page: 1, limit: 50 }),
+        Error,
+        "Unexpected data structure from CollectionService.getCollectionDetails",
+      );
+    });
+
+    it("should handle invalid data structure from StampController", async () => {
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve(mockPaginatedResponse);
+      StampController.getStamps = () =>
+        Promise.resolve({
+          data: "invalid", // Should be array
+          page: 1,
+          limit: 12,
+          totalPages: 1,
+          total: 0,
+        });
+
+      await assertRejects(
+        () => CollectionController.getCollectionStamps({ page: 1, limit: 50 }),
+        Error,
+        "Unexpected data structure from StampController.getStamps",
+      );
+    });
+
+    it("should pass correct parameters to StampController", async () => {
+      let capturedStampParams: any;
+
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve(mockPaginatedResponse);
+      StampController.getStamps = (params) => {
+        capturedStampParams = params;
+        return Promise.resolve({
+          data: [],
+          page: 1,
+          limit: 12,
+          totalPages: 1,
+          total: 0,
+        });
+      };
+
+      await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      assertEquals(capturedStampParams.collectionId, ["POSH"]);
+      assertEquals(capturedStampParams.noPagination, false);
+      assertEquals(capturedStampParams.type, "all");
+      assertEquals(capturedStampParams.sortBy, "ASC");
+      assertEquals(capturedStampParams.allColumns, false);
+      assertEquals(capturedStampParams.limit, 12); // 1 collection * 12
+      assertEquals(capturedStampParams.collectionStampLimit, 12);
+      assertEquals(capturedStampParams.groupBy, "collection_id");
+      assertEquals(capturedStampParams.groupBySubquery, true);
+    });
+
+    it("should handle service errors in getCollectionStamps", async () => {
+      CollectionService.getCollectionDetails = () => {
+        throw new Error("Collection service error");
+      };
+
+      await assertRejects(
+        () => CollectionController.getCollectionStamps({ page: 1, limit: 50 }),
+        Error,
+        "Collection service error",
+      );
+    });
+
+    it("should handle error from StampController", async () => {
+      CollectionService.getCollectionDetails = () =>
+        Promise.resolve(mockPaginatedResponse);
+      StampController.getStamps = () => {
+        throw new Error("Stamp service error");
+      };
+
+      await assertRejects(
+        () => CollectionController.getCollectionStamps({ page: 1, limit: 50 }),
+        Error,
+        "Stamp service error",
+      );
+    });
+  });
+});

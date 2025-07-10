@@ -596,7 +596,9 @@ export class SRC20QueryService {
       metrics.duration = performance.now() - startTime;
       
       if (error.message.includes("Stamps Down")) {
-        throw new Error("Stamps Down...");
+        const stampsDownError = new Error("Stamps Down...");
+        (stampsDownError as any).performance = metrics;
+        throw stampsDownError;
       }
       
       // Add metrics to error for monitoring
