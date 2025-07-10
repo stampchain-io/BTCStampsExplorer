@@ -4,6 +4,7 @@ import { DatabaseManager } from "$server/database/databaseManager.ts";
 // Set environment variables for CI/local Redis testing
 // IMPORTANT: Must be set before DatabaseManager reads them
 Deno.env.set("SKIP_REDIS_TLS", "true"); // Disable TLS for local Redis in CI
+Deno.env.set("DENO_ENV", "test"); // Force test environment
 
 // Force skip Redis for integration tests unless explicitly enabled
 if (!Deno.env.get("ENABLE_REDIS_INTEGRATION_TESTS")) {
@@ -12,11 +13,16 @@ if (!Deno.env.get("ENABLE_REDIS_INTEGRATION_TESTS")) {
 
 // Test configuration - using LOCAL defaults, not production
 const testConfig = {
-  DB_HOST: Deno.env.get("TEST_DB_HOST") || "localhost",
-  DB_USER: Deno.env.get("TEST_DB_USER") || "root",
-  DB_PASSWORD: Deno.env.get("TEST_DB_PASSWORD") || "",
-  DB_PORT: parseInt(Deno.env.get("TEST_DB_PORT") || "3306"),
-  DB_NAME: Deno.env.get("TEST_DB_NAME") || "test_btcstamps",
+  DB_HOST: Deno.env.get("TEST_DB_HOST") || Deno.env.get("DB_HOST") ||
+    "localhost",
+  DB_USER: Deno.env.get("TEST_DB_USER") || Deno.env.get("DB_USER") || "root",
+  DB_PASSWORD: Deno.env.get("TEST_DB_PASSWORD") ||
+    Deno.env.get("DB_PASSWORD") || "",
+  DB_PORT: parseInt(
+    Deno.env.get("TEST_DB_PORT") || Deno.env.get("DB_PORT") || "3306",
+  ),
+  DB_NAME: Deno.env.get("TEST_DB_NAME") || Deno.env.get("DB_NAME") ||
+    "stamps_test",
   DB_MAX_RETRIES: 1, // Reduced retries for faster test failure
   ELASTICACHE_ENDPOINT: Deno.env.get("TEST_REDIS_HOST") || "localhost", // Use TEST_ prefix
   DENO_ENV: "test", // Important: this prevents file logging
