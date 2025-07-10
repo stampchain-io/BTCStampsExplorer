@@ -584,7 +584,7 @@ describe("Comprehensive PSBT Coverage with Fixtures (CI-Safe)", () => {
       const allFixtures = getAllFixtures();
       const startTime = performance.now();
 
-      const promises = allFixtures.map(async (fixture, i) => {
+      const promises = allFixtures.map((fixture, i) => {
         const params = {
           mockValue: fixture.value,
           scriptType: fixture.scriptType,

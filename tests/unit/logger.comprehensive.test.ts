@@ -46,14 +46,14 @@ function mockConsole() {
 function mockFileSystem() {
   if (globalThis.Deno) {
     // Mock Deno.mkdir
-    globalThis.Deno.mkdir = async (path: any, options?: any) => {
+    globalThis.Deno.mkdir = (path: any, options?: any) => {
       mockFileOperations.mkdir.push({ path, options });
       // Don't throw AlreadyExists error by default
       return Promise.resolve();
     };
 
     // Mock Deno.writeTextFile
-    globalThis.Deno.writeTextFile = async (
+    globalThis.Deno.writeTextFile = (
       path: any,
       data: any,
       options?: any,
@@ -144,7 +144,7 @@ Deno.test("logger - file writing in development mode", async () => {
   teardown();
 });
 
-Deno.test("logger - production vs development file writing logic", async () => {
+Deno.test("logger - production vs development file writing logic", () => {
   setup();
 
   // Test that production environment is detected correctly
@@ -169,7 +169,7 @@ Deno.test("logger - file writing with directory already exists", async () => {
   setup();
 
   // Mock mkdir to throw AlreadyExists error
-  globalThis.Deno.mkdir = async () => {
+  globalThis.Deno.mkdir = () => {
     const error = new (globalThis.Deno.errors.AlreadyExists)(
       "Directory already exists",
     );
@@ -192,7 +192,7 @@ Deno.test("logger - file writing with mkdir error", async () => {
   setup();
 
   // Mock mkdir to throw a different error
-  globalThis.Deno.mkdir = async () => {
+  globalThis.Deno.mkdir = () => {
     throw new Error("Permission denied");
   };
 
@@ -214,7 +214,7 @@ Deno.test("logger - file writing with writeTextFile error", async () => {
   setup();
 
   // Mock writeTextFile to throw error
-  globalThis.Deno.writeTextFile = async () => {
+  globalThis.Deno.writeTextFile = () => {
     throw new Error("Disk full");
   };
 
