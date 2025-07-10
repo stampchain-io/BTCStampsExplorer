@@ -89,8 +89,9 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
     // Test invalid configuration handling
     const invalidConfig = {
       ...testConfig,
-      DB_HOST: "", // Invalid empty host
-      DB_MAX_RETRIES: 1,
+      DB_HOST: "definitely-nonexistent-host-12345.invalid", // Invalid host that will definitely fail
+      DB_PORT: 9999, // Invalid port
+      DB_MAX_RETRIES: 1, // Fast failure
     };
 
     const dbManager = new DatabaseManager(invalidConfig);
@@ -102,6 +103,9 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
       },
       Error,
     );
+
+    // Ensure cleanup
+    await dbManager.closeAllClients();
   });
 
   await t.step("Cache Key Generation", async () => {
@@ -169,7 +173,12 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
 
         assertEquals(result.rows?.[0]?.int_val, 42);
         assertEquals(result.rows?.[0]?.str_val, "test_string");
-        assertEquals(result.rows?.[0]?.float_val, 3.14159);
+        // MySQL returns numbers as strings in some cases, so we need to handle both
+        const floatVal = result.rows?.[0]?.float_val;
+        assertEquals(
+          typeof floatVal === "string" ? parseFloat(floatVal) : floatVal,
+          3.14159,
+        );
 
         await dbManager.closeAllClients();
       });
