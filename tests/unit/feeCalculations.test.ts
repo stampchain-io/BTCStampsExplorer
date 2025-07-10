@@ -1,11 +1,11 @@
-import { assertEquals } from "@std/assert";
+import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import {
   calculateDust,
   calculateMiningFee,
   calculateP2WSHMiningFee,
   estimateFee,
 } from "$lib/utils/minting/feeCalculations.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { assertEquals } from "@std/assert";
 
 Deno.test("calculateDust - calculates dust based on file size", () => {
   // Each 32 bytes requires one output
@@ -73,6 +73,109 @@ Deno.test("estimateFee - with ancestors", () => {
 
   // Fee with ancestors should include ancestor fees
   assertEquals(feeWithAncestors, feeWithoutAncestors + 1500);
+});
+
+Deno.test("estimateFee - with undefined ancestors (covers line 36-38)", () => {
+  const outputs = [
+    { value: 1000, address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq" },
+  ];
+
+  // Test with undefined ancestors - should fall back to 0 ancestor fees
+  const feeWithUndefinedAncestors = estimateFee(outputs, 1, 1, undefined);
+  const feeWithoutAncestors = estimateFee(outputs, 1, 1);
+
+  // Should be the same since undefined ancestors defaults to 0 fees
+  assertEquals(feeWithUndefinedAncestors, feeWithoutAncestors);
+});
+
+Deno.test("estimateFee - with null ancestors (covers line 36-38)", () => {
+  const outputs = [
+    { value: 1000, address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq" },
+  ];
+
+  // Test with null ancestors - should fall back to 0 ancestor fees
+  const feeWithNullAncestors = estimateFee(outputs, 1, 1, null as any);
+  const feeWithoutAncestors = estimateFee(outputs, 1, 1);
+
+  // Should be the same since null ancestors defaults to 0 fees
+  assertEquals(feeWithNullAncestors, feeWithoutAncestors);
+});
+
+Deno.test("estimateFee - with empty ancestors array", () => {
+  const outputs = [
+    { value: 1000, address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq" },
+  ];
+
+  // Test with empty ancestors array - should result in 0 ancestor fees
+  const feeWithEmptyAncestors = estimateFee(outputs, 1, 1, []);
+  const feeWithoutAncestors = estimateFee(outputs, 1, 1);
+
+  // Should be the same since empty array reduces to 0 fees
+  assertEquals(feeWithEmptyAncestors, feeWithoutAncestors);
+});
+
+Deno.test("estimateFee - with ancestors missing fees property (covers || 0 fallback)", () => {
+  const outputs = [
+    { value: 1000, address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq" },
+  ];
+
+  // Test with ancestors that have missing or undefined fees property
+  const ancestorsWithMissingFees = [
+    { vsize: 200, effectiveRate: 5 }, // No fees property
+    { fees: undefined, vsize: 150, effectiveRate: 3.33 }, // Undefined fees
+    { fees: 1000, vsize: 100, effectiveRate: 10 }, // Normal fees
+  ] as any;
+
+  const feeWithMissingFees = estimateFee(
+    outputs,
+    1,
+    1,
+    ancestorsWithMissingFees,
+  );
+  const feeWithoutAncestors = estimateFee(outputs, 1, 1);
+
+  // Should only include the 1000 from the third ancestor (others default to 0)
+  assertEquals(feeWithMissingFees, feeWithoutAncestors + 1000);
+});
+
+Deno.test("estimateFee - with script-based outputs (covers line 19-21)", () => {
+  // Test output with script property to trigger script detection fallback
+  const outputsWithScript = [
+    {
+      value: 1000,
+      script: "0014" + "a".repeat(40), // P2WPKH script as hex string
+    },
+  ];
+
+  const fee = estimateFee(outputsWithScript, 1);
+  assertEquals(fee > 0, true);
+});
+
+Deno.test("estimateFee - with outputs missing address and script (covers line 25)", () => {
+  // Test output with neither address nor script to trigger default P2WPKH fallback
+  const outputsWithoutAddressOrScript = [
+    {
+      value: 1000,
+      script: "", // Empty script should trigger default
+      address: undefined, // No address
+    } as any, // Type assertion to allow testing edge case
+  ];
+
+  const fee = estimateFee(outputsWithoutAddressOrScript, 1);
+  assertEquals(fee > 0, true);
+});
+
+Deno.test("estimateFee - with output having empty address (covers line 25)", () => {
+  // Test output with empty address to trigger default P2WPKH fallback
+  const outputsWithEmptyAddress = [
+    {
+      value: 1000,
+      address: "", // Empty address should trigger default
+    },
+  ];
+
+  const fee = estimateFee(outputsWithEmptyAddress, 1);
+  assertEquals(fee > 0, true);
 });
 
 Deno.test("calculateMiningFee - basic calculation", () => {
