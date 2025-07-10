@@ -77,7 +77,6 @@
     "test:all": "deno task test:unit && deno task test:integration",
     "test:fixtures": "deno run --allow-read --allow-write --allow-env --allow-net tests/fixtures/generateFixtures.ts",
     "analyze:types": "deno run --allow-run --allow-write scripts/analyze-type-errors.ts",
-    "analyze:types:v2": "deno run --allow-run --allow-write scripts/analyze-type-errors-v2.ts",
     "check:types:staged": "deno run --allow-run --allow-read scripts/type-check-staged.ts",
     "type:prioritize": "deno run --allow-read --allow-write scripts/prioritize-type-fixes.ts",
     "type:gradual": "deno run --allow-read --allow-write --allow-run scripts/setup-gradual-types.ts"

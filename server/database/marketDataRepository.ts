@@ -646,7 +646,7 @@ export class MarketDataRepository {
       DEFAULT_CACHE_DURATION
     );
 
-    if (!result || result.rows.length === 0) {
+    if (!result || !result.rows || result.rows.length === 0) {
       return [];
     }
 

@@ -475,5 +475,121 @@ Deno.test("validateStampContent - handles object errors", async () => {
 });
 
 // Note: DOM-dependent functions (showFallback, handleImageError, isValidSVG)
-// are not tested here as they require a browser environment.
-// These functions would be better tested in integration/e2e tests with a real DOM.
+// are not tested here as they require browser-specific APIs (HTMLIFrameElement, HTMLImageElement)
+// that are not available in the Deno test environment. These would need integration tests.
+
+// Skip DOM tests for now
+/*
+Deno.test("showFallback - handles regular HTML element", async () => {
+  await withDOM(() => {
+    const container = new MockHTMLElement("div") as any;
+    let appendedChild: any = null;
+    container.appendChild = (child: any) => {
+      appendedChild = child;
+      return child;
+    };
+    container.innerHTML = "original content";
+
+    // Mock document.createElement globally
+    const originalCreateElement = globalThis.document.createElement;
+    globalThis.document.createElement = (tagName: string) => {
+      const element = new MockHTMLElement(tagName) as any;
+      element.src = "";
+      element.alt = "";
+      element.className = "";
+      return element;
+    };
+
+    showFallback(container);
+
+    assertEquals(container.innerHTML, "");
+    assertEquals(appendedChild?.src, NOT_AVAILABLE_IMAGE);
+    assertEquals(appendedChild?.alt, "Content not available");
+    assertEquals(
+      appendedChild?.className,
+      "w-full h-full object-contain rounded-lg pixelart",
+    );
+
+    // Restore
+    globalThis.document.createElement = originalCreateElement;
+  });
+});
+
+Deno.test("handleImageError - updates image src on error", async () => {
+  await withDOM(() => {
+    const img = new MockHTMLElement("img") as any;
+    img.src = "original.jpg";
+    // Mark it as HTMLImageElement
+    Object.setPrototypeOf(img, HTMLImageElement.prototype);
+
+    const event = {
+      currentTarget: img,
+    };
+
+    handleImageError(event as any);
+
+    assertEquals(img.src, NOT_AVAILABLE_IMAGE);
+  });
+});
+
+Deno.test("isValidSVG - validates well-formed SVG", async () => {
+  await withDOM(() => {
+    // Mock DOMParser
+    globalThis.DOMParser = class {
+      parseFromString(_content: string, _type: string) {
+        return {
+          querySelector: (selector: string) => {
+            if (selector === "parsererror") return null;
+            if (selector === "svg") return {};
+            return null;
+          },
+          getElementsByTagName: (tagName: string) => {
+            if (tagName === "*") {
+              return [{
+                attributes: [
+                  { name: "xmlns", value: "http://www.w3.org/2000/svg" },
+                  { name: "r", value: "10" },
+                ],
+              }];
+            }
+            return [];
+          },
+        };
+      }
+    } as any;
+
+    const validSvg =
+      '<svg xmlns="http://www.w3.org/2000/svg"><circle r="10"/></svg>';
+    const result = isValidSVG(validSvg);
+    assertEquals(result, true);
+  });
+});
+
+Deno.test("isValidSVG - rejects SVG with event handlers", async () => {
+  await withDOM(() => {
+    // Mock DOMParser
+    globalThis.DOMParser = class {
+      parseFromString(_content: string, _type: string) {
+        return {
+          querySelector: (selector: string) => {
+            if (selector === "parsererror") return null;
+            if (selector === "svg") return {};
+            return null;
+          },
+          getElementsByTagName: (_tagName: string) => {
+            return [{
+              attributes: [
+                { name: "onclick", value: "alert('bad')" },
+              ],
+            }];
+          },
+        };
+      }
+    } as any;
+
+    const badSvg = '<svg onclick="alert(\'bad\')"><circle r="10"/></svg>';
+    const result = isValidSVG(badSvg);
+    assertEquals(result, false);
+  });
+});
+*/
