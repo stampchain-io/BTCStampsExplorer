@@ -1,6 +1,10 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { DatabaseManager } from "$server/database/databaseManager.ts";
 
+// Set environment variables for CI/local Redis testing
+// IMPORTANT: Must be set before DatabaseManager reads them
+Deno.env.set("SKIP_REDIS_TLS", "true"); // Disable TLS for local Redis in CI
+
 // Force skip Redis for integration tests unless explicitly enabled
 if (!Deno.env.get("ENABLE_REDIS_INTEGRATION_TESTS")) {
   (globalThis as any).SKIP_REDIS_CONNECTION = true;
@@ -18,12 +22,14 @@ const testConfig = {
   DENO_ENV: "test", // Important: this prevents file logging
   CACHE: "true",
   REDIS_LOG_LEVEL: "ERROR", // Minimal logging to avoid file operations
+  SKIP_REDIS_TLS: "true", // IMPORTANT: Disable TLS for local Redis in CI
 };
 
 console.log("=== TEST CONFIGURATION ===");
 console.log(`DB_HOST: ${testConfig.DB_HOST}`);
 console.log(`DB_NAME: ${testConfig.DB_NAME}`);
 console.log(`REDIS_HOST: ${testConfig.ELASTICACHE_ENDPOINT}`);
+console.log(`SKIP_REDIS_TLS env: ${Deno.env.get("SKIP_REDIS_TLS")}`);
 console.log(
   `SKIP_REDIS_CONNECTION: ${(globalThis as any).SKIP_REDIS_CONNECTION}`,
 );
