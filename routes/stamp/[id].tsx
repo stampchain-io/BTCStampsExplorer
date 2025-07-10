@@ -11,6 +11,7 @@ import { body, gapSectionSlim } from "$layout";
 import { StampImage, StampInfo } from "$content";
 import { StampGallery } from "$section";
 import { DataTableBase, HoldersTable } from "$table";
+import { logger, LogNamespace } from "$lib/utils/logger.ts";
 
 /* ===== TYPES ===== */
 interface StampData {
@@ -52,13 +53,14 @@ export const handler: Handlers<StampData> = {
         return ctx.renderNotFound();
       }
 
-      // Debug log to verify market data
-      console.log("Stamp data fetched:", {
+      // Log stamp data with market information
+      await logger.debug("stamps" as LogNamespace, {
+        message: "Stamp data fetched",
         stamp: stampData.data.stamp.stamp,
         cpid: stampData.data.stamp.cpid,
         floorPrice: stampData.data.stamp.floorPrice,
         floorPriceUSD: stampData.data.stamp.floorPriceUSD,
-        marketData: stampData.data.stamp.marketData,
+        hasMarketData: !!stampData.data.stamp.marketData,
       });
 
       // Use the CPID from stamp data for other queries
@@ -83,11 +85,11 @@ export const handler: Handlers<StampData> = {
         ]),
       ]);
 
-      // Debug log to verify holders data structure
-      console.log("Holders data:", {
-        holdersLength: holders.data?.length,
-        firstHolder: holders.data?.[0],
-        holdersStructure: holders.data?.slice(0, 3),
+      // Log holders data structure
+      await logger.debug("stamps" as LogNamespace, {
+        message: "Holders data fetched",
+        holdersLength: holders.data?.length || 0,
+        hasHolders: holders.data && holders.data.length > 0,
       });
 
       // Only fetch dispensers for STAMP or SRC-721
@@ -142,7 +144,11 @@ export const handler: Handlers<StampData> = {
         },
       });
     } catch (error) {
-      console.error("Error fetching stamp data:", error);
+      await logger.error("stamps" as LogNamespace, {
+        message: "Error fetching stamp data",
+        error: error instanceof Error ? error.message : String(error),
+        stampId: ctx.params.id,
+      });
       if ((error as Error).message?.includes("Stamp not found")) {
         return ctx.renderNotFound();
       }
@@ -191,20 +197,6 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     stamps_recent,
     lowestPriceDispenser = null,
   } = props.data;
-
-  console.log("Initial data:", {
-    dispensers: dispensers,
-    dispenses: dispenses,
-    sends: sends,
-  });
-
-  const totalCounts = {
-    dispensers: dispensers?.length || 0,
-    sales: dispenses?.length || 0,
-    transfers: sends?.length || 0,
-  };
-
-  console.log("Total counts:", totalCounts);
 
   /* ===== META INFORMATION ===== */
   const title = htmlTitle

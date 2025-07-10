@@ -13,7 +13,7 @@ import {
 import { assert, assertEquals, assertExists } from "@std/assert";
 
 // Mock fetch responses for testing
-let mockFetchResponses: Map<string, any> = new Map();
+const mockFetchResponses: Map<string, any> = new Map();
 let fetchCallCount = 0;
 let consoleErrorCalls: any[] = [];
 

@@ -683,8 +683,6 @@ describe("CIP33 Comprehensive Test Suite", () => {
     });
 
     it("should handle valid bech32 charset characters", () => {
-      const charset = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
-
       // Test each character in a valid P2WSH address context (62 chars)
       const validP2WSHAddress =
         "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3";

@@ -3,7 +3,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { WalletPageProps } from "$types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { Src101Controller } from "$server/controller/src101Controller.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
@@ -14,7 +13,6 @@ import {
   PaginationQueryParams,
 } from "$types/pagination.d.ts";
 import { SRC20Row, StampRow } from "$globals";
-import { DEFAULT_PAGINATION } from "$server/services/routeValidationService.ts";
 import { WalletOverviewInfo } from "$types/wallet.d.ts";
 import { WalletProfileHeader } from "$header";
 import { WalletProfileContent } from "$content";
@@ -73,7 +71,6 @@ export const handler: Handlers = {
         dispensersResponse,
         stampsCreatedCount,
         marketDataResponse,
-        src101Response,
         src101FetchResponse,
         creatorNameResponse,
       ] = await Promise.allSettled([
@@ -114,13 +111,7 @@ export const handler: Handlers = {
         StampController.getStampsCreatedCount(address),
         MarketDataRepository.getAllSRC20MarketData(1000),
 
-        // SRC101 Balance request
-        await Src101Controller.handleSrc101BalanceRequest({
-          address,
-          limit: DEFAULT_PAGINATION.limit,
-          page: DEFAULT_PAGINATION.page,
-          sort: "ASC",
-        }),
+        // SRC101 Balance request via fetch
         fetch(
           `${url.origin}/api/v2/src101/balance/${address}?limit=100&offset=0`,
         ).then(async (res) => {
@@ -291,8 +282,8 @@ export const handler: Handlers = {
               ),
             },
           },
-          src101: src101Response.status === "fulfilled"
-            ? src101Response.value
+          src101: src101FetchResponse.status === "fulfilled"
+            ? src101FetchResponse.value
             : null,
         },
         walletData,
