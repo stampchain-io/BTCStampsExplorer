@@ -45,11 +45,10 @@ console.log("==========================");
 async function isDatabaseAvailable(): Promise<boolean> {
   // Simple TCP connectivity check instead of full database connection
   try {
-    const conn = await Deno.connect({
+    using _conn = await Deno.connect({
       hostname: testConfig.DB_HOST,
       port: testConfig.DB_PORT,
     });
-    conn.close();
     return true;
   } catch {
     return false;
@@ -64,11 +63,10 @@ async function isRedisAvailable(): Promise<boolean> {
 
   try {
     // Try to connect via Deno's TCP to check if Redis port is open
-    const conn = await Deno.connect({
+    using _conn = await Deno.connect({
       hostname: testConfig.ELASTICACHE_ENDPOINT,
       port: 6379,
     });
-    conn.close();
     return true;
   } catch {
     return false;
@@ -138,14 +136,19 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
   });
 
   // Conditional tests based on service availability
-  const dbAvailable = await isDatabaseAvailable();
-  const redisAvailable = await isRedisAvailable();
+  let dbAvailable = false;
+  let redisAvailable = false;
 
-  console.log(
-    `Test environment: Database=${
-      dbAvailable ? "Available" : "Not Available"
-    }, Redis=${redisAvailable ? "Available" : "Not Available"}`,
-  );
+  await t.step("Check Service Availability", async () => {
+    dbAvailable = await isDatabaseAvailable();
+    redisAvailable = await isRedisAvailable();
+
+    console.log(
+      `Test environment: Database=${
+        dbAvailable ? "Available" : "Not Available"
+      }, Redis=${redisAvailable ? "Available" : "Not Available"}`,
+    );
+  });
 
   if (dbAvailable) {
     await t.step("Database Connection Tests (Real DB)", async (st) => {
