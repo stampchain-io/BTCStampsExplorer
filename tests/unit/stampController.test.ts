@@ -276,3 +276,389 @@ Deno.test("StampController.getCollectionPageData includes metadata", async () =>
     CollectionService.getCollectionByName = originalGetCollectionByName;
   }
 });
+
+Deno.test("StampController.getStamps handles sort parameters", async () => {
+  const originalGetStamps = StampService.getStamps;
+
+  StampService.getStamps = (options: any) => {
+    // Verify sort options are passed through correctly
+    assertEquals(options.sortBy, "ASC");
+    assertEquals(options.sortColumn, "block_index");
+
+    return Promise.resolve({
+      stamps: [{
+        cpid: "A123456789",
+        stamp_url: "test.jpg",
+        ident: "STAMP",
+        block_index: 800000,
+      }],
+      last_block: 820000,
+      page: 1,
+      page_size: 20,
+      pages: 1,
+      total: 1,
+    });
+  };
+
+  BTCPriceService.getPrice = () =>
+    Promise.resolve({
+      price: 50000,
+      source: "test",
+      confidence: "high",
+      timestamp: new Date().toISOString(),
+    });
+
+  try {
+    const result = await StampController.getStamps({
+      page: 1,
+      limit: 20,
+      sortBy: "ASC",
+      sortColumn: "block_index",
+    });
+
+    assertExists(result.data);
+    assertEquals(result.data[0].block_index, 800000);
+  } finally {
+    StampService.getStamps = originalGetStamps;
+    BTCPriceService.getPrice = originalGetPrice;
+  }
+});
+
+Deno.test("StampController.getStamps handles filter parameters", async () => {
+  const originalGetStamps = StampService.getStamps;
+
+  StampService.getStamps = (options: any) => {
+    // Verify filter options are passed through
+    assertEquals(options.filterBy, ["SRC-20"]);
+    assertEquals(options.type, "collection");
+    // Note: creator parameter is not directly passed through in the current implementation
+
+    return Promise.resolve({
+      stamps: [{
+        cpid: "A123456789",
+        stamp_url: "test.jpg",
+        ident: "STAMP",
+        creator: "bc1qtest",
+      }],
+      last_block: 820000,
+      page: 1,
+      page_size: 20,
+      pages: 1,
+      total: 1,
+    });
+  };
+
+  BTCPriceService.getPrice = () =>
+    Promise.resolve({
+      price: 50000,
+      source: "test",
+      confidence: "high",
+      timestamp: new Date().toISOString(),
+    });
+
+  try {
+    const result = await StampController.getStamps({
+      page: 1,
+      limit: 20,
+      filterBy: ["SRC-20"],
+      type: "collection",
+      creator: "bc1qtest",
+    });
+
+    assertExists(result.data);
+    assertEquals(result.data[0].creator, "bc1qtest");
+  } finally {
+    StampService.getStamps = originalGetStamps;
+    BTCPriceService.getPrice = originalGetPrice;
+  }
+});
+
+Deno.test("StampController.getStamps handles pagination edge cases", async () => {
+  const originalGetStamps = StampService.getStamps;
+
+  StampService.getStamps = (options: any) => {
+    // Test high page number
+    assertEquals(options.page, 999);
+    assertEquals(options.limit, 50);
+
+    return Promise.resolve({
+      stamps: [], // Empty result for high page
+      last_block: 820000,
+      page: 999,
+      page_size: 50,
+      pages: 100,
+      total: 5000,
+    });
+  };
+
+  BTCPriceService.getPrice = () =>
+    Promise.resolve({
+      price: 50000,
+      source: "test",
+      confidence: "high",
+      timestamp: new Date().toISOString(),
+    });
+
+  try {
+    const result = await StampController.getStamps({
+      page: 999,
+      limit: 50,
+    });
+
+    assertEquals(result.data.length, 0);
+    assertEquals(result.page, 999);
+    assertEquals(result.totalPages, 100);
+  } finally {
+    StampService.getStamps = originalGetStamps;
+    BTCPriceService.getPrice = originalGetPrice;
+  }
+});
+
+Deno.test("StampController.getStamps handles empty results", async () => {
+  const originalGetStamps = StampService.getStamps;
+
+  StampService.getStamps = (_options: any) => {
+    return Promise.resolve({
+      stamps: [],
+      last_block: 820000,
+      page: 1,
+      page_size: 20,
+      pages: 0,
+      total: 0,
+    });
+  };
+
+  BTCPriceService.getPrice = () =>
+    Promise.resolve({
+      price: 50000,
+      source: "test",
+      confidence: "high",
+      timestamp: new Date().toISOString(),
+    });
+
+  try {
+    const result = await StampController.getStamps({
+      page: 1,
+      limit: 20,
+    });
+
+    assertEquals(result.data.length, 0);
+    assertEquals(result.total, 0);
+    assertEquals(result.totalPages, 0);
+  } finally {
+    StampService.getStamps = originalGetStamps;
+    BTCPriceService.getPrice = originalGetPrice;
+  }
+});
+
+Deno.test("StampController.getStamps handles identifier lookup", async () => {
+  const originalGetStamps = StampService.getStamps;
+
+  StampService.getStamps = (options: any) => {
+    assertEquals(
+      options.identifier,
+      "A123456789012345678901234567890123456789",
+    );
+
+    return Promise.resolve({
+      stamps: [{
+        cpid: "A123456789012345678901234567890123456789",
+        stamp_url: "test.jpg",
+        ident: "STAMP",
+      }],
+      last_block: 820000,
+      page: 1,
+      page_size: 1,
+      pages: 1,
+      total: 1,
+    });
+  };
+
+  BTCPriceService.getPrice = () =>
+    Promise.resolve({
+      price: 50000,
+      source: "test",
+      confidence: "high",
+      timestamp: new Date().toISOString(),
+    });
+
+  try {
+    const result = await StampController.getStamps({
+      identifier: "A123456789012345678901234567890123456789",
+    });
+
+    // When identifier is provided, response structure is { stamp: stampData }
+    assertExists(result.data.stamp);
+    assertEquals(
+      result.data.stamp.cpid,
+      "A123456789012345678901234567890123456789",
+    );
+  } finally {
+    StampService.getStamps = originalGetStamps;
+    BTCPriceService.getPrice = originalGetPrice;
+  }
+});
+
+Deno.test("StampController.getStamps handles block identifier lookup", async () => {
+  const originalGetStamps = StampService.getStamps;
+
+  StampService.getStamps = (options: any) => {
+    assertEquals(options.blockIdentifier, "800000");
+
+    return Promise.resolve({
+      stamps: [{
+        cpid: "A123456789012345678901234567890123456789",
+        stamp_url: "test.jpg",
+        ident: "STAMP",
+        block_index: 800000,
+      }],
+      last_block: 820000,
+      page: 1,
+      page_size: 20,
+      pages: 1,
+      total: 1,
+    });
+  };
+
+  BTCPriceService.getPrice = () =>
+    Promise.resolve({
+      price: 50000,
+      source: "test",
+      confidence: "high",
+      timestamp: new Date().toISOString(),
+    });
+
+  try {
+    const result = await StampController.getStamps({
+      blockIdentifier: "800000",
+    });
+
+    assertEquals(result.data.length, 1);
+    assertEquals(result.data[0].block_index, 800000);
+  } finally {
+    StampService.getStamps = originalGetStamps;
+    BTCPriceService.getPrice = originalGetPrice;
+  }
+});
+
+Deno.test("StampController.getStamps handles noPagination option", async () => {
+  const originalGetStamps = StampService.getStamps;
+
+  StampService.getStamps = (options: any) => {
+    assertEquals(options.noPagination, true);
+
+    return Promise.resolve({
+      stamps: [{
+        cpid: "A123456789012345678901234567890123456789",
+        stamp_url: "test.jpg",
+        ident: "STAMP",
+      }],
+      last_block: 820000,
+    });
+  };
+
+  BTCPriceService.getPrice = () =>
+    Promise.resolve({
+      price: 50000,
+      source: "test",
+      confidence: "high",
+      timestamp: new Date().toISOString(),
+    });
+
+  try {
+    const result = await StampController.getStamps({
+      noPagination: true,
+    });
+
+    assertExists(result.data);
+    assertEquals(result.data.length, 1);
+  } finally {
+    StampService.getStamps = originalGetStamps;
+    BTCPriceService.getPrice = originalGetPrice;
+  }
+});
+
+Deno.test("StampController.getStamps handles allColumns option", async () => {
+  const originalGetStamps = StampService.getStamps;
+
+  StampService.getStamps = (options: any) => {
+    assertEquals(options.allColumns, true);
+
+    return Promise.resolve({
+      stamps: [{
+        cpid: "A123456789012345678901234567890123456789",
+        stamp_url: "test.jpg",
+        ident: "STAMP",
+        creator: "bc1qtest",
+        block_index: 800000,
+        tx_hash: "abc123",
+      }],
+      last_block: 820000,
+      page: 1,
+      page_size: 20,
+      pages: 1,
+      total: 1,
+    });
+  };
+
+  BTCPriceService.getPrice = () =>
+    Promise.resolve({
+      price: 50000,
+      source: "test",
+      confidence: "high",
+      timestamp: new Date().toISOString(),
+    });
+
+  try {
+    const result = await StampController.getStamps({
+      allColumns: true,
+    });
+
+    assertExists(result.data);
+    assertEquals(result.data[0].creator, "bc1qtest");
+    assertEquals(result.data[0].tx_hash, "abc123");
+  } finally {
+    StampService.getStamps = originalGetStamps;
+    BTCPriceService.getPrice = originalGetPrice;
+  }
+});
+
+Deno.test("StampController.getStamps handles skipTotalCount option", async () => {
+  const originalGetStamps = StampService.getStamps;
+
+  StampService.getStamps = (options: any) => {
+    assertEquals(options.skipTotalCount, true);
+
+    return Promise.resolve({
+      stamps: [{
+        cpid: "A123456789012345678901234567890123456789",
+        stamp_url: "test.jpg",
+        ident: "STAMP",
+      }],
+      last_block: 820000,
+      page: 1,
+      page_size: 20,
+      pages: 1,
+    });
+  };
+
+  BTCPriceService.getPrice = () =>
+    Promise.resolve({
+      price: 50000,
+      source: "test",
+      confidence: "high",
+      timestamp: new Date().toISOString(),
+    });
+
+  try {
+    const result = await StampController.getStamps({
+      skipTotalCount: true,
+    });
+
+    assertExists(result.data);
+    assertEquals(result.total, undefined);
+  } finally {
+    StampService.getStamps = originalGetStamps;
+    BTCPriceService.getPrice = originalGetPrice;
+  }
+});

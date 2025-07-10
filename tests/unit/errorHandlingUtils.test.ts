@@ -477,37 +477,64 @@ Deno.test("ErrorHandlingUtils.createErrorBoundary - initial state", () => {
 Deno.test("ErrorHandlingUtils.createErrorBoundary - catch error", () => {
   const boundary = ErrorHandlingUtils.createErrorBoundary();
 
-  boundary.catch(new Error("Test error"), "Component context");
-  const state = boundary.getState();
+  // Suppress console.error for this test since we're intentionally causing errors
+  const originalConsoleError = console.error;
+  console.error = () => {}; // Suppress error logging
 
-  assertEquals(state.hasError, true);
-  assertExists(state.errorInfo);
-  assertEquals(state.errorInfo?.message, "Component context: Test error");
+  try {
+    boundary.catch(new Error("Test error"), "Component context");
+    const state = boundary.getState();
+
+    assertEquals(state.hasError, true);
+    assertExists(state.errorInfo);
+    assertEquals(state.errorInfo?.message, "Component context: Test error");
+  } finally {
+    // Restore console.error
+    console.error = originalConsoleError;
+  }
 });
 
 Deno.test("ErrorHandlingUtils.createErrorBoundary - reset functionality", () => {
   const boundary = ErrorHandlingUtils.createErrorBoundary();
 
-  boundary.catch(new Error("Test error"));
-  assertEquals(boundary.getState().hasError, true);
+  // Suppress console.error for this test since we're intentionally causing errors
+  const originalConsoleError = console.error;
+  console.error = () => {}; // Suppress error logging
 
-  boundary.reset();
-  const state = boundary.getState();
-  assertEquals(state.hasError, false);
-  assertEquals(state.errorInfo, null);
+  try {
+    boundary.catch(new Error("Test error"));
+    assertEquals(boundary.getState().hasError, true);
+
+    boundary.reset();
+    const state = boundary.getState();
+    assertEquals(state.hasError, false);
+    assertEquals(state.errorInfo, null);
+  } finally {
+    // Restore console.error
+    console.error = originalConsoleError;
+  }
 });
 
 Deno.test("ErrorHandlingUtils.createErrorBoundary - render with error", () => {
   const boundary = ErrorHandlingUtils.createErrorBoundary();
 
-  boundary.catch(new Error("Test error"));
+  // Suppress console.error for this test since we're intentionally causing errors
+  const originalConsoleError = console.error;
+  console.error = () => {}; // Suppress error logging
 
-  const children = () => "Normal content";
-  const fallback = (error: ErrorInfo) => `Error: ${error.message}`;
+  try {
+    boundary.catch(new Error("Test error"));
 
-  const result = boundary.render(children, fallback);
-  assertEquals(typeof result, "string");
-  assertEquals((result as string).includes("Error:"), true);
+    const children = () => "Normal content";
+    const fallback = (error: ErrorInfo) => `Error: ${error.message}`;
+
+    const result = boundary.render(children, fallback);
+    assertEquals(typeof result, "string");
+    assertEquals((result as string).includes("Error:"), true);
+  } finally {
+    // Restore console.error
+    console.error = originalConsoleError;
+  }
 });
 
 Deno.test("ErrorHandlingUtils.createErrorBoundary - render without error", () => {
