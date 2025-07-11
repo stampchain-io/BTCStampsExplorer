@@ -171,6 +171,24 @@ class DatabaseManager {
       this.#keepAliveInterval = undefined;
     }
     
+    // Close Redis connection
+    if (this.#redisClient) {
+      try {
+        // Check if Redis client has a close/quit method
+        if (typeof this.#redisClient.quit === 'function') {
+          await this.#redisClient.quit();
+        } else if (typeof this.#redisClient.close === 'function') {
+          await this.#redisClient.close();
+        }
+        console.log('[REDIS CLEANUP] Redis connection closed');
+      } catch (error) {
+        console.log(`[REDIS CLEANUP ERROR] ${error instanceof Error ? error.message : error}`);
+      } finally {
+        this.#redisClient = undefined;
+        this.#redisAvailable = false;
+      }
+    }
+    
     await Promise.all(this.#pool.map((client) => this.closeClient(client)));
   }
 
@@ -507,6 +525,20 @@ class DatabaseManager {
     console.log(`[REDIS RECONNECT] Starting background reconnection attempt #${this.#redisRetryCount + 1}/${this.#MAX_RETRIES}`);
     
     try {
+      // Cleanup old failed connection first
+      if (this.#redisClient) {
+        try {
+          if (typeof this.#redisClient.quit === 'function') {
+            await this.#redisClient.quit();
+          } else if (typeof this.#redisClient.close === 'function') {
+            await this.#redisClient.close();
+          }
+        } catch {
+          // Ignore errors from already-failed connections
+        }
+        this.#redisClient = undefined;
+      }
+      
       console.log(`[REDIS RECONNECT] Attempting to reconnect to Redis at ${this.config.ELASTICACHE_ENDPOINT}:6379`);
       await this.connectToRedis();
       console.log(`[REDIS RECONNECT SUCCESS] ✅ Successfully reconnected to Redis`);
@@ -858,7 +890,10 @@ console.log(`REDIS_LOG_LEVEL: ${dbConfig.REDIS_LOG_LEVEL}`);
 console.log(`SKIP_REDIS_CONNECTION: ${(globalThis as any).SKIP_REDIS_CONNECTION ? 'true' : 'false'}`);
 console.log("===========================");
 
-export const dbManager = new DatabaseManager(dbConfig);
+// Only create singleton if not in test mode to prevent resource leaks during testing
+export const dbManager = Deno.env.get("DENO_ENV") === "test" 
+  ? undefined as any as DatabaseManager  // Type assertion for compatibility
+  : new DatabaseManager(dbConfig);
 
 // Export the class for testing and other uses
 export { DatabaseManager };

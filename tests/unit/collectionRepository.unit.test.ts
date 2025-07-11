@@ -1,40 +1,52 @@
 import { assertEquals, assertExists } from "@std/assert";
+import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { CollectionRepository } from "$server/database/collectionRepository.ts";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 
-Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
+describe("CollectionRepository Unit Tests", () => {
   let originalDb: typeof dbManager;
   let mockDb: MockDatabaseManager;
 
-  // Setup before each test
-  function setup() {
+  beforeEach(() => {
+    // Check if we should run database tests
+    if (Deno.env.get("RUN_DB_TESTS") === "true") {
+      // Skip these tests in CI - they need real database connection
+      console.log(
+        "Skipping CollectionRepository unit tests - RUN_DB_TESTS is set for integration tests",
+      );
+      return;
+    }
+
     // Store original database
-    originalDb = (CollectionRepository as any).db;
+    originalDb = dbManager;
 
     // Create mock database
     mockDb = new MockDatabaseManager();
 
     // Inject mock
     CollectionRepository.setDatabase(mockDb as unknown as typeof dbManager);
-  }
+  });
 
-  // Teardown after each test
-  function teardown() {
+  afterEach(() => {
+    // Skip cleanup if we didn't set up
+    if (!mockDb) return;
+
     // Clear mock data FIRST before restoring
-    if (mockDb) {
-      mockDb.clearQueryHistory();
-      mockDb.clearMockResponses();
-    }
+    mockDb.clearQueryHistory();
+    mockDb.clearMockResponses();
 
     // Restore original database
     CollectionRepository.setDatabase(originalDb);
-  }
 
-  await t.step(
-    "getCollectionDetails - returns collection details with basic info",
-    async () => {
-      setup();
+    // Reset references
+    mockDb = null as any;
+  });
+
+  describe("getCollectionDetails", () => {
+    it("should return collection details with basic info", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       const result = await CollectionRepository.getCollectionDetails({
         limit: 10,
@@ -54,15 +66,11 @@ Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
         assertEquals(typeof firstCollection.stamp_count, "string");
         assertEquals(typeof firstCollection.total_editions, "string");
       }
+    });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getCollectionDetails - filters by creator",
-    async () => {
-      setup();
+    it("should filter by creator", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       // From fixtures, we know this creator has collections
       const creatorAddress = "bc1q2uh80zl320nsfs57dc5umkf95rcf0s9ppnlyuj";
@@ -84,15 +92,11 @@ Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
         );
         assertExists(collection, "Should find INFINITY SEED collection");
       }
+    });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getCollectionDetails - filters by minimum stamp count",
-    async () => {
-      setup();
+    it("should filter by minimum stamp count", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       // KEVIN collection has 50 stamps in fixtures
       const result = await CollectionRepository.getCollectionDetails({
@@ -115,15 +119,100 @@ Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
           );
         });
       }
+    });
 
-      teardown();
-    },
-  );
+    it("should handle pagination correctly", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
-  await t.step(
-    "getTotalCollectionsByCreatorFromDb - returns total count",
-    async () => {
-      setup();
+      // Test first page
+      const page1 = await CollectionRepository.getCollectionDetails({
+        limit: 2,
+        page: 1,
+      });
+
+      // Test second page
+      const page2 = await CollectionRepository.getCollectionDetails({
+        limit: 2,
+        page: 2,
+      });
+
+      assertExists(page1);
+      assertExists(page2);
+      assertExists(page1.rows);
+      assertExists(page2.rows);
+
+      // Verify offset was applied (mock should handle this)
+      const query1 = mockDb.getQueryHistory()[0];
+      const query2 = mockDb.getQueryHistory()[1];
+
+      assertEquals(
+        query1.params.includes(0),
+        true,
+        "First page should have offset 0",
+      );
+      assertEquals(
+        query2.params.includes(2),
+        true,
+        "Second page should have offset 2",
+      );
+    });
+
+    it("should properly format creators and stamps arrays", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
+
+      // No need to set up a specific mock - we'll use the default collection data
+      // which returns properly formatted collections
+
+      const result = await CollectionRepository.getCollectionDetails({
+        limit: 10,
+        page: 1,
+      });
+
+      assertExists(result);
+      assertExists(result.rows);
+
+      // We should have at least one collection from fixtures
+      assertEquals(
+        result.rows.length > 0,
+        true,
+        "Should have at least one collection",
+      );
+
+      if (result.rows.length > 0) {
+        const collection = result.rows[0];
+
+        // Check that creators is an array (transformed from comma-separated string)
+        assertEquals(
+          Array.isArray(collection.creators),
+          true,
+          "creators should be an array",
+        );
+
+        // Check that stamps is an array (transformed from comma-separated string)
+        assertEquals(
+          Array.isArray(collection.stamps),
+          true,
+          "stamps should be an array",
+        );
+
+        // If there are stamps, check they are numbers
+        if (collection.stamps.length > 0) {
+          assertEquals(
+            typeof collection.stamps[0],
+            "number",
+            "stamps should contain numbers",
+          );
+        }
+      }
+    });
+  });
+
+  describe("getTotalCollectionsByCreatorFromDb", () => {
+    it("should return total count", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       const total = await CollectionRepository
         .getTotalCollectionsByCreatorFromDb();
@@ -137,15 +226,11 @@ Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
 
       assertEquals(typeof total, "number");
       assertEquals(total >= 0, true);
+    });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getTotalCollectionsByCreatorFromDb - filters by creator",
-    async () => {
-      setup();
+    it("should filter by creator", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       const creatorAddress = "bc1q2uh80zl320nsfs57dc5umkf95rcf0s9ppnlyuj";
       const total = await CollectionRepository
@@ -153,15 +238,13 @@ Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
 
       assertEquals(typeof total, "number");
       assertEquals(total >= 0, true);
+    });
+  });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getCollectionByName - returns collection by name",
-    async () => {
-      setup();
+  describe("getCollectionByName", () => {
+    it("should return collection by name", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       // From fixtures, we know KEVIN collection exists
       const result = await CollectionRepository.getCollectionByName("KEVIN");
@@ -173,15 +256,11 @@ Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
         assertEquals(typeof result.stamp_count, "string");
         assertEquals(typeof result.total_editions, "string");
       }
+    });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getCollectionByName - returns null for non-existent collection",
-    async () => {
-      setup();
+    it("should return null for non-existent collection", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       const result = await CollectionRepository.getCollectionByName(
         "NON_EXISTENT_COLLECTION",
@@ -195,15 +274,13 @@ Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
       }
 
       assertEquals(result, null);
+    });
+  });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getCollectionNames - returns collection names with pagination",
-    async () => {
-      setup();
+  describe("getCollectionNames", () => {
+    it("should return collection names with pagination", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       const result = await CollectionRepository.getCollectionNames({
         limit: 5,
@@ -220,15 +297,13 @@ Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
           assertEquals(typeof row.collection_name, "string");
         });
       }
+    });
+  });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getCollectionDetailsWithMarketData - returns collections without market data",
-    async () => {
-      setup();
+  describe("getCollectionDetailsWithMarketData", () => {
+    it("should return collections without market data", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       const result = await CollectionRepository
         .getCollectionDetailsWithMarketData({
@@ -246,15 +321,11 @@ Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
         assertExists(firstCollection.collection_name);
         assertEquals(firstCollection.marketData, undefined);
       }
+    });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getCollectionDetailsWithMarketData - includes market data when requested",
-    async () => {
-      setup();
+    it("should include market data when requested", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       // Set up mock response with market data fields
       mockDb.setMockResponse(
@@ -315,15 +386,13 @@ Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
           "number",
         );
       }
+    });
+  });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "handles database errors gracefully",
-    async () => {
-      setup();
+  describe("Error Handling", () => {
+    it("should handle database errors gracefully", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       // Mock database error
       mockDb.executeQueryWithCache = () =>
@@ -337,103 +406,6 @@ Deno.test("CollectionRepository Unit Tests with DI", async (t) => {
         assertExists(error);
         assertEquals(error.message, "Database connection failed");
       }
-
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getCollectionDetails - handles pagination correctly",
-    async () => {
-      setup();
-
-      // Test first page
-      const page1 = await CollectionRepository.getCollectionDetails({
-        limit: 2,
-        page: 1,
-      });
-
-      // Test second page
-      const page2 = await CollectionRepository.getCollectionDetails({
-        limit: 2,
-        page: 2,
-      });
-
-      assertExists(page1);
-      assertExists(page2);
-      assertExists(page1.rows);
-      assertExists(page2.rows);
-
-      // Verify offset was applied (mock should handle this)
-      const query1 = mockDb.getQueryHistory()[0];
-      const query2 = mockDb.getQueryHistory()[1];
-
-      assertEquals(
-        query1.params.includes(0),
-        true,
-        "First page should have offset 0",
-      );
-      assertEquals(
-        query2.params.includes(2),
-        true,
-        "Second page should have offset 2",
-      );
-
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getCollectionDetails - properly formats creators and stamps arrays",
-    async () => {
-      setup();
-
-      // No need to set up a specific mock - we'll use the default collection data
-      // which returns properly formatted collections
-
-      const result = await CollectionRepository.getCollectionDetails({
-        limit: 10,
-        page: 1,
-      });
-
-      assertExists(result);
-      assertExists(result.rows);
-
-      // We should have at least one collection from fixtures
-      assertEquals(
-        result.rows.length > 0,
-        true,
-        "Should have at least one collection",
-      );
-
-      if (result.rows.length > 0) {
-        const collection = result.rows[0];
-
-        // Check that creators is an array (transformed from comma-separated string)
-        assertEquals(
-          Array.isArray(collection.creators),
-          true,
-          "creators should be an array",
-        );
-
-        // Check that stamps is an array (transformed from comma-separated string)
-        assertEquals(
-          Array.isArray(collection.stamps),
-          true,
-          "stamps should be an array",
-        );
-
-        // If there are stamps, check they are numbers
-        if (collection.stamps.length > 0) {
-          assertEquals(
-            typeof collection.stamps[0],
-            "number",
-            "stamps should contain numbers",
-          );
-        }
-      }
-
-      teardown();
-    },
-  );
+    });
+  });
 });

@@ -1,6 +1,8 @@
+import { COINGECKO_API_BASE_URL } from "$lib/utils/constants.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { RouteType, getCacheConfig } from "$server/services/cacheService.ts";
-import { COINGECKO_API_BASE_URL } from "$lib/utils/constants.ts";
+
+import type { DatabaseManager } from "$server/database/databaseManager.ts";
 
 export interface BTCPriceData {
   price: number;
@@ -13,6 +15,12 @@ export interface BTCPriceData {
 }
 
 export class BTCPriceService {
+  private static db: DatabaseManager = dbManager;
+
+  static setDatabase(database: DatabaseManager): void {
+    this.db = database;
+  }
+
   private static readonly CACHE_KEY = "btc_price_data";
   private static readonly CACHE_CONFIG = getCacheConfig(RouteType.PRICE);
   private static sourceCounter = 0;
@@ -31,12 +39,17 @@ export class BTCPriceService {
     try {
       console.log(`[BTCPriceService] Starting BTC price fetch with Redis caching, preferredSource: ${preferredSource}`);
 
-      // Use Redis cache with fallback chain
-      const priceData = await dbManager.handleCache<BTCPriceData>(
-        this.CACHE_KEY,
-        () => this.fetchFreshPriceData(preferredSource),
-        this.CACHE_CONFIG.duration,
-      );
+      const cachedData = await this.db.handleCache<BTCPriceData | null>(this.CACHE_KEY, () => Promise.resolve(null), this.CACHE_CONFIG.duration);
+
+      if (cachedData && this.isCacheValid(cachedData)) {
+        return {
+          ...cachedData,
+          source: "cached",
+          confidence: cachedData.confidence,
+        };
+      }
+
+      const priceData = await this.fetchFreshPriceData(preferredSource);
 
       const duration = Date.now() - startTime;
       console.log(`[BTCPriceService] BTC price retrieved successfully: $${priceData.price} from ${priceData.source} (${duration}ms)`);
@@ -49,6 +62,11 @@ export class BTCPriceService {
       // Emergency fallback to static default
       return this.getStaticFallbackPrice();
     }
+  }
+
+  private static isCacheValid(data: BTCPriceData): boolean {
+    const age = Date.now() - data.timestamp;
+    return age < this.CACHE_CONFIG.duration * 1000;
   }
 
   /**
@@ -270,7 +288,7 @@ export class BTCPriceService {
    */
   static invalidateCache(): Promise<void> {
     try {
-      return dbManager.invalidateCacheByPattern(this.CACHE_KEY)
+      return this.db.invalidateCacheByPattern(this.CACHE_KEY)
         .then(() => {
           console.log("[BTCPriceService] BTC price cache invalidated");
         });

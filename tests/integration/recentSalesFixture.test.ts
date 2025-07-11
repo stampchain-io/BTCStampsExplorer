@@ -74,6 +74,9 @@ describe("Recent Sales Fixture-Based Tests", () => {
       })`,
       testCpids,
     );
+
+    // Close all database connections to prevent TCP leaks
+    await dbManager.closeAllClients();
   });
 
   describe("Default Behavior Tests", () => {

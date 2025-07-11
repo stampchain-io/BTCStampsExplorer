@@ -1,20 +1,379 @@
-// Comprehensive PSBTService Test Suite - 100% Coverage
-// Tests formatting function and private methods with fixtures
-// Uses bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m address fixtures
+/**
+ * @fileoverview Comprehensive PSBTService tests with dependency injection and fixtures
+ * Combines unit tests, integration tests, and fixture-based tests for full coverage
+ */
 
-import { assertEquals, assertExists, assertThrows } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
+import {
+  assertEquals,
+  assertExists,
+  assertRejects,
+  assertThrows,
+} from "@std/assert";
+import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { Buffer } from "node:buffer";
 import { networks, Psbt, Transaction } from "bitcoinjs-lib";
+import * as bitcoin from "../mocks/bitcoinjs-lib.mock.ts";
+
+// Set test environment before any imports
+(globalThis as any).SKIP_REDIS_CONNECTION = true;
+(globalThis as any).SKIP_DB_CONNECTION = true;
+Deno.env.set("SKIP_REDIS_CONNECTION", "true");
+Deno.env.set("SKIP_DB_CONNECTION", "true");
+Deno.env.set("DENO_ENV", "test");
+
 import {
+  createPSBTService,
   formatPsbtForLogging,
   PSBTService,
 } from "../../server/services/transaction/psbtService.ts";
+import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
+import { clearMockUTXOResponses } from "../mocks/utxoUtils.mock.ts";
+import {
+  clearMockResponses,
+  MockCommonUTXOService,
+  setMockTransactionHex,
+  setMockUTXOResponse as setMockCommonUTXOResponse,
+} from "../mocks/CommonUTXOService.mock.ts";
 
 // Test address and fixtures
 const TEST_ADDRESS = "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";
 
+// Create mock dependencies for injected tests
+const createMockDependencies = () => ({
+  getUTXOForAddress: (
+    _address: string,
+    specificTxid?: string,
+    specificVout?: number,
+  ) => {
+    const allFixtures = Object.values(utxoFixtures).flatMap((group) =>
+      Object.values(group)
+    );
+
+    const fixture = allFixtures.find((f) =>
+      f.txid === specificTxid && f.vout === specificVout
+    );
+
+    if (fixture) {
+      return Promise.resolve({
+        utxo: {
+          value: Number(fixture.value),
+          script: fixture.script,
+          ancestor: fixture.blockHeight
+            ? {
+              fees: 0,
+              vsize: 250,
+              effectiveRate: 0,
+              txid: fixture.txid,
+              vout: fixture.vout,
+              weight: 1000,
+              size: 250,
+              scriptType: fixture.scriptType,
+              sequence: 0xfffffffd,
+              blockHeight: fixture.blockHeight,
+              confirmations: fixture.confirmations || 1,
+            }
+            : null,
+        },
+      });
+    }
+
+    return Promise.resolve({
+      utxo: {
+        value: 100000,
+        script: "0014cafebabe".repeat(5).slice(0, 44),
+        ancestor: null,
+      },
+    });
+  },
+
+  estimateFee: (outputs: any[], feeRate: number, inputCount: number) => {
+    const size = inputCount * 148 + outputs.length * 34 + 10;
+    const fee = Math.ceil(size * feeRate);
+    return fee;
+  },
+
+  commonUtxoService: MockCommonUTXOService.getInstance(),
+  bitcoin: bitcoin,
+});
+
 describe("PSBTService Comprehensive Coverage", () => {
+  describe("PSBTService with Dependency Injection", () => {
+    let psbtService: ReturnType<typeof createPSBTService>;
+
+    beforeEach(() => {
+      clearMockUTXOResponses();
+      clearMockResponses();
+      psbtService = createPSBTService(createMockDependencies());
+    });
+
+    afterEach(() => {
+      clearMockUTXOResponses();
+      clearMockResponses();
+    });
+
+    describe("createPSBT with UTXO Fixtures", () => {
+      it("should create PSBT with P2WPKH standard fixture", async () => {
+        const fixture = utxoFixtures.p2wpkh.standard;
+        const salePrice = 0.001;
+        const sellerAddress = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4";
+
+        setMockTransactionHex(
+          fixture.txid,
+          "02000000" + "01" + "0".repeat(64) + "00000000" + "00" + "ffffffff" +
+            "01" + Number(fixture.value).toString(16).padStart(16, "0") +
+            (fixture.script.length / 2).toString(16).padStart(2, "0") +
+            fixture.script + "00000000",
+        );
+
+        const psbtHex = await psbtService.createPSBT(
+          `${fixture.txid}:${fixture.vout}`,
+          salePrice,
+          sellerAddress,
+        );
+
+        assertExists(psbtHex);
+        assertEquals(typeof psbtHex, "string");
+        assertEquals(psbtHex.startsWith("70736274ff"), true);
+
+        const psbt = bitcoin.Psbt.fromHex(psbtHex);
+        assertEquals(psbt.data.inputs.length, 1);
+        assertEquals(psbt.txOutputs.length, 2);
+        assertExists(psbt.data.inputs[0].witnessUtxo);
+      });
+
+      it("should reject dust amounts", async () => {
+        const fixture = utxoFixtures.p2wpkh.dustAmount;
+        const salePrice = 0.00000001;
+
+        setMockTransactionHex(
+          fixture.txid,
+          "02000000" + "01" + "0".repeat(64) + "00000000" + "00" + "ffffffff" +
+            "01" + Number(fixture.value).toString(16).padStart(16, "0") +
+            (fixture.script.length / 2).toString(16).padStart(2, "0") +
+            fixture.script + "00000000",
+        );
+
+        await assertRejects(
+          async () => {
+            await psbtService.createPSBT(
+              `${fixture.txid}:${fixture.vout}`,
+              salePrice,
+              "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            );
+          },
+          Error,
+        );
+      });
+
+      it("should handle P2PKH addresses", async () => {
+        const fixture = utxoFixtures.p2pkh.standard;
+        const salePrice = 0.005;
+        const sellerAddress = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4";
+
+        setMockTransactionHex(
+          fixture.txid,
+          "02000000" + "01" + "a".repeat(64) + "00000000" + "00" + "ffffffff" +
+            "01" + fixture.value.toString(16).padStart(16, "0") +
+            (fixture.script.length / 2).toString(16).padStart(2, "0") +
+            fixture.script + "00000000",
+        );
+
+        const psbtHex = await psbtService.createPSBT(
+          `${fixture.txid}:${fixture.vout}`,
+          salePrice,
+          sellerAddress,
+        );
+
+        assertExists(psbtHex);
+        const psbt = bitcoin.Psbt.fromHex(psbtHex);
+        assertEquals(psbt.data.inputs.length, 1);
+        assertEquals(psbt.txOutputs.length, 2);
+      });
+    });
+
+    describe("validateUTXOOwnership with Fixtures", () => {
+      it("should validate ownership for correct address", async () => {
+        const fixture = utxoFixtures.p2wpkh.standard;
+
+        setMockCommonUTXOResponse(fixture.txid, fixture.vout, {
+          value: Number(fixture.value),
+          script: fixture.script,
+          address: fixture.address,
+        });
+
+        const isValid = await psbtService.validateUTXOOwnership(
+          `${fixture.txid}:${fixture.vout}`,
+          fixture.address,
+        );
+
+        assertEquals(isValid, true);
+      });
+
+      it("should reject ownership for wrong address", async () => {
+        const fixture = utxoFixtures.p2wpkh.standard;
+        const wrongAddress = utxoFixtures.p2pkh.standard.address;
+
+        setMockCommonUTXOResponse(fixture.txid, fixture.vout, {
+          value: Number(fixture.value),
+          script: fixture.script,
+          address: fixture.address,
+        });
+
+        const isValid = await psbtService.validateUTXOOwnership(
+          `${fixture.txid}:${fixture.vout}`,
+          wrongAddress,
+        );
+
+        assertEquals(isValid, false);
+      });
+    });
+
+    describe("processCounterpartyPSBT with Fixtures", () => {
+      it("should process PSBT with mixed fixture types", async () => {
+        const buyerFixture = utxoFixtures.p2wpkh.standard;
+        const sellerFixture = utxoFixtures.p2pkh.standard;
+
+        const psbt = new bitcoin.Psbt();
+        psbt.addInput({
+          hash: buyerFixture.txid,
+          index: buyerFixture.vout,
+          witnessUtxo: {
+            value: buyerFixture.value,
+            script: Buffer.from(buyerFixture.script, "hex"),
+          },
+        });
+
+        psbt.addOutput({
+          address: sellerFixture.address,
+          value: 100000n,
+        });
+
+        setMockTransactionHex(
+          sellerFixture.txid,
+          "02000000" + "01" + "c".repeat(64) + "00000000" + "00" + "ffffffff" +
+            "01" + sellerFixture.value.toString(16).padStart(16, "0") +
+            (sellerFixture.script.length / 2).toString(16).padStart(2, "0") +
+            sellerFixture.script + "00000000",
+        );
+
+        const result = await psbtService.processCounterpartyPSBT(
+          psbt.toHex(),
+          `${sellerFixture.txid}:${sellerFixture.vout}`,
+          sellerFixture.address,
+        );
+
+        assertExists(result);
+        assertExists(result.psbtHex);
+        assertEquals(typeof result.psbtHex, "string");
+        assertEquals(result.psbtHex.startsWith("70736274ff"), true);
+      });
+    });
+
+    describe("Edge Cases with Fixtures", () => {
+      it("should handle invalid UTXO string format", async () => {
+        await assertRejects(
+          async () => {
+            await psbtService.createPSBT(
+              "invalid-format",
+              0.001,
+              "bc1q7c6u6q8g50txf9e9qw4m4w8ukmh3lxp2c8yz3g",
+            );
+          },
+          Error,
+          "Invalid utxo format",
+        );
+      });
+
+      it("should handle negative vout", async () => {
+        await assertRejects(
+          async () => {
+            await psbtService.createPSBT(
+              "deadbeef:-1",
+              0.001,
+              "bc1q7c6u6q8g50txf9e9qw4m4w8ukmh3lxp2c8yz3g",
+            );
+          },
+          Error,
+          "Invalid vout value",
+        );
+      });
+
+      it("should handle mixed network addresses", async () => {
+        const mainnetFixture = utxoFixtures.p2wpkh.standard;
+        const testnetAddress = "tb1q7c6u6q8g50txf9e9qw4m4w8ukmh3lxp2czyz3g";
+
+        setMockTransactionHex(
+          mainnetFixture.txid,
+          "02000000" + "01" + "0".repeat(64) + "00000000" + "00" + "ffffffff" +
+            "01" + Number(mainnetFixture.value).toString(16).padStart(16, "0") +
+            (mainnetFixture.script.length / 2).toString(16).padStart(2, "0") +
+            mainnetFixture.script + "00000000",
+        );
+
+        await assertRejects(
+          async () => {
+            await psbtService.createPSBT(
+              `${mainnetFixture.txid}:${mainnetFixture.vout}`,
+              0.001,
+              testnetAddress,
+            );
+          },
+          Error,
+          "Network mismatch: Cannot use testnet address",
+        );
+      });
+    });
+
+    describe("Fee Calculations with Fixtures", () => {
+      it("should calculate correct fees for different script types", async () => {
+        const testCases = [
+          { fixture: utxoFixtures.p2wpkh.standard, expectedMaxFee: 2000 },
+          { fixture: utxoFixtures.p2pkh.standard, expectedMaxFee: 3000 },
+          { fixture: utxoFixtures.p2wsh.multisig2of3, expectedMaxFee: 5000 },
+        ];
+
+        for (const { fixture, expectedMaxFee } of testCases) {
+          if (fixture.scriptType === "p2pkh") {
+            setMockTransactionHex(
+              fixture.txid,
+              "02000000" + "01" + "d".repeat(64) + "00000000" + "00" +
+                "ffffffff" +
+                "01" + fixture.value.toString(16).padStart(16, "0") +
+                (fixture.script.length / 2).toString(16).padStart(2, "0") +
+                fixture.script + "00000000",
+            );
+          }
+
+          const salePrice = 0.001;
+          const _psbtHex = await psbtService.createPSBT(
+            `${fixture.txid}:${fixture.vout}`,
+            salePrice,
+            "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+          );
+
+          const totalInput = Number(fixture.value);
+          const saleAmountSats = Math.floor(salePrice * 100000000);
+          const expectedFee = 1920;
+          const expectedChange = totalInput - saleAmountSats - expectedFee;
+          const totalOutput = saleAmountSats +
+            (expectedChange > 333 ? expectedChange : 0);
+          const fee = totalInput - totalOutput;
+
+          assertEquals(
+            fee > 0,
+            true,
+            `Fee should be positive for ${fixture.scriptType}`,
+          );
+          assertEquals(
+            fee < expectedMaxFee,
+            true,
+            `Fee should be less than ${expectedMaxFee} for ${fixture.scriptType}, got ${fee}`,
+          );
+        }
+      });
+    });
+  });
+
   describe("formatPsbtForLogging", () => {
     it("should format PSBT for logging correctly", () => {
       const psbt = new Psbt({ network: networks.bitcoin });

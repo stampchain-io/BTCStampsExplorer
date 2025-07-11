@@ -1,5 +1,11 @@
 import { assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "@std/testing/bdd";
 import { StampRepository } from "$server/database/stampRepository.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
@@ -61,6 +67,12 @@ describe("Recent Sales Integration Tests", () => {
       data_quality_score: 9.0,
     },
   ];
+
+  // Clean up after tests - close database connections
+  afterAll(async () => {
+    // Close all database connections to prevent TCP leaks
+    await dbManager.closeAllClients();
+  });
 
   beforeEach(async () => {
     // Insert test stamps

@@ -67,7 +67,7 @@ export const utxoFixtures = {
       vout: 0,
       value: 314435204n, // 3.14435204 BTC in satoshis
       script: "0014f1e2d3c4b5a697880123456789abcdef123456ab",
-      address: "bc1q78hd83946jucpqfxg4nczwd7c0hrx3t8q9k2mp",
+      address: "bc1q78hd83946jucpqfxg4nczwd7c0hrx3t8q9k2mp2x3y4z",
       scriptType: "p2wpkh" as const,
       witnessUtxo: {
         script: "0014f1e2d3c4b5a697880123456789abcdef123456ab",

@@ -1,13 +1,24 @@
 import { assertEquals, assertExists } from "@std/assert";
-import { afterEach, describe, it } from "@std/testing/bdd";
+import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { stub } from "@std/testing/mock";
 import { StampRepository } from "$server/database/stampRepository.ts";
-import { dbManager } from "$server/database/databaseManager.ts";
 import stampFixtures from "../fixtures/stampData.json" with { type: "json" };
 
+// Mock database manager for testing
+class MockDatabaseManager {
+  executeQueryWithCache: any;
+  executeQuery: any;
+}
+
 describe("StampRepository Tests with Fixtures", () => {
+  let mockDb: MockDatabaseManager;
   let queryStub: any;
   let executeQueryStub: any;
+
+  beforeEach(() => {
+    mockDb = new MockDatabaseManager();
+    StampRepository.setDatabase(mockDb as any);
+  });
 
   afterEach(() => {
     if (queryStub) {
@@ -24,9 +35,13 @@ describe("StampRepository Tests with Fixtures", () => {
     it("should return stamps with basic pagination", async () => {
       // Stub to return fixture data
       queryStub = stub(
-        dbManager,
+        mockDb,
         "executeQueryWithCache",
-        () => {
+        (
+          _query: string,
+          _params: unknown[],
+          _cacheDuration: number | "never",
+        ) => {
           // Map fixture data to match expected structure
           const mappedRows = stampFixtures.regularStamps.slice(0, 5).map(
             (stamp) => ({
@@ -63,9 +78,13 @@ describe("StampRepository Tests with Fixtures", () => {
     it("should return stamps filtered by type", async () => {
       // Return only regular stamps for "stamps" type
       queryStub = stub(
-        dbManager,
+        mockDb,
         "executeQueryWithCache",
-        () => {
+        (
+          _query: string,
+          _params: unknown[],
+          _cacheDuration: number | "never",
+        ) => {
           const mappedRows = stampFixtures.regularStamps.map((stamp) => ({
             ...stamp,
             creator_name: null,
@@ -85,16 +104,20 @@ describe("StampRepository Tests with Fixtures", () => {
 
       assertExists(result);
       // All stamps should have positive numbers
-      result.stamps.forEach((stamp) => {
+      result.stamps.forEach((stamp: any) => {
         assertEquals(stamp.stamp > 0, true);
       });
     });
 
     it("should return cursed stamps when filtered", async () => {
       queryStub = stub(
-        dbManager,
+        mockDb,
         "executeQueryWithCache",
-        () => {
+        (
+          _query: string,
+          _params: unknown[],
+          _cacheDuration: number | "never",
+        ) => {
           const mappedRows = stampFixtures.cursedStamps.map((stamp) => ({
             ...stamp,
             creator_name: null,
@@ -114,16 +137,20 @@ describe("StampRepository Tests with Fixtures", () => {
 
       assertExists(result);
       // All stamps should have negative numbers
-      result.stamps.forEach((stamp) => {
+      result.stamps.forEach((stamp: any) => {
         assertEquals(stamp.stamp < 0, true);
       });
     });
 
     it("should handle empty results", async () => {
       queryStub = stub(
-        dbManager,
+        mockDb,
         "executeQueryWithCache",
-        () => Promise.resolve({ rows: [], rowCount: 0 }),
+        (
+          _query: string,
+          _params: unknown[],
+          _cacheDuration: number | "never",
+        ) => Promise.resolve({ rows: [], rowCount: 0 }),
       );
 
       const result = await StampRepository.getStamps({
@@ -139,9 +166,13 @@ describe("StampRepository Tests with Fixtures", () => {
 
     it("should handle database errors gracefully", async () => {
       queryStub = stub(
-        dbManager,
+        mockDb,
         "executeQueryWithCache",
-        () => Promise.reject(new Error("Database connection failed")),
+        (
+          _query: string,
+          _params: unknown[],
+          _cacheDuration: number | "never",
+        ) => Promise.reject(new Error("Database connection failed")),
       );
 
       try {
@@ -151,7 +182,7 @@ describe("StampRepository Tests with Fixtures", () => {
         });
         assertEquals(false, true, "Expected error to be thrown");
       } catch (error) {
-        assertEquals(error.message, "Database connection failed");
+        assertEquals((error as Error).message, "Database connection failed");
       }
     });
   });
@@ -159,9 +190,10 @@ describe("StampRepository Tests with Fixtures", () => {
   describe("updateCreatorName", () => {
     it("should update creator name successfully", async () => {
       executeQueryStub = stub(
-        dbManager,
+        mockDb,
         "executeQuery",
-        () => Promise.resolve({ affectedRows: 1, rows: [], rowCount: 1 }),
+        (_query: string, _params: unknown[]) =>
+          Promise.resolve({ affectedRows: 1, rows: [], rowCount: 1 }),
       );
 
       const result = await StampRepository.updateCreatorName(
@@ -173,9 +205,10 @@ describe("StampRepository Tests with Fixtures", () => {
 
     it("should return false on error", async () => {
       executeQueryStub = stub(
-        dbManager,
+        mockDb,
         "executeQuery",
-        () => Promise.reject(new Error("Update failed")),
+        (_query: string, _params: unknown[]) =>
+          Promise.reject(new Error("Update failed")),
       );
 
       const result = await StampRepository.updateCreatorName(

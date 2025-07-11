@@ -9,7 +9,15 @@ console.log("=================================");
 // Set environment variable to skip Redis
 Deno.env.set("SKIP_REDIS_CONNECTION", "true");
 
-// Import and run tests
-await import("./tests/unit/marketDataRepository.test.ts");
+try {
+  // Import and run tests
+  await import("./tests/unit/marketDataRepository.test.ts");
 
-console.log("\nTest run complete!");
+  console.log("\nTest run complete!");
+} catch (error) {
+  console.error("\nTest run failed!");
+  console.error(error);
+
+  // Exit with non-zero code to indicate failure
+  Deno.exit(1);
+}
