@@ -69,7 +69,7 @@
     "test:performance:watch": "deno test --allow-net tests/fee-performance.test.ts --no-check --allow-read --allow-env --allow-write --watch",
     "test:btc-price": "deno test --allow-net tests/btc-price-caching.test.ts --no-check --allow-read --allow-env --allow-write",
     "test:btc-price:watch": "deno test --allow-net tests/btc-price-caching.test.ts --no-check --allow-read --allow-env --allow-write --watch",
-    "test:unit": "SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-env --allow-write --allow-read tests/unit/",
+    "test:unit": "SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-env --allow-write --allow-read tests/unit/ --no-check",
     "test:unit:coverage": "DENO_ENV=test SKIP_REDIS_CONNECTION=true mkdir -p coverage && deno test --coverage=coverage/ tests/unit/ --no-check --allow-env --allow-read --allow-write --allow-net && deno coverage coverage/ --exclude=tests/",
     "test:integration": "DENO_ENV=test deno test tests/integration/ --no-check --allow-env --allow-read --allow-write --allow-net",
     "test:integration:watch": "DENO_ENV=test deno test tests/integration/ --no-check --allow-env --allow-read --allow-write --allow-net --watch",

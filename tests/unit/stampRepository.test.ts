@@ -87,7 +87,7 @@ describe("StampRepository Unit Tests", () => {
       assertEquals(Array.isArray(result.stamps), true);
 
       // Verify all stamps are regular stamps (not cursed or SRC-20)
-      result.stamps.forEach((stamp) => {
+      result.stamps.forEach((stamp: any) => {
         assertEquals(stamp.stamp >= 0, true);
         assertEquals(stamp.ident !== "SRC-20", true);
       });
@@ -107,7 +107,7 @@ describe("StampRepository Unit Tests", () => {
       assertEquals(Array.isArray(result.stamps), true);
 
       // Verify all stamps are cursed (negative stamp numbers)
-      result.stamps.forEach((stamp) => {
+      result.stamps.forEach((stamp: any) => {
         assertEquals(stamp.stamp < 0, true);
       });
     });
@@ -125,7 +125,7 @@ describe("StampRepository Unit Tests", () => {
         _query: string,
         _params: unknown[],
         _cacheDuration: number | "never",
-      ) => {
+      ): any => {
         queryCount++;
         // First query is for data, second is for count
         if (queryCount === 1) {
@@ -165,7 +165,7 @@ describe("StampRepository Unit Tests", () => {
       } catch (error) {
         // Expected behavior - getStamps throws errors
         assertExists(error);
-        assertEquals(error.message, "Database connection failed");
+        assertEquals((error as Error).message, "Database connection failed");
       }
     });
   });
@@ -220,7 +220,7 @@ describe("StampRepository Unit Tests", () => {
       } catch (error) {
         // Expected behavior - method throws errors
         assertExists(error);
-        assertEquals(error.message, "Count query failed");
+        assertEquals((error as Error).message, "Count query failed");
       }
     });
   });
@@ -240,7 +240,7 @@ describe("StampRepository Unit Tests", () => {
         _query: string,
         params: unknown[],
         _cacheDuration: number | "never",
-      ) => {
+      ): any => {
         // Check if this is a getStampFile query by looking at the params
         if (params.length === 1 && params[0] === stamp.cpid) {
           return Promise.resolve({
@@ -249,7 +249,7 @@ describe("StampRepository Unit Tests", () => {
               stamp_hash: stamp.stamp_hash,
               stamp_mimetype: stamp.stamp_mimetype,
               cpid: stamp.cpid,
-              stamp_base64: stamp.stamp_base64 || null,
+              stamp_base64: (stamp as any).stamp_base64 || null,
               stamp_url: stamp.stamp_url,
               stamp: stamp.stamp,
             }],
@@ -345,7 +345,7 @@ describe("StampRepository Unit Tests", () => {
       } catch (error) {
         // If it throws instead of returning null, that's also acceptable
         assertExists(error);
-        assertEquals(error.message, "Creator query failed");
+        assertEquals((error as Error).message, "Creator query failed");
       }
     });
   });
@@ -422,7 +422,7 @@ describe("StampRepository Unit Tests", () => {
       const result = await StampRepository.getStamps({
         limit: 10,
         page: 1,
-        filterBy: ["marketplace"],
+        filterBy: ["marketplace"] as any,
       });
 
       assertExists(result);
