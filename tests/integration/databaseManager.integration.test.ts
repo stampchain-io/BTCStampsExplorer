@@ -329,9 +329,24 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
   await cleanupAll();
 });
 
+// Add proper cleanup for the Cache Logic Tests
 Deno.test("DatabaseManager Cache Logic Tests", async (t) => {
+  const dbInstances: DatabaseManager[] = [];
+
+  const cleanup = async () => {
+    await Promise.all(dbInstances.map(async (instance) => {
+      try {
+        await instance.closeAllClients();
+      } catch (error) {
+        console.log(`Cleanup error: ${error}`);
+      }
+    }));
+    dbInstances.length = 0;
+  };
+
   await t.step("Cache Key Consistency", async () => {
     const dbManager = new DatabaseManager(testConfig);
+    dbInstances.push(dbManager);
 
     // Force use of in-memory cache
     (globalThis as any).SKIP_REDIS_CONNECTION = true;
@@ -345,14 +360,31 @@ Deno.test("DatabaseManager Cache Logic Tests", async (t) => {
     await dbManager.closeAllClients();
     delete (globalThis as any).SKIP_REDIS_CONNECTION;
   });
+
+  // Cleanup all database connections at the end
+  await cleanup();
 });
 
 // Performance test that doesn't require external services
 Deno.test("DatabaseManager Performance Tests", async (t) => {
+  const dbInstances: DatabaseManager[] = [];
+
+  const cleanup = async () => {
+    await Promise.all(dbInstances.map(async (instance) => {
+      try {
+        await instance.closeAllClients();
+      } catch (error) {
+        console.log(`Cleanup error: ${error}`);
+      }
+    }));
+    dbInstances.length = 0;
+  };
+
   await t.step("Initialization Performance", async () => {
     const start = Date.now();
 
     const dbManager = new DatabaseManager(testConfig);
+    dbInstances.push(dbManager);
 
     // Force skip external services for pure initialization test
     (globalThis as any).SKIP_REDIS_CONNECTION = true;
@@ -373,4 +405,7 @@ Deno.test("DatabaseManager Performance Tests", async (t) => {
     await dbManager.closeAllClients();
     delete (globalThis as any).SKIP_REDIS_CONNECTION;
   });
+
+  // Cleanup all database connections at the end
+  await cleanup();
 });

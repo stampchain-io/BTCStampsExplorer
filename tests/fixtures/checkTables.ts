@@ -15,6 +15,13 @@ async function checkTables() {
   } catch (error) {
     console.error("Error checking tables:", error);
   } finally {
+    // Properly close database connections to prevent leaks
+    try {
+      await dbManager.closeAllClients();
+      console.log("✅ Database connections closed");
+    } catch (closeError) {
+      console.error("❌ Error closing database connections:", closeError);
+    }
     Deno.exit(0);
   }
 }
