@@ -182,3 +182,4 @@ coverage_psbt_final/*
 # Task files
 # tasks.json
 # tasks/ 
+coverage_report.json
