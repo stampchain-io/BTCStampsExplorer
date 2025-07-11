@@ -66,7 +66,7 @@ export class CollectionRepository {
 
     queryParams.push(limit, offset);
 
-    const results = await this.db.executeQueryWithCache(
+    const results = await this.db.executeQueryWithCache<{ rows: any[]; [key: string]: any }>(
       query,
       queryParams,
       60 * 5 // 5 minutes cache in seconds
@@ -322,7 +322,7 @@ export class CollectionRepository {
 
     queryParams.push(limit, offset);
 
-    const result = await this.db.executeQueryWithCache(
+    const result = await this.db.executeQueryWithCache<{ rows: any[]; [key: string]: any }>(
       query,
       queryParams,
       60 * 5 // 5 minutes cache in seconds

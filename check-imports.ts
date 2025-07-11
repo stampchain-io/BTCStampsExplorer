@@ -9,15 +9,15 @@ try {
   Deno.env.set("SKIP_REDIS_CONNECTION", "true");
 
   console.log("1. Importing market data types...");
-  const types = await import("./lib/types/marketData.d.ts");
+  await import("./lib/types/marketData.d.ts");
   console.log("✓ Types imported successfully");
 
   console.log("2. Importing market data utils...");
-  const utils = await import("./lib/utils/marketData.ts");
+  await import("./lib/utils/marketData.ts");
   console.log("✓ Utils imported successfully");
 
   console.log("3. Importing database manager...");
-  const dbManagerModule = await import("./server/database/databaseManager.ts");
+  await import("./server/database/databaseManager.ts");
   console.log("✓ Database manager imported successfully");
 
   console.log("4. Importing market data repository...");
@@ -39,7 +39,7 @@ try {
 
   console.log("\nChecking repository methods:");
   for (const method of methods) {
-    if (typeof MarketDataRepository[method] === "function") {
+    if (typeof (MarketDataRepository as any)[method] === "function") {
       console.log(`✓ ${method} exists`);
     } else {
       console.log(`✗ ${method} missing!`);

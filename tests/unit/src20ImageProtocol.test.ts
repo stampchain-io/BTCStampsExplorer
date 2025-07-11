@@ -195,3 +195,272 @@ Deno.test("Image Protocol Utils - Real World Examples", () => {
     }
   }
 });
+
+Deno.test("Image Protocol Utils - Additional Edge Cases", () => {
+  // Test case sensitivity
+  assert(
+    validateImageReference("AR:hash") === false,
+    "Uppercase protocol should fail",
+  );
+  assert(
+    validateImageReference("Ar:hash") === false,
+    "Mixed case protocol should fail",
+  );
+  assert(
+    validateImageReference("IPFS:hash") === false,
+    "Uppercase IPFS should fail",
+  );
+
+  // Test special characters in hash
+  assert(
+    validateImageReference("ar:hash_with-dash") === true,
+    "Underscore and dash should be valid",
+  );
+  assert(
+    validateImageReference("ar:hash.dot") === false,
+    "Dot should be invalid",
+  );
+  assert(
+    validateImageReference("ar:hash space") === false,
+    "Space should be invalid",
+  );
+  assert(
+    validateImageReference("ar:hash@symbol") === false,
+    "@ symbol should be invalid",
+  );
+  assert(
+    validateImageReference("ar:hash#pound") === false,
+    "# symbol should be invalid",
+  );
+  assert(
+    validateImageReference("ar:hash$dollar") === false,
+    "$ symbol should be invalid",
+  );
+  assert(
+    validateImageReference("ar:hash%percent") === false,
+    "% symbol should be invalid",
+  );
+  assert(
+    validateImageReference("ar:hash&amp") === false,
+    "& symbol should be invalid",
+  );
+  assert(
+    validateImageReference("ar:hash*star") === false,
+    "* symbol should be invalid",
+  );
+  assert(
+    validateImageReference("ar:hash+plus") === false,
+    "+ symbol should be invalid",
+  );
+  assert(
+    validateImageReference("ar:hash/slash") === false,
+    "/ symbol should be invalid",
+  );
+  assert(
+    validateImageReference("ar:hash\\backslash") === false,
+    "\\ symbol should be invalid",
+  );
+
+  // Test boundary conditions for length
+  const exactlyThirtyTwo = "ar:" + "a".repeat(29); // 3 + 29 = 32
+  assert(
+    validateImageReference(exactlyThirtyTwo) === true,
+    "Exactly 32 chars should be valid",
+  );
+
+  const thirtyThree = "ar:" + "a".repeat(30); // 3 + 30 = 33
+  assert(
+    validateImageReference(thirtyThree) === false,
+    "33 chars should be invalid",
+  );
+
+  // Test minimum valid references
+  assert(
+    validateImageReference("ar:a") === true,
+    "Single char hash should be valid",
+  );
+  assert(
+    validateImageReference("ipfs:1") === true,
+    "Single digit hash should be valid",
+  );
+
+  // Test parseImageReference with edge cases
+  const weirdButValid = parseImageReference("ord:_-_-_");
+  assertEquals(weirdButValid.protocol, "ord");
+  assertEquals(weirdButValid.hash, "_-_-_");
+  assertEquals(weirdButValid.isValid, true);
+
+  // Test getImageUrl with all valid edge cases
+  assertEquals(getImageUrl("ar:a"), "https://arweave.net/a");
+  assertEquals(getImageUrl("ipfs:_"), "https://ipfs.io/ipfs/_");
+  assertEquals(getImageUrl("fc:-"), "https://dweb.link/ipfs/-");
+  assertEquals(getImageUrl("ord:123"), "https://ordinals.com/inscription/123");
+
+  // Test numeric-only hashes
+  assert(
+    validateImageReference("ar:123456789") === true,
+    "Numeric hash should be valid",
+  );
+  assert(
+    validateImageReference("ipfs:000000") === true,
+    "All zeros hash should be valid",
+  );
+
+  // Test mixed case hashes (should be allowed)
+  assert(
+    validateImageReference("ar:AbCdEf123") === true,
+    "Mixed case hash should be valid",
+  );
+  assert(
+    validateImageReference("ord:UPPERCASE") === true,
+    "Uppercase hash should be valid",
+  );
+});
+
+Deno.test("Image Protocol Utils - Protocol Specific Validation", () => {
+  // Test each protocol with typical hash patterns
+  const protocolTests = [
+    { protocol: "ar", hash: "BNttzDav3jHVnNiV7nYb", expected: true },
+    { protocol: "ipfs", hash: "QmXoypizjW3WknFiJn", expected: true },
+    { protocol: "fc", hash: "bafy2bzacea4b2wlqr", expected: true },
+    { protocol: "ord", hash: "a1b2c3d4e5f6789012", expected: true },
+  ];
+
+  for (const test of protocolTests) {
+    const ref = `${test.protocol}:${test.hash}`;
+    assertEquals(
+      validateImageReference(ref),
+      test.expected,
+      `${test.protocol} with typical hash should validate`,
+    );
+  }
+});
+
+Deno.test("Image Protocol Utils - URL Generation Edge Cases", () => {
+  // Test that invalid references return null
+  assertEquals(getImageUrl(""), null, "Empty string should return null");
+  assertEquals(
+    getImageUrl("invalid"),
+    null,
+    "Invalid format should return null",
+  );
+  assertEquals(
+    getImageUrl("unknown:hash"),
+    null,
+    "Unknown protocol should return null",
+  );
+  assertEquals(getImageUrl("ar:"), null, "Empty hash should return null");
+  assertEquals(
+    getImageUrl("ar:invalid@hash"),
+    null,
+    "Invalid hash should return null",
+  );
+
+  // Test URL encoding - hashes with special valid characters
+  const urlTests = [
+    {
+      input: "ar:hash_with_underscore",
+      expected: "https://arweave.net/hash_with_underscore",
+    },
+    {
+      input: "ipfs:hash-with-dash",
+      expected: "https://ipfs.io/ipfs/hash-with-dash",
+    },
+    { input: "fc:HASH123", expected: "https://dweb.link/ipfs/HASH123" },
+    {
+      input: "ord:123ABC",
+      expected: "https://ordinals.com/inscription/123ABC",
+    },
+  ];
+
+  for (const test of urlTests) {
+    assertEquals(getImageUrl(test.input), test.expected);
+  }
+});
+
+Deno.test("Image Protocol Utils - Parse Reference Return Values", () => {
+  // Test that parseImageReference always returns the expected structure
+  const testCases = [
+    {
+      input: "",
+      expected: { protocol: "", hash: "", fullReference: "", isValid: false },
+    },
+    {
+      input: null as any,
+      expected: { protocol: "", hash: "", fullReference: null, isValid: false },
+    },
+    {
+      input: undefined as any,
+      expected: {
+        protocol: "",
+        hash: "",
+        fullReference: undefined,
+        isValid: false,
+      },
+    },
+    {
+      input: 123 as any,
+      expected: { protocol: "", hash: "", fullReference: 123, isValid: false },
+    },
+    {
+      input: "nocolon",
+      expected: {
+        protocol: "",
+        hash: "nocolon",
+        fullReference: "nocolon",
+        isValid: false,
+      },
+    },
+    {
+      input: ":noproto",
+      expected: {
+        protocol: "",
+        hash: "noproto",
+        fullReference: ":noproto",
+        isValid: true,
+      },
+    },
+    {
+      input: "proto:",
+      expected: {
+        protocol: "proto",
+        hash: "",
+        fullReference: "proto:",
+        isValid: true,
+      },
+    },
+    {
+      input: ":",
+      expected: { protocol: "", hash: "", fullReference: ":", isValid: true },
+    },
+    {
+      input: ":::",
+      expected: {
+        protocol: "",
+        hash: "::",
+        fullReference: ":::",
+        isValid: true,
+      },
+    },
+  ];
+
+  for (const test of testCases) {
+    const result = parseImageReference(test.input);
+    assertEquals(
+      result.protocol,
+      test.expected.protocol,
+      `Protocol for "${test.input}"`,
+    );
+    assertEquals(result.hash, test.expected.hash, `Hash for "${test.input}"`);
+    assertEquals(
+      result.fullReference,
+      test.expected.fullReference,
+      `Full reference for "${test.input}"`,
+    );
+    assertEquals(
+      result.isValid,
+      test.expected.isValid,
+      `Is valid for "${test.input}"`,
+    );
+  }
+});

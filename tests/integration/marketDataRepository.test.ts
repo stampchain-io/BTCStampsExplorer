@@ -9,9 +9,10 @@ describe("MarketDataRepository Integration Tests", () => {
     // Ensure database connection is established
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     console.log("Cleaning up database connections...");
-    // dbManager doesn't have a close method - it manages connections internally
+    // Close all database connections to prevent TCP leaks
+    await dbManager.closeAllClients();
   });
 
   describe("getStampMarketData", () => {
