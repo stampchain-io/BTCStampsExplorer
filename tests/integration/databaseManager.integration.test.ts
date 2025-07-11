@@ -74,9 +74,30 @@ async function isRedisAvailable(): Promise<boolean> {
 }
 
 Deno.test("DatabaseManager Integration Tests", async (t) => {
+  // Track all created instances for cleanup
+  const dbInstances: DatabaseManager[] = [];
+
+  const createDbManager = (config = testConfig) => {
+    const instance = new DatabaseManager(config);
+    dbInstances.push(instance);
+    return instance;
+  };
+
+  // Cleanup function to close all connections
+  const cleanupAll = async () => {
+    await Promise.all(dbInstances.map(async (instance) => {
+      try {
+        await instance.closeAllClients();
+      } catch (error) {
+        console.log(`Cleanup error: ${error}`);
+      }
+    }));
+    dbInstances.length = 0; // Clear the array
+  };
+
   await t.step("DatabaseManager Class Instantiation", () => {
     // Test that we can create a DatabaseManager instance
-    const dbManager = new DatabaseManager(testConfig);
+    const dbManager = createDbManager();
     assertEquals(typeof dbManager, "object");
     assertEquals(typeof dbManager.initialize, "function");
     assertEquals(typeof dbManager.executeQuery, "function");
@@ -92,7 +113,7 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
       DB_MAX_RETRIES: 1, // Fast failure
     };
 
-    const dbManager = new DatabaseManager(invalidConfig);
+    const dbManager = createDbManager(invalidConfig);
 
     // Should fail gracefully when trying to execute query
     await assertRejects(
@@ -101,13 +122,10 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
       },
       Error,
     );
-
-    // Ensure cleanup
-    await dbManager.closeAllClients();
   });
 
   await t.step("Cache Key Generation", async () => {
-    const dbManager = new DatabaseManager(testConfig);
+    const dbManager = createDbManager();
 
     // Test that the same query/params generate the same cache key
     // We can't directly test this without accessing private methods,
@@ -153,7 +171,7 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
   if (dbAvailable) {
     await t.step("Database Connection Tests (Real DB)", async (st) => {
       await st.step("should connect and execute basic queries", async () => {
-        const dbManager = new DatabaseManager(testConfig);
+        const dbManager = createDbManager();
         await dbManager.initialize();
 
         const result = await dbManager.executeQuery("SELECT ? as test_value", [
@@ -165,7 +183,7 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
       });
 
       await st.step("should handle parameterized queries", async () => {
-        const dbManager = new DatabaseManager(testConfig);
+        const dbManager = createDbManager();
         await dbManager.initialize();
 
         const values = [42, "test_string", 3.14159];
@@ -187,7 +205,7 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
       });
 
       await st.step("should handle SQL injection prevention", async () => {
-        const dbManager = new DatabaseManager(testConfig);
+        const dbManager = createDbManager();
         await dbManager.initialize();
 
         const maliciousInput = "'; DROP TABLE test; --";
@@ -217,7 +235,7 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
   if (redisAvailable) {
     await t.step("Redis Integration Tests (Real Redis)", async (st) => {
       await st.step("should initialize Redis connection", async () => {
-        const dbManager = new DatabaseManager(testConfig);
+        const dbManager = createDbManager();
 
         // Don't skip Redis for this test
         delete (globalThis as any).SKIP_REDIS_CONNECTION;
@@ -249,7 +267,7 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
         // Force skip Redis to test in-memory fallback
         (globalThis as any).SKIP_REDIS_CONNECTION = true;
 
-        const dbManager = new DatabaseManager({
+        const dbManager = createDbManager({
           ...testConfig,
           ELASTICACHE_ENDPOINT: "nonexistent-redis-host", // Force Redis failure
         });
@@ -276,7 +294,7 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
         DB_MAX_RETRIES: 1, // Fast failure
       };
 
-      const dbManager = new DatabaseManager(invalidConfig);
+      const dbManager = createDbManager(invalidConfig);
 
       await assertRejects(
         async () => {
@@ -290,7 +308,7 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
       // Force skip Redis for this test to avoid connection attempts
       (globalThis as any).SKIP_REDIS_CONNECTION = true;
 
-      const dbManager = new DatabaseManager(testConfig);
+      const dbManager = createDbManager();
 
       // Test that we can call these methods without error
       await dbManager.closeAllClients(); // Should not throw even if no connections
@@ -306,6 +324,9 @@ Deno.test("DatabaseManager Integration Tests", async (t) => {
       }
     });
   });
+
+  // Cleanup all database connections at the end
+  await cleanupAll();
 });
 
 Deno.test("DatabaseManager Cache Logic Tests", async (t) => {

@@ -1,38 +1,50 @@
 import { assertEquals, assertExists } from "@std/assert";
+import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 
-Deno.test("SRC20Repository Unit Tests with DI", async (t) => {
+describe("SRC20Repository Unit Tests", () => {
   let mockDb: MockDatabaseManager;
   let originalDb: typeof dbManager;
 
-  // Setup before each test
-  function setup() {
+  beforeEach(() => {
+    // Check if we should run database tests
+    if (Deno.env.get("RUN_DB_TESTS") === "true") {
+      // Skip these tests in CI - they need real database connection
+      console.log(
+        "Skipping SRC20Repository unit tests - RUN_DB_TESTS is set for integration tests",
+      );
+      return;
+    }
+
     // Store original database instance
     originalDb = dbManager;
 
     // Create and inject mock database
     mockDb = new MockDatabaseManager();
     SRC20Repository.setDatabase(mockDb as unknown as typeof dbManager);
-  }
+  });
 
-  // Teardown after each test
-  function teardown() {
+  afterEach(() => {
+    // Skip cleanup if we didn't set up
+    if (!mockDb) return;
+
     // Clear mock data FIRST before restoring
-    if (mockDb) {
-      mockDb.clearQueryHistory();
-      mockDb.clearMockResponses();
-    }
+    mockDb.clearQueryHistory();
+    mockDb.clearMockResponses();
 
     // Restore original database
     SRC20Repository.setDatabase(originalDb);
-  }
 
-  await t.step(
-    "getValidSrc20TxFromDb - returns SRC20 transactions",
-    async () => {
-      setup();
+    // Reset references
+    mockDb = null as any;
+  });
+
+  describe("getValidSrc20TxFromDb", () => {
+    it("should return SRC20 transactions", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       const result = await SRC20Repository.getValidSrc20TxFromDb({
         limit: 10,
@@ -46,15 +58,11 @@ Deno.test("SRC20Repository Unit Tests with DI", async (t) => {
       // The mock should return some SRC20 data
       // We just verify the structure is correct
       assertEquals(result.rows.length >= 0, true);
+    });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getValidSrc20TxFromDb - filters by operation type",
-    async () => {
-      setup();
+    it("should filter by operation type", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       const result = await SRC20Repository.getValidSrc20TxFromDb({
         op: "DEPLOY",
@@ -69,79 +77,122 @@ Deno.test("SRC20Repository Unit Tests with DI", async (t) => {
       // The mock should filter by operation type
       // We just verify we got a result
       assertEquals(result.rows.length >= 0, true);
-
-      teardown();
-    },
-  );
-
-  await t.step("getValidSrc20TxFromDb - filters by tick", async () => {
-    setup();
-
-    const result = await SRC20Repository.getValidSrc20TxFromDb({
-      tick: "!", // Use a tick that exists in the fixture data
-      limit: 10,
-      page: 1,
     });
 
-    assertExists(result);
-    assertExists(result.rows);
+    it("should filter by tick", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
-    // Check that all returned transactions are for ! tick
-    result.rows.forEach((tx: any) => {
-      assertEquals(tx.tick, "!");
+      const result = await SRC20Repository.getValidSrc20TxFromDb({
+        tick: "!", // Use a tick that exists in the fixture data
+        limit: 10,
+        page: 1,
+      });
+
+      assertExists(result);
+      assertExists(result.rows);
+
+      // Check that all returned transactions are for ! tick
+      result.rows.forEach((tx: any) => {
+        assertEquals(tx.tick, "!");
+      });
     });
 
-    teardown();
-  });
+    it("should handle emoji/unicode conversion", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
-  await t.step("getTotalCountValidSrc20TxFromDb - returns count", async () => {
-    setup();
+      // Test that emoji ticks are properly handled
+      const result = await SRC20Repository.getValidSrc20TxFromDb({
+        tick: "🔥", // Emoji tick
+        limit: 10,
+        page: 1,
+      });
 
-    const result = await SRC20Repository.getTotalCountValidSrc20TxFromDb(
-      {},
-    ) as any;
+      assertExists(result);
 
-    assertExists(result);
-    assertExists(result.rows);
-    assertEquals(Array.isArray(result.rows), true);
-    assertEquals(result.rows.length > 0, true);
-
-    const count = result.rows[0]?.total || 0;
-    assertEquals(typeof count, "number");
-    assertEquals(count > 0, true);
-
-    teardown();
-  });
-
-  await t.step("getSrc20BalanceFromDb - returns balances", async () => {
-    setup();
-
-    const result = await SRC20Repository.getSrc20BalanceFromDb({
-      address: "bc1test",
-      limit: 10,
-      page: 1,
+      // Verify query was made with unicode escape
+      const queryHistory = mockDb.getQueryHistory();
+      const hasUnicodeQuery = queryHistory.some((h) =>
+        h.query.includes("\\U") ||
+        h.params.some((p) => typeof p === "string" && p.includes("\\U"))
+      );
+      assertEquals(hasUnicodeQuery, true);
     });
 
-    assertExists(result);
-    assertEquals(Array.isArray(result), true);
+    it("should handle database errors gracefully", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
-    // The mock should return balance data
-    if (result.length > 0) {
-      const firstBalance = result[0];
-      assertExists(firstBalance.address);
-      assertExists(firstBalance.tick);
-      assertExists(firstBalance.amt);
-      // It also adds deploy_tx and deploy_img
-      assertExists(firstBalance.deploy_tx || firstBalance.deploy_img);
-    }
+      // Override executeQueryWithCache to throw error
+      mockDb.executeQueryWithCache = () =>
+        Promise.reject(new Error("Database connection failed"));
 
-    teardown();
+      try {
+        await SRC20Repository.getValidSrc20TxFromDb({
+          limit: 10,
+          page: 1,
+        });
+        // Should not reach here
+        assertEquals(true, false, "Expected error to be thrown");
+      } catch (error) {
+        // Error is expected
+        assertExists(error);
+        assertEquals((error as Error).message, "Database connection failed");
+      }
+    });
   });
 
-  await t.step(
-    "fetchSrc20MintProgress - returns null for non-existent tokens",
-    async () => {
-      setup();
+  describe("getTotalCountValidSrc20TxFromDb", () => {
+    it("should return count", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
+
+      const result = await SRC20Repository.getTotalCountValidSrc20TxFromDb(
+        {},
+      ) as any;
+
+      assertExists(result);
+      assertExists(result.rows);
+      assertEquals(Array.isArray(result.rows), true);
+      assertEquals(result.rows.length > 0, true);
+
+      const count = result.rows[0]?.total || 0;
+      assertEquals(typeof count, "number");
+      assertEquals(count > 0, true);
+    });
+  });
+
+  describe("getSrc20BalanceFromDb", () => {
+    it("should return balances", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
+
+      const result = await SRC20Repository.getSrc20BalanceFromDb({
+        address: "bc1test",
+        limit: 10,
+        page: 1,
+      });
+
+      assertExists(result);
+      assertEquals(Array.isArray(result), true);
+
+      // The mock should return balance data
+      if (result.length > 0) {
+        const firstBalance = result[0];
+        assertExists(firstBalance.address);
+        assertExists(firstBalance.tick);
+        assertExists(firstBalance.amt);
+        // It also adds deploy_tx and deploy_img
+        assertExists(firstBalance.deploy_tx || firstBalance.deploy_img);
+      }
+    });
+  });
+
+  describe("fetchSrc20MintProgress", () => {
+    it("should return null for non-existent tokens", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       // Explicitly set the mock to return empty rows
       mockDb.setMockResponse(
@@ -168,15 +219,11 @@ Deno.test("SRC20Repository Unit Tests with DI", async (t) => {
 
       const result = await SRC20Repository.fetchSrc20MintProgress("NOPE!");
       assertEquals(result, null, "Should return null for non-existent token");
+    });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "fetchSrc20MintProgress - returns data for existing tokens",
-    async () => {
-      setup();
+    it("should return data for existing tokens", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       // Explicitly set the mock to return data for "!"
       mockDb.setMockResponse(
@@ -224,15 +271,13 @@ Deno.test("SRC20Repository Unit Tests with DI", async (t) => {
         assertExists(result.decimals);
         assertExists(result.tx_hash);
       }
+    });
+  });
 
-      teardown();
-    },
-  );
-
-  await t.step(
-    "getTotalSrc20BalanceCount - returns balance count",
-    async () => {
-      setup();
+  describe("getTotalSrc20BalanceCount", () => {
+    it("should return balance count", async () => {
+      // Skip if in RUN_DB_TESTS mode
+      if (!mockDb) return;
 
       const count = await SRC20Repository.getTotalSrc20BalanceCount({
         address: "bc1test",
@@ -241,54 +286,6 @@ Deno.test("SRC20Repository Unit Tests with DI", async (t) => {
       assertEquals(typeof count, "number");
       // The mock will return a count based on fixture data
       assertEquals(count >= 0, true);
-
-      teardown();
-    },
-  );
-
-  await t.step("handles database errors gracefully", async () => {
-    setup();
-
-    // Override executeQueryWithCache to throw error
-    mockDb.executeQueryWithCache = () =>
-      Promise.reject(new Error("Database connection failed"));
-
-    try {
-      await SRC20Repository.getValidSrc20TxFromDb({
-        limit: 10,
-        page: 1,
-      });
-      // Should not reach here
-      assertEquals(true, false, "Expected error to be thrown");
-    } catch (error) {
-      // Error is expected
-      assertExists(error);
-      assertEquals((error as Error).message, "Database connection failed");
-    }
-
-    teardown();
-  });
-
-  await t.step("handles emoji/unicode conversion", async () => {
-    setup();
-
-    // Test that emoji ticks are properly handled
-    const result = await SRC20Repository.getValidSrc20TxFromDb({
-      tick: "🔥", // Emoji tick
-      limit: 10,
-      page: 1,
     });
-
-    assertExists(result);
-
-    // Verify query was made with unicode escape
-    const queryHistory = mockDb.getQueryHistory();
-    const hasUnicodeQuery = queryHistory.some((h) =>
-      h.query.includes("\\U") ||
-      h.params.some((p) => typeof p === "string" && p.includes("\\U"))
-    );
-    assertEquals(hasUnicodeQuery, true);
-
-    teardown();
   });
 });

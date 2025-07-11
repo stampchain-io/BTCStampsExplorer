@@ -418,4 +418,11 @@ Deno.test("Redis Infrastructure Tests", async (t) => {
     // Allow any pending HTTP requests to complete
     await cleanupDelay();
   });
+
+  // Clean up database connections after all tests
+  try {
+    await dbManager.closeAllClients();
+  } catch {
+    // Ignore errors if dbManager is not available
+  }
 });

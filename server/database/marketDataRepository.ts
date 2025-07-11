@@ -82,13 +82,13 @@ export class MarketDataRepository {
         query,
         [cpid],
         DEFAULT_CACHE_DURATION
-      );
+      ) as { rows?: Array<StampMarketDataRow & { cache_age_minutes: number }> };
 
-      if (!(result as any).rows || (result as any).rows.length === 0) {
+      if (!result.rows || result.rows.length === 0) {
         return null;
       }
 
-      const row = (result as any).rows[0] as StampMarketDataRow & { cache_age_minutes: number };
+      const row = result.rows[0];
       
       // Parse the row data into the application format
       return this.parseStampMarketDataRow(row);
@@ -182,7 +182,7 @@ export class MarketDataRepository {
         query,
         queryParams,
         DEFAULT_CACHE_DURATION
-      );
+      ) as { rows?: Array<any> };
 
       if (!result.rows) {
         return [];
@@ -204,17 +204,12 @@ export class MarketDataRepository {
           supply: row.supply,
           block_time: row.block_time,
           tx_hash: row.tx_hash,
-          tx_index: row.tx_index,
           ident: row.ident,
           stamp_hash: row.stamp_hash,
           file_hash: row.file_hash,
           stamp_base64: row.stamp_base64,
-          asset_longname: row.asset_longname,
-          message_index: row.message_index,
-          src_data: row.src_data,
-          is_btc_stamp: row.is_btc_stamp,
-          is_reissue: row.is_reissue,
-          is_valid_base64: row.is_valid_base64,
+          unbound_quantity: row.unbound_quantity || 0,
+          // These are optional fields that may not be in the DB result
         };
 
         let marketData: StampMarketData | null = null;
@@ -223,29 +218,40 @@ export class MarketDataRepository {
 
         // Check if market data exists
         if (row.market_data_last_updated) {
-          marketData = {
+          const marketDataRow: StampMarketDataRow & { cache_age_minutes: number } = {
             cpid: row.cpid,
-            floorPriceBTC: parseBTCDecimal(row.floor_price_btc),
-            recentSalePriceBTC: parseBTCDecimal(row.recent_sale_price_btc),
-            openDispensersCount: row.open_dispensers_count || 0,
-            closedDispensersCount: row.closed_dispensers_count || 0,
-            totalDispensersCount: row.total_dispensers_count || 0,
-            holderCount: row.holder_count || 0,
-            uniqueHolderCount: row.unique_holder_count || 0,
-            topHolderPercentage: parseFloat(row.top_holder_percentage) || 0,
-            holderDistributionScore: parseFloat(row.holder_distribution_score) || 0,
-            volume24hBTC: parseBTCDecimal(row.volume_24h_btc) || 0,
-            volume7dBTC: parseBTCDecimal(row.volume_7d_btc) || 0,
-            volume30dBTC: parseBTCDecimal(row.volume_30d_btc) || 0,
-            totalVolumeBTC: parseBTCDecimal(row.total_volume_btc) || 0,
-            priceSource: row.price_source,
-            volumeSources: parseVolumeSources(row.volume_sources),
-            dataQualityScore: parseFloat(row.data_quality_score) || 0,
-            confidenceLevel: parseFloat(row.confidence_level) || 0,
-            lastUpdated: new Date(row.market_data_last_updated),
-            lastPriceUpdate: row.last_price_update ? new Date(row.last_price_update) : null,
-            updateFrequencyMinutes: row.update_frequency_minutes || 60,
+            floor_price_btc: row.floor_price_btc,
+            recent_sale_price_btc: row.recent_sale_price_btc,
+            open_dispensers_count: row.open_dispensers_count,
+            closed_dispensers_count: row.closed_dispensers_count,
+            total_dispensers_count: row.total_dispensers_count,
+            holder_count: row.holder_count,
+            unique_holder_count: row.unique_holder_count,
+            top_holder_percentage: row.top_holder_percentage,
+            holder_distribution_score: row.holder_distribution_score,
+            volume_24h_btc: row.volume_24h_btc,
+            volume_7d_btc: row.volume_7d_btc,
+            volume_30d_btc: row.volume_30d_btc,
+            total_volume_btc: row.total_volume_btc,
+            price_source: row.price_source,
+            volume_sources: row.volume_sources,
+            data_quality_score: row.data_quality_score,
+            confidence_level: row.confidence_level,
+            last_updated: row.market_data_last_updated,
+            last_price_update: row.last_price_update,
+            update_frequency_minutes: row.update_frequency_minutes,
+            last_sale_tx_hash: row.last_sale_tx_hash,
+            last_sale_buyer_address: row.last_sale_buyer_address,
+            last_sale_dispenser_address: row.last_sale_dispenser_address,
+            last_sale_btc_amount: row.last_sale_btc_amount,
+            last_sale_dispenser_tx_hash: row.last_sale_dispenser_tx_hash,
+            last_sale_block_index: row.last_sale_block_index,
+            activity_level: row.activity_level,
+            last_activity_time: row.last_activity_time,
+            cache_age_minutes: row.cache_age_minutes
           };
+          
+          marketData = this.parseStampMarketDataRow(marketDataRow);
 
           cacheAgeMinutes = row.cache_age_minutes;
           cacheStatus = getCacheStatus(cacheAgeMinutes);
@@ -254,8 +260,8 @@ export class MarketDataRepository {
         const stampWithMarketData: StampWithMarketData = {
           ...stamp,
           marketData,
-          cacheStatus,
-          cacheAgeMinutes,
+          ...(cacheStatus !== undefined && { cacheStatus }),
+          ...(cacheAgeMinutes !== undefined && { cacheAgeMinutes }),
         };
 
         // Add a message if no market data is available
@@ -309,13 +315,13 @@ export class MarketDataRepository {
         query,
         [tick],
         DEFAULT_CACHE_DURATION
-      );
+      ) as { rows?: Array<SRC20MarketDataRow & { cache_age_minutes: number }> };
 
-      if (!(result as any).rows || (result as any).rows.length === 0) {
+      if (!result.rows || result.rows.length === 0) {
         return null;
       }
 
-      const row = (result as any).rows[0] as SRC20MarketDataRow & { cache_age_minutes: number };
+      const row = result.rows[0];
       
       // Parse the row data into the application format
       return this.parseSRC20MarketDataRow(row);
@@ -359,13 +365,13 @@ export class MarketDataRepository {
         query,
         [collectionId],
         DEFAULT_CACHE_DURATION
-      );
+      ) as { rows?: Array<CollectionMarketDataRow & { cache_age_minutes: number }> };
 
-      if (!(result as any).rows || (result as any).rows.length === 0) {
+      if (!result.rows || result.rows.length === 0) {
         return null;
       }
 
-      const row = (result as any).rows[0] as CollectionMarketDataRow & { cache_age_minutes: number };
+      const row = result.rows[0];
       
       // Parse the row data into the application format
       return this.parseCollectionMarketDataRow(row);
@@ -400,14 +406,14 @@ export class MarketDataRepository {
         query,
         [cpid],
         DEFAULT_CACHE_DURATION
-      );
+      ) as { rows?: Array<StampHolderCacheRow> };
 
-      if (!(result as any).rows) {
+      if (!result.rows) {
         return [];
       }
 
       // Parse each row into StampHolderCache format
-      return (result as any).rows.map((row: StampHolderCacheRow) => ({
+      return result.rows.map((row: StampHolderCacheRow) => ({
         id: row.id,
         cpid: row.cpid,
         address: row.address,
@@ -476,13 +482,13 @@ export class MarketDataRepository {
         query,
         cpids,
         DEFAULT_CACHE_DURATION
-      );
+      ) as { rows?: Array<StampMarketDataRow & { cache_age_minutes: number }> };
 
       const marketDataMap = new Map<string, StampMarketData>();
 
       if (result.rows) {
         for (const row of result.rows) {
-          const marketData = this.parseStampMarketDataRow(row as StampMarketDataRow & { cache_age_minutes: number });
+          const marketData = this.parseStampMarketDataRow(row);
           if (marketData) {
             marketDataMap.set(marketData.cpid, marketData);
           }
@@ -644,16 +650,16 @@ export class MarketDataRepository {
       query,
       [limit],
       DEFAULT_CACHE_DURATION
-    );
+    ) as { rows?: Array<SRC20MarketDataRow & { cache_age_minutes: number }> };
 
     if (!result || !result.rows || result.rows.length === 0) {
       return [];
     }
 
     return result.rows
-      .map((row: SRC20MarketDataRow & { cache_age_minutes: number }) => 
+      .map((row) => 
         this.parseSRC20MarketDataRow(row)
       )
-      .filter((data: any): data is SRC20MarketData => data !== null);
+      .filter((data): data is SRC20MarketData => data !== null);
   }
 }
