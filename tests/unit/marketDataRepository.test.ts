@@ -20,9 +20,18 @@ describe("MarketDataRepository Unit Tests", () => {
     MarketDataRepository.setDatabase(mockDb as unknown as typeof dbManager);
   });
 
-  afterEach(() => {
-    // Restore original database
-    MarketDataRepository.setDatabase(originalDb);
+  afterEach(async () => {
+    // Close any existing connections before reset
+    if (originalDb && typeof originalDb.closeAllClients === "function") {
+      try {
+        await originalDb.closeAllClients();
+      } catch (_error) {
+        // Ignore cleanup errors
+      }
+    }
+
+    // Reset repository to null to prevent stale references
+    MarketDataRepository.setDatabase(null as any);
 
     // Clear mock data
     mockDb.clearQueryHistory();

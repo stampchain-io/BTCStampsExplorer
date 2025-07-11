@@ -337,7 +337,13 @@ async function main() {
   } catch (error) {
     console.error("\n❌ Error during fixture generation:", error);
   } finally {
-    // The dbManager will close connections automatically
+    // Properly close database connections to prevent leaks
+    try {
+      await dbManager.closeAllClients();
+      console.log("✅ Database connections closed");
+    } catch (closeError) {
+      console.error("❌ Error closing database connections:", closeError);
+    }
     Deno.exit(0);
   }
 }
