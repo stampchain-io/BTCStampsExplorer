@@ -208,5 +208,6 @@
   // === PERFORMANCE ===
   "extensions.experimental.affinity": {
     "denoland.vscode-deno": 1
-  }
+  },
+  "testing.automaticallyOpenTestResults": "neverOpen"
 }

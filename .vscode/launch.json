@@ -10,16 +10,17 @@
       "runtimeArgs": [
         "run",
         "--inspect-wait",
-        "--allow-all",
         "--watch",
+        "--watch-exclude=dist/,node_modules/,_fresh/,.git/,coverage/,tmp/,tests/,fresh.gen.ts",
         "--no-clear-screen"
       ],
       "program": "${workspaceFolder}/dev.ts",
+      "args": ["--host"],
       "env": {
         "DENO_ENV": "development"
       },
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
     },
     {
       "name": "Deno: Run main.ts",
@@ -36,8 +37,8 @@
       "env": {
         "DENO_ENV": "production"
       },
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
     },
     {
       "name": "Deno: Debug Tests",
@@ -56,8 +57,8 @@
         "DENO_ENV": "test",
         "SKIP_REDIS_CONNECTION": "true"
       },
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
     }
   ]
 }

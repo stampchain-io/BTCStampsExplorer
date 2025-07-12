@@ -165,18 +165,18 @@ export class StampController {
       fileSizeMin,
       fileSizeMax
     });
-    
+
     console.log("About to call repository with range:", range);
-    
-    const filterByArray: STAMP_FILTER_TYPES[] = Array.isArray(filterBy) 
-      ? filterBy 
+
+    const filterByArray: STAMP_FILTER_TYPES[] = Array.isArray(filterBy)
+      ? filterBy
       : typeof filterBy === "string" && filterBy
         ? (filterBy as string).split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
         : [];
 
     // Initialize ident based on type
     let finalIdent: SUBPROTOCOLS[] = ident || [];
-    
+
     // Validate ident parameter if provided
     const VALID_IDENTS = ["STAMP", "SRC-20", "SRC-721"];
     if (ident && ident.length > 0) {
@@ -194,7 +194,7 @@ export class StampController {
         };
       }
     }
-    
+
     if ((!ident || ident.length === 0) && type) {
       if (type === "classic") {
         finalIdent = ["STAMP"];
@@ -240,7 +240,7 @@ export class StampController {
         const urlObj = new URL(url);
         const rangeMinParam = urlObj.searchParams.get("range[stampRange][min]");
         const rangeMaxParam = urlObj.searchParams.get("range[stampRange][max]");
-        
+
         if (rangeMinParam || rangeMaxParam) {
           console.log("Controller detected custom range params:", { rangeMinParam, rangeMaxParam });
           customRange = "custom"; // Use the custom literal value
@@ -259,20 +259,20 @@ export class StampController {
     // Always include market data for stamps that support it (STAMP and SRC-721)
     // This ensures floor prices are available on detail pages
     const useMarketData = true;
-    
+
     // Determine if this is a detail view (single stamp) or list view
     const isDetailView = identifier && !Array.isArray(identifier);
-    
+
     // Only include heavy fields like stamp_base64 for detail views
     const shouldIncludeSecondary = isDetailView ? includeSecondary : false;
-    
+
     // Convert boolean parameters to proper types for service call
     const dispensersParam = typeof dispensers === "boolean" ? dispensers : undefined;
     const atomicsParam = typeof atomics === "boolean" ? atomics : undefined;
-    
+
     // Convert groupBySubquery to boolean
     const groupBySubqueryParam = typeof groupBySubquery === "string" ? groupBySubquery === "true" : Boolean(groupBySubquery);
-    
+
     // Always include market data when available
     const stampResult = await StampService.getStamps({
       page,
@@ -351,7 +351,7 @@ export class StampController {
 
     // Build response based on query type
     const baseResponse = {
-      data: identifier && !Array.isArray(identifier) 
+      data: identifier && !Array.isArray(identifier)
         ? { stamp: processedStamps[0] }  // Single stamp response
         : processedStamps,               // Multiple stamps response
       last_block: stampResult.last_block,
@@ -380,7 +380,7 @@ export class StampController {
 
   // This becomes a wrapper around getStamps for backward compatibility
   static getStampDetailsById(
-    id: string, 
+    id: string,
     stampType: STAMP_TYPES = "all",
     cacheType: RouteType = RouteType.STAMP_DETAIL,
     cacheDuration?: number,
@@ -397,11 +397,11 @@ export class StampController {
       enrichWithAssetInfo: true,
       includeSecondary,
     };
-    
+
     if (cacheDuration !== undefined) {
       params.cacheDuration = cacheDuration;
     }
-    
+
     return this.getStamps(params);
   }
 
@@ -435,7 +435,7 @@ export class StampController {
   }
 
   static async getRecentSales(
-    page?: number, 
+    page?: number,
     limit?: number,
     options?: {
       dayRange?: number;
@@ -448,7 +448,7 @@ export class StampController {
         limit,
         options
       );
-      
+
       const lastBlock = await BlockService.getLastBlock();
       const totalPages = limit ? Math.ceil(result.total / limit) : 1;
 
@@ -481,15 +481,15 @@ export class StampController {
         address,
         false
       );
-      
+
       console.log(`[StampController] Got ${xcpBalances.length} XCP balances out of ${xcpTotal} total`);
 
       // Get paginated stamps and total count
       const [{ stamps, total }, lastBlock] = await Promise.all([
         StampService.getStampBalancesByAddress(
-          address, 
-          limit, 
-          page, 
+          address,
+          limit,
+          page,
           xcpBalances,
           sortBy
         ),
@@ -582,7 +582,7 @@ export class StampController {
       const collectionData = collections?.data ? await (async () => {
         // Get all collection IDs
         const collectionIds = collections.data.map(item => item.collection_id);
-        
+
         // Fetch first stamp for each collection in a single request if possible
         const firstStamps = await Promise.all(
           collectionIds.map(async (collectionId) => {
@@ -596,7 +596,7 @@ export class StampController {
             return result.data?.[0];
           })
         );
-        
+
         // Map collection data with images
         return collections.data.map((item, index) => ({
           ...item,
@@ -624,11 +624,11 @@ export class StampController {
   static async getCollectionPageData(params: any) {
     try {
       const {sortBy} = params
-      
+
       // Fetch BTC price once
       const btcPriceData = await BTCPriceService.getPrice();
       const btcPrice = btcPriceData.price;
-      
+
       const [
         stampCategories,
       ] = await Promise.all([
@@ -695,10 +695,10 @@ export class StampController {
     contentType: string = 'application/octet-stream'
   ) {
     const proxyPath = `${baseUrl}/stamps/${identifier}`;
-    
+
     try {
       const response = await fetch(proxyPath);
-      
+
       return new Response(response.body, {
         headers: Object.fromEntries(normalizeHeaders({
           ...Object.fromEntries(response.headers),
@@ -748,7 +748,7 @@ export class StampController {
   private static handleFullPathStamp(identifier: string, baseUrl?: string) {
     const [, extension] = identifier.split(".");
     const contentType = getMimeType(extension);
-    
+
     return this.proxyContentRouteToStampsRoute(
       identifier,
       `${baseUrl}/stamps/${identifier}`,
@@ -764,8 +764,8 @@ export class StampController {
       result.headers["Content-Type"] as string | undefined
     );
 
-    const needsDecoding = 
-      contentInfo.mimeType.includes('javascript') || 
+    const needsDecoding =
+      contentInfo.mimeType.includes('javascript') ||
       contentInfo.mimeType.includes('text/') ||
       contentInfo.mimeType.includes('application/json') ||
       contentInfo.mimeType.includes('xml');
@@ -784,10 +784,10 @@ export class StampController {
       return WebResponseUtil.stampResponse(decodedContent, contentInfo.mimeType, {
         binary: false,
         headers: {
-          "CF-No-Transform": String(contentInfo.mimeType.includes('javascript') || 
+          "CF-No-Transform": String(contentInfo.mimeType.includes('javascript') ||
                             contentInfo.mimeType.includes('text/html')),
           "X-API-Version": API_RESPONSE_VERSION,
-          ...(result.headers ? Object.fromEntries(result.headers) : {}),
+          ...(result.headers || {}),
         }
       });
     } catch (error) {
@@ -805,7 +805,7 @@ export class StampController {
       binary: true,
       headers: Object.fromEntries(normalizeHeaders({
         "X-API-Version": API_RESPONSE_VERSION,
-        ...(result.headers ? Object.fromEntries(result.headers) : {}),
+        ...(result.headers || {}),
       }))
     });
   }
@@ -831,7 +831,7 @@ export class StampController {
   }
 
   static async getDispensersWithStampsByAddress(
-    address: string, 
+    address: string,
     page: number = 1,
     limit: number = 50,
     options = {}
@@ -920,11 +920,11 @@ export class StampController {
     try {
       // If not a CPID, resolve it
       const cpid = isCpid(id) ? id : await this.resolveToCpid(id);
-      
+
       const { holders, total } = await StampService.getStampHolders(
         cpid,
-        page, 
-        limit, 
+        page,
+        limit,
         { cacheType }
       );
 
@@ -945,8 +945,8 @@ export class StampController {
   }
 
   static async getStampSends(
-    id: string, 
-    page: number = 1, 
+    id: string,
+    page: number = 1,
     limit: number = 50,
     cacheType: RouteType
   ) {
@@ -970,8 +970,8 @@ export class StampController {
   }
 
   static async getStampDispensers(
-    id: string, 
-    page: number, 
+    id: string,
+    page: number,
     limit: number,
     cacheType: RouteType
   ) {
@@ -1015,8 +1015,8 @@ export class StampController {
   }
 
   static async getStampDispenses(
-    id: string, 
-    page: number = 1, 
+    id: string,
+    page: number = 1,
     limit: number = 50,
     cacheType: RouteType
   ) {
@@ -1072,7 +1072,7 @@ export class StampController {
 
       // Get all stamp CPIDs
       const cpids = stamps.map(s => s.cpid);
-      
+
       // Fetch stamps with market data in a single request
       const stampsResult = await StampService.getStamps({
         identifier: cpids,
@@ -1092,8 +1092,8 @@ export class StampController {
       stamps.forEach((walletStamp: any) => {
         const stampData = stampsByCpid.get(walletStamp.cpid);
         if (stampData && (stampData as any).marketData) {
-          const unitPrice = (stampData as any).marketData.floorPriceBTC || 
-                           (stampData as any).marketData.recentSalePriceBTC || 
+          const unitPrice = (stampData as any).marketData.floorPriceBTC ||
+                           (stampData as any).marketData.recentSalePriceBTC ||
                            0;
           const totalStampValue = unitPrice * walletStamp.balance;
           stampValues[walletStamp.cpid] = totalStampValue;
