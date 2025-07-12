@@ -1,15 +1,15 @@
+import { logger } from "$lib/utils/logger.ts";
+import { getRecommendedFees } from "$lib/utils/mempool.ts";
+import {
+    recordFallbackUsage,
+    recordFeeFailure,
+    recordFeeSuccess,
+} from "$lib/utils/monitoring.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { RouteType, getCacheConfig } from "$server/services/cacheService.ts";
-import { getRecommendedFees } from "$lib/utils/mempool.ts";
+import { FeeSecurityService } from "$server/services/fee/feeSecurityService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
-import { logger } from "$lib/utils/logger.ts";
-import {
-  recordFallbackUsage,
-  recordFeeFailure,
-  recordFeeSuccess,
-} from "$lib/utils/monitoring.ts";
-import { FeeSecurityService } from "$server/services/fee/feeSecurityService.ts";
 
 // Enhanced fee response interface
 export interface FeeData {
@@ -54,12 +54,25 @@ export class FeeService {
         cacheConfig: this.CACHE_CONFIG,
       });
 
-      // Use Redis cache with fallback chain
-      const feeData = await dbManager.handleCache<FeeData>(
-        this.CACHE_KEY,
-        () => this.fetchFreshFeeData(),
-        this.CACHE_CONFIG.duration,
-      );
+      // Skip Redis caching in development mode to prevent timeouts
+      const isDevelopment = Deno.env.get("DENO_ENV") === "development";
+      const skipRedis = isDevelopment || (globalThis as any).SKIP_REDIS_CONNECTION;
+
+      let feeData: FeeData;
+
+      if (skipRedis) {
+        logger.debug("stamps", {
+          message: "Skipping Redis cache in development mode, fetching fresh data",
+        });
+        feeData = await this.fetchFreshFeeData();
+      } else {
+        // Use Redis cache with fallback chain
+        feeData = await dbManager.handleCache<FeeData>(
+          this.CACHE_KEY,
+          () => this.fetchFreshFeeData(),
+          this.CACHE_CONFIG.duration,
+        );
+      }
 
       const duration = Date.now() - startTime;
       logger.info("stamps", {
@@ -92,6 +105,15 @@ export class FeeService {
     logger.debug("stamps", {
       message: "Fetching fresh fee data from external sources",
     });
+
+    // In development mode, use static fallback immediately to prevent timeouts
+    const isDevelopment = Deno.env.get("DENO_ENV") === "development";
+    if (isDevelopment) {
+      logger.info("stamps", {
+        message: "Development mode detected - using static fallback to prevent API timeouts",
+      });
+      return this.getStaticFallbackFees();
+    }
 
     // Get BTC price in parallel (don't let this block fee estimation)
     const btcPricePromise = BTCPriceService.getPrice()
@@ -159,7 +181,7 @@ export class FeeService {
       "quicknode",
       "Primary source failed after retries",
     );
-    
+
     const quicknodeResult = await this.getQuickNodeFees();
     if (quicknodeResult) {
       logger.info("stamps", {
@@ -214,11 +236,11 @@ export class FeeService {
       "default",
       "Secondary source failed after retries",
     );
-    
+
     // Wait for BTC price and add it to static fallback
     const btcPrice = await btcPricePromise;
     const staticFallback = this.getStaticFallbackFees();
-    
+
     const response: FeeData = {
       ...staticFallback,
       btcPrice: btcPrice || 0,
@@ -476,4 +498,4 @@ export class FeeService {
       staleIfError: this.CACHE_CONFIG.staleIfError,
     };
   }
-} 
+}

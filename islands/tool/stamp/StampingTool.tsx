@@ -1,38 +1,30 @@
 /* ===== STAMPING COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
+import { ToggleSwitchButton } from "$button";
 import { useConfig } from "$client/hooks/useConfig.ts";
-import axiod from "axiod";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { getWalletProvider } from "$client/wallet/walletHelper.ts";
 import { useFees } from "$fees";
-import { FeeCalculatorAdvanced } from "$islands/section/FeeCalculatorAdvanced.tsx";
-import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
+import { InputField } from "$form";
 import { Config } from "$globals";
-import { logger } from "$lib/utils/logger.ts";
+import { Icon } from "$icon";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
+import { FeeCalculatorAdvanced } from "$islands/section/FeeCalculatorAdvanced.tsx";
+import { bodyTool, containerBackground, containerRowForm } from "$layout";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
-import { bodyTool, containerBackground, containerRowForm } from "$layout";
-import { titlePurpleLD } from "$text";
-import { ToggleSwitchButton } from "$button";
-import { Icon } from "$icon";
-import { InputField } from "$form";
+import { logger } from "$lib/utils/logger.ts";
+import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
+import { showToast } from "$lib/utils/toastSignal.ts";
 import {
   StatusMessages,
   tooltipButton,
   tooltipButtonInCollapsible,
   tooltipImage,
 } from "$notification";
-import { openModal } from "$islands/modal/states.ts";
-import { showToast } from "$lib/utils/toastSignal.ts";
-
-/* ===== LOGGING UTILITY ===== */
-const log = (message: string, data?: unknown) => {
-  logger.debug("stamps", {
-    message: `[StampingTool] ${message}`,
-    data,
-  });
-};
+import { titlePurpleLD } from "$text";
+import axiod from "axiod";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TRANSACTION AND VALIDATION INTERFACES ===== */
 interface TransactionInput {
@@ -75,73 +67,12 @@ function isValidForMinting(params: ValidationParams) {
     addressError,
   } = params;
 
-  // Create a validation results object for detailed logging
-  const validationResults = {
-    hasFile: !!file,
-    fileError,
-    issuanceError,
-    stampNameError,
-    isPoshStamp,
-    hasStampName: !!stampName,
-    addressError,
-    fileType: file?.type,
-    fileSize: file?.size,
-  };
+  if (!file) return false;
+  if (fileError) return false;
+  if (issuanceError) return false;
+  if (addressError) return false;
+  if (isPoshStamp && (!stampName || stampNameError)) return false;
 
-  logger.debug("stamps", {
-    message: "Checking form validation state",
-    validationResults,
-  });
-
-  if (!file) {
-    logger.debug("stamps", {
-      message: "Form invalid: No file",
-      validationResults,
-    });
-    return false;
-  }
-
-  if (fileError) {
-    logger.debug("stamps", {
-      message: "Form invalid: File error",
-      error: fileError,
-      validationResults,
-    });
-    return false;
-  }
-
-  if (issuanceError) {
-    logger.debug("stamps", {
-      message: "Form invalid: Issuance error",
-      error: issuanceError,
-      validationResults,
-    });
-    return false;
-  }
-
-  if (addressError) {
-    logger.debug("stamps", {
-      message: "Form invalid: Address error",
-      error: addressError,
-      validationResults,
-    });
-    return false;
-  }
-
-  if (isPoshStamp && (!stampName || stampNameError)) {
-    logger.debug("stamps", {
-      message: "Form invalid: POSH requirements not met",
-      stampName,
-      stampNameError,
-      validationResults,
-    });
-    return false;
-  }
-
-  logger.debug("stamps", {
-    message: "Form validation passed",
-    validationResults,
-  });
   return true;
 }
 
@@ -292,10 +223,24 @@ export function StampingTool() {
 function StampingToolMain({ config }: { config: Config }) {
   const { wallet, isConnected } = walletContext;
   const address = isConnected ? wallet.address : undefined;
-  const { fees, loading, fetchFees } = useFees();
+  const { fees, loading, fetchFees, feeSource } = useFees();
+
+  // Fee polling state monitoring
+  useEffect(() => {
+    if (fees && !loading) {
+      logger.debug("stamps", {
+        message: "Fee data updated",
+        data: {
+          recommendedFee: fees?.recommendedFee,
+          source: feeSource?.source,
+          fallbackUsed: feeSource?.fallbackUsed,
+        },
+      });
+    }
+  }, [fees, loading, feeSource]);
 
   const [file, setFile] = useState<File | null>(null);
-  const [fee, setFee] = useState<number>(0);
+  const [fee, setFee] = useState<number>(10); // Initialize with a safe default fee (10 sat/vB)
   const [issuance, setIssuance] = useState("1");
   const [BTCPrice, setBTCPrice] = useState<number>(60000);
   const [fileSize, setFileSize] = useState<number | undefined>(undefined);
@@ -370,16 +315,16 @@ function StampingToolMain({ config }: { config: Config }) {
   useEffect(() => {
     if (fees && !loading) {
       const recommendedFee = Math.round(fees.recommendedFee);
-      logger.debug("stamps", {
-        message: "Setting initial fee and BTC price from polled data",
-        data: {
-          recommendedFee,
-          currentFee: fee,
-          polledBtcPrice: (fees as any).btcPrice,
-          hasFile: !!file,
-        },
-      });
-      setFee(recommendedFee);
+      // Only update fee if the recommended fee is valid (>= 1 sat/vB)
+      if (recommendedFee >= 1) {
+        setFee(recommendedFee);
+        logger.debug("stamps", {
+          message: "Fee updated from polling service",
+          oldFee: fee,
+          newFee: recommendedFee,
+          source: fees.source,
+        });
+      }
       if (typeof (fees as any).btcPrice === "number") {
         setBTCPrice((fees as any).btcPrice);
       }
@@ -405,30 +350,10 @@ function StampingToolMain({ config }: { config: Config }) {
 
   // When file is uploaded
   useEffect(() => {
-    logger.debug("stamps", {
-      message: "Checking transaction requirements",
-      data: {
-        isConnected,
-        hasWalletAddress: !!wallet.address,
-        hasFile: !!file,
-        fileType: file?.type,
-        fileSize: file?.size,
-      },
-    });
-
     if (isConnected && wallet.address && file) {
-      log("Starting transaction preparation", {
-        address: wallet.address,
-        fileSize: file.size,
-        fileType: file.type,
-      });
-
       const prepareTx = async () => {
         try {
           const fileData = await toBase64(file);
-          log("File converted to base64", {
-            dataLength: fileData.length,
-          });
 
           const dryRunPayload:
             & Omit<MintRequest, "service_fee" | "service_fee_address">
@@ -447,23 +372,8 @@ function StampingToolMain({ config }: { config: Config }) {
             (dryRunPayload as MintRequest).assetName = stampName;
           }
 
-          log("Sending mint request (dry run)", {
-            request: { ...dryRunPayload, file: "[REDACTED]" },
-          });
           const response = await axiod.post("/api/v2/olga/mint", dryRunPayload);
           const data = response.data as MintResponse;
-
-          // Add debug logging here
-          logger.debug("stamps", {
-            message: "Mint API response",
-            data: {
-              raw: response.data,
-              est_miner_fee: data.est_miner_fee,
-              total_dust_value: data.total_dust_value,
-              input_value: data.input_value,
-              total_output_value: data.total_output_value,
-            },
-          });
 
           setFeeDetails({
             minerFee: Number(data.est_miner_fee) || 0,
@@ -474,7 +384,7 @@ function StampingToolMain({ config }: { config: Config }) {
           });
         } catch (error) {
           logger.error("stamps", {
-            message: "Transaction preparation failed (initial dry run)",
+            message: "Transaction preparation failed",
             error: error instanceof Error ? error.message : String(error),
           });
           const extractedMessage = extractErrorMessage(error);
@@ -488,12 +398,6 @@ function StampingToolMain({ config }: { config: Config }) {
         }
       };
       prepareTx();
-    } else {
-      log("Missing requirements for tx preparation", {
-        isConnected,
-        hasAddress: !!wallet.address,
-        hasFile: !!file,
-      });
     }
   }, [isConnected, wallet.address, file, fee]);
 
@@ -521,16 +425,6 @@ function StampingToolMain({ config }: { config: Config }) {
           dryRun: true,
         };
 
-        logger.debug("stamps", {
-          message: "Recalculating fees with new fee rate",
-          data: {
-            feeRate: fee,
-            previousMinerFee: feeDetails.minerFee,
-            previousDustValue: feeDetails.dustValue,
-            previousTotalValue: feeDetails.totalValue,
-          },
-        });
-
         const response = await axiod.post("/api/v2/olga/mint", mintRequest);
         const data = response.data as MintResponse;
 
@@ -540,17 +434,6 @@ function StampingToolMain({ config }: { config: Config }) {
           totalValue: (Number(data.est_miner_fee) || 0) +
             (Number(data.total_dust_value) || 0),
           hasExactFees: true,
-        });
-
-        logger.debug("stamps", {
-          message: "Fee calculation updated with new fee rate",
-          data: {
-            estimatedSize: data.est_tx_size,
-            feeRate: fee,
-            minerFee: data.est_miner_fee,
-            outputValue: data.total_output_value,
-            totalWithFee: data.total_output_value + data.est_miner_fee,
-          },
         });
       } catch (error) {
         logger.error("stamps", {
@@ -591,17 +474,15 @@ function StampingToolMain({ config }: { config: Config }) {
   /* ===== WALLET ADDRESS VALIDATION ===== */
   const validateWalletAddress = (address: string) => {
     const { isValid, error } = validateWalletAddressForMinting(address);
-    logger.debug("stamps", {
-      message: "Validating wallet address",
-      data: { address, isValid, error },
-    });
     setAddressError(error);
     return isValid;
   };
 
   /* ===== EVENT HANDLERS ===== */
   const handleChangeFee = (newFee: number) => {
-    setFee(newFee);
+    // Ensure fee is never below the minimum required (1 sat/vB)
+    const validatedFee = Math.max(newFee, 1);
+    setFee(validatedFee);
   };
 
   /* ===== ADVANCED OPTIONS HANDLERS ===== */
@@ -651,9 +532,6 @@ function StampingToolMain({ config }: { config: Config }) {
     const selectedFile = input.files?.[0];
 
     if (!selectedFile) {
-      logger.debug("stamps", {
-        message: "No file selected",
-      });
       setFileError("No file selected");
       setFile(null);
       setFileSize(undefined);
@@ -663,24 +541,11 @@ function StampingToolMain({ config }: { config: Config }) {
     const validation = validateFile(selectedFile);
 
     if (!validation.isValid) {
-      logger.debug("stamps", {
-        message: "File validation failed",
-        error: validation.error,
-      });
       setFileError(validation.error || "Invalid file");
       setFile(null);
       setFileSize(undefined);
       return;
     }
-
-    logger.debug("stamps", {
-      message: "Setting valid file",
-      data: {
-        name: selectedFile.name,
-        size: selectedFile.size,
-        type: selectedFile.type,
-      },
-    });
 
     setFileError("");
     setFile(selectedFile);
@@ -776,16 +641,11 @@ function StampingToolMain({ config }: { config: Config }) {
   /* ===== MINTING HANDLER ===== */
   const handleMint = async () => {
     if (!isConnected) {
-      logger.debug("stamps", {
-        message: "Showing wallet connect modal - user not connected",
-      });
       walletContext.showConnectModal();
       return;
     }
 
     try {
-      log("Starting minting process");
-
       if (address && !validateWalletAddress(address)) {
         throw new Error(addressError || "Invalid wallet address type");
       }
@@ -795,17 +655,7 @@ function StampingToolMain({ config }: { config: Config }) {
       }
 
       try {
-        log("Converting file to base64");
         const fileData = await toBase64(file);
-        log("File converted to base64", { fileSize: fileData.length });
-
-        // Do not convert fee rate; use it directly
-        logger.debug("stamps", {
-          message: "User-selected fee rate",
-          data: { fee: `${fee} sat/vB` },
-        });
-
-        log("Preparing mint request");
         const finalMintPayload: MintRequest = {
           sourceWallet: address,
           qty: issuance,
@@ -822,16 +672,10 @@ function StampingToolMain({ config }: { config: Config }) {
           finalMintPayload.assetName = stampName;
         }
 
-        log("Mint request prepared (final)", {
-          payload: finalMintPayload,
-          file: "[REDACTED]",
-        });
         const response = await axiod.post(
           "/api/v2/olga/mint",
           finalMintPayload,
         );
-
-        log("Received response from API", response);
 
         if (!response.data) {
           throw new Error("No data received from API");
@@ -989,41 +833,6 @@ function StampingToolMain({ config }: { config: Config }) {
     setIsFullScreenModalOpen(!isFullScreenModalOpen);
   };
 
-  // Update the useEffect to monitor validation state
-  useEffect(() => {
-    const validationState = isValidForMinting({
-      file,
-      fileError,
-      issuanceError,
-      stampNameError,
-      isPoshStamp,
-      stampName,
-      addressError,
-    });
-
-    logger.debug("stamps", {
-      message: "Form validation state updated",
-      data: {
-        isValid: validationState,
-        file: !!file,
-        fileError,
-        issuanceError,
-        stampNameError,
-        isPoshStamp,
-        stampName,
-        addressError,
-      },
-    });
-  }, [
-    file,
-    fileError,
-    issuanceError,
-    stampNameError,
-    isPoshStamp,
-    stampName,
-    addressError,
-  ]);
-
   const isFormValid = isValidForMinting({
     file,
     fileError,
@@ -1034,24 +843,6 @@ function StampingToolMain({ config }: { config: Config }) {
     addressError,
   });
 
-  // Add initialization tracking
-  useEffect(() => {
-    logger.debug("stamps", {
-      message: "StampingTool mounted",
-      data: {
-        isConnected,
-        hasWallet: !!wallet,
-        provider: wallet?.provider,
-      },
-    });
-
-    return () => {
-      logger.debug("stamps", {
-        message: "StampingTool unmounted",
-      });
-    };
-  }, []);
-
   // Add cleanup for blob URLs
   useEffect(() => {
     return () => {
@@ -1060,26 +851,6 @@ function StampingToolMain({ config }: { config: Config }) {
       }
     };
   }, [file]);
-
-  useEffect(() => {
-    logger.debug("stamps", {
-      message: "Fee calculation effect triggered",
-      data: {
-        isConnected,
-        hasWalletAddress: !!wallet.address,
-        hasFile: !!file,
-        currentFee: fee,
-        fileDetails: file
-          ? {
-            type: file.type,
-            size: file.size,
-          }
-          : null,
-      },
-    });
-
-    // ... rest of the effect
-  }, [isConnected, wallet.address, file, fee]);
 
   /* ===== TOOLTIP HANDLERS ===== */
   const handleMouseMove = (e: MouseEvent) => {

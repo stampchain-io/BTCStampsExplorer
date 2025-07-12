@@ -1,10 +1,10 @@
-import { useEffect, useState } from "preact/hooks";
-import { walletContext } from "$client/wallet/wallet.ts";
-import axiod from "axiod";
 import { useConfig } from "$client/hooks/useConfig.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 import { useFees } from "$fees";
 import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
+import axiod from "axiod";
+import { useEffect, useState } from "preact/hooks";
 
 interface PSBTFees {
   estMinerFee: number;
@@ -67,7 +67,7 @@ export function useSRC101Form(
     toAddress: "",
     token: initialToken || "",
     amt: "",
-    fee: 0,
+    fee: 10, // Initialize with a safe default fee (10 sat/vB)
     feeError: "",
     BTCPrice: 0,
     jsonSize: 0,
@@ -107,7 +107,10 @@ export function useSRC101Form(
   useEffect(() => {
     if (fees) {
       const recommendedFee = Math.round(fees.recommendedFee);
-      setFormState((prev) => ({ ...prev, fee: recommendedFee }));
+      // Only update fee if the recommended fee is valid (>= 1 sat/vB)
+      if (recommendedFee >= 1) {
+        setFormState((prev) => ({ ...prev, fee: recommendedFee }));
+      }
     }
   }, [fees]);
 
@@ -350,7 +353,9 @@ export function useSRC101Form(
   };
 
   const handleChangeFee = (newFee: number) => {
-    setFormState((prev) => ({ ...prev, fee: newFee }));
+    // Ensure fee is never below the minimum required (1 sat/vB)
+    const validatedFee = Math.max(newFee, 1);
+    setFormState((prev) => ({ ...prev, fee: validatedFee }));
   };
 
   return {

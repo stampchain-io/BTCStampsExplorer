@@ -117,7 +117,6 @@ tmp/
 temp/
 
 # Editor directories and files
-.vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -179,7 +178,4 @@ coverage_psbt_mocked/*
 coverage_psbt_injected/*
 coverage_psbt_final/*
 
-# Task files
-# tasks.json
-# tasks/ 
 coverage_report.json
