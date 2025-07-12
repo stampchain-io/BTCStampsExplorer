@@ -4,23 +4,23 @@ on:
   push:
     branches: [main, dev]
     paths:
-      - 'tests/unit/**'
-      - 'tests/fixtures/**'
-      - 'tests/mocks/**'
-      - 'server/database/**'
-      - 'lib/**'
-      - 'deno.json'
-      - '.github/workflows/unit-tests.yml'
+      - "tests/unit/**"
+      - "tests/fixtures/**"
+      - "tests/mocks/**"
+      - "server/database/**"
+      - "lib/**"
+      - "deno.json"
+      - ".github/workflows/unit-tests.yml"
   pull_request:
     branches: [main, dev]
     paths:
-      - 'tests/unit/**'
-      - 'tests/fixtures/**'
-      - 'tests/mocks/**'
-      - 'server/database/**'
-      - 'lib/**'
-      - 'deno.json'
-      - '.github/workflows/unit-tests.yml'
+      - "tests/unit/**"
+      - "tests/fixtures/**"
+      - "tests/mocks/**"
+      - "server/database/**"
+      - "lib/**"
+      - "deno.json"
+      - ".github/workflows/unit-tests.yml"
 
 jobs:
   unit-tests:
@@ -98,12 +98,14 @@ jobs:
         run: |
           echo "Running unit tests with mock database and fixtures..."
           mkdir -p coverage
-          deno test --coverage=coverage/ tests/unit/ --no-check --allow-env --allow-read --allow-write
-          
+
+                    # Run unit tests with coverage using deno task (which handles directory change)
+          deno task test:unit:coverage
+
           # Generate coverage report
           echo "Generating coverage report..."
           deno coverage coverage/
-          
+
           # Generate LCOV report for Codecov
           echo "Generating LCOV report..."
           deno coverage coverage/ --lcov > coverage-unit.lcov
@@ -125,14 +127,14 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Count test files and tests
           TEST_FILES=$(find tests/unit -name "*.test.ts" -o -name "*.unit.test.ts" | wc -l)
           echo "- Test files: $TEST_FILES" >> $GITHUB_STEP_SUMMARY
           echo "- Using mock database manager for all repository tests" >> $GITHUB_STEP_SUMMARY
           echo "- Using test fixtures from tests/fixtures/" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           echo "### Repositories with Unit Tests" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "✅ **Completed:**" >> $GITHUB_STEP_SUMMARY
@@ -150,4 +152,4 @@ jobs:
         run: |
           echo "❌ Unit tests failed. Please check the test output above."
           echo "Make sure all mock database responses are configured correctly."
-          echo "Verify that fixtures contain the expected test data." 
+          echo "Verify that fixtures contain the expected test data."
