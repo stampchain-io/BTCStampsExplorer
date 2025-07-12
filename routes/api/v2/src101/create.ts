@@ -23,7 +23,7 @@ export const handler: Handlers = {
       const effectiveSourceAddress = body.sourceAddress || body.fromAddress ||
         body.changeAddress;
       const effectiveChangeAddress = body.changeAddress || body.sourceAddress ||
-        body.fromAddress;
+        body.fromAddress || "";
       const effectiveRecAddress = body.recAddress;
 
       // Ensure at least one address exists
@@ -43,11 +43,15 @@ export const handler: Handlers = {
             | "setrecord"
             | "renew",
           {
-            ...body,
+            op: body.op,
+            feeRate: body.feeRate,
+            toAddress: body.toAddress,
+            fromAddress: body.fromAddress,
+            root: body.root,
             sourceAddress: effectiveSourceAddress,
             changeAddress: effectiveChangeAddress,
-            recAddress: effectiveRecAddress,
-          },
+            ...(effectiveRecAddress && { recAddress: effectiveRecAddress }),
+          } as SRC101InputData,
         );
       // Validation failed
       if (validationError) {

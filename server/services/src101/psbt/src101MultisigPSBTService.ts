@@ -37,12 +37,12 @@ if (!Deno.args.includes("build")) {
 }
 
 import { crypto } from "@std/crypto";
-import { TransactionService } from "$server/services/transaction/index.ts";
 import { arc4 } from "$lib/utils/minting/transactionUtils.ts";
 import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
 // import { SRC101Service } from "$server/services/src101/index.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { PSBTInput, VOUT } from "$types/index.d.ts";
+import type { BufferLike } from "$lib/types/utils.d.ts";
 import { IPrepareSRC101TX } from "$server/types/services/src101.d.ts";
 // import * as msgpack from "msgpack";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
@@ -86,10 +86,17 @@ export class SRC101MultisigPSBTService {
         { address: recAddress || changeAddress, value: recVault || this.RECIPIENT_DUST },
       ];
 
+      // Convert vouts to Output format
+      const outputsForSelection = vouts.map(vout => ({
+        value: vout.value,
+        script: vout.script ? (vout.script as any).toString('hex') : "",
+        ...(vout.address && { address: vout.address })
+      }));
+
       // Select UTXOs first to get txid for encryption
-      const { inputs, change: _change, fee } = await TransactionService.UTXOService.selectUTXOsForTransaction(
+      const { inputs, change: _change, fee } = await (await import("$server/services/transaction/index.ts")).TransactionService.utxoServiceInstance.selectUTXOsForTransaction(
         sourceAddress,
-        vouts,
+        outputsForSelection,
         feeRate,
         0,
         1.5,
@@ -156,7 +163,7 @@ export class SRC101MultisigPSBTService {
 
         const script = `5121${pubkey1}21${pubkey2}21${this.THIRD_PUBKEY}53ae`;
         vouts.push({
-          script: hex2bin(script),
+          script: new Uint8Array(hex2bin(script)) as BufferLike,
           value: this.MULTISIG_DUST,
         });
       }
@@ -175,8 +182,7 @@ export class SRC101MultisigPSBTService {
           throw new Error(`Input UTXO ${input.txid}:${input.vout} is missing script (scriptPubKey).`);
         }
         const isWitnessUtxo = input.scriptType?.startsWith("witness") || 
-                              input.scriptType?.toUpperCase().includes("P2W") || 
-                              (input.scriptType === "P2SH" && input.redeemScriptType?.isWitness);
+                              input.scriptType?.toUpperCase().includes("P2W");
 
         const psbtInput: PSBTInput = {
           hash: input.txid,
@@ -186,7 +192,7 @@ export class SRC101MultisigPSBTService {
 
         if (isWitnessUtxo) {
           psbtInput.witnessUtxo = {
-            script: hex2bin(input.script),
+            script: new Uint8Array(hex2bin(input.script)) as BufferLike,
             value: BigInt(input.value),
           };
         } else {
@@ -195,7 +201,7 @@ export class SRC101MultisigPSBTService {
             logger.error("src101-psbt-service", { message: "Failed to fetch raw tx hex for non-witness input in SRC101 Multisig", txid: input.txid });
             throw new Error(`Failed to fetch raw transaction for non-witness input ${input.txid}`);
           }
-          psbtInput.nonWitnessUtxo = hex2bin(rawTxHex);
+          psbtInput.nonWitnessUtxo = new Uint8Array(hex2bin(rawTxHex)) as BufferLike;
         }
 
         psbt.addInput(psbtInput as any);
@@ -259,8 +265,18 @@ export class SRC101MultisigPSBTService {
         change: changeAmount.toString(),
         inputsToSign: inputs.map((_: any, index: any) => ({ index })),
         estimatedTxSize: estimateTransactionSize({
-          inputs,
-          outputs: vouts,
+          inputs: inputs.map(input => ({
+            type: (input.scriptType as any) || "P2WPKH",
+            ...(input.vsize && { size: input.vsize }),
+            ...(input.ancestor?.txid && input.ancestor?.vout !== undefined && { 
+              ancestor: { 
+                txid: input.ancestor.txid, 
+                vout: input.ancestor.vout,
+                ...(input.ancestor.weight && { weight: input.ancestor.weight })
+              } 
+            })
+          })),
+          outputs: vouts.map(_vout => ({ type: "P2WPKH" as const })),
           includeChangeOutput: true,
           changeOutputType: "P2WPKH"
         }),

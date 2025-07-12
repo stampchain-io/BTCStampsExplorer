@@ -69,6 +69,18 @@ export const handler: Handlers = {
         }
 
         // Fetch stamps with filters
+        // Filter out undefined values from queryParamsToServicePayload
+        const queryParams = queryParamsToServicePayload(url.search);
+        const filteredQueryParams = Object.entries(queryParams).reduce(
+          (acc, [key, value]) => {
+            if (value !== undefined) {
+              acc[key] = value;
+            }
+            return acc;
+          },
+          {} as Record<string, any>,
+        );
+
         const payload = {
           page,
           limit: page_size,
@@ -78,7 +90,7 @@ export const handler: Handlers = {
           ident,
           collectionId,
           url: url.origin,
-          ...queryParamsToServicePayload(url.search),
+          ...filteredQueryParams,
         };
         console.log("stamp controller payload", payload);
 
@@ -116,10 +128,10 @@ export function StampOverviewPage(props: StampPageProps) {
     stamps,
     page,
     totalPages,
-    sortBy,
+    sortBy: _sortBy,
     selectedTab,
     filters,
-    search,
+    search: _search,
   } = props.data;
   const stampsArray = Array.isArray(stamps) ? stamps : [];
   const isRecentSales = selectedTab === "recent_sales";
@@ -130,8 +142,6 @@ export function StampOverviewPage(props: StampPageProps) {
       {/* Header Component with Filter Controls */}
       <StampOverviewHeader
         currentFilters={filters as StampFilters}
-        sortBy={sortBy}
-        search={search}
       />
 
       {/* Main Content with Pagination */}

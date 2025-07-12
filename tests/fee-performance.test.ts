@@ -27,7 +27,6 @@ Deno.test("Fee System Performance and Migration Tests", {
   await t.step("Redis cache performance benchmark", async () => {
     const iterations = 10;
     const times: number[] = [];
-    const baseUrl = "https://test.example.com";
 
     console.log(
       `Running Redis cache performance test with ${iterations} iterations...`,
@@ -37,7 +36,7 @@ Deno.test("Fee System Performance and Migration Tests", {
       const startTime = performance.now();
 
       try {
-        await FeeService.getFeeData(baseUrl);
+        await FeeService.getFeeData();
         const endTime = performance.now();
         times.push(endTime - startTime);
       } catch (error) {
@@ -122,7 +121,6 @@ Deno.test("Fee System Performance and Migration Tests", {
 
   await t.step("Concurrent request handling performance", async () => {
     const concurrentRequests = 5;
-    const baseUrl = "https://test.example.com";
 
     console.log(
       `Testing concurrent request handling with ${concurrentRequests} requests...`,
@@ -135,7 +133,7 @@ Deno.test("Fee System Performance and Migration Tests", {
       async (_, i) => {
         const requestStart = performance.now();
         try {
-          const result = await FeeService.getFeeData(baseUrl);
+          const result = await FeeService.getFeeData();
           const requestEnd = performance.now();
           return {
             index: i,
@@ -181,12 +179,10 @@ Deno.test("Fee System Performance and Migration Tests", {
   });
 
   await t.step("Cache invalidation performance", async () => {
-    const baseUrl = "https://test.example.com";
-
     console.log("Testing cache invalidation performance...");
 
     // First, populate the cache
-    await FeeService.getFeeData(baseUrl);
+    await FeeService.getFeeData();
 
     // Test invalidation performance
     const invalidationStart = performance.now();
@@ -196,7 +192,7 @@ Deno.test("Fee System Performance and Migration Tests", {
 
     // Test fresh fetch after invalidation
     const fetchStart = performance.now();
-    await FeeService.getFeeData(baseUrl);
+    await FeeService.getFeeData();
     const fetchEnd = performance.now();
     const fetchTime = fetchEnd - fetchStart;
 
@@ -215,13 +211,11 @@ Deno.test("Fee System Performance and Migration Tests", {
   });
 
   await t.step("Background service performance impact", async () => {
-    const baseUrl = "https://test.example.com";
-
     console.log("Testing background service performance impact...");
 
     // Test without background service
     const withoutBgStart = performance.now();
-    await FeeService.getFeeData(baseUrl);
+    await FeeService.getFeeData();
     const withoutBgEnd = performance.now();
     const withoutBgTime = withoutBgEnd - withoutBgStart;
 
@@ -233,7 +227,7 @@ Deno.test("Fee System Performance and Migration Tests", {
 
     // Test with background service (should be faster due to warm cache)
     const withBgStart = performance.now();
-    await FeeService.getFeeData(baseUrl);
+    await FeeService.getFeeData();
     const withBgEnd = performance.now();
     const withBgTime = withBgEnd - withBgStart;
 
@@ -358,17 +352,15 @@ Deno.test("Fee System Performance and Migration Tests", {
   await t.step("Migration validation - fallback chain integrity", async () => {
     console.log("Testing migration fallback chain integrity...");
 
-    const baseUrl = "https://test.example.com";
-
     // Test 1: Normal operation (should use Redis cache)
-    const normalResult = await FeeService.getFeeData(baseUrl);
+    const normalResult = await FeeService.getFeeData();
     assertExists(normalResult);
     assert(typeof normalResult.recommendedFee === "number");
     assert(normalResult.recommendedFee >= 1);
 
     // Test 2: Cache invalidation and fresh fetch
     await FeeService.invalidateCache();
-    const freshResult = await FeeService.getFeeData(baseUrl);
+    const freshResult = await FeeService.getFeeData();
     assertExists(freshResult);
     assert(typeof freshResult.recommendedFee === "number");
 
@@ -384,8 +376,6 @@ Deno.test("Fee System Performance and Migration Tests", {
   await t.step("End-to-end system integration test", async () => {
     console.log("Running end-to-end system integration test...");
 
-    const baseUrl = "https://test.example.com";
-
     // Clear any existing state
     FeeSecurityService.clearEvents();
     await FeeService.invalidateCache();
@@ -397,7 +387,7 @@ Deno.test("Fee System Performance and Migration Tests", {
     BackgroundFeeService.start(baseUrl);
 
     // 2. Get fee data (should trigger security validation)
-    const feeData = await FeeService.getFeeData(baseUrl);
+    const feeData = await FeeService.getFeeData();
 
     // 3. Validate the response
     assertExists(feeData);

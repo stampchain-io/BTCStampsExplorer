@@ -18,7 +18,7 @@ type FilterTypes =
 
 interface FilterProps {
   initFilter?: FilterTypes[];
-  setFilterValue?: (value: FilterTypes) => void;
+  setFilterValue?: (value: FilterTypes[]) => void;
   open: boolean;
   handleOpen: (open: boolean) => void;
   filterButtons: FilterTypes[];

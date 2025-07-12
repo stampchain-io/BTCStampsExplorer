@@ -1,5 +1,6 @@
 // was previously // lib/utils/minting/stamp.ts
 
+import { Buffer } from "node:buffer";
 import { TransactionService } from "$server/services/transaction/index.ts";
 import { extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
 import * as bitcoin from "bitcoinjs-lib";
@@ -51,8 +52,8 @@ export class StampMintService {
   }) {
     // Validate and normalize fee rate
     const { normalizedSatsPerVB, normalizedSatsPerKB } = normalizeFeeRate({
-      satsPerKB,
-      satsPerVB
+      ...(satsPerKB !== undefined && { satsPerKB }),
+      ...(satsPerVB !== undefined && { satsPerVB }),
     });
 
     logger.info("stamp-create", { message: "Starting createStampIssuance with params", sourceWallet, assetName, qty, locked, divisible, filename, fileSize: Math.ceil((file.length * 3) / 4), providedSatsPerKB: satsPerKB, providedSatsPerVB: satsPerVB, normalizedSatsPerVB, service_fee, service_fee_address, prefix, isDryRun });
@@ -129,7 +130,7 @@ export class StampMintService {
     } catch (error) {
       logger.error("stamp-create", { message: "Detailed mint error", error: error instanceof Error ? error.message : String(error) });
       // Enhance error messages for common issues
-      if (error.message.includes('invalid base58')) {
+      if (error instanceof Error && error.message.includes('invalid base58')) {
         throw new Error('Invalid address format. Please use a supported Bitcoin address format (P2PKH, P2WPKH, or P2SH).');
       }
       throw error;
@@ -158,7 +159,20 @@ export class StampMintService {
 
       psbt = new bitcoin.Psbt({ network: bitcoin.networks.bitcoin });
       const txObj = bitcoin.Transaction.fromHex(tx);
-      vouts = extractOutputs(txObj, address);
+      const rawOutputs = extractOutputs(txObj, address);
+      // Convert Output[] to expected format for selectUTXOsForTransaction
+      vouts = rawOutputs.map(output => {
+        const scriptString = (output as any).script;
+        const scriptBuffer = typeof scriptString === 'string' 
+          ? new Uint8Array(Buffer.from(scriptString, 'hex'))
+          : undefined;
+        
+        return {
+          value: output.value,
+          address: (output as any).address,
+          ...(scriptBuffer && { script: scriptBuffer }),
+        };
+      });
 
       logger.debug("stamp-create", { message: "Initial vouts from transaction", count: vouts.length, values: vouts.map(v => v.value) });
 
@@ -218,11 +232,18 @@ export class StampMintService {
         logger.debug("stamp-create", { message: "Added service fee output", service_fee, newTotalOutputValue: totalOutputValue });
       }
 
+      // Convert vouts to the expected Output format
+      const outputsForSelection = vouts.map(vout => ({
+        value: vout.value,
+        script: vout.script ? Buffer.from(vout.script).toString('hex') : "",
+        ...(vout.address && { address: vout.address })
+      }));
+
       // Get UTXO selection
-      const { inputs, initialChange } = await TransactionService.utxoServiceInstance
+      const { inputs, change: initialChange } = await TransactionService.utxoServiceInstance
         .selectUTXOsForTransaction(
           address,
-          vouts,
+          outputsForSelection,
           satsPerVB,
           0,
           1.5,

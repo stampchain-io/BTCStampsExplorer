@@ -437,6 +437,11 @@ export interface SRC20Row {
     tx_hash: string;
     tick: string;
   };
+  volume24?: number;
+  market_cap?: number;
+  chart?: any[];
+  mint_count?: number | string;
+  trending_rank?: number;
 }
 
 // Add EnrichedSRC20Row type
@@ -790,6 +795,7 @@ export interface PaginatedTickResponseBody {
   last_block: number;
   page: number;
   limit: number;
+  total: number;
   totalPages: number;
   mint_status: MintStatus;
   data: Src20Detail[];

@@ -5,7 +5,7 @@ import { Timeframe } from "$layout";
 import { labelSm, textSm, valueDark } from "$text";
 import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { rowCardHover } from "$layout";
+import { rowTable } from "$layout";
 
 interface SRC20MintingTableProps {
   data: SRC20Row[];
@@ -139,13 +139,13 @@ export function SRC20MintingTable({
                     <td
                       class={`${
                         cellAlign(1, headers.length)
-                      } ${rowCardHover} hidden min-[600px]:table-cell`}
+                      } ${rowTable} hidden min-[600px]:table-cell`}
                     >
                       {src20.mint_count || "N/A"}
                     </td>
                     {/* PROGRESS */}
                     <td
-                      class={`${cellAlign(2, headers.length)} ${rowCardHover}`}
+                      class={`${cellAlign(2, headers.length)} ${rowTable}`}
                     >
                       <div class="flex items-center justify-center w-full">
                         <div class="flex flex-col w-[100px] min-[420px]:w-[120px] mobileLg:w-[160px] gap-1">
@@ -166,7 +166,7 @@ export function SRC20MintingTable({
                     <td
                       class={`${
                         cellAlign(3, headers.length)
-                      } ${rowCardHover} hidden min-[600px]:table-cell`}
+                      } ${rowTable} hidden min-[600px]:table-cell`}
                     >
                       {src20.trending_rank ? `#${src20.trending_rank}` : "N/A"}
                     </td>
@@ -174,7 +174,7 @@ export function SRC20MintingTable({
                     <td
                       class={`${
                         cellAlign(4, headers.length)
-                      } ${rowCardHover} hidden tablet:table-cell`}
+                      } ${rowTable} hidden tablet:table-cell`}
                     >
                       {formatDate(new Date(src20.block_time), {
                         month: "numeric",
@@ -186,7 +186,7 @@ export function SRC20MintingTable({
                     <td
                       class={`${
                         cellAlign(5, headers.length)
-                      } ${rowCardHover} hidden mobileLg:table-cell`}
+                      } ${rowTable} hidden mobileLg:table-cell`}
                     >
                       {Number(src20.holders).toLocaleString()}
                     </td>

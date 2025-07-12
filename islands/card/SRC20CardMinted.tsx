@@ -13,8 +13,8 @@ export function SRC20CardMinted(
   return (
     <SRC20CardBase
       src20={src20}
-      fromPage={fromPage}
-      onImageClick={onImageClick}
+      {...(fromPage && { fromPage })}
+      {...(onImageClick && { onImageClick })}
       totalColumns={totalColumns}
     >
       {/* Deploy Cell */}
@@ -44,13 +44,13 @@ export function SRC20CardMinted(
 
       {/* Volume Cell */}
       <td class={`${cellAlign(5, totalColumns)} ${valueSm}`}>
-        {Math.round(src20.volume24 ?? 0).toLocaleString()}
+        {Math.round((src20 as any).volume24 ?? 0).toLocaleString()}
         <span class="text-stamp-grey-light ml-1">BTC</span>
       </td>
 
       {/* Market Cap Cell */}
       <td class={`${cellAlign(6, totalColumns)} ${valueSm}`}>
-        {Math.round((src20.market_cap ?? 0) * 1e8).toLocaleString()}
+        {Math.round(((src20 as any).market_cap ?? 0) * 1e8).toLocaleString()}
         <span class="text-stamp-grey-light ml-1">SATS</span>
       </td>
 
@@ -58,7 +58,7 @@ export function SRC20CardMinted(
       <td class={`${cellAlign(7, totalColumns)} ${valueSm}`}>
         <ChartWidget
           fromPage="home"
-          data={src20.chart}
+          data={(src20 as any).chart}
           tick={src20.tick}
         />
       </td>

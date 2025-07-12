@@ -62,7 +62,8 @@ export const handler: Handlers = {
     const testResults: TestResults = {
       config: {
         BASE_URL: baseUrl,
-        IMAGES_SRC_PATH: serverConfig.IMAGES_SRC_PATH,
+        ...(serverConfig.IMAGES_SRC_PATH &&
+          { IMAGES_SRC_PATH: serverConfig.IMAGES_SRC_PATH }),
       },
       stampchainTests: [],
       proxyTests: [],

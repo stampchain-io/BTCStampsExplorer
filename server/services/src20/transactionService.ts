@@ -1,5 +1,4 @@
 import { TX, TXError } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { deploySRC20, mintSRC20, transferSRC20 } from "./index.ts";
 import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$server/types/services/src20.d.ts";
 import { InputData } from "$types/index.d.ts";
@@ -43,9 +42,9 @@ export class SRC20TransactionService {
         break;
       case "mint":
         if (!body.amt) {
-          return ResponseUtil.badRequest(
-            "Error: amt is required for mint operation",
-          );
+          return {
+            error: "Error: amt is required for mint operation",
+          };
         }
         logger.debug("stamps", {
           message: "Handling mint operation",
@@ -58,14 +57,14 @@ export class SRC20TransactionService {
         break;
       case "transfer":
         if (!body.fromAddress) {
-          return ResponseUtil.badRequest(
-            "Error: fromAddress is required for transfer operation",
-          );
+          return {
+            error: "Error: fromAddress is required for transfer operation",
+          };
         }
         if (!body.amt) {
-          return ResponseUtil.badRequest(
-            "Error: amt is required for transfer operation",
-          );
+          return {
+            error: "Error: amt is required for transfer operation",
+          };
         }
         logger.debug("stamps", {
           message: "Handling transfer operation",
@@ -77,7 +76,7 @@ export class SRC20TransactionService {
         } as ITransferSRC20);
         break;
       default:
-        return ResponseUtil.badRequest("Invalid operation");
+        return { error: "Invalid operation" };
     }
 
     logger.debug("stamps", {
@@ -90,10 +89,15 @@ export class SRC20TransactionService {
         message: "Operation error",
         error: result.error
       });
-      return ResponseUtil.badRequest(result.error);
+      return { error: result.error };
     }
 
-    return result;
+    // Map the result to the expected TX format
+    return {
+      psbtHex: result.hex || result.base64 || "",
+      fee: Number(result.est_miner_fee || 0),
+      change: Number(result.change_value || 0)
+    };
   }
 
   private static prepareDeploy(body: InputData): IDeploySRC20 {
@@ -121,16 +125,19 @@ export class SRC20TransactionService {
       tick: body.tick,
       feeRate: body.feeRate,
       amt: body.amt?.toString() ?? "",
+      network: "mainnet", // Default to mainnet
     };
   }
 
   private static prepareTransfer(body: InputData): ITransferSRC20 {
     return {
       toAddress: body.toAddress,
-      fromAddress: body.fromAddress,
+      fromAddress: body.fromAddress || "",
+      changeAddress: body.changeAddress,
       tick: body.tick,
       feeRate: body.feeRate,
       amt: body.amt?.toString() ?? "",
+      network: "mainnet", // Default to mainnet
     };
   }
 }

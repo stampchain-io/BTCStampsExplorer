@@ -69,7 +69,14 @@ export function ErrorDisplay({
       <div
         class={`flex items-center gap-2 p-2 rounded border ${styles.container} ${className}`}
       >
-        <Icon name={styles.iconName} size="sm" className={styles.icon} />
+        <Icon
+          name={styles.iconName}
+          size="sm"
+          type="icon"
+          weight="normal"
+          color="custom"
+          className={styles.icon}
+        />
         <span class="text-sm flex-1">{userMessage}</span>
 
         {error.retryable && onRetry && (
@@ -88,7 +95,13 @@ export function ErrorDisplay({
             onClick={onDismiss}
             class="text-gray-400 hover:text-white transition-colors"
           >
-            <Icon name="x" size="xs" />
+            <Icon
+              name="x"
+              size="xs"
+              type="icon"
+              weight="normal"
+              color="custom"
+            />
           </button>
         )}
       </div>
@@ -105,6 +118,9 @@ export function ErrorDisplay({
         <Icon
           name={styles.iconName}
           size="lg"
+          type="icon"
+          weight="normal"
+          color="custom"
           className={`${styles.icon} flex-shrink-0 mt-1`}
         />
 
@@ -165,7 +181,13 @@ export function ErrorDisplay({
               class="p-1 text-gray-400 hover:text-white transition-colors"
               aria-label="Dismiss error"
             >
-              <Icon name="x" size="sm" />
+              <Icon
+                name="x"
+                size="sm"
+                type="icon"
+                weight="normal"
+                color="custom"
+              />
             </button>
           )}
         </div>
@@ -213,7 +235,7 @@ export function NetworkErrorDisplay({ onRetry }: { onRetry?: () => void }) {
     action: "retry",
   };
 
-  return <ErrorDisplay error={error} onRetry={onRetry} />;
+  return <ErrorDisplay error={error} {...(onRetry && { onRetry })} />;
 }
 
 export function LoadingTimeoutDisplay({ onRetry }: { onRetry?: () => void }) {
@@ -227,7 +249,7 @@ export function LoadingTimeoutDisplay({ onRetry }: { onRetry?: () => void }) {
     action: "retry",
   };
 
-  return <ErrorDisplay error={error} onRetry={onRetry} compact />;
+  return <ErrorDisplay error={error} {...(onRetry && { onRetry })} compact />;
 }
 
 export function DataNotFoundDisplay() {

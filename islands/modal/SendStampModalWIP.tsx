@@ -382,7 +382,7 @@ function SendStampModal({
 
       {/* ===== FEE CALCULATOR ===== */}
       <FeeCalculatorSimple
-        isModal
+        {...(true && { isModal: true })}
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="transfer"
@@ -392,10 +392,10 @@ function SendStampModal({
         onCancel={handleCloseModal}
         buttonName="TRANSFER"
         className="pt-9 mobileLg:pt-12"
-        userAddress={wallet?.address}
+        {...(wallet?.address && { userAddress: wallet.address })}
         inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
-        tosAgreed
+        {...(true && { tosAgreed: true })}
       />
 
       {/* ===== STATUS MESSAGES ===== */}

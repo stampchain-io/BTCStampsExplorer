@@ -1,4 +1,4 @@
-import { UTXO, BasicUTXO } from "$lib/types/base.d.ts";
+import { UTXO } from "$lib/types/base.d.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { QuicknodeUTXOService, UTXOOptions as QuicknodeInternalUTXOOptions } from "$server/services/quicknode/quicknodeUTXOService.ts";
 import {
@@ -18,6 +18,7 @@ interface CommonUTXOFetchOptions extends UTXOFetchOptions {
  * prioritizing QuickNode if configured, and falling back to public APIs.
  */
 export class CommonUTXOService implements ICommonUTXOService {
+  private static instance: CommonUTXOService;
   private isQuickNodeConfigured: boolean;
   private rawTxHexCache: Map<string, string | null>; // Cache for raw tx hex
 
@@ -30,11 +31,18 @@ export class CommonUTXOService implements ICommonUTXOService {
     logger.info("common-utxo-service", { message });
   }
 
+  static getInstance(): CommonUTXOService {
+    if (!CommonUTXOService.instance) {
+      CommonUTXOService.instance = new CommonUTXOService();
+    }
+    return CommonUTXOService.instance;
+  }
+
   async getRawTransactionHex(txid: string): Promise<string | null> {
     if (this.rawTxHexCache.has(txid)) {
       const cachedHex = this.rawTxHexCache.get(txid);
       logger.debug("common-utxo-service", { message: "Cache hit for rawTxHex", txid, found: cachedHex !== null });
-      return cachedHex;
+      return cachedHex || null;
     }
     logger.debug("common-utxo-service", { message: "Cache miss for rawTxHex", txid });
 
@@ -82,7 +90,7 @@ export class CommonUTXOService implements ICommonUTXOService {
     address: string,
     _amountNeeded?: number, 
     options?: UTXOFetchOptions,
-  ): Promise<BasicUTXO[]> {
+  ): Promise<UTXO[]> {
     const logContext = { address, options, quicknodeEnabled: this.isQuickNodeConfigured };
     logger.debug("common-utxo-service", { message: "getSpendableUTXOs called for basic UTXO list", ...logContext });
 
@@ -97,7 +105,12 @@ export class CommonUTXOService implements ICommonUTXOService {
         
         if (result && "data" in result && Array.isArray(result.data)) {
           logger.info("common-utxo-service", { message: "Successfully received basic UTXO data from QuickNode", address, count: result.data.length });
-          return result.data;
+          return result.data.map(utxo => ({
+            txid: utxo.txid,
+            vout: utxo.vout,
+            value: utxo.value,
+            script: "" // QuickNode doesn't provide script in basic UTXO response
+          }));
         } else if (result && "error" in result) {
           logger.warn("common-utxo-service", { message: "QuickNode returned an error for getUTXOs", address, error: result.error });
         } else {
@@ -119,7 +132,8 @@ export class CommonUTXOService implements ICommonUTXOService {
         return publicUtxosResult.map(utxo => ({
           txid: utxo.txid,
           vout: utxo.vout,
-          value: utxo.value
+          value: utxo.value,
+          script: utxo.script || ""
         }));
       }
       logger.warn("common-utxo-service", { message: "Public APIs returned non-array or null for getSpendableUTXOs", address, response: publicUtxosResult });

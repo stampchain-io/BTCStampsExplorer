@@ -6,14 +6,6 @@ import { logger } from "$lib/utils/logger.ts";
 
 export class FileUploadService {
   private static readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-  private static readonly ALLOWED_MIME_TYPES = [
-    "image/jpeg",
-    "image/png",
-    "image/gif",
-    "image/svg+xml",
-    "image/webp",
-    "image/avif",
-  ];
 
   static async uploadSRC20Background(
     params: SRC20BackgroundUpload & { csrfToken: string }

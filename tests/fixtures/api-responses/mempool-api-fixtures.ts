@@ -3,7 +3,7 @@
  * Based on real API responses from mempool.space
  */
 
-export const mempoolApiFixtures: Record<string, any> = {
+export const mempoolApiFixtures: Record<string, unknown> = {
   // P2WPKH transaction
   "a0a34578b86c5ed1720083e0008e0578a744a9daa8c13124f64fb8ebbae9029b": {
     txid: "a0a34578b86c5ed1720083e0008e0578a744a9daa8c13124f64fb8ebbae9029b",
@@ -37,7 +37,7 @@ export const mempoolApiFixtures: Record<string, any> = {
         scriptpubkey_asm:
           "OP_0 OP_PUSHBYTES_20 c8e5f38f19fc54ffb6fe03043057dd2e89b2b623",
         scriptpubkey_type: "v0_p2wpkh",
-        scriptpubkey_address: "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
+        scriptpubkey_address: "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v",
         value: 44089800,
       },
       {

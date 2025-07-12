@@ -1,9 +1,20 @@
 import { assert, assertEquals, assertExists } from "@std/assert";
+import { beforeEach, describe, it } from "@std/testing/bdd";
 import { returnsNext, stub } from "@std/testing/mock";
 import btcPriceApiResponses from "../fixtures/btcPriceApiResponses.json" with {
-  type: "json",
+  type: "json"
 };
 import { btcPriceFixture } from "../fixtures/marketDataFixtures.ts";
+
+// Define mock DbManager interface
+interface MockDbManager {
+  handleCache: (
+    key: string,
+    fetchFn: () => Promise<unknown>,
+    duration?: number,
+  ) => Promise<unknown>;
+  invalidateCacheByPattern: (pattern: string) => Promise<void>;
+}
 
 // Define the interface for BTCPriceData
 interface BTCPriceData {
@@ -11,28 +22,28 @@ interface BTCPriceData {
   source: "quicknode" | "coingecko" | "binance" | "cached" | "default";
   confidence: "high" | "medium" | "low";
   timestamp: number;
-  details?: any;
+  details?: unknown;
   fallbackUsed?: boolean;
   errors?: string[];
 }
 
 // Create a test-only version of BTCPriceService that doesn't require external dependencies
 class TestBTCPriceService {
-  private static dbManager: any;
-  private static readonly CACHE_KEY = "btc_price_data";
-  private static readonly CACHE_CONFIG = {
+  private dbManager: MockDbManager;
+  private readonly CACHE_KEY = "btc_price_data";
+  private readonly CACHE_CONFIG = {
     duration: 60,
     staleWhileRevalidate: 300,
     staleIfError: 3600,
   };
-  private static sourceCounter = 0;
-  private static readonly SOURCES = ["coingecko", "binance"] as const;
+  private sourceCounter = 0;
+  private readonly SOURCES = ["coingecko", "binance"] as const;
 
-  static setDbManager(mockDbManager: any) {
+  setDbManager(mockDbManager: MockDbManager) {
     this.dbManager = mockDbManager;
   }
 
-  static async getPrice(preferredSource?: string): Promise<BTCPriceData> {
+  async getPrice(preferredSource?: string): Promise<BTCPriceData> {
     const startTime = Date.now();
 
     try {
@@ -74,12 +85,12 @@ class TestBTCPriceService {
     }
   }
 
-  private static isCacheValid(data: BTCPriceData): boolean {
+  private isCacheValid(data: BTCPriceData): boolean {
     const age = Date.now() - data.timestamp;
     return age < this.CACHE_CONFIG.duration * 1000;
   }
 
-  private static async fetchFreshPriceData(
+  private async fetchFreshPriceData(
     preferredSource?: string,
   ): Promise<BTCPriceData> {
     const errors: string[] = [];
@@ -142,7 +153,7 @@ class TestBTCPriceService {
     };
   }
 
-  private static getNextSourceOrder(): string[] {
+  private getNextSourceOrder(): string[] {
     const primaryIndex = this.sourceCounter % this.SOURCES.length;
     this.sourceCounter = (this.sourceCounter + 1) % Number.MAX_SAFE_INTEGER;
 
@@ -152,7 +163,7 @@ class TestBTCPriceService {
     return [primary, secondary];
   }
 
-  private static async fetchFromSource(
+  private async fetchFromSource(
     source: string,
   ): Promise<
     Omit<BTCPriceData, "timestamp" | "fallbackUsed" | "errors"> | null
@@ -167,7 +178,7 @@ class TestBTCPriceService {
     }
   }
 
-  private static async fetchFromCoinGecko(): Promise<
+  private async fetchFromCoinGecko(): Promise<
     Omit<BTCPriceData, "timestamp" | "fallbackUsed" | "errors"> | null
   > {
     try {
@@ -202,7 +213,7 @@ class TestBTCPriceService {
     }
   }
 
-  private static async fetchFromBinance(): Promise<
+  private async fetchFromBinance(): Promise<
     Omit<BTCPriceData, "timestamp" | "fallbackUsed" | "errors"> | null
   > {
     try {
@@ -237,7 +248,7 @@ class TestBTCPriceService {
     }
   }
 
-  private static getStaticFallbackPrice(): BTCPriceData {
+  private getStaticFallbackPrice(): BTCPriceData {
     return {
       price: 0,
       source: "default",
@@ -251,7 +262,7 @@ class TestBTCPriceService {
     };
   }
 
-  static invalidateCache(): Promise<void> {
+  invalidateCache(): Promise<void> {
     try {
       return this.dbManager.invalidateCacheByPattern(this.CACHE_KEY)
         .then(() => {
@@ -266,7 +277,7 @@ class TestBTCPriceService {
     }
   }
 
-  static getCacheInfo(): {
+  getCacheInfo(): {
     cacheKey: string;
     cacheDuration: number;
     staleWhileRevalidate: number;
@@ -281,7 +292,7 @@ class TestBTCPriceService {
   }
 }
 
-Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
+describe("BTCPriceService Unit Tests - Isolated", () => {
   // Create a mock dbManager
   const mockDbManager = {
     handleCache: async (_key: string, fetchFn: () => Promise<any>) => {
@@ -317,9 +328,15 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     cleanupStubs();
   }
 
-  await t.step("getPrice - returns cached price data", async () => {
+  let testService: TestBTCPriceService;
+
+  beforeEach(() => {
+    testService = new TestBTCPriceService();
+    testService.setDbManager(mockDbManager);
+  });
+
+  it("getPrice - returns cached price data", async () => {
     ensureCleanup();
-    TestBTCPriceService.setDbManager(mockDbManager);
 
     const cachedPrice = {
       price: btcPriceFixture.btc_usd,
@@ -334,7 +351,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
       () => Promise.resolve(cachedPrice),
     );
 
-    const result = await TestBTCPriceService.getPrice();
+    const result = await testService.getPrice();
 
     assertEquals(result.price, btcPriceFixture.btc_usd);
     assertEquals(result.source, "cached");
@@ -344,13 +361,13 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step("getPrice - fetches fresh data when cache miss", async () => {
+  it("getPrice - fetches fresh data when cache miss", async () => {
     ensureCleanup();
 
     createStub(
       mockDbManager,
       "handleCache",
-      async (_key: string, fetchFn: () => Promise<any>) => {
+      async (_key: string, fetchFn: () => Promise<unknown>) => {
         return await fetchFn();
       },
     );
@@ -372,7 +389,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
         ),
     );
 
-    const result = await TestBTCPriceService.getPrice();
+    const result = await testService.getPrice();
 
     assertEquals(
       result.price,
@@ -385,13 +402,13 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step("getPrice - handles preferred source", async () => {
+  it("getPrice - handles preferred source", async () => {
     ensureCleanup();
 
     createStub(
       mockDbManager,
       "handleCache",
-      async (_key: string, fetchFn: () => Promise<any>) => {
+      async (_key: string, fetchFn: () => Promise<unknown>) => {
         return await fetchFn();
       },
     );
@@ -413,7 +430,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
         ),
     );
 
-    const result = await TestBTCPriceService.getPrice("binance");
+    const result = await testService.getPrice("binance");
 
     assertEquals(result.source, "binance");
     assertExists(result.price);
@@ -422,7 +439,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step(
+  it(
     "fetchFreshPriceData - handles CoinGecko API failure with fallback",
     async () => {
       ensureCleanup();
@@ -430,7 +447,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
       createStub(
         mockDbManager,
         "handleCache",
-        async (_key: string, fetchFn: () => Promise<any>) => {
+        async (_key: string, fetchFn: () => Promise<unknown>) => {
           return await fetchFn();
         },
       );
@@ -460,7 +477,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
         },
       );
 
-      const result = await TestBTCPriceService.getPrice();
+      const result = await testService.getPrice();
 
       // Should fall back to static price
       assertEquals(result.source, "default");
@@ -472,7 +489,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     },
   );
 
-  await t.step(
+  it(
     "fetchFreshPriceData - returns static fallback when all sources fail",
     async () => {
       ensureCleanup();
@@ -480,7 +497,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
       createStub(
         mockDbManager,
         "handleCache",
-        async (_key: string, fetchFn: () => Promise<any>) => {
+        async (_key: string, fetchFn: () => Promise<unknown>) => {
           return await fetchFn();
         },
       );
@@ -491,7 +508,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
         () => Promise.reject(new Error("Network error")),
       );
 
-      const result = await TestBTCPriceService.getPrice();
+      const result = await testService.getPrice();
 
       assertEquals(result.source, "default");
       assertEquals(result.confidence, "low");
@@ -502,13 +519,13 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     },
   );
 
-  await t.step("fetchFromCoinGecko - handles successful response", async () => {
+  it("fetchFromCoinGecko - handles successful response", async () => {
     ensureCleanup();
 
     createStub(
       mockDbManager,
       "handleCache",
-      async (_key: string, fetchFn: () => Promise<any>) => {
+      async (_key: string, fetchFn: () => Promise<unknown>) => {
         return await fetchFn();
       },
     );
@@ -546,7 +563,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
       },
     );
 
-    const result = await TestBTCPriceService.getPrice();
+    const result = await testService.getPrice();
 
     assertExists(result.price);
     assert(result.price > 0);
@@ -555,13 +572,13 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step("fetchFromBinance - handles successful response", async () => {
+  it("fetchFromBinance - handles successful response", async () => {
     ensureCleanup();
 
     createStub(
       mockDbManager,
       "handleCache",
-      async (_key: string, fetchFn: () => Promise<any>) => {
+      async (_key: string, fetchFn: () => Promise<unknown>) => {
         return await fetchFn();
       },
     );
@@ -583,7 +600,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
         ),
     );
 
-    const result = await TestBTCPriceService.getPrice("binance");
+    const result = await testService.getPrice("binance");
 
     assertEquals(
       result.price,
@@ -594,7 +611,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step("getPrice - handles cache error gracefully", async () => {
+  it("getPrice - handles cache error gracefully", async () => {
     ensureCleanup();
 
     createStub(
@@ -603,7 +620,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
       () => Promise.reject(new Error("Cache error")),
     );
 
-    const result = await TestBTCPriceService.getPrice();
+    const result = await testService.getPrice();
 
     // Should return static fallback on cache error
     assertEquals(result.source, "default");
@@ -613,7 +630,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step("invalidateCache - handles cache invalidation", async () => {
+  it("invalidateCache - handles cache invalidation", async () => {
     ensureCleanup();
 
     let invalidateCalled = false;
@@ -626,13 +643,13 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
       },
     );
 
-    await TestBTCPriceService.invalidateCache();
+    await testService.invalidateCache();
     assertEquals(invalidateCalled, true);
 
     ensureCleanup();
   });
 
-  await t.step("invalidateCache - handles invalidation error", async () => {
+  it("invalidateCache - handles invalidation error", async () => {
     ensureCleanup();
 
     createStub(
@@ -644,7 +661,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     // The method returns a promise that rejects on error
     // This is the actual behavior - it doesn't catch promise rejections
     try {
-      await TestBTCPriceService.invalidateCache();
+      await testService.invalidateCache();
       // Should not reach here
       assert(false, "Expected invalidateCache to throw");
     } catch (error) {
@@ -657,12 +674,12 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step(
+  it(
     "getCacheInfo - returns correct cache configuration",
     () => {
       ensureCleanup();
 
-      const cacheInfo = TestBTCPriceService.getCacheInfo();
+      const cacheInfo = testService.getCacheInfo();
 
       assertExists(cacheInfo);
       assertExists(cacheInfo.cacheKey);
@@ -674,13 +691,13 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     },
   );
 
-  await t.step("fetchFromSource - handles unknown source", async () => {
+  it("fetchFromSource - handles unknown source", async () => {
     ensureCleanup();
 
     createStub(
       mockDbManager,
       "handleCache",
-      async (_key: string, fetchFn: () => Promise<any>) => {
+      async (_key: string, fetchFn: () => Promise<unknown>) => {
         return await fetchFn();
       },
     );
@@ -704,7 +721,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     );
 
     // The service should ignore unknown sources and use valid ones
-    const result = await TestBTCPriceService.getPrice("unknown" as any);
+    const result = await testService.getPrice("unknown");
 
     // Should use a valid source instead
     assert(["coingecko", "binance"].includes(result.source));
@@ -713,7 +730,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step("getNextSourceOrder - rotates sources correctly", async () => {
+  it("getNextSourceOrder - rotates sources correctly", async () => {
     ensureCleanup();
 
     // Track fetch calls to verify round-robin behavior
@@ -722,7 +739,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     createStub(
       mockDbManager,
       "handleCache",
-      async (_key: string, fetchFn: () => Promise<any>) => {
+      async (_key: string, fetchFn: () => Promise<unknown>) => {
         return await fetchFn();
       },
     );
@@ -761,8 +778,8 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     );
 
     // Make multiple requests
-    const result1 = await TestBTCPriceService.getPrice();
-    const result2 = await TestBTCPriceService.getPrice();
+    const result1 = await testService.getPrice();
+    const result2 = await testService.getPrice();
 
     // Verify we got results
     assertExists(result1);
@@ -777,13 +794,13 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step("fetchFromCoinGecko - handles rate limit error", async () => {
+  it("fetchFromCoinGecko - handles rate limit error", async () => {
     ensureCleanup();
 
     createStub(
       mockDbManager,
       "handleCache",
-      async (_key: string, fetchFn: () => Promise<any>) => {
+      async (_key: string, fetchFn: () => Promise<unknown>) => {
         return await fetchFn();
       },
     );
@@ -812,7 +829,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
       },
     );
 
-    const result = await TestBTCPriceService.getPrice();
+    const result = await testService.getPrice();
 
     // Should fall back to Binance
     assertEquals(result.source, "binance");
@@ -821,13 +838,13 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step("fetchFromBinance - handles invalid response", async () => {
+  it("fetchFromBinance - handles invalid response", async () => {
     ensureCleanup();
 
     createStub(
       mockDbManager,
       "handleCache",
-      async (_key: string, fetchFn: () => Promise<any>) => {
+      async (_key: string, fetchFn: () => Promise<unknown>) => {
         return await fetchFn();
       },
     );
@@ -855,7 +872,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
       ]),
     );
 
-    const result = await TestBTCPriceService.getPrice("binance");
+    const result = await testService.getPrice("binance");
 
     // When Binance returns invalid data (NaN), it should still report as binance
     // since the fetch technically succeeded
@@ -867,7 +884,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step(
+  it(
     "fetchFromBinance - handles rate limit with specific error code",
     async () => {
       ensureCleanup();
@@ -875,7 +892,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
       createStub(
         mockDbManager,
         "handleCache",
-        async (_key: string, fetchFn: () => Promise<any>) => {
+        async (_key: string, fetchFn: () => Promise<unknown>) => {
           return await fetchFn();
         },
       );
@@ -903,7 +920,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
         ]),
       );
 
-      const result = await TestBTCPriceService.getPrice("binance");
+      const result = await testService.getPrice("binance");
 
       // Should fall back to CoinGecko
       assertEquals(result.source, "coingecko");
@@ -913,13 +930,13 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     },
   );
 
-  await t.step("handles network errors gracefully", async () => {
+  it("handles network errors gracefully", async () => {
     ensureCleanup();
 
     createStub(
       mockDbManager,
       "handleCache",
-      async (_key: string, fetchFn: () => Promise<any>) => {
+      async (_key: string, fetchFn: () => Promise<unknown>) => {
         return await fetchFn();
       },
     );
@@ -930,7 +947,7 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
       () => Promise.reject(new Error("Network error")),
     );
 
-    const result = await TestBTCPriceService.getPrice();
+    const result = await testService.getPrice();
 
     // Should return static fallback
     assertEquals(result.source, "default");
@@ -940,13 +957,13 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     ensureCleanup();
   });
 
-  await t.step("respects round-robin source selection", async () => {
+  it("respects round-robin source selection", async () => {
     ensureCleanup();
 
     createStub(
       mockDbManager,
       "handleCache",
-      async (_key: string, fetchFn: () => Promise<any>) => {
+      async (_key: string, fetchFn: () => Promise<unknown>) => {
         return await fetchFn();
       },
     );
@@ -979,8 +996,8 @@ Deno.test("BTCPriceService Unit Tests - Isolated", async (t) => {
     );
 
     // Make several requests and verify round-robin
-    const result1 = await TestBTCPriceService.getPrice();
-    const result2 = await TestBTCPriceService.getPrice();
+    const result1 = await testService.getPrice();
+    const result2 = await testService.getPrice();
 
     // Both should have valid sources
     assert(["coingecko", "binance"].includes(result1.source));

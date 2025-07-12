@@ -100,6 +100,7 @@ export function checkEmptyResult(
     console.log(`Empty result received for ${context}:`, result);
     return ResponseUtil.notFound(`No ${context} found`);
   }
+  return undefined;
 }
 
 /**

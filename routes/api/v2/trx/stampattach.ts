@@ -276,18 +276,20 @@ export const handler: Handlers = {
       const tempPsbtForSize = psbt.clone();
       tempPsbtForSize.addOutput({
         address: address,
-        value: TX_CONSTANTS.DUST_SIZE,
+        value: BigInt(TX_CONSTANTS.DUST_SIZE),
       });
 
       const inputsForSizeEst: InputTypeForSizeEstimation[] = psbt.data.inputs
         .map((input, idx) => {
           let scriptHex = "";
           if (input.witnessUtxo?.script) {
-            scriptHex = input.witnessUtxo.script.toString("hex");
+            scriptHex = input.witnessUtxo.script.toString();
           } else if (input.nonWitnessUtxo) {
             try {
-              scriptHex = Transaction.fromBuffer(input.nonWitnessUtxo)
-                .outs[psbt.txInputs[idx].index].script.toString("hex");
+              scriptHex = Buffer.from(
+                Transaction.fromBuffer(input.nonWitnessUtxo)
+                  .outs[psbt.txInputs[idx].index].script,
+              ).toString("hex");
             } catch (e: any) {
               logger.warn("api", {
                 message:
@@ -310,7 +312,7 @@ export const handler: Handlers = {
       const outputsForSizeEst: OutputTypeForSizeEstimation[] = tempPsbtForSize
         .txOutputs.map((out) => {
           const scriptInfo: ScriptTypeInfo = getScriptTypeInfo(
-            out.script.toString("hex"),
+            Buffer.from(out.script).toString("hex"),
           );
           return { type: scriptInfo.type };
         });
@@ -353,12 +355,15 @@ export const handler: Handlers = {
           });
           psbt.txOutputs.splice(cpChangeOutputIndex, 1);
           if (psbt.data.globalMap.unsignedTx) {
-            psbt.data.globalMap.unsignedTx.outs.splice(cpChangeOutputIndex, 1);
+            (psbt.data.globalMap.unsignedTx as any).outs.splice(
+              cpChangeOutputIndex,
+              1,
+            );
           }
         } else {
           while (psbt.txOutputs.length > 0) psbt.txOutputs.pop();
           if (psbt.data.globalMap.unsignedTx) {
-            psbt.data.globalMap.unsignedTx.outs = [];
+            (psbt.data.globalMap.unsignedTx as any).outs = [];
           }
           essentialCpOutputs.forEach((out) => psbt.addOutput(out));
           if (feeService > 0 && feeServiceAddress) {

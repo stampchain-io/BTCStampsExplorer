@@ -24,7 +24,15 @@
       "last_balance_block": null,
       "last_price_update": null,
       "update_frequency_minutes": 30,
-      "created_at": "2025-06-15T14:43:42.000Z"
+      "created_at": "2025-06-15T14:43:42.000Z",
+      "last_sale_tx_hash": null,
+      "last_sale_buyer_address": null,
+      "last_sale_dispenser_address": null,
+      "last_sale_btc_amount": null,
+      "last_sale_dispenser_tx_hash": null,
+      "last_sale_block_index": null,
+      "activity_level": null,
+      "last_activity_time": null
     },
     {
       "cpid": "A5040405140001130101",
@@ -50,7 +58,15 @@
       "last_balance_block": null,
       "last_price_update": null,
       "update_frequency_minutes": 30,
-      "created_at": "2025-06-15T11:22:52.000Z"
+      "created_at": "2025-06-15T11:22:52.000Z",
+      "last_sale_tx_hash": null,
+      "last_sale_buyer_address": null,
+      "last_sale_dispenser_address": null,
+      "last_sale_btc_amount": null,
+      "last_sale_dispenser_tx_hash": null,
+      "last_sale_block_index": null,
+      "activity_level": null,
+      "last_activity_time": null
     },
     {
       "cpid": "A300476194093058737",
@@ -76,7 +92,15 @@
       "last_balance_block": null,
       "last_price_update": null,
       "update_frequency_minutes": 30,
-      "created_at": "2025-06-15T09:53:05.000Z"
+      "created_at": "2025-06-15T09:53:05.000Z",
+      "last_sale_tx_hash": null,
+      "last_sale_buyer_address": null,
+      "last_sale_dispenser_address": null,
+      "last_sale_btc_amount": null,
+      "last_sale_dispenser_tx_hash": null,
+      "last_sale_block_index": null,
+      "activity_level": null,
+      "last_activity_time": null
     },
     {
       "cpid": "A890328765311495732",
@@ -102,7 +126,15 @@
       "last_balance_block": null,
       "last_price_update": null,
       "update_frequency_minutes": 30,
-      "created_at": "2025-06-15T14:48:09.000Z"
+      "created_at": "2025-06-15T14:48:09.000Z",
+      "last_sale_tx_hash": null,
+      "last_sale_buyer_address": null,
+      "last_sale_dispenser_address": null,
+      "last_sale_btc_amount": null,
+      "last_sale_dispenser_tx_hash": null,
+      "last_sale_block_index": null,
+      "activity_level": null,
+      "last_activity_time": null
     },
     {
       "cpid": "PEPETOKENART",
@@ -128,7 +160,15 @@
       "last_balance_block": null,
       "last_price_update": null,
       "update_frequency_minutes": 30,
-      "created_at": "2025-06-15T14:24:15.000Z"
+      "created_at": "2025-06-15T14:24:15.000Z",
+      "last_sale_tx_hash": null,
+      "last_sale_buyer_address": null,
+      "last_sale_dispenser_address": null,
+      "last_sale_btc_amount": null,
+      "last_sale_dispenser_tx_hash": null,
+      "last_sale_block_index": null,
+      "activity_level": null,
+      "last_activity_time": null
     },
     {
       "cpid": "A1104545795632581985",
@@ -154,7 +194,15 @@
       "last_balance_block": null,
       "last_price_update": null,
       "update_frequency_minutes": 30,
-      "created_at": "2025-06-15T14:47:29.000Z"
+      "created_at": "2025-06-15T14:47:29.000Z",
+      "last_sale_tx_hash": null,
+      "last_sale_buyer_address": null,
+      "last_sale_dispenser_address": null,
+      "last_sale_btc_amount": null,
+      "last_sale_dispenser_tx_hash": null,
+      "last_sale_block_index": null,
+      "activity_level": null,
+      "last_activity_time": null
     },
     {
       "cpid": "A1334094899031611479",
@@ -180,7 +228,15 @@
       "last_balance_block": null,
       "last_price_update": null,
       "update_frequency_minutes": 30,
-      "created_at": "2025-06-15T14:17:27.000Z"
+      "created_at": "2025-06-15T14:17:27.000Z",
+      "last_sale_tx_hash": null,
+      "last_sale_buyer_address": null,
+      "last_sale_dispenser_address": null,
+      "last_sale_btc_amount": null,
+      "last_sale_dispenser_tx_hash": null,
+      "last_sale_block_index": null,
+      "activity_level": null,
+      "last_activity_time": null
     },
     {
       "cpid": "A13358114815176296000",
@@ -206,7 +262,15 @@
       "last_balance_block": null,
       "last_price_update": null,
       "update_frequency_minutes": 30,
-      "created_at": "2025-06-15T13:48:56.000Z"
+      "created_at": "2025-06-15T13:48:56.000Z",
+      "last_sale_tx_hash": null,
+      "last_sale_buyer_address": null,
+      "last_sale_dispenser_address": null,
+      "last_sale_btc_amount": null,
+      "last_sale_dispenser_tx_hash": null,
+      "last_sale_block_index": null,
+      "activity_level": null,
+      "last_activity_time": null
     },
     {
       "cpid": "A197706323115424971",
@@ -232,7 +296,15 @@
       "last_balance_block": null,
       "last_price_update": null,
       "update_frequency_minutes": 30,
-      "created_at": "2025-06-15T14:17:25.000Z"
+      "created_at": "2025-06-15T14:17:25.000Z",
+      "last_sale_tx_hash": null,
+      "last_sale_buyer_address": null,
+      "last_sale_dispenser_address": null,
+      "last_sale_btc_amount": null,
+      "last_sale_dispenser_tx_hash": null,
+      "last_sale_block_index": null,
+      "activity_level": null,
+      "last_activity_time": null
     },
     {
       "cpid": "A499530796365067729",
@@ -258,7 +330,15 @@
       "last_balance_block": null,
       "last_price_update": null,
       "update_frequency_minutes": 30,
-      "created_at": "2025-06-15T14:14:36.000Z"
+      "created_at": "2025-06-15T14:14:36.000Z",
+      "last_sale_tx_hash": null,
+      "last_sale_buyer_address": null,
+      "last_sale_dispenser_address": null,
+      "last_sale_btc_amount": null,
+      "last_sale_dispenser_tx_hash": null,
+      "last_sale_block_index": null,
+      "activity_level": null,
+      "last_activity_time": null
     }
   ],
   "src20MarketData": [

@@ -8,8 +8,8 @@ import { labelXs, loaderText, textSm, textSmLink } from "$text";
 /* ===== TYPES ===== */
 interface Holder {
   address: string | null;
-  amt: number;
-  percentage: number;
+  amt: number | string;
+  percentage: number | string;
 }
 
 interface HoldersTableBaseProps {

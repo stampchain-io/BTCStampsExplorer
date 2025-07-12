@@ -104,7 +104,7 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
           opForValidation,
           {
             sourceAddress: effectiveSourceAddress,
-            changeAddress: effectiveChangeAddress,
+            changeAddress: effectiveChangeAddress || "",
             tick: body.tick,
             max: body.max?.toString(),
             lim: body.lim?.toString(),
@@ -178,7 +178,7 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
             : body.service_fee)
           : 0,
         service_fee_address: body.service_fee_address || "",
-        changeAddress: effectiveChangeAddress,
+        changeAddress: effectiveChangeAddress || "",
         trxType: body.trxType || "olga",
         isDryRun: isEffectivelyDryRun,
       });

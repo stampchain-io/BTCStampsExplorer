@@ -69,7 +69,7 @@ export class SRC20QueryService {
           : undefined,
         tx_hash: params.tx_hash
           ? params.tx_hash.replace(/[^\w-]/g, "")
-          : params.tx_hash,
+          : null,
       };
 
       // Ensure limit and page have default numeric values
@@ -127,14 +127,18 @@ export class SRC20QueryService {
         queryParams,
       );
 
-      if (
-        params.singleResult && Array.isArray(formattedData) &&
-        formattedData.length > 0
-      ) {
-        return {
-          last_block: lastBlock,
-          data: formattedData[0],
-        };
+      if (params.singleResult) {
+        if (Array.isArray(formattedData) && formattedData.length > 0) {
+          return {
+            last_block: lastBlock,
+            data: formattedData[0],
+          };
+        } else if (!Array.isArray(formattedData)) {
+          return {
+            last_block: lastBlock,
+            data: formattedData,
+          };
+        }
       }
 
       const pagination = paginate(total, page, limit);
@@ -195,7 +199,7 @@ export class SRC20QueryService {
 
       if (!src20 || (Array.isArray(src20) && src20.length === 0)) {
         // Return an empty response instead of throwing an error
-        return params.address && params.tick ? 
+        return params.address && params.tick ?
           { last_block: 0, data: [] } as any : // Fixed: Use any to avoid type conversion issues
           { last_block: 0, data: [] } as any; // Fixed: Use any to avoid type conversion issues
       }
@@ -205,7 +209,7 @@ export class SRC20QueryService {
       console.error("Error in fetchSrc20Balance:", error);
       console.error("Params:", params);
       // Return an empty response for any other errors as well
-      return params.address && params.tick ? 
+      return params.address && params.tick ?
         { last_block: 0, data: [] } as any : // Fixed: Use any to avoid type conversion issues
         { last_block: 0, data: [] } as any; // Fixed: Use any to avoid type conversion issues
     }
@@ -250,7 +254,7 @@ export class SRC20QueryService {
     params: SRC20TrxRequestParams,
   ) {
     return params.tx_hash !== null && mappedData.length === 1 &&
-        params.block_index === null
+        (params.block_index === null || params.block_index === undefined)
       ? mappedData[0]
       : [mappedData].flat();
   }
@@ -299,7 +303,7 @@ export class SRC20QueryService {
       // Apply pagination after formatting
       const startIndex = (validPage - 1) * validLimit;
       const paginatedData = formattedData.slice(startIndex, startIndex + validLimit);
-      
+
       const pagination = paginate(data.total, validPage, validLimit);
 
       return {
@@ -327,7 +331,7 @@ export class SRC20QueryService {
 
       // Fetch raw data from repository
       const rawResults = await SRC20Repository.searchValidSrc20TxFromDb(sanitizedQuery);
-      
+
       // Early return for empty results
       if (!rawResults || rawResults.length === 0) {
         return [];
@@ -335,7 +339,7 @@ export class SRC20QueryService {
 
       // Map and format the data using existing utility methods
       const mappedData = this.mapTransactionData(rawResults);
-      
+
       // Return formatted results
       return Array.isArray(mappedData) ? mappedData : [mappedData];
     } catch (error: any) {
@@ -415,7 +419,7 @@ export class SRC20QueryService {
           : undefined,
         tx_hash: params.tx_hash
           ? params.tx_hash.replace(/[^\w-]/g, "")
-          : params.tx_hash,
+          : null,
       };
 
       // Ensure limit and page have default numeric values
@@ -445,7 +449,7 @@ export class SRC20QueryService {
       // Fetch base data and metadata in parallel
       const [data, totalResult, lastBlock] = await Promise.all([
         SRC20Repository.getValidSrc20TxFromDb(
-          queryParams, 
+          queryParams,
           options.excludeFullyMinted
         ),
         SRC20Repository.getTotalCountValidSrc20TxFromDb(
@@ -504,7 +508,7 @@ export class SRC20QueryService {
 
         // Apply market data based filtering if specified
         if (options.includeMarketData && (
-          sanitizedParams.minPrice !== undefined || 
+          sanitizedParams.minPrice !== undefined ||
           sanitizedParams.maxPrice !== undefined ||
           sanitizedParams.minVolume !== undefined ||
           sanitizedParams.maxVolume !== undefined
@@ -516,12 +520,12 @@ export class SRC20QueryService {
             if (!item.market_data) return false;
 
             const { floor_price = 0, volume_24h = 0 } = item.market_data;
-            
+
             if (sanitizedParams.minPrice !== undefined && floor_price < sanitizedParams.minPrice) return false;
             if (sanitizedParams.maxPrice !== undefined && floor_price > sanitizedParams.maxPrice) return false;
             if (sanitizedParams.minVolume !== undefined && volume_24h < sanitizedParams.minVolume) return false;
             if (sanitizedParams.maxVolume !== undefined && volume_24h > sanitizedParams.maxVolume) return false;
-           
+
             return true;
           });
         }
@@ -535,7 +539,7 @@ export class SRC20QueryService {
             return true
           })
         }
-    
+
         if (sanitizedParams.minHolder !== undefined ||
           sanitizedParams.maxHolder !== undefined)
         {
@@ -566,41 +570,45 @@ export class SRC20QueryService {
           })
         }
       }
-      
+
       // Handle single result case
       if (
-        params.singleResult && 
-        Array.isArray(formattedData) && 
+        params.singleResult &&
+        Array.isArray(formattedData) &&
         formattedData.length > 0
       ) {
         metrics.duration = performance.now() - startTime;
-        return {
+        const singleResponse = {
           last_block: lastBlock,
           data: formattedData[0],
-          performance: metrics
         };
+        // Add performance metrics as additional property
+        (singleResponse as any).performance = metrics;
+        return singleResponse;
       }
 
       // Return paginated response
       const pagination = paginate(total, page, limit);
       metrics.duration = performance.now() - startTime;
 
-      return {
+      const response = {
         ...pagination,
         last_block: lastBlock,
         data: Array.isArray(formattedData) ? formattedData : [formattedData],
-        performance: metrics
       };
+      // Add performance metrics as additional property
+      (response as any).performance = metrics;
+      return response;
     } catch (error: any) {
       console.error("Error in fetchAndFormatSrc20DataV2:", error);
       metrics.duration = performance.now() - startTime;
-      
+
       if (error.message.includes("Stamps Down")) {
         const stampsDownError = new Error("Stamps Down...");
         (stampsDownError as any).performance = metrics;
         throw stampsDownError;
       }
-      
+
       // Add metrics to error for monitoring
       error.performance = metrics;
       throw error;
@@ -633,12 +641,12 @@ export class SRC20QueryService {
         // Fetch market data and mint progress in parallel
         const [marketData, mintProgress] = await Promise.all([
           options.includeMarketData
-            ? (options.prefetchedMarketData && options.prefetchedMarketData.length > 0) 
-              ? options.prefetchedMarketData 
+            ? (options.prefetchedMarketData && options.prefetchedMarketData.length > 0)
+              ? options.prefetchedMarketData
               : (console.log("No prefetched market data available, fetching from external API"), await SRC20MarketService.fetchMarketListingSummary())
             : null,
           options.enrichWithProgress
-            ? Promise.all(ticks.map(tick => 
+            ? Promise.all(ticks.map(tick =>
                 this.fetchSrc20MintProgress(tick).catch(() => null)
               ))
             : null

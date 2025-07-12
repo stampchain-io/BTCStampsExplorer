@@ -1,6 +1,11 @@
 // At the very top of the file, before any imports
 (globalThis as any).SKIP_REDIS_CONNECTION = true;
 
+// Declare global mock data for testing
+declare global {
+  var mockTxData: any;
+}
+
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import * as msgpack from "msgpack";

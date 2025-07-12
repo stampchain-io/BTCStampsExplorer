@@ -1,38 +1,27 @@
-import { StampService } from "$server/services/stampService.ts";
-import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
-import { HolderRow, SUBPROTOCOLS } from "$globals";
-import { CollectionService } from "$server/services/collectionService.ts";
-import { BlockService } from "$server/services/blockService.ts";
-import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import {
-  PaginatedStampBalanceResponseBody,
-  ProcessedHolder,
-  StampRow,
-  StampBalance,
-  STAMP_FILTER_TYPES,
-  STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES,
-  STAMP_FILETYPES,
-  STAMP_EDITIONS,
-  STAMP_MARKETPLACE,
-  STAMP_RANGES,
-  STAMP_FILESIZES,
+    HolderRow, PaginatedStampBalanceResponseBody,
+    ProcessedHolder, STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
+    STAMP_RANGES, STAMP_SUFFIX_FILTERS,
+    STAMP_TYPES, StampBalance, StampRow, SUBPROTOCOLS
 } from "$globals";
+import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
+import { BlockService } from "$server/services/blockService.ts";
+import { CollectionService } from "$server/services/collectionService.ts";
+import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
+import { StampService } from "$server/services/stampService.ts";
 import { CollectionController } from "./collectionController.ts";
 // import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts"; // Fixed: Removed unused import
-import { logger } from "$lib/utils/logger.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { StampRepository } from "$server/database/stampRepository.ts";
-import { isCpid } from "$lib/utils/identifierUtils.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { detectContentType } from "$lib/utils/imageUtils.ts";
-import { getMimeType } from "$lib/utils/imageUtils.ts";
-import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
-import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 import { decodeBase64 } from "$lib/utils/formatUtils.ts";
+import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
+import { isCpid } from "$lib/utils/identifierUtils.ts";
+import { detectContentType, getMimeType } from "$lib/utils/imageUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { API_RESPONSE_VERSION, ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { StampRepository } from "$server/database/stampRepository.ts";
+import { RouteType } from "$server/services/cacheService.ts";
+import { XcpManager } from "$server/services/xcpService.ts";
 
 export class StampController {
   static async getStamps({
@@ -89,6 +78,7 @@ export class StampController {
     minDataQualityScore,
     maxCacheAgeMinutes,
     priceSource,
+    collectionStampLimit,
   }: {
     page?: number;
     limit?: number;
@@ -108,7 +98,7 @@ export class StampController {
     includeSecondary?: boolean;
     sortColumn?: string;
     groupBy?: string;
-    groupBySubquery?: string;
+    groupBySubquery?: string | boolean;
     cacheType?: RouteType;
     filterBy?: STAMP_FILTER_TYPES[];
     fileType?: STAMP_FILETYPES[];
@@ -143,6 +133,7 @@ export class StampController {
     minDataQualityScore?: string;
     maxCacheAgeMinutes?: string;
     priceSource?: string;
+    collectionStampLimit?: number;
   } = {}) {
     console.log("stamp controller payload", {
       page,
@@ -292,49 +283,50 @@ export class StampController {
       suffix: suffix as STAMP_SUFFIX_FILTERS[],
       allColumns,
       includeSecondary: shouldIncludeSecondary,
-      collectionId,
-      identifier,
-      blockIdentifier,
-      cacheDuration: cacheDuration || undefined,
+      ...(collectionId !== undefined ? { collectionId } : {}),
+      ...(identifier !== undefined ? { identifier } : {}),
+      ...(blockIdentifier !== undefined ? { blockIdentifier } : {}),
+      ...(cacheDuration !== undefined ? { cacheDuration } : {}),
       noPagination,
       sortColumn,
-      groupBy,
+      ...(groupBy !== undefined ? { groupBy } : {}),
       groupBySubquery: groupBySubqueryParam,
       skipTotalCount,
       cacheType,
       filterBy: filterByArray,
-      fileType,
-      editions,
-      range: customRange,
-      rangeMin,
-      rangeMax,
-      market,
-      dispensers: dispensersParam,
-      atomics: atomicsParam,
-      listings,
-      listingsMin,
-      listingsMax,
-      sales,
-      salesMin,
-      salesMax,
-      volume,
-      volumeMin,
-      volumeMax,
-      fileSize,
-      fileSizeMin,
-      fileSizeMax,
+      ...(fileType !== undefined ? { fileType } : {}),
+      ...(editions !== undefined ? { editions } : {}),
+      ...(customRange !== undefined ? { range: customRange } : {}),
+      ...(rangeMin !== undefined ? { rangeMin } : {}),
+      ...(rangeMax !== undefined ? { rangeMax } : {}),
+      ...(market !== undefined ? { market } : {}),
+      ...(dispensersParam !== undefined ? { dispensers: dispensersParam } : {}),
+      ...(atomicsParam !== undefined ? { atomics: atomicsParam } : {}),
+      ...(listings !== undefined ? { listings } : {}),
+      ...(listingsMin !== undefined ? { listingsMin } : {}),
+      ...(listingsMax !== undefined ? { listingsMax } : {}),
+      ...(sales !== undefined ? { sales } : {}),
+      ...(salesMin !== undefined ? { salesMin } : {}),
+      ...(salesMax !== undefined ? { salesMax } : {}),
+      ...(volume !== undefined ? { volume } : {}),
+      ...(volumeMin !== undefined ? { volumeMin } : {}),
+      ...(volumeMax !== undefined ? { volumeMax } : {}),
+      ...(fileSize !== undefined ? { fileSize } : {}),
+      ...(fileSizeMin !== undefined ? { fileSizeMin } : {}),
+      ...(fileSizeMax !== undefined ? { fileSizeMax } : {}),
       // Market Data Filters (Task 42)
-      minHolderCount,
-      maxHolderCount,
-      minDistributionScore,
-      maxTopHolderPercentage,
-      minFloorPriceBTC,
-      maxFloorPriceBTC,
-      minVolume24h,
-      minPriceChange24h,
-      minDataQualityScore,
-      maxCacheAgeMinutes,
-      priceSource,
+      ...(minHolderCount !== undefined ? { minHolderCount } : {}),
+      ...(maxHolderCount !== undefined ? { maxHolderCount } : {}),
+      ...(minDistributionScore !== undefined ? { minDistributionScore } : {}),
+      ...(maxTopHolderPercentage !== undefined ? { maxTopHolderPercentage } : {}),
+      ...(minFloorPriceBTC !== undefined ? { minFloorPriceBTC } : {}),
+      ...(maxFloorPriceBTC !== undefined ? { maxFloorPriceBTC } : {}),
+      ...(minVolume24h !== undefined ? { minVolume24h } : {}),
+      ...(minPriceChange24h !== undefined ? { minPriceChange24h } : {}),
+      ...(minDataQualityScore !== undefined ? { minDataQualityScore } : {}),
+      ...(maxCacheAgeMinutes !== undefined ? { maxCacheAgeMinutes } : {}),
+      ...(priceSource !== undefined ? { priceSource } : {}),
+      ...(collectionStampLimit !== undefined ? { collectionStampLimit } : {}),
       includeMarketData: Boolean(useMarketData),
       btcPriceUSD: btcPrice
     });
@@ -657,8 +649,8 @@ export class StampController {
           page: 1,
           limit: 24,
           sortBy: sortBy,
-          includeMarketData: true, // Use cached market data
-          btcPriceUSD: btcPrice
+          // includeMarketData: true, // Use cached market data
+          // btcPriceUSD: btcPrice
         });
         stamps_posh = poshStampsResult.data;
       } else {
@@ -791,12 +783,12 @@ export class StampController {
 
       return WebResponseUtil.stampResponse(decodedContent, contentInfo.mimeType, {
         binary: false,
-        headers: normalizeHeaders({
-          "CF-No-Transform": contentInfo.mimeType.includes('javascript') || 
-                            contentInfo.mimeType.includes('text/html'),
+        headers: {
+          "CF-No-Transform": String(contentInfo.mimeType.includes('javascript') || 
+                            contentInfo.mimeType.includes('text/html')),
           "X-API-Version": API_RESPONSE_VERSION,
-          ...(result.headers || {}),
-        })
+          ...(result.headers ? Object.fromEntries(result.headers) : {}),
+        }
       });
     } catch (error) {
       logger.error("content", {
@@ -813,7 +805,7 @@ export class StampController {
       binary: true,
       headers: Object.fromEntries(normalizeHeaders({
         "X-API-Version": API_RESPONSE_VERSION,
-        ...(result.headers || {}),
+        ...(result.headers ? Object.fromEntries(result.headers) : {}),
       }))
     });
   }
@@ -1008,7 +1000,7 @@ export class StampController {
   ) {
     try {
       const cpid = await this.resolveToCpid(id);
-      const { dispensers, total } = await StampService.getStampDispensers(cpid, { cacheType });
+      const { dispensers, total } = await StampService.getStampDispensers(cpid, 1, 50, { cacheType });
       return {
         data: dispensers,
         total
@@ -1099,9 +1091,9 @@ export class StampController {
       // Calculate values using cached market data
       stamps.forEach((walletStamp: any) => {
         const stampData = stampsByCpid.get(walletStamp.cpid);
-        if (stampData && stampData.marketData) {
-          const unitPrice = stampData.marketData.floorPriceBTC || 
-                           stampData.marketData.recentSalePriceBTC || 
+        if (stampData && (stampData as any).marketData) {
+          const unitPrice = (stampData as any).marketData.floorPriceBTC || 
+                           (stampData as any).marketData.recentSalePriceBTC || 
                            0;
           const totalStampValue = unitPrice * walletStamp.balance;
           stampValues[walletStamp.cpid] = totalStampValue;
@@ -1113,7 +1105,7 @@ export class StampController {
 
       return { stampValues, totalValue };
     } catch (error) {
-      logger.error("calculateWalletStampValues", {
+      logger.error("stamps", {
         message: "Error calculating wallet stamp values",
         error: error instanceof Error ? error.message : String(error)
       });

@@ -10,6 +10,7 @@ export interface IPrepareSRC101TX {
   feeRate: number;
   transferString: string;
   recVault?: number;
+  enableRBF?: boolean;
 }
 
 export interface IMintSRC101 extends Omit<IPrepareSRC101TX, "transferString"> {

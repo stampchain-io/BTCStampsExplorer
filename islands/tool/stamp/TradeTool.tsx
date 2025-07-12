@@ -200,7 +200,7 @@ export function StampTradeTool() {
       const { cpid, quantity, feeRateVB, utxo } = attachFormState;
 
       // Validate required inputs first
-      if (!cpid || !quantity || !feeRateVB || !utxo) {
+      if (!cpid || !quantity || !feeRateVB || !utxo || !address) {
         setApiError("Please fill in all fields with valid values.");
         setIsSubmitting(false);
         return;
@@ -457,6 +457,11 @@ export function StampTradeTool() {
   const handleQueryAssets = useCallback(async () => {
     if (!isConnected) {
       showConnectModal();
+      return;
+    }
+
+    if (!address) {
+      setApiError("No wallet address available");
       return;
     }
 
@@ -750,9 +755,7 @@ export function StampTradeTool() {
         </div>
 
         <StatusMessages
-          submissionMessage={submissionMessage
-            ? { message: submissionMessage }
-            : null}
+          submissionMessage={submissionMessage ? submissionMessage : null}
           apiError={apiError}
           walletError={null}
         />

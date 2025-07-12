@@ -38,9 +38,9 @@ describe("StampRepository Tests with Fixtures", () => {
         mockDb,
         "executeQueryWithCache",
         (
-          _query: string,
-          _params: unknown[],
-          _cacheDuration: number | "never",
+          _query: unknown,
+          _params: unknown,
+          _cacheDuration: unknown,
         ) => {
           // Map fixture data to match expected structure
           const mappedRows = stampFixtures.regularStamps.slice(0, 5).map(
@@ -81,9 +81,9 @@ describe("StampRepository Tests with Fixtures", () => {
         mockDb,
         "executeQueryWithCache",
         (
-          _query: string,
-          _params: unknown[],
-          _cacheDuration: number | "never",
+          _query: unknown,
+          _params: unknown,
+          _cacheDuration: unknown,
         ) => {
           const mappedRows = stampFixtures.regularStamps.map((stamp) => ({
             ...stamp,
@@ -114,9 +114,9 @@ describe("StampRepository Tests with Fixtures", () => {
         mockDb,
         "executeQueryWithCache",
         (
-          _query: string,
-          _params: unknown[],
-          _cacheDuration: number | "never",
+          _query: unknown,
+          _params: unknown,
+          _cacheDuration: unknown,
         ) => {
           const mappedRows = stampFixtures.cursedStamps.map((stamp) => ({
             ...stamp,
@@ -147,9 +147,9 @@ describe("StampRepository Tests with Fixtures", () => {
         mockDb,
         "executeQueryWithCache",
         (
-          _query: string,
-          _params: unknown[],
-          _cacheDuration: number | "never",
+          _query: unknown,
+          _params: unknown,
+          _cacheDuration: unknown,
         ) => Promise.resolve({ rows: [], rowCount: 0 }),
       );
 
@@ -169,9 +169,9 @@ describe("StampRepository Tests with Fixtures", () => {
         mockDb,
         "executeQueryWithCache",
         (
-          _query: string,
-          _params: unknown[],
-          _cacheDuration: number | "never",
+          _query: unknown,
+          _params: unknown,
+          _cacheDuration: unknown,
         ) => Promise.reject(new Error("Database connection failed")),
       );
 
@@ -192,7 +192,7 @@ describe("StampRepository Tests with Fixtures", () => {
       executeQueryStub = stub(
         mockDb,
         "executeQuery",
-        (_query: string, _params: unknown[]) =>
+        (_query: unknown, _params: unknown) =>
           Promise.resolve({ affectedRows: 1, rows: [], rowCount: 1 }),
       );
 
@@ -207,7 +207,7 @@ describe("StampRepository Tests with Fixtures", () => {
       executeQueryStub = stub(
         mockDb,
         "executeQuery",
-        (_query: string, _params: unknown[]) =>
+        (_query: unknown, _params: unknown) =>
           Promise.reject(new Error("Update failed")),
       );
 

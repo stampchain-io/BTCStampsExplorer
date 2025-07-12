@@ -36,7 +36,7 @@ function StampSteps() {
     <StepList hasImportantNotes={STAMP_IMPORTANT_NOTES?.length > 0}>
       {STAMP_STEPS.map((step) => (
         <List
-          key={step.number}
+          key={(step as any).number}
           title={step.title}
           image={step.image}
           description={step.description}

@@ -18,7 +18,7 @@ export class Src101Controller{
         SRC101Service.QueryService.getSrc101TXFromSRC101Table(params),
         SRC101Service.QueryService.getTotalSrc101TXFromSRC101TableCount(params),
       ]);
-      const limit = params.limit;
+      const limit = params.limit || 50;
       const page = params.page;
       const restructuredResult: any = {
         last_block: lastBlock,
@@ -47,7 +47,7 @@ export class Src101Controller{
         SRC101Service.QueryService.getValidSrc101Tx(params),
         SRC101Service.QueryService.getTotalValidSrc101TxCount(params),
       ]);
-      const limit = params.limit;
+      const limit = params.limit || 50;
       const page = params.page;
       const restructuredResult: any = {
         last_block: lastBlock,
@@ -125,7 +125,7 @@ export class Src101Controller{
         SRC101Service.QueryService.getSrc101BalanceTotalCount(params),
       ]);
   
-      const limit = params.limit;
+      const limit = params.limit || 50;
       const page = params.page;
       const restructuredResult: any = {
         last_block: lastBlock,
@@ -142,7 +142,7 @@ export class Src101Controller{
       // Return an empty response instead of throwing an error
       return {
         last_block: await BlockService.getLastBlock(),
-        data: params.deploy_hash && params.tokenid && params.index ? {} : [],
+        data: (params as any).deploy_hash && (params as any).tokenid && (params as any).index ? {} : [],
       };
     }
   }
@@ -157,7 +157,7 @@ export class Src101Controller{
         SRC101Service.QueryService.getSrc101OwnerCount(params),
       ]);
   
-      const limit = params.limit;
+      const limit = params.limit || 50;
       const page = params.page;
       const restructuredResult: any = {
         last_block: lastBlock,
@@ -174,7 +174,7 @@ export class Src101Controller{
       // Return an empty response instead of throwing an error
       return {
         last_block: await BlockService.getLastBlock(),
-        data: params.deploy_hash && params.tokenid && params.index ? {} : [],
+        data: (params as any).deploy_hash && (params as any).tokenid && (params as any).index ? {} : [],
       };
     }
   }
@@ -215,7 +215,7 @@ export class Src101Controller{
       // Return an empty response instead of throwing an error
       return {
         last_block: await BlockService.getLastBlock(),
-        data: params.deploy_hash && params.address_btc ? {} : [],
+        data: (params as any).deploy_hash && (params as any).address_btc ? {} : [],
       };
     }
   }

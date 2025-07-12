@@ -197,7 +197,13 @@ export default function SalesActivityFeed({
                   title="View transaction"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Icon name="external-link" size="xs" />
+                  <Icon
+                    name="external-link"
+                    size="xs"
+                    type="icon"
+                    weight="normal"
+                    color="custom"
+                  />
                 </a>
                 {!compact && (
                   <button
@@ -209,7 +215,13 @@ export default function SalesActivityFeed({
                       handleItemClick(sale);
                     }}
                   >
-                    <Icon name="eye" size="xs" />
+                    <Icon
+                      name="eye"
+                      size="xs"
+                      type="icon"
+                      weight="normal"
+                      color="custom"
+                    />
                   </button>
                 )}
               </div>
@@ -251,6 +263,9 @@ export default function SalesActivityFeed({
               <Icon
                 name={refreshLoading ? "loading" : "refresh"}
                 size="sm"
+                type="icon"
+                weight="normal"
+                color="custom"
                 className={refreshLoading ? "animate-spin" : ""}
               />
             </button>

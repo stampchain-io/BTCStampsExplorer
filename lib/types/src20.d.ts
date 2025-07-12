@@ -113,6 +113,11 @@ export interface SRC20TickPageData {
   mint_status: SRC20MintStatus;
   total_transactions: number;
   marketInfo?: MarketListingAggregated;
+  initialCounts?: {
+    totalMints: number;
+    totalTransfers: number;
+  };
+  highcharts?: any[];
 }
 
 export interface SRC20BalanceRequestParams {

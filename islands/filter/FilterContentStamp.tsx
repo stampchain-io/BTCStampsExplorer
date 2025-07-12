@@ -39,6 +39,18 @@ const defaultFilters: StampFilters = {
   range: null,
   rangeMin: "",
   rangeMax: "",
+  // Market Data Filters
+  minHolderCount: "",
+  maxHolderCount: "",
+  minDistributionScore: "",
+  maxTopHolderPercentage: "",
+  minFloorPriceBTC: "",
+  maxFloorPriceBTC: "",
+  minVolume24h: "",
+  minPriceChange24h: "",
+  minDataQualityScore: "",
+  maxCacheAgeMinutes: "",
+  priceSource: "",
 };
 
 export function filtersToQueryParams(search: string, filters: StampFilters) {

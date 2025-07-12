@@ -2,14 +2,14 @@ import { Handlers } from "$fresh/server.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
-export const collectionHandler: Handlers = {
+const collectionHandler: Handlers = {
   async GET(req: Request, _ctx) {
     try {
       const url = new URL(req.url);
       const collectionName = url.searchParams.get("name");
 
       if (!collectionName) {
-        return ResponseUtil.badRequest("Collection name is required", 400);
+        return ResponseUtil.badRequest("Collection name is required");
       }
 
       const collection = await CollectionService.getCollectionByName(
@@ -26,3 +26,5 @@ export const collectionHandler: Handlers = {
     }
   },
 };
+
+export const handler = collectionHandler;

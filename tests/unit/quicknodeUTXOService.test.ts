@@ -80,34 +80,34 @@ class MockCachedQuicknodeRPCService {
     this.failureCount = 0;
   }
 
-  static executeRPC<T>(
+  static executeRPC(
     method: string,
     params: any[],
     _cacheDuration?: number,
-  ): Promise<any> {
+  ): Promise<{ result?: any; error?: string }> {
     if (this.shouldFail && this.failureCount < this.maxFailures) {
       this.failureCount++;
-      return { error: "RPC call failed" };
+      return Promise.resolve({ error: "RPC call failed" });
     }
 
     const key = `${method}:${JSON.stringify(params)}`;
     const response = this.mockResponses.get(key);
 
     if (response) {
-      return { result: response };
+      return Promise.resolve({ result: response });
     }
 
     // Default responses based on method
     if (method === "bb_getUTXO") {
-      return { error: "UTXO not found" };
+      return Promise.resolve({ error: "UTXO not found" });
     }
     if (method === "getrawtransaction") {
-      return { error: "Transaction not found" };
+      return Promise.resolve({ error: "Transaction not found" });
     }
     if (method === "bb_getUTXOs") {
-      return { result: [] };
+      return Promise.resolve({ result: [] });
     }
-    return { error: `Unmocked method: ${method}` };
+    return Promise.resolve({ error: `Unmocked method: ${method}` });
   }
 }
 
@@ -756,4 +756,3 @@ describe("QuicknodeUTXOService", () => {
     });
   });
 });
-

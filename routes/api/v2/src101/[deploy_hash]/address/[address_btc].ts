@@ -46,7 +46,7 @@ export const handler: Handlers<AddressHandlerContext> = {
         prim: url.searchParams.get("prim") === "true",
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
-        sort: sortValidation.data,
+        ...(sortValidation.data && { sort: sortValidation.data }),
       };
 
       const result = await Src101Controller.handleSrc101TokenidsRequest(

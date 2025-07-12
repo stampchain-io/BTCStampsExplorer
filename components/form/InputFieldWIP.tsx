@@ -15,14 +15,14 @@ export interface InputFieldProps {
   placeholder: string;
   value: string;
   onChange: (e: Event) => void;
-  onBlur?: () => void;
+  onBlur?: (() => void) | undefined;
   error?: string;
   maxLength?: number;
   isUppercase?: boolean;
   inputMode?: "numeric" | "text" | "email";
   pattern?: string;
-  onFocus?: () => void;
-  ref?: Ref<HTMLInputElement>;
+  onFocus?: (() => void) | undefined;
+  ref?: Ref<HTMLInputElement> | undefined;
   "data-amount-input"?: boolean;
   [key: string]: any;
 }
@@ -43,21 +43,26 @@ export function InputFieldWIP({
   ref,
   ...props
 }: InputFieldProps) {
+  const inputClass = `${inputField} ${isUppercase ? "uppercase" : ""}`;
+  const dataAmountInput = props["data-amount-input"];
+  const { "data-amount-input": _, ...restProps } = props;
+
   return (
     <div class="w-full">
       <input
+        {...(dataAmountInput && { "data-amount-input": dataAmountInput })}
         type={type}
-        class={`${inputField} ${isUppercase ? "uppercase" : ""}`}
+        class={inputClass}
         placeholder={placeholder}
         value={value}
         onInput={onChange}
-        onBlur={onBlur}
-        onFocus={onFocus}
-        maxLength={maxLength}
-        inputMode={inputMode}
-        pattern={pattern}
-        ref={ref}
-        {...props}
+        {...(onBlur && { onBlur })}
+        {...(onFocus && { onFocus })}
+        {...(maxLength && { maxLength })}
+        {...(inputMode && { inputMode })}
+        {...(pattern && { pattern })}
+        {...(ref && { ref })}
+        {...restProps}
       />
       {error && <div class="text-red-500 text-xs mt-1">{error}</div>}
     </div>
