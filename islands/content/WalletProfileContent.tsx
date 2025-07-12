@@ -554,9 +554,10 @@ export default function WalletProfileContent({
           {src20.data?.length
             ? (
               <SRC20Gallery
-                type="all"
+                viewType="minted"
                 fromPage="wallet"
                 initialData={src20.data}
+                timeframe="24H"
                 pagination={{
                   page: src20.pagination.page,
                   totalPages: src20.pagination.totalPages,
@@ -569,7 +570,6 @@ export default function WalletProfileContent({
                   },
                 }}
                 address={address}
-                sortBy={sortTokens}
               />
             )
             : (

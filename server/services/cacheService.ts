@@ -28,6 +28,7 @@ export interface CacheConfig {
   duration: number;              // Cache duration in seconds
   staleWhileRevalidate: number;  // Allow serving stale content while fetching fresh
   staleIfError: number;          // Use stale content if backend errors
+  ttl?: number;                  // Time to live in seconds (alternative to duration)
 }
 
 export function getCacheConfig(routeType: RouteType): CacheConfig {

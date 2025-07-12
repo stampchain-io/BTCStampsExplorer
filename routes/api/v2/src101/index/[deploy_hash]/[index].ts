@@ -12,8 +12,8 @@ export const handler: Handlers<AddressHandlerContext> = {
 
       const queryParams = {
         deploy_hash,
-        tokenid: null,
-        index: index,
+        tokenid: "",
+        index: Number(index),
         limit: Number(params.get("limit")) || 1000,
         page: Number(params.get("page")) || 1,
         sort: params.get("sort") || "ASC",

@@ -256,7 +256,7 @@ export class QuickNodeFeeProvider extends HttpFeeProvider {
   }
 
   // Override isAvailable to use quicknodeService
-  async isAvailable(): Promise<boolean> {
+  override async isAvailable(): Promise<boolean> {
     try {
       await this.quicknodeService.estimateSmartFee(6, "economical");
       return true;

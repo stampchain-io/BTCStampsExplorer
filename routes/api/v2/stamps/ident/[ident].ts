@@ -49,7 +49,8 @@ export const handler: Handlers<IdentHandlerContext> = {
       const result = await StampController.getStamps({
         page: page || DEFAULT_PAGINATION.page,
         limit: limit || DEFAULT_PAGINATION.limit,
-        sortBy: sortValidation.data,
+        ...(sortValidation.data &&
+          { sortBy: sortValidation.data as "ASC" | "DESC" }),
         type: "stamps",
         ident: [ident.toUpperCase() as SUBPROTOCOLS],
       });
@@ -61,13 +62,12 @@ export const handler: Handlers<IdentHandlerContext> = {
       }
 
       const body: PaginatedIdResponseBody = {
-        page: result.page || DEFAULT_PAGINATION.page,
-        limit: result.page_size || DEFAULT_PAGINATION.limit,
-        totalPages: result.pages,
-        total: result.total,
+        page: (result as any).page || DEFAULT_PAGINATION.page,
+        limit: (result as any).page_size || DEFAULT_PAGINATION.limit,
+        totalPages: (result as any).pages,
         last_block: result.last_block,
         ident: ident.toUpperCase() as SUBPROTOCOLS,
-        stamps: result.stamps,
+        data: (result as any).stamps,
       };
 
       return ResponseUtil.success(body);

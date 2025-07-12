@@ -22,12 +22,12 @@ export class BlockService {
       }),
     ]);
 
-    if (!block_info || !block_info.rows || block_info.rows.length === 0) {
+    if (!block_info || !(block_info as any).rows || (block_info as any).rows.length === 0) {
       throw new Error(`Block: ${blockIdentifier} not found`);
     }
 
     const blockData = {
-      ...block_info.rows[0],
+      ...(block_info as any).rows[0],
       tx_count: data.stamps.length,
     };
 
@@ -46,7 +46,7 @@ export class BlockService {
       block_info: stampBlockResponse.block_info,
       data: stampBlockResponse.data,
       sends: [], // Assuming sends is always an empty array as per the original function
-    };
+    } as any;
   }
 
   static async getRelatedBlocksWithStamps(blockIdentifier: number | string) {
@@ -63,10 +63,10 @@ export class BlockService {
 
   static async getLastBlock(): Promise<number> {
     const last_block = await BlockRepository.getLastBlockFromDb();
-    if (!last_block || !last_block.rows || last_block.rows.length === 0) {
+    if (!last_block || !(last_block as any).rows || (last_block as any).rows.length === 0) {
       throw new Error("Could not get last block");
     }
 
-    return last_block.rows[0].last_block;
+    return (last_block as any).rows[0].last_block;
   }
 }

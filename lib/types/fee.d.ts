@@ -18,18 +18,25 @@ export interface BaseFeeCalculatorProps {
 
 export interface SimpleFeeCalculatorProps
   extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
-  type: "send" | "transfer" | "buy";
+  type: "send" | "transfer" | "buy" | "src101";
   amount?: number;
   recipientAddress?: string;
   userAddress?: string;
   inputType?: ScriptType;
   outputTypes?: ScriptType[];
   utxoAncestors?: AncestorInfo[];
+  isModal?: boolean;
 }
 
 export interface AdvancedFeeCalculatorProps
   extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
-  type: "stamp" | "src20" | "fairmint" | "transfer" | "src20-transfer";
+  type:
+    | "stamp"
+    | "src20"
+    | "fairmint"
+    | "transfer"
+    | "src20-transfer"
+    | "src101";
   fileType?: string;
   fileSize?: number;
   issuance?: number;
@@ -41,4 +48,6 @@ export interface AdvancedFeeCalculatorProps
   feeDetails?: FeeDetails;
   onRefresh?: () => void;
   disabled?: boolean;
+  fromPage?: string;
+  bitname?: string;
 }

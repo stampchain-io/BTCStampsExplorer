@@ -53,7 +53,7 @@ export async function validateCSRFToken(token: string): Promise<boolean> {
       ["sign", "verify"],
     );
     const { payload } = await verify(token, key);
-    const exp = payload.exp as number;
+    const exp = (payload as { exp: number }).exp;
     if (Date.now() / 1000 > exp) {
       return false;
     }

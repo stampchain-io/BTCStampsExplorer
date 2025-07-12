@@ -30,7 +30,6 @@ export const handler: Handlers<AddressHandlerContext> = {
       if (xssPattern.test(address)) {
         return ResponseUtil.badRequest(
           "Invalid input detected",
-          undefined,
           { routeType: RouteType.BALANCE },
         );
       }
@@ -39,7 +38,6 @@ export const handler: Handlers<AddressHandlerContext> = {
       if (!isValidBitcoinAddress(address)) {
         return ResponseUtil.badRequest(
           `Invalid Bitcoin address format: ${address}`,
-          undefined,
           { routeType: RouteType.BALANCE },
         );
       }
@@ -74,7 +72,8 @@ export const handler: Handlers<AddressHandlerContext> = {
       }
 
       // Calculate combined totals
-      const totalItems = (stamps.total || 0) + (src20.total || 0);
+      const totalItems = ((stamps as any).total || 0) +
+        ((src20 as any).total || 0);
       const totalPages = Math.ceil(totalItems / limit);
 
       // Format response to match old schema

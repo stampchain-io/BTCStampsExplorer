@@ -190,7 +190,7 @@ function formatAddress(address: string): JSX.Element[] {
         ? <br key={`break-${index}`} />
         : <span key={`space-${index}`}>&nbsp;</span>
     ),
-  ]).flat();
+  ]).flat().filter(Boolean) as JSX.Element[];
 }
 
 export default RecieveAddyModal;

@@ -51,7 +51,7 @@ export class BlockController {
     blockIdentifier: number | string,
     type: "stamps" | "cursed" | "all" = "all",
   ) {
-    if (!isIntOr32ByteHex(blockIdentifier)) {
+    if (!isIntOr32ByteHex(blockIdentifier as string)) {
       throw new Error(
         `Invalid input: ${blockIdentifier}. It must be a valid block index (integer) or block hash (64 character string).`,
       );
@@ -65,7 +65,7 @@ export class BlockController {
     blockIdentifier: number | string,
     type: "stamps" | "cursed",
   ) {
-    if (!isIntOr32ByteHex(blockIdentifier)) {
+    if (!isIntOr32ByteHex(blockIdentifier as string)) {
       throw new Error(
         "Invalid argument provided. Must be an integer or 32 byte hex string.",
       );

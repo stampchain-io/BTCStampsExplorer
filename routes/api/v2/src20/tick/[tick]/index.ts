@@ -54,8 +54,8 @@ export const handler: Handlers = {
         tick: decodedTick,
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
-        op: opParam,
-        sortBy: sortValidation.data,
+        ...(opParam && { op: opParam }),
+        ...(sortValidation.data && { sortBy: sortValidation.data }),
       };
 
       // Fetch data using controller
@@ -73,6 +73,27 @@ export const handler: Handlers = {
         amt: tx.amt ? new BigFloat(tx.amt).toString() : null,
       }));
 
+      // Handle mint_status conversion
+      const formattedMintStatus = mint_status
+        ? {
+          max_supply: mint_status.max_supply?.toString() ?? "0",
+          total_minted: mint_status.total_minted?.toString() ?? "0",
+          total_mints: mint_status.total_mints ?? 0,
+          progress: mint_status.progress ?? "0",
+          decimals: mint_status.decimals ?? 0,
+          limit: typeof mint_status.limit === "string"
+            ? parseInt(mint_status.limit) || null
+            : (mint_status.limit ?? null),
+        }
+        : {
+          max_supply: "0",
+          total_minted: "0",
+          total_mints: 0,
+          progress: "0",
+          decimals: 0,
+          limit: 0,
+        };
+
       // Construct response body
       const body: PaginatedTickResponseBody = {
         page: page || DEFAULT_PAGINATION.page,
@@ -80,14 +101,7 @@ export const handler: Handlers = {
         total,
         totalPages,
         last_block: lastBlock,
-        mint_status: mint_status
-          ? {
-            ...mint_status,
-            max_supply: mint_status.max_supply?.toString() ?? null,
-            total_minted: mint_status.total_minted?.toString() ?? null,
-            limit: mint_status.limit ?? null,
-          }
-          : null,
+        mint_status: formattedMintStatus,
         data,
       };
 

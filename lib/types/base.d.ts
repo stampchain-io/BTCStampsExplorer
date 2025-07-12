@@ -160,6 +160,7 @@ export interface AdvancedFeeCalculatorProps extends BaseFeeCalculatorProps {
   disabled?: boolean;
   inputType?: string;
   bitname?: string;
+  fromPage?: string;
 }
 
 interface PSBTFees extends FeeDetails {

@@ -1,6 +1,7 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Deployment, MintStatus } from "$types/index.d.ts";
+import { Deployment } from "$types/index.d.ts";
+import type { SRC20MintStatus } from "$types/src20.d.ts";
 import {
   abbreviateAddress,
   formatDate,
@@ -21,7 +22,7 @@ export interface SRC20DetailHeaderProps {
     tg?: string;
     x?: string;
   };
-  _mintStatus: MintStatus;
+  _mintStatus: SRC20MintStatus;
   _totalMints: number;
   _totalTransfers: number;
   marketInfo?: MarketListingAggregated;

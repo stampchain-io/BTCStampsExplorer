@@ -52,12 +52,12 @@ export class SRC20UtilityService {
 
       const balanceData = await SRC20QueryService.fetchSrc20Balance(params);
 
-      if (!balanceData || !balanceData.amt) {
+      if (!balanceData || !(balanceData as any).amt) {
         console.error("No SRC-20 token balance found");
         throw new Error("No SRC-20 token balance found");
       }
 
-      if (new BigFloat(amount).gt(balanceData.amt)) {
+      if (new BigFloat(amount).gt((balanceData as any).amt)) {
         throw new Error("Error: Not enough SRC-20 token balance");
       }
 

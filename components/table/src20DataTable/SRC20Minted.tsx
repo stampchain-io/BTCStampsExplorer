@@ -155,7 +155,7 @@ export function SRC20MintedTable({
                     <td class={cellAlign(7, headers.length)}>
                       <ChartWidget
                         fromPage="home"
-                        data={src20.chart}
+                        data={src20.chart as [number, number][] || []}
                         tick={src20.tick}
                       />
                     </td>

@@ -61,10 +61,10 @@ export const handler: Handlers = {
         hasFileData: !!body.fileData,
         fileDataLength: body.fileData?.length,
         hasTick: !!body.tick,
-        hasCSRF: !!body.csrfToken,
+        hasCSRF: !!(body as any).csrfToken,
         tickLength: body.tick?.length,
         tick: body.tick,
-        csrfPresent: !!body.csrfToken,
+        csrfPresent: !!(body as any).csrfToken,
       });
 
       if (!body.fileData || !body.tick) {

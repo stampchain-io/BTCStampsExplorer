@@ -4,6 +4,7 @@ import { logger } from "$lib/utils/logger.ts";
 
 interface CSRFPayload {
   exp: number;
+  [key: string]: unknown;
 }
 
 export class SecurityService {

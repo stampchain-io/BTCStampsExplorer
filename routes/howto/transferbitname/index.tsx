@@ -34,9 +34,9 @@ function IntroSection() {
 function TransferSteps() {
   return (
     <StepList hasImportantNotes={TRANSFER_BITNAME_IMPORTANT_NOTES?.length > 0}>
-      {TRANSFER_BITNAME_STEPS.map((step) => (
+      {TRANSFER_BITNAME_STEPS.map((step, index) => (
         <List
-          key={step.number}
+          key={index}
           title={step.title}
           image={step.image}
           description={step.description}

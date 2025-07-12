@@ -329,11 +329,11 @@ export class CollectionRepository {
     );
 
     // Transform the results to include market data in the expected format
-    if (includeMarketData && result.rows) {
+    if (includeMarketData && (result as any).rows) {
       // Import parseBTCDecimal at the top of the file
       const { parseBTCDecimal } = await import("$lib/utils/marketData.ts");
       
-      result.rows = result.rows.map((row: any) => {
+      (result as any).rows = (result as any).rows.map((row: any) => {
         const marketData = row.minFloorPriceBTC !== undefined ? {
           minFloorPriceBTC: parseBTCDecimal(row.minFloorPriceBTC),
           maxFloorPriceBTC: parseBTCDecimal(row.maxFloorPriceBTC),

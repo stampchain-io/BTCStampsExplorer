@@ -6,13 +6,6 @@ import { textSm } from "$text";
 import { Icon } from "$icon";
 import { tooltipIcon } from "$notification";
 
-// Extend the searchState type to include results
-declare module "$islands/modal/states" {
-  interface SearchState {
-    results?: Array<{ tick: string }>;
-  }
-}
-
 export function SearchSRC20Modal({
   showButton = true,
 }: {

@@ -150,7 +150,10 @@ export const handler: Handlers = {
 
       const dispensersData = dispensersResponse.status === "fulfilled"
         ? {
-          data: dispensersResponse.value.dispensers,
+          data: dispensersResponse.value.dispensers.map((dispenser: any) => ({
+            ...dispenser,
+            dispenses: dispenser.dispenses || [], // Ensure dispenses field exists
+          })),
           total: dispensersResponse.value.total,
           page: dispensersParams.page,
           limit: dispensersParams.limit,

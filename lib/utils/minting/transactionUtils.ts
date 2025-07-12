@@ -2,6 +2,7 @@
 
 import * as bitcoin from "bitcoinjs-lib";
 import { Output } from "$types/index.d.ts";
+import { Buffer } from "node:buffer";
 
 export function arc4(key: Uint8Array, data: Uint8Array): Uint8Array {
   const S = new Uint8Array(256);
@@ -37,7 +38,7 @@ export function extractOutputs(tx: bitcoin.Transaction, address: string) {
   for (const vout of tx.outs) {
     if ("address" in vout) {
       outputs.push({
-        value: vout.value,
+        value: Number(vout.value),
         address: vout.address,
       });
     } else if ("script" in vout) {
@@ -50,14 +51,14 @@ export function extractOutputs(tx: bitcoin.Transaction, address: string) {
             address
         ) {
           outputs.push({
-            value: vout.value,
-            script: vout.script,
+            value: Number(vout.value),
+            script: Buffer.from(vout.script).toString("hex"),
           });
         }
       } catch {
         outputs.push({
-          value: vout.value,
-          script: vout.script,
+          value: Number(vout.value),
+          script: Buffer.from(vout.script).toString("hex"),
         });
       }
     }

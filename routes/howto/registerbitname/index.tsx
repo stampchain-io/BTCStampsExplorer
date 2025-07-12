@@ -32,7 +32,7 @@ function BitnameSteps() {
     <StepList hasImportantNotes={BITNAME_IMPORTANT_NOTES?.length > 0}>
       {BITNAME_STEPS.map((step) => (
         <List
-          key={step.number}
+          key={(step as any).number}
           title={step.title}
           image={step.image}
           description={step.description}

@@ -75,7 +75,11 @@ export class BTCPriceServiceDI {
       const priceData = await this.dependencies.cacheService.get(
         this.config.cacheKey,
         () => this.fetchFreshPriceData(preferredSource),
-        { ttl: this.config.cacheDuration }
+        { 
+          duration: this.config.cacheDuration,
+          staleWhileRevalidate: 300, // 5 minutes
+          staleIfError: 3600 // 1 hour
+        }
       );
 
       const duration = Date.now() - startTime;

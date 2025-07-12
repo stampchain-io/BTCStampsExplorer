@@ -8,7 +8,7 @@ interface PropTypes {
 }
 
 const SelectDate = ({ setDateRange, isUppercase = true }: PropTypes) => {
-  const calendarRef = useRef<HTMLDivElement>(null);
+  const calendarRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (calendarRef.current) {

@@ -123,7 +123,7 @@ function StampStats({
   }
 
   /* ===== COMPUTED VALUES ===== */
-  const firstDispenser = dispensers?.items?.[0];
+  const firstDispenser = (dispensers as any)?.items?.[0];
   const stampData = firstDispenser?.stamp as StampRow;
 
   if (!firstDispenser || !stampData) return null;
@@ -289,7 +289,7 @@ function DispenserStats({
   btcPrice: number;
 }) {
   const [fee, setFee] = useState(1);
-  const firstDispenser = dispensers?.items?.[0];
+  const firstDispenser = (dispensers as any)?.items?.[0];
 
   const handleOpenBuyModal = () => {
     const modalContent = (
@@ -519,7 +519,7 @@ export default function WalletDispenserDetails({
   walletData,
 }: WalletDispenserDetailsProps) {
   /* ===== COMPUTED VALUES ===== */
-  const firstDispenser = walletData.dispensers?.items?.[0];
+  const firstDispenser = (walletData.dispensers as any)?.items?.[0];
   const stampData = firstDispenser?.stamp;
 
   /* ===== RENDER ===== */

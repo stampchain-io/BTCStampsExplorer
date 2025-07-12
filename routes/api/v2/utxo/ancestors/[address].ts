@@ -13,7 +13,7 @@ export const handler: Handlers = {
       }
 
       // Use existing UTXOService with ancestor information
-      const utxos = await UTXOService.getAddressUTXOs(address, {
+      const utxos = await (UTXOService as any).getAddressUTXOs(address, {
         includeAncestors: true,
         filterStampUTXOs: true,
       });

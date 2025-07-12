@@ -45,7 +45,7 @@ export class QuicknodeService {
     method: string,
     params: any[],
     retries = 0,
-  ) {
+  ): Promise<any> {
     try {
       // Log the request without exposing sensitive information
       console.log("Fetching from QuickNode:", { 

@@ -24,8 +24,8 @@ export function SRC20CardMinting(
   return (
     <SRC20CardBase
       src20={src20}
-      fromPage={fromPage}
-      onImageClick={onImageClick}
+      {...(fromPage && { fromPage })}
+      {...(onImageClick && { onImageClick })}
       totalColumns={totalColumns}
     >
       {/* Deploy Cell */}

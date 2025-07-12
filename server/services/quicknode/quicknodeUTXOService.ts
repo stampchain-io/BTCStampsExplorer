@@ -1,10 +1,8 @@
 import { UTXO } from "$lib/types/index.d.ts";
-import { AncestorInfo } from "$lib/types/base.d.ts";
 import { CachedQuicknodeRPCService } from "$server/services/quicknode/cachedQuicknodeRpcService.ts";
 import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts"; // Import for conversion
 import { address as bjsAddress, networks as bjsNetworks } from "bitcoinjs-lib"; // For toOutputScript & network
 import { bytesToHex } from "$lib/utils/binary/baseUtils.ts"; // For logging/comparison
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts"; // Added for getScriptTypeInfo
 
 // TODO(@baba): Utilize as primary utxo fetching source from utxoService
 
@@ -39,6 +37,9 @@ interface QuickNodeTxSpecific {
   fee?: number; // Fee in satoshis
   fee_rate?: number; // Fee rate (e.g., sats/vB)
   height?: number; // Block height of the transaction
+  ancestorcount?: number;
+  ancestorsize?: number;
+  ancestorfees?: number;
   vin: Array<{
     txid?: string; // txid of the input transaction
     vout?: number; // vout of the input transaction
@@ -101,7 +102,7 @@ export class QuicknodeUTXOService {
           derivedScriptHex = bytesToHex(bjsAddress.toOutputScript(qnProvidedAddress, network)).toLowerCase();
           console.log(`[QN_UTXO_V6.1] Derived script from QN address '${qnProvidedAddress}' -> ${derivedScriptHex}`);
         } catch (e) {
-          console.error(`[QN_UTXO_V6.1] Error deriving script from QN address '${qnProvidedAddress}': ${e.message}`);
+          console.error(`[QN_UTXO_V6.1] Error deriving script from QN address '${qnProvidedAddress}': ${(e as Error).message}`);
           // derivedScriptHex remains undefined, proceed to check qnProvidedHex
         }
 
@@ -136,10 +137,11 @@ export class QuicknodeUTXOService {
       const valueInSatoshis = Math.round(outputDetail.value * SATOSHIS_PER_BTC);
       const utxoToReturn: UTXO = {
         txid, vout, value: valueInSatoshis, script: finalScriptHex,
-        scriptType: getScriptTypeInfo(finalScriptHex).type, 
-        scriptDesc: outputDetail.scriptPubKey.desc, 
-        vsize: tx.vsize, weight: tx.weight, coinbase: !!(tx.vin[0]?.coinbase),
-        rawTxHex: tx.hex,
+        ...(tx.ancestorcount !== undefined && { ancestorCount: tx.ancestorcount }),
+        ...(tx.ancestorsize !== undefined && { ancestorSize: tx.ancestorsize }),
+        ...(tx.ancestorfees !== undefined && { ancestorFees: tx.ancestorfees }),
+        vsize: tx.vsize, 
+        weight: tx.weight
       };
       if (includeAncestors && tx.vin && tx.vin.length > 0) {
         const firstInput = tx.vin[0];
@@ -149,7 +151,7 @@ export class QuicknodeUTXOService {
             txid: tx.txid, vout, weight: tx.weight, size: tx.size,
             scriptType: outputDetail.scriptPubKey.type, 
             sequence: firstInput?.sequence, 
-            blockHeight: tx.height, confirmations: tx.confirmations,
+            blockHeight: tx.height || 0, confirmations: tx.confirmations,
         };
       }
       console.log(`[QN_UTXO_V6.1] RETURNING for ${txid}:${vout}: script=${utxoToReturn.script}, value=${utxoToReturn.value}, type=${utxoToReturn.scriptType}`);
@@ -200,77 +202,6 @@ export class QuicknodeUTXOService {
     return { data: formattedUtxos };
   }
 
-  private static async enrichWithAncestorInfo(utxos: Partial<UTXO>[], includeFinancialAncestors = true): Promise<UTXO[]> {
-    const enrichedUtxos = await Promise.all(
-        utxos.map(async (baseUtxo) => {
-            if (baseUtxo.txid === undefined || baseUtxo.vout === undefined) {
-                console.error("Cannot enrich UTXO without txid or vout", baseUtxo);
-                return null; 
-            }
-            try {
-                const txResponse = await CachedQuicknodeRPCService.executeRPC<QuickNodeTxSpecific>(
-                    "bb_getTxSpecific",
-                    [baseUtxo.txid]
-                );
-
-                if ("error" in txResponse && txResponse.error) {
-                    console.error('Error fetching tx details for ' + baseUtxo.txid + ':', txResponse.error);
-                    return null; 
-                }
-                if (!txResponse.result) {
-                    console.error('No result for tx details for ' + baseUtxo.txid);
-                    return null;
-                }
-
-                const tx = txResponse.result;
-                if (!tx.vout || baseUtxo.vout >= tx.vout.length || !tx.vout[baseUtxo.vout]) {
-                     console.error("TxSpecific response vout index out of bounds", { txid: baseUtxo.txid, vout: baseUtxo.vout });
-                    return null;
-                }
-                const outputDetail = tx.vout[baseUtxo.vout];
-
-                // Ensure value from bb_getTxSpecific (outputDetail.value) is converted from BTC to satoshis
-                const valueFromTxSpecificInSatoshis = Math.round(outputDetail.value * SATOSHIS_PER_BTC);
-
-                let ancestorData: AncestorInfo | undefined = undefined;
-                if (includeFinancialAncestors) {
-                    ancestorData = {
-                        fees: tx.fee || 0,
-                        vsize: tx.vsize,
-                        effectiveRate: tx.fee_rate || (tx.fee && tx.vsize ? tx.fee / tx.vsize : 0),
-                        size: tx.size,
-                        weight: tx.weight,
-                        scriptType: outputDetail.scriptPubKey.type,
-                        sequence: tx.vin[0]?.sequence,
-                        blockHeight: tx.height,
-                        confirmations: tx.confirmations,
-                        txid: tx.txid,
-                        vout: baseUtxo.vout,
-                    };
-                }
-
-                return {
-                    txid: baseUtxo.txid,
-                    vout: baseUtxo.vout,
-                    // Use baseUtxo.value if available (assumed already satoshis from bb_getUTXOs),
-                    // otherwise use the converted value from bb_getTxSpecific.
-                    value: baseUtxo.value !== undefined ? baseUtxo.value : valueFromTxSpecificInSatoshis,
-                    script: outputDetail.scriptPubKey.hex,
-                    scriptType: outputDetail.scriptPubKey.type,
-                    scriptDesc: outputDetail.scriptPubKey.desc,
-                    vsize: tx.vsize,
-                    weight: tx.weight,
-                    coinbase: tx.vin[0]?.txid === undefined && tx.vin[0]?.vout === undefined,
-                    ancestor: ancestorData, // This will be undefined if includeFinancialAncestors is false
-                } as UTXO; // All fields of UTXO should be present or explicitly undefined if optional
-            } catch (error) {
-                console.error('Failed to enrich UTXO ' + baseUtxo.txid + ':', error);
-                return null; 
-            }
-        })
-    );
-    return enrichedUtxos.filter(utxo => utxo !== null) as UTXO[];
-}
 
   static async getRawTransactionHex(txid: string): Promise<{ data?: string; error?: string }> {
     try {
@@ -282,7 +213,7 @@ export class QuicknodeUTXOService {
       );
 
       if ("error" in response && response.error) {
-        return { error: response.error };
+        return { error: typeof response.error === 'string' ? response.error : JSON.stringify(response.error) };
       }
       if (typeof response.result === 'string') {
         return { data: response.result };

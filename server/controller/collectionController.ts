@@ -1,10 +1,10 @@
-import { CollectionService } from "$server/services/collectionService.ts";
 import {
   Collection,
 } from "$globals";
-import { CollectionQueryParams, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
-import { StampController } from "$server/controller/stampController.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { CollectionService } from "$server/services/collectionService.ts";
+import { CollectionQueryParams, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
 
 export class CollectionController {
   static async getCollectionDetails(
@@ -28,8 +28,8 @@ export class CollectionController {
       const collectionsResult = await CollectionService.getCollectionDetails({
         limit,
         page,
-        creator,
-        sortBy,
+        ...(creator ? { creator } : {}),
+        ...(sortBy ? { sortBy } : {}),
         minStampCount: 2,
         includeMarketData
       });
@@ -59,10 +59,10 @@ export class CollectionController {
         });
 
         const stampResults = await StampController.getStamps({
-          collectionId: collectionIds,
+          collectionId: collectionIds.join(','),
           noPagination: false,
-          type: "all",
-          sortBy: "ASC",
+          type: "all" as const,
+          sortBy: "ASC" as const,
           allColumns: false,
           limit: totalLimit,
           collectionStampLimit: 12,
@@ -120,7 +120,7 @@ export class CollectionController {
 
       return {
         ...collectionsResult,
-        data: collections,
+        data: collections as any,
         // No need to update total - it's already correct from database filtering
       };
     } catch (error) {

@@ -39,28 +39,28 @@ export const handler: Handlers = {
       console.log("Debug Pagination:", {
         minted: {
           dataLength: mintedData.data.length,
-          total: mintedData.total,
+          total: (mintedData as any).total,
           page: mintedData.page,
-          totalPages: mintedData.totalPages,
+          totalPages: (mintedData as any).totalPages,
         },
         minting: {
           dataLength: mintingData.data.length,
-          total: mintingData.total,
+          total: (mintingData as any).total,
           page: mintingData.page,
-          totalPages: mintingData.totalPages,
+          totalPages: (mintingData as any).totalPages,
         },
       });
 
       return ctx.render({
         mintedData: {
           data: mintedData.data,
-          total: mintedData.total,
+          total: 0, // PaginatedSrc20ResponseBody doesn't have total
           page: mintedData.page,
           totalPages: mintedData.totalPages,
         },
         mintingData: {
           data: mintingData.data,
-          total: mintingData.total,
+          total: 0, // PaginatedSrc20ResponseBody doesn't have total
           page: mintingData.page,
           totalPages: mintingData.totalPages,
         },

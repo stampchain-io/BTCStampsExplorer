@@ -2,7 +2,7 @@
 // Extends existing fixtures with comprehensive test data for all API endpoints
 
 import process from "node:process";
-import { marketDataFixtures } from "./marketDataFixtures";
+import { marketDataFixtures } from "./marketDataFixtures.ts";
 
 export const apiTestFixtures = {
   // System endpoints test data

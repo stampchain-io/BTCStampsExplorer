@@ -58,6 +58,7 @@ const getCommonButtonProps = ({
 /* ===== TYPES ===== */
 type ExtendedButtonProps = ButtonProps & {
   isActive?: boolean;
+  type?: "button" | "submit" | "reset";
   ref?:
     | JSX.HTMLAttributes<HTMLButtonElement>["ref"]
     | JSX.HTMLAttributes<HTMLAnchorElement>["ref"];
@@ -73,6 +74,7 @@ export function Button({
   href,
   "f-partial": fPartial,
   class: className,
+  type,
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -128,6 +130,7 @@ export function Button({
   }
 
   const commonProps = getCommonButtonProps({
+    type,
     disabled: !IS_BROWSER || disabled,
     onClick,
     onMouseEnter,
@@ -222,6 +225,7 @@ export function ButtonIcon({
 /* ===== TYPES ===== */
 type ExtendedProcessingButtonProps = ExtendedButtonProps & {
   isSubmitting: boolean;
+  type?: "button" | "submit" | "reset";
 };
 
 /* ===== PROCESSING BUTTON COMPONENT ===== */
@@ -243,6 +247,7 @@ export function ButtonProcessing({
   role,
   ariaLabel,
   "data-type": dataType,
+  type,
   ref,
   children,
   ...props
@@ -254,6 +259,7 @@ export function ButtonProcessing({
   });
 
   const commonProps = getCommonButtonProps({
+    type,
     disabled: !IS_BROWSER || disabled || isSubmitting,
     onClick,
     onMouseEnter,

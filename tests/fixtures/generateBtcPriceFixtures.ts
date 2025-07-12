@@ -41,7 +41,9 @@ async function fetchRealApiResponses() {
     };
   } catch (error) {
     console.error("CoinGecko error:", error);
-    fixtures.responses.coingecko = { error: error.message };
+    fixtures.responses.coingecko = {
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 
   // Fetch from Binance
@@ -77,7 +79,9 @@ async function fetchRealApiResponses() {
     };
   } catch (error) {
     console.error("Binance error:", error);
-    fixtures.responses.binance = { error: error.message };
+    fixtures.responses.binance = {
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 
   // Add error response examples

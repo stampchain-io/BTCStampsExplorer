@@ -36,7 +36,7 @@ export const handler: Handlers = {
 
       const params: SRC20TrxRequestParams = {
         tx_hash,
-        sortBy: sortValidation.data,
+        ...(sortValidation.data && { sortBy: sortValidation.data }),
         noPagination: true,
         singleResult: true,
       };

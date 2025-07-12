@@ -170,7 +170,7 @@ emergency_cleanup.sh
 # MCP Servers (external dependencies)
 stampchain-mcp/
 
-.vscode
+.vscode/mcp.json
 
 coverage_profile/*
 cov_profile/*

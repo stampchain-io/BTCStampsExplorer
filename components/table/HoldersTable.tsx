@@ -3,9 +3,9 @@ import { containerBackground } from "$layout";
 import { labelSm, value3xl } from "$text";
 
 interface Holder {
-  address: string | null;
-  amt: number;
-  percentage: number;
+  address?: string;
+  amt: string;
+  percentage: string;
 }
 
 interface HoldersTableProps {
@@ -33,11 +33,11 @@ export function HoldersTable({ holders = [] }: HoldersTableProps) {
       </div>
       <div className="flex flex-col tablet:flex-row w-full gap-6">
         <div className="flex justify-center tablet:justify-start">
-          <HoldersPieChart holders={holders} />
+          <HoldersPieChart holders={holders as any} />
         </div>
 
         <div className="relative w-full max-w-full">
-          <HoldersTableBase holders={holders} />
+          <HoldersTableBase holders={holders as any} />
         </div>
       </div>
     </div>

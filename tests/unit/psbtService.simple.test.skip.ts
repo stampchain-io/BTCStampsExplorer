@@ -108,7 +108,7 @@ describe("PSBTService Simple Tests", {
         // If createPSBT fails due to missing imports, at least we tested the module loading
         console.log(
           "createPSBT test skipped due to import issues:",
-          error.message,
+          error instanceof Error ? error.message : String(error),
         );
       }
     });
@@ -129,7 +129,7 @@ describe("PSBTService Simple Tests", {
       } catch (error) {
         console.log(
           "validateUTXOOwnership test skipped due to import issues:",
-          error.message,
+          error instanceof Error ? error.message : String(error),
         );
       }
     });
@@ -152,7 +152,10 @@ describe("PSBTService Simple Tests", {
           assertEquals(typeof result, "string");
         }
       } catch (error) {
-        console.log("getAddressType test skipped:", error.message);
+        console.log(
+          "getAddressType test skipped:",
+          error instanceof Error ? error.message : String(error),
+        );
       }
     });
 
@@ -164,7 +167,10 @@ describe("PSBTService Simple Tests", {
           assertExists(network);
         }
       } catch (error) {
-        console.log("getAddressNetwork test skipped:", error.message);
+        console.log(
+          "getAddressNetwork test skipped:",
+          error instanceof Error ? error.message : String(error),
+        );
       }
     });
   });
@@ -183,7 +189,10 @@ describe("PSBTService Simple Tests", {
           Error,
         );
       } catch (error) {
-        console.log("Error handling test skipped:", error.message);
+        console.log(
+          "Error handling test skipped:",
+          error instanceof Error ? error.message : String(error),
+        );
       }
     });
   });

@@ -2,26 +2,62 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Deno Fresh: Debug",
-      "request": "launch",
+      "name": "Deno: Run dev.ts",
       "type": "node",
+      "request": "launch",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
-        "task",
-        "dev"
+        "run",
+        "--inspect-wait",
+        "--allow-all",
+        "--watch",
+        "--no-clear-screen"
       ],
-      "attachSimplePort": 9229,
-      "restart": true,
-      "outputCapture": "std",
-      "postDebugTask": "deno: cleanup-ports",
+      "program": "${workspaceFolder}/dev.ts",
       "env": {
-        "DENO_ENV": "development",
-        "DENO_V8_FLAGS": "--max-old-space-size=8192"
+        "DENO_ENV": "development"
       },
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart",
-      "autoAttachChildProcesses": true
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Deno: Run main.ts",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--inspect-wait",
+        "--allow-all"
+      ],
+      "program": "${workspaceFolder}/main.ts",
+      "env": {
+        "DENO_ENV": "production"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Deno: Debug Tests",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "--inspect-wait",
+        "--allow-all",
+        "--config=tests/deno.json"
+      ],
+      "program": "${workspaceFolder}/tests/",
+      "env": {
+        "DENO_ENV": "test",
+        "SKIP_REDIS_CONNECTION": "true"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     }
   ]
 }

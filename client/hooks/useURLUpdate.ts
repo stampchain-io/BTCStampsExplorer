@@ -1,6 +1,7 @@
 import { useCallback } from "preact/hooks";
 import {
   COLLECTION_FILTER_TYPES,
+  LISTING_FILTER_TYPES,
   SRC20_FILTER_TYPES,
   STAMP_FILTER_TYPES,
   WALLET_FILTER_TYPES,
@@ -10,7 +11,8 @@ type FilterTypes =
   | STAMP_FILTER_TYPES
   | SRC20_FILTER_TYPES
   | COLLECTION_FILTER_TYPES
-  | WALLET_FILTER_TYPES;
+  | WALLET_FILTER_TYPES
+  | LISTING_FILTER_TYPES;
 
 interface URLUpdateParams {
   sortBy?: "ASC" | "DESC";

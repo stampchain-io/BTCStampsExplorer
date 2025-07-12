@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { UTXOService } from "$server/services/transaction/utxoService.ts";
-import type { UTXO } from "$types/index.d.ts";
+import type { BasicUTXO, UTXO } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 export const handler: Handlers = {
@@ -22,7 +22,7 @@ export const handler: Handlers = {
         excludeAssets,
       });
 
-      let utxos: UTXO[];
+      let utxos: BasicUTXO[] | UTXO[];
 
       if (excludeAssets) {
         // Use selectUTXOsForTransaction to get filtered UTXOs
@@ -93,7 +93,7 @@ export const handler: Handlers = {
       }
 
       // Sorting remains the same
-      const sortedUtxos: UTXO[] = [...utxos].sort((a, b) => a.value - b.value);
+      const sortedUtxos = [...utxos].sort((a, b) => a.value - b.value);
       logger.debug("api-utxo-query", {
         message: "API: Successfully processed UTXO query",
         address,

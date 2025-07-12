@@ -141,7 +141,8 @@ export const CollectionDetailHeader = (
               FLOOR PRICE
             </h5>
             <h6 className={valueSm}>
-              {collection.marketData?.minFloorPriceBTC !== null
+              {collection.marketData?.minFloorPriceBTC !== null &&
+                  collection.marketData?.minFloorPriceBTC !== undefined
                 ? `${formatBTC(collection.marketData.minFloorPriceBTC)} BTC`
                 : "N/A BTC"}
             </h6>
@@ -161,7 +162,8 @@ export const CollectionDetailHeader = (
               AVG PRICE
             </h5>
             <h6 className={valueSm}>
-              {collection.marketData?.avgFloorPriceBTC !== null
+              {collection.marketData?.avgFloorPriceBTC !== null &&
+                  collection.marketData?.avgFloorPriceBTC !== undefined
                 ? `${formatBTC(collection.marketData.avgFloorPriceBTC)} BTC`
                 : "N/A BTC"}
             </h6>

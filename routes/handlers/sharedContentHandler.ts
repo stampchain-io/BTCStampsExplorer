@@ -161,3 +161,10 @@ export async function handleContentRequest(
     return WebResponseUtil.stampNotFound();
   }
 }
+
+// Export is already done in function declaration above
+
+// Add default export for Fresh manifest compatibility - dummy handler
+export default function () {
+  return new Response("OK");
+}

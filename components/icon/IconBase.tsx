@@ -102,6 +102,19 @@ export function Icon(props: IconVariants) {
       donate: "coinsHand",
       stamp: "stamp",
       uploadImage: "image",
+
+      // Error Display Icons (fallback to existing icons)
+      "info": "magnifingGlass", // Using magnifying glass as placeholder for info
+      "alert-triangle": "flame", // Using flame as placeholder for warning triangle
+      "alert-circle": "atom", // Using atom as placeholder for alert circle
+      "x-circle": "x", // Using x as placeholder for x-circle
+      "x": "x",
+
+      // Other common icons
+      "external-link": "pageOut", // Using pageOut as external link
+      "loading": "clockCounterClockwise", // Using clock as loading spinner
+      "refresh": "clockCounterClockwise", // Using clock for refresh too
+      "eye": "eye",
     };
 
     const iconName = iconNameMap[name as keyof typeof iconNameMap];
