@@ -2,36 +2,30 @@ import { dbManager } from "$server/database/databaseManager.ts";
 import { BackgroundFeeService } from "$server/services/fee/backgroundFeeService.ts";
 import { assert, assertEquals, assertExists } from "@std/assert";
 
-// 🚀 SIMPLIFIED FEE SYSTEM TESTS
-// Basic functionality tests without complex mocking
+// 🚀 SIMPLE FEE SYSTEM TESTS
+// Basic functionality tests without network calls
 
-Deno.test("🚀 Simplified Fee System Tests", async (t) => {
-  console.log("🎯 Starting simplified fee system test suite...\n");
+Deno.test("🚀 Simple Fee System Tests", async (t) => {
+  console.log("🎯 Starting simple fee system test suite...\n");
 
-  await t.step("🔄 Background Service Basic State", async () => {
-    console.log("🔧 Testing background service basic state...");
+  await t.step("🔄 Background Service Status Check", async () => {
+    console.log("🔧 Testing background service status check...");
 
-    try {
-      // Test initial state (no network calls)
-      let status = BackgroundFeeService.getStatus();
-      assertEquals(status.isRunning, false);
-      assertEquals(status.intervalId, null);
-      console.log("✅ Initial state: service not running");
+    // Test initial state (no network calls, just status check)
+    const status = BackgroundFeeService.getStatus();
+    assertEquals(status.isRunning, false);
+    assertEquals(status.intervalId, null);
+    console.log("✅ Initial state: service not running");
 
-      // Test status structure
-      assertExists(status);
-      assert(typeof status.isRunning === "boolean");
-      assert(status.intervalId === null || typeof status.intervalId === "number");
-      console.log("✅ Service status structure validated");
-
-    } finally {
-      // Ensure service is stopped (in case it was running)
-      BackgroundFeeService.stop();
-    }
+    // Test status structure
+    assertExists(status);
+    assert(typeof status.isRunning === "boolean");
+    assert(status.intervalId === null || typeof status.intervalId === "number");
+    console.log("✅ Service status structure validated");
   });
 
-  await t.step("🗄️ Database Manager Basic Operations", async () => {
-    console.log("💾 Testing database manager basic operations...");
+  await t.step("🗄️ Database Manager Cache Operations", async () => {
+    console.log("�� Testing database manager cache operations...");
 
     try {
       // Test cache invalidation with valid pattern
@@ -59,10 +53,10 @@ Deno.test("🚀 Simplified Fee System Tests", async (t) => {
     }
   });
 
-  await t.step("🧪 Basic Validation Functions", async () => {
-    console.log("🔬 Testing basic validation functions...");
+  await t.step("🧪 Fee Data Structure Validation", async () => {
+    console.log("🔬 Testing fee data structure validation...");
 
-    // Test fee validation
+    // Test fee validation with mock data
     const testFeeData = {
       recommendedFee: 15,
       btcPrice: 45000,
@@ -94,7 +88,7 @@ Deno.test("🚀 Simplified Fee System Tests", async (t) => {
     console.log("✅ Fee range validation passed");
   });
 
-  await t.step("⚡ Performance Baseline", async () => {
+  await t.step("⚡ Performance Baseline Test", async () => {
     console.log("🏎️ Testing performance baseline...");
 
     const iterations = 5;
@@ -133,5 +127,5 @@ Deno.test("🚀 Simplified Fee System Tests", async (t) => {
     console.log("✅ Performance baseline passed");
   });
 
-  console.log("\n🎉 All simplified fee system tests completed successfully!");
+  console.log("\n🎉 All simple fee system tests completed successfully!");
 });
