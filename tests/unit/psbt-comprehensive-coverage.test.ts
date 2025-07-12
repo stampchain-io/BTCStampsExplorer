@@ -105,7 +105,10 @@ class MockAPIHandlers {
       );
       return { status: 200, data: { psbtHex } };
     } catch (error) {
-      return { status: 500, error: error.message };
+      return {
+        status: 500,
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
   }
 
@@ -126,7 +129,10 @@ class MockAPIHandlers {
       );
       return { status: 200, data: { completedPsbt } };
     } catch (error) {
-      return { status: 500, error: error.message };
+      return {
+        status: 500,
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
   }
 
@@ -149,7 +155,10 @@ class MockAPIHandlers {
 
       return { status: 200, data: result };
     } catch (error) {
-      return { status: 500, error: error.message };
+      return {
+        status: 500,
+        error: error instanceof Error ? error.message : String(error),
+      };
     }
   }
 }

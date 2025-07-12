@@ -36,7 +36,7 @@ function SendSteps() {
     <StepList hasImportantNotes={SEND_STAMP_IMPORTANT_NOTES?.length > 0}>
       {SEND_STAMP_STEPS.map((step) => (
         <List
-          key={step.number}
+          key={(step as any).number}
           title={step.title}
           image={step.image}
           description={step.description}

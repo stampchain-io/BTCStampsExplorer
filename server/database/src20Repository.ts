@@ -1,19 +1,19 @@
-import { serverConfig } from "$server/config/config.ts";
-import { BigFloat } from "bigfloat/mod.ts";
-import { bigFloatToString } from "$lib/utils/formatUtils.ts";
-import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "$lib/utils/constants.ts";
 import {
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
-import { dbManager } from "$server/database/databaseManager.ts";
+import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "$lib/utils/constants.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { bigFloatToString } from "$lib/utils/formatUtils.ts";
+import { serverConfig } from "$server/config/config.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
+import { BigFloat } from "bigfloat/mod.ts";
 
 export class SRC20Repository {
   // Dependency injection support
   private static db: typeof dbManager = dbManager;
-  
+
   static setDatabase(database: typeof dbManager): void {
     this.db = database;
   }
@@ -148,12 +148,12 @@ export class SRC20Repository {
     const queryParams = [];
     const whereClauses = [];
 
-    if (block_index !== undefined) {
+    if (block_index != null) {
       whereClauses.push(`src20.block_index = ?`);
       queryParams.push(block_index);
     }
 
-    if (tick !== undefined) {
+    if (tick != null) {
       if (Array.isArray(tick)) {
         whereClauses.push(`src20.tick IN (${tick.map(() => "?").join(", ")})`);
         queryParams.push(...tick.map(t => this.ensureUnicodeEscape(t || "")));
@@ -163,7 +163,7 @@ export class SRC20Repository {
       }
     }
 
-    if (op !== undefined) {
+    if (op != null) {
       if (Array.isArray(op)) {
         whereClauses.push(`src20.op IN (${op.map(() => "?").join(", ")})`);
         queryParams.push(...op.map(o => this.ensureUnicodeEscape(o || "")));
@@ -173,12 +173,12 @@ export class SRC20Repository {
       }
     }
 
-    if (tx_hash !== undefined) {
+    if (tx_hash != null) {
       whereClauses.push(`src20.tx_hash = ?`);
       queryParams.push(tx_hash);
     }
 
-    if (address !== undefined) {
+    if (address != null) {
       whereClauses.push(`(src20.creator = ? OR src20.destination = ?)`);
       queryParams.push(address, address);
     }
@@ -213,7 +213,7 @@ export class SRC20Repository {
     try {
       const query = `
         WITH base_query AS (
-          SELECT 
+          SELECT
             (@row_number:=@row_number + 1) AS row_num,
             src20.tx_hash,
             src20.block_index,
@@ -237,7 +237,7 @@ export class SRC20Repository {
           ORDER BY src20.block_index ${validOrder}
         ),
         holders AS (
-          SELECT 
+          SELECT
             tick,
             COUNT(DISTINCT address) as holders
           FROM ${SRC20_BALANCE_TABLE}
@@ -259,7 +259,7 @@ export class SRC20Repository {
           FROM SRC20Valid dep
           WHERE dep.op = 'DEPLOY'
         )
-        SELECT 
+        SELECT
           b.row_num,
           b.tx_hash,
           b.block_index,
@@ -284,6 +284,9 @@ export class SRC20Repository {
       `;
 
       const fullQueryParams = [rowNumberInit, ...queryParams];
+
+      console.log("DEBUG: Executing SQL query in getValidSrc20TxFromDb:", query);
+      console.log("DEBUG: Query parameters:", fullQueryParams);
 
       const results = await this.db.executeQueryWithCache(
         query,
@@ -450,7 +453,7 @@ export class SRC20Repository {
   static async fetchSrc20MintProgress(tick: string) {
     const unicodeTick = this.ensureUnicodeEscape(tick);
     const query = `
-      SELECT 
+      SELECT
         dep.max,
         dep.deci,
         dep.lim,
@@ -461,7 +464,7 @@ export class SRC20Repository {
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints
       FROM ${SRC20_TABLE} AS dep
       LEFT JOIN src20_token_stats stats ON stats.tick = dep.tick
-      WHERE 
+      WHERE
         dep.tick = ? AND
         dep.op = 'DEPLOY'
       LIMIT 1;
@@ -550,7 +553,7 @@ export class SRC20Repository {
       queryParams,
       1000 * 60 * 10, // Cache duration
     );
-    
+
     return {
       rows: this.convertResponseToEmoji((results as any).rows),
       total: (results as any).rows.length
@@ -560,13 +563,13 @@ export class SRC20Repository {
   static async getDeploymentAndCountsForTick(tick: string) {
     const unicodeTick = this.ensureUnicodeEscape(tick);
     const query = `
-      SELECT 
+      SELECT
         dep.*,
         creator_info.creator AS creator_name,
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'MINT') AS total_mints,
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'TRANSFER') AS total_transfers
       FROM ${SRC20_TABLE} dep
-      LEFT JOIN 
+      LEFT JOIN
         creator creator_info ON dep.destination = creator_info.address
       WHERE dep.tick = ? AND dep.op = 'DEPLOY'
       LIMIT 1
@@ -608,7 +611,7 @@ export class SRC20Repository {
   static async getCountsForTick(tick: string) {
     const unicodeTick = this.ensureUnicodeEscape(tick);
     const query = `
-      SELECT 
+      SELECT
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'MINT') AS total_mints,
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'TRANSFER') AS total_transfers
     `;
@@ -619,13 +622,13 @@ export class SRC20Repository {
       1000 * 60 * 2, // Cache duration
     );
 
-    if (!result.rows || result.rows.length === 0) {
+    if (!(result as any).rows || (result as any).rows.length === 0) {
       return { total_mints: 0, total_transfers: 0 };
     }
 
     return {
-      total_mints: result.rows[0].total_mints,
-      total_transfers: result.rows[0].total_transfers,
+      total_mints: (result as any).rows[0].total_mints,
+      total_transfers: (result as any).rows[0].total_transfers,
     };
   }
 
@@ -669,7 +672,7 @@ export class SRC20Repository {
         1000 * 60 * 2 // Cache duration: 2 minutes
       );
 
-      return this.convertResponseToEmoji(result.rows.map((row: any) => {
+      return this.convertResponseToEmoji((result as any).rows.map((row: any) => {
         const maxSupply = new BigFloat(row?.max_supply || "1");
         const totalMinted = new BigFloat(row.total_minted || "0");
         const progress = bigFloatToString(totalMinted.div(maxSupply).mul(100), 3);
@@ -693,12 +696,12 @@ export class SRC20Repository {
       const result = await this.getTotalCountValidSrc20TxFromDb({
         op: "DEPLOY"
       });
-      
+
       // If we can't get a count or it's 0, that indicates a database problem
-      if (!result?.rows?.[0]?.total) {
+      if (!(result as any)?.rows?.[0]?.total) {
         throw new Error("No SRC-20 deployments found in database");
       }
-      const count = result.rows[0].total;
+      const count = (result as any).rows[0].total;
       return {
         isValid: true,
         count

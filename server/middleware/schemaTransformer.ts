@@ -164,7 +164,7 @@ export function transformResponseForVersion(
     const config = TRANSFORMATION_REGISTRY[version];
     
     if (!config) {
-      logger.warn(`No transformation config for version ${version}`);
+      logger.warn("api", { message: `No transformation config for version ${version}` });
       return data;
     }
     
@@ -209,7 +209,7 @@ export function transformResponseForVersion(
     
     return transformed;
   } catch (error) {
-    logger.error("Error transforming response for version", { version, error });
+    logger.error("api", { message: "Error transforming response for version", version, error });
     return data; // Return original data on error
   }
 }
@@ -291,7 +291,7 @@ export function getVersionChangeSummary(
 } {
   const fromConfig = TRANSFORMATION_REGISTRY[fromVersion];
   // TODO(@team): toConfig might need to be used for analyzing target version changes
-  const _toConfig = TRANSFORMATION_REGISTRY[toVersion];
+  // const _toConfig = TRANSFORMATION_REGISTRY[toVersion];
   
   const summary = {
     addedFields: [] as string[],

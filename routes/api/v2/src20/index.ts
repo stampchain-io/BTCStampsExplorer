@@ -26,9 +26,10 @@ export const handler: Handlers = {
       return sortValidation.error!;
     }
 
+    const op = url.searchParams.get("op");
     const params: SRC20TrxRequestParams = {
-      op: url.searchParams.get("op") ?? undefined,
-      sortBy: sortValidation.data,
+      ...(op && { op }),
+      ...(sortValidation.data && { sortBy: sortValidation.data }),
       page: page || DEFAULT_PAGINATION.page,
       limit: limit || DEFAULT_PAGINATION.limit,
     };

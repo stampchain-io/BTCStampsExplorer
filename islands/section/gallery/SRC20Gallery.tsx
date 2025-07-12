@@ -246,7 +246,6 @@ export function SRC20Gallery({
               <SRC20CardSm
                 data={data}
                 fromPage={fromPage}
-                timeframe={timeframe}
                 onImageClick={handleImageClick}
               />
             )

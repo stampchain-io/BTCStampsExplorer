@@ -11,6 +11,6 @@ export const formatHtmlFromUrl = (htmlContent: string): string => {
     return formattedHTML;
   } catch (error) {
     console.log("Format Error: ", error);
-    return null;
+    return htmlContent;
   }
 };

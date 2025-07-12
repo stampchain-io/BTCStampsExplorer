@@ -38,7 +38,7 @@ export function StampOverviewContent({
                 isRecentSale={isRecentSales}
                 showDetails
                 variant="grey"
-                fromPage={fromPage}
+                {...(fromPage && { fromPage })}
               />
             ))}
           </div>
@@ -54,8 +54,9 @@ export function StampOverviewContent({
           <Pagination
             page={pagination.page}
             totalPages={pagination.totalPages}
-            prefix={pagination.prefix}
-            onPageChange={pagination.onPageChange}
+            {...(pagination.prefix && { prefix: pagination.prefix })}
+            {...(pagination.onPageChange &&
+              { onPageChange: pagination.onPageChange })}
           />
         </div>
       )}

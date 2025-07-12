@@ -285,7 +285,11 @@ export class XcpManagerDI {
           error: errorMessage
         } as T;
       },
-      { ttl: cacheTimeout },
+      { 
+        duration: cacheTimeout,
+        staleWhileRevalidate: 300, // 5 minutes  
+        staleIfError: 3600 // 1 hour
+      },
     );
   }
 
@@ -1102,7 +1106,7 @@ export class MockXcpProvider implements XcpProvider {
     return {
       balances: [mockBalance],
       total: 1,
-      next_cursor: options?.cursor ? undefined : "mock_cursor"
+      ...(options?.cursor ? {} : { next_cursor: "mock_cursor" })
     };
   }
 

@@ -1,6 +1,6 @@
 import { ApiResponseOptions, ApiResponseUtil } from "./apiResponseUtil.ts";
 import { transformResponseForVersion } from "../../server/middleware/schemaTransformer.ts";
-import { Context } from "$fresh/server.ts";
+import { FreshContext } from "$fresh/server.ts";
 
 /**
  * Versioned API Response Utility
@@ -15,23 +15,26 @@ export class VersionedApiResponse {
    */
   static json(
     data: unknown,
-    ctx: Context,
+    ctx: FreshContext,
     options: ApiResponseOptions = {},
   ): Response {
     // Get API version from context
-    const apiVersion = ctx.state?.apiVersion || "2.3";
+    const apiVersion = (ctx.state as any)?.apiVersion || "2.3";
 
     // Transform data based on version
-    const transformedData = transformResponseForVersion(data, apiVersion);
+    const transformedData = transformResponseForVersion(
+      data,
+      apiVersion as string,
+    );
 
     // Create response using base utility
     const response = ApiResponseUtil.success(transformedData, options);
 
     // Add version headers
-    if (_ctx?.state?.versionContext) {
-      const { isDeprecated, endOfLife } = _ctx.state.versionContext;
+    if (ctx?.state?.versionContext) {
+      const { isDeprecated, endOfLife } = (ctx.state as any).versionContext;
 
-      response.headers.set("API-Version", apiVersion);
+      response.headers.set("API-Version", apiVersion as string);
 
       if (isDeprecated) {
         response.headers.set("Deprecation", "true");
@@ -51,11 +54,11 @@ export class VersionedApiResponse {
    */
   static error(
     message: string,
-    _ctx?: Context,
+    _ctx?: FreshContext,
     options: ApiResponseOptions & { code?: string; details?: unknown } = {},
   ): Response {
     // Error responses are not transformed
-    return ApiResponseUtil.error(message, options);
+    return ApiResponseUtil.badRequest(message, options.details, options);
   }
 
   /**
@@ -63,10 +66,10 @@ export class VersionedApiResponse {
    */
   static notFound(
     message: string,
-    _ctx?: Context,
+    _ctx?: FreshContext,
     options: ApiResponseOptions = {},
   ): Response {
-    return ApiResponseUtil.notFound(message, options);
+    return ApiResponseUtil.notFound(message, undefined, options);
   }
 
   /**
@@ -74,10 +77,10 @@ export class VersionedApiResponse {
    */
   static badRequest(
     message: string,
-    _ctx?: Context,
+    _ctx?: FreshContext,
     options: ApiResponseOptions & { details?: unknown } = {},
   ): Response {
-    return ApiResponseUtil.badRequest(message, options);
+    return ApiResponseUtil.badRequest(message, options.details, options);
   }
 
   /**
@@ -85,10 +88,10 @@ export class VersionedApiResponse {
    */
   static internalServerError(
     message: string,
-    _ctx?: Context,
+    _ctx?: FreshContext,
     options: ApiResponseOptions & { details?: unknown } = {},
   ): Response {
-    return ApiResponseUtil.internalServerError(message, options);
+    return ApiResponseUtil.internalError(message, message, options);
   }
 
   /**
@@ -96,10 +99,10 @@ export class VersionedApiResponse {
    */
   static unauthorized(
     message: string,
-    _ctx?: Context,
+    _ctx?: FreshContext,
     options: ApiResponseOptions = {},
   ): Response {
-    return ApiResponseUtil.unauthorized(message, options);
+    return ApiResponseUtil.unauthorized(message, undefined, options);
   }
 
   /**
@@ -107,10 +110,10 @@ export class VersionedApiResponse {
    */
   static forbidden(
     message: string,
-    _ctx?: Context,
+    _ctx?: FreshContext,
     options: ApiResponseOptions = {},
   ): Response {
-    return ApiResponseUtil.forbidden(message, options);
+    return ApiResponseUtil.forbidden(message, undefined, options);
   }
 
   /**
@@ -118,12 +121,15 @@ export class VersionedApiResponse {
    */
   static created(
     data: unknown,
-    ctx: Context,
+    ctx: FreshContext,
     options: ApiResponseOptions = {},
   ): Response {
     // Transform data based on version
-    const apiVersion = ctx.state?.apiVersion || "2.3";
-    const transformedData = transformResponseForVersion(data, apiVersion);
+    const apiVersion = (ctx.state as any)?.apiVersion || "2.3";
+    const transformedData = transformResponseForVersion(
+      data,
+      apiVersion as string,
+    );
 
     return ApiResponseUtil.created(transformedData, options);
   }
@@ -132,7 +138,7 @@ export class VersionedApiResponse {
    * Create a versioned no content response
    */
   static noContent(
-    _ctx?: Context,
+    _ctx?: FreshContext,
     options: ApiResponseOptions = {},
   ): Response {
     return ApiResponseUtil.noContent(options);

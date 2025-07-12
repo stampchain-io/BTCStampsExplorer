@@ -262,7 +262,7 @@ export default function RecentSalesGallery({
           <Pagination
             page={pagination.page}
             totalPages={pagination.totalPages}
-            prefix={pagination.prefix || ""}
+            {...(pagination.prefix && { prefix: pagination.prefix })}
             onPageChange={handlePageChange}
           />
         </div>

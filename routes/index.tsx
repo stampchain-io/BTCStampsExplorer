@@ -73,15 +73,15 @@ export const handler: Handlers<HomePageData> = {
         src20Data: {
           minted: {
             data: mintedData.data,
-            total: mintedData.total,
+            total: (mintedData as any).total,
             page: mintedData.page,
-            totalPages: mintedData.totalPages,
+            totalPages: (mintedData as any).totalPages,
           },
           minting: {
-            data: mintingData.data,
-            total: mintingData.total,
+            data: mintingData.data as any,
+            total: (mintingData as any).total,
             page: mintingData.page,
-            totalPages: mintingData.totalPages,
+            totalPages: (mintingData as any).totalPages,
           },
         },
       });
@@ -197,7 +197,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
                   subTitle="TOP TICKERS"
                   viewType="minted"
                   fromPage="home"
-                  serverData={src20Data?.minted}
+                  {...(src20Data?.minted && { serverData: src20Data.minted })}
                   useClientFetch={false}
                   timeframe="24H"
                 />
@@ -208,7 +208,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
                   subTitle="TRENDING MINTS"
                   viewType="minting"
                   fromPage="home"
-                  serverData={src20Data?.minting}
+                  {...(src20Data?.minting && { serverData: src20Data.minting })}
                   useClientFetch={false}
                   timeframe="24H"
                 />

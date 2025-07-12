@@ -48,8 +48,8 @@ export const handler: Handlers = {
 
       /* ===== RESPONSE FORMATTING ===== */
       body.initialCounts = {
-        transfers: transferCount.total || 0,
-        mints: mintCount.total || 0,
+        totalTransfers: transferCount.total || 0,
+        totalMints: mintCount.total || 0,
       };
       body.highcharts = highchartsData || [];
 
@@ -105,13 +105,13 @@ function SRC20DetailPage(props: SRC20DetailPageProps) {
     <div class="flex flex-col gap-6">
       <SRC20DetailHeader
         deployment={deployment}
-        mintStatus={mint_status}
-        totalMints={total_mints}
-        totalTransfers={total_transfers}
-        marketInfo={marketInfo}
+        _mintStatus={mint_status}
+        _totalMints={total_mints}
+        _totalTransfers={total_transfers}
+        {...(marketInfo && { marketInfo })}
       />
-      <ChartWidget data={highcharts} />
-      <HoldersTable holders={holders} />
+      <ChartWidget data={highcharts || []} fromPage="src20" tick={tick} />
+      <HoldersTable holders={holders as any} />
       <DataTableBase
         type="src20"
         configs={tableConfigs}

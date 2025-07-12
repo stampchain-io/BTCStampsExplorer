@@ -259,10 +259,13 @@ Deno.test("Stamp Transaction Creation and Validation", async (t) => {
           } catch (error) {
             // If we expect an error, this is okay
             if (testCase.expectedOutputs.errorPattern) {
+              const errorMessage = error instanceof Error
+                ? error.message
+                : String(error);
               assertEquals(
-                testCase.expectedOutputs.errorPattern.test(error.message),
+                testCase.expectedOutputs.errorPattern.test(errorMessage),
                 true,
-                `Error message should match ${testCase.expectedOutputs.errorPattern}: ${error.message}`,
+                `Error message should match ${testCase.expectedOutputs.errorPattern}: ${errorMessage}`,
               );
               // Skip the rest of the test since we expected this error
               return;
@@ -366,10 +369,13 @@ Deno.test("Stamp Transaction Creation and Validation", async (t) => {
       } catch (error) {
         // If we're expecting an error, check the pattern
         if (testCase.expectedOutputs.errorPattern) {
+          const errorMessage = error instanceof Error
+            ? error.message
+            : String(error);
           assertEquals(
-            testCase.expectedOutputs.errorPattern.test(error.message),
+            testCase.expectedOutputs.errorPattern.test(errorMessage),
             true,
-            `Error message should match ${testCase.expectedOutputs.errorPattern}: ${error.message}`,
+            `Error message should match ${testCase.expectedOutputs.errorPattern}: ${errorMessage}`,
           );
           return;
         }
@@ -455,10 +461,13 @@ Deno.test("Stamp creation error handling", async (t) => {
       // Should not reach here
       assertEquals(true, false, "Expected an error for oversized file");
     } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
       assertEquals(
-        /file size|too large|exceeds/i.test(error.message),
+        /file size|too large|exceeds/i.test(errorMessage),
         true,
-        `Error should mention file size: ${error.message}`,
+        `Error should mention file size: ${errorMessage}`,
       );
     }
   });
@@ -480,10 +489,13 @@ Deno.test("Stamp creation error handling", async (t) => {
       // Should not reach here
       assertEquals(true, false, "Expected an error for invalid wallet address");
     } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
       assertEquals(
-        /invalid|wallet|address/i.test(error.message),
+        /invalid|wallet|address/i.test(errorMessage),
         true,
-        `Error should mention invalid address: ${error.message}`,
+        `Error should mention invalid address: ${errorMessage}`,
       );
     }
   });
@@ -505,10 +517,13 @@ Deno.test("Stamp creation error handling", async (t) => {
       // Should not reach here
       assertEquals(true, false, "Expected an error for invalid fee parameter");
     } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
       assertEquals(
-        /fee|invalid|negative/i.test(error.message),
+        /fee|invalid|negative/i.test(errorMessage),
         true,
-        `Error should mention invalid fee: ${error.message}`,
+        `Error should mention invalid fee: ${errorMessage}`,
       );
     }
   });

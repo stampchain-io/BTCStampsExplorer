@@ -45,7 +45,7 @@ function DeploySteps() {
     <StepList hasImportantNotes={DEPLOY_IMPORTANT_NOTES?.length > 0}>
       {DEPLOY_STEPS.map((step) => (
         <List
-          key={step.number}
+          key={(step as any).number}
           title={step.title}
           image={step.image}
           description={step.description}

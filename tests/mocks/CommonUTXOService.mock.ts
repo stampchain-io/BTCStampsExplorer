@@ -47,7 +47,7 @@ export class MockCommonUTXOService {
       if (response instanceof Error) {
         throw response;
       }
-      return response;
+      return Promise.resolve(response);
     }
 
     // Find matching fixture by txid and vout

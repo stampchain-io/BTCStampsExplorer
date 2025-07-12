@@ -2,7 +2,7 @@
 import { Button } from "$button";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
+import { FeeCalculatorAdvanced } from "$islands/section/FeeCalculatorAdvanced.tsx";
 import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
 import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
@@ -81,7 +81,7 @@ export function SRC101RegisterTool({
     handleInputChange(
       {
         target: { value: tld },
-      },
+      } as Event & { target: { value: string } },
       "root",
     );
     setIsSelectingTld(false);
@@ -289,7 +289,7 @@ export function SRC101RegisterTool({
 
       {/* ===== FEE CALCULATOR AND STATUS MESSAGES ===== */}
       <div className={containerBackground}>
-        <FeeCalculatorSimple
+        <FeeCalculatorAdvanced
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src101"
@@ -304,7 +304,8 @@ export function SRC101RegisterTool({
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           userAddress={wallet?.address}
-          utxoAncestors={formState.utxoAncestors}
+          {...(formState.utxoAncestors &&
+            { utxoAncestors: formState.utxoAncestors })}
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
           bitname={formState.toAddress + formState.root}

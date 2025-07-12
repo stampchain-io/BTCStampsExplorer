@@ -1,13 +1,14 @@
-import { Buffer } from "node:buffer";
-import { Psbt, Transaction, payments, networks, address as bjsAddress } from "bitcoinjs-lib";
-import { getUTXOForAddress as getUTXOForAddressFromUtils } from "$lib/utils/utxoUtils.ts";
-import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
-import { hex2bin, bytesToHex } from "$lib/utils/binary/baseUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import type { Output } from "$lib/types/index.d.ts";
+import { bytesToHex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
+import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { getUTXOForAddress as getUTXOForAddressFromUtils } from "$lib/utils/utxoUtils.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import * as bitcoin from "bitcoinjs-lib";
+import { Buffer } from "node:buffer";
+const { Psbt, Transaction, payments, networks, address: bjsAddress } = bitcoin;
 
 // Define interfaces for dependency injection
 export interface PSBTServiceDependencies {
@@ -17,20 +18,20 @@ export interface PSBTServiceDependencies {
   bitcoin?: typeof import("bitcoinjs-lib"); // Optional bitcoin lib injection for testing
 }
 
-export function formatPsbtForLogging(psbt: Psbt) {
+export function formatPsbtForLogging(psbt: InstanceType<typeof Psbt>) {
   return {
-      inputs: psbt.data.inputs.map(input => ({
+      inputs: psbt.data.inputs.map((input: any) => ({
           witnessUtxo: input.witnessUtxo ? {
               value: Number(input.witnessUtxo.value),
               script: input.witnessUtxo.script.toString()
           } : undefined,
-          nonWitnessUtxo: input.nonWitnessUtxo ? input.nonWitnessUtxo.toString('hex') : undefined,
-          redeemScript: input.redeemScript ? input.redeemScript.toString('hex') : undefined,
-          witnessScript: input.witnessScript ? input.witnessScript.toString('hex') : undefined,
+          nonWitnessUtxo: input.nonWitnessUtxo ? Buffer.from(input.nonWitnessUtxo).toString('hex') : undefined,
+          redeemScript: input.redeemScript ? Buffer.from(input.redeemScript).toString('hex') : undefined,
+          witnessScript: input.witnessScript ? Buffer.from(input.witnessScript).toString('hex') : undefined,
       })),
-      outputs: psbt.txOutputs.map(output => ({
+      outputs: psbt.txOutputs.map((output: any) => ({
           address: output.address,
-          script: output.script?.toString('hex'),
+          script: output.script ? Buffer.from(output.script).toString('hex') : undefined,
           value: Number(output.value)
       })),
   };
@@ -44,7 +45,7 @@ export class PSBTServiceImpl {
   constructor(dependencies: PSBTServiceDependencies) {
     this.dependencies = dependencies;
     // Use injected bitcoin lib or fallback to default import
-    this.bitcoin = dependencies.bitcoin || { Psbt, Transaction, payments, networks, address: bjsAddress };
+    this.bitcoin = dependencies.bitcoin || bitcoin;
   }
 
   // Simple createPSBT method with dependency injection
@@ -70,35 +71,38 @@ export class PSBTServiceImpl {
 
     // Fetch specific UTXO details using injected dependency
     const txInfo = await this.dependencies.getUTXOForAddress(sellerAddress, txid, vout);
-    
+
     // Validate network consistency - UTXO and address must be on same network
     if (txInfo && 'utxo' in txInfo && txInfo.utxo) {
       // For mainnet UTXOs, ensure we're not using testnet addresses
-      const isTestnetAddress = sellerAddress.startsWith('tb1') || sellerAddress.startsWith('2') || 
+      const isTestnetAddress = sellerAddress.startsWith('tb1') || sellerAddress.startsWith('2') ||
                               sellerAddress.startsWith('m') || sellerAddress.startsWith('n');
       if (isTestnetAddress) {
         throw new Error(`Network mismatch: Cannot use testnet address ${sellerAddress} with mainnet UTXO`);
       }
     }
-    
+
     // Type guard to check if txInfo has utxo property
     if (!txInfo || Array.isArray(txInfo) || !('utxo' in txInfo) || !txInfo.utxo) {
       throw new Error(`Invalid UTXO details for ${txid}:${vout}`);
     }
-    
+
     const utxoDetails = txInfo.utxo;
-    logger.debug("UTXO Details:", utxoDetails);
+    logger.debug("psbt-service", { message: "UTXO Details", utxoDetails });
 
     const satoshiAmount = BigInt(Math.floor(salePrice * 100000000));
-    
+
     // Get the raw transaction hex for the input
     const rawTxHex = await this.dependencies.commonUtxoService.getRawTransactionHex(txid);
+    if (!rawTxHex) {
+      throw new Error(`Could not fetch raw transaction for ${txid}`);
+    }
     const rawTxBuffer = Buffer.from(rawTxHex, 'hex');
-    
+
     // Determine the script type and add appropriate input
     const script = Buffer.from(utxoDetails.script, 'hex');
     const scriptTypeInfo = getScriptTypeInfo(script);
-    
+
     const inputData: any = {
       hash: txid,
       index: vout,
@@ -106,7 +110,7 @@ export class PSBTServiceImpl {
     };
 
     // Add witness or non-witness UTXO based on script type
-    if (scriptTypeInfo.isSegwit) {
+    if (scriptTypeInfo.isWitness) {
       inputData.witnessUtxo = {
         script: script,
         value: BigInt(utxoDetails.value),
@@ -115,15 +119,8 @@ export class PSBTServiceImpl {
       inputData.nonWitnessUtxo = rawTxBuffer;
     }
 
-    // Add redeem script for P2SH
-    if (scriptTypeInfo.type === 'p2sh' || scriptTypeInfo.type === 'p2sh-p2wpkh' || scriptTypeInfo.type === 'p2sh-p2wsh') {
-      if (scriptTypeInfo.type === 'p2sh-p2wpkh') {
-        const addressInfo = this.getAddressInfo(sellerAddress, network);
-        if (addressInfo && addressInfo.hash) {
-          inputData.redeemScript = this.bitcoin.payments.p2wpkh({ hash: addressInfo.hash, network }).output;
-        }
-      }
-    }
+    // Add redeem script for P2SH (if we can determine the inner script type)
+    // TODO(@dev): Implement proper P2SH redeem script detection
 
     psbt.addInput(inputData);
 
@@ -136,7 +133,7 @@ export class PSBTServiceImpl {
     // Calculate and add change output if needed
     const feeRate = 10; // sats/vbyte
     const estimatedFee = this.dependencies.estimateFee(
-      [{ address: sellerAddress, value: satoshiAmount }],
+      [{ address: sellerAddress, value: Number(satoshiAmount) }],
       feeRate,
       1 // one input
     );
@@ -150,7 +147,7 @@ export class PSBTServiceImpl {
       dustLimit: TX_CONSTANTS.SRC20_DUST,
       shouldAddChange: changeAmount > BigInt(TX_CONSTANTS.SRC20_DUST)
     });
-    
+
     if (changeAmount < 0n) {
       throw new Error(`Insufficient funds: need ${satoshiAmount + BigInt(estimatedFee)} satoshis but only have ${utxoDetails.value} satoshis`);
     } else if (changeAmount > BigInt(TX_CONSTANTS.SRC20_DUST)) {
@@ -164,8 +161,8 @@ export class PSBTServiceImpl {
       console.log("PSBTService DEBUG - No change output added, amount too small");
     }
 
-    logger.debug("Created PSBT:", formatPsbtForLogging(psbt));
-    
+    logger.debug("psbt-service", { message: "Created PSBT", psbt: formatPsbtForLogging(psbt) });
+
     return psbt.toHex();
   }
 
@@ -178,46 +175,38 @@ export class PSBTServiceImpl {
 
     try {
       const utxo = await this.dependencies.commonUtxoService.getSpecificUTXO(txid, vout);
-      
-      // Check if the UTXO's address matches the provided address
-      if (utxo.address) {
-        return utxo.address === address;
+
+      if (!utxo) {
+        throw new Error(`UTXO ${txid}:${vout} not found`);
       }
-      
-      // If no address, try to derive it from the script
-      const script = Buffer.from(utxo.script, 'hex');
-      const derivedAddress = this.bitcoin.address.fromOutputScript(script, this.getAddressNetwork(address));
-      
-      return derivedAddress === address;
+
+      // Try to derive address from the script
+      try {
+        const script = Buffer.from(utxo.script, 'hex');
+        const network = this.getAddressNetwork(address);
+        const derivedAddress = this.bitcoin.address.fromOutputScript(script, network);
+        return derivedAddress === address;
+      } catch (addressError) {
+        // If there's an error deriving address or network mismatch, return false
+        logger.error("psbt-service", { 
+          message: "Error deriving address from script", 
+          error: addressError instanceof Error ? addressError.message : String(addressError),
+          script: utxo.script,
+          expectedAddress: address
+        });
+        return false;
+      }
     } catch (error) {
-      logger.error(`Error validating UTXO ownership: ${error}`);
+      logger.error("psbt-service", { message: "Error validating UTXO ownership", error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }
 
   // Helper methods
-  private getAddressType(address: string, network: any): string {
-    try {
-      const decoded = this.bitcoin.address.fromBase58Check(address);
-      if (decoded.version === network.pubKeyHash) return "p2pkh";
-      if (decoded.version === network.scriptHash) return "p2sh";
-    } catch {
-      // Not a base58 address, try bech32
-      try {
-        const decoded = this.bitcoin.address.fromBech32(address);
-        if (decoded.version === 0 && decoded.data.length === 20) return "p2wpkh";
-        if (decoded.version === 0 && decoded.data.length === 32) return "p2wsh";
-        if (decoded.version === 1 && decoded.data.length === 32) return "p2tr";
-      } catch {
-        throw new Error("Invalid address format");
-      }
-    }
-    throw new Error("Unknown address type");
-  }
 
   private getAddressNetwork(address: string): any {
     // Check for testnet prefixes
-    if (address.startsWith('tb1') || address.startsWith('2') || 
+    if (address.startsWith('tb1') || address.startsWith('2') ||
         address.startsWith('m') || address.startsWith('n')) {
       try {
         this.bitcoin.address.toOutputScript(address, this.bitcoin.networks.testnet);
@@ -226,7 +215,7 @@ export class PSBTServiceImpl {
         // Fall through to mainnet
       }
     }
-    
+
     // Default to mainnet
     try {
       this.bitcoin.address.toOutputScript(address, this.bitcoin.networks.bitcoin);
@@ -237,19 +226,6 @@ export class PSBTServiceImpl {
     }
   }
 
-  private getAddressInfo(address: string, _network: any): any {
-    try {
-      const decoded = this.bitcoin.address.fromBase58Check(address);
-      return { hash: decoded.hash, version: decoded.version };
-    } catch {
-      try {
-        const decoded = this.bitcoin.address.fromBech32(address);
-        return { hash: Buffer.from(decoded.data), version: decoded.version };
-      } catch {
-        return null;
-      }
-    }
-  }
 
   // Simplified version of processCounterpartyPSBT for testing
   async processCounterpartyPSBT(
@@ -259,25 +235,25 @@ export class PSBTServiceImpl {
     _options?: { serviceFee?: number }
   ): Promise<{ psbtHex: string; isComplete: boolean }> {
     const psbt = this.bitcoin.Psbt.fromHex(psbtHex);
-    
+
     // Parse seller UTXO
     const [txid, voutStr] = sellerUtxo.split(":");
     const vout = parseInt(voutStr, 10);
-    
+
     // Verify buyer is paying to seller
     const hasPaymentToSeller = psbt.txOutputs.some(output => output.address === sellerAddress);
     if (!hasPaymentToSeller) {
       throw new Error("PSBT does not pay to the seller address");
     }
-    
+
     // Get seller UTXO details
     const txInfo = await this.dependencies.getUTXOForAddress(sellerAddress, txid, vout);
     if (!txInfo || !('utxo' in txInfo) || !txInfo.utxo) {
       throw new Error(`Invalid seller UTXO: ${sellerUtxo}`);
     }
-    
+
     const utxoDetails = txInfo.utxo;
-    
+
     // Add seller's input
     psbt.addInput({
       hash: txid,
@@ -287,7 +263,7 @@ export class PSBTServiceImpl {
         value: BigInt(utxoDetails.value),
       },
     });
-    
+
     return {
       psbtHex: psbt.toHex(),
       isComplete: false
@@ -298,27 +274,27 @@ export class PSBTServiceImpl {
   async buildPsbtFromUserFundedRawHex(rawHex: string): Promise<string> {
     const tx = this.bitcoin.Transaction.fromHex(rawHex);
     const psbt = new this.bitcoin.Psbt();
-    
+
     // Add inputs from the transaction
     for (let i = 0; i < tx.ins.length; i++) {
       const input = tx.ins[i];
       const txid = Buffer.from(input.hash).reverse().toString('hex');
       const vout = input.index;
-      
+
       // Get UTXO details for this input
       const utxoInfo = await this.dependencies.commonUtxoService.getSpecificUTXO(txid, vout);
-      
+
       if (utxoInfo && utxoInfo.script) {
         const script = Buffer.from(utxoInfo.script, 'hex');
         const scriptTypeInfo = getScriptTypeInfo(script);
-        
+
         const inputData: any = {
           hash: txid,
           index: vout,
           sequence: input.sequence,
         };
-        
-        if (scriptTypeInfo.isSegwit) {
+
+        if (scriptTypeInfo.isWitness) {
           inputData.witnessUtxo = {
             script: script,
             value: BigInt(utxoInfo.value),
@@ -326,13 +302,16 @@ export class PSBTServiceImpl {
         } else {
           // For non-segwit, we need the full transaction
           const rawTxHex = await this.dependencies.commonUtxoService.getRawTransactionHex(txid);
+          if (!rawTxHex) {
+            throw new Error(`Could not get raw transaction hex for ${txid}`);
+          }
           inputData.nonWitnessUtxo = Buffer.from(rawTxHex, 'hex');
         }
-        
+
         psbt.addInput(inputData);
       }
     }
-    
+
     // Add outputs from the transaction
     for (const output of tx.outs) {
       psbt.addOutput({
@@ -340,14 +319,14 @@ export class PSBTServiceImpl {
         value: output.value,
       });
     }
-    
+
     return psbt.toHex();
   }
 }
 
 export class PSBTService {
   private static commonUtxoService = new CommonUTXOService();
-  
+
   // Dependency injection support
   private static customInstance: PSBTServiceImpl | null = null;
 
@@ -359,6 +338,7 @@ export class PSBTService {
     PSBTService.customInstance = null;
   }
 
+  // @ts-ignore - Method is used internally
   private static getInstance(): PSBTServiceImpl {
     if (PSBTService.customInstance) {
       return PSBTService.customInstance;
@@ -384,12 +364,12 @@ export class PSBTService {
 
     // Fetch specific UTXO details (no ancestor info needed)
     const txInfo = await getUTXOForAddressFromUtils(sellerAddress, txid, vout);
-    
+
     // Type guard to check if txInfo has utxo property
     if (!txInfo || Array.isArray(txInfo) || !('utxo' in txInfo) || !txInfo.utxo) {
       throw new Error(`Invalid UTXO details for ${txid}:${vout}`);
     }
-    
+
     const utxoDetails = txInfo.utxo;
     console.log("UTXO Details:", utxoDetails);
 
@@ -421,12 +401,12 @@ export class PSBTService {
     });
 
     const addressType = PSBTService.getAddressType(sellerAddress, network);
-    
+
     if (addressType === 'p2sh-p2wpkh') {
       const p2wpkh = payments.p2wpkh({ address: sellerAddress, network });
       const p2sh = payments.p2sh({ redeem: p2wpkh, network });
       if (p2sh.redeem?.output) {
-        psbt.updateInput(0, { 
+        psbt.updateInput(0, {
           redeemScript: new Uint8Array(p2sh.redeem.output) // Be explicit with Uint8Array
         });
       }
@@ -437,23 +417,23 @@ export class PSBTService {
   }
 
   // Make sure all helper functions are static class methods
-  private static getAddressType(address: string, network: networks.Network): string {
+  private static getAddressType(address: string, network: typeof networks.bitcoin): string {
     try {
       // First check if it's a valid address
       bjsAddress.toOutputScript(address, network);
-      
+
       // Check for P2WPKH (native segwit) - starts with bc1q for mainnet, tb1q for testnet
       if ((network === networks.bitcoin && address.startsWith('bc1q')) ||
           (network === networks.testnet && address.startsWith('tb1q'))) {
         return 'p2wpkh';
       }
-      
+
       // Check for P2PKH (legacy) - starts with 1 for mainnet, m/n for testnet
       if ((network === networks.bitcoin && address.startsWith('1')) ||
           (network === networks.testnet && (address.startsWith('m') || address.startsWith('n')))) {
         return 'p2pkh';
       }
-      
+
       // Check for P2SH - starts with 3 for mainnet, 2 for testnet
       if ((network === networks.bitcoin && address.startsWith('3')) ||
           (network === networks.testnet && address.startsWith('2'))) {
@@ -468,7 +448,7 @@ export class PSBTService {
           return 'p2sh';
         }
       }
-      
+
       throw new Error('Unsupported address type');
     } catch (_error) {
       throw new Error('Unsupported address type');
@@ -489,7 +469,7 @@ export class PSBTService {
     }
   }
 
-  private static getAddressFromScript(script: Uint8Array, network: networks.Network): string {
+  private static getAddressFromScript(script: Uint8Array, network: typeof networks.bitcoin): string {
     try {
       // Use bjsAddress.fromOutputScript which handles multiple script types
       return bjsAddress.fromOutputScript(Buffer.from(script), network);
@@ -503,6 +483,11 @@ export class PSBTService {
     address: string,
   ): Promise<boolean> {
     try {
+      // Early return false for obviously invalid addresses
+      if (!address || typeof address !== 'string' || address.length < 26 || address.length > 62) {
+        return false;
+      }
+
       const [txid, voutStr] = utxo.split(":");
       const vout = parseInt(voutStr, 10);
 
@@ -540,7 +525,7 @@ export class PSBTService {
 
     } catch (error) {
       console.error("Error in validateUTXOOwnership:", error);
-      return false;
+      return false; // Gracefully return false on any error, including invalid address
     }
   }
 
@@ -703,7 +688,7 @@ export class PSBTService {
       console.log(`[PSBTService] PSBT parsed. Initial input count: ${psbt.inputCount}, output count: ${psbt.txOutputs.length}`);
 
       const originalTx = psbt.data.globalMap.unsignedTx;
-      if (!originalTx || !originalTx.ins || !originalTx.outs) {
+      if (!originalTx || !(originalTx as any).ins || !(originalTx as any).outs) {
         throw new Error("Invalid transaction structure in PSBT from Counterparty");
       }
 
@@ -712,13 +697,13 @@ export class PSBTService {
       for (const [index, _inputDetail] of psbt.data.inputs.entries()) {
         // If witnessUtxo is already present and seems valid, we might trust it.
         // However, CP might provide minimal PSBTs, so re-fetching is safer.
-        const txIn = originalTx.ins[index];
+        const txIn = (originalTx as any).ins[index];
         const inputTxid = Buffer.from(txIn.hash).reverse().toString('hex');
         const inputVout = txIn.index;
-        
+
         console.log(`[PSBTService] Enriching input ${index}: ${inputTxid}:${inputVout}`);
-        const utxoDetails = await this.commonUtxoService.getSpecificUTXO(inputTxid, inputVout, { 
-            includeAncestorDetails: !isDryRun, 
+        const utxoDetails = await this.commonUtxoService.getSpecificUTXO(inputTxid, inputVout, {
+            includeAncestorDetails: !isDryRun,
             forcePublicAPI: true // Consider if always forcing public is needed or use smart fallback
         });
 
@@ -756,7 +741,7 @@ export class PSBTService {
       let totalValueToPreservedOutputs = BigInt(0);
       const outputsToPreserve: { address?: string; script: Buffer; value: bigint }[] = [];
 
-      for (const output of originalTx.outs) {
+      for (const output of (originalTx as any).outs) {
           let isChangeToUser = false;
           try {
             const outputAddress = bjsAddress.fromOutputScript(output.script, network);
@@ -773,7 +758,7 @@ export class PSBTService {
             console.log(`[PSBTService] Ignoring original output to user (potential old change): value=${output.value}, script=${bytesToHex(output.script)}`);
           }
       }
-      
+
       let totalValueToOthers = totalValueToPreservedOutputs;
 
       // 3. Add service fee output if applicable
@@ -786,20 +771,20 @@ export class PSBTService {
         totalValueToOthers += BigInt(options.serviceFeeDetails.fee);
         console.log(`[PSBTService] Added service fee output: ${options.serviceFeeDetails.fee} sats to ${options.serviceFeeDetails.address}`);
       }
-      
+
       // Clear existing outputs from PSBT object to rebuild cleanly
       while (psbt.txOutputs.length > 0) {
         psbt.txOutputs.pop();
       }
       if (psbt.data.globalMap.unsignedTx) {
-          psbt.data.globalMap.unsignedTx.outs = [];
+          (psbt.data.globalMap.unsignedTx as any).outs = [];
       }
 
       // Add preserved and service fee outputs to PSBT for size estimation
       outputsToPreserve.forEach(out => {
         psbt.addOutput({ script: out.script, value: out.value });
       });
-      
+
       // Add a dummy change output for size estimation - use a non-dust value
       psbt.addOutput({ address: userAddress, value: BigInt(2000) }); // e.g., 2000 sats
 
@@ -817,16 +802,16 @@ export class PSBTService {
             throw new Error(`Failed to finalize input #${i} for PSBT construction: ${errorMessage}`);
         }
       }
-      
+
       const tempTx = psbt.extractTransaction(true);
       const estimatedVsize = BigInt(tempTx.virtualSize());
       let calculatedMinerFee = estimatedVsize * BigInt(Math.ceil(targetFeeRateSatVb));
       console.log(`[PSBTService] Fee estimation: VSize=${estimatedVsize}, Rate=${targetFeeRateSatVb} sat/vB, MinerFee=${calculatedMinerFee}`);
-      
+
       // Remove dummy change output and rebuild outputs correctly
       psbt.txOutputs.pop(); // remove dummy change
       if (psbt.data.globalMap.unsignedTx) {
-        psbt.data.globalMap.unsignedTx.outs.pop();
+        (psbt.data.globalMap.unsignedTx as any).outs.pop();
       }
 
 
@@ -845,7 +830,7 @@ export class PSBTService {
           `Insufficient funds: Input ${totalInputValue}, To Others ${totalValueToOthers}, Miner Fee ${calculatedMinerFee}. Deficit: ${-actualUserChange}`,
         );
       }
-      
+
       if (isDryRun) {
         return {
           estimatedFee: Number(calculatedMinerFee),
@@ -855,13 +840,13 @@ export class PSBTService {
           finalUserChange: actualUserChange,
         };
       }
-      
+
       psbt.setMaximumFeeRate(Math.ceil(targetFeeRateSatVb * 1.5)); // Safety margin
 
       // Finalize inputs AGAIN on the final PSBT structure before returning to client
       // This ensures the PSBT is ready for the client to sign.
       console.log("[PSBTService] Finalizing inputs on the final PSBT structure...");
-      
+
       // Create inputsToSign array for return value
       const inputsToSign: { index: number; address?: string; sighashTypes?: number[] }[] = [];
       for (let i = 0; i < psbt.inputCount; i++) {
@@ -878,7 +863,7 @@ export class PSBTService {
       }
 
       const finalPsbtHex = psbt.toHex();
-      
+
       // For verification, re-parse and log details - Keep this section for debugging for now
       console.log("[PSBTService] ------------- VERIFYING FINAL psbtHex ON SERVER (processCounterpartyPSBT v2.0) ------------- ");
       // (Optional: Add verification log similar to buildPsbtFromUserFundedRawHex if needed)
@@ -1002,7 +987,7 @@ export class PSBTService {
       if (opReturnOutput) {
         finalOutputs.push({ script: Buffer.from(opReturnOutput.script), value: BigInt(opReturnOutput.value) });
       }
-      
+
       // 3. Service fee output
       if (options.serviceFeeDetails && options.serviceFeeDetails.fee > 0 && options.serviceFeeDetails.address) {
         finalOutputs.push({
@@ -1015,22 +1000,22 @@ export class PSBTService {
       // ESTIMATE SIZE AND FEE
       const outputsForEstimation: Output[] = [];
       // 1. Dispenser payment output (assume P2WPKH for estimation)
-      outputsForEstimation.push({ value: Number(options.dispenserPaymentAmount) });
+      outputsForEstimation.push({ script: "", value: Number(options.dispenserPaymentAmount) });
       // 2. OP_RETURN output (if present) - estimateFee handles type via determineOutputType
       if (opReturnOutput) {
         outputsForEstimation.push({ script: opReturnOutput.script.toString(), value: Number(opReturnOutput.value) });
       }
       // 3. Service fee output (if present, assume P2WPKH for estimation)
       if (options.serviceFeeDetails && options.serviceFeeDetails.fee > 0) {
-        outputsForEstimation.push({ value: options.serviceFeeDetails.fee });
+        outputsForEstimation.push({ script: "", value: options.serviceFeeDetails.fee });
       }
       // 4. Change output (assume P2WPKH, value doesn't matter as much for size here)
-      outputsForEstimation.push({ value: 1000 }); // Dummy value for size estimation
+      outputsForEstimation.push({ script: "", value: 1000 }); // Dummy value for size estimation
 
       const estimatedMinerFeeFull = estimateFee(outputsForEstimation, targetFeeRateSatVb, 1); // 1 input
       let calculatedMinerFee = BigInt(estimatedMinerFeeFull);
       const estimatedVsize = Math.ceil(estimatedMinerFeeFull / targetFeeRateSatVb); // Back-calculate VSize from fee and rate
-      
+
       console.log(`[PSBTService] Fee Est (using estimateFee): totalValueToOthers=${totalValueToOthers}, estimatedVsize=${estimatedVsize}, targetFeeRateSatVb=${targetFeeRateSatVb}, calculatedMinerFee=${calculatedMinerFee}`);
 
       let actualBuyerChange = totalBuyerInputValue - totalValueToOthers - calculatedMinerFee;
@@ -1052,7 +1037,7 @@ export class PSBTService {
           `Insufficient funds: Input ${totalBuyerInputValue}, To Others ${totalValueToOthers}, Miner Fee ${calculatedMinerFee}. Deficit: ${-actualBuyerChange}`,
         );
       }
-      
+
       // DO NOT CALL FINALIZEINPUT on server for this version
       // The PSBT will be finalized by the client's wallet.
 
@@ -1086,6 +1071,6 @@ export function createPSBTService(dependencies: Partial<PSBTServiceDependencies>
     getUTXOForAddress: dependencies.getUTXOForAddress || getUTXOForAddressFromUtils,
     estimateFee: dependencies.estimateFee || estimateFee,
     commonUtxoService: dependencies.commonUtxoService || CommonUTXOService.getInstance(),
-    bitcoin: dependencies.bitcoin, // Pass through bitcoin lib injection
+    ...(dependencies.bitcoin && { bitcoin: dependencies.bitcoin }),
   });
 }

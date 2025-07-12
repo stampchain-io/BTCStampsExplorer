@@ -2,6 +2,7 @@
 import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletData } from "$lib/types/index.d.ts";
+import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { containerBackground, containerColData } from "$layout";
 import {
@@ -192,7 +193,7 @@ function DispenserStats({
 }: {
   dispensers: WalletOverviewInfo["dispensers"];
   btcPrice: number;
-  walletData: WalletOverviewInfo;
+  walletData: WalletData;
 }) {
   /* ===== VALIDATION ===== */
   if (!walletData.address.startsWith("1D") && !walletData.dispensers?.total) {
@@ -200,7 +201,7 @@ function DispenserStats({
   }
 
   /* ===== COMPUTED VALUES ===== */
-  const firstDispenser = dispensers?.items?.[0];
+  const firstDispenser = (dispensers as any)?.items?.[0];
   const stampData = firstDispenser?.stamp;
 
   if (!firstDispenser || !stampData) return null;
@@ -260,12 +261,11 @@ function DispenserStats({
       {/* Price Display */}
       <div className="flex flex-col justify-end pt-6">
         <StatTitle
-          label={
-            <>
-              {((firstDispenser.satoshirate || 0) / 100000000 * btcPrice)
-                .toFixed(2)} <span className="font-light">USD</span>
-            </>
-          }
+          label={`${
+            ((firstDispenser.satoshirate || 0) / 100000000 * btcPrice).toFixed(
+              2,
+            )
+          } USD`}
           value={
             <>
               {formatBTCAmount((firstDispenser.satoshirate || 0) / 100000000, {
@@ -306,7 +306,7 @@ function WalletStats(
     setShowItem?: (type: string) => void;
     stampValue?: number;
     src20Value?: number;
-    walletData: WalletOverviewInfo;
+    walletData: WalletData;
   },
 ) {
   /* ===== EVENT HANDLERS ===== */
@@ -387,7 +387,7 @@ function TokenStats(
     src20Total: number;
     handleType: (type: string) => void;
     src20Value?: number;
-    walletData: WalletOverviewInfo;
+    walletData: WalletData;
   },
 ) {
   /* ===== COMPUTED VALUES ===== */

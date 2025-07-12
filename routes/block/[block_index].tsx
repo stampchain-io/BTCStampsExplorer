@@ -45,9 +45,14 @@ export const handler: Handlers<BlockPageData> = {
         currentBlock: {
           block_index: 0,
           block_hash: "",
-          block_time: new Date().toISOString(),
+          block_time: new Date(),
           issuances: 0,
-          // Add other required BlockRow properties with safe default values
+          previous_block_hash: "",
+          difficulty: 0,
+          ledger_hash: "",
+          txlist_hash: "",
+          messages_hash: "",
+          indexed: 1,
         } as BlockRow,
         relatedBlocks: [],
         error: "Failed to load block data",

@@ -1,25 +1,24 @@
+import {
+    STAMP_EDITIONS,
+    STAMP_FILESIZES,
+    STAMP_FILETYPES,
+    STAMP_FILTER_TYPES,
+    STAMP_MARKETPLACE,
+    STAMP_RANGES,
+    STAMP_SUFFIX_FILTERS,
+    STAMP_TYPES,
+    SUBPROTOCOLS,
+} from "$globals";
 import { StampRepository } from "$server/database/index.ts";
 import { BlockService } from "$server/services/blockService.ts";
-import {
-  STAMP_FILTER_TYPES,
-  STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES,
-  SUBPROTOCOLS,
-  STAMP_FILETYPES,
-  STAMP_EDITIONS,
-  STAMP_MARKETPLACE,
-  STAMP_RANGES,
-  STAMP_FILESIZES,
-} from "$globals";
-import { DispenserManager } from "$server/services/xcpService.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { DispenserManager, XcpManager } from "$server/services/xcpService.ts";
 
-import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
+import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
-import type { StampMarketData } from "$types/marketData.d.ts";
 import type { XcpBalance } from "$types/index.d.ts";
+import type { StampMarketData } from "$types/marketData.d.ts";
 
 interface StampServiceOptions {
   cacheType: RouteType;
@@ -52,8 +51,8 @@ export class StampService {
         noPagination: true,
         type: stampType,
         skipTotalCount: true,
-        cacheType,
-        cacheDuration,
+        ...(cacheType && { cacheType }),
+        ...(cacheDuration !== undefined && { cacheDuration }),
         includeSecondary
       });
 
@@ -71,9 +70,8 @@ export class StampService {
         };
       }
 
-      // Get asset details from XCP with same cache parameters
-      const { duration } = getCacheConfig(cacheType || RouteType.STAMP_DETAIL);
-      const asset = await XcpManager.getAssetInfo(stamp.cpid, duration);
+      // Get asset details from XCP
+      const asset = await XcpManager.getAssetInfo(stamp.cpid);
 
       return {
         stamp,
@@ -166,6 +164,7 @@ export class StampService {
     minDataQualityScore?: string;
     maxCacheAgeMinutes?: string;
     priceSource?: string;
+    collectionStampLimit?: number;
   }) {
     // Extract range parameters from URL if not already set
     let range = options.range;
@@ -214,43 +213,42 @@ export class StampService {
     const [result, lastBlock] = await Promise.all([
       StampRepository.getStamps({
         ...queryOptions,
-        includeSecondary: options.includeSecondary,
-        cacheType: options.cacheType,
-        cacheDuration: options.cacheDuration,
-        fileType: options.fileType,
-        editions: options.editions,
-        range: range,
-        rangeMin: rangeMin,
-        rangeMax: rangeMax,
-        market: options.market,
-        dispensers: options.dispensers,
-        atomics: options.atomics,
-        listings: options.listings,
-        listingsMin: options.listingsMin,
-        listingsMax: options.listingsMax,
-        sales: options.sales,
-        salesMin: options.salesMin,
-        salesMax: options.salesMax,
-        volume: options.volume,
-        volumeMin: options.volumeMin,
-        volumeMax: options.volumeMax,
-        fileSize: options.fileSize,
-        fileSizeMin: options.fileSizeMin,
-        fileSizeMax: options.fileSizeMax,
-        // Pass filters object with market data filters (Task 42)
-        filters: {
-          minHolderCount: options.minHolderCount,
-          maxHolderCount: options.maxHolderCount,
-          minDistributionScore: options.minDistributionScore,
-          maxTopHolderPercentage: options.maxTopHolderPercentage,
-          minFloorPriceBTC: options.minFloorPriceBTC,
-          maxFloorPriceBTC: options.maxFloorPriceBTC,
-          minVolume24h: options.minVolume24h,
-          minPriceChange24h: options.minPriceChange24h,
-          minDataQualityScore: options.minDataQualityScore,
-          maxCacheAgeMinutes: options.maxCacheAgeMinutes,
-          priceSource: options.priceSource,
-        },
+        ...(options.includeSecondary !== undefined && { includeSecondary: options.includeSecondary }),
+        ...(options.cacheType && { cacheType: options.cacheType }),
+        ...(options.cacheDuration !== undefined && { cacheDuration: options.cacheDuration }),
+        ...(options.fileType !== undefined && { fileType: options.fileType }),
+        ...(options.editions !== undefined && { editions: options.editions }),
+        ...(range !== undefined && { range: range }),
+        ...(rangeMin !== undefined && { rangeMin: rangeMin }),
+        ...(rangeMax !== undefined && { rangeMax: rangeMax }),
+        ...(options.market !== undefined && { market: options.market }),
+        ...(options.dispensers !== undefined && { dispensers: options.dispensers }),
+        ...(options.atomics !== undefined && { atomics: options.atomics }),
+        ...(options.listings !== undefined && { listings: options.listings }),
+        ...(options.listingsMin !== undefined && { listingsMin: options.listingsMin }),
+        ...(options.listingsMax !== undefined && { listingsMax: options.listingsMax }),
+        ...(options.sales !== undefined && { sales: options.sales }),
+        ...(options.salesMin !== undefined && { salesMin: options.salesMin }),
+        ...(options.salesMax !== undefined && { salesMax: options.salesMax }),
+        ...(options.volume !== undefined && { volume: options.volume }),
+        ...(options.volumeMin !== undefined && { volumeMin: options.volumeMin }),
+        ...(options.volumeMax !== undefined && { volumeMax: options.volumeMax }),
+        ...(options.fileSize !== undefined && { fileSize: options.fileSize }),
+        ...(options.fileSizeMin !== undefined && { fileSizeMin: options.fileSizeMin }),
+        ...(options.fileSizeMax !== undefined && { fileSizeMax: options.fileSizeMax }),
+        // Pass market data filters conditionally
+        ...(options.minHolderCount !== undefined && { minHolderCount: options.minHolderCount }),
+        ...(options.maxHolderCount !== undefined && { maxHolderCount: options.maxHolderCount }),
+        ...(options.minDistributionScore !== undefined && { minDistributionScore: options.minDistributionScore }),
+        ...(options.maxTopHolderPercentage !== undefined && { maxTopHolderPercentage: options.maxTopHolderPercentage }),
+        ...(options.minFloorPriceBTC !== undefined && { minFloorPriceBTC: options.minFloorPriceBTC }),
+        ...(options.maxFloorPriceBTC !== undefined && { maxFloorPriceBTC: options.maxFloorPriceBTC }),
+        ...(options.minVolume24h !== undefined && { minVolume24h: options.minVolume24h }),
+        ...(options.minPriceChange24h !== undefined && { minPriceChange24h: options.minPriceChange24h }),
+        ...(options.minDataQualityScore !== undefined && { minDataQualityScore: options.minDataQualityScore }),
+        ...(options.maxCacheAgeMinutes !== undefined && { maxCacheAgeMinutes: options.maxCacheAgeMinutes }),
+        ...(options.priceSource !== undefined && { priceSource: options.priceSource }),
+        ...(options.collectionStampLimit !== undefined && { collectionStampLimit: options.collectionStampLimit }),
       }),
       BlockService.getLastBlock(),
     ]);
@@ -478,9 +476,9 @@ export class StampService {
     cpid: string, 
     page?: number, 
     limit?: number,
-    options: StampServiceOptions
+    options?: StampServiceOptions
   ) {
-    const { duration } = getCacheConfig(options.cacheType);
+    const { duration } = getCacheConfig(options?.cacheType || RouteType.STAMP_DISPENSER);
     if (page !== undefined && limit !== undefined) {
       return await DispenserManager.getDispensersByCpid(cpid, page, limit, duration);
     }
@@ -613,12 +611,12 @@ export class StampService {
   }): Promise<any[]> {
     // Use the repository method that includes JOIN with market data
     const stampsWithMarketData = await MarketDataRepository.getStampsWithMarketData({
-      collectionId: options.collectionId,
-      offset: options.offset,
-      limit: options.limit,
-      filters: options.filters,
-      sortBy: options.sortBy,
-      sortOrder: options.sortOrder
+      ...(options.collectionId && { collectionId: options.collectionId }),
+      ...(options.offset !== undefined && { offset: options.offset }),
+      ...(options.limit !== undefined && { limit: options.limit }),
+      ...(options.filters && { filters: options.filters }),
+      ...(options.sortBy && { sortBy: options.sortBy }),
+      ...(options.sortOrder && { sortOrder: options.sortOrder })
     });
 
     // Enrich each stamp with USD calculations and cache status

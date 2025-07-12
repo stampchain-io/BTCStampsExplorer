@@ -105,8 +105,8 @@ export function ExplorerPage(props: StampPageProps) {
     stamps,
     page,
     totalPages,
-    filterBy,
-    sortBy,
+    filterBy: _filterBy,
+    sortBy: _sortBy,
     selectedTab,
   } = props.data;
 
@@ -117,10 +117,7 @@ export function ExplorerPage(props: StampPageProps) {
   return (
     <div class="w-full" f-client-nav data-partial="/explorer">
       {/* Header Component with Filter Controls */}
-      <ExplorerHeader
-        filterBy={filterBy as STAMP_FILTER_TYPES[]}
-        sortBy={sortBy}
-      />
+      <ExplorerHeader />
 
       {/* Main Content with Pagination */}
       <ExplorerContent

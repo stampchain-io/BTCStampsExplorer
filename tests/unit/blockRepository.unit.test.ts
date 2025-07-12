@@ -289,7 +289,10 @@ Deno.test("BlockRepository Unit Tests with DI", async (t) => {
       assertEquals(Array.isArray(result), true);
     } catch (error) {
       // If an error is thrown, it should be a specific error
-      console.log("Error thrown:", error.message);
+      console.log(
+        "Error thrown:",
+        error instanceof Error ? error.message : String(error),
+      );
       assertExists(error);
     }
 

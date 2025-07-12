@@ -106,9 +106,9 @@ export default function ToolSrc20Page(
         return (
           <SRC20MintTool
             trxType={trxType}
-            tick={tick}
-            mintStatus={mintStatus}
-            holders={holders}
+            {...(tick && { tick })}
+            {...(mintStatus && { mintStatus })}
+            {...(holders !== undefined && { holders })}
           />
         );
       case "deploy":

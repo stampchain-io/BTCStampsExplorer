@@ -61,8 +61,8 @@ export const HoldersPieChart = ({ holders }: PieChartProps) => {
             backgroundColor: "#000000BF",
             titleColor: "#CCCCCC",
             bodyColor: "#CCCCCC",
-            position: "nearest",
-            yAlign: "bottom",
+            position: "nearest" as const,
+            yAlign: "bottom" as const,
             callbacks: {
               label: (context: any) => {
                 const holder = holders[context.dataIndex];

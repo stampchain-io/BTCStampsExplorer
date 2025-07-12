@@ -5,7 +5,7 @@ import { SecurityService } from "$server/services/security/securityService.ts";
 export class CreatorService {
   static async getCreatorNameByAddress(address: string): Promise<string | null> {
     try {
-      return await StampController.getCreatorNameByAddress(address);
+      return await StampController.getCreatorNameByAddress(address) as any;
     } catch (error) {
       console.error("Error in CreatorService.getCreatorNameByAddress:", error);
       return null;

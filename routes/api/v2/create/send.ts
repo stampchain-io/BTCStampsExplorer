@@ -100,7 +100,7 @@ export const handler: Handlers<SendResponse | { error: string }> = {
         // Assuming XcpManager.createSend handles conversion if CP API needs fee_per_kb
         fee_per_kb: options.fee_per_kb ||
           (satsPerVB
-            ? satsPerVB * TX_CONSTANTS.APPROX_VBYTES_PER_KB / 1000
+            ? satsPerVB * (TX_CONSTANTS as any).APPROX_VBYTES_PER_KB / 1000
             : undefined),
       };
       if (options.memo !== undefined) xcpCreateSendOptions.memo = options.memo;
@@ -162,8 +162,14 @@ export const handler: Handlers<SendResponse | { error: string }> = {
       const inputVout = cpInput.index;
 
       // Fetch full UTXO details for this input
-      const utxoDetails: DetailedUTXO | null = await commonUtxoService
+      const rawUtxoDetails = await commonUtxoService
         .getSpecificUTXO(inputTxid, inputVout);
+      const utxoDetails: DetailedUTXO | null = rawUtxoDetails
+        ? {
+          ...rawUtxoDetails,
+          scriptType: rawUtxoDetails.scriptType as any, // Type cast to handle different ScriptType definitions
+        }
+        : null;
       if (
         !utxoDetails || !utxoDetails.script || utxoDetails.value === undefined
       ) {

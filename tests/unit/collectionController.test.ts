@@ -3,11 +3,11 @@
  * Aims for high coverage with mocked dependencies and fixtures
  */
 
+import { CollectionController } from "$server/controller/collectionController.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { CollectionService } from "$server/services/collectionService.ts";
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { CollectionController } from "$server/controller/collectionController.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
-import { StampController } from "$server/controller/stampController.ts";
 
 // Test fixtures
 const mockCollectionData = {
@@ -538,7 +538,7 @@ describe("CollectionController", () => {
         limit: 50,
       });
 
-      assertEquals(capturedStampParams.collectionId, ["POSH"]);
+      assertEquals(capturedStampParams.collectionId, "POSH");
       assertEquals(capturedStampParams.noPagination, false);
       assertEquals(capturedStampParams.type, "all");
       assertEquals(capturedStampParams.sortBy, "ASC");

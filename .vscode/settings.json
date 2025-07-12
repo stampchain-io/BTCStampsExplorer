@@ -1,4 +1,5 @@
 {
+  // === DENO CONFIGURATION ===
   "deno.enable": true,
   "deno.lint": true,
   "deno.config": "./deno.json",
@@ -13,33 +14,199 @@
   "deno.suggest.imports.autoDiscover": true,
   "deno.codeLens.test": true,
   "deno.codeLens.testArgs": ["--allow-all", "--no-check"],
+  "deno.testing.enable": true,
+  "deno.unstable": true,
+
+  // === TYPESCRIPT/JAVASCRIPT CONFIGURATION ===
+  // Disable built-in TS/JS support in favor of Deno
   "typescript.suggest.autoImports": false,
   "typescript.suggest.completeFunctionCalls": true,
   "typescript.suggest.names": true,
   "typescript.suggest.paths": true,
   "typescript.validate.enable": false,
+  "typescript.preferences.quoteStyle": "double",
+  "typescript.preferences.includePackageJsonAutoImports": "off",
   "javascript.suggest.autoImports": false,
   "javascript.suggest.completeFunctionCalls": true,
   "javascript.suggest.names": true,
   "javascript.suggest.paths": true,
+  "javascript.validate.enable": false,
+  "javascript.preferences.quoteStyle": "double",
+
+  // === EDITOR CONFIGURATION ===
   "editor.defaultFormatter": "denoland.vscode-deno",
   "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": false,
   "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
   "editor.rulers": [80],
+  "editor.wordWrap": "bounded",
+  "editor.wordWrapColumn": 80,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit"
   },
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.inlineSuggest.enabled": true,
+
+  // === FILE TYPE SPECIFIC FORMATTING ===
   "[typescript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
+    "editor.defaultFormatter": "denoland.vscode-deno",
+    "editor.tabSize": 2
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
+    "editor.defaultFormatter": "denoland.vscode-deno",
+    "editor.tabSize": 2
   },
   "[javascript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
+    "editor.defaultFormatter": "denoland.vscode-deno",
+    "editor.tabSize": 2
   },
   "[javascriptreact]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
+    "editor.defaultFormatter": "denoland.vscode-deno",
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.defaultFormatter": "denoland.vscode-deno",
+    "editor.tabSize": 2
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "denoland.vscode-deno",
+    "editor.tabSize": 2
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one",
+    "editor.wordWrap": "on",
+    "editor.rulers": []
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.tabSize": 2
+  },
+
+  // === TERMINAL CONFIGURATION ===
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.profiles.osx": {
+    "zsh": {
+      "path": "/bin/zsh",
+      "args": ["-l"]
+    },
+    "bash": {
+      "path": "/bin/bash",
+      "args": ["-l"]
+    }
+  },
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.enableMultiLinePasteWarning": false,
+  "terminal.integrated.allowWorkspaceConfiguration": true,
+  "terminal.integrated.cwd": "${workspaceFolder}",
+
+  // === FILES CONFIGURATION ===
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/_fresh": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/tmp": true,
+    "**/.cache": true,
+    "**/build": true,
+    "**/vendor": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/_fresh/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true,
+    "**/tmp/**": true,
+    "**/.cache/**": true,
+    "**/build/**": true,
+    "**/vendor/**": true
+  },
+  "files.associations": {
+    "*.tsx": "typescriptreact",
+    "*.ts": "typescript",
+    "deno.json": "jsonc",
+    "deno.jsonc": "jsonc"
+  },
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "files.trimFinalNewlines": true,
+
+  // === SEARCH CONFIGURATION ===
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/_fresh": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/tmp": true,
+    "**/.cache": true,
+    "**/build": true,
+    "**/vendor": true,
+    "**/*.log": true
+  },
+
+  // === TAILWIND CSS CONFIGURATION ===
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["tw`([^`]*)", "'([^']*)'"],
+    ["tw=\"([^\"]*)\"", "'([^']*)'"],
+    ["tw={\"([^\"}]*)", "'([^']*)'"],
+    ["tw\\.\\w+`([^`]*)", "'([^']*)'"],
+    ["tw\\(.*?\\)`([^`]*)", "'([^']*)'"]
+  ],
+
+  // === GITLENS CONFIGURATION (to prevent terminal issues) ===
+  "gitlens.advanced.fileHistoryFollowsRenames": false,
+  "gitlens.advanced.fileHistoryShowAllBranches": false,
+  "gitlens.blame.ignoreWhitespace": true,
+  "gitlens.gitCommands.skipConfirmations": ["fetch:command", "stash-push:command"],
+  "gitlens.outputLevel": "warn",
+
+  // === TESTING CONFIGURATION ===
+  "testing.automaticallyOpenPeekView": "never",
+  "testing.openTesting": "neverOpen",
+
+  // === WORKSPACE SPECIFIC ===
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.enablePreviewFromQuickOpen": false,
+  "workbench.startupEditor": "none",
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+
+  // === SPELL CHECKER ===
+  "cSpell.words": [
+    "deno",
+    "preact",
+    "tailwindcss",
+    "bitcoinjs",
+    "bigfloat",
+    "axiod",
+    "sweetalert",
+    "qrcode",
+    "puppeteer",
+    "screenshotone",
+    "stampchain",
+    "src20",
+    "src101",
+    "psbt",
+    "utxo",
+    "btcstamps",
+    "fairmint"
+  ],
+
+  // === PERFORMANCE ===
+  "extensions.experimental.affinity": {
+    "denoland.vscode-deno": 1
   }
 }

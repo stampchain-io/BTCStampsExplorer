@@ -7,6 +7,17 @@ export interface CacheConfig {
   duration: number;
   staleWhileRevalidate?: number;
   staleIfError?: number;
+  ttl?: number;
+}
+
+// Interface for dbManager with proper generic typing
+export interface DbManager {
+  handleCache<T>(
+    key: string,
+    factory: () => Promise<T>,
+    duration: number
+  ): Promise<T>;
+  getFromCache<T>(key: string): Promise<T | null>;
 }
 
 export interface CacheService {
@@ -167,7 +178,7 @@ export class InMemoryCacheService implements CacheService {
  * Redis-based cache adapter (wrapper for existing dbManager)
  */
 export class RedisCacheService implements CacheService {
-  constructor(private dbManager: any) {}
+  constructor(private dbManager: DbManager) {}
 
   async get<T>(
     key: string,

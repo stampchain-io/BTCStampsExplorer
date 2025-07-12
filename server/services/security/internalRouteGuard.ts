@@ -69,7 +69,7 @@ export class InternalRouteGuard {
       return ResponseUtil.badRequest("Missing signature data");
     }
 
-    const isValid = SecurityService.verifySignature(message, signature, address);
+    const isValid = (SecurityService as any).verifySignature(message, signature, address);
     if (!isValid) {
       return ResponseUtil.badRequest("Invalid signature");
     }
@@ -96,7 +96,7 @@ export class InternalRouteGuard {
       return ResponseUtil.custom(
         { error: "Missing API key" },
         401,
-        { "Cache-Control": "no-store" }
+        { headers: { "Cache-Control": "no-store" } }
       );
     }
 
@@ -105,7 +105,7 @@ export class InternalRouteGuard {
       return ResponseUtil.custom(
         { error: "Invalid API key" },
         401,
-        { "Cache-Control": "no-store" }
+        { headers: { "Cache-Control": "no-store" } }
       );
     }
 
@@ -238,7 +238,7 @@ export class InternalRouteGuard {
 
     // Special case: If no origin/referer, but host matches allowed domains
     if (!origin && !referer && host) {
-      const isValidHost = isDomainMatch(host, mainDomain) || 
+      const isValidHost = (mainDomain && isDomainMatch(host, mainDomain)) || 
         allowedDomains.some(allowed => isDomainMatch(host, allowed));
       
       if (isValidHost) {

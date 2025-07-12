@@ -7,7 +7,8 @@ import { assertEquals, assertExists } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
 
 // Set test environment
-(globalThis as any).SKIP_REDIS_CONNECTION = true;
+(globalThis as unknown as { SKIP_REDIS_CONNECTION: boolean })
+  .SKIP_REDIS_CONNECTION = true;
 Deno.env.set("SKIP_REDIS_CONNECTION", "true");
 Deno.env.set("DENO_ENV", "test");
 
@@ -27,12 +28,12 @@ import type {
 
 // Mock implementations
 class MockCacheService implements CacheService {
-  private cache = new Map<string, { value: any; expiry: number }>();
+  private cache = new Map<string, { value: unknown; expiry: number }>();
 
   async get<T>(
     key: string,
     factory: () => Promise<T>,
-    config: { ttl: number },
+    config?: { ttl?: number },
   ): Promise<T> {
     const cached = this.cache.get(key);
     const now = Date.now();
@@ -43,12 +44,36 @@ class MockCacheService implements CacheService {
 
     // Cache miss - compute new value
     const value = await factory();
+    const ttl = config?.ttl ?? 60; // Default to 60 seconds
     this.cache.set(key, {
       value,
-      expiry: now + (config.ttl * 1000),
+      expiry: now + (ttl * 1000),
     });
 
     return value;
+  }
+
+  async getOnly<T>(key: string): Promise<T | undefined> {
+    await Promise.resolve(); // Make it async
+    const cached = this.cache.get(key);
+    const now = Date.now();
+
+    if (cached && cached.expiry > now) {
+      return cached.value as T;
+    }
+    return undefined;
+  }
+
+  async exists(key: string): Promise<boolean> {
+    await Promise.resolve(); // Make it async
+    const cached = this.cache.get(key);
+    const now = Date.now();
+    return cached !== undefined && cached.expiry > now;
+  }
+
+  async getStats(): Promise<{ hits: number; misses: number; hitRate: number }> {
+    await Promise.resolve(); // Make it async
+    return { hits: 0, misses: 0, hitRate: 0 };
   }
 
   async set<T>(key: string, value: T, ttlSeconds?: number): Promise<void> {
@@ -64,16 +89,17 @@ class MockCacheService implements CacheService {
     this.cache.delete(key);
   }
 
-  clear(): void {
+  async clear(): Promise<void> {
+    await Promise.resolve(); // Make it async
     this.cache.clear();
   }
 }
 
 class MockHttpClient implements HttpClient {
-  private mockResponses = new Map<string, HttpResponse<any>>();
+  private mockResponses = new Map<string, HttpResponse<unknown>>();
   private shouldFail = false;
 
-  setMockResponse(url: string, response: HttpResponse<any>): void {
+  setMockResponse(url: string, response: HttpResponse<unknown>): void {
     this.mockResponses.set(url, response);
   }
 
@@ -85,7 +111,10 @@ class MockHttpClient implements HttpClient {
     this.mockResponses.clear();
   }
 
-  async get<T = any>(url: string, _config?: any): Promise<HttpResponse<T>> {
+  async get<T = unknown>(
+    url: string,
+    _config?: unknown,
+  ): Promise<HttpResponse<T>> {
     await Promise.resolve(); // Simulate async operation
     if (this.shouldFail) {
       throw new Error("Mock HTTP client configured to fail");
@@ -106,22 +135,22 @@ class MockHttpClient implements HttpClient {
     };
   }
 
-  async post<T = any>(): Promise<HttpResponse<T>> {
+  async post<T = unknown>(): Promise<HttpResponse<T>> {
     await Promise.resolve();
     throw new Error("POST not implemented in mock");
   }
 
-  async put<T = any>(): Promise<HttpResponse<T>> {
+  async put<T = unknown>(): Promise<HttpResponse<T>> {
     await Promise.resolve();
     throw new Error("PUT not implemented in mock");
   }
 
-  async delete<T = any>(): Promise<HttpResponse<T>> {
+  async delete<T = unknown>(): Promise<HttpResponse<T>> {
     await Promise.resolve();
     throw new Error("DELETE not implemented in mock");
   }
 
-  async request<T = any>(): Promise<HttpResponse<T>> {
+  async request<T = unknown>(): Promise<HttpResponse<T>> {
     await Promise.resolve();
     throw new Error("Generic request not implemented in mock");
   }
@@ -177,7 +206,7 @@ describe("BTCPriceServiceDI", () => {
       assertEquals(price1.source, "coingecko");
 
       // Clear cache to force fresh fetch
-      mockCache.clear();
+      await mockCache.clear();
 
       // Second call should rotate to second provider
       const price2 = await priceService.getPrice();
@@ -298,11 +327,11 @@ describe("BTCPriceServiceDI", () => {
       });
 
       // Multiple calls should always use first provider
-      mockCache.clear();
+      await mockCache.clear();
       const price1 = await nonRotatingService.getPrice();
       assertEquals(price1.source, "coingecko");
 
-      mockCache.clear();
+      await mockCache.clear();
       const price2 = await nonRotatingService.getPrice();
       assertEquals(price2.source, "coingecko");
     });
@@ -334,6 +363,10 @@ describe("BTCPriceServiceDI", () => {
           await Promise.resolve();
           throw new Error("Cache service failure");
         },
+        getOnly: async () => {
+          await Promise.resolve();
+          return undefined;
+        },
         set: async () => {
           await Promise.resolve();
           throw new Error("Cache set failure");
@@ -341,6 +374,18 @@ describe("BTCPriceServiceDI", () => {
         delete: async () => {
           await Promise.resolve();
           throw new Error("Cache delete failure");
+        },
+        clear: async () => {
+          await Promise.resolve();
+          throw new Error("Cache clear failure");
+        },
+        exists: async () => {
+          await Promise.resolve();
+          return false;
+        },
+        getStats: async () => {
+          await Promise.resolve();
+          return { hits: 0, misses: 0, hitRate: 0 };
         },
       };
 

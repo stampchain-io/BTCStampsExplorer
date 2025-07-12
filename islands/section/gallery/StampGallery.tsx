@@ -229,6 +229,7 @@ export default function StampGallery({
                       showEdition={showEdition}
                       showMinDetails={showMinDetails}
                       variant={variant}
+                      {...(fromPage && { fromPage })}
                     />
                   </div>
                 ))
@@ -268,6 +269,7 @@ export default function StampGallery({
                       showEdition={showEdition}
                       showMinDetails={showMinDetails}
                       variant={variant}
+                      {...(fromPage && { fromPage })}
                     />
                   </div>
                 ))
@@ -283,7 +285,7 @@ export default function StampGallery({
           <Pagination
             page={pagination.page}
             totalPages={pagination.totalPages}
-            prefix={pagination.prefix || ""}
+            {...(pagination.prefix && { prefix: pagination.prefix })}
             onPageChange={handlePageChange}
           />
         </div>

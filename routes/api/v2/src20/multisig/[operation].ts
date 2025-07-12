@@ -36,6 +36,10 @@ export const handler: Handlers<TX | TXError> = {
           break;
       }
 
+      if (!result) {
+        return ApiResponseUtil.badRequest("Operation failed");
+      }
+
       if (result.error) {
         return ApiResponseUtil.badRequest(result.error);
       }

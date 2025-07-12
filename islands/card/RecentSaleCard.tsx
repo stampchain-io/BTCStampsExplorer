@@ -105,7 +105,13 @@ export function RecentSaleCard({
                 class="text-blue-400 hover:text-blue-300 transition-colors text-sm font-mono flex items-center gap-1"
               >
                 {abbreviateAddress(sale.sale_data.buyer_address, 6)}
-                <Icon name="external-link" size="xs" />
+                <Icon
+                  name="external-link"
+                  size="xs"
+                  type="icon"
+                  weight="normal"
+                  color="grey"
+                />
               </a>
             </div>
           )}
@@ -121,7 +127,13 @@ export function RecentSaleCard({
                 class="text-purple-400 hover:text-purple-300 transition-colors text-sm font-mono flex items-center gap-1"
               >
                 {abbreviateAddress(sale.sale_data.dispenser_address, 6)}
-                <Icon name="external-link" size="xs" />
+                <Icon
+                  name="external-link"
+                  size="xs"
+                  type="icon"
+                  weight="normal"
+                  color="grey"
+                />
               </a>
             </div>
           )}
@@ -153,7 +165,13 @@ export function RecentSaleCard({
               rel="noopener noreferrer"
               class="flex items-center justify-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm w-full py-2 bg-gray-800 rounded hover:bg-gray-700"
             >
-              <Icon name="external-link" size="xs" />
+              <Icon
+                name="external-link"
+                size="xs"
+                type="icon"
+                weight="normal"
+                color="custom"
+              />
               View Sale Transaction
             </a>
 
@@ -165,7 +183,13 @@ export function RecentSaleCard({
                 rel="noopener noreferrer"
                 class="flex items-center justify-center gap-2 text-purple-400 hover:text-purple-300 transition-colors text-sm w-full py-2 bg-gray-800 rounded hover:bg-gray-700"
               >
-                <Icon name="external-link" size="xs" />
+                <Icon
+                  name="external-link"
+                  size="xs"
+                  type="icon"
+                  weight="normal"
+                  color="grey"
+                />
                 View Dispenser Transaction
               </a>
             )}

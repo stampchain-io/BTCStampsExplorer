@@ -102,8 +102,8 @@ async function decodeSRC20Transaction(txHash: string): Promise<string> {
     }
   } catch (error) {
     console.error("Error decoding data:", error);
-    // If all decoding attempts fail, return the data as a string
-    return new TextDecoder().decode(chunk).trim();
+    // If all decoding attempts fail, return empty string
+    return "";
   }
 }
 

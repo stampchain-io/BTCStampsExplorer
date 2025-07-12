@@ -309,7 +309,7 @@ function SearchContent({
     console.log("Error state changed:", searchState.value.error);
   }, [searchState.value.error]);
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     console.log(
       "KeyDown in SearchContent:",
       e.key,

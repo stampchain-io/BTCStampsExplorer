@@ -14,8 +14,8 @@ export class CollectionService {
 
     const [collectionsResult, totalCollections, lastBlock] = await Promise.all([
       includeMarketData 
-        ? CollectionRepository.getCollectionDetailsWithMarketData({ limit, page, creator, sortBy, minStampCount, includeMarketData })
-        : CollectionRepository.getCollectionDetails({ limit, page, creator, sortBy, minStampCount }),
+        ? CollectionRepository.getCollectionDetailsWithMarketData({ limit, page, ...(creator && { creator }), ...(sortBy && { sortBy }), ...(minStampCount && { minStampCount }), includeMarketData })
+        : CollectionRepository.getCollectionDetails({ limit, page, ...(creator && { creator }), ...(sortBy && { sortBy }), ...(minStampCount && { minStampCount }) }),
       CollectionRepository.getTotalCollectionsByCreatorFromDb(creator, minStampCount),
       BlockController.getLastBlock(),
     ]);
@@ -58,16 +58,18 @@ export class CollectionService {
   ): Promise<PaginatedCollectionResponseBody> {
     const { limit = 50, page = 1, creator } = params;
 
-    const [collectionsResult, totalCollections] = await Promise.all([
-      CollectionRepository.getCollectionNames({ limit, page, creator }),
+    const [collectionsResult, totalCollections, lastBlock] = await Promise.all([
+      CollectionRepository.getCollectionNames({ limit, page, ...(creator && { creator }) }),
       CollectionRepository.getTotalCollectionsByCreatorFromDb(creator),
+      BlockController.getLastBlock(),
     ]);
 
     const pagination = paginate(totalCollections, page, limit);
 
     return {
       ...pagination,
-      data: collectionsResult,
+      last_block: lastBlock,
+      data: collectionsResult as any,
     };
   }
 }

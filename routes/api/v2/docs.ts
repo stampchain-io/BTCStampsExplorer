@@ -11,7 +11,10 @@ const openApiSchema = parseYaml(schemaContent) as Record<string, unknown>;
 // Helper function to resolve $ref in schemas
 function resolveRef(ref: string): Record<string, unknown> | null {
   const path = ref.replace("#/components/schemas/", "").split("/");
-  let schema = openApiSchema.components?.schemas as Record<string, unknown>;
+  let schema = (openApiSchema as any).components?.schemas as Record<
+    string,
+    unknown
+  >;
 
   for (const segment of path) {
     if (!schema || typeof schema !== "object") return null;

@@ -22,8 +22,8 @@ Deno.test("Redis Fee System Tests", async (t) => {
   await t.step(
     "FeeService.getFeeData() returns valid fee data structure",
     async () => {
-      const baseUrl = "https://test.example.com";
-      const feeData = await FeeService.getFeeData(baseUrl);
+      const _baseUrl = "https://test.example.com";
+      const feeData = await FeeService.getFeeData();
 
       // Verify required fields
       assertExists(feeData.recommendedFee);
@@ -55,14 +55,14 @@ Deno.test("Redis Fee System Tests", async (t) => {
   );
 
   await t.step("FeeService uses Redis caching correctly", async () => {
-    const baseUrl = "https://test.example.com";
+    const _baseUrl = "https://test.example.com";
 
     // First call - should fetch fresh data
-    const firstCall = await FeeService.getFeeData(baseUrl);
+    const firstCall = await FeeService.getFeeData();
 
     // Second call immediately after - should use cache (much faster)
     const cacheStartTime = Date.now();
-    const secondCall = await FeeService.getFeeData(baseUrl);
+    const secondCall = await FeeService.getFeeData();
     const cacheCallTime = Date.now() - cacheStartTime;
 
     // Verify both calls return valid data
@@ -86,10 +86,10 @@ Deno.test("Redis Fee System Tests", async (t) => {
     // Since we can't easily mock external APIs in this test environment,
     // we'll test that the service handles invalid URLs gracefully
 
-    const baseUrl = "https://invalid-test-url.example.com";
+    const _baseUrl = "https://invalid-test-url.example.com";
 
     try {
-      const feeData = await FeeService.getFeeData(baseUrl);
+      const feeData = await FeeService.getFeeData();
 
       // Should still return valid data
       assertExists(feeData.recommendedFee);
@@ -119,16 +119,16 @@ Deno.test("Redis Fee System Tests", async (t) => {
   });
 
   await t.step("FeeService.invalidateCache() works correctly", async () => {
-    const baseUrl = "https://test.example.com";
+    const _baseUrl = "https://test.example.com";
 
     // Get initial data
-    const initialData = await FeeService.getFeeData(baseUrl);
+    const initialData = await FeeService.getFeeData();
 
     // Invalidate cache
     await FeeService.invalidateCache();
 
     // Next call should fetch fresh data (not from cache)
-    const freshData = await FeeService.getFeeData(baseUrl);
+    const freshData = await FeeService.getFeeData();
 
     // Both should be valid
     assertExists(initialData.recommendedFee);
@@ -202,17 +202,17 @@ Deno.test("Redis Fee System Tests", async (t) => {
   });
 
   await t.step("Redis cache performance test", async () => {
-    const baseUrl = "https://test.example.com";
+    const _baseUrl = "https://test.example.com";
     const iterations = 5;
     const times: number[] = [];
 
     // Warm up cache
-    await FeeService.getFeeData(baseUrl);
+    await FeeService.getFeeData();
 
     // Test multiple cache hits
     for (let i = 0; i < iterations; i++) {
       const start = Date.now();
-      await FeeService.getFeeData(baseUrl);
+      await FeeService.getFeeData();
       const duration = Date.now() - start;
       times.push(duration);
     }
@@ -234,8 +234,8 @@ Deno.test("Redis Fee System Tests", async (t) => {
   });
 
   await t.step("Fee data validation test", async () => {
-    const baseUrl = "https://test.example.com";
-    const feeData = await FeeService.getFeeData(baseUrl);
+    const _baseUrl = "https://test.example.com";
+    const feeData = await FeeService.getFeeData();
 
     // Test fee rate bounds
     assertEquals(feeData.recommendedFee >= 1, true, "Fee rate too low");
@@ -263,10 +263,10 @@ Deno.test("Redis Fee System Tests", async (t) => {
     // Test that monitoring functions are called correctly
     // This is more of a smoke test since we can't easily mock the monitoring
 
-    const baseUrl = "https://test.example.com";
+    const _baseUrl = "https://test.example.com";
 
     try {
-      const feeData = await FeeService.getFeeData(baseUrl);
+      const feeData = await FeeService.getFeeData();
 
       // If successful, monitoring should have recorded success
       assertExists(feeData);
@@ -278,12 +278,10 @@ Deno.test("Redis Fee System Tests", async (t) => {
   });
 
   await t.step("Concurrent request handling", async () => {
-    const baseUrl = "https://test.example.com";
+    const _baseUrl = "https://test.example.com";
 
     // Make multiple concurrent requests
-    const promises = Array(5).fill(null).map(() =>
-      FeeService.getFeeData(baseUrl)
-    );
+    const promises = Array(5).fill(null).map(() => FeeService.getFeeData());
 
     const results = await Promise.all(promises);
 
@@ -320,7 +318,7 @@ Deno.test("Redis Fee System Tests", async (t) => {
   });
 
   await t.step("Background fee service functionality", async () => {
-    const baseUrl = "https://test.example.com";
+    const _baseUrl = "https://test.example.com";
 
     // Test service status when not running
     let status = BackgroundFeeService.getStatus();

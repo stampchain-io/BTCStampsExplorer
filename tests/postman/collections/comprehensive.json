@@ -1440,6 +1440,82 @@
               ]
             }
           }
+        },
+        {
+          "name": "SRC20 TX Edge Cases",
+          "item": [
+            {
+              "name": "Get SRC20 TX with Null Tick - Dev",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{dev_base_url}}/api/v2/src20/tx/{{test_tx_hash}}?tick=null",
+                  "host": ["{{dev_base_url}}"],
+                  "path": ["api", "v2", "src20", "tx", "{{test_tx_hash}}"],
+                  "query": [{"key": "tick", "value": "null"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Returns non-empty data for valid hash with null tick', () => {",
+                      "  pm.response.to.have.status(200);",
+                      "  const jsonData = pm.response.json();",
+                      "  pm.expect(jsonData.data).to.exist;",
+                      "  pm.expect(jsonData.data).to.be.an('object'); // Expect single object due to singleResult",
+                      "  pm.expect(jsonData.data.tx_hash).to.equal('c5be12c63abb42e3093f63dd8d0fdeb8016c49b74824cf8c494fc2945c90cdb9');",
+                      "  pm.expect(jsonData.data.op).to.equal('TRANSFER'); // Specific field assertion",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get SRC20 TX with Null Tick - Prod",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{prod_base_url}}/api/v2/src20/tx/{{test_tx_hash}}?tick=null",
+                  "host": ["{{prod_base_url}}"],
+                  "path": ["api", "v2", "src20", "tx", "{{test_tx_hash}}"],
+                  "query": [{"key": "tick", "value": "null"}]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Returns non-empty data for valid hash with null tick', () => {",
+                      "  pm.response.to.have.status(200);",
+                      "  const jsonData = pm.response.json();",
+                      "  pm.expect(jsonData.data).to.exist;",
+                      "  pm.expect(jsonData.data).to.be.an('object');",
+                      "  pm.expect(jsonData.data.tx_hash).to.equal('c5be12c63abb42e3093f63dd8d0fdeb8016c49b74824cf8c494fc2945c90cdb9');",
+                      "  pm.expect(jsonData.data.op).to.equal('TRANSFER');",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            // Add more edge cases here, e.g., for undefined params (simulated via absence) or invalid formats
+          ]
         }
       ]
     },

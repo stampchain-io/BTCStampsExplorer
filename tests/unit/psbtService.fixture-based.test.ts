@@ -9,9 +9,9 @@ import { Psbt } from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
 
 // Import the fixture-based mock
-import { getUTXOForAddress } from "../mocks/utxoUtils.fixture-based.mock.ts";
-import { mempoolApiFixtures } from "../fixtures/api-responses/mempool-api-fixtures.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { mempoolApiFixtures } from "../fixtures/api-responses/mempool-api-fixtures.ts";
+import { getUTXOForAddress } from "../mocks/utxoUtils.fixture-based.mock.ts";
 
 // Mock CommonUTXOService methods
 const mockCommonUtxoService = {
@@ -52,7 +52,11 @@ const mockCommonUtxoService = {
 // Mock dependencies
 const mockDependencies = {
   getUTXOForAddress,
-  estimateFee: (outputs: any[], feeRate: number, inputCount: number) => {
+  estimateFee: (
+    outputs: { script: string; value: number }[],
+    feeRate: number,
+    inputCount: number,
+  ) => {
     const size = inputCount * 148 + outputs.length * 34 + 10;
     return Math.ceil(size * feeRate);
   },
@@ -69,7 +73,7 @@ describe("PSBTService with Fixture-Based Mocks", {
   sanitizeOps: false,
   sanitizeResources: false,
 }, () => {
-  let psbtService: any;
+  let psbtService: ReturnType<typeof createPSBTService>;
 
   beforeEach(() => {
     // Create service with mocked dependencies
@@ -85,7 +89,7 @@ describe("PSBTService with Fixture-Based Mocks", {
       const utxoString =
         "a0a34578b86c5ed1720083e0008e0578a744a9daa8c13124f64fb8ebbae9029b:0";
       const salePrice = 0.001; // BTC
-      const sellerAddress = "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2";
+      const sellerAddress = "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v";
 
       const psbtHex = await psbtService.createPSBT(
         utxoString,
@@ -192,7 +196,7 @@ describe("PSBTService with Fixture-Based Mocks", {
           await psbtService.createPSBT(
             "invalid-utxo-format",
             0.001,
-            "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
+            "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v",
           );
         },
         Error,
@@ -206,7 +210,7 @@ describe("PSBTService with Fixture-Based Mocks", {
           await psbtService.createPSBT(
             "nonexistenttxid1234567890abcdef1234567890abcdef1234567890abcdef:0",
             0.001,
-            "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
+            "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v",
           );
         },
         Error,
@@ -218,7 +222,7 @@ describe("PSBTService with Fixture-Based Mocks", {
       const utxoString =
         "a0a34578b86c5ed1720083e0008e0578a744a9daa8c13124f64fb8ebbae9029b:0";
       const salePrice = 0.4; // BTC
-      const sellerAddress = "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2";
+      const sellerAddress = "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v";
 
       const psbtHex = await psbtService.createPSBT(
         utxoString,
@@ -265,7 +269,9 @@ describe("PSBTService with Fixture-Based Mocks", {
         }],
       };
 
-      const formatted = formatPsbtForLogging(mockPsbt as any);
+      const formatted = formatPsbtForLogging(
+        mockPsbt as Parameters<typeof formatPsbtForLogging>[0],
+      );
 
       assertExists(formatted.inputs);
       assertExists(formatted.outputs);
@@ -288,7 +294,9 @@ describe("PSBTService with Fixture-Based Mocks", {
         }],
       };
 
-      const formatted = formatPsbtForLogging(mockPsbt as any);
+      const formatted = formatPsbtForLogging(
+        mockPsbt as Parameters<typeof formatPsbtForLogging>[0],
+      );
 
       assertExists(formatted.inputs);
       assertEquals(formatted.inputs[0].witnessUtxo, undefined);
@@ -300,7 +308,7 @@ describe("PSBTService with Fixture-Based Mocks", {
     it("should validate UTXO ownership for matching address", async () => {
       const utxoString =
         "a0a34578b86c5ed1720083e0008e0578a744a9daa8c13124f64fb8ebbae9029b:0";
-      const address = "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2";
+      const address = "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v"; // Verified to match the script in mock
 
       const isValid = await psbtService.validateUTXOOwnership(
         utxoString,
@@ -313,7 +321,7 @@ describe("PSBTService with Fixture-Based Mocks", {
     it("should reject UTXO ownership for non-matching address", async () => {
       const utxoString =
         "a0a34578b86c5ed1720083e0008e0578a744a9daa8c13124f64fb8ebbae9029b:0";
-      const wrongAddress = "bc1qwrongaddress";
+      const wrongAddress = "bc1qdifferentvalid0000000000000000000000000"; // Use a valid but mismatched bc1q address
 
       const isValid = await psbtService.validateUTXOOwnership(
         utxoString,
@@ -325,7 +333,7 @@ describe("PSBTService with Fixture-Based Mocks", {
 
     it("should handle UTXO retrieval errors", async () => {
       const utxoString = "nonexistent:0";
-      const address = "bc1qtest";
+      const address = "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v";
 
       await assertRejects(
         async () => {
