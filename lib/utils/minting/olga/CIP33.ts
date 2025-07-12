@@ -33,7 +33,7 @@ export class CIP33 {
     chunks[last] = chunks[last].padEnd(64, "0");
 
     //Generate addresses from chunks
-    const addresses = [];
+    const addresses: (string | undefined)[] = [];
     for (const element of chunks) {
       addresses.push(this.cip33_hex_to_bech32(element, network));
     }
