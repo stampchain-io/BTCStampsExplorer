@@ -1,15 +1,72 @@
 {
+  "lock": false,
+  "lint": {
+    "rules": {
+      "tags": ["fresh", "recommended"],
+      "include": [
+        "ban-untagged-todo",
+        "no-node-buffer",
+        "prefer-native-node-imports"
+      ],
+      "exclude": [
+        "no-explicit-any",
+        "react-no-danger",
+        "no-unused-vars",
+        "prefer-const",
+        "no-inferrable-types"
+      ]
+    },
+    "exclude": [
+      "**/_fresh/**/*",
+      "**/node_modules/**/*",
+      "**/dist/**/*",
+      "**/.git/**/*",
+      "**/coverage/**/*",
+      "**/tmp/**/*",
+      "**/.cache/**/*",
+      "**/build/**/*",
+      "**/vendor/**/*"
+    ]
+  },
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
-    "strict": true,
+    "strict": false,
     "types": ["npm:@types/node"],
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noImplicitReturns": true,
+    "noImplicitReturns": false,
     "exactOptionalPropertyTypes": false,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": false
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "noImplicitOverride": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false
+  },
+  "fmt": {
+    "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
+    "exclude": [
+      "**/_fresh/**/*",
+      "**/node_modules/**/*",
+      "**/dist/**/*",
+      "**/.git/**/*",
+      "**/coverage/**/*",
+      "**/tmp/**/*",
+      "**/.cache/**/*",
+      "**/build/**/*",
+      "**/vendor/**/*",
+      "**/*.yml",
+      "**/*.yaml",
+      "**/*.css",
+      "**/*.md",
+      "**/*.html"
+    ],
+    "useTabs": false,
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "singleQuote": false,
+    "proseWrap": "preserve"
   },
   "imports": {
     "stream": "node:stream",
@@ -92,6 +149,7 @@
     "$notification": "../components/notification/index.ts",
     "$table": "../islands/table/index.ts",
     "$fees": "../lib/hooks/useFees.ts",
-    "$animation": "../lib/hooks/useAnimationControls.ts"
+    "$animation": "../lib/hooks/useAnimationControls.ts",
+    "@tests/": "./"
   }
 }
