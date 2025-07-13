@@ -1,6 +1,7 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
 import { Buffer } from "node:buffer";
+import { createMockUTXO } from "./utils/testFactories.ts";
 
 // Define types needed for the test
 interface UTXO {

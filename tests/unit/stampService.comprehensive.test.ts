@@ -5,38 +5,83 @@
  */
 
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
+import {
+  createMockStampMarketData,
+  createMockStampRow,
+} from "./utils/testFactories.ts";
+import type { StampRow } from "$globals";
+
+// Interfaces for mock repository options
+interface MockStampOptions {
+  _shouldThrow?: boolean;
+  identifier?: string | string[];
+  creatorAddress?: string;
+  limit?: number;
+  page?: number;
+  includeMarketData?: boolean;
+  type?: string;
+}
 
 // Set environment to skip Redis before importing database-related modules
 (globalThis as any).SKIP_REDIS_CONNECTION = true;
 Deno.env.set("SKIP_REDIS_CONNECTION", "true");
 Deno.env.set("DENO_ENV", "test");
 
-// Test fixtures
-const mockStampFixture = {
+// Test fixtures using typed factory functions
+const mockStampFixture = createMockStampRow({
   stamp: 1,
   cpid: "A123456789",
   stamp_url: "https://example.com/stamp1",
   stamp_mimetype: "image/png",
   ident: "STAMP",
   tx_hash: "abc123",
+  tx_index: 123,
   block_index: 800000,
   creator: "bc1qtest",
   supply: 100,
-  divisible: 0,
-};
+  divisible: false,
+  locked: 1,
+  keyburn: null,
+  stamp_base64: "base64data",
+  block_time: new Date("2024-01-01"),
+});
 
-const mockSrc20StampFixture = {
+const mockSrc20StampFixture = createMockStampRow({
   stamp: 2,
   cpid: "B987654321",
   stamp_url: "https://example.com/stamp2",
   stamp_mimetype: "text/plain",
   ident: "SRC-20",
   tx_hash: "def456",
+  tx_index: 456,
   block_index: 800001,
   creator: "bc1qtest2",
+  supply: 1000000,
+  divisible: true,
+  locked: 0,
+  keyburn: null,
+  stamp_base64: "base64data2",
+  block_time: new Date("2024-01-02"),
+});
+
+// Additional fields that might be needed by tests but not in base StampRow
+const mockStampFixtureWithExtras = {
+  ...mockStampFixture,
+  creator_name: null,
+  stamp_hash: "hash123",
+  file_hash: "filehash123",
+  unbound_quantity: 0,
 };
 
-const mockMarketDataFixture = {
+const mockSrc20StampFixtureWithExtras = {
+  ...mockSrc20StampFixture,
+  creator_name: null,
+  stamp_hash: "hash456",
+  file_hash: "filehash456",
+  unbound_quantity: 0,
+};
+
+const mockMarketDataFixture = createMockStampMarketData({
   cpid: "A123456789",
   floorPriceBTC: 0.001,
   recentSalePriceBTC: 0.0012,
@@ -46,19 +91,23 @@ const mockMarketDataFixture = {
   holderCount: 25,
   uniqueHolderCount: 20,
   topHolderPercentage: 15.5,
-  holderDistributionScore: 0.75,
+  holderDistributionScore: 75,
   volume24hBTC: 0.05,
   volume7dBTC: 0.35,
   volume30dBTC: 1.5,
   totalVolumeBTC: 10.5,
   priceSource: "dispenser",
-  volumeSources: ["dispenser", "otc"],
-  dataQualityScore: 0.85,
-  confidenceLevel: 0.9,
+  volumeSources: { "dispenser": 0.03, "otc": 0.02 }, // Fix: should be object, not array
+  dataQualityScore: 8.5, // Fix: our factory expects number 1-10, not decimal
+  confidenceLevel: 9, // Fix: our factory expects number 1-10, not decimal
   lastUpdated: new Date(),
   lastPriceUpdate: new Date(),
   updateFrequencyMinutes: 60,
-  // Enhanced transaction details
+});
+
+// Additional market data fields that might be needed by tests but not in base StampMarketData
+const mockMarketDataFixtureWithExtras = {
+  ...mockMarketDataFixture,
   lastSaleBtcAmount: 0.0012,
   lastSaleTxHash: "sale123",
   lastSaleBlockIndex: 799999,
@@ -97,7 +146,7 @@ const mockXcpBalanceFixture = {
 
 // Mock repositories and services
 const MockStampRepository = {
-  async getStamps(options: any) {
+  async getStamps(options: MockStampOptions) {
     await Promise.resolve();
     if (options._shouldThrow) {
       throw new Error("Database error");
@@ -125,7 +174,7 @@ const MockStampRepository = {
         };
       }
 
-      const stamps = identifiers.map((id: any, index: number) => {
+      const stamps = identifiers.map((id: string, index: number) => {
         // Use SRC-20 fixture for B987654321
         if (id === "B987654321") {
           return {
@@ -268,7 +317,7 @@ const MockStampRepository = {
     };
   },
 
-  async getRecentlyActiveSold(_options: any) {
+  async getRecentlyActiveSold(_options: MockStampOptions) {
     await Promise.resolve();
     return {
       stamps: [
@@ -411,7 +460,7 @@ const MockMarketDataRepository = {
     return marketDataMap;
   },
 
-  async getStampsWithMarketData(_options: any) {
+  async getStampsWithMarketData(_options: MockStampOptions) {
     await Promise.resolve();
     return [
       {
@@ -438,7 +487,7 @@ class TestStampService {
   static async getStampDetailsById(
     id: string | number,
     stampType: string = "all",
-    _cacheType?: any,
+    _cacheType?: string,
     _cacheDuration?: number | "never",
     includeSecondary: boolean = true,
   ) {
@@ -491,7 +540,7 @@ class TestStampService {
     }
   }
 
-  static async getStamps(options: any) {
+  static async getStamps(options: MockStampOptions) {
     const [result, lastBlock] = await Promise.all([
       MockStampRepository.getStamps(options),
       MockBlockService.getLastBlock(),
@@ -849,7 +898,9 @@ class TestStampService {
     return "outdated";
   }
 
-  static async getStampsWithMarketData(options: any): Promise<any[]> {
+  static async getStampsWithMarketData(
+    options: MockStampOptions,
+  ): Promise<(StampRow & { marketData?: any })[]> {
     const stampsWithMarketData = await MockMarketDataRepository
       .getStampsWithMarketData(options);
 
@@ -993,10 +1044,10 @@ Deno.test("StampService.getStamps", async (t) => {
     });
 
     assertExists(result);
-    assertExists((result as any).page);
-    assertExists((result as any).page_size);
-    assertExists((result as any).pages);
-    assertExists((result as any).total);
+    assertExists(result.page);
+    assertExists(result.page_size);
+    assertExists(result.pages);
+    assertExists(result.total);
   });
 
   await t.step("throws error when no stamps found", async () => {

@@ -84,14 +84,9 @@ export interface FeeEstimationResult {
 // their definitions would need to be brought here and use the ScriptType below.
 // For now, focusing on the core conflicting types.
 
-export type ScriptType =
-  | "P2PKH"
-  | "P2SH"
-  | "P2WPKH"
-  | "P2WSH"
-  | "P2TR"
-  | "OP_RETURN"
-  | "UNKNOWN";
+// Import and re-export ScriptType from base.d.ts to avoid duplication
+import type { ScriptType } from "./base.d.ts";
+export type { ScriptType };
 
 export interface ScriptTypeInfo {
   type: ScriptType;
@@ -114,20 +109,6 @@ export interface Output {
   script?: string;
   address?: string;
   value: number;
-}
-
-export interface UTXO {
-  txid: string;
-  vout: number;
-  value: number;
-  script: string;
-  scriptType?: ScriptType;
-  isWitness?: boolean;
-  redeemScript?: string;
-  rawTxHex?: string;
-  ancestorCount?: number;
-  ancestorSize?: number;
-  ancestorFees?: number;
 }
 
 // Add back clean versions of FeeEstimationParams and FeeEstimationResult if they were used,

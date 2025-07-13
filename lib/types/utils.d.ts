@@ -24,21 +24,8 @@ export interface UTXOFromBlockchain {
   tx_index: number;
 }
 
-export interface UTXO {
-  txid: string;
-  vout: number;
-  value: number;
-  address: string;
-  script: string;
-  size: number;
-  status: {
-    confirmed: boolean;
-    block_height?: number;
-    block_hash?: string;
-    block_time?: number;
-  };
-  index?: number;
-}
+// UTXO interface moved to base.d.ts to avoid duplication
+// Import with: import type { UTXO } from "./base.d.ts";
 
 type Output = {
   address: string;

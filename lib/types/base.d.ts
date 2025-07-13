@@ -3,6 +3,7 @@ export interface UTXO {
   vout: number;
   value: number;
   script: string;
+  address?: string; // Optional address field for convenience
   ancestorCount?: number;
   ancestorSize?: number;
   ancestorFees?: number;
@@ -13,6 +14,8 @@ export interface UTXO {
   scriptDesc?: string;
   witness?: string[];
   coinbase?: boolean;
+  confirmations?: number; // Optional confirmations field
+  ancestors?: any[]; // Optional ancestors array for compatibility
 }
 
 export type BasicUTXO = Pick<UTXO, "txid" | "vout" | "value">;

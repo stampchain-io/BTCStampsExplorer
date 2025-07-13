@@ -1,8 +1,16 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { CollectionRepository } from "$server/database/collectionRepository.ts";
+import type {
+  CollectionRow,
+  CollectionWithOptionalMarketData,
+} from "$server/types/collection.d.ts";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
+import {
+  createMockCollection,
+  createMockDatabaseManager,
+} from "./utils/testFactories.ts";
 
 describe("CollectionRepository Unit Tests", () => {
   let originalDb: typeof dbManager;
@@ -24,8 +32,8 @@ describe("CollectionRepository Unit Tests", () => {
     // Create mock database
     mockDb = new MockDatabaseManager();
 
-    // Inject mock
-    CollectionRepository.setDatabase(mockDb as unknown as typeof dbManager);
+    // Inject mock with proper typing
+    CollectionRepository.setDatabase(mockDb as typeof dbManager);
   });
 
   afterEach(() => {
@@ -40,7 +48,7 @@ describe("CollectionRepository Unit Tests", () => {
     CollectionRepository.setDatabase(originalDb);
 
     // Reset references
-    mockDb = null as any;
+    mockDb = undefined as any;
   });
 
   describe("getCollectionDetails", () => {
@@ -88,7 +96,7 @@ describe("CollectionRepository Unit Tests", () => {
       // In fixtures, this creator is associated with INFINITY SEED collection
       if (result.rows.length > 0) {
         const collection = result.rows.find(
-          (c: any) => c.collection_name === "INFINITY SEED",
+          (c: CollectionRow) => c.collection_name === "INFINITY SEED",
         );
         assertExists(collection, "Should find INFINITY SEED collection");
       }
@@ -110,8 +118,8 @@ describe("CollectionRepository Unit Tests", () => {
 
       // Mock should filter collections with at least 30 stamps
       if (result.rows.length > 0) {
-        result.rows.forEach((collection: any) => {
-          const stampCount = parseInt(collection.stamp_count);
+        result.rows.forEach((collection: CollectionRow) => {
+          const stampCount = parseInt(collection.stamp_count.toString());
           assertEquals(
             stampCount >= 30,
             true,
@@ -292,7 +300,7 @@ describe("CollectionRepository Unit Tests", () => {
       assertEquals(Array.isArray(result.rows), true);
 
       if (result.rows.length > 0) {
-        result.rows.forEach((row: any) => {
+        result.rows.forEach((row: CollectionRow) => {
           assertExists(row.collection_name);
           assertEquals(typeof row.collection_name, "string");
         });
@@ -327,7 +335,17 @@ describe("CollectionRepository Unit Tests", () => {
       // Skip if in RUN_DB_TESTS mode
       if (!mockDb) return;
 
-      // Set up mock response with market data fields
+      // Set up mock response with market data fields using factory
+      const mockCollectionWithMarketData = createMockCollection({
+        collection_id: "015F0478516E4273DD90FE59C766DD98",
+        collection_name: "KEVIN",
+        collection_description: null,
+        creators: ["bc1qexamplecreator"],
+        stamp_count: "3",
+        total_editions: "300",
+        stamps: [4258, 4262, 4265],
+      });
+
       mockDb.setMockResponse(
         `SELECT 
         HEX(c.collection_id) as collection_id,
@@ -335,14 +353,10 @@ describe("CollectionRepository Unit Tests", () => {
         [],
         {
           rows: [{
-            collection_id: "015F0478516E4273DD90FE59C766DD98",
-            collection_name: "KEVIN",
-            collection_description: null,
-            creators: "bc1qexamplecreator",
+            ...mockCollectionWithMarketData,
+            creators: "bc1qexamplecreator", // Database stores as string
             creator_names: "Example Creator",
-            stamp_numbers: "4258,4262,4265",
-            stamp_count: "3",
-            total_editions: "300",
+            stamp_numbers: "4258,4262,4265", // Database stores as string
             minFloorPriceBTC: "0.001",
             maxFloorPriceBTC: "0.01",
             avgFloorPriceBTC: "0.005",

@@ -1,5 +1,5 @@
 import { TX, TXError } from "$globals";
-import { deploySRC20, mintSRC20, transferSRC20 } from "./index.ts";
+import { SRC20OperationService } from "./operations/src20Operations.ts";
 import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$server/types/services/src20.d.ts";
 import { InputData } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
@@ -35,7 +35,7 @@ export class SRC20TransactionService {
           message: "Handling deploy operation",
           deployParams: this.prepareDeploy(body)
         });
-        result = await deploySRC20({
+        result = await SRC20OperationService.deploySRC20({
           ...commonParams,
           ...this.prepareDeploy(body),
         } as IDeploySRC20);
@@ -50,7 +50,7 @@ export class SRC20TransactionService {
           message: "Handling mint operation",
           mintParams: this.prepareMint(body)
         });
-        result = await mintSRC20({
+        result = await SRC20OperationService.mintSRC20({
           ...commonParams,
           ...this.prepareMint(body),
         } as IMintSRC20);
@@ -70,7 +70,7 @@ export class SRC20TransactionService {
           message: "Handling transfer operation",
           transferParams: this.prepareTransfer(body)
         });
-        result = await transferSRC20({
+        result = await SRC20OperationService.transferSRC20({
           ...commonParams,
           ...this.prepareTransfer(body),
         } as ITransferSRC20);

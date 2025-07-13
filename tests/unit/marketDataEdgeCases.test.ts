@@ -10,6 +10,11 @@ import {
   parseExchangeSources,
   parseVolumeSources,
 } from "$lib/utils/marketData.ts";
+import {
+  createMockCollection,
+  createMockSRC20MarketData,
+  createMockStampMarketData,
+} from "./utils/testFactories.ts";
 
 // Mock console to suppress error outputs during tests
 const originalConsoleError = console.error;
@@ -21,29 +26,12 @@ function restoreConsole() {
 }
 
 Deno.test("Edge Case - Stamp with all null market data fields", () => {
-  const nullMarketData: StampMarketData = {
+  const nullMarketData: StampMarketData = createMockStampMarketData({
     cpid: "A123456789ABCDEF",
-    floorPriceBTC: null,
-    recentSalePriceBTC: null,
-    openDispensersCount: 0,
-    closedDispensersCount: 0,
-    totalDispensersCount: 0,
     holderCount: 0,
     uniqueHolderCount: 0,
     topHolderPercentage: 0,
-    holderDistributionScore: 0,
-    volume24hBTC: 0,
-    volume7dBTC: 0,
-    volume30dBTC: 0,
-    totalVolumeBTC: 0,
-    priceSource: null,
-    volumeSources: null,
-    dataQualityScore: 0,
-    confidenceLevel: 0,
-    lastUpdated: new Date(),
-    lastPriceUpdate: null,
-    updateFrequencyMinutes: 60,
-  };
+  });
 
   // Test that the object is valid
   assertExists(nullMarketData.cpid);
@@ -54,7 +42,7 @@ Deno.test("Edge Case - Stamp with all null market data fields", () => {
 });
 
 Deno.test("Edge Case - SRC20 with extreme values", () => {
-  const extremeMarketData: SRC20MarketData = {
+  const extremeMarketData: SRC20MarketData = createMockSRC20MarketData({
     tick: "MEGA",
     priceBTC: 0.00000001, // 1 satoshi
     priceUSD: 0.00095, // Very small USD value
@@ -69,7 +57,7 @@ Deno.test("Edge Case - SRC20 with extreme values", () => {
     exchangeSources: [],
     dataQualityScore: 0.1,
     lastUpdated: new Date(),
-  };
+  });
 
   // Verify extreme values are handled
   assertEquals(extremeMarketData.priceBTC, 0.00000001);
@@ -228,7 +216,7 @@ Deno.test("Edge Case - BTC decimal precision limits", () => {
 });
 
 Deno.test("Edge Case - Unicode and special characters in data", () => {
-  const unicodeMarketData: StampMarketData = {
+  const unicodeMarketData: StampMarketData = createMockStampMarketData({
     cpid: "A🚀🌙💎UNICODE",
     floorPriceBTC: 0.1,
     recentSalePriceBTC: 0.15,
@@ -250,7 +238,7 @@ Deno.test("Edge Case - Unicode and special characters in data", () => {
     lastUpdated: new Date(),
     lastPriceUpdate: new Date(),
     updateFrequencyMinutes: 30,
-  };
+  });
 
   // Verify unicode handling
   assertEquals(unicodeMarketData.cpid, "A🚀🌙💎UNICODE");
@@ -261,7 +249,7 @@ Deno.test("Edge Case - Unicode and special characters in data", () => {
 
 Deno.test("Edge Case - Concurrent data updates simulation", () => {
   // Simulate race condition with conflicting updates
-  const baseData: StampMarketData = {
+  const baseData: StampMarketData = createMockStampMarketData({
     cpid: "A123456789ABCDEF",
     floorPriceBTC: 0.1,
     recentSalePriceBTC: 0.12,
@@ -283,7 +271,7 @@ Deno.test("Edge Case - Concurrent data updates simulation", () => {
     lastUpdated: new Date("2024-12-26T12:00:00Z"),
     lastPriceUpdate: new Date("2024-12-26T12:00:00Z"),
     updateFrequencyMinutes: 30,
-  };
+  });
 
   // Simulate update 1 (price increase)
   const update1 = { ...baseData };
@@ -307,7 +295,7 @@ Deno.test("Edge Case - Concurrent data updates simulation", () => {
 
 Deno.test("Edge Case - Data quality with missing fields", () => {
   // Test partial data scenarios
-  const partialData = {
+  const partialData = createMockStampMarketData({
     cpid: "PARTIAL123",
     floorPriceBTC: 0.1,
     // Missing many fields that might come from API
@@ -330,7 +318,7 @@ Deno.test("Edge Case - Data quality with missing fields", () => {
     lastUpdated: new Date(),
     lastPriceUpdate: null,
     updateFrequencyMinutes: 1440, // Daily updates only
-  };
+  });
 
   // Verify partial data handling
   assertExists(partialData.cpid);

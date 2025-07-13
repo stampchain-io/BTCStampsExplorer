@@ -35,13 +35,13 @@ export interface SRC20OperationResult {
 export type SRC20Operation = "deploy" | "mint" | "transfer";
 
 export interface InputData {
-  op: SRC20Operation;
+  op?: SRC20Operation; // Optional for validation testing
   sourceAddress: string;
-  toAddress: string;
+  toAddress?: string; // Optional, only required for transfer operations
   fromAddress?: string;
-  changeAddress: string;
+  changeAddress?: string; // Optional for validation testing
   tick: string;
-  feeRate: number;
+  feeRate?: number; // Optional for validation testing
   amt?: string;
   max?: string;
   lim?: string;

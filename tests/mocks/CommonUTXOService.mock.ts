@@ -5,10 +5,11 @@
 
 import type { UTXOFixture } from "../fixtures/utxoFixtures.ts";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 
 // Store mock responses for different scenarios
 const mockResponses = new Map<string, any>();
-const mockTransactionHexes = new Map<string, string>();
+const mockTransactionHexes = new Map<string, string | Error>();
 
 // Cache flattened fixtures for performance
 let flattenedFixtures: UTXOFixture[] | null = null;
@@ -25,14 +26,21 @@ function getAllFixtures(): UTXOFixture[] {
   return flattenedFixtures;
 }
 
-export class MockCommonUTXOService {
-  static instance: MockCommonUTXOService | null = null;
+export class MockCommonUTXOService extends CommonUTXOService {
+  private static mockInstance: MockCommonUTXOService | null = null;
 
-  static getInstance(): MockCommonUTXOService {
-    if (!MockCommonUTXOService.instance) {
-      MockCommonUTXOService.instance = new MockCommonUTXOService();
+  constructor() {
+    super();
+    // Override properties for testing
+    this.isQuickNodeConfigured = true;
+    this.rawTxHexCache = new Map<string, string>();
+  }
+
+  static getInstance(): CommonUTXOService {
+    if (!MockCommonUTXOService.mockInstance) {
+      MockCommonUTXOService.mockInstance = new MockCommonUTXOService();
     }
-    return MockCommonUTXOService.instance;
+    return MockCommonUTXOService.mockInstance;
   }
 
   getSpecificUTXO(
@@ -230,6 +238,16 @@ export class MockCommonUTXOService {
     // Default to not spent
     return Promise.resolve(false);
   }
+
+  // Add missing getSpendableUTXOs method
+  async getSpendableUTXOs(
+    address: string,
+    minConfirmations: number = 1,
+  ): Promise<any[]> {
+    const utxos = await this.getUTXOsForAddress(address);
+    // Filter by confirmations
+    return utxos.filter((utxo) => utxo.confirmations >= minConfirmations);
+  }
 }
 
 // Function to set specific mock responses for testing
@@ -260,6 +278,6 @@ export function clearMockResponses(): void {
 }
 
 // Export singleton instance getter
-export const CommonUTXOService = {
+export const commonUTXOService = {
   getInstance: MockCommonUTXOService.getInstance,
 };
