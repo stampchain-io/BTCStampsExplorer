@@ -400,6 +400,16 @@ export class MarketDataRepositoryCI {
         lastUpdated: new Date(row.last_updated),
         lastPriceUpdate: row.last_price_update ? new Date(row.last_price_update) : null,
         updateFrequencyMinutes: row.update_frequency_minutes || 60,
+        // New transaction detail fields
+        lastSaleTxHash: row.last_sale_tx_hash,
+        lastSaleBuyerAddress: row.last_sale_buyer_address,
+        lastSaleDispenserAddress: row.last_sale_dispenser_address,
+        lastSaleBtcAmount: row.last_sale_btc_amount ? parseFloat(row.last_sale_btc_amount) / 100000000 : null,
+        lastSaleDispenserTxHash: row.last_sale_dispenser_tx_hash,
+        lastSaleBlockIndex: row.last_sale_block_index,
+        // Activity tracking fields
+        activityLevel: row.activity_level,
+        lastActivityTime: row.last_activity_time,
       };
     } catch (error) {
       console.error("Error parsing stamp market data row:", error);
@@ -417,9 +427,14 @@ export class MarketDataRepositoryCI {
         marketCapBTC: parseBTCDecimal(row.market_cap_btc) || 0,
         marketCapUSD: parseBTCDecimal(row.market_cap_usd) || 0,
         volume24hBTC: parseBTCDecimal(row.volume_24h_btc) || 0,
+        volume7dBTC: parseBTCDecimal(row.volume_7d_btc) || 0,
+        volume30dBTC: parseBTCDecimal(row.volume_30d_btc) || 0,
+        totalVolumeBTC: parseBTCDecimal(row.total_volume_btc) || 0,
         holderCount: row.holder_count || 0,
         circulatingSupply: row.circulating_supply || "0",
         priceChange24hPercent: parseFloat(row.price_change_24h_percent) || 0,
+        priceChange7dPercent: parseFloat(row.price_change_7d_percent) || 0,
+        priceChange30dPercent: parseFloat(row.price_change_30d_percent) || 0,
         primaryExchange: row.primary_exchange,
         exchangeSources: parseExchangeSources(row.exchange_sources),
         dataQualityScore: parseFloat(row.data_quality_score) || 0,

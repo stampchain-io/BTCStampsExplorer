@@ -41,7 +41,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import { arc4 } from "$lib/utils/minting/transactionUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { SRC20Service } from "$server/services/src20/index.ts";
+import { SRC20CompressionService } from "$server/services/src20/compression/compressionService.ts";
 import { TransactionService } from "$server/services/transaction/index.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { IPrepareSRC20TX } from "$server/types/services/src20.d.ts";
@@ -98,7 +98,7 @@ export class SRC20MultisigPSBTService {
 
       const transferData = JSON.parse(transferString);
       const msgpackData = msgpack.encode(transferData);
-      const { compressedData, compressed } = await SRC20Service.CompressionService
+      const { compressedData, compressed } = await SRC20CompressionService
         .compressWithCheck(msgpackData);
 
       const transferDataBytes = compressed ? compressedData : new TextEncoder().encode(JSON.stringify(transferData));

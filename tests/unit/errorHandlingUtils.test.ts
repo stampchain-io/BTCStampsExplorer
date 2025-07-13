@@ -447,9 +447,15 @@ Deno.test("ErrorHandlingUtils.safeAsync - failed operation with fallback", async
 
   assertEquals(result.success, false);
   if (!result.success) {
-    assertEquals(result.fallback, "fallback");
-    assertEquals(result.error.message, "Test context: failed");
-    assertExists(result.error);
+    // Type assertion needed due to TypeScript's union type narrowing limitations
+    const failedResult = result as {
+      success: false;
+      error: ErrorInfo;
+      fallback?: "fallback";
+    };
+    assertEquals(failedResult.fallback, "fallback");
+    assertEquals(failedResult.error.message, "Test context: failed");
+    assertExists(failedResult.error);
   }
 });
 
@@ -459,8 +465,14 @@ Deno.test("ErrorHandlingUtils.safeAsync - failed operation without fallback", as
 
   assertEquals(result.success, false);
   if (!result.success) {
-    assertEquals(result.fallback, undefined);
-    assertExists(result.error);
+    // Type assertion needed due to TypeScript's union type narrowing limitations
+    const failedResult = result as {
+      success: false;
+      error: ErrorInfo;
+      fallback?: never;
+    };
+    assertEquals(failedResult.fallback, undefined);
+    assertExists(failedResult.error);
   }
 });
 

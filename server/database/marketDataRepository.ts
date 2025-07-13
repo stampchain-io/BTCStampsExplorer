@@ -204,6 +204,7 @@ export class MarketDataRepository {
           supply: row.supply,
           block_time: row.block_time,
           tx_hash: row.tx_hash,
+          tx_index: row.tx_index || 0, // Add missing tx_index field
           ident: row.ident,
           stamp_hash: row.stamp_hash,
           file_hash: row.file_hash,

@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { stub } from "@std/testing/mock";
 import { StampRepository } from "$server/database/stampRepository.ts";
 import stampFixtures from "../fixtures/stampData.json" with { type: "json" };
+import { createMockStampRow } from "./utils/testFactories.ts";
+import type { StampRow } from "$globals";
 
 // Mock database manager for testing
 class MockDatabaseManager {
@@ -42,12 +44,13 @@ describe("StampRepository Tests with Fixtures", () => {
           _params: unknown,
           _cacheDuration: unknown,
         ) => {
-          // Map fixture data to match expected structure
+          // Use factory to create properly typed stamps based on fixtures
           const mappedRows = stampFixtures.regularStamps.slice(0, 5).map(
-            (stamp) => ({
-              ...stamp,
-              creator_name: null, // Add the joined field
-            }),
+            (fixtureStamp) =>
+              createMockStampRow({
+                ...fixtureStamp,
+                creator_name: null, // Add the joined field expected by query
+              }),
           );
           return Promise.resolve({
             rows: mappedRows,
@@ -85,10 +88,12 @@ describe("StampRepository Tests with Fixtures", () => {
           _params: unknown,
           _cacheDuration: unknown,
         ) => {
-          const mappedRows = stampFixtures.regularStamps.map((stamp) => ({
-            ...stamp,
-            creator_name: null,
-          }));
+          const mappedRows = stampFixtures.regularStamps.map((fixtureStamp) =>
+            createMockStampRow({
+              ...fixtureStamp,
+              creator_name: null,
+            })
+          );
           return Promise.resolve({
             rows: mappedRows,
             rowCount: mappedRows.length,
@@ -104,9 +109,11 @@ describe("StampRepository Tests with Fixtures", () => {
 
       assertExists(result);
       // All stamps should have positive numbers
-      result.stamps.forEach((stamp: any) => {
-        assertEquals(stamp.stamp > 0, true);
-      });
+      result.stamps.forEach(
+        (stamp: StampRow & { creator_name: string | null }) => {
+          assertEquals(stamp.stamp! > 0, true);
+        },
+      );
     });
 
     it("should return cursed stamps when filtered", async () => {
@@ -118,10 +125,12 @@ describe("StampRepository Tests with Fixtures", () => {
           _params: unknown,
           _cacheDuration: unknown,
         ) => {
-          const mappedRows = stampFixtures.cursedStamps.map((stamp) => ({
-            ...stamp,
-            creator_name: null,
-          }));
+          const mappedRows = stampFixtures.cursedStamps.map((fixtureStamp) =>
+            createMockStampRow({
+              ...fixtureStamp,
+              creator_name: null,
+            })
+          );
           return Promise.resolve({
             rows: mappedRows,
             rowCount: mappedRows.length,
@@ -137,9 +146,11 @@ describe("StampRepository Tests with Fixtures", () => {
 
       assertExists(result);
       // All stamps should have negative numbers
-      result.stamps.forEach((stamp: any) => {
-        assertEquals(stamp.stamp < 0, true);
-      });
+      result.stamps.forEach(
+        (stamp: StampRow & { creator_name: string | null }) => {
+          assertEquals(stamp.stamp! < 0, true);
+        },
+      );
     });
 
     it("should handle empty results", async () => {

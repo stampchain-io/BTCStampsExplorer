@@ -7,7 +7,8 @@ import { assertEquals } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { restore, stub } from "@std/testing/mock";
 import { SRC20TransactionService } from "$server/services/src20/transactionService.ts";
-import * as src20Operations from "$server/services/src20/index.ts";
+// Import from operations directly to avoid circular dependency
+import { SRC20OperationService } from "$server/services/src20/operations/src20Operations.ts";
 // TX and TXError types are used for type checking in the service but not directly in tests
 import type { InputData } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
@@ -94,7 +95,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
   describe("handleOperation - Deploy", () => {
     it("should successfully handle deploy operation", async () => {
       const deploySRC20Stub = stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(mockDeployResult),
       );
@@ -135,7 +136,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
       };
 
       const deploySRC20Stub = stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(mockDeployResult),
       );
@@ -170,7 +171,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
       };
 
       const deploySRC20Stub = stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(mockDeployResult),
       );
@@ -186,7 +187,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
 
     it("should handle deploy operation error", async () => {
       stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(mockErrorResult),
       );
@@ -203,7 +204,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
   describe("handleOperation - Mint", () => {
     it("should successfully handle mint operation", async () => {
       const mintSRC20Stub = stub(
-        src20Operations,
+        SRC20OperationService,
         "mintSRC20",
         () => Promise.resolve(mockMintResult),
       );
@@ -245,7 +246,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
 
     it("should handle mint operation error from service", async () => {
       stub(
-        src20Operations,
+        SRC20OperationService,
         "mintSRC20",
         () => Promise.resolve(mockErrorResult),
       );
@@ -265,7 +266,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
       };
 
       const mintSRC20Stub = stub(
-        src20Operations,
+        SRC20OperationService,
         "mintSRC20",
         () => Promise.resolve(mockMintResult),
       );
@@ -283,7 +284,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
   describe("handleOperation - Transfer", () => {
     it("should successfully handle transfer operation", async () => {
       const transferSRC20Stub = stub(
-        src20Operations,
+        SRC20OperationService,
         "transferSRC20",
         () => Promise.resolve(mockTransferResult),
       );
@@ -358,7 +359,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
 
     it("should handle transfer operation error from service", async () => {
       stub(
-        src20Operations,
+        SRC20OperationService,
         "transferSRC20",
         () => Promise.resolve(mockErrorResult),
       );
@@ -392,7 +393,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
       };
 
       stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(hexOnlyResult),
       );
@@ -417,7 +418,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
       };
 
       stub(
-        src20Operations,
+        SRC20OperationService,
         "mintSRC20",
         () => Promise.resolve(base64OnlyResult),
       );
@@ -440,7 +441,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
       };
 
       stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(incompleteResult),
       );
@@ -464,7 +465,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
       };
 
       stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(emptyResult),
       );
@@ -485,7 +486,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
   describe("Logger Calls", () => {
     it("should log debug messages during operation", async () => {
       stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(mockDeployResult),
       );
@@ -509,7 +510,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
 
     it("should log error messages when operation fails", async () => {
       stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(mockErrorResult),
       );
@@ -540,7 +541,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
       };
 
       const deploySRC20Stub = stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(mockDeployResult),
       );
@@ -575,7 +576,7 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
       };
 
       const deploySRC20Stub = stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(mockDeployResult),
       );
@@ -598,19 +599,19 @@ describe("SRC20TransactionService - Comprehensive Tests", () => {
 
     it("should handle concurrent operations", async () => {
       const deploySRC20Stub = stub(
-        src20Operations,
+        SRC20OperationService,
         "deploySRC20",
         () => Promise.resolve(mockDeployResult),
       );
 
       const mintSRC20Stub = stub(
-        src20Operations,
+        SRC20OperationService,
         "mintSRC20",
         () => Promise.resolve(mockMintResult),
       );
 
       const transferSRC20Stub = stub(
-        src20Operations,
+        SRC20OperationService,
         "transferSRC20",
         () => Promise.resolve(mockTransferResult),
       );

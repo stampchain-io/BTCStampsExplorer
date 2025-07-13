@@ -21,7 +21,7 @@ export const xcp_v2_nodes = [
 ];
 
 
-interface XcpBalanceOptions {
+export interface XcpBalanceOptions {
   type?: 'all' | 'send' | 'dispenser' | 'issuance';  // Types of balances
   cursor?: string;      // Last index for cursor-based pagination
   limit?: number;       // Max results per request

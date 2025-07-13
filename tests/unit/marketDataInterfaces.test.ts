@@ -40,6 +40,16 @@ const stampMarketDataRowFixture: StampMarketDataRow = {
   last_updated: new Date("2024-12-26T12:00:00Z"),
   last_price_update: new Date("2024-12-26T11:30:00Z"),
   update_frequency_minutes: 30,
+  // New transaction detail fields
+  last_sale_tx_hash: null,
+  last_sale_buyer_address: null,
+  last_sale_dispenser_address: null,
+  last_sale_btc_amount: null,
+  last_sale_dispenser_tx_hash: null,
+  last_sale_block_index: null,
+  // Activity tracking fields
+  activity_level: null,
+  last_activity_time: null,
 };
 
 const src20MarketDataRowFixture: SRC20MarketDataRow = {
@@ -50,9 +60,14 @@ const src20MarketDataRowFixture: SRC20MarketDataRow = {
   market_cap_btc: "1234.56000000",
   market_cap_usd: "123456.78",
   volume_24h_btc: "12.34000000",
+  volume_7d_btc: "86.12000000",
+  volume_30d_btc: "245.67000000",
+  total_volume_btc: "1234.56789000",
   holder_count: 1523,
   circulating_supply: "1000000000000",
   price_change_24h_percent: "15.67",
+  price_change_7d_percent: "45.23",
+  price_change_30d_percent: "-12.45",
   primary_exchange: "openstamp",
   exchange_sources: '["openstamp", "kucoin", "stampscan"]',
   data_quality_score: "9.2",
@@ -105,6 +120,18 @@ function parseStampMarketDataRow(
     lastUpdated: row.last_updated,
     lastPriceUpdate: row.last_price_update,
     updateFrequencyMinutes: row.update_frequency_minutes,
+    // New transaction detail fields
+    lastSaleTxHash: row.last_sale_tx_hash,
+    lastSaleBuyerAddress: row.last_sale_buyer_address,
+    lastSaleDispenserAddress: row.last_sale_dispenser_address,
+    lastSaleBtcAmount: row.last_sale_btc_amount
+      ? parseFloat(row.last_sale_btc_amount) / 100000000
+      : null,
+    lastSaleDispenserTxHash: row.last_sale_dispenser_tx_hash,
+    lastSaleBlockIndex: row.last_sale_block_index,
+    // Activity tracking fields
+    activityLevel: row.activity_level,
+    lastActivityTime: row.last_activity_time,
   };
 }
 
@@ -117,9 +144,14 @@ function parseSRC20MarketDataRow(row: SRC20MarketDataRow): SRC20MarketData {
     marketCapBTC: parseFloat(row.market_cap_btc),
     marketCapUSD: parseFloat(row.market_cap_usd),
     volume24hBTC: parseFloat(row.volume_24h_btc),
+    volume7dBTC: parseFloat(row.volume_7d_btc),
+    volume30dBTC: parseFloat(row.volume_30d_btc),
+    totalVolumeBTC: parseFloat(row.total_volume_btc),
     holderCount: row.holder_count,
     circulatingSupply: row.circulating_supply,
     priceChange24hPercent: parseFloat(row.price_change_24h_percent),
+    priceChange7dPercent: parseFloat(row.price_change_7d_percent),
+    priceChange30dPercent: parseFloat(row.price_change_30d_percent),
     primaryExchange: row.primary_exchange,
     exchangeSources: row.exchange_sources
       ? parseExchangeSources(row.exchange_sources)

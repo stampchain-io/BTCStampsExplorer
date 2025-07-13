@@ -7,7 +7,7 @@ import { assertEquals } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { restore, stub } from "@std/testing/mock";
 import { SRC20OperationService } from "$server/services/src20/operations/src20Operations.ts";
-import { SRC20Service } from "$server/services/src20/index.ts";
+import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
 import { SRC20MultisigPSBTService } from "$server/services/src20/psbt/src20MultisigPSBTService.ts";
 import { logger } from "$lib/utils/logger.ts";
 import type {
@@ -63,7 +63,7 @@ const validDeployParams: IDeploySRC20 = {
 
 const validTransferParams: ITransferSRC20 = {
   network: "mainnet",
-  toAddress: utxoFixtures.p2sh.standard.address,
+  toAddress: utxoFixtures.p2sh.multisig.address,
   fromAddress: utxoFixtures.p2wpkh.standard.address,
   changeAddress: utxoFixtures.p2wpkh.largeValue.address,
   tick: mintFixture?.tick || "TEST",
@@ -95,7 +95,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     it("should successfully mint SRC20 tokens", async () => {
       // Stub checkMintedOut to return not minted out
       const checkMintedOutStub = stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkMintedOut",
         () => Promise.resolve({ minted_out: false, progress: 50 }),
       );
@@ -113,7 +113,10 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
       // Verify checkMintedOut was called with correct params
       assertEquals(checkMintedOutStub.calls.length, 1);
-      assertEquals(checkMintedOutStub.calls[0].args[0], "TEST");
+      assertEquals(
+        checkMintedOutStub.calls[0].args[0],
+        mintFixture?.tick || "TEST",
+      );
       assertEquals(checkMintedOutStub.calls[0].args[1], "1000");
 
       // Verify preparePSBT was called with correct transfer string
@@ -124,7 +127,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
         JSON.stringify({
           op: "MINT",
           p: "SRC-20",
-          tick: "TEST",
+          tick: mintFixture?.tick || "TEST",
           amt: "1000",
         }),
       );
@@ -132,7 +135,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should handle token already minted out error", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkMintedOut",
         () => Promise.resolve({ minted_out: true, progress: 100 }),
       );
@@ -140,7 +143,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
       const result = await SRC20OperationService.mintSRC20(validMintParams);
 
       assertEquals(result, {
-        error: "Error: token TEST already minted out",
+        error: `Error: token ${mintFixture?.tick || "TEST"} already minted out`,
       });
 
       // Verify preparePSBT was not called
@@ -149,12 +152,12 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should handle prepare PSBT error", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkMintedOut",
         () => Promise.resolve({ minted_out: false, progress: 50 }),
       );
 
-      restore(preparePSBTStub);
+      preparePSBTStub.restore();
       preparePSBTStub = stub(
         SRC20MultisigPSBTService,
         "preparePSBT",
@@ -178,12 +181,12 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should handle estimatedTxSize being undefined", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkMintedOut",
         () => Promise.resolve({ minted_out: false, progress: 50 }),
       );
 
-      restore(preparePSBTStub);
+      preparePSBTStub.restore();
       preparePSBTStub = stub(
         SRC20MultisigPSBTService,
         "preparePSBT",
@@ -203,7 +206,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
   describe("deploySRC20", () => {
     it("should successfully deploy SRC20 token with all fields", async () => {
       const checkDeployedTickStub = stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkDeployedTick",
         () => Promise.resolve({ deployed: false }),
       );
@@ -231,7 +234,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
         tick: "NEWTOKEN",
         max: "1000000",
         lim: "1000",
-        dec: 8,
+        // dec is not included because deployFixture.deci is 18, which is >= 18
         x: "https://x.com/newtoken",
         web: "https://newtoken.com",
         email: "contact@newtoken.com",
@@ -246,15 +249,15 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should deploy with minimal parameters", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkDeployedTick",
         () => Promise.resolve({ deployed: false }),
       );
 
       const minimalDeployParams: IDeploySRC20 = {
         network: "mainnet",
-        toAddress: "bc1qtest987654321",
-        changeAddress: "bc1qchangeaddress1",
+        toAddress: utxoFixtures.p2wpkh.dustAmount.address,
+        changeAddress: utxoFixtures.p2wsh.multisig2of3.address,
         tick: "MIN",
         feeRate: 10,
         max: "1000000",
@@ -282,7 +285,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should include dec when it is 0", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkDeployedTick",
         () => Promise.resolve({ deployed: false }),
       );
@@ -297,7 +300,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should not include dec when it is 18 or higher", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkDeployedTick",
         () => Promise.resolve({ deployed: false }),
       );
@@ -312,7 +315,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should not include dec when it is negative", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkDeployedTick",
         () => Promise.resolve({ deployed: false }),
       );
@@ -327,7 +330,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should use desc when description is not provided", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkDeployedTick",
         () => Promise.resolve({ deployed: false }),
       );
@@ -346,7 +349,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should prefer description over desc when both provided", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkDeployedTick",
         () => Promise.resolve({ deployed: false }),
       );
@@ -364,7 +367,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should handle token already deployed error", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkDeployedTick",
         () => Promise.resolve({ deployed: true }),
       );
@@ -378,7 +381,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should only include optional fields when they have values", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkDeployedTick",
         () => Promise.resolve({ deployed: false }),
       );
@@ -409,7 +412,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
   describe("transferSRC20", () => {
     it("should successfully transfer SRC20 tokens", async () => {
       const checkEnoughBalanceStub = stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkEnoughBalance",
         () => Promise.resolve(true),
       );
@@ -431,9 +434,12 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
       assertEquals(checkEnoughBalanceStub.calls.length, 1);
       assertEquals(
         checkEnoughBalanceStub.calls[0].args[0],
-        "bc1qfromaddress123",
+        utxoFixtures.p2wpkh.standard.address,
       );
-      assertEquals(checkEnoughBalanceStub.calls[0].args[1], "TEST");
+      assertEquals(
+        checkEnoughBalanceStub.calls[0].args[1],
+        mintFixture?.tick || "TEST",
+      );
       assertEquals(checkEnoughBalanceStub.calls[0].args[2], "500");
 
       // Verify preparePSBT was called with correct transfer string
@@ -443,7 +449,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
         JSON.stringify({
           op: "TRANSFER",
           p: "SRC-20",
-          tick: "TEST",
+          tick: mintFixture?.tick || "TEST",
           amt: "500",
         }),
       );
@@ -451,7 +457,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should handle insufficient balance error", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkEnoughBalance",
         () => Promise.resolve(false),
       );
@@ -467,7 +473,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should handle checkEnoughBalance throwing error", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkEnoughBalance",
         () => Promise.reject(new Error("Database error")),
       );
@@ -485,7 +491,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
   describe("Error Handling", () => {
     it("should handle non-Error exceptions", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkMintedOut",
         () => Promise.reject("String error"),
       );
@@ -503,7 +509,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should handle undefined errors", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkMintedOut",
         () => Promise.reject(undefined),
       );
@@ -517,7 +523,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should handle null errors", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkMintedOut",
         () => Promise.reject(null),
       );
@@ -531,7 +537,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should handle object errors", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkMintedOut",
         () => Promise.reject({ code: "ERR_001", message: "Custom error" }),
       );
@@ -548,17 +554,17 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
     it("should handle all operations returning consistent structure", async () => {
       // Setup stubs
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkMintedOut",
         () => Promise.resolve({ minted_out: false }),
       );
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkDeployedTick",
         () => Promise.resolve({ deployed: false }),
       );
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkEnoughBalance",
         () => Promise.resolve(true),
       );
@@ -586,7 +592,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
 
     it("should pass through all params to preparePSBT", async () => {
       stub(
-        SRC20Service.UtilityService,
+        SRC20UtilityService,
         "checkMintedOut",
         () => Promise.resolve({ minted_out: false }),
       );
@@ -601,7 +607,7 @@ describe("SRC20OperationService - Comprehensive Tests", () => {
       const prepareCall = preparePSBTStub.calls[0].args[0];
       assertEquals(prepareCall.extraField, "should be passed through");
       assertEquals(prepareCall.network, "mainnet");
-      assertEquals(prepareCall.toAddress, "bc1qtest987654321");
+      assertEquals(prepareCall.toAddress, utxoFixtures.p2wpkh.standard.address);
     });
   });
 });

@@ -2,7 +2,6 @@ import "$/server/config/env.ts";
 
 import { Client } from "mysql/mod.ts";
 // Conditionally import Redis based on build mode
-// @ts-expect-error TS6133: Variables used conditionally for Redis client type and connection function
 // deno-lint-ignore no-unused-vars
 let connect: any, Redis: any;
 if (Deno.args.includes("build")) {
@@ -892,7 +891,7 @@ console.log("===========================");
 
 // Only create singleton if not in test mode to prevent resource leaks during testing
 export const dbManager = Deno.env.get("DENO_ENV") === "test" 
-  ? undefined as any as DatabaseManager  // Type assertion for compatibility
+  ? (globalThis as any).__mockDbManager || undefined as any as DatabaseManager  // Use mock if available in test mode
   : new DatabaseManager(dbConfig);
 
 // Export the class for testing and other uses

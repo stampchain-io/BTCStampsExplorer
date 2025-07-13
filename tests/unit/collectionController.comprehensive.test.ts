@@ -17,7 +17,7 @@ const mockCollectionResponse = {
     {
       collection_id: "015F0478516E4273DD90FE59C766DD98",
       collection_name: "KEVIN",
-      collection_description: null,
+      collection_description: "",
       creators: ["bc1qcreator1"],
       stamp_count: 5,
       total_editions: 50,

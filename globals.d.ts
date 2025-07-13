@@ -339,6 +339,7 @@ export interface StampRow {
   supply: number;
   block_time: Date;
   tx_hash: string;
+  tx_index: number;
   ident: SUBPROTOCOLS;
   creator_name: string | null;
   stamp_hash: string;
@@ -355,6 +356,13 @@ export interface StampRow {
     block_index: number;
     tx_hash: string;
   };
+  // Extended fields (optional)
+  asset_longname?: string | null;
+  message_index?: number | null;
+  src_data?: any | null;
+  is_btc_stamp?: number | null;
+  is_reissue?: number | null;
+  is_valid_base64?: number | null;
 }
 
 export interface DisplayCountBreakpoints {
@@ -562,6 +570,8 @@ export interface Src20Detail {
   block_time: string;
   creator_name: string | null;
   destination_name: string;
+  // Optional fields for test compatibility and legacy support
+  id?: number;
   // market_data and chart removed from here, will be on EnrichedSRC20Row for relevant responses
 }
 
