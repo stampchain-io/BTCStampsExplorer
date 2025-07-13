@@ -5,6 +5,7 @@ import {
   getUTXOForAddress,
   isValidBitcoinAddress,
 } from "$lib/utils/utxoUtils.ts";
+import { createMockUTXO } from "./utils/testFactories.ts";
 
 // Helper function to create mock Response objects
 function createMockResponse(body: any, status = 200): Response {
@@ -324,10 +325,12 @@ describe("utxoUtils", () => {
           if (url.includes("/address/") && url.includes("/utxo")) {
             return Promise.resolve(createMockResponse([
               {
-                txid:
-                  "a0a34578b86c5ed1720083e0008e0578a744a9daa8c13124f64fb8ebbae9029b",
-                vout: 0,
-                value: 44089800,
+                ...createMockUTXO({
+                  txid:
+                    "a0a34578b86c5ed1720083e0008e0578a744a9daa8c13124f64fb8ebbae9029b",
+                  vout: 0,
+                  value: 44089800,
+                }),
                 scriptpubkey: "0014bd9b3a3dc6056392a498146692050e1719a5d70d",
                 status: {
                   confirmed: true,
@@ -338,10 +341,12 @@ describe("utxoUtils", () => {
                 },
               },
               {
-                txid:
-                  "ee9ee0c0c1de2591dc5b04c528ba60b3609d5c78ca0303d81a17e81f908a962d",
-                vout: 1,
-                value: 546,
+                ...createMockUTXO({
+                  txid:
+                    "ee9ee0c0c1de2591dc5b04c528ba60b3609d5c78ca0303d81a17e81f908a962d",
+                  vout: 1,
+                  value: 546,
+                }),
                 scriptpubkey: "0014bd9b3a3dc6056392a498146692050e1719a5d70d",
                 status: {
                   confirmed: true,

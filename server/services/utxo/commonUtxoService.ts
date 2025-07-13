@@ -19,8 +19,8 @@ interface CommonUTXOFetchOptions extends UTXOFetchOptions {
  */
 export class CommonUTXOService implements ICommonUTXOService {
   private static instance: CommonUTXOService;
-  private isQuickNodeConfigured: boolean;
-  private rawTxHexCache: Map<string, string | null>; // Cache for raw tx hex
+  protected isQuickNodeConfigured: boolean;
+  protected rawTxHexCache: Map<string, string | null>; // Cache for raw tx hex
 
   constructor() {
     this.isQuickNodeConfigured = !!(serverConfig.QUICKNODE_ENDPOINT && serverConfig.QUICKNODE_API_KEY);

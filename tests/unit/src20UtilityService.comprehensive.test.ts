@@ -8,10 +8,17 @@ import { SRC20QueryService } from "$server/services/src20/queryService.ts";
 import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
 import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
+import {
+  createMockMintProgress,
+  createMockSimpleBalance,
+  createMockSrc20BalanceResponse,
+  createMockSrc20Detail,
+} from "./utils/testFactories.ts";
 
 // Store original database manager and query service methods for cleanup
 let originalDbManager: DatabaseManager;
-let originalFetchSrc20MintProgress: typeof SRC20QueryService.fetchSrc20MintProgress;
+let originalFetchSrc20MintProgress:
+  typeof SRC20QueryService.fetchSrc20MintProgress;
 let originalCheckMintedOut: typeof SRC20QueryService.checkMintedOut;
 let originalFetchSrc20Balance: typeof SRC20QueryService.fetchSrc20Balance;
 
@@ -52,17 +59,16 @@ Deno.test({
   name: "SRC20UtilityService - formatSRC20Row",
   fn: async (t) => {
     await t.step("should format row with all fields", () => {
-      const row = {
+      const row = createMockSrc20Detail({
         tick: "\\uD83D\\uDC36", // Unicode escape for dog emoji
         max: BigInt("1000000"),
         lim: BigInt("1000"),
         amt: BigInt("500"),
         id: 1,
         block_index: 12345,
-        // Add other typical fields
         op: "deploy" as const,
         creator: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-      };
+      });
 
       const result = SRC20UtilityService.formatSRC20Row(row);
 
@@ -75,7 +81,7 @@ Deno.test({
     });
 
     await t.step("should handle null values", () => {
-      const row = {
+      const row = createMockSrc20Detail({
         tick: "TEST",
         max: null,
         lim: null,
@@ -84,7 +90,7 @@ Deno.test({
         block_index: 12345,
         op: "deploy" as const,
         creator: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-      };
+      });
 
       const result = SRC20UtilityService.formatSRC20Row(row);
 
@@ -95,7 +101,7 @@ Deno.test({
     });
 
     await t.step("should handle undefined values", () => {
-      const row = {
+      const row = createMockSrc20Detail({
         tick: "TEST",
         max: undefined,
         lim: undefined,
@@ -104,7 +110,7 @@ Deno.test({
         block_index: 12345,
         op: "deploy" as const,
         creator: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-      };
+      });
 
       const result = SRC20UtilityService.formatSRC20Row(row);
 
@@ -115,7 +121,7 @@ Deno.test({
     });
 
     await t.step("should handle zero values as falsy (return null)", () => {
-      const row = {
+      const row = createMockSrc20Detail({
         tick: "TEST",
         max: BigInt("0"), // BigInt("0") is falsy, so returns null
         lim: BigInt("0"),
@@ -124,7 +130,7 @@ Deno.test({
         block_index: 12345,
         op: "deploy" as const,
         creator: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-      };
+      });
 
       const result = SRC20UtilityService.formatSRC20Row(row);
 
@@ -135,7 +141,7 @@ Deno.test({
     });
 
     await t.step("should handle non-zero BigInt values as strings", () => {
-      const row = {
+      const row = createMockSrc20Detail({
         tick: "TEST",
         max: BigInt("1000000"), // Non-zero BigInt is truthy, so converts to string
         lim: BigInt("1000"),
@@ -144,7 +150,7 @@ Deno.test({
         block_index: 12345,
         op: "deploy" as const,
         creator: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-      };
+      });
 
       const result = SRC20UtilityService.formatSRC20Row(row);
 
@@ -155,7 +161,7 @@ Deno.test({
     });
 
     await t.step("should handle BigInt(0n) as falsy", () => {
-      const row = {
+      const row = createMockSrc20Detail({
         tick: "TEST",
         max: 0n, // This should be falsy and return null
         lim: 0n,
@@ -164,7 +170,7 @@ Deno.test({
         block_index: 12345,
         op: "deploy" as const,
         creator: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-      };
+      });
 
       const result = SRC20UtilityService.formatSRC20Row(row);
 
@@ -237,42 +243,54 @@ Deno.test({
     setupTestEnvironment();
 
     try {
-      await t.step("should return deployed: true when tick exists", async () => {
-        // Mock fetchSrc20MintProgress to return mint info
-        SRC20QueryService.fetchSrc20MintProgress = async (_tick: string) => {
-          return {
-            tick: "TEST",
-            max: "1000000",
-            lim: "1000",
-            current_supply: "500000",
-            progress: 50,
-            minted_out: false,
+      await t.step(
+        "should return deployed: true when tick exists",
+        async () => {
+          // Mock fetchSrc20MintProgress to return mint info
+          SRC20QueryService.fetchSrc20MintProgress = (_tick: string) => {
+            return Promise.resolve(createMockMintProgress({
+              tick: "TEST",
+              max_supply: "1000000",
+              limit: "1000",
+              total_minted: "500000",
+              progress: "50.000",
+            }));
           };
-        };
 
-        const result = await SRC20UtilityService.checkDeployedTick("TEST");
-        assertEquals(result.deployed, true);
-      });
+          const result = await SRC20UtilityService.checkDeployedTick("TEST");
+          assertEquals(result.deployed, true);
+        },
+      );
 
-      await t.step("should return deployed: false when tick doesn't exist", async () => {
-        // Mock fetchSrc20MintProgress to return null
-        SRC20QueryService.fetchSrc20MintProgress = async (_tick: string) => {
-          return null;
-        };
+      await t.step(
+        "should return deployed: false when tick doesn't exist",
+        async () => {
+          // Mock fetchSrc20MintProgress to return null
+          SRC20QueryService.fetchSrc20MintProgress = (_tick: string) => {
+            return null;
+          };
 
-        const result = await SRC20UtilityService.checkDeployedTick("NONEXISTENT");
-        assertEquals(result.deployed, false);
-      });
+          const result = await SRC20UtilityService.checkDeployedTick(
+            "NONEXISTENT",
+          );
+          assertEquals(result.deployed, false);
+        },
+      );
 
-      await t.step("should return deployed: false when fetchSrc20MintProgress returns undefined", async () => {
-        // Mock fetchSrc20MintProgress to return undefined
-        SRC20QueryService.fetchSrc20MintProgress = async (_tick: string) => {
-          return undefined as any;
-        };
+      await t.step(
+        "should return deployed: false when fetchSrc20MintProgress returns undefined",
+        async () => {
+          // Mock fetchSrc20MintProgress to return undefined
+          SRC20QueryService.fetchSrc20MintProgress = (_tick: string) => {
+            return undefined as any;
+          };
 
-        const result = await SRC20UtilityService.checkDeployedTick("UNDEFINED");
-        assertEquals(result.deployed, false);
-      });
+          const result = await SRC20UtilityService.checkDeployedTick(
+            "UNDEFINED",
+          );
+          assertEquals(result.deployed, false);
+        },
+      );
     } finally {
       cleanupTestEnvironment();
     }
@@ -286,17 +304,20 @@ Deno.test({
 
     try {
       await t.step("should return mint info when token exists", async () => {
-        const mockMintInfo = {
+        const mockMintInfo = createMockMintProgress({
           tick: "TEST",
-          max: "1000000",
-          lim: "1000",
-          current_supply: "500000",
-          progress: 50,
+          max_supply: "1000000",
+          limit: "1000",
+          total_minted: "500000",
+          progress: "50.000",
           minted_out: false,
-        };
+        });
 
-        SRC20QueryService.checkMintedOut = async (_tick: string, _amount: string) => {
-          return mockMintInfo;
+        SRC20QueryService.checkMintedOut = (
+          _tick: string,
+          _amount: string,
+        ) => {
+          return Promise.resolve(mockMintInfo);
         };
 
         const result = await SRC20UtilityService.checkMintedOut("TEST", "100");
@@ -304,8 +325,11 @@ Deno.test({
       });
 
       await t.step("should throw error when token not found", async () => {
-        SRC20QueryService.checkMintedOut = async (_tick: string, _amount: string) => {
-          return null;
+        SRC20QueryService.checkMintedOut = (
+          _tick: string,
+          _amount: string,
+        ) => {
+          return Promise.resolve(null);
         };
 
         await assertRejects(
@@ -313,23 +337,29 @@ Deno.test({
             await SRC20UtilityService.checkMintedOut("NONEXISTENT", "100");
           },
           Error,
-          "Error: Token not found"
+          "Error: Token not found",
         );
       });
 
-      await t.step("should throw error when checkMintedOut returns undefined", async () => {
-        SRC20QueryService.checkMintedOut = async (_tick: string, _amount: string) => {
-          return undefined as any;
-        };
+      await t.step(
+        "should throw error when checkMintedOut returns undefined",
+        async () => {
+          SRC20QueryService.checkMintedOut = (
+            _tick: string,
+            _amount: string,
+          ) => {
+            return Promise.resolve(undefined as any);
+          };
 
-        await assertRejects(
-          async () => {
-            await SRC20UtilityService.checkMintedOut("UNDEFINED", "100");
-          },
-          Error,
-          "Error: Token not found"
-        );
-      });
+          await assertRejects(
+            async () => {
+              await SRC20UtilityService.checkMintedOut("UNDEFINED", "100");
+            },
+            Error,
+            "Error: Token not found",
+          );
+        },
+      );
     } finally {
       cleanupTestEnvironment();
     }
@@ -342,83 +372,105 @@ Deno.test({
     setupTestEnvironment();
 
     try {
-      await t.step("should return true when balance is sufficient", async () => {
-        SRC20QueryService.fetchSrc20Balance = async (_params: any) => {
-          return { amt: "1000" };
-        };
+      await t.step(
+        "should return true when balance is sufficient",
+        async () => {
+          SRC20QueryService.fetchSrc20Balance = (_params: any) => {
+            return Promise.resolve(createMockSimpleBalance({
+              amt: "1000",
+            }));
+          };
 
-        const result = await SRC20UtilityService.checkEnoughBalance(
-          "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-          "TEST",
-          "500"
-        );
-        assertEquals(result, true);
-      });
+          const result = await SRC20UtilityService.checkEnoughBalance(
+            "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            "TEST",
+            "500",
+          );
+          assertEquals(result, true);
+        },
+      );
 
-      await t.step("should return false when balance is insufficient", async () => {
-        SRC20QueryService.fetchSrc20Balance = async (_params: any) => {
-          return { amt: "100" };
-        };
+      await t.step(
+        "should return false when balance is insufficient",
+        async () => {
+          SRC20QueryService.fetchSrc20Balance = (_params: any) => {
+            return Promise.resolve(createMockSimpleBalance({
+              amt: "100",
+            }));
+          };
 
-        const result = await SRC20UtilityService.checkEnoughBalance(
-          "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-          "TEST",
-          "500"
-        );
-        assertEquals(result, false);
-      });
+          const result = await SRC20UtilityService.checkEnoughBalance(
+            "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            "TEST",
+            "500",
+          );
+          assertEquals(result, false);
+        },
+      );
 
       await t.step("should return false when no balance data", async () => {
-        SRC20QueryService.fetchSrc20Balance = async (_params: any) => {
-          return null;
+        SRC20QueryService.fetchSrc20Balance = (_params: any) => {
+          return Promise.resolve(null);
         };
 
         const result = await SRC20UtilityService.checkEnoughBalance(
           "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
           "TEST",
-          "500"
+          "500",
         );
         assertEquals(result, false);
       });
 
-      await t.step("should return false when balance data has no amt field", async () => {
-        SRC20QueryService.fetchSrc20Balance = async (_params: any) => {
-          return { tick: "TEST" }; // Missing amt field
-        };
+      await t.step(
+        "should return false when balance data has no amt field",
+        async () => {
+          SRC20QueryService.fetchSrc20Balance = (_params: any) => {
+            return Promise.resolve({
+              tick: "TEST", // Missing amt field for testing - explicitly create object without amt
+              address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+              // amt is intentionally missing
+            } as any); // Use any to bypass type checking for this test case
+          };
 
-        const result = await SRC20UtilityService.checkEnoughBalance(
-          "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-          "TEST",
-          "500"
-        );
-        assertEquals(result, false);
-      });
+          const result = await SRC20UtilityService.checkEnoughBalance(
+            "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            "TEST",
+            "500",
+          );
+          assertEquals(result, false);
+        },
+      );
 
       await t.step("should handle decimal amounts correctly", async () => {
-        SRC20QueryService.fetchSrc20Balance = async (_params: any) => {
-          return { amt: "1000.5" };
+        SRC20QueryService.fetchSrc20Balance = (_params: any) => {
+          return Promise.resolve(createMockSimpleBalance({
+            amt: "1000.5",
+          }));
         };
 
         const result = await SRC20UtilityService.checkEnoughBalance(
           "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
           "TEST",
-          "1000.25"
+          "1000.25",
         );
         assertEquals(result, true);
       });
 
-      await t.step("should return false when fetchSrc20Balance throws error", async () => {
-        SRC20QueryService.fetchSrc20Balance = async (_params: any) => {
-          throw new Error("Database error");
-        };
+      await t.step(
+        "should return false when fetchSrc20Balance throws error",
+        async () => {
+          SRC20QueryService.fetchSrc20Balance = (_params: any) => {
+            return Promise.reject(new Error("Database error"));
+          };
 
-        const result = await SRC20UtilityService.checkEnoughBalance(
-          "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-          "TEST",
-          "500"
-        );
-        assertEquals(result, false);
-      });
+          const result = await SRC20UtilityService.checkEnoughBalance(
+            "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            "TEST",
+            "500",
+          );
+          assertEquals(result, false);
+        },
+      );
     } finally {
       cleanupTestEnvironment();
     }
@@ -441,7 +493,10 @@ Deno.test({
         } as any);
 
         assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "Source address is required");
+        assertStringIncludes(
+          await result?.text() || "",
+          "Source address is required",
+        );
       });
 
       await t.step("should require tick", async () => {
@@ -458,11 +513,14 @@ Deno.test({
       });
 
       await t.step("should reject invalid operation", async () => {
-        const result = await SRC20UtilityService.validateOperation("invalid" as any, {
-          sourceAddress: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-          tick: "TEST",
-          isEstimate: true,
-        } as any);
+        const result = await SRC20UtilityService.validateOperation(
+          "invalid" as any,
+          {
+            sourceAddress: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            tick: "TEST",
+            isEstimate: true,
+          } as any,
+        );
 
         assertEquals(result?.status, 400);
         assertStringIncludes(await result?.text() || "", "Invalid operation");
@@ -490,7 +548,10 @@ Deno.test({
         });
 
         assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "Invalid numeric values");
+        assertStringIncludes(
+          await result?.text() || "",
+          "Invalid numeric values",
+        );
       });
 
       await t.step("should validate max > 0", async () => {
@@ -504,7 +565,10 @@ Deno.test({
         });
 
         assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "Max supply must be greater than 0");
+        assertStringIncludes(
+          await result?.text() || "",
+          "Max supply must be greater than 0",
+        );
       });
 
       await t.step("should validate lim > 0", async () => {
@@ -518,7 +582,10 @@ Deno.test({
         });
 
         assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "Limit per mint must be greater than 0");
+        assertStringIncludes(
+          await result?.text() || "",
+          "Limit per mint must be greater than 0",
+        );
       });
 
       await t.step("should validate lim <= max", async () => {
@@ -532,7 +599,10 @@ Deno.test({
         });
 
         assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "Limit per mint cannot exceed max supply");
+        assertStringIncludes(
+          await result?.text() || "",
+          "Limit per mint cannot exceed max supply",
+        );
       });
 
       await t.step("should validate decimals range", async () => {
@@ -546,7 +616,10 @@ Deno.test({
         });
 
         assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "Decimals must be between 0 and 18");
+        assertStringIncludes(
+          await result?.text() || "",
+          "Decimals must be between 0 and 18",
+        );
       });
 
       await t.step("should validate negative decimals", async () => {
@@ -560,7 +633,10 @@ Deno.test({
         });
 
         assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "Decimals must be between 0 and 18");
+        assertStringIncludes(
+          await result?.text() || "",
+          "Decimals must be between 0 and 18",
+        );
       });
 
       await t.step("should handle string decimals", async () => {
@@ -569,31 +645,41 @@ Deno.test({
           tick: "TEST",
           max: "1000000",
           lim: "1000",
-          dec: "8", // String instead of number
+          dec: 8, // Number as required by interface
           isEstimate: true,
         });
 
         assertEquals(result, null); // Should be valid
       });
 
-      await t.step("should check deployed status when not estimating", async () => {
-        // Mock checkDeployedTick to return deployed: true
-        SRC20QueryService.fetchSrc20MintProgress = async (_tick: string) => {
-          return { tick: "TEST", max: "1000000", lim: "1000", current_supply: "0", progress: 0, minted_out: false };
-        };
+      await t.step(
+        "should check deployed status when not estimating",
+        async () => {
+          // Mock checkDeployedTick to return deployed: true
+          SRC20QueryService.fetchSrc20MintProgress = (_tick: string) => {
+            return Promise.resolve(createMockMintProgress({
+              tick: "TEST",
+              max_supply: "1000000",
+              limit: "1000",
+              total_minted: "0",
+              progress: "0.000",
+              minted_out: false,
+            }));
+          };
 
-        const result = await SRC20UtilityService.validateOperation("deploy", {
-          sourceAddress: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-          tick: "TEST",
-          max: "1000000",
-          lim: "1000",
-          dec: 18,
-          isEstimate: false, // Not estimating
-        });
+          const result = await SRC20UtilityService.validateOperation("deploy", {
+            sourceAddress: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            tick: "TEST",
+            max: "1000000",
+            lim: "1000",
+            dec: 18,
+            isEstimate: false, // Not estimating
+          });
 
-        assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "already deployed");
-      });
+          assertEquals(result?.status, 400);
+          assertStringIncludes(await result?.text() || "", "already deployed");
+        },
+      );
     } finally {
       cleanupTestEnvironment();
     }
@@ -614,25 +700,44 @@ Deno.test({
         });
 
         assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "Amount is required for mint");
+        assertStringIncludes(
+          await result?.text() || "",
+          "Amount is required for mint",
+        );
       });
 
-      await t.step("should check minted out status when not estimating", async () => {
-        // Mock checkMintedOut to return minted_out: true
-        SRC20QueryService.checkMintedOut = async (_tick: string, _amount: string) => {
-          return { tick: "TEST", max: "1000000", lim: "1000", current_supply: "1000000", progress: 100, minted_out: true };
-        };
+      await t.step(
+        "should check minted out status when not estimating",
+        async () => {
+          // Mock checkMintedOut to return minted_out: true
+          SRC20QueryService.checkMintedOut = (
+            _tick: string,
+            _amount: string,
+          ) => {
+            return Promise.resolve(createMockMintProgress({
+              tick: "TEST",
+              max_supply: "1000000",
+              limit: "1000",
+              total_minted: "1000000",
+              progress: "100.000",
+              minted_out: true,
+            }));
+          };
 
-        const result = await SRC20UtilityService.validateOperation("mint", {
-          sourceAddress: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-          tick: "TEST",
-          amt: "100",
-          isEstimate: false, // Not estimating
-        });
+          const result = await SRC20UtilityService.validateOperation("mint", {
+            sourceAddress: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            tick: "TEST",
+            amt: "100",
+            isEstimate: false, // Not estimating
+          });
 
-        assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "already minted out");
-      });
+          assertEquals(result?.status, 400);
+          assertStringIncludes(
+            await result?.text() || "",
+            "already minted out",
+          );
+        },
+      );
 
       await t.step("should pass validation when estimating", async () => {
         const result = await SRC20UtilityService.validateOperation("mint", {
@@ -666,7 +771,10 @@ Deno.test({
         });
 
         assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "Invalid or missing recipient address");
+        assertStringIncludes(
+          await result?.text() || "",
+          "Invalid or missing recipient address",
+        );
       });
 
       await t.step("should require amount", async () => {
@@ -678,13 +786,18 @@ Deno.test({
         });
 
         assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "Amount is required for transfer");
+        assertStringIncludes(
+          await result?.text() || "",
+          "Amount is required for transfer",
+        );
       });
 
       await t.step("should check balance when not estimating", async () => {
         // Mock checkEnoughBalance to return false
-        SRC20QueryService.fetchSrc20Balance = async (_params: any) => {
-          return { amt: "50" }; // Less than required 100
+        SRC20QueryService.fetchSrc20Balance = (_params: any) => {
+          return Promise.resolve(createMockSimpleBalance({
+            amt: "50", // Less than required 100
+          }));
         };
 
         const result = await SRC20UtilityService.validateOperation("transfer", {
@@ -696,7 +809,10 @@ Deno.test({
         });
 
         assertEquals(result?.status, 400);
-        assertStringIncludes(await result?.text() || "", "Insufficient balance");
+        assertStringIncludes(
+          await result?.text() || "",
+          "Insufficient balance",
+        );
       });
 
       await t.step("should pass validation when estimating", async () => {
@@ -720,13 +836,15 @@ Deno.test({
   name: "SRC20UtilityService - validateSRC20Deployment edge cases",
   fn: async (t) => {
     await t.step("should handle missing required fields", async () => {
-      const result = await SRC20UtilityService.validateSRC20Deployment({} as any);
+      const result = await SRC20UtilityService.validateSRC20Deployment(
+        {} as any,
+      );
 
       assertEquals(result.isValid, false);
       assertEquals(result.errors.length > 0, true);
-      assertEquals(result.errors.some(e => e.includes("tick")), true);
-      assertEquals(result.errors.some(e => e.includes("max")), true);
-      assertEquals(result.errors.some(e => e.includes("lim")), true);
+      assertEquals(result.errors.some((e) => e.includes("tick")), true);
+      assertEquals(result.errors.some((e) => e.includes("max")), true);
+      assertEquals(result.errors.some((e) => e.includes("lim")), true);
     });
 
     await t.step("should handle non-string types", async () => {
@@ -738,9 +856,18 @@ Deno.test({
       } as any);
 
       assertEquals(result.isValid, false);
-      assertEquals(result.errors.some(e => e.includes("tick") && e.includes("string")), true);
-      assertEquals(result.errors.some(e => e.includes("max") && e.includes("string")), true);
-      assertEquals(result.errors.some(e => e.includes("lim") && e.includes("string")), true);
+      assertEquals(
+        result.errors.some((e) => e.includes("tick") && e.includes("string")),
+        true,
+      );
+      assertEquals(
+        result.errors.some((e) => e.includes("max") && e.includes("string")),
+        true,
+      );
+      assertEquals(
+        result.errors.some((e) => e.includes("lim") && e.includes("string")),
+        true,
+      );
     });
 
     await t.step("should validate image protocol references", async () => {
@@ -754,8 +881,8 @@ Deno.test({
       });
 
       assertEquals(result.isValid, false);
-      assertEquals(result.errors.some(e => e.includes("img")), true);
-      assertEquals(result.errors.some(e => e.includes("icon")), true);
+      assertEquals(result.errors.some((e) => e.includes("img")), true);
+      assertEquals(result.errors.some((e) => e.includes("icon")), true);
     });
 
     await t.step("should handle edge case field lengths", async () => {
@@ -788,7 +915,11 @@ Deno.test({
           icon: `${protocol}:validicon456`,
         });
 
-        assertEquals(result.isValid, true, `Protocol ${protocol} should be valid`);
+        assertEquals(
+          result.isValid,
+          true,
+          `Protocol ${protocol} should be valid`,
+        );
         assertEquals(result.errors.length, 0);
       }
     });

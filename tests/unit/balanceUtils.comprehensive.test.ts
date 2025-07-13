@@ -9,6 +9,7 @@ import {
   getBTCBalanceInfo,
 } from "$lib/utils/balanceUtils.ts";
 import { assertEquals, assertExists } from "@std/assert";
+import { createMockBTCBalance } from "./utils/testFactories.ts";
 
 // Test fixtures for consistent data
 const FIXTURES = {
@@ -90,20 +91,32 @@ const FIXTURES = {
     },
   },
   blockcypherResponses: {
-    fallback: {
-      address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-      balance: 1000000000, // 10 BTC
-      unconfirmed_balance: 50000000, // 0.5 BTC
-      n_tx: 75,
-      unconfirmed_n_tx: 2,
-    },
-    nullFallback: {
-      address: "1TestAddress",
-      balance: 250000000, // 2.5 BTC
-      unconfirmed_balance: 0,
-      n_tx: 10,
-      unconfirmed_n_tx: 0,
-    },
+    fallback: (() => {
+      const balance = createMockBTCBalance({
+        confirmed: 1000000000,
+        unconfirmed: 50000000,
+      });
+      return {
+        address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+        balance: balance.confirmed,
+        unconfirmed_balance: balance.unconfirmed,
+        n_tx: 75,
+        unconfirmed_n_tx: 2,
+      };
+    })(),
+    nullFallback: (() => {
+      const balance = createMockBTCBalance({
+        confirmed: 250000000,
+        unconfirmed: 0,
+      });
+      return {
+        address: "1TestAddress",
+        balance: balance.confirmed,
+        unconfirmed_balance: balance.unconfirmed,
+        n_tx: 10,
+        unconfirmed_n_tx: 0,
+      };
+    })(),
   },
   priceResponses: {
     success: { data: { price: 45000 } },

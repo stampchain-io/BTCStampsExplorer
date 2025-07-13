@@ -177,5 +177,6 @@ coverage_psbt/*
 coverage_psbt_mocked/*
 coverage_psbt_injected/*
 coverage_psbt_final/*
+coverage_compression*/*
 
 coverage_report.json

@@ -5,18 +5,18 @@
  */
 
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
+import { createMockCollection } from "./utils/testFactories.ts";
 
-// Test fixtures based on actual data structure
-const mockCollectionRow = {
+// Test fixtures using factory functions
+const mockCollectionRow = createMockCollection({
   collection_id: "015F0478516E4273DD90FE59C766DD98",
   collection_name: "KEVIN",
-  collection_description: null,
   creators: ["bc1qcreator1"],
   stamp_count: 5,
   total_editions: 50,
   stamps: [4258, 4262, 4265, 4269, 4283],
   img: "https://example.com/image1.png",
-};
+});
 
 const mockCollectionRowWithMarketData = {
   ...mockCollectionRow,

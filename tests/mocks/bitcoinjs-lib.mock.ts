@@ -7,7 +7,7 @@ import { Buffer } from "node:buffer";
 
 // Add bech32 encode function based on sipa/bech32 reference
 function bech32Encode(prefix: string, words: number[]): string {
-  const ALPHABET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+  const ALPHABET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
 
   function polymod(values: number[]): number {
     let gen = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
@@ -32,11 +32,11 @@ function bech32Encode(prefix: string, words: number[]): string {
   }
 
   let pfx = prefixChk(prefix.toLowerCase());
-  let encoded = prefix.toLowerCase() + '1';
+  let encoded = prefix.toLowerCase() + "1";
   for (let word of words) {
     encoded += ALPHABET.charAt(word);
   }
-  let checksum = polymod(pfx.concat(words).concat([0,0,0,0,0,0])) ^ 1;
+  let checksum = polymod(pfx.concat(words).concat([0, 0, 0, 0, 0, 0])) ^ 1;
   for (let i = 0; i < 6; ++i) {
     encoded += ALPHABET.charAt((checksum >> (5 * (5 - i))) & 31);
   }
@@ -78,6 +78,17 @@ export const address = {
     throw new Error("Invalid address format");
   },
 
+  toBase58Check: (hash: Buffer, version: number) => {
+    // Mock implementation - return a valid-looking address
+    if (version === 0x00) {
+      return "1MockAddress" + hash.toString("hex").substring(0, 20);
+    }
+    if (version === 0x05) {
+      return "3MockAddress" + hash.toString("hex").substring(0, 20);
+    }
+    return "InvalidMockAddress";
+  },
+
   fromBech32: (addr: string) => {
     // Mock implementation
     if (addr.startsWith("bc1q")) {
@@ -99,6 +110,18 @@ export const address = {
       };
     }
     throw new Error("Invalid bech32 address");
+  },
+
+  toBech32: (data: Buffer, version: number, prefix: string) => {
+    // Mock implementation - return a valid-looking bech32 address
+    const mockData = data.toString("hex").substring(0, 40);
+    if (version === 0) {
+      return `${prefix}1q${mockData}`;
+    }
+    if (version === 1) {
+      return `${prefix}1p${mockData}`;
+    }
+    return `${prefix}1invalid`;
   },
 
   toOutputScript: (addr: string, network: any) => {
@@ -153,20 +176,30 @@ export const address = {
 
   fromOutputScript: (script: Buffer, network: any) => {
     // Mock implementation - return plausible addresses
-    const scriptHex = Buffer.from(script).toString('hex').toLowerCase();
+    const scriptHex = Buffer.from(script).toString("hex").toLowerCase();
 
     const knownScripts = {
-      '0014c7e20a5dd06b5e3b8f8d5e3b5a8e1c6d9e2f3a4b': 'bc1qcl3q5hwsdd0rhrudtca44rsudk0z7wjthy8t0p',
-      '0014a1b2c3d4e5f6789012345678901234567890abcd': 'bc1q5xev84897eufqy352eufqy352eufp27d2t6dex',
-      '0014f1e2d3c4b5a697880123456789abcdef123456ab': 'bc1q783d839456tcsqfrg4ncn27daufrg44txrckns',
-      '0020701a8d401c84fb13e6baf169d59684e17abd9fa216c8cc5b9fc63d622ff8c58d': 'bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej',
-      '0020a16b5755f7f6f385c5709c56025c29b61ba8ce1ba8f1ab9e58b9c9e58b9c9e58': 'bc1q5944w40h7mect3tsn3tqyhpfkcd63nsm4rc6h8jch8y7tzuunevqz4qdny',
-      '76a9145e9b23809261178723055968d134a947f47e799f88ac': '19dENFt4wVwos6xtgwStA6n8bbA57WCS58',
-      '76a914a1b2c3d4e5f6789012345678901234567890abcd88ac': '1FjywhAAKpxzdFGEQV3ESe9uMd6C56NyhF',
-      'a914b7fcfa53b4f5e5c5a5b5c5a5b5c5a5b5c5a5b5c587': '3JTrdrfo7Z5h8iDJQRH5XZUuX8csqcb82z',
-      'a9146b5c4e3f2a1b9c8d7e6f5a4b3c2d1e0f9a8b7c6d87': '3BUgoaWzeZkz5Vi9V8nRhbdcvZMe8bWW6x',
+      "0014c7e20a5dd06b5e3b8f8d5e3b5a8e1c6d9e2f3a4b":
+        "bc1qcl3q5hwsdd0rhrudtca44rsudk0z7wjthy8t0p",
+      "0014a1b2c3d4e5f6789012345678901234567890abcd":
+        "bc1q5xev84897eufqy352eufqy352eufp27d2t6dex",
+      "0014f1e2d3c4b5a697880123456789abcdef123456ab":
+        "bc1q783d839456tcsqfrg4ncn27daufrg44txrckns",
+      "0020701a8d401c84fb13e6baf169d59684e17abd9fa216c8cc5b9fc63d622ff8c58d":
+        "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
+      "0020a16b5755f7f6f385c5709c56025c29b61ba8ce1ba8f1ab9e58b9c9e58b9c9e58":
+        "bc1q5944w40h7mect3tsn3tqyhpfkcd63nsm4rc6h8jch8y7tzuunevqz4qdny",
+      "76a9145e9b23809261178723055968d134a947f47e799f88ac":
+        "19dENFt4wVwos6xtgwStA6n8bbA57WCS58",
+      "76a914a1b2c3d4e5f6789012345678901234567890abcd88ac":
+        "1FjywhAAKpxzdFGEQV3ESe9uMd6C56NyhF",
+      "a914b7fcfa53b4f5e5c5a5b5c5a5b5c5a5b5c5a5b5c587":
+        "3JTrdrfo7Z5h8iDJQRH5XZUuX8csqcb82z",
+      "a9146b5c4e3f2a1b9c8d7e6f5a4b3c2d1e0f9a8b7c6d87":
+        "3BUgoaWzeZkz5Vi9V8nRhbdcvZMe8bWW6x",
       // p2tr if enabled
-      '5120a1b2c3d4e5f6789012345678901234567890abcdef1234567890123456789012': 'bc1p5xev84897eufqy352eufqy352eufp27d2v8x9k2rx3ufqy352eufqgxqxqx',
+      "5120a1b2c3d4e5f6789012345678901234567890abcdef1234567890123456789012":
+        "bc1p5xev84897eufqy352eufqy352eufp27d2v8x9k2rx3ufqy352eufqgxqxqx",
     };
 
     if (knownScripts[scriptHex]) {
@@ -174,14 +207,14 @@ export const address = {
     }
 
     // Proper P2WPKH derivation
-    if (scriptHex.startsWith('0014')) {
+    if (scriptHex.startsWith("0014")) {
       const data = script.slice(2);
       const words = [];
       for (let i = 0; i < data.length; i++) {
         words.push(data[i] >> 5);
         words.push(data[i] & 31);
       }
-      const prefix = network.bech32 || 'bc';
+      const prefix = network.bech32 || "bc";
       return bech32Encode(prefix, words);
     }
 
@@ -450,9 +483,36 @@ export class Transaction {
     return tx;
   }
 
+  addInput(hash: Buffer, index: number, sequence?: number): void {
+    this.ins.push({
+      hash,
+      index,
+      sequence: sequence ?? 0xfffffffd,
+      script: Buffer.alloc(0),
+    });
+  }
+
+  addOutput(script: Buffer, value: bigint): void {
+    this.outs.push({
+      script,
+      value,
+    });
+  }
+
   toHex(): string {
     return "02000000" + "0".repeat(100); // Mock transaction hex
   }
+
+  toBuffer(): Buffer {
+    // Simple mock implementation
+    return Buffer.from(this.toHex(), "hex");
+  }
+
+  // Add static constants that might be used
+  static SIGHASH_ALL = 0x01;
+  static SIGHASH_NONE = 0x02;
+  static SIGHASH_SINGLE = 0x03;
+  static SIGHASH_ANYONECANPAY = 0x80;
 }
 
 // Export all mocked functionality
@@ -580,6 +640,10 @@ export const opcodes = {
   OP_PUSHDATA4: 0x4e,
 };
 
+// Add missing exports
+export const Block = {};
+export const initEccLib = () => {};
+
 // Helper function to inject this mock
 export function mockBitcoinJSLib() {
   // This would be used in test setup to replace the real bitcoinjs-lib
@@ -593,5 +657,7 @@ export function mockBitcoinJSLib() {
     script,
     ECPair,
     opcodes,
+    Block,
+    initEccLib,
   };
 }
