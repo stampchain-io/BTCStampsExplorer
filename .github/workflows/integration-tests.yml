@@ -144,10 +144,10 @@ jobs:
           ENABLE_REDIS_INTEGRATION_TESTS: true
         run: |
           echo "Running CI-safe integration tests..."
-          # Use the proper deno task that changes to tests/ directory first
-          # This ensures tests run with the correct tests/deno.json configuration
+          # Use the CI-specific task that only runs database manager integration test
+          # This test is designed for CI environments with fallback logic
           set +e  # Don't exit on error
-          deno task test:integration:coverage
+          deno task test:integration:ci
           test_exit_code=$?
           set -e  # Re-enable exit on error
 
@@ -191,17 +191,17 @@ jobs:
             echo ""
             echo "### Test Coverage"
             echo ""
-            echo "CI-safe integration tests cover:"
+            echo "CI integration tests cover:"
             echo "- DatabaseManager initialization and configuration"
-            echo "- Service availability detection"
-            echo "- Graceful fallback when services unavailable"
-            echo "- In-memory cache functionality"
-            echo "- Error handling and connection management"
+            echo "- Service availability detection and fallback logic"
+            echo "- Redis connection management (with/without Redis)"
+            echo "- Database connection pooling and error handling"
+            echo "- In-memory cache functionality when Redis unavailable"
             echo ""
             echo "### Full Integration Tests"
             echo ""
-            echo "Complete integration tests (requiring production DB access) should be run locally:"
-            echo "\`deno task test:integration\`"
+            echo "Complete integration tests (including API tests requiring dev server) should be run locally:"
+            echo "\`deno task test:integration\` or \`deno task test:integration:coverage\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Check test output
