@@ -1,13 +1,9 @@
-import type { Output, UTXO, AncestorInfo, BasicUTXO, ScriptType } from "$types/index.d.ts";
+import type { Output, UTXO, BasicUTXO } from "$types/index.d.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import * as bitcoin from "bitcoinjs-lib";
-import { calculateMiningFee } from "$lib/utils/minting/feeCalculations.ts";
-import { 
-  getScriptTypeInfo 
-} from "$lib/utils/scriptTypeUtils.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
 
 export class UTXOService {
   private static readonly CHANGE_DUST = 1000;
@@ -149,108 +145,71 @@ export class UTXOService {
     change: number;
     fee: number;
   }> {
-    const totalOutputValue = vouts.reduce((sum: any, vout: any) => 
-      BigInt(sum) + BigInt(vout.value), BigInt(0));
-    let totalInputValue = BigInt(0);
-    const selectedInputs: UTXO[] = [];
-
-    const sortedBasicUtxos = [...basicUtxos].sort((a, b) => Number(BigInt(b.value) - BigInt(a.value)));
-
     try {
-      for (const basicUtxo of sortedBasicUtxos) {
-        let utxoToProcess: UTXO;
+      // Use optimal UTXO selection algorithm
+      const selectionResult = OptimalUTXOSelection.selectUTXOs(
+        basicUtxos,
+        vouts,
+        feeRate,
+        {
+          avoidChange: true,
+          consolidationMode: false,
+          dustThreshold: UTXOService.CHANGE_DUST
+        }
+      );
 
-        if (fetchFullDetails) {
-          console.log(`[UTXOService.selectUTXOsLogic] Fetching full details for buyer UTXO: ${basicUtxo.txid}:${basicUtxo.vout}`);
+      // If fetchFullDetails is true, we need to replace the selected UTXOs with full details
+      if (fetchFullDetails) {
+        const fullUTXOs: UTXO[] = [];
+        
+        for (const selectedUtxo of selectionResult.inputs) {
+          console.log(`[UTXOService.selectUTXOsLogic] Fetching full details for buyer UTXO: ${selectedUtxo.txid}:${selectedUtxo.vout}`);
           const fullUtxo = await this.commonUtxoService.getSpecificUTXO(
-            basicUtxo.txid,
-            basicUtxo.vout,
+            selectedUtxo.txid,
+            selectedUtxo.vout,
             { includeAncestorDetails: true, confirmedOnly: false }
           );
+          
           if (!fullUtxo || !fullUtxo.script) {
-            logger.warn("transaction-utxo-service", { message: "Failed to fetch full details for UTXO in selectUTXOsLogic, skipping.", txid: basicUtxo.txid, vout: basicUtxo.vout });
-            continue; 
+            logger.warn("transaction-utxo-service", { 
+              message: "Failed to fetch full details for UTXO in selectUTXOsLogic, skipping.", 
+              txid: selectedUtxo.txid, 
+              vout: selectedUtxo.vout 
+            });
+            // Try to continue with basic UTXO data
+            fullUTXOs.push(selectedUtxo);
+          } else {
+            console.log(`[UTXOService.selectUTXOsLogic] For buyer UTXO ${selectedUtxo.txid}:${selectedUtxo.vout}, fetched fullUtxo.script (hex): ${fullUtxo.script}`);
+            fullUTXOs.push(fullUtxo);
           }
-          console.log(`[UTXOService.selectUTXOsLogic] For buyer UTXO ${basicUtxo.txid}:${basicUtxo.vout}, fetched fullUtxo.script (hex): ${fullUtxo.script}`);
-          utxoToProcess = fullUtxo;
-        } else {
-          utxoToProcess = {
-            ...basicUtxo,
-            script: "assumed_for_estimation",
-            scriptType: "P2WPKH",
-            scriptDesc: "assumed P2WPKH for estimation",
-          };
         }
         
-        selectedInputs.push(utxoToProcess);
-        totalInputValue += BigInt(utxoToProcess.value);
-  
-        const currentFee = BigInt(calculateMiningFee(
-          selectedInputs.map(input => {
-            const scriptForFeeCalc: string | undefined = input.script;
-            const ancestorForFeeCalc: AncestorInfo | undefined = input.ancestor;
-
-            if (!fetchFullDetails) {
-              return {
-                type: "P2WPKH" as ScriptType,
-                size: TX_CONSTANTS.P2WPKH.size,
-                isWitness: true,
-                ancestor: undefined as any
-              };
-            } else {
-              if (!scriptForFeeCalc) throw new Error(`Script missing for selected input ${input.txid}:${input.vout} in final calculation`);
-              const actualScriptTypeInfo = getScriptTypeInfo(scriptForFeeCalc);
-              return {
-                type: actualScriptTypeInfo.type as ScriptType,
-                size: actualScriptTypeInfo.size,
-                isWitness: actualScriptTypeInfo.isWitness,
-                ancestor: ancestorForFeeCalc as any
-              };
-            }
-          }),
-          vouts.map(output => {
-            let scriptTypeInfo;
-            if ('script' in output && output.script) {
-                scriptTypeInfo = getScriptTypeInfo(output.script);
-            } else if ('address' in output && output.address) {
-                scriptTypeInfo = getScriptTypeInfo(bitcoin.address.toOutputScript(output.address, bitcoin.networks.bitcoin));
-            } else {
-                logger.warn("transaction-utxo-service", {message: "Output missing script/address for fee calc, defaulting P2WPKH"});
-                scriptTypeInfo = { type: "P2WPKH", size: TX_CONSTANTS.P2WPKH.size, isWitness: true }; 
-            }
-            return {
-              type: scriptTypeInfo.type as ScriptType,
-              size: scriptTypeInfo.size,
-              isWitness: scriptTypeInfo.isWitness,
-              value: Number(output.value) 
-            };
-          }),
-          feeRate,
-          {
-            includeChangeOutput: true,
-            changeOutputType: "P2WPKH" 
-          }
-        ));
-  
-        if (totalInputValue >= totalOutputValue + currentFee) {
-          const change = totalInputValue - totalOutputValue - currentFee;
-          const changeDust = BigInt(UTXOService.CHANGE_DUST); 
-          
-          if (change >= changeDust || change === BigInt(0)) {
-            logger.info("transaction-utxo-service", { message: "UTXO selection successful", inputsSelected: selectedInputs.length, totalInputValue: totalInputValue.toString(), totalOutputValue: totalOutputValue.toString(), fee: currentFee.toString(), change: change.toString(), fetchFullDetails });
-            return {
-              inputs: selectedInputs, 
-              change: change >= changeDust ? Number(change) : 0,
-              fee: Number(currentFee),
-            };
-          }
-        }
+        selectionResult.inputs = fullUTXOs;
       }
-  
-      logger.warn("transaction-utxo-service", { message: "Insufficient funds to cover outputs and fees after processing all UTXOs", address: (basicUtxos[0] as any)?.address, fetchFullDetails });
-      throw new Error("Insufficient funds to cover outputs and fees");
+
+      logger.info("transaction-utxo-service", { 
+        message: "UTXO selection successful using optimal algorithm", 
+        algorithm: selectionResult.algorithm,
+        inputsSelected: selectionResult.inputs.length, 
+        totalInputValue: selectionResult.inputs.reduce((sum, u) => sum + u.value, 0), 
+        fee: selectionResult.fee, 
+        change: selectionResult.change,
+        waste: selectionResult.waste,
+        fetchFullDetails 
+      });
+
+      return {
+        inputs: selectionResult.inputs,
+        change: selectionResult.change,
+        fee: selectionResult.fee,
+      };
     } catch (error) {
-      logger.error("transaction-utxo-service", { message: "Error in selectUTXOsLogic", error: (error as any).message, stack: (error as any).stack, fetchFullDetails });
+      logger.error("transaction-utxo-service", { 
+        message: "Error in selectUTXOsLogic with optimal selection", 
+        error: (error as any).message, 
+        stack: (error as any).stack, 
+        fetchFullDetails 
+      });
       throw error;
     }
   }
