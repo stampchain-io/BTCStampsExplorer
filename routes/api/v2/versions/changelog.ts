@@ -1,11 +1,10 @@
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "../../../lib/utils/apiResponseUtil.ts";
-import { VERSION_CONFIG } from "../../../server/middleware/apiVersionMiddleware.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { VERSION_CONFIG } from "$server/middleware/apiVersionMiddleware.ts";
 
 /**
- * API Version Discovery Endpoint
+ * API Version Changelog Endpoint
  *
- * GET /api/v2/versions - Returns available API versions and their status
  * GET /api/v2/versions/changelog - Returns version changelog
  */
 
@@ -99,108 +98,14 @@ const CHANGELOG = [
 ];
 
 export const handler: Handlers = {
-  GET(req, ctx) {
-    const url = new URL(req.url);
-    const path = url.pathname;
-
-    // Changelog endpoint
-    if (path === "/api/v2/versions/changelog") {
-      return ApiResponseUtil.success({
-        changelog: CHANGELOG,
-        currentVersion: VERSION_CONFIG.defaultVersion,
-        deprecationPolicy: {
-          notice: "6 months",
-          support: "12 months after deprecation",
-        },
-      });
-    }
-
-    // Version discovery endpoint
-    const currentVersion: string =
-      (typeof ctx.state.apiVersion === "string"
-        ? ctx.state.apiVersion
-        : null) ||
-      VERSION_CONFIG.defaultVersion;
-
-    const versions = VERSION_CONFIG.supportedVersions.map((version) => {
-      const changelogEntry = CHANGELOG.find((entry) =>
-        entry.version.startsWith(version)
-      );
-      const isDeprecated = VERSION_CONFIG.deprecatedVersions.includes(version);
-      const endOfLife = VERSION_CONFIG.versionEndOfLife[version];
-
-      return {
-        version,
-        status: version === VERSION_CONFIG.defaultVersion
-          ? "current"
-          : isDeprecated
-          ? "deprecated"
-          : "supported",
-        releaseDate: changelogEntry?.releaseDate,
-        endOfLife,
-        changes: changelogEntry?.changes,
-        links: {
-          documentation: `/docs`,
-          changelog: `/api/v2/versions/changelog#${version}`,
-        },
-      };
+  GET(_req, _ctx) {
+    return ApiResponseUtil.success({
+      changelog: CHANGELOG,
+      currentVersion: VERSION_CONFIG.defaultVersion,
+      deprecationPolicy: {
+        notice: "6 months",
+        support: "12 months after deprecation",
+      },
     });
-
-    // Add deprecated versions to the list
-    VERSION_CONFIG.deprecatedVersions.forEach((version: string) => {
-      if (!versions.some((v) => v.version === version)) {
-        const changelogEntry = CHANGELOG.find((entry) =>
-          entry.version.startsWith(version)
-        );
-        versions.push({
-          version,
-          status: "deprecated",
-          releaseDate: changelogEntry?.releaseDate,
-          endOfLife: VERSION_CONFIG.versionEndOfLife[version],
-          changes: changelogEntry?.changes,
-          links: {
-            documentation: `/docs`,
-            changelog: `/api/v2/versions/changelog#${version}`,
-          },
-        });
-      }
-    });
-
-    // Sort versions by version number descending
-    versions.sort((a, b) => b.version.localeCompare(a.version));
-
-    const response: any = {
-      current: VERSION_CONFIG.defaultVersion,
-      requestedVersion: currentVersion,
-      versions,
-      headers: {
-        "API-Version": "Specify desired API version (e.g., '2.3')",
-        "Accept-Version": "Alternative version header (e.g., '2.2')",
-        "X-API-Version": "Legacy version header (e.g., '2.1')",
-      },
-      usage: {
-        example: "curl -H 'X-API-Version: 2.2' /api/v2/stamps",
-        note:
-          "Use any of the above headers to specify API version. Documentation at /docs applies to all versions.",
-      },
-      links: {
-        changelog: "/api/v2/versions/changelog",
-        documentation: "/docs",
-      },
-    };
-
-    // Add deprecation notice if using deprecated version
-    if (VERSION_CONFIG.deprecatedVersions.includes(currentVersion)) {
-      response.deprecationNotice = {
-        message:
-          `API version ${currentVersion} is deprecated and will be removed on ${
-            VERSION_CONFIG.versionEndOfLife[currentVersion]
-          }`,
-        migrationGuide: `/docs`,
-        currentVersion: VERSION_CONFIG.defaultVersion,
-      };
-    }
-
-    return ApiResponseUtil.success(response);
   },
 };

@@ -55,7 +55,7 @@ paths:
         - System
       summary: Health check endpoint
       description: |
-        Checks if the API service is running and responding correctly. 
+        Checks if the API service is running and responding correctly.
         Validates the status of core services including the API, indexer, and mempool connectivity.
         Also provides block synchronization status between the indexer and network.
       responses:
@@ -308,11 +308,11 @@ paths:
       summary: Get available API versions
       description: |
         Returns information about all available API versions, their status, and migration information.
-        
+
         Use the API-Version header to request a specific API version:
         - API-Version: 2.2 (stable, legacy)
         - API-Version: 2.3 (current, with enhanced market data)
-        
+
         Default version is 2.3 when no header is specified.
       parameters:
         - in: header
@@ -643,7 +643,7 @@ paths:
         - Cursed Stamps
       summary: Get stamp by ID {tx_hash, stamp, cpid}
       description: |
-        Retrieves a specific cursed stamp by its identifier. Cursed stamps simply have a negative stamp number. 
+        Retrieves a specific cursed stamp by its identifier. Cursed stamps simply have a negative stamp number.
         This endpoint is equivalent to /api/v2/stamps/{id} but specifically for cursed stamps.
       parameters:
         - in: path
@@ -2166,7 +2166,7 @@ paths:
                     regular_dust_size:
                       type: number
                       description: Override the dust amount for regular outputs (in satoshis)
-                      default: 546
+                      default: 333
                     return_psbt:
                       type: boolean
                       description: Return a PSBT instead of raw transaction
