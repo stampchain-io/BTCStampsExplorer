@@ -75,12 +75,13 @@ export class FetchHttpClient implements HttpClient {
       retryDelay = this.defaultRetryDelay,
     } = config;
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-
     let lastError: Error;
 
     for (let attempt = 0; attempt <= retries; attempt++) {
+      // Create new AbortController for each attempt
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+
       try {
         const fetchConfig: RequestInit = {
           method,
@@ -96,7 +97,6 @@ export class FetchHttpClient implements HttpClient {
         }
 
         const response = await fetch(url, fetchConfig);
-        clearTimeout(timeoutId);
 
         // Parse response data
         let data: T;
@@ -134,10 +134,12 @@ export class FetchHttpClient implements HttpClient {
           const delay = retryDelay * Math.pow(2, attempt);
           await new Promise(resolve => setTimeout(resolve, delay));
         }
+      } finally {
+        // Always cleanup timeout, even on errors
+        clearTimeout(timeoutId);
       }
     }
 
-    clearTimeout(timeoutId);
     throw lastError!;
   }
 
