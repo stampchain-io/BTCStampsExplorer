@@ -18,10 +18,7 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": ["$deno"],
-      "runOptions": {
-        "runOn": "folderOpen"
-      }
+      "problemMatcher": ["$deno"]
     },
     {
       "label": "deno: check",
