@@ -1,27 +1,31 @@
 #!/usr/bin/env deno run --allow-env --allow-read
 
+// Set test environment BEFORE any imports to avoid creating db.log files
+Deno.env.set("DENO_ENV", "test");
+
+// Skip Redis connection for imports
+(globalThis as any).SKIP_REDIS_CONNECTION = true;
+Deno.env.set("SKIP_REDIS_CONNECTION", "true");
+
 // Check if imports work correctly
 console.log("Checking imports...");
 
 try {
-  // Skip Redis connection for imports
-  (globalThis as any).SKIP_REDIS_CONNECTION = true;
-  Deno.env.set("SKIP_REDIS_CONNECTION", "true");
 
   console.log("1. Importing market data types...");
-  await import("./lib/types/marketData.d.ts");
+  await import("$lib/types/marketData.d.ts");
   console.log("✓ Types imported successfully");
 
   console.log("2. Importing market data utils...");
-  await import("./lib/utils/marketData.ts");
+  await import("$lib/utils/marketData.ts");
   console.log("✓ Utils imported successfully");
 
   console.log("3. Importing database manager...");
-  await import("./server/database/databaseManager.ts");
+  await import("$server/database/databaseManager.ts");
   console.log("✓ Database manager imported successfully");
 
   console.log("4. Importing market data repository...");
-  const repoModule = await import("./server/database/marketDataRepository.ts");
+  const repoModule = await import("$server/database/marketDataRepository.ts");
   console.log("✓ Market data repository imported successfully");
 
   console.log("\nAll imports successful! ✅");
