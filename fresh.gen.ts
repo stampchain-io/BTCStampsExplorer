@@ -89,7 +89,8 @@ import * as $api_v2_trx_stampdetach from "./routes/api/v2/trx/stampdetach.ts";
 import * as $api_v2_trx_utxoquery from "./routes/api/v2/trx/utxoquery.ts";
 import * as $api_v2_utxo_ancestors_address_ from "./routes/api/v2/utxo/ancestors/[address].ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
-import * as $api_v2_versions from "./routes/api/v2/versions.ts";
+import * as $api_v2_versions_changelog from "./routes/api/v2/versions/changelog.ts";
+import * as $api_v2_versions_index from "./routes/api/v2/versions/index.ts";
 import * as $block_block_index_ from "./routes/block/[block_index].tsx";
 import * as $block_index from "./routes/block/index.tsx";
 import * as $collection_overview_ from "./routes/collection/[overview].tsx";
@@ -392,7 +393,8 @@ const manifest = {
     "./routes/api/v2/utxo/ancestors/[address].ts":
       $api_v2_utxo_ancestors_address_,
     "./routes/api/v2/version.ts": $api_v2_version,
-    "./routes/api/v2/versions.ts": $api_v2_versions,
+    "./routes/api/v2/versions/changelog.ts": $api_v2_versions_changelog,
+    "./routes/api/v2/versions/index.ts": $api_v2_versions_index,
     "./routes/block/[block_index].tsx": $block_block_index_,
     "./routes/block/index.tsx": $block_index,
     "./routes/collection/[overview].tsx": $collection_overview_,
