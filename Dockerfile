@@ -12,34 +12,8 @@ ENV HOME=/app \
     NPM_CONFIG_CACHE=/app/.npm \
     REDIS_LOG_LEVEL=DEBUG
 
-# Install additional tools and lightweight Chrome for Puppeteer
-RUN apk add --no-cache bash curl \
-    # Chrome dependencies
-    chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    # Additional Chrome dependencies for Alpine
-    libstdc++ \
-    glib \
-    libx11 \
-    libxcomposite \
-    libxdamage \
-    libxrandr \
-    libxscrnsaver \
-    alsa-lib \
-    libdrm \
-    libxkbcommon \
-    gtk+3.0 \
-    # Cleanup to keep image small
-    && rm -rf /var/cache/apk/*
-
-# Set Chrome path for Puppeteer
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+# Install additional tools
+RUN apk add --no-cache bash curl
 
 # Create necessary directories
 RUN mkdir -p /app \
