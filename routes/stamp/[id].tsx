@@ -291,10 +291,11 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     <>
       <Head>
         <title>{title}</title>
-        <meta property="og:title" content={title} />
+        <meta property="og:title" content={title} key="og-title" />
         <meta
           property="og:description"
           content={metaDescription}
+          key="og-description"
         />
         {/* Primary og:image - stamp preview (should override app-level meta tag) */}
         <meta property="og:image" content={metaInfo.url} key="og:image" />
