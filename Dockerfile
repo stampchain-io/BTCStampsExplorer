@@ -31,7 +31,6 @@ RUN apk add --no-cache bash curl \
     libxrandr \
     libxss \
     alsa-lib \
-    at-spi2-core \
     libdrm \
     libxkbcommon \
     gtk+3.0 \
