@@ -12,19 +12,26 @@ import PageVisibilityManager from "$islands/layout/PageVisibilityManager.tsx";
 import AnimationControlsManager from "$islands/layout/AnimationControlsManager.tsx";
 
 /* ===== ROOT COMPONENT ===== */
-export default function App({ Component, state }: PageProps<unknown>) {
+export default function App({ Component, state, url }: PageProps<unknown>) {
   /* ===== LAYOUT BYPASS CHECK ===== */
   if (state?.skipAppLayout) {
     return <Component />;
   }
 
+  // Check if this is a stamp page that will have its own og:image
+  const isStampPage = url.pathname.startsWith("/stamp/");
+
   /* ===== RENDER ===== */
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      data-page-type={isStampPage ? "stamp" : "other"}
+      data-pathname={url.pathname}
+    >
       {/* ===== HEAD SECTION ===== */}
       <Head>
         {/* ===== META TAGS ===== */}
-        <MetaTags />
+        <MetaTags skipImage={isStampPage} />
 
         {/* ===== RESOURCE PRELOADING ===== */}
         <link
