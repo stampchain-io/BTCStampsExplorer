@@ -29,7 +29,7 @@ RUN apk add --no-cache bash curl \
     libxcomposite \
     libxdamage \
     libxrandr \
-    libxss \
+    libxscrnsaver \
     alsa-lib \
     libdrm \
     libxkbcommon \
