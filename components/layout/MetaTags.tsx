@@ -7,12 +7,14 @@ interface MetaTagsProps {
   title?: string;
   description?: string;
   image?: string;
+  skipImage?: boolean;
 }
 
 export function MetaTags({
   title = "Bitcoin Stamps",
   description = "Unprunable UTXO Art, Because Sats Don't Exist",
   image = STAMPCHAIN_OPENGRAPH_IMAGE,
+  skipImage = false,
 }: MetaTagsProps) {
   return (
     <>
@@ -44,10 +46,23 @@ export function MetaTags({
         content={description}
         key="og-description"
       />
-      <meta property="og:image" content={image} key="og-image" />
-      <meta property="og:image:type" content={getImageType(image)} />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
+      {/* Conditionally add og:image - skip if page has its own */}
+      {!skipImage && (
+        <>
+          <meta property="og:image" content={image} key="og:image" />
+          <meta
+            property="og:image:type"
+            content={getImageType(image)}
+            key="og:image:type"
+          />
+          <meta property="og:image:width" content="1200" key="og:image:width" />
+          <meta
+            property="og:image:height"
+            content="630"
+            key="og:image:height"
+          />
+        </>
+      )}
       <meta property="og:type" content="website" key="og-type" />
       <meta property="og:url" content="https://stampchain.io" key="og-url" />
       <meta property="og:locale" content="en_US" key="og-locale" />
@@ -59,7 +74,10 @@ export function MetaTags({
         key="twitter-card"
       />
       <meta name="twitter:title" content="stampchain.io" key="twitter-title" />
-      <meta name="twitter:image" content={image} key="twitter-image" />
+      {/* Conditionally add twitter:image - skip if page has its own */}
+      {!skipImage && (
+        <meta name="twitter:image" content={image} key="twitter:image" />
+      )}
       <meta
         name="twitter:description"
         content={description}

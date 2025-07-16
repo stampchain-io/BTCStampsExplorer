@@ -233,7 +233,8 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     };
   };
 
-  const baseUrl = new URL(props.url || "").origin;
+  // Ensure HTTPS for production preview URLs
+  const baseUrl = new URL(props.url || "").origin.replace(/^http:/, "https:");
   const metaInfo = getMetaImageInfo(stamp, baseUrl);
   const metaDescription = stamp
     ? `Bitcoin Stamp #${stamp.stamp} - ${stamp.name || "Unprunable UTXO Art"}`
@@ -290,21 +291,13 @@ export default function StampDetailPage(props: StampDetailPageProps) {
     <>
       <Head>
         <title>{title}</title>
-        <meta property="og:title" content={title} key="og-title" />
+        <meta property="og:title" content={title} />
         <meta
           property="og:description"
           content={metaDescription}
-          key="og-description"
         />
-        <meta property="og:image" content={metaInfo.url} key="og-image" />
-        {/* Add fallback image for SVGs in case preview fails */}
-        {stamp?.stamp_mimetype === "image/svg+xml" && (
-          <meta
-            property="og:image"
-            content={stamp.stamp_url}
-            key="og-image-fallback"
-          />
-        )}
+        {/* Primary og:image - stamp preview (should override app-level meta tag) */}
+        <meta property="og:image" content={metaInfo.url} key="og:image" />
         <meta property="og:type" content="website" key="og-type" />
         <meta
           name="twitter:card"
@@ -317,25 +310,20 @@ export default function StampDetailPage(props: StampDetailPageProps) {
           content={metaDescription}
           key="twitter-description"
         />
-        <meta name="twitter:image" content={metaInfo.url} key="twitter-image" />
-        {/* Add fallback image for SVGs in case preview fails */}
-        {stamp?.stamp_mimetype === "image/svg+xml" && (
-          <meta
-            name="twitter:image"
-            content={stamp.stamp_url}
-            key="twitter-image-fallback"
-          />
-        )}
+        {/* Primary twitter:image - stamp preview (should override app-level meta tag) */}
+        <meta name="twitter:image" content={metaInfo.url} key="twitter:image" />
         {/* Only add dimension meta tags if we have the dimensions */}
         {metaInfo.width && metaInfo.height && (
           <>
             <meta
               property="og:image:width"
               content={metaInfo.width.toString()}
+              key="og:image:width"
             />
             <meta
               property="og:image:height"
               content={metaInfo.height.toString()}
+              key="og:image:height"
             />
           </>
         )}
