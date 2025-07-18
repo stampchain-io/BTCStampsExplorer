@@ -6,7 +6,7 @@ import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
 /* ===== PAGE COMPONENT ===== */
 export default function HowToPage() {
   return (
-    <div className={`${body} ${gapSection}`}>
+    <div class={`${body} ${gapSection}`}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
@@ -26,10 +26,10 @@ export default function HowToPage() {
       />
 
       {/* ===== INTRODUCTION SECTION ===== */}
-      <section className="mb-3 mobileLg:mb-6">
-        <h1 className={titleGreyLD}>HOW-TO</h1>
-        <h2 className={subtitleGrey}>OUR STEP-BY-STEP GUIDES</h2>
-        <p className={text}>
+      <section class="mb-3 mobileLg:mb-6">
+        <h1 class={titleGreyLD}>HOW-TO</h1>
+        <h2 class={subtitleGrey}>OUR STEP-BY-STEP GUIDES</h2>
+        <p class={text}>
           <b>
             Explore our comprehensive How-To section, where you'll find
             step-by-step guides for the most popular features on our platform.
@@ -38,7 +38,7 @@ export default function HowToPage() {
           Whether you're a beginner or a pro, these guides will help you make
           the most out of every tool we offer.
         </p>
-        <p className={text}>
+        <p class={text}>
           Need help with something that's not covered? Let us know!
           <br />
           Reach out to us, and we'll be happy to create new how-tos based on
@@ -48,9 +48,9 @@ export default function HowToPage() {
 
       {/* ===== LEATHER WALLET CREATION GUIDE ===== */}
       <section>
-        <h2 className={`${headingGrey} mb-4`}>CREATE A LEATHER WALLET</h2>
+        <h2 class={`${headingGrey} mb-4`}>CREATE A LEATHER WALLET</h2>
         <div
-          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
         >
           <img
             src="/img/how-tos/createleatherwallet/00.png"
@@ -58,17 +58,17 @@ export default function HowToPage() {
             alt="Create, setup and install Bitcoin Leather wallet"
             class="rounded"
           />
-          <div className="flex flex-col desktop:col-span-2 gap-2">
-            <p className={text}>
+          <div class="flex flex-col desktop:col-span-2 gap-2">
+            <p class={text}>
               New to Bitcoin, Stamps, wallet and all the other fancy
               lingo?<br />
               No worries! We've got you covered.
             </p>
-            <p className={text}>
+            <p class={text}>
               <a
                 href="/howto/leathercreate"
                 f-partial="/howto/leathercreate"
-                className="animated-underline"
+                class="animated-underline"
               >
                 Start your stamps journey by creating a Leather wallet
               </a>
@@ -79,9 +79,9 @@ export default function HowToPage() {
 
       {/* ===== LEATHER WALLET CONNECTION GUIDE ===== */}
       <section>
-        <h2 className={`${headingGrey} mb-4`}>CONNECT YOUR LEATHER WALLET</h2>
+        <h2 class={`${headingGrey} mb-4`}>CONNECT YOUR LEATHER WALLET</h2>
         <div
-          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
         >
           <img
             src="/img/how-tos/connectleatherwallet/00.png"
@@ -89,17 +89,17 @@ export default function HowToPage() {
             alt="Connect your Bitcoin Leather wallet to the Stampchain website"
             class="block mobileLg:order-last rounded"
           />
-          <div className="flex flex-col desktop:col-span-2 gap-2">
-            <p className={text}>
+          <div class="flex flex-col desktop:col-span-2 gap-2">
+            <p class={text}>
               To create and buy stamps, deploy, mint and transfer tokens or
               interact with the Stamps protocol, you need to connect and verify
               with your Leather wallet.
             </p>
-            <p className={text}>
+            <p class={text}>
               <a
                 href="/howto/leatherconnect"
                 f-partial="/howto/leatherconnect"
-                className="animated-underline"
+                class="animated-underline"
               >
                 Learn how connect your Leather wallet to stampchain.io
               </a>
@@ -110,9 +110,9 @@ export default function HowToPage() {
 
       {/* ===== TOKEN DEPLOYMENT GUIDE ===== */}
       <section>
-        <h2 className={`${headingGrey} mb-4`}>DEPLOY YOUR OWN TOKEN</h2>
+        <h2 class={`${headingGrey} mb-4`}>DEPLOY YOUR OWN TOKEN</h2>
         <div
-          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
         >
           <img
             src="/img/how-tos/deploy/00.png"
@@ -120,17 +120,17 @@ export default function HowToPage() {
             alt="Deploy a SRC-20 token on Bitcoin"
             class="rounded"
           />
-          <div className="flex flex-col desktop:col-span-2 gap-2">
-            <p className={text}>
+          <div class="flex flex-col desktop:col-span-2 gap-2">
+            <p class={text}>
               To deploy a SRC-20 token, you need to stamp the transaction on
               Bitcoin with the token's supply and metadata. This makes the token
               immutable and secured by Bitcoin's blockchain.
             </p>
-            <p className={text}>
+            <p class={text}>
               <a
                 href="/howto/deploytoken"
                 f-partial="/howto/deploytoken"
-                className="animated-underline"
+                class="animated-underline"
               >
                 Read how to deploy your very own SRC-20 token
               </a>
@@ -141,9 +141,9 @@ export default function HowToPage() {
 
       {/* ===== TOKEN MINTING GUIDE ===== */}
       <section>
-        <h2 className={`${headingGrey} mb-4`}>MINT YOUR TOKEN</h2>
+        <h2 class={`${headingGrey} mb-4`}>MINT YOUR TOKEN</h2>
         <div
-          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
         >
           <img
             src="/img/how-tos/mintsrc20/00.png"
@@ -151,16 +151,16 @@ export default function HowToPage() {
             alt="How to mint a SRC-20 Bitcoin stamps token"
             class="block mobileLg:order-last rounded"
           />
-          <div className="flex flex-col desktop:col-span-2 gap-2">
-            <p className={text}>
+          <div class="flex flex-col desktop:col-span-2 gap-2">
+            <p class={text}>
               After deploying a token, anyone can mint SRC-20 tokens based on
               the initial supply set in the contract.
             </p>
-            <p className={text}>
+            <p class={text}>
               <a
                 href="/howto/minttoken"
                 f-partial="/howto/minttoken"
-                className="animated-underline"
+                class="animated-underline"
               >
                 Learn how to mint a SRC-20 token
               </a>
@@ -171,9 +171,9 @@ export default function HowToPage() {
 
       {/* ===== CREATE A STAMP GUIDE ===== */}
       <section>
-        <h2 className={`${headingGrey} mb-4`}>CREATE A STAMP</h2>
+        <h2 class={`${headingGrey} mb-4`}>CREATE A STAMP</h2>
         <div
-          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
+          class={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid}`}
         >
           <img
             src="/img/how-tos/stamping/00.png"
@@ -181,18 +181,18 @@ export default function HowToPage() {
             alt="Guide on how to create NFTs on Bitcoin using the stamps protocol"
             class="rounded"
           />
-          <div className="flex flex-col desktop:col-span-2 gap-2">
-            <p className={text}>
+          <div class="flex flex-col desktop:col-span-2 gap-2">
+            <p class={text}>
               Store your art permanently on Bitcoin - the most resilient
               blockchain in the world.<br />
               With our state of the art stamping tools, we've made it smooth and
               simple for you to immortalize your art on Bitcoin.
             </p>
-            <p className={text}>
+            <p class={text}>
               <a
                 href="/howto/stamp"
                 f-partial="/howto/stamp"
-                className="animated-underline"
+                class="animated-underline"
               >
                 Time to get stamping !
               </a>

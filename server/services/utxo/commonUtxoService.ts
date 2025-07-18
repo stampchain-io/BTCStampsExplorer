@@ -1,16 +1,58 @@
 import { UTXO } from "$lib/types/base.d.ts";
-import { serverConfig } from "$server/config/config.ts";
-import { QuicknodeUTXOService, UTXOOptions as QuicknodeInternalUTXOOptions } from "$server/services/quicknode/quicknodeUTXOService.ts";
+import { BLOCKSTREAM_API_BASE_URL, MEMPOOL_API_BASE_URL } from "$lib/utils/constants.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { detectScriptType } from "$lib/utils/scriptTypeUtils.ts";
 import {
   getUTXOForAddress as getUTXOsFromPublicAPIsForAddress
 } from "$lib/utils/utxoUtils.ts";
-import { detectScriptType } from "$lib/utils/scriptTypeUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { serverConfig } from "$server/config/config.ts";
+import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
+import { UTXOOptions as QuicknodeInternalUTXOOptions, QuicknodeUTXOService } from "$server/services/quicknode/quicknodeUTXOService.ts";
 import { ICommonUTXOService, UTXOFetchOptions } from "./utxoServiceInterface.d.ts";
-import { BLOCKSTREAM_API_BASE_URL } from "$lib/utils/constants.ts";
+
+const httpClient = new FetchHttpClient();
 
 interface CommonUTXOFetchOptions extends UTXOFetchOptions {
   forcePublicAPI?: boolean;
+}
+
+// Added interface for mempool.space transaction response
+interface MempoolTransaction {
+  txid: string;
+  version: number;
+  locktime: number;
+  vin: Array<{
+    txid: string;
+    vout: number;
+    prevout?: {
+      scriptpubkey: string;
+      scriptpubkey_asm: string;
+      scriptpubkey_type: string;
+      scriptpubkey_address?: string;
+      value: number;
+    };
+    scriptsig: string;
+    scriptsig_asm: string;
+    witness?: string[];
+    is_coinbase: boolean;
+    sequence: number;
+  }>;
+  vout: Array<{
+    scriptpubkey: string;
+    scriptpubkey_asm: string;
+    scriptpubkey_type: string;
+    scriptpubkey_address?: string;
+    value: number;
+  }>;
+  size: number;
+  weight: number;
+  fee: number;
+  status: {
+    confirmed: boolean;
+    block_height?: number;
+    block_hash?: string;
+    block_time?: number;
+  };
 }
 
 /**
@@ -23,12 +65,12 @@ export class CommonUTXOService implements ICommonUTXOService {
   protected rawTxHexCache: Map<string, string | null>; // Cache for raw tx hex
 
   constructor() {
-    this.isQuickNodeConfigured = !!(serverConfig.QUICKNODE_ENDPOINT && serverConfig.QUICKNODE_API_KEY);
-    this.rawTxHexCache = new Map<string, string | null>(); // Initialize cache
-    const message = this.isQuickNodeConfigured
-      ? "QuickNode is configured. UTXO fetching will prioritize QuickNode."
-      : "QuickNode is not configured. UTXO fetching will use public API fallbacks.";
-    logger.info("common-utxo-service", { message });
+    // Initialize QuickNode configuration check
+    this.isQuickNodeConfigured = !!(
+      serverConfig.QUICKNODE_ENDPOINT && serverConfig.QUICKNODE_API_KEY
+    );
+    this.rawTxHexCache = new Map();
+    logger.info("common-utxo-service", { message: "CommonUTXOService initialized", isQuickNodeConfigured: this.isQuickNodeConfigured });
   }
 
   static getInstance(): CommonUTXOService {
@@ -71,9 +113,9 @@ export class CommonUTXOService implements ICommonUTXOService {
     if (!hex) {
       logger.debug("common-utxo-service", { message: "Falling back to public APIs for getRawTransactionHex", txid });
       try {
-        const response = await fetch(`${BLOCKSTREAM_API_BASE_URL}/tx/${txid}/hex`);
+        const response = await httpClient.get(`${BLOCKSTREAM_API_BASE_URL}/tx/${txid}/hex`);
         if (response.ok) {
-          hex = await response.text();
+          hex = response.data;
           logger.info("common-utxo-service", { message: "Successfully fetched rawTxHex from public API (Blockstream)", txid });
         } else {
           logger.warn("common-utxo-service", { message: `Public API (Blockstream) failed to fetch raw tx hex ${txid}`, status: response.statusText, code: response.status });
@@ -88,7 +130,7 @@ export class CommonUTXOService implements ICommonUTXOService {
 
   async getSpendableUTXOs(
     address: string,
-    _amountNeeded?: number, 
+    _amountNeeded?: number,
     options?: UTXOFetchOptions,
   ): Promise<UTXO[]> {
     const logContext = { address, options, quicknodeEnabled: this.isQuickNodeConfigured };
@@ -97,12 +139,12 @@ export class CommonUTXOService implements ICommonUTXOService {
     if (this.isQuickNodeConfigured) {
       try {
         logger.debug("common-utxo-service", { message: "Attempting to fetch basic UTXOs via QuickNode", address });
-        
-        const qnOptions: QuicknodeInternalUTXOOptions = {}; 
+
+        const qnOptions: QuicknodeInternalUTXOOptions = {};
         if (options?.confirmedOnly !== undefined) qnOptions.confirmedOnly = options.confirmedOnly;
 
         const result = await QuicknodeUTXOService.getUTXOs(address, qnOptions);
-        
+
         if (result && "data" in result && Array.isArray(result.data)) {
           logger.info("common-utxo-service", { message: "Successfully received basic UTXO data from QuickNode", address, count: result.data.length });
           return result.data.map(utxo => ({
@@ -126,7 +168,7 @@ export class CommonUTXOService implements ICommonUTXOService {
     logger.debug("common-utxo-service", { message: "Falling back to public APIs for getSpendableUTXOs (basic list)", address });
     try {
       const publicUtxosResult = await getUTXOsFromPublicAPIsForAddress(address, undefined, undefined, false, 3);
-      
+
       if (Array.isArray(publicUtxosResult)) {
         logger.info("common-utxo-service", { message: "Successfully fetched basic UTXOs from public APIs", address, count: publicUtxosResult.length });
         return publicUtxosResult.map(utxo => ({
@@ -169,7 +211,7 @@ export class CommonUTXOService implements ICommonUTXOService {
       try {
         // logger.debug("common-utxo-service", { message: "Attempting QuickNode for getSpecificUTXO", txid, vout }); // Original debug line moved and enhanced above
         const qnResult = await QuicknodeUTXOService.getUTXO(txid, vout, options?.includeAncestorDetails);
-        
+
         const qnResultLog = {
             message: "QuickNode getUTXO result received",
             txid,
@@ -178,10 +220,10 @@ export class CommonUTXOService implements ICommonUTXOService {
             hasError: qnResult && qnResult.error ? qnResult.error : "no explicit error property",
         };
         logger.info("common-utxo-service", qnResultLog);
-        
+
         if (qnResult && qnResult.data) {
           // console.log(\`[CommonUTXO] USING QuickNode for ${txid}:${vout}. Script: ${qnResult.data.script}, Value: ${qnResult.data.value}\`); // Original console.log
-          logger.info("common-utxo-service", { 
+          logger.info("common-utxo-service", {
             message: "[CommonUTXO] USING QuickNode for " + txid + ":" + vout + ". Script: " + qnResult.data.script?.substring(0,20) + "... Value: " + qnResult.data.value
           }); // Changed to logger.info and truncated script, using string concatenation
           return qnResult.data;
@@ -198,29 +240,72 @@ export class CommonUTXOService implements ICommonUTXOService {
       }
     }
 
-    logger.debug("common-utxo-service", { 
-        message: (this.isQuickNodeConfigured && options?.forcePublicAPI) 
-            ? "FORCING public APIs for getSpecificUTXO due to option" 
-            : "Falling back/using public APIs for getSpecificUTXO", 
-        txid, vout 
+    logger.debug("common-utxo-service", {
+        message: (this.isQuickNodeConfigured && options?.forcePublicAPI)
+            ? "FORCING public APIs for getSpecificUTXO due to option"
+            : "Falling back/using public APIs for getSpecificUTXO",
+        txid, vout
     });
+
+    // Try mempool.space first as it's often faster and more reliable
     try {
-        const response = await fetch(`${BLOCKSTREAM_API_BASE_URL}/tx/${txid}`);
+      logger.debug("common-utxo-service", { message: "Attempting mempool.space for getSpecificUTXO", txid, vout });
+      const response = await httpClient.get(`${MEMPOOL_API_BASE_URL}/tx/${txid}`);
+
+      if (response.ok && response.data) {
+        const txData = response.data as MempoolTransaction;
+
+        if (txData && Array.isArray(txData.vout) && txData.vout[vout]) {
+          const output = txData.vout[vout];
+          if (output.value !== undefined && output.scriptpubkey) {
+            const scriptFromMempool = output.scriptpubkey; // hex string
+            console.log(`[CommonUTXO] USING Mempool.space for ${txid}:${vout}. Fetched scriptpubkey: ${scriptFromMempool}, Value: ${output.value}`);
+
+            const formattedUtxo: UTXO = {
+              txid: txid,
+              vout: vout,
+              value: output.value,
+              script: scriptFromMempool,
+              vsize: txData.weight ? Math.ceil(txData.weight / 4) : 0,
+              weight: txData.weight,
+              scriptType: detectScriptType(scriptFromMempool),
+            };
+
+            logger.info("common-utxo-service", { message: "Successfully fetched and formatted specific UTXO from mempool.space", txid, vout });
+            console.log(`[CommonUTXOService.getSpecificUTXO - Mempool.space Path] Returning for ${txid}:${vout}, script in UTXO object: ${formattedUtxo.script}`);
+            return formattedUtxo;
+          } else {
+            logger.warn("common-utxo-service", { message: "Mempool.space output missing value or scriptpubkey", txid, vout, output });
+          }
+        } else {
+          logger.warn("common-utxo-service", { message: "Specific output not found in tx from mempool.space", txid, vout, receivedVoutLength: txData?.vout?.length });
+        }
+      } else {
+        logger.warn("common-utxo-service", { message: `Mempool.space failed to fetch tx ${txid}`, status: response.statusText, code: response.status });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.warn("common-utxo-service", { message: "Error fetching specific UTXO from mempool.space, trying Blockstream", txid, vout, error: errorMessage });
+    }
+
+    // Fallback to Blockstream API
+    try {
+        const response = await httpClient.get(`${BLOCKSTREAM_API_BASE_URL}/tx/${txid}`);
         if (!response.ok) {
             logger.warn("common-utxo-service", { message: `Public API (Blockstream) failed to fetch tx ${txid}`, status: response.statusText, code: response.status });
             return null;
         }
-        const txData = await response.json();
+        const txData = response.data;
         if (txData && Array.isArray(txData.vout) && txData.vout[vout]) {
             const output = txData.vout[vout];
             if (output.value === undefined || !output.scriptpubkey) {
                  logger.warn("common-utxo-service", { message: "Blockstream output missing value or scriptpubkey", txid, vout, output });
                  return null;
             }
-            
+
             const scriptFromBlockstream = output.scriptpubkey; // hex string
             console.log(`[CommonUTXO] USING Blockstream for ${txid}:${vout}. Fetched scriptpubkey: ${scriptFromBlockstream}, Value: ${output.value}`);
-            
+
             const formattedUtxo: UTXO = {
                 txid: txid, vout: vout, value: output.value, script: scriptFromBlockstream,
                 vsize: txData.weight ? Math.ceil(txData.weight / 4) : 0,
@@ -235,8 +320,8 @@ export class CommonUTXOService implements ICommonUTXOService {
             return null;
         }
     } catch (error) {
-      logger.error("common-utxo-service", { message: "Error fetching specific UTXO from public APIs", txid, vout, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+      logger.error("common-utxo-service", { message: "Error fetching specific UTXO from all fallback APIs", txid, vout, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       return null;
     }
   }
-} 
+}

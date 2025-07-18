@@ -1,11 +1,15 @@
 /* ===== EXPLORER PAGE ===== */
-import { StampPageProps } from "$globals";
+import { ExplorerContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
+import {
+  STAMP_FILTER_TYPES,
+  STAMP_TYPES,
+  StampPageProps,
+  SUBPROTOCOLS,
+} from "$globals";
+import { ExplorerHeader } from "$header";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
-import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "$globals";
-import { ExplorerContent } from "$content";
-import { ExplorerHeader } from "$header";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
@@ -127,6 +131,10 @@ export function ExplorerPage(props: StampPageProps) {
           page,
           totalPages,
           onPageChange: (newPage: number) => {
+            // SSR-safe browser environment check
+            if (typeof globalThis === "undefined" || !globalThis?.location) {
+              return; // Cannot navigate during SSR
+            }
             const url = new URL(globalThis.location.href);
             url.searchParams.set("page", newPage.toString());
             globalThis.location.href = url.toString();

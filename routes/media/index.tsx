@@ -8,7 +8,7 @@ import { headingGreyLDLink, subtitleGrey, text, titleGreyLD } from "$text";
 export default function MediaPage() {
   /* ===== RENDER ===== */
   return (
-    <div className={`${body} ${gapSection}`}>
+    <div class={`${body} ${gapSection}`}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
@@ -29,9 +29,9 @@ export default function MediaPage() {
 
       {/* ===== INTRODUCTION SECTION ===== */}
       <section>
-        <div className={`flex flex-col w-full desktop:w-3/4 ${text}`}>
-          <h1 className={titleGreyLD}>MEDIA MATTERS</h1>
-          <h2 className={subtitleGrey}>HONOURABLE STAMP MENTIONS</h2>
+        <div class={`flex flex-col w-full desktop:w-3/4 ${text}`}>
+          <h1 class={titleGreyLD}>MEDIA MATTERS</h1>
+          <h2 class={subtitleGrey}>HONOURABLE STAMP MENTIONS</h2>
           <p>
             Explore the world of Bitcoin Stamps with our curated list of news
             coverage, in-depth articles, reports and video podcasts.
@@ -52,16 +52,16 @@ export default function MediaPage() {
 
       {/* ===== INTERVIEWS SECTION ===== */}
       <section>
-        <h1 className={titleGreyLD}>INTERVIEWS</h1>
+        <h1 class={titleGreyLD}>INTERVIEWS</h1>
         <div
-          className={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid} ${text}`}
+          class={`grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 ${gapGrid} ${text}`}
         >
           {/* ===== RICE TVX INTERVIEW ===== */}
-          <div className="flex flex-col">
-            <h2 className={subtitleGrey}>RICE TVX</h2>
-            <div className="relative w-full pt-[56.25%]">
+          <div class="flex flex-col">
+            <h2 class={subtitleGrey}>RICE TVX</h2>
+            <div class="relative w-full pt-[56.25%]">
               <iframe
-                className="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
+                class="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
                 src="https://www.youtube.com/embed/zwzi0qsd3sg"
                 title="Rice TVX"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -82,11 +82,11 @@ export default function MediaPage() {
             </p>
           </div>
           {/* ===== WAGE CUCKING INTERVIEW ===== */}
-          <div className="flex flex-col">
-            <h2 className={subtitleGrey}>WAGE CUCKING</h2>
-            <div className="relative w-full pt-[56.25%]">
+          <div class="flex flex-col">
+            <h2 class={subtitleGrey}>WAGE CUCKING</h2>
+            <div class="relative w-full pt-[56.25%]">
               <iframe
-                className="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
+                class="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
                 src="https://www.youtube.com/embed/jJV_-EFZshU"
                 title="WAGE CUCKING"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -105,11 +105,11 @@ export default function MediaPage() {
             </p>
           </div>
           {/* ===== UNIVERSE INTERVIEW ===== */}
-          <div className="flex flex-col">
-            <h2 className={subtitleGrey}>UNIVERSE</h2>
-            <div className="relative w-full pt-[56.25%]">
+          <div class="flex flex-col">
+            <h2 class={subtitleGrey}>UNIVERSE</h2>
+            <div class="relative w-full pt-[56.25%]">
               <iframe
-                className="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
+                class="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
                 src="https://www.youtube.com/embed/y07GjM0DqYs?si=bSAG-uFvhjMsSLtc"
                 title="The Origin of Bitcoin Stamps"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -136,120 +136,120 @@ export default function MediaPage() {
 
       {/* ===== NEWS SECTION ===== */}
       <section>
-        <h1 className={titleGreyLD}>IN THE NEWS</h1>
-        <h2 className={subtitleGrey}>BREAKING STORIES</h2>
+        <h1 class={titleGreyLD}>IN THE NEWS</h1>
+        <h2 class={subtitleGrey}>BREAKING STORIES</h2>
         {/* ===== NEWS ARTICLES LIST ===== */}
-        <div className={`flex flex-col min-[1280px]:flex-row ${gapGrid}`}>
-          <div className="flex flex-col w-full min-[1280px]:w-1/2">
-            <p className={text}>
+        <div class={`flex flex-col min-[1280px]:flex-row ${gapGrid}`}>
+          <div class="flex flex-col w-full min-[1280px]:w-1/2">
+            <p class={text}>
               BINANCE
               <br />
               <a
                 href="https://academy.binance.com/en/articles/what-are-bitcoin-stamps"
                 target="_blank"
-                className={`${headingGreyLDLink} -mt-1`}
+                class={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT ARE BITCOIN STAMPS
               </a>
             </p>
-            <p className={text}>
+            <p class={text}>
               YAHOO FINANCE
               <br />
               <a
                 href="https://finance.yahoo.com/video/project-bitcoin-stamps-renews-debate-164902188.html?guccounter=1"
                 target="_blank"
-                className={`${headingGreyLDLink} -mt-1`}
+                class={`${headingGreyLDLink} -mt-1`}
               >
                 NEW PROJECT RENEWS DEBATE OVER BITCOIN NFTS
               </a>
             </p>
-            <p className={text}>
+            <p class={text}>
               BINGX
               <br />
               <a
                 href="https://blog.bingx.com/bingx-insights/a-dive-into-bitcoin-stamps/"
                 target="_blank"
-                className={`${headingGreyLDLink} -mt-1`}
+                class={`${headingGreyLDLink} -mt-1`}
               >
                 A DIVE INTO BITCOIN STAMPS
               </a>
             </p>
-            <p className={text}>
+            <p class={text}>
               HACKERNOON
               <br />
               <a
                 href="https://hackernoon.com/what-are-bitcoin-stamps"
                 target="_blank"
-                className={`${headingGreyLDLink} -mt-1`}
+                class={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT ARE BITCOIN STAMPS
               </a>
             </p>
-            <p className={text}>
+            <p class={text}>
               COINMARKETCAP
               <br />
               <a
                 href="https://coinmarketcap.com/community/articles/6554749e8f19ea588322c1ae/"
                 target="_blank"
-                className={`${headingGreyLDLink} -mt-1`}
+                class={`${headingGreyLDLink} -mt-1`}
               >
                 BITCOIN STAMPS VS ORDINALS
               </a>
             </p>
           </div>
-          <div className="flex flex-col w-full -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:-mt-7 min-[1280px]:mt-0
+          <div class="flex flex-col w-full -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:-mt-7 min-[1280px]:mt-0
                           min-[1280px]:w-1/2 min-[1280px]:justify-end min-[1280px]:pt-0 min-[1280px]:text-right">
-            <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
+            <p class={`${text} min-[1280px]:text-stamp-grey-darker`}>
               M2
               <br />
               <a
                 href="https://explore.m2.com/learn/what-are-bitcoin-stamps"
                 target="_blank"
-                className={`${headingGreyLDLink} -mt-1`}
+                class={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT ARE BITCOIN STAMPS
               </a>
             </p>
-            <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
+            <p class={`${text} min-[1280px]:text-stamp-grey-darker`}>
               GATE
               <br />
               <a
                 href="https://www.gate.io/learn/articles/what-are-bitcoin-stamps-and-src-20/1006"
                 target="_blank"
-                className={`${headingGreyLDLink} -mt-1`}
+                class={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT ARE BITCOIN STAMPS AND SRC-20
               </a>
             </p>
-            <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
+            <p class={`${text} min-[1280px]:text-stamp-grey-darker`}>
               BITCOIN.COM
               <br />
               <a
                 href="https://news.bitcoin.com/study-src20-protocols-unmatched-data-permanence-makes-it-a-superior-choice-over-brc20-and-runes/"
                 target="_blank"
-                className={`${headingGreyLDLink} -mt-1`}
+                class={`${headingGreyLDLink} -mt-1`}
               >
                 SRC20 PROTOCOL'S "UNMATCHED DATA PERMANENCE"
               </a>
             </p>
-            <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
+            <p class={`${text} min-[1280px]:text-stamp-grey-darker`}>
               OKX
               <br />
               <a
                 href="https://www.okx.com/learn/what-is-src20-spurring-innovation-in-bitcoin-ecosystem"
                 target="_blank"
-                className={`${headingGreyLDLink} -mt-1`}
+                class={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT IS SRC-20
               </a>
             </p>
-            <p className={`${text} min-[1280px]:text-stamp-grey-darker`}>
+            <p class={`${text} min-[1280px]:text-stamp-grey-darker`}>
               COIN CODEX
               <br />
               <a
                 href="https://coincodex.com/article/44872/src-20-tokens/"
                 target="_blank"
-                className={`${headingGreyLDLink} -mt-1`}
+                class={`${headingGreyLDLink} -mt-1`}
               >
                 WHAT ARE SRC-20 TOKENS
               </a>
@@ -260,13 +260,13 @@ export default function MediaPage() {
 
       {/* ===== REPORTS SECTION ===== */}
       <section>
-        <h1 className={titleGreyLD}>REPORTS</h1>
-        <div className="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
+        <h1 class={titleGreyLD}>REPORTS</h1>
+        <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
           {/* ===== SQRR DEEP DIVE ===== */}
           <div
-            className={`flex flex-col w-full mobileLg:w-2/3 ${text}`}
+            class={`flex flex-col w-full mobileLg:w-2/3 ${text}`}
           >
-            <h2 className={subtitleGrey}>SQRR - DEEP DIVE</h2>
+            <h2 class={subtitleGrey}>SQRR - DEEP DIVE</h2>
             <p>
               Stamps is a blockchain protocol created by MikeInSpace that
               enables storing images on-chain on Bitcoin transaction outputs.
@@ -276,7 +276,7 @@ export default function MediaPage() {
               layer, to broadcast Stamping transactions to the Bitcoin Network.
               In addition, using a Counterparty transaction ...
             </p>
-            <div className="flex justify-end mobileLg:justify-start pt-3">
+            <div class="flex justify-end mobileLg:justify-start pt-3">
               <Button
                 variant="outline"
                 color="grey"
@@ -290,15 +290,15 @@ export default function MediaPage() {
           </div>
 
           {/* ===== INSIGHTS REPORT ===== */}
-          <div className="flex flex-col w-full mobileLg:w-1/3 mobileLg:text-right">
-            <h2 className={subtitleGrey}>INSIGHTS</h2>
-            <p className={text}>
+          <div class="flex flex-col w-full mobileLg:w-1/3 mobileLg:text-right">
+            <h2 class={subtitleGrey}>INSIGHTS</h2>
+            <p class={text}>
               <b>Detailed monthly reports about Bitcoin Stamps.</b>
               <br />
               A comprehensive research into the usage of the Stamps protocol,
               with multiple stats and illustrative charts.
             </p>
-            <div className="flex justify-end pt-3">
+            <div class="flex justify-end pt-3">
               <Button
                 variant="outline"
                 color="grey"

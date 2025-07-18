@@ -71,16 +71,16 @@ export default function ToolStampPage(
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${body} ${gapSection}`}>
-      <div className={`flex w-full`}>
+    <div class={`${body} ${gapSection}`}>
+      <div class={`flex w-full`}>
         {renderContent()}
       </div>
-      <div className="flex w-full">
+      <div class="flex w-full">
         {renderLeftSidebar()}
       </div>
       {
         /*
-        <div className="flex w-full tablet:w-1/2">
+        <div class="flex w-full tablet:w-1/2">
           {renderRightSidebar()}
         </div>
         */

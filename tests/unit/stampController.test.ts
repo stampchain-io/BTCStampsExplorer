@@ -1,7 +1,8 @@
-import { assertEquals, assertExists, assertRejects } from "@std/assert";
 import { StampController } from "$server/controller/stampController.ts";
+import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { StampService } from "$server/services/stampService.ts";
+import { assertEquals, assertExists, assertRejects } from "@std/assert";
 
 // Mock the services
 const originalGetPrice = BTCPriceService.getPrice;
@@ -156,44 +157,42 @@ Deno.test("StampController.getStamps includes market data for collections", asyn
 });
 
 Deno.test("StampController.calculateWalletStampValues uses cached market data", async () => {
-  // Mock services
-  BTCPriceService.getPrice = () =>
-    Promise.resolve({
-      price: 55000,
-      source: "test",
-      confidence: "high",
-      timestamp: new Date().toISOString(),
-    });
-
-  StampService.getStamps = (options: any) => {
-    // Verify market data is requested
-    assertEquals(options.includeMarketData, true);
-
-    return Promise.resolve({
-      stamps: [
-        {
-          cpid: "STAMP1",
-          marketData: {
-            floorPriceBTC: 0.001,
-            recentSalePriceBTC: null,
-          },
-        },
-        {
-          cpid: "STAMP2",
-          marketData: {
-            floorPriceBTC: null,
-            recentSalePriceBTC: 0.002,
-          },
-        },
-        {
-          cpid: "STAMP3",
-          marketData: null, // No market data
-        },
-      ],
-    });
-  };
+  // Store original methods
+  const originalGetPrice = BTCPriceService.getPrice;
+  const originalGetBulkStampMarketData =
+    MarketDataRepository.getBulkStampMarketData;
 
   try {
+    // Mock services
+    BTCPriceService.getPrice = () =>
+      Promise.resolve({
+        price: 55000,
+        source: "test",
+        confidence: "high",
+        timestamp: new Date().toISOString(),
+      });
+
+    MarketDataRepository.getBulkStampMarketData = (cpids: string[]) => {
+      // Create a Map with the expected market data
+      const marketDataMap = new Map();
+
+      // STAMP1 has floor price
+      marketDataMap.set("STAMP1", {
+        floorPriceBTC: 0.001,
+        recentSalePriceBTC: null,
+      });
+
+      // STAMP2 has recent sale price
+      marketDataMap.set("STAMP2", {
+        floorPriceBTC: null,
+        recentSalePriceBTC: 0.002,
+      });
+
+      // STAMP3 has no market data (not in map)
+
+      return Promise.resolve(marketDataMap);
+    };
+
     const walletStamps = [
       { cpid: "STAMP1", balance: 10 },
       { cpid: "STAMP2", balance: 5 },
@@ -208,10 +207,11 @@ Deno.test("StampController.calculateWalletStampValues uses cached market data", 
     assertEquals(result.stampValues["STAMP1"], 0.01); // 0.001 * 10
     assertEquals(result.stampValues["STAMP2"], 0.01); // 0.002 * 5
     assertEquals(result.stampValues["STAMP3"], 0); // No market data
-    assertEquals(result.totalValue, 0.02); // 0.01 + 0.01
+    assertEquals(result.totalValue, 0.02); // 0.01 + 0.01 + 0
   } finally {
     BTCPriceService.getPrice = originalGetPrice;
-    StampService.getStamps = originalGetStamps;
+    MarketDataRepository.getBulkStampMarketData =
+      originalGetBulkStampMarketData;
   }
 });
 

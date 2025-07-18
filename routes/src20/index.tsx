@@ -1,7 +1,7 @@
 /* ===== SRC20 OVERVIEW PAGE ===== */
 /*@baba-149*/
-import { Handlers } from "$fresh/server.ts";
 import { SRC20OverviewContent } from "$content";
+import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 /* ===== SERVER HANDLER ===== */
@@ -30,8 +30,6 @@ export const handler: Handlers = {
           limit,
           page,
           1000,
-          sortBy,
-          sortDirection,
         ),
       ]);
 

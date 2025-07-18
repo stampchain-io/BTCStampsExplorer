@@ -1,22 +1,22 @@
-import stampFixturesData from "../fixtures/stampData.json" with {
-  type: "json",
-};
-import marketDataFixturesData from "../fixtures/marketData.json" with {
-  type: "json",
-};
-import src20FixturesData from "../fixtures/src20Data.json" with {
+import { MAX_PAGINATION_LIMIT } from "$constants";
+import blockFixturesData from "../fixtures/blockData.json" with {
   type: "json",
 };
 import collectionFixturesData from "../fixtures/collectionData.json" with {
   type: "json",
 };
-import blockFixturesData from "../fixtures/blockData.json" with {
+import marketDataFixturesData from "../fixtures/marketData.json" with {
   type: "json",
 };
 import src101FixturesData from "../fixtures/src101Data.json" with {
   type: "json",
 };
-import { MAX_PAGINATION_LIMIT } from "$constants";
+import src20FixturesData from "../fixtures/src20Data.json" with {
+  type: "json",
+};
+import stampFixturesData from "../fixtures/stampData.json" with {
+  type: "json",
+};
 
 interface QueryResult {
   rows: any[];
@@ -53,6 +53,19 @@ export class MockDatabaseManager {
   ): Promise<T> {
     // In mock, cache duration is ignored
     return this.executeQuery<T>(query, params);
+  }
+
+  /**
+   * Handle cache operations - mock implementation
+   */
+  async handleCache<T>(
+    key: string,
+    factory: () => Promise<T>,
+    duration: number,
+  ): Promise<T> {
+    // For testing, just call the factory function directly
+    // This bypasses caching but allows the circuit breaker logic to work
+    return await factory();
   }
 
   /**

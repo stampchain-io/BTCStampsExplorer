@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20OverviewHeader } from "$header";
 import { SRC20Gallery } from "$section";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
@@ -69,6 +69,10 @@ export default function SRC20MintingPage({ data }: any) {
           page,
           totalPages,
           onPageChange: (newPage: number) => {
+            // SSR-safe browser environment check
+            if (typeof globalThis === "undefined" || !globalThis?.location) {
+              return; // Cannot navigate during SSR
+            }
             const url = new URL(globalThis.location.href);
             url.searchParams.set("page", newPage.toString());
             globalThis.location.href = url.toString();

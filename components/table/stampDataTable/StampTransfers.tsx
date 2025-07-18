@@ -25,7 +25,7 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
       <table class={`${valueSm} w-full`}>
         <colgroup>
           {colGroup().map((col) => (
-            <col key={col.key} className={col.className} />
+            <col key={col.key} class={col.className} />
           ))}
         </colgroup>
         {sends.length > 0 && (
@@ -58,10 +58,10 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
                         }}
                         className={valueSmLink}
                       >
-                        <span className="tablet:hidden">
+                        <span class="tablet:hidden">
                           {abbreviateAddress(send.source, 4)}
                         </span>
-                        <span className="hidden tablet:inline">
+                        <span class="hidden tablet:inline">
                           {abbreviateAddress(send.source, 6)}
                         </span>
                       </a>
@@ -80,10 +80,10 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
                         }}
                         className={valueSmLink}
                       >
-                        <span className="tablet:hidden">
+                        <span class="tablet:hidden">
                           {abbreviateAddress(send.destination, 4)}
                         </span>
-                        <span className="hidden tablet:inline">
+                        <span class="hidden tablet:inline">
                           {abbreviateAddress(send.destination, 6)}
                         </span>
                       </a>

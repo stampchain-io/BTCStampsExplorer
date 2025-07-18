@@ -18,10 +18,10 @@ Deno.env.set("SKIP_EXTERNAL_APIS", "true");
 (globalThis as any).SKIP_REDIS_CONNECTION = true;
 (globalThis as any).SKIP_DB_CONNECTION = true;
 
-import { assertEquals, assertExists, assertRejects } from "@std/assert";
-import { createMockUTXO } from "./utils/testFactories.ts";
+import { assertEquals, assertExists } from "@std/assert";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
+import { createMockUTXO } from "./utils/testFactories.ts";
 
 // Create a mock dbManager with handleCache method BEFORE any service imports
 const mockDbManager = new MockDatabaseManager();
@@ -41,6 +41,9 @@ const originalConfig = {
   QUICKNODE_ENDPOINT: Deno.env.get("QUICKNODE_ENDPOINT"),
   QUICKNODE_API_KEY: Deno.env.get("QUICKNODE_API_KEY"),
 };
+
+// Store original fetch for cleanup
+const originalFetch = globalThis.fetch;
 
 // Mock serverConfig
 const mockServerConfig = {
@@ -127,6 +130,27 @@ const mockUtxoUtils = {
 
 // Mock fetch for raw transaction hex from public APIs and QuickNode
 const mockFetch = (url: string, options?: any): Promise<Response> => {
+  // Create a proper headers mock that matches the Headers interface
+  const createMockHeaders = (contentType = "application/json") => {
+    const headersMap = new Map([["content-type", contentType]]);
+
+    return {
+      get: (name: string) => {
+        return headersMap.get(name.toLowerCase()) || null;
+      },
+      forEach: (callback: (value: string, key: string) => void) => {
+        headersMap.forEach((value, key) => callback(value, key));
+      },
+      has: (name: string) => headersMap.has(name.toLowerCase()),
+      set: (name: string, value: string) =>
+        headersMap.set(name.toLowerCase(), value),
+      delete: (name: string) => headersMap.delete(name.toLowerCase()),
+      entries: () => headersMap.entries(),
+      keys: () => headersMap.keys(),
+      values: () => headersMap.values(),
+    };
+  };
+
   // Mock QuickNode endpoint responses
   if (url.includes("test-endpoint")) {
     const body = JSON.parse(options?.body || "{}");
@@ -139,89 +163,185 @@ const mockFetch = (url: string, options?: any): Promise<Response> => {
         return Promise.resolve({
           ok: true,
           status: 200,
+          statusText: "OK",
+          headers: createMockHeaders(),
+          redirected: false,
+          type: "basic",
+          url: url,
+          body: null,
+          bodyUsed: false,
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+          blob: () => Promise.resolve(new Blob()),
+          formData: () => Promise.resolve(new FormData()),
           json: () =>
             Promise.resolve({
-              result: [{
-                txid: utxoFixtures.p2wpkh.standard.txid,
-                vout: utxoFixtures.p2wpkh.standard.vout,
-                value: String(utxoFixtures.p2wpkh.standard.value), // QuickNode returns value as string
-                script: utxoFixtures.p2wpkh.standard.script,
-                address: utxoFixtures.p2wpkh.standard.address,
-              }],
+              result: [
+                {
+                  txid: "quicknode_tx_1",
+                  vout: 0,
+                  value: 100000,
+                  height: 850000,
+                  confirmations: 100,
+                },
+              ],
             }),
-        } as Response);
-      }
-
-      if (address === "public_api_address") {
+          text: () =>
+            Promise.resolve(JSON.stringify({
+              result: [
+                {
+                  txid: "quicknode_tx_1",
+                  vout: 0,
+                  value: 100000,
+                  height: 850000,
+                  confirmations: 100,
+                },
+              ],
+            })),
+          clone: function () {
+            return this;
+          },
+        } as any);
+      } else {
+        // Address not found
         return Promise.resolve({
           ok: false,
-          status: 500,
-          text: () => Promise.resolve("Server error"),
-        } as Response);
-      }
-
-      if (address === "public_api_error") {
-        return Promise.resolve({
-          ok: false,
-          status: 500,
-          text: () => Promise.resolve("Server error"),
-        } as Response);
-      }
-    }
-
-    // Handle bb_getTxSpecific method
-    if (body.method === "bb_getTxSpecific") {
-      const txid = body.params?.[0];
-
-      if (txid === "quicknode_specific_tx") {
-        return Promise.resolve({
-          ok: true,
-          status: 200,
-          json: () =>
-            Promise.resolve({
-              result: {
-                txid: txid,
-                vout: [{
-                  value: Number(utxoFixtures.p2wpkh.standard.value) / 100000000, // BTC value
-                  scriptPubKey: {
-                    hex: utxoFixtures.p2wpkh.standard.script,
-                    address: utxoFixtures.p2wpkh.standard.address,
-                  },
-                }],
-              },
-            }),
-        } as Response);
-      }
-
-      if (txid === "quicknode_specific_error") {
-        return Promise.resolve({
-          ok: false,
-          status: 500,
-          text: () => Promise.resolve("Server error"),
-        } as Response);
+          status: 404,
+          statusText: "Not Found",
+          headers: createMockHeaders(),
+          redirected: false,
+          type: "basic",
+          url: url,
+          body: null,
+          bodyUsed: false,
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+          blob: () => Promise.resolve(new Blob()),
+          formData: () => Promise.resolve(new FormData()),
+          json: () => Promise.resolve({ error: "Address not found" }),
+          text: () =>
+            Promise.resolve(JSON.stringify({ error: "Address not found" })),
+          clone: function () {
+            return this;
+          },
+        } as any);
       }
     }
 
     // Handle getrawtransaction method
     if (body.method === "getrawtransaction") {
-      const txid = body.params?.[0];
-
-      if (txid === "quicknode_tx") {
-        return Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              result: "0200000001abcd...",
-            }),
-        } as Response);
-      }
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        headers: createMockHeaders(),
+        redirected: false,
+        type: "basic",
+        url: url,
+        body: null,
+        bodyUsed: false,
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+        blob: () => Promise.resolve(new Blob()),
+        formData: () => Promise.resolve(new FormData()),
+        json: () => Promise.resolve({ result: "mocked_tx_hex_quicknode" }),
+        text: () =>
+          Promise.resolve(
+            JSON.stringify({ result: "mocked_tx_hex_quicknode" }),
+          ),
+        clone: function () {
+          return this;
+        },
+      } as Response);
     }
 
-    // Default QuickNode error response
+    // Default QuickNode response
     return Promise.resolve({
-      ok: false,
-      status: 500,
-      text: () => Promise.resolve("Server error"),
+      ok: true,
+      status: 200,
+      statusText: "OK",
+      headers: createMockHeaders(),
+      redirected: false,
+      type: "basic",
+      url: url,
+      body: null,
+      bodyUsed: false,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+      blob: () => Promise.resolve(new Blob()),
+      formData: () => Promise.resolve(new FormData()),
+      json: () => Promise.resolve({ result: "default_quicknode_response" }),
+      text: () =>
+        Promise.resolve(
+          JSON.stringify({ result: "default_quicknode_response" }),
+        ),
+      clone: function () {
+        return this;
+      },
+    } as Response);
+  }
+
+  // Mock mempool.space endpoint
+  if (url.includes("mempool.space")) {
+    if (url.includes("success_tx")) {
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        headers: createMockHeaders("text/plain"),
+        redirected: false,
+        type: "basic",
+        url: url,
+        body: null,
+        bodyUsed: false,
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+        blob: () => Promise.resolve(new Blob()),
+        formData: () => Promise.resolve(new FormData()),
+        json: () => Promise.resolve("mocked_mempool_hex"),
+        text: () => Promise.resolve("mocked_mempool_hex"),
+        clone: function () {
+          return this;
+        },
+      } as Response);
+    } else {
+      return Promise.resolve({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        headers: createMockHeaders(),
+        redirected: false,
+        type: "basic",
+        url: url,
+        body: null,
+        bodyUsed: false,
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+        blob: () => Promise.resolve(new Blob()),
+        formData: () => Promise.resolve(new FormData()),
+        json: () => Promise.resolve({ error: "Transaction not found" }),
+        text: () => Promise.resolve("Transaction not found"),
+        clone: function () {
+          return this;
+        },
+      } as Response);
+    }
+  }
+
+  // Mock blockstream.info endpoint
+  if (url.includes("blockstream.info")) {
+    return Promise.resolve({
+      ok: true,
+      status: 200,
+      statusText: "OK",
+      headers: createMockHeaders("text/plain"),
+      redirected: false,
+      type: "basic",
+      url: url,
+      body: null,
+      bodyUsed: false,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+      blob: () => Promise.resolve(new Blob()),
+      formData: () => Promise.resolve(new FormData()),
+      json: () => Promise.resolve("mocked_blockstream_hex"),
+      text: () => Promise.resolve("mocked_blockstream_hex"),
+      clone: function () {
+        return this;
+      },
     } as Response);
   }
 
@@ -229,12 +349,16 @@ const mockFetch = (url: string, options?: any): Promise<Response> => {
   if (url.includes("blockstream") && url.includes("quicknode_tx")) {
     return Promise.resolve({
       ok: true,
+      status: 200,
+      headers: createMockHeaders("text/plain"),
       text: () => Promise.resolve("0200000001abcd..."),
     } as Response);
   }
   if (url.includes("blockstream") && url.includes("public_api_tx")) {
     return Promise.resolve({
       ok: true,
+      status: 200,
+      headers: createMockHeaders("text/plain"),
       text: () => Promise.resolve("0200000001efgh..."),
     } as Response);
   }
@@ -242,6 +366,7 @@ const mockFetch = (url: string, options?: any): Promise<Response> => {
     return Promise.resolve({
       ok: false,
       status: 404,
+      headers: createMockHeaders("text/plain"),
       text: () => Promise.resolve("Not found"),
     } as Response);
   }
@@ -253,6 +378,8 @@ const mockFetch = (url: string, options?: any): Promise<Response> => {
     if (address === "public_api_address") {
       return Promise.resolve({
         ok: true,
+        status: 200,
+        headers: createMockHeaders(),
         json: () =>
           Promise.resolve([{
             txid: utxoFixtures.p2pkh.standard.txid,
@@ -267,6 +394,7 @@ const mockFetch = (url: string, options?: any): Promise<Response> => {
       return Promise.resolve({
         ok: false,
         status: 500,
+        headers: createMockHeaders("text/plain"),
         text: () => Promise.resolve("Server error"),
       } as Response);
     }
@@ -274,6 +402,8 @@ const mockFetch = (url: string, options?: any): Promise<Response> => {
     // Default empty UTXO response
     return Promise.resolve({
       ok: true,
+      status: 200,
+      headers: createMockHeaders(),
       json: () => Promise.resolve([]),
     } as Response);
   }
@@ -286,6 +416,8 @@ const mockFetch = (url: string, options?: any): Promise<Response> => {
     if (txid === "quicknode_specific_tx") {
       return Promise.resolve({
         ok: true,
+        status: 200,
+        headers: createMockHeaders(),
         json: () =>
           Promise.resolve({
             txid: txid,
@@ -302,6 +434,7 @@ const mockFetch = (url: string, options?: any): Promise<Response> => {
   return Promise.resolve({
     ok: false,
     status: 500,
+    headers: createMockHeaders("text/plain"),
     text: () => Promise.resolve("Server error"),
   } as Response);
 };
@@ -321,6 +454,9 @@ Deno.test("CommonUTXOService - Comprehensive Branch Coverage", async (t) => {
     );
     CommonUTXOService = module.CommonUTXOService;
   }
+
+  // Apply mock fetch for all test steps
+  globalThis.fetch = mockFetch as any;
 
   await t.step("constructor - with QuickNode configured", () => {
     // Set environment to simulate QuickNode configuration
@@ -527,4 +663,7 @@ Deno.test("CommonUTXOService - Comprehensive Branch Coverage", async (t) => {
     );
     assertEquals(result.length, 1);
   });
+
+  // Cleanup: restore original fetch
+  globalThis.fetch = originalFetch;
 });

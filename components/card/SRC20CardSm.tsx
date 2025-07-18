@@ -18,15 +18,25 @@ interface SRC20CardSmProps {
 
 export function SRC20CardSm({
   data,
+  fromPage,
   onImageClick,
 }: SRC20CardSmProps) {
-  const headers = [
-    "TOKEN",
-    "PRICE",
-    "CHANGE 24H",
-    "VOLUME 24H",
-    "MARKETCAP",
-  ];
+  const headers = fromPage === "wallet"
+    ? [
+      "TOKEN",
+      "BALANCE",
+      "PRICE",
+      "CHANGE 24H",
+      "VOLUME 24H",
+      "MARKETCAP",
+    ]
+    : [
+      "TOKEN",
+      "PRICE",
+      "CHANGE 24H",
+      "VOLUME 24H",
+      "MARKETCAP",
+    ];
 
   function splitTextAndEmojis(text: string): { text: string; emoji: string } {
     const emojiRegex =
@@ -43,22 +53,53 @@ export function SRC20CardSm({
   return (
     <table class={`w-full ${textSm} border-separate border-spacing-y-3 -mt-8`}>
       <colgroup>
-        {colGroup([
-          {
-            width:
-              "w-[45%] min-[420px]:w-[35%] mobileMd:w-[20%] tablet:w-[30%] desktop:w-[20%]",
-          }, // TOKEN
-          {
-            width:
-              "w-[35%] min-[420px]:w-[40%] mobileMd:w-[20%] tablet:w-[25%] desktop:w-[20%]",
-          }, // PRICE
-          {
-            width:
-              "w-[20%] min-[420px]:w-[25%] mobileMd:w-[20%] tablet:w-[20%] desktop:w-[20%]",
-          }, // CHANGE
-          { width: "hidden mobileMd:w-[20%] tablet:w-[25%] desktop:w-[20%]" }, // VOLUME (24H)
-          { width: "hidden mobileMd:w-[20%] tablet:hidden desktop:w-[20%]" }, // MARKETCAP
-        ]).map((col) => <col key={col.key} className={col.className} />)}
+        {colGroup(
+          fromPage === "wallet"
+            ? [
+              {
+                width:
+                  "w-[30%] min-[420px]:w-[25%] mobileMd:w-[15%] tablet:w-[20%] desktop:w-[15%]",
+              }, // TOKEN
+              {
+                width:
+                  "w-[25%] min-[420px]:w-[25%] mobileMd:w-[15%] tablet:w-[15%] desktop:w-[15%]",
+              }, // BALANCE
+              {
+                width:
+                  "w-[25%] min-[420px]:w-[25%] mobileMd:w-[15%] tablet:w-[20%] desktop:w-[15%]",
+              }, // PRICE
+              {
+                width:
+                  "w-[20%] min-[420px]:w-[25%] mobileMd:w-[15%] tablet:w-[15%] desktop:w-[15%]",
+              }, // CHANGE
+              {
+                width: "hidden mobileMd:w-[20%] tablet:w-[20%] desktop:w-[20%]",
+              }, // VOLUME (24H)
+              {
+                width: "hidden mobileMd:w-[20%] tablet:hidden desktop:w-[20%]",
+              }, // MARKETCAP
+            ]
+            : [
+              {
+                width:
+                  "w-[45%] min-[420px]:w-[35%] mobileMd:w-[20%] tablet:w-[30%] desktop:w-[20%]",
+              }, // TOKEN
+              {
+                width:
+                  "w-[35%] min-[420px]:w-[40%] mobileMd:w-[20%] tablet:w-[25%] desktop:w-[20%]",
+              }, // PRICE
+              {
+                width:
+                  "w-[20%] min-[420px]:w-[25%] mobileMd:w-[20%] tablet:w-[20%] desktop:w-[20%]",
+              }, // CHANGE
+              {
+                width: "hidden mobileMd:w-[20%] tablet:w-[25%] desktop:w-[20%]",
+              }, // VOLUME (24H)
+              {
+                width: "hidden mobileMd:w-[20%] tablet:hidden desktop:w-[20%]",
+              }, // MARKETCAP
+            ],
+        ).map((col) => <col key={col.key} class={col.className} />)}
       </colgroup>
       <thead>
         <tr>
@@ -179,10 +220,25 @@ export function SRC20CardSm({
                       </div>
                     </div>
                   </td>
+                  {/* BALANCE - only show in wallet view */}
+                  {fromPage === "wallet" && (
+                    <td
+                      class={`${
+                        cellAlign(1, headers.length)
+                      } ${rowCardBorderCenter}`}
+                    >
+                      {(() => {
+                        const balance = Number(src20.amt || 0);
+                        if (balance === 0) return "0";
+                        // Format with commas for large numbers
+                        return balance.toLocaleString();
+                      })()}
+                    </td>
+                  )}
                   {/* PRICE */}
                   <td
                     class={`${
-                      cellAlign(1, headers.length)
+                      cellAlign(fromPage === "wallet" ? 2 : 1, headers.length)
                     } ${rowCardBorderCenter}`}
                   >
                     {(() => {
@@ -277,7 +333,9 @@ export function SRC20CardSm({
                   {/* MARKETCAP */}
                   <td
                     class={`
-                      ${cellAlign(4, headers.length)}
+                      ${
+                      cellAlign(fromPage === "wallet" ? 5 : 4, headers.length)
+                    }
                       ${rowCardBorderRight}
                       hidden mobileMd:table-cell tablet:hidden desktop:table-cell
                     `}

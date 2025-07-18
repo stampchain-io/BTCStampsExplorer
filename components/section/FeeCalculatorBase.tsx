@@ -233,22 +233,22 @@ export function FeeCalculatorBase({
 
   // Fee selector component
   const renderFeeSelector = () => (
-    <div className={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
-      <h6 className="font-light text-base text-stamp-grey-light">
-        <span className="text-stamp-grey-darker pr-2">FEE</span>
-        <span className="font-bold">
-          {fee === 0 ? <span className="animate-pulse">XX</span> : fee}
+    <div class={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
+      <h6 class="font-light text-base text-stamp-grey-light">
+        <span class="text-stamp-grey-darker pr-2">FEE</span>
+        <span class="font-bold">
+          {fee === 0 ? <span class="animate-pulse">XX</span> : fee}
         </span>{" "}
         SAT/vB
       </h6>
-      <h6 className="font-light text-sm text-stamp-grey-light mb-3 text-nowrap">
-        <span className="text-stamp-grey-darker pr-2">RECOMMENDED</span>
-        <span className="font-medium">
+      <h6 class="font-light text-sm text-stamp-grey-light mb-3 text-nowrap">
+        <span class="text-stamp-grey-darker pr-2">RECOMMENDED</span>
+        <span class="font-medium">
           {fees?.recommendedFee
             ? (
               fees.recommendedFee
             )
-            : <span className="animate-pulse">XX</span>}
+            : <span class="animate-pulse">XX</span>}
         </span>{" "}
         SAT/vB
       </h6>
@@ -301,45 +301,45 @@ export function FeeCalculatorBase({
           visible ? "max-h-[220px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="gap-1 mt-1.5">
+        <div class="gap-1 mt-1.5">
           {/* File Type - Only show for stamp type */}
           {type === "stamp" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>FILE</span>&nbsp;&nbsp;
+            <h6 class={textXs}>
+              <span class={labelXs}>FILE</span>&nbsp;&nbsp;
               {fileType
                 ? fileType.toUpperCase()
-                : <span className="animate-pulse">***</span>}
+                : <span class="animate-pulse">***</span>}
             </h6>
           )}
 
           {/* Editions - Only show for stamp type */}
           {type === "stamp" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 EDITIONS
               </span>&nbsp;&nbsp;
-              {issuance ? issuance : <span className="animate-pulse">***</span>}
+              {issuance ? issuance : <span class="animate-pulse">***</span>}
             </h6>
           )}
 
           {/* File Size */}
           {type === "stamp" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>SIZE</span>&nbsp;&nbsp;
-              {fileSize ? fileSize : <span className="animate-pulse">***</span>}
+            <h6 class={textXs}>
+              <span class={labelXs}>SIZE</span>&nbsp;&nbsp;
+              {fileSize ? fileSize : <span class="animate-pulse">***</span>}
               {" "}
-              <span className="font-light">BYTES</span>
+              <span class="font-light">BYTES</span>
             </h6>
           )}
 
           {/* Sats Per Byte */}
-          <h6 className={textXs}>
-            <span className={labelXs}>SATS PER BYTE</span>&nbsp;&nbsp;{fee}
+          <h6 class={textXs}>
+            <span class={labelXs}>SATS PER BYTE</span>&nbsp;&nbsp;{fee}
           </h6>
 
           {/* Miner Fee */}
-          <h6 className={textXs}>
-            <span className={labelXs}>
+          <h6 class={textXs}>
+            <span class={labelXs}>
               MINER FEE
             </span>&nbsp;&nbsp;
             {feeDetails?.minerFee
@@ -350,21 +350,21 @@ export function FeeCalculatorBase({
                       includeSymbol: false,
                     })
                     : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice)}{" "}
-                  <span className="font-light">{coinType}</span>
+                  <span class="font-light">{coinType}</span>
                 </>
               )
               : (
                 <>
-                  <span className="animate-pulse">0.00000000</span>{" "}
-                  <span className="font-light">{coinType}</span>
+                  <span class="animate-pulse">0.00000000</span>{" "}
+                  <span class="font-light">{coinType}</span>
                 </>
               )}
           </h6>
 
           {/* Service Fee - Display if available in feeDetails */}
           {feeDetails?.serviceFee && feeDetails.serviceFee > 0 && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 SERVICE FEE
               </span>&nbsp;&nbsp;
               {coinType === "BTC"
@@ -372,14 +372,14 @@ export function FeeCalculatorBase({
                   includeSymbol: false,
                 })
                 : formatSatoshisToUSD(feeDetails.serviceFee, BTCPrice)}{" "}
-              <span className="font-light">{coinType}</span>
+              <span class="font-light">{coinType}</span>
             </h6>
           )}
 
           {/* Dust Value */}
           {!!feeDetails?.dustValue && feeDetails?.dustValue > 0 && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 DUST
               </span>&nbsp;&nbsp;
               {feeDetails?.dustValue
@@ -391,37 +391,37 @@ export function FeeCalculatorBase({
                       })
                       : formatSatoshisToUSD(feeDetails.dustValue, BTCPrice)}
                     {" "}
-                    <span className="font-light">{coinType}</span>
+                    <span class="font-light">{coinType}</span>
                   </>
                 )
-                : <span className="animate-pulse">0.00000000</span>}
+                : <span class="animate-pulse">0.00000000</span>}
             </h6>
           )}
 
           {/* Bitname TLD */}
           {!!bitname && bitname.split(".")[1] && (
-            <h6 className={textXs}>
-              <span className={labelXs}>TLD</span>&nbsp;&nbsp;
+            <h6 class={textXs}>
+              <span class={labelXs}>TLD</span>&nbsp;&nbsp;
               {`.${bitname.split(".")[1]}`}
             </h6>
           )}
 
           {/* Bitname domain */}
           {fromPage === "src101_bitname" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>NAME</span>&nbsp;&nbsp;
+            <h6 class={textXs}>
+              <span class={labelXs}>NAME</span>&nbsp;&nbsp;
               {bitname?.split(".")[0]
                 ? (
                   bitname?.split(".")[0]
                 )
-                : <span className="animate-pulse">*******</span>}
+                : <span class="animate-pulse">*******</span>}
             </h6>
           )}
 
           {/* Donate amount */}
           {fromPage === "donate" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 DONATION AMOUNT
               </span>&nbsp;&nbsp;
               {feeDetails?.itemPrice !== undefined
@@ -433,13 +433,13 @@ export function FeeCalculatorBase({
                       })
                       : formatSatoshisToUSD(feeDetails.itemPrice, BTCPrice)}
                     {" "}
-                    <span className="font-light">{coinType}</span>
+                    <span class="font-light">{coinType}</span>
                   </>
                 )
                 : (
                   <>
-                    <span className="animate-pulse">0.00000000</span>{" "}
-                    <span className="font-light">{coinType}</span>
+                    <span class="animate-pulse">0.00000000</span>{" "}
+                    <span class="font-light">{coinType}</span>
                   </>
                 )}
             </h6>
@@ -447,20 +447,20 @@ export function FeeCalculatorBase({
 
           {/* Receive amount on donate */}
           {fromPage === "donate" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 RECEIVE
               </span>&nbsp;&nbsp;
               {receive
                 ? receive
-                : <span className="animate-pulse">******</span>} USDSTAMPS
+                : <span class="animate-pulse">******</span>} USDSTAMPS
             </h6>
           )}
 
           {/** Stamp Buy Modal */}
           {fromPage === "stamp_buy" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 STAMP PRICE
               </span>&nbsp;&nbsp;
               {feeDetails?.itemPrice !== undefined
@@ -472,13 +472,13 @@ export function FeeCalculatorBase({
                       })
                       : formatSatoshisToUSD(feeDetails.itemPrice, BTCPrice)}
                     {" "}
-                    <span className="font-light">{coinType}</span>
+                    <span class="font-light">{coinType}</span>
                   </>
                 )
                 : (
                   <>
-                    <span className="animate-pulse">0.00000000</span>{" "}
-                    <span className="font-light">{coinType}</span>
+                    <span class="animate-pulse">0.00000000</span>{" "}
+                    <span class="font-light">{coinType}</span>
                   </>
                 )}
             </h6>
@@ -486,69 +486,69 @@ export function FeeCalculatorBase({
 
           {/** Stamp Buy Modal */}
           {fromPage === "stamp_buy" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 EDITIONS
               </span>&nbsp;&nbsp;
-              {edition ? edition : <span className="animate-pulse">***</span>}
+              {edition ? edition : <span class="animate-pulse">***</span>}
             </h6>
           )}
 
           {/** SRC20 DEPLOY */}
           {fromPage === "src20_deploy" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 TICKER
               </span>&nbsp;&nbsp;
-              {ticker ? ticker : <span className="animate-pulse">*****</span>}
+              {ticker ? ticker : <span class="animate-pulse">*****</span>}
             </h6>
           )}
           {fromPage === "src20_deploy" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 SUPPLY
               </span>&nbsp;&nbsp;
-              {supply ? supply : <span className="animate-pulse">0</span>}
+              {supply ? supply : <span class="animate-pulse">0</span>}
             </h6>
           )}
           {fromPage === "src20_deploy" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 LIMIT
               </span>&nbsp;&nbsp;
-              {limit ? limit : <span className="animate-pulse">0</span>}
+              {limit ? limit : <span class="animate-pulse">0</span>}
             </h6>
           )}
           {fromPage === "src20_deploy" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 DECIMALS
               </span>&nbsp;&nbsp;
               {dec !== undefined
                 ? dec
-                : <span className="animate-pulse">0</span>}
+                : <span class="animate-pulse">0</span>}
             </h6>
           )}
 
           {/* SRC20 Transfer Details */}
           {fromPage === "src20_transfer" && (
             <>
-              <h6 className={textXs}>
-                <span className={labelXs}>RECIPIENT ADDY</span>&nbsp;&nbsp;
+              <h6 class={textXs}>
+                <span class={labelXs}>RECIPIENT ADDY</span>&nbsp;&nbsp;
                 {src20TransferDetails?.address || (
-                  <span className="animate-pulse">************</span>
+                  <span class="animate-pulse">************</span>
                 )}
               </h6>
-              <h6 className={textXs}>
-                <span className={labelXs}>TOKEN TICKER</span>&nbsp;&nbsp;
+              <h6 class={textXs}>
+                <span class={labelXs}>TOKEN TICKER</span>&nbsp;&nbsp;
                 {src20TransferDetails?.token || (
-                  <span className="animate-pulse">*****</span>
+                  <span class="animate-pulse">*****</span>
                 )}
               </h6>
-              <h6 className={textXs}>
-                <span className={labelXs}>AMOUNT</span>&nbsp;&nbsp;
+              <h6 class={textXs}>
+                <span class={labelXs}>AMOUNT</span>&nbsp;&nbsp;
                 {src20TransferDetails?.amount || (
-                  <span className="animate-pulse">0</span>
+                  <span class="animate-pulse">0</span>
                 )}
               </h6>
             </>
@@ -557,22 +557,22 @@ export function FeeCalculatorBase({
           {/* Stamp Transfer Details */}
           {fromPage === "stamp_transfer" && (
             <>
-              <h6 className={textXs}>
-                <span className={labelXs}>STAMP</span>&nbsp;&nbsp;
+              <h6 class={textXs}>
+                <span class={labelXs}>STAMP</span>&nbsp;&nbsp;
                 {stampTransferDetails?.stamp || (
-                  <span className="animate-pulse">*******</span>
+                  <span class="animate-pulse">*******</span>
                 )}
               </h6>
-              <h6 className={textXs}>
-                <span className={labelXs}>EDITIONS</span>&nbsp;&nbsp;
+              <h6 class={textXs}>
+                <span class={labelXs}>EDITIONS</span>&nbsp;&nbsp;
                 {stampTransferDetails?.editions || (
-                  <span className="animate-pulse">***</span>
+                  <span class="animate-pulse">***</span>
                 )}
               </h6>
-              <h6 className={textXs}>
-                <span className={labelXs}>RECIPIENT ADDY</span>&nbsp;&nbsp;
+              <h6 class={textXs}>
+                <span class={labelXs}>RECIPIENT ADDY</span>&nbsp;&nbsp;
                 {stampTransferDetails?.address || (
-                  <span className="animate-pulse">************</span>
+                  <span class="animate-pulse">************</span>
                 )}
               </h6>
             </>
@@ -580,30 +580,30 @@ export function FeeCalculatorBase({
 
           {/* Mint Details */}
           {fromPage === "src20_mint" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 TOKEN TICKER
               </span>&nbsp;&nbsp;
               {mintDetails?.token
                 ? mintDetails.token
-                : <span className="animate-pulse">*****</span>}
+                : <span class="animate-pulse">*****</span>}
             </h6>
           )}
 
           {fromPage === "src20_mint" && (
-            <h6 className={textXs}>
-              <span className={labelXs}>
+            <h6 class={textXs}>
+              <span class={labelXs}>
                 AMOUNT
               </span>&nbsp;&nbsp;
               {mintDetails?.amount !== undefined && mintDetails.amount > 0
                 ? mintDetails.amount
-                : <span className="animate-pulse">0</span>}
+                : <span class="animate-pulse">0</span>}
             </h6>
           )}
 
           {/* TOTAL */}
-          <h6 className={textXs}>
-            <span className={`${labelXs} font-normal`}>
+          <h6 class={textXs}>
+            <span class={`${labelXs} font-normal`}>
               TOTAL
             </span>&nbsp;&nbsp;
             {feeDetails?.totalValue
@@ -616,8 +616,8 @@ export function FeeCalculatorBase({
                     : formatSatoshisToUSD(feeDetails.totalValue, BTCPrice)}
                 </>
               )
-              : <span className="animate-pulse">0.00000000</span>}{" "}
-            <span className="font-light">{coinType}</span>
+              : <span class="animate-pulse">0.00000000</span>}{" "}
+            <span class="font-light">{coinType}</span>
           </h6>
         </div>
       </div>
@@ -636,8 +636,8 @@ export function FeeCalculatorBase({
   };
 
   return (
-    <div className={`text-[#999999] ${className}`}>
-      <div className="flex">
+    <div class={`text-[#999999] ${className}`}>
+      <div class="flex">
         {renderFeeSelector()}
         {showCoinToggle && (
           <div
@@ -671,34 +671,34 @@ export function FeeCalculatorBase({
         )}
       </div>
 
-      <h6 className="mt-4 text-xl text-stamp-grey-light font-light">
-        <span className="text-stamp-grey-darker pr-2">ESTIMATE</span>
+      <h6 class="mt-4 text-xl text-stamp-grey-light font-light">
+        <span class="text-stamp-grey-darker pr-2">ESTIMATE</span>
         {feeDetails?.totalValue !== undefined
           ? (
             coinType === "BTC"
               ? (
                 <>
-                  <span className="font-bold">
+                  <span class="font-bold">
                     {formatSatoshisToBTC(feeDetails.totalValue, {
                       includeSymbol: false,
                     })}
                   </span>{" "}
-                  <span className="font-light">BTC</span>
+                  <span class="font-light">BTC</span>
                 </>
               )
               : (
                 <>
-                  <span className="font-bold">
+                  <span class="font-bold">
                     {(feeDetails.totalValue / 1e8 * BTCPrice).toFixed(2)}
                   </span>{" "}
-                  <span className="font-light">{coinType}</span>
+                  <span class="font-light">{coinType}</span>
                 </>
               )
           )
           : (
             <>
-              <span className="font-bold animate-pulse">0.00000000</span>{" "}
-              <span className="font-light">{coinType}</span>
+              <span class="font-bold animate-pulse">0.00000000</span>{" "}
+              <span class="font-light">{coinType}</span>
             </>
           )}
       </h6>
@@ -722,8 +722,8 @@ export function FeeCalculatorBase({
 
       {renderDetails()}
 
-      <div className="flex flex-col items-end gap-4 pt-10">
-        <div className="relative flex items-center">
+      <div class="flex flex-col items-end gap-4 pt-10">
+        <div class="relative flex items-center">
           <input
             type="checkbox"
             id="tosAgreed"
@@ -793,8 +793,8 @@ export function FeeCalculatorBase({
               `}
             >
               AGREE TO THE{" "}
-              <span className="text-stamp-purple">
-                <span className="tablet:hidden">
+              <span class="text-stamp-purple">
+                <span class="tablet:hidden">
                   <a
                     href="/termsofservice"
                     className={`
@@ -808,7 +808,7 @@ export function FeeCalculatorBase({
                     TERMS
                   </a>
                 </span>
-                <span className="hidden tablet:inline">
+                <span class="hidden tablet:inline">
                   <a
                     href="/termsofservice"
                     className={`
@@ -827,7 +827,7 @@ export function FeeCalculatorBase({
           </label>
         </div>
 
-        <div className="flex justify-end gap-6">
+        <div class="flex justify-end gap-6">
           {onCancel && (
             <button
               type="button"

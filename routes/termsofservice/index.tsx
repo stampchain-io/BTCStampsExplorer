@@ -7,23 +7,23 @@ export default function TermsOfServicePage() {
   return (
     <>
       <CourierFontLoader />
-      <div className={`${body} ${gapGrid}`}>
+      <div class={`${body} ${gapGrid}`}>
         {/* ===== HEADER SECTION ===== */}
         <section>
-          <h1 className={titleGreyLD}>TERMS OF SERVICE</h1>
-          <div className="flex flex-col tablet:flex-row tablet:justify-between tablet:items-end">
-            <h2 className={subtitleGrey}>
+          <h1 class={titleGreyLD}>TERMS OF SERVICE</h1>
+          <div class="flex flex-col tablet:flex-row tablet:justify-between tablet:items-end">
+            <h2 class={subtitleGrey}>
               AGREEMENT TO OUR LEGAL TERMS
             </h2>
-            <h5 className="text-lg mobileLg:text-xl font-light text-stamp-grey pb-4 mobileLg:pb-2">
+            <h5 class="text-lg mobileLg:text-xl font-light text-stamp-grey pb-4 mobileLg:pb-2">
               LAST UPDATED
-              <span className="pl-3 font-medium text-stamp-grey-light">
+              <span class="pl-3 font-medium text-stamp-grey-light">
                 SEPTEMBER 11 2024
               </span>
             </h5>
           </div>
           <div
-            className={`flex flex-col ${textSm} font-courier-prime leading-6`}
+            class={`flex flex-col ${textSm} font-courier-prime leading-6`}
           >
             <p>
               We are Stampchain ("Company," "we," "us," "our"). We operate the
@@ -38,7 +38,7 @@ export default function TermsOfServicePage() {
               You agree that by accessing the Services, you have read,
               understood, and agreed to be bound by all of these Legal Terms.
             </p>
-            <p className={`${text} !font-semibold`}>
+            <p class={`${text} !font-semibold`}>
               IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE
               EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST
               DISCONTINUE USE IMMEDIATELY.
@@ -70,8 +70,8 @@ export default function TermsOfServicePage() {
         </section>
         {/* ===== TABLE OF CONTENTS SECTION ===== */}
         <section>
-          <p className="font-semibold text-lg text-stamp-grey-light font-courier-prime">
-            <span className="text-2xl">
+          <p class="font-semibold text-lg text-stamp-grey-light font-courier-prime">
+            <span class="text-2xl">
               TABLE OF CONTENTS<br />
             </span>
             1. OUR SERVICES<br />
@@ -105,7 +105,7 @@ export default function TermsOfServicePage() {
 
         {/* ===== TERMS CONTENT SECTION ===== */}
         <div
-          className={`flex flex-col space-y-9 tablet:space-y-6 ${textSm} font-courier-prime leading-6`}
+          class={`flex flex-col space-y-9 tablet:space-y-6 ${textSm} font-courier-prime leading-6`}
         >
           {/* ===== TERMS DESCRIPTION SECTION ===== */}
           {/* ===== 1. OUR SERVICES ===== */}
@@ -767,14 +767,14 @@ export default function TermsOfServicePage() {
             further information regarding use of the Services, please{" "}
             <a
               href="/about#contact"
-              className={`${textSm} animated-underline`}
+              class={`${textSm} animated-underline`}
             >
               send us an email
             </a>.
           </section>
 
           {/* ===== FOOTER NOTE ===== */}
-          <p className="mt-3 !font-semibold">
+          <p class="mt-3 !font-semibold">
             These terms of use were created using Termly's Terms and Conditions
             Generator.
           </p>

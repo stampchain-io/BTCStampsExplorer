@@ -1,11 +1,11 @@
 /* ===== ICON COMPONENT ===== */
+import * as iconPaths from "$components/icon/paths.ts";
 import {
   BadgeVariants,
   globalSvgAttributes,
   iconStyles,
   IconVariants,
 } from "$icon";
-import * as iconPaths from "$components/icon/paths.ts";
 
 /* ===== COMPONENT ===== */
 export function Icon(props: IconVariants) {
@@ -150,7 +150,7 @@ export function Icon(props: IconVariants) {
             <path
               key={index}
               d={pathItem.path}
-              className={`${pathItem.style} ${fillColor}`}
+              class={`${pathItem.style} ${fillColor}`}
             />
           );
         }
@@ -197,7 +197,7 @@ export function Icon(props: IconVariants) {
 export function BadgeIcon({ text, className = "" }: BadgeVariants) {
   return (
     <span
-      className={`
+      class={`
         flex items-center justify-center
         absolute top-[-4px] left-[-12px] z-10
         size-5 rounded-full
