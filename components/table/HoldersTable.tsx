@@ -15,8 +15,8 @@ interface HoldersTableProps {
 export function HoldersTable({ holders = [] }: HoldersTableProps) {
   if (!holders.length) {
     return (
-      <div className="flex flex-col bg-gradient-to-br primary-gradient p-6 relative rounded-lg">
-        <div className="text-center py-10">No holder data available</div>
+      <div class="flex flex-col bg-gradient-to-br primary-gradient p-6 relative rounded-lg">
+        <div class="text-center py-10">No holder data available</div>
       </div>
     );
   }
@@ -24,19 +24,19 @@ export function HoldersTable({ holders = [] }: HoldersTableProps) {
   const totalHolders = holders.length;
 
   return (
-    <div className={containerBackground}>
-      <div className="text-left tablet:text-right">
-        <h5 className={labelSm}>HOLDERS</h5>
-        <h6 className={value3xl}>
+    <div class={containerBackground}>
+      <div class="text-left tablet:text-right">
+        <h5 class={labelSm}>HOLDERS</h5>
+        <h6 class={value3xl}>
           {totalHolders}
         </h6>
       </div>
-      <div className="flex flex-col tablet:flex-row w-full gap-6">
-        <div className="flex justify-center tablet:justify-start">
+      <div class="flex flex-col tablet:flex-row w-full gap-6">
+        <div class="flex justify-center tablet:justify-start">
           <HoldersPieChart holders={holders as any} />
         </div>
 
-        <div className="relative w-full max-w-full">
+        <div class="relative w-full max-w-full">
           <HoldersTableBase holders={holders as any} />
         </div>
       </div>

@@ -1,8 +1,8 @@
 import { TX, TXError } from "$globals";
-import { SRC20OperationService } from "./operations/src20Operations.ts";
+import { logger } from "$lib/utils/logger.ts";
 import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$server/types/services/src20.d.ts";
 import { InputData } from "$types/index.d.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { SRC20OperationService } from "./operations/src20Operations.ts";
 
 export class SRC20TransactionService {
   static async handleOperation(
@@ -101,6 +101,9 @@ export class SRC20TransactionService {
   }
 
   private static prepareDeploy(body: InputData): IDeploySRC20 {
+    if (!body.toAddress || !body.changeAddress || body.feeRate === undefined) {
+      throw new Error("Missing required fields: toAddress, changeAddress, or feeRate");
+    }
     return {
       network: "mainnet",
       toAddress: body.toAddress,
@@ -120,10 +123,10 @@ export class SRC20TransactionService {
 
   private static prepareMint(body: InputData): IMintSRC20 {
     return {
-      toAddress: body.toAddress,
-      changeAddress: body.changeAddress,
+      toAddress: body.toAddress ?? "",
+      changeAddress: body.changeAddress ?? "",
       tick: body.tick,
-      feeRate: body.feeRate,
+      feeRate: body.feeRate ?? 1,
       amt: body.amt?.toString() ?? "",
       network: "mainnet", // Default to mainnet
     };
@@ -131,11 +134,11 @@ export class SRC20TransactionService {
 
   private static prepareTransfer(body: InputData): ITransferSRC20 {
     return {
-      toAddress: body.toAddress,
-      fromAddress: body.fromAddress || "",
-      changeAddress: body.changeAddress,
+      toAddress: body.toAddress ?? "",
+      fromAddress: body.fromAddress ?? "",
+      changeAddress: body.changeAddress ?? "",
       tick: body.tick,
-      feeRate: body.feeRate,
+      feeRate: body.feeRate ?? 1,
       amt: body.amt?.toString() ?? "",
       network: "mainnet", // Default to mainnet
     };

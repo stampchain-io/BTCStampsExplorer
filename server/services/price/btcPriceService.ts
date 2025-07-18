@@ -1,21 +1,50 @@
 import { COINGECKO_API_BASE_URL } from "$lib/utils/constants.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
+import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 import { RouteType, getCacheConfig } from "$server/services/cacheService.ts";
+import { CircuitBreaker, CircuitBreakerConfig, CircuitBreakerMetrics } from "./circuitBreaker.ts";
 
 import type { DatabaseManager } from "$server/database/databaseManager.ts";
 
+const httpClient = new FetchHttpClient();
+const BINANCE_API_BASE_URL = "https://api.binance.com/api/v3";
+const KRAKEN_API_BASE_URL = "https://api.kraken.com/0/public";
+const COINBASE_API_BASE_URL = "https://api.coinbase.com/v2";
+const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
+const BITSTAMP_API_BASE_URL = "https://www.bitstamp.net/api/v2";
+
 export interface BTCPriceData {
   price: number;
-  source: "quicknode" | "coingecko" | "binance" | "cached" | "default";
+  source: "quicknode" | "coingecko" | "binance" | "kraken" | "coinbase" | "blockchain" | "bitstamp" | "cached" | "default";
   confidence: "high" | "medium" | "low";
   timestamp: number;
   details?: any;
   fallbackUsed?: boolean;
   errors?: string[];
+  circuitBreakerMetrics?: Record<string, CircuitBreakerMetrics>;
 }
 
 export class BTCPriceService {
   private static db: DatabaseManager = dbManager;
+
+  // Circuit breaker configurations
+  private static readonly CIRCUIT_BREAKER_CONFIG: CircuitBreakerConfig = {
+    failureThreshold: 3,        // Open after 3 failures
+    recoveryTimeout: 30000,     // Wait 30s before trying HALF_OPEN
+    successThreshold: 2,        // Need 2 successes to close from HALF_OPEN
+    timeout: 5000,             // 5s timeout per request
+    monitoringPeriod: 60000,   // Track failures over 1 minute
+  };
+
+  // Circuit breakers for each price source
+  private static circuitBreakers = {
+    coingecko: new CircuitBreaker("CoinGecko", this.CIRCUIT_BREAKER_CONFIG),
+    binance: new CircuitBreaker("Binance", this.CIRCUIT_BREAKER_CONFIG),
+    kraken: new CircuitBreaker("Kraken", this.CIRCUIT_BREAKER_CONFIG),
+    coinbase: new CircuitBreaker("Coinbase", this.CIRCUIT_BREAKER_CONFIG),
+    blockchain: new CircuitBreaker("Blockchain.info", this.CIRCUIT_BREAKER_CONFIG),
+    bitstamp: new CircuitBreaker("Bitstamp", this.CIRCUIT_BREAKER_CONFIG),
+  };
 
   static setDatabase(database: DatabaseManager): void {
     this.db = database;
@@ -24,11 +53,11 @@ export class BTCPriceService {
   private static readonly CACHE_KEY = "btc_price_data";
   private static readonly CACHE_CONFIG = getCacheConfig(RouteType.PRICE);
   private static sourceCounter = 0;
-  
-  // Updated sources array - QuickNode disabled (no longer subscribed to cg_simplePrice addon)
-  // Binance added as free alternative API for price fetching
-  private static readonly SOURCES = ["coingecko", "binance"] as const;
-  // To re-enable QuickNode when subscription is restored: ["quicknode", "coingecko", "binance"]
+
+  // Updated sources array with multiple fallback options for reliability
+  // Sources are ordered by reliability and response time
+  private static readonly SOURCES = ["coingecko", "kraken", "coinbase", "bitstamp", "blockchain", "binance"] as const;
+  // To re-enable QuickNode when subscription is restored: add "quicknode" at the beginning
 
   /**
    * Get BTC price with Redis caching and comprehensive fallback
@@ -45,22 +74,32 @@ export class BTCPriceService {
         return {
           ...cachedData,
           source: "cached",
-          confidence: cachedData.confidence,
+          circuitBreakerMetrics: this.getCircuitBreakerMetrics(),
         };
       }
 
-      const priceData = await this.fetchFreshPriceData(preferredSource);
+      // Fetch fresh data
+      console.log(`[BTCPriceService] Cache miss or stale data, fetching fresh price...`);
+      const freshData = await this.fetchFreshPriceData(preferredSource);
 
-      const duration = Date.now() - startTime;
-      console.log(`[BTCPriceService] BTC price retrieved successfully: $${priceData.price} from ${priceData.source} (${duration}ms)`);
+      // Cache the result
+      if (freshData.source !== "default") {
+        await this.db.handleCache(this.CACHE_KEY, () => Promise.resolve(freshData), this.CACHE_CONFIG.duration);
+      }
 
-      return priceData;
+      return {
+        ...freshData,
+        circuitBreakerMetrics: this.getCircuitBreakerMetrics(),
+      };
     } catch (error) {
-      const duration = Date.now() - startTime;
-      console.error(`[BTCPriceService] Critical error in BTC price retrieval (${duration}ms):`, error);
-
-      // Emergency fallback to static default
-      return this.getStaticFallbackPrice();
+      console.error("[BTCPriceService] Failed to get BTC price:", error);
+      return {
+        ...this.getStaticFallbackPrice(),
+        errors: [error instanceof Error ? error.message : String(error)],
+        circuitBreakerMetrics: this.getCircuitBreakerMetrics(),
+      };
+    } finally {
+      console.log(`[BTCPriceService] Request completed in ${Date.now() - startTime}ms`);
     }
   }
 
@@ -77,9 +116,10 @@ export class BTCPriceService {
 
     console.log(`[BTCPriceService] Fetching fresh BTC price from external sources, preferredSource: ${preferredSource}`);
 
-    // Determine source order
-    const sources = preferredSource 
-      ? [preferredSource, ...this.SOURCES.filter(s => s !== preferredSource)]
+    // Determine source order, filtering out permanently disabled sources
+    const availableSources = this.getAvailableSources();
+    const sources = preferredSource && availableSources.includes(preferredSource)
+      ? [preferredSource, ...availableSources.filter(s => s !== preferredSource)]
       : this.getNextSourceOrder();
 
     console.log(`[BTCPriceService] Source order: ${sources.join(' → ')}`);
@@ -102,7 +142,7 @@ export class BTCPriceService {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         errors.push(`${source}: ${errorMessage}`);
-        
+
         // Only log simple message for expected errors with fallbacks
         const isRateLimitError = errorMessage.includes('429');
         if (isRateLimitError) {
@@ -126,13 +166,31 @@ export class BTCPriceService {
    * Get round-robin source order
    */
   private static getNextSourceOrder(): string[] {
-    const primaryIndex = this.sourceCounter % this.SOURCES.length;
+    // Filter out permanently disabled sources
+    const availableSources = this.getAvailableSources();
+    
+    if (availableSources.length === 0) {
+      console.warn("[BTCPriceService] No available price sources - all are permanently disabled");
+      return [];
+    }
+
+    const primaryIndex = this.sourceCounter % availableSources.length;
     this.sourceCounter = (this.sourceCounter + 1) % Number.MAX_SAFE_INTEGER;
-    
-    const primary = this.SOURCES[primaryIndex];
-    const secondary = this.SOURCES.find(s => s !== primary)!;
-    
-    return [primary, secondary];
+
+    const primary = availableSources[primaryIndex];
+    const remaining = availableSources.filter(s => s !== primary);
+
+    return [primary, ...remaining];
+  }
+
+  /**
+   * Get list of available (non-permanently disabled) sources
+   */
+  private static getAvailableSources(): string[] {
+    return this.SOURCES.filter(source => {
+      const breaker = this.circuitBreakers[source as keyof typeof this.circuitBreakers];
+      return breaker && !breaker.isPermanentlyDisabled();
+    });
   }
 
   /**
@@ -147,6 +205,14 @@ export class BTCPriceService {
         return await this.fetchFromCoinGecko();
       case "binance":
         return await this.fetchFromBinance();
+      case "kraken":
+        return await this.fetchFromKraken();
+      case "coinbase":
+        return await this.fetchFromCoinbase();
+      case "blockchain":
+        return await this.fetchFromBlockchain();
+      case "bitstamp":
+        return await this.fetchFromBitstamp();
       default:
         throw new Error(`Unknown price source: ${source}`);
     }
@@ -156,7 +222,7 @@ export class BTCPriceService {
    * Fetch from QuickNode (DISABLED - no longer subscribed to cg_simplePrice addon)
    * Keeping this method commented out in case subscription is restored
    */
-  /* 
+  /*
   private static async fetchFromQuickNode(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
     try {
       const params = ["bitcoin", "usd", true, true, true];
@@ -180,7 +246,7 @@ export class BTCPriceService {
 
       const price = response.result.bitcoin.usd;
       console.log(`[BTCPriceService] QuickNode price result: $${price}`);
-      
+
       return {
         price,
         source: "quicknode",
@@ -195,75 +261,272 @@ export class BTCPriceService {
   */
 
   /**
-   * Fetch from CoinGecko
+   * Fetch from CoinGecko with circuit breaker protection
    */
   private static async fetchFromCoinGecko(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
-    try {
-      const response = await fetch(
-        `${COINGECKO_API_BASE_URL}/simple/price?ids=bitcoin&vs_currencies=usd`
-      );
-      
-      if (!response.ok) {
-        // Consume the response body to prevent resource leak
-        await response.text();
-        
-        // Less verbose logging for rate limits
+    return await this.circuitBreakers.coingecko.execute(async () => {
+      const response = await httpClient.get(`${COINGECKO_API_BASE_URL}/simple/price?ids=bitcoin&vs_currencies=usd`);
+
+      if (response.status !== 200) {
+        // Handle specific error types for circuit breaker
         if (response.status === 429) {
-          throw new Error(`CoinGecko API rate limit (${response.status})`);
+          const error = new Error(`CoinGecko API rate limit (${response.status})`);
+          error.name = "RateLimitError";
+          throw error;
+        }
+        if (response.status === 451) {
+          const error = new Error(`CoinGecko API unavailable for legal reasons (${response.status})`);
+          error.name = "LegalRestrictionError";
+          throw error;
+        }
+        if (response.status >= 500) {
+          const error = new Error(`CoinGecko API server error (${response.status})`);
+          error.name = "ServerError";
+          throw error;
         }
         throw new Error(`CoinGecko API returned ${response.status}`);
       }
-      
-      const data = await response.json();
-      const price = data.bitcoin.usd;
+
+      const data = response.data;
+      const price = data.bitcoin?.usd;
+
+      if (!price || typeof price !== 'number' || price <= 0) {
+        throw new Error("Invalid price data from CoinGecko");
+      }
+
       console.log(`[BTCPriceService] CoinGecko price result: $${price}`);
-      
+
       return {
         price,
-        source: "coingecko",
-        confidence: "high",
+        source: "coingecko" as const,
+        confidence: "high" as const,
         details: data,
       };
-    } catch (error) {
-      // Re-throw with message only, no stack trace logging
-      throw error;
-    }
+    });
   }
 
   /**
-   * Fetch from Binance (Free API - no authentication required)
+   * Fetch from Binance with circuit breaker protection (Free API - no authentication required)
    */
   private static async fetchFromBinance(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
-    try {
-      const response = await fetch(
-        "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
-      );
-      
-      if (!response.ok) {
-        // Consume the response body to prevent resource leak
-        await response.text();
-        
-        // Less verbose logging for rate limits
+    return await this.circuitBreakers.binance.execute(async () => {
+      const response = await httpClient.get(`${BINANCE_API_BASE_URL}/ticker/price?symbol=BTCUSDT`);
+
+      if (response.status !== 200) {
+        // Handle specific error types for circuit breaker
         if (response.status === 429) {
-          throw new Error(`Binance API rate limit (${response.status})`);
+          const error = new Error(`Binance API rate limit (${response.status})`);
+          error.name = "RateLimitError";
+          throw error;
+        }
+        if (response.status === 451) {
+          const error = new Error(`Binance API unavailable for legal reasons (${response.status})`);
+          error.name = "LegalRestrictionError";
+          throw error;
+        }
+        if (response.status >= 500) {
+          const error = new Error(`Binance API server error (${response.status})`);
+          error.name = "ServerError";
+          throw error;
         }
         throw new Error(`Binance API returned ${response.status}`);
       }
-      
-      const data = await response.json();
+
+      const data = response.data;
       const price = parseFloat(data.price);
+
+      if (!price || isNaN(price) || price <= 0) {
+        throw new Error("Invalid price data from Binance");
+      }
+
       console.log(`[BTCPriceService] Binance price result: $${price}`);
-      
+
       return {
         price,
-        source: "binance",
-        confidence: "high",
+        source: "binance" as const,
+        confidence: "high" as const,
         details: data,
       };
-    } catch (error) {
-      // Re-throw with message only, no stack trace logging
-      throw error;
-    }
+    });
+  }
+
+  /**
+   * Fetch from Kraken with circuit breaker protection (Free API)
+   */
+  private static async fetchFromKraken(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
+    return await this.circuitBreakers.kraken.execute(async () => {
+      const response = await httpClient.get(`${KRAKEN_API_BASE_URL}/Ticker?pair=XBTUSD`);
+
+      if (response.status !== 200) {
+        if (response.status === 429) {
+          const error = new Error(`Kraken API rate limit (${response.status})`);
+          error.name = "RateLimitError";
+          throw error;
+        }
+        if (response.status === 451) {
+          const error = new Error(`Kraken API unavailable for legal reasons (${response.status})`);
+          error.name = "LegalRestrictionError";
+          throw error;
+        }
+        if (response.status >= 500) {
+          const error = new Error(`Kraken API server error (${response.status})`);
+          error.name = "ServerError";
+          throw error;
+        }
+        throw new Error(`Kraken API returned ${response.status}`);
+      }
+
+      const data = response.data;
+      if (data.error && data.error.length > 0) {
+        throw new Error(`Kraken API error: ${data.error.join(', ')}`);
+      }
+
+      const price = parseFloat(data.result?.XXBTZUSD?.c?.[0]);
+      if (!price || isNaN(price) || price <= 0) {
+        throw new Error("Invalid price data from Kraken");
+      }
+
+      console.log(`[BTCPriceService] Kraken price result: $${price}`);
+
+      return {
+        price,
+        source: "kraken" as const,
+        confidence: "high" as const,
+        details: data.result,
+      };
+    });
+  }
+
+  /**
+   * Fetch from Coinbase with circuit breaker protection (Free API)
+   */
+  private static async fetchFromCoinbase(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
+    return await this.circuitBreakers.coinbase.execute(async () => {
+      const response = await httpClient.get(`${COINBASE_API_BASE_URL}/exchange-rates?currency=BTC`);
+
+      if (response.status !== 200) {
+        if (response.status === 429) {
+          const error = new Error(`Coinbase API rate limit (${response.status})`);
+          error.name = "RateLimitError";
+          throw error;
+        }
+        if (response.status === 451) {
+          const error = new Error(`Coinbase API unavailable for legal reasons (${response.status})`);
+          error.name = "LegalRestrictionError";
+          throw error;
+        }
+        if (response.status >= 500) {
+          const error = new Error(`Coinbase API server error (${response.status})`);
+          error.name = "ServerError";
+          throw error;
+        }
+        throw new Error(`Coinbase API returned ${response.status}`);
+      }
+
+      const data = response.data;
+      const price = parseFloat(data.data?.rates?.USD);
+
+      if (!price || isNaN(price) || price <= 0) {
+        throw new Error("Invalid price data from Coinbase");
+      }
+
+      console.log(`[BTCPriceService] Coinbase price result: $${price}`);
+
+      return {
+        price,
+        source: "coinbase" as const,
+        confidence: "high" as const,
+        details: data.data,
+      };
+    });
+  }
+
+  /**
+   * Fetch from Blockchain.info with circuit breaker protection (Free API)
+   */
+  private static async fetchFromBlockchain(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
+    return await this.circuitBreakers.blockchain.execute(async () => {
+      const response = await httpClient.get(`${BLOCKCHAIN_API_BASE_URL}/ticker`);
+
+      if (response.status !== 200) {
+        if (response.status === 429) {
+          const error = new Error(`Blockchain.info API rate limit (${response.status})`);
+          error.name = "RateLimitError";
+          throw error;
+        }
+        if (response.status === 451) {
+          const error = new Error(`Blockchain.info API unavailable for legal reasons (${response.status})`);
+          error.name = "LegalRestrictionError";
+          throw error;
+        }
+        if (response.status >= 500) {
+          const error = new Error(`Blockchain.info API server error (${response.status})`);
+          error.name = "ServerError";
+          throw error;
+        }
+        throw new Error(`Blockchain.info API returned ${response.status}`);
+      }
+
+      const data = response.data;
+      const price = data.USD?.last;
+
+      if (!price || typeof price !== 'number' || price <= 0) {
+        throw new Error("Invalid price data from Blockchain.info");
+      }
+
+      console.log(`[BTCPriceService] Blockchain.info price result: $${price}`);
+
+      return {
+        price,
+        source: "blockchain" as const,
+        confidence: "high" as const,
+        details: data.USD,
+      };
+    });
+  }
+
+  /**
+   * Fetch from Bitstamp with circuit breaker protection (Free API)
+   */
+  private static async fetchFromBitstamp(): Promise<Omit<BTCPriceData, 'timestamp' | 'fallbackUsed' | 'errors'> | null> {
+    return await this.circuitBreakers.bitstamp.execute(async () => {
+      const response = await httpClient.get(`${BITSTAMP_API_BASE_URL}/ticker/btcusd`);
+
+      if (response.status !== 200) {
+        if (response.status === 429) {
+          const error = new Error(`Bitstamp API rate limit (${response.status})`);
+          error.name = "RateLimitError";
+          throw error;
+        }
+        if (response.status === 451) {
+          const error = new Error(`Bitstamp API unavailable for legal reasons (${response.status})`);
+          error.name = "LegalRestrictionError";
+          throw error;
+        }
+        if (response.status >= 500) {
+          const error = new Error(`Bitstamp API server error (${response.status})`);
+          error.name = "ServerError";
+          throw error;
+        }
+        throw new Error(`Bitstamp API returned ${response.status}`);
+      }
+
+      const data = response.data;
+      const price = parseFloat(data.last);
+
+      if (!price || isNaN(price) || price <= 0) {
+        throw new Error("Invalid price data from Bitstamp");
+      }
+
+      console.log(`[BTCPriceService] Bitstamp price result: $${price}`);
+
+      return {
+        price,
+        source: "bitstamp" as const,
+        confidence: "high" as const,
+        details: data,
+      };
+    });
   }
 
   /**
@@ -314,5 +577,63 @@ export class BTCPriceService {
       staleIfError: this.CACHE_CONFIG.staleIfError,
     };
   }
-}
 
+  /**
+   * Get circuit breaker metrics for all sources
+   */
+  private static getCircuitBreakerMetrics(): Record<string, CircuitBreakerMetrics> {
+    const metrics: Record<string, CircuitBreakerMetrics> = {};
+    for (const [name, breaker] of Object.entries(this.circuitBreakers)) {
+      metrics[name] = breaker.getMetrics();
+    }
+    return metrics;
+  }
+
+  /**
+   * Get health status of all price sources
+   */
+  static getHealthStatus(): Record<string, boolean> {
+    const health: Record<string, boolean> = {};
+    for (const [name, breaker] of Object.entries(this.circuitBreakers)) {
+      health[name] = breaker.isHealthy();
+    }
+    return health;
+  }
+
+  /**
+   * Reset circuit breakers (for testing/admin purposes)
+   */
+  static resetCircuitBreakers(): void {
+    for (const breaker of Object.values(this.circuitBreakers)) {
+      breaker.reset();
+    }
+    console.log("[BTCPriceService] All circuit breakers reset");
+  }
+
+  /**
+   * Get detailed service metrics including circuit breaker status
+   */
+  static getServiceMetrics(): {
+    circuitBreakers: Record<string, CircuitBreakerMetrics>;
+    healthStatus: Record<string, boolean>;
+    permanentlyDisabled: Record<string, boolean>;
+    configuration: CircuitBreakerConfig;
+    sources: string[];
+    availableSources: string[];
+  } {
+    const permanentlyDisabled: Record<string, boolean> = {};
+    for (const [name, breaker] of Object.entries(this.circuitBreakers)) {
+      permanentlyDisabled[name] = breaker.isPermanentlyDisabled();
+    }
+
+    return {
+      circuitBreakers: this.getCircuitBreakerMetrics(),
+      healthStatus: this.getHealthStatus(),
+      permanentlyDisabled,
+      configuration: this.CIRCUIT_BREAKER_CONFIG,
+      sources: [...this.SOURCES],
+      availableSources: this.getAvailableSources(),
+    };
+  }
+
+}

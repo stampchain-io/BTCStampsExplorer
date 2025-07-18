@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "preact/hooks";
 import { Icon } from "$components/icon/IconBase.tsx";
 import { tooltipIcon } from "$notification";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 interface SortProps {
   searchParams?: URLSearchParams | undefined;
@@ -10,7 +10,7 @@ interface SortProps {
 }
 
 export function SortButton(
-  { searchParams, initSort, sortParam = "sortBy", onChangeSort }: SortProps,
+  { searchParams, initSort, sortParam = "sortBy" }: SortProps,
 ) {
   // Initialize sort based on URL parameter or initSort prop
   const sort = (() => {
@@ -32,23 +32,35 @@ export function SortButton(
   const [allowTooltip, setAllowTooltip] = useState(true);
   const tooltipTimeoutRef = useRef<number | null>(null);
 
-  const handleSort = () => {
+  // Helper function to determine the anchor based on sort parameter
+  const getSectionAnchor = (sortParam: string): string => {
+    switch (sortParam) {
+      case "stampsSortBy":
+        return "stamps";
+      case "src20SortBy":
+        return "src20";
+      case "dispensersSortBy":
+        return "dispensers";
+      default:
+        return "stamps";
+    }
+  };
+
+  // Generate the sort URL for Fresh.js partial navigation
+  const getSortUrl = (): string => {
+    // Check if we're in a browser environment
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return "/"; // Fallback URL during SSR
+    }
+
     const url = new URL(globalThis.location.href);
     const currentSort = url.searchParams.get(sortParam) || "DESC";
-
-    // Toggle between ASC and DESC
     const newSort = currentSort === "ASC" ? "DESC" : "ASC";
 
-    // Don't update state before page reload
-    setIsTooltipVisible(false);
-    setAllowTooltip(false);
-
-    // Call the onChangeSort callback if provided
-    onChangeSort?.(newSort);
-
-    // Update URL and reload page
     url.searchParams.set(sortParam, newSort);
-    globalThis.location.href = url.toString();
+    url.searchParams.set("anchor", getSectionAnchor(sortParam));
+
+    return url.toString();
   };
 
   // Add tooltip handlers
@@ -81,19 +93,24 @@ export function SortButton(
   }, []);
 
   return (
-    <div className="relative">
-      <Icon
-        type="iconButton"
-        name={sort === "DESC" ? "sortAsc" : "sortDesc"}
-        weight="bold"
-        size="custom"
-        color="purple"
-        className="mt-[4px] tablet:mt-[5px] w-[28px] h-[28px] tablet:w-[25px] tablet:h-[25px] transform transition-all duration-300"
-        ariaLabel={`Sort ${sort === "DESC" ? "ascending" : "descending"}`}
-        onClick={handleSort}
+    <div class="relative">
+      <a
+        href={getSortUrl()}
+        f-partial={getSortUrl()}
+        class="inline-block"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-      />
+      >
+        <Icon
+          type="iconButton"
+          name={sort === "DESC" ? "sortAsc" : "sortDesc"}
+          weight="bold"
+          size="custom"
+          color="purple"
+          className="mt-[4px] tablet:mt-[5px] w-[28px] h-[28px] tablet:w-[25px] tablet:h-[25px] transform transition-all duration-300"
+          ariaLabel={`Sort ${sort === "DESC" ? "ascending" : "descending"}`}
+        />
+      </a>
       <div
         className={`${tooltipIcon} ${
           isTooltipVisible ? "opacity-100" : "opacity-0"

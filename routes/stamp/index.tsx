@@ -1,16 +1,20 @@
 /* ===== STAMP OVERVIEW PAGE ===== */
-import { StampPageProps } from "$globals";
-import { Handlers } from "$fresh/server.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
-import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "$globals";
 import { StampOverviewContent } from "$content";
+import { Handlers } from "$fresh/server.ts";
+import {
+  STAMP_FILTER_TYPES,
+  STAMP_TYPES,
+  StampPageProps,
+  SUBPROTOCOLS,
+} from "$globals";
 import { StampOverviewHeader } from "$header";
 import {
   queryParamsToFilters,
   queryParamsToServicePayload,
   StampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
+import { StampController } from "$server/controller/stampController.ts";
+import { CollectionService } from "$server/services/collectionService.ts";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
@@ -154,7 +158,12 @@ export function StampOverviewPage(props: StampPageProps) {
           onPageChange: (newPage: number) => {
             const url = new URL(globalThis.location.href);
             url.searchParams.set("page", newPage.toString());
-            globalThis.location.href = url.toString();
+
+            // Use Fresh.js partial navigation
+            const link = document.createElement("a");
+            link.href = url.toString();
+            link.setAttribute("f-partial", "");
+            link.click();
           },
         }}
       />

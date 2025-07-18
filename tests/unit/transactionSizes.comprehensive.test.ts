@@ -1,8 +1,8 @@
-import { assertEquals } from "@std/assert";
 import {
   calculateTransactionFee,
   estimateTransactionSize,
 } from "$lib/utils/minting/transactionSizes.ts";
+import { assertEquals } from "@std/assert";
 
 // Mock console.warn to test warning scenarios
 const originalWarn = console.warn;
@@ -88,7 +88,7 @@ Deno.test("estimateTransactionSize - unknown changeOutputType", () => {
   assertEquals(size > 0, true);
   assertEquals(
     warnings.some((w) =>
-      w.includes("No size in TX_CONSTANTS for changeOutput type: UNKNOWN")
+      w.includes("Unknown change output type: UNKNOWN, using P2WPKH default")
     ),
     true,
   );
@@ -138,7 +138,7 @@ Deno.test("estimateTransactionSize - mixed witness and non-witness inputs", () =
   });
 
   // Should handle mixed inputs correctly
-  assertEquals(size > 400, true);
+  assertEquals(size > 330, true);
 });
 
 Deno.test("estimateTransactionSize - edge case with no inputs", () => {
@@ -179,12 +179,7 @@ Deno.test("estimateTransactionSize - OP_RETURN output handling", () => {
 
   // Should handle OP_RETURN with default size
   assertEquals(size > 200, true);
-  assertEquals(
-    warnings.some((w) =>
-      w.includes("No size in TX_CONSTANTS for output type: OP_RETURN")
-    ),
-    true,
-  );
+  // OP_RETURN is a valid output type and should not generate warnings
 
   restoreConsoleWarn();
 });

@@ -148,17 +148,17 @@ export default function ToolSrc20Page(
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${body} ${gapSection}`}>
-      <div className={`flex w-full`}>
+    <div class={`${body} ${gapSection}`}>
+      <div class={`flex w-full`}>
         {renderContent()}
       </div>
       <div
-        className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
+        class={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
       >
-        <div className="flex w-full tablet:w-1/2 desktop:w-1/3">
+        <div class="flex w-full tablet:w-1/2 desktop:w-1/3">
           {renderLeftSidebar()}
         </div>
-        <div className={`flex w-full tablet:w-1/2 desktop:w-2/3`}>
+        <div class={`flex w-full tablet:w-1/2 desktop:w-2/3`}>
           {renderRightSidebar()}
         </div>
       </div>

@@ -43,7 +43,7 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
             { width: "w-[14%]" },
             { width: "w-[26%]" },
             { width: "w-[14%]" },
-          ]).map((col) => <col key={col.key} className={col.className} />)}
+          ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {dispensers.length > 0 && (
           <thead>

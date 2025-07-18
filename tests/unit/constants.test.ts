@@ -1,4 +1,3 @@
-import { assert, assertEquals } from "@std/assert";
 import {
   AUDIO_FILE_IMAGE,
   BIG_LIMIT,
@@ -34,6 +33,7 @@ import {
   WALLET_PROVIDERS,
   type WalletProviderKey,
 } from "$lib/utils/constants.ts";
+import { assert, assertEquals } from "@std/assert";
 
 Deno.test("constants - breakpoints", () => {
   assertEquals(BREAKPOINTS.desktop, 1440, "Desktop breakpoint");
@@ -139,7 +139,7 @@ Deno.test("constants - image paths", () => {
   );
   assertEquals(
     STAMPCHAIN_OPENGRAPH_IMAGE,
-    "/img/logo/stampchain-logo-opengraph.jpg",
+    "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg",
     "Stampchain OpenGraph image",
   );
 
@@ -186,7 +186,7 @@ Deno.test("constants - image paths", () => {
 
 Deno.test("constants - carousel stamp IDs", () => {
   assertEquals(CAROUSEL_STAMP_IDS.length, 5, "Should have 5 carousel stamps");
-  assertEquals(CAROUSEL_STAMP_IDS, [42158, 336082, 57356, 368359, 74607]);
+  assertEquals(CAROUSEL_STAMP_IDS, [42158, 336082, 57356, 1163993, 74607]);
 
   // Verify all are positive numbers
   for (const id of CAROUSEL_STAMP_IDS) {

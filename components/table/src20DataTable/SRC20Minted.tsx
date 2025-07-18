@@ -56,7 +56,7 @@ export function SRC20MintedTable({
             { width: "w-[10%]" }, // VOLUME
             { width: "w-[15%]" }, // MARKETCAP
             { width: "w-[15%]" }, // CHART
-          ]).map((col) => <col key={col.key} className={col.className} />)}
+          ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>
           <tr>

@@ -60,7 +60,7 @@ export function UploadBackground(props: PropTypes) {
   /* ===== RENDER ===== */
   return (
     <>
-      <div className={body}>
+      <div class={body}>
         <h1 class={titlePurpleLD}>SRC20 STAMP UPLOAD</h1>
 
         <UploadImageTable data={data} />

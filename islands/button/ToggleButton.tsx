@@ -110,20 +110,20 @@ export const ToggleButton = ({
   };
 
   return (
-    <div className={getContainerClass()}>
+    <div class={getContainerClass()}>
       {options.map((option) => {
         const isDisabled = disabledOptions.includes(option);
 
         return (
           <div
             key={option}
-            className={`relative group ${
+            class={`relative group ${
               spacing === "evenFullwidth" ? "flex-1" : ""
             }`}
           >
             <button
               type="button"
-              className={`${getButtonClass(option)} ${
+              class={`${getButtonClass(option)} ${
                 spacing === "evenFullwidth" ? "w-full" : ""
               }`}
               onClick={() => handleClick(option)}
@@ -134,8 +134,8 @@ export const ToggleButton = ({
 
             {/* Coming Soon overlay text for disabled buttons */}
             {isDisabled && (
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-10">
-                <div className="text-stamp-grey-light text-xs font-bold">
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-10">
+                <div class="text-stamp-grey-light text-xs font-bold">
                   SOON™
                 </div>
               </div>
