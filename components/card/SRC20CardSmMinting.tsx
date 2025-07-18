@@ -62,7 +62,7 @@ export function SRC20CardSmMinting({
             width:
               "w-[33%] min-[600px]:w-[39%] tablet:w-[30%] min-[1280px]:w-[39%]",
           }, // MINT button
-        ]).map((col) => <col key={col.key} className={col.className} />)}
+        ]).map((col) => <col key={col.key} class={col.className} />)}
       </colgroup>
       <thead>
         <tr>

@@ -54,7 +54,7 @@ export function SRC20MintingTable({
             { width: "hidden tablet:w-[15%]" }, // DEPLOY
             { width: "hidden mobileLg:w-[12%]" }, // HOLDERS - hidden on mobile
             { width: "w-[24%] min-[600px]:w-[24%]" }, // MINT button
-          ]).map((col) => <col key={col.key} className={col.className} />)}
+          ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>
           <tr>

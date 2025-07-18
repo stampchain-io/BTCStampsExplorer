@@ -22,7 +22,7 @@ import { summarize_issuances } from "./index.ts";
 export class StampRepository {
   // Dependency injection support
   private static db: typeof dbManager = dbManager;
-  
+
   static setDatabase(database: typeof dbManager): void {
     this.db = database;
   }
@@ -63,7 +63,7 @@ export class StampRepository {
 
         const numericIds = validIdentifiers.filter((id): id is number =>
           isStampNumber(id)
-        ); 
+        );
         const txHashes = validIdentifiers.filter((id): id is string =>
           isTxHash(id)
         );
@@ -140,7 +140,7 @@ export class StampRepository {
       if (stampCondition) {
         whereConditions.push(`(${stampCondition})`);
       }
-    } else {  
+    } else {
       // For 'all' type, only exclude 'SRC-20'- this messes up the api/block route
       // stampCondition = "st.ident != 'SRC-20'";
       // whereConditions.push(`(${stampCondition})`);
@@ -190,26 +190,26 @@ export class StampRepository {
     // Handle combined filters (both suffix and fileType filters)
     if (combinedFilters && combinedFilters.length > 0) {
       // Separate file extensions (STAMP_SUFFIX_FILTERS) from other types
-      const fileExtensions = combinedFilters.filter(filter => 
+      const fileExtensions = combinedFilters.filter(filter =>
         ["gif", "jpg", "png", "webp", "bmp", "jpeg", "svg", "html"].includes(filter as string)
       ) as STAMP_SUFFIX_FILTERS[];
-      
+
       // Separate encoding filters (legacy/olga)
-      const encodingFilters = combinedFilters.filter(filter => 
+      const encodingFilters = combinedFilters.filter(filter =>
         ["legacy", "olga"].includes(filter as string)
       ) as STAMP_FILETYPES[];
-      
-      // Separate edition filters 
-      const editionFilters = combinedFilters.filter(filter => 
+
+      // Separate edition filters
+      const editionFilters = combinedFilters.filter(filter =>
         ["single", "multiple", "locked", "unlocked", "divisible"].includes(filter as string)
       ) as unknown as STAMP_EDITIONS[];
-      
+
       // Separate other file type filters (mimetype-based)
-      const mimetypeFilters = combinedFilters.filter(filter => 
+      const mimetypeFilters = combinedFilters.filter(filter =>
         ["jpg", "jpeg", "png", "gif", "webp", "avif", "bmp", "svg", "html", "txt", "mp3", "mpeg"].includes(filter as string) &&
         !["legacy", "olga", "single", "multiple", "locked", "unlocked", "divisible"].includes(filter as string)
       ) as STAMP_FILETYPES[];
-      
+
       // Process file extensions (URL-based filtering)
       if (fileExtensions.length > 0) {
         const suffixCondition = fileExtensions
@@ -217,12 +217,12 @@ export class StampRepository {
           .join(" OR ");
         whereConditions.push(`(${suffixCondition})`);
       }
-      
+
       // Process mimetype and encoding filters
       if (mimetypeFilters.length > 0 || encodingFilters.length > 0) {
         this.buildFileTypeFilterConditions([...mimetypeFilters, ...encodingFilters], whereConditions, queryParams);
       }
-      
+
       // Process edition filters
       if (editionFilters.length > 0) {
         this.buildEditionsFilterConditions(editionFilters, whereConditions, queryParams);
@@ -283,10 +283,10 @@ export class StampRepository {
     // Handle range filters
     if (range) {
       this.buildRangeFilterConditions(
-        range, 
-        whereConditions, 
-        queryParams, 
-        rangeMin, 
+        range,
+        whereConditions,
+        queryParams,
+        rangeMin,
         rangeMax
       );
     }
@@ -464,7 +464,7 @@ export class StampRepository {
     }
 
     const query = `
-      SELECT 
+      SELECT
         tx_hash,
         stamp_hash,
         stamp_mimetype,
@@ -667,7 +667,7 @@ export class StampRepository {
 
     // Use either the object or direct parameters
     let effectiveRange = range;
-    
+
     // If no range but direct parameters are provided, use those
     if (!effectiveRange && (rangeMin || rangeMax)) {
       effectiveRange = {
@@ -682,22 +682,22 @@ export class StampRepository {
 
     // Core stamp fields that are always needed
     const coreColumns = `
-      st.stamp, 
-      st.block_index, 
-      st.cpid, 
-      st.creator, 
-      cr.creator AS creator_name, 
-      st.divisible, 
-      st.keyburn, 
-      st.locked, 
-      st.stamp_url, 
+      st.stamp,
+      st.block_index,
+      st.cpid,
+      st.creator,
+      cr.creator AS creator_name,
+      st.divisible,
+      st.keyburn,
+      st.locked,
+      st.stamp_url,
       st.stamp_mimetype,
-      st.supply, 
-      st.block_time, 
-      st.tx_hash, 
-      st.tx_index, 
-      st.ident, 
-      st.stamp_hash, 
+      st.supply,
+      st.block_time,
+      st.tx_hash,
+      st.tx_index,
+      st.ident,
+      st.stamp_hash,
       st.file_hash
     `;
 
@@ -750,7 +750,7 @@ export class StampRepository {
 
     // Check if any market data filters are present (Task 42)
     const hasMarketDataFilters = !!(
-      filters?.minHolderCount || 
+      filters?.minHolderCount ||
       filters?.maxHolderCount ||
       filters?.minDistributionScore ||
       filters?.maxTopHolderPercentage ||
@@ -788,7 +788,7 @@ export class StampRepository {
         JOIN collection_stamps cs1 ON st.stamp = cs1.stamp
         LEFT JOIN creator AS cr ON st.creator = cr.address
       `;
-      
+
       // Add market data join if needed for collections
       if (hasMarketDataFilters) {
         joinClause += `
@@ -821,11 +821,11 @@ export class StampRepository {
         // Complex query for multiple collections with per-collection limits
         const subQuery = `
           WITH ValidStamps AS (
-            SELECT 
+            SELECT
               ${coreColumns},
               HEX(cs1.collection_id) as collection_id,
               ROW_NUMBER() OVER (
-                PARTITION BY cs1.collection_id 
+                PARTITION BY cs1.collection_id
                 ORDER BY st.${sortColumn} ${order}
               ) as rn
             FROM ${STAMP_TABLE} st
@@ -937,16 +937,16 @@ export class StampRepository {
       );
 
       const query = `
-        SELECT 
-          st.stamp, 
+        SELECT
+          st.stamp,
           st.tx_hash,
-          st.cpid, 
-          st.stamp_url, 
-          st.stamp_mimetype, 
-          st.divisible, 
-          st.supply, 
-          st.locked, 
-          st.creator, 
+          st.cpid,
+          st.stamp_url,
+          st.stamp_mimetype,
+          st.divisible,
+          st.supply,
+          st.locked,
+          st.creator,
           cr.creator AS creator_name
         FROM ${STAMP_TABLE} st
         LEFT JOIN creator cr ON st.creator = cr.address
@@ -1119,23 +1119,56 @@ export class StampRepository {
     };
   }
 
-  static async getSpecificStamp(tx_index: string): Promise<{ stamp_url: string, stamp_mimetype: string }>{
-     const query = `
-      SELECT stamp_url, stamp_mimetype
+  static async getSpecificStamp(identifier: string): Promise<{ stamp: number | undefined, stamp_url: string, stamp_mimetype: string }>{
+    // Determine the type of identifier
+    const idType = getIdentifierType(identifier);
+    
+    let whereClause: string;
+    let params: (string | number)[];
+    
+    switch (idType) {
+      case "stamp_number":
+        whereClause = "stamp = ?";
+        params = [Number(identifier)];
+        break;
+      case "tx_hash":
+        whereClause = "tx_hash = ?";
+        params = [identifier];
+        break;
+      case "stamp_hash":
+        whereClause = "stamp_hash = ?";
+        params = [identifier];
+        break;
+      case "cpid":
+        whereClause = "cpid = ?";
+        params = [identifier];
+        break;
+      default:
+        // Return empty result for invalid identifiers
+        return {
+          stamp: undefined,
+          stamp_url: '',
+          stamp_mimetype: ''
+        };
+    }
+    
+    const query = `
+      SELECT stamp, stamp_url, stamp_mimetype
       FROM ${STAMP_TABLE}
-      WHERE stamp = ?
+      WHERE ${whereClause}
+      LIMIT 1
     `;
-
 
     const result = await this.db.executeQueryWithCache(
       query,
-      [tx_index],
+      params,
       DEFAULT_CACHE_DURATION
     );
 
     return {
-      stamp_url: (result as any).rows[0]?.stamp_url || 0,
-      stamp_mimetype: (result as any).rows[0]?.stamp_mimetype || 0
+      stamp: (result as any).rows[0]?.stamp,
+      stamp_url: (result as any).rows[0]?.stamp_url || '',
+      stamp_mimetype: (result as any).rows[0]?.stamp_mimetype || ''
     };
   }
 
@@ -1153,10 +1186,10 @@ export class StampRepository {
     includeMarketData?: boolean;
   }): Promise<{ stamps: any[], total: number }> {
     const offset = (page - 1) * limit;
-    
-    // Query stamps with recent sales from market data
-    const query = `
-      SELECT 
+
+    // Use stamp_sales_history as primary source for recent sales
+    const salesHistoryQuery = `
+      SELECT DISTINCT
         s.stamp,
         s.cpid,
         s.stamp_url,
@@ -1170,92 +1203,113 @@ export class StampRepository {
         s.divisible,
         s.locked,
         ${includeMarketData ? `
-        -- Market data fields
-        smd.recent_sale_price_btc,
+        -- Sales data from stamp_sales_history
+        ssh.btc_amount,
+        ssh.unit_price_sats,
+        ssh.quantity,
+        ssh.buyer_address,
+        ssh.seller_address,
+        ssh.block_time as sale_time,
+        ssh.tx_hash as sale_tx_hash,
+        ssh.block_index as sale_block_index,
+        -- Market data fields (optional)
         smd.floor_price_btc,
         smd.volume_24h_btc,
         smd.volume_7d_btc,
         smd.holder_count,
-        smd.last_price_update,
-        smd.data_quality_score,
-        TIMESTAMPDIFF(MINUTE, smd.last_price_update, UTC_TIMESTAMP()) as minutes_since_sale
+        smd.data_quality_score
         ` : ''}
       FROM ${STAMP_TABLE} s
-      INNER JOIN stamp_market_data smd ON s.cpid = smd.cpid
-      WHERE 
-        -- Must have a recent sale
-        smd.last_price_update IS NOT NULL
-        -- Ensure good data quality
-        AND smd.data_quality_score >= 7
-        -- Optional: Only show sales from last 30 days for relevance
-        AND smd.last_price_update > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 DAY)
-      ORDER BY 
-        smd.last_price_update DESC
+      INNER JOIN stamp_sales_history ssh ON s.cpid = ssh.cpid
+      LEFT JOIN stamp_market_data smd ON s.cpid = smd.cpid
+      WHERE
+        -- Must have actual sale data
+        ssh.btc_amount > 0
+        AND ssh.unit_price_sats > 0
+      ORDER BY
+        ssh.block_time DESC
       LIMIT ? OFFSET ?
     `;
 
-    const countQuery = `
-      SELECT COUNT(*) as total
+    const salesHistoryCountQuery = `
+      SELECT COUNT(DISTINCT s.cpid) as total
       FROM ${STAMP_TABLE} s
-      INNER JOIN stamp_market_data smd ON s.cpid = smd.cpid
-      WHERE 
-        smd.last_price_update IS NOT NULL
-        AND smd.data_quality_score >= 7
-        AND smd.last_price_update > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 DAY)
+      INNER JOIN stamp_sales_history ssh ON s.cpid = ssh.cpid
+      WHERE
+        ssh.btc_amount > 0
+        AND ssh.unit_price_sats > 0
     `;
 
-    const [result, countResult] = await Promise.all([
-      this.db.executeQueryWithCache(query, [limit, offset], 60), // 1 minute cache
-      this.db.executeQueryWithCache(countQuery, [], 300) // 5 minute cache for count
-    ]);
+    try {
+      const [result, countResult] = await Promise.all([
+        this.db.executeQueryWithCache(salesHistoryQuery, [limit, offset], 60), // 1 minute cache
+        this.db.executeQueryWithCache(salesHistoryCountQuery, [], 300) // 5 minute cache for count
+      ]);
 
-    // Transform the data to include market data in expected format
-    const stamps = (result as any).rows.map((row: any) => {
-      const stamp = {
-        stamp: row.stamp,
-        cpid: row.cpid,
-        stamp_url: row.stamp_url,
-        stamp_mimetype: row.stamp_mimetype,
-        creator: row.creator,
-        tx_hash: row.tx_hash,
-        block_index: row.block_index,
-        block_time: row.block_time,
-        ident: row.ident,
-        supply: row.supply,
-        divisible: row.divisible,
-        locked: row.locked
-      };
+      const stamps = (result as any).rows || [];
+      const total = (countResult as any).rows[0]?.total || 0;
 
-      if (includeMarketData) {
-        return {
-          ...stamp,
-          marketData: {
-            recentSalePriceBTC: row.recent_sale_price_btc ? parseFloat(row.recent_sale_price_btc) : null,
-            floorPriceBTC: row.floor_price_btc ? parseFloat(row.floor_price_btc) : null,
-            volume24hBTC: row.volume_24h_btc ? parseFloat(row.volume_24h_btc) : 0,
-            volume7dBTC: row.volume_7d_btc ? parseFloat(row.volume_7d_btc) : 0,
-            holderCount: row.holder_count || 0,
-            lastPriceUpdate: row.last_price_update,
-            minutesSinceSale: row.minutes_since_sale,
-            dataQualityScore: row.data_quality_score ? parseFloat(row.data_quality_score) : 0,
-            // Enhanced transaction detail fields - set to null since columns don't exist yet
-            lastSaleBlockIndex: null,
-            lastSaleTxHash: null,
-            lastSaleBuyerAddress: null,
-            lastSaleDispenserAddress: null,
-            lastSaleBtcAmount: null,
-            lastSaleDispenserTxHash: null
+      // If we have data from sales history, use it
+      if (stamps.length > 0) {
+        console.log(`[RECENT SALES] Using stamp_sales_history: ${stamps.length} stamps found`);
+        console.log(`[RECENT SALES] Sample data:`, stamps[0]);
+
+        const transformedStamps = stamps.map((row: any) => {
+          const stamp = {
+            stamp: row.stamp,
+            cpid: row.cpid,
+            stamp_url: row.stamp_url,
+            stamp_mimetype: row.stamp_mimetype,
+            creator: row.creator,
+            tx_hash: row.tx_hash,
+            block_index: row.block_index,
+            block_time: row.block_time,
+            ident: row.ident,
+            supply: row.supply,
+            divisible: row.divisible,
+            locked: row.locked
+          };
+
+          if (includeMarketData) {
+            return {
+              ...stamp,
+              marketData: {
+                recentSalePriceBTC: row.unit_price_sats ? parseFloat(row.unit_price_sats) / 100000000 : null, // Convert sats to BTC
+                floorPriceBTC: row.floor_price_btc ? parseFloat(row.floor_price_btc) : null,
+                volume24hBTC: row.volume_24h_btc ? parseFloat(row.volume_24h_btc) : null,
+                volume7dBTC: row.volume_7d_btc ? parseFloat(row.volume_7d_btc) : null,
+                holderCount: row.holder_count || 0,
+                lastPriceUpdate: row.sale_time ? new Date(row.sale_time * 1000) : null, // Convert unix timestamp
+                dataQualityScore: row.data_quality_score || 0,
+                minutesSinceSale: row.sale_time ? Math.floor((Date.now() - (row.sale_time * 1000)) / 60000) : 0
+              },
+              sale_data: {
+                btc_amount: row.btc_amount ? parseFloat(row.btc_amount) : 0,
+                block_index: row.sale_block_index || row.block_index,
+                tx_hash: row.sale_tx_hash || row.tx_hash,
+                buyer_address: row.buyer_address,
+                seller_address: row.seller_address,
+                time_ago: row.sale_time ? this.getTimeAgo(new Date(row.sale_time * 1000)) : null,
+                btc_amount_satoshis: row.btc_amount ? Math.round(parseFloat(row.btc_amount) * 100000000) : null,
+                dispenser_tx_hash: null
+              }
+            };
           }
-        };
+
+          return stamp;
+        });
+
+        return { stamps: transformedStamps, total };
       }
 
-      return stamp;
-    });
+      // No sales found in stamp_sales_history
+      console.log(`[RECENT SALES] No recent sales found in stamp_sales_history`);
+      return { stamps: [], total: 0 };
 
-    return {
-      stamps,
-      total: (countResult as any).rows[0]?.total || 0
-    };
+    } catch (error) {
+      console.error(`[RECENT SALES] Error in getRecentlyActiveSold:`, error);
+      throw error;
+    }
   }
 
   /**
@@ -1270,14 +1324,14 @@ export class StampRepository {
     _queryParams: (string | number)[] // Not used - filetype filters are static SQL conditions
   ) {
     // Separate encoding filters (legacy/olga) from mimetype filters
-    const mimetypeFilters = filetypes.filter(type => 
+    const mimetypeFilters = filetypes.filter(type =>
       type !== "legacy" && type !== "olga"
     );
-    
-    const encodingFilters = filetypes.filter(type => 
+
+    const encodingFilters = filetypes.filter(type =>
       type === "legacy" || type === "olga"
     );
-    
+
     // Handle mimetype filters
     if (mimetypeFilters.length > 0) {
       const mimetypeConditions = mimetypeFilters.map(filetype => {
@@ -1304,12 +1358,12 @@ export class StampRepository {
         }
         return "";
       }).filter(Boolean);
-      
+
       if (mimetypeConditions.length > 0) {
         whereConditions.push(`(${mimetypeConditions.join(" OR ")})`);
       }
     }
-    
+
     // Handle encoding filters
     if (encodingFilters.length > 0) {
       const encodingCondition = this.buildEncodingFilterSQL(encodingFilters);
@@ -1321,18 +1375,18 @@ export class StampRepository {
 
   /**
    * Builds SQL conditions for filtering stamps by encoding type (legacy or OLGA)
-   * 
+   *
    * IMPORTANT: Legacy and OLGA are not database identifiers but encoding types:
    * - "legacy" = multisig encoding used before block 833000 (pre-Taproot activation)
    * - "olga" = P2WSH encoding used from block 833000 onwards (post-Taproot activation)
-   * 
+   *
    * These filters work by checking the block_index of when the stamp was created:
    * - legacy: st.block_index < 833000 (before Taproot activation)
    * - olga: st.block_index >= 833000 (after Taproot activation)
-   * 
+   *
    * This is consensus-critical logic - DO NOT modify the block height thresholds
    * without understanding the Bitcoin protocol changes.
-   * 
+   *
    * @param filters Array of file type filters that may include "legacy" or "olga"
    * @returns SQL condition string for filtering by encoding based on block height
    */
@@ -1340,18 +1394,18 @@ export class StampRepository {
     if (!filters || !filters.includes("legacy") && !filters.includes("olga")) {
       return "";
     }
-    
+
     let sql = "";
-    
+
     if (filters.includes("legacy")) {
       sql += "st.block_index < 833000";
     }
-    
+
     if (filters.includes("olga")) {
       if (sql) sql += " OR ";
       sql += "st.block_index >= 833000";
     }
-    
+
     return sql ? `(${sql})` : "";
   }
 
@@ -1370,25 +1424,25 @@ export class StampRepository {
     if (filters.fileType && filters.fileType.length > 0) {
       this.buildFileTypeFilterConditions(filters.fileType, whereConditions, queryParams);
     }
-    
+
     // Handle editions filters
     if (filters.editions && filters.editions.length > 0) {
       this.buildEditionsFilterConditions(filters.editions, whereConditions, queryParams);
     }
-    
+
     // Handle range filters
     if (filters.range && filters.range !== null) {
       this.buildRangeFilterConditions(filters.range, whereConditions, queryParams, filters.rangeMin || undefined, filters.rangeMax || undefined);
     }
-    
+
     // Handle market filters
     if (filters.market) {
       this.buildMarketFilterConditions([filters.market] as STAMP_MARKETPLACE[], whereConditions, queryParams, undefined, undefined);
     }
-    
+
     // Handle new market data filters (Task 42)
     this.buildMarketDataFilterConditions(filters, whereConditions, queryParams);
-    
+
     // Handle search text
     if (filters.search) {
       this.buildSearchConditions(filters.search, whereConditions, queryParams);
@@ -1409,48 +1463,48 @@ export class StampRepository {
     if (!editions || editions.length === 0) {
       return;
     }
-    
+
     // Group filters by category
     const supplyFilters = [];
     const lockFilters = [];
     const divisibilityFilters = [];
-    
+
     // Sort filters into their respective categories
     if (editions.includes("single")) {
       supplyFilters.push("st.supply = 1");
     }
-    
+
     if (editions.includes("multiple")) {
       supplyFilters.push("st.supply > 1");
     }
-    
+
     if (editions.includes("locked")) {
       lockFilters.push("st.locked = 1");
     }
-    
+
     if (editions.includes("unlocked")) {
       lockFilters.push("st.locked = 0");
     }
-    
+
     if (editions.includes("divisible")) {
       divisibilityFilters.push("st.divisible = 1");
     }
-    
+
     // Build category conditions - within each category use OR
     const categoryConditions = [];
-    
+
     if (supplyFilters.length > 0) {
       categoryConditions.push(`(${supplyFilters.join(" OR ")})`);
     }
-    
+
     if (lockFilters.length > 0) {
       categoryConditions.push(`(${lockFilters.join(" OR ")})`);
     }
-    
+
     if (divisibilityFilters.length > 0) {
       categoryConditions.push(`(${divisibilityFilters.join(" OR ")})`);
     }
-    
+
     // Combine categories with AND logic (must satisfy all selected categories)
     if (categoryConditions.length > 0) {
       whereConditions.push(categoryConditions.join(" AND "));
@@ -1574,7 +1628,7 @@ export class StampRepository {
   ) {
     // Note: These filters require joining with stamp_market_data table
     // The join should be handled in the main query when any market data filter is present
-    
+
     // Holder metrics
     if (filters.minHolderCount) {
       whereConditions.push("smd.holder_count >= ?");
@@ -1592,7 +1646,7 @@ export class StampRepository {
       whereConditions.push("smd.top_holder_percentage <= ?");
       queryParams.push(Number(filters.maxTopHolderPercentage));
     }
-    
+
     // Market metrics
     if (filters.minFloorPriceBTC) {
       whereConditions.push("smd.floor_price_btc >= ?");
@@ -1611,7 +1665,7 @@ export class StampRepository {
       // This might require a different join or approach
       console.log("Warning: minPriceChange24h filter requires src20_market_data join");
     }
-    
+
     // Data quality
     if (filters.minDataQualityScore) {
       whereConditions.push("smd.data_quality_score >= ?");
@@ -1641,5 +1695,17 @@ export class StampRepository {
       const searchTerm = `%${search.trim()}%`;
       queryParams.push(searchTerm, searchTerm, searchTerm);
     }
+  }
+
+  /**
+   * Calculate time ago string from date
+   */
+  private static getTimeAgo(date: Date): string {
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
   }
 }

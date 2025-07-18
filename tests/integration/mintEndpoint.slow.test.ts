@@ -1,21 +1,21 @@
+import { handler } from "$routes/api/v2/olga/mint.ts";
+import { StampValidationService } from "$server/services/stamp/stampValidationService.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { XcpManager } from "$server/services/xcpService.ts";
+import * as bitcoin from "bitcoinjs-lib";
 import {
   assertEquals,
   assertExists,
 } from "https://deno.land/std@0.208.0/assert/mod.ts";
 import { stub } from "https://deno.land/std@0.208.0/testing/mock.ts";
-import { handler } from "$routes/api/v2/olga/mint.ts";
 import { mintAddressUTXOs } from "../fixtures/utxoFixtures.mint.ts";
-import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
-import { StampMintService } from "$server/services/stamp/stampMintService.ts";
-import * as bitcoin from "bitcoinjs-lib";
 
 /**
  * Comprehensive test for the Olga mint endpoint with real UTXO data
  */
 Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
-  // Create a 31KB base64 encoded "image"
-  const create31KBImage = (): string => {
+  // Create a base64 encoded "image" of specified size
+  const createTestImage = (sizeInKB: number = 31): string => {
     // PNG header (8 bytes) + IHDR chunk (25 bytes) + data chunk header (8 bytes)
     const pngHeader = new Uint8Array([
       0x89,
@@ -53,8 +53,8 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
       0x00, // CRC placeholder
     ]);
 
-    // Create dummy data to reach 31KB
-    const targetSize = 31 * 1024;
+    // Create dummy data to reach target size
+    const targetSize = sizeInKB * 1024;
     const dataSize = targetSize - pngHeader.length - 12; // 12 for IEND chunk
     const dummyData = new Uint8Array(dataSize);
 
@@ -137,13 +137,30 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
       );
 
       // Mock XCP API calls
+      // The XCP API returns a raw transaction for issuance
+      // This is a minimal valid transaction with no inputs (as XCP would create)
+      // and one OP_RETURN output for the issuance data
+      const mockTxHex = "02000000" + // Version 2
+        "00" + // 0 inputs (XCP will add inputs later)
+        "01" + // 1 output (OP_RETURN for issuance data)
+        "0000000000000000" + // 0 value for OP_RETURN
+        "29" + // Script length (41 bytes)
+        "6a" + // OP_RETURN
+        "28" + // Push 40 bytes
+        // 40 bytes of dummy issuance data (XCP encoded)
+        "434e545250525459" + // "CNTRPRTY" prefix
+        "0000000000000014" + // Message ID 20 (issuance)
+        "0000000000000001" + // Asset quantity
+        "00000000000000000000000000000000" + // Rest of data
+        "00000000"; // Locktime
+
       const createIssuanceStub = stub(
         XcpManager,
         "createIssuance",
         () =>
           Promise.resolve({
             result: {
-              rawtransaction: "0200000000010000000000", // Minimal valid tx hex
+              rawtransaction: mockTxHex,
             },
           }),
       );
@@ -158,6 +175,13 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
           }),
       );
 
+      // Mock asset validation to avoid hitting real API
+      const checkAssetAvailabilityStub = stub(
+        StampValidationService,
+        "checkAssetAvailability",
+        () => Promise.resolve(true), // Return asset is available (doesn't exist)
+      );
+
       try {
         const requestBody = {
           sourceWallet: mintAddressUTXOs.address,
@@ -166,9 +190,9 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
           locked: true,
           divisible: false,
           filename: "test-31kb.png",
-          file: create31KBImage(),
+          file: createTestImage(31),
           satsPerVB: 1.1,
-          service_fee: 50000,
+          service_fee: 50, // Small 50 sat service fee
           service_fee_address: "bc1qnpszanef2ed9yxtqndvyxy72tdmnks6m28rn3d",
           prefix: "stamp",
           dryRun: false,
@@ -242,6 +266,7 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
         getRawTransactionHexStub.restore();
         createIssuanceStub.restore();
         getXcpBalancesByAddressStub.restore();
+        checkAssetAvailabilityStub.restore();
       }
     },
   );
@@ -259,13 +284,30 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
       () => Promise.resolve({ balances: [], total: 0 }),
     );
 
+    // The XCP API returns a raw transaction for issuance
+    // This is a minimal valid transaction with no inputs (as XCP would create)
+    // and one OP_RETURN output for the issuance data
+    const mockTxHex = "02000000" + // Version 2
+      "00" + // 0 inputs (XCP will add inputs later)
+      "01" + // 1 output (OP_RETURN for issuance data)
+      "0000000000000000" + // 0 value for OP_RETURN
+      "29" + // Script length (41 bytes)
+      "6a" + // OP_RETURN
+      "28" + // Push 40 bytes
+      // 40 bytes of dummy issuance data (XCP encoded)
+      "434e545250525459" + // "CNTRPRTY" prefix
+      "0000000000000014" + // Message ID 20 (issuance)
+      "0000000000000001" + // Asset quantity
+      "00000000000000000000000000000000" + // Rest of data
+      "00000000"; // Locktime
+
     const createIssuanceStub = stub(
       XcpManager,
       "createIssuance",
       () =>
         Promise.resolve({
           result: {
-            rawtransaction: "0200000000010000000000",
+            rawtransaction: mockTxHex,
           },
         }),
     );
@@ -278,9 +320,9 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
         locked: true,
         divisible: false,
         filename: "test.png",
-        file: create31KBImage(),
+        file: createTestImage(31), // Use 31KB image
         satsPerVB: 1.1,
-        service_fee: 50000,
+        service_fee: 50, // Small 50 sat service fee
         service_fee_address: "bc1qnpszanef2ed9yxtqndvyxy72tdmnks6m28rn3d",
         dryRun: true, // Enable dry run
       };
@@ -321,13 +363,30 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
       () => Promise.resolve({ balances: [], total: 0 }),
     );
 
+    // The XCP API returns a raw transaction for issuance
+    // This is a minimal valid transaction with no inputs (as XCP would create)
+    // and one OP_RETURN output for the issuance data
+    const mockTxHex = "02000000" + // Version 2
+      "00" + // 0 inputs (XCP will add inputs later)
+      "01" + // 1 output (OP_RETURN for issuance data)
+      "0000000000000000" + // 0 value for OP_RETURN
+      "29" + // Script length (41 bytes)
+      "6a" + // OP_RETURN
+      "28" + // Push 40 bytes
+      // 40 bytes of dummy issuance data (XCP encoded)
+      "434e545250525459" + // "CNTRPRTY" prefix
+      "0000000000000014" + // Message ID 20 (issuance)
+      "0000000000000001" + // Asset quantity
+      "00000000000000000000000000000000" + // Rest of data
+      "00000000"; // Locktime
+
     const createIssuanceStub = stub(
       XcpManager,
       "createIssuance",
       () =>
         Promise.resolve({
           result: {
-            rawtransaction: "0200000000010000000000",
+            rawtransaction: mockTxHex,
           },
         }),
     );
@@ -340,9 +399,9 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
         locked: true,
         divisible: false,
         filename: "test.png",
-        file: create31KBImage(),
+        file: createTestImage(15), // Use 15KB image
         satsPerVB: 1.1,
-        service_fee: 50000,
+        service_fee: 50, // Use 50 sat service fee
         service_fee_address: "bc1qnpszanef2ed9yxtqndvyxy72tdmnks6m28rn3d",
       };
 

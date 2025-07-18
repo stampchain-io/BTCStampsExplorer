@@ -8,7 +8,7 @@ interface ReadAllButtonProps {
 /* ===== COMPONENT ===== */
 export function ReadAllButton({ href = "/howto" }: ReadAllButtonProps) {
   return (
-    <div className="flex justify-end tablet:justify-start mt-0.5 tablet:mt-1">
+    <div class="flex justify-end tablet:justify-start mt-0.5 tablet:mt-1">
       <a
         href={href}
         target="_top"

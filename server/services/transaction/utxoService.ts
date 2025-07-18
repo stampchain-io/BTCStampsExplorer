@@ -1,9 +1,9 @@
-import type { Output, UTXO, BasicUTXO } from "$types/index.d.ts";
-import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
-import * as bitcoin from "bitcoinjs-lib";
 import { logger } from "$lib/utils/logger.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
+import { XcpManager } from "$server/services/xcpService.ts";
+import type { BasicUTXO, Output, UTXO } from "$types/index.d.ts";
+import * as bitcoin from "bitcoinjs-lib";
 
 export class UTXOService {
   private static readonly CHANGE_DUST = 1000;
@@ -16,16 +16,16 @@ export class UTXOService {
 
   async getAddressUTXOs(
     address: string,
-    options: { 
+    options: {
       includeAncestors?: boolean;
       filterStampUTXOs?: boolean;
       excludeUtxos?: Array<{ txid: string; vout: number }>;
     } = {}
   ): Promise<BasicUTXO[]> {
-    logger.debug("transaction-utxo-service", { 
-      message: "getAddressUTXOs called for basic UTXO list", 
-      address, 
-      options 
+    logger.debug("transaction-utxo-service", {
+      message: "getAddressUTXOs called for basic UTXO list",
+      address,
+      options
     });
 
     let basicUtxos = await this.commonUtxoService.getSpendableUTXOs(address, undefined, {
@@ -64,16 +64,16 @@ export class UTXOService {
         basicUtxos = basicUtxos.filter(
           (utxo) => !utxosToExcludeFromStamps.has(`${utxo.txid}:${utxo.vout}`),
         );
-        logger.info("transaction-utxo-service", { 
-          message: "Filtered stamp UTXOs from basic list", 
-          address, 
-          stampUtxosExcluded: preStampFilterCount - basicUtxos.length, 
-          remainingCount: basicUtxos.length 
+        logger.info("transaction-utxo-service", {
+          message: "Filtered stamp UTXOs from basic list",
+          address,
+          stampUtxosExcluded: preStampFilterCount - basicUtxos.length,
+          remainingCount: basicUtxos.length
         });
       } catch (error) {
-        logger.error("transaction-utxo-service", { 
-          message: "Error fetching stamps balance for UTXO exclusion (from basic list)", 
-          address, 
+        logger.error("transaction-utxo-service", {
+          message: "Error fetching stamps balance for UTXO exclusion (from basic list)",
+          address,
           error: (error as any).message
         });
       }
@@ -89,7 +89,7 @@ export class UTXOService {
       try {
         const outputScript = bitcoin.address.toOutputScript((output as any).address, bitcoin.networks.bitcoin);
         scriptSize = outputScript.length;
-      } catch (e) { 
+      } catch (e) {
         logger.warn("transaction-utxo-service", { message: "Could not determine script size for address", address: (output as any).address, error: (e as any).message });
         scriptSize = 34;
       }
@@ -161,7 +161,7 @@ export class UTXOService {
       // If fetchFullDetails is true, we need to replace the selected UTXOs with full details
       if (fetchFullDetails) {
         const fullUTXOs: UTXO[] = [];
-        
+
         for (const selectedUtxo of selectionResult.inputs) {
           console.log(`[UTXOService.selectUTXOsLogic] Fetching full details for buyer UTXO: ${selectedUtxo.txid}:${selectedUtxo.vout}`);
           const fullUtxo = await this.commonUtxoService.getSpecificUTXO(
@@ -169,33 +169,35 @@ export class UTXOService {
             selectedUtxo.vout,
             { includeAncestorDetails: true, confirmedOnly: false }
           );
-          
+
           if (!fullUtxo || !fullUtxo.script) {
-            logger.warn("transaction-utxo-service", { 
-              message: "Failed to fetch full details for UTXO in selectUTXOsLogic, skipping.", 
-              txid: selectedUtxo.txid, 
-              vout: selectedUtxo.vout 
+            logger.error("transaction-utxo-service", {
+              message: "Failed to fetch full UTXO details including script - this is required for PSBT creation",
+              txid: selectedUtxo.txid,
+              vout: selectedUtxo.vout,
+              fullUtxoExists: !!fullUtxo,
+              scriptExists: !!fullUtxo?.script
             });
-            // Try to continue with basic UTXO data
-            fullUTXOs.push(selectedUtxo);
+            // This is a critical error for PSBT creation - we cannot proceed without scripts
+            throw new Error(`Failed to fetch script (scriptPubKey) for UTXO ${selectedUtxo.txid}:${selectedUtxo.vout}. This is required for PSBT creation.`);
           } else {
             console.log(`[UTXOService.selectUTXOsLogic] For buyer UTXO ${selectedUtxo.txid}:${selectedUtxo.vout}, fetched fullUtxo.script (hex): ${fullUtxo.script}`);
             fullUTXOs.push(fullUtxo);
           }
         }
-        
+
         selectionResult.inputs = fullUTXOs;
       }
 
-      logger.info("transaction-utxo-service", { 
-        message: "UTXO selection successful using optimal algorithm", 
+      logger.info("transaction-utxo-service", {
+        message: "UTXO selection successful using optimal algorithm",
         algorithm: selectionResult.algorithm,
-        inputsSelected: selectionResult.inputs.length, 
-        totalInputValue: selectionResult.inputs.reduce((sum, u) => sum + u.value, 0), 
-        fee: selectionResult.fee, 
+        inputsSelected: selectionResult.inputs.length,
+        totalInputValue: selectionResult.inputs.reduce((sum, u) => sum + u.value, 0),
+        fee: selectionResult.fee,
         change: selectionResult.change,
         waste: selectionResult.waste,
-        fetchFullDetails 
+        fetchFullDetails
       });
 
       return {
@@ -204,11 +206,11 @@ export class UTXOService {
         fee: selectionResult.fee,
       };
     } catch (error) {
-      logger.error("transaction-utxo-service", { 
-        message: "Error in selectUTXOsLogic with optimal selection", 
-        error: (error as any).message, 
-        stack: (error as any).stack, 
-        fetchFullDetails 
+      logger.error("transaction-utxo-service", {
+        message: "Error in selectUTXOsLogic with optimal selection",
+        error: (error as any).message,
+        stack: (error as any).stack,
+        fetchFullDetails
       });
       throw error;
     }

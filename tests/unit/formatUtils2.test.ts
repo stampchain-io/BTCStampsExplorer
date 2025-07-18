@@ -1,4 +1,3 @@
-import { assertEquals } from "@std/assert";
 import {
   bigFloatToString,
   bigIntSerializer,
@@ -8,6 +7,7 @@ import {
   formatUSDValue,
   jsonStringifyWithBigInt,
 } from "$lib/utils/formatUtils.ts";
+import { assertEquals } from "@std/assert";
 import { BigFloat } from "bigfloat/mod.ts";
 
 Deno.test("formatSatoshisToUSD - basic conversion", () => {
@@ -93,10 +93,19 @@ Deno.test("bigFloatToString - no decimal part", () => {
 });
 
 Deno.test("bigIntSerializer - serializes bigint values", () => {
-  assertEquals(bigIntSerializer("key", 123n), "123");
-  assertEquals(bigIntSerializer("key", 0n), "0");
-  assertEquals(bigIntSerializer("key", -456n), "-456");
-  assertEquals(bigIntSerializer("key", 9007199254740991n), "9007199254740991");
+  assertEquals(bigIntSerializer("key", 123n), {
+    __type: "BigInt",
+    value: "123",
+  });
+  assertEquals(bigIntSerializer("key", 0n), { __type: "BigInt", value: "0" });
+  assertEquals(bigIntSerializer("key", -456n), {
+    __type: "BigInt",
+    value: "-456",
+  });
+  assertEquals(bigIntSerializer("key", 9007199254740991n), {
+    __type: "BigInt",
+    value: "9007199254740991",
+  });
 });
 
 Deno.test("bigIntSerializer - passes through non-bigint values", () => {
@@ -121,7 +130,7 @@ Deno.test("jsonStringifyWithBigInt - serializes objects with bigints", () => {
   const result = jsonStringifyWithBigInt(obj);
   assertEquals(
     result,
-    '{"regular":123,"bigint":"456","nested":{"value":"789","array":[1,"2",3]}}',
+    '{"regular":123,"bigint":{"__type":"BigInt","value":"456"},"nested":{"value":{"__type":"BigInt","value":"789"},"array":[1,{"__type":"BigInt","value":"2"},3]}}',
   );
 });
 

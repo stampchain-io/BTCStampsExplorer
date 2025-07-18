@@ -60,7 +60,7 @@ export function SRC20Card({
           { width: "hidden tablet:w-[12%]" }, // DEPLOY
           { width: "hidden mobileLg:w-[13%] tablet:w-[10%]" }, // HOLDERS
           { width: "hidden mobileMd:w-[16%] mobileLg:w-[22%] tablet:w-[26%]" }, // CHART
-        ]).map((col) => <col key={col.key} className={col.className} />)}
+        ]).map((col) => <col key={col.key} class={col.className} />)}
       </colgroup>
       <thead>
         <tr>

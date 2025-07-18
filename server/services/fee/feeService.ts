@@ -67,11 +67,11 @@ export class FeeService {
         feeData = await this.fetchFreshFeeData();
       } else {
         // Use Redis cache with fallback chain
-        feeData = await dbManager.handleCache<FeeData>(
+        feeData = await dbManager.handleCache(
           this.CACHE_KEY,
           () => this.fetchFreshFeeData(),
           this.CACHE_CONFIG.duration,
-        );
+        ) as FeeData;
       }
 
       const duration = Date.now() - startTime;

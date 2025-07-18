@@ -1,19 +1,19 @@
 import {
-  BIG_LIMIT,
-  SRC101_OWNERS_TABLE,
-  SRC101_TABLE,
-  SRC101_ALL_TABLE,
-  SRC101_RECIPIENTS_TABLE,
-  SRC101_PRICE_TABLE,
+    BIG_LIMIT,
+    SRC101_ALL_TABLE,
+    SRC101_OWNERS_TABLE,
+    SRC101_PRICE_TABLE,
+    SRC101_RECIPIENTS_TABLE,
+    SRC101_TABLE,
 } from "$lib/utils/constants.ts";
 
 import {
-  SRC101ValidTxTotalCountParams,
-  SRC101TxParams,
-  SRC101ValidTxParams,
-  SRC101TokenidsParams,
-  SRC101OwnerParams,
-  Src101BalanceParams,
+    SRC101OwnerParams,
+    SRC101TokenidsParams,
+    SRC101TxParams,
+    SRC101ValidTxParams,
+    SRC101ValidTxTotalCountParams,
+    Src101BalanceParams,
 } from "$globals";
 
 import { dbManager } from "$server/database/databaseManager.ts";
@@ -21,7 +21,7 @@ import { dbManager } from "$server/database/databaseManager.ts";
 export class SRC101Repository {
   // Dependency injection support
   private static db: typeof dbManager = dbManager;
-  
+
   static setDatabase(database: typeof dbManager): void {
     this.db = database;
   }
@@ -30,7 +30,7 @@ export class SRC101Repository {
     deploy_hash: string,
   ){
     const sqlQuery = `
-    SELECT 
+    SELECT
       len, price
     FROM
       ${SRC101_PRICE_TABLE}
@@ -111,8 +111,8 @@ export class SRC101Repository {
     if (params.tick) {
       whereClause += (whereClause ? " AND " : "") + `src101.tick = ?`;
       queryParams.push(params.tick);
-    }   
-     
+    }
+
     if (params.op) {
       whereClause += (whereClause ? " AND " : "") + `src101.op = ?`;
       queryParams.push(params.op);
@@ -136,7 +136,7 @@ export class SRC101Repository {
     const validOrder = "ASC";
 
     const sqlQuery = `
-      SELECT 
+      SELECT
         (@row_number:=@row_number + 1) AS row_num,
         src101.tx_hash,
         src101.block_index,
@@ -172,7 +172,7 @@ export class SRC101Repository {
       CROSS JOIN
         (SELECT @row_number := ?) AS init
       ${whereClause ? `WHERE ${whereClause}` : ""}
-      ORDER BY 
+      ORDER BY
         src101.tx_index ${validOrder}
       ${params.limit ? `LIMIT ? OFFSET ?` : ""};
     `;
@@ -246,7 +246,7 @@ export class SRC101Repository {
     deploy_hash: string,
   ) {
     let sqlQuery = `
-    SELECT 
+    SELECT
       address
     FROM
       ${SRC101_RECIPIENTS_TABLE}
@@ -256,7 +256,7 @@ export class SRC101Repository {
       sqlQuery,
       [deploy_hash],
       60 * 2, // Cache duration in seconds
-    ) as any).rows.map((result: any) => 
+    ) as any).rows.map((result: any) =>
       result["address"]
     );
 
@@ -265,7 +265,7 @@ export class SRC101Repository {
     whereClause += `tx_hash = ?`;
     queryParams.push(deploy_hash);
     sqlQuery = `
-    SELECT 
+    SELECT
       tx_hash,
       block_index,
       p,
@@ -310,7 +310,7 @@ export class SRC101Repository {
     deploy_hash: string,
   ) {
     const sqlQuery = `
-    SELECT 
+    SELECT
       COUNT(*)
     FROM
       ${SRC101_OWNERS_TABLE}
@@ -368,7 +368,7 @@ export class SRC101Repository {
 
     const validOrder = "ASC";
     const sqlQuery = `
-      SELECT 
+      SELECT
         (@row_number:=@row_number + 1) AS row_num,
         src101.tx_hash,
         src101.block_index,
@@ -399,13 +399,13 @@ export class SRC101Repository {
       CROSS JOIN
         (SELECT @row_number := ?) AS init
       ${whereClause ? `WHERE ${whereClause}` : ""}
-      ORDER BY 
+      ORDER BY
         src101.tx_index ${validOrder}
       ${params.limit ? `LIMIT ? OFFSET ?` : ""};
     `;
 
     queryParams.unshift(offset);
-    
+
     return (await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
@@ -425,18 +425,18 @@ export class SRC101Repository {
     {
       const queryParams = [];
       const whereClauses = [];
-  
+
       if (params.address) {
         whereClauses.push(`owner = ?`);
         queryParams.push(params.address);
       }
-  
+
       const sqlQuery = `
         SELECT COUNT(*)
         FROM ${SRC101_OWNERS_TABLE}
         WHERE ${whereClauses.join(" AND ")}
       `;
-  
+
       const total = (await this.db.executeQueryWithCache(
         sqlQuery,
         queryParams,
@@ -482,6 +482,31 @@ export class SRC101Repository {
     return results;
   }
 
+  static async getPrimaryDomainForAddress(
+    address: string,
+  ): Promise<string | null> {
+    const sqlQuery = `
+      SELECT tokenid_utf8
+      FROM ${SRC101_OWNERS_TABLE}
+      WHERE owner = ? AND prim = 1 AND expire_timestamp > ?
+      ORDER BY last_update DESC
+      LIMIT 1
+    `;
+
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    const result = await this.db.executeQueryWithCache(
+      sqlQuery,
+      [address, currentTimestamp],
+      60 * 2, // Cache duration in seconds
+    ) as any;
+
+    if (result?.rows?.length > 0) {
+      return result.rows[0].tokenid_utf8;
+    }
+
+    return null;
+  }
+
   static async getTotalSrc101TokenidsCount(
       params: SRC101TokenidsParams
     ) {
@@ -492,7 +517,7 @@ export class SRC101Repository {
       } = params;
       const queryParams = [];
       const whereClauses = [];
-  
+
       if (deploy_hash) {
         whereClauses.push(`deploy_hash = ?`);
         queryParams.push(deploy_hash);
@@ -503,16 +528,16 @@ export class SRC101Repository {
       }
       whereClauses.push(`prim = ?`);
       queryParams.push(prim);
-  
+
       whereClauses.push(`expire_timestamp > ?`);
       queryParams.push(new Date().getTime() / 1000);
-  
+
       const sqlQuery = `
       SELECT COUNT(*) AS total
       FROM ${SRC101_OWNERS_TABLE}
       WHERE ${whereClauses.join(" AND ")}
     `;
-  
+
       const results = (await this.db.executeQueryWithCache(
         sqlQuery,
         queryParams,

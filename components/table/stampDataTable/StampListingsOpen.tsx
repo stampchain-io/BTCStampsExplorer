@@ -61,7 +61,7 @@ export function StampListingsOpenTable({
                   width:
                     "w-[23%] min-[420px]:w-[23%] min-[880px]:w-[23%] min-[1080px]:w-[23%]",
                 },
-              ]).map((col) => <col key={col.key} className={col.className} />)}
+              ]).map((col) => <col key={col.key} class={col.className} />)}
             </colgroup>
             <thead>
               <tr>

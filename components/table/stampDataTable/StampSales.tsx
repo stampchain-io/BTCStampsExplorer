@@ -28,7 +28,7 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
       <table class={`${valueSm} w-full`}>
         <colgroup>
           {colGroup().map((col) => (
-            <col key={col.key} className={col.className} />
+            <col key={col.key} class={col.className} />
           ))}
         </colgroup>
         {dispenses.length > 0 && (
@@ -59,10 +59,10 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
                     }}
                     className={valueSmLink}
                   >
-                    <span className="tablet:hidden">
+                    <span class="tablet:hidden">
                       {abbreviateAddress(dispense.source, 4)}
                     </span>
-                    <span className="hidden tablet:inline">
+                    <span class="hidden tablet:inline">
                       {abbreviateAddress(dispense.source, 6)}
                     </span>
                   </a>
@@ -77,10 +77,10 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
                     }}
                     className={valueSmLink}
                   >
-                    <span className="tablet:hidden">
+                    <span class="tablet:hidden">
                       {abbreviateAddress(dispense.destination, 4)}
                     </span>
-                    <span className="hidden tablet:inline">
+                    <span class="hidden tablet:inline">
                       {abbreviateAddress(dispense.destination, 6)}
                     </span>
                   </a>

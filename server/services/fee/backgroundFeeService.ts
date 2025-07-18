@@ -1,6 +1,6 @@
+import { logger } from "$lib/utils/logger.ts";
 import { FeeService } from "$server/services/fee/feeService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
-import { logger } from "$lib/utils/logger.ts";
 
 export class BackgroundFeeService {
   private static intervalId: number | null = null;
@@ -31,9 +31,20 @@ export class BackgroundFeeService {
 
     this.isRunning = true;
 
-    // Initial cache warming
-    this.warmFeeCache();
-    this.warmPriceCache();
+    // Initial cache warming - run asynchronously to not block server startup
+    this.warmFeeCache().catch((error) => {
+      logger.error("stamps", {
+        message: "Initial fee cache warming failed during startup",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
+
+    this.warmPriceCache().catch((error) => {
+      logger.error("stamps", {
+        message: "Initial price cache warming failed during startup",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
 
     // Set up intervals for regular cache warming
     this.intervalId = setInterval(() => {
@@ -267,4 +278,4 @@ export class BackgroundFeeService {
   static get running(): boolean {
     return this.isRunning;
   }
-} 
+}

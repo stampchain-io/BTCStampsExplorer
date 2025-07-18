@@ -1,20 +1,20 @@
 import {
-  MarketListingAggregated,
-  PaginatedSrc20ResponseBody,
-  Src20BalanceResponseBody,
-  Src20ResponseBody,
-  SRC20Row,
-  Src20SnapShotDetail,
-  SRC20SnapshotRequestParams,
-  SRC20TrxRequestParams,
+    MarketListingAggregated,
+    PaginatedSrc20ResponseBody,
+    Src20BalanceResponseBody,
+    Src20ResponseBody,
+    SRC20Row,
+    Src20SnapShotDetail,
+    SRC20SnapshotRequestParams,
+    SRC20TrxRequestParams,
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { paginate } from "$lib/utils/paginationUtils.ts";
+import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { Big } from "big";
-import { SRC20MarketService } from "./marketService.ts";
 import { SRC20UtilityService } from "./utilityService.ts";
 
 // Define missing types
@@ -393,8 +393,8 @@ export class SRC20QueryService {
         ...params,
         tick: params.tick
           ? (Array.isArray(params.tick)
-            ? params.tick.map((t) => t.replace(/[^\w-]/g, ""))
-            : params.tick.replace(/[^\w-]/g, ""))
+            ? params.tick.map((t) => t && typeof t === 'string' ? t.replace(/[^\w-]/g, "") : t).filter(Boolean)
+            : typeof params.tick === 'string' ? params.tick.replace(/[^\w-]/g, "") : params.tick)
           : params.tick,
         dateFrom: params.dateFrom ? new Date(params.dateFrom).toISOString() : undefined,
         dateTo: params.dateTo ? new Date(params.dateTo).toISOString() : undefined,
@@ -643,7 +643,7 @@ export class SRC20QueryService {
           options.includeMarketData
             ? (options.prefetchedMarketData && options.prefetchedMarketData.length > 0)
               ? options.prefetchedMarketData
-              : (console.log("No prefetched market data available, fetching from external API"), await SRC20MarketService.fetchMarketListingSummary())
+              : this.fetchMarketDataFromCache(ticks) // Use cached data instead of external API
             : null,
           options.enrichWithProgress
             ? Promise.all(ticks.map(tick =>
@@ -655,17 +655,23 @@ export class SRC20QueryService {
         // Enrich market data and holders
         if (marketData) {
           const marketMap = new Map(
-            marketData.map(item => [item.tick.toUpperCase(), item])
+            marketData
+              .map(item => [item.tick?.toUpperCase(), item] as [string | undefined, any])
+              .filter(([key]) => key) as [string, any][] // Filter out null/undefined keys and assert type
           );
           batch.forEach((row, index) => {
-            const tickForLookup = row.tick.toUpperCase();
-            const market = marketMap.get(tickForLookup);
-            if (market) {
-              (enriched[i + index] as any).market_data = market;
-              (enriched[i + index] as any).holders = row.holders || market.holder_count || 0;
+            const tickForLookup = row.tick?.toUpperCase();
+            if (tickForLookup) {
+              const market = marketMap.get(tickForLookup);
+              if (market) {
+                (enriched[i + index] as any).market_data = market;
+                (enriched[i + index] as any).holders = row.holders || (market as any).holder_count || 0;
+              } else {
+                // Optional: Log if a tick is not found in the market map, can be noisy
+                console.log(`[enrichData] Market data not found for tick: '${row.tick}' (lookup key: '${tickForLookup}')`);
+              }
             } else {
-              // Optional: Log if a tick is not found in the market map, can be noisy
-              console.log(`[enrichData] Market data not found for tick: '${row.tick}' (lookup key: '${tickForLookup}')`);
+              console.warn(`[enrichData] Invalid tick value (null/undefined) for row at index ${i + index}`);
             }
           });
         }
@@ -690,6 +696,56 @@ export class SRC20QueryService {
       console.error("Error in enrichData:", error);
       // On error, return original data without enrichment
       return data;
+    }
+  }
+
+  /**
+   * Fetch market data from the cached src20_market_data table for specific ticks
+   * This is much more efficient than calling external APIs
+   */
+  private static async fetchMarketDataFromCache(ticks: string[]): Promise<MarketListingAggregated[]> {
+    try {
+      console.log(`[fetchMarketDataFromCache] Fetching market data for ${ticks.length} ticks from cache`);
+
+      // Fetch market data for each tick from the cache
+      const marketDataPromises = ticks.map(tick =>
+        MarketDataRepository.getSRC20MarketData(tick).catch(() => null)
+      );
+
+      const marketDataResults = await Promise.all(marketDataPromises);
+
+      // Convert to MarketListingAggregated format for compatibility
+      const marketListingData: MarketListingAggregated[] = [];
+
+      marketDataResults.forEach((marketData) => {
+        if (marketData) {
+          marketListingData.push({
+            tick: marketData.tick,
+            floor_unit_price: marketData.floorPriceBTC || 0,
+            mcap: marketData.marketCapBTC || 0,
+            volume24: marketData.volume24hBTC || 0,
+            stamp_url: null, // Not available in SRC20MarketData
+            tx_hash: "", // Not available in SRC20MarketData
+            holder_count: marketData.holderCount || 0,
+            market_data: {
+              stampscan: {
+                price: marketData.marketCapBTC || 0,
+                volume24: marketData.volume24hBTC || 0
+              },
+              openstamp: {
+                price: marketData.marketCapBTC || 0,
+                volume24: marketData.volume24hBTC || 0
+              }
+            }
+          });
+        }
+      });
+
+      console.log(`[fetchMarketDataFromCache] Retrieved ${marketListingData.length} market data entries from cache`);
+      return marketListingData;
+    } catch (error) {
+      console.error("[fetchMarketDataFromCache] Error fetching market data from cache:", error);
+      return []; // Return empty array on error
     }
   }
 }

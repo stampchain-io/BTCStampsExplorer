@@ -8,6 +8,9 @@ interface MetaTagsProps {
   description?: string;
   image?: string;
   skipImage?: boolean;
+  skipTitle?: boolean;
+  skipDescription?: boolean;
+  skipOgMeta?: boolean;
 }
 
 export function MetaTags({
@@ -15,6 +18,9 @@ export function MetaTags({
   description = "Unprunable UTXO Art, Because Sats Don't Exist",
   image = STAMPCHAIN_OPENGRAPH_IMAGE,
   skipImage = false,
+  skipTitle = false,
+  skipDescription = false,
+  skipOgMeta = false,
 }: MetaTagsProps) {
   return (
     <>
@@ -40,12 +46,16 @@ export function MetaTags({
       <link rel="canonical" href="https://stampchain.io" />
 
       {/* OpenGraph tags */}
-      <meta property="og:title" content="Stampchain.io" key="og-title" />
-      <meta
-        property="og:description"
-        content={description}
-        key="og-description"
-      />
+      {!skipTitle && (
+        <meta property="og:title" content="Stampchain.io" key="og-title" />
+      )}
+      {!skipDescription && (
+        <meta
+          property="og:description"
+          content={description}
+          key="og-description"
+        />
+      )}
       {/* Conditionally add og:image - skip if page has its own */}
       {!skipImage && (
         <>
@@ -63,26 +73,44 @@ export function MetaTags({
           />
         </>
       )}
-      <meta property="og:type" content="website" key="og-type" />
-      <meta property="og:url" content="https://stampchain.io" key="og-url" />
-      <meta property="og:locale" content="en_US" key="og-locale" />
+      {!skipOgMeta && (
+        <>
+          <meta property="og:type" content="website" key="og-type" />
+          <meta
+            property="og:url"
+            content="https://stampchain.io"
+            key="og-url"
+          />
+          <meta property="og:locale" content="en_US" key="og-locale" />
+        </>
+      )}
 
       {/* Twitter Card tags */}
-      <meta
-        name="twitter:card"
-        content="summary_large_image"
-        key="twitter-card"
-      />
-      <meta name="twitter:title" content="stampchain.io" key="twitter-title" />
+      {!skipOgMeta && (
+        <meta
+          name="twitter:card"
+          content="summary_large_image"
+          key="twitter-card"
+        />
+      )}
+      {!skipTitle && (
+        <meta
+          name="twitter:title"
+          content="stampchain.io"
+          key="twitter-title"
+        />
+      )}
       {/* Conditionally add twitter:image - skip if page has its own */}
       {!skipImage && (
         <meta name="twitter:image" content={image} key="twitter:image" />
       )}
-      <meta
-        name="twitter:description"
-        content={description}
-        key="twitter-description"
-      />
+      {!skipDescription && (
+        <meta
+          name="twitter:description"
+          content={description}
+          key="twitter-description"
+        />
+      )}
     </>
   );
 }

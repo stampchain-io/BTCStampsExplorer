@@ -18,13 +18,13 @@ export function Article(
 ) {
   /* ===== COMPONENT RENDER ===== */
   return (
-    <div className={`${body} ${gapSection}`}>
-      <div className={bodyArticle}>
+    <div class={`${body} ${gapSection}`}>
+      <div class={bodyArticle}>
         {/* ===== MAIN CONTENT SECTION ===== */}
         <section>
           {/* ===== HEADER ===== */}
-          <h1 className={titleGreyLD}>{title}</h1>
-          <h2 className={subtitleGrey}>{subtitle}</h2>
+          <h1 class={titleGreyLD}>{title}</h1>
+          <h2 class={subtitleGrey}>{subtitle}</h2>
 
           {/* ===== FEATURED IMAGE ===== */}
           <img
@@ -44,11 +44,11 @@ export function Article(
           {/* ===== IMPORTANT NOTES SECTION ===== */}
           {importantNotes?.length > 0 && (
             <div class="mt-0">
-              <p className={`${headingGrey} !text-stamp-grey-light mb-0`}>
+              <p class={`${headingGrey} !text-stamp-grey-light mb-0`}>
                 IMPORTANT
               </p>
               {importantNotes.map((note, index) => (
-                <p key={index} className={text}>
+                <p key={index} class={text}>
                   {note}
                 </p>
               ))}

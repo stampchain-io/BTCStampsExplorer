@@ -67,17 +67,17 @@ export default function ToolStampingPage({ data }: PageProps<StampPageData>) {
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${body} ${gapSection}`}>
-      <div className={`flex w-full`}>
+    <div class={`${body} ${gapSection}`}>
+      <div class={`flex w-full`}>
         <StampingTool />
       </div>
       <div
-        className={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
+        class={`flex flex-col tablet:flex-row justify-between ${gapSection}`}
       >
-        <div className="flex w-full tablet:w-1/2">
+        <div class="flex w-full tablet:w-1/2">
           <StampingHowto />
         </div>
-        <div className="flex flex-col w-full tablet:w-1/2 items-start tablet:items-end gap-6">
+        <div class="flex flex-col w-full tablet:w-1/2 items-start tablet:items-end gap-6">
           <StampGallery {...latestStampsSection} />
         </div>
       </div>

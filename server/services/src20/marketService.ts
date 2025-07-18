@@ -1,7 +1,9 @@
-import { serverConfig } from "$server/config/config.ts";
 import { MarketListingAggregated, OpenStampMarketData, StampScanMarketData } from "$lib/types/marketData.d.ts";
+import { serverConfig } from "$server/config/config.ts";
+import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 
 const OPENSTAMP_API_KEY = serverConfig.OPENSTAMP_API_KEY;
+const httpClient = new FetchHttpClient();
 
 export class SRC20MarketService {
   static async fetchMarketListingSummary(): Promise<MarketListingAggregated[]> {
@@ -53,7 +55,7 @@ export class SRC20MarketService {
       const stampScanPrice = stampScanItem?.floor_unit_price ?? Infinity;
       const openStampPrice = openStampItem && openStampItem.price ? Number(openStampItem.price) / 1e8 : Infinity; // Added check for openStampItem.price
       const floor_unit_price = Math.min(stampScanPrice, openStampPrice);
-      
+
       // Calculate market cap using the lower price
       const totalSupply = openStampItem?.totalSupply ?? 0;
       const mcap = (floor_unit_price !== Infinity && totalSupply > 0) ? floor_unit_price * totalSupply : 0; // Avoid Infinity * 0 or Infinity * number
@@ -108,18 +110,18 @@ export class SRC20MarketService {
   }
 
   private static async fetchStampScanMarketData(): Promise<StampScanMarketData[]> {
-    const response = await fetch("https://api.stampscan.xyz/market/listingSummary");
+    const response = await httpClient.get("https://api.stampscan.xyz/market/listingSummary");
     if (!response.ok) {
-      const errorText = await response.text().catch(() => "Could not read error response text");
-      console.error(`[SRC20MarketService] Failed to fetch market listing summary from StampScan. Status: ${response.status}, Text: ${errorText}`);
+      console.error(`[SRC20MarketService] Failed to fetch market listing summary from StampScan. Status: ${response.status}, Text: ${response.data}`);
       throw new Error(`Failed to fetch market listing summary from StampScan. Status: ${response.status}`);
     }
-    const rawData = await response.text();
+
     try {
-      const data = JSON.parse(rawData);
+      const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
       return Array.isArray(data) ? data : (data?.data && Array.isArray(data.data) ? data.data : []); // Handle potential variations in response structure
     } catch (e) {
-      console.error("[SRC20MarketService] Error parsing StampScan JSON:", e, "Raw data:", rawData.substring(0, 500) + "...");
+      const rawDataPreview = typeof response.data === 'string' ? response.data.substring(0, 500) + "..." : JSON.stringify(response.data).substring(0, 500) + "...";
+      console.error("[SRC20MarketService] Error parsing StampScan JSON:", e, "Raw data:", rawDataPreview);
       throw new Error("Error parsing StampScan JSON");
     }
   }
@@ -134,16 +136,14 @@ export class SRC20MarketService {
         console.warn("[SRC20MarketService] OPENSTAMP_API_KEY is not set. OpenStamp API might fail or return limited data.");
       }
 
-      const response = await fetch(url, { headers });
+      const response = await httpClient.get(url, { headers });
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => "Could not read error response text");
-        console.error(`[SRC20MarketService] HTTP Error fetching from OpenStamp: ${response.status} ${response.statusText}. Text: ${errorText}`);
+        console.error(`[SRC20MarketService] HTTP Error fetching from OpenStamp: ${response.status} ${response.statusText}. Text: ${response.data}`);
         return [];
       }
-      
-      const rawData = await response.text();
-      const data = JSON.parse(rawData);
+
+      const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
 
       // Ensure `data.data` is an array, otherwise return an empty array
       if (data && Array.isArray(data.data)) { // Check if data itself is not null/undefined
@@ -152,7 +152,7 @@ export class SRC20MarketService {
          return data;
       }else {
         console.warn("[SRC20MarketService] Unexpected data format from OpenStamp: data.data is not an array or root is not an array. Received:", JSON.stringify(data, null, 2).substring(0,500) + "...");
-        return [];
+        return []; // Return empty array to maintain type consistency
       }
     } catch (error) {
       console.error("[SRC20MarketService] Fetch Error from OpenStamp:", error instanceof Error ? error.message : String(error));

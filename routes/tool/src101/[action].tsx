@@ -57,8 +57,8 @@ export default function ToolsSrc101Page(
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${body} ${gapSection}`}>
-      <div className={`flex w-full`}>
+    <div class={`${body} ${gapSection}`}>
+      <div class={`flex w-full`}>
         {renderContent()}
       </div>
       <div class="flex w-full">

@@ -202,7 +202,7 @@ export default function StampDetailPage(props: StampDetailPageProps) {
   const title = htmlTitle
     ? htmlTitle.toUpperCase()
     : stamp?.cpid?.startsWith("A")
-    ? `Bitcoin Stamp #${stamp?.stamp || ""} - stampchain.io`
+    ? `Bitcoin Stamp #${stamp?.stamp || ""}`
     : stamp?.cpid || "Stamp Not Found";
 
   // Update the getMetaImageInfo and add dimension handling
@@ -215,21 +215,12 @@ export default function StampDetailPage(props: StampDetailPageProps) {
       };
     }
 
-    // For HTML/SVG content, use preview endpoint with known dimensions
-    if (
-      stamp.stamp_mimetype === "text/html" ||
-      stamp.stamp_mimetype === "image/svg+xml"
-    ) {
-      return {
-        url: `${baseUrl}/api/v2/stamp/${stamp.stamp}/preview`,
-        width: 1200,
-        height: 1200,
-      };
-    }
-
-    // For direct images, use original URL and dimensions
+    // For all content, use preview endpoint
+    // Default to square (1200x1200) since most stamps are square
     return {
-      url: stamp.stamp_url,
+      url: `${baseUrl}/api/v2/stamp/${stamp.stamp}/preview`,
+      width: 1200,
+      height: 1200, // Square format works best for both X and Telegram
     };
   };
 
@@ -237,8 +228,8 @@ export default function StampDetailPage(props: StampDetailPageProps) {
   const baseUrl = new URL(props.url || "").origin.replace(/^http:/, "https:");
   const metaInfo = getMetaImageInfo(stamp, baseUrl);
   const metaDescription = stamp
-    ? `Bitcoin Stamp #${stamp.stamp} - ${stamp.name || "Unprunable UTXO Art"}`
-    : "Bitcoin Stamp - Unprunable UTXO Art";
+    ? stamp.name || "Unprunable UTXO Art"
+    : "Unprunable UTXO Art";
 
   /* ===== SECTION CONFIGURATION ===== */
   const latestStampsSection = {
@@ -300,6 +291,8 @@ export default function StampDetailPage(props: StampDetailPageProps) {
         {/* Primary og:image - stamp preview (should override app-level meta tag) */}
         <meta property="og:image" content={metaInfo.url} key="og:image" />
         <meta property="og:type" content="website" key="og-type" />
+        <meta property="og:url" content={props.url} key="og-url" />
+        <meta property="og:locale" content="en_US" key="og-locale" />
         <meta
           name="twitter:card"
           content="summary_large_image"
@@ -313,21 +306,22 @@ export default function StampDetailPage(props: StampDetailPageProps) {
         />
         {/* Primary twitter:image - stamp preview (should override app-level meta tag) */}
         <meta name="twitter:image" content={metaInfo.url} key="twitter:image" />
-        {/* Only add dimension meta tags if we have the dimensions */}
-        {metaInfo.width && metaInfo.height && (
-          <>
-            <meta
-              property="og:image:width"
-              content={metaInfo.width.toString()}
-              key="og:image:width"
-            />
-            <meta
-              property="og:image:height"
-              content={metaInfo.height.toString()}
-              key="og:image:height"
-            />
-          </>
-        )}
+        <meta
+          name="twitter:image:alt"
+          content={`Bitcoin Stamp #${stamp?.stamp || ""}`}
+          key="twitter:image:alt"
+        />
+        {/* Always use 1200x1200 for all stamps */}
+        <meta
+          property="og:image:width"
+          content="1200"
+          key="og:image:width"
+        />
+        <meta
+          property="og:image:height"
+          content="1200"
+          key="og:image:height"
+        />
       </Head>
 
       <div class={`${body} ${gapSectionSlim}`}>

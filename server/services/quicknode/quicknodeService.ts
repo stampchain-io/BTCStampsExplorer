@@ -1,5 +1,13 @@
+import { BLOCKCHAIN_API_BASE_URL, MAX_XCP_RETRIES } from "$lib/utils/constants.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { MAX_XCP_RETRIES, BLOCKCHAIN_API_BASE_URL } from "$lib/utils/constants.ts";
+import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
+
+// Create httpClient instance for QuickNode service
+const httpClient = new FetchHttpClient(
+  10000, // defaultTimeout
+  3,     // defaultRetries
+  1000   // defaultRetryDelay
+);
 
 // Interface for QuickNode estimatesmartfee response
 interface EstimateSmartFeeResponse {
@@ -22,18 +30,18 @@ export class QuicknodeService {
   private static getQuickNodeUrl(): string {
     const endpoint = serverConfig.QUICKNODE_ENDPOINT;
     const apiKey = serverConfig.QUICKNODE_API_KEY;
-    
+
     if (!endpoint || !apiKey) {
       throw new Error("QuickNode API configuration is missing or invalid");
     }
-    
+
     // Ensure the endpoint doesn't already contain a protocol
     const formattedEndpoint = endpoint.replace(/^https?:\/\//, '');
-    
+
     // Return the properly formatted URL
     return `https://${formattedEndpoint}/${apiKey}`;
   }
-  
+
   // For logging and error reporting, use this safe version that hides the API key
   private static getSafeEndpointForLogs(): string {
     const endpoint = serverConfig.QUICKNODE_ENDPOINT;
@@ -48,29 +56,27 @@ export class QuicknodeService {
   ): Promise<any> {
     try {
       // Log the request without exposing sensitive information
-      console.log("Fetching from QuickNode:", { 
-        method, 
+      console.log("Fetching from QuickNode:", {
+        method,
         paramsCount: params.length,
-        endpoint: this.getSafeEndpointForLogs() 
+        endpoint: this.getSafeEndpointForLogs()
       });
-      
+
       // Get the URL only when needed, never store it
       const quicknodeUrl = this.getQuickNodeUrl();
-      const response = await fetch(quicknodeUrl, {
-        method: "POST",
+      const response = await httpClient.post(quicknodeUrl, {
+        id: 1,
+        jsonrpc: "2.0",
+        method,
+        params,
+      }, {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          id: 1,
-          jsonrpc: "2.0",
-          method,
-          params,
-        }),
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
+        const errorText = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
         console.error(
           `Error: response for method: ${method} unsuccessful. Response: ${response.status} - ${errorText}`,
         );
@@ -87,7 +93,7 @@ export class QuicknodeService {
         );
       }
 
-      const result = await response.json();
+      const result = response.data;
       return result;
     } catch (error) {
       // Log detailed error information without exposing sensitive data
@@ -95,10 +101,10 @@ export class QuicknodeService {
         error: error instanceof Error ? error.message : String(error),
         method,
         paramsCount: params.length,
-        endpoint: this.getSafeEndpointForLogs(), 
+        endpoint: this.getSafeEndpointForLogs(),
         retryCount: retries,
       });
-      
+
       if (retries < MAX_XCP_RETRIES) {
         console.log(`Retrying QuickNode request... (${retries + 1}/${MAX_XCP_RETRIES})`);
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -140,13 +146,13 @@ export class QuicknodeService {
   private static async fallbackGetRawTx(txHash: string): Promise<string> {
     console.log(`Attempting fallback for transaction: ${txHash}`);
     try {
-      const response = await fetch(
+      const response = await httpClient.get(
         `${BLOCKCHAIN_API_BASE_URL}/rawtx/${txHash}?format=hex`,
       );
       if (!response.ok) {
         throw new Error(`Blockchain.info API error: ${response.status}`);
       }
-      const rawTx = await response.text();
+      const rawTx = response.data;
       return rawTx;
     } catch (error) {
       console.error(`ERROR: Fallback failed for tx:`, error);
@@ -184,19 +190,19 @@ export class QuicknodeService {
   ): Promise<NormalizedFeeEstimate | null> {
     const method = "estimatesmartfee";
     const params = [confTarget, estimateMode];
-    
+
     try {
       console.log(`[QuickNode] Estimating smart fee for ${confTarget} blocks (${estimateMode} mode)`);
-      
+
       const result = await this.fetchQuicknode(method, params);
-      
+
       if (!result?.result) {
         console.error("[QuickNode] estimatesmartfee: No result in response");
         return null;
       }
 
       const feeData: EstimateSmartFeeResponse = result.result;
-      
+
       // Check for errors in the response
       if (feeData.errors && feeData.errors.length > 0) {
         console.error("[QuickNode] estimatesmartfee errors:", feeData.errors);
@@ -214,10 +220,10 @@ export class QuicknodeService {
       // 1 kB = 1000 vB (virtual bytes)
       // Formula: (feerate_btc_per_kb * 100000000) / 1000
       const feeRateSatsPerVB = Math.round((feeData.feerate * 100000000) / 1000);
-      
+
       // Ensure minimum fee rate of 1 sat/vB
       const normalizedFeeRate = Math.max(feeRateSatsPerVB, 1);
-      
+
       // Determine confidence based on confirmation target
       let confidence: 'high' | 'medium' | 'low';
       if (confTarget <= 2) {
@@ -243,7 +249,7 @@ export class QuicknodeService {
       });
 
       return estimate;
-      
+
     } catch (error) {
       console.error("[QuickNode] estimateSmartFee failed:", {
         error: error instanceof Error ? error.message : String(error),
@@ -261,12 +267,12 @@ export class QuicknodeService {
    */
   static async getMultipleFeeEstimates(): Promise<{
     fast: NormalizedFeeEstimate | null;    // 1-2 blocks
-    normal: NormalizedFeeEstimate | null;  // 6 blocks  
+    normal: NormalizedFeeEstimate | null;  // 6 blocks
     economy: NormalizedFeeEstimate | null; // 144 blocks
   }> {
     try {
       console.log("[QuickNode] Fetching multiple fee estimates");
-      
+
       // Fetch all estimates in parallel
       const [fastEstimate, normalEstimate, economyEstimate] = await Promise.all([
         this.estimateSmartFee(1, 'conservative'),  // Fast: 1 block, conservative
@@ -279,7 +285,7 @@ export class QuicknodeService {
         normal: normalEstimate,
         economy: economyEstimate
       };
-      
+
     } catch (error) {
       console.error("[QuickNode] getMultipleFeeEstimates failed:", error);
       return {
@@ -289,4 +295,4 @@ export class QuicknodeService {
       };
     }
   }
-} 
+}
