@@ -5,10 +5,9 @@
 // Set development environment
 Deno.env.set("DENO_ENV", "development");
 
-import "preact/debug";
-import dev from "$fresh/dev.ts";
-import build from "$fresh/dev.ts";
 import config from "$/fresh.config.ts";
+import { default as build, default as dev } from "$fresh/dev.ts";
+import "preact/debug";
 
 if (Deno.args.includes("build")) {
   await build(import.meta.url, "./main.ts", config);

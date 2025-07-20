@@ -196,61 +196,8 @@ describe("SRC20Controller Performance Benchmarks", () => {
       );
     });
 
-    it("should measure fetchFullyMintedByMarketCapV2 performance", async () => {
-      if (!serverAvailable || skipPerformanceTests) {
-        console.log("⏭️ Skipping performance test - server not available");
-        return;
-      }
-
-      const metrics: PerformanceMetrics[] = [];
-      const tracker = new PerformanceTracker();
-
-      console.log(
-        `🔄 Running ${BENCHMARK_ITERATIONS} iterations for fetchFullyMintedByMarketCapV2...`,
-      );
-
-      for (let i = 0; i < BENCHMARK_ITERATIONS; i++) {
-        try {
-          tracker.start();
-
-          const response = await fetch(
-            `${BASE_URL}/api/v2/src20/tickers/fully-minted?limit=10&page=1`,
-            {
-              headers: {
-                "X-API-Version": "2.3",
-                "Accept": "application/json",
-              },
-              signal: AbortSignal.timeout(10000),
-            },
-          );
-
-          assertEquals(response.ok, true, "Request should succeed");
-          await response.json();
-
-          const metric = tracker.end();
-          metrics.push(metric);
-
-          if (i % 5 === 0) {
-            console.log(
-              `  ⏱️ Iteration ${i + 1}: ${metric.responseTime.toFixed(2)}ms`,
-            );
-          }
-        } catch (error) {
-          console.warn(`  ⚠️ Iteration ${i + 1} failed:`, error);
-        }
-      }
-
-      const stats = PerformanceTracker.calculateStats(metrics);
-
-      console.log(`📊 fetchFullyMintedByMarketCapV2 Performance Results:`);
-      console.log(
-        `  Average Response Time: ${stats.responseTime.toFixed(2)}ms`,
-      );
-      console.log(`  95th Percentile: ${stats.p95.toFixed(2)}ms`);
-      console.log(`  99th Percentile: ${stats.p99.toFixed(2)}ms`);
-
-      assert(stats.responseTime < ACCEPTABLE_RESPONSE_TIME);
-    });
+    // Removed fetchFullyMintedByMarketCapV2 performance test - method no longer exists
+    // Using frontend filtering on /api/v2/src20?op=DEPLOY instead
 
     it("should measure fetchTrendingActiveMintingTokensV2 performance", async () => {
       if (!serverAvailable || skipPerformanceTests) {
@@ -336,13 +283,14 @@ describe("SRC20Controller Performance Benchmarks", () => {
             ? "tickers/fully-minted?limit=5"
             : "tickers/trending?limit=5";
 
-          const requests = Array.from({ length: requestsPerEndpoint }, () =>
-            fetch(`${BASE_URL}/api/v2/src20/${endpoint}`, {
-              headers: { "X-API-Version": "2.3" },
-              signal: AbortSignal.timeout(15000),
-            }).then((r) =>
-              r.json()
-            ));
+          const requests = Array.from(
+            { length: requestsPerEndpoint },
+            () =>
+              fetch(`${BASE_URL}/api/v2/src20/${endpoint}`, {
+                headers: { "X-API-Version": "2.3" },
+                signal: AbortSignal.timeout(15000),
+              }).then((r) => r.json()),
+          );
 
           return Promise.all(requests);
         },
@@ -683,7 +631,6 @@ describe("SRC20Controller Performance Benchmarks", () => {
 
       const baselines = {
         handleSrc20BalanceRequest: 0,
-        fetchFullyMintedByMarketCapV2: 0,
         fetchTrendingActiveMintingTokensV2: 0,
         timestamp: Date.now(),
       };
@@ -693,10 +640,6 @@ describe("SRC20Controller Performance Benchmarks", () => {
         {
           name: "handleSrc20BalanceRequest",
           url: "DEPLOY?limit=10&sortBy=DESC",
-        },
-        {
-          name: "fetchFullyMintedByMarketCapV2",
-          url: "tickers/fully-minted?limit=10",
         },
         {
           name: "fetchTrendingActiveMintingTokensV2",
@@ -742,11 +685,6 @@ describe("SRC20Controller Performance Benchmarks", () => {
       console.log(
         `  handleSrc20BalanceRequest: ${
           baselines.handleSrc20BalanceRequest.toFixed(2)
-        }ms`,
-      );
-      console.log(
-        `  fetchFullyMintedByMarketCapV2: ${
-          baselines.fetchFullyMintedByMarketCapV2.toFixed(2)
         }ms`,
       );
       console.log(

@@ -304,7 +304,7 @@ export interface MarketDataFilters {
 // Utility type for handling emoji ticks
 export interface EmojiTickHandling {
   ensureUnicodeEscape: (tick: string) => string; // For DB operations
-  convertToEmoji: (tick: string) => string; // For display
+  unicodeEscapeToEmoji: (tick: string) => string; // For display (updated from deprecated convertToEmoji)
   isEmojiFormat: (tick: string) => boolean;
   isUnicodeEscapeFormat: (tick: string) => boolean;
   isURLEncodedFormat: (tick: string) => boolean;
@@ -428,6 +428,8 @@ export interface SRC20Row {
   x?: string;
   holders: number;
   floor_unit_price?: number;
+  fee_rate_sat_vb: number | null;
+  fee: number | null;
   mcap?: number;
   top_mints_percentage?: number;
   volume_7d?: number;
@@ -1021,18 +1023,5 @@ declare namespace NodeJS {
     // Add other environment variables here if needed
   }
 }
-
-// Add mockTxData to globalThis for testing purposes
-// declare global {
-//   // eslint-disable-next-line no-var
-//   var mockTxData: {
-//     vout: Array<{
-//       scriptPubKey: {
-//         type: string;
-//         hex: string;
-//       };
-//     }>;
-//   };
-// }
 
 export {};

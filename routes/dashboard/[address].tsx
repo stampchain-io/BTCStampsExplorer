@@ -1,17 +1,15 @@
 /* ===== WALLET DASHBOARD PAGE ===== */
 /*@baba - FINETUNE PAGE */
+import { WalletDashboardContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import { WalletOverviewInfo, WalletPageProps } from "$lib/types/index.d.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
-import { enrichTokensWithMarketData } from "$server/services/src20Service.ts";
-import { PaginatedResponse } from "$lib/types/pagination.d.ts";
 import { DispenserRow, SRC20Row, StampRow } from "$globals";
 import { WalletDashboardHeader } from "$header";
 import WalletDashboardDetails from "$islands/content/WalletDashboardDetails.tsx";
-import { WalletDashboardContent } from "$content";
+import { WalletOverviewInfo, WalletPageProps } from "$lib/types/index.d.ts";
+import { PaginatedResponse } from "$lib/types/pagination.d.ts";
+import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { StampController } from "$server/controller/stampController.ts";
 
 /* ===== HELPERS ===== */
 /**
@@ -68,7 +66,6 @@ export const handler: Handlers = {
         btcInfoResponse,
         dispensersResponse,
         stampsCreatedCount,
-        marketDataResponse,
       ] = await Promise.allSettled([
         // Stamps with sorting and pagination
         StampController.getStampBalancesByAddress(
@@ -85,6 +82,7 @@ export const handler: Handlers = {
           limit: src20Params.limit || 10,
           page: src20Params.page || 1,
           includeMintData: true,
+          includeMarketData: true, // 🚀 FIX: Use controller's built-in market data
           sortBy: src20SortBy,
         }),
 
@@ -105,7 +103,6 @@ export const handler: Handlers = {
         ),
 
         StampController.getStampsCreatedCount(address),
-        MarketDataRepository.getAllSRC20MarketData(1000),
       ]);
 
       /* ===== DATA PROCESSING ===== */
@@ -132,20 +129,22 @@ export const handler: Handlers = {
       const src20Data = src20Response.status === "fulfilled"
         ? {
           ...src20Response.value,
-          data: enrichTokensWithMarketData(
-            src20Response.value.data,
-            marketDataResponse.status === "fulfilled"
-              ? marketDataResponse.value
-              : [],
-          ),
+          data: src20Response.value.data, // Use the data directly from the response
         } as PaginatedResponse<SRC20Row>
         : { data: [], total: 0, page: 1, limit: 10, totalPages: 0 };
 
       // Calculate total SRC20 value from enriched tokens
       const src20Value = src20Data.data.reduce((total, token: any) => {
-        // token.value is added by enrichTokensWithMarketData
-        // it's floor_unit_price * amt
-        return total + (token.value || 0);
+        // For v2.3, market data is in token.market_data
+        const marketData = token.market_data;
+        if (marketData?.floor_price_btc && token.amt) {
+          const quantity = typeof token.amt === "bigint"
+            ? Number(token.amt)
+            : token.amt;
+          const valueInBTC = marketData.floor_price_btc * quantity;
+          return total + valueInBTC;
+        }
+        return total;
       }, 0);
 
       const dispensersData = dispensersResponse.status === "fulfilled"
@@ -290,27 +289,35 @@ export const handler: Handlers = {
 
 /* ===== PAGE COMPONENT ===== */
 export default function DashboardPage(props: WalletPageProps) {
-  const { data } = props;
+  const {
+    data,
+    walletData,
+    stampsTotal,
+    src20Total,
+    stampsCreated,
+    stampsSortBy,
+    src20SortBy,
+  } = props;
 
   /* ===== RENDER ===== */
   return (
     <div class="flex flex-col gap-6" f-client-nav>
       <WalletDashboardHeader />
       <WalletDashboardDetails
-        walletData={data.walletData as WalletOverviewInfo}
-        stampsTotal={data.stampsTotal}
-        src20Total={data.src20Total}
-        stampsCreated={data.stampsCreated}
-        setShowItem={() => {}}
+        walletData={walletData as WalletOverviewInfo}
+        stampsTotal={stampsTotal}
+        src20Total={src20Total}
+        stampsCreated={stampsCreated}
+        setShowItem={() => {}} // Add missing required prop
       />
       <WalletDashboardContent
-        stamps={data.data.stamps}
-        src20={data.data.src20}
-        dispensers={data.data.dispensers}
-        address={data.walletData.address as string}
-        anchor={data.anchor}
-        stampsSortBy={props.stampsSortBy ?? "DESC"}
-        src20SortBy={props.src20SortBy ?? "DESC"}
+        stamps={data.stamps}
+        src20={data.src20}
+        dispensers={data.dispensers}
+        address={walletData.address}
+        anchor=""
+        stampsSortBy={stampsSortBy || "DESC"}
+        src20SortBy={src20SortBy || "DESC"}
       />
     </div>
   );

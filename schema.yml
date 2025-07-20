@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Stampchain - OpenAPI 3.0
   description: Stampchain API UI
-  version: 2.2.0
+  version: 2.3.0
   license:
     name: GNU Affero General Public License v3.0
     url: https://www.gnu.org/licenses/agpl-3.0.html
@@ -705,7 +705,15 @@ paths:
       description: |
         Retrieves a paginated list of valid SRC-20 transactions with optional market data filtering.
         The new filters allow querying based on holder metrics, price ranges, volume, and data quality.
+        API version 2.3 includes enhanced market data in responses.
       parameters:
+        - in: header
+          name: API-Version
+          schema:
+            type: string
+            default: "2.3"
+            example: "2.3"
+          description: Specify the API version (2.2 for legacy format, 2.3 for enhanced market data)
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Page"
         - $ref: "#/components/parameters/Sort"
@@ -788,24 +796,36 @@ paths:
         - SRC-20
         - Balance
       summary: Get SRC-20 balances by BTC wallet address
-      description: Retrieves all SRC-20 token balances for a specific Bitcoin address.
+      description: |
+        Retrieves all SRC-20 token balances for a specific Bitcoin address.
+        API version 2.3 includes enhanced market data in nested marketData objects.
+        API version 2.2 maintains legacy flat structure for backward compatibility.
       parameters:
         - in: path
           name: address
           required: true
-          example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
+          description: The address of the wallet
           schema:
             type: string
-          description: The address of the wallet
+          example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
+        - in: header
+          name: API-Version
+          schema:
+            type: string
+            default: "2.3"
+            example: "2.3"
+          description: Specify the API version (2.2 for legacy format, 2.3 for enhanced market data)
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Page"
       responses:
         "200":
-          description: Successful response
+          description: Successful response with SRC-20 balance data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedSrc20BalanceResponseBody"
+                oneOf:
+                  - $ref: "#/components/schemas/PaginatedSrc20BalanceResponseBody"
+                  - $ref: "#/components/schemas/PaginatedSrc20WithMarketDataResponseBody"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -1887,8 +1907,13 @@ paths:
       tags:
         - Stamps
         - Balance
-      summary: Get stamp balances by address
-      description: Retrieve all stamp balances for a specific Bitcoin address.
+      summary: Get stamp balances by address with optional enhanced features
+      description: |
+        Retrieve all stamp balances for a specific Bitcoin address.
+        Use the 'enhanced=true' parameter to enable advanced features including:
+        - Market data integration with individual stamp values
+        - Advanced sorting options (value, quantity, stamp number, recent activity)
+        - Bulk market data optimization for better performance
       parameters:
         - in: path
           name: address
@@ -1897,15 +1922,40 @@ paths:
           description: The address to retrieve stamp balances for
           schema:
             type: string
+        - in: query
+          name: enhanced
+          schema:
+            type: boolean
+            default: true
+          description: Enable enhanced features with market data and advanced sorting
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            default: "DESC"
+            enum:
+              - ASC
+              - DESC
+              - value_desc
+              - value_asc
+              - quantity_desc
+              - quantity_asc
+              - stamp_desc
+              - stamp_asc
+              - recent_desc
+              - recent_asc
+          description: Sort order for stamps (requires enhanced=true for advanced options)
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Page"
       responses:
         "200":
-          description: Successful response
+          description: Successful response with stamp balance data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedStampBalanceResponseBody"
+                oneOf:
+                  - $ref: "#/components/schemas/PaginatedStampBalanceResponseBody"
+                  - $ref: "#/components/schemas/EnhancedStampBalanceResponseBody"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -2467,7 +2517,7 @@ components:
         floorPriceUSD:
           type: number
           nullable: true
-          description: "Floor price converted to USD using current BTC/USD exchange rate"
+          description: "Floor price converted to USD (floorPrice * BTC/USD rate)"
         marketCapUSD:
           type: number
           nullable: true
@@ -2513,18 +2563,8 @@ components:
           type: string
         file_hash:
           type: string
-        floorPrice:
-          type: number
-          nullable: true
-          description: "Current floor price in BTC. Uses lowest open dispenser price, or most recent closed dispenser price if no open dispensers exist"
-        floorPriceUSD:
-          type: number
-          nullable: true
-          description: "Floor price converted to USD using current BTC/USD exchange rate"
-        marketCapUSD:
-          type: number
-          nullable: true
-          description: "Market capitalization in USD (supply * floorPrice * BTC/USD rate)"
+        # NOTE: Root-level price fields removed in v2.3 - use marketData.floorPriceBTC instead
+        # floorPrice, floorPriceUSD, marketCapUSD are available in v2.2 only
     BlockStampRow:
       type: object
       properties:
@@ -2569,6 +2609,8 @@ components:
           type: string
         file_hash:
           type: string
+        # NOTE: Root-level price fields removed in v2.3 - use marketData.floorPriceBTC instead
+        # NOTE: Fee fields (fee_rate_sat_vb, fee) are only in transaction-specific endpoints, not stamp schemas
 
     SRC20Balance:
       type: object
@@ -2642,6 +2684,7 @@ components:
           nullable: true
         destination_name:
           type: string
+        # NOTE: Fee fields (fee_rate_sat_vb, fee) are only in transaction-specific endpoints like /api/v2/src20/tx/{tx_hash}, not in general SRC20 or balance schemas
     Src20SnapshotDetail:
       type: object
       properties:
@@ -2795,6 +2838,55 @@ components:
                 type: string
               quantity:
                 type: number
+    EnhancedStampBalance:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/StampBalance"
+        - type: object
+          properties:
+            marketData:
+              type: object
+              nullable: true
+              properties:
+                floorPriceBTC:
+                  type: number
+                  nullable: true
+                  description: "Current floor price per stamp in BTC from dispensers or recent sales. Null indicates no market data available."
+                recentSalePriceBTC:
+                  type: number
+                  nullable: true
+                  description: "Most recent actual sale price per stamp in BTC. Null indicates no recent sales data available."
+                lastPriceBTC:
+                  type: number
+                  description: "Best calculated price per stamp in BTC using fallback hierarchy: floorPriceBTC > recentSalePriceBTC > default calculations. This is the recommended price for portfolio calculations."
+                walletValueBTC:
+                  type: number
+                  description: "Total portfolio value for this stamp (quantity owned × lastPriceBTC). Represents the estimated total BTC worth of all units owned by this wallet."
+                openDispensersCount:
+                  type: number
+                  description: Count of open dispensers
+                holderCount:
+                  type: number
+                  description: Number of holders
+                volume24hBTC:
+                  type: number
+                  nullable: true
+                  description: 24-hour volume in BTC
+                volume7dBTC:
+                  type: number
+                  nullable: true
+                  description: 7-day volume in BTC
+                volume30dBTC:
+                  type: number
+                  nullable: true
+                  description: 30-day volume in BTC
+                lastUpdated:
+                  type: string
+                  format: date-time
+                  nullable: true
+                dataQualityScore:
+                  type: number
+                  description: Data quality score (1-10)
     MintStatus:
       type: object
       properties:
@@ -2836,6 +2928,40 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/StampBalance"
+    EnhancedStampBalanceResponseBody:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - type: object
+          properties:
+            last_block:
+              type: number
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/EnhancedStampBalance"
+            stampValues:
+              type: object
+              properties:
+                stampValues:
+                  type: object
+                  additionalProperties:
+                    type: number
+                totalValue:
+                  type: number
+            metadata:
+              type: object
+              properties:
+                marketDataCacheStatus:
+                  type: string
+                  enum: [cached, no_data, error]
+                enhancedWithMarketData:
+                  type: integer
+                sortBy:
+                  type: string
+                sortingMethod:
+                  type: string
+                  enum: [client, database, none]
     PaginatedSrc20ResponseBody:
       type: object
       allOf:
@@ -2928,6 +3054,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SRC20Balance"
+    PaginatedSrc20WithMarketDataResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SRC20WithMarketData"
     Src20BalanceResponseBody:
       type: object
       properties:

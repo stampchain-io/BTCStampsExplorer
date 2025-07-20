@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import {
   ComposeAttachOptions,
   normalizeFeeRate,
@@ -70,11 +70,11 @@ export const handler: Handlers = {
       const normalizedFees = normalizeFeeRate(feeArgs);
 
       if (!normalizedFees || normalizedFees.normalizedSatsPerVB <= 0) {
-        return ResponseUtil.badRequest("Invalid fee rate.");
+        return ApiResponseUtil.badRequest("Invalid fee rate.");
       }
 
       if (inputs_set && !inputs_set.match(/^[a-fA-F0-9]{64}:\d+$/)) {
-        return ResponseUtil.badRequest("Invalid inputs_set format.");
+        return ApiResponseUtil.badRequest("Invalid inputs_set format.");
       }
 
       const cpid = await StampController.resolveToCpid(identifier);
@@ -402,7 +402,7 @@ export const handler: Handlers = {
         );
       }
       const finalPsbtHex = psbt.toHex();
-      return ResponseUtil.success({
+      return ApiResponseUtil.success({
         psbtHex: finalPsbtHex,
         inputsToSign,
         estimatedFee: Number(
@@ -427,9 +427,9 @@ export const handler: Handlers = {
         errorMessage.toLowerCase().includes("insufficient funds") ||
         errorMessage.includes("utxo selection failed")
       ) {
-        return ResponseUtil.badRequest(errorMessage);
+        return ApiResponseUtil.badRequest(errorMessage);
       }
-      return ResponseUtil.internalError(error, errorMessage);
+      return ApiResponseUtil.internalError(error, errorMessage);
     }
   },
 };

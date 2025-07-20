@@ -144,7 +144,14 @@ export function SRC20TransferTool(
       if (!wallet?.address) return;
 
       try {
-        const response = await fetch(`/api/v2/src20/balance/${wallet.address}`);
+        const response = await fetch(
+          `/api/v2/src20/balance/${wallet.address}`,
+          {
+            headers: {
+              "X-API-Version": "2.3",
+            },
+          },
+        );
         const data = await response.json();
 
         if (data.data && Array.isArray(data.data)) {

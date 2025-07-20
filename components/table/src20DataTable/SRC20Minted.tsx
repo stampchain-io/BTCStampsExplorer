@@ -1,11 +1,17 @@
-import { SRC20Row } from "$globals";
-import { formatDate } from "$lib/utils/formatUtils.ts";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import ChartWidget from "$islands/layout/ChartWidget.tsx";
-import { Timeframe } from "$layout";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { rowTable } from "$layout";
+import { SRC20Row } from "$globals";
+import ChartWidget from "$islands/layout/ChartWidget.tsx";
+import { rowTable, Timeframe } from "$layout";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { formatDate } from "$lib/utils/formatUtils.ts";
 import { labelXs, valueDark, valueSm } from "$text";
+
+// ✅ NEW: Import type-safe market data utilities
+import {
+  getFloorPrice,
+  getMarketCapBTC,
+  getVolume24h,
+} from "$lib/utils/marketDataHelpers.ts";
 
 interface SRC20MintedTableProps {
   data: SRC20Row[];
@@ -132,7 +138,7 @@ export function SRC20MintedTable({
                     </td>
                     {/* PRICE */}
                     <td class={cellAlign(3, headers.length)}>
-                      {Math.round((src20.floor_unit_price ?? 0) * 1e8)
+                      {Math.round(getFloorPrice(src20) * 1e8)
                         .toLocaleString()}
                       <span class="text-stamp-grey-light ml-1">SATS</span>
                     </td>
@@ -142,12 +148,12 @@ export function SRC20MintedTable({
                     </td>
                     {/* VOLUME */}
                     <td class={cellAlign(5, headers.length)}>
-                      {Math.round(src20.volume24 ?? 0).toLocaleString()}
+                      {Math.round(getVolume24h(src20)).toLocaleString()}
                       <span class="text-stamp-grey-light ml-1">BTC</span>
                     </td>
                     {/* MARKETCAP */}
                     <td class={cellAlign(6, headers.length)}>
-                      {Math.round((src20.market_cap ?? 0) * 1e8)
+                      {Math.round(getMarketCapBTC(src20) * 1e8)
                         .toLocaleString()}
                       <span class="text-stamp-grey-light ml-1">SATS</span>
                     </td>

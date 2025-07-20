@@ -28,11 +28,6 @@ export interface WalletStampWithValue extends StampBalance {
   unbound_quantity?: number; // Quantity NOT attached to UTXOs (unbound/detached)
   utxos?: UTXOInfo[]; // UTXO attachment information (detailed)
 
-  // DEPRECATED: Legacy pricing fields - use marketData instead
-  value?: number; // @deprecated Use marketData.walletValueBTC
-  unitPrice?: number; // @deprecated Use marketData.lastPriceBTC
-  floorPrice?: number | "priceless"; // @deprecated Use marketData.floorPriceBTC
-  recentSalePrice?: number | "priceless"; // @deprecated Use marketData.recentSalePriceBTC
   // Additional StampRow fields for wallet display
   stamp?: number;
   tx_hash?: string;

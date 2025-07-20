@@ -1,5 +1,7 @@
 /* ===== COLLECTION DETAILS HEADER COMPONENT ===== */
 import { Collection, StampRow } from "$globals";
+import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
+import { containerBackground, containerColData } from "$layout";
 import {
   abbreviateAddress,
   formatBTC,
@@ -8,8 +10,6 @@ import {
   formatVolume,
 } from "$lib/utils/formatUtils.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
-import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
-import { containerBackground, containerColData } from "$layout";
 import {
   headingGreyDLLink,
   labelSm,
@@ -33,13 +33,20 @@ export const CollectionDetailHeader = (
       <div class={containerBackground}>
         <div class="flex justify-between">
           <div class="flex">
-            <img
-              src={stamps[0].stamp_url}
-              loading="lazy"
-              onError={handleImageError}
-              alt="Collection image"
-              class="h-[91px] w-[91px] object-contain items-center pixelart image-rendering-pixelated"
-            />
+            {stamps && stamps.length > 0 && (
+              <img
+                src={stamps[0].stamp_url}
+                loading="lazy"
+                onError={handleImageError}
+                alt="Collection image"
+                class="h-[91px] w-[91px] object-contain items-center pixelart image-rendering-pixelated"
+              />
+            )}
+            {(!stamps || stamps.length === 0) && (
+              <div class="h-[91px] w-[91px] bg-gray-200 flex items-center justify-center text-gray-500 text-xs">
+                No Image
+              </div>
+            )}
             <div class="flex flex-col pl-6">
               <h1 class={`${titleGreyLD} pb-1.5`}>
                 {collection.collection_name.length > 12
@@ -99,9 +106,10 @@ export const CollectionDetailHeader = (
           </h5>
           <h6 class={value3xl}>
             {collection.marketData?.minFloorPriceBTC !== null &&
+                collection.marketData?.minFloorPriceBTC !== undefined &&
                 collection.total_editions
               ? formatMarketCap(
-                collection.marketData!.minFloorPriceBTC *
+                collection.marketData.minFloorPriceBTC *
                   collection.total_editions,
               )
               : "N/A"} <span class="font-light">BTC</span>

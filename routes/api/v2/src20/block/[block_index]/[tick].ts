@@ -1,27 +1,20 @@
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { BlockHandlerContext } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
-export const handler: Handlers = {
-  async GET(req, ctx) {
+export const handler: Handlers<BlockHandlerContext> = {
+  async GET(_req, ctx) {
+    const { block_index, tick } = ctx.params;
+
     try {
-      const { block_index, tick: rawTick } = ctx.params;
-      const params = {
-        block_index: parseInt(block_index, 10),
-        tick: decodeURIComponent(rawTick),
-      };
-
-      const result = await Src20Controller.handleSrc20TransactionsRequest(
-        req,
-        params,
-      );
+      const result = await SRC20Service.QueryService.fetchAndFormatSrc20Data({
+        block_index: Number(block_index),
+        tick,
+      });
       return ApiResponseUtil.success(result);
     } catch (error) {
-      console.error("Error in block/tick handler:", error);
-      return ApiResponseUtil.internalError(
-        error,
-        "Error processing block/tick request",
-      );
+      return ApiResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

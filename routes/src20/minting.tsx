@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20OverviewHeader } from "$header";
-import { SRC20Gallery } from "$section";
+import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers = {
@@ -60,25 +60,19 @@ export default function SRC20MintingPage({ data }: any) {
         // as this page is not set up to handle that interactivity.
         // If SRC20OverviewHeader requires them, its usage here or the component itself needs adjustment.
       />
-      <SRC20Gallery
-        viewType="minting"
-        fromPage="src20"
+      <FreshSRC20Gallery
         initialData={src20s}
-        timeframe="24H"
-        pagination={{
+        initialPagination={{
           page,
+          limit: data.limit || 11,
+          total: data.total || 0,
           totalPages,
-          onPageChange: (newPage: number) => {
-            // SSR-safe browser environment check
-            if (typeof globalThis === "undefined" || !globalThis?.location) {
-              return; // Cannot navigate during SSR
-            }
-            const url = new URL(globalThis.location.href);
-            url.searchParams.set("page", newPage.toString());
-            globalThis.location.href = url.toString();
-          },
         }}
-        useClientFetch={false} // Explicitly set for a server-rendered context
+        address="" // Not applicable for minting page
+        initialSort="ASC" // Default sort for minting tokens
+        fromPage="src20"
+        enablePartialNavigation={true}
+        showLoadingSkeleton={true}
       />
     </div>
   );

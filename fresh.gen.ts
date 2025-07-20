@@ -14,7 +14,6 @@ import * as $api_internal_background_fee_status from "./routes/api/internal/back
 import * as $api_internal_bitcoinNotifications from "./routes/api/internal/bitcoinNotifications.ts";
 import * as $api_internal_btc_price_status from "./routes/api/internal/btc-price-status.ts";
 import * as $api_internal_btcPrice from "./routes/api/internal/btcPrice.ts";
-import * as $api_internal_cache_clear from "./routes/api/internal/cache/clear.ts";
 import * as $api_internal_carousel from "./routes/api/internal/carousel.ts";
 import * as $api_internal_creatorName from "./routes/api/internal/creatorName.ts";
 import * as $api_internal_csrfToken from "./routes/api/internal/csrfToken.ts";
@@ -113,7 +112,6 @@ import * as $howto_index from "./routes/howto/index.tsx";
 import * as $howto_leatherconnect_index from "./routes/howto/leatherconnect/index.tsx";
 import * as $howto_leathercreate_index from "./routes/howto/leathercreate/index.tsx";
 import * as $howto_minttoken_index from "./routes/howto/minttoken/index.tsx";
-import * as $howto_registerbitname_index from "./routes/howto/registerbitname/index.tsx";
 import * as $howto_sendstamp_index from "./routes/howto/sendstamp/index.tsx";
 import * as $howto_stamp_index from "./routes/howto/stamp/index.tsx";
 import * as $howto_template_index from "./routes/howto/template/index.tsx";
@@ -173,7 +171,6 @@ import * as $content_WalletDashboardDetails from "./islands/content/WalletDashbo
 import * as $content_WalletDetails from "./islands/content/WalletDetails.tsx";
 import * as $content_WalletDispenserDetails from "./islands/content/WalletDispenserDetails.tsx";
 import * as $content_WalletProfileContent from "./islands/content/WalletProfileContent.tsx";
-import * as $content_WalletProfileContentWithSorting from "./islands/content/WalletProfileContentWithSorting.tsx";
 import * as $content_WalletProfileDetails from "./islands/content/WalletProfileDetails.tsx";
 import * as $content_blockContent_BlockSelector from "./islands/content/blockContent/BlockSelector.tsx";
 import * as $content_blockContent_BlockTransactions from "./islands/content/blockContent/BlockTransactions.tsx";
@@ -268,6 +265,7 @@ import * as $section_howto_StampSendHowTo from "./islands/section/howto/StampSen
 import * as $section_howto_StampingHowto from "./islands/section/howto/StampingHowto.tsx";
 import * as $section_index from "./islands/section/index.ts";
 import * as $sorting_SortingComponent from "./islands/sorting/SortingComponent.tsx";
+import * as $sorting_SortingErrorBoundary from "./islands/sorting/SortingErrorBoundary.tsx";
 import * as $sorting_SortingProvider from "./islands/sorting/SortingProvider.tsx";
 import * as $sorting_SortingProviderWithURL from "./islands/sorting/SortingProviderWithURL.tsx";
 import * as $sorting_SortingStyles from "./islands/sorting/SortingStyles.tsx";
@@ -311,7 +309,6 @@ const manifest = {
       $api_internal_bitcoinNotifications,
     "./routes/api/internal/btc-price-status.ts": $api_internal_btc_price_status,
     "./routes/api/internal/btcPrice.ts": $api_internal_btcPrice,
-    "./routes/api/internal/cache/clear.ts": $api_internal_cache_clear,
     "./routes/api/internal/carousel.ts": $api_internal_carousel,
     "./routes/api/internal/creatorName.ts": $api_internal_creatorName,
     "./routes/api/internal/csrfToken.ts": $api_internal_csrfToken,
@@ -436,7 +433,6 @@ const manifest = {
     "./routes/howto/leatherconnect/index.tsx": $howto_leatherconnect_index,
     "./routes/howto/leathercreate/index.tsx": $howto_leathercreate_index,
     "./routes/howto/minttoken/index.tsx": $howto_minttoken_index,
-    "./routes/howto/registerbitname/index.tsx": $howto_registerbitname_index,
     "./routes/howto/sendstamp/index.tsx": $howto_sendstamp_index,
     "./routes/howto/stamp/index.tsx": $howto_stamp_index,
     "./routes/howto/template/index.tsx": $howto_template_index,
@@ -502,8 +498,6 @@ const manifest = {
     "./islands/content/WalletDispenserDetails.tsx":
       $content_WalletDispenserDetails,
     "./islands/content/WalletProfileContent.tsx": $content_WalletProfileContent,
-    "./islands/content/WalletProfileContentWithSorting.tsx":
-      $content_WalletProfileContentWithSorting,
     "./islands/content/WalletProfileDetails.tsx": $content_WalletProfileDetails,
     "./islands/content/blockContent/BlockSelector.tsx":
       $content_blockContent_BlockSelector,
@@ -624,6 +618,7 @@ const manifest = {
     "./islands/section/howto/StampingHowto.tsx": $section_howto_StampingHowto,
     "./islands/section/index.ts": $section_index,
     "./islands/sorting/SortingComponent.tsx": $sorting_SortingComponent,
+    "./islands/sorting/SortingErrorBoundary.tsx": $sorting_SortingErrorBoundary,
     "./islands/sorting/SortingProvider.tsx": $sorting_SortingProvider,
     "./islands/sorting/SortingProviderWithURL.tsx":
       $sorting_SortingProviderWithURL,

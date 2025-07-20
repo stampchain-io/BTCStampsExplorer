@@ -1,8 +1,8 @@
 /**
- * Preact hooks for BTC value calculations
+ * Modern Preact hooks for BTC value calculations (v2.3+)
  *
- * Provides hooks for managing BTC value calculations with memoization
- * and state management using Preact's hook system.
+ * Clean Preact hooks using only marketData structure.
+ * No fallbacks to deprecated fields - forces v2.3 migration.
  */
 
 import type { WalletStampWithValue } from "$lib/types/wallet.d.ts";
@@ -10,23 +10,153 @@ import {
   calculateStampBTCValue,
   calculateTotalBTCValue,
   formatBTCValue,
-  getBestStampPrice,
-  getValueSummary,
+  getBestPrice,
 } from "$lib/utils/btcCalculations.ts";
 import { useMemo } from "preact/hooks";
 
 /**
- * Hook for calculating BTC value of a single stamp
- * @param quantity - Number of stamps owned
- * @param unitPrice - Price per stamp in BTC
- * @returns Memoized BTC value calculation
+ * Modern hook for calculating stamp BTC value using marketData
+ * @param stamp - Wallet stamp with modern marketData structure
+ * @returns Memoized stamp value calculation
  */
-export function useBTCValue(
-  quantity: number,
-  unitPrice: number | null | undefined,
-) {
+export function useStampValue(stamp: WalletStampWithValue) {
   return useMemo(() => {
-    const value = calculateStampBTCValue(quantity, unitPrice);
+    const quantity = stamp.balance || 0;
+    const marketData = stamp.marketData;
+
+    // Use pre-calculated walletValueBTC if available (most efficient)
+    if (marketData?.walletValueBTC && marketData.walletValueBTC > 0) {
+      return {
+        quantity,
+        totalValue: marketData.walletValueBTC,
+        unitPrice: marketData.lastPriceBTC,
+        formattedValue: formatBTCValue(marketData.walletValueBTC),
+        formattedUnitPrice: formatBTCValue(marketData.lastPriceBTC),
+        hasValue: marketData.walletValueBTC > 0,
+        dataSource: "preCalculated",
+        isEfficient: true, // Using pre-calculated value
+      };
+    }
+
+    // Otherwise calculate using quantity and market price
+    const totalValue = calculateStampBTCValue(quantity, marketData);
+    const unitPrice = getBestPrice(marketData);
+
+    return {
+      quantity,
+      totalValue,
+      unitPrice,
+      formattedValue: formatBTCValue(totalValue),
+      formattedUnitPrice: formatBTCValue(unitPrice),
+      hasValue: totalValue !== null && totalValue > 0,
+      dataSource: marketData ? "marketData" : null,
+      isEfficient: false, // Had to calculate
+    };
+  }, [
+    stamp.balance,
+    stamp.marketData?.walletValueBTC,
+    stamp.marketData?.lastPriceBTC,
+    stamp.marketData?.floorPriceBTC,
+    stamp.marketData?.recentSalePriceBTC,
+  ]);
+}
+
+/**
+ * Hook for individual stamp price information using modern marketData
+ * @param stamp - Wallet stamp with marketData
+ * @returns Memoized price information
+ */
+export function useStampPrice(stamp: WalletStampWithValue) {
+  return useMemo(() => {
+    const marketData = stamp.marketData;
+    const price = getBestPrice(marketData);
+
+    return {
+      price,
+      formatted: formatBTCValue(price),
+      hasPrice: price !== null && price > 0,
+      dataSource: marketData ? "marketData" : null,
+      priceHierarchy: {
+        floor: marketData?.floorPriceBTC || null,
+        recent: marketData?.recentSalePriceBTC || null,
+        calculated: marketData?.lastPriceBTC || null,
+      },
+    };
+  }, [
+    stamp.marketData?.lastPriceBTC,
+    stamp.marketData?.floorPriceBTC,
+    stamp.marketData?.recentSalePriceBTC,
+  ]);
+}
+
+/**
+ * Hook for portfolio-level calculations using modern marketData
+ * @param stamps - Array of wallet stamps with marketData
+ * @returns Memoized portfolio calculations
+ */
+export function usePortfolioValue(stamps: WalletStampWithValue[]) {
+  return useMemo(() => {
+    if (!stamps || stamps.length === 0) {
+      return {
+        totalValue: 0,
+        totalStamps: 0,
+        valuedStamps: 0,
+        formattedTotal: formatBTCValue(0),
+        hasValue: false,
+        coverage: 0,
+      };
+    }
+
+    // Use the modern calculateTotalBTCValue function
+    const totalValue = calculateTotalBTCValue(stamps);
+
+    // Calculate statistics
+    let totalStamps = 0;
+    let valuedStamps = 0;
+
+    stamps.forEach((stamp) => {
+      const quantity = stamp.balance || 0;
+      totalStamps += quantity;
+
+      // Count valued stamps (have marketData with price > 0)
+      const hasValue = stamp.marketData?.lastPriceBTC &&
+        stamp.marketData.lastPriceBTC > 0;
+      if (hasValue) {
+        valuedStamps += quantity;
+      }
+    });
+
+    return {
+      totalValue,
+      totalStamps,
+      valuedStamps,
+      formattedTotal: formatBTCValue(totalValue),
+      hasValue: totalValue > 0,
+      coverage: totalStamps > 0 ? (valuedStamps / totalStamps) * 100 : 0,
+    };
+  }, [
+    stamps.length,
+    stamps.map((s) => s.balance || 0).join(","),
+    stamps.map((s) => s.marketData?.walletValueBTC || 0).join(","),
+    stamps.map((s) => s.marketData?.lastPriceBTC || 0).join(","),
+  ]);
+}
+
+/**
+ * Backward compatibility hooks for existing components
+ * These maintain the old API while using modern implementations
+ */
+
+/**
+ * Legacy hook for simple BTC value calculation
+ * @deprecated Use calculateStampBTCValue from btcCalculations.ts directly
+ */
+export function useBTCValue(quantity: number, unitPrice?: number | null) {
+  return useMemo(() => {
+    const value = quantity && unitPrice && unitPrice > 0
+      ? quantity * unitPrice
+      : null;
+
     return {
       value,
       formatted: formatBTCValue(value),
@@ -36,123 +166,54 @@ export function useBTCValue(
 }
 
 /**
- * Hook for calculating total BTC value of multiple stamps
- * @param stamps - Array of wallet stamps with value data
- * @returns Memoized total BTC value calculation
+ * Legacy hook for total portfolio BTC value
+ * @deprecated Use usePortfolioValue instead
  */
 export function useTotalBTCValue(stamps: WalletStampWithValue[]) {
   return useMemo(() => {
-    const totalBTC = calculateTotalBTCValue(stamps);
+    const total = calculateTotalBTCValue(stamps);
+
     return {
-      total: totalBTC,
-      formatted: formatBTCValue(totalBTC),
-      hasValue: totalBTC > 0,
+      total,
+      formatted: formatBTCValue(total),
+      hasValue: total !== null && total > 0,
     };
   }, [stamps]);
 }
 
 /**
- * Hook for getting the best available price for a stamp using v2.3 market data or legacy fallback
- * @param stamp - Wallet stamp data with optional marketData
- * @returns Memoized best price calculation with improved source tracking
- */
-export function useBestStampPrice(stamp: WalletStampWithValue) {
-  return useMemo(() => {
-    const price = getBestStampPrice(stamp);
-    let source = null;
-
-    // v2.3 API: Track if using marketData.lastPriceBTC (preferred)
-    if (
-      stamp.marketData?.lastPriceBTC && price === stamp.marketData.lastPriceBTC
-    ) {
-      source = "market"; // New source type for v2.3 calculated price
-    } // Legacy source tracking for backward compatibility
-    else if (price === stamp.unitPrice) {
-      source = "unit";
-    } else if (price === stamp.recentSalePrice) {
-      source = "recent";
-    } else if (price === stamp.floorPrice) {
-      source = "floor";
-    }
-
-    return {
-      price,
-      formatted: formatBTCValue(price),
-      hasPrice: price !== null && price > 0,
-      source,
-    };
-  }, [
-    stamp.unitPrice,
-    stamp.recentSalePrice,
-    stamp.floorPrice,
-    stamp.marketData?.lastPriceBTC,
-  ]);
-}
-
-/**
- * Hook for comprehensive value summary of a stamp collection
- * @param stamps - Array of wallet stamps
- * @returns Memoized value summary with statistics
+ * Legacy hook for detailed portfolio value summary
+ * @deprecated Consider using usePortfolioValue for simpler cases
  */
 export function useValueSummary(stamps: WalletStampWithValue[]) {
   return useMemo(() => {
-    return getValueSummary(stamps);
-  }, [stamps]);
-}
+    const total = calculateTotalBTCValue(stamps);
+    const totalStamps = stamps.length;
+    const stampsWithValue = stamps.filter((stamp) => {
+      const value = calculateStampBTCValue(
+        stamp.balance || 0,
+        stamp.marketData,
+      );
+      return value !== null && value > 0;
+    });
 
-/**
- * Hook for calculating individual stamp display values using v2.3 market data or legacy fallback
- * @param stamp - Individual stamp data with optional marketData
- * @returns Memoized stamp value calculations with v2.3 optimizations
- */
-export function useStampValue(stamp: WalletStampWithValue) {
-  return useMemo(() => {
-    const quantity = stamp.balance || 0;
+    const valuedStamps = stampsWithValue.length;
+    const valueCoverage = totalStamps > 0
+      ? (valuedStamps / totalStamps) * 100
+      : 0;
 
-    // v2.3 API: Use pre-calculated walletValueBTC if available (most efficient)
-    let totalValue = null;
-    if (
-      stamp.marketData?.walletValueBTC && stamp.marketData.walletValueBTC > 0
-    ) {
-      totalValue = stamp.marketData.walletValueBTC;
-    } else {
-      // Fallback to calculation using getBestStampPrice
-      const bestPrice = getBestStampPrice(stamp);
-      totalValue = calculateStampBTCValue(quantity, bestPrice);
-    }
-
-    const bestPrice = getBestStampPrice(stamp);
-
-    // Enhanced price source tracking for v2.3 and legacy
-    let priceSource = null;
-    if (
-      stamp.marketData?.lastPriceBTC &&
-      bestPrice === stamp.marketData.lastPriceBTC
-    ) {
-      priceSource = "market"; // v2.3 calculated price
-    } else if (bestPrice === stamp.unitPrice) {
-      priceSource = "unit";
-    } else if (bestPrice === stamp.recentSalePrice) {
-      priceSource = "recent";
-    } else if (bestPrice === stamp.floorPrice) {
-      priceSource = "floor";
-    }
+    // Count unique collections (by tick)
+    const uniqueTicks = new Set(stamps.map((stamp) => stamp.tick));
+    const totalCollections = uniqueTicks.size;
 
     return {
-      quantity,
-      totalValue,
-      formattedValue: formatBTCValue(totalValue),
-      formattedTotalValue: formatBTCValue(totalValue),
-      formattedUnitPrice: formatBTCValue(bestPrice),
-      hasValue: totalValue !== null && totalValue > 0,
-      priceSource,
+      formattedTotal: formatBTCValue(total),
+      totalStamps,
+      valuedStamps,
+      stampsWithValue,
+      totalCollections,
+      hasValue: total !== null && total > 0,
+      valueCoverage: Math.round(valueCoverage),
     };
-  }, [
-    stamp.balance,
-    stamp.unitPrice,
-    stamp.recentSalePrice,
-    stamp.floorPrice,
-    stamp.marketData?.lastPriceBTC,
-    stamp.marketData?.walletValueBTC,
-  ]);
+  }, [stamps]);
 }

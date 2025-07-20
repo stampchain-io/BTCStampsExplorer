@@ -1,13 +1,13 @@
 import {
-    STAMP_EDITIONS,
-    STAMP_FILESIZES,
-    STAMP_FILETYPES,
-    STAMP_FILTER_TYPES,
-    STAMP_MARKETPLACE,
-    STAMP_RANGES,
-    STAMP_SUFFIX_FILTERS,
-    STAMP_TYPES,
-    SUBPROTOCOLS,
+  STAMP_EDITIONS,
+  STAMP_FILESIZES,
+  STAMP_FILETYPES,
+  STAMP_FILTER_TYPES,
+  STAMP_MARKETPLACE,
+  STAMP_RANGES,
+  STAMP_SUFFIX_FILTERS,
+  STAMP_TYPES,
+  SUBPROTOCOLS,
 } from "$globals";
 import { StampRepository } from "$server/database/index.ts";
 import { BlockService } from "$server/services/blockService.ts";
@@ -598,8 +598,8 @@ export class StampService {
 
     return {
       ...stamp,
-      floorPrice,
-      recentSalePrice,
+      // v2.3+: floorPrice and recentSalePrice moved to marketData section only
+      // Removed: floorPrice, recentSalePrice (now only in marketData)
       floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPriceUSD : null,
       marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPriceUSD : null,
       marketData: {
@@ -660,5 +660,37 @@ export class StampService {
       const { marketData, cacheStatus: _cacheStatus, cacheAgeMinutes: _cacheAgeMinutes, ...stamp } = stampData;
       return this.enrichStampWithMarketData(stamp, marketData, options.btcPriceUSD);
     });
+  }
+
+  /**
+   * Get the count of stamps created by a specific address
+   */
+  static async getStampsCreatedCount(address: string): Promise<{ total: number }> {
+    try {
+      return await StampRepository.getStampsCreatedCount(address);
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error getting stamps created count",
+        error: error instanceof Error ? error.message : String(error),
+        address
+      });
+      return { total: 0 };
+    }
+  }
+
+  /**
+   * Get bulk stamp market data for multiple CPIDs
+   */
+  static async getBulkStampMarketData(cpids: string[]): Promise<Map<string, StampMarketData>> {
+    try {
+      return await MarketDataRepository.getBulkStampMarketData(cpids);
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error getting bulk stamp market data",
+        error: error instanceof Error ? error.message : String(error),
+        cpids: cpids.slice(0, 10) // Log first 10 CPIDs only for debugging
+      });
+      return new Map();
+    }
   }
 }

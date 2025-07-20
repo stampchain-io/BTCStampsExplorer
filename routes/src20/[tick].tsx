@@ -1,9 +1,9 @@
 /* ===== SRC20 DETAIL PAGE ===== */
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20DetailHeader } from "$header";
-import { DataTableBase, HoldersTable } from "$table";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { DataTableBase, HoldersTable } from "$table";
 import type { SRC20TickPageData } from "$types/src20.d.ts";
 
 /* ===== SERVER HANDLER ===== */
@@ -25,9 +25,18 @@ export const handler: Handlers = {
           Src20Controller.fetchSrc20TickPageData(decodedTick),
           fetch(
             `${baseUrl}/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`,
+            {
+              headers: {
+                "X-API-Version": "2.3",
+              },
+            },
           )
             .then((r) => r.json()),
-          fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`)
+          fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`, {
+            headers: {
+              "X-API-Version": "2.3",
+            },
+          })
             .then((r) => r.json()),
           fetch(
             `https://api.stampscan.xyz/utxo/combinedListings?tick=${encodedTick}`,

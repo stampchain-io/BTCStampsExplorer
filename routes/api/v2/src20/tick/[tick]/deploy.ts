@@ -1,6 +1,6 @@
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 // import { TickHandlerContext } from "$globals"; // Temporarily replaced
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { FreshContext } from "$fresh/server.ts";
 
 // Define params shape explicitly for this route
@@ -19,9 +19,9 @@ export const handler = async (
     // If 'op' was needed from query params: const op = ctx.url.searchParams.get("op");
 
     const body = await Src20Controller.handleDeploymentRequest(tick, req);
-    return ResponseUtil.success(body);
+    return ApiResponseUtil.success(body);
   } catch (error) {
     console.error("Error in deploy handler:", error);
-    return ResponseUtil.internalError(error, "Internal server error");
+    return ApiResponseUtil.internalError(error, "Internal server error");
   }
 };

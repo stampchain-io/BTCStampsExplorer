@@ -1,18 +1,18 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
+import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
+import type { MarketListingAggregated } from "$globals";
+import { Icon } from "$icon";
+import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
+import type { AlignmentType } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Deployment } from "$types/index.d.ts";
-import type { SRC20MintStatus } from "$types/src20.d.ts";
 import {
   abbreviateAddress,
   formatDate,
   formatNumber,
 } from "$lib/utils/formatUtils.ts";
-import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import { labelSm, titleGreyLD, valueSm } from "$text";
-import type { AlignmentType } from "$layout";
-import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
-import type { MarketListingAggregated } from "$globals";
-import { Icon } from "$icon";
+import { Deployment } from "$types/index.d.ts";
+import type { SRC20MintStatus } from "$types/src20.d.ts";
 
 /* ===== TYPES ===== */
 export interface SRC20DetailHeaderProps {
@@ -51,13 +51,13 @@ export function SRC20DetailHeader({
     year: "numeric",
   });
 
-  // Market data formatting
+  // Market data formatting - MarketListingAggregated already has the fields we need
   const floorUnitPriceBTC = marketInfo?.floor_unit_price ?? 0;
   const sum1dBTC = marketInfo?.volume24 ?? 0;
-  const sum7dBTC = (marketInfo as any)?.volume7d ?? 0;
+  const sum7dBTC = (marketInfo as any)?.volume7d ?? 0; // TODO(@dev): Add volume7d to MarketListingAggregated type
   const mcapBTC = marketInfo?.mcap ?? 0;
-  const change24h = (marketInfo as any)?.change24 ?? null;
-  const change7d = (marketInfo as any)?.change7d ?? null;
+  const change24h = marketInfo?.change24 ?? null;
+  const change7d = (marketInfo as any)?.change7d ?? null; // TODO(@dev): Add change7d to MarketListingAggregated type
 
   // Convert floorUnitPrice from BTC to Satoshis with smart formatting
   const floorUnitPriceSats = floorUnitPriceBTC * 1e8;

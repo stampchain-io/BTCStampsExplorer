@@ -386,6 +386,16 @@ export default function WalletProfileDetails({
         <div className={containerBackground}>
           <WalletOverview walletData={walletData} />
         </div>
+
+        {/* Market Data Status - only show if there are issues */}
+        {(walletData as any).marketDataStatus && (
+          <div class="mt-3">
+            <p class="text-red-500 text-sm">
+              Market data might be delayed or unavailable. Please check back
+              later.
+            </p>
+          </div>
+        )}
       </div>
       <div class="flex flex-col w-full tablet:w-1/3">
         <WalletStats

@@ -1,12 +1,10 @@
 /* ===== HOME PAGE ROUTE ===== */
-import { SRC20Row, StampRow } from "$globals";
-import type { Collection } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { gapSectionSlim, Micro5FontLoader } from "$layout";
+import type { Collection } from "$globals";
+import { SRC20Row, StampRow } from "$globals";
 import { HomeHeader } from "$header";
+import { gapSectionSlim, Micro5FontLoader } from "$layout";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import {
   CarouselHome,
   GetStampingCta,
@@ -16,6 +14,8 @@ import {
   StampOverviewGallery,
   StampSalesGallery,
 } from "$section";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { StampController } from "$server/controller/stampController.ts";
 
 /* ===== TYPES ===== */
 // Define the shape of pageData from StampController.getHomePageData()
@@ -54,51 +54,108 @@ export const handler: Handlers<HomePageData> = {
       return ResponseUtil.custom(null, 204);
     }
 
+    console.log(`[HOMEPAGE] Starting homepage request`);
+
     try {
       /* ===== DATA FETCHING ===== */
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 2000);
+      const timeout = setTimeout(() => {
+        console.log(`[HOMEPAGE] Request timed out after 15 seconds`);
+        controller.abort();
+      }, 15000); // Increased timeout for ECS
 
-      const [pageData, mintedData, mintingData] = await Promise.all([
-        StampController.getHomePageData(),
-        Src20Controller.fetchFullyMintedByMarketCapV2(5, 1),
-        Src20Controller.fetchTrendingActiveMintingTokensV2(5, 1, 1000),
+      console.log(`[HOMEPAGE] Starting parallel data fetches...`);
+      const startTime = Date.now();
+
+      // ECS-specific: Add individual timeouts and fallbacks for each data source
+      const fetchWithFallback = async (
+        fetchFn: () => Promise<any>,
+        fallbackData: any,
+        name: string,
+      ) => {
+        try {
+          const result = await Promise.race([
+            fetchFn(),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error(`${name} timeout`)), 12000)
+            ),
+          ]);
+          console.log(`[HOMEPAGE] ${name} completed successfully`);
+          return result;
+        } catch (error) {
+          console.warn(`[HOMEPAGE] ${name} failed, using fallback:`, error);
+          return fallbackData;
+        }
+      };
+
+      const [pageData, mintedData, mintingData] = await Promise.allSettled([
+        fetchWithFallback(
+          () => StampController.getHomePageData(),
+          {
+            carouselStamps: [],
+            stamps_art: [],
+            stamps_src721: [],
+            stamps_posh: [],
+            collectionData: [],
+          },
+          "StampController.getHomePageData",
+        ),
+        fetchWithFallback(
+          () => Src20Controller.fetchFullyMintedByMarketCapV2(5, 1),
+          { data: [], total: 0, page: 1, totalPages: 0 },
+          "fetchFullyMintedByMarketCapV2",
+        ),
+        fetchWithFallback(
+          () => Src20Controller.fetchTrendingActiveMintingTokensV2(5, 1, 1000),
+          { data: [], total: 0, page: 1, totalPages: 0 },
+          "fetchTrendingActiveMintingTokensV2",
+        ),
       ]);
 
       clearTimeout(timeout);
 
-      /* ===== RESPONSE CONFIGURATION ===== */
-      const response = await ctx.render({
-        ...pageData,
-        src20Data: {
-          minted: {
-            data: mintedData.data,
-            total: (mintedData as any).total,
-            page: mintedData.page,
-            totalPages: (mintedData as any).totalPages,
-          },
-          minting: {
-            data: mintingData.data as any,
-            total: (mintingData as any).total,
-            page: mintingData.page,
-            totalPages: (mintingData as any).totalPages,
-          },
-        },
-      });
-      response.headers.set("Cache-Control", "public, max-age=300"); // 5 min cache
-      response.headers.set("Priority", "high"); // Signal high priority to CDN
-      return response;
-    } catch (error) {
-      /* ===== ERROR HANDLING ===== */
-      console.error("Handler error:", error);
-      // Return minimal data for fast initial render
-      return ctx.render({
+      const duration = Date.now() - startTime;
+      console.log(`[HOMEPAGE] All data fetches completed in ${duration}ms`);
+
+      // Extract results from Promise.allSettled
+      const pageResult = pageData.status === "fulfilled" ? pageData.value : {
         carouselStamps: [],
         stamps_art: [],
         stamps_src721: [],
         stamps_posh: [],
         collectionData: [],
-        error: "Failed to load complete data",
+      };
+      const mintedResult = mintedData.status === "fulfilled"
+        ? mintedData.value
+        : { data: [], total: 0, page: 1, totalPages: 0 };
+      const mintingResult = mintingData.status === "fulfilled"
+        ? mintingData.value
+        : { data: [], total: 0, page: 1, totalPages: 0 };
+
+      /* ===== RESPONSE RENDERING ===== */
+      const response = await ctx.render({
+        ...pageResult,
+        src20Data: {
+          minted: mintedResult as any,
+          minting: mintingResult as any,
+        },
+      });
+
+      return response;
+    } catch (error) {
+      console.error("[HOMEPAGE] Critical error:", error);
+      if (error instanceof Error) {
+        console.error("[HOMEPAGE] Error stack:", error.stack);
+      }
+
+      // ECS-specific: Return minimal working page instead of failing completely
+      return await ctx.render({
+        carouselStamps: [],
+        stamps_art: [],
+        stamps_src721: [],
+        stamps_posh: [],
+        collectionData: [],
+        error: "Service temporarily unavailable", // This will show a friendly error message
         src20Data: {
           minted: { data: [], total: 0, page: 1, totalPages: 0 },
           minting: { data: [], total: 0, page: 1, totalPages: 0 },

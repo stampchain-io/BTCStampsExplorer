@@ -1,4 +1,4 @@
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 
 export type SortDirection = "ASC" | "DESC";
 
@@ -33,10 +33,10 @@ export function validateSortDirection(
 
   // Validate sort direction
   if (!allowedDirections?.includes(normalizedSort)) {
-    return ResponseUtil.badRequest(
+    return ApiResponseUtil.badRequest(
       `Invalid sort parameter. Must be one of: ${allowedDirections?.join(", ")}`,
     );
   }
 
   return normalizedSort;
-} 
+}

@@ -10,6 +10,7 @@ import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { MAX_PAGINATION_LIMIT } from "$lib/utils/constants.ts";
 import { getIdentifierType } from "$lib/utils/identifierUtils.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { validateSortDirection } from "$server/services/validationService.ts";
@@ -189,6 +190,12 @@ export const createStampHandler = (
           );
         }
 
+        // Determine if market data should be included based on API version
+        // v2.2: No market data (clean, minimal responses)
+        // v2.3+: Include market data with clean nested structure
+        const apiVersion = (ctx.state.apiVersion as string) || "2.3";
+        const includeMarketData = parseFloat(apiVersion) >= 2.3;
+
         // Important part: Pass the min/max values directly to the controller
         const result = await StampController.getStamps({
           page,
@@ -230,6 +237,8 @@ export const createStampHandler = (
           ...(minDataQualityScore && { minDataQualityScore }),
           ...(maxCacheAgeMinutes && { maxCacheAgeMinutes }),
           ...(priceSource && { priceSource }),
+          // Version-aware market data inclusion
+          includeMarketData,
         });
 
         // Return the normal result
@@ -383,5 +392,7 @@ export const createStampHandler = (
 
 // Add default export for Fresh manifest compatibility - dummy handler
 export default function () {
-  return new Response("OK");
+  return WebResponseUtil.success("OK", {
+    headers: { "Content-Type": "text/plain" },
+  });
 }

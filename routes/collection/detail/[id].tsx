@@ -1,11 +1,11 @@
 /* ===== COLLECTION DETAILS PAGE ===== */
+import { CollectionDetailContent } from "$content";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { STAMP_FILTER_TYPES, StampRow, SUBPROTOCOLS } from "$globals";
+import { CollectionDetailHeader } from "$header";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { CollectionDetailContent } from "$content";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
-import { CollectionDetailHeader } from "$header";
 /* ===== TYPES ===== */
 type CollectionDetailsPageProps = {
   data: {
@@ -108,6 +108,10 @@ export default function CollectionDetailPage(
           page={page}
           totalPages={pages}
           onPageChange={(newPage) => {
+            // SSR-safe browser environment check
+            if (typeof globalThis === "undefined" || !globalThis?.location) {
+              return; // Cannot navigate during SSR
+            }
             const url = new URL(globalThis.location.href);
             url.searchParams.set("page", newPage.toString());
             globalThis.location.href = url.toString();
