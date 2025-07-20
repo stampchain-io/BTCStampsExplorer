@@ -1,12 +1,10 @@
 import {
-  PaginatedSrc20ResponseBody,
-  SRC20SnapshotRequestParams,
-  SRC20TrxRequestParams,
+    PaginatedSrc20ResponseBody,
+    SRC20SnapshotRequestParams
 } from "$globals";
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
 import { SRC20BalanceRequestParams, SRC20TickPageData } from "$lib/types/src20.d.ts";
 import { formatAmount } from "$lib/utils/formatUtils.ts";
-import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { CircuitBreakerService, MARKET_CAP_FALLBACK_DATA, TRENDING_FALLBACK_DATA } from "$server/services/circuitBreaker.ts";
@@ -63,26 +61,6 @@ export class Src20Controller {
       return (result as any).rows[0].total;
     } catch (error) {
       console.error("Error getting total valid SRC20 transactions:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * @deprecated Use SRC20Service.QueryService.fetchAndFormatSrc20Data directly.
-   * This method is kept for backward compatibility with existing API routes.
-   */
-  static async handleSrc20TransactionsRequest(
-    _req: Request,
-    params: SRC20TrxRequestParams,
-    excludeFullyMinted = false,
-  ) {
-    try {
-      return await SRC20Service.QueryService.fetchAndFormatSrc20Data(
-        params,
-        excludeFullyMinted,
-      );
-    } catch (error) {
-      console.error("Error processing SRC20 transaction request:", error);
       throw error;
     }
   }
@@ -294,7 +272,7 @@ export class Src20Controller {
         this.handleSrc20BalanceRequest(balanceParams),
         SRC20Service.QueryService.fetchSrc20MintProgress(tick), // tick is unicode
         SRC20Service.QueryService.fetchAllSrc20DataForTick(tick),
-        MarketDataRepository.getSRC20MarketData(tick),
+        SRC20Service.QueryService.getSRC20MarketData(tick),
       ]);
 
       // Check if deployment is null
@@ -375,7 +353,7 @@ export class Src20Controller {
 
       // Use the optimized market data repository method
       const marketDataLimit = Math.min(limit * 3, 150); // Get more data for sorting, but not too much
-      const cachedMarketData = await MarketDataRepository.getAllSRC20MarketData(marketDataLimit);
+      const cachedMarketData = await SRC20Service.QueryService.getAllSRC20MarketData(marketDataLimit);
 
       console.log(`[MarketCapV2] Retrieved ${cachedMarketData.length} market data entries`);
 
@@ -428,6 +406,12 @@ export class Src20Controller {
         src20DataMap.set(item.tick, item);
       });
 
+      // Create a map of market data for service layer
+      const marketDataMap = new Map();
+      cachedMarketData.forEach(marketData => {
+        marketDataMap.set(marketData.tick, marketData);
+      });
+
       // Merge market data with SRC20 deploy data in the correct order
       const baseData = cachedMarketData
         .map(marketData => {
@@ -443,18 +427,11 @@ export class Src20Controller {
         })
         .filter(item => item !== null); // Remove null entries
 
-      // 🚀 CENTRALIZED MARKET DATA ENRICHMENT (v2.3 format)
-      // Middleware will transform to v2.2 (remove market_data) if needed
-      const mergedData = await MarketDataEnrichmentService.enrichWithMarketData(
-        baseData,
-        {
-          bulkOptimized: true,
-          enableLogging: false
-        }
-      );
+      // 🚀 SERVICE LAYER: Structure data with market data
+      const structuredData = SRC20Service.QueryService.structureWithMarketData(baseData, marketDataMap);
 
       // Apply sorting if needed (market data is already sorted by market cap)
-      const sortedData = mergedData;
+      const sortedData = structuredData;
       if (sortBy === "HOLDERS") {
         sortedData.sort((a: any, b: any) => {
           const aHolders = Number(a.holders) || 0;
@@ -535,18 +512,7 @@ export class Src20Controller {
       const ticks = trendingData.data.map(row => row.tick);
 
       // Fetch market data for these specific ticks only (much more efficient)
-      const marketDataPromises = ticks.map(tick =>
-        MarketDataRepository.getSRC20MarketData(tick).catch(() => null)
-      );
-      const marketDataResults = await Promise.all(marketDataPromises);
-
-      // Create a map of tick -> market data for fast lookup
-      const marketDataMap = new Map();
-      marketDataResults.forEach((marketData, index) => {
-        if (marketData) {
-          marketDataMap.set(ticks[index], marketData);
-        }
-      });
+      const marketDataMap = await SRC20Service.QueryService.getBulkSRC20MarketData(ticks);
 
       // Get basic deployment data for trending tokens
       const deploymentData = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2({
@@ -579,7 +545,7 @@ export class Src20Controller {
         deploymentMap.set(item.tick, item);
       });
 
-      // Merge trending data with deployment data
+      // Merge trending data with deployment data and market data
       const baseData = trendingData.data
         .map(trendingItem => {
           const deploymentItem = deploymentMap.get(trendingItem.tick);
@@ -595,22 +561,19 @@ export class Src20Controller {
         })
         .filter(item => item !== null); // Remove null entries
 
-      // Enrich with market data using centralized service
-      const enrichedData = await MarketDataEnrichmentService.enrichWithMarketData(
-        baseData,
-        { bulkOptimized: true, includeExtendedFields: true }
-      );
+      // 🚀 SERVICE LAYER: Structure data with market data
+      const structuredData = SRC20Service.QueryService.structureWithMarketData(baseData, marketDataMap);
 
       // Apply pagination
       const startIndex = (page - 1) * limit;
-      const paginatedData = enrichedData.slice(startIndex, startIndex + limit);
-      const totalPages = Math.ceil(enrichedData.length / limit);
+      const paginatedData = structuredData.slice(startIndex, startIndex + limit);
+      const totalPages = Math.ceil(structuredData.length / limit);
 
       console.log(`[TrendingV2] Returning ${paginatedData.length} items (page ${page}/${totalPages})`);
 
       return {
         data: paginatedData,
-        total: enrichedData.length,
+        total: structuredData.length,
         page,
         totalPages,
         limit,

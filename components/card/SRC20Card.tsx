@@ -12,6 +12,15 @@ import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { formatDate } from "$lib/utils/formatUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
 
+// Local utility functions for v2.3 market data format
+function getFloorPrice(src20: any): number {
+  return src20?.market_data?.floor_price_btc || 0;
+}
+
+function getVolume24h(src20: any): number {
+  return src20?.market_data?.volume_24h_btc || 0;
+}
+
 interface SRC20CardProps {
   data: SRC20Row[];
   fromPage: "src20" | "wallet" | "stamping/src20" | "home";
@@ -168,7 +177,8 @@ export function SRC20Card({
                     } ${rowCardBorderCenter}`}
                   >
                     {(() => {
-                      const priceInBtc = src20.floor_unit_price ?? 0;
+                      // ✅ CLEANED: No more root-level field access
+                      const priceInBtc = getFloorPrice(src20);
                       if (priceInBtc === 0) {
                         return "0 SATS";
                       }
@@ -224,15 +234,14 @@ export function SRC20Card({
                     } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
                   >
                     {(() => {
-                      const volume = (src20 as any).volume24;
-                      if (volume === undefined || volume === null) {
-                        return "N/A";
+                      // ✅ CLEANED: No more type casting chaos
+                      const volume = getVolume24h(src20);
+                      if (volume === 0) {
+                        return "0 BTC";
                       }
 
                       // Smart formatting based on volume level
-                      if (volume === 0) {
-                        return "0 BTC";
-                      } else if (volume < 0.0001) {
+                      if (volume < 0.0001) {
                         // For very small volumes, show 6 decimals
                         return volume.toFixed(6) + " BTC";
                       } else if (volume < 0.01) {

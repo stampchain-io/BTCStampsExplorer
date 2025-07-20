@@ -749,4 +749,65 @@ export class SRC20QueryService {
       return []; // Return empty array on error
     }
   }
+
+  /**
+   * Structure SRC20 data with v2.3 market data format
+   * Follows proper service layer pattern for market data structuring
+   */
+  static structureWithMarketData(
+    baseData: any[],
+    marketDataMap: Map<string, any>
+  ): any[] {
+    return baseData.map(item => {
+      const marketData = marketDataMap.get(item.tick);
+
+      return {
+        ...item,
+        // 🚀 SERVICE LAYER: Structure v2.3 market data format
+        market_data: marketData ? {
+          tick: marketData.tick,
+          floor_price_btc: marketData.floorPriceBTC,
+          market_cap_btc: marketData.marketCapBTC,
+          volume_24h_btc: marketData.volume24hBTC,
+          price_change_24h_percent: marketData.priceChange24hPercent,
+          volume_7d_btc: marketData.volume7dBTC || 0,
+          price_change_7d_percent: marketData.priceChange7dPercent || 0,
+          holder_count: marketData.holderCount,
+          last_updated: marketData.lastUpdated,
+        } : null
+      };
+    });
+  }
+
+  /**
+   * Get all SRC20 market data - service layer method
+   */
+  static async getAllSRC20MarketData(limit: number) {
+    return await MarketDataRepository.getAllSRC20MarketData(limit);
+  }
+
+  /**
+   * Get market data for a single tick - service layer method
+   */
+  static async getSRC20MarketData(tick: string) {
+    return await MarketDataRepository.getSRC20MarketData(tick);
+  }
+
+  /**
+   * Get market data for multiple ticks - service layer method
+   */
+  static async getBulkSRC20MarketData(ticks: string[]) {
+    const marketDataPromises = ticks.map(tick =>
+      MarketDataRepository.getSRC20MarketData(tick).catch(() => null)
+    );
+    const marketDataResults = await Promise.all(marketDataPromises);
+
+    const marketDataMap = new Map();
+    marketDataResults.forEach((marketData, index) => {
+      if (marketData) {
+        marketDataMap.set(ticks[index], marketData);
+      }
+    });
+    return marketDataMap;
+  }
 }

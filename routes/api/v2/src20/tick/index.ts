@@ -1,40 +1,46 @@
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { SRC20TrxRequestParams } from "$globals";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import {
+  DEFAULT_PAGINATION,
+  validateSortParam,
+} from "$server/services/routeValidationService.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
 export const handler: Handlers = {
   async GET(req) {
+    const url = new URL(req.url);
+    const pagination = getPaginationParams(url);
+
+    // Check if pagination validation failed
+    if (pagination instanceof Response) {
+      return pagination;
+    }
+
+    const { limit, page } = pagination;
+
+    // Validate sort parameter
+    const sortValidation = validateSortParam(url);
+    if (!sortValidation.isValid) {
+      return sortValidation.error!;
+    }
+
+    const tick = url.searchParams.get("tick");
+    const params: SRC20TrxRequestParams = {
+      ...(tick && { tick }),
+      ...(sortValidation.data && { sortBy: sortValidation.data }),
+      page: page || DEFAULT_PAGINATION.page,
+      limit: limit || DEFAULT_PAGINATION.limit,
+    };
+
     try {
-      const url = new URL(req.url);
-      const pagination = getPaginationParams(url);
-
-      // Check if pagination validation failed
-      if (pagination instanceof Response) {
-        return pagination;
-      }
-
-      const { limit, page } = pagination;
-
-      const params: SRC20TrxRequestParams = {
-        sortBy: url.searchParams.get("sort") || "ASC",
-        limit,
-        page,
-      };
-
-      const op = url.searchParams.get("op");
-      if (op) {
-        params.op = op;
-      }
-
-      const result = await Src20Controller.handleSrc20TransactionsRequest(
-        req,
+      const result = await SRC20Service.QueryService.fetchAndFormatSrc20Data(
         params,
       );
-      return ResponseUtil.success(result);
+      return ApiResponseUtil.success(result);
     } catch (error) {
-      return ResponseUtil.internalError(error, "Error processing request");
+      return ApiResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

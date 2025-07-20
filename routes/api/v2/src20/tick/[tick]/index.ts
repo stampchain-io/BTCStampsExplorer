@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { PaginatedTickResponseBody } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { BigFloat } from "bigfloat/mod.ts";
@@ -27,7 +27,7 @@ export const handler: Handlers = {
 
       // Validate SRC20 tick format
       if (!isValidSrc20Tick(decodedTick)) {
-        return ResponseUtil.badRequest(
+        return ApiResponseUtil.badRequest(
           `Invalid SRC20 tick format: ${decodedTick}. Must be 1-5 characters, alphanumeric and special characters allowed.`,
         );
       }
@@ -105,10 +105,10 @@ export const handler: Handlers = {
         data,
       };
 
-      return ResponseUtil.success(body);
+      return ApiResponseUtil.success(body);
     } catch (error) {
       console.error(error);
-      return ResponseUtil.internalError(error, "Error processing request");
+      return ApiResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

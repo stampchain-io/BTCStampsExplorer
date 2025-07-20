@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
@@ -13,19 +13,19 @@ export const handler: Handlers = {
     const address = url.searchParams.get("address");
 
     if (!address) {
-      return ResponseUtil.badRequest("Address is required");
+      return ApiResponseUtil.badRequest("Address is required");
     }
 
     try {
       const creatorName = await CreatorService.getCreatorNameByAddress(address);
 
       if (!creatorName) {
-        return ResponseUtil.notFound("Creator name not found");
+        return ApiResponseUtil.notFound("Creator name not found");
       }
 
-      return ResponseUtil.success({ creatorName });
+      return ApiResponseUtil.success({ creatorName });
     } catch (error) {
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error fetching creator name",
       );
@@ -49,7 +49,7 @@ export const handler: Handlers = {
         .json();
 
       if (!address || !newName || !signature || !timestamp || !csrfToken) {
-        return ResponseUtil.badRequest("Missing required fields");
+        return ApiResponseUtil.badRequest("Missing required fields");
       }
 
       const result = await CreatorService.updateCreatorName({
@@ -61,15 +61,15 @@ export const handler: Handlers = {
       });
 
       if (!result.success) {
-        return ResponseUtil.badRequest(result.message || "Update failed");
+        return ApiResponseUtil.badRequest(result.message || "Update failed");
       }
 
-      return ResponseUtil.success({
+      return ApiResponseUtil.success({
         success: true,
         creatorName: result.creatorName,
       });
     } catch (error) {
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error updating creator name",
       );

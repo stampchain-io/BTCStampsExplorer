@@ -1,7 +1,6 @@
 /* ===== DATA TABLE BASE COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
-import { containerBackground, ScrollContainer } from "$layout";
 import { TabData, TableProps, TableType } from "$components/layout/types.ts";
+import { containerBackground, ScrollContainer } from "$layout";
 import {
   SRC20MintsTable,
   SRC20TransfersTable,
@@ -10,6 +9,7 @@ import {
   StampTransfersTable,
 } from "$table";
 import { labelSm, loaderText, value3xlTransparent } from "$text";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
 const PAGE_SIZE = 20;
@@ -104,6 +104,11 @@ export default function DataTableBase({
         const operation = tabId === "mints" ? "MINT" : "TRANSFER";
         const response = await fetch(
           `/api/v2/src20/tick/${tick}?op=${operation}&${params}`,
+          {
+            headers: {
+              "X-API-Version": "2.3",
+            },
+          },
         );
         const data = await response.json();
 
@@ -221,8 +226,16 @@ export default function DataTableBase({
         } else if (type === "src20" && tick) {
           const encodedTick = encodeURIComponent(tick);
           const [transferCount, mintCount] = await Promise.all([
-            fetch(`/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`),
-            fetch(`/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`),
+            fetch(`/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`, {
+              headers: {
+                "X-API-Version": "2.3",
+              },
+            }),
+            fetch(`/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`, {
+              headers: {
+                "X-API-Version": "2.3",
+              },
+            }),
           ]);
 
           const [transferData, mintData] = await Promise.all([

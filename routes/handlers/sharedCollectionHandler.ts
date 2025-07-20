@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 const collectionHandler: Handlers = {
   async GET(req: Request, _ctx) {
@@ -9,7 +9,7 @@ const collectionHandler: Handlers = {
       const collectionName = url.searchParams.get("name");
 
       if (!collectionName) {
-        return ResponseUtil.badRequest("Collection name is required");
+        return ApiResponseUtil.badRequest("Collection name is required");
       }
 
       const collection = await CollectionService.getCollectionByName(
@@ -17,12 +17,12 @@ const collectionHandler: Handlers = {
       );
 
       if (!collection) {
-        return ResponseUtil.notFound("Collection not found");
+        return ApiResponseUtil.notFound("Collection not found");
       }
 
-      return ResponseUtil.success({ data: collection });
+      return ApiResponseUtil.success({ data: collection });
     } catch (error) {
-      return ResponseUtil.internalError(error, "Error fetching collection");
+      return ApiResponseUtil.internalError(error, "Error fetching collection");
     }
   },
 };

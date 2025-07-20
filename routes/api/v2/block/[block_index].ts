@@ -1,39 +1,29 @@
 import { Handlers } from "$fresh/server.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { BlockController } from "$server/controller/blockController.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { BlockHandlerContext } from "$globals";
+import { RouteType } from "$server/services/cacheService.ts";
 
-export const handler: Handlers<BlockHandlerContext> = {
-  async GET(req, ctx) {
+export const handler: Handlers = {
+  async GET(_req, ctx) {
     try {
-      const { block_index } = ctx.params;
-
-      // Validate block_index parameter
-      const blockNum = Number(block_index);
-      if (isNaN(blockNum) || blockNum < 0 || !Number.isInteger(blockNum)) {
-        return ResponseUtil.badRequest(
-          `Invalid block index: ${block_index}. Must be a non-negative integer.`,
+      const blockIndex = parseInt(ctx.params.block_index);
+      if (isNaN(blockIndex)) {
+        return ApiResponseUtil.badRequest(
+          "Invalid block index: must be a valid number",
         );
       }
 
-      const url = new URL(req.url);
-      const type = url.pathname.includes("/cursed/")
-        ? "cursed"
-        : url.pathname.includes("/stamps/")
-        ? "stamps"
-        : "all";
+      const block = await BlockController.getBlockInfoResponse(blockIndex);
+      if (!block) {
+        return ApiResponseUtil.notFound("Block not found");
+      }
 
-      const response = await BlockController.getBlockInfoResponse(
-        block_index,
-        type,
-      );
-      return ResponseUtil.success(response);
+      return ApiResponseUtil.success({ data: block }, {
+        routeType: RouteType.HISTORICAL,
+      });
     } catch (error) {
-      console.error(`Error in block handler:`, error);
-      return ResponseUtil.internalError(
-        error,
-        "Error processing block request",
-      );
+      console.error("Error fetching block:", error);
+      return ApiResponseUtil.internalError(error);
     }
   },
 };

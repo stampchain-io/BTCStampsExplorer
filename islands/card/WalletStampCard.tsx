@@ -80,7 +80,7 @@ const WalletStampCardComponent = (
     return 6;
   };
 
-  const fetchStampImage = async () => {
+  const fetchStampImage = () => {
     setLoading(true);
     // Use stamp_url if available, otherwise construct image source
     if (stamp.stamp_url) {
@@ -384,13 +384,10 @@ const WalletStampCardComponent = (
   const stampWithMarketData = stamp as any;
   const marketData = stampWithMarketData?.marketData;
 
-  const hasStampValue = marketData?.walletValueBTC > 0 ||
-    (stamp.value && stamp.value > 0);
+  const hasStampValue = marketData?.walletValueBTC > 0;
   const hasMarketPrice = marketData
     ? (marketData.floorPriceBTC > 0 || marketData.recentSalePriceBTC > 0)
-    : ((stamp.floorPrice !== "priceless" && !isNaN(Number(stamp.floorPrice))) ||
-      (stamp.recentSalePrice !== "priceless" &&
-        !isNaN(Number(stamp.recentSalePrice))));
+    : false;
 
   // Determine fallback display
   const fallbackDisplay = {

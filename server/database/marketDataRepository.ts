@@ -1,23 +1,69 @@
 import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT } from "$constants";
 import type { StampFilters, StampRow } from "$globals";
 import type {
-  CacheStatus,
-  CollectionMarketData,
-  CollectionMarketDataRow,
-  SRC20MarketData,
-  SRC20MarketDataRow,
-  StampHolderCache,
-  StampHolderCacheRow,
-  StampMarketData,
-  StampMarketDataRow,
-  StampWithMarketData,
+    CacheStatus,
+    CollectionMarketData,
+    CollectionMarketDataRow,
+    SRC20MarketData,
+    SRC20MarketDataRow,
+    StampHolderCache,
+    StampHolderCacheRow,
+    StampMarketData,
+    StampMarketDataRow,
+    StampWithMarketData,
 } from "$lib/types/marketData.d.ts";
-import {
-  getCacheStatus,
-  parseBTCDecimal,
-  parseExchangeSources,
-  parseVolumeSources,
-} from "$lib/utils/marketData.ts";
+// Local utility functions for market data parsing
+function getCacheStatus(cacheAgeMinutes?: number): any {
+  if (!cacheAgeMinutes) return "UNKNOWN";
+  if (cacheAgeMinutes <= 5) return "FRESH";
+  if (cacheAgeMinutes <= 15) return "STALE_OK";
+  if (cacheAgeMinutes <= 60) return "STALE";
+  return "EXPIRED";
+}
+
+function parseBTCDecimal(value: any): number {
+  if (value === null || value === undefined) return 0;
+  const parsed = typeof value === 'string' ? parseFloat(value) : Number(value);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+function parseExchangeSources(sources: any): string[] {
+  if (!sources) return [];
+  if (Array.isArray(sources)) return sources;
+  if (typeof sources === 'string') {
+    try {
+      return JSON.parse(sources);
+    } catch {
+      return [sources];
+    }
+  }
+  return [];
+}
+
+function parseVolumeSources(sources: any): any {
+  if (!sources) return {};
+  if (typeof sources === 'object' && sources !== null && !Array.isArray(sources)) {
+    return sources;
+  }
+  if (Array.isArray(sources)) {
+    // Convert array to Record if needed
+    const result: Record<string, number> = {};
+    sources.forEach((source, index) => {
+      result[source] = index;
+    });
+    return result;
+  }
+  if (typeof sources === 'string') {
+    try {
+      const parsed = JSON.parse(sources);
+      return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+  return {};
+}
+
 import { dbManager } from "$server/database/databaseManager.ts";
 
 /**
@@ -254,7 +300,7 @@ export class MarketDataRepository {
           marketData = this.parseStampMarketDataRow(marketDataRow);
 
           cacheAgeMinutes = row.cache_age_minutes;
-          cacheStatus = getCacheStatus(cacheAgeMinutes);
+          cacheStatus = getCacheStatus(cacheAgeMinutes) as any;
         }
 
         const stampWithMarketData: StampWithMarketData = {

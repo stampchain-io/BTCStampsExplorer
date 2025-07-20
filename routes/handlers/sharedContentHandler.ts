@@ -1,15 +1,15 @@
-import { StampController } from "$server/controller/stampController.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { FreshContext } from "$fresh/server.ts";
+import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
 import {
   getIdentifierType,
   isCpid,
   isTxHash,
 } from "$lib/utils/identifierUtils.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
-import { FreshContext } from "$fresh/server.ts";
-import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { getRecursiveHeaders } from "$lib/utils/securityHeaders.ts";
+import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { RouteType } from "$server/services/cacheService.ts";
 
 // Define the state type
 export interface State {
@@ -166,5 +166,7 @@ export async function handleContentRequest(
 
 // Add default export for Fresh manifest compatibility - dummy handler
 export default function () {
-  return new Response("OK");
+  return WebResponseUtil.success("OK", {
+    headers: { "Content-Type": "text/plain" },
+  });
 }

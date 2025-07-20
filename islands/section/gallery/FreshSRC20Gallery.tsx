@@ -8,7 +8,7 @@ import { SRC20CardSm } from "$components/card/SRC20CardSm.tsx";
 import type { EnrichedSRC20Row } from "$globals";
 import { LoadingIcon } from "$icon";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 
 // ===== TYPES =====
 
@@ -60,6 +60,27 @@ export default function FreshSRC20Gallery({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentSort, setCurrentSort] = useState<"ASC" | "DESC">(initialSort);
+
+  // ===== FRESH PERFORMANCE OPTIMIZATION =====
+  // Memoize tokens to prevent unnecessary re-renders when market data hasn't changed
+  const memoizedTokens = useMemo(() => {
+    // Create a stable reference for the token array based on market data values
+    return tokens.map((token) => ({
+      ...token,
+      // Add a computed field for memoization stability using available market data
+      _marketDataHash: token.market_data
+        ? `${token.market_data.floor_unit_price}-${token.market_data.volume24}-${token.market_data.mcap}`
+        : "no-market-data",
+    }));
+  }, [
+    // Re-memoize when:
+    tokens.length, // Number of tokens changes
+    tokens.map((t) => t.tick).join(","), // Token composition changes
+    tokens.map((t) => {
+      const md = t.market_data;
+      return md ? `${md.floor_unit_price}-${md.volume24}-${md.mcap}` : "none";
+    }).join(","), // Market data values change
+  ]);
 
   // ===== COMPUTED VALUES =====
   // const isWalletPage = fromPage === "wallet" ||
@@ -116,7 +137,11 @@ export default function FreshSRC20Gallery({
       }
 
       // Fallback to manual fetch if Fresh.js not available
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          "X-API-Version": "2.3",
+        },
+      });
       if (!response.ok) {
         throw new Error(`Failed to fetch SRC-20 tokens: ${response.status}`);
       }
@@ -363,7 +388,7 @@ export default function FreshSRC20Gallery({
       {/* SRC-20 Token Table */}
       <div class="relative">
         <SRC20CardSm
-          data={tokens}
+          data={memoizedTokens}
           fromPage={fromPage as "src20" | "wallet" | "stamping/src20" | "home"}
           onImageClick={(imgSrc: string) => {
             console.log("SRC-20 image clicked:", imgSrc);

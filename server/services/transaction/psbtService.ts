@@ -188,8 +188,8 @@ export class PSBTServiceImpl {
         return derivedAddress === address;
       } catch (addressError) {
         // If there's an error deriving address or network mismatch, return false
-        logger.error("psbt-service", { 
-          message: "Error deriving address from script", 
+        logger.error("psbt-service", {
+          message: "Error deriving address from script",
           error: addressError instanceof Error ? addressError.message : String(addressError),
           script: utxo.script,
           expectedAddress: address
@@ -656,7 +656,16 @@ export class PSBTService {
   }
 
   /**
-   * @deprecated This will be removed in a future release. Please migrate to the buildPsbtFromUserFundedRawHex function.
+   * @deprecated ✅ NO LONGER USED - Migrated to GeneralPSBTService.generatePSBT()
+   *
+   * This method has been replaced by GeneralPSBTService.generatePSBT() which provides
+   * a cleaner architecture and supports all operation types.
+   *
+   * See migration examples in:
+   * - routes/api/v2/fairmint/compose.ts
+   * - routes/api/v2/trx/stampdetach.ts
+   *
+   * @deprecated This will be removed in a future release. Please migrate to GeneralPSBTService.generatePSBT().
    */
   static async processCounterpartyPSBT(
     psbtBase64: string,

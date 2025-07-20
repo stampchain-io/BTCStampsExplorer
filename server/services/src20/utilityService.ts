@@ -4,7 +4,7 @@ import { crypto } from "@std/crypto";
 import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
 import { SRC20QueryService } from "./queryService.ts";
 import { BigFloat } from "bigfloat/mod.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { InputData } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { validateImageReference } from "$lib/utils/imageProtocolUtils.ts";
@@ -83,11 +83,11 @@ export class SRC20UtilityService {
 
     // Basic validation for all operations
     if (!data.sourceAddress) {
-      return ResponseUtil.badRequest("Source address is required");
+      return ApiResponseUtil.badRequest("Source address is required");
     }
 
     if (!data.tick) {
-      return ResponseUtil.badRequest("Tick is required");
+      return ApiResponseUtil.badRequest("Tick is required");
     }
 
     // Operation-specific validation
@@ -99,53 +99,53 @@ export class SRC20UtilityService {
       case "transfer":
         return await this.validateTransfer(data);
       default:
-        return ResponseUtil.badRequest("Invalid operation");
+        return ApiResponseUtil.badRequest("Invalid operation");
     }
   }
 
   private static async validateDeploy(data: InputData): Promise<Response | null> {
     // Optional field validations - apply to both estimation and non-estimation
     if (data.x && (typeof data.x !== 'string' || data.x.length > 32 || !/^[a-zA-Z0-9_]{1,32}$/.test(data.x))) {
-      return ResponseUtil.badRequest("Invalid x username (max 32 chars, alphanumeric and underscore only)");
+      return ApiResponseUtil.badRequest("Invalid x username (max 32 chars, alphanumeric and underscore only)");
     }
     if (data.web) {
       if (typeof data.web !== 'string') {
-        return ResponseUtil.badRequest("Invalid website URL (must be string)");
+        return ApiResponseUtil.badRequest("Invalid website URL (must be string)");
       }
       if (data.web.length > 255) {
-        return ResponseUtil.badRequest("Invalid website URL (max 255 chars)");
+        return ApiResponseUtil.badRequest("Invalid website URL (max 255 chars)");
       }
       if (!/^https?:\/\/.+/.test(data.web)) {
-        return ResponseUtil.badRequest("Invalid website URL (must start with http:// or https://)");
+        return ApiResponseUtil.badRequest("Invalid website URL (must start with http:// or https://)");
       }
     }
     if (data.email && (typeof data.email !== 'string' || data.email.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))) {
-      return ResponseUtil.badRequest("Invalid email address (max 255 chars)");
+      return ApiResponseUtil.badRequest("Invalid email address (max 255 chars)");
     }
     if (data.tg && (typeof data.tg !== 'string' || data.tg.length > 32 || !/^[a-zA-Z0-9_]{1,32}$/.test(data.tg))) {
-      return ResponseUtil.badRequest("Invalid telegram username (max 32 chars, alphanumeric and underscore only)");
+      return ApiResponseUtil.badRequest("Invalid telegram username (max 32 chars, alphanumeric and underscore only)");
     }
     if ((data.description || data.desc) && (typeof (data.description || data.desc) !== 'string' || (data.description || data.desc)!.length > 255)) {
-      return ResponseUtil.badRequest("Invalid description (max 255 chars)");
+      return ApiResponseUtil.badRequest("Invalid description (max 255 chars)");
     }
 
     // Skip deployed check for estimation only
     if (!data.isEstimate) {
       const { deployed } = await this.checkDeployedTick(data.tick);
       if (deployed) {
-        return ResponseUtil.badRequest(`Token ${data.tick} already deployed`);
+        return ApiResponseUtil.badRequest(`Token ${data.tick} already deployed`);
       }
     }
 
     // Required field validations
     if (!data.max) {
-      return ResponseUtil.badRequest("Max supply is required for deploy");
+      return ApiResponseUtil.badRequest("Max supply is required for deploy");
     }
     if (!data.lim) {
-      return ResponseUtil.badRequest("Limit per mint is required for deploy");
+      return ApiResponseUtil.badRequest("Limit per mint is required for deploy");
     }
     if (data.dec === undefined) {
-      return ResponseUtil.badRequest("Decimals is required for deploy");
+      return ApiResponseUtil.badRequest("Decimals is required for deploy");
     }
 
     // Validate numeric values
@@ -155,23 +155,23 @@ export class SRC20UtilityService {
       const decValue = typeof data.dec === 'number' ? data.dec : parseInt(String(data.dec));
 
       if (maxValue <= 0n) {
-        return ResponseUtil.badRequest("Max supply must be greater than 0");
+        return ApiResponseUtil.badRequest("Max supply must be greater than 0");
       }
       if (limValue <= 0n) {
-        return ResponseUtil.badRequest("Limit per mint must be greater than 0");
+        return ApiResponseUtil.badRequest("Limit per mint must be greater than 0");
       }
       if (limValue > maxValue) {
-        return ResponseUtil.badRequest("Limit per mint cannot exceed max supply");
+        return ApiResponseUtil.badRequest("Limit per mint cannot exceed max supply");
       }
       if (decValue < 0 || decValue > 18) {
-        return ResponseUtil.badRequest("Decimals must be between 0 and 18");
+        return ApiResponseUtil.badRequest("Decimals must be between 0 and 18");
       }
     } catch (error) {
       logger.error("src20-utility", { 
         message: "Failed to parse numeric values for deploy validation", 
         error: error instanceof Error ? error.message : String(error) 
       });
-      return ResponseUtil.badRequest("Invalid numeric values provided");
+      return ApiResponseUtil.badRequest("Invalid numeric values provided");
     }
 
     return null;
@@ -179,14 +179,14 @@ export class SRC20UtilityService {
 
   private static async validateMint(data: InputData): Promise<Response | null> {
     if (!data.amt) {
-      return ResponseUtil.badRequest("Amount is required for mint");
+      return ApiResponseUtil.badRequest("Amount is required for mint");
     }
 
     // Skip minted out check for estimation
     if (!data.isEstimate) {
       const mintInfo = await this.checkMintedOut(data.tick, data.amt);
       if (mintInfo.minted_out) {
-        return ResponseUtil.badRequest(`Token ${data.tick} already minted out`);
+        return ApiResponseUtil.badRequest(`Token ${data.tick} already minted out`);
       }
     }
 
@@ -195,10 +195,10 @@ export class SRC20UtilityService {
 
   private static async validateTransfer(data: InputData): Promise<Response | null> {
     if (!data.toAddress || !isValidBitcoinAddress(data.toAddress)) {
-      return ResponseUtil.badRequest("Invalid or missing recipient address");
+      return ApiResponseUtil.badRequest("Invalid or missing recipient address");
     }
     if (!data.amt) {
-      return ResponseUtil.badRequest("Amount is required for transfer");
+      return ApiResponseUtil.badRequest("Amount is required for transfer");
     }
 
     // Skip balance check for estimation
@@ -209,7 +209,7 @@ export class SRC20UtilityService {
         data.amt,
       );
       if (!hasBalance) {
-        return ResponseUtil.badRequest("Insufficient balance");
+        return ApiResponseUtil.badRequest("Insufficient balance");
       }
     }
 

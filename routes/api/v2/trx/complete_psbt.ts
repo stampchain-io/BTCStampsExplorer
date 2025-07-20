@@ -25,9 +25,7 @@ export const handler: Handlers = {
           feeRate,
         );
 
-      return new Response(JSON.stringify({ completedPsbt: completedPsbtHex }), {
-        headers: { "Content-Type": "application/json" },
-      });
+      return ApiResponseUtil.success({ completedPsbt: completedPsbtHex });
     } catch (error) {
       logger.error("api", {
         message: "Error completing PSBT",

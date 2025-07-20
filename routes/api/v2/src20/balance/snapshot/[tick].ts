@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { TickHandlerContext } from "$globals";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
@@ -56,10 +56,10 @@ export const handler: Handlers<TickHandlerContext> = {
         return emptyCheck;
       }
 
-      return ResponseUtil.success(result, { routeType: RouteType.BALANCE });
+      return ApiResponseUtil.success(result, { routeType: RouteType.BALANCE });
     } catch (error) {
       console.error("Error in snapshot handler:", error);
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error processing snapshot request",
       );

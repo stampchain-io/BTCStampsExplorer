@@ -1,8 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { UTXOService } from "$server/services/transaction/utxoService.ts";
 import type { BasicUTXO, UTXO } from "$types/index.d.ts";
-import { logger } from "$lib/utils/logger.ts";
 
 export const handler: Handlers = {
   async GET(req: Request) {
@@ -13,7 +13,7 @@ export const handler: Handlers = {
       const excludeAssets = url.searchParams.get("excludeAssets") === "true";
 
       if (!address) {
-        return ResponseUtil.badRequest("Address parameter is required");
+        return ApiResponseUtil.badRequest("address parameter is required");
       }
 
       logger.debug("api-utxo-query", {
@@ -50,7 +50,7 @@ export const handler: Handlers = {
             address,
             error: (error as Error).message,
           });
-          return ResponseUtil.internalError(
+          return ApiResponseUtil.internalError(
             error as Error,
             "Failed to select/filter UTXOs",
           );
@@ -74,20 +74,20 @@ export const handler: Handlers = {
             address,
             error: (error as Error).message,
           });
-          return ResponseUtil.internalError(
+          return ApiResponseUtil.internalError(
             error as Error,
             "Failed to fetch UTXOs",
           );
         }
       }
 
-      if (!utxos) { // Should generally not happen if errors are caught, but as a safeguard
+      if (!utxos || utxos.length === 0) {
         logger.warn("api-utxo-query", {
           message:
             "API: No UTXOs found or error occurred, utxos array is undefined",
           address,
         });
-        return ResponseUtil.notFound(
+        return ApiResponseUtil.notFound(
           "No UTXOs found for address or error in processing",
         );
       }
@@ -100,16 +100,14 @@ export const handler: Handlers = {
         finalCount: sortedUtxos.length,
       });
 
-      return new Response(JSON.stringify({ utxos: sortedUtxos }), {
-        headers: { "Content-Type": "application/json" },
-      });
+      return ApiResponseUtil.success({ utxos: sortedUtxos });
     } catch (error) {
       logger.error("api-utxo-query", {
         message: "API: Unhandled error in UTXO query handler",
         error: (error as Error).message,
         stack: (error as Error).stack,
       });
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error as Error,
         "Internal Server Error",
       );

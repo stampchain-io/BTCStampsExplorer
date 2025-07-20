@@ -1,6 +1,6 @@
 import {
-    SRC20SnapshotRequestParams,
-    SRC20TrxRequestParams,
+  SRC20SnapshotRequestParams,
+  SRC20TrxRequestParams,
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "$lib/utils/constants.ts";
@@ -198,9 +198,31 @@ export class SRC20Repository {
       : 1;
     const offset = safeLimit * (safePage - 1);
 
-    const validOrder = ["ASC", "DESC"].includes(sortBy.toUpperCase())
-      ? sortBy.toUpperCase()
-      : "ASC";
+    // Handle HOLDERS sorting specially
+    let finalOrderBy = `src20.block_index ASC`;
+    let needsMarketData = false;
+
+    if (sortBy) {
+      const normalizedSortBy = sortBy.toUpperCase();
+
+      if (normalizedSortBy === "HOLDERS_DESC") {
+        finalOrderBy = `h.holders DESC`;
+        needsMarketData = false;
+      } else if (normalizedSortBy === "HOLDERS_ASC") {
+        finalOrderBy = `h.holders ASC`;
+        needsMarketData = false;
+      } else if (normalizedSortBy === "MARKET_CAP_DESC") {
+        finalOrderBy = `smd.market_cap_btc DESC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "MARKET_CAP_ASC") {
+        finalOrderBy = `smd.market_cap_btc ASC`;
+        needsMarketData = true;
+      } else if (["ASC", "DESC"].includes(normalizedSortBy)) {
+        finalOrderBy = `src20.block_index ${normalizedSortBy}`;
+      } else {
+        finalOrderBy = `src20.block_index ASC`;
+      }
+    }
 
     const rowNumberInit = offset;
     const limitOffsetClause = `LIMIT ? OFFSET ?`;
@@ -286,11 +308,12 @@ export class SRC20Repository {
           b.block_time,
           b.creator_name,
           b.destination_name,
-          h.holders,
-          mp.progress${feeFieldsOutput}
+          COALESCE(h.holders, 0) as holders,
+          COALESCE(mp.progress, 0) as progress${needsMarketData ? ',\n          smd.market_cap_btc,\n          smd.floor_price_btc' : ''}${feeFieldsOutput}
         FROM base_query b
         LEFT JOIN holders h ON h.tick = b.tick
-        LEFT JOIN mint_progress mp ON mp.tick = b.tick
+        LEFT JOIN mint_progress mp ON mp.tick = b.tick${needsMarketData ? '\n        LEFT JOIN src20_market_data smd ON smd.tick = b.tick' : ''}
+        ORDER BY ${finalOrderBy}
         ${limitOffsetClause}
       `;
 

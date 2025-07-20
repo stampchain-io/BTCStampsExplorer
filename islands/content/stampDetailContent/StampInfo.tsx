@@ -1,22 +1,26 @@
 /* ===== STAMP INFO COMPONENT ===== */
 /*@baba-750+764+815+icons - refactor to StatItems */
-import { useEffect, useRef, useState } from "preact/hooks";
-import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
-import {
-  abbreviateAddress,
-  formatBTCAmount,
-  formatDate,
-} from "$lib/utils/formatUtils.ts";
-import { getSRC101Data, getStampImageSrc } from "$lib/utils/imageUtils.ts";
+import { Button } from "$button";
 import { Src101Detail, StampRow } from "$globals";
+import { Icon } from "$icon";
+import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
-import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
+import { openModal } from "$islands/modal/states.ts";
 import {
   body,
   containerBackground,
   containerColData,
   gapSectionSlim,
 } from "$layout";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+  formatDate,
+} from "$lib/utils/formatUtils.ts";
+import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
+import { getSRC101Data, getStampImageSrc } from "$lib/utils/imageUtils.ts";
+import { tooltipIcon } from "$notification";
+import { Dispenser, StampListingsOpenTable } from "$table";
 import {
   headingGreyDLLink,
   labelSm,
@@ -25,11 +29,7 @@ import {
   valueDark,
   valueSm,
 } from "$text";
-import { Button } from "$button";
-import { Dispenser, StampListingsOpenTable } from "$table";
-import { tooltipIcon } from "$notification";
-import { openModal } from "$islands/modal/states.ts";
-import { Icon } from "$icon";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface StampInfoProps {
@@ -549,21 +549,36 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     null,
   );
 
-  // Calculate BTC price from stamp data if available
-  const btcPrice =
-    stamp.floorPriceUSD && stamp.floorPrice && stamp.floorPrice !== "priceless"
-      ? stamp.floorPriceUSD / stamp.floorPrice
-      : null;
+  // v2.3 API: Use marketData for pricing (preferred) with legacy fallback
+  const stampWithMarketData = stamp as any;
+  const marketData = stampWithMarketData?.marketData;
 
-  // First, ensure our calculations are correct
+  // Calculate BTC price from v2.3 marketData or legacy fields
+  const floorPriceBTC = marketData?.floorPriceBTC ??
+    (stamp.floorPrice && stamp.floorPrice !== "priceless"
+      ? stamp.floorPrice
+      : null);
+  const floorPriceUSD = marketData
+    // For v2.3: calculate from marketData if available
+    ? (marketData.floorPriceBTC && marketData.volume24hBTC
+      ? marketData.floorPriceBTC * 117888
+      : null)
+    // Legacy fallback
+    : stamp.floorPriceUSD;
+
+  const btcPrice = floorPriceUSD && floorPriceBTC
+    ? floorPriceUSD / floorPriceBTC
+    : null;
+
+  // Calculate display price: dispenser price > floor price
   const displayPrice = selectedDispenser
     ? parseInt(selectedDispenser.satoshirate.toString(), 10) / 100000000
-    : (typeof stamp.floorPrice === "number" ? stamp.floorPrice : 0);
+    : (floorPriceBTC || 0);
 
   const displayPriceUSD = selectedDispenser && btcPrice
     ? (parseInt(selectedDispenser.satoshirate.toString(), 10) / 100000000) *
       btcPrice
-    : stamp.floorPriceUSD;
+    : floorPriceUSD;
 
   // Debug effects for development only
   useEffect(() => {
@@ -825,9 +840,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                           : (
                             <StampListingsOpenTable
                               dispensers={dispensers}
-                              floorPrice={typeof stamp.floorPrice === "number"
-                                ? stamp.floorPrice
-                                : 0}
+                              floorPrice={floorPriceBTC || 0}
                               onSelectDispenser={handleDispenserSelect}
                               selectedDispenser={selectedDispenser}
                             />

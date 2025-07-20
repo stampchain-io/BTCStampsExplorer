@@ -1,6 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
-import { BlockController } from "$server/controller/blockController.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { BlockController } from "$server/controller/blockController.ts";
 
 const sharedBlockWithStampsHandler: Handlers = {
   async GET(_req, ctx) {
@@ -27,5 +28,7 @@ export const handler = sharedBlockWithStampsHandler;
 
 // Add default export for Fresh manifest compatibility - dummy handler
 export default function () {
-  return new Response("OK");
+  return WebResponseUtil.success("OK", {
+    headers: { "Content-Type": "text/plain" },
+  });
 }

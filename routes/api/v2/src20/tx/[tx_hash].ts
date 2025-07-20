@@ -1,64 +1,55 @@
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { AddressHandlerContext, SRC20TrxRequestParams } from "$globals";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
-  checkEmptyResult,
-  validateRequiredParams,
+  DEFAULT_PAGINATION,
   validateSortParam,
 } from "$server/services/routeValidationService.ts";
-import { SRC20TrxRequestParams } from "$globals";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
-export const handler: Handlers = {
+export const handler: Handlers<AddressHandlerContext> = {
   async GET(req, ctx) {
+    const { tx_hash } = ctx.params;
+    const url = new URL(req.url);
+    const pagination = getPaginationParams(url);
+
+    // Check if pagination validation failed
+    if (pagination instanceof Response) {
+      return pagination;
+    }
+
+    const { limit, page } = pagination;
+
+    // Validate sort parameter
+    const sortValidation = validateSortParam(url);
+    if (!sortValidation.isValid) {
+      return sortValidation.error!;
+    }
+
+    const singleResult = url.searchParams.get("singleResult");
+    const tick = url.searchParams.get("tick");
+    const op = url.searchParams.get("op");
+    const block_index = url.searchParams.get("block_index");
+
+    const params: SRC20TrxRequestParams = {
+      tx_hash,
+      ...(op && { op }),
+      ...(tick && { tick }),
+      ...(block_index && { block_index: Number(block_index) }),
+      ...(singleResult === "true" && { singleResult: true }),
+      ...(sortValidation.data && { sortBy: sortValidation.data }),
+      page: page || DEFAULT_PAGINATION.page,
+      limit: limit || DEFAULT_PAGINATION.limit,
+    };
+
     try {
-      const { tx_hash } = ctx.params;
-
-      // Validate required parameters
-      const paramsValidation = validateRequiredParams({ tx_hash });
-      if (!paramsValidation.isValid) {
-        return paramsValidation.error!;
-      }
-
-      // Validate transaction hash format (should be 64 character hex)
-      if (!/^[a-fA-F0-9]{64}$/.test(tx_hash)) {
-        return ResponseUtil.badRequest(
-          `Invalid transaction hash format: ${tx_hash}. Must be a 64-character hexadecimal string.`,
-        );
-      }
-
-      const url = new URL(req.url);
-
-      // Validate sort parameter
-      const sortValidation = validateSortParam(url);
-      if (!sortValidation.isValid) {
-        return sortValidation.error!;
-      }
-
-      const params: SRC20TrxRequestParams = {
-        tx_hash,
-        ...(sortValidation.data && { sortBy: sortValidation.data }),
-        noPagination: true,
-        singleResult: true,
-      };
-
-      const result = await Src20Controller.handleSrc20TransactionsRequest(
-        req,
+      const result = await SRC20Service.QueryService.fetchAndFormatSrc20Data(
         params,
       );
-
-      // Check for empty result
-      const emptyCheck = checkEmptyResult(result, "transaction data");
-      if (emptyCheck) {
-        return emptyCheck;
-      }
-
-      return ResponseUtil.success(result);
+      return ApiResponseUtil.success(result);
     } catch (error) {
-      console.error("Error in GET handler:", error);
-      return ResponseUtil.internalError(
-        error,
-        "Error processing SRC20 tx request",
-      );
+      return ApiResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

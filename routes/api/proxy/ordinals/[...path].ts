@@ -1,4 +1,6 @@
 import { FreshContext } from "$fresh/server.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 
 export const handler = async (
   _req: Request,
@@ -12,11 +14,20 @@ export const handler = async (
   const ordinalsUrl = `https://ordinals.com/content/${fullPath}`;
 
   try {
-    // Fetch from ordinals.com
-    const response = await fetch(ordinalsUrl);
+    // Fetch from ordinals.com with User-Agent for monitoring
+    const response = await fetch(ordinalsUrl, {
+      headers: {
+        "User-Agent": "BTCStampsExplorer-Ordinals-Proxy",
+      },
+    });
 
     if (!response.ok) {
-      return new Response("Not Found", { status: 404 });
+      logger.warn("content", {
+        message: "Ordinals content not found",
+        url: ordinalsUrl,
+        status: response.status,
+      });
+      return WebResponseUtil.notFound("Ordinals content not found");
     }
 
     // Get the content and headers
@@ -24,20 +35,31 @@ export const handler = async (
     const contentType = response.headers.get("content-type") ||
       "application/octet-stream";
 
-    // Return with appropriate headers
-    return new Response(content, {
-      status: 200,
+    // Convert to base64 for WebResponseUtil.stampResponse
+    const uint8Array = new Uint8Array(content);
+    const base64String = btoa(String.fromCharCode(...uint8Array));
+
+    // Use WebResponseUtil for consistent content handling
+    return WebResponseUtil.stampResponse(base64String, contentType, {
+      binary: true,
       headers: {
-        "Content-Type": contentType,
         "Cache-Control": "public, max-age=31536000, immutable",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
         "Access-Control-Allow-Headers":
           "Content-Type, Accept, Origin, Authorization",
+        "X-Proxy-Source": "ordinals.com",
       },
     });
   } catch (error) {
-    console.error("Error proxying ordinals content:", error);
-    return new Response("Internal Server Error", { status: 500 });
+    logger.error("content", {
+      message: "Error proxying ordinals content",
+      error: error instanceof Error ? error.message : String(error),
+      url: ordinalsUrl,
+    });
+    return WebResponseUtil.internalError(
+      error,
+      "Failed to proxy Ordinals content",
+    );
   }
 };

@@ -1,13 +1,12 @@
 import { useConfig } from "$client/hooks/useConfig.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { useFees } from "$fees";
-import axiod from "axiod";
-import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
-// import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts"; // No longer used directly
 import { Config } from "$globals";
 import { debounce } from "$lib/utils/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { showNotification } from "$lib/utils/notificationUtils.ts";
+import axiod from "axiod";
+import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 
 interface PSBTFees {
   estMinerFee: number;

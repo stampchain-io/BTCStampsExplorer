@@ -86,15 +86,3 @@ export function unicodeEscapeToEmoji(unicodeStr: string): string {
 
   return result;
 }
-
-/**
- * @deprecated Use emojiToUnicodeEscape instead.
- * This function converts emoji characters to Unicode escape sequences for database storage.
- */
-export const convertEmojiToTick = emojiToUnicodeEscape;
-
-/**
- * @deprecated Use unicodeEscapeToEmoji instead.
- * This function converts Unicode escape sequences back to emoji characters for display.
- */
-export const convertToEmoji = unicodeEscapeToEmoji;

@@ -1,134 +1,160 @@
-import { Handlers } from "$fresh/server.ts";
-import {
-  getActiveAlerts,
-  getAlertsBySeverity,
-  getFeeSourceHealth,
-  getMonitoringMetrics,
-  logMonitoringSummary,
-} from "$lib/utils/monitoring.ts";
+// routes/api/internal/monitoring.ts
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { cloudWatchMonitoring } from "$server/services/aws/cloudWatchMonitoring.ts";
+import { objectPoolManager } from "$server/services/memory/objectPool.ts";
+import { memoryMonitor } from "$server/services/monitoring/memoryMonitorService.ts";
+import process from "node:process";
 
-export const handler: Handlers = {
-  GET(req) {
+export async function handler(req: Request): Promise<Response> {
+  try {
     const url = new URL(req.url);
-    const action = url.searchParams.get("action") || "summary";
+    const action = url.searchParams.get("action") || "health";
 
-    try {
-      switch (action) {
-        case "summary": {
-          const health = getFeeSourceHealth();
-          const activeAlerts = getActiveAlerts();
+    logger.info("api", { message: "Internal monitoring request", action });
 
-          return Response.json({
-            health,
-            activeAlerts: activeAlerts.length,
-            criticalAlerts: getAlertsBySeverity("critical").length,
-            highAlerts: getAlertsBySeverity("high").length,
-            timestamp: Date.now(),
-          });
-        }
-
-        case "metrics": {
-          const metrics = getMonitoringMetrics();
-          return Response.json(metrics);
-        }
-
-        case "alerts": {
-          const severity = url.searchParams.get("severity");
-          const alerts = severity
-            ? getAlertsBySeverity(severity as any)
-            : getActiveAlerts();
-
-          return Response.json({
-            alerts,
-            count: alerts.length,
-            timestamp: Date.now(),
-          });
-        }
-
-        case "health": {
-          const health = getFeeSourceHealth();
-          return Response.json({
-            sources: health,
-            overall: determineOverallHealth(health),
-            timestamp: Date.now(),
-          });
-        }
-
-        case "log": {
-          // Log summary to console (useful for debugging)
-          logMonitoringSummary();
-          return Response.json({
-            message: "Monitoring summary logged to console",
-            timestamp: Date.now(),
-          });
-        }
-
-        default:
-          return Response.json(
-            {
-              error:
-                "Invalid action. Use: summary, metrics, alerts, health, or log",
-            },
-            { status: 400 },
-          );
-      }
-    } catch (error) {
-      console.error("[monitoring API] Error:", error);
-      return Response.json(
-        {
-          error: "Internal server error",
-          message: error instanceof Error ? error.message : String(error),
-        },
-        { status: 500 },
-      );
+    switch (action) {
+      case "memory":
+        return await handleMemoryAction();
+      case "cloudwatch":
+        return await handleCloudWatchAction();
+      case "ecs":
+        return await handleECSAction();
+      case "pools":
+        return await handlePoolsAction();
+      case "business":
+        return await handleBusinessMetricsAction();
+      case "health":
+      default:
+        return await handleHealthAction();
     }
-  },
-};
+  } catch (error) {
+    logger.error("api", {
+      message: "Internal monitoring error",
+      error: String(error),
+    });
+    return ApiResponseUtil.internalError(
+      "Internal monitoring failed",
+      String(error),
+    );
+  }
+}
 
 /**
- * Determine overall system health based on individual source health
+ * Handle health check action
  */
-function determineOverallHealth(health: Record<string, any>): {
-  status: "healthy" | "degraded" | "unhealthy";
-  message: string;
-} {
-  const sources = Object.values(health);
-
-  if (sources.length === 0) {
-    return {
-      status: "unhealthy",
-      message: "No fee sources available",
+function handleHealthAction(): Promise<Response> {
+  try {
+    const health = {
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      pid: process.pid,
+      node_version: process.version,
+      environment: Deno.env.get("DENO_ENV") || "development",
     };
+
+    return Promise.resolve(ApiResponseUtil.success(health));
+  } catch (error) {
+    return Promise.resolve(
+      ApiResponseUtil.internalError(
+        "Health check failed",
+        error instanceof Error ? error.message : "Unknown error",
+      ),
+    );
   }
+}
 
-  const healthyCount = sources.filter((s) => s.status === "healthy").length;
-  const degradedCount = sources.filter((s) => s.status === "degraded").length;
-  const unhealthyCount = sources.filter((s) => s.status === "unhealthy").length;
+/**
+ * Handle memory monitoring action
+ */
+function handleMemoryAction(): Promise<Response> {
+  try {
+    const memoryStats = memoryMonitor.getMemoryStats();
+    return Promise.resolve(ApiResponseUtil.success(memoryStats));
+  } catch (error) {
+    return Promise.resolve(
+      ApiResponseUtil.internalError(
+        "Memory monitoring failed",
+        error instanceof Error ? error.message : "Unknown error",
+      ),
+    );
+  }
+}
 
-  if (unhealthyCount === sources.length) {
-    return {
-      status: "unhealthy",
-      message: "All fee sources are unhealthy",
+/**
+ * Handle CloudWatch monitoring action
+ */
+function handleCloudWatchAction(): Promise<Response> {
+  try {
+    const monitoringStatus = cloudWatchMonitoring.getMonitoringStatus();
+    return Promise.resolve(ApiResponseUtil.success(monitoringStatus));
+  } catch (error) {
+    return Promise.resolve(
+      ApiResponseUtil.internalError(
+        "CloudWatch monitoring failed",
+        error instanceof Error ? error.message : "Unknown error",
+      ),
+    );
+  }
+}
+
+/**
+ * Handle ECS-specific monitoring action
+ */
+function handleECSAction(): Promise<Response> {
+  try {
+    const ecsStatus = {
+      detected: cloudWatchMonitoring.getMonitoringStatus().ecsDetected,
+      environment: cloudWatchMonitoring.getMonitoringStatus().awsEnvironment,
+      timestamp: new Date().toISOString(),
     };
+    return Promise.resolve(ApiResponseUtil.success(ecsStatus));
+  } catch (error) {
+    return Promise.resolve(
+      ApiResponseUtil.internalError(
+        "ECS status failed",
+        error instanceof Error ? error.message : "Unknown error",
+      ),
+    );
   }
+}
 
-  if (healthyCount === 0) {
-    return {
-      status: "degraded",
-      message: `${degradedCount} degraded, ${unhealthyCount} unhealthy sources`,
+/**
+ * Handle object pools monitoring action
+ */
+function handlePoolsAction(): Promise<Response> {
+  try {
+    const poolStats = objectPoolManager.getAllMetrics();
+    return Promise.resolve(ApiResponseUtil.success(poolStats));
+  } catch (error) {
+    return Promise.resolve(
+      ApiResponseUtil.internalError(
+        "Pool stats failed",
+        error instanceof Error ? error.message : "Unknown error",
+      ),
+    );
+  }
+}
+
+/**
+ * Handle business metrics action
+ */
+function handleBusinessMetricsAction(): Promise<Response> {
+  try {
+    const businessMetrics = {
+      timestamp: new Date().toISOString(),
+      status: "healthy",
+      // Add business metrics here
     };
+    return Promise.resolve(ApiResponseUtil.success(businessMetrics));
+  } catch (error) {
+    return Promise.resolve(
+      ApiResponseUtil.internalError(
+        "Business metrics failed",
+        error instanceof Error ? error.message : "Unknown error",
+      ),
+    );
   }
-
-  if (unhealthyCount > 0 || degradedCount > 0) {
-    return {
-      status: "degraded",
-      message:
-        `${healthyCount} healthy, ${degradedCount} degraded, ${unhealthyCount} unhealthy sources`,
-    };
-  }
-
-  return {
-    status: "healthy",
-    message: `All ${healthyCount} sources are healthy`,
-  };
 }
