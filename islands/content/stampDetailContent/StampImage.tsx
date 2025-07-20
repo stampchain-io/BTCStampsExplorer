@@ -1,22 +1,22 @@
 /* ===== STAMP IMAGE COMPONENT ===== */
 /* @baba-update audio icon size (custom) - 780*/
-import { useEffect, useRef, useState } from "preact/hooks";
-import { VNode } from "preact";
 import { StampRow } from "$globals";
-import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
+import { Icon, LoadingIcon } from "$icon";
+import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
+import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
+import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
+import { body, containerDetailImage, gapSectionSlim } from "$layout";
 import {
   AUDIO_FILE_IMAGE,
   LIBRARY_FILE_IMAGE,
   NOT_AVAILABLE_IMAGE,
 } from "$lib/utils/constants.ts";
-import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
-import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
-import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
+import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
-import { openModal } from "$islands/modal/states.ts";
-import { Icon, LoadingIcon } from "$icon";
-import { body, containerDetailImage, gapSectionSlim } from "$layout";
+import { VNode } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== RIGHT PANEL SUBCOMPONENT ===== */
 function RightPanel(
@@ -561,12 +561,18 @@ export function StampImage(
 
           const svgContent = await response.text();
 
-          // Check if SVG has external ordinals.com references
-          if (svgContent.includes("ordinals.com/content/")) {
+          // Check if SVG has external ordinals.com or arweave.net references
+          if (
+            svgContent.includes("ordinals.com/content/") ||
+            svgContent.includes("arweave.net/")
+          ) {
             // Rewrite external references to use our proxy
             let rewrittenSVG = svgContent.replace(
               /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
               "/api/proxy/ordinals/$1",
+            ).replace(
+              /https:\/\/arweave\.net\/([^"'\s>]+)/g,
+              "/api/proxy/arweave/$1",
             );
 
             // Ensure SVG fills container by removing fixed dimensions and adding proper styling

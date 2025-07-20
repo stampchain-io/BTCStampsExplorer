@@ -1,10 +1,10 @@
 /* @baba - commentary + global styles */
-import { useCallback, useEffect, useRef, useState } from "preact/hooks";
-import { ModalSearchBase } from "$layout";
-import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
-import { textSm } from "$text";
 import { Icon } from "$icon";
+import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
+import { ModalSearchBase } from "$layout";
 import { tooltipIcon } from "$notification";
+import { textSm } from "$text";
+import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
 export function SearchStampModal({
   showButton = true,
@@ -92,6 +92,10 @@ export function SearchStampModal({
           if (
             stampResponse.ok && responseData.data && responseData.data.stamp
           ) {
+            // SSR-safe browser environment check
+            if (typeof globalThis === "undefined" || !globalThis?.location) {
+              return; // Cannot navigate during SSR
+            }
             globalThis.location.href = `/stamp/${query}`;
             return;
           }
@@ -111,6 +115,10 @@ export function SearchStampModal({
       if (/^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}$/.test(query)) {
         const isValidAndActive = await validateBitcoinAddress(query);
         if (isValidAndActive) {
+          // SSR-safe browser environment check
+          if (typeof globalThis === "undefined" || !globalThis?.location) {
+            return; // Cannot navigate during SSR
+          }
           globalThis.location.href = `/wallet/${query}`;
           return;
         }
@@ -131,6 +139,10 @@ export function SearchStampModal({
           const responseData = await response.json();
 
           if (response.ok && responseData.data && responseData.data.stamp) {
+            // SSR-safe browser environment check
+            if (typeof globalThis === "undefined" || !globalThis?.location) {
+              return; // Cannot navigate during SSR
+            }
             globalThis.location.href = `/stamp/${query.toUpperCase()}`;
             return;
           }
@@ -152,6 +164,10 @@ export function SearchStampModal({
           const responseData = await response.json();
 
           if (response.ok && responseData.data && responseData.data.stamp) {
+            // SSR-safe browser environment check
+            if (typeof globalThis === "undefined" || !globalThis?.location) {
+              return; // Cannot navigate during SSR
+            }
             globalThis.location.href = `/stamp/${query}`;
             return;
           }
@@ -253,7 +269,7 @@ export function SearchStampModal({
   }, []);
 
   return (
-    <div className="relative">
+    <div class="relative">
       {showButton && (
         <Icon
           type="iconButton"

@@ -451,9 +451,9 @@ export function FeeCalculatorBase({
               <span class={labelXs}>
                 RECEIVE
               </span>&nbsp;&nbsp;
-              {receive
-                ? receive
-                : <span class="animate-pulse">******</span>} USDSTAMPS
+              {receive ? receive : <span class="animate-pulse">******</span>}
+              {" "}
+              USDSTAMPS
             </h6>
           )}
 
@@ -524,9 +524,7 @@ export function FeeCalculatorBase({
               <span class={labelXs}>
                 DECIMALS
               </span>&nbsp;&nbsp;
-              {dec !== undefined
-                ? dec
-                : <span class="animate-pulse">0</span>}
+              {dec !== undefined ? dec : <span class="animate-pulse">0</span>}
             </h6>
           )}
 

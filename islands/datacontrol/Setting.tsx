@@ -49,7 +49,7 @@ export function Setting({
               onClick={() => handleOpen(false)}
               ariaLabel="Close"
             />
-            <p className="text-lg font-black text-[#AA00FF] mb-1">TOOLS</p>
+            <p class="text-lg font-black text-[#AA00FF] mb-1">TOOLS</p>
             {filterButtons.map((filter) => (
               <button
                 key={filter}
@@ -86,7 +86,7 @@ export function Setting({
           className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-lg shadow-md"
         >
           Settings
-          <div className="tooltip-arrow" />
+          <div class="tooltip-arrow" />
         </div>
       )}
     </div>

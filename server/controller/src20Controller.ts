@@ -1,7 +1,7 @@
 import {
-    PaginatedSrc20ResponseBody,
-    SRC20SnapshotRequestParams,
-    SRC20TrxRequestParams,
+  PaginatedSrc20ResponseBody,
+  SRC20SnapshotRequestParams,
+  SRC20TrxRequestParams,
 } from "$globals";
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
 import { SRC20BalanceRequestParams, SRC20TickPageData } from "$lib/types/src20.d.ts";
@@ -9,7 +9,9 @@ import { formatAmount } from "$lib/utils/formatUtils.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/blockService.ts";
+import { CircuitBreakerService, MARKET_CAP_FALLBACK_DATA, TRENDING_FALLBACK_DATA } from "$server/services/circuitBreaker.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
+import { MarketDataEnrichmentService } from "$server/services/src20/marketDataEnrichmentService.ts";
 import { MarketListingAggregated } from "$types/index.d.ts";
 
 export class Src20Controller {
@@ -17,7 +19,7 @@ export class Src20Controller {
    * Convert SRC20MarketData from cache to MarketListingAggregated format
    * This maintains compatibility with existing API consumers
    */
-  private static convertToMarketListingFormat(data: SRC20MarketData): MarketListingAggregated & { 
+  private static convertToMarketListingFormat(data: SRC20MarketData): MarketListingAggregated & {
     change24?: number;
     volume7d?: number;
     change7d?: number;
@@ -25,7 +27,7 @@ export class Src20Controller {
     // Use floor price or regular price (keep in BTC for the floor_unit_price field)
     const priceInBTC = data.floorPriceBTC || data.priceBTC || 0;
     const priceInSats = priceInBTC * 1e8;
-    
+
     return {
       tick: data.tick,
       floor_unit_price: priceInBTC, // Keep in BTC as SRC20Card expects
@@ -109,15 +111,27 @@ export class Src20Controller {
       // Process data with mint progress if requested
       let processedData: any = Array.isArray(rawData) && rawData.length > 1 ? [...rawData]: rawData;
 
+      // 🚀 CENTRALIZED MARKET DATA ENRICHMENT (v2.3 format)
+      // Middleware will transform to v2.2 (remove market_data) if needed
+      if (balanceParams.includeMarketData) {
+        processedData = await MarketDataEnrichmentService.enrichWithMarketData(
+          processedData,
+          {
+            bulkOptimized: true,
+            enableLogging: false
+          }
+        );
+      }
+
       if (balanceParams.includeMintData && Array.isArray(processedData)) {
         const ticks = processedData.map((row: any) => row.tick).filter(Boolean);
         if (ticks.length > 0) {
           const mintProgressData = await Promise.all(
-            ticks.map((tick: string) => 
+            ticks.map((tick: string) =>
               SRC20Service.QueryService.fetchSrc20MintProgress(tick)
             )
           );
-          
+
           // Create a map of tick to mint progress for efficient lookup
           const mintProgressMap = new Map(
             mintProgressData.map((progress: any, index: number) => [ticks[index], progress])
@@ -196,7 +210,7 @@ export class Src20Controller {
     const [src20_txs, totalResult, lastBlock, mint_status] = await Promise.all([
       SRC20Service.QueryService.fetchRawSrc20Data(params),
       this.getTotalCountValidSrc20Tx(
-        params.op 
+        params.op
           ? { tick: params.tick, op: params.op }
           : { tick: params.tick }
       ),
@@ -289,7 +303,7 @@ export class Src20Controller {
       }
 
       // Convert cached market data to the expected format
-      const marketInfoForTick = cachedMarketData 
+      const marketInfoForTick = cachedMarketData
         ? this.convertToMarketListingFormat(cachedMarketData)
         : undefined;
 
@@ -347,60 +361,26 @@ export class Src20Controller {
     sortBy: string = "TRENDING",
     sortDirection: string = "desc",
   ): Promise<PaginatedSrc20ResponseBody> {
-    try {
-      // First fetch market data from cache to get top ticks by market cap
-      const cachedMarketData = await MarketDataRepository.getAllSRC20MarketData(1000);
-      
-      console.log(`Cached market data count: ${cachedMarketData.length}`);
-      if (cachedMarketData.length > 0) {
-        console.log("Sample cached data:", cachedMarketData[0]);
-      }
-      
-      // Convert to MarketListingAggregated format for compatibility
-      const convertedMarketData = cachedMarketData.map((data: any) => 
-        this.convertToMarketListingFormat(data)
-      );
-      
-      if (convertedMarketData.length > 0) {
-        console.log("Sample converted data:", convertedMarketData[0]);
-      }
-      
-      // Market data is already sorted by market cap, just get the ticks
-      const sortedTicks = cachedMarketData.map(item => item.tick);
+    const circuitBreaker = CircuitBreakerService.getMarketCapBreaker();
 
-      // When sorting by HOLDERS or other fields, we need to get ALL fully minted tokens
-      // not just the ones in the market data cache
-      let ticksToFetch = sortedTicks;
-      
-      // Use cached market data when available, fall back to external API when not
-      let marketDataToUse = convertedMarketData.length > 0 ? convertedMarketData : null;
+    const fallbackData = {
+      ...MARKET_CAP_FALLBACK_DATA,
+      page,
+      limit,
+      last_block: await BlockService.getLastBlock().catch(() => 0),
+    } as PaginatedSrc20ResponseBody;
+
+    return circuitBreaker.execute(async () => {
+      console.log(`[MarketCapV2] Fetching market data directly from src20_market_data table...`);
+
+      // Use the optimized market data repository method
+      const marketDataLimit = Math.min(limit * 3, 150); // Get more data for sorting, but not too much
+      const cachedMarketData = await MarketDataRepository.getAllSRC20MarketData(marketDataLimit);
+
+      console.log(`[MarketCapV2] Retrieved ${cachedMarketData.length} market data entries`);
+
       if (cachedMarketData.length === 0) {
-        console.log("No cached market data found, falling back to external API");
-        marketDataToUse = null; // This will trigger fetchMarketListingSummary in enrichData
-      }
-      
-      if (sortBy !== "TRENDING" && sortBy !== "VOLUME") {
-        // For non-market-based sorts, fetch all fully minted tokens
-        const allFullyMintedResult = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
-          {
-            limit: 10000,
-            page: 1,
-            op: "DEPLOY",
-            sortBy: "DESC"
-          },
-          {
-            onlyFullyMinted: true,
-            includeMarketData: false,
-            enrichWithProgress: false
-          }
-        );
-        
-        if (allFullyMintedResult.data && Array.isArray(allFullyMintedResult.data)) {
-          ticksToFetch = allFullyMintedResult.data.map(item => item.tick);
-        }
-      }
-
-      if (ticksToFetch.length === 0) {
+        console.log("[MarketCapV2] No market data found, returning empty result");
         return {
           data: [],
           page,
@@ -411,63 +391,97 @@ export class Src20Controller {
         } as PaginatedSrc20ResponseBody;
       }
 
-      // Fetch ALL SRC20 data first (without pagination) to sort properly
-      const allDataResult = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
+      // Get the ticks from market data (already sorted by market cap)
+      const ticks = cachedMarketData.map(data => data.tick);
+
+      // Fetch basic SRC20 deploy data for these ticks only
+      const src20Result = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
         {
-          tick: ticksToFetch,
-          limit: 10000, // Get all data for proper sorting
+          tick: ticks,
+          limit: marketDataLimit,
           page: 1,
           op: "DEPLOY",
           sortBy: "DESC"
         },
         {
           onlyFullyMinted: true,
-          includeMarketData: true,
+          includeMarketData: false, // We already have market data
           enrichWithProgress: true,
-          ...(marketDataToUse && { prefetchedMarketData: marketDataToUse })
         }
       );
 
-      // Transform data to ensure market fields are properly exposed for the UI
-      let allData: any[] = [];
-      if (allDataResult.data && Array.isArray(allDataResult.data)) {
-        allData = allDataResult.data.map(item => ({
-          ...item,
-          floor_unit_price: item.market_data?.floor_unit_price || 0,
-          market_cap: item.market_data?.mcap || 0,
-          mcap: item.market_data?.mcap || 0,
-          volume24: item.market_data?.volume24 || 0,
-          change24: item.market_data?.change24 || 0, // Use the change24 from market data
-          holders: item.holders || item.market_data?.holder_count || 0
-        }));
-
-        // Apply server-side sorting based on sortBy parameter
-        if (sortBy === "HOLDERS") {
-          allData.sort((a, b) => {
-            const aHolders = Number(a.holders) || 0;
-            const bHolders = Number(b.holders) || 0;
-            return sortDirection === "asc" ? aHolders - bHolders : bHolders - aHolders;
-          });
-        } else if (sortBy === "DEPLOY") {
-          allData.sort((a, b) => {
-            const aTime = new Date(a.block_time).getTime();
-            const bTime = new Date(b.block_time).getTime();
-            return sortDirection === "asc" ? aTime - bTime : bTime - aTime;
-          });
-        } else if (sortBy === "VOLUME") {
-          allData.sort((a, b) => {
-            const aVolume = a.volume24 || 0;
-            const bVolume = b.volume24 || 0;
-            return sortDirection === "asc" ? aVolume - bVolume : bVolume - aVolume;
-          });
-        }
-        // Default "TRENDING" is already sorted by market cap
+      if (!src20Result.data || !Array.isArray(src20Result.data)) {
+        console.log("[MarketCapV2] No SRC20 deploy data found");
+        return {
+          data: [],
+          page,
+          totalPages: 0,
+          limit,
+          last_block: await BlockService.getLastBlock(),
+          total: 0,
+        } as PaginatedSrc20ResponseBody;
       }
 
-      // Now paginate the sorted data
+      // Create a map of tick -> SRC20 data for fast lookup
+      const src20DataMap = new Map();
+      src20Result.data.forEach(item => {
+        src20DataMap.set(item.tick, item);
+      });
+
+      // Merge market data with SRC20 deploy data in the correct order
+      const baseData = cachedMarketData
+        .map(marketData => {
+          const src20Data = src20DataMap.get(marketData.tick);
+          if (!src20Data) {
+            return null; // Skip if no deploy data found
+          }
+
+          return {
+            ...src20Data,
+            holders: marketData.holderCount || src20Data.holders || 0,
+          };
+        })
+        .filter(item => item !== null); // Remove null entries
+
+      // 🚀 CENTRALIZED MARKET DATA ENRICHMENT (v2.3 format)
+      // Middleware will transform to v2.2 (remove market_data) if needed
+      const mergedData = await MarketDataEnrichmentService.enrichWithMarketData(
+        baseData,
+        {
+          bulkOptimized: true,
+          enableLogging: false
+        }
+      );
+
+      // Apply sorting if needed (market data is already sorted by market cap)
+      const sortedData = mergedData;
+      if (sortBy === "HOLDERS") {
+        sortedData.sort((a: any, b: any) => {
+          const aHolders = Number(a.holders) || 0;
+          const bHolders = Number(b.holders) || 0;
+          return sortDirection === "asc" ? aHolders - bHolders : bHolders - aHolders;
+        });
+      } else if (sortBy === "VOLUME") {
+        sortedData.sort((a: any, b: any) => {
+          const aVolume = a.volume24 || 0;
+          const bVolume = b.volume24 || 0;
+          return sortDirection === "asc" ? aVolume - bVolume : bVolume - aVolume;
+        });
+      } else if (sortBy === "DEPLOY") {
+        sortedData.sort((a: any, b: any) => {
+          const aTime = new Date(a.block_time).getTime();
+          const bTime = new Date(b.block_time).getTime();
+          return sortDirection === "asc" ? aTime - bTime : bTime - aTime;
+        });
+      }
+      // "TRENDING" (default) is already sorted by market cap from the market data query
+
+      // Apply pagination
       const startIndex = (page - 1) * limit;
-      const paginatedData = allData.slice(startIndex, startIndex + limit);
-      const totalPages = Math.ceil(allData.length / limit);
+      const paginatedData = sortedData.slice(startIndex, startIndex + limit);
+      const totalPages = Math.ceil(sortedData.length / limit);
+
+      console.log(`[MarketCapV2] Returning ${paginatedData.length} items (page ${page}/${totalPages})`);
 
       return {
         data: paginatedData,
@@ -475,12 +489,9 @@ export class Src20Controller {
         totalPages,
         limit,
         last_block: await BlockService.getLastBlock(),
-        total: allData.length,
+        total: sortedData.length,
       } as PaginatedSrc20ResponseBody;
-    } catch (error) {
-      console.error("Error in fetchFullyMintedByMarketCapV2:", error);
-      throw error;
-    }
+    }, fallbackData);
   }
 
 
@@ -488,113 +499,123 @@ export class Src20Controller {
     limit: number,
     page: number,
     transactionCount: number,
-    sortBy: string = "TRENDING",
-    sortDirection: string = "desc",
   ) {
+    const circuitBreaker = CircuitBreakerService.getTrendingBreaker();
 
-    try {
-      // Get ALL trending data first for proper sorting
-      const allTrendingData = await SRC20Service.QueryService.fetchTrendingActiveMintingTokens(
-        10000, // Get all data
-        1,
+    const fallbackData = {
+      ...TRENDING_FALLBACK_DATA,
+      page,
+      limit,
+      last_block: await BlockService.getLastBlock().catch(() => 0),
+    };
+
+    return circuitBreaker.execute(async () => {
+      console.log(`[TrendingV2] Fetching trending minting tokens with optimized query...`);
+
+      // Get trending data from the optimized repository query
+      const trendingData = await SRC20Service.QueryService.fetchTrendingActiveMintingTokens(
+        limit * 2, // Get more data for better results
+        page,
         transactionCount,
       );
 
-      // Get cached market data for minting tokens as well
-      const cachedMarketData = await MarketDataRepository.getAllSRC20MarketData(1000);
-      const convertedMarketData = cachedMarketData.length > 0 
-        ? cachedMarketData.map((data: any) => this.convertToMarketListingFormat(data))
-        : null;
-
-      // Get basic deployment data for all trending tokens
-      const enrichedData = await SRC20Service.QueryService.fetchAndFormatSrc20Data({
-        tick: allTrendingData.data.map(row => row.tick),
-        op: "DEPLOY",
-        limit: 1000,
-        page: 1
-      });
-
-      // Get mint progress for all tokens in parallel
-      const mintProgressPromises = allTrendingData.data.map(row => 
-        SRC20Service.QueryService.fetchSrc20MintProgress(row.tick).catch(() => null)
-      );
-
-      // Wait for all mint progress data to be fetched
-      const mintProgressData = await Promise.all(mintProgressPromises);
-
-      // Create a map of tick to mint progress for efficient lookup
-      const mintProgressMap = new Map(
-        mintProgressData.map((progress: any, index: number) => [allTrendingData.data[index].tick, progress])
-      );
-
-      // Create a map of deployment data for efficient lookup
-      const deploymentMap = new Map(
-        Array.isArray(enrichedData.data) 
-          ? enrichedData.data.map(item => [item.tick, item])
-          : []
-      );
-
-      // Merge trending data with deployment data and mint progress
-      const allEnrichedResult = allTrendingData.data.map(row => {
-        const deploymentItem = deploymentMap.get(row.tick);
-        const mintProgress = mintProgressMap.get(row.tick);
-        const marketData = convertedMarketData?.find(market => market.tick.toUpperCase() === row.tick.toUpperCase());
-        
+      if (!trendingData.data || trendingData.data.length === 0) {
+        console.log("[TrendingV2] No trending data found");
         return {
-          ...row,
-          ...deploymentItem,
-          holders: deploymentItem?.holders || 0,
-          mcap: marketData?.mcap || 0,
-          market_cap: marketData?.mcap || 0,
-          floor_unit_price: marketData?.floor_unit_price || 0,
-          volume24: marketData?.volume24 || 0,
-          change24: marketData?.change24 || 0,
-          progress: mintProgress?.progress || null,
-          mint_count: row.mint_count,
-          top_mints_percentage: row.top_mints_percentage ? Number(row.top_mints_percentage) : 0,
-          total_minted: mintProgress?.total_minted || "0",
-          max_supply: mintProgress?.max_supply || "0",
+          data: [],
+          total: 0,
+          page,
+          totalPages: 0,
+          limit,
+          last_block: await BlockService.getLastBlock(),
         };
+      }
+
+      // Get the ticks from trending data
+      const ticks = trendingData.data.map(row => row.tick);
+
+      // Fetch market data for these specific ticks only (much more efficient)
+      const marketDataPromises = ticks.map(tick =>
+        MarketDataRepository.getSRC20MarketData(tick).catch(() => null)
+      );
+      const marketDataResults = await Promise.all(marketDataPromises);
+
+      // Create a map of tick -> market data for fast lookup
+      const marketDataMap = new Map();
+      marketDataResults.forEach((marketData, index) => {
+        if (marketData) {
+          marketDataMap.set(ticks[index], marketData);
+        }
       });
 
-      // Apply server-side sorting
-      if (sortBy === "HOLDERS") {
-        allEnrichedResult.sort((a, b) => {
-          const aHolders = Number(a.holders) || 0;
-          const bHolders = Number(b.holders) || 0;
-          return sortDirection === "asc" ? aHolders - bHolders : bHolders - aHolders;
-        });
-      } else if (sortBy === "DEPLOY") {
-        allEnrichedResult.sort((a, b) => {
-          const aTime = new Date(a.block_time).getTime();
-          const bTime = new Date(b.block_time).getTime();
-          return sortDirection === "asc" ? aTime - bTime : bTime - aTime;
-        });
-      } else if (sortBy === "VOLUME") {
-        allEnrichedResult.sort((a, b) => {
-          const aVolume = a.volume24 || 0;
-          const bVolume = b.volume24 || 0;
-          return sortDirection === "asc" ? aVolume - bVolume : bVolume - aVolume;
-        });
-      }
-      // Default "TRENDING" keeps the original trending order
+      // Get basic deployment data for trending tokens
+      const deploymentData = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2({
+        tick: ticks,
+        op: "DEPLOY",
+        limit: ticks.length,
+        page: 1,
+        sortBy: "DESC"
+      }, {
+        onlyFullyMinted: false, // Include minting tokens
+        includeMarketData: false, // We have market data already
+        enrichWithProgress: true,
+      });
 
-      // Now paginate the sorted data
+      if (!deploymentData.data || !Array.isArray(deploymentData.data)) {
+        console.log("[TrendingV2] No deployment data found");
+        return {
+          data: [],
+          total: 0,
+          page,
+          totalPages: 0,
+          limit,
+          last_block: await BlockService.getLastBlock(),
+        };
+      }
+
+      // Create a map of tick -> deployment data for fast lookup
+      const deploymentMap = new Map();
+      deploymentData.data.forEach(item => {
+        deploymentMap.set(item.tick, item);
+      });
+
+      // Merge trending data with deployment data
+      const baseData = trendingData.data
+        .map(trendingItem => {
+          const deploymentItem = deploymentMap.get(trendingItem.tick);
+
+          if (!deploymentItem) {
+            return null; // Skip if no deployment data
+          }
+
+          return {
+            ...trendingItem,
+            ...deploymentItem,
+          };
+        })
+        .filter(item => item !== null); // Remove null entries
+
+      // Enrich with market data using centralized service
+      const enrichedData = await MarketDataEnrichmentService.enrichWithMarketData(
+        baseData,
+        { bulkOptimized: true, includeExtendedFields: true }
+      );
+
+      // Apply pagination
       const startIndex = (page - 1) * limit;
-      const paginatedData = allEnrichedResult.slice(startIndex, startIndex + limit);
-      const totalPages = Math.ceil(allEnrichedResult.length / limit);
+      const paginatedData = enrichedData.slice(startIndex, startIndex + limit);
+      const totalPages = Math.ceil(enrichedData.length / limit);
+
+      console.log(`[TrendingV2] Returning ${paginatedData.length} items (page ${page}/${totalPages})`);
 
       return {
         data: paginatedData,
-        total: allEnrichedResult.length,
+        total: enrichedData.length,
         page,
         totalPages,
         limit,
-        last_block: await BlockService.getLastBlock()
+        last_block: await BlockService.getLastBlock(),
       };
-    } catch (error) {
-      console.error("Error in fetchTrendingActiveMintingTokensV2:", error);
-      throw error;
-    }
+    }, fallbackData);
   }
 }

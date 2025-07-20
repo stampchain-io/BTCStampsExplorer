@@ -1,25 +1,24 @@
-import { dbManager } from "$server/database/databaseManager.ts";
 import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT } from "$constants";
-import {
-  parseBTCDecimal,
-  parseVolumeSources,
-  parseExchangeSources,
-  getCacheStatus,
-} from "$lib/utils/marketData.ts";
+import type { StampFilters, StampRow } from "$globals";
 import type {
-  StampMarketData,
-  StampMarketDataRow,
-  SRC20MarketData,
-  SRC20MarketDataRow,
+  CacheStatus,
   CollectionMarketData,
   CollectionMarketDataRow,
+  SRC20MarketData,
+  SRC20MarketDataRow,
   StampHolderCache,
   StampHolderCacheRow,
+  StampMarketData,
+  StampMarketDataRow,
   StampWithMarketData,
-  CacheStatus,
 } from "$lib/types/marketData.d.ts";
-import type { StampRow } from "$globals";
-import type { StampFilters } from "$globals";
+import {
+  getCacheStatus,
+  parseBTCDecimal,
+  parseExchangeSources,
+  parseVolumeSources,
+} from "$lib/utils/marketData.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 
 /**
  * Repository for accessing market data from cache tables.
@@ -29,7 +28,7 @@ import type { StampFilters } from "$globals";
 export class MarketDataRepository {
   // Dependency injection support
   private static db: typeof dbManager = dbManager;
-  
+
   static setDatabase(database: typeof dbManager): void {
     this.db = database;
   }
@@ -41,7 +40,7 @@ export class MarketDataRepository {
    */
   static async getStampMarketData(cpid: string): Promise<StampMarketData | null> {
     const query = `
-      SELECT 
+      SELECT
         cpid,
         floor_price_btc,
         recent_sale_price_btc,
@@ -89,7 +88,7 @@ export class MarketDataRepository {
       }
 
       const row = result.rows[0];
-      
+
       // Parse the row data into the application format
       return this.parseStampMarketDataRow(row);
     } catch (error) {
@@ -122,7 +121,7 @@ export class MarketDataRepository {
 
     // Build the query with LEFT JOIN to include stamps without market data
     let query = `
-      SELECT 
+      SELECT
         st.*,
         cr.creator AS creator_name,
         smd.floor_price_btc,
@@ -251,7 +250,7 @@ export class MarketDataRepository {
             last_activity_time: row.last_activity_time,
             cache_age_minutes: row.cache_age_minutes
           };
-          
+
           marketData = this.parseStampMarketDataRow(marketDataRow);
 
           cacheAgeMinutes = row.cache_age_minutes;
@@ -285,7 +284,7 @@ export class MarketDataRepository {
    */
   static async getSRC20MarketData(tick: string): Promise<SRC20MarketData | null> {
     const query = `
-      SELECT 
+      SELECT
         tick,
         price_btc,
         price_usd,
@@ -323,7 +322,7 @@ export class MarketDataRepository {
       }
 
       const row = result.rows[0];
-      
+
       // Parse the row data into the application format
       return this.parseSRC20MarketDataRow(row);
     } catch (error) {
@@ -339,7 +338,7 @@ export class MarketDataRepository {
    */
   static async getCollectionMarketData(collectionId: string): Promise<CollectionMarketData | null> {
     const query = `
-      SELECT 
+      SELECT
         collection_id,
         min_floor_price_btc,
         max_floor_price_btc,
@@ -373,7 +372,7 @@ export class MarketDataRepository {
       }
 
       const row = result.rows[0];
-      
+
       // Parse the row data into the application format
       return this.parseCollectionMarketDataRow(row);
     } catch (error) {
@@ -389,7 +388,7 @@ export class MarketDataRepository {
    */
   static async getStampHoldersFromCache(cpid: string): Promise<StampHolderCache[]> {
     const query = `
-      SELECT 
+      SELECT
         id,
         cpid,
         address,
@@ -441,9 +440,9 @@ export class MarketDataRepository {
 
     // Build placeholders for the IN clause
     const placeholders = cpids.map(() => '?').join(',');
-    
+
     const query = `
-      SELECT 
+      SELECT
         cpid,
         floor_price_btc,
         recent_sale_price_btc,
@@ -514,6 +513,12 @@ export class MarketDataRepository {
         cpid: row.cpid,
         floorPriceBTC: parseBTCDecimal(row.floor_price_btc),
         recentSalePriceBTC: parseBTCDecimal(row.recent_sale_price_btc),
+        // Calculate best price using fallback hierarchy
+        lastPriceBTC: parseBTCDecimal(row.floor_price_btc) ||
+                      parseBTCDecimal(row.recent_sale_price_btc) ||
+                      0,
+        // Default wallet value (not relevant for this context without quantity)
+        walletValueBTC: 0,
         openDispensersCount: row.open_dispensers_count || 0,
         closedDispensersCount: row.closed_dispensers_count || 0,
         totalDispensersCount: row.total_dispensers_count || 0,
@@ -620,7 +625,7 @@ export class MarketDataRepository {
    */
   static async getAllSRC20MarketData(limit: number = 1000): Promise<SRC20MarketData[]> {
     const query = `
-      SELECT 
+      SELECT
         tick,
         price_btc,
         price_usd,
@@ -658,7 +663,7 @@ export class MarketDataRepository {
     }
 
     return result.rows
-      .map((row) => 
+      .map((row) =>
         this.parseSRC20MarketDataRow(row)
       )
       .filter((data): data is SRC20MarketData => data !== null);

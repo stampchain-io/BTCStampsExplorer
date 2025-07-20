@@ -160,6 +160,8 @@ export interface StampMarketData {
   cpid: string;
   floorPriceBTC: number | null;
   recentSalePriceBTC: number | null;
+  lastPriceBTC: number; // Calculated best price (fallback hierarchy: floorPriceBTC > recentSalePriceBTC > defaults)
+  walletValueBTC: number; // Total portfolio value (quantity × lastPriceBTC)
   openDispensersCount: number;
   closedDispensersCount: number;
   totalDispensersCount: number;

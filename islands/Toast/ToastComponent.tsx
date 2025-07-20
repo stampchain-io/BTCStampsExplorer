@@ -15,7 +15,7 @@ export const ToastComponent = (
       case "error":
         return (
           <svg
-            className="w-5 h-5"
+            class="w-5 h-5"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
@@ -27,7 +27,7 @@ export const ToastComponent = (
       case "success":
         return (
           <svg
-            className="w-5 h-5"
+            class="w-5 h-5"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
@@ -40,7 +40,7 @@ export const ToastComponent = (
       default:
         return (
           <svg
-            className="w-5 h-5"
+            class="w-5 h-5"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"

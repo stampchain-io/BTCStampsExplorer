@@ -1,18 +1,18 @@
 import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT, STAMP_TABLE } from "$constants";
 import {
-    STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
-    STAMP_RANGES, STAMP_SUFFIX_FILTERS,
-    STAMP_TYPES,
-    StampBalance,
-    StampFilters, SUBPROTOCOLS
+  STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
+  STAMP_RANGES, STAMP_SUFFIX_FILTERS,
+  STAMP_TYPES,
+  StampBalance,
+  StampFilters, SUBPROTOCOLS
 } from "$globals";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
 import {
-    getIdentifierType,
-    isCpid,
-    isStampHash,
-    isStampNumber,
-    isTxHash,
+  getIdentifierType,
+  isCpid,
+  isStampHash,
+  isStampNumber,
+  isTxHash,
 } from "$lib/utils/identifierUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
@@ -1122,10 +1122,10 @@ export class StampRepository {
   static async getSpecificStamp(identifier: string): Promise<{ stamp: number | undefined, stamp_url: string, stamp_mimetype: string }>{
     // Determine the type of identifier
     const idType = getIdentifierType(identifier);
-    
+
     let whereClause: string;
     let params: (string | number)[];
-    
+
     switch (idType) {
       case "stamp_number":
         whereClause = "stamp = ?";
@@ -1151,7 +1151,7 @@ export class StampRepository {
           stamp_mimetype: ''
         };
     }
-    
+
     const query = `
       SELECT stamp, stamp_url, stamp_mimetype
       FROM ${STAMP_TABLE}

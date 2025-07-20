@@ -140,9 +140,10 @@ export const WalletStampValue = memo(function WalletStampValue({
   } = useStampValue(stamp);
 
   const sourceLabels = {
-    unit: "Unit Price",
-    recent: "Recent Sale",
-    floor: "Floor Price",
+    market: "Market Data", // v2.3 calculated price from marketData.lastPriceBTC
+    unit: "Last Price", // Legacy unitPrice field
+    recent: "Recent Sale", // Legacy recentSalePrice field
+    floor: "Floor Price", // Legacy floorPrice field
   };
 
   return (

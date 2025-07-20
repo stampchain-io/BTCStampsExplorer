@@ -771,7 +771,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </div>
           </div>
 
-          {(dispensers?.length > 0 || stamp.floorPrice)
+          {(dispensers?.length > 0)
             ? (
               <div className="flex flex-col w-full pt-6 mobileLg:pt-12">
                 <div

@@ -1,9 +1,9 @@
+import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { rowTable } from "$layout";
 import {
   abbreviateAddress,
   formatSatoshisToBTC,
 } from "$lib/utils/formatUtils.ts";
-import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { rowTable } from "$layout";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface Dispenser {
@@ -91,11 +91,6 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
                   <td class={cellAlign(5, headers.length)}>
                     <a
                       href={`/wallet/${dispenser.source}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        globalThis.location.href =
-                          `/wallet/${dispenser.source}`;
-                      }}
                       className={`${valueSmLink} ${
                         isEmpty
                           ? "!text-stamp-grey-darker hover:!text-stamp-purple-bright"

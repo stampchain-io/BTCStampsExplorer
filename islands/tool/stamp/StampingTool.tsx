@@ -240,7 +240,7 @@ function StampingToolMain({ config }: { config: Config }) {
   }, [fees, loading, feeSource]);
 
   const [file, setFile] = useState<File | null>(null);
-  const [fee, setFee] = useState<number>(10); // Initialize with a safe default fee (10 sat/vB)
+  const [fee, setFee] = useState<number>(1); // Initialize with a lower default fee (1 sat/vB)
   const [issuance, setIssuance] = useState("1");
   const [BTCPrice, setBTCPrice] = useState<number>(60000);
   const [fileSize, setFileSize] = useState<number | undefined>(undefined);
@@ -314,9 +314,9 @@ function StampingToolMain({ config }: { config: Config }) {
   /* ===== EFFECT HOOKS ===== */
   useEffect(() => {
     if (fees && !loading) {
-      const recommendedFee = Math.round(fees.recommendedFee);
-      // Only update fee if the recommended fee is valid (>= 1 sat/vB)
-      if (recommendedFee >= 1) {
+      const recommendedFee = fees.recommendedFee;
+      // Only update fee if the recommended fee is valid (>= 0.1 sat/vB)
+      if (recommendedFee >= 0.1) {
         setFee(recommendedFee);
         logger.debug("stamps", {
           message: "Fee updated from polling service",
@@ -480,8 +480,8 @@ function StampingToolMain({ config }: { config: Config }) {
 
   /* ===== EVENT HANDLERS ===== */
   const handleChangeFee = (newFee: number) => {
-    // Ensure fee is never below the minimum required (1 sat/vB)
-    const validatedFee = Math.max(newFee, 1);
+    // Allow any positive fee rate, including 0.1 sat/vB
+    const validatedFee = Math.max(newFee, 0.1);
     setFee(validatedFee);
   };
 

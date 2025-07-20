@@ -24,7 +24,7 @@ const SelectDate = ({ setDateRange, isUppercase = true }: PropTypes) => {
 
   return (
     <input
-      className={`${inputField} ${isUppercase ? "uppercase" : ""}`}
+      class={`${inputField} ${isUppercase ? "uppercase" : ""}`}
       placeholder="SELECT DATE"
       ref={calendarRef}
     />

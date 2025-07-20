@@ -283,7 +283,7 @@ export function Header() {
               ? link.title
               : link.title.default}
             // Base styles for nav container with conditional mobile styling
-            className={`relative group ${isMobile ? "" : ""}`}
+            class={`relative group ${isMobile ? "" : ""}`}
           >
             {/* Main navigation link */}
             <a
@@ -297,7 +297,7 @@ export function Header() {
                 setCurrentPath(link?.href ? link?.href : null); // Update current path
               }}
               // Complex conditional styling for mobile/desktop
-              className={`inline-block w-full ${
+              class={`inline-block w-full ${
                 isMobile
                   ? ` ${
                     // Title of menus
@@ -306,13 +306,13 @@ export function Header() {
               }`}
             >
               {/* Hidden tablet version of title */}
-              <span className="tablet:block min-[1180px]:hidden">
+              <span class="tablet:block min-[1180px]:hidden">
                 {typeof link.title === "string"
                   ? link.title
                   : link.title.tablet}
               </span>
               {/* Visible default version of title */}
-              <span className="hidden min-[1180px]:block">
+              <span class="hidden min-[1180px]:block">
                 {typeof link.title === "string"
                   ? link.title
                   : link.title.default}
@@ -327,10 +327,10 @@ export function Header() {
                     ? link.title
                     : link.title.default) === "TOOLS"
                   ? (
-                    <div className="hidden group-hover:flex absolute top-full -right-[18px] min-w-[300px] z-10 pt-1 pb-3.5 px-[18px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
-                      <div className="grid grid-cols-3 gap-4 w-full">
+                    <div class="hidden group-hover:flex absolute top-full -right-[18px] min-w-[300px] z-10 pt-1 pb-3.5 px-[18px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
+                      <div class="grid grid-cols-3 gap-4 w-full">
                         {/* Column 1: Left aligned - Stamp tools */}
-                        <div className="flex flex-col space-y-1 text-left">
+                        <div class="flex flex-col space-y-1 text-left">
                           <h6
                             class={labelXs}
                           >
@@ -348,7 +348,7 @@ export function Header() {
                                   subLink?.href ? subLink?.href : null,
                                 );
                               }}
-                              className={`font-semibold text-xs transition-colors duration-300 ${
+                              class={`font-semibold text-xs transition-colors duration-300 ${
                                 currentPath === subLink.href
                                   ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                                   : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -360,7 +360,7 @@ export function Header() {
                         </div>
 
                         {/* Column 2: Center aligned - Token tools */}
-                        <div className="flex flex-col space-y-1 text-center">
+                        <div class="flex flex-col space-y-1 text-center">
                           <h6
                             class={labelXs}
                           >
@@ -379,7 +379,7 @@ export function Header() {
                                   subLink?.href ? subLink?.href : null,
                                 );
                               }}
-                              className={`font-semibold text-xs transition-colors duration-300 ${
+                              class={`font-semibold text-xs transition-colors duration-300 ${
                                 currentPath === subLink.href
                                   ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                                   : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -391,7 +391,7 @@ export function Header() {
                         </div>
 
                         {/* Column 3: Right aligned - Register */}
-                        <div className="flex flex-col space-y-1 text-right">
+                        <div class="flex flex-col space-y-1 text-right">
                           <h6
                             class={labelXs}
                           >
@@ -408,7 +408,7 @@ export function Header() {
                                   subLink?.href ? subLink?.href : null,
                                 );
                               }}
-                              className={`font-semibold text-xs transition-colors duration-300 ${
+                              class={`font-semibold text-xs transition-colors duration-300 ${
                                 currentPath === subLink.href
                                   ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                                   : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -423,7 +423,7 @@ export function Header() {
                   )
                   : (
                     // Default single-column layout for other dropdowns
-                    <div className="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
+                    <div class="hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg">
                       {link.subLinks?.map((subLink) => (
                         <a
                           key={subLink.href}
@@ -433,7 +433,7 @@ export function Header() {
                               subLink?.href ? subLink?.href : null,
                             );
                           }}
-                          className={`font-semibold text-center text-xs transition-colors duration-300 ${
+                          class={`font-semibold text-center text-xs transition-colors duration-300 ${
                             currentPath === subLink.href
                               ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                               : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -454,26 +454,26 @@ export function Header() {
 
   /* ===== COMPONENT RENDER ===== */
   return (
-    <header className="tablet:flex justify-between items-center max-w-desktop w-full mx-auto
+    <header class="tablet:flex justify-between items-center max-w-desktop w-full mx-auto
      px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop 
      pt-6 pb-9 mobileLg:pt-9 mobileLg:pb-14">
       {/* ===== LOGO AND MOBILE MENU TOGGLE BUTTON ===== */}
-      <div className="flex justify-between items-center w-full ">
+      <div class="flex justify-between items-center w-full ">
         <a
           href="/home"
           f-partial="/home"
           onClick={() => setCurrentPath("home")}
-          className={`${logoPurpleLDLink} pr-3`}
+          class={`${logoPurpleLDLink} pr-3`}
         >
           STAMPCHAIN
         </a>
-        <div className="tablet:hidden block relative -ml-1">
+        <div class="tablet:hidden block relative -ml-1">
           <HamburgerMenuIcon isOpen={open} onClick={toggleMenu} />
         </div>
       </div>
 
       {/* ===== DESKTOP NAVIGATION ===== */}
-      <div className="hidden tablet:flex justify-between items-center gap-6">
+      <div class="hidden tablet:flex justify-between items-center gap-6">
         {renderNavLinks()}
         <ConnectButton />
       </div>
@@ -481,7 +481,7 @@ export function Header() {
       {/* ===== MOBILE NAVIGATION DRAWER ===== */}
       <div
         ref={drawerRef}
-        className={`flex tablet:hidden flex-col justify-between
+        class={`flex tablet:hidden flex-col justify-between
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-screen z-30
            bg-gradient-to-b from-[#0e0014]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
            shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
@@ -491,11 +491,11 @@ export function Header() {
         id="navbar-collapse"
       >
         {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
-        <div className="flex flex-col h-full">
-          <div className="flex pt-[30px] px-9">
-            <div className="relative">
+        <div class="flex flex-col h-full">
+          <div class="flex pt-[30px] px-9">
+            <div class="relative">
               <div
-                className={`${tooltipIcon} ${
+                class={`${tooltipIcon} ${
                   isCloseTooltipVisible ? "opacity-100" : "opacity-0"
                 }`}
               >
@@ -516,16 +516,16 @@ export function Header() {
               />
             </div>
           </div>
-          <div className="flex flex-col flex-1 items-start p-9 gap-5">
+          <div class="flex flex-col flex-1 items-start p-9 gap-5">
             {renderNavLinks(true)}
           </div>
 
-          <div className="flex flex-col w-full sticky bottom-0
+          <div class="flex flex-col w-full sticky bottom-0
           bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
           shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
             {/* Tools section with gear icon */}
-            <div className="flex w-full justify-between pt-3 pb-8 px-9">
-              <div className="flex justify-start items-end -ml-1">
+            <div class="flex w-full justify-between pt-3 pb-8 px-9">
+              <div class="flex justify-start items-end -ml-1">
                 <GearIcon
                   size="md"
                   weight="normal"
@@ -535,7 +535,7 @@ export function Header() {
                 />
               </div>
               <div
-                className={`flex justify-end items-center transition-opacity duration-100
+                class={`flex justify-end items-center transition-opacity duration-100
                   ${toolsOpen ? "opacity-0" : "opacity-100"}`}
                 style={{
                   transitionDelay: toolsOpen ? "0ms" : "425ms",
@@ -546,12 +546,12 @@ export function Header() {
             </div>
 
             <div
-              className={`overflow-hidden transition-all duration-500 ease-in-out
+              class={`overflow-hidden transition-all duration-500 ease-in-out
                 ${
                 toolsOpen ? "max-h-[260px] opacity-100" : "max-h-0 opacity-0"
               }`}
             >
-              <div className="flex flex-col pl-9 pb-9 gap-3">
+              <div class="flex flex-col pl-9 pb-9 gap-3">
                 {toolLinks.map((link) => (
                   <a
                     key={link.href}
@@ -560,7 +560,7 @@ export function Header() {
                       toggleMenu();
                       setCurrentPath(link.href);
                     }}
-                    className={`font-bold transition-colors duration-300 ${
+                    class={`font-bold transition-colors duration-300 ${
                       currentPath === link.href
                         ? "text-base text-stamp-grey-darker hover:text-stamp-grey-light"
                         : "text-base text-stamp-grey-light hover:!text-stamp-grey-darker"
@@ -582,7 +582,7 @@ export function Header() {
 /*
 <div
 // Different dropdown styles for mobile/desktop
-className={`${
+class={`${
   isMobile
     ? "hidden group-hover:flex flex-col z-10 w-full pt-3 gap-2 group"
     : "hidden group-hover:flex flex-col absolute top-full left-1/2 -translate-x-1/2 min-w-[calc(100%+36px)] z-10 pt-1 pb-3.5 px-[18px] space-y-1 whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
@@ -599,7 +599,7 @@ Map through dropdown items
       setCurrentPath(subLink?.href ? subLink?.href : null); // Update current path
     }}
     // Complex conditional styling for active/inactive states
-    className={`font-bold transition-colors duration-300 ${
+    class={`font-bold transition-colors duration-300 ${
       isMobile
         ? currentPath === subLink.href
           ? "text-base text-stamp-grey-light hover:text-stamp-grey py-1"

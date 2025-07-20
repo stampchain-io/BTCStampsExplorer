@@ -1,19 +1,18 @@
 /* ===== SRC20 GALLERY COMPONENT ===== */
 // @baba - add token cards specific to wallet page
-import { useEffect, useState } from "preact/hooks";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { SRC20Row } from "$globals";
-import { subtitlePurple, titlePurpleLD } from "$text";
 import { ViewAllButton } from "$button";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { Timeframe as _Timeframe } from "$layout";
 import {
   SRC20Card,
   SRC20CardMinting,
   SRC20CardSm,
   SRC20CardSmMinting,
 } from "$card";
+import { SRC20Row } from "$globals";
+import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { subtitlePurple, titlePurpleLD } from "$text";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface SRC20GalleryProps {
@@ -183,6 +182,10 @@ export function SRC20Gallery({
     if (pagination?.onPageChange) {
       pagination.onPageChange(page);
     } else if (!useClientFetch) {
+      // SSR-safe browser environment check
+      if (typeof globalThis === "undefined" || !globalThis?.location) {
+        return; // Cannot navigate during SSR
+      }
       const url = new URL(globalThis.location.href);
       url.searchParams.set("page", page.toString());
       globalThis.location.href = url.toString();

@@ -1,0 +1,420 @@
+{
+  "info": {
+    "name": "BTCStampsExplorer - Production Smoke Tests",
+    "description": "Comprehensive smoke test suite for production readiness validation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health & Monitoring Tests",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Smoke Test: API Health Check",
+                  "pm.test('Health endpoint responds with 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Health response time < 1000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test('Health response contains status', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('status');",
+                  "    pm.expect(responseJson.status).to.eql('healthy');",
+                  "});",
+                  "",
+                  "// Store health check result",
+                  "pm.globals.set('health_check_passed', pm.response.code === 200);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Internal Monitoring Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/internal/monitoring",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "internal", "monitoring"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Smoke Test: Internal Monitoring",
+                  "pm.test('Monitoring endpoint responds', function () {",
+                  "    pm.expect([200, 401, 403]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "pm.test('Monitoring response time < 2000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});",
+                  "",
+                  "// If accessible, validate response structure",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Monitoring response has system info', function () {",
+                  "        const responseJson = pm.response.json();",
+                  "        pm.expect(responseJson).to.be.an('object');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Critical SRC20 API Tests",
+      "item": [
+        {
+          "name": "SRC20 Balance v2.2 - Smoke Test",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2.2"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20/balance/{{test_address}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20", "balance", "{{test_address}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Smoke Test: SRC20 Balance v2.2 Critical Endpoint",
+                  "pm.test('SRC20 Balance v2.2 responds with 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Balance v2.2 response time < 2000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Balance v2.2 - NO market_data field (critical)', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.be.an('object');",
+                  "    pm.expect(responseJson.data).to.be.an('array');",
+                  "    ",
+                  "    if (responseJson.data.length > 0) {",
+                  "        const firstItem = responseJson.data[0];",
+                  "        pm.expect(firstItem).to.not.have.property('market_data', 'v2.2 MUST NOT have market_data field');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Balance v2.2 has required structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.all.keys('last_block', 'data');",
+                  "    pm.expect(responseJson.last_block).to.be.a('number');",
+                  "    pm.expect(responseJson.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "// Store test results for reporting",
+                  "pm.globals.set('src20_balance_v2_2_passed', pm.response.code === 200);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SRC20 Balance v2.3 - Smoke Test",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2.3"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20/balance/{{test_address}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20", "balance", "{{test_address}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Smoke Test: SRC20 Balance v2.3 Critical Endpoint",
+                  "pm.test('SRC20 Balance v2.3 responds with 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Balance v2.3 response time < 2000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Balance v2.3 - HAS market_data field (critical)', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.be.an('object');",
+                  "    pm.expect(responseJson.data).to.be.an('array');",
+                  "    ",
+                  "    if (responseJson.data.length > 0) {",
+                  "        const firstItem = responseJson.data[0];",
+                  "        pm.expect(firstItem).to.have.property('market_data', 'v2.3 MUST have market_data field');",
+                  "        ",
+                  "        // market_data can be null or object",
+                  "        const marketData = firstItem.market_data;",
+                  "        pm.expect([null, 'object']).to.include(typeof marketData);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Balance v2.3 has required structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.all.keys('last_block', 'data');",
+                  "    pm.expect(responseJson.last_block).to.be.a('number');",
+                  "    pm.expect(responseJson.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "// Store test results for reporting",
+                  "pm.globals.set('src20_balance_v2_3_passed', pm.response.code === 200);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SRC20 Overview - Smoke Test",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2.3"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20?limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Smoke Test: SRC20 Overview Critical Endpoint",
+                  "pm.test('SRC20 Overview responds with 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Overview response time < 3000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Overview has data structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.be.an('object');",
+                  "    pm.expect(responseJson.data).to.be.an('array');",
+                  "    pm.expect(responseJson.total).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Overview returns data', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.data.length).to.be.above(0, 'Should return at least 1 SRC20 token');",
+                  "});",
+                  "",
+                  "// Store test results for reporting",
+                  "pm.globals.set('src20_overview_passed', pm.response.code === 200);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Database Connectivity Tests",
+      "item": [
+        {
+          "name": "Database Connection - Via SRC20 Query",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20?limit=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Smoke Test: Database Connectivity",
+                  "pm.test('Database query successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Database response time < 3000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                  "});",
+                  "",
+                  "pm.test('Database returns valid data structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.be.an('object');",
+                  "    pm.expect(responseJson).to.have.property('data');",
+                  "    pm.expect(responseJson).to.have.property('total');",
+                  "});",
+                  "",
+                  "// Store database connectivity result",
+                  "pm.globals.set('database_connectivity_passed', pm.response.code === 200);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Performance Threshold Tests",
+      "item": [
+        {
+          "name": "Critical Endpoints Performance Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// SMOKE TEST SUITE RESULTS SUMMARY",
+                  "",
+                  "// Collect all test results",
+                  "const healthPassed = pm.globals.get('health_check_passed') === 'true';",
+                  "const src20v22Passed = pm.globals.get('src20_balance_v2_2_passed') === 'true';",
+                  "const src20v23Passed = pm.globals.get('src20_balance_v2_3_passed') === 'true';",
+                  "const overviewPassed = pm.globals.get('src20_overview_passed') === 'true';",
+                  "const dbPassed = pm.globals.get('database_connectivity_passed') === 'true';",
+                  "",
+                  "// Calculate overall success rate",
+                  "const totalTests = 5;",
+                  "const passedTests = [healthPassed, src20v22Passed, src20v23Passed, overviewPassed, dbPassed]",
+                  "    .filter(result => result === true).length;",
+                  "const successRate = (passedTests / totalTests) * 100;",
+                  "",
+                  "pm.test('OVERALL SMOKE TEST SUCCESS RATE >= 80%', function () {",
+                  "    pm.expect(successRate).to.be.at.least(80, ",
+                  "        `Success rate: ${successRate}% (${passedTests}/${totalTests} tests passed)`);",
+                  "});",
+                  "",
+                  "pm.test('CRITICAL: Health Check Passed', function () {",
+                  "    pm.expect(healthPassed).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('CRITICAL: Database Connectivity Passed', function () {",
+                  "    pm.expect(dbPassed).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('CRITICAL: SRC20 API v2.2/v2.3 Both Working', function () {",
+                  "    pm.expect(src20v22Passed && src20v23Passed).to.be.true;",
+                  "});",
+                  "",
+                  "// Log results for reporting",
+                  "console.log('🔥 SMOKE TEST RESULTS SUMMARY:');",
+                  "console.log(`   Health Check: ${healthPassed ? '✅ PASS' : '❌ FAIL'}`);",
+                  "console.log(`   SRC20 v2.2: ${src20v22Passed ? '✅ PASS' : '❌ FAIL'}`);",
+                  "console.log(`   SRC20 v2.3: ${src20v23Passed ? '✅ PASS' : '❌ FAIL'}`);",
+                  "console.log(`   SRC20 Overview: ${overviewPassed ? '✅ PASS' : '❌ FAIL'}`);",
+                  "console.log(`   Database: ${dbPassed ? '✅ PASS' : '❌ FAIL'}`);",
+                  "console.log(`   Overall Success Rate: ${successRate}% (${passedTests}/${totalTests})`);",
+                  "",
+                  "// Set final result for deployment pipeline",
+                  "pm.globals.set('smoke_tests_passed', successRate >= 80);",
+                  "pm.globals.set('smoke_tests_success_rate', successRate);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set default test values if not provided",
+          "if (!pm.globals.has('test_address')) {",
+          "    pm.globals.set('test_address', 'bc1qrfne7jw6fk6r8kl6dlm0ktt6rv4e5nqp5y4yny');",
+          "}",
+          "",
+          "// Clear previous test results",
+          "pm.globals.unset('health_check_passed');",
+          "pm.globals.unset('src20_balance_v2_2_passed');",
+          "pm.globals.unset('src20_balance_v2_3_passed');",
+          "pm.globals.unset('src20_overview_passed');",
+          "pm.globals.unset('database_connectivity_passed');",
+          "pm.globals.unset('smoke_tests_passed');",
+          "pm.globals.unset('smoke_tests_success_rate');",
+          "",
+          "console.log('🔥 Starting BTCStampsExplorer Production Smoke Tests...');"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://stampchain.io",
+      "type": "string"
+    },
+    {
+      "key": "test_address",
+      "value": "bc1qrfne7jw6fk6r8kl6dlm0ktt6rv4e5nqp5y4yny",
+      "type": "string"
+    }
+  ]
+}

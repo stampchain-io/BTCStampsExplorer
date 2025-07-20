@@ -1,16 +1,16 @@
 /* ===== WALLET DASHBOARD DETAILS COMPONENT ===== */
 /* @baba - cleanup button/icon code */
-import { useEffect, useRef, useState } from "preact/hooks";
-import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
+import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
+import { Icon } from "$icon";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
+import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
+import { containerBackground } from "$layout";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
-import { containerBackground } from "$layout";
-import { titleGreyLD } from "$text";
 import { tooltipIcon } from "$notification";
-import { openModal } from "$islands/modal/states.ts";
-import { Icon } from "$icon";
+import { titleGreyLD } from "$text";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface WalletDashboardDetailsProps {
@@ -222,9 +222,9 @@ function WalletOverview(
 
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col">
-      <div className="flex justify-between">
-        <div className={`${hideBalance ? "blur-sm" : ""}`}>
+    <div class="flex flex-col">
+      <div class="flex justify-between">
+        <div class={`${hideBalance ? "blur-sm" : ""}`}>
           <h6 class="text-stamp-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl select-none">
             <span class="font-bold">
               {hideBalance ? "*********" : walletData.balance}
@@ -417,9 +417,9 @@ function WalletOverview(
 function DashboardProfile() {
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col">
-      <div className="flex">
-        <div className="flex items-center justify-center relative -top-3 -left-3 mobileMd:-top-6 mobileMd:-left-6 w-[58px] h-[58px] mobileLg:w-[76px] mobileLg:h-[76px] bg-stamp-purple rounded-full">
+    <div class="flex flex-col">
+      <div class="flex">
+        <div class="flex items-center justify-center relative -top-3 -left-3 mobileMd:-top-6 mobileMd:-left-6 w-[58px] h-[58px] mobileLg:w-[76px] mobileLg:h-[76px] bg-stamp-purple rounded-full">
           <img
             src="/img/banner/kevin.png"
             alt="Avatar"
@@ -513,7 +513,7 @@ function WalletStats(
   return (
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
       <div class="flex flex-col w-full">
-        <div className={containerBackground}>
+        <div class={containerBackground}>
           <StampStats
             stampsTotal={stampsTotal}
             stampsCreated={stampsCreated}
@@ -523,7 +523,7 @@ function WalletStats(
         </div>
       </div>
       <div class="flex flex-col w-full">
-        <div className={containerBackground}>
+        <div class={containerBackground}>
           <DispenserStats
             dispensers={{
               open: dispensers?.open ?? 0,
@@ -535,7 +535,7 @@ function WalletStats(
         </div>
       </div>
       <div class="flex flex-col w-full">
-        <div className={containerBackground}>
+        <div class={containerBackground}>
           <TokenStats
             src20Total={src20Total}
             handleType={handleType}
@@ -558,11 +558,11 @@ function StampStats(
 ) {
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
-      <div className="flex pb-1.5 mobileLg:pb-3">
+    <div class="flex flex-col gap-1.5 mobileLg:gap-3">
+      <div class="flex pb-1.5 mobileLg:pb-3">
         <StatTitle label="STAMPS" value={stampsTotal.toString()} />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem label="EDITIONS" value="239" />
         <StatItem label="CREATED" value={stampsCreated.toString()} />
         <StatItem
@@ -570,13 +570,13 @@ function StampStats(
           value={
             <>
               {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
+              <span class="font-light">BTC</span>
             </>
           }
           align="right"
         />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem label="COLLECTIONS" value="8" />
         <StatItem
           label="LISTINGS"
@@ -597,11 +597,11 @@ function DispenserStats(
 ) {
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
-      <div className="flex pb-1.5 mobileLg:pb-3">
+    <div class="flex flex-col gap-1.5 mobileLg:gap-3">
+      <div class="flex pb-1.5 mobileLg:pb-3">
         <StatTitle label="LISTINGS" value={dispensers.open.toString()} />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem label="ATOMIC" value="N/A" />
         <StatItem
           label="DISPENSERS"
@@ -626,24 +626,24 @@ function TokenStats(
 
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
-      <div className="flex pb-1.5 mobileLg:pb-3">
+    <div class="flex flex-col gap-1.5 mobileLg:gap-3">
+      <div class="flex pb-1.5 mobileLg:pb-3">
         <StatTitle label="TOKENS" value={src20Total?.toString()} />
       </div>
 
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem
           label="VALUE"
           value={
             <>
               {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
+              <span class="font-light">BTC</span>
             </>
           }
         />
         <StatItem label="24H CHANGE" value="+/- 0.00%" align="right" />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem
           label="TOP HOLDINGS"
           value={
@@ -720,12 +720,12 @@ export default function WalletDashboardDetails({
     <div class="flex flex-col w-full gap-3 mobileMd:gap-6">
       <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
         <div class="flex flex-col w-full mobileLg:w-1/2 tablet:w-2/3">
-          <div className={containerBackground}>
+          <div class={containerBackground}>
             <DashboardProfile />
           </div>
         </div>
         <div class="flex flex-col w-full mobileLg:w-1/2 tablet:w-1/3">
-          <div className={containerBackground}>
+          <div class={containerBackground}>
             <WalletOverview
               walletData={walletData}
               onSend={handleOpenSendModal}
@@ -741,9 +741,11 @@ export default function WalletDashboardDetails({
           stampsTotal={stampsTotal}
           src20Total={src20Total}
           stampsCreated={stampsCreated}
-          dispensers={walletData.dispensers}
-          stampValue={walletData.stampValue}
-          src20Value={walletData.src20Value}
+          {...(walletData.dispensers && { dispensers: walletData.dispensers })}
+          {...(walletData.stampValue !== undefined &&
+            { stampValue: walletData.stampValue })}
+          {...(walletData.src20Value !== undefined &&
+            { src20Value: walletData.src20Value })}
         />
       </div>
     </div>

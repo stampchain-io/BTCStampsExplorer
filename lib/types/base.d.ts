@@ -16,6 +16,8 @@ export interface UTXO {
   coinbase?: boolean;
   confirmations?: number; // Optional confirmations field
   ancestors?: any[]; // Optional ancestors array for compatibility
+  rawTxHex?: string; // Optional raw transaction hex for non-witness UTXOs
+  redeemScript?: string; // Optional redeem script for P2SH inputs
 }
 
 export type BasicUTXO = Pick<UTXO, "txid" | "vout" | "value">;

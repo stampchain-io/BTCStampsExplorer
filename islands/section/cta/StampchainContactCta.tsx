@@ -9,16 +9,16 @@ export const StampchainContactCta = () => {
     <div class="grid grid-cols-1 desktop:grid-cols-3 gap-7 items-end
       max-w-desktop w-full mx-auto
     ">
-      <div className="col-span1 desktop:col-span-2">
+      <div class="col-span1 desktop:col-span-2">
         {/* ===== HEADER SECTION ===== */}
-        <h3 className={titleGreyDL}>STAMPCHAIN</h3>
-        <h4 className={subtitleGrey}>
+        <h3 class={titleGreyDL}>STAMPCHAIN</h3>
+        <h4 class={subtitleGrey}>
           THE CREATORS OF BITCOIN STAMPS
         </h4>
         {/* ===== CONTENT SECTION ===== */}
-        <div className={`flex flex-col ${text}`}>
+        <div class={`flex flex-col ${text}`}>
           <p>
-            <span className={textLg}>
+            <span class={textLg}>
               <b>
                 As the architects of the Bitcoin Stamps protocol, we've been at
                 the forefront of the ecosystem since its inception.
@@ -45,7 +45,7 @@ export const StampchainContactCta = () => {
       </div>
 
       {/* ===== BUTTONS SECTION ===== */}
-      <div className="flex gap-6 justify-end">
+      <div class="flex gap-6 justify-end">
         <Button
           variant="outline"
           color="grey"

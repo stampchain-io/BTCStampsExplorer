@@ -1,15 +1,15 @@
-import { SRC20Row } from "$globals";
-import { formatDate } from "$lib/utils/formatUtils.ts";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import ChartWidget from "$islands/layout/ChartWidget.tsx";
-import { Timeframe } from "$layout";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { SRC20Row } from "$globals";
+import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import {
   containerCardTable,
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
+  Timeframe,
 } from "$layout";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { formatDate } from "$lib/utils/formatUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
 
 interface SRC20CardProps {
@@ -107,6 +107,13 @@ export function SRC20Card({
                       e.button !== 1
                     ) {
                       e.preventDefault();
+                      // SSR-safe browser environment check
+                      if (
+                        typeof globalThis === "undefined" ||
+                        !globalThis?.location
+                      ) {
+                        return; // Cannot navigate during SSR
+                      }
                       const href = `/src20/${
                         encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
                       }`;
@@ -193,8 +200,8 @@ export function SRC20Card({
                   </td>
                   {/* CHANGE */}
                   <td
-                    class={`text-right mobileMd:text-center 
-                      ${rowCardBorderRight} 
+                    class={`text-right mobileMd:text-center
+                      ${rowCardBorderRight}
                       mobileMd:${rowCardBorderCenter} mobileMd:pr-3 mobileMd:border-r-0 mobileMd:rounded-r-none`}
                   >
                     {(src20 as any).change24 !== undefined &&

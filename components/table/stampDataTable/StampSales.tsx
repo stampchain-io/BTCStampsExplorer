@@ -1,10 +1,10 @@
+import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { rowTable } from "$layout";
 import {
   abbreviateAddress,
   formatDate,
   formatSatoshisToBTC,
 } from "$lib/utils/formatUtils.ts";
-import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { rowTable } from "$layout";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface Dispense {
@@ -27,9 +27,7 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
     <div class="w-[500px] min-[500px]:w-full">
       <table class={`${valueSm} w-full`}>
         <colgroup>
-          {colGroup().map((col) => (
-            <col key={col.key} class={col.className} />
-          ))}
+          {colGroup().map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {dispenses.length > 0 && (
           <thead>
@@ -53,10 +51,6 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
                 <td class={cellAlign(0, headers.length)}>
                   <a
                     href={`/wallet/${dispense.source}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      globalThis.location.href = `/wallet/${dispense.source}`;
-                    }}
                     className={valueSmLink}
                   >
                     <span class="tablet:hidden">
@@ -70,11 +64,6 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
                 <td class={cellAlign(1, headers.length)}>
                   <a
                     href={`/wallet/${dispense.destination}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      globalThis.location.href =
-                        `/wallet/${dispense.destination}`;
-                    }}
                     className={valueSmLink}
                   >
                     <span class="tablet:hidden">

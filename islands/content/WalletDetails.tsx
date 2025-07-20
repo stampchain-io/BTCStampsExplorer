@@ -212,26 +212,26 @@ function DispenserStats({
 
   /* ===== RENDER ===== */
   return (
-    <div className="flex flex-col pt-6">
+    <div class="flex flex-col pt-6">
       {/* Stamp Info Section */}
       <div>
         <p
-          className={`${valueLg} whitespace-nowrap overflow-hidden`}
+          class={`${valueLg} whitespace-nowrap overflow-hidden`}
         >
-          <span className="font-light">STAMP #</span>
-          <span className="font-black">{stampData.stamp}</span>
+          <span class="font-light">STAMP #</span>
+          <span class="font-black">{stampData.stamp}</span>
         </p>
 
         {stampData.cpid && (
-          <p className="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
+          <p class="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
             {stampData.cpid}
           </p>
         )}
 
-        <div className="flex flex-col items-start pt-1.5 mobileLg:pt-3">
-          <p className={labelSm}>BY</p>
+        <div class="flex flex-col items-start pt-1.5 mobileLg:pt-3">
+          <p class={labelSm}>BY</p>
           <a
-            className="text-sm mobileLg:text-base font-black gray-gradient3-hover -mt-1"
+            class="text-sm mobileLg:text-base font-black gray-gradient3-hover -mt-1"
             href={`/wallet/${stampData.creator}`}
             target="_parent"
           >
@@ -241,7 +241,7 @@ function DispenserStats({
       </div>
 
       {/* Dispenser Stats */}
-      <div className="flex justify-between pt-6">
+      <div class="flex justify-between pt-6">
         <StatItem
           label="ESCROW"
           value={firstDispenser.escrow_quantity.toString()}
@@ -259,7 +259,7 @@ function DispenserStats({
       </div>
 
       {/* Price Display */}
-      <div className="flex flex-col justify-end pt-6">
+      <div class="flex flex-col justify-end pt-6">
         <StatTitle
           label={`${
             ((firstDispenser.satoshirate || 0) / 100000000 * btcPrice).toFixed(
@@ -270,12 +270,12 @@ function DispenserStats({
             <>
               {formatBTCAmount((firstDispenser.satoshirate || 0) / 100000000, {
                 excludeSuffix: true,
-              })} <span className="font-extralight">BTC</span>
+              })} <span class="font-extralight">BTC</span>
             </>
           }
           align="right"
         />
-        <div className="flex justify-end pt-6">
+        <div class="flex justify-end pt-6">
           <Button
             variant="outline"
             color="purple"
@@ -347,13 +347,13 @@ function StampStats(
   /* ===== RENDER ===== */
   return (
     <div
-      className={`${containerBackground} gap-6`}
+      class={`${containerBackground} gap-6`}
       onClick={() => handleType("stamp")}
     >
-      <div className="flex">
+      <div class="flex">
         <StatTitle label="STAMPS" value={stampsTotal.toString()} />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem
           label="CREATED"
           value={stampsCreated.toString()}
@@ -364,14 +364,14 @@ function StampStats(
           align="right"
         />
       </div>
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem label="LISTINGS" value={dispensers.open.toString()} />
         <StatItem
           label="VALUE"
           value={
             <>
               {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
+              <span class="font-light">BTC</span>
             </>
           }
           align="right"
@@ -396,10 +396,10 @@ function TokenStats(
   /* ===== RENDER ===== */
   return (
     <div
-      className={`${containerBackground} gap-6`}
+      class={`${containerBackground} gap-6`}
       onClick={() => handleType("token")}
     >
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatTitle label="TOKENS" value={src20Total?.toString()} />
         <StatItem
           label={`${walletData.usdValue.toFixed(2)} USD`}
@@ -413,7 +413,7 @@ function TokenStats(
         />
       </div>
 
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem
           label="TOP HOLDINGS"
           value={
@@ -462,14 +462,14 @@ function TokenStats(
         />
       </div>
 
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem label="24H CHANGE" value="+/- 0.00%" />
         <StatItem
           label="TOTAL VALUE"
           value={
             <>
               {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
+              <span class="font-light">BTC</span>
             </>
           }
           align="right"

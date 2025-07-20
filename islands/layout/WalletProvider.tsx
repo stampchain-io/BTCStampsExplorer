@@ -87,13 +87,13 @@ export function WalletProvider(
       onClick={handleConnect}
       role="button"
       aria-label={`Connect to ${providerInfo.name}`}
-      className={`flex justify-between items-center p-4 ${containerCard}`}
+      class={`flex justify-between items-center p-4 ${containerCard}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* ===== PROVIDER NAME ===== */}
       <h6
-        className={`font-extrabold text-lg uppercase tracking-wide ${
+        class={`font-extrabold text-lg uppercase tracking-wide ${
           isHovered ? "text-stamp-purple-bright" : "gray-gradient3"
         }`}
       >
@@ -104,7 +104,7 @@ export function WalletProvider(
       <img
         src={providerInfo.logo}
         alt={providerInfo.name}
-        className="w-8 h-8"
+        class="w-8 h-8"
       />
     </div>
   );

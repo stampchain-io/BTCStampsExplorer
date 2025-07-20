@@ -16,6 +16,7 @@ import { DispenserManager, XcpManager } from "$server/services/xcpService.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
+import { CreatorService } from "$server/services/creator/creatorService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import type { XcpBalance } from "$types/index.d.ts";
 import type { StampMarketData } from "$types/marketData.d.ts";
@@ -97,11 +98,11 @@ export class StampService {
         throw new Error(`Error: Stamp not found`);
       }
       return stampResult.stamps[0];
-    } 
+    }
     // Handle single stamp result
     else if (stampResult.stamp) {
       return stampResult.stamp;
-    } 
+    }
     // Handle direct result
     else {
       return stampResult;
@@ -170,13 +171,13 @@ export class StampService {
     let range = options.range;
     let rangeMin = options.rangeMin;
     let rangeMax = options.rangeMax;
-    
+
     if (!range && options.url) {
       try {
         const url = new URL(options.url);
         const urlRangeMin = url.searchParams.get("range[stampRange][min]");
         const urlRangeMax = url.searchParams.get("range[stampRange][max]");
-        
+
         if (urlRangeMin || urlRangeMax) {
           console.log("Service extracting range params:", { urlRangeMin, urlRangeMax });
           // Set range to "custom" and pass min/max separately
@@ -266,17 +267,20 @@ export class StampService {
       // Get market data for all stamps in a single query
       const cpids = processedStamps.map((stamp: any) => stamp.cpid).filter(Boolean);
       const marketDataMap = await MarketDataRepository.getBulkStampMarketData(cpids);
-      
+
       // Enrich each stamp with its market data
       processedStamps = processedStamps.map((stamp: any) => {
         if (!stamp.cpid || (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721")) {
           return stamp;
         }
-        
+
         const marketData = marketDataMap.get(stamp.cpid) || null;
         return this.enrichStampWithMarketData(stamp, marketData, options.btcPriceUSD || 0);
       });
     }
+
+    // Enrich stamps with enhanced creator names using 3-tier fallback
+    processedStamps = await CreatorService.enrichStampsWithCreatorNames(processedStamps);
 
     // Build base response
     const response = {
@@ -358,7 +362,7 @@ export class StampService {
   }
 
   static async getRecentSales(
-    page?: number, 
+    page?: number,
     limit?: number,
     options?: {
       dayRange?: number;
@@ -369,7 +373,7 @@ export class StampService {
     const pageNum = page || 1;
     const pageLimit = limit || 50;
     const dayRange = options?.dayRange || 30;
-    
+
     // Query stamps with recent sales from market data cache
     const result = await StampRepository.getRecentlyActiveSold({
       page: pageNum,
@@ -416,7 +420,7 @@ export class StampService {
       };
     }).filter((stamp: any) => stamp !== null && stamp.sale_data !== null);
 
-    return { 
+    return {
       recentSales,
       total: result.total,
       btcPriceUSD,
@@ -432,7 +436,7 @@ export class StampService {
    */
   private static getTimeAgo(date: Date): string {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    
+
     if (seconds < 60) return `${seconds}s ago`;
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
@@ -453,8 +457,8 @@ export class StampService {
   }
 
   static async getStampHolders(
-    cpid: string, 
-    page: number, 
+    cpid: string,
+    page: number,
     limit: number,
     options: StampServiceOptions
   ) {
@@ -463,8 +467,8 @@ export class StampService {
   }
 
   static async getStampSends(
-    cpid: string, 
-    page: number, 
+    cpid: string,
+    page: number,
     limit: number,
     options: StampServiceOptions
   ) {
@@ -473,8 +477,8 @@ export class StampService {
   }
 
   static async getStampDispensers(
-    cpid: string, 
-    page?: number, 
+    cpid: string,
+    page?: number,
     limit?: number,
     options?: StampServiceOptions
   ) {
@@ -486,8 +490,8 @@ export class StampService {
   }
 
   static async getStampDispenses(
-    cpid: string, 
-    page: number, 
+    cpid: string,
+    page: number,
     limit: number,
     options: StampServiceOptions
   ) {
@@ -506,7 +510,7 @@ export class StampService {
         // Only select minimal required fields
         selectColumns: ['cpid', 'ident'],
         // Important: Don't filter by type to allow cursed stamps
-        type: "all"  
+        type: "all"
       });
 
       if (!result?.stamps?.[0]) {
@@ -524,8 +528,8 @@ export class StampService {
     return await StampRepository.countTotalStamps();
   }
 
-  static async getSpecificStamp(tx_index: string): Promise<{ stamp_url: string, stamp_mimetype: string }> {
-    return await StampRepository.getSpecificStamp(tx_index);
+  static async getSpecificStamp(identifier: string): Promise<{ stamp: number | undefined, stamp_url: string, stamp_mimetype: string }> {
+    return await StampRepository.getSpecificStamp(identifier);
   }
 
   /**
@@ -545,6 +549,7 @@ export class StampService {
       return {
         ...stamp,
         floorPrice: "priceless",
+        recentSalePrice: "priceless",
         floorPriceUSD: null,
         marketData: null,
         cacheStatus: undefined,
@@ -561,9 +566,40 @@ export class StampService {
       floorPrice = marketData.recentSalePriceBTC;
     }
 
+    // Determine recent sale price for backward compatibility
+    let recentSalePrice: number | "priceless" = "priceless";
+    if (marketData.recentSalePriceBTC !== null && marketData.recentSalePriceBTC > 0) {
+      recentSalePrice = marketData.recentSalePriceBTC;
+    }
+
+    // VALIDATION: Ensure recentSalePrice mirrors marketData.recentSalePriceBTC exactly
+    const isValidMirroring = (
+      (recentSalePrice === "priceless" && (marketData.recentSalePriceBTC === null || marketData.recentSalePriceBTC <= 0)) ||
+      (typeof recentSalePrice === "number" && recentSalePrice === marketData.recentSalePriceBTC)
+    );
+
+    if (!isValidMirroring) {
+      logger.error("stamps", {
+        message: "recentSalePrice validation failed - field does not mirror marketData.recentSalePriceBTC",
+        cpid: stamp.cpid,
+        stamp: stamp.stamp,
+        recentSalePrice,
+        marketDataRecentSalePriceBTC: marketData.recentSalePriceBTC,
+        validationDetails: {
+          recentSalePriceType: typeof recentSalePrice,
+          recentSalePriceValue: recentSalePrice,
+          marketDataType: typeof marketData.recentSalePriceBTC,
+          marketDataValue: marketData.recentSalePriceBTC,
+          marketDataIsNull: marketData.recentSalePriceBTC === null,
+          marketDataIsZero: marketData.recentSalePriceBTC === 0
+        }
+      });
+    }
+
     return {
       ...stamp,
       floorPrice,
+      recentSalePrice,
       floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPriceUSD : null,
       marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPriceUSD : null,
       marketData: {
@@ -576,7 +612,7 @@ export class StampService {
         volume30dUSD: marketData.volume30dBTC ? marketData.volume30dBTC * btcPriceUSD : null,
       },
       // Add cache status
-      cacheStatus: marketData.lastUpdated ? 
+      cacheStatus: marketData.lastUpdated ?
         this.getCacheStatus(marketData.lastUpdated) : undefined,
       dispenserInfo: {
         openCount: marketData.openDispensersCount || 0,

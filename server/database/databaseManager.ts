@@ -1,9 +1,17 @@
 import "$/server/config/env.ts";
 
+import { bigIntReviver, bigIntSerializer } from "$/lib/utils/formatUtils.ts";
+import { crypto } from "@std/crypto";
+import {
+  ConsoleHandler,
+  FileHandler,
+  getLogger,
+  LogRecord,
+  setup,
+} from "@std/log";
 import { Client } from "mysql/mod.ts";
 // Conditionally import Redis based on build mode
-// deno-lint-ignore no-unused-vars
-let connect: any, Redis: any;
+let connect: any;
 if (Deno.args.includes("build")) {
   console.log("[REDIS IMPORT] Skipping Redis import in build mode");
   // Create dummy implementations for build
@@ -14,14 +22,12 @@ if (Deno.args.includes("build")) {
     keys: () => Promise.resolve([]),
     del: () => Promise.resolve(0)
   });
-  Redis = class DummyRedis {};
 } else {
   // Use the Deno Redis client in non-build mode
   try {
     const redis = await import("redis");
     connect = redis.connect;
     // Note: The deno redis module doesn't export a Redis class, just the connect function
-    Redis = null; // Not needed for this Redis client
     console.log("[REDIS IMPORT] Successfully imported Redis client");
   } catch (e: unknown) {
     const error = e as Error;
@@ -34,17 +40,8 @@ if (Deno.args.includes("build")) {
       keys: () => Promise.resolve([]),
       del: () => Promise.resolve(0)
     });
-    Redis = class DummyRedis {};
-  }
+    }
 }
-import { crypto } from "@std/crypto";
-import {
-  ConsoleHandler,
-  FileHandler,
-  getLogger,
-  LogRecord,
-  setup,
-} from "@std/log";
 
 export interface DatabaseConfig {
   DB_HOST: string;
@@ -65,7 +62,7 @@ function shouldInitializeRedis(): boolean {
     console.log("[REDIS] Build mode detected, skipping Redis initialization");
     return false;
   }
-  
+
   // Otherwise check global flag
   const skip = !!(globalThis as any).SKIP_REDIS_CONNECTION;
   console.log(`[REDIS] shouldInitializeRedis check: SKIP_REDIS_CONNECTION=${skip}`);
@@ -74,6 +71,7 @@ function shouldInitializeRedis(): boolean {
 
 class DatabaseManager {
   #pool: Client[] = [];
+  #activeConnections = 0; // Track active connections
   #redisClient: any | undefined; // Redis client type
   #isConnectingRedis = false;
   #redisRetryCount = 0;
@@ -87,6 +85,7 @@ class DatabaseManager {
   #lastCacheStatusLog: number = 0;
   #keepAliveInterval: number | undefined;
   readonly #KEEP_ALIVE_INTERVAL = 30000; // 30 seconds
+  #cacheKeyRegistry: { [category: string]: Set<string> } = {}; // Add cache key registry
 
   constructor(private config: DatabaseConfig) {
     this.#MAX_RETRIES = this.config.DB_MAX_RETRIES || 5;
@@ -97,7 +96,7 @@ class DatabaseManager {
   public async initialize(): Promise<void> {
     // Start MySQL keep-alive mechanism
     this.startKeepAlive();
-    
+
     if (shouldInitializeRedis()) {
       await this.initializeRedisConnection();
       this.#redisAvailableAtStartup = this.#redisAvailable;
@@ -109,14 +108,14 @@ class DatabaseManager {
   #setupLogging(): void {
     const level = this.config.REDIS_LOG_LEVEL || "INFO";
     const isTest = this.config.DENO_ENV === "test";
-    
+
     // Only include file handler if not in test mode
     const handlers: any = {
       console: new ConsoleHandler(level as any),
     };
-    
+
     const handlerNames = ["console"];
-    
+
     if (!isTest) {
       handlers.file = new FileHandler("WARN", {
         filename: "./db.log",
@@ -125,7 +124,7 @@ class DatabaseManager {
       });
       handlerNames.push("file");
     }
-    
+
     setup({
       handlers: handlers,
       loggers: {
@@ -141,10 +140,13 @@ class DatabaseManager {
 
   getClient(): Promise<Client> {
     if (this.#pool.length > 0) {
-      return Promise.resolve(this.#pool.pop() as Client);
+      const client = this.#pool.pop() as Client;
+      this.#activeConnections++; // Track connection taken from pool
+      return Promise.resolve(client);
     }
 
     if (this.#pool.length < this.#MAX_POOL_SIZE) {
+      this.#activeConnections++; // Track new connection being created
       return this.createConnection();
     }
 
@@ -153,6 +155,7 @@ class DatabaseManager {
 
   releaseClient(client: Client): void {
     this.#pool.push(client);
+    this.#activeConnections--; // Track connection returned to pool
   }
 
   async closeClient(client: Client): Promise<void> {
@@ -160,7 +163,25 @@ class DatabaseManager {
     const index = this.#pool.indexOf(client);
     if (index > -1) {
       this.#pool.splice(index, 1);
+      this.#activeConnections--; // Track connection being closed
     }
+  }
+
+  /**
+   * Get current connection pool statistics for monitoring
+   */
+  getConnectionStats(): {
+    activeConnections: number;
+    poolSize: number;
+    maxPoolSize: number;
+    totalConnections: number;
+  } {
+    return {
+      activeConnections: this.#activeConnections,
+      poolSize: this.#pool.length,
+      maxPoolSize: this.#MAX_POOL_SIZE,
+      totalConnections: this.#activeConnections + this.#pool.length,
+    };
   }
 
   async closeAllClients(): Promise<void> {
@@ -169,7 +190,7 @@ class DatabaseManager {
       clearInterval(this.#keepAliveInterval);
       this.#keepAliveInterval = undefined;
     }
-    
+
     // Close Redis connection
     if (this.#redisClient) {
       try {
@@ -187,7 +208,7 @@ class DatabaseManager {
         this.#redisAvailable = false;
       }
     }
-    
+
     await Promise.all(this.#pool.map((client) => this.closeClient(client)));
   }
 
@@ -196,7 +217,7 @@ class DatabaseManager {
       let client: Client | null = null;
       try {
         client = await this.getClient();
-        
+
         // Test connection before executing query
         try {
           await client.execute("SELECT 1", []);
@@ -209,14 +230,14 @@ class DatabaseManager {
           // Get a new connection
           client = await this.getClient();
         }
-        
+
         const result = await client.execute(query, params);
         this.releaseClient(client);
         return result as T;
       } catch (error) {
         // Check if it's a connection timeout error
-        if (error instanceof Error && 
-            (error.message.includes("disconnected by the server") || 
+        if (error instanceof Error &&
+            (error.message.includes("disconnected by the server") ||
              error.message.includes("wait_timeout") ||
              error.message.includes("interactive_timeout") ||
              error.message.includes("connection") ||
@@ -237,7 +258,7 @@ class DatabaseManager {
             this.releaseClient(client);
           }
         }
-        
+
         // Only log as error on final attempt
         if (attempt === this.#MAX_RETRIES) {
           this.#logger.error(
@@ -250,7 +271,7 @@ class DatabaseManager {
             error instanceof Error ? error.message : String(error),
           );
         }
-        
+
         if (attempt === this.#MAX_RETRIES) {
           throw error;
         }
@@ -262,7 +283,7 @@ class DatabaseManager {
     throw new Error("Max retries reached");
   }
 
-  async executeQueryWithCache<T>(
+  async executeQueryWithCache<T = any>(
     query: string,
     params: unknown[],
     cacheDuration: number | "never",
@@ -285,20 +306,36 @@ class DatabaseManager {
   private async createConnection(): Promise<Client> {
     const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = this.config;
     const charset = 'utf8mb4';
-    
+
+    // Use longer timeouts in development mode for external database
+    const isDevelopment = this.config.DENO_ENV === "development";
+    const queryTimeout = isDevelopment ? 180000 : 60000; // 3 minutes in dev, 1 minute in prod
+
     const client = new Client();
-    await client.connect({
-      hostname: DB_HOST,
-      port: DB_PORT,
-      username: DB_USER,
-      db: DB_NAME,
-      password: DB_PASSWORD,
-      charset: charset,
-      // Additional connection options to prevent timeouts
-      idleTimeout: 0, // Disable idle timeout
-      timeout: 60000, // 60 second query timeout
-    });
-    
+
+    // Add connection timeout to prevent hanging
+    const connectWithTimeout = () => {
+      const connectionPromise = client.connect({
+        hostname: DB_HOST,
+        port: DB_PORT,
+        username: DB_USER,
+        db: DB_NAME,
+        password: DB_PASSWORD,
+        charset: charset,
+        // Additional connection options to prevent timeouts
+        idleTimeout: 0, // Disable idle timeout
+        timeout: queryTimeout,
+      });
+
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error(`Database connection timeout after 10 seconds to ${DB_HOST}:${DB_PORT}`)), 10000);
+      });
+
+      return Promise.race([connectionPromise, timeoutPromise]);
+    };
+
+    await connectWithTimeout();
+
     // Set session timezone to UTC to ensure consistent timestamp handling
     try {
       await client.execute("SET time_zone = '+00:00'", []);
@@ -306,28 +343,28 @@ class DatabaseManager {
     } catch (error) {
       this.#logger.warn("Failed to set session timezone", error);
     }
-    
+
     return client;
   }
-  
+
   private startKeepAlive(): void {
     // Clear any existing interval
     if (this.#keepAliveInterval) {
       clearInterval(this.#keepAliveInterval);
     }
-    
+
     // Set up keep-alive interval to ping connections
     this.#keepAliveInterval = setInterval(async () => {
       try {
         // Get a snapshot of current pool size
         const poolSize = this.#pool.length;
-        
+
         if (poolSize > 0) {
           this.#logger.debug(`Running keep-alive on ${poolSize} connections`);
-          
+
           // Test each connection in the pool
           const connectionsToRemove: Client[] = [];
-          
+
           for (const client of this.#pool) {
             try {
               // Execute a simple query to keep connection alive
@@ -337,12 +374,12 @@ class DatabaseManager {
               connectionsToRemove.push(client);
             }
           }
-          
+
           // Remove bad connections
           for (const badClient of connectionsToRemove) {
             await this.closeClient(badClient);
           }
-          
+
           // Log pool health
           const remainingConnections = this.#pool.length;
           if (connectionsToRemove.length > 0) {
@@ -355,14 +392,14 @@ class DatabaseManager {
         this.#logger.error("Error in keep-alive routine:", error);
       }
     }, this.#KEEP_ALIVE_INTERVAL);
-    
+
     this.#logger.info("MySQL keep-alive mechanism started");
   }
 
   private async initializeRedisConnection(): Promise<void> {
     console.log(`[REDIS INIT] SKIP_REDIS_CONNECTION=${(globalThis as any).SKIP_REDIS_CONNECTION}, ELASTICACHE_ENDPOINT=${this.config.ELASTICACHE_ENDPOINT}`);
     console.log(`[REDIS INIT] CACHE=${this.config.CACHE}, DENO_ENV=${this.config.DENO_ENV}`);
-    
+
     if ((globalThis as any).SKIP_REDIS_CONNECTION) {
       const skipMsg = "Skipping Redis connection for build process";
       this.#logger.info(skipMsg);
@@ -373,7 +410,7 @@ class DatabaseManager {
     const initMsg = `Initializing Redis connection to ${this.config.ELASTICACHE_ENDPOINT}...`;
     this.#logger.info(initMsg);
     console.log(`[REDIS INIT] ${initMsg}`);
-    
+
     try {
       await this.connectToRedis();
       const successMsg = "Redis connection successful - cache system ready";
@@ -383,20 +420,20 @@ class DatabaseManager {
     } catch (error) {
       let errorMsg = "";
       if (error instanceof Error) {
-        errorMsg = error.name === "AbortError" 
-          ? "Redis connection timed out" 
+        errorMsg = error.name === "AbortError"
+          ? "Redis connection timed out"
           : `Failed to connect to Redis at startup: ${error.name} - ${error.message}`;
       } else {
         errorMsg = "Failed to connect to Redis at startup: Unknown error";
       }
-      
+
       this.#logger.error(errorMsg);
       console.log(`[REDIS INIT ERROR] ${errorMsg}`);
-      
+
       if (error instanceof Error && error.stack) {
         console.log(`[REDIS INIT ERROR] Stack trace: ${error.stack}`);
       }
-      
+
       const fallbackMsg = "Continuing with in-memory cache. Redis not available.";
       this.#logger.info(fallbackMsg);
       console.log(`[REDIS INIT] ${fallbackMsg}`);
@@ -409,7 +446,7 @@ class DatabaseManager {
     // Note: REDIS_DEBUG not used in this function - only used in cache operations
     const SKIP_REDIS_TLS = Deno.env.get("SKIP_REDIS_TLS") === "true"; // Only skip if explicitly set to true
     // Note: REDIS_MAX_RETRIES not used in this function - class uses this.#MAX_RETRIES from DB_MAX_RETRIES
-    
+
     // Early console log to ensure we can see Redis connection attempts in logs
     console.log(`[REDIS CONFIG] ELASTICACHE_ENDPOINT=${this.config.ELASTICACHE_ENDPOINT}, SKIP_REDIS_TLS=${SKIP_REDIS_TLS}, TIMEOUT=${REDIS_CONNECTION_TIMEOUT}ms`);
     console.log(`[REDIS CONFIG] USING OFFICIAL JSR REDIS CLIENT (@db/redis)`);
@@ -419,13 +456,13 @@ class DatabaseManager {
       // Log at the highest visibility level for production debugging
       console.log(`[REDIS CONNECTION] Attempting Redis connection to ${this.config.ELASTICACHE_ENDPOINT}:6379`);
       console.log(`[REDIS CONNECTION] TLS=${!SKIP_REDIS_TLS}, TIMEOUT=${REDIS_CONNECTION_TIMEOUT}ms`);
-      
+
       if (!this.config.ELASTICACHE_ENDPOINT) {
         const errMsg = "ELASTICACHE_ENDPOINT is empty or not set";
         console.log(`[REDIS ERROR] ${errMsg}`);
         throw new Error(errMsg);
       }
-      
+
       // Try TCP connection first to verify connectivity
       try {
         console.log(`[REDIS CONNECTION] Testing TCP connectivity...`);
@@ -440,7 +477,7 @@ class DatabaseManager {
         console.error(`[REDIS CONNECTION] TCP CONNECTION FAILED: ${tcpError instanceof Error ? tcpError.message : String(tcpError)}`);
         throw new Error(`TCP connection failed: ${tcpError instanceof Error ? tcpError.message : String(tcpError)}`);
       }
-      
+
       // JSR Redis client connection options
       const connectionOptions = {
         hostname: this.config.ELASTICACHE_ENDPOINT,
@@ -455,43 +492,43 @@ class DatabaseManager {
         },
         reconnectOnError: (err: Error) => {
           // Only reconnect on specific network-related errors
-          const shouldReconnect = 
-            err.message.includes('ECONNRESET') || 
-            err.message.includes('connection') || 
+          const shouldReconnect =
+            err.message.includes('ECONNRESET') ||
+            err.message.includes('connection') ||
             err.message.includes('network') ||
             err.message.includes('timeout');
           console.log(`[REDIS RECONNECT] Error: ${err.message}, Should reconnect: ${shouldReconnect}`);
           return shouldReconnect;
         }
       };
-      
+
       console.log(`[REDIS CONNECTION] Options: ${JSON.stringify(connectionOptions)}`);
-      
+
       const connectionStart = Date.now();
       // Connect with the JSR Redis client
       this.#redisClient = await connect(connectionOptions);
       console.log(`[REDIS CONNECTION] Connection established (${Date.now() - connectionStart}ms)`);
-      
+
       // Test connection by setting a test key
       console.log(`[REDIS CONNECTION] Testing with PING command...`);
       const pingStart = Date.now();
       const pingResult = await this.#redisClient.ping();
       console.log(`[REDIS CONNECTION] PING returned "${pingResult}" (${Date.now() - pingStart}ms)`);
-      
+
       console.log(`[REDIS CONNECTION] Setting test key...`);
       const setStart = Date.now();
       await this.#redisClient.set("redis_connection_test", "success", { ex: 10 });
       console.log(`[REDIS CONNECTION] SET operation successful (${Date.now() - setStart}ms)`);
-      
+
       console.log(`[REDIS CONNECTION] Getting test key...`);
       const getStart = Date.now();
       const value = await this.#redisClient.get("redis_connection_test");
       console.log(`[REDIS CONNECTION] GET returned "${value}" (${Date.now() - getStart}ms)`);
-      
+
       if (value !== "success") {
         throw new Error(`Test key verification failed: expected "success" but got "${value}"`);
       }
-      
+
       console.log(`[REDIS CONNECTION SUCCESS] ✅ Connected to Redis successfully with verified read/write`);
       this.#logger.info("✅ Connected to Redis successfully with verified read/write");
       this.#redisAvailable = true;
@@ -502,14 +539,14 @@ class DatabaseManager {
         errorMessage = `Redis connection error: ${error.name} - ${error.message}`;
         console.log(`[REDIS CONNECTION ERROR] ${errorMessage}`);
         this.#logger.error(errorMessage);
-        
+
         if (error.stack) {
           console.log(`[REDIS CONNECTION ERROR] Stack trace: ${error.stack}`);
         }
       } else {
         console.log(`[REDIS CONNECTION ERROR] Non-Error object:`, error);
       }
-      
+
       throw new Error(errorMessage);
     }
   }
@@ -522,7 +559,7 @@ class DatabaseManager {
 
     this.#isConnectingRedis = true;
     console.log(`[REDIS RECONNECT] Starting background reconnection attempt #${this.#redisRetryCount + 1}/${this.#MAX_RETRIES}`);
-    
+
     try {
       // Cleanup old failed connection first
       if (this.#redisClient) {
@@ -537,7 +574,7 @@ class DatabaseManager {
         }
         this.#redisClient = undefined;
       }
-      
+
       console.log(`[REDIS RECONNECT] Attempting to reconnect to Redis at ${this.config.ELASTICACHE_ENDPOINT}:6379`);
       await this.connectToRedis();
       console.log(`[REDIS RECONNECT SUCCESS] ✅ Successfully reconnected to Redis`);
@@ -547,12 +584,12 @@ class DatabaseManager {
       const errorMsg = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
       this.#logger.error(`Failed to reconnect to Redis: ${errorMsg}`);
       console.log(`[REDIS RECONNECT ERROR] Failed attempt #${this.#redisRetryCount + 1}: ${errorMsg}`);
-      
+
       if (this.#redisRetryCount < this.#MAX_RETRIES) {
         this.#redisRetryCount++;
         const backoffTime = this.#RETRY_INTERVAL * Math.pow(1.5, this.#redisRetryCount - 1); // Exponential backoff
         console.log(`[REDIS RECONNECT] Will retry in ${backoffTime}ms (attempt ${this.#redisRetryCount + 1}/${this.#MAX_RETRIES})`);
-        
+
         setTimeout(
           () => this.#connectToRedisInBackground(),
           backoffTime,
@@ -574,10 +611,58 @@ class DatabaseManager {
     const data = encoder.encode(input);
     const hashBuffer = crypto.subtle.digestSync("SHA-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const cacheKey = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // Register cache key by category based on query content
+    this.registerCacheKey(cacheKey, query);
+
+    return cacheKey;
   }
 
-  public async handleCache<T>(
+  private registerCacheKey(cacheKey: string, query: string): void {
+    const queryUpper = query.toUpperCase();
+
+    // Determine category based on query content
+    let category: string | null = null;
+
+    // Enhanced balance query detection - check for balance-related table names and patterns
+    if (queryUpper.includes('SRC20_BALANCE') ||
+        queryUpper.includes('BALANCES') ||
+        queryUpper.includes('FROM BALANCES') ||
+        queryUpper.includes('JOIN BALANCES') ||
+        queryUpper.includes('BALANCE_TABLE') ||
+        queryUpper.includes('amt') && queryUpper.includes('tick') && queryUpper.includes('address')) {
+      if (queryUpper.includes('SRC20')) {
+        category = 'src20_balance';
+      } else {
+        category = 'balance';
+      }
+    } else if (queryUpper.includes('SRC101_OWNERS') || queryUpper.includes('src101')) {
+      category = 'src101_balance';
+    } else if (queryUpper.includes('STAMP_') && queryUpper.includes('BALANCE')) {
+      category = 'stamp_balance';
+    } else if (queryUpper.includes('STAMP_MARKET_DATA') || queryUpper.includes('SRC20_MARKET_DATA')) {
+      category = 'market_data';
+    } else if (queryUpper.includes('STAMP_') || queryUpper.includes('stamps')) {
+      category = 'stamp';
+    } else if (queryUpper.includes('BLOCK_') || queryUpper.includes('block')) {
+      category = 'block';
+    } else if (queryUpper.includes('TRANSACTION') || queryUpper.includes('tx_')) {
+      category = 'transaction';
+    }
+
+    if (category) {
+      if (!this.#cacheKeyRegistry[category]) {
+        this.#cacheKeyRegistry[category] = new Set();
+      }
+      this.#cacheKeyRegistry[category].add(cacheKey);
+      console.log(`[CACHE REGISTRY] Registered key ${cacheKey.substring(0, 12)}... in category: ${category}`);
+    } else {
+      console.log(`[CACHE REGISTRY] No category found for query: ${query.substring(0, 50)}...`);
+    }
+  }
+
+  public async handleCache<T = any>(
     key: string,
     fetchData: () => Promise<T>,
     cacheDuration: number | "never",
@@ -590,14 +675,14 @@ class DatabaseManager {
       const status = `Cache status: Redis ${this.#redisAvailable ? 'AVAILABLE' : 'UNAVAILABLE'}, fallback=${!this.#redisAvailable}, endpoint=${this.config.ELASTICACHE_ENDPOINT}`;
       this.#logger.info(status);
       console.log(`[REDIS CACHE STATUS] ${status}`);
-      
+
       // Add detailed Redis client status information
       console.log(`[REDIS CACHE STATUS] Redis client initialized: ${!!this.#redisClient}`);
-      
+
       // Log cache statistics
       const inMemoryKeys = Object.keys(this.#inMemoryCache).length;
       console.log(`[REDIS CACHE STATUS] In-memory cache entries: ${inMemoryKeys}`);
-      
+
       // Test connectivity with simple ping if redis is supposed to be available
       if (this.#redisClient && this.#redisAvailable) {
         this.#redisClient.ping()
@@ -605,9 +690,9 @@ class DatabaseManager {
           .catch((err: unknown) => console.log(`[REDIS CACHE STATUS] PING test failed: ${err instanceof Error ? err.message : err}`));
       }
     }
-    
+
     const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
-    
+
     if (!this.#redisAvailable) {
       if (this.#redisAvailableAtStartup) {
         const reconnectMsg = "Redis was available at startup but is now unavailable. Attempting reconnection...";
@@ -615,21 +700,21 @@ class DatabaseManager {
         console.log(`[REDIS RECONNECT] ${reconnectMsg}`);
         this.#connectToRedisInBackground();
       }
-      
+
       const fallbackMsg = `Using in-memory cache fallback for key: ${key.substring(0, 10)}... (type: ${typeof fetchData}, cacheDuration: ${cacheDuration})`;
       this.#logger.debug(fallbackMsg);
       // Only log fallback messages in production or when explicitly debugging
       if (REDIS_DEBUG && this.config.DENO_ENV === "production") {
         console.log(`[REDIS FALLBACK] ${fallbackMsg}`);
       }
-      
+
       return this.handleInMemoryCache(key, fetchData, cacheDuration);
     }
-    
+
     if (REDIS_DEBUG) {
       console.log(`[REDIS CACHE] Attempting to get data for key: ${key}`);
     }
-    
+
     try {
       const cachedData = await this.getCachedData(key);
       if (cachedData) {
@@ -638,17 +723,17 @@ class DatabaseManager {
         }
         return cachedData as T;
       }
-      
+
       if (REDIS_DEBUG) {
         console.log(`[REDIS CACHE MISS] No data found for key: ${key}, fetching fresh data`);
       }
-      
+
       const data = await fetchData();
-      
+
       if (REDIS_DEBUG) {
         console.log(`[REDIS CACHE SET] Setting data for key: ${key}, expiry: ${cacheDuration}`);
       }
-      
+
       await this.setCachedData(key, data, cacheDuration);
       return data;
     } catch (error) {
@@ -660,25 +745,25 @@ class DatabaseManager {
 
   private async getCachedData(key: string): Promise<unknown | null> {
     const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
-    
+
     if (this.#redisClient) {
       try {
         const startTime = Date.now();
         const data = await this.#redisClient.get(key);
         const duration = Date.now() - startTime;
-        
+
         if (REDIS_DEBUG && this.config.DENO_ENV === "production") {
           console.log(`[REDIS GET] Key: ${key.substring(0, 10)}... - ${data ? 'HIT' : 'MISS'} (${duration}ms)`);
         }
-        
+
         if (duration > 500) {
           // Log slow Redis operations
           console.log(`[REDIS SLOW] Slow Redis GET operation detected: ${duration}ms for key ${key.substring(0, 10)}...`);
         }
-        
+
         if (data) {
           try {
-            const parsedData = JSON.parse(data);
+            const parsedData = JSON.parse(data, bigIntReviver);
             return parsedData;
           } catch (parseError) {
             console.log(`[REDIS PARSE ERROR] Failed to parse data for key ${key.substring(0, 10)}...: ${parseError instanceof Error ? parseError.message : parseError}`);
@@ -690,16 +775,16 @@ class DatabaseManager {
         const errorMsg = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
         this.#logger.error(`Failed to read from Redis cache: ${errorMsg}`);
         console.log(`[REDIS ERROR] Failed to get key ${key.substring(0, 10)}...: ${errorMsg}`);
-        
+
         // Check if connection was lost
-        if (error instanceof Error && 
-            (error.message.includes("connection") || 
-             error.message.includes("network") || 
+        if (error instanceof Error &&
+            (error.message.includes("connection") ||
+             error.message.includes("network") ||
              error.message.includes("ECONNRESET") ||
              error.message.includes("closed"))) {
           console.log(`[REDIS CONNECTION ISSUE] Possible connection loss detected: ${error.message}`);
           this.#redisAvailable = false;
-          
+
           if (this.#redisAvailableAtStartup) {
             console.log(`[REDIS RECONNECT] Scheduling reconnection attempt in background...`);
             this.#connectToRedisInBackground();
@@ -709,7 +794,7 @@ class DatabaseManager {
     } else if (REDIS_DEBUG) {
       console.log(`[REDIS CLIENT MISSING] Redis client unavailable for key: ${key.substring(0, 10)}...`);
     }
-    
+
     return this.getInMemoryCachedData(key);
   }
 
@@ -719,10 +804,10 @@ class DatabaseManager {
     expiry: number | "never",
   ): Promise<void> {
     const REDIS_DEBUG = Deno.env.get("REDIS_DEBUG") === "true";
-    
+
     // Always set in-memory cache as fallback regardless of Redis status
     this.setInMemoryCachedData(key, data, expiry);
-    
+
     if (this.#redisClient) {
       try {
         // If expiry is 0 (or less), it implies "no cache" or "real-time data".
@@ -738,14 +823,14 @@ class DatabaseManager {
         // Serialize the data
         let value: string;
         try {
-          value = JSON.stringify(data);
-          
+          value = JSON.stringify(data, bigIntSerializer);
+
           // Log data size for performance monitoring
           const byteSize = new TextEncoder().encode(value).length;
           if (byteSize > 100 * 1024) { // 100KB or larger
             console.log(`[REDIS LARGE DATA] Large value detected for key ${key.substring(0, 10)}...: ${byteSize / 1024} KB`);
           }
-          
+
           if (REDIS_DEBUG) {
             // Changed log message to be more explicit about what's being attempted
             console.log(`[REDIS SET ATTEMPT] Key: ${key.substring(0, 10)}..., Value Size: ${byteSize} bytes, Expiry Opts: ${expiry === "never" ? "none" : `{ ex: ${expiry} }`}`);
@@ -754,17 +839,17 @@ class DatabaseManager {
           console.log(`[REDIS SERIALIZE ERROR] Failed to serialize data for key ${key.substring(0, 10)}...: ${serializeError instanceof Error ? serializeError.message : serializeError}`);
           return; // Skip Redis set but keep in-memory cache
         }
-        
+
         // Measure Redis operation time
         const startTime = Date.now();
-        
+
         if (expiry === "never") {
           await this.#redisClient.set(key, value);
         } else {
           // At this point, expiry is a positive number
           await this.#redisClient.set(key, value, { ex: expiry });
         }
-        
+
         const duration = Date.now() - startTime;
         if (duration > 500) {
           // Log slow operations
@@ -776,21 +861,21 @@ class DatabaseManager {
         const errorMsg = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
         this.#logger.error(`Failed to write to Redis cache: ${errorMsg}`);
         console.log(`[REDIS ERROR ON SET] Failed for key ${key.substring(0, 10)}...: ${errorMsg}`);
-        
+
         // Detailed error inspection
         if (error instanceof Error && error.stack) {
           console.log(`[REDIS ERROR STACK] ${error.stack}`);
         }
-        
+
         // Check if connection was lost
-        if (error instanceof Error && 
-            (error.message.includes("connection") || 
-             error.message.includes("network") || 
+        if (error instanceof Error &&
+            (error.message.includes("connection") ||
+             error.message.includes("network") ||
              error.message.includes("ECONNRESET") ||
              error.message.includes("closed"))) {
           console.log(`[REDIS CONNECTION ISSUE DURING SET] Possible connection loss detected: ${error.message}`);
           this.#redisAvailable = false;
-          
+
           if (this.#redisAvailableAtStartup) {
             console.log(`[REDIS RECONNECT DURING SET] Scheduling reconnection attempt in background...`);
             this.#connectToRedisInBackground();
@@ -836,18 +921,37 @@ class DatabaseManager {
   }
 
   public async invalidateCacheByPattern(pattern: string): Promise<void> {
+    // Handle registry-based invalidation for known patterns
+    const categoryMap: { [key: string]: string[] } = {
+      'balance_*': ['balance', 'src20_balance', 'src101_balance', 'stamp_balance'],
+      'src20_balance_*': ['src20_balance'],
+      'src101_balance_*': ['src101_balance'],
+      'stamp_balance_*': ['stamp_balance'],
+      'market_data_*': ['market_data'],
+      'stamp_*': ['stamp'],
+      'block_*': ['block'],
+      'transaction_*': ['transaction'],
+      'btc_price*': [] // Keep original pattern matching for this
+    };
+
+    const categories = categoryMap[pattern];
+    if (categories) {
+      // Invalidate by categories
+      for (const category of categories) {
+        await this.invalidateCacheByCategory(category);
+      }
+    }
+
+    // Also try original pattern matching for backwards compatibility
     if (this.#redisClient) {
       try {
         const keys = await this.#redisClient.keys(pattern);
         if (keys.length > 0) {
           await this.#redisClient.del(...keys);
-          this.#logger.info(`Cache invalidated for pattern: ${pattern}`);
+          console.log(`Cache invalidated ${keys.length} keys for pattern: ${pattern}`);
         }
       } catch (error) {
-        this.#logger.error(
-          "Failed to invalidate Redis cache by pattern:",
-          error,
-        );
+        console.error("Failed to invalidate Redis cache by pattern:", error);
         if (this.#redisAvailableAtStartup) {
           this.#connectToRedisInBackground();
         }
@@ -855,6 +959,84 @@ class DatabaseManager {
       }
     }
     this.invalidateInMemoryCacheByPattern(pattern);
+  }
+
+  private async invalidateCacheByCategory(category: string): Promise<void> {
+    const cacheKeys = this.#cacheKeyRegistry[category];
+    if (!cacheKeys || cacheKeys.size === 0) {
+      return;
+    }
+
+    console.log(`Invalidating ${cacheKeys.size} cache keys for category: ${category}`);
+
+    // Redis invalidation
+    if (this.#redisClient) {
+      try {
+        const keysArray = Array.from(cacheKeys);
+        if (keysArray.length > 0) {
+          await this.#redisClient.del(...keysArray);
+        }
+      } catch (error) {
+        console.error(`Failed to invalidate Redis cache for category ${category}:`, error);
+      }
+    }
+
+    // In-memory cache invalidation
+    for (const key of cacheKeys) {
+      delete this.#inMemoryCache[key];
+    }
+
+    // Clear the registry for this category
+    this.#cacheKeyRegistry[category].clear();
+  }
+
+  /**
+   * Get cache registry statistics (for debugging/monitoring)
+   */
+  public async getCacheRegistryStats(): Promise<{ [category: string]: number }> {
+    const stats: { [category: string]: number } = {};
+    for (const [category, keys] of Object.entries(this.#cacheKeyRegistry)) {
+      stats[category] = keys.size;
+    }
+    return stats;
+  }
+
+  /**
+   * Force clear all balance-related caches (for debugging/testing)
+   */
+  public async forceInvalidateAllBalanceCaches(): Promise<void> {
+    console.log("[CACHE DEBUG] Force invalidating all balance caches...");
+
+    // Clear all explicit balance-related categories
+    const explicitBalanceCategories = ['balance', 'src20_balance', 'src101_balance', 'stamp_balance'];
+
+    for (const category of explicitBalanceCategories) {
+      await this.invalidateCacheByCategory(category);
+    }
+
+    // Clear categories that balance queries might be miscategorized into
+    const additionalCategories = ['stamp', 'market_data', 'block'];
+
+    for (const category of additionalCategories) {
+      await this.invalidateCacheByCategory(category);
+    }
+
+    // Also clear by patterns for any missed keys (backward compatibility)
+    await this.invalidateCacheByPattern('balance_*');
+    await this.invalidateCacheByPattern('src20_balance_*');
+    await this.invalidateCacheByPattern('src101_balance_*');
+    await this.invalidateCacheByPattern('stamp_balance_*');
+
+    console.log("[CACHE DEBUG] All balance caches cleared (comprehensive method)");
+  }
+
+  /**
+   * Debug method to check what's cached
+   */
+  public debugCacheStatus(): void {
+    console.log("[CACHE DEBUG] Registry stats:", this.getCacheRegistryStats());
+    console.log("[CACHE DEBUG] In-memory cache keys:", Object.keys(this.#inMemoryCache).length);
+    console.log("[CACHE DEBUG] Redis available:", this.#redisAvailable);
   }
 
   private invalidateInMemoryCacheByPattern(pattern: string): void {
@@ -890,7 +1072,7 @@ console.log(`SKIP_REDIS_CONNECTION: ${(globalThis as any).SKIP_REDIS_CONNECTION 
 console.log("===========================");
 
 // Only create singleton if not in test mode to prevent resource leaks during testing
-export const dbManager = Deno.env.get("DENO_ENV") === "test" 
+export const dbManager = Deno.env.get("DENO_ENV") === "test"
   ? (globalThis as any).__mockDbManager || undefined as any as DatabaseManager  // Use mock if available in test mode
   : new DatabaseManager(dbConfig);
 

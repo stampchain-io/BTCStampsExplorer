@@ -42,9 +42,12 @@ import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts"
 import { arc4 } from "$lib/utils/minting/transactionUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { SRC20CompressionService } from "$server/services/src20/compression/compressionService.ts";
-import { TransactionService } from "$server/services/transaction/index.ts";
+// Removed TransactionService import - using direct OptimalUTXOSelection instead
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
+import { XcpManager } from "$server/services/xcpService.ts";
 import { IPrepareSRC20TX } from "$server/types/services/src20.d.ts";
+import type { UTXO } from "$types/index.d.ts";
 import { PSBTInput, VOUT } from "$types/index.d.ts";
 import { crypto } from "@std/crypto";
 import * as msgpack from "msgpack";
@@ -56,6 +59,95 @@ export class SRC20MultisigPSBTService {
   private static readonly CHANGE_DUST = BigInt(1000);
   private static readonly THIRD_PUBKEY = "020202020202020202020202020202020202020202020202020202020202020202";
   private static commonUtxoService = new CommonUTXOService();
+
+  /**
+   * Simplified UTXO selection that gets full details upfront - same pattern as stamp minting
+   */
+  private static async getFullUTXOsWithDetails(
+    address: string,
+    filterStampUTXOs: boolean = true,
+    excludeUtxos: Array<{ txid: string; vout: number }> = []
+  ): Promise<UTXO[]> {
+    logger.debug("src20", {
+      message: "Fetching full UTXOs with details upfront for multisig",
+      address,
+      filterStampUTXOs,
+      excludeUtxos: excludeUtxos.length
+    });
+
+    // Get basic UTXOs first
+    let basicUtxos = await this.commonUtxoService.getSpendableUTXOs(address, undefined, {
+      includeAncestorDetails: true,
+      confirmedOnly: false
+    });
+
+    // Apply exclusions
+    if (excludeUtxos.length > 0) {
+      const excludeSet = new Set(excludeUtxos.map(u => `${u.txid}:${u.vout}`));
+      basicUtxos = basicUtxos.filter(utxo => !excludeSet.has(`${utxo.txid}:${utxo.vout}`));
+    }
+
+    // Filter stamp UTXOs if requested
+    if (filterStampUTXOs) {
+      try {
+        const stampBalances = await XcpManager.getXcpBalancesByAddress(address, undefined, true);
+        const utxosToExcludeFromStamps = new Set<string>();
+        for (const balance of stampBalances.balances) {
+          if (balance.utxo) {
+            utxosToExcludeFromStamps.add(balance.utxo);
+          }
+        }
+        basicUtxos = basicUtxos.filter(
+          (utxo) => !utxosToExcludeFromStamps.has(`${utxo.txid}:${utxo.vout}`),
+        );
+      } catch (error) {
+        logger.error("src20", {
+          message: "Error filtering stamp UTXOs for multisig",
+          address,
+          error: (error as any).message
+        });
+      }
+    }
+
+    // Now get full details for all UTXOs upfront
+    const fullUTXOs: UTXO[] = [];
+    for (const basicUtxo of basicUtxos) {
+      try {
+        const fullUtxo = await this.commonUtxoService.getSpecificUTXO(
+          basicUtxo.txid,
+          basicUtxo.vout,
+          { includeAncestorDetails: true, confirmedOnly: false }
+        );
+
+        if (fullUtxo && fullUtxo.script) {
+          fullUTXOs.push(fullUtxo);
+        } else {
+          logger.warn("src20", {
+            message: "Skipping UTXO with missing script for multisig",
+            txid: basicUtxo.txid,
+            vout: basicUtxo.vout,
+            hasFullUtxo: !!fullUtxo,
+            hasScript: !!fullUtxo?.script
+          });
+        }
+      } catch (error) {
+        logger.warn("src20", {
+          message: "Failed to fetch full UTXO details for multisig",
+          txid: basicUtxo.txid,
+          vout: basicUtxo.vout,
+          error: (error as any).message
+        });
+      }
+    }
+
+    logger.debug("src20", {
+      message: "Full UTXOs fetched successfully for multisig",
+      total: fullUTXOs.length,
+      withScripts: fullUTXOs.filter(u => u.script).length
+    });
+
+    return fullUTXOs;
+  }
 
   static async preparePSBT({
     network,
@@ -79,15 +171,33 @@ export class SRC20MultisigPSBTService {
         { address: toAddress, value: Number(this.RECIPIENT_DUST) },
       ];
 
-      // Select UTXOs first to get txid for encryption
-      const { inputs, change: _change, fee } = await TransactionService.utxoServiceInstance.selectUTXOsForTransaction(
-        changeAddress,
-        vouts as any,
+      // Convert initial vouts to format expected by OptimalUTXOSelection
+      const initialOutputsForSelection = vouts.map(vout => ({
+        value: vout.value,
+        script: "",
+        ...(vout.address && { address: vout.address })
+      }));
+
+      // Get full UTXOs with details first - same pattern as stamp minting
+      const fullUTXOs = await this.getFullUTXOsWithDetails(changeAddress, true, []);
+
+      if (fullUTXOs.length === 0) {
+        throw new Error("No UTXOs available for SRC-20 multisig transaction");
+      }
+
+      // Use optimal UTXO selection directly - same pattern as stamp minting
+      const selectionResult = OptimalUTXOSelection.selectUTXOs(
+        fullUTXOs,
+        initialOutputsForSelection,
         feeRate,
-        0,
-        1.5,
-        { filterStampUTXOs: true, includeAncestors: true }
+        {
+          avoidChange: true,
+          consolidationMode: false,
+          dustThreshold: 1000
+        }
       );
+
+      const { inputs, change: _change, fee } = selectionResult;
 
       if (inputs.length === 0) {
         throw new Error("Unable to select suitable UTXOs for the transaction");
@@ -169,8 +279,8 @@ export class SRC20MultisigPSBTService {
           logger.error("src20", { message: "Input UTXO is missing script for Multisig.", input });
           throw new Error(`Input UTXO ${input.txid}:${input.vout} is missing script (scriptPubKey).`);
         }
-        const isWitnessUtxo = input.scriptType?.startsWith("witness") || 
-                              input.scriptType?.toUpperCase().includes("P2W") || 
+        const isWitnessUtxo = input.scriptType?.startsWith("witness") ||
+                              input.scriptType?.toUpperCase().includes("P2W") ||
                               (input.scriptType === "P2SH");
 
         const psbtInput: PSBTInput = {
@@ -197,11 +307,11 @@ export class SRC20MultisigPSBTService {
       }
 
       // Calculate total input and output values
-      const totalInputValue = inputs.reduce((sum: any, input: any) => 
+      const totalInputValue = inputs.reduce((sum: any, input: any) =>
         BigInt(sum) + BigInt(input.value), BigInt(0));
 
       // Calculate total output value before change
-      const outputsBeforeChange = vouts.reduce((sum: any, vout: any) => 
+      const outputsBeforeChange = vouts.reduce((sum: any, vout: any) =>
         BigInt(sum) + BigInt(vout.value), BigInt(0));
 
       // Calculate fee
@@ -213,28 +323,28 @@ export class SRC20MultisigPSBTService {
       // Add all outputs to PSBT
       vouts.forEach((vout) => {
         if ("address" in vout && vout.address) {
-          psbt.addOutput({ 
-            address: vout.address, 
-            value: BigInt(vout.value) 
+          psbt.addOutput({
+            address: vout.address,
+            value: BigInt(vout.value)
           });
         } else if ("script" in vout && vout.script) {
-          psbt.addOutput({ 
-            script: new Uint8Array(vout.script), 
-            value: BigInt(vout.value) 
+          psbt.addOutput({
+            script: new Uint8Array(vout.script),
+            value: BigInt(vout.value)
           });
         }
       });
 
       // Add change output if it's above dust
       if (changeAmount > this.CHANGE_DUST) {
-        psbt.addOutput({ 
-          address: changeAddress, 
-          value: changeAmount 
+        psbt.addOutput({
+          address: changeAddress,
+          value: changeAmount
         });
       }
 
       logger.debug("src20", {
-        message: "Final transaction details for Multisig PSBT", 
+        message: "Final transaction details for Multisig PSBT",
         inputs: inputs.map((utxo: any) => ({
           ...utxo,
           value: BigInt(utxo.value).toString()

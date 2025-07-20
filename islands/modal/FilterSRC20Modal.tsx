@@ -1,10 +1,8 @@
 /* ===== FILTER SRC20 MODAL COMPONENT ===== */
 // @bbaba+@reinamora - are the
 // deno-lint-ignore-file
-import { useState } from "preact/hooks";
-import type { JSX } from "preact";
-import { ModalBase } from "$layout";
-import { InputField } from "$form";
+import { Button } from "$button";
+import { InputField, SelectDate } from "$form";
 import {
   COLLECTION_FILTER_TYPES,
   LISTING_FILTER_TYPES,
@@ -12,10 +10,11 @@ import {
   STAMP_FILTER_TYPES,
   WALLET_FILTER_TYPES,
 } from "$globals";
-import { Button } from "$button";
-import { SelectDate } from "$form";
 import { closeModal } from "$islands/modal/states.ts";
+import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
+import type { JSX } from "preact";
+import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 type FilterTypes =
@@ -95,6 +94,11 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
 
   /* ===== FORM SUBMISSION ===== */
   const handleSubmit = () => {
+    // SSR-safe browser environment check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
+    }
+
     const url = new URL(globalThis.location.href);
     switch (filterOptions[filterOptions.length - 1]) {
       case "minting":
@@ -182,7 +186,7 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
         break;
     }
 
-    window.location.href = url.toString();
+    globalThis.location.href = url.toString();
     closeModal();
   };
 
@@ -342,7 +346,7 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
       onClose={handleCloseModal}
       title={title}
     >
-      <div className="flex flex-col items-center justify-center gap-5">
+      <div class="flex flex-col items-center justify-center gap-5">
         {renderContent()}
 
         <Button

@@ -107,7 +107,7 @@ export function SRC20DetailHeader({
         <div class="relative w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg">
           <div class="flex flex-row w-full">
             {/* ===== TOKEN IMAGE AND CREATOR ===== */}
-            <div className="flex gap-[18px] mobileMd:gap-[30px]">
+            <div class="flex gap-[18px] mobileMd:gap-[30px]">
               <img
                 src={`/content/${deployment.tx_hash}.svg`}
                 class="max-w-[80px] rounded-sm relative z-10"
@@ -168,10 +168,10 @@ export function SRC20DetailHeader({
                   </div>
                 </div>
                 {/* Creator information */}
-                <h6 className={labelSm}>
+                <h6 class={labelSm}>
                   CREATOR
                 </h6>
-                <h5 className="font-bold text-lg gray-gradient3-hover tracking-wide -mt-1">
+                <h5 class="font-bold text-lg gray-gradient3-hover tracking-wide -mt-1">
                   {deployment.creator_name ||
                     abbreviateAddress(deployment.destination)}
                 </h5>
@@ -182,26 +182,26 @@ export function SRC20DetailHeader({
             <div class="flex flex-col gap-0 justify-end ml-auto">
               <div class="hidden mobileLg:flex flex-col ml-20 mb-0 -space-y-0.5 items-center">
                 <div class="flex items-center gap-1.5">
-                  <h5 className={labelSm}>
+                  <h5 class={labelSm}>
                     DEPLOY
                   </h5>
-                  <h6 className={valueSm}>
+                  <h6 class={valueSm}>
                     {deployDate.toUpperCase()}
                   </h6>
                 </div>
                 <div class="flex items-center gap-1.5">
-                  <h5 className={labelSm}>
+                  <h5 class={labelSm}>
                     BLOCK #
                   </h5>
-                  <h6 className={valueSm}>
+                  <h6 class={valueSm}>
                     {deployment.block_index}
                   </h6>
                 </div>
                 <div class="flex items-center gap-1.5">
-                  <h5 className={labelSm}>
+                  <h5 class={labelSm}>
                     TX ID
                   </h5>
-                  <h6 className={valueSm}>
+                  <h6 class={valueSm}>
                     {abbreviateAddress(deployment.tx_hash)}
                   </h6>
                 </div>
@@ -212,26 +212,26 @@ export function SRC20DetailHeader({
             <div class="flex flex-col gap-0 justify-end items-end ml-auto">
               <div class="flex flex-col -space-y-0.5 text-right">
                 <div class="flex items-center gap-1.5 justify-end">
-                  <h5 className={labelSm}>
+                  <h5 class={labelSm}>
                     DECIMALS
                   </h5>
-                  <h6 className={valueSm}>
+                  <h6 class={valueSm}>
                     {deployment.deci}
                   </h6>
                 </div>
                 <div class="flex items-center gap-1.5 justify-end">
-                  <h5 className={labelSm}>
+                  <h5 class={labelSm}>
                     LIMIT
                   </h5>
-                  <h6 className={valueSm}>
+                  <h6 class={valueSm}>
                     {formatNumber(deployment.lim, 0)}
                   </h6>
                 </div>
                 <div class="flex items-center gap-1.5 justify-end">
-                  <h5 className={labelSm}>
+                  <h5 class={labelSm}>
                     SUPPLY
                   </h5>
-                  <h6 className={valueSm}>
+                  <h6 class={valueSm}>
                     {formatNumber(deployment.max, 0)}
                   </h6>
                 </div>
@@ -243,10 +243,10 @@ export function SRC20DetailHeader({
         {/* ===== MARKET INFORMATION CARD ===== */}
         <div class="flex flex-col dark-gradient rounded-lg p-6">
           {/* Market cap */}
-          <div className="flex flex-col">
+          <div class="flex flex-col">
             <StatTitle
               label="MARKET CAP"
-              value={`${mcapBTCFormatted} BTC`}
+              value={mcapBTCFormatted}
             />
           </div>
 
@@ -254,7 +254,7 @@ export function SRC20DetailHeader({
           <div class="flex flex-wrap justify-between pt-6">
             <StatItem
               label="24H VOLUME"
-              value={`${sum1dBTCFormatted} BTC`}
+              value={sum1dBTCFormatted}
               align="left"
             />
             <StatItem
@@ -264,7 +264,7 @@ export function SRC20DetailHeader({
             />
             <StatItem
               label="7 DAY VOLUME"
-              value={`${sum7dBTCFormatted} BTC`}
+              value={sum7dBTCFormatted}
               align="right"
             />
           </div>

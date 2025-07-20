@@ -41,7 +41,7 @@ export function SelectField({
             <option
               key={item.tx_hash || item.cpid || item.stamp?.toString()}
               value={item.stamp?.toString()}
-              className="font-light uppercase"
+              class="font-light uppercase"
             >
               #{item.stamp}
             </option>

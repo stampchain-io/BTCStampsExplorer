@@ -594,6 +594,9 @@ export interface StampBalance {
   creator: string;
   creator_name: string | null;
   balance: number | string;
+  // Market data pricing fields - added for backward compatibility
+  floorPrice?: number | "priceless";
+  recentSalePrice?: number | "priceless";
 }
 
 interface MintStatus {

@@ -75,7 +75,7 @@ const HoldersTableBase = (
       class="h-[188px] mobileLg:h-[248px] mt-6 w-full"
       onScroll={handleScroll}
     >
-      <table className={`${textSm} w-full`}>
+      <table class={`${textSm} w-full`}>
         {/* ===== TABLE STRUCTURE ===== */}
         <colgroup>
           {colGroup([
@@ -85,7 +85,7 @@ const HoldersTableBase = (
           ]).map((col) => (
             <col
               key={col.key}
-              className={col.className}
+              class={col.className}
             />
           ))}
         </colgroup>
@@ -106,11 +106,11 @@ const HoldersTableBase = (
         </thead>
 
         {/* ===== TABLE CONTENT ===== */}
-        <tbody className={textSm}>
+        <tbody class={textSm}>
           {!isLoading && data.map((holder, index) => {
             if (!holder.address) {
               return (
-                <tr className={rowTable}>
+                <tr class={rowTable}>
                   <td class={cellAlign(0, headers.length)}>UNKNOWN</td>
                   <td class={cellAlign(1, headers.length)}>
                     {holder.amt}
@@ -123,17 +123,17 @@ const HoldersTableBase = (
             }
 
             return (
-              <tr key={index} className={rowTable}>
+              <tr key={index} class={rowTable}>
                 <td class={cellAlign(0, headers.length)}>
                   <a
                     target="_top"
                     href={`/wallet/${holder.address}`}
-                    className={textSmLink}
+                    class={textSmLink}
                   >
-                    <span className="mobileLg:hidden">
+                    <span class="mobileLg:hidden">
                       {abbreviateAddress(holder.address, 8)}
                     </span>
-                    <span className="hidden mobileLg:inline">
+                    <span class="hidden mobileLg:inline">
                       {holder.address}
                     </span>
                   </a>

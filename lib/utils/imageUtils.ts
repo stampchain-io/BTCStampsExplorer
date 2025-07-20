@@ -157,6 +157,7 @@ export function handleImageError(e: Event) {
 // Trusted domains for external references in SVGs
 const TRUSTED_DOMAINS = [
   "ordinals.com",
+  "arweave.net",
   "stampchain.io",
   "www.w3.org", // Standard SVG and XML namespaces
 ];

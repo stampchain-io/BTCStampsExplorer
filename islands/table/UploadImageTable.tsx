@@ -136,7 +136,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
           </div>
         )
         : (
-          <h3 className={textLg}>
+          <h3 class={textLg}>
             CONNECT YOUR WALLET TO SEE YOUR STAMPS
           </h3>
         )}

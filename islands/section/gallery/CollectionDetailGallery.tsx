@@ -1,13 +1,13 @@
 /* ===== COLLECTION DETAIL GALLERY COMPONENT ===== */
 /* @baba - not updated */
-import { useEffect, useState } from "preact/hooks";
-import { Collection, CollectionGalleryProps } from "$globals";
-import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { ViewAllButton } from "$button";
 import { CollectionCard } from "$card";
-import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { subtitlePurple, titlePurpleLD } from "$text";
+import { Collection, CollectionGalleryProps } from "$globals";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
+import { BREAKPOINTS } from "$lib/utils/constants.ts";
+import { subtitlePurple, titlePurpleLD } from "$text";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== STATE ===== */
 export default function CollectionDetailGallery({
@@ -27,6 +27,10 @@ export default function CollectionDetailGallery({
     if (pagination?.onPageChange) {
       pagination.onPageChange(page);
     } else {
+      // SSR-safe browser environment check
+      if (typeof globalThis === "undefined" || !globalThis?.location) {
+        return; // Cannot navigate during SSR
+      }
       const url = new URL(globalThis.location.href);
       url.searchParams.set("page", page.toString());
       globalThis.location.href = url.toString();
