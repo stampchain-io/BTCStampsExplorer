@@ -1,9 +1,9 @@
 /* ===== SALES ACTIVITY FEED COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
 import { Icon, LoadingIcon } from "$icon";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { subtitlePurple, titlePurpleDL } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
+import { useEffect, useState } from "preact/hooks";
 
 interface SalesActivityFeedProps {
   title?: string;
@@ -57,7 +57,10 @@ export default function SalesActivityFeed({
     if (onItemClick) {
       onItemClick(sale);
     } else {
-      // Default behavior: navigate to stamp detail page
+      // Default behavior: navigate to stamp detail page with SSR protection
+      if (typeof globalThis === "undefined" || !globalThis?.location) {
+        return; // Cannot navigate during SSR
+      }
       globalThis.location.href = `/stamp/${sale.tx_hash}`;
     }
   };

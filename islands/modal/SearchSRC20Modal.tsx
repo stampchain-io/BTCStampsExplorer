@@ -1,10 +1,10 @@
 /*@baba-styles is not config properly*/
-import { useCallback, useEffect, useRef, useState } from "preact/hooks";
-import { ModalSearchBase } from "$layout";
-import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
-import { textSm } from "$text";
 import { Icon } from "$icon";
+import { closeModal, openModal, searchState } from "$islands/modal/states.ts";
+import { ModalSearchBase } from "$layout";
 import { tooltipIcon } from "$notification";
+import { textSm } from "$text";
+import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
 export function SearchSRC20Modal({
   showButton = true,
@@ -134,7 +134,7 @@ export function SearchSRC20Modal({
   }, []);
 
   return (
-    <div className="relative">
+    <div class="relative">
       {showButton && (
         <Icon
           type="iconButton"
@@ -198,6 +198,10 @@ function SearchContent({
   }, [searchState.value.term]);
 
   const handleResultClick = (tick: string) => {
+    // SSR-safe browser environment check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
+    }
     globalThis.location.href = `/src20/${tick}`;
   };
 

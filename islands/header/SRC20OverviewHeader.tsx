@@ -135,14 +135,14 @@ export const SRC20OverviewHeader = (
     <div class="relative flex flex-col w-full gap-1.5">
       <div class="flex flex-row justify-between items-start w-full">
         {/* ===== RESPONSIVE TITLE ===== */}
-        <h1 className={`${titlePurpleLD} block mobileLg:hidden`}>TOKENS</h1>
-        <h1 className={`${titlePurpleLD} hidden mobileLg:block`}>
+        <h1 class={`${titlePurpleLD} block mobileLg:hidden`}>TOKENS</h1>
+        <h1 class={`${titlePurpleLD} hidden mobileLg:block`}>
           SRC-20 TOKENS
         </h1>
 
         {/* ===== CONTROLS SECTION ===== */}
-        <div className="flex flex-col">
-          <div className="flex relative items-start justify-between gap-[18px] tablet:gap-3">
+        <div class="flex flex-col">
+          <div class="flex relative items-start justify-between gap-[18px] tablet:gap-3">
             <SearchSRC20Modal showButton />
             <Button
               variant={viewType === "minting"
@@ -164,9 +164,9 @@ export const SRC20OverviewHeader = (
       </div>
 
       {/* ===== FILTER AND TIMEFRAME BUTTONS ===== */}
-      <div className="flex flex-col tablet:flex-row justify-between w-full">
+      <div class="flex flex-col tablet:flex-row justify-between w-full">
         {/* Filter Buttons */}
-        <div className="flex gap-3">
+        <div class="flex gap-3">
           {(["TRENDING", "DEPLOY", "HOLDERS"] as const).map((filter) => (
             <Button
               key={filter}
@@ -186,9 +186,9 @@ export const SRC20OverviewHeader = (
             >
               {(filter === "HOLDERS" || filter === "DEPLOY")
                 ? (
-                  <div className="relative">
+                  <div class="relative">
                     <span
-                      className={`transition-opacity duration-150 ${
+                      class={`transition-opacity duration-150 ${
                         filter === currentSort?.filter
                           ? "group-hover:opacity-0"
                           : ""
@@ -197,7 +197,7 @@ export const SRC20OverviewHeader = (
                       {filter}
                     </span>
                     {filter === currentSort?.filter && (
-                      <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                      <span class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                         SORT
                       </span>
                     )}
@@ -209,7 +209,7 @@ export const SRC20OverviewHeader = (
         </div>
 
         {/* Timeframe Buttons */}
-        <div className="flex pt-3 tablet:pt-0 gap-3">
+        <div class="flex pt-3 tablet:pt-0 gap-3">
           {(["24H", "3D", "7D"] as const).map((timeframe) => (
             <Button
               key={timeframe}

@@ -47,16 +47,16 @@ export default function StampTextContent({ src }: { src: string }) {
   }, [src]);
 
   /* ===== RENDER ===== */
-  if (error) return <div className="text-red-500">Error: {error}</div>;
+  if (error) return <div class="text-red-500">Error: {error}</div>;
 
   return (
     <div
       ref={containerRef}
-      className="flex items-center justify-center w-full h-full overflow-auto bg-[#F7931A] rounded"
+      class="flex items-center justify-center w-full h-full overflow-auto bg-[#F7931A] rounded"
     >
       {/* ===== TEXT CONTENT ===== */}
       <pre
-        className="whitespace-pre-wrap break-words max-w-full text-black text-center"
+        class="whitespace-pre-wrap break-words max-w-full text-black text-center"
         style={{ fontSize }}
       >
         {content}

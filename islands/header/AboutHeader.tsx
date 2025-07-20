@@ -46,14 +46,14 @@ export default function AboutHeader() {
     <section>
       <div>
         {/* ===== HEADER SECTION ===== */}
-        <h1 className={titlePurpleLD}>ABOUT</h1>
-        <h2 className={subtitlePurple}>STAMPCHAIN</h2>
+        <h1 class={titlePurpleLD}>ABOUT</h1>
+        <h2 class={subtitlePurple}>STAMPCHAIN</h2>
 
         {/* ===== INTRODUCTION SECTION ===== */}
-        <div className="w-full">
-          <p className={text}>
+        <div class="w-full">
+          <p class={text}>
             The{" "}
-            <span className="text-stamp-purple-highlight">
+            <span class="text-stamp-purple-highlight">
               Bitcoin Stamps meta-protocol
             </span>{" "}
             was conceived by Mike In Space, a maverick figure in the Bitcoin and
@@ -62,14 +62,14 @@ export default function AboutHeader() {
             Mike glimpsed something more profound: the foundation for humanity's
             most permanent digital canvas.
           </p>
-          <p className={text}>
+          <p class={text}>
             Enter Arwyn, a long-time peer and fellow digital conspirator, who
             may or may not have slightly oversold his dev credentials when Mike
             came calling. Together, they began experimenting with various
             methods, some so forward-thinking they accidentally predicted future
             innovations.
           </p>
-          <p className={text}>
+          <p class={text}>
             As the project evolved from concept to creation, Reinamora joined
             the fellowship, bringing technical precision and focused
             determination to the team during what he called his "extended
@@ -82,9 +82,9 @@ export default function AboutHeader() {
         {/* ===== SRC-20 DESCRIPTION SECTION ===== */}
         <div class="grid grid-cols-12 mt-6">
           <div class="flex flex-col col-span-12 mobileLg:col-span-6 desktop:col-span-8 w-full gap-1">
-            <p className={text}>
+            <p class={text}>
               The introduction of{" "}
-              <span className="text-stamp-purple-highlight">SRC-20 tokens</span>
+              <span class="text-stamp-purple-highlight">SRC-20 tokens</span>
               {" "}
               marked a watershed moment, proving that Bitcoin Stamps could do
               more than just store data—it could breathe new life into the
@@ -93,9 +93,9 @@ export default function AboutHeader() {
               the community after years away, reigniting their passion for
               building on Bitcoin.
             </p>
-            <p className={text}>
+            <p class={text}>
               Today,{" "}
-              <span className="text-stamp-purple-highlight">
+              <span class="text-stamp-purple-highlight">
                 Bitcoin Stamps stands as an immutable testament to human
                 ingenuity
               </span>, combining Bitcoin's unshakeable security with
@@ -109,7 +109,7 @@ export default function AboutHeader() {
           {/* ===== STATISTICS SECTION ===== */}
           {/* ===== GENESIS STAMP INFO ===== */}
           <div class="flex flex-col col-span-12 mobileLg:col-span-6 desktop:col-span-4 w-full h-full justify-center items-center pl-24 mobileLg:pl-0 mt-12 mobileLg:mt-auto">
-            <p className={`${labelSmPurple} !mb-1.5`}>
+            <p class={`${labelSmPurple} !mb-1.5`}>
               GENESIS STAMP
             </p>
             <div class="flex flex-col items-center">

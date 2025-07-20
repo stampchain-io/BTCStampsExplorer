@@ -1,22 +1,24 @@
 /* ===== STAMP CARD COMPONENT ===== */
 /* @baba-update audio icon size (custom) - 247*/
 /*@baba-check styles+icon*/
-import { useEffect, useRef, useState } from "preact/hooks";
-import { VNode } from "preact";
 import { StampRow } from "$globals";
 import { Icon, LoadingIcon } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
+import { VNode } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
 
-import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
-import { formatSupplyValue } from "$lib/utils/formatUtils.ts";
-import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { TEXT_STYLES } from "$card";
 import {
   AUDIO_FILE_IMAGE,
   LIBRARY_FILE_IMAGE,
   NOT_AVAILABLE_IMAGE,
 } from "$lib/utils/constants.ts";
-import { TEXT_STYLES } from "$card";
+import {
+  abbreviateAddress,
+  formatSupplyValue,
+  stripTrailingZeros,
+} from "$lib/utils/formatUtils.ts";
+import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 
 /* ===== TYPES ===== */
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
@@ -36,7 +38,6 @@ export function StampCard({
   showEdition = false,
   showMinDetails = false,
   variant = "default",
-  fromPage,
 }: {
   stamp: StampWithSaleData;
   isRecentSale?: boolean;
@@ -44,7 +45,6 @@ export function StampCard({
   showEdition?: boolean;
   showMinDetails?: boolean;
   variant?: "default" | "grey";
-  fromPage?: string;
 }) {
   /* ===== STATE ===== */
   const [loading, setLoading] = useState<boolean>(true);
@@ -105,12 +105,18 @@ export function StampCard({
 
           const svgContent = await response.text();
 
-          // Check if SVG has external ordinals.com references
-          if (svgContent.includes("ordinals.com/content/")) {
+          // Check if SVG has external ordinals.com or arweave.net references
+          if (
+            svgContent.includes("ordinals.com/content/") ||
+            svgContent.includes("arweave.net/")
+          ) {
             // Rewrite external references to use our proxy
             let rewrittenSVG = svgContent.replace(
               /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
               "/api/proxy/ordinals/$1",
+            ).replace(
+              /https:\/\/arweave\.net\/([^"'\s>]+)/g,
+              "/api/proxy/arweave/$1",
             );
 
             // Ensure SVG fills container by removing fixed dimensions and adding proper styling
@@ -190,7 +196,7 @@ export function StampCard({
   const renderContent = () => {
     if (loading && !src) {
       return (
-        <div className="stamp-container">
+        <div class="stamp-container">
           <LoadingIcon />
         </div>
       );
@@ -236,9 +242,9 @@ export function StampCard({
                 e.preventDefault();
                 togglePlayback();
               }}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[40px] tablet:w-[34px] aspect-square flex items-center justify-center group/button"
+              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[40px] tablet:w-[34px] aspect-square flex items-center justify-center group/button"
             >
-              <div className="absolute inset-0 bg-black opacity-50 rounded-full" />
+              <div class="absolute inset-0 bg-black opacity-50 rounded-full" />
               <Icon
                 name={isPlaying ? "pause" : "play"}
                 type="iconButton"
@@ -344,13 +350,31 @@ export function StampCard({
       };
     }
 
-    // Handle floor price or recent sale price
-    const price = stamp.floorPrice !== "priceless"
+    // v2.3 API: Use marketData pricing (preferred) - safe access with optional chaining
+    const marketData = (stamp as any).marketData;
+    if (marketData) {
+      // Priority: floorPriceBTC > recentSalePriceBTC (specific business logic for StampCard)
+      const marketPrice = marketData.floorPriceBTC !== null &&
+          marketData.floorPriceBTC > 0
+        ? marketData.floorPriceBTC
+        : marketData.recentSalePriceBTC;
+
+      if (marketPrice !== null && marketPrice > 0) {
+        return {
+          text: `${stripTrailingZeros(Number(marketPrice).toFixed(8))} BTC`,
+          style: TEXT_STYLES.price,
+        };
+      }
+    }
+
+    // Legacy fallback for v2.2 or older data structures
+    // @deprecated - Remove once all data migrated to v2.3 marketData structure
+    const legacyPrice = stamp.floorPrice !== "priceless"
       ? stamp.floorPrice
       : stamp.recentSalePrice;
-    if (price !== "priceless" && !isNaN(Number(price))) {
+    if (legacyPrice !== "priceless" && !isNaN(Number(legacyPrice))) {
       return {
-        text: `${stripTrailingZeros(Number(price).toFixed(8))} BTC`,
+        text: `${stripTrailingZeros(Number(legacyPrice).toFixed(8))} BTC`,
         style: TEXT_STYLES.price,
       };
     }
@@ -427,17 +451,8 @@ export function StampCard({
         `}
       >
         {/* ===== ATOM ICON ===== */}
-        {fromPage && fromPage === "stamp" && (
-          <div className="absolute top-0 right-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-[#1F002E] p-[3px] desktop:block hidden">
-            <Icon
-              type="icon"
-              name="atom"
-              weight="normal"
-              size="xs"
-              color="grey"
-            />
-          </div>
-        )}
+        {/* Note: Atomic icon is only shown on WalletStampCard for stamps with UTXO attachments */}
+        {/* Regular StampCard does not show atomic icon as it lacks wallet-specific UTXO data */}
 
         {/* ===== CONTENT SECTION ===== */}
         <div class="relative w-full h-full">

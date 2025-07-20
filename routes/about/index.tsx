@@ -1,15 +1,15 @@
 /* ===== ABOUT PAGE ===== */
 /* ContactCta + DonateCta MUST use direct path imports - CANNOT use barrel file exports */
-import { body, gapSectionSlim } from "$layout";
 import { AboutHeader } from "$header";
-import DonateCta from "$islands/section/cta/DonateCta.tsx";
 import ContactCta from "$islands/section/cta/ContactCta.tsx";
+import DonateCta from "$islands/section/cta/DonateCta.tsx";
+import { body, gapSectionSlim } from "$layout";
 import { PartnersBanner, TeamBanner } from "$section";
 
 /* ===== PAGE COMPONENT ===== */
 export default function AboutPage() {
   return (
-    <div className={`${body} ${gapSectionSlim}`}>
+    <div class={`${body} ${gapSectionSlim}`}>
       {/* ===== BODY BACKGROUND IMAGE ===== */}
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"

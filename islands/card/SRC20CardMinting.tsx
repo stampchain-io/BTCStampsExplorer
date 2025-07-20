@@ -1,10 +1,10 @@
 /* ===== SRC20 CARD MINTING COMPONENT ===== */
 /*@baba-check styles*/
-import { SRC20CardBase, SRC20CardBaseProps } from "./SRC20CardBase.tsx";
-import { formatDate } from "$lib/utils/formatUtils.ts";
 import { Button } from "$button";
-import { valueSm } from "$text";
 import { cellAlign } from "$components/layout/types.ts";
+import { formatDate } from "$lib/utils/formatUtils.ts";
+import { valueSm } from "$text";
+import { SRC20CardBase, SRC20CardBaseProps } from "./SRC20CardBase.tsx";
 
 /* ===== COMPONENT ===== */
 export function SRC20CardMinting(
@@ -17,6 +17,10 @@ export function SRC20CardMinting(
 
   const handleMintClick = (event: MouseEvent) => {
     event.preventDefault();
+    // SSR-safe browser environment check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
+    }
     globalThis.location.href = mintHref;
   };
 

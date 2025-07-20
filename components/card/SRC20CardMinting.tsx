@@ -1,17 +1,17 @@
 /* reinamora - update Trending calculations */
-import { SRC20Row } from "$globals";
-import { formatDate } from "$lib/utils/formatUtils.ts";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Timeframe } from "$layout";
-import { labelXs, textSm, valueDarkSm } from "$text";
 import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { SRC20Row } from "$globals";
 import {
   containerCardTable,
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
+  Timeframe,
 } from "$layout";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { formatDate } from "$lib/utils/formatUtils.ts";
+import { labelXs, textSm, valueDarkSm } from "$text";
 
 interface SRC20CardMintingProps {
   data: SRC20Row[];
@@ -108,6 +108,14 @@ export function SRC20CardMinting({
 
               const handleMintClick = (event: MouseEvent) => {
                 event.preventDefault();
+
+                // SSR-safe browser environment check
+                if (
+                  typeof globalThis === "undefined" || !globalThis?.location
+                ) {
+                  return; // Cannot navigate during SSR
+                }
+
                 globalThis.location.href = mintHref;
               };
 
@@ -149,6 +157,15 @@ export function SRC20CardMinting({
                                         e.button !== 1
                                       ) {
                                         e.preventDefault();
+
+                                        // SSR-safe browser environment check
+                                        if (
+                                          typeof globalThis === "undefined" ||
+                                          !globalThis?.location
+                                        ) {
+                                          return; // Cannot navigate during SSR
+                                        }
+
                                         globalThis.location.href = href;
                                       }
                                     }}

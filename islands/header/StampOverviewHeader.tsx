@@ -65,12 +65,12 @@ export const StampOverviewHeader = (
       class={`relative flex flex-row justify-between items-start w-full gap-3`}
     >
       {/* Responsive Title Section */}
-      <h1 className={`${titlePurpleLD} block mobileMd:hidden`}>STAMPS</h1>
-      <h1 className={`${titlePurpleLD} hidden mobileMd:block`}>ART STAMPS</h1>
+      <h1 class={`${titlePurpleLD} block mobileMd:hidden`}>STAMPS</h1>
+      <h1 class={`${titlePurpleLD} hidden mobileMd:block`}>ART STAMPS</h1>
 
       {/* Controls Section */}
-      <div className="flex flex-col">
-        <div className="flex relative items-start justify-between gap-[18px] tablet:gap-3">
+      <div class="flex flex-col">
+        <div class="flex relative items-start justify-between gap-[18px] tablet:gap-3">
           <FilterButton
             count={countActiveStampFilters(currentFilters)}
             open={isOpen1}

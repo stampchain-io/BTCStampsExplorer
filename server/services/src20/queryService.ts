@@ -1,12 +1,11 @@
 import {
     MarketListingAggregated,
     PaginatedSrc20ResponseBody,
-    Src20BalanceResponseBody,
     Src20ResponseBody,
     SRC20Row,
     Src20SnapShotDetail,
     SRC20SnapshotRequestParams,
-    SRC20TrxRequestParams,
+    SRC20TrxRequestParams
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
@@ -180,7 +179,7 @@ export class SRC20QueryService {
 
   static async fetchSrc20Balance(
     params: SRC20BalanceRequestParams,
-  ): Promise<Src20BalanceResponseBody> {
+  ): Promise<any> {
     try {
       // Ensure limit and page have default values if undefined
       const limit =
@@ -197,21 +196,23 @@ export class SRC20QueryService {
 
       const src20 = await SRC20Repository.getSrc20BalanceFromDb(params);
 
-      if (!src20 || (Array.isArray(src20) && src20.length === 0)) {
-        // Return an empty response instead of throwing an error
-        return params.address && params.tick ?
-          { last_block: 0, data: [] } as any : // Fixed: Use any to avoid type conversion issues
-          { last_block: 0, data: [] } as any; // Fixed: Use any to avoid type conversion issues
-      }
+          if (!src20 || (Array.isArray(src20) && src20.length === 0)) {
+      // Return structured response for empty data to match test expectations
+      return {
+        last_block: 0,
+        data: []
+      };
+    }
 
       return params.address && params.tick ? src20[0] : src20;
     } catch (error: any) {
-      console.error("Error in fetchSrc20Balance:", error);
-      console.error("Params:", params);
-      // Return an empty response for any other errors as well
-      return params.address && params.tick ?
-        { last_block: 0, data: [] } as any : // Fixed: Use any to avoid type conversion issues
-        { last_block: 0, data: [] } as any; // Fixed: Use any to avoid type conversion issues
+          console.error("Error in fetchSrc20Balance:", error);
+    console.error("Params:", params);
+    // Return structured response for errors to match test expectations
+    return {
+      last_block: 0,
+      data: []
+    };
     }
   }
 

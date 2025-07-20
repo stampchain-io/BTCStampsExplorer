@@ -91,8 +91,8 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
       contentClassName="h-full bg-[#FAFAFA] rounded-md overflow-auto scrollbar-grey"
     >
       {/* ===== CODE DISPLAY ===== */}
-      <div className="flex flex-col w-full h-full p-6 mobileMd:p-9">
-        <code className="whitespace-pre-wrap text-xs text-stamp-grey-darkest leading-tight pb-6 mobileMd:pb-9">
+      <div class="flex flex-col w-full h-full p-6 mobileMd:p-9">
+        <code class="whitespace-pre-wrap text-xs text-stamp-grey-darkest leading-tight pb-6 mobileMd:pb-9">
           {formattedSrc}
         </code>
       </div>

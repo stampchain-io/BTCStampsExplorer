@@ -212,7 +212,7 @@ export function SRC101RegisterTool({
             />
             {/* TLD Dropdown Container */}
             <div
-              className="relative"
+              class="relative"
               ref={tldDropdownRef}
             >
               <button
@@ -222,13 +222,13 @@ export function SRC101RegisterTool({
                   setAllowTldTooltip(false);
                   setIsTldTooltipVisible(false);
                 }}
-                className="h-11 min-w-20 mt-[1px] px-5 rounded-md bg-transparent font-bold text-base text-stamp-grey text-right hover:text-stamp-grey-light tracking-wider transition-colors duration-300 focus-visible:!outline-none"
+                class="h-11 min-w-20 mt-[1px] px-5 rounded-md bg-transparent font-bold text-base text-stamp-grey text-right hover:text-stamp-grey-light tracking-wider transition-colors duration-300 focus-visible:!outline-none"
                 onMouseEnter={handleTldMouseEnter}
                 onMouseLeave={handleTldMouseLeave}
                 aria-label="Select top level domain"
               >
                 <div
-                  className={`${tooltipButton} tracking-normal ${
+                  class={`${tooltipButton} tracking-normal ${
                     isTldTooltipVisible ? "opacity-100" : "opacity-0"
                   }`}
                 >
@@ -237,11 +237,11 @@ export function SRC101RegisterTool({
                 {formState.root}
               </button>
               {openTldDropdown && (
-                <ul className="absolute top-[100%] right-[-2px] max-h-[160px] w-[80px] bg-[#100318] bg-opacity-70 backdrop-filter backdrop-blur-md border-2 border-t-0 border-stamp-purple-bright rounded-b-md z-[11] overflow-y-auto">
+                <ul class="absolute top-[100%] right-[-2px] max-h-[160px] w-[80px] bg-[#100318] bg-opacity-70 backdrop-filter backdrop-blur-md border-2 border-t-0 border-stamp-purple-bright rounded-b-md z-[11] overflow-y-auto">
                   {ROOT_DOMAINS.map((tld) => (
                     <li
                       key={tld}
-                      className="py-2 last:pb-4 tablet:py-1.5 tablet:last:pb-3 pr-5 font-bold text-sm text-stamp-grey text-right tracking-wide leading-none hover:bg-stamp-purple-bright/15 hover:text-stamp-grey-light transition-colors duration-300 cursor-pointer"
+                      class="py-2 last:pb-4 tablet:py-1.5 tablet:last:pb-3 pr-5 font-bold text-sm text-stamp-grey text-right tracking-wide leading-none hover:bg-stamp-purple-bright/15 hover:text-stamp-grey-light transition-colors duration-300 cursor-pointer"
                       onClick={() => handleTldSelect(tld)}
                       onMouseDown={(e) => e.preventDefault()}
                       role="option"
@@ -257,10 +257,10 @@ export function SRC101RegisterTool({
         </div>
 
         {/* Status and Availability Check Section */}
-        <div className="flex flex-row justify-between w-full">
-          <div className="flex flex-col justify-center items-start">
+        <div class="flex flex-row justify-between w-full">
+          <div class="flex flex-col justify-center items-start">
             {/* message - default:noDisplay / display on user input & onClick - either already registered or available */}
-            <h6 className="font-medium text-sm text-stamp-grey">
+            <h6 class="font-medium text-sm text-stamp-grey">
               {formState.toAddress && checkStatus
                 ? isExist
                   ? `${
@@ -272,7 +272,7 @@ export function SRC101RegisterTool({
                 : ""}
             </h6>
           </div>
-          <div className="flex flex-col items-end">
+          <div class="flex flex-col items-end">
             <Button
               type="button"
               variant="outline"
@@ -288,7 +288,7 @@ export function SRC101RegisterTool({
       </form>
 
       {/* ===== FEE CALCULATOR AND STATUS MESSAGES ===== */}
-      <div className={containerBackground}>
+      <div class={containerBackground}>
         <FeeCalculatorAdvanced
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
@@ -321,7 +321,7 @@ export function SRC101RegisterTool({
 }
 
 {
-  /* <div className={animatedInputContainer}>
+  /* <div class={animatedInputContainer}>
   <InputField
     type="text"
     placeholder="Please input your bitname"

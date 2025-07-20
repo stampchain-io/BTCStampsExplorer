@@ -1,0 +1,644 @@
+{
+  "info": {
+    "name": "BTC Stamps Explorer API - Version Header Testing",
+    "description": "Comprehensive X-API-Version header testing for v2.2 (no market data) and v2.3 (clean market_data structure) API compatibility",
+    "version": "2.3.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "test_address",
+      "value": "bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq",
+      "type": "string"
+    },
+    {
+      "key": "test_src20_tick",
+      "value": "STAMP",
+      "type": "string"
+    },
+    {
+      "key": "version_validation_results",
+      "value": "[]",
+      "type": "any"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Initialize version testing session",
+          "if (!pm.collectionVariables.get('test_session_id')) {",
+          "    pm.collectionVariables.set('test_session_id', Date.now().toString());",
+          "    console.log('🔍 Starting API Version Compatibility Testing');",
+          "    console.log('  📋 Testing v2.2 (no market data) vs v2.3 (clean market_data)');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Store version test results",
+          "const endpoint = pm.request.url.getPath();",
+          "const version = pm.request.headers.get('X-API-Version') || 'default';",
+          "const testResult = {",
+          "    endpoint: endpoint,",
+          "    version: version,",
+          "    status: pm.response.code,",
+          "    responseTime: pm.response.responseTime,",
+          "    timestamp: new Date().toISOString(),",
+          "    hasMarketData: false,",
+          "    marketDataStructure: null",
+          "};",
+          "",
+          "// Analyze response for market data",
+          "if (pm.response.code === 200) {",
+          "    try {",
+          "        const json = pm.response.json();",
+          "        if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+          "            const firstItem = json.data[0];",
+          "            testResult.hasMarketData = firstItem.hasOwnProperty('market_data');",
+          "            testResult.marketDataStructure = firstItem.market_data ? 'nested' : (firstItem.floor_unit_price ? 'root-level' : 'none');",
+          "        }",
+          "    } catch (e) {",
+          "        console.log('Response parsing error:', e.message);",
+          "    }",
+          "}",
+          "",
+          "// Store result",
+          "let results = JSON.parse(pm.collectionVariables.get('version_validation_results') || '[]');",
+          "results.push(testResult);",
+          "pm.collectionVariables.set('version_validation_results', JSON.stringify(results));"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "SRC20 Balance Endpoints - Version Compatibility",
+      "item": [
+        {
+          "name": "SRC20 Balance List - v2.2 (No Market Data)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('v2.2 - SRC20 Balance endpoint responds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('v2.2 - Response time acceptable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                  "});",
+                  "",
+                  "pm.test('v2.2 - Response has JSON structure', function () {",
+                  "    pm.response.to.have.jsonBody();",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('data');",
+                  "});",
+                  "",
+                  "pm.test('v2.2 - CRITICAL: No market_data field should exist', function () {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "        const firstItem = json.data[0];",
+                  "        pm.expect(firstItem).to.not.have.property('market_data', 'v2.2 should not include market_data field');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('v2.2 - Should not have root-level market fields', function () {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "        const firstItem = json.data[0];",
+                  "        pm.expect(firstItem).to.not.have.property('floor_unit_price');",
+                  "        pm.expect(firstItem).to.not.have.property('market_cap');",
+                  "        pm.expect(firstItem).to.not.have.property('volume24');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Version",
+                "value": "2.2",
+                "description": "Request v2.2 format (no market data)"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20/balance/{{test_address}}?limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20", "balance", "{{test_address}}"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRC20 Balance List - v2.3 (Clean Market Data)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('v2.3 - SRC20 Balance endpoint responds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('v2.3 - Response time acceptable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                  "});",
+                  "",
+                  "pm.test('v2.3 - Response has JSON structure', function () {",
+                  "    pm.response.to.have.jsonBody();",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('data');",
+                  "});",
+                  "",
+                  "pm.test('v2.3 - CRITICAL: market_data field should exist', function () {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "        const firstItem = json.data[0];",
+                  "        pm.expect(firstItem).to.have.property('market_data', 'v2.3 should include market_data field');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('v2.3 - market_data should be nested object or null', function () {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "        const firstItem = json.data[0];",
+                  "        if (firstItem.market_data !== null) {",
+                  "            pm.expect(firstItem.market_data).to.be.an('object');",
+                  "            // If market data exists, check for expected structure",
+                  "            if (Object.keys(firstItem.market_data).length > 0) {",
+                  "                pm.expect(firstItem.market_data).to.satisfy(data => {",
+                  "                    return typeof data.floor_unit_price === 'number' || data.floor_unit_price === null;",
+                  "                }, 'market_data.floor_unit_price should be number or null');",
+                  "            }",
+                  "        }",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('v2.3 - Should NOT have root-level market fields', function () {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "        const firstItem = json.data[0];",
+                  "        pm.expect(firstItem).to.not.have.property('floor_unit_price', 'v2.3 should not have root-level floor_unit_price');",
+                  "        pm.expect(firstItem).to.not.have.property('market_cap', 'v2.3 should not have root-level market_cap');",
+                  "        pm.expect(firstItem).to.not.have.property('volume24', 'v2.3 should not have root-level volume24');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Version",
+                "value": "2.3",
+                "description": "Request v2.3 format (clean market_data structure)"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20/balance/{{test_address}}?limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20", "balance", "{{test_address}}"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRC20 Balance Single Tick - v2.2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('v2.2 - Single tick balance responds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('v2.2 - No market_data in single tick response', function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        const json = pm.response.json();",
+                  "        if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "            pm.expect(json.data[0]).to.not.have.property('market_data');",
+                  "        }",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Version",
+                "value": "2.2"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20/balance/{{test_address}}/{{test_src20_tick}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "{{test_address}}",
+                "{{test_src20_tick}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRC20 Balance Single Tick - v2.3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('v2.3 - Single tick balance responds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('v2.3 - Has market_data in single tick response', function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        const json = pm.response.json();",
+                  "        if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "            pm.expect(json.data[0]).to.have.property('market_data');",
+                  "        }",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Version",
+                "value": "2.3"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20/balance/{{test_address}}/{{test_src20_tick}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "balance",
+                "{{test_address}}",
+                "{{test_src20_tick}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SRC20 Overview Endpoints - Version Compatibility",
+      "item": [
+        {
+          "name": "SRC20 Overview List - v2.2 (No Market Data)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('v2.2 - SRC20 overview responds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('v2.2 - No market data fields in overview', function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        const json = pm.response.json();",
+                  "        if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "            const firstItem = json.data[0];",
+                  "            pm.expect(firstItem).to.not.have.property('market_data');",
+                  "            pm.expect(firstItem).to.not.have.property('floor_unit_price');",
+                  "            pm.expect(firstItem).to.not.have.property('market_cap');",
+                  "        }",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Version",
+                "value": "2.2"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20?limit=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "3"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRC20 Overview List - v2.3 (Clean Market Data)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('v2.3 - SRC20 overview responds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('v2.3 - Has market_data field in overview', function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        const json = pm.response.json();",
+                  "        if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "            const firstItem = json.data[0];",
+                  "            pm.expect(firstItem).to.have.property('market_data');",
+                  "            pm.expect(firstItem).to.not.have.property('floor_unit_price', 'Should not have root-level market fields');",
+                  "        }",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Version",
+                "value": "2.3"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20?limit=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "3"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Version Header Validation",
+      "item": [
+        {
+          "name": "No Version Header (Should Use Default)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Default version behavior - endpoint responds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Default version should match v2.3 behavior', function () {",
+                  "    if (pm.response.code === 200) {",
+                  "        const json = pm.response.json();",
+                  "        if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "            const firstItem = json.data[0];",
+                  "            // Default should be v2.3 behavior (with market_data)",
+                  "            pm.expect(firstItem).to.have.property('market_data', 'Default should use v2.3 format');",
+                  "        }",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20?limit=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Invalid Version Header",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Invalid version - should fallback gracefully', function () {",
+                  "    // Should either return 400 Bad Request or fallback to default",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Invalid version fallback uses default format', function () {",
+                  "        const json = pm.response.json();",
+                  "        if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "            // Should fallback to default (v2.3) format",
+                  "            pm.expect(json.data[0]).to.have.property('market_data');",
+                  "        }",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Version",
+                "value": "9.9",
+                "description": "Invalid version number"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20?limit=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Version Compatibility Summary",
+      "item": [
+        {
+          "name": "Generate Compatibility Report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// This is a summary request - analyze all previous results",
+                  "const results = JSON.parse(pm.collectionVariables.get('version_validation_results') || '[]');",
+                  "",
+                  "console.log('\\n' + '='.repeat(80));",
+                  "console.log('🔍 API VERSION COMPATIBILITY REPORT');",
+                  "console.log('='.repeat(80));",
+                  "",
+                  "let v22Results = results.filter(r => r.version === '2.2');",
+                  "let v23Results = results.filter(r => r.version === '2.3');",
+                  "let defaultResults = results.filter(r => r.version === 'default' || r.version === '');",
+                  "",
+                  "console.log(`📊 Test Results Summary:`);",
+                  "console.log(`   v2.2 Tests: ${v22Results.length} endpoints`);",
+                  "console.log(`   v2.3 Tests: ${v23Results.length} endpoints`);",
+                  "console.log(`   Default Tests: ${defaultResults.length} endpoints`);",
+                  "",
+                  "// Analyze v2.2 compliance",
+                  "let v22Compliant = v22Results.filter(r => !r.hasMarketData && r.marketDataStructure === 'none');",
+                  "console.log(`\\n✅ v2.2 Compliance: ${v22Compliant.length}/${v22Results.length} endpoints`);",
+                  "if (v22Results.length > v22Compliant.length) {",
+                  "    console.log('❌ v2.2 Non-compliant endpoints:');",
+                  "    v22Results.filter(r => r.hasMarketData || r.marketDataStructure !== 'none')",
+                  "               .forEach(r => console.log(`   - ${r.endpoint}: has market data`));",
+                  "}",
+                  "",
+                  "// Analyze v2.3 compliance",
+                  "let v23Compliant = v23Results.filter(r => r.hasMarketData && r.marketDataStructure === 'nested');",
+                  "console.log(`\\n✅ v2.3 Compliance: ${v23Compliant.length}/${v23Results.length} endpoints`);",
+                  "if (v23Results.length > v23Compliant.length) {",
+                  "    console.log('❌ v2.3 Non-compliant endpoints:');",
+                  "    v23Results.filter(r => !r.hasMarketData || r.marketDataStructure !== 'nested')",
+                  "               .forEach(r => console.log(`   - ${r.endpoint}: ${r.marketDataStructure} structure`));",
+                  "}",
+                  "",
+                  "// Performance analysis",
+                  "let avgResponseTime = results.reduce((sum, r) => sum + (r.responseTime || 0), 0) / results.length;",
+                  "console.log(`\\n⚡ Performance:`);",
+                  "console.log(`   Average Response Time: ${Math.round(avgResponseTime)}ms`);",
+                  "console.log(`   Successful Responses: ${results.filter(r => r.status === 200).length}/${results.length}`);",
+                  "",
+                  "console.log('\\n' + '='.repeat(80));",
+                  "",
+                  "// Final test assertion",
+                  "let totalTests = results.length;",
+                  "let successfulTests = results.filter(r => r.status === 200).length;",
+                  "pm.test(`Version compatibility validation completed: ${successfulTests}/${totalTests} endpoints successful`, function () {",
+                  "    pm.expect(successfulTests).to.be.at.least(Math.floor(totalTests * 0.8)); // At least 80% success rate",
+                  "});",
+                  "",
+                  "// Critical compliance tests",
+                  "pm.test('v2.2 endpoints have no market data', function () {",
+                  "    let v22NonCompliant = v22Results.filter(r => r.hasMarketData);",
+                  "    pm.expect(v22NonCompliant.length).to.equal(0, `v2.2 endpoints with market data: ${v22NonCompliant.map(r => r.endpoint).join(', ')}`);",
+                  "});",
+                  "",
+                  "pm.test('v2.3 endpoints have nested market_data structure', function () {",
+                  "    let v23NonCompliant = v23Results.filter(r => !r.hasMarketData || r.marketDataStructure === 'root-level');",
+                  "    pm.expect(v23NonCompliant.length).to.equal(0, `v2.3 endpoints with incorrect structure: ${v23NonCompliant.map(r => r.endpoint).join(', ')}`);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

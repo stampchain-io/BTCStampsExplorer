@@ -100,6 +100,13 @@ export function SRC20CardSmMinting({
               const handleMintClick = (event: MouseEvent) => {
                 event.preventDefault();
 
+                // SSR-safe browser environment check
+                if (
+                  typeof globalThis === "undefined" || !globalThis?.location
+                ) {
+                  return; // Cannot navigate during SSR
+                }
+
                 // Check if we're already on the mint page
                 const currentPath = globalThis.location.pathname;
                 const isMintPage = currentPath.includes("/tool/src20/mint");
@@ -161,6 +168,13 @@ export function SRC20CardSmMinting({
                                         e.button !== 1
                                       ) {
                                         e.preventDefault();
+                                        // SSR-safe browser environment check
+                                        if (
+                                          typeof globalThis === "undefined" ||
+                                          !globalThis?.location
+                                        ) {
+                                          return; // Cannot navigate during SSR
+                                        }
                                         globalThis.location.href = href;
                                       }
                                     }}

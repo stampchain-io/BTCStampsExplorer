@@ -1,9 +1,9 @@
 /* ===== SRC20 OVERVIEW CONTENT COMPONENT ===== */
 import { useState } from "preact/hooks";
 // import { SRC20Row } from "$globals"; // Removed unused import
-import { SRC20Gallery } from "$section";
-import { SRC20OverviewHeader } from "$header";
 import type { EnrichedSRC20Row } from "$globals"; // CHANGED: Import from $globals
+import { SRC20OverviewHeader } from "$header";
+import { SRC20Gallery } from "$section";
 
 /* ===== TYPES ===== */
 interface SRC20OverviewContentProps {
@@ -56,12 +56,16 @@ export function SRC20OverviewContent({
   ) => {
     setCurrentSort({ filter, direction });
 
-    // Redirect to the same page with sort parameters
+    // Use Fresh.js partial navigation for sorting
     const url = new URL(globalThis.location.href);
     url.searchParams.set("sortBy", filter || "TRENDING");
     url.searchParams.set("sortDirection", direction);
     url.searchParams.set("page", "1"); // Reset to page 1 when sorting changes
-    globalThis.location.href = url.toString();
+
+    const link = document.createElement("a");
+    link.href = url.toString();
+    link.setAttribute("f-partial", "");
+    link.click();
   };
 
   // Handle view type changes
@@ -94,7 +98,12 @@ export function SRC20OverviewContent({
           onPageChange: (newPage: number) => {
             const url = new URL(globalThis.location.href);
             url.searchParams.set("page", newPage.toString());
-            globalThis.location.href = url.toString();
+
+            // Use Fresh.js partial navigation
+            const link = document.createElement("a");
+            link.href = url.toString();
+            link.setAttribute("f-partial", "");
+            link.click();
           },
         }}
         useClientFetch={false}

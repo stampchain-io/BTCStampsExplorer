@@ -103,9 +103,9 @@ export function PartnersBanner() {
   return (
     <div class="flex flex-col max-w-desktop w-full mx-auto mb-4">
       {/* ===== TITLE SECTION ===== */}
-      <h2 className={`${subtitleGrey} !mb-2`}>PARTNERS</h2>
+      <h2 class={`${subtitleGrey} !mb-2`}>PARTNERS</h2>
       {/* ===== BANNER CARDS SECTION ===== */}
-      <div className={`grid grid-cols-3 pt-2 ${gapGrid}`}>
+      <div class={`grid grid-cols-3 pt-2 ${gapGrid}`}>
         {partners.map((partner) => (
           <PartnerCard key={partner.name} {...partner} />
         ))}

@@ -1,6 +1,7 @@
 export enum RouteType {
   // No cache (real-time data)
   DYNAMIC = 'dynamic',
+  INTERNAL = 'internal',           // Internal admin endpoints
   STAMP_DISPENSER = 'stamp_dispenser',
   STAMP_DISPENSE = 'stamp_dispense',
   STAMP_SEND = 'stamp_send',
@@ -38,6 +39,7 @@ export function getCacheConfig(routeType: RouteType): CacheConfig {
     case RouteType.STAMP_DISPENSE:
     case RouteType.STAMP_SEND:
     case RouteType.DYNAMIC:
+    case RouteType.INTERNAL:
       return {
         duration: 0,
         staleWhileRevalidate: 0,
@@ -105,4 +107,4 @@ export function getCacheConfig(routeType: RouteType): CacheConfig {
         staleIfError: 600,
       };
   }
-} 
+}

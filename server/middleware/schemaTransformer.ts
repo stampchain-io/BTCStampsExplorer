@@ -1,9 +1,9 @@
-import { getFieldsToStrip } from "./apiVersionMiddleware.ts";
 import { logger } from "../../lib/utils/logger.ts";
+import { getFieldsToStrip } from "./apiVersionMiddleware.ts";
 
 /**
  * Schema Transformation Framework
- * 
+ *
  * Task 4.2: Design Schema Transformation Framework and Version Registry
  * Handles field mapping, type conversions, and structural changes between API versions
  */
@@ -11,7 +11,7 @@ import { logger } from "../../lib/utils/logger.ts";
 export interface TransformationRule {
   sourceField: string;
   targetField?: string;
-  transform?: (value: any) => any;
+  transform?: (value: any, data?: any) => any;
   condition?: (data: any) => boolean;
   remove?: boolean;
 }
@@ -27,25 +27,15 @@ const TRANSFORMATION_REGISTRY: Record<string, VersionTransformationConfig> = {
   "2.2": {
     version: "2.2",
     rules: [
-      // Remove all enhanced fields for v2.2
-      { sourceField: "marketData", remove: true },
-      { sourceField: "dispenserInfo", remove: true },
-      { sourceField: "cacheStatus", remove: true },
-      { sourceField: "cacheInfo", remove: true },
-      { sourceField: "holderCount", remove: true },
-      { sourceField: "uniqueHolderCount", remove: true },
-      { sourceField: "floorPriceBTC", remove: true },
-      { sourceField: "volume24hBTC", remove: true },
-      { sourceField: "dataQualityScore", remove: true },
-      { sourceField: "priceSource", remove: true }
+      // v2.2 has no pricing fields - no transformation needed
     ],
-    globalTransforms: []
   },
   "2.3": {
     version: "2.3",
-    rules: [], // No transformations needed - latest version
-    globalTransforms: []
-  }
+    rules: [
+      // v2.3 uses clean structure with pricing in marketData - no transformation needed
+    ],
+  },
 };
 
 /**
@@ -55,22 +45,22 @@ function deepClone<T>(obj: T): T {
   if (obj === null || typeof obj !== "object") {
     return obj;
   }
-  
+
   if (obj instanceof Date) {
     return new Date(obj.getTime()) as any;
   }
-  
+
   if (obj instanceof Array) {
     return obj.map(item => deepClone(item)) as any;
   }
-  
+
   const clonedObj: any = {};
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       clonedObj[key] = deepClone(obj[key]);
     }
   }
-  
+
   return clonedObj;
 }
 
@@ -92,7 +82,7 @@ function removeFields(obj: any, fieldsToRemove: Set<string>): void {
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       const value = obj[key];
-      
+
       if (Array.isArray(value)) {
         value.forEach(item => removeFields(item, fieldsToRemove));
       } else if (value && typeof value === "object") {
@@ -110,27 +100,32 @@ function applyTransformationRules(
   rules: TransformationRule[]
 ): any {
   const transformed = deepClone(data);
-  
+
   for (const rule of rules) {
     // Check condition if specified
     if (rule.condition && !rule.condition(transformed)) {
       continue;
     }
-    
+
     // Handle field removal
     if (rule.remove) {
+      logger.debug("api", {
+        message: "Removing field from response",
+        field: rule.sourceField,
+        exists: rule.sourceField in transformed
+      });
       delete transformed[rule.sourceField];
       continue;
     }
-    
+
     // Handle field transformation
     if (rule.sourceField in transformed) {
       const sourceValue = transformed[rule.sourceField];
-      
+
       if (rule.transform) {
         // Apply transformation function
-        const transformedValue = rule.transform(sourceValue);
-        
+        const transformedValue = rule.transform(sourceValue, transformed);
+
         if (rule.targetField) {
           // Move to new field
           transformed[rule.targetField] = transformedValue;
@@ -148,7 +143,7 @@ function applyTransformationRules(
       }
     }
   }
-  
+
   return transformed;
 }
 
@@ -162,15 +157,15 @@ export function transformResponseForVersion(
   try {
     // Get transformation config for version
     const config = TRANSFORMATION_REGISTRY[version];
-    
+
     if (!config) {
       logger.warn("api", { message: `No transformation config for version ${version}` });
       return data;
     }
-    
+
     // Clone data to avoid mutations
     let transformed = deepClone(data);
-    
+
     // Apply field stripping based on version
     const fieldsToStrip = getFieldsToStrip(version);
     if (fieldsToStrip.size > 0) {
@@ -184,29 +179,29 @@ export function transformResponseForVersion(
         removeFields(transformed, fieldsToStrip);
       }
     }
-    
+
     // Apply transformation rules
     if (config.rules.length > 0) {
       if (Array.isArray(transformed)) {
-        transformed = transformed.map(item => 
+        transformed = transformed.map(item =>
           applyTransformationRules(item, config.rules)
         );
       } else if (transformed.data && Array.isArray(transformed.data)) {
-        transformed.data = transformed.data.map((item: any) => 
+        transformed.data = transformed.data.map((item: any) =>
           applyTransformationRules(item, config.rules)
         );
       } else {
         transformed = applyTransformationRules(transformed, config.rules);
       }
     }
-    
+
     // Apply global transforms
     if (config.globalTransforms) {
       for (const transform of config.globalTransforms) {
         transformed = transform(transformed);
       }
     }
-    
+
     return transformed;
   } catch (error) {
     logger.error("api", { message: "Error transforming response for version", version, error });
@@ -228,7 +223,7 @@ export function registerTransformationRule(
       globalTransforms: []
     };
   }
-  
+
   TRANSFORMATION_REGISTRY[version].rules.push(rule);
 }
 
@@ -242,19 +237,19 @@ export function validateResponseSchema(
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
   const fieldsToStrip = getFieldsToStrip(version);
-  
+
   // Check if stripped fields are present
   const checkForStrippedFields = (obj: any, path: string = ""): void => {
     if (!obj || typeof obj !== "object") {
       return;
     }
-    
+
     for (const field of fieldsToStrip) {
       if (field in obj) {
         errors.push(`Field '${field}' should not be present in version ${version} at ${path}`);
       }
     }
-    
+
     // Check nested objects
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
@@ -269,9 +264,9 @@ export function validateResponseSchema(
       }
     }
   };
-  
+
   checkForStrippedFields(data);
-  
+
   return {
     valid: errors.length === 0,
     errors
@@ -292,13 +287,13 @@ export function getVersionChangeSummary(
   const fromConfig = TRANSFORMATION_REGISTRY[fromVersion];
   // TODO(@team): toConfig might need to be used for analyzing target version changes
   // const _toConfig = TRANSFORMATION_REGISTRY[toVersion];
-  
+
   const summary = {
     addedFields: [] as string[],
     removedFields: [] as string[],
     transformedFields: [] as string[]
   };
-  
+
   // Analyze rules to determine changes
   if (fromConfig) {
     fromConfig.rules.forEach(rule => {
@@ -309,17 +304,17 @@ export function getVersionChangeSummary(
       }
     });
   }
-  
+
   // Get fields based on version differences
   const fromFields = getFieldsToStrip(fromVersion);
   const toFields = getFieldsToStrip(toVersion);
-  
+
   // Fields in fromFields but not in toFields are added
   fromFields.forEach(field => {
     if (!toFields.has(field)) {
       summary.addedFields.push(field);
     }
   });
-  
+
   return summary;
 }

@@ -305,9 +305,9 @@ function SendStampModal({
   return (
     <ModalBase onClose={handleCloseModal} title="TRANSFER">
       {/* ===== STAMP SELECTION SECTION ===== */}
-      <div className="flex w-full gap-6">
+      <div class="flex w-full gap-6">
         {/* ===== STAMP PREVIEW ===== */}
-        <div className="flex items-center justify-center rounded min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker">
+        <div class="flex items-center justify-center rounded min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker">
           {selectedStamp
             ? (
               <img
@@ -330,7 +330,7 @@ function SendStampModal({
         </div>
 
         {/* ===== STAMP DETAILS ===== */}
-        <div className="flex flex-col gap-3 mobileMd:gap-6 flex-1">
+        <div class="flex flex-col gap-3 mobileMd:gap-6 flex-1">
           <SelectField
             options={stamps.data}
             value={selectedStamp?.stamp?.toString() || ""}
@@ -345,12 +345,12 @@ function SendStampModal({
           />
 
           {/* ===== QUANTITY SELECTION ===== */}
-          <div className="flex w-full justify-between items-start">
-            <div className="flex flex-col justify-start -space-y-0.5">
-              <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey">
+          <div class="flex w-full justify-between items-start">
+            <div class="flex flex-col justify-start -space-y-0.5">
+              <p class="text-lg mobileLg:text-xl font-bold text-stamp-grey">
                 EDITIONS
               </p>
-              <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
+              <p class="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
                 MAX {maxQuantity}
               </p>
             </div>
@@ -367,7 +367,7 @@ function SendStampModal({
       </div>
 
       {/* ===== RECIPIENT ADDRESS INPUT ===== */}
-      <div className="flex pt-5">
+      <div class="flex pt-5">
         <input
           value={formState.recipientAddress}
           onInput={(e) =>
@@ -400,12 +400,12 @@ function SendStampModal({
 
       {/* ===== STATUS MESSAGES ===== */}
       {error && (
-        <div className="text-red-500 text-center mt-4 font-medium">
+        <div class="text-red-500 text-center mt-4 font-medium">
           {error}
         </div>
       )}
       {successMessage && (
-        <div className="text-green-500 text-center mt-4 font-medium">
+        <div class="text-green-500 text-center mt-4 font-medium">
           {successMessage}
         </div>
       )}

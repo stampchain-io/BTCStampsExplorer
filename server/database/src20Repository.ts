@@ -1,6 +1,6 @@
 import {
-  SRC20SnapshotRequestParams,
-  SRC20TrxRequestParams,
+    SRC20SnapshotRequestParams,
+    SRC20TrxRequestParams,
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "$lib/utils/constants.ts";
@@ -210,6 +210,17 @@ export class SRC20Repository {
 
     queryParams.push(safeLimit, offset);
 
+    // Determine if we need fee fields (only for transaction-specific queries)
+    const needsFeeFields = tx_hash != null || block_index != null;
+    const feeFieldsSelect = needsFeeFields ? `,
+            txns.fee_rate_sat_vb,
+            txns.fee` : "";
+    const feeFieldsJoin = needsFeeFields ? `
+          LEFT JOIN transactions txns ON src20.tx_hash = txns.tx_hash` : "";
+    const feeFieldsOutput = needsFeeFields ? `,
+          b.fee_rate_sat_vb,
+          b.fee` : "";
+
     try {
       const query = `
         WITH base_query AS (
@@ -228,21 +239,21 @@ export class SRC20Repository {
             src20.destination,
             src20.block_time,
             creator_info.creator as creator_name,
-            destination_info.creator as destination_name
+            destination_info.creator as destination_name${feeFieldsSelect}
           FROM ${SRC20_TABLE} src20
           LEFT JOIN creator creator_info ON src20.creator = creator_info.address
-          LEFT JOIN creator destination_info ON src20.destination = destination_info.address
+          LEFT JOIN creator destination_info ON src20.destination = destination_info.address${feeFieldsJoin}
           CROSS JOIN (SELECT @row_number := ?) AS init
           ${whereClause}
           ORDER BY src20.block_index ${validOrder}
         ),
         holders AS (
           SELECT
-            tick,
-            COUNT(DISTINCT address) as holders
-          FROM ${SRC20_BALANCE_TABLE}
-          WHERE amt > 0
-          GROUP BY tick
+            b.tick,
+            COUNT(DISTINCT bal.address) as holders
+          FROM (SELECT DISTINCT tick FROM base_query) b
+          LEFT JOIN ${SRC20_BALANCE_TABLE} bal ON bal.tick = b.tick AND bal.amt > 0
+          GROUP BY b.tick
         ),
         mint_progress AS (
           SELECT
@@ -276,7 +287,7 @@ export class SRC20Repository {
           b.creator_name,
           b.destination_name,
           h.holders,
-          mp.progress
+          mp.progress${feeFieldsOutput}
         FROM base_query b
         LEFT JOIN holders h ON h.tick = b.tick
         LEFT JOIN mint_progress mp ON mp.tick = b.tick
@@ -504,6 +515,9 @@ export class SRC20Repository {
   static async fetchTrendingActiveMintingTokens(
     transactionCount: number = 1000,
   ) {
+    // Reduce transaction count for better performance in production
+    const optimizedTransactionCount = Math.min(transactionCount, 300);
+
     const query = `
       WITH latest_mint_transactions AS (
         SELECT tx_index, tick
@@ -517,6 +531,7 @@ export class SRC20Repository {
                (COUNT(*) * 100.0 / ?) as top_mints_percentage
         FROM latest_mint_transactions
         GROUP BY tick
+        HAVING COUNT(*) >= 2
       )
       SELECT
         'data' as type,
@@ -538,26 +553,74 @@ export class SRC20Repository {
         COALESCE(stats.holders_count, 0) as holders,
         COALESCE(stats.total_minted, 0) as total_minted
       FROM mint_counts mc
-      JOIN ${SRC20_TABLE} src20_deploy ON mc.tick = src20_deploy.tick AND src20_deploy.op = 'DEPLOY'
+      JOIN ${SRC20_TABLE} src20_deploy
+        ON mc.tick = src20_deploy.tick AND src20_deploy.op = 'DEPLOY'
       LEFT JOIN creator creator_info ON src20_deploy.creator = creator_info.address
       LEFT JOIN src20_token_stats stats ON stats.tick = mc.tick
       WHERE COALESCE(stats.total_minted, 0) < src20_deploy.max
-      ORDER BY mc.mint_count DESC;
+      ORDER BY mc.mint_count DESC
+      LIMIT 25;
     `;
     const queryParams = [
-      transactionCount, // Number of recent mint transactions to consider
-      transactionCount, // For top_mints_percentage calculation
+      optimizedTransactionCount, // Number of recent mint transactions to consider
+      optimizedTransactionCount, // For top_mints_percentage calculation
     ];
-    const results = await this.db.executeQueryWithCache(
-      query,
-      queryParams,
-      1000 * 60 * 10, // Cache duration
-    );
 
-    return {
-      rows: this.convertResponseToEmoji((results as any).rows),
-      total: (results as any).rows.length
-    };
+    try {
+      const results = await this.db.executeQueryWithCache(
+        query,
+        queryParams,
+        1000 * 60 * 20, // Increased cache duration to 20 minutes
+      );
+
+      return {
+        rows: this.convertResponseToEmoji((results as any).rows),
+        total: (results as any).rows.length
+      };
+    } catch (error) {
+      console.error("Error in fetchTrendingActiveMintingTokens:", error);
+
+      // Fallback to simpler query if the optimized one fails
+      const fallbackQuery = `
+        SELECT
+          'data' as type,
+          src20_deploy.tick,
+          0 as mint_count,
+          0 as top_mints_percentage,
+          src20_deploy.tx_hash,
+          src20_deploy.block_index,
+          src20_deploy.p,
+          src20_deploy.op,
+          src20_deploy.creator,
+          src20_deploy.amt,
+          src20_deploy.deci,
+          src20_deploy.lim,
+          src20_deploy.max,
+          src20_deploy.destination,
+          src20_deploy.block_time,
+          creator_info.creator as creator_name,
+          COALESCE(stats.holders_count, 0) as holders,
+          COALESCE(stats.total_minted, 0) as total_minted
+        FROM ${SRC20_TABLE} src20_deploy
+        LEFT JOIN creator creator_info ON src20_deploy.creator = creator_info.address
+        LEFT JOIN src20_token_stats stats ON stats.tick = src20_deploy.tick
+        WHERE src20_deploy.op = 'DEPLOY'
+          AND COALESCE(stats.total_minted, 0) < src20_deploy.max
+        ORDER BY src20_deploy.block_index DESC
+        LIMIT 15;
+      `;
+
+      const fallbackResults = await this.db.executeQueryWithCache(
+        fallbackQuery,
+        [],
+        1000 * 60 * 10, // 10 minute cache for fallback
+      );
+
+      return {
+        rows: this.convertResponseToEmoji((fallbackResults as any).rows),
+        total: (fallbackResults as any).rows.length
+      };
+    }
   }
 
   static async getDeploymentAndCountsForTick(tick: string) {

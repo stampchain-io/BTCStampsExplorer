@@ -2,42 +2,42 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Deno: Run dev.ts",
-      "type": "node",
+      "name": "Deno Fresh: Debug",
       "request": "launch",
+      "type": "node",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
-        "run",
-        "--inspect-wait",
-        "--watch",
-        "--watch-exclude=dist/,node_modules/,_fresh/,.git/,coverage/,tmp/,tests/,fresh.gen.ts",
-        "--no-clear-screen"
+        "task",
+        "dev"
       ],
-      "program": "${workspaceFolder}/dev.ts",
-      "args": ["--host"],
+      "attachSimplePort": 9229,
+      "restart": true,
+      "outputCapture": "std",
       "env": {
-        "DENO_ENV": "development"
+        "DENO_ENV": "development",
+        "SKIP_REDIS_CONNECTION": "true"
       },
+      // "console": "integratedTerminal",
       "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
+      "internalConsoleOptions": "openOnSessionStart",
+      "autoAttachChildProcesses": false
     },
     {
-      "name": "Deno: Run main.ts",
+      "name": "Deno: Production Server",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
-        "run",
-        "--inspect-wait",
-        "--allow-all"
+        "task",
+        "dev"
       ],
-      "program": "${workspaceFolder}/main.ts",
+      "attachSimplePort": 9230,
       "env": {
         "DENO_ENV": "production"
       },
-      "console": "internalConsole",
+      "console": "integratedTerminal",
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
@@ -52,13 +52,14 @@
         "--allow-all",
         "--config=tests/deno.json"
       ],
-      "program": "${workspaceFolder}/tests/",
+      "program": "${workspaceFolder}/tests/unit/",
       "env": {
         "DENO_ENV": "test",
         "SKIP_REDIS_CONNECTION": "true"
       },
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "openOnSessionStart",
+      "attachSimplePort": 9231
     }
   ]
 }

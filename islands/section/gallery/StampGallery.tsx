@@ -187,7 +187,7 @@ export default function StampGallery({
                 alignRight && "tablet:items-end"
               }`}
             >
-              <h2 className={subtitlePurple}>
+              <h2 class={subtitlePurple}>
                 {subTitle}
               </h2>
             </div>

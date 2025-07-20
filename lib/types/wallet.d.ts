@@ -1,6 +1,9 @@
 import { WalletProviderKey } from "$lib/utils/constants.ts";
-import { Dispenser, DispenserStats } from "./services.d.ts";
-import { StampRow } from "$globals";
+import { PaginationQueryParams } from "./pagination.d.ts";
+import { WalletSortKey } from "./sorting.d.ts";
+
+// Re-export for convenience
+export type { WalletSortKey } from "./sorting.d.ts";
 
 export interface StampBalance {
   cpid?: string;
@@ -11,6 +14,45 @@ export interface StampBalance {
   divisible?: boolean;
   stamp?: number;
   info?: any;
+}
+
+// UTXO information for wallet stamps
+export interface UTXOInfo {
+  quantity: number;
+  utxo: string;
+}
+
+// Enhanced stamp interface for wallet display with value and UTXO information
+export interface WalletStampWithValue extends StampBalance {
+  balance?: number; // Total balance of this stamp owned by the wallet
+  unbound_quantity?: number; // Quantity NOT attached to UTXOs (unbound/detached)
+  utxos?: UTXOInfo[]; // UTXO attachment information (detailed)
+
+  // DEPRECATED: Legacy pricing fields - use marketData instead
+  value?: number; // @deprecated Use marketData.walletValueBTC
+  unitPrice?: number; // @deprecated Use marketData.lastPriceBTC
+  floorPrice?: number | "priceless"; // @deprecated Use marketData.floorPriceBTC
+  recentSalePrice?: number | "priceless"; // @deprecated Use marketData.recentSalePriceBTC
+  // Additional StampRow fields for wallet display
+  stamp?: number;
+  tx_hash?: string;
+  stamp_url?: string;
+  stamp_mimetype?: string;
+  supply?: number;
+  creator?: string;
+  creator_name?: string;
+  divisible?: boolean;
+  locked?: number;
+  cpid?: string;
+  marketData?: any;
+}
+
+// Utility type for checking UTXO attachment status
+export interface UTXOAttachmentInfo {
+  hasUTXOAttachment: boolean;
+  attachedQuantity: number;
+  unattachedQuantity: number;
+  totalBalance: number;
 }
 
 // Base interface for chain and mempool stats from Mempool API
@@ -29,7 +71,7 @@ export interface MempoolAddressResponse {
   mempool_stats: BTCStatsDetail;
 }
 
-interface BlockCypherAddressBalanceResponse {
+export interface BlockCypherAddressBalanceResponse {
   address: string;
   total_received: number;
   total_sent: number;
@@ -61,138 +103,277 @@ export interface BTCBalanceInfo {
   usdValue?: number;
 }
 
-export interface BTCBalanceInfoOptions {
-  includeUSD?: boolean;
-  apiBaseUrl?: string;
-}
-
-export interface Wallet {
+// Wallet provider types
+export interface WalletInfo {
   address?: string;
-  publicKey?: string;
-  accounts: any[];
-  btcBalance: BTCBalance;
-  stampBalance: StampBalance[];
-  type?: "legacy" | "segwit";
+  balance?: BTCBalance;
   provider?: WalletProviderKey;
+  connected?: boolean;
   network?: "mainnet" | "testnet";
+  // Legacy properties for backward compatibility
+  accounts?: string[];
+  publicKey?: string;
+  btcBalance?: BTCBalance;
   addressType?: "p2wpkh" | "p2tr";
+  stampBalance?: StampBalance[];
 }
 
-// Interface for wallet overview display that requires all fields
-export interface WalletOverviewInfo {
+// Wallet connection state
+export interface WalletConnectionState {
+  isConnected: boolean;
+  isConnecting: boolean;
+  error?: string;
+  wallet?: WalletInfo;
+  supportedWallets: WalletProviderKey[];
+}
+
+// Wallet connection methods
+export interface WalletConnectionMethods {
+  connect: (provider: WalletProviderKey) => Promise<void>;
+  disconnect: () => Promise<void>;
+  getBalance: () => Promise<BTCBalance>;
+  signTransaction: (tx: any) => Promise<string>;
+  broadcastTransaction: (signedTx: string) => Promise<string>;
+}
+
+// Combined wallet context
+export interface WalletContext
+  extends WalletConnectionState, WalletConnectionMethods {
+  refreshBalance: () => Promise<void>;
+  isRefreshing: boolean;
+}
+
+// Wallet display preferences
+export interface WalletDisplayPreferences {
+  showUSDValues: boolean;
+  showQuantityDetails: boolean;
+  showRecentActivity: boolean;
+  defaultSortBy: WalletSortKey;
+  itemsPerPage: number;
+}
+
+// Wallet stats aggregation
+export interface WalletStats {
+  totalStamps: number;
+  totalValue: number;
+  totalUSDValue?: number;
+  uniqueStamps: number;
+  recentActivity: {
+    lastTransaction?: Date;
+    transactionCount24h: number;
+    volumeChange24h: number;
+  };
+}
+
+// Wallet activity item
+export interface WalletActivityItem {
+  type: "purchase" | "sale" | "transfer" | "mint";
+  stamp: number;
+  quantity: number;
+  price?: number;
+  timestamp: Date;
+  txHash: string;
+  counterparty?: string;
+}
+
+// Wallet activity response
+export interface WalletActivityResponse {
+  data: WalletActivityItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  stats: WalletStats;
+}
+
+// Dispenser aggregation for wallet display
+export interface WalletDispenserInfo {
+  stamp: number;
+  quantity: number;
+  pricePerStamp: number;
+  totalValue: number;
+  isActive: boolean;
+  createdAt: Date;
+  lastActivity?: Date;
+}
+
+// Wallet page data structure
+export interface WalletPageData {
   address: string;
-  balance: number;
-  txCount: number;
-  unconfirmedBalance: number;
-  unconfirmedTxCount: number;
-  btcPrice: number;
-  usdValue: number;
-  fee: number;
-  creatorName?: string;
-  dispensers: {
-    open: number;
-    closed: number;
-    total: number;
+  balance: BTCBalance;
+  stamps: WalletStampWithValue[];
+  dispensers: WalletDispenserInfo[];
+  activity: WalletActivityItem[];
+  stats: WalletStats;
+  preferences: WalletDisplayPreferences;
+  lastUpdated: Date;
+}
+
+// Wallet filter options
+export interface WalletFilterOptions {
+  priceRange?: {
+    min: number;
+    max: number;
   };
-  stampValue: number;
-  src20Value: number;
-  src101?: {
-    names: string[];
-    total: number;
+  quantityRange?: {
+    min: number;
+    max: number;
+  };
+  hasUTXOAttachment?: boolean;
+  hasMarketData?: boolean;
+  stampTypes?: ("STAMP" | "SRC-20" | "SRC-721")[];
+  dateRange?: {
+    start: Date;
+    end: Date;
   };
 }
 
-// Extended interface for wallet data that includes dispenser stats
-export interface WalletData extends Partial<WalletOverviewInfo> {
-  dispensers?: DispenserStats;
+// Wallet search and filter state
+export interface WalletSearchState {
+  query: string;
+  filters: WalletFilterOptions;
+  sortBy: WalletSortKey;
+  isLoading: boolean;
+  error?: string;
+  results: WalletStampWithValue[];
+  totalResults: number;
 }
 
-// Add the WalletStats interface
-export interface WalletStatsProps {
+// Wallet navigation state for complex wallet interfaces
+export interface WalletNavigationState {
+  currentTab: "stamps" | "activity" | "dispensers" | "stats";
+  stampView: "grid" | "list" | "table";
+  showFilters: boolean;
+  showSearch: boolean;
+  selectedStamps: number[];
+  bulkActions: {
+    isEnabled: boolean;
+    availableActions: string[];
+    isProcessing: boolean;
+  };
+  breadcrumbs: {
+    label: string;
+    href: string;
+  }[];
+}
+
+// Wallet page query parameters
+export interface WalletPageParams {
+  address: string;
+  anchor: string;
+  tab?: "stamps" | "activity" | "dispensers" | "stats";
+  view?: "grid" | "list" | "table";
+  search?: string;
+  filters?: {
+    priceMin?: number;
+    priceMax?: number;
+    quantityMin?: number;
+    quantityMax?: number;
+    hasUTXO?: boolean;
+    hasMarketData?: boolean;
+    types?: string;
+    dateStart?: string;
+    dateEnd?: string;
+  };
+  stamps?: {
+    page?: number;
+    limit?: number;
+    sortBy?: WalletSortKey;
+  };
+  activity?: {
+    page?: number;
+    limit?: number;
+    sortBy?: "date_desc" | "date_asc" | "value_desc" | "value_asc";
+  };
+  dispensers?: {
+    page?: number;
+    limit?: number;
+    sortBy?: "date_desc" | "date_asc" | "price_desc" | "price_asc";
+  };
+  stampsSortBy?: "ASC" | "DESC";
+  src20SortBy?: "ASC" | "DESC";
+  dispensersSortBy?: "ASC" | "DESC";
+}
+
+export interface WalletStampsQueryParams extends PaginationQueryParams {
+  sortBy?: WalletSortKey;
+}
+
+export interface WalletStampsApiResponse {
+  data: WalletStampWithValue[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  stampValues: {
+    stampValues: Record<string, number>;
+    totalValue: number;
+  };
+  metadata: {
+    marketDataCacheStatus: string;
+    enhancedWithMarketData: number;
+    sortBy?: WalletSortKey;
+  };
+}
+
+export interface WalletPageProps {
+  walletData: WalletOverviewInfo;
   stampsTotal: number;
   src20Total: number;
   stampsCreated: number;
-  stampValue: number;
+  data: {
+    stamps: any;
+    src20: any;
+    dispensers: any;
+  };
+  stampsSortBy?: "ASC" | "DESC";
+  src20SortBy?: "ASC" | "DESC";
+}
+
+/* ===== WALLET CONTENT PROPS ===== */
+
+export interface WalletContentProps {
+  stamps: any;
+  src20: any;
+  dispensers: any;
+  address: string;
+  anchor?: string;
+  stampsSortBy?: "ASC" | "DESC";
+  src20SortBy?: "ASC" | "DESC";
+  dispensersSortBy?: "ASC" | "DESC";
+}
+
+export interface WalletOverviewInfo {
+  totalStamps: number;
+  totalValue: number;
+  totalSRC20: number;
+  totalDispensers: number;
+  lastActivity?: Date;
+  // Core wallet properties
+  address: string;
+  balance: number;
+  usdValue: number;
+  fee?: number;
+  btcPrice: number; // Required for calculations
+  // Dispensers data - matching component interface
   dispensers?: {
     open: number;
     closed: number;
     total: number;
   };
-  setShowItem?: (type: string) => void;
+  // Value breakdowns
+  stampValue?: number;
+  src20Value?: number;
+  // SRC-101 data
+  src101?: {
+    names: string[];
+  };
+  // Creator information
+  creatorName?: string;
 }
 
-// Interface for paginated data
-export interface PaginatedData {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  onPageChange?: (page: number) => void;
-}
-
-// Interface for wallet page data structure
-export interface WalletPageData {
-  stamps: {
-    data: StampRow[];
-    pagination: PaginatedData;
-  };
-  src20: {
-    data: any[]; // Could be typed more specifically if we have SRC20 type
-    pagination: PaginatedData;
-  };
-  dispensers: {
-    data: Dispenser[];
-    pagination: PaginatedData;
-  };
-}
-
-// Props interface for the wallet page
-export interface WalletPageProps {
-  data: {
-    data: WalletPageData;
-    address: string;
-    walletData: WalletData;
-    stampsTotal: number;
-    src20Total: number;
-    stampsCreated: number;
-    anchor: string;
-  };
-  stampsSortBy?: "ASC" | "DESC";
-  src20SortBy?: "ASC" | "DESC";
-  dispensersSortBy?: "ASC" | "DESC";
-}
-
-interface WalletContentProps {
-  stamps: {
-    data: StampRow[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  };
-  src20: {
-    data: any[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  };
-  dispensers: {
-    data: Dispenser[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  };
-  address: string;
-  anchor: string;
-  stampsSortBy?: "ASC" | "DESC";
-  src20SortBy?: "ASC" | "DESC";
-  dispensersSortBy?: "ASC" | "DESC";
-}
+/* ===== EXISTING WALLET TYPES ===== */

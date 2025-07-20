@@ -1,12 +1,19 @@
 // TODO(@team): Move to /server
 
-
-import { dbManager } from "$server/database/databaseManager.ts";
-import { DispenserFilter, DispenseEvent, XcpBalance, Dispenser } from "$types/index.d.ts";
 import type { Fairminter } from "$lib/types/services.d.ts";
-import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
+import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
+import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
+import { DispenseEvent, Dispenser, DispenserFilter, XcpBalance } from "$types/index.d.ts";
+
+// Create a shared httpClient instance
+const httpClient = new FetchHttpClient(
+  30000, // defaultTimeout - 30 seconds for XCP API calls
+  2,     // defaultRetries
+  1000   // defaultRetryDelay
+);
 
 // Only include active, working counterparty nodes
 export const xcp_v2_nodes = [
@@ -39,21 +46,22 @@ export function normalizeFeeRate(params: {
   normalizedSatsPerKB: number;
 } {
   let normalizedSatsPerVB: number;
-  
+
   try {
     if (params.satsPerVB !== undefined) {
       normalizedSatsPerVB = params.satsPerVB;
     } else if (params.satsPerKB !== undefined) {
       // If satsPerKB/1000 < 1, assume it was intended as sats/vB
-      normalizedSatsPerVB = params.satsPerKB < SATS_PER_KB_MULTIPLIER 
-        ? params.satsPerKB 
+      normalizedSatsPerVB = params.satsPerKB < SATS_PER_KB_MULTIPLIER
+        ? params.satsPerKB
         : params.satsPerKB / SATS_PER_KB_MULTIPLIER;
     } else {
       throw new Error("Either satsPerKB or satsPerVB must be provided");
     }
 
-    if (normalizedSatsPerVB < 0.1) {
-      throw new Error("Fee rate must be at least 0.1 sat/vB");
+    // Allow any positive fee rate, including 0.1 sat/vB
+    if (normalizedSatsPerVB <= 0) {
+      throw new Error("Fee rate must be greater than 0");
     }
 
     return {
@@ -96,8 +104,8 @@ export async function fetchXcpV2WithCache<T>(
         });
 
         try {
-          const response = await fetch(url);
-          
+          const response = await httpClient.get(url);
+
           await logger.debug("api", {
             message: "XCP node response received",
             node: node.name,
@@ -107,7 +115,7 @@ export async function fetchXcpV2WithCache<T>(
           });
 
           if (!response.ok) {
-            const errorBody = await response.text();
+            const errorBody = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
             await logger.error("api", {
               message: "XCP node error response",
               node: node.name,
@@ -119,7 +127,7 @@ export async function fetchXcpV2WithCache<T>(
             continue; // Try the next node
           }
 
-          const data = await response.json();
+          const data = response.data;
           await logger.debug("api", {
             message: "XCP node successful response",
             node: node.name,
@@ -146,7 +154,7 @@ export async function fetchXcpV2WithCache<T>(
         queryParams: queryParams.toString(),
         error: errorMessage
       });
-      
+
       return {
         result: [],
         next_cursor: null,
@@ -189,7 +197,7 @@ export class DispenserManager {
             limit: apiLimit.toString(),
             status: filter
         });
-        
+
         if (cursor) {
             queryParams.append("cursor", cursor);
         }
@@ -232,7 +240,7 @@ export class DispenserManager {
 
             // Update cursor for next iteration
             cursor = response.next_cursor;
-            
+
             // Break if no more results
             if (!cursor) {
                 break;
@@ -250,16 +258,16 @@ export class DispenserManager {
     } while (cursor);
 
     // Filter results if needed
-    const filteredDispensers = filter === "all" 
+    const filteredDispensers = filter === "all"
         ? allDispensers
-        : allDispensers.filter(dispenser => 
-            filter === "open" 
-                ? dispenser.give_remaining > 0 
+        : allDispensers.filter(dispenser =>
+            filter === "open"
+                ? dispenser.give_remaining > 0
                 : dispenser.give_remaining === 0
         );
 
     // Apply pagination to the final results
-    const paginatedDispensers = limit 
+    const paginatedDispensers = limit
         ? filteredDispensers.slice(skipCount, skipCount + effectiveLimit)
         : filteredDispensers;
 
@@ -406,7 +414,7 @@ export interface ComposeAttachOptions {
 
 // Also add ComposeDetachOptions since it's used in stampdetach.ts
 export interface ComposeDetachOptions {
-  // Fee parameters  
+  // Fee parameters
   fee_per_kb?: number;
 
   // Optional parameters
@@ -538,7 +546,7 @@ export class XcpManager {
           .forEach((holder: any) => {
             // Use utxo_address if address is null, otherwise use address
             const effectiveAddress = holder.address || holder.utxo_address;
-            
+
             if (effectiveAddress) {
               // Add to existing quantity or create new entry
               const currentQuantity = holderMap.get(effectiveAddress) || 0;
@@ -586,7 +594,7 @@ export class XcpManager {
   ): Promise<{ balances: XcpBalance[]; total: number; next_cursor?: string }> {
     const baseEndpoint = `/addresses/${address}/balances`;
     const endpoint = cpid ? `${baseEndpoint}/${cpid}` : baseEndpoint;
-    
+
     const defaultParams = new URLSearchParams();
     defaultParams.append("type", options.type || "all");
     defaultParams.append("limit", (options.limit || 50).toString());
@@ -629,11 +637,11 @@ export class XcpManager {
                 .filter((balance: any) => balance.quantity > 0)
                 .forEach((balance: any,index:number) => {
                     const effectiveAddress = balance.address || balance.utxo_address;
-                    
+
                     if (effectiveAddress) {
                         const key = `${effectiveAddress}-${balance.asset}-${index}`;
                         const existing = balanceMap.get(key);
-                        
+
                         if (existing) {
                             existing.quantity += balance.quantity;
                         } else {
@@ -700,7 +708,7 @@ export class XcpManager {
     try {
       const MAX_RETRIES = 3;
       const attempt = 0;
-      
+
       while (attempt < MAX_RETRIES) {
         await logger.info("api", {
           message: "[XcpManager] Starting balance fetch attempt",
@@ -714,7 +722,7 @@ export class XcpManager {
         let allBalances: XcpBalance[] = [];
         let cursor: string | null = null;
         let expectedTotal: number | null = null;
-        
+
         do {
           // Prepare options for each request
           const options: XcpBalanceOptions = {
@@ -722,7 +730,7 @@ export class XcpManager {
             limit: 500,
             verbose: true
           };
-          
+
           if (cursor) {
             options.cursor = cursor;
           }
@@ -1012,7 +1020,7 @@ export class XcpManager {
 
     queryParams.append("dispenser", dispenser);
     queryParams.append("quantity", quantity.toString());
-    
+
     // Handle options carefully to avoid deprecated fields and prioritize correct ones
     const finalApiOptions: Record<string, string | number | boolean> = {};
 
@@ -1037,14 +1045,14 @@ export class XcpManager {
       if (value !== undefined && value !== null) {
         if (key === 'regular_dust_size') continue; // Skip deprecated
         if (key === 'fee_per_kb' && options.sat_per_vbyte !== undefined) continue; // Skip if sat_per_vbyte is used
-        
+
         // If key is already set (like sat_per_vbyte from fee_per_kb), don't override from generic options spread
         if (!(key in finalApiOptions)) {
             finalApiOptions[key] = value.toString();
         }
       }
     }
-    
+
     // Ensure return_psbt is explicitly set based on what the route wants (which is now false)
     if (options.return_psbt !== undefined) {
         finalApiOptions.return_psbt = options.return_psbt;
@@ -1063,15 +1071,15 @@ export class XcpManager {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
       console.log(`Attempting to fetch from URL: ${url}`);
 
-      try {
-        const response = await fetch(url);
+            try {
+        const response = await httpClient.get(url);
         console.log(`Response status from ${node.name}: ${response.status}`);
 
         if (!response.ok) {
-          const errorBody = await response.text();
+          const errorBody = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
           console.error(`Error response body from ${node.name}: ${errorBody}`);
           try {
-            const errorJson = JSON.parse(errorBody);
+            const errorJson = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
             if (errorJson.error) {
               lastError = errorJson.error;
             }
@@ -1081,10 +1089,10 @@ export class XcpManager {
           continue; // Try the next node
         }
 
-        const data = await response.json();
+        const data = response.data;
         // DETAILED LOGGING OF THE RAW RESPONSE FROM COUNTERPARTY
         console.log(`[XcpManager.createDispense] RAW RESPONSE from ${node.name} for dispense:`);
-        console.log(JSON.stringify(data, null, 2)); 
+        console.log(JSON.stringify(data, null, 2));
         // END DETAILED LOGGING
 
         console.log(`Successful response from ${node.name}`);
@@ -1141,7 +1149,7 @@ export class XcpManager {
     queryParams.append("destination", destination);
     queryParams.append("asset", asset);
     queryParams.append("quantity", quantity.toString());
-    
+
     // Set default dust size if not provided
     if (!options.regular_dust_size) {
       queryParams.append("regular_dust_size", "546"); // Bitcoin's standard dust limit
@@ -1161,14 +1169,14 @@ export class XcpManager {
       console.log(`Attempting to fetch from URL: ${url}`);
 
       try {
-        const response = await fetch(url);
+        const response = await httpClient.get(url);
         console.log(`Response status from ${node.name}: ${response.status}`);
 
         if (!response.ok) {
-          const errorBody = await response.text();
+          const errorBody = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
           console.error(`Error response body from ${node.name}: ${errorBody}`);
           try {
-            const errorJson = JSON.parse(errorBody);
+            const errorJson = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
             if (errorJson.error) {
               lastError = errorJson.error;
             }
@@ -1178,7 +1186,7 @@ export class XcpManager {
           continue; // Try the next node
         }
 
-        const data = await response.json();
+        const data = response.data;
         console.log(`Successful response from ${node.name}`);
         return data;
       } catch (error) {
@@ -1211,14 +1219,14 @@ export class XcpManager {
     // Default return_psbt to false if not specified by the caller for this new flow
     // If the caller wants a PSBT directly from CP, they can set options.return_psbt = true
     if (options.return_psbt === undefined) {
-        queryParams.append("return_psbt", "false"); 
+        queryParams.append("return_psbt", "false");
     } else {
         queryParams.append("return_psbt", options.return_psbt.toString());
     }
 
     // Handle fee_per_kb: XCP API for compose operations often requires fee_per_kb.
     // The route handler will later calculate the final fee with user's preferred satsPerVB.
-    // For this call, if options.fee_per_kb is provided, use it. Otherwise, a default might be needed 
+    // For this call, if options.fee_per_kb is provided, use it. Otherwise, a default might be needed
     // or the CP API might error. For now, assume if not provided, CP uses a default or handles it.
     if (options.fee_per_kb) {
       queryParams.append("fee_per_kb", Math.floor(options.fee_per_kb).toString());
@@ -1239,7 +1247,7 @@ export class XcpManager {
         queryParams.append(key, String(value));
       }
     }
-    
+
     // Remove potentially problematic defaults that might have been in ComposeAttachOptions if not intended for this call
     // if (!options.multisig_dust_size) queryParams.delete("multisig_dust_size"); // Example: if you don't want default
 
@@ -1310,14 +1318,14 @@ export class XcpManager {
       console.log(`Attempting to fetch from URL: ${url}`);
 
       try {
-        const response = await fetch(url);
+        const response = await httpClient.get(url);
         console.log(`Response status from ${node.name}: ${response.status}`);
 
         if (!response.ok) {
-          const errorBody = await response.text();
+          const errorBody = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
           console.error(`Error response body from ${node.name}: ${errorBody}`);
           try {
-            const errorJson = JSON.parse(errorBody);
+            const errorJson = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
             if (errorJson.error) {
               lastError = errorJson.error;
             }
@@ -1327,7 +1335,7 @@ export class XcpManager {
           continue;
         }
 
-        const data = await response.json();
+        const data = response.data;
         console.log(`Successful response from ${node.name}`);
         return data;
       } catch (error) {
@@ -1406,16 +1414,16 @@ export class XcpManager {
       console.log(`Attempting to fetch from URL: ${url}`);
 
       try {
-        const response = await fetch(url);
+        const response = await httpClient.get(url);
         console.log(`Response status from ${node.name}: ${response.status}`);
 
         if (!response.ok) {
-          const errorBody = await response.text();
+          const errorBody = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
           console.error(`Error response body from ${node.name}: ${errorBody}`);
           continue; // Try the next node
         }
 
-        const data = await response.json();
+        const data = response.data;
         console.log(`Successful response from ${node.name}`);
         return data;
       } catch (error) {
@@ -1479,16 +1487,16 @@ export class XcpManager {
       console.log(`Attempting to fetch from URL: ${url}`);
 
       try {
-        const response = await fetch(url);
+        const response = await httpClient.get(url);
         console.log(`Response status from ${node.name}: ${response.status}`);
 
         if (!response.ok) {
-          const errorBody = await response.text();
+          const errorBody = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
           console.error(`Error response body from ${node.name}: ${errorBody}`);
           continue; // Try the next node
         }
 
-        const data = await response.json();
+        const data = response.data;
         console.log(`Successful response from ${node.name}`, data);
         return data;
       } catch (error) {
@@ -1607,8 +1615,8 @@ export class XcpManager {
     }
 
     // Validate fee_per_kb (satsPerKB in original)
-    const feePerKB = typeof options.fee_per_kb === "string" 
-      ? Number(options.fee_per_kb) 
+    const feePerKB = typeof options.fee_per_kb === "string"
+      ? Number(options.fee_per_kb)
       : options.fee_per_kb;
     if (feePerKB !== undefined && (isNaN(feePerKB) || feePerKB <= 0)) {
       throw new Error("Invalid fee_per_kb parameter. Expected a positive number.");
@@ -1620,7 +1628,7 @@ export class XcpManager {
     // Add required parameters
     queryParams.append("asset", asset);
     queryParams.append("quantity", validatedQuantity.toString());
-    
+
     // Always set encoding to OP_RETURN for CIP33
     queryParams.append("encoding", "opreturn");
 
@@ -1670,7 +1678,7 @@ export class XcpManager {
         console.log(`Attempting to fetch from URL: ${url}`);
 
         try {
-          const response = await fetch(url);
+          const response = await httpClient.get(url);
           console.log(`Response status from ${node.name}: ${response.status}`);
 
           // If asset doesn't exist, continue to next node
@@ -1679,12 +1687,12 @@ export class XcpManager {
           }
 
           if (!response.ok) {
-            const errorBody = await response.text();
+            const errorBody = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
             console.error(`Error response body from ${node.name}: ${errorBody}`);
             continue;
           }
 
-          const data = await response.json();
+          const data = response.data;
           if (data && data.result) {
             return data.result;
           }
@@ -1752,7 +1760,7 @@ export class XcpManager {
       pageParams.set('limit', limit.toString());
       pageParams.set('offset', skipCount.toString());
       const response = await this.fetchXcpV2WithCache<any>(endpoint, pageParams);
-      
+
       if (!response || !Array.isArray(response.result)) {
         return {
           dispensers: [],
@@ -1807,7 +1815,7 @@ export class XcpManager {
       // Using the cache function with a short timeout for health checks
       // Health checks should be cached for less time than regular API calls
       const cacheTime = cacheTimeout || 60000; // Default to 1 minute cache for health checks
-      
+
       const response = await this.fetchXcpV2WithCache<{ result: { status: string } }>(
         endpoint,
         queryParams,

@@ -451,7 +451,7 @@ export function SRC20MintTool({
       </form>
 
       {/* ===== FEE CALCULATOR ===== */}
-      <div className={containerBackground}>
+      <div class={containerBackground}>
         <FeeCalculatorSimple
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

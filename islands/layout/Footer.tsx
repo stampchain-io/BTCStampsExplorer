@@ -106,7 +106,7 @@ const socialLinks = [
 export function Footer() {
   /* ===== COMPONENT RENDER ===== */
   return (
-    <footer className="
+    <footer class="
       flex flex-col tablet:flex-row justify-between max-w-desktop w-full mx-auto 
       px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
       pt-24 pb-6 tablet:pt-24 tablet:pb-6
@@ -116,7 +116,7 @@ export function Footer() {
       <img
         src={STAMPCHAIN_LOGO_IMAGE}
         alt=""
-        className="
+        class="
           absolute z-[-999]
           size-[270px] mobileMd:size-[250px]
           -bottom-11 mobileMd:-bottom-10
@@ -128,26 +128,26 @@ export function Footer() {
       />
 
       {/* ===== MOBILE SMALL CENTER SECTION - MOBILE MEDIUM+ LEFT SECTION ===== */}
-      <div className="
+      <div class="
         flex flex-col mobileMd:flex-row tablet:flex-col w-full 
         justify-start mobileMd:justify-between tablet:justify-start 
         items-center mobileMd:items-end tablet:items-start gap-1
       ">
         {/* ===== LOGO AND TAGLINE ===== */}
-        <div className="flex flex-col">
-          <h5 className={`${logoPurpleDL} text-center mobileMd:text-left`}>
+        <div class="flex flex-col">
+          <h5 class={`${logoPurpleDL} text-center mobileMd:text-left`}>
             STAMPCHAIN
-            <span className="font-extralight pr-1">.IO</span>
+            <span class="font-extralight pr-1">.IO</span>
           </h5>
           <h6
-            className={`${tagline} text-center mobileMd:text-left`}
+            class={`${tagline} text-center mobileMd:text-left`}
           >
             IMMORTALISED ART - STORED ON BITCOIN
           </h6>
         </div>
 
         {/* ===== SOCIAL MEDIA ICONS ===== */}
-        <div className="flex gap-6 tablet:gap-4 mt-3 mobileMd:mt-0 tablet:mt-3">
+        <div class="flex gap-6 tablet:gap-4 mt-3 mobileMd:mt-0 tablet:mt-3">
           {socialLinks.map((link, index) => (
             <div key={index}>
               {link.icon}
@@ -157,17 +157,17 @@ export function Footer() {
       </div>
 
       {/* ===== DESKTOP RIGHT SECTION ===== */}
-      <div className={`${overlayPurple}`}>
-        <div className="hidden tablet:flex flex-row justify-end w-[300px] pt-1">
+      <div class={`${overlayPurple}`}>
+        <div class="hidden tablet:flex flex-row justify-end w-[300px] pt-1">
           {/* ===== RESOURCES LINKS ===== */}
-          <div className="flex w-1/2 ">
-            <div className="flex flex-col w-full justify-center gap-1">
+          <div class="flex w-1/2 ">
+            <div class="flex flex-col w-full justify-center gap-1">
               {resourcesLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
                   f-partial={link.isExternal ? "" : link.href}
-                  className={`${navLinkTransparentPurple}`}
+                  class={`${navLinkTransparentPurple}`}
                   target={link.isExternal ? "_blank" : undefined}
                   rel={link.isExternal ? "noopener noreferrer" : undefined}
                 >
@@ -178,14 +178,14 @@ export function Footer() {
           </div>
 
           {/* ===== ABOUT LINKS  ===== */}
-          <div className="flex w-1/2">
-            <div className="flex flex-col w-full justify-center gap-1 text-right">
+          <div class="flex w-1/2">
+            <div class="flex flex-col w-full justify-center gap-1 text-right">
               {aboutLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
                   f-partial={link.isExternal ? "" : link.href}
-                  className={`${navLinkTransparentPurple}`}
+                  class={`${navLinkTransparentPurple}`}
                   target={link.isExternal ? "_blank" : undefined}
                   rel={link.isExternal ? "noopener noreferrer" : undefined}
                 >
@@ -198,14 +198,14 @@ export function Footer() {
 
         {/* ===== MOBILE BOTTOM ROW SECTION ===== */}
         {/* ===== MIXED LINKS  ===== */}
-        <div className="flex tablet:hidden w-[360px] mobileMd:w-full justify-center mobileMd:justify-start mx-auto mt-2 mobileMd:mt-1 mb-2">
-          <div className="flex flex-row w-full justify-between">
+        <div class="flex tablet:hidden w-[360px] mobileMd:w-full justify-center mobileMd:justify-start mx-auto mt-2 mobileMd:mt-1 mb-2">
+          <div class="flex flex-row w-full justify-between">
             {mobileLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 f-partial={link.isExternal ? "" : link.href}
-                className={`${navLinkTransparentPurple}`}
+                class={`${navLinkTransparentPurple}`}
                 target={link.isExternal ? "_blank" : undefined}
                 rel={link.isExternal ? "noopener noreferrer" : undefined}
               >
@@ -214,17 +214,17 @@ export function Footer() {
             ))}
             {/* ===== COPYRIGHT SECTION - MOBILEMD + MOBILELG ===== */}
             <h6
-              className={`${copyright} hidden mobileMd:block tablet:hidden`}
+              class={`${copyright} hidden mobileMd:block tablet:hidden`}
             >
-              <span className="italic">STAMPCHAIN</span> &copy; 2025
+              <span class="italic">STAMPCHAIN</span> &copy; 2025
             </h6>
           </div>
         </div>
 
         {/* ===== COPYRIGHT SECTION - BASE/MOBILESM + TABLET/DESKTOP ===== */}
-        <div className="flex flex-row mobileMd:hidden tablet:block w-full justify-center tablet:justify-end tablet:text-right mt-3 tablet:mt-4">
-          <h6 className={`${copyright}`}>
-            <span className="italic">STAMPCHAIN</span> &copy; 2025
+        <div class="flex flex-row mobileMd:hidden tablet:block w-full justify-center tablet:justify-end tablet:text-right mt-3 tablet:mt-4">
+          <h6 class={`${copyright}`}>
+            <span class="italic">STAMPCHAIN</span> &copy; 2025
           </h6>
         </div>
       </div>

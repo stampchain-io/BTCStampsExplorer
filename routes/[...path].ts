@@ -1,4 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
+import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 
 export const handler: Handlers = {
   GET(req, ctx) {
@@ -34,8 +35,5 @@ function handleLegacyRedirect(url: URL): Response {
     redirectPath = `/stamp/${params.stampNumber}`;
   }
 
-  return new Response("", {
-    status: 301,
-    headers: { Location: redirectPath },
-  });
+  return WebResponseUtil.redirect(redirectPath, 301);
 }

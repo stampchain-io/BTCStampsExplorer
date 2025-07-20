@@ -27,21 +27,21 @@ export const CollectionDetailHeader = (
 
   /* ===== COMPONENT ===== */
   return (
-    <div className="flex flex-col gap-6">
+    <div class="flex flex-col gap-6">
       <SearchStampModal showButton={false} />
       {/* ===== COLLECTION INFO SECTION ===== */}
-      <div className={containerBackground}>
-        <div className="flex justify-between">
-          <div className="flex">
+      <div class={containerBackground}>
+        <div class="flex justify-between">
+          <div class="flex">
             <img
               src={stamps[0].stamp_url}
               loading="lazy"
               onError={handleImageError}
               alt="Collection image"
-              className="h-[91px] w-[91px] object-contain items-center pixelart image-rendering-pixelated"
+              class="h-[91px] w-[91px] object-contain items-center pixelart image-rendering-pixelated"
             />
-            <div className="flex flex-col pl-6">
-              <h1 className={`${titleGreyLD} pb-1.5`}>
+            <div class="flex flex-col pl-6">
+              <h1 class={`${titleGreyLD} pb-1.5`}>
                 {collection.collection_name.length > 12
                   ? (
                     <>
@@ -56,12 +56,12 @@ export const CollectionDetailHeader = (
                   )
                   : collection.collection_name.toUpperCase()}
               </h1>
-              <h2 className={labelSm}>
+              <h2 class={labelSm}>
                 COLLECTION BY
               </h2>
               <div>
                 <a
-                  className={headingGreyDLLink}
+                  class={headingGreyDLLink}
                   href={`/wallet/${collection.creators?.[0] || ""}`}
                   target="_parent"
                 >
@@ -78,12 +78,12 @@ export const CollectionDetailHeader = (
         </div>
 
         {collection.collection_description && (
-          <div className="flex flex-col pt-3 min-[520px]:pt-[18px]">
-            <div className={containerColData}>
-              <h5 className={labelSm}>
+          <div class="flex flex-col pt-3 min-[520px]:pt-[18px]">
+            <div class={containerColData}>
+              <h5 class={labelSm}>
                 ABOUT
               </h5>
-              <h6 className={`${textSm} pt-1 mb-0`}>
+              <h6 class={`${textSm} pt-1 mb-0`}>
                 {collection.collection_description}
               </h6>
             </div>
@@ -93,26 +93,26 @@ export const CollectionDetailHeader = (
 
       {/* ===== COLLECTION STATS SECTION ===== */}
       <div class={containerBackground}>
-        <div className="flex flex-col">
-          <h5 className={labelSm}>
+        <div class="flex flex-col">
+          <h5 class={labelSm}>
             MARKETCAP
           </h5>
-          <h6 className={value3xl}>
+          <h6 class={value3xl}>
             {collection.marketData?.minFloorPriceBTC !== null &&
                 collection.total_editions
               ? formatMarketCap(
                 collection.marketData!.minFloorPriceBTC *
                   collection.total_editions,
               )
-              : "N/A"} <span className="font-light">BTC</span>
+              : "N/A"} <span class="font-light">BTC</span>
           </h6>
         </div>
         <div class="flex flex-wrap justify-between pt-3">
-          <div className="-space-y-0.5">
-            <h5 className={labelSm}>
+          <div class="-space-y-0.5">
+            <h5 class={labelSm}>
               HOLDERS
             </h5>
-            <h6 className={valueSm}>
+            <h6 class={valueSm}>
               {collection.marketData?.totalUniqueHolders
                 ? formatNumberWithCommas(
                   collection.marketData.totalUniqueHolders,
@@ -120,48 +120,48 @@ export const CollectionDetailHeader = (
                 : "N/A"}
             </h6>
           </div>
-          <div className="hidden min-[520px]:block text-center -space-y-0.5">
-            <h5 className={labelSm}>
+          <div class="hidden min-[520px]:block text-center -space-y-0.5">
+            <h5 class={labelSm}>
               EDITIONS
             </h5>
-            <h6 className={valueSm}>
+            <h6 class={valueSm}>
               {Number(collection.total_editions).toFixed(0)}
             </h6>
           </div>
-          <div className="text-right -space-y-0.5">
-            <h5 className={labelSm}>
+          <div class="text-right -space-y-0.5">
+            <h5 class={labelSm}>
               STAMPS
             </h5>
-            <h6 className={valueSm}>{collection.stamp_count}</h6>
+            <h6 class={valueSm}>{collection.stamp_count}</h6>
           </div>
         </div>
         <div class="flex flex-wrap justify-between pt-3">
-          <div className="-space-y-0.5">
-            <h5 className={labelSm}>
+          <div class="-space-y-0.5">
+            <h5 class={labelSm}>
               FLOOR PRICE
             </h5>
-            <h6 className={valueSm}>
+            <h6 class={valueSm}>
               {collection.marketData?.minFloorPriceBTC !== null &&
                   collection.marketData?.minFloorPriceBTC !== undefined
                 ? `${formatBTC(collection.marketData.minFloorPriceBTC)} BTC`
                 : "N/A BTC"}
             </h6>
           </div>
-          <div className="hidden min-[520px]:block text-center -space-y-0.5">
-            <h5 className={labelSm}>
+          <div class="hidden min-[520px]:block text-center -space-y-0.5">
+            <h5 class={labelSm}>
               24H VOLUME
             </h5>
-            <h6 className={valueSm}>
+            <h6 class={valueSm}>
               {collection.marketData?.totalVolume24hBTC !== undefined
                 ? `${formatVolume(collection.marketData.totalVolume24hBTC)} BTC`
                 : "N/A BTC"}
             </h6>
           </div>
-          <div className="text-right -space-y-0.5">
-            <h5 className={labelSm}>
+          <div class="text-right -space-y-0.5">
+            <h5 class={labelSm}>
               AVG PRICE
             </h5>
-            <h6 className={valueSm}>
+            <h6 class={valueSm}>
               {collection.marketData?.avgFloorPriceBTC !== null &&
                   collection.marketData?.avgFloorPriceBTC !== undefined
                 ? `${formatBTC(collection.marketData.avgFloorPriceBTC)} BTC`

@@ -1,17 +1,17 @@
 /* ===== BUY STAMP MODAL COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
-import type { StampRow } from "$globals";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
-import { logger } from "$lib/utils/logger.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { ModalBase } from "$layout";
-import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
-import { closeModal, openModal } from "$islands/modal/states.ts";
+import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { StampImage } from "$content";
 import { inputFieldSquare } from "$form";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
+import type { StampRow } from "$globals";
+import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
+import { closeModal, openModal } from "$islands/modal/states.ts";
+import { ModalBase } from "$layout";
+import { logger } from "$lib/utils/logger.ts";
 import { showToast } from "$lib/utils/toastSignal.ts";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -39,9 +39,14 @@ const BuyStampModal = ({
   const [totalPrice, setTotalPrice] = useState(0);
 
   /* ===== COMPUTED VALUES ===== */
+  // v2.3 API: Use marketData for pricing with legacy fallback
+  const stampWithMarketData = stamp as any;
+  const marketData = stampWithMarketData?.marketData;
+
   const displayPrice = dispenser
     ? parseInt(dispenser.satoshirate.toString(), 10) / 100000000
-    : (typeof stamp.floorPrice === "number" ? stamp.floorPrice : 0);
+    : (marketData?.lastPriceBTC ||
+      (typeof stamp.floorPrice === "number" ? stamp.floorPrice : 0));
 
   /* ===== FORM HANDLING ===== */
   const {

@@ -9,10 +9,8 @@ import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import type {
-  ScriptTypeInfo,
-  UTXO as DetailedUTXO,
-} from "$lib/types/transaction.d.ts";
+import type { ScriptTypeInfo } from "$lib/types/transaction.d.ts";
+import type { UTXO as DetailedUTXO } from "$lib/types/index.d.ts";
 
 interface SendRequestBody {
   address: string; // Source address for CP, and for fetching UTXO details if needed

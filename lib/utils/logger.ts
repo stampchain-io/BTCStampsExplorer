@@ -5,6 +5,7 @@ interface LogMessage {
 
 type LogLevel = "debug" | "error" | "info" | "warn";
 export type LogNamespace =
+  | "aws"
   | "stamps"
   | "content"
   | "api"
@@ -13,11 +14,13 @@ export type LogNamespace =
   | "auth"
   | "system"
   | "ui"
+  | "src101"
   | "src20"
   | "stamp-create"
   | "src20-transfer"
   | "src20-deploy"
   | "src20-mint"
+  | "src20-multisig"
   | "quicknode-service"
   | "common-utxo-service"
   | "transaction-utxo-service"
@@ -27,6 +30,8 @@ export type LogNamespace =
   | "src101-psbt-service"
   | "src20-operation-service"
   | "src101-operation-service"
+  | "src20-multisig-psbt-service"
+  | "transaction-utxo-service"
   | "api-src101-create"
   | "broadcast"
   | "src20-utility";

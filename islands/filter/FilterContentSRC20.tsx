@@ -178,7 +178,7 @@ export const FilterContentSRC20 = ({
   };
 
   return (
-    <div className="space-y-1.5 tablet:space-y-1">
+    <div class="space-y-1.5 tablet:space-y-1">
       {/* STATUS SECTION - Independent group */}
       <CollapsibleSection
         title="STATUS"

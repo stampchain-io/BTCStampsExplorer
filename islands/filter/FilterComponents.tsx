@@ -690,9 +690,9 @@ export const RangeSlider = ({
   };
 
   return (
-    <div className={`w-full ${variant === "price" ? "mt-0 mb-2" : ""}`}>
-      <div className="flex w-full justify-center pb-1.5 tablet:pb-1">
-        <div className="flex items-center text-sm tablet:text-xs font-regular">
+    <div class={`w-full ${variant === "price" ? "mt-0 mb-2" : ""}`}>
+      <div class="flex w-full justify-center pb-1.5 tablet:pb-1">
+        <div class="flex items-center text-sm tablet:text-xs font-regular">
           {/* Min Value - Clickable/Editable */}
           {editingMin
             ? (
@@ -762,7 +762,7 @@ export const RangeSlider = ({
                 }}
                 placeholder="0"
                 tabIndex={1}
-                className={`${
+                class={`${
                   variant === "price"
                     ? "w-[84px] tablet:w-[72px]"
                     : "w-[72px] tablet:w-16"
@@ -772,7 +772,7 @@ export const RangeSlider = ({
             )
             : (
               <div
-                className={`${
+                class={`${
                   variant === "price"
                     ? "w-[84px] tablet:w-[72px]"
                     : "w-[72px] tablet:w-16"
@@ -787,7 +787,7 @@ export const RangeSlider = ({
               </div>
             )}
 
-          <span className="mx-2 text-stamp-grey">-</span>
+          <span class="mx-2 text-stamp-grey">-</span>
 
           {/* Max Value - Clickable/Editable */}
           {editingMax
@@ -858,13 +858,13 @@ export const RangeSlider = ({
                 }}
                 placeholder="NO LIMIT"
                 tabIndex={2}
-                className="w-[72px] tablet:w-16 text-left bg-transparent text-stamp-grey-light placeholder:text-stamp-grey-light px-1 text-sm tablet:text-xs outline-none focus:outline-none focus:ring-0 border-0 border-b-[1px] border-stamp-grey-light focus:border-b-[1px] focus:border-stamp-grey-light no-outline"
+                class="w-[72px] tablet:w-16 text-left bg-transparent text-stamp-grey-light placeholder:text-stamp-grey-light px-1 text-sm tablet:text-xs outline-none focus:outline-none focus:ring-0 border-0 border-b-[1px] border-stamp-grey-light focus:border-b-[1px] focus:border-stamp-grey-light no-outline"
                 autoFocus
               />
             )
             : (
               <div
-                className={`w-[72px] tablet:w-16 text-left cursor-pointer select-none ${
+                class={`w-[72px] tablet:w-16 text-left cursor-pointer select-none ${
                   hoveredHandle === "max"
                     ? "text-stamp-grey-light"
                     : "text-stamp-grey"
@@ -878,13 +878,13 @@ export const RangeSlider = ({
       </div>
 
       <div
-        className="relative h-5 tablet:h-4 rounded-full bg-stamp-grey-darkest border-2 border-stamp-grey-darkest cursor-pointer"
+        class="relative h-5 tablet:h-4 rounded-full bg-stamp-grey-darkest border-2 border-stamp-grey-darkest cursor-pointer"
         ref={sliderRef}
         onClick={handleTrackClick}
       >
         {/* Track fill with dynamic gradient */}
         <div
-          className="absolute top-0 bottom-0 h-4 tablet:h-3 rounded-full transition-colors duration-300 pointer-events-none"
+          class="absolute top-0 bottom-0 h-4 tablet:h-3 rounded-full transition-colors duration-300 pointer-events-none"
           style={trackGradientFill(hoveredHandle)}
         />
 
@@ -900,7 +900,7 @@ export const RangeSlider = ({
           onMouseEnter={() => setHoveredHandle("min")}
           onMouseLeave={() => setHoveredHandle(null)}
           tabIndex={3}
-          className={`${handleIcon} ${
+          class={`${handleIcon} ${
             lastChangedHandle === "min" ? "z-20" : "z-10"
           }`}
         />
@@ -917,14 +917,14 @@ export const RangeSlider = ({
           onMouseEnter={() => setHoveredHandle("max")}
           onMouseLeave={() => setHoveredHandle(null)}
           tabIndex={4}
-          className={`${handleIcon} ${
+          class={`${handleIcon} ${
             lastChangedHandle === "max" ? "z-20" : "z-10"
           }`}
         />
       </div>
 
       {/* Tick marks for the segment boundaries */}
-      <div className="relative w-full h-6 pt-1.5 tablet:pt-1 text-xs tablet:text-[10px] font-regular text-stamp-grey-darker cursor-default select-none">
+      <div class="relative w-full h-6 pt-1.5 tablet:pt-1 text-xs tablet:text-[10px] font-regular text-stamp-grey-darker cursor-default select-none">
         {config.tickMarks.map((mark, index) => {
           const position = config.tickMarkPositions[index];
           const isFirst = index === 0;
@@ -933,7 +933,7 @@ export const RangeSlider = ({
           return (
             <p
               key={index}
-              className={`absolute ${position} ${
+              class={`absolute ${position} ${
                 isFirst
                   ? "transform-none"
                   : isLast
@@ -965,8 +965,8 @@ interface RangeInputProps {
 export const RangeInput = (
   { label, placeholder, value, onChange, type }: RangeInputProps,
 ) => (
-  <div className="flex flex-col space-y-1">
-    <label className="text-base tablet:text-xs font-medium text-stamp-grey-light">
+  <div class="flex flex-col space-y-1">
+    <label class="text-base tablet:text-xs font-medium text-stamp-grey-light">
       {label}
     </label>
     <input
@@ -1018,7 +1018,7 @@ export const RangeInput = (
       step={type === "price" ? "0.00000001" : "1"}
       inputMode="decimal"
       pattern={type === "price" ? "[0-9]*[.]?[0-9]*" : "[0-9]*"}
-      className="h-10 tablet:h-9 px-3 tablet:px-4 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-base tablet:text-sm font-medium placeholder:text-xs w-full outline-none focus:bg-stamp-grey-light"
+      class="h-10 tablet:h-9 px-3 tablet:px-4 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-base tablet:text-sm font-medium placeholder:text-xs w-full outline-none focus:bg-stamp-grey-light"
       placeholder={placeholder}
     />
   </div>
@@ -1052,25 +1052,25 @@ export const Checkbox = ({
   };
 
   return (
-    <div className="flex flex-col">
+    <div class="flex flex-col">
       <div
-        className="flex items-center py-1.5 tablet:py-1.5 cursor-pointer group"
+        class="flex items-center py-1.5 tablet:py-1.5 cursor-pointer group"
         onMouseLeave={handleMouseLeave}
         onClick={handleChange}
       >
         <input
-          className={inputCheckbox(checked, canHoverSelected)}
+          class={inputCheckbox(checked, canHoverSelected)}
           type="checkbox"
           checked={checked}
           readOnly
         />
-        <label className={labelLogicResponsive(checked, canHoverSelected)}>
+        <label class={labelLogicResponsive(checked, canHoverSelected)}>
           {label}
         </label>
       </div>
 
       {hasDropdown && checked && dropdownContent && (
-        <div className="ml-0.5 mt-1 mb-2">
+        <div class="ml-0.5 mt-1 mb-2">
           {dropdownContent}
         </div>
       )}
@@ -1103,19 +1103,19 @@ export const Radiobutton = (
 
   return (
     <div
-      className="flex items-center cursor-pointer group"
+      class="flex items-center cursor-pointer group"
       onMouseLeave={handleMouseLeave}
       onClick={handleChange}
     >
       <input
-        className={inputCheckbox(checked, canHoverSelected)}
+        class={inputCheckbox(checked, canHoverSelected)}
         type="radio"
         name={name}
         value={value}
         checked={checked}
         readOnly
       />
-      <label className={labelLogicResponsive(checked, canHoverSelected)}>
+      <label class={labelLogicResponsive(checked, canHoverSelected)}>
         {label}
       </label>
     </div>
