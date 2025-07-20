@@ -9,26 +9,26 @@ export default function TeamBanner() {
     <>
       <section>
         {/* ===== TEAM SECTION CONTAINER ===== */}
-        <div className="w-full flex justify-start items-start py-9">
-          <div className="w-full">
+        <div class="w-full flex justify-start items-start py-9">
+          <div class="w-full">
             {/* ===== SECTION TITLE ===== */}
-            <h2 className={subtitlePurple}>THE TEAM</h2>
+            <h2 class={subtitlePurple}>THE TEAM</h2>
 
             {/* ===== TEAM MEMBERS GRID ===== */}
             <div
-              className={`flex justify-between items-start
+              class={`flex justify-between items-start
              mx-0 mobileLg:mx-12 desktop:mx-16 mt-4
               ${gapGrid}`}
             >
               {/* ===== MIKE IN SPACE CARD ===== */}
-              <div className="flex flex-col items-center">
+              <div class="flex flex-col items-center">
                 <img src="/img/profile/mike.png" />
-                <h5 className={headingPurpleLD}>
+                <h5 class={headingPurpleLD}>
                   MIKE IN SPACE
                 </h5>
-                <h6 className={valueSmPurple}>
+                <h6 class={valueSmPurple}>
                   CODE{" "}
-                  <span className="mobileMd:hidden">
+                  <span class="mobileMd:hidden">
                     <br />
                   </span>
                   CONOISSEUR
@@ -36,14 +36,14 @@ export default function TeamBanner() {
               </div>
 
               {/* ===== REINAMORA CARD ===== */}
-              <div className="flex flex-col items-center">
+              <div class="flex flex-col items-center">
                 <img src="/img/profile/kevin.png" />
-                <h5 className={headingPurpleLD}>
+                <h5 class={headingPurpleLD}>
                   REINAMORA
                 </h5>
-                <h6 className={valueSmPurple}>
+                <h6 class={valueSmPurple}>
                   BACKEND{" "}
-                  <span className="mobileMd:hidden">
+                  <span class="mobileMd:hidden">
                     <br />
                   </span>
                   BIGBRAINS
@@ -51,14 +51,14 @@ export default function TeamBanner() {
               </div>
 
               {/* ===== ARWYN CARD ===== */}
-              <div className="flex flex-col items-center">
+              <div class="flex flex-col items-center">
                 <img src="/img/profile/arwyn.png" />
-                <h5 className={headingPurpleLD}>
+                <h5 class={headingPurpleLD}>
                   ARWYN
                 </h5>
-                <h6 className={valueSmPurple}>
+                <h6 class={valueSmPurple}>
                   MEMETIC{" "}
-                  <span className="mobileMd:hidden">
+                  <span class="mobileMd:hidden">
                     <br />
                   </span>MASTER
                 </h6>

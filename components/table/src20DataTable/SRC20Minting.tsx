@@ -1,11 +1,10 @@
-import { SRC20Row } from "$globals";
-import { formatDate } from "$lib/utils/formatUtils.ts";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Timeframe } from "$layout";
-import { labelSm, textSm, valueDark } from "$text";
 import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { rowTable } from "$layout";
+import { SRC20Row } from "$globals";
+import { rowTable, Timeframe } from "$layout";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { formatDate } from "$lib/utils/formatUtils.ts";
+import { labelSm, textSm, valueDark } from "$text";
 
 interface SRC20MintingTableProps {
   data: SRC20Row[];
@@ -86,10 +85,7 @@ export function SRC20MintingTable({
                   encodeURIComponent(src20.tick)
                 }&trxType=olga`;
 
-                const handleMintClick = (event: MouseEvent) => {
-                  event.preventDefault();
-                  globalThis.location.href = mintHref;
-                };
+                // Note: Button component with href attribute handles navigation automatically
 
                 return (
                   <tr
@@ -201,7 +197,6 @@ export function SRC20MintingTable({
                         color="purple"
                         size="xs"
                         href={mintHref}
-                        onClick={handleMintClick}
                       >
                         MINT
                       </Button>

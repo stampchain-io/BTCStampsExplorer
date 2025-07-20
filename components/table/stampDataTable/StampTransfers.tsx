@@ -1,6 +1,6 @@
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { rowTable } from "$layout";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface SendRow {
@@ -24,9 +24,7 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
     <div class="w-[500px] min-[500px]:w-full">
       <table class={`${valueSm} w-full`}>
         <colgroup>
-          {colGroup().map((col) => (
-            <col key={col.key} class={col.className} />
-          ))}
+          {colGroup().map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {sends.length > 0 && (
           <thead>
@@ -52,10 +50,6 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
                     ? (
                       <a
                         href={`/wallet/${send.source}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          globalThis.location.href = `/wallet/${send.source}`;
-                        }}
                         className={valueSmLink}
                       >
                         <span class="tablet:hidden">
@@ -73,11 +67,6 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
                     ? (
                       <a
                         href={`/wallet/${send.destination}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          globalThis.location.href =
-                            `/wallet/${send.destination}`;
-                        }}
                         className={valueSmLink}
                       >
                         <span class="tablet:hidden">

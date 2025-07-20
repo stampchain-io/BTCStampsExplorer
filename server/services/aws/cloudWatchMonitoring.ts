@@ -140,7 +140,7 @@ export class CloudWatchMonitoringService {
   /**
    * Collect ECS-specific metrics
    */
-  private async collectECSMetrics(): Promise<void> {
+  private collectECSMetrics(): void {
     if (!this.ecsMetadata?.isECS) {
       return;
     }
@@ -352,7 +352,7 @@ export class CloudWatchMonitoringService {
   /**
    * Process metric queue (send to CloudWatch or log locally)
    */
-  private async processMetricQueue(): Promise<void> {
+  private processMetricQueue(): void {
     if (this.metricQueue.length === 0) {
       return;
     }

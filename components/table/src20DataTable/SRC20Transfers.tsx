@@ -1,7 +1,7 @@
-import { SRC20Row } from "$globals";
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { SRC20Row } from "$globals";
 import { rowTable } from "$layout";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface SRC20TransfersProps {
@@ -15,9 +15,7 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
     <div class="w-[660px] min-[660px]:w-full">
       <table class={`${valueSm} w-full`}>
         <colgroup>
-          {colGroup().map((col) => (
-            <col key={col.key} class={col.className} />
-          ))}
+          {colGroup().map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {sends?.length > 0 &&
           (
@@ -42,10 +40,6 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
                 <td class={cellAlign(0, headers.length)}>
                   <a
                     href={`/wallet/${send.creator}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      globalThis.location.href = `/wallet/${send.creator}`;
-                    }}
                     className={valueSmLink}
                   >
                     <span class="tablet:hidden">
@@ -59,10 +53,6 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
                 <td class={cellAlign(1, headers.length)}>
                   <a
                     href={`/wallet/${send.destination}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      globalThis.location.href = `/wallet/${send.destination}`;
-                    }}
                     className={valueSmLink}
                   >
                     <span class="tablet:hidden">

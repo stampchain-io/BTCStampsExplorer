@@ -6,7 +6,7 @@ import { titlePurpleLD } from "$text";
 function CollectionOverviewHeader() {
   return (
     <div class="flex flex-row justify-between items-start w-full">
-      <h1 className={titlePurpleLD}>
+      <h1 class={titlePurpleLD}>
         COLLECTIONS
       </h1>
       <SearchStampModal showButton />

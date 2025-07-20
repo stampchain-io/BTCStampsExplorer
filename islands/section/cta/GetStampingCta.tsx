@@ -1,9 +1,10 @@
 /* ===== GET STAMPING CTA COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
-import { formatUSDValue } from "$lib/utils/formatUtils.ts";
-import { gapGrid } from "$layout";
 import { Button } from "$button";
+import { gapGrid } from "$layout";
+import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
+import { formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { subtitleGrey, text, titleGreyDL } from "$text";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
 export default function GetStampingCta() {
@@ -14,20 +15,31 @@ export default function GetStampingCta() {
 
   /* ===== DATA FETCHING ===== */
   useEffect(() => {
-    fetch("/api/internal/fees")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch");
-        return res.json();
-      })
-      .then(({ btcPrice, recommendedFee }) => {
-        setBtcPrice(btcPrice);
-        setRecommendedFee(recommendedFee);
+    const fetchFees = async () => {
+      try {
+        const csrfToken = await getCSRFToken();
+
+        const response = await fetch("/api/internal/fees", {
+          headers: {
+            "X-CSRF-Token": csrfToken,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch fees: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setBtcPrice(data.btcPrice);
+        setRecommendedFee(data.recommendedFee);
         setIsLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Fees fetch error:", err);
         setIsLoading(false);
-      });
+      }
+    };
+
+    fetchFees();
   }, []);
 
   /* ===== HELPERS ===== */
@@ -38,14 +50,14 @@ export default function GetStampingCta() {
   return (
     <div class="flex flex-col">
       {/* ===== HEADER SECTION ===== */}
-      <h3 className={titleGreyDL}>GET STAMPING</h3>
-      <h4 className={subtitleGrey}>IMMORTALISE YOUR ART</h4>
+      <h3 class={titleGreyDL}>GET STAMPING</h3>
+      <h4 class={subtitleGrey}>IMMORTALISE YOUR ART</h4>
 
       {/* ===== CONTENT SECTION ===== */}
       <div
-        className={`flex flex-col tablet:flex-row ${gapGrid} ${text}`}
+        class={`flex flex-col tablet:flex-row ${gapGrid} ${text}`}
       >
-        <div className="flex flex-col">
+        <div class="flex flex-col">
           <p>
             <b>
               The Stampchain stamping machine has been revamped and refitted
@@ -63,7 +75,7 @@ export default function GetStampingCta() {
             stamps.
           </p>
         </div>
-        <div className="flex flex-col -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:mt-0 tablet:text-right">
+        <div class="flex flex-col -mt-1 mobileMd:-mt-2 mobileLg:-mt-4 tablet:mt-0 tablet:text-right">
           <p>
             <b>Wanna stay true to classic A grade numerics ?</b>
             <br />
@@ -82,9 +94,9 @@ export default function GetStampingCta() {
       </div>
 
       {/* ===== BUTTONS SECTION ===== */}
-      <div className="flex flex-col pt-7 gap-3">
+      <div class="flex flex-col pt-7 gap-3">
         {/* ===== BUTTONS ===== */}
-        <div className="flex justify-end gap-6">
+        <div class="flex justify-end gap-6">
           <Button
             variant="outline"
             color="grey"
@@ -104,19 +116,19 @@ export default function GetStampingCta() {
         </div>
 
         {/* ===== PRICE/FEE INFO ===== */}
-        <div className="flex justify-end gap-5
+        <div class="flex justify-end gap-5
         font-light text-sm text-stamp-grey">
           <p>
-            <span className="text-stamp-grey-darker">FEE</span>&nbsp;
+            <span class="text-stamp-grey-darker">FEE</span>&nbsp;
             {isLoading
-              ? <span className="animate-pulse">XX</span>
-              : <span className="font-medium">{displayFee}</span>} SAT/vB
+              ? <span class="animate-pulse">XX</span>
+              : <span class="font-medium">{displayFee}</span>} SAT/vB
           </p>
           <p>
-            <span className="text-stamp-grey-darker">BTC</span>&nbsp;
+            <span class="text-stamp-grey-darker">BTC</span>&nbsp;
             {isLoading
-              ? <span className="animate-pulse">XX,XXX</span>
-              : <span className="font-medium">{displayPrice}</span>} USD
+              ? <span class="animate-pulse">XX,XXX</span>
+              : <span class="font-medium">{displayPrice}</span>} USD
           </p>
         </div>
       </div>

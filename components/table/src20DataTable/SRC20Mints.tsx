@@ -1,7 +1,7 @@
-import { SRC20Row } from "$globals";
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { SRC20Row } from "$globals";
 import { rowTable } from "$layout";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface SRC20MintsProps {
@@ -15,9 +15,7 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
     <div class="w-[660px] min-[660px]:w-full">
       <table class={`${valueSm} w-full`}>
         <colgroup>
-          {colGroup().map((col) => (
-            <col key={col.key} class={col.className} />
-          ))}
+          {colGroup().map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {mints.length > 0 && (
           <thead>
@@ -44,10 +42,6 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
                 <td class={cellAlign(1, headers.length)}>
                   <a
                     href={`/wallet/${mint.destination}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      globalThis.location.href = `/wallet/${mint.destination}`;
-                    }}
                     className={valueSmLink}
                   >
                     <span class="tablet:hidden">

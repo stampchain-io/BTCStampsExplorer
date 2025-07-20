@@ -93,19 +93,19 @@ export function StampOverviewGallery({
 
   /* ===== RENDER ===== */
   return (
-    <div className="
+    <div class="
         flex flex-col max-w-desktop w-full mx-auto
         gap-12 mobileLg:gap-24 desktop:gap-36
       ">
       {/* ===== LATEST ART STAMPS SECTION ===== */}
-      <div className="flex flex-col">
-        <div className="w-full">
-          <h1 className={titlePurpleDL}>
-            <span className="block mobileLg:hidden">LATEST STAMPS</span>
-            <span className="hidden mobileLg:block">LATEST ART STAMPS</span>
+      <div class="flex flex-col">
+        <div class="w-full">
+          <h1 class={titlePurpleDL}>
+            <span class="block mobileLg:hidden">LATEST STAMPS</span>
+            <span class="hidden mobileLg:block">LATEST ART STAMPS</span>
           </h1>
         </div>
-        <div className="flex flex-col gap-3 mobileMd:gap-6">
+        <div class="flex flex-col gap-3 mobileMd:gap-6">
           {LatestArtStampsSection.map((section, index) => (
             <StampGallery key={index} {...section} />
           ))}

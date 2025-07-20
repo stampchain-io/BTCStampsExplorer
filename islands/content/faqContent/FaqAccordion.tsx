@@ -39,7 +39,7 @@ export function FaqAccordion({ item }: FaqAccordionProps) {
                     <a
                       href={listItem.href}
                       target={listItem.target}
-                      className={listItem.className}
+                      class={listItem.className}
                     >
                       {listItem.text}
                     </a>
@@ -54,13 +54,13 @@ export function FaqAccordion({ item }: FaqAccordionProps) {
 
         {/* ===== ADDITIONAL LINKS SECTION ===== */}
         {item.links && (
-          <div className="">
+          <div class="">
             {item.links.map((link, index) => (
               <div key={index}>
                 <a
                   href={link.href}
                   target={link.target}
-                  className={link.className}
+                  class={link.className}
                 >
                   {link.text}
                 </a>

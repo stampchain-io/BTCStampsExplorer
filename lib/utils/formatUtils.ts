@@ -1,5 +1,5 @@
-import { BigFloat } from "bigfloat/mod.ts";
 import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts";
+import { BigFloat } from "bigfloat/mod.ts";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -190,13 +190,51 @@ export function formatBigInt(value: bigint): string {
 
 export function bigIntSerializer(_key: string, value: unknown): unknown {
   if (typeof value === "bigint") {
-    return value.toString();
+    return { __type: "BigInt", value: value.toString() };
   }
   return value;
 }
 
 export function jsonStringifyWithBigInt(obj: object): string {
   return JSON.stringify(obj, bigIntSerializer);
+}
+
+export function bigIntReviver(_key: string, value: unknown): unknown {
+  // Handle the specific format created by bigIntSerializer
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "__type" in value &&
+    "value" in value &&
+    (value as any).__type === "BigInt"
+  ) {
+    try {
+      return BigInt((value as any).value);
+    } catch (error) {
+      console.warn(
+        `Failed to parse BigInt from serialized value: ${(value as any).value}`,
+        error,
+      );
+      return (value as any).value; // Return original string if BigInt conversion fails
+    }
+  }
+
+  // Fallback: Check if value is a string that represents a valid BigInt
+  if (typeof value === "string" && /^-?\d+$/.test(value)) {
+    // Try to determine if this should be a BigInt based on size
+    // Numbers larger than MAX_SAFE_INTEGER should be BigInt
+    const num = Number(value);
+    if (!isNaN(num) && Math.abs(num) <= Number.MAX_SAFE_INTEGER) {
+      return num; // Keep as number if within safe range
+    }
+    // Convert to BigInt for large numbers
+    try {
+      return BigInt(value);
+    } catch {
+      return value; // Return original string if BigInt conversion fails
+    }
+  }
+  return value;
 }
 
 export function formatUSDValue(value: number): number {
@@ -318,4 +356,85 @@ export function formatMarketCap(marketCap: number | null | undefined): string {
   if (marketCap < 1000) return formatBTC(marketCap, { decimals: 2 });
 
   return `${formatNumberWithCommas(Math.round(marketCap))}`;
+}
+
+/**
+ * Formats large numbers with abbreviated suffixes for constrained display spaces
+ * @param value The number to format
+ * @param decimals Number of decimal places for abbreviated numbers (default: 1)
+ * @returns Formatted string with K, M, B suffixes for large numbers
+ */
+export function formatLargeNumber(value: number, decimals: number = 1): string {
+  if (value === 0) return "0";
+
+  // Handle negative numbers
+  const sign = value < 0 ? "-" : "";
+  const absValue = Math.abs(value);
+
+  // Less than 1,000 - show as is
+  if (absValue < 1000) {
+    return sign + absValue.toString();
+  }
+
+  // 1,000 - 999,999 - use K suffix
+  if (absValue < 1000000) {
+    const kValue = absValue / 1000;
+    return sign + kValue.toFixed(decimals).replace(/\.?0+$/, "") + "K";
+  }
+
+  // 1,000,000 - 999,999,999 - use M suffix
+  if (absValue < 1000000000) {
+    const mValue = absValue / 1000000;
+    return sign + mValue.toFixed(decimals).replace(/\.?0+$/, "") + "M";
+  }
+
+  // 1,000,000,000+ - use B suffix
+  const bValue = absValue / 1000000000;
+  return sign + bValue.toFixed(decimals).replace(/\.?0+$/, "") + "B";
+}
+
+/**
+ * Formats balance/supply display for wallet cards with overflow protection
+ * @param balance Number of stamps owned
+ * @param supply Total supply of stamps
+ * @param divisible Whether the stamp is divisible
+ * @returns Formatted string with smart abbreviation for large numbers
+ */
+export function formatBalanceDisplay(
+  balance: number,
+  supply: number,
+  divisible: boolean,
+): string {
+  let formattedBalance: string;
+  let formattedSupply: string;
+
+  if (divisible) {
+    // For divisible stamps, use formatSupplyValue but abbreviate if result is too long
+    const balanceValue = balance / 100000000;
+    const supplyValue = supply / 100000000;
+
+    // If balance is very large, use abbreviation
+    if (balanceValue >= 1000) {
+      formattedBalance = formatLargeNumber(balanceValue, 1);
+    } else {
+      formattedBalance = balanceValue.toFixed(2).replace(/\.?0+$/, "");
+    }
+
+    // Supply formatting (keeping existing logic)
+    formattedSupply = supply > 100000
+      ? "+100000"
+      : supplyValue.toFixed(2).replace(/\.?0+$/, "");
+  } else {
+    // For non-divisible stamps, use smart abbreviation for large numbers
+    if (balance >= 1000) {
+      formattedBalance = formatLargeNumber(balance, 1);
+    } else {
+      formattedBalance = balance.toString();
+    }
+
+    // Supply formatting (keeping existing logic)
+    formattedSupply = supply > 100000 ? "+100000" : supply.toString();
+  }
+
+  return `${formattedBalance}/${formattedSupply}`;
 }

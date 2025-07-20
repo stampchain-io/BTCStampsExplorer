@@ -31,6 +31,9 @@ export const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
 export const SATOSHIS_PER_BTC = 100000000;
 export const MAX_XCP_RETRIES = 5;
 
+/* ===== FEE CONSTANTS ===== */
+export const MIN_FEE_RATE_SATS_PER_VB = 0.1; // Minimum allowed fee rate in sats/vB
+
 /* ===== API BASE URLS ===== */
 export const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
 export const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
@@ -43,7 +46,7 @@ export const COINGECKO_API_BASE_URL = "https://api.coingecko.com/api/v3";
 export const STAMPCHAIN_LOGO_IMAGE = "/img/logo/stampchain-logo-480.svg";
 export const STAMPCHAIN_FAVICON_IMAGE = "/img/logo/stampchain-logo-favicon.jpg";
 export const STAMPCHAIN_OPENGRAPH_IMAGE =
-  "/img/logo/stampchain-logo-opengraph.jpg";
+  "https://stampchain.io/img/logo/stampchain-logo-opengraph.jpg";
 /* ===== PLACEHOLDER IMAGES ===== */
 // LOADING_IMAGE = "components/icon/LoadingIcon.tsx"
 export const NOT_AVAILABLE_IMAGE = "/img/placeholder/stamp-no-image.svg";
@@ -57,7 +60,7 @@ export const CAROUSEL_STAMP_IDS = [
   42158,
   336082,
   57356,
-  368359,
+  1163993,
   74607,
 ];
 

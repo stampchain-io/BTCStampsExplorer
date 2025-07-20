@@ -1,4 +1,5 @@
 import { FreshContext } from "$fresh/server.ts";
+import { ApiResponseUtil } from "../../lib/utils/apiResponseUtil.ts";
 import { apiVersionMiddleware } from "../../server/middleware/apiVersionMiddleware.ts";
 import { transformResponseForVersion } from "../../server/middleware/schemaTransformer.ts";
 
@@ -82,10 +83,9 @@ export async function handler(
             }
           }
 
-          return new Response(JSON.stringify(transformed), {
+          return ApiResponseUtil.success(transformed, {
             status: response.status,
-            statusText: response.statusText,
-            headers: newHeaders,
+            headers: Object.fromEntries(newHeaders),
           });
         }
       } catch (error) {

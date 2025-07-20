@@ -5,11 +5,11 @@ import { InternalRouteGuard } from "$server/services/security/internalRouteGuard
 
 export const handler: Handlers = {
   async GET(req) {
-    // CSRF Protection for fee endpoints
-    const csrfError = await InternalRouteGuard.requireCSRF(req);
-    if (csrfError) {
-      console.log("[fees.ts] CSRF validation failed");
-      return csrfError;
+    // Origin validation for read-only endpoint (no CSRF needed)
+    const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+    if (originError) {
+      console.log("[fees.ts] Origin validation failed");
+      return originError;
     }
 
     // Rate limiting for fee endpoints

@@ -277,9 +277,9 @@ export function SRC20DeployTool(
         novalidate
       >
         {/* ===== MAIN FORM CONTAINER ===== */}
-        <div className={containerRowForm}>
+        <div class={containerRowForm}>
           {/* Image upload and decimals section */}
-          <div className={`${containerColForm} !w-[100px]`}>
+          <div class={`${containerColForm} !w-[100px]`}>
             {/* Image upload preview */}
             <div
               id="image-preview"
@@ -352,7 +352,7 @@ export function SRC20DeployTool(
           </div>
 
           {/* Token details section */}
-          <div className={containerColForm}>
+          <div class={containerColForm}>
             <div class={containerRowForm}>
               {/* Token input */}
               <SRC20InputField
@@ -372,7 +372,7 @@ export function SRC20DeployTool(
                 isUppercase
               />
               {/* Advanced options toggle */}
-              <div className="relative" tabIndex={0}>
+              <div class="relative" tabIndex={0}>
                 <ToggleSwitchButton
                   isActive={showAdvancedOptions}
                   onToggle={() => {
@@ -389,7 +389,7 @@ export function SRC20DeployTool(
                   }}
                 />
                 <div
-                  className={`${tooltipButton} ${
+                  class={`${tooltipButton} ${
                     isToggleTooltipVisible ? "opacity-100" : "opacity-0"
                   }`}
                 >
@@ -425,20 +425,20 @@ export function SRC20DeployTool(
 
         {/* ===== ADVANCED OPTIONS SECTION ===== */}
         <div
-          className={`overflow-hidden transition-all duration-500 ${
+          class={`overflow-hidden transition-all duration-500 ${
             showAdvancedOptions
               ? "max-h-[250px] opacity-100 mt-5"
               : "max-h-0 opacity-0 mt-0"
           }`}
         >
-          <div className={containerColForm}>
+          <div class={containerColForm}>
             <textarea
               type="text"
               class={`${inputTextarea} scrollbar-grey`}
               placeholder="Description"
               rows={3}
             />
-            <div className={containerRowForm}>
+            <div class={containerRowForm}>
               <SRC20InputField
                 type="text"
                 placeholder="X"
@@ -453,7 +453,7 @@ export function SRC20DeployTool(
                 onChange={(e) => handleInputChange(e, "web")}
               />
             </div>
-            <div className={containerRowForm}>
+            <div class={containerRowForm}>
               <SRC20InputField
                 type="text"
                 placeholder="Telegram"
@@ -472,7 +472,7 @@ export function SRC20DeployTool(
       </form>
 
       {/* ===== FEE CALCULATOR AND STATUS MESSAGES ===== */}
-      <div className={containerBackground}>
+      <div class={containerBackground}>
         <FeeCalculatorSimple
           fee={formState.fee}
           ticker={formState.token}

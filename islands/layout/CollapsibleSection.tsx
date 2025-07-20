@@ -37,11 +37,11 @@ export const CollapsibleSection = ({
             type="button"
             onClick={handleClick}
             onMouseLeave={handleMouseLeave}
-            className="flex items-center w-full justify-between pt-2 pb-4 tablet:pt-2 tablet:pb-3 transition-colors duration-300 group"
+            class="flex items-center w-full justify-between pt-2 pb-4 tablet:pt-2 tablet:pb-3 transition-colors duration-300 group"
             data-section-toggle
           >
             <span
-              className={`
+              class={`
                 font-light tablet:font-normal text-lg tablet:text-sm transition-colors duration-300
                 ${
                 expanded
@@ -57,12 +57,12 @@ export const CollapsibleSection = ({
             </span>
 
             <div
-              className={`transform transition-all duration-300 ${
+              class={`transform transition-all duration-300 ${
                 expanded ? "scale-y-[-1]" : ""
               }`}
             >
               <div
-                className={`${
+                class={`${
                   expanded
                     ? `stroke-stamp-grey ${
                       canHoverSelected
@@ -86,12 +86,12 @@ export const CollapsibleSection = ({
           </button>
 
           <div
-            className={`overflow-hidden transition-all duration-300 ${
+            class={`overflow-hidden transition-all duration-300 ${
               expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
             }`}
             data-section-expanded={expanded}
           >
-            <div className="-mt-2 tablet:-mt-1 pb-4 pl-0.5">
+            <div class="-mt-2 tablet:-mt-1 pb-4 pl-0.5">
               {children}
             </div>
           </div>
@@ -106,10 +106,10 @@ export const CollapsibleSection = ({
             type="button"
             onClick={handleClick}
             onMouseLeave={handleMouseLeave}
-            className="flex items-center w-full mt-2 tablet:mt-1.5 group transition-colors duration-300"
+            class="flex items-center w-full mt-2 tablet:mt-1.5 group transition-colors duration-300"
           >
             <div
-              className={`transform transition-all duration-300 ${
+              class={`transform transition-all duration-300 ${
                 expanded ? "scale-y-[-1]" : "mb-0.5"
               } ${
                 expanded
@@ -133,7 +133,7 @@ export const CollapsibleSection = ({
             </div>
 
             <span
-              className={`${
+              class={`${
                 labelLogicResponsive(expanded, canHoverSelected)
               } font-light`}
             >
@@ -142,12 +142,12 @@ export const CollapsibleSection = ({
           </button>
 
           <div
-            className={`overflow-hidden transition-all duration-300 ${
+            class={`overflow-hidden transition-all duration-300 ${
               expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
             }`}
             data-section-expanded={expanded}
           >
-            <div className="pt-3.5 pl-0.5">
+            <div class="pt-3.5 pl-0.5">
               {children}
             </div>
           </div>
@@ -158,12 +158,12 @@ export const CollapsibleSection = ({
     case "collapsibleLabel": {
       return (
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          class={`overflow-hidden transition-all duration-300 ease-in-out ${
             expanded ? "max-h-[100px] opacity-100" : "max-h-0 opacity-0"
           }`}
           data-section-expanded={expanded}
         >
-          <div className="pt-2 pl-0.5">
+          <div class="pt-2 pl-0.5">
             {children}
           </div>
         </div>

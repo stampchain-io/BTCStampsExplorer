@@ -3,7 +3,7 @@ import { titlePurpleLD } from "$text";
 const WalletProfileHeader = () => {
   return (
     <div class="flex justify-between items-center gap-3 w-full relative">
-      <h1 className={titlePurpleLD}>WALLET</h1>
+      <h1 class={titlePurpleLD}>WALLET</h1>
       {
         /*
         import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";

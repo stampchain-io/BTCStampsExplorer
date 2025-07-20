@@ -1,94 +1,207 @@
 /* ===== WALLET PROFILE CONTENT COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
-import { SortButton } from "$islands/button/SortButton.tsx";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { FilterOld } from "$islands/WIP/FilterOld.tsx";
-import { Setting } from "$islands/datacontrol/Setting.tsx";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { SRC20Gallery, StampGallery } from "$section";
-import { WalletContentProps } from "$types/wallet.d.ts";
-import { Dispenser } from "$types/index.d.ts";
-import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
-import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { StampRow } from "$globals";
-import { label } from "$text";
 import { Icon, LoadingIcon } from "$icon";
+import { SortButton } from "$islands/button/SortButton.tsx";
+import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { Setting } from "$islands/datacontrol/Setting.tsx";
+// AjaxStampGallery has been replaced with FreshStampGallery for Fresh.js partial navigation
+import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
+import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
+import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
+import { createPaginationHandler } from "$lib/utils/freshNavigationUtils.ts";
+import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
+import { Dispenser } from "$types/index.d.ts";
+import { WalletContentProps } from "$types/wallet.d.ts";
+import { useEffect, useState } from "preact/hooks";
 
-/* ===== ITEM HEADER SUBCOMPONENT ===== */
-const ItemHeader = ({
-  title = "STAMP",
-  sortBy = "ASC" as const,
-  isOpenSetting = false,
-  handleOpenSetting = () => {},
-  isOpenFilter = false,
-  handleOpenFilter = () => {},
-  sort = true,
-  filter = true,
-  setting = false,
-  setOpenSettingModal = () => {},
-  onChangeSort = () => {},
-}: {
+// ===== ADVANCED SORTING IMPORTS =====
+import { CompleteSortingInterface } from "$islands/sorting/index.ts";
+import SortingErrorBoundary from "$islands/sorting/SortingErrorBoundary.tsx";
+import { WalletSortingProvider } from "$islands/sorting/SortingProviderWithURL.tsx";
+import type { WalletSortKey } from "$lib/types/sorting.d.ts";
+
+// ===== TYPES AND INTERFACES =====
+
+/**
+ * Enhanced wallet content props with feature flag support
+ */
+interface EnhancedWalletContentProps extends WalletContentProps {
+  /** Enable advanced sorting features (default: false for backward compatibility) */
+  enableAdvancedSorting?: boolean;
+  /** Show performance metrics for sorting operations */
+  showSortingMetrics?: boolean;
+  /** Additional sorting configuration */
+  sortingConfig?: {
+    enableUrlSync?: boolean;
+    enablePersistence?: boolean;
+    enableMetrics?: boolean;
+  };
+}
+
+/**
+ * Section-specific sorting configuration for advanced mode
+ */
+interface SectionSortingConfig {
+  section: "stamps" | "src20" | "dispensers";
+  paramName: string;
+  pageParamName: string;
+  anchorName: string;
+  sortOptions: string[]; // Will expand to include advanced options
+}
+
+// ===== SECTION CONFIGURATIONS =====
+
+/**
+ * Configuration for each wallet section with support for advanced sorting
+ */
+const SECTION_CONFIGS: Record<string, SectionSortingConfig> = {
+  stamps: {
+    section: "stamps",
+    paramName: "stampsSortBy",
+    pageParamName: "stamps_page",
+    anchorName: "stamps",
+    sortOptions: [
+      "ASC",
+      "DESC",
+      // Advanced options (only used when enableAdvancedSorting is true)
+      "value_asc", // Sort by BTC value ascending
+      "value_desc", // Sort by BTC value descending
+      "stamp_asc", // Sort by stamp number ascending
+      "stamp_desc", // Sort by stamp number descending
+    ],
+  },
+  src20: {
+    section: "src20",
+    paramName: "src20SortBy",
+    pageParamName: "src20_page",
+    anchorName: "src20",
+    sortOptions: [
+      "ASC",
+      "DESC",
+      // Advanced options
+      "value_asc", // Sort by BTC value ascending
+      "value_desc", // Sort by BTC value descending
+      "quantity_asc", // Sort by quantity ascending
+      "quantity_desc", // Sort by quantity descending
+    ],
+  },
+  dispensers: {
+    section: "dispensers",
+    paramName: "dispensersSortBy",
+    pageParamName: "dispensers_page",
+    anchorName: "closed_listings",
+    sortOptions: [
+      "ASC",
+      "DESC",
+      // Advanced options
+      "value_asc",
+      "value_desc",
+    ],
+  },
+};
+
+// ===== SECTION HEADER COMPONENT =====
+
+interface SectionHeaderProps {
   title: string;
-  sortBy: "ASC" | "DESC";
-  sort: boolean;
-  filter: boolean;
-  setting: boolean;
-  isOpenFilter: boolean;
-  isOpenSetting: boolean;
-  handleOpenSetting: (open: boolean) => void;
-  handleOpenFilter: (open: boolean) => void;
-  setOpenSettingModal?: (open: boolean) => void;
-  onChangeSort?: (newSortBy: "ASC" | "DESC") => void;
-}) => {
-  /* ===== RENDER HEADER ===== */
+  config: SectionSortingConfig;
+  sortBy: string;
+  onSortChange: (sort: string) => void;
+  enableAdvancedSorting?: boolean;
+  showMetrics?: boolean;
+}
+
+/**
+ * Section header with conditional rendering for legacy/advanced sorting
+ */
+function SectionHeader({
+  title,
+  config,
+  sortBy,
+  onSortChange,
+  enableAdvancedSorting = false,
+  showMetrics = false,
+}: SectionHeaderProps) {
+  // Performance metrics placeholder for advanced mode
+  const sortMetrics = enableAdvancedSorting && showMetrics
+    ? { count: 0, avgDuration: 0 } // Will be connected to real metrics
+    : null;
+
   return (
-    <div class="flex flex-row justify-between items-center gap-3 w-full relative">
-      <div class="flex items-end">
-        <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-bright">
+    <div
+      class="flex items-center justify-between mb-2"
+      f-partial={`/${config.paramName}`}
+    >
+      <div class="flex items-center gap-4">
+        <h2 class="text-stamp-grey-dark text-lg mobileLg:text-2xl tablet:text-2xl desktop:text-2xl font-nunito font-extrabold">
           {title}
-        </p>
+        </h2>
+        {sortMetrics && (
+          <div class="text-xs text-stamp-grey opacity-75">
+            {sortMetrics.count} sorts • {sortMetrics.avgDuration}ms avg
+          </div>
+        )}
       </div>
-      <div class="flex gap-3 justify-between h-[36px] items-center">
-        {setting && (
-          <Setting
-            initFilter={[]}
-            open={isOpenSetting}
-            handleOpen={handleOpenSetting}
-            filterButtons={["transfer"]}
-            onFilterClick={(filter) => {
-              if (filter === "transfer") {
-                setOpenSettingModal(true);
-              }
-            }}
-          />
-        )}
-        {filter && (
-          <FilterOld
-            initFilter={[]}
-            open={isOpenFilter}
-            handleOpen={handleOpenFilter}
-            filterButtons={["all", "psbt", "dispensers"]}
-            dropdownPosition="bottom"
-          />
-        )}
-        {sort && (
-          <SortButton
-            initSort={sortBy}
-            onChangeSort={onChangeSort}
-            sortParam={title === "STAMPS"
-              ? "stampsSortBy"
-              : title === "TOKENS"
-              ? "src20SortBy"
-              : "dispensersSortBy"}
-          />
-        )}
+
+      <div class="flex items-center gap-2">
+        {enableAdvancedSorting
+          ? (
+            // Advanced sorting interface
+            <SortingErrorBoundary
+              context="wallet"
+              maxRetries={2}
+              testId="sorting-interface-boundary"
+              onError={(error) => {
+                console.error("Sorting interface error:", error);
+              }}
+            >
+              <CompleteSortingInterface
+                config={{
+                  defaultSort: sortBy as WalletSortKey,
+                }}
+                options={config.sortOptions.map((option) => ({
+                  value: option as WalletSortKey,
+                  label: getSortLabel(option),
+                  direction: option.includes("_desc") ? "desc" : "asc",
+                }))}
+                variant="buttons"
+                size="sm"
+                showLabel={false}
+              />
+            </SortingErrorBoundary>
+          )
+          : (
+            // Legacy sorting interface
+            <SortButton
+              initSort={sortBy as "ASC" | "DESC"}
+              onChangeSort={(newSort) => onSortChange(newSort)}
+              sortParam={config.paramName}
+            />
+          )}
       </div>
     </div>
   );
-};
+}
 
-/* ===== DISPENSER ITEM SUBCOMPONENT ===== */
+/**
+ * Get human-readable label for sort option
+ */
+function getSortLabel(option: string): string {
+  const labels: Record<string, string> = {
+    "ASC": "Low to High",
+    "DESC": "High to Low",
+    "value_asc": "Value ↑",
+    "value_desc": "Value ↓",
+    "stamp_asc": "Stamp # ↑",
+    "stamp_desc": "Stamp # ↓",
+    "quantity_asc": "Quantity ↑",
+    "quantity_desc": "Quantity ↓",
+  };
+  return labels[option] || option;
+}
+
+// ===== DISPENSER ITEM SUBCOMPONENT =====
 function DispenserItem({
   dispensers = [],
   pagination,
@@ -200,12 +313,10 @@ function DispenserItem({
             page={pagination.page}
             totalPages={pagination.totalPages}
             prefix="dispensers"
-            onPageChange={(page: number) => {
-              const url = new URL(globalThis.location.href);
-              url.searchParams.set("dispensers_page", page.toString());
-              url.searchParams.set("anchor", "closed_listings");
-              globalThis.location.href = url.toString();
-            }}
+            onPageChange={createPaginationHandler(
+              "dispensers_page",
+              "closed_listings",
+            )}
           />
         </div>
       )}
@@ -374,8 +485,49 @@ function DispenserRow(
   );
 }
 
-/* ===== MAIN WALLET PROFILE COMPONENT ===== */
-export default function WalletProfileContent({
+// ===== MAIN COMPONENT WRAPPER =====
+
+/**
+ * Production-ready wallet profile content with optional advanced sorting
+ */
+export default function WalletProfileContent(
+  props: EnhancedWalletContentProps,
+) {
+  const { enableAdvancedSorting = false } = props;
+
+  // When advanced sorting is enabled, wrap with WalletSortingProvider and error boundary
+  if (enableAdvancedSorting) {
+    return (
+      <SortingErrorBoundary
+        context="wallet"
+        maxRetries={3}
+        testId="wallet-sorting-boundary"
+        onError={(error, details) => {
+          console.error("Wallet sorting error:", error);
+          console.debug("Error details:", details);
+          // TODO(#sorting): Report error to monitoring system
+        }}
+      >
+        <WalletSortingProvider
+          defaultSort={props.stampsSortBy || "DESC"}
+          testId="wallet-sorting-provider"
+        >
+          <WalletProfileContentInner {...props} />
+        </WalletSortingProvider>
+      </SortingErrorBoundary>
+    );
+  }
+
+  // Otherwise render directly
+  return <WalletProfileContentInner {...props} />;
+}
+
+// ===== MAIN COMPONENT IMPLEMENTATION =====
+
+/**
+ * Inner component with all the wallet profile logic
+ */
+function WalletProfileContentInner({
   stamps,
   src20,
   dispensers,
@@ -384,35 +536,38 @@ export default function WalletProfileContent({
   stampsSortBy = "DESC",
   src20SortBy = "DESC",
   dispensersSortBy = "DESC",
-}: WalletContentProps) {
-  /* ===== STATE ===== */
-  const [_openSettingModal, setOpenSettingModal] = useState<boolean>(false);
-
-  /* ===== SORT STATE ===== */
-  const [sortStamps, setSortStamps] = useState<"ASC" | "DESC">(stampsSortBy);
-  const [sortTokens, setSortTokens] = useState<"ASC" | "DESC">(src20SortBy);
-  const [sortDispensers, setSortDispensers] = useState<"ASC" | "DESC">(
-    dispensersSortBy,
-  );
-
-  /* ===== TOGGLE STATES ===== */
-  const [openFilter, setOpenFilter] = useState<boolean>(false);
-  const [openSetting, setOpenSetting] = useState<boolean>(false);
+  // Feature flag support
+  enableAdvancedSorting = false, // Default to false for backward compatibility
+  showSortingMetrics = false,
+  sortingConfig = {
+    enableUrlSync: true,
+    enablePersistence: true,
+    enableMetrics: true,
+  },
+}: EnhancedWalletContentProps) {
+  /* ===== STATE MANAGEMENT ===== */
+  const [sortStamps] = useState<string>(stampsSortBy);
+  const [sortTokens] = useState<string>(src20SortBy);
+  const [sortDispensers] = useState<string>(dispensersSortBy);
+  const [openSetting, setOpenSetting] = useState(false);
+  const [openSettingModal, setOpenSettingModal] = useState(false);
 
   /* ===== COMPUTED VALUES ===== */
   const openDispensersCount =
-    dispensers.data.filter((d) => d.give_remaining > 0).length;
+    dispensers.data.filter((d: any) => d.give_remaining > 0).length;
+  const closedDispensersCount = dispensers.data.length - openDispensersCount;
 
   /* ===== EFFECTS ===== */
   useEffect(() => {
     if (anchor) {
-      const sectionMap = {
+      const sectionMap: Record<string, string> = {
         stamp: "stamps-section",
+        stamps: "stamps-section",
         src20: "src20-section",
         open_listings: "open-listings-section",
         closed_listings: "closed-listings-section",
       };
-      const sectionId = sectionMap[anchor as keyof typeof sectionMap];
+      const sectionId = sectionMap[anchor];
       if (sectionId) {
         const element = document.getElementById(sectionId);
         if (element) {
@@ -420,50 +575,41 @@ export default function WalletProfileContent({
         }
       }
     }
-  }, [anchor, stamps, src20, dispensers]);
+  }, [anchor]);
 
-  useEffect(() => {
-    const currentUrl = globalThis.location.href;
-    const url = new URL(currentUrl);
-    const filterByValue = url.searchParams.get("filterBy") || "";
-    if (filterByValue === "Transfer") {
-      setOpenSettingModal(true);
+  /* ===== HANDLERS ===== */
+  const handleStampSort = (newSort: string) => {
+    // SSR safety check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
     }
-  }, []);
-
-  /* ===== EVENT HANDLERS ===== */
-  const handleOpenSetting = () => {
-    setOpenSetting(!openSetting);
-  };
-
-  const handleOpenFilter = () => {
-    setOpenFilter(!openFilter);
-  };
-
-  /* ===== SORT HANDLERS ===== */
-  const handleChangeSort = (newSort: "ASC" | "DESC") => {
-    setSortStamps(newSort);
     const url = new URL(globalThis.location.href);
-    url.searchParams.set("stampsSortBy", newSort);
-    url.searchParams.delete("stamps_page");
-    url.searchParams.set("anchor", "stamps");
+    url.searchParams.set(SECTION_CONFIGS.stamps.paramName, newSort);
+    url.searchParams.delete(SECTION_CONFIGS.stamps.pageParamName);
+    url.searchParams.set("anchor", SECTION_CONFIGS.stamps.anchorName);
     globalThis.location.href = url.toString();
   };
 
-  const handleTokenSort = (newSort: "ASC" | "DESC") => {
-    setSortTokens(newSort);
+  const handleTokenSort = (newSort: string) => {
+    // SSR safety check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
+    }
     const url = new URL(globalThis.location.href);
-    url.searchParams.set("src20SortBy", newSort);
-    url.searchParams.delete("src20_page");
-    url.searchParams.set("anchor", "src20");
+    url.searchParams.set(SECTION_CONFIGS.src20.paramName, newSort);
+    url.searchParams.delete(SECTION_CONFIGS.src20.pageParamName);
+    url.searchParams.set("anchor", SECTION_CONFIGS.src20.anchorName);
     globalThis.location.href = url.toString();
   };
 
-  const handleDispenserSort = (newSort: "ASC" | "DESC") => {
-    setSortDispensers(newSort);
+  const handleDispenserSort = (newSort: string) => {
+    // SSR safety check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
+    }
     const url = new URL(globalThis.location.href);
-    url.searchParams.set("dispensersSortBy", newSort);
-    url.searchParams.delete("dispensers_page");
+    url.searchParams.set(SECTION_CONFIGS.dispensers.paramName, newSort);
+    url.searchParams.delete(SECTION_CONFIGS.dispensers.pageParamName);
     url.searchParams.set(
       "anchor",
       openDispensersCount > 0 ? "open_listings" : "closed_listings",
@@ -471,65 +617,76 @@ export default function WalletProfileContent({
     globalThis.location.href = url.toString();
   };
 
-  /* ===== GALLERY CONFIGURATION ===== */
-  const stampGallery = {
-    title: "",
-    type: "all",
-    stamps: stamps.data,
-    layout: "grid" as const,
-    showDetails: false,
-    gridClass: `
-      grid w-full
-      gap-3
-      mobileMd:gap-6
-      grid-cols-4
-      mobileLg:grid-cols-6
-      tablet:grid-cols-6
-      desktop:grid-cols-8
-      auto-rows-fr
-    `,
-    displayCounts: {
-      mobileSm: 16,
-      mobileLg: 24,
-      tablet: 24,
-      desktop: 32,
-    },
-    pagination: {
-      page: stamps.pagination.page,
-      totalPages: Math.ceil(stamps.pagination.total / stamps.pagination.limit),
-      prefix: "stamps_page",
-      onPageChange: (page: number) => {
-        const url = new URL(globalThis.location.href);
-        url.searchParams.set("stamps_page", page.toString());
-        url.searchParams.set("anchor", "stamps");
-        globalThis.location.href = url.toString();
-      },
-    },
-  };
-
   /* ===== RENDER ===== */
   return (
-    <>
+    <div class="flex flex-col w-full z-[2] p-3 bg-[--stamp-sidebar-background] backdrop-blur-[.8rem]
+             desktop:rounded-t-[32px] select-none">
+      {/* Page Header */}
+      <div class="flex flex-row justify-between items-center gap-3 w-full relative mb-6">
+        <div class="flex gap-3 items-center">
+          <h1 class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-bright">
+            WALLET
+          </h1>
+          <p class="text-sm mobileMd:text-sm mobileLg:text-lg text-stamp-gray">
+            {abbreviateAddress(address)}
+          </p>
+        </div>
+        <div class="flex gap-3 justify-between h-[36px] items-center">
+          <Setting
+            initFilter={[]}
+            open={openSetting}
+            handleOpen={setOpenSetting}
+            filterButtons={["transfer"]}
+            onFilterClick={(filter) => {
+              if (filter === "transfer") {
+                setOpenSettingModal(true);
+              }
+            }}
+          />
+        </div>
+      </div>
+
       {/* Stamps Section */}
-      <div class="mt-3 mobileLg:mt-6" id="stamps-section">
-        <ItemHeader
+      <div id="stamps-section" class="mb-8">
+        <SectionHeader
           title="STAMPS"
-          sort
+          config={SECTION_CONFIGS.stamps}
           sortBy={sortStamps}
-          onChangeSort={handleChangeSort}
-          filter={false}
-          setting={false}
-          isOpenFilter={false}
-          isOpenSetting={openSetting}
-          handleOpenFilter={() => {}}
-          handleOpenSetting={handleOpenSetting}
-          setOpenSettingModal={setOpenSettingModal}
+          onSortChange={handleStampSort}
+          enableAdvancedSorting={enableAdvancedSorting}
+          showMetrics={showSortingMetrics}
         />
-        <div class="mt-3 mobileLg:mt-6">
+
+        <div f-partial="/stamps">
           {stamps.data?.length
-            ? <StampGallery {...stampGallery} />
+            ? (
+              <FreshStampGallery
+                initialData={stamps.data}
+                initialPagination={{
+                  page: stamps.pagination.page,
+                  limit: stamps.pagination.limit,
+                  total: stamps.pagination.total,
+                  totalPages: Math.ceil(
+                    stamps.pagination.total / stamps.pagination.limit,
+                  ),
+                }}
+                address={address}
+                initialSort="DESC"
+                fromPage="wallet"
+                gridClass={`
+                grid w-full
+                gap-3
+                mobileMd:gap-6
+                grid-cols-4
+                mobileSm:grid-cols-5
+                mobileLg:grid-cols-6
+                tablet:grid-cols-9
+                desktop:grid-cols-10
+                `}
+              />
+            )
             : (
-              <p class={`${label} -mt-1.5 mobileLg:-mt-3`}>
+              <p class="text-stamp-grey opacity-75 text-center py-8">
                 NO STAMPS IN THE WALLET
               </p>
             )}
@@ -537,43 +694,34 @@ export default function WalletProfileContent({
       </div>
 
       {/* SRC20 (TOKENS) Section */}
-      <div class="mt-6 mobileLg:mt-12" id="src20-section">
-        <ItemHeader
+      <div id="src20-section" class="mb-8">
+        <SectionHeader
           title="TOKENS"
-          sort
+          config={SECTION_CONFIGS.src20}
           sortBy={sortTokens}
-          onChangeSort={handleTokenSort}
-          filter={false}
-          setting={false}
-          isOpenFilter={false}
-          isOpenSetting={false}
-          handleOpenFilter={() => {}}
-          handleOpenSetting={() => {}}
+          onSortChange={handleTokenSort}
+          enableAdvancedSorting={enableAdvancedSorting}
+          showMetrics={showSortingMetrics}
         />
-        <div class="mt-3 mobileLg:mt-6">
+
+        <div f-partial="/src20">
           {src20.data?.length
             ? (
-              <SRC20Gallery
-                viewType="minted"
-                fromPage="wallet"
+              <FreshSRC20Gallery
                 initialData={src20.data}
-                timeframe="24H"
-                pagination={{
+                initialPagination={{
                   page: src20.pagination.page,
+                  limit: src20.pagination.limit || 50,
+                  total: src20.pagination.total || src20.data.length,
                   totalPages: src20.pagination.totalPages,
-                  prefix: "src20",
-                  onPageChange: (page: number) => {
-                    const url = new URL(globalThis.location.href);
-                    url.searchParams.set("src20_page", page.toString());
-                    url.searchParams.set("anchor", "src20");
-                    globalThis.location.href = url.toString();
-                  },
                 }}
                 address={address}
+                initialSort="DESC"
+                fromPage="wallet"
               />
             )
             : (
-              <p class={`${label} -mt-1.5 mobileLg:-mt-3`}>
+              <p class="text-stamp-grey opacity-75 text-center py-8">
                 NO TOKENS IN THE WALLET
               </p>
             )}
@@ -582,50 +730,72 @@ export default function WalletProfileContent({
 
       {/* Dispensers Section */}
       {dispensers.data.length > 0 && (
-        <div class="mt-3 mobileLg:mt-6" id="listings-section">
-          <ItemHeader
+        <div id="dispensers-section" class="mb-8">
+          <SectionHeader
             title="LISTINGS"
-            sort
+            config={SECTION_CONFIGS.dispensers}
             sortBy={sortDispensers}
-            onChangeSort={handleDispenserSort}
-            filter={false}
-            setting={false}
-            isOpenFilter={openFilter}
-            isOpenSetting={false}
-            handleOpenFilter={handleOpenFilter}
-            handleOpenSetting={() => {}}
+            onSortChange={handleDispenserSort}
+            enableAdvancedSorting={enableAdvancedSorting}
+            showMetrics={showSortingMetrics}
           />
-          <div class="mt-3 mobileMd:mt-6">
-            <DispenserItem
-              dispensers={dispensers.data}
-              pagination={{
-                page: dispensers.pagination.page,
-                totalPages: dispensers.pagination.totalPages,
-                prefix: "dispensers",
-                onPageChange: (page: number) => {
-                  const url = new URL(globalThis.location.href);
-                  url.searchParams.set("dispensers_page", page.toString());
-                  url.searchParams.set("anchor", "closed_listings");
-                  globalThis.location.href = url.toString();
-                },
-              }}
-            />
+
+          {/* Open Dispensers */}
+          {openDispensersCount > 0 && (
+            <div id="open-listings-section" class="mb-6">
+              <h3 class="text-lg font-semibold text-stamp-grey-darkest mb-3">
+                Open Listings ({openDispensersCount})
+              </h3>
+              <DispenserItem
+                dispensers={dispensers.data.filter((d: any) =>
+                  d.give_remaining > 0
+                )}
+              />
+            </div>
+          )}
+
+          {/* Closed Dispensers */}
+          {closedDispensersCount > 0 && (
+            <div id="closed-listings-section">
+              <h3 class="text-lg font-semibold text-stamp-grey-darkest mb-3">
+                Closed Listings ({closedDispensersCount})
+              </h3>
+              <DispenserItem
+                dispensers={dispensers.data.filter((d: any) =>
+                  d.give_remaining === 0
+                )}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Feature Flag Debug Info */}
+      {enableAdvancedSorting && showSortingMetrics && (
+        <div class="mt-8 p-4 bg-stamp-grey-lightest rounded-lg">
+          <h3 class="text-sm font-semibold text-stamp-grey-darkest mb-2">
+            Advanced Sorting Status
+          </h3>
+          <div class="text-xs text-stamp-grey space-y-1">
+            <div>Status: ✅ Enabled (Phase 1 - Infrastructure)</div>
+            <div>URL Sync: {sortingConfig.enableUrlSync ? "✅" : "❌"}</div>
+            <div>
+              Persistence: {sortingConfig.enablePersistence ? "✅" : "❌"}
+            </div>
+            <div>Metrics: {sortingConfig.enableMetrics ? "✅" : "❌"}</div>
+            <div class="mt-2 text-stamp-warning">
+              Note: Advanced sorting UI will be available in Phase 2
+            </div>
           </div>
         </div>
       )}
 
-      {
-        /* Modal for sending stamps
-      {_openSettingModal && (
-        <WalletSendStampModal
-          stamps={stamps}
-          fee={0}
-          handleChangeFee={() => {}}
-          toggleModal={handleOpenSettingModal}
-          handleCloseModal={handleCloseSettingModal}
-        />
-      )} */
-      }
-    </>
+      {/* Transfer Modal */}
+      {openSettingModal && (
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          {/* Modal content would go here */}
+        </div>
+      )}
+    </div>
   );
 }

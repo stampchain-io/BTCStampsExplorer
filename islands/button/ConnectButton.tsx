@@ -1,14 +1,14 @@
 // KEEP file for reference on the handleUpdateDisplayName to move into the new wallet / dashboard page
 // UPDATE COMMENTARY
-import { useEffect, useRef, useState } from "preact/hooks";
-import { walletContext } from "$client/wallet/wallet.ts";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
-import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
-import { DEFAULT_WALLET_CONNECTORS } from "$lib/utils/constants.ts";
 import { Button } from "$button";
-import { navSublinkPurple, valueDarkSm, valueDarkXs } from "$text";
+import { walletContext } from "$client/wallet/wallet.ts";
+import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
+import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
+import { DEFAULT_WALLET_CONNECTORS } from "$lib/utils/constants.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { navSublinkPurple, valueDarkSm, valueDarkXs } from "$text";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== MAIN WALLET MODAL COMPONENT ===== */
 export const ConnectButton = () => {
@@ -21,6 +21,10 @@ export const ConnectButton = () => {
 
   /* ===== PATH INITIALIZATION ===== */
   useEffect(() => {
+    // SSR-safe browser environment check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot access location during SSR
+    }
     setPath(globalThis.location.pathname?.split("/")[1] || null);
   }, []);
 
@@ -66,8 +70,8 @@ export const ConnectButton = () => {
     <div class="relative z-10">
       {/* ===== CONNECT WALLET BUTTON ===== */}
       {!(isConnected && address) && (
-        <div className="relative">
-          <div className={`hidden tablet:block`}>
+        <div class="relative">
+          <div class={`hidden tablet:block`}>
             <Button
               variant="outlineGradient"
               color="purpleGradient"
@@ -79,7 +83,7 @@ export const ConnectButton = () => {
               CONNECT
             </Button>
           </div>
-          <div className="block tablet:hidden">
+          <div class="block tablet:hidden">
             <Button
               variant="text"
               color="custom"
@@ -108,6 +112,12 @@ export const ConnectButton = () => {
               size="md"
               onClick={() => {
                 if (isConnected && address) {
+                  // SSR-safe browser environment check
+                  if (
+                    typeof globalThis === "undefined" || !globalThis?.location
+                  ) {
+                    return; // Cannot navigate during SSR
+                  }
                   globalThis.location.href = `/wallet/${address}`;
                 }
               }}

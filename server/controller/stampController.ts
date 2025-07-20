@@ -1,8 +1,8 @@
 import {
-    HolderRow, PaginatedStampBalanceResponseBody,
-    ProcessedHolder, STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
-    STAMP_RANGES, STAMP_SUFFIX_FILTERS,
-    STAMP_TYPES, StampBalance, StampRow, SUBPROTOCOLS
+  HolderRow, PaginatedStampBalanceResponseBody,
+  ProcessedHolder, STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
+  STAMP_RANGES, STAMP_SUFFIX_FILTERS,
+  STAMP_TYPES, StampBalance, StampRow, SUBPROTOCOLS
 } from "$globals";
 import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
@@ -19,6 +19,7 @@ import { detectContentType, getMimeType } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { API_RESPONSE_VERSION, ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { StampRepository } from "$server/database/stampRepository.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
@@ -79,6 +80,7 @@ export class StampController {
     maxCacheAgeMinutes,
     priceSource,
     collectionStampLimit,
+    includeMarketData = true, // Default to true for backward compatibility
   }: {
     page?: number;
     limit?: number;
@@ -134,6 +136,7 @@ export class StampController {
     maxCacheAgeMinutes?: string;
     priceSource?: string;
     collectionStampLimit?: number;
+    includeMarketData?: boolean;
   } = {}) {
     console.log("stamp controller payload", {
       page,
@@ -256,9 +259,8 @@ export class StampController {
     const btcPrice = btcPriceData.price;
     console.log(`[StampController] BTC price: $${btcPrice} from ${btcPriceData.source}`);
 
-    // Always include market data for stamps that support it (STAMP and SRC-721)
-    // This ensures floor prices are available on detail pages
-    const useMarketData = true;
+    // Use market data inclusion setting from route handler (version-aware)
+    const useMarketData = includeMarketData;
 
     // Determine if this is a detail view (single stamp) or list view
     const isDetailView = identifier && !Array.isArray(identifier);
@@ -498,16 +500,50 @@ export class StampController {
 
       console.log(`[StampController] Got ${stamps.length} stamps for page ${page}, total stamps: ${total}`);
 
+      // BACKWARD COMPATIBILITY: Add market data pricing to non-enhanced endpoint
+      // This ensures consistency with the enhanced endpoint while maintaining backward compatibility
+      const enhancedStamps = await this.addMarketDataToStampBalances(stamps);
+
       return {
         page,
         limit,
         totalPages: Math.ceil(total / limit),
         last_block: lastBlock,
-        data: stamps,
+        data: enhancedStamps,
       };
     } catch (error) {
       console.error("Error in getStampBalancesByAddress:", error);
       throw error;
+    }
+  }
+
+  /**
+   * Add market data pricing to stamp balances for backward compatibility
+   * This ensures non-enhanced endpoints also have access to market data pricing
+   *
+   * NOTE: For v2.3, floorPrice and recentSalePrice have been moved to marketData section.
+   * The middleware handles backward compatibility for v2.2 clients.
+   */
+  private static async addMarketDataToStampBalances(stamps: any[]): Promise<any[]> {
+    try {
+      if (!stamps || stamps.length === 0) {
+        return stamps;
+      }
+
+      // For v2.3, we don't add floorPrice/recentSalePrice at root level
+      // The middleware will handle backward compatibility for v2.2
+      // We could fetch market data here for caching, but it's not needed
+      // since the stamps already have the data from the query
+      const enhancedStamps = stamps;
+
+      return enhancedStamps;
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error adding market data to stamp balances",
+        error: error instanceof Error ? error.message : String(error)
+      });
+      // Return original stamps if market data fetch fails
+      return stamps;
     }
   }
 
@@ -697,16 +733,49 @@ export class StampController {
     const proxyPath = `${baseUrl}/stamps/${identifier}`;
 
     try {
-      const response = await fetch(proxyPath);
-
-      return new Response(response.body, {
-        headers: Object.fromEntries(normalizeHeaders({
-          ...Object.fromEntries(response.headers),
-          "Content-Type": contentType,
-          "X-API-Version": API_RESPONSE_VERSION,
-          "Vary": "Accept-Encoding, X-API-Version, Origin",
-        })),
+      // Use raw fetch for binary content to avoid consuming the response body
+      const response = await fetch(proxyPath, {
+        method: 'GET',
+        headers: {
+          'Accept': '*/*',
+          'User-Agent': 'BTCStampsExplorer-CDN-Proxy'
+        }
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      // Convert ReadableStream to string for WebResponseUtil
+      // For binary content, we need to handle this properly
+      const isTextContent = contentType.includes('text/') ||
+                           contentType.includes('javascript') ||
+                           contentType.includes('application/json') ||
+                           contentType.includes('xml');
+
+      if (isTextContent) {
+        const textContent = await response.text();
+        return WebResponseUtil.stampResponse(textContent, contentType, {
+          binary: false,
+          headers: {
+            ...Object.fromEntries(response.headers),
+            "Vary": "Accept-Encoding, X-API-Version, Origin",
+          }
+        });
+      } else {
+        // For binary content, convert to base64 string as expected by WebResponseUtil
+        const arrayBuffer = await response.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        const base64String = btoa(String.fromCharCode(...uint8Array));
+
+        return WebResponseUtil.stampResponse(base64String, contentType, {
+          binary: true,
+          headers: {
+            ...Object.fromEntries(response.headers),
+            "Vary": "Accept-Encoding, X-API-Version, Origin",
+          }
+        });
+      }
     } catch (error) {
       logger.error("content", {
         message: "Error fetching from CDN",
@@ -779,7 +848,51 @@ export class StampController {
 
   private static async handleTextContent(result: any, contentInfo: any, identifier: string) {
     try {
-      const decodedContent = await decodeBase64(result.body);
+      let decodedContent = await decodeBase64(result.body);
+
+      // If it's SVG content, rewrite external references to use our proxy
+      if (contentInfo.mimeType.includes('svg') || decodedContent.includes('<svg')) {
+        // Rewrite ordinals.com references to use our proxy
+        decodedContent = decodedContent.replace(
+          /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
+          "/api/proxy/ordinals/$1"
+        );
+
+        // Rewrite arweave.net references to use our proxy
+        decodedContent = decodedContent.replace(
+          /https:\/\/arweave\.net\/([^"'\s>]+)/g,
+          "/api/proxy/arweave/$1"
+        );
+      }
+
+      // Apply Cloudflare Rocket Loader fixes to HTML content (including SVG with HTML structure)
+      if (contentInfo.mimeType.includes('html') || decodedContent.includes('<html') || decodedContent.includes('<script')) {
+        // Step 1: Ensure scripts have correct type and data-cfasync="false"
+        decodedContent = decodedContent.replace(
+          /(<script[^>]*?)>/g,
+          (_match, openingTagInnerContentAndAttributes) => {
+            let tag = openingTagInnerContentAndAttributes;
+            // Correct type if it's mangled by Cloudflare Rocket Loader
+            tag = tag.replace(
+              /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/i,
+              'type="text/javascript"',
+            );
+            // Add data-cfasync="false" if not already present
+            if (!tag.includes('data-cfasync="false"')) {
+              tag += ' data-cfasync="false"';
+            }
+            return tag + ">";
+          },
+        );
+
+        // Step 2: Globally correct any remaining mangled script types
+        // Cloudflare's Rocket Loader might change type="text/javascript"
+        // to type="<hex_value>-text/javascript". This reverts that change.
+        decodedContent = decodedContent.replace(
+          /type\s*=\s*"[a-f0-9]{24}-text\/javascript"/gi,
+          'type="text/javascript"',
+        );
+      }
 
       return WebResponseUtil.stampResponse(decodedContent, contentInfo.mimeType, {
         binary: false,
@@ -787,6 +900,10 @@ export class StampController {
           "CF-No-Transform": String(contentInfo.mimeType.includes('javascript') ||
                             contentInfo.mimeType.includes('text/html')),
           "X-API-Version": API_RESPONSE_VERSION,
+          // Disable Cloudflare optimizations for SVG content with inline JavaScript
+          "CF-Rocket-Loader": "false",
+          "CF-Auto-Minify": "false",
+          "CF-ScrapeShield": "false",
           ...(result.headers || {}),
         }
       });
@@ -805,6 +922,8 @@ export class StampController {
       binary: true,
       headers: Object.fromEntries(normalizeHeaders({
         "X-API-Version": API_RESPONSE_VERSION,
+        // Disable Cloudflare's Rocket Loader for all stamp content
+        "CF-Rocket-Loader": "false",
         ...(result.headers || {}),
       }))
     });
@@ -1057,6 +1176,7 @@ export class StampController {
   /**
    * Calculate total value of stamps in a wallet using cached market data
    * This is a specialized method for the wallet page that won't affect API endpoints
+   * OPTIMIZED: Uses MarketDataRepository.getBulkStampMarketData directly instead of heavy StampService.getStamps call
    */
   static async calculateWalletStampValues(stamps: StampBalance[]): Promise<{
     stampValues: { [cpid: string]: string | number };
@@ -1066,35 +1186,29 @@ export class StampController {
       const stampValues: { [cpid: string]: string | number } = {};
       let totalValue = 0;
 
-      // Get BTC price once
-      const btcPriceData = await BTCPriceService.getPrice();
-      const btcPrice = btcPriceData.price;
+      if (!stamps || stamps.length === 0) {
+        return { stampValues, totalValue };
+      }
 
       // Get all stamp CPIDs
       const cpids = stamps.map(s => s.cpid);
 
-      // Fetch stamps with market data in a single request
-      const stampsResult = await StampService.getStamps({
-        identifier: cpids,
-        allColumns: false,
-        noPagination: true,
-        skipTotalCount: true,
-        includeMarketData: true,
-        btcPriceUSD: btcPrice
-      });
-
-      // Create a map of stamps by CPID for quick lookup
-      const stampsByCpid = new Map(
-        stampsResult.stamps.map((stamp: any) => [stamp.cpid, stamp])
-      );
+      // OPTIMIZATION: Use direct market data fetch instead of full stamp data
+      const marketDataMap = await MarketDataRepository.getBulkStampMarketData(cpids);
 
       // Calculate values using cached market data
       stamps.forEach((walletStamp: any) => {
-        const stampData = stampsByCpid.get(walletStamp.cpid);
-        if (stampData && (stampData as any).marketData) {
-          const unitPrice = (stampData as any).marketData.floorPriceBTC ||
-                           (stampData as any).marketData.recentSalePriceBTC ||
-                           0;
+        const marketData = marketDataMap.get(walletStamp.cpid);
+        if (marketData) {
+          let unitPrice = 0;
+
+          // Use the same pricing hierarchy as the API endpoint
+          if (marketData.floorPriceBTC) {
+            unitPrice = marketData.floorPriceBTC;
+          } else if (marketData.recentSalePriceBTC) {
+            unitPrice = marketData.recentSalePriceBTC;
+          }
+
           const totalStampValue = unitPrice * walletStamp.balance;
           stampValues[walletStamp.cpid] = totalStampValue;
           totalValue += totalStampValue;
@@ -1113,7 +1227,7 @@ export class StampController {
     }
   }
 
-  static async getSpecificStamp(tx_index: string): Promise<{ stamp_url: string, stamp_mimetype: string }> {
-    return await StampService.getSpecificStamp(tx_index);
+  static async getSpecificStamp(identifier: string): Promise<{ stamp: number | undefined, stamp_url: string, stamp_mimetype: string }> {
+    return await StampService.getSpecificStamp(identifier);
   }
 }

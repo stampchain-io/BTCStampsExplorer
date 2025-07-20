@@ -490,19 +490,19 @@ const Radio = ({ label, value, checked, onChange, name }: RadioProps) => {
 
   return (
     <div
-      className="flex items-center py-1.5 mobileLg:py-1.5 cursor-pointer group"
+      class="flex items-center py-1.5 mobileLg:py-1.5 cursor-pointer group"
       onMouseLeave={handleMouseLeave}
       onClick={handleChange}
     >
       <input
-        className={inputCheckbox(checked, canHover)}
+        class={inputCheckbox(checked, canHover)}
         type="radio"
         name={name}
         value={value}
         checked={checked}
         readOnly
       />
-      <label className={labelLogicResponsive(checked, canHover)}>
+      <label class={labelLogicResponsive(checked, canHover)}>
         {label}
       </label>
     </div>
@@ -920,7 +920,7 @@ export const FilterContentStamp = ({
         variant="collapsibleTitle"
       >
         {/* Top Level: LISTINGS vs SALES */}
-        <div className="my-2">
+        <div class="my-2">
           <ToggleButton
             options={["listings", "sales"]}
             selected={filters.market}
@@ -936,7 +936,7 @@ export const FilterContentStamp = ({
         {filters.market === "listings" && (
           <div>
             {/* Dispensers and Atomics buttons */}
-            <div className="my-4">
+            <div class="my-4">
               <ToggleButton
                 options={["dispensers", "atomics"]}
                 selected={[
@@ -976,7 +976,7 @@ export const FilterContentStamp = ({
                   checked={filters.listings === "all"}
                   onChange={() => handleListingPriceType("all")}
                 />
-                <div className={`${labelXsR} ${labelXsPosition}`}>
+                <div class={`${labelXsR} ${labelXsPosition}`}>
                   PRICE RANGE
                 </div>
                 <Radio
@@ -1010,7 +1010,7 @@ export const FilterContentStamp = ({
 
                 {/* Custom price range slider */}
                 {filters.listings === "custom" && (
-                  <div className="mt-3 pl-0.5">
+                  <div class="mt-3 pl-0.5">
                     <RangeSlider
                       variant="price"
                       onChange={handlePriceRangeChange}
@@ -1026,7 +1026,7 @@ export const FilterContentStamp = ({
         {filters.market === "sales" && (
           <div>
             {/* Dispensers and Atomics buttons */}
-            <div className="my-4">
+            <div class="my-4">
               <ToggleButton
                 options={["dispensers", "atomics"]}
                 selected={[
@@ -1070,7 +1070,7 @@ export const FilterContentStamp = ({
               checked={filters.sales === "volume"}
               onChange={() => handleSalesType("volume")}
             />
-            <div className={`${labelXsR} ${labelXsPosition}`}>
+            <div class={`${labelXsR} ${labelXsPosition}`}>
               PRICE RANGE
             </div>
             <Radio
@@ -1090,7 +1090,7 @@ export const FilterContentStamp = ({
 
             {/* Custom price range slider for sales */}
             {filters.sales === "custom" && (
-              <div className="mt-3 pl-0.5">
+              <div class="mt-3 pl-0.5">
                 <RangeSlider
                   variant="price"
                   onChange={handlePriceRangeChange}
@@ -1100,7 +1100,7 @@ export const FilterContentStamp = ({
 
             {/* Volume Period Selection - only show if TRENDING is selected */}
             {filters.sales === "volume" && (
-              <div className="mt-3 pl-0.5">
+              <div class="mt-3 pl-0.5">
                 <ToggleButton
                   options={["24h", "7d", "30d"]}
                   selected={filters.volume}
@@ -1122,7 +1122,7 @@ export const FilterContentStamp = ({
         variant="collapsibleTitle"
       >
         {/* Category: PIXEL */}
-        <div className={`${labelXsR} ${labelXsPosition}`}>
+        <div class={`${labelXsR} ${labelXsPosition}`}>
           PIXELS
         </div>
         <Checkbox
@@ -1165,7 +1165,7 @@ export const FilterContentStamp = ({
         />
 
         {/* Category: VECTOR */}
-        <div className={`${labelXsR} ${labelXsPosition}`}>
+        <div class={`${labelXsR} ${labelXsPosition}`}>
           VECTOR
         </div>
         <Checkbox
@@ -1190,7 +1190,7 @@ export const FilterContentStamp = ({
         }
 
         {/* Category: AUDIO */}
-        <div className={`${labelXsR} ${labelXsPosition}`}>
+        <div class={`${labelXsR} ${labelXsPosition}`}>
           AUDIO
         </div>
         <Checkbox
@@ -1202,7 +1202,7 @@ export const FilterContentStamp = ({
         />
 
         {/* Category: ENCODING */}
-        <div className={`${labelXsR} ${labelXsPosition}`}>
+        <div class={`${labelXsR} ${labelXsPosition}`}>
           ENCODING
         </div>
         <Checkbox
@@ -1263,7 +1263,7 @@ export const FilterContentStamp = ({
         />
 
         {filters.fileSize === "custom" && (
-          <div className="mt-2">
+          <div class="mt-2">
             <RangeSlider
               variant="fileSize"
               onChange={handleFileSizeRangeChange}

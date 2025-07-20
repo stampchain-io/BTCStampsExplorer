@@ -9,7 +9,7 @@ const BLOCK_FIELDS =
 export class BlockRepository {
   // Dependency injection support
   private static db: typeof dbManager = dbManager;
-  
+
   static setDatabase(database: typeof dbManager): void {
     this.db = database;
   }
@@ -72,18 +72,16 @@ export class BlockRepository {
       const blocks = (result as any).rows;
       const blockIndexes = blocks.map((block: any) => block.block_index);
 
-      const tx_counts_result = await this.db.executeQueryWithCache<
-        { block_index: number; tx_count: number }[]
-      >(
+      const tx_counts_result = await this.db.executeQueryWithCache(
         `
         SELECT block_index, COUNT(*) AS tx_count
         FROM ${STAMP_TABLE}
-        WHERE block_index IN (${blockIndexes.map(() => "?").join(",")})
-        GROUP BY block_index;
+        WHERE block_index IN (${blockIndexes.join(",")})
+        GROUP BY block_index
         `,
-        blockIndexes,
-        "never",
-      ) || { rows: [] };
+        [],
+        60,
+      ) as { block_index: number; tx_count: number }[];
 
       const tx_counts = (tx_counts_result as any).rows;
 

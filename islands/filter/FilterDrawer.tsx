@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "preact/hooks";
 import { FilterContentStamp } from "$islands/filter/FilterContentStamp.tsx";
 import {
   defaultFilters as stampDefaultFilters,
@@ -6,6 +5,7 @@ import {
   queryParamsToFilters as stampQueryParamsToFilters,
   StampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
+import { useEffect, useRef, useState } from "preact/hooks";
 // Import SRC20 filter options
 import {
   defaultFilters as src20DefaultFilters,
@@ -14,16 +14,16 @@ import {
   SRC20Filters,
 } from "$islands/filter/FilterOptionsSRC20.tsx";
 // Import SRC20 filter content
-import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
-import { FilterType } from "$islands/button/FilterButton.tsx";
-import { CloseIcon, Icon } from "$icon";
 import { Button } from "$button";
-import { tooltipIcon } from "$notification";
+import { CloseIcon, Icon } from "$icon";
+import { FilterType } from "$islands/button/FilterButton.tsx";
+import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
+import { tooltipIcon } from "$notification";
 
 // Tooltip component
 const Tooltip = ({ visible, text }: { visible: boolean; text: string }) => (
-  <div className={`${tooltipIcon} ${visible ? "opacity-100" : "opacity-0"}`}>
+  <div class={`${tooltipIcon} ${visible ? "opacity-100" : "opacity-0"}`}>
     {text}
   </div>
 );
@@ -42,7 +42,8 @@ const FilterDrawer = (
 
   // Parse the current URL parameters to initialize filters
   const getInitialFilters = (): AllFilters => {
-    if (typeof globalThis.location === "undefined") {
+    // SSR-safe browser environment check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
       // SSR: return default filters
       return getEmptyFilters();
     }
@@ -258,6 +259,12 @@ const FilterDrawer = (
   };
 
   const handleApplyFilters = () => {
+    // SSR-safe browser environment check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      setOpen(false);
+      return; // Cannot apply filters during SSR
+    }
+
     const existingParams = new URLSearchParams(globalThis.location.search);
     const baseParams = existingParams.get("type")
       ? `type=${existingParams.get("type")}`
@@ -280,6 +287,12 @@ const FilterDrawer = (
     }
 
     // Construct the new URL with the query params
+    // SSR-safe browser environment check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      setOpen(false);
+      return; // Cannot navigate during SSR
+    }
+
     const newUrl = globalThis.location.pathname +
       (queryParams ? `?${queryParams}` : "");
 
@@ -319,15 +332,15 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}
-      <div className="h-[calc(100vh-110px)] tablet:h-[calc(100vh-82px)] overflow-y-auto scrollbar-black">
-        <div className="w-full pt-[25px] mobileLg:pt-[37px] tablet:pt-[38px] px-9 tablet:px-6">
-          <div className="relative w-full">
+      <div class="h-[calc(100vh-110px)] tablet:h-[calc(100vh-82px)] overflow-y-auto scrollbar-black">
+        <div class="w-full pt-[25px] mobileLg:pt-[37px] tablet:pt-[38px] px-9 tablet:px-6">
+          <div class="relative w-full">
             {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
-            <div className="flex flex-row tablet:hidden justify-between items-center w-full">
-              <h6 className="font-extrabold text-2xl gray-gradient1 mt-[1px] select-none">
+            <div class="flex flex-row tablet:hidden justify-between items-center w-full">
+              <h6 class="font-extrabold text-2xl gray-gradient1 mt-[1px] select-none">
                 FILTERS
               </h6>
-              <div className="relative">
+              <div class="relative">
                 <Tooltip
                   visible={isCloseTooltipVisible}
                   text={closeTooltipText}
@@ -344,8 +357,8 @@ const FilterDrawer = (
               </div>
             </div>
             {/* Tablet+ Icon - hidden on mobile, shows on tablet+ */}
-            <div className="hidden tablet:flex flex-row justify-between items-center w-full">
-              <div className="relative">
+            <div class="hidden tablet:flex flex-row justify-between items-center w-full">
+              <div class="relative">
                 <Tooltip
                   visible={isCloseTooltipVisible}
                   text={closeTooltipText}
@@ -362,7 +375,7 @@ const FilterDrawer = (
                   aria-label="Close menu"
                 />
               </div>
-              <h6 className="font-normal text-lg gray-gradient1 mt-[2px] select-none">
+              <h6 class="font-normal text-lg gray-gradient1 mt-[2px] select-none">
                 FILTERS
               </h6>
             </div>
@@ -370,7 +383,7 @@ const FilterDrawer = (
         </div>
 
         {/* Filter content based on type */}
-        <div className="flex flex-col pt-6 pb-9 px-9 tablet:pt-5 tablet:pb-6 tablet:px-6">
+        <div class="flex flex-col pt-6 pb-9 px-9 tablet:pt-5 tablet:pb-6 tablet:px-6">
           {type === "stamp" && (
             <FilterContentStamp
               initialFilters={currentFilters as StampFilters}
@@ -391,7 +404,7 @@ const FilterDrawer = (
         </div>
       </div>
       {/* Sticky buttons */}
-      <div className="flex justify-between w-full sticky bottom-0 py-9 tablet:py-6 px-9 tablet:px-6 gap-6
+      <div class="flex justify-between w-full sticky bottom-0 py-9 tablet:py-6 px-9 tablet:px-6 gap-6
        bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
         shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
         <Button

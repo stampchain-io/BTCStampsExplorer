@@ -4,7 +4,7 @@ import {
   queryParamsToFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
 import { expect } from "jsr:@std/expect";
-// not up to date with the new filter options
+
 Deno.test("filterToQueryParams - does not encode false values", () => {
   expect(filtersToQueryParams("", defaultFilters)).toEqual("");
 });
@@ -19,7 +19,7 @@ Deno.test("filterToQueryParams - encode boolean values", () => {
     ...defaultFilters,
     atomics: true,
     fileType: ["svg"],
-  })).toEqual("atomics=true&fileType=svg");
+  })).toEqual("atomics=true&filetype=svg");
 });
 
 Deno.test("queryParamsToFilters empty", () => {
@@ -28,19 +28,18 @@ Deno.test("queryParamsToFilters empty", () => {
   ).toEqual(defaultFilters);
 });
 
-Deno.test("queryParamsToFilters stampRangePreset", () => {
+Deno.test("queryParamsToFilters range preset", () => {
   expect(
-    queryParamsToFilters("?stampRangePreset=5000"),
+    queryParamsToFilters("?range=5000"),
   ).toEqual({
     ...defaultFilters,
-    // Note: this property might not exist in the current interface
-    // This test may need to be updated based on actual functionality
+    range: "5000",
   });
 });
 
 Deno.test("queryParamsToFilters file type filters", () => {
   expect(
-    queryParamsToFilters("?fileType=jpeg&fileType=gif"),
+    queryParamsToFilters("?filetype=jpeg,gif"),
   ).toEqual({
     ...defaultFilters,
     fileType: ["jpeg", "gif"],

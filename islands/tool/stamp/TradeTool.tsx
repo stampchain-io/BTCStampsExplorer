@@ -530,19 +530,19 @@ export function StampTradeTool() {
 
   /* ===== RENDER ===== */
   return (
-    <div className={`${bodyTool}`}>
+    <div class={`${bodyTool}`}>
       {/* ===== SELLER SECTION ===== */}
-      <h1 className={`${titlePurpleLD} mobileMd:mx-auto`}>
+      <h1 class={`${titlePurpleLD} mobileMd:mx-auto`}>
         ATTACH TO UTXO
       </h1>
-      <h2 className={`${subtitlePurple} mobileMd:mx-auto`}>SELLER</h2>
+      <h2 class={`${subtitlePurple} mobileMd:mx-auto`}>SELLER</h2>
 
       {/* ===== CREATE PSBT FORM ===== */}
-      <div className={containerBackground}>
-        <h3 className=" font-bold text-xl text-stamp-purple mb-2">
+      <div class={containerBackground}>
+        <h3 class=" font-bold text-xl text-stamp-purple mb-2">
           CREATE PSBT
         </h3>
-        <div className="flex flex-col gap-5">
+        <div class="flex flex-col gap-5">
           <InputField
             type="text"
             placeholder="UTXO (e.g., txid:vout)"
@@ -560,7 +560,7 @@ export function StampTradeTool() {
           />
         </div>
 
-        <div className="flex justify-end mt-5">
+        <div class="flex justify-end mt-5">
           <Button
             variant="flat"
             color="purple"
@@ -579,14 +579,14 @@ export function StampTradeTool() {
         />
 
         {tradeFormState.psbtHex && (
-          <div className={`${containerBackground} break-words mt-6`}>
-            <h2 className="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
+          <div class={`${containerBackground} break-words mt-6`}>
+            <h2 class="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
-              className="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
+              class="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
               readOnly
               value={tradeFormState.psbtHex}
             />
-            <p className="mt-2">
+            <p class="mt-2">
               Share this signed PSBT with the buyer to complete the transaction.
             </p>
           </div>
@@ -594,15 +594,15 @@ export function StampTradeTool() {
       </div>
 
       {/* ===== UTXO ATTACH FORM ===== */}
-      <div className={containerBackground}>
-        <h3 className=" font-bold text-xl text-stamp-purple mb-2">
+      <div class={containerBackground}>
+        <h3 class=" font-bold text-xl text-stamp-purple mb-2">
           UTXO ATTACH
         </h3>
-        <div className="flex flex-col gap-5">
+        <div class="flex flex-col gap-5">
           {/* Asset (CPID) section with query button */}
-          <div className="flex flex-col gap-5">
-            <div className="flex gap-5 items-start">
-              <div className="flex-grow">
+          <div class="flex flex-col gap-5">
+            <div class="flex gap-5 items-start">
+              <div class="flex-grow">
                 <InputField
                   type="text"
                   placeholder="Asset (cpid)"
@@ -611,7 +611,7 @@ export function StampTradeTool() {
                 />
               </div>
 
-              <div className="flex justify-end">
+              <div class="flex justify-end">
                 <Button
                   variant="outline"
                   color="purple"
@@ -626,8 +626,8 @@ export function StampTradeTool() {
 
             {/* Asset list */}
             {availableAssets.length > 0 && (
-              <div className="mt-2 max-h-60 overflow-y-auto bg-gray-800 rounded-md">
-                <div className="p-2 border-b border-gray-700 font-bold text-sm">
+              <div class="mt-2 max-h-60 overflow-y-auto bg-gray-800 rounded-md">
+                <div class="p-2 border-b border-gray-700 font-bold text-sm">
                   Available Assets (sorted by CPID)
                 </div>
                 {availableAssets.map((asset) => (
@@ -635,13 +635,13 @@ export function StampTradeTool() {
                     type="button"
                     key={asset.cpid}
                     onClick={() => handleAssetSelection(asset)}
-                    className="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-red-500 last:border-b-0"
+                    class="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-red-500 last:border-b-0"
                   >
-                    <div className="flex justify-between items-center">
-                      <div className="truncate flex-1">
+                    <div class="flex justify-between items-center">
+                      <div class="truncate flex-1">
                         {asset.cpid}
                       </div>
-                      <div className="ml-2 text-green-400">
+                      <div class="ml-2 text-green-400">
                         {`${asset.quantity.toLocaleString()} units`}
                       </div>
                     </div>
@@ -652,9 +652,9 @@ export function StampTradeTool() {
           </div>
 
           {/* Quantity input with MAX display */}
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-2 items-start">
-              <div className="flex-grow relative">
+          <div class="flex flex-col gap-2">
+            <div class="flex gap-2 items-start">
+              <div class="flex-grow relative">
                 <InputField
                   type="number"
                   placeholder="Quantity"
@@ -669,7 +669,7 @@ export function StampTradeTool() {
                   }}
                 />
                 {maxQuantity !== null && (
-                  <div className="absolute right-0 -top-6 text-sm text-gray-400">
+                  <div class="absolute right-0 -top-6 text-sm text-gray-400">
                     Max: {maxQuantity.toLocaleString()}
                   </div>
                 )}
@@ -677,7 +677,7 @@ export function StampTradeTool() {
             </div>
             {attachFormState.quantity && maxQuantity &&
               parseInt(attachFormState.quantity) > maxQuantity && (
-              <div className="text-red-500 text-sm">
+              <div class="text-red-500 text-sm">
                 Quantity cannot exceed {maxQuantity.toLocaleString()}
               </div>
             )}
@@ -691,9 +691,9 @@ export function StampTradeTool() {
           />
 
           {/* UTXO section with query button */}
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-5 items-start">
-              <div className="flex-grow">
+          <div class="flex flex-col gap-2">
+            <div class="flex gap-5 items-start">
+              <div class="flex-grow">
                 <InputField
                   type="text"
                   placeholder="UTXO (e.g., txid:vout)"
@@ -714,8 +714,8 @@ export function StampTradeTool() {
 
             {/* UTXO list */}
             {availableUtxos.length > 0 && (
-              <div className="mt-2 max-h-60 overflow-y-auto bg-gray-800 rounded-md">
-                <div className="p-2 border-b border-gray-700 font-bold text-sm">
+              <div class="mt-2 max-h-60 overflow-y-auto bg-gray-800 rounded-md">
+                <div class="p-2 border-b border-gray-700 font-bold text-sm">
                   Available UTXOs ≥ {MIN_UTXO_VALUE} sats (sorted by value)
                 </div>
                 {availableUtxos.map((utxo) => (
@@ -723,15 +723,15 @@ export function StampTradeTool() {
                     type="button"
                     key={`${utxo.txid}:${utxo.vout}`}
                     onClick={() => handleUtxoSelection(utxo)}
-                    className="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-gray-700 last:border-b-0"
+                    class="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-gray-700 last:border-b-0"
                   >
-                    <div className="flex justify-between items-center">
-                      <div className="truncate flex-1">
+                    <div class="flex justify-between items-center">
+                      <div class="truncate flex-1">
                         {`${utxo.txid.substring(0, 8)}...${
                           utxo.txid.substring(utxo.txid.length - 8)
                         }:${utxo.vout}`}
                       </div>
-                      <div className="ml-2 text-green-400">
+                      <div class="ml-2 text-green-400">
                         {`${utxo.value.toLocaleString()} sats`}
                       </div>
                     </div>
@@ -742,7 +742,7 @@ export function StampTradeTool() {
           </div>
         </div>
 
-        <div className="flex justify-end mt-5">
+        <div class="flex justify-end mt-5">
           <Button
             variant="flat"
             color="purple"
@@ -761,14 +761,14 @@ export function StampTradeTool() {
         />
 
         {attachFormState.psbtHex && (
-          <div className={`${containerBackground} break-words mt-6`}>
-            <h2 className="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
+          <div class={`${containerBackground} break-words mt-6`}>
+            <h2 class="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
-              className="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
+              class="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
               readOnly
               value={attachFormState.psbtHex}
             />
-            <p className="mt-2">
+            <p class="mt-2">
               Share this signed PSBT to complete the transaction.
             </p>
           </div>
@@ -777,12 +777,12 @@ export function StampTradeTool() {
 
       {/* ===== BUYER SECTION ===== */}
       {/* ===== COMPLETE SWAP FORM ===== */}
-      <div className={containerBackground}>
-        <h2 className={`${subtitlePurple} mobileMd:mx-auto`}>BUYER</h2>
-        <h3 className=" font-bold text-xl text-stamp-purple mb-2">
+      <div class={containerBackground}>
+        <h2 class={`${subtitlePurple} mobileMd:mx-auto`}>BUYER</h2>
+        <h3 class=" font-bold text-xl text-stamp-purple mb-2">
           COMPLETE SWAP
         </h3>
-        <div className="flex flex-col gap-5">
+        <div class="flex flex-col gap-5">
           <InputField
             type="text"
             placeholder="Seller's PSBT (Hex)"
@@ -804,7 +804,7 @@ export function StampTradeTool() {
             min="1"
           />
         </div>
-        <div className="flex justify-end mt-5">
+        <div class="flex justify-end mt-5">
           <Button
             variant="flat"
             color="purple"

@@ -1,6 +1,7 @@
-import { useEffect, useState } from "preact/hooks";
-import { PaginationProps } from "$types/pagination.d.ts";
 import { Icon } from "$icon";
+import { getWindowWidth } from "$lib/utils/freshNavigationUtils.ts";
+import { PaginationProps } from "$types/pagination.d.ts";
+import { useEffect, useState } from "preact/hooks";
 
 // Update pagination range constants
 const MOBILESM_MAX_PAGE_RANGE = 0;
@@ -22,7 +23,7 @@ const useScreenSize = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      const width = globalThis.innerWidth;
+      const width = getWindowWidth();
       if (width < 568) {
         setScreenSize("mobileSm");
       } else if (width < 768) {
@@ -75,6 +76,11 @@ export function Pagination({
     }
 
     // Legacy URL-based navigation if no onPageChange provided
+    // SSR-safe browser environment check
+    if (typeof globalThis === "undefined" || !globalThis?.location) {
+      return; // Cannot navigate during SSR
+    }
+
     const url = new URL(globalThis.location.href);
     url.searchParams.set(
       prefix ? `${prefix}_page` : "page",

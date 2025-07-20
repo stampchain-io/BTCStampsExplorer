@@ -1,14 +1,14 @@
 // import { SRC20Row } from "$globals";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import type { EnrichedSRC20Row } from "$globals";
 import {
   containerCardTable,
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
 } from "$layout";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
-import type { EnrichedSRC20Row } from "$globals";
 
 interface SRC20CardSmProps {
   data: EnrichedSRC20Row[];
@@ -173,6 +173,13 @@ export function SRC20CardSm({
                       e.button !== 1
                     ) {
                       e.preventDefault();
+                      // SSR-safe browser environment check
+                      if (
+                        typeof globalThis === "undefined" ||
+                        !globalThis?.location
+                      ) {
+                        return; // Cannot navigate during SSR
+                      }
                       const href = `/src20/${
                         encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
                       }`;
@@ -275,8 +282,8 @@ export function SRC20CardSm({
                   </td>
                   {/* CHANGE 24H */}
                   <td
-                    class={`text-right mobileMd:text-center 
-                      ${rowCardBorderRight} 
+                    class={`text-right mobileMd:text-center
+                      ${rowCardBorderRight}
                       mobileMd:${rowCardBorderCenter} mobileMd:pr-3 mobileMd:border-r-0 mobileMd:rounded-r-none`}
                   >
                     {src20.market_data?.change24 !== undefined &&

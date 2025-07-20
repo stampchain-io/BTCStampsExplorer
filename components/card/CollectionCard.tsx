@@ -100,8 +100,7 @@ export function CollectionCard(
           <div class="flex flex-col mobileLg:flex-row justify-between w-full">
             <h5 class={`${labelSm} -mt-0.5`}>
               <span class="min-[400px]:hidden">PRICE</span>
-              <span class="hidden min-[400px]:inline">FLOOR PRICE</span>
-              {" "}
+              <span class="hidden min-[400px]:inline">FLOOR PRICE</span>{" "}
               <span class={valueSm}>
                 {collection.marketData?.minFloorPriceBTC !== null &&
                     collection.marketData?.minFloorPriceBTC !== undefined

@@ -45,14 +45,9 @@ export interface StampWithOptionalMarketData {
   stamp_hash: string;
   file_hash: string;
 
-  // Optional market data fields
+  // Optional market data fields - contains all pricing/market information
   marketData?: StampMarketData | null;
   marketDataMessage?: string;
   cacheStatus?: CacheStatus;
   cacheAgeMinutes?: number;
-
-  // Legacy fields for backward compatibility
-  floorPrice?: number | null;
-  floorPriceUSD?: number | null;
-  marketCapUSD?: number | null;
 }

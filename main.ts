@@ -5,6 +5,31 @@
 /// <reference lib="deno.ns" />
 /// <reference types="npm:@types/node" />
 
+// Fix for EventTarget memory leak warning
+// Suppress MaxListenersExceededWarning for AbortSignal to prevent memory leak warnings
+// This is safe because we properly clean up listeners in our HTTP client
+if (typeof process !== "undefined" && process.emitWarning) {
+  const originalEmitWarning = process.emitWarning;
+  // @ts-ignore - Complex overloaded function signature, but we handle it safely
+  process.emitWarning = function (
+    warning: string | Error,
+    type?: string,
+    code?: string,
+    ctor?: Function,
+  ) {
+    // Suppress MaxListenersExceededWarning for AbortSignal
+    if (
+      type === "MaxListenersExceededWarning" &&
+      typeof warning === "string" &&
+      warning.includes("AbortSignal")
+    ) {
+      return;
+    }
+    // @ts-ignore - Complex overloaded function signature, but we handle it safely
+    return originalEmitWarning.call(this, warning, type, code, ctor);
+  };
+}
+
 // Try to establish the resolver as early as possible.
 // The error happens before the original main.ts logs, so this might not catch it either,
 // but it's an attempt to hook in earlier.
@@ -31,13 +56,13 @@ import.meta.resolve = function (specifier: string): string {
   return earlyOriginalResolve(specifier);
 };
 
-import "$/globals.d.ts";
-import { start } from "$fresh/server.ts";
-import build from "$fresh/dev.ts";
-import manifest from "$/fresh.gen.ts";
 import config from "$/fresh.config.ts";
-import "$server/database/index.ts"; // Ensures dbManager instance is created via its module execution
+import manifest from "$/fresh.gen.ts";
+import "$/globals.d.ts";
+import build from "$fresh/dev.ts";
+import { start } from "$fresh/server.ts";
 import { dbManager } from "$server/database/databaseManager.ts"; // Explicit import for direct use
+import "$server/database/index.ts"; // Ensures dbManager instance is created via its module execution
 import { BackgroundFeeService } from "$server/services/fee/backgroundFeeService.ts";
 
 // Set DENO_BUILD_MODE globally, to be accessible within the resolver

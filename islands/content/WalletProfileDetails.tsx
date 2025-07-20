@@ -1,12 +1,12 @@
 /* ===== WALLET PROFILE DETAILS COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
+import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
+import { Icon } from "$icon";
+import { containerBackground } from "$layout";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
-import { containerBackground } from "$layout";
-import { labelSm, subtitleGrey, titleGreyLD } from "$text";
 import { tooltipIcon } from "$notification";
-import { Icon } from "$icon";
+import { labelSm, subtitleGrey, titleGreyLD } from "$text";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface WalletProfileDetailsProps {
@@ -190,23 +190,25 @@ function TokenStats(
     src20Total,
     handleType: _handleType,
     src20Value = 0,
-    walletData: _walletData,
+    stampValue: _stampValue,
+    walletData,
   }: {
     src20Total: number;
     handleType: (type: string) => void;
     src20Value?: number;
+    stampValue?: number;
     walletData: WalletOverviewInfo;
   },
 ) {
   /* ===== COMPUTED VALUES ===== */
-  const totalValue = src20Value || 0;
+  const src20ValueUSD = (src20Value || 0) * (walletData.btcPrice || 0);
 
   /* ===== RENDER ===== */
   return (
     <div className="flex flex-col gap-1.5 mobileLg:gap-3">
       <div className="flex pb-1.5 mobileLg:pb-3">
         <StatTitle
-          label="TOKENS"
+          label="SRC-20"
           value={src20Total?.toString()}
         />
       </div>
@@ -216,12 +218,27 @@ function TokenStats(
           label="TOTAL VALUE"
           value={
             <>
-              {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
+              {src20Value > 0 ? src20Value.toFixed(8) : "N/A"}{" "}
               <span className="font-light">BTC</span>
             </>
           }
         />
-        <StatItem label="24H CHANGE" value="+/- 0.00%" align="right" />
+        <StatItem
+          label="TOTAL VALUE"
+          value={
+            <>
+              {src20ValueUSD > 0
+                ? `$${
+                  src20ValueUSD.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
+                }`
+                : "N/A"} <span className="font-light">USD</span>
+            </>
+          }
+          align="right"
+        />
       </div>
     </div>
   );
@@ -231,18 +248,23 @@ function TokenStats(
 function StampStats(
   {
     stampsTotal,
-    stampsCreated: _stampsCreated,
+    stampsCreated,
     handleType: _handleType,
-    stampValue: _stampValue = 0,
-    dispensers: _dispensers,
+    stampValue = 0,
+    dispensers,
+    walletData,
   }: {
     stampsTotal: number;
     stampsCreated: number;
     handleType: (type: string) => void;
     stampValue?: number;
     dispensers: { open: number; closed: number; total: number };
+    walletData: WalletOverviewInfo;
   },
 ) {
+  /* ===== COMPUTED VALUES ===== */
+  const stampValueUSD = (stampValue || 0) * (walletData.btcPrice || 0);
+
   /* ===== RENDER ===== */
   return (
     <div className="flex flex-col gap-1.5 mobileLg:gap-3">
@@ -252,9 +274,42 @@ function StampStats(
           value={stampsTotal.toString()}
         />
       </div>
+
       <div className="flex justify-between">
-        <StatItem label="CREATED" value="N/A" />
-        <StatItem label="LISTINGS" value="N/A" align="right" />
+        <StatItem
+          label="TOTAL VALUE"
+          value={
+            <>
+              {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
+              <span className="font-light">BTC</span>
+            </>
+          }
+        />
+        <StatItem
+          label="TOTAL VALUE"
+          value={
+            <>
+              {stampValueUSD > 0
+                ? `$${
+                  stampValueUSD.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
+                }`
+                : "N/A"} <span className="font-light">USD</span>
+            </>
+          }
+          align="right"
+        />
+      </div>
+
+      <div className="flex justify-between">
+        <StatItem label="CREATED" value={stampsCreated.toString()} />
+        <StatItem
+          label="LISTINGS"
+          value={dispensers.open.toString()}
+          align="right"
+        />
       </div>
     </div>
   );
@@ -294,6 +349,7 @@ function WalletStats(
             src20Total={src20Total}
             handleType={handleType}
             src20Value={src20Value}
+            stampValue={stampValue}
             walletData={walletData}
           />
         </div>
@@ -307,6 +363,7 @@ function WalletStats(
             stampValue={stampValue}
             dispensers={walletData.dispensers ||
               { open: 0, closed: 0, total: 0 }}
+            walletData={walletData}
           />
         </div>
       </div>
@@ -336,6 +393,10 @@ export default function WalletProfileDetails({
           src20Total={src20Total}
           stampsCreated={stampsCreated}
           setShowItem={setShowItem}
+          {...(walletData.stampValue !== undefined &&
+            { stampValue: walletData.stampValue })}
+          {...(walletData.src20Value !== undefined &&
+            { src20Value: walletData.src20Value })}
           walletData={walletData}
         />
       </div>

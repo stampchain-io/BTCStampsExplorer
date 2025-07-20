@@ -46,12 +46,12 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
 
       <form class={`${containerBackground} mb-6`}>
         {/* ===== TOKEN SELECTION ===== */}
-        <div className={containerColForm}>
+        <div class={containerColForm}>
           {hasFairminters
             ? (
               // Render the select dropdown if fairminters are available
               <select
-                className="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+                class="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={handleAssetChange}
               >
@@ -79,7 +79,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
               <input
                 type="text"
                 placeholder="ENTER ASSET"
-                className="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+                class="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
                 value={formState.asset}
                 onChange={(e) => handleInputChange(e, "asset")}
               />
@@ -88,7 +88,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
           <input
             type="number"
             placeholder="QUANTITY"
-            className="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
+            class="h-10 p-3 rounded-md bg-[#999999] text-black placeholder:text-black placeholder:font-light"
             value={formState.quantity}
             onChange={(e) => handleInputChange(e, "quantity")}
           />
@@ -96,7 +96,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
       </form>
 
       {/* ===== FEE CALCULATOR ===== */}
-      <div className={containerBackground}>
+      <div class={containerBackground}>
         <FeeCalculatorAdvanced
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

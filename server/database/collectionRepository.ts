@@ -1,10 +1,10 @@
 import { SMALL_LIMIT, STAMP_TABLE } from "$constants";
-import { dbManager } from "$server/database/databaseManager.ts";
 import { Collection } from "$globals";
+import { dbManager } from "$server/database/databaseManager.ts";
 export class CollectionRepository {
   // Dependency injection support
   private static db: typeof dbManager = dbManager;
-  
+
   static setDatabase(database: typeof dbManager): void {
     this.db = database;
   }
@@ -22,7 +22,7 @@ export class CollectionRepository {
     const offset = (page - 1) * limit;
 
     let query = `
-      SELECT 
+      SELECT
         HEX(c.collection_id) as collection_id,
         c.collection_name,
         c.collection_description,
@@ -30,10 +30,10 @@ export class CollectionRepository {
         GROUP_CONCAT(DISTINCT cs.stamp) as stamp_numbers,
         COUNT(DISTINCT cs.stamp) as stamp_count,
         SUM(
-          CASE 
+          CASE
             WHEN st.divisible = 1 THEN st.supply / 100000000
             WHEN st.supply > 100000 THEN 100000
-            ELSE st.supply 
+            ELSE st.supply
           END
         ) as total_editions
       FROM collections c
@@ -66,15 +66,15 @@ export class CollectionRepository {
 
     queryParams.push(limit, offset);
 
-    const results = await this.db.executeQueryWithCache<{ rows: any[]; [key: string]: any }>(
+    const result = await this.db.executeQueryWithCache(
       query,
       queryParams,
       60 * 5 // 5 minutes cache in seconds
-    );
+    ) as { rows: any[]; [key: string]: any };
 
     return {
-      ...results,
-      rows: results.rows.map((row: any) => ({
+      ...result,
+      rows: result.rows.map((row: any) => ({
         ...row,
         creators: row.creators ? row.creators.split(',') : [],
         stamps: row.stamp_numbers ? row.stamp_numbers.split(',').map(Number) : [],
@@ -133,17 +133,17 @@ export class CollectionRepository {
     collectionName: string,
   ): Promise<Collection | null> {
     const query = `
-      SELECT 
+      SELECT
         HEX(c.collection_id) as collection_id,
         c.collection_name,
         c.collection_description,
         GROUP_CONCAT(DISTINCT cc.creator_address) as creators,
         COUNT(DISTINCT cs.stamp) as stamp_count,
         SUM(
-          CASE 
+          CASE
             WHEN st.divisible = 1 THEN st.supply / 100000000
             WHEN st.supply > 100000 THEN 100000
-            ELSE st.supply 
+            ELSE st.supply
           END
         ) as total_editions
       FROM collections c
@@ -174,7 +174,7 @@ export class CollectionRepository {
     const offset = (page - 1) * limit;
 
     let query = `
-      SELECT 
+      SELECT
         collection_name
       FROM collections c
       LEFT JOIN collection_creators cc ON c.collection_id = cc.collection_id
@@ -216,7 +216,7 @@ export class CollectionRepository {
     const offset = (page - 1) * limit;
 
     let query = `
-      SELECT 
+      SELECT
         HEX(c.collection_id) as collection_id,
         c.collection_name,
         c.collection_description,
@@ -225,10 +225,10 @@ export class CollectionRepository {
         GROUP_CONCAT(DISTINCT cs.stamp) as stamp_numbers,
         COUNT(DISTINCT cs.stamp) as stamp_count,
         SUM(
-          CASE 
+          CASE
             WHEN st.divisible = 1 THEN st.supply / 100000000
             WHEN st.supply > 100000 THEN 100000
-            ELSE st.supply 
+            ELSE st.supply
           END
         ) as total_editions
     `;
@@ -268,7 +268,7 @@ export class CollectionRepository {
       // Aggregate market data from individual stamps in the collection
       query += `
       LEFT JOIN (
-        SELECT 
+        SELECT
           cs.collection_id,
           MIN(smd.floor_price_btc) as min_floor_price_btc,
           MAX(smd.floor_price_btc) as max_floor_price_btc,
@@ -302,9 +302,9 @@ export class CollectionRepository {
     `;
 
     if (includeMarketData) {
-      query += `, cmd.min_floor_price_btc, cmd.max_floor_price_btc, cmd.avg_floor_price_btc, 
+      query += `, cmd.min_floor_price_btc, cmd.max_floor_price_btc, cmd.avg_floor_price_btc,
                   cmd.total_volume_24h_btc, cmd.stamps_with_prices_count,
-                  cmd.min_holder_count, cmd.max_holder_count, cmd.avg_holder_count, 
+                  cmd.min_holder_count, cmd.max_holder_count, cmd.avg_holder_count,
                   cmd.total_unique_holders, cmd.avg_distribution_score,
                   cmd.total_stamps_count, cmd.last_updated`;
     }
@@ -322,17 +322,17 @@ export class CollectionRepository {
 
     queryParams.push(limit, offset);
 
-    const result = await this.db.executeQueryWithCache<{ rows: any[]; [key: string]: any }>(
+    const result = await this.db.executeQueryWithCache(
       query,
       queryParams,
       60 * 5 // 5 minutes cache in seconds
-    );
+    ) as { rows: any[]; [key: string]: any };
 
     // Transform the results to include market data in the expected format
     if (includeMarketData && (result as any).rows) {
       // Import parseBTCDecimal at the top of the file
       const { parseBTCDecimal } = await import("$lib/utils/marketData.ts");
-      
+
       (result as any).rows = (result as any).rows.map((row: any) => {
         const marketData = row.minFloorPriceBTC !== undefined ? {
           minFloorPriceBTC: parseBTCDecimal(row.minFloorPriceBTC),
