@@ -6,10 +6,10 @@ type Next = any;
 
 /**
  * API Version Middleware
- * 
+ *
  * Handles API version headers and manages version-specific transformations
  * Supports semantic versioning (e.g., 2.2, 2.3) through API-Version header
- * 
+ *
  * Task 4.1: Implement API Version Header Middleware and Validation
  */
 
@@ -34,18 +34,28 @@ export const VERSION_CONFIG: VersionConfig = {
 // Fields added in each version
 const VERSION_FIELDS: Record<string, string[]> = {
   "2.3": [
-    "marketData",
+    "market_data", // Clean nested market data object only - NO root price fields
     "dispenserInfo",
     "cacheStatus",
     "cacheInfo",
     "holderCount",
     "uniqueHolderCount",
-    "floorPriceBTC",
-    "volume24hBTC",
     "dataQualityScore",
-    "priceSource"
+    "priceSource",
+    "fee_rate_sat_vb", // v2.3+ transaction fee rate (transaction endpoints only)
+    "fee" // v2.3+ transaction fee (transaction endpoints only)
   ],
-  "2.2": [] // Base version - no enhanced fields
+  "2.2": [] // Base version - no market data fields at all
+};
+
+// Fields that should be REMOVED in specific versions (for root-level price cleanup)
+const VERSION_FIELDS_TO_REMOVE: Record<string, string[]> = {
+  "2.3": [
+    "floorPrice", // Moved to marketData.floorPriceBTC
+    "floorPriceUSD", // Moved to marketData.floorPriceUSD
+    "marketCapUSD" // Moved to marketData calculation
+  ],
+  "2.2": [] // Base version - no removals needed
 };
 
 export interface VersionContext {
@@ -59,10 +69,10 @@ export interface VersionContext {
  * Parse API version from request headers
  */
 function parseApiVersion(headers: Headers): string {
-  const versionHeader = headers.get("api-version") || 
-                       headers.get("x-api-version") || 
+  const versionHeader = headers.get("api-version") ||
+                       headers.get("x-api-version") ||
                        headers.get("accept-version");
-  
+
   if (!versionHeader) {
     return VERSION_CONFIG.defaultVersion;
   }
@@ -75,7 +85,7 @@ function parseApiVersion(headers: Headers): string {
   }
 
   const requestedVersion = versionMatch[1];
-  
+
   // Check if version is supported
   if (!VERSION_CONFIG.supportedVersions.includes(requestedVersion)) {
     logger.warn("api", { message: `Unsupported API version requested: ${requestedVersion}` });
@@ -91,11 +101,11 @@ function parseApiVersion(headers: Headers): string {
 function getVersionContext(version: string): VersionContext {
   const isDeprecated = VERSION_CONFIG.deprecatedVersions.includes(version);
   const endOfLife = VERSION_CONFIG.versionEndOfLife[version];
-  
+
   // Get all fields available for this version
   const enhancedFields: string[] = [];
   const versionNum = parseFloat(version);
-  
+
   for (const [v, fields] of Object.entries(VERSION_FIELDS)) {
     if (parseFloat(v) <= versionNum) {
       enhancedFields.push(...fields);
@@ -112,7 +122,7 @@ function getVersionContext(version: string): VersionContext {
 
 /**
  * API Version Middleware
- * 
+ *
  * Adds version information to request state and response headers
  */
 export async function apiVersionMiddleware(
@@ -120,7 +130,7 @@ export async function apiVersionMiddleware(
   next: Next
 ): Promise<Response> {
   const { req, state } = ctx;
-  
+
   // Handle case where req might be undefined
   let headers: Headers;
   if (req && req.headers) {
@@ -136,15 +146,15 @@ export async function apiVersionMiddleware(
     // Use empty headers as fallback
     headers = new Headers();
   }
-  
+
   // Parse API version from headers
   const version = parseApiVersion(headers);
   const versionContext = getVersionContext(version);
-  
+
   // Store version context in state for downstream use
   state.apiVersion = version;
   state.versionContext = versionContext;
-  
+
   // Log version usage
   const requestUrl = req?.url || ctx.state.request?.url || "unknown";
   logger.info("api", {
@@ -159,7 +169,7 @@ export async function apiVersionMiddleware(
   // Add version headers to response
   response.headers.set("API-Version", version);
   response.headers.set("API-Version-Supported", VERSION_CONFIG.supportedVersions.join(", "));
-  
+
   // Add deprecation warning if applicable
   if (versionContext.isDeprecated) {
     response.headers.set("Deprecation", "true");
@@ -168,7 +178,7 @@ export async function apiVersionMiddleware(
       "Link",
       `<https://stampchain.io/docs/api/migration>; rel="deprecation"`
     );
-    
+
     logger.warn("api", {
       message: `Deprecated API version ${version} used`,
       endOfLife: versionContext.endOfLife
@@ -188,14 +198,20 @@ export async function apiVersionMiddleware(
 export function getFieldsToStrip(version: string): Set<string> {
   const versionNum = parseFloat(version);
   const fieldsToStrip = new Set<string>();
-  
+
   // Add fields from newer versions that should be stripped
   for (const [v, fields] of Object.entries(VERSION_FIELDS)) {
     if (parseFloat(v) > versionNum) {
       fields.forEach(field => fieldsToStrip.add(field));
     }
   }
-  
+
+  // Add fields that should be specifically removed for this version
+  const fieldsToRemove = VERSION_FIELDS_TO_REMOVE[version];
+  if (fieldsToRemove) {
+    fieldsToRemove.forEach(field => fieldsToStrip.add(field));
+  }
+
   return fieldsToStrip;
 }
 
@@ -230,7 +246,7 @@ export function requireApiVersion(minVersion: string) {
   return async (ctx: Context, next: Next): Promise<Response> => {
     const version = ctx.state.apiVersion || VERSION_CONFIG.defaultVersion;
     const validation = validateVersionSupport(version, minVersion);
-    
+
     if (!validation.valid) {
       return new Response(
         JSON.stringify({
@@ -247,7 +263,7 @@ export function requireApiVersion(minVersion: string) {
         }
       );
     }
-    
+
     return await next();
   };
 }

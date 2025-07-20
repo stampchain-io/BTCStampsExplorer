@@ -1,9 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { BlockService } from "$server/services/blockService.ts";
 import { getCurrentBlock } from "$lib/utils/mempool.ts";
-import { StampService } from "$server/services/stampService.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
+import { BlockService } from "$server/services/blockService.ts";
+import { StampService } from "$server/services/stampService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 
 interface HealthStatus {
@@ -35,10 +35,7 @@ export const handler: Handlers = {
     // Extract path to check if this is a simple health check
     const url = new URL(ctx.url);
     if (url.searchParams.has("simple")) {
-      return new Response(JSON.stringify({ status: "OK" }), {
-        headers: { "Content-Type": "application/json" },
-        status: 200,
-      });
+      return ApiResponseUtil.success({ status: "OK" }, { forceNoCache: true });
     }
 
     // Continue with full health check if not simple

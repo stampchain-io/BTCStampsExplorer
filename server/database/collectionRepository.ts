@@ -1,6 +1,14 @@
 import { SMALL_LIMIT, STAMP_TABLE } from "$constants";
 import { Collection } from "$globals";
 import { dbManager } from "$server/database/databaseManager.ts";
+
+// Local utility function for BTC decimal parsing
+function parseBTCDecimal(value: any): number {
+  if (value === null || value === undefined) return 0;
+  const parsed = typeof value === 'string' ? parseFloat(value) : Number(value);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
 export class CollectionRepository {
   // Dependency injection support
   private static db: typeof dbManager = dbManager;
@@ -330,9 +338,6 @@ export class CollectionRepository {
 
     // Transform the results to include market data in the expected format
     if (includeMarketData && (result as any).rows) {
-      // Import parseBTCDecimal at the top of the file
-      const { parseBTCDecimal } = await import("$lib/utils/marketData.ts");
-
       (result as any).rows = (result as any).rows.map((row: any) => {
         const marketData = row.minFloorPriceBTC !== undefined ? {
           minFloorPriceBTC: parseBTCDecimal(row.minFloorPriceBTC),

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
 import {
   COLLECTION_FILTER_TYPES,
   LISTING_FILTER_TYPES,
@@ -6,8 +6,8 @@ import {
   STAMP_FILTER_TYPES,
   WALLET_FILTER_TYPES,
 } from "$globals";
-import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
 import { Icon } from "$icon";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 type FilterTypes =
   | SRC20_FILTER_TYPES
@@ -127,6 +127,11 @@ export function FilterOld({
       setFilterValue?.(newFilters);
       updateURL({ filterBy: newFilters });
 
+      // SSR-safe browser environment check
+      if (typeof globalThis === "undefined" || !globalThis?.location) {
+        return newFilters; // Cannot navigate during SSR
+      }
+
       const url = new URL(globalThis.location.href);
       url.searchParams.set(
         "filterBy",
@@ -169,7 +174,7 @@ export function FilterOld({
         {open
           ? (
             <>
-              <p className="text-xl text-stamp-purple-bright font-black tracking-[0.05em] mb-1">
+              <p class="text-xl text-stamp-purple-bright font-black tracking-[0.05em] mb-1">
                 FILTERS
               </p>
               {filterButtons.map((filter) => (
@@ -206,7 +211,7 @@ export function FilterOld({
           className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-lg shadow-md"
         >
           FILTERS
-          <div className="tooltip-arrow" />
+          <div class="tooltip-arrow" />
         </div>
       )}
       {/* Modal for mobile screens */}
@@ -218,10 +223,10 @@ export function FilterOld({
           }}
         >
           <div class={modalFilter}>
-            <div className={animatedBorderGrey}>
+            <div class={animatedBorderGrey}>
               <div class="relative flex flex-col max-h-[90%] overflow-hidden">
                 <div class="relative z-[2] !bg-[#080808] text-center rounded-md p-3">
-                  <p className="text-lg text-stamp-grey font-light mb-2">
+                  <p class="text-lg text-stamp-grey font-light mb-2">
                     FILTERS
                   </p>
                   {filterButtons.map((filter) => (

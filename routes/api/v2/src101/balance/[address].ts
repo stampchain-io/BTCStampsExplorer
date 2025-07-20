@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
 import { AddressHandlerContext } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
@@ -55,13 +55,13 @@ export const handler: Handlers<AddressHandlerContext> = {
         return emptyCheck;
       }
 
-      return ResponseUtil.success(result, { routeType: RouteType.BALANCE });
+      return ApiResponseUtil.success(result, { routeType: RouteType.BALANCE });
     } catch (error) {
       console.error(
         "Error in [deploy_hash]/address/[address_btc] handler:",
         error,
       );
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error processing src101 tokenids request",
       );

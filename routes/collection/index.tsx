@@ -1,16 +1,12 @@
 /* ===== COLLECTION LANDING PAGE ===== */
+import { FreshContext, Handlers } from "$fresh/server.ts";
 import {
   CollectionGalleryProps,
   STAMP_FILTER_TYPES,
   StampGalleryProps,
   StampRow,
 } from "$globals";
-import { FreshContext, Handlers } from "$fresh/server.ts";
-import { CollectionController } from "$server/controller/collectionController.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import {
-  CollectionWithOptionalMarketData,
-} from "$server/types/collection.d.ts";
+import { CollectionOverviewHeader } from "$header";
 import { body, gapSection } from "$layout";
 import {
   CollectionDetailGallery,
@@ -18,7 +14,11 @@ import {
   StampGallery,
   StampPoshCta,
 } from "$section";
-import { CollectionOverviewHeader } from "$header";
+import { CollectionController } from "$server/controller/collectionController.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import {
+  CollectionWithOptionalMarketData,
+} from "$server/types/collection.d.ts";
 
 /* ===== TYPES ===== */
 type CollectionLandingPageProps = {
@@ -161,45 +161,9 @@ export default function CollectionLandingPage(
     },
   };
 
-  {
-    /*
-  const EspeciallyPoshSection: CollectionGalleryProps = {
-    title: "ESPECIALLY POSH",
-    subTitle: "STAMP COLLECTIONS",
-    collections: collections,
-    gridClass: `
-      grid gap-3 mobileLg:gap-6
-      grid-cols-2 tablet:grid-cols-3
-    `,
-    displayCounts: {
-      "mobileSm": 2, // 2 columns x 1 rows
-      "mobileLg": 2, // 2 columns x 1 rows
-      "tablet": 3, // 3 columns x 1 rows
-      "desktop": 3, // 3 columns x 1 rows
-    },
-  };
-
-  const CuttingEdgeSection: CollectionGalleryProps = {
-    title: "CUTTING EDGE",
-    subTitle: "SRC-721r COLLECTIONS",
-    collections: collections,
-    gridClass: `
-      grid gap-3 mobileLg:gap-6
-      grid-cols-2 tablet:grid-cols-3 desktop:grid-cols-4
-    `,
-    displayCounts: {
-      "mobileSm": 2, // 2 columns x 1 rows
-      "mobileLg": 2, // 2 columns x 1 rows
-      "tablet": 3, // 3 columns x 1 rows
-      "desktop": 4, // 4 columns x 1 rows
-    },
-  };
-    */
-  }
-
   /* ===== COMPONENT ===== */
   return (
-    <div className={`${body} ${gapSection}`}>
+    <div class={`${body} ${gapSection}`}>
       <div>
         <CollectionOverviewHeader />
         <StampGallery
@@ -213,12 +177,6 @@ export default function CollectionLandingPage(
         <RecursiveContactCta />
       </div>
       <CollectionDetailGallery {...CollectionDetailSection} />
-      {
-        /*
-        <CollectionGallery {...EspeciallyPoshSection} />
-        <CollectionGallery {...CuttingEdgeSection} />
-      */
-      }
     </div>
   );
 }

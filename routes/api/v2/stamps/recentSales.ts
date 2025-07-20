@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
   checkEmptyResult,
@@ -41,10 +41,10 @@ export const handler: Handlers = {
       }
 
       // Return with appropriate cache duration for recent sales
-      return ResponseUtil.success(result, { routeType: RouteType.DYNAMIC });
+      return ApiResponseUtil.success(result, { routeType: RouteType.DYNAMIC });
     } catch (error) {
       console.error("Error in GET handler:", error);
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error processing recent sales request",
       );

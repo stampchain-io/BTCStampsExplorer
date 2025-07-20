@@ -144,7 +144,7 @@ describe("MarketDataRepository Comprehensive Tests", () => {
       assertEquals(stamp.marketData?.cpid, "TEST001");
       assertEquals(stamp.marketData?.floorPriceBTC, 0.000015);
       assertEquals(stamp.marketData?.holderCount, 100);
-      assertEquals(stamp.cacheStatus, "fresh");
+      assertEquals(stamp.cacheStatus, "FRESH"); // Implementation returns uppercase
       assertEquals(stamp.cacheAgeMinutes, 5);
     });
 

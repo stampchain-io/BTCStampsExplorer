@@ -5,10 +5,10 @@ import { InternalRouteGuard } from "$server/services/security/internalRouteGuard
 export const handler: Handlers = {
   async GET(req) {
     try {
-      // CSRF protection for internal endpoints
-      const csrfResult = await InternalRouteGuard.requireCSRF(req);
-      if (csrfResult) {
-        return csrfResult; // Return the error response directly
+      // Origin validation for read-only endpoint (no CSRF needed)
+      const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+      if (originError) {
+        return originError;
       }
 
       const url = new URL(req.url);

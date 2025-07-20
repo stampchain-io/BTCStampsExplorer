@@ -130,14 +130,19 @@ export const WalletStampValue = memo(function WalletStampValue({
   showBreakdown = false,
   showSource = false,
 }: WalletStampValueProps) {
+  const stampValue = useStampValue(stamp);
   const {
     quantity,
     totalValue,
-    formattedTotalValue,
+    formattedValue,
     formattedUnitPrice,
     hasValue,
-    priceSource,
-  } = useStampValue(stamp);
+    dataSource,
+  } = stampValue;
+
+  // Assign to expected variable names for compatibility
+  const formattedTotalValue = formattedValue;
+  const priceSource = dataSource;
 
   const sourceLabels = {
     market: "Market Data", // v2.3 calculated price from marketData.lastPriceBTC

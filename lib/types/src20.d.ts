@@ -2,10 +2,35 @@ import type { SRC20Row } from "$globals";
 import type {
   CacheStatus,
   MarketListingAggregated,
+  SRC20MarketData,
 } from "$types/marketData.d.ts";
 import type { BufferLike } from "$types/utils.d.ts";
 
 type INETWORK = "mainnet" | "testnet";
+
+/**
+ * Chart data point: [timestamp, priceInSatoshis]
+ * - timestamp: Unix timestamp in milliseconds (from Date.getTime())
+ * - priceInSatoshis: Price converted to satoshis (BTC * 100000000)
+ */
+export type ChartDataPoint = [number, number];
+
+/**
+ * Chart data structure used by ChartWidget component
+ * Array of time-series price data points for Highcharts
+ */
+export type ChartData = ChartDataPoint[];
+
+/**
+ * Chart configuration options for different chart types
+ */
+export interface ChartOptions {
+  type?: "line" | "candlestick";
+  title?: string;
+  yAxisTitle?: string;
+  fromPage?: string;
+  tick?: string;
+}
 
 export interface VOUT {
   address?: string;
@@ -116,7 +141,7 @@ export interface SRC20TickPageData {
     totalMints: number;
     totalTransfers: number;
   };
-  highcharts?: any[];
+  highcharts?: ChartData;
 }
 
 export interface SRC20BalanceRequestParams {
@@ -132,125 +157,30 @@ export interface SRC20BalanceRequestParams {
   includeMarketData?: boolean; // NEW: API v2.3 enhancement for market data enrichment
 }
 
-/**
- * Enhanced SRC20 Row with clean v2.3 market data structure
- * Used for detailed token pages with additional enrichment data
- */
+// Add EnrichedSRC20Row type
 export interface EnrichedSRC20Row extends SRC20Row {
-  // ONLY clean nested market data structure ✅
-  market_data?: SRC20MarketDataV3 | null;
-
-  // Additional enrichment data
-  chart?: any; // TODO: Define proper chart interface
-  holders: number; // Inherited from SRC20Row but made explicit
-
-  // Optional metadata
-  marketDataMessage?: string;
-  cacheStatus?: CacheStatus;
-  cacheAgeMinutes?: number;
+  market_data?: MarketListingAggregated;
+  chart?: ChartData;
+  // holders is inherited from SRC20Row
+  // deploy_img, deploy_tx, stamp_url are inherited from SRC20Row
 }
 
 /**
- * Utility type for safe market data access patterns
- * Components should use these patterns instead of direct property access
- * Type guard functions are implemented in lib/utils/marketDataHelpers.ts
- */
-export type SafeMarketDataAccess<
-  T extends SRC20Token | SRC20Balance | EnrichedSRC20Row,
-> = T extends { market_data: SRC20MarketDataV3 } ? T["market_data"] : never;
-
-/**
- * Clean v2.3 Market Data structure for SRC20 tokens
- * Standardized nested object - NO root-level field duplication
- */
-export interface SRC20MarketDataV3 {
-  // Price fields (BTC-denominated)
-  floorPriceBTC: number | null;
-  recentSalePriceBTC: number | null;
-  lastPriceBTC: number; // Best available price (hierarchy: floor > recent > 0)
-
-  // Market metrics
-  marketCapBTC: number;
-  marketCapUSD: number;
-
-  // Volume data
-  volume24hBTC: number;
-  volume7dBTC: number;
-  volume30dBTC: number;
-
-  // Market activity
-  holderCount: number;
-  circulatingSupply: string;
-
-  // Price changes
-  change24h: number | null; // Percentage change
-  change7d: number | null;
-  change30d: number | null;
-
-  // Data quality & metadata
-  dataQualityScore: number; // 1-10 scale
-  lastUpdated: string; // ISO date string
-  primaryExchange: string | null;
-  exchangeSources: string[] | null;
-}
-
-/**
- * Clean v2.3 SRC20 Token interface
- * ONLY uses nested market_data object - NO root-level market fields
- */
-export interface SRC20Token extends SRC20Row {
-  // ONLY nested market data structure ✅
-  market_data?: SRC20MarketDataV3 | null;
-
-  // Optional enrichment metadata
-  marketDataMessage?: string;
-  cacheStatus?: CacheStatus;
-  cacheAgeMinutes?: number;
-
-  // Chart data for detail pages
-  chart?: any; // TODO: Define proper chart interface
-}
-
-/**
- * Clean v2.3 SRC20 Balance interface for wallet endpoints
- * Extends basic balance with optional market data enrichment
- */
-export interface SRC20Balance extends SRC20Row {
-  // Balance-specific fields
-  address: string;
-  balance: string;
-  available: string;
-  transferable: string;
-
-  // ONLY nested market data structure ✅
-  market_data?: SRC20MarketDataV3 | null;
-
-  // Optional enrichment metadata
-  marketDataMessage?: string;
-  cacheStatus?: CacheStatus;
-  cacheAgeMinutes?: number;
-}
-
-/**
- * @deprecated Legacy interface - use SRC20Token instead
- * Kept temporarily for backward compatibility during migration
+ * Extended SRC20 interface that includes optional market data from cache
+ * Used when SRC20 tokens are fetched with market data
  */
 export interface SRC20WithOptionalMarketData extends SRC20Row {
-  /** @deprecated Use market_data?.floorPriceBTC instead */
-  marketData?: SRC20MarketDataV3 | null;
+  // Optional market data fields
+  marketData?: SRC20MarketData | null;
   marketDataMessage?: string;
   cacheStatus?: CacheStatus;
   cacheAgeMinutes?: number;
 
-  /** @deprecated Use market_data instead - will be removed in v2.4 */
+  // Legacy fields for backward compatibility
   market_data?: MarketListingAggregated;
-  /** @deprecated Use market_data?.floorPriceBTC instead */
   priceBTC?: number | null;
-  /** @deprecated Use market_data?.marketCapUSD instead */
   priceUSD?: number | null;
-  /** @deprecated Use market_data?.marketCapUSD instead */
   marketCapUSD?: number | null;
-  /** @deprecated Use market_data?.volume24hBTC instead */
   volume24h?: number | null;
 }
 
@@ -266,29 +196,7 @@ export interface SRC20MarketDataQueryParams {
 }
 
 /**
- * Paginated SRC20 response with market data - v2.3 Clean Format
- * Uses clean SRC20Token interface with nested market_data structure only
- */
-export interface PaginatedSRC20Response {
-  page: number;
-  limit: number;
-  totalPages: number;
-  total: number;
-  last_block: number;
-  data: SRC20Token[]; // ✅ Using clean interface
-  marketDataSummary?: {
-    tokensWithData: number;
-    tokensWithoutData: number;
-    totalMarketCapBTC: number;
-    totalMarketCapUSD: number;
-    totalVolume24hBTC: number;
-    cacheStatus: CacheStatus;
-  };
-}
-
-/**
- * @deprecated Use PaginatedSRC20Response instead
- * Legacy paginated response - kept for backward compatibility
+ * Paginated SRC20 response with market data
  */
 export interface PaginatedSRC20WithMarketDataResponse {
   page: number;
@@ -296,7 +204,7 @@ export interface PaginatedSRC20WithMarketDataResponse {
   totalPages: number;
   total: number;
   last_block: number;
-  data: SRC20WithOptionalMarketData[]; // Legacy format
+  data: SRC20WithOptionalMarketData[];
   marketDataSummary?: {
     tokensWithData: number;
     tokensWithoutData: number;

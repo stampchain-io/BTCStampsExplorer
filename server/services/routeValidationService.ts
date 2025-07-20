@@ -1,4 +1,4 @@
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 
 export type SortDirection = "ASC" | "DESC";
 
@@ -37,7 +37,7 @@ export function validateRequiredParams(
   if (missingParams.length > 0) {
     return {
       isValid: false,
-      error: ResponseUtil.badRequest(
+      error: ApiResponseUtil.badRequest(
         `Missing required parameters: ${missingParams.join(", ")}`,
       ),
     };
@@ -74,7 +74,7 @@ export function validateSortParam(
   if (!["ASC", "DESC"].includes(normalizedSort)) {
     return {
       isValid: false,
-      error: ResponseUtil.badRequest(
+      error: ApiResponseUtil.badRequest(
         `Invalid sort parameter. Must be one of: ASC, DESC`,
       ),
     };
@@ -98,7 +98,7 @@ export function checkEmptyResult(
 ): Response | undefined {
   if (!result || (typeof result === "object" && Object.keys(result).length === 0)) {
     console.log(`Empty result received for ${context}:`, result);
-    return ResponseUtil.notFound(`No ${context} found`);
+    return ApiResponseUtil.notFound(`No ${context} found`);
   }
   return undefined;
 }
@@ -124,7 +124,7 @@ export function validateFileUpload(
   if (missingFields.length > 0) {
     return {
       isValid: false,
-      error: ResponseUtil.badRequest(
+      error: ApiResponseUtil.badRequest(
         `Missing required fields: ${missingFields.join(", ")}`,
       ),
     };
@@ -142,7 +142,7 @@ export function validateFileUpload(
     if (sizeInBytes > maxSizeBytes) {
       return {
         isValid: false,
-        error: ResponseUtil.badRequest(
+        error: ApiResponseUtil.badRequest(
           `File size exceeds maximum allowed size of ${maxSizeBytes} bytes`,
         ),
       };
@@ -154,7 +154,7 @@ export function validateFileUpload(
       if (!allowedMimeTypes.includes(mimeType)) {
         return {
           isValid: false,
-          error: ResponseUtil.badRequest(
+          error: ApiResponseUtil.badRequest(
             `Invalid file type. Allowed types: ${allowedMimeTypes.join(", ")}`,
           ),
         };

@@ -81,6 +81,7 @@ export class FetchHttpClient implements HttpClient {
   private maxPoolSize: number;
   private totalRequests: number;
   private totalErrors: number;
+  private activeTimeouts: Set<number>; // Track active timeout IDs
 
   constructor(
     defaultTimeout: number = 30000,
@@ -98,6 +99,7 @@ export class FetchHttpClient implements HttpClient {
     this.maxPoolSize = maxPoolSize;
     this.totalRequests = 0;
     this.totalErrors = 0;
+    this.activeTimeouts = new Set(); // Initialize timeout tracking
   }
 
   /**
@@ -146,11 +148,17 @@ export class FetchHttpClient implements HttpClient {
     // If only timeout, create a timeout controller
     if (!externalSignal && timeoutMs) {
       const timeoutController = new AbortController();
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         if (!timeoutController.signal.aborted) {
           timeoutController.abort();
         }
+        // Remove from active timeouts when it fires
+        this.activeTimeouts.delete(timeoutId);
       }, timeoutMs);
+
+      // Track the timeout ID
+      this.activeTimeouts.add(timeoutId);
+
       return timeoutController.signal;
     }
 
@@ -169,11 +177,17 @@ export class FetchHttpClient implements HttpClient {
       if (!combinedController.signal.aborted) {
         combinedController.abort();
       }
+      // Remove from active timeouts when it fires
+      this.activeTimeouts.delete(timeoutId);
     }, timeoutMs!);
+
+    // Track the timeout ID
+    this.activeTimeouts.add(timeoutId);
 
     // Listen to external signal - but only add ONE listener
     const abortHandler = () => {
       clearTimeout(timeoutId);
+      this.activeTimeouts.delete(timeoutId); // Remove from tracking
       if (!combinedController.signal.aborted) {
         combinedController.abort();
       }
@@ -388,5 +402,11 @@ export class FetchHttpClient implements HttpClient {
       }
     });
     this.abortControllerPool = [];
+
+    // Clear all active timeouts
+    this.activeTimeouts.forEach(timeoutId => {
+      clearTimeout(timeoutId);
+    });
+    this.activeTimeouts.clear();
   }
 }

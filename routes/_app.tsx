@@ -31,7 +31,12 @@ export default function App({ Component, state, url }: PageProps<unknown>) {
       {/* ===== HEAD SECTION ===== */}
       <Head>
         {/* ===== META TAGS ===== */}
-        <MetaTags skipImage={isStampPage} />
+        <MetaTags
+          skipImage={isStampPage}
+          skipTitle={isStampPage}
+          skipDescription={isStampPage}
+          skipOgMeta={isStampPage}
+        />
 
         {/* ===== RESOURCE PRELOADING ===== */}
         <link

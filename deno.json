@@ -65,9 +65,9 @@
     "test:src20:metadata": "DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test tests/unit/src20MetadataFields.test.ts --allow-all",
     "test:src20:image-protocol": "DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test tests/unit/src20ImageProtocol.test.ts --allow-all",
     "test:src20:metadata:watch": "DENO_ENV=test deno test tests/unit/src20MetadataFields.test.ts --no-check --allow-env --allow-read --allow-net --watch",
-
-    "test:unit": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-read --allow-write --allow-env unit/ --no-check",
-    "test:unit:coverage": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-read --allow-write --allow-env unit/ --coverage=../coverage/ --no-check && cd .. && deno coverage coverage/ --exclude='tests/' --exclude='mockDatabaseManager' --exclude='node_modules/' --exclude='Library/' --exclude='_fresh/' --exclude='dist/' --exclude='coverage/' --exclude='tmp/' --exclude='build/' --exclude='vendor/'",
+    "test:unit": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-read --allow-write --allow-env --allow-run unit/ --no-check",
+    "test:unit:ci": "./scripts/run-tests-ci.sh",
+    "test:unit:coverage": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-read --allow-write --allow-env --allow-run unit/ --coverage=../coverage/ --no-check && cd .. && deno coverage coverage/ --exclude='tests/' --exclude='mockDatabaseManager' --exclude='node_modules/' --exclude='Library/' --exclude='_fresh/' --exclude='dist/' --exclude='coverage/' --exclude='tmp/' --exclude='build/' --exclude='vendor/'",
     "test:integration": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-read --allow-write --allow-env integration/ --no-check",
     "test:integration:watch": "DENO_ENV=test cd tests && deno test --allow-net --allow-read --allow-write --allow-env integration/ --no-check --watch",
     "test:integration:coverage": "DENO_ENV=test mkdir -p coverage && cd tests && deno test --allow-net --allow-read --allow-write --allow-env integration/ --coverage=../coverage/ --no-check && cd .. && deno coverage coverage/ --exclude='tests/' --exclude='mockDatabaseManager' --exclude='node_modules/' --exclude='Library/' --exclude='_fresh/' --exclude='dist/' --exclude='coverage/' --exclude='tmp/' --exclude='build/' --exclude='vendor/'",
@@ -78,17 +78,44 @@
     "check:types:staged": "deno run --allow-run --allow-read scripts/type-check-staged.ts",
     "type:prioritize": "deno run --allow-read --allow-write scripts/prioritize-type-fixes.ts",
     "type:gradual": "deno run --allow-read --allow-write --allow-run scripts/setup-gradual-types.ts",
-    "deploy:validate": "deno run --allow-net --allow-env --allow-read scripts/deployToECS.ts"
+    "deploy:validate": "deno run --allow-net --allow-env --allow-read scripts/deployToECS.ts",
+    "smoke:test": "newman run tests/postman/collections/smoke-tests.json --environment-var baseUrl=https://stampchain.io --reporters html,json --reporter-html-export ./reports/smoke-test-$(date +%Y%m%d_%H%M%S).html --reporter-json-export ./reports/smoke-test-$(date +%Y%m%d_%H%M%S).json --bail",
+    "smoke:test:dev": "newman run tests/postman/collections/smoke-tests.json --environment-var baseUrl=http://localhost:8000 --reporters html,json --reporter-html-export ./reports/smoke-test-dev-$(date +%Y%m%d_%H%M%S).html --reporter-json-export ./reports/smoke-test-dev-$(date +%Y%m%d_%H%M%S).json --bail",
+    "smoke:test:staging": "BASE_URL=${STAGING_URL:-https://staging.stampchain.io} newman run tests/postman/collections/smoke-tests.json --environment-var baseUrl=$BASE_URL --reporters html,json --reporter-html-export ./reports/smoke-test-staging-$(date +%Y%m%d_%H%M%S).html --reporter-json-export ./reports/smoke-test-staging-$(date +%Y%m%d_%H%M%S).json --bail",
+    "load:test": "./scripts/load-testing/run-load-tests.sh smoke",
+    "load:test:full": "./scripts/load-testing/run-load-tests.sh load",
+    "load:test:stress": "./scripts/load-testing/run-load-tests.sh stress",
+    "load:test:spike": "./scripts/load-testing/run-load-tests.sh spike",
+    "load:test:health": "./scripts/load-testing/run-load-tests.sh health",
+    "load:test:api": "./scripts/load-testing/run-load-tests.sh api",
+    "load:test:all": "./scripts/load-testing/run-load-tests.sh all",
+    "production:validate": "./scripts/deployment/validate-production-readiness.sh",
+    "production:validate:dev": "BASE_URL=http://localhost:8000 DEPLOYMENT_ENV=development ./scripts/deployment/validate-production-readiness.sh",
+    "production:validate:staging": "BASE_URL=${STAGING_URL:-https://staging.stampchain.io} DEPLOYMENT_ENV=staging ./scripts/deployment/validate-production-readiness.sh",
+    "production:validate:light": "SKIP_LOAD_TESTS=true ./scripts/deployment/validate-production-readiness.sh",
+    "production:validate:smoke-only": "SKIP_LOAD_TESTS=true SKIP_SMOKE_TESTS=false ./scripts/deployment/validate-production-readiness.sh",
+    "deploy:pre-flight": "deno task production:validate && echo '✅ Pre-flight checks completed - ready for deployment'",
+    "deploy:pre-flight:dev": "deno task production:validate:dev && echo '✅ Development pre-flight checks completed'",
+    "deploy:pre-flight:staging": "deno task production:validate:staging && echo '✅ Staging pre-flight checks completed'",
+    "deploy:pre-flight:light": "deno task production:validate:light && echo '✅ Light pre-flight checks completed'",
+    "check:responses": "deno run --allow-read scripts/check-manual-responses.ts",
+    "check:responses:fix": "deno run --allow-read scripts/check-manual-responses.ts || echo \"Found manual Response usage - see suggestions above\""
   },
   "lint": {
     "rules": {
-      "tags": ["fresh", "recommended"],
+      "tags": [
+        "fresh",
+        "recommended"
+      ],
       "include": [
         "ban-untagged-todo",
         "no-node-buffer",
         "prefer-native-node-imports"
       ],
-      "exclude": ["no-explicit-any", "react-no-danger"]
+      "exclude": [
+        "no-explicit-any",
+        "react-no-danger"
+      ]
     },
     "exclude": [
       "**/_fresh/**/*",
@@ -114,7 +141,14 @@
       "tests/"
     ]
   },
-  "exclude": ["**/_fresh/*", "scripts/*", "tests/**/*", "**/*.test.ts", "**/*.ci.ts", "**/stubs/*"],
+  "exclude": [
+    "**/_fresh/*",
+    "scripts/*",
+    "tests/**/*",
+    "**/*.test.ts",
+    "**/*.ci.ts",
+    "**/stubs/*"
+  ],
   "nodeModulesDir": "auto",
   "imports": {
     "stream": "node:stream",
@@ -203,7 +237,9 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "strict": true,
-    "types": ["npm:@types/node"],
+    "types": [
+      "npm:@types/node"
+    ],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
@@ -214,7 +250,13 @@
     "allowUnreachableCode": false
   },
   "fmt": {
-    "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
+    "include": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.json"
+    ],
     "exclude": [
       "**/_fresh/**/*",
       "**/server/**/*",

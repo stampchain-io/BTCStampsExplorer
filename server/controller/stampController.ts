@@ -1,8 +1,8 @@
 import {
-  HolderRow, PaginatedStampBalanceResponseBody,
-  ProcessedHolder, STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
-  STAMP_RANGES, STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES, StampBalance, StampRow, SUBPROTOCOLS
+    HolderRow, PaginatedStampBalanceResponseBody,
+    ProcessedHolder, STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
+    STAMP_RANGES, STAMP_SUFFIX_FILTERS,
+    STAMP_TYPES, StampBalance, StampRow, SUBPROTOCOLS
 } from "$globals";
 import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
@@ -12,15 +12,13 @@ import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { CollectionController } from "./collectionController.ts";
 // import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts"; // Fixed: Removed unused import
+import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { decodeBase64 } from "$lib/utils/formatUtils.ts";
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
 import { isCpid } from "$lib/utils/identifierUtils.ts";
 import { detectContentType, getMimeType } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { API_RESPONSE_VERSION, ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
-import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
-import { StampRepository } from "$server/database/stampRepository.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 
@@ -500,16 +498,13 @@ export class StampController {
 
       console.log(`[StampController] Got ${stamps.length} stamps for page ${page}, total stamps: ${total}`);
 
-      // BACKWARD COMPATIBILITY: Add market data pricing to non-enhanced endpoint
-      // This ensures consistency with the enhanced endpoint while maintaining backward compatibility
-      const enhancedStamps = await this.addMarketDataToStampBalances(stamps);
-
+      // v2.3: Stamps already have clean structure, no additional processing needed
       return {
         page,
         limit,
         totalPages: Math.ceil(total / limit),
         last_block: lastBlock,
-        data: enhancedStamps,
+        data: stamps,
       };
     } catch (error) {
       console.error("Error in getStampBalancesByAddress:", error);
@@ -517,35 +512,7 @@ export class StampController {
     }
   }
 
-  /**
-   * Add market data pricing to stamp balances for backward compatibility
-   * This ensures non-enhanced endpoints also have access to market data pricing
-   *
-   * NOTE: For v2.3, floorPrice and recentSalePrice have been moved to marketData section.
-   * The middleware handles backward compatibility for v2.2 clients.
-   */
-  private static async addMarketDataToStampBalances(stamps: any[]): Promise<any[]> {
-    try {
-      if (!stamps || stamps.length === 0) {
-        return stamps;
-      }
 
-      // For v2.3, we don't add floorPrice/recentSalePrice at root level
-      // The middleware will handle backward compatibility for v2.2
-      // We could fetch market data here for caching, but it's not needed
-      // since the stamps already have the data from the query
-      const enhancedStamps = stamps;
-
-      return enhancedStamps;
-    } catch (error) {
-      logger.error("stamps", {
-        message: "Error adding market data to stamp balances",
-        error: error instanceof Error ? error.message : String(error)
-      });
-      // Return original stamps if market data fetch fails
-      return stamps;
-    }
-  }
 
   static async getMultipleStampCategories(categories: {
     idents: SUBPROTOCOLS[];
@@ -913,7 +880,7 @@ export class StampController {
         error: error instanceof Error ? error.message : String(error),
         identifier,
       });
-      return ResponseUtil.internalError(error);
+      return ApiResponseUtil.internalError(error);
     }
   }
 
@@ -1160,8 +1127,8 @@ export class StampController {
 
   static async getStampsCreatedCount(address: string): Promise<number> {
     try {
-      // Use a direct count query instead of getStamps
-      const result = await StampRepository.getStampsCreatedCount(address);
+      // ✅ FIXED: Use service layer instead of calling repository directly
+      const result = await StampService.getStampsCreatedCount(address);
       return result.total || 0;
     } catch (error) {
       logger.error("stamps", {
@@ -1176,7 +1143,7 @@ export class StampController {
   /**
    * Calculate total value of stamps in a wallet using cached market data
    * This is a specialized method for the wallet page that won't affect API endpoints
-   * OPTIMIZED: Uses MarketDataRepository.getBulkStampMarketData directly instead of heavy StampService.getStamps call
+   * OPTIMIZED: Uses StampService.getBulkStampMarketData instead of calling repository directly
    */
   static async calculateWalletStampValues(stamps: StampBalance[]): Promise<{
     stampValues: { [cpid: string]: string | number };
@@ -1193,8 +1160,8 @@ export class StampController {
       // Get all stamp CPIDs
       const cpids = stamps.map(s => s.cpid);
 
-      // OPTIMIZATION: Use direct market data fetch instead of full stamp data
-      const marketDataMap = await MarketDataRepository.getBulkStampMarketData(cpids);
+      // ✅ FIXED: Use service layer instead of calling repository directly
+      const marketDataMap = await StampService.getBulkStampMarketData(cpids);
 
       // Calculate values using cached market data
       stamps.forEach((walletStamp: any) => {

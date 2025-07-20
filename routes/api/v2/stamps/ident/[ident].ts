@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { PROTOCOL_IDENTIFIERS } from "$lib/utils/protocol.ts";
 import { IdentHandlerContext, PaginatedIdResponseBody } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
   checkEmptyResult,
@@ -24,7 +24,7 @@ export const handler: Handlers<IdentHandlerContext> = {
 
     // Validate protocol identifier
     if (!PROTOCOL_IDENTIFIERS.includes(ident.toUpperCase())) {
-      return ResponseUtil.notFound(
+      return ApiResponseUtil.notFound(
         `Error: ident: ${ident} not found, use ${PROTOCOL_IDENTIFIERS}`,
       );
     }
@@ -70,10 +70,10 @@ export const handler: Handlers<IdentHandlerContext> = {
         data: (result as any).stamps,
       };
 
-      return ResponseUtil.success(body);
+      return ApiResponseUtil.success(body);
     } catch (error) {
       console.error(`Error in stamps/ident handler:`, error);
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         `Error: stamps with ident: ${ident} not found`,
       );

@@ -49,10 +49,7 @@ export const handler: Handlers = {
       );
       const response: CreatePSBTResponse = { psbt: psbtHex };
 
-      return new Response(
-        JSON.stringify(response),
-        { headers: { "Content-Type": "application/json" } },
-      );
+      return ApiResponseUtil.success(response);
     } catch (error) {
       if (error instanceof SyntaxError) {
         logger.error("api", {

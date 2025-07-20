@@ -1,11 +1,10 @@
 import { Handlers } from "$fresh/server.ts";
 import { TXError } from "$globals";
-import { AncestorInfo, InputData } from "$types/index.d.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { SRC20Service } from "$server/services/src20/index.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { normalizeFeeRate } from "$server/services/xcpService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
+import { normalizeFeeRate } from "$server/services/xcpService.ts";
+import { AncestorInfo, InputData } from "$types/index.d.ts";
 
 type TrxType = "multisig" | "olga";
 
@@ -48,14 +47,14 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
     try {
       const rawBody = await req.text();
       if (!rawBody) {
-        return ResponseUtil.badRequest("Empty request body");
+        return ApiResponseUtil.badRequest("Empty request body");
       }
 
       let body: ExtendedInputData;
       try {
         body = JSON.parse(rawBody);
       } catch (_e) {
-        return ResponseUtil.badRequest("Invalid JSON in request body");
+        return ApiResponseUtil.badRequest("Invalid JSON in request body");
       }
 
       if (
@@ -123,7 +122,7 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
         );
       if (validationError) return validationError as Response;
       if (body.trxType === "multisig") {
-        return ResponseUtil.badRequest(
+        return ApiResponseUtil.badRequest(
           "Multisig transactions should use dedicated endpoint",
         );
       }
@@ -134,7 +133,7 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
           "$lib/utils/imageProtocolUtils.ts"
         );
         if (!validateImageReference(body.img)) {
-          return ResponseUtil.badRequest(
+          return ApiResponseUtil.badRequest(
             "Invalid img format. Use protocol:hash format (max 32 chars). Supported protocols: ar, ipfs, fc, ord",
           );
         }
@@ -145,7 +144,7 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
           "$lib/utils/imageProtocolUtils.ts"
         );
         if (!validateImageReference(body.icon)) {
-          return ResponseUtil.badRequest(
+          return ApiResponseUtil.badRequest(
             "Invalid icon format. Use protocol:hash format (max 32 chars). Supported protocols: ar, ipfs, fc, ord",
           );
         }

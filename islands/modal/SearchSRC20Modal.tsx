@@ -33,6 +33,11 @@ export function SearchSRC20Modal({
     try {
       const response = await fetch(
         `/api/v2/src20/search?q=${encodeURIComponent(currentTerm.trim())}`,
+        {
+          headers: {
+            "X-API-Version": "2.3",
+          },
+        },
       );
       const data = await response.json();
 

@@ -1,17 +1,17 @@
 import { Handlers } from "$fresh/server.ts";
 import { AddressHandlerContext } from "$globals";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { isValidBitcoinAddress } from "$lib/utils/scriptTypeUtils.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { RouteType } from "$server/services/cacheService.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
   validateRequiredParams,
 } from "$server/services/routeValidationService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
-import { isValidBitcoinAddress } from "$lib/utils/scriptTypeUtils.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(req: Request, ctx): Promise<Response> {
@@ -22,13 +22,13 @@ export const handler: Handlers<AddressHandlerContext> = {
       const paramsValidation = validateRequiredParams({ address });
       if (!paramsValidation.isValid) {
         return paramsValidation.error ??
-          new Response("Invalid parameters", { status: 400 });
+          ApiResponseUtil.badRequest("Invalid parameters");
       }
 
       // Check for XSS attempts
       const xssPattern = /<script|javascript:|on\w+=/i;
       if (xssPattern.test(address)) {
-        return ResponseUtil.badRequest(
+        return ApiResponseUtil.badRequest(
           "Invalid input detected",
           { routeType: RouteType.BALANCE },
         );
@@ -36,7 +36,7 @@ export const handler: Handlers<AddressHandlerContext> = {
 
       // Validate Bitcoin address format
       if (!isValidBitcoinAddress(address)) {
-        return ResponseUtil.badRequest(
+        return ApiResponseUtil.badRequest(
           `Invalid Bitcoin address format: ${address}`,
           { routeType: RouteType.BALANCE },
         );
@@ -68,7 +68,7 @@ export const handler: Handlers<AddressHandlerContext> = {
       // Check for empty results
       if (!stamps.data?.length && !src20.data?.length) {
         return checkEmptyResult(null, "balance data") ??
-          new Response("No data found", { status: 404 });
+          ApiResponseUtil.notFound("No balance data found for this address");
       }
 
       // Calculate combined totals
@@ -97,7 +97,7 @@ export const handler: Handlers<AddressHandlerContext> = {
       };
 
       // Return with proper caching and informational headers
-      return ResponseUtil.success(response, {
+      return ApiResponseUtil.success(response, {
         routeType: RouteType.BALANCE,
         headers: {
           "X-Preferred-Endpoints":
@@ -108,8 +108,10 @@ export const handler: Handlers<AddressHandlerContext> = {
       });
     } catch (error) {
       console.error("Error in balance/[address] handler:", error);
-      return ResponseUtil.internalError(error) ??
-        new Response("Internal server error", { status: 500 });
+      return ApiResponseUtil.internalError(
+        error instanceof Error ? error : new Error(String(error)),
+        "Failed to fetch balance data",
+      );
     }
   },
 };

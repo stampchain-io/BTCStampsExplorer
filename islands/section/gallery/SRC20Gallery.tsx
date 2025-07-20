@@ -142,7 +142,11 @@ export function SRC20Gallery({
           }
 
           if (endpoint) {
-            const response = await fetch(`${endpoint}&${params.toString()}`);
+            const response = await fetch(`${endpoint}&${params.toString()}`, {
+              headers: {
+                "X-API-Version": "2.3",
+              },
+            });
             const result = await response.json();
             setData(
               result.data?.map((item: SRC20Row) => ({

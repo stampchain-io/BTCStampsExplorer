@@ -3,11 +3,11 @@ import "$/server/config/env.ts";
 import { bigIntReviver, bigIntSerializer } from "$/lib/utils/formatUtils.ts";
 import { crypto } from "@std/crypto";
 import {
-  ConsoleHandler,
-  FileHandler,
-  getLogger,
-  LogRecord,
-  setup,
+    ConsoleHandler,
+    FileHandler,
+    getLogger,
+    LogRecord,
+    setup,
 } from "@std/log";
 import { Client } from "mysql/mod.ts";
 // Conditionally import Redis based on build mode
@@ -961,29 +961,33 @@ class DatabaseManager {
     this.invalidateInMemoryCacheByPattern(pattern);
   }
 
-  private async invalidateCacheByCategory(category: string): Promise<void> {
-    const cacheKeys = this.#cacheKeyRegistry[category];
-    if (!cacheKeys || cacheKeys.size === 0) {
+  /**
+   * Invalidate all cache entries for a specific category
+   */
+  public async invalidateCacheByCategory(category: string): Promise<void> {
+    const keysToDelete = Array.from(this.#cacheKeyRegistry[category] || []);
+
+    if (keysToDelete.length === 0) {
+      console.log(`[CACHE] No keys to invalidate for category: ${category}`);
       return;
     }
 
-    console.log(`Invalidating ${cacheKeys.size} cache keys for category: ${category}`);
+    console.log(`[CACHE] Invalidating ${keysToDelete.length} keys for category: ${category}`);
 
-    // Redis invalidation
-    if (this.#redisClient) {
+    if (this.#redisAvailable && this.#redisClient) {
       try {
-        const keysArray = Array.from(cacheKeys);
-        if (keysArray.length > 0) {
-          await this.#redisClient.del(...keysArray);
+        // Redis: Delete all keys in this category
+        if (keysToDelete.length > 0) {
+          await this.#redisClient.del(...keysToDelete);
         }
       } catch (error) {
-        console.error(`Failed to invalidate Redis cache for category ${category}:`, error);
+        console.error(`[CACHE] Redis category invalidation error:`, error);
       }
-    }
-
-    // In-memory cache invalidation
-    for (const key of cacheKeys) {
-      delete this.#inMemoryCache[key];
+    } else {
+      // Memory cache: Delete all keys in this category
+      for (const key of keysToDelete) {
+        delete this.#inMemoryCache[key];
+      }
     }
 
     // Clear the registry for this category
@@ -991,50 +995,16 @@ class DatabaseManager {
   }
 
   /**
-   * Get cache registry statistics (for debugging/monitoring)
-   */
-  public async getCacheRegistryStats(): Promise<{ [category: string]: number }> {
-    const stats: { [category: string]: number } = {};
-    for (const [category, keys] of Object.entries(this.#cacheKeyRegistry)) {
-      stats[category] = keys.size;
-    }
-    return stats;
-  }
-
-  /**
-   * Force clear all balance-related caches (for debugging/testing)
-   */
-  public async forceInvalidateAllBalanceCaches(): Promise<void> {
-    console.log("[CACHE DEBUG] Force invalidating all balance caches...");
-
-    // Clear all explicit balance-related categories
-    const explicitBalanceCategories = ['balance', 'src20_balance', 'src101_balance', 'stamp_balance'];
-
-    for (const category of explicitBalanceCategories) {
-      await this.invalidateCacheByCategory(category);
-    }
-
-    // Clear categories that balance queries might be miscategorized into
-    const additionalCategories = ['stamp', 'market_data', 'block'];
-
-    for (const category of additionalCategories) {
-      await this.invalidateCacheByCategory(category);
-    }
-
-    // Also clear by patterns for any missed keys (backward compatibility)
-    await this.invalidateCacheByPattern('balance_*');
-    await this.invalidateCacheByPattern('src20_balance_*');
-    await this.invalidateCacheByPattern('src101_balance_*');
-    await this.invalidateCacheByPattern('stamp_balance_*');
-
-    console.log("[CACHE DEBUG] All balance caches cleared (comprehensive method)");
-  }
-
-  /**
    * Debug method to check what's cached
    */
   public debugCacheStatus(): void {
-    console.log("[CACHE DEBUG] Registry stats:", this.getCacheRegistryStats());
+    // Inline registry stats calculation (replacing deleted getCacheRegistryStats method)
+    const registryStats: { [category: string]: number } = {};
+    for (const [category, keys] of Object.entries(this.#cacheKeyRegistry)) {
+      registryStats[category] = keys.size;
+    }
+
+    console.log("[CACHE DEBUG] Registry stats:", registryStats);
     console.log("[CACHE DEBUG] In-memory cache keys:", Object.keys(this.#inMemoryCache).length);
     console.log("[CACHE DEBUG] Redis available:", this.#redisAvailable);
   }

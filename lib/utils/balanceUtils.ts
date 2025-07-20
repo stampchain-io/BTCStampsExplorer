@@ -1,4 +1,3 @@
-import { formatSatoshisToBTC, formatUSDValue } from "$lib/utils/formatUtils.ts";
 import {
   BlockCypherAddressBalanceResponse,
   BTCBalance,
@@ -6,92 +5,8 @@ import {
   BTCBalanceInfoOptions,
 } from "$lib/types/index.d.ts";
 import { BLOCKCYPHER_API_BASE_URL } from "$lib/utils/constants.ts";
+import { formatSatoshisToBTC, formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { getBTCBalanceFromMempool } from "$lib/utils/mempool.ts";
-
-/**
- * @deprecated Use BTCPriceService.getPrice() for server-side or /api/internal/btcPrice for client-side
- * Fetch BTC price in USD using the centralized Redis-cached endpoint
- * This function is kept for backward compatibility but should be migrated to BTCPriceService
- */
-export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
-  console.warn(
-    "fetchBTCPriceInUSD is deprecated. Use BTCPriceService.getPrice() or /api/internal/btcPrice",
-  );
-
-  const requestId = `btc-price-${Date.now()}-${
-    Math.random().toString(36).substr(2, 9)
-  }`;
-
-  console.log(
-    `[${requestId}] Fetching BTC price from centralized endpoint, apiBaseUrl: ${
-      apiBaseUrl || "none"
-    }`,
-  );
-
-  // Fallback implementation for compatibility
-  if (typeof window !== "undefined" || !apiBaseUrl) {
-    // Client-side or no baseUrl: use centralized endpoint
-    try {
-      const baseUrl = apiBaseUrl ||
-        (typeof window !== "undefined"
-          ? globalThis.location.origin
-          : "http://localhost:8000");
-      const response = await fetch(`${baseUrl}/api/internal/btcPrice`);
-      if (response.ok) {
-        const data = await response.json();
-        const price = formatUSDValue(data.data?.price || 0);
-        console.log(
-          `[${requestId}] BTC price from centralized endpoint: $${price}`,
-        );
-        return price;
-      }
-    } catch (error) {
-      console.error(`[${requestId}] Error fetching BTC price:`, error);
-    }
-    return 0;
-  } else {
-    // Server-side with baseUrl: try the provided URL first, then fallback to service
-    try {
-      const response = await fetch(`${apiBaseUrl}/api/internal/btcPrice`);
-      if (response.ok) {
-        const data = await response.json();
-        const price = formatUSDValue(data.data?.price || 0);
-        console.log(
-          `[${requestId}] BTC price from centralized endpoint: $${price}`,
-        );
-        return price;
-      }
-    } catch (error) {
-      console.error(
-        `[${requestId}] Error fetching BTC price from provided URL:`,
-        error,
-      );
-      // If the provided URL fails, fallback to BTCPriceService only for valid-looking URLs
-      if (
-        apiBaseUrl.startsWith("http://localhost") ||
-        apiBaseUrl.startsWith("https://")
-      ) {
-        try {
-          const { BTCPriceService } = await import(
-            "$server/services/price/btcPriceService.ts"
-          );
-          const btcPriceData = await BTCPriceService.getPrice();
-          const price = formatUSDValue(btcPriceData.price);
-          console.log(
-            `[${requestId}] BTC price from BTCPriceService fallback: $${price} from ${btcPriceData.source}`,
-          );
-          return price;
-        } catch (serviceError) {
-          console.error(
-            `[${requestId}] Error fetching BTC price from BTCPriceService fallback:`,
-            serviceError,
-          );
-        }
-      }
-    }
-    return 0;
-  }
-}
 
 async function getBTCBalanceFromBlockCypher(
   address: string,

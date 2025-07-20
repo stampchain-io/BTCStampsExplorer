@@ -1,11 +1,11 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 
 export const handler: Handlers = {
   GET(req) {
     // Only available in development
     if (Deno.env.get("DENO_ENV") !== "development") {
-      return ResponseUtil.badRequest(
+      return ApiResponseUtil.badRequest(
         "Debug endpoint only available in development",
       );
     }
@@ -38,7 +38,7 @@ export const handler: Handlers = {
       },
     };
 
-    return ResponseUtil.success(debugInfo, {
+    return ApiResponseUtil.success(debugInfo, {
       forceNoCache: true,
     });
   },

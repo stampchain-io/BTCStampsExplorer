@@ -4,6 +4,8 @@ import { Icon, LoadingIcon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
+import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
+import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import {
@@ -12,7 +14,6 @@ import {
   navigateWithFresh,
 } from "$lib/utils/freshNavigationUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
-import { SRC20Gallery, StampGallery } from "$section";
 import { Dispenser } from "$types/index.d.ts";
 import { WalletContentProps } from "$types/wallet.d.ts";
 import { useEffect, useState } from "preact/hooks";
@@ -451,37 +452,6 @@ const WalletDashboardContent = ({
     );
   };
 
-  /* ===== GALLERY CONFIGURATION ===== */
-  const stampGallery = {
-    title: "",
-    type: "all",
-    stamps: stamps.data,
-    layout: "grid" as const,
-    showDetails: false,
-    gridClass: `
-      grid w-full
-      gap-3
-      mobileMd:gap-6
-      grid-cols-4
-      mobileLg:grid-cols-6
-      tablet:grid-cols-6
-      desktop:grid-cols-8
-      auto-rows-fr
-    `,
-    displayCounts: {
-      mobileSm: 16,
-      mobileLg: 24,
-      tablet: 24,
-      desktop: 32,
-    },
-    pagination: {
-      page: stamps.pagination.page,
-      totalPages: Math.ceil(stamps.pagination.total / stamps.pagination.limit),
-      prefix: "stamps_page",
-      onPageChange: createPaginationHandler("stamps_page", "stamps"),
-    },
-  };
-
   /* ===== RENDER ===== */
   return (
     <>
@@ -501,7 +471,33 @@ const WalletDashboardContent = ({
         />
         <div class="mt-3 mobileLg:mt-6">
           {stamps.data?.length
-            ? <StampGallery {...stampGallery} />
+            ? (
+              <FreshStampGallery
+                initialData={stamps.data}
+                initialPagination={{
+                  page: stamps.pagination.page,
+                  limit: stamps.pagination.limit || 10,
+                  total: stamps.pagination.total || 0,
+                  totalPages: Math.ceil(
+                    stamps.pagination.total / stamps.pagination.limit,
+                  ),
+                }}
+                address={address}
+                initialSort={sortStamps}
+                enablePartialNavigation={true}
+                showLoadingSkeleton={true}
+                gridClass={`
+                  grid w-full
+                  gap-3
+                  mobileMd:gap-6
+                  grid-cols-4
+                  mobileLg:grid-cols-6
+                  tablet:grid-cols-6
+                  desktop:grid-cols-8
+                  auto-rows-fr
+                `}
+              />
+            )
             : <p class="text-gray-500">NO AVAILABLE STAMP</p>}
         </div>
       </div>
@@ -520,18 +516,18 @@ const WalletDashboardContent = ({
         <div class="mt-3 mobileLg:mt-6">
           {src20.data?.length
             ? (
-              <SRC20Gallery
-                viewType="minted"
-                fromPage="wallet"
+              <FreshSRC20Gallery
                 initialData={src20.data}
-                pagination={{
+                initialPagination={{
                   page: src20.pagination.page,
+                  limit: src20.pagination.limit || 10,
+                  total: src20.pagination.total || 0,
                   totalPages: src20.pagination.totalPages,
-                  prefix: "src20",
-                  onPageChange: createPaginationHandler("src20_page", "src20"),
                 }}
                 address={address}
-                timeframe="24H"
+                initialSort={sortTokens}
+                enablePartialNavigation={true}
+                showLoadingSkeleton={true}
               />
             )
             : <p class="text-gray-500">NO AVAILABLE TOKEN</p>}

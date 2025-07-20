@@ -1,12 +1,12 @@
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { SRC20TrxRequestParams } from "$globals";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
   DEFAULT_PAGINATION,
   validateSortParam,
 } from "$server/services/routeValidationService.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
 export const handler: Handlers = {
   async GET(req) {
@@ -35,13 +35,12 @@ export const handler: Handlers = {
     };
 
     try {
-      const result = await Src20Controller.handleSrc20TransactionsRequest(
-        req,
+      const result = await SRC20Service.QueryService.fetchAndFormatSrc20Data(
         params,
       );
-      return ResponseUtil.success(result);
+      return ApiResponseUtil.success(result);
     } catch (error) {
-      return ResponseUtil.internalError(error, "Error processing request");
+      return ApiResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

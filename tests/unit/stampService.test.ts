@@ -6,10 +6,10 @@ Deno.env.set("SKIP_REDIS_CONNECTION", "true");
 Deno.env.set("DENO_ENV", "test");
 
 // Import after setting environment
-import { StampService } from "$server/services/stampService.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { StampRepository } from "$server/database/stampRepository.ts";
 import { BlockService } from "$server/services/blockService.ts";
+import { StampService } from "$server/services/stampService.ts";
 
 // Mock the repositories
 const originalGetBulkStampMarketData =
@@ -108,10 +108,28 @@ function mockRepositories() {
   MarketDataRepository.getStampsWithMarketData = (_options: any) => {
     return Promise.resolve([
       {
+        // Required StampRow properties
         stamp: 1,
+        block_index: 800000,
         cpid: "A123456789",
+        creator: "bc1qtest123",
+        divisible: true,
+        keyburn: null,
+        locked: 0,
+        stamp_base64: "test_base64_data",
+        stamp_mimetype: "image/png",
         stamp_url: "https://example.com/stamp1",
-        ident: "STAMP",
+        supply: 1,
+        block_time: new Date("2023-01-01"),
+        tx_hash: "test_tx_hash_123",
+        tx_index: 1,
+        ident: "STAMP" as any,
+        creator_name: "Test Creator",
+        stamp_hash: "test_stamp_hash",
+        file_hash: "test_file_hash",
+        unbound_quantity: 0,
+
+        // Market data as expected by StampWithMarketData interface
         marketData: {
           cpid: "A123456789",
           floorPriceBTC: 0.001,
@@ -134,10 +152,10 @@ function mockRepositories() {
           lastUpdated: new Date(),
           lastPriceUpdate: new Date(),
           updateFrequencyMinutes: 60,
-        },
-        cacheStatus: "fresh",
+        } as any,
+        cacheStatus: "fresh" as any,
         cacheAgeMinutes: 5,
-      },
+      } as any,
     ]);
   };
 }
@@ -183,12 +201,13 @@ Deno.test("StampService - enrichStampWithMarketData adds market data correctly",
     assertEquals(result.stamps.length, 2);
 
     const firstStamp = result.stamps[0];
-    assertExists(firstStamp.floorPrice);
-    assertEquals(firstStamp.floorPrice, 0.001);
+    // v2.3+: floorPrice is now only in marketData, not at root level
+    assertExists(firstStamp.marketData);
+    assertExists(firstStamp.marketData.floorPriceBTC);
+    assertEquals(firstStamp.marketData.floorPriceBTC, 0.001);
     assertExists(firstStamp.floorPriceUSD);
     assertEquals(firstStamp.floorPriceUSD, 50); // 0.001 * 50000
 
-    assertExists(firstStamp.marketData);
     assertEquals(firstStamp.marketData.openDispensersCount, 2);
     assertEquals(firstStamp.marketData.holderCount, 25);
 
@@ -248,8 +267,9 @@ Deno.test("StampService - getStampsWithMarketData uses JOIN query", async () => 
     assertEquals(result.length, 1);
 
     const stamp = result[0];
-    assertExists(stamp.floorPrice);
+    // v2.3+: floorPrice is now only in marketData, not at root level
     assertExists(stamp.marketData);
+    assertExists(stamp.marketData.floorPriceBTC);
     assertEquals(stamp.marketData.floorPriceUSD, 50); // 0.001 * 50000
   } finally {
     restoreRepositories();
