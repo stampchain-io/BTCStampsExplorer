@@ -1,6 +1,16 @@
 name: Unit Tests with Fixtures
 
 on:
+  push:
+    branches: [main, dev]
+    paths:
+      - "tests/unit/**"
+      - "tests/fixtures/**"
+      - "tests/mocks/**"
+      - "server/database/**"
+      - "lib/**"
+      - "deno.json"
+      - ".github/workflows/unit-tests.yml"
   pull_request:
     branches: [main, dev]
     paths:
@@ -17,6 +27,8 @@ jobs:
     name: Unit Tests with Mock Database
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Skip duplicate runs: if it's a push event, only run if it's not associated with a PR
+    if: github.event_name != 'push' || github.event.before == '0000000000000000000000000000000000000000'
 
     env:
       CI: true

@@ -1,5 +1,7 @@
 name: Code Quality
 on:
+  push:
+    branches: [dev]
   pull_request:
     branches: [main, dev]
     types: [opened, synchronize, reopened]
@@ -9,6 +11,8 @@ jobs:
     name: Quality Checks
     runs-on: ubuntu-latest
     timeout-minutes: 15 # Prevent hanging jobs
+    # Skip duplicate runs: if it's a push event, only run if it's not associated with a PR
+    if: github.event_name != 'push' || github.event.before == '0000000000000000000000000000000000000000'
 
     permissions:
       id-token: write # Needed for auth with Deno Deploy
