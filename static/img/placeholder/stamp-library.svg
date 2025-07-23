@@ -59,7 +59,7 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.25px;font-family:'Work Sans';text-align:start;letter-spacing:0.075em;text-anchor:start;display:inline;fill:#CC8800;stroke:#CC8800;stroke-width:0.025;stroke-dasharray:none;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.25px;font-family:'Work Sans', Arial, sans-serif;text-align:start;letter-spacing:0.075em;text-anchor:start;display:inline;fill:#CC8800;stroke:#CC8800;stroke-width:0.025;stroke-dasharray:none;stroke-opacity:1"
        x="10.626127"
        y="23.5557"
        id="text">LIBRARY</text>
