@@ -54,7 +54,7 @@ export function SRC20DeployTool(
   const uploadTooltipTimeoutRef = useRef<number | null>(null);
   const toggleTooltipTimeoutRef = useRef<number | null>(null);
   const [tooltipText, setTooltipText] = useState("OPTIONAL FIELDS");
-  const { wallet, isConnected } = walletContext;
+  const { isConnected } = walletContext;
 
   /* ===== FILE HANDLING ===== */
   const handleFileChange = (e: Event) => {
