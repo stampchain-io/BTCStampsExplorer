@@ -3,13 +3,13 @@ import { ToggleSwitchButton } from "$button";
 import { useConfig } from "$client/hooks/useConfig.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { getWalletProvider } from "$client/wallet/walletHelper.ts";
+import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { useFees } from "$fees";
 import { InputField } from "$form";
 import { Config } from "$globals";
 import { Icon } from "$icon";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { FeeCalculatorAdvanced } from "$islands/section/FeeCalculatorAdvanced.tsx";
 import { bodyTool, containerBackground, containerRowForm } from "$layout";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
@@ -223,7 +223,7 @@ export function StampingTool() {
 function StampingToolMain({ config }: { config: Config }) {
   const { wallet, isConnected } = walletContext;
   const address = isConnected ? wallet.address : undefined;
-  const { fees, loading, fetchFees, feeSource } = useFees();
+  const { fees, loading, feeSource } = useFees();
 
   // Fee polling state monitoring
   useEffect(() => {
@@ -348,97 +348,142 @@ function StampingToolMain({ config }: { config: Config }) {
     }
   }, [address, isConnected]);
 
-  // When file is uploaded
+  // Progressive fee estimation - always try estimation first, then upgrade to exact if possible
   useEffect(() => {
-    if (isConnected && wallet.address && file) {
-      const prepareTx = async () => {
+    if (!file) {
+      setFeeDetails({
+        hasExactFees: false,
+        minerFee: 0,
+        dustValue: 0,
+        totalValue: 0,
+      });
+      return;
+    }
+
+    const calculateFees = async () => {
+      try {
+        const fileData = await toBase64(file);
+
+        // Phase 1: Always try estimation first (works without wallet)
         try {
-          const fileData = await toBase64(file);
+          const estimatePayload = {
+            file: fileData,
+            filename: file.name,
+            satsPerVB: fee,
+            qty: issuance,
+            isPoshStamp: isPoshStamp,
+          };
 
-          const dryRunPayload:
-            & Omit<MintRequest, "service_fee" | "service_fee_address">
-            & { dryRun: true } = {
-              sourceWallet: address,
-              file: fileData,
-              satsPerVB: fee,
-              locked: isLocked,
-              qty: issuance,
-              filename: file.name,
-              divisible: isDivisible,
-              isPoshStamp: isPoshStamp,
-              dryRun: true,
-            };
-          if (stampName) {
-            (dryRunPayload as MintRequest).assetName = stampName;
-          }
+          const estimateResponse = await axiod.post(
+            "/api/v2/olga/estimate",
+            estimatePayload,
+          );
+          const estimateData = estimateResponse.data;
 
-          const response = await axiod.post("/api/v2/olga/mint", dryRunPayload);
-          const data = response.data as MintResponse;
-
+          // Set estimation data first
           setFeeDetails({
-            minerFee: Number(data.est_miner_fee) || 0,
-            dustValue: Number(data.total_dust_value) || 0,
-            totalValue: (Number(data.est_miner_fee) || 0) +
-              (Number(data.total_dust_value) || 0),
-            hasExactFees: true,
+            minerFee: Number(estimateData.est_miner_fee) || 0,
+            dustValue: Number(estimateData.total_dust_value) || 0,
+            totalValue: Number(estimateData.total_cost) || 0,
+            hasExactFees: false, // This is an estimate
           });
-        } catch (error) {
+
+          logger.debug("stamps", {
+            message: "Fee estimation successful",
+            data: {
+              minerFee: estimateData.est_miner_fee,
+              dustValue: estimateData.total_dust_value,
+              totalCost: estimateData.total_cost,
+            },
+          });
+
+          // Clear any previous API errors since estimation worked
+          setApiError("");
+        } catch (estimateError) {
           logger.error("stamps", {
-            message: "Transaction preparation failed",
-            error: error instanceof Error ? error.message : String(error),
+            message: "Fee estimation failed",
+            error: estimateError instanceof Error
+              ? estimateError.message
+              : String(estimateError),
           });
-          const extractedMessage = extractErrorMessage(error);
-          setApiError(extractedMessage);
+          setApiError("Unable to estimate fees");
           setFeeDetails({
             hasExactFees: false,
             minerFee: 0,
             dustValue: 0,
             totalValue: 0,
           });
+          return; // Don't try exact calculation if estimation fails
         }
-      };
-      prepareTx();
-    }
-  }, [isConnected, wallet.address, file, fee]);
 
-  // Update the fee recalculation effect
-  useEffect(() => {
-    // This effect should run when any of the fee-related parameters change
-    const prepareTxWithNewFee = async () => {
-      if (!isConnected || !wallet.address || !file) {
-        return;
-      }
+        // Phase 2: If wallet is connected, try to upgrade to exact fees
+        if (isConnected && wallet.address) {
+          try {
+            const dryRunPayload:
+              & Omit<MintRequest, "service_fee" | "service_fee_address">
+              & { dryRun: true } = {
+                sourceWallet: address,
+                file: fileData,
+                satsPerVB: fee,
+                locked: isLocked,
+                qty: issuance,
+                filename: file.name,
+                divisible: isDivisible,
+                isPoshStamp: isPoshStamp,
+                dryRun: true,
+              };
+            if (stampName) {
+              (dryRunPayload as MintRequest).assetName = stampName;
+            }
 
-      try {
-        const fileData = await toBase64(file);
+            const exactResponse = await axiod.post(
+              "/api/v2/olga/mint",
+              dryRunPayload,
+            );
+            const exactData = exactResponse.data as MintResponse;
 
-        const mintRequest = {
-          sourceWallet: address,
-          file: fileData,
-          satsPerVB: fee, // Use the current fee setting
-          locked: isLocked,
-          qty: issuance,
-          filename: file.name,
-          divisible: isDivisible,
-          assetName: stampName || undefined,
-          isPoshStamp: isPoshStamp,
-          dryRun: true,
-        };
+            // Upgrade to exact fees
+            setFeeDetails({
+              minerFee: Number(exactData.est_miner_fee) || 0,
+              dustValue: Number(exactData.total_dust_value) || 0,
+              totalValue: (Number(exactData.est_miner_fee) || 0) +
+                (Number(exactData.total_dust_value) || 0),
+              hasExactFees: true, // This is exact
+            });
 
-        const response = await axiod.post("/api/v2/olga/mint", mintRequest);
-        const data = response.data as MintResponse;
+            logger.debug("stamps", {
+              message: "Exact fee calculation successful",
+              data: {
+                minerFee: exactData.est_miner_fee,
+                dustValue: exactData.total_dust_value,
+              },
+            });
 
-        setFeeDetails({
-          minerFee: Number(data.est_miner_fee) || 0,
-          dustValue: Number(data.total_dust_value) || 0,
-          totalValue: (Number(data.est_miner_fee) || 0) +
-            (Number(data.total_dust_value) || 0),
-          hasExactFees: true,
-        });
+            // Clear API errors since exact calculation worked
+            setApiError("");
+          } catch (exactError) {
+            logger.debug("stamps", {
+              message: "Exact fee calculation failed, keeping estimation",
+              error: exactError instanceof Error
+                ? exactError.message
+                : String(exactError),
+            });
+
+            // Keep the estimation data, just show a helpful message
+            const extractedMessage = extractErrorMessage(exactError);
+            if (extractedMessage.includes("Insufficient funds")) {
+              setApiError(
+                "Insufficient funds for exact calculation - showing estimate",
+              );
+            } else {
+              setApiError("Using estimated fees");
+            }
+          }
+        }
       } catch (error) {
         logger.error("stamps", {
-          message: "Fee recalculation failed (dry run)",
-          error,
+          message: "Fee calculation completely failed",
+          error: error instanceof Error ? error.message : String(error),
         });
         const extractedMessage = extractErrorMessage(error);
         setApiError(extractedMessage);
@@ -451,23 +496,15 @@ function StampingToolMain({ config }: { config: Config }) {
       }
     };
 
-    // Call the function when fee changes
-    prepareTxWithNewFee();
+    calculateFees();
   }, [
-    fee,
-
-    isConnected,
-
-    wallet.address,
-
     file,
-
+    fee,
+    isConnected,
+    wallet.address,
     isLocked,
-
     issuance,
-
     isPoshStamp,
-
     stampName,
   ]);
 
@@ -1349,7 +1386,7 @@ function StampingToolMain({ config }: { config: Config }) {
       </form>
 
       <div className={containerBackground}>
-        <FeeCalculatorAdvanced
+        <FeeCalculatorBase
           fee={fee}
           handleChangeFee={handleChangeFee}
           type="stamp"
@@ -1357,16 +1394,14 @@ function StampingToolMain({ config }: { config: Config }) {
           fileSize={fileSize}
           issuance={parseInt(issuance, 10)}
           BTCPrice={BTCPrice}
-          onRefresh={fetchFees}
           isSubmitting={false}
           onSubmit={handleMint}
           buttonName={isConnected ? "STAMP" : "CONNECT WALLET"}
-          userAddress={address}
           feeDetails={feeDetails}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           disabled={!isFormValid}
-          utxoAncestors={[]}
+          bitname=""
         />
 
         <StatusMessages

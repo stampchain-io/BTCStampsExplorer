@@ -2,7 +2,7 @@
 import { Button } from "$button";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorAdvanced } from "$islands/section/FeeCalculatorAdvanced.tsx";
+import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
 import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
@@ -28,7 +28,6 @@ export function SRC101RegisterTool({
     handleChangeFee,
     handleInputChange,
     handleSubmit,
-    fetchFees,
     config,
     isSubmitting,
     submissionMessage,
@@ -37,7 +36,7 @@ export function SRC101RegisterTool({
 
   /* ===== STATE MANAGEMENT ===== */
   const [tosAgreed, setTosAgreed] = useState<boolean>(false);
-  const { wallet, isConnected } = walletContext;
+  const { isConnected } = walletContext;
   const [isExist, setIsExist] = useState(true);
   const [checkStatus, setCheckStatus] = useState(false);
   const [_modalData, setModalData] = useState<SRC101Balance | null>(null);
@@ -289,7 +288,7 @@ export function SRC101RegisterTool({
 
       {/* ===== FEE CALCULATOR AND STATUS MESSAGES ===== */}
       <div class={containerBackground}>
-        <FeeCalculatorAdvanced
+        <FeeCalculatorBase
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src101"
@@ -297,17 +296,11 @@ export function SRC101RegisterTool({
           fileType="application/json"
           fileSize={formState.jsonSize}
           BTCPrice={formState.BTCPrice}
-          onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleTransferSubmit}
           buttonName={isConnected ? "REGISTER" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
-          userAddress={wallet?.address}
-          {...(formState.utxoAncestors &&
-            { utxoAncestors: formState.utxoAncestors })}
-          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
-          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
           bitname={formState.toAddress + formState.root}
         />
 

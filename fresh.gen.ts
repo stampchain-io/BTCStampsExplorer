@@ -46,6 +46,7 @@ import * as $api_v2_error from "./routes/api/v2/error.ts";
 import * as $api_v2_fairmint_compose from "./routes/api/v2/fairmint/compose.ts";
 import * as $api_v2_fairmint_index from "./routes/api/v2/fairmint/index.ts";
 import * as $api_v2_health from "./routes/api/v2/health.ts";
+import * as $api_v2_olga_estimate from "./routes/api/v2/olga/estimate.ts";
 import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
 import * as $api_v2_src101_deploy_hash_tokenid_ from "./routes/api/v2/src101/[deploy_hash]/[tokenid].ts";
 import * as $api_v2_src101_deploy_hash_address_address_btc_ from "./routes/api/v2/src101/[deploy_hash]/address/[address_btc].ts";
@@ -234,7 +235,6 @@ import * as $modal_SearchStampModal from "./islands/modal/SearchStampModal.tsx";
 import * as $modal_SendBTCModal from "./islands/modal/SendBTCModal.tsx";
 import * as $modal_SendStampModalWIP from "./islands/modal/SendStampModalWIP.tsx";
 import * as $modal_states from "./islands/modal/states.ts";
-import * as $section_FeeCalculatorAdvanced from "./islands/section/FeeCalculatorAdvanced.tsx";
 import * as $section_cta_ContactCta from "./islands/section/cta/ContactCta.tsx";
 import * as $section_cta_DonateCta from "./islands/section/cta/DonateCta.tsx";
 import * as $section_cta_GetStampingCta from "./islands/section/cta/GetStampingCta.tsx";
@@ -351,6 +351,7 @@ const manifest = {
     "./routes/api/v2/fairmint/compose.ts": $api_v2_fairmint_compose,
     "./routes/api/v2/fairmint/index.ts": $api_v2_fairmint_index,
     "./routes/api/v2/health.ts": $api_v2_health,
+    "./routes/api/v2/olga/estimate.ts": $api_v2_olga_estimate,
     "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
     "./routes/api/v2/src101/[deploy_hash]/[tokenid].ts":
       $api_v2_src101_deploy_hash_tokenid_,
@@ -575,8 +576,6 @@ const manifest = {
     "./islands/modal/SendBTCModal.tsx": $modal_SendBTCModal,
     "./islands/modal/SendStampModalWIP.tsx": $modal_SendStampModalWIP,
     "./islands/modal/states.ts": $modal_states,
-    "./islands/section/FeeCalculatorAdvanced.tsx":
-      $section_FeeCalculatorAdvanced,
     "./islands/section/cta/ContactCta.tsx": $section_cta_ContactCta,
     "./islands/section/cta/DonateCta.tsx": $section_cta_DonateCta,
     "./islands/section/cta/GetStampingCta.tsx": $section_cta_GetStampingCta,
