@@ -1,5 +1,5 @@
 # Deno base image
-FROM denoland/deno:alpine-2.3.3
+FROM denoland/deno:alpine-2.4.2
 
 # Set environment variables
 ENV HOME=/app \
