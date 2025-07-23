@@ -49,7 +49,7 @@ export const ConnectButton = () => {
         );
 
         // Open modal
-        openModal(modalContent, "scaleUpDown");
+        openModal(modalContent, "slideUpDown");
       } catch (error) {
         console.error("Error in handleOpenModal:", error);
       }

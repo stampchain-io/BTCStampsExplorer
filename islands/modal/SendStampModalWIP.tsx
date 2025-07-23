@@ -1,16 +1,16 @@
 /* ===== SEND STAMP MODAL COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
+import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
-import { ModalBase } from "$layout";
-import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
+import { inputField, inputFieldSquare, SelectField } from "$form";
 import type { StampRow } from "$globals";
+import { Icon } from "$icon";
+import { closeModal } from "$islands/modal/states.ts";
+import { ModalBase } from "$layout";
+import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-import { inputField, inputFieldSquare, SelectField } from "$form";
-import { closeModal } from "$islands/modal/states.ts";
-import { Icon } from "$icon";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -425,5 +425,5 @@ export default SendStampModal;
 //       stamps={stamps}
 //     />
 //   );
-//   openModal(modalContent, "scaleUpDown");
+//   openModal(modalContent, "slideUpDown");
 // };

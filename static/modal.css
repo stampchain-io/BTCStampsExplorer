@@ -3,7 +3,7 @@
   /*  --animation-duration-modal: 0s;
 --animation-delay-background: 0s;
 --animation-delay-modal: 0s;
-defined individually 
+defined individually
   */
   --animation-timing: cubic-bezier(0.250, 0.100, 0.250, 1.000);
   --animation-bg: rgba(66, 66, 66, .3);
@@ -20,8 +20,9 @@ defined individually
   transform: scale(0);
   z-index: 50;
 
-  /* Common styles for all scale/zoom animations */
-  &[class*="scale"],
+  /* Common styles for all slide/zoom animations */
+  &.slideUpDown,
+  &.slideDownUp,
   &.zoomInOut {
     transform: scale(1);
 
@@ -50,34 +51,34 @@ defined individually
   }
 
   /* Specific animation variants */
-  &.scaleUpDown {
+  &.slideUpDown {
     .animation-modal {
-      animation: scaleBottomUp 0.3s var(--animation-timing) forwards;
+      animation: slideBottomUp 0.3s var(--animation-timing) forwards;
     }
 
     &.out {
-      animation: scaleBottomDown 0s var(--animation-cleanup-delay) linear forwards;
+      animation: slideBottomDown 0s var(--animation-cleanup-delay) linear forwards;
 
       .animation-modal {
-        animation: scaleBottomDown 0.5s var(--animation-timing) forwards;
+        animation: slideBottomDown 0.5s var(--animation-timing) forwards;
       }
     }
   }
 
-  &.scaleDownUp {
+  &.slideDownUp {
     .animation-modal-background {
       vertical-align: top;
     }
 
     .animation-modal {
-      animation: scaleTopDown 0.3s var(--animation-timing) forwards;
+      animation: slideTopDown 0.3s var(--animation-timing) forwards;
     }
 
     &.out {
-      animation: scaleTopUp 0s var(--animation-cleanup-delay) linear forwards;
+      animation: slideTopUp 0s var(--animation-cleanup-delay) linear forwards;
 
       .animation-modal {
-        animation: scaleTopUp 0.5s var(--animation-timing) forwards;
+        animation: slideTopUp 0.5s var(--animation-timing) forwards;
       }
     }
   }
@@ -98,7 +99,7 @@ defined individually
 
   .animation-modal-background {
     display: table-cell;
-    background: rgba(66, 66, 66, .3);
+    background: var(--animation-bg);
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
     text-align: center;
@@ -112,9 +113,9 @@ defined individually
   }
 }
 
-@keyframes scaleBottomUp {
+@keyframes slideBottomUp {
   0% {
-    transform: scale(.95) translateY(100vh);
+    transform: scale(1) translateY(100vh);
     opacity: 0;
   }
 
@@ -124,9 +125,9 @@ defined individually
   }
 }
 
-@keyframes scaleBottomDown {
+@keyframes slideBottomDown {
   0% {
-    transform: scale(.95) translateY(0);
+    transform: scale(1) translateY(0);
     opacity: 1;
   }
 
@@ -136,9 +137,9 @@ defined individually
   }
 }
 
-@keyframes scaleTopDown {
+@keyframes slideTopDown {
   0% {
-    transform: scale(.95) translateY(-100vh);
+    transform: scale(1) translateY(-100vh);
     opacity: 0;
   }
 
@@ -148,21 +149,21 @@ defined individually
   }
 }
 
-@keyframes scaleTopUp {
+@keyframes slideTopUp {
   0% {
     transform: scale(1) translateY(0);
     opacity: 1;
   }
 
   100% {
-    transform: scale(.95) translateY(-100vh);
+    transform: scale(1) translateY(-100vh);
     opacity: 0;
   }
 }
 
 @keyframes zoomCenterIn {
   0% {
-    transform: scale(.3);
+    transform: scale(.1);
     opacity: 0;
   }
 
@@ -179,7 +180,7 @@ defined individually
   }
 
   100% {
-    transform: scale(.3);
+    transform: scale(.1);
     opacity: 0;
   }
 }
@@ -210,13 +211,13 @@ defined individually
   }
 
   100% {
-    transform: scale(.95);
+    transform: scale(.98);
   }
 }
 
 @keyframes scaleContentForward {
   0% {
-    transform: scale(.95);
+    transform: scale(.98);
   }
 
   100% {
