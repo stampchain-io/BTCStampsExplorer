@@ -269,8 +269,7 @@ export const BITNAME_STEPS: ListProps[] = [
   {
     title: "COMPLETE THE INFORMATION",
     image: "/img/how-tos/bitname/01.png",
-    description:
-      `Type the name that you want to register.\n
+    description: `Type the name that you want to register.\n
       The token ticker name must be unique and no longer than 5 characters.\n
       Check availability by clicking on AVAILABILITY.\n
       FEES shows the suggested amount, adjustable via the slider.\nAll related costs are detailed in the DETAILS section.\nAccept the terms and conditions to activate the DEPLOY button.\nDEPLOY button will submit your transaction with all the provided details.`,
@@ -341,8 +340,7 @@ export const TRANSFER_BITNAME_STEPS: ListProps[] = [
   {
     title: "COMPLETE THE INFORMATION",
     image: "/img/how-tos/bitnametransfer/02.png",
-    description:
-      `To be written. Not yet in the Tools menu\n
+    description: `To be written. Not yet in the Tools menu\n
       FEES shows the suggested amount, adjustable via the slider.\nAll related costs are detailed in the DETAILS section.\nAccept the terms and conditions to activate the DEPLOY button.\nDEPLOY button will submit your transaction with all the provided details.`,
   },
   {
