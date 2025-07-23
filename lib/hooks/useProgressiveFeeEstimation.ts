@@ -86,6 +86,7 @@ export interface ProgressiveFeeEstimationResult {
   estimationCount: number;
   lastEstimationTime: number | null;
   cacheStatus: "fresh" | "stale" | "empty";
+  feeDetailsVersion: number;
 }
 
 /**
@@ -156,6 +157,9 @@ export function useProgressiveFeeEstimation(
     "empty",
   );
 
+  // 🎯 PREACT REACTIVITY FIX: Version counter to force change detection
+  const [feeDetailsVersion, setFeeDetailsVersion] = useState(0);
+
   // Progressive fee estimation function with DI support
   const estimateFeesDebounced = debounce(async (
     estimationOptions: ProgressiveFeeEstimationOptions,
@@ -205,13 +209,12 @@ export function useProgressiveFeeEstimation(
         estimatedSize: Number(estimateData.est_tx_size) || 0,
       };
 
-      console.log("🎯 useProgressiveFeeEstimation: Setting phase1FeeDetails", {
-        minerFee: phase1FeeDetails.minerFee,
-        dustValue: phase1FeeDetails.dustValue,
-        toolType,
-        feeRate: options.feeRate,
-      });
+      console.log(
+        "🎯 useProgressiveFeeEstimation: Setting phase1FeeDetails",
+        phase1FeeDetails,
+      );
       setFeeDetails(phase1FeeDetails);
+      setFeeDetailsVersion((prev) => prev + 1);
       setCacheStatus("fresh");
 
       loggerService.debug("ui", {
@@ -257,6 +260,7 @@ export function useProgressiveFeeEstimation(
           };
 
           setFeeDetails(phase2FeeDetails);
+          setFeeDetailsVersion((prev) => prev + 1);
 
           loggerService.debug("ui", {
             message: `Exact fee estimation completed (Phase 2)`,
@@ -301,6 +305,7 @@ export function useProgressiveFeeEstimation(
         hasExactFees: false,
         estimatedSize: 0,
       });
+      setFeeDetailsVersion((prev) => prev + 1);
     } finally {
       setIsEstimating(false);
     }
@@ -358,6 +363,7 @@ export function useProgressiveFeeEstimation(
     estimationCount,
     lastEstimationTime,
     cacheStatus,
+    feeDetailsVersion,
   };
 }
 
