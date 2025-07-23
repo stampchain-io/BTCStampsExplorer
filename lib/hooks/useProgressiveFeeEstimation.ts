@@ -460,8 +460,8 @@ export function buildEstimationRequest(
 export const createMockFeeEstimationService = (
   mockResponse: any,
 ): FeeEstimationService => ({
-  async estimateFees(_endpoint: string, _payload: any) {
-    return mockResponse;
+  estimateFees(_endpoint: string, _payload: any) {
+    return Promise.resolve(mockResponse);
   },
 });
 
