@@ -288,7 +288,7 @@ export class MarketDataEnrichmentService {
     const marketDataMap = new Map<string, MarketDataFields>();
     const failedTicks: string[] = [];
 
-    // TODO: Implement true bulk database query when MarketDataRepository supports it
+    // TODO(@kevinsitzes): Implement true bulk database query when MarketDataRepository supports it
     // For now, use Promise.allSettled for concurrent fetching
     const promises = ticks.map(async (tick) => {
       try {

@@ -54,7 +54,6 @@ export const handler: Handlers = {
       const collectionsData = await CollectionController.getCollectionStamps({
         limit: limit,
         page: page,
-        creator: "",
         sortBy,
         includeMarketData: true,
       });

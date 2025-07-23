@@ -11,6 +11,7 @@ import { CollectionService } from "$server/services/collectionService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { CollectionController } from "./collectionController.ts";
+import type { CollectionRow } from "$server/types/collection.d.ts";
 // import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts"; // Fixed: Removed unused import
 import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { decodeBase64 } from "$lib/utils/formatUtils.ts";
@@ -606,11 +607,11 @@ export class StampController {
       // Get stamp URLs for collections more efficiently
       const collectionData = collections?.data ? await (async () => {
         // Get all collection IDs
-        const collectionIds = collections.data.map(item => item.collection_id);
+        const collectionIds = collections.data.map((item: CollectionRow) => item.collection_id);
 
         // Fetch first stamp for each collection in a single request if possible
         const firstStamps = await Promise.all(
-          collectionIds.map(async (collectionId) => {
+          collectionIds.map(async (collectionId: string) => {
             const result = await this.getStamps({
               collectionId,
               limit: 1,
@@ -623,7 +624,7 @@ export class StampController {
         );
 
         // Map collection data with images
-        return collections.data.map((item, index) => ({
+        return collections.data.map((item: CollectionRow, index: number) => ({
           ...item,
           img: firstStamps[index]?.stamp_url || null
         }));

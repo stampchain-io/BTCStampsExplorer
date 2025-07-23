@@ -374,11 +374,10 @@ export class SRC20QueryService {
    * Calculate mint velocity and trending metrics for SRC20 tokens
    * Uses pre-populated src20_market_data fields to avoid expensive CTEs
    */
-  // deno-lint-ignore no-unused-vars
-  private static async calculateTrendingMetrics(
+  private static calculateTrendingMetrics(
     tokens: any[],
     options: TrendingCalculationOptions = {}
-  ): Promise<EnhancedSRC20Row[]> {
+  ): EnhancedSRC20Row[] {
     const { trendingWindow = '24h' } = options;
 
     return tokens.map(token => {
@@ -424,7 +423,6 @@ export class SRC20QueryService {
   /**
    * Apply trending-based sorting to token data
    */
-  // deno-lint-ignore no-unused-vars
   private static applyTrendingSorting(
     tokens: EnhancedSRC20Row[],
     sortBy: string
@@ -511,7 +509,6 @@ export class SRC20QueryService {
   /**
    * Filter tokens based on mint velocity requirements
    */
-  // deno-lint-ignore no-unused-vars
   private static applyMintVelocityFilter(
     tokens: EnhancedSRC20Row[],
     mintVelocityMin?: number
@@ -709,7 +706,7 @@ export class SRC20QueryService {
 
       // Optional data enrichment
       if (options.includeMarketData || options.enrichWithProgress) {
-        formattedData = await this.enrichData(
+        formattedData = this.enrichData(
           formattedData,
           {
             includeMarketData: options.includeMarketData || false,
@@ -812,7 +809,7 @@ export class SRC20QueryService {
 
         // Enrich the trending data if needed
         if (options.includeMarketData || options.enrichWithProgress) {
-          formattedData = await this.enrichData(
+          formattedData = this.enrichData(
             formattedTrendingData,
             {
               includeMarketData: options.includeMarketData || false,
@@ -958,7 +955,7 @@ export class SRC20QueryService {
    * Helper function to enrich SRC20 data with market and progress information
    * Handles batching and error recovery
    */
-  private static async enrichData(
+  private static enrichData(
     data: SRC20Row | SRC20Row[],
     options: {
       includeMarketData?: boolean;
@@ -966,7 +963,7 @@ export class SRC20QueryService {
       batchSize?: number;
       prefetchedMarketData?: MarketListingAggregated[];
     }
-  ): Promise<SRC20Row | SRC20Row[]> {
+  ): SRC20Row | SRC20Row[] {
     const rows = Array.isArray(data) ? data : [data];
     const enriched = [...rows];
     const batchSize = options.batchSize || 50;

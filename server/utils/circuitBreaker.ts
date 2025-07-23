@@ -427,7 +427,7 @@ export function createDatabaseCircuitBreaker(
     successThreshold: isDevelopment ? 2 : 3,      // Easier recovery in dev
     timeout: isDevelopment ? 60000 : 30000,       // 60s in dev, 30s in prod
     requestTimeout: isDevelopment ? 15000 : 10000, // Request timeout
-    fallbackFn: async () => {
+    fallbackFn: () => {
       console.warn(`[${name}] Using circuit breaker fallback - returning null`);
       return null; // Signal to use cache or default response
     }

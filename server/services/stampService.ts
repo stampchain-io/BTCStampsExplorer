@@ -293,8 +293,8 @@ export class StampService {
       return {
         ...response,
         page: initialResult.page,
-        page_size: initialResult.page_size,
-        pages: initialResult.pages,
+        limit: initialResult.page_size,      // Map page_size → limit
+        totalPages: initialResult.pages,     // Map pages → totalPages
         total: initialResult.total,
       };
     }
