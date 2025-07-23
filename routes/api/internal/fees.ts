@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { RateLimitMiddleware } from "$server/middleware/rateLimitMiddleware.ts";
-import { FeeService } from "$server/services/fee/feeService.ts";
+import { getProductionFeeService } from "$server/services/fee/feeServiceFactory.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
 export const handler: Handlers = {
@@ -22,14 +22,15 @@ export const handler: Handlers = {
     const startTime = Date.now();
 
     try {
-      console.log("[fees.ts] Starting Redis-cached fee estimation");
+      console.log("[fees.ts] Starting fee estimation with DI service");
 
-      // Use the new FeeService with Redis caching
-      const feeData = await FeeService.getFeeData();
+      // Use the new DI-based FeeService
+      const feeService = getProductionFeeService();
+      const feeData = await feeService.getFeeData();
 
       const duration = Date.now() - startTime;
       console.log(
-        `[fees.ts] Fee estimation completed in ${duration}ms using ${feeData.source} source (Redis-cached)`,
+        `[fees.ts] Fee estimation completed in ${duration}ms using ${feeData.source} source (DI-based)`,
       );
 
       // Add rate limit headers to response

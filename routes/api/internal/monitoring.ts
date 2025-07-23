@@ -1,6 +1,7 @@
 // routes/api/internal/monitoring.ts
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 import { cloudWatchMonitoring } from "$server/services/aws/cloudWatchMonitoring.ts";
 import { objectPoolManager } from "$server/services/memory/objectPool.ts";
 import { memoryMonitor } from "$server/services/monitoring/memoryMonitorService.ts";
@@ -22,6 +23,8 @@ export async function handler(req: Request): Promise<Response> {
         return await handleECSAction();
       case "pools":
         return await handlePoolsAction();
+      case "database":
+        return await handleDatabaseAction(req);
       case "business":
         return await handleBusinessMetricsAction();
       case "health":
@@ -132,6 +135,93 @@ function handlePoolsAction(): Promise<Response> {
     return Promise.resolve(
       ApiResponseUtil.internalError(
         "Pool stats failed",
+        error instanceof Error ? error.message : "Unknown error",
+      ),
+    );
+  }
+}
+
+/**
+ * Handle database connection pool monitoring action
+ */
+async function handleDatabaseAction(req: Request): Promise<Response> {
+  try {
+    const url = new URL(req.url);
+    const subAction = url.searchParams.get("subaction") || "status";
+
+    switch (subAction) {
+      case "status":
+        return await handleDatabaseStatus();
+      case "reset":
+        return await handleDatabaseReset();
+      default:
+        return await handleDatabaseStatus();
+    }
+  } catch (error) {
+    return Promise.resolve(
+      ApiResponseUtil.internalError(
+        "Database monitoring failed",
+        error instanceof Error ? error.message : "Unknown error",
+      ),
+    );
+  }
+}
+
+/**
+ * Get database connection pool status
+ */
+async function handleDatabaseStatus(): Promise<Response> {
+  try {
+    const stats = dbManager.getConnectionStats();
+    const status = {
+      connectionPool: stats,
+      health: {
+        poolUtilization: stats.totalConnections / stats.maxPoolSize,
+        hasAvailableConnections: stats.poolSize > 0 ||
+          stats.activeConnections < stats.maxPoolSize,
+        isHealthy: stats.totalConnections <= stats.maxPoolSize,
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    return Promise.resolve(ApiResponseUtil.success(status));
+  } catch (error) {
+    return Promise.resolve(
+      ApiResponseUtil.internalError(
+        "Database status failed",
+        error instanceof Error ? error.message : "Unknown error",
+      ),
+    );
+  }
+}
+
+/**
+ * Reset database connection pool (emergency recovery)
+ */
+async function handleDatabaseReset(): Promise<Response> {
+  try {
+    const beforeStats = dbManager.getConnectionStats();
+    await dbManager.resetConnectionPool();
+    const afterStats = dbManager.getConnectionStats();
+
+    const result = {
+      action: "reset",
+      before: beforeStats,
+      after: afterStats,
+      timestamp: new Date().toISOString(),
+    };
+
+    logger.warn("api", {
+      message: "Database connection pool reset via monitoring endpoint",
+      beforeStats,
+      afterStats,
+    });
+
+    return Promise.resolve(ApiResponseUtil.success(result));
+  } catch (error) {
+    return Promise.resolve(
+      ApiResponseUtil.internalError(
+        "Database reset failed",
         error instanceof Error ? error.message : "Unknown error",
       ),
     );
