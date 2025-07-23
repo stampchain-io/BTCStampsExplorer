@@ -30,7 +30,7 @@
 *       <SearchContent {...props} />
 *     </ModalSearchBase>
 *   );
-*   openModal(modalContent, "scaleDownUp");
+*   openModal(modalContent, "slideDownUp");
 * };
 * ```
 *
@@ -49,8 +49,8 @@
 * Animation Types
 * -------------
 * The system supports three animation types (defined in modal.css):
-* 1. scaleUpDown: Scales and slides up from bottom on open and down on close
-* 2. scaleDownUp: Scales and slides down from top and up on close
+* 1. slideUpDown: Slides up from bottom on open and down on close
+* 2. slideDownUp: Slides down from top and up on close
 * 3. zoomInOut: Zooms in/out from center
 *
 * Each animation includes:
@@ -85,7 +85,7 @@
 *
 * 3. Open modal with animation:
 *    ```tsx
-*    openModal(modalContent, "scaleUpDown");
+*    openModal(modalContent, "slideUpDown");
 *    ```
 *
 * 4. Transform between modals:
@@ -95,9 +95,9 @@
 *      if (!wallet?.address) {
 *        const { modalContent } = foregroundConnectWalletModal(() => {
 *          // Transform back to buy modal after connection
-*          openModal(<BuyStampModal {...props} />, "scaleDownUp");
+*          openModal(<BuyStampModal {...props} />, "slideDownUp");
 *        });
-*        openModal(modalContent, "scaleUpDown");
+*        openModal(modalContent, "slideUpDown");
 *        return;
 *      }
 *      // ... rest of buy logic

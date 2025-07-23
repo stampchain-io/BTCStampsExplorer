@@ -120,10 +120,10 @@ const BuyStampModal = ({
             handleChangeFee={handleChangeFee}
             dispenser={dispenser}
           />,
-          "scaleUpDown",
+          "slideUpDown",
         );
       });
-      openModal(modalContent, "scaleUpDown");
+      openModal(modalContent, "slideUpDown");
       return;
     }
 

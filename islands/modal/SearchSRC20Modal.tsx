@@ -93,7 +93,7 @@ export function SearchSRC20Modal({
         />
       </ModalSearchBase>
     );
-    openModal(modalContent, "scaleDownUp");
+    openModal(modalContent, "slideDownUp");
   };
 
   // Add tooltip handlers
