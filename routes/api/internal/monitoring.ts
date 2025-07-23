@@ -170,7 +170,7 @@ async function handleDatabaseAction(req: Request): Promise<Response> {
 /**
  * Get database connection pool status
  */
-async function handleDatabaseStatus(): Promise<Response> {
+function handleDatabaseStatus(): Promise<Response> {
   try {
     const stats = dbManager.getConnectionStats();
     const status = {

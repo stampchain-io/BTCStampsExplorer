@@ -320,38 +320,42 @@ function StampingToolMain({ config }: { config: Config }) {
 
   // Update local feeDetails when progressive estimation completes
   useEffect(() => {
+    console.log("🔄 StampingTool: useEffect triggered", {
+      progressiveFeeDetails,
+      isEstimating,
+      estimationError,
+      fee,
+      stampName,
+    });
+
     if (progressiveFeeDetails && !isEstimating) {
-      setFeeDetails({
+      console.log("✅ StampingTool: Updating feeDetails", {
+        oldMinerFee: feeDetails.minerFee,
+        newMinerFee: progressiveFeeDetails.minerFee,
+      });
+
+      const newFeeDetails = {
         minerFee: progressiveFeeDetails.minerFee || 0,
         dustValue: progressiveFeeDetails.dustValue || 0,
         totalValue: progressiveFeeDetails.totalValue || 0,
         hasExactFees: progressiveFeeDetails.hasExactFees || false,
         est_tx_size: progressiveFeeDetails.estimatedSize || 0,
-      });
+      };
 
-      // Log the successful fee estimation
-      logger.debug("ui", {
-        message: "Progressive fee estimation completed",
-        data: {
-          minerFee: progressiveFeeDetails.minerFee,
-          dustValue: progressiveFeeDetails.dustValue,
-          totalValue: progressiveFeeDetails.totalValue,
-          hasExactFees: progressiveFeeDetails.hasExactFees,
-          estimatedSize: progressiveFeeDetails.estimatedSize,
-          feeRate: fee,
-          filename: stampName,
-        },
-      });
+      console.log("📊 StampingTool: Setting new feeDetails", newFeeDetails);
+      setFeeDetails(newFeeDetails);
     }
+  }, [progressiveFeeDetails, isEstimating, fee, stampName]);
 
-    // Handle estimation errors
-    if (estimationError) {
-      logger.warn("ui", {
-        message: "Progressive fee estimation error",
-        error: estimationError,
-      });
-    }
-  }, [progressiveFeeDetails, isEstimating, estimationError, fee, stampName]);
+  // Debug: Track when feeDetails state actually changes
+  useEffect(() => {
+    console.log("💰 StampingTool: feeDetails state changed", {
+      minerFee: feeDetails.minerFee,
+      dustValue: feeDetails.dustValue,
+      totalValue: feeDetails.totalValue,
+      timestamp: new Date().toISOString(),
+    });
+  }, [feeDetails]);
 
   // Tooltip state and refs
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
