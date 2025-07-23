@@ -25,7 +25,7 @@ import {
 import { useProgressiveFeeEstimation } from "$progressiveFees";
 import { titlePurpleLD } from "$text";
 import axiod from "axiod";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 
@@ -318,6 +318,15 @@ function StampingToolMain({ config }: { config: Config }) {
     debounceMs: 100, // Faster for testing
   });
 
+  // 🎯 PREACT FORCE UPDATE: Counter to force re-renders
+  const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
+
+  // 🎯 PREACT OPTIMIZATION: Create stable dependency for progressiveFeeDetails
+  const progressiveFeeDetailsKey = useMemo(() => {
+    if (!progressiveFeeDetails) return null;
+    return JSON.stringify(progressiveFeeDetails);
+  }, [progressiveFeeDetails]);
+
   // Update local feeDetails when progressive estimation completes
   useEffect(() => {
     console.log("🔄 StampingTool: useEffect triggered", {
@@ -326,6 +335,7 @@ function StampingToolMain({ config }: { config: Config }) {
       estimationError,
       fee,
       stampName,
+      progressiveFeeDetailsKey,
     });
 
     if (progressiveFeeDetails && !isEstimating) {
@@ -344,10 +354,13 @@ function StampingToolMain({ config }: { config: Config }) {
 
       console.log("📊 StampingTool: Setting new feeDetails", newFeeDetails);
       setFeeDetails(newFeeDetails);
+
+      // 🎯 PREACT FORCE UPDATE: Increment counter to force re-render
+      setForceUpdateCounter((prev) => prev + 1);
     }
   }, [
-    // Use JSON.stringify to ensure Preact detects object changes
-    JSON.stringify(progressiveFeeDetails),
+    // Use stable useMemo key to ensure Preact detects object changes
+    progressiveFeeDetailsKey,
     isEstimating,
     fee,
     stampName,
@@ -359,9 +372,10 @@ function StampingToolMain({ config }: { config: Config }) {
       minerFee: feeDetails.minerFee,
       dustValue: feeDetails.dustValue,
       totalValue: feeDetails.totalValue,
+      forceUpdateCounter,
       timestamp: new Date().toISOString(),
     });
-  }, [feeDetails]);
+  }, [feeDetails, forceUpdateCounter]);
 
   // Tooltip state and refs
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
