@@ -34,7 +34,8 @@ export type LogNamespace =
   | "transaction-utxo-service"
   | "api-src101-create"
   | "broadcast"
-  | "src20-utility";
+  | "src20-utility"
+  | "sql";
 
 declare global {
   interface Window {

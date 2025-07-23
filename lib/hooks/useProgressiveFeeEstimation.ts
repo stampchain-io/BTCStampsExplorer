@@ -302,6 +302,10 @@ export function useProgressiveFeeEstimation(
 
   // Trigger estimation when parameters change (Preact-optimized)
   useEffect(() => {
+    console.log(
+      "🔄 useProgressiveFeeEstimation: useEffect triggered with feeRate:",
+      options.feeRate,
+    );
     estimateFeesDebounced(options);
 
     // Mark cache as stale after 30 seconds
