@@ -4,11 +4,11 @@ import { bigIntReviver, bigIntSerializer } from "$/lib/utils/formatUtils.ts";
 import { getDatabaseConfig, logDatabaseConfig, validateDatabaseConfig, type DatabaseConfig as DBPoolConfig } from "$/server/config/database.config.ts";
 import { crypto } from "@std/crypto";
 import {
-  ConsoleHandler,
-  FileHandler,
-  getLogger,
-  LogRecord,
-  setup,
+    ConsoleHandler,
+    FileHandler,
+    getLogger,
+    LogRecord,
+    setup,
 } from "@std/log";
 import { Client } from "mysql/mod.ts";
 // Conditionally import Redis based on build mode
@@ -185,17 +185,32 @@ class DatabaseManager {
         return client;
       } catch (error) {
         this.#logger.warn(`Connection validation failed: ${error}`);
-        // Try to get another connection
+        // Connection is invalid, close it and try to get another one
+        await this.closeClient(client);
+        // Recursively try to get another connection (this won't increment activeConnections again)
         return this.getClient();
       }
     }
 
+    // Check if we can create a new connection
     if (this.#activeConnections < this.#CONNECTION_LIMIT) {
-      this.#activeConnections++; // Track new connection being created
-      return this.createConnection();
+      try {
+        // Don't increment activeConnections until we successfully create the connection
+        const client = await this.createConnection();
+        this.#activeConnections++; // Only increment after successful creation
+        return client;
+      } catch (error) {
+        // Connection creation failed, don't increment counter
+        this.#logger.warn(`Failed to create new connection: ${error instanceof Error ? error.message : String(error)}`);
+        throw error;
+      }
     }
 
-    return Promise.reject(new Error("No available connections in the pool"));
+    // No connections available and can't create new ones
+    const stats = this.getConnectionStats();
+    const errorMsg = `No available connections in the pool. Stats: active=${stats.activeConnections}, pool=${stats.poolSize}, max=${stats.maxPoolSize}, total=${stats.totalConnections}`;
+    this.#logger.error(errorMsg);
+    throw new Error(errorMsg);
   }
 
   /**
@@ -278,6 +293,31 @@ class DatabaseManager {
     };
   }
 
+  /**
+   * Emergency method to reset connection pool state
+   * Use only when connection pool is in an inconsistent state
+   */
+  async resetConnectionPool(): Promise<void> {
+    this.#logger.warn("Resetting connection pool due to inconsistent state");
+
+    // Log current state before reset
+    const stats = this.getConnectionStats();
+    this.#logger.warn(`Pool state before reset: ${JSON.stringify(stats)}`);
+
+    // Close all existing connections
+    await Promise.all(this.#pool.map(client => this.closeClient(client)));
+
+    // Reset counters
+    this.#activeConnections = 0;
+    this.#pool = [];
+
+    // Warm up the pool again
+    await this.warmupConnectionPool();
+
+    const newStats = this.getConnectionStats();
+    this.#logger.info(`Pool state after reset: ${JSON.stringify(newStats)}`);
+  }
+
   async closeAllClients(): Promise<void> {
     // Stop keep-alive interval
     if (this.#keepAliveInterval) {
@@ -329,49 +369,67 @@ class DatabaseManager {
         this.releaseClient(client);
         return result as T;
       } catch (error) {
-        // Check if it's a connection timeout error
-        if (error instanceof Error &&
-            (error.message.includes("disconnected by the server") ||
-             error.message.includes("wait_timeout") ||
-             error.message.includes("interactive_timeout") ||
-             error.message.includes("connection") ||
-             error.message.includes("PROTOCOL_CONNECTION_LOST") ||
-             error.message.includes("ECONNRESET") ||
-             error.message.includes("ETIMEDOUT"))) {
-          this.#logger.warn(
-            `Connection error detected on attempt ${attempt}: ${error.message}`,
-          );
-          // Remove the bad connection from the pool
-          if (client) {
-            await this.closeClient(client);
-            client = null;
+        // Handle different types of errors appropriately
+        let shouldRetry = true;
+        let isConnectionError = false;
+
+        if (error instanceof Error) {
+          // Check if it's a connection pool exhaustion error
+          if (error.message.includes("No available connections in the pool")) {
+            this.#logger.warn(
+              `Connection pool exhausted on attempt ${attempt}. Pool stats: ${JSON.stringify(this.getConnectionStats())}`,
+            );
+            isConnectionError = true;
           }
-        } else {
-          // For non-connection errors, return to pool
-          if (client) {
-            this.releaseClient(client);
+          // Check if it's a connection timeout/network error
+          else if (error.message.includes("disconnected by the server") ||
+                   error.message.includes("wait_timeout") ||
+                   error.message.includes("interactive_timeout") ||
+                   error.message.includes("connection") ||
+                   error.message.includes("PROTOCOL_CONNECTION_LOST") ||
+                   error.message.includes("ECONNRESET") ||
+                   error.message.includes("ETIMEDOUT")) {
+            this.#logger.warn(
+              `Connection error detected on attempt ${attempt}: ${error.message}`,
+            );
+            isConnectionError = true;
+          }
+          // For SQL syntax errors or constraint violations, don't retry
+          else if (error.message.includes("syntax error") ||
+                   error.message.includes("constraint") ||
+                   error.message.includes("duplicate") ||
+                   error.message.includes("foreign key")) {
+            shouldRetry = false;
           }
         }
 
-        // Only log as error on final attempt
-        if (attempt === this.#MAX_RETRIES) {
+        // Handle connection cleanup
+        if (isConnectionError && client) {
+          await this.closeClient(client);
+          client = null;
+        } else if (client) {
+          // For non-connection errors, return client to pool
+          this.releaseClient(client);
+        }
+
+        // Log appropriately based on attempt and error type
+        if (attempt === this.#MAX_RETRIES || !shouldRetry) {
           this.#logger.error(
             `Error executing query on attempt ${attempt}:`,
             error,
           );
+          throw error;
         } else {
           this.#logger.warn(
             `Query failed on attempt ${attempt}, retrying...`,
             error instanceof Error ? error.message : String(error),
           );
         }
-
-        if (attempt === this.#MAX_RETRIES) {
-          throw error;
-        }
       }
-      // Exponential backoff for retries
-      const backoffTime = this.#RETRY_INTERVAL * Math.pow(1.5, attempt - 1);
+
+      // Exponential backoff for retries, with longer delay for connection pool issues
+      const baseDelay = this.#RETRY_INTERVAL * Math.pow(1.5, attempt - 1);
+      const backoffTime = Math.min(baseDelay, 5000); // Cap at 5 seconds
       await new Promise((resolve) => setTimeout(resolve, backoffTime));
     }
     throw new Error("Max retries reached");
