@@ -220,7 +220,7 @@ Deno.test("Fee System Performance and Migration Tests", {
     const withoutBgTime = withoutBgEnd - withoutBgStart;
 
     // Start background service
-    BackgroundFeeService.start(baseUrl);
+    BackgroundFeeService.start();
 
     // Wait a moment for background service to warm cache
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -384,7 +384,7 @@ Deno.test("Fee System Performance and Migration Tests", {
     const startTime = performance.now();
 
     // 1. Start background service
-    BackgroundFeeService.start(baseUrl);
+    BackgroundFeeService.start();
 
     // 2. Get fee data (should trigger security validation)
     const feeData = await FeeService.getFeeData();
