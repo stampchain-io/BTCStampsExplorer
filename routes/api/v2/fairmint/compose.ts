@@ -17,6 +17,7 @@ export const handler: Handlers = {
         satsPerKB,
         service_fee,
         service_fee_address,
+        dryRun,
       } = body;
 
       if (!address || !asset || !quantity) {
@@ -71,6 +72,34 @@ export const handler: Handlers = {
         const serviceFeeAddrInput = service_fee_address !== undefined
           ? service_fee_address
           : serverConfig.MINTING_SERVICE_FEE_ADDRESS;
+
+        // For dryRun, return fee estimates without generating actual PSBT
+        if (dryRun === true) {
+          // Fairmint transactions are simpler - typically 1 input, 2 outputs (recipient + change)
+          // Estimated transaction size: ~250 bytes for fairmint
+          const estimatedTxSize = 250;
+          const estMinerFee = Math.ceil(
+            estimatedTxSize * normalizedFees.normalizedSatsPerVB,
+          );
+          const totalDustValue = 546; // Standard P2WPKH dust limit
+          const totalCost = estMinerFee + totalDustValue +
+            (serviceFeeInput || 0);
+
+          return ResponseUtil.success({
+            est_miner_fee: estMinerFee,
+            total_dust_value: totalDustValue,
+            total_cost: totalCost,
+            est_tx_size: estimatedTxSize,
+            service_fee: serviceFeeInput || 0,
+            feeDetails: {
+              total: estMinerFee,
+              effectiveFeeRate: normalizedFees.normalizedSatsPerVB,
+              estimatedSize: estimatedTxSize,
+            },
+            is_estimate: true,
+            estimation_method: "dryRun_calculation",
+          });
+        }
 
         const psbtResult = await GeneralPSBTService.generatePSBT(
           response.result.rawtransaction, // ✅ Use raw hex from Counterparty
