@@ -12,7 +12,12 @@ const mockDb = {
   ): Promise<T> => {
     // Simple in-memory cache for testing
     if (mockDb.cache[key]) {
-      return mockDb.cache[key];
+      // Return cached data with source updated to "cached"
+      const cachedData = { ...mockDb.cache[key] };
+      if (cachedData.source) {
+        cachedData.source = "cached";
+      }
+      return cachedData;
     }
     const result = await fetchFn();
     mockDb.cache[key] = result;
@@ -37,6 +42,22 @@ const mockFetchResponses = {
   },
   binance: {
     price: "44950.00",
+  },
+  kraken: {
+    error: [],
+    result: {
+      XXBTZUSD: {
+        a: ["45100.00", "1", "1.000"],
+        b: ["45099.90", "1", "1.000"],
+        c: ["45100.00", "0.00080000"],
+        v: ["100.12345678", "200.12345678"],
+        p: ["45050.00", "45040.00"],
+        t: [1000, 2000],
+        l: ["44900.00", "44890.00"],
+        h: ["45200.00", "45210.00"],
+        o: "45000.00",
+      },
+    },
   },
 };
 
@@ -64,6 +85,13 @@ describe("BTCPriceService", () => {
 
       if (urlString.includes("binance")) {
         return new Response(JSON.stringify(mockFetchResponses.binance), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      if (urlString.includes("kraken")) {
+        return new Response(JSON.stringify(mockFetchResponses.kraken), {
           status: 200,
           headers: { "Content-Type": "application/json" },
         });
@@ -144,6 +172,13 @@ describe("BTCPriceService", () => {
 
         if (urlString.includes("binance")) {
           return new Response(JSON.stringify(mockFetchResponses.binance), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        if (urlString.includes("kraken")) {
+          return new Response(JSON.stringify(mockFetchResponses.kraken), {
             status: 200,
             headers: { "Content-Type": "application/json" },
           });
