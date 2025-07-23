@@ -429,7 +429,7 @@ export function createDatabaseCircuitBreaker(
     requestTimeout: isDevelopment ? 15000 : 10000, // Request timeout
     fallbackFn: () => {
       console.warn(`[${name}] Using circuit breaker fallback - returning null`);
-      return null; // Signal to use cache or default response
+      return Promise.resolve(null); // Signal to use cache or default response
     }
   });
 }
