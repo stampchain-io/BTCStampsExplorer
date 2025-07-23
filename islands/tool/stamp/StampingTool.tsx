@@ -25,7 +25,7 @@ import {
 import { useProgressiveFeeEstimation } from "$progressiveFees";
 import { titlePurpleLD } from "$text";
 import axiod from "axiod";
-import { useEffect, useMemo, useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 
@@ -304,6 +304,7 @@ function StampingToolMain({ config }: { config: Config }) {
     feeDetails: progressiveFeeDetails,
     isEstimating,
     estimationError,
+    feeDetailsVersion,
   } = useProgressiveFeeEstimation({
     toolType: "stamp",
     feeRate: fee,
@@ -321,12 +322,6 @@ function StampingToolMain({ config }: { config: Config }) {
   // 🎯 PREACT FORCE UPDATE: Counter to force re-renders
   const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
 
-  // 🎯 PREACT OPTIMIZATION: Create stable dependency for progressiveFeeDetails
-  const progressiveFeeDetailsKey = useMemo(() => {
-    if (!progressiveFeeDetails) return null;
-    return JSON.stringify(progressiveFeeDetails);
-  }, [progressiveFeeDetails]);
-
   // Update local feeDetails when progressive estimation completes
   useEffect(() => {
     console.log("🔄 StampingTool: useEffect triggered", {
@@ -335,7 +330,7 @@ function StampingToolMain({ config }: { config: Config }) {
       estimationError,
       fee,
       stampName,
-      progressiveFeeDetailsKey,
+      feeDetailsVersion,
     });
 
     if (progressiveFeeDetails && !isEstimating) {
@@ -359,8 +354,8 @@ function StampingToolMain({ config }: { config: Config }) {
       setForceUpdateCounter((prev) => prev + 1);
     }
   }, [
-    // Use stable useMemo key to ensure Preact detects object changes
-    progressiveFeeDetailsKey,
+    // Use version counter to ensure Preact detects fee changes
+    feeDetailsVersion,
     isEstimating,
     fee,
     stampName,
