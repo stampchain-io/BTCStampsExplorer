@@ -27,7 +27,7 @@ This is a Deno project. For security information including how npm development d
 ## Prerequisites
 
 1. **Install Deno**
-   > ⚠️ **Required Version**: 2.3.3
+   > ⚠️ **Required Version**: 2.4.2
    ```sh
    curl -fsSL https://deno.land/install.sh | sh
    ```
@@ -95,13 +95,13 @@ deno task start
 ### 2. Docker Deployment
 
 ```sh
-docker build -t btc-stamps-explorer:2.3.3 .
-docker run -p 8000:8000 btc-stamps-explorer:2.3.3
+docker build -t btc-stamps-explorer:2.4.2 .
+docker run -p 8000:8000 btc-stamps-explorer:2.4.2
 ```
 
 The container uses:
 - Ubuntu 22.04 base image
-- Deno 2.3.3
+- Deno 2.4.2
 - Production environment
 - Port 8000
 - Required permissions for network, file system, and environment variables

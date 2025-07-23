@@ -1,6 +1,6 @@
 import type { FeeDetails } from "$lib/types/base.d.ts";
 import { debounce } from "$lib/utils/debounce.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { logger, type LogNamespace } from "$lib/utils/logger.ts";
 import { useEffect, useState } from "preact/hooks";
 
 // ✨ Dependency injection interfaces for testability
@@ -9,9 +9,9 @@ export interface FeeEstimationService {
 }
 
 export interface LoggerService {
-  debug(category: string, data: any): void;
-  warn(category: string, data: any): void;
-  error(category: string, data: any): void;
+  debug(category: LogNamespace, data: any): void;
+  warn(category: LogNamespace, data: any): void;
+  error(category: LogNamespace, data: any): void;
 }
 
 // Default implementations
@@ -32,9 +32,9 @@ export const defaultFeeEstimationService: FeeEstimationService = {
 };
 
 export const defaultLoggerService: LoggerService = {
-  debug: (category: string, data: any) => logger.debug(category, data),
-  warn: (category: string, data: any) => logger.warn(category, data),
-  error: (category: string, data: any) => logger.error(category, data),
+  debug: (category: LogNamespace, data: any) => logger.debug(category, data),
+  warn: (category: LogNamespace, data: any) => logger.warn(category, data),
+  error: (category: LogNamespace, data: any) => logger.error(category, data),
 };
 
 export interface ProgressiveFeeEstimationOptions {
@@ -469,11 +469,11 @@ export const createMockLoggerService = (): LoggerService & { logs: any[] } => {
   const logs: any[] = [];
   return {
     logs,
-    debug: (category: string, data: any) =>
+    debug: (category: LogNamespace, data: any) =>
       logs.push({ level: "debug", category, data }),
-    warn: (category: string, data: any) =>
+    warn: (category: LogNamespace, data: any) =>
       logs.push({ level: "warn", category, data }),
-    error: (category: string, data: any) =>
+    error: (category: LogNamespace, data: any) =>
       logs.push({ level: "error", category, data }),
   };
 };

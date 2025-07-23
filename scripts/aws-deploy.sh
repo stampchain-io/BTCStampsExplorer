@@ -31,13 +31,13 @@ if [ -f .env ]; then
         # Skip comments and empty lines
         [[ $key == \#* ]] && continue
         [[ -z "$key" ]] && continue
-        
+
         # Remove any inline comments from the value
         value=$(echo "$value" | sed 's/[[:space:]]*#.*$//')
-        
+
         # Clear any carriage returns or other special characters that might be in the value
         value=$(echo "$value" | tr -d '\r')
-        
+
         # Export the variable
         export "$key=$value"
     done < .env
@@ -99,7 +99,7 @@ usage() {
     echo -e "  --diagnose          Diagnose ECR connectivity issues and verify VPC endpoint configuration"
     echo -e "  --skip-build        Skip building Docker image (alias for backward compatibility)"
     echo -e "  --cache-deno-image  Cache Deno image from Docker Hub to ECR (version specified with --deno-version)"
-    echo -e "  --deno-version      Deno version to cache (default: 2.3.3, use with --cache-deno-image)"
+    echo -e "  --deno-version      Deno version to cache (default: 2.4.2, use with --cache-deno-image)"
     echo -e "  --list-images       List all available images in ECR repository with timestamps"
     echo -e "  --auto-tag-images   Automatically tag all untagged images with date-based tags"
     echo -e "  --select-image      Select a specific image tag to deploy instead of latest"
@@ -155,7 +155,7 @@ CACHE_DENO_IMAGE=false
 LIST_IMAGES=false
 AUTO_TAG_IMAGES=false
 SELECT_IMAGE=""
-DENO_VERSION="2.3.3"
+DENO_VERSION="2.4.2"
 
 for arg in "$@"; do
     case $arg in
@@ -228,8 +228,8 @@ for arg in "$@"; do
 done
 
 # If no action specified, show usage
-if [ "$BUILD" = false ] && [ "$CODEBUILD" = false ] && [ "$DEPLOY" = false ] && [ "$FIX_NETWORKING" = false ] && 
-   [ "$DIAGNOSE" = false ] && [ "$FIX_TASK_DEF" = false ] && [ "$CACHE_DENO_IMAGE" = false ] && 
+if [ "$BUILD" = false ] && [ "$CODEBUILD" = false ] && [ "$DEPLOY" = false ] && [ "$FIX_NETWORKING" = false ] &&
+   [ "$DIAGNOSE" = false ] && [ "$FIX_TASK_DEF" = false ] && [ "$CACHE_DENO_IMAGE" = false ] &&
    [ "$LIST_IMAGES" = false ] && [ "$AUTO_TAG_IMAGES" = false ] && [ -z "$SELECT_IMAGE" ]; then
     usage
 fi
@@ -241,48 +241,48 @@ aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS 
 # Function to list available images in ECR
 list_ecr_images() {
     echo -e "${GREEN}Listing available images in repository ${ECR_REPOSITORY_NAME}...${NC}"
-    
+
     # Check if the ECR repository exists
     if ! aws ecr describe-repositories --repository-names "$ECR_REPOSITORY_NAME" --region "$AWS_REGION" &> /dev/null; then
         echo -e "${RED}Error: ECR repository '$ECR_REPOSITORY_NAME' does not exist.${NC}"
         return 1
     fi
-    
+
     # Get list of images with timestamps
     if [ "$JQ_INSTALLED" = true ]; then
         # Use jq for better formatting when available
         echo -e "${GREEN}=== Available Images in ${ECR_REPOSITORY_NAME} ===${NC}"
         echo -e "${YELLOW}Image Tag              | Push Date           | Size    | Digest (Short)${NC}"
         echo -e "${YELLOW}------------------------------------------------------------------${NC}"
-        
+
         # Use a very simple jq query that works with all jq versions
         aws ecr describe-images --repository-name "$ECR_REPOSITORY_NAME" --region "$AWS_REGION" --output json | \
-        jq -r '.imageDetails | sort_by(.imagePushedAt) | reverse | .[] | 
-            if has("imageTags") and (.imageTags | length > 0) then 
-                (.imageTags[0] // "<no tag>") + " | " + 
-                (.imagePushedAt[0:19] | gsub("T"; " ")) + " | " + 
+        jq -r '.imageDetails | sort_by(.imagePushedAt) | reverse | .[] |
+            if has("imageTags") and (.imageTags | length > 0) then
+                (.imageTags[0] // "<no tag>") + " | " +
+                (.imagePushedAt[0:19] | gsub("T"; " ")) + " | " +
                 (if has("imageSizeInBytes") then ((.imageSizeInBytes/1024/1024) | floor | tostring) + " MB" else "N/A" end) + " | " +
                 (.imageDigest | split(":")[1][0:12])
-            else 
-                "<untagged> | " + 
-                (.imagePushedAt[0:19] | gsub("T"; " ")) + " | " + 
+            else
+                "<untagged> | " +
+                (.imagePushedAt[0:19] | gsub("T"; " ")) + " | " +
                 (if has("imageSizeInBytes") then ((.imageSizeInBytes/1024/1024) | floor | tostring) + " MB" else "N/A" end) + " | " +
                 (.imageDigest | split(":")[1][0:12])
             end'
-        
+
         echo -e "\n${YELLOW}Current production image: latest${NC}"
         LATEST_DIGEST=$(aws ecr describe-images --repository-name "$ECR_REPOSITORY_NAME" --image-ids imageTag=latest --region "$AWS_REGION" --query 'imageDetails[0].imageDigest' --output text 2>/dev/null || echo "")
         if [ -n "$LATEST_DIGEST" ] && [ "$LATEST_DIGEST" != "None" ]; then
             # Find all tags with the same digest as 'latest'
             echo -e "${GREEN}The 'latest' tag currently points to:${NC}"
             aws ecr describe-images --repository-name "$ECR_REPOSITORY_NAME" --region "$AWS_REGION" --output json | \
-            jq --arg DIGEST "$LATEST_DIGEST" -r '.imageDetails[] | select(.imageDigest == $DIGEST) | 
-                if has("imageTags") then 
-                    (.imageTags | length | tostring) + " tags, including:" 
-                else 
+            jq --arg DIGEST "$LATEST_DIGEST" -r '.imageDetails[] | select(.imageDigest == $DIGEST) |
+                if has("imageTags") then
+                    (.imageTags | length | tostring) + " tags, including:"
+                else
                     "<no tags>"
                 end'
-                
+
             # Simple approach to list other tags for latest image
             echo -e "${YELLOW}All tags for the 'latest' image:${NC}"
             aws ecr describe-images --repository-name "$ECR_REPOSITORY_NAME" --image-ids imageTag=latest --region "$AWS_REGION" --output json | \
@@ -292,7 +292,7 @@ list_ecr_images() {
         else
             echo -e "${YELLOW}  No 'latest' tag found in the repository${NC}"
         fi
-        
+
         # Suggest automatically generating tags for untagged images
         echo -e "\n${YELLOW}To automatically tag images with date-based tags:${NC}"
         echo -e "${GREEN}Run: ${0} --auto-tag-images${NC}"
@@ -302,17 +302,17 @@ list_ecr_images() {
         echo -e "${YELLOW}Note: Install jq for better output with timestamps and size information${NC}"
         aws ecr list-images --repository-name "$ECR_REPOSITORY_NAME" --region "$AWS_REGION" --query 'imageIds[?imageTag!=`null`].imageTag' --output text | tr '\t' '\n' | sort -r
     fi
-    
+
     echo -e "\n${GREEN}To deploy a specific image, use:${NC}"
     echo -e "${YELLOW}${0} --deploy --select-image <tag>${NC}"
     return 0
 }
 
 # List available images if requested as a standalone operation
-if [ "$LIST_IMAGES" = true ] && [ "$BUILD" = false ] && [ "$CODEBUILD" = false ] && [ "$DEPLOY" = false ] && 
-   [ "$FIX_NETWORKING" = false ] && [ "$DIAGNOSE" = false ] && [ "$FIX_TASK_DEF" = false ] && 
+if [ "$LIST_IMAGES" = true ] && [ "$BUILD" = false ] && [ "$CODEBUILD" = false ] && [ "$DEPLOY" = false ] &&
+   [ "$FIX_NETWORKING" = false ] && [ "$DIAGNOSE" = false ] && [ "$FIX_TASK_DEF" = false ] &&
    [ "$CACHE_DENO_IMAGE" = false ] && [ -z "$SELECT_IMAGE" ]; then
-    
+
     list_ecr_images
     exit 0
 fi
@@ -325,23 +325,23 @@ fi
 # Automatically tag untagged images if requested
 if [ "$AUTO_TAG_IMAGES" = true ]; then
     echo -e "${GREEN}Automatically tagging untagged images in repository ${ECR_REPOSITORY_NAME}...${NC}"
-    
+
     # Check if the ECR repository exists
     if ! aws ecr describe-repositories --repository-names "$ECR_REPOSITORY_NAME" --region "$AWS_REGION" &> /dev/null; then
         echo -e "${RED}Error: ECR repository '$ECR_REPOSITORY_NAME' does not exist.${NC}"
         exit 1
     fi
-    
+
     # Get information about untagged images
     echo -e "${YELLOW}Checking for untagged images...${NC}"
     # Get all image digests
     ALL_DIGESTS=$(aws ecr describe-images --repository-name "$ECR_REPOSITORY_NAME" --region "$AWS_REGION" --output json | \
                   jq -r '.imageDetails[] | .imageDigest')
-    
-    # Get all tagged image digests 
+
+    # Get all tagged image digests
     TAGGED_DIGESTS=$(aws ecr describe-images --repository-name "$ECR_REPOSITORY_NAME" --region "$AWS_REGION" --output json | \
                     jq -r '.imageDetails[] | select(has("imageTags")) | .imageDigest')
-    
+
     # Find untagged images by comparing the lists
     UNTAGGED_IMAGES=""
     for digest in $ALL_DIGESTS; do
@@ -353,24 +353,24 @@ if [ "$AUTO_TAG_IMAGES" = true ]; then
 "
         fi
     done
-    
+
     if [ -z "$UNTAGGED_IMAGES" ]; then
         echo -e "${GREEN}No untagged images found in repository.${NC}"
     else
         echo -e "${GREEN}Found untagged images. Adding date-based tags...${NC}"
-        
+
         # Process each untagged image
         echo "$UNTAGGED_IMAGES" | while read -r IMAGE_INFO; do
             # Extract digest and timestamp
             IMAGE_DIGEST=$(echo "$IMAGE_INFO" | cut -f1)
             PUSH_DATE=$(echo "$IMAGE_INFO" | cut -f2)
-            
+
             # Convert ISO date to YYYYMMDD-HHMMSS format for tag
             DATE_TAG=$(echo "$PUSH_DATE" | sed 's/[-:T]//g' | cut -d. -f1 | sed 's/\([0-9]\{8\}\)\([0-9]\{6\}\)/\1-\2/')
             TAG="date-$DATE_TAG"
-            
+
             echo -e "${YELLOW}Adding tag '$TAG' to image $IMAGE_DIGEST${NC}"
-            
+
             # Tag the image
             if aws ecr put-image --repository-name "$ECR_REPOSITORY_NAME" --image-tag "$TAG" --image-manifest "$(aws ecr batch-get-image --repository-name "$ECR_REPOSITORY_NAME" --image-ids imageDigest="$IMAGE_DIGEST" --query 'images[].imageManifest' --output text)" --region "$AWS_REGION" > /dev/null; then
                 echo -e "${GREEN}✓ Successfully tagged image with $TAG${NC}"
@@ -378,15 +378,15 @@ if [ "$AUTO_TAG_IMAGES" = true ]; then
                 echo -e "${RED}✗ Failed to tag image${NC}"
             fi
         done
-        
+
         # Show the updated list of images
         echo -e "\n${GREEN}Updated image list:${NC}"
         list_ecr_images
     fi
-    
+
     # Exit if auto-tagging was the only action
-    if [ "$BUILD" = false ] && [ "$CODEBUILD" = false ] && [ "$DEPLOY" = false ] && [ "$FIX_NETWORKING" = false ] && 
-       [ "$DIAGNOSE" = false ] && [ "$FIX_TASK_DEF" = false ] && [ "$CACHE_DENO_IMAGE" = false ] && 
+    if [ "$BUILD" = false ] && [ "$CODEBUILD" = false ] && [ "$DEPLOY" = false ] && [ "$FIX_NETWORKING" = false ] &&
+       [ "$DIAGNOSE" = false ] && [ "$FIX_TASK_DEF" = false ] && [ "$CACHE_DENO_IMAGE" = false ] &&
        [ "$LIST_IMAGES" = false ] && [ -z "$SELECT_IMAGE" ]; then
         exit 0
     fi
@@ -396,7 +396,7 @@ fi
 if [ "$CACHE_DENO_IMAGE" = true ]; then
     # Define repository names
     BASE_REPOSITORY_NAME="${ECR_REPOSITORY_NAME}-base"
-    
+
     # Create the base repository if it doesn't exist
     echo -e "${GREEN}Checking for base repository ${BASE_REPOSITORY_NAME}...${NC}"
     if ! aws ecr describe-repositories --repository-names "$BASE_REPOSITORY_NAME" --region "$AWS_REGION" &> /dev/null; then
@@ -405,23 +405,23 @@ if [ "$CACHE_DENO_IMAGE" = true ]; then
     else
         echo -e "${GREEN}Base repository '$BASE_REPOSITORY_NAME' found.${NC}"
     fi
-    
+
     # Pull, tag, and push the Deno image
     echo -e "${GREEN}Pulling Deno image version ${DENO_VERSION} from Docker Hub...${NC}"
     docker pull --platform=linux/amd64 denoland/deno:alpine-${DENO_VERSION}
-    
+
     echo -e "${GREEN}Tagging Deno image for ECR...${NC}"
     docker tag denoland/deno:alpine-${DENO_VERSION} "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BASE_REPOSITORY_NAME:alpine-${DENO_VERSION}"
-    
+
     echo -e "${GREEN}Pushing Deno image to ECR...${NC}"
     docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BASE_REPOSITORY_NAME:alpine-${DENO_VERSION}"
-    
+
     echo -e "${GREEN}Deno image version ${DENO_VERSION} successfully cached to ECR.${NC}"
     echo -e "${GREEN}You can now use this image in your Dockerfile or CodeBuild project by replacing:${NC}"
     echo -e "${YELLOW}FROM denoland/deno:alpine-${DENO_VERSION}${NC}"
     echo -e "${GREEN}with:${NC}"
     echo -e "${YELLOW}FROM ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BASE_REPOSITORY_NAME}:alpine-${DENO_VERSION}${NC}"
-    
+
     exit 0
 fi
 
@@ -431,17 +431,17 @@ if [ "$CODEBUILD" = true ]; then
     echo -e "${GREEN}Starting build in AWS CodeBuild project: ${CODEBUILD_PROJECT}...${NC}"
     # Debug echo to check all key variables
     echo "DEBUG: Cluster=${ECS_CLUSTER_NAME}, Service=${ECS_SERVICE_NAME}, Region=${AWS_REGION}, Repo=${ECR_REPOSITORY_NAME}"
-    
+
     # Start the build in CodeBuild
     BUILD_ID=$(aws codebuild start-build --project-name "$CODEBUILD_PROJECT" --query 'build.id' --output text)
-    
+
     if [ -n "$BUILD_ID" ]; then
         echo -e "${GREEN}Build started with ID: ${BUILD_ID}${NC}"
         echo -e "${YELLOW}Monitoring build progress...${NC}"
-        
+
         # Initialize build status
         BUILD_STATUS="IN_PROGRESS"
-        
+
         # Monitor build status
         while [ "$BUILD_STATUS" = "IN_PROGRESS" ]; do
             sleep 10
@@ -449,20 +449,20 @@ if [ "$CODEBUILD" = true ]; then
             CURRENT_PHASE=$(aws codebuild batch-get-builds --ids "$BUILD_ID" --query 'builds[0].currentPhase' --output text)
             echo -e "${YELLOW}Build status: ${BUILD_STATUS}, Current phase: ${CURRENT_PHASE}${NC}"
         done
-        
+
         # Check final build status
         if [ "$BUILD_STATUS" = "SUCCEEDED" ]; then
             echo -e "${GREEN}Build completed successfully!${NC}"
-            
+
             # Store service name with explicit quoting to prevent errors - ensure variables persist for deployment
             # These variables need to be available for the deploy section
             ECS_SERVICE_NAME="${ECS_SERVICE_NAME:-stamps-app-service}"
             ECS_CLUSTER_NAME="${ECS_CLUSTER_NAME:-stamps-app-prod}"
             ECR_REPOSITORY_NAME="${ECR_REPOSITORY_NAME:-btc-stamps-explorer}"
-            
+
             # Debug echo to help troubleshoot
             echo "DEBUG: Service=${ECS_SERVICE_NAME}, Cluster=${ECS_CLUSTER_NAME}, Repository=${ECR_REPOSITORY_NAME}"
-            
+
             # Set deploy flag to true after successful build to ensure deployment happens
             DEPLOY=true
         else
@@ -474,7 +474,7 @@ if [ "$CODEBUILD" = true ]; then
         echo -e "${RED}Failed to start build in CodeBuild. Continuing with deployment...${NC}"
         DEPLOY=true
     fi
-    
+
     # Make sure variables are properly set for deployment after CodeBuild, even if build failed
     if [ "$CODEBUILD" = true ]; then
         # Ensure ECS service variables are set correctly
@@ -484,7 +484,7 @@ if [ "$CODEBUILD" = true ]; then
         ECR_REPOSITORY_NAME="${ECR_REPOSITORY_NAME:-btc-stamps-explorer}"
         echo "DEBUG: Final variables for deployment - Service=${ECS_SERVICE_NAME}, Cluster=${ECS_CLUSTER_NAME}, Repository=${ECR_REPOSITORY_NAME}"
     fi
-    
+
 # Build and push Docker image locally if requested
 elif [ "$BUILD" = true ]; then
     # Check if the ECR repository exists
@@ -494,18 +494,18 @@ elif [ "$BUILD" = true ]; then
     else
         echo -e "${GREEN}ECR repository '$ECR_REPOSITORY_NAME' found.${NC}"
     fi
-    
+
     echo -e "${GREEN}Building Docker image locally for AMD64 architecture...${NC}"
     # Use a local tag without slashes for Docker build
     LOCAL_TAG="stamps_app_frontend"
     docker build --platform=linux/amd64 -t "$LOCAL_TAG:latest" .
-    
+
     echo -e "${GREEN}Tagging Docker image...${NC}"
     docker tag "$LOCAL_TAG:latest" "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME:latest"
-    
+
     echo -e "${GREEN}Pushing Docker image to ECR...${NC}"
     docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME:latest"
-    
+
     echo -e "${GREEN}Cleaning up local image...${NC}"
     docker rmi "$LOCAL_TAG:latest"
 fi
@@ -513,10 +513,10 @@ fi
 # Fix networking configuration for ECS service if requested
 if [ "$FIX_NETWORKING" = true ]; then
     echo -e "${GREEN}Updating ECS service with correct network configuration...${NC}"
-    
+
     # Validate AWS resources
     echo -e "${GREEN}Validating primary subnet for internet access...${NC}"
-    
+
     # Verify primary subnet exists
     echo -e "${GREEN}Verifying subnet ${AWS_PRIMARY_SUBNET} exists...${NC}"
     if ! aws ec2 describe-subnets --subnet-ids "$AWS_PRIMARY_SUBNET" --query 'Subnets[0].SubnetId' --output text &>/dev/null; then
@@ -526,10 +526,10 @@ if [ "$FIX_NETWORKING" = true ]; then
         echo -e "${YELLOW}Please update AWS_PRIMARY_SUBNET in your .env file.${NC}"
         exit 1
     fi
-    
+
     # Configure subnet setup based on available values
     SUBNET_CONFIG="[${AWS_PRIMARY_SUBNET}]"
-    
+
     # Add secondary subnet if available
     if [ -n "$AWS_SECONDARY_SUBNET" ]; then
         echo -e "${GREEN}Verifying secondary subnet ${AWS_SECONDARY_SUBNET} exists...${NC}"
@@ -542,15 +542,15 @@ if [ "$FIX_NETWORKING" = true ]; then
     else
         echo -e "${YELLOW}No secondary subnet configured. Using only ${AWS_PRIMARY_SUBNET}${NC}"
     fi
-    
+
     # Get current task definition
     TASK_DEF_ARN=$(aws ecs describe-services --cluster "$ECS_CLUSTER_NAME" --services "$ECS_SERVICE_NAME" --query 'services[0].taskDefinition' --output text)
     echo -e "${GREEN}Current task definition: ${TASK_DEF_ARN}${NC}"
-    
+
     echo -e "${GREEN}Updating ECS service with network configuration...${NC}"
     echo -e "${YELLOW}Using subnet configuration: ${SUBNET_CONFIG}${NC}"
     echo -e "${YELLOW}Using security group: ${AWS_ECS_SECURITY_GROUP}${NC}"
-    
+
     # Update ECS service with network configuration
     aws ecs update-service \
       --cluster "${ECS_CLUSTER_NAME}" \
@@ -560,22 +560,22 @@ if [ "$FIX_NETWORKING" = true ]; then
       --network-configuration "awsvpcConfiguration={subnets=${SUBNET_CONFIG},securityGroups=[${AWS_ECS_SECURITY_GROUP}],assignPublicIp=ENABLED}" \
       --health-check-grace-period-seconds 300 \
       --force-new-deployment
-    
+
     # Update target group health check path
     echo -e "${GREEN}Checking for associated target groups to update health check path...${NC}"
-    
+
     # Find the load balancer target group associated with the service
     TARGET_GROUPS=$(aws ecs describe-services --cluster "$ECS_CLUSTER_NAME" --services "$ECS_SERVICE_NAME" --query 'services[0].loadBalancers[*].targetGroupArn' --output text)
-    
+
     if [ -n "$TARGET_GROUPS" ]; then
         echo -e "${GREEN}Found target groups: ${TARGET_GROUPS}${NC}"
-        
+
         for TARGET_GROUP in $TARGET_GROUPS; do
             echo -e "${GREEN}Updating health check path for target group: ${TARGET_GROUP}${NC}"
-            
+
             # Update health check path and settings
             aws elbv2 modify-target-group --target-group-arn "$TARGET_GROUP" --health-check-path "/api/v2/health?simple" --health-check-interval-seconds 30 --health-check-timeout-seconds 10 --healthy-threshold-count 2 --unhealthy-threshold-count 3
-            
+
             echo -e "${GREEN}Health check updated for target group: ${TARGET_GROUP}${NC}"
         done
     else
@@ -586,28 +586,28 @@ fi
 # Deploy to ECS if requested
 if [ "$DEPLOY" = true ]; then
     echo -e "${GREEN}Deploying to ECS...${NC}"
-    
+
     # First, get current task definition and update it to use the correct repository
     echo -e "${GREEN}Fixing task definition to use correct repository first...${NC}"
-    
+
     # Get current task definition
     TASK_DEF_ARN=$(aws ecs describe-services --cluster "$ECS_CLUSTER_NAME" --services "$ECS_SERVICE_NAME" --query 'services[0].taskDefinition' --output text)
     echo -e "${GREEN}Current task definition: ${TASK_DEF_ARN}${NC}"
-    
+
     # Get the task definition JSON
     TASK_DEF=$(aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN")
-    
+
     # Get current image
     CURRENT_IMAGE=$(echo "$TASK_DEF" | jq -r '.taskDefinition.containerDefinitions[0].image')
     echo -e "${GREEN}Current image: ${CURRENT_IMAGE}${NC}"
-    
+
     # Determine the image tag to use
     IMAGE_TAG="latest"
-    
+
     # Use the selected image tag if specified
     if [ -n "$SELECT_IMAGE" ]; then
         echo -e "${GREEN}Using specified image tag: ${SELECT_IMAGE}${NC}"
-        
+
         # Verify that the selected image tag exists
         if aws ecr describe-images --repository-name "$ECR_REPOSITORY_NAME" --image-ids imageTag="$SELECT_IMAGE" --region "$AWS_REGION" &> /dev/null; then
             IMAGE_TAG="$SELECT_IMAGE"
@@ -622,30 +622,30 @@ if [ "$DEPLOY" = true ]; then
     else
         echo -e "${GREEN}Using default 'latest' image tag${NC}"
     fi
-    
+
     # Correct image URI using our repository and the selected tag
     CORRECT_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME:$IMAGE_TAG"
     echo -e "${GREEN}Using image: ${CORRECT_IMAGE}${NC}"
-    
+
     # Create new task definition with the correct image
-    NEW_TASK_DEF=$(echo "$TASK_DEF" | jq --arg IMAGE "$CORRECT_IMAGE" '.taskDefinition | 
-        del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) | 
+    NEW_TASK_DEF=$(echo "$TASK_DEF" | jq --arg IMAGE "$CORRECT_IMAGE" '.taskDefinition |
+        del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) |
         .containerDefinitions[0].image = $IMAGE')
-    
+
     # Register new task definition
     echo -e "${GREEN}Registering new task definition...${NC}"
     NEW_TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json "$NEW_TASK_DEF" --query 'taskDefinition.taskDefinitionArn' --output text)
-    
+
     if [ -n "$NEW_TASK_DEF_ARN" ]; then
         echo -e "${GREEN}New task definition registered: ${NEW_TASK_DEF_ARN}${NC}"
     else
         echo -e "${RED}Failed to register new task definition.${NC}"
         exit 1
     fi
-    
+
     # Configure subnet setup based on available values
     SUBNET_CONFIG="[${AWS_PRIMARY_SUBNET}]"
-    
+
     # Add secondary subnet if available
     if [ -n "$AWS_SECONDARY_SUBNET" ]; then
         echo -e "${GREEN}Verifying secondary subnet ${AWS_SECONDARY_SUBNET} exists...${NC}"
@@ -658,11 +658,11 @@ if [ "$DEPLOY" = true ]; then
     else
         echo -e "${YELLOW}No secondary subnet configured. Using only ${AWS_PRIMARY_SUBNET}${NC}"
     fi
-    
+
     echo -e "${GREEN}Updating ECS service...${NC}"
     echo -e "${YELLOW}Using subnet configuration: ${SUBNET_CONFIG}${NC}"
     echo -e "${YELLOW}Using security group: ${AWS_ECS_SECURITY_GROUP}${NC}"
-    
+
     aws ecs update-service \
       --cluster "${ECS_CLUSTER_NAME}" \
       --service "${ECS_SERVICE_NAME}" \
@@ -671,51 +671,51 @@ if [ "$DEPLOY" = true ]; then
       --network-configuration "awsvpcConfiguration={subnets=${SUBNET_CONFIG},securityGroups=[${AWS_ECS_SECURITY_GROUP}],assignPublicIp=ENABLED}" \
       --health-check-grace-period-seconds 300 \
       --force-new-deployment
-    
+
     echo -e "${GREEN}The service is now configured to run 2 tasks for high availability${NC}"
-    
+
     # Update the load balancer target group health check to use simple health check
     echo -e "${GREEN}Checking for associated target groups to update health check path...${NC}"
-    
+
     # First, find the load balancer target group associated with the service
     TARGET_GROUPS=$(aws ecs describe-services --cluster "$ECS_CLUSTER_NAME" --services "$ECS_SERVICE_NAME" --query 'services[0].loadBalancers[*].targetGroupArn' --output text)
-    
+
     if [ -n "$TARGET_GROUPS" ]; then
         echo -e "${GREEN}Found target groups: ${TARGET_GROUPS}${NC}"
-        
+
         for TARGET_GROUP in $TARGET_GROUPS; do
             echo -e "${GREEN}Updating health check path for target group: ${TARGET_GROUP}${NC}"
-            
+
             # Update health check path and settings
             aws elbv2 modify-target-group --target-group-arn "$TARGET_GROUP" --health-check-path "/api/v2/health?simple" --health-check-interval-seconds 30 --health-check-timeout-seconds 10 --healthy-threshold-count 2 --unhealthy-threshold-count 3
-            
+
             echo -e "${GREEN}Health check updated for target group: ${TARGET_GROUP}${NC}"
         done
     else
         echo -e "${YELLOW}No target groups found for service ${ECS_SERVICE_NAME}. No health check updates needed.${NC}"
     fi
-    
+
     echo -e "${YELLOW}Check AWS ECS console for ongoing status and CloudWatch logs for application logs.${NC}"
 fi
 
 # Diagnostics section
 if [ "$DIAGNOSE" = true ]; then
     echo -e "${GREEN}Running connectivity diagnostics...${NC}"
-    
+
     echo -e "${GREEN}Checking subnet configuration for ECR connectivity...${NC}"
     echo -e "${YELLOW}Primary Subnet ID: ${AWS_PRIMARY_SUBNET}${NC}"
     if [ -n "$AWS_SECONDARY_SUBNET" ]; then
         echo -e "${YELLOW}Secondary Subnet ID: ${AWS_SECONDARY_SUBNET}${NC}"
     fi
-    
+
     # Check subnet details
     echo -e "${GREEN}Primary subnet details:${NC}"
     aws ec2 describe-subnets --subnet-ids "$AWS_PRIMARY_SUBNET" --query 'Subnets[0].[VpcId,AvailabilityZone,MapPublicIpOnLaunch,CidrBlock]' --output text
-    
+
     # Get the VPC ID from the subnet
     VPC_ID=$(aws ec2 describe-subnets --subnet-ids "$AWS_PRIMARY_SUBNET" --query 'Subnets[0].VpcId' --output text)
     echo -e "${GREEN}VPC ID: ${VPC_ID}${NC}"
-    
+
     # Check if the subnet is public
     IS_PUBLIC=$(aws ec2 describe-subnets --subnet-ids "$AWS_PRIMARY_SUBNET" --query 'Subnets[0].MapPublicIpOnLaunch' --output text)
     if [ "$IS_PUBLIC" != "True" ] && [ "$IS_PUBLIC" != "true" ]; then
@@ -724,7 +724,7 @@ if [ "$DIAGNOSE" = true ]; then
     else
         echo -e "${GREEN}Subnet ${AWS_PRIMARY_SUBNET} is public (MapPublicIpOnLaunch=true) ✓${NC}"
     fi
-    
+
     # Check for Internet Gateway
     IGW=$(aws ec2 describe-internet-gateways --no-cli-pager --filters "Name=attachment.vpc-id,Values=$VPC_ID" --query 'InternetGateways[0].InternetGatewayId' --output text)
     if [ -z "$IGW" ] || [ "$IGW" == "None" ]; then
@@ -734,46 +734,46 @@ if [ "$DIAGNOSE" = true ]; then
     else
         echo -e "${GREEN}✓ Found Internet Gateway ${IGW} attached to VPC ${VPC_ID}${NC}"
     fi
-    
+
     # Check route table for the subnet
     ROUTE_TABLE=$(aws ec2 describe-route-tables --no-cli-pager --filters "Name=association.subnet-id,Values=$AWS_PRIMARY_SUBNET" --query 'RouteTables[0].RouteTableId' --output text)
     if [ -z "$ROUTE_TABLE" ] || [ "$ROUTE_TABLE" == "None" ]; then
         echo -e "${YELLOW}⚠ No explicit route table associated with subnet ${AWS_PRIMARY_SUBNET}, checking main route table${NC}"
         ROUTE_TABLE=$(aws ec2 describe-route-tables --no-cli-pager --filters "Name=vpc-id,Values=$VPC_ID" "Name=association.main,Values=true" --query 'RouteTables[0].RouteTableId' --output text)
     fi
-    
+
     echo -e "${YELLOW}Route table for subnet: ${ROUTE_TABLE}${NC}"
-    
+
     # Check security group settings
     echo -e "${GREEN}Checking security group ${AWS_ECS_SECURITY_GROUP}:${NC}"
     aws ec2 describe-security-groups --group-ids "$AWS_ECS_SECURITY_GROUP" --query 'SecurityGroups[0].[GroupName,Description]' --output text
-    
+
     # Check outbound rules (needed for ECR access)
     echo -e "${GREEN}Checking outbound rules (needed for ECR access):${NC}"
     aws ec2 describe-security-groups --no-cli-pager --group-ids "$AWS_ECS_SECURITY_GROUP" --query 'SecurityGroups[0].IpPermissionsEgress' --output json
-    
+
     # Check task definition
     echo -e "${GREEN}Checking ECS task definition:${NC}"
     TASK_DEF_ARN=$(aws ecs describe-services --cluster "$ECS_CLUSTER_NAME" --services "$ECS_SERVICE_NAME" --query 'services[0].taskDefinition' --output text)
     echo -e "${GREEN}Task definition ARN: ${TASK_DEF_ARN}${NC}"
-    
+
     if [ -n "$TASK_DEF_ARN" ]; then
         # Get task definition details
         aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --query 'taskDefinition.[family,revision,networkMode,containerDefinitions[0].image]' --output text
-        
+
         # Check task execution role
         EXECUTION_ROLE=$(aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --query 'taskDefinition.executionRoleArn' --output text)
         echo -e "${GREEN}Task execution role: ${EXECUTION_ROLE}${NC}"
     else
         echo -e "${RED}✗ Could not retrieve task definition.${NC}"
     fi
-    
+
     # Check ElastiCache connectivity
     echo -e "\n${GREEN}Checking ElastiCache configuration:${NC}"
-    
+
     # Define ElastiCache cluster name
     ELASTICACHE_CLUSTER=${ELASTICACHE_CLUSTER_NAME:-stamps-app-cache}
-    
+
     # Try to describe the cluster
     echo -e "${GREEN}Checking ElastiCache cluster configuration:${NC}"
     if aws elasticache describe-cache-clusters --no-cli-pager --cache-cluster-id "$ELASTICACHE_CLUSTER" --show-cache-node-info &> /dev/null; then
@@ -781,7 +781,7 @@ if [ "$DIAGNOSE" = true ]; then
     else
         echo -e "${YELLOW}Could not find ElastiCache cluster '${ELASTICACHE_CLUSTER}'. Check cluster name.${NC}"
     fi
-    
+
     # Provide a summary
     echo -e "\n${GREEN}==== DIAGNOSTIC SUMMARY =====${NC}"
     echo -e "${YELLOW}Based on the diagnostics, check the following:${NC}"
