@@ -322,13 +322,14 @@ const FilterDrawer = (
       ref={drawerRef}
       class={`fixed top-0 z-40 h-screen
         bg-gradient-to-b from-[#0e0014]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
-        transition-transform duration-500 ease-in-out will-change-transform
+        transition-transform duration-500 will-change-transform
         overflow-y-auto overflow-x-hidden scrollbar-black
         left-0 right-auto w-full min-[420px]:w-[340px] shadow-[12px_0_12px_-6px_rgba(0,0,0,0.5)]
         tablet:right-0 tablet:left-auto tablet:w-[300px] tablet:shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
         ${
         open ? "translate-x-0" : "-translate-x-full tablet:translate-x-full"
       }`}
+      style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}

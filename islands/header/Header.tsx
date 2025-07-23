@@ -1,8 +1,8 @@
 /* ===== HEADER COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
-import { ConnectButton } from "$islands/button/ConnectButton.tsx";
-import { CloseIcon, GearIcon } from "$icon";
 import { HamburgerMenuIcon } from "$components/icon/MenuIcon.tsx"; // Import HamburgerMenuIcon directly to ensure it's available
+import { CloseIcon, GearIcon } from "$icon";
+import { ConnectButton } from "$islands/button/ConnectButton.tsx";
+import { tooltipIcon } from "$notification";
 import {
   labelXs,
   logoPurpleLDLink,
@@ -10,7 +10,7 @@ import {
   navLinkGreyLD,
   navLinkPurple,
 } from "$text";
-import { tooltipIcon } from "$notification";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== NAVIGATION LINK INTERFACE ===== */
 interface NavLink {
@@ -455,7 +455,7 @@ export function Header() {
   /* ===== COMPONENT RENDER ===== */
   return (
     <header class="tablet:flex justify-between items-center max-w-desktop w-full mx-auto
-     px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop 
+     px-gutter-mobile mobileLg:px-gutter-tablet tablet:px-gutter-desktop
      pt-6 pb-9 mobileLg:pt-9 mobileLg:pb-14">
       {/* ===== LOGO AND MOBILE MENU TOGGLE BUTTON ===== */}
       <div class="flex justify-between items-center w-full ">
@@ -485,9 +485,10 @@ export function Header() {
            fixed top-0 right-0 left-auto w-full min-[420px]:w-[340px] h-screen z-30
            bg-gradient-to-b from-[#0e0014]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
            shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
-           transition-transform duration-500 ease-in-out will-change-transform
+           transition-transform duration-500 will-change-transform
            overflow-y-auto overflow-x-hidden scrollbar-black
            ${open ? "translate-x-0" : "translate-x-full"}`}
+        style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
         id="navbar-collapse"
       >
         {/* ===== MOBILE MENU LINKS AND CONNECT BUTTON ===== */}
@@ -546,10 +547,11 @@ export function Header() {
             </div>
 
             <div
-              class={`overflow-hidden transition-all duration-500 ease-in-out
+              class={`overflow-hidden transition-all duration-500
                 ${
                 toolsOpen ? "max-h-[260px] opacity-100" : "max-h-0 opacity-0"
               }`}
+              style="transition-timing-function: cubic-bezier(0.46,0.03,0.52,0.96);"
             >
               <div class="flex flex-col pl-9 pb-9 gap-3">
                 {toolLinks.map((link) => (
