@@ -31,10 +31,56 @@ export const VERSION_CONFIG: VersionConfig = {
   }
 };
 
+// ✅ ENDPOINT DEPRECATION CONFIGURATION
+// Endpoints that are deprecated in specific versions
+export const DEPRECATED_ENDPOINTS: Record<string, {
+  deprecatedInVersion: string;
+  reason: string;
+  alternative: string;
+  endOfLife: string;
+}> = {
+  "/api/v2/cursed": {
+    deprecatedInVersion: "2.3",
+    reason: "Redundant endpoint - use /api/v2/stamps with type=cursed filter instead",
+    alternative: "/api/v2/stamps?type=cursed",
+    endOfLife: "2025-12-01"
+  },
+  "/api/v2/cursed/": {
+    deprecatedInVersion: "2.3",
+    reason: "Redundant endpoint - use /api/v2/stamps with type=cursed filter instead",
+    alternative: "/api/v2/stamps?type=cursed",
+    endOfLife: "2025-12-01"
+  }
+};
+
+// Helper function to check if an endpoint is deprecated in a specific version
+export function isEndpointDeprecated(pathname: string, version: string): boolean {
+  // Check exact matches and path patterns
+  for (const [deprecatedPath, config] of Object.entries(DEPRECATED_ENDPOINTS)) {
+    if (pathname.startsWith(deprecatedPath) || pathname === deprecatedPath) {
+      // Check if the endpoint is deprecated in this version or later
+      const deprecatedVersion = config.deprecatedInVersion;
+      return version >= deprecatedVersion;
+    }
+  }
+  return false;
+}
+
+// Get deprecation info for an endpoint
+export function getEndpointDeprecationInfo(pathname: string) {
+  for (const [deprecatedPath, config] of Object.entries(DEPRECATED_ENDPOINTS)) {
+    if (pathname.startsWith(deprecatedPath) || pathname === deprecatedPath) {
+      return config;
+    }
+  }
+  return null;
+}
+
 // Fields added in each version
 const VERSION_FIELDS: Record<string, string[]> = {
   "2.3": [
-    "market_data", // Clean nested market data object only - NO root price fields
+      // v2.3 Enhanced Schema - Nested market data object (CLEAN structure)
+      "market_data", // ✅ FIXED: Use snake_case to match actual API field names
     "dispenserInfo",
     "cacheStatus",
     "cacheInfo",
@@ -43,7 +89,10 @@ const VERSION_FIELDS: Record<string, string[]> = {
     "dataQualityScore",
     "priceSource",
     "fee_rate_sat_vb", // v2.3+ transaction fee rate (transaction endpoints only)
-    "fee" // v2.3+ transaction fee (transaction endpoints only)
+    "fee", // v2.3+ transaction fee (transaction endpoints only)
+    // ✅ v2.3 IMAGE FIELDS: Add image-related fields that should be stripped from v2.2
+    "stamp_url", // Image URL for SRC-20 tokens (v2.3+ only)
+    "deploy_img", // Deploy image URL for SRC-20 tokens (v2.3+ only)
   ],
   "2.2": [] // Base version - no market data fields at all
 };

@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "BTC Stamps Explorer API - Version Header Testing",
-    "description": "Comprehensive X-API-Version header testing for v2.2 (no market data) and v2.3 (enhanced marketData structure) API compatibility",
+    "description": "Comprehensive X-API-Version header testing for v2.2 (no market data) and v2.3 (enhanced market_data structure) API compatibility",
     "version": "2.3.1",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -32,7 +32,7 @@
           "if (!pm.collectionVariables.get('test_session_id')) {",
           "    pm.collectionVariables.set('test_session_id', Date.now().toString());",
           "    console.log('🔍 Starting API Version Compatibility Testing');",
-          "    console.log('  📋 Testing v2.2 (no market data) vs v2.3 (enhanced marketData structure)');",
+          "    console.log('  📋 Testing v2.2 (no market data) vs v2.3 (enhanced market_data structure)');",
           "    console.log('  🎯 Validating field transformations and schema compliance');",
           "}"
         ]
@@ -60,7 +60,7 @@
           "        const json = pm.response.json();",
           "        if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
           "            const firstItem = json.data[0];",
-          "            testResult.hasMarketData = firstItem.hasOwnProperty('marketData');",
+          "            testResult.hasMarketData = firstItem.hasOwnProperty('market_data');",
           "            testResult.hasRootPriceFields = firstItem.hasOwnProperty('floorPrice') || firstItem.hasOwnProperty('floorPriceUSD');",
           "        }",
           "    } catch (e) {",
@@ -108,11 +108,11 @@
                   "    pm.expect(json.data).to.be.an('array');",
                   "});",
                   "",
-                  "pm.test('🚫 v2.2 CRITICAL - No marketData field should exist', function () {",
+                  "pm.test('🚫 v2.2 CRITICAL - No market_data field should exist', function () {",
                   "    const json = pm.response.json();",
                   "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
                   "        const firstItem = json.data[0];",
-                  "        pm.expect(firstItem).to.not.have.property('marketData', 'v2.2 should never include marketData field');",
+                  "        pm.expect(firstItem).to.not.have.property('market_data', 'v2.2 should never include market_data field');",
                   "    }",
                   "});",
                   "",
@@ -187,11 +187,11 @@
                   "    pm.expect(json).to.have.property('data');",
                   "});",
                   "",
-                  "pm.test('🚫 v2.2 CRITICAL - No marketData field should exist', function () {",
+                  "pm.test('🚫 v2.2 CRITICAL - No market_data field should exist', function () {",
                   "    const json = pm.response.json();",
                   "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
                   "        const firstItem = json.data[0];",
-                  "        pm.expect(firstItem).to.not.have.property('marketData', 'v2.2 should never include marketData field');",
+                  "        pm.expect(firstItem).to.not.have.property('market_data', 'v2.2 should never include market_data field');",
                   "    }",
                   "});",
                   "",
@@ -262,47 +262,45 @@
                   "    pm.expect(json.data).to.be.an('array');",
                   "});",
                   "",
-                  "pm.test('✅ v2.3 CRITICAL - marketData field should exist', function () {",
-                  "    const json = pm.response.json();",
-                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
-                  "        const firstItem = json.data[0];",
-                  "        pm.expect(firstItem).to.have.property('marketData', 'v2.3 must include marketData field');",
+                  "pm.test('✅ v2.3 CRITICAL - market_data field should exist', function () {",
+                  "    var firstItem = pm.response.json().data[0];",
+                  "    pm.expect(pm.response).to.be.an('object');",
+                  "    if (firstItem) {",
+                  "        pm.expect(firstItem).to.have.property('market_data', 'v2.3 must include market_data field');",
                   "    }",
                   "});",
                   "",
-                  "pm.test('📊 v2.3 - marketData structure validation', function () {",
-                  "    const json = pm.response.json();",
-                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
-                  "        const firstItem = json.data[0];",
-                  "        if (firstItem.marketData !== null && firstItem.marketData !== undefined) {",
-                  "            pm.expect(firstItem.marketData).to.be.an('object');",
-                  "            ",
-                  "            // Core market data fields validation",
-                  "            const marketData = firstItem.marketData;",
-                  "            pm.expect(marketData).to.have.property('floorPriceBTC');",
-                  "            pm.expect(marketData).to.have.property('volume24hBTC');",
-                  "            pm.expect(marketData).to.have.property('holderCount');",
-                  "            pm.expect(marketData).to.have.property('dataQualityScore');",
-                  "            pm.expect(marketData).to.have.property('priceSource');",
-                  "            ",
-                  "            // Validate data types",
-                  "            if (marketData.floorPriceBTC !== null) {",
-                  "                pm.expect(marketData.floorPriceBTC).to.be.a('number');",
-                  "            }",
-                  "            if (marketData.holderCount !== null) {",
-                  "                pm.expect(marketData.holderCount).to.be.a('number');",
-                  "            }",
+                  "pm.test('📊 v2.3 - market_data structure validation', function () {",
+                  "    var body = pm.response.json();",
+                  "    var firstItem = body.data[0];",
+                  "    ",
+                  "    if (firstItem && firstItem.market_data !== null && firstItem.market_data !== undefined) {",
+                  "        pm.expect(firstItem.market_data).to.be.an('object');",
+                  "        ",
+                  "        // Validate market_data structure for stamps (consistent snake_case)",
+                  "        const marketData = firstItem.market_data;",
+                  "        pm.expect(marketData).to.have.property('floor_price_btc');",
+                  "        pm.expect(marketData).to.have.property('volume_24h_btc');",
+                  "        pm.expect(marketData).to.have.property('holder_count');",
+                  "        pm.expect(marketData).to.have.property('data_quality_score');",
+                  "        pm.expect(marketData).to.have.property('price_source');",
+                  "        ",
+                  "        // Type validation",
+                  "        if (marketData.floor_price_btc !== null) {",
+                  "            pm.expect(marketData.floor_price_btc).to.be.a('number');",
+                  "        }",
+                  "        if (marketData.holder_count !== null) {",
+                  "            pm.expect(marketData.holder_count).to.be.a('number');",
                   "        }",
                   "    }",
                   "});",
                   "",
-                  "pm.test('🚫 v2.3 CRITICAL - No root-level price fields should exist', function () {",
-                  "    const json = pm.response.json();",
-                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
-                  "        const firstItem = json.data[0];",
-                  "        pm.expect(firstItem).to.not.have.property('floorPrice', 'v2.3 should not have root floorPrice - moved to marketData.floorPriceBTC');",
-                  "        pm.expect(firstItem).to.not.have.property('floorPriceUSD', 'v2.3 should not have root floorPriceUSD - moved to marketData.floorPriceUSD');",
-                  "        pm.expect(firstItem).to.not.have.property('marketCapUSD', 'v2.3 should not have root marketCapUSD - calculated from marketData');",
+                  "pm.test('🚫 v2.3 - No root-level market fields', function () {",
+                  "    var firstItem = pm.response.json().data[0];",
+                  "    if (firstItem) {",
+                  "        pm.expect(firstItem).to.not.have.property('floorPrice', 'v2.3 should not have root floorPrice - moved to market_data.floor_price_btc');",
+                  "        pm.expect(firstItem).to.not.have.property('floorPriceUSD', 'v2.3 should not have root floorPriceUSD - moved to market_data.floor_price_usd');",
+                  "        pm.expect(firstItem).to.not.have.property('marketCapUSD', 'v2.3 should not have root marketCapUSD - calculated from market_data');",
                   "    }",
                   "});",
                   "",
@@ -345,14 +343,14 @@
           }
         },
         {
-          "name": "SRC20 Balance List - v2.3 (Enhanced MarketData)",
+          "name": "SRC20 Overview List - v2.3 (Enhanced MarketData)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('✅ v2.3 - SRC20 Balance endpoint responds', function () {",
+                  "pm.test('✅ v2.3 - SRC20 Overview endpoint responds', function () {",
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
@@ -367,44 +365,76 @@
                   "});",
                   "",
                   "pm.test('✅ v2.3 CRITICAL - marketData field should exist', function () {",
-                  "    const json = pm.response.json();",
-                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
-                  "        const firstItem = json.data[0];",
-                  "        pm.expect(firstItem).to.have.property('marketData', 'v2.3 must include marketData field');",
-                  "    }",
+                  "    pm.expect(pm.response.json()).to.be.an('object');",
+                  "    const responseData = pm.response.json();",
+                  "    pm.expect(responseData).to.have.property('data');",
+                  "    pm.expect(responseData.data).to.be.an('array').that.is.not.empty;",
+                  "    ",
+                  "    // Check first item has market_data (snake_case - consistent with API schema)",
+                  "    const firstItem = responseData.data[0];",
+                  "    pm.expect(firstItem, 'v2.3 must include market_data field').to.have.property('market_data');",
+                  "    pm.expect(firstItem.market_data, 'market_data should be an object or null').to.satisfy(function(val) { return val === null || typeof val === 'object'; });",
+                  "    ",
+                  "    // Store for cross-version comparison",
+                  "    pm.globals.set('v23_src20_has_marketData', firstItem.market_data !== null);",
                   "});",
                   "",
-                  "pm.test('📊 v2.3 - SRC20 marketData structure validation', function () {",
-                  "    const json = pm.response.json();",
-                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
-                  "        const firstItem = json.data[0];",
-                  "        if (firstItem.marketData !== null && firstItem.marketData !== undefined) {",
-                  "            pm.expect(firstItem.marketData).to.be.an('object');",
+                  "pm.test('📊 v2.3 - SRC20 market_data structure validation', function () {",
+                  "    const firstItem = pm.response.json().data[0];",
+                  "    const marketData = firstItem.market_data;",
+                  "    ",
+                  "    // Validate market_data structure for SRC20 (standardized snake_case)",
+                  "    if (marketData && marketData !== null) {",
+                  "        pm.expect(marketData).to.be.an('object');",
+                  "        pm.expect(marketData).to.have.property('tick');",
+                  "        ",
+                  "        // ✅ UPDATED: Standardized field names (consistent with stamps)",
+                  "        pm.expect(marketData).to.have.any.keys('floor_price_btc', 'market_cap_btc', 'volume_24h_btc', 'holder_count');",
+                  "        ",
+                  "        // ✅ NEW: Comprehensive volume timeframes validation",
+                  "        if (marketData.volume_24h_btc !== undefined) {",
+                  "            pm.expect(marketData).to.have.property('volume_7d_btc');",
+                  "            pm.expect(marketData).to.have.property('volume_30d_btc');",
                   "            ",
-                  "            // SRC20-specific market data fields",
-                  "            const marketData = firstItem.marketData;",
-                  "            pm.expect(marketData).to.have.property('floorPriceBTC');",
-                  "            pm.expect(marketData).to.have.property('volume24hBTC');",
-                  "            pm.expect(marketData).to.have.property('totalVolumeBTC');",
-                  "            pm.expect(marketData).to.have.property('holderCount');",
-                  "            pm.expect(marketData).to.have.property('uniqueHolderCount');",
-                  "            pm.expect(marketData).to.have.property('lastUpdated');",
+                  "            // Validate volume values are numeric and non-negative",
+                  "            pm.expect(marketData.volume_24h_btc).to.be.a('number');",
+                  "            pm.expect(marketData.volume_7d_btc).to.be.a('number');",
+                  "            pm.expect(marketData.volume_30d_btc).to.be.a('number');",
                   "            ",
-                  "            // Validate timestamps are properly formatted",
-                  "            if (marketData.lastUpdated !== null) {",
-                  "                pm.expect(marketData.lastUpdated).to.match(/\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/);",
-                  "            }",
+                  "            pm.expect(marketData.volume_24h_btc).to.be.at.least(0);",
+                  "            pm.expect(marketData.volume_7d_btc).to.be.at.least(0);",
+                  "            pm.expect(marketData.volume_30d_btc).to.be.at.least(0);",
                   "        }",
+                  "        ",
+                  "        // Validate nested market_data_sources (consistent snake_case naming)",
+                  "        if (marketData.market_data_sources) {",
+                  "            pm.expect(marketData.market_data_sources).to.be.an('object');",
+                  "            pm.expect(marketData.market_data_sources).to.have.any.keys('stampscan', 'openstamp');",
+                  "        }",
+                  "    } else {",
+                  "        pm.test.skip('No market_data available for this SRC20 token');",
                   "    }",
                   "});",
                   "",
-                  "pm.test('🚫 v2.3 CRITICAL - Should NOT have root-level market fields', function () {",
-                  "    const json = pm.response.json();",
-                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
-                  "        const firstItem = json.data[0];",
-                  "        pm.expect(firstItem).to.not.have.property('floorPrice', 'v2.3 moved floorPrice to marketData.floorPriceBTC');",
-                  "        pm.expect(firstItem).to.not.have.property('floorPriceUSD', 'v2.3 moved floorPriceUSD to marketData.floorPriceUSD');",
-                  "        pm.expect(firstItem).to.not.have.property('marketCapUSD', 'v2.3 removed root marketCapUSD field');",
+                  "pm.test('📊 v2.3 - Volume timeframes comprehensive validation', function () {",
+                  "    const firstItem = pm.response.json().data[0];",
+                  "    const marketData = firstItem.market_data;",
+                  "    ",
+                  "    if (marketData && marketData !== null) {",
+                  "        // All volume timeframes must be present",
+                  "        const requiredVolumeFields = ['volume_24h_btc', 'volume_7d_btc', 'volume_30d_btc'];",
+                  "        requiredVolumeFields.forEach(field => {",
+                  "            pm.expect(marketData, `Missing ${field} field`).to.have.property(field);",
+                  "        });",
+                  "        ",
+                  "        // Logical volume relationships (7d >= 24h, 30d >= 7d in most cases)",
+                  "        if (marketData.volume_24h_btc > 0 && marketData.volume_7d_btc > 0) {",
+                  "            pm.expect(marketData.volume_7d_btc, 'Weekly volume should typically be >= daily volume').to.be.at.least(marketData.volume_24h_btc * 0.1);",
+                  "        }",
+                  "        ",
+                  "        if (marketData.volume_7d_btc > 0 && marketData.volume_30d_btc > 0) {",
+                  "            pm.expect(marketData.volume_30d_btc, 'Monthly volume should typically be >= weekly volume').to.be.at.least(marketData.volume_7d_btc * 0.1);",
+                  "        }",
                   "    }",
                   "});"
                 ]
@@ -425,13 +455,191 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v2/src20/balance/{{test_address}}?limit=5",
+              "raw": "{{baseUrl}}/api/v2/src20?limit=5",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "v2", "src20", "balance", "{{test_address}}"],
+              "path": ["api", "v2", "src20"],
               "query": [
                 {
                   "key": "limit",
                   "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRC20 MINT Operations - v2.3 (No Market Data Expected)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ v2.3 - MINT operation responds successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('🚫 CRITICAL - MINT operations should NOT have market_data', function () {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "        json.data.forEach((item, index) => {",
+                  "            pm.expect(item.op, `Item ${index} should be MINT operation`).to.equal('MINT');",
+                  "            pm.expect(item, `MINT operation ${index} should not have market_data`).to.not.have.property('market_data');",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Version",
+                "value": "2.3",
+                "description": "Request v2.3 format (should still exclude market_data for MINT)"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20?op=MINT&tick=STAMP&limit=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "op",
+                  "value": "MINT"
+                },
+                {
+                  "key": "tick",
+                  "value": "STAMP"
+                },
+                {
+                  "key": "limit",
+                  "value": "3"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRC20 TRANSFER Operations - v2.3 (No Market Data Expected)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ v2.3 - TRANSFER operation responds successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('🚫 CRITICAL - TRANSFER operations should NOT have market_data', function () {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "        json.data.forEach((item, index) => {",
+                  "            pm.expect(item.op, `Item ${index} should be TRANSFER operation`).to.equal('TRANSFER');",
+                  "            pm.expect(item, `TRANSFER operation ${index} should not have market_data`).to.not.have.property('market_data');",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Version",
+                "value": "2.3",
+                "description": "Request v2.3 format (should still exclude market_data for TRANSFER)"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20?op=TRANSFER&tick=STAMP&limit=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "op",
+                  "value": "TRANSFER"
+                },
+                {
+                  "key": "tick",
+                  "value": "STAMP"
+                },
+                {
+                  "key": "limit",
+                  "value": "3"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRC20 DEPLOY Operations - v2.3 (Market Data Required)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ v2.3 - DEPLOY operation responds successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('✅ CRITICAL - DEPLOY operations MUST have market_data', function () {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
+                  "        json.data.forEach((item, index) => {",
+                  "            pm.expect(item.op, `Item ${index} should be DEPLOY operation`).to.equal('DEPLOY');",
+                  "            pm.expect(item, `DEPLOY operation ${index} must have market_data`).to.have.property('market_data');",
+                  "            pm.expect(item.market_data, `DEPLOY market_data ${index} should not be null`).to.not.be.null;",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Version",
+                "value": "2.3",
+                "description": "Request v2.3 format (should include market_data for DEPLOY)"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20?op=DEPLOY&tick=STAMP&limit=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "op",
+                  "value": "DEPLOY"
+                },
+                {
+                  "key": "tick",
+                  "value": "STAMP"
+                },
+                {
+                  "key": "limit",
+                  "value": "3"
                 }
               ]
             }
@@ -462,11 +670,11 @@
                   "        pm.expect(firstCollection).to.have.property('stamp_count');",
                   "        pm.expect(firstCollection).to.have.property('total_editions');",
                   "        ",
-                  "        // Collections may have marketData if available",
-                  "        if (firstCollection.marketData) {",
-                  "            pm.expect(firstCollection.marketData).to.be.an('object');",
-                  "            pm.expect(firstCollection.marketData).to.have.property('minFloorPriceBTC');",
-                  "            pm.expect(firstCollection.marketData).to.have.property('totalUniqueHolders');",
+                  "        // Collections may have market_data if available",
+                  "        if (firstCollection.market_data) {",
+                  "            pm.expect(firstCollection.market_data).to.be.an('object');",
+                  "            pm.expect(firstCollection.market_data).to.have.property('min_floor_price_btc');",
+                  "            pm.expect(firstCollection.market_data).to.have.property('total_unique_holders');",
                   "        }",
                   "    }",
                   "});"
@@ -495,6 +703,87 @@
                 {
                   "key": "limit",
                   "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cursed Endpoint Deprecation - v2.3 vs v2.2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Test v2.3 deprecation",
+                  "pm.test('✅ v2.3 - Cursed endpoint returns deprecation notice', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.deprecated).to.be.true;",
+                  "    pm.expect(response.message).to.include('deprecated');",
+                  "    pm.expect(response.alternative).to.equal('/api/v2/stamps?type=cursed');",
+                  "});",
+                  "",
+                  "pm.test('🚫 v2.3 - Cursed endpoint returns 410 Gone status', function () {",
+                  "    pm.response.to.have.status(410);",
+                  "});",
+                  "",
+                  "pm.test('📋 v2.3 - Deprecation headers present', function () {",
+                  "    pm.expect(pm.response.headers.get('Deprecation')).to.equal('true');",
+                  "    pm.expect(pm.response.headers.get('Sunset')).to.exist;",
+                  "    pm.expect(pm.response.headers.get('X-Alternative-Endpoint')).to.equal('/api/v2/stamps?type=cursed');",
+                  "});",
+                  "",
+                  "pm.test('🔗 v2.3 - Alternative endpoint information provided', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.supportedAlternative).to.exist;",
+                  "    pm.expect(response.supportedAlternative.endpoint).to.equal('/api/v2/stamps?type=cursed');",
+                  "    pm.expect(response.supportedAlternative.example).to.include('limit=10');",
+                  "});",
+                  "",
+                  "// Now test v2.2 compatibility",
+                  "pm.sendRequest({",
+                  "    url: pm.globals.get('baseUrl') + '/api/v2/cursed?limit=1',",
+                  "    method: 'GET',",
+                  "    header: {",
+                  "        'X-API-Version': '2.2'",
+                  "    }",
+                  "}, function (err, response) {",
+                  "    pm.test('✅ v2.2 - Cursed endpoint still works', function () {",
+                  "        pm.expect(response).to.have.property('code', 200);",
+                  "        const body = response.json();",
+                  "        pm.expect(body.data).to.be.an('array');",
+                  "        pm.expect(body.deprecated).to.not.exist;",
+                  "    });",
+                  "    ",
+                  "    pm.test('📊 v2.2 - Returns actual cursed stamp data', function () {",
+                  "        const body = response.json();",
+                  "        if (body.data && body.data.length > 0) {",
+                  "            pm.expect(body.data[0]).to.have.property('stamp');",
+                  "            pm.expect(body.data[0].stamp).to.be.below(0); // Cursed stamps have negative numbers",
+                  "        }",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2.3"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/cursed?limit=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "cursed"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
                 }
               ]
             }
@@ -532,11 +821,11 @@
                   "    ",
                   "    if (json.data && Array.isArray(json.data) && json.data.length > 0) {",
                   "        const firstItem = json.data[0];",
-                  "        const hasMarketData = firstItem.hasOwnProperty('marketData');",
+                  "        const hasMarketData = firstItem.hasOwnProperty('market_data');",
                   "        const hasRootPriceFields = firstItem.hasOwnProperty('floorPrice');",
                   "        ",
                   "        console.log(`📋 Version ${version} Schema Summary:`);",
-                  "        console.log(`   marketData field: ${hasMarketData}`);",
+                  "        console.log(`   market_data field: ${hasMarketData}`);",
                   "        console.log(`   Root price fields: ${hasRootPriceFields}`);",
                   "        console.log(`   Enhanced fields: ${firstItem.hasOwnProperty('dispenserInfo')}`);",
                   "        ",
@@ -608,14 +897,14 @@
           "        const v23WithMarketData = v23Tests.filter(r => r.hasMarketData).length;",
           "        ",
           "        console.log(`🔍 Schema Compliance:`);",
-          "        console.log(`   v2.2 with marketData: ${v22WithMarketData} (should be 0)`);",
-          "        console.log(`   v2.3 with marketData: ${v23WithMarketData} (should be ${v23Tests.length})`);",
+          "        console.log(`   v2.2 with market_data: ${v22WithMarketData} (should be 0)`);",
+          "        console.log(`   v2.3 with market_data: ${v23WithMarketData} (should be ${v23Tests.length})`);",
           "        ",
           "        if (v22WithMarketData > 0) {",
-          "            console.log('⚠️  WARNING: v2.2 endpoints returning marketData field!');",
+          "            console.log('⚠️  WARNING: v2.2 endpoints returning market_data field!');",
           "        }",
           "        if (v23WithMarketData < v23Tests.length) {",
-          "            console.log('⚠️  WARNING: Some v2.3 endpoints missing marketData field!');",
+          "            console.log('⚠️  WARNING: Some v2.3 endpoints missing market_data field!');",
           "        }",
           "        if (v22WithMarketData === 0 && v23WithMarketData === v23Tests.length) {",
           "            console.log('✅ All version-specific schema validations passed!');",

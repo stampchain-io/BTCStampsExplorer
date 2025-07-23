@@ -1,8 +1,8 @@
 import {
-    HolderRow, PaginatedStampBalanceResponseBody,
-    ProcessedHolder, STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
-    STAMP_RANGES, STAMP_SUFFIX_FILTERS,
-    STAMP_TYPES, StampBalance, StampRow, SUBPROTOCOLS
+  HolderRow, PaginatedStampBalanceResponseBody,
+  ProcessedHolder, STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
+  STAMP_RANGES, STAMP_SUFFIX_FILTERS,
+  STAMP_TYPES, StampBalance, StampRow, SUBPROTOCOLS
 } from "$globals";
 import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
@@ -78,6 +78,9 @@ export class StampController {
     maxCacheAgeMinutes,
     priceSource,
     collectionStampLimit,
+    // Performance optimization - pass pre-fetched BTC price
+    btcPrice,
+    btcPriceSource,
     includeMarketData = true, // Default to true for backward compatibility
   }: {
     page?: number;
@@ -135,6 +138,9 @@ export class StampController {
     priceSource?: string;
     collectionStampLimit?: number;
     includeMarketData?: boolean;
+    // Performance optimization - pre-fetched BTC price
+    btcPrice?: number;
+    btcPriceSource?: string;
   } = {}) {
     console.log("stamp controller payload", {
       page,
@@ -252,10 +258,20 @@ export class StampController {
       }
     }
 
-    // Fetch BTC price once for all stamps
-    const btcPriceData = await BTCPriceService.getPrice();
-    const btcPrice = btcPriceData.price;
-    console.log(`[StampController] BTC price: $${btcPrice} from ${btcPriceData.source}`);
+    // Use pre-fetched BTC price if provided, otherwise fetch it
+    let btcPriceValue: number;
+    let btcPriceSourceValue: string;
+
+    if (btcPrice !== undefined && btcPriceSource !== undefined) {
+      btcPriceValue = btcPrice;
+      btcPriceSourceValue = btcPriceSource;
+      console.log(`[StampController] Using pre-fetched BTC price: $${btcPriceValue} from ${btcPriceSourceValue}`);
+    } else {
+      const btcPriceData = await BTCPriceService.getPrice();
+      btcPriceValue = btcPriceData.price;
+      btcPriceSourceValue = btcPriceData.source;
+      console.log(`[StampController] Fetched BTC price: $${btcPriceValue} from ${btcPriceSourceValue}`);
+    }
 
     // Use market data inclusion setting from route handler (version-aware)
     const useMarketData = includeMarketData;
@@ -328,7 +344,7 @@ export class StampController {
       ...(priceSource !== undefined ? { priceSource } : {}),
       ...(collectionStampLimit !== undefined ? { collectionStampLimit } : {}),
       includeMarketData: Boolean(useMarketData),
-      btcPriceUSD: btcPrice
+              btcPriceUSD: btcPriceValue
     });
 
     // Process stamps - only fetch additional asset info for single stamp detail pages
@@ -356,9 +372,9 @@ export class StampController {
         : processedStamps,               // Multiple stamps response
       last_block: stampResult.last_block,
       metadata: {
-        btcPrice: btcPrice,
+        btcPrice: btcPriceValue,
         cacheStatus: cacheStatus,
-        source: btcPriceData.source
+        source: btcPriceSourceValue
       }
     };
 
@@ -440,6 +456,7 @@ export class StampController {
     options?: {
       dayRange?: number;
       includeFullDetails?: boolean;
+      type?: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
     }
   ) {
     try {
@@ -455,6 +472,7 @@ export class StampController {
       return {
         page: page || 1,
         limit: limit || result.total,
+        total: result.total,
         totalPages,
         last_block: lastBlock,
         data: result.recentSales,
@@ -544,7 +562,7 @@ export class StampController {
     return results;
   }
 
-  static async getHomePageData() {
+  static async getHomePageData(btcPrice?: number, btcPriceSource?: string) {
     try {
       // Critical above-the-fold content first
       const [carouselData, mainCategories, collections] = await Promise.all([
@@ -554,7 +572,9 @@ export class StampController {
           noPagination: true,
           skipTotalCount: true,
           includeSecondary: false,
-          type: "all"
+          type: "all",
+          ...(btcPrice !== undefined && { btcPrice }),
+          ...(btcPriceSource !== undefined && { btcPriceSource })
         }),
         this.getMultipleStampCategories([
           { idents: ["STAMP", "SRC-721"], limit: 8, type: "stamps", sortBy: "DESC" },
@@ -578,6 +598,8 @@ export class StampController {
           limit: 16,
           sortBy: "DESC",
           skipTotalCount: true,
+          ...(btcPrice !== undefined && { btcPrice }),
+          ...(btcPriceSource !== undefined && { btcPriceSource })
         });
         poshStamps = poshResult.data;
       }

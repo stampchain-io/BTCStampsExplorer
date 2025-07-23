@@ -1,12 +1,11 @@
 import {
-  SRC20SnapshotRequestParams,
-  SRC20TrxRequestParams,
+    SRC20SnapshotRequestParams,
+    SRC20TrxRequestParams,
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "$lib/utils/constants.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { bigFloatToString } from "$lib/utils/formatUtils.ts";
-import { serverConfig } from "$server/config/config.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 
@@ -57,6 +56,7 @@ export class SRC20Repository {
   static async getTotalCountValidSrc20TxFromDb(
     params: SRC20TrxRequestParams,
     excludeFullyMinted: boolean = false,
+    onlyFullyMinted: boolean = false,
   ) {
     const {
       tick = null,
@@ -106,16 +106,27 @@ export class SRC20Repository {
       queryParams.push(tx_hash);
     }
 
-    // Additional condition to exclude fully minted tokens
+    // 🚀 OPTIMIZED: Use pre-computed market data instead of expensive correlated subquery
+    let fromClause = `FROM ${SRC20_TABLE} src20`;
+
     if (excludeFullyMinted) {
-      whereConditions.push(
-        `(SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = src20.tick) < src20.max`,
-      );
+      // Use LEFT JOIN with src20_market_data for much better performance
+      fromClause = `FROM ${SRC20_TABLE} src20
+        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick`;
+      whereConditions.push(`COALESCE(smd.progress_percentage, 0) < 100`);
+    }
+
+    // 🚀 CRITICAL: Add filter for onlyFullyMinted
+    if (onlyFullyMinted) {
+      // Use LEFT JOIN with src20_market_data for filtering
+      fromClause = `FROM ${SRC20_TABLE} src20
+        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick`;
+      whereConditions.push(`COALESCE(smd.progress_percentage, 0) >= 99.9`);
     }
 
     let sqlQuery = `
           SELECT COUNT(*) AS total
-          FROM ${SRC20_TABLE} src20
+          ${fromClause}
       `;
 
     if (whereConditions.length > 0) {
@@ -132,6 +143,7 @@ export class SRC20Repository {
   static async getValidSrc20TxFromDb(
     params: SRC20TrxRequestParams,
     excludeFullyMinted: boolean = false,
+    onlyFullyMinted: boolean = false,
   ) {
     const {
       block_index,
@@ -184,9 +196,16 @@ export class SRC20Repository {
     }
 
     if (excludeFullyMinted) {
-      whereClauses.push(
-        `(SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = src20.tick) < src20.max`,
-      );
+      // Filter out tokens that are fully minted (progress = 100%)
+      whereClauses.push(`COALESCE(smd.progress_percentage, 0) < 100`);
+      // needsMarketData will be set to true later in the sorting section
+    }
+
+    // 🚀 CRITICAL: Add WHERE clause for onlyFullyMinted filter
+    if (onlyFullyMinted) {
+      // Filter for tokens that are fully minted (progress = 100%)
+      whereClauses.push(`COALESCE(smd.progress_percentage, 0) = 100`);
+      // needsMarketData will be set to true later in the sorting section
     }
 
     // Enforce limit and pagination
@@ -198,33 +217,143 @@ export class SRC20Repository {
       : 1;
     const offset = safeLimit * (safePage - 1);
 
-    // Handle HOLDERS sorting specially
+    // Handle comprehensive sorting with proper architecture and type safety
     let finalOrderBy = `src20.block_index ASC`;
     let needsMarketData = false;
+
+    // 🚀 AUTO-INCLUDE: DEPLOY operations always include market data
+    if (op === "DEPLOY") {
+      needsMarketData = true;
+    }
+
+    // 🚀 PERFORMANCE: Check if we need market data for excludeFullyMinted filter
+    if (excludeFullyMinted) {
+      needsMarketData = true;
+    }
+
+    // 🚀 PERFORMANCE: Check if we need market data for onlyFullyMinted filter
+    if (onlyFullyMinted) {
+      needsMarketData = true;
+    }
 
     if (sortBy) {
       const normalizedSortBy = sortBy.toUpperCase();
 
+      // HOLDERS sorting (requires holder count calculation)
       if (normalizedSortBy === "HOLDERS_DESC") {
-        finalOrderBy = `h.holders DESC`;
-        needsMarketData = false;
+        finalOrderBy = `COALESCE(smd.holder_count, 0) DESC`;
+        needsMarketData = true; // ✅ FIXED: HOLDERS sorting needs market data
       } else if (normalizedSortBy === "HOLDERS_ASC") {
-        finalOrderBy = `h.holders ASC`;
-        needsMarketData = false;
+        finalOrderBy = `COALESCE(smd.holder_count, 0) ASC`;
+        needsMarketData = true; // ✅ FIXED: HOLDERS sorting needs market data
+
+      // MARKET DATA sorting (requires market data JOIN)
       } else if (normalizedSortBy === "MARKET_CAP_DESC") {
         finalOrderBy = `smd.market_cap_btc DESC`;
         needsMarketData = true;
       } else if (normalizedSortBy === "MARKET_CAP_ASC") {
         finalOrderBy = `smd.market_cap_btc ASC`;
         needsMarketData = true;
+      } else if (normalizedSortBy === "VALUE_DESC" || normalizedSortBy === "PRICE_DESC") {
+        finalOrderBy = `smd.floor_price_btc DESC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "VALUE_ASC" || normalizedSortBy === "PRICE_ASC") {
+        finalOrderBy = `smd.floor_price_btc ASC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "VOLUME_24H_DESC") {
+        finalOrderBy = `smd.volume_24h_btc DESC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "VOLUME_24H_ASC") {
+        finalOrderBy = `smd.volume_24h_btc ASC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "VOLUME_7D_DESC") {
+        finalOrderBy = `smd.volume_7d_btc DESC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "VOLUME_7D_ASC") {
+        finalOrderBy = `smd.volume_7d_btc ASC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "VOLUME_30D_DESC") {
+        finalOrderBy = `smd.volume_30d_btc DESC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "VOLUME_30D_ASC") {
+        finalOrderBy = `smd.volume_30d_btc ASC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "CHANGE_24H_DESC") {
+        finalOrderBy = `smd.change_24h DESC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "CHANGE_24H_ASC") {
+        finalOrderBy = `smd.change_24h ASC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "CHANGE_7D_DESC") {
+        finalOrderBy = `smd.change_7d DESC`;
+        needsMarketData = true;
+      } else if (normalizedSortBy === "CHANGE_7D_ASC") {
+        finalOrderBy = `smd.change_7d ASC`;
+        needsMarketData = true;
+
+      // TOKEN METRICS sorting (no additional JOINs needed)
+      } else if (normalizedSortBy === "SUPPLY_DESC") {
+        finalOrderBy = `CAST(src20.max AS UNSIGNED) DESC`;
+        needsMarketData = false;
+      } else if (normalizedSortBy === "SUPPLY_ASC") {
+        finalOrderBy = `CAST(src20.max AS UNSIGNED) ASC`;
+        needsMarketData = false;
+      } else if (normalizedSortBy === "LIMIT_DESC") {
+        finalOrderBy = `CAST(src20.lim AS UNSIGNED) DESC`;
+        needsMarketData = false;
+      } else if (normalizedSortBy === "LIMIT_ASC") {
+        finalOrderBy = `CAST(src20.lim AS UNSIGNED) ASC`;
+        needsMarketData = false;
+      } else if (normalizedSortBy === "DECIMALS_DESC") {
+        finalOrderBy = `CAST(src20.deci AS UNSIGNED) DESC`;
+        needsMarketData = false;
+      } else if (normalizedSortBy === "DECIMALS_ASC") {
+        finalOrderBy = `CAST(src20.deci AS UNSIGNED) ASC`;
+        needsMarketData = false;
+      } else if (normalizedSortBy === "PROGRESS_DESC") {
+        finalOrderBy = `COALESCE(smd.progress_percentage, 0) DESC`;
+        needsMarketData = false;
+      } else if (normalizedSortBy === "PROGRESS_ASC") {
+        finalOrderBy = `COALESCE(smd.progress_percentage, 0) ASC`;
+        needsMarketData = false;
+
+      // BASIC/ALPHABETICAL sorting (no additional JOINs needed)
+      } else if (normalizedSortBy === "DEPLOY_DESC" || normalizedSortBy === "BLOCK_DESC") {
+        finalOrderBy = `src20.block_index DESC`;
+        // Don't override needsMarketData if already set by operation type (e.g., op=DEPLOY)
+      } else if (normalizedSortBy === "DEPLOY_ASC" || normalizedSortBy === "BLOCK_ASC") {
+        finalOrderBy = `src20.block_index ASC`;
+        // Don't override needsMarketData if already set by operation type (e.g., op=DEPLOY)
+      } else if (normalizedSortBy === "TICK_DESC") {
+        finalOrderBy = `src20.tick DESC`;
+        // Don't override needsMarketData if already set by operation type (e.g., op=DEPLOY)
+      } else if (normalizedSortBy === "TICK_ASC") {
+        finalOrderBy = `src20.tick ASC`;
+        // Don't override needsMarketData if already set by operation type (e.g., op=DEPLOY)
+      } else if (normalizedSortBy === "CREATOR_DESC") {
+        // Sort by creator name if available, fallback to creator address
+        finalOrderBy = `COALESCE(creator_info.creator, src20.creator) DESC`;
+        // Don't override needsMarketData if already set by operation type (e.g., op=DEPLOY)
+      } else if (normalizedSortBy === "CREATOR_ASC") {
+        // Sort by creator name if available, fallback to creator address
+        finalOrderBy = `COALESCE(creator_info.creator, src20.creator) ASC`;
+        // Don't override needsMarketData if already set by operation type (e.g., op=DEPLOY)
+      } else if (normalizedSortBy === "RECENT_DESC") {
+        finalOrderBy = `src20.block_time DESC`;
+        // Don't override needsMarketData if already set by operation type (e.g., op=DEPLOY)
+      } else if (normalizedSortBy === "RECENT_ASC") {
+        finalOrderBy = `src20.block_time ASC`;
+        // Don't override needsMarketData if already set by operation type (e.g., op=DEPLOY)
+
+      // LEGACY sorting (maintain backward compatibility)
       } else if (["ASC", "DESC"].includes(normalizedSortBy)) {
         finalOrderBy = `src20.block_index ${normalizedSortBy}`;
       } else {
+        // Invalid sortBy parameter - default to ASC
         finalOrderBy = `src20.block_index ASC`;
       }
     }
 
-    const rowNumberInit = offset;
     const limitOffsetClause = `LIMIT ? OFFSET ?`;
     const whereClause = whereClauses.length > 0
       ? `WHERE ${whereClauses.join(" AND ")}`
@@ -239,85 +368,56 @@ export class SRC20Repository {
             txns.fee` : "";
     const feeFieldsJoin = needsFeeFields ? `
           LEFT JOIN transactions txns ON src20.tx_hash = txns.tx_hash` : "";
-    const feeFieldsOutput = needsFeeFields ? `,
-          b.fee_rate_sat_vb,
-          b.fee` : "";
+    // feeFieldsOutput removed - no longer needed in simplified query
 
     try {
+      // 🚀 SIMPLIFIED QUERY: Remove expensive CTE and ROW_NUMBER() for better performance
       const query = `
-        WITH base_query AS (
-          SELECT
-            (@row_number:=@row_number + 1) AS row_num,
-            src20.tx_hash,
-            src20.block_index,
-            src20.p,
-            src20.op,
-            src20.tick,
-            src20.creator,
-            src20.amt,
-            src20.deci,
-            src20.lim,
-            src20.max,
-            src20.destination,
-            src20.block_time,
-            creator_info.creator as creator_name,
-            destination_info.creator as destination_name${feeFieldsSelect}
-          FROM ${SRC20_TABLE} src20
-          LEFT JOIN creator creator_info ON src20.creator = creator_info.address
-          LEFT JOIN creator destination_info ON src20.destination = destination_info.address${feeFieldsJoin}
-          CROSS JOIN (SELECT @row_number := ?) AS init
-          ${whereClause}
-          ORDER BY src20.block_index ${validOrder}
-        ),
-        holders AS (
-          SELECT
-            b.tick,
-            COUNT(DISTINCT bal.address) as holders
-          FROM (SELECT DISTINCT tick FROM base_query) b
-          LEFT JOIN ${SRC20_BALANCE_TABLE} bal ON bal.tick = b.tick AND bal.amt > 0
-          GROUP BY b.tick
-        ),
-        mint_progress AS (
-          SELECT
-            dep.tick,
-            dep.max,
-            COALESCE((
-                SELECT SUM(amt) FROM balances WHERE tick = dep.tick
-            ), 0) AS total_minted,
-            ROUND(
-                COALESCE((
-                    SELECT SUM(amt) FROM balances WHERE tick = dep.tick
-                ), 0) / dep.max * 100, 2
-            ) AS progress
-          FROM SRC20Valid dep
-          WHERE dep.op = 'DEPLOY'
-        )
         SELECT
-          b.row_num,
-          b.tx_hash,
-          b.block_index,
-          b.p,
-          b.op,
-          b.tick,
-          b.creator,
-          b.amt,
-          b.deci,
-          b.lim,
-          b.max,
-          b.destination,
-          b.block_time,
-          b.creator_name,
-          b.destination_name,
-          COALESCE(h.holders, 0) as holders,
-          COALESCE(mp.progress, 0) as progress${needsMarketData ? ',\n          smd.market_cap_btc,\n          smd.floor_price_btc' : ''}${feeFieldsOutput}
-        FROM base_query b
-        LEFT JOIN holders h ON h.tick = b.tick
-        LEFT JOIN mint_progress mp ON mp.tick = b.tick${needsMarketData ? '\n        LEFT JOIN src20_market_data smd ON smd.tick = b.tick' : ''}
+          src20.tx_hash,
+          src20.block_index,
+          src20.p,
+          src20.op,
+          src20.tick,
+          src20.creator,
+          src20.amt,
+          src20.deci,
+          src20.lim,
+          src20.max,
+          src20.destination,
+          src20.block_time,
+          creator_info.creator as creator_name,
+          destination_info.creator as destination_name,
+          COALESCE(smd.holder_count, 0) as holders,
+          COALESCE(smd.progress_percentage, 0) as progress,
+          COALESCE(smd.total_minted, 0) as minted_amt,
+          COALESCE(smd.total_mints, 0) as total_mints,
+          -- Add deploy_tx for image URL generation
+          CASE
+            WHEN src20.op = 'DEPLOY' THEN src20.tx_hash
+            ELSE (
+              SELECT deploy.tx_hash
+              FROM ${SRC20_TABLE} deploy
+              WHERE deploy.tick = src20.tick AND deploy.op = 'DEPLOY'
+              LIMIT 1
+            )
+          END as deploy_tx${needsMarketData ? `,
+          smd.market_cap_btc,
+          smd.price_btc,
+          smd.volume_24h_btc,
+          smd.price_change_24h_percent,
+          smd.price_source_type` : ''}${feeFieldsSelect}
+        FROM ${SRC20_TABLE} src20
+        LEFT JOIN creator creator_info ON src20.creator = creator_info.address
+        LEFT JOIN creator destination_info ON src20.destination = destination_info.address
+        LEFT JOIN src20_market_data smd ON smd.tick = src20.tick${feeFieldsJoin}
+        ${whereClause}
         ORDER BY ${finalOrderBy}
         ${limitOffsetClause}
       `;
 
-      const fullQueryParams = [rowNumberInit, ...queryParams];
+      // 🚀 SIMPLIFIED PARAMS: No offset parameter needed since ROW_NUMBER() was removed
+      const fullQueryParams = [...queryParams];
 
       console.log("DEBUG: Executing SQL query in getValidSrc20TxFromDb:", query);
       console.log("DEBUG: Query parameters:", fullQueryParams);
@@ -430,9 +530,9 @@ export class SRC20Repository {
     ) => ({
       ...result,
       deploy_tx: tx_hashes_map[result.tick],
-      deploy_img: `${serverConfig.IMAGES_SRC_PATH}/${
-        tx_hashes_map[result.tick]
-      }.svg`,
+      deploy_img: tx_hashes_map[result.tick]
+        ? `https://stampchain.io/stamps/${tx_hashes_map[result.tick]}.svg`
+        : null,
     }));
 
     return resultsWithDeployImg;
@@ -673,22 +773,33 @@ export class SRC20Repository {
 
     const row = (result as any).rows[0];
 
+    // ✅ ENHANCED IMAGE FIELDS: Add stamp_url and deploy_img for SRC-20 detail pages
+    const env = Deno.env.get("DENO_ENV");
+    const baseUrl = env === "development"
+      ? (Deno.env.get("DEV_BASE_URL") || "https://stampchain.io")
+      : "https://stampchain.io";
+
+    const deployment = this.convertSingleResponseToEmoji({
+      tick: row.tick,
+      tx_hash: row.tx_hash,
+      block_index: row.block_index,
+      p: row.p,
+      op: row.op,
+      creator: row.creator,
+      creator_name: row.creator_name,
+      amt: row.amt,
+      deci: row.deci,
+      lim: row.lim,
+      max: row.max,
+      destination: row.destination,
+      block_time: row.block_time,
+      // ✅ Add enhanced image fields
+      stamp_url: row.tx_hash ? `${baseUrl}/stamps/${row.tx_hash}.svg` : null,
+      deploy_img: row.tx_hash ? `${baseUrl}/stamps/${row.tx_hash}.svg` : null,
+    });
+
     return {
-      deployment: this.convertSingleResponseToEmoji({
-        tick: row.tick,
-        tx_hash: row.tx_hash,
-        block_index: row.block_index,
-        p: row.p,
-        op: row.op,
-        creator: row.creator,
-        creator_name: row.creator_name,
-        amt: row.amt,
-        deci: row.deci,
-        lim: row.lim,
-        max: row.max,
-        destination: row.destination,
-        block_time: row.block_time,
-      }),
+      deployment,
       total_mints: row.total_mints,
       total_transfers: row.total_transfers,
     };
@@ -723,27 +834,32 @@ export class SRC20Repository {
 
     const sqlQuery = `
     SELECT DISTINCT
-        tick,
-        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
-        (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted,
-        dep.max AS max_supply,
-        dep.lim AS lim,
-        dep.deci AS decimals
-    FROM ${SRC20_TABLE} dep
+        src20.tick,
+        src20.max AS max_supply,
+        src20.lim AS lim,
+        src20.deci AS decimals,
+        -- 🚀 USE src20_market_data AS SOURCE OF TRUTH
+        COALESCE(smd.total_mints, 0) AS total_mints,
+        COALESCE(smd.total_minted, 0) AS total_minted,
+        COALESCE(smd.progress_percentage, 0) AS progress,
+        COALESCE(smd.holder_count, 0) AS holders
+    FROM ${SRC20_TABLE} src20
+    LEFT JOIN src20_market_data smd ON smd.tick = src20.tick
     WHERE
-        (tick LIKE ? OR
-        tx_hash LIKE ? OR
-        creator LIKE ? OR
-        destination LIKE ?)
-        AND dep.max IS NOT NULL
-        AND dep.op = 'DEPLOY'
-        AND (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) < dep.max
+        (src20.tick LIKE ? OR
+        src20.tx_hash LIKE ? OR
+        src20.creator LIKE ? OR
+        src20.destination LIKE ?)
+        AND src20.max IS NOT NULL
+        AND src20.op = 'DEPLOY'
+        -- Use progress_percentage from market data instead of manual calculation
+        AND COALESCE(smd.progress_percentage, 0) < 100
     ORDER BY
         CASE
-            WHEN tick LIKE ? THEN 0
+            WHEN src20.tick LIKE ? THEN 0
             ELSE 1
         END,
-        tick
+        src20.tick
     LIMIT 10;
     `;
 
@@ -759,16 +875,14 @@ export class SRC20Repository {
       );
 
       return this.convertResponseToEmoji((result as any).rows.map((row: any) => {
-        const maxSupply = new BigFloat(row?.max_supply || "1");
-        const totalMinted = new BigFloat(row.total_minted || "0");
-        const progress = bigFloatToString(totalMinted.div(maxSupply).mul(100), 3);
-        const progressNum = parseFloat(progress);
-
+        // No manual calculations - just use the data from src20_market_data
         return {
           tick: row.tick,
-          progress: progressNum,
+          progress: parseFloat(row.progress || "0"),
           total_minted: row.total_minted,
-          max_supply: row.max_supply
+          max_supply: row.max_supply,
+          holders: row.holders,
+          total_mints: row.total_mints
         };
       }).filter(Boolean)); // Remove null entries
     } catch (error) {
@@ -800,4 +914,243 @@ export class SRC20Repository {
       };
     }
   }
+
+  // 🚀 NEW V2.3 OPTIMIZED TRENDING METHODS USING src20_market_data
+
+  /**
+   * Optimized trending active minting tokens using pre-populated src20_market_data fields
+   * Eliminates expensive CTEs by leveraging progress_percentage and total_minted fields
+   */
+  static async fetchTrendingActiveMintingTokensOptimized(
+    trendingWindow: '24h' | '7d' | '30d' = '24h',
+    mintVelocityMin?: number,
+    limit: number = 25
+  ): Promise<{ rows: any[]; total: number }> {
+    // Convert trending window to hours for velocity calculation
+    const windowHours = trendingWindow === '24h' ? 24 : trendingWindow === '7d' ? 168 : 720;
+
+    const query = `
+      SELECT
+        'data' as type,
+        src20_deploy.tick,
+        src20_deploy.tx_hash,
+        src20_deploy.block_index,
+        src20_deploy.p,
+        src20_deploy.op,
+        src20_deploy.creator,
+        src20_deploy.amt,
+        src20_deploy.deci,
+        src20_deploy.lim,
+        src20_deploy.max,
+        src20_deploy.destination,
+        src20_deploy.block_time,
+        creator_info.creator as creator_name,
+
+        -- 🚀 USE PRE-POPULATED MARKET DATA FIELDS
+        COALESCE(smd.holder_count, 0) as holders,
+        COALESCE(smd.total_minted, 0) as total_minted,
+        COALESCE(smd.progress_percentage, 0) as progress,
+        COALESCE(smd.total_mints, 0) as total_mints,
+
+        -- 🚀 CALCULATE MINT VELOCITY FROM PROGRESS DATA
+        CASE
+          WHEN smd.progress_percentage > 0 AND smd.progress_percentage < 100 THEN
+            -- Estimate mint velocity based on progress rate
+            ROUND(
+              (smd.total_mints * (100 - smd.progress_percentage) / 100) / ${windowHours},
+              2
+            )
+          ELSE 0
+        END as mint_velocity,
+
+        -- 🚀 TRENDING SCORE BASED ON MINT ACTIVITY AND PROGRESS
+        CASE
+          WHEN smd.progress_percentage BETWEEN 10 AND 90 THEN
+            -- Active minting phase gets highest score
+            (smd.total_mints * 0.6) + ((100 - smd.progress_percentage) * 0.4)
+          WHEN smd.progress_percentage < 10 THEN
+            -- New tokens get moderate score
+            (smd.total_mints * 0.8) + (smd.progress_percentage * 0.2)
+          ELSE
+            -- Nearly complete tokens get lower score
+            smd.total_mints * 0.3
+        END as trending_score
+
+      FROM ${SRC20_TABLE} src20_deploy
+      LEFT JOIN creator creator_info ON src20_deploy.creator = creator_info.address
+      LEFT JOIN src20_market_data smd ON smd.tick = src20_deploy.tick
+      WHERE
+        src20_deploy.op = 'DEPLOY'
+        AND COALESCE(smd.progress_percentage, 0) < 100  -- Only mintable tokens
+        ${mintVelocityMin ? `AND (
+          CASE
+            WHEN smd.progress_percentage > 0 AND smd.progress_percentage < 100 THEN
+              ROUND((smd.total_mints * (100 - smd.progress_percentage) / 100) / ${windowHours}, 2)
+            ELSE 0
+          END
+        ) >= ?` : ''}
+      ORDER BY trending_score DESC, smd.total_mints DESC
+      LIMIT ?;
+    `;
+
+    const queryParams = mintVelocityMin ? [mintVelocityMin, limit] : [limit];
+
+    try {
+      const results = await this.db.executeQueryWithCache(
+        query,
+        queryParams,
+        1000 * 60 * 10, // 10 minute cache
+      );
+
+      return {
+        rows: this.convertResponseToEmoji((results as any).rows),
+        total: (results as any).rows.length
+      };
+    } catch (error) {
+      console.error("Error in fetchTrendingActiveMintingTokensOptimized:", error);
+
+      // Fallback to existing method
+      return this.fetchTrendingActiveMintingTokens();
+    }
+  }
+
+  /**
+   * Optimized mint progress using pre-populated src20_market_data fields
+   * Eliminates expensive SUM() calculations by using cached progress_percentage
+   */
+  static async fetchSrc20MintProgressOptimized(tick: string): Promise<any> {
+    const unicodeTick = this.ensureUnicodeEscape(tick);
+
+    const query = `
+      SELECT
+        src20_deploy.tx_hash,
+        src20_deploy.tick,
+        src20_deploy.max,
+        src20_deploy.lim,
+        src20_deploy.deci,
+
+        -- 🚀 USE PRE-POPULATED MARKET DATA FIELDS
+        COALESCE(smd.total_minted, 0) as total_minted,
+        COALESCE(smd.holder_count, 0) as holders_count,
+        COALESCE(smd.total_mints, 0) as total_mints,
+        COALESCE(smd.progress_percentage, 0) as progress
+
+      FROM ${SRC20_TABLE} AS src20_deploy
+      LEFT JOIN src20_market_data smd ON smd.tick = src20_deploy.tick
+      WHERE
+        src20_deploy.tick = ? AND
+        src20_deploy.op = 'DEPLOY'
+      LIMIT 1;
+    `;
+
+    const data = await this.db.executeQueryWithCache(
+      query,
+      [unicodeTick],
+      1000 * 60 * 5, // 5 minute cache
+    );
+
+    if ((data as any).rows.length === 0) {
+      return null;
+    }
+
+    const row = (data as any).rows[0];
+
+    return this.convertSingleResponseToEmoji({
+      max_supply: row["max"].toString(),
+      total_minted: row["total_minted"].toString(),
+      limit: row["lim"].toString(),
+      total_mints: row["total_mints"],
+      progress: row["progress"].toString(),
+      decimals: parseInt(row["deci"]),
+      holders: row["holders_count"],
+      tx_hash: row["tx_hash"],
+      tick: row["tick"],
+    });
+  }
+
+  // End of optimized trending methods
+
+  // 🚀 OPTIMIZED COUNT METHOD USING PRE-COMPUTED MARKET DATA
+  static async getTotalCountValidSrc20TxFromDbOptimized(
+    params: SRC20TrxRequestParams,
+    excludeFullyMinted: boolean = false,
+  ) {
+    const {
+      tick = null,
+      op = null,
+      block_index = null,
+      tx_hash = null,
+      address = null,
+    } = params;
+
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (tick !== null) {
+      if (Array.isArray(tick)) {
+        whereConditions.push(
+          `src20.tick IN (${tick.map(() => "?").join(", ")})`,
+        );
+        queryParams.push(...tick.map(t => this.ensureUnicodeEscape(t)));
+      } else {
+        whereConditions.push(`src20.tick = ?`);
+        queryParams.push(this.ensureUnicodeEscape(tick));
+      }
+    }
+
+    if (op !== null) {
+      if (Array.isArray(op)) {
+        whereConditions.push(`src20.op IN (${op.map(() => "?").join(", ")})`);
+        queryParams.push(...op.map(o => this.ensureUnicodeEscape(o)));
+      } else {
+        whereConditions.push(`src20.op = ?`);
+        queryParams.push(this.ensureUnicodeEscape(op));
+      }
+    }
+
+    if (block_index !== null) {
+      whereConditions.push(`src20.block_index = ?`);
+      queryParams.push(block_index);
+    }
+
+    if (address !== null) {
+      whereConditions.push(`src20.address = ?`);
+      queryParams.push(address);
+    }
+
+    if (tx_hash !== null) {
+      whereConditions.push(`src20.tx_hash = ?`);
+      queryParams.push(tx_hash);
+    }
+
+    // 🚀 OPTIMIZED FULLY MINTED EXCLUSION USING PRE-COMPUTED DATA
+    if (excludeFullyMinted) {
+      // Use pre-computed progress_percentage from src20_market_data table
+      whereConditions.push(`COALESCE(smd.progress_percentage, 0) < 100`);
+    }
+
+    let sqlQuery = `
+          SELECT COUNT(*) AS total
+          FROM ${SRC20_TABLE} src20
+      `;
+
+    // Add JOIN only when excluding fully minted tokens
+    if (excludeFullyMinted) {
+      sqlQuery += `
+          LEFT JOIN src20_market_data smd ON smd.tick = src20.tick
+      `;
+    }
+
+    if (whereConditions.length > 0) {
+      sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
+    }
+
+    return await this.db.executeQueryWithCache(
+      sqlQuery,
+      queryParams,
+      1000 * 60 * 5, // Increase cache duration since we're using pre-computed data
+    );
+  }
+
+
 }

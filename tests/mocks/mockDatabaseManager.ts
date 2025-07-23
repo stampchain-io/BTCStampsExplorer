@@ -81,6 +81,16 @@ export class MockDatabaseManager {
   }
 
   /**
+   * Helper method to mock query results - simpler API for tests
+   */
+  mockQueryResult(rows: any[]): void {
+    // Store the mock response to be returned by the next query
+    this._nextMockResult = { rows };
+  }
+
+  private _nextMockResult: QueryResult | null = null;
+
+  /**
    * Get the history of queries that were executed
    */
   getQueryHistory(): Array<{ query: string; params: unknown[] }> {
@@ -125,6 +135,13 @@ export class MockDatabaseManager {
    */
   private getMockDataForQuery(query: string, params: unknown[]): QueryResult {
     const normalizedQuery = query.toLowerCase();
+
+    // Check if there's a next mock result waiting
+    if (this._nextMockResult) {
+      const result = this._nextMockResult;
+      this._nextMockResult = null; // Clear after use
+      return result;
+    }
 
     // Check if there's a specific mock response set first
     const mockKey = this.generateMockKey(query, params);

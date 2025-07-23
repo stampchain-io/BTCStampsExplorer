@@ -66,7 +66,7 @@ const tests: EndpointTest[] = [
   },
   {
     name: 'SRC20 Trending API',
-    url: `${BASE_URL}/api/internal/src20/trending?type=minting`,
+    url: `${BASE_URL}/api/v2/src20?op=DEPLOY&mintingStatus=minting&sortBy=TRENDING_MINTING_DESC&limit=5`,
     method: 'GET',
     expectedStatus: [200],
     critical: true

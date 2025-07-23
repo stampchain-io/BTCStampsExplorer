@@ -52,7 +52,7 @@ export class SRC20MarketService {
       const openStampItem = openStampMap.get(tick);
 
       // Calculate floor price (lower of stampscan and openstamp)
-      const stampScanPrice = stampScanItem?.floor_unit_price ?? Infinity;
+      const stampScanPrice = stampScanItem?.floor_price_btc ?? Infinity;
       const openStampPrice = openStampItem && openStampItem.price ? Number(openStampItem.price) / 1e8 : Infinity; // Added check for openStampItem.price
       const floor_unit_price = Math.min(stampScanPrice, openStampPrice);
 
@@ -61,12 +61,12 @@ export class SRC20MarketService {
       const mcap = (floor_unit_price !== Infinity && totalSupply > 0) ? floor_unit_price * totalSupply : 0; // Avoid Infinity * 0 or Infinity * number
 
       // Calculate combined 24h volume
-      const stampScanVolume = stampScanItem?.sum_1d ?? 0;
-      const openStampVolume = openStampItem ? Number(openStampItem.volume24) / 1e8 : 0;
+      const stampScanVolume = stampScanItem?.volume_24h_btc ?? 0;
+      const openStampVolume = openStampItem ? Number(openStampItem.volume_24h_btc) / 1e8 : 0;
       const volume24 = stampScanVolume + openStampVolume;
 
       // Extract and parse change24 from OpenStamp data
-      const change24Raw = openStampItem?.change24;
+      const change24Raw = openStampItem?.change_24h;
       let change24: number | undefined = undefined;
       if (change24Raw) {
         try {
@@ -90,19 +90,27 @@ export class SRC20MarketService {
 
       return {
         tick, // emoji tick
-        floor_unit_price,
+        // ✅ v2.3 STANDARDIZED FIELDS
+        floor_price_btc: floor_unit_price !== Infinity ? floor_unit_price : null,
+        market_cap_btc: mcap,
+        volume_24h_btc: volume24,
+        change_24h: change24,
+
+        // 🔄 BACKWARD COMPATIBILITY: Legacy field names (populate for existing components)
+        floor_unit_price: floor_unit_price !== Infinity ? floor_unit_price : null,
         mcap,
         volume24,
         change24,
+
         ...metadata,
         market_data: {
           stampscan: {
             price: stampScanPrice === Infinity ? 0 : stampScanPrice,
-            volume24: stampScanVolume,
+            volume_24h_btc: stampScanVolume,
           },
           openstamp: {
             price: openStampPrice === Infinity ? 0 : openStampPrice,
-            volume24: openStampVolume,
+            volume_24h_btc: openStampVolume,
           },
         },
       };

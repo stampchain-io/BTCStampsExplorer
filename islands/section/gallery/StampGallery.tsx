@@ -1,16 +1,16 @@
 /* ===== STAMP GALLERY COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { ViewAllButton } from "$button";
 import { StampCard } from "$card";
 import { StampGalleryProps, StampRow } from "$globals";
-import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { SortButton } from "$islands/button/SortButton.tsx";
+import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
+import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
+import { BREAKPOINTS } from "$lib/utils/constants.ts";
+import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
+import { useEffect, useRef, useState } from "preact/hooks";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
-import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
-import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 
 /* ===== COMPONENT ===== */
 export default function StampGallery({
@@ -215,12 +215,12 @@ export default function StampGallery({
           <div class="swiper-container overflow-hidden">
             <div class="swiper-wrapper">
               {isLoading ? <div>Loading...</div> : (
-                filteredStamps.map((stamp: StampRow) => (
+                filteredStamps.map((stamp: StampRow, index: number) => (
                   <div
                     class="swiper-slide"
                     key={isRecentSales && stamp.sale_data
-                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
-                      : stamp.tx_hash}
+                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}-${index}`
+                      : `${stamp.tx_hash}-${index}`}
                   >
                     <StampCard
                       stamp={stamp}
@@ -256,11 +256,14 @@ export default function StampGallery({
                 })
               )
               : (
-                filteredStamps.slice(0, displayCount).map((stamp: StampRow) => (
+                filteredStamps.slice(0, displayCount).map((
+                  stamp: StampRow,
+                  index: number,
+                ) => (
                   <div
                     key={isRecentSales && stamp.sale_data
-                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
-                      : stamp.tx_hash}
+                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}-${index}`
+                      : `${stamp.tx_hash}-${index}`}
                   >
                     <StampCard
                       stamp={stamp}

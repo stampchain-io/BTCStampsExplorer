@@ -66,28 +66,41 @@ export type LISTING_FILTER_TYPES =
   | "psbt"
   | "dispensers";
 
-// START ADDED TYPE
+// START v2.3 PUNK ROCK INTERFACE 🎸
 export interface MarketListingAggregated {
   tick: string;
-  floor_unit_price: number;
-  mcap: number;
-  volume24: number;
+  // v2.3 STANDARDIZED FIELDS - NO MORE LEGACY CRUFT!
+  price_btc?: number | null; // ✅ v2.3 field for fungible SRC-20 tokens
+  floor_price_btc: number | null; // ✅ Proper v2.3 standardized field
+  market_cap_btc: number; // ✅ Proper v2.3 standardized field
+  volume_24h_btc: number; // ✅ Proper v2.3 standardized field
+  volume_7d_btc?: number; // ✅ v2.3 extended field
+  volume_30d_btc?: number; // ✅ v2.3 extended field
+  change_24h_percent?: number | undefined; // ✅ v2.3 standardized field (24h price change percentage)
   stamp_url?: string | null;
   tx_hash: string;
   holder_count: number;
+
+  // 🔄 BACKWARD COMPATIBILITY: Legacy field names (DEPRECATED - use standardized names above)
+  floor_unit_price?: number | null; // @deprecated Use floor_price_btc
+  mcap?: number; // @deprecated Use market_cap_btc
+  volume24?: number; // @deprecated Use volume_24h_btc
+  change_24h?: number | undefined; // @deprecated Use change_24h_percent
+  change24?: number | undefined; // @deprecated Use change_24h_percent
+
   market_data: {
     stampscan: {
       price: number;
-      volume24: number;
+      volume_24h_btc: number; // ✅ Updated to v2.3 field name
     };
     openstamp: {
       price: number;
-      volume24: number;
+      volume_24h_btc: number; // ✅ Updated to v2.3 field name
     };
   };
-  change24?: number; // Added for step 6
+  change_7d?: number; // ✅ v2.3 extended field
 }
-// END ADDED TYPE
+// END v2.3 PUNK ROCK INTERFACE 🎸
 
 // Filter types - Stamp
 export type STAMP_MARKETPLACE =
@@ -285,7 +298,7 @@ export interface SRC20Filters {
 export interface MarketDataFilters {
   // Holder metrics
   minHolderCount?: number;
-  maxHolderCount?: number;
+  maxHolderCount?: number; // 0-100
   minDistributionScore?: number; // 0-100
   maxTopHolderPercentage?: number; // 0-100
 
@@ -427,12 +440,13 @@ export interface SRC20Row {
   tg?: string;
   x?: string;
   holders: number;
-  floor_unit_price?: number;
+  // 🎸 PUNK ROCK v2.3 STANDARDIZED FIELDS 🎸
+  floor_price_btc?: number | null; // ✅ v2.3 standardized field (was floor_unit_price)
   fee_rate_sat_vb: number | null;
   fee: number | null;
-  mcap?: number;
+  market_cap_btc?: number; // ✅ v2.3 standardized field (was mcap)
   top_mints_percentage?: number;
-  volume_7d?: number;
+  volume_7d_btc?: number; // ✅ v2.3 extended field (was volume_7d)
   value?: number;
   stamp_url?: string;
   deploy_img?: string;
@@ -447,20 +461,20 @@ export interface SRC20Row {
     tx_hash: string;
     tick: string;
   };
-  volume24?: number;
+  volume_24h_btc?: number; // ✅ v2.3 standardized field (was volume24)
   market_cap?: number;
   chart?: any[];
   mint_count?: number | string;
   trending_rank?: number;
 }
 
-// Add EnrichedSRC20Row type
+// 🎸 PUNK ROCK v2.3 ENRICHED SRC20 ROW 🎸
 export interface EnrichedSRC20Row extends SRC20Row {
-  market_data?: MarketListingAggregated; // MarketListingAggregated is already defined above
+  market_data?: MarketListingAggregated; // ✅ Uses our punk rock v2.3 interface
   chart?: any;
   mint_count?: number | string; // Number of mints for this token
-  volume24?: number; // 24h trading volume
-  market_cap?: number; // Market capitalization
+  volume_24h_btc?: number; // ✅ v2.3 standardized field (was volume24) - 24h trading volume
+  market_cap_btc?: number; // ✅ v2.3 standardized field (was market_cap) - Market capitalization
 }
 
 interface SendRow {
@@ -688,6 +702,12 @@ export interface SRC20TrxRequestParams {
   address?: string | null;
   noPagination?: boolean;
   singleResult?: boolean;
+
+  // 🚀 NEW V2.3 PARAMETERS FOR TRENDING AND MINT PROGRESS
+  mintingStatus?: "all" | "minting" | "minted"; // Simplified filter: all (default), minting (progress < 100%), minted (progress >= 99.9%)
+  trendingWindow?: "24h" | "7d" | "30d"; // Time window for trending calculations
+  includeProgress?: boolean; // Include progress_percentage, total_minted from market data
+  mintVelocityMin?: number; // Minimum mint velocity for trending (mints per hour)
 }
 
 export interface SRC101TokenidsParams {

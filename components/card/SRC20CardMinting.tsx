@@ -11,6 +11,7 @@ import {
 } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { formatDate } from "$lib/utils/formatUtils.ts";
+import { constructStampUrl } from "$lib/utils/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
 
 interface SRC20CardMintingProps {
@@ -93,10 +94,15 @@ export function SRC20CardMinting({
         {data.length
           ? (
             data.map((src20) => {
-              const imageUrl = src20.stamp_url ||
-                src20.deploy_img ||
-                `/content/${src20.tx_hash}.svg` ||
-                `/content/${src20.deploy_tx}`;
+              // SRC-20 Image URL Logic:
+              // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
+              // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
+              // 3. Fallback to constructing URL from deploy_tx if available
+              // 4. Final fallback to placeholder image
+              const imageUrl = src20.deploy_img ||
+                src20.stamp_url ||
+                (src20.deploy_tx ? constructStampUrl(src20.deploy_tx) : null) ||
+                "/img/placeholder/stamp-no-image.svg";
 
               const href = `/src20/${
                 encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
@@ -202,13 +208,21 @@ export function SRC20CardMinting({
                     <div class="flex items-center justify-center w-full">
                       <div class="flex flex-col w-[100px] min-[420px]:w-[120px] mobileLg:w-[160px] gap-1">
                         <div class="!text-xs text-center">
-                          {Number(src20.progress)}
+                          {Number(
+                            src20.mint_progress?.progress || src20.progress ||
+                              0,
+                          )}
                           <span class="text-stamp-grey-light">%</span>
                         </div>
                         <div class="relative h-1.5 bg-stamp-grey rounded-full">
                           <div
                             class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
-                            style={{ width: `${src20.progress}%` }}
+                            style={{
+                              width: `${
+                                src20.mint_progress?.progress ||
+                                src20.progress || 0
+                              }%`,
+                            }}
                           />
                         </div>
                       </div>
@@ -240,7 +254,10 @@ export function SRC20CardMinting({
                       cellAlign(5, headers.length)
                     } ${rowCardBorderCenter} hidden mobileLg:table-cell`}
                   >
-                    {Number(src20.holders).toLocaleString()}
+                    {Number(
+                      (src20 as any)?.market_data?.holder_count ||
+                        (src20 as any)?.holders || 0,
+                    ).toLocaleString()}
                   </td>
                   {/* MINT BUTTON */}
                   <td

@@ -15,7 +15,7 @@ const CHANGELOG = [
     status: "current",
     changes: {
       added: [
-        "market_data nested object containing clean, structured market information (floor price, volume, market cap, holder counts)",
+        "market_data object with floor price and volume information",
         "dispenserInfo for stamp dispenser statistics",
         "cacheStatus to indicate data freshness",
         "holderCount and uniqueHolderCount fields",
@@ -23,19 +23,12 @@ const CHANGELOG = [
         "dataQualityScore for data reliability metrics",
         "from_timestamp and to_timestamp query parameters for date filtering (validation only)",
         "Enhanced transaction details in recent sales data including buyer_address, dispenser_address, time_ago, btc_amount_satoshis, and dispenser_tx_hash",
-        "dayRange query parameter for /api/v2/stamps/recentSales to filter sales by days (default: 30)",
-        "fullDetails query parameter for /api/v2/stamps/recentSales to enable enhanced transaction information",
         "btcPriceUSD field in recent sales response for real-time USD conversions",
         "metadata object in recent sales response with dayRange and lastUpdated timestamp",
         "activityLevel field in StampMarketData (HOT, WARM, COOL, DORMANT, COLD) for trading activity indicators",
         "lastActivityTime field in StampMarketData with Unix timestamp of last trading activity",
         "Enhanced transaction details in StampMarketData including lastSaleTxHash, lastSaleBuyerAddress, lastSaleDispenserAddress",
         "lastSaleBtcAmount, lastSaleDispenserTxHash, and lastSaleBlockIndex fields for complete sale information",
-      ],
-      notes: [
-        "Clean market data architecture - ALL market information is contained within the structured market_data object",
-        "NO root-level market data duplication - eliminates confusion and reduces response size",
-        "Backward compatible via API versioning headers (X-API-Version: 2.2 for minimal responses, 2.3 for market data)",
       ],
       improved: [
         "Response performance with intelligent caching",
@@ -54,10 +47,11 @@ const CHANGELOG = [
         "stamp_base64 remains available in single stamp detail endpoints (/stamps/[identifier])",
       ],
       fixed: [],
-      deprecated: [],
+      deprecated: [
+        "🚫 /api/v2/cursed endpoint - Use /api/v2/stamps?type=cursed instead for better filtering and consistency",
+      ],
       removed: [
-        "Root-level market data fields (floor_unit_price, market_cap, volume24, change24) - replaced by clean nested market_data object",
-        "Duplicated market data representation - v2.3 uses ONLY the structured market_data object for consistency",
+        "floorPrice, floorPriceUSD, marketCapUSD moved into marketData object in stamp detail endpoints",
       ],
       migrationGuide: "https://stampchain.io/docs/api/migration/v2.2-to-v2.3",
     },
@@ -72,10 +66,6 @@ const CHANGELOG = [
         "SRC-101 token support",
         "Collections endpoints",
         "Cursed stamps functionality",
-      ],
-      notes: [
-        "Baseline version with NO market data fields - provides clean, minimal responses for basic data needs",
-        "All endpoints return core stamp/token data without market pricing or volume information",
       ],
       improved: [
         "Error handling and response formats",

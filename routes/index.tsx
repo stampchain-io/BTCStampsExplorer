@@ -14,7 +14,6 @@ import {
   StampOverviewGallery,
   StampSalesGallery,
 } from "$section";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
 
 /* ===== TYPES ===== */
@@ -43,6 +42,16 @@ interface HomePageData extends StampControllerData {
       totalPages: number;
     };
   };
+  // Performance optimization - single BTC price fetch
+  btcPrice?: number;
+  btcPriceSource?: string;
+  // Recent sales data for SSR optimization
+  recentSalesData?: {
+    data: any[];
+    total: number;
+    page: number;
+    totalPages: number;
+  };
 }
 
 /* ===== SERVER HANDLER ===== */
@@ -57,6 +66,21 @@ export const handler: Handlers<HomePageData> = {
     console.log(`[HOMEPAGE] Starting homepage request`);
 
     try {
+      /* ===== SINGLE BTC PRICE FETCH ===== */
+      // 🚀 PERFORMANCE: Use singleton BTC price service to eliminate duplicate fetches
+      const { btcPriceSingleton } = await import(
+        "$server/services/price/btcPriceSingleton.ts"
+      );
+      const btcPriceData = await btcPriceSingleton.getPrice();
+      const btcPrice = btcPriceData.price;
+      console.log(
+        `[HOMEPAGE] Singleton BTC price: $${btcPrice} from ${btcPriceData.source}`,
+      );
+
+      // Store BTC price in context for components to use
+      ctx.state.btcPrice = btcPrice;
+      ctx.state.btcPriceSource = btcPriceData.source;
+
       /* ===== DATA FETCHING ===== */
       const controller = new AbortController();
       const timeout = setTimeout(() => {
@@ -88,29 +112,101 @@ export const handler: Handlers<HomePageData> = {
         }
       };
 
-      const [pageData, mintedData, mintingData] = await Promise.allSettled([
-        fetchWithFallback(
-          () => StampController.getHomePageData(),
-          {
-            carouselStamps: [],
-            stamps_art: [],
-            stamps_src721: [],
-            stamps_posh: [],
-            collectionData: [],
-          },
-          "StampController.getHomePageData",
-        ),
-        fetchWithFallback(
-          () => Src20Controller.fetchFullyMintedByMarketCapV2(5, 1),
-          { data: [], total: 0, page: 1, totalPages: 0 },
-          "fetchFullyMintedByMarketCapV2",
-        ),
-        fetchWithFallback(
-          () => Src20Controller.fetchTrendingActiveMintingTokensV2(5, 1, 1000),
-          { data: [], total: 0, page: 1, totalPages: 0 },
-          "fetchTrendingActiveMintingTokensV2",
-        ),
-      ]);
+      // ✅ ARCHITECTURE: Use API endpoints for SRC20 data
+      const fetchSRC20FromAPI = async (
+        endpoint: string,
+        baseUrl: string,
+      ): Promise<any> => {
+        try {
+          const response = await fetch(`${baseUrl}${endpoint}`, {
+            headers: {
+              "X-API-Version": "2.3", // Use latest API version with market data
+            },
+          });
+
+          if (!response.ok) {
+            console.error(
+              `[HOMEPAGE] API call failed: ${endpoint} - ${response.status}`,
+            );
+            return { data: [], total: 0, page: 1, totalPages: 0 };
+          }
+
+          const result = await response.json();
+
+          // ✅ FIXED: Handle API response structure properly
+          if (result.data && Array.isArray(result.data)) {
+            // Standard API response with pagination info
+            return {
+              data: result.data,
+              total: result.total || 0,
+              page: result.page || 1,
+              totalPages: result.totalPages || 0,
+            };
+          } else if (Array.isArray(result)) {
+            // Direct array response (for some internal endpoints)
+            return {
+              data: result,
+              total: result.length,
+              page: 1,
+              totalPages: 1,
+            };
+          } else {
+            // Fallback for other response structures
+            return result.data || result ||
+              { data: [], total: 0, page: 1, totalPages: 0 };
+          }
+        } catch (error) {
+          console.error(`[HOMEPAGE] API call error: ${endpoint}`, error);
+          return { data: [], total: 0, page: 1, totalPages: 0 };
+        }
+      };
+
+      // ✅ PRODUCTION FIX: Use request origin instead of hardcoded localhost
+      const url = new URL(req.url);
+      const baseUrl = `${url.protocol}//${url.host}`;
+
+      const [pageData, mintedData, mintingData, recentSalesData] = await Promise
+        .allSettled([
+          fetchWithFallback(
+            () =>
+              StampController.getHomePageData(btcPrice, btcPriceData.source),
+            {
+              carouselStamps: [],
+              stamps_art: [],
+              stamps_src721: [],
+              stamps_posh: [],
+              collectionData: [],
+            },
+            "StampController.getHomePageData",
+          ),
+          fetchWithFallback(
+            () =>
+              fetchSRC20FromAPI(
+                "/api/v2/src20?op=DEPLOY&mintingStatus=minted&sortBy=TRENDING_24H_DESC&limit=5&page=1&includeMarketData=true&includeProgress=true",
+                baseUrl,
+              ),
+            { data: [], total: 0, page: 1, totalPages: 0 },
+            "fetchTopMintedTokens",
+          ),
+          fetchWithFallback(
+            () =>
+              fetchSRC20FromAPI(
+                "/api/v2/src20?op=DEPLOY&mintingStatus=minting&sortBy=TRENDING_MINTING_DESC&limit=5&page=1&includeMarketData=true&includeProgress=true",
+                baseUrl,
+              ),
+            { data: [], total: 0, page: 1, totalPages: 0 },
+            "fetchTrendingActiveMintingTokensV2",
+          ),
+          fetchWithFallback(
+            () =>
+              fetchSRC20FromAPI(
+                "/api/internal/stamp-recent-sales?page=1&limit=8",
+                baseUrl,
+              ),
+            { data: [], total: 0, page: 1, totalPages: 0 },
+            "fetchRecentSalesData",
+          ),
+        ]);
 
       clearTimeout(timeout);
 
@@ -131,6 +227,9 @@ export const handler: Handlers<HomePageData> = {
       const mintingResult = mintingData.status === "fulfilled"
         ? mintingData.value
         : { data: [], total: 0, page: 1, totalPages: 0 };
+      const recentSalesResult = recentSalesData.status === "fulfilled"
+        ? recentSalesData.value
+        : { data: [], total: 0, page: 1, totalPages: 0 };
 
       /* ===== RESPONSE RENDERING ===== */
       const response = await ctx.render({
@@ -139,6 +238,10 @@ export const handler: Handlers<HomePageData> = {
           minted: mintedResult as any,
           minting: mintingResult as any,
         },
+        recentSalesData: recentSalesResult as any,
+        // 🚀 PERFORMANCE: Pass BTC price to components to avoid redundant fetches
+        btcPrice: btcPrice,
+        btcPriceSource: btcPriceData.source,
       });
 
       return response;
@@ -175,6 +278,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
     stamps_posh = [],
     collectionData = [],
     src20Data,
+    recentSalesData,
   } = data || {};
 
   /* ===== RENDER ===== */
@@ -235,6 +339,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
                 title="RECENT SALES"
                 subTitle="HOT STAMPS"
                 variant="home"
+                initialData={recentSalesData?.data || []}
                 displayCounts={{
                   mobileSm: 3,
                   mobileMd: 4,
@@ -255,7 +360,6 @@ export default function Home({ data }: PageProps<HomePageData>) {
                   viewType="minted"
                   fromPage="home"
                   {...(src20Data?.minted && { serverData: src20Data.minted })}
-                  useClientFetch={false}
                   timeframe="24H"
                 />
               </div>
@@ -266,7 +370,6 @@ export default function Home({ data }: PageProps<HomePageData>) {
                   viewType="minting"
                   fromPage="home"
                   {...(src20Data?.minting && { serverData: src20Data.minting })}
-                  useClientFetch={false}
                   timeframe="24H"
                 />
               </div>

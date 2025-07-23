@@ -43,13 +43,20 @@ export const handler: Handlers = {
       const page = parseInt(url.searchParams.get("page") || "1");
       const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
-      const recentSales = url.searchParams.get("recentSales") === "true";
+      // Handle both new view parameter and legacy recentSales parameter
+      const viewMode = url.searchParams.get("view") || "all";
+      const recentSales = viewMode === "sales" ||
+        url.searchParams.get("recentSales") === "true";
 
       /* ===== DATA FETCHING ===== */
       let result;
       if (recentSales) {
-        // Handle recent sales view
-        result = await StampController.getRecentSales(page, page_size);
+        // Handle recent sales view with type filtering
+        // Note: SRC-20 excluded from recent sales as they're handled separately in the app
+        const recentSalesType = selectedTab === "src20" ? "all" : selectedTab;
+        result = await StampController.getRecentSales(page, page_size, {
+          type: recentSalesType === "all" ? "all" : recentSalesType,
+        });
       } else {
         // Handle regular stamp listing
         const ident: SUBPROTOCOLS[] = [];

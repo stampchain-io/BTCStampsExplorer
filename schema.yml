@@ -542,6 +542,7 @@ paths:
         - in: path
           name: number
           required: true
+
           example: 1
           schema:
             type: integer
@@ -595,6 +596,7 @@ paths:
         - in: path
           name: creator
           required: true
+
           example: "bc1qefhvcqwuz6g6qy6nck5dq2el2r37pky73tqxkc"
           schema:
             type: string
@@ -649,6 +651,7 @@ paths:
         - in: path
           name: id
           required: true
+
           example: "-2"
           schema:
             type: string
@@ -678,6 +681,7 @@ paths:
         - in: path
           name: block_index
           required: true
+
           example: 781141
           schema:
             type: integer
@@ -716,7 +720,89 @@ paths:
           description: Specify the API version (2.2 for legacy format, 2.3 for enhanced market data)
         - $ref: "#/components/parameters/Limit"
         - $ref: "#/components/parameters/Page"
-        - $ref: "#/components/parameters/Sort"
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum:
+              [
+                ASC,
+                DESC,
+                HOLDERS_DESC,
+                HOLDERS_ASC,
+                MARKET_CAP_DESC,
+                MARKET_CAP_ASC,
+                VALUE_DESC,
+                VALUE_ASC,
+                PRICE_DESC,
+                PRICE_ASC,
+                VOLUME_24H_DESC,
+                VOLUME_24H_ASC,
+                VOLUME_7D_DESC,
+                VOLUME_7D_ASC,
+                VOLUME_30D_DESC,
+                VOLUME_30D_ASC,
+                CHANGE_24H_DESC,
+                CHANGE_24H_ASC,
+                CHANGE_7D_DESC,
+                CHANGE_7D_ASC,
+                SUPPLY_DESC,
+                SUPPLY_ASC,
+                PROGRESS_DESC,
+                PROGRESS_ASC,
+                LIMIT_DESC,
+                LIMIT_ASC,
+                DECIMALS_DESC,
+                DECIMALS_ASC,
+                DEPLOY_DESC,
+                DEPLOY_ASC,
+                RECENT_DESC,
+                RECENT_ASC,
+                BLOCK_DESC,
+                BLOCK_ASC,
+                TICK_DESC,
+                TICK_ASC,
+                CREATOR_DESC,
+                CREATOR_ASC,
+              ]
+            default: "DESC"
+          description: |
+            Comprehensive sort options for SRC-20 transactions:
+
+            **⚠️ OPERATION-SPECIFIC RESTRICTIONS:**
+            - **DEPLOY operations**: All sorting options available
+            - **MINT/TRANSFER operations**: Limited to basic, activity, and alphabetical sorting only
+            - **Market data and token metrics sorting**: Only available for DEPLOY operations
+
+            **Basic Sorting (All Operations):**
+            - ASC/DESC: Sort by block index (deploy date)
+            - DEPLOY_DESC/DEPLOY_ASC: Sort by deploy date (block_index)
+            - BLOCK_DESC/BLOCK_ASC: Sort by block index
+            - TICK_DESC/TICK_ASC: Sort alphabetically by tick name
+            - CREATOR_DESC/CREATOR_ASC: Sort by creator address
+
+            **DEPLOY-Only Market Data Sorting:**
+            - HOLDERS_DESC/HOLDERS_ASC: Sort by holder count
+            - MARKET_CAP_DESC/MARKET_CAP_ASC: Sort by market cap (BTC)
+            - VALUE_DESC/VALUE_ASC: Sort by floor price/market value
+            - PRICE_DESC/PRICE_ASC: Alias for VALUE sorting
+            - VOLUME_24H/7D/30D_DESC/ASC: Sort by trading volume
+            - CHANGE_24H/7D_DESC/ASC: Sort by price change percentage
+
+            **DEPLOY-Only Token Metrics Sorting:**
+            - SUPPLY_DESC/SUPPLY_ASC: Sort by max supply (numeric)
+            - PROGRESS_DESC/PROGRESS_ASC: Sort by mint progress percentage
+            - LIMIT_DESC/LIMIT_ASC: Sort by mint limit per transaction
+            - DECIMALS_DESC/DECIMALS_ASC: Sort by token decimals
+
+            **MINT/TRANSFER-Only Sorting:**
+            - AMOUNT_DESC/AMOUNT_ASC: Sort by transaction amount
+            - RECENT_DESC/RECENT_ASC: Sort by recent activity (block_time)
+
+            **Example Usage:**
+            - `?op=DEPLOY&sortBy=SUPPLY_DESC` ✅ Valid
+            - `?op=MINT&sortBy=SUPPLY_DESC` ❌ Invalid - returns error
+            - `?op=MINT&sortBy=AMOUNT_DESC` ✅ Valid
         # Market Data Filters for SRC-20 (Task 42)
         - name: minHolderCount
           in: query
@@ -777,6 +863,55 @@ paths:
           schema:
             type: string
           example: "openstamp"
+        # v2.3 Enhanced Filtering Parameters
+        - name: mintingStatus
+          in: query
+          description: |
+            Filter tokens by minting status (v2.3+)
+            - all: Return all tokens (default)
+            - minting: Return only tokens still being minted (progress < 100%)
+            - minted: Return only fully minted tokens (progress = 100%)
+          schema:
+            type: string
+            enum:
+              - all
+              - minting
+              - minted
+            default: all
+        - name: includeProgress
+          in: query
+          description: |
+            Include detailed mint progress data in the response.
+            Adds mint_progress object with progress percentage, current minted amount, and max supply.
+          schema:
+            type: boolean
+            default: false
+          example: true
+        - name: includeMarketData
+          in: query
+          description: |
+            Include comprehensive market data in the response.
+            Adds market_data object with price, volume, holder count, and change metrics.
+            Note: Automatically included for DEPLOY operations.
+          schema:
+            type: boolean
+            default: false
+          example: true
+        - name: trendingWindow
+          in: query
+          description: Time window for trending calculations and volume metrics
+          schema:
+            type: string
+            enum: ["24h", "7d", "30d"]
+          example: "24h"
+        - name: mintVelocityMin
+          in: query
+          description: Minimum minting velocity (tokens minted per hour) to filter by
+          schema:
+            type: number
+            format: float
+            minimum: 0
+          example: 100.5
       responses:
         "200":
           description: Successful response with paginated SRC-20 transactions
@@ -804,6 +939,7 @@ paths:
         - in: path
           name: address
           required: true
+
           description: The address of the wallet
           schema:
             type: string
@@ -845,6 +981,7 @@ paths:
         - in: path
           name: address
           required: true
+
           example: "bc1qx6tg7nls0u949wy8eudwcaw0rcq0vl7ehh6p9l"
           schema:
             type: string
@@ -852,6 +989,7 @@ paths:
         - in: path
           name: tick
           required: true
+
           example: "STAMP"
           schema:
             type: string
@@ -884,6 +1022,7 @@ paths:
         - in: path
           name: tick
           required: true
+
           example: "KEVIN"
           schema:
             type: string
@@ -915,6 +1054,7 @@ paths:
         - in: path
           name: block_index
           required: true
+
           example: 844757
           schema:
             type: integer
@@ -953,6 +1093,7 @@ paths:
         - in: path
           name: block_index
           required: true
+
           example: 844757
           schema:
             type: integer
@@ -961,6 +1102,7 @@ paths:
         - in: path
           name: tick
           required: true
+
           example: "STAMP"
           schema:
             type: string
@@ -1029,6 +1171,7 @@ paths:
         - in: path
           name: tick
           required: true
+
           example: "KEVIN"
           description: Tick value
           schema:
@@ -1067,6 +1210,7 @@ paths:
         - in: path
           name: tick
           required: true
+
           example: "KEVIN"
           description: The tick value.
           schema:
@@ -1096,6 +1240,7 @@ paths:
         - in: path
           name: tx_hash
           required: true
+
           example: "9d5451a3ae07a6fe92907cef3c649f52544b8b4e67a6cae848b14e1d8047b5a4"
           schema:
             type: string
@@ -1191,6 +1336,7 @@ paths:
         - in: path
           name: tx_hash
           required: true
+
           example: "bc1ppwujuuj8ejh4qu5lpfftgmfg3yue7ml7ge8vgzyqzmpu5rc9ttmsrkaeh8"
           schema:
             type: string
@@ -1220,6 +1366,7 @@ paths:
         - in: path
           name: deploy_hash
           required: true
+
           example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
           schema:
             type: string
@@ -1251,6 +1398,7 @@ paths:
         - in: path
           name: deploy_hash
           required: true
+
           example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
           schema:
             type: string
@@ -1285,6 +1433,7 @@ paths:
         - in: path
           name: deploy_hash
           required: true
+
           example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
           schema:
             type: string
@@ -1322,6 +1471,7 @@ paths:
         - in: path
           name: deploy_hash
           required: true
+
           example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
           description: The hash of the deploy transaction.
           schema:
@@ -1329,6 +1479,7 @@ paths:
         - in: path
           name: address_btc
           required: true
+
           example: "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m"
           schema:
             type: string
@@ -1358,6 +1509,7 @@ paths:
         - in: path
           name: address
           required: true
+
           example: "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m"
           schema:
             type: string
@@ -1389,6 +1541,7 @@ paths:
         - in: path
           name: deploy_hash
           required: true
+
           example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
           schema:
             type: string
@@ -1396,6 +1549,7 @@ paths:
         - in: path
           name: tokenid
           required: true
+
           example: "aXJvbmI=="
           schema:
             type: string
@@ -1425,6 +1579,7 @@ paths:
         - in: path
           name: deploy_hash
           required: true
+
           example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
           schema:
             type: string
@@ -1432,6 +1587,7 @@ paths:
         - in: path
           name: index
           required: true
+
           example: 1
           schema:
             type: number
@@ -1710,6 +1866,7 @@ paths:
         - in: path
           name: id
           required: true
+
           example: "5faa1aa3012c89b598372153371f835a88739e5539c9c709924ce189fb9c7863"
           description: ID (tx_hash, stamp, cpid) of the stamp
           schema:
@@ -1739,6 +1896,7 @@ paths:
         - in: path
           name: id
           required: true
+
           example: "792121"
           schema:
             type: string
@@ -1783,6 +1941,7 @@ paths:
         - in: path
           name: id
           required: true
+
           example: "792121"
           schema:
             type: string
@@ -1821,6 +1980,7 @@ paths:
         - in: path
           name: id
           required: true
+
           example: "792121"
           schema:
             type: string
@@ -1874,6 +2034,7 @@ paths:
         - in: path
           name: id
           required: true
+
           example: "792121"
           schema:
             type: string
@@ -1918,6 +2079,7 @@ paths:
         - in: path
           name: address
           required: true
+
           example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
           description: The address to retrieve stamp balances for
           schema:
@@ -1974,6 +2136,7 @@ paths:
         - in: path
           name: block_index
           required: true
+
           example: "779652"
           schema:
             type: string
@@ -2003,6 +2166,7 @@ paths:
         - in: path
           name: ident
           required: true
+
           example: "STAMP"
           description: The ident value (SRC-721, STAMP)
           schema:
@@ -2631,10 +2795,20 @@ components:
           description: "The block index of the last update to the balance"
         deploy_tx:
           type: string
-          description: "the tx_hash of the deploy transaction"
+          description: "The tx_hash of the deploy transaction"
+          example: "3e3d1b81e06d9f31081da0532ce547b12bc773aad04d645084bbee8d311d6f73"
         deploy_img:
           type: string
-          description: "The image associated with the deploy token"
+          description: "The fully qualified URL to the deploy transaction stamp image (https://stampchain.io/stamps/{deploy_tx}.svg)"
+          format: uri
+          pattern: "^https://stampchain\\.io/stamps/[a-f0-9]{64}\\.svg$"
+          example: "https://stampchain.io/stamps/3e3d1b81e06d9f31081da0532ce547b12bc773aad04d645084bbee8d311d6f73.svg"
+        stamp_url:
+          type: string
+          description: "The fully qualified URL to the transaction stamp content (https://stampchain.io/stamps/{tx_hash}.svg)"
+          format: uri
+          pattern: "^https://stampchain\\.io/stamps/[a-f0-9]{64}\\.svg$"
+          example: "https://stampchain.io/stamps/3e3d1b81e06d9f31081da0532ce547b12bc773aad04d645084bbee8d311d6f73.svg"
 
     BtcInfo:
       type: object
@@ -2684,6 +2858,107 @@ components:
           nullable: true
         destination_name:
           type: string
+
+        # 🚀 V2.3 CLEAN STRUCTURE: Mint Progress Object
+        mint_progress:
+          type: object
+          nullable: true
+          description: "Minting progress information (v2.3+). Contains progress percentage and current/max supply data."
+          properties:
+            progress:
+              type: string
+              description: "Minting progress as percentage string (e.g., '75.50')"
+              example: "75.50"
+            current:
+              type: string
+              description: "Current total minted amount as string to preserve precision"
+              example: "15750000000.000000000000000000"
+            max:
+              type: string
+              description: "Maximum supply as string to preserve precision"
+              example: "21000000000.000000000000000000"
+            total_mints:
+              type: integer
+              description: "Total count of MINT transactions for this token (v2.3+)"
+              example: 1234
+
+        # 🚀 V2.3 CLEAN STRUCTURE: Market Data Object (for DEPLOY operations)
+        market_data:
+          type: object
+          nullable: true
+          description: "Market data information (v2.3+, DEPLOY operations only). Contains pricing, volume, and holder statistics."
+          properties:
+            market_cap_btc:
+              type: string
+              nullable: true
+              description: "Market capitalization in BTC"
+              example: "8807.40000000"
+            price_btc:
+              type: string
+              nullable: true
+              description: "Current price in BTC"
+              example: "0.00041900"
+            price_source_type:
+              type: string
+              nullable: true
+              description: "Type of price data (v2.3+): 'last_traded' (executed trade), 'floor_ask' (lowest listing), 'composite' (weighted average), 'unknown'"
+              enum:
+                - last_traded
+                - floor_ask
+                - composite
+                - unknown
+              example: "last_traded"
+            volume_24h_btc:
+              type: string
+              nullable: true
+              description: "24-hour trading volume in BTC"
+            volume_7d_btc:
+              type: string
+              nullable: true
+              description: "7-day trading volume in BTC"
+            volume_30d_btc:
+              type: string
+              nullable: true
+              description: "30-day trading volume in BTC"
+            change_24h_percent:
+              type: string
+              nullable: true
+              description: "24-hour price change percentage"
+            change_7d_percent:
+              type: string
+              nullable: true
+              description: "7-day price change percentage"
+            holders:
+              type: number
+              description: "Number of unique token holders"
+              example: 31558
+            last_updated:
+              type: string
+              format: date-time
+              description: "Timestamp of last market data update"
+
+        # 📋 V2.2 COMPATIBILITY FIELDS (deprecated in v2.3)
+        progress:
+          type: string
+          nullable: true
+          description: "⚠️ DEPRECATED in v2.3: Use mint_progress.progress instead. Minting progress percentage."
+        minted_amt:
+          type: string
+          nullable: true
+          description: "⚠️ DEPRECATED in v2.3: Use mint_progress.current instead. Current minted amount."
+        holders:
+          type: number
+          nullable: true
+          description: "⚠️ DEPRECATED in v2.3: Use market_data.holders instead. Number of token holders."
+        market_cap_btc:
+          type: string
+          nullable: true
+          description: "⚠️ DEPRECATED in v2.3: Use market_data.market_cap_btc instead. Market cap in BTC."
+        floor_price_btc:
+          type: string
+          nullable: true
+          description: "⚠️ DEPRECATED in v2.3: Use market_data.floor_price_btc instead. Floor price in BTC."
+
         # NOTE: Fee fields (fee_rate_sat_vb, fee) are only in transaction-specific endpoints like /api/v2/src20/tx/{tx_hash}, not in general SRC20 or balance schemas
     Src20SnapshotDetail:
       type: object
@@ -2844,7 +3119,7 @@ components:
         - $ref: "#/components/schemas/StampBalance"
         - type: object
           properties:
-            marketData:
+            market_data:
               type: object
               nullable: true
               properties:
@@ -3849,6 +4124,67 @@ components:
           format: date-time
           description: Last update timestamp
 
+    SRC20MarketDataEnhanced:
+      type: object
+      description: Enhanced market data for SRC-20 tokens in v2.3 API responses with consistent snake_case naming
+      required:
+        - tick
+        - floor_unit_price
+        - mcap
+        - volume24
+        - holder_count
+      properties:
+        tick:
+          type: string
+          description: Token ticker symbol
+        floor_price_btc:
+          type: number
+          description: Floor price per unit in BTC (standardized naming)
+        market_cap_btc:
+          type: number
+          description: Market capitalization in BTC (standardized naming)
+        volume_24h_btc:
+          type: number
+          description: 24-hour trading volume in BTC (standardized naming)
+        volume_7d_btc:
+          type: number
+          description: 7-day trading volume in BTC (standardized naming)
+        volume_30d_btc:
+          type: number
+          description: 30-day trading volume in BTC (standardized naming)
+        stamp_url:
+          type: string
+          nullable: true
+          description: Associated stamp URL
+        tx_hash:
+          type: string
+          description: Associated transaction hash (deploy tx for consistency)
+        holder_count:
+          type: integer
+          description: Number of token holders
+        market_data_sources:
+          type: object
+          description: Market data from various exchange sources (consistent snake_case naming)
+          properties:
+            stampscan:
+              type: object
+              properties:
+                price:
+                  type: number
+                  description: Price from StampScan
+                volume24:
+                  type: number
+                  description: 24h volume from StampScan
+            openstamp:
+              type: object
+              properties:
+                price:
+                  type: number
+                  description: Price from OpenStamp
+                volume24:
+                  type: number
+                  description: 24h volume from OpenStamp
+
     CollectionMarketData:
       type: object
       description: Aggregated market data for collections
@@ -3943,8 +4279,11 @@ components:
         - type: object
           properties:
             marketData:
-              $ref: "#/components/schemas/SRC20MarketData"
+              oneOf:
+                - $ref: "#/components/schemas/SRC20MarketData"
+                - $ref: "#/components/schemas/SRC20MarketDataEnhanced"
               nullable: true
+              description: Market data structure varies by API version - v2.3 uses enhanced structure with marketDataSources
             marketDataMessage:
               type: string
               nullable: true

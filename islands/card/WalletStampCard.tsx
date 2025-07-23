@@ -391,7 +391,7 @@ const WalletStampCardComponent = (
 
   // Determine fallback display
   const fallbackDisplay = {
-    text: stamp.stamp_mimetype?.split("/")[1].toUpperCase() || "UNKNOWN",
+    text: stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() || "UNKNOWN",
     style: TEXT_STYLES.mimeType,
     title: `File Type: ${stamp.stamp_mimetype || "Unknown"}`,
   };

@@ -137,7 +137,7 @@ export class SRC101Repository {
 
     const sqlQuery = `
       SELECT
-        (@row_number:=@row_number + 1) AS row_num,
+        ROW_NUMBER() OVER (ORDER BY src101.tx_index ${validOrder}) + ? AS row_num,
         src101.tx_hash,
         src101.block_index,
         src101.p,
@@ -169,8 +169,6 @@ export class SRC101Repository {
         src101.status
       FROM
         ${SRC101_ALL_TABLE} src101
-      CROSS JOIN
-        (SELECT @row_number := ?) AS init
       ${whereClause ? `WHERE ${whereClause}` : ""}
       ORDER BY
         src101.tx_index ${validOrder}
@@ -369,7 +367,7 @@ export class SRC101Repository {
     const validOrder = "ASC";
     const sqlQuery = `
       SELECT
-        (@row_number:=@row_number + 1) AS row_num,
+        ROW_NUMBER() OVER (ORDER BY src101.tx_index ${validOrder}) + ? AS row_num,
         src101.tx_hash,
         src101.block_index,
         src101.p,
@@ -396,8 +394,6 @@ export class SRC101Repository {
         src101.block_time
       FROM
         ${SRC101_TABLE} src101
-      CROSS JOIN
-        (SELECT @row_number := ?) AS init
       ${whereClause ? `WHERE ${whereClause}` : ""}
       ORDER BY
         src101.tx_index ${validOrder}

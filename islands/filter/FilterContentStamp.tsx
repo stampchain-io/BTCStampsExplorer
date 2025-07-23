@@ -1,19 +1,20 @@
-import { useEffect, useRef, useState } from "preact/hooks";
+import { ToggleButton } from "$button";
+import { inputCheckbox } from "$form";
 import {
   STAMP_EDITIONS,
   STAMP_FILESIZES,
   STAMP_FILETYPES,
-  STAMP_MARKETPLACE as _STAMP_MARKETPLACE,
   STAMP_RANGES,
 } from "$globals";
-import { inputCheckbox } from "$form";
-import { labelLogicResponsive, labelXsPosition, labelXsR } from "$text";
-import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import { Checkbox, RangeSlider } from "$islands/filter/FilterComponents.tsx";
-import { ToggleButton } from "$button";
 import { StampFilters } from "$islands/filter/FilterOptionsStamp.tsx";
+import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
+import { labelLogicResponsive, labelXsPosition, labelXsR } from "$text";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 const defaultFilters: StampFilters = {
+  // Stamp Type
+  stampType: "classic",
   // Market Place
   market: "",
   dispensers: false,
@@ -547,6 +548,7 @@ export const FilterContentStamp = ({
 }) => {
   const [filters, setFilters] = useState(initialFilters);
   const [expandedSections, setExpandedSections] = useState({
+    stampType: true, // Always show stamp type filter
     fileType: hasActiveFilters("fileType", filters),
     fileSize: hasActiveFilters("fileSize", filters),
     editions: hasActiveFilters("editions", filters),
@@ -910,8 +912,53 @@ export const FilterContentStamp = ({
     });
   };
 
+  // Handler for stamp type changes
+  const handleStampTypeChange = (
+    type: "cursed" | "classic" | "posh", // Removed "all" and "stamps"
+  ) => {
+    setFilters((prevFilters) => {
+      const newFilters = {
+        ...prevFilters,
+        stampType: type,
+      };
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
   return (
     <div ref={drawerRef}>
+      {/* 🎯 STAMP TYPE FILTER - BEAUTIFUL RADIO DESIGN! */}
+      <CollapsibleSection
+        title="STAMP TYPE"
+        section="stampType"
+        expanded={expandedSections.stampType}
+        toggle={() => toggleSection("stampType")}
+        variant="collapsibleTitle"
+      >
+        <Radio
+          label="CLASSIC"
+          value="classic"
+          checked={filters.stampType === "classic"}
+          onChange={() => handleStampTypeChange("classic")}
+          name="stampType"
+        />
+        <Radio
+          label="CURSED"
+          value="cursed"
+          checked={filters.stampType === "cursed"}
+          onChange={() => handleStampTypeChange("cursed")}
+          name="stampType"
+        />
+        <Radio
+          label="POSH COLLECTION"
+          value="posh"
+          checked={filters.stampType === "posh"}
+          onChange={() => handleStampTypeChange("posh")}
+          name="stampType"
+        />
+      </CollapsibleSection>
+
       <CollapsibleSection
         title="MARKET PLACE"
         section="market"

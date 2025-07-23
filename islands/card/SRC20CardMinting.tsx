@@ -43,7 +43,10 @@ export function SRC20CardMinting(
 
       {/* Holders Cell */}
       <td class={`${cellAlign(2, totalColumns)} ${valueSm}`}>
-        {Number(src20.holders).toLocaleString()}
+        {Number(
+          (src20 as any)?.market_data?.holder_count ||
+            (src20 as any)?.holders || 0,
+        ).toLocaleString()}
       </td>
 
       {/* TRENDING */}

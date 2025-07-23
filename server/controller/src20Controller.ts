@@ -1,5 +1,4 @@
 import {
-    PaginatedSrc20ResponseBody,
     SRC20SnapshotRequestParams
 } from "$globals";
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
@@ -7,7 +6,7 @@ import { SRC20BalanceRequestParams, SRC20TickPageData } from "$lib/types/src20.d
 import { formatAmount } from "$lib/utils/formatUtils.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/blockService.ts";
-import { CircuitBreakerService, MARKET_CAP_FALLBACK_DATA, TRENDING_FALLBACK_DATA } from "$server/services/circuitBreaker.ts";
+import { CircuitBreakerService, TRENDING_FALLBACK_DATA } from "$server/services/circuitBreaker.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { MarketDataEnrichmentService } from "$server/services/src20/marketDataEnrichmentService.ts";
 import { MarketListingAggregated } from "$types/index.d.ts";
@@ -22,29 +21,34 @@ export class Src20Controller {
     volume7d?: number;
     change7d?: number;
   } {
-    // Use floor price or regular price (keep in BTC for the floor_unit_price field)
-    const priceInBTC = data.floorPriceBTC || data.priceBTC || 0;
-    const priceInSats = priceInBTC * 1e8;
+    // Convert SRC20MarketData to MarketListingAggregated format
 
     return {
       tick: data.tick,
-      floor_unit_price: priceInBTC, // Keep in BTC as SRC20Card expects
-      mcap: data.marketCapBTC,
-      volume24: data.volume24hBTC,
-      stamp_url: null, // Not available in cache yet
-      tx_hash: "", // Not available in cache yet
-      holder_count: data.holderCount,
-      change24: data.priceChange24hPercent, // Add the 24h change from cache
-      volume7d: data.volume7dBTC, // Add the 7d volume from cache
-      change7d: data.priceChange7dPercent, // Add the 7d change from cache
+      // ✅ v2.3 STANDARDIZED FIELDS
+      floor_price_btc: data.floorPriceBTC,
+      market_cap_btc: data.marketCapBTC || 0,
+      volume_24h_btc: data.volume24hBTC || 0,
+
+      // 🔄 BACKWARD COMPATIBILITY: Legacy field names
+      floor_unit_price: data.floorPriceBTC || 0,
+      mcap: data.marketCapBTC || 0,
+      volume24: data.volume24hBTC || 0,
+
+      stamp_url: null,
+      tx_hash: "", // SRC20 tokens don't have tx_hash in market data
+      holder_count: data.holderCount || 0,
+      change24: data.priceChange24hPercent || 0,
+      volume7d: data.volume7dBTC || 0,
+      change7d: data.priceChange7dPercent || 0,
       market_data: {
         stampscan: {
-          price: priceInSats, // Keep in sats for compatibility
-          volume24: data.volume24hBTC / 2, // Split volume between sources
+          price: (data.floorPriceBTC || 0) / 2, // Split price between sources, handle null
+          volume_24h_btc: (data.volume24hBTC || 0) / 2, // Split volume between sources
         },
         openstamp: {
-          price: priceInSats, // Keep in sats for compatibility
-          volume24: data.volume24hBTC / 2, // Split volume between sources
+          price: (data.floorPriceBTC || 0) / 2, // Split price between sources, handle null
+          volume_24h_btc: (data.volume24hBTC || 0) / 2, // Split volume between sources
         },
       },
     };
@@ -92,13 +96,30 @@ export class Src20Controller {
       // 🚀 CENTRALIZED MARKET DATA ENRICHMENT (v2.3 format)
       // Middleware will transform to v2.2 (remove market_data) if needed
       if (balanceParams.includeMarketData) {
-        processedData = await MarketDataEnrichmentService.enrichWithMarketData(
-          processedData,
-          {
-            bulkOptimized: true,
-            enableLogging: false
-          }
-        );
+        try {
+          processedData = await MarketDataEnrichmentService.enrichWithMarketData(
+            processedData,
+            {
+              includeExtendedFields: true, // ✅ Include volume_7d_btc, volume_30d_btc for v2.3
+              bulkOptimized: true,
+              enableLogging: true // ✅ Enable logging for error tracking
+            }
+          );
+        } catch (marketDataError) {
+          // ✅ Enhanced error handling for market data enrichment failures
+          console.warn("Market data enrichment failed for balance request:", {
+            error: marketDataError,
+            params: {
+              address: balanceParams.address,
+              tick: balanceParams.tick,
+              itemCount: Array.isArray(processedData) ? processedData.length : 1
+            }
+          });
+
+          // ✅ Graceful degradation: continue with balance data but no market enrichment
+          // The MarketDataEnrichmentService already handles this, but we log the failure
+          console.info("Balance request continuing without market data enrichment");
+        }
       }
 
       if (balanceParams.includeMintData && Array.isArray(processedData)) {
@@ -141,12 +162,33 @@ export class Src20Controller {
 
       return restructuredResult;
     } catch (error) {
-      console.error("Error processing SRC20 balance request:", error);
-      console.error("Params:", JSON.stringify(balanceParams));
-      // Return an empty response instead of throwing an error
+      // ✅ Enhanced error handling with specific error categorization
+      console.error("Error processing SRC20 balance request:", {
+        error: error instanceof Error ? error.message : error,
+        stack: error instanceof Error ? error.stack : undefined,
+        params: {
+          address: balanceParams.address,
+          tick: balanceParams.tick,
+          includeMarketData: balanceParams.includeMarketData,
+          limit: balanceParams.limit,
+          page: balanceParams.page
+        }
+      });
+
+      // ✅ Attempt to get last block for error response, with fallback
+      let lastBlock;
+      try {
+        lastBlock = await BlockService.getLastBlock();
+      } catch (blockError) {
+        console.warn("Failed to get last block in error handler:", blockError);
+        lastBlock = 0; // Fallback value
+      }
+
+      // ✅ Return structured error response with graceful degradation
       return {
-        last_block: await BlockService.getLastBlock(),
+        last_block: lastBlock,
         data: balanceParams.address && balanceParams.tick ? {} : [],
+        // Note: API middleware will add appropriate error metadata if needed
       };
     }
   }
@@ -332,145 +374,6 @@ export class Src20Controller {
     const percentage = (amountNum / totalNum) * 100;
     return percentage.toFixed(2);
   }
-
-  static async fetchFullyMintedByMarketCapV2(
-    limit: number = 50,
-    page: number = 1,
-    sortBy: string = "TRENDING",
-    sortDirection: string = "desc",
-  ): Promise<PaginatedSrc20ResponseBody> {
-    const circuitBreaker = CircuitBreakerService.getMarketCapBreaker();
-
-    const fallbackData = {
-      ...MARKET_CAP_FALLBACK_DATA,
-      page,
-      limit,
-      last_block: await BlockService.getLastBlock().catch(() => 0),
-    } as PaginatedSrc20ResponseBody;
-
-    return circuitBreaker.execute(async () => {
-      console.log(`[MarketCapV2] Fetching market data directly from src20_market_data table...`);
-
-      // Use the optimized market data repository method
-      const marketDataLimit = Math.min(limit * 3, 150); // Get more data for sorting, but not too much
-      const cachedMarketData = await SRC20Service.QueryService.getAllSRC20MarketData(marketDataLimit);
-
-      console.log(`[MarketCapV2] Retrieved ${cachedMarketData.length} market data entries`);
-
-      if (cachedMarketData.length === 0) {
-        console.log("[MarketCapV2] No market data found, returning empty result");
-        return {
-          data: [],
-          page,
-          totalPages: 0,
-          limit,
-          last_block: await BlockService.getLastBlock(),
-          total: 0,
-        } as PaginatedSrc20ResponseBody;
-      }
-
-      // Get the ticks from market data (already sorted by market cap)
-      const ticks = cachedMarketData.map(data => data.tick);
-
-      // Fetch basic SRC20 deploy data for these ticks only
-      const src20Result = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
-        {
-          tick: ticks,
-          limit: marketDataLimit,
-          page: 1,
-          op: "DEPLOY",
-          sortBy: "DESC"
-        },
-        {
-          onlyFullyMinted: true,
-          includeMarketData: false, // We already have market data
-          enrichWithProgress: true,
-        }
-      );
-
-      if (!src20Result.data || !Array.isArray(src20Result.data)) {
-        console.log("[MarketCapV2] No SRC20 deploy data found");
-        return {
-          data: [],
-          page,
-          totalPages: 0,
-          limit,
-          last_block: await BlockService.getLastBlock(),
-          total: 0,
-        } as PaginatedSrc20ResponseBody;
-      }
-
-      // Create a map of tick -> SRC20 data for fast lookup
-      const src20DataMap = new Map();
-      src20Result.data.forEach(item => {
-        src20DataMap.set(item.tick, item);
-      });
-
-      // Create a map of market data for service layer
-      const marketDataMap = new Map();
-      cachedMarketData.forEach(marketData => {
-        marketDataMap.set(marketData.tick, marketData);
-      });
-
-      // Merge market data with SRC20 deploy data in the correct order
-      const baseData = cachedMarketData
-        .map(marketData => {
-          const src20Data = src20DataMap.get(marketData.tick);
-          if (!src20Data) {
-            return null; // Skip if no deploy data found
-          }
-
-          return {
-            ...src20Data,
-            holders: marketData.holderCount || src20Data.holders || 0,
-          };
-        })
-        .filter(item => item !== null); // Remove null entries
-
-      // 🚀 SERVICE LAYER: Structure data with market data
-      const structuredData = SRC20Service.QueryService.structureWithMarketData(baseData, marketDataMap);
-
-      // Apply sorting if needed (market data is already sorted by market cap)
-      const sortedData = structuredData;
-      if (sortBy === "HOLDERS") {
-        sortedData.sort((a: any, b: any) => {
-          const aHolders = Number(a.holders) || 0;
-          const bHolders = Number(b.holders) || 0;
-          return sortDirection === "asc" ? aHolders - bHolders : bHolders - aHolders;
-        });
-      } else if (sortBy === "VOLUME") {
-        sortedData.sort((a: any, b: any) => {
-          const aVolume = a.volume24 || 0;
-          const bVolume = b.volume24 || 0;
-          return sortDirection === "asc" ? aVolume - bVolume : bVolume - aVolume;
-        });
-      } else if (sortBy === "DEPLOY") {
-        sortedData.sort((a: any, b: any) => {
-          const aTime = new Date(a.block_time).getTime();
-          const bTime = new Date(b.block_time).getTime();
-          return sortDirection === "asc" ? aTime - bTime : bTime - aTime;
-        });
-      }
-      // "TRENDING" (default) is already sorted by market cap from the market data query
-
-      // Apply pagination
-      const startIndex = (page - 1) * limit;
-      const paginatedData = sortedData.slice(startIndex, startIndex + limit);
-      const totalPages = Math.ceil(sortedData.length / limit);
-
-      console.log(`[MarketCapV2] Returning ${paginatedData.length} items (page ${page}/${totalPages})`);
-
-      return {
-        data: paginatedData,
-        page,
-        totalPages,
-        limit,
-        last_block: await BlockService.getLastBlock(),
-        total: sortedData.length,
-      } as PaginatedSrc20ResponseBody;
-    }, fallbackData);
-  }
-
 
   static async fetchTrendingActiveMintingTokensV2(
     limit: number,

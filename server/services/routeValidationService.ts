@@ -50,6 +50,100 @@ export function validateRequiredParams(
 }
 
 /**
+ * Validates sort parameter for SRC-20 endpoints with operation-specific restrictions
+ * @param url URL object containing search parameters
+ * @param operation The SRC-20 operation type (DEPLOY, MINT, TRANSFER)
+ * @param paramName Name of the sort parameter (default: "sortBy")
+ * @returns ValidationResult with validated sort direction or error response
+ */
+export function validateSRC20SortParam(
+  url: URL,
+  operation?: string,
+  paramName = "sortBy",
+): ValidationResult<string> {
+  const sortParam = url.searchParams.get(paramName);
+
+  // If no sort parameter, return default
+  if (!sortParam) {
+    return {
+      isValid: true,
+      data: "DESC",
+    };
+  }
+
+  const normalizedSort = sortParam.toUpperCase();
+  const normalizedOp = operation?.toUpperCase();
+
+  // Basic sorting (always valid)
+  const basicSortValues = [
+    "ASC", "DESC", // Basic sorting
+    "DEPLOY_DESC", "DEPLOY_ASC", // Deploy date (block_index)
+    "BLOCK_DESC", "BLOCK_ASC", // Block index
+    "TICK_DESC", "TICK_ASC", // Alphabetical by tick name
+    "CREATOR_DESC", "CREATOR_ASC", // Sort by creator
+  ];
+
+  // DEPLOY-only sorting (requires market data and token metrics)
+  const deployOnlySortValues = [
+    "HOLDERS_DESC", "HOLDERS_ASC", // Holder count sorting
+    // Market Data Sorting (DEPLOY only)
+    "MARKET_CAP_DESC", "MARKET_CAP_ASC", // Market cap (BTC)
+    "VALUE_DESC", "VALUE_ASC", // Floor price / market value
+    "PRICE_DESC", "PRICE_ASC", // Alias for value
+    "VOLUME_24H_DESC", "VOLUME_24H_ASC", // 24h trading volume
+    "VOLUME_7D_DESC", "VOLUME_7D_ASC", // 7d trading volume
+    "VOLUME_30D_DESC", "VOLUME_30D_ASC", // 30d trading volume
+    "CHANGE_24H_DESC", "CHANGE_24H_ASC", // 24h price change %
+    "CHANGE_7D_DESC", "CHANGE_7D_ASC", // 7d price change %
+    // Token Metrics Sorting (DEPLOY only) - CIRCULATING removed
+    "SUPPLY_DESC", "SUPPLY_ASC", // Max supply
+    "PROGRESS_DESC", "PROGRESS_ASC", // Mint progress %
+    "LIMIT_DESC", "LIMIT_ASC", // Mint limit per tx
+    "DECIMALS_DESC", "DECIMALS_ASC", // Token decimals
+    // 🚀 NEW V2.3 TRENDING AND MINT VELOCITY SORTING
+    "TRENDING_MINTING_DESC", "TRENDING_MINTING_ASC", // Trending mint activity (percentage-based)
+    "MINT_VELOCITY_DESC", "MINT_VELOCITY_ASC", // Mint velocity (mints per hour)
+    "TRENDING_24H_DESC", "TRENDING_24H_ASC", // 24h trending activity
+    "TRENDING_7D_DESC", "TRENDING_7D_ASC", // 7d trending activity
+    "TRENDING_30D_DESC", "TRENDING_30D_ASC", // 30d trending activity
+  ];
+
+  // MINT/TRANSFER specific sorting
+  const mintTransferSortValues = [
+    "AMOUNT_DESC", "AMOUNT_ASC", // Transaction amount
+    "RECENT_DESC", "RECENT_ASC", // Recent activity
+  ];
+
+  // Combine valid values based on operation
+  let validSortValues = [...basicSortValues];
+
+  if (normalizedOp === "DEPLOY") {
+    validSortValues = [...basicSortValues, ...deployOnlySortValues];
+  } else if (normalizedOp === "MINT" || normalizedOp === "TRANSFER") {
+    validSortValues = [...basicSortValues, ...mintTransferSortValues];
+  } else {
+    // No operation specified - allow all for backward compatibility
+    validSortValues = [...basicSortValues, ...deployOnlySortValues, ...mintTransferSortValues];
+  }
+
+  // Validate sort parameter
+  if (!validSortValues.includes(normalizedSort)) {
+    const operationNote = normalizedOp ? ` for ${normalizedOp} operations` : "";
+    return {
+      isValid: false,
+      error: ApiResponseUtil.badRequest(
+        `Invalid sort parameter${operationNote}. Must be one of: ${validSortValues.join(", ")}`,
+      ),
+    };
+  }
+
+  return {
+    isValid: true,
+    data: normalizedSort,
+  };
+}
+
+/**
  * Validates sort parameter and returns appropriate response
  * @param url URL object containing search params
  * @param paramName Name of the sort parameter (default: "sort")
@@ -60,7 +154,6 @@ export function validateSortParam(
   paramName = "sort",
 ): ValidationResult<string> {
   const sortParam = url.searchParams.get(paramName);
-  const normalizedSort = sortParam?.toUpperCase() as SortDirection;
 
   // If no sort parameter, return default
   if (!sortParam) {
@@ -70,12 +163,41 @@ export function validateSortParam(
     };
   }
 
-  // Validate sort direction
-  if (!["ASC", "DESC"].includes(normalizedSort)) {
+  const normalizedSort = sortParam.toUpperCase();
+
+  // Extended validation for SRC-20 advanced sorting
+  const validSortValues = [
+    "ASC", "DESC", // Basic sorting
+    "HOLDERS_DESC", "HOLDERS_ASC", // Holder count sorting
+    // Market Data Sorting
+    "MARKET_CAP_DESC", "MARKET_CAP_ASC", // Market cap (BTC)
+    "VALUE_DESC", "VALUE_ASC", // Floor price / market value
+    "PRICE_DESC", "PRICE_ASC", // Alias for value
+    "VOLUME_24H_DESC", "VOLUME_24H_ASC", // 24h trading volume
+    "VOLUME_7D_DESC", "VOLUME_7D_ASC", // 7d trading volume
+    "VOLUME_30D_DESC", "VOLUME_30D_ASC", // 30d trading volume
+    "CHANGE_24H_DESC", "CHANGE_24H_ASC", // 24h price change %
+    "CHANGE_7D_DESC", "CHANGE_7D_ASC", // 7d price change %
+    // Token Metrics Sorting - CIRCULATING removed
+    "SUPPLY_DESC", "SUPPLY_ASC", // Max supply
+    "PROGRESS_DESC", "PROGRESS_ASC", // Mint progress %
+    "LIMIT_DESC", "LIMIT_ASC", // Mint limit per tx
+    "DECIMALS_DESC", "DECIMALS_ASC", // Token decimals
+    // Activity & Time Sorting
+    "DEPLOY_DESC", "DEPLOY_ASC", // Deploy date (block_index)
+    "RECENT_DESC", "RECENT_ASC", // Recent activity
+    "BLOCK_DESC", "BLOCK_ASC", // Block index
+    // Alphabetical Sorting
+    "TICK_DESC", "TICK_ASC", // Alphabetical by tick name
+    "CREATOR_DESC", "CREATOR_ASC", // Sort by creator
+  ];
+
+  // Validate sort parameter
+  if (!validSortValues.includes(normalizedSort)) {
     return {
       isValid: false,
       error: ApiResponseUtil.badRequest(
-        `Invalid sort parameter. Must be one of: ASC, DESC`,
+        `Invalid sort parameter. Must be one of: ${validSortValues.join(", ")}`,
       ),
     };
   }
@@ -133,9 +255,9 @@ export function validateFileUpload(
   // Check file data if present
   if (body.fileData) {
     const fileData = String(body.fileData);
-    
+
     // Check file size
-    const base64Data = fileData.includes(";base64,") 
+    const base64Data = fileData.includes(";base64,")
       ? fileData.split(";base64,")[1]
       : fileData;
     const sizeInBytes = (base64Data.length * 3) / 4; // Base64 size estimation
@@ -166,4 +288,4 @@ export function validateFileUpload(
     isValid: true,
     data: body,
   };
-} 
+}

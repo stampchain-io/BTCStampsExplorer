@@ -1,15 +1,15 @@
 import { Handlers } from "$fresh/server.ts";
 import { PaginatedTickResponseBody } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { isValidSrc20Tick } from "$lib/utils/identifierUtils.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { BigFloat } from "bigfloat/mod.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 import {
   DEFAULT_PAGINATION,
   validateRequiredParams,
   validateSortParam,
 } from "$server/services/routeValidationService.ts";
-import { isValidSrc20Tick } from "$lib/utils/identifierUtils.ts";
+import { BigFloat } from "bigfloat/mod.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -43,6 +43,10 @@ export const handler: Handlers = {
       const { limit, page } = pagination;
       const opParam = url.searchParams.get("op") || undefined;
 
+      // 🚀 NEW V2.3 PARAMETER
+      const includeProgress =
+        url.searchParams.get("includeProgress") === "true";
+
       // Validate sort parameter
       const sortValidation = validateSortParam(url, "sortBy");
       if (!sortValidation.isValid) {
@@ -56,6 +60,8 @@ export const handler: Handlers = {
         page: page || DEFAULT_PAGINATION.page,
         ...(opParam && { op: opParam }),
         ...(sortValidation.data && { sortBy: sortValidation.data }),
+        // 🚀 NEW V2.3 PARAMETER
+        ...(includeProgress && { includeProgress }),
       };
 
       // Fetch data using controller

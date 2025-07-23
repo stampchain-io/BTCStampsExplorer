@@ -1,9 +1,9 @@
 /* ===== SRC20 RECENT TRANSFERS GALLERY COMPONENT ===== */
+import { StampCard } from "$card";
+import type { StampTransaction } from "$lib/types/stamping.ts";
+import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import type { StampTransaction } from "$lib/types/stamping.ts";
-import { StampCard } from "$card";
-import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function SRC20TransfersGallery(): JSX.Element {
@@ -16,7 +16,12 @@ export default function SRC20TransfersGallery(): JSX.Element {
     const fetchRecentTransactions = async () => {
       try {
         const response = await fetch(
-          "/api/internal/src20/trending?type=transfer&limit=5&page=1&transactionCount=1000",
+          "/api/v2/src20?op=TRANSFER&sortBy=RECENT_DESC&limit=5&page=1",
+          {
+            headers: {
+              "X-API-Version": "2.3",
+            },
+          },
         );
         if (!response.ok) {
           throw new Error("Failed to fetch recent transactions");

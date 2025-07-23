@@ -23,15 +23,22 @@ describe("CircuitBreaker", () => {
   };
 
   beforeEach(() => {
-    circuitBreaker = new CircuitBreaker("TestService", config);
+    circuitBreaker = new CircuitBreaker({
+      name: "TestService",
+      failureThreshold: config.failureThreshold,
+      successThreshold: config.successThreshold,
+      timeout: config.recoveryTimeout,
+      requestTimeout: config.timeout,
+      monitoringPeriod: config.monitoringPeriod,
+    });
   });
 
   describe("Initial State", () => {
     it("should start in CLOSED state", () => {
       const metrics = circuitBreaker.getMetrics();
       assertEquals(metrics.state, CircuitState.CLOSED);
-      assertEquals(metrics.failures, 0);
-      assertEquals(metrics.successes, 0);
+      assertEquals(metrics.failureCount, 0);
+      assertEquals(metrics.successCount, 0);
       assertEquals(circuitBreaker.isHealthy(), true);
     });
   });
@@ -45,8 +52,8 @@ describe("CircuitBreaker", () => {
       assertEquals(result, "success");
       const metrics = circuitBreaker.getMetrics();
       assertEquals(metrics.state, CircuitState.CLOSED);
-      assertEquals(metrics.totalSuccesses, 1);
-      assertEquals(metrics.totalRequests, 1);
+      assertEquals(metrics.successCount, 1);
+      assertEquals(metrics.requestCount, 1);
     });
 
     it("should reset failure count after success", async () => {
@@ -64,14 +71,14 @@ describe("CircuitBreaker", () => {
       } catch {}
 
       let metrics = circuitBreaker.getMetrics();
-      assertEquals(metrics.failures, 2);
+      assertEquals(metrics.failureCount, 2);
 
       // Success should reset failure count
       await circuitBreaker.execute(async () => "success");
 
       metrics = circuitBreaker.getMetrics();
-      assertEquals(metrics.failures, 0);
-      assertEquals(metrics.successes, 1);
+      assertEquals(metrics.failureCount, 0);
+      assertEquals(metrics.successCount, 1);
     });
   });
 
@@ -84,8 +91,8 @@ describe("CircuitBreaker", () => {
       } catch {}
 
       const metrics = circuitBreaker.getMetrics();
-      assertEquals(metrics.totalFailures, 1);
-      assertEquals(metrics.totalRequests, 1);
+      assertEquals(metrics.failureCount, 1);
+      assertEquals(metrics.requestCount, 1);
       assertEquals(metrics.state, CircuitState.CLOSED);
     });
 
@@ -150,7 +157,7 @@ describe("CircuitBreaker", () => {
       } catch {}
 
       const metrics = circuitBreaker.getMetrics();
-      assertEquals(metrics.totalFailures, 1);
+      assertEquals(metrics.failureCount, 1);
     });
   });
 
@@ -247,7 +254,7 @@ describe("CircuitBreaker", () => {
       await circuitBreaker.execute(async () => "success 2");
 
       const metrics = circuitBreaker.getMetrics();
-      assertEquals(metrics.totalRequests, 3);
+      assertEquals(metrics.requestCount, 3);
       assertEquals(metrics.totalSuccesses, 2);
       assertEquals(metrics.totalFailures, 1);
       assertExists(metrics.lastSuccessTime);
@@ -289,8 +296,8 @@ describe("CircuitBreaker", () => {
 
       metrics = circuitBreaker.getMetrics();
       assertEquals(metrics.state, CircuitState.CLOSED);
-      assertEquals(metrics.failures, 0);
-      assertEquals(metrics.successes, 0);
+      assertEquals(metrics.failureCount, 0);
+      assertEquals(metrics.successCount, 0);
       assertEquals(circuitBreaker.isHealthy(), true);
     });
   });
