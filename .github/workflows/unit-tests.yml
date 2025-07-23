@@ -1,16 +1,6 @@
 name: Unit Tests with Fixtures
 
 on:
-  push:
-    branches: [main, dev]
-    paths:
-      - "tests/unit/**"
-      - "tests/fixtures/**"
-      - "tests/mocks/**"
-      - "server/database/**"
-      - "lib/**"
-      - "deno.json"
-      - ".github/workflows/unit-tests.yml"
   pull_request:
     branches: [main, dev]
     paths:
