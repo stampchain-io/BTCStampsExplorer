@@ -92,6 +92,11 @@ const mockFetchResponses = {
 describe("BTCPriceService", () => {
   let originalFetch: typeof globalThis.fetch;
   let originalDb: DatabaseManager;
+  let activeTimers: Set<any> = new Set();
+
+  // Override setTimeout to track timers
+  const originalSetTimeout = globalThis.setTimeout;
+  const originalClearTimeout = globalThis.clearTimeout;
 
   beforeEach(() => {
     // Reset cache
@@ -103,18 +108,27 @@ describe("BTCPriceService", () => {
     // Save original database
     originalDb = (BTCPriceService as any).db;
 
+    // Track all timers
+    activeTimers = new Set();
+    globalThis.setTimeout = ((fn: any, delay?: number, ...args: any[]) => {
+      const timer = originalSetTimeout(fn, delay, ...args);
+      activeTimers.add(timer);
+      return timer;
+    }) as any;
+
+    globalThis.clearTimeout = (timer: any) => {
+      activeTimers.delete(timer);
+      originalClearTimeout(timer);
+    };
+
     // Mock fetch with immediate responses
     globalThis.fetch = async (
       url: string | URL | Request,
       options?: RequestInit,
     ) => {
-      // Immediately abort any abort signal to prevent timer leaks
-      if (options?.signal) {
-        const signal = options.signal as AbortSignal;
-        if (signal.addEventListener) {
-          // Remove any abort listeners to prevent timer leaks
-          signal.addEventListener("abort", () => {}, { once: true });
-        }
+      // If there's an abort signal with a timeout, clear it immediately
+      if (options?.signal && "reason" in options.signal) {
+        // Signal already aborted, ignore
       }
 
       const urlString = typeof url === "string" ? url : url.toString();
@@ -170,6 +184,16 @@ describe("BTCPriceService", () => {
   });
 
   afterEach(async () => {
+    // Clear all active timers
+    for (const timer of activeTimers) {
+      originalClearTimeout(timer);
+    }
+    activeTimers.clear();
+
+    // Restore original timer functions
+    globalThis.setTimeout = originalSetTimeout;
+    globalThis.clearTimeout = originalClearTimeout;
+
     // Restore original fetch
     globalThis.fetch = originalFetch;
     // Clear cache
