@@ -1,17 +1,17 @@
 /* ===== DONATE STAMP MODAL COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
-import type { StampRow } from "$globals";
-import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { walletContext } from "$client/wallet/wallet.ts";
-import { ModalBase } from "$layout";
-import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
-import { handleModalClose } from "$components/layout/ModalBase.tsx";
-import { closeModal, openModal } from "$islands/modal/states.ts";
-import { StampImage } from "$content";
 import { sliderBar, sliderKnob } from "$button";
-import { tooltipImage } from "$notification";
+import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
+import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
+import { StampImage } from "$content";
+import type { StampRow } from "$globals";
+import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
+import { closeModal, openModal } from "$islands/modal/states.ts";
+import { ModalBase } from "$layout";
+import { logger } from "$lib/utils/logger.ts";
+import { tooltipImage } from "$notification";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface Props {
@@ -142,12 +142,12 @@ const DonateStampModal = ({
             handleChangeFee={handleChangeFee}
             dispenser={dispenser}
           />,
-          "scaleUpDown",
+          "slideUpDown",
         );
       });
 
       // Open the Connect Wallet Modal
-      openModal(modalContent, "scaleUpDown");
+      openModal(modalContent, "slideUpDown");
       return;
     }
 

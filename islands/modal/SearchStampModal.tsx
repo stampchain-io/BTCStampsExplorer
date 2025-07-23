@@ -223,7 +223,7 @@ export function SearchStampModal({
         />
       </ModalSearchBase>
     );
-    openModal(modalContent, "scaleDownUp");
+    openModal(modalContent, "slideDownUp");
   };
 
   useEffect(() => {

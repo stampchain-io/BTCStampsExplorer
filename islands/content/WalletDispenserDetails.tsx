@@ -1,17 +1,17 @@
 /* ===== WALLET DISPENSER DETAILS COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
-import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
-import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
-import { StampRow } from "$globals";
-import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
+import { Button } from "$button";
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { StampImage } from "$content";
-import { containerBackground } from "$layout";
-import { headingGreyLD, textXs, titleGreyLD } from "$text";
-import { Button } from "$button";
-import { tooltipIcon } from "$notification";
-import { openModal } from "$islands/modal/states.ts";
+import { StampRow } from "$globals";
 import { Icon } from "$icon";
+import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
+import { containerBackground } from "$layout";
+import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
+import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
+import { tooltipIcon } from "$notification";
+import { headingGreyLD, textXs, titleGreyLD } from "$text";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface WalletDispenserDetailsProps {
@@ -300,7 +300,7 @@ function DispenserStats({
         dispenser={firstDispenser}
       />
     );
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   /* ===== RENDER ===== */

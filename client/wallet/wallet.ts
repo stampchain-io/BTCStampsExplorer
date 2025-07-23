@@ -137,7 +137,7 @@ export const walletContext: WalletContext = {
   },
   showConnectModal: () => {
     const { modalContent } = stackConnectWalletModal();
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   },
 };
 

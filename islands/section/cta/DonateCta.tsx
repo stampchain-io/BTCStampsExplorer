@@ -1,10 +1,14 @@
 /* ===== DONATE CTA COMPONENT ===== */
-import { useEffect, useRef, useState } from "preact/hooks";
+import { Button } from "$button";
 import { StampCard } from "$card";
 import { StampRow } from "$globals";
-import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
+import { Icon } from "$icon";
 import DonateStampModal from "$islands/modal/DonateStampModal.tsx";
+import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
+import { openModal } from "$islands/modal/states.ts";
 import { DonateStampData, Transaction, TxOutput } from "$layout";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { tooltipIcon } from "$notification";
 import {
   headingGrey,
   labelSm,
@@ -12,11 +16,7 @@ import {
   text,
   titlePurpleLD,
 } from "$text";
-import { tooltipIcon } from "$notification";
-import { Button } from "$button";
-import { Icon } from "$icon";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { openModal } from "$islands/modal/states.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
 const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
@@ -275,7 +275,7 @@ export default function DonateCta() {
         dispenser={dispenser}
       />
     );
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   const handleOpenReceiveModal = () => {
@@ -285,7 +285,7 @@ export default function DonateCta() {
         title="DONATE"
       />
     );
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   /* ===== SUBCOMPONENTS ===== */

@@ -702,7 +702,7 @@ export default function WalletDashboardDetails({
         handleChangeFee={setFee}
       />
     );
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   const handleOpenReceiveModal = () => {
@@ -712,7 +712,7 @@ export default function WalletDashboardDetails({
         title="RECEIVE"
       />
     );
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   /* ===== RENDER ===== */

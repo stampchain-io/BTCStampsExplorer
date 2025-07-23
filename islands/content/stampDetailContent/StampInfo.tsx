@@ -67,7 +67,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     );
 
     // Show modal with animation
-    openModal(modalContent, "scaleUpDown");
+    openModal(modalContent, "slideUpDown");
   };
 
   const createdDate = (() => {

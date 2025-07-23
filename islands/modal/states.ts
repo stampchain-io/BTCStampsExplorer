@@ -4,7 +4,7 @@ import { signal } from "@preact/signals";
 import type { ComponentChildren } from "preact";
 
 /* ===== MODAL TYPES ===== */
-export type ModalAnimation = "scaleUpDown" | "scaleDownUp" | "zoomInOut";
+export type ModalAnimation = "slideUpDown" | "slideDownUp" | "zoomInOut";
 
 export interface ModalConfig {
   type: "connect" | "search" | "preview" | "filter";
@@ -13,7 +13,7 @@ export interface ModalConfig {
   props?: Record<string, unknown>;
 }
 
-export const DEFAULT_MODAL_ANIMATION: ModalAnimation = "scaleUpDown";
+export const DEFAULT_MODAL_ANIMATION: ModalAnimation = "slideUpDown";
 
 /* ===== MODAL STATE ===== */
 export interface GlobalModalState {
@@ -26,7 +26,7 @@ export interface GlobalModalState {
 export const globalModal = signal<GlobalModalState>({
   isOpen: false,
   content: null,
-  animation: "scaleUpDown",
+  animation: "slideUpDown",
 });
 
 export interface SearchState {
@@ -44,7 +44,7 @@ export const searchState = signal<SearchState>({
 /* ===== MODAL ACTIONS ===== */
 export function openModal(
   content: ComponentChildren,
-  animation: ModalAnimation = "scaleUpDown",
+  animation: ModalAnimation = "slideUpDown",
 ) {
   if (!content) {
     return;

@@ -1,6 +1,6 @@
 // islands/modal/ModalOverlay.tsx
-import { useEffect, useRef, useState } from "preact/hooks";
 import { ModalAnimation } from "$islands/modal/states.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 interface ModalOverlayProps {
   handleClose: () => void;
@@ -11,7 +11,7 @@ interface ModalOverlayProps {
 export default function ModalOverlay({
   handleClose,
   children,
-  animation = "scaleUpDown", // default animation
+  animation = "slideUpDown", // default animation
 }: ModalOverlayProps) {
   const [status, setStatus] = useState<boolean>(false);
   const focusTrapRef = useRef<HTMLDivElement>(null);
