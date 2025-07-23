@@ -31,7 +31,6 @@ import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts"
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
 import * as $api_v2_block_block_index_ from "./routes/api/v2/block/[block_index].ts";
 import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_count/[...number].ts";
-import * as $api_v2_block_related_block_index_ from "./routes/api/v2/block/related/[block_index].ts";
 import * as $api_v2_collections_by_name_name_ from "./routes/api/v2/collections/by-name/[name].ts";
 import * as $api_v2_collections_creator_creator_ from "./routes/api/v2/collections/creator/[creator].ts";
 import * as $api_v2_collections_index from "./routes/api/v2/collections/index.ts";
@@ -334,8 +333,6 @@ const manifest = {
     "./routes/api/v2/block/[block_index].ts": $api_v2_block_block_index_,
     "./routes/api/v2/block/block_count/[...number].ts":
       $api_v2_block_block_count_number_,
-    "./routes/api/v2/block/related/[block_index].ts":
-      $api_v2_block_related_block_index_,
     "./routes/api/v2/collections/by-name/[name].ts":
       $api_v2_collections_by_name_name_,
     "./routes/api/v2/collections/creator/[creator].ts":

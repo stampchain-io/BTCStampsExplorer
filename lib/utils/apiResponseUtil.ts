@@ -1,5 +1,5 @@
-import { getSecurityHeaders } from "$lib/utils/securityHeaders.ts";
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
+import { getSecurityHeaders } from "$lib/utils/securityHeaders.ts";
 import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
 
 export const API_RESPONSE_VERSION = "v2.2.7";
@@ -268,6 +268,23 @@ export class ApiResponseUtil {
     );
   }
 
+  static gone(
+    message = "Resource no longer available",
+    details?: unknown,
+    options: ApiResponseOptions = {},
+  ): Response {
+    console.warn("Resource Gone:", message, details || "");
+    return new Response(
+      JSON.stringify(
+        this.createErrorResponse(message, "GONE", details),
+      ),
+      {
+        status: 410,
+        headers: normalizeHeaders(this.createHeaders(options)),
+      },
+    );
+  }
+
   // Helper method for custom responses
   static custom<T>(
     body: T,
@@ -277,7 +294,10 @@ export class ApiResponseUtil {
     return new Response(
       body instanceof ArrayBuffer || body instanceof Uint8Array
         ? body
-        : JSON.stringify(body),
+        : JSON.stringify(
+          body,
+          (_key, value) => typeof value === "bigint" ? value.toString() : value,
+        ),
       {
         status,
         headers: normalizeHeaders(this.createHeaders(options)),

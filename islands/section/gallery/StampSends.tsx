@@ -40,7 +40,7 @@ export default function StampSendsGallery({
             <StampCard
               key={index}
               stamp={stamp}
-              isRecentSale={true}
+              isRecentSale
               showDetails={false}
             />
           ))

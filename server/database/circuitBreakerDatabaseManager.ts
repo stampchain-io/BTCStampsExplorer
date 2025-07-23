@@ -20,11 +20,11 @@ class CircuitBreakerDatabaseManager {
   /**
    * Execute a query with circuit breaker protection
    */
-  async executeQuery<T = any>(
+  executeQuery<T = any>(
     query: string,
     params: any[] = []
   ): Promise<{ rows?: T[]; affectedRows?: number }> {
-    return this.circuitBreaker.execute(async () => {
+    return this.circuitBreaker.execute(() => {
       return dbManager.executeQuery(query, params);
     });
   }
@@ -32,12 +32,12 @@ class CircuitBreakerDatabaseManager {
   /**
    * Execute a query with caching and circuit breaker protection
    */
-  async executeQueryWithCache<T = any>(
+  executeQueryWithCache<T = any>(
     query: string,
     params: any[] = [],
     cacheDuration: number | "never" = 300
   ): Promise<{ rows?: T[] }> {
-    return this.circuitBreaker.execute(async () => {
+    return this.circuitBreaker.execute(() => {
       return dbManager.executeQueryWithCache(query, params, cacheDuration);
     });
   }
@@ -45,8 +45,8 @@ class CircuitBreakerDatabaseManager {
   /**
    * Get a client connection with circuit breaker protection
    */
-  async getClient() {
-    return this.circuitBreaker.execute(async () => {
+  getClient() {
+    return this.circuitBreaker.execute(() => {
       return dbManager.getClient();
     });
   }
@@ -107,7 +107,7 @@ class CircuitBreakerDatabaseManager {
     return dbManager.debugCacheStatus();
   }
 
-  async close() {
+  close() {
     return dbManager.close();
   }
 
