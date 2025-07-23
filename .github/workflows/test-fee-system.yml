@@ -114,10 +114,7 @@ jobs:
           echo "Running fee system tests with Redis..."
           deno task test:fees
 
-      - name: Run Redis Fee Tests
-        run: |
-          echo "Running Redis-specific fee tests..."
-          deno task test:redis-fees
+      # Redis-specific tests are covered in the fee system tests above
 
       - name: Run Security Tests
         run: |

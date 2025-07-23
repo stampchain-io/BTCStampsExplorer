@@ -30,33 +30,35 @@ export async function handler(
     const deprecationInfo = getEndpointDeprecationInfo(pathname);
 
     if (deprecationInfo) {
-      // Return deprecation notice for v2.3+
-      return ApiResponseUtil.success({
-        deprecated: true,
-        message: `Endpoint ${pathname} is deprecated in API v${apiVersion}`,
-        reason: deprecationInfo.reason,
-        alternative: deprecationInfo.alternative,
-        endOfLife: deprecationInfo.endOfLife,
-        migrationGuide:
-          "https://stampchain.io/docs/api/migration/cursed-to-stamps",
-        currentVersion: apiVersion,
-        supportedAlternative: {
-          endpoint: deprecationInfo.alternative,
-          description:
-            "Use the stamps endpoint with type=cursed filter for cursed stamps",
-          example: `${deprecationInfo.alternative}&limit=10&page=1`,
+      // Use standardized ApiResponseUtil.gone() method for consistent error responses
+      return ApiResponseUtil.gone(
+        `Endpoint ${pathname} is deprecated in API v${apiVersion}`,
+        {
+          deprecated: true,
+          reason: deprecationInfo.reason,
+          alternative: deprecationInfo.alternative,
+          endOfLife: deprecationInfo.endOfLife,
+          migrationGuide:
+            "https://stampchain.io/docs/api/migration/cursed-to-stamps",
+          currentVersion: apiVersion,
+          supportedAlternative: {
+            endpoint: deprecationInfo.alternative,
+            description:
+              "Use the stamps endpoint with type=cursed filter for cursed stamps",
+            example: `${deprecationInfo.alternative}&limit=10&page=1`,
+          },
         },
-      }, {
-        status: 410, // Gone - indicates the endpoint has been deprecated
-        headers: {
-          "Deprecation": "true",
-          "Sunset": deprecationInfo.endOfLife,
-          "Link":
-            `<${deprecationInfo.alternative}>; rel="alternate"; title="Use stamps endpoint instead"`,
-          "X-Deprecated-Endpoint": pathname,
-          "X-Alternative-Endpoint": deprecationInfo.alternative,
+        {
+          headers: {
+            "Deprecation": "true",
+            "Sunset": deprecationInfo.endOfLife,
+            "Link":
+              `<${deprecationInfo.alternative}>; rel="alternate"; title="Use stamps endpoint instead"`,
+            "X-Deprecated-Endpoint": pathname,
+            "X-Alternative-Endpoint": deprecationInfo.alternative,
+          },
         },
-      });
+      );
     }
   }
 
