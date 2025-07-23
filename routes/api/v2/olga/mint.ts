@@ -133,6 +133,13 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
           : body.feeRate;
       }
       normalizedFees = normalizeFeeRate(feeInputArgs);
+
+      // Log fee rate for debugging
+      console.log("🔧 /api/v2/olga/mint: Processing with fee rate", {
+        rawFeeRate: body.feeRate,
+        normalizedFees,
+        isDryRun: body.dryRun,
+      });
     } catch (error) {
       return ApiResponseUtil.badRequest(
         error instanceof Error ? error.message : "Invalid fee rate",
