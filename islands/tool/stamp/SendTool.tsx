@@ -24,8 +24,6 @@ import { useEffect, useState } from "preact/hooks";
 import { SelectField } from "../../form/SelectField.tsx";
 
 /* ===== TYPES ===== */
-interface Props {}
-
 interface FeeDetails {
   minerFee: number;
   dustValue: number;
@@ -35,7 +33,7 @@ interface FeeDetails {
 }
 
 /* ===== COMPONENT ===== */
-export function StampSendTool({}: Props) {
+export function StampSendTool() {
   console.log("SENDTOOL: Component rendering - TOP LEVEL");
 
   /* ===== CONTEXT ===== */

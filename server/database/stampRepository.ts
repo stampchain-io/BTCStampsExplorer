@@ -1,18 +1,18 @@
 import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT, STAMP_TABLE } from "$constants";
 import {
-    STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
-    STAMP_RANGES, STAMP_SUFFIX_FILTERS,
-    STAMP_TYPES,
-    StampBalance,
-    StampFilters, SUBPROTOCOLS
+  STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
+  STAMP_RANGES, STAMP_SUFFIX_FILTERS,
+  STAMP_TYPES,
+  StampBalance,
+  StampFilters, SUBPROTOCOLS
 } from "$globals";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
 import {
-    getIdentifierType,
-    isCpid,
-    isStampHash,
-    isStampNumber,
-    isTxHash,
+  getIdentifierType,
+  isCpid,
+  isStampHash,
+  isStampNumber,
+  isTxHash,
 } from "$lib/utils/identifierUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
@@ -872,8 +872,8 @@ export class StampRepository {
 
     // Near the end of the getStamps method, right before executing the query
     if (Deno.env.get("DEBUG_SQL") === "true" || Deno.env.get("DENO_ENV") === "development") {
-      console.log("[SQL DEBUG] Final SQL query:", query);
-      console.log("[SQL DEBUG] With parameters:", queryParams);
+      logger.debug("sql", `[SQL DEBUG] Final SQL query: ${query}`);
+      logger.debug("sql", `[SQL DEBUG] With parameters: ${queryParams}`);
     }
 
     // Execute the data query

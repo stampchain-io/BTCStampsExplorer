@@ -296,6 +296,10 @@ function StampingToolMain({ config }: { config: Config }) {
   }, [file]);
 
   // 🚀 PROGRESSIVE FEE ESTIMATION HOOK - Replaces 100+ lines of custom logic!
+  console.log(
+    "🚀 StampingTool: Calling useProgressiveFeeEstimation with feeRate:",
+    fee,
+  );
   const {
     feeDetails: progressiveFeeDetails,
     isEstimating,
@@ -311,6 +315,7 @@ function StampingToolMain({ config }: { config: Config }) {
     locked: isLocked,
     divisible: isDivisible,
     isPoshStamp,
+    debounceMs: 100, // Faster for testing
   });
 
   // Update local feeDetails when progressive estimation completes
@@ -455,6 +460,11 @@ function StampingToolMain({ config }: { config: Config }) {
   const handleChangeFee = (newFee: number) => {
     // Allow any positive fee rate, including 0.1 sat/vB
     const validatedFee = Math.max(newFee, 0.1);
+    console.log("🔧 StampingTool: Fee slider changed", {
+      newFee,
+      validatedFee,
+      currentFee: fee,
+    });
     setFee(validatedFee);
   };
 
