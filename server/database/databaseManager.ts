@@ -84,14 +84,9 @@ class DatabaseManager {
   readonly #ACQUIRE_TIMEOUT: number;
   readonly #CONNECTION_TIMEOUT: number;
   readonly #IDLE_TIMEOUT: number;
-  // deno-lint-ignore no-unused-vars
-  // deno-lint-ignore no-unused-vars
   readonly #MAX_RECONNECTS: number; // Reserved for future reconnection logic
-  // deno-lint-ignore no-unused-vars
   readonly #RECONNECT_DELAY: number; // Reserved for future reconnection logic
-  // deno-lint-ignore no-unused-vars
   readonly #MIN_CONNECTIONS: number; // Reserved for connection pool warmup
-  // deno-lint-ignore no-unused-vars
   readonly #VALIDATION_TIMEOUT: number; // Reserved for connection validation
   readonly #ENABLE_COMPRESSION: boolean;
   readonly #ENABLE_CONNECTION_LOGGING: boolean;

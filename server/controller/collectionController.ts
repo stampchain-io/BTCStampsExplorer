@@ -1,9 +1,7 @@
-import {
-  Collection,
-} from "$globals";
+import { Collection } from "$globals";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
-import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
+import { StampService } from "$server/services/stampService.ts";
 import { CollectionQueryParams, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
 
 export class CollectionController {
@@ -18,83 +16,71 @@ export class CollectionController {
     }
   }
 
-  static async getCollectionStamps(
-    params: CollectionQueryParams,
-  ): Promise<PaginatedCollectionResponseBody> {
+  static async getCollectionStamps(options: {
+    limit?: number;
+    page?: number;
+    sortBy?: "ASC" | "DESC";
+    includeMarketData?: boolean;
+  }) {
     try {
-      const { limit = 50, page = 1, creator, sortBy, includeMarketData = true } = params;
-      
-      // Apply minimum stamp count filter at database level
+      const {
+        limit = 50,
+        page = 1,
+        sortBy = "DESC",
+        includeMarketData = true,
+      } = options;
+
+      // Get collections with market data
       const collectionsResult = await CollectionService.getCollectionDetails({
         limit,
         page,
-        ...(creator ? { creator } : {}),
-        ...(sortBy ? { sortBy } : {}),
-        minStampCount: 2,
-        includeMarketData
+        sortBy,
+        includeMarketData,
       });
 
-      if (!collectionsResult.data || !Array.isArray(collectionsResult.data)) {
-        throw new Error(
-          "Unexpected data structure from CollectionService.getCollectionDetails",
-        );
+      if (!collectionsResult.data || collectionsResult.data.length === 0) {
+        return {
+          ...collectionsResult,
+          data: [],
+        };
       }
 
-      const collectionIds = collectionsResult.data.map(
-        (collection: Collection) => collection.collection_id,
-      );
-
-      // Create a map to store stamps by collection ID
+      // Get stamps for each collection to build image arrays
       const stampsByCollection = new Map<string, string[]>();
 
-      // Only fetch stamps if we have collections
-      if (collectionIds.length > 0) {
-        // Calculate total limit based on number of collections
-        const totalLimit = collectionIds.length * 12;
+      for (const collection of collectionsResult.data) {
+        const collectionId = collection.collection_id;
 
-        console.log('Fetching stamps for collections:', {
-          collectionIds,
-          totalLimit,
-          collectionStampLimit: 12
+        // Get stamps for this collection with a reasonable limit for images
+        const stampResults = await StampService.getStamps({
+          collectionId,
+          limit: 12, // Limit stamps per collection for image gallery
+          sortBy: "DESC",
+          type: "stamps",
+          includeSecondary: false,
+          skipTotalCount: true,
         });
 
-        const stampResults = await StampController.getStamps({
-          collectionId: collectionIds.join(','),
-          noPagination: false,
-          type: "all" as const,
-          sortBy: "ASC" as const,
-          allColumns: false,
-          limit: totalLimit,
-          collectionStampLimit: 12,
-          groupBy: "collection_id",
-          groupBySubquery: true
-        });
+        if (stampResults.stamps && stampResults.stamps.length > 0) {
+          const stamps: string[] = [];
 
-        if (!stampResults.data || !Array.isArray(stampResults.data)) {
-          throw new Error(
-            "Unexpected data structure from StampController.getStamps",
-          );
-        }
+          for (const stamp of stampResults.stamps) {
+            if (!stamp.tx_hash || !stamp.stamp_mimetype) {
+              continue;
+            }
 
-        // Group stamps by collection ID
-        for (const stamp of stampResults.data) {
-          if (!stamp.tx_hash || !stamp.stamp_mimetype) {
-            continue;
-          }
-          
-          const collectionId = stamp.collection_id?.toUpperCase();
-          if (!collectionId) {
-            continue;
+            // WORKAROUND: Manually set collection_id since database JOIN is not working
+            // This ensures the grouping logic below works correctly
+            stamp.collection_id = collectionId;
+
+            const imageUrl = await getStampImageSrc(stamp);
+            if (stamps.length < 12 && !stamps.includes(imageUrl)) {
+              stamps.push(imageUrl);
+            }
           }
 
-          if (!stampsByCollection.has(collectionId)) {
-            stampsByCollection.set(collectionId, []);
-          }
-
-          const stamps = stampsByCollection.get(collectionId)!;
-          const imageUrl = await getStampImageSrc(stamp);
-          if (stamps.length < 12 && !stamps.includes(imageUrl)) {
-            stamps.push(imageUrl);
+          if (stamps.length > 0) {
+            stampsByCollection.set(collectionId.toUpperCase(), stamps);
           }
         }
       }
@@ -104,12 +90,10 @@ export class CollectionController {
         (collection: Collection) => {
           const collectionId = collection.collection_id.toUpperCase();
           const stamps = stampsByCollection.get(collectionId) || [];
-          
+
           // Use the second stamp if available, otherwise fall back to the first stamp
           const firstStampImage = stamps[1] || stamps[0] || null;
-          
 
-          
           return {
             ...collection,
             first_stamp_image: firstStampImage,

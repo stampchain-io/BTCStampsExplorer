@@ -32,6 +32,11 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
     try {
       const overview = ctx.params.overview || "artist";
 
+      // Explicitly reject "detail" to avoid conflict with detail/[id].tsx route
+      if (overview === "detail") {
+        return ctx.renderNotFound();
+      }
+
       // Validate overview parameter first
       if (!["artist", "posh", "recursive"].includes(overview)) {
         return ctx.renderNotFound();
@@ -58,7 +63,6 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
               {
                 limit: page_size,
                 page: page,
-                creator: "",
               },
             );
 

@@ -353,27 +353,31 @@ export class HorizonWallet {
   /**
    * Get wallet network (Bitcoin mainnet assumed)
    */
-  async getNetwork(): Promise<string> {
-    return "mainnet"; // Horizon Wallet appears to be mainnet-focused
+  getNetwork(): Promise<string> {
+    return Promise.resolve("mainnet"); // Horizon Wallet appears to be mainnet-focused
   }
 
   /**
    * Get wallet balance (not directly supported by Horizon API)
    */
-  async getBalance(): Promise<
+  getBalance(): Promise<
     { confirmed: number; unconfirmed: number; total: number }
   > {
-    throw new Error(
-      "getBalance not supported by Horizon Wallet - use external API",
+    return Promise.reject(
+      new Error(
+        "getBalance not supported by Horizon Wallet - use external API",
+      ),
     );
   }
 
   /**
    * Send Bitcoin (not directly supported - use PSBT signing instead)
    */
-  async sendBitcoin(_to: string, _amount: number): Promise<string> {
-    throw new Error(
-      "sendBitcoin not directly supported - use PSBT signing workflow instead",
+  sendBitcoin(_to: string, _amount: number): Promise<string> {
+    return Promise.reject(
+      new Error(
+        "sendBitcoin not directly supported - use PSBT signing workflow instead",
+      ),
     );
   }
 
@@ -506,15 +510,19 @@ export const horizonProvider = {
     }
   },
 
-  broadcastRawTX: async (_rawTx: string): Promise<string> => {
-    throw new Error(
-      "broadcastRawTX not supported by Horizon Wallet - use external broadcast service",
+  broadcastRawTX: (_rawTx: string): Promise<string> => {
+    return Promise.reject(
+      new Error(
+        "broadcastRawTX not supported by Horizon Wallet - use external broadcast service",
+      ),
     );
   },
 
-  broadcastPSBT: async (_psbtHex: string): Promise<string> => {
-    throw new Error(
-      "broadcastPSBT not supported by Horizon Wallet - use external broadcast service",
+  broadcastPSBT: (_psbtHex: string): Promise<string> => {
+    return Promise.reject(
+      new Error(
+        "broadcastPSBT not supported by Horizon Wallet - use external broadcast service",
+      ),
     );
   },
 };
