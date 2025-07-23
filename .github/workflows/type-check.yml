@@ -4,21 +4,21 @@ on:
   push:
     branches: [main, dev]
     paths:
-      - '**/*.ts'
-      - '**/*.tsx'
-      - 'deno.json'
-      - 'globals.d.ts'
-      - 'lib/types/**'
-      - '.github/workflows/type-check.yml'
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "deno.json"
+      - "globals.d.ts"
+      - "lib/types/**"
+      - ".github/workflows/type-check.yml"
   pull_request:
     branches: [main, dev]
     paths:
-      - '**/*.ts'
-      - '**/*.tsx'
-      - 'deno.json'
-      - 'globals.d.ts'
-      - 'lib/types/**'
-      - '.github/workflows/type-check.yml'
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "deno.json"
+      - "globals.d.ts"
+      - "lib/types/**"
+      - ".github/workflows/type-check.yml"
 
 jobs:
   type-check:
@@ -36,7 +36,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.3.3
+          deno-version: v2.4.2
 
       - name: Cache Deno dependencies
         uses: actions/cache@v4
@@ -58,7 +58,7 @@ jobs:
         run: |
           echo "🔍 Running comprehensive TypeScript analysis..."
           deno task analyze:types || echo "⚠️ Type analysis completed with issues"
-          
+
           # Check main entry points but don't fail the workflow
           echo "📋 Checking main entry points..."
           if deno task check:types; then
@@ -72,26 +72,26 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           echo "🔍 Analyzing TypeScript changes in PR..."
-          
+
           # Get changed TypeScript files
           CHANGED_TS_FILES=$(git diff --name-only origin/${{ github.base_ref }}..HEAD | grep -E '\.(ts|tsx)$' | grep -v -E '(test|spec)\.(ts|tsx)$' || echo "")
-          
+
           if [ -n "$CHANGED_TS_FILES" ]; then
             echo "📝 Changed TypeScript files:"
             echo "$CHANGED_TS_FILES"
             echo ""
-            
+
             # Check each changed file and track results
             NEW_ERRORS_FOUND=false
             CHECKED_FILES=0
             FILES_WITH_ERRORS=0
-            
+
             echo "🔍 Type checking changed files..."
             for file in $CHANGED_TS_FILES; do
               if [ -f "$file" ]; then
                 echo "Checking: $file"
                 CHECKED_FILES=$((CHECKED_FILES + 1))
-                
+
                 if deno check "$file" 2>&1; then
                   echo "  ✅ No type errors in $file"
                 else
@@ -103,12 +103,12 @@ jobs:
                 echo ""
               fi
             done
-            
+
             echo "📊 Summary for changed files:"
             echo "  - Files checked: $CHECKED_FILES"
             echo "  - Files with type errors: $FILES_WITH_ERRORS"
             echo "  - Files without errors: $((CHECKED_FILES - FILES_WITH_ERRORS))"
-            
+
             # Only fail if ALL changed files have errors (likely indicates a systemic issue)
             if [ $CHECKED_FILES -gt 0 ] && [ $FILES_WITH_ERRORS -eq $CHECKED_FILES ] && [ $CHECKED_FILES -gt 2 ]; then
               echo "❌ All changed files have type errors - this may indicate a systemic issue"
@@ -130,18 +130,18 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "🎯 **Status**: This workflow is in gradual improvement mode and won't block PRs due to existing type errors." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Read the analysis report if it exists
           if [ -f "reports/type-error-analysis.md" ]; then
             echo "### 📊 Current Type Error Status" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            
+
             # Extract key metrics
             TOTAL_ERRORS=$(grep "Total Errors" reports/type-error-analysis.md | head -1 | grep -o '[0-9]*' || echo "Unknown")
             echo "- **Total Errors**: $TOTAL_ERRORS" >> $GITHUB_STEP_SUMMARY
             echo "- **Workflow Status**: Non-blocking (gradual improvement mode)" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            
+
             # Show top error categories
             echo "### 🎯 Top Error Categories" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -149,7 +149,7 @@ jobs:
             grep -A 10 "## Error Categories" reports/type-error-analysis.md | head -15 || echo "Error categories not available" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            
+
             # Show critical files
             echo "### 🔥 Critical Files (Most Errors)" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -158,7 +158,7 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "### 💡 Improvement Suggestions" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "1. **Focus on Easy Wins**: Start with \`MISSING_TYPE\` and \`IMPLICIT_ANY\` errors" >> $GITHUB_STEP_SUMMARY
@@ -199,4 +199,4 @@ jobs:
           echo "  - Run 'deno check <file>' before committing changes"
           echo "  - Use 'deno task analyze:types' to track overall progress"
           echo ""
-          echo "🚀 Once we reduce errors significantly, we'll enable strict blocking mode!" 
+          echo "🚀 Once we reduce errors significantly, we'll enable strict blocking mode!"
