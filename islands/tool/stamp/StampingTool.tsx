@@ -278,13 +278,20 @@ function StampingToolMain({ config }: { config: Config }) {
     est_tx_size: 0,
   });
 
-  // Convert file to string for fee estimation
-  const [fileContent, setFileContent] = useState<string | undefined>();
+  // Convert file to base64 for fee estimation (matches actual minting process)
+  const [fileBase64, setFileBase64] = useState<string | undefined>();
   useEffect(() => {
     if (file) {
-      file.text().then(setFileContent);
+      // Use the same toBase64 conversion as the actual minting process
+      toBase64(file).then(setFileBase64).catch((error) => {
+        logger.error("ui", {
+          message: "Failed to convert file to base64 for fee estimation",
+          error: error.message,
+        });
+        setFileBase64(undefined);
+      });
     } else {
-      setFileContent(undefined);
+      setFileBase64(undefined);
     }
   }, [file]);
 
@@ -298,7 +305,7 @@ function StampingToolMain({ config }: { config: Config }) {
     feeRate: fee,
     ...(wallet?.address && { walletAddress: wallet.address }),
     isConnected,
-    ...(fileContent && { file: fileContent }),
+    ...(fileBase64 && { file: fileBase64 }),
     filename: stampName,
     quantity: Number(issuance) || 1,
     locked: isLocked,
