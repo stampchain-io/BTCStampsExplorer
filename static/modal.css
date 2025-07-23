@@ -5,7 +5,7 @@
 --animation-delay-modal: 0s;
 defined individually
   */
-  --animation-timing: cubic-bezier(0.250, 0.100, 0.250, 1.000);
+  --animation-timing: cubic-bezier(0.46,0.03,0.52,0.96);
   --animation-bg: rgba(66, 66, 66, .3);
   --animation-duration-background: .5s;
   --animation-cleanup-delay: .5s;
