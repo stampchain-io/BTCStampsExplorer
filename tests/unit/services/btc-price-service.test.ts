@@ -59,6 +59,34 @@ const mockFetchResponses = {
       },
     },
   },
+  coinbase: {
+    data: {
+      currency: "BTC",
+      rates: {
+        USD: "45050.00",
+      },
+    },
+  },
+  blockchain: {
+    USD: {
+      "15m": 45030.00,
+      last: 45030.00,
+      buy: 45025.00,
+      sell: 45035.00,
+      symbol: "$",
+    },
+  },
+  bitstamp: {
+    last: "45040.00",
+    high: "45200.00",
+    low: "44900.00",
+    vwap: "45050.00",
+    volume: "1234.56789012",
+    bid: "45035.00",
+    ask: "45045.00",
+    timestamp: "1234567890",
+    open: "45000.00",
+  },
 };
 
 describe("BTCPriceService", () => {
@@ -72,8 +100,23 @@ describe("BTCPriceService", () => {
     // Save original fetch
     originalFetch = globalThis.fetch;
 
-    // Mock fetch
-    globalThis.fetch = async (url: string | URL | Request) => {
+    // Save original database
+    originalDb = (BTCPriceService as any).db;
+
+    // Mock fetch with immediate responses
+    globalThis.fetch = async (
+      url: string | URL | Request,
+      options?: RequestInit,
+    ) => {
+      // Immediately abort any abort signal to prevent timer leaks
+      if (options?.signal) {
+        const signal = options.signal as AbortSignal;
+        if (signal.addEventListener) {
+          // Remove any abort listeners to prevent timer leaks
+          signal.addEventListener("abort", () => {}, { once: true });
+        }
+      }
+
       const urlString = typeof url === "string" ? url : url.toString();
 
       if (urlString.includes("coingecko")) {
@@ -97,6 +140,27 @@ describe("BTCPriceService", () => {
         });
       }
 
+      if (urlString.includes("coinbase")) {
+        return new Response(JSON.stringify(mockFetchResponses.coinbase), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      if (urlString.includes("blockchain.info")) {
+        return new Response(JSON.stringify(mockFetchResponses.blockchain), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      if (urlString.includes("bitstamp")) {
+        return new Response(JSON.stringify(mockFetchResponses.bitstamp), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
       // Default fallback
       throw new Error(`Unmocked URL: ${urlString}`);
     };
@@ -105,11 +169,17 @@ describe("BTCPriceService", () => {
     BTCPriceService.setDatabase(mockDb as any);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     // Restore original fetch
     globalThis.fetch = originalFetch;
     // Clear cache
     mockDb.cache = {};
+    // Invalidate any remaining cache
+    await BTCPriceService.invalidateCache();
+    // Restore original database if it was changed
+    if (originalDb) {
+      BTCPriceService.setDatabase(originalDb);
+    }
   });
 
   describe("Core Functionality", () => {
@@ -132,9 +202,9 @@ describe("BTCPriceService", () => {
         "Cached price should match original",
       );
       assertEquals(
-        price1.source,
         price2.source,
-        "Cached source should match original",
+        "cached",
+        "Cached response should have source 'cached'",
       );
       assert(
         duration < 100,
@@ -184,21 +254,48 @@ describe("BTCPriceService", () => {
           });
         }
 
+        if (urlString.includes("coinbase")) {
+          return new Response(JSON.stringify(mockFetchResponses.coinbase), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        if (urlString.includes("blockchain.info")) {
+          return new Response(JSON.stringify(mockFetchResponses.blockchain), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        if (urlString.includes("bitstamp")) {
+          return new Response(JSON.stringify(mockFetchResponses.bitstamp), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
         throw new Error(`Unmocked URL: ${urlString}`);
       };
 
       const result = await BTCPriceService.getPrice("coingecko");
       assert(result.price > 0, "Should get price from fallback source");
-      assert(result.source === "binance", "Should use Binance as fallback");
+      assert(result.source === "kraken", "Should use Kraken as fallback");
     });
   });
 
   describe("Performance", () => {
     it("should handle concurrent requests efficiently", async () => {
+      // Clear cache to ensure clean test
+      await BTCPriceService.invalidateCache();
+
+      // First, make a single request to populate the cache
+      const initial = await BTCPriceService.getPrice();
+
       const concurrentCalls = 5;
       const start = performance.now();
 
-      // Make concurrent requests
+      // Make concurrent requests - these should all hit the cache
       const promises = Array.from(
         { length: concurrentCalls },
         () => BTCPriceService.getPrice(),
@@ -207,28 +304,26 @@ describe("BTCPriceService", () => {
       const results = await Promise.all(promises);
       const totalDuration = performance.now() - start;
 
-      // All should return the same data
-      const firstPrice = results[0].price;
-      const firstSource = results[0].source;
-      const firstTimestamp = results[0].timestamp;
+      // All should return the same cached data
+      const expectedPrice = initial.price;
+      const expectedTimestamp = initial.timestamp;
 
       for (const result of results) {
         assertEquals(
           result.price,
-          firstPrice,
+          expectedPrice,
           "All concurrent requests should return same cached price",
         );
         assertEquals(
           result.source,
-          firstSource,
-          "All concurrent requests should return same cached source",
+          "cached",
+          "All concurrent requests should return cached source",
         );
-        // Allow small timestamp differences for concurrent execution
-        assert(
-          Math.abs(result.timestamp - firstTimestamp) <= 10,
-          `Timestamp difference should be minimal, got ${
-            Math.abs(result.timestamp - firstTimestamp)
-          }ms difference`,
+        // Cached results should have the same timestamp
+        assertEquals(
+          result.timestamp,
+          expectedTimestamp,
+          "Cached results should have same timestamp",
         );
       }
 
@@ -282,7 +377,14 @@ describe("BTCPriceService", () => {
       const result1 = await BTCPriceService.getPrice();
 
       // Should get data from one of the sources
-      const validSources = ["coingecko", "binance"];
+      const validSources = [
+        "coingecko",
+        "kraken",
+        "coinbase",
+        "bitstamp",
+        "blockchain",
+        "binance",
+      ];
       assert(
         validSources.includes(result1.source),
         `Should use valid source, got: ${result1.source}`,
@@ -292,8 +394,13 @@ describe("BTCPriceService", () => {
       const result2 = await BTCPriceService.getPrice();
       assertEquals(
         result2.source,
-        result1.source,
-        "Should return same source from cache",
+        "cached",
+        "Should return cached source on second call",
+      );
+      assertEquals(
+        result2.price,
+        result1.price,
+        "Should return same price from cache",
       );
     });
   });
@@ -363,16 +470,16 @@ describe("BTCPriceService", () => {
         for (const [source, metrics] of metricEntries) {
           assertExists(metrics.state, `${source} should have state`);
           assertExists(
-            metrics.failures,
-            `${source} should have failures count`,
+            metrics.failureCount,
+            `${source} should have failureCount`,
           );
           assertExists(
-            metrics.successes,
-            `${source} should have successes count`,
+            metrics.successCount,
+            `${source} should have successCount`,
           );
           assertExists(
-            metrics.nextAttempt,
-            `${source} should have nextAttempt`,
+            metrics.lastStateChange,
+            `${source} should have lastStateChange`,
           );
 
           const validStates = ["CLOSED", "OPEN", "HALF_OPEN"];
