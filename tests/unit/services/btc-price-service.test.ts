@@ -352,25 +352,35 @@ describe("BTCPriceService", () => {
       const result = await BTCPriceService.getPrice();
 
       if (result.circuitBreakerMetrics) {
-        assertExists(result.circuitBreakerMetrics.state, "Should have state");
-        assertExists(
-          result.circuitBreakerMetrics.failures,
-          "Should have failures count",
-        );
-        assertExists(
-          result.circuitBreakerMetrics.successes,
-          "Should have successes count",
-        );
-        assertExists(
-          result.circuitBreakerMetrics.nextAttempt,
-          "Should have nextAttempt",
+        // circuitBreakerMetrics is a Record<string, CircuitBreakerMetrics>
+        const metricEntries = Object.entries(result.circuitBreakerMetrics);
+        assert(
+          metricEntries.length > 0,
+          "Should have at least one circuit breaker",
         );
 
-        const validStates = ["CLOSED", "OPEN", "HALF_OPEN"];
-        assert(
-          validStates.includes(result.circuitBreakerMetrics.state),
-          `State should be valid, got: ${result.circuitBreakerMetrics.state}`,
-        );
+        // Check each circuit breaker
+        for (const [source, metrics] of metricEntries) {
+          assertExists(metrics.state, `${source} should have state`);
+          assertExists(
+            metrics.failures,
+            `${source} should have failures count`,
+          );
+          assertExists(
+            metrics.successes,
+            `${source} should have successes count`,
+          );
+          assertExists(
+            metrics.nextAttempt,
+            `${source} should have nextAttempt`,
+          );
+
+          const validStates = ["CLOSED", "OPEN", "HALF_OPEN"];
+          assert(
+            validStates.includes(metrics.state),
+            `${source} state should be valid, got: ${metrics.state}`,
+          );
+        }
       }
     });
   });
