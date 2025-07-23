@@ -378,7 +378,7 @@ export function buildEstimationRequest(
           qty: Number(quantity) || 1,
           locked: locked || false,
           divisible: divisible || false,
-          satsPerVB: feeRate,
+          feeRate: feeRate, // Fixed: API expects 'feeRate', not 'satsPerVB'
           description: "stamp:",
           prefix: "stamp",
           service_fee: 0,
