@@ -70,7 +70,8 @@ export type WalletProviderKey =
   | "leather"
   | "okx"
   | "tapwallet"
-  | "phantom";
+  | "phantom"
+  | "horizon";
 
 export const DEFAULT_WALLET_CONNECTORS: WalletProviderKey[] = [
   "unisat",
@@ -78,6 +79,7 @@ export const DEFAULT_WALLET_CONNECTORS: WalletProviderKey[] = [
   "okx",
   "tapwallet",
   "phantom",
+  "horizon",
 ];
 
 export const WALLET_PROVIDERS: Record<
@@ -97,12 +99,16 @@ export const WALLET_PROVIDERS: Record<
     logo: "/img/wallet/okx/logo_okx.svg",
   },
   tapwallet: {
-    name: "TapWallet",
+    name: "Universe",
     logo: "/img/wallet/tapwallet/logo_tapwallet.png",
   },
   phantom: {
     name: "Phantom",
     logo: "/img/wallet/phantom/logo_phantom.svg",
+  },
+  horizon: {
+    name: "Horizon",
+    logo: "/img/wallet/horizon/logo_horizon.svg",
   },
 };
 

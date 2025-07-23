@@ -1,10 +1,11 @@
+import { logger } from "$lib/utils/logger.ts";
+import { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { horizonProvider } from "./horizon.ts";
 import { leatherProvider } from "./leather.ts";
 import { okxProvider } from "./okx.ts";
-import { unisatProvider } from "./unisat.ts";
-import { tapWalletProvider } from "./tapwallet.ts";
 import { phantomProvider } from "./phantom.ts";
-import { SignPSBTResult, Wallet } from "$types/index.d.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { tapWalletProvider } from "./tapwallet.ts";
+import { unisatProvider } from "./unisat.ts";
 
 interface WalletProvider {
   signMessage: (message: string) => Promise<string>;
@@ -122,6 +123,8 @@ export const getWalletProvider = (
       return tapWalletProvider;
     case "phantom":
       return phantomProvider;
+    case "horizon":
+      return horizonProvider;
     default:
       throw new Error(`Unsupported wallet provider: ${provider}`);
   }

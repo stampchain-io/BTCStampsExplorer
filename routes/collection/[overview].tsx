@@ -1,14 +1,14 @@
 /* ===== COLLECTION OVERVIEW PAGE ===== */
-import { STAMP_FILTER_TYPES } from "$globals";
+import { StampOverviewContent } from "$content";
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
+import { STAMP_FILTER_TYPES } from "$globals";
+import { CollectionOverviewHeader } from "$header";
+import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { CollectionDetailGallery } from "$section";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { CollectionRow } from "$server/types/collection.d.ts";
-import { StampOverviewContent } from "$content";
-import { CollectionDetailGallery } from "$section";
-import { CollectionOverviewHeader } from "$header";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
@@ -23,6 +23,7 @@ interface CollectionOverviewPageProps {
   sortBy: string;
   filterBy: string[];
   partial?: boolean;
+  isRecentSales?: boolean;
 }
 
 /* ===== SERVER HANDLER ===== */
@@ -44,6 +45,11 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
       const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
 
+      // Handle both new view parameter and legacy recentSales parameter
+      const viewMode = url.searchParams.get("view") || "all";
+      const isRecentSales = viewMode === "sales" ||
+        url.searchParams.get("recentSales") === "true";
+
       switch (overview) {
         case "artist": {
           const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
@@ -64,6 +70,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
             page_size: collectionsData.limit,
             filterBy,
             sortBy,
+            isRecentSales,
           });
         }
 
@@ -99,6 +106,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
             page_size,
             filterBy,
             sortBy,
+            isRecentSales,
             partial: url.searchParams.has("_fresh"),
           });
         }
@@ -122,6 +130,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
             page_size,
             filterBy: ["recursive"],
             sortBy,
+            isRecentSales,
             partial: url.searchParams.has("_fresh"),
           });
         }
@@ -151,6 +160,7 @@ export default function CollectionOverviewPage(
     collections,
     page,
     pages,
+    isRecentSales = false,
   } = data;
 
   /* ===== HELPERS ===== */
@@ -177,7 +187,7 @@ export default function CollectionOverviewPage(
             <div data-partial="/stamp">
               <StampOverviewContent
                 stamps={stamps || []}
-                isRecentSales={false}
+                isRecentSales={isRecentSales}
                 pagination={{
                   page,
                   totalPages: pages,

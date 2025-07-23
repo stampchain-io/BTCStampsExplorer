@@ -7,12 +7,12 @@ import {
   SRC20CardSm,
   SRC20CardSmMinting,
 } from "$card";
-import { SRC20Row } from "$globals";
+import { EnrichedSRC20Row } from "$globals";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface SRC20GalleryProps {
@@ -20,7 +20,7 @@ interface SRC20GalleryProps {
   subTitle?: string;
   viewType: "minted" | "minting";
   fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  initialData?: SRC20Row[];
+  initialData?: EnrichedSRC20Row[]; // 🎯 FIXED: Use EnrichedSRC20Row for market data support
   pagination?: {
     page: number;
     totalPages: number;
@@ -28,11 +28,9 @@ interface SRC20GalleryProps {
     limit?: number;
     onPageChange?: (page: number) => void;
   };
-  address?: string;
-  useClientFetch?: boolean;
-  timeframe: "24H" | "3D" | "7D";
+  timeframe: "24H" | "7D" | "30D";
   serverData?: {
-    data: SRC20Row[];
+    data: EnrichedSRC20Row[]; // 🎯 FIXED: Use EnrichedSRC20Row for market data support
     total: number;
     page: number;
     totalPages: number;
@@ -41,151 +39,43 @@ interface SRC20GalleryProps {
 
 /* ===== COMPONENT ===== */
 export function SRC20Gallery({
+  initialData,
+  fromPage = "src20",
+  viewType,
   title,
   subTitle,
-  viewType,
-  fromPage,
-  initialData,
   pagination,
-  address,
-  useClientFetch = fromPage === "wallet",
   timeframe,
   serverData,
 }: SRC20GalleryProps) {
-  const [data, setData] = useState<SRC20Row[]>(initialData || []);
+  const [data, setData] = useState<EnrichedSRC20Row[]>(initialData || []); // 🎯 FIXED: Use EnrichedSRC20Row
   const [isLoading, setIsLoading] = useState(!initialData && !serverData);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [enriched, setEnriched] = useState(false);
 
-  // Helper to fetch chart data for a tick
-  async function fetchChartData(tick: string): Promise<[number, number][]> {
-    try {
-      const url = `https://api.stampscan.xyz/utxo/combinedListings?tick=${
-        encodeURIComponent(tick)
-      }`;
-      const resp = await fetch(url);
-      if (!resp.ok) return [];
-      const chartRaw = await resp.json();
-      console.log("Raw chart data for", tick, chartRaw);
-      const mapped: [number, number][] = (chartRaw || [])
-        .map((item: any) => {
-          const ts = new Date(item.date).getTime();
-          const price = Number(item.unit_price_btc) * 100_000_000;
-          if (isNaN(ts) || isNaN(price)) return null;
-          return [ts, price];
-        })
-        .filter(Boolean);
-      return mapped.sort((a, b) => a[0] - b[0]);
-    } catch {
-      return [];
-    }
-  }
+  // 🚀 PREACT OPTIMIZATION: Memoized data processing
+  const processedData: EnrichedSRC20Row[] = useMemo(() => {
+    return data.map((item: EnrichedSRC20Row) => ({
+      ...item,
+      tick: unicodeEscapeToEmoji(item.tick),
+    }));
+  }, [data]);
 
-  // Enrich tokens with chart data (SSR-friendly: only runs on server or initial render)
-  useEffect(() => {
-    if (
-      !enriched &&
-      viewType === "minted" &&
-      fromPage === "src20" &&
-      data.length > 0
-    ) {
-      // Only enrich tokens that do not already have chart data
-      const tokensToEnrich = data.filter((token: any) =>
-        !token.chart || token.chart.length === 0
-      );
-      if (tokensToEnrich.length === 0) {
-        setEnriched(true);
-        setIsLoading(false);
-        return;
-      }
-      setIsLoading(true);
-      console.log(
-        "Enriching tokens with chart data:",
-        tokensToEnrich.map((t) => t.tick),
-      );
-      Promise.all(
-        data.map(async (token: any) => {
-          if (token.chart && token.chart.length > 0) return token;
-          return {
-            ...token,
-            chart: await fetchChartData(token.tick),
-          };
-        }),
-      ).then((enrichedTokens) => {
-        setData(enrichedTokens);
-        setEnriched(true);
-        setIsLoading(false);
-      });
-    }
-  }, [data, viewType, fromPage, enriched]);
-
+  // 🚀 DENO FRESH 2.3+ OPTIMIZATION: Server-side data is already enriched and filtered
   useEffect(() => {
     if (serverData) {
       setData(serverData.data);
-      return;
+      setIsLoading(false);
     }
+  }, [serverData]);
 
-    if (!initialData?.length && useClientFetch) {
-      setIsTransitioning(true);
-      setIsLoading(true);
-      const fetchData = async () => {
-        try {
-          let endpoint = "";
-          const params = new URLSearchParams({
-            limit: String(pagination?.limit || 5),
-            page: String(pagination?.page || 1),
-            timeframe: timeframe,
-          });
+  // 🚀 REMOVED: Client-side API calls for /src20 page - use server-side rendering only
+  // This eliminates dual data sources and ensures consistency
 
-          if (fromPage === "wallet" && address) {
-            endpoint = `/api/v2/src20/balance/${address}`;
-          }
-
-          if (endpoint) {
-            const response = await fetch(`${endpoint}&${params.toString()}`, {
-              headers: {
-                "X-API-Version": "2.3",
-              },
-            });
-            const result = await response.json();
-            setData(
-              result.data?.map((item: SRC20Row) => ({
-                ...item,
-                tick: unicodeEscapeToEmoji(item.tick),
-              })) || [],
-            );
-          }
-        } catch (error) {
-          console.error(`SRC20 ${viewType} fetch error:`, error);
-        } finally {
-          setIsLoading(false);
-          setIsTransitioning(false);
-        }
-      };
-
-      fetchData();
-    }
-  }, [
-    viewType,
-    timeframe,
-    pagination?.page,
-    initialData,
-    fromPage,
-    address,
-    useClientFetch,
-    serverData,
-  ]);
-
-  useEffect(() => {
-    if (initialData?.length) {
-      setData(initialData);
-    }
-  }, [initialData]);
-
+  // 🚀 FRESH.JS NAVIGATION: Server-side rendering with URL updates
   const handlePageChange = (page: number) => {
     if (pagination?.onPageChange) {
       pagination.onPageChange(page);
-    } else if (!useClientFetch) {
+    } else {
+      // Always use server-side navigation for /src20 page
       // SSR-safe browser environment check
       if (typeof globalThis === "undefined" || !globalThis?.location) {
         return; // Cannot navigate during SSR
@@ -196,26 +86,43 @@ export function SRC20Gallery({
     }
   };
 
+  // 🚀 SIMPLIFIED: Basic image click handler
   const handleImageClick = (_imgSrc: string) => {
     // TODO(@dev): Implement image click handler
   };
 
+  // 🚀 DENO FRESH 2.3+ OPTIMIZATION: Simplified card component selection
+  const CardComponent = useMemo(() => {
+    // For /src20 page, use full-size cards
+    if (fromPage === "src20" || fromPage === "stamping/src20") {
+      return viewType === "minted" ? SRC20Card : SRC20CardMinting;
+    }
+    // For other pages (home, wallet), use small cards
+    return viewType === "minted" ? SRC20CardSm : SRC20CardSmMinting;
+  }, [viewType, fromPage]);
+
+  // 🚀 PREACT OPTIMIZATION: Memoized card props
+  const cardProps = useMemo(() => ({
+    data: processedData,
+    fromPage,
+    timeframe,
+    onImageClick: handleImageClick,
+  }), [processedData, fromPage, timeframe, handleImageClick]);
+
   // Always call hooks at the top level
   const skeletonClasses = useLoadingSkeleton(
-    isLoading || isTransitioning,
+    isLoading,
     "src20-skeleton h-[400px]",
   );
 
-  if (isLoading || isTransitioning) {
+  if (isLoading) {
     return <div class={skeletonClasses} />;
   }
 
-  console.log("Gallery Pagination:", {
-    hasPagination: !!pagination,
-    totalPages: pagination?.totalPages,
-    currentPage: pagination?.page,
-    shouldShow: pagination && pagination.totalPages > 1,
-  });
+  // 🚀 DENO FRESH 2.3+ OPTIMIZATION: Early return for src20 page with optimized rendering
+  if (fromPage === "src20" || fromPage === "stamping/src20") {
+    return <CardComponent {...cardProps} />;
+  }
 
   return (
     <div class="w-full">
@@ -238,42 +145,8 @@ export function SRC20Gallery({
         </h2>
       )}
 
-      {viewType === "minted"
-        ? (
-          fromPage === "src20"
-            ? (
-              <SRC20Card
-                data={data}
-                fromPage={fromPage}
-                timeframe={timeframe}
-                onImageClick={handleImageClick}
-              />
-            )
-            : (
-              <SRC20CardSm
-                data={data}
-                fromPage={fromPage}
-                onImageClick={handleImageClick}
-              />
-            )
-        )
-        : fromPage === "src20"
-        ? (
-          <SRC20CardMinting
-            data={data}
-            fromPage={fromPage}
-            timeframe={timeframe}
-            onImageClick={handleImageClick}
-          />
-        )
-        : (
-          <SRC20CardSmMinting
-            data={data}
-            fromPage={fromPage}
-            timeframe={timeframe}
-            onImageClick={handleImageClick}
-          />
-        )}
+      {/* 🚀 OPTIMIZED: Use dynamic card component selection based on minting status */}
+      <CardComponent {...cardProps} />
 
       {fromPage === "home" && (
         <div class="flex justify-end -mt-3 mobileMd:-mt-6">

@@ -4,14 +4,21 @@ import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import { rowTable, Timeframe } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { formatDate } from "$lib/utils/formatUtils.ts";
+import { constructStampUrl } from "$lib/utils/imageUtils.ts";
 import { labelXs, valueDark, valueSm } from "$text";
 
-// ✅ NEW: Import type-safe market data utilities
-import {
-  getFloorPrice,
-  getMarketCapBTC,
-  getVolume24h,
-} from "$lib/utils/marketDataHelpers.ts";
+// ✅ LOCAL: v2.3 market data helper functions
+function getFloorPrice(src20: any): number {
+  return src20?.market_data?.floor_price_btc || 0;
+}
+
+function getMarketCapBTC(src20: any): number {
+  return src20?.market_data?.market_cap_btc || 0;
+}
+
+function getVolume24h(src20: any): number {
+  return src20?.market_data?.volume_24h_btc || 0;
+}
 
 interface SRC20MintedTableProps {
   data: SRC20Row[];
@@ -82,10 +89,12 @@ export function SRC20MintedTable({
           {data.length
             ? (
               data.map((src20) => {
-                const imageUrl = src20.stamp_url ||
-                  src20.deploy_img ||
-                  `/content/${src20.tx_hash}.svg` ||
-                  `/content/${src20.deploy_tx}`;
+                const imageUrl = src20.deploy_img ||
+                  src20.stamp_url ||
+                  (src20.deploy_tx
+                    ? constructStampUrl(src20.deploy_tx)
+                    : null) ||
+                  "/img/placeholder/stamp-no-image.svg";
 
                 return (
                   <tr key={src20.tx_hash} class={rowTable}>

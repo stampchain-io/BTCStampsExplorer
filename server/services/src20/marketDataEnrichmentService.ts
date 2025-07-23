@@ -80,7 +80,7 @@ export interface MarketDataFields {
  */
 export interface EnrichedSRC20Item extends SRC20Row {
   /**
-   * Nested market data object - SINGLE SOURCE OF TRUTH
+   * Nested market data object - SINGLE SOURCE OF TRUTH (snake_case for API consistency)
    * NO root-level fields like floor_unit_price, market_cap, volume24, change24
    */
   market_data: MarketDataFields | null;
@@ -108,10 +108,10 @@ export interface BulkEnrichmentResult {
 /**
  * Centralized Market Data Enrichment Service
  *
- * This service eliminates the 3x code duplication found in:
+ * This service eliminates code duplication found in:
  * - handleSrc20BalanceRequest()
- * - fetchFullyMintedByMarketCapV2()
  * - fetchTrendingActiveMintingTokensV2()
+ * - Other SRC20 endpoints that need market data enrichment
  *
  * By providing a single, standardized interface for market data enrichment
  * with proper error handling, performance optimization, and API versioning support.
@@ -288,7 +288,7 @@ export class MarketDataEnrichmentService {
     const marketDataMap = new Map<string, MarketDataFields>();
     const failedTicks: string[] = [];
 
-    // TODO(@kevinsitzes): Implement true bulk database query when MarketDataRepository supports it
+    // TODO: Implement true bulk database query when MarketDataRepository supports it
     // For now, use Promise.allSettled for concurrent fetching
     const promises = ticks.map(async (tick) => {
       try {

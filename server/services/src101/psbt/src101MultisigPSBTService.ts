@@ -321,7 +321,7 @@ export class SRC101MultisigPSBTService {
       const estimatedFee = BigInt(fee);
 
       // Calculate change correctly
-      const changeAmount = totalInputValue - outputsBeforeChange - estimatedFee;
+      const changeAmount = totalInputValue - BigInt(outputsBeforeChange) - estimatedFee;
 
       // Add all outputs to PSBT
       vouts.forEach((vout) => {

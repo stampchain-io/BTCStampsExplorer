@@ -201,21 +201,21 @@ Deno.test("StampService - enrichStampWithMarketData adds market data correctly",
     assertEquals(result.stamps.length, 2);
 
     const firstStamp = result.stamps[0];
-    // v2.3+: floorPrice is now only in marketData, not at root level
-    assertExists(firstStamp.marketData);
-    assertExists(firstStamp.marketData.floorPriceBTC);
-    assertEquals(firstStamp.marketData.floorPriceBTC, 0.001);
-    assertExists(firstStamp.floorPriceUSD);
-    assertEquals(firstStamp.floorPriceUSD, 50); // 0.001 * 50000
+    // v2.3+: market data is now in market_data with snake_case fields
+    assertExists(firstStamp.market_data);
+    assertExists(firstStamp.market_data.floor_price_btc);
+    assertEquals(firstStamp.market_data.floor_price_btc, 0.001);
+    assertExists(firstStamp.market_data.floor_price_usd);
+    assertEquals(firstStamp.market_data.floor_price_usd, 50); // 0.001 * 50000
 
-    assertEquals(firstStamp.marketData.openDispensersCount, 2);
-    assertEquals(firstStamp.marketData.holderCount, 25);
+    assertEquals(firstStamp.market_data.dispensers.open_count, 2);
+    assertEquals(firstStamp.market_data.holder_count, 25);
 
-    assertExists(firstStamp.dispenserInfo);
-    assertEquals(firstStamp.dispenserInfo.openCount, 2);
-    assertEquals(firstStamp.dispenserInfo.totalCount, 7);
+    assertExists(firstStamp.market_data.dispensers);
+    assertEquals(firstStamp.market_data.dispensers.open_count, 2);
+    assertEquals(firstStamp.market_data.dispensers.total_count, 7);
 
-    assertExists(firstStamp.cacheStatus);
+    assertExists(firstStamp.market_data.cache_status);
   } finally {
     restoreRepositories();
   }
@@ -240,9 +240,8 @@ Deno.test("StampService - handles stamps without market data", async () => {
     assertEquals(result.stamps.length, 1);
 
     const stamp = result.stamps[0];
-    assertEquals(stamp.floorPrice, "priceless");
-    assertEquals(stamp.floorPriceUSD, null);
-    assertEquals(stamp.marketData, null);
+    // market_data should be null when no market data is available
+    assertEquals(stamp.market_data, null);
     assertEquals(
       stamp.marketDataMessage,
       "No market data available for this stamp",
@@ -267,10 +266,10 @@ Deno.test("StampService - getStampsWithMarketData uses JOIN query", async () => 
     assertEquals(result.length, 1);
 
     const stamp = result[0];
-    // v2.3+: floorPrice is now only in marketData, not at root level
-    assertExists(stamp.marketData);
-    assertExists(stamp.marketData.floorPriceBTC);
-    assertEquals(stamp.marketData.floorPriceUSD, 50); // 0.001 * 50000
+    // v2.3+: market data is in market_data with snake_case fields
+    assertExists(stamp.market_data);
+    assertExists(stamp.market_data.floor_price_btc);
+    assertEquals(stamp.market_data.floor_price_usd, 50); // 0.001 * 50000
   } finally {
     restoreRepositories();
   }

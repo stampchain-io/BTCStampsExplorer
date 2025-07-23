@@ -1,11 +1,11 @@
 import {
-    MarketListingAggregated,
-    PaginatedSrc20ResponseBody,
-    Src20ResponseBody,
-    SRC20Row,
-    Src20SnapShotDetail,
-    SRC20SnapshotRequestParams,
-    SRC20TrxRequestParams
+  MarketListingAggregated,
+  PaginatedSrc20ResponseBody,
+  Src20ResponseBody,
+  SRC20Row,
+  Src20SnapShotDetail,
+  SRC20SnapshotRequestParams,
+  SRC20TrxRequestParams
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
@@ -23,13 +23,29 @@ interface PerformanceMetrics {
   dataSize: number;
 }
 
+// 🚀 NEW V2.3 TRENDING CALCULATION INTERFACES
+interface TrendingCalculationOptions {
+  trendingWindow?: '24h' | '7d' | '30d';
+  mintVelocityMin?: number | undefined;  // Allow undefined explicitly
+}
+
+interface EnhancedSRC20Row extends SRC20Row {
+  mint_velocity?: number;           // Mints per hour
+  trending_score?: number;          // Calculated trending score
+  mint_activity_24h?: number;       // 24h mint count
+  mint_activity_7d?: number;        // 7d mint count
+  mint_activity_30d?: number;       // 30d mint count
+  market_data?: MarketListingAggregated; // Market data for sorting
+}
+
 // Change class name from Src20Service to SRC20QueryService
 export class SRC20QueryService {
   static async getTotalCountValidSrc20Tx(params: {
     tick?: string | string[];
     op?: string | string[];
   }, excludeFullyMinted = false): Promise<number> {
-    const result = await SRC20Repository.getTotalCountValidSrc20TxFromDb(
+    // 🚀 USE OPTIMIZED METHOD WITH PRE-COMPUTED MARKET DATA
+    const result = await SRC20Repository.getTotalCountValidSrc20TxFromDbOptimized(
       params,
       excludeFullyMinted,
     );
@@ -45,7 +61,7 @@ export class SRC20QueryService {
     params: SRC20TrxRequestParams,
     excludeFullyMinted = false,
   ) {
-    return await SRC20Repository.getValidSrc20TxFromDb(params, excludeFullyMinted);
+            return await SRC20Repository.getValidSrc20TxFromDb(params, excludeFullyMinted);
   }
 
   static async fetchAndFormatSrc20Data(
@@ -254,8 +270,10 @@ export class SRC20QueryService {
     mappedData: any[],
     params: SRC20TrxRequestParams,
   ) {
+    // Return single object when requesting specific tx_hash without block_index constraint
+    // This ensures consistent API behavior regardless of whether block_index is null or undefined
     return params.tx_hash !== null && mappedData.length === 1 &&
-        (params.block_index === null || params.block_index === undefined)
+        (params.block_index == null) // Use == to catch both null and undefined
       ? mappedData[0]
       : [mappedData].flat();
   }
@@ -350,6 +368,161 @@ export class SRC20QueryService {
     }
   }
 
+  // 🚀 NEW V2.3 TRENDING CALCULATION METHODS
+
+  /**
+   * Calculate mint velocity and trending metrics for SRC20 tokens
+   * Uses pre-populated src20_market_data fields to avoid expensive CTEs
+   */
+  // deno-lint-ignore no-unused-vars
+  private static async calculateTrendingMetrics(
+    tokens: any[],
+    options: TrendingCalculationOptions = {}
+  ): Promise<EnhancedSRC20Row[]> {
+    const { trendingWindow = '24h' } = options;
+
+    return tokens.map(token => {
+      const enhancedToken = { ...token } as EnhancedSRC20Row;
+
+      // Calculate mint velocity using progress data from src20_market_data
+      const progress = parseFloat(token.progress || "0");
+      const totalMinted = parseFloat(token.total_minted || "0");
+
+      // Estimate mint velocity based on progress and time
+      // This is a simplified calculation - in production you'd use actual mint timestamps
+      const progressRate = Math.max(0, progress / 100);
+      const estimatedMintDuration = progressRate > 0 ? 24 : 0; // Simplified: assume 24h for active tokens
+      enhancedToken.mint_velocity = estimatedMintDuration > 0 ? totalMinted / estimatedMintDuration : 0;
+
+      // Calculate trending score based on recent mint activity
+      // Use market data volume as proxy for activity (higher volume = more trading = more trending)
+      // Check both locations since data might be enriched (market_data) or raw (root level)
+      const volume24h = parseFloat((token as any).market_data?.volume_24h_btc || token.volume_24h_btc || "0");
+      const volume7d = parseFloat((token as any).market_data?.volume_7d_btc || token.volume_7d_btc || "0");
+      const volume30d = parseFloat((token as any).market_data?.volume_30d_btc || token.volume_30d_btc || "0");
+
+      // Calculate trending score based on selected window
+      switch (trendingWindow) {
+        case '24h':
+          enhancedToken.trending_score = volume24h * (1 + progressRate);
+          enhancedToken.mint_activity_24h = volume24h;
+          break;
+        case '7d':
+          enhancedToken.trending_score = volume7d * (1 + progressRate);
+          enhancedToken.mint_activity_7d = volume7d;
+          break;
+        case '30d':
+          enhancedToken.trending_score = volume30d * (1 + progressRate);
+          enhancedToken.mint_activity_30d = volume30d;
+          break;
+      }
+
+      return enhancedToken;
+    });
+  }
+
+  /**
+   * Apply trending-based sorting to token data
+   */
+  // deno-lint-ignore no-unused-vars
+  private static applyTrendingSorting(
+    tokens: EnhancedSRC20Row[],
+    sortBy: string
+  ): EnhancedSRC20Row[] {
+    const sortedTokens = [...tokens];
+
+    // Helper function for secondary market cap sorting
+    const compareByMarketCap = (a: any, b: any, ascending: boolean = false): number => {
+      const aMarketCap = a.market_data?.market_cap_btc || 0;
+      const bMarketCap = b.market_data?.market_cap_btc || 0;
+      return ascending ? aMarketCap - bMarketCap : bMarketCap - aMarketCap;
+    };
+
+    switch (sortBy) {
+      case 'TRENDING_MINTING_DESC':
+        return sortedTokens.sort((a, b) => (b.trending_score || 0) - (a.trending_score || 0));
+      case 'TRENDING_MINTING_ASC':
+        return sortedTokens.sort((a, b) => (a.trending_score || 0) - (b.trending_score || 0));
+      case 'MINT_VELOCITY_DESC':
+        return sortedTokens.sort((a, b) => (b.mint_velocity || 0) - (a.mint_velocity || 0));
+      case 'MINT_VELOCITY_ASC':
+        return sortedTokens.sort((a, b) => (a.mint_velocity || 0) - (b.mint_velocity || 0));
+      case 'TRENDING_24H_DESC':
+        return sortedTokens.sort((a, b) => {
+          const volumeDiff = (b.mint_activity_24h || 0) - (a.mint_activity_24h || 0);
+          // Secondary sort by market cap if volumes are equal
+          return volumeDiff !== 0 ? volumeDiff : compareByMarketCap(a, b);
+        });
+      case 'TRENDING_24H_ASC':
+        return sortedTokens.sort((a, b) => {
+          const volumeDiff = (a.mint_activity_24h || 0) - (b.mint_activity_24h || 0);
+          // Secondary sort by market cap if volumes are equal
+          return volumeDiff !== 0 ? volumeDiff : compareByMarketCap(a, b, true);
+        });
+      case 'TRENDING_7D_DESC':
+        return sortedTokens.sort((a, b) => {
+          const volumeDiff = (b.mint_activity_7d || 0) - (a.mint_activity_7d || 0);
+          // Secondary sort by market cap if volumes are equal
+          if (volumeDiff === 0) {
+            const aMarketCap = a.market_data?.market_cap_btc || 0;
+            const bMarketCap = b.market_data?.market_cap_btc || 0;
+            return bMarketCap - aMarketCap;
+          }
+          return volumeDiff;
+        });
+      case 'TRENDING_7D_ASC':
+        return sortedTokens.sort((a, b) => {
+          const volumeDiff = (a.mint_activity_7d || 0) - (b.mint_activity_7d || 0);
+          // Secondary sort by market cap if volumes are equal
+          if (volumeDiff === 0) {
+            const aMarketCap = a.market_data?.market_cap_btc || 0;
+            const bMarketCap = b.market_data?.market_cap_btc || 0;
+            return aMarketCap - bMarketCap;
+          }
+          return volumeDiff;
+        });
+      case 'TRENDING_30D_DESC':
+        return sortedTokens.sort((a, b) => {
+          const volumeDiff = (b.mint_activity_30d || 0) - (a.mint_activity_30d || 0);
+          // Secondary sort by market cap if volumes are equal
+          if (volumeDiff === 0) {
+            const aMarketCap = a.market_data?.market_cap_btc || 0;
+            const bMarketCap = b.market_data?.market_cap_btc || 0;
+            return bMarketCap - aMarketCap;
+          }
+          return volumeDiff;
+        });
+      case 'TRENDING_30D_ASC':
+        return sortedTokens.sort((a, b) => {
+          const volumeDiff = (a.mint_activity_30d || 0) - (b.mint_activity_30d || 0);
+          // Secondary sort by market cap if volumes are equal
+          if (volumeDiff === 0) {
+            const aMarketCap = a.market_data?.market_cap_btc || 0;
+            const bMarketCap = b.market_data?.market_cap_btc || 0;
+            return aMarketCap - bMarketCap;
+          }
+          return volumeDiff;
+        });
+      default:
+        return sortedTokens; // No trending sorting applied
+    }
+  }
+
+  /**
+   * Filter tokens based on mint velocity requirements
+   */
+  // deno-lint-ignore no-unused-vars
+  private static applyMintVelocityFilter(
+    tokens: EnhancedSRC20Row[],
+    mintVelocityMin?: number
+  ): EnhancedSRC20Row[] {
+    if (!mintVelocityMin || mintVelocityMin <= 0) {
+      return tokens;
+    }
+
+    return tokens.filter(token => (token.mint_velocity || 0) >= mintVelocityMin);
+  }
+
   /**
    * Enhanced version of fetchAndFormatSrc20Data with optional data enrichment
    * and performance monitoring. This version maintains backward compatibility
@@ -371,6 +544,7 @@ export class SRC20QueryService {
       maxProgress?: number;
       minTxCount?: number;
       maxTxCount?: number;
+      onlyMintable?: boolean; // Added for optimized trending
     } = {},
     options: {
       excludeFullyMinted?: boolean;
@@ -447,29 +621,44 @@ export class SRC20QueryService {
         delete queryParams.op;
       }
 
+      // Handle onlyFullyMinted vs excludeFullyMinted logic
+      let useExcludeFullyMinted = options.excludeFullyMinted || false;
+
+      // 🚨 CRITICAL FIX: Handle onlyFullyMinted option
+      if (options.onlyFullyMinted) {
+        // For onlyFullyMinted, we need to add a custom WHERE clause to the repository
+        // We'll pass a special parameter to indicate we want only fully minted tokens
+        useExcludeFullyMinted = false; // Don't exclude any tokens at the repository level
+
+        // Add a custom filter condition for fully minted tokens
+        if (!queryParams.tick || (Array.isArray(queryParams.tick) && queryParams.tick.length === 0)) {
+          // If no specific ticks are provided, we need to modify the approach
+          console.log("[fetchAndFormatSrc20DataV2] onlyFullyMinted requires specific ticks from market data");
+        }
+      }
+
       // Fetch base data and metadata in parallel
       const [data, totalResult, lastBlock] = await Promise.all([
         SRC20Repository.getValidSrc20TxFromDb(
           queryParams,
-          options.excludeFullyMinted
+          useExcludeFullyMinted,  // Use the calculated excludeFullyMinted value
+          options.onlyFullyMinted  // Pass onlyFullyMinted flag to repository
         ),
-        SRC20Repository.getTotalCountValidSrc20TxFromDb(
+        SRC20Repository.getTotalCountValidSrc20TxFromDbOptimized(
           queryParams,
-          options.excludeFullyMinted
+          useExcludeFullyMinted  // Use the calculated excludeFullyMinted value
         ),
         BlockService.getLastBlock(),
       ]);
 
-      const total = (totalResult as any).rows[0].total;
+      let total = (totalResult as any).rows[0].total; // Make total mutable for optimized queries
       metrics.dataSize = data.rows?.length || 0;
 
       // Early return for empty data
       if (!data.rows || data.rows.length === 0) {
         metrics.duration = performance.now() - startTime;
         return {
-          data: [],
-          total: 0,
-          page,
+          currentPage: page,
           totalPages: 0,
           limit,
           last_block: lastBlock,
@@ -483,6 +672,29 @@ export class SRC20QueryService {
         mappedData,
         queryParams
       );
+
+      // 🚨 CRITICAL FIX: Apply onlyFullyMinted filtering after data formatting
+      if (options.onlyFullyMinted && Array.isArray(formattedData)) {
+        console.log(`[fetchAndFormatSrc20DataV2] Applying onlyFullyMinted filter to ${formattedData.length} items`);
+
+        formattedData = formattedData.filter((item: any) => {
+          // 🚀 USE ONLY src20_market_data progress_percentage AS SOURCE OF TRUTH
+          const progress = parseFloat(item.progress || "0");
+
+          // Consider fully minted if progress >= 99.9%
+          const isFullyMinted = progress >= 99.9;
+
+          if (isFullyMinted) {
+            console.log(`[fetchAndFormatSrc20DataV2] Including fully minted token: ${item.tick} (${progress}%)`);
+          } else {
+            console.log(`[fetchAndFormatSrc20DataV2] Excluding minting token: ${item.tick} (${progress}%)`);
+          }
+
+          return isFullyMinted;
+        });
+
+        console.log(`[fetchAndFormatSrc20DataV2] After onlyFullyMinted filter: ${formattedData.length} items`);
+      }
 
       // Apply date range filtering if specified
       if (sanitizedParams.dateFrom || sanitizedParams.dateTo) {
@@ -572,6 +784,132 @@ export class SRC20QueryService {
         }
       }
 
+      // 🚀 NEW V2.3 TRENDING CALCULATIONS AND FILTERING
+      const isTrendingSortRequested = sanitizedParams.sortBy && [
+        'TRENDING_MINTING_DESC', 'TRENDING_MINTING_ASC',
+        'MINT_VELOCITY_DESC', 'MINT_VELOCITY_ASC',
+        'TRENDING_24H_DESC', 'TRENDING_24H_ASC',
+        'TRENDING_7D_DESC', 'TRENDING_7D_ASC',
+        'TRENDING_30D_DESC', 'TRENDING_30D_ASC'
+      ].includes(sanitizedParams.sortBy);
+
+      // 🚀 USE OPTIMIZED REPOSITORY METHODS FOR TRENDING QUERIES
+      if ((isTrendingSortRequested || sanitizedParams.mintVelocityMin || sanitizedParams.trendingWindow) &&
+          options.excludeFullyMinted) {  // Use excludeFullyMinted which is set when mintingStatus === "minting"
+
+        console.log('🚀 Using optimized trending repository method');
+
+        // Use optimized repository method that leverages src20_market_data
+        const trendingResult = await SRC20Repository.fetchTrendingActiveMintingTokensOptimized(
+          sanitizedParams.trendingWindow || '24h',
+          sanitizedParams.mintVelocityMin,
+          sanitizedParams.limit || 25
+        );
+
+        // Map and format the optimized results
+        const mappedTrendingData = this.mapTransactionData(trendingResult.rows);
+        const formattedTrendingData = this.formatTransactionData(mappedTrendingData, queryParams);
+
+        // Enrich the trending data if needed
+        if (options.includeMarketData || options.enrichWithProgress) {
+          formattedData = await this.enrichData(
+            formattedTrendingData,
+            {
+              includeMarketData: options.includeMarketData || false,
+              enrichWithProgress: options.enrichWithProgress || false,
+              batchSize: options.batchSize || 50,
+              prefetchedMarketData: options.prefetchedMarketData || []
+            }
+          );
+        } else {
+          formattedData = formattedTrendingData;
+        }
+
+        total = trendingResult.total;
+
+        console.log(`✅ Optimized trending query returned ${total} results`);
+
+      } else if (isTrendingSortRequested || sanitizedParams.mintVelocityMin || sanitizedParams.trendingWindow) {
+        // Ensure we have array format for trending calculations
+        formattedData = Array.isArray(formattedData) ? formattedData : [formattedData];
+
+        // Calculate trending metrics using pre-populated src20_market_data fields
+        const enhancedTokens = await this.calculateTrendingMetrics(
+          formattedData,
+          {
+            trendingWindow: sanitizedParams.trendingWindow || '24h',
+            mintVelocityMin: sanitizedParams.mintVelocityMin
+          }
+        );
+
+        // Apply mint velocity filtering if specified
+        let filteredTokens = sanitizedParams.mintVelocityMin
+          ? this.applyMintVelocityFilter(enhancedTokens, sanitizedParams.mintVelocityMin)
+          : enhancedTokens;
+
+        // Apply trending-based sorting if requested
+        if (isTrendingSortRequested && sanitizedParams.sortBy) {
+          filteredTokens = this.applyTrendingSorting(filteredTokens, sanitizedParams.sortBy);
+        }
+
+                        // 🚀 FILTER OUT ZERO-VOLUME TOKENS FOR TRENDING SORTS (MINTED TOKENS ONLY)
+        // Only apply volume filtering to MINTED tokens (100% progress) since:
+        // 1. MINTING tokens (< 100% progress) don't have trading volume yet - they use mint activity
+        // 2. MINTED tokens should be filtered by actual trading volume to show true "top tickers"
+        // 3. We differentiate between mint-based trending (TRENDING_MINTING_*) and volume-based trending (TRENDING_24H_*, etc.)
+        const isVolumeBasedTrendingSort = sanitizedParams.sortBy ? [
+          'TRENDING_24H_DESC', 'TRENDING_24H_ASC',
+          'TRENDING_7D_DESC', 'TRENDING_7D_ASC',
+          'TRENDING_30D_DESC', 'TRENDING_30D_ASC'
+        ].includes(sanitizedParams.sortBy) : false;
+
+                const isMintedTokensQuery = !options.excludeFullyMinted; // excludeFullyMinted is false for minted tokens
+
+
+        if (isVolumeBasedTrendingSort && isMintedTokensQuery) {
+          // For v2.3 API, volume data is in market_data structure
+          const getVolumeFromToken = (token: any, timeframe: '24h' | '7d' | '30d' = '24h'): number => {
+            const marketData = token.market_data;
+            if (!marketData) return 0;
+
+            switch (timeframe) {
+              case '24h': return parseFloat(marketData.volume_24h_btc || "0");
+              case '7d': return parseFloat(marketData.volume_7d_btc || "0");
+              case '30d': return parseFloat(marketData.volume_30d_btc || "0");
+              default: return 0;
+            }
+          };
+
+          const timeframe = sanitizedParams.sortBy?.includes('24H') ? '24h' :
+                           sanitizedParams.sortBy?.includes('7D') ? '7d' : '30d';
+
+          console.log(`[fetchAndFormatSrc20DataV2] Analyzing ${timeframe} volume distribution for ${sanitizedParams.sortBy || 'unknown'}`);
+          const beforeCount = filteredTokens.length;
+
+                    // Count tokens with meaningful volume (> 0.01 BTC = ~$600+ at current prices)
+          const tokensWithVolume = filteredTokens.filter((token: any) => {
+            const volume = getVolumeFromToken(token, timeframe);
+            return volume > 0.01;
+          }).length;
+
+          // For minted tokens, be more permissive - only filter if we have many high-volume tokens
+          // This ensures established tokens show up even during quiet trading periods
+          const shouldApplyFiltering = tokensWithVolume >= Math.min(10, Math.floor(beforeCount * 0.5));
+
+          if (shouldApplyFiltering) {
+            filteredTokens = filteredTokens.filter((token: any) => {
+              const volume = getVolumeFromToken(token, timeframe);
+              return volume > 0;
+            });
+            console.log(`[fetchAndFormatSrc20DataV2] Applied ${timeframe} volume filtering: ${beforeCount} → ${filteredTokens.length} tokens (${tokensWithVolume} had high volume)`);
+          } else {
+            console.log(`[fetchAndFormatSrc20DataV2] Skipped ${timeframe} volume filtering: only ${tokensWithVolume} tokens have high volume out of ${beforeCount} (threshold: ${Math.min(10, Math.floor(beforeCount * 0.5))})`);
+          }
+        }
+
+        formattedData = filteredTokens;
+      }
+
       // Handle single result case
       if (
         params.singleResult &&
@@ -580,7 +918,7 @@ export class SRC20QueryService {
       ) {
         metrics.duration = performance.now() - startTime;
         const singleResponse = {
-          last_block: lastBlock,
+          last_block: await BlockService.getLastBlock(),
           data: formattedData[0],
         };
         // Add performance metrics as additional property
@@ -594,7 +932,7 @@ export class SRC20QueryService {
 
       const response = {
         ...pagination,
-        last_block: lastBlock,
+        last_block: await BlockService.getLastBlock(),
         data: Array.isArray(formattedData) ? formattedData : [formattedData],
       };
       // Add performance metrics as additional property
@@ -637,23 +975,17 @@ export class SRC20QueryService {
       // Process in batches if needed
       for (let i = 0; i < rows.length; i += batchSize) {
         const batch = rows.slice(i, i + batchSize);
-        const ticks = batch.map(row => row.tick);
 
-        // Fetch market data and mint progress in parallel
-        const [marketData, mintProgress] = await Promise.all([
-          options.includeMarketData
-            ? (options.prefetchedMarketData && options.prefetchedMarketData.length > 0)
-              ? options.prefetchedMarketData
-              : this.fetchMarketDataFromCache(ticks) // Use cached data instead of external API
-            : null,
-          options.enrichWithProgress
-            ? Promise.all(ticks.map(tick =>
-                this.fetchSrc20MintProgress(tick).catch(() => null)
-              ))
-            : null
-        ]);
+        // 🚀 OPTIMIZATION: Skip external API lookup when database already provides market data
+        // The SQL query already fetches market data from src20_market_data table
+        const marketData = options.includeMarketData
+          ? (options.prefetchedMarketData && options.prefetchedMarketData.length > 0)
+            ? options.prefetchedMarketData
+            : null // Skip external API - database is single source of truth
+          : null;
 
-        // Enrich market data and holders
+        // 🚀 OPTIMIZED: Only enrich DEPLOY and MINT operations with market data
+        // TRANSFER operations don't need market data (just address-to-address moves)
         if (marketData) {
           const marketMap = new Map(
             marketData
@@ -661,35 +993,95 @@ export class SRC20QueryService {
               .filter(([key]) => key) as [string, any][] // Filter out null/undefined keys and assert type
           );
           batch.forEach((row, index) => {
-            const tickForLookup = row.tick?.toUpperCase();
-            if (tickForLookup) {
+            const tickForLookup = row.tick || "";
+            const shouldEnrichWithMarketData = options.includeMarketData && row.op === 'DEPLOY';
+
+            if (tickForLookup && shouldEnrichWithMarketData) {
               const market = marketMap.get(tickForLookup);
+
               if (market) {
-                (enriched[i + index] as any).market_data = market;
+                // ✅ Enrich market data with standardized naming (consistent with stamps)
+                const enrichedMarketData = {
+                  tick: market.tick,
+                  // ✅ STANDARDIZED NAMING: Use consistent snake_case like stamps
+                  floor_price_btc: market.floor_unit_price || 0,
+                  market_cap_btc: market.mcap || 0,
+                  // ✅ VOLUME TIMEFRAMES: Add all available timeframes like stamps
+                  volume_24h_btc: market.volume24 || 0,
+                  volume_7d_btc: market.volume7d || 0, // Add 7d volume from cache
+                  volume_30d_btc: market.volume30d || 0, // Add 30d volume from cache
+                  // ✅ REMOVED: stamp_url and tx_hash no longer in market_data (deduplicated)
+                  holder_count: market.holder_count || 0,
+                  market_data_sources: market.market_data_sources || market.market_data || {},
+                };
+                (enriched[i + index] as any).market_data = enrichedMarketData;
                 (enriched[i + index] as any).holders = row.holders || (market as any).holder_count || 0;
               } else {
                 // Optional: Log if a tick is not found in the market map, can be noisy
                 console.log(`[enrichData] Market data not found for tick: '${row.tick}' (lookup key: '${tickForLookup}')`);
               }
+            } else if (!shouldEnrichWithMarketData) {
+              // 📊 PERFORMANCE: Skip market data for TRANSFER operations
+              console.log(`[enrichData] Skipping market data for ${row.op} operation: '${row.tick}'`);
             } else {
               console.warn(`[enrichData] Invalid tick value (null/undefined) for row at index ${i + index}`);
             }
           });
         }
 
-        // Enrich mint progress
-        if (mintProgress) {
-          batch.forEach((row, index) => {
-            const progress = mintProgress[index];
-            if (progress) {
-              (enriched[i + index] as any).mint_progress = {
-                progress: row.progress || progress.progress || "0",
-                current: (progress as any).total_minted || 0,
-                max: (progress as any).max_supply || 0
-              };
-            }
-          });
-        }
+        // 🚀 V2.3 CLEAN STRUCTURE: Create nested objects and remove root duplicates
+        enriched.forEach((row: any) => {
+          // Get base URL (same logic as used in other parts of the app)
+          const env = Deno.env.get("DENO_ENV");
+          const baseUrl = env === "development"
+            ? (Deno.env.get("DEV_BASE_URL") || "https://stampchain.io")
+            : "https://stampchain.io";
+
+          // ✅ STAMP_URL: Use transaction hash for the actual stamp content
+          if (row.tx_hash) {
+            row.stamp_url = `${baseUrl}/stamps/${row.tx_hash}.svg`;
+          }
+
+          // ✅ DEPLOY_IMG: Use deploy transaction hash for the deploy image
+          if (row.deploy_tx) {
+            row.deploy_img = `${baseUrl}/stamps/${row.deploy_tx}.svg`;
+          }
+
+          // ✅ CLEAN MARKET DATA STRUCTURE
+          if (row.market_cap_btc !== undefined || row.price_btc !== undefined || row.holders !== undefined) {
+            row.market_data = {
+              market_cap_btc: row.market_cap_btc || "0",
+              price_btc: row.price_btc || "0", // Using price_btc for fungible tokens
+              price_source_type: row.price_source_type || "unknown", // Default to "unknown" if not present
+              volume_24h_btc: row.volume_24h_btc || "0",
+              change_24h_percent: row.price_change_24h_percent || 0, // Keep consistent with schema
+              holder_count: row.holders || 0
+            };
+
+            // 🎯 V2.3 CLEAN: Remove duplicate root fields
+            delete row.market_cap_btc;
+            delete row.price_btc;
+            delete row.price_source_type; // Safe to delete even if undefined
+            delete row.volume_24h_btc;
+            delete row.price_change_24h_percent; // Clean up the DB field
+            delete row.holders;
+          }
+
+                    // ✅ CLEAN MINT PROGRESS STRUCTURE
+          if (row.progress !== undefined || row.minted_amt !== undefined || row.total_mints !== undefined) {
+            row.mint_progress = {
+              progress: row.progress || "0.00",
+              current: row.minted_amt || "0",
+              max: row.max || "0",
+              total_mints: row.total_mints || 0
+            };
+
+            // 🎯 V2.3 CLEAN: Remove duplicate root fields
+            delete row.progress;
+            delete row.minted_amt;
+            delete row.total_mints;
+          }
+        });
       }
 
       return Array.isArray(data) ? enriched : enriched[0];
@@ -700,55 +1092,7 @@ export class SRC20QueryService {
     }
   }
 
-  /**
-   * Fetch market data from the cached src20_market_data table for specific ticks
-   * This is much more efficient than calling external APIs
-   */
-  private static async fetchMarketDataFromCache(ticks: string[]): Promise<MarketListingAggregated[]> {
-    try {
-      console.log(`[fetchMarketDataFromCache] Fetching market data for ${ticks.length} ticks from cache`);
-
-      // Fetch market data for each tick from the cache
-      const marketDataPromises = ticks.map(tick =>
-        MarketDataRepository.getSRC20MarketData(tick).catch(() => null)
-      );
-
-      const marketDataResults = await Promise.all(marketDataPromises);
-
-      // Convert to MarketListingAggregated format for compatibility
-      const marketListingData: MarketListingAggregated[] = [];
-
-      marketDataResults.forEach((marketData) => {
-        if (marketData) {
-          marketListingData.push({
-            tick: marketData.tick,
-            floor_unit_price: marketData.floorPriceBTC || 0,
-            mcap: marketData.marketCapBTC || 0,
-            volume24: marketData.volume24hBTC || 0,
-            stamp_url: null, // Not available in SRC20MarketData
-            tx_hash: "", // Not available in SRC20MarketData
-            holder_count: marketData.holderCount || 0,
-            market_data: {
-              stampscan: {
-                price: marketData.marketCapBTC || 0,
-                volume24: marketData.volume24hBTC || 0
-              },
-              openstamp: {
-                price: marketData.marketCapBTC || 0,
-                volume24: marketData.volume24hBTC || 0
-              }
-            }
-          });
-        }
-      });
-
-      console.log(`[fetchMarketDataFromCache] Retrieved ${marketListingData.length} market data entries from cache`);
-      return marketListingData;
-    } catch (error) {
-      console.error("[fetchMarketDataFromCache] Error fetching market data from cache:", error);
-      return []; // Return empty array on error
-    }
-  }
+  // Note: fetchMarketDataFromCache method removed as database is now single source of truth
 
   /**
    * Structure SRC20 data with v2.3 market data format

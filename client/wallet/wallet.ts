@@ -1,7 +1,7 @@
-import { signal } from "@preact/signals";
-import { logger } from "$lib/utils/logger.ts";
-import { openModal } from "$islands/modal/states.ts";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
+import { openModal } from "$islands/modal/states.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { signal } from "@preact/signals";
 
 import { Wallet } from "$types/index.d.ts";
 import {
@@ -28,6 +28,7 @@ interface WalletProviders {
   unisat?: any;
   tapwallet?: any;
   phantom?: any;
+  HorizonWalletProvider?: any;
 }
 
 interface WalletContext {
@@ -189,6 +190,7 @@ export function getGlobalWallets(): WalletProviders {
       unisat?: unknown;
       tapwallet?: unknown;
       phantom?: { bitcoin?: { isPhantom?: boolean } };
+      HorizonWalletProvider?: unknown;
     };
 
     logger.debug("ui", {
@@ -199,6 +201,7 @@ export function getGlobalWallets(): WalletProviders {
         hasUnisat: Boolean(global.unisat),
         hasTapWallet: Boolean(global.tapwallet),
         hasPhantom: Boolean(global.phantom?.bitcoin?.isPhantom),
+        hasHorizon: Boolean(global.HorizonWalletProvider),
         timestamp: new Date().toISOString(),
       },
     });
@@ -209,6 +212,7 @@ export function getGlobalWallets(): WalletProviders {
       unisat: global.unisat,
       tapwallet: global.tapwallet,
       phantom: global.phantom,
+      HorizonWalletProvider: global.HorizonWalletProvider,
     };
   } catch (_error) {
     // Silently handle wallet detection errors to prevent console spam
@@ -237,6 +241,8 @@ export function checkWalletAvailability(provider: string): boolean {
       return !!wallets.tapwallet;
     case "phantom":
       return !!wallets.phantom?.bitcoin?.isPhantom;
+    case "horizon":
+      return !!wallets.HorizonWalletProvider;
     default:
       return false;
   }

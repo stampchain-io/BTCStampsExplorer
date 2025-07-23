@@ -15,32 +15,28 @@ export const handler: Handlers = {
       const decodedTick = decodeURIComponent(rawTick);
       const encodedTick = encodeURIComponent(rawTick);
 
-      // Get the base URL from the request
-      const url = new URL(_req.url);
-      const baseUrl = `${url.protocol}//${url.host}`;
-
-      /* ===== DATA FETCHING ===== */
+      /* ===== SERVER-SIDE DATA FETCHING ===== */
       const [body, transferCount, mintCount, combinedListings] = await Promise
         .all([
           Src20Controller.fetchSrc20TickPageData(decodedTick),
-          fetch(
-            `${baseUrl}/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`,
-            {
-              headers: {
-                "X-API-Version": "2.3",
-              },
-            },
-          )
-            .then((r) => r.json()),
-          fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`, {
-            headers: {
-              "X-API-Version": "2.3",
-            },
-          })
-            .then((r) => r.json()),
+          // 🚀 SERVER-SIDE: Use controller directly instead of HTTP fetch
+          Src20Controller.getTickData({
+            tick: decodedTick,
+            limit: 1,
+            page: 1,
+            op: "TRANSFER",
+          }).then((result) => ({ total: result.total })),
+          // 🚀 SERVER-SIDE: Use controller directly instead of HTTP fetch
+          Src20Controller.getTickData({
+            tick: decodedTick,
+            limit: 1,
+            page: 1,
+            op: "MINT",
+          }).then((result) => ({ total: result.total })),
+          // 🚀 EXTERNAL API: Keep external call but with better error handling
           fetch(
             `https://api.stampscan.xyz/utxo/combinedListings?tick=${encodedTick}`,
-          ).then((r) => r.json()),
+          ).then((r) => r.ok ? r.json() : []).catch(() => []),
         ]);
 
       if (!body) {

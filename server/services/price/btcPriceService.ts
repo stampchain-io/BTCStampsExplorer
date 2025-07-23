@@ -1,17 +1,24 @@
+import { dbManager, type DatabaseManager } from "$/server/database/databaseManager.ts";
+import { FetchHttpClient } from "$/server/interfaces/httpClient.ts";
+import {
+  createPriceServiceCircuitBreaker,
+  type CircuitBreakerMetrics
+} from "$/server/utils/circuitBreaker.ts";
 import { COINGECKO_API_BASE_URL } from "$lib/utils/constants.ts";
-import { dbManager } from "$server/database/databaseManager.ts";
-import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
-import { RouteType, getCacheConfig } from "$server/services/cacheService.ts";
-import { CircuitBreaker, CircuitBreakerConfig, CircuitBreakerMetrics } from "./circuitBreaker.ts";
+import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
 
-import type { DatabaseManager } from "$server/database/databaseManager.ts";
-
-const httpClient = new FetchHttpClient();
 const BINANCE_API_BASE_URL = "https://api.binance.com/api/v3";
 const KRAKEN_API_BASE_URL = "https://api.kraken.com/0/public";
 const COINBASE_API_BASE_URL = "https://api.coinbase.com/v2";
 const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
 const BITSTAMP_API_BASE_URL = "https://www.bitstamp.net/api/v2";
+
+// Create httpClient instance
+const httpClient = new FetchHttpClient(
+  10000, // 10 second timeout for price APIs
+  3,     // 3 retries
+  1000   // 1 second retry delay
+);
 
 export interface BTCPriceData {
   price: number;
@@ -27,23 +34,14 @@ export interface BTCPriceData {
 export class BTCPriceService {
   private static db: DatabaseManager = dbManager;
 
-  // Circuit breaker configurations
-  private static readonly CIRCUIT_BREAKER_CONFIG: CircuitBreakerConfig = {
-    failureThreshold: 3,        // Open after 3 failures
-    recoveryTimeout: 30000,     // Wait 30s before trying HALF_OPEN
-    successThreshold: 2,        // Need 2 successes to close from HALF_OPEN
-    timeout: 5000,             // 5s timeout per request
-    monitoringPeriod: 60000,   // Track failures over 1 minute
-  };
-
   // Circuit breakers for each price source
   private static circuitBreakers = {
-    coingecko: new CircuitBreaker("CoinGecko", this.CIRCUIT_BREAKER_CONFIG),
-    binance: new CircuitBreaker("Binance", this.CIRCUIT_BREAKER_CONFIG),
-    kraken: new CircuitBreaker("Kraken", this.CIRCUIT_BREAKER_CONFIG),
-    coinbase: new CircuitBreaker("Coinbase", this.CIRCUIT_BREAKER_CONFIG),
-    blockchain: new CircuitBreaker("Blockchain.info", this.CIRCUIT_BREAKER_CONFIG),
-    bitstamp: new CircuitBreaker("Bitstamp", this.CIRCUIT_BREAKER_CONFIG),
+    coingecko: createPriceServiceCircuitBreaker("CoinGecko"),
+    binance: createPriceServiceCircuitBreaker("Binance"),
+    kraken: createPriceServiceCircuitBreaker("Kraken"),
+    coinbase: createPriceServiceCircuitBreaker("Coinbase"),
+    blockchain: createPriceServiceCircuitBreaker("Blockchain.info"),
+    bitstamp: createPriceServiceCircuitBreaker("Bitstamp"),
   };
 
   static setDatabase(database: DatabaseManager): void {
@@ -168,7 +166,7 @@ export class BTCPriceService {
   private static getNextSourceOrder(): string[] {
     // Filter out permanently disabled sources
     const availableSources = this.getAvailableSources();
-    
+
     if (availableSources.length === 0) {
       console.warn("[BTCPriceService] No available price sources - all are permanently disabled");
       return [];
@@ -617,7 +615,6 @@ export class BTCPriceService {
     circuitBreakers: Record<string, CircuitBreakerMetrics>;
     healthStatus: Record<string, boolean>;
     permanentlyDisabled: Record<string, boolean>;
-    configuration: CircuitBreakerConfig;
     sources: string[];
     availableSources: string[];
   } {
@@ -630,7 +627,6 @@ export class BTCPriceService {
       circuitBreakers: this.getCircuitBreakerMetrics(),
       healthStatus: this.getHealthStatus(),
       permanentlyDisabled,
-      configuration: this.CIRCUIT_BREAKER_CONFIG,
       sources: [...this.SOURCES],
       availableSources: this.getAvailableSources(),
     };

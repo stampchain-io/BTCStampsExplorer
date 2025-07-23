@@ -1,15 +1,16 @@
 /* ===== WALLET PROVIDER MODAL COMPONENT ===== */
-import { useState } from "preact/hooks";
-import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
-import { unisatProvider } from "$client/wallet/unisat.ts";
-import { showToast } from "$lib/utils/toastSignal.ts";
+import { horizonProvider } from "$client/wallet/horizon.ts";
 import { leatherProvider } from "$client/wallet/leather.ts";
 import { okxProvider } from "$client/wallet/okx.ts";
-import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
 import { phantomProvider } from "$client/wallet/phantom.ts";
-import { containerCard } from "$layout";
+import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
+import { unisatProvider } from "$client/wallet/unisat.ts";
 import { closeForegroundModal, closeModal } from "$islands/modal/states.ts";
+import { containerCard } from "$layout";
+import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
 import type { BaseToast } from "$lib/utils/toastSignal.ts";
+import { showToast } from "$lib/utils/toastSignal.ts";
+import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface WalletProviderProps {
@@ -24,6 +25,7 @@ const walletConnectors = {
   okx: okxProvider.connectOKX,
   tapwallet: tapWalletProvider.connectTapWallet,
   phantom: phantomProvider.connectPhantom,
+  horizon: horizonProvider.connectHorizon,
 } as const;
 
 /* ===== MODAL COMPONENT ===== */
@@ -104,7 +106,7 @@ export function WalletProvider(
       <img
         src={providerInfo.logo}
         alt={providerInfo.name}
-        class="w-8 h-8"
+        class="w-8 h-8 object-contain"
       />
     </div>
   );

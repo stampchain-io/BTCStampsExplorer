@@ -256,6 +256,219 @@
               }
             }
           ]
+        },
+        {
+          "name": "SRC20 Deploy Enhanced Fields - Smoke Test",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2.3"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/src20?op=deploy&limit=3&includeMarketData=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v2", "src20"],
+              "query": [
+                {
+                  "key": "op",
+                  "value": "deploy"
+                },
+                {
+                  "key": "limit",
+                  "value": "3"
+                },
+                {
+                  "key": "includeMarketData",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Smoke Test: SRC20 Deploy Enhanced Fields Critical Validation",
+                  "pm.test('SRC20 Deploy Enhanced responds with 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Deploy Enhanced response time < 3000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Deploy Enhanced has required structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.be.an('object');",
+                  "    pm.expect(responseJson.data).to.be.an('array');",
+                  "    pm.expect(responseJson.total).to.be.a('number');",
+                  "    pm.expect(responseJson.last_block).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Deploy Enhanced - CRITICAL: stamp_url field validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.data.length).to.be.above(0, 'Should return at least 1 deploy operation');",
+                  "    ",
+                  "    const firstItem = responseJson.data[0];",
+                  "    pm.expect(firstItem).to.have.property('stamp_url', 'stamp_url field MUST exist');",
+                  "    pm.expect(firstItem.stamp_url).to.be.a('string');",
+                  "    ",
+                  "    // Validate stamp_url format: https://stampchain.io/stamps/{tx_hash}.svg",
+                  "    const stampUrlPattern = /^https:\\/\\/stampchain\\.io\\/stamps\\/[a-f0-9]{64}\\.svg$/;",
+                  "    pm.expect(firstItem.stamp_url).to.match(stampUrlPattern, 'stamp_url must match pattern https://stampchain.io/stamps/{64-char-hex}.svg');",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Deploy Enhanced - CRITICAL: deploy_img field validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const firstItem = responseJson.data[0];",
+                  "    ",
+                  "    pm.expect(firstItem).to.have.property('deploy_img', 'deploy_img field MUST exist');",
+                  "    pm.expect(firstItem.deploy_img).to.be.a('string');",
+                  "    ",
+                  "    // Validate deploy_img format: https://stampchain.io/stamps/{deploy_tx}.svg",
+                  "    const deployImgPattern = /^https:\\/\\/stampchain\\.io\\/stamps\\/[a-f0-9]{64}\\.svg$/;",
+                  "    pm.expect(firstItem.deploy_img).to.match(deployImgPattern, 'deploy_img must match pattern https://stampchain.io/stamps/{64-char-hex}.svg');",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Deploy Enhanced - CRITICAL: deploy_tx field validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const firstItem = responseJson.data[0];",
+                  "    ",
+                  "    pm.expect(firstItem).to.have.property('deploy_tx', 'deploy_tx field MUST exist');",
+                  "    pm.expect(firstItem.deploy_tx).to.be.a('string');",
+                  "    ",
+                  "    // Validate deploy_tx format: 64-character hex string",
+                  "    const deployTxPattern = /^[a-f0-9]{64}$/;",
+                  "    pm.expect(firstItem.deploy_tx).to.match(deployTxPattern, 'deploy_tx must be 64-character hex string');",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Deploy Enhanced - URL consistency validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const firstItem = responseJson.data[0];",
+                  "    ",
+                  "    // Extract tx_hash from stamp_url",
+                  "    const stampUrlMatch = firstItem.stamp_url.match(/\\/stamps\\/([a-f0-9]{64})\\.svg$/);",
+                  "    pm.expect(stampUrlMatch).to.not.be.null;",
+                  "    const stampUrlTxHash = stampUrlMatch[1];",
+                  "    ",
+                  "    // Extract deploy_tx from deploy_img",
+                  "    const deployImgMatch = firstItem.deploy_img.match(/\\/stamps\\/([a-f0-9]{64})\\.svg$/);",
+                  "    pm.expect(deployImgMatch).to.not.be.null;",
+                  "    const deployImgTxHash = deployImgMatch[1];",
+                  "    ",
+                  "    // For deploy operations, stamp_url should use tx_hash, deploy_img should use deploy_tx",
+                  "    pm.expect(stampUrlTxHash).to.equal(firstItem.tx_hash, 'stamp_url should contain tx_hash');",
+                  "    pm.expect(deployImgTxHash).to.equal(firstItem.deploy_tx, 'deploy_img should contain deploy_tx');",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Deploy Enhanced - Market data structure validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const firstItem = responseJson.data[0];",
+                  "    ",
+                  "    pm.expect(firstItem).to.have.property('market_data', 'market_data field MUST exist for v2.3');",
+                  "    ",
+                  "    if (firstItem.market_data !== null) {",
+                  "        pm.expect(firstItem.market_data).to.be.an('object');",
+                  "        pm.expect(firstItem.market_data).to.have.property('holder_count');",
+                  "        pm.expect(firstItem.market_data).to.have.property('market_cap_btc');",
+                  "        pm.expect(firstItem.market_data).to.have.property('price_btc');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('SRC20 Deploy Enhanced - Mint progress structure validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    const firstItem = responseJson.data[0];",
+                  "    ",
+                  "    pm.expect(firstItem).to.have.property('mint_progress', 'mint_progress field MUST exist for v2.3');",
+                  "    ",
+                  "    if (firstItem.mint_progress !== null) {",
+                  "        pm.expect(firstItem.mint_progress).to.be.an('object');",
+                  "        pm.expect(firstItem.mint_progress).to.have.property('progress');",
+                  "        pm.expect(firstItem.mint_progress).to.have.property('current');",
+                  "        pm.expect(firstItem.mint_progress).to.have.property('max');",
+                  "        pm.expect(firstItem.mint_progress).to.have.property('total_mints');",
+                  "    }",
+                  "});",
+                  "",
+                  "// Store test results for reporting",
+                  "pm.globals.set('src20_deploy_enhanced_passed', pm.response.code === 200);"
+                ]
+              }
+            }
+          ]
+        }
+              ]
+      },
+      {
+        "name": "Stamps with Cursed Filter (Alternative to Deprecated Cursed Endpoint)",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('✅ Stamps with cursed filter responds', function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "",
+                "pm.test('⚡ Stamps cursed filter response time acceptable', function () {",
+                "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                "});",
+                "",
+                "pm.test('📋 Stamps cursed filter has required structure', function () {",
+                "    const response = pm.response.json();",
+                "    pm.expect(response).to.have.property('data');",
+                "    pm.expect(response).to.have.property('page');",
+                "    pm.expect(response).to.have.property('limit');",
+                "    pm.expect(response).to.have.property('total');",
+                "});",
+                "",
+                "pm.test('🎯 Stamps cursed filter returns cursed stamps only', function () {",
+                "    const response = pm.response.json();",
+                "    if (response.data && response.data.length > 0) {",
+                "        response.data.forEach(function(stamp) {",
+                "            pm.expect(stamp).to.have.property('stamp');",
+                "            pm.expect(stamp.stamp).to.be.below(0); // Cursed stamps have negative numbers",
+                "        });",
+                "    }",
+                "});",
+                "",
+                "pm.test('✨ Stamps cursed filter equivalent to deprecated cursed endpoint', function () {",
+                "    const response = pm.response.json();",
+                "    pm.expect(response.deprecated).to.not.exist; // Should not be deprecated",
+                "    pm.expect(response.data).to.be.an('array');",
+                "});"
+              ]
+            }
+          }
+        ],
+        "request": {
+          "method": "GET",
+          "header": [
+            {
+              "key": "X-API-Version",
+              "value": "2.3"
+            }
+          ],
+          "url": {
+            "raw": "{{baseUrl}}/api/v2/stamps?type=cursed&limit=3",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "v2", "stamps"],
+            "query": [
+              {
+                "key": "type",
+                "value": "cursed"
+              },
+              {
+                "key": "limit",
+                "value": "3"
+              }
+            ]
+          }
         }
       ]
     },
@@ -336,10 +549,11 @@
                   "const src20v23Passed = pm.globals.get('src20_balance_v2_3_passed') === 'true';",
                   "const overviewPassed = pm.globals.get('src20_overview_passed') === 'true';",
                   "const dbPassed = pm.globals.get('database_connectivity_passed') === 'true';",
+                  "const src20DeployEnhancedPassed = pm.globals.get('src20_deploy_enhanced_passed') === 'true';",
                   "",
                   "// Calculate overall success rate",
-                  "const totalTests = 5;",
-                  "const passedTests = [healthPassed, src20v22Passed, src20v23Passed, overviewPassed, dbPassed]",
+                  "const totalTests = 6;",
+                  "const passedTests = [healthPassed, src20v22Passed, src20v23Passed, overviewPassed, dbPassed, src20DeployEnhancedPassed]",
                   "    .filter(result => result === true).length;",
                   "const successRate = (passedTests / totalTests) * 100;",
                   "",
@@ -360,6 +574,10 @@
                   "    pm.expect(src20v22Passed && src20v23Passed).to.be.true;",
                   "});",
                   "",
+                  "pm.test('CRITICAL: SRC20 Deploy Enhanced Endpoint Working', function () {",
+                  "    pm.expect(src20DeployEnhancedPassed).to.be.true;",
+                  "});",
+                  "",
                   "// Log results for reporting",
                   "console.log('🔥 SMOKE TEST RESULTS SUMMARY:');",
                   "console.log(`   Health Check: ${healthPassed ? '✅ PASS' : '❌ FAIL'}`);",
@@ -367,6 +585,7 @@
                   "console.log(`   SRC20 v2.3: ${src20v23Passed ? '✅ PASS' : '❌ FAIL'}`);",
                   "console.log(`   SRC20 Overview: ${overviewPassed ? '✅ PASS' : '❌ FAIL'}`);",
                   "console.log(`   Database: ${dbPassed ? '✅ PASS' : '❌ FAIL'}`);",
+                  "console.log(`   SRC20 Deploy Enhanced: ${src20DeployEnhancedPassed ? '✅ PASS' : '❌ FAIL'}`);",
                   "console.log(`   Overall Success Rate: ${successRate}% (${passedTests}/${totalTests})`);",
                   "",
                   "// Set final result for deployment pipeline",
@@ -397,6 +616,7 @@
           "pm.globals.unset('src20_balance_v2_3_passed');",
           "pm.globals.unset('src20_overview_passed');",
           "pm.globals.unset('database_connectivity_passed');",
+          "pm.globals.unset('src20_deploy_enhanced_passed');",
           "pm.globals.unset('smoke_tests_passed');",
           "pm.globals.unset('smoke_tests_success_rate');",
           "",

@@ -1,127 +1,309 @@
 /* ===== STAMP OVERVIEW PAGE ===== */
 import { StampOverviewContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import {
-  STAMP_FILTER_TYPES,
-  STAMP_TYPES,
-  StampPageProps,
-  SUBPROTOCOLS,
-} from "$globals";
+import { StampPageProps } from "$globals";
 import { StampOverviewHeader } from "$header";
 import {
   queryParamsToFilters,
   queryParamsToServicePayload,
   StampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
-import { StampController } from "$server/controller/stampController.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
+
+// ✅ PROPER SEPARATION: Use HTTP client for API calls
+import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
+
+// ✅ PROPER SEPARATION: Create httpClient instance
+const httpClient = new FetchHttpClient();
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
     const url = new URL(req.url);
-    console.log("[Stamp Handler]", {
-      url: url.toString(),
-      pathname: url.pathname,
-      params: Object.fromEntries(url.searchParams),
-      headers: Object.fromEntries(req.headers),
-    });
-
-    // Only process requests for /stamp route
-    if (url.searchParams.has("_fresh") && !url.pathname.startsWith("/stamp")) {
-      return new Response(null, { status: 204 });
-    }
+    const baseUrl = `${url.protocol}//${url.host}`;
 
     try {
-      /* ===== QUERY PARAMETERS ===== */
-      const sortBy = url.searchParams.get("sortBy") || "DESC";
-      const filterBy = url.searchParams.get("filterBy")
-        ? (url.searchParams.get("filterBy")?.split(",").filter(
-          Boolean,
-        ) as STAMP_FILTER_TYPES[])
-        : [];
-      const selectedTab =
-        (url.searchParams.get("type") || "all") as STAMP_TYPES;
+      /* ===== URL PARAMS ===== */
       const page = parseInt(url.searchParams.get("page") || "1");
-      const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
-      const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
-      const recentSales = url.searchParams.get("recentSales") === "true";
+      const page_size = Math.min(
+        parseInt(url.searchParams.get("limit") || "60"),
+        MAX_PAGE_SIZE,
+      );
+      const sortBy = url.searchParams.get("sortBy") || "DESC";
 
-      /* ===== DATA FETCHING ===== */
-      let result;
-      if (recentSales) {
-        // Handle recent sales view
-        result = await StampController.getRecentSales(page, page_size);
-      } else {
-        // Handle regular stamp listing
-        const ident: SUBPROTOCOLS[] = [];
-        let collectionId;
+      // ✅ IMPROVED: Handle view parameter for different stamp display modes
+      const viewMode = url.searchParams.get("view") || "all";
+      const recentSales = viewMode === "sales" ||
+        url.searchParams.get("recentSales") === "true"; // Backward compatibility
 
-        // Special handling for POSH stamps
-        if (selectedTab === "posh") {
-          const poshCollection = await CollectionService.getCollectionByName(
-            "posh",
-          );
-          if (poshCollection) {
-            collectionId = poshCollection.collection_id;
-          } else {
-            throw new Error("Posh collection not found");
-          }
-        }
+      // ✅ NEW: Handle type parameter for stamp filtering (classic, cursed, posh, etc.)
+      // Note: SRC-20 excluded from frontend options as they're handled separately in the app
+      const stampType = url.searchParams.get("type") || "classic"; // Default to classic
+      const validTypes = [
+        "classic",
+        "cursed",
+        "posh",
+      ]; // Removed "all" and "stamps"
+      const typeFilter = validTypes.includes(stampType) ? stampType : "classic";
 
-        // Fetch stamps with filters
-        // Filter out undefined values from queryParamsToServicePayload
-        const queryParams = queryParamsToServicePayload(url.search);
-        const filteredQueryParams = Object.entries(queryParams).reduce(
-          (acc, [key, value]) => {
-            if (value !== undefined) {
-              acc[key] = value;
-            }
-            return acc;
-          },
-          {} as Record<string, any>,
-        );
-
-        const payload = {
-          page,
-          limit: page_size,
-          sortBy: sortBy as "DESC" | "ASC",
-          type: selectedTab,
-          filterBy,
-          ident,
-          collectionId,
-          url: url.origin,
-          ...filteredQueryParams,
+      /* ===== DATA FETCHING BASED ON MODE ===== */
+      let stampsData: {
+        data: any[];
+        pagination: {
+          total: number;
+          page?: number | undefined;
+          totalPages?: number | undefined;
         };
-        console.log("stamp controller payload", payload);
+      } = {
+        data: [],
+        pagination: { total: 0 },
+      };
+      let recentSalesData: any[] = [];
 
-        result = await StampController.getStamps(payload);
+      if (recentSales) {
+        // ✅ FIX: When recentSales=true, fetch from optimized internal API endpoint
+        try {
+          const recentSalesParams = new URLSearchParams({
+            page: page.toString(),
+            limit: page_size.toString(),
+            sortBy: "DESC", // Recent sales should always be DESC (newest first)
+            dayRange: "30", // Use 30-day range like homepage
+            fullDetails: "true", // Enable enhanced transaction information
+            type: typeFilter, // Add stamp type filtering
+          });
+
+          const recentSalesResponse = await httpClient.get(
+            `${baseUrl}/api/internal/stamp-recent-sales?${recentSalesParams}`,
+            {
+              headers: {},
+            },
+          );
+
+          if (!recentSalesResponse.ok) {
+            console.error(
+              "[Recent Sales API Error]",
+              recentSalesResponse.status,
+            );
+            throw new Error(
+              `Recent sales API failed: ${recentSalesResponse.status}`,
+            );
+          }
+
+          // Extract data (handle API wrapper format)
+          const salesResult = recentSalesResponse.data?.data ||
+            recentSalesResponse.data || [];
+          recentSalesData = Array.isArray(salesResult) ? salesResult : [];
+
+          // ✅ FIX: Format as stamps data for StampOverviewContent
+          stampsData = {
+            data: recentSalesData,
+            pagination: {
+              total: recentSalesResponse.data?.total || recentSalesData.length,
+              page: page,
+              totalPages: recentSalesResponse.data?.totalPages ||
+                Math.ceil(
+                  (recentSalesResponse.data?.total || recentSalesData.length) /
+                    page_size,
+                ),
+            },
+          };
+
+          console.log(
+            `[Stamp Route] Recent sales mode: fetched ${recentSalesData.length} sales`,
+          );
+        } catch (recentSalesError) {
+          console.error(
+            "[Recent Sales Error]",
+            (recentSalesError as Error).message || "Unknown error",
+          );
+          // Fallback to empty data for recent sales
+          stampsData = { data: [], pagination: { total: 0 } };
+          recentSalesData = [];
+        }
+      } else {
+        // ✅ IMPROVED: Handle type-based filtering vs POSH collection
+        try {
+          // If a specific type is requested, fetch stamps by type instead of collection
+          if (typeFilter !== "all") {
+            /* ===== TYPE-BASED STAMP FILTERING ===== */
+            try {
+              // Get filter and sort parameters from URL
+              const filterBy = url.searchParams.getAll("filterBy");
+
+              // Build stamps API parameters for type filtering
+              const params = new URLSearchParams({
+                page: page.toString(),
+                limit: page_size.toString(),
+                sortBy,
+                type: typeFilter, // Add type parameter for filtering
+              });
+
+              if (filterBy.length > 0) {
+                params.set("filterBy", filterBy.join(","));
+              }
+
+              // Add other query parameters from filters
+              const queryParams = queryParamsToServicePayload(url.search);
+              Object.entries(queryParams).forEach(([key, value]) => {
+                if (value !== undefined && !params.has(key)) {
+                  params.set(key, value.toString());
+                }
+              });
+
+              const stampsResponse = await httpClient.get(
+                `${baseUrl}/api/v2/stamps?${params}`,
+              );
+
+              if (!stampsResponse.ok) {
+                throw new Error(
+                  `Stamps API error: ${stampsResponse.status} ${stampsResponse.statusText}`,
+                );
+              }
+
+              // Extract data (correct API response structure)
+              const apiData = stampsResponse.data || {};
+              stampsData = {
+                data: apiData.data || [],
+                pagination: {
+                  total: apiData.total || 0,
+                  page: apiData.page || page,
+                  totalPages: apiData.totalPages || 0,
+                },
+              };
+
+              console.log(
+                `[Stamp Route] Type filtering mode: fetched ${
+                  stampsData.data?.length || 0
+                } stamps for type '${typeFilter}'`,
+              );
+            } catch (typeError) {
+              console.error("[Type Filtering Error]:", {
+                message: (typeError as Error).message || "Unknown error",
+                type: typeFilter,
+                url: url.pathname,
+                timestamp: new Date().toISOString(),
+              });
+              // Use fallback data
+              stampsData = { data: [], pagination: { total: 0 } };
+            }
+          } else {
+            /* ===== DEFAULT: POSH COLLECTION ===== */
+            let poshCollection = null;
+            try {
+              const poshResponse = await httpClient.get(
+                `${baseUrl}/api/v2/collections/by-name/posh`,
+              );
+
+              if (poshResponse.ok) {
+                poshCollection = poshResponse.data?.data || poshResponse.data;
+              }
+            } catch (poshError) {
+              console.error(
+                "[POSH Collection API Error]",
+                (poshError as Error).message || "Unknown error",
+              );
+            }
+
+            /* ===== STAMPS FOR COLLECTION ===== */
+            if (poshCollection) {
+              try {
+                // Get filter and sort parameters from URL
+                const filterBy = url.searchParams.getAll("filterBy");
+
+                // Build stamps API parameters
+                const params = new URLSearchParams({
+                  page: page.toString(),
+                  limit: page_size.toString(),
+                  sortBy,
+                  collectionId: poshCollection.collection_id.toString(),
+                });
+
+                if (filterBy.length > 0) {
+                  params.set("filterBy", filterBy.join(","));
+                }
+
+                // Add other query parameters
+                const queryParams = queryParamsToServicePayload(url.search);
+                Object.entries(queryParams).forEach(([key, value]) => {
+                  if (value !== undefined && !params.has(key)) {
+                    params.set(key, value.toString());
+                  }
+                });
+
+                const stampsResponse = await httpClient.get(
+                  `${baseUrl}/api/v2/stamps?${params}`,
+                );
+
+                if (!stampsResponse.ok) {
+                  throw new Error(
+                    `Stamps API error: ${stampsResponse.status} ${stampsResponse.statusText}`,
+                  );
+                }
+
+                // Extract data (correct API response structure)
+                const apiData = stampsResponse.data || {};
+                stampsData = {
+                  data: apiData.data || [],
+                  pagination: {
+                    total: apiData.total || 0,
+                    page: apiData.page || page,
+                    totalPages: apiData.totalPages || 0,
+                  },
+                };
+              } catch (stampError) {
+                console.error("[Stamp Gallery Error] Stamp Gallery:", {
+                  message: (stampError as Error).message || "Unknown error",
+                  url: url.pathname,
+                  timestamp: new Date().toISOString(),
+                });
+                // Use fallback data
+                stampsData = { data: [], pagination: { total: 0 } };
+              }
+            }
+          }
+        } catch (collectionError) {
+          console.error(
+            "[Collection Error]",
+            (collectionError as Error).message || "Unknown error",
+          );
+          stampsData = { data: [], pagination: { total: 0 } };
+        }
       }
 
-      /* ===== RESPONSE FORMATTING ===== */
-      const { data: stamps = [], ...restResult } = result;
-      const data = {
-        ...restResult,
-        stamps: Array.isArray(stamps) ? stamps : [],
-        filterBy,
-        sortBy,
-        selectedTab: recentSales ? "recent_sales" : selectedTab,
-        page,
-        limit: page_size,
-        filters: queryParamsToFilters(url.search),
-        search: url.search,
-      };
-
+      /* ===== RENDER PAGE ===== */
       return ctx.render({
-        ...data,
-        partial: url.searchParams.has("_fresh"),
+        stamps: stampsData.data || [],
+        pagination: stampsData.pagination || { total: 0 },
+        recentSales: recentSalesData || [], // Keep for backward compatibility
+        filters: queryParamsToFilters(url.search),
+        page,
+        page_size,
+        sortBy,
+        // ✅ FIX: Set selectedTab properly like explorer route
+        selectedTab: recentSales ? "recent_sales" : "all",
+        totalPages: stampsData.pagination?.totalPages ||
+          Math.ceil((stampsData.pagination?.total || 0) / page_size),
       });
     } catch (error) {
-      console.error(error);
-      return ctx.render({ error: `Error: Internal server error` });
+      console.error(
+        "[Stamp Handler Error]",
+        (error as Error).message || "Unknown error",
+      );
+
+      // Ultimate fallback
+      return ctx.render({
+        stamps: [],
+        pagination: { total: 0 },
+        recentSales: [],
+        filters: queryParamsToFilters(url.search),
+        page: 1,
+        page_size: 60,
+        sortBy: "DESC",
+        selectedTab: "all",
+        totalPages: 0,
+      });
     }
   },
 };

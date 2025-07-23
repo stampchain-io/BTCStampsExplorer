@@ -1,10 +1,10 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
-import { useEffect, useState } from "preact/hooks";
-import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
+import { loaderSpinXsPurple } from "$layout";
 import { StampGallery } from "$section";
 import { titlePurpleLD } from "$text";
-import { loaderSpinXsPurple } from "$layout";
+import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface DisplayCountBreakpoints {
@@ -40,12 +40,19 @@ export function StampSalesGallery({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /* ===== DATA FETCHING ===== */
+  /* ===== OPTIMIZED DATA FETCHING ===== */
   const fetchRecentSales = async () => {
+    // Skip fetching if we already have initial data and this is the first load
+    if (initialData.length > 0 && recentSales.length === 0) {
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch("/api/v2/stamps/recentSales?page=1&limit=8");
+      const response = await fetch(
+        "/api/internal/stamp-recent-sales?page=1&limit=8",
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch recent sales");
       }
@@ -67,15 +74,22 @@ export function StampSalesGallery({
     }
   };
 
-  /* ===== EFFECTS ===== */
+  /* ===== OPTIMIZED EFFECTS FOR DENO FRESH SSR ===== */
   useEffect(() => {
+    // Initialize with server-side data if available
+    if (initialData.length > 0 && recentSales.length === 0) {
+      setRecentSales(initialData);
+    }
+
+    // Only fetch client-side if no initial data was provided
     if (initialData.length === 0) {
       fetchRecentSales();
     }
 
-    const refreshInterval = setInterval(fetchRecentSales, 30000);
+    // Set up refresh interval for live updates (but less aggressive for SSR)
+    const refreshInterval = setInterval(fetchRecentSales, 60000); // Increased to 60s for better SSR performance
     return () => clearInterval(refreshInterval);
-  }, []);
+  }, [initialData.length]); // Depend on initialData.length to handle server-side updates
 
   /* ===== ERROR HANDLING ===== */
   if (error) {
@@ -108,7 +122,7 @@ export function StampSalesGallery({
 
   const defaultDetailGridClass = `
     grid w-full gap-3 mobileLg:gap-6
-    grid-cols-2 mobileSm:grid-cols-3 
+    grid-cols-2 mobileSm:grid-cols-3
     mobileLg:grid-cols-4 desktop:grid-cols-6
   `;
 
@@ -134,7 +148,7 @@ export function StampSalesGallery({
       layout: "grid" as const,
       isRecentSales: true,
       showDetails: false,
-      viewAllLink: "/stamp?recentSales=true",
+      viewAllLink: "/stamp?view=sales",
       showMinDetails: true,
       variant: "grey" as const,
       gridClass: gridClass || defaultHomeGridClass,

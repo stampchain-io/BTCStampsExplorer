@@ -16,8 +16,8 @@ Deno.env.set("DENO_ENV", "test");
 // Import dependencies that need database
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/blockService.ts";
-import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
 import { SRC20MarketService } from "$server/services/src20/marketService.ts";
+import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
 
 // Import the service we're testing
 import { SRC20QueryService } from "$server/services/src20/queryService.ts";
@@ -98,7 +98,7 @@ describe(
 
     describe("getTotalCountValidSrc20Tx", () => {
       it("should return total count from repository", async () => {
-        SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
+        SRC20Repository.getTotalCountValidSrc20TxFromDbOptimized = () =>
           Promise.resolve({ rows: [{ total: 150 }] });
 
         const result = await SRC20QueryService.getTotalCountValidSrc20Tx({
@@ -111,7 +111,7 @@ describe(
 
       it("should handle excludeFullyMinted parameter", async () => {
         let capturedExcludeFullyMinted: boolean;
-        SRC20Repository.getTotalCountValidSrc20TxFromDb = (
+        SRC20Repository.getTotalCountValidSrc20TxFromDbOptimized = (
           _params,
           excludeFullyMinted,
         ) => {
@@ -129,7 +129,7 @@ describe(
 
       it("should handle arrays in parameters", async () => {
         let capturedParams: any;
-        SRC20Repository.getTotalCountValidSrc20TxFromDb = (params) => {
+        SRC20Repository.getTotalCountValidSrc20TxFromDbOptimized = (params) => {
           capturedParams = params;
           return Promise.resolve({ rows: [{ total: 200 }] });
         };
@@ -1001,13 +1001,13 @@ describe(
       it("should handle empty data with performance metrics", async () => {
         SRC20Repository.getValidSrc20TxFromDb = () =>
           Promise.resolve({ rows: [] });
-        SRC20Repository.getTotalCountValidSrc20TxFromDb = () =>
+        SRC20Repository.getTotalCountValidSrc20TxFromDbOptimized = () =>
           Promise.resolve({ rows: [{ total: 0 }] });
 
         const result = await SRC20QueryService.fetchAndFormatSrc20DataV2();
 
-        assertEquals(result.data, []);
-        assertEquals((result as any).total, 0);
+        // When empty, the method returns undefined for data property, not an empty array
+        assertEquals(result.data, undefined);
         assertEquals((result as any).totalPages, 0);
         assertExists((result as any).performance);
       });

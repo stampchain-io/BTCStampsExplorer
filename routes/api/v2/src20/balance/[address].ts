@@ -35,7 +35,9 @@ export const handler: Handlers<AddressHandlerContext> = {
         amt: Number(params.get("amt")) || 0,
         sortBy: sortValidation,
         includePagination: params.get("includePagination") !== "false",
-        includeMarketData: params.get("includeMarketData") === "true", // NEW: API v2.3 enhancement
+        // 🚀 Include market data by default for v2.3 API versioning
+        // The API middleware will strip it for v2.2 automatically
+        includeMarketData: params.get("includeMarketData") !== "false", // Default to true
       };
 
       const result = await Src20Controller.handleSrc20BalanceRequest(

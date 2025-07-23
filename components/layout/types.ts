@@ -21,7 +21,7 @@ export interface DonateStampData {
 
 /* ===== SRC20 TOKEN CARDS TABLE ===== */
 export type SRC20ViewType = "minted" | "minting";
-export type Timeframe = "24H" | "3D" | "7D" | "1M" | "ALL";
+export type Timeframe = "24H" | "7D" | "30D" | "1M" | "ALL";
 
 export interface TableColumn {
   key: string;
@@ -38,12 +38,12 @@ export const MINTED_COLUMNS: TableColumn[] = [
   {
     key: "change",
     label: "CHANGE",
-    timeframes: ["24H", "3D", "7D", "1M", "ALL"],
+    timeframes: ["24H", "7D", "30D", "1M", "ALL"],
   },
   {
     key: "volume",
     label: "VOLUME",
-    timeframes: ["24H", "3D", "7D", "1M", "ALL"],
+    timeframes: ["24H", "7D", "30D", "1M", "ALL"],
   },
   { key: "marketcap", label: "MARKETCAP" },
   { key: "chart", label: "CHART" },
@@ -58,7 +58,7 @@ export const MINTING_COLUMNS: TableColumn[] = [
   {
     key: "mints",
     label: "MINTS",
-    timeframes: ["24H", "3D", "7D", "1M", "ALL"],
+    timeframes: ["24H", "7D", "30D", "1M", "ALL"],
   },
   { key: "progress", label: "PROGRESS" },
   { key: "mint", label: "MINT" },

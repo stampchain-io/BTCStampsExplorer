@@ -7,6 +7,9 @@ import {
 } from "$globals";
 
 export type StampFilters = {
+  // Stamp Type Filter (NEW!)
+  stampType: "cursed" | "classic" | "posh"; // Removed "all" and "stamps"
+
   // Market Place filters
   market: Extract<_STAMP_MARKETPLACE, "listings" | "sales"> | "";
 
@@ -63,6 +66,7 @@ export type StampFilters = {
 };
 
 export const defaultFilters: StampFilters = {
+  stampType: "classic", // Changed default to classic // Default to showing all stamp types
   market: "",
   dispensers: false,
   atomics: false,
@@ -102,6 +106,13 @@ export function filtersToQueryParams(
   filters: StampFilters,
 ) {
   const queryParams = new URLSearchParams(search);
+
+  // STAMP TYPE (NEW!)
+  if (filters.stampType && filters.stampType !== "classic") {
+    queryParams.set("type", filters.stampType);
+  } else {
+    queryParams.delete("type"); // Default to classic (no type param needed)
+  }
 
   // MARKET TYPE
   if (filters.market) {
@@ -325,6 +336,7 @@ export function filtersToServicePayload(filters: StampFilters) {
   }
 
   const result = {
+    type: filters.stampType || undefined, // NEW: Include stamp type in API payload!
     ident: [],
     fileType: filters.fileType.length > 0 ? filters.fileType : undefined,
     editions: filters.editions.length > 0 ? filters.editions : undefined,
@@ -410,6 +422,7 @@ export function queryParamsToFilters(query: string): StampFilters {
   const params = new URLSearchParams(query);
 
   const filtersPartial: Partial<StampFilters> = {
+    stampType: "classic", // Default stamp type
     market: "",
     dispensers: false,
     atomics: false,
@@ -441,6 +454,20 @@ export function queryParamsToFilters(query: string): StampFilters {
     maxCacheAgeMinutes: "",
     priceSource: "",
   };
+
+  // Parse stamp type parameter (NEW!)
+  const stampTypeParam = params.get("type") || params.get("stampType");
+  if (
+    stampTypeParam &&
+    ["cursed", "classic", "posh"].includes(
+      stampTypeParam,
+    )
+  ) {
+    filtersPartial.stampType = stampTypeParam as
+      | "cursed"
+      | "classic"
+      | "posh";
+  }
 
   // Parse market type parameter
   const marketParam = params.get("market");

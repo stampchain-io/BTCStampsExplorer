@@ -21,8 +21,8 @@ import * as $api_internal_debug_headers from "./routes/api/internal/debug-header
 import * as $api_internal_fee_security from "./routes/api/internal/fee-security.ts";
 import * as $api_internal_fees from "./routes/api/internal/fees.ts";
 import * as $api_internal_monitoring from "./routes/api/internal/monitoring.ts";
-import * as $api_internal_src20_trending from "./routes/api/internal/src20/trending.ts";
 import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
+import * as $api_internal_stamp_recent_sales from "./routes/api/internal/stamp-recent-sales.ts";
 import * as $api_internal_test_reset_circuit_breakers from "./routes/api/internal/test-reset-circuit-breakers.ts";
 import * as $api_proxy_arweave_path_ from "./routes/api/proxy/arweave/[...path].ts";
 import * as $api_proxy_ordinals_path_ from "./routes/api/proxy/ordinals/[...path].ts";
@@ -32,11 +32,13 @@ import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getSt
 import * as $api_v2_block_block_index_ from "./routes/api/v2/block/[block_index].ts";
 import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_count/[...number].ts";
 import * as $api_v2_block_related_block_index_ from "./routes/api/v2/block/related/[block_index].ts";
+import * as $api_v2_collections_by_name_name_ from "./routes/api/v2/collections/by-name/[name].ts";
 import * as $api_v2_collections_creator_creator_ from "./routes/api/v2/collections/creator/[creator].ts";
 import * as $api_v2_collections_index from "./routes/api/v2/collections/index.ts";
 import * as $api_v2_create_dispense from "./routes/api/v2/create/dispense.ts";
 import * as $api_v2_create_send from "./routes/api/v2/create/send.ts";
 import * as $api_v2_cursed_id_ from "./routes/api/v2/cursed/[id].ts";
+import * as $api_v2_cursed_middleware from "./routes/api/v2/cursed/_middleware.ts";
 import * as $api_v2_cursed_block from "./routes/api/v2/cursed/block.ts";
 import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block/[block_index].ts";
 import * as $api_v2_cursed_index from "./routes/api/v2/cursed/index.ts";
@@ -83,7 +85,6 @@ import * as $api_v2_stamps_block from "./routes/api/v2/stamps/block.ts";
 import * as $api_v2_stamps_block_block_index_ from "./routes/api/v2/stamps/block/[block_index].ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
-import * as $api_v2_stamps_recentSales from "./routes/api/v2/stamps/recentSales.ts";
 import * as $api_v2_trx_complete_psbt from "./routes/api/v2/trx/complete_psbt.ts";
 import * as $api_v2_trx_create_psbt from "./routes/api/v2/trx/create_psbt.ts";
 import * as $api_v2_trx_stampattach from "./routes/api/v2/trx/stampattach.ts";
@@ -130,6 +131,9 @@ import * as $stamp_index from "./routes/stamp/index.tsx";
 import * as $stamp_posh from "./routes/stamp/posh.tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
 import * as $test_design_system from "./routes/test/design-system.tsx";
+import * as $test_horizon_psbt_html from "./routes/test/horizon-psbt.html.ts";
+import * as $test_horizon_html from "./routes/test/horizon.html.ts";
+import * as $test_horizon from "./routes/test/horizon.tsx";
 import * as $test_test_image from "./routes/test/test-image.ts";
 import * as $tool_fairmint_index from "./routes/tool/fairmint/index.tsx";
 import * as $tool_src101_action_ from "./routes/tool/src101/[action].tsx";
@@ -316,8 +320,9 @@ const manifest = {
     "./routes/api/internal/fee-security.ts": $api_internal_fee_security,
     "./routes/api/internal/fees.ts": $api_internal_fees,
     "./routes/api/internal/monitoring.ts": $api_internal_monitoring,
-    "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,
     "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
+    "./routes/api/internal/stamp-recent-sales.ts":
+      $api_internal_stamp_recent_sales,
     "./routes/api/internal/test-reset-circuit-breakers.ts":
       $api_internal_test_reset_circuit_breakers,
     "./routes/api/proxy/arweave/[...path].ts": $api_proxy_arweave_path_,
@@ -331,12 +336,15 @@ const manifest = {
       $api_v2_block_block_count_number_,
     "./routes/api/v2/block/related/[block_index].ts":
       $api_v2_block_related_block_index_,
+    "./routes/api/v2/collections/by-name/[name].ts":
+      $api_v2_collections_by_name_name_,
     "./routes/api/v2/collections/creator/[creator].ts":
       $api_v2_collections_creator_creator_,
     "./routes/api/v2/collections/index.ts": $api_v2_collections_index,
     "./routes/api/v2/create/dispense.ts": $api_v2_create_dispense,
     "./routes/api/v2/create/send.ts": $api_v2_create_send,
     "./routes/api/v2/cursed/[id].ts": $api_v2_cursed_id_,
+    "./routes/api/v2/cursed/_middleware.ts": $api_v2_cursed_middleware,
     "./routes/api/v2/cursed/block.ts": $api_v2_cursed_block,
     "./routes/api/v2/cursed/block/[block_index].ts":
       $api_v2_cursed_block_block_index_,
@@ -401,7 +409,6 @@ const manifest = {
       $api_v2_stamps_block_block_index_,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
-    "./routes/api/v2/stamps/recentSales.ts": $api_v2_stamps_recentSales,
     "./routes/api/v2/trx/complete_psbt.ts": $api_v2_trx_complete_psbt,
     "./routes/api/v2/trx/create_psbt.ts": $api_v2_trx_create_psbt,
     "./routes/api/v2/trx/stampattach.ts": $api_v2_trx_stampattach,
@@ -451,6 +458,9 @@ const manifest = {
     "./routes/stamp/posh.tsx": $stamp_posh,
     "./routes/termsofservice/index.tsx": $termsofservice_index,
     "./routes/test/design-system.tsx": $test_design_system,
+    "./routes/test/horizon-psbt.html.ts": $test_horizon_psbt_html,
+    "./routes/test/horizon.html.ts": $test_horizon_html,
+    "./routes/test/horizon.tsx": $test_horizon,
     "./routes/test/test-image.ts": $test_test_image,
     "./routes/tool/fairmint/index.tsx": $tool_fairmint_index,
     "./routes/tool/src101/[action].tsx": $tool_src101_action_,

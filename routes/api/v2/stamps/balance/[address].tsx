@@ -39,9 +39,13 @@ export const handler: Handlers<AddressHandlerContext> = {
 
       let body;
 
-      if (enhanced) {
+      // 🚀 ALWAYS include market data for v2.3 API versioning
+      // Enhanced flag is now for additional features, not basic market data
+      const includeMarketData = true; // Always true for proper API versioning
+
+      if (enhanced || includeMarketData) {
         // 🚀 ENHANCED BALANCE RESPONSE with market data consolidation
-        console.log(`[StampBalance] Enhanced mode for ${address}`);
+        console.log(`[StampBalance] Enhanced/MarketData mode for ${address}`);
 
         // Use regular method and enhance the response
         body = await StampController.getStampBalancesByAddress(
@@ -55,26 +59,26 @@ export const handler: Handlers<AddressHandlerContext> = {
         // Let middleware strip fields for v2.2 if needed
         if (body.data && Array.isArray(body.data)) {
           body.data = body.data.map((stamp: any) => {
-            // Create marketData nested object for v2.3
-            const marketData = {
-              floorPriceBTC: stamp.floorPrice || null,
-              recentSalePriceBTC: stamp.recentSalePrice || null,
-              lastPriceBTC: stamp.floorPrice || stamp.recentSalePrice || 0,
-              walletValueBTC: (stamp.balance || 0) *
+            // Create market_data nested object for v2.3
+            const market_data = {
+              floor_price_btc: stamp.floorPrice || null,
+              recent_sale_price_btc: stamp.recentSalePrice || null,
+              last_price_btc: stamp.floorPrice || stamp.recentSalePrice || 0,
+              wallet_value_btc: (stamp.balance || 0) *
                 (stamp.floorPrice || stamp.recentSalePrice || 0),
-              openDispensersCount: stamp.openDispensersCount || 0,
-              holderCount: stamp.holderCount || 0,
-              volume24hBTC: stamp.volume24h || 0,
-              volume7dBTC: stamp.volume7d || 0,
-              volume30dBTC: stamp.volume30d || 0,
-              lastUpdated: new Date().toISOString(),
-              dataQualityScore: stamp.dataQualityScore || 7,
+              open_dispensers_count: stamp.openDispensersCount || 0,
+              holder_count: stamp.holderCount || 0,
+              volume_24h_btc: stamp.volume24h || 0,
+              volume_7d_btc: stamp.volume7d || 0,
+              volume_30d_btc: stamp.volume30d || 0,
+              last_updated: new Date().toISOString(),
+              data_quality_score: stamp.dataQualityScore || 7,
             };
 
             // Return v2.3 format - let middleware strip for v2.2
             return {
               ...stamp,
-              marketData, // v2.3 nested object
+              market_data, // v2.3 nested object (consistent snake_case)
               // Remove root-level price fields that were temporary
               floorPrice: undefined,
               floorPriceUSD: undefined,

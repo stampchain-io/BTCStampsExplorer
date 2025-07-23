@@ -72,12 +72,12 @@
           "if (!pm.collectionVariables.get('test_session_id')) {",
           "    const sessionId = 'test_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);",
           "    pm.collectionVariables.set('test_session_id', sessionId);",
-          "    console.log('🚀 Starting v2.3 regression test session:', sessionId);",
+          "    console.log('\ud83d\ude80 Starting v2.3 regression test session:', sessionId);",
           "}",
           "",
           "// Log each request",
           "const requestUrl = pm.request.url.toString();",
-          "console.log(`📤 Request: ${pm.request.method} ${requestUrl}`);"
+          "console.log(`\ud83d\udce4 Request: ${pm.request.method} ${requestUrl}`);"
         ]
       }
     },
@@ -290,7 +290,7 @@
                   "pm.test('Pagination metadata structure', () => {",
                   "    const body = pm.response.json();",
                   "    pm.expect(body).to.have.property('page');",
-                  "    pm.expect(body).to.have.property('limit');", 
+                  "    pm.expect(body).to.have.property('limit');",
                   "    pm.expect(body).to.have.property('total');",
                   "    pm.expect(body).to.have.property('totalPages');",
                   "    pm.expect(typeof body.page).to.equal('number');",
@@ -357,7 +357,7 @@
                   "pm.test('Pagination metadata structure', () => {",
                   "    const body = pm.response.json();",
                   "    pm.expect(body).to.have.property('page');",
-                  "    pm.expect(body).to.have.property('limit');", 
+                  "    pm.expect(body).to.have.property('limit');",
                   "    pm.expect(body).to.have.property('total');",
                   "    pm.expect(body).to.have.property('totalPages');",
                   "    pm.expect(typeof body.page).to.equal('number');",
@@ -535,15 +535,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?limit=5&page=1",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?limit=5&page=1",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -608,15 +607,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?limit=5&page=1",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales?limit=5&page=1",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -677,15 +675,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?limit=3&page=1&dayRange=7&fullDetails=true",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?limit=3&page=1&dayRange=7&fullDetails=true",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -754,7 +751,7 @@
           ]
         },
         {
-          "name": "Recent Sales Enhanced Parameters - Prod", 
+          "name": "Recent Sales Enhanced Parameters - Prod",
           "request": {
             "method": "GET",
             "header": [
@@ -764,15 +761,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?limit=3&page=1&dayRange=7&fullDetails=true",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales?limit=3&page=1&dayRange=7&fullDetails=true",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -832,15 +828,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?limit=9999&page=1",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?limit=9999&page=1",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -848,7 +843,7 @@
                   "value": "9999"
                 },
                 {
-                  "key": "page", 
+                  "key": "page",
                   "value": "1"
                 }
               ]
@@ -887,15 +882,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?limit=9999&page=1",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales?limit=9999&page=1",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -962,7 +956,7 @@
                   "    // Common API response structure validation",
                   "    if (endpoint.includes('/stamps') && !endpoint.includes('/balance')) {",
                   "        // Validate pagination structure for list endpoints",
-                  "        if ((endpoint === '/api/v2/stamps' || endpoint.includes('/recentSales')) && !obj.stamp_id) {", 
+                  "        if ((endpoint === '/api/v2/stamps' || endpoint.includes('/recentSales')) && !obj.stamp) {",
                   "            if (typeof obj.page !== 'number') issues.push(`${environment}: 'page' should be number, got ${typeof obj.page}`);",
                   "            if (typeof obj.limit !== 'number') issues.push(`${environment}: 'limit' should be number, got ${typeof obj.limit}`);",
                   "            if (typeof obj.total !== 'number') issues.push(`${environment}: 'total' should be number, got ${typeof obj.total}`);",
@@ -1090,7 +1084,7 @@
                   "});",
                   "",
                   "console.log('\\n' + '='.repeat(80));",
-                  "console.log('🔍 V2.3 REGRESSION TEST REPORT');",
+                  "console.log('\ud83d\udd0d V2.3 REGRESSION TEST REPORT');",
                   "console.log('='.repeat(80));",
                   "console.log('Session ID:', pm.collectionVariables.get('test_session_id'));",
                   "console.log('Generated:', new Date().toISOString());",
@@ -1128,11 +1122,11 @@
                   "        ",
                   "        // Compare status codes",
                   "        if (dev.status !== prod.status) {",
-                  "            console.log(`   ❌ Status Code: Dev=${dev.status}, Prod=${prod.status}`);",
+                  "            console.log(`   \u274c Status Code: Dev=${dev.status}, Prod=${prod.status}`);",
                   "            statusMismatches++;",
                   "            endpointDiffs++;",
                   "        } else {",
-                  "            console.log(`   ✅ Status Code: ${dev.status}`);",
+                  "            console.log(`   \u2705 Status Code: ${dev.status}`);",
                   "        }",
                   "        ",
                   "        // Validate JSON structure and types",
@@ -1141,7 +1135,7 @@
                   "        structureIssues.push(...devStructureIssues, ...prodStructureIssues);",
                   "        ",
                   "        if (devStructureIssues.length > 0 || prodStructureIssues.length > 0) {",
-                  "            console.log(`   ⚠️  Structure Issues Found:`);",
+                  "            console.log(`   \u26a0\ufe0f  Structure Issues Found:`);",
                   "            [...devStructureIssues, ...prodStructureIssues].forEach(issue => {",
                   "                console.log(`      - ${issue}`);",
                   "            });",
@@ -1153,7 +1147,7 @@
                   "        ",
                   "        if (bodyDiffs.length > 0) {",
                   "            endpointDiffs += bodyDiffs.length;",
-                  "            console.log(`   ⚠️  Response Differences Found (${bodyDiffs.length}):`);",
+                  "            console.log(`   \u26a0\ufe0f  Response Differences Found (${bodyDiffs.length}):`);",
                   "            ",
                   "            // Group differences by type",
                   "            const added = bodyDiffs.filter(d => d.type === 'added');",
@@ -1161,7 +1155,7 @@
                   "            const changed = bodyDiffs.filter(d => d.type === 'changed');",
                   "            ",
                   "            if (added.length > 0) {",
-                  "                console.log('      📗 Fields in DEV but not PROD (v2.3 additions):');",
+                  "                console.log('      \ud83d\udcd7 Fields in DEV but not PROD (v2.3 additions):');",
                   "                added.forEach(d => {",
                   "                    console.log(`         - ${d.path}`);",
                   "                    // Track v2.3 specific fields",
@@ -1178,7 +1172,7 @@
                   "            }",
                   "            ",
                   "            if (removed.length > 0) {",
-                  "                console.log('      📕 Fields in PROD but not DEV (v2.3 removals):');",
+                  "                console.log('      \ud83d\udcd5 Fields in PROD but not DEV (v2.3 removals):');",
                   "                removed.forEach(d => {",
                   "                    console.log(`         - ${d.path}`);",
                   "                    if (d.path.includes('stamp_base64')) v23Fields.stamp_base64_removed++;",
@@ -1186,7 +1180,7 @@
                   "            }",
                   "            ",
                   "            if (changed.length > 0) {",
-                  "                console.log('      📙 Fields with different values:');",
+                  "                console.log('      \ud83d\udcd9 Fields with different values:');",
                   "                changed.slice(0, 10).forEach(d => {",
                   "                    console.log(`         - ${d.path}`);",
                   "                    if (typeof d.devValue !== 'object' && typeof d.prodValue !== 'object') {",
@@ -1208,7 +1202,7 @@
                   "});",
                   "",
                   "console.log('\\n' + '='.repeat(80));",
-                  "console.log('📊 SUMMARY');",
+                  "console.log('\ud83d\udcca SUMMARY');",
                   "console.log('='.repeat(80));",
                   "console.log('Endpoints Tested:', Object.keys(grouped).length);",
                   "console.log('Endpoints with Differences:', endpointsWithDifferences);",
@@ -1217,12 +1211,12 @@
                   "console.log('Structure/Type Issues:', structureIssues.length);",
                   "",
                   "if (structureIssues.length > 0) {",
-                  "    console.log('\\\\n🔧 STRUCTURE/TYPE ISSUES:');",
+                  "    console.log('\\\\n\ud83d\udd27 STRUCTURE/TYPE ISSUES:');",
                   "    structureIssues.forEach(issue => console.log(`   - ${issue}`));",
                   "}",
                   "",
                   "// v2.3 specific changes summary",
-                  "console.log('\\n📌 V2.3 SPECIFIC CHANGES DETECTED:');",
+                  "console.log('\\n\ud83d\udccc V2.3 SPECIFIC CHANGES DETECTED:');",
                   "console.log(`   - marketData fields: ${v23Fields.marketData}`);",
                   "console.log(`   - dispenserInfo fields: ${v23Fields.dispenserInfo}`);",
                   "console.log(`   - cacheStatus fields: ${v23Fields.cacheStatus}`);",
@@ -1234,20 +1228,20 @@
                   "console.log(`   - dayRange parameter support: ${v23Fields.dayRange_param}`);",
                   "console.log(`   - fullDetails parameter support: ${v23Fields.fullDetails_param}`);",
                   "",
-                  "console.log('\\n📌 Expected v2.3 Changes:');",
-                  "console.log('   - marketData (new in v2.3) ✓');",
-                  "console.log('   - dispenserInfo (new in v2.3) ✓');",
-                  "console.log('   - cacheStatus (new in v2.3) ✓');",
-                  "console.log('   - holderCount/uniqueHolderCount (new in v2.3) ✓');",
-                  "console.log('   - dataQualityScore (new in v2.3) ✓');",
-                  "console.log('   - stamp_base64 excluded from lists in v2.3 ✓');",
-                  "console.log('   - Invalid tick validation (400 in dev, 200 in prod) ✓');",
-                  "console.log('   - Enhanced recent sales with sale_data (new in v2.3) ✓');",
-                  "console.log('   - Recent sales dayRange parameter (new in v2.3) ✓');",
-                  "console.log('   - Recent sales fullDetails parameter (new in v2.3) ✓');",
+                  "console.log('\\n\ud83d\udccc Expected v2.3 Changes:');",
+                  "console.log('   - marketData (new in v2.3) \u2713');",
+                  "console.log('   - dispenserInfo (new in v2.3) \u2713');",
+                  "console.log('   - cacheStatus (new in v2.3) \u2713');",
+                  "console.log('   - holderCount/uniqueHolderCount (new in v2.3) \u2713');",
+                  "console.log('   - dataQualityScore (new in v2.3) \u2713');",
+                  "console.log('   - stamp_base64 excluded from lists in v2.3 \u2713');",
+                  "console.log('   - Invalid tick validation (400 in dev, 200 in prod) \u2713');",
+                  "console.log('   - Enhanced recent sales with sale_data (new in v2.3) \u2713');",
+                  "console.log('   - Recent sales dayRange parameter (new in v2.3) \u2713');",
+                  "console.log('   - Recent sales fullDetails parameter (new in v2.3) \u2713');",
                   "",
                   "// Performance regression analysis",
-                  "console.log('\\n📊 PERFORMANCE REGRESSION ANALYSIS:');",
+                  "console.log('\\n\ud83d\udcca PERFORMANCE REGRESSION ANALYSIS:');",
                   "const devBasicTime = pm.collectionVariables.get('dev_recent_sales_basic_time');",
                   "const prodBasicTime = pm.collectionVariables.get('prod_recent_sales_basic_time');",
                   "const devEnhancedTime = pm.collectionVariables.get('dev_recent_sales_enhanced_time');",
@@ -1260,11 +1254,11 @@
                   "    console.log(`  Performance Impact: ${basicTimeDiff > 0 ? '+' : ''}${basicTimeDiff}ms (${basicPercentDiff}%)`);",
                   "    ",
                   "    if (Math.abs(basicPercentDiff) > 50) {",
-                  "        console.log('  ⚠️  SIGNIFICANT PERFORMANCE REGRESSION DETECTED');",
+                  "        console.log('  \u26a0\ufe0f  SIGNIFICANT PERFORMANCE REGRESSION DETECTED');",
                   "    } else if (Math.abs(basicPercentDiff) > 20) {",
-                  "        console.log('  ⚠️  Moderate performance change detected');",
+                  "        console.log('  \u26a0\ufe0f  Moderate performance change detected');",
                   "    } else {",
-                  "        console.log('  ✅ Performance within acceptable range');",
+                  "        console.log('  \u2705 Performance within acceptable range');",
                   "    }",
                   "}",
                   "",
@@ -1281,11 +1275,11 @@
                   "    console.log(`v2.3 Enhancement Overhead: ${enhancementOverhead}ms (${overheadPercent}%)`);",
                   "    ",
                   "    if (overheadPercent > 100) {",
-                  "        console.log('  ⚠️  HIGH OVERHEAD - Enhanced features significantly impact performance');",
+                  "        console.log('  \u26a0\ufe0f  HIGH OVERHEAD - Enhanced features significantly impact performance');",
                   "    } else if (overheadPercent > 50) {",
-                  "        console.log('  ⚠️  Moderate overhead from enhanced features');",
+                  "        console.log('  \u26a0\ufe0f  Moderate overhead from enhanced features');",
                   "    } else {",
-                  "        console.log('  ✅ Enhanced features have minimal performance impact');",
+                  "        console.log('  \u2705 Enhanced features have minimal performance impact');",
                   "    }",
                   "}",
                   "",

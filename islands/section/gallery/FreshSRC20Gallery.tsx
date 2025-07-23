@@ -69,7 +69,7 @@ export default function FreshSRC20Gallery({
       ...token,
       // Add a computed field for memoization stability using available market data
       _marketDataHash: token.market_data
-        ? `${token.market_data.floor_unit_price}-${token.market_data.volume24}-${token.market_data.mcap}`
+        ? `${token.market_data.floor_price_btc}-${token.market_data.volume_24h_btc}-${token.market_data.market_cap_btc}`
         : "no-market-data",
     }));
   }, [
@@ -78,7 +78,9 @@ export default function FreshSRC20Gallery({
     tokens.map((t) => t.tick).join(","), // Token composition changes
     tokens.map((t) => {
       const md = t.market_data;
-      return md ? `${md.floor_unit_price}-${md.volume24}-${md.mcap}` : "none";
+      return md
+        ? `${md.floor_price_btc}-${md.volume_24h_btc}-${md.market_cap_btc}`
+        : "none";
     }).join(","), // Market data values change
   ]);
 

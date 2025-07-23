@@ -10,6 +10,7 @@ import {
   Timeframe,
 } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { constructStampUrl } from "$lib/utils/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
 
 interface SRC20CardSmMintingProps {
@@ -27,6 +28,7 @@ export function SRC20CardSmMinting({
     "TOKEN",
     "MINTS",
     "PROGRESS",
+    "HOLDERS",
     "", // MINT button
   ];
 
@@ -48,19 +50,23 @@ export function SRC20CardSmMinting({
         {colGroup([
           {
             width:
-              "w-[33%] min-[600px]:w-[25%] tablet:w-[40%] min-[1280px]:w-[25%]",
+              "w-[28%] min-[600px]:w-[22%] tablet:w-[35%] min-[1280px]:w-[22%]",
           }, // TOKEN
           {
             width:
-              "hidden min-[600px]:w-[18%] tablet:hidden min-[1280px]:w-[14%]",
+              "hidden min-[600px]:w-[16%] tablet:hidden min-[1280px]:w-[12%]",
           }, // MINTS
           {
             width:
-              "w-[34%] min-[600px]:w-[18%] tablet:w-[30%] min-[1280px]:w-[22%]",
+              "w-[32%] min-[600px]:w-[16%] tablet:w-[28%] min-[1280px]:w-[20%]",
           }, // PROGRESS
           {
             width:
-              "w-[33%] min-[600px]:w-[39%] tablet:w-[30%] min-[1280px]:w-[39%]",
+              "w-[17%] min-[600px]:w-[16%] tablet:w-[20%] min-[1280px]:w-[18%]",
+          }, // HOLDERS
+          {
+            width:
+              "w-[23%] min-[600px]:w-[30%] tablet:w-[17%] min-[1280px]:w-[28%]",
           }, // MINT button
         ]).map((col) => <col key={col.key} class={col.className} />)}
       </colgroup>
@@ -84,10 +90,15 @@ export function SRC20CardSmMinting({
         {data.length
           ? (
             data.map((src20) => {
-              const imageUrl = src20.stamp_url ||
-                src20.deploy_img ||
-                `/content/${src20.tx_hash}.svg` ||
-                `/content/${src20.deploy_tx}`;
+              // SRC-20 Image URL Logic:
+              // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
+              // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
+              // 3. Fallback to constructing URL from deploy_tx if available
+              // 4. Final fallback to placeholder image
+              const imageUrl = src20.deploy_img ||
+                src20.stamp_url ||
+                (src20.deploy_tx ? constructStampUrl(src20.deploy_tx) : null) ||
+                "/img/placeholder/stamp-no-image.svg";
 
               const href = `/src20/${
                 encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
@@ -200,7 +211,8 @@ export function SRC20CardSmMinting({
                       cellAlign(1, headers.length)
                     } ${rowCardBorderCenter} hidden min-[600px]:table-cell tablet:hidden min-[1280px]:table-cell`}
                   >
-                    {src20.mint_count || "N/A"}
+                    {src20.mint_progress?.total_mints || src20.mint_count ||
+                      "N/A"}
                   </td>
                   {/* PROGRESS */}
                   <td
@@ -211,22 +223,74 @@ export function SRC20CardSmMinting({
                     <div class="flex items-center justify-center w-full">
                       <div class="flex flex-col w-[100px] min-[420px]:w-[120px] mobileLg:w-[160px] tablet:w-[120px] desktop:w-[160px] gap-1">
                         <div class="!text-xs text-center">
-                          {Number(src20.progress)}
+                          {(() => {
+                            // ✅ FIXED: Use the same data access pattern as SRC20CardMinting
+                            const progressRaw = src20.mint_progress?.progress ||
+                              src20.progress;
+                            if (
+                              progressRaw === undefined || progressRaw === null
+                            ) {
+                              return "0";
+                            }
+                            const progressValue = Number(progressRaw);
+                            if (isNaN(progressValue)) {
+                              return "0";
+                            }
+                            return progressValue.toFixed(1);
+                          })()}
                           <span class="text-stamp-grey-light">%</span>
                         </div>
                         <div class="relative h-1.5 bg-stamp-grey rounded-full">
                           <div
                             class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
-                            style={{ width: `${src20.progress}%` }}
+                            style={{
+                              width: `${
+                                (() => {
+                                  // ✅ FIXED: Use the same data access pattern as SRC20CardMinting
+                                  const progressRaw =
+                                    src20.mint_progress?.progress ||
+                                    src20.progress;
+                                  if (
+                                    progressRaw === undefined ||
+                                    progressRaw === null
+                                  ) {
+                                    return 0;
+                                  }
+                                  const progressValue = Number(progressRaw);
+                                  if (isNaN(progressValue)) {
+                                    return 0;
+                                  }
+                                  return Math.min(
+                                    100,
+                                    Math.max(0, progressValue),
+                                  );
+                                })()
+                              }%`,
+                            }}
                           />
                         </div>
                       </div>
                     </div>
                   </td>
-                  {/* MINT BUTTON */}
+                  {/* HOLDERS */}
                   <td
                     class={`${
                       cellAlign(3, headers.length)
+                    } ${rowCardBorderCenter}`}
+                  >
+                    {(() => {
+                      // ✅ FIXED: Use the same data access pattern as SRC20CardMinting
+                      const holderCount =
+                        (src20 as any)?.market_data?.holder_count ||
+                        (src20 as any)?.holders ||
+                        0;
+                      return Number(holderCount).toLocaleString();
+                    })()}
+                  </td>
+                  {/* MINT BUTTON */}
+                  <td
+                    class={`${
+                      cellAlign(4, headers.length)
                     } ${rowCardBorderRight}`}
                   >
                     <Button

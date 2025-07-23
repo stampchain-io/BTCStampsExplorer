@@ -6,11 +6,12 @@ export type { SRC20Row, StampRow };
 
 export interface MarketListingSummary {
   tick: string;
-  floor_unit_price: number;
-  mcap: number;
-  sum_7d: number | null;
-  sum_3d: number | null;
-  sum_1d: number | null;
+  // 🎸 PUNK ROCK v2.3 STANDARDIZED FIELDS 🎸
+  floor_price_btc: number | null; // ✅ v2.3 standardized field
+  market_cap_btc: number; // ✅ v2.3 standardized field
+  volume_7d_btc: number | null; // ✅ v2.3 extended field (was sum_7d)
+  volume_3d_btc: number | null; // ✅ v2.3 extended field (was sum_3d)
+  volume_24h_btc: number | null; // ✅ v2.3 standardized field (was sum_1d)
   stamp_url: string | null;
   tx_hash: string;
   holder_count: number;
@@ -23,19 +24,20 @@ export interface OpenStampMarketData {
   holdersCount: number;
   price: string; // in satoshis
   amount24: string;
-  volume24: string; // in satoshis
-  volume24Change: string;
-  change24: string;
-  change7d: string;
+  volume_24h_btc: string; // ✅ v2.3 standardized field (was volume24, in satoshis)
+  volume_24h_change: string; // ✅ v2.3 standardized field (was volume24Change)
+  change_24h: string; // ✅ v2.3 standardized field (was change24)
+  change_7d: string; // ✅ v2.3 standardized field (was change7d)
 }
 
 export interface StampScanMarketData {
   tick: string; // emoji tick
-  floor_unit_price: number; // in btc
-  mcap: number; // in btc
-  sum_7d: number | null; // in btc
-  sum_3d: number | null; // in btc
-  sum_1d: number | null; // in btc
+  // 🎸 PUNK ROCK v2.3 STANDARDIZED FIELDS 🎸
+  floor_price_btc: number | null; // ✅ v2.3 standardized field (was floor_unit_price)
+  market_cap_btc: number; // ✅ v2.3 standardized field (was mcap)
+  volume_7d_btc: number | null; // ✅ v2.3 extended field (was sum_7d)
+  volume_3d_btc: number | null; // ✅ v2.3 extended field (was sum_3d)
+  volume_24h_btc: number | null; // ✅ v2.3 standardized field (was sum_1d)
   stamp_url: string | null;
   tx_hash: string;
   holder_count: number;
@@ -43,20 +45,33 @@ export interface StampScanMarketData {
 
 export interface MarketListingAggregated {
   tick: string;
-  floor_unit_price: number; // lower of stampscan floor_unit_price and openstamp price
-  mcap: number; // computed on lower of stampscan floor_unit_price and openstamp price * totalSupply
-  volume24: number; // sum of sum_1d + volume24
+  // 🎸 PUNK ROCK v2.3 STANDARDIZED FIELDS 🎸
+  price_btc?: number | null; // ✅ v2.3 field for fungible SRC-20 tokens
+  floor_price_btc: number | null; // ✅ v2.3 standardized field (for NFTs, lower of stampscan/openstamp)
+  market_cap_btc: number; // ✅ v2.3 standardized field (computed on lower price * totalSupply)
+  volume_24h_btc: number; // ✅ v2.3 standardized field (sum of volumes)
+  volume_7d_btc?: number; // ✅ v2.3 extended field
+  volume_30d_btc?: number; // ✅ v2.3 extended field
+  change_24h_percent?: number | undefined; // ✅ v2.3 standardized field (24h price change percentage)
   stamp_url?: string | null;
   tx_hash: string;
   holder_count: number; // use stampscan holder_count value
+
+  // 🔄 BACKWARD COMPATIBILITY: Legacy field names (DEPRECATED - use standardized names above)
+  floor_unit_price?: number | null; // @deprecated Use floor_price_btc
+  mcap?: number; // @deprecated Use market_cap_btc
+  volume24?: number; // @deprecated Use volume_24h_btc
+  change_24h?: number | undefined; // @deprecated Use change_24h_percent
+  change24?: number | undefined; // @deprecated Use change_24h_percent
+
   market_data: {
     stampscan: {
-      price: number; // floor_unit_price
-      volume24: number; // sum_1d
+      price: number; // floor_price_btc
+      volume_24h_btc: number; // ✅ v2.3 standardized field (was volume24)
     };
     openstamp: {
       price: number; // price
-      volume24: number; // volume24
+      volume_24h_btc: number; // ✅ v2.3 standardized field (was volume24)
     };
   };
 }
