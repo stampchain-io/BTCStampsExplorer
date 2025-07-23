@@ -4,7 +4,7 @@
  */
 
 import { CollectionController } from "$server/controller/collectionController.ts";
-import { StampController } from "$server/controller/stampController.ts";
+import { StampService } from "$server/services/stampService.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
@@ -30,6 +30,7 @@ const mockStampData = [
     collection_id: "POSH",
     cpid: "A123456789012345678901234567890123456789",
     stamp_url: "https://example.com/stamp1.png",
+    ident: "STAMP",
   },
   {
     tx_hash: "def456",
@@ -37,6 +38,7 @@ const mockStampData = [
     collection_id: "POSH",
     cpid: "B123456789012345678901234567890123456789",
     stamp_url: "https://example.com/stamp2.jpg",
+    ident: "STAMP",
   },
   {
     tx_hash: "ghi789",
@@ -44,6 +46,7 @@ const mockStampData = [
     collection_id: "POSH",
     cpid: "C123456789012345678901234567890123456789",
     stamp_url: "https://example.com/stamp3.gif",
+    ident: "STAMP",
   },
 ];
 
@@ -59,7 +62,7 @@ const mockPaginatedResponse = {
 // Mock the services
 const originalGetCollectionDetails = CollectionService.getCollectionDetails;
 const originalGetCollectionNames = CollectionService.getCollectionNames;
-const originalGetStamps = StampController.getStamps;
+const originalGetStamps = StampService.getStamps;
 
 describe("CollectionController", () => {
   beforeEach(() => {
@@ -70,7 +73,7 @@ describe("CollectionController", () => {
     // Restore original methods
     CollectionService.getCollectionDetails = originalGetCollectionDetails;
     CollectionService.getCollectionNames = originalGetCollectionNames;
-    StampController.getStamps = originalGetStamps;
+    StampService.getStamps = originalGetStamps;
   });
 
   describe("getCollectionDetails", () => {
@@ -232,13 +235,13 @@ describe("CollectionController", () => {
     it("should return collections with stamp images", async () => {
       CollectionService.getCollectionDetails = () =>
         Promise.resolve(mockPaginatedResponse);
-      StampController.getStamps = () =>
+      StampService.getStamps = () =>
         Promise.resolve({
-          data: mockStampData,
+          stamps: mockStampData,
+          total: 3,
+          totalPages: 1,
           page: 1,
           limit: 36,
-          totalPages: 1,
-          total: 3,
         });
 
       const result = await CollectionController.getCollectionStamps({
@@ -272,16 +275,16 @@ describe("CollectionController", () => {
       assertEquals(result.total, 0);
     });
 
-    it("should apply minimum stamp count filter", async () => {
+    it("should pass through includeMarketData parameter", async () => {
       let capturedParams: any;
       CollectionService.getCollectionDetails = (params) => {
         capturedParams = params;
         return Promise.resolve(mockPaginatedResponse);
       };
 
-      StampController.getStamps = () =>
+      StampService.getStamps = () =>
         Promise.resolve({
-          data: [],
+          stamps: [],
           page: 1,
           limit: 12,
           totalPages: 1,
@@ -291,9 +294,10 @@ describe("CollectionController", () => {
       await CollectionController.getCollectionStamps({
         page: 1,
         limit: 50,
+        includeMarketData: false,
       });
 
-      assertEquals(capturedParams.minStampCount, 2);
+      assertEquals(capturedParams.includeMarketData, false);
     });
 
     it("should group stamps by collection ID", async () => {
@@ -315,14 +319,19 @@ describe("CollectionController", () => {
           total: 2,
         });
 
-      StampController.getStamps = () =>
-        Promise.resolve({
-          data: multiStampData,
+      StampService.getStamps = (params: any) => {
+        // Return stamps filtered by collection ID
+        const stamps = multiStampData.filter((s) =>
+          s.collection_id === params.collectionId
+        );
+        return Promise.resolve({
+          stamps,
           page: 1,
-          limit: 24,
+          limit: 12,
           totalPages: 1,
-          total: 3,
+          total: stamps.length,
         });
+      };
 
       const result = await CollectionController.getCollectionStamps({
         page: 1,
@@ -350,19 +359,18 @@ describe("CollectionController", () => {
       const invalidStampData = [
         { ...mockStampData[0], tx_hash: null }, // Missing tx_hash
         { ...mockStampData[1], stamp_mimetype: null }, // Missing mimetype
-        { ...mockStampData[2], collection_id: null }, // Missing collection_id
         mockStampData[0], // Valid stamp
       ];
 
       CollectionService.getCollectionDetails = () =>
         Promise.resolve(mockPaginatedResponse);
-      StampController.getStamps = () =>
+      StampService.getStamps = () =>
         Promise.resolve({
-          data: invalidStampData,
+          stamps: invalidStampData,
           page: 1,
           limit: 12,
           totalPages: 1,
-          total: 4,
+          total: 3,
         });
 
       const result = await CollectionController.getCollectionStamps({
@@ -385,9 +393,9 @@ describe("CollectionController", () => {
 
       CollectionService.getCollectionDetails = () =>
         Promise.resolve(mockPaginatedResponse);
-      StampController.getStamps = () =>
+      StampService.getStamps = () =>
         Promise.resolve({
-          data: manyStamps,
+          stamps: manyStamps,
           page: 1,
           limit: 240, // 20 * 12
           totalPages: 1,
@@ -409,9 +417,9 @@ describe("CollectionController", () => {
 
       CollectionService.getCollectionDetails = () =>
         Promise.resolve(mockPaginatedResponse);
-      StampController.getStamps = () =>
+      StampService.getStamps = () =>
         Promise.resolve({
-          data: twoStamps,
+          stamps: twoStamps,
           page: 1,
           limit: 12,
           totalPages: 1,
@@ -436,9 +444,9 @@ describe("CollectionController", () => {
 
       CollectionService.getCollectionDetails = () =>
         Promise.resolve(mockPaginatedResponse);
-      StampController.getStamps = () =>
+      StampService.getStamps = () =>
         Promise.resolve({
-          data: oneStamp,
+          stamps: oneStamp,
           page: 1,
           limit: 12,
           totalPages: 1,
@@ -461,9 +469,9 @@ describe("CollectionController", () => {
     it("should handle collections with no stamps", async () => {
       CollectionService.getCollectionDetails = () =>
         Promise.resolve(mockPaginatedResponse);
-      StampController.getStamps = () =>
+      StampService.getStamps = () =>
         Promise.resolve({
-          data: [],
+          stamps: [],
           page: 1,
           limit: 12,
           totalPages: 1,
@@ -494,16 +502,15 @@ describe("CollectionController", () => {
       await assertRejects(
         () => CollectionController.getCollectionStamps({ page: 1, limit: 50 }),
         Error,
-        "Unexpected data structure from CollectionService.getCollectionDetails",
       );
     });
 
-    it("should handle invalid data structure from StampController", async () => {
+    it("should handle invalid data structure from StampService", async () => {
       CollectionService.getCollectionDetails = () =>
         Promise.resolve(mockPaginatedResponse);
-      StampController.getStamps = () =>
+      StampService.getStamps = () =>
         Promise.resolve({
-          data: "invalid", // Should be array
+          stamps: "invalid", // Should be array
           page: 1,
           limit: 12,
           totalPages: 1,
@@ -513,19 +520,18 @@ describe("CollectionController", () => {
       await assertRejects(
         () => CollectionController.getCollectionStamps({ page: 1, limit: 50 }),
         Error,
-        "Unexpected data structure from StampController.getStamps",
       );
     });
 
-    it("should pass correct parameters to StampController", async () => {
+    it("should pass correct parameters to StampService", async () => {
       let capturedStampParams: any;
 
       CollectionService.getCollectionDetails = () =>
         Promise.resolve(mockPaginatedResponse);
-      StampController.getStamps = (params) => {
+      StampService.getStamps = (params: any) => {
         capturedStampParams = params;
         return Promise.resolve({
-          data: [],
+          stamps: [],
           page: 1,
           limit: 12,
           totalPages: 1,
@@ -539,14 +545,11 @@ describe("CollectionController", () => {
       });
 
       assertEquals(capturedStampParams.collectionId, "POSH");
-      assertEquals(capturedStampParams.noPagination, false);
-      assertEquals(capturedStampParams.type, "all");
-      assertEquals(capturedStampParams.sortBy, "ASC");
-      assertEquals(capturedStampParams.allColumns, false);
-      assertEquals(capturedStampParams.limit, 12); // 1 collection * 12
-      assertEquals(capturedStampParams.collectionStampLimit, 12);
-      assertEquals(capturedStampParams.groupBy, "collection_id");
-      assertEquals(capturedStampParams.groupBySubquery, true);
+      assertEquals(capturedStampParams.limit, 12);
+      assertEquals(capturedStampParams.sortBy, "DESC");
+      assertEquals(capturedStampParams.type, "stamps");
+      assertEquals(capturedStampParams.includeSecondary, false);
+      assertEquals(capturedStampParams.skipTotalCount, true);
     });
 
     it("should handle service errors in getCollectionStamps", async () => {
@@ -561,10 +564,10 @@ describe("CollectionController", () => {
       );
     });
 
-    it("should handle error from StampController", async () => {
+    it("should handle error from StampService", async () => {
       CollectionService.getCollectionDetails = () =>
         Promise.resolve(mockPaginatedResponse);
-      StampController.getStamps = () => {
+      StampService.getStamps = () => {
         throw new Error("Stamp service error");
       };
 

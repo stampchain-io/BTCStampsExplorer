@@ -61,7 +61,7 @@ export class CollectionController {
           skipTotalCount: true,
         });
 
-        if (stampResults.stamps && stampResults.stamps.length > 0) {
+        if (stampResults.stamps && Array.isArray(stampResults.stamps) && stampResults.stamps.length > 0) {
           const stamps: string[] = [];
 
           for (const stamp of stampResults.stamps) {
@@ -82,6 +82,9 @@ export class CollectionController {
           if (stamps.length > 0) {
             stampsByCollection.set(collectionId.toUpperCase(), stamps);
           }
+        } else if (stampResults.stamps && !Array.isArray(stampResults.stamps)) {
+          // Handle invalid data structure
+          throw new Error("Invalid stamp data structure: stamps is not an array");
         }
       }
 

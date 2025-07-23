@@ -3121,47 +3121,46 @@ components:
           properties:
             market_data:
               type: object
+              oneOf:
+                - $ref: "#/components/schemas/SRC20MarketData"
+                - $ref: "#/components/schemas/SRC20MarketDataEnhanced"
               nullable: true
-              properties:
-                floorPriceBTC:
-                  type: number
-                  nullable: true
-                  description: "Current floor price per stamp in BTC from dispensers or recent sales. Null indicates no market data available."
-                recentSalePriceBTC:
-                  type: number
-                  nullable: true
-                  description: "Most recent actual sale price per stamp in BTC. Null indicates no recent sales data available."
-                lastPriceBTC:
-                  type: number
-                  description: "Best calculated price per stamp in BTC using fallback hierarchy: floorPriceBTC > recentSalePriceBTC > default calculations. This is the recommended price for portfolio calculations."
-                walletValueBTC:
-                  type: number
-                  description: "Total portfolio value for this stamp (quantity owned × lastPriceBTC). Represents the estimated total BTC worth of all units owned by this wallet."
-                openDispensersCount:
-                  type: number
-                  description: Count of open dispensers
-                holderCount:
-                  type: number
-                  description: Number of holders
-                volume24hBTC:
-                  type: number
-                  nullable: true
-                  description: 24-hour volume in BTC
-                volume7dBTC:
-                  type: number
-                  nullable: true
-                  description: 7-day volume in BTC
-                volume30dBTC:
-                  type: number
-                  nullable: true
-                  description: 30-day volume in BTC
-                lastUpdated:
-                  type: string
-                  format: date-time
-                  nullable: true
-                dataQualityScore:
-                  type: number
-                  description: Data quality score (1-10)
+              description: Market data structure varies by API version - v2.3 uses enhanced structure with marketDataSources
+            recentSalePriceBTC:
+              type: number
+              nullable: true
+              description: "Most recent actual sale price per stamp in BTC. Null indicates no recent sales data available."
+            lastPriceBTC:
+              type: number
+              description: "Best calculated price per stamp in BTC using fallback hierarchy: floorPriceBTC > recentSalePriceBTC > default calculations. This is the recommended price for portfolio calculations."
+            walletValueBTC:
+              type: number
+              description: "Total portfolio value for this stamp (quantity owned × lastPriceBTC). Represents the estimated total BTC worth of all units owned by this wallet."
+            openDispensersCount:
+              type: number
+              description: Count of open dispensers
+            holderCount:
+              type: number
+              description: Number of holders
+            volume24hBTC:
+              type: number
+              nullable: true
+              description: 24-hour volume in BTC
+            volume7dBTC:
+              type: number
+              nullable: true
+              description: 7-day volume in BTC
+            volume30dBTC:
+              type: number
+              nullable: true
+              description: 30-day volume in BTC
+            lastUpdated:
+              type: string
+              format: date-time
+              nullable: true
+            dataQualityScore:
+              type: number
+              description: Data quality score (1-10)
     MintStatus:
       type: object
       properties:
@@ -4279,6 +4278,7 @@ components:
         - type: object
           properties:
             marketData:
+              type: object
               oneOf:
                 - $ref: "#/components/schemas/SRC20MarketData"
                 - $ref: "#/components/schemas/SRC20MarketDataEnhanced"
