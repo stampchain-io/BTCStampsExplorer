@@ -1,11 +1,10 @@
 /* ===== FAIRMINT CONTENT COMPONENT ===== */
-import { useState } from "preact/hooks";
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
-import { FeeCalculatorAdvanced } from "$islands/section/FeeCalculatorAdvanced.tsx";
-import { StatusMessages } from "$notification";
-import { walletContext } from "$client/wallet/wallet.ts";
+import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { bodyTool, containerBackground, containerColForm } from "$layout";
+import { StatusMessages } from "$notification";
 import { titlePurpleLD } from "$text";
+import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface FairmintToolProps {
@@ -21,7 +20,6 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
     handleInputChange,
     handleSubmit,
     handleChangeFee,
-    fetchFees,
     isLoading,
     isSubmitting,
     submissionMessage,
@@ -29,7 +27,6 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
   } = useFairmintForm(fairminters);
 
   const [tosAgreed, setTosAgreed] = useState(false);
-  const { wallet } = walletContext;
 
   /* ===== HELPERS ===== */
   // Check if the fairminters array is empty
@@ -97,21 +94,18 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
 
       {/* ===== FEE CALCULATOR ===== */}
       <div class={containerBackground}>
-        <FeeCalculatorAdvanced
+        <FeeCalculatorBase
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="fairmint"
           fileType="application/json"
           fileSize={formState.jsonSize}
           BTCPrice={formState.BTCPrice}
-          onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           buttonName="FAIRMINT"
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
-          userAddress={wallet?.address}
-          utxoAncestors={formState.utxoAncestors || []}
           feeDetails={{
             minerFee: formState.psbtFeeDetails?.estMinerFee || 0,
             dustValue: formState.psbtFeeDetails?.totalDustValue || 0,
@@ -119,6 +113,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             totalValue: (formState.psbtFeeDetails?.estMinerFee || 0) +
               (formState.psbtFeeDetails?.totalDustValue || 0),
           }}
+          bitname=""
         />
 
         {/* ===== STATUS MESSAGES ===== */}

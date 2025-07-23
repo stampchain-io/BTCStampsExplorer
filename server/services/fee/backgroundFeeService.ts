@@ -211,4 +211,26 @@ export class BackgroundFeeService {
       this.warmPriceCache(),
     ]);
   }
+
+  /**
+   * Force a manual BTC price cache warm
+   */
+  static async forceWarmPrice(): Promise<void> {
+    logger.info("stamps", {
+      message: "Forcing manual BTC price cache warm",
+    });
+
+    await this.warmPriceCache();
+  }
+
+  /**
+   * Force a manual fee cache warm
+   */
+  static async forceWarmFee(): Promise<void> {
+    logger.info("stamps", {
+      message: "Forcing manual fee cache warm",
+    });
+
+    await this.warmFeeCache();
+  }
 }
