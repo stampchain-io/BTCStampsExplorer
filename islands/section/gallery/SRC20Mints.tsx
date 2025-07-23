@@ -16,7 +16,12 @@ export default function SRC20MintsGallery() {
     const fetchTrendingActiveMintingTokens = async () => {
       try {
         const response = await fetch(
-          "/api/internal/src20/trending?type=minting&limit=5&page=1&transactionCount=1000",
+          "/api/v2/src20?op=DEPLOY&mintingStatus=minting&sortBy=TRENDING_MINTING_DESC&limit=5&page=1&includeMarketData=true&includeProgress=true",
+          {
+            headers: {
+              "X-API-Version": "2.3",
+            },
+          },
         );
 
         if (!response.ok) {

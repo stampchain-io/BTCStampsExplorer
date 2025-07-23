@@ -97,7 +97,7 @@
           "if (!pm.collectionVariables.get('test_session_id')) {",
           "    const sessionId = 'test_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);",
           "    pm.collectionVariables.set('test_session_id', sessionId);",
-          "    console.log('🚀 Starting regression test session:', sessionId);",
+          "    console.log('\ud83d\ude80 Starting regression test session:', sessionId);",
           "}",
           "",
           "// Initialize comparison results",
@@ -106,7 +106,7 @@
           "}",
           "",
           "// Log request details",
-          "console.log('📤 Request: ' + pm.request.method + ' ' + pm.request.url.toString());"
+          "console.log('\ud83d\udce4 Request: ' + pm.request.method + ' ' + pm.request.url.toString());"
         ]
       }
     },
@@ -542,7 +542,7 @@
                   "});",
                   "",
                   "console.log('\\n' + '='.repeat(80));",
-                  "console.log('🔍 COMPREHENSIVE API REGRESSION REPORT');",
+                  "console.log('\ud83d\udd0d COMPREHENSIVE API REGRESSION REPORT');",
                   "console.log('='.repeat(80));",
                   "console.log('Session ID:', pm.collectionVariables.get('test_session_id'));",
                   "console.log('Generated:', new Date().toISOString());",
@@ -564,11 +564,11 @@
                   "        ",
                   "        // Compare status codes",
                   "        if (dev.status !== prod.status) {",
-                  "            console.log(`   ❌ Status Code: Dev=${dev.status}, Prod=${prod.status}`);",
+                  "            console.log(`   \u274c Status Code: Dev=${dev.status}, Prod=${prod.status}`);",
                   "            statusMismatches++;",
                   "            endpointDiffs++;",
                   "        } else {",
-                  "            console.log(`   ✅ Status Code: ${dev.status}`);",
+                  "            console.log(`   \u2705 Status Code: ${dev.status}`);",
                   "        }",
                   "        ",
                   "        // Deep compare response bodies",
@@ -576,7 +576,7 @@
                   "        ",
                   "        if (bodyDiffs.length > 0) {",
                   "            endpointDiffs += bodyDiffs.length;",
-                  "            console.log(`   ⚠️  Response Differences Found (${bodyDiffs.length}):`);",
+                  "            console.log(`   \u26a0\ufe0f  Response Differences Found (${bodyDiffs.length}):`);",
                   "            ",
                   "            // Group differences by type",
                   "            const added = bodyDiffs.filter(d => d.type === 'added');",
@@ -584,21 +584,21 @@
                   "            const changed = bodyDiffs.filter(d => d.type === 'changed');",
                   "            ",
                   "            if (added.length > 0) {",
-                  "                console.log('      📗 Fields in DEV but not PROD (v2.3 additions):');",
+                  "                console.log('      \ud83d\udcd7 Fields in DEV but not PROD (v2.3 additions):');",
                   "                added.forEach(d => {",
                   "                    console.log(`         - ${d.path}`);",
                   "                });",
                   "            }",
                   "            ",
                   "            if (removed.length > 0) {",
-                  "                console.log('      📕 Fields in PROD but not DEV (v2.3 removals):');",
+                  "                console.log('      \ud83d\udcd5 Fields in PROD but not DEV (v2.3 removals):');",
                   "                removed.forEach(d => {",
                   "                    console.log(`         - ${d.path}`);",
                   "                });",
                   "            }",
                   "            ",
                   "            if (changed.length > 0) {",
-                  "                console.log('      📙 Fields with different values:');",
+                  "                console.log('      \ud83d\udcd9 Fields with different values:');",
                   "                changed.slice(0, 10).forEach(d => {",
                   "                    console.log(`         - ${d.path}`);",
                   "                    if (typeof d.devValue !== 'object') {",
@@ -620,7 +620,7 @@
                   "});",
                   "",
                   "console.log('\\n' + '='.repeat(80));",
-                  "console.log('📊 SUMMARY');",
+                  "console.log('\ud83d\udcca SUMMARY');",
                   "console.log('='.repeat(80));",
                   "console.log('Endpoints Tested:', Object.keys(grouped).length);",
                   "console.log('Endpoints with Differences:', endpointsWithDifferences);",
@@ -628,7 +628,7 @@
                   "console.log('Total Field Differences:', totalDifferences);",
                   "",
                   "// Expected v2.3 differences",
-                  "console.log('\\n📌 Expected v2.3 Differences:');",
+                  "console.log('\\n\ud83d\udccc Expected v2.3 Differences:');",
                   "console.log('   - marketData (new in v2.3)');",
                   "console.log('   - dispenserInfo (new in v2.3)');",
                   "console.log('   - cacheStatus (new in v2.3)');",
@@ -1456,9 +1456,22 @@
                 ],
                 "url": {
                   "raw": "{{dev_base_url}}/api/v2/src20/tx/{{test_tx_hash}}?tick=null",
-                  "host": ["{{dev_base_url}}"],
-                  "path": ["api", "v2", "src20", "tx", "{{test_tx_hash}}"],
-                  "query": [{"key": "tick", "value": "null"}]
+                  "host": [
+                    "{{dev_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "src20",
+                    "tx",
+                    "{{test_tx_hash}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "tick",
+                      "value": "null"
+                    }
+                  ]
                 }
               },
               "event": [
@@ -1491,9 +1504,22 @@
                 ],
                 "url": {
                   "raw": "{{prod_base_url}}/api/v2/src20/tx/{{test_tx_hash}}?tick=null",
-                  "host": ["{{prod_base_url}}"],
-                  "path": ["api", "v2", "src20", "tx", "{{test_tx_hash}}"],
-                  "query": [{"key": "tick", "value": "null"}]
+                  "host": [
+                    "{{prod_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "src20",
+                    "tx",
+                    "{{test_tx_hash}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "tick",
+                      "value": "null"
+                    }
+                  ]
                 }
               },
               "event": [
@@ -1513,8 +1539,7 @@
                   }
                 }
               ]
-            },
-            // Add more edge cases here, e.g., for undefined params (simulated via absence) or invalid formats
+            }
           ]
         }
       ]
@@ -5175,15 +5200,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ]
             }
           },
@@ -5214,9 +5238,9 @@
                   "",
                   "pm.test('Response has enhanced fields', function () {",
                   "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('btcPriceUSD');",
+                  "    pm.expect(jsonData).to.have.property('btc_price_usd');",
                   "    pm.expect(jsonData).to.have.property('metadata');",
-                  "    pm.expect(jsonData.btcPriceUSD).to.be.a('number');",
+                  "    pm.expect(jsonData.btc_price_usd).to.be.a('number');",
                   "    pm.expect(jsonData.metadata).to.be.an('object');",
                   "});",
                   "",
@@ -5233,12 +5257,12 @@
                   "    ",
                   "    if (jsonData.data.length > 0) {",
                   "        const sale = jsonData.data[0];",
-                  "        pm.expect(sale).to.have.property('stamp_id');",
-                  "        pm.expect(sale).to.have.property('lastSalePrice');",
-                  "        pm.expect(sale).to.have.property('lastSalePriceUSD');",
-                  "        pm.expect(sale).to.have.property('lastSaleDate');",
-                  "        pm.expect(sale).to.have.property('time_ago');",
-                  "        pm.expect(sale).to.have.property('btc_amount_satoshis');",
+                  "        pm.expect(sale).to.have.property('stamp');",
+                  "        pm.expect(sale).to.have.property('usd_amount');",
+                  "        pm.expect(sale).to.have.property('last_sale_date');",
+                  "        pm.expect(sale).to.have.property('sale_data');",
+                  "        pm.expect(sale.sale_data).to.be.an('object');",
+                  "        pm.expect(sale.sale_data).to.have.property('btc_amount');",
                   "    }",
                   "});"
                 ]
@@ -5257,15 +5281,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ]
             }
           },
@@ -5309,15 +5332,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=7",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=7",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5363,15 +5385,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?dayRange=7",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales?dayRange=7",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5393,15 +5414,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?fullDetails=true",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?fullDetails=true",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5458,15 +5478,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?fullDetails=true",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales?fullDetails=true",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5488,15 +5507,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?page=1&limit=10",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?page=1&limit=10",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5547,15 +5565,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?page=1&limit=10",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales?page=1&limit=10",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5581,15 +5598,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=1",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=1",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5629,15 +5645,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?dayRange=1",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales?dayRange=1",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5659,15 +5674,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=365",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=365",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5711,15 +5725,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?dayRange=365",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales?dayRange=365",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5741,15 +5754,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=14&fullDetails=true&page=1&limit=5",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=14&fullDetails=true&page=1&limit=5",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5814,15 +5826,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?dayRange=14&fullDetails=true&page=1&limit=5",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales?dayRange=14&fullDetails=true&page=1&limit=5",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5856,15 +5867,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=invalid",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=invalid",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5903,15 +5913,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=-5",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=-5",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5950,15 +5959,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?limit=50",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?limit=50",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -5992,7 +6000,7 @@
                   "    ",
                   "    // Verify each item has required performance-critical fields",
                   "    jsonData.data.forEach(function(sale, index) {",
-                  "        pm.expect(sale, `Sale ${index} missing stamp_id`).to.have.property('stamp_id');",
+                  "        pm.expect(sale, `Sale ${index} missing stamp`).to.have.property('stamp');",
                   "        pm.expect(sale, `Sale ${index} missing lastSalePrice`).to.have.property('lastSalePrice');",
                   "        pm.expect(sale, `Sale ${index} missing lastSalePriceUSD`).to.have.property('lastSalePriceUSD');",
                   "    });",
@@ -6013,15 +6021,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?limit=50",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales?limit=50",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -6063,15 +6070,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?dayRange=7&fullDetails=true&limit=10",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?dayRange=7&fullDetails=true&limit=10",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -6123,15 +6129,14 @@
               }
             ],
             "url": {
-              "raw": "{{prod_base_url}}/api/v2/stamps/recentSales?dayRange=7&fullDetails=true&limit=10",
+              "raw": "{{prod_base_url}}/api/internal/stamp-recent-sales?dayRange=7&fullDetails=true&limit=10",
               "host": [
                 "{{prod_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -6188,7 +6193,7 @@
                   "        // Compare data structure if data exists",
                   "        if (prodResponse.data && prodResponse.data.length > 0) {",
                   "            const prodSale = prodResponse.data[0];",
-                  "            pm.expect(prodSale).to.have.property('stamp_id');",
+                  "            pm.expect(prodSale).to.have.property('stamp');",
                   "            pm.expect(prodSale).to.have.property('lastSalePrice');",
                   "            pm.expect(prodSale).to.have.property('lastSalePriceUSD');",
                   "            pm.expect(prodSale).to.have.property('lastSaleDate');",
@@ -6215,15 +6220,14 @@
               }
             ],
             "url": {
-              "raw": "{{dev_base_url}}/api/v2/stamps/recentSales?fullDetails=true&limit=5",
+              "raw": "{{dev_base_url}}/api/internal/stamp-recent-sales?fullDetails=true&limit=5",
               "host": [
                 "{{dev_base_url}}"
               ],
               "path": [
                 "api",
-                "v2",
-                "stamps",
-                "recentSales"
+                "internal",
+                "stamp-recent-sales"
               ],
               "query": [
                 {
@@ -6267,7 +6271,7 @@
                   "    if (jsonData.data && jsonData.data.length > 0) {",
                   "        const sale = jsonData.data[0];",
                   "        const requiredSaleFields = [",
-                  "            'stamp_id', 'lastSalePrice', 'lastSalePriceUSD', 'lastSaleDate',",
+                  "            'stamp', 'lastSalePrice', 'lastSalePriceUSD', 'lastSaleDate',",
                   "            'time_ago', 'btc_amount_satoshis', 'buyer_address', 'dispenser_address'",
                   "        ];",
                   "        ",
@@ -6276,7 +6280,7 @@
                   "        });",
                   "        ",
                   "        // Type validation",
-                  "        pm.expect(sale.stamp_id).to.be.a('number');",
+                  "        pm.expect(sale.stamp).to.be.a('number');",
                   "        pm.expect(sale.lastSalePrice).to.be.a('number');",
                   "        pm.expect(sale.lastSalePriceUSD).to.be.a('number');",
                   "        pm.expect(sale.lastSaleDate).to.be.a('string');",
@@ -7110,7 +7114,32 @@
           }
         },
         {
-          "name": "Detach Stamp - Dev",
+          "name": "Detach Stamp - No Assets (Dev)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test Case: UTXO with no stamps attached (nothing to detach)",
+                  "pm.test(\"Status code is 500 (expected for no stamps to detach)\", function () {",
+                  "    pm.response.to.have.status(500);",
+                  "});",
+                  "",
+                  "pm.test(\"Response indicates no assets to detach\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const errorMessage = jsonData.error || jsonData.message || '';",
+                  "    pm.expect(errorMessage.toLowerCase()).to.include('no assets to detach');",
+                  "});",
+                  "",
+                  "pm.test(\"Response has proper error structure\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -7125,7 +7154,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"utxo\": \"{{test_stamp_id}}:0\",\n  \"destination\": \"{{test_address}}\",\n  \"options\": {\n    \"fee_per_kb\": 12000\n  }\n}"
+              "raw": "{\n  \"utxo\": \"27000ab9c75570204adc1b3a5e7820c482d99033fbb3aafb844c3a3ce8b063db:0\",\n  \"destination\": \"bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq\",\n  \"options\": {\n    \"fee_per_kb\": 50000\n  }\n}"
             },
             "url": {
               "raw": "{{dev_base_url}}/api/v2/trx/stampdetach",
@@ -7142,7 +7171,36 @@
           }
         },
         {
-          "name": "Detach Stamp - Prod",
+          "name": "Detach Stamp - Insufficient Funds (Dev)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test Case: UTXO with stamp attached but insufficient BTC for fees",
+                  "pm.test(\"Status code is 500 (expected for insufficient funds)\", function () {",
+                  "    pm.response.to.have.status(500);",
+                  "});",
+                  "",
+                  "pm.test(\"Response indicates insufficient funds\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const errorMessage = jsonData.error || jsonData.message || '';",
+                  "    // Should contain either 'insufficient funds' or specific amount comparison",
+                  "    const hasInsufficientFunds = errorMessage.toLowerCase().includes('insufficient funds') ||",
+                  "                                 errorMessage.includes('1191 < 11718') ||",
+                  "                                 errorMessage.toLowerCase().includes('insufficient');",
+                  "    pm.expect(hasInsufficientFunds).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"Response has proper error structure\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -7157,7 +7215,125 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"utxo\": \"{{test_stamp_id}}:0\",\n  \"destination\": \"{{test_address}}\",\n  \"options\": {\n    \"fee_per_kb\": 12000\n  }\n}"
+              "raw": "{\n  \"utxo\": \"a5b51bd8e9f01ce59bfa7e4f7cbdd9b3a642a6068b21ab181cdd5a11cf0ff1dd:0\",\n  \"destination\": \"bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq\",\n  \"options\": {\n    \"fee_per_kb\": 50000\n  }\n}"
+            },
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/trx/stampdetach",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "trx",
+                "stampdetach"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detach Stamp - No Assets (Prod)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test Case: UTXO with no stamps attached (nothing to detach)",
+                  "pm.test(\"Status code is 500 (expected for no stamps to detach)\", function () {",
+                  "    pm.response.to.have.status(500);",
+                  "});",
+                  "",
+                  "pm.test(\"Response indicates no assets to detach\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const errorMessage = jsonData.error || jsonData.message || '';",
+                  "    pm.expect(errorMessage.toLowerCase()).to.include('no assets to detach');",
+                  "});",
+                  "",
+                  "pm.test(\"Response has proper error structure\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"utxo\": \"27000ab9c75570204adc1b3a5e7820c482d99033fbb3aafb844c3a3ce8b063db:0\",\n  \"destination\": \"bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq\",\n  \"options\": {\n    \"fee_per_kb\": 50000\n  }\n}"
+            },
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/trx/stampdetach",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "trx",
+                "stampdetach"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detach Stamp - Insufficient Funds (Prod)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test Case: UTXO with stamp attached but insufficient BTC for fees",
+                  "pm.test(\"Status code is 500 (expected for insufficient funds)\", function () {",
+                  "    pm.response.to.have.status(500);",
+                  "});",
+                  "",
+                  "pm.test(\"Response indicates insufficient funds\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const errorMessage = jsonData.error || jsonData.message || '';",
+                  "    // Should contain either 'insufficient funds' or specific amount comparison",
+                  "    const hasInsufficientFunds = errorMessage.toLowerCase().includes('insufficient funds') ||",
+                  "                                 errorMessage.includes('1191 < 11718') ||",
+                  "                                 errorMessage.toLowerCase().includes('insufficient');",
+                  "    pm.expect(hasInsufficientFunds).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"Response has proper error structure\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"utxo\": \"a5b51bd8e9f01ce59bfa7e4f7cbdd9b3a642a6068b21ab181cdd5a11cf0ff1dd:0\",\n  \"destination\": \"bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq\",\n  \"options\": {\n    \"fee_per_kb\": 50000\n  }\n}"
             },
             "url": {
               "raw": "{{prod_base_url}}/api/v2/trx/stampdetach",

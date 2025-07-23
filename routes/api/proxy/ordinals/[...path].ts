@@ -19,6 +19,7 @@ export const handler = async (
       headers: {
         "User-Agent": "BTCStampsExplorer-Ordinals-Proxy",
       },
+      redirect: "follow", // Follow redirects automatically
     });
 
     if (!response.ok) {
@@ -35,14 +36,13 @@ export const handler = async (
     const contentType = response.headers.get("content-type") ||
       "application/octet-stream";
 
-    // Convert to base64 for WebResponseUtil.stampResponse
+    // Convert to Uint8Array for direct response
     const uint8Array = new Uint8Array(content);
-    const base64String = btoa(String.fromCharCode(...uint8Array));
 
-    // Use WebResponseUtil for consistent content handling
-    return WebResponseUtil.stampResponse(base64String, contentType, {
-      binary: true,
+    // Return binary content directly to avoid WebResponseUtil issues
+    return new Response(uint8Array, {
       headers: {
+        "Content-Type": contentType,
         "Cache-Control": "public, max-age=31536000, immutable",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
@@ -52,6 +52,12 @@ export const handler = async (
       },
     });
   } catch (error) {
+    console.error("Ordinals Proxy Error Details:", {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      url: ordinalsUrl,
+      fullPath: fullPath,
+    });
     logger.error("content", {
       message: "Error proxying ordinals content",
       error: error instanceof Error ? error.message : String(error),

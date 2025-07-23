@@ -1,13 +1,13 @@
 import {
-  STAMP_EDITIONS,
-  STAMP_FILESIZES,
-  STAMP_FILETYPES,
-  STAMP_FILTER_TYPES,
-  STAMP_MARKETPLACE,
-  STAMP_RANGES,
-  STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES,
-  SUBPROTOCOLS,
+    STAMP_EDITIONS,
+    STAMP_FILESIZES,
+    STAMP_FILETYPES,
+    STAMP_FILTER_TYPES,
+    STAMP_MARKETPLACE,
+    STAMP_RANGES,
+    STAMP_SUFFIX_FILTERS,
+    STAMP_TYPES,
+    SUBPROTOCOLS,
 } from "$globals";
 import { StampRepository } from "$server/database/index.ts";
 import { BlockService } from "$server/services/blockService.ts";
@@ -367,6 +367,7 @@ export class StampService {
     options?: {
       dayRange?: number;
       includeFullDetails?: boolean;
+      type?: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
     }
   ) {
     // Use local market data instead of fetching all dispense events
@@ -378,14 +379,15 @@ export class StampService {
     const result = await StampRepository.getRecentlyActiveSold({
       page: pageNum,
       limit: pageLimit,
-      includeMarketData: true
+      includeMarketData: true,
+      type: options?.type || "all"
     });
 
     // Get current BTC price for USD conversion
     const btcPriceData = await BTCPriceService.getPrice();
     const btcPriceUSD = btcPriceData.price;
 
-    // Transform the data with enhanced transaction details
+    // Transform the data to match schema (EnhancedStampSale format)
     const recentSales = result.stamps.map((stamp: any) => {
       const marketData = stamp.marketData;
       if (!marketData) return null;
@@ -398,27 +400,71 @@ export class StampService {
       const btcAmount = marketData.lastSaleBtcAmount || marketData.recentSalePriceBTC || 0;
       const txHash = marketData.lastSaleTxHash || stamp.tx_hash;
       const blockIndex = marketData.lastSaleBlockIndex || stamp.block_index;
+      const buyerAddress = marketData.lastSaleBuyerAddress || null;
+      const dispenserAddress = marketData.lastSaleDispenserAddress || null;
 
-      const saleData = {
-        btc_amount: btcAmount,
-        block_index: blockIndex,
-        tx_hash: txHash,
-        // Enhanced transaction details (will be null until database schema is updated)
-        buyer_address: marketData.lastSaleBuyerAddress || null,
-        dispenser_address: marketData.lastSaleDispenserAddress || null,
-        time_ago: timeAgo,
-        btc_amount_satoshis: marketData.lastSaleBtcAmount ? Math.round(marketData.lastSaleBtcAmount * 100000000) : null,
-        dispenser_tx_hash: marketData.lastSaleDispenserTxHash || null,
-      };
-
+      // Return EnhancedStampSale format (schema-compliant)
       return {
-        ...stamp,
-        sale_data: saleData,
-        // Include activity tracking data
+        // Core transaction info
+        tx_hash: txHash,
+        block_index: blockIndex,
+        timestamp: saleTime.toISOString(),
+
+        // Stamp info
+        cpid: stamp.cpid,
+        stamp_number: stamp.stamp,
+        stamp: stamp.stamp, // v2.2 compatibility
+
+        // Transaction participants
+        source: dispenserAddress || stamp.creator, // Seller (dispenser owner)
+        destination: buyerAddress || null, // Buyer
+        buyer_address: buyerAddress, // v2.2 compatibility
+        dispenser_address: dispenserAddress, // v2.2 compatibility
+
+        // Dispenser info
+        dispenser_tx_hash: marketData.lastSaleDispenserTxHash || null,
+        dispense_quantity: 1, // Stamps are typically quantity 1
+
+        // Price info
+        btc_amount: btcAmount,
+        btc_rate: btcAmount, // BTC rate is same as amount for stamps
+        satoshi_rate: btcAmount * 100000000, // Convert to satoshis
+        btc_amount_satoshis: Math.round(btcAmount * 100000000),
+
+        // USD price calculations
+        usd_price: btcAmount * btcPriceUSD,
+        btc_price_usd: btcPriceUSD,
+
+        // v2.2 compatibility fields
+        lastSalePrice: btcAmount,
+        lastSalePriceUSD: btcAmount * btcPriceUSD,
+        lastSaleDate: saleTime.toISOString(),
+        time_ago: timeAgo,
+
+        // Enhanced transaction details (when fullDetails=true)
+        transaction_details: options?.includeFullDetails ? {
+          size: null,
+          weight: null,
+          fee: null,
+          fee_rate: null,
+          input_count: null,
+          output_count: null,
+          confirmations: null,
+          block_time: Math.floor(saleTime.getTime() / 1000),
+          block_hash: null
+        } : null,
+
+        // Additional stamp metadata for compatibility
+        stamp_url: stamp.stamp_url,
+        stamp_mimetype: stamp.stamp_mimetype,
+        creator: stamp.creator,
+        creator_name: stamp.creator_name,
+
+        // Activity tracking
         activity_level: marketData.activityLevel || null,
         last_activity_time: marketData.lastActivityTime || null,
       };
-    }).filter((stamp: any) => stamp !== null && stamp.sale_data !== null);
+    }).filter((sale: any) => sale !== null);
 
     return {
       recentSales,
@@ -426,6 +472,16 @@ export class StampService {
       btcPriceUSD,
       metadata: {
         dayRange,
+        fullDetails: options?.includeFullDetails || false,
+        totalSales: recentSales.length,
+        totalVolumeBTC: recentSales.reduce((sum: number, sale: any) => sum + sale.btc_amount, 0),
+        totalVolumeUSD: recentSales.reduce((sum: number, sale: any) => sum + (sale.usd_price || 0), 0),
+        averagePriceBTC: recentSales.length > 0 ? recentSales.reduce((sum: number, sale: any) => sum + sale.btc_amount, 0) / recentSales.length : 0,
+        averagePriceUSD: recentSales.length > 0 ? recentSales.reduce((sum: number, sale: any) => sum + (sale.usd_price || 0), 0) / recentSales.length : 0,
+        uniqueStamps: new Set(recentSales.map((sale: any) => sale.stamp_number)).size,
+        uniqueBuyers: new Set(recentSales.map((sale: any) => sale.destination).filter(Boolean)).size,
+        uniqueSellers: new Set(recentSales.map((sale: any) => sale.source).filter(Boolean)).size,
+        queryTime: new Date().toISOString(),
         lastUpdated: new Date().toISOString()
       }
     };
@@ -548,23 +604,12 @@ export class StampService {
     if (!marketData) {
       return {
         ...stamp,
-        floorPrice: "priceless",
-        recentSalePrice: "priceless",
-        floorPriceUSD: null,
-        marketData: null,
-        cacheStatus: undefined,
+        market_data: null,
         marketDataMessage: "No market data available for this stamp"
       };
     }
 
-    // Determine floor price
-    let floorPrice: number | "priceless" = "priceless";
-    if (marketData.floorPriceBTC !== null && marketData.floorPriceBTC > 0) {
-      floorPrice = marketData.floorPriceBTC;
-    } else if (marketData.recentSalePriceBTC !== null && marketData.recentSalePriceBTC > 0) {
-      // Fallback to recent sale price if no floor price
-      floorPrice = marketData.recentSalePriceBTC;
-    }
+    // Floor price is now handled directly in market_data structure
 
     // Determine recent sale price for backward compatibility
     let recentSalePrice: number | "priceless" = "priceless";
@@ -598,27 +643,32 @@ export class StampService {
 
     return {
       ...stamp,
-      // v2.3+: floorPrice and recentSalePrice moved to marketData section only
-      // Removed: floorPrice, recentSalePrice (now only in marketData)
-      floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPriceUSD : null,
-      marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPriceUSD : null,
-      marketData: {
-        ...marketData,
-        // Add USD conversions
-        floorPriceUSD: marketData.floorPriceBTC ? marketData.floorPriceBTC * btcPriceUSD : null,
-        recentSalePriceUSD: marketData.recentSalePriceBTC ? marketData.recentSalePriceBTC * btcPriceUSD : null,
-        volume24hUSD: marketData.volume24hBTC ? marketData.volume24hBTC * btcPriceUSD : null,
-        volume7dUSD: marketData.volume7dBTC ? marketData.volume7dBTC * btcPriceUSD : null,
-        volume30dUSD: marketData.volume30dBTC ? marketData.volume30dBTC * btcPriceUSD : null,
-      },
-      // Add cache status
-      cacheStatus: marketData.lastUpdated ?
-        this.getCacheStatus(marketData.lastUpdated) : undefined,
-      dispenserInfo: {
-        openCount: marketData.openDispensersCount || 0,
-        closedCount: marketData.closedDispensersCount || 0,
-        totalCount: marketData.totalDispensersCount || 0
-      }
+      // v2.3+: market_data contains all market information (consistent snake_case)
+      market_data: marketData ? {
+        // Convert camelCase to snake_case for API consistency
+        floor_price_btc: marketData.floorPriceBTC || null,
+        floor_price_usd: marketData.floorPriceBTC ? marketData.floorPriceBTC * btcPriceUSD : null,
+        recent_sale_price_btc: marketData.recentSalePriceBTC || null,
+        recent_sale_price_usd: marketData.recentSalePriceBTC ? marketData.recentSalePriceBTC * btcPriceUSD : null,
+        volume_24h_btc: marketData.volume24hBTC || 0,
+        volume_24h_usd: marketData.volume24hBTC ? marketData.volume24hBTC * btcPriceUSD : null,
+        volume_7d_btc: marketData.volume7dBTC || 0,
+        volume_7d_usd: marketData.volume7dBTC ? marketData.volume7dBTC * btcPriceUSD : null,
+        volume_30d_btc: marketData.volume30dBTC || 0,
+        volume_30d_usd: marketData.volume30dBTC ? marketData.volume30dBTC * btcPriceUSD : null,
+        holder_count: marketData.holderCount || 0,
+        data_quality_score: marketData.dataQualityScore || 7,
+        price_source: marketData.priceSource || "unknown",
+        last_price_update: marketData.lastPriceUpdate || null,
+        cache_status: marketData.lastUpdated ?
+          this.getCacheStatus(marketData.lastUpdated) : undefined,
+        dispensers: {
+          open_count: marketData.openDispensersCount || 0,
+          closed_count: marketData.closedDispensersCount || 0,
+          total_count: marketData.totalDispensersCount || 0
+        }
+      } : null,
+      marketDataMessage: marketData ? undefined : "No market data available for this stamp"
     };
   }
 

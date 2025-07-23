@@ -2,6 +2,39 @@ import { WalletProviderKey } from "$lib/utils/constants.ts";
 import { PaginationQueryParams } from "./pagination.d.ts";
 import { WalletSortKey } from "./sorting.d.ts";
 
+// ===== HORIZON WALLET SPECIFIC TYPES =====
+
+export interface HorizonAddress {
+  address: string;
+  type: "p2wpkh" | "p2sh" | "p2tr" | "p2pkh";
+  publicKey: string;
+}
+
+export interface HorizonGetAddressesResponse {
+  addresses: HorizonAddress[];
+}
+
+export interface HorizonSignMessageParams {
+  message: string;
+  address: string;
+}
+
+export interface HorizonSignPsbtParams {
+  hex: string;
+  signInputs: Record<string, number[]>; // address -> input indices mapping
+}
+
+export interface HorizonWalletAPI {
+  request: (method: string, params: any) => Promise<any>;
+}
+
+// Global window interface extension
+declare global {
+  interface Window {
+    HorizonWalletProvider?: HorizonWalletAPI;
+  }
+}
+
 // Re-export for convenience
 export type { WalletSortKey } from "./sorting.d.ts";
 

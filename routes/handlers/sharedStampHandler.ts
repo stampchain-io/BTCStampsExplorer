@@ -131,6 +131,22 @@ export const createStampHandler = (
         const fileSizeMin = url.searchParams.get("fileSizeMin") || undefined;
         const fileSizeMax = url.searchParams.get("fileSizeMax") || undefined;
 
+        // Extract type parameter (NEW: Support for stamp type filtering!)
+        const typeParam = url.searchParams.get("type");
+        const validTypes = [
+          "classic",
+          "cursed",
+          "posh",
+          "src20",
+        ];
+        const stampType = (typeParam && validTypes.includes(typeParam))
+          ? typeParam as
+            | "classic"
+            | "cursed"
+            | "posh"
+            | "src20"
+          : "classic"; // Default to classic
+
         // Extract range filters
         const rangePreset = url.searchParams.get("rangePreset") || "";
         const rangeMin = url.searchParams.get("rangeMin") || "";
@@ -201,7 +217,7 @@ export const createStampHandler = (
           page,
           limit: effectiveLimit,
           sortBy: sortValidation,
-          type: routeConfig.type,
+          type: stampType,
           allColumns: false,
           skipTotalCount: false,
           ...(ident && { ident }),
@@ -249,7 +265,7 @@ export const createStampHandler = (
         // Validate stamp ID format before processing
         const identifierType = getIdentifierType(id);
         if (identifierType === "invalid") {
-          return ApiResponseUtil.badRequest(
+          return ApiResponseUtil.notFound(
             `Invalid stamp identifier: ${id}. Must be a valid stamp number, transaction hash, or CPID.`,
             undefined,
             { routeType: getCacheType(new URL(req.url).pathname, false) },

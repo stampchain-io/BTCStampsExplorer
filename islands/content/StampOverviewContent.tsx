@@ -1,6 +1,6 @@
 /* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
-import { StampRow } from "$globals";
 import { StampCard } from "$card";
+import { StampRow } from "$globals";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 /* ===== TYPES ===== */
@@ -29,10 +29,10 @@ export function StampOverviewContent({
       {stamps?.length
         ? (
           <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-3 mobileMd:gap-6 w-full auto-rows-fr">
-            {stamps.map((stamp) => (
+            {stamps.map((stamp, index) => (
               <StampCard
                 key={isRecentSales && stamp.sale_data
-                  ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
+                  ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}-${stamp.sale_data.block_index}-${index}`
                   : stamp.tx_hash}
                 stamp={stamp}
                 isRecentSale={isRecentSales}

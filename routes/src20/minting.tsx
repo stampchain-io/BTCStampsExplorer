@@ -71,8 +71,8 @@ export default function SRC20MintingPage({ data }: any) {
         address="" // Not applicable for minting page
         initialSort="ASC" // Default sort for minting tokens
         fromPage="src20"
-        enablePartialNavigation={true}
-        showLoadingSkeleton={true}
+        enablePartialNavigation
+        showLoadingSkeleton
       />
     </div>
   );

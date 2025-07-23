@@ -1,9 +1,9 @@
 /* ===== SRC20 RECENT DEPLOYS GALLERY COMPONENT ===== */
+import { StampCard } from "$card";
+import type { StampTransaction } from "$lib/types/stamping.ts";
+import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import type { StampTransaction } from "$lib/types/stamping.ts";
-import { StampCard } from "$card";
-import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 
 /* ===== COMPONENT ===== */
 export default function SRC20DeploysGallery(): JSX.Element {
@@ -16,7 +16,12 @@ export default function SRC20DeploysGallery(): JSX.Element {
     const fetchRecentTransactions = async () => {
       try {
         const response = await fetch(
-          "/api/internal/src20/trending?type=deploy&limit=5&page=1&transactionCount=1000",
+          "/api/v2/src20?op=DEPLOY&mintingStatus=minted&sortBy=TRENDING_24H_DESC&limit=5&page=1&includeMarketData=true&includeProgress=true",
+          {
+            headers: {
+              "X-API-Version": "2.3",
+            },
+          },
         );
         if (!response.ok) {
           throw new Error("Failed to fetch recent transactions");

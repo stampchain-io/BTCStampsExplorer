@@ -1,13 +1,14 @@
 import "$/server/config/env.ts";
 
 import { bigIntReviver, bigIntSerializer } from "$/lib/utils/formatUtils.ts";
+import { getDatabaseConfig, logDatabaseConfig, validateDatabaseConfig, type DatabaseConfig as DBPoolConfig } from "$/server/config/database.config.ts";
 import { crypto } from "@std/crypto";
 import {
-    ConsoleHandler,
-    FileHandler,
-    getLogger,
-    LogRecord,
-    setup,
+  ConsoleHandler,
+  FileHandler,
+  getLogger,
+  LogRecord,
+  setup,
 } from "@std/log";
 import { Client } from "mysql/mod.ts";
 // Conditionally import Redis based on build mode
@@ -78,7 +79,22 @@ class DatabaseManager {
   #redisAvailable = false;
   readonly #MAX_RETRIES: number;
   readonly #RETRY_INTERVAL = 500;
-  readonly #MAX_POOL_SIZE = 10;
+  // Enhanced connection pool configuration from Task 1
+  readonly #CONNECTION_LIMIT: number;
+  readonly #ACQUIRE_TIMEOUT: number;
+  readonly #CONNECTION_TIMEOUT: number;
+  readonly #IDLE_TIMEOUT: number;
+  // deno-lint-ignore no-unused-vars
+  // deno-lint-ignore no-unused-vars
+  readonly #MAX_RECONNECTS: number; // Reserved for future reconnection logic
+  // deno-lint-ignore no-unused-vars
+  readonly #RECONNECT_DELAY: number; // Reserved for future reconnection logic
+  // deno-lint-ignore no-unused-vars
+  readonly #MIN_CONNECTIONS: number; // Reserved for connection pool warmup
+  // deno-lint-ignore no-unused-vars
+  readonly #VALIDATION_TIMEOUT: number; // Reserved for connection validation
+  readonly #ENABLE_COMPRESSION: boolean;
+  readonly #ENABLE_CONNECTION_LOGGING: boolean;
   #logger: ReturnType<typeof getLogger>;
   #redisAvailableAtStartup = false;
   #inMemoryCache: { [key: string]: { data: any; expiry: number } } = {};
@@ -86,14 +102,39 @@ class DatabaseManager {
   #keepAliveInterval: number | undefined;
   readonly #KEEP_ALIVE_INTERVAL = 30000; // 30 seconds
   #cacheKeyRegistry: { [category: string]: Set<string> } = {}; // Add cache key registry
+  #dbPoolConfig: DBPoolConfig; // Store the enhanced config
 
   constructor(private config: DatabaseConfig) {
-    this.#MAX_RETRIES = this.config.DB_MAX_RETRIES || 5;
+    // Get environment-aware database configuration
+    this.#dbPoolConfig = getDatabaseConfig();
+
+    // Log configuration on startup
+    logDatabaseConfig(this.#dbPoolConfig);
+
+    // Validate configuration
+    validateDatabaseConfig(this.#dbPoolConfig);
+
+    // Apply configuration values
+    this.#MAX_RETRIES = this.#dbPoolConfig.maxRetries;
+    this.#CONNECTION_LIMIT = this.#dbPoolConfig.maxConnections;
+    this.#MIN_CONNECTIONS = this.#dbPoolConfig.minConnections;
+    this.#ACQUIRE_TIMEOUT = this.#dbPoolConfig.acquireTimeout;
+    this.#CONNECTION_TIMEOUT = this.#dbPoolConfig.connectionTimeout;
+    this.#VALIDATION_TIMEOUT = this.#dbPoolConfig.validationTimeout;
+    this.#IDLE_TIMEOUT = 0; // Disable idle timeout
+    this.#MAX_RECONNECTS = 3;
+    this.#RECONNECT_DELAY = this.#dbPoolConfig.retryDelay;
+    this.#ENABLE_COMPRESSION = this.#dbPoolConfig.enableCompression;
+    this.#ENABLE_CONNECTION_LOGGING = this.#dbPoolConfig.enableConnectionLogging;
+
     this.#setupLogging();
     this.#logger = getLogger();
   }
 
   public async initialize(): Promise<void> {
+    // Warm up connection pool to MIN_CONNECTIONS
+    await this.warmupConnectionPool();
+
     // Start MySQL keep-alive mechanism
     this.startKeepAlive();
 
@@ -138,19 +179,77 @@ class DatabaseManager {
     this.#logger = getLogger();
   }
 
-  getClient(): Promise<Client> {
+  async getClient(): Promise<Client> {
     if (this.#pool.length > 0) {
       const client = this.#pool.pop() as Client;
-      this.#activeConnections++; // Track connection taken from pool
-      return Promise.resolve(client);
+
+      // Validate connection before returning
+      try {
+        await this.#validateConnection(client);
+        this.#activeConnections++; // Track connection taken from pool
+        return client;
+      } catch (error) {
+        this.#logger.warn(`Connection validation failed: ${error}`);
+        // Try to get another connection
+        return this.getClient();
+      }
     }
 
-    if (this.#pool.length < this.#MAX_POOL_SIZE) {
+    if (this.#activeConnections < this.#CONNECTION_LIMIT) {
       this.#activeConnections++; // Track new connection being created
       return this.createConnection();
     }
 
     return Promise.reject(new Error("No available connections in the pool"));
+  }
+
+  /**
+   * Warm up connection pool to minimum connections
+   */
+  private async warmupConnectionPool(): Promise<void> {
+    this.#logger.info(`Warming up connection pool to ${this.#MIN_CONNECTIONS} connections...`);
+
+    const warmupPromises: Promise<void>[] = [];
+    for (let i = 0; i < this.#MIN_CONNECTIONS; i++) {
+      warmupPromises.push(this.createAndPoolConnection());
+    }
+
+    try {
+      await Promise.all(warmupPromises);
+      this.#logger.info(`Connection pool warmed up with ${this.#pool.length} connections`);
+    } catch (error) {
+      this.#logger.warn(`Failed to warm up all connections: ${error}`);
+    }
+  }
+
+  /**
+   * Create a connection and add it to the pool
+   */
+  private async createAndPoolConnection(): Promise<void> {
+    try {
+      const client = await this.createConnection();
+      this.#pool.push(client);
+    } catch (error) {
+      this.#logger.warn(`Failed to create warmup connection: ${error}`);
+    }
+  }
+
+  /**
+   * Validate a database connection
+   */
+  async #validateConnection(client: Client): Promise<void> {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error(`Connection validation timeout after ${this.#VALIDATION_TIMEOUT}ms`)), this.#VALIDATION_TIMEOUT);
+    });
+
+    const validationPromise = client.query("SELECT 1");
+
+    try {
+      await Promise.race([validationPromise, timeoutPromise]);
+    } catch (error) {
+      await this.closeClient(client);
+      throw error;
+    }
   }
 
   releaseClient(client: Client): void {
@@ -179,7 +278,7 @@ class DatabaseManager {
     return {
       activeConnections: this.#activeConnections,
       poolSize: this.#pool.length,
-      maxPoolSize: this.#MAX_POOL_SIZE,
+      maxPoolSize: this.#CONNECTION_LIMIT,
       totalConnections: this.#activeConnections + this.#pool.length,
     };
   }
@@ -304,31 +403,60 @@ class DatabaseManager {
   }
 
   private async createConnection(): Promise<Client> {
+    let lastError: Error | null = null;
+
+    // Implement reconnection logic with MAX_RECONNECTS
+    for (let attempt = 0; attempt < this.#MAX_RECONNECTS; attempt++) {
+      try {
+        return await this.#attemptConnection();
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        this.#logger.warn(`Connection attempt ${attempt + 1}/${this.#MAX_RECONNECTS} failed: ${lastError.message}`);
+
+        if (attempt < this.#MAX_RECONNECTS - 1) {
+          // Wait before retrying with RECONNECT_DELAY
+          await new Promise(resolve => setTimeout(resolve, this.#RECONNECT_DELAY));
+        }
+      }
+    }
+
+    throw lastError || new Error("Failed to create connection");
+  }
+
+  async #attemptConnection(): Promise<Client> {
     const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = this.config;
     const charset = 'utf8mb4';
 
-    // Use longer timeouts in development mode for external database
-    const isDevelopment = this.config.DENO_ENV === "development";
-    const queryTimeout = isDevelopment ? 180000 : 60000; // 3 minutes in dev, 1 minute in prod
+    // Use configuration-based timeouts from our environment-aware config
+    const queryTimeout = this.#CONNECTION_TIMEOUT;
 
     const client = new Client();
 
+    // Enhanced connection options for production optimization
+    const connectionOptions: any = {
+      hostname: DB_HOST,
+      port: DB_PORT,
+      username: DB_USER,
+      db: DB_NAME,
+      password: DB_PASSWORD,
+      charset: charset,
+      // Advanced connection options to prevent timeouts and optimize performance
+      timeout: queryTimeout,
+      idleTimeout: this.#IDLE_TIMEOUT,
+      // Enable compression for remote databases (dev environment)
+      compress: this.#ENABLE_COMPRESSION,
+    };
+
+    if (this.#ENABLE_CONNECTION_LOGGING) {
+      console.log(`[DB Connection] Connecting to ${DB_HOST}:${DB_PORT} with timeout=${queryTimeout}ms, compression=${this.#ENABLE_COMPRESSION}`);
+    }
+
     // Add connection timeout to prevent hanging
     const connectWithTimeout = () => {
-      const connectionPromise = client.connect({
-        hostname: DB_HOST,
-        port: DB_PORT,
-        username: DB_USER,
-        db: DB_NAME,
-        password: DB_PASSWORD,
-        charset: charset,
-        // Additional connection options to prevent timeouts
-        idleTimeout: 0, // Disable idle timeout
-        timeout: queryTimeout,
-      });
+      const connectionPromise = client.connect(connectionOptions);
 
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error(`Database connection timeout after 10 seconds to ${DB_HOST}:${DB_PORT}`)), 10000);
+        setTimeout(() => reject(new Error(`Database connection timeout after ${this.#ACQUIRE_TIMEOUT}ms to ${DB_HOST}:${DB_PORT}`)), this.#ACQUIRE_TIMEOUT);
       });
 
       return Promise.race([connectionPromise, timeoutPromise]);

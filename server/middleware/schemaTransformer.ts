@@ -27,13 +27,79 @@ const TRANSFORMATION_REGISTRY: Record<string, VersionTransformationConfig> = {
   "2.2": {
     version: "2.2",
     rules: [
-      // v2.2 has no pricing fields - no transformation needed
+      // v2.2 requires flat structure - transform nested objects to root fields
+      {
+        sourceField: "mint_progress",
+        transform: (mintProgress: any, data: any) => {
+          // Extract nested fields to root level for v2.2 compatibility
+          if (mintProgress) {
+            data.progress = mintProgress.progress;
+            data.minted_amt = mintProgress.current;
+            // max is already at root level
+            // v2.3: Extract total_mints to root level for v2.2
+            if (mintProgress.total_mints !== undefined) {
+              data.total_mints = mintProgress.total_mints;
+            }
+          }
+          return undefined; // Remove the nested object
+        },
+        remove: true // Remove the nested object after transformation
+      },
+      {
+        sourceField: "market_data",
+        transform: (marketData: any, data: any) => {
+          // Extract nested fields to root level for v2.2 compatibility
+          if (marketData) {
+            data.holders = marketData.holders || marketData.holder_count;
+            data.market_cap_btc = marketData.market_cap_btc;
+            // v2.2 uses floor_price_btc, v2.3 uses price_btc
+            data.floor_price_btc = marketData.price_btc || marketData.floor_price_btc;
+            data.volume_24h_btc = marketData.volume_24h_btc;
+            data.volume_7d_btc = marketData.volume_7d_btc;
+            data.volume_30d_btc = marketData.volume_30d_btc;
+            data.change_24h_percent = marketData.change_24h_percent;
+            data.change_7d_percent = marketData.change_7d_percent;
+            // v2.3: Extract price_source_type to root level for v2.2
+            if (marketData.price_source_type !== undefined) {
+              data.price_source_type = marketData.price_source_type;
+            }
+          }
+          return undefined; // Remove the nested object
+        },
+        remove: true // Remove the nested object after transformation
+      }
     ],
   },
   "2.3": {
     version: "2.3",
     rules: [
-      // v2.3 uses clean structure with pricing in marketData - no transformation needed
+      // v2.3 uses clean nested structure - no transformation needed
+      // Remove any legacy root-level fields if they exist
+      {
+        sourceField: "progress",
+        condition: (data: any) => data.mint_progress !== undefined,
+        remove: true // Remove root-level progress if mint_progress exists
+      },
+      {
+        sourceField: "minted_amt",
+        condition: (data: any) => data.mint_progress !== undefined,
+        remove: true // Remove root-level minted_amt if mint_progress exists
+      },
+      {
+        sourceField: "holders",
+        condition: (data: any) => data.market_data !== undefined,
+        remove: true // Remove root-level holders if market_data exists
+      },
+      {
+        sourceField: "market_cap_btc",
+        condition: (data: any) => data.market_data !== undefined,
+        remove: true // Remove root-level market_cap_btc if market_data exists
+      },
+      {
+        sourceField: "floor_price_btc",
+        condition: (data: any) => data.market_data !== undefined,
+        remove: true // Remove root-level floor_price_btc if market_data exists
+      }
     ],
   },
 };
@@ -155,32 +221,18 @@ export function transformResponseForVersion(
   version: string
 ): any {
   try {
+    // Clone data to avoid mutations
+    let transformed = deepClone(data);
+
     // Get transformation config for version
     const config = TRANSFORMATION_REGISTRY[version];
 
     if (!config) {
-      logger.warn("api", { message: `No transformation config for version ${version}` });
-      return data;
+      logger.debug("api", { message: `No transformation config for version ${version}` });
+      return transformed; // Return cloned data
     }
 
-    // Clone data to avoid mutations
-    let transformed = deepClone(data);
-
-    // Apply field stripping based on version
-    const fieldsToStrip = getFieldsToStrip(version);
-    if (fieldsToStrip.size > 0) {
-      // Handle both single object and array responses
-      if (Array.isArray(transformed)) {
-        transformed.forEach(item => removeFields(item, fieldsToStrip));
-      } else if (transformed.data && Array.isArray(transformed.data)) {
-        // Handle paginated responses
-        transformed.data.forEach((item: any) => removeFields(item, fieldsToStrip));
-      } else {
-        removeFields(transformed, fieldsToStrip);
-      }
-    }
-
-    // Apply transformation rules
+    // Apply transformation rules first (handles v2.2 compatibility)
     if (config.rules.length > 0) {
       if (Array.isArray(transformed)) {
         transformed = transformed.map(item =>
@@ -192,6 +244,20 @@ export function transformResponseForVersion(
         );
       } else {
         transformed = applyTransformationRules(transformed, config.rules);
+      }
+    }
+
+    // Apply field stripping based on version (for future versions)
+    const fieldsToStrip = getFieldsToStrip(version);
+    if (fieldsToStrip.size > 0) {
+      // Handle both single object and array responses
+      if (Array.isArray(transformed)) {
+        transformed.forEach(item => removeFields(item, fieldsToStrip));
+      } else if (transformed.data && Array.isArray(transformed.data)) {
+        // Handle paginated responses
+        transformed.data.forEach((item: any) => removeFields(item, fieldsToStrip));
+      } else {
+        removeFields(transformed, fieldsToStrip);
       }
     }
 

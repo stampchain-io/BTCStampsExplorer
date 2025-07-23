@@ -378,6 +378,72 @@ export class MarketDataRepository {
   }
 
   /**
+   * Get market data for multiple SRC-20 tokens in a single batch query
+   * This eliminates the connection storm by using a single database connection
+   * @param ticks - Array of ticks to fetch market data for
+   * @returns Map of tick to SRC20MarketData for O(1) lookups
+   */
+  static async getSRC20MarketDataBatch(ticks: string[]): Promise<Map<string, SRC20MarketData>> {
+    if (!ticks || ticks.length === 0) {
+      return new Map();
+    }
+
+    // Create placeholders for the IN clause
+    const placeholders = ticks.map(() => '?').join(',');
+
+    const query = `
+      SELECT
+        tick,
+        price_btc,
+        price_usd,
+        floor_price_btc,
+        market_cap_btc,
+        market_cap_usd,
+        volume_24h_btc,
+        volume_7d_btc,
+        volume_30d_btc,
+        total_volume_btc,
+        holder_count,
+        circulating_supply,
+        price_change_24h_percent,
+        price_change_7d_percent,
+        price_change_30d_percent,
+        primary_exchange,
+        exchange_sources,
+        data_quality_score,
+        last_updated,
+        TIMESTAMPDIFF(MINUTE, last_updated, UTC_TIMESTAMP()) as cache_age_minutes
+      FROM src20_market_data
+      WHERE tick IN (${placeholders})
+    `;
+
+    try {
+      const result = await this.db.executeQueryWithCache(
+        query,
+        ticks,
+        DEFAULT_CACHE_DURATION
+      ) as { rows?: Array<SRC20MarketDataRow & { cache_age_minutes: number }> };
+
+      const marketDataMap = new Map<string, SRC20MarketData>();
+
+      if (result.rows && result.rows.length > 0) {
+        for (const row of result.rows) {
+          const marketData = this.parseSRC20MarketDataRow(row);
+          if (marketData) {
+            marketDataMap.set(marketData.tick, marketData);
+          }
+        }
+      }
+
+      console.log(`[getSRC20MarketDataBatch] Fetched ${marketDataMap.size} market data entries for ${ticks.length} requested ticks`);
+      return marketDataMap;
+    } catch (error) {
+      console.error(`Error fetching batch market data for SRC-20 tokens:`, error);
+      return new Map();
+    }
+  }
+
+  /**
    * Get aggregated market data for a collection
    * @param collectionId - The collection ID (hex string)
    * @returns CollectionMarketData or null if not found

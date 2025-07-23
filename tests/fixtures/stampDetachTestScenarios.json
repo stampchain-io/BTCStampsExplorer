@@ -1,0 +1,103 @@
+{
+  "successfulDetachTest": {
+    "description": "UTXO with sufficient BTC balance to cover detach transaction fees",
+    "cpid": "A12301588492677696204",
+    "utxo": "mock_sufficient_balance_utxo:0",
+    "destination": "bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq",
+    "mock_utxo_balance": 50000,
+    "fee_per_kb": 25000,
+    "expected_status": 200,
+    "expected_behavior": "Should successfully generate PSBT for detach transaction",
+    "expected_response_fields": ["psbt", "fee", "inputs", "outputs"],
+    "test_scenario": "positive_case_sufficient_funds"
+  },
+  "insufficientFundsTest": {
+    "description": "UTXO with stamp attached but insufficient BTC to cover detach fees",
+    "cpid": "A12301588492677696204", 
+    "utxo": "a5b51bd8e9f01ce59bfa7e4f7cbdd9b3a642a6068b21ab181cdd5a11cf0ff1dd:0",
+    "destination": "bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq",
+    "mock_utxo_balance": 1191,
+    "required_amount": 11718,
+    "fee_per_kb": 50000,
+    "expected_status": 500,
+    "expected_error": "Insufficient funds for the target amount: 1191 < 11718",
+    "expected_behavior": "Should return error about insufficient funds",
+    "test_scenario": "negative_case_insufficient_funds"
+  },
+  "noStampsAttachedTest": {
+    "description": "UTXO with no stamps attached (nothing to detach)",
+    "utxo": "27000ab9c75570204adc1b3a5e7820c482d99033fbb3aafb844c3a3ce8b063db:0",
+    "destination": "bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq",
+    "mock_utxo_balance": 50000,
+    "fee_per_kb": 50000,
+    "expected_status": 500,
+    "expected_error": "no assets to detach",
+    "expected_behavior": "Should return error indicating no stamps to detach",
+    "test_scenario": "negative_case_no_assets"
+  },
+  "invalidUtxoTest": {
+    "description": "Invalid UTXO format or non-existent UTXO",
+    "utxo": "invalid_utxo_format:0",
+    "destination": "bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq",
+    "fee_per_kb": 50000,
+    "expected_status": 400,
+    "expected_error": "Invalid UTXO format",
+    "expected_behavior": "Should return validation error for invalid UTXO",
+    "test_scenario": "negative_case_invalid_utxo"
+  },
+  "invalidDestinationTest": {
+    "description": "Invalid destination address format",
+    "utxo": "27000ab9c75570204adc1b3a5e7820c482d99033fbb3aafb844c3a3ce8b063db:0",
+    "destination": "invalid_bitcoin_address",
+    "fee_per_kb": 50000,
+    "expected_status": 400,
+    "expected_error": "Invalid destination address",
+    "expected_behavior": "Should return validation error for invalid address",
+    "test_scenario": "negative_case_invalid_address"
+  },
+  "mockingConfiguration": {
+    "description": "Configuration for mocking external API responses",
+    "counterparty_api_base": "https://api.counterparty.io:4000/v2",
+    "mock_responses": {
+      "successful_detach": {
+        "endpoint": "/utxos/mock_sufficient_balance_utxo:0/compose/detach",
+        "response": {
+          "result": {
+            "psbt": "cHNidP8BAHECAAAAAQABAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4fAAAAAAD/////AqAPAAAAAAAAGXapFODVxvhXERQM0/4pJHxVQ0FMickahyADAAAAAAAAGXapFN2unhjx2L5OOho2WSKhVz/VStJNhwAAAAABAR+gDwAAAAAAABl2qRTg1cb4VxEUDNP+KSR8VUNBTInJGociBgKBkurFb2aE7VTKzQtyJZOJEoFvjQ+/jVQR1z9IHd9XuRkMUGzBUAAAgAEAAIAAAACAAAAAAAAAAAAAAAEBFgAU4NXG+FcRFAzT/ikkfFVDQUyJyRoAAAAA",
+            "fee": 2250,
+            "inputs": [
+              {
+                "txid": "mock_sufficient_balance_utxo",
+                "vout": 0,
+                "value": 50000,
+                "scriptPubKey": "76a914e0d5c6f857111400d3fe29247c554341c89c91a887"
+              }
+            ],
+            "outputs": [
+              {
+                "value": 4000,
+                "scriptPubKey": "76a914e0d5c6f857111400d3fe29247c554341c89c91a887"
+              },
+              {
+                "value": 43750,
+                "scriptPubKey": "76a914ddb9e8711cb1d8be4e3a1a365922a1573fd54ad24d87"
+              }
+            ]
+          }
+        }
+      },
+      "insufficient_funds": {
+        "endpoint": "/utxos/a5b51bd8e9f01ce59bfa7e4f7cbdd9b3a642a6068b21ab181cdd5a11cf0ff1dd:0/compose/detach",
+        "response": {
+          "error": "Insufficient funds for the target amount: 1191 < 11718"
+        }
+      },
+      "no_assets": {
+        "endpoint": "/utxos/27000ab9c75570204adc1b3a5e7820c482d99033fbb3aafb844c3a3ce8b063db:0/compose/detach",
+        "response": {
+          "error": "no assets to detach"
+        }
+      }
+    }
+  }
+}

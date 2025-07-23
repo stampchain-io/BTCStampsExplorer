@@ -8,6 +8,7 @@ import {
   rowCardBorderRight,
 } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { constructStampUrl } from "$lib/utils/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
 
 interface SRC20CardSmProps {
@@ -127,10 +128,15 @@ export function SRC20CardSm({
         {data.length
           ? (
             data.map((src20, index) => {
-              const imageUrl = src20.stamp_url ||
-                src20.deploy_img ||
-                `/content/${src20.tx_hash}.svg` ||
-                `/content/${src20.deploy_tx}`;
+              // SRC-20 Image URL Logic:
+              // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
+              // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
+              // 3. Fallback to constructing URL from deploy_tx if available
+              // 4. Final fallback to placeholder image
+              const imageUrl = src20.deploy_img ||
+                src20.stamp_url ||
+                (src20.deploy_tx ? constructStampUrl(src20.deploy_tx) : null) ||
+                "/img/placeholder/stamp-no-image.svg";
 
               // --- BEGIN DEBUG LOGS ---
               if (index < 3) { // Log only for the first 3 items to avoid spam
@@ -141,9 +147,10 @@ export function SRC20CardSm({
                   `  Raw src20.market_data:`,
                   JSON.stringify(src20.market_data),
                 );
-                const priceBTC = src20.market_data?.floor_unit_price;
+                // ✅ FIXED: Use price_btc for fungible tokens (floor_price_btc is for NFTs)
+                const priceBTC = src20.market_data?.price_btc;
                 console.log(
-                  `  src20.market_data?.floor_unit_price (BTC):`,
+                  `  src20.market_data?.price_btc (BTC):`,
                   priceBTC,
                 );
                 const priceSATSBeforeRound = (priceBTC ?? 0) * 1e8;
@@ -249,9 +256,17 @@ export function SRC20CardSm({
                     } ${rowCardBorderCenter}`}
                   >
                     {(() => {
-                      const priceInBtc = src20.market_data?.floor_unit_price ??
-                        0;
-                      if (priceInBtc === 0) {
+                      // ✅ FIXED: Use price_btc for fungible tokens with proper type conversion
+                      const priceInBtcRaw = src20.market_data?.price_btc;
+                      if (
+                        priceInBtcRaw === undefined || priceInBtcRaw === null
+                      ) {
+                        return "0 SATS";
+                      }
+
+                      // Convert to number and validate
+                      const priceInBtc = Number(priceInBtcRaw);
+                      if (isNaN(priceInBtc) || priceInBtc === 0) {
                         return "0 SATS";
                       }
                       const priceInSats = priceInBtc * 1e8;
@@ -286,18 +301,37 @@ export function SRC20CardSm({
                       ${rowCardBorderRight}
                       mobileMd:${rowCardBorderCenter} mobileMd:pr-3 mobileMd:border-r-0 mobileMd:rounded-r-none`}
                   >
-                    {src20.market_data?.change24 !== undefined &&
-                        src20.market_data?.change24 !== null
-                      ? (
+                    {/* ✅ FIXED: Use change_24h_percent (correct field name) */}
+                    {(() => {
+                      const changePercent = src20.market_data
+                        ?.change_24h_percent;
+                      if (
+                        changePercent === undefined || changePercent === null
+                      ) {
+                        return (
+                          <span class="text-stamp-grey-light">+0.00%</span>
+                        );
+                      }
+
+                      // Convert to number and validate
+                      const changeValue = Number(changePercent);
+                      if (isNaN(changeValue)) {
+                        return (
+                          <span class="text-stamp-grey-light">+0.00%</span>
+                        );
+                      }
+
+                      return (
                         <span
-                          class={src20.market_data.change24 >= 0
-                            ? "text-green-500"
-                            : "text-red-500"}
+                          class={changeValue >= 0
+                            ? "text-success font-mono text-xs"
+                            : "text-danger font-mono text-xs"}
                         >
-                          {src20.market_data.change24.toFixed(2)}%
+                          {changeValue >= 0 ? "+" : ""}
+                          {changeValue.toFixed(2)}%
                         </span>
-                      )
-                      : <span class="text-stamp-grey-light">N/A%</span>}
+                      );
+                    })()}
                   </td>
                   {/* VOLUME 24H */}
                   <td
@@ -308,8 +342,15 @@ export function SRC20CardSm({
                      desktop:${rowCardBorderCenter} desktop:pr-3 desktop:border-r-0 desktop:rounded-r-none`}
                   >
                     {(() => {
-                      const volume = src20.market_data?.volume24;
-                      if (volume === undefined || volume === null) {
+                      // ✅ FIXED: Use v2.3 standardized field name with proper type conversion
+                      const volumeRaw = src20.market_data?.volume_24h_btc;
+                      if (volumeRaw === undefined || volumeRaw === null) {
+                        return "N/A";
+                      }
+
+                      // Convert to number and validate
+                      const volume = Number(volumeRaw);
+                      if (isNaN(volume)) {
                         return "N/A";
                       }
 
@@ -348,8 +389,15 @@ export function SRC20CardSm({
                     `}
                   >
                     {(() => {
-                      const marketCap = src20.market_data?.mcap;
-                      if (marketCap === undefined || marketCap === null) {
+                      // ✅ FIXED: Use v2.3 standardized field name with proper type conversion
+                      const marketCapRaw = src20.market_data?.market_cap_btc;
+                      if (marketCapRaw === undefined || marketCapRaw === null) {
+                        return "N/A";
+                      }
+
+                      // Convert to number and validate
+                      const marketCap = Number(marketCapRaw);
+                      if (isNaN(marketCap)) {
                         return "N/A";
                       }
 

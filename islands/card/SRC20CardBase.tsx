@@ -1,10 +1,10 @@
 /* ===== SRC20 CARD BASE COMPONENT ===== */
 /*@baba-check styles*/
-import { useState } from "preact/hooks";
+import { cellAlign, Timeframe } from "$components/layout/types.ts";
 import { SRC20Row } from "$globals";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Timeframe } from "$components/layout/types.ts";
-import { cellAlign } from "$components/layout/types.ts";
+import { constructStampUrl } from "$lib/utils/imageUtils.ts";
+import { useState } from "preact/hooks";
 
 /* ===== HELPER FUNCTIONS ===== */
 function splitTextAndEmojis(text: string): { text: string; emoji: string } {
@@ -46,11 +46,15 @@ export function SRC20CardBase({
 }: SRC20CardBaseProps) {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Ensure proper image URL fallback chain
-  const imageUrl = src20.stamp_url ||
-    src20.deploy_img ||
-    `/content/${src20.tx_hash}.svg` ||
-    `/content/${src20.deploy_tx}`;
+  // SRC-20 Image URL Logic:
+  // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
+  // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
+  // 3. Fallback to constructing URL from deploy_tx if available
+  // 4. Final fallback to placeholder image
+  const imageUrl = src20.deploy_img ||
+    src20.stamp_url ||
+    (src20.deploy_tx ? constructStampUrl(src20.deploy_tx) : null) ||
+    "/img/placeholder/stamp-no-image.svg";
 
   return (
     <tr

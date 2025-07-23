@@ -484,8 +484,8 @@ const WalletDashboardContent = ({
                 }}
                 address={address}
                 initialSort={sortStamps}
-                enablePartialNavigation={true}
-                showLoadingSkeleton={true}
+                enablePartialNavigation
+                showLoadingSkeleton
                 gridClass={`
                   grid w-full
                   gap-3
@@ -526,8 +526,8 @@ const WalletDashboardContent = ({
                 }}
                 address={address}
                 initialSort={sortTokens}
-                enablePartialNavigation={true}
-                showLoadingSkeleton={true}
+                enablePartialNavigation
+                showLoadingSkeleton
               />
             )
             : <p class="text-gray-500">NO AVAILABLE TOKEN</p>}

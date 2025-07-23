@@ -17,9 +17,9 @@ Deno.test("StampController.getStamps fetches BTC price once per request", async 
     btcPriceFetchCount++;
     return Promise.resolve({
       price: 50000,
-      source: "test",
+      source: "default" as const,
       confidence: "high",
-      timestamp: new Date().toISOString(),
+      timestamp: Date.now(),
     });
   };
 
@@ -79,7 +79,7 @@ Deno.test("StampController.getStamps fetches BTC price once per request", async 
     assertExists(result.metadata, "Response should include metadata");
     assertEquals(result.metadata.btcPrice, 50000);
     assertEquals(result.metadata.cacheStatus, "fresh");
-    assertEquals(result.metadata.source, "test");
+    assertEquals(result.metadata.source, "default");
 
     // Verify stamps data is included
     assertExists(result.data);
@@ -97,7 +97,7 @@ Deno.test("StampController.getStamps includes market data for collections", asyn
   BTCPriceService.getPrice = () =>
     Promise.resolve({
       price: 60000,
-      source: "test",
+      source: "default",
       confidence: "high",
       timestamp: new Date().toISOString(),
     });
@@ -329,8 +329,8 @@ Deno.test("StampController.getStamps handles filter parameters", async () => {
 
   StampService.getStamps = (options: any) => {
     // Verify filter options are passed through
-    assertEquals(options.filterBy, ["SRC-20"]);
-    assertEquals(options.type, "collection");
+    assertEquals(options.filterBy, ["STAMP"]);
+    assertEquals(options.type, "classic");
     // Note: creator parameter is not directly passed through in the current implementation
 
     return Promise.resolve({
@@ -360,8 +360,8 @@ Deno.test("StampController.getStamps handles filter parameters", async () => {
     const result = await StampController.getStamps({
       page: 1,
       limit: 20,
-      filterBy: ["SRC-20"],
-      type: "collection",
+      filterBy: ["STAMP"],
+      type: "classic",
       creator: "bc1qtest",
     });
 

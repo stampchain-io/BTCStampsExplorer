@@ -1,6 +1,36 @@
 /// <reference lib="dom" />
 import { StampRow } from "$globals";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+
+/**
+ * Get the base URL for the current environment
+ * Used for constructing fully qualified URLs
+ */
+export const getBaseUrl = (): string => {
+  // Client-side: use current window location
+  if (typeof globalThis.window !== "undefined") {
+    return globalThis.window.location.origin;
+  }
+
+  // Server-side: use environment-based logic
+  const env = Deno.env.get("DENO_ENV");
+  return env === "development"
+    ? (Deno.env.get("DEV_BASE_URL") || "https://stampchain.io")
+    : "https://stampchain.io";
+};
+
+/**
+ * Construct a fully qualified stamp URL from a transaction hash
+ * Used for SRC-20 stamps and fallbacks
+ */
+export const constructStampUrl = (
+  txHash: string,
+  extension = "svg",
+): string => {
+  const baseUrl = getBaseUrl();
+  return `${baseUrl}/stamps/${txHash}.${extension}`;
+};
+
 export const mimeTypes: { [key: string]: string } = {
   "jpg": "image/jpeg",
   "jpeg": "image/jpeg",
@@ -295,6 +325,15 @@ export function detectContentType(
   providedMimeType?: string | undefined,
 ): ContentTypeResult {
   try {
+    // Handle null or undefined content
+    if (!content || content === null || content === undefined) {
+      return {
+        mimeType: providedMimeType || "application/octet-stream",
+        isGzipped: false,
+        isJavaScript: false,
+      };
+    }
+
     // First check for gzip magic bytes
     if (content.startsWith("\x1f\x8b\x08")) {
       return {

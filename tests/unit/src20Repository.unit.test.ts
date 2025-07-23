@@ -1,7 +1,7 @@
+import { dbManager } from "$server/database/databaseManager.ts";
+import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { SRC20Repository } from "$server/database/src20Repository.ts";
-import { dbManager } from "$server/database/databaseManager.ts";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 
 describe("SRC20Repository Unit Tests", () => {
@@ -82,6 +82,22 @@ describe("SRC20Repository Unit Tests", () => {
     it("should filter by tick", async () => {
       // Skip if in RUN_DB_TESTS mode
       if (!mockDb) return;
+
+      // Set up mock response with proper tick data
+      mockDb.setMockResponse(
+        "SELECT",
+        [],
+        {
+          rows: [
+            {
+              tick: "!",
+              op: "DEPLOY",
+              tx_hash: "test123",
+              block_index: 12345,
+            },
+          ],
+        },
+      );
 
       const result = await SRC20Repository.getValidSrc20TxFromDb({
         tick: "!", // Use a tick that exists in the fixture data
@@ -183,8 +199,9 @@ describe("SRC20Repository Unit Tests", () => {
         assertExists(firstBalance.address);
         assertExists(firstBalance.tick);
         assertExists(firstBalance.amt);
-        // It also adds deploy_tx and deploy_img
-        assertExists(firstBalance.deploy_tx || firstBalance.deploy_img);
+        // It adds deploy_tx and deploy_img fields (they may be null if no deploy tx found)
+        assertEquals("deploy_tx" in firstBalance, true);
+        assertEquals("deploy_img" in firstBalance, true);
       }
     });
   });
@@ -197,7 +214,7 @@ describe("SRC20Repository Unit Tests", () => {
       // Explicitly set the mock to return empty rows
       mockDb.setMockResponse(
         `
-      SELECT 
+      SELECT
         dep.max,
         dep.deci,
         dep.lim,
@@ -208,7 +225,7 @@ describe("SRC20Repository Unit Tests", () => {
         (SELECT COUNT(*) FROM SRC20Valid WHERE tick = dep.tick AND op = 'MINT') AS total_mints
       FROM SRC20Valid AS dep
       LEFT JOIN src20_token_stats stats ON stats.tick = dep.tick
-      WHERE 
+      WHERE
         dep.tick = ? AND
         dep.op = 'DEPLOY'
       LIMIT 1;
@@ -228,7 +245,7 @@ describe("SRC20Repository Unit Tests", () => {
       // Explicitly set the mock to return data for "!"
       mockDb.setMockResponse(
         `
-      SELECT 
+      SELECT
         dep.max,
         dep.deci,
         dep.lim,
@@ -239,7 +256,7 @@ describe("SRC20Repository Unit Tests", () => {
         (SELECT COUNT(*) FROM SRC20Valid WHERE tick = dep.tick AND op = 'MINT') AS total_mints
       FROM SRC20Valid AS dep
       LEFT JOIN src20_token_stats stats ON stats.tick = dep.tick
-      WHERE 
+      WHERE
         dep.tick = ? AND
         dep.op = 'DEPLOY'
       LIMIT 1;

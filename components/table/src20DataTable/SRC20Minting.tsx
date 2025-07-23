@@ -4,6 +4,7 @@ import { SRC20Row } from "$globals";
 import { rowTable, Timeframe } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { formatDate } from "$lib/utils/formatUtils.ts";
+import { constructStampUrl } from "$lib/utils/imageUtils.ts";
 import { labelSm, textSm, valueDark } from "$text";
 
 interface SRC20MintingTableProps {
@@ -76,10 +77,12 @@ export function SRC20MintingTable({
           {data.length
             ? (
               data.map((src20) => {
-                const imageUrl = src20.stamp_url ||
-                  src20.deploy_img ||
-                  `/content/${src20.tx_hash}.svg` ||
-                  `/content/${src20.deploy_tx}`;
+                const imageUrl = src20.deploy_img ||
+                  src20.stamp_url ||
+                  (src20.deploy_tx
+                    ? constructStampUrl(src20.deploy_tx)
+                    : null) ||
+                  "/img/placeholder/stamp-no-image.svg";
 
                 const mintHref = `/tool/src20/mint?tick=${
                   encodeURIComponent(src20.tick)

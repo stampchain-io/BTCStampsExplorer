@@ -10,6 +10,7 @@ import {
   formatDate,
   formatNumber,
 } from "$lib/utils/formatUtils.ts";
+import { constructStampUrl } from "$lib/utils/imageUtils.ts";
 import { labelSm, titleGreyLD, valueSm } from "$text";
 import { Deployment } from "$types/index.d.ts";
 import type { SRC20MintStatus } from "$types/src20.d.ts";
@@ -21,6 +22,8 @@ export interface SRC20DetailHeaderProps {
     web?: string;
     tg?: string;
     x?: string;
+    stamp_url?: string;
+    deploy_img?: string;
   };
   _mintStatus: SRC20MintStatus;
   _totalMints: number;
@@ -51,16 +54,26 @@ export function SRC20DetailHeader({
     year: "numeric",
   });
 
-  // Market data formatting - MarketListingAggregated already has the fields we need
-  const floorUnitPriceBTC = marketInfo?.floor_unit_price ?? 0;
-  const sum1dBTC = marketInfo?.volume24 ?? 0;
-  const sum7dBTC = (marketInfo as any)?.volume7d ?? 0; // TODO(@dev): Add volume7d to MarketListingAggregated type
-  const mcapBTC = marketInfo?.mcap ?? 0;
-  const change24h = marketInfo?.change24 ?? null;
-  const change7d = (marketInfo as any)?.change7d ?? null; // TODO(@dev): Add change7d to MarketListingAggregated type
+  // ✅ ENHANCED IMAGE URL LOGIC: Use new stamp_url and deploy_img fields
+  // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
+  // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
+  // 3. Fallback to constructing URL from deployment.tx_hash if available
+  // 4. Final fallback to placeholder image
+  const imageUrl = deployment.deploy_img ||
+    deployment.stamp_url ||
+    (deployment.tx_hash ? constructStampUrl(deployment.tx_hash) : null) ||
+    "/img/placeholder/stamp-no-image.svg";
 
-  // Convert floorUnitPrice from BTC to Satoshis with smart formatting
-  const floorUnitPriceSats = floorUnitPriceBTC * 1e8;
+  // 🎸 PUNK ROCK v2.3 MARKET DATA - PROPER STANDARDIZED FIELDS! 🎸
+  const floorPriceBTC = marketInfo?.floor_price_btc ?? 0; // ✅ v2.3 standardized field
+  const volume24hBTC = marketInfo?.volume_24h_btc ?? 0; // ✅ v2.3 standardized field
+  const volume7dBTC = marketInfo?.volume_7d_btc ?? 0; // ✅ v2.3 extended field (no more (as any) hacks!)
+  const marketCapBTC = marketInfo?.market_cap_btc ?? 0; // ✅ v2.3 standardized field
+  const change24h = marketInfo?.change_24h ?? null; // ✅ v2.3 standardized field
+  const change7d = marketInfo?.change_7d ?? null; // ✅ v2.3 extended field (properly typed now!)
+
+  // Convert floorPrice from BTC to Satoshis with smart formatting
+  const floorPriceSats = floorPriceBTC * 1e8;
 
   // Smart price formatting
   const formatPrice = (sats: number): string => {
@@ -93,10 +106,10 @@ export function SRC20DetailHeader({
     return Math.round(btc).toLocaleString() + " BTC";
   };
 
-  const floorUnitPriceSatsFormatted = formatPrice(floorUnitPriceSats);
-  const sum1dBTCFormatted = formatBTCVolume(sum1dBTC);
-  const sum7dBTCFormatted = formatBTCVolume(sum7dBTC);
-  const mcapBTCFormatted = formatMarketCap(mcapBTC);
+  const floorPriceSatsFormatted = formatPrice(floorPriceSats);
+  const volume24hBTCFormatted = formatBTCVolume(volume24hBTC);
+  const volume7dBTCFormatted = formatBTCVolume(volume7dBTC);
+  const marketCapBTCFormatted = formatMarketCap(marketCapBTC);
 
   /* ===== RENDER ===== */
   return (
@@ -109,7 +122,7 @@ export function SRC20DetailHeader({
             {/* ===== TOKEN IMAGE AND CREATOR ===== */}
             <div class="flex gap-[18px] mobileMd:gap-[30px]">
               <img
-                src={`/content/${deployment.tx_hash}.svg`}
+                src={imageUrl}
                 class="max-w-[80px] rounded-sm relative z-10"
                 alt={`${deployment.tick} token image`}
                 loading="lazy"
@@ -246,7 +259,7 @@ export function SRC20DetailHeader({
           <div class="flex flex-col">
             <StatTitle
               label="MARKET CAP"
-              value={mcapBTCFormatted}
+              value={marketCapBTCFormatted}
             />
           </div>
 
@@ -254,7 +267,7 @@ export function SRC20DetailHeader({
           <div class="flex flex-wrap justify-between pt-6">
             <StatItem
               label="24H VOLUME"
-              value={sum1dBTCFormatted}
+              value={volume24hBTCFormatted}
               align="left"
             />
             <StatItem
@@ -264,7 +277,7 @@ export function SRC20DetailHeader({
             />
             <StatItem
               label="7 DAY VOLUME"
-              value={sum7dBTCFormatted}
+              value={volume7dBTCFormatted}
               align="right"
             />
           </div>
@@ -273,7 +286,7 @@ export function SRC20DetailHeader({
           <div class="flex flex-wrap justify-between pt-3">
             <StatItem
               label="PRICE"
-              value={floorUnitPriceSatsFormatted}
+              value={floorPriceSatsFormatted}
             />
             <StatItem
               label="24H CHANGE"

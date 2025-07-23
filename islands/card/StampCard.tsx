@@ -381,7 +381,7 @@ export function StampCard({
 
     // Default to mime type if no valid price
     return {
-      text: stamp.stamp_mimetype?.split("/")[1].toUpperCase() || "UNKNOWN",
+      text: stamp.stamp_mimetype?.split("/")[1]?.toUpperCase() || "UNKNOWN",
       style: TEXT_STYLES.mimeType,
     };
   };

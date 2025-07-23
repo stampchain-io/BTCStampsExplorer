@@ -1,18 +1,18 @@
 import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT, STAMP_TABLE } from "$constants";
 import {
-  STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
-  STAMP_RANGES, STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES,
-  StampBalance,
-  StampFilters, SUBPROTOCOLS
+    STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
+    STAMP_RANGES, STAMP_SUFFIX_FILTERS,
+    STAMP_TYPES,
+    StampBalance,
+    StampFilters, SUBPROTOCOLS
 } from "$globals";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
 import {
-  getIdentifierType,
-  isCpid,
-  isStampHash,
-  isStampNumber,
-  isTxHash,
+    getIdentifierType,
+    isCpid,
+    isStampHash,
+    isStampNumber,
+    isTxHash,
 } from "$lib/utils/identifierUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
@@ -1179,13 +1179,31 @@ export class StampRepository {
   static async getRecentlyActiveSold({
     page = 1,
     limit = 50,
-    includeMarketData = true
+    includeMarketData = true,
+    type = "all"
   }: {
     page?: number;
     limit?: number;
     includeMarketData?: boolean;
+    type?: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
   }): Promise<{ stamps: any[], total: number }> {
     const offset = (page - 1) * limit;
+
+    // Build type-based filtering condition
+    let typeCondition = "";
+    if (type !== "all") {
+      if (type === "cursed") {
+        typeCondition = "AND s.stamp < 0";
+      } else if (type === "classic") {
+        typeCondition = "AND s.stamp >= 0 AND s.cpid LIKE 'A%' AND s.ident != 'SRC-20'";
+      } else if (type === "stamps") {
+        typeCondition = "AND s.stamp >= 0 AND s.ident != 'SRC-20'";
+      } else if (type === "posh") {
+        typeCondition = "AND s.stamp < 0 AND s.cpid NOT LIKE 'A%' AND s.ident != 'SRC-20'";
+      } else if (type === "src20") {
+        typeCondition = "AND s.ident = 'SRC-20'";
+      }
+    }
 
     // Use stamp_sales_history as primary source for recent sales
     const salesHistoryQuery = `
@@ -1226,6 +1244,7 @@ export class StampRepository {
         -- Must have actual sale data
         ssh.btc_amount > 0
         AND ssh.unit_price_sats > 0
+        ${typeCondition}
       ORDER BY
         ssh.block_time DESC
       LIMIT ? OFFSET ?
@@ -1238,6 +1257,7 @@ export class StampRepository {
       WHERE
         ssh.btc_amount > 0
         AND ssh.unit_price_sats > 0
+        ${typeCondition}
     `;
 
     try {
@@ -1251,8 +1271,11 @@ export class StampRepository {
 
       // If we have data from sales history, use it
       if (stamps.length > 0) {
-        console.log(`[RECENT SALES] Using stamp_sales_history: ${stamps.length} stamps found`);
-        console.log(`[RECENT SALES] Sample data:`, stamps[0]);
+        // 🔧 PRODUCTION: Remove verbose debug logging
+        // Only log in development environment
+        if (Deno.env.get("DENO_ENV") === "development") {
+          console.log(`[RECENT SALES] Using stamp_sales_history: ${stamps.length} stamps found`);
+        }
 
         const transformedStamps = stamps.map((row: any) => {
           const stamp = {
@@ -1303,7 +1326,9 @@ export class StampRepository {
       }
 
       // No sales found in stamp_sales_history
-      console.log(`[RECENT SALES] No recent sales found in stamp_sales_history`);
+      if (Deno.env.get("DENO_ENV") === "development") {
+        console.log(`[RECENT SALES] No recent sales found in stamp_sales_history`);
+      }
       return { stamps: [], total: 0 };
 
     } catch (error) {
