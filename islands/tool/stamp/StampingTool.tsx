@@ -345,7 +345,13 @@ function StampingToolMain({ config }: { config: Config }) {
       console.log("📊 StampingTool: Setting new feeDetails", newFeeDetails);
       setFeeDetails(newFeeDetails);
     }
-  }, [progressiveFeeDetails, isEstimating, fee, stampName]);
+  }, [
+    // Use JSON.stringify to ensure Preact detects object changes
+    JSON.stringify(progressiveFeeDetails),
+    isEstimating,
+    fee,
+    stampName,
+  ]);
 
   // Debug: Track when feeDetails state actually changes
   useEffect(() => {
