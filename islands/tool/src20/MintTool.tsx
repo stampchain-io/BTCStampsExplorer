@@ -1,7 +1,7 @@
 /* ===== SRC20 TOKEN MINTING COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
+import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { SRC20InputField } from "$form";
 import { Icon } from "$icon";
 import {
@@ -9,21 +9,19 @@ import {
   containerBackground,
   containerColForm,
   containerRowForm,
-  imagePreviewTool,
   loaderSpinGrey,
 } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages } from "$notification";
-import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
-import { SRC20MintStatus } from "$types/src20.d.ts";
-import axiod from "axiod";
-import { useEffect, useRef, useState } from "preact/hooks";
+import { titlePurpleLD } from "$text";
+import type { SRC20Balance } from "$types/index.d.ts";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== MAIN COMPONENT INTERFACE ===== */
 interface SRC20MintToolProps {
   trxType?: "olga" | "multisig";
   tick?: string | undefined | null;
-  mintStatus?: SRC20MintStatus | null | undefined;
+  mintStatus?: SRC20Balance | null | undefined;
   holders?: number;
 }
 
@@ -452,7 +450,7 @@ export function SRC20MintTool({
 
       {/* ===== FEE CALCULATOR ===== */}
       <div class={containerBackground}>
-        <FeeCalculatorSimple
+        <FeeCalculatorBase
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20"
