@@ -205,6 +205,12 @@ export function useProgressiveFeeEstimation(
         estimatedSize: Number(estimateData.est_tx_size) || 0,
       };
 
+      console.log("🎯 useProgressiveFeeEstimation: Setting phase1FeeDetails", {
+        minerFee: phase1FeeDetails.minerFee,
+        dustValue: phase1FeeDetails.dustValue,
+        toolType,
+        feeRate: options.feeRate,
+      });
       setFeeDetails(phase1FeeDetails);
       setCacheStatus("fresh");
 
