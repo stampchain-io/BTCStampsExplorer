@@ -23,12 +23,13 @@ const mockDb = {
     mockDb.cache[key] = result;
     return result;
   },
-  invalidateCacheByPattern: async (pattern: string): Promise<void> => {
+  invalidateCacheByPattern: (pattern: string): Promise<void> => {
     Object.keys(mockDb.cache).forEach((key) => {
       if (key.includes(pattern)) {
         delete mockDb.cache[key];
       }
     });
+    return Promise.resolve();
   },
   cache: {} as Record<string, any>,
 };
@@ -122,10 +123,10 @@ describe("BTCPriceService", () => {
     };
 
     // Mock fetch with immediate responses
-    globalThis.fetch = async (
+    globalThis.fetch = (
       url: string | URL | Request,
       options?: RequestInit,
-    ) => {
+    ): Promise<Response> => {
       // If there's an abort signal with a timeout, clear it immediately
       if (options?.signal && "reason" in options.signal) {
         // Signal already aborted, ignore
@@ -134,10 +135,12 @@ describe("BTCPriceService", () => {
       const urlString = typeof url === "string" ? url : url.toString();
 
       if (urlString.includes("coingecko")) {
-        return new Response(JSON.stringify(mockFetchResponses.coingecko), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        });
+        return Promise.resolve(
+          new Response(JSON.stringify(mockFetchResponses.coingecko), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+        );
       }
 
       if (urlString.includes("binance")) {
@@ -257,49 +260,59 @@ describe("BTCPriceService", () => {
 
     it("should use fallback when primary source fails", async () => {
       // Override fetch to simulate failure
-      globalThis.fetch = async (url: string | URL | Request) => {
+      globalThis.fetch = (url: string | URL | Request): Promise<Response> => {
         const urlString = typeof url === "string" ? url : url.toString();
 
         if (urlString.includes("coingecko")) {
-          throw new Error("Network error");
+          return Promise.reject(new Error("Network error"));
         }
 
         if (urlString.includes("binance")) {
-          return new Response(JSON.stringify(mockFetchResponses.binance), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          });
+          return Promise.resolve(
+            new Response(JSON.stringify(mockFetchResponses.binance), {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            }),
+          );
         }
 
         if (urlString.includes("kraken")) {
-          return new Response(JSON.stringify(mockFetchResponses.kraken), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          });
+          return Promise.resolve(
+            new Response(JSON.stringify(mockFetchResponses.kraken), {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            }),
+          );
         }
 
         if (urlString.includes("coinbase")) {
-          return new Response(JSON.stringify(mockFetchResponses.coinbase), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          });
+          return Promise.resolve(
+            new Response(JSON.stringify(mockFetchResponses.coinbase), {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            }),
+          );
         }
 
         if (urlString.includes("blockchain.info")) {
-          return new Response(JSON.stringify(mockFetchResponses.blockchain), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          });
+          return Promise.resolve(
+            new Response(JSON.stringify(mockFetchResponses.blockchain), {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            }),
+          );
         }
 
         if (urlString.includes("bitstamp")) {
-          return new Response(JSON.stringify(mockFetchResponses.bitstamp), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          });
+          return Promise.resolve(
+            new Response(JSON.stringify(mockFetchResponses.bitstamp), {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            }),
+          );
         }
 
-        throw new Error(`Unmocked URL: ${urlString}`);
+        return Promise.reject(new Error(`Unmocked URL: ${urlString}`));
       };
 
       const result = await BTCPriceService.getPrice("coingecko");
