@@ -4,6 +4,7 @@ import { useFees } from "$fees";
 import { Config } from "$globals";
 import { debounce } from "$lib/utils/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { showNotification } from "$lib/utils/notificationUtils.ts";
 import axiod from "axiod";
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
@@ -69,7 +70,61 @@ export class SRC20FormController {
 
     if (!wallet.address) return;
 
+    // Phase 1: Immediate client-side fee estimation
     try {
+      // SRC-20 transactions typically have:
+      // 1. Main output (dust to recipient ~333 sats)
+      // 2. OP_RETURN output (0 sats for data)
+      // 3. Change output (variable, back to sender)
+      const outputs = [
+        { type: "P2WPKH", value: 333, script: "" }, // Main dust output
+        { type: "OP_RETURN", value: 0, script: "" }, // Data output
+        { type: "P2WPKH", value: 0, script: "" }, // Change output
+      ];
+
+      const immediateEstimate = estimateFee(outputs, formState.fee, 1);
+      const dustValue = 333; // Standard SRC-20 dust amount
+      const totalEstimate = immediateEstimate + dustValue;
+
+      // Set immediate estimates with hasExactFees: false
+      setFormState((prev) => ({
+        ...prev,
+        psbtFees: {
+          estMinerFee: immediateEstimate,
+          totalDustValue: dustValue,
+          totalValue: totalEstimate,
+          hasExactFees: false, // Mark as estimate
+          effectiveFeeRate: formState.fee,
+          estimatedSize: Math.ceil(immediateEstimate / formState.fee),
+        },
+        isLoading: true, // Show that we're upgrading to exact fees
+      }));
+
+      logger.debug("stamps", {
+        message: "SRC-20 immediate fee estimate",
+        data: {
+          action,
+          fee: formState.fee,
+          immediateEstimate,
+          dustValue,
+          totalEstimate,
+          isEstimate: true,
+        },
+      });
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Failed to provide immediate fee estimate",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    // Phase 2: Upgrade to exact fees via API
+    try {
+      // Determine if we should use dryRun based on wallet connection
+      // dryRun: true = estimation with dummy UTXOs (no wallet or insufficient funds)
+      // dryRun: false = exact calculation with real UTXOs (connected wallet with funds)
+      const shouldUseDryRun = !wallet.address; // Use dryRun if no wallet connected
+
       const response = await axiod.post("/api/v2/src20/create", {
         sourceAddress: wallet.address,
         toAddress: action === "transfer" ? formState.toAddress : wallet.address,
@@ -77,6 +132,7 @@ export class SRC20FormController {
         trxType,
         op: action,
         tick: formState.token || "TEST",
+        dryRun: shouldUseDryRun, // Dynamic based on wallet state
         ...(action === "deploy" && {
           max: formState.max || "1000",
           lim: formState.lim || "1000",
@@ -128,7 +184,7 @@ export class SRC20FormController {
             psbtFees: {
               estMinerFee: Number(response.data.est_miner_fee) || 0,
               totalDustValue: Number(response.data.total_dust_value) || 0,
-              hasExactFees: true,
+              hasExactFees: !shouldUseDryRun, // Exact fees when dryRun=false, estimates when dryRun=true
               totalValue: (Number(response.data.est_miner_fee) || 0) +
                 (Number(response.data.total_dust_value) || 0),
               effectiveFeeRate:
@@ -139,6 +195,7 @@ export class SRC20FormController {
               hex: response.data.hex,
               inputsToSign: response.data.inputsToSign,
             },
+            isLoading: false, // Clear loading state after exact fees are loaded
           };
 
           logger.debug("stamps", {
@@ -154,6 +211,18 @@ export class SRC20FormController {
 
           return newState;
         });
+        logger.debug("stamps", {
+          message: "SRC-20 fee calculation completed",
+          data: {
+            action,
+            fee: formState.fee,
+            shouldUseDryRun,
+            hasExactFees: !shouldUseDryRun,
+            walletConnected: !!wallet.address,
+            estMinerFee: Number(response.data.est_miner_fee) || 0,
+            totalDustValue: Number(response.data.total_dust_value) || 0,
+          },
+        });
       }
     } catch (error) {
       logger.error("stamps", {
@@ -165,6 +234,13 @@ export class SRC20FormController {
           fee: formState.fee,
         },
       });
+
+      // Preserve estimates and clear loading state when exact fees fail
+      setFormState((prev) => ({
+        ...prev,
+        isLoading: false,
+        // Keep existing psbtFees (estimates) if they exist
+      }));
     }
   }, 500);
 
