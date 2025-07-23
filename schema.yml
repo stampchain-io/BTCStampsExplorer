@@ -392,6 +392,10 @@ paths:
                         format: uri
                       currentVersion:
                         type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -464,6 +468,10 @@ paths:
                       support:
                         type: string
                         example: "12 months after deprecation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -4305,78 +4313,6 @@ components:
               description: Message when market data is null
             cacheInfo:
               $ref: "#/components/schemas/MarketDataCacheInfo"
-
-    StampHolderCache:
-      type: object
-      description: Cached holder information for stamps
-      properties:
-        id:
-          type: integer
-          description: Unique identifier
-        cpid:
-          type: string
-          description: Counterparty ID of the stamp
-        address:
-          type: string
-          description: Holder's Bitcoin address
-        quantity:
-          type: number
-          description: Amount held by this address
-        percentage:
-          type: number
-          description: Percentage of total supply held
-        rankPosition:
-          type: integer
-          description: Holder's rank by quantity
-        lastUpdated:
-          type: string
-          format: date-time
-          description: Last update timestamp
-
-    MarketDataSource:
-      type: object
-      description: Market data from various sources for transparency
-      properties:
-        id:
-          type: integer
-          description: Unique identifier
-        assetType:
-          type: string
-          enum: [stamp, src20]
-          description: Type of asset
-        assetId:
-          type: string
-          description: Asset identifier (cpid for stamps, tick for src20)
-        source:
-          type: string
-          description: Data source name
-        priceBTC:
-          type: number
-          nullable: true
-          description: Price in BTC
-        priceUSD:
-          type: number
-          nullable: true
-          description: Price in USD
-        volume24hBTC:
-          type: number
-          description: 24-hour volume in BTC
-        holderCount:
-          type: integer
-          description: Number of holders
-        marketCapBTC:
-          type: number
-          description: Market cap in BTC
-        sourceConfidence:
-          type: number
-          description: Confidence score (0-10)
-        apiResponseTimeMs:
-          type: integer
-          description: API response time in milliseconds
-        lastUpdated:
-          type: string
-          format: date-time
-          description: Last update timestamp
 
     RecentStampSalesResponseBody:
       type: object

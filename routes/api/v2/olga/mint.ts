@@ -1,15 +1,15 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 // MintStampInputData import removed as RawRequestBody is now explicitly defined
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts"; // For XCP decimal handling if values are not base units
+import { logger } from "$lib/utils/logger.ts"; // Import logger
 import { serverConfig } from "$server/config/config.ts";
 import {
   StampMintService,
   StampValidationService,
 } from "$server/services/stamp/index.ts";
 import { normalizeFeeRate, XcpManager } from "$server/services/xcpService.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import * as bitcoin from "bitcoinjs-lib"; // Keep for Psbt.fromHex
-import { logger } from "$lib/utils/logger.ts"; // Import logger
-import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts"; // For XCP decimal handling if values are not base units
 
 // Define TransactionInput if not available globally or for clarity here
 interface TransactionInput {
@@ -68,6 +68,8 @@ interface NormalizedMintResponse {
   change_value: number;
   total_output_value: number;
   txDetails: TransactionInput[];
+  is_estimate?: boolean;
+  estimation_method?: string;
 }
 
 export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
@@ -79,9 +81,27 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       return ApiResponseUtil.badRequest("Invalid JSON format in request body");
     }
 
+    // Check dryRun status early to handle dummy address logic
+    const isDryRun = body.dryRun === true;
+
+    logger.info("api", {
+      message: "Olga mint request received",
+      bodyDryRun: body.dryRun,
+      isDryRun,
+      bodyDryRunType: typeof body.dryRun,
+      hasSourceWallet: !!body.sourceWallet,
+    });
+
+    // For dryRun, use dummy address if sourceWallet is not provided
+    // This allows fee estimation without wallet connection (Phase 1 estimation)
+    const effectiveSourceWallet = isDryRun && !body.sourceWallet
+      ? "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4" // Valid P2WPKH dummy address for estimation
+      : body.sourceWallet;
+
     // Validate essential fields that StampMintService will require
+    // Use effectiveSourceWallet instead of body.sourceWallet for validation
     if (
-      !body.sourceWallet || !body.filename || !body.file ||
+      !effectiveSourceWallet || !body.filename || !body.file ||
       body.qty === undefined || body.locked === undefined ||
       body.divisible === undefined
     ) {
@@ -119,7 +139,18 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       );
     }
 
-    const isDryRun = body.dryRun === true;
+    // Log the dryRun mode for clarity
+    logger.debug("api", {
+      message: "Processing olga mint request",
+      isDryRun,
+      dryRunMode: isDryRun
+        ? "estimation_with_dummy_utxos"
+        : "execution_with_real_utxos",
+      originalSourceWallet: body.sourceWallet,
+      effectiveSourceWallet: effectiveSourceWallet,
+      filename: body.filename,
+    });
+
     let validatedAssetName;
     try {
       validatedAssetName = await StampValidationService
@@ -132,16 +163,19 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       );
     }
 
-    // XCP Check for POSH stamps
-    if (body.isPoshStamp && validatedAssetName && body.sourceWallet) {
+    // XCP Check for POSH stamps - Only required for actual execution (dryRun: false)
+    if (
+      body.isPoshStamp && validatedAssetName && effectiveSourceWallet &&
+      !isDryRun
+    ) {
       try {
         logger.info("api", {
           message: "Performing XCP balance check for POSH stamp",
           assetName: validatedAssetName,
-          wallet: body.sourceWallet,
+          wallet: effectiveSourceWallet,
         });
         const balancesResult = await XcpManager.getXcpBalancesByAddress(
-          body.sourceWallet,
+          effectiveSourceWallet,
           "XCP",
         ); // Fetch specific XCP balance
 
@@ -155,7 +189,7 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
         logger.debug("api", {
           message: "XCP Balance Check Details",
           assetName: validatedAssetName,
-          wallet: body.sourceWallet,
+          wallet: effectiveSourceWallet,
           xcpBalanceBaseUnits: xcpBalance,
           requiredXcpBaseUnits,
           xcpAssetFound: !!xcpAsset,
@@ -198,7 +232,7 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       : serverConfig.MINTING_SERVICE_FEE_ADDRESS || ""; // Provide ultimate fallback for string
 
     const createIssuanceParams: CreateStampIssuanceParams = {
-      sourceWallet: body.sourceWallet,
+      sourceWallet: effectiveSourceWallet,
       assetName: validatedAssetName || "",
       qty: typeof body.qty === "string" ? parseInt(body.qty, 10) : body.qty,
       locked: body.locked,
@@ -219,9 +253,18 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
         createIssuanceParams,
       );
 
+      // dryRun: true = Estimation mode (return fee estimates without PSBT hex)
       if (isDryRun) {
+        logger.debug("api", {
+          message: "Returning fee estimation (dryRun: true)",
+          est_tx_size: mint_tx_details.est_tx_size,
+          est_miner_fee: mint_tx_details.est_miner_fee,
+          total_dust_value: mint_tx_details.total_dust_value,
+          total_output_value: mint_tx_details.total_output_value,
+        });
+
         return ApiResponseUtil.success({
-          hex: "",
+          hex: "", // No PSBT hex for estimation
           cpid: validatedAssetName || "",
           est_tx_size: Number(mint_tx_details.est_tx_size),
           input_value: Number(mint_tx_details.input_value),
@@ -229,10 +272,13 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
           est_miner_fee: Number(mint_tx_details.est_miner_fee),
           change_value: Number(mint_tx_details.change_value),
           total_output_value: Number(mint_tx_details.total_output_value),
-          txDetails: [],
+          txDetails: [], // No transaction details for estimation
+          is_estimate: true,
+          estimation_method: "service_with_dummy_utxos",
         } as NormalizedMintResponse, { forceNoCache: true });
       }
 
+      // dryRun: false = Execution mode (return full PSBT hex for signing)
       if (!mint_tx_details || !mint_tx_details.hex) {
         logger.error("api", {
           message: "Invalid mint_tx_details structure (missing hex for PSBT)",
@@ -261,8 +307,15 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
         },
       );
 
+      logger.debug("api", {
+        message: "Returning execution PSBT (dryRun: false)",
+        psbtLength: mint_tx_details.hex.length,
+        txDetailsCount: txDetails.length,
+        est_tx_size: mint_tx_details.est_tx_size,
+      });
+
       return ApiResponseUtil.success({
-        hex: mint_tx_details.hex,
+        hex: mint_tx_details.hex, // Full PSBT hex for execution
         cpid: validatedAssetName || "",
         est_tx_size: Number(mint_tx_details.est_tx_size),
         input_value: Number(mint_tx_details.input_value),
@@ -270,7 +323,9 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
         est_miner_fee: Number(mint_tx_details.est_miner_fee),
         change_value: Number(mint_tx_details.change_value),
         total_output_value: Number(mint_tx_details.total_output_value),
-        txDetails: txDetails,
+        txDetails: txDetails, // Full transaction details for execution
+        is_estimate: false,
+        estimation_method: "exact_with_real_utxos",
       } as NormalizedMintResponse, { forceNoCache: true });
     } catch (error: unknown) {
       logger.error("api", {

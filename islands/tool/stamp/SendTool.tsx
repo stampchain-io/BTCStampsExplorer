@@ -1,11 +1,10 @@
 /* ===== SEND TOOL COMPONENT ===== */
-import { JSX } from "preact";
-import { useEffect, useState } from "preact/hooks";
-import { walletContext } from "$client/wallet/wallet.ts";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
-import { SelectField } from "../../form/SelectField.tsx";
+import { walletContext } from "$client/wallet/wallet.ts";
+import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
+import { inputField, inputFieldSquare } from "$form";
 import type { StampRow } from "$globals";
+import { Icon } from "$icon";
 import {
   bodyTool,
   containerBackground,
@@ -15,13 +14,24 @@ import {
   loaderSpinGrey,
   rowForm,
 } from "$layout";
+import { debounce } from "$lib/utils/debounce.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { TransactionFeeEstimator } from "$lib/utils/minting/TransactionFeeEstimator.ts";
 import { titlePurpleLD } from "$text";
-import { Icon } from "$icon";
-import { inputField, inputFieldSquare } from "$form";
+import axiod from "axiod";
+import { JSX } from "preact";
+import { useEffect, useState } from "preact/hooks";
+import { SelectField } from "../../form/SelectField.tsx";
 
 /* ===== TYPES ===== */
-interface Props {
-  trxType: string;
+interface Props {}
+
+interface FeeDetails {
+  minerFee: number;
+  dustValue: number;
+  totalValue: number;
+  hasExactFees: boolean;
+  est_tx_size: number;
 }
 
 /* ===== COMPONENT ===== */
@@ -56,6 +66,15 @@ export function StampSendTool({}: Props) {
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [showFallbackIcon, setShowFallbackIcon] = useState(false);
 
+  // Fee details state for progressive estimation
+  const [feeDetails, setFeeDetails] = useState<FeeDetails>({
+    minerFee: 0,
+    dustValue: 0,
+    totalValue: 0,
+    hasExactFees: false,
+    est_tx_size: 0,
+  });
+
   /* ===== FORM HANDLING ===== */
   const {
     formState,
@@ -71,6 +90,116 @@ export function StampSendTool({}: Props) {
     type: "transfer",
     initialFee: 1,
   });
+
+  // Progressive fee estimation for stamp transfers
+  const estimateStampTransferFeesDebounced = debounce(async (
+    currentStamp: StampRow | null,
+    transferQuantity: number,
+    recipientAddress: string,
+    feeRate: number,
+    walletAddress?: string,
+  ) => {
+    if (
+      !currentStamp || !transferQuantity || transferQuantity <= 0 || !feeRate ||
+      feeRate <= 0
+    ) {
+      return;
+    }
+
+    try {
+      // Phase 1: Immediate client-side fee estimation
+      const immediateEstimate = TransactionFeeEstimator.estimateTransferFees(
+        feeRate,
+      );
+
+      // Set immediate estimate
+      setFeeDetails({
+        minerFee: immediateEstimate.estMinerFee,
+        dustValue: immediateEstimate.totalDustValue,
+        totalValue: immediateEstimate.totalValue,
+        hasExactFees: false, // This is an estimate
+        est_tx_size: immediateEstimate.est_tx_size,
+      });
+
+      logger.debug("ui", {
+        message: "Stamp transfer fee estimation (Phase 1)",
+        data: {
+          stamp: currentStamp.stamp,
+          quantity: transferQuantity,
+          feeRate,
+          estimate: immediateEstimate,
+        },
+      });
+
+      // Phase 2: If wallet is connected and we have recipient, try to upgrade to exact fees
+      if (walletAddress && recipientAddress && recipientAddress.trim()) {
+        try {
+          const exactFeePayload = {
+            address: walletAddress,
+            destination: recipientAddress,
+            asset: currentStamp.cpid,
+            quantity: transferQuantity,
+            satsPerVB: feeRate,
+            dryRun: true, // Request fee estimation only
+            options: {
+              return_psbt: false, // We only want fee details
+              fee_per_kb: feeRate * 1000,
+              allow_unconfirmed_inputs: true,
+            },
+          };
+
+          const response = await axiod.post(
+            "/api/v2/create/send",
+            exactFeePayload,
+          );
+
+          if (
+            response.data && typeof response.data.est_miner_fee === "number"
+          ) {
+            // Upgrade to exact fees
+            setFeeDetails({
+              minerFee: Number(response.data.est_miner_fee) || 0,
+              dustValue: Number(response.data.total_dust_value) || 0,
+              totalValue: (Number(response.data.est_miner_fee) || 0) +
+                (Number(response.data.total_dust_value) || 0),
+              hasExactFees: true, // This is exact
+              est_tx_size: Number(response.data.est_tx_size) ||
+                immediateEstimate.est_tx_size,
+            });
+
+            logger.debug("ui", {
+              message: "Stamp transfer exact fee calculation (Phase 2)",
+              data: {
+                stamp: currentStamp.stamp,
+                exactFees: response.data,
+              },
+            });
+          }
+        } catch (exactError) {
+          logger.debug("ui", {
+            message: "Exact fee calculation failed, keeping estimate",
+            error: exactError instanceof Error
+              ? exactError.message
+              : String(exactError),
+          });
+          // Keep the estimation - no need to show error for this
+        }
+      }
+    } catch (error) {
+      logger.error("ui", {
+        message: "Fee estimation failed",
+        error: error instanceof Error ? error.message : String(error),
+      });
+      // Reset to default state
+      setFeeDetails({
+        minerFee: 0,
+        dustValue: 0,
+        totalValue: 0,
+        hasExactFees: false,
+        est_tx_size: 0,
+      });
+    }
+  }, 500);
 
   /* ===== EFFECTS ===== */
   // Fetch stamps effect
@@ -101,12 +230,11 @@ export function StampSendTool({}: Props) {
         if (error instanceof Error) {
           setError(error.message);
         } else {
-          setError(String(error)); // Fallback in case it's not an instance of Error
+          setError(String(error));
         }
       }
     };
 
-    // Only fetch if we have a wallet address
     if (wallet?.address) {
       fetchStamps();
     }
@@ -124,6 +252,23 @@ export function StampSendTool({}: Props) {
       }));
     }
   }, [stamps.data]);
+
+  // Progressive fee estimation effect
+  useEffect(() => {
+    estimateStampTransferFeesDebounced(
+      selectedStamp,
+      quantity,
+      formState.recipientAddress || "",
+      formState.fee,
+      wallet?.address,
+    );
+  }, [
+    selectedStamp,
+    quantity,
+    formState.recipientAddress,
+    formState.fee,
+    wallet?.address,
+  ]);
 
   // Reset loading state when selected stamp changes
   useEffect(() => {
@@ -501,7 +646,7 @@ export function StampSendTool({}: Props) {
 
       {/* ===== FEE CALCULATOR SECTION ===== */}
       <div class={containerBackground}>
-        <FeeCalculatorSimple
+        <FeeCalculatorBase
           fee={formState.fee}
           handleChangeFee={internalHandleChangeFee}
           type="transfer"
@@ -514,17 +659,16 @@ export function StampSendTool({}: Props) {
             handleTransferSubmit();
           }}
           buttonName={wallet?.address ? "SEND" : "CONNECT WALLET"}
-          userAddress={wallet?.address || ""}
-          inputType="P2WPKH"
-          outputTypes={["P2WPKH"]}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           fromPage="stamp_transfer"
+          bitname=""
           stampTransferDetails={{
             address: formState.recipientAddress || "",
             stamp: selectedStamp?.stamp?.toString() || "",
             editions: quantity || 0,
           }}
+          feeDetails={feeDetails}
         />
       </div>
 

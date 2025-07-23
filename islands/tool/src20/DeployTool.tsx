@@ -2,7 +2,7 @@
 import { ToggleSwitchButton } from "$button";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
+import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { inputTextarea, SRC20InputField } from "$form";
 import { Icon } from "$icon";
 import {
@@ -473,7 +473,7 @@ export function SRC20DeployTool(
 
       {/* ===== FEE CALCULATOR AND STATUS MESSAGES ===== */}
       <div class={containerBackground}>
-        <FeeCalculatorSimple
+        <FeeCalculatorBase
           fee={formState.fee}
           ticker={formState.token}
           limit={Number(formState.lim) || 0}
@@ -488,9 +488,15 @@ export function SRC20DeployTool(
           buttonName={isConnected ? "DEPLOY" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
-          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
-          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
-          userAddress={wallet?.address ?? ""}
+          bitname=""
+          feeDetails={formState.psbtFees
+            ? {
+              minerFee: formState.psbtFees.estMinerFee,
+              dustValue: formState.psbtFees.totalDustValue,
+              totalValue: formState.psbtFees.totalValue,
+              hasExactFees: formState.psbtFees.hasExactFees,
+            }
+            : undefined}
         />
 
         <StatusMessages

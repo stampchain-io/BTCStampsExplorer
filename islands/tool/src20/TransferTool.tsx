@@ -1,7 +1,7 @@
 /* ===== TRANSFER CONTENT COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
+import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { SRC20InputField } from "$form";
 import {
   bodyTool,
@@ -310,7 +310,7 @@ export function SRC20TransferTool(
 
       {/* ===== FEE CALCULATOR ===== */}
       <div class={containerBackground}>
-        <FeeCalculatorSimple
+        <FeeCalculatorBase
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           BTCPrice={formState.BTCPrice}
@@ -321,10 +321,8 @@ export function SRC20TransferTool(
           onTosChange={setTosAgreed}
           type="src20"
           fromPage="src20_transfer"
-          userAddress={wallet?.address || ""}
-          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
-          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
-          transferDetails={{
+          bitname=""
+          src20TransferDetails={{
             address: formState.toAddress,
             token: formState.token,
             amount: Number(formState.amt) || 0,
