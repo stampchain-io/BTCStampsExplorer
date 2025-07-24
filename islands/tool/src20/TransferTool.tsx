@@ -1,7 +1,6 @@
 /* ===== TRANSFER CONTENT COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { SRC20InputField } from "$form";
 import {
   bodyTool,
@@ -13,6 +12,7 @@ import {
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages } from "$notification";
+import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 

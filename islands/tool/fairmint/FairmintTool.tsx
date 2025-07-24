@@ -1,8 +1,8 @@
 /* ===== FAIRMINT CONTENT COMPONENT ===== */
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
-import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { bodyTool, containerBackground, containerColForm } from "$layout";
 import { StatusMessages } from "$notification";
+import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import { useState } from "preact/hooks";
 

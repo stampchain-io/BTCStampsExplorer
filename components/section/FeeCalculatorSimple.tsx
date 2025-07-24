@@ -1,6 +1,6 @@
-import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
-import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
+import { FeeCalculatorBase } from "$islands/section/FeeCalculatorBase.tsx";
 import type { SimpleFeeCalculatorProps } from "$lib/types/base.d.ts";
+import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import type { Output } from "$types/index.d.ts";
 
 export function FeeCalculatorSimple({

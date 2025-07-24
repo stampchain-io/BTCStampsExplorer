@@ -235,6 +235,7 @@ import * as $modal_SearchStampModal from "./islands/modal/SearchStampModal.tsx";
 import * as $modal_SendBTCModal from "./islands/modal/SendBTCModal.tsx";
 import * as $modal_SendStampModalWIP from "./islands/modal/SendStampModalWIP.tsx";
 import * as $modal_states from "./islands/modal/states.ts";
+import * as $section_FeeCalculatorBase from "./islands/section/FeeCalculatorBase.tsx";
 import * as $section_cta_ContactCta from "./islands/section/cta/ContactCta.tsx";
 import * as $section_cta_DonateCta from "./islands/section/cta/DonateCta.tsx";
 import * as $section_cta_GetStampingCta from "./islands/section/cta/GetStampingCta.tsx";
@@ -576,6 +577,7 @@ const manifest = {
     "./islands/modal/SendBTCModal.tsx": $modal_SendBTCModal,
     "./islands/modal/SendStampModalWIP.tsx": $modal_SendStampModalWIP,
     "./islands/modal/states.ts": $modal_states,
+    "./islands/section/FeeCalculatorBase.tsx": $section_FeeCalculatorBase,
     "./islands/section/cta/ContactCta.tsx": $section_cta_ContactCta,
     "./islands/section/cta/DonateCta.tsx": $section_cta_DonateCta,
     "./islands/section/cta/GetStampingCta.tsx": $section_cta_GetStampingCta,

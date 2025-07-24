@@ -2,7 +2,6 @@
 import { ToggleSwitchButton } from "$button";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { inputTextarea, SRC20InputField } from "$form";
 import { Icon } from "$icon";
 import {
@@ -16,6 +15,7 @@ import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages, tooltipButton, tooltipImage } from "$notification";
+import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";

@@ -1,7 +1,6 @@
 /* ===== SEND TOOL COMPONENT ===== */
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { inputField, inputFieldSquare } from "$form";
 import type { StampRow } from "$globals";
 import { Icon } from "$icon";
@@ -17,6 +16,7 @@ import {
 import { debounce } from "$lib/utils/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { TransactionFeeEstimator } from "$lib/utils/minting/TransactionFeeEstimator.ts";
+import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import axiod from "axiod";
 import { JSX } from "preact";
