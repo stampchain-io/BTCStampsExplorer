@@ -35,6 +35,10 @@ interface SRC20GalleryProps {
     page: number;
     totalPages: number;
   };
+  currentSort?: {
+    filter: string | null;
+    direction: "asc" | "desc";
+  };
 }
 
 /* ===== COMPONENT ===== */
@@ -47,6 +51,7 @@ export function SRC20Gallery({
   pagination,
   timeframe,
   serverData,
+  currentSort,
 }: SRC20GalleryProps) {
   const [data, setData] = useState<EnrichedSRC20Row[]>(initialData || []); // 🎯 FIXED: Use EnrichedSRC20Row
   const [isLoading, setIsLoading] = useState(!initialData && !serverData);
@@ -107,7 +112,8 @@ export function SRC20Gallery({
     fromPage,
     timeframe,
     onImageClick: handleImageClick,
-  }), [processedData, fromPage, timeframe, handleImageClick]);
+    ...(currentSort && { currentSort }), // Only pass currentSort if it exists
+  }), [processedData, fromPage, timeframe, handleImageClick, currentSort]);
 
   // Always call hooks at the top level
   const skeletonClasses = useLoadingSkeleton(
