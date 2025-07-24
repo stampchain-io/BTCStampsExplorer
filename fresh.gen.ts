@@ -218,6 +218,7 @@ import * as $layout_ModalProvider from "./islands/layout/ModalProvider.tsx";
 import * as $layout_ModalStack from "./islands/layout/ModalStack.tsx";
 import * as $layout_NavigatorProvider from "./islands/layout/NavigatorProvider.tsx";
 import * as $layout_PageVisibilityManager from "./islands/layout/PageVisibilityManager.tsx";
+import * as $layout_SegmentControl from "./islands/layout/SegmentControl.tsx";
 import * as $layout_WalletProvider from "./islands/layout/WalletProvider.tsx";
 import * as $modal_BuyStampModal from "./islands/modal/BuyStampModal.tsx";
 import * as $modal_ConnectWalletModal from "./islands/modal/ConnectWalletModal.tsx";
@@ -556,6 +557,7 @@ const manifest = {
     "./islands/layout/ModalStack.tsx": $layout_ModalStack,
     "./islands/layout/NavigatorProvider.tsx": $layout_NavigatorProvider,
     "./islands/layout/PageVisibilityManager.tsx": $layout_PageVisibilityManager,
+    "./islands/layout/SegmentControl.tsx": $layout_SegmentControl,
     "./islands/layout/WalletProvider.tsx": $layout_WalletProvider,
     "./islands/modal/BuyStampModal.tsx": $modal_BuyStampModal,
     "./islands/modal/ConnectWalletModal.tsx": $modal_ConnectWalletModal,
