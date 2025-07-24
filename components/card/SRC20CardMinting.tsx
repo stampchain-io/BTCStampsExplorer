@@ -2,6 +2,7 @@
 import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { SRC20Row } from "$globals";
+import { Icon } from "$icon";
 import {
   containerCardTable,
   rowCardBorderCenter,
@@ -85,52 +86,45 @@ export function SRC20CardMinting({
     }
   };
 
-  // Helper function to get header class names
-  const getHeaderClass = (headerName: string, index: number) => {
-    const baseClass = `${labelXs} ${cellAlign(index, headers.length)} p-4`;
-    const responsiveClass = index === 1
-      ? "hidden min-[600px]:table-cell" // MINTS
-      : index === 3
-      ? "hidden min-[600px]:table-cell" // TRENDING
-      : index === 4
-      ? "hidden tablet:table-cell" // DEPLOY
-      : index === 5
-      ? "hidden mobileLg:table-cell"
-      : ""; // HOLDERS
+  // Helper function to get segmented control header class names (Apple HIG style)
+  const getSegmentedHeaderClass = (
+    index: number,
+    isFirst: boolean,
+    isLast: boolean,
+    isSelected: boolean,
+    isClickable: boolean,
+  ) => {
+    const baseClass = `${labelXs} ${cellAlign(index, headers.length)} py-2`;
 
-    // Add cursor and hover styles for clickable headers
-    const isClickable = headerName !== "" && headerName !== "TRENDING";
+    // Row background color and rounded corners
+    const rowClass = isFirst
+      ? "bg-stamp-grey-darkest/15 rounded-l-lg"
+      : isLast
+      ? "bg-stamp-grey-darkest/15 rounded-r-lg"
+      : "bg-stamp-grey-darkest/15";
 
-    // Add sort indicator styles
-    const sortMapping: Record<string, string> = {
-      "TOKEN": "TOKEN",
-      "MINTS": "MINTS",
-      "PROGRESS": "PROGRESS",
-      "DEPLOY": "DEPLOY",
-      "HOLDERS": "HOLDERS",
-    };
-    const apiSortKey = sortMapping[headerName];
-    const isCurrentSort = currentSort?.filter === apiSortKey;
+    // Selected segment styling
+    const selectedClass = isSelected ? "text-stamp-grey-light" : "";
 
-    // Color classes based on state
-    const colorClass = isCurrentSort
+    const colorClass = isSelected
       ? "text-stamp-grey-light"
       : isClickable
-      ? "text-stamp-grey hover:text-stamp-grey-light"
-      : "text-stamp-grey";
+      ? "text-stamp-grey-darker hover:text-stamp-grey-light"
+      : "text-stamp-grey-darker";
 
     const clickableClass = isClickable
-      ? "cursor-pointer transition-colors duration-200 select-none"
+      ? "cursor-pointer transition-all duration-200 select-none"
       : "";
 
-    const sortIndicator = isCurrentSort ? "relative" : "";
+    const sortIndicator = isSelected ? "relative" : "";
 
-    return `${baseClass} ${responsiveClass} ${colorClass} ${clickableClass} ${sortIndicator}`
+    return `${baseClass} ${rowClass} ${selectedClass} ${colorClass} ${clickableClass} ${sortIndicator}`
       .trim();
   };
 
   // Helper function to render sort indicator
   const renderSortIndicator = (headerName: string) => {
+    // Map header names to API sort parameters
     const sortMapping: Record<string, string> = {
       "TOKEN": "TOKEN",
       "MINTS": "MINTS",
@@ -138,14 +132,24 @@ export function SRC20CardMinting({
       "DEPLOY": "DEPLOY",
       "HOLDERS": "HOLDERS",
     };
+
     const apiSortKey = sortMapping[headerName];
     const isCurrentSort = currentSort?.filter === apiSortKey;
 
     if (!isCurrentSort) return null;
 
     return (
-      <span class="absolute -right-2 top-0">
-        {currentSort.direction === "desc" ? "↓" : "↑"}
+      <span class="absolute -right-5 -top-[1px]">
+        <Icon
+          type="icon"
+          name="caretUp"
+          weight="normal"
+          size="xxxs"
+          color="custom"
+          className={` stroke-stamp-grey-light transition-all duration-300 transform ${
+            currentSort.direction === "desc" ? "scale-y-[-1]" : ""
+          }`}
+        />
       </span>
     );
   };
@@ -163,243 +167,263 @@ export function SRC20CardMinting({
   }
 
   return (
-    <table class={`w-full ${textSm} border-separate border-spacing-y-3`}>
-      <colgroup>
-        {colGroup([
-          {
-            width: "w-[30%] min-[600px]:w-[20%] mobileLg:w-[12%] tablet:w-[4%]",
-          }, // TOKEN
-          { width: "hidden min-[600px]:w-[8%] mobileLg:w-[8%] tablet:w-[3%]" }, // MINTS - hidden on mobile
-          {
-            width:
-              "w-[45%] min-[600px]:w-[20%] mobileLg:w-[25%] tablet:w-[26%]",
-          }, // PROGRESS - shown on mobile
-          {
-            width: "hidden min-[600px]:w-[22%] mobileLg:w-[22%] tablet:w-[20%]",
-          }, // TRENDING
-          { width: "hidden tablet:w-[15%]" }, // DEPLOY
-          { width: "hidden mobileLg:w-[15%] tablet:w-[12%]" }, // HOLDERS - hidden on mobile
-          {
-            width:
-              "w-[25%] min-[600px]:w-[30%] mobileLg:w-[18%] tablet:w-[20%]",
-          }, // MINT button
-        ]).map((col) => <col key={col.key} class={col.className} />)}
-      </colgroup>
-      <thead class="sticky top-0 z-10">
-        <tr class="bg-stamp-grey-darkest/80 rounded-sm">
-          {headers.map((header, i) => (
-            <th
-              key={header}
-              class={getHeaderClass(header, i)}
-              onClick={() => handleHeaderClick(header)}
-            >
-              <span class="relative inline-block">
-                {header}
-                {header === "TRENDING" && ` ${timeframe}`}
-                {renderSortIndicator(header)}
-              </span>
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.length
-          ? (
-            data.map((src20) => {
-              // SRC-20 Image URL Logic:
-              // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
-              // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
-              // 3. Fallback to constructing URL from deploy_tx if available
-              // 4. Final fallback to placeholder image
-              const imageUrl = src20.deploy_img ||
-                src20.stamp_url ||
-                (src20.deploy_tx ? constructStampUrl(src20.deploy_tx) : null) ||
-                "/img/placeholder/stamp-no-image.svg";
+    <div class="overflow-x-auto">
+      <table class={`w-full ${textSm} border-separate border-spacing-y-3`}>
+        <colgroup>
+          {colGroup([
+            {
+              width:
+                "min-w-[150px] max-w-[180px] w-auto sticky left-0 tablet:static",
+            }, // TOKEN
+            { width: "min-w-[100px] w-auto" }, // MINTS
+            { width: "min-w-[120px] w-auto" }, // PROGRESS
+            { width: "min-w-[110px] w-auto" }, // TRENDING
+            { width: "min-w-[110px] w-auto" }, // DEPLOY
+            { width: "min-w-[90px] w-auto" }, // HOLDERS
+            { width: "min-w-[100px] w-auto" }, // MINT button
+          ]).map((col) => <col key={col.key} class={col.className} />)}
+        </colgroup>
+        <thead>
+          <tr>
+            {headers.map((header, i) => {
+              const isFirst = i === 0;
+              const isLast = i === headers.length - 1;
+              const isClickable = header !== "" && header !== "TRENDING";
 
-              const href = `/src20/${
-                encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
-              }`;
-
-              const mintHref = `/tool/src20/mint?tick=${
-                encodeURIComponent(src20.tick)
-              }&trxType=olga`;
-
-              const handleMintClick = (event: MouseEvent) => {
-                event.preventDefault();
-
-                // SSR-safe browser environment check
-                if (
-                  typeof globalThis === "undefined" || !globalThis?.location
-                ) {
-                  return; // Cannot navigate during SSR
-                }
-
-                globalThis.location.href = mintHref;
+              // Get sort state for segmented control styling
+              const sortMapping: Record<string, string> = {
+                "TOKEN": "TOKEN",
+                "MINTS": "MINTS",
+                "PROGRESS": "PROGRESS",
+                "DEPLOY": "DEPLOY",
+                "HOLDERS": "HOLDERS",
               };
+              const apiSortKey = sortMapping[header];
+              const isSelected = currentSort?.filter === apiSortKey;
 
               return (
-                <tr
-                  key={src20.tx_hash}
-                  class={`${containerCardTable} cursor-pointer group`}
+                <th
+                  key={header}
+                  class={`${
+                    getSegmentedHeaderClass(
+                      i,
+                      isFirst,
+                      isLast,
+                      isSelected,
+                      isClickable,
+                    )
+                  } ${
+                    isFirst
+                      ? "sticky left-0 tablet:static backdrop-blur-sm tablet:backdrop-blur-none z-10"
+                      : ""
+                  }`}
+                  onClick={() => handleHeaderClick(header)}
                 >
-                  {/* TOKEN */}
-                  <td
-                    class={`${
-                      cellAlign(0, headers.length)
-                    } ${rowCardBorderLeft}`}
+                  <span class="relative inline-block">
+                    {header}
+                    {header === "TRENDING" && ` ${timeframe}`}
+                    {renderSortIndicator(header)}
+                  </span>
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {data.length
+            ? (
+              data.map((src20) => {
+                // SRC-20 Image URL Logic:
+                // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
+                // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
+                // 3. Fallback to constructing URL from deploy_tx if available
+                // 4. Final fallback to placeholder image
+                const imageUrl = src20.deploy_img ||
+                  src20.stamp_url ||
+                  (src20.deploy_tx
+                    ? constructStampUrl(src20.deploy_tx)
+                    : null) ||
+                  "/img/placeholder/stamp-no-image.svg";
+
+                const mintHref = `/tool/src20/mint?tick=${
+                  encodeURIComponent(src20.tick)
+                }&trxType=olga`;
+
+                const handleMintClick = (event: MouseEvent) => {
+                  event.preventDefault();
+
+                  // SSR-safe browser environment check
+                  if (
+                    typeof globalThis === "undefined" || !globalThis?.location
+                  ) {
+                    return; // Cannot navigate during SSR
+                  }
+
+                  globalThis.location.href = mintHref;
+                };
+
+                return (
+                  <tr
+                    key={src20.tx_hash}
+                    class={`${containerCardTable} cursor-pointer group`}
+                    onClick={(e) => {
+                      // Only navigate if not clicking on image or button
+                      const target = e.target as HTMLElement;
+                      const isImage = target.tagName === "IMG";
+                      const isButton = target.closest("button");
+                      if (
+                        !isImage && !isButton && !e.ctrlKey && !e.metaKey &&
+                        e.button !== 1
+                      ) {
+                        e.preventDefault();
+                        if (
+                          typeof globalThis !== "undefined" &&
+                          globalThis?.location
+                        ) {
+                          const href = `/src20/${
+                            encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
+                          }`;
+                          globalThis.location.href = href;
+                        }
+                      }
+                    }}
                   >
-                    <div class="flex items-center gap-4">
-                      <img
-                        src={imageUrl}
-                        class="hidden min-[420px]:flex w-7 h-7 rounded-sm cursor-pointer"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onImageClick?.(imageUrl);
-                        }}
-                        alt={unicodeEscapeToEmoji(src20.tick)}
-                      />
-                      <div class="flex flex-col">
-                        <div class="font-bold text-base uppercase tracking-wide">
-                          {(() => {
-                            const { text, emoji } = splitTextAndEmojis(
-                              unicodeEscapeToEmoji(src20.tick),
-                            );
-                            return (
-                              <>
-                                {text && (
-                                  <a
-                                    href={href}
-                                    onClick={(e) => {
-                                      if (
-                                        !e.ctrlKey && !e.metaKey &&
-                                        e.button !== 1
-                                      ) {
-                                        e.preventDefault();
-
-                                        // SSR-safe browser environment check
-                                        if (
-                                          typeof globalThis === "undefined" ||
-                                          !globalThis?.location
-                                        ) {
-                                          return; // Cannot navigate during SSR
-                                        }
-
-                                        globalThis.location.href = href;
-                                      }
-                                    }}
-                                  >
+                    {/* TOKEN */}
+                    <td
+                      class={`${
+                        cellAlign(0, headers.length)
+                      } ${rowCardBorderLeft} sticky left-0 tablet:static backdrop-blur-sm tablet:backdrop-blur-none z-10`}
+                    >
+                      <div class="flex items-center gap-4">
+                        <img
+                          src={imageUrl}
+                          class="w-7 h-7 rounded cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation(); // Prevent row click
+                            onImageClick?.(imageUrl);
+                          }}
+                          alt={unicodeEscapeToEmoji(src20.tick)}
+                        />
+                        <div class="flex flex-col">
+                          <div class="font-bold text-base uppercase tracking-wide">
+                            {(() => {
+                              const { text, emoji } = splitTextAndEmojis(
+                                unicodeEscapeToEmoji(src20.tick),
+                              );
+                              return (
+                                <>
+                                  {text && (
                                     <span class="gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] inline-block transition-colors duration-300">
                                       {text.toUpperCase()}
                                     </span>
-                                  </a>
-                                )}
-                                {emoji && (
-                                  <span class="emoji-ticker">{emoji}</span>
-                                )}
-                              </>
-                            );
-                          })()}
+                                  )}
+                                  {emoji && (
+                                    <span class="emoji-ticker">{emoji}</span>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  {/* MINTS */}
-                  <td
-                    class={`${
-                      cellAlign(1, headers.length)
-                    } ${rowCardBorderCenter} hidden min-[600px]:table-cell`}
-                  >
-                    {src20.mint_progress?.total_mints || "N/A"}
-                  </td>
-                  {/* PROGRESS */}
-                  <td
-                    class={`${
-                      cellAlign(2, headers.length)
-                    } ${rowCardBorderCenter}`}
-                  >
-                    <div class="flex items-center justify-center w-full">
-                      <div class="flex flex-col w-[100px] min-[420px]:w-[120px] mobileLg:w-[160px] gap-1">
-                        <div class="!text-xs text-center">
-                          {Number(
-                            src20.mint_progress?.progress || src20.progress ||
-                              0,
-                          )}
-                          <span class="text-stamp-grey-light">%</span>
-                        </div>
-                        <div class="relative h-1.5 bg-stamp-grey rounded-full">
-                          <div
-                            class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
-                            style={{
-                              width: `${
-                                src20.mint_progress?.progress ||
-                                src20.progress || 0
-                              }%`,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  {/* TRENDING */}
-                  <td
-                    class={`${
-                      cellAlign(3, headers.length)
-                    } ${rowCardBorderCenter} hidden min-[600px]:table-cell`}
-                  >
-                    {"N/A"}
-                  </td>
-                  {/* DEPLOY */}
-                  <td
-                    class={`${
-                      cellAlign(4, headers.length)
-                    } ${rowCardBorderCenter} hidden tablet:table-cell`}
-                  >
-                    {formatDate(new Date(src20.block_time), {
-                      month: "numeric",
-                      day: "numeric",
-                      year: "numeric",
-                    }).toUpperCase()}
-                  </td>
-                  {/* HOLDERS */}
-                  <td
-                    class={`${
-                      cellAlign(5, headers.length)
-                    } ${rowCardBorderCenter} hidden mobileLg:table-cell`}
-                  >
-                    {Number(
-                      (src20 as any)?.market_data?.holder_count ||
-                        (src20 as any)?.holders || 0,
-                    ).toLocaleString()}
-                  </td>
-                  {/* MINT BUTTON */}
-                  <td
-                    class={`${
-                      cellAlign(6, headers.length)
-                    } ${rowCardBorderRight}`}
-                  >
-                    <Button
-                      variant="outline"
-                      color="custom"
-                      size="xxs"
-                      class="[--default-color:#999999] [--hover-color:#AA00FF]"
-                      href={mintHref}
-                      onClick={handleMintClick}
+                    </td>
+                    {/* MINTS */}
+                    <td
+                      class={`${
+                        cellAlign(1, headers.length)
+                      } ${rowCardBorderCenter}`}
                     >
-                      MINT
-                    </Button>
-                  </td>
-                </tr>
-              );
-            })
-          )
-          : (
-            <tr>
-              <td colSpan={headers.length} class={`${valueDarkSm} w-full`}>
-                NO MINTING TOKENS
-              </td>
-            </tr>
-          )}
-      </tbody>
-    </table>
+                      {src20.mint_progress?.total_mints || "N/A"}
+                    </td>
+                    {/* PROGRESS */}
+                    <td
+                      class={`${
+                        cellAlign(2, headers.length)
+                      } ${rowCardBorderCenter}`}
+                    >
+                      <div class="flex items-center justify-center w-full">
+                        <div class="flex flex-col w-[100px] min-[420px]:w-[120px] mobileLg:w-[160px] gap-1">
+                          <div class="!text-xs text-center">
+                            {Number(
+                              src20.mint_progress?.progress || src20.progress ||
+                                0,
+                            )}
+                            <span class="text-stamp-grey-light">%</span>
+                          </div>
+                          <div class="relative h-1.5 bg-stamp-grey rounded-full">
+                            <div
+                              class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
+                              style={{
+                                width: `${
+                                  src20.mint_progress?.progress ||
+                                  src20.progress || 0
+                                }%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    {/* TRENDING */}
+                    <td
+                      class={`${
+                        cellAlign(3, headers.length)
+                      } ${rowCardBorderCenter}`}
+                    >
+                      {"N/A"}
+                    </td>
+                    {/* DEPLOY */}
+                    <td
+                      class={`${
+                        cellAlign(4, headers.length)
+                      } ${rowCardBorderCenter}`}
+                    >
+                      {formatDate(new Date(src20.block_time), {
+                        month: "numeric",
+                        day: "numeric",
+                        year: "numeric",
+                      }).toUpperCase()}
+                    </td>
+                    {/* HOLDERS */}
+                    <td
+                      class={`${
+                        cellAlign(5, headers.length)
+                      } ${rowCardBorderCenter}`}
+                    >
+                      {Number(
+                        (src20 as any)?.market_data?.holder_count ||
+                          (src20 as any)?.holders || 0,
+                      ).toLocaleString()}
+                    </td>
+                    {/* MINT BUTTON */}
+                    <td
+                      class={`text-right ${rowCardBorderRight}`}
+                    >
+                      <Button
+                        variant="outline"
+                        color="custom"
+                        size="xxs"
+                        class="[--default-color:#999999] [--hover-color:#AA00FF]"
+                        href={mintHref}
+                        onClick={handleMintClick}
+                      >
+                        MINT
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })
+            )
+            : (
+              <tr>
+                <td colSpan={headers.length} class={`${valueDarkSm} w-full`}>
+                  NO MINTING TOKENS
+                </td>
+              </tr>
+            )}
+        </tbody>
+      </table>
+    </div>
   );
 }
