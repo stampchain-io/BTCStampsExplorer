@@ -8,9 +8,8 @@ import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { UTXOService } from "$server/services/transaction/utxoService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
 import type { UTXO } from "$types/index.d.ts";
 
 interface PSBTParams {
@@ -36,95 +35,13 @@ interface PSBTParams {
 export class SRC20PSBTService {
   private static readonly STAMP_PREFIX = "stamp:";
   private static commonUtxoService = new CommonUTXOService();
+  private static utxoService = new UTXOService(); // Add UTXOService instance
 
   /**
-   * Simplified UTXO selection that gets full details upfront - same pattern as stamp minting
+   * 🚀 REMOVED: getFullUTXOsWithDetails method - replaced with optimal UTXOService pattern
+   * OLD INEFFICIENT PATTERN: Fetch full details for ALL UTXOs before selection
+   * NEW OPTIMAL PATTERN: Fetch basic UTXOs → Select optimal → Fetch full details for selected only
    */
-  private static async getFullUTXOsWithDetails(
-    address: string,
-    filterStampUTXOs: boolean = true,
-    excludeUtxos: Array<{ txid: string; vout: number }> = []
-  ): Promise<UTXO[]> {
-    logger.debug("src20", {
-      message: "Fetching full UTXOs with details upfront",
-      address,
-      filterStampUTXOs,
-      excludeUtxos: excludeUtxos.length
-    });
-
-    // Get basic UTXOs first
-    let basicUtxos = await this.commonUtxoService.getSpendableUTXOs(address, undefined, {
-      includeAncestorDetails: true,
-      confirmedOnly: false
-    });
-
-    // Apply exclusions
-    if (excludeUtxos.length > 0) {
-      const excludeSet = new Set(excludeUtxos.map(u => `${u.txid}:${u.vout}`));
-      basicUtxos = basicUtxos.filter(utxo => !excludeSet.has(`${utxo.txid}:${utxo.vout}`));
-    }
-
-    // Filter stamp UTXOs if requested
-    if (filterStampUTXOs) {
-      try {
-        const stampBalances = await XcpManager.getXcpBalancesByAddress(address, undefined, true);
-        const utxosToExcludeFromStamps = new Set<string>();
-        for (const balance of stampBalances.balances) {
-          if (balance.utxo) {
-            utxosToExcludeFromStamps.add(balance.utxo);
-          }
-        }
-        basicUtxos = basicUtxos.filter(
-          (utxo) => !utxosToExcludeFromStamps.has(`${utxo.txid}:${utxo.vout}`),
-        );
-      } catch (error) {
-        logger.error("src20", {
-          message: "Error filtering stamp UTXOs",
-          address,
-          error: (error as any).message
-        });
-      }
-    }
-
-    // Now get full details for all UTXOs upfront
-    const fullUTXOs: UTXO[] = [];
-    for (const basicUtxo of basicUtxos) {
-      try {
-        const fullUtxo = await this.commonUtxoService.getSpecificUTXO(
-          basicUtxo.txid,
-          basicUtxo.vout,
-          { includeAncestorDetails: true, confirmedOnly: false }
-        );
-
-        if (fullUtxo && fullUtxo.script) {
-          fullUTXOs.push(fullUtxo);
-        } else {
-          logger.warn("src20", {
-            message: "Skipping UTXO with missing script",
-            txid: basicUtxo.txid,
-            vout: basicUtxo.vout,
-            hasFullUtxo: !!fullUtxo,
-            hasScript: !!fullUtxo?.script
-          });
-        }
-      } catch (error) {
-        logger.warn("src20", {
-          message: "Failed to fetch full UTXO details",
-          txid: basicUtxo.txid,
-          vout: basicUtxo.vout,
-          error: (error as any).message
-        });
-      }
-    }
-
-    logger.debug("src20", {
-      message: "Full UTXOs fetched successfully",
-      total: fullUTXOs.length,
-      withScripts: fullUTXOs.filter(u => u.script).length
-    });
-
-    return fullUTXOs;
-  }
 
   static async preparePSBT({
     sourceAddress,
@@ -165,24 +82,43 @@ export class SRC20PSBTService {
         script: output.script,
       }));
 
-      // Get full UTXOs with details first - same pattern as stamp minting
-      const fullUTXOs = await this.getFullUTXOsWithDetails(sourceAddress, true, []);
+      // 🚀 OPTIMIZATION: Use optimal UTXO selection pattern instead of fetching all details upfront
+      logger.debug("src20", {
+        message: "Using optimal UTXO selection pattern",
+        outputsForSelection: outputsForSelection.length,
+        satsPerVB
+      });
+
+      // Use UTXOService for optimal UTXO selection with full details
+      const selectionResult = await this.utxoService.selectUTXOsForTransaction(
+        sourceAddress,
+        outputsForSelection,
+        satsPerVB,
+        0, // sigops_rate
+        1.5, // rbfBuffer
+        {
+          filterStampUTXOs: true, // Filter out stamp-bearing UTXOs
+          includeAncestors: true,  // Get full details for selected UTXOs only
+        }
+      );
+
+      const { inputs: fullUTXOs } = selectionResult;
 
       if (fullUTXOs.length === 0) {
         throw new Error("No UTXOs available for SRC-20 transaction");
       }
 
-      // Use optimal UTXO selection directly - same pattern as stamp minting
-      const selectionResult = OptimalUTXOSelection.selectUTXOs(
-        fullUTXOs,
-        outputsForSelection,
-        satsPerVB,
-        {
-          avoidChange: true,
-          consolidationMode: false,
-          dustThreshold: 1000
-        }
-      );
+      logger.debug("src20", {
+        message: "Optimal UTXO selection completed",
+        inputCount: fullUTXOs.length,
+        totalInputValue: fullUTXOs.reduce((sum: number, input: UTXO) => sum + input.value, 0),
+        inputDetails: fullUTXOs.map((input: UTXO) => ({
+          value: input.value,
+          hasAncestor: !!input.ancestor,
+          ancestorFees: input.ancestor?.fees,
+          ancestorVsize: input.ancestor?.vsize
+        }))
+      });
 
       const { inputs, change } = selectionResult;
 

@@ -1,654 +1,539 @@
 /**
- * Unified Transaction Fee Estimator
+ * TransactionFeeEstimator - World-class progressive fee estimation system
  *
- * Provides consistent client-side fee estimation for all Bitcoin transaction types
- * used across the BTC Stamps Explorer application.
+ * Implements a 3-phase approach:
+ * Phase 1: Instant mathematical estimates (no API calls)
+ * Phase 2: Smart tool endpoint estimates with dryRun=true (NEW: Direct tool integration)
+ * Phase 3: Exact transaction construction (on user action only)
+ *
+ * @author BTCStampsExplorer Team
+ * @version 2.0.0 - Now with direct tool endpoint integration
  */
 
-export interface TransactionOutput {
-  type: "P2WPKH" | "P2SH" | "P2PKH" | "OP_RETURN" | "MULTISIG";
+import type {
+  AnyTransactionOptions,
+  SRC101TransactionOptions,
+  SRC20TransactionOptions,
+  StampTransactionOptions,
+  ToolType,
+} from "$lib/types/toolEndpointAdapter.ts";
+import { logger } from "$lib/utils/logger.ts";
+import {
+  toolEndpointFeeEstimator,
+} from "$lib/utils/minting/ToolEndpointFeeEstimator.ts";
+
+// Core interfaces for the fee estimation system
+export interface BasicUTXO {
+  txid: string;
+  vout: number;
   value: number;
-  script?: string;
+  scriptType: "P2WPKH" | "P2SH" | "P2PKH" | "P2WSH";
+  confirmations: number;
 }
 
-export interface FeeEstimate {
-  estMinerFee: number;
-  totalDustValue: number;
-  totalValue: number;
-  hasExactFees: boolean;
-  est_tx_size: number;
-  transactionType: string;
-  estimationMethod:
-    | "client_side_calculation"
-    | "mempool_api"
-    | "cached"
-    | "fallback";
-  priority?: FeePriority;
-  feeRate?: number;
+export interface DetailedUTXO extends BasicUTXO {
+  script: string;
+  witnessData?: string;
+  ancestorDetails?: {
+    size: number;
+    fee: number;
+    count: number;
+  };
 }
 
-export type FeePriority = "economy" | "standard" | "priority" | "urgent";
-
-export interface FeeRateData {
-  economy: number; // ~1 hour
-  standard: number; // ~30 minutes
-  priority: number; // ~10 minutes
-  urgent: number; // ~5 minutes
+export interface UTXOCache {
+  walletAddress: string;
+  utxos: BasicUTXO[];
   timestamp: number;
-  source: string;
+  ttl: number; // 30 seconds
 }
 
-export interface FeeEstimationError {
-  type:
-    | "NetworkError"
-    | "ValidationError"
-    | "InsufficientDataError"
-    | "APIError";
-  message: string;
-  details?: unknown;
+export interface FeeEstimationResult {
+  phase: "instant" | "smart" | "exact"; // Updated: "cached" -> "smart" to reflect new tool endpoint approach
+  minerFee: number;
+  totalValue: number;
+  dustValue: number;
+  hasExactFees: boolean;
+  cacheHit?: boolean;
+  estimationTime?: number;
+  estimationMethod?: string; // NEW: Track which estimation method was used
+}
+
+export interface EstimationOptions {
+  toolType:
+    | "stamp"
+    | "src20-mint"
+    | "src20-deploy"
+    | "src20-transfer"
+    | "src101-create";
+  walletAddress?: string;
+  feeRate: number;
+  isConnected: boolean;
+  isSubmitting?: boolean;
+  // Tool-specific parameters
+  [key: string]: any;
 }
 
 /**
- * Transaction size constants for different Bitcoin transaction types
- * These are empirically derived averages based on actual transaction patterns
+ * UTXOCacheManager - Intelligent UTXO caching with TTL and LRU eviction
+ * NOTE: This is now primarily used for Phase 3 (exact estimation) since Phase 2 uses tool endpoints
  */
-export const TRANSACTION_SIZE_CONSTANTS = {
-  // Stamp creation (~321 bytes average)
-  STAMP: 321,
+export class UTXOCacheManager {
+  private cache = new Map<string, UTXOCache>();
+  private readonly maxCacheSize = 100; // Max cached wallets
+  private readonly defaultTTL = 30000; // 30 seconds
 
-  // Fairmint transactions (~250 bytes average)
-  FAIRMINT: 250,
+  /**
+   * Get cached UTXOs for a wallet address
+   */
+  get(walletAddress: string): BasicUTXO[] | null {
+    const cached = this.cache.get(walletAddress);
 
-  // SRC-20 transactions (~280 bytes average)
-  SRC20: 280,
-
-  // SRC-101 transactions (~300 bytes average)
-  SRC101: 300,
-
-  // Base transaction overhead
-  BASE_TX_SIZE: 10,
-
-  // Input sizes (bytes)
-  P2WPKH_INPUT: 68,
-  P2SH_INPUT: 91,
-  P2PKH_INPUT: 148,
-
-  // Output sizes (bytes)
-  P2WPKH_OUTPUT: 31,
-  P2SH_OUTPUT: 32,
-  P2PKH_OUTPUT: 34,
-  OP_RETURN_OUTPUT: 43, // Base size + typical data
-  MULTISIG_OUTPUT: 71,
-} as const;
-
-/**
- * Dust limits for different output types (in satoshis)
- */
-export const DUST_LIMITS = {
-  P2WPKH: 294,
-  P2SH: 540,
-  P2PKH: 546,
-  OP_RETURN: 0,
-  MULTISIG: 546,
-} as const;
-
-/**
- * Default fee rates for different priorities (sat/vB)
- * Used as fallback when API sources are unavailable
- */
-export const DEFAULT_FEE_RATES: Record<FeePriority, number> = {
-  economy: 1,
-  standard: 5,
-  priority: 15,
-  urgent: 30,
-} as const;
-
-/**
- * Fee estimation cache with TTL
- */
-class FeeRateCache {
-  private cache: FeeRateData | null = null;
-  private readonly TTL = 30000; // 30 seconds
-
-  set(data: FeeRateData): void {
-    this.cache = { ...data, timestamp: Date.now() };
-  }
-
-  get(): FeeRateData | null {
-    if (!this.cache) return null;
-
-    const age = Date.now() - this.cache.timestamp;
-    if (age > this.TTL) {
-      this.cache = null;
+    if (!cached) {
       return null;
     }
 
-    return this.cache;
+    // Check TTL expiration
+    if (Date.now() - cached.timestamp > cached.ttl) {
+      this.cache.delete(walletAddress);
+      logger.debug("system", {
+        message: "UTXO cache expired",
+        walletAddress,
+        age: Date.now() - cached.timestamp,
+      });
+      return null;
+    }
+
+    logger.debug("system", {
+      message: "UTXO cache hit",
+      walletAddress,
+      utxoCount: cached.utxos.length,
+    });
+
+    return cached.utxos;
   }
 
-  clear(): void {
-    this.cache = null;
+  /**
+   * Set cached UTXOs for a wallet address
+   */
+  set(walletAddress: string, utxos: BasicUTXO[], ttl?: number): void {
+    // Implement LRU eviction
+    if (this.cache.size >= this.maxCacheSize) {
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey) {
+        this.cache.delete(firstKey);
+      }
+    }
+
+    this.cache.set(walletAddress, {
+      walletAddress,
+      utxos,
+      timestamp: Date.now(),
+      ttl: ttl || this.defaultTTL,
+    });
+
+    logger.debug("system", {
+      message: "UTXO cache updated",
+      walletAddress,
+      utxoCount: utxos.length,
+    });
   }
 
-  isValid(): boolean {
-    return this.get() !== null;
+  /**
+   * Clear cache for a specific wallet or all wallets
+   */
+  clear(walletAddress?: string): void {
+    if (walletAddress) {
+      this.cache.delete(walletAddress);
+    } else {
+      this.cache.clear();
+    }
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getStats(): { size: number; maxSize: number } {
+    return {
+      size: this.cache.size,
+      maxSize: this.maxCacheSize,
+    };
   }
 }
 
+/**
+ * TransactionFeeEstimator - Core fee estimation engine
+ */
 export class TransactionFeeEstimator {
-  private static feeCache = new FeeRateCache();
-  private static pendingRequests = new Map<string, Promise<FeeRateData>>();
+  private utxoCache = new UTXOCacheManager();
 
   /**
-   * Fetch current fee rates from multiple sources with fallback
+   * Phase 1: Instant mathematical estimation (no API calls)
+   * Fast fallback calculation using transaction size estimates
    */
-  static async getFeeRates(): Promise<FeeRateData> {
-    // Check cache first
-    const cached = this.feeCache.get();
-    if (cached) {
-      return cached;
-    }
-
-    // Prevent duplicate requests
-    const cacheKey = "fee_rates";
-    if (this.pendingRequests.has(cacheKey)) {
-      return this.pendingRequests.get(cacheKey)!;
-    }
-
-    const request = this.fetchFeeRatesWithFallback();
-    this.pendingRequests.set(cacheKey, request);
+  async estimateInstant(
+    options: EstimationOptions,
+  ): Promise<FeeEstimationResult> {
+    const startTime = performance.now();
 
     try {
-      const result = await request;
-      this.feeCache.set(result);
-      return result;
-    } finally {
-      this.pendingRequests.delete(cacheKey);
-    }
-  }
+      // 🔧 FIX: Validate fee rate to prevent negative calculations
+      const validatedFeeRate = Math.max(options.feeRate, 0.1); // Minimum 0.1 sat/vB
 
-  /**
-   * Fetch fee rates with multiple source fallback
-   */
-  private static async fetchFeeRatesWithFallback(): Promise<FeeRateData> {
-    const sources = [
-      () => this.fetchFromMempoolSpace(),
-      () => this.fetchFromBlockstream(),
-      () => this.createFallbackRates(),
-    ];
+      const txSize = this.calculateTransactionSize(options);
+      const minerFee = Math.max(Math.ceil(txSize * validatedFeeRate), 1); // Minimum 1 sat
+      const dustValue = this.calculateDustValue(options);
 
-    for (const source of sources) {
-      try {
-        const result = await source();
-        if (this.validateFeeRates(result)) {
-          return result;
-        }
-      } catch (error) {
-        console.warn("Fee rate source failed:", error);
-        continue;
-      }
-    }
+      const result: FeeEstimationResult = {
+        phase: "instant",
+        minerFee,
+        totalValue: minerFee + dustValue,
+        dustValue,
+        hasExactFees: false,
+        estimationTime: performance.now() - startTime,
+        cacheHit: false,
+        estimationMethod: "mathematical_calculation",
+      };
 
-    // Final fallback
-    return this.createFallbackRates();
-  }
+      logger.debug("system", {
+        message: "Phase 1 (instant) estimation completed",
+        toolType: options.toolType,
+        feeRate: validatedFeeRate,
+        txSize,
+        minerFee,
+        dustValue,
+        totalValue: result.totalValue,
+        estimationTime: result.estimationTime,
+      });
 
-  /**
-   * Fetch fee rates from mempool.space API
-   */
-  private static async fetchFromMempoolSpace(): Promise<FeeRateData> {
-    const response = await fetch(
-      "https://mempool.space/api/v1/fees/recommended",
-      {
-        signal: AbortSignal.timeout(5000),
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error(`Mempool API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    return {
-      economy: data.hourFee || DEFAULT_FEE_RATES.economy,
-      standard: data.halfHourFee || DEFAULT_FEE_RATES.standard,
-      priority: data.fastestFee || DEFAULT_FEE_RATES.priority,
-      urgent: Math.max(data.fastestFee * 1.5, DEFAULT_FEE_RATES.urgent),
-      timestamp: Date.now(),
-      source: "mempool.space",
-    };
-  }
-
-  /**
-   * Fetch fee rates from blockstream API
-   */
-  private static async fetchFromBlockstream(): Promise<FeeRateData> {
-    const response = await fetch("https://blockstream.info/api/fee-estimates", {
-      signal: AbortSignal.timeout(5000),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Blockstream API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    return {
-      economy: data["144"] || DEFAULT_FEE_RATES.economy,
-      standard: data["6"] || DEFAULT_FEE_RATES.standard,
-      priority: data["3"] || DEFAULT_FEE_RATES.priority,
-      urgent: data["1"] || DEFAULT_FEE_RATES.urgent,
-      timestamp: Date.now(),
-      source: "blockstream.info",
-    };
-  }
-
-  /**
-   * Create fallback fee rates
-   */
-  private static createFallbackRates(): FeeRateData {
-    return {
-      ...DEFAULT_FEE_RATES,
-      timestamp: Date.now(),
-      source: "fallback",
-    };
-  }
-
-  /**
-   * Validate fee rate data
-   */
-  private static validateFeeRates(rates: FeeRateData): boolean {
-    return (
-      typeof rates.economy === "number" && rates.economy > 0 &&
-      typeof rates.standard === "number" && rates.standard > 0 &&
-      typeof rates.priority === "number" && rates.priority > 0 &&
-      typeof rates.urgent === "number" && rates.urgent > 0 &&
-      rates.standard >= rates.economy &&
-      rates.priority >= rates.standard &&
-      rates.urgent >= rates.priority
-    );
-  }
-
-  /**
-   * Get fee rate for specific priority
-   */
-  static async getFeeRate(priority: FeePriority = "standard"): Promise<number> {
-    try {
-      const rates = await this.getFeeRates();
-      return rates[priority];
+      return Promise.resolve(result);
     } catch (error) {
-      console.warn("Failed to get live fee rates, using fallback:", error);
-      return DEFAULT_FEE_RATES[priority];
+      logger.error("system", {
+        message: "Phase 1 estimation failed",
+        error: String(error),
+        toolType: options.toolType,
+      });
+      throw error;
     }
   }
 
   /**
-   * Estimate fees for stamp creation transactions
+   * Phase 2: Smart tool endpoint estimation with dryRun=true
+   * NEW: Direct tool endpoint integration - eliminates redundant UTXO queries!
    */
-  static async estimateStampFees(
-    priority: FeePriority = "standard",
-    editions?: number,
-  ): Promise<FeeEstimate> {
-    const feeRate = await this.getFeeRate(priority);
+  async estimateSmart(
+    options: EstimationOptions,
+  ): Promise<FeeEstimationResult> {
+    const startTime = performance.now();
 
-    // For large stamps with many outputs, scale the transaction size
-    const baseSize = TRANSACTION_SIZE_CONSTANTS.STAMP;
-    const outputCount = editions || 1;
+    // 🚀 UPDATED: Phase 2 can now run even without wallet connection for dryRun estimation
+    // The endpoints handle dummy addresses internally when dryRun=true
+    if (options.isSubmitting) {
+      // Only skip if actively submitting - otherwise proceed with dummy address estimation
+      return this.estimateInstant(options);
+    }
 
-    // Each additional output adds ~31 bytes for P2WPKH
-    const scaledSize = outputCount > 1000
-      ? baseSize + (outputCount * 0.5) // Rough scaling for large batches
-      : baseSize;
+    try {
+      // 🚀 NEW: Build tool-specific transaction options (now supports dummy addresses)
+      const toolOptions = this.buildToolTransactionOptions(options);
 
-    const estMinerFee = Math.ceil(scaledSize * feeRate);
-    const totalDustValue = 333; // Standard stamp dust value
+      // 🚀 NEW: Call tool endpoint directly with dryRun=true
+      const toolResponse = await toolEndpointFeeEstimator.estimateFees(
+        this.mapToToolType(options.toolType),
+        toolOptions,
+      );
 
-    return {
-      estMinerFee,
-      totalDustValue,
-      totalValue: estMinerFee + totalDustValue,
-      hasExactFees: false,
-      est_tx_size: Math.ceil(scaledSize),
-      transactionType: "stamp",
-      estimationMethod: this.feeCache.isValid() ? "mempool_api" : "fallback",
-      priority,
-      feeRate,
-    };
+      // Convert tool response to our standard format
+      const result: FeeEstimationResult = {
+        phase: "smart",
+        minerFee: toolResponse.minerFee,
+        totalValue: toolResponse.totalCost,
+        dustValue: toolResponse.dustValue,
+        hasExactFees: false, // Still an estimate, but much more accurate
+        cacheHit: false, // Tool endpoint responses are cached internally
+        estimationTime: performance.now() - startTime,
+        estimationMethod: toolResponse.estimationMethod,
+      };
+
+      logger.debug("system", {
+        message: "Phase 2 complete - smart tool endpoint estimation",
+        toolType: options.toolType,
+        estimationMethod: toolResponse.estimationMethod,
+        estimatedSize: toolResponse.estimatedSize,
+        feeRate: toolResponse.feeRate,
+        estimationTime: result.estimationTime,
+        hasWalletAddress: !!options.walletAddress,
+        usedDummyAddress: !options.walletAddress,
+      });
+
+      return result;
+    } catch (error) {
+      logger.warn("system", {
+        message: "Phase 2 failed, falling back to instant",
+        error: error instanceof Error ? error.message : String(error),
+        toolType: options.toolType,
+        hasWalletAddress: !!options.walletAddress,
+      });
+
+      // Graceful fallback to Phase 1
+      return this.estimateInstant(options);
+    }
   }
 
   /**
-   * Estimate fees for SRC-20 transactions
+   * Phase 3: Exact transaction construction
+   * Only called when user clicks action button (STAMP/MINT/etc)
    */
-  static async estimateSRC20Fees(
-    priority: FeePriority = "standard",
-  ): Promise<FeeEstimate> {
-    const feeRate = await this.getFeeRate(priority);
-    const txSize = TRANSACTION_SIZE_CONSTANTS.SRC20;
-    const estMinerFee = Math.ceil(txSize * feeRate);
-    const totalDustValue = 333; // SRC-20 dust value
+  async estimateExact(
+    options: EstimationOptions,
+  ): Promise<FeeEstimationResult> {
+    const startTime = performance.now();
 
-    return {
-      estMinerFee,
-      totalDustValue,
-      totalValue: estMinerFee + totalDustValue,
-      hasExactFees: false,
-      est_tx_size: txSize,
-      transactionType: "src20",
-      estimationMethod: this.feeCache.isValid() ? "mempool_api" : "fallback",
-      priority,
-      feeRate,
-    };
+    if (!options.walletAddress || !options.isConnected) {
+      throw new Error("Wallet connection required for exact estimation");
+    }
+
+    try {
+      // 🚀 FIXED: Phase 3 should use real wallet address and dryRun=false for exact calculation
+      const toolOptions = this.buildToolTransactionOptions(options, false);
+
+      const toolResponse = await toolEndpointFeeEstimator.estimateFees(
+        this.mapToToolType(options.toolType),
+        toolOptions,
+      );
+
+      const result: FeeEstimationResult = {
+        phase: "exact",
+        minerFee: toolResponse.minerFee,
+        totalValue: toolResponse.totalCost,
+        dustValue: toolResponse.dustValue,
+        hasExactFees: true, // This is as exact as we can get without actually creating the transaction
+        cacheHit: false,
+        estimationTime: performance.now() - startTime,
+        estimationMethod: toolResponse.estimationMethod,
+      };
+
+      logger.debug("system", {
+        message:
+          "Phase 3 complete - exact tool endpoint estimation with real UTXOs",
+        toolType: options.toolType,
+        estimationMethod: toolResponse.estimationMethod,
+        estimatedSize: toolResponse.estimatedSize,
+        estimationTime: result.estimationTime,
+        usedRealWallet: true,
+        dryRun: false,
+      });
+
+      return result;
+    } catch (error) {
+      logger.error("system", {
+        message: "Phase 3 estimation failed",
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
   }
 
   /**
-   * Estimate fees for fairmint transactions
+   * 🚀 NEW: Build tool-specific transaction options from generic EstimationOptions
    */
-  static async estimateFairmintFees(
-    priority: FeePriority = "standard",
-  ): Promise<FeeEstimate> {
-    const feeRate = await this.getFeeRate(priority);
-    const txSize = TRANSACTION_SIZE_CONSTANTS.FAIRMINT;
-    const estMinerFee = Math.ceil(txSize * feeRate);
-    const totalDustValue = 546; // Standard P2WPKH dust
-
-    return {
-      estMinerFee,
-      totalDustValue,
-      totalValue: estMinerFee + totalDustValue,
-      hasExactFees: false,
-      est_tx_size: txSize,
-      transactionType: "fairmint",
-      estimationMethod: this.feeCache.isValid() ? "mempool_api" : "fallback",
-      priority,
-      feeRate,
+  private buildToolTransactionOptions(
+    options: EstimationOptions,
+    dryRun: boolean = true,
+  ): AnyTransactionOptions {
+    // Use dummy address when wallet is not connected - endpoints handle this for dryRun=true
+    const baseOptions = {
+      walletAddress: options.walletAddress ||
+        "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", // Standard dummy P2WPKH address
+      feeRate: options.feeRate, // Keep as sats/vB - tool adapters handle conversion as needed
+      dryRun, // Now configurable based on phase
     };
-  }
 
-  /**
-   * Estimate fees for SRC-101 transactions
-   */
-  static async estimateSRC101Fees(
-    priority: FeePriority = "standard",
-  ): Promise<FeeEstimate> {
-    const feeRate = await this.getFeeRate(priority);
-    const txSize = TRANSACTION_SIZE_CONSTANTS.SRC101;
-    const estMinerFee = Math.ceil(txSize * feeRate);
-    const totalDustValue = 546; // Standard P2WPKH dust
+    switch (options.toolType) {
+      case "stamp": {
+        // Provide meaningful defaults for all required stamp fields
+        return {
+          ...baseOptions,
+          file: options.file ||
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", // 1x1 transparent PNG
+          filename: options.filename || "dummy-stamp.png",
+          fileSize: options.fileSize || options.file?.length || 69, // Size of dummy PNG
+          quantity: options.quantity || 1,
+          locked: options.locked ?? true,
+          divisible: options.divisible ?? false,
+        } as StampTransactionOptions;
+      }
 
-    return {
-      estMinerFee,
-      totalDustValue,
-      totalValue: estMinerFee + totalDustValue,
-      hasExactFees: false,
-      est_tx_size: txSize,
-      transactionType: "src101",
-      estimationMethod: this.feeCache.isValid() ? "mempool_api" : "fallback",
-      priority,
-      feeRate,
-    };
-  }
+      case "src20-deploy": {
+        return {
+          ...baseOptions,
+          op: "DEPLOY" as const,
+          tick: options.tick || "TEST",
+          max: options.max || "1000",
+          lim: options.lim || "100",
+          dec: options.dec ?? 0,
+        } as SRC20TransactionOptions;
+      }
 
-  /**
-   * Estimate fees for stamp/asset transfer transactions
-   */
-  static async estimateTransferFees(
-    priority: FeePriority = "standard",
-  ): Promise<FeeEstimate> {
-    const feeRate = await this.getFeeRate(priority);
+      case "src20-mint": {
+        return {
+          ...baseOptions,
+          op: "MINT" as const,
+          tick: options.tick || "TEST",
+          amt: options.amt || "1",
+        } as SRC20TransactionOptions;
+      }
 
-    // Transfer transactions are typically smaller than minting
-    // Usually 1 input + 2 outputs (recipient + change)
-    const baseSize = TRANSACTION_SIZE_CONSTANTS.BASE_TX_SIZE;
-    const inputSize = TRANSACTION_SIZE_CONSTANTS.P2WPKH_INPUT;
-    const outputSize = TRANSACTION_SIZE_CONSTANTS.P2WPKH_OUTPUT * 2; // recipient + change
+      case "src20-transfer": {
+        return {
+          ...baseOptions,
+          op: "TRANSFER" as const,
+          tick: options.tick || "TEST",
+          amt: options.amt || "1",
+          destinationAddress: options.destinationAddress ||
+            baseOptions.walletAddress,
+        } as SRC20TransactionOptions;
+      }
 
-    const txSize = baseSize + inputSize + outputSize;
-    const estMinerFee = Math.ceil(txSize * feeRate);
-    const totalDustValue = 0; // Transfers don't typically have dust outputs
+      case "src101-create": {
+        return {
+          ...baseOptions,
+          op: options.op || "deploy",
+          root: options.root || "test.btc",
+          name: options.name,
+          amt: options.amt,
+          destinationAddress: options.destinationAddress,
+        } as SRC101TransactionOptions;
+      }
 
-    return {
-      estMinerFee,
-      totalDustValue,
-      totalValue: estMinerFee + totalDustValue,
-      hasExactFees: false,
-      est_tx_size: txSize,
-      transactionType: "transfer",
-      estimationMethod: this.feeCache.isValid() ? "mempool_api" : "fallback",
-      priority,
-      feeRate,
-    };
-  }
-
-  /**
-   * Generic fee estimation based on outputs
-   * Fallback method for custom transaction structures
-   */
-  static async estimateCustomTransactionFees(
-    outputs: TransactionOutput[],
-    priority: FeePriority = "standard",
-    inputCount: number = 1,
-  ): Promise<FeeEstimate> {
-    const feeRate = await this.getFeeRate(priority);
-
-    // Calculate transaction size
-    let txSize = TRANSACTION_SIZE_CONSTANTS.BASE_TX_SIZE;
-
-    // Add input sizes (assume P2WPKH for simplicity)
-    txSize += inputCount * TRANSACTION_SIZE_CONSTANTS.P2WPKH_INPUT;
-
-    // Add output sizes
-    for (const output of outputs) {
-      switch (output.type) {
-        case "P2WPKH":
-          txSize += TRANSACTION_SIZE_CONSTANTS.P2WPKH_OUTPUT;
-          break;
-        case "P2SH":
-          txSize += TRANSACTION_SIZE_CONSTANTS.P2SH_OUTPUT;
-          break;
-        case "P2PKH":
-          txSize += TRANSACTION_SIZE_CONSTANTS.P2PKH_OUTPUT;
-          break;
-        case "OP_RETURN":
-          txSize += TRANSACTION_SIZE_CONSTANTS.OP_RETURN_OUTPUT;
-          break;
-        case "MULTISIG":
-          txSize += TRANSACTION_SIZE_CONSTANTS.MULTISIG_OUTPUT;
-          break;
+      default: {
+        throw new Error(`Unsupported tool type: ${options.toolType}`);
       }
     }
-
-    const estMinerFee = Math.ceil(txSize * feeRate);
-
-    // Calculate total dust value
-    const totalDustValue = outputs.reduce((sum, output) => {
-      if (output.type === "OP_RETURN") return sum;
-      const dustLimit = DUST_LIMITS[output.type] || DUST_LIMITS.P2WPKH;
-      return sum + Math.max(output.value, dustLimit);
-    }, 0);
-
-    return {
-      estMinerFee,
-      totalDustValue,
-      totalValue: estMinerFee + totalDustValue,
-      hasExactFees: false,
-      est_tx_size: txSize,
-      transactionType: "custom",
-      estimationMethod: this.feeCache.isValid() ? "mempool_api" : "fallback",
-      priority,
-      feeRate,
-    };
   }
 
   /**
-   * Get transaction type-specific estimation method
+   * 🚀 NEW: Map internal tool type to adapter tool type
    */
-  static getEstimatorForType(type: string) {
-    switch (type.toLowerCase()) {
+  private mapToToolType(toolType: string): ToolType {
+    switch (toolType) {
       case "stamp":
-      case "stamping":
-        return this.estimateStampFees;
-      case "src20":
-      case "src-20":
-        return this.estimateSRC20Fees;
-      case "fairmint":
-        return this.estimateFairmintFees;
-      case "src101":
-      case "src-101":
-        return this.estimateSRC101Fees;
-      case "transfer":
-        return this.estimateTransferFees;
+        return "stamp";
+      case "src20-mint":
+      case "src20-deploy":
+      case "src20-transfer":
+        return "src20";
+      case "src101-create":
+        return "src101";
       default:
-        return this.estimateCustomTransactionFees;
+        throw new Error(`Cannot map tool type: ${toolType}`);
     }
   }
 
   /**
-   * Validate fee estimate result
+   * Calculate estimated transaction size based on tool type and parameters
    */
-  static validateEstimate(estimate: FeeEstimate): boolean {
-    return (
-      estimate.estMinerFee > 0 &&
-      estimate.totalDustValue >= 0 &&
-      estimate.totalValue > 0 &&
-      estimate.est_tx_size > 0
-    );
-  }
+  private calculateTransactionSize(options: EstimationOptions): number {
+    const baseSize = 250; // Base transaction overhead
 
-  /**
-   * Clear fee rate cache (useful for testing or manual refresh)
-   */
-  static clearCache(): void {
-    this.feeCache.clear();
-  }
+    switch (options.toolType) {
+      case "stamp": {
+        // Dynamic size calculation based on file size
+        const fileSize = options.fileSize || options.file?.length || 0;
+        const outputCount = Math.max(Math.ceil(fileSize / 32), 1);
+        return baseSize + (outputCount * 43); // 43 bytes per OP_RETURN output
+      }
 
-  /**
-   * Get cache status
-   */
-  static getCacheStatus(): { isValid: boolean; age?: number; source?: string } {
-    const cached = this.feeCache.get();
-    if (!cached) {
-      return { isValid: false };
+      case "src20-mint":
+      case "src20-deploy":
+      case "src20-transfer": {
+        const dataSize = options.data?.length || 50; // Typical SRC-20 data size
+        const chunks = Math.ceil(dataSize / 32) || 1;
+        return baseSize + (chunks * 64); // 64 bytes per P2WSH output
+      }
+
+      case "src101-create": {
+        return baseSize + 100; // Fixed overhead for SRC-101
+      }
+
+      default: {
+        return baseSize;
+      }
     }
-
-    return {
-      isValid: true,
-      age: Date.now() - cached.timestamp,
-      source: cached.source,
-    };
-  }
-
-  // Legacy methods for backward compatibility (synchronous versions)
-
-  /**
-   * @deprecated Use estimateStampFees instead
-   */
-  static estimateStampFeesSync(
-    feeRate: number,
-    editions?: number,
-  ): FeeEstimate {
-    const baseSize = TRANSACTION_SIZE_CONSTANTS.STAMP;
-    const outputCount = editions || 1;
-    const scaledSize = outputCount > 1000
-      ? baseSize + (outputCount * 0.5)
-      : baseSize;
-
-    const estMinerFee = Math.ceil(scaledSize * feeRate);
-    const totalDustValue = 333;
-
-    return {
-      estMinerFee,
-      totalDustValue,
-      totalValue: estMinerFee + totalDustValue,
-      hasExactFees: false,
-      est_tx_size: Math.ceil(scaledSize),
-      transactionType: "stamp",
-      estimationMethod: "client_side_calculation",
-      feeRate,
-    };
   }
 
   /**
-   * @deprecated Use estimateSRC20Fees instead
+   * Calculate dust value based on tool type and parameters
    */
-  static estimateSRC20FeesSync(feeRate: number): FeeEstimate {
-    const txSize = TRANSACTION_SIZE_CONSTANTS.SRC20;
-    const estMinerFee = Math.ceil(txSize * feeRate);
-    const totalDustValue = 333;
+  private calculateDustValue(options: EstimationOptions): number {
+    switch (options.toolType) {
+      case "stamp": {
+        // Dynamic dust calculation based on file size
+        const fileSize = options.fileSize || options.file?.length || 0;
+        const outputCount = Math.max(Math.ceil(fileSize / 32), 1);
+        // Each OP_RETURN output needs dust value
+        return outputCount * 333; // DUST_SIZE per OP_RETURN output
+      }
 
-    return {
-      estMinerFee,
-      totalDustValue,
-      totalValue: estMinerFee + totalDustValue,
-      hasExactFees: false,
-      est_tx_size: txSize,
-      transactionType: "src20",
-      estimationMethod: "client_side_calculation",
-      feeRate,
-    };
+      case "src20-mint":
+      case "src20-deploy":
+      case "src20-transfer": {
+        const chunks = Math.ceil((options.data?.length || 0) / 32) || 1;
+        return chunks * 333; // SRC20_DUST per P2WSH output
+      }
+
+      default: {
+        return 0; // No dust for operations that don't need multiple outputs
+      }
+    }
   }
 
   /**
-   * @deprecated Use estimateFairmintFees instead
+   * Clear all caches (useful for testing or manual cache management)
    */
-  static estimateFairmintFeesSync(feeRate: number): FeeEstimate {
-    const txSize = TRANSACTION_SIZE_CONSTANTS.FAIRMINT;
-    const estMinerFee = Math.ceil(txSize * feeRate);
-    const totalDustValue = 546;
+  clearCaches(): void {
+    this.utxoCache.clear();
+    toolEndpointFeeEstimator.clearCache();
 
-    return {
-      estMinerFee,
-      totalDustValue,
-      totalValue: estMinerFee + totalDustValue,
-      hasExactFees: false,
-      est_tx_size: txSize,
-      transactionType: "fairmint",
-      estimationMethod: "client_side_calculation",
-      feeRate,
-    };
+    logger.debug("system", {
+      message: "All fee estimation caches cleared",
+    });
   }
 
   /**
-   * @deprecated Use estimateSRC101Fees instead
+   * Get cache statistics for monitoring
    */
-  static estimateSRC101FeesSync(feeRate: number): FeeEstimate {
-    const txSize = TRANSACTION_SIZE_CONSTANTS.SRC101;
-    const estMinerFee = Math.ceil(txSize * feeRate);
-    const totalDustValue = 546;
-
+  getCacheStats(): {
+    utxoCache: { size: number; maxSize: number };
+    toolEndpointCache: any;
+  } {
     return {
-      estMinerFee,
-      totalDustValue,
-      totalValue: estMinerFee + totalDustValue,
-      hasExactFees: false,
-      est_tx_size: txSize,
-      transactionType: "src101",
-      estimationMethod: "client_side_calculation",
-      feeRate,
+      utxoCache: this.utxoCache.getStats(),
+      toolEndpointCache: toolEndpointFeeEstimator.getCacheStats(),
     };
   }
+}
 
-  /**
-   * @deprecated Use estimateTransferFees instead
-   */
-  static estimateTransferFeesSync(feeRate: number): FeeEstimate {
-    const baseSize = TRANSACTION_SIZE_CONSTANTS.BASE_TX_SIZE;
-    const inputSize = TRANSACTION_SIZE_CONSTANTS.P2WPKH_INPUT;
-    const outputSize = TRANSACTION_SIZE_CONSTANTS.P2WPKH_OUTPUT * 2;
+/**
+ * Singleton instance for use throughout the application
+ */
+export const transactionFeeEstimator = new TransactionFeeEstimator();
 
-    const txSize = baseSize + inputSize + outputSize;
-    const estMinerFee = Math.ceil(txSize * feeRate);
-    const totalDustValue = 0;
-
-    return {
-      estMinerFee,
-      totalDustValue,
-      totalValue: estMinerFee + totalDustValue,
-      hasExactFees: false,
-      est_tx_size: txSize,
-      transactionType: "transfer",
-      estimationMethod: "client_side_calculation",
-      feeRate,
-    };
+/**
+ * Convenience function for estimating fees
+ */
+export async function estimateTransactionFees(
+  options: EstimationOptions,
+  phase: "instant" | "smart" | "exact" = "smart",
+): Promise<FeeEstimationResult> {
+  switch (phase) {
+    case "instant":
+      return transactionFeeEstimator.estimateInstant(options);
+    case "smart":
+      return transactionFeeEstimator.estimateSmart(options);
+    case "exact":
+      return transactionFeeEstimator.estimateExact(options);
+    default:
+      throw new Error(`Invalid estimation phase: ${phase}`);
   }
 }

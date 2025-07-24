@@ -30,7 +30,7 @@ interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   fileType?: string | undefined;
   fileSize?: number | undefined;
   issuance?: number | undefined;
-  bitname: string | undefined;
+  bitname?: string | undefined;
   amount?: number;
   receive?: number;
   fromPage?: string;
@@ -132,6 +132,12 @@ export function FeeCalculatorBase({
       }
     };
   }, []);
+
+  // Debug: Log when feeDetails prop changes
+  useEffect(() => {
+    // This effect helps track fee details updates for debugging
+    // Can be removed in production if not needed
+  }, [feeDetails]);
 
   const handleCoinToggle = () => {
     logger.debug("stamps", {
@@ -345,12 +351,20 @@ export function FeeCalculatorBase({
             {feeDetails?.minerFee
               ? (
                 <>
+                  {!feeDetails.hasExactFees && (
+                    <span class="text-stamp-grey-light">~</span>
+                  )}
                   {coinType === "BTC"
                     ? formatSatoshisToBTC(feeDetails.minerFee, {
                       includeSymbol: false,
                     })
                     : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice)}{" "}
                   <span class="font-light">{coinType}</span>
+                  {!feeDetails?.hasExactFees && (
+                    <span class="text-stamp-grey-light text-xs ml-1 opacity-70">
+                      (est)
+                    </span>
+                  )}
                 </>
               )
               : (
@@ -616,6 +630,11 @@ export function FeeCalculatorBase({
               )
               : <span class="animate-pulse">0.00000000</span>}{" "}
             <span class="font-light">{coinType}</span>
+            {feeDetails && !feeDetails.hasExactFees && (
+              <span class="text-stamp-grey-light text-xs ml-1 opacity-70">
+                (est)
+              </span>
+            )}
           </h6>
         </div>
       </div>
@@ -673,25 +692,31 @@ export function FeeCalculatorBase({
         <span class="text-stamp-grey-darker pr-2">ESTIMATE</span>
         {feeDetails?.totalValue !== undefined
           ? (
-            coinType === "BTC"
-              ? (
-                <>
-                  <span class="font-bold">
-                    {formatSatoshisToBTC(feeDetails.totalValue, {
-                      includeSymbol: false,
-                    })}
-                  </span>{" "}
-                  <span class="font-light">BTC</span>
-                </>
-              )
-              : (
-                <>
-                  <span class="font-bold">
-                    {(feeDetails.totalValue / 1e8 * BTCPrice).toFixed(2)}
-                  </span>{" "}
-                  <span class="font-light">{coinType}</span>
-                </>
-              )
+            <>
+              {!feeDetails.hasExactFees && (
+                <span class="text-stamp-grey-light">~</span>
+              )}
+              {coinType === "BTC"
+                ? (
+                  <>
+                    <span class="font-bold">
+                      {formatSatoshisToBTC(feeDetails.totalValue, {
+                        includeSymbol: false,
+                      })}
+                    </span>{" "}
+                    <span class="font-light">BTC</span>
+                  </>
+                )
+                : (
+                  <>
+                    <span class="font-bold">
+                      {(feeDetails.totalValue / 1e8 * BTCPrice).toFixed(2)}
+                    </span>{" "}
+                    <span class="font-light">{coinType}</span>
+                  </>
+                )}
+              {/* Removed (est) from main ESTIMATE line as requested */}
+            </>
           )
           : (
             <>
@@ -742,8 +767,8 @@ export function FeeCalculatorBase({
           >
             <div
               className={`
-                w-4 h-4 tablet:w-3 tablet:h-3 mr-3 tablet:mr-2 
-                flex items-center justify-center 
+                w-4 h-4 tablet:w-3 tablet:h-3 mr-3 tablet:mr-2
+                flex items-center justify-center
                 rounded-sm
                 transition-all duration-300 ease-in-out
                 border
@@ -762,7 +787,7 @@ export function FeeCalculatorBase({
             >
               <div
                 className={`
-                  absolute 
+                  absolute
                   inset-0.5
                   transform transition-all duration-300 ease-in-out
                   ${tosAgreed ? "scale-100" : "scale-0"}
@@ -777,7 +802,7 @@ export function FeeCalculatorBase({
             <span
               className={`
                 text-xs font-medium select-none
-                transition-colors duration-300 
+                transition-colors duration-300
                 ${
                 tosAgreed ? "text-stamp-grey-darker" : "text-stamp-grey-light"
               }
@@ -796,7 +821,7 @@ export function FeeCalculatorBase({
                   <a
                     href="/termsofservice"
                     className={`
-                      transition-colors duration-300 
+                      transition-colors duration-300
                       ${
                       tosAgreed ? "text-stamp-purple-dark" : "text-stamp-purple"
                     }
@@ -810,7 +835,7 @@ export function FeeCalculatorBase({
                   <a
                     href="/termsofservice"
                     className={`
-                      transition-colors duration-300 
+                      transition-colors duration-300
                       ${
                       tosAgreed ? "text-stamp-purple-dark" : "text-stamp-purple"
                     }

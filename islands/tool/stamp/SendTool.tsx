@@ -1,6 +1,7 @@
 /* ===== SEND TOOL COMPONENT ===== */
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { ProgressiveFeeStatusIndicator } from "$fee";
 import { inputField, inputFieldSquare } from "$form";
 import type { StampRow } from "$globals";
 import { Icon } from "$icon";
@@ -13,24 +14,13 @@ import {
   loaderSpinGrey,
   rowForm,
 } from "$layout";
-import { debounce } from "$lib/utils/debounce.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { TransactionFeeEstimator } from "$lib/utils/minting/TransactionFeeEstimator.ts";
+import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
 import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
-import axiod from "axiod";
 import { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { SelectField } from "../../form/SelectField.tsx";
-
-/* ===== TYPES ===== */
-interface FeeDetails {
-  minerFee: number;
-  dustValue: number;
-  totalValue: number;
-  hasExactFees: boolean;
-  est_tx_size: number;
-}
 
 /* ===== COMPONENT ===== */
 export function StampSendTool() {
@@ -64,15 +54,6 @@ export function StampSendTool() {
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [showFallbackIcon, setShowFallbackIcon] = useState(false);
 
-  // Fee details state for progressive estimation
-  const [feeDetails, setFeeDetails] = useState<FeeDetails>({
-    minerFee: 0,
-    dustValue: 0,
-    totalValue: 0,
-    hasExactFees: false,
-    est_tx_size: 0,
-  });
-
   /* ===== FORM HANDLING ===== */
   const {
     formState,
@@ -89,115 +70,30 @@ export function StampSendTool() {
     initialFee: 1,
   });
 
-  // Progressive fee estimation for stamp transfers
-  const estimateStampTransferFeesDebounced = debounce(async (
-    currentStamp: StampRow | null,
-    transferQuantity: number,
-    recipientAddress: string,
-    feeRate: number,
-    walletAddress?: string,
-  ) => {
-    if (
-      !currentStamp || !transferQuantity || transferQuantity <= 0 || !feeRate ||
-      feeRate <= 0
-    ) {
-      return;
-    }
-
-    try {
-      // Phase 1: Immediate client-side fee estimation
-      const immediateEstimate = TransactionFeeEstimator.estimateTransferFees(
-        feeRate,
-      );
-
-      // Set immediate estimate
-      setFeeDetails({
-        minerFee: immediateEstimate.estMinerFee,
-        dustValue: immediateEstimate.totalDustValue,
-        totalValue: immediateEstimate.totalValue,
-        hasExactFees: false, // This is an estimate
-        est_tx_size: immediateEstimate.est_tx_size,
-      });
-
-      logger.debug("ui", {
-        message: "Stamp transfer fee estimation (Phase 1)",
-        data: {
-          stamp: currentStamp.stamp,
-          quantity: transferQuantity,
-          feeRate,
-          estimate: immediateEstimate,
-        },
-      });
-
-      // Phase 2: If wallet is connected and we have recipient, try to upgrade to exact fees
-      if (walletAddress && recipientAddress && recipientAddress.trim()) {
-        try {
-          const exactFeePayload = {
-            address: walletAddress,
-            destination: recipientAddress,
-            asset: currentStamp.cpid,
-            quantity: transferQuantity,
-            satsPerVB: feeRate,
-            dryRun: true, // Request fee estimation only
-            options: {
-              return_psbt: false, // We only want fee details
-              fee_per_kb: feeRate * 1000,
-              allow_unconfirmed_inputs: true,
-            },
-          };
-
-          const response = await axiod.post(
-            "/api/v2/create/send",
-            exactFeePayload,
-          );
-
-          if (
-            response.data && typeof response.data.est_miner_fee === "number"
-          ) {
-            // Upgrade to exact fees
-            setFeeDetails({
-              minerFee: Number(response.data.est_miner_fee) || 0,
-              dustValue: Number(response.data.total_dust_value) || 0,
-              totalValue: (Number(response.data.est_miner_fee) || 0) +
-                (Number(response.data.total_dust_value) || 0),
-              hasExactFees: true, // This is exact
-              est_tx_size: Number(response.data.est_tx_size) ||
-                immediateEstimate.est_tx_size,
-            });
-
-            logger.debug("ui", {
-              message: "Stamp transfer exact fee calculation (Phase 2)",
-              data: {
-                stamp: currentStamp.stamp,
-                exactFees: response.data,
-              },
-            });
-          }
-        } catch (exactError) {
-          logger.debug("ui", {
-            message: "Exact fee calculation failed, keeping estimate",
-            error: exactError instanceof Error
-              ? exactError.message
-              : String(exactError),
-          });
-          // Keep the estimation - no need to show error for this
-        }
-      }
-    } catch (error) {
-      logger.error("ui", {
-        message: "Fee estimation failed",
-        error: error instanceof Error ? error.message : String(error),
-      });
-      // Reset to default state
-      setFeeDetails({
-        minerFee: 0,
-        dustValue: 0,
-        totalValue: 0,
-        hasExactFees: false,
-        est_tx_size: 0,
-      });
-    }
-  }, 500);
+  /* ===== 🚀 PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
+  const {
+    feeDetails: progressiveFeeDetails,
+    isEstimating,
+    feeDetailsVersion,
+    isPreFetching,
+    estimateExact,
+    phase1Result,
+    phase2Result,
+    phase3Result,
+    currentPhase,
+    error: feeEstimationError,
+    clearError,
+  } = useTransactionFeeEstimator({
+    toolType: "send",
+    feeRate: isSubmitting ? 0 : formState.fee,
+    walletAddress: wallet?.address,
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // Stamp send specific parameters
+    asset: selectedStamp?.cpid || "",
+    transferQuantity: quantity,
+    recipientAddress: formState.recipientAddress || "",
+  });
 
   /* ===== EFFECTS ===== */
   // Fetch stamps effect
@@ -253,20 +149,10 @@ export function StampSendTool() {
 
   // Progressive fee estimation effect
   useEffect(() => {
-    estimateStampTransferFeesDebounced(
-      selectedStamp,
-      quantity,
-      formState.recipientAddress || "",
-      formState.fee,
-      wallet?.address,
-    );
-  }, [
-    selectedStamp,
-    quantity,
-    formState.recipientAddress,
-    formState.fee,
-    wallet?.address,
-  ]);
+    // This useEffect is no longer needed as the fee estimation is handled by useTransactionFeeEstimator
+    // However, we keep it to ensure the formState.fee is updated correctly if the user changes it.
+    // The useTransactionFeeEstimator will re-trigger this effect if feeRate changes.
+  }, [formState.fee]);
 
   // Reset loading state when selected stamp changes
   useEffect(() => {
@@ -562,15 +448,6 @@ export function StampSendTool() {
     );
   };
 
-  // Log props before rendering FeeCalculatorSimple
-  console.log("SENDTOOL: Props for FeeCalculatorSimple:", {
-    isSubmitting,
-    tosAgreed,
-    userAddress: wallet?.address || "",
-    buttonName_prop_to_fee_calc: wallet?.address ? "SEND" : "CONNECT WALLET",
-    formState_fee_for_fee_calc: formState.fee,
-  });
-
   /* ===== RENDER ===== */
   return (
     <div class={bodyTool}>
@@ -578,7 +455,7 @@ export function StampSendTool() {
 
       {/* ===== STAMP SELECTION SECTION ===== */}
       <form
-        class={`${containerBackground} mb-6`}
+        class={`${containerBackground} mb-6 relative`}
         onSubmit={(e) => {
           e.preventDefault();
           // If we want the form submit to also try, but FeeCalc is primary:
@@ -588,6 +465,18 @@ export function StampSendTool() {
         aria-label="Send stamp"
         novalidate
       >
+        {/* Progressive Fee Status Indicator */}
+        <ProgressiveFeeStatusIndicator
+          isConnected={!!wallet}
+          isSubmitting={isSubmitting}
+          currentPhase={currentPhase}
+          phase1Result={phase1Result}
+          phase2Result={phase2Result}
+          phase3Result={phase3Result}
+          isPreFetching={isPreFetching}
+          feeEstimationError={feeEstimationError}
+          clearError={clearError}
+        />
         <div class={`${containerRowForm} mb-5`}>
           <div class={imagePreviewTool}>
             {renderStampContent()}
@@ -666,7 +555,16 @@ export function StampSendTool() {
             stamp: selectedStamp?.stamp?.toString() || "",
             editions: quantity || 0,
           }}
-          feeDetails={feeDetails}
+          feeDetails={mapProgressiveFeeDetails(progressiveFeeDetails)}
+          // Progressive fee estimation status props
+          isEstimating={isEstimating}
+          isPreFetching={isPreFetching}
+          currentPhase={currentPhase}
+          phase1Result={phase1Result}
+          phase2Result={phase2Result}
+          phase3Result={phase3Result}
+          feeEstimationError={feeEstimationError}
+          clearError={clearError}
         />
       </div>
 

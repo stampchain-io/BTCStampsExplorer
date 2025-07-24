@@ -2,15 +2,16 @@
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { StampImage } from "$content";
 import { inputFieldSquare } from "$form";
 import type { StampRow } from "$globals";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
+import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { showToast } from "$lib/utils/toastSignal.ts";
+import { FeeCalculatorBase } from "$section";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -61,6 +62,33 @@ const BuyStampModal = ({
     initialFee,
   });
 
+  /* ===== 🚀 PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
+  const {
+    getBestEstimate,
+    isEstimating: _isEstimating,
+    isPreFetching: _isPreFetching,
+    phase1: _phase1,
+    phase2: _phase2,
+    phase3: _phase3,
+    currentPhase: _currentPhase,
+    error: feeEstimationError,
+    clearError: _clearError,
+  } = useTransactionFeeEstimator({
+    toolType: "stamp", // Buy stamp uses stamp toolType
+    feeRate: isSubmitting ? 0 : formState.fee,
+    walletAddress: wallet?.address || "",
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // Buy-specific parameters
+    ...(dispenser && {
+      dispenserSource: dispenser.source,
+      purchaseQuantity: totalPrice.toString(),
+    }),
+  });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
   /* ===== EFFECTS ===== */
   useEffect(() => {
     handleChangeFee(formState.fee);
@@ -96,6 +124,16 @@ const BuyStampModal = ({
       setFormHookError(null);
     }
   }, [formHookError, setFormHookError]);
+
+  // Handle fee estimation errors
+  useEffect(() => {
+    if (feeEstimationError) {
+      logger.debug("system", {
+        message: "Fee estimation error in BuyStampModal",
+        error: feeEstimationError,
+      });
+    }
+  }, [feeEstimationError]);
 
   /* ===== EVENT HANDLERS ===== */
   const handleQuantityChange = (e: Event) => {
@@ -227,9 +265,7 @@ const BuyStampModal = ({
             "Signing reported success, but critical data missing.",
           );
         }
-      } else if (signResult.cancelled) {
-        showToast("Transaction signing was cancelled.", "info", true);
-      } else {
+      } else if (!signResult.cancelled) {
         const signErrorMsg = signResult.error || "Unknown signing error";
         logger.error("ui", {
           message: "PSBT Signing failed",
@@ -241,6 +277,8 @@ const BuyStampModal = ({
             signErrorMsg.length > 50 ? "..." : ""
           }`,
         );
+      } else {
+        showToast("Transaction signing was cancelled.", "info", true);
       }
     });
   };
@@ -298,10 +336,17 @@ const BuyStampModal = ({
         </div>
       </div>
 
+      {/* ===== 🎯 PROGRESSIVE FEE STATUS INDICATOR ===== */}
+      {
+        /* Note: ProgressiveFeeStatusIndicator is commented out due to interface mismatch.
+          The component expects phase*Result props but hook returns phase* props.
+          This needs to be fixed in either the component or the hook. */
+      }
+
       {/* ===== FEE CALCULATOR ===== */}
-      <FeeCalculatorSimple
+      <FeeCalculatorBase
         fee={formState.fee}
-        handleChangeFee={(newFee) => {
+        handleChangeFee={(newFee: number) => {
           logger.debug("ui", {
             message: "Fee changing",
             newFee,
@@ -330,9 +375,23 @@ const BuyStampModal = ({
         }}
         buttonName="BUY"
         className="pt-9 mobileLg:pt-12"
-        userAddress={wallet?.address ?? ""}
-        inputType="P2WPKH"
-        outputTypes={["P2WPKH"]}
+        bitname={undefined}
+        // ===== 🚀 PROGRESSIVE FEE DETAILS INTEGRATION =====
+        feeDetails={progressiveFeeDetails
+          ? {
+            minerFee: progressiveFeeDetails.minerFee || 0,
+            dustValue: progressiveFeeDetails.dustValue || 0,
+            totalValue: progressiveFeeDetails.totalValue || 0,
+            hasExactFees: progressiveFeeDetails.hasExactFees || false,
+            estimatedSize: 300, // Default transaction size for stamps
+          }
+          : {
+            minerFee: 0,
+            dustValue: 0,
+            totalValue: 0,
+            hasExactFees: false,
+            estimatedSize: 300,
+          }}
       />
     </ModalBase>
   );

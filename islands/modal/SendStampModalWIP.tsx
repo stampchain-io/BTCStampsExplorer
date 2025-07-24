@@ -1,7 +1,7 @@
 /* ===== SEND STAMP MODAL COMPONENT ===== */
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
+import { FeeCalculatorBase } from "$section";
 import { inputField, inputFieldSquare, SelectField } from "$form";
 import type { StampRow } from "$globals";
 import { Icon } from "$icon";
@@ -41,6 +41,7 @@ function SendStampModal({
   const [quantity, setQuantity] = useState(0);
   const [imgSrc, setImgSrc] = useState("");
   const [selectedStamp, setSelectedStamp] = useState<StampRow | null>(null);
+  const [tosAgreed, setTosAgreed] = useState(false);
 
   /* ===== FORM HANDLING ===== */
   const {
@@ -381,21 +382,17 @@ function SendStampModal({
       </div>
 
       {/* ===== FEE CALCULATOR ===== */}
-      <FeeCalculatorSimple
-        {...(true && { isModal: true })}
+      <FeeCalculatorBase
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
-        type="transfer"
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
         onSubmit={handleTransferSubmit}
         onCancel={handleCloseModal}
         buttonName="TRANSFER"
         className="pt-9 mobileLg:pt-12"
-        {...(wallet?.address && { userAddress: wallet.address })}
-        inputType="P2WPKH"
-        outputTypes={["P2WPKH"]}
-        {...(true && { tosAgreed: true })}
+        tosAgreed={tosAgreed}
+        onTosChange={setTosAgreed}
       />
 
       {/* ===== STATUS MESSAGES ===== */}

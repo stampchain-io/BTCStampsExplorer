@@ -2,15 +2,19 @@
 import { sliderBar, sliderKnob } from "$button";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { ProgressiveFeeStatusIndicator } from "$components/fee/index.ts";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
 import { StampImage } from "$content";
 import type { StampRow } from "$globals";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
+import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { showToast } from "$lib/utils/toastSignal.ts";
 import { tooltipImage } from "$notification";
+import { FeeCalculatorBase } from "$section";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -48,12 +52,35 @@ const DonateStampModal = ({
     handleChangeFee: internalHandleChangeFee,
     handleSubmit,
     isSubmitting,
-    error,
-    successMessage,
-    setSuccessMessage,
+    error: formHookError,
+    setError: setFormHookError,
   } = useTransactionForm({
     type: "buy",
     initialFee,
+  });
+
+  /* ===== 🚀 PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
+  const {
+    feeDetails: progressiveFeeDetails,
+    isPreFetching,
+    error: feeEstimationError,
+    clearError,
+    // Phase-specific results for status indicator
+    currentPhase,
+    phase1Result,
+    phase2Result,
+    phase3Result,
+  } = useTransactionFeeEstimator({
+    toolType: "stamp", // Donate uses stamp toolType for dispense transactions
+    feeRate: isSubmitting ? 0 : formState.fee,
+    ...(wallet?.address && { walletAddress: wallet.address }),
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // Donation-specific parameters
+    ...(dispenser && {
+      dispenserSource: dispenser.source,
+      purchaseQuantity: totalPrice.toString(),
+    }),
   });
 
   /* ===== EFFECTS ===== */
@@ -96,6 +123,24 @@ const DonateStampModal = ({
       });
     };
   }, []);
+
+  // Handle form errors with toast notifications
+  useEffect(() => {
+    if (formHookError) {
+      showToast(formHookError, "error", false);
+      setFormHookError(null);
+    }
+  }, [formHookError, setFormHookError]);
+
+  // Handle fee estimation errors
+  useEffect(() => {
+    if (feeEstimationError) {
+      logger.debug("system", {
+        message: "Fee estimation error in DonateStampModal",
+        error: feeEstimationError,
+      });
+    }
+  }, [feeEstimationError]);
 
   /* ===== EVENT HANDLERS ===== */
   const handleMouseMove = (e: MouseEvent) => {
@@ -172,35 +217,104 @@ const DonateStampModal = ({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || "Failed to create dispense transaction.",
-        );
+        const errorData = await response.json().catch(() => ({
+          error: "Failed to parse error from server.",
+        }));
+        const detailedError = errorData.error ||
+          "Failed to create dispense transaction (unknown server error).";
+        logger.error("ui", {
+          message: "API error creating dispense transaction",
+          details: detailedError,
+          status: response.status,
+        });
+        throw new Error("Failed to prepare transaction. Please try again.");
       }
 
       const responseData = await response.json();
-
       if (!responseData?.psbt || !responseData?.inputsToSign) {
-        throw new Error("Invalid response: Missing PSBT or inputsToSign");
+        logger.error("ui", {
+          message: "Invalid API response: Missing PSBT or inputsToSign",
+          data: responseData,
+        });
+        throw new Error("Received invalid transaction data from server.");
       }
 
-      // PSBT is already in hex format with witness data from backend
       const signResult = await walletContext.signPSBT(
         wallet,
         responseData.psbt,
         responseData.inputsToSign,
-        true,
+        true, // Enable RBF
       );
 
-      if (signResult.signed && signResult.txid) {
-        setSuccessMessage(
-          `Broadcasted: ${signResult.txid}`,
+      if (signResult.signed) {
+        if (signResult.txid) {
+          showToast(
+            `Broadcasted: ${signResult.txid.substring(0, 10)}...`,
+            "success",
+            false,
+          );
+          closeModal();
+        } else if (signResult.psbt) {
+          try {
+            showToast("Transaction signed. Broadcasting...", "info", true);
+            const broadcastTxid = await walletContext.broadcastPSBT(
+              signResult.psbt,
+            );
+            if (broadcastTxid && typeof broadcastTxid === "string") {
+              showToast(
+                ` Broadcasted: ${broadcastTxid.substring(0, 10)}...`,
+                "success",
+                false,
+              );
+              closeModal();
+            } else {
+              logger.error("ui", {
+                message: "Broadcast did not return a valid TXID after signing",
+                broadcastResult: broadcastTxid,
+                psbtHex: signResult.psbt,
+              });
+              throw new Error(
+                "Broadcast failed after signing. Please check transaction status.",
+              );
+            }
+          } catch (broadcastError: unknown) {
+            const beMsg = broadcastError instanceof Error
+              ? broadcastError.message
+              : String(broadcastError);
+            logger.error("ui", {
+              message: "Error broadcasting signed PSBT",
+              error: beMsg,
+              psbtHex: signResult.psbt,
+            });
+            throw new Error(
+              `Broadcast failed: ${beMsg.substring(0, 50)}${
+                beMsg.length > 50 ? "..." : ""
+              }`,
+            );
+          }
+        } else {
+          logger.error("ui", {
+            message: "Signed but no TXID or PSBT hex returned to modal",
+            signResult,
+          });
+          throw new Error(
+            "Signing reported success, but critical data missing.",
+          );
+        }
+      } else if (!signResult.cancelled) {
+        const signErrorMsg = signResult.error || "Unknown signing error";
+        logger.error("ui", {
+          message: "PSBT Signing failed",
+          error: signErrorMsg,
+          details: signResult,
+        });
+        throw new Error(
+          `Signing failed: ${signErrorMsg.substring(0, 50)}${
+            signErrorMsg.length > 50 ? "..." : ""
+          }`,
         );
-        setTimeout(closeModal, 5000);
-      } else if (signResult.cancelled) {
-        throw new Error("Transaction signing was cancelled.");
       } else {
-        throw new Error(`Failed to sign PSBT: ${signResult.error}`);
+        showToast("Transaction signing was cancelled.", "info", true);
       }
     });
   };
@@ -221,7 +335,16 @@ const DonateStampModal = ({
 
   /* ===== RENDER ===== */
   return (
-    <ModalBase title="DONATE">
+    <ModalBase
+      onClose={() => {
+        logger.debug("ui", {
+          message: "Modal closing",
+          component: "DonateStampModal",
+        });
+        closeModal();
+      }}
+      title="DONATE"
+    >
       {/* ===== PRICE DISPLAY ===== */}
       <div className="mb-6">
         <h6 className="font-extrabold text-3xl text-stamp-grey-light text-center">
@@ -229,6 +352,19 @@ const DonateStampModal = ({
           <span className="font-extralight">BTC</span>
         </h6>
       </div>
+
+      {/* ===== 🎯 PROGRESSIVE FEE STATUS INDICATOR ===== */}
+      <ProgressiveFeeStatusIndicator
+        isConnected={!!wallet}
+        isSubmitting={isSubmitting}
+        currentPhase={currentPhase}
+        phase1Result={phase1Result}
+        phase2Result={phase2Result}
+        phase3Result={phase3Result}
+        isPreFetching={isPreFetching}
+        feeEstimationError={feeEstimationError}
+        clearError={clearError}
+      />
 
       {/* ===== STAMP DETAILS ===== */}
       <div className="flex flex-row gap-6">
@@ -294,9 +430,9 @@ const DonateStampModal = ({
       </div>
 
       {/* ===== FEE CALCULATOR ===== */}
-      <FeeCalculatorSimple
+      <FeeCalculatorBase
         fee={formState.fee}
-        handleChangeFee={(newFee) => {
+        handleChangeFee={(newFee: number) => {
           logger.debug("ui", {
             message: "Fee changing",
             newFee,
@@ -305,29 +441,36 @@ const DonateStampModal = ({
           internalHandleChangeFee(newFee);
         }}
         type="buy"
-        fromPage="donate"
         tosAgreed={tosAgreed}
         onTosChange={setTosAgreed}
         amount={totalPrice}
-        receive={quantity * 1000}
+        price={0} // Donation has no price
+        edition={quantity * 1000} // USDSTAMPS received
+        fromPage="donate"
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
-        onSubmit={() => handleBuyClick()}
+        onSubmit={() => {
+          logger.debug("ui", {
+            message: "Submit clicked",
+            component: "DonateStampModal",
+          });
+          handleBuyClick();
+        }}
         onCancel={() => {
           handleModalClose();
         }}
-        buttonName="DONATE"
+        buttonName={wallet?.address ? "DONATE" : "CONNECT WALLET"}
         className="pt-9 mobileLg:pt-12"
-        userAddress={wallet?.address ?? ""}
-        inputType="P2WPKH"
-        outputTypes={["P2WPKH"]}
+        bitname={undefined}
+        // ===== 🚀 PROGRESSIVE FEE DETAILS INTEGRATION =====
+        feeDetails={mapProgressiveFeeDetails(progressiveFeeDetails) || {
+          minerFee: 0,
+          dustValue: 0,
+          totalValue: 0,
+          hasExactFees: false,
+          estimatedSize: 300,
+        }}
       />
-
-      {/* ===== STATUS MESSAGES ===== */}
-      {error && <div className="text-xs text-red-500 mt-2">{error}</div>}
-      {successMessage && (
-        <div className="text-xs text-green-500 mt-2">{successMessage}</div>
-      )}
     </ModalBase>
   );
 };

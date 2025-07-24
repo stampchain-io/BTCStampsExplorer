@@ -872,8 +872,8 @@ export class StampRepository {
 
     // Near the end of the getStamps method, right before executing the query
     if (Deno.env.get("DEBUG_SQL") === "true" || Deno.env.get("DENO_ENV") === "development") {
-      logger.debug("sql", `[SQL DEBUG] Final SQL query: ${query}`);
-      logger.debug("sql", `[SQL DEBUG] With parameters: ${queryParams}`);
+      logger.debug("sql", { message: `[SQL DEBUG] Final SQL query: ${query}` });
+      logger.debug("sql", { message: `[SQL DEBUG] With parameters: ${queryParams}` });
     }
 
     // Execute the data query

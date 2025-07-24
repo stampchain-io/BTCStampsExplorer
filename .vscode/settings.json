@@ -3,22 +3,42 @@
   "deno.enable": true,
   "deno.lint": true,
   "deno.config": "./deno.json",
-  "deno.importMap": "./deno.json",
+  // Remove importMap since deno.json already contains imports
+  // "deno.importMap": "./deno.json",
+  // Enable unstable features to match deno.json tasks
+  "deno.unstable": ["byonm", "broadcast-channel", "temporal"],
+  // Disable lockfile since lock: false in deno.json
+  "deno.disablePaths": ["deno.lock"],
   "deno.suggest.imports.hosts": {
     "https://deno.land": true,
-    "https://cdn.nest.land": true,
-    "https://crux.land": true,
-    "https://esm.sh": true,
-    "https://jsr.io": true
+    "https://jsr.io": true,     // Re-enable since you use jsr imports
+    "https://esm.sh": false,    // Keep disabled if still having issues
+    "https://cdn.nest.land": false,  // Not used in your imports
+    "https://crux.land": false       // Not used in your imports
   },
-  "deno.suggest.imports.autoDiscover": true,
+  "deno.suggest.imports.autoDiscover": false,  // Disable auto-discovery to prevent errors
   "deno.codeLens.test": true,
   "deno.codeLens.testArgs": ["--allow-all", "--no-check"],
   "deno.testing.enable": true,
-  "deno.unstable": true,
+  // Increase document preload limit to avoid warnings
+  "deno.documentPreloadLimit": 2000,
+  // Enable Deno 2.x cache on save for better performance
+  "deno.cacheOnSave": true,
+  // Optimize performance by limiting scope
+  "deno.enablePaths": [
+    "./routes",
+    "./components",
+    "./islands",
+    "./lib",
+    "./server",
+    "./utils",
+    "./client"
+  ],
 
   // === TYPESCRIPT/JAVASCRIPT CONFIGURATION ===
   // Disable built-in TS/JS support in favor of Deno
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.suggest.autoImports": false,
   "typescript.suggest.completeFunctionCalls": true,
   "typescript.suggest.names": true,

@@ -1,6 +1,7 @@
 import { DispenserRow } from "$globals";
 
 export * from "./api.ts";
+export * from "./fee-estimation.ts";
 export * from "./marketData.d.ts";
 export * from "./quicknode.d.ts";
 export * from "./services.d.ts";
@@ -9,6 +10,22 @@ export * from "./src20.d.ts";
 export * from "./stamp.d.ts";
 export * from "./utils.d.ts";
 export * from "./wallet.d.ts";
+
+// Re-export specific fee estimation types for convenience
+export type {
+  CacheManagerConfig,
+  CacheResult,
+  CacheStats,
+  DetailedUTXO,
+  EstimationPhase,
+  FeeEstimationError,
+  ProgressiveFeeEstimationOptions,
+  ProgressiveFeeEstimationResult,
+  ToolEstimationParams,
+  ToolType,
+  UTXOCache,
+  UtxoSelectionStrategy,
+} from "./fee-estimation.ts";
 
 // Re-export specific market data types for convenience
 export type {
