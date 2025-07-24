@@ -3,7 +3,7 @@ import { BLOCKSTREAM_API_BASE_URL, MEMPOOL_API_BASE_URL } from "$lib/utils/const
 import { logger } from "$lib/utils/logger.ts";
 import { detectScriptType } from "$lib/utils/scriptTypeUtils.ts";
 import {
-  getUTXOForAddress as getUTXOsFromPublicAPIsForAddress
+    getUTXOForAddress as getUTXOsFromPublicAPIsForAddress
 } from "$lib/utils/utxoUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
@@ -222,7 +222,6 @@ export class CommonUTXOService implements ICommonUTXOService {
         logger.info("common-utxo-service", qnResultLog);
 
         if (qnResult && qnResult.data) {
-          // console.log(\`[CommonUTXO] USING QuickNode for ${txid}:${vout}. Script: ${qnResult.data.script}, Value: ${qnResult.data.value}\`); // Original console.log
           logger.info("common-utxo-service", {
             message: "[CommonUTXO] USING QuickNode for " + txid + ":" + vout + ". Script: " + qnResult.data.script?.substring(0,20) + "... Value: " + qnResult.data.value
           }); // Changed to logger.info and truncated script, using string concatenation
@@ -259,8 +258,6 @@ export class CommonUTXOService implements ICommonUTXOService {
           const output = txData.vout[vout];
           if (output.value !== undefined && output.scriptpubkey) {
             const scriptFromMempool = output.scriptpubkey; // hex string
-            console.log(`[CommonUTXO] USING Mempool.space for ${txid}:${vout}. Fetched scriptpubkey: ${scriptFromMempool}, Value: ${output.value}`);
-
             const formattedUtxo: UTXO = {
               txid: txid,
               vout: vout,
@@ -270,12 +267,11 @@ export class CommonUTXOService implements ICommonUTXOService {
               weight: txData.weight,
               scriptType: detectScriptType(scriptFromMempool),
             };
-
-            logger.info("common-utxo-service", { message: "Successfully fetched and formatted specific UTXO from mempool.space", txid, vout });
-            console.log(`[CommonUTXOService.getSpecificUTXO - Mempool.space Path] Returning for ${txid}:${vout}, script in UTXO object: ${formattedUtxo.script}`);
+            logger.info("common-utxo-service", { message: "Successfully fetched and formatted specific UTXO from public API (Mempool.space)", txid, vout });
             return formattedUtxo;
           } else {
             logger.warn("common-utxo-service", { message: "Mempool.space output missing value or scriptpubkey", txid, vout, output });
+            return null;
           }
         } else {
           logger.warn("common-utxo-service", { message: "Specific output not found in tx from mempool.space", txid, vout, receivedVoutLength: txData?.vout?.length });
@@ -304,8 +300,6 @@ export class CommonUTXOService implements ICommonUTXOService {
             }
 
             const scriptFromBlockstream = output.scriptpubkey; // hex string
-            console.log(`[CommonUTXO] USING Blockstream for ${txid}:${vout}. Fetched scriptpubkey: ${scriptFromBlockstream}, Value: ${output.value}`);
-
             const formattedUtxo: UTXO = {
                 txid: txid, vout: vout, value: output.value, script: scriptFromBlockstream,
                 vsize: txData.weight ? Math.ceil(txData.weight / 4) : 0,
@@ -313,7 +307,6 @@ export class CommonUTXOService implements ICommonUTXOService {
                 scriptType: detectScriptType(scriptFromBlockstream),
             };
             logger.info("common-utxo-service", { message: "Successfully fetched and formatted specific UTXO from public API (Blockstream)", txid, vout });
-            console.log(`[CommonUTXOService.getSpecificUTXO - Blockstream Path] Returning for ${txid}:${vout}, script in UTXO object: ${formattedUtxo.script}`);
             return formattedUtxo;
         } else {
             logger.warn("common-utxo-service", { message: "Specific output not found in tx from public API (Blockstream)", txid, vout, receivedVoutLength: txData?.vout?.length });

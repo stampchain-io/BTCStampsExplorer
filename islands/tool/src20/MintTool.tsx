@@ -8,14 +8,24 @@ import {
   containerBackground,
   containerColForm,
   containerRowForm,
+  imagePreviewTool,
   loaderSpinGrey,
 } from "$layout";
+import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
+import type { ToolEstimationParams } from "$lib/types/fee-estimation.ts";
 import { logger } from "$lib/utils/logger.ts";
+import {
+  extractSRC20ErrorMessage,
+  MintLimitExceededError,
+  validateAmount,
+  validateTicker,
+} from "$lib/utils/src20/errorHandling.tsx";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { titlePurpleLD } from "$text";
+import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
 import type { SRC20Balance } from "$types/index.d.ts";
-import { useEffect, useState } from "preact/hooks";
+import axiod from "axiod";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== MAIN COMPONENT INTERFACE ===== */
 interface SRC20MintToolProps {
@@ -250,7 +260,8 @@ export function SRC20MintTool({
         error: err,
         tick,
       });
-      setError("Error fetching token data");
+      const errorMessage = extractSRC20ErrorMessage(err, "mint");
+      setError(errorMessage);
       resetTokenData();
     } finally {
       setIsImageLoading(false);
@@ -274,29 +285,45 @@ export function SRC20MintTool({
   const limit = mintStatus ? Number(mintStatus.limit).toLocaleString() : "0";
   const minters = holders ? holders.toString() : "0";
 
-  /* ===== DEBUG LOGGING EFFECT ===== */
-  useEffect(() => {
-    logger.debug("stamps", {
-      message: "SRC20MintTool formState updated",
-      data: {
-        fee: formState.fee,
-        psbtFees: formState.psbtFees,
-        hasFeesData: !!formState.psbtFees,
-      },
-    });
-  }, [formState.fee, formState.psbtFees]);
-
-  /* ===== FEE CALCULATOR PREPARATION ===== */
-  logger.debug("stamps", {
-    message: "Fee details for calculator (MintTool)",
-    data: {
-      psbtFees: formState.psbtFees,
-      formState: {
-        fee: formState.fee,
-        BTCPrice: formState.BTCPrice,
-      },
-    },
+  /* ===== PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
+  const {
+    feeDetails: progressiveFeeDetails,
+    isEstimating,
+    feeDetailsVersion,
+    isPreFetching,
+    estimateExact,
+    phase1Result,
+    phase2Result,
+    phase3Result,
+    currentPhase,
+    error: feeEstimationError,
+    clearError,
+  } = useTransactionFeeEstimator({
+    toolType: "src20-mint",
+    feeRate: isSubmitting ? 0 : formState.fee,
+    walletAddress: wallet?.address,
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // SRC-20 mint specific parameters
+    tick: formState.token,
+    amt: formState.amt,
   });
+
+  /* ===== FEE DETAILS SYNCHRONIZATION ===== */
+  useEffect(() => {
+    if (progressiveFeeDetails && !isEstimating) {
+      logger.debug("stamps", {
+        message: "SRC20 MintTool progressive fee details update",
+        data: {
+          minerFee: progressiveFeeDetails.minerFee,
+          dustValue: progressiveFeeDetails.dustValue,
+          totalValue: progressiveFeeDetails.totalValue,
+          hasExactFees: progressiveFeeDetails.hasExactFees,
+          currentPhase,
+        },
+      });
+    }
+  }, [progressiveFeeDetails, isEstimating, currentPhase, feeDetailsVersion]);
 
   /* ===== COMPONENT RENDER ===== */
   return (
@@ -460,18 +487,14 @@ export function SRC20MintTool({
             token: formState.token,
             amount: Number(formState.amt) || 0,
           }}
-          feeDetails={formState.psbtFees
+          feeDetails={progressiveFeeDetails
             ? {
-              minerFee: formState.psbtFees.estMinerFee,
-              dustValue: formState.psbtFees.totalDustValue,
-              totalValue: formState.psbtFees.totalValue,
-              hasExactFees: formState.psbtFees.hasExactFees,
-              effectiveFeeRate: formState.psbtFees.effectiveFeeRate,
-              ...(formState.psbtFees.estimatedSize &&
-                { estimatedSize: formState.psbtFees.estimatedSize }),
-              ...(formState.psbtFees.totalVsize &&
-                { totalVsize: formState.psbtFees.totalVsize }),
-            } as any
+              minerFee: progressiveFeeDetails.minerFee || 0,
+              dustValue: progressiveFeeDetails.dustValue || 0,
+              totalValue: progressiveFeeDetails.totalValue || 0,
+              hasExactFees: progressiveFeeDetails.hasExactFees || false,
+              est_tx_size: progressiveFeeDetails.estimatedSize || 300,
+            }
             : undefined}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
@@ -481,6 +504,15 @@ export function SRC20MintTool({
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
           userAddress={wallet?.address || ""}
+          // Progressive fee estimation status props
+          isEstimating={isEstimating}
+          isPreFetching={isPreFetching}
+          currentPhase={currentPhase}
+          phase1Result={phase1Result}
+          phase2Result={phase2Result}
+          phase3Result={phase3Result}
+          feeEstimationError={feeEstimationError}
+          clearError={clearError}
         />
 
         {/* ===== STATUS MESSAGES ===== */}

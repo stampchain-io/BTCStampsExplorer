@@ -247,6 +247,7 @@
     "$form": "./components/form/index.ts",
     "$notification": "./components/notification/index.ts",
     "$table": "./islands/table/index.ts",
+    "$fee": "./components/fee/index.ts",
     "$fees": "./lib/hooks/useFees.ts",
     "$animation": "./lib/hooks/useAnimationControls.ts",
     "$progressiveFees": "./lib/hooks/useProgressiveFeeEstimation.ts"

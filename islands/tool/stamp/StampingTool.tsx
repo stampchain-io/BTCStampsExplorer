@@ -10,6 +10,7 @@ import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { bodyTool, containerBackground, containerRowForm } from "$layout";
 import { useFees } from "$lib/hooks/useFees.ts";
+import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
@@ -21,7 +22,6 @@ import {
   tooltipButtonInCollapsible,
   tooltipImage,
 } from "$notification";
-import { useProgressiveFeeEstimation } from "$progressiveFees";
 import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import axiod from "axiod";
@@ -29,17 +29,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 
-// Keep the custom FeeDetails for backward compatibility with existing UI
-interface FeeDetails {
-  minerFee: number;
-  dustValue: number;
-  totalValue: number;
-  hasExactFees: boolean;
-  est_tx_size: number;
-  isLoading?: boolean;
-}
-
-// 🎉 REMOVED: StampFormState interface - no longer needed with progressive hook!
+// 🎉 REMOVED: FeeDetails interface - no longer needed with progressive hook!
 
 interface MintResponse {
   hex: string;
@@ -265,18 +255,10 @@ function StampingToolMain({ config }: { config: Config }) {
     SubmissionMessage | null
   >(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track minting progress
   const [addressError, setAddressError] = useState<string | undefined>(
     undefined,
   );
-
-  // Fee details state
-  const [feeDetails, setFeeDetails] = useState<FeeDetails>({
-    minerFee: 0,
-    dustValue: 0,
-    totalValue: 0,
-    hasExactFees: false,
-    est_tx_size: 0,
-  });
 
   // Convert file to base64 for fee estimation (matches actual minting process)
   const [fileBase64, setFileBase64] = useState<string | undefined>();
@@ -295,89 +277,67 @@ function StampingToolMain({ config }: { config: Config }) {
     }
   }, [file]);
 
-  // 🚀 PROGRESSIVE FEE ESTIMATION HOOK - Replaces 100+ lines of custom logic!
-  console.log(
-    "🚀 StampingTool: Calling useProgressiveFeeEstimation with feeRate:",
-    fee,
-  );
+  // 🚀 World-Class Progressive Fee Estimation Hook
+  // Uses our new 3-phase estimation system: Instant → Smart → Exact
   const {
-    feeDetails: progressiveFeeDetails,
+    getBestEstimate,
     isEstimating,
-    estimationError,
-    feeDetailsVersion,
-  } = useProgressiveFeeEstimation({
+    isPreFetching,
+    estimateExact, // Phase 3: Exact estimation for when user clicks STAMP
+    // Phase-specific results for UI indicators
+    phase1,
+    phase2,
+    phase3,
+    currentPhase,
+    error: feeEstimationError,
+    clearError,
+  } = useTransactionFeeEstimator({
     toolType: "stamp",
-    feeRate: fee,
-    ...(wallet?.address && { walletAddress: wallet.address }),
-    isConnected,
-    ...(fileBase64 && { file: fileBase64 }),
-    filename: stampName,
-    quantity: Number(issuance) || 1,
-    locked: isLocked,
-    divisible: isDivisible,
-    isPoshStamp,
-    debounceMs: 100, // Faster for testing
+    feeRate: isSubmitting ? 0 : fee, // Disable by setting feeRate to 0 during submission
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting, // Pass isSubmitting state to hook for background fetch abortion
+    // Tool-specific parameters for stamp creation (pass unconditionally)
+    file: fileBase64, // Pass unconditionally - undefined is fine
+    filename: file?.name, // Pass unconditionally - undefined is fine
+    fileSize: fileSize, // Pass unconditionally - undefined is fine
+    quantity: parseInt(issuance, 10),
+    locked: true,
+    divisible: false,
   });
 
-  // 🔍 DEBUG: Log all hook values immediately after call
-  console.log("🔍 StampingTool: Hook values", {
-    progressiveFeeDetails,
-    isEstimating,
-    estimationError,
-    feeDetailsVersion,
-    fee,
-    stampName,
-  });
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes)
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates
+  useEffect(() => {
+    // Clear exact fee details when fee rate changes so slider updates work
+    setExactFeeDetails(null);
+  }, [fee]); // Reset when fee rate changes
 
   // Update local feeDetails when progressive estimation completes
   useEffect(() => {
-    console.log("🔄 StampingTool: useEffect triggered", {
-      progressiveFeeDetails,
-      isEstimating,
-      estimationError,
-      fee,
-      stampName,
-      feeDetailsVersion,
-    });
-
     if (progressiveFeeDetails && !isEstimating) {
-      console.log("✅ StampingTool: Updating feeDetails", {
-        oldMinerFee: feeDetails.minerFee,
-        newMinerFee: progressiveFeeDetails.minerFee,
-      });
-
-      const newFeeDetails = {
-        minerFee: progressiveFeeDetails.minerFee || 0,
-        dustValue: progressiveFeeDetails.dustValue || 0,
-        totalValue: progressiveFeeDetails.totalValue || 0,
-        hasExactFees: progressiveFeeDetails.hasExactFees || false,
-        est_tx_size: progressiveFeeDetails.estimatedSize || 0,
-      };
-
-      console.log("📊 StampingTool: Setting new feeDetails", newFeeDetails);
-      setFeeDetails(newFeeDetails);
-
-      // 🎯 PREACT FORCE UPDATE: Increment counter to force re-render
-      // setForceUpdateCounter((prev) => prev + 1); // REMOVED
+      // Progressive fee details are now used directly in JSX
+      // This useEffect is kept for any future side effects needed
     }
   }, [
     // Use version counter to ensure Preact detects fee changes
-    feeDetailsVersion,
+    progressiveFeeDetails,
     isEstimating,
     fee,
     stampName,
   ]);
 
-  // Debug: Track when feeDetails state actually changes
+  // Update feeDetails state when it changes (for passing to FeeCalculatorBase)
   useEffect(() => {
-    console.log("💰 StampingTool: feeDetails state changed", {
-      minerFee: feeDetails.minerFee,
-      dustValue: feeDetails.dustValue,
-      totalValue: feeDetails.totalValue,
-      // forceUpdateCounter, // REMOVED
-      timestamp: new Date().toISOString(),
-    });
-  }, [feeDetails]); // REMOVED forceUpdateCounter
+    // This effect ensures feeDetails state is synchronized with the progressive estimation
+  }, []);
 
   // Tooltip state and refs
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
@@ -457,7 +417,7 @@ function StampingToolMain({ config }: { config: Config }) {
     }
   }, [address, isConnected]);
 
-  // 🎉 REPLACED: The 100+ lines of custom progressive fee estimation logic below
+  // �� REPLACED: The 100+ lines of custom progressive fee estimation logic below
   // has been replaced with the useProgressiveFeeEstimation hook above!
   // This eliminates:
   // - Custom debounced estimation function (estimateStampFeesDebounced)
@@ -486,11 +446,6 @@ function StampingToolMain({ config }: { config: Config }) {
   const handleChangeFee = (newFee: number) => {
     // Allow any positive fee rate, including 0.1 sat/vB
     const validatedFee = Math.max(newFee, 0.1);
-    console.log("🔧 StampingTool: Fee slider changed", {
-      newFee,
-      validatedFee,
-      currentFee: fee,
-    });
     setFee(validatedFee);
   };
 
@@ -654,6 +609,14 @@ function StampingToolMain({ config }: { config: Config }) {
       return;
     }
 
+    // Prevent multiple submissions
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setApiError(""); // Clear any previous errors
+
     try {
       if (address && !validateWalletAddress(address)) {
         throw new Error(addressError || "Invalid wallet address type");
@@ -676,10 +639,33 @@ function StampingToolMain({ config }: { config: Config }) {
           isPoshStamp: isPoshStamp,
           service_fee: config?.MINTING_SERVICE_FEE,
           service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
+          dryRun: false, // Critical: Set to false for actual PSBT generation
         };
         if (stampName) {
           finalMintPayload.assetName = stampName;
         }
+
+        // 🚀 Phase 3: Exact fee estimation for optimal transaction construction
+        // This provides the most accurate fees possible right before minting
+        logger.debug("stamps", {
+          message: "Starting Phase 3 exact fee estimation",
+          toolType: "stamp",
+        });
+
+        const exactFeeResult = await estimateExact();
+
+        logger.debug("stamps", {
+          message: "Phase 3 exact fee estimation complete",
+          result: exactFeeResult,
+          phase: exactFeeResult.phase,
+          hasExactFees: exactFeeResult.hasExactFees,
+        });
+
+        // Update local fee details with exact results for user feedback
+        setExactFeeDetails({
+          ...exactFeeResult,
+          hasExactFees: true, // Mark as exact when Phase 3 completes
+        });
 
         const response = await axiod.post(
           "/api/v2/olga/mint",
@@ -695,6 +681,21 @@ function StampingToolMain({ config }: { config: Config }) {
         if (!mintResponse.hex) {
           throw new Error("Invalid response structure: missing hex field");
         }
+
+        // Update fee details with ACTUAL values from the final transaction
+        // This ensures the UI shows the exact same values the wallet will use
+        // The wallet shows "You'll transfer X BTC" which is the net spend (input_value - change_value)
+        const netSpendAmount = (mintResponse.input_value || 0) -
+          (mintResponse.change_value || 0);
+
+        setExactFeeDetails({
+          phase: "exact",
+          minerFee: mintResponse.est_miner_fee || 0,
+          dustValue: mintResponse.total_dust_value || 0,
+          totalValue: netSpendAmount, // Use net spend amount to match wallet display
+          hasExactFees: true, // These are the actual transaction values
+          estimationMethod: "final_transaction", // Mark as final transaction values
+        });
 
         const walletProvider = getWalletProvider(
           wallet.provider,
@@ -734,6 +735,7 @@ function StampingToolMain({ config }: { config: Config }) {
           });
           setApiError("Wallet provider error: No response received");
           setSubmissionMessage(null);
+          setIsSubmitting(false); // Reset submitting state
           return;
         }
 
@@ -764,6 +766,7 @@ function StampingToolMain({ config }: { config: Config }) {
             } else {
               showToast(result.error, "error", false);
             }
+            setIsSubmitting(false); // Reset submitting state
             return;
           }
 
@@ -772,6 +775,7 @@ function StampingToolMain({ config }: { config: Config }) {
               message: "Transaction was cancelled by user",
             });
             showToast("Transaction signing was cancelled", "info", true);
+            setIsSubmitting(false); // Reset submitting state
             return;
           }
 
@@ -785,6 +789,7 @@ function StampingToolMain({ config }: { config: Config }) {
             "error",
             false,
           );
+          setIsSubmitting(false); // Reset submitting state
           return;
         }
 
@@ -800,6 +805,7 @@ function StampingToolMain({ config }: { config: Config }) {
             false,
           );
           setApiError(""); // Clear any previous errors
+          setIsSubmitting(false); // Reset submitting state
         } else {
           logger.debug("stamps", {
             message: "Transaction signed successfully, but txid not returned",
@@ -810,6 +816,7 @@ function StampingToolMain({ config }: { config: Config }) {
             false,
           );
           setApiError("");
+          setIsSubmitting(false); // Reset submitting state
         }
       } catch (error) {
         const errorMsg = extractErrorMessage(error);
@@ -820,6 +827,7 @@ function StampingToolMain({ config }: { config: Config }) {
         });
         setApiError(errorMsg);
         setSubmissionMessage(null);
+        setIsSubmitting(false); // Reset submitting state
       }
     } catch (error: any) {
       logger.error("stamps", {
@@ -831,6 +839,7 @@ function StampingToolMain({ config }: { config: Config }) {
           "An unexpected error occurred",
       );
       setSubmissionMessage(null);
+      setIsSubmitting(false); // Reset submitting state
     }
   };
 
@@ -1366,21 +1375,153 @@ function StampingToolMain({ config }: { config: Config }) {
           fileSize={fileSize}
           issuance={parseInt(issuance, 10)}
           BTCPrice={BTCPrice}
-          isSubmitting={false}
+          isSubmitting={isSubmitting}
           onSubmit={handleMint}
           buttonName={isConnected ? "STAMP" : "CONNECT WALLET"}
-          feeDetails={feeDetails}
+          feeDetails={(exactFeeDetails || progressiveFeeDetails)
+            ? {
+              minerFee: (exactFeeDetails || progressiveFeeDetails)?.minerFee ||
+                0,
+              dustValue:
+                (exactFeeDetails || progressiveFeeDetails)?.dustValue || 0,
+              totalValue:
+                (exactFeeDetails || progressiveFeeDetails)?.totalValue || 0,
+              hasExactFees:
+                (exactFeeDetails || progressiveFeeDetails)?.hasExactFees ||
+                false,
+              estimatedSize: 300, // Default transaction size for stamps
+            }
+            : {
+              minerFee: 0,
+              dustValue: 0,
+              totalValue: 0,
+              hasExactFees: false,
+              estimatedSize: 300,
+            }}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
-          disabled={!isFormValid}
+          disabled={isConnected ? !isFormValid : false}
           bitname=""
         />
 
-        <StatusMessages
-          submissionMessage={submissionMessage}
-          apiError={apiError}
-        />
+        {/* 🚀 Three-Phase Fee Estimation Status Indicator */}
+        <div className="absolute top-3 right-3 z-10">
+          {/* Phase 2: Smart UTXO-based estimation (background pre-fetching) */}
+          {isPreFetching && (
+            <div className="flex items-center gap-2 bg-stamp-grey-darker/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-stamp-grey-light/10 mb-2">
+              <div className="relative">
+                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse">
+                </div>
+                <div className="absolute inset-0 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping opacity-20">
+                </div>
+              </div>
+              <span className="hidden sm:inline text-xs text-stamp-grey-light font-normal opacity-80">
+                Smart UTXO analysis
+              </span>
+              <span className="inline sm:hidden text-blue-400 text-xs opacity-80">
+                💡
+              </span>
+            </div>
+          )}
+
+          {/* Phase 3: Exact estimation (during minting) */}
+          {isSubmitting && currentPhase === "exact" && (
+            <div className="flex items-center gap-2 bg-green-900/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-green-500/20 mb-2">
+              <div className="relative">
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse">
+                </div>
+                <div className="absolute inset-0 w-1.5 h-1.5 bg-green-400 rounded-full animate-ping opacity-20">
+                </div>
+              </div>
+              <span className="hidden sm:inline text-xs text-green-300 font-normal opacity-90">
+                Exact fee calculation
+              </span>
+              <span className="inline sm:hidden text-green-400 text-xs opacity-80">
+                🎯
+              </span>
+            </div>
+          )}
+
+          {/* Phase Status Summary - Always visible when connected */}
+          {isConnected && !isSubmitting && (
+            <div className="flex items-center gap-2 bg-stamp-grey-darker/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-stamp-grey-light/10">
+              {/* Phase indicators */}
+              <div className="flex items-center gap-1">
+                {/* Phase 1: Instant */}
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    phase1 ? "bg-green-400" : "bg-stamp-grey-light/30"
+                  }`}
+                  title="Phase 1: Instant estimate"
+                >
+                </div>
+
+                {/* Phase 2: Smart */}
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    phase2
+                      ? "bg-blue-400"
+                      : currentPhase === "smart" || isPreFetching
+                      ? "bg-blue-400 animate-pulse"
+                      : "bg-stamp-grey-light/30"
+                  }`}
+                  title="Phase 2: Smart UTXO estimate"
+                >
+                </div>
+
+                {/* Phase 3: Exact */}
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    phase3 ? "bg-green-500" : "bg-stamp-grey-light/30"
+                  }`}
+                  title="Phase 3: Exact calculation"
+                >
+                </div>
+              </div>
+
+              {/* Current phase text */}
+              <span className="hidden sm:inline text-xs text-stamp-grey-light font-normal opacity-80">
+                {currentPhase === "instant" && "⚡ Instant"}
+                {currentPhase === "smart" && "💡 Smart"}
+                {currentPhase === "exact" && "🎯 Exact"}
+              </span>
+
+              {/* Mobile-only emoji */}
+              <span className="inline sm:hidden text-stamp-grey-light text-xs opacity-80">
+                {currentPhase === "instant" && "⚡"}
+                {currentPhase === "smart" && "💡"}
+                {currentPhase === "exact" && "🎯"}
+              </span>
+            </div>
+          )}
+
+          {/* Error indicator */}
+          {feeEstimationError && (
+            <div className="flex items-center gap-2 bg-red-900/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-red-500/20 mt-2">
+              <div className="w-1.5 h-1.5 bg-red-400 rounded-full"></div>
+              <span className="hidden sm:inline text-xs text-red-300 font-normal opacity-90">
+                Estimation error
+              </span>
+              <span className="inline sm:hidden text-red-400 text-xs opacity-80">
+                ⚠️
+              </span>
+              <button
+                type="button"
+                onClick={clearError}
+                className="text-red-300 hover:text-red-200 text-xs ml-1"
+                title="Clear error"
+              >
+                ×
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      <StatusMessages
+        submissionMessage={submissionMessage}
+        apiError={apiError}
+      />
 
       {isFullScreenModalOpen && openModal(
         <PreviewImageModal

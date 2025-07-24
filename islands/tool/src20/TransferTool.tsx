@@ -9,8 +9,15 @@ import {
   loaderSpinGrey,
   rowResponsiveForm,
 } from "$layout";
+import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
+import type { ToolEstimationParams } from "$lib/types/fee-estimation.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import {
+  extractSRC20ErrorMessage,
+  InsufficientBalanceError,
+  validateAmount,
+} from "$lib/utils/src20/errorHandling.tsx";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
@@ -53,6 +60,31 @@ export function SRC20TransferTool(
 
   /* ===== WALLET CONTEXT ===== */
   const { wallet, isConnected } = walletContext;
+
+  /* ===== PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
+  const {
+    feeDetails: progressiveFeeDetails,
+    isEstimating,
+    feeDetailsVersion,
+    isPreFetching,
+    estimateExact,
+    phase1Result,
+    phase2Result,
+    phase3Result,
+    currentPhase,
+    error: feeEstimationError,
+    clearError,
+  } = useTransactionFeeEstimator({
+    toolType: "src20-transfer",
+    feeRate: isSubmitting ? 0 : formState.fee,
+    walletAddress: wallet?.address,
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // SRC-20 transfer specific parameters
+    tick: formState.token,
+    amt: formState.amt,
+    recipientAddress: formState.toAddress,
+  });
 
   /* ===== CLICK OUTSIDE HANDLER ===== */
   useEffect(() => {
@@ -327,6 +359,24 @@ export function SRC20TransferTool(
             token: formState.token,
             amount: Number(formState.amt) || 0,
           }}
+          feeDetails={progressiveFeeDetails
+            ? {
+              minerFee: progressiveFeeDetails.minerFee || 0,
+              dustValue: progressiveFeeDetails.dustValue || 0,
+              totalValue: progressiveFeeDetails.totalValue || 0,
+              hasExactFees: progressiveFeeDetails.hasExactFees || false,
+              est_tx_size: progressiveFeeDetails.estimatedSize || 300,
+            }
+            : undefined}
+          // Progressive fee estimation status props
+          isEstimating={isEstimating}
+          isPreFetching={isPreFetching}
+          currentPhase={currentPhase}
+          phase1Result={phase1Result}
+          phase2Result={phase2Result}
+          phase3Result={phase3Result}
+          feeEstimationError={feeEstimationError}
+          clearError={clearError}
         />
 
         {/* ===== STATUS MESSAGES ===== */}

@@ -1,7 +1,7 @@
 /* ===== SEND BTC MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorSimple } from "$components/section/FeeCalculatorSimple.tsx";
+import { FeeCalculatorBase } from "$section";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalBase } from "$layout";
 import { inputField } from "$form";
@@ -433,11 +433,9 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
       </div>
 
       {/* ===== FEE CALCULATOR ===== */}
-      <FeeCalculatorSimple
+      <FeeCalculatorBase
         fee={formState.fee}
-        amount={Number(formState.amount) || 0}
         handleChangeFee={internalHandleChangeFee}
-        type="send"
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
         onSubmit={handleSendSubmit}
@@ -446,10 +444,6 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
         tosAgreed={tosAgreed}
         onTosChange={setTosAgreed}
         className="mt-auto"
-        userAddress={wallet?.address ?? ""}
-        recipientAddress={formState.recipientAddress ?? ""}
-        inputType="P2WPKH"
-        outputTypes={["P2WPKH"]}
       />
     </ModalBase>
   );

@@ -58,6 +58,10 @@ export interface ProgressiveFeeEstimationOptions {
   tick?: string;
   amt?: string;
   operation?: "deploy" | "mint" | "transfer";
+  // SRC20-deploy specific
+  max?: string;
+  lim?: string;
+  dec?: string;
 
   // Transfer-specific
   recipientAddress?: string;
@@ -75,6 +79,7 @@ export interface ProgressiveFeeEstimationOptions {
   feeEstimationService?: FeeEstimationService;
   loggerService?: LoggerService;
   debounceMs?: number;
+  isSubmitting?: boolean; // Added for testing
 }
 
 export interface ProgressiveFeeEstimationResult {
@@ -87,6 +92,9 @@ export interface ProgressiveFeeEstimationResult {
   lastEstimationTime: number | null;
   cacheStatus: "fresh" | "stale" | "empty";
   feeDetailsVersion: number;
+  // Background exact fee calculation state
+  isPreFetching: boolean;
+  preFetchedFees: FeeDetails | null;
 }
 
 /**
@@ -133,20 +141,13 @@ export interface ProgressiveFeeEstimationResult {
 export function useProgressiveFeeEstimation(
   options: ProgressiveFeeEstimationOptions,
 ): ProgressiveFeeEstimationResult {
-  const {
-    feeEstimationService = defaultFeeEstimationService,
-    loggerService = defaultLoggerService,
-    debounceMs = 500,
-  } = options;
-
+  // State management
   const [feeDetails, setFeeDetails] = useState<FeeDetails>({
     minerFee: 0,
-    dustValue: 0,
     totalValue: 0,
+    dustValue: 0,
     hasExactFees: false,
-    estimatedSize: 0,
   });
-
   const [isEstimating, setIsEstimating] = useState(false);
   const [estimationError, setEstimationError] = useState<string | null>(null);
   const [estimationCount, setEstimationCount] = useState(0);
@@ -160,11 +161,20 @@ export function useProgressiveFeeEstimation(
   // 🎯 PREACT REACTIVITY FIX: Version counter to force change detection
   const [feeDetailsVersion, setFeeDetailsVersion] = useState(0);
 
+  // Background UTXO pre-fetching state
+  const [isPreFetching, setIsPreFetching] = useState(false);
+  const [preFetchedFees, setPreFetchedFees] = useState<FeeDetails | null>(null);
+
+  // DI services with defaults
+  const feeEstimationService = options.feeEstimationService ||
+    defaultFeeEstimationService;
+  const loggerService = options.loggerService || defaultLoggerService;
+
   // Progressive fee estimation function with DI support
   const estimateFeesDebounced = debounce(async (
     estimationOptions: ProgressiveFeeEstimationOptions,
   ) => {
-    const { toolType, feeRate, walletAddress, isConnected } = estimationOptions;
+    const { feeRate } = estimationOptions;
 
     // Skip estimation if required parameters are missing
     if (!feeRate || feeRate <= 0) {
@@ -177,164 +187,135 @@ export function useProgressiveFeeEstimation(
     setLastEstimationTime(Date.now());
 
     try {
-      // Phase 1: Get endpoint and payload based on tool type
-      const { endpoint, payload } = buildEstimationRequest(
-        estimationOptions,
-        true,
+      // 🚀 PHASE 1: ALWAYS get instant estimates (dryRun=true)
+      // This provides immediate feedback regardless of wallet status
+      const phase1Request = buildEstimationRequest(estimationOptions, true); // Always dryRun for instant estimates
+
+      const phase1Response = await feeEstimationService.estimateFees(
+        phase1Request.endpoint,
+        phase1Request.payload,
       );
 
-      loggerService.debug("ui", {
-        message: `${toolType} fee estimation (Phase 1 - dryRun: true)`,
-        data: {
-          toolType,
-          feeRate,
-          endpoint,
-          hasWallet: !!walletAddress,
-          estimationCount: estimationCount + 1,
-        },
-      });
+      if (phase1Response) {
+        const phase1FeeDetails: FeeDetails = {
+          minerFee: Number(phase1Response.est_miner_fee) || 0,
+          totalValue: Number(phase1Response.total_output_value) || 0,
+          dustValue: Number(phase1Response.total_dust_value) || 0,
+          hasExactFees: false, // Always false for dryRun estimates
+        };
 
-      // Make Phase 1 estimation call using injected service
-      const estimateData = await feeEstimationService.estimateFees(
-        endpoint,
-        payload,
-      );
-
-      // Set Phase 1 estimation data
-      const phase1FeeDetails: FeeDetails = {
-        minerFee: Number(estimateData.est_miner_fee) || 0,
-        dustValue: Number(estimateData.total_dust_value) || 0,
-        totalValue: Number(estimateData.total_output_value) || 0,
-        hasExactFees: false, // This is an estimate
-        estimatedSize: Number(estimateData.est_tx_size) || 0,
-      };
-
-      console.log(
-        "🎯 useProgressiveFeeEstimation: Setting phase1FeeDetails",
-        phase1FeeDetails,
-      );
-      setFeeDetails(phase1FeeDetails);
-      console.log(
-        "🎯 useProgressiveFeeEstimation: Incrementing feeDetailsVersion from",
-        feeDetailsVersion,
-        "to",
-        feeDetailsVersion + 1,
-      );
-      setFeeDetailsVersion((prev) => prev + 1);
-      setCacheStatus("fresh");
-
-      loggerService.debug("ui", {
-        message: `${toolType} fee estimation completed (Phase 1)`,
-        data: {
-          minerFee: estimateData.est_miner_fee,
-          dustValue: estimateData.total_dust_value,
-          totalValue: estimateData.total_output_value,
-          isEstimate: estimateData.is_estimate,
-          method: estimateData.estimation_method,
-        },
-      });
-
-      // Phase 2: If wallet is connected, try to upgrade to exact fees
-      if (isConnected && walletAddress) {
-        try {
-          const { payload: exactPayload } = buildEstimationRequest(
-            estimationOptions,
-            false,
-          );
-
-          loggerService.debug("ui", {
-            message: `Upgrading to exact fees (Phase 2 - with wallet)`,
-            data: {
-              toolType,
-              walletAddress,
-              walletConnected: true,
-            },
-          });
-
-          const exactData = await feeEstimationService.estimateFees(
-            endpoint,
-            exactPayload,
-          );
-
-          // Update with exact fees (hasExactFees: true)
-          const phase2FeeDetails: FeeDetails = {
-            minerFee: Number(exactData.est_miner_fee) || 0,
-            dustValue: Number(exactData.total_dust_value) || 0,
-            totalValue: Number(exactData.total_output_value) || 0,
-            hasExactFees: true, // This is exact with real wallet
-            estimatedSize: Number(exactData.est_tx_size) || 0,
-          };
-
-          setFeeDetails(phase2FeeDetails);
-          console.log(
-            "🎯 useProgressiveFeeEstimation: Incrementing feeDetailsVersion (Phase 2) from",
-            feeDetailsVersion,
-            "to",
-            feeDetailsVersion + 1,
-          );
-          setFeeDetailsVersion((prev) => prev + 1);
-
-          loggerService.debug("ui", {
-            message: `Exact fee estimation completed (Phase 2)`,
-            data: {
-              toolType,
-              minerFee: exactData.est_miner_fee,
-              dustValue: exactData.total_dust_value,
-              totalValue: exactData.total_output_value,
-              isEstimate: exactData.is_estimate,
-              method: exactData.estimation_method,
-            },
-          });
-        } catch (exactError) {
-          // If exact calculation fails, keep the estimates and log the error
-          loggerService.warn("ui", {
-            message: "Exact fee calculation failed, keeping estimates",
-            error: exactError instanceof Error
-              ? exactError.message
-              : String(exactError),
-          });
-          // Estimates are already set above, so we just continue
-        }
+        setFeeDetails(phase1FeeDetails);
+        setFeeDetailsVersion((prev) => prev + 1);
+        setCacheStatus("fresh");
+        loggerService.debug("ui", {
+          message:
+            `${estimationOptions.toolType} fee estimation completed (Phase 1)`,
+          data: {
+            minerFee: phase1Response.est_miner_fee,
+            dustValue: phase1Response.total_dust_value,
+            totalValue: phase1Response.total_output_value,
+            isEstimate: phase1Response.is_estimate,
+            method: phase1Response.estimation_method,
+          },
+        });
       }
     } catch (error) {
       const errorMessage = error instanceof Error
         ? error.message
-        : String(error);
+        : "Unknown estimation error";
       setEstimationError(errorMessage);
-      setCacheStatus("empty");
-
       loggerService.error("ui", {
-        message: `${toolType} fee estimation failed`,
+        message: "Fee estimation failed",
         error: errorMessage,
-        estimationCount: estimationCount + 1,
       });
-
-      // Reset to safe state on error
-      setFeeDetails({
-        minerFee: 0,
-        dustValue: 0,
-        totalValue: 0,
-        hasExactFees: false,
-        estimatedSize: 0,
-      });
-      console.log(
-        "🎯 useProgressiveFeeEstimation: Incrementing feeDetailsVersion (Error) from",
-        feeDetailsVersion,
-        "to",
-        feeDetailsVersion + 1,
-      );
-      setFeeDetailsVersion((prev) => prev + 1);
     } finally {
       setIsEstimating(false);
     }
-  }, debounceMs);
+  }, 300); // Fast debounce for instant estimates
+
+  // 🎯 PHASE 2: Background exact calculation with real UTXOs and connected wallet
+  // Uses dryRun=false for precise fee calculation with actual UTXO selection
+  const preFetchExactFeesDebounced = debounce(async (
+    estimationOptions: ProgressiveFeeEstimationOptions,
+  ) => {
+    // 🚨 CRITICAL: Check if minting started during debounce delay
+    // If user clicked STAMP while this was debouncing, abort to prevent interference
+    if (estimationOptions.isSubmitting) {
+      loggerService.debug("ui", {
+        message: "Background pre-fetching aborted - minting in progress",
+        toolType: estimationOptions.toolType,
+      });
+      return;
+    }
+
+    // Only pre-fetch if wallet is connected and we have required params
+    if (!estimationOptions.walletAddress || !estimationOptions.feeRate) {
+      return;
+    }
+
+    setIsPreFetching(true);
+
+    try {
+      // 🚀 PHASE 2: Exact calculation with real UTXOs and connected wallet
+      // Uses dryRun=false to get precise fees with actual UTXO selection
+      const phase2Request = buildEstimationRequest(estimationOptions, false); // dryRun=false for exact fees
+
+      const phase2Response = await feeEstimationService.estimateFees(
+        phase2Request.endpoint,
+        phase2Request.payload,
+      );
+
+      // 🚨 CRITICAL: Check again after async operation completes
+      // If minting started while we were fetching, don't update UI state
+      if (estimationOptions.isSubmitting) {
+        loggerService.debug("ui", {
+          message:
+            "Background pre-fetching result discarded - minting in progress",
+          toolType: estimationOptions.toolType,
+        });
+        return;
+      }
+
+      if (phase2Response) {
+        const exactFeeDetails: FeeDetails = {
+          minerFee: Number(phase2Response.est_miner_fee) || 0,
+          totalValue: Number(phase2Response.total_output_value) || 0,
+          dustValue: Number(phase2Response.total_dust_value) || 0,
+          hasExactFees: true, // True for real UTXO calculations (dryRun=false)
+        };
+
+        // 🎯 Update UI with exact fees (removes ~ and (est) indicators)
+        setFeeDetails(exactFeeDetails);
+        setPreFetchedFees(exactFeeDetails);
+        setFeeDetailsVersion((prev) => prev + 1);
+
+        loggerService.debug("ui", {
+          message: `Exact fee calculation completed (Phase 2)`,
+          data: {
+            toolType: estimationOptions.toolType,
+            minerFee: phase2Response.est_miner_fee,
+            dustValue: phase2Response.total_dust_value,
+            totalValue: phase2Response.total_output_value,
+            isEstimate: phase2Response.is_estimate,
+            method: phase2Response.estimation_method,
+          },
+        });
+      }
+    } catch (error) {
+      // Silent failure for background exact calculation - user still has initial estimates
+      loggerService.warn("ui", {
+        message: "Background exact fee calculation failed",
+        error: error instanceof Error ? error.message : "Unknown error",
+        walletAddress: estimationOptions.walletAddress,
+      });
+    } finally {
+      setIsPreFetching(false);
+    }
+  }, 2000); // 2-second delay for background pre-fetching
 
   // Trigger estimation when parameters change (Preact-optimized)
   useEffect(() => {
-    console.log(
-      "🔄 useProgressiveFeeEstimation: useEffect triggered with feeRate:",
-      options.feeRate,
-    );
+    // 🚀 PHASE 1: Always get instant estimates
     estimateFeesDebounced(options);
 
     // Mark cache as stale after 30 seconds
@@ -348,9 +329,7 @@ export function useProgressiveFeeEstimation(
   }, [
     options.toolType,
     options.feeRate,
-    options.walletAddress,
-    options.isConnected,
-    // Tool-specific dependencies
+    // Tool-specific dependencies for instant estimates
     options.file,
     options.filename,
     options.quantity,
@@ -368,9 +347,31 @@ export function useProgressiveFeeEstimation(
     options.jsonData,
   ]);
 
+  // 🎯 SEPARATE useEffect for background exact fee calculation
+  // Only triggers when wallet connects or core transaction params change
+  useEffect(() => {
+    // Only start exact calculation if wallet is connected
+    if (options.walletAddress && options.feeRate) {
+      preFetchExactFeesDebounced(options);
+    }
+  }, [
+    // 🎯 SMART TRIGGERS: Only wallet connection and core transaction changes
+    options.walletAddress, // Wallet connects/disconnects
+    options.toolType, // Tool type changes
+    options.file, // File changes (major transaction change)
+    options.filename, // Filename changes (major transaction change)
+    options.quantity, // Quantity changes (major transaction change)
+    // Note: Deliberately EXCLUDE feeRate to prevent constant pre-fetching on slider moves
+  ]);
+
   const refresh = () => {
     setEstimationCount((prev) => prev + 1);
     estimateFeesDebounced(options);
+
+    // Also refresh exact fees if wallet connected
+    if (options.walletAddress) {
+      preFetchExactFeesDebounced(options);
+    }
   };
 
   return {
@@ -382,6 +383,9 @@ export function useProgressiveFeeEstimation(
     lastEstimationTime,
     cacheStatus,
     feeDetailsVersion,
+    // New background pre-fetching state
+    isPreFetching,
+    preFetchedFees,
   };
 }
 
@@ -413,7 +417,9 @@ export function buildEstimationRequest(
           prefix: "stamp",
           service_fee: 0,
           isPoshStamp: isPoshStamp || false,
-          dryRun: true, // Always use dryRun for estimation
+          dryRun: isDryRun, // Use the isDryRun parameter instead of hardcoding
+          // 🎯 CRITICAL: Don't provide assetName for estimation (dryRun=true)
+          // Let the API generate a random available asset name to avoid conflicts
           ...(isDryRun ? {} : { sourceWallet: walletAddress }),
         },
       };
@@ -436,6 +442,51 @@ export function buildEstimationRequest(
       }
       // Add other SRC20 operations as needed
       throw new Error(`SRC20 operation ${operation} not implemented`);
+    }
+
+    case "src20-mint": {
+      const { tick, amt } = options;
+      return {
+        endpoint: "/api/v2/src20/mint",
+        payload: {
+          tick: tick || "",
+          amt: amt || "1",
+          satsPerVB: feeRate,
+          dryRun: isDryRun,
+          ...(isDryRun ? {} : { sourceWallet: walletAddress }),
+        },
+      };
+    }
+
+    case "src20-deploy": {
+      const { tick, max, lim, dec } = options;
+      return {
+        endpoint: "/api/v2/src20/deploy",
+        payload: {
+          tick: tick || "",
+          max: max || "21000000",
+          lim: lim || "1000",
+          dec: dec || "18",
+          satsPerVB: feeRate,
+          dryRun: isDryRun,
+          ...(isDryRun ? {} : { sourceWallet: walletAddress }),
+        },
+      };
+    }
+
+    case "src20-transfer": {
+      const { tick, amt, recipientAddress } = options;
+      return {
+        endpoint: "/api/v2/src20/transfer",
+        payload: {
+          tick: tick || "",
+          amt: amt || "1",
+          to: recipientAddress || "",
+          satsPerVB: feeRate,
+          dryRun: isDryRun,
+          ...(isDryRun ? {} : { sourceWallet: walletAddress }),
+        },
+      };
     }
 
     case "src101": {
@@ -465,7 +516,8 @@ export function buildEstimationRequest(
       };
     }
 
-    case "transfer": {
+    case "transfer":
+    case "send": {
       const { recipientAddress, asset, transferQuantity } = options;
       return {
         endpoint: "/api/v2/create/send",

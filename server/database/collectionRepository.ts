@@ -165,7 +165,7 @@ export class CollectionRepository {
     const result = await this.db.executeQueryWithCache(
       query,
       [collectionName],
-      "never",
+      60 * 10, // Cache for 10 minutes instead of never
     ) as { rows: Collection[] };
 
     return result.rows.length > 0 ? result.rows[0] : null;

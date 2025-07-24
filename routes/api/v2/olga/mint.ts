@@ -137,6 +137,8 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       // Log fee rate for debugging
       console.log("🔧 /api/v2/olga/mint: Processing with fee rate", {
         rawFeeRate: body.feeRate,
+        rawSatsPerVB: body.satsPerVB,
+        rawSatsPerKB: body.satsPerKB,
         normalizedFees,
         isDryRun: body.dryRun,
       });

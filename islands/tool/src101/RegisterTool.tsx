@@ -7,6 +7,8 @@ import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { bodyTool, containerBackground, loaderSpinGrey } from "$layout";
+import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
 import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
 import { StatusMessages, tooltipButton } from "$notification";
 import { FeeCalculatorBase } from "$section";
@@ -36,7 +38,7 @@ export function SRC101RegisterTool({
 
   /* ===== STATE MANAGEMENT ===== */
   const [tosAgreed, setTosAgreed] = useState<boolean>(false);
-  const { isConnected } = walletContext;
+  const { isConnected, wallet } = walletContext;
   const [isExist, setIsExist] = useState(true);
   const [checkStatus, setCheckStatus] = useState(false);
   const [_modalData, setModalData] = useState<SRC101Balance | null>(null);
@@ -46,6 +48,19 @@ export function SRC101RegisterTool({
   const [isTldTooltipVisible, setIsTldTooltipVisible] = useState(false);
   const [allowTldTooltip, setAllowTldTooltip] = useState(true);
   const tldTooltipTimeoutRef = useRef<number | null>(null);
+
+  /* ===== PROGRESSIVE FEE ESTIMATION ===== */
+  const {
+    feeDetails: progressiveFeeDetails,
+  } = useTransactionFeeEstimator({
+    toolType: "src101-create",
+    feeRate: isSubmitting ? 0 : formState.fee,
+    ...(wallet?.address && { walletAddress: wallet.address }),
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // SRC-101 specific parameters
+    bitname: formState.toAddress ? formState.toAddress + formState.root : "",
+  });
 
   /* ===== CLICK OUTSIDE HANDLER ===== */
   useEffect(() => {
@@ -302,6 +317,13 @@ export function SRC101RegisterTool({
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           bitname={formState.toAddress + formState.root}
+          feeDetails={mapProgressiveFeeDetails(progressiveFeeDetails) || {
+            minerFee: 0,
+            dustValue: 0,
+            totalValue: 0,
+            hasExactFees: false,
+            estimatedSize: 300,
+          }}
         />
 
         <StatusMessages

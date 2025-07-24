@@ -160,33 +160,35 @@ export class UTXOService {
 
       // If fetchFullDetails is true, we need to replace the selected UTXOs with full details
       if (fetchFullDetails) {
-        const fullUTXOs: UTXO[] = [];
+        // 🚀 OPTIMIZATION: Batch fetch all selected UTXOs at once instead of individual calls
+        logger.info("transaction-utxo-service", {
+          message: "Starting batch UTXO enrichment for selected UTXOs",
+          selectedCount: selectionResult.inputs.length,
+          utxoIds: selectionResult.inputs.map(u => `${u.txid}:${u.vout}`)
+        });
 
-        for (const selectedUtxo of selectionResult.inputs) {
-          console.log(`[UTXOService.selectUTXOsLogic] Fetching full details for buyer UTXO: ${selectedUtxo.txid}:${selectedUtxo.vout}`);
-          const fullUtxo = await this.commonUtxoService.getSpecificUTXO(
-            selectedUtxo.txid,
-            selectedUtxo.vout,
-            { includeAncestorDetails: true, confirmedOnly: false }
-          );
+        const fullUTXOs: UTXO[] = await this.batchFetchFullUTXODetails(selectionResult.inputs);
 
+        // Verify all UTXOs have required script data
+        for (const [index, fullUtxo] of fullUTXOs.entries()) {
+          const originalUtxo = selectionResult.inputs[index];
           if (!fullUtxo || !fullUtxo.script) {
             logger.error("transaction-utxo-service", {
               message: "Failed to fetch full UTXO details including script - this is required for PSBT creation",
-              txid: selectedUtxo.txid,
-              vout: selectedUtxo.vout,
+              txid: originalUtxo.txid,
+              vout: originalUtxo.vout,
               fullUtxoExists: !!fullUtxo,
               scriptExists: !!fullUtxo?.script
             });
-            // This is a critical error for PSBT creation - we cannot proceed without scripts
-            throw new Error(`Failed to fetch script (scriptPubKey) for UTXO ${selectedUtxo.txid}:${selectedUtxo.vout}. This is required for PSBT creation.`);
-          } else {
-            console.log(`[UTXOService.selectUTXOsLogic] For buyer UTXO ${selectedUtxo.txid}:${selectedUtxo.vout}, fetched fullUtxo.script (hex): ${fullUtxo.script}`);
-            fullUTXOs.push(fullUtxo);
+            throw new Error(`Failed to fetch script (scriptPubKey) for UTXO ${originalUtxo.txid}:${originalUtxo.vout}. This is required for PSBT creation.`);
           }
         }
 
         selectionResult.inputs = fullUTXOs;
+        logger.info("transaction-utxo-service", {
+          message: "Batch UTXO enrichment completed successfully",
+          enrichedCount: fullUTXOs.length
+        });
       }
 
       logger.info("transaction-utxo-service", {
@@ -214,5 +216,75 @@ export class UTXOService {
       });
       throw error;
     }
+  }
+
+  /**
+   * 🚀 OPTIMIZATION: Batch fetch full UTXO details to avoid individual API calls
+   * This replaces the inefficient loop that was making individual QuickNode calls
+   */
+  private async batchFetchFullUTXODetails(selectedUtxos: BasicUTXO[]): Promise<UTXO[]> {
+    // Group UTXOs by transaction to minimize API calls
+    const txidToUtxos = new Map<string, { vout: number; originalIndex: number }[]>();
+
+    selectedUtxos.forEach((utxo, index) => {
+      if (!txidToUtxos.has(utxo.txid)) {
+        txidToUtxos.set(utxo.txid, []);
+      }
+      txidToUtxos.get(utxo.txid)!.push({ vout: utxo.vout, originalIndex: index });
+    });
+
+    logger.info("transaction-utxo-service", {
+      message: "Batch UTXO fetch optimization",
+      totalUtxos: selectedUtxos.length,
+      uniqueTransactions: txidToUtxos.size,
+      optimizationRatio: `${selectedUtxos.length}:${txidToUtxos.size}`
+    });
+
+    // Fetch all unique transactions in parallel
+    const txFetchPromises = Array.from(txidToUtxos.keys()).map(async (txid) => {
+      const utxosInTx = txidToUtxos.get(txid)!;
+      const results: Array<{ utxo: UTXO | null; originalIndex: number }> = [];
+
+      // For each UTXO in this transaction, fetch details
+      for (const { vout, originalIndex } of utxosInTx) {
+        try {
+          const fullUtxo = await this.commonUtxoService.getSpecificUTXO(
+            txid,
+            vout,
+            { includeAncestorDetails: true, confirmedOnly: false }
+          );
+          results.push({ utxo: fullUtxo, originalIndex });
+        } catch (error) {
+          logger.error("transaction-utxo-service", {
+            message: "Error fetching individual UTXO in batch",
+            txid,
+            vout,
+            error: error instanceof Error ? error.message : String(error)
+          });
+          results.push({ utxo: null, originalIndex });
+        }
+      }
+
+      return results;
+    });
+
+    // Wait for all transactions to be fetched
+    const allResults = await Promise.all(txFetchPromises);
+
+    // Flatten and sort results back to original order
+    const flatResults = allResults.flat();
+    flatResults.sort((a, b) => a.originalIndex - b.originalIndex);
+
+    // Extract UTXOs in original order
+    const fullUTXOs = flatResults.map(result => result.utxo).filter((utxo): utxo is UTXO => utxo !== null);
+
+    logger.info("transaction-utxo-service", {
+      message: "Batch UTXO fetch completed",
+      requested: selectedUtxos.length,
+      successful: fullUTXOs.length,
+      failed: selectedUtxos.length - fullUTXOs.length
+    });
+
+    return fullUTXOs;
   }
 }

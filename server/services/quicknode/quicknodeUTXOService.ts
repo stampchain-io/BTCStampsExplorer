@@ -1,8 +1,8 @@
 import { UTXO } from "$lib/types/index.d.ts";
-import { CachedQuicknodeRPCService } from "$server/services/quicknode/cachedQuicknodeRpcService.ts";
-import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts"; // Import for conversion
-import { address as bjsAddress, networks as bjsNetworks } from "bitcoinjs-lib"; // For toOutputScript & network
 import { bytesToHex } from "$lib/utils/binary/baseUtils.ts"; // For logging/comparison
+import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts"; // Import for conversion
+import { CachedQuicknodeRPCService } from "$server/services/quicknode/cachedQuicknodeRpcService.ts";
+import { address as bjsAddress, networks as bjsNetworks } from "bitcoinjs-lib"; // For toOutputScript & network
 
 // TODO(@baba): Utilize as primary utxo fetching source from utxoService
 
@@ -73,7 +73,6 @@ export class QuicknodeUTXOService {
     vout: number,
     includeAncestors = false,
   ): Promise<SingleUTXOResponse> {
-    console.log(`[QN_UTXO_V6.1_STRICT_FALLBACK] Called for: ${txid}:${vout}`);
     const network = bjsNetworks.bitcoin;
     try {
       const txResponse = await CachedQuicknodeRPCService.executeRPC<QuickNodeTxSpecific>("bb_getTxSpecific", [txid]);
@@ -92,7 +91,6 @@ export class QuicknodeUTXOService {
       const outputDetail = tx.vout[vout];
       const qnProvidedHex = outputDetail.scriptPubKey?.hex?.toLowerCase();
       const qnProvidedAddress = outputDetail.scriptPubKey?.address;
-      console.log(`[QN_UTXO_V6.1] For ${txid}:${vout} - QN Raw Data: scriptHex='${qnProvidedHex}', address='${qnProvidedAddress}'`);
 
       let finalScriptHex: string | undefined;
 
@@ -100,7 +98,6 @@ export class QuicknodeUTXOService {
         let derivedScriptHex: string | undefined;
         try {
           derivedScriptHex = bytesToHex(bjsAddress.toOutputScript(qnProvidedAddress, network)).toLowerCase();
-          console.log(`[QN_UTXO_V6.1] Derived script from QN address '${qnProvidedAddress}' -> ${derivedScriptHex}`);
         } catch (e) {
           console.error(`[QN_UTXO_V6.1] Error deriving script from QN address '${qnProvidedAddress}': ${(e as Error).message}`);
           // derivedScriptHex remains undefined, proceed to check qnProvidedHex
@@ -113,11 +110,9 @@ export class QuicknodeUTXOService {
           }
           // Consistent, or derivation failed so we trust QN hex, or no address to compare against.
           finalScriptHex = qnProvidedHex;
-          console.log(`[QN_UTXO_V6.1] Using QN-provided hex (verified if address was present & derivation succeeded): ${finalScriptHex}`);
         } else if (derivedScriptHex) {
           // No QN hex, but derived from address is available
           finalScriptHex = derivedScriptHex;
-          console.log(`[QN_UTXO_V6.1] No QN hex, using script derived from QN address: ${finalScriptHex}`);
         } else {
           // No QN hex, and address either wasn't there or derivation failed.
           return { error: `Cannot determine script for ${txid}:${vout} from QN (no hex, and address unusable).` };
@@ -125,7 +120,6 @@ export class QuicknodeUTXOService {
       } else if (qnProvidedHex && qnProvidedHex.length > 0) {
         // No QN address, only QN hex. Trust QN hex.
         finalScriptHex = qnProvidedHex;
-        console.log(`[QN_UTXO_V6.1] No QN address, using QN-provided hex: ${finalScriptHex}`);
       } else {
         return { error: `Neither script hex nor address from QN for ${txid}:${vout}.` };
       }
@@ -133,14 +127,14 @@ export class QuicknodeUTXOService {
       if (!finalScriptHex || finalScriptHex.length === 0) {
          return { error: `Script for UTXO ${txid}:${vout} could not be resolved.` };
       }
-      
+
       const valueInSatoshis = Math.round(outputDetail.value * SATOSHIS_PER_BTC);
       const utxoToReturn: UTXO = {
         txid, vout, value: valueInSatoshis, script: finalScriptHex,
         ...(tx.ancestorcount !== undefined && { ancestorCount: tx.ancestorcount }),
         ...(tx.ancestorsize !== undefined && { ancestorSize: tx.ancestorsize }),
         ...(tx.ancestorfees !== undefined && { ancestorFees: tx.ancestorfees }),
-        vsize: tx.vsize, 
+        vsize: tx.vsize,
         weight: tx.weight
       };
       if (includeAncestors && tx.vin && tx.vin.length > 0) {
@@ -149,12 +143,11 @@ export class QuicknodeUTXOService {
             fees: tx.fee || 0, vsize: tx.vsize,
             effectiveRate: tx.fee_rate || (tx.fee && tx.vsize ? tx.fee / tx.vsize : 0),
             txid: tx.txid, vout, weight: tx.weight, size: tx.size,
-            scriptType: outputDetail.scriptPubKey.type, 
-            sequence: firstInput?.sequence, 
+            scriptType: outputDetail.scriptPubKey.type,
+            sequence: firstInput?.sequence,
             blockHeight: tx.height || 0, confirmations: tx.confirmations,
         };
       }
-      console.log(`[QN_UTXO_V6.1] RETURNING for ${txid}:${vout}: script=${utxoToReturn.script}, value=${utxoToReturn.value}, type=${utxoToReturn.scriptType}`);
       return { data: utxoToReturn };
     } catch (error) {
       console.error(`[QN_UTXO_V6.1] CATCH BLOCK Error for ${txid}:${vout}:`, error);
@@ -165,7 +158,7 @@ export class QuicknodeUTXOService {
   static async getUTXOs(address: string, options: UTXOOptions = {}): Promise<{ data?: Pick<UTXO, 'txid' | 'vout' | 'value'>[]; error?: string }> {
     try {
       const basicUtxosResult = await this.fetchBasicUTXOs(address, options);
-      
+
       if ("error" in basicUtxosResult && basicUtxosResult.error) {
         return { error: basicUtxosResult.error };
       }
@@ -177,10 +170,10 @@ export class QuicknodeUTXOService {
   }
 
   private static async fetchBasicUTXOs(address: string, options: UTXOOptions): Promise<{ data?: Pick<UTXO, 'txid' | 'vout' | 'value'>[]; error?: string }> {
-    const params = [address, { confirmed: options.confirmedOnly }]; 
-    
+    const params = [address, { confirmed: options.confirmedOnly }];
+
     const response = await CachedQuicknodeRPCService.executeRPC<QuickNodeUTXO[]>(
-      "bb_getUTXOs", 
+      "bb_getUTXOs",
       params,
       this.CACHE_DURATION
     );
@@ -228,4 +221,4 @@ export class QuicknodeUTXOService {
   // Add method to fetch witness information when needed
 // ... existing code ...
 
-} 
+}

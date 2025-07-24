@@ -13,103 +13,20 @@ import { Buffer } from "node:buffer";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { UTXOService } from "$server/services/transaction/utxoService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
 import { normalizeFeeRate } from "$server/services/xcpService.ts";
 import type { UTXO } from "$types/index.d.ts";
 
 export class StampMintService {
   private static commonUtxoService = new CommonUTXOService();
+  private static utxoService = new UTXOService(); // Add UTXOService instance
 
   /**
-   * Simplified UTXO selection that gets full details upfront
+   * 🚀 REMOVED: getFullUTXOsWithDetails method - replaced with optimal UTXOService pattern
+   * OLD INEFFICIENT PATTERN: Fetch full details for ALL UTXOs before selection
+   * NEW OPTIMAL PATTERN: Fetch basic UTXOs → Select optimal → Fetch full details for selected only
    */
-  private static async getFullUTXOsWithDetails(
-    address: string,
-    filterStampUTXOs: boolean = true,
-    excludeUtxos: Array<{ txid: string; vout: number }> = []
-  ): Promise<UTXO[]> {
-    logger.debug("stamp-create", {
-      message: "Fetching full UTXOs with details upfront",
-      address,
-      filterStampUTXOs,
-      excludeUtxos: excludeUtxos.length
-    });
-
-    // Get basic UTXOs first
-    let basicUtxos = await this.commonUtxoService.getSpendableUTXOs(address, undefined, {
-      includeAncestorDetails: true,
-      confirmedOnly: false
-    });
-
-    // Apply exclusions
-    if (excludeUtxos.length > 0) {
-      const excludeSet = new Set(excludeUtxos.map(u => `${u.txid}:${u.vout}`));
-      basicUtxos = basicUtxos.filter(utxo => !excludeSet.has(`${utxo.txid}:${utxo.vout}`));
-    }
-
-    // Filter stamp UTXOs if requested
-    if (filterStampUTXOs) {
-      try {
-        const stampBalances = await XcpManager.getXcpBalancesByAddress(address, undefined, true);
-        const utxosToExcludeFromStamps = new Set<string>();
-        for (const balance of stampBalances.balances) {
-          if (balance.utxo) {
-            utxosToExcludeFromStamps.add(balance.utxo);
-          }
-        }
-        basicUtxos = basicUtxos.filter(
-          (utxo) => !utxosToExcludeFromStamps.has(`${utxo.txid}:${utxo.vout}`),
-        );
-      } catch (error) {
-        logger.error("stamp-create", {
-          message: "Error filtering stamp UTXOs",
-          address,
-          error: (error as any).message
-        });
-      }
-    }
-
-    // Now get full details for all UTXOs upfront
-    const fullUTXOs: UTXO[] = [];
-    for (const basicUtxo of basicUtxos) {
-      try {
-        const fullUtxo = await this.commonUtxoService.getSpecificUTXO(
-          basicUtxo.txid,
-          basicUtxo.vout,
-          { includeAncestorDetails: true, confirmedOnly: false }
-        );
-
-        if (fullUtxo && fullUtxo.script) {
-          fullUTXOs.push(fullUtxo);
-        } else {
-          logger.warn("stamp-create", {
-            message: "Skipping UTXO with missing script",
-            txid: basicUtxo.txid,
-            vout: basicUtxo.vout,
-            hasFullUtxo: !!fullUtxo,
-            hasScript: !!fullUtxo?.script
-          });
-        }
-      } catch (error) {
-        logger.warn("stamp-create", {
-          message: "Failed to fetch full UTXO details",
-          txid: basicUtxo.txid,
-          vout: basicUtxo.vout,
-          error: (error as any).message
-        });
-      }
-    }
-
-    logger.info("stamp-create", {
-      message: "Full UTXOs fetched",
-      basicUtxosCount: basicUtxos.length,
-      fullUtxosCount: fullUTXOs.length,
-      skippedCount: basicUtxos.length - fullUTXOs.length
-    });
-
-    return fullUTXOs;
-  }
 
   static async createStampIssuance({
     sourceWallet,
@@ -119,34 +36,46 @@ export class StampMintService {
     divisible = false,
     filename,
     file,
-    satsPerKB,
     satsPerVB,
-    service_fee,
-    service_fee_address,
-    prefix,
-    isDryRun,
+    service_fee = 0,
+    service_fee_address = "",
+    prefix = "stamp",
+    isDryRun = false
   }: {
     sourceWallet: string;
-    assetName: string;
-    qty: number;
-    locked: boolean;
-    divisible: boolean;
+    assetName?: string;
+    qty: string;
+    locked?: boolean;
+    divisible?: boolean;
     filename: string;
     file: string;
-    satsPerKB?: number;
     satsPerVB?: number;
-    service_fee: number;
-    service_fee_address: string;
-    prefix: "stamp" | "file" | "glyph";
+    service_fee?: number;
+    service_fee_address?: string;
+    prefix?: "stamp" | "file" | "glyph";
     isDryRun?: boolean;
   }) {
     // Validate and normalize fee rate
-    const { normalizedSatsPerVB, normalizedSatsPerKB } = normalizeFeeRate({
-      ...(satsPerKB !== undefined && { satsPerKB }),
+    const { normalizedSatsPerVB } = normalizeFeeRate({
       ...(satsPerVB !== undefined && { satsPerVB }),
     });
 
-    logger.info("stamp-create", { message: "Starting createStampIssuance with params", sourceWallet, assetName, qty, locked, divisible, filename, fileSize: Math.ceil((file.length * 3) / 4), providedSatsPerKB: satsPerKB, providedSatsPerVB: satsPerVB, normalizedSatsPerVB, service_fee, service_fee_address, prefix, isDryRun });
+    logger.info("stamp-create", {
+      message: "Starting createStampIssuance with params",
+      sourceWallet,
+      assetName,
+      qty,
+      locked,
+      divisible,
+      filename,
+      fileSize: Math.ceil((file.length * 3) / 4),
+      providedSatsPerVB: satsPerVB,
+      normalizedSatsPerVB,
+      service_fee,
+      service_fee_address,
+      prefix,
+      isDryRun
+    });
 
     try {
       // Validate source wallet
@@ -165,14 +94,17 @@ export class StampMintService {
 
       logger.info("stamp-create", { message: "Starting createStampIssuance" });
 
+      // Convert qty from string to number if needed
+      const qtyNumber = typeof qty === 'string' ? parseInt(qty, 10) : qty;
+
       const result = await this.createIssuanceTransaction({
         sourceWallet,
-        assetName,
-        qty,
+        assetName: assetName || "", // Provide default empty string for undefined assetName
+        qty: qtyNumber,
         locked,
         divisible,
         description: "stamp:",
-        satsPerKB: normalizedSatsPerKB,
+        satsPerKB: Math.floor(normalizedSatsPerVB * 1000), // Convert sats/vB to sats/kB and ensure integer
         isDryRun: isDryRun || false,
         file, // Pass file data for accurate size calculation
         service_fee,
@@ -250,6 +182,56 @@ export class StampMintService {
 
     try {
       logger.debug("stamp-create", { message: "Starting PSBT generation with params", address, satsPerVB, service_fee, recipient_fee, cip33AddressCount: cip33Addresses.length, fileSize });
+
+      // For dryRun, return mock PSBT data immediately to avoid unnecessary transaction parsing
+      if (isDryRun) {
+        logger.info("stamp-create", { message: "DryRun mode: returning mock PSBT data", address, fileSize, cip33AddressCount: cip33Addresses.length });
+
+        // Calculate dust value for CIP33 addresses
+        totalDustValue = cip33Addresses.length * TX_CONSTANTS.DUST_SIZE;
+
+        // Calculate accurate estimated size based on transaction structure
+        const dryRunEstimatedSize = estimateTransactionSize({
+          inputs: [{
+            type: "P2WPKH" as ScriptType, // Assume P2WPKH input for estimation
+            isWitness: true
+          }],
+          outputs: [
+            { type: "OP_RETURN" as ScriptType }, // OP_RETURN
+            ...cip33Addresses.map(() => ({
+              type: "P2WSH" as ScriptType
+            })),
+            ...(service_fee > 0 ? [{ type: "P2WPKH" as ScriptType }] : []) // service fee if applicable
+          ],
+          includeChangeOutput: true,
+          changeOutputType: "P2WPKH" as ScriptType
+        });
+
+        const estimatedFee = Math.ceil(dryRunEstimatedSize * satsPerVB);
+
+        // FIXED: Include miner fee in total output value for accurate estimation display
+        totalOutputValue = totalDustValue + service_fee + estimatedFee;
+
+        return {
+          psbt: new bitcoin.Psbt({ network: bitcoin.networks.bitcoin }), // Empty PSBT for dryRun
+          inputs: [{
+            txid: "mock_txid_for_estimation",
+            vout: 0,
+            value: totalOutputValue + estimatedFee + 10000, // Mock sufficient input
+            address: address,
+            script: "mock_script"
+          }],
+          vouts: [], // Empty for dryRun
+          totalOutputValue,
+          totalInputValue: totalOutputValue + estimatedFee + 10000,
+          estimatedTxSize: dryRunEstimatedSize,
+          estMinerFee: estimatedFee,
+          totalDustValue,
+          actualExactFeeNeeded: estimatedFee,
+          totalChangeOutput: 10000 - (estimatedFee % 10000), // Mock change
+          feeRate: satsPerVB
+        };
+      }
 
       psbt = new bitcoin.Psbt({ network: bitcoin.networks.bitcoin });
 
@@ -366,79 +348,41 @@ export class StampMintService {
         ...(vout.address && { address: vout.address })
       }));
 
-      // For dryRun, return mock PSBT data to avoid UTXO lookup
-      if (isDryRun) {
-        logger.info("stamp-create", { message: "DryRun mode: returning mock PSBT data", address, fileSize, totalOutputValue, cip33AddressCount: cip33Addresses.length, vouts: vouts.length });
+      // 🚀 OPTIMIZATION: Use optimal UTXO selection pattern instead of fetching all details upfront
+      logger.debug("stamp-create", {
+        message: "Using optimal UTXO selection pattern",
+        outputsForSelection: outputsForSelection.length,
+        satsPerVB: satsPerVB
+      });
 
-        // Calculate accurate estimated size based on transaction structure
-        // Use the same logic as the real calculation but with mock input assumptions
-        const dryRunEstimatedSize = estimateTransactionSize({
-          inputs: [{
-            type: "P2WPKH" as ScriptType, // Assume P2WPKH input for estimation
-            isWitness: true
-          }],
-          outputs: [
-            { type: "OP_RETURN" as ScriptType }, // OP_RETURN
-            ...cip33Addresses.map(() => ({
-              type: "P2WSH" as ScriptType
-            })),
-            { type: "P2WPKH" as ScriptType } // service fee
-          ],
-          includeChangeOutput: true,
-          changeOutputType: "P2WPKH" as ScriptType
-        });
-
-        const estimatedFee = Math.ceil(dryRunEstimatedSize * satsPerVB);
-
-        return {
-          psbt: psbt, // Proper PSBT object for non-dryRun cases
-          inputs: [{
-            txid: "mock_txid_for_estimation",
-            vout: 0,
-            value: totalOutputValue + estimatedFee + 10000, // Mock sufficient input
-            address: address,
-            script: "mock_script"
-          }],
-          vouts,
-          totalOutputValue,
-          totalInputValue: totalOutputValue + estimatedFee + 10000,
-          estimatedTxSize: dryRunEstimatedSize,
-          estMinerFee: estimatedFee,
-          totalDustValue,
-          actualExactFeeNeeded: estimatedFee,
-          totalChangeOutput: 10000 - (estimatedFee % 10000), // Mock change
-          feeRate: satsPerVB
-        };
-      }
-
-      // Get full UTXOs with details first
-      const fullUTXOs = await this.getFullUTXOsWithDetails(address, true, []);
-
-      if (fullUTXOs.length === 0) {
-        throw new Error("No UTXOs available for stamp minting");
-      }
-
-      // Use optimal UTXO selection
-      const selectionResult = OptimalUTXOSelection.selectUTXOs(
-        fullUTXOs,
+      // Use UTXOService for optimal UTXO selection with full details
+      const selectionResult = await this.utxoService.selectUTXOsForTransaction(
+        address,
         outputsForSelection,
         satsPerVB,
+        0, // sigops_rate
+        1.5, // rbfBuffer
         {
-          avoidChange: true,
-          consolidationMode: false,
-          dustThreshold: 1000
+          filterStampUTXOs: true, // Filter out stamp-bearing UTXOs
+          includeAncestors: true,  // Get full details for selected UTXOs only
         }
       );
 
       const { inputs, change: initialChange } = selectionResult;
       const totalInputValue = inputs.reduce((sum: number, input: UTXO) => sum + input.value, 0);
 
-      logger.debug("stamp-create", { message: "UTXO selection results", inputCount: inputs.length, totalInputValue, initialChange, inputDetails: inputs.map((input: UTXO) => ({
-        value: input.value,
-        hasAncestor: !!input.ancestor,
-        ancestorFees: input.ancestor?.fees,
-        ancestorVsize: input.ancestor?.vsize
-      })) });
+      logger.debug("stamp-create", {
+        message: "Optimal UTXO selection completed",
+        inputCount: inputs.length,
+        totalInputValue,
+        initialChange,
+        inputDetails: inputs.map((input: UTXO) => ({
+          value: input.value,
+          hasAncestor: !!input.ancestor,
+          ancestorFees: input.ancestor?.fees,
+          ancestorVsize: input.ancestor?.vsize
+        }))
+      });
 
       // Recalculate the exact fee with the actual number of inputs selected
       actualEstimatedSize = estimateTransactionSize({

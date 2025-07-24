@@ -11,9 +11,16 @@ import {
   containerRowForm,
   loaderSpinGrey,
 } from "$layout";
+import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
+import type { ToolEstimationParams } from "$lib/types/fee-estimation.ts";
 import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import {
+  extractSRC20ErrorMessage,
+  TokenAlreadyExistsError,
+  validateDeploymentParams,
+} from "$lib/utils/src20/errorHandling.tsx";
 import { StatusMessages, tooltipButton, tooltipImage } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
@@ -54,7 +61,33 @@ export function SRC20DeployTool(
   const uploadTooltipTimeoutRef = useRef<number | null>(null);
   const toggleTooltipTimeoutRef = useRef<number | null>(null);
   const [tooltipText, setTooltipText] = useState("OPTIONAL FIELDS");
-  const { isConnected } = walletContext;
+  const { isConnected, wallet } = walletContext;
+
+  /* ===== PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
+  const {
+    feeDetails: progressiveFeeDetails,
+    isEstimating,
+    feeDetailsVersion,
+    isPreFetching,
+    estimateExact,
+    phase1Result,
+    phase2Result,
+    phase3Result,
+    currentPhase,
+    error: feeEstimationError,
+    clearError,
+  } = useTransactionFeeEstimator({
+    toolType: "src20-deploy",
+    feeRate: isSubmitting ? 0 : formState.fee,
+    walletAddress: wallet?.address,
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // SRC-20 deploy specific parameters
+    tick: formState.token,
+    max: formState.max,
+    lim: formState.lim,
+    dec: formState.dec,
+  });
 
   /* ===== FILE HANDLING ===== */
   const handleFileChange = (e: Event) => {
@@ -489,14 +522,24 @@ export function SRC20DeployTool(
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           bitname=""
-          feeDetails={formState.psbtFees
+          feeDetails={progressiveFeeDetails
             ? {
-              minerFee: formState.psbtFees.estMinerFee,
-              dustValue: formState.psbtFees.totalDustValue,
-              totalValue: formState.psbtFees.totalValue,
-              hasExactFees: formState.psbtFees.hasExactFees,
+              minerFee: progressiveFeeDetails.minerFee || 0,
+              dustValue: progressiveFeeDetails.dustValue || 0,
+              totalValue: progressiveFeeDetails.totalValue || 0,
+              hasExactFees: progressiveFeeDetails.hasExactFees || false,
+              est_tx_size: progressiveFeeDetails.estimatedSize || 300,
             }
             : undefined}
+          // Progressive fee estimation status props
+          isEstimating={isEstimating}
+          isPreFetching={isPreFetching}
+          currentPhase={currentPhase}
+          phase1Result={phase1Result}
+          phase2Result={phase2Result}
+          phase3Result={phase3Result}
+          feeEstimationError={feeEstimationError}
+          clearError={clearError}
         />
 
         <StatusMessages

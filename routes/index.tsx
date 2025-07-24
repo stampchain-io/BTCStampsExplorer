@@ -101,7 +101,7 @@ export const handler: Handlers<HomePageData> = {
           const result = await Promise.race([
             fetchFn(),
             new Promise((_, reject) =>
-              setTimeout(() => reject(new Error(`${name} timeout`)), 12000)
+              setTimeout(() => reject(new Error(`${name} timeout`)), 30000)
             ),
           ]);
           console.log(`[HOMEPAGE] ${name} completed successfully`);

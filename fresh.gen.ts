@@ -24,6 +24,7 @@ import * as $api_internal_monitoring from "./routes/api/internal/monitoring.ts";
 import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
 import * as $api_internal_stamp_recent_sales from "./routes/api/internal/stamp-recent-sales.ts";
 import * as $api_internal_test_reset_circuit_breakers from "./routes/api/internal/test-reset-circuit-breakers.ts";
+import * as $api_internal_utxoquery from "./routes/api/internal/utxoquery.ts";
 import * as $api_proxy_arweave_path_ from "./routes/api/proxy/arweave/[...path].ts";
 import * as $api_proxy_ordinals_path_ from "./routes/api/proxy/ordinals/[...path].ts";
 import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
@@ -89,7 +90,6 @@ import * as $api_v2_trx_complete_psbt from "./routes/api/v2/trx/complete_psbt.ts
 import * as $api_v2_trx_create_psbt from "./routes/api/v2/trx/create_psbt.ts";
 import * as $api_v2_trx_stampattach from "./routes/api/v2/trx/stampattach.ts";
 import * as $api_v2_trx_stampdetach from "./routes/api/v2/trx/stampdetach.ts";
-import * as $api_v2_trx_utxoquery from "./routes/api/v2/trx/utxoquery.ts";
 import * as $api_v2_utxo_ancestors_address_ from "./routes/api/v2/utxo/ancestors/[address].ts";
 import * as $api_v2_versions_changelog from "./routes/api/v2/versions/changelog.ts";
 import * as $api_v2_versions_index from "./routes/api/v2/versions/index.ts";
@@ -287,6 +287,7 @@ import * as $table_UploadImageTable from "./islands/table/UploadImageTable.tsx";
 import * as $table_index from "./islands/table/index.ts";
 import * as $tool_StatusMessages from "./islands/tool/StatusMessages.tsx";
 import * as $tool_fairmint_FairmintTool from "./islands/tool/fairmint/FairmintTool.tsx";
+import * as $tool_fairmint_FairmintToolStyles from "./islands/tool/fairmint/FairmintToolStyles.tsx";
 import * as $tool_index from "./islands/tool/index.ts";
 import * as $tool_src101_RegisterTool from "./islands/tool/src101/RegisterTool.tsx";
 import * as $tool_src20_DeployTool from "./islands/tool/src20/DeployTool.tsx";
@@ -325,6 +326,7 @@ const manifest = {
       $api_internal_stamp_recent_sales,
     "./routes/api/internal/test-reset-circuit-breakers.ts":
       $api_internal_test_reset_circuit_breakers,
+    "./routes/api/internal/utxoquery.ts": $api_internal_utxoquery,
     "./routes/api/proxy/arweave/[...path].ts": $api_proxy_arweave_path_,
     "./routes/api/proxy/ordinals/[...path].ts": $api_proxy_ordinals_path_,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
@@ -412,7 +414,6 @@ const manifest = {
     "./routes/api/v2/trx/create_psbt.ts": $api_v2_trx_create_psbt,
     "./routes/api/v2/trx/stampattach.ts": $api_v2_trx_stampattach,
     "./routes/api/v2/trx/stampdetach.ts": $api_v2_trx_stampdetach,
-    "./routes/api/v2/trx/utxoquery.ts": $api_v2_trx_utxoquery,
     "./routes/api/v2/utxo/ancestors/[address].ts":
       $api_v2_utxo_ancestors_address_,
     "./routes/api/v2/versions/changelog.ts": $api_v2_versions_changelog,
@@ -648,6 +649,8 @@ const manifest = {
     "./islands/table/index.ts": $table_index,
     "./islands/tool/StatusMessages.tsx": $tool_StatusMessages,
     "./islands/tool/fairmint/FairmintTool.tsx": $tool_fairmint_FairmintTool,
+    "./islands/tool/fairmint/FairmintToolStyles.tsx":
+      $tool_fairmint_FairmintToolStyles,
     "./islands/tool/index.ts": $tool_index,
     "./islands/tool/src101/RegisterTool.tsx": $tool_src101_RegisterTool,
     "./islands/tool/src20/DeployTool.tsx": $tool_src20_DeployTool,
