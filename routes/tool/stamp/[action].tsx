@@ -51,7 +51,7 @@ export default function ToolStampPage(
     console.log("Rendering Content for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
-        return <StampSendTool trxType={trxType} />;
+        return <StampSendTool />;
       default:
         return <div>No content available for this tab.</div>;
     }

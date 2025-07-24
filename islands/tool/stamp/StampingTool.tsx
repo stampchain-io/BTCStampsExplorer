@@ -10,7 +10,8 @@ import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { bodyTool, containerBackground, containerRowForm } from "$layout";
 import { useFees } from "$lib/hooks/useFees.ts";
-import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
+
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
@@ -291,7 +292,7 @@ function StampingToolMain({ config }: { config: Config }) {
     currentPhase,
     error: feeEstimationError,
     clearError,
-  } = useTransactionFeeEstimator({
+  } = useTransactionConstructionService({
     toolType: "stamp",
     feeRate: isSubmitting ? 0 : fee, // Disable by setting feeRate to 0 during submission
     walletAddress: wallet?.address || "", // Provide empty string instead of undefined

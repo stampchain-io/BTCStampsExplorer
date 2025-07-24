@@ -1,7 +1,6 @@
 /* ===== SEND TOOL COMPONENT ===== */
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { ProgressiveFeeStatusIndicator } from "$fee";
 import { inputField, inputFieldSquare } from "$form";
 import type { StampRow } from "$globals";
 import { Icon } from "$icon";
@@ -14,8 +13,7 @@ import {
   loaderSpinGrey,
   rowForm,
 } from "$layout";
-import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import { JSX } from "preact";
@@ -72,21 +70,20 @@ export function StampSendTool() {
 
   /* ===== 🚀 PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
   const {
-    feeDetails: progressiveFeeDetails,
-    isEstimating,
-    feeDetailsVersion,
+    getBestEstimate,
     isPreFetching,
-    estimateExact,
-    phase1Result,
-    phase2Result,
-    phase3Result,
+    estimateExact, // Phase 3: Exact estimation before sending
+    // Phase-specific results for UI indicators
+    phase1,
+    phase2,
+    phase3,
     currentPhase,
     error: feeEstimationError,
     clearError,
-  } = useTransactionFeeEstimator({
-    toolType: "send",
+  } = useTransactionConstructionService({
+    toolType: "stamp",
     feeRate: isSubmitting ? 0 : formState.fee,
-    walletAddress: wallet?.address,
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
     isConnected: !!wallet && !isSubmitting,
     isSubmitting,
     // Stamp send specific parameters
@@ -94,6 +91,43 @@ export function StampSendTool() {
     transferQuantity: quantity,
     recipientAddress: formState.recipientAddress || "",
   });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes) - StampingTool pattern
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates - StampingTool pattern
+  useEffect(() => {
+    // Clear exact fee details when fee rate changes so slider updates work
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  // Wrapper function for sending that gets exact fees first - StampingTool pattern
+  const handleSendWithExactFees = async () => {
+    try {
+      // Get exact fees before final submission
+      const exactFees = await estimateExact();
+      if (exactFees) {
+        // Calculate net spend amount (matches wallet display)
+        const netSpendAmount = exactFees.totalValue || 0;
+        setExactFeeDetails({
+          ...exactFees,
+          totalValue: netSpendAmount, // Matches wallet
+        });
+      }
+
+      // Call the original transfer submission
+      await handleTransferSubmit();
+    } catch (error) {
+      console.error("SENDTOOL: Error in exact fee estimation", error);
+      // Still proceed with submission even if exact fees fail
+      await handleTransferSubmit();
+    }
+  };
 
   /* ===== EFFECTS ===== */
   // Fetch stamps effect
@@ -149,9 +183,9 @@ export function StampSendTool() {
 
   // Progressive fee estimation effect
   useEffect(() => {
-    // This useEffect is no longer needed as the fee estimation is handled by useTransactionFeeEstimator
+    // This useEffect is no longer needed as the fee estimation is handled by useTransactionConstructionService
     // However, we keep it to ensure the formState.fee is updated correctly if the user changes it.
-    // The useTransactionFeeEstimator will re-trigger this effect if feeRate changes.
+    // The useTransactionConstructionService will re-trigger this effect if feeRate changes.
   }, [formState.fee]);
 
   // Reset loading state when selected stamp changes
@@ -465,18 +499,7 @@ export function StampSendTool() {
         aria-label="Send stamp"
         novalidate
       >
-        {/* Progressive Fee Status Indicator */}
-        <ProgressiveFeeStatusIndicator
-          isConnected={!!wallet}
-          isSubmitting={isSubmitting}
-          currentPhase={currentPhase}
-          phase1Result={phase1Result}
-          phase2Result={phase2Result}
-          phase3Result={phase3Result}
-          isPreFetching={isPreFetching}
-          feeEstimationError={feeEstimationError}
-          clearError={clearError}
-        />
+        {/* Progressive Fee Status Indicator removed - using simplified approach */}
         <div class={`${containerRowForm} mb-5`}>
           <div class={imagePreviewTool}>
             {renderStampContent()}
@@ -543,7 +566,7 @@ export function StampSendTool() {
             console.log(
               "FEE_CALCULATOR_SUBMIT (SendTool): onSubmit triggered!",
             );
-            handleTransferSubmit();
+            handleSendWithExactFees();
           }}
           buttonName={wallet?.address ? "SEND" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
@@ -555,17 +578,140 @@ export function StampSendTool() {
             stamp: selectedStamp?.stamp?.toString() || "",
             editions: quantity || 0,
           }}
-          feeDetails={mapProgressiveFeeDetails(progressiveFeeDetails)}
-          // Progressive fee estimation status props
-          isEstimating={isEstimating}
-          isPreFetching={isPreFetching}
-          currentPhase={currentPhase}
-          phase1Result={phase1Result}
-          phase2Result={phase2Result}
-          phase3Result={phase3Result}
-          feeEstimationError={feeEstimationError}
-          clearError={clearError}
+          feeDetails={(exactFeeDetails || progressiveFeeDetails)
+            ? {
+              minerFee: (exactFeeDetails || progressiveFeeDetails)?.minerFee ||
+                0,
+              dustValue: 0, // Send transactions use OP_RETURN encoding, no dust outputs created
+              totalValue:
+                (exactFeeDetails || progressiveFeeDetails)?.totalValue || 0,
+              hasExactFees:
+                (exactFeeDetails || progressiveFeeDetails)?.hasExactFees ||
+                false,
+              estimatedSize: 300, // Default transaction size for stamp sends
+            }
+            : {
+              minerFee: 0,
+              dustValue: 0, // Send transactions use OP_RETURN encoding, no dust outputs created
+              totalValue: 0,
+              hasExactFees: false,
+              estimatedSize: 300,
+            }}
+          // Progressive fee estimation status props removed - using simplified approach
         />
+
+        {/* 🚀 Three-Phase Fee Estimation Status Indicator */}
+        <div className="absolute top-3 right-3 z-10">
+          {/* Phase 2: Smart UTXO-based estimation (background pre-fetching) */}
+          {isPreFetching && (
+            <div className="flex items-center gap-2 bg-stamp-grey-darker/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-stamp-grey-light/10 mb-2">
+              <div className="relative">
+                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse">
+                </div>
+                <div className="absolute inset-0 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping opacity-20">
+                </div>
+              </div>
+              <span className="hidden sm:inline text-xs text-stamp-grey-light font-normal opacity-80">
+                Smart UTXO analysis
+              </span>
+              <span className="inline sm:hidden text-blue-400 text-xs opacity-80">
+                💡
+              </span>
+            </div>
+          )}
+
+          {/* Phase 3: Exact estimation (during sending) */}
+          {isSubmitting && currentPhase === "exact" && (
+            <div className="flex items-center gap-2 bg-green-900/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-green-500/20 mb-2">
+              <div className="relative">
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse">
+                </div>
+                <div className="absolute inset-0 w-1.5 h-1.5 bg-green-400 rounded-full animate-ping opacity-20">
+                </div>
+              </div>
+              <span className="hidden sm:inline text-xs text-green-300 font-normal opacity-90">
+                Exact fee calculation
+              </span>
+              <span className="inline sm:hidden text-green-400 text-xs opacity-80">
+                🎯
+              </span>
+            </div>
+          )}
+
+          {/* Phase Status Summary - Always visible when connected */}
+          {wallet?.address && !isSubmitting && (
+            <div className="flex items-center gap-2 bg-stamp-grey-darker/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-stamp-grey-light/10">
+              {/* Phase indicators */}
+              <div className="flex items-center gap-1">
+                {/* Phase 1: Instant */}
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    phase1 ? "bg-green-400" : "bg-stamp-grey-light/30"
+                  }`}
+                  title="Phase 1: Instant estimate"
+                >
+                </div>
+
+                {/* Phase 2: Smart */}
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    phase2
+                      ? "bg-blue-400"
+                      : currentPhase === "smart" || isPreFetching
+                      ? "bg-blue-400 animate-pulse"
+                      : "bg-stamp-grey-light/30"
+                  }`}
+                  title="Phase 2: Smart UTXO estimate"
+                >
+                </div>
+
+                {/* Phase 3: Exact */}
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    phase3 ? "bg-green-500" : "bg-stamp-grey-light/30"
+                  }`}
+                  title="Phase 3: Exact calculation"
+                >
+                </div>
+              </div>
+
+              {/* Current phase text */}
+              <span className="hidden sm:inline text-xs text-stamp-grey-light font-normal opacity-80">
+                {currentPhase === "instant" && "⚡ Instant"}
+                {currentPhase === "smart" && "💡 Smart"}
+                {currentPhase === "exact" && "🎯 Exact"}
+              </span>
+
+              {/* Mobile-only emoji */}
+              <span className="inline sm:hidden text-stamp-grey-light text-xs opacity-80">
+                {currentPhase === "instant" && "⚡"}
+                {currentPhase === "smart" && "💡"}
+                {currentPhase === "exact" && "🎯"}
+              </span>
+            </div>
+          )}
+
+          {/* Error indicator */}
+          {feeEstimationError && (
+            <div className="flex items-center gap-2 bg-red-900/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-red-500/20 mt-2">
+              <div className="w-1.5 h-1.5 bg-red-400 rounded-full"></div>
+              <span className="hidden sm:inline text-xs text-red-300 font-normal opacity-90">
+                Estimation error
+              </span>
+              <span className="inline sm:hidden text-red-400 text-xs opacity-80">
+                ⚠️
+              </span>
+              <button
+                type="button"
+                onClick={clearError}
+                className="text-red-300 hover:text-red-200 text-xs ml-1"
+                title="Clear error"
+              >
+                ×
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ===== STATUS MESSAGES ===== */}

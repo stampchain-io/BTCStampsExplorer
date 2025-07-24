@@ -6,14 +6,14 @@
  */
 
 import {
-    TransactionFeeEstimator,
-    type EstimationOptions
-} from "$lib/utils/minting/TransactionFeeEstimator.ts";
+    TransactionConstructionService,
+    type EstimationOptions,
+} from "$lib/utils/minting/TransactionConstructionService.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 
 describe("StampingTool Page Load Scenario", () => {
-  const estimator = new TransactionFeeEstimator();
+  const estimator = new TransactionConstructionService();
 
   it("should simulate exact page load conditions", () => {
     // This simulates the exact state when /tool/stamp/create loads

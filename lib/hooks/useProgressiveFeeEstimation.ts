@@ -44,7 +44,16 @@ export interface ProgressiveFeeEstimationOptions {
   isConnected?: boolean;
 
   // Tool-specific parameters
-  toolType: "stamp" | "src20" | "src101" | "fairmint" | "transfer";
+  toolType:
+    | "stamp"
+    | "src20"
+    | "src20-mint"
+    | "src20-deploy"
+    | "src20-transfer"
+    | "src101"
+    | "fairmint"
+    | "transfer"
+    | "send";
 
   // Stamp-specific
   file?: string;

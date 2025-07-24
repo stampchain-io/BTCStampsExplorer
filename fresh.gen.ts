@@ -287,7 +287,6 @@ import * as $table_UploadImageTable from "./islands/table/UploadImageTable.tsx";
 import * as $table_index from "./islands/table/index.ts";
 import * as $tool_StatusMessages from "./islands/tool/StatusMessages.tsx";
 import * as $tool_fairmint_FairmintTool from "./islands/tool/fairmint/FairmintTool.tsx";
-import * as $tool_fairmint_FairmintToolStyles from "./islands/tool/fairmint/FairmintToolStyles.tsx";
 import * as $tool_index from "./islands/tool/index.ts";
 import * as $tool_src101_RegisterTool from "./islands/tool/src101/RegisterTool.tsx";
 import * as $tool_src20_DeployTool from "./islands/tool/src20/DeployTool.tsx";
@@ -649,8 +648,6 @@ const manifest = {
     "./islands/table/index.ts": $table_index,
     "./islands/tool/StatusMessages.tsx": $tool_StatusMessages,
     "./islands/tool/fairmint/FairmintTool.tsx": $tool_fairmint_FairmintTool,
-    "./islands/tool/fairmint/FairmintToolStyles.tsx":
-      $tool_fairmint_FairmintToolStyles,
     "./islands/tool/index.ts": $tool_index,
     "./islands/tool/src101/RegisterTool.tsx": $tool_src101_RegisterTool,
     "./islands/tool/src20/DeployTool.tsx": $tool_src20_DeployTool,

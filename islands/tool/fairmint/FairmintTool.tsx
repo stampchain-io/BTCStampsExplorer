@@ -2,21 +2,13 @@
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { bodyTool, containerBackground, containerColForm } from "$layout";
-import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
-import { useState } from "preact/hooks";
-import {
-  ANIMATION_TIMINGS,
-  EASING_FUNCTIONS,
-} from "$lib/components/fee-indicators/AnimationConstants.ts";
-import {
-  FEE_INDICATOR_COLORS,
-  FEE_INDICATOR_SPACING,
-} from "$lib/components/fee-indicators/StyleConstants.ts";
-import { FairmintToolStyles } from "./FairmintToolStyles.tsx";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface FairmintToolProps {
@@ -43,17 +35,21 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
 
   /* ===== PROGRESSIVE FEE ESTIMATION ===== */
   const {
-    feeDetails: progressiveFeeDetails,
-    currentPhase,
-    phase1Result,
-    phase2Result,
-    phase3Result,
-    isPreFetching,
+    getBestEstimate,
     isEstimating,
-  } = useTransactionFeeEstimator({
+    isPreFetching,
+    estimateExact, // Phase 3: Exact estimation for when user clicks FAIRMINT
+    // Phase-specific results for UI indicators
+    phase1,
+    phase2,
+    phase3,
+    currentPhase,
+    error: feeEstimationError,
+    clearError,
+  } = useTransactionConstructionService({
     toolType: "stamp", // Fairmint uses stamp toolType for minting
     feeRate: isSubmitting ? 0 : formState.fee,
-    ...(wallet?.address && { walletAddress: wallet.address }),
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
     isConnected: !!wallet && !isSubmitting,
     isSubmitting,
     // Fairmint specific parameters - using defaults
@@ -61,6 +57,45 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
     fileSize: formState.jsonSize || 0,
     issuance: parseInt(formState.quantity, 10) || 1,
   });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes) - StampingTool pattern
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates - StampingTool pattern
+  useEffect(() => {
+    // Clear exact fee details when fee rate changes so slider updates work
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  // Wrapper function for fairminting that gets exact fees first - StampingTool pattern
+  const handleFairmintWithExactFees = async () => {
+    try {
+      // Get exact fees before final submission
+      const exactFees = await estimateExact();
+      if (exactFees) {
+        // Calculate net spend amount (matches wallet display)
+        const netSpendAmount = exactFees.totalValue || 0;
+        setExactFeeDetails({
+          ...exactFees,
+          totalValue: netSpendAmount, // Matches wallet
+        });
+      }
+      // Call the original fairmint submission
+      await handleSubmit();
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error in Fairmint exact fee estimation",
+        data: { error: error instanceof Error ? error.message : String(error) },
+      });
+      // Still proceed with submission even if exact fees fail
+      await handleSubmit();
+    }
+  };
 
   /* ===== HELPERS ===== */
   // Check if the fairminters array is empty
@@ -73,7 +108,6 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
 
   return (
     <div class={bodyTool} data-testid="fairmint-tool">
-      <FairmintToolStyles />
       <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>FAIRMINT</h1>
 
       <form class={`${containerBackground} mb-6`}>
@@ -136,42 +170,42 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             data-testid="fee-phase-indicator"
             class="flex items-center gap-2 mb-3"
             style={{
-              transitionDuration: ANIMATION_TIMINGS.normal,
-              transitionTimingFunction: EASING_FUNCTIONS.easeInOut,
+              transitionDuration: "0.3s", // Removed ANIMATION_TIMINGS.normal
+              transitionTimingFunction: "ease-in-out", // Removed EASING_FUNCTIONS.easeInOut
             }}
           >
             {/* Phase dots */}
             <div class="flex items-center gap-1">
               <div
                 class={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                  phase1Result ? "opacity-100" : "opacity-30"
+                  phase1 ? "opacity-100" : "opacity-30"
                 }`}
                 style={{
-                  backgroundColor: phase1Result
-                    ? FEE_INDICATOR_COLORS.instant
-                    : FEE_INDICATOR_COLORS.loading,
+                  backgroundColor: phase1
+                    ? "#007BFF" // Changed from FEE_INDICATOR_COLORS.instant
+                    : "#6C757D", // Changed from FEE_INDICATOR_COLORS.loading
                 }}
                 title="Phase 1: Instant estimate"
               />
               <div
                 class={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                  phase2Result ? "opacity-100" : "opacity-30"
+                  phase2 ? "opacity-100" : "opacity-30"
                 } ${isPreFetching ? "animate-pulse" : ""}`}
                 style={{
-                  backgroundColor: phase2Result
-                    ? FEE_INDICATOR_COLORS.cached
-                    : FEE_INDICATOR_COLORS.loading,
+                  backgroundColor: phase2
+                    ? "#28A745" // Changed from FEE_INDICATOR_COLORS.cached
+                    : "#6C757D", // Changed from FEE_INDICATOR_COLORS.loading
                 }}
                 title="Phase 2: Smart UTXO estimate"
               />
               <div
                 class={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                  phase3Result ? "opacity-100" : "opacity-30"
+                  phase3 ? "opacity-100" : "opacity-30"
                 } ${isEstimating ? "animate-pulse" : ""}`}
                 style={{
-                  backgroundColor: phase3Result
-                    ? FEE_INDICATOR_COLORS.exact
-                    : FEE_INDICATOR_COLORS.loading,
+                  backgroundColor: phase3
+                    ? "#DC3545" // Changed from FEE_INDICATOR_COLORS.exact
+                    : "#6C757D", // Changed from FEE_INDICATOR_COLORS.loading
                 }}
                 title="Phase 3: Exact calculation"
               />
@@ -180,7 +214,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
             {/* Phase text */}
             <span class="text-xs text-stamp-grey-light font-normal opacity-80">
               {currentPhase === "instant" && "⚡ Instant"}
-              {currentPhase === "cached" && "💡 Smart"}
+              {currentPhase === "smart" && "💡 Smart"}
               {currentPhase === "exact" && "🎯 Exact"}
             </span>
           </div>
@@ -194,26 +228,33 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
           fileSize={formState.jsonSize}
           BTCPrice={formState.BTCPrice}
           isSubmitting={isSubmitting}
-          onSubmit={handleSubmit}
+          onSubmit={handleFairmintWithExactFees}
           buttonName="FAIRMINT"
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
-          feeDetails={mapProgressiveFeeDetails(progressiveFeeDetails) || {
-            minerFee: 0,
-            dustValue: 0,
-            totalValue: 0,
-            hasExactFees: false,
-            estimatedSize: 300,
-          }}
+          feeDetails={mapProgressiveFeeDetails(
+            exactFeeDetails || progressiveFeeDetails,
+          )}
           bitname=""
-          // Pass progressive fee props for FeeCalculatorBase
-          phase1Result={phase1Result}
-          phase2Result={phase2Result}
-          phase3Result={phase3Result}
-          currentPhase={currentPhase}
-          isPreFetching={isPreFetching}
-          isEstimating={isEstimating}
+          // Progressive fee estimation props removed - not supported by FeeCalculatorBase
         />
+
+        {/* ===== 🚨 FEE ESTIMATION ERROR HANDLING ===== */}
+        {feeEstimationError && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center justify-between">
+              <span className="text-red-700 text-sm">
+                Fee estimation error: {feeEstimationError}
+              </span>
+              <button
+                onClick={clearError}
+                className="text-red-500 hover:text-red-700 text-sm font-medium"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ===== STATUS MESSAGES ===== */}
         <StatusMessages

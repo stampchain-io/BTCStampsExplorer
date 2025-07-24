@@ -11,16 +11,11 @@ import {
   containerRowForm,
   loaderSpinGrey,
 } from "$layout";
-import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
-import type { ToolEstimationParams } from "$lib/types/fee-estimation.ts";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
-import {
-  extractSRC20ErrorMessage,
-  TokenAlreadyExistsError,
-  validateDeploymentParams,
-} from "$lib/utils/src20/errorHandling.tsx";
 import { StatusMessages, tooltipButton, tooltipImage } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
@@ -65,21 +60,14 @@ export function SRC20DeployTool(
 
   /* ===== PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
   const {
-    feeDetails: progressiveFeeDetails,
-    isEstimating,
-    feeDetailsVersion,
-    isPreFetching,
-    estimateExact,
-    phase1Result,
-    phase2Result,
-    phase3Result,
-    currentPhase,
+    getBestEstimate,
+    estimateExact, // Phase 3: Exact estimation before deploying
     error: feeEstimationError,
     clearError,
-  } = useTransactionFeeEstimator({
+  } = useTransactionConstructionService({
     toolType: "src20-deploy",
     feeRate: isSubmitting ? 0 : formState.fee,
-    walletAddress: wallet?.address,
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
     isConnected: !!wallet && !isSubmitting,
     isSubmitting,
     // SRC-20 deploy specific parameters
@@ -88,6 +76,43 @@ export function SRC20DeployTool(
     lim: formState.lim,
     dec: formState.dec,
   });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes) - StampingTool pattern
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates - StampingTool pattern
+  useEffect(() => {
+    // Clear exact fee details when fee rate changes so slider updates work
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  // Wrapper function for deploying that gets exact fees first - StampingTool pattern
+  const handleDeployWithExactFees = async () => {
+    try {
+      // Get exact fees before final submission
+      const exactFees = await estimateExact();
+      if (exactFees) {
+        // Calculate net spend amount (matches wallet display)
+        const netSpendAmount = exactFees.totalValue || 0;
+        setExactFeeDetails({
+          ...exactFees,
+          totalValue: netSpendAmount, // Matches wallet
+        });
+      }
+
+      // Call the original deploy submission
+      await handleSubmit();
+    } catch (error) {
+      console.error("SRC20 DEPLOY: Error in exact fee estimation", error);
+      // Still proceed with submission even if exact fees fail
+      await handleSubmit();
+    }
+  };
 
   /* ===== FILE HANDLING ===== */
   const handleFileChange = (e: Event) => {
@@ -206,7 +231,7 @@ export function SRC20DeployTool(
       }
     }
 
-    await handleSubmit();
+    await handleDeployWithExactFees();
   };
 
   /* ===== ADANCED OPTIONS TOGGLE ===== */
@@ -517,30 +542,29 @@ export function SRC20DeployTool(
           type="src20"
           BTCPrice={formState.BTCPrice}
           isSubmitting={isSubmitting}
-          onSubmit={handleSubmitWithUpload}
+          onSubmit={handleDeployWithExactFees}
           buttonName={isConnected ? "DEPLOY" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           bitname=""
-          feeDetails={progressiveFeeDetails
-            ? {
-              minerFee: progressiveFeeDetails.minerFee || 0,
-              dustValue: progressiveFeeDetails.dustValue || 0,
-              totalValue: progressiveFeeDetails.totalValue || 0,
-              hasExactFees: progressiveFeeDetails.hasExactFees || false,
-              est_tx_size: progressiveFeeDetails.estimatedSize || 300,
-            }
-            : undefined}
-          // Progressive fee estimation status props
-          isEstimating={isEstimating}
-          isPreFetching={isPreFetching}
-          currentPhase={currentPhase}
-          phase1Result={phase1Result}
-          phase2Result={phase2Result}
-          phase3Result={phase3Result}
-          feeEstimationError={feeEstimationError}
-          clearError={clearError}
+          feeDetails={mapProgressiveFeeDetails(
+            exactFeeDetails || progressiveFeeDetails,
+          )}
+          // Progressive fee estimation props removed - not supported by FeeCalculatorBase
         />
+
+        {/* Error Display */}
+        {feeEstimationError && (
+          <div className="mt-2 text-red-500 text-sm">
+            Fee estimation error: {feeEstimationError}
+            <button
+              onClick={clearError}
+              className="ml-2 text-red-400 hover:text-red-300"
+            >
+              ✕
+            </button>
+          </div>
+        )}
 
         <StatusMessages
           submissionMessage={submissionMessage}

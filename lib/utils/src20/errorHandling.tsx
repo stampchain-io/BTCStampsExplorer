@@ -40,7 +40,9 @@ export class SRC20Error extends Error {
     this.operation = operation;
     this.correlationId = generateCorrelationId();
     this.timestamp = Date.now();
-    this.context = context;
+    if (context !== undefined) {
+      this.context = context;
+    }
 
     // Log error with correlation ID
     logger.error("src20", {
