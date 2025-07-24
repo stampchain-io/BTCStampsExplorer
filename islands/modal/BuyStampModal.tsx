@@ -8,7 +8,8 @@ import type { StampRow } from "$globals";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
-import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { showToast } from "$lib/utils/toastSignal.ts";
 import { FeeCalculatorBase } from "$section";
@@ -62,24 +63,24 @@ const BuyStampModal = ({
     initialFee,
   });
 
-  /* ===== 🚀 PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
+  /* ===== 🚀 UNIFIED FEE ESTIMATION SYSTEM ===== */
+  // Use the unified fee estimation system with stamp toolType for purchases
   const {
     getBestEstimate,
-    isEstimating: _isEstimating,
-    isPreFetching: _isPreFetching,
-    phase1: _phase1,
-    phase2: _phase2,
-    phase3: _phase3,
-    currentPhase: _currentPhase,
+    isEstimating,
+    estimateExact,
+    currentPhase,
     error: feeEstimationError,
-    clearError: _clearError,
-  } = useTransactionFeeEstimator({
-    toolType: "stamp", // Buy stamp uses stamp toolType
+  } = useTransactionConstructionService({
+    toolType: "stamp", // Buy stamp uses stamp toolType for dispense transactions
     feeRate: isSubmitting ? 0 : formState.fee,
-    walletAddress: wallet?.address || "",
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
     isConnected: !!wallet && !isSubmitting,
     isSubmitting,
-    // Buy-specific parameters
+    // Purchase-specific parameters - include the value being sent to dispenser
+    recipientAddress: dispenser?.source || "",
+    amount: totalPrice ? (totalPrice / 100000000).toFixed(8) : "0", // Convert satoshis to BTC string
+    // Additional dispenser info for context
     ...(dispenser && {
       dispenserSource: dispenser.source,
       purchaseQuantity: totalPrice.toString(),
@@ -88,6 +89,32 @@ const BuyStampModal = ({
 
   // Get the best available fee estimate
   const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes) - StampingTool pattern
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates - StampingTool pattern
+  useEffect(() => {
+    // Clear exact fee details when fee rate changes so slider updates work
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  /* ===== FEE DETAILS SYNCHRONIZATION ===== */
+  useEffect(() => {
+    if (progressiveFeeDetails && !isEstimating) {
+      logger.debug("stamps", {
+        message: "BuyStamp progressive fee details update",
+        data: {
+          phase: currentPhase,
+          hasExactFees: progressiveFeeDetails.hasExactFees,
+          minerFee: progressiveFeeDetails.minerFee,
+          totalValue: progressiveFeeDetails.totalValue,
+        },
+      });
+    }
+  }, [progressiveFeeDetails, isEstimating, currentPhase]);
 
   /* ===== EFFECTS ===== */
   useEffect(() => {
@@ -166,6 +193,28 @@ const BuyStampModal = ({
     }
 
     await handleSubmit(async () => {
+      // Get exact fee estimation before submitting - StampingTool pattern
+      try {
+        const exactEstimate = await estimateExact();
+        if (exactEstimate) {
+          setExactFeeDetails(exactEstimate);
+          logger.debug("stamps", {
+            message: "BuyStamp exact fee estimation completed",
+            data: {
+              minerFee: exactEstimate.minerFee,
+              totalValue: exactEstimate.totalValue,
+              hasExactFees: exactEstimate.hasExactFees,
+            },
+          });
+        }
+      } catch (error) {
+        logger.warn("stamps", {
+          message:
+            "BuyStamp exact fee estimation failed, using progressive estimate",
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+
       const feeRateKB = formState.fee * 1000;
       const options = { return_psbt: true, fee_per_kb: feeRateKB };
 
@@ -337,11 +386,7 @@ const BuyStampModal = ({
       </div>
 
       {/* ===== 🎯 PROGRESSIVE FEE STATUS INDICATOR ===== */}
-      {
-        /* Note: ProgressiveFeeStatusIndicator is commented out due to interface mismatch.
-          The component expects phase*Result props but hook returns phase* props.
-          This needs to be fixed in either the component or the hook. */
-      }
+      {/* Using simplified fee display approach */}
 
       {/* ===== FEE CALCULATOR ===== */}
       <FeeCalculatorBase
@@ -358,7 +403,7 @@ const BuyStampModal = ({
         tosAgreed={tosAgreed}
         onTosChange={setTosAgreed}
         amount={totalPrice}
-        price={displayPrice}
+        price={dispenser ? (dispenser.satoshirate / 100000000) : displayPrice}
         edition={quantity}
         fromPage="stamp_buy"
         BTCPrice={formState.BTCPrice}
@@ -377,21 +422,29 @@ const BuyStampModal = ({
         className="pt-9 mobileLg:pt-12"
         bitname={undefined}
         // ===== 🚀 PROGRESSIVE FEE DETAILS INTEGRATION =====
-        feeDetails={progressiveFeeDetails
-          ? {
-            minerFee: progressiveFeeDetails.minerFee || 0,
-            dustValue: progressiveFeeDetails.dustValue || 0,
-            totalValue: progressiveFeeDetails.totalValue || 0,
-            hasExactFees: progressiveFeeDetails.hasExactFees || false,
-            estimatedSize: 300, // Default transaction size for stamps
+        feeDetails={(() => {
+          const baseFeeDetails = mapProgressiveFeeDetails(
+            exactFeeDetails || progressiveFeeDetails,
+          );
+
+          // For buy transactions, add the purchase amount to totalValue
+          // and remove dust since dispense uses OP_RETURN (no dust needed)
+          if (baseFeeDetails && totalPrice > 0) {
+            // Recalculate totalValue: minerFee only (no dust) + purchase amount
+            const correctedTotalValue = baseFeeDetails.minerFee + totalPrice;
+
+            return {
+              ...baseFeeDetails,
+              dustValue: 0, // Dispense transactions use OP_RETURN, no dust needed
+              totalValue: correctedTotalValue,
+              itemPrice: totalPrice, // Add the stamp price for display in details
+              // Add a custom field to indicate this includes purchase amount
+              includesPurchaseAmount: true,
+            };
           }
-          : {
-            minerFee: 0,
-            dustValue: 0,
-            totalValue: 0,
-            hasExactFees: false,
-            estimatedSize: 300,
-          }}
+
+          return baseFeeDetails;
+        })()}
       />
     </ModalBase>
   );

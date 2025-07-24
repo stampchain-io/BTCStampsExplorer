@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { FeeCalculatorBase } from "$section";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
 import { ModalBase } from "$layout";
 import { inputField } from "$form";
 import { tooltipIcon } from "$notification";
@@ -47,6 +49,50 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
     type: "send",
     initialFee,
   });
+
+  /* ===== PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
+  const {
+    getBestEstimate,
+    isEstimating,
+    estimateExact,
+    currentPhase,
+  } = useTransactionConstructionService({
+    toolType: "stamp", // Using "stamp" for basic BTC sends (no data)
+    feeRate: isSubmitting ? 0 : formState.fee,
+    walletAddress: wallet?.address || "",
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // BTC send specific parameters
+    recipientAddress: formState.recipientAddress,
+    amount: formState.amount,
+  });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes)
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates
+  useEffect(() => {
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  /* ===== FEE DETAILS SYNCHRONIZATION ===== */
+  useEffect(() => {
+    if (progressiveFeeDetails && !isEstimating) {
+      logger.debug("system", {
+        message: "SendBTC progressive fee details update",
+        data: {
+          phase: currentPhase,
+          hasExactFees: progressiveFeeDetails.hasExactFees,
+          minerFee: progressiveFeeDetails.minerFee,
+        },
+      });
+    }
+  }, [progressiveFeeDetails, isEstimating, currentPhase]);
 
   /* ===== EFFECTS ===== */
   useEffect(() => {
@@ -135,6 +181,27 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
 
   const handleSendSubmit = async () => {
     await handleSubmit(async () => {
+      // Get exact fee estimation before submitting
+      try {
+        const exactEstimate = await estimateExact();
+        if (exactEstimate) {
+          setExactFeeDetails(exactEstimate);
+          logger.debug("system", {
+            message: "SendBTC exact fee estimation completed",
+            data: {
+              minerFee: exactEstimate.minerFee,
+              hasExactFees: exactEstimate.hasExactFees,
+            },
+          });
+        }
+      } catch (error) {
+        logger.warn("system", {
+          message:
+            "SendBTC exact fee estimation failed, using progressive estimate",
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+
       const options = {
         return_psbt: true,
         fee_per_kb: formState.fee * 1000,
@@ -437,6 +504,9 @@ function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         BTCPrice={formState.BTCPrice}
+        feeDetails={mapProgressiveFeeDetails(
+          exactFeeDetails || progressiveFeeDetails,
+        )}
         isSubmitting={isSubmitting}
         onSubmit={handleSendSubmit}
         onCancel={handleCloseModal}

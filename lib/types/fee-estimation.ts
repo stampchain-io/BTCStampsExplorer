@@ -69,7 +69,7 @@ export interface UTXOCache {
  */
 export interface ProgressiveFeeEstimationResult extends FeeDetails {
   /** Which estimation phase produced this result */
-  phase: "instant" | "cached" | "exact";
+  phase: "instant" | "smart" | "exact";
   /** Whether this came from cache */
   cacheHit?: boolean;
   /** Time taken for this estimation in milliseconds */
@@ -157,8 +157,8 @@ export interface ToolEstimationParams {
 export interface ProgressiveFeeEstimationOptions {
   /** Phase 1: Instant estimation timeout (default: 100ms) */
   instantTimeout: number;
-  /** Phase 2: Cached estimation timeout (default: 2000ms) */
-  cachedTimeout: number;
+  /** Phase 2: Smart estimation timeout (default: 2000ms) */
+  smartTimeout: number;
   /** Phase 3: Exact estimation timeout (default: 10000ms) */
   exactTimeout: number;
 
@@ -176,11 +176,11 @@ export interface ProgressiveFeeEstimationOptions {
 
   /** Callback functions for phase completion */
   onPhaseComplete?: (
-    phase: "instant" | "cached" | "exact",
+    phase: "instant" | "smart" | "exact",
     result: ProgressiveFeeEstimationResult,
   ) => void;
   /** Error callback */
-  onError?: (error: Error, phase?: "instant" | "cached" | "exact") => void;
+  onError?: (error: Error, phase?: "instant" | "smart" | "exact") => void;
 
   /** Enable debug logging */
   debug?: boolean;
@@ -233,7 +233,7 @@ export interface CacheManagerConfig {
  */
 export interface FeeEstimationError extends Error {
   /** Which phase the error occurred in */
-  phase?: "instant" | "cached" | "exact";
+  phase?: "instant" | "smart" | "exact";
   /** Error code for programmatic handling */
   code:
     | "TIMEOUT"
@@ -258,7 +258,7 @@ export type ToolType = ToolEstimationParams["toolType"];
 /**
  * Estimation phase union for type safety
  */
-export type EstimationPhase = "instant" | "cached" | "exact";
+export type EstimationPhase = "instant" | "smart" | "exact";
 
 /**
  * Cache operation result

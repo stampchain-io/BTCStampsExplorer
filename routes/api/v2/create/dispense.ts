@@ -1,15 +1,16 @@
 // routes/api/v2/dispense.ts
 import { Handlers } from "$fresh/server.ts";
-import { normalizeFeeRate, XcpManager } from "$server/services/xcpService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { PSBTService } from "$server/services/transaction/psbtService.ts";
 import { serverConfig } from "$server/config/config.ts";
+import { PSBTService } from "$server/services/transaction/psbtService.ts";
+import { normalizeFeeRate, XcpManager } from "$server/services/xcpService.ts";
 
 interface DispenseInput {
   address: string;
   dispenser: string;
   quantity: number;
+  dryRun?: boolean; // Add dryRun support for unified fee estimation system
   options: {
     fee_per_kb?: number;
     satsPerVB?: number;
@@ -30,8 +31,35 @@ export const handler: Handlers = {
         address: buyerAddress,
         dispenser,
         quantity: dispenserPaymentAmountSat,
+        dryRun, // Extract dryRun parameter
         options: clientOptions,
       } = input;
+
+      // For dryRun, return fee estimates without creating actual PSBT
+      if (dryRun === true) {
+        // Dispense transactions are simple Bitcoin transfers - typically 1 input, 2 outputs
+        const estimatedTxSize = 200; // bytes (typical for dispense transaction)
+        const feeRate = clientOptions.satsPerVB || 1;
+        const estMinerFee = Math.ceil(estimatedTxSize * feeRate);
+        const serviceFee = 1000; // Service fee in sats
+        const totalCost = dispenserPaymentAmountSat + estMinerFee + serviceFee;
+
+        return ApiResponseUtil.success({
+          est_miner_fee: estMinerFee,
+          total_dust_value: 0, // No dust for simple Bitcoin transfers
+          total_cost: totalCost,
+          est_tx_size: estimatedTxSize,
+          service_fee: serviceFee,
+          dispenser_payment: dispenserPaymentAmountSat,
+          feeDetails: {
+            total: estMinerFee,
+            effectiveFeeRate: feeRate,
+            estimatedSize: estimatedTxSize,
+          },
+          is_estimate: true,
+          estimation_method: "dryRun_calculation",
+        });
+      }
 
       let normalizedFees;
       try {

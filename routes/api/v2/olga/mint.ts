@@ -44,7 +44,7 @@ interface RawRequestBody {
 interface CreateStampIssuanceParams {
   sourceWallet: string;
   assetName: string;
-  qty: number;
+  qty: string; // ← FIXED: Service expects string, not number
   locked: boolean;
   divisible: boolean;
   filename: string;
@@ -243,7 +243,7 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
     const createIssuanceParams: CreateStampIssuanceParams = {
       sourceWallet: effectiveSourceWallet,
       assetName: validatedAssetName || "",
-      qty: typeof body.qty === "string" ? parseInt(body.qty, 10) : body.qty,
+      qty: typeof body.qty === "string" ? body.qty : String(body.qty),
       locked: body.locked,
       divisible: body.divisible,
       filename: body.filename,

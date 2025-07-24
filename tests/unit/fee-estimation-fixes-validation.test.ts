@@ -9,36 +9,39 @@
  */
 
 import { assertEquals, assertExists, assertGreaterOrEqual } from "@std/assert";
-import { TransactionFeeEstimator } from "../../lib/utils/minting/TransactionFeeEstimator.ts";
+import { TransactionConstructionService } from "../../lib/utils/minting/TransactionConstructionService.ts";
 
 // Test wallet with known UTXO for validation
 const TEST_WALLET = "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";
 
 Deno.test("Task 23.2: UTXO API Integration Fix", async (t) => {
-  const estimator = TransactionFeeEstimator.getInstance();
+  const estimator = new TransactionConstructionService();
 
-  await t.step("should use correct UTXO endpoint", async () => {
-    // Mock fetch to verify correct endpoint is called
+  await t.step("should use tool endpoint for smart estimation", async () => {
+    // Mock fetch to verify tool endpoint is called
     const originalFetch = globalThis.fetch;
     let capturedUrl = "";
 
     globalThis.fetch = async (url: string | URL) => {
       capturedUrl = url.toString();
+      // Return tool endpoint response format for stamp endpoint
       return new Response(
         JSON.stringify({
-          utxos: [{
-            txid: "test-txid",
-            vout: 0,
-            value: 5000,
-            scriptType: "P2WPKH",
-          }],
+          est_tx_size: 250,
+          est_miner_fee: 500,
+          total_dust_value: 333,
+          total_output_value: 833,
+          is_estimate: true,
+          estimation_method: "service_with_dummy_utxos",
+          change_value: 0,
+          input_value: 1000,
         }),
         { status: 200 },
       );
     };
 
     try {
-      await estimator.estimateCached({
+      const result = await estimator.estimateSmart({
         toolType: "stamp",
         feeRate: 1.0,
         walletAddress: TEST_WALLET,
@@ -49,39 +52,39 @@ Deno.test("Task 23.2: UTXO API Integration Fix", async (t) => {
         divisible: false,
       });
 
-      // Verify correct endpoint was called
+      // Smart estimation uses tool endpoints now
       assertEquals(
-        capturedUrl,
-        `/api/v2/trx/utxoquery?address=${TEST_WALLET}&excludeAssets=true`,
-        "Should use correct UTXO query endpoint",
+        capturedUrl.includes("/api/v2/olga/mint"),
+        true,
+        "Should use tool endpoint for smart estimation",
       );
+      assertEquals(result.phase, "smart", "Should be smart phase");
     } finally {
       globalThis.fetch = originalFetch;
     }
   });
 
-  await t.step("should parse UTXO response format correctly", async () => {
+  await t.step("should handle tool endpoint response correctly", async () => {
     const originalFetch = globalThis.fetch;
 
     globalThis.fetch = async () => {
       return new Response(
         JSON.stringify({
-          utxos: [
-            {
-              txid:
-                "f6ecb5658a7cd93b42f5d251f01542daf491d42208f63fb548654dd3ebbf9e75",
-              vout: 3,
-              value: 5000,
-              scriptType: "P2WPKH",
-            },
-          ],
+          est_tx_size: 250,
+          est_miner_fee: 500,
+          total_dust_value: 333,
+          total_output_value: 833,
+          is_estimate: true,
+          estimation_method: "service_with_dummy_utxos",
+          change_value: 0,
+          input_value: 1000,
         }),
         { status: 200 },
       );
     };
 
     try {
-      const result = await estimator.estimateCached({
+      const result = await estimator.estimateSmart({
         toolType: "stamp",
         feeRate: 1.0,
         walletAddress: TEST_WALLET,
@@ -93,11 +96,17 @@ Deno.test("Task 23.2: UTXO API Integration Fix", async (t) => {
       });
 
       assertExists(result, "Should return estimation result");
-      assertEquals(result.phase, "cached", "Should be cached phase result");
-      assertGreaterOrEqual(
-        result.minerFee,
-        1,
-        "Should calculate positive miner fee",
+      assertEquals(result.phase, "smart", "Should be smart phase result");
+      assertEquals(result.minerFee, 500, "Should use tool endpoint miner fee");
+      assertEquals(
+        result.totalValue,
+        833,
+        "Should use tool endpoint total cost",
+      );
+      assertEquals(
+        result.dustValue,
+        333,
+        "Should use tool endpoint dust value",
       );
     } finally {
       globalThis.fetch = originalFetch;
@@ -106,7 +115,7 @@ Deno.test("Task 23.2: UTXO API Integration Fix", async (t) => {
 });
 
 Deno.test("Task 23.3: Negative Fee Calculation Fix", async (t) => {
-  const estimator = TransactionFeeEstimator.getInstance();
+  const estimator = new TransactionConstructionService();
 
   await t.step("should prevent negative fees with low fee rates", async () => {
     const result = await estimator.estimateInstant({
@@ -158,7 +167,7 @@ Deno.test("Task 23.3: Negative Fee Calculation Fix", async (t) => {
   });
 
   await t.step(
-    "should validate fee calculations in cached estimation",
+    "should validate fee calculations in smart estimation",
     async () => {
       const originalFetch = globalThis.fetch;
 
@@ -177,7 +186,7 @@ Deno.test("Task 23.3: Negative Fee Calculation Fix", async (t) => {
       };
 
       try {
-        const result = await estimator.estimateCached({
+        const result = await estimator.estimateSmart({
           toolType: "stamp",
           feeRate: 0.05, // Low fee rate
           walletAddress: TEST_WALLET,
@@ -191,7 +200,7 @@ Deno.test("Task 23.3: Negative Fee Calculation Fix", async (t) => {
         assertGreaterOrEqual(
           result.minerFee,
           1,
-          "Cached estimation should prevent negative fees",
+          "Smart estimation should prevent negative fees",
         );
         assertGreaterOrEqual(
           result.totalValue,
@@ -207,7 +216,7 @@ Deno.test("Task 23.3: Negative Fee Calculation Fix", async (t) => {
 
 Deno.test("Task 23.4: End-to-End Flow Validation", async (t) => {
   await t.step("should handle complete estimation flow", async () => {
-    const estimator = TransactionFeeEstimator.getInstance();
+    const estimator = new TransactionConstructionService();
 
     // Phase 1: Instant estimation
     const instantResult = await estimator.estimateInstant({
@@ -233,26 +242,27 @@ Deno.test("Task 23.4: End-to-End Flow Validation", async (t) => {
       "Phase 1 should have positive fees",
     );
 
-    // Mock successful UTXO fetch for Phase 2
+    // Mock successful tool endpoint for Phase 2
     const originalFetch = globalThis.fetch;
     globalThis.fetch = async () => {
       return new Response(
         JSON.stringify({
-          utxos: [{
-            txid:
-              "f6ecb5658a7cd93b42f5d251f01542daf491d42208f63fb548654dd3ebbf9e75",
-            vout: 3,
-            value: 5000,
-            scriptType: "P2WPKH",
-          }],
+          est_tx_size: 300,
+          est_miner_fee: 600,
+          total_dust_value: 333,
+          total_output_value: 933,
+          is_estimate: true,
+          estimation_method: "service_with_dummy_utxos",
+          change_value: 0,
+          input_value: 1200,
         }),
         { status: 200 },
       );
     };
 
     try {
-      // Phase 2: Cached estimation
-      const cachedResult = await estimator.estimateCached({
+      // Phase 2: Smart estimation
+      const cachedResult = await estimator.estimateSmart({
         toolType: "stamp",
         feeRate: 2.0,
         walletAddress: TEST_WALLET,
@@ -263,7 +273,7 @@ Deno.test("Task 23.4: End-to-End Flow Validation", async (t) => {
         divisible: false,
       });
 
-      assertEquals(cachedResult.phase, "cached", "Phase 2 should be cached");
+      assertEquals(cachedResult.phase, "smart", "Phase 2 should be smart");
       assertEquals(
         cachedResult.hasExactFees,
         false,
@@ -284,7 +294,7 @@ Deno.test("Task 23.4: End-to-End Flow Validation", async (t) => {
 
   await t.step("should handle test wallet UTXO correctly", async () => {
     // This test validates that our test wallet's 5000 sat UTXO is sufficient
-    const estimator = TransactionFeeEstimator.getInstance();
+    const estimator = new TransactionConstructionService();
 
     const result = await estimator.estimateInstant({
       toolType: "stamp",
@@ -313,23 +323,24 @@ Deno.test("Task 23.4: End-to-End Flow Validation", async (t) => {
 
 Deno.test("Task 23: Integration Validation", async (t) => {
   await t.step("should validate all fixes work together", async () => {
-    const estimator = TransactionFeeEstimator.getInstance();
+    const estimator = new TransactionConstructionService();
 
     // Test the complete flow with all fixes applied
     const originalFetch = globalThis.fetch;
     globalThis.fetch = async (url: string | URL) => {
       const urlStr = url.toString();
 
-      if (urlStr.includes("/api/v2/trx/utxoquery")) {
+      if (urlStr.includes("/api/v2/olga/mint")) {
         return new Response(
           JSON.stringify({
-            utxos: [{
-              txid:
-                "f6ecb5658a7cd93b42f5d251f01542daf491d42208f63fb548654dd3ebbf9e75",
-              vout: 3,
-              value: 5000,
-              scriptType: "P2WPKH",
-            }],
+            est_tx_size: 300,
+            est_miner_fee: 450,
+            total_dust_value: 333,
+            total_output_value: 783,
+            is_estimate: true,
+            estimation_method: "service_with_dummy_utxos",
+            change_value: 0,
+            input_value: 1000,
           }),
           { status: 200 },
         );
@@ -351,8 +362,8 @@ Deno.test("Task 23: Integration Validation", async (t) => {
         divisible: false,
       });
 
-      // Test cached estimation (should use fixed UTXO API)
-      const cached = await estimator.estimateCached({
+      // Test smart estimation (should use tool endpoint)
+      const smart = await estimator.estimateSmart({
         toolType: "stamp",
         feeRate: 1.5,
         walletAddress: TEST_WALLET,
@@ -365,7 +376,7 @@ Deno.test("Task 23: Integration Validation", async (t) => {
 
       // Validate both phases work correctly
       assertEquals(instant.phase, "instant", "Instant phase should work");
-      assertEquals(cached.phase, "cached", "Cached phase should work");
+      assertEquals(smart.phase, "smart", "Smart phase should work");
 
       assertGreaterOrEqual(
         instant.minerFee,
@@ -373,9 +384,9 @@ Deno.test("Task 23: Integration Validation", async (t) => {
         "Instant fees should be positive",
       );
       assertGreaterOrEqual(
-        cached.minerFee,
+        smart.minerFee,
         1,
-        "Cached fees should be positive",
+        "Smart fees should be positive",
       );
 
       assertGreaterOrEqual(
@@ -384,9 +395,9 @@ Deno.test("Task 23: Integration Validation", async (t) => {
         "Instant total should be valid",
       );
       assertGreaterOrEqual(
-        cached.totalValue,
-        cached.minerFee,
-        "Cached total should be valid",
+        smart.totalValue,
+        smart.minerFee,
+        "Smart total should be valid",
       );
     } finally {
       globalThis.fetch = originalFetch;

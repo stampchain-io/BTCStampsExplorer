@@ -1,17 +1,15 @@
 /**
- * Integration test for Tool Endpoint Integration (Task 23.13)
- *
- * Tests the complete integration of tool endpoint adapters with the
- * TransactionFeeEstimator system to validate the 33% API call reduction.
+ * Integration tests for tool endpoint adapters and the
+ * TransactionConstructionService system to validate the 33% API call reduction.
  */
 
 import type {
-  SRC101TransactionOptions,
-  SRC20TransactionOptions,
-  StampTransactionOptions,
+    SRC101TransactionOptions,
+    SRC20TransactionOptions,
+    StampTransactionOptions,
 } from "$lib/types/toolEndpointAdapter.ts";
 import {
-  toolEndpointFeeEstimator,
+    toolEndpointFeeEstimator,
 } from "$lib/utils/minting/ToolEndpointFeeEstimator.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
