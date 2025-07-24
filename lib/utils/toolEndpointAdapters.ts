@@ -3,7 +3,7 @@
  *
  * Concrete implementations of tool endpoint adapters that handle the specific
  * request/response formats for each tool type while providing a standardized
- * interface for the TransactionFeeEstimator system.
+ * interface for the TransactionConstructionService system.
  */
 
 import {
@@ -400,14 +400,13 @@ export class DefaultToolEndpointAdapterFactory
 /**
  * Singleton factory instance for use throughout the application
  */
-export const toolEndpointAdapterFactory =
-  new DefaultToolEndpointAdapterFactory();
+export const factory = new DefaultToolEndpointAdapterFactory();
 
 /**
  * Utility function to get an adapter for a specific tool type
  */
 export function getToolAdapter(toolType: ToolType): ToolEndpointAdapter {
-  return toolEndpointAdapterFactory.createAdapter(toolType);
+  return factory.createAdapter(toolType);
 }
 
 /**

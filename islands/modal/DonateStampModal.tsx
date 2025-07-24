@@ -2,14 +2,14 @@
 import { sliderBar, sliderKnob } from "$button";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { ProgressiveFeeStatusIndicator } from "$components/fee/index.ts";
+// Using simplified fee display approach
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { StampImage } from "$content";
 import type { StampRow } from "$globals";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
-import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { showToast } from "$lib/utils/toastSignal.ts";
@@ -61,27 +61,55 @@ const DonateStampModal = ({
 
   /* ===== 🚀 PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
   const {
-    feeDetails: progressiveFeeDetails,
-    isPreFetching,
-    error: feeEstimationError,
-    clearError,
-    // Phase-specific results for status indicator
+    getBestEstimate,
+    isEstimating,
+    estimateExact,
     currentPhase,
-    phase1Result,
-    phase2Result,
-    phase3Result,
-  } = useTransactionFeeEstimator({
+    error: feeEstimationError,
+  } = useTransactionConstructionService({
     toolType: "stamp", // Donate uses stamp toolType for dispense transactions
     feeRate: isSubmitting ? 0 : formState.fee,
-    ...(wallet?.address && { walletAddress: wallet.address }),
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
     isConnected: !!wallet && !isSubmitting,
     isSubmitting,
-    // Donation-specific parameters
+    // Donation-specific parameters - include the value being sent to dispenser
+    recipientAddress: dispenser?.source || "",
+    amount: totalPrice ? (totalPrice / 100000000).toFixed(8) : "0", // Convert satoshis to BTC string
+    // Additional dispenser info for context
     ...(dispenser && {
       dispenserSource: dispenser.source,
       purchaseQuantity: totalPrice.toString(),
     }),
   });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes) - StampingTool pattern
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates - StampingTool pattern
+  useEffect(() => {
+    // Clear exact fee details when fee rate changes so slider updates work
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  /* ===== FEE DETAILS SYNCHRONIZATION ===== */
+  useEffect(() => {
+    if (progressiveFeeDetails && !isEstimating) {
+      logger.debug("stamps", {
+        message: "DonateStamp progressive fee details update",
+        data: {
+          phase: currentPhase,
+          hasExactFees: progressiveFeeDetails.hasExactFees,
+          minerFee: progressiveFeeDetails.minerFee,
+          totalValue: progressiveFeeDetails.totalValue,
+        },
+      });
+    }
+  }, [progressiveFeeDetails, isEstimating, currentPhase]);
 
   /* ===== EFFECTS ===== */
   // Sync fee state with parent
@@ -197,6 +225,28 @@ const DonateStampModal = ({
     }
 
     await handleSubmit(async () => {
+      // Get exact fee estimation before submitting - StampingTool pattern
+      try {
+        const exactEstimate = await estimateExact();
+        if (exactEstimate) {
+          setExactFeeDetails(exactEstimate);
+          logger.debug("stamps", {
+            message: "DonateStamp exact fee estimation completed",
+            data: {
+              minerFee: exactEstimate.minerFee,
+              totalValue: exactEstimate.totalValue,
+              hasExactFees: exactEstimate.hasExactFees,
+            },
+          });
+        }
+      } catch (error) {
+        logger.warn("stamps", {
+          message:
+            "DonateStamp exact fee estimation failed, using progressive estimate",
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+
       // Convert fee rate from sat/vB to sat/kB
       const feeRateKB = formState.fee * 1000;
 
@@ -353,18 +403,7 @@ const DonateStampModal = ({
         </h6>
       </div>
 
-      {/* ===== 🎯 PROGRESSIVE FEE STATUS INDICATOR ===== */}
-      <ProgressiveFeeStatusIndicator
-        isConnected={!!wallet}
-        isSubmitting={isSubmitting}
-        currentPhase={currentPhase}
-        phase1Result={phase1Result}
-        phase2Result={phase2Result}
-        phase3Result={phase3Result}
-        isPreFetching={isPreFetching}
-        feeEstimationError={feeEstimationError}
-        clearError={clearError}
-      />
+      {/* Using simplified fee display approach */}
 
       {/* ===== STAMP DETAILS ===== */}
       <div className="flex flex-row gap-6">
@@ -463,13 +502,29 @@ const DonateStampModal = ({
         className="pt-9 mobileLg:pt-12"
         bitname={undefined}
         // ===== 🚀 PROGRESSIVE FEE DETAILS INTEGRATION =====
-        feeDetails={mapProgressiveFeeDetails(progressiveFeeDetails) || {
-          minerFee: 0,
-          dustValue: 0,
-          totalValue: 0,
-          hasExactFees: false,
-          estimatedSize: 300,
-        }}
+        feeDetails={(() => {
+          const baseFeeDetails = mapProgressiveFeeDetails(
+            exactFeeDetails || progressiveFeeDetails,
+          );
+
+          // For donate transactions, add the donation amount to totalValue
+          // and remove dust since dispense uses OP_RETURN (no dust needed)
+          if (baseFeeDetails && totalPrice > 0) {
+            // Recalculate totalValue: minerFee only (no dust) + donation amount
+            const correctedTotalValue = baseFeeDetails.minerFee + totalPrice;
+
+            return {
+              ...baseFeeDetails,
+              dustValue: 0, // Dispense transactions use OP_RETURN, no dust needed
+              totalValue: correctedTotalValue,
+              itemPrice: totalPrice, // Add the donation amount for display in details
+              // Add a custom field to indicate this includes donation amount
+              includesDonationAmount: true,
+            };
+          }
+
+          return baseFeeDetails;
+        })()}
       />
     </ModalBase>
   );

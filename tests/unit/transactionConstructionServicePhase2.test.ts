@@ -1,19 +1,19 @@
 /**
- * Unit test for TransactionFeeEstimator Phase 2 dummy address handling
+ * Unit test for TransactionConstructionService Phase 2 dummy address handling
  *
  * Tests that Phase 2 can now run without a wallet address by using
  * dummy addresses for dryRun estimation.
  */
 
 import {
-    TransactionFeeEstimator,
-    type EstimationOptions
-} from "$lib/utils/minting/TransactionFeeEstimator.ts";
+    TransactionConstructionService,
+    type EstimationOptions,
+} from "$lib/utils/minting/TransactionConstructionService.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 
-describe("TransactionFeeEstimator Phase 2 Dummy Address Tests", () => {
-  const estimator = new TransactionFeeEstimator();
+describe("TransactionConstructionService Phase 2 Dummy Address Tests", () => {
+  const estimator = new TransactionConstructionService();
 
   it("should build tool options with dummy address when wallet is not connected", () => {
     const options: EstimationOptions = {

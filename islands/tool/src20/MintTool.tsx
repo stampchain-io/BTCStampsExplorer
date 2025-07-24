@@ -11,19 +11,13 @@ import {
   imagePreviewTool,
   loaderSpinGrey,
 } from "$layout";
-import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
-import type { ToolEstimationParams } from "$lib/types/fee-estimation.ts";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
-import {
-  extractSRC20ErrorMessage,
-  MintLimitExceededError,
-  validateAmount,
-  validateTicker,
-} from "$lib/utils/src20/errorHandling.tsx";
+import { extractSRC20ErrorMessage } from "$lib/utils/src20/errorHandling.tsx";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
-import type { SRC20Balance } from "$types/index.d.ts";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -31,7 +25,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 interface SRC20MintToolProps {
   trxType?: "olga" | "multisig";
   tick?: string | undefined | null;
-  mintStatus?: SRC20Balance | null | undefined;
+  mintStatus?: any | null | undefined; // Using any to accept both SRC20Balance and SRC20MintStatus
   holders?: number;
 }
 
@@ -287,27 +281,63 @@ export function SRC20MintTool({
 
   /* ===== PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
   const {
-    feeDetails: progressiveFeeDetails,
+    getBestEstimate,
     isEstimating,
-    feeDetailsVersion,
-    isPreFetching,
     estimateExact,
-    phase1Result,
-    phase2Result,
-    phase3Result,
     currentPhase,
     error: feeEstimationError,
     clearError,
-  } = useTransactionFeeEstimator({
-    toolType: "src20-mint",
+  } = useTransactionConstructionService({
+    toolType: "src20-mint", // Correct tool type for SRC-20 minting
     feeRate: isSubmitting ? 0 : formState.fee,
-    walletAddress: wallet?.address,
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
     isConnected: !!wallet && !isSubmitting,
     isSubmitting,
     // SRC-20 mint specific parameters
+    op: "MINT",
     tick: formState.token,
     amt: formState.amt,
   });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes) - StampingTool pattern
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates - StampingTool pattern
+  useEffect(() => {
+    // Clear exact fee details when fee rate changes so slider updates work
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  // Wrapper function for minting that gets exact fees first - StampingTool pattern
+  const handleMint = async () => {
+    try {
+      // Get exact fees before final submission
+      const exactFees = await estimateExact();
+      if (exactFees) {
+        // Calculate net spend amount (matches wallet display)
+        const netSpendAmount = exactFees.totalValue || 0;
+        setExactFeeDetails({
+          ...exactFees,
+          totalValue: netSpendAmount, // Matches wallet
+        });
+      }
+
+      // Call the original form submission
+      await handleSubmit();
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error in SRC20 mint exact fee estimation",
+        data: { error: error instanceof Error ? error.message : String(error) },
+      });
+      // Still proceed with submission even if exact fees fail
+      await handleSubmit();
+    }
+  };
 
   /* ===== FEE DETAILS SYNCHRONIZATION ===== */
   useEffect(() => {
@@ -323,7 +353,7 @@ export function SRC20MintTool({
         },
       });
     }
-  }, [progressiveFeeDetails, isEstimating, currentPhase, feeDetailsVersion]);
+  }, [progressiveFeeDetails, isEstimating, currentPhase]);
 
   /* ===== COMPONENT RENDER ===== */
   return (
@@ -341,7 +371,7 @@ export function SRC20MintTool({
         class={`${containerBackground} mb-6`}
         onSubmit={(e) => {
           e.preventDefault();
-          handleSubmit();
+          handleMint();
         }}
         aria-label="Mint SRC20 tokens"
         novalidate
@@ -487,33 +517,28 @@ export function SRC20MintTool({
             token: formState.token,
             amount: Number(formState.amt) || 0,
           }}
-          feeDetails={progressiveFeeDetails
-            ? {
-              minerFee: progressiveFeeDetails.minerFee || 0,
-              dustValue: progressiveFeeDetails.dustValue || 0,
-              totalValue: progressiveFeeDetails.totalValue || 0,
-              hasExactFees: progressiveFeeDetails.hasExactFees || false,
-              est_tx_size: progressiveFeeDetails.estimatedSize || 300,
-            }
-            : undefined}
+          feeDetails={mapProgressiveFeeDetails(
+            exactFeeDetails || progressiveFeeDetails,
+          )}
           isSubmitting={isSubmitting}
-          onSubmit={handleSubmit}
+          onSubmit={handleMint}
           buttonName={isConnected ? "MINT" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
-          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
-          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
-          userAddress={wallet?.address || ""}
-          // Progressive fee estimation status props
-          isEstimating={isEstimating}
-          isPreFetching={isPreFetching}
-          currentPhase={currentPhase}
-          phase1Result={phase1Result}
-          phase2Result={phase2Result}
-          phase3Result={phase3Result}
-          feeEstimationError={feeEstimationError}
-          clearError={clearError}
         />
+
+        {/* Error Display */}
+        {feeEstimationError && (
+          <div className="mt-2 text-red-500 text-sm">
+            Fee estimation error: {feeEstimationError}
+            <button
+              onClick={clearError}
+              className="ml-2 text-red-400 hover:text-red-300"
+            >
+              ✕
+            </button>
+          </div>
+        )}
 
         {/* ===== STATUS MESSAGES ===== */}
         <StatusMessages

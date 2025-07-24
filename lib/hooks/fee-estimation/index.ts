@@ -6,23 +6,20 @@
  */
 
 // Main progressive fee estimation hook
-export { useTransactionFeeEstimator } from "../useTransactionFeeEstimator.ts";
 export { useProgressiveFeeEstimation } from "../useProgressiveFeeEstimation.ts";
+export { useTransactionConstructionService } from "../useTransactionConstructionService.ts";
 
 // Supporting hooks
-export { useFees } from "../useFees.ts";
 export { useBTCValue } from "../useBTCValue.ts";
+export { useFees } from "../useFees.ts";
 
-// Hook types
-export type {
-  UseTransactionFeeEstimatorParams,
-  UseTransactionFeeEstimatorReturn,
-} from "$lib/types/fee-estimation.ts";
+// Hook types - removed missing exports
+// export type { UseTransactionConstructionServiceParams, UseTransactionConstructionServiceReturn } from "$lib/types/fee-estimation.ts";
 
-// Utility hooks for fee-related UI
-export { useFeeAnimations } from "./useFeeAnimations.ts";
-export { useFeeIndicatorState } from "./useFeeIndicatorState.ts";
-export { useFeeTheme } from "./useFeeTheme.ts";
+// Removed deleted hooks:
+// export { useFeeAnimations } from "./useFeeAnimations.ts";
+// export { useFeeTheme } from "./useFeeTheme.ts";
+// export { useFeeIndicatorState } from "./useFeeIndicatorState.ts";
 
 // Constants for hook configuration
 export const FEE_ESTIMATION_DEFAULTS = {
@@ -36,17 +33,17 @@ export const FEE_ESTIMATION_DEFAULTS = {
 export const TOOL_HOOK_PATTERNS = {
   // Pattern 1: Simple tools using FeeCalculatorBase
   props: {
-    hooks: ["useTransactionFeeEstimator"],
-    components: ["FeeCalculatorBase", "SimplePhaseIndicator"],
+    hooks: ["useTransactionConstructionService"],
+    components: ["FeeCalculatorBase"],
   },
   // Pattern 2: Modal tools with custom UI
   component: {
-    hooks: ["useTransactionFeeEstimator"],
-    components: ["ProgressiveFeeStatusIndicator"],
+    hooks: ["useTransactionConstructionService"],
+    components: [],
   },
   // Pattern 3: Advanced tools with inline indicators
   inline: {
-    hooks: ["useTransactionFeeEstimator", "useFeeAnimations"],
-    components: ["InlinePhaseIndicator"],
+    hooks: ["useTransactionConstructionService"],
+    components: [],
   },
 } as const;

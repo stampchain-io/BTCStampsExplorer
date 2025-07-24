@@ -2,6 +2,8 @@
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { FeeCalculatorBase } from "$section";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
 import { inputField, inputFieldSquare, SelectField } from "$form";
 import type { StampRow } from "$globals";
 import { Icon } from "$icon";
@@ -58,6 +60,52 @@ function SendStampModal({
     type: "transfer",
     initialFee,
   });
+
+  /* ===== PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
+  const {
+    getBestEstimate,
+    isEstimating,
+    estimateExact,
+    currentPhase,
+  } = useTransactionConstructionService({
+    toolType: "stamp", // Using "stamp" for stamp transfers
+    feeRate: isSubmitting ? 0 : formState.fee,
+    walletAddress: wallet?.address || "",
+    isConnected: !!wallet && !isSubmitting,
+    isSubmitting,
+    // Stamp transfer specific parameters
+    recipientAddress: formState.recipientAddress,
+    stampId: selectedStamp?.stamp,
+    cpid: selectedStamp?.cpid,
+    quantity: quantity,
+  });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes)
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates
+  useEffect(() => {
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  /* ===== FEE DETAILS SYNCHRONIZATION ===== */
+  useEffect(() => {
+    if (progressiveFeeDetails && !isEstimating) {
+      logger.debug("stamps", {
+        message: "SendStamp progressive fee details update",
+        data: {
+          phase: currentPhase,
+          hasExactFees: progressiveFeeDetails.hasExactFees,
+          minerFee: progressiveFeeDetails.minerFee,
+        },
+      });
+    }
+  }, [progressiveFeeDetails, isEstimating, currentPhase]);
 
   /* ===== EFFECTS ===== */
   // Sync external fee state with internal state - FIXED to prevent infinite loop
@@ -127,6 +175,27 @@ function SendStampModal({
             message: "Transfer failed - no stamp selected",
           });
           throw new Error("Please select a stamp to transfer");
+        }
+
+        // Get exact fee estimation before submitting
+        try {
+          const exactEstimate = await estimateExact();
+          if (exactEstimate) {
+            setExactFeeDetails(exactEstimate);
+            logger.debug("stamps", {
+              message: "SendStamp exact fee estimation completed",
+              data: {
+                minerFee: exactEstimate.minerFee,
+                hasExactFees: exactEstimate.hasExactFees,
+              },
+            });
+          }
+        } catch (error) {
+          logger.warn("stamps", {
+            message:
+              "SendStamp exact fee estimation failed, using progressive estimate",
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
 
         if (!wallet?.address) {
@@ -386,6 +455,9 @@ function SendStampModal({
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         BTCPrice={formState.BTCPrice}
+        feeDetails={mapProgressiveFeeDetails(
+          exactFeeDetails || progressiveFeeDetails,
+        )}
         isSubmitting={isSubmitting}
         onSubmit={handleTransferSubmit}
         onCancel={handleCloseModal}

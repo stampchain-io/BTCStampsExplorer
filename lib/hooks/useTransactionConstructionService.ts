@@ -1,13 +1,23 @@
 /**
- * useTransactionFeeEstimator - World-class fee estimation hook
+ * useTransactionConstructionService - World-class transaction construction hook
  *
- * Uses the new TransactionFeeEstimator class to provide:
- * - Phase 1: Instant mathematical estimates
- * - Phase 2: Smart tool endpoint estimates with dryRun=true (NEW: Direct integration)
- * - Phase 3: Exact transaction construction (on demand)
+ * Uses the new TransactionConstructionService class to provide:
+ * • Phase 1: Instant mathematical estimates (0ms)
+ * • Phase 2: Smart UTXO-based estimates (100-300ms)
+ * • Phase 3: Exact API-based estimates (300-1000ms)
  *
- * @author BTCStampsExplorer Team
- * @version 2.0.0 - Now with direct tool endpoint integration
+ * @example
+ * ```tsx
+ * const {
+ *   phase1, phase2, phase3,
+ *   isEstimating, estimateExact
+ * } = useTransactionConstructionService({
+ *   toolType: "stamp",
+ *   feeRate: 10,
+ *   walletAddress: "bc1q...",
+ *   file: base64Data
+ * });
+ * ```
  */
 
 import { debounce } from "$lib/utils/debounce.ts";
@@ -15,8 +25,8 @@ import { logger } from "$lib/utils/logger.ts";
 import {
   type EstimationOptions,
   type FeeEstimationResult,
-  transactionFeeEstimator,
-} from "$lib/utils/minting/TransactionFeeEstimator.ts";
+  transactionConstructionService,
+} from "$lib/utils/minting/TransactionConstructionService.ts";
 import { useCallback, useEffect, useMemo, useReducer } from "preact/hooks";
 
 // Hook state interface
@@ -124,7 +134,7 @@ function feeEstimatorReducer(
 /**
  * Progressive fee estimation hook with 3-phase approach
  */
-export function useTransactionFeeEstimator(options: EstimationOptions) {
+export function useTransactionConstructionService(options: EstimationOptions) {
   const [state, dispatch] = useReducer(feeEstimatorReducer, initialState);
 
   // Memoize options to prevent unnecessary re-renders
@@ -225,7 +235,7 @@ export function useTransactionFeeEstimator(options: EstimationOptions) {
       try {
         dispatch({ type: "START_ESTIMATION", phase: "instant" });
 
-        const result = await transactionFeeEstimator.estimateInstant(
+        const result = await transactionConstructionService.estimateInstant(
           memoizedOptions,
         );
 
@@ -271,7 +281,7 @@ export function useTransactionFeeEstimator(options: EstimationOptions) {
         dispatch({ type: "START_ESTIMATION", phase: "smart" }); // Updated: "cached" -> "smart"
 
         // 🚀 NEW: Use estimateSmart instead of estimateCached
-        const result = await transactionFeeEstimator.estimateSmart(
+        const result = await transactionConstructionService.estimateSmart(
           memoizedOptions,
         );
 
@@ -312,7 +322,7 @@ export function useTransactionFeeEstimator(options: EstimationOptions) {
     try {
       dispatch({ type: "START_ESTIMATION", phase: "exact" });
 
-      const result = await transactionFeeEstimator.estimateExact(
+      const result = await transactionConstructionService.estimateExact(
         memoizedOptions,
       );
 
@@ -361,7 +371,7 @@ export function useTransactionFeeEstimator(options: EstimationOptions) {
 
   const clearCache = useCallback(() => {
     // 🚀 UPDATED: Use clearCaches instead of clearCache
-    transactionFeeEstimator.clearCaches();
+    transactionConstructionService.clearCaches();
   }, []);
 
   // Get the best available estimate
@@ -373,7 +383,7 @@ export function useTransactionFeeEstimator(options: EstimationOptions) {
 
   // Get cache statistics
   const getCacheStats = useCallback(() => {
-    return transactionFeeEstimator.getCacheStats();
+    return transactionConstructionService.getCacheStats();
   }, []);
 
   return {

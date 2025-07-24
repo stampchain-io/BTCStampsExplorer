@@ -17,9 +17,15 @@ import type { ProgressiveFeeEstimationResult } from "$types/fee-estimation.ts";
 export function mapProgressiveFeeDetails(
   progressiveFeeDetails: ProgressiveFeeEstimationResult | null,
   defaultEstimatedSize = 300,
-): FeeDetails | undefined {
+): FeeDetails {
   if (!progressiveFeeDetails) {
-    return undefined;
+    return {
+      minerFee: 0,
+      dustValue: 0,
+      totalValue: 0,
+      hasExactFees: false,
+      estimatedSize: defaultEstimatedSize,
+    };
   }
 
   const feeDetails: FeeDetails = {

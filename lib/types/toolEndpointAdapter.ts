@@ -2,7 +2,7 @@
  * Tool Endpoint Adapter Interfaces
  *
  * Provides standardized interfaces for calling different tool endpoints with dryRun
- * parameter and normalizing their responses for the TransactionFeeEstimator system.
+ * parameter and normalizing their responses for the TransactionConstructionService system.
  *
  * This eliminates the need for redundant /api/internal/utxoquery calls by allowing
  * Phase 2 to directly call tool endpoints with dryRun=true.
@@ -64,6 +64,12 @@ export interface StampTransactionOptions extends TransactionOptions {
   locked: boolean;
   /** Whether asset is divisible */
   divisible: boolean;
+
+  // Optional dispense-specific properties for stamp purchases
+  /** Dispenser source address (for purchases) */
+  dispenserSource?: string;
+  /** Purchase quantity in satoshis (for purchases) */
+  purchaseQuantity?: string;
 }
 
 /**

@@ -1,5 +1,5 @@
 /**
- * TransactionFeeEstimator - World-class progressive fee estimation system
+ * TransactionConstructionService - World-class progressive transaction construction system
  *
  * Implements a 3-phase approach:
  * Phase 1: Instant mathematical estimates (no API calls)
@@ -162,9 +162,11 @@ export class UTXOCacheManager {
 }
 
 /**
- * TransactionFeeEstimator - Core fee estimation engine
+ * TransactionConstructionService - Core transaction construction engine
+ *
+ * Provides progressive fee estimation with 3-phase approach for optimal user experience.
  */
-export class TransactionFeeEstimator {
+export class TransactionConstructionService {
   private utxoCache = new UTXOCacheManager();
 
   /**
@@ -517,23 +519,24 @@ export class TransactionFeeEstimator {
 /**
  * Singleton instance for use throughout the application
  */
-export const transactionFeeEstimator = new TransactionFeeEstimator();
+export const transactionConstructionService =
+  new TransactionConstructionService();
 
 /**
- * Convenience function for estimating fees
+ * Convenience functions that delegate to the singleton instance
  */
-export async function estimateTransactionFees(
+export async function estimateInstant(
   options: EstimationOptions,
-  phase: "instant" | "smart" | "exact" = "smart",
 ): Promise<FeeEstimationResult> {
-  switch (phase) {
-    case "instant":
-      return transactionFeeEstimator.estimateInstant(options);
-    case "smart":
-      return transactionFeeEstimator.estimateSmart(options);
-    case "exact":
-      return transactionFeeEstimator.estimateExact(options);
-    default:
-      throw new Error(`Invalid estimation phase: ${phase}`);
-  }
+  return transactionConstructionService.estimateInstant(options);
+}
+export async function estimateSmart(
+  options: EstimationOptions,
+): Promise<FeeEstimationResult> {
+  return transactionConstructionService.estimateSmart(options);
+}
+export async function estimateExact(
+  options: EstimationOptions,
+): Promise<FeeEstimationResult> {
+  return transactionConstructionService.estimateExact(options);
 }

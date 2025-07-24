@@ -7,9 +7,10 @@ import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { bodyTool, containerBackground, loaderSpinGrey } from "$layout";
-import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages, tooltipButton } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
@@ -51,16 +52,58 @@ export function SRC101RegisterTool({
 
   /* ===== PROGRESSIVE FEE ESTIMATION ===== */
   const {
-    feeDetails: progressiveFeeDetails,
-  } = useTransactionFeeEstimator({
+    getBestEstimate,
+    estimateExact, // Phase 3: Exact estimation before registering
+    error: feeEstimationError,
+    clearError,
+  } = useTransactionConstructionService({
     toolType: "src101-create",
     feeRate: isSubmitting ? 0 : formState.fee,
-    ...(wallet?.address && { walletAddress: wallet.address }),
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
     isConnected: !!wallet && !isSubmitting,
     isSubmitting,
     // SRC-101 specific parameters
     bitname: formState.toAddress ? formState.toAddress + formState.root : "",
   });
+
+  // Get the best available fee estimate
+  const progressiveFeeDetails = getBestEstimate();
+
+  // Local state for exact fee details (updated when Phase 3 completes) - StampingTool pattern
+  const [exactFeeDetails, setExactFeeDetails] = useState<
+    typeof progressiveFeeDetails | null
+  >(null);
+
+  // Reset exactFeeDetails when fee rate changes to allow slider updates - StampingTool pattern
+  useEffect(() => {
+    // Clear exact fee details when fee rate changes so slider updates work
+    setExactFeeDetails(null);
+  }, [formState.fee]);
+
+  // Wrapper function for registering that gets exact fees first - StampingTool pattern
+  const handleRegisterWithExactFees = async () => {
+    try {
+      // Get exact fees before final submission
+      const exactFees = await estimateExact();
+      if (exactFees) {
+        // Calculate net spend amount (matches wallet display)
+        const netSpendAmount = exactFees.totalValue || 0;
+        setExactFeeDetails({
+          ...exactFees,
+          totalValue: netSpendAmount, // Matches wallet
+        });
+      }
+      // Call the original register submission
+      await handleSubmit();
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error in SRC101 register exact fee estimation",
+        data: { error: error instanceof Error ? error.message : String(error) },
+      });
+      // Still proceed with submission even if exact fees fail
+      await handleSubmit();
+    }
+  };
 
   /* ===== CLICK OUTSIDE HANDLER ===== */
   useEffect(() => {
@@ -156,7 +199,7 @@ export function SRC101RegisterTool({
       if (!formState.toAddress) return;
       const checkStatus = await checkAvailability();
       if (checkStatus) {
-        await handleSubmit();
+        await handleRegisterWithExactFees();
       }
     } catch (error) {
       console.error("Transfer error:", (error as Error).message);
@@ -312,19 +355,33 @@ export function SRC101RegisterTool({
           fileSize={formState.jsonSize}
           BTCPrice={formState.BTCPrice}
           isSubmitting={isSubmitting}
-          onSubmit={handleTransferSubmit}
+          onSubmit={handleRegisterWithExactFees}
           buttonName={isConnected ? "REGISTER" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           bitname={formState.toAddress + formState.root}
-          feeDetails={mapProgressiveFeeDetails(progressiveFeeDetails) || {
-            minerFee: 0,
-            dustValue: 0,
-            totalValue: 0,
-            hasExactFees: false,
-            estimatedSize: 300,
-          }}
+          feeDetails={mapProgressiveFeeDetails(
+            exactFeeDetails || progressiveFeeDetails,
+          )}
+          // Progressive fee estimation props removed - not supported by FeeCalculatorBase
         />
+
+        {/* ===== 🚨 FEE ESTIMATION ERROR HANDLING ===== */}
+        {feeEstimationError && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center justify-between">
+              <span className="text-red-700 text-sm">
+                Fee estimation error: {feeEstimationError}
+              </span>
+              <button
+                onClick={clearError}
+                className="text-red-500 hover:text-red-700 text-sm font-medium"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        )}
 
         <StatusMessages
           submissionMessage={submissionMessage}

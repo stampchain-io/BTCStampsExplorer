@@ -1,6 +1,21 @@
 /* ===== TRADE CONTENT COMPONENT ===== */
+/*
+ * 🚨 MIGRATION NEEDED: This component needs to be aligned with the unified fee estimation system.
+ *
+ * Current State: Uses 3 separate useTransactionConstructionService instances for attach/detach/dispense operations
+ * Required Changes:
+ * 1. Remove '_' prefixes from unused variables in all 3 estimator instances
+ * 2. Add exact fee handling wrappers (handleAttachWithExactFees, handleDetachWithExactFees, handleDispenseWithExactFees)
+ * 3. Add exactFeeDetails state management for each operation
+ * 4. Update FeeCalculatorBase props to use mapProgressiveFeeDetails(exactFeeDetails || progressiveFeeDetails)
+ * 5. Add 3-phase indicators for each operation
+ * 6. Add error handling for feeEstimationError and clearError
+ *
+ * Reference: See StampingTool.tsx, SendTool.tsx, MintTool.tsx for the unified pattern
+ * Priority: LOW - Component is not actively used in production
+ */
 import { walletContext } from "$client/wallet/wallet.ts";
-import { useTransactionFeeEstimator } from "$lib/hooks/useTransactionFeeEstimator.ts";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { showToast } from "$lib/utils/toastSignal.ts";
 import { useCallback, useEffect, useState } from "preact/hooks";
@@ -74,18 +89,21 @@ export function StampTradeTool() {
 
   /* ===== 🚀 PROGRESSIVE FEE ESTIMATION - CREATE PSBT ===== */
   const {
-    feeDetails: createPsbtFeeDetails,
+    getBestEstimate: getCreatePsbtBestEstimate,
+    isEstimating: _createPsbtIsEstimating,
     isPreFetching: createPsbtIsPreFetching,
+    estimateExact: _createPsbtEstimateExact,
+    // Phase-specific results
+    phase1: createPsbtPhase1,
+    phase2: _createPsbtPhase2,
+    phase3: createPsbtPhase3,
+    currentPhase: _createPsbtPhase,
     error: createPsbtFeeError,
     clearError: _createPsbtClearError,
-    currentPhase: _createPsbtPhase,
-    phase1Result: createPsbtPhase1,
-    phase2Result: _createPsbtPhase2,
-    phase3Result: createPsbtPhase3,
-  } = useTransactionFeeEstimator({
+  } = useTransactionConstructionService({
     toolType: "stamp", // Trade operations use stamp toolType
     feeRate: isSubmitting ? 0 : 1, // Default to 1 sat/vB for trades
-    ...(wallet?.address && { walletAddress: wallet.address }),
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
     isConnected: !!wallet && !isSubmitting,
     isSubmitting,
     // Trade-specific parameters for PSBT creation
@@ -95,22 +113,28 @@ export function StampTradeTool() {
     }),
   });
 
+  // Get the best available fee estimate
+  const createPsbtFeeDetails = getCreatePsbtBestEstimate();
+
   /* ===== 🚀 PROGRESSIVE FEE ESTIMATION - UTXO ATTACH ===== */
   const {
-    feeDetails: attachFeeDetails,
+    getBestEstimate: getAttachBestEstimate,
+    isEstimating: _attachIsEstimating,
     isPreFetching: attachIsPreFetching,
+    estimateExact: _attachEstimateExact,
+    // Phase-specific results
+    phase1: attachPhase1,
+    phase2: _attachPhase2,
+    phase3: attachPhase3,
+    currentPhase: _attachPhase,
     error: attachFeeError,
     clearError: _attachClearError,
-    currentPhase: _attachPhase,
-    phase1Result: attachPhase1,
-    phase2Result: _attachPhase2,
-    phase3Result: attachPhase3,
-  } = useTransactionFeeEstimator({
+  } = useTransactionConstructionService({
     toolType: "stamp", // Attach operations use stamp toolType
     feeRate: attachFormState.feeRateVB
       ? parseInt(attachFormState.feeRateVB)
       : 0,
-    ...(wallet?.address && { walletAddress: wallet.address }),
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
     isConnected: !!wallet && !isSubmitting,
     isSubmitting,
     // Attach-specific parameters
@@ -120,20 +144,26 @@ export function StampTradeTool() {
     ...(attachFormState.utxo && { utxoString: attachFormState.utxo }),
   });
 
+  // Get the best available fee estimate
+  const attachFeeDetails = getAttachBestEstimate();
+
   /* ===== 🚀 PROGRESSIVE FEE ESTIMATION - COMPLETE SWAP ===== */
   const {
-    feeDetails: swapFeeDetails,
+    getBestEstimate: getSwapBestEstimate,
+    isEstimating: _swapIsEstimating,
     isPreFetching: swapIsPreFetching,
+    estimateExact: _swapEstimateExact,
+    // Phase-specific results
+    phase1: swapPhase1,
+    phase2: _swapPhase2,
+    phase3: swapPhase3,
+    currentPhase: _swapPhase,
     error: swapFeeError,
     clearError: _swapClearError,
-    currentPhase: _swapPhase,
-    phase1Result: swapPhase1,
-    phase2Result: _swapPhase2,
-    phase3Result: swapPhase3,
-  } = useTransactionFeeEstimator({
+  } = useTransactionConstructionService({
     toolType: "stamp", // Swap completion uses stamp toolType
     feeRate: buyerFormState.feeRate ? parseInt(buyerFormState.feeRate) : 0,
-    ...(wallet?.address && { walletAddress: wallet.address }),
+    walletAddress: wallet?.address || "", // Provide empty string instead of undefined
     isConnected: !!wallet && !isSubmitting,
     isSubmitting,
     // Swap-specific parameters
@@ -142,6 +172,9 @@ export function StampTradeTool() {
       psbtSize: buyerFormState.sellerPsbtHex.length / 2, // Hex to bytes
     }),
   });
+
+  // Get the best available fee estimate
+  const swapFeeDetails = getSwapBestEstimate();
 
   /* ===== EFFECTS ===== */
   useEffect(() => {

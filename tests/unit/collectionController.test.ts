@@ -12,15 +12,13 @@ import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 // Test fixtures
 const mockCollectionData = {
   collection_id: "POSH",
-  name: "posh",
+  collection_name: "posh",
+  collection_description: "Test Collection",
+  creators: ["bc1qtest"],
   stamp_count: 100,
-  creator: "bc1qtest",
-  first_stamp_block: 800000,
-  last_stamp_block: 820000,
-  description: "Test Collection",
-  floor_price: 0.001,
-  volume_24h: 5.5,
-  market_cap: 150.75,
+  total_editions: 100,
+  stamps: [],
+  img: "https://example.com/collection.png",
 };
 
 const mockStampData = [
@@ -88,7 +86,7 @@ describe("CollectionController", () => {
 
       assertEquals(result.data.length, 1);
       assertEquals(result.data[0].collection_id, "POSH");
-      assertEquals(result.data[0].name, "posh");
+      assertEquals(result.data[0].collection_name, "posh");
       assertEquals(result.page, 1);
       assertEquals(result.total, 1);
     });
@@ -172,7 +170,7 @@ describe("CollectionController", () => {
   describe("getCollectionNames", () => {
     it("should return collection names successfully", async () => {
       const mockNamesResponse = {
-        data: [{ collection_id: "POSH", name: "posh" }],
+        data: [mockCollectionData],
         page: 1,
         limit: 50,
         totalPages: 1,
@@ -190,7 +188,7 @@ describe("CollectionController", () => {
 
       assertEquals(result.data.length, 1);
       assertEquals(result.data[0].collection_id, "POSH");
-      assertEquals(result.data[0].name, "posh");
+      assertEquals(result.data[0].collection_name, "posh");
     });
 
     it("should handle service errors gracefully", async () => {
@@ -242,6 +240,7 @@ describe("CollectionController", () => {
           totalPages: 1,
           page: 1,
           limit: 36,
+          last_block: 820000,
         });
 
       const result = await CollectionController.getCollectionStamps({
@@ -289,6 +288,7 @@ describe("CollectionController", () => {
           limit: 12,
           totalPages: 1,
           total: 0,
+          last_block: 820000,
         });
 
       await CollectionController.getCollectionStamps({
@@ -303,7 +303,11 @@ describe("CollectionController", () => {
     it("should group stamps by collection ID", async () => {
       const multiCollectionData = [
         { ...mockCollectionData, collection_id: "POSH" },
-        { ...mockCollectionData, collection_id: "COOL", name: "cool" },
+        {
+          ...mockCollectionData,
+          collection_id: "COOL",
+          collection_name: "cool",
+        },
       ];
 
       const multiStampData = [
@@ -330,6 +334,7 @@ describe("CollectionController", () => {
           limit: 12,
           totalPages: 1,
           total: stamps.length,
+          last_block: 820000,
         });
       };
 
@@ -371,6 +376,7 @@ describe("CollectionController", () => {
           limit: 12,
           totalPages: 1,
           total: 3,
+          last_block: 820000,
         });
 
       const result = await CollectionController.getCollectionStamps({
@@ -400,6 +406,7 @@ describe("CollectionController", () => {
           limit: 240, // 20 * 12
           totalPages: 1,
           total: 20,
+          last_block: 820000,
         });
 
       const result = await CollectionController.getCollectionStamps({
@@ -424,6 +431,7 @@ describe("CollectionController", () => {
           limit: 12,
           totalPages: 1,
           total: 2,
+          last_block: 820000,
         });
 
       const result = await CollectionController.getCollectionStamps({
@@ -451,6 +459,7 @@ describe("CollectionController", () => {
           limit: 12,
           totalPages: 1,
           total: 1,
+          last_block: 820000,
         });
 
       const result = await CollectionController.getCollectionStamps({
@@ -476,6 +485,7 @@ describe("CollectionController", () => {
           limit: 12,
           totalPages: 1,
           total: 0,
+          last_block: 820000,
         });
 
       const result = await CollectionController.getCollectionStamps({
@@ -491,7 +501,7 @@ describe("CollectionController", () => {
     it("should handle invalid data structure from CollectionService", async () => {
       CollectionService.getCollectionDetails = () =>
         Promise.resolve({
-          data: "invalid", // Should be array
+          data: "invalid" as any, // Should be array
           page: 1,
           limit: 50,
           totalPages: 1,
@@ -515,12 +525,21 @@ describe("CollectionController", () => {
           limit: 12,
           totalPages: 1,
           total: 0,
+          last_block: 820000,
         });
 
-      await assertRejects(
-        () => CollectionController.getCollectionStamps({ page: 1, limit: 50 }),
-        Error,
-      );
+      // Should not throw - errors are caught and logged
+      const result = await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      // Verify collections are returned with empty stamp arrays
+      assertEquals(result.data.length, 1);
+      result.data.forEach((collection: any) => {
+        assertEquals(collection.stamp_images, []);
+        assertEquals(collection.first_stamp_image, null);
+      });
     });
 
     it("should pass correct parameters to StampService", async () => {
@@ -536,6 +555,7 @@ describe("CollectionController", () => {
           limit: 12,
           totalPages: 1,
           total: 0,
+          last_block: 820000,
         });
       };
 
@@ -571,11 +591,18 @@ describe("CollectionController", () => {
         throw new Error("Stamp service error");
       };
 
-      await assertRejects(
-        () => CollectionController.getCollectionStamps({ page: 1, limit: 50 }),
-        Error,
-        "Stamp service error",
-      );
+      // Should not throw - errors are caught and logged for individual stamp fetches
+      const result = await CollectionController.getCollectionStamps({
+        page: 1,
+        limit: 50,
+      });
+
+      // Verify collections are returned with empty stamp arrays
+      assertEquals(result.data.length, 1);
+      result.data.forEach((collection: any) => {
+        assertEquals(collection.stamp_images, []);
+        assertEquals(collection.first_stamp_image, null);
+      });
     });
   });
 });

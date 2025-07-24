@@ -17,6 +17,7 @@ import {
   formatSatoshisToUSD,
 } from "$lib/utils/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { estimateTransactionSizeForType } from "$lib/utils/transactionSizeEstimator.ts";
 import { tooltipButton, tooltipImage } from "$notification";
 import { labelXs, textXs } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
@@ -112,6 +113,8 @@ export function FeeCalculatorBase({
   const [allowCurrencyTooltip, setAllowCurrencyTooltip] = useState(true);
   const [canHoverSelected, setCanHoverSelected] = useState(true);
   const [allowHover, setAllowHover] = useState(true);
+  const [isTxSizeTooltipVisible, setIsTxSizeTooltipVisible] = useState(false);
+  const txSizeTooltipTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     logger.debug("ui", {
@@ -129,6 +132,9 @@ export function FeeCalculatorBase({
       }
       if (currencyTooltipTimeoutRef.current) {
         globalThis.clearTimeout(currencyTooltipTimeoutRef.current);
+      }
+      if (txSizeTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(txSizeTooltipTimeoutRef.current);
       }
     };
   }, []);
@@ -204,6 +210,30 @@ export function FeeCalculatorBase({
     }
     setIsCurrencyTooltipVisible(false);
     setAllowCurrencyTooltip(true);
+  };
+
+  const handleTxSizeMouseEnter = () => {
+    if (txSizeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(txSizeTooltipTimeoutRef.current);
+    }
+
+    txSizeTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+      setIsTxSizeTooltipVisible(true);
+    }, 1500);
+  };
+
+  const handleTxSizeMouseLeave = () => {
+    if (txSizeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(txSizeTooltipTimeoutRef.current);
+    }
+    setIsTxSizeTooltipVisible(false);
+  };
+
+  const handleTxSizeMouseDown = () => {
+    if (txSizeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(txSizeTooltipTimeoutRef.current);
+    }
+    setIsTxSizeTooltipVisible(false);
   };
 
   // Helper functions to convert between slider position and fee value
@@ -335,6 +365,35 @@ export function FeeCalculatorBase({
               {fileSize ? fileSize : <span class="animate-pulse">***</span>}
               {" "}
               <span class="font-light">BYTES</span>
+            </h6>
+          )}
+
+          {/* Transaction Size */}
+          {(type === "stamp" || type === "src20" || type === "src101" ||
+            type === "send") && (
+            <h6
+              class={`${textXs} cursor-help`}
+              onMouseEnter={handleTxSizeMouseEnter}
+              onMouseLeave={handleTxSizeMouseLeave}
+              onMouseDown={handleTxSizeMouseDown}
+              onMouseMove={handleMouseMove}
+            >
+              <span class={labelXs}>TX SIZE</span>&nbsp;&nbsp;
+              <span class="text-stamp-grey-light">~</span>
+              {(() => {
+                const transactionType = type === "send"
+                  ? "send"
+                  : type === "src20"
+                  ? "src20"
+                  : type === "src101"
+                  ? "src101"
+                  : "stamp";
+                const estimatedSize = estimateTransactionSizeForType(
+                  transactionType,
+                  fileSize,
+                );
+                return estimatedSize;
+              })()} <span class="font-light">vBYTES</span>
             </h6>
           )}
 
@@ -889,6 +948,29 @@ export function FeeCalculatorBase({
           >
             {isSubmitting ? "PROCESSING" : confirmText || buttonName}
           </button>
+        </div>
+      </div>
+
+      {/* Transaction Size Tooltip */}
+      <div
+        className={`${tooltipImage} ${
+          isTxSizeTooltipVisible ? "opacity-100" : "opacity-0"
+        }`}
+        style={{
+          left: `${tooltipPosition.x}px`,
+          top: `${tooltipPosition.y - 6}px`,
+          transform: "translate(-50%, -100%)",
+          maxWidth: "280px",
+          whiteSpace: "normal",
+          textAlign: "center",
+          fontSize: "11px",
+          lineHeight: "1.3",
+        }}
+      >
+        <div class="font-medium mb-1">TRANSACTION SIZE (vBYTES)</div>
+        <div class="font-light">
+          Virtual bytes measure Bitcoin transaction size for fee calculation.
+          Larger files create bigger transactions that cost more to broadcast.
         </div>
       </div>
     </div>

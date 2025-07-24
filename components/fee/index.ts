@@ -4,10 +4,7 @@
  * Central export point for all fee-related components
  */
 
-export {
-  CompactFeePhaseIndicator,
-  ProgressiveFeeStatusIndicator,
-} from "./ProgressiveFeeStatusIndicator.tsx";
+// Fee status indicators removed as part of Task 30 simplification
 
 // Re-export types for convenience
 export type {

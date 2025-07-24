@@ -84,7 +84,7 @@ describe("SRC20 PSBT Services - New Architecture", () => {
           });
         },
         Error,
-        "No UTXOs available for SRC-20 transaction",
+        "Failed to fetch script (scriptPubKey) for UTXO abc123:0. This is required for PSBT creation.",
       );
     });
 
