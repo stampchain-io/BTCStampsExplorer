@@ -1,5 +1,6 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { SRC20Row } from "$globals";
+import { Icon } from "$icon";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import {
   containerCardTable,
@@ -84,8 +85,8 @@ export function SRC20Card({
 
   // Helper function to handle header clicks for sorting
   const handleHeaderClick = (headerName: string) => {
-    // Skip sorting for empty header (CHART)
-    if (headerName === "") {
+    // Skip sorting for CHART header (non-interactive)
+    if (headerName === "CHART") {
       return;
     }
 
@@ -137,12 +138,12 @@ export function SRC20Card({
   ) => {
     const baseClass = `${labelXs} ${cellAlign(index, headers.length)} py-2`;
 
-    // Segmented control borders and corners
-    const segmentedBorders = isFirst
-      ? "border-l border-t border-b rounded-l-lg border-stamp-grey-darker/50"
+    // Row background color and rounded corners
+    const rowClass = isFirst
+      ? "bg-stamp-grey-darkest/15 rounded-l-lg"
       : isLast
-      ? "border-r border-t border-b rounded-r-lg border-l-0 border-stamp-grey-darker/50"
-      : "border-t border-b border-l-0 border-stamp-grey-darker/50";
+      ? "bg-stamp-grey-darkest/15 rounded-r-lg"
+      : "bg-stamp-grey-darkest/15";
 
     // Selected segment styling
     const selectedClass = isSelected ? "text-stamp-grey-light" : "";
@@ -159,12 +160,13 @@ export function SRC20Card({
 
     const sortIndicator = isSelected ? "relative" : "";
 
-    return `${baseClass} ${segmentedBorders} ${selectedClass} ${colorClass} ${clickableClass} ${sortIndicator}`
+    return `${baseClass} ${rowClass} ${selectedClass} ${colorClass} ${clickableClass} ${sortIndicator}`
       .trim();
   };
 
   // Helper function to render sort indicator
   const renderSortIndicator = (headerName: string) => {
+    // Map header names to API sort parameters
     const sortMapping: Record<string, string> = {
       "TOKEN": "TOKEN",
       "PRICE": "PRICE",
@@ -174,14 +176,24 @@ export function SRC20Card({
       "DEPLOY": "DEPLOY",
       "HOLDERS": "HOLDERS",
     };
+
     const apiSortKey = sortMapping[headerName];
     const isCurrentSort = currentSort?.filter === apiSortKey;
 
     if (!isCurrentSort) return null;
 
     return (
-      <span class="absolute -right-2 top-0">
-        {currentSort.direction === "desc" ? "↓" : "↑"}
+      <span class="absolute -right-5 -top-[1px]">
+        <Icon
+          type="icon"
+          name="caretUp"
+          weight="normal"
+          size="xxxs"
+          color="custom"
+          className={`stroke-stamp-grey-light transition-all duration-300 transform ${
+            currentSort.direction === "desc" ? "scale-y-[-1]" : ""
+          }`}
+        />
       </span>
     );
   };
@@ -218,12 +230,12 @@ export function SRC20Card({
             { width: "min-w-[160px] w-auto" }, // CHART
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
-        <thead class="sticky top-0 z-10">
-          <tr class="transparent">
+        <thead>
+          <tr>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === headers.length - 1;
-              const isClickable = header !== "";
+              const isClickable = header !== "CHART";
 
               // Get sort state for segmented control styling
               const sortMapping: Record<string, string> = {
@@ -241,13 +253,19 @@ export function SRC20Card({
               return (
                 <th
                   key={header}
-                  class={getSegmentedHeaderClass(
-                    i,
-                    isFirst,
-                    isLast,
-                    isSelected,
-                    isClickable,
-                  )}
+                  class={`${
+                    getSegmentedHeaderClass(
+                      i,
+                      isFirst,
+                      isLast,
+                      isSelected,
+                      isClickable,
+                    )
+                  } ${
+                    isFirst
+                      ? "sticky left-0 tablet:static backdrop-blur-sm tablet:backdrop-blur-none z-10"
+                      : ""
+                  }`}
                   onClick={() => handleHeaderClick(header)}
                 >
                   <span class="relative inline-block">
