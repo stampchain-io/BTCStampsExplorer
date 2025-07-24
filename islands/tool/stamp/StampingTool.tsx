@@ -3,7 +3,6 @@ import { ToggleSwitchButton } from "$button";
 import { useConfig } from "$client/hooks/useConfig.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { getWalletProvider } from "$client/wallet/walletHelper.ts";
-import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { InputField } from "$form";
 import { Config } from "$globals";
 import { Icon } from "$icon";
@@ -23,6 +22,7 @@ import {
   tooltipImage,
 } from "$notification";
 import { useProgressiveFeeEstimation } from "$progressiveFees";
+import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
@@ -319,8 +319,15 @@ function StampingToolMain({ config }: { config: Config }) {
     debounceMs: 100, // Faster for testing
   });
 
-  // 🎯 PREACT FORCE UPDATE: Counter to force re-renders
-  const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
+  // 🔍 DEBUG: Log all hook values immediately after call
+  console.log("🔍 StampingTool: Hook values", {
+    progressiveFeeDetails,
+    isEstimating,
+    estimationError,
+    feeDetailsVersion,
+    fee,
+    stampName,
+  });
 
   // Update local feeDetails when progressive estimation completes
   useEffect(() => {
@@ -351,7 +358,7 @@ function StampingToolMain({ config }: { config: Config }) {
       setFeeDetails(newFeeDetails);
 
       // 🎯 PREACT FORCE UPDATE: Increment counter to force re-render
-      setForceUpdateCounter((prev) => prev + 1);
+      // setForceUpdateCounter((prev) => prev + 1); // REMOVED
     }
   }, [
     // Use version counter to ensure Preact detects fee changes
@@ -367,10 +374,10 @@ function StampingToolMain({ config }: { config: Config }) {
       minerFee: feeDetails.minerFee,
       dustValue: feeDetails.dustValue,
       totalValue: feeDetails.totalValue,
-      forceUpdateCounter,
+      // forceUpdateCounter, // REMOVED
       timestamp: new Date().toISOString(),
     });
-  }, [feeDetails, forceUpdateCounter]);
+  }, [feeDetails]); // REMOVED forceUpdateCounter
 
   // Tooltip state and refs
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });

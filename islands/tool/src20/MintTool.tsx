@@ -1,7 +1,6 @@
 /* ===== SRC20 TOKEN MINTING COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { SRC20InputField } from "$form";
 import { Icon } from "$icon";
 import {
@@ -13,6 +12,7 @@ import {
 } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages } from "$notification";
+import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import type { SRC20Balance } from "$types/index.d.ts";
 import { useEffect, useState } from "preact/hooks";

@@ -214,6 +214,12 @@ export function useProgressiveFeeEstimation(
         phase1FeeDetails,
       );
       setFeeDetails(phase1FeeDetails);
+      console.log(
+        "🎯 useProgressiveFeeEstimation: Incrementing feeDetailsVersion from",
+        feeDetailsVersion,
+        "to",
+        feeDetailsVersion + 1,
+      );
       setFeeDetailsVersion((prev) => prev + 1);
       setCacheStatus("fresh");
 
@@ -260,6 +266,12 @@ export function useProgressiveFeeEstimation(
           };
 
           setFeeDetails(phase2FeeDetails);
+          console.log(
+            "🎯 useProgressiveFeeEstimation: Incrementing feeDetailsVersion (Phase 2) from",
+            feeDetailsVersion,
+            "to",
+            feeDetailsVersion + 1,
+          );
           setFeeDetailsVersion((prev) => prev + 1);
 
           loggerService.debug("ui", {
@@ -305,6 +317,12 @@ export function useProgressiveFeeEstimation(
         hasExactFees: false,
         estimatedSize: 0,
       });
+      console.log(
+        "🎯 useProgressiveFeeEstimation: Incrementing feeDetailsVersion (Error) from",
+        feeDetailsVersion,
+        "to",
+        feeDetailsVersion + 1,
+      );
       setFeeDetailsVersion((prev) => prev + 1);
     } finally {
       setIsEstimating(false);

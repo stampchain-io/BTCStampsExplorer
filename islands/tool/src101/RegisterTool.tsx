@@ -2,7 +2,6 @@
 import { Button } from "$button";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeCalculatorBase } from "$components/section/FeeCalculatorBase.tsx";
 import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
 import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
@@ -10,6 +9,7 @@ import { openModal } from "$islands/modal/states.ts";
 import { bodyTool, containerBackground, loaderSpinGrey } from "$layout";
 import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
 import { StatusMessages, tooltipButton } from "$notification";
+import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
