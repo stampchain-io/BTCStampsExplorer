@@ -229,5 +229,23 @@
   "extensions.experimental.affinity": {
     "denoland.vscode-deno": 1
   },
-  "testing.automaticallyOpenTestResults": "neverOpen"
+  "testing.automaticallyOpenTestResults": "neverOpen",
+  "folder-color.pathColors": [
+    {
+      "folderPath": "BTCStampsExplorer/routes/",
+      "color": "foldercolorizer.color_cc66ff"
+    },
+    {
+      "folderPath": "BTCStampsExplorer/islands/",
+      "color": "foldercolorizer.color_ffccff"
+    },
+    {
+      "folderPath": "BTCStampsExplorer/components/",
+      "color": "foldercolorizer.color_cc6633"
+    },
+    {
+      "folderPath": "BTCStampsExplorer/static/",
+      "color": "foldercolorizer.color_00cc99"
+    }
+  ]
 }
