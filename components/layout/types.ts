@@ -102,9 +102,9 @@ export const defaultColGroup = {
 };
 
 export const cellAlignment = {
-  first: "text-left",
+  first: "text-center",
   middle: "text-center",
-  last: "text-right",
+  last: "text-center",
 };
 
 /* ===== TABLE STYLING UTILITIES ===== */

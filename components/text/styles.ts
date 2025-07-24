@@ -26,7 +26,7 @@ export const logoPurpleLDLink =
 /* ===== NAVIGATION STYLES ===== */
 // Header - Desktop
 export const navLinkPurple =
-  `font-extrabold text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wide ${transition} ${cursor}`;
+  `font-bold text-stamp-purple text-sm group-hover:text-stamp-purple-bright tracking-wide ${transition} ${cursor}`;
 export const navSublinkPurple =
   `font-semibold text-stamp-purple text-xs hover:text-stamp-purple-bright ${transition} ${cursor}`; // used in ConnectButton.tsx for connected sunmenu links - header uses custom styles
 // Header - Mobile/tablet

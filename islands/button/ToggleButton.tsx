@@ -1,5 +1,5 @@
-import { useState } from "preact/hooks";
 import { button } from "$button";
+import { useState } from "preact/hooks";
 
 export const ToggleButton = ({
   options,
