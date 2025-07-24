@@ -79,7 +79,7 @@ export function SRC20Card({
     "MARKETCAP",
     "DEPLOY",
     "HOLDERS",
-    "",
+    "CHART",
   ];
 
   // Helper function to handle header clicks for sorting
@@ -135,27 +135,14 @@ export function SRC20Card({
     isSelected: boolean,
     isClickable: boolean,
   ) => {
-    const baseClass = `${labelXs} ${cellAlign(index, headers.length)} p-3`;
-    const responsiveClass = index === 2
-      ? "text-right mobileMd:text-center" // CHANGE
-      : index === 3
-      ? "hidden mobileMd:table-cell" // VOLUME
-      : index === 4
-      ? "hidden mobileLg:table-cell" // MARKETCAP
-      : index === 5
-      ? "hidden tablet:table-cell" // DEPLOY
-      : index === 6
-      ? "hidden mobileLg:table-cell" // HOLDERS
-      : index === 7
-      ? "hidden mobileMd:table-cell"
-      : ""; // CHART
+    const baseClass = `${labelXs} ${cellAlign(index, headers.length)} py-2`;
 
     // Segmented control borders and corners
     const segmentedBorders = isFirst
-      ? "border-l border-t border-b rounded-l-lg border-stamp-grey-darker"
+      ? "border-l border-t border-b rounded-l-lg border-stamp-grey-darker/50"
       : isLast
-      ? "border-r border-t border-b rounded-r-lg border-l-0 border-stamp-grey-darker"
-      : "border-t border-b border-l-0 border-stamp-grey-darker";
+      ? "border-r border-t border-b rounded-r-lg border-l-0 border-stamp-grey-darker/50"
+      : "border-t border-b border-l-0 border-stamp-grey-darker/50";
 
     // Selected segment styling
     const selectedClass = isSelected ? "text-stamp-grey-light" : "";
@@ -163,8 +150,8 @@ export function SRC20Card({
     const colorClass = isSelected
       ? "text-stamp-grey-light"
       : isClickable
-      ? "text-stamp-grey hover:text-stamp-grey-light"
-      : "text-stamp-grey";
+      ? "text-stamp-grey-darker hover:text-stamp-grey-light"
+      : "text-stamp-grey-darker";
 
     const clickableClass = isClickable
       ? "cursor-pointer transition-all duration-200 select-none"
@@ -172,7 +159,7 @@ export function SRC20Card({
 
     const sortIndicator = isSelected ? "relative" : "";
 
-    return `${baseClass} ${responsiveClass} ${segmentedBorders} ${selectedClass} ${colorClass} ${clickableClass} ${sortIndicator}`
+    return `${baseClass} ${segmentedBorders} ${selectedClass} ${colorClass} ${clickableClass} ${sortIndicator}`
       .trim();
   };
 
@@ -212,353 +199,363 @@ export function SRC20Card({
   }
 
   return (
-    <table class={`w-full ${textSm} border-separate border-spacing-y-3`}>
-      <colgroup>
-        {colGroup([
-          { width: "w-[40%] mobileMd:w-[25%] mobileLg:w-[19%] tablet:w-[16%]" }, // TOKEN
-          { width: "w-[30%] mobileMd:w-[16%] mobileLg:w-[12%] tablet:w-[8%]" }, // PRICE
-          { width: "w-[30%] mobileMd:w-[8%] mobileLg:w-[4%] tablet:w-[8%]" }, // CHANGE
-          { width: "hidden mobileMd:w-[8%] mobileLg:w-[16%] tablet:w-[10%]" }, // VOLUME
-          { width: "hidden mobileLg:w-[16%] tablet:w-[10%]" }, // MARKETCAP
-          { width: "hidden tablet:w-[12%]" }, // DEPLOY
-          { width: "hidden mobileLg:w-[13%] tablet:w-[10%]" }, // HOLDERS
-          { width: "hidden mobileMd:w-[16%] mobileLg:w-[22%] tablet:w-[26%]" }, // CHART
-        ]).map((col) => <col key={col.key} class={col.className} />)}
-      </colgroup>
-      <thead class="sticky top-0 z-10">
-        <tr class="dark-gradient">
-          {headers.map((header, i) => {
-            const isFirst = i === 0;
-            const isLast = i === headers.length - 1;
-            const isClickable = header !== "";
+    <div class="overflow-x-auto">
+      <table
+        class={`w-full ${textSm} border-separate border-spacing-y-3`}
+      >
+        <colgroup>
+          {colGroup([
+            {
+              width:
+                "min-w-[150px] max-w-[180px] w-auto sticky left-0 tablet:static",
+            }, // TOKEN
+            { width: "min-w-[100px] w-auto" }, // PRICE
+            { width: "min-w-[90px] w-auto" }, // CHANGE
+            { width: "min-w-[110px] w-auto" }, // VOLUME
+            { width: "min-w-[110px] w-auto" }, // MARKETCAP
+            { width: "min-w-[110px] w-auto" }, // DEPLOY
+            { width: "min-w-[90px] w-auto" }, // HOLDERS
+            { width: "min-w-[160px] w-auto" }, // CHART
+          ]).map((col) => <col key={col.key} class={col.className} />)}
+        </colgroup>
+        <thead class="sticky top-0 z-10">
+          <tr class="transparent">
+            {headers.map((header, i) => {
+              const isFirst = i === 0;
+              const isLast = i === headers.length - 1;
+              const isClickable = header !== "";
 
-            // Get sort state for segmented control styling
-            const sortMapping: Record<string, string> = {
-              "TOKEN": "TOKEN",
-              "PRICE": "PRICE",
-              "CHANGE": "CHANGE",
-              "VOLUME": "VOLUME",
-              "MARKETCAP": "MARKET_CAP",
-              "DEPLOY": "DEPLOY",
-              "HOLDERS": "HOLDERS",
-            };
-            const apiSortKey = sortMapping[header];
-            const isSelected = currentSort?.filter === apiSortKey;
-
-            return (
-              <th
-                key={header}
-                class={getSegmentedHeaderClass(
-                  i,
-                  isFirst,
-                  isLast,
-                  isSelected,
-                  isClickable,
-                )}
-                onClick={() => handleHeaderClick(header)}
-              >
-                <span class="relative inline-block">
-                  {header}
-                  {(header === "CHANGE" || header === "VOLUME") &&
-                    ` ${timeframe}`}
-                  {renderSortIndicator(header)}
-                </span>
-              </th>
-            );
-          })}
-        </tr>
-      </thead>
-      <tbody>
-        {data.length
-          ? (
-            data.map((src20) => {
-              // SRC-20 Image URL Logic:
-              // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
-              // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
-              // 3. Fallback to constructing URL from deploy_tx if available
-              // 4. Final fallback to placeholder image
-              const imageUrl = src20.deploy_img ||
-                src20.stamp_url ||
-                (src20.deploy_tx ? constructStampUrl(src20.deploy_tx) : null) ||
-                "/img/placeholder/stamp-no-image.svg";
+              // Get sort state for segmented control styling
+              const sortMapping: Record<string, string> = {
+                "TOKEN": "TOKEN",
+                "PRICE": "PRICE",
+                "CHANGE": "CHANGE",
+                "VOLUME": "VOLUME",
+                "MARKETCAP": "MARKET_CAP",
+                "DEPLOY": "DEPLOY",
+                "HOLDERS": "HOLDERS",
+              };
+              const apiSortKey = sortMapping[header];
+              const isSelected = currentSort?.filter === apiSortKey;
 
               return (
-                <tr
-                  key={src20.tx_hash}
-                  class={`${containerCardTable} cursor-pointer group`}
-                  onClick={(e) => {
-                    // Only navigate if not clicking on image or chart
-                    const target = e.target as HTMLElement;
-                    const isImage = target.tagName === "IMG";
-                    const isChart = target.closest("[data-chart-widget]"); // Add this data attribute to ChartWidget
-                    if (
-                      !isImage && !isChart && !e.ctrlKey && !e.metaKey &&
-                      e.button !== 1
-                    ) {
-                      e.preventDefault();
-                      // SSR-safe browser environment check
-                      if (
-                        typeof globalThis === "undefined" ||
-                        !globalThis?.location
-                      ) {
-                        return; // Cannot navigate during SSR
-                      }
-                      const href = `/src20/${
-                        encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
-                      }`;
-                      globalThis.location.href = href;
-                    }
-                  }}
+                <th
+                  key={header}
+                  class={getSegmentedHeaderClass(
+                    i,
+                    isFirst,
+                    isLast,
+                    isSelected,
+                    isClickable,
+                  )}
+                  onClick={() => handleHeaderClick(header)}
                 >
-                  {/* TOKEN */}
-                  <td
-                    class={`${
-                      cellAlign(0, headers.length)
-                    } ${rowCardBorderLeft}`}
+                  <span class="relative inline-block">
+                    {header}
+                    {(header === "CHANGE" || header === "VOLUME") &&
+                      ` ${timeframe}`}
+                    {renderSortIndicator(header)}
+                  </span>
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {data.length
+            ? (
+              data.map((src20) => {
+                // SRC-20 Image URL Logic:
+                // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
+                // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
+                // 3. Fallback to constructing URL from deploy_tx if available
+                // 4. Final fallback to placeholder image
+                const imageUrl = src20.deploy_img ||
+                  src20.stamp_url ||
+                  (src20.deploy_tx
+                    ? constructStampUrl(src20.deploy_tx)
+                    : null) ||
+                  "/img/placeholder/stamp-no-image.svg";
+
+                return (
+                  <tr
+                    key={src20.tx_hash}
+                    class={`${containerCardTable} cursor-pointer group`}
+                    onClick={(e) => {
+                      // Only navigate if not clicking on image or chart
+                      const target = e.target as HTMLElement;
+                      const isImage = target.tagName === "IMG";
+                      const isChart = target.closest("[data-chart-widget]"); // Add this data attribute to ChartWidget
+                      if (
+                        !isImage && !isChart && !e.ctrlKey && !e.metaKey &&
+                        e.button !== 1
+                      ) {
+                        e.preventDefault();
+                        // SSR-safe browser environment check
+                        if (
+                          typeof globalThis === "undefined" ||
+                          !globalThis?.location
+                        ) {
+                          return; // Cannot navigate during SSR
+                        }
+                        const href = `/src20/${
+                          encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
+                        }`;
+                        globalThis.location.href = href;
+                      }
+                    }}
                   >
-                    <div class="flex items-center gap-4">
-                      <img
-                        src={imageUrl}
-                        class="w-7 h-7 rounded cursor-pointer"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation(); // Prevent row click
-                          onImageClick?.(imageUrl);
-                        }}
-                        alt={unicodeEscapeToEmoji(src20.tick)}
-                      />
-                      <div class="flex flex-col">
-                        <div class="font-bold text-base uppercase tracking-wide">
-                          {(() => {
-                            const { text, emoji } = splitTextAndEmojis(
-                              unicodeEscapeToEmoji(src20.tick),
-                            );
-                            return (
-                              <>
-                                {text && (
-                                  <span class="gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] inline-block transition-colors duration-300">
-                                    {text.toUpperCase()}
-                                  </span>
-                                )}
-                                {emoji && (
-                                  <span class="emoji-ticker">{emoji}</span>
-                                )}
-                              </>
-                            );
-                          })()}
+                    {/* TOKEN */}
+                    <td
+                      class={`${
+                        cellAlign(0, headers.length)
+                      } ${rowCardBorderLeft} sticky left-0 tablet:static backdrop-blur-sm tablet:backdrop-blur-none z-10`}
+                    >
+                      <div class="flex items-center gap-4">
+                        <img
+                          src={imageUrl}
+                          class="w-7 h-7 rounded cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation(); // Prevent row click
+                            onImageClick?.(imageUrl);
+                          }}
+                          alt={unicodeEscapeToEmoji(src20.tick)}
+                        />
+                        <div class="flex flex-col">
+                          <div class="font-bold text-base uppercase tracking-wide">
+                            {(() => {
+                              const { text, emoji } = splitTextAndEmojis(
+                                unicodeEscapeToEmoji(src20.tick),
+                              );
+                              return (
+                                <>
+                                  {text && (
+                                    <span class="gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] inline-block transition-colors duration-300">
+                                      {text.toUpperCase()}
+                                    </span>
+                                  )}
+                                  {emoji && (
+                                    <span class="emoji-ticker">{emoji}</span>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  {/* PRICE */}
-                  <td
-                    class={`${
-                      cellAlign(1, headers.length)
-                    } ${rowCardBorderCenter}`}
-                  >
-                    {(() => {
-                      // ✅ CLEANED: No more root-level field access
-                      const priceInBtc = getPrice(src20);
-                      const priceSourceType = (src20 as any)?.market_data
-                        ?.price_source_type;
-                      const sourceLabel = getPriceSourceLabel(priceSourceType);
-
-                      if (priceInBtc === 0) {
-                        return "0 SATS";
-                      }
-                      const priceInSats = priceInBtc * 1e8;
-
-                      // Smart formatting based on price level
-                      let priceDisplay = "";
-                      if (priceInSats < 0.0001) {
-                        // For extremely small values, show with high precision
-                        priceDisplay = priceInSats.toFixed(6) + " SATS";
-                      } else if (priceInSats < 1) {
-                        // For values less than 1 sat, show 4 decimal places
-                        priceDisplay = priceInSats.toFixed(4) + " SATS";
-                      } else if (priceInSats < 10) {
-                        // For values 1-10 sats, show 2 decimal places
-                        priceDisplay = priceInSats.toFixed(2) + " SATS";
-                      } else if (priceInSats < 100000) {
-                        // For larger values, use comma formatting
-                        priceDisplay = priceInSats.toLocaleString("en-US", {
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0,
-                        }) + " SATS";
-                      } else {
-                        // For very large values, switch to K/M notation
-                        const millions = priceInSats / 1000000;
-                        if (millions >= 1) {
-                          priceDisplay = millions.toFixed(2) + "M SATS";
-                        } else {
-                          const thousands = priceInSats / 1000;
-                          priceDisplay = thousands.toFixed(1) + "K SATS";
-                        }
-                      }
-
-                      // Add price source indicator if available
-                      if (sourceLabel) {
-                        return (
-                          <span class="relative">
-                            {priceDisplay}
-                            <sup class="text-[8px] text-stamp-grey-light ml-0.5">
-                              {sourceLabel}
-                            </sup>
-                          </span>
+                    </td>
+                    {/* PRICE */}
+                    <td
+                      class={`${
+                        cellAlign(1, headers.length)
+                      } ${rowCardBorderCenter}`}
+                    >
+                      {(() => {
+                        // ✅ CLEANED: No more root-level field access
+                        const priceInBtc = getPrice(src20);
+                        const priceSourceType = (src20 as any)?.market_data
+                          ?.price_source_type;
+                        const sourceLabel = getPriceSourceLabel(
+                          priceSourceType,
                         );
-                      }
 
-                      return priceDisplay;
-                    })()}
-                  </td>
-                  {/* CHANGE */}
-                  <td
-                    class={`text-right mobileMd:text-center
-                      ${rowCardBorderRight}
-                      mobileMd:${rowCardBorderCenter} mobileMd:pr-3 mobileMd:border-r-0 mobileMd:rounded-r-none`}
-                  >
-                    {(() => {
-                      const change = (src20 as any)?.market_data
-                        ?.change_24h_percent;
-                      if (change !== undefined && change !== null) {
-                        const changeNum = parseFloat(change);
-                        if (!isNaN(changeNum)) {
+                        if (priceInBtc === 0) {
+                          return "0 SATS";
+                        }
+                        const priceInSats = priceInBtc * 1e8;
+
+                        // Smart formatting based on price level
+                        let priceDisplay = "";
+                        if (priceInSats < 0.0001) {
+                          // For extremely small values, show with high precision
+                          priceDisplay = priceInSats.toFixed(6) + " SATS";
+                        } else if (priceInSats < 1) {
+                          // For values less than 1 sat, show 4 decimal places
+                          priceDisplay = priceInSats.toFixed(4) + " SATS";
+                        } else if (priceInSats < 10) {
+                          // For values 1-10 sats, show 2 decimal places
+                          priceDisplay = priceInSats.toFixed(2) + " SATS";
+                        } else if (priceInSats < 100000) {
+                          // For larger values, use comma formatting
+                          priceDisplay = priceInSats.toLocaleString("en-US", {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          }) + " SATS";
+                        } else {
+                          // For very large values, switch to K/M notation
+                          const millions = priceInSats / 1000000;
+                          if (millions >= 1) {
+                            priceDisplay = millions.toFixed(2) + "M SATS";
+                          } else {
+                            const thousands = priceInSats / 1000;
+                            priceDisplay = thousands.toFixed(1) + "K SATS";
+                          }
+                        }
+
+                        // Add price source indicator if available
+                        if (sourceLabel) {
                           return (
-                            <span
-                              class={changeNum >= 0
-                                ? "text-green-500"
-                                : "text-red-500"}
-                            >
-                              {changeNum >= 0 ? "+" : ""}
-                              {changeNum.toFixed(2)}%
+                            <span class="relative">
+                              {priceDisplay}
+                              <sup class="text-[8px] text-stamp-grey-light ml-0.5">
+                                {sourceLabel}
+                              </sup>
                             </span>
                           );
                         }
-                      }
-                      return <span class="text-stamp-grey-light">N/A</span>;
-                    })()}
-                  </td>
-                  {/* VOLUME */}
-                  <td
-                    class={`${
-                      cellAlign(3, headers.length)
-                    } ${rowCardBorderCenter} hidden mobileMd:table-cell`}
-                  >
-                    {(() => {
-                      // ✅ CLEANED: No more type casting chaos
-                      const volume = getVolume24h(src20);
-                      if (volume === 0) {
-                        return "0 BTC";
-                      }
 
-                      // Smart formatting based on volume level
-                      if (volume < 0.0001) {
-                        // For very small volumes, show 6 decimals
-                        return volume.toFixed(6) + " BTC";
-                      } else if (volume < 0.01) {
-                        // For small volumes, show 4 decimals
-                        return volume.toFixed(4) + " BTC";
-                      } else if (volume < 0.1) {
-                        // For medium-small volumes, show 3 decimals
-                        return volume.toFixed(3) + " BTC";
-                      } else if (volume < 1) {
-                        // For sub-1 BTC volumes, show 2 decimals
-                        return volume.toFixed(2) + " BTC";
-                      } else if (volume < 100) {
-                        // For 1-100 BTC, show 2 decimals
-                        return volume.toFixed(2) + " BTC";
-                      } else {
-                        // For large volumes, show whole numbers with commas
-                        return Math.round(volume).toLocaleString() + " BTC";
-                      }
-                    })()}
-                  </td>
-                  {/* MARKETCAP */}
-                  <td
-                    class={`${
-                      cellAlign(4, headers.length)
-                    } ${rowCardBorderCenter} hidden mobileLg:table-cell`}
-                  >
-                    {(() => {
-                      // ✅ FIXED: Use correct market data path with proper typing
-                      const marketCap = getMarketCap(src20);
-                      if (marketCap === 0) {
-                        return "0 BTC";
-                      } else if (marketCap < 1) {
-                        // For small market caps, show 2 decimals
-                        return marketCap.toFixed(2) + " BTC";
-                      } else if (marketCap < 100) {
-                        // For medium market caps, show 2 decimals
-                        return marketCap.toFixed(2) + " BTC";
-                      } else if (marketCap < 1000) {
-                        // For larger market caps, show 1 decimal
-                        return marketCap.toFixed(1) + " BTC";
-                      } else {
-                        // For very large market caps, show whole numbers with commas
-                        return Math.round(marketCap).toLocaleString() + " BTC";
-                      }
-                    })()}
-                  </td>
+                        return priceDisplay;
+                      })()}
+                    </td>
+                    {/* CHANGE */}
+                    <td
+                      class={`text-center ${rowCardBorderCenter}`}
+                    >
+                      {(() => {
+                        const change = (src20 as any)?.market_data
+                          ?.change_24h_percent;
+                        if (change !== undefined && change !== null) {
+                          const changeNum = parseFloat(change);
+                          if (!isNaN(changeNum)) {
+                            return (
+                              <span
+                                class={changeNum >= 0
+                                  ? "text-[#44cc00]"
+                                  : "text-[#aa0000]"}
+                              >
+                                {changeNum >= 0 ? "+" : ""}
+                                {changeNum.toFixed(2)}%
+                              </span>
+                            );
+                          }
+                        }
+                        return <span class="text-stamp-grey-light">N/A</span>;
+                      })()}
+                    </td>
+                    {/* VOLUME */}
+                    <td
+                      class={`${
+                        cellAlign(3, headers.length)
+                      } ${rowCardBorderCenter}`}
+                    >
+                      {(() => {
+                        // ✅ CLEANED: No more type casting chaos
+                        const volume = getVolume24h(src20);
+                        if (volume === 0) {
+                          return "0 BTC";
+                        }
 
-                  {/* DEPLOY */}
-                  <td
-                    class={`${
-                      cellAlign(5, headers.length)
-                    } ${rowCardBorderCenter} hidden tablet:table-cell`}
-                  >
-                    {formatDate(new Date(src20.block_time), {
-                      month: "numeric",
-                      day: "numeric",
-                      year: "numeric",
-                    }).toUpperCase()}
-                  </td>
-                  {/* HOLDERS */}
-                  <td
-                    class={`${
-                      cellAlign(6, headers.length)
-                    } ${rowCardBorderCenter} hidden mobileLg:table-cell`}
-                  >
-                    {(() => {
-                      // First try market_data.holder_count (v2.3 structure)
-                      const holderCount =
-                        (src20 as any)?.market_data?.holder_count ||
-                        // Fallback to root level holders for backward compatibility
-                        (src20 as any)?.holders ||
-                        0;
-                      return Number(holderCount).toLocaleString();
-                    })()}
-                  </td>
+                        // Smart formatting based on volume level
+                        if (volume < 0.0001) {
+                          // For very small volumes, show 6 decimals
+                          return volume.toFixed(6) + " BTC";
+                        } else if (volume < 0.01) {
+                          // For small volumes, show 4 decimals
+                          return volume.toFixed(4) + " BTC";
+                        } else if (volume < 0.1) {
+                          // For medium-small volumes, show 3 decimals
+                          return volume.toFixed(3) + " BTC";
+                        } else if (volume < 1) {
+                          // For sub-1 BTC volumes, show 2 decimals
+                          return volume.toFixed(2) + " BTC";
+                        } else if (volume < 100) {
+                          // For 1-100 BTC, show 2 decimals
+                          return volume.toFixed(2) + " BTC";
+                        } else {
+                          // For large volumes, show whole numbers with commas
+                          return Math.round(volume).toLocaleString() + " BTC";
+                        }
+                      })()}
+                    </td>
+                    {/* MARKETCAP */}
+                    <td
+                      class={`${
+                        cellAlign(4, headers.length)
+                      } ${rowCardBorderCenter}`}
+                    >
+                      {(() => {
+                        // ✅ FIXED: Use correct market data path with proper typing
+                        const marketCap = getMarketCap(src20);
+                        if (marketCap === 0) {
+                          return "0 BTC";
+                        } else if (marketCap < 1) {
+                          // For small market caps, show 2 decimals
+                          return marketCap.toFixed(2) + " BTC";
+                        } else if (marketCap < 100) {
+                          // For medium market caps, show 2 decimals
+                          return marketCap.toFixed(2) + " BTC";
+                        } else if (marketCap < 1000) {
+                          // For larger market caps, show 1 decimal
+                          return marketCap.toFixed(1) + " BTC";
+                        } else {
+                          // For very large market caps, show whole numbers with commas
+                          return Math.round(marketCap).toLocaleString() +
+                            " BTC";
+                        }
+                      })()}
+                    </td>
 
-                  {/* CHART */}
-                  <td
-                    class={`${
-                      cellAlign(7, headers.length)
-                    } ${rowCardBorderRight} hidden mobileMd:table-cell !py-0`}
-                  >
-                    {console.log(
-                      "Chart data for",
-                      src20.tick,
-                      (src20 as any).chart,
-                    )}
-                    <ChartWidget
-                      fromPage="home"
-                      data={(src20 as any).chart}
-                      tick={src20.tick}
-                      data-chart-widget
-                    />
-                  </td>
-                </tr>
-              );
-            })
-          )
-          : (
-            <tr>
-              <td colSpan={headers.length} class={`${valueDarkSm} w-full`}>
-                NO TOKENS TO DISPLAY
-              </td>
-            </tr>
-          )}
-      </tbody>
-    </table>
+                    {/* DEPLOY */}
+                    <td
+                      class={`${
+                        cellAlign(5, headers.length)
+                      } ${rowCardBorderCenter}`}
+                    >
+                      {formatDate(new Date(src20.block_time), {
+                        month: "numeric",
+                        day: "numeric",
+                        year: "numeric",
+                      }).toUpperCase()}
+                    </td>
+                    {/* HOLDERS */}
+                    <td
+                      class={`${
+                        cellAlign(6, headers.length)
+                      } ${rowCardBorderCenter}`}
+                    >
+                      {(() => {
+                        // First try market_data.holder_count (v2.3 structure)
+                        const holderCount =
+                          (src20 as any)?.market_data?.holder_count ||
+                          // Fallback to root level holders for backward compatibility
+                          (src20 as any)?.holders ||
+                          0;
+                        return Number(holderCount).toLocaleString();
+                      })()}
+                    </td>
+
+                    {/* CHART */}
+                    <td
+                      class={`${
+                        cellAlign(7, headers.length)
+                      } ${rowCardBorderRight} !py-0`}
+                    >
+                      {console.log(
+                        "Chart data for",
+                        src20.tick,
+                        (src20 as any).chart,
+                      )}
+                      <ChartWidget
+                        fromPage="home"
+                        data={(src20 as any).chart}
+                        tick={src20.tick}
+                        data-chart-widget
+                      />
+                    </td>
+                  </tr>
+                );
+              })
+            )
+            : (
+              <tr>
+                <td colSpan={headers.length} class={`${valueDarkSm} w-full`}>
+                  NO TOKENS TO DISPLAY
+                </td>
+              </tr>
+            )}
+        </tbody>
+      </table>
+    </div>
   );
 }

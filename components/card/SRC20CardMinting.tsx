@@ -380,7 +380,7 @@ export function SRC20CardMinting({
                     <Button
                       variant="outline"
                       color="custom"
-                      size="xs"
+                      size="xxs"
                       class="[--default-color:#999999] [--hover-color:#AA00FF]"
                       href={mintHref}
                       onClick={handleMintClick}
