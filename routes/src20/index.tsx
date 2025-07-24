@@ -83,7 +83,7 @@ export const handler: Handlers = {
       | "desc";
 
     // 🎸 NEW: MINTING button toggle functionality
-    const viewType = (url.searchParams.get("viewType") || "minting") as
+    const viewType = (url.searchParams.get("viewType") || "minted") as
       | "minted"
       | "minting";
 
@@ -249,7 +249,7 @@ export default function SRC20OverviewPage({ data }: any) {
     timeframe = "24H",
     sortBy = "TRENDING",
     sortDirection = "desc",
-    viewType = "minting",
+    viewType = "minted",
     btcPrice,
     btcPriceSource,
   } = data;
