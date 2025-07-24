@@ -19,6 +19,10 @@ interface SRC20CardMintingProps {
   fromPage: "src20" | "wallet" | "stamping/src20" | "home";
   timeframe: Timeframe;
   onImageClick: (imgSrc: string) => void;
+  currentSort?: {
+    filter: string | null;
+    direction: "asc" | "desc";
+  };
 }
 
 export function SRC20CardMinting({
@@ -26,6 +30,7 @@ export function SRC20CardMinting({
   fromPage: _fromPage,
   timeframe,
   onImageClick,
+  currentSort,
 }: SRC20CardMintingProps) {
   const headers = [
     "TOKEN",
@@ -36,6 +41,114 @@ export function SRC20CardMinting({
     "HOLDERS",
     "", // MINT button
   ];
+
+  // Helper function to handle header clicks for sorting
+  const handleHeaderClick = (headerName: string) => {
+    // Skip sorting for empty header (MINT button) and TRENDING (leave for now as requested)
+    if (headerName === "" || headerName === "TRENDING") {
+      return;
+    }
+
+    // Map header names to API sort parameters
+    const sortMapping: Record<string, string> = {
+      "TOKEN": "TOKEN", // Add TOKEN for alphabetical sorting
+      "MINTS": "MINTS",
+      "PROGRESS": "PROGRESS",
+      "DEPLOY": "DEPLOY",
+      "HOLDERS": "HOLDERS",
+    };
+
+    const apiSortKey = sortMapping[headerName];
+    if (!apiSortKey) return;
+
+    // Determine new direction
+    const isCurrentSort = currentSort?.filter === apiSortKey;
+    const newDirection = isCurrentSort && currentSort.direction === "desc"
+      ? "asc"
+      : "desc";
+
+    // Navigate with new sort parameters
+    if (typeof globalThis !== "undefined" && globalThis?.location) {
+      const url = new URL(globalThis.location.href);
+      url.searchParams.set("sortBy", apiSortKey);
+      url.searchParams.set("sortDirection", newDirection);
+      url.searchParams.set("page", "1"); // Reset to page 1 when sorting changes
+
+      // Use Fresh.js navigation
+      const link = document.createElement("a");
+      link.href = url.toString();
+      link.setAttribute("f-partial", "");
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  // Helper function to get header class names
+  const getHeaderClass = (headerName: string, index: number) => {
+    const baseClass = `${labelXs} ${cellAlign(index, headers.length)} p-4`;
+    const responsiveClass = index === 1
+      ? "hidden min-[600px]:table-cell" // MINTS
+      : index === 3
+      ? "hidden min-[600px]:table-cell" // TRENDING
+      : index === 4
+      ? "hidden tablet:table-cell" // DEPLOY
+      : index === 5
+      ? "hidden mobileLg:table-cell"
+      : ""; // HOLDERS
+
+    // Add cursor and hover styles for clickable headers
+    const isClickable = headerName !== "" && headerName !== "TRENDING";
+
+    // Add sort indicator styles
+    const sortMapping: Record<string, string> = {
+      "TOKEN": "TOKEN",
+      "MINTS": "MINTS",
+      "PROGRESS": "PROGRESS",
+      "DEPLOY": "DEPLOY",
+      "HOLDERS": "HOLDERS",
+    };
+    const apiSortKey = sortMapping[headerName];
+    const isCurrentSort = currentSort?.filter === apiSortKey;
+
+    // Color classes based on state
+    const colorClass = isCurrentSort
+      ? "text-stamp-grey-light"
+      : isClickable
+      ? "text-stamp-grey hover:text-stamp-grey-light"
+      : "text-stamp-grey";
+
+    const clickableClass = isClickable
+      ? "cursor-pointer transition-colors duration-200 select-none"
+      : "";
+
+    const sortIndicator = isCurrentSort ? "relative" : "";
+
+    return `${baseClass} ${responsiveClass} ${colorClass} ${clickableClass} ${sortIndicator}`
+      .trim();
+  };
+
+  // Helper function to render sort indicator
+  const renderSortIndicator = (headerName: string) => {
+    const sortMapping: Record<string, string> = {
+      "TOKEN": "TOKEN",
+      "MINTS": "MINTS",
+      "PROGRESS": "PROGRESS",
+      "DEPLOY": "DEPLOY",
+      "HOLDERS": "HOLDERS",
+    };
+    const apiSortKey = sortMapping[headerName];
+    const isCurrentSort = currentSort?.filter === apiSortKey;
+
+    if (!isCurrentSort) return null;
+
+    return (
+      <span class="absolute -right-2 top-0">
+        {currentSort.direction === "desc" ? "↓" : "↑"}
+      </span>
+    );
+  };
 
   function splitTextAndEmojis(text: string): { text: string; emoji: string } {
     const emojiRegex =
@@ -72,20 +185,19 @@ export function SRC20CardMinting({
           }, // MINT button
         ]).map((col) => <col key={col.key} class={col.className} />)}
       </colgroup>
-      <thead>
-        <tr>
+      <thead class="sticky top-0 z-10">
+        <tr class="bg-stamp-grey-darkest/80 rounded-sm">
           {headers.map((header, i) => (
             <th
               key={header}
-              class={`${labelXs} ${cellAlign(i, headers.length)} ${
-                i === 1 ? "hidden min-[600px]:table-cell" : "" // MINTS
-              } ${i === 3 ? "hidden min-[600px]:table-cell" : "" // TRENDING
-              } ${i === 4 ? "hidden tablet:table-cell" : "" // DEPLOY
-              } ${i === 5 ? "hidden mobileLg:table-cell" : "" // HOLDERS
-              }`}
+              class={getHeaderClass(header, i)}
+              onClick={() => handleHeaderClick(header)}
             >
-              {header}
-              {header === "TRENDING" && ` ${timeframe}`}
+              <span class="relative inline-block">
+                {header}
+                {header === "TRENDING" && ` ${timeframe}`}
+                {renderSortIndicator(header)}
+              </span>
             </th>
           ))}
         </tr>

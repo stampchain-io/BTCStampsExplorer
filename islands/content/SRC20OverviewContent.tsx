@@ -136,6 +136,7 @@ export function SRC20OverviewContent({
         fromPage="src20"
         initialData={currentData}
         timeframe={_currentTimeframe}
+        currentSort={currentSort} // 🎯 NEW: Pass currentSort for table header sorting
         pagination={{
           page: currentPage,
           totalPages: totalPages,
