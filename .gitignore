@@ -146,6 +146,7 @@ dev-debug.log
 .cursor/
 .taskmaster/config.json
 .taskmaster/*
+.taskmaster/state.json
 mcp.json
 docs/delegation/
 docs/delegation/archive/

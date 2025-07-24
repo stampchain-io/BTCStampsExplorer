@@ -565,7 +565,12 @@ export class StampController {
 
   static async getHomePageData(btcPrice?: number, btcPriceSource?: string) {
     try {
+      console.log("[StampController] getHomePageData started");
+      const overallStartTime = Date.now();
+      
       // Critical above-the-fold content first
+      console.log("[StampController] Starting parallel fetch of carousel, categories, and collections...");
+      const parallelStartTime = Date.now();
       const [carouselData, mainCategories, collections] = await Promise.all([
         this.getStamps({
           identifier: CAROUSEL_STAMP_IDS,
@@ -588,21 +593,34 @@ export class StampController {
           sortBy: "DESC"
         })
       ]);
+      console.log(`[StampController] Parallel fetch completed in ${Date.now() - parallelStartTime}ms`);
 
       // Get posh stamps
+      console.log("[StampController] Starting posh collection fetch...");
+      const poshStartTime = Date.now();
       const poshCollection = await CollectionService.getCollectionByName("posh");
+      console.log(`[StampController] Posh collection lookup took ${Date.now() - poshStartTime}ms`);
+      
       let poshStamps = [];
       if (poshCollection) {
+        console.log("[StampController] Fetching posh stamps with collection_id:", poshCollection.collection_id);
+        const poshStampsStartTime = Date.now();
         const poshResult = await this.getStamps({
           collectionId: poshCollection.collection_id,
           page: 1,
           limit: 16,
           sortBy: "DESC",
           skipTotalCount: true,
+          groupBy: 'collection_id',        // Optimize collection query
+          groupBySubquery: true,           // Use window function for better performance
+          collectionStampLimit: 16,        // Limit stamps per collection
           ...(btcPrice !== undefined && { btcPrice }),
           ...(btcPriceSource !== undefined && { btcPriceSource })
         });
         poshStamps = poshResult.data;
+        console.log(`[StampController] Posh stamps fetch took ${Date.now() - poshStampsStartTime}ms, got ${poshStamps.length} stamps`);
+      } else {
+        console.log("[StampController] No posh collection found");
       }
       // Get stamp URLs for collections more efficiently
       const collectionData = collections?.data ? await (async () => {
@@ -630,13 +648,16 @@ export class StampController {
         }));
       })() : [];
 
-      return {
+      const result = {
         carouselStamps: carouselData.data ?? [],
         stamps_src721: mainCategories[1]?.stamps ?? [],
         stamps_art: mainCategories[2]?.stamps ?? [], // Now at index 2
         stamps_posh: poshStamps,
         collectionData: collectionData ?? [],
       };
+      
+      console.log(`[StampController] getHomePageData completed in ${Date.now() - overallStartTime}ms`);
+      return result;
 
     } catch (error) {
       logger.error("stamps", {
@@ -649,12 +670,16 @@ export class StampController {
 
   static async getCollectionPageData(params: any) {
     try {
+      console.log("[StampController] getCollectionPageData started");
+      const overallStartTime = Date.now();
       const {sortBy} = params
 
       // Fetch BTC price once
       const btcPriceData = await BTCPriceService.getPrice();
       const btcPrice = btcPriceData.price;
 
+      console.log("[StampController] Starting SRC-721 stamp categories fetch...");
+      const categoriesStartTime = Date.now();
       const [
         stampCategories,
       ] = await Promise.all([
@@ -662,29 +687,42 @@ export class StampController {
           { idents: ["SRC-721"], limit: 16, type: "stamps", sortBy: sortBy },
         ]),
       ]);
+      console.log(`[StampController] Categories fetch completed in ${Date.now() - categoriesStartTime}ms`);
       // Fetch the "posh" collection to get its collection_id
+      console.log("[StampController] Starting posh collection fetch for collection page...");
+      const poshLookupStartTime = Date.now();
       const poshCollection = await CollectionService.getCollectionByName(
         "posh",
       );
+      console.log(`[StampController] Posh collection lookup took ${Date.now() - poshLookupStartTime}ms`);
+      
       let stamps_posh = [];
       if (poshCollection) {
         const poshCollectionId = poshCollection.collection_id;
+        console.log("[StampController] Fetching posh stamps with collection_id:", poshCollectionId);
+        const poshStampsStartTime = Date.now();
         // Fetch stamps from the "posh" collection with cached market data
         const poshStampsResult = await this.getStamps({
           collectionId: poshCollectionId,
           page: 1,
           limit: 24,
           sortBy: sortBy,
+          groupBy: 'collection_id',        // Optimize collection query
+          groupBySubquery: true,           // Use window function for better performance
+          collectionStampLimit: 24,        // Limit stamps per collection
           // includeMarketData: true, // Use cached market data
           // btcPriceUSD: btcPrice
         });
         stamps_posh = poshStampsResult.data;
+        console.log(`[StampController] Posh stamps fetch took ${Date.now() - poshStampsStartTime}ms, got ${stamps_posh.length} stamps`);
       } else {
         logger.warn("stamps", {
           message: "Posh collection not found"
         });
+        console.log("[StampController] No posh collection found");
       }
-      return {
+      
+      const result = {
         stamps_src721: stampCategories[0].stamps,
         stamps_posh,
         metadata: {
@@ -692,6 +730,9 @@ export class StampController {
           source: btcPriceData.source
         }
       };
+      
+      console.log(`[StampController] getCollectionPageData completed in ${Date.now() - overallStartTime}ms`);
+      return result;
     } catch (error) {
       logger.error("stamps", {
         message: "Error in getCollectionPageData",

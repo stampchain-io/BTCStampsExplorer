@@ -35,6 +35,7 @@ export type LogNamespace =
   | "api-src101-create"
   | "broadcast"
   | "src20-utility"
+  | "tool-endpoint-estimator"
   | "sql";
 
 declare global {

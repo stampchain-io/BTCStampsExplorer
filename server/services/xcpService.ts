@@ -1069,11 +1069,9 @@ export class XcpManager {
 
     for (const node of xcp_v2_nodes) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
-      console.log(`Attempting to fetch from URL: ${url}`);
 
-            try {
+      try {
         const response = await httpClient.get(url);
-        console.log(`Response status from ${node.name}: ${response.status}`);
 
         if (!response.ok) {
           const errorBody = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
@@ -1095,7 +1093,6 @@ export class XcpManager {
         console.log(JSON.stringify(data, null, 2));
         // END DETAILED LOGGING
 
-        console.log(`Successful response from ${node.name}`);
         return data;
       } catch (error) {
         console.error(`Fetch error for ${url}:`, error);
@@ -1681,9 +1678,9 @@ export class XcpManager {
           const response = await httpClient.get(url);
           console.log(`Response status from ${node.name}: ${response.status}`);
 
-          // If asset doesn't exist, continue to next node
+          // If asset doesn't exist, it's available for use
           if (response.status === 404) {
-            continue;
+            return null;
           }
 
           if (!response.ok) {

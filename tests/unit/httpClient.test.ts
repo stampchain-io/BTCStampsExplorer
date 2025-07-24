@@ -232,7 +232,7 @@ describe("FetchHttpClient Core Tests", () => {
     it.skip("should handle network errors", async () => {
       // TEMPORARILY SKIPPED: This test causes uncaught promise rejection
       // due to httpClient's internal promise tracking when fetch fails immediately
-      // TODO: Fix httpClient promise handling or test implementation
+      // TODO(reinamora137): Fix httpClient promise handling or test implementation
 
       // Store original fetch to restore later
       const originalFetch = globalThis.fetch;
