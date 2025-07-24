@@ -136,7 +136,7 @@ const ChartWidget = (
   }, [data]);
 
   if (!data || data.length === 0) {
-    return <div class="text-sm text-stamp-grey">NO CHART DATA</div>;
+    return <div class="text-sm text-stamp-grey">NO DATA</div>;
   }
 
   return (
