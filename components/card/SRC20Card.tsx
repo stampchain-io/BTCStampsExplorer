@@ -58,6 +58,10 @@ interface SRC20CardProps {
   fromPage: "src20" | "wallet" | "stamping/src20" | "home";
   timeframe: Timeframe;
   onImageClick: (imgSrc: string) => void;
+  currentSort?: {
+    filter: string | null;
+    direction: "asc" | "desc";
+  };
 }
 
 export function SRC20Card({
@@ -65,6 +69,7 @@ export function SRC20Card({
   fromPage: _fromPage,
   timeframe,
   onImageClick,
+  currentSort,
 }: SRC20CardProps) {
   const headers = [
     "TOKEN",
@@ -76,6 +81,123 @@ export function SRC20Card({
     "HOLDERS",
     "",
   ];
+
+  // Helper function to handle header clicks for sorting
+  const handleHeaderClick = (headerName: string) => {
+    // Skip sorting for empty header (CHART)
+    if (headerName === "") {
+      return;
+    }
+
+    // Map header names to API sort parameters
+    const sortMapping: Record<string, string> = {
+      "TOKEN": "TOKEN", // Alphabetical sorting
+      "PRICE": "PRICE",
+      "CHANGE": "CHANGE",
+      "VOLUME": "VOLUME",
+      "MARKETCAP": "MARKET_CAP",
+      "DEPLOY": "DEPLOY",
+      "HOLDERS": "HOLDERS",
+    };
+
+    const apiSortKey = sortMapping[headerName];
+    if (!apiSortKey) return;
+
+    // Determine new direction
+    const isCurrentSort = currentSort?.filter === apiSortKey;
+    const newDirection = isCurrentSort && currentSort.direction === "desc"
+      ? "asc"
+      : "desc";
+
+    // Navigate with new sort parameters
+    if (typeof globalThis !== "undefined" && globalThis?.location) {
+      const url = new URL(globalThis.location.href);
+      url.searchParams.set("sortBy", apiSortKey);
+      url.searchParams.set("sortDirection", newDirection);
+      url.searchParams.set("page", "1"); // Reset to page 1 when sorting changes
+
+      // Use Fresh.js navigation
+      const link = document.createElement("a");
+      link.href = url.toString();
+      link.setAttribute("f-partial", "");
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  // Helper function to get segmented control header class names (Apple HIG style)
+  const getSegmentedHeaderClass = (
+    index: number,
+    isFirst: boolean,
+    isLast: boolean,
+    isSelected: boolean,
+    isClickable: boolean,
+  ) => {
+    const baseClass = `${labelXs} ${cellAlign(index, headers.length)} p-3`;
+    const responsiveClass = index === 2
+      ? "text-right mobileMd:text-center" // CHANGE
+      : index === 3
+      ? "hidden mobileMd:table-cell" // VOLUME
+      : index === 4
+      ? "hidden mobileLg:table-cell" // MARKETCAP
+      : index === 5
+      ? "hidden tablet:table-cell" // DEPLOY
+      : index === 6
+      ? "hidden mobileLg:table-cell" // HOLDERS
+      : index === 7
+      ? "hidden mobileMd:table-cell"
+      : ""; // CHART
+
+    // Segmented control borders and corners
+    const segmentedBorders = isFirst
+      ? "border-l border-t border-b rounded-l-lg border-stamp-grey-darker"
+      : isLast
+      ? "border-r border-t border-b rounded-r-lg border-l-0 border-stamp-grey-darker"
+      : "border-t border-b border-l-0 border-stamp-grey-darker";
+
+    // Selected segment styling
+    const selectedClass = isSelected ? "text-stamp-grey-light" : "";
+
+    const colorClass = isSelected
+      ? "text-stamp-grey-light"
+      : isClickable
+      ? "text-stamp-grey hover:text-stamp-grey-light"
+      : "text-stamp-grey";
+
+    const clickableClass = isClickable
+      ? "cursor-pointer transition-all duration-200 select-none"
+      : "";
+
+    const sortIndicator = isSelected ? "relative" : "";
+
+    return `${baseClass} ${responsiveClass} ${segmentedBorders} ${selectedClass} ${colorClass} ${clickableClass} ${sortIndicator}`
+      .trim();
+  };
+
+  // Helper function to render sort indicator
+  const renderSortIndicator = (headerName: string) => {
+    const sortMapping: Record<string, string> = {
+      "TOKEN": "TOKEN",
+      "PRICE": "PRICE",
+      "CHANGE": "CHANGE",
+      "VOLUME": "VOLUME",
+      "MARKETCAP": "MARKET_CAP",
+      "DEPLOY": "DEPLOY",
+      "HOLDERS": "HOLDERS",
+    };
+    const apiSortKey = sortMapping[headerName];
+    const isCurrentSort = currentSort?.filter === apiSortKey;
+
+    if (!isCurrentSort) return null;
+
+    return (
+      <span class="absolute -right-2 top-0">
+        {currentSort.direction === "desc" ? "↓" : "↑"}
+      </span>
+    );
+  };
 
   function splitTextAndEmojis(text: string): { text: string; emoji: string } {
     const emojiRegex =
@@ -103,26 +225,47 @@ export function SRC20Card({
           { width: "hidden mobileMd:w-[16%] mobileLg:w-[22%] tablet:w-[26%]" }, // CHART
         ]).map((col) => <col key={col.key} class={col.className} />)}
       </colgroup>
-      <thead>
-        <tr>
-          {headers.map((header, i) => (
-            <th
-              key={header}
-              class={`${labelXs} ${cellAlign(i, headers.length)}
-              ${i === 2 ? "text-right mobileMd:text-center" : "" // CHANGE
-              }${i === 3 ? "hidden mobileMd:table-cell" : "" // VOLUME
-              } ${i === 4 ? "hidden mobileLg:table-cell" : "" // MARKETCAP
-              } ${i === 5 ? "hidden tablet:table-cell" : "" // DEPLOY
-              } ${i === 6 ? "hidden mobileLg:table-cell" : "" // HOLDERS
-              }${i === 7 ? "hidden mobileMd:table-cell" : "" // CHART
-              }
-              `}
-            >
-              {header}
-              {(header === "CHANGE" || header === "VOLUME") &&
-                ` ${timeframe}`}
-            </th>
-          ))}
+      <thead class="sticky top-0 z-10">
+        <tr class="dark-gradient">
+          {headers.map((header, i) => {
+            const isFirst = i === 0;
+            const isLast = i === headers.length - 1;
+            const isClickable = header !== "";
+
+            // Get sort state for segmented control styling
+            const sortMapping: Record<string, string> = {
+              "TOKEN": "TOKEN",
+              "PRICE": "PRICE",
+              "CHANGE": "CHANGE",
+              "VOLUME": "VOLUME",
+              "MARKETCAP": "MARKET_CAP",
+              "DEPLOY": "DEPLOY",
+              "HOLDERS": "HOLDERS",
+            };
+            const apiSortKey = sortMapping[header];
+            const isSelected = currentSort?.filter === apiSortKey;
+
+            return (
+              <th
+                key={header}
+                class={getSegmentedHeaderClass(
+                  i,
+                  isFirst,
+                  isLast,
+                  isSelected,
+                  isClickable,
+                )}
+                onClick={() => handleHeaderClick(header)}
+              >
+                <span class="relative inline-block">
+                  {header}
+                  {(header === "CHANGE" || header === "VOLUME") &&
+                    ` ${timeframe}`}
+                  {renderSortIndicator(header)}
+                </span>
+              </th>
+            );
+          })}
         </tr>
       </thead>
       <tbody>
@@ -176,7 +319,7 @@ export function SRC20Card({
                     <div class="flex items-center gap-4">
                       <img
                         src={imageUrl}
-                        class="w-7 h-7 rounded-sm cursor-pointer"
+                        class="w-7 h-7 rounded cursor-pointer"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation(); // Prevent row click
