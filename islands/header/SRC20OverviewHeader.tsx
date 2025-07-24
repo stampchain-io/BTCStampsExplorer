@@ -1,6 +1,7 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
 /* @baba - update search button styling */
 import { Button } from "$components/button/ButtonBase.tsx";
+import { SegmentControl } from "$islands/layout/SegmentControl.tsx";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
 import { useCallback, useMemo, useState } from "preact/hooks";
@@ -9,7 +10,7 @@ import { useCallback, useMemo, useState } from "preact/hooks";
 interface SRC20OverviewHeaderProps {
   onViewTypeChange?: () => void;
   viewType: "minted" | "minting";
-  onTimeframeChange?: (timeframe: "24H" | "7D" | "30D") => void;
+  onTimeframeChange?: (timeframe: string) => void;
   onFilterChange?: (filter: string, direction?: "asc" | "desc") => void;
   currentSort?: {
     filter: string | null;
@@ -34,9 +35,7 @@ export const SRC20OverviewHeader = (
   }: SRC20OverviewHeaderProps,
 ) => {
   // 🚀 SIMPLIFIED STATE: Reduced complexity with modern patterns
-  const [selectedTimeframe, setSelectedTimeframe] = useState<
-    "24H" | "7D" | "30D"
-  >("24H");
+  const [selectedTimeframe, setSelectedTimeframe] = useState<string>("24H");
   const [viewTypeHover, setViewTypeHover] = useState<HoverState>({
     canHover: true,
     isHovered: false,
@@ -85,7 +84,7 @@ export const SRC20OverviewHeader = (
   }, [viewTypeHover.canHover]);
 
   const handleTimeframeClick = useCallback(
-    (timeframe: "24H" | "7D" | "30D") => {
+    (timeframe: string) => {
       setSelectedTimeframe(timeframe);
       onTimeframeChange?.(timeframe);
     },
@@ -100,12 +99,6 @@ export const SRC20OverviewHeader = (
   }, [onFilterChange, currentSort?.filter]);
 
   // 🚀 PREACT OPTIMIZATION: Memoized variant getters
-  const getTimeframeVariant = useCallback((timeframe: "24H" | "7D" | "30D") => {
-    return timeframe === selectedTimeframe
-      ? "flatOutlineSelector"
-      : "outlineFlatSelector";
-  }, [selectedTimeframe]);
-
   const getTrendingVariant = useCallback(() => {
     return currentSort?.filter === "TRENDING"
       ? "flatOutlineSelector"
@@ -131,49 +124,53 @@ export const SRC20OverviewHeader = (
       </div>
 
       {/* ===== TRENDING, MINTED/MINTING AND TIMEFRAME BUTTONS ===== */}
-      <div class="flex flex-col tablet:flex-row justify-between w-full">
-        {/* Trending and Minting/Minted Buttons - Left */}
-        <div class="flex pt-3 tablet:pt-0 gap-3">
+      <div class="flex flex-col mobileLg:flex-row justify-between w-full">
+        {/* Minting/Minted/Listings */}
+        <div class="flex gap-3 w-full mobileMd:w-auto">
+          <SegmentControl
+            options={[
+              { value: "minted", label: "MINTED" },
+              { value: "minting", label: "MINTING" },
+              { value: "listings", label: "LISTINGS", disabled: true },
+            ]}
+            value={viewType}
+            onChange={() => handleViewTypeClick()}
+            size="sm"
+            color="purple"
+            className="w-full mobileMd:w-auto"
+          />
+        </div>
+
+        {/* Trending and Timeframes - Right */}
+        <div class="flex justify-between pt-3 mobileLg:pt-0 gap-3">
           {/* Trending Button */}
           <Button
             variant={getTrendingVariant()}
-            color="purple"
+            color="custom"
             size="xs"
             onClick={handleTrendingClick}
-            class={currentSort?.filter === "TRENDING" ? "cursor-default" : ""}
+            class={`
+              ${currentSort?.filter === "TRENDING" ? "cursor-default" : ""}
+              [--default-color:#333333]
+              [--hover-color:#666666]
+              mt-[2px]
+            `}
           >
             TRENDING
           </Button>
 
-          {/* Minting/Minted Button */}
-          <Button
-            variant={viewTypeButton.variant}
-            color="purple"
-            size="xs"
-            ariaLabel={viewTypeButton.ariaLabel}
-            onClick={handleViewTypeClick}
-            onMouseEnter={handleViewTypeMouseEnter}
-            onMouseLeave={handleViewTypeMouseLeave}
-          >
-            {viewTypeButton.text}
-          </Button>
-        </div>
-
-        {/* Timeframe Buttons - Right */}
-        <div class="flex pt-3 tablet:pt-0 gap-3">
-          {/* Available timeframes: 24H, 7D, 30D (API doesn't support 3D) */}
-          {(["24H", "7D", "30D"] as const).map((timeframe) => (
-            <Button
-              key={timeframe}
-              variant={getTimeframeVariant(timeframe)}
-              color="greyDark"
-              size="xs"
-              onClick={() => handleTimeframeClick(timeframe)}
-              class={timeframe === selectedTimeframe ? "cursor-default" : ""}
-            >
-              {timeframe}
-            </Button>
-          ))}
+          {/* Timeframe Buttons */}
+          <SegmentControl
+            options={[
+              { value: "24H", label: "24H" },
+              { value: "7D", label: "7D" },
+              { value: "30D", label: "30D" },
+            ]}
+            value={selectedTimeframe}
+            onChange={handleTimeframeClick}
+            size="sm"
+            color="grey"
+          />
         </div>
       </div>
     </div>
