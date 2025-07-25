@@ -3,7 +3,7 @@ import {
   clearCSRFTokenCache,
   getCSRFToken,
   makeAuthenticatedRequest,
-} from "$lib/utils/clientSecurityUtils.ts";
+} from "$lib/utils/security/clientSecurityUtils.ts";
 import { FakeTime } from "@std/testing/time";
 
 // Mock fetch for testing

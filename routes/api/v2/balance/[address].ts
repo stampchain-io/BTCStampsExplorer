@@ -1,8 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
 import { AddressHandlerContext } from "$globals";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import { isValidBitcoinAddress } from "$lib/utils/scriptTypeUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";

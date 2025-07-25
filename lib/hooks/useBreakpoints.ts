@@ -1,4 +1,4 @@
-import { BREAKPOINTS } from "../utils/constants.ts";
+import { BREAKPOINTS } from "$constants";
 import { useWindowSize } from "./useWindowSize.ts";
 
 type Breakpoints = "desktop" | "tablet" | "mobileLg" | "mobileMd" | "mobileSm";

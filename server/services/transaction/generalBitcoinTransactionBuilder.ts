@@ -7,15 +7,15 @@
  * Supports: Mint, Fairmint, Detach, Dispense, and future operations
  */
 
-import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
-import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import { extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { TX_CONSTANTS } from "$constants";
+import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
+import { extractOutputs } from "$lib/utils/bitcoin/minting/transactionUtils.ts";
+import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
-import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import type { ScriptType, UTXO } from "$types/index.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
@@ -198,7 +198,7 @@ export class GeneralBitcoinTransactionBuilder {
       const totalInputValue = inputs.reduce((sum: number, input: UTXO) => sum + input.value, 0);
 
       // Recalculate with actual inputs
-      const actualEstimatedSize = estimateTransactionSize({
+      const actualEstimatedSize = estimateMintingTransactionSize({
         inputs: inputs.map((input: UTXO) => ({
           type: (input.scriptType || "P2WPKH") as ScriptType,
           isWitness: true

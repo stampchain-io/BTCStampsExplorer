@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import {

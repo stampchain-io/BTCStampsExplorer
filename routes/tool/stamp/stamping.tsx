@@ -1,7 +1,7 @@
 /* ===== STAMPING REDIRECT ROUTE ===== */
 // @baba - delete this file after 2025-09-01
 import { Handlers } from "$fresh/server.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {

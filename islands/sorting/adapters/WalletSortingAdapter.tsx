@@ -6,8 +6,8 @@
 
 import type { SortOption } from "$lib/types/sorting.d.ts";
 import type { WalletStampWithValue } from "$lib/types/wallet.d.ts";
-import { walletSortingConfig } from "$lib/utils/sorting/config.ts";
-import { getAvailableSortOptions } from "$lib/utils/sorting/performance.ts";
+import { walletSortingConfig } from "$lib/utils/data/sorting/config.ts";
+import { getAvailableSortOptions } from "$lib/utils/data/sorting/performance.ts";
 import { useMemo } from "preact/hooks";
 
 export interface WalletSortingAdapterProps {

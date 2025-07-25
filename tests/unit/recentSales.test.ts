@@ -17,8 +17,8 @@ import {
   ErrorHandlingUtils,
   ErrorSeverity,
   ErrorType,
-} from "$lib/utils/errorHandlingUtils.ts";
-import { AccessibilityUtils } from "$lib/utils/accessibilityUtils.ts";
+} from "$lib/utils/monitoring/errors/errorHandlingUtils.ts";
+import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 
 /* ===== TEST DATA ===== */

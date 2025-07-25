@@ -10,7 +10,7 @@ import {
 import { EnrichedSRC20Row } from "$globals";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
 import { useEffect, useMemo, useState } from "preact/hooks";
 

@@ -6,12 +6,12 @@
  */
 
 // Main progressive fee estimation hook
-export { useProgressiveFeeEstimation } from "$lib/hooks/fee-estimation/useProgressiveFeeEstimation.ts";
-export { useTransactionConstructionService } from "../useTransactionConstructionService.ts";
+export { useProgressiveFeeEstimation } from "$lib/hooks/useProgressiveFeeEstimation.ts";
+export { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 
 // Supporting hooks
-export { useBTCValue } from "../useBTCValue.ts";
-export { useFees } from "../useFees.ts";
+export { useBTCValue } from "$lib/hooks/useBTCValue.ts";
+export { useFees } from "$lib/hooks/useFees.ts";
 
 // Hook types - removed missing exports
 // export type { UseTransactionConstructionServiceParams, UseTransactionConstructionServiceReturn } from "$lib/types/fee-estimation.ts";

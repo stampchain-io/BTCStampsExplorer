@@ -4,8 +4,11 @@
  * world-class sorting infrastructure while maintaining backward compatibility
  */
 
+import {
+  useSorting,
+  useSortingMetrics,
+} from "$islands/sorting/SortingProvider.tsx";
 import { useMemo } from "preact/hooks";
-import { useSorting, useSortingMetrics } from "../SortingProvider.tsx";
 
 interface EnhancedSortButtonProps {
   enableAdvancedSorting?: boolean;

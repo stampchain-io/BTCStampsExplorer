@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import type { SRC20MintDataResponse } from "$lib/types/src20.d.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { rowTable, ScrollContainer } from "$layout";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, loaderText, textSm, textSmLink } from "$text";
 
 /* ===== TYPES ===== */

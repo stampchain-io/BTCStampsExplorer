@@ -5,13 +5,13 @@
  * and maintain backward compatibility.
  */
 
-import { assert } from "https://deno.land/std@0.208.0/assert/mod.ts";
 import type {
-  EnrichedSRC20Row,
-  SRC20MarketDataV3,
-  SRC20Token,
-  SRC20WithOptionalMarketData, // Legacy interface
-} from "../../lib/types/src20.d.ts";
+    EnrichedSRC20Row,
+    SRC20MarketDataV3,
+    SRC20Token,
+    SRC20WithOptionalMarketData, // Legacy interface
+} from "$lib/types/src20.d.ts";
+import { assert } from "https://deno.land/std@0.208.0/assert/mod.ts";
 
 console.log("🧪 TypeScript Interface Validation Tests");
 
@@ -186,4 +186,4 @@ console.log("   • Enhanced type safety throughout");
 console.log("   • Improved developer experience");
 console.log("   • Enabled future extensibility");
 
-export {}; // Make this a module
+export { }; // Make this a module

@@ -7,7 +7,7 @@ import { WalletDashboardHeader } from "$header";
 import WalletDashboardDetails from "$islands/content/WalletDashboardDetails.tsx";
 import { WalletOverviewInfo, WalletPageProps } from "$lib/types/index.d.ts";
 import { PaginatedResponse } from "$lib/types/pagination.d.ts";
-import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
+import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
 

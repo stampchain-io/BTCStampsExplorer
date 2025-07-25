@@ -2,7 +2,7 @@ import { useConfig } from "$client/hooks/useConfig.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { useFees } from "$fees";
 import { Config } from "$globals";
-import { debounce } from "$lib/utils/debounce.ts";
+import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";

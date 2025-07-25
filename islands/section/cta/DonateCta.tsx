@@ -7,7 +7,7 @@ import DonateStampModal from "$islands/modal/DonateStampModal.tsx";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { DonateStampData, Transaction, TxOutput } from "$layout";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import {
   headingGrey,

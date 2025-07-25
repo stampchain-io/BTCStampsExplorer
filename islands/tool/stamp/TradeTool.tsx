@@ -17,7 +17,7 @@
 import { walletContext } from "$client/wallet/wallet.ts";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { showToast } from "$lib/utils/toastSignal.ts";
+import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { useCallback, useEffect, useState } from "preact/hooks";
 
 import { Button } from "$button";

@@ -1,4 +1,7 @@
-import { formatNumber, formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
+import {
+  formatNumber,
+  formatSatoshisToBTC,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { rowTable, ScrollContainer } from "$layout";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { labelXs, valueSm } from "$text";

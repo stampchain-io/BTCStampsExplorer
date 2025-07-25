@@ -6,7 +6,7 @@ import {
   formatSatoshisToUSD,
   formatUSDValue,
   jsonStringifyWithBigInt,
-} from "$lib/utils/formatUtils.ts";
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { assertEquals } from "@std/assert";
 import { BigFloat } from "bigfloat/mod.ts";
 

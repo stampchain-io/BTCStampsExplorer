@@ -1,7 +1,10 @@
 import { SRC20Row, WalletDataTypes } from "$globals";
 import { useState } from "preact/hooks";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
+import {
+  abbreviateAddress,
+  formatDate,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { textLg } from "$text";
 import { walletSignal } from "$client/wallet/wallet.ts";
 type SRC20BalanceTableProps = {

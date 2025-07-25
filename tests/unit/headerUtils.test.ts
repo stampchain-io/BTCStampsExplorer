@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "@std/assert";
-import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
+import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
 
 Deno.test("headerUtils - normalizeHeaders with Headers object", () => {
   const headers = new Headers({

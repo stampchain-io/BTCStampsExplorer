@@ -1,13 +1,13 @@
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { Src20Detail } from "$globals";
 import { crypto } from "@std/crypto";
-import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
+import { isValidBitcoinAddress } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { SRC20QueryService } from "./queryService.ts";
 import { BigFloat } from "bigfloat/mod.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { InputData } from "$types/index.d.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { validateImageReference } from "$lib/utils/imageProtocolUtils.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { validateImageReference } from "$lib/utils/data/protocols/imageProtocolUtils.ts";
 
 export class SRC20UtilityService {
   static formatSRC20Row(row: Src20Detail) {

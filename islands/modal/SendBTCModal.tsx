@@ -4,13 +4,13 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { FeeCalculatorBase } from "$section";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { ModalBase } from "$layout";
 import { inputField } from "$form";
 import { tooltipIcon } from "$notification";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { showToast } from "$lib/utils/toastSignal.ts";
+import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 
 /* ===== TYPES ===== */
 interface Props {

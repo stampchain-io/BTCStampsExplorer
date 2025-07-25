@@ -5,7 +5,7 @@
 
 import { assertEquals, assertExists } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 describe("ApiResponseUtil", () => {

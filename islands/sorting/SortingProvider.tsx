@@ -10,7 +10,7 @@ import type {
   UseSortingConfig,
   UseSortingReturn,
 } from "$lib/types/sorting.d.ts";
-import { DEFAULT_SORT_CONFIG } from "$lib/utils/sortingConstants.ts";
+import { DEFAULT_SORT_CONFIG } from "$lib/utils/data/sorting/sortingConstants.ts";
 import { createContext } from "preact";
 import { useContext, useEffect, useState } from "preact/hooks";
 

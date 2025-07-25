@@ -1,7 +1,7 @@
 import {
   calculateTransactionFee,
   estimateTransactionSize,
-} from "$lib/utils/minting/transactionSizes.ts";
+} from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
 import { assertEquals } from "@std/assert";
 
 Deno.test("calculateTransactionFee - calculates fee correctly", () => {

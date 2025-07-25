@@ -12,9 +12,9 @@ import {
   loaderSpinGrey,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { extractSRC20ErrorMessage } from "$lib/utils/src20/errorHandling.tsx";
+import { extractSRC20ErrorMessage } from "$lib/utils/bitcoin/src20/errorHandling.tsx";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
 import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";

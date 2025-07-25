@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { BlockController } from "$server/controller/blockController.ts";
 
 const sharedBlockWithStampsHandler: Handlers = {

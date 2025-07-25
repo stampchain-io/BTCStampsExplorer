@@ -1,6 +1,6 @@
 #!/usr/bin/env deno run --allow-net --allow-env --allow-read
 
-import { BTCPriceService } from "../server/services/price/btcPriceService.ts";
+import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 
 console.log("Testing all BTC price sources...\n");
 
@@ -16,12 +16,12 @@ const sources = ["coingecko", "kraken", "coinbase", "bitstamp", "blockchain", "b
 
 for (const source of sources) {
   console.log(`Testing ${source.toUpperCase()}...`);
-  
+
   try {
     const startTime = Date.now();
     const result = await BTCPriceService.getPrice(source);
     const duration = Date.now() - startTime;
-    
+
     if (result.source === source || result.source === "cached") {
       console.log(`✅ SUCCESS: $${result.price.toFixed(2)} (${result.source}) - ${duration}ms`);
       if (result.details) {
@@ -36,16 +36,16 @@ for (const source of sources) {
   } catch (error) {
     console.log(`❌ ERROR: ${error.message}`);
   }
-  
+
   // Check circuit breaker status for this source
   const metrics = BTCPriceService.getServiceMetrics();
   const breaker = metrics.circuitBreakers[source];
   if (breaker) {
     console.log(`   Circuit breaker: ${breaker.state} (failures: ${breaker.totalFailures}, successes: ${breaker.totalSuccesses})`);
   }
-  
+
   console.log("");
-  
+
   // Small delay between tests
   await new Promise(resolve => setTimeout(resolve, 1000));
 }

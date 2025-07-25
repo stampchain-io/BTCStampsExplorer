@@ -9,7 +9,7 @@ import { openModal } from "$islands/modal/states.ts";
 import { bodyTool, containerBackground, loaderSpinGrey } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { ROOT_DOMAINS } from "$constants";
-import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages, tooltipButton } from "$notification";
 import { FeeCalculatorBase } from "$section";

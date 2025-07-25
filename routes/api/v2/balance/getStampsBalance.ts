@@ -1,4 +1,4 @@
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { validateRequiredParams } from "$server/services/validation/routeValidationService.ts";

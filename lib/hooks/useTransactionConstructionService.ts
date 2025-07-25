@@ -20,7 +20,7 @@
  * ```
  */
 
-import { debounce } from "$lib/utils/debounce.ts";
+import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import {
   type EstimationOptions,

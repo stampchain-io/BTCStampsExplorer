@@ -15,9 +15,9 @@ import type {
 import {
   formatSatoshisToBTC,
   formatSatoshisToUSD,
-} from "$lib/utils/formatUtils.ts";
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { estimateTransactionSizeForType } from "$lib/utils/transactionSizeEstimator.ts";
+import { estimateTransactionSizeForType } from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
 import { tooltipButton, tooltipImage } from "$notification";
 import { labelXs, textXs } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";

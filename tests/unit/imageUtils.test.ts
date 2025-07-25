@@ -10,7 +10,7 @@ import {
   mimeTypeToSuffix,
   showFallback,
   validateStampContent,
-} from "$lib/utils/imageUtils.ts";
+} from "$lib/utils/ui/media/imageUtils.ts";
 import { assertEquals } from "@std/assert";
 
 Deno.test("getMimeType - returns correct mime type for known extensions", () => {

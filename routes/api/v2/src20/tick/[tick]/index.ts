@@ -1,8 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
 import { PaginatedTickResponseBody } from "$globals";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { isValidSrc20Tick } from "$lib/utils/identifierUtils.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { isValidSrc20Tick } from "$lib/utils/data/identifiers/identifierUtils.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import {
   DEFAULT_PAGINATION,

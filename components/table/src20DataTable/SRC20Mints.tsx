@@ -1,7 +1,10 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { SRC20Row } from "$globals";
 import { rowTable } from "$layout";
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatDate,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface SRC20MintsProps {

@@ -1,4 +1,4 @@
-import { arraysEqual } from "$lib/utils/binary/baseUtils.ts";
+import { arraysEqual } from "$lib/utils/data/binary/baseUtils.ts";
 import { SRC20CompressionService } from "$server/services/src20/compression/compressionService.ts";
 import { assertEquals, assertInstanceOf } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";

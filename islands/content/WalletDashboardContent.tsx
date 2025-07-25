@@ -7,13 +7,16 @@ import { Setting } from "$islands/datacontrol/Setting.tsx";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
 import { NOT_AVAILABLE_IMAGE } from "$constants";
-import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   createPaginationHandler,
   getCurrentUrl,
   navigateWithFresh,
-} from "$lib/utils/freshNavigationUtils.ts";
-import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
+} from "$lib/utils/navigation/freshNavigationUtils.ts";
+import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { Dispenser } from "$types/index.d.ts";
 import { WalletContentProps } from "$types/wallet.d.ts";
 import { useEffect, useState } from "preact/hooks";

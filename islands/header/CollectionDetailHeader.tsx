@@ -8,8 +8,8 @@ import {
   formatMarketCap,
   formatNumberWithCommas,
   formatVolume,
-} from "$lib/utils/formatUtils.ts";
-import { handleImageError } from "$lib/utils/imageUtils.ts";
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
 import {
   headingGreyDLLink,
   labelSm,

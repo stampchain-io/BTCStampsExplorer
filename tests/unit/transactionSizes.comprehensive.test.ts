@@ -1,7 +1,7 @@
 import {
   calculateTransactionFee,
   estimateTransactionSize,
-} from "$lib/utils/minting/transactionSizes.ts";
+} from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
 import { assertEquals } from "@std/assert";
 
 // Mock console.warn to test warning scenarios
@@ -88,7 +88,7 @@ Deno.test("estimateTransactionSize - unknown changeOutputType", () => {
   assertEquals(size > 0, true);
   assertEquals(
     warnings.some((w) =>
-      w.includes("Unknown change output type: UNKNOWN, using P2WPKH default")
+      w.includes("Unknown output type: UNKNOWN, using P2WPKH default")
     ),
     true,
   );

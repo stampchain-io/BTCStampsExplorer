@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --allow-net --allow-env --allow-read
 
-import { dbManager } from "../server/database/databaseManager.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 
 async function analyzeQueryPerformance(db: any) {
   console.log("\n=== SQL QUERY PERFORMANCE ANALYSIS ===\n");
@@ -11,7 +11,7 @@ async function analyzeQueryPerformance(db: any) {
       name: "Get stamps with market data (collection page)",
       sql: `
         EXPLAIN ANALYZE
-        SELECT 
+        SELECT
           s.*,
           m.floor_price_btc,
           m.recent_sale_price_btc,
@@ -30,7 +30,7 @@ async function analyzeQueryPerformance(db: any) {
       name: "Get stamps with market data filters",
       sql: `
         EXPLAIN ANALYZE
-        SELECT 
+        SELECT
           s.*,
           m.floor_price_btc,
           m.recent_sale_price_btc,
@@ -51,7 +51,7 @@ async function analyzeQueryPerformance(db: any) {
       name: "Get SRC-20 tokens with market data",
       sql: `
         EXPLAIN ANALYZE
-        SELECT 
+        SELECT
           s.*,
           m.floor_price_btc,
           m.recent_sale_price_btc,

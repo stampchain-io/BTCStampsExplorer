@@ -1,10 +1,10 @@
-// import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts"; // Unused import - removed
+// import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts"; // Unused import - removed
 import { TXError } from "$globals";
 // import { crypto } from "@std/crypto"; // Unused import - removed
-import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
+import { isValidBitcoinAddress } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { SRC101QueryService } from "./queryService.ts";
 // import { BigFloat } from "bigfloat/mod.ts"; // Unused import - removed
-// import { ResponseUtil } from "$lib/utils/responseUtil.ts"; // Unused import - removed
+// import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts"; // Unused import - removed
 import { SRC101InputData } from "$types/index.d.ts"; // Fixed import path
 
 export class SRC101UtilityService {

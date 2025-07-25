@@ -4,7 +4,7 @@ import {
   Collection,
 } from "$globals";
 import { CollectionQueryParams, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
-import { paginate } from "$lib/utils/paginationUtils.ts";
+import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
 
 export class CollectionService {
   static async getCollectionDetails(

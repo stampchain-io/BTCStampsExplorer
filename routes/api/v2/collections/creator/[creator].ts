@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,

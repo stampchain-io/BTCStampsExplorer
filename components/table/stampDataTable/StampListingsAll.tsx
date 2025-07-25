@@ -3,7 +3,7 @@ import { rowTable } from "$layout";
 import {
   abbreviateAddress,
   formatSatoshisToBTC,
-} from "$lib/utils/formatUtils.ts";
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
 interface Dispenser {

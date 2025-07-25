@@ -1,5 +1,5 @@
 import { Icon } from "$icon";
-import { getWindowWidth } from "$lib/utils/freshNavigationUtils.ts";
+import { getWindowWidth } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { PaginationProps } from "$types/pagination.d.ts";
 import { useEffect, useState } from "preact/hooks";
 

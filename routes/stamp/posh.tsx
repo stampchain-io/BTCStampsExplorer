@@ -1,6 +1,6 @@
 /* ===== POSH REDIRECT ROUTE ===== */
 import { Handlers } from "$fresh/server.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {

@@ -12,9 +12,9 @@ import {
   loaderSpinGrey,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
-import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
-import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
+import { APIResponse } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages, tooltipButton, tooltipImage } from "$notification";
 import { FeeCalculatorBase } from "$section";

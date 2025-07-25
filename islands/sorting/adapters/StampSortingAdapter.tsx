@@ -6,7 +6,7 @@
 
 import type { StampRow } from "$globals";
 import type { SortOption } from "$lib/types/sorting.d.ts";
-import { getAvailableSortOptions } from "$lib/utils/sorting/performance.ts";
+import { getAvailableSortOptions } from "$lib/utils/data/sorting/performance.ts";
 import { useMemo } from "preact/hooks";
 
 export interface StampSortingAdapterProps {

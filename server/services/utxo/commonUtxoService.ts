@@ -1,10 +1,10 @@
 import { UTXO } from "$lib/types/base.d.ts";
 import { BLOCKSTREAM_API_BASE_URL, MEMPOOL_API_BASE_URL } from "$constants";
-import { logger } from "$lib/utils/logger.ts";
-import { detectScriptType } from "$lib/utils/scriptTypeUtils.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { detectScriptType } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import {
     getUTXOForAddress as getUTXOsFromPublicAPIsForAddress
-} from "$lib/utils/utxoUtils.ts";
+} from "$lib/utils/bitcoin/utxo/utxoUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 import { UTXOOptions as QuicknodeInternalUTXOOptions, QuicknodeUTXOService } from "$server/services/quicknode/quicknodeUTXOService.ts";

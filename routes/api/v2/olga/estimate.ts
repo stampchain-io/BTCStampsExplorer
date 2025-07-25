@@ -1,9 +1,10 @@
+import { TX_CONSTANTS } from "$constants";
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
-import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
-import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
+import { base64ToHex } from "$lib/utils/data/binary/baseUtils.ts";
+import { FileToAddressUtils } from "$lib/utils/bitcoin/encoding/fileToAddressUtils.ts";
+import { estimateMintingTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
 import type { ScriptType } from "$types/index.d.ts";
 
@@ -109,8 +110,8 @@ export const handler: Handlers = {
 
       // Parse file and calculate CIP33 addresses
       const fileSize = Math.ceil((body.file.length * 3) / 4);
-      const hex_file = CIP33.base64_to_hex(body.file);
-      const cip33Addresses = CIP33.file_to_addresses(hex_file);
+      const hex_file = base64ToHex(body.file);
+      const cip33Addresses = FileToAddressUtils.fileToAddresses(hex_file);
 
       logger.debug("stamps", {
         message: "File analysis for estimation",
@@ -161,7 +162,7 @@ export const handler: Handlers = {
       });
 
       // Estimate transaction size using dummy inputs/outputs with realistic sizes
-      const estimatedSize = estimateTransactionSize({
+      const estimatedSize = estimateMintingTransactionSize({
         inputs: [
           {
             type: "P2WPKH" as ScriptType,

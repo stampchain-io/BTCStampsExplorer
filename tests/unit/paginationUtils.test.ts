@@ -1,5 +1,8 @@
 import { assertEquals, assertInstanceOf } from "@std/assert";
-import { getPaginationParams, paginate } from "$lib/utils/paginationUtils.ts";
+import {
+  getPaginationParams,
+  paginate,
+} from "$lib/utils/data/pagination/paginationUtils.ts";
 
 Deno.test("paginationUtils - getPaginationParams with default values", () => {
   const url = new URL("https://example.com/api/stamps");

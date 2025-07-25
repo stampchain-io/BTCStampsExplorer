@@ -1,6 +1,6 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 // MintStampInputData import removed as RawRequestBody is now explicitly defined
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { SATOSHIS_PER_BTC } from "$constants"; // For XCP decimal handling if values are not base units
 import { logger } from "$lib/utils/logger.ts"; // Import logger
 import { serverConfig } from "$server/config/config.ts";
