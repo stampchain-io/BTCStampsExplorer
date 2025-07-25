@@ -1,11 +1,11 @@
 import { logger } from "$lib/utils/logger.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
-import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import type { BasicUTXO, Output, UTXO } from "$types/index.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 
-export class UTXOService {
+export class BitcoinUtxoManager {
   private static readonly CHANGE_DUST = 1000;
 
   private commonUtxoService: CommonUTXOService;
@@ -154,7 +154,7 @@ export class UTXOService {
         {
           avoidChange: true,
           consolidationMode: false,
-          dustThreshold: UTXOService.CHANGE_DUST
+          dustThreshold: BitcoinUtxoManager.CHANGE_DUST
         }
       );
 

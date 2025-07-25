@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { UTXOService } from "$server/services/transaction/utxoService.ts";
+import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 import { logger } from "$lib/utils/logger.ts";
 import type { AncestorInfo, UTXO } from "$types/index.d.ts";
 

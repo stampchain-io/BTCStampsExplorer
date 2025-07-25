@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { UTXOService } from "$server/services/transaction/utxoService.ts";
+import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 import type { BasicUTXO, UTXO } from "$types/index.d.ts";
 
 /**
@@ -40,7 +40,7 @@ import type { BasicUTXO, UTXO } from "$types/index.d.ts";
  */
 export const handler: Handlers = {
   async GET(req: Request) {
-    const utxoService = new UTXOService();
+    const utxoService = new BitcoinUtxoManager();
     try {
       const url = new URL(req.url);
       const address = url.searchParams.get("address");
