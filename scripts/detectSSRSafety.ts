@@ -142,6 +142,17 @@ class SSRSafetyDetector {
     'tmp',
     'tests',
     'scripts',
+    '.deno',
+    'deno_modules',
+    'npm',
+    '.npm',
+    'cache',
+    '.cache',
+    'vendor',
+    'coverage_psbt',
+    'newman-reporter-enhanced',
+    '--help',
+    '--version',
   ];
 
   async scanFile(filePath: string): Promise<void> {
@@ -212,8 +223,10 @@ class SSRSafetyDetector {
     }
   }
 
-  async scanDirectory(rootPath: string): Promise<void> {
-    console.log('🔍 Scanning codebase for SSR safety issues...\n');
+  async scanDirectory(rootPath: string, isCI = false): Promise<void> {
+    if (!isCI) {
+      console.log('🔍 Scanning codebase for SSR safety issues...\n');
+    }
 
     let totalFiles = 0;
 
@@ -317,24 +330,52 @@ class SSRSafetyDetector {
 // Main execution
 async function main() {
   const detector = new SSRSafetyDetector();
+  const args = Deno.args;
+  const isCI = args.includes('--ci');
 
   // Scan the codebase
-  await detector.scanDirectory('.');
+  await detector.scanDirectory('.', isCI);
 
-  // Generate and display report
+  // Generate report
   const report = detector.generateReport();
-  detector.displayReport(report);
 
-  // Save report to file
-  const outputPath = './ssr-safety-report.json';
-  await detector.saveReport(report, outputPath);
+  if (isCI) {
+    // In CI mode, output JSON to stdout for test consumption
+    const ciOutput = {
+      totalFiles: report.totalFiles,
+      issuesFound: report.summary.total,
+      critical: report.summary.high,
+      medium: report.summary.medium,
+      low: report.summary.low,
+      issues: report.issues.map(issue => ({
+        file: issue.file,
+        line: issue.line,
+        pattern: issue.type,
+        severity: issue.severity,
+        description: issue.description,
+        suggestion: issue.suggestion
+      }))
+    };
+    console.log(JSON.stringify(ciOutput));
+  } else {
+    // Normal mode - display human-readable report
+    detector.displayReport(report);
+
+    // Save report to file
+    const outputPath = './ssr-safety-report.json';
+    await detector.saveReport(report, outputPath);
+  }
 
   // Exit with error code if issues found
   if (report.summary.total > 0) {
-    console.log('❌ SSR safety issues detected. Please review and fix the issues above.');
+    if (!isCI) {
+      console.log('❌ SSR safety issues detected. Please review and fix the issues above.');
+    }
     Deno.exit(1);
   } else {
-    console.log('✅ All SSR safety checks passed!');
+    if (!isCI) {
+      console.log('✅ All SSR safety checks passed!');
+    }
     Deno.exit(0);
   }
 }
