@@ -320,7 +320,7 @@ const FilterDrawer = (
     <div
       id={drawerId}
       ref={drawerRef}
-      class={`fixed top-0 z-40 h-screen
+      class={`fixed top-0 z-40 h-[100dvh]
         bg-gradient-to-b from-[#0e0014]/60 via-[#000000]/80 to-[#000000]/100 backdrop-blur-md
         transition-transform duration-500 will-change-transform
         overflow-y-auto overflow-x-hidden scrollbar-black
@@ -333,7 +333,7 @@ const FilterDrawer = (
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}
-      <div class="h-[calc(100vh-110px)] tablet:h-[calc(100vh-82px)] overflow-y-auto scrollbar-black">
+      <div class="h-[calc(100dvh-110px)] tablet:h-[calc(100dvh-82px)] overflow-y-auto scrollbar-black">
         <div class="w-full pt-[25px] mobileLg:pt-[37px] tablet:pt-[38px] px-9 tablet:px-6">
           <div class="relative w-full">
             {/* Mobile CloseIcon - shows by default, hidden on tablet+ */}
