@@ -218,9 +218,9 @@ export default {
         "stroke-width": "2px",
       },
       boxShadow: {
-        "stamp": "0px 0px 30px #aa00ff",
-        "stamp-hover": "0px 0px 40px #aa00ff",
-        "collection": "0px 0px 30px #FFFFFF7F",
+        "stamp": "0px 0px 18px #aa00ff",
+        "stamp-hover": "0px 0px 24px #aa00ff",
+        "collection": "0px 0px 24px #FFFFFF7F",
       },
       aspectRatio: {
         "stamp": "1",
@@ -262,7 +262,7 @@ export default {
             0.05em 0 0.25em #80C,          /* right */
             0 -0.05em 0.25em #80C,         /* top */
             0 0.05em 0.25em #80C,          /* bottom */
-            
+
             /* Stroke effect */
             -3px -3px 0 #A0F,
             3px -3px 0 #A0F,
@@ -285,7 +285,7 @@ export default {
             0.02em 0 0.3em #80C,          /* right */
             0 -0.02em 0.3em #80C,         /* top */
             0 0.02em 0.3em #80C,          /* bottom */
-            
+
             /* Stroke effect */
             -2px -2px 0 #A0F,
             2px -2px 0 #A0F,

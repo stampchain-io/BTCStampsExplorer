@@ -13,6 +13,7 @@ import {
   LIBRARY_FILE_IMAGE,
   NOT_AVAILABLE_IMAGE,
 } from "$constants";
+import { glassmorphism, transition } from "$layout";
 import {
   abbreviateAddress,
   formatSupplyValue,
@@ -444,10 +445,9 @@ export function StampCard({
         class={`
           text-white group relative z-0 flex flex-col
           p-stamp-card mobileLg:p-3
-          rounded-md transition-all
           w-full h-full
-          hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent
-          bg-stamp-card-bg
+          hover:border-stamp-purple-bright hover:shadow-stamp
+          ${glassmorphism} ${transition}
         `}
       >
         {/* ===== ATOM ICON ===== */}
