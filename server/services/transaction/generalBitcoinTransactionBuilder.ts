@@ -1,5 +1,5 @@
 /**
- * General PSBT Service - Clean Architecture for All Counterparty Operations
+ * General Bitcoin Transaction Builder - Clean Architecture for All Counterparty Operations
  *
  * Extracted from the proven StampMintService.generatePSBT() pattern
  * Works with raw hex from Counterparty (return_psbt: false)
@@ -20,7 +20,7 @@ import type { ScriptType, UTXO } from "$types/index.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
 
-export interface PSBTGenerationOptions {
+export interface BitcoinTransactionGenerationOptions {
   address: string;
   satsPerVB: number;
   serviceFee?: number;
@@ -33,7 +33,7 @@ export interface PSBTGenerationOptions {
   customOutputs?: Array<{ value: number; address: string }>;
 }
 
-export interface PSBTGenerationResult {
+export interface BitcoinTransactionGenerationResult {
   psbt: bitcoin.Psbt;
   estimatedTxSize: number;
   totalInputValue: number;
@@ -44,7 +44,7 @@ export interface PSBTGenerationResult {
   changeAddress: string;
 }
 
-export class GeneralPSBTService {
+export class GeneralBitcoinTransactionBuilder {
   private static commonUtxoService = new CommonUTXOService();
 
   /**
@@ -53,8 +53,8 @@ export class GeneralPSBTService {
    */
   static async generatePSBT(
     counterpartyRawHex: string,
-    options: PSBTGenerationOptions
-  ): Promise<PSBTGenerationResult> {
+    options: BitcoinTransactionGenerationOptions
+  ): Promise<BitcoinTransactionGenerationResult> {
     const {
       address,
       satsPerVB,

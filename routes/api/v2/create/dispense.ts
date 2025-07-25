@@ -3,8 +3,8 @@ import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { PSBTService } from "$server/services/transaction/psbtService.ts";
-import { normalizeFeeRate, XcpManager } from "$server/services/xcpService.ts";
+import { BitcoinTransactionBuilder } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
+import { XcpManager } from "$server/services/xcpService.ts";
 
 interface DispenseInput {
   address: string;
@@ -73,7 +73,7 @@ export const handler: Handlers = {
 
         // normalizeFeeRate itself throws if neither is provided, which is good.
         // We just need to ensure the object passed is clean for exactOptionalPropertyTypes.
-        normalizedFees = normalizeFeeRate(feeArgsInput);
+        normalizedFees = XcpManager.normalizeFeeRate(feeArgsInput);
 
         if (!normalizedFees || normalizedFees.normalizedSatsPerVB <= 0) {
           return ApiResponseUtil.badRequest(
@@ -204,12 +204,13 @@ export const handler: Handlers = {
         console.log(
           "[Dispense Route] About to call PSBTService.buildPsbtFromUserFundedRawHex",
         );
-        const builtPsbtData = await PSBTService.buildPsbtFromUserFundedRawHex(
-          counterpartyTxHex,
-          buyerAddress, // This is the userAddress
-          normalizedFees.normalizedSatsPerVB,
-          psbtOptions,
-        );
+        const builtPsbtData = await BitcoinTransactionBuilder
+          .buildPsbtFromUserFundedRawHex(
+            counterpartyTxHex,
+            buyerAddress, // This is the userAddress
+            normalizedFees.normalizedSatsPerVB,
+            psbtOptions,
+          );
         console.log(
           "[Dispense Route] Result from PSBTService.buildPsbtFromUserFundedRawHex:",
           JSON.stringify(builtPsbtData, null, 2),
