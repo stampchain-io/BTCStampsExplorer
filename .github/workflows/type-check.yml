@@ -91,33 +91,26 @@ jobs:
 
             echo "🔍 Type checking changed files..."
             
-            # Check files in parallel for better performance
-            export -f check_file
-            check_file() {
-              local file=$1
-              if timeout 30 deno check "$file" 2>&1 >/dev/null; then
-                echo "✅ $file"
-                return 0
-              else
-                echo "❌ $file"
-                return 1
-              fi
-            }
-            
             # Process files and collect results
             ERROR_FILES=""
             for file in $CHANGED_TS_FILES; do
               if [ -f "$file" ]; then
                 CHECKED_FILES=$((CHECKED_FILES + 1))
-                if ! timeout 30 deno check "$file" 2>&1; then
+                echo -n "Checking $file... "
+                
+                # Check the file with timeout
+                if timeout 30 deno check "$file" 2>&1 >/dev/null; then
+                  echo "✅"
+                else
+                  echo "❌"
                   FILES_WITH_ERRORS=$((FILES_WITH_ERRORS + 1))
-                  ERROR_FILES="$ERROR_FILES\n  - $file"
+                  ERROR_FILES="${ERROR_FILES}  - $file\n"
                 fi
               fi
             done
             
             if [ -n "$ERROR_FILES" ]; then
-              echo -e "\n⚠️ Files with type errors:$ERROR_FILES"
+              echo -e "\n⚠️ Files with type errors:\n$ERROR_FILES"
             fi
 
             echo "📊 Summary for changed files:"
