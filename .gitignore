@@ -181,3 +181,4 @@ coverage_psbt_final/*
 coverage_compression*/*
 
 coverage_report.json
+ssr_safety_report.json
