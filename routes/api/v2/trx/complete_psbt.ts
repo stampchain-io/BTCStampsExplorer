@@ -1,7 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { TransactionService } from "$server/services/transaction/index.ts";
+import {
+  BitcoinTransactionBuilder,
+} from "$server/services/transaction/index.ts";
 
 export const handler: Handlers = {
   async POST(req: Request) {
@@ -17,8 +19,7 @@ export const handler: Handlers = {
 
       // Complete PSBT with specified fee rate
 
-      const completedPsbtHex = await TransactionService
-        .BitcoinTransactionBuilder
+      const completedPsbtHex = await BitcoinTransactionBuilder
         .completePSBT(
           sellerPsbtHex,
           buyerUtxo,
