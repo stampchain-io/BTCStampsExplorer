@@ -1,4 +1,4 @@
-import type { CollectionMarketData, CacheStatus } from "../../lib/types/marketData.d.ts";
+import type { CacheStatus, CollectionMarketData } from "$types/marketData.d.ts";
 
 export interface CollectionRow {
   collection_id: string;
@@ -21,7 +21,7 @@ export interface CollectionWithOptionalMarketData extends CollectionRow {
   marketDataMessage?: string;
   cacheStatus?: CacheStatus;
   cacheAgeMinutes?: number;
-  
+
   // Convenience fields for quick access
   floorPriceRange?: {
     min: number | null;
@@ -60,4 +60,4 @@ export interface PaginatedCollectionWithMarketDataResponseBody extends Paginated
     collectionsWithoutData: number;
     cacheStatus: CacheStatus;
   };
-} 
+}
