@@ -275,6 +275,7 @@ export class CommonUTXOService implements ICommonUTXOService {
           }
         } else {
           logger.warn("common-utxo-service", { message: "Specific output not found in tx from mempool.space", txid, vout, receivedVoutLength: txData?.vout?.length });
+          // Continue to fallback APIs
         }
       } else {
         logger.warn("common-utxo-service", { message: `Mempool.space failed to fetch tx ${txid}`, status: response.statusText, code: response.status });
