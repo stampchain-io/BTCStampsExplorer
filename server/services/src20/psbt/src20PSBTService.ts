@@ -1,13 +1,13 @@
-import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
+import { FileToAddressUtils } from "$lib/utils/bitcoin/encoding/fileToAddressUtils.ts";
 import { AncestorInfo, PSBTInput } from "$types/index.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 const { networks, address, Psbt } = bitcoin;
 // Removed unused imports: calculateDust, calculateMiningFee, estimateTransactionSize, msgpack
-import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
+import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
 // Removed TransactionService import - using direct OptimalUTXOSelection instead
-import { logger } from "$lib/utils/logger.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { TX_CONSTANTS } from "$constants";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import type { UTXO } from "$types/index.d.ts";
@@ -278,8 +278,8 @@ export class SRC20PSBTService {
         normalizedAction
       });
 
-      // Let CIP33 handle length prefix and chunking
-      const cip33Addresses = CIP33.file_to_addresses(hex_data);
+      // Let FileToAddressUtils handle length prefix and chunking
+      const cip33Addresses = FileToAddressUtils.fileToAddresses(hex_data);
       if (!cip33Addresses || cip33Addresses.length === 0) {
         throw new Error("Failed to generate CIP33 addresses");
       }

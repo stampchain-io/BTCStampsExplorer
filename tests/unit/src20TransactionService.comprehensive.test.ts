@@ -11,7 +11,7 @@ import { SRC20TransactionService } from "$server/services/src20/transactionServi
 import { SRC20OperationService } from "$server/services/src20/operations/src20Operations.ts";
 // TX and TXError types are used for type checking in the service but not directly in tests
 import type { InputData } from "$types/index.d.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 
 // Test fixtures
 const mockDeployResult = {

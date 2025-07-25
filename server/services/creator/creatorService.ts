@@ -1,4 +1,4 @@
-import { verifySignature } from "$lib/utils/cryptoUtils.ts";
+import { verifySignature } from "$lib/utils/security/cryptoUtils.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { SecurityService } from "$server/services/security/securityService.ts";
 import { SRC101Service } from "$server/services/src101/index.ts";

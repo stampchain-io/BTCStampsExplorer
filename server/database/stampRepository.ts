@@ -6,15 +6,15 @@ import {
   StampBalance,
   StampFilters, SUBPROTOCOLS
 } from "$globals";
-import { filterOptions } from "$lib/utils/filterOptions.ts";
+import { filterOptions } from "$lib/utils/data/filtering/filterOptions.ts";
 import {
   getIdentifierType,
   isCpid,
   isStampHash,
   isStampNumber,
   isTxHash,
-} from "$lib/utils/identifierUtils.ts";
-import { logger, LogNamespace } from "$lib/utils/logger.ts";
+} from "$lib/utils/data/identifiers/identifierUtils.ts";
+import { logger, LogNamespace } from "$lib/utils/monitoring/logging/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { XcpBalance } from "$types/index.d.ts";
 import { summarize_issuances } from "./index.ts";

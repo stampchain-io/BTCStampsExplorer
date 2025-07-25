@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { AddressTickHandlerContext } from "$globals";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import {

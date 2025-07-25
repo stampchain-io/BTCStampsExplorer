@@ -4,13 +4,13 @@
  * Tests all functions, branches, and edge cases
  */
 
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { TX_CONSTANTS } from "$lib/utils/bitcoin/minting/constants.ts";
 import {
   calculateDust,
   calculateMiningFee,
   calculateP2WSHMiningFee,
   estimateFee,
-} from "$lib/utils/minting/feeCalculations.ts";
+} from "$lib/utils/bitcoin/minting/feeCalculations.ts";
 import type {
   AncestorInfo,
   Output,

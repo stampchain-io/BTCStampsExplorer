@@ -11,7 +11,7 @@ import {
   isUsingFallback,
   refreshFees,
   subscribeFees,
-} from "$lib/utils/feeSignal.ts";
+} from "$lib/utils/performance/signals/feeSignal.ts";
 
 // Hook interface for fee data access with enhanced fallback capabilities
 interface UseFeeResult {

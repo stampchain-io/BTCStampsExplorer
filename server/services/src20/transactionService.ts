@@ -1,5 +1,5 @@
 import { TX, TXError } from "$globals";
-import { logger } from "$lib/utils/logger.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$server/types/services/src20.d.ts";
 import { InputData } from "$types/index.d.ts";
 import { SRC20OperationService } from "./operations/src20Operations.ts";

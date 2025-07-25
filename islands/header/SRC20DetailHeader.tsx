@@ -4,13 +4,13 @@ import type { MarketListingAggregated } from "$globals";
 import { Icon } from "$icon";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import type { AlignmentType } from "$layout";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import {
   abbreviateAddress,
   formatDate,
   formatNumber,
-} from "$lib/utils/formatUtils.ts";
-import { constructStampUrl } from "$lib/utils/imageUtils.ts";
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelSm, titleGreyLD, valueSm } from "$text";
 import { Deployment } from "$types/index.d.ts";
 import type { SRC20MintStatus } from "$types/src20.d.ts";

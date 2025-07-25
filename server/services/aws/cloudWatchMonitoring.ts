@@ -1,8 +1,8 @@
 // server/services/aws/cloudWatchMonitoring.ts
-import { logger } from "$lib/utils/logger.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { objectPoolManager } from "$server/services/memory/objectPool.ts";
+import { memoryMonitor } from "$server/services/monitoring/memoryMonitorService.ts";
 import process from "node:process";
-import { objectPoolManager } from "../memory/objectPool.ts";
-import { memoryMonitor } from "../monitoring/memoryMonitorService.ts";
 import { ecsDetection, type ECSMetadata } from "./ecsDetection.ts";
 
 export interface CloudWatchMetric {

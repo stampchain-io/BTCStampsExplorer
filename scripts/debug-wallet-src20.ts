@@ -5,9 +5,9 @@
  * Specifically for the production issue where token count shows 25 but data is empty
  */
 
-import { Src20Controller } from "../server/controller/src20Controller.ts";
-import { MarketDataRepository } from "../server/database/marketDataRepository.ts";
-import { enrichTokensWithMarketData } from "../server/services/src20Service.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
+import { enrichTokensWithMarketData } from "$server/services/src20Service.ts";
 
 const TEST_ADDRESS = "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";
 

@@ -13,7 +13,7 @@ import { StampRepository } from "$server/database/index.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { CounterpartyDispenserService, CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 
-import { logger, LogNamespace } from "$lib/utils/logger.ts";
+import { logger, LogNamespace } from "$lib/utils/monitoring/logging/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { getCacheConfig, RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";

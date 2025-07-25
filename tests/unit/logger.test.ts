@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "@std/assert";
-import { logger } from "$lib/utils/logger.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 
 // Save original console methods and Deno
 const originalConsole = {

@@ -8,7 +8,7 @@ import {
   isP2WSH,
   isValidBitcoinAddress,
   validateWalletAddressForMinting,
-} from "$lib/utils/scriptTypeUtils.ts";
+} from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 
 // Test toHexString function indirectly through script detection functions
 Deno.test("scriptTypeUtils - isP2SH with Uint8Array", () => {

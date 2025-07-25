@@ -1,6 +1,6 @@
 /* ===== UPLOAD PAGE ===== */
 /* @baba+@reinamora - what is this page used for, should it be improved? */
-import { paginate } from "$lib/utils/paginationUtils.ts";
+import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
 
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";

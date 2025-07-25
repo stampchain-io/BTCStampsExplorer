@@ -2,11 +2,11 @@
 // UPDATE COMMENTARY
 import { Button } from "$button";
 import { walletContext } from "$client/wallet/wallet.ts";
+import { DEFAULT_WALLET_CONNECTORS } from "$constants";
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
-import { DEFAULT_WALLET_CONNECTORS } from "$constants";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { navSublinkPurple, valueDarkSm, valueDarkXs } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -332,7 +332,7 @@ const WalletPopup = (
       </div>
       {
         /* <hr />
-        // TODO: Need to add Twitter column to the DB
+        // TODO(btcstamps) Need to add Twitter column to the DB
       <p>X (Twitter)</p>
       <div class={"flex justify-between"}>
         <input
@@ -343,7 +343,7 @@ const WalletPopup = (
         <button
           class="border border-[#8A8989] bg-[#5503A6] p-[7px]"
           onClick={() => {
-            // TODO: add update logic here
+            // TODO(btcstamps) add update logic here
             if (xNameRef.current) {
               console.log(xNameRef.current.value);
             }

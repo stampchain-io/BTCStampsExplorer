@@ -16,9 +16,12 @@ import {
   abbreviateAddress,
   formatBTCAmount,
   formatDate,
-} from "$lib/utils/formatUtils.ts";
-import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
-import { getSRC101Data, getStampImageSrc } from "$lib/utils/imageUtils.ts";
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { calculateTransactionSize } from "$lib/utils/data/identifiers/identifierUtils.ts";
+import {
+  getSRC101Data,
+  getStampImageSrc,
+} from "$lib/utils/ui/media/imageUtils.ts";
 import { tooltipIcon } from "$notification";
 import { Dispenser, StampListingsOpenTable } from "$table";
 import {

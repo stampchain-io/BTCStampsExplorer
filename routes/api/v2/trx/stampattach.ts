@@ -1,31 +1,31 @@
+import { TX_CONSTANTS } from "$constants";
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import type {
+  InputTypeForSizeEstimation,
+  OutputTypeForSizeEstimation,
+  ScriptTypeInfo,
+} from "$lib/types/transaction.d.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { estimateMintingTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
+import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { serverConfig } from "$server/config/config.ts"; // Import serverConfig
+import { StampController } from "$server/controller/stampController.ts";
 import {
   ComposeAttachOptions,
   CounterpartyApiManager,
   normalizeFeeRate,
 } from "$server/services/counterpartyApiService.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { serverConfig } from "$server/config/config.ts"; // Import serverConfig
-import { Buffer } from "node:buffer";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import type { UTXO as ServiceUTXO } from "$types/index.d.ts";
 import {
   address as bjsAddress,
   networks,
   Psbt,
   Transaction,
 } from "bitcoinjs-lib";
-import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
-import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
-import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import type {
-  InputTypeForSizeEstimation,
-  OutputTypeForSizeEstimation,
-  ScriptTypeInfo,
-} from "$lib/types/transaction.d.ts";
-import { logger } from "$lib/utils/logger.ts";
-import type { UTXO as ServiceUTXO } from "$types/index.d.ts";
+import { Buffer } from "node:buffer";
 
 // Update interface to accept either fee rate type and service fee
 interface StampAttachInput {
@@ -317,7 +317,7 @@ export const handler: Handlers = {
           return { type: scriptInfo.type };
         });
 
-      const estimatedVsize = estimateTransactionSize({
+      const estimatedVsize = estimateMintingTransactionSize({
         inputs: inputsForSizeEst,
         outputs: outputsForSizeEst,
         includeChangeOutput: false,

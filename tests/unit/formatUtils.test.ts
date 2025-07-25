@@ -17,7 +17,7 @@ import {
   formatVolume,
   isIntOr32ByteHex,
   stripTrailingZeros,
-} from "$lib/utils/formatUtils.ts";
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 
 Deno.test("formatUtils - abbreviateAddress", () => {
   assertEquals(abbreviateAddress(""), "");

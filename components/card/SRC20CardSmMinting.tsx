@@ -9,8 +9,8 @@ import {
   rowCardBorderRight,
   Timeframe,
 } from "$layout";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { constructStampUrl } from "$lib/utils/imageUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
+import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
 
 interface SRC20CardSmMintingProps {

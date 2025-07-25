@@ -2,8 +2,8 @@
 
 import type { Fairminter } from "$lib/types/services.d.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$constants";
-import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { formatSatoshisToBTC } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 import { DispenseEvent, Dispenser, DispenserFilter, XcpBalance } from "$types/index.d.ts";

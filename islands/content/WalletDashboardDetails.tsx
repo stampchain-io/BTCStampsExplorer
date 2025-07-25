@@ -7,7 +7,7 @@ import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { containerBackground } from "$layout";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import { titleGreyLD } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";

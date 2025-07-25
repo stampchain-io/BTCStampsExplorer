@@ -2,8 +2,8 @@
 /*@baba-check styles*/
 import { cellAlign, Timeframe } from "$components/layout/types.ts";
 import { SRC20Row } from "$globals";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { constructStampUrl } from "$lib/utils/imageUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
+import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { useState } from "preact/hooks";
 
 /* ===== HELPER FUNCTIONS ===== */

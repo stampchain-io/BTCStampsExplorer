@@ -3,7 +3,7 @@ import { ModalBase } from "$components/layout/ModalBase.tsx";
 import { AUDIO_FILE_IMAGE } from "$constants";
 import { StampTextContent } from "$content";
 import { closeModal } from "$islands/modal/states.ts";
-import { handleImageError } from "$lib/utils/imageUtils.ts";
+import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 /* ===== TYPES ===== */

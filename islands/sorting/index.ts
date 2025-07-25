@@ -68,4 +68,4 @@ export {
   DEFAULT_SORT_CONFIG,
   SORT_DIRECTIONS,
   SORT_LABELS,
-} from "$lib/utils/sortingConstants.ts";
+} from "$lib/utils/data/sorting/sortingConstants.ts";

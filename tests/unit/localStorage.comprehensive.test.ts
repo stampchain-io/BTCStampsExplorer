@@ -8,8 +8,8 @@ import {
   hasValidFeeData,
   loadFeeData,
   saveFeeData,
-} from "$lib/utils/localStorage.ts";
-import { FeeData } from "$lib/utils/feeSignal.ts";
+} from "$lib/utils/performance/storage/localStorage.ts";
+import { FeeData } from "$lib/utils/performance/signals/feeSignal.ts";
 
 // Mock localStorage
 const mockStorage = new Map<string, string>();

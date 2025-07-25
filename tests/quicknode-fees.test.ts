@@ -1,5 +1,5 @@
+import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 import { assertEquals, assertExists } from "@std/assert";
-import { QuicknodeService } from "../server/services/quicknode/quicknodeService.ts";
 
 // Mock QuickNode service for testing
 const originalFetchQuicknode = QuicknodeService.fetchQuicknode;

@@ -3,8 +3,8 @@ import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import {
   getTxInfo,
   getUTXOForAddress,
-  isValidBitcoinAddress,
-} from "$lib/utils/utxoUtils.ts";
+} from "$lib/utils/bitcoin/utxo/utxoUtils.ts";
+import { isValidBitcoinAddress } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { createMockUTXO } from "./utils/testFactories.ts";
 
 // Helper function to create mock Response objects

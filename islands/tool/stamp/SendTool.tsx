@@ -4,6 +4,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { inputField, inputFieldSquare } from "$form";
 import type { StampRow } from "$globals";
 import { Icon } from "$icon";
+import { SelectField } from "$islands/form/SelectField.tsx";
 import {
   bodyTool,
   containerBackground,
@@ -18,7 +19,6 @@ import { FeeCalculatorBase } from "$section";
 import { titlePurpleLD } from "$text";
 import { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import { SelectField } from "../../form/SelectField.tsx";
 
 /* ===== COMPONENT ===== */
 export function StampSendTool() {

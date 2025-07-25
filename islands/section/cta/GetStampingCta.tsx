@@ -1,8 +1,8 @@
 /* ===== GET STAMPING CTA COMPONENT ===== */
 import { Button } from "$button";
 import { gapGrid } from "$layout";
-import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
-import { formatUSDValue } from "$lib/utils/formatUtils.ts";
+import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
+import { formatUSDValue } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { subtitleGrey, text, titleGreyDL } from "$text";
 import { useEffect, useState } from "preact/hooks";
 

@@ -5,7 +5,7 @@
  */
 
 import type { SortKey } from "$lib/types/sorting.d.ts";
-import { DEFAULT_SORT_CONFIG } from "$lib/utils/sortingConstants.ts";
+import { DEFAULT_SORT_CONFIG } from "$lib/utils/data/sorting/sortingConstants.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 // ===== TYPES =====

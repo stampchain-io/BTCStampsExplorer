@@ -2,7 +2,10 @@
 import { ComponentChildren } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { ToastComponent } from "./ToastComponent.tsx";
-import { type BaseToast, toastSignal } from "$lib/utils/toastSignal.ts";
+import {
+  type BaseToast,
+  toastSignal,
+} from "$lib/utils/ui/notifications/toastSignal.ts";
 
 // Re-define Toast type for internal state management in ToastProvider if needed, or use BaseToast directly
 // This Toast type is for the state array within ToastProvider (which includes an id)

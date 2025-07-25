@@ -3,7 +3,7 @@
  * This bridges the gap between the DI architecture and production usage
  */
 
-import { getRecommendedFees } from "$lib/utils/mempool.ts";
+import { getRecommendedFees } from "$lib/utils/bitcoin/network/mempool.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { RouteType, getCacheConfig } from "$server/services/infrastructure/cacheService.ts";
 import { FeeSecurityService } from "$server/services/fee/feeSecurityService.ts";

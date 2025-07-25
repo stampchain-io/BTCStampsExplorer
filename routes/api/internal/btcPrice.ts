@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 
 // Use an atomic counter for round-robin
 let requestCounter = 0;

@@ -18,7 +18,7 @@ import {
 } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { type UTXOFixture, utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import { realUTXOFixtures } from "../fixtures/realUTXOFixtures.ts";
-import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
+import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
 import { networks, Psbt } from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
 

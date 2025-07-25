@@ -4,7 +4,7 @@ import type { Collection } from "$globals";
 import { SRC20Row, StampRow } from "$globals";
 import { HomeHeader } from "$header";
 import { gapSectionSlim, Micro5FontLoader } from "$layout";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 import {
   CarouselHome,
   GetStampingCta,

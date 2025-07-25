@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 
 export const handler: Handlers = {
   GET(req, ctx) {

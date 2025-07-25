@@ -3,7 +3,10 @@ import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletData } from "$lib/types/index.d.ts";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
-import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { containerBackground, containerColData } from "$layout";
 import {
   labelSm,

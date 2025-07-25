@@ -8,7 +8,7 @@
 import {
     TransactionConstructionService,
     type EstimationOptions,
-} from "$lib/utils/minting/TransactionConstructionService.ts";
+} from "$lib/utils/bitcoin/minting/TransactionConstructionService.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 

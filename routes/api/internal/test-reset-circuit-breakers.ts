@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { CircuitBreakerService } from "$server/services/infrastructure/circuitBreaker.ts";
 
 export const handler: Handlers = {

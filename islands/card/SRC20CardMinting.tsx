@@ -2,7 +2,7 @@
 /*@baba-check styles*/
 import { Button } from "$button";
 import { cellAlign } from "$components/layout/types.ts";
-import { formatDate } from "$lib/utils/formatUtils.ts";
+import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { valueSm } from "$text";
 import { SRC20CardBase, SRC20CardBaseProps } from "./SRC20CardBase.tsx";
 

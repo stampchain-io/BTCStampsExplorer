@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 

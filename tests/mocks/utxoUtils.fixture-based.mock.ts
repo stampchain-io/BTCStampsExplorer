@@ -5,7 +5,7 @@
 
 import { UTXO } from "$types/index.d.ts";
 import { getMempoolTransaction } from "../fixtures/api-responses/mempool-api-fixtures.ts";
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 
 // Mock formatUTXOs function
 export function formatUTXOs(utxoData: any[], _address: string): UTXO[] | null {

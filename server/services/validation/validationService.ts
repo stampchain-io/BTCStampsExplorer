@@ -1,4 +1,4 @@
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 
 export type SortDirection = "ASC" | "DESC";
 

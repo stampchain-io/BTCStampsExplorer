@@ -1,10 +1,10 @@
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { TX_CONSTANTS } from "$lib/utils/bitcoin/minting/constants.ts";
 import {
   calculateDust,
   calculateMiningFee,
   calculateP2WSHMiningFee,
   estimateFee,
-} from "$lib/utils/minting/feeCalculations.ts";
+} from "$lib/utils/bitcoin/minting/feeCalculations.ts";
 import { assertEquals } from "@std/assert";
 
 Deno.test("calculateDust - calculates dust based on file size", () => {

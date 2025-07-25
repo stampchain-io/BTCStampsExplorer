@@ -4,7 +4,7 @@ import {
   parseImageReference,
   SUPPORTED_PROTOCOLS,
   validateImageReference,
-} from "$lib/utils/imageProtocolUtils.ts";
+} from "$lib/utils/data/protocols/imageProtocolUtils.ts";
 
 Deno.test("Image Protocol Utils - Protocol Configuration", () => {
   // Test that all protocols are properly configured

@@ -6,7 +6,7 @@ import {
   isStampNumber,
   isTxHash,
   isValidSrc20Tick,
-} from "$lib/utils/identifierUtils.ts";
+} from "$lib/utils/data/identifiers/identifierUtils.ts";
 
 Deno.test("identifierUtils - isStampNumber", async (t) => {
   await t.step("should validate positive integers", () => {

@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { BlockHandlerContext } from "$globals";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 
 export const handler: Handlers<BlockHandlerContext> = {

@@ -1,5 +1,5 @@
 // routes/api/internal/monitoring.ts
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { cloudWatchMonitoring } from "$server/services/aws/cloudWatchMonitoring.ts";

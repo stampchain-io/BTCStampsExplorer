@@ -9,7 +9,7 @@ import {
   parseImageReference,
   SUPPORTED_PROTOCOLS,
   validateImageReference,
-} from "$lib/utils/imageProtocolUtils.ts";
+} from "$lib/utils/data/protocols/imageProtocolUtils.ts";
 import { assertEquals } from "@std/assert";
 
 /* ===== PARSE IMAGE REFERENCE TESTS ===== */

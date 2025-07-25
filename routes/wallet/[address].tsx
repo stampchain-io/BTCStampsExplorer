@@ -6,7 +6,7 @@ import { Handlers } from "$fresh/server.ts";
 import { SRC20Row, StampRow } from "$globals";
 import WalletDispenserDetails from "$islands/content/WalletDispenserDetails.tsx";
 import WalletProfileDetails from "$islands/content/WalletProfileDetails.tsx";
-import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
+import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";

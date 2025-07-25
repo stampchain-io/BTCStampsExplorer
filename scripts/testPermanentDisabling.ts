@@ -1,6 +1,6 @@
 #!/usr/bin/env deno run --allow-net --allow-env --allow-read
 
-import { BTCPriceService } from "../server/services/price/btcPriceService.ts";
+import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 
 console.log("Testing BTC Price Service with permanent disabling...\n");
 
@@ -17,7 +17,7 @@ for (let i = 0; i < 5; i++) {
   try {
     const result = await BTCPriceService.getPrice();
     console.log(`Price: $${result.price} from ${result.source}`);
-    
+
     // Show circuit breaker states
     const metrics = BTCPriceService.getServiceMetrics();
     console.log("\nCircuit breaker states:");
@@ -29,7 +29,7 @@ for (let i = 0; i < 5; i++) {
   } catch (error) {
     console.error("Error:", error.message);
   }
-  
+
   // Wait a bit between attempts
   await new Promise(resolve => setTimeout(resolve, 2000));
 }

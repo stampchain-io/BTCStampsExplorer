@@ -7,10 +7,10 @@ import {
   STAMP_MARKETPLACE,
   STAMP_RANGES,
 } from "$globals";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { getIdentifierType } from "$lib/utils/identifierUtils.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { getIdentifierType } from "$lib/utils/data/identifiers/identifierUtils.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { validateSortDirection } from "$server/services/validation/validationService.ts";

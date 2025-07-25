@@ -5,11 +5,11 @@ import { IS_BROWSER } from "$fresh/runtime.ts";
 import { StampRow } from "$globals";
 import { ComponentChildren } from "preact";
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   getStampImageSrc,
   validateStampContent,
-} from "$lib/utils/imageUtils.ts";
+} from "$lib/utils/ui/media/imageUtils.ts";
 import { ERROR_IMAGE } from "$constants";
 
 /* ===== TYPES ===== */

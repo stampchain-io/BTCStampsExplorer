@@ -1,6 +1,6 @@
 import { FreshContext } from "$fresh/server.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 
 export const handler = async (
   _req: Request,

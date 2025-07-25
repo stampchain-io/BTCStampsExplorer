@@ -4,8 +4,8 @@ import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
 import { handleWalletError } from "./walletHelper.ts";
-import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
-import type { BaseToast } from "$lib/utils/toastSignal.ts";
+import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
+import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 
 interface LeatherAddress {
   symbol: "BTC" | "STX";

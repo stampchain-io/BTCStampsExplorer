@@ -13,7 +13,7 @@ describe("SSR Safety Integration Tests", () => {
     "islands/modal/FilterSRC20Modal.tsx",
     "components/card/SRC20CardMinting.tsx",
     "components/card/SRC20CardSmMinting.tsx",
-    "lib/utils/freshNavigationUtils.ts",
+    "lib/utils/navigation/freshNavigationUtils.ts",
     "islands/modal/SearchSRC20Modal.tsx",
     "islands/modal/SearchStampModal.tsx",
   ];
@@ -224,7 +224,7 @@ describe("SSR Safety Pattern Recognition", () => {
   });
 
   it("should recognize freshNavigationUtils safety pattern", async () => {
-    const filePath = "../lib/utils/freshNavigationUtils.ts";
+    const filePath = "../lib/utils/navigation/freshNavigationUtils.ts";
     if (!existsSync(filePath)) return;
 
     const content = await Deno.readTextFile(filePath);

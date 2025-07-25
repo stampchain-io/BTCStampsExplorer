@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { SecurityService } from "$server/services/security/securityService.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 export const handler: Handlers = {

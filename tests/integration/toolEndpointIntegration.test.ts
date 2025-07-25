@@ -10,7 +10,7 @@ import type {
 } from "$lib/types/toolEndpointAdapter.ts";
 import {
     toolEndpointFeeEstimator,
-} from "$lib/utils/minting/ToolEndpointFeeEstimator.ts";
+} from "$lib/utils/bitcoin/minting/ToolEndpointFeeEstimator.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 

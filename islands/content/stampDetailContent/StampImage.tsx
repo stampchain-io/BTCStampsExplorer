@@ -12,7 +12,10 @@ import {
   LIBRARY_FILE_IMAGE,
   NOT_AVAILABLE_IMAGE,
 } from "$constants";
-import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
+import {
+  getStampImageSrc,
+  handleImageError,
+} from "$lib/utils/ui/media/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
 import { VNode } from "preact";

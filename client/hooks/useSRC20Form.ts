@@ -2,7 +2,7 @@ import { useConfig } from "$client/hooks/useConfig.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { useFees } from "$fees";
 import { Config } from "$globals";
-import { debounce } from "$lib/utils/debounce.ts";
+import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { showNotification } from "$lib/utils/notificationUtils.ts";

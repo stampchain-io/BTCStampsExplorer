@@ -17,8 +17,8 @@ import {
 import {
   abbreviateAddress,
   formatBalanceDisplay,
-} from "$lib/utils/formatUtils.ts";
-import { isAtomicIconVisible } from "$lib/utils/stampUtils.ts";
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { isAtomicIconVisible } from "$lib/utils/bitcoin/stamps/stampUtils.ts";
 
 /* ===== TYPES ===== */
 interface WalletStampCardProps {
