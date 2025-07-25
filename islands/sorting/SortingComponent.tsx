@@ -276,8 +276,21 @@ SortingComponent.Label = function SortingLabel({
       sortState.sortBy;
 
     if (showDirection) {
-      const directionIndicator = sortState.direction === "asc" ? "↑" : "↓";
-      return `${baseLabel} ${directionIndicator}`;
+      return (
+        <span class="flex items-center gap-1">
+          {baseLabel}
+          <Icon
+            type="icon"
+            name="caretUp"
+            weight="normal"
+            size="xxs"
+            color="custom"
+            className={`stroke-stamp-grey-light transition-all duration-300 transform ${
+              sortState.direction === "desc" ? "scale-y-[-1]" : ""
+            }`}
+          />
+        </span>
+      );
     }
 
     return baseLabel;
