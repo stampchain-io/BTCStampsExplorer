@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { GeneralPSBTService } from "$server/services/transaction/generalPsbtService.ts";
+import { GeneralBitcoinTransactionBuilder } from "$server/services/transaction/generalBitcoinTransactionBuilder.ts";
 import { normalizeFeeRate, XcpManager } from "$server/services/xcpService.ts";
 
 export const handler: Handlers = {
@@ -101,7 +101,7 @@ export const handler: Handlers = {
           });
         }
 
-        const psbtResult = await GeneralPSBTService.generatePSBT(
+        const psbtResult = await GeneralBitcoinTransactionBuilder.generatePSBT(
           response.result.rawtransaction, // ✅ Use raw hex from Counterparty
           {
             address,

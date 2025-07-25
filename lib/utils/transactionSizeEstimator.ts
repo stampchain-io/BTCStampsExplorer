@@ -130,30 +130,41 @@ function calculateOutputScriptSizes(
   fileSize?: number,
 ): number {
   switch (transactionType) {
-    case "stamp":
+    case "stamp": {
       // Stamp transactions: 1 OP_RETURN output + change output
       const opReturnSize = Math.min(fileSize || 0, 80) + 2; // OP_RETURN + length byte
       return opReturnSize + TX_COMPONENT_SIZES.P2WPKH_SCRIPT;
+    }
 
-    case "src20":
-    case "src101":
+    case "src20": {
       // SRC-20/101 transactions: multiple P2WSH outputs for data + change
       const dataOutputs = outputCount - 1; // Assume last output is change
       return (dataOutputs * TX_COMPONENT_SIZES.P2WSH_SCRIPT) +
         TX_COMPONENT_SIZES.P2WPKH_SCRIPT;
+    }
 
-    case "send":
+    case "src101": {
+      // SRC-20/101 transactions: multiple P2WSH outputs for data + change
+      const dataOutputs = outputCount - 1; // Assume last output is change
+      return (dataOutputs * TX_COMPONENT_SIZES.P2WSH_SCRIPT) +
+        TX_COMPONENT_SIZES.P2WPKH_SCRIPT;
+    }
+
+    case "send": {
       // Send transactions: recipient + change (both P2WPKH typically)
       return outputCount * TX_COMPONENT_SIZES.P2WPKH_SCRIPT;
+    }
 
-    case "dispense":
+    case "dispense": {
       // Dispenser transactions: OP_RETURN + recipient + change
       return TX_COMPONENT_SIZES.OP_RETURN_SCRIPT +
         ((outputCount - 1) * TX_COMPONENT_SIZES.P2WPKH_SCRIPT);
+    }
 
-    default:
+    default: {
       // Default to P2WPKH outputs
       return outputCount * TX_COMPONENT_SIZES.P2WPKH_SCRIPT;
+    }
   }
 }
 
@@ -165,15 +176,16 @@ export function getTypicalTransactionParams(
   fileSize?: number,
 ): Omit<TransactionSizeParams, "transactionType"> {
   switch (transactionType) {
-    case "stamp":
+    case "stamp": {
       return {
         inputCount: 1, // Typical single UTXO
         outputCount: 2, // OP_RETURN + change
-        fileSize: fileSize ?? 0,
+        ...(fileSize !== undefined && { fileSize }),
         hasWitnessData: true,
       };
+    }
 
-    case "src20":
+    case "src20": {
       // SRC-20 transactions create multiple P2WSH outputs for data
       const dataChunks = Math.ceil((fileSize || 100) / 32); // Rough estimate
       return {
@@ -181,34 +193,39 @@ export function getTypicalTransactionParams(
         outputCount: Math.min(dataChunks + 1, 6), // Data outputs + change, capped
         hasWitnessData: true,
       };
+    }
 
-    case "src101":
+    case "src101": {
       return {
         inputCount: 1,
         outputCount: 3, // Typical multisig transaction
         hasWitnessData: true,
       };
+    }
 
-    case "send":
+    case "send": {
       return {
         inputCount: 1,
         outputCount: 2, // Recipient + change
         hasWitnessData: true,
       };
+    }
 
-    case "dispense":
+    case "dispense": {
       return {
         inputCount: 2, // Buyer UTXO + dispenser UTXO
         outputCount: 3, // OP_RETURN + recipient + change
         hasWitnessData: true,
       };
+    }
 
-    default:
+    default: {
       return {
         inputCount: 1,
         outputCount: 2,
         hasWitnessData: true,
       };
+    }
   }
 }
 
