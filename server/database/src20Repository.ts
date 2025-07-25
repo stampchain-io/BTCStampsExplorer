@@ -3,7 +3,7 @@ import {
     SRC20TrxRequestParams,
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
-import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "$lib/utils/constants.ts";
+import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "$constants";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { bigFloatToString } from "$lib/utils/formatUtils.ts";
 import { dbManager } from "$server/database/databaseManager.ts";

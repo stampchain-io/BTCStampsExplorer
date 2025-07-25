@@ -1,5 +1,5 @@
 const MAX_RETRIES = 3;
-import { MEMPOOL_API_BASE_URL } from "$lib/utils/constants.ts";
+import { MEMPOOL_API_BASE_URL } from "$constants";
 import { BTCBalance, MempoolAddressResponse } from "$lib/types/index.d.ts";
 
 interface RecommendedFees {

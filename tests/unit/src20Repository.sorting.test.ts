@@ -3,10 +3,10 @@
  * Tests the sorting logic implementation in the repository layer
  */
 
+import { dbManager } from "$server/database/databaseManager.ts";
+import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { dbManager } from "../../server/database/databaseManager.ts";
-import { SRC20Repository } from "../../server/database/src20Repository.ts";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 
 // Test fixtures for sorting validation

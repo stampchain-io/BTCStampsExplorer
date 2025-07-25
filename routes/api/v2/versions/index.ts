@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "../../../../lib/utils/apiResponseUtil.ts";
-import { VERSION_CONFIG } from "../../../../server/middleware/apiVersionMiddleware.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { VERSION_CONFIG } from "$server/middleware/apiVersionMiddleware.ts";
 
 /**
  * API Version Discovery Endpoint

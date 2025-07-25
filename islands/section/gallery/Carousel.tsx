@@ -10,7 +10,7 @@ import {
   getStampImageSrc,
   validateStampContent,
 } from "$lib/utils/imageUtils.ts";
-import { ERROR_IMAGE } from "$lib/utils/constants.ts";
+import { ERROR_IMAGE } from "$constants";
 
 /* ===== TYPES ===== */
 interface CarouselProps {

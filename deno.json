@@ -217,7 +217,7 @@
     "$/": "./",
     "$client/": "./client/",
     "$components/": "./components/",
-    "$constants": "./lib/utils/constants.ts",
+    "$constants": "./lib/constants/index.ts",
     "$globals": "./globals.d.ts",
     "$handlers/": "./routes/handlers/",
     "$islands/": "./islands/",

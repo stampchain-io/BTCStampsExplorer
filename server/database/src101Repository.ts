@@ -5,7 +5,7 @@ import {
     SRC101_PRICE_TABLE,
     SRC101_RECIPIENTS_TABLE,
     SRC101_TABLE,
-} from "$lib/utils/constants.ts";
+} from "$constants";
 
 import {
     SRC101OwnerParams,

@@ -1,5 +1,5 @@
 import type { SRC20Row, StampRow } from "$globals";
-import type { CollectionRow } from "../../server/types/collection.d.ts";
+import type { CollectionRow } from "$server/types/collection.d.ts";
 
 // Re-export for other modules
 export type { SRC20Row, StampRow };

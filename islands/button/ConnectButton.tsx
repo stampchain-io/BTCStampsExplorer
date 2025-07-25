@@ -5,7 +5,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { WalletProvider } from "$islands/layout/WalletProvider.tsx";
 import { ConnectWalletModal } from "$islands/modal/ConnectWalletModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
-import { DEFAULT_WALLET_CONNECTORS } from "$lib/utils/constants.ts";
+import { DEFAULT_WALLET_CONNECTORS } from "$constants";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { navSublinkPurple, valueDarkSm, valueDarkXs } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";

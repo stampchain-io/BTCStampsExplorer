@@ -1,7 +1,7 @@
 import { FreshContext } from "$fresh/server.ts";
-import { ApiResponseUtil } from "../../lib/utils/apiResponseUtil.ts";
-import { apiVersionMiddleware } from "../../server/middleware/apiVersionMiddleware.ts";
-import { transformResponseForVersion } from "../../server/middleware/schemaTransformer.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { apiVersionMiddleware } from "$server/middleware/apiVersionMiddleware.ts";
+import { transformResponseForVersion } from "$server/middleware/schemaTransformer.ts";
 
 /**
  * API-specific middleware

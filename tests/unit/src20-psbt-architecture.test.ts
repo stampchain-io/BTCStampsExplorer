@@ -1,18 +1,18 @@
 // SRC20 PSBT Services - New Architecture Unit Tests
 // Tests the simplified UTXO selection architecture
 
+import { DatabaseManager } from "$server/database/databaseManager.ts";
 import { assertExists, assertRejects } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { restore, stub } from "@std/testing/mock";
-import { DatabaseManager } from "../../server/database/databaseManager.ts";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 
 // Import the updated PSBT services
-import { SRC20PSBTService } from "../../server/services/src20/psbt/src20PSBTService.ts";
-import { CommonUTXOService } from "../../server/services/utxo/commonUtxoService.ts";
-import { OptimalUTXOSelection } from "../../server/services/utxo/optimalUtxoSelection.ts";
-import { CounterpartyApiManager } from "../../server/services/counterpartyApiService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import { SRC20PSBTService } from "$server/services/src20/psbt/src20PSBTService.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
 
 // Valid raw transaction hex for testing
 const validRawTxHex =

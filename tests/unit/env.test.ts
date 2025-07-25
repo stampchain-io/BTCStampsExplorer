@@ -9,7 +9,7 @@
 import { assertEquals, assertExists } from "@std/assert";
 
 // Import env.ts to ensure it runs before our tests
-await import("../../server/config/env.ts");
+await import("$server/config/env.ts");
 
 // Save original console methods
 const originalConsoleLog = console.log;

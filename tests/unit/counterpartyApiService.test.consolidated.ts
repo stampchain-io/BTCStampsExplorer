@@ -11,7 +11,7 @@ import {
   xcp_v2_nodes,
   type XcpBalanceOptions,
 } from "$server/services/counterpartyApiService.ts";
-import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
+import { SATS_PER_KB_MULTIPLIER } from "$constants";
 import {
   assertEquals,
   assertExists,

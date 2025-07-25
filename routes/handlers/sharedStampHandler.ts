@@ -1,3 +1,4 @@
+import { MAX_PAGINATION_LIMIT } from "$constants";
 import { Handlers } from "$fresh/server.ts";
 import {
   STAMP_EDITIONS,
@@ -7,7 +8,6 @@ import {
   STAMP_RANGES,
 } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { MAX_PAGINATION_LIMIT } from "$lib/utils/constants.ts";
 import { getIdentifierType } from "$lib/utils/identifierUtils.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";

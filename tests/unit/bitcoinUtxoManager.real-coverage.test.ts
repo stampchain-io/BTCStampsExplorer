@@ -6,9 +6,9 @@
  * to ensure coverage tracking works properly.
  */
 
-import { assertEquals, assertExists, assertRejects } from "@std/assert";
-import { createMockUTXO } from "./utils/testFactories.ts";
+import { assertEquals } from "@std/assert";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
+import { createMockUTXO } from "./utils/testFactories.ts";
 
 // Set test environment
 (globalThis as any).SKIP_REDIS_CONNECTION = true;
@@ -19,7 +19,7 @@ Deno.env.set("DENO_ENV", "test");
 Deno.env.set("SKIP_EXTERNAL_APIS", "true");
 
 // Import the real BitcoinUtxoManager
-import { BitcoinUtxoManager } from "../../server/services/transaction/bitcoinUtxoManager.ts";
+import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 
 // Mock dependencies at the module level
 const mockCommonUtxoService = {

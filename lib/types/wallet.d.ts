@@ -1,4 +1,4 @@
-import { WalletProviderKey } from "$lib/utils/constants.ts";
+import { WalletProviderKey } from "$constants";
 import { PaginationQueryParams } from "./pagination.d.ts";
 import { WalletSortKey } from "./sorting.d.ts";
 

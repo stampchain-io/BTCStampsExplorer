@@ -11,7 +11,7 @@ import {
   AUDIO_FILE_IMAGE,
   LIBRARY_FILE_IMAGE,
   NOT_AVAILABLE_IMAGE,
-} from "$lib/utils/constants.ts";
+} from "$constants";
 import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";

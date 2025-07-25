@@ -450,7 +450,7 @@ Deno.test("CommonUTXOService - Comprehensive Branch Coverage", async (t) => {
   // Load CommonUTXOService after environment setup
   if (!CommonUTXOService) {
     const module = await import(
-      "../../server/services/utxo/commonUtxoService.ts"
+      "$server/services/utxo/commonUtxoService.ts"
     );
     CommonUTXOService = module.CommonUTXOService;
   }

@@ -3,11 +3,11 @@
  * Tests validation, processing, and API integration for all metadata fields
  */
 
-import { assertEquals } from "@std/assert";
-import { SRC20Service } from "../../server/services/src20/index.ts";
-import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
-import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 import { DatabaseManager } from "$server/database/databaseManager.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
+import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
+import { assertEquals } from "@std/assert";
+import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 
 // Store original database manager for cleanup
 let originalDbManager: DatabaseManager;
