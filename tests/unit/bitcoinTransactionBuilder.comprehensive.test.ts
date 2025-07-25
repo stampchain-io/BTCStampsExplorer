@@ -22,6 +22,7 @@ Deno.env.set("SKIP_DB_CONNECTION", "true");
 Deno.env.set("DENO_ENV", "test");
 
 import {
+  BitcoinTransactionBuilder,
   type BitcoinTransactionBuilderDependencies,
   createBitcoinTransactionBuilder,
 } from "../../server/services/transaction/bitcoinTransactionBuilder.ts";
@@ -559,23 +560,24 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
     });
   });
 
-  describe.skip("bitcoinTransactionBuilder.getAddressType (private method) - SKIPPED: Testing private methods after refactoring", () => {
+  describe("bitcoinTransactionBuilder.getAddressType (static method)", () => {
     const mockNetworks = createMockNetworks();
     const addressTestData = createMockAddressTestData();
 
     it("should correctly identify P2WPKH addresses", () => {
-      // Test that the method exists and handles the pattern correctly
-      // Due to mock limitations, we test that it either returns the correct type or throws expected error
-      const service = BitcoinTransactionBuilder as any;
+      // Access private static method using bracket notation
+      const getAddressType =
+        (BitcoinTransactionBuilder as any)["getAddressType"];
       const testAddress = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4";
 
       assertExists(
-        service.getAddressType,
+        getAddressType,
         "getAddressType method should exist",
       );
 
       try {
-        const result = service.getAddressType(
+        const result = getAddressType.call(
+          BitcoinTransactionBuilder,
           testAddress,
           mockNetworks.bitcoin,
         );
@@ -645,13 +647,15 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
     });
   });
 
-  describe.skip("bitcoinTransactionBuilder.getAddressNetwork (private method) - SKIPPED: Testing private methods after refactoring", () => {
+  describe("bitcoinTransactionBuilder.getAddressNetwork (private method)", () => {
+    // Access the private method using bracket notation
+    const getAddressNetwork =
+      (BitcoinTransactionBuilder as any)["getAddressNetwork"];
+
     const mockNetworks = createMockNetworks();
     const addressTestData = createMockAddressTestData();
 
     it("should detect mainnet for mainnet addresses", () => {
-      const service = BitcoinTransactionBuilder as any;
-
       // Mock bitcoin.payments.p2wpkh to not throw for mainnet addresses
       const originalP2wpkh = bitcoin.payments.p2wpkh;
       bitcoin.payments.p2wpkh = (options: any) => {
@@ -665,7 +669,8 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
       };
 
       try {
-        const network = service.getAddressNetwork(
+        const network = getAddressNetwork.call(
+          BitcoinTransactionBuilder,
           addressTestData.mainnet.p2wpkh,
         );
         assertEquals(network.bech32, mockNetworks.bitcoin.bech32);
@@ -676,8 +681,6 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
     });
 
     it("should detect testnet for testnet addresses", () => {
-      const service = BitcoinTransactionBuilder as any;
-
       // Mock bitcoin.payments.p2wpkh to not throw for testnet addresses
       const originalP2wpkh = bitcoin.payments.p2wpkh;
       bitcoin.payments.p2wpkh = (options: any) => {
@@ -697,7 +700,8 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
       };
 
       try {
-        const network = service.getAddressNetwork(
+        const network = getAddressNetwork.call(
+          BitcoinTransactionBuilder,
           addressTestData.testnet.p2wpkh,
         );
         assertEquals(network.bech32, mockNetworks.testnet.bech32);
@@ -708,104 +712,127 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
     });
 
     it("should throw error for invalid address", () => {
-      const service = BitcoinTransactionBuilder as any;
       assertThrows(
-        () => service.getAddressNetwork("invalid-address"),
+        () =>
+          getAddressNetwork.call(BitcoinTransactionBuilder, "invalid-address"),
         Error,
         "Invalid Bitcoin address",
       );
     });
 
     it("should throw error for empty address", () => {
-      const service = BitcoinTransactionBuilder as any;
       assertThrows(
-        () => service.getAddressNetwork(""),
+        () => getAddressNetwork.call(BitcoinTransactionBuilder, ""),
         Error,
         "Invalid Bitcoin address",
       );
     });
 
     it("should handle legacy testnet addresses", () => {
-      const service = BitcoinTransactionBuilder as any;
       const testnetP2PKH = "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn";
       const testnetP2SH = "2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc";
 
       // These should throw as they're not native segwit
       assertThrows(
-        () => service.getAddressNetwork(testnetP2PKH),
+        () => getAddressNetwork.call(BitcoinTransactionBuilder, testnetP2PKH),
         Error,
         "Invalid Bitcoin address",
       );
       assertThrows(
-        () => service.getAddressNetwork(testnetP2SH),
+        () => getAddressNetwork.call(BitcoinTransactionBuilder, testnetP2SH),
         Error,
         "Invalid Bitcoin address",
       );
     });
   });
 
-  describe.skip("bitcoinTransactionBuilder.getAddressFromScript (private method) - SKIPPED: Testing private methods after refactoring", () => {
+  describe("bitcoinTransactionBuilder.getAddressFromScript (private method)", () => {
+    // Access the private method using bracket notation
+    const getAddressFromScript =
+      (BitcoinTransactionBuilder as any)["getAddressFromScript"];
+
     it("should derive address from P2WPKH script", () => {
-      const service = BitcoinTransactionBuilder as any;
       const script = new Uint8Array(
         Buffer.from("0014bdd9a1eccc053725271114f2a406406f095a707d", "hex"),
       );
-      const address = service.getAddressFromScript(script, networks.bitcoin);
+      const address = getAddressFromScript.call(
+        BitcoinTransactionBuilder,
+        script,
+        networks.bitcoin,
+      );
       assertEquals(address, TEST_ADDRESS);
     });
 
     it("should derive address from P2PKH script", () => {
-      const service = BitcoinTransactionBuilder as any;
       const script = new Uint8Array(
         Buffer.from(
           "76a914" + "89abcdefabbaabbaabbaabbaabbaabbaabbaabba" + "88ac",
           "hex",
         ),
       );
-      const address = service.getAddressFromScript(script, networks.bitcoin);
+      const address = getAddressFromScript.call(
+        BitcoinTransactionBuilder,
+        script,
+        networks.bitcoin,
+      );
       assertExists(address);
       assertEquals(address.startsWith("1"), true);
     });
 
     it("should derive address from P2SH script", () => {
-      const service = BitcoinTransactionBuilder as any;
+      // P2SH script: OP_HASH160 <20-byte hash> OP_EQUAL
       const script = new Uint8Array(
         Buffer.from(
-          "a914" + "89abcdefabbaabbaabbaabbaabbaabbaabbaabba" + "87",
+          "a914" + "3b9aca00eca94fdbca7d8e1c6e8a5c9f5ad93519" + "87",
           "hex",
         ),
       );
-      const address = service.getAddressFromScript(script, networks.bitcoin);
+      const address = getAddressFromScript.call(
+        BitcoinTransactionBuilder,
+        script,
+        networks.bitcoin,
+      );
       assertExists(address);
       assertEquals(address.startsWith("3"), true);
     });
 
     it("should throw error for invalid script", () => {
-      const service = BitcoinTransactionBuilder as any;
       const invalidScript = new Uint8Array([0x00, 0x01, 0x02]);
       assertThrows(
-        () => service.getAddressFromScript(invalidScript, networks.bitcoin),
+        () =>
+          getAddressFromScript.call(
+            BitcoinTransactionBuilder,
+            invalidScript,
+            networks.bitcoin,
+          ),
         Error,
         "Failed to derive address from script",
       );
     });
 
     it("should throw error for empty script", () => {
-      const service = BitcoinTransactionBuilder as any;
       const emptyScript = new Uint8Array([]);
       assertThrows(
-        () => service.getAddressFromScript(emptyScript, networks.bitcoin),
+        () =>
+          getAddressFromScript.call(
+            BitcoinTransactionBuilder,
+            emptyScript,
+            networks.bitcoin,
+          ),
         Error,
         "Failed to derive address from script",
       );
     });
 
     it("should handle testnet scripts", () => {
-      const service = BitcoinTransactionBuilder as any;
       const script = new Uint8Array(
         Buffer.from("0014751e76e8199196d454941c45d1b3a323f1433bd6", "hex"),
       );
-      const address = service.getAddressFromScript(script, networks.testnet);
+      const address = getAddressFromScript.call(
+        BitcoinTransactionBuilder,
+        script,
+        networks.testnet,
+      );
       assertEquals(address, "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx");
     });
   });
