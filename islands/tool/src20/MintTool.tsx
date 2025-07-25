@@ -532,6 +532,7 @@ export function SRC20MintTool({
           <div className="mt-2 text-red-500 text-sm">
             Fee estimation error: {feeEstimationError}
             <button
+              type="button"
               onClick={clearError}
               className="ml-2 text-red-400 hover:text-red-300"
             >
