@@ -315,7 +315,12 @@ class SSRSafetyDetector {
     }
   }
 
-  async saveReport(report: SSRSafetyReport, outputPath: string): Promise<void> {
+  async saveReport(report: SSRSafetyReport, outputPath: string, isCI = false): Promise<void> {
+    // Never attempt to write files in CI mode
+    if (isCI) {
+      return;
+    }
+    
     try {
       await Deno.writeTextFile(outputPath, JSON.stringify(report, null, 2));
       console.log(`💾 Report saved to: ${outputPath}`);
@@ -361,7 +366,7 @@ async function main() {
 
     // Save report to file
     const outputPath = './ssr-safety-report.json';
-    await detector.saveReport(report, outputPath);
+    await detector.saveReport(report, outputPath, false);
   }
 
   // Exit with error code if issues found
