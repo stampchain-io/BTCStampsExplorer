@@ -1,9 +1,10 @@
-import { createBitcoinTransactionBuilder, BitcoinTransactionBuilderImpl } from "./bitcoinTransactionBuilder.ts";
+import { createBitcoinTransactionBuilder, BitcoinTransactionBuilderImpl, BitcoinTransactionBuilder } from "./bitcoinTransactionBuilder.ts";
 import { BitcoinUtxoManager } from "./bitcoinUtxoManager.ts";
 
 export { 
   createBitcoinTransactionBuilder, 
-  BitcoinTransactionBuilderImpl as BitcoinTransactionBuilder,
+  BitcoinTransactionBuilderImpl,
+  BitcoinTransactionBuilder,
   BitcoinUtxoManager 
 };
 
