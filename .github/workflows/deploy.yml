@@ -270,44 +270,8 @@ jobs:
       - name: Build project
         run: deno task build
 
-      # Unit tests with mock database and fixtures
-      - name: Run Unit Tests with Coverage
-        run: |
-          echo "Running unit tests with mock database and fixtures..."
-          mkdir -p coverage
-          export DENO_ENV=test
-          export SKIP_REDIS_CONNECTION=true
-
-          # Verify fixtures are available
-          echo "Verifying test fixtures..."
-          ls -la tests/fixtures/ || echo "Warning: fixtures directory not found"
-
-                    # Run unit tests with coverage using deno task (which handles directory change)
-          deno task test:unit:coverage
-
-          echo "Generating coverage summary..."
-          deno coverage coverage/
-          echo "Generating LCOV report for Codecov..."
-          deno coverage coverage/ --lcov > coverage.lcov
-
-          # Show test summary
-          echo ""
-          echo "Unit Test Summary:"
-          echo "- Using mock database manager for repository tests"
-          echo "- Using test fixtures from tests/fixtures/"
-          echo "- Using tests/deno.json configuration for relaxed TypeScript settings"
-          echo "- Redis connection skipped for unit tests"
-
-      # Upload coverage to Codecov
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: stampchain-io/BTCStampsExplorer
-          files: ./coverage.lcov
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: false
+      # Note: Unit tests are handled by the dedicated unit-tests.yml workflow
+      # This avoids redundant test execution while maintaining coverage reporting
 
       # Commented out for future implementation
       # - name: Type check
