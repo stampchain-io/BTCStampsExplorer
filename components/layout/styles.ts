@@ -6,7 +6,7 @@ export const glassmorphism =
   bg-gradient-to-br from-stamp-grey-darkest/15 to-stamp-grey-darkest/30
   backdrop-blur-md overflow-hidden
   shadow-[0_8px_32px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_8px_4px_rgba(22,22,22,0.2)]`;
-const transition = "transition-colors ease-in-out duration-200";
+export const transition = "transition-colors duration-200";
 
 /* ===== BODY STYLES ===== */
 // Main body styles
@@ -89,6 +89,7 @@ export const modalSearch = "w-[90%] max-w-[600px] mt-[72px] tablet:mt-24";
 export type LayoutStyles = {
   // Base styles
   glassmorphism: string;
+  transition: string;
 
   // Body styles
   body: string;
