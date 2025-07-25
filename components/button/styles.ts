@@ -10,9 +10,7 @@ export interface ButtonVariants {
     | "outline"
     | "flatOutline"
     | "outlineFlat"
-    | "outlineGradient"
-    | "flatOutlineSelector"
-    | "outlineFlatSelector",
+    | "outlineGradient",
     string
   >;
   color: Record<
@@ -28,11 +26,29 @@ export interface ButtonVariants {
   >;
   size: Record<
     // when adding new sizes, update the ToggleButton.tsx file too
-    "xs" | "sm" | "md" | "lg" | "xl" | "xsR" | "smR" | "mdR" | "lgR",
+    | "xxs"
+    | "xs"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "xxsR"
+    | "xsR"
+    | "smR"
+    | "mdR"
+    | "lgR",
     string
   >;
   textSize: Record<
     "xs" | "sm" | "md" | "lg" | "xl",
+    string
+  >;
+  padding: Record<
+    "xs" | "sm" | "md" | "lg",
+    string
+  >;
+  pillSize: Record<
+    "xs" | "sm" | "md" | "lg",
     string
   >;
   state: {
@@ -80,72 +96,63 @@ export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
   base: `
     inline-flex items-center justify-center
-    rounded-md border-2 
+    rounded-lg border-[1px]
     font-bold tracking-wide
-    transition-colors duration-300
+    transition-colors ease-in-out duration-200
   `,
 
   /* ===== VARIANT STYLES ===== */
   variant: {
     text: `
-      bg-transparent
-      !border-0 !p-0 !h-auto
-      !items-start !justify-start
+      !items-start !justify-start !h-auto
+      !p-0 bg-transparent !border-0
       font-semibold tracking-wide
       text-[var(--default-color)] hover:text-[var(--hover-color)]
     `,
     flat: `
-      bg-[var(--default-color)] hover:bg-[var(--hover-color)]
-      border-[var(--default-color)] hover:border-[var(--hover-color)]
-      text-black
+      bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
+      border-[var(--color-dark)] text-black
+      hover:bg-gradient-to-br hover:from-[var(--color-light)] hover:to-[var(--color-light)]
+      hover:border-[var(--color-light)]
     `,
     outline: `
-      bg-transparent
-      border-[var(--default-color)] hover:border-[var(--hover-color)]
-      text-[var(--default-color)] hover:text-[var(--hover-color)]
+      bg-transparent border-[var(--color-dark)] text-[var(--color-dark)]
+      hover:border-[var(--color-light)] hover:text-[var(--color-light)]
     `,
     flatOutline: `
-      bg-[var(--default-color)] hover:bg-transparent 
-      border-[var(--default-color)] hover:border-[var(--hover-color)]
-      text-black hover:text-[var(--hover-color)]
+      bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
+      border-[var(--color-dark)] text-black
+      hover:bg-gradient-to-br hover:from-transparent hover:to-transparent
+      hover:border-[var(--color-dark)] hover:text-[var(--color-dark)]
     `,
     outlineFlat: `
-      bg-transparent hover:bg-[var(--hover-color)] 
-      border-[var(--default-color)] hover:border-[var(--hover-color)]
-      text-[var(--default-color)] hover:text-black
+      bg-transparent border-[var(--color-dark)] text-[var(--color-dark)]
+      hover:bg-gradient-to-br hover:from-[var(--color-light)] hover:to-[var(--color-dark)] hover:border-[var(--color-dark)] hover:text-black
     `,
     outlineGradient: `
-      relative !bg-[linear-gradient(to_right,#1a0824,#210925)] !p-[2px] rounded-md !border-0
-      before:absolute before:inset-0 before:rounded-md before:z-[1]
+      relative !bg-[linear-gradient(to_right,#1a0824,#210925)] !p-[1px] rounded-lg !border-0
+      before:absolute before:inset-0 before:rounded-lg before:z-[1]
       before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
       before:[--angle:0deg] before:animate-rotate
       hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
-      before:transition-colors before:duration-300
-      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[linear-gradient(to_right,#1a0824,#210925)] [&>*]:!border-0
+      before:transition-colors before:ease-in-out before:duration-200
+      [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[linear-gradient(to_right,#1a0824,#210925)] [&>*]:!border-0
       [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
-      [&>*]:font-bold [&>*]:tracking-wider 
+      [&>*]:font-bold [&>*]:tracking-wider
       [&>*]:text-[var(--default-color)] hover:[&>*]:text-[var(--hover-color)]
-      [&>*]:transition-colors [&>*]:duration-100
-    `,
-    flatOutlineSelector: `
-      bg-[var(--hover-color)] border-[var(--hover-color)] text-black
-      hover:bg-[var(--hover-color)] hover:border-[var(--hover-color)] hover:text-black
-    `,
-    outlineFlatSelector: `
-      bg-transparent border-[var(--default-color)] text-[var(--default-color)]
-      hover:bg-[var(--hover-color)] hover:border-[var(--hover-color)] hover:text-black
+      [&>*]:transition-colors [&>*]:ease-in-out [&>*]:duration-200
     `,
   },
 
   /* ===== COLOR STYLES ===== */
   color: {
     grey: `
-      [--default-color:#999999]
-      [--hover-color:#CCCCCC]
+      [--color-dark:#999999]
+      [--color-light:#CCCCCC]
     `,
     greyDark: `
-      [--default-color:#666666]
-      [--hover-color:#999999]
+      [--color-dark:#666666]
+      [--color-light:#999999]
     `,
     greyGradient: `
       [--color-dark:#666666]
@@ -155,12 +162,12 @@ export const buttonStyles: ButtonVariants = {
       [--hover-color:var(--color-light)]
     `,
     purple: `
-      [--default-color:#8800CC]
-      [--hover-color:#AA00FF]
+      [--color-dark:#8800CC]
+      [--color-light:#AA00FF]
     `,
     purpleDark: `
-      [--default-color:#660099]
-      [--hover-color:#8800CC]
+      [--color-dark:#660099]
+      [--color-light:#8800CC]
     `,
     purpleGradient: `
       [--color-dark:#660099]
@@ -170,19 +177,21 @@ export const buttonStyles: ButtonVariants = {
       [--hover-color:var(--color-light)]
     `,
     test: `
-      [--default-color:#00CC00]
-      [--hover-color:#CC0000]
+      [--color-dark:#00CC00]
+      [--color-light:#CC0000]
     `,
     custom: "",
   },
 
   /* ===== SIZE STYLES ===== */
   size: {
+    xxs: "h-[26px] px-[14px] text-[10px]",
     xs: "h-[30px] px-[14px] text-xs",
     sm: "h-[34px] px-4 text-xs",
     md: "h-[38px] px-4 text-sm",
     lg: "h-[42px] px-4 text-sm",
     xl: "h-[46px] px-5 text-base",
+    xxsR: "h-[26px] tablet:h-[22px] px-[14px] text-[10px]",
     xsR: "h-[30px] tablet:h-[26px] px-[14px] text-xs",
     smR: "h-[34px] tablet:h-[30px] px-4 text-xs",
     mdR: "h-[38px] tablet:h-[34px] px-4 text-sm tablet:text-xs",
@@ -198,12 +207,27 @@ export const buttonStyles: ButtonVariants = {
     xl: "text-xl",
   },
 
+  /* ===== PADDING STYLES ===== */
+  padding: {
+    xs: "py-[5px] px-[14px]",
+    sm: "py-[7px] px-4",
+    md: "py-[9px] px-4",
+    lg: "py-[11px] px-4",
+  },
+
+  /* ===== PILL SIZE STYLES ===== */
+  pillSize: {
+    xs: "text-xs py-[5px] px-[14px]",
+    sm: "text-xs py-[7px] px-4",
+    md: "text-sm py-[9px] px-4",
+    lg: "text-sm py-[11px] px-4",
+  },
+
   /* ===== STATE STYLES ===== */
   state: {
     disabled: `
-      opacity-50
+      opacity-70
       cursor-not-allowed
-      pointer-events-none
     `,
     loading: `
       cursor-wait
@@ -218,27 +242,27 @@ export const buttonStyles: ButtonVariants = {
 
   /* ===== SPINNER STYLES - @baba - duplicate of loaderSpin in layout/styles.ts ===== */
   spinner: `
-    animate-spin 
-    rounded-full 
-    h-5 w-5 
-    border-b-[3px] 
+    animate-spin
+    rounded-full
+    h-5 w-5
+    border-b-[3px]
     border-[var(--hover-color)]
   `,
 };
 
 /* ===== ADDITIONAL STYLES ===== */
 /* ===== TEMPORARY STYLES ===== */
-/* @baba - update feeCalculatorBase buttons */
+/* @baba - update feeCalculatorBase buttons + toggle switch */
 export const buttonPurpleOutline =
-  "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm font-bold tracking-wider text-stamp-purple h-[38px] px-4 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors duration-300";
+  "inline-flex items-center justify-center border-[1px] border-stamp-purple rounded-lg text-sm font-bold tracking-wider text-stamp-purple h-[38px] px-4 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors ease-in-out duration-200";
 export const buttonPurpleFlat =
-  "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm font-bold tracking-wider text-black h-[38px] px-4 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors duration-300";
+  "inline-flex items-center justify-center bg-stamp-purple border-[1px] border-stamp-purple rounded-lg text-sm font-bold tracking-wider text-black h-[38px] px-4 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors ease-in-out duration-200";
 
 /* ===== TOGGLE SWITCH BUTTON STYLES ===== */
 export const toggleButton =
-  "flex items-center relative w-10 h-5 rounded-full bg-stamp-grey focus:outline-none transition duration-300";
+  "flex items-center relative w-10 h-5 rounded-full bg-stamp-grey focus:outline-none transition ease-in-out duration-200";
 export const toggleKnobBackground =
-  "flex justify-center items-center relative w-5 h-5 bg-stamp-grey rounded-full transition transform duration-500 ";
+  "flex justify-center items-center relative w-5 h-5 bg-stamp-grey rounded-full transition ease-in-out transform duration-400 ";
 export const toggleKnob = "w-[18px] h-[18px] rounded-full";
 export const sliderKnob =
   `[&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:tablet:w-4 [&::-webkit-slider-thumb]:tablet:h-4 [&::-webkit-slider-thumb]:appearance-none
@@ -265,9 +289,9 @@ export const button = (
   if (state?.active) stateClasses.push(buttonStyles.state.active);
 
   return `
-    ${buttonStyles.base} 
-    ${buttonStyles.variant[variant]} 
-    ${buttonStyles.color[color]} 
+    ${buttonStyles.base}
+    ${buttonStyles.variant[variant]}
+    ${buttonStyles.color[color]}
     ${buttonStyles.size[size]}
     ${stateClasses.join(" ")}
   `;
