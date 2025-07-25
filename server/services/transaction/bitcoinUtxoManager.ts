@@ -160,9 +160,9 @@ export class BitcoinUtxoManager {
 
       // If fetchFullDetails is true, we need to replace the selected UTXOs with full details
       if (fetchFullDetails) {
-        // 🚀 OPTIMIZATION: Batch fetch all selected UTXOs at once instead of individual calls
+        // Fetch full details for all selected UTXOs (groups by transaction for parallel processing)
         logger.info("transaction-utxo-service", {
-          message: "Starting batch UTXO enrichment for selected UTXOs",
+          message: "Starting UTXO enrichment for selected UTXOs",
           selectedCount: selectionResult.inputs.length,
           utxoIds: selectionResult.inputs.map(u => `${u.txid}:${u.vout}`)
         });
@@ -186,7 +186,7 @@ export class BitcoinUtxoManager {
 
         selectionResult.inputs = fullUTXOs;
         logger.info("transaction-utxo-service", {
-          message: "Batch UTXO enrichment completed successfully",
+          message: "UTXO enrichment completed successfully",
           enrichedCount: fullUTXOs.length
         });
       }
@@ -219,8 +219,9 @@ export class BitcoinUtxoManager {
   }
 
   /**
-   * 🚀 OPTIMIZATION: Batch fetch full UTXO details to avoid individual API calls
-   * This replaces the inefficient loop that was making individual QuickNode calls
+   * Fetch full UTXO details for selected UTXOs with parallel processing optimization
+   * Groups UTXOs by transaction ID to process transactions concurrently
+   * Note: Still requires individual API calls per UTXO, but improves performance through parallelization
    */
   private async batchFetchFullUTXODetails(selectedUtxos: BasicUTXO[]): Promise<UTXO[]> {
     // Group UTXOs by transaction to minimize API calls
@@ -234,7 +235,7 @@ export class BitcoinUtxoManager {
     });
 
     logger.info("transaction-utxo-service", {
-      message: "Batch UTXO fetch optimization",
+      message: "UTXO fetch optimization by transaction grouping",
       totalUtxos: selectedUtxos.length,
       uniqueTransactions: txidToUtxos.size,
       optimizationRatio: `${selectedUtxos.length}:${txidToUtxos.size}`
@@ -279,7 +280,7 @@ export class BitcoinUtxoManager {
     const fullUTXOs = flatResults.map(result => result.utxo).filter((utxo): utxo is UTXO => utxo !== null);
 
     logger.info("transaction-utxo-service", {
-      message: "Batch UTXO fetch completed",
+      message: "UTXO fetch completed",
       requested: selectedUtxos.length,
       successful: fullUTXOs.length,
       failed: selectedUtxos.length - fullUTXOs.length
