@@ -6,7 +6,7 @@ import { assertEquals } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 import { Buffer } from "node:buffer";
 import { networks, Psbt } from "bitcoinjs-lib";
-import { formatPsbtForLogging } from "../../server/services/transaction/psbtService.ts";
+import { formatPsbtForLogging } from "../../server/services/transaction/bitcoinTransactionBuilder.ts";
 
 // Test address
 const TEST_ADDRESS = "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";

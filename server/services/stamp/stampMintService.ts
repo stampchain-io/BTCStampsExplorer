@@ -4,7 +4,7 @@ import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import { extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
 import { getScriptTypeInfo, validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
-import { formatPsbtForLogging } from "$server/services/transaction/psbtService.ts";
+import { formatPsbtForLogging } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import type { ScriptType } from "$types/index.d.ts";
 import * as bitcoin from "bitcoinjs-lib";

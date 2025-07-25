@@ -49,7 +49,7 @@ await import("$lib/utils/utxoUtils.ts").then((module) => {
 
 // Import PSBTService after mocks are set
 const { PSBTService, formatPsbtForLogging } = await import(
-  "$server/services/transaction/psbtService.ts"
+  "$server/services/transaction/bitcoinTransactionBuilder.ts"
 );
 
 describe("PSBTService Simple Tests", {

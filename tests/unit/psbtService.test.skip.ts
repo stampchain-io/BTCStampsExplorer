@@ -15,7 +15,7 @@ import {
   formatPsbtForLogging,
   PSBTService,
   PSBTServiceImpl,
-} from "$server/services/transaction/psbtService.ts";
+} from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { type UTXOFixture, utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import { realUTXOFixtures } from "../fixtures/realUTXOFixtures.ts";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";

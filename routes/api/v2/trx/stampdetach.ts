@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { GeneralPSBTService } from "$server/services/transaction/generalPsbtService.ts";
+import { GeneralBitcoinTransactionBuilder } from "$server/services/transaction/generalBitcoinTransactionBuilder.ts";
 import type { ComposeDetachOptions } from "$server/services/xcp/xcpManagerDI.ts";
 import { normalizeFeeRate, XcpManager } from "$server/services/xcpService.ts";
 
@@ -68,7 +68,7 @@ export const handler: Handlers = {
           );
         }
 
-        // ✅ NEW: Use GeneralPSBTService instead of deprecated processCounterpartyPSBT
+        // ✅ NEW: Use GeneralBitcoinTransactionBuilder instead of deprecated processCounterpartyPSBT
         const serviceFeeInput = options.service_fee !== undefined
           ? options.service_fee
           : parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS, 10);
@@ -85,7 +85,7 @@ export const handler: Handlers = {
           // Warning: User address for PSBT processing (change) is empty
         }
 
-        const psbtResult = await GeneralPSBTService.generatePSBT(
+        const psbtResult = await GeneralBitcoinTransactionBuilder.generatePSBT(
           response.result.rawtransaction, // ✅ Use raw hex from Counterparty
           {
             address: userAddressForPsbtProcessing,

@@ -20,7 +20,7 @@ Deno.env.set("DENO_ENV", "test");
 import {
   createPSBTService,
   formatPsbtForLogging,
-} from "$server/services/transaction/psbtService.ts";
+} from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import {
   clearMockResponses,
