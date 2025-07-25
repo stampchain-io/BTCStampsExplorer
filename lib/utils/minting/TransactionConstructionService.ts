@@ -173,7 +173,7 @@ export class TransactionConstructionService {
    * Phase 1: Instant mathematical estimation (no API calls)
    * Fast fallback calculation using transaction size estimates
    */
-  async estimateInstant(
+  estimateInstant(
     options: EstimationOptions,
   ): Promise<FeeEstimationResult> {
     const startTime = performance.now();
@@ -525,17 +525,17 @@ export const transactionConstructionService =
 /**
  * Convenience functions that delegate to the singleton instance
  */
-export async function estimateInstant(
+export function estimateInstant(
   options: EstimationOptions,
 ): Promise<FeeEstimationResult> {
   return transactionConstructionService.estimateInstant(options);
 }
-export async function estimateSmart(
+export function estimateSmart(
   options: EstimationOptions,
 ): Promise<FeeEstimationResult> {
   return transactionConstructionService.estimateSmart(options);
 }
-export async function estimateExact(
+export function estimateExact(
   options: EstimationOptions,
 ): Promise<FeeEstimationResult> {
   return transactionConstructionService.estimateExact(options);

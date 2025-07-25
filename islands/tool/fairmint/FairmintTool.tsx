@@ -247,6 +247,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
                 Fee estimation error: {feeEstimationError}
               </span>
               <button
+                type="button"
                 onClick={clearError}
                 className="text-red-500 hover:text-red-700 text-sm font-medium"
               >

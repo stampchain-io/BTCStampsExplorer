@@ -419,6 +419,7 @@ export function SRC20ErrorFallback({
         </p>
       )}
       <button
+        type="button"
         onClick={resetError}
         class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
       >
