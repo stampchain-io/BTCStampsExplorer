@@ -238,7 +238,9 @@ class SSRSafetyDetector {
       }
     }
 
-    console.log(`📊 Scanned ${this.scannedFiles} files out of ${totalFiles} total files\n`);
+    if (!isCI) {
+      console.log(`📊 Scanned ${this.scannedFiles} files out of ${totalFiles} total files\n`);
+    }
   }
 
   generateReport(): SSRSafetyReport {

@@ -1,12 +1,11 @@
-import { TX_CONSTANTS } from "./constants.ts";
+import { TX_CONSTANTS } from "$constants";
 import type {
   // InputTypeForSizeEstimation, // Removed as unused
   // OutputTypeForSizeEstimation, // Removed as unused
   ScriptType,
-  // ScriptTypeInfo, // Removed as unused
 } from "$lib/types/transaction.d.ts";
-import { getScriptTypeInfo as getScriptTypeInfoFromUtils } from "$lib/utils/scriptTypeUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { getScriptTypeInfo as getScriptTypeInfoFromUtils } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 
 // Using imported types for the options if they resolve correctly
 interface InternalTransactionSizeOptions {
