@@ -8,7 +8,7 @@ const textFont = "font-normal text-stamp-grey-light";
 const labelFont = "font-light text-stamp-grey-darker tracking-wide";
 const valueFont = "font-medium text-stamp-grey-light";
 const cursor = "cursor-default select-none whitespace-nowrap";
-const transition = "transition-colors duration-300";
+const transition = "transition-colors duration-200";
 
 /* ===== OVERLAY STYLES ===== */
 // Overlays - used for text overlay effects of whole divs - text must be transparent or not declared with tailwind css
@@ -96,7 +96,7 @@ export const labelLogicResponsive = ( // used for the filter labels
 ): string => `
   inline-block ml-3 tablet:ml-[9px] pt-[1px] tablet:pt-0
   font-semibold text-sm tablet:text-xs
-  transition-colors duration-300
+  transition-colors duration-200
   cursor-pointer select-none
   ${
   checked

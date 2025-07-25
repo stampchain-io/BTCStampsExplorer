@@ -1,5 +1,13 @@
 /* ===== LAYOUT STYLES MODULE ===== */
 
+/* ===== BASE STYLES ===== */
+export const glassmorphism =
+  `border-[1px] border-stamp-grey-darkest/20 rounded-xl
+  bg-gradient-to-br from-stamp-grey-darkest/15 to-stamp-grey-darkest/30
+  backdrop-blur-md overflow-hidden
+  shadow-[0_8px_32px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_8px_4px_rgba(22,22,22,0.2)]`;
+const transition = "transition-colors ease-in-out duration-200";
+
 /* ===== BODY STYLES ===== */
 // Main body styles
 export const body = "flex flex-col w-full";
@@ -17,12 +25,15 @@ export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 
 /* ===== CONTAINER STYLES ===== */
 export const containerBackground =
-  "flex flex-col w-full dark-gradient rounded-lg p-6";
-export const containerDetailImage = "relative dark-gradient rounded-lg p-6";
-export const containerCard =
-  "dark-gradient rounded-lg border-2 border-transparent hover:border-stamp-purple-bright hover:shadow-[0px_0px_20px_#9900EE] transition-colors ease-in-out duration-100 cursor-pointer";
-export const containerCardTable =
-  "dark-gradient hover:shadow-[0px_0px_20px_#9900EE] transition-colors ease-in-out duration-100 cursor-pointer group"; // used for src20 tokencards - the border styling is handled below
+  `flex flex-col w-full px-6 py-5 ${glassmorphism}`;
+
+export const containerDetailImage = `relative p-5 ${glassmorphism}`;
+
+export const containerCard = `${glassmorphism}
+  hover:border-stamp-purple-bright hover:shadow-[0px_0px_16px_#9900EE] ${transition} cursor-pointer`; // not in use
+
+export const containerCardTable = `rounded-xl ${glassmorphism}
+   hover:shadow-[0px_0px_16px_#9900EE] ${transition} cursor-pointer group`; // used for src20 tokencards - the border styling is handled below
 
 export const containerColData = "flex flex-col -space-y-1"; // Data specific (global)
 export const containerColForm = "flex flex-col w-full gap-5"; // Form input fields specific
@@ -31,14 +42,13 @@ export const containerRowForm = "flex w-full gap-5"; // Form input fields specif
 /* ===== ROW STYLES ===== */
 export const rowForm = "flex w-full";
 export const rowResponsiveForm = "flex flex-col mobileMd:flex-row w-full gap-5";
-export const rowTable =
-  "h-7 hover:bg-stamp-purple-bright/15 transition-colors duration-100";
+export const rowTable = `h-7 hover:bg-stamp-purple-bright/15 ${transition}`;
 export const rowCardBorderLeft =
-  "p-3 pl-4 rounded-l-lg border-y-2 border-l-2 border-r-0 border-transparent group-hover:border-stamp-purple-bright transition-colors ease-in-out duration-100";
+  `p-3 pl-4 rounded-l-xl border-y-[1px] border-l-[1px] border-r-0 border-stamp-grey-darkest/20 group-hover:border-stamp-purple-bright ${transition}`;
 export const rowCardBorderRight =
-  "p-3 pr-4 rounded-r-lg border-y-2 border-r-2 border-l-0  border-transparent group-hover:border-stamp-purple-bright transition-colors ease-in-out duration-100";
+  `p-3 pr-4 rounded-r-xl border-y-[1px] border-r-[1px] border-l-0  border-stamp-grey-darkest/20 group-hover:border-stamp-purple-bright ${transition}`;
 export const rowCardBorderCenter =
-  "p-3 border-y-2 border-x-0 border-transparent group-hover:border-stamp-purple-bright transition-colors ease-in-out duration-100";
+  `p-3 border-y-[1px] border-x-0 border-stamp-grey-darkest/20 group-hover:border-stamp-purple-bright ${transition}`;
 
 /* ===== COL STYLES ===== */
 
@@ -77,6 +87,9 @@ export const modalSearch = "w-[90%] max-w-[600px] mt-[72px] tablet:mt-24";
 
 /* ===== TYPE DEFINITIONS ===== */
 export type LayoutStyles = {
+  // Base styles
+  glassmorphism: string;
+
   // Body styles
   body: string;
   bodyTool: string;
