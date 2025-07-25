@@ -1,4 +1,4 @@
-import { BLOCKCHAIN_API_BASE_URL, MAX_XCP_RETRIES } from "$lib/utils/constants.ts";
+import { BLOCKCHAIN_API_BASE_URL, MAX_XCP_RETRIES } from "$constants";
 import { serverConfig } from "$server/config/config.ts";
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 

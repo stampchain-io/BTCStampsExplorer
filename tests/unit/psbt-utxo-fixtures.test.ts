@@ -2,9 +2,9 @@
 // Tests bitcoinjs-lib v7.0.0-rc.0 compatibility with bigint values
 // Validates all Bitcoin script types with comprehensive test coverage
 
+import { DatabaseManager } from "$server/database/databaseManager.ts";
 import { assertEquals, assertExists, assertThrows } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { DatabaseManager } from "../../server/database/databaseManager.ts";
 import {
     createUTXOFixture,
     safeBigIntConversion,

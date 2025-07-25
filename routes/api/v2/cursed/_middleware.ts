@@ -1,10 +1,10 @@
 import { FreshContext } from "$fresh/server.ts";
-import { ApiResponseUtil } from "../../../../lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import {
   getEndpointDeprecationInfo,
   isEndpointDeprecated,
   VERSION_CONFIG,
-} from "../../../../server/middleware/apiVersionMiddleware.ts";
+} from "$server/middleware/apiVersionMiddleware.ts";
 
 /**
  * Cursed Endpoint Deprecation Middleware

@@ -4,7 +4,7 @@ import {
   BTCBalanceInfo,
   BTCBalanceInfoOptions,
 } from "$lib/types/index.d.ts";
-import { BLOCKCYPHER_API_BASE_URL } from "$lib/utils/constants.ts";
+import { BLOCKCYPHER_API_BASE_URL } from "$constants";
 import { formatSatoshisToBTC, formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { getBTCBalanceFromMempool } from "$lib/utils/mempool.ts";
 

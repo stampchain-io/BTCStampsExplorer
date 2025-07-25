@@ -1,7 +1,7 @@
+import { StampCreationService } from "$server/services/stamp/stampCreationService.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
 import { assertEquals, assertExists } from "@std/assert";
-import { StampCreationService } from "../../server/services/stamp/stampCreationService.ts";
-import { CommonUTXOService } from "../../server/services/utxo/commonUtxoService.ts";
-import { OptimalUTXOSelection } from "../../server/services/utxo/optimalUtxoSelection.ts";
 
 Deno.test("UTXO Architecture - Quick Validation", async (t) => {
   await t.step("validate simplified architecture instantiation", async () => {

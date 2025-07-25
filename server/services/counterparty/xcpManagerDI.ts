@@ -6,7 +6,7 @@
 import type { HttpClient } from "$server/interfaces/httpClient.ts";
 import type { CacheService } from "$server/interfaces/cacheService.ts";
 import type { XcpBalance } from "$types/index.d.ts";
-import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
+import { SATS_PER_KB_MULTIPLIER } from "$constants";
 
 // Core configuration interface
 export interface CounterpartyApiManagerConfig {

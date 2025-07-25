@@ -12,7 +12,7 @@ import { bodyTool, containerBackground, containerRowForm } from "$layout";
 import { useFees } from "$lib/hooks/useFees.ts";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { NOT_AVAILABLE_IMAGE } from "$constants";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";

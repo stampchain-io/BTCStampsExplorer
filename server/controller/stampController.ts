@@ -4,7 +4,7 @@ import {
   STAMP_RANGES, STAMP_SUFFIX_FILTERS,
   STAMP_TYPES, StampBalance, StampRow, SUBPROTOCOLS
 } from "$globals";
-import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
+import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$constants";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";

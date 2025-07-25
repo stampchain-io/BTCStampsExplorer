@@ -12,7 +12,7 @@ import {
   AUDIO_FILE_IMAGE,
   LIBRARY_FILE_IMAGE,
   NOT_AVAILABLE_IMAGE,
-} from "$lib/utils/constants.ts";
+} from "$constants";
 import {
   abbreviateAddress,
   formatSupplyValue,

@@ -1,4 +1,4 @@
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { NOT_AVAILABLE_IMAGE } from "$constants";
 import {
   detectContentType,
   getMimeType,

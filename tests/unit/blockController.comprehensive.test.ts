@@ -4,8 +4,8 @@
  * Ensures CI compatibility with proper mocking and fixtures
  */
 
+import { BlockController } from "$server/controller/blockController.ts";
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
-import { BlockController } from "../../server/controller/blockController.ts";
 
 // Create mocks for BlockService
 const mockBlockService = {
@@ -115,7 +115,7 @@ function createMockBlockInfoResponse(blockIndex: number, stampsCount = 0) {
 
 // Mock BlockService before importing BlockController
 const originalBlockService = await import(
-  "../../server/services/core/blockService.ts"
+  "$server/services/core/blockService.ts"
 );
 
 // Store original methods for restoration

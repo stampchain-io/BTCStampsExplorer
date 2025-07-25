@@ -1,4 +1,4 @@
-import { RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW } from "$lib/utils/constants.ts";
+import { RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW } from "$constants";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 

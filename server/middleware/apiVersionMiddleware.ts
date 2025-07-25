@@ -1,4 +1,4 @@
-import { logger } from "../../lib/utils/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 // Use any types to avoid Fresh version compatibility issues
 type Context = any;

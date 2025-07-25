@@ -2,9 +2,9 @@
 // Tests all PSBT services using only mocks and fixtures - no external API calls
 // Validates BigInt compatibility with bitcoinjs-lib v7.0.0-rc.0
 
+import { DatabaseManager } from "$server/database/databaseManager.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { DatabaseManager } from "../../server/database/databaseManager.ts";
 import { type UTXOFixture, utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 

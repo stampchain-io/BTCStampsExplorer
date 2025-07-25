@@ -4,7 +4,7 @@ import { StampTextContent } from "$content";
 import { ModalBase } from "../../components/layout/ModalBase.tsx";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { AUDIO_FILE_IMAGE } from "$lib/utils/constants.ts";
+import { AUDIO_FILE_IMAGE } from "$constants";
 
 /* ===== TYPES ===== */
 interface PreviewImageModalProps {

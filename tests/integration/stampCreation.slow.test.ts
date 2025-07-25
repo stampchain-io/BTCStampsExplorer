@@ -1,5 +1,5 @@
+import { StampCreationService } from "$server/services/stamp/stampCreationService.ts";
 import { assertEquals, assertExists } from "@std/assert";
-import { StampCreationService } from "../../server/services/stamp/stampCreationService.ts";
 
 // Test configuration
 const TEST_ADDRESS = "bc1qnpszanef2ed9yxtqndvyxy72tdmnks6m28rn3d";

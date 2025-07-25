@@ -4,7 +4,7 @@ import {
   createPriceServiceCircuitBreaker,
   type CircuitBreakerMetrics
 } from "$/server/utils/circuitBreaker.ts";
-import { COINGECKO_API_BASE_URL } from "$lib/utils/constants.ts";
+import { COINGECKO_API_BASE_URL } from "$constants";
 import { getCacheConfig, RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 const BINANCE_API_BASE_URL = "https://api.binance.com/api/v3";

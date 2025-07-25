@@ -1,18 +1,18 @@
 // SRC20 PSBT Services Coverage Test - Targeted for 100% Coverage
 // Simple tests focused on hitting uncovered lines and branches
 
+import { DatabaseManager } from "$server/database/databaseManager.ts";
 import { assertExists, assertRejects } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { restore, stub } from "@std/testing/mock";
-import { DatabaseManager } from "../../server/database/databaseManager.ts";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 
 // Import the actual PSBT services
-import { SRC20MultisigPSBTService } from "../../server/services/src20/psbt/src20MultisigPSBTService.ts";
-import { SRC20PSBTService } from "../../server/services/src20/psbt/src20PSBTService.ts";
-import { TransactionService } from "../../server/services/transaction/index.ts";
-import { CommonUTXOService } from "../../server/services/utxo/commonUtxoService.ts";
+import { SRC20MultisigPSBTService } from "$server/services/src20/psbt/src20MultisigPSBTService.ts";
+import { SRC20PSBTService } from "$server/services/src20/psbt/src20PSBTService.ts";
+import { TransactionService } from "$server/services/transaction/index.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 
 // Valid raw transaction hex for testing
 const validRawTxHex =

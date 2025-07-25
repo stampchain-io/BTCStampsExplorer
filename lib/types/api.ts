@@ -5,6 +5,7 @@
  * market data from the cache with proper status indicators and error handling.
  */
 
+import type { CollectionRow } from "$server/types/collection.d.ts";
 import type {
   CacheStatus,
   CollectionMarketData,
@@ -13,7 +14,6 @@ import type {
   StampMarketData,
   StampRow,
 } from "./marketData.d.ts";
-import type { CollectionRow } from "../../server/types/collection.d.ts";
 import type { PaginatedResponse } from "./pagination.d.ts";
 
 /**

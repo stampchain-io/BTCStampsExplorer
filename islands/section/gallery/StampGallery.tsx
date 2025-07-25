@@ -6,7 +6,7 @@ import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
-import { BREAKPOINTS } from "$lib/utils/constants.ts";
+import { BREAKPOINTS } from "$constants";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 import Swiper from "swiper";
