@@ -36,6 +36,7 @@ export type LogNamespace =
   | "broadcast"
   | "src20-utility"
   | "tool-endpoint-estimator"
+  | "utxo-ancestors"
   | "sql";
 
 declare global {

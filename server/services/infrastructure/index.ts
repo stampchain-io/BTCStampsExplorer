@@ -1,4 +1,10 @@
 // Barrel exports for infrastructure services
 export * from './cacheService.ts';
-export * from './circuitBreaker.ts';
-export * from './circuitBreakerService.ts';
+
+// Export only what we need from circuitBreaker to avoid conflicts
+export { CircuitBreakerError } from './circuitBreaker.ts';
+
+// Export only what we need from circuitBreakerService to avoid conflicts
+export {
+  CircuitBreakerService as InfrastructureCircuitBreakerService, MARKET_CAP_FALLBACK_DATA, TRENDING_FALLBACK_DATA
+} from './circuitBreakerService.ts';
