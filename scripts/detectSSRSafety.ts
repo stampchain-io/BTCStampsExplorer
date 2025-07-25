@@ -151,8 +151,6 @@ class SSRSafetyDetector {
     'vendor',
     'coverage_psbt',
     'newman-reporter-enhanced',
-    '--help',
-    '--version',
   ];
 
   async scanFile(filePath: string): Promise<void> {
