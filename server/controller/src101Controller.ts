@@ -6,7 +6,7 @@ import {
   SRC101ValidTxTotalCountParams,
   Src101BalanceParams,
 } from "$globals";
-import { BlockService } from "$server/services/blockService.ts";
+import { BlockService } from "$server/services/core/blockService.ts";
 
 export class Src101Controller{
   static async handleSrc101TXFromSRC101Table(

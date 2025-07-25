@@ -6,8 +6,8 @@ import {
 } from "$globals";
 import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
-import { BlockService } from "$server/services/blockService.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
+import { BlockService } from "$server/services/core/blockService.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { CollectionController } from "./collectionController.ts";
@@ -20,7 +20,7 @@ import { isCpid } from "$lib/utils/identifierUtils.ts";
 import { detectContentType, getMimeType } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 
 export class StampController {

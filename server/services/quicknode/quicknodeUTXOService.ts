@@ -4,7 +4,7 @@ import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts"; // Import for conver
 import { CachedQuicknodeRPCService } from "$server/services/quicknode/cachedQuicknodeRpcService.ts";
 import { address as bjsAddress, networks as bjsNetworks } from "bitcoinjs-lib"; // For toOutputScript & network
 
-// TODO(@baba): Utilize as primary utxo fetching source from utxoService
+// TODO(@baba): Utilize as primary utxo fetching source from BitcoinUtxoManager
 
 // Define options for fetching multiple UTXOs
 export interface UTXOOptions {

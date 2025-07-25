@@ -3,11 +3,11 @@ import { AddressHandlerContext } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import {
   DEFAULT_PAGINATION,
   validateRequiredParams,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(req: Request, ctx) {

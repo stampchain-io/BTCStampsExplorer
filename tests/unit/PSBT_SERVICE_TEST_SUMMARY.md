@@ -1,99 +1,81 @@
-# PSBT Service Test Summary
+# BitcoinTransactionBuilder Test Summary - ✅ UPDATED
 
-## Overview
-The PSBT Service tests have been reorganized and optimized for comprehensive coverage and CI compatibility. Previously skipped tests have been activated and consolidated.
+This document summarizes the comprehensive test coverage for the **BitcoinTransactionBuilder** service (formerly PSBTService).
 
-## Test Files
+## Test Files Overview
 
-### 1. `psbtService.comprehensive.test.ts` (Main Test Suite)
-- **Status**: ✅ Active and passing
-- **Coverage**: Complete coverage of PSBTService functionality
-- **Features**:
-  - Dependency injection tests with UTXO fixtures
-  - Format logging functionality tests
-  - Private method testing (getAddressType, getAddressNetwork, getAddressFromScript)
-  - Edge cases and BigInt handling
-  - Fee calculation verification
-  - Support for all Bitcoin address types (P2WPKH, P2PKH, P2SH, P2WSH, P2TR)
+### 1. `bitcoinTransactionBuilder.comprehensive.test.ts` (Main Test Suite)
+- **Status**: ✅ ACTIVE
+- **Coverage**: Complete coverage of BitcoinTransactionBuilder functionality
+- **Features**: Dependency injection, comprehensive error handling, real fixture data
+- **Tests**: 50+ test cases covering all service methods
+- **Mocking**: Uses MockDatabaseManager, MockBTCPriceService
+- **Dependencies**: Full integration with CommonUTXOService
+- **Purpose**: Primary test suite for all BitcoinTransactionBuilder operations
 
-### 2. `psbtService.injected.test.ts` (Fixture-Based DI Tests)
-- **Status**: ✅ Active and passing (renamed from `.skip.ts`)
-- **Coverage**: Tests using dependency injection with mock bitcoinjs-lib
-- **Features**:
-  - Complete mock implementation of bitcoinjs-lib
-  - Fixture-based testing for realistic scenarios
-  - UTXO validation and ownership tests
-  - Counterparty PSBT processing
-  - Raw hex PSBT building
+### 2. `bitcoinTransactionBuilder.injected.test.ts` (Fixture-Based DI Tests)
+- **Status**: ✅ ACTIVE
+- **Coverage**: Dependency injection patterns with fixtures
+- **Features**: Constructor injection, service composition
+- **Tests**: 15+ focused tests on DI scenarios
+- **Mocking**: Advanced mocking with fixture-based data
+- **Purpose**: Validates service composition and dependency management
 
-### 3. `psbtService.fixture-based.test.ts` (API Fixture Tests)
-- **Status**: ✅ Active with some skipped tests
-- **Coverage**: Tests using real API response fixtures
-- **Features**:
-  - Uses mempool API fixtures for realistic data
-  - Basic PSBT creation and validation
-  - Some tests skipped due to address validation requirements
+### 3. `bitcoinTransactionBuilder.fixture-based.test.ts` (API Fixture Tests)
+- **Status**: ⚠️ SOME SKIPPED TESTS
+- **Coverage**: Real API data with fixture mocking
+- **Features**: External API simulation, realistic data scenarios
+- **Tests**: 20+ tests with some skipped due to address validation
+- **Issue**: Some tests skip due to strict address validation requirements
+- **Purpose**: Integration testing with realistic external data
 
-### 4. `psbtService.mocked.test.skip.ts` (Removed)
-- **Status**: ❌ Removed
-- **Reason**: Failed due to improper global mocking and dynamic imports
+### 4. `bitcoinTransactionBuilder.minimal.test.ts` (Core Tests)
+- **Status**: ✅ ACTIVE
+- **Coverage**: Essential BitcoinTransactionBuilder operations
+- **Features**: Minimal dependencies, fast execution
+- **Tests**: Core functionality validation
+- **Purpose**: Quick validation of essential service operations
 
-## Key Improvements
+## Test Infrastructure
 
-1. **CI Compatibility**:
-   - All tests set `SKIP_REDIS_CONNECTION=true` and `SKIP_DB_CONNECTION=true`
-   - No external API calls or database connections
-   - Deterministic behavior with fixtures
+### Mock Services
+- MockDatabaseManager for database operations
+- MockBTCPriceService for price data
+- CommonUTXOService mock for UTXO operations
 
-2. **Coverage Enhancements**:
-   - Tests cover all Bitcoin script types
-   - Edge cases for dust amounts, invalid formats, network mismatches
-   - Fee calculation verification
-   - Private method testing for complete coverage
+### Environment Setup
+- Uses `SKIP_REDIS_CONNECTION=true` and `SKIP_DB_CONNECTION=true` for CI compatibility
+- Fixtures located in `tests/fixtures/` directory
 
-3. **Mock Infrastructure**:
-   - Custom bitcoinjs-lib mock with proper PSBT support
-   - CommonUTXOService mock for UTXO operations
-   - Transaction hex mocking for realistic scenarios
+## Running Tests
 
-## Test Execution
-
-Run all PSBT tests:
+### All BitcoinTransactionBuilder Tests
 ```bash
-SKIP_REDIS_CONNECTION=true SKIP_DB_CONNECTION=true deno test --no-check --allow-all tests/unit/psbtService*.test.ts
+SKIP_REDIS_CONNECTION=true SKIP_DB_CONNECTION=true deno test --no-check --allow-all tests/unit/bitcoinTransactionBuilder*.test.ts
 ```
 
-Run specific test suite:
+### Individual Test Suites
 ```bash
 # Comprehensive tests
-deno test --no-check --allow-all tests/unit/psbtService.comprehensive.test.ts
+deno test --no-check --allow-all tests/unit/bitcoinTransactionBuilder.comprehensive.test.ts
 
-# Injected tests
-deno test --no-check --allow-all tests/unit/psbtService.injected.test.ts
+# Dependency injection tests
+deno test --no-check --allow-all tests/unit/bitcoinTransactionBuilder.injected.test.ts
 
 # Fixture-based tests
-deno test --no-check --allow-all tests/unit/psbtService.fixture-based.test.ts
+deno test --no-check --allow-all tests/unit/bitcoinTransactionBuilder.fixture-based.test.ts
+
+# Minimal tests
+deno test --no-check --allow-all tests/unit/bitcoinTransactionBuilder.minimal.test.ts
 ```
 
-## Test Results Summary
+## Integration Tests
 
-- **Total Test Files**: 3 active (1 removed)
-- **Total Tests**: 84 tests across all files
-- **Pass Rate**: 100% (excluding intentionally skipped tests)
-- **CI Ready**: ✅ Yes
+Integration tests are located in `tests/integration/bitcoinTransactionBuilder.integration.test.ts` and provide end-to-end validation of the service with real dependencies.
 
 ## Recommendations
 
-1. Consider migrating skipped tests in `psbtService.fixture-based.test.ts` to use proper address validation
-2. Add performance benchmarks for PSBT creation with different script types
-3. Consider adding integration tests with actual Bitcoin testnet transactions (in separate test suite)
-4. Monitor test execution time in CI to ensure fast feedback loops
-
-## Testing Guidelines Compliance
-
-✅ **Dependency Injection**: All tests use DI pattern
-✅ **Mocking**: Comprehensive mocks for all external dependencies
-✅ **Environment Variables**: Proper test environment setup
-✅ **Coverage**: High coverage with edge cases
-✅ **CI Safety**: No external calls, deterministic behavior
-✅ **Structure**: BDD style with describe/it blocks
+1. Consider migrating skipped tests in `bitcoinTransactionBuilder.fixture-based.test.ts` to use proper address validation
+2. Expand integration tests for more real-world scenarios
+3. Add performance benchmarks for large transaction scenarios
+4. Consider adding property-based testing for edge cases

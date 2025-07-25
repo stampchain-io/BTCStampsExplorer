@@ -8,7 +8,7 @@ Deno.env.set("DENO_ENV", "test");
 // Import after setting environment
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { StampRepository } from "$server/database/stampRepository.ts";
-import { BlockService } from "$server/services/blockService.ts";
+import { BlockService } from "$server/services/core/blockService.ts";
 import { StampService } from "$server/services/stampService.ts";
 
 // Mock the repositories

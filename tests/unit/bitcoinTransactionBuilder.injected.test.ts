@@ -1,6 +1,6 @@
 /**
- * @fileoverview PSBTService tests using dependency injection and UTXO fixtures
- * This version uses the refactored PSBTService with injected dependencies
+ * @fileoverview BitcoinTransactionBuilder tests using dependency injection and UTXO fixtures
+ * This version uses the refactored BitcoinTransactionBuilder with injected dependencies
  */
 
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
@@ -16,9 +16,9 @@ Deno.env.set("SKIP_REDIS_CONNECTION", "true");
 Deno.env.set("SKIP_DB_CONNECTION", "true");
 Deno.env.set("DENO_ENV", "test");
 
-// Import the production PSBTService with dependency injection
+// Import the production BitcoinTransactionBuilder with dependency injection
 import {
-  createPSBTService,
+  createBitcoinTransactionBuilder,
   formatPsbtForLogging,
 } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
@@ -97,16 +97,16 @@ const mockDependencies = {
   bitcoin: bitcoin, // Inject our mock bitcoinjs-lib
 };
 
-describe("PSBTService with Dependency Injection and Fixtures", {
+describe("BitcoinTransactionBuilder with Dependency Injection and Fixtures", {
   sanitizeOps: false,
   sanitizeResources: false,
 }, () => {
-  let psbtService: ReturnType<typeof createPSBTService>;
+  let bitcoinTransactionBuilder: ReturnType<typeof createBitcoinTransactionBuilder>;
 
   beforeEach(() => {
     clearMockUTXOResponses();
     clearMockResponses();
-    psbtService = createPSBTService(mockDependencies);
+    bitcoinTransactionBuilder = createBitcoinTransactionBuilder(mockDependencies);
   });
 
   afterEach(() => {
@@ -171,7 +171,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
           fixture.script + "00000000",
       );
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         `${fixture.txid}:${fixture.vout}`,
         salePrice,
         sellerAddress,
@@ -206,7 +206,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
 
       await assertRejects(
         async () => {
-          await psbtService.createPSBT(
+          await bitcoinTransactionBuilder.createPSBT(
             `${fixture.txid}:${fixture.vout}`,
             salePrice,
             "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", // Valid P2WPKH address
@@ -231,7 +231,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
           fixture.script + "00000000",
       );
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         `${fixture.txid}:${fixture.vout}`,
         salePrice,
         sellerAddress,
@@ -260,7 +260,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
           fixture.script + "00000000",
       );
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         `${fixture.txid}:${fixture.vout}`,
         salePrice,
         sellerAddress,
@@ -288,7 +288,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
           fixture.script + "00000000",
       );
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         `${fixture.txid}:${fixture.vout}`,
         salePrice,
         sellerAddress,
@@ -304,7 +304,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
       const salePrice = 0.02;
       const sellerAddress = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"; // Valid P2WPKH address
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         `${fixture.txid}:${fixture.vout}`,
         salePrice,
         sellerAddress,
@@ -323,7 +323,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
       const salePrice = 0.015;
       const sellerAddress = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"; // Valid P2WPKH address
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         `${fixture.txid}:${fixture.vout}`,
         salePrice,
         sellerAddress,
@@ -347,7 +347,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
         address: fixture.address, // Use fixture address for proper validation
       });
 
-      const isValid = await psbtService.validateUTXOOwnership(
+      const isValid = await bitcoinTransactionBuilder.validateUTXOOwnership(
         `${fixture.txid}:${fixture.vout}`,
         fixture.address,
       );
@@ -365,7 +365,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
         address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", // Valid P2WPKH address
       });
 
-      const isValid = await psbtService.validateUTXOOwnership(
+      const isValid = await bitcoinTransactionBuilder.validateUTXOOwnership(
         `${fixture.txid}:${fixture.vout}`,
         wrongAddress,
       );
@@ -389,7 +389,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
           address: fixture.address, // Use fixture address for proper validation
         });
 
-        const isValid = await psbtService.validateUTXOOwnership(
+        const isValid = await bitcoinTransactionBuilder.validateUTXOOwnership(
           `${fixture.txid}:${fixture.vout}`,
           fixture.address, // Use fixture address for proper validation
         );
@@ -429,7 +429,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
           sellerFixture.script + "00000000",
       );
 
-      const result = await psbtService.processCounterpartyPSBT(
+      const result = await bitcoinTransactionBuilder.processCounterpartyPSBT(
         psbt.toHex(),
         `${sellerFixture.txid}:${sellerFixture.vout}`,
         sellerFixture.address,
@@ -472,7 +472,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
 
       setMockTransactionHex(fixture.txid, rawHex);
 
-      const result = await psbtService.buildPsbtFromUserFundedRawHex(rawHex);
+      const result = await bitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex(rawHex);
 
       assertExists(result);
       assertEquals(typeof result, "string");
@@ -484,7 +484,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
     it("should handle invalid UTXO string format", async () => {
       await assertRejects(
         async () => {
-          await psbtService.createPSBT(
+          await bitcoinTransactionBuilder.createPSBT(
             "invalid-format",
             0.001,
             "bc1q7c6u6q8g50txf9e9qw4m4w8ukmh3lxp2c8yz3g", // Valid test address
@@ -498,7 +498,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
     it("should handle negative vout", async () => {
       await assertRejects(
         async () => {
-          await psbtService.createPSBT(
+          await bitcoinTransactionBuilder.createPSBT(
             "deadbeef:-1",
             0.001,
             "bc1q7c6u6q8g50txf9e9qw4m4w8ukmh3lxp2c8yz3g", // Valid test address
@@ -524,7 +524,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
 
       await assertRejects(
         async () => {
-          await psbtService.createPSBT(
+          await bitcoinTransactionBuilder.createPSBT(
             `${mainnetFixture.txid}:${mainnetFixture.vout}`,
             0.001,
             testnetAddress,
@@ -561,7 +561,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
 
       await assertRejects(
         async () => {
-          await psbtService.processCounterpartyPSBT(
+          await bitcoinTransactionBuilder.processCounterpartyPSBT(
             psbt.toHex(),
             "test".padEnd(64, "0") + ":0",
             "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq", // Different seller address
@@ -594,7 +594,7 @@ describe("PSBTService with Dependency Injection and Fixtures", {
         }
 
         const salePrice = 0.001;
-        const psbtHex = await psbtService.createPSBT(
+        const psbtHex = await bitcoinTransactionBuilder.createPSBT(
           `${fixture.txid}:${fixture.vout}`,
           salePrice,
           "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", // Valid P2WPKH address

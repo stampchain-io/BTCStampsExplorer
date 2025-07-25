@@ -12,7 +12,7 @@ function createTestFile(): string {
   return btoa(testData); // Base64 encode
 }
 
-Deno.test("Stamp Minting Integration Tests", async (t) => {
+Deno.test("Stamp Creation Integration Tests", async (t) => {
   await t.step("UTXO selection and fee calculation", async () => {
     try {
       // Test the core UTXO selection logic that was causing "script missing" errors
@@ -162,7 +162,7 @@ Deno.test("Stamp Minting Integration Tests", async (t) => {
   });
 });
 
-Deno.test("Stamp Minting - Performance Validation", async (t) => {
+Deno.test("Stamp Creation - Performance Validation", async (t) => {
   await t.step("performance benchmarks", async () => {
     console.log("⚡ Performance validation...");
 

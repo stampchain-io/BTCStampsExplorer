@@ -1,4 +1,4 @@
-// Minimal PSBTService Test Suite - Tests only public methods
+// Minimal BitcoinTransactionBuilder Test Suite - Tests only public methods
 // Tests formatting function with fixtures
 // Uses bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m address fixtures
 
@@ -11,7 +11,7 @@ import { formatPsbtForLogging } from "../../server/services/transaction/bitcoinT
 // Test address
 const TEST_ADDRESS = "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";
 
-describe("PSBTService - formatPsbtForLogging", () => {
+describe("BitcoinTransactionBuilder - formatPsbtForLogging", () => {
   it("should format PSBT for logging correctly", () => {
     const psbt = new Psbt({ network: networks.bitcoin });
 

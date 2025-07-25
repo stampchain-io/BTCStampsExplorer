@@ -20,10 +20,10 @@ import type { UTXO } from "$types/index.d.ts";
 
 export class StampCreationService {
   private static commonUtxoService = new CommonUTXOService();
-  private static utxoService = new BitcoinUtxoManager(); // Add UTXOService instance
+  private static utxoService = new BitcoinUtxoManager(); // Add BitcoinUtxoManager instance
 
   /**
-   * 🚀 REMOVED: getFullUTXOsWithDetails method - replaced with optimal UTXOService pattern
+   * 🚀 REMOVED: getFullUTXOsWithDetails method - replaced with optimal BitcoinUtxoManager pattern
    * OLD INEFFICIENT PATTERN: Fetch full details for ALL UTXOs before selection
    * NEW OPTIMAL PATTERN: Fetch basic UTXOs → Select optimal → Fetch full details for selected only
    */
@@ -355,7 +355,7 @@ export class StampCreationService {
         satsPerVB: satsPerVB
       });
 
-      // Use UTXOService for optimal UTXO selection with full details
+      // Use BitcoinUtxoManager for optimal UTXO selection with full details
       const selectionResult = await this.utxoService.selectUTXOsForTransaction(
         address,
         outputsForSelection,

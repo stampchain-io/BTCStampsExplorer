@@ -5,7 +5,7 @@ import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
   DEFAULT_PAGINATION,
   validateRequiredParams,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {

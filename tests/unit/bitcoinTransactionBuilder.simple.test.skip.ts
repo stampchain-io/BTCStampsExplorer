@@ -1,5 +1,5 @@
 /**
- * @fileoverview Simple tests for PSBTService to increase coverage
+ * @fileoverview Simple tests for BitcoinTransactionBuilder to increase coverage
  * This version uses direct mocking to avoid import side effects
  */
 
@@ -47,12 +47,12 @@ await import("$lib/utils/utxoUtils.ts").then((module) => {
   return Math.ceil(size * feeRate);
 };
 
-// Import PSBTService after mocks are set
-const { PSBTService, formatPsbtForLogging } = await import(
+// Import BitcoinTransactionBuilder after mocks are set
+const { BitcoinTransactionBuilder, formatPsbtForLogging } = await import(
   "$server/services/transaction/bitcoinTransactionBuilder.ts"
 );
 
-describe("PSBTService Simple Tests", {
+describe("BitcoinTransactionBuilder Simple Tests", {
   sanitizeOps: false,
   sanitizeResources: false,
 }, () => {
@@ -95,7 +95,7 @@ describe("PSBTService Simple Tests", {
       const sellerAddress = "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2";
 
       try {
-        const psbtHex = await PSBTService.createPSBT(
+        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
           utxoString,
           salePrice,
           sellerAddress,
@@ -120,7 +120,7 @@ describe("PSBTService Simple Tests", {
       const address = "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2";
 
       try {
-        const isValid = await PSBTService.validateUTXOOwnership(
+        const isValid = await BitcoinTransactionBuilder.validateUTXOOwnership(
           utxoString,
           address,
         );
@@ -139,7 +139,7 @@ describe("PSBTService Simple Tests", {
     it("should test getAddressType", () => {
       try {
         // Access private method through any cast
-        const getAddressType = (PSBTService as any).getAddressType;
+        const getAddressType = (BitcoinTransactionBuilder as any).getAddressType;
         if (getAddressType) {
           // Mock networks object
           const mockNetwork = {
@@ -161,7 +161,7 @@ describe("PSBTService Simple Tests", {
 
     it("should test getAddressNetwork", () => {
       try {
-        const getAddressNetwork = (PSBTService as any).getAddressNetwork;
+        const getAddressNetwork = (BitcoinTransactionBuilder as any).getAddressNetwork;
         if (getAddressNetwork) {
           const network = getAddressNetwork("bc1qtest");
           assertExists(network);
@@ -180,7 +180,7 @@ describe("PSBTService Simple Tests", {
       try {
         await assertRejects(
           async () => {
-            await PSBTService.createPSBT(
+            await BitcoinTransactionBuilder.createPSBT(
               "invalid",
               0.001,
               "bc1qtest",

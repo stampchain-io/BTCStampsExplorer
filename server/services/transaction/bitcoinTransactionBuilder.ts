@@ -139,7 +139,7 @@ export class BitcoinTransactionBuilderImpl {
     );
 
     const changeAmount = BigInt(utxoDetails.value) - satoshiAmount - BigInt(estimatedFee);
-    console.log("PSBTService DEBUG - Change calculation:", {
+    console.log("BitcoinTransactionBuilder DEBUG - Change calculation:", {
       utxoValue: utxoDetails.value,
       satoshiAmount: satoshiAmount.toString(),
       estimatedFee,
@@ -156,9 +156,9 @@ export class BitcoinTransactionBuilderImpl {
         address: sellerAddress,
         value: changeAmount,
       });
-      console.log("PSBTService DEBUG - Added change output");
+      console.log("BitcoinTransactionBuilder DEBUG - Added change output");
     } else {
-      console.log("PSBTService DEBUG - No change output added, amount too small");
+      console.log("BitcoinTransactionBuilder DEBUG - No change output added, amount too small");
     }
 
     logger.debug("psbt-service", { message: "Created PSBT", psbt: formatPsbtForLogging(psbt) });
@@ -652,16 +652,16 @@ export class BitcoinTransactionBuilder {
   }
 
   /**
-   * @deprecated ✅ NO LONGER USED - Migrated to GeneralPSBTService.generatePSBT()
+   * @deprecated ✅ NO LONGER USED - Migrated to GeneralBitcoinTransactionBuilder.generatePSBT()
    *
-   * This method has been replaced by GeneralPSBTService.generatePSBT() which provides
+   * This method has been replaced by GeneralBitcoinTransactionBuilder.generatePSBT() which provides
    * a cleaner architecture and supports all operation types.
    *
    * See migration examples in:
    * - routes/api/v2/fairmint/compose.ts
    * - routes/api/v2/trx/stampdetach.ts
    *
-   * @deprecated This will be removed in a future release. Please migrate to GeneralPSBTService.generatePSBT().
+   * @deprecated This will be removed in a future release. Please migrate to GeneralBitcoinTransactionBuilder.generatePSBT().
    */
   static async processCounterpartyPSBT(
     psbtBase64: string,
@@ -680,17 +680,17 @@ export class BitcoinTransactionBuilder {
     totalOutputValue?: bigint;
     finalUserChange?: bigint;
   }> {
-    console.log("\n[PSBTService] === Entered processCounterpartyPSBT function v2.0 (Robust Fee/Change/ServiceFee) ===");
-    console.log(`[PSBTService] Initial psbtBase64 (len): ${psbtBase64.length}, userAddress: ${userAddress}, targetFeeRateSatVb: ${targetFeeRateSatVb}`);
+    console.log("\n[BitcoinTransactionBuilder] === Entered processCounterpartyPSBT function v2.0 (Robust Fee/Change/ServiceFee) ===");
+    console.log(`[BitcoinTransactionBuilder] Initial psbtBase64 (len): ${psbtBase64.length}, userAddress: ${userAddress}, targetFeeRateSatVb: ${targetFeeRateSatVb}`);
     if (options?.serviceFeeDetails) {
-        console.log("[PSBTService] Service Fee Details:", options.serviceFeeDetails);
+        console.log("[BitcoinTransactionBuilder] Service Fee Details:", options.serviceFeeDetails);
     }
 
     try {
       const psbt = Psbt.fromBase64(psbtBase64);
       const network = this.getAddressNetwork(userAddress);
 
-      console.log(`[PSBTService] PSBT parsed. Initial input count: ${psbt.inputCount}, output count: ${psbt.txOutputs.length}`);
+      console.log(`[BitcoinTransactionBuilder] PSBT parsed. Initial input count: ${psbt.inputCount}, output count: ${psbt.txOutputs.length}`);
 
       const originalTx = psbt.data.globalMap.unsignedTx;
       if (!originalTx || !(originalTx as any).ins || !(originalTx as any).outs) {
@@ -706,7 +706,7 @@ export class BitcoinTransactionBuilder {
         const inputTxid = Buffer.from(txIn.hash).reverse().toString('hex');
         const inputVout = txIn.index;
 
-        console.log(`[PSBTService] Enriching input ${index}: ${inputTxid}:${inputVout}`);
+        console.log(`[BitcoinTransactionBuilder] Enriching input ${index}: ${inputTxid}:${inputVout}`);
         const utxoDetails = await this.commonUtxoService.getSpecificUTXO(inputTxid, inputVout, {
             includeAncestorDetails: !isDryRun,
             forcePublicAPI: true // Consider if always forcing public is needed or use smart fallback
@@ -737,9 +737,9 @@ export class BitcoinTransactionBuilder {
           }
         }
         psbt.updateInput(index, updateData);
-        console.log(`[PSBTService] Input ${index} enriched. Value: ${utxoDetails.value}`);
+        console.log(`[BitcoinTransactionBuilder] Input ${index} enriched. Value: ${utxoDetails.value}`);
       }
-      console.log(`[PSBTService] All inputs enriched. Total Input Value: ${totalInputValue.toString()}`);
+      console.log(`[BitcoinTransactionBuilder] All inputs enriched. Total Input Value: ${totalInputValue.toString()}`);
 
       // 2. Identify outputs to preserve from original PSBT (excluding any potential old change to userAddress)
       // And calculate their total value.
@@ -758,9 +758,9 @@ export class BitcoinTransactionBuilder {
           if (!isChangeToUser) {
             outputsToPreserve.push({ script: Buffer.from(output.script), value: BigInt(output.value) });
             totalValueToPreservedOutputs += BigInt(output.value);
-            console.log(`[PSBTService] Preserving original output: value=${output.value}, script=${bytesToHex(output.script)}`);
+            console.log(`[BitcoinTransactionBuilder] Preserving original output: value=${output.value}, script=${bytesToHex(output.script)}`);
           } else {
-            console.log(`[PSBTService] Ignoring original output to user (potential old change): value=${output.value}, script=${bytesToHex(output.script)}`);
+            console.log(`[BitcoinTransactionBuilder] Ignoring original output to user (potential old change): value=${output.value}, script=${bytesToHex(output.script)}`);
           }
       }
 
@@ -774,7 +774,7 @@ export class BitcoinTransactionBuilder {
           value: BigInt(options.serviceFeeDetails.fee),
         });
         totalValueToOthers += BigInt(options.serviceFeeDetails.fee);
-        console.log(`[PSBTService] Added service fee output: ${options.serviceFeeDetails.fee} sats to ${options.serviceFeeDetails.address}`);
+        console.log(`[BitcoinTransactionBuilder] Added service fee output: ${options.serviceFeeDetails.fee} sats to ${options.serviceFeeDetails.address}`);
       }
 
       // Clear existing outputs from PSBT object to rebuild cleanly
@@ -797,13 +797,13 @@ export class BitcoinTransactionBuilder {
       for (let i = 0; i < psbt.inputCount; i++) {
         try {
           psbt.finalizeInput(i);
-          console.log(`[PSBTService] Successfully finalized input #${i} for size estimation.`);
+          console.log(`[BitcoinTransactionBuilder] Successfully finalized input #${i} for size estimation.`);
         } catch (e) {
             // This can happen if, for example, a script type needs a redeemScript that wasn't provided
             // For standard P2WPKH from buyerUtxoDetails, this should generally be fine.
-            // console.warn(`[PSBTService] Non-critical error during psbt.finalizeInput(${i}) for size estimation: ${e.message}`);
+            // console.warn(`[BitcoinTransactionBuilder] Non-critical error during psbt.finalizeInput(${i}) for size estimation: ${e.message}`);
             const errorMessage = e instanceof Error ? e.message : String(e);
-            console.error(`[PSBTService] CRITICAL error during psbt.finalizeInput(${i}) for input ${psbt.txInputs[i].hash.toString()}: ${errorMessage}`);
+            console.error(`[BitcoinTransactionBuilder] CRITICAL error during psbt.finalizeInput(${i}) for input ${psbt.txInputs[i].hash.toString()}: ${errorMessage}`);
             throw new Error(`Failed to finalize input #${i} for PSBT construction: ${errorMessage}`);
         }
       }
@@ -811,7 +811,7 @@ export class BitcoinTransactionBuilder {
       const tempTx = psbt.extractTransaction(true);
       const estimatedVsize = BigInt(tempTx.virtualSize());
       let calculatedMinerFee = estimatedVsize * BigInt(Math.ceil(targetFeeRateSatVb));
-      console.log(`[PSBTService] Fee estimation: VSize=${estimatedVsize}, Rate=${targetFeeRateSatVb} sat/vB, MinerFee=${calculatedMinerFee}`);
+      console.log(`[BitcoinTransactionBuilder] Fee estimation: VSize=${estimatedVsize}, Rate=${targetFeeRateSatVb} sat/vB, MinerFee=${calculatedMinerFee}`);
 
       // Remove dummy change output and rebuild outputs correctly
       psbt.txOutputs.pop(); // remove dummy change
@@ -821,15 +821,15 @@ export class BitcoinTransactionBuilder {
 
 
       let actualUserChange = totalInputValue - totalValueToOthers - calculatedMinerFee;
-      console.log(`[PSBTService] User change calculation: totalIn=${totalInputValue}, totalToOthers=${totalValueToOthers}, minerFee=${calculatedMinerFee}, change=${actualUserChange}`);
+      console.log(`[BitcoinTransactionBuilder] User change calculation: totalIn=${totalInputValue}, totalToOthers=${totalValueToOthers}, minerFee=${calculatedMinerFee}, change=${actualUserChange}`);
 
       if (actualUserChange >= TX_CONSTANTS.DUST_SIZE) {
         psbt.addOutput({ address: userAddress, value: actualUserChange });
-        console.log(`[PSBTService] Added actual user change output: ${actualUserChange} sats to ${userAddress}`);
+        console.log(`[BitcoinTransactionBuilder] Added actual user change output: ${actualUserChange} sats to ${userAddress}`);
       } else if (actualUserChange > 0) {
         calculatedMinerFee += actualUserChange;
         actualUserChange = BigInt(0);
-        console.log(`[PSBTService] User change ${actualUserChange} is below dust, adding to fee. New miner fee: ${calculatedMinerFee}`);
+        console.log(`[BitcoinTransactionBuilder] User change ${actualUserChange} is below dust, adding to fee. New miner fee: ${calculatedMinerFee}`);
       } else if (actualUserChange < 0) {
         throw new Error(
           `Insufficient funds: Input ${totalInputValue}, To Others ${totalValueToOthers}, Miner Fee ${calculatedMinerFee}. Deficit: ${-actualUserChange}`,
@@ -850,7 +850,7 @@ export class BitcoinTransactionBuilder {
 
       // Finalize inputs AGAIN on the final PSBT structure before returning to client
       // This ensures the PSBT is ready for the client to sign.
-      console.log("[PSBTService] Finalizing inputs on the final PSBT structure...");
+      console.log("[BitcoinTransactionBuilder] Finalizing inputs on the final PSBT structure...");
 
       // Create inputsToSign array for return value
       const inputsToSign: { index: number; address?: string; sighashTypes?: number[] }[] = [];
@@ -858,11 +858,11 @@ export class BitcoinTransactionBuilder {
         inputsToSign.push({ index: i, address: userAddress, sighashTypes: [Transaction.SIGHASH_ALL] });
         try {
           psbt.finalizeInput(i);
-          console.log(`[PSBTService] Successfully finalized input #${i} on final PSBT.`);
+          console.log(`[BitcoinTransactionBuilder] Successfully finalized input #${i} on final PSBT.`);
         } catch (e) {
           // If this finalization fails, it's a more critical issue for client signing.
           const errorMessage = e instanceof Error ? e.message : String(e);
-          console.error(`[PSBTService] CRITICAL error during FINAL psbt.finalizeInput(${i}) for input ${psbt.txInputs[i].hash.toString()}:${psbt.txInputs[i].index}: ${errorMessage}`);
+          console.error(`[BitcoinTransactionBuilder] CRITICAL error during FINAL psbt.finalizeInput(${i}) for input ${psbt.txInputs[i].hash.toString()}:${psbt.txInputs[i].index}: ${errorMessage}`);
           throw new Error(`Failed to finalize input #${i} on the final PSBT: ${errorMessage}`);
         }
       }
@@ -870,9 +870,9 @@ export class BitcoinTransactionBuilder {
       const finalPsbtHex = psbt.toHex();
 
       // For verification, re-parse and log details - Keep this section for debugging for now
-      console.log("[PSBTService] ------------- VERIFYING FINAL psbtHex ON SERVER (processCounterpartyPSBT v2.0) ------------- ");
+      console.log("[BitcoinTransactionBuilder] ------------- VERIFYING FINAL psbtHex ON SERVER (processCounterpartyPSBT v2.0) ------------- ");
       // (Optional: Add verification log similar to buildPsbtFromUserFundedRawHex if needed)
-      console.log("[PSBTService] ------------------------------------------------------------------------------------\n");
+      console.log("[BitcoinTransactionBuilder] ------------------------------------------------------------------------------------\n");
 
 
       return {
@@ -886,7 +886,7 @@ export class BitcoinTransactionBuilder {
       };
 
     } catch (error) {
-      console.error("[PSBTService] === ERROR in processCounterpartyPSBT v2.0 ===");
+      console.error("[BitcoinTransactionBuilder] === ERROR in processCounterpartyPSBT v2.0 ===");
       await logger.error("psbt-service", {
         message: "Error processing Counterparty PSBT v2.0",
         error: error instanceof Error ? error.message : "Unknown error",
@@ -916,7 +916,7 @@ export class BitcoinTransactionBuilder {
     estimatedVsize: number;
     finalBuyerChange: number;
   }> {
-    console.log("[PSBTService] Entered buildPsbtFromUserFundedRawHex v8.1 (Robust Fee/Change, No Server Finalize)");
+    console.log("[BitcoinTransactionBuilder] Entered buildPsbtFromUserFundedRawHex v8.1 (Robust Fee/Change, No Server Finalize)");
     console.log(
       `  Params: userAddress=${userAddress}, targetFeeRateSatVb=${targetFeeRateSatVb}, counterpartyTxHex (len)=${counterpartyTxHex.length}`,
     );
@@ -945,7 +945,7 @@ export class BitcoinTransactionBuilder {
         const inputTxid = Buffer.from(cpInput.hash).reverse().toString("hex");
         const inputVout = cpInput.index;
 
-        console.log(`[PSBTService] Processing input ${index} from CP Hex: ${inputTxid}:${inputVout}`);
+        console.log(`[BitcoinTransactionBuilder] Processing input ${index} from CP Hex: ${inputTxid}:${inputVout}`);
 
         const utxoDetails = await this.commonUtxoService.getSpecificUTXO(
           inputTxid,
@@ -961,7 +961,7 @@ export class BitcoinTransactionBuilder {
         const inputValue = BigInt(utxoDetails.value);
         totalBuyerInputValue += inputValue;
         console.log(
-          `[PSBTService] Fetched UTXO details for input ${index}: script=${utxoDetails.script}, value=${inputValue}`,
+          `[BitcoinTransactionBuilder] Fetched UTXO details for input ${index}: script=${utxoDetails.script}, value=${inputValue}`,
         );
 
         psbt.addInput({
@@ -1021,10 +1021,10 @@ export class BitcoinTransactionBuilder {
       let calculatedMinerFee = BigInt(estimatedMinerFeeFull);
       const estimatedVsize = Math.ceil(estimatedMinerFeeFull / targetFeeRateSatVb); // Back-calculate VSize from fee and rate
 
-      console.log(`[PSBTService] Fee Est (using estimateFee): totalValueToOthers=${totalValueToOthers}, estimatedVsize=${estimatedVsize}, targetFeeRateSatVb=${targetFeeRateSatVb}, calculatedMinerFee=${calculatedMinerFee}`);
+      console.log(`[BitcoinTransactionBuilder] Fee Est (using estimateFee): totalValueToOthers=${totalValueToOthers}, estimatedVsize=${estimatedVsize}, targetFeeRateSatVb=${targetFeeRateSatVb}, calculatedMinerFee=${calculatedMinerFee}`);
 
       let actualBuyerChange = totalBuyerInputValue - totalValueToOthers - calculatedMinerFee;
-      console.log(`[PSBTService] Buyer's available for change & fee: ${totalBuyerInputValue - totalValueToOthers}. Calculated change (before dust check): ${actualBuyerChange}`);
+      console.log(`[BitcoinTransactionBuilder] Buyer's available for change & fee: ${totalBuyerInputValue - totalValueToOthers}. Calculated change (before dust check): ${actualBuyerChange}`);
 
       // Add final outputs to PSBT
       finalOutputs.forEach(out => {
@@ -1047,7 +1047,7 @@ export class BitcoinTransactionBuilder {
       // The PSBT will be finalized by the client's wallet.
 
       const finalPsbtHex = psbt.toHex();
-      console.log("[PSBTService] PSBT constructed (v8.1 - no server finalize). Ready for client.");
+      console.log("[BitcoinTransactionBuilder] PSBT constructed (v8.1 - no server finalize). Ready for client.");
 
       return {
         psbtHex: finalPsbtHex,
@@ -1057,7 +1057,7 @@ export class BitcoinTransactionBuilder {
         finalBuyerChange: Number(actualBuyerChange),
       };
     } catch (error) {
-      console.error("[PSBTService] ERROR in buildPsbtFromUserFundedRawHex v8.1:", error);
+      console.error("[BitcoinTransactionBuilder] ERROR in buildPsbtFromUserFundedRawHex v8.1:", error);
       await logger.error("psbt-service", {
         message: "Error in buildPsbtFromUserFundedRawHex v8.1",
         error: error instanceof Error ? error.message : String(error),
@@ -1071,7 +1071,7 @@ export class BitcoinTransactionBuilder {
 }
 
 // Export function to create instance with custom dependencies for testing
-export function createPSBTService(dependencies: Partial<BitcoinTransactionBuilderDependencies> = {}): BitcoinTransactionBuilderImpl {
+export function createBitcoinTransactionBuilder(dependencies: Partial<BitcoinTransactionBuilderDependencies> = {}): BitcoinTransactionBuilderImpl {
   return new BitcoinTransactionBuilderImpl({
     getUTXOForAddress: dependencies.getUTXOForAddress || getUTXOForAddressFromUtils,
     estimateFee: dependencies.estimateFee || estimateFee,

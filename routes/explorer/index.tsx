@@ -9,7 +9,7 @@ import {
 } from "$globals";
 import { ExplorerHeader } from "$header";
 import { StampController } from "$server/controller/stampController.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
