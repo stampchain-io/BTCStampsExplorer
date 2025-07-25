@@ -13,14 +13,14 @@ import { Buffer } from "node:buffer";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
-import { UTXOService } from "$server/services/transaction/utxoService.ts";
+import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
 import type { UTXO } from "$types/index.d.ts";
 
 export class StampMintService {
   private static commonUtxoService = new CommonUTXOService();
-  private static utxoService = new UTXOService(); // Add UTXOService instance
+  private static utxoService = new BitcoinUtxoManager(); // Add UTXOService instance
 
   /**
    * 🚀 REMOVED: getFullUTXOsWithDetails method - replaced with optimal UTXOService pattern
