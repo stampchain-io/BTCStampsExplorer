@@ -1,4 +1,4 @@
-import { logger } from "$lib/utils/logger.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 
 export interface FeeSecurityConfig {
   minFeeRate: number; // Minimum allowed fee rate (sats/vB)

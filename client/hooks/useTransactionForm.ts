@@ -7,7 +7,7 @@ import {
 import { logger } from "$lib/utils/logger.ts";
 import { FeeDetails } from "$lib/types/base.d.ts";
 import axiod from "axiod";
-import { debounce } from "$lib/utils/debounce.ts";
+import { debounce } from "$lib/utils/performance/debounce.ts";
 
 interface TransactionFormState {
   fee: number;

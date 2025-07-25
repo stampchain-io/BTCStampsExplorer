@@ -1,7 +1,7 @@
 import { SecurityService } from "./securityService.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 
 export class InternalRouteGuard {
   // For routes that require CSRF

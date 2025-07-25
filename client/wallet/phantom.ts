@@ -3,10 +3,10 @@ import { walletContext } from "./wallet.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
 import { handleWalletError } from "./walletHelper.ts";
-import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
+import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { broadcastTransaction } from "$lib/utils/minting/broadcast.ts";
-import type { BaseToast } from "$lib/utils/toastSignal.ts";
+import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 
 export const isPhantomInstalled = signal<boolean>(false);
 

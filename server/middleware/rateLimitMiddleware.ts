@@ -1,6 +1,6 @@
 import { RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW } from "$constants";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 
 interface RateLimitEntry {
   count: number;

@@ -1,18 +1,19 @@
 // was previously // lib/utils/minting/stamp.ts
 
-import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
-import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import { extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
-import { getScriptTypeInfo, validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
+import { base64ToHex } from "$lib/utils/data/binary/baseUtils.ts";
+import { FileToAddressUtils } from "$lib/utils/bitcoin/encoding/fileToAddressUtils.ts";
+import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
+import { extractOutputs } from "$lib/utils/bitcoin/minting/transactionUtils.ts";
+import { getScriptTypeInfo, validateWalletAddressForMinting } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { formatPsbtForLogging } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import type { ScriptType } from "$types/index.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
 // Removed unused fee calculation imports
-import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { TX_CONSTANTS } from "$constants";
+import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
 import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
@@ -115,8 +116,8 @@ export class StampCreationService {
       }
 
       const hex = result.tx_hex;
-      const hex_file = CIP33.base64_to_hex(file);
-      const cip33Addresses = CIP33.file_to_addresses(hex_file);
+      const hex_file = base64ToHex(file);
+      const cip33Addresses = FileToAddressUtils.fileToAddresses(hex_file);
 
       const fileSize = Math.ceil((file.length * 3) / 4);
       logger.debug("stamp-create", { message: "File and CIP33 details", fileSize, cip33AddressCount: cip33Addresses.length, hex_length: hex_file.length });
@@ -191,7 +192,7 @@ export class StampCreationService {
         totalDustValue = cip33Addresses.length * TX_CONSTANTS.DUST_SIZE;
 
         // Calculate accurate estimated size based on transaction structure
-        const dryRunEstimatedSize = estimateTransactionSize({
+        const dryRunEstimatedSize = estimateMintingTransactionSize({
           inputs: [{
             type: "P2WPKH" as ScriptType, // Assume P2WPKH input for estimation
             isWitness: true
@@ -286,7 +287,7 @@ export class StampCreationService {
       logger.debug("stamp-create", { message: "Initial vouts from transaction", count: vouts.length, values: vouts.map(v => v.value) });
 
       // Calculate size first
-      const estimatedSize = estimateTransactionSize({
+      const estimatedSize = estimateMintingTransactionSize({
         inputs: [{
           type: "P2WPKH" as ScriptType,
           isWitness: true
@@ -385,7 +386,7 @@ export class StampCreationService {
       });
 
       // Recalculate the exact fee with the actual number of inputs selected
-      actualEstimatedSize = estimateTransactionSize({
+      actualEstimatedSize = estimateMintingTransactionSize({
         inputs: inputs.map((input: UTXO) => ({
           type: (input.scriptType || "P2WPKH") as ScriptType,
           isWitness: true

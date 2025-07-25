@@ -1,7 +1,7 @@
+import { bytesToHex } from "$lib/utils/data/binary/baseUtils.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
 import { Buffer } from "node:buffer";
-import { createMockUTXO } from "./utils/testFactories.ts";
 
 // Define types needed for the test
 interface UTXO {
@@ -151,9 +151,11 @@ const mockBitcoinJS = {
   },
 };
 
-// Mock helper functions
-function bytesToHex(bytes: Uint8Array | Buffer): string {
-  return Buffer.from(bytes).toString("hex");
+// Mock helper functions - removed duplicate bytesToHex function, now imported from baseUtils
+function bytesToHexCompat(bytes: Uint8Array | Buffer): string {
+  // Convert Buffer to Uint8Array if needed, then use baseUtils function
+  const uint8Array = bytes instanceof Buffer ? new Uint8Array(bytes) : bytes;
+  return bytesToHex(uint8Array);
 }
 
 function getScriptTypeInfo(script: string): ScriptTypeInfo {
@@ -219,7 +221,7 @@ class TestQuicknodeUTXOService {
 
     try {
       // Generate expected output script
-      const expectedScript = bytesToHex(
+      const expectedScript = bytesToHexCompat(
         mockBitcoinJS.address.toOutputScript(
           address,
           mockBitcoinJS.networks.bitcoin,
@@ -670,7 +672,7 @@ describe("QuicknodeUTXOService", () => {
             txid,
             vout: 0,
             value: "0.1",
-            hex: bytesToHex(
+            hex: bytesToHexCompat(
               mockBitcoinJS.address.toOutputScript(testCase.address),
             ),
           },

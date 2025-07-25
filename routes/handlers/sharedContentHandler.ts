@@ -1,13 +1,13 @@
 import { FreshContext } from "$fresh/server.ts";
-import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
+import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
 import {
   getIdentifierType,
   isCpid,
   isTxHash,
-} from "$lib/utils/identifierUtils.ts";
+} from "$lib/utils/data/identifiers/identifierUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { getRecursiveHeaders } from "$lib/utils/securityHeaders.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { getRecursiveHeaders } from "$lib/utils/security/securityHeaders.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 

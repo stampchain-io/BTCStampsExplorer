@@ -1,7 +1,7 @@
 // TODO(@baba): Move checkbox + radiobuttons to form folder + rename file to RangeSlider.tsx and move to form folder
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { ComponentChildren } from "preact";
-import { formatNumberWithCommas } from "$lib/utils/formatUtils.ts";
+import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { handleIcon } from "$icon";
 import { labelLogicResponsive } from "$text";
 import { inputCheckbox } from "$form";

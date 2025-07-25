@@ -10,7 +10,7 @@
  */
 
 import type { BasicUTXO as BaseUTXO, Output, UTXO } from "$lib/types/index.d.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 
 // Extend BasicUTXO to include optional fields we need
 interface BasicUTXO extends BaseUTXO {

@@ -19,7 +19,7 @@ import {
   sortActions,
   sortStateReducer,
   validateSortKey,
-} from "$lib/utils/sorting/sortStateReducer.ts";
+} from "$lib/utils/data/sorting/sortStateReducer.ts";
 
 // ===== CONSTANTS =====
 

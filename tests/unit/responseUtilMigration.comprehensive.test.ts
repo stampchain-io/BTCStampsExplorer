@@ -9,8 +9,8 @@
  * the standardization migration.
  */
 
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";

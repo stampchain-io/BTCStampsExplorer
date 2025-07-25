@@ -1,10 +1,10 @@
+import { TX_CONSTANTS } from "$constants";
 import type { Output } from "$lib/types/index.d.ts";
-import { bytesToHex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
-import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
-import { getUTXOForAddress as getUTXOForAddressFromUtils } from "$lib/utils/utxoUtils.ts";
+import { bytesToHex, hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { estimateFee } from "$lib/utils/bitcoin/minting/feeCalculations.ts";
+import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
+import { getUTXOForAddress as getUTXOForAddressFromUtils } from "$lib/utils/bitcoin/utxo/utxoUtils.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";

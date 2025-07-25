@@ -5,13 +5,13 @@
  * @since 2024-01-07
  */
 
+import { ErrorDisplay } from "$islands/error/ErrorDisplay.tsx";
 import {
   ErrorHandlingUtils,
   ErrorInfo,
   ErrorType,
 } from "$lib/utils/errorHandlingUtils.ts";
 import { Component, type ComponentChildren } from "preact";
-import { ErrorDisplay } from "../error/ErrorDisplay.tsx";
 
 // ===== TYPES =====
 

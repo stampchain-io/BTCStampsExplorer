@@ -17,8 +17,8 @@ import {
   abbreviateAddress,
   formatSupplyValue,
   stripTrailingZeros,
-} from "$lib/utils/formatUtils.ts";
-import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
+} from "$lib/utils/ui/formatting/formatUtils.ts";
+import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 
 /* ===== TYPES ===== */
 interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {

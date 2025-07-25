@@ -9,7 +9,7 @@ import {
   getCurrentBlock,
   getRecommendedFees,
   getTransactionInfo,
-} from "$lib/utils/mempool.ts";
+} from "$lib/utils/bitcoin/network/mempool.ts";
 import { assert, assertEquals, assertExists } from "@std/assert";
 
 // Mock fetch responses for testing

@@ -1,5 +1,5 @@
 /* ===== ACTIVITY BADGE COMPONENT ===== */
-import { ActivityLevel } from "$lib/constants/activityLevels.ts";
+import { ActivityLevel } from "$constants";
 import type { ActivityLevel as ActivityLevelType } from "$types/marketData.d.ts";
 
 interface ActivityBadgeProps {

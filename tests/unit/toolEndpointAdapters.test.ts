@@ -20,7 +20,7 @@ import {
   SRC101ToolAdapter,
   SRC20ToolAdapter,
   StampToolAdapter,
-} from "$lib/utils/toolEndpointAdapters.ts";
+} from "$lib/utils/api/adapters/toolEndpointAdapters.ts";
 import { assertEquals, assertThrows } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 

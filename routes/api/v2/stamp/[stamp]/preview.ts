@@ -12,17 +12,17 @@
  * All images are output as 1200x1200 PNG with compression level 9
  */
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import {
   getOptimalLocalOptions,
   isLocalRenderingAvailable,
   renderHtmlSmart,
-} from "$lib/utils/localRenderer.ts";
+} from "$lib/utils/ui/rendering/localRenderer.ts";
 import {
   calculateSocialMediaDimensions,
   calculateSvgDimensions,
   getOptimalConversionOptions,
-} from "$lib/utils/svgUtils.ts";
+} from "$lib/utils/ui/rendering/svgUtils.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
 import { initWasm, Resvg } from "npm:@resvg/resvg-wasm@2.6.0";

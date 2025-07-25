@@ -1,5 +1,5 @@
 import type { FeeDetails } from "$lib/types/base.d.ts";
-import { debounce } from "$lib/utils/debounce.ts";
+import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger, type LogNamespace } from "$lib/utils/logger.ts";
 import { useEffect, useState } from "preact/hooks";
 

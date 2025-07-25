@@ -2,9 +2,9 @@ import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { SRC20Row } from "$globals";
 import { rowTable, Timeframe } from "$layout";
-import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { formatDate } from "$lib/utils/formatUtils.ts";
-import { constructStampUrl } from "$lib/utils/imageUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
+import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelSm, textSm, valueDark } from "$text";
 
 interface SRC20MintingTableProps {

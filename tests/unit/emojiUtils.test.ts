@@ -1,7 +1,7 @@
 import {
   emojiToUnicodeEscape,
   unicodeEscapeToEmoji,
-} from "$lib/utils/emojiUtils.ts";
+} from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { assertEquals } from "@std/assert";
 
 Deno.test("emojiUtils - emojiToUnicodeEscape", () => {

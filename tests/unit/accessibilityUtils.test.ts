@@ -5,7 +5,7 @@
 
 import { assertEquals } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
-import { AccessibilityUtils } from "$lib/utils/accessibilityUtils.ts";
+import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
 import { MockHTMLElement, withDOM } from "./utils/testHelpers.ts";
 
 describe("AccessibilityUtils", () => {

@@ -10,8 +10,8 @@ import {
   rowResponsiveForm,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/fee-estimation-utils.ts";
-import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
+import { stripTrailingZeros } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";

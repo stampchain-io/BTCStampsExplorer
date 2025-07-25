@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { debounce } from "$lib/utils/debounce.ts";
+import { debounce } from "$lib/utils/performance/debounce.ts";
 import { delay } from "@std/async/delay";
 
 Deno.test("debounce - delays function execution", async () => {

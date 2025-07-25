@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "@std/assert";
-import { filterOptions } from "$lib/utils/filterOptions.ts";
+import { filterOptions } from "$lib/utils/data/filtering/filterOptions.ts";
 
 Deno.test("filterOptions - has expected filter types", () => {
   const expectedTypes = ["vector", "pixel", "recursive", "audio", "encoding"];

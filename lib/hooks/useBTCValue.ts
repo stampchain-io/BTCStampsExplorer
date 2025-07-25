@@ -11,7 +11,7 @@ import {
   calculateTotalBTCValue,
   formatBTCValue,
   getBestPrice,
-} from "$lib/utils/btcCalculations.ts";
+} from "$lib/utils/bitcoin/calculations/btcCalculations.ts";
 import { useMemo } from "preact/hooks";
 
 /**

@@ -3,12 +3,12 @@
  * Refactored from static methods to injectable instance-based service
  */
 
-import { logger } from "$lib/utils/logger.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import {
   recordFallbackUsage,
   recordFeeFailure,
   recordFeeSuccess,
-} from "$lib/utils/monitoring.ts";
+} from "$lib/utils/monitoring/metrics/monitoring.ts";
 import { FeeSecurityService as _FeeSecurityService } from "$server/services/fee/feeSecurityService.ts";
 
 // Re-export the FeeData interface

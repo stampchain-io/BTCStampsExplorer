@@ -5,7 +5,7 @@
  * Fixed to work properly in CI with correct HTTP status expectations.
  */
 
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { assertEquals, assertExists } from "@std/assert";
 
@@ -443,7 +443,7 @@ Deno.test("ResponseUtil - simulate API route detection for coverage", () => {
 
 Deno.test("ApiResponseUtil - test all remaining methods for 100% coverage", async () => {
   // Import ApiResponseUtil directly since it's not exposed through ResponseUtil
-  const { ApiResponseUtil } = await import("$lib/utils/apiResponseUtil.ts");
+  const { ApiResponseUtil } = await import("$lib/utils/api/responses/apiResponseUtil.ts");
 
   // Test created method (201)
   const createdResponse = ApiResponseUtil.created({

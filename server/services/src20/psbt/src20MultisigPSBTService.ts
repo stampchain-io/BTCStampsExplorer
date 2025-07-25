@@ -36,10 +36,10 @@ if (!Deno.args.includes("build")) {
   };
 }
 
-import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import { arc4 } from "$lib/utils/minting/transactionUtils.ts";
+import { bin2hex, hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
+import { arc4 } from "$lib/utils/bitcoin/minting/transactionUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { SRC20CompressionService } from "$server/services/src20/compression/compressionService.ts";
 // Removed TransactionService import - using direct OptimalUTXOSelection instead
@@ -363,7 +363,7 @@ export class SRC20MultisigPSBTService {
         fee: fee.toString(),
         change: changeAmount.toString(),
         inputsToSign: inputs.map((_: any, index: any) => ({ index })),
-        estimatedTxSize: estimateTransactionSize({
+        estimatedTxSize: estimateMintingTransactionSize({
           inputs: inputs.map(_input => ({ type: "P2WPKH" as any })),
           outputs: vouts.map(() => ({ type: "P2WSH" as any })),
           includeChangeOutput: true,

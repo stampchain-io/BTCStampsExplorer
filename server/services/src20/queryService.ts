@@ -8,8 +8,8 @@ import {
   SRC20TrxRequestParams
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
-import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
-import { paginate } from "$lib/utils/paginationUtils.ts";
+import { stripTrailingZeros } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/core/blockService.ts";

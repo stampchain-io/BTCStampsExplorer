@@ -1,7 +1,7 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
-import { getRecommendedFees } from "$lib/utils/mempool.ts";
-import { loadFeeData, saveFeeData } from "$lib/utils/localStorage.ts";
+import { getRecommendedFees } from "$lib/utils/bitcoin/network/mempool.ts";
+import { loadFeeData, saveFeeData } from "$lib/utils/performance/storage/localStorage.ts";
 
 // Detect CI environment
 const isCI = Deno.env.get("CI") === "true" ||

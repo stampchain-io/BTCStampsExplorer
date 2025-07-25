@@ -1,4 +1,4 @@
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { TX_CONSTANTS } from "$lib/utils/bitcoin/minting/constants.ts";
 import { assertEquals } from "@std/assert";
 
 Deno.test("TX_CONSTANTS - base sizes", () => {

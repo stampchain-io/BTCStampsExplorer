@@ -1,5 +1,5 @@
 import { FreshContext } from "$fresh/server.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 
 // Route configuration constants
 const ROUTE_CONFIG = {

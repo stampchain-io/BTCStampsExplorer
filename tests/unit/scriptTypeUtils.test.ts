@@ -9,7 +9,7 @@ import {
   isP2WSH,
   isValidBitcoinAddress,
   validateWalletAddressForMinting,
-} from "$lib/utils/scriptTypeUtils.ts";
+} from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 
 Deno.test("scriptTypeUtils - isP2PKH", () => {
   // Valid P2PKH scripts

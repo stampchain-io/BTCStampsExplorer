@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { serverConfig } from "$server/config/config.ts";
 import type { ComposeDetachOptions } from "$server/services/counterparty/xcpManagerDI.ts";
 import {

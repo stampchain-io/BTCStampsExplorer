@@ -8,7 +8,10 @@ import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { containerBackground } from "$layout";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
-import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { tooltipIcon } from "$notification";
 import { headingGreyLD, textXs, titleGreyLD } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";

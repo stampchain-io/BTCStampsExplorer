@@ -1,6 +1,9 @@
 /* ===== SALES ACTIVITY FEED COMPONENT ===== */
 import { Icon, LoadingIcon } from "$icon";
-import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { subtitlePurple, titlePurpleDL } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 import { useEffect, useState } from "preact/hooks";

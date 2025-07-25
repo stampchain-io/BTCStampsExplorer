@@ -6,12 +6,12 @@
  */
 
 import { type WalletSortKey } from "$lib/types/sorting.d.ts";
-import { SortStorage } from "$lib/utils/sorting/localStorage.ts";
+import { SortStorage } from "$lib/utils/data/sorting/localStorage.ts";
 import {
   createInitialSortState,
   sortActions,
   sortStateReducer,
-} from "$lib/utils/sorting/sortStateReducer.ts";
+} from "$lib/utils/data/sorting/sortStateReducer.ts";
 import { assert, assertEquals, assertExists } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 

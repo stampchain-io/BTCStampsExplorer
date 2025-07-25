@@ -84,6 +84,8 @@ export function createMockStampMarketData(
     cpid: "A111111111111111",
     floorPriceBTC: null,
     recentSalePriceBTC: null,
+    lastPriceBTC: 0,
+    walletValueBTC: 0,
     openDispensersCount: 0,
     closedDispensersCount: 0,
     totalDispensersCount: 0,

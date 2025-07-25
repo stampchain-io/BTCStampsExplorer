@@ -5,7 +5,7 @@ import {
   formatBTC,
   formatMarketCap,
   formatVolume,
-} from "$lib/utils/formatUtils.ts";
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { containerBackground } from "$layout";
 import { labelSm, valueSm } from "$text";
 

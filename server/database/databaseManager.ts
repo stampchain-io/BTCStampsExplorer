@@ -1,14 +1,14 @@
 import "$/server/config/env.ts";
 
-import { bigIntReviver, bigIntSerializer } from "$/lib/utils/formatUtils.ts";
 import { getDatabaseConfig, logDatabaseConfig, validateDatabaseConfig, type DatabaseConfig as DBPoolConfig } from "$/server/config/database.config.ts";
+import { bigIntReviver, bigIntSerializer } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { crypto } from "@std/crypto";
 import {
-    ConsoleHandler,
-    FileHandler,
-    getLogger,
-    LogRecord,
-    setup,
+  ConsoleHandler,
+  FileHandler,
+  getLogger,
+  LogRecord,
+  setup,
 } from "@std/log";
 import { Client } from "mysql/mod.ts";
 // Conditionally import Redis based on build mode

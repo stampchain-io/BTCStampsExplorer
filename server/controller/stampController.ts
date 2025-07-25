@@ -5,21 +5,21 @@ import {
   STAMP_TYPES, StampBalance, StampRow, SUBPROTOCOLS
 } from "$globals";
 import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$constants";
-import { filterOptions } from "$lib/utils/filterOptions.ts";
+import { filterOptions } from "$lib/utils/data/filtering/filterOptions.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { CollectionController } from "./collectionController.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
-// import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts"; // Fixed: Removed unused import
-import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { decodeBase64 } from "$lib/utils/formatUtils.ts";
-import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
-import { isCpid } from "$lib/utils/identifierUtils.ts";
-import { detectContentType, getMimeType } from "$lib/utils/imageUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+// import { formatSatoshisToBTC } from "$lib/utils/ui/formatting/formatUtils.ts"; // Fixed: Removed unused import
+import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { decodeBase64 } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
+import { isCpid } from "$lib/utils/data/identifiers/identifierUtils.ts";
+import { detectContentType, getMimeType } from "$lib/utils/ui/media/imageUtils.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 

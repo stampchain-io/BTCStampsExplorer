@@ -1,5 +1,5 @@
 import { assertEquals, assertInstanceOf } from "@std/assert";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 
 Deno.test("responseUtil - success creates Response", () => {
   const data = { message: "Success" };

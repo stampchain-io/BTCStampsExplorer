@@ -3,7 +3,7 @@ import {
   clearCSRFTokenCache,
   getCSRFToken,
   makeAuthenticatedRequest,
-} from "$lib/utils/clientSecurityUtils.ts";
+} from "$lib/utils/security/clientSecurityUtils.ts";
 
 // Mock fetch for testing
 function mockFetch(response: any, ok = true, status = 200) {

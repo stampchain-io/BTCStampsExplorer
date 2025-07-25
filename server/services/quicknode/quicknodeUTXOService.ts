@@ -1,5 +1,5 @@
 import { UTXO } from "$lib/types/index.d.ts";
-import { bytesToHex } from "$lib/utils/binary/baseUtils.ts"; // For logging/comparison
+import { bytesToHex } from "$lib/utils/data/binary/baseUtils.ts"; // For logging/comparison
 import { SATOSHIS_PER_BTC } from "$constants"; // Import for conversion
 import { CachedQuicknodeRPCService } from "$server/services/quicknode/cachedQuicknodeRpcService.ts";
 import { address as bjsAddress, networks as bjsNetworks } from "bitcoinjs-lib"; // For toOutputScript & network

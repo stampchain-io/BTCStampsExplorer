@@ -8,8 +8,8 @@ import { unisatProvider } from "$client/wallet/unisat.ts";
 import { closeForegroundModal, closeModal } from "$islands/modal/states.ts";
 import { containerCard } from "$layout";
 import { WALLET_PROVIDERS, WalletProviderKey } from "$constants";
-import type { BaseToast } from "$lib/utils/toastSignal.ts";
-import { showToast } from "$lib/utils/toastSignal.ts";
+import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */

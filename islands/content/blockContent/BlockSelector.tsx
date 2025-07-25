@@ -1,6 +1,9 @@
 /* ===== BLOCK SELECTOR COMPONENT ===== */
 import type { Signal } from "@preact/signals";
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatDate,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { BlockRow } from "$globals";
 
 /* ===== TYPES ===== */

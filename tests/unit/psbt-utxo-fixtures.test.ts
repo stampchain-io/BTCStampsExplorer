@@ -2,6 +2,7 @@
 // Tests bitcoinjs-lib v7.0.0-rc.0 compatibility with bigint values
 // Validates all Bitcoin script types with comprehensive test coverage
 
+import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
 import { DatabaseManager } from "$server/database/databaseManager.ts";
 import { assertEquals, assertExists, assertThrows } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
@@ -32,12 +33,7 @@ interface MockPSBTService {
   validateInputs(inputs: MockPSBTInput[]): boolean;
 }
 
-// Test utilities
-function hex2bin(hex: string): Uint8Array {
-  return new Uint8Array(
-    hex.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)),
-  );
-}
+// Test utilities - removed duplicate hex2bin function, now imported from baseUtils
 
 function createMockPSBTInput(fixture: UTXOFixture): MockPSBTInput {
   const input: MockPSBTInput = {
@@ -523,4 +519,4 @@ describe("PSBT UTXO Fixtures Test Suite", () => {
 });
 
 // Export test utilities for use in other test files
-export { createMockPSBTInput, hex2bin, MockPSBTService };
+export { createMockPSBTInput, MockPSBTService };

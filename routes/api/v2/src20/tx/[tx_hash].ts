@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { AddressHandlerContext, SRC20TrxRequestParams } from "$globals";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import {
   DEFAULT_PAGINATION,
   validateSortParam,

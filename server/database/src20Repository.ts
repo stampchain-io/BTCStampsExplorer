@@ -4,8 +4,8 @@ import {
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "$constants";
-import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { bigFloatToString } from "$lib/utils/formatUtils.ts";
+import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
+import { bigFloatToString } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 

@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { TXError } from "$globals";
-import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";

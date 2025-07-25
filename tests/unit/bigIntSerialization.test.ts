@@ -1,4 +1,7 @@
-import { bigIntReviver, bigIntSerializer } from "$/lib/utils/formatUtils.ts";
+import {
+  bigIntReviver,
+  bigIntSerializer,
+} from "$lib/utils/ui/formatting/formatUtils.ts";
 import { assertEquals } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 
