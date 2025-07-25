@@ -1,7 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { TransactionService } from "$server/services/transaction/index.ts";
+import {
+  createBitcoinTransactionBuilder,
+} from "$server/services/transaction/index.ts";
 
 interface CreatePSBTInput {
   utxo: string;
@@ -42,7 +44,8 @@ export const handler: Handlers = {
       // Create PSBT with validated inputs
 
       // Create PSBT
-      const psbtHex = await TransactionService.BitcoinTransactionBuilder
+      const builder = createBitcoinTransactionBuilder();
+      const psbtHex = await builder
         .createPSBT(
           utxo,
           salePrice,
