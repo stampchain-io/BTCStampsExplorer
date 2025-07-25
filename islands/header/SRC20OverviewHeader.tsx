@@ -7,9 +7,9 @@ import { useCallback, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface SRC20OverviewHeaderProps {
-  onViewTypeChange?: () => void;
+  onViewTypeChange?: (viewType: string) => void;
   viewType: "minted" | "minting";
-  onTimeframeChange?: (timeframe: string) => void;
+  onTimeframeChange?: (timeframe: "24H" | "7D" | "30D") => void;
   onFilterChange?: (filter: string, direction?: "asc" | "desc") => void;
   currentSort?: {
     filter: string | null;
@@ -31,17 +31,18 @@ export const SRC20OverviewHeader = (
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>("24H");
 
   // 🚀 PREACT OPTIMIZATION: Memoized handlers
-  const handleViewTypeClick = useCallback(() => {
+  const handleViewTypeClick = useCallback((viewType: string) => {
     // Reset timeframe to default when switching views
     setSelectedTimeframe("24H");
     onTimeframeChange?.("24H");
-    onViewTypeChange?.();
+    // Pass the new view type to the parent component
+    onViewTypeChange?.(viewType);
   }, [onViewTypeChange, onTimeframeChange]);
 
   const handleTimeframeClick = useCallback(
     (timeframe: string) => {
       setSelectedTimeframe(timeframe);
-      onTimeframeChange?.(timeframe);
+      onTimeframeChange?.(timeframe as "24H" | "7D" | "30D");
     },
     [onTimeframeChange],
   );
@@ -87,7 +88,7 @@ export const SRC20OverviewHeader = (
               { value: "listings", label: "LISTINGS", disabled: true },
             ]}
             value={viewType}
-            onChange={() => handleViewTypeClick()}
+            onChange={handleViewTypeClick}
             size="sm"
             color="purple"
             className="w-full mobileMd:w-auto"

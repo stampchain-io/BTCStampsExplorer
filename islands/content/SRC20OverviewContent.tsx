@@ -87,16 +87,13 @@ export function SRC20OverviewContent({
   };
 
   // Handle view type changes
-  const handleViewTypeChange = () => {
-    // 🎸 MINTING BUTTON: Toggle between minted and minting views
+  const handleViewTypeChange = (viewType: string) => {
+    // 🎸 MINTING BUTTON: Use the provided view type instead of toggling
     setIsNavigating(true);
 
     if (typeof globalThis !== "undefined" && globalThis?.location) {
       const url = new URL(globalThis.location.href);
-      const currentViewType = url.searchParams.get("viewType") || "minting";
-      const newViewType = currentViewType === "minting" ? "minted" : "minting";
-
-      url.searchParams.set("viewType", newViewType);
+      url.searchParams.set("viewType", viewType);
       url.searchParams.set("page", "1"); // Reset to page 1 when view changes
 
       // Create anchor element with f-partial attribute for Fresh.js navigation
