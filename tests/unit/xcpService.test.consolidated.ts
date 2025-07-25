@@ -3,14 +3,14 @@ import { dbManager } from "$server/database/databaseManager.ts";
 import {
   type ComposeAttachOptions,
   type ComposeDetachOptions,
-  DispenserManager,
+  CounterpartyDispenserService,
   fetchXcpV2WithCache,
   type IssuanceOptions,
   normalizeFeeRate,
   xcp_v2_nodes,
   type XcpBalanceOptions,
-  XcpManager,
-} from "$server/services/xcpService.ts";
+  CounterpartyApiManager,
+} from "$server/services/counterpartyApiService.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import {
   assertEquals,
@@ -324,7 +324,7 @@ describe("xcpService", () => {
     });
   });
 
-  describe("DispenserManager", () => {
+  describe("CounterpartyDispenserService", () => {
     beforeEach(() => {
       // Stub dbManager.handleCache to pass through the function
       dbManagerStub = stub(
@@ -356,7 +356,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await DispenserManager.getDispensersByCpid(
+        const result = await CounterpartyDispenserService.getDispensersByCpid(
           "A4399874976698242000",
           1,
           10,
@@ -395,7 +395,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await DispenserManager.getDispensersByCpid(
+        const result = await CounterpartyDispenserService.getDispensersByCpid(
           "A4399874976698242000",
           1,
           10,
@@ -441,7 +441,7 @@ describe("xcpService", () => {
           },
         );
 
-        const result = await DispenserManager.getDispensersByCpid(
+        const result = await CounterpartyDispenserService.getDispensersByCpid(
           "A4399874976698242000",
           1,
           100,
@@ -473,7 +473,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await DispenserManager.getDispensersByCpid(
+        const result = await CounterpartyDispenserService.getDispensersByCpid(
           "A4399874976698242000",
         );
 
@@ -505,7 +505,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await DispenserManager.getDispensesByCpid(
+        const result = await CounterpartyDispenserService.getDispensesByCpid(
           "A4399874976698242000",
           1,
           10,
@@ -535,7 +535,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await DispenserManager.getDispensesByCpid(
+        const result = await CounterpartyDispenserService.getDispensesByCpid(
           "A4399874976698242000",
         );
 
@@ -544,7 +544,7 @@ describe("xcpService", () => {
     });
   });
 
-  describe("XcpManager", () => {
+  describe("CounterpartyApiManager", () => {
     beforeEach(() => {
       // Stub dbManager.handleCache to pass through the function
       dbManagerStub = stub(
@@ -570,7 +570,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.getXcpAsset("A4399874976698242000");
+        const result = await CounterpartyApiManager.getXcpAsset("A4399874976698242000");
 
         assertEquals(result, xcpServiceFixtures.assets.stamps[0]);
       });
@@ -583,7 +583,7 @@ describe("xcpService", () => {
         );
 
         await assertRejects(
-          () => XcpManager.getXcpAsset("A4399874976698242000"),
+          () => CounterpartyApiManager.getXcpAsset("A4399874976698242000"),
           Error,
           "Invalid response for asset A4399874976698242000",
         );
@@ -614,7 +614,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.getAllXcpHoldersByCpid(
+        const result = await CounterpartyApiManager.getAllXcpHoldersByCpid(
           "A4399874976698242000",
           1,
           10,
@@ -649,7 +649,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.getAllXcpHoldersByCpid(
+        const result = await CounterpartyApiManager.getAllXcpHoldersByCpid(
           "A4399874976698242000",
           1,
           10,
@@ -682,7 +682,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.getXcpBalancesByAddress("bc1qtest123");
+        const result = await CounterpartyApiManager.getXcpBalancesByAddress("bc1qtest123");
 
         assertEquals(result.balances.length, 1);
         assertEquals(result.balances[0].address, "bc1qtest123");
@@ -713,7 +713,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.getXcpBalancesByAddress(
+        const result = await CounterpartyApiManager.getXcpBalancesByAddress(
           "bc1qtest123",
           undefined,
           true,
@@ -751,7 +751,7 @@ describe("xcpService", () => {
           verbose: true,
         };
 
-        await XcpManager.getXcpBalancesByAddress(
+        await CounterpartyApiManager.getXcpBalancesByAddress(
           "bc1qtest123",
           undefined,
           false,
@@ -791,7 +791,7 @@ describe("xcpService", () => {
           },
         );
 
-        const result = await XcpManager.getAllXcpBalancesByAddress("bc1qwhale");
+        const result = await CounterpartyApiManager.getAllXcpBalancesByAddress("bc1qwhale");
 
         assertEquals(result.balances.length, 5000);
         assertEquals(result.total, 5000);
@@ -820,7 +820,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.getXcpBalancesByAddress("bc1q1");
+        const result = await CounterpartyApiManager.getXcpBalancesByAddress("bc1q1");
 
         // Should maintain separate entries with unique keys
         assertEquals(result.balances.length, 3);
@@ -844,7 +844,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.getXcpBalancesByAddress("bc1q1");
+        const result = await CounterpartyApiManager.getXcpBalancesByAddress("bc1q1");
 
         // Zero quantity balances should be filtered out
         assertEquals(result.balances.length, 1);
@@ -875,7 +875,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.createSend(
+        const result = await CounterpartyApiManager.createSend(
           "bc1qtest",
           "bc1qdest",
           "ASSET",
@@ -899,7 +899,7 @@ describe("xcpService", () => {
         );
 
         const specialMemo = "Test 🚀 memo with émojis & special chars!";
-        await XcpManager.createSend(
+        await CounterpartyApiManager.createSend(
           "bc1qtest",
           "bc1qdest",
           "ASSET",
@@ -926,7 +926,7 @@ describe("xcpService", () => {
             ),
         );
 
-        await XcpManager.createIssuance(
+        await CounterpartyApiManager.createIssuance(
           "bc1qtest",
           "NEWASSET",
           100,
@@ -953,7 +953,7 @@ describe("xcpService", () => {
         );
 
         const maxEscrow = Number.MAX_SAFE_INTEGER;
-        await XcpManager.composeDispenser(
+        await CounterpartyApiManager.composeDispenser(
           "bc1qtest",
           "ASSET",
           1,
@@ -989,7 +989,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.getAssetInfo("ASSET");
+        const result = await CounterpartyApiManager.getAssetInfo("ASSET");
 
         assertEquals(result.description.length, 10000);
       });
@@ -1017,7 +1017,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.getAssetInfo("A95428956661682177");
+        const result = await CounterpartyApiManager.getAssetInfo("A95428956661682177");
 
         assertEquals(result.asset, "A95428956661682177");
       });
@@ -1046,7 +1046,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.fetchDispenseEvents();
+        const result = await CounterpartyApiManager.fetchDispenseEvents();
 
         // Should only return valid events
         assertEquals(result.length, 1);
@@ -1074,7 +1074,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.fetchDispenseEvents();
+        const result = await CounterpartyApiManager.fetchDispenseEvents();
 
         assertEquals(result[0].params.btc_amount, 21000000); // Converted to BTC
       });
@@ -1091,7 +1091,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.checkHealth();
+        const result = await CounterpartyApiManager.checkHealth();
 
         assertEquals(result, false);
       });
@@ -1114,7 +1114,7 @@ describe("xcpService", () => {
             ),
         );
 
-        const result = await XcpManager.checkHealth();
+        const result = await CounterpartyApiManager.checkHealth();
 
         assertEquals(result, true);
       });
@@ -1137,7 +1137,7 @@ describe("xcpService", () => {
         );
 
         await assertRejects(
-          () => XcpManager.createSend("bc1q", "bc1q", "ASSET", 1),
+          () => CounterpartyApiManager.createSend("bc1q", "bc1q", "ASSET", 1),
           Error,
         );
       });

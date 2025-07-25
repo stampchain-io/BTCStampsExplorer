@@ -3,8 +3,8 @@ import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import {
   ComposeAttachOptions,
   normalizeFeeRate,
-  XcpManager,
-} from "$server/services/xcpService.ts";
+  CounterpartyApiManager,
+} from "$server/services/counterpartyApiService.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { serverConfig } from "$server/config/config.ts"; // Import serverConfig
 import { Buffer } from "node:buffer";
@@ -84,7 +84,7 @@ export const handler: Handlers = {
         return_psbt: false, // Explicitly ask for raw tx from XCP Manager
         verbose: true,
         // Pass a fee_per_kb if CP API needs it for composition, even if we recalculate later.
-        // Using the normalized one, XcpManager.composeAttach expects fee_per_kb.
+        // Using the normalized one, CounterpartyApiManager.composeAttach expects fee_per_kb.
         fee_per_kb: normalizedFees.normalizedSatsPerKB,
       };
       // Remove options that should not be passed directly or are handled differently now
@@ -92,7 +92,7 @@ export const handler: Handlers = {
       delete xcpApiCallOptions.service_fee;
       delete xcpApiCallOptions.service_fee_address;
 
-      const cpResult = await XcpManager.composeAttach(
+      const cpResult = await CounterpartyApiManager.composeAttach(
         address,
         cpid,
         quantity,

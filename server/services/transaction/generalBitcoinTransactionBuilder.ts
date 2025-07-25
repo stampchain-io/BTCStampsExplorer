@@ -15,7 +15,7 @@ import { extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import type { ScriptType, UTXO } from "$types/index.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
@@ -346,7 +346,7 @@ export class GeneralBitcoinTransactionBuilder {
     // Filter stamp UTXOs if requested
     if (filterStampUTXOs) {
       try {
-        const stampBalances = await XcpManager.getXcpBalancesByAddress(address, undefined, true);
+        const stampBalances = await CounterpartyApiManager.getXcpBalancesByAddress(address, undefined, true);
         const utxosToExcludeFromStamps = new Set<string>();
         for (const balance of stampBalances.balances) {
           if (balance.utxo) {

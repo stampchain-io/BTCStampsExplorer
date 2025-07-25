@@ -11,7 +11,7 @@ import {
 } from "$globals";
 import { StampRepository } from "$server/database/index.ts";
 import { BlockService } from "$server/services/blockService.ts";
-import { DispenserManager, XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyDispenserService, CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
@@ -72,7 +72,7 @@ export class StampService {
       }
 
       // Get asset details from XCP
-      const asset = await XcpManager.getAssetInfo(stamp.cpid);
+      const asset = await CounterpartyApiManager.getAssetInfo(stamp.cpid);
 
       return {
         stamp,
@@ -519,7 +519,7 @@ export class StampService {
     options: StampServiceOptions
   ) {
     const { duration } = getCacheConfig(options.cacheType);
-    return await XcpManager.getAllXcpHoldersByCpid(cpid, page, limit, duration);
+    return await CounterpartyApiManager.getAllXcpHoldersByCpid(cpid, page, limit, duration);
   }
 
   static async getStampSends(
@@ -529,7 +529,7 @@ export class StampService {
     options: StampServiceOptions
   ) {
     const { duration } = getCacheConfig(options.cacheType);
-    return await XcpManager.getXcpSendsByCPID(cpid, page, limit, duration);
+    return await CounterpartyApiManager.getXcpSendsByCPID(cpid, page, limit, duration);
   }
 
   static async getStampDispensers(
@@ -540,9 +540,9 @@ export class StampService {
   ) {
     const { duration } = getCacheConfig(options?.cacheType || RouteType.STAMP_DISPENSER);
     if (page !== undefined && limit !== undefined) {
-      return await DispenserManager.getDispensersByCpid(cpid, page, limit, duration);
+      return await CounterpartyDispenserService.getDispensersByCpid(cpid, page, limit, duration);
     }
-    return await DispenserManager.getDispensersByCpid(cpid);
+    return await CounterpartyDispenserService.getDispensersByCpid(cpid);
   }
 
   static async getStampDispenses(
@@ -552,7 +552,7 @@ export class StampService {
     options: StampServiceOptions
   ) {
     const { duration } = getCacheConfig(options.cacheType);
-    return await DispenserManager.getDispensesByCpid(cpid, page, limit, duration);
+    return await CounterpartyDispenserService.getDispensesByCpid(cpid, page, limit, duration);
   }
 
   // New lightweight method to just get cpid

@@ -4,7 +4,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import { normalizeFeeRate } from "$server/services/xcpService.ts";
+import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
 import type { ScriptType } from "$types/index.d.ts";
 
 interface EstimateRequest {

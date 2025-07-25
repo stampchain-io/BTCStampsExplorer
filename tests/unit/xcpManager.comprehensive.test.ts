@@ -1,5 +1,5 @@
 /**
- * @fileoverview Comprehensive tests for XcpManagerDI with mocked dependencies
+ * @fileoverview Comprehensive tests for CounterpartyApiManagerDI with mocked dependencies
  * Tests all XCP operations, node failover, caching, and error scenarios
  */
 
@@ -7,7 +7,7 @@ import { assertEquals, assertRejects } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { MockXcpProvider } from "$server/services/xcp/xcpManagerDI.ts";
 
-describe("XcpManagerDI", () => {
+describe("CounterpartyApiManagerDI", () => {
   let mockProvider: MockXcpProvider;
 
   beforeEach(() => {

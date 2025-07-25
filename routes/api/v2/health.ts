@@ -5,7 +5,7 @@ import { circuitBreakerDbManager } from "$server/database/circuitBreakerDatabase
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { StampService } from "$server/services/stampService.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 
 interface HealthStatus {
   status: "OK" | "ERROR";
@@ -67,7 +67,7 @@ export const handler: Handlers = {
         getCurrentBlock(),
         StampService.countTotalStamps(),
         SRC20Repository.checkSrc20Deployments(),
-        XcpManager.checkHealth(30), // 30 seconds cache for health checks (was 30000ms)
+        CounterpartyApiManager.checkHealth(30), // 30 seconds cache for health checks (was 30000ms)
       ]);
 
       // Update service statuses

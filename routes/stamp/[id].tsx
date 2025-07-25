@@ -4,7 +4,7 @@ import { StampRow } from "$globals";
 import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { DispenserManager } from "$server/services/xcpService.ts";
+import { CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { DOMParser } from "dom";
 import { body, gapSectionSlim } from "$layout";
@@ -101,7 +101,7 @@ export const handler: Handlers<StampData> = {
         stampData.data.stamp.ident === "SRC-721"
       ) {
         // Fetch dispensers separately for display on detail page
-        const dispensersData = await DispenserManager.getDispensersByCpid(
+        const dispensersData = await CounterpartyDispenserService.getDispensersByCpid(
           stampData.data.stamp.cpid,
         );
         dispensers = dispensersData?.dispensers || [];

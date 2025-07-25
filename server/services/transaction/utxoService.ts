@@ -1,7 +1,7 @@
 import { logger } from "$lib/utils/logger.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import type { BasicUTXO, Output, UTXO } from "$types/index.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 
@@ -48,7 +48,7 @@ export class UTXOService {
     if (options.filterStampUTXOs) {
       try {
         logger.debug("transaction-utxo-service", { message: "Filtering stamp UTXOs from basic list", address });
-        const stampBalances = await XcpManager.getXcpBalancesByAddress(
+        const stampBalances = await CounterpartyApiManager.getXcpBalancesByAddress(
           address,
           undefined,
           true,

@@ -338,7 +338,7 @@ const MockBlockService = {
   },
 };
 
-const MockXcpManager = {
+const MockCounterpartyApiManager = {
   async getAssetInfo(cpid: string, _duration: number) {
     await Promise.resolve();
     if (cpid === "notfound") {
@@ -400,7 +400,7 @@ const MockXcpManager = {
   },
 };
 
-const MockDispenserManager = {
+const MockCounterpartyDispenserService = {
   async getDispensersByCpid(cpid: string, _page?: number, _limit?: number) {
     await Promise.resolve();
     if (cpid === "error") {
@@ -514,7 +514,7 @@ class TestStampService {
         };
       }
 
-      const asset = await MockXcpManager.getAssetInfo(stamp.cpid, 300);
+      const asset = await MockCounterpartyApiManager.getAssetInfo(stamp.cpid, 300);
 
       return {
         stamp,
@@ -753,7 +753,7 @@ class TestStampService {
     limit: number,
     _options: any,
   ) {
-    return await MockXcpManager.getAllXcpHoldersByCpid(cpid, page, limit, 300);
+    return await MockCounterpartyApiManager.getAllXcpHoldersByCpid(cpid, page, limit, 300);
   }
 
   static async getStampSends(
@@ -762,7 +762,7 @@ class TestStampService {
     limit: number,
     _options: any,
   ) {
-    return await MockXcpManager.getXcpSendsByCPID(cpid, page, limit, 300);
+    return await MockCounterpartyApiManager.getXcpSendsByCPID(cpid, page, limit, 300);
   }
 
   static async getStampDispensers(
@@ -772,9 +772,9 @@ class TestStampService {
     _options?: any,
   ) {
     if (page !== undefined && limit !== undefined) {
-      return await MockDispenserManager.getDispensersByCpid(cpid, page, limit);
+      return await MockCounterpartyDispenserService.getDispensersByCpid(cpid, page, limit);
     }
-    return await MockDispenserManager.getDispensersByCpid(cpid);
+    return await MockCounterpartyDispenserService.getDispensersByCpid(cpid);
   }
 
   static async getStampDispenses(
@@ -783,7 +783,7 @@ class TestStampService {
     limit: number,
     _options: any,
   ) {
-    return await MockDispenserManager.getDispensesByCpid(
+    return await MockCounterpartyDispenserService.getDispensesByCpid(
       cpid,
       page,
       limit,

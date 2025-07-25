@@ -5,7 +5,7 @@ import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts"
 import { extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
 import { getScriptTypeInfo, validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { formatPsbtForLogging } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import type { ScriptType } from "$types/index.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
@@ -15,7 +15,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { UTXOService } from "$server/services/transaction/utxoService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { normalizeFeeRate } from "$server/services/xcpService.ts";
+import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
 import type { UTXO } from "$types/index.d.ts";
 
 export class StampMintService {
@@ -654,7 +654,7 @@ export class StampMintService {
       }
 
       // Use the new V2 API call
-      const response = await XcpManager.createIssuance(
+      const response = await CounterpartyApiManager.createIssuance(
         sourceWallet,
         assetName,
         qty,

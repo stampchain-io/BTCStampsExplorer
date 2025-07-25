@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { GeneralBitcoinTransactionBuilder } from "$server/services/transaction/generalBitcoinTransactionBuilder.ts";
-import { normalizeFeeRate, XcpManager } from "$server/services/xcpService.ts";
+import { normalizeFeeRate, CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 
 export const handler: Handlers = {
   async POST(req) {
@@ -43,7 +43,7 @@ export const handler: Handlers = {
         delete xcpApiOptions.service_fee_address; // Not for XCP API call
 
         // ✅ NEW CLEAN PATTERN: Get raw hex instead of PSBT
-        const response = await XcpManager.composeFairmint(
+        const response = await CounterpartyApiManager.composeFairmint(
           address,
           asset,
           quantity,

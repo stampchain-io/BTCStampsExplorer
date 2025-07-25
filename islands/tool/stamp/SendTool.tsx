@@ -318,7 +318,7 @@ export function StampSendTool() {
             return_psbt: true,
             fee_per_kb: feeRateKB,
             allow_unconfirmed_inputs: true, // Or your preferred setting
-            // Add other necessary options based on XcpManager.composeSend or similar
+            // Add other necessary options based on CounterpartyApiManager.composeSend or similar
           },
         };
 

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Dependency-Injected XcpManager with abstracted dependencies
+ * @fileoverview Dependency-Injected CounterpartyApiManager with abstracted dependencies
  * Enables better testing, flexibility, and maintainability
  */
 
@@ -9,7 +9,7 @@ import type { XcpBalance } from "$types/index.d.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 
 // Core configuration interface
-export interface XcpManagerConfig {
+export interface CounterpartyApiManagerConfig {
   nodes: Array<{
     name: string;
     url: string;
@@ -21,11 +21,11 @@ export interface XcpManagerConfig {
 }
 
 // Dependencies interface
-export interface XcpManagerDependencies {
+export interface CounterpartyApiManagerDependencies {
   httpClient: HttpClient;
   cacheService: CacheService;
   logger: LoggerService;
-  config: XcpManagerConfig;
+  config: CounterpartyApiManagerConfig;
 }
 
 // Logger interface for dependency injection
@@ -124,7 +124,7 @@ export interface IssuanceOptions {
 }
 
 // Default configuration
-const DEFAULT_CONFIG: Partial<XcpManagerConfig> = {
+const DEFAULT_CONFIG: Partial<CounterpartyApiManagerConfig> = {
   nodes: [
     {
       name: "counterparty.io",
@@ -141,11 +141,11 @@ const DEFAULT_CONFIG: Partial<XcpManagerConfig> = {
   requestTimeout: 30000,
 };
 
-export class XcpManagerDI {
-  private config: XcpManagerConfig;
+export class CounterpartyApiManagerDI {
+  private config: CounterpartyApiManagerConfig;
 
-  constructor(private dependencies: XcpManagerDependencies) {
-    this.config = { ...DEFAULT_CONFIG, ...dependencies.config } as XcpManagerConfig;
+  constructor(private dependencies: CounterpartyApiManagerDependencies) {
+    this.config = { ...DEFAULT_CONFIG, ...dependencies.config } as CounterpartyApiManagerConfig;
     
     // Validate configuration
     if (!this.config.nodes || this.config.nodes.length === 0) {
@@ -358,7 +358,7 @@ export class XcpManagerDI {
     }
 
     await this.dependencies.logger.debug("api", {
-        message: "[XcpManagerDI] Fetching balances",
+        message: "[CounterpartyApiManagerDI] Fetching balances",
         endpoint,
         params: Object.fromEntries(defaultParams),
         address
@@ -428,7 +428,7 @@ export class XcpManagerDI {
         }
 
         await this.dependencies.logger.debug("api", {
-            message: "[XcpManagerDI] Balances fetched",
+            message: "[CounterpartyApiManagerDI] Balances fetched",
             balancesCount: balances.length,
             total,
             nextCursor: response.next_cursor,
@@ -465,7 +465,7 @@ export class XcpManagerDI {
       for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
         try {
           await this.dependencies.logger.info("api", {
-          message: "[XcpManagerDI] Starting balance fetch attempt",
+          message: "[CounterpartyApiManagerDI] Starting balance fetch attempt",
           attempt: attempt + 1,
           maxRetries: MAX_RETRIES,
           address,
@@ -507,7 +507,7 @@ export class XcpManagerDI {
           }
 
           await this.dependencies.logger.debug("api", {
-            message: "[XcpManagerDI] Pagination progress",
+            message: "[CounterpartyApiManagerDI] Pagination progress",
             currentCount: allBalances.length,
             expectedTotal,
             cursor,
@@ -530,7 +530,7 @@ export class XcpManagerDI {
 
           // Return results if successful
           await this.dependencies.logger.info("api", {
-            message: "[XcpManagerDI] Successfully fetched balances",
+            message: "[CounterpartyApiManagerDI] Successfully fetched balances",
             finalCount: allBalances.length,
             expectedTotal,
             address
@@ -540,7 +540,7 @@ export class XcpManagerDI {
         } catch (attemptError) {
           lastError = attemptError instanceof Error ? attemptError : new Error(String(attemptError));
           await this.dependencies.logger.warn("api", {
-            message: "[XcpManagerDI] Balance fetch attempt failed",
+            message: "[CounterpartyApiManagerDI] Balance fetch attempt failed",
             attempt: attempt + 1,
             maxRetries: MAX_RETRIES,
             error: lastError.message,
@@ -859,7 +859,7 @@ export class XcpManagerDI {
     }
 
     await this.dependencies.logger.debug("api", {
-        message: "[XcpManagerDI.composeAttach] Calling Counterparty API",
+        message: "[CounterpartyApiManagerDI.composeAttach] Calling Counterparty API",
         endpoint,
         queryParams: queryParams.toString()
     });
@@ -869,7 +869,7 @@ export class XcpManagerDI {
 
     if (response.error || !response.result) {
         await this.dependencies.logger.error("api", {
-            message: "[XcpManagerDI.composeAttach] Error from Counterparty API",
+            message: "[CounterpartyApiManagerDI.composeAttach] Error from Counterparty API",
             error: response.error,
             result: response.result
         });
@@ -877,7 +877,7 @@ export class XcpManagerDI {
     }
 
     await this.dependencies.logger.debug("api", {
-        message: "[XcpManagerDI.composeAttach] Response from Counterparty API",
+        message: "[CounterpartyApiManagerDI.composeAttach] Response from Counterparty API",
         result: response.result
     });
     return response.result;
@@ -1004,7 +1004,7 @@ export class XcpManagerDI {
   /**
    * Get configuration information (safe for logging)
    */
-  getConfig(): Omit<XcpManagerConfig, 'nodes'> & { nodeCount: number } {
+  getConfig(): Omit<CounterpartyApiManagerConfig, 'nodes'> & { nodeCount: number } {
     const { nodes, ...safeConfig } = this.config;
     return {
       ...safeConfig,
