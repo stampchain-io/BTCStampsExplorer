@@ -1,4 +1,4 @@
-import { buttonStyles } from "$button";
+import { color, padding, pillSize, state } from "$button";
 import { glassmorphism } from "$layout";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
@@ -92,28 +92,11 @@ export const SelectorButtons = ({
     onChange?.(optionValue);
   }, [disabledProp, options, onChange]);
 
-  // Size classes
-  const padding = {
-    xs: "py-[5px] px-[14px]",
-    sm: "py-[7px] px-4",
-    md: "py-[9px] px-4",
-    lg: "py-[11px] px-4",
+  // Use imported color from buttonStyles (needs the css variables)
+  const colorVariants = {
+    grey: color.grey,
+    purple: color.purple,
   };
-
-  const textSize = {
-    xs: `text-xs ${padding.xs}`,
-    sm: `text-xs ${padding.sm}`,
-    md: `text-sm ${padding.md}`,
-    lg: `text-sm ${padding.lg}`,
-  };
-
-  // Use color from buttonStyles
-  const color = {
-    grey: buttonStyles.color.grey,
-    purple: buttonStyles.color.purple,
-  };
-
-  const disabled = "opacity-30 !cursor-not-allowed";
 
   // Helper function to determine if an option is disabled
   const isOptionDisabled = useCallback((option: SelectorOption) => {
@@ -125,8 +108,8 @@ export const SelectorButtons = ({
       ref={containerRef}
       class={`relative grid p-0.5 select-none
         ${glassmorphism}
-        ${color[colorProp]}
-        ${disabledProp ? disabled : ""}
+        ${colorVariants[colorProp]}
+        ${disabledProp ? state.disabled : ""}
         ${className}
       `}
       style={{
@@ -157,8 +140,8 @@ export const SelectorButtons = ({
             key={option.value}
             ref={(el) => (optionRefs.current[index] = el)}
             class={`
-              relative min-w-0 cursor-pointer
-              ${optionDisabled ? "cursor-not-allowed" : ""}
+              relative min-w-0
+              ${optionDisabled ? state.disabled : "cursor-pointer"}
             `}
           >
             <input
@@ -169,7 +152,7 @@ export const SelectorButtons = ({
               checked={selectedValue === option.value}
               disabled={optionDisabled}
               onChange={() => handleOptionChange(option.value)}
-              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              class="absolute inset-0 w-full h-full opacity-0"
             />
             <label
               for={`selector-${option.value}`}
@@ -177,13 +160,13 @@ export const SelectorButtons = ({
                 relative block z-20
                 font-semibold text-center
                 transition-all duration-200 ease-in-out
-                ${textSize[size]}
+                ${pillSize[size]}
                 ${
                 selectedValue === option.value
-                  ? "text-black cursor-default"
-                  : "text-[var(--color-dark)] hover:text-[var(--color-light)] cursor-pointer"
+                  ? "text-black"
+                  : "text-[var(--color-dark)] hover:text-[var(--color-light)]"
               }
-                ${optionDisabled ? disabled : ""}
+                ${optionDisabled ? state.disabled : "cursor-pointer"}
               `}
             >
               <span class="block relative z-20">
