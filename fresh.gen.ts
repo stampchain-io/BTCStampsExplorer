@@ -147,8 +147,6 @@ import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
-import * as $WIP_FilterOld from "./islands/WIP/FilterOld.tsx";
-import * as $WIP_test_ReviewDogTest from "./islands/WIP/test/ReviewDogTest.tsx";
 import * as $badge_ActivityBadge from "./islands/badge/ActivityBadge.tsx";
 import * as $badge_index from "./islands/badge/index.ts";
 import * as $button_ConnectButton from "./islands/button/ConnectButton.tsx";
@@ -475,8 +473,6 @@ const manifest = {
   islands: {
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
-    "./islands/WIP/FilterOld.tsx": $WIP_FilterOld,
-    "./islands/WIP/test/ReviewDogTest.tsx": $WIP_test_ReviewDogTest,
     "./islands/badge/ActivityBadge.tsx": $badge_ActivityBadge,
     "./islands/badge/index.ts": $badge_index,
     "./islands/button/ConnectButton.tsx": $button_ConnectButton,
