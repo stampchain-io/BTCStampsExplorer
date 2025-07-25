@@ -65,7 +65,7 @@ export const handler: Handlers = {
           );
         }
 
-        // ✅ NEW: Use GeneralPSBTService instead of deprecated processCounterpartyPSBT
+        // ✅ NEW: Use GeneralBitcoinTransactionBuilder instead of deprecated processCounterpartyPSBT
         const serviceFeeInput = service_fee !== undefined
           ? service_fee
           : parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS, 10);

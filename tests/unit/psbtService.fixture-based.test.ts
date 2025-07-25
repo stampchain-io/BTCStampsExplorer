@@ -67,7 +67,7 @@ const mockDependencies = {
 import {
   createPSBTService,
   formatPsbtForLogging,
-} from "$server/services/transaction/psbtService.ts";
+} from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 
 describe("PSBTService with Fixture-Based Mocks", {
   sanitizeOps: false,
