@@ -17,7 +17,8 @@ export const handler: Handlers = {
 
       // Complete PSBT with specified fee rate
 
-      const completedPsbtHex = await TransactionService.PSBTService
+      const completedPsbtHex = await TransactionService
+        .BitcoinTransactionBuilder
         .completePSBT(
           sellerPsbtHex,
           buyerUtxo,
