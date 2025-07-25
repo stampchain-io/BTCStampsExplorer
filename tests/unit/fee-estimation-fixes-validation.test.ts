@@ -8,8 +8,8 @@
  * 4. End-to-end wallet flow (23.4)
  */
 
+import { TransactionConstructionService } from "$lib/utils/minting/TransactionConstructionService.ts";
 import { assertEquals, assertExists, assertGreaterOrEqual } from "@std/assert";
-import { TransactionConstructionService } from "../../lib/utils/minting/TransactionConstructionService.ts";
 
 // Test wallet with known UTXO for validation
 const TEST_WALLET = "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";

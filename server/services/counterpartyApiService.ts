@@ -1,7 +1,7 @@
 // TODO(@team): Move to /server
 
 import type { Fairminter } from "$lib/types/services.d.ts";
-import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
+import { SATS_PER_KB_MULTIPLIER } from "$constants";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";

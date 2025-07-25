@@ -2,9 +2,9 @@
 // Tests all CIP33 functionality with fixtures and mocking for complete coverage
 // Validates base64/hex conversion, address generation, bech32 encoding/decoding
 
+import { CIP33 } from "$lib/utils/minting/olga/CIP33.ts";
 import { assertEquals, assertExists, assertThrows } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
-import { CIP33 } from "../../lib/utils/minting/olga/CIP33.ts";
 
 // Test fixtures for CIP33 functionality
 const testFixtures = {

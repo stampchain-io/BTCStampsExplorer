@@ -7,7 +7,7 @@ import { Setting } from "$islands/datacontrol/Setting.tsx";
 // AjaxStampGallery has been replaced with FreshStampGallery for Fresh.js partial navigation
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { NOT_AVAILABLE_IMAGE } from "$constants";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { createPaginationHandler } from "$lib/utils/freshNavigationUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";

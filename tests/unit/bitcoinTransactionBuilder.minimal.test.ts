@@ -2,11 +2,11 @@
 // Tests formatting function with fixtures
 // Uses bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m address fixtures
 
+import { formatPsbtForLogging } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { assertEquals } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
-import { Buffer } from "node:buffer";
 import { networks, Psbt } from "bitcoinjs-lib";
-import { formatPsbtForLogging } from "../../server/services/transaction/bitcoinTransactionBuilder.ts";
+import { Buffer } from "node:buffer";
 
 // Test address
 const TEST_ADDRESS = "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";

@@ -4,10 +4,10 @@
  */
 
 import {
-  assertEquals,
-  assertExists,
-  assertRejects,
-  assertThrows,
+    assertEquals,
+    assertExists,
+    assertRejects,
+    assertThrows,
 } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { Buffer } from "node:buffer";
@@ -22,21 +22,21 @@ Deno.env.set("SKIP_DB_CONNECTION", "true");
 Deno.env.set("DENO_ENV", "test");
 
 import {
-  BitcoinTransactionBuilder,
-  type BitcoinTransactionBuilderDependencies,
-  createBitcoinTransactionBuilder,
-} from "../../server/services/transaction/bitcoinTransactionBuilder.ts";
+    BitcoinTransactionBuilder,
+    type BitcoinTransactionBuilderDependencies,
+    createBitcoinTransactionBuilder,
+} from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import {
-  clearMockResponses,
-  MockCommonUTXOService,
-  setMockTransactionHex,
-  setMockUTXOResponse as setMockCommonUTXOResponse,
+    clearMockResponses,
+    MockCommonUTXOService,
+    setMockUTXOResponse as setMockCommonUTXOResponse,
+    setMockTransactionHex,
 } from "../mocks/CommonUTXOService.mock.ts";
 import { clearMockUTXOResponses } from "../mocks/utxoUtils.mock.ts";
 import {
-  createMockAddressTestData,
-  createMockNetworks,
+    createMockAddressTestData,
+    createMockNetworks,
 } from "./utils/testFactories.ts";
 
 // Use the mock Psbt type for formatPsbtForLogging

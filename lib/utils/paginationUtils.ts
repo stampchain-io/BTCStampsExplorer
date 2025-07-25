@@ -1,6 +1,6 @@
 import { PaginationQueryParams } from "$lib/types/pagination.d.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { MAX_PAGINATION_LIMIT } from "$lib/utils/constants.ts";
+import { MAX_PAGINATION_LIMIT } from "$constants";
 
 export function getPaginationParams(
   url: URL,

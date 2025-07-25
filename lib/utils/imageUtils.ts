@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 import { StampRow } from "$globals";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { NOT_AVAILABLE_IMAGE } from "$constants";
 
 /**
  * Get the base URL for the current environment

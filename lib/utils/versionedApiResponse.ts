@@ -1,6 +1,6 @@
-import { ApiResponseOptions, ApiResponseUtil } from "./apiResponseUtil.ts";
-import { transformResponseForVersion } from "../../server/middleware/schemaTransformer.ts";
 import { FreshContext } from "$fresh/server.ts";
+import { transformResponseForVersion } from "$server/middleware/schemaTransformer.ts";
+import { ApiResponseOptions, ApiResponseUtil } from "./apiResponseUtil.ts";
 
 /**
  * Versioned API Response Utility

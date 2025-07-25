@@ -1,0 +1,57 @@
+/* ===== WALLET PROVIDER CONSTANTS ===== */
+
+/**
+ * Supported wallet provider keys for Bitcoin wallet connections
+ */
+export type WalletProviderKey =
+  | "unisat"
+  | "leather"
+  | "okx"
+  | "tapwallet"
+  | "phantom"
+  | "horizon";
+
+/**
+ * Default wallet connectors available in the application
+ */
+export const DEFAULT_WALLET_CONNECTORS: WalletProviderKey[] = [
+  "unisat",
+  "leather",
+  "okx",
+  "tapwallet",
+  "phantom",
+  "horizon",
+];
+
+/**
+ * Wallet provider configuration with display names and logo paths
+ */
+export const WALLET_PROVIDERS: Record<
+  WalletProviderKey,
+  { name: string; logo: string }
+> = {
+  unisat: {
+    name: "Unisat",
+    logo: "/img/wallet/unisat/logo_unisat.png",
+  },
+  leather: {
+    name: "Leather",
+    logo: "/img/wallet/leather/logo_leather.svg",
+  },
+  okx: {
+    name: "OKX",
+    logo: "/img/wallet/okx/logo_okx.svg",
+  },
+  tapwallet: {
+    name: "Universe",
+    logo: "/img/wallet/tapwallet/logo_tapwallet.png",
+  },
+  phantom: {
+    name: "Phantom",
+    logo: "/img/wallet/phantom/logo_phantom.svg",
+  },
+  horizon: {
+    name: "Horizon",
+    logo: "/img/wallet/horizon/logo_horizon.svg",
+  },
+};

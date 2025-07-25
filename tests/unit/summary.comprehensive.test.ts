@@ -4,8 +4,8 @@
  * Ensures CI compatibility with proper fixtures and no external dependencies
  */
 
+import { summarize_issuances } from "$server/database/summary.ts";
 import { assertEquals } from "@std/assert";
-import { summarize_issuances } from "../../server/database/summary.ts";
 import type { StampRow } from "../../globals.d.ts";
 
 // Helper function to create mock StampRow data

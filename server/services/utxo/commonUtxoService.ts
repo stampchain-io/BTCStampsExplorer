@@ -1,5 +1,5 @@
 import { UTXO } from "$lib/types/base.d.ts";
-import { BLOCKSTREAM_API_BASE_URL, MEMPOOL_API_BASE_URL } from "$lib/utils/constants.ts";
+import { BLOCKSTREAM_API_BASE_URL, MEMPOOL_API_BASE_URL } from "$constants";
 import { logger } from "$lib/utils/logger.ts";
 import { detectScriptType } from "$lib/utils/scriptTypeUtils.ts";
 import {

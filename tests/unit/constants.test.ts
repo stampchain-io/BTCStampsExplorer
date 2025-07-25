@@ -32,7 +32,7 @@ import {
   SUPPORTED_UNICODE_FROM_INDEXER_CODE,
   WALLET_PROVIDERS,
   type WalletProviderKey,
-} from "$lib/utils/constants.ts";
+} from "$constants";
 import { assert, assertEquals } from "@std/assert";
 
 Deno.test("constants - breakpoints", () => {

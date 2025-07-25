@@ -1,4 +1,4 @@
-import { COINGECKO_API_BASE_URL } from "$lib/utils/constants.ts";
+import { COINGECKO_API_BASE_URL } from "$constants";
 
 async function fetchRealApiResponses() {
   console.log("🚀 Fetching real API responses for BTC price fixtures...\n");

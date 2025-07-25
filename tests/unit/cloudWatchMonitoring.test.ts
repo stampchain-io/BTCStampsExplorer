@@ -1,11 +1,11 @@
 // tests/unit/cloudWatchMonitoring.test.ts
+import {
+    type BusinessMetrics,
+    cloudWatchMonitoring,
+} from "$server/services/aws/cloudWatchMonitoring.ts";
+import { ecsDetection } from "$server/services/aws/ecsDetection.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { afterAll, beforeAll, describe, it } from "@std/testing/bdd";
-import {
-  type BusinessMetrics,
-  cloudWatchMonitoring,
-} from "../../server/services/aws/cloudWatchMonitoring.ts";
-import { ecsDetection } from "../../server/services/aws/ecsDetection.ts";
 
 describe("CloudWatch Monitoring Service", () => {
   // Store original interval functions to restore later

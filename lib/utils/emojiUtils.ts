@@ -1,4 +1,4 @@
-import { SUPPORTED_UNICODE_FROM_INDEXER_CODE } from "$lib/utils/constants.ts";
+import { SUPPORTED_UNICODE_FROM_INDEXER_CODE } from "$constants";
 // Format the unicode string and create a Set of supported emoji code points
 const formattedString =
   SUPPORTED_UNICODE_FROM_INDEXER_CODE.replace(/U/g, "\\u{") + "}";

@@ -1,5 +1,5 @@
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { assertEquals, assertExists } from "@std/assert";
-import { CommonUTXOService } from "../../server/services/utxo/commonUtxoService.ts";
 
 // Test address with known UTXOs for integration testing
 const TEST_ADDRESS = "bc1qnpszanef2ed9yxtqndvyxy72tdmnks6m28rn3d";

@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
+import { CAROUSEL_STAMP_IDS } from "$constants";
 
 export const handler: Handlers = {
   async GET(_req, _ctx) {
