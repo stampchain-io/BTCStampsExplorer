@@ -1,9 +1,9 @@
 import { BitcoinTransactionBuilder } from "./bitcoinTransactionBuilder.ts";
-import { UTXOService as UTXOServiceClass } from "./utxoService.ts";
+import { BitcoinUtxoManager } from "./bitcoinUtxoManager.ts";
 
-export { BitcoinTransactionBuilder, UTXOServiceClass as UTXOService };
+export { BitcoinTransactionBuilder, BitcoinUtxoManager };
 
 export class TransactionService {
-  static readonly utxoServiceInstance = new UTXOServiceClass();
+  static readonly utxoServiceInstance = new BitcoinUtxoManager();
   static readonly BitcoinTransactionBuilder = BitcoinTransactionBuilder;
 }

@@ -19,7 +19,7 @@ Deno.env.set("DENO_ENV", "test");
 Deno.env.set("SKIP_EXTERNAL_APIS", "true");
 
 // Import the real UTXOService
-import { UTXOService } from "../../server/services/transaction/utxoService.ts";
+import { BitcoinUtxoManager } from "../../server/services/transaction/bitcoinUtxoManager.ts";
 
 // Mock dependencies at the module level
 const mockCommonUtxoService = {
