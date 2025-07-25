@@ -1,6 +1,6 @@
 // routes/api/v2/create/send.ts
 import { Handlers } from "$fresh/server.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { Buffer } from "node:buffer";
 import { networks, Psbt, Transaction } from "bitcoinjs-lib";
@@ -24,8 +24,8 @@ interface SendRequestBody {
     memo?: string;
     memo_is_hex?: boolean;
     encoding?: string;
-    // Options for XcpManager.createSend
-    fee_per_kb?: number; // XcpManager.createSend might take this for CP API
+    // Options for CounterpartyApiManager.createSend
+    fee_per_kb?: number; // CounterpartyApiManager.createSend might take this for CP API
     return_psbt?: boolean; // Should be false for this flow
   };
   dryRun?: boolean; // Dry run will be complex with this model, deferring full implementation
@@ -86,7 +86,7 @@ export const handler: Handlers<SendResponse | { error: string }> = {
         });
       }
 
-      // Options for XcpManager.createSend to get the raw transaction
+      // Options for CounterpartyApiManager.createSend to get the raw transaction
       // Counterparty's create_send might require a fee parameter.
       // We pass satsPerVB (converted to fee_per_kb if needed by createSend options) so CP can build its tx.
       // The fee it calculates is implicit in its rawtransaction.
@@ -94,8 +94,8 @@ export const handler: Handlers<SendResponse | { error: string }> = {
         encoding: options.encoding || "opreturn",
         return_psbt: false, // Explicitly ask for raw tx, not PSBT from CP
         verbose: true,
-        // Pass fee info if XcpManager.createSend expects it for the CP API call
-        // Assuming XcpManager.createSend handles conversion if CP API needs fee_per_kb
+        // Pass fee info if CounterpartyApiManager.createSend expects it for the CP API call
+        // Assuming CounterpartyApiManager.createSend handles conversion if CP API needs fee_per_kb
         fee_per_kb: options.fee_per_kb ||
           (satsPerVB
             ? satsPerVB * (TX_CONSTANTS as any).APPROX_VBYTES_PER_KB / 1000
@@ -105,9 +105,9 @@ export const handler: Handlers<SendResponse | { error: string }> = {
       if (options.memo_is_hex !== undefined) {
         xcpCreateSendOptions.memo_is_hex = options.memo_is_hex;
       }
-      // Add any other options XcpManager.createSend would pass to Counterparty API
+      // Add any other options CounterpartyApiManager.createSend would pass to Counterparty API
 
-      const cpResponse = await XcpManager.createSend(
+      const cpResponse = await CounterpartyApiManager.createSend(
         address,
         destination,
         asset,
@@ -121,14 +121,14 @@ export const handler: Handlers<SendResponse | { error: string }> = {
       ) {
         await logger.error("api", {
           message:
-            "[API /send] Error or no rawtransaction from XcpManager.createSend",
+            "[API /send] Error or no rawtransaction from CounterpartyApiManager.createSend",
           error: cpResponse.error,
           result: cpResponse.result,
         });
         throw new Error(
           cpResponse.error?.message || cpResponse.error?.description ||
             cpResponse.error ||
-            "Failed to get raw transaction from XcpManager.createSend.",
+            "Failed to get raw transaction from CounterpartyApiManager.createSend.",
         );
       }
 

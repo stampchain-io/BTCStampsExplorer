@@ -12,7 +12,7 @@ import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 import { SRC20PSBTService } from "../../server/services/src20/psbt/src20PSBTService.ts";
 import { CommonUTXOService } from "../../server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "../../server/services/utxo/optimalUtxoSelection.ts";
-import { XcpManager } from "../../server/services/xcpService.ts";
+import { CounterpartyApiManager } from "../../server/services/counterpartyApiService.ts";
 
 // Valid raw transaction hex for testing
 const validRawTxHex =
@@ -64,9 +64,9 @@ describe("SRC20 PSBT Services - New Architecture", () => {
           }),
       );
 
-      // Mock XcpManager to avoid external calls
+      // Mock CounterpartyApiManager to avoid external calls
       stub(
-        XcpManager,
+        CounterpartyApiManager,
         "getXcpBalancesByAddress",
         () => Promise.resolve({ balances: [], total: 0 }),
       );
@@ -118,9 +118,9 @@ describe("SRC20 PSBT Services - New Architecture", () => {
           }),
       );
 
-      // Mock XcpManager to avoid external calls
+      // Mock CounterpartyApiManager to avoid external calls
       stub(
-        XcpManager,
+        CounterpartyApiManager,
         "getXcpBalancesByAddress",
         () => Promise.resolve({ balances: [], total: 0 }),
       );
@@ -228,7 +228,7 @@ describe("SRC20 PSBT Services - New Architecture", () => {
       );
 
       stub(
-        XcpManager,
+        CounterpartyApiManager,
         "getXcpBalancesByAddress",
         () => Promise.resolve({ balances: [], total: 0 }),
       );

@@ -28,7 +28,7 @@ import { StatusMessages } from "$notification";
 import {
   ComposeAttachOptions,
   normalizeFeeRate,
-} from "$server/services/xcpService.ts";
+} from "$server/services/counterpartyApiService.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
 
 /* ===== CONSTANTS ===== */

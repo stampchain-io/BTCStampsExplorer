@@ -120,7 +120,7 @@ const mockCommonUtxoService = {
   },
 };
 
-const mockXcpManager = {
+const mockCounterpartyApiManager = {
   getXcpBalancesByAddress: (
     address: string,
     _assets?: any,
@@ -222,7 +222,7 @@ class MockUTXOService {
 
     if (options.filterStampUTXOs) {
       try {
-        const stampBalances = await mockXcpManager.getXcpBalancesByAddress(
+        const stampBalances = await mockCounterpartyApiManager.getXcpBalancesByAddress(
           address,
           undefined,
           true,

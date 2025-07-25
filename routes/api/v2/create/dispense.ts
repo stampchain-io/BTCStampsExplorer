@@ -4,7 +4,7 @@ import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { BitcoinTransactionBuilder } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 
 interface DispenseInput {
   address: string;
@@ -73,7 +73,7 @@ export const handler: Handlers = {
 
         // normalizeFeeRate itself throws if neither is provided, which is good.
         // We just need to ensure the object passed is clean for exactOptionalPropertyTypes.
-        normalizedFees = XcpManager.normalizeFeeRate(feeArgsInput);
+        normalizedFees = CounterpartyApiManager.normalizeFeeRate(feeArgsInput);
 
         if (!normalizedFees || normalizedFees.normalizedSatsPerVB <= 0) {
           return ApiResponseUtil.badRequest(
@@ -88,10 +88,10 @@ export const handler: Handlers = {
         );
       }
 
-      // Prepare options for XcpManager.createDispense
-      // Only include options relevant to XcpManager.createDispense and use correct param names
+      // Prepare options for CounterpartyApiManager.createDispense
+      // Only include options relevant to CounterpartyApiManager.createDispense and use correct param names
       const xcpDispenseCallOpts = {
-        // Spread known & safe options from clientOptions if needed by XcpManager.createDispense
+        // Spread known & safe options from clientOptions if needed by CounterpartyApiManager.createDispense
         allow_unconfirmed_inputs: clientOptions.allow_unconfirmed_inputs ??
           true,
         validate: clientOptions.validate ?? true,
@@ -99,25 +99,25 @@ export const handler: Handlers = {
         sat_per_vbyte: normalizedFees.normalizedSatsPerVB,
         return_psbt: false, // We need raw tx hex
         // `regular_dust_size` is deprecated and removed.
-        // Add other specific options XcpManager.createDispense might expect from clientOptions if any.
+        // Add other specific options CounterpartyApiManager.createDispense might expect from clientOptions if any.
       };
 
       try {
-        // Call XcpManager.createDispense
-        const xcpResponse = await XcpManager.createDispense(
+        // Call CounterpartyApiManager.createDispense
+        const xcpResponse = await CounterpartyApiManager.createDispense(
           buyerAddress, // Source for XCP (often buyer if they pay fees)
           dispenser, // Dispenser ID
           dispenserPaymentAmountSat, // BTC quantity buyer pays TO dispenser
           xcpDispenseCallOpts,
         );
         console.log(
-          "[Dispense Route] Response from XcpManager:",
+          "[Dispense Route] Response from CounterpartyApiManager:",
           JSON.stringify(xcpResponse, null, 2),
         );
 
         if (!xcpResponse || xcpResponse.error) {
           console.error(
-            "[Dispense Route] Error from XcpManager or no response.",
+            "[Dispense Route] Error from CounterpartyApiManager or no response.",
             xcpResponse?.error,
           );
           return ApiResponseUtil.badRequest(

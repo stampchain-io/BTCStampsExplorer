@@ -21,7 +21,7 @@ import { detectContentType, getMimeType } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 import { RouteType } from "$server/services/cacheService.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 
 export class StampController {
   static async getStamps({
@@ -354,7 +354,7 @@ export class StampController {
       // Only enrich with asset info for detail pages
       const stamp = stampResult.stamps[0];
       if (stamp && (stamp.ident === "STAMP" || stamp.ident === "SRC-721")) {
-        const asset = await XcpManager.getAssetInfo(stamp.cpid);
+        const asset = await CounterpartyApiManager.getAssetInfo(stamp.cpid);
         processedStamps = [this.enrichStampWithAssetData(stamp, asset)];
       }
     }
@@ -496,7 +496,7 @@ export class StampController {
     sortBy: "ASC" | "DESC" = "DESC"
   ): Promise<PaginatedStampBalanceResponseBody> {
     try {
-      const { balances: xcpBalances, total: xcpTotal } = await XcpManager.getAllXcpBalancesByAddress(
+      const { balances: xcpBalances, total: xcpTotal } = await CounterpartyApiManager.getAllXcpBalancesByAddress(
         address,
         false
       );
@@ -995,7 +995,7 @@ export class StampController {
         options
       });
 
-      const dispensersData = await XcpManager.getDispensersByAddress(address, {
+      const dispensersData = await CounterpartyApiManager.getDispensersByAddress(address, {
         verbose: true,
         page,
         limit,

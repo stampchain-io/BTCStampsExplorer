@@ -115,7 +115,7 @@ const mockCommonUtxoService = {
   },
 };
 
-const mockXcpManager = {
+const mockCounterpartyApiManager = {
   getXcpBalancesByAddress: (
     address: string,
     _assets?: any,
@@ -145,7 +145,7 @@ const mockXcpManager = {
 
 // Mock the dependencies before creating UTXOService instance
 (globalThis as any).mockCommonUtxoService = mockCommonUtxoService;
-(globalThis as any).mockXcpManager = mockXcpManager;
+(globalThis as any).mockCounterpartyApiManager = mockCounterpartyApiManager;
 
 Deno.test("UTXOService - Real Production Code Coverage", async (t) => {
   await t.step(

@@ -216,7 +216,7 @@ export const mockCollectionService = {
 // XCP MANAGER MOCKS
 // =============================================================================
 
-export const mockXcpManager = {
+export const mockCounterpartyApiManager = {
   getAllXcpBalancesByAddress: (address: string, normalized: boolean = false) =>
     Promise.resolve({
       balances: [createMockXcpBalance({ address })],
@@ -245,7 +245,7 @@ export const applyV23TestMocks = (customMocks: any = {}) => {
     mockStampController,
     mockStampRepository,
     mockCollectionService,
-    mockXcpManager,
+    mockCounterpartyApiManager,
     ...customMocks,
   });
 };

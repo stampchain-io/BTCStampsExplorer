@@ -1,5 +1,5 @@
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { validateRequiredParams } from "$server/services/routeValidationService.ts";
 
@@ -17,7 +17,7 @@ export async function handler(req: Request): Promise<Response> {
       return paramsValidation.error!;
     }
 
-    const { balances: stampBalance } = await XcpManager.getXcpBalancesByAddress(
+    const { balances: stampBalance } = await CounterpartyApiManager.getXcpBalancesByAddress(
       address!,
       undefined, // cpid
       utxoOnly,
