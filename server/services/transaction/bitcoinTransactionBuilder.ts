@@ -11,7 +11,7 @@ import { Buffer } from "node:buffer";
 const { Psbt, Transaction, payments, networks, address: bjsAddress } = bitcoin;
 
 // Define interfaces for dependency injection
-export interface PSBTServiceDependencies {
+export interface BitcoinTransactionBuilderDependencies {
   getUTXOForAddress: typeof getUTXOForAddressFromUtils;
   estimateFee: typeof estimateFee;
   commonUtxoService: CommonUTXOService;
@@ -38,11 +38,11 @@ export function formatPsbtForLogging(psbt: InstanceType<typeof Psbt>) {
 }
 
 // Implementation class with dependency injection support
-export class PSBTServiceImpl {
-  private dependencies: PSBTServiceDependencies;
+export class BitcoinTransactionBuilderImpl {
+  private dependencies: BitcoinTransactionBuilderDependencies;
   private bitcoin: typeof import("bitcoinjs-lib");
 
-  constructor(dependencies: PSBTServiceDependencies) {
+  constructor(dependencies: BitcoinTransactionBuilderDependencies) {
     this.dependencies = dependencies;
     // Use injected bitcoin lib or fallback to default import
     this.bitcoin = dependencies.bitcoin || bitcoin;
@@ -324,30 +324,26 @@ export class PSBTServiceImpl {
   }
 }
 
-export class PSBTService {
+export class BitcoinTransactionBuilder {
   private static commonUtxoService = new CommonUTXOService();
 
   // Dependency injection support
-  private static customInstance: PSBTServiceImpl | null = null;
+  private static customInstance: BitcoinTransactionBuilderImpl | null = null;
 
-  static setInstance(instance: PSBTServiceImpl) {
-    PSBTService.customInstance = instance;
-  }
-
-  static resetInstance() {
-    PSBTService.customInstance = null;
+  static setInstance(instance: BitcoinTransactionBuilderImpl) {
+    BitcoinTransactionBuilder.customInstance = instance;
   }
 
   // @ts-ignore - Method is used internally
-  private static getInstance(): PSBTServiceImpl {
-    if (PSBTService.customInstance) {
-      return PSBTService.customInstance;
+  private static getInstance(): BitcoinTransactionBuilderImpl {
+    if (BitcoinTransactionBuilder.customInstance) {
+      return BitcoinTransactionBuilder.customInstance;
     }
     // Return default instance with current dependencies
-    return new PSBTServiceImpl({
+    return new BitcoinTransactionBuilderImpl({
       getUTXOForAddress: getUTXOForAddressFromUtils,
       estimateFee,
-      commonUtxoService: PSBTService.commonUtxoService,
+      commonUtxoService: BitcoinTransactionBuilder.commonUtxoService,
     });
   }
 
@@ -359,7 +355,7 @@ export class PSBTService {
     const [txid, voutStr] = utxo.split(":");
     const vout = parseInt(voutStr, 10);
 
-    const network = PSBTService.getAddressNetwork(sellerAddress);
+    const network = BitcoinTransactionBuilder.getAddressNetwork(sellerAddress);
     const psbt = new Psbt({ network });
 
     // Fetch specific UTXO details (no ancestor info needed)
@@ -400,7 +396,7 @@ export class PSBTService {
       value: salePriceSats,
     });
 
-    const addressType = PSBTService.getAddressType(sellerAddress, network);
+    const addressType = BitcoinTransactionBuilder.getAddressType(sellerAddress, network);
 
     if (addressType === 'p2sh-p2wpkh') {
       const p2wpkh = payments.p2wpkh({ address: sellerAddress, network });
@@ -537,7 +533,7 @@ export class PSBTService {
   ): Promise<string> {
     console.log(`Starting completePSBT with feeRate: ${feeRate} sat/vB`);
 
-    const network = PSBTService.getAddressNetwork(buyerAddress);
+    const network = BitcoinTransactionBuilder.getAddressNetwork(buyerAddress);
 
     // Parse the seller's PSBT
     const psbt = Psbt.fromHex(sellerPsbtHex, { network });
@@ -561,7 +557,7 @@ export class PSBTService {
       throw new Error("Seller's witnessUtxo not found");
     }
 
-    const sellerAddress = PSBTService.getAddressFromScript(
+    const sellerAddress = BitcoinTransactionBuilder.getAddressFromScript(
       new Uint8Array(sellerWitnessUtxo.script), // Be explicit with Uint8Array
       network
     );
@@ -1075,8 +1071,8 @@ export class PSBTService {
 }
 
 // Export function to create instance with custom dependencies for testing
-export function createPSBTService(dependencies: Partial<PSBTServiceDependencies> = {}): PSBTServiceImpl {
-  return new PSBTServiceImpl({
+export function createPSBTService(dependencies: Partial<BitcoinTransactionBuilderDependencies> = {}): BitcoinTransactionBuilderImpl {
+  return new BitcoinTransactionBuilderImpl({
     getUTXOForAddress: dependencies.getUTXOForAddress || getUTXOForAddressFromUtils,
     estimateFee: dependencies.estimateFee || estimateFee,
     commonUtxoService: dependencies.commonUtxoService || CommonUTXOService.getInstance(),
