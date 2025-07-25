@@ -61,33 +61,32 @@ export const ToggleButton = ({
     const isSelected = isOptionSelected(option);
     const isDisabled = disabledOptions.includes(option);
 
-    // Handle disabled options with 50% opacity and disabled cursor
     if (isDisabled) {
       const color = mode === "single" ? "grey" : "greyDark";
       return `${
-        button("outlineFlatSelector", color, size)
-      } opacity-50 cursor-not-allowed`;
+        button("outlineFlat", color, size)
+      } opacity-30 cursor-not-allowed`;
     }
 
     // Choose variant and color based on selection state and mode
     if (isSelected) {
       if (mode === "single") {
-        // Single select: use flatOutlineSelector for selected state (grey) with default cursor (can't be deselected)
-        return `${button("flatOutlineSelector", "grey", size)} cursor-default ${
+        // Single select: use flatOutline for selected state (grey) with default cursor (can't be deselected)
+        return `${button("flatOutline", "grey", size)} cursor-default ${
           !canHoverSelected ? "pointer-events-none" : ""
         }`;
       } else {
-        // Multi select: use flatOutlineSelector for selected state (purple)
+        // Multi select: use flatOutline for selected state
         // Special case for "dispensers" - show default cursor since it can't be deselected
-        const cursorClass = option === "dispensers" ? "cursor-default" : "";
-        return `${
-          button("flatOutlineSelector", "greyDark", size)
-        } ${cursorClass}`;
+        const cursorClass = option === "dispensers"
+          ? "cursor-default [&:hover]:!bg-[var(--default-color)] [&:hover]:!border-[var(--default-color)] [&:hover]:!text-black"
+          : "";
+        return `${button("flatOutline", "greyDark", size)} ${cursorClass}`;
       }
     } else {
-      // Unselected state: use outlineFlatSelector
+      // Unselected state: use outlineFlat
       const color = mode === "single" ? "grey" : "greyDark";
-      return `${button("outlineFlatSelector", color, size)} ${
+      return `${button("outlineFlat", color, size)} ${
         !canHoverSelected
           ? "hover:bg-transparent hover:border-[var(--default-color)] hover:text-[var(--default-color)]"
           : ""
