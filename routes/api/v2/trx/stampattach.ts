@@ -6,10 +6,10 @@ import type {
   ScriptTypeInfo,
 } from "$lib/types/transaction.d.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
-import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { estimateMintingTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
+import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
+import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { serverConfig } from "$server/config/config.ts"; // Import serverConfig
 import { StampController } from "$server/controller/stampController.ts";
 import {

@@ -33,12 +33,10 @@ export function base64ToHex(base64: string): string {
 }
 
 export function hexToBase64(hex: string): string {
-  // Maintain CIP33's original behavior: throw on empty hex strings
+  // Maintain CIP33 compatibility: empty hex should throw TypeError
   if (hex === "") {
-    const bytes = new Uint8Array(
-      hex.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)),
-    );
-    return bytesToBase64(bytes);
+    // Simulate the original CIP33 behavior where match returns null and map throws
+    throw new TypeError("Cannot read properties of null (reading 'map')");
   }
   return bytesToBase64(hexToBytes(hex));
 }
