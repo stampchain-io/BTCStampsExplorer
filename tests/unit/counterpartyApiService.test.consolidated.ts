@@ -3,13 +3,13 @@ import { dbManager } from "$server/database/databaseManager.ts";
 import {
   type ComposeAttachOptions,
   type ComposeDetachOptions,
+  CounterpartyApiManager,
   CounterpartyDispenserService,
   fetchXcpV2WithCache,
   type IssuanceOptions,
   normalizeFeeRate,
   xcp_v2_nodes,
   type XcpBalanceOptions,
-  CounterpartyApiManager,
 } from "$server/services/counterpartyApiService.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import {
@@ -23,7 +23,7 @@ import { assertSpyCalls, restore, stub } from "@std/testing/mock";
 import {
   counterpartyApiServiceFixtures,
   xcpTestHelpers,
-} from "@tests/fixtures/counterpartyApiServiceFixtures.ts";
+} from "../fixtures/counterpartyApiServiceFixtures.ts";
 
 describe("counterpartyApiService", () => {
   let fetchStub: any;
@@ -127,9 +127,12 @@ describe("counterpartyApiService", () => {
         "fetch",
         () =>
           Promise.resolve(
-            new Response(JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]), {
-              status: 200,
-            }),
+            new Response(
+              JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]),
+              {
+                status: 200,
+              },
+            ),
           ),
       );
 
@@ -152,9 +155,12 @@ describe("counterpartyApiService", () => {
             return Promise.resolve(new Response("Error", { status: 500 }));
           }
           return Promise.resolve(
-            new Response(JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]), {
-              status: 200,
-            }),
+            new Response(
+              JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]),
+              {
+                status: 200,
+              },
+            ),
           );
         },
       );
@@ -194,9 +200,12 @@ describe("counterpartyApiService", () => {
         "fetch",
         () =>
           Promise.resolve(
-            new Response(JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]), {
-              status: 200,
-            }),
+            new Response(
+              JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]),
+              {
+                status: 200,
+              },
+            ),
           ),
       );
 
@@ -251,9 +260,12 @@ describe("counterpartyApiService", () => {
             return Promise.reject(new Error("Connection refused"));
           }
           return Promise.resolve(
-            new Response(JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]), {
-              status: 200,
-            }),
+            new Response(
+              JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]),
+              {
+                status: 200,
+              },
+            ),
           );
         },
       );
@@ -570,7 +582,9 @@ describe("counterpartyApiService", () => {
             ),
         );
 
-        const result = await CounterpartyApiManager.getXcpAsset("A4399874976698242000");
+        const result = await CounterpartyApiManager.getXcpAsset(
+          "A4399874976698242000",
+        );
 
         assertEquals(result, counterpartyApiServiceFixtures.assets.stamps[0]);
       });
@@ -682,7 +696,9 @@ describe("counterpartyApiService", () => {
             ),
         );
 
-        const result = await CounterpartyApiManager.getXcpBalancesByAddress("bc1qtest123");
+        const result = await CounterpartyApiManager.getXcpBalancesByAddress(
+          "bc1qtest123",
+        );
 
         assertEquals(result.balances.length, 1);
         assertEquals(result.balances[0].address, "bc1qtest123");
@@ -791,7 +807,9 @@ describe("counterpartyApiService", () => {
           },
         );
 
-        const result = await CounterpartyApiManager.getAllXcpBalancesByAddress("bc1qwhale");
+        const result = await CounterpartyApiManager.getAllXcpBalancesByAddress(
+          "bc1qwhale",
+        );
 
         assertEquals(result.balances.length, 5000);
         assertEquals(result.total, 5000);
@@ -820,7 +838,9 @@ describe("counterpartyApiService", () => {
             ),
         );
 
-        const result = await CounterpartyApiManager.getXcpBalancesByAddress("bc1q1");
+        const result = await CounterpartyApiManager.getXcpBalancesByAddress(
+          "bc1q1",
+        );
 
         // Should maintain separate entries with unique keys
         assertEquals(result.balances.length, 3);
@@ -844,7 +864,9 @@ describe("counterpartyApiService", () => {
             ),
         );
 
-        const result = await CounterpartyApiManager.getXcpBalancesByAddress("bc1q1");
+        const result = await CounterpartyApiManager.getXcpBalancesByAddress(
+          "bc1q1",
+        );
 
         // Zero quantity balances should be filtered out
         assertEquals(result.balances.length, 1);
@@ -892,7 +914,9 @@ describe("counterpartyApiService", () => {
           () =>
             Promise.resolve(
               new Response(
-                JSON.stringify({ result: counterpartyApiServiceFixtures.compose.send }),
+                JSON.stringify({
+                  result: counterpartyApiServiceFixtures.compose.send,
+                }),
                 { status: 200 },
               ),
             ),
@@ -944,7 +968,9 @@ describe("counterpartyApiService", () => {
           () =>
             Promise.resolve(
               new Response(
-                JSON.stringify(counterpartyApiServiceFixtures.compose.dispenser),
+                JSON.stringify(
+                  counterpartyApiServiceFixtures.compose.dispenser,
+                ),
                 {
                   status: 200,
                 },
@@ -1017,7 +1043,9 @@ describe("counterpartyApiService", () => {
             ),
         );
 
-        const result = await CounterpartyApiManager.getAssetInfo("A95428956661682177");
+        const result = await CounterpartyApiManager.getAssetInfo(
+          "A95428956661682177",
+        );
 
         assertEquals(result.asset, "A95428956661682177");
       });
@@ -1028,7 +1056,10 @@ describe("counterpartyApiService", () => {
         const events = [
           counterpartyApiServiceFixtures.dispenses.events[0],
           { event: "DISPENSE", params: {} }, // Missing required fields
-          { ...counterpartyApiServiceFixtures.dispenses.events[0], event: "SEND" }, // Wrong event type
+          {
+            ...counterpartyApiServiceFixtures.dispenses.events[0],
+            event: "SEND",
+          }, // Wrong event type
         ];
 
         fetchStub = stub(
