@@ -228,7 +228,7 @@ export function estimateTransactionSizeForType(
       outputs = [{ type: "OP_RETURN" }, { type: "P2WPKH" }]; // data + change
       break;
     case "src20":
-    case "src101":
+    case "src101": {
       // Estimate data chunks needed (capped at reasonable amount)
       const dataChunks = Math.min(Math.ceil((fileSize || 100) / 32), 5);
       outputs = [
@@ -236,6 +236,7 @@ export function estimateTransactionSizeForType(
         { type: "P2WPKH" }, // change
       ];
       break;
+    }
     case "send":
       outputs = [{ type: "P2WPKH" }, { type: "P2WPKH" }]; // recipient + change
       break;
