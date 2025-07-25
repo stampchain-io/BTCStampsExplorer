@@ -5,7 +5,7 @@ import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
   DEFAULT_PAGINATION,
   validateSRC20SortParam,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 
 export const handler: Handlers = {

@@ -12,8 +12,8 @@ import { getIdentifierType } from "$lib/utils/identifierUtils.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { validateSortDirection } from "$server/services/validationService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { validateSortDirection } from "$server/services/validation/validationService.ts";
 
 type StampHandlerConfig = {
   type: "stamps" | "cursed";

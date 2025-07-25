@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 
 const collectionHandler: Handlers = {
   async GET(req: Request, _ctx) {

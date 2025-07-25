@@ -202,7 +202,7 @@ export const handler: Handlers = {
         }
 
         console.log(
-          "[Dispense Route] About to call PSBTService.buildPsbtFromUserFundedRawHex",
+          "[Dispense Route] About to call BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex",
         );
         const builtPsbtData = await BitcoinTransactionBuilder
           .buildPsbtFromUserFundedRawHex(
@@ -212,7 +212,7 @@ export const handler: Handlers = {
             psbtOptions,
           );
         console.log(
-          "[Dispense Route] Result from PSBTService.buildPsbtFromUserFundedRawHex:",
+          "[Dispense Route] Result from BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex:",
           JSON.stringify(builtPsbtData, null, 2),
         );
 

@@ -9,7 +9,7 @@ import {
   DEFAULT_PAGINATION,
   validateRequiredParams,
   validateSortParam,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
 import { SUBPROTOCOLS } from "$globals";
 
 export const handler: Handlers<IdentHandlerContext> = {

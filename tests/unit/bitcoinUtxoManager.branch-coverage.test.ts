@@ -185,7 +185,7 @@ const mockGetScriptTypeInfo = (script: string | Buffer) => {
   return { type: "P2WPKH", size: 31, isWitness: true };
 };
 
-// Create a mock UTXOService class for testing
+// Create a mock BitcoinUtxoManager class for testing
 class MockUTXOService {
   private static readonly CHANGE_DUST = 1000;
   private commonUtxoService: any;

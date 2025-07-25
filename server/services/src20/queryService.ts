@@ -12,7 +12,7 @@ import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { paginate } from "$lib/utils/paginationUtils.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
-import { BlockService } from "$server/services/blockService.ts";
+import { BlockService } from "$server/services/core/blockService.ts";
 import { Big } from "big";
 import { SRC20UtilityService } from "./utilityService.ts";
 

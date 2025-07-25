@@ -5,7 +5,10 @@ import {
   getSecurityHeaders,
 } from "$lib/utils/securityHeaders.ts";
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
-import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
+import {
+  getCacheConfig,
+  RouteType,
+} from "$server/services/infrastructure/cacheService.ts";
 import { API_RESPONSE_VERSION } from "./apiResponseUtil.ts";
 
 export interface WebResponseOptions {

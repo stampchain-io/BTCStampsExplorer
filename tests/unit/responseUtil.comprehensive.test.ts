@@ -6,7 +6,7 @@
  */
 
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { assertEquals, assertExists } from "@std/assert";
 
 /* ===== BASIC RESPONSE TESTS ===== */
@@ -578,7 +578,7 @@ Deno.test("ApiResponseUtil - test all remaining methods for 100% coverage", asyn
   assertExists(customUint8Array.headers);
 
   // Test caching options with routeType
-  const { RouteType } = await import("$server/services/cacheService.ts");
+  const { RouteType } = await import("$server/services/infrastructure/cacheService.ts");
   const successWithCache = ApiResponseUtil.success(
     { cached: true },
     {
@@ -591,7 +591,7 @@ Deno.test("ApiResponseUtil - test all remaining methods for 100% coverage", asyn
   assertExists(successWithCache.headers);
 
   // Test cache config edge cases
-  const { RouteType: RT } = await import("$server/services/cacheService.ts");
+  const { RouteType: RT } = await import("$server/services/infrastructure/cacheService.ts");
 
   // Test with staleWhileRevalidate and staleIfError values
   const successWithFullCache = ApiResponseUtil.success(

@@ -1,6 +1,6 @@
 import { ApiResponseUtil } from "./apiResponseUtil.ts";
 import { WebResponseUtil } from "./webResponseUtil.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 // Re-export from apiResponseUtil for backward compatibility
 export { API_RESPONSE_VERSION } from "./apiResponseUtil.ts";

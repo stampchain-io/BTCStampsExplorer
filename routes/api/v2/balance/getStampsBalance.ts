@@ -1,7 +1,7 @@
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { validateRequiredParams } from "$server/services/routeValidationService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { validateRequiredParams } from "$server/services/validation/routeValidationService.ts";
 
 export async function handler(req: Request): Promise<Response> {
   try {
@@ -17,12 +17,13 @@ export async function handler(req: Request): Promise<Response> {
       return paramsValidation.error!;
     }
 
-    const { balances: stampBalance } = await CounterpartyApiManager.getXcpBalancesByAddress(
-      address!,
-      undefined, // cpid
-      utxoOnly,
-      { type: "all" },
-    );
+    const { balances: stampBalance } = await CounterpartyApiManager
+      .getXcpBalancesByAddress(
+        address!,
+        undefined, // cpid
+        utxoOnly,
+        { type: "all" },
+      );
 
     return ResponseUtil.success(
       { stampBalance },

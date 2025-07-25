@@ -1,5 +1,5 @@
 /**
- * @fileoverview PSBT Service tests using fixture-based mocks
+ * @fileoverview Bitcoin Transaction Builder tests using fixture-based mocks
  * Uses real API response fixtures to test without external dependencies
  */
 
@@ -63,21 +63,21 @@ const mockDependencies = {
   commonUtxoService: mockCommonUtxoService as CommonUTXOService,
 };
 
-// Import PSBTService with mocked dependencies
+// Import BitcoinTransactionBuilder with mocked dependencies
 import {
-  createPSBTService,
+  createBitcoinTransactionBuilder,
   formatPsbtForLogging,
 } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 
-describe("PSBTService with Fixture-Based Mocks", {
+describe("BitcoinTransactionBuilder with Fixture-Based Mocks", {
   sanitizeOps: false,
   sanitizeResources: false,
 }, () => {
-  let psbtService: ReturnType<typeof createPSBTService>;
+  let bitcoinTransactionBuilder: ReturnType<typeof createBitcoinTransactionBuilder>;
 
   beforeEach(() => {
     // Create service with mocked dependencies
-    psbtService = createPSBTService(mockDependencies);
+    bitcoinTransactionBuilder = createBitcoinTransactionBuilder(mockDependencies);
   });
 
   afterEach(() => {
@@ -91,7 +91,7 @@ describe("PSBTService with Fixture-Based Mocks", {
       const salePrice = 0.001; // BTC
       const sellerAddress = "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v";
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         utxoString,
         salePrice,
         sellerAddress,
@@ -120,7 +120,7 @@ describe("PSBTService with Fixture-Based Mocks", {
       const sellerAddress =
         "bc1qhkdn50wxq43e9fyczesnyqg7zuv6t4cdl2yf95rds7wtu6dec0szq3plc";
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         utxoString,
         salePrice,
         sellerAddress,
@@ -139,7 +139,7 @@ describe("PSBTService with Fixture-Based Mocks", {
       const salePrice = 0.2; // BTC
       const sellerAddress = "1JTud7z3TBmFBMVqcJdJAF4n7YLcUNjbVj";
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         utxoString,
         salePrice,
         sellerAddress,
@@ -158,7 +158,7 @@ describe("PSBTService with Fixture-Based Mocks", {
       const salePrice = 0.4; // BTC
       const sellerAddress = "3MDyKwgXQy9nUa8VnKh7gmKc9XWCJ6NUfL";
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         utxoString,
         salePrice,
         sellerAddress,
@@ -178,7 +178,7 @@ describe("PSBTService with Fixture-Based Mocks", {
       const sellerAddress =
         "bc1puw90tdnymr5lpgdjc02wtm486jxapg0j5w6vt4h80uy2dsx89glq6dx8n6";
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         utxoString,
         salePrice,
         sellerAddress,
@@ -193,7 +193,7 @@ describe("PSBTService with Fixture-Based Mocks", {
     it("should handle invalid UTXO string format", async () => {
       await assertRejects(
         async () => {
-          await psbtService.createPSBT(
+          await bitcoinTransactionBuilder.createPSBT(
             "invalid-utxo-format",
             0.001,
             "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v",
@@ -207,7 +207,7 @@ describe("PSBTService with Fixture-Based Mocks", {
     it("should handle non-existent UTXO", async () => {
       await assertRejects(
         async () => {
-          await psbtService.createPSBT(
+          await bitcoinTransactionBuilder.createPSBT(
             "nonexistenttxid1234567890abcdef1234567890abcdef1234567890abcdef:0",
             0.001,
             "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v",
@@ -224,7 +224,7 @@ describe("PSBTService with Fixture-Based Mocks", {
       const salePrice = 0.4; // BTC
       const sellerAddress = "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v";
 
-      const psbtHex = await psbtService.createPSBT(
+      const psbtHex = await bitcoinTransactionBuilder.createPSBT(
         utxoString,
         salePrice,
         sellerAddress,
@@ -310,7 +310,7 @@ describe("PSBTService with Fixture-Based Mocks", {
         "a0a34578b86c5ed1720083e0008e0578a744a9daa8c13124f64fb8ebbae9029b:0";
       const address = "bc1qerjl8rcel320ldh7qvzrq47a96ym9d3rhtwv6v"; // Verified to match the script in mock
 
-      const isValid = await psbtService.validateUTXOOwnership(
+      const isValid = await bitcoinTransactionBuilder.validateUTXOOwnership(
         utxoString,
         address,
       );
@@ -323,7 +323,7 @@ describe("PSBTService with Fixture-Based Mocks", {
         "a0a34578b86c5ed1720083e0008e0578a744a9daa8c13124f64fb8ebbae9029b:0";
       const wrongAddress = "bc1qdifferentvalid0000000000000000000000000"; // Use a valid but mismatched bc1q address
 
-      const isValid = await psbtService.validateUTXOOwnership(
+      const isValid = await bitcoinTransactionBuilder.validateUTXOOwnership(
         utxoString,
         wrongAddress,
       );
@@ -337,7 +337,7 @@ describe("PSBTService with Fixture-Based Mocks", {
 
       await assertRejects(
         async () => {
-          await psbtService.validateUTXOOwnership(utxoString, address);
+          await bitcoinTransactionBuilder.validateUTXOOwnership(utxoString, address);
         },
         Error,
       );

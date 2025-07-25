@@ -5,8 +5,8 @@ import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
-} from "$server/services/routeValidationService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+} from "$server/services/validation/routeValidationService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {

@@ -1,6 +1,9 @@
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
 import { getSecurityHeaders } from "$lib/utils/securityHeaders.ts";
-import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
+import {
+  getCacheConfig,
+  RouteType,
+} from "$server/services/infrastructure/cacheService.ts";
 
 export const API_RESPONSE_VERSION = "v2.2.7";
 

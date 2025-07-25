@@ -1,6 +1,6 @@
 /**
  * Mock implementation of bitcoinjs-lib for complete test isolation
- * This allows testing PSBTService without depending on the actual Bitcoin library
+ * This allows testing BitcoinTransactionBuilder without depending on the actual Bitcoin library
  */
 
 import { Buffer } from "node:buffer";

@@ -3,8 +3,8 @@ import { AddressHandlerContext } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { validateSortDirection } from "$server/services/validationService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { validateSortDirection } from "$server/services/validation/validationService.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(req, ctx) {

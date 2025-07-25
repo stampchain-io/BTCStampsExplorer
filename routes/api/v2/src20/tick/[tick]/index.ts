@@ -8,7 +8,7 @@ import {
   DEFAULT_PAGINATION,
   validateRequiredParams,
   validateSortParam,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 
 export const handler: Handlers = {

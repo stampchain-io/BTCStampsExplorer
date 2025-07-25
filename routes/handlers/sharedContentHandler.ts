@@ -9,7 +9,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { getRecursiveHeaders } from "$lib/utils/securityHeaders.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 // Define the state type
 export interface State {

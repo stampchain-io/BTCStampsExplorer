@@ -5,7 +5,7 @@ import { STAMP_FILTER_TYPES, StampRow, SUBPROTOCOLS } from "$globals";
 import { CollectionDetailHeader } from "$header";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { StampController } from "$server/controller/stampController.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 /* ===== TYPES ===== */
 type CollectionDetailsPageProps = {
   data: {

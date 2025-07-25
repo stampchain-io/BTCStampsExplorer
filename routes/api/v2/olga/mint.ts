@@ -8,7 +8,10 @@ import {
   StampCreationService,
   StampValidationService,
 } from "$server/services/stamp/index.ts";
-import { normalizeFeeRate, CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import {
+  CounterpartyApiManager,
+  normalizeFeeRate,
+} from "$server/services/counterpartyApiService.ts";
 import * as bitcoin from "bitcoinjs-lib"; // Keep for Psbt.fromHex
 
 // Define TransactionInput if not available globally or for clarity here
@@ -183,10 +186,11 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
           assetName: validatedAssetName,
           wallet: effectiveSourceWallet,
         });
-        const balancesResult = await CounterpartyApiManager.getXcpBalancesByAddress(
-          effectiveSourceWallet,
-          "XCP",
-        ); // Fetch specific XCP balance
+        const balancesResult = await CounterpartyApiManager
+          .getXcpBalancesByAddress(
+            effectiveSourceWallet,
+            "XCP",
+          ); // Fetch specific XCP balance
 
         const xcpAsset = balancesResult.balances.find((b) => b.cpid === "XCP");
         const xcpBalance = xcpAsset ? xcpAsset.quantity : 0;

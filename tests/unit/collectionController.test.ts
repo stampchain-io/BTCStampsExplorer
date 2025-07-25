@@ -5,7 +5,7 @@
 
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampService } from "$server/services/stampService.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 

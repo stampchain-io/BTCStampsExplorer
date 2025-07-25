@@ -5,7 +5,7 @@ import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { DOMParser } from "dom";
 import { body, gapSectionSlim } from "$layout";
 import { StampImage, StampInfo } from "$content";
@@ -101,9 +101,10 @@ export const handler: Handlers<StampData> = {
         stampData.data.stamp.ident === "SRC-721"
       ) {
         // Fetch dispensers separately for display on detail page
-        const dispensersData = await CounterpartyDispenserService.getDispensersByCpid(
-          stampData.data.stamp.cpid,
-        );
+        const dispensersData = await CounterpartyDispenserService
+          .getDispensersByCpid(
+            stampData.data.stamp.cpid,
+          );
         dispensers = dispensersData?.dispensers || [];
         lowestPriceDispenser = findLowestPriceDispenser(dispensers);
       }

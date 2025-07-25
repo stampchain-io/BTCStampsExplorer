@@ -2,12 +2,12 @@ import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { BlockService } from "$server/services/blockService.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { BlockService } from "$server/services/core/blockService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 import { StampService } from "$server/services/stampService.ts";
 

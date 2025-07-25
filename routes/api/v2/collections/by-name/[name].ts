@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
-import { RouteType } from "$server/services/cacheService.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 
 export const handler: Handlers = {
   async GET(_req, ctx) {

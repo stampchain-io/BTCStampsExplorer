@@ -155,8 +155,10 @@ class DatabaseManager {
     if (!isTest) {
       handlers.file = new FileHandler("WARN", {
         filename: "./db.log",
-        formatter: (logRecord: LogRecord) =>
-          `${logRecord.levelName} ${logRecord.msg}`,
+        formatter: (logRecord: LogRecord) => {
+          const timestamp = new Date().toISOString();
+          return `[${timestamp}] ${logRecord.levelName} ${logRecord.msg}`;
+        },
       });
       handlerNames.push("file");
     }
