@@ -79,7 +79,7 @@ export const ToggleButton = ({
         // Multi select: use flatOutline for selected state
         // Special case for "dispensers" - show default cursor since it can't be deselected
         const cursorClass = option === "dispensers"
-          ? "cursor-default [&:hover]:!bg-[var(--default-color)] [&:hover]:!border-[var(--default-color)] [&:hover]:!text-black"
+          ? "cursor-default [&:hover]:!bg-gradient-to-br [&:hover]:!from-[var(--color-light)] [&:hover]:!to-[var(--color-dark)] [&:hover]:!text-black"
           : "";
         return `${button("flatOutline", "greyDark", size)} ${cursorClass}`;
       }
@@ -88,7 +88,7 @@ export const ToggleButton = ({
       const color = mode === "single" ? "grey" : "greyDark";
       return `${button("outlineFlat", color, size)} ${
         !canHoverSelected
-          ? "hover:bg-transparent hover:border-[var(--default-color)] hover:text-[var(--default-color)]"
+          ? "hover:bg-gradient-to-br hover:from-transparent hover:to-transparent hover:border-[var(--color-dark)] hover:text-[var(--color-dark)]"
           : ""
       }`;
     }
@@ -133,7 +133,7 @@ export const ToggleButton = ({
 
             {/* Coming Soon overlay text for disabled buttons */}
             {isDisabled && (
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-10">
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity ease-in-out duration-200 pointer-events-none z-10">
                 <div class="text-stamp-grey-light text-xs font-bold">
                   SOON™
                 </div>

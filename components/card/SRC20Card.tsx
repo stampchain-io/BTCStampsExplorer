@@ -4,6 +4,7 @@ import { Icon } from "$icon";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import {
   containerCardTable,
+  glassmorphism,
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
@@ -140,10 +141,10 @@ export function SRC20Card({
 
     // Row background color and rounded corners
     const rowClass = isFirst
-      ? "bg-stamp-grey-darkest/15 rounded-l-lg"
+      ? rowCardBorderLeft
       : isLast
-      ? "bg-stamp-grey-darkest/15 rounded-r-lg"
-      : "bg-stamp-grey-darkest/15";
+      ? rowCardBorderRight
+      : rowCardBorderCenter;
 
     // Selected segment styling
     const selectedClass = isSelected ? "text-stamp-grey-light" : "";
@@ -231,7 +232,7 @@ export function SRC20Card({
           ]).map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
         <thead>
-          <tr>
+          <tr class={`${glassmorphism}`}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
               const isLast = i === headers.length - 1;
