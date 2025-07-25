@@ -318,7 +318,7 @@ export class ToolEndpointFeeEstimator {
     return {
       size: this.cache.size,
       maxSize: this.config.maxCacheSize,
-      hitRate: 0, // TODO: Implement hit rate tracking if needed
+      hitRate: 0, // TODO(@btcstamps): Implement hit rate tracking if needed
       oldestEntry: oldestTimestamp,
     };
   }
@@ -344,7 +344,7 @@ export const toolEndpointFeeEstimator = new ToolEndpointFeeEstimator({
 /**
  * Convenience function for estimating fees
  */
-export async function estimateFeesWithToolEndpoint(
+export function estimateFeesWithToolEndpoint(
   toolType: ToolType,
   options: AnyTransactionOptions,
 ): Promise<StandardFeeResponse> {
