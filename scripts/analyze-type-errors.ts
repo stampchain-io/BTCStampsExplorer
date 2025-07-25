@@ -33,6 +33,7 @@ async function runTypeCheck(): Promise<string> {
       args: ["check", "main.ts", "dev.ts"],
       stdout: "piped",
       stderr: "piped",
+      signal: AbortSignal.timeout(15 * 60 * 1000), // 15 minute timeout
     });
 
     const result = await cmd.output();
@@ -41,12 +42,27 @@ async function runTypeCheck(): Promise<string> {
 
     return stderr + stdout;
   } catch (error) {
+    if (error.name === "TimeoutError") {
+      console.error("⏰ Type check timed out after 15 minutes");
+      return "Type check timed out - project may be too large for comprehensive analysis";
+    }
     console.error("❌ Failed to run type check:", error);
     return "";
   }
 }
 
 function parseTypeErrors(output: string): AnalysisResult {
+  // Handle timeout case
+  if (output.includes("Type check timed out")) {
+    return {
+      totalErrors: -1,
+      totalFiles: 0,
+      errorCategories: [],
+      criticalFiles: [],
+      summary: "⏰ Type check timed out - project requires optimization for faster analysis",
+    };
+  }
+
   const lines = output.split("\n");
   const errorCategories = new Map<string, number>();
   const fileErrors = new Map<string, string[]>();
@@ -55,9 +71,12 @@ function parseTypeErrors(output: string): AnalysisResult {
   let currentErrorBlock: string[] = [];
   let currentFileName = "";
 
-  console.log("🔍 Debugging: Total lines to process:", lines.length);
+  console.log("🔍 Processing lines:", Math.min(lines.length, 10000), "of", lines.length);
+  
+  // Limit processing to prevent timeout in CI
+  const maxLines = process.env.CI ? 10000 : lines.length;
 
-  for (let i = 0; i < lines.length; i++) {
+  for (let i = 0; i < Math.min(lines.length, maxLines); i++) {
     const line = lines[i];
 
     // Check for start of new error (TS#### [ERROR])
