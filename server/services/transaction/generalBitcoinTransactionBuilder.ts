@@ -1,7 +1,7 @@
 /**
  * General Bitcoin Transaction Builder - Clean Architecture for All Counterparty Operations
  *
- * Extracted from the proven StampMintService.generatePSBT() pattern
+ * Extracted from the proven StampCreationService.generatePSBT() pattern
  * Works with raw hex from Counterparty (return_psbt: false)
  *
  * Supports: Mint, Fairmint, Detach, Dispense, and future operations
@@ -325,7 +325,7 @@ export class GeneralBitcoinTransactionBuilder {
   }
 
   /**
-   * Get full UTXO details (copied from StampMintService pattern)
+   * Get full UTXO details (copied from StampCreationService pattern)
    */
   private static async getFullUTXOsWithDetails(
     address: string,

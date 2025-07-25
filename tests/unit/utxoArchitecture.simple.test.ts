@@ -1,5 +1,5 @@
 import { assertEquals, assertExists } from "@std/assert";
-import { StampMintService } from "../../server/services/stamp/stampMintService.ts";
+import { StampCreationService } from "../../server/services/stamp/stampCreationService.ts";
 import { CommonUTXOService } from "../../server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "../../server/services/utxo/optimalUtxoSelection.ts";
 
@@ -11,9 +11,9 @@ Deno.test("UTXO Architecture - Quick Validation", async (t) => {
     const commonUtxoService = new CommonUTXOService();
     console.log("✅ CommonUTXOService instantiated successfully");
 
-    // StampMintService is static, so just reference it
-    const stampMintService = StampMintService;
-    console.log("✅ StampMintService referenced successfully");
+    // StampCreationService is static, so just reference it
+    const stampMintService = StampCreationService;
+    console.log("✅ StampCreationService referenced successfully");
 
     // OptimalUTXOSelection is static, test that key method exists
     assertExists(OptimalUTXOSelection.selectUTXOs);
@@ -82,14 +82,14 @@ Deno.test("UTXO Architecture - Quick Validation", async (t) => {
   await t.step("validate stamp minting structure", async () => {
     console.log("🏭 Validating stamp minting structure...");
 
-    // Check that StampMintService has the main methods
-    assertExists(StampMintService.createStampIssuance);
-    assertEquals(typeof StampMintService.createStampIssuance, "function");
+    // Check that StampCreationService has the main methods
+    assertExists(StampCreationService.createStampIssuance);
+    assertEquals(typeof StampCreationService.createStampIssuance, "function");
     console.log("✅ createStampIssuance method exists");
 
     // Check that the service has simplified dependencies
     // (This is structural validation, not functional testing)
-    console.log("✅ StampMintService architectural validation complete");
+    console.log("✅ StampCreationService architectural validation complete");
     console.log("   - Simplified UTXO selection flow");
     console.log("   - Direct OptimalUTXOSelection usage");
     console.log("   - Single CommonUTXOService instance");
@@ -101,7 +101,7 @@ Deno.test("UTXO Architecture - Quick Validation", async (t) => {
     // Test that invalid parameters are handled gracefully
     try {
       // This should fail gracefully, not crash
-      await StampMintService.createStampIssuance({
+      await StampCreationService.createStampIssuance({
         sourceWallet: "",
         assetName: "",
         qty: 0,

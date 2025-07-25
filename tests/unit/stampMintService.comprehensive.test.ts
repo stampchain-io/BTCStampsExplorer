@@ -1,5 +1,5 @@
 /**
- * Comprehensive test suite for StampMintService using mocked bitcoinjs-lib
+ * Comprehensive test suite for StampCreationService using mocked bitcoinjs-lib
  * This provides complete test isolation and covers all major functionality
  */
 
@@ -64,7 +64,7 @@ const TEST_FIXTURES = {
   },
 };
 
-describe("StampMintService", () => {
+describe("StampCreationService", () => {
   beforeEach(() => {
     setupMocks();
     // Note: Spy calls are automatically reset between tests

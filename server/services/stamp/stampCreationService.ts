@@ -4,8 +4,8 @@ import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import { extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
 import { getScriptTypeInfo, validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
-import { formatPsbtForLogging } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import { formatPsbtForLogging } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import type { ScriptType } from "$types/index.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
@@ -13,12 +13,12 @@ import { Buffer } from "node:buffer";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
 import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
 import type { UTXO } from "$types/index.d.ts";
 
-export class StampMintService {
+export class StampCreationService {
   private static commonUtxoService = new CommonUTXOService();
   private static utxoService = new BitcoinUtxoManager(); // Add UTXOService instance
 
@@ -491,7 +491,7 @@ export class StampMintService {
             value: BigInt(input.value),
           };
         } else {
-          const rawTxHex = await StampMintService.commonUtxoService.getRawTransactionHex(input.txid);
+          const rawTxHex = await StampCreationService.commonUtxoService.getRawTransactionHex(input.txid);
           if (!rawTxHex) {
             logger.error("stamp-create", { message: "Failed to fetch raw transaction hex for non-witness input", txid: input.txid });
             throw new Error(`Failed to fetch raw transaction for non-witness input ${input.txid}`);
@@ -501,14 +501,14 @@ export class StampMintService {
 
         // Log before adding input
         const currentInputIndexForLog = psbt.inputCount;
-        console.log(`[StampMintService] Preparing Minter Input #${currentInputIndexForLog} (from UTXO ${input.txid}:${input.vout})`);
-        console.log(`[StampMintService] Minter Input Data for addInput:`, JSON.stringify(psbtInputDataForStamp, (_k,v) => typeof v === 'bigint' ? v.toString() : v));
+        console.log(`[StampCreationService] Preparing Minter Input #${currentInputIndexForLog} (from UTXO ${input.txid}:${input.vout})`);
+        console.log(`[StampCreationService] Minter Input Data for addInput:`, JSON.stringify(psbtInputDataForStamp, (_k,v) => typeof v === 'bigint' ? v.toString() : v));
 
         psbt.addInput(psbtInputDataForStamp as any);
 
         // Log psbt.data.inputs[currentInputIndexForLog] AFTER adding
         const addedInputData = psbt.data.inputs[currentInputIndexForLog];
-        console.log(`[StampMintService] Minter Input #${currentInputIndexForLog} state in psbt.data.inputs AFTER addInput:`);
+        console.log(`[StampCreationService] Minter Input #${currentInputIndexForLog} state in psbt.data.inputs AFTER addInput:`);
         console.log(addedInputData ? JSON.stringify({
             hasWitnessUtxo: !!addedInputData.witnessUtxo,
             witnessUtxoValue: addedInputData.witnessUtxo?.value.toString(),
@@ -553,7 +553,7 @@ export class StampMintService {
         changeAddress: address,
       };
     } catch (error) {
-      logger.error("stamp-create", { message: "PSBT Generation Error in StampMintService", error: error instanceof Error ? error.message : String(error), address, fileSize, satsPerVB, totalOutputValue, cip33AddressCount: cip33Addresses.length, vouts: vouts.length, estimatedFee: estMinerFee });
+      logger.error("stamp-create", { message: "PSBT Generation Error in StampCreationService", error: error instanceof Error ? error.message : String(error), address, fileSize, satsPerVB, totalOutputValue, cip33AddressCount: cip33Addresses.length, vouts: vouts.length, estimatedFee: estMinerFee });
       throw error;
     }
   }

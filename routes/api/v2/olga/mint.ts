@@ -5,7 +5,7 @@ import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts"; // For XCP decimal h
 import { logger } from "$lib/utils/logger.ts"; // Import logger
 import { serverConfig } from "$server/config/config.ts";
 import {
-  StampMintService,
+  StampCreationService,
   StampValidationService,
 } from "$server/services/stamp/index.ts";
 import { normalizeFeeRate, CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
@@ -39,7 +39,7 @@ interface RawRequestBody {
   // Include other fields from MintStampInputData if they can be in the body
 }
 
-// Type for the object passed to StampMintService.createStampIssuance
+// Type for the object passed to StampCreationService.createStampIssuance
 // This should match the parameters of that method precisely.
 interface CreateStampIssuanceParams {
   sourceWallet: string;
@@ -98,7 +98,7 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       ? "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4" // Valid P2WPKH dummy address for estimation
       : body.sourceWallet;
 
-    // Validate essential fields that StampMintService will require
+    // Validate essential fields that StampCreationService will require
     // Use effectiveSourceWallet instead of body.sourceWallet for validation
     if (
       !effectiveSourceWallet || !body.filename || !body.file ||
@@ -258,7 +258,7 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
     };
 
     try {
-      const mint_tx_details = await StampMintService.createStampIssuance(
+      const mint_tx_details = await StampCreationService.createStampIssuance(
         createIssuanceParams,
       );
 
