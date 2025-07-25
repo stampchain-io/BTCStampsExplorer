@@ -3,7 +3,7 @@ import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { GeneralBitcoinTransactionBuilder } from "$server/services/transaction/generalBitcoinTransactionBuilder.ts";
 import type { ComposeDetachOptions } from "$server/services/xcp/xcpManagerDI.ts";
-import { normalizeFeeRate, XcpManager } from "$server/services/xcpService.ts";
+import { normalizeFeeRate, CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 
 export const handler: Handlers = {
   async POST(req) {
@@ -47,7 +47,7 @@ export const handler: Handlers = {
         delete xcpApiOptions.service_fee_address; // Not for XCP API
 
         // ✅ NEW CLEAN PATTERN: Get raw hex instead of PSBT
-        const response = await XcpManager.composeDetach(
+        const response = await CounterpartyApiManager.composeDetach(
           utxo,
           destination || "",
           {

@@ -3,7 +3,7 @@ import { TXError } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
-import { normalizeFeeRate } from "$server/services/xcpService.ts";
+import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
 import { AncestorInfo, InputData } from "$types/index.d.ts";
 
 type TrxType = "multisig" | "olga";

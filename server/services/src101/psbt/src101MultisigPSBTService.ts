@@ -45,7 +45,7 @@ import { serverConfig } from "$server/config/config.ts";
 import type { BufferLike } from "$lib/types/utils.d.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { IPrepareSRC101TX } from "$server/types/services/src101.d.ts";
 import type { UTXO } from "$types/index.d.ts";
 import { PSBTInput, VOUT } from "$types/index.d.ts";
@@ -88,7 +88,7 @@ export class SRC101MultisigPSBTService {
     // Filter stamp UTXOs if requested
     if (filterStampUTXOs) {
       try {
-        const stampBalances = await XcpManager.getXcpBalancesByAddress(address, undefined, true);
+        const stampBalances = await CounterpartyApiManager.getXcpBalancesByAddress(address, undefined, true);
         const utxosToExcludeFromStamps = new Set<string>();
         for (const balance of stampBalances.balances) {
           if (balance.utxo) {

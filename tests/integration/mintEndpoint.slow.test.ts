@@ -1,7 +1,7 @@
 import { handler } from "$routes/api/v2/olga/mint.ts";
 import { StampValidationService } from "$server/services/stamp/stampValidationService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import {
   assertEquals,
@@ -155,7 +155,7 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
         "00000000"; // Locktime
 
       const createIssuanceStub = stub(
-        XcpManager,
+        CounterpartyApiManager,
         "createIssuance",
         () =>
           Promise.resolve({
@@ -166,7 +166,7 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
       );
 
       const getXcpBalancesByAddressStub = stub(
-        XcpManager,
+        CounterpartyApiManager,
         "getXcpBalancesByAddress",
         () =>
           Promise.resolve({
@@ -279,7 +279,7 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
     );
 
     const getXcpBalancesByAddressStub = stub(
-      XcpManager,
+      CounterpartyApiManager,
       "getXcpBalancesByAddress",
       () => Promise.resolve({ balances: [], total: 0 }),
     );
@@ -302,7 +302,7 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
       "00000000"; // Locktime
 
     const createIssuanceStub = stub(
-      XcpManager,
+      CounterpartyApiManager,
       "createIssuance",
       () =>
         Promise.resolve({
@@ -358,7 +358,7 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
     );
 
     const getXcpBalancesByAddressStub = stub(
-      XcpManager,
+      CounterpartyApiManager,
       "getXcpBalancesByAddress",
       () => Promise.resolve({ balances: [], total: 0 }),
     );
@@ -381,7 +381,7 @@ Deno.test("Mint Endpoint - 31KB Image with Real UTXOs", async (t) => {
       "00000000"; // Locktime
 
     const createIssuanceStub = stub(
-      XcpManager,
+      CounterpartyApiManager,
       "createIssuance",
       () =>
         Promise.resolve({

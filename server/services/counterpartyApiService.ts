@@ -166,7 +166,7 @@ export async function fetchXcpV2WithCache<T>(
   );
 }
 
-export class DispenserManager {
+export class CounterpartyDispenserService {
 
   static async getDispensersByCpid(
     cpid: string,
@@ -462,7 +462,7 @@ export interface IssuanceOptions {
   description?: string;
 }
 
-export class XcpManager {
+export class CounterpartyApiManager {
   private static fetchXcpV2WithCache = fetchXcpV2WithCache;
 
   static async getXcpAsset(cpid: string): Promise<any> {
@@ -608,7 +608,7 @@ export class XcpManager {
     }
 
     await logger.debug("api", {
-        message: "[XcpManager] Fetching balances",
+        message: "[CounterpartyApiManager] Fetching balances",
         endpoint,
         params: Object.fromEntries(defaultParams),
         address
@@ -678,7 +678,7 @@ export class XcpManager {
         }
 
         await logger.debug("api", {
-            message: "[XcpManager] Balances fetched",
+            message: "[CounterpartyApiManager] Balances fetched",
             balancesCount: balances.length,
             total,
             nextCursor: response.next_cursor,
@@ -711,7 +711,7 @@ export class XcpManager {
 
       while (attempt < MAX_RETRIES) {
         await logger.info("api", {
-          message: "[XcpManager] Starting balance fetch attempt",
+          message: "[CounterpartyApiManager] Starting balance fetch attempt",
           attempt: attempt + 1,
           maxRetries: MAX_RETRIES,
           address,
@@ -753,7 +753,7 @@ export class XcpManager {
           }
 
           await logger.debug("api", {
-            message: "[XcpManager] Pagination progress",
+            message: "[CounterpartyApiManager] Pagination progress",
             currentCount: allBalances.length,
             expectedTotal,
             cursor,
@@ -780,7 +780,7 @@ export class XcpManager {
           return { balances: [], total: 0 };
         } else {
           await logger.info("api", {
-            message: "[XcpManager] Successfully fetched balances",
+            message: "[CounterpartyApiManager] Successfully fetched balances",
             finalCount: allBalances.length,
             expectedTotal,
             address
@@ -1032,7 +1032,7 @@ export class XcpManager {
       // but ideally caller (route) should have normalized to sat_per_vbyte.
       // Or, convert it here: finalApiOptions.sat_per_vbyte = options.fee_per_kb / 1000; (approx)
       // For now, let route handle normalization to sat_per_vbyte for options.sat_per_vbyte
-      // This XcpManager method will just pass what it's given, preferring sat_per_vbyte.
+      // This CounterpartyApiManager method will just pass what it's given, preferring sat_per_vbyte.
       // If route sends options.fee_per_kb, it will be iterated below unless we exclude.
       // Let's ensure we only send one fee type.
       if (options.fee_per_kb !== undefined && options.sat_per_vbyte === undefined) {
@@ -1089,7 +1089,7 @@ export class XcpManager {
 
         const data = response.data;
         // DETAILED LOGGING OF THE RAW RESPONSE FROM COUNTERPARTY
-        console.log(`[XcpManager.createDispense] RAW RESPONSE from ${node.name} for dispense:`);
+        console.log(`[CounterpartyApiManager.createDispense] RAW RESPONSE from ${node.name} for dispense:`);
         console.log(JSON.stringify(data, null, 2));
         // END DETAILED LOGGING
 
@@ -1249,7 +1249,7 @@ export class XcpManager {
     // if (!options.multisig_dust_size) queryParams.delete("multisig_dust_size"); // Example: if you don't want default
 
     await logger.debug("api", {
-        message: "[XcpManager.composeAttach] Calling Counterparty API",
+        message: "[CounterpartyApiManager.composeAttach] Calling Counterparty API",
         endpoint,
         queryParams: queryParams.toString()
     });
@@ -1259,7 +1259,7 @@ export class XcpManager {
 
     if (response.error || !response.result) {
         await logger.error("api", {
-            message: "[XcpManager.composeAttach] Error from Counterparty API",
+            message: "[CounterpartyApiManager.composeAttach] Error from Counterparty API",
             error: response.error,
             result: response.result
         });
@@ -1269,7 +1269,7 @@ export class XcpManager {
     // The response.result could contain .psbt, .rawtransaction, or other fields.
     // The caller (route handler) will be responsible for checking for .rawtransaction.
     await logger.debug("api", {
-        message: "[XcpManager.composeAttach] Response from Counterparty API",
+        message: "[CounterpartyApiManager.composeAttach] Response from Counterparty API",
         result: response.result // Log the whole result for inspection
     });
     return response.result; // Return the entire result object
@@ -1745,7 +1745,7 @@ export class XcpManager {
       const countResponse = await this.fetchXcpV2WithCache<any>(endpoint, countParams);
       const totalCount = countResponse?.result?.length || 0;
 
-      console.log("[XcpManager] Total dispenser count:", {
+      console.log("[CounterpartyApiManager] Total dispenser count:", {
         address,
         totalCount,
         page,
@@ -1783,7 +1783,7 @@ export class XcpManager {
         dispenser_info: dispenser.dispenser_info
       }));
 
-      console.log("[XcpManager] Returning dispensers:", {
+      console.log("[CounterpartyApiManager] Returning dispensers:", {
         address,
         dispensersCount: dispensers.length,
         totalCount,

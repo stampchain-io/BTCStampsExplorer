@@ -354,7 +354,7 @@ describe("StampMintService", () => {
     });
 
     it("should handle XCP API errors", async () => {
-      const failingXcpManager = {
+      const failingCounterpartyApiManager = {
         createIssuance: spy(() =>
           Promise.resolve({
             error: { message: "Invalid base58 address" },
@@ -364,7 +364,7 @@ describe("StampMintService", () => {
 
       const mockService = {
         createIssuanceTransaction: async () => {
-          const response = await failingXcpManager.createIssuance();
+          const response = await failingCounterpartyApiManager.createIssuance();
           if (response.error) {
             if (response.error.message?.includes("invalid base58")) {
               throw new Error(

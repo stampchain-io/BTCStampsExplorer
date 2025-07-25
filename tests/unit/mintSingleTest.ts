@@ -6,7 +6,7 @@ import { stub } from "https://deno.land/std@0.208.0/testing/mock.ts";
 import { handler } from "$routes/api/v2/olga/mint.ts";
 import { mintAddressUTXOs } from "../fixtures/utxoFixtures.mint.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import * as bitcoin from "bitcoinjs-lib";
 
 console.log(
@@ -140,7 +140,7 @@ const mockTxHex = "02000000" +
   "00000000";
 
 const createIssuanceStub = stub(
-  XcpManager,
+  CounterpartyApiManager,
   "createIssuance",
   () =>
     Promise.resolve({
@@ -151,7 +151,7 @@ const createIssuanceStub = stub(
 );
 
 const getXcpBalancesByAddressStub = stub(
-  XcpManager,
+  CounterpartyApiManager,
   "getXcpBalancesByAddress",
   () =>
     Promise.resolve({
