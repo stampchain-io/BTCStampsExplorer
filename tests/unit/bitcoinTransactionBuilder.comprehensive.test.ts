@@ -4,10 +4,10 @@
  */
 
 import {
-    assertEquals,
-    assertExists,
-    assertRejects,
-    assertThrows,
+  assertEquals,
+  assertExists,
+  assertRejects,
+  assertThrows,
 } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { Buffer } from "node:buffer";
@@ -22,20 +22,20 @@ Deno.env.set("SKIP_DB_CONNECTION", "true");
 Deno.env.set("DENO_ENV", "test");
 
 import {
-    BitcoinTransactionBuilder,
-    type BitcoinTransactionBuilderDependencies,
+  type BitcoinTransactionBuilderDependencies,
+  createBitcoinTransactionBuilder,
 } from "../../server/services/transaction/bitcoinTransactionBuilder.ts";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import {
-    clearMockResponses,
-    MockCommonUTXOService,
-    setMockUTXOResponse as setMockCommonUTXOResponse,
-    setMockTransactionHex,
+  clearMockResponses,
+  MockCommonUTXOService,
+  setMockTransactionHex,
+  setMockUTXOResponse as setMockCommonUTXOResponse,
 } from "../mocks/CommonUTXOService.mock.ts";
 import { clearMockUTXOResponses } from "../mocks/utxoUtils.mock.ts";
 import {
-    createMockAddressTestData,
-    createMockNetworks
+  createMockAddressTestData,
+  createMockNetworks,
 } from "./utils/testFactories.ts";
 
 // Use the mock Psbt type for formatPsbtForLogging
@@ -72,7 +72,9 @@ function formatPsbtForLogging(psbt: Psbt) {
 const TEST_ADDRESS = "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";
 
 // Create mock dependencies for injected tests
-const createMockDependencies = (): Partial<BitcoinTransactionBuilderDependencies> => ({
+const createMockDependencies = (): Partial<
+  BitcoinTransactionBuilderDependencies
+> => ({
   getUTXOForAddress: (
     _address: string,
     specificTxid?: string,
@@ -136,12 +138,16 @@ const createMockDependencies = (): Partial<BitcoinTransactionBuilderDependencies
 
 describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
   describe("BitcoinTransactionBuilder with Dependency Injection", () => {
-    let BitcoinTransactionBuilder: ReturnType<typeof BitcoinTransactionBuilder>;
+    let bitcoinTransactionBuilder: ReturnType<
+      typeof createBitcoinTransactionBuilder
+    >;
 
     beforeEach(() => {
       clearMockUTXOResponses();
       clearMockResponses();
-      BitcoinTransactionBuilder = BitcoinTransactionBuilder(createMockDependencies());
+      bitcoinTransactionBuilder = createBitcoinTransactionBuilder(
+        createMockDependencies(),
+      );
     });
 
     afterEach(() => {
@@ -163,7 +169,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
             fixture.script + "00000000",
         );
 
-        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
+        const psbtHex = await bitcoinTransactionBuilder.createPSBT(
           `${fixture.txid}:${fixture.vout}`,
           salePrice,
           sellerAddress,
@@ -193,7 +199,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
 
         await assertRejects(
           async () => {
-            await BitcoinTransactionBuilder.createPSBT(
+            await bitcoinTransactionBuilder.createPSBT(
               `${fixture.txid}:${fixture.vout}`,
               salePrice,
               "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
@@ -216,7 +222,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
             fixture.script + "00000000",
         );
 
-        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
+        const psbtHex = await bitcoinTransactionBuilder.createPSBT(
           `${fixture.txid}:${fixture.vout}`,
           salePrice,
           sellerAddress,
@@ -239,7 +245,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
           address: fixture.address,
         });
 
-        const isValid = await BitcoinTransactionBuilder.validateUTXOOwnership(
+        const isValid = await bitcoinTransactionBuilder.validateUTXOOwnership(
           `${fixture.txid}:${fixture.vout}`,
           fixture.address,
         );
@@ -257,7 +263,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
           address: fixture.address,
         });
 
-        const isValid = await BitcoinTransactionBuilder.validateUTXOOwnership(
+        const isValid = await bitcoinTransactionBuilder.validateUTXOOwnership(
           `${fixture.txid}:${fixture.vout}`,
           wrongAddress,
         );
@@ -294,7 +300,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
             sellerFixture.script + "00000000",
         );
 
-        const result = await BitcoinTransactionBuilder.processCounterpartyPSBT(
+        const result = await bitcoinTransactionBuilder.processCounterpartyPSBT(
           psbt.toHex(),
           `${sellerFixture.txid}:${sellerFixture.vout}`,
           sellerFixture.address,
@@ -311,7 +317,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
       it("should handle invalid UTXO string format", async () => {
         await assertRejects(
           async () => {
-            await BitcoinTransactionBuilder.createPSBT(
+            await bitcoinTransactionBuilder.createPSBT(
               "invalid-format",
               0.001,
               "bc1q7c6u6q8g50txf9e9qw4m4w8ukmh3lxp2c8yz3g",
@@ -325,7 +331,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
       it("should handle negative vout", async () => {
         await assertRejects(
           async () => {
-            await BitcoinTransactionBuilder.createPSBT(
+            await bitcoinTransactionBuilder.createPSBT(
               "deadbeef:-1",
               0.001,
               "bc1q7c6u6q8g50txf9e9qw4m4w8ukmh3lxp2c8yz3g",
@@ -350,7 +356,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
 
         await assertRejects(
           async () => {
-            await BitcoinTransactionBuilder.createPSBT(
+            await bitcoinTransactionBuilder.createPSBT(
               `${mainnetFixture.txid}:${mainnetFixture.vout}`,
               0.001,
               testnetAddress,
@@ -383,7 +389,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
           }
 
           const salePrice = 0.001;
-          const _psbtHex = await BitcoinTransactionBuilder.createPSBT(
+          const _psbtHex = await bitcoinTransactionBuilder.createPSBT(
             `${fixture.txid}:${fixture.vout}`,
             salePrice,
             "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
@@ -553,7 +559,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
     });
   });
 
-  describe("BitcoinTransactionBuilder.getAddressType (private method)", () => {
+  describe("bitcoinTransactionBuilder.getAddressType (private method)", () => {
     const mockNetworks = createMockNetworks();
     const addressTestData = createMockAddressTestData();
 
@@ -639,7 +645,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
     });
   });
 
-  describe("BitcoinTransactionBuilder.getAddressNetwork (private method)", () => {
+  describe("bitcoinTransactionBuilder.getAddressNetwork (private method)", () => {
     const mockNetworks = createMockNetworks();
     const addressTestData = createMockAddressTestData();
 
@@ -738,7 +744,7 @@ describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
     });
   });
 
-  describe("BitcoinTransactionBuilder.getAddressFromScript (private method)", () => {
+  describe("bitcoinTransactionBuilder.getAddressFromScript (private method)", () => {
     it("should derive address from P2WPKH script", () => {
       const service = BitcoinTransactionBuilder as any;
       const script = new Uint8Array(

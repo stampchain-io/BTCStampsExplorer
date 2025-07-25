@@ -115,7 +115,7 @@ function createMockBlockInfoResponse(blockIndex: number, stampsCount = 0) {
 
 // Mock BlockService before importing BlockController
 const originalBlockService = await import(
-  "../../server/services/blockService.ts"
+  "../../server/services/core/blockService.ts"
 );
 
 // Store original methods for restoration

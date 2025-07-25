@@ -1,7 +1,7 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { Src20Controller } from "../../server/controller/src20Controller.ts";
 import { SRC20Service } from "../../server/services/src20/index.ts";
-import { BlockService } from "../../server/services/blockService.ts";
+import { BlockService } from "../../server/services/core/blockService.ts";
 
 // Setup test data
 const mockBalanceData = [{ tick: "TEST", balance: "1000" }];
