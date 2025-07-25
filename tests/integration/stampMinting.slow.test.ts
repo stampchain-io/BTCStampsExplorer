@@ -1,5 +1,5 @@
 import { assertEquals, assertExists } from "@std/assert";
-import { StampMintService } from "../../server/services/stamp/stampMintService.ts";
+import { StampCreationService } from "../../server/services/stamp/stampCreationService.ts";
 
 // Test configuration
 const TEST_ADDRESS = "bc1qnpszanef2ed9yxtqndvyxy72tdmnks6m28rn3d";
@@ -23,7 +23,7 @@ Deno.test("Stamp Minting Integration Tests", async (t) => {
       console.log(`   Fee Rate: ${TEST_SATS_PER_VB} sat/vB`);
 
       // This would normally create a full stamp issuance, but we're testing dry run
-      const result = await StampMintService.createStampIssuance({
+      const result = await StampCreationService.createStampIssuance({
         sourceWallet: TEST_ADDRESS,
         assetName: "TESTINTEGRATION",
         qty: 1,
@@ -95,8 +95,8 @@ Deno.test("Stamp Minting Integration Tests", async (t) => {
 
     try {
       // The service should instantiate without errors
-      const service = StampMintService;
-      console.log("✅ StampMintService instantiated successfully");
+      const service = StampCreationService;
+      console.log("✅ StampCreationService instantiated successfully");
 
       // Check that we're using the direct OptimalUTXOSelection approach
       // (This is more of a structural validation)
@@ -116,7 +116,7 @@ Deno.test("Stamp Minting Integration Tests", async (t) => {
 
     try {
       // Test with invalid address
-      await StampMintService.createStampIssuance({
+      await StampCreationService.createStampIssuance({
         sourceWallet: "invalid_address",
         assetName: "TESTFAIL",
         qty: 1,
@@ -139,7 +139,7 @@ Deno.test("Stamp Minting Integration Tests", async (t) => {
 
     try {
       // Test with unreasonably high fee rate
-      await StampMintService.createStampIssuance({
+      await StampCreationService.createStampIssuance({
         sourceWallet: TEST_ADDRESS,
         assetName: "TESTFEE",
         qty: 1,
@@ -172,7 +172,7 @@ Deno.test("Stamp Minting - Performance Validation", async (t) => {
       // Test a realistic scenario
       const testFile = createTestFile();
 
-      const result = await StampMintService.createStampIssuance({
+      const result = await StampCreationService.createStampIssuance({
         sourceWallet: TEST_ADDRESS,
         assetName: "PERFTEST",
         qty: 1,
