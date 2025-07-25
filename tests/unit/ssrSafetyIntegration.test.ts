@@ -151,7 +151,7 @@ describe("SSR Safety Validation Script", () => {
       args: [
         "run",
         "--allow-read",
-        "../scripts/validate-ssr-safety.ts",
+        "../scripts/detectSSRSafety.ts",
         "--ci",
       ],
       stdout: "piped",
@@ -245,7 +245,7 @@ describe("Validation Script Quality", () => {
       args: [
         "run",
         "--allow-read",
-        "../scripts/validate-ssr-safety.ts",
+        "../scripts/detectSSRSafety.ts",
         "--ci",
       ],
       stdout: "piped",
@@ -275,7 +275,7 @@ describe("Validation Script Quality", () => {
       args: [
         "run",
         "--allow-read",
-        "../scripts/validate-ssr-safety.ts",
+        "../scripts/detectSSRSafety.ts",
         "--ci",
       ],
       stdout: "piped",
