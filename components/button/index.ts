@@ -1,5 +1,9 @@
 export * from "$components/button/styles.ts";
 
+// Destructure commonly used properties for cleaner imports
+import { buttonStyles } from "$components/button/styles.ts";
+export const { color, padding, pillSize, state } = buttonStyles;
+
 export * from "$components/button/ButtonBase.tsx";
 
 export * from "$components/button/ReadAllButton.tsx";
