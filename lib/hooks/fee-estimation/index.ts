@@ -6,7 +6,7 @@
  */
 
 // Main progressive fee estimation hook
-export { useProgressiveFeeEstimation } from "../useProgressiveFeeEstimation.ts";
+export { useProgressiveFeeEstimation } from "$lib/hooks/fee-estimation/useProgressiveFeeEstimation.ts";
 export { useTransactionConstructionService } from "../useTransactionConstructionService.ts";
 
 // Supporting hooks
