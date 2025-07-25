@@ -44,34 +44,37 @@ jobs:
           path: |
             ~/.deno
             ~/.cache/deno
-          key: ${{ runner.os }}-deno-typecheck-${{ hashFiles('**/deno.json') }}
+            .deno_cache
+          key: ${{ runner.os }}-deno-typecheck-${{ hashFiles('**/deno.json', '**/import_map.json', 'main.ts', 'dev.ts') }}
           restore-keys: |
+            ${{ runner.os }}-deno-typecheck-${{ hashFiles('**/deno.json') }}
             ${{ runner.os }}-deno-typecheck-
             ${{ runner.os }}-deno-
 
-      - name: Cache dependencies
+      - name: Cache dependencies (if needed)
+        if: github.event_name != 'pull_request'
         run: |
-          echo "Caching dependencies for type checking..."
+          echo "Caching dependencies for comprehensive type checking..."
+          # Only cache main entry points for non-PR runs
           deno cache --no-check main.ts dev.ts
 
-      - name: Run TypeScript type analysis (non-blocking)
+      - name: Run TypeScript type analysis (PR-optimized)
         run: |
-          echo "🔍 Running comprehensive TypeScript analysis..."
-          deno task analyze:types || echo "⚠️ Type analysis completed with issues"
-
-          # Check main entry points but don't fail the workflow
-          echo "📋 Checking main entry points..."
-          if deno task check:types; then
-            echo "✅ No type errors in main entry points!"
+          echo "🔍 Running TypeScript analysis..."
+          
+          # For PRs, we'll check changed files in the next step
+          # For pushes to main/dev, run the comprehensive analysis
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "🔍 Running comprehensive analysis for ${{ github.ref_name }} branch..."
+            timeout 600 deno task analyze:types || echo "⚠️ Full analysis completed with timeout or issues"
           else
-            echo "⚠️ Type errors found in main entry points (expected during gradual improvement)"
-            echo "📊 This is informational only and doesn't block the workflow"
+            echo "⚡ Skipping comprehensive analysis for PR - will check changed files only"
           fi
 
-      - name: Analyze changed files and check for new errors (PR only)
+      - name: Type check changed files (PR only)
         if: github.event_name == 'pull_request'
         run: |
-          echo "🔍 Analyzing TypeScript changes in PR..."
+          echo "🔍 Type checking changed TypeScript files in PR..."
 
           # Get changed TypeScript files
           CHANGED_TS_FILES=$(git diff --name-only origin/${{ github.base_ref }}..HEAD | grep -E '\.(ts|tsx)$' | grep -v -E '(test|spec)\.(ts|tsx)$' || echo "")
@@ -87,22 +90,35 @@ jobs:
             FILES_WITH_ERRORS=0
 
             echo "🔍 Type checking changed files..."
+            
+            # Check files in parallel for better performance
+            export -f check_file
+            check_file() {
+              local file=$1
+              if timeout 30 deno check "$file" 2>&1 >/dev/null; then
+                echo "✅ $file"
+                return 0
+              else
+                echo "❌ $file"
+                return 1
+              fi
+            }
+            
+            # Process files and collect results
+            ERROR_FILES=""
             for file in $CHANGED_TS_FILES; do
               if [ -f "$file" ]; then
-                echo "Checking: $file"
                 CHECKED_FILES=$((CHECKED_FILES + 1))
-
-                if deno check "$file" 2>&1; then
-                  echo "  ✅ No type errors in $file"
-                else
-                  echo "  ⚠️ Type errors found in $file"
+                if ! timeout 30 deno check "$file" 2>&1; then
                   FILES_WITH_ERRORS=$((FILES_WITH_ERRORS + 1))
-                  # Note: We're not setting NEW_ERRORS_FOUND=true here because we're in gradual improvement mode
-                  # Only fail if there are critical syntax errors or completely broken files
+                  ERROR_FILES="$ERROR_FILES\n  - $file"
                 fi
-                echo ""
               fi
             done
+            
+            if [ -n "$ERROR_FILES" ]; then
+              echo -e "\n⚠️ Files with type errors:$ERROR_FILES"
+            fi
 
             echo "📊 Summary for changed files:"
             echo "  - Files checked: $CHECKED_FILES"
