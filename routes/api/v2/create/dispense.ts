@@ -3,8 +3,8 @@ import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { BitcoinTransactionBuilder } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import { BitcoinTransactionBuilder } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 
 interface DispenseInput {
   address: string;
@@ -73,7 +73,7 @@ export const handler: Handlers = {
 
         // normalizeFeeRate itself throws if neither is provided, which is good.
         // We just need to ensure the object passed is clean for exactOptionalPropertyTypes.
-        normalizedFees = CounterpartyApiManager.normalizeFeeRate(feeArgsInput);
+        normalizedFees = normalizeFeeRate(feeArgsInput);
 
         if (!normalizedFees || normalizedFees.normalizedSatsPerVB <= 0) {
           return ApiResponseUtil.badRequest(

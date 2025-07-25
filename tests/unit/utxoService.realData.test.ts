@@ -1,5 +1,5 @@
 /**
- * @fileoverview Real blockchain data tests for UTXOService
+ * @fileoverview Real blockchain data tests for BitcoinUtxoManager
  * Tests with actual Bitcoin UTXO data from mempool.space
  * Validates that our estimates work with real-world data
  */
@@ -43,7 +43,7 @@ function estimateVoutSize(output: any): number {
   return 8 + 1 + scriptSize; // 8 bytes value + 1 byte script length + script
 }
 
-describe("UTXOService Real Data Tests", () => {
+describe("BitcoinUtxoManager Real Data Tests", () => {
   it("should handle real P2WPKH UTXOs correctly", () => {
     const p2wpkhUtxos = realUTXOFixtures.p2wpkh;
 

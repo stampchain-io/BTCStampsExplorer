@@ -1,17 +1,12 @@
 /**
- * Integration tests for PSBT Service
+ * Integration tests for BitcoinTransactionBuilder
  *
- * ⚠️  DEPRECATED METHODS REMOVED FROM TESTS
+ * Note: Most comprehensive PSBT integration tests
+ * have been migrated to GeneralBitcoinTransactionBuilder.generatePSBT().
  *
- * The deprecated methods processCounterpartyPSBT and buildPsbtFromUserFundedRawHex
- * have been migrated to GeneralPSBTService.generatePSBT().
- *
- * See migration examples in:
- * - routes/api/v2/fairmint/compose.ts
- * - routes/api/v2/trx/stampdetach.ts
- *
- * These integration tests now focus on the non-deprecated PSBT functionality.
+ * This file is kept for historical reference and may be
+ * expanded in the future for specific BitcoinTransactionBuilder
+ * integration scenarios.
  */
 
-// TODO(reinamora137): Add integration tests for GeneralPSBTService when needed
-// For now, removing deprecated method tests to keep codebase clean
+// TODO(reinamora137): Add integration tests for GeneralBitcoinTransactionBuilder when needed

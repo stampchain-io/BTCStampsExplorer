@@ -1,27 +1,29 @@
 import { Handlers } from "$fresh/server.ts";
+import type { UTXOData } from "$lib/types/index.d.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
-import { logger } from "$lib/utils/logger.ts";
-import type { AncestorInfo, UTXO } from "$types/index.d.ts";
 
 export const handler: Handlers = {
-  async GET(_req: Request, ctx) {
-    try {
-      const { address } = ctx.params;
-      if (!address) {
-        return ResponseUtil.badRequest("Address is required");
-      }
+  async GET(_req, ctx) {
+    const { address } = ctx.params;
 
-      // Use existing UTXOService with ancestor information
-      const utxos = await (UTXOService as any).getAddressUTXOs(address, {
+    try {
+      logger.info(`Getting UTXO ancestors for address: ${address}`);
+
+      // Get UTXOs with ancestor information
+      const utxoService = new BitcoinUtxoManager();
+      const utxos = await utxoService.getAddressUTXOs(address, {
         includeAncestors: true,
         filterStampUTXOs: true,
       });
 
       // Extract ancestor information from UTXOs
-      const ancestors: AncestorInfo[] = utxos
-        .filter((utxo: UTXO) => utxo.ancestorCount && utxo.ancestorCount > 0)
-        .map((utxo: UTXO) => ({
+      const ancestors: UTXOData[] = utxos
+        .filter((utxo: UTXOData) =>
+          utxo.ancestorCount && utxo.ancestorCount > 0
+        )
+        .map((utxo: UTXOData) => ({
           fees: utxo.ancestorFees || 0,
           vsize: utxo.ancestorSize || 0,
           weight: (utxo.ancestorSize || 0) * 4,
