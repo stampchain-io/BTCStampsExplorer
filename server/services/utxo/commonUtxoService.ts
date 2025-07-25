@@ -271,6 +271,8 @@ export class CommonUTXOService implements ICommonUTXOService {
             return formattedUtxo;
           } else {
             logger.warn("common-utxo-service", { message: "Mempool.space output missing value or scriptpubkey", txid, vout, output });
+            // Return null without fallback - if mempool has the tx but output is malformed,
+            // other APIs likely won't have better data
             return null;
           }
         } else {
