@@ -1,14 +1,15 @@
+import { glassmorph } from "$layout";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface SegmentOption {
+interface SelectorOption {
   value: string;
   label: string;
   disabled?: boolean;
 }
 
-interface SegmentControlProps {
-  options: SegmentOption[];
+interface SelectorButtonsProps {
+  options: SelectorOption[];
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
@@ -19,16 +20,16 @@ interface SegmentControlProps {
 }
 
 /* ===== COMPONENT ===== */
-export const SegmentControl = ({
+export const SelectorButtons = ({
   options,
   value,
   defaultValue,
   onChange,
-  disabled = false,
   size,
-  color,
+  color: colorProp,
   className = "",
-}: SegmentControlProps) => {
+  disabled: disabledProp = false,
+}: SelectorButtonsProps) => {
   const [selectedValue, setSelectedValue] = useState<string>(
     value || defaultValue || options[0]?.value || "",
   );
@@ -81,24 +82,24 @@ export const SegmentControl = ({
 
   // Handle option selection
   const handleOptionChange = useCallback((optionValue: string) => {
-    if (disabled) return;
+    if (disabledProp) return;
 
     const option = options.find((opt) => opt.value === optionValue);
     if (option?.disabled) return;
 
     setSelectedValue(optionValue);
     onChange?.(optionValue);
-  }, [disabled, options, onChange]);
+  }, [disabledProp, options, onChange]);
 
   // Size classes
-  const sizeClasses = {
+  const textSize = {
     xs: "text-xs py-[5px] px-[14px]",
     sm: "text-xs py-[7px] px-4",
     md: "text-sm py-[9px] px-4",
     lg: "text-sm py-[11px] px-4",
   };
 
-  const pillSizeClasses = {
+  const buttonSize = {
     xs: "py-[5px] px-[14px]",
     sm: "py-[7px] px-4",
     md: "py-[9px] px-4",
@@ -106,116 +107,103 @@ export const SegmentControl = ({
   };
 
   // Color variants using CSS custom properties
-  const colorClasses = {
+  const color = {
     grey: `
       [--default-color:#666666]
       [--hover-color:#999999]
-      [--selected-color:#666666]
+      [--button-color-light:#999999]
+      [--button-color-dark:#666666]
     `,
     purple: `
       [--default-color:#8800CC]
       [--hover-color:#AA00FF]
-      [--selected-color:#8800CC]
+      [--button-color-light:#AA00FF]
+      [--button-color-dark:#8800CC]
     `,
   };
+
+  const disabled = "opacity-30 !cursor-not-allowed";
+
+  // Helper function to determine if an option is disabled
+  const isOptionDisabled = useCallback((option: SelectorOption) => {
+    return option.disabled || disabledProp;
+  }, [disabledProp]);
 
   return (
     <div
       ref={containerRef}
-      class={`
-        ios-segmented-control
-        bg-stamp-grey-darkest/15
-        rounded-lg
-        p-0.5
-        grid
-        select-none
-        relative
-        ${colorClasses[color]}
-        ${disabled ? "opacity-33 cursor-not-allowed" : ""}
+      class={`relative grid p-0.5 select-none
+        ${glassmorph}
+        ${color[colorProp]}
+        ${disabledProp ? disabled : ""}
         ${className}
       `}
       style={{
         gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
       }}
     >
-      {/* Selection pill - positioned absolutely to match one column width */}
+      {/* Selection button */}
       <div
-        class={`
-          selection-pill
-          bg-[var(--selected-color)]
-          border-[var(--selected-color)]
-          shadow-lg
-          rounded-md
-          z-10
-          transition-transform
-          duration-100
-          ease-out
-          absolute
-          top-0.5
-          bottom-0.5
-          ${pillSizeClasses[size]}
+        class={`absolute top-0.5 bottom-0.5 z-10
+          rounded-lg shadow-lg
+          transition-transform duration-200 ease-out
+          ${buttonSize[size]}
         `}
         style={{
           transform: selectionTransform,
           width: `calc((100% - ${options.length * 2}px) / ${options.length})`,
+          background:
+            `linear-gradient(135deg, var(--button-color-light), var(--button-color-dark))`,
         }}
       />
 
       {/* Options */}
-      {options.map((option, index) => (
-        <div
-          key={option.value}
-          ref={(el) => (optionRefs.current[index] = el)}
-          class={`
-            option
-            relative
-            cursor-pointer
-            min-w-0
-            ${option.disabled || disabled ? "cursor-not-allowed" : ""}
-          `}
-        >
-          <input
-            type="radio"
-            id={`segment-${option.value}`}
-            name="segment-control"
-            value={option.value}
-            checked={selectedValue === option.value}
-            disabled={option.disabled || disabled}
-            onChange={() => handleOptionChange(option.value)}
-            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          />
-          <label
-            for={`segment-${option.value}`}
+      {options.map((option, index) => {
+        const optionDisabled = isOptionDisabled(option);
+
+        return (
+          <div
+            key={option.value}
+            ref={(el) => (optionRefs.current[index] = el)}
             class={`
-              block
-              text-center
-              font-semibold
-              transition-all
-              duration-100
-              ease-out
-              relative
-              z-20
-              ${sizeClasses[size]}
-              ${
-              selectedValue === option.value
-                ? "text-black cursor-default"
-                : "text-[var(--default-color)] hover:text-[var(--hover-color)] cursor-pointer"
-            }
-              ${
-              option.disabled || disabled
-                ? "opacity-50 !cursor-not-allowed"
-                : ""
-            }
+              relative min-w-0 cursor-pointer
+              ${optionDisabled ? "cursor-not-allowed" : ""}
             `}
           >
-            <span class="block relative z-20">
-              {option.label}
-            </span>
-          </label>
-        </div>
-      ))}
+            <input
+              type="radio"
+              id={`selector-${option.value}`}
+              name="selector-buttons"
+              value={option.value}
+              checked={selectedValue === option.value}
+              disabled={optionDisabled}
+              onChange={() => handleOptionChange(option.value)}
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+            <label
+              for={`selector-${option.value}`}
+              class={`
+                relative block z-20
+                font-semibold text-center
+                transition-all duration-200 ease-out
+                ${textSize[size]}
+                ${
+                selectedValue === option.value
+                  ? "text-black cursor-default"
+                  : "text-[var(--default-color)] hover:text-[var(--hover-color)] cursor-pointer"
+              }
+                ${optionDisabled ? disabled : ""}
+              `}
+            >
+              <span class="block relative z-20">
+                {option.label}
+              </span>
+            </label>
+          </div>
+        );
+      })}
     </div>
   );
 };
 
-export default SegmentControl;
+export default SelectorButtons;
