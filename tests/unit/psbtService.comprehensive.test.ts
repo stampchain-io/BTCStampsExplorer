@@ -1,18 +1,18 @@
 /**
- * @fileoverview Comprehensive PSBTService tests with dependency injection and fixtures
+ * @fileoverview Comprehensive BitcoinTransactionBuilder tests with dependency injection and fixtures
  * Combines unit tests, integration tests, and fixture-based tests for full coverage
  */
 
 import {
-  assertEquals,
-  assertExists,
-  assertRejects,
-  assertThrows,
+    assertEquals,
+    assertExists,
+    assertRejects,
+    assertThrows,
 } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { Buffer } from "node:buffer";
-import { networks, Psbt, Transaction } from "../mocks/bitcoinjs-lib.mock.ts";
 import * as bitcoin from "../mocks/bitcoinjs-lib.mock.ts";
+import { networks, Psbt, Transaction } from "../mocks/bitcoinjs-lib.mock.ts";
 
 // Set test environment before any imports
 (globalThis as any).SKIP_REDIS_CONNECTION = true;
@@ -22,10 +22,21 @@ Deno.env.set("SKIP_DB_CONNECTION", "true");
 Deno.env.set("DENO_ENV", "test");
 
 import {
-  createPSBTService,
-  PSBTService,
-  type PSBTServiceDependencies,
+    BitcoinTransactionBuilder,
+    type BitcoinTransactionBuilderDependencies,
 } from "../../server/services/transaction/bitcoinTransactionBuilder.ts";
+import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
+import {
+    clearMockResponses,
+    MockCommonUTXOService,
+    setMockUTXOResponse as setMockCommonUTXOResponse,
+    setMockTransactionHex,
+} from "../mocks/CommonUTXOService.mock.ts";
+import { clearMockUTXOResponses } from "../mocks/utxoUtils.mock.ts";
+import {
+    createMockAddressTestData,
+    createMockNetworks
+} from "./utils/testFactories.ts";
 
 // Use the mock Psbt type for formatPsbtForLogging
 function formatPsbtForLogging(psbt: Psbt) {
@@ -56,26 +67,12 @@ function formatPsbtForLogging(psbt: Psbt) {
     })),
   };
 }
-import type { UTXO } from "$types/index.d.ts";
-import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
-import { clearMockUTXOResponses } from "../mocks/utxoUtils.mock.ts";
-import {
-  BIG,
-  createMockAddressTestData,
-  createMockNetworks,
-} from "./utils/testFactories.ts";
-import {
-  clearMockResponses,
-  MockCommonUTXOService,
-  setMockTransactionHex,
-  setMockUTXOResponse as setMockCommonUTXOResponse,
-} from "../mocks/CommonUTXOService.mock.ts";
 
 // Test address and fixtures
 const TEST_ADDRESS = "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m";
 
 // Create mock dependencies for injected tests
-const createMockDependencies = (): Partial<PSBTServiceDependencies> => ({
+const createMockDependencies = (): Partial<BitcoinTransactionBuilderDependencies> => ({
   getUTXOForAddress: (
     _address: string,
     specificTxid?: string,
@@ -137,14 +134,14 @@ const createMockDependencies = (): Partial<PSBTServiceDependencies> => ({
   bitcoin: bitcoin as any, // Use mock bitcoin for testing
 });
 
-describe("PSBTService Comprehensive Coverage", () => {
-  describe("PSBTService with Dependency Injection", () => {
-    let psbtService: ReturnType<typeof createPSBTService>;
+describe("BitcoinTransactionBuilder Comprehensive Coverage", () => {
+  describe("BitcoinTransactionBuilder with Dependency Injection", () => {
+    let BitcoinTransactionBuilder: ReturnType<typeof BitcoinTransactionBuilder>;
 
     beforeEach(() => {
       clearMockUTXOResponses();
       clearMockResponses();
-      psbtService = createPSBTService(createMockDependencies());
+      BitcoinTransactionBuilder = BitcoinTransactionBuilder(createMockDependencies());
     });
 
     afterEach(() => {
@@ -166,7 +163,7 @@ describe("PSBTService Comprehensive Coverage", () => {
             fixture.script + "00000000",
         );
 
-        const psbtHex = await psbtService.createPSBT(
+        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
           `${fixture.txid}:${fixture.vout}`,
           salePrice,
           sellerAddress,
@@ -196,7 +193,7 @@ describe("PSBTService Comprehensive Coverage", () => {
 
         await assertRejects(
           async () => {
-            await psbtService.createPSBT(
+            await BitcoinTransactionBuilder.createPSBT(
               `${fixture.txid}:${fixture.vout}`,
               salePrice,
               "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
@@ -219,7 +216,7 @@ describe("PSBTService Comprehensive Coverage", () => {
             fixture.script + "00000000",
         );
 
-        const psbtHex = await psbtService.createPSBT(
+        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
           `${fixture.txid}:${fixture.vout}`,
           salePrice,
           sellerAddress,
@@ -242,7 +239,7 @@ describe("PSBTService Comprehensive Coverage", () => {
           address: fixture.address,
         });
 
-        const isValid = await psbtService.validateUTXOOwnership(
+        const isValid = await BitcoinTransactionBuilder.validateUTXOOwnership(
           `${fixture.txid}:${fixture.vout}`,
           fixture.address,
         );
@@ -260,7 +257,7 @@ describe("PSBTService Comprehensive Coverage", () => {
           address: fixture.address,
         });
 
-        const isValid = await psbtService.validateUTXOOwnership(
+        const isValid = await BitcoinTransactionBuilder.validateUTXOOwnership(
           `${fixture.txid}:${fixture.vout}`,
           wrongAddress,
         );
@@ -297,7 +294,7 @@ describe("PSBTService Comprehensive Coverage", () => {
             sellerFixture.script + "00000000",
         );
 
-        const result = await psbtService.processCounterpartyPSBT(
+        const result = await BitcoinTransactionBuilder.processCounterpartyPSBT(
           psbt.toHex(),
           `${sellerFixture.txid}:${sellerFixture.vout}`,
           sellerFixture.address,
@@ -314,7 +311,7 @@ describe("PSBTService Comprehensive Coverage", () => {
       it("should handle invalid UTXO string format", async () => {
         await assertRejects(
           async () => {
-            await psbtService.createPSBT(
+            await BitcoinTransactionBuilder.createPSBT(
               "invalid-format",
               0.001,
               "bc1q7c6u6q8g50txf9e9qw4m4w8ukmh3lxp2c8yz3g",
@@ -328,7 +325,7 @@ describe("PSBTService Comprehensive Coverage", () => {
       it("should handle negative vout", async () => {
         await assertRejects(
           async () => {
-            await psbtService.createPSBT(
+            await BitcoinTransactionBuilder.createPSBT(
               "deadbeef:-1",
               0.001,
               "bc1q7c6u6q8g50txf9e9qw4m4w8ukmh3lxp2c8yz3g",
@@ -353,7 +350,7 @@ describe("PSBTService Comprehensive Coverage", () => {
 
         await assertRejects(
           async () => {
-            await psbtService.createPSBT(
+            await BitcoinTransactionBuilder.createPSBT(
               `${mainnetFixture.txid}:${mainnetFixture.vout}`,
               0.001,
               testnetAddress,
@@ -386,7 +383,7 @@ describe("PSBTService Comprehensive Coverage", () => {
           }
 
           const salePrice = 0.001;
-          const _psbtHex = await psbtService.createPSBT(
+          const _psbtHex = await BitcoinTransactionBuilder.createPSBT(
             `${fixture.txid}:${fixture.vout}`,
             salePrice,
             "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
@@ -556,14 +553,14 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
   });
 
-  describe("PSBTService.getAddressType (private method)", () => {
+  describe("BitcoinTransactionBuilder.getAddressType (private method)", () => {
     const mockNetworks = createMockNetworks();
     const addressTestData = createMockAddressTestData();
 
     it("should correctly identify P2WPKH addresses", () => {
       // Test that the method exists and handles the pattern correctly
       // Due to mock limitations, we test that it either returns the correct type or throws expected error
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const testAddress = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4";
 
       assertExists(
@@ -585,7 +582,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should correctly identify P2SH addresses", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const testAddress = "3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy";
 
       try {
@@ -601,7 +598,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should correctly identify P2PKH addresses", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const testAddress = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa";
 
       try {
@@ -617,7 +614,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should throw error for unsupported address type", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       assertThrows(
         () => service.getAddressType("invalid-address", mockNetworks.bitcoin),
         Error,
@@ -626,7 +623,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should handle testnet addresses", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const testAddress = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx";
 
       try {
@@ -642,12 +639,12 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
   });
 
-  describe("PSBTService.getAddressNetwork (private method)", () => {
+  describe("BitcoinTransactionBuilder.getAddressNetwork (private method)", () => {
     const mockNetworks = createMockNetworks();
     const addressTestData = createMockAddressTestData();
 
     it("should detect mainnet for mainnet addresses", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
 
       // Mock bitcoin.payments.p2wpkh to not throw for mainnet addresses
       const originalP2wpkh = bitcoin.payments.p2wpkh;
@@ -673,7 +670,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should detect testnet for testnet addresses", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
 
       // Mock bitcoin.payments.p2wpkh to not throw for testnet addresses
       const originalP2wpkh = bitcoin.payments.p2wpkh;
@@ -705,7 +702,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should throw error for invalid address", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       assertThrows(
         () => service.getAddressNetwork("invalid-address"),
         Error,
@@ -714,7 +711,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should throw error for empty address", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       assertThrows(
         () => service.getAddressNetwork(""),
         Error,
@@ -723,7 +720,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should handle legacy testnet addresses", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const testnetP2PKH = "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn";
       const testnetP2SH = "2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc";
 
@@ -741,9 +738,9 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
   });
 
-  describe("PSBTService.getAddressFromScript (private method)", () => {
+  describe("BitcoinTransactionBuilder.getAddressFromScript (private method)", () => {
     it("should derive address from P2WPKH script", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const script = new Uint8Array(
         Buffer.from("0014bdd9a1eccc053725271114f2a406406f095a707d", "hex"),
       );
@@ -752,7 +749,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should derive address from P2PKH script", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const script = new Uint8Array(
         Buffer.from(
           "76a914" + "89abcdefabbaabbaabbaabbaabbaabbaabbaabba" + "88ac",
@@ -765,7 +762,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should derive address from P2SH script", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const script = new Uint8Array(
         Buffer.from(
           "a914" + "89abcdefabbaabbaabbaabbaabbaabbaabbaabba" + "87",
@@ -778,7 +775,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should throw error for invalid script", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const invalidScript = new Uint8Array([0x00, 0x01, 0x02]);
       assertThrows(
         () => service.getAddressFromScript(invalidScript, networks.bitcoin),
@@ -788,7 +785,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should throw error for empty script", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const emptyScript = new Uint8Array([]);
       assertThrows(
         () => service.getAddressFromScript(emptyScript, networks.bitcoin),
@@ -798,7 +795,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should handle testnet scripts", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const script = new Uint8Array(
         Buffer.from("0014751e76e8199196d454941c45d1b3a323f1433bd6", "hex"),
       );
@@ -897,7 +894,7 @@ describe("PSBTService Comprehensive Coverage", () => {
     });
 
     it("should handle network detection for various address formats", () => {
-      const service = PSBTService as any;
+      const service = BitcoinTransactionBuilder as any;
       const mockNetworks = createMockNetworks();
       const addressTestData = createMockAddressTestData();
 
