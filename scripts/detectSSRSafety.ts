@@ -230,7 +230,7 @@ class SSRSafetyDetector {
 
     for await (const entry of walk(rootPath, {
       exts: this.EXTENSIONS,
-      skip: this.EXCLUDE_DIRS.map(dir => new RegExp(`[\\\\/]${dir}[\\\\/]`))
+      skip: this.EXCLUDE_DIRS.map(dir => new RegExp(`(^|[\\\\/])${dir}([\\\\/]|$)`))
     })) {
       if (entry.isFile) {
         totalFiles++;
