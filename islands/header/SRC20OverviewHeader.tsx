@@ -1,10 +1,9 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
 /* @baba - update search button styling */
-import { Button } from "$components/button/ButtonBase.tsx";
-import { SegmentControl } from "$islands/layout/SegmentControl.tsx";
+import { Button, SelectorButtons } from "$button";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
-import { useCallback, useMemo, useState } from "preact/hooks";
+import { useCallback, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
 interface SRC20OverviewHeaderProps {
@@ -16,12 +15,6 @@ interface SRC20OverviewHeaderProps {
     filter: string | null;
     direction: "asc" | "desc";
   };
-}
-
-// 🚀 DENO FRESH 2.3+ OPTIMIZATION: Simplified hover state type
-interface HoverState {
-  canHover: boolean;
-  isHovered: boolean;
 }
 
 /* ===== COMPONENT ===== */
@@ -36,52 +29,14 @@ export const SRC20OverviewHeader = (
 ) => {
   // 🚀 SIMPLIFIED STATE: Reduced complexity with modern patterns
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>("24H");
-  const [viewTypeHover, setViewTypeHover] = useState<HoverState>({
-    canHover: true,
-    isHovered: false,
-  });
-
-  // 🚀 DENO FRESH 2.3+ OPTIMIZATION: Memoized button text and variant logic
-  const viewTypeButton = useMemo(() => {
-    // 🎯 FIXED LOGIC: Button shows what you can switch TO, not current state
-    const buttonText = viewType === "minted" ? "MINTING" : "MINTED";
-    const isActive = viewType === "minting"; // Active when showing minting view
-
-    type ButtonVariant = "flatOutline" | "outlineFlat";
-    const variant: ButtonVariant = isActive ? "flatOutline" : "outlineFlat";
-
-    return {
-      text: buttonText,
-      variant,
-      ariaLabel: `Switch to ${buttonText.toLowerCase()} view`,
-    };
-  }, [viewType, viewTypeHover.isHovered]);
 
   // 🚀 PREACT OPTIMIZATION: Memoized handlers
   const handleViewTypeClick = useCallback(() => {
-    setViewTypeHover({ canHover: false, isHovered: false });
     // Reset timeframe to default when switching views
     setSelectedTimeframe("24H");
     onTimeframeChange?.("24H");
     onViewTypeChange?.();
-
-    // Re-enable hover after a brief delay
-    setTimeout(() => {
-      setViewTypeHover({ canHover: true, isHovered: false });
-    }, 150);
   }, [onViewTypeChange, onTimeframeChange]);
-
-  const handleViewTypeMouseEnter = useCallback(() => {
-    if (viewTypeHover.canHover) {
-      setViewTypeHover((prev) => ({ ...prev, isHovered: true }));
-    }
-  }, [viewTypeHover.canHover]);
-
-  const handleViewTypeMouseLeave = useCallback(() => {
-    if (viewTypeHover.canHover) {
-      setViewTypeHover((prev) => ({ ...prev, isHovered: false }));
-    }
-  }, [viewTypeHover.canHover]);
 
   const handleTimeframeClick = useCallback(
     (timeframe: string) => {
@@ -100,9 +55,7 @@ export const SRC20OverviewHeader = (
 
   // 🚀 PREACT OPTIMIZATION: Memoized variant getters
   const getTrendingVariant = useCallback(() => {
-    return currentSort?.filter === "TRENDING"
-      ? "flatOutlineSelector"
-      : "outlineFlatSelector";
+    return currentSort?.filter === "TRENDING" ? "flatOutline" : "outlineFlat";
   }, [currentSort?.filter]);
 
   /* ===== RENDER ===== */
@@ -127,7 +80,7 @@ export const SRC20OverviewHeader = (
       <div class="flex flex-col mobileLg:flex-row justify-between w-full">
         {/* Minting/Minted/Listings */}
         <div class="flex gap-3 w-full mobileMd:w-auto">
-          <SegmentControl
+          <SelectorButtons
             options={[
               { value: "minted", label: "MINTED" },
               { value: "minting", label: "MINTING" },
@@ -146,21 +99,23 @@ export const SRC20OverviewHeader = (
           {/* Trending Button */}
           <Button
             variant={getTrendingVariant()}
-            color="custom"
+            color="grey"
             size="xs"
             onClick={handleTrendingClick}
             class={`
-              ${currentSort?.filter === "TRENDING" ? "cursor-default" : ""}
-              [--default-color:#333333]
-              [--hover-color:#666666]
-              mt-[2px]
+              ${
+              currentSort?.filter === "TRENDING"
+                ? "cursor-default"
+                : "cursor-pointer"
+            }
+              mt-[3px]
             `}
           >
             TRENDING
           </Button>
 
           {/* Timeframe Buttons */}
-          <SegmentControl
+          <SelectorButtons
             options={[
               { value: "24H", label: "24H" },
               { value: "7D", label: "7D" },
