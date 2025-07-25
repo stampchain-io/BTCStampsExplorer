@@ -3,7 +3,7 @@
  * Comprehensive mock data for testing XCP service functionality
  */
 
-export const xcpServiceFixtures = {
+export const counterpartyApiServiceFixtures = {
   // XCP Node configurations
   nodes: {
     primary: {
@@ -515,7 +515,7 @@ export const xcpTestHelpers = {
    */
   generateDispensers(count: number, cpid: string = "A4399874976698242000") {
     return Array.from({ length: count }, (_, i) => ({
-      ...xcpServiceFixtures.dispensers.open,
+      ...counterpartyApiServiceFixtures.dispensers.open,
       tx_hash: `dispenser_${i}`,
       block_index: 850000 + i,
       give_remaining: Math.max(0, 10 - i),
@@ -582,8 +582,8 @@ export const xcpTestHelpers = {
   /**
    * Generate error response
    */
-  generateErrorResponse(type: keyof typeof xcpServiceFixtures.errors) {
-    const errorConfig = xcpServiceFixtures.errors[type];
+  generateErrorResponse(type: keyof typeof counterpartyApiServiceFixtures.errors) {
+    const errorConfig = counterpartyApiServiceFixtures.errors[type];
     if ("error" in errorConfig) {
       return {
         error: errorConfig.error,
@@ -598,4 +598,4 @@ export const xcpTestHelpers = {
   },
 };
 
-export default xcpServiceFixtures;
+export default counterpartyApiServiceFixtures;

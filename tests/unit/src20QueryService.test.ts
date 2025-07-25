@@ -15,7 +15,7 @@ Deno.env.set("DENO_ENV", "test");
 
 // Import dependencies that need database
 import { SRC20Repository } from "$server/database/src20Repository.ts";
-import { BlockService } from "$server/services/blockService.ts";
+import { BlockService } from "$server/services/core/blockService.ts";
 import { SRC20MarketService } from "$server/services/src20/marketService.ts";
 import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
 

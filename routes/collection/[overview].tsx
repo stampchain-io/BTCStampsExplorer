@@ -7,7 +7,7 @@ import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { CollectionDetailGallery } from "$section";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { CollectionService } from "$server/services/collectionService.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 import { CollectionRow } from "$server/types/collection.d.ts";
 
 /* ===== CONSTANTS ===== */

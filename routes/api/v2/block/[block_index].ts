@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { BlockController } from "$server/controller/blockController.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 export const handler: Handlers = {
   async GET(_req, ctx) {

@@ -12,7 +12,7 @@ import { afterEach, describe, it } from "@std/testing/bdd";
 import { restore, stub } from "@std/testing/mock";
 
 // Import the modules we need to test
-import { CollectionService } from "$server/services/collectionService.ts";
+import { CollectionService } from "$server/services/core/collectionService.ts";
 
 describe("Stamp Handler API Separation of Concerns", () => {
   afterEach(() => {

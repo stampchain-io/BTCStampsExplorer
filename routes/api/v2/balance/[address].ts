@@ -6,12 +6,12 @@ import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { isValidBitcoinAddress } from "$lib/utils/scriptTypeUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
   validateRequiredParams,
-} from "$server/services/routeValidationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(req: Request, ctx): Promise<Response> {

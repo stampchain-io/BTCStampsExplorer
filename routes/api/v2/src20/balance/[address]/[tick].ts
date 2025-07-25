@@ -3,12 +3,12 @@ import { AddressTickHandlerContext } from "$globals";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import {
   DEFAULT_PAGINATION,
   validateRequiredParams,
-} from "$server/services/routeValidationService.ts";
-import { validateSortDirection } from "$server/services/validationService.ts";
+} from "$server/services/validation/routeValidationService.ts";
+import { validateSortDirection } from "$server/services/validation/validationService.ts";
 
 export const handler: Handlers<AddressTickHandlerContext> = {
   async GET(req, ctx) {

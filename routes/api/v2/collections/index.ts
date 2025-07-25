@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
-import { RouteType } from "$server/services/cacheService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 export const handler: Handlers = {
   async GET(req, _ctx) {

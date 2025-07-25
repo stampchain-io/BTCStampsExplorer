@@ -21,11 +21,11 @@ import {
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertSpyCalls, restore, stub } from "@std/testing/mock";
 import {
-  xcpServiceFixtures,
+  counterpartyApiServiceFixtures,
   xcpTestHelpers,
-} from "@tests/fixtures/xcpServiceFixtures.ts";
+} from "@tests/fixtures/counterpartyApiServiceFixtures.ts";
 
-describe("xcpService", () => {
+describe("counterpartyApiService", () => {
   let fetchStub: any;
   let dbManagerStub: any;
   let loggerStub: any;
@@ -127,7 +127,7 @@ describe("xcpService", () => {
         "fetch",
         () =>
           Promise.resolve(
-            new Response(JSON.stringify(xcpServiceFixtures.assets.stamps[0]), {
+            new Response(JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]), {
               status: 200,
             }),
           ),
@@ -135,7 +135,7 @@ describe("xcpService", () => {
 
       const result = await fetchXcpV2WithCache("/test", new URLSearchParams());
 
-      assertEquals(result, xcpServiceFixtures.assets.stamps[0]);
+      assertEquals(result, counterpartyApiServiceFixtures.assets.stamps[0]);
       assertSpyCalls(fetchStub, 1);
       assertSpyCalls(loggerStub.info, 1); // 1 info call at start
       assertSpyCalls(loggerStub.debug, 3); // 3 debug calls: attempting, response received, successful
@@ -152,7 +152,7 @@ describe("xcpService", () => {
             return Promise.resolve(new Response("Error", { status: 500 }));
           }
           return Promise.resolve(
-            new Response(JSON.stringify(xcpServiceFixtures.assets.stamps[0]), {
+            new Response(JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]), {
               status: 200,
             }),
           );
@@ -161,7 +161,7 @@ describe("xcpService", () => {
 
       const result = await fetchXcpV2WithCache("/test", new URLSearchParams());
 
-      assertEquals(result, xcpServiceFixtures.assets.stamps[0]);
+      assertEquals(result, counterpartyApiServiceFixtures.assets.stamps[0]);
       assertSpyCalls(fetchStub, 2);
       assertSpyCalls(loggerStub.error, 1);
     });
@@ -194,7 +194,7 @@ describe("xcpService", () => {
         "fetch",
         () =>
           Promise.resolve(
-            new Response(JSON.stringify(xcpServiceFixtures.assets.stamps[0]), {
+            new Response(JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]), {
               status: 200,
             }),
           ),
@@ -251,7 +251,7 @@ describe("xcpService", () => {
             return Promise.reject(new Error("Connection refused"));
           }
           return Promise.resolve(
-            new Response(JSON.stringify(xcpServiceFixtures.assets.stamps[0]), {
+            new Response(JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]), {
               status: 200,
             }),
           );
@@ -263,7 +263,7 @@ describe("xcpService", () => {
         new URLSearchParams(),
       );
 
-      assertEquals(result, xcpServiceFixtures.assets.stamps[0]);
+      assertEquals(result, counterpartyApiServiceFixtures.assets.stamps[0]);
       assertSpyCalls(fetchStub, 2);
     });
 
@@ -345,7 +345,7 @@ describe("xcpService", () => {
             Promise.resolve(
               new Response(
                 JSON.stringify({
-                  result: [xcpServiceFixtures.dispensers.open],
+                  result: [counterpartyApiServiceFixtures.dispensers.open],
                   next_cursor: null,
                   result_count: 1,
                 }),
@@ -371,11 +371,11 @@ describe("xcpService", () => {
 
       it("should filter by dispenser status", async () => {
         const openDispenser = {
-          ...xcpServiceFixtures.dispensers.open,
+          ...counterpartyApiServiceFixtures.dispensers.open,
           give_remaining: 10,
         };
         const closedDispenser = {
-          ...xcpServiceFixtures.dispensers.open,
+          ...counterpartyApiServiceFixtures.dispensers.open,
           give_remaining: 0,
         };
 
@@ -418,7 +418,7 @@ describe("xcpService", () => {
               return Promise.resolve(
                 new Response(
                   JSON.stringify({
-                    result: [xcpServiceFixtures.dispensers.open],
+                    result: [counterpartyApiServiceFixtures.dispensers.open],
                     next_cursor: "cursor123",
                     result_count: 1,
                   }),
@@ -429,7 +429,7 @@ describe("xcpService", () => {
             return Promise.resolve(
               new Response(
                 JSON.stringify({
-                  result: [xcpServiceFixtures.dispensers.open],
+                  result: [counterpartyApiServiceFixtures.dispensers.open],
                   next_cursor: null,
                   result_count: 1,
                 }),
@@ -453,7 +453,7 @@ describe("xcpService", () => {
 
       it("should handle dispensers with extreme values", async () => {
         const extremeDispenser = {
-          ...xcpServiceFixtures.dispensers.open,
+          ...counterpartyApiServiceFixtures.dispensers.open,
           give_quantity: Number.MAX_SAFE_INTEGER,
           satoshirate: 1, // Minimum possible rate
         };
@@ -494,7 +494,7 @@ describe("xcpService", () => {
             Promise.resolve(
               new Response(
                 JSON.stringify({
-                  result: [xcpServiceFixtures.dispenses.recent[0]],
+                  result: [counterpartyApiServiceFixtures.dispenses.recent[0]],
                   next_cursor: null,
                   result_count: 1,
                 }),
@@ -519,7 +519,7 @@ describe("xcpService", () => {
 
       it("should handle dispenses with null block_time", async () => {
         const dispense = {
-          ...xcpServiceFixtures.dispenses.recent[0],
+          ...counterpartyApiServiceFixtures.dispenses.recent[0],
           block_time: null,
         };
 
@@ -564,7 +564,7 @@ describe("xcpService", () => {
           () =>
             Promise.resolve(
               new Response(
-                JSON.stringify(xcpServiceFixtures.assets.stamps[0]),
+                JSON.stringify(counterpartyApiServiceFixtures.assets.stamps[0]),
                 { status: 200 },
               ),
             ),
@@ -572,7 +572,7 @@ describe("xcpService", () => {
 
         const result = await CounterpartyApiManager.getXcpAsset("A4399874976698242000");
 
-        assertEquals(result, xcpServiceFixtures.assets.stamps[0]);
+        assertEquals(result, counterpartyApiServiceFixtures.assets.stamps[0]);
       });
 
       it("should throw error on invalid response", async () => {
@@ -670,7 +670,7 @@ describe("xcpService", () => {
             Promise.resolve(
               new Response(
                 JSON.stringify({
-                  result: [xcpServiceFixtures.balances.single],
+                  result: [counterpartyApiServiceFixtures.balances.single],
                   next_cursor: null,
                   result_count: 1,
                   total: 1,
@@ -692,8 +692,8 @@ describe("xcpService", () => {
 
       it("should filter by UTXO only", async () => {
         const balances = [
-          { ...xcpServiceFixtures.balances.single, utxo: "abc:0" },
-          { ...xcpServiceFixtures.balances.single, utxo: "" },
+          { ...counterpartyApiServiceFixtures.balances.single, utxo: "abc:0" },
+          { ...counterpartyApiServiceFixtures.balances.single, utxo: "" },
         ];
 
         fetchStub = stub(
@@ -731,7 +731,7 @@ describe("xcpService", () => {
             return Promise.resolve(
               new Response(
                 JSON.stringify({
-                  result: [xcpServiceFixtures.balances.single],
+                  result: [counterpartyApiServiceFixtures.balances.single],
                   next_cursor: null,
                   result_count: 1,
                   total: 1,
@@ -856,9 +856,9 @@ describe("xcpService", () => {
       it("should handle very large quantities", async () => {
         const largeQuantityResponse = {
           result: {
-            ...xcpServiceFixtures.compose.send,
+            ...counterpartyApiServiceFixtures.compose.send,
             params: {
-              ...xcpServiceFixtures.compose.send.params,
+              ...counterpartyApiServiceFixtures.compose.send.params,
               quantity: Number.MAX_SAFE_INTEGER,
             },
           },
@@ -892,7 +892,7 @@ describe("xcpService", () => {
           () =>
             Promise.resolve(
               new Response(
-                JSON.stringify({ result: xcpServiceFixtures.compose.send }),
+                JSON.stringify({ result: counterpartyApiServiceFixtures.compose.send }),
                 { status: 200 },
               ),
             ),
@@ -918,7 +918,7 @@ describe("xcpService", () => {
           () =>
             Promise.resolve(
               new Response(
-                JSON.stringify(xcpServiceFixtures.compose.issuance),
+                JSON.stringify(counterpartyApiServiceFixtures.compose.issuance),
                 {
                   status: 200,
                 },
@@ -944,7 +944,7 @@ describe("xcpService", () => {
           () =>
             Promise.resolve(
               new Response(
-                JSON.stringify(xcpServiceFixtures.compose.dispenser),
+                JSON.stringify(counterpartyApiServiceFixtures.compose.dispenser),
                 {
                   status: 200,
                 },
@@ -975,7 +975,7 @@ describe("xcpService", () => {
         const longDescription = "A".repeat(10000);
         const assetWithLongDesc = {
           result: {
-            ...xcpServiceFixtures.assets.stamps[0],
+            ...counterpartyApiServiceFixtures.assets.stamps[0],
             description: longDescription,
           },
         };
@@ -1026,9 +1026,9 @@ describe("xcpService", () => {
     describe("Event fetching edge cases", () => {
       it("should handle malformed dispense events", async () => {
         const events = [
-          xcpServiceFixtures.dispenses.events[0],
+          counterpartyApiServiceFixtures.dispenses.events[0],
           { event: "DISPENSE", params: {} }, // Missing required fields
-          { ...xcpServiceFixtures.dispenses.events[0], event: "SEND" }, // Wrong event type
+          { ...counterpartyApiServiceFixtures.dispenses.events[0], event: "SEND" }, // Wrong event type
         ];
 
         fetchStub = stub(
@@ -1055,9 +1055,9 @@ describe("xcpService", () => {
 
       it("should handle events with extreme BTC amounts", async () => {
         const event = {
-          ...xcpServiceFixtures.dispenses.events[0],
+          ...counterpartyApiServiceFixtures.dispenses.events[0],
           params: {
-            ...xcpServiceFixtures.dispenses.events[0].params,
+            ...counterpartyApiServiceFixtures.dispenses.events[0].params,
             btc_amount: 2100000000000000, // 21 million BTC in satoshis
           },
         };

@@ -5,7 +5,7 @@ import {
   type CircuitBreakerMetrics
 } from "$/server/utils/circuitBreaker.ts";
 import { COINGECKO_API_BASE_URL } from "$lib/utils/constants.ts";
-import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
+import { getCacheConfig, RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 const BINANCE_API_BASE_URL = "https://api.binance.com/api/v3";
 const KRAKEN_API_BASE_URL = "https://api.kraken.com/0/public";

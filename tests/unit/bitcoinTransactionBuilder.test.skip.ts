@@ -1,5 +1,5 @@
 /**
- * @fileoverview Comprehensive tests for PSBTService
+ * @fileoverview Comprehensive tests for BitcoinTransactionBuilder
  * Aims to increase coverage from 13.0% to 80%+ with mocked dependencies and fixtures
  */
 
@@ -11,10 +11,10 @@ import {
 } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import {
-  createPSBTService,
+  createBitcoinTransactionBuilder,
   formatPsbtForLogging,
-  PSBTService,
-  PSBTServiceImpl,
+  BitcoinTransactionBuilder,
+  BitcoinTransactionBuilderImpl,
 } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
 import { type UTXOFixture, utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import { realUTXOFixtures } from "../fixtures/realUTXOFixtures.ts";
@@ -133,27 +133,27 @@ const mockEstimateFee = (
 // No need to store original functions with dependency injection
 
 // Create mocked PSBT service instance for tests
-let mockedPsbtService: PSBTServiceImpl;
+let mockedPsbtService: BitcoinTransactionBuilderImpl;
 
 describe(
-  "PSBTService",
+  "BitcoinTransactionBuilder",
   { sanitizeOps: false, sanitizeResources: false },
   () => {
     beforeEach(() => {
       // Create mocked service with comprehensive fixtures
-      mockedPsbtService = createPSBTService({
+      mockedPsbtService = createBitcoinTransactionBuilder({
         getUTXOForAddress: mockGetUTXOForAddress,
         estimateFee: mockEstimateFee,
         commonUtxoService: new MockCommonUTXOService(),
       });
 
       // Set the mocked instance for static method calls
-      PSBTService.setInstance(mockedPsbtService);
+      BitcoinTransactionBuilder.setInstance(mockedPsbtService);
     });
 
     afterEach(() => {
-      // Reset the PSBTService to use default dependencies
-      PSBTService.resetInstance();
+      // Reset the BitcoinTransactionBuilder to use default dependencies
+      BitcoinTransactionBuilder.resetInstance();
     });
 
     describe("formatPsbtForLogging", () => {
@@ -196,7 +196,7 @@ describe(
         const utxoString = `${fixture.txid}:${fixture.vout}`;
         const salePrice = 0.001; // 0.001 BTC
 
-        const psbtHex = await PSBTService.createPSBT(
+        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
           utxoString,
           salePrice,
           fixture.address,
@@ -218,7 +218,7 @@ describe(
         const utxoString = `${fixture.txid}:${fixture.vout}`;
         const salePrice = 0.01; // 0.01 BTC
 
-        const psbtHex = await PSBTService.createPSBT(
+        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
           utxoString,
           salePrice,
           fixture.address,
@@ -235,7 +235,7 @@ describe(
         const utxoString = `${fixture.txid}:${fixture.vout}`;
         const salePrice = 0.001;
 
-        const psbtHex = await PSBTService.createPSBT(
+        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
           utxoString,
           salePrice,
           fixture.address,
@@ -249,7 +249,7 @@ describe(
       it("should throw error for invalid UTXO string", async () => {
         await assertRejects(
           async () => {
-            await PSBTService.createPSBT(
+            await BitcoinTransactionBuilder.createPSBT(
               "invalid",
               0.001,
               "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
@@ -265,7 +265,7 @@ describe(
 
         await assertRejects(
           async () => {
-            await PSBTService.createPSBT(
+            await BitcoinTransactionBuilder.createPSBT(
               "deadbeef:0",
               0.001,
               "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
@@ -282,7 +282,7 @@ describe(
         const fixture = utxoFixtures.p2wpkh.standard;
         const utxoString = `${fixture.txid}:${fixture.vout}`;
 
-        const isValid = await PSBTService.validateUTXOOwnership(
+        const isValid = await BitcoinTransactionBuilder.validateUTXOOwnership(
           utxoString,
           fixture.address,
         );
@@ -295,7 +295,7 @@ describe(
         const utxoString = `${fixture.txid}:${fixture.vout}`;
         const wrongAddress = "bc1q000000000000000000000000000000000000000";
 
-        const isValid = await PSBTService.validateUTXOOwnership(
+        const isValid = await BitcoinTransactionBuilder.validateUTXOOwnership(
           utxoString,
           wrongAddress,
         );
@@ -304,7 +304,7 @@ describe(
       });
 
       it("should return false for invalid UTXO string", async () => {
-        const isValid = await PSBTService.validateUTXOOwnership(
+        const isValid = await BitcoinTransactionBuilder.validateUTXOOwnership(
           "invalid",
           "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
         );
@@ -318,7 +318,7 @@ describe(
           utxo: { value: 100000, script: null },
         });
 
-        const isValid = await PSBTService.validateUTXOOwnership(
+        const isValid = await BitcoinTransactionBuilder.validateUTXOOwnership(
           "deadbeef:0",
           "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
         );
@@ -333,7 +333,7 @@ describe(
         const buyerFixture = utxoFixtures.p2wpkh.largeValue;
 
         // Create seller PSBT first
-        const sellerPsbtHex = await PSBTService.createPSBT(
+        const sellerPsbtHex = await BitcoinTransactionBuilder.createPSBT(
           `${sellerFixture.txid}:${sellerFixture.vout}`,
           0.001,
           sellerFixture.address,
@@ -342,7 +342,7 @@ describe(
         const buyerUtxoString = `${buyerFixture.txid}:${buyerFixture.vout}`;
         const feeRate = 10; // 10 sat/vB
 
-        const completedPsbtHex = await PSBTService.completePSBT(
+        const completedPsbtHex = await BitcoinTransactionBuilder.completePSBT(
           sellerPsbtHex,
           buyerUtxoString,
           buyerFixture.address,
@@ -359,7 +359,7 @@ describe(
         const sellerFixture = utxoFixtures.p2wpkh.standard;
         const buyerFixture = utxoFixtures.p2wpkh.dustAmount; // Very small amount
 
-        const sellerPsbtHex = await PSBTService.createPSBT(
+        const sellerPsbtHex = await BitcoinTransactionBuilder.createPSBT(
           `${sellerFixture.txid}:${sellerFixture.vout}`,
           0.1, // Large amount that buyer can't afford
           sellerFixture.address,
@@ -367,7 +367,7 @@ describe(
 
         await assertRejects(
           async () => {
-            await PSBTService.completePSBT(
+            await BitcoinTransactionBuilder.completePSBT(
               sellerPsbtHex,
               `${buyerFixture.txid}:${buyerFixture.vout}`,
               buyerFixture.address,
@@ -382,7 +382,7 @@ describe(
       it("should throw error for invalid seller PSBT", async () => {
         await assertRejects(
           async () => {
-            await PSBTService.completePSBT(
+            await BitcoinTransactionBuilder.completePSBT(
               "invalid",
               "deadbeef:0",
               "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
@@ -423,7 +423,7 @@ describe(
 
         await assertRejects(
           async () => {
-            await PSBTService.completePSBT(
+            await BitcoinTransactionBuilder.completePSBT(
               psbt.toHex(),
               "anothertxid:0",
               "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
@@ -453,7 +453,7 @@ describe(
           value: 50000n,
         });
 
-        const result = await PSBTService.processCounterpartyPSBT(
+        const result = await BitcoinTransactionBuilder.processCounterpartyPSBT(
           psbt.toBase64(),
           utxoFixtures.p2wpkh.standard.address,
           10,
@@ -483,7 +483,7 @@ describe(
           value: 50000n,
         });
 
-        const result = await PSBTService.processCounterpartyPSBT(
+        const result = await BitcoinTransactionBuilder.processCounterpartyPSBT(
           psbt.toBase64(),
           utxoFixtures.p2wpkh.standard.address,
           10,
@@ -503,7 +503,7 @@ describe(
       it("should handle invalid PSBT base64", async () => {
         await assertRejects(
           async () => {
-            await PSBTService.processCounterpartyPSBT(
+            await BitcoinTransactionBuilder.processCounterpartyPSBT(
               "invalid",
               "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
               10,
@@ -521,7 +521,7 @@ describe(
 
         await assertRejects(
           async () => {
-            await PSBTService.processCounterpartyPSBT(
+            await BitcoinTransactionBuilder.processCounterpartyPSBT(
               psbt.toBase64(),
               "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
               10,
@@ -540,7 +540,7 @@ describe(
         const mockTxHex =
           "020000000001010000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
-        const result = await PSBTService.buildPsbtFromUserFundedRawHex(
+        const result = await BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex(
           mockTxHex,
           utxoFixtures.p2wpkh.standard.address,
           10,
@@ -564,7 +564,7 @@ describe(
         const mockTxHex =
           "020000000001010000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
-        const result = await PSBTService.buildPsbtFromUserFundedRawHex(
+        const result = await BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex(
           mockTxHex,
           utxoFixtures.p2wpkh.standard.address,
           10,
@@ -589,7 +589,7 @@ describe(
 
         await assertRejects(
           async () => {
-            await PSBTService.buildPsbtFromUserFundedRawHex(
+            await BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex(
               mockTxHex,
               utxoFixtures.p2wpkh.standard.address,
               10,
@@ -610,7 +610,7 @@ describe(
         const mockTxHex =
           "020000000001010000000000000000000000000000000000000000000000000000000000000000000000000000000001066a047465737400000000";
 
-        const result = await PSBTService.buildPsbtFromUserFundedRawHex(
+        const result = await BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex(
           mockTxHex,
           utxoFixtures.p2wpkh.standard.address,
           10,
@@ -632,7 +632,7 @@ describe(
 
     describe("getAddressType", () => {
       it("should identify P2WPKH addresses", () => {
-        const addressType = (PSBTService as any).getAddressType(
+        const addressType = (BitcoinTransactionBuilder as any).getAddressType(
           "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
           networks.bitcoin,
         );
@@ -640,7 +640,7 @@ describe(
       });
 
       it("should identify P2PKH addresses", () => {
-        const addressType = (PSBTService as any).getAddressType(
+        const addressType = (BitcoinTransactionBuilder as any).getAddressType(
           "19dENFt4wVwos6xtgwStA6n8bbA57WCS58",
           networks.bitcoin,
         );
@@ -648,7 +648,7 @@ describe(
       });
 
       it("should identify P2SH addresses", () => {
-        const addressType = (PSBTService as any).getAddressType(
+        const addressType = (BitcoinTransactionBuilder as any).getAddressType(
           "3JRdkXJFhyWH6QrXbZpFjsJdEMhD4z5yQz",
           networks.bitcoin,
         );
@@ -656,7 +656,7 @@ describe(
       });
 
       it("should identify testnet addresses", () => {
-        const addressType = (PSBTService as any).getAddressType(
+        const addressType = (BitcoinTransactionBuilder as any).getAddressType(
           "tb1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
           networks.testnet,
         );
@@ -666,7 +666,7 @@ describe(
       it("should throw error for unsupported address type", () => {
         assertThrows(
           () => {
-            (PSBTService as any).getAddressType(
+            (BitcoinTransactionBuilder as any).getAddressType(
               "invalid_address",
               networks.bitcoin,
             );
@@ -679,14 +679,14 @@ describe(
 
     describe("getAddressNetwork", () => {
       it("should identify bitcoin mainnet addresses", () => {
-        const network = (PSBTService as any).getAddressNetwork(
+        const network = (BitcoinTransactionBuilder as any).getAddressNetwork(
           "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
         );
         assertEquals(network, networks.bitcoin);
       });
 
       it("should identify bitcoin testnet addresses", () => {
-        const network = (PSBTService as any).getAddressNetwork(
+        const network = (BitcoinTransactionBuilder as any).getAddressNetwork(
           "tb1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
         );
         assertEquals(network, networks.testnet);
@@ -695,7 +695,7 @@ describe(
       it("should throw error for invalid address", () => {
         assertThrows(
           () => {
-            (PSBTService as any).getAddressNetwork("invalid_address");
+            (BitcoinTransactionBuilder as any).getAddressNetwork("invalid_address");
           },
           Error,
           "Invalid Bitcoin address",
@@ -708,7 +708,7 @@ describe(
         const script = new Uint8Array(
           hex2bin("0014c7e20a5dd06b5e3b8f8d5e3b5a8e1c6d9e2f3a4b"),
         );
-        const address = (PSBTService as any).getAddressFromScript(
+        const address = (BitcoinTransactionBuilder as any).getAddressFromScript(
           script,
           networks.bitcoin,
         );
@@ -720,7 +720,7 @@ describe(
         const script = new Uint8Array(
           hex2bin("76a9145e9b23809261178723055968d134a947f47e799f88ac"),
         );
-        const address = (PSBTService as any).getAddressFromScript(
+        const address = (BitcoinTransactionBuilder as any).getAddressFromScript(
           script,
           networks.bitcoin,
         );
@@ -732,7 +732,7 @@ describe(
         const invalidScript = new Uint8Array([0x00, 0x00]);
         assertThrows(
           () => {
-            (PSBTService as any).getAddressFromScript(
+            (BitcoinTransactionBuilder as any).getAddressFromScript(
               invalidScript,
               networks.bitcoin,
             );
@@ -748,7 +748,7 @@ describe(
         const fixture = utxoFixtures.p2wpkh.largeValue;
         const utxoString = `${fixture.txid}:${fixture.vout}`;
 
-        const psbtHex = await PSBTService.createPSBT(
+        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
           utxoString,
           3.14, // Large BTC amount
           fixture.address,
@@ -762,7 +762,7 @@ describe(
         const fixture = utxoFixtures.p2wpkh.dustAmount;
         const utxoString = `${fixture.txid}:${fixture.vout}`;
 
-        const psbtHex = await PSBTService.createPSBT(
+        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
           utxoString,
           0.00000546, // Dust amount
           fixture.address,
@@ -774,7 +774,7 @@ describe(
 
       it("should handle RBF (Replace-By-Fee) sequence", async () => {
         const fixture = utxoFixtures.p2wpkh.standard;
-        const psbtHex = await PSBTService.createPSBT(
+        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
           `${fixture.txid}:${fixture.vout}`,
           0.001,
           fixture.address,
@@ -790,7 +790,7 @@ describe(
 
         await assertRejects(
           async () => {
-            await PSBTService.createPSBT(
+            await BitcoinTransactionBuilder.createPSBT(
               "deadbeef:0",
               0.001,
               "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
@@ -816,7 +816,7 @@ describe(
 
         await assertRejects(
           async () => {
-            await PSBTService.completePSBT(
+            await BitcoinTransactionBuilder.completePSBT(
               psbt.toHex(),
               "anothertxid:0",
               "bc1qcvq650ddrvmq9a7m5ezltsk9wyh8epwlhzc8f2",
@@ -830,7 +830,7 @@ describe(
 
       it("should handle script type info for non-witness inputs", async () => {
         // Mock CommonUTXOService to return P2PKH script
-        (PSBTService as any).commonUtxoService.getRawTransactionHex = () => {
+        (BitcoinTransactionBuilder as any).commonUtxoService.getRawTransactionHex = () => {
           return "020000000101deadbeef00000000000000000000000000000000000000000000000000000000000000000000000000";
         };
 
@@ -844,7 +844,7 @@ describe(
           },
         });
 
-        const result = await PSBTService.processCounterpartyPSBT(
+        const result = await BitcoinTransactionBuilder.processCounterpartyPSBT(
           psbt.toBase64(),
           utxoFixtures.p2pkh.standard.address,
           10,
@@ -867,7 +867,7 @@ describe(
         });
 
         // Need to access the private method through the service
-        const psbtHex = await PSBTService.createPSBT(
+        const psbtHex = await BitcoinTransactionBuilder.createPSBT(
           `${fixture.txid}:${fixture.vout}`,
           0.001,
           fixture.address,
@@ -878,7 +878,7 @@ describe(
 
       it("should handle all error paths in processCounterpartyPSBT", async () => {
         // Test with enrichment error
-        (PSBTService as any).commonUtxoService.getSpecificUTXO = () => {
+        (BitcoinTransactionBuilder as any).commonUtxoService.getSpecificUTXO = () => {
           throw new Error("Enrichment failed");
         };
 
@@ -890,7 +890,7 @@ describe(
 
         await assertRejects(
           async () => {
-            await PSBTService.processCounterpartyPSBT(
+            await BitcoinTransactionBuilder.processCounterpartyPSBT(
               psbt.toBase64(),
               utxoFixtures.p2wpkh.standard.address,
               10,
@@ -928,7 +928,7 @@ describe(
           value: 20000n,
         });
 
-        const result = await PSBTService.processCounterpartyPSBT(
+        const result = await BitcoinTransactionBuilder.processCounterpartyPSBT(
           psbt.toBase64(),
           userAddress,
           10,
@@ -955,7 +955,7 @@ describe(
         });
 
         // This test will log errors during finalization but should still complete
-        const result = await PSBTService.processCounterpartyPSBT(
+        const result = await BitcoinTransactionBuilder.processCounterpartyPSBT(
           psbt.toBase64(),
           utxoFixtures.p2wpkh.standard.address,
           10,
@@ -970,7 +970,7 @@ describe(
         const mockTxHex =
           "020000000002010000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
-        const result = await PSBTService.buildPsbtFromUserFundedRawHex(
+        const result = await BitcoinTransactionBuilder.buildPsbtFromUserFundedRawHex(
           mockTxHex,
           utxoFixtures.p2wpkh.standard.address,
           10,
@@ -1007,7 +1007,7 @@ describe(
           },
         });
 
-        const result = await PSBTService.processCounterpartyPSBT(
+        const result = await BitcoinTransactionBuilder.processCounterpartyPSBT(
           psbt.toBase64(),
           utxoFixtures.p2wpkh.standard.address,
           10,

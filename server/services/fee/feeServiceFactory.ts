@@ -5,7 +5,7 @@
 
 import { getRecommendedFees } from "$lib/utils/mempool.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
-import { RouteType, getCacheConfig } from "$server/services/cacheService.ts";
+import { RouteType, getCacheConfig } from "$server/services/infrastructure/cacheService.ts";
 import { FeeSecurityService } from "$server/services/fee/feeSecurityService.ts";
 import {
     FeeServiceDI,
