@@ -1,4 +1,5 @@
-import { glassmorph } from "$layout";
+import { buttonStyles } from "$button";
+import { glassmorphism } from "$layout";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
@@ -92,34 +93,24 @@ export const SelectorButtons = ({
   }, [disabledProp, options, onChange]);
 
   // Size classes
-  const textSize = {
-    xs: "text-xs py-[5px] px-[14px]",
-    sm: "text-xs py-[7px] px-4",
-    md: "text-sm py-[9px] px-4",
-    lg: "text-sm py-[11px] px-4",
-  };
-
-  const buttonSize = {
+  const padding = {
     xs: "py-[5px] px-[14px]",
     sm: "py-[7px] px-4",
     md: "py-[9px] px-4",
     lg: "py-[11px] px-4",
   };
 
-  // Color variants using CSS custom properties
+  const textSize = {
+    xs: `text-xs ${padding.xs}`,
+    sm: `text-xs ${padding.sm}`,
+    md: `text-sm ${padding.md}`,
+    lg: `text-sm ${padding.lg}`,
+  };
+
+  // Use color from buttonStyles
   const color = {
-    grey: `
-      [--default-color:#666666]
-      [--hover-color:#999999]
-      [--button-color-light:#999999]
-      [--button-color-dark:#666666]
-    `,
-    purple: `
-      [--default-color:#8800CC]
-      [--hover-color:#AA00FF]
-      [--button-color-light:#AA00FF]
-      [--button-color-dark:#8800CC]
-    `,
+    grey: buttonStyles.color.grey,
+    purple: buttonStyles.color.purple,
   };
 
   const disabled = "opacity-30 !cursor-not-allowed";
@@ -133,7 +124,7 @@ export const SelectorButtons = ({
     <div
       ref={containerRef}
       class={`relative grid p-0.5 select-none
-        ${glassmorph}
+        ${glassmorphism}
         ${color[colorProp]}
         ${disabledProp ? disabled : ""}
         ${className}
@@ -146,14 +137,14 @@ export const SelectorButtons = ({
       <div
         class={`absolute top-0.5 bottom-0.5 z-10
           rounded-lg shadow-lg
-          transition-transform duration-200 ease-out
-          ${buttonSize[size]}
+          transition-transform duration-200 ease-in-out
+          ${padding[size]}
         `}
         style={{
           transform: selectionTransform,
           width: `calc((100% - ${options.length * 2}px) / ${options.length})`,
           background:
-            `linear-gradient(135deg, var(--button-color-light), var(--button-color-dark))`,
+            `linear-gradient(135deg, var(--color-light), var(--color-dark))`,
         }}
       />
 
@@ -185,12 +176,12 @@ export const SelectorButtons = ({
               class={`
                 relative block z-20
                 font-semibold text-center
-                transition-all duration-200 ease-out
+                transition-all duration-200 ease-in-out
                 ${textSize[size]}
                 ${
                 selectedValue === option.value
                   ? "text-black cursor-default"
-                  : "text-[var(--default-color)] hover:text-[var(--hover-color)] cursor-pointer"
+                  : "text-[var(--color-dark)] hover:text-[var(--color-light)] cursor-pointer"
               }
                 ${optionDisabled ? disabled : ""}
               `}
