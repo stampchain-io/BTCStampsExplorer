@@ -1,6 +1,6 @@
 import { assertEquals, assertExists } from "@std/assert";
 import {
-  StampMintService,
+  StampCreationService,
   StampValidationService,
 } from "../../server/services/stamp/index.ts";
 import { Psbt } from "bitcoinjs-lib";
@@ -276,7 +276,7 @@ Deno.test("Stamp Transaction Creation and Validation", async (t) => {
         }
 
         // Create test transaction (with mock UTXOs)
-        const result = await StampMintService.createStampIssuance({
+        const result = await StampCreationService.createStampIssuance({
           ...serviceInput,
           // Add mock UTXOs for testing if not doing a dry run
           ...(serviceInput.dryRun ? {} : {
@@ -392,7 +392,7 @@ Deno.test("Fee normalization for Stamp creation", async () => {
   // Test different fee parameters to ensure they result in consistent values
 
   // Test with satsPerVB
-  const resultVB = await StampMintService.createStampIssuance({
+  const resultVB = await StampCreationService.createStampIssuance({
     sourceWallet: CONFIG.TEST_WALLET_ADDRESS,
     qty: "1",
     locked: true,
@@ -405,7 +405,7 @@ Deno.test("Fee normalization for Stamp creation", async () => {
   });
 
   // Test with satsPerKB (should be converted to 10 sat/vB internally)
-  const resultKB = await StampMintService.createStampIssuance({
+  const resultKB = await StampCreationService.createStampIssuance({
     sourceWallet: CONFIG.TEST_WALLET_ADDRESS,
     qty: "1",
     locked: true,
@@ -446,7 +446,7 @@ Deno.test("Stamp creation error handling", async (t) => {
     const largeFile = "A".repeat(70 * 1024); // 70KB of data
 
     try {
-      await StampMintService.createStampIssuance({
+      await StampCreationService.createStampIssuance({
         sourceWallet: CONFIG.TEST_WALLET_ADDRESS,
         qty: "1",
         locked: true,
@@ -474,7 +474,7 @@ Deno.test("Stamp creation error handling", async (t) => {
 
   await t.step("Invalid source wallet", async () => {
     try {
-      await StampMintService.createStampIssuance({
+      await StampCreationService.createStampIssuance({
         sourceWallet: "invalid-address",
         qty: "1",
         locked: true,
@@ -502,7 +502,7 @@ Deno.test("Stamp creation error handling", async (t) => {
 
   await t.step("Invalid fee parameter", async () => {
     try {
-      await StampMintService.createStampIssuance({
+      await StampCreationService.createStampIssuance({
         sourceWallet: CONFIG.TEST_WALLET_ADDRESS,
         qty: "1",
         locked: true,
