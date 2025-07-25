@@ -25,7 +25,7 @@ import {
   createPSBTService,
   PSBTService,
   type PSBTServiceDependencies,
-} from "../../server/services/transaction/psbtService.ts";
+} from "../../server/services/transaction/bitcoinTransactionBuilder.ts";
 
 // Use the mock Psbt type for formatPsbtForLogging
 function formatPsbtForLogging(psbt: Psbt) {
