@@ -42,11 +42,12 @@ export const handler: Handlers = {
       // Create PSBT with validated inputs
 
       // Create PSBT
-      const psbtHex = await TransactionService.PSBTService.createPSBT(
-        utxo,
-        salePrice,
-        sellerAddress,
-      );
+      const psbtHex = await TransactionService.BitcoinTransactionBuilder
+        .createPSBT(
+          utxo,
+          salePrice,
+          sellerAddress,
+        );
       const response: CreatePSBTResponse = { psbt: psbtHex };
 
       return ApiResponseUtil.success(response);

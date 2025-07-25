@@ -1,5 +1,5 @@
 /**
- * @fileoverview Comprehensive unit tests for UTXOService class
+ * @fileoverview Comprehensive unit tests for BitcoinUtxoManager class
  * Tests the estimateVoutSize static method using UTXO fixtures
  * CI-compatible with no external dependencies
  */
@@ -40,7 +40,7 @@ function estimateVoutSize(output: any): number {
   return 8 + 1 + scriptSize;
 }
 
-describe("UTXOService Comprehensive Coverage", () => {
+describe("BitcoinUtxoManager Comprehensive Coverage", () => {
   describe("estimateVoutSize (static method)", () => {
     it("should estimate size for P2WPKH address", () => {
       const output = {

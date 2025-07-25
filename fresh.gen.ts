@@ -138,7 +138,6 @@ import * as $test_test_image from "./routes/test/test-image.ts";
 import * as $tool_fairmint_index from "./routes/tool/fairmint/index.tsx";
 import * as $tool_src101_action_ from "./routes/tool/src101/[action].tsx";
 import * as $tool_src20_action_ from "./routes/tool/src20/[action].tsx";
-import * as $tool_src20_src20RedirectWIP from "./routes/tool/src20/src20RedirectWIP.tsx";
 import * as $tool_stamp_action_ from "./routes/tool/stamp/[action].tsx";
 import * as $tool_stamp_create from "./routes/tool/stamp/create.tsx";
 import * as $tool_stamp_stamping from "./routes/tool/stamp/stamping.tsx";
@@ -231,7 +230,6 @@ import * as $modal_RecieveAddyModal from "./islands/modal/RecieveAddyModal.tsx";
 import * as $modal_SearchSRC20Modal from "./islands/modal/SearchSRC20Modal.tsx";
 import * as $modal_SearchStampModal from "./islands/modal/SearchStampModal.tsx";
 import * as $modal_SendBTCModal from "./islands/modal/SendBTCModal.tsx";
-import * as $modal_SendStampModalWIP from "./islands/modal/SendStampModalWIP.tsx";
 import * as $modal_states from "./islands/modal/states.ts";
 import * as $section_FeeCalculatorBase from "./islands/section/FeeCalculatorBase.tsx";
 import * as $section_cta_ContactCta from "./islands/section/cta/ContactCta.tsx";
@@ -462,7 +460,6 @@ const manifest = {
     "./routes/tool/fairmint/index.tsx": $tool_fairmint_index,
     "./routes/tool/src101/[action].tsx": $tool_src101_action_,
     "./routes/tool/src20/[action].tsx": $tool_src20_action_,
-    "./routes/tool/src20/src20RedirectWIP.tsx": $tool_src20_src20RedirectWIP,
     "./routes/tool/stamp/[action].tsx": $tool_stamp_action_,
     "./routes/tool/stamp/create.tsx": $tool_stamp_create,
     "./routes/tool/stamp/stamping.tsx": $tool_stamp_stamping,
@@ -571,7 +568,6 @@ const manifest = {
     "./islands/modal/SearchSRC20Modal.tsx": $modal_SearchSRC20Modal,
     "./islands/modal/SearchStampModal.tsx": $modal_SearchStampModal,
     "./islands/modal/SendBTCModal.tsx": $modal_SendBTCModal,
-    "./islands/modal/SendStampModalWIP.tsx": $modal_SendStampModalWIP,
     "./islands/modal/states.ts": $modal_states,
     "./islands/section/FeeCalculatorBase.tsx": $section_FeeCalculatorBase,
     "./islands/section/cta/ContactCta.tsx": $section_cta_ContactCta,

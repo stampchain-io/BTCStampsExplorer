@@ -3,9 +3,9 @@
  * Tests all XCP operations, node failover, caching, and error scenarios
  */
 
+import { MockXcpProvider } from "$server/services/counterparty/xcpManagerDI.ts";
 import { assertEquals, assertRejects } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { MockXcpProvider } from "$server/services/xcp/xcpManagerDI.ts";
 
 describe("CounterpartyApiManagerDI", () => {
   let mockProvider: MockXcpProvider;
