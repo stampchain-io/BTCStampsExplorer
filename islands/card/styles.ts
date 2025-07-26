@@ -4,25 +4,25 @@ export const TEXT_STYLES = {
     sizes: "text-lg mobileLg:text-xl",
   },
   stampNumber: {
-    base: "font-black text-stamp-purple-bright truncate max-w-full",
+    base: "font-extrabold text-stamp-purple-bright truncate max-w-full",
     // sizes: "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl group-data-[long-number=true]:text-sm group-data-[long-number=true]:mobileSm:text-sm group-data-[long-number=true]:mobileLg:text-base group-data-[long-number=true]:tablet:text-lg group-data-[long-number=true]:desktop:text-xl",
     sizes: "text-lg mobileLg:text-xl",
   },
   creator: {
-    base: "font-bold text-stamp-grey break-words text-center pt-1",
+    base: "font-semibold text-stamp-grey-light break-words text-center pt-1",
     sizes: "text-xs mobileMd:text-sm",
   },
   price: {
-    base: "font-medium text-stamp-grey-light text-nowrap",
+    base: "font-normal text-stamp-grey-light text-nowrap",
     sizes: "text-xs mobileLg:text-sm",
   },
   mimeType: {
-    base: "font-medium text-stamp-grey text-nowrap",
+    base: "font-normal text-stamp-grey text-nowrap",
     sizes: "text-xs mobileLg:text-sm",
   },
   supply: {
-    base: "font-bold text-stamp-grey-darker text-right desktop:pt-[3px]",
-    sizes: "text-sm mobileLg:text-base",
+    base: "font-medium text-stamp-grey text-right",
+    sizes: "text-xs mobileLg:text-base",
   },
   minimal: {
     hashSymbol: {
@@ -56,9 +56,9 @@ export const TEXT_STYLES = {
 } as const;
 
 export const ABBREVIATION_LENGTHS = {
-  desktop: 6,
-  tablet: 6,
-  mobileLg: 5,
-  mobileMd: 6,
-  mobileSm: 6,
+  desktop: 5,
+  tablet: 5,
+  mobileLg: 4,
+  mobileMd: 5,
+  mobileSm: 5,
 } as const;
