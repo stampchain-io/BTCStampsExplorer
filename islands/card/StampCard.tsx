@@ -494,7 +494,7 @@ export function StampCard({
             {/* Price and Supply */}
             <div class="flex justify-between items-center mt-4 w-full">
               {/* Price on the Left */}
-              <div class="text-left bg-stamp-grey-light/10 rounded-lg px-3 py-1">
+              <div class="text-left bg-stamp-grey-light/5 rounded-lg px-3 py-1">
                 <span
                   class={`${renderPrice().style.base} ${renderPrice().style.sizes}`}
                 >
@@ -503,7 +503,7 @@ export function StampCard({
               </div>
               {/* Supply/Editions on the Right */}
               <div
-                class={`${TEXT_STYLES.supply.base} ${TEXT_STYLES.supply.sizes} text-right bg-stamp-grey-light/10 rounded-lg px-3 py-1`}
+                class={`${TEXT_STYLES.supply.base} ${TEXT_STYLES.supply.sizes} text-right bg-stamp-grey-light/5 rounded-lg px-3 py-1`}
               >
                 {supplyDisplay}
               </div>

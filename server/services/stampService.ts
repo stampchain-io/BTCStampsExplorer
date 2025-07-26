@@ -1,22 +1,22 @@
 import {
-    STAMP_EDITIONS,
-    STAMP_FILESIZES,
-    STAMP_FILETYPES,
-    STAMP_FILTER_TYPES,
-    STAMP_MARKETPLACE,
-    STAMP_RANGES,
-    STAMP_SUFFIX_FILTERS,
-    STAMP_TYPES,
-    SUBPROTOCOLS,
+  STAMP_EDITIONS,
+  STAMP_FILESIZES,
+  STAMP_FILETYPES,
+  STAMP_FILTER_TYPES,
+  STAMP_MARKETPLACE,
+  STAMP_RANGES,
+  STAMP_SUFFIX_FILTERS,
+  STAMP_TYPES,
+  SUBPROTOCOLS,
 } from "$globals";
 import { StampRepository } from "$server/database/index.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
-import { CounterpartyDispenserService, CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import { CounterpartyApiManager, CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
 
 import { logger, LogNamespace } from "$lib/utils/monitoring/logging/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
-import { getCacheConfig, RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
+import { getCacheConfig, RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import type { XcpBalance } from "$types/index.d.ts";
 import type { StampMarketData } from "$types/marketData.d.ts";
@@ -667,6 +667,22 @@ export class StampService {
           closed_count: marketData.closedDispensersCount || 0,
           total_count: marketData.totalDispensersCount || 0
         }
+      } : null,
+      // Backward compatibility: marketData in camelCase for existing frontend components
+      marketData: marketData ? {
+        floorPriceBTC: marketData.floorPriceBTC || null,
+        recentSalePriceBTC: marketData.recentSalePriceBTC || null,
+        volume24hBTC: marketData.volume24hBTC || 0,
+        volume7dBTC: marketData.volume7dBTC || 0,
+        volume30dBTC: marketData.volume30dBTC || 0,
+        holderCount: marketData.holderCount || 0,
+        dataQualityScore: marketData.dataQualityScore || 7,
+        priceSource: marketData.priceSource || "unknown",
+        lastPriceUpdate: marketData.lastPriceUpdate || null,
+        lastUpdated: marketData.lastUpdated,
+        openDispensersCount: marketData.openDispensersCount || 0,
+        closedDispensersCount: marketData.closedDispensersCount || 0,
+        totalDispensersCount: marketData.totalDispensersCount || 0
       } : null,
       marketDataMessage: marketData ? undefined : "No market data available for this stamp"
     };
