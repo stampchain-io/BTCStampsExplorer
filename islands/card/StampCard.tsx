@@ -463,7 +463,7 @@ export function StampCard({
 
         {/* ===== DETAILS SECTION ===== */}
         {showDetails && !showMinDetails && (
-          <div class="flex flex-col items-center px-[6px] pt-[18px] pb-0">
+          <div class="flex flex-col items-center px-[6px] pt-5 pb-0">
             {/* Stamp Number with container */}
             <div class="flex items-center justify-center max-w-[90%]">
               {shouldDisplayHash && (
@@ -486,23 +486,24 @@ export function StampCard({
 
             {/* Creator Name or Abbreviated Address */}
             <div
-              class={`${TEXT_STYLES.creator.base} ${TEXT_STYLES.creator.sizes} mt-[3px]`}
+              class={`${TEXT_STYLES.creator.base} ${TEXT_STYLES.creator.sizes} mt-1`}
             >
               {creatorDisplay}
             </div>
 
             {/* Price and Supply */}
-            <div class="flex justify-between w-full mt-[6px]">
-              {/* Render Price on the Left */}
-              <div class="flex-1 text-left -mt-[2px] mobileLg:-mt-[0px] desktop:mt-[3px]">
+            <div class="flex justify-between items-center mt-4 w-full">
+              {/* Price on the Left */}
+              <div class="text-left bg-stamp-grey-light/10 rounded-lg px-3 py-1">
                 <span
                   class={`${renderPrice().style.base} ${renderPrice().style.sizes}`}
                 >
                   {renderPrice().text}
                 </span>
               </div>
+              {/* Supply/Editions on the Right */}
               <div
-                class={`${TEXT_STYLES.supply.base} ${TEXT_STYLES.supply.sizes} flex-1 text-right`}
+                class={`${TEXT_STYLES.supply.base} ${TEXT_STYLES.supply.sizes} text-right bg-stamp-grey-light/10 rounded-lg px-3 py-1`}
               >
                 {supplyDisplay}
               </div>
