@@ -3,10 +3,17 @@
   "lockfile": "deno.lock",
   "tasks": {
     "start": "deno task check_version && deno run -A main.ts",
-    "dev": "bash -c 'source .env.dev 2>/dev/null || true && deno run --inspect --allow-all --watch --watch-exclude=dist/,node_modules/,_fresh/,.git/,coverage/,tmp/,tests/,fresh.gen.ts --no-clear-screen dev.ts --host'",
+    "dev": "deno run -A --watch=routes/,islands/,components/,lib/,server/ --watch-exclude=_fresh/,node_modules/,coverage/,tmp/,dist/,fresh.gen.ts --no-clear-screen dev.ts --host",
     "dev:nowatch": "deno run --inspect --allow-all --watch=routes/ --watch-exclude=dist/,node_modules/,_fresh/,.git/,coverage/,tmp/,tests/,static/ --no-clear-screen dev.ts --host",
-    "dev:safe": "deno run --allow-run scripts/cleanup.ts && deno task dev",
+    "dev:safe": "deno run -A --watch=routes/,islands/,components/,lib/,server/ --watch-exclude=_fresh/,node_modules/,coverage/,tmp/,dist/,fresh.gen.ts --watch-debounce=1000 --no-clear-screen dev.ts --host",
+    "dev:debug": "./scripts/kill-servers.sh && deno run --inspect -A --watch=routes/,islands/,components/,lib/,server/ --watch-exclude=_fresh/,node_modules/,coverage/,tmp/,dist/,fresh.gen.ts --watch-debounce=1500 --no-clear-screen dev.ts --host",
+    "dev:ui": "deno run -A --watch=routes/,islands/,components/,static/,tailwind.config.ts --watch-exclude=_fresh/,server/,lib/types/,lib/utils/ --watch-debounce=500 --no-clear-screen dev.ts --host",
     "dev:build": "deno task build && deno task dev",
+    "kill": "./scripts/kill-servers.sh",
+    "kill:safe": "./scripts/kill-servers-safe.sh",
+    "dev:clean": "deno task kill && deno task dev",
+    "dev:debounced": "deno run --inspect --allow-all --watch=routes/,islands/,components/,lib/,server/ --watch-exclude=_fresh/,node_modules/,coverage/,tmp/,dist/,fresh.gen.ts --watch-debounce=1500 --no-clear-screen dev.ts --host",
+    "dev:frontend": "deno run --inspect --allow-all --watch=routes/,islands/,components/,static/ --watch-exclude=_fresh/,node_modules/,coverage/,tmp/,dist/,server/ --watch-debounce=500 --no-clear-screen dev.ts --host",
     "build": "deno run --unstable-byonm -A main.ts build",
     "build:fast": "deno run --unstable-byonm -A --no-check main.ts build",
     "fakebuild": "echo 'fake build'",
@@ -116,19 +123,13 @@
   },
   "lint": {
     "rules": {
-      "tags": [
-        "fresh",
-        "recommended"
-      ],
+      "tags": ["fresh", "recommended"],
       "include": [
         "ban-untagged-todo",
         "no-node-buffer",
         "prefer-native-node-imports"
       ],
-      "exclude": [
-        "no-explicit-any",
-        "react-no-danger"
-      ]
+      "exclude": ["no-explicit-any", "react-no-danger"]
     },
     "exclude": [
       "**/_fresh/**/*",
@@ -368,9 +369,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "strict": true,
-    "types": [
-      "npm:@types/node"
-    ],
+    "types": ["npm:@types/node"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,

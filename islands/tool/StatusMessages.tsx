@@ -1,5 +1,7 @@
 /* ===== STATUS MESSAGES ===== */
 /*@baba-move file*/
+import { glassmorphism } from "$layout";
+
 interface StatusMessagesProps {
   submissionMessage?:
     | {
@@ -11,6 +13,7 @@ interface StatusMessagesProps {
   apiError?: string | null;
   fileUploadError?: string | null;
   walletError?: string | null;
+  maraError?: string | null;
 }
 
 export function StatusMessages({
@@ -18,6 +21,7 @@ export function StatusMessages({
   apiError,
   fileUploadError,
   walletError,
+  maraError,
 }: StatusMessagesProps) {
   // Handle different submissionMessage types
   const messageText = typeof submissionMessage === "string"
@@ -34,16 +38,18 @@ export function StatusMessages({
   return (
     <>
       {hasSubmissionMessage && (
-        <div class="w-full text-center text-white mt-4">
-          <p>{messageText}</p>
+        <div
+          class={`w-full mt-4 ${glassmorphism} bg-gradient-to-br from-green-900/15 to-green-800/25 border-green-500/20 p-4`}
+        >
+          <p class="text-green-400 text-center font-medium">{messageText}</p>
           {txid && (
-            <div class="overflow-x-auto" style={{ maxWidth: "100%" }}>
-              <span>TXID:&nbsp;</span>
+            <div class="overflow-x-auto mt-2" style={{ maxWidth: "100%" }}>
+              <span class="text-green-300">TXID:&nbsp;</span>
               <a
                 href={`https://mempool.space/tx/${txid}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-blue-500 underline whitespace-nowrap"
+                class="text-green-400 underline whitespace-nowrap hover:text-green-300 transition-colors"
               >
                 {txid}
               </a>
@@ -52,15 +58,36 @@ export function StatusMessages({
         </div>
       )}
       {apiError && (
-        <div class="w-full text-red-500 text-center mt-4">{apiError}</div>
+        <div
+          class={`w-full mt-4 ${glassmorphism} bg-gradient-to-br from-red-900/15 to-red-800/25 border-red-500/20 p-4`}
+        >
+          <p class="text-red-400 text-center font-medium">{apiError}</p>
+        </div>
       )}
       {fileUploadError && (
-        <div class="w-full text-yellow-500 text-center mt-4">
-          {fileUploadError}
+        <div
+          class={`w-full mt-4 ${glassmorphism} bg-gradient-to-br from-yellow-900/15 to-yellow-800/25 border-yellow-500/20 p-4`}
+        >
+          <p class="text-yellow-400 text-center font-medium">
+            {fileUploadError}
+          </p>
         </div>
       )}
       {walletError && (
-        <div class="w-full text-red-500 text-center mt-4">{walletError}</div>
+        <div
+          class={`w-full mt-4 ${glassmorphism} bg-gradient-to-br from-red-900/15 to-red-800/25 border-red-500/20 p-4`}
+        >
+          <p class="text-red-400 text-center font-medium">{walletError}</p>
+        </div>
+      )}
+      {maraError && !apiError && (
+        <div
+          class={`w-full mt-4 ${glassmorphism} bg-gradient-to-br from-purple-900/15 to-purple-800/25 border-purple-500/20 p-4`}
+        >
+          <p class="text-purple-400 text-center font-medium">
+            MARA Service: {maraError}
+          </p>
+        </div>
       )}
     </>
   );

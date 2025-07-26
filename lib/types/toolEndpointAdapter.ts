@@ -64,6 +64,8 @@ export interface StampTransactionOptions extends TransactionOptions {
   locked: boolean;
   /** Whether asset is divisible */
   divisible: boolean;
+  /** Custom output value for MARA mode (optional) */
+  outputValue?: number;
 
   // Optional dispense-specific properties for stamp purchases
   /** Dispenser source address (for purchases) */

@@ -29,7 +29,7 @@ export class StampToolAdapter
   readonly endpoint = "/api/v2/olga/mint";
 
   buildRequestBody(options: StampTransactionOptions): Record<string, any> {
-    return {
+    const requestBody: Record<string, any> = {
       sourceWallet: options.walletAddress,
       filename: options.filename,
       file: options.file,
@@ -39,6 +39,13 @@ export class StampToolAdapter
       dryRun: options.dryRun,
       satsPerVB: options.feeRate,
     };
+
+    // Add outputValue for MARA mode if specified
+    if (options.outputValue !== undefined) {
+      requestBody.outputValue = options.outputValue;
+    }
+
+    return requestBody;
   }
 
   parseResponse(response: any): StandardFeeResponse {
@@ -73,11 +80,17 @@ export class StampToolAdapter
       );
     }
 
+    // Calculate actual cost to user (excluding change output)
+    // totalCost = dust + miner fee + service fee (if any)
+    const serviceFee = response.service_fee || 0;
+    const actualTotalCost = response.total_dust_value + response.est_miner_fee +
+      serviceFee;
+
     return {
       estimatedSize: response.est_tx_size,
       minerFee: response.est_miner_fee,
       dustValue: response.total_dust_value,
-      totalCost: response.total_output_value,
+      totalCost: actualTotalCost,
       isEstimate: response.is_estimate ?? true,
       estimationMethod: response.estimation_method ??
         "service_with_dummy_utxos",

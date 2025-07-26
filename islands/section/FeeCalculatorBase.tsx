@@ -21,6 +21,8 @@ import { estimateTransactionSizeForType } from "$lib/utils/bitcoin/transactions/
 import { tooltipButton, tooltipImage } from "$notification";
 import { labelXs, textXs } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
+import { MaraModeBadge } from "$components/indicators/MaraModeIndicator.tsx";
+import { FeeSkeletonLoader } from "$components/indicators/ProgressIndicator.tsx";
 
 interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   isModal?: boolean;
@@ -54,6 +56,10 @@ interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   onTosChange?: (agreed: boolean) => void;
   feeDetails?: FeeDetails;
   mintDetails?: MintDetails;
+  maraMode?: boolean;
+  maraFeeRate?: number | null;
+  isLoadingMaraFee?: boolean;
+  progressIndicator?: preact.ComponentChildren;
 }
 
 export function FeeCalculatorBase({
@@ -98,6 +104,10 @@ export function FeeCalculatorBase({
     editions: 0,
   },
   dec,
+  maraMode = false,
+  maraFeeRate = null,
+  isLoadingMaraFee = false,
+  progressIndicator,
 }: ExtendedBaseFeeCalculatorProps) {
   const { fees } = useFees();
   const [visible, setVisible] = useState(false);
@@ -268,66 +278,100 @@ export function FeeCalculatorBase({
   };
 
   // Fee selector component
-  const renderFeeSelector = () => (
-    <div class={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
-      <h6 class="font-light text-base text-stamp-grey-light">
-        <span class="text-stamp-grey-darker pr-2">FEE</span>
-        <span class="font-bold">
-          {fee === 0 ? <span class="animate-pulse">XX</span> : fee}
-        </span>{" "}
-        SAT/vB
-      </h6>
-      <h6 class="font-light text-sm text-stamp-grey-light mb-3 text-nowrap">
-        <span class="text-stamp-grey-darker pr-2">RECOMMENDED</span>
-        <span class="font-medium">
-          {fees?.recommendedFee
-            ? (
-              fees.recommendedFee
-            )
-            : <span class="animate-pulse">XX</span>}
-        </span>{" "}
-        SAT/vB
-      </h6>
-      <div
-        className="relative w-full group"
-        onMouseMove={handleMouseMove}
-        onMouseEnter={handleFeeMouseEnter}
-        onMouseLeave={handleFeeMouseLeave}
-        onMouseDown={handleMouseDown}
-        onClick={(e) =>
-          e.stopPropagation()}
-      >
-        <input
-          type="range"
-          value={feeToSliderPos(fee)}
-          min="0"
-          max="100"
-          step="0.25"
-          onChange={(e) =>
-            handleChangeFee(
-              sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
-            )}
-          onInput={(e) =>
-            handleChangeFee(
-              sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
-            )}
-          className={`${sliderBar} ${sliderKnob}`}
-        />
+  const renderFeeSelector = () => {
+    if (isLoadingMaraFee) {
+      return (
+        <div class={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
+          <FeeSkeletonLoader />
+        </div>
+      );
+    }
+
+    return (
+      <div class={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
+        <div class="flex items-center gap-2">
+          <h6 class="font-light text-base text-stamp-grey-light">
+            <span class="text-stamp-grey-darker pr-2">FEE</span>
+            <span class={`font-bold ${maraMode ? "text-purple-400" : ""}`}>
+              {fee === 0 ? <span class="animate-pulse">XX</span> : fee}
+            </span>{" "}
+            SAT/vB
+          </h6>
+          {maraMode && (
+            <div
+              className="relative cursor-help"
+              title="MARA Pool: Direct mining pool submission for non-standard transactions"
+            >
+              <MaraModeBadge />
+            </div>
+          )}
+        </div>
+        <h6 class="font-light text-sm text-stamp-grey-light mb-3 text-nowrap">
+          <span class="text-stamp-grey-darker pr-2">
+            {maraMode ? "MARA REQUIRED" : "RECOMMENDED"}
+          </span>
+          <span class={`font-medium ${maraMode ? "text-purple-400" : ""}`}>
+            {maraMode && maraFeeRate !== null
+              ? maraFeeRate
+              : fees?.recommendedFee
+              ? fees.recommendedFee
+              : <span class="animate-pulse">XX</span>}
+          </span>{" "}
+          SAT/vB
+        </h6>
         <div
-          className={`${tooltipImage} ${
-            isFeeTooltipVisible ? "opacity-100" : "opacity-0"
-          }`}
-          style={{
-            left: `${tooltipPosition.x}px`,
-            top: `${tooltipPosition.y - 6}px`,
-            transform: "translate(-50%, -100%)",
-          }}
+          className="relative w-full group"
+          onMouseMove={handleMouseMove}
+          onMouseEnter={handleFeeMouseEnter}
+          onMouseLeave={handleFeeMouseLeave}
+          onMouseDown={handleMouseDown}
+          onClick={(e) => e.stopPropagation()}
         >
-          SELECT FEE
+          <input
+            type="range"
+            value={feeToSliderPos(fee)}
+            min="0"
+            max="100"
+            step="0.25"
+            onChange={(e) => {
+              if (!maraMode) {
+                handleChangeFee(
+                  sliderPosToFee(
+                    parseFloat((e.target as HTMLInputElement).value),
+                  ),
+                );
+              }
+            }}
+            onInput={(e) => {
+              if (!maraMode) {
+                handleChangeFee(
+                  sliderPosToFee(
+                    parseFloat((e.target as HTMLInputElement).value),
+                  ),
+                );
+              }
+            }}
+            className={`${sliderBar} ${sliderKnob} ${
+              maraMode ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={maraMode}
+          />
+          <div
+            className={`${tooltipImage} ${
+              isFeeTooltipVisible ? "opacity-100" : "opacity-0"
+            }`}
+            style={{
+              left: `${tooltipPosition.x}px`,
+              top: `${tooltipPosition.y - 6}px`,
+              transform: "translate(-50%, -100%)",
+            }}
+          >
+            SELECT FEE
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Estimate details component
   const renderDetails = () => {
@@ -755,25 +799,31 @@ export function FeeCalculatorBase({
               {!feeDetails.hasExactFees && (
                 <span class="text-stamp-grey-light">~</span>
               )}
-              {coinType === "BTC"
-                ? (
-                  <>
-                    <span class="font-bold">
-                      {formatSatoshisToBTC(feeDetails.totalValue, {
-                        includeSymbol: false,
-                      })}
-                    </span>{" "}
-                    <span class="font-light">BTC</span>
-                  </>
-                )
-                : (
-                  <>
-                    <span class="font-bold">
-                      {(feeDetails.totalValue / 1e8 * BTCPrice).toFixed(2)}
-                    </span>{" "}
-                    <span class="font-light">{coinType}</span>
-                  </>
-                )}
+              {(() => {
+                // Add MARA service fee if in MARA mode
+                const maraServiceFee = maraMode ? 42000 : 0;
+                const totalWithMaraFee = feeDetails.totalValue + maraServiceFee;
+
+                return coinType === "BTC"
+                  ? (
+                    <>
+                      <span class="font-bold">
+                        {formatSatoshisToBTC(totalWithMaraFee, {
+                          includeSymbol: false,
+                        })}
+                      </span>{" "}
+                      <span class="font-light">BTC</span>
+                    </>
+                  )
+                  : (
+                    <>
+                      <span class="font-bold">
+                        {(totalWithMaraFee / 1e8 * BTCPrice).toFixed(2)}
+                      </span>{" "}
+                      <span class="font-light">{coinType}</span>
+                    </>
+                  );
+              })()}
               {/* Removed (est) from main ESTIMATE line as requested */}
             </>
           )
@@ -909,45 +959,55 @@ export function FeeCalculatorBase({
           </label>
         </div>
 
-        <div class="flex justify-end gap-6">
-          {onCancel && (
+        <div class="flex items-center justify-between gap-4">
+          {/* Progress indicator on the left */}
+          {progressIndicator && (
+            <div class="flex-1">
+              {progressIndicator}
+            </div>
+          )}
+
+          {/* Buttons on the right */}
+          <div class="flex justify-end gap-6">
+            {onCancel && (
+              <button
+                type="button"
+                className={`${buttonPurpleOutline} ${
+                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                onClick={() => {
+                  logger.debug("ui", {
+                    message: "Cancel clicked",
+                    component: "FeeCalculatorBase",
+                  });
+                  handleModalClose();
+                  onCancel();
+                }}
+                disabled={isSubmitting}
+              >
+                {cancelText}
+              </button>
+            )}
             <button
               type="button"
-              className={`${buttonPurpleOutline} ${
-                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              className={`${buttonPurpleFlat} ${
+                (disabled || isSubmitting || !tosAgreed)
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
               }`}
               onClick={() => {
-                logger.debug("ui", {
-                  message: "Cancel clicked",
-                  component: "FeeCalculatorBase",
-                });
-                handleModalClose();
-                onCancel();
+                console.log(
+                  "FEE_CALCULATOR_BASE: Internal button onClick fired! About to call props.onSubmit.",
+                );
+                if (onSubmit) {
+                  onSubmit();
+                }
               }}
-              disabled={isSubmitting}
+              disabled={disabled || isSubmitting || !tosAgreed}
             >
-              {cancelText}
+              {isSubmitting ? "PROCESSING" : confirmText || buttonName}
             </button>
-          )}
-          <button
-            type="button"
-            className={`${buttonPurpleFlat} ${
-              (disabled || isSubmitting || !tosAgreed)
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-            onClick={() => {
-              console.log(
-                "FEE_CALCULATOR_BASE: Internal button onClick fired! About to call props.onSubmit.",
-              );
-              if (onSubmit) {
-                onSubmit();
-              }
-            }}
-            disabled={disabled || isSubmitting || !tosAgreed}
-          >
-            {isSubmitting ? "PROCESSING" : confirmText || buttonName}
-          </button>
+          </div>
         </div>
       </div>
 
