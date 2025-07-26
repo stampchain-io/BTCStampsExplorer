@@ -219,14 +219,22 @@ export function estimateTransactionSizeForType(
   fileSize?: number,
 ): number {
   // For frontend fee estimation when we don't have actual UTXOs
+  // Note: Transaction size depends only on input/output count and types, not values
   const inputType: ScriptType = "P2WPKH"; // Most common
   const inputs = [{ type: inputType, isWitness: true }];
 
   let outputs: Array<{ type: ScriptType }>;
   switch (transactionType) {
-    case "stamp":
-      outputs = [{ type: "OP_RETURN" }, { type: "P2WPKH" }]; // data + change
+    case "stamp": {
+      // Calculate P2WSH outputs needed for stamp data based on file size
+      const dataChunks = Math.max(1, Math.ceil((fileSize || 100) / 32));
+      outputs = [
+        { type: "OP_RETURN" }, // Stamp protocol marker
+        ...Array(dataChunks).fill({ type: "P2WSH" }), // Data outputs with custom dust
+        { type: "P2WPKH" }, // change
+      ];
       break;
+    }
     case "src20":
     case "src101": {
       // Estimate data chunks needed (capped at reasonable amount)

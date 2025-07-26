@@ -39,6 +39,9 @@ interface RawRequestBody {
   service_fee?: number | string;
   service_fee_address?: string;
   isPoshStamp?: boolean;
+  // MARA integration parameters
+  outputValue?: number | string; // Custom dust value (1-332)
+  maraFeeRate?: number | string; // Pre-fetched MARA fee rate from frontend
   // Include other fields from MintStampInputData if they can be in the body
 }
 
@@ -59,6 +62,7 @@ interface CreateStampIssuanceParams {
   isDryRun?: boolean;
   service_fee: number;
   service_fee_address: string;
+  outputValue?: number; // Optional custom dust value for MARA mode
 }
 
 interface NormalizedMintResponse {
@@ -113,6 +117,17 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       );
     }
 
+    // MARA mode detection - activated when outputValue is provided and < 333
+    const outputValueNum = body.outputValue !== undefined
+      ? (typeof body.outputValue === "string"
+        ? parseInt(body.outputValue, 10)
+        : body.outputValue)
+      : undefined;
+
+    const isMaraMode = outputValueNum !== undefined &&
+      outputValueNum >= 1 &&
+      outputValueNum <= 332;
+
     let normalizedFees;
     try {
       const feeInputArgs: { satsPerKB?: number; satsPerVB?: number } = {};
@@ -137,11 +152,31 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       }
       normalizedFees = normalizeFeeRate(feeInputArgs);
 
+      // Override with MARA fee rate if in MARA mode and rate provided
+      if (isMaraMode && body.maraFeeRate) {
+        const maraFeeRateNum = typeof body.maraFeeRate === "string"
+          ? parseFloat(body.maraFeeRate)
+          : body.maraFeeRate;
+
+        // MARA provides fee rate in sats/vB
+        normalizedFees.normalizedSatsPerVB = maraFeeRateNum;
+        normalizedFees.normalizedSatsPerKB = maraFeeRateNum * 1000;
+
+        logger.info("api", {
+          message: "Using MARA fee rate override",
+          maraFeeRate: maraFeeRateNum,
+          normalizedSatsPerVB: normalizedFees.normalizedSatsPerVB,
+          normalizedSatsPerKB: normalizedFees.normalizedSatsPerKB,
+        });
+      }
+
       // Log fee rate for debugging
       console.log("🔧 /api/v2/olga/mint: Processing with fee rate", {
         rawFeeRate: body.feeRate,
         rawSatsPerVB: body.satsPerVB,
         rawSatsPerKB: body.satsPerKB,
+        maraFeeRate: body.maraFeeRate,
+        isMaraMode,
         normalizedFees,
         isDryRun: body.dryRun,
       });
@@ -234,15 +269,41 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       }
     }
 
-    const serviceFeeNum = body.service_fee !== undefined
-      ? (typeof body.service_fee === "string"
-        ? parseInt(body.service_fee, 10)
-        : body.service_fee)
-      : parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS, 10);
+    // Validate outputValue range if provided
+    if (
+      outputValueNum !== undefined &&
+      (outputValueNum < 1 || outputValueNum > 332)
+    ) {
+      return ApiResponseUtil.badRequest(
+        "Invalid outputValue: must be between 1 and 332 for MARA mode",
+      );
+    }
 
-    const serviceFeeAddr = body.service_fee_address !== undefined
-      ? body.service_fee_address
-      : serverConfig.MINTING_SERVICE_FEE_ADDRESS || ""; // Provide ultimate fallback for string
+    // Service fee override logic for MARA mode
+    const serviceFeeNum = isMaraMode
+      ? 42000 // MARA pool access fee (42k sats)
+      : (body.service_fee !== undefined
+        ? (typeof body.service_fee === "string"
+          ? parseInt(body.service_fee, 10)
+          : body.service_fee)
+        : parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS, 10));
+
+    const serviceFeeAddr = isMaraMode
+      ? "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m" // MARA service fee address
+      : (body.service_fee_address !== undefined
+        ? body.service_fee_address
+        : serverConfig.MINTING_SERVICE_FEE_ADDRESS || ""); // Provide ultimate fallback for string
+
+    // Log MARA mode status
+    if (isMaraMode) {
+      logger.info("api", {
+        message: "MARA mode activated",
+        outputValue: outputValueNum,
+        serviceFee: serviceFeeNum,
+        serviceFeeAddress: serviceFeeAddr,
+        maraFeeRate: body.maraFeeRate,
+      });
+    }
 
     const createIssuanceParams: CreateStampIssuanceParams = {
       sourceWallet: effectiveSourceWallet,
@@ -259,6 +320,7 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       isDryRun: isDryRun,
       service_fee: serviceFeeNum,
       service_fee_address: serviceFeeAddr,
+      ...(outputValueNum !== undefined && { outputValue: outputValueNum }),
     };
 
     try {

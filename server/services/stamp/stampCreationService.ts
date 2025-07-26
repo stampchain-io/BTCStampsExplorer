@@ -41,7 +41,8 @@ export class StampCreationService {
     service_fee = 0,
     service_fee_address = "",
     prefix = "stamp",
-    isDryRun = false
+    isDryRun = false,
+    outputValue
   }: {
     sourceWallet: string;
     assetName?: string;
@@ -55,11 +56,20 @@ export class StampCreationService {
     service_fee_address?: string;
     prefix?: "stamp" | "file" | "glyph";
     isDryRun?: boolean;
+    outputValue?: number;
   }) {
     // Validate and normalize fee rate
     const { normalizedSatsPerVB } = normalizeFeeRate({
       ...(satsPerVB !== undefined && { satsPerVB }),
     });
+
+    // Validate outputValue if provided (must be 1-332 or exactly 333)
+    const dustValue = outputValue !== undefined ? outputValue : TX_CONSTANTS.DUST_SIZE;
+    if (outputValue !== undefined) {
+      if (!((outputValue >= 1 && outputValue <= 332) || outputValue === 333)) {
+        throw new Error(`Invalid outputValue: ${outputValue}. Must be 1-332 or exactly 333.`);
+      }
+    }
 
     logger.info("stamp-create", {
       message: "Starting createStampIssuance with params",
@@ -75,7 +85,9 @@ export class StampCreationService {
       service_fee,
       service_fee_address,
       prefix,
-      isDryRun
+      isDryRun,
+      outputValue,
+      dustValue
     });
 
     try {
@@ -109,6 +121,7 @@ export class StampCreationService {
         isDryRun: isDryRun || false,
         file, // Pass file data for accurate size calculation
         service_fee,
+        outputValue: dustValue, // Pass the dust value for accurate fee estimation
       });
 
       if (!result.tx_hex) {
@@ -130,7 +143,8 @@ export class StampCreationService {
         service_fee_address,
         cip33Addresses as string[],
         fileSize,
-        isDryRun || false
+        isDryRun || false,
+        dustValue
       );
 
       if (isDryRun) {
@@ -171,7 +185,8 @@ export class StampCreationService {
     recipient_fee: string,
     cip33Addresses: string[],
     fileSize: number,
-    isDryRun: boolean
+    isDryRun: boolean,
+    dustValue: number = TX_CONSTANTS.DUST_SIZE
   ) {
     let totalOutputValue = 0;
     let psbt;
@@ -189,7 +204,7 @@ export class StampCreationService {
         logger.info("stamp-create", { message: "DryRun mode: returning mock PSBT data", address, fileSize, cip33AddressCount: cip33Addresses.length });
 
         // Calculate dust value for CIP33 addresses
-        totalDustValue = cip33Addresses.length * TX_CONSTANTS.DUST_SIZE;
+        totalDustValue = cip33Addresses.length * dustValue;
 
         // Calculate accurate estimated size based on transaction structure
         const dryRunEstimatedSize = estimateMintingTransactionSize({
@@ -322,7 +337,6 @@ export class StampCreationService {
 
       // Add data outputs
       for (let i = 0; i < cip33Addresses.length; i++) {
-        const dustValue = TX_CONSTANTS.DUST_SIZE;
         vouts.push({
           value: dustValue,
           address: cip33Addresses[i],
@@ -570,6 +584,7 @@ export class StampCreationService {
     isDryRun,
     file,
     service_fee,
+    outputValue,
   }: {
     sourceWallet: string;
     assetName: string;
@@ -581,6 +596,7 @@ export class StampCreationService {
     isDryRun?: boolean;
     file: string;
     service_fee: number;
+    outputValue?: number;
   }) {
     try {
       // Add wallet validation
@@ -589,7 +605,7 @@ export class StampCreationService {
         throw new Error(`Invalid source wallet address: ${walletValidation.error}`);
       }
 
-      logger.info("stamp-create", { message: "Starting createIssuanceTransaction with params", sourceWallet, assetName, qty, locked, divisible, description, satsPerKB, isDryRun: isDryRun, isDryRunType: typeof isDryRun });
+      logger.info("stamp-create", { message: "Starting createIssuanceTransaction with params", sourceWallet, assetName, qty, locked, divisible, description, satsPerKB, isDryRun: isDryRun, isDryRunType: typeof isDryRun, outputValue });
 
       // For dryRun, return mock transaction data to avoid UTXO lookup
       if (isDryRun === true) {
@@ -620,7 +636,8 @@ export class StampCreationService {
         }
 
         const estimatedFee = Math.ceil(estimatedSize * (satsPerKB / 1000));
-        const totalDustValue = cip33ChunkCount * 333; // Each P2WSH output has dust
+        const dustValue = outputValue !== undefined ? outputValue : TX_CONSTANTS.DUST_SIZE;
+        const totalDustValue = cip33ChunkCount * dustValue; // Each P2WSH output has dust
 
         logger.info("stamp-create", {
           message: "DryRun size calculation",
@@ -630,6 +647,8 @@ export class StampCreationService {
           satsPerKB,
           estimatedFee,
           totalDustValue,
+          dustValue,
+          outputValue,
           hasServiceFee: service_fee > 0,
           breakdown: {
             base: 10,

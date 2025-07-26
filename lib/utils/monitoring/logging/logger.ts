@@ -8,6 +8,7 @@ export type LogNamespace =
   | "aws"
   | "stamps"
   | "content"
+  | "config"
   | "api"
   | "database"
   | "cache"
@@ -31,13 +32,13 @@ export type LogNamespace =
   | "src20-operation-service"
   | "src101-operation-service"
   | "src20-multisig-psbt-service"
-  | "transaction-utxo-service"
   | "api-src101-create"
   | "broadcast"
   | "src20-utility"
   | "tool-endpoint-estimator"
   | "utxo-ancestors"
-  | "sql";
+  | "sql"
+  | "mara";
 
 declare global {
   interface Window {
