@@ -7,8 +7,17 @@ import { InputField } from "$form";
 import { Config } from "$globals";
 import { Icon } from "$icon";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
-import { openModal } from "$islands/modal/states.ts";
-import { bodyTool, containerBackground, containerRowForm } from "$layout";
+import { closeModal, openModal } from "$islands/modal/states.ts";
+import {
+  bodyTool,
+  containerBackground,
+  containerRowForm,
+  glassmorphism,
+} from "$layout";
+import { MaraModeIndicator } from "$components/indicators/MaraModeIndicator.tsx";
+import { MaraModeWarningModal } from "$components/modals/MaraModeWarningModal.tsx";
+import { MaraServiceUnavailableModal } from "$components/modals/MaraServiceUnavailableModal.tsx";
+import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
 import { useFees } from "$lib/hooks/useFees.ts";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 
@@ -73,6 +82,8 @@ interface MintRequest {
   divisible: boolean;
   isPoshStamp: boolean;
   dryRun?: boolean;
+  outputValue?: number; // MARA custom dust value
+  maraFeeRate?: number; // MARA-specified fee rate
 }
 
 /* ===== FORM VALIDATION UTILITY ===== */
@@ -247,6 +258,21 @@ function StampingToolMain({ config }: { config: Config }) {
   const [stampName, setStampName] = useState("");
   const [isDivisible, _setIsDivisible] = useState(false);
 
+  // MARA mode state variables
+  const [outputValue, setOutputValue] = useState<number | null>(null);
+  const [maraMode, setMaraMode] = useState(false);
+  const [maraFeeRate, setMaraFeeRate] = useState<number | null>(null);
+  const [maraError, setMaraError] = useState<string>("");
+  const [isLoadingMaraFee, setIsLoadingMaraFee] = useState(false);
+  const [showMaraWarning, setShowMaraWarning] = useState(false);
+  const [pendingMintPayload, setPendingMintPayload] = useState<
+    MintRequest | null
+  >(null);
+  const [maraUnavailable, setMaraUnavailable] = useState(false);
+  const [showMaraUnavailableModal, setShowMaraUnavailableModal] = useState(
+    false,
+  );
+
   // Validation state
   const [fileError, setFileError] = useState<string>("");
   const [issuanceError, setIssuanceError] = useState<string>("");
@@ -305,6 +331,7 @@ function StampingToolMain({ config }: { config: Config }) {
     quantity: parseInt(issuance, 10),
     locked: true,
     divisible: false,
+    outputValue: outputValue, // Pass custom dust value for MARA mode
   });
 
   // Get the best available fee estimate
@@ -381,9 +408,286 @@ function StampingToolMain({ config }: { config: Config }) {
   const previewButtonRef = useRef<HTMLDivElement>(null);
   const previewTooltipTimeoutRef = useRef<number | null>(null);
 
+  /* ===== MARA AVAILABILITY CHECK ===== */
+  const checkMaraAvailability = async () => {
+    try {
+      await axiod.get("/api/internal/mara-fee-rate");
+      setMaraUnavailable(false);
+      return true;
+    } catch (error) {
+      logger.warn("stamps", {
+        message: "MARA service appears unavailable",
+        error: (error as any)?.message,
+      });
+      setMaraUnavailable(true);
+      return false;
+    }
+  };
+
+  /* ===== FALLBACK TO STANDARD MODE ===== */
+  const switchToStandardMode = () => {
+    setMaraMode(false);
+    setOutputValue(null);
+    setMaraError("");
+    setMaraUnavailable(false);
+    setShowMaraUnavailableModal(false);
+    setApiError("");
+
+    // Remove URL parameter
+    const url = new URL(globalThis.location.href);
+    url.searchParams.delete("outputValue");
+    globalThis.history.replaceState({}, "", url);
+
+    logger.info("stamps", {
+      message: "Switched from MARA mode to standard stamping",
+    });
+
+    showToast("Switched to standard stamping (333 sat outputs)", "info", true);
+  };
+
+  /* ===== MARA TRANSACTION SUBMISSION WITH RETRY LOGIC ===== */
+  const submitToMara = async (
+    signedHex: string,
+    retryCount = 0,
+  ): Promise<any> => {
+    const maxRetries = 3;
+    const baseDelay = 1000; // 1 second base delay
+
+    try {
+      logger.info("stamps", {
+        message: "Submitting signed transaction to MARA pool",
+        hexLength: signedHex.length,
+        attempt: retryCount + 1,
+        maxAttempts: maxRetries + 1,
+      });
+
+      const response = await axiod.post("/api/internal/mara-submit", {
+        hex: signedHex,
+        priority: "high",
+      });
+
+      if (response.data && response.data.txid) {
+        const status = response.data.status;
+        const txidShort = response.data.txid.substring(0, 10);
+
+        logger.info("stamps", {
+          message: "Successfully submitted to MARA pool",
+          txid: response.data.txid,
+          status: status,
+          attempts: retryCount + 1,
+        });
+
+        // Display status-specific messages to user
+        switch (status) {
+          case "accepted":
+            showToast(
+              `MARA Pool: Transaction accepted - ${txidShort}...`,
+              "success",
+              false,
+            );
+            break;
+          case "pending":
+            showToast(
+              `MARA Pool: Transaction pending review - ${txidShort}...`,
+              "info",
+              false,
+            );
+            break;
+          case "rejected":
+            showToast(
+              `MARA Pool: Transaction rejected - ${txidShort}...`,
+              "error",
+              false,
+            );
+            break;
+          default:
+            showToast(
+              `MARA Pool: Status ${status} - ${txidShort}...`,
+              "info",
+              false,
+            );
+        }
+
+        setApiError("");
+        return response.data;
+      } else {
+        throw new Error("Invalid response from MARA submission");
+      }
+    } catch (error) {
+      const errorMessage = (error as any)?.response?.data?.error ||
+        (error as any)?.message ||
+        "Failed to submit transaction to MARA pool";
+
+      const isRetryableError = errorMessage.includes("network") ||
+        errorMessage.includes("timeout") ||
+        errorMessage.includes("Failed to fetch") ||
+        errorMessage.includes("502") ||
+        errorMessage.includes("503") ||
+        errorMessage.includes("504") ||
+        (error as any)?.response?.status >= 500;
+
+      if (retryCount < maxRetries && isRetryableError) {
+        const delay = baseDelay * Math.pow(2, retryCount); // Exponential backoff
+
+        logger.warn("stamps", {
+          message: `MARA submission failed, retrying in ${delay}ms`,
+          error: errorMessage,
+          attempt: retryCount + 1,
+          nextRetryIn: delay,
+        });
+
+        showToast(
+          `MARA submission failed, retrying... (${
+            retryCount + 1
+          }/${maxRetries})`,
+          "info",
+          true,
+        );
+
+        // Wait before retrying
+        await new Promise((resolve) => setTimeout(resolve, delay));
+
+        return submitToMara(signedHex, retryCount + 1);
+      }
+
+      // Max retries reached or non-retryable error
+      logger.error("stamps", {
+        message: "MARA submission failed after all retry attempts",
+        error: errorMessage,
+        totalAttempts: retryCount + 1,
+        isRetryableError,
+      });
+
+      throw new Error(errorMessage);
+    }
+  };
+
+  /* ===== MARA FEE RATE FETCHING ===== */
+  const fetchMaraFeeRate = async () => {
+    setIsLoadingMaraFee(true);
+    try {
+      const response = await axiod.get("/api/internal/mara-fee-rate");
+
+      if (response.data && typeof response.data.fee_rate === "number") {
+        setMaraFeeRate(response.data.fee_rate);
+        setFee(response.data.fee_rate); // Update the fee slider with MARA rate
+        setMaraError(""); // Clear any previous errors
+
+        logger.info("stamps", {
+          message: "MARA fee rate fetched successfully",
+          feeRate: response.data.fee_rate,
+          minFeeRate: response.data.min_fee_rate,
+        });
+
+        return response.data.fee_rate;
+      } else {
+        throw new Error("Invalid fee rate response");
+      }
+    } catch (error) {
+      const errorMessage = (error as any)?.response?.data?.error ||
+        (error as any)?.message ||
+        "Failed to fetch MARA fee rate";
+
+      setMaraError(errorMessage);
+      logger.error("stamps", {
+        message: "Failed to fetch MARA fee rate",
+        error: errorMessage,
+      });
+
+      // Check if it's a circuit breaker issue or service unavailable
+      if (
+        errorMessage.includes("circuit breaker") ||
+        errorMessage.includes("Circuit breaker") ||
+        errorMessage.includes("OPEN") ||
+        errorMessage.includes("temporarily unavailable") ||
+        errorMessage.includes("service temporarily unavailable") ||
+        errorMessage.includes("Failed to fetch") ||
+        errorMessage.includes("502") ||
+        errorMessage.includes("503") ||
+        errorMessage.includes("504")
+      ) {
+        setMaraUnavailable(true);
+        // Show error message immediately
+        setApiError(
+          `MARA service is temporarily unavailable. You can switch to standard mode or try again later.`,
+        );
+        // Show the unavailable modal
+        setShowMaraUnavailableModal(true);
+      } else {
+        // Disable MARA mode on other failures
+        setMaraMode(false);
+        setOutputValue(null);
+      }
+
+      throw error;
+    } finally {
+      setIsLoadingMaraFee(false);
+    }
+  };
+
+  /* ===== URL PARAMETER PARSING ===== */
+  useEffect(() => {
+    // Parse URL parameters on component mount
+    const params = new URLSearchParams(globalThis.location.search);
+    const outputValueParam = params.get("outputValue");
+
+    if (outputValueParam) {
+      const value = parseInt(outputValueParam, 10);
+
+      // Validate outputValue is within MARA range (1-332)
+      if (!isNaN(value) && value >= 1 && value <= 332) {
+        setOutputValue(value);
+        setMaraMode(true);
+
+        logger.info("stamps", {
+          message: "MARA mode activated via URL parameter",
+          outputValue: value,
+        });
+
+        // Fetch MARA fee rate when mode is activated
+        fetchMaraFeeRate().catch((error) => {
+          // If fee rate fetching fails, check if it's a service unavailable error
+          const errorMessage = error?.message || "";
+          logger.warn("stamps", {
+            message: "Failed to fetch MARA fee rate",
+            error: errorMessage,
+          });
+
+          if (
+            errorMessage.includes("circuit breaker") ||
+            errorMessage.includes("Circuit breaker") ||
+            errorMessage.includes("OPEN") ||
+            errorMessage.includes("temporarily unavailable") ||
+            errorMessage.includes("Failed to fetch") ||
+            errorMessage.includes("502") ||
+            errorMessage.includes("503") ||
+            errorMessage.includes("504")
+          ) {
+            // Service is temporarily unavailable - keep MARA mode but show modal
+            setMaraError("MARA service is temporarily unavailable");
+            checkMaraAvailability();
+          } else {
+            // Other errors - disable MARA mode
+            setMaraMode(false);
+            setOutputValue(null);
+            setMaraError("MARA integration is not available");
+          }
+        });
+      } else {
+        setMaraError("Invalid outputValue: must be between 1 and 332");
+        logger.error("stamps", {
+          message: "Invalid outputValue parameter",
+          value: outputValueParam,
+          parsed: value,
+        });
+      }
+    }
+  }, []); // Only run once on mount
+
   /* ===== EFFECT HOOKS ===== */
   useEffect(() => {
-    if (fees && !loading) {
+    if (fees && !loading && !maraMode) {
+      // Only update fee from polling service if not in MARA mode
       const recommendedFee = fees.recommendedFee;
       // Only update fee if the recommended fee is valid (>= 0.1 sat/vB)
       if (recommendedFee >= 0.1) {
@@ -399,7 +703,7 @@ function StampingToolMain({ config }: { config: Config }) {
         setBTCPrice((fees as any).btcPrice);
       }
     }
-  }, [fees, loading]);
+  }, [fees, loading, maraMode]);
 
   useEffect(() => {
     setIsLocked(true);
@@ -445,6 +749,20 @@ function StampingToolMain({ config }: { config: Config }) {
 
   /* ===== EVENT HANDLERS ===== */
   const handleChangeFee = (newFee: number) => {
+    // In MARA mode, only allow fee rates above the MARA minimum
+    if (maraMode && maraFeeRate !== null) {
+      const validatedFee = Math.max(newFee, maraFeeRate);
+      if (newFee < maraFeeRate) {
+        logger.warn("stamps", {
+          message: "Fee rate must be at least MARA minimum",
+          attemptedFee: newFee,
+          maraMinFee: maraFeeRate,
+        });
+      }
+      setFee(validatedFee);
+      return;
+    }
+
     // Allow any positive fee rate, including 0.1 sat/vB
     const validatedFee = Math.max(newFee, 0.1);
     setFee(validatedFee);
@@ -603,6 +921,318 @@ function StampingToolMain({ config }: { config: Config }) {
     }
   };
 
+  /* ===== SIGNED TRANSACTION PROCESSING ===== */
+  const processSignedTransaction = async (mintPayload: MintRequest) => {
+    try {
+      const response = await axiod.post(
+        "/api/v2/olga/mint",
+        mintPayload,
+      );
+
+      if (!response.data) {
+        throw new Error("No data received from API");
+      }
+
+      const mintResponse = response.data as MintResponse;
+
+      if (!mintResponse.hex) {
+        throw new Error("Invalid response structure: missing hex field");
+      }
+
+      // Update fee details with ACTUAL values from the final transaction
+      const netSpendAmount = (mintResponse.input_value || 0) -
+        (mintResponse.change_value || 0);
+
+      setExactFeeDetails({
+        phase: "exact",
+        minerFee: mintResponse.est_miner_fee || 0,
+        dustValue: mintResponse.total_dust_value || 0,
+        totalValue: netSpendAmount,
+        hasExactFees: true,
+        estimationMethod: "final_transaction",
+      });
+
+      const walletProvider = getWalletProvider(wallet.provider);
+
+      // Construct inputsToSign
+      const inputsToSign = mintResponse.txDetails.map((
+        input: TransactionInput,
+      ) => ({
+        index: input.signingIndex,
+      }));
+
+      logger.debug("stamps", {
+        message: "Constructed inputsToSign",
+        data: { inputsToSign },
+      });
+
+      // Call wallet signing with broadcast prevention for MARA mode
+      const result = await walletProvider.signPSBT(
+        mintResponse.hex,
+        inputsToSign,
+        true, // enableRBF
+        undefined, // sighashTypes
+        !maraMode, // autoBroadcast: false for MARA mode
+      );
+
+      logger.debug("stamps", {
+        message: "Raw wallet provider response",
+        data: {
+          result,
+          resultType: typeof result,
+          error: result?.error,
+          hasSignatures: result?.signed === true,
+          cancelled: result?.cancelled === true,
+          txid: result?.txid,
+          maraMode,
+        },
+      });
+
+      if (!result) {
+        logger.error("stamps", {
+          message: "Wallet provider returned null or undefined response",
+        });
+        setApiError("Wallet provider error: No response received");
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!result.signed) {
+        // Handle various error conditions
+        if (result.error) {
+          logger.debug("stamps", {
+            message: "Using error from result",
+            error: result.error,
+          });
+
+          if (result.error.includes("insufficient funds")) {
+            showToast(
+              "Insufficient funds in wallet to cover transaction fees",
+              "error",
+              false,
+            );
+          } else if (
+            result.error.includes("timeout") ||
+            result.error.includes("timed out")
+          ) {
+            showToast(
+              "Wallet connection timed out. Please try again",
+              "error",
+              false,
+            );
+          } else {
+            showToast(result.error, "error", false);
+          }
+          setIsSubmitting(false);
+          return;
+        }
+
+        if (result.cancelled) {
+          logger.debug("stamps", {
+            message: "Transaction was cancelled by user",
+          });
+          showToast("Transaction signing was cancelled", "info", true);
+          setIsSubmitting(false);
+          return;
+        }
+
+        logger.error("stamps", {
+          message: "Unknown PSBT signing failure",
+          data: { result },
+        });
+        showToast(
+          "Failed to sign transaction. Please check wallet connection and try again",
+          "error",
+          false,
+        );
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Handle successful signing
+      if (maraMode) {
+        // For MARA mode, submit to MARA pool
+        if (!result.psbt) {
+          // Fallback: Check if wallet accidentally broadcast despite autoBroadcast=false
+          if (result.txid) {
+            logger.warn("stamps", {
+              message:
+                "MARA mode: Wallet broadcast transaction despite autoBroadcast=false",
+              txid: result.txid,
+            });
+            showToast(
+              `Transaction broadcast by wallet: ${
+                result.txid.substring(0, 10)
+              }...`,
+              "success",
+              false,
+            );
+            setApiError("");
+            setIsSubmitting(false);
+            return;
+          }
+
+          // No fallback available - hex extraction failed
+          logger.error("stamps", {
+            message:
+              "MARA mode: No signed transaction hex available for submission",
+            walletProvider: wallet?.provider,
+            resultKeys: Object.keys(result),
+          });
+          setApiError(
+            "MARA mode requires signed transaction hex but wallet didn't provide it. Please try switching to standard stamping mode.",
+          );
+          setIsSubmitting(false);
+          return;
+        }
+
+        try {
+          await submitToMara(result.psbt);
+          setIsSubmitting(false);
+        } catch (maraError) {
+          logger.error("stamps", {
+            message: "MARA submission failed, attempting fallback",
+            error: maraError,
+          });
+
+          const errorMessage = (maraError as any)?.message || "";
+
+          // Check if it's a circuit breaker error or service unavailable
+          if (
+            errorMessage.includes("circuit breaker") ||
+            errorMessage.includes("Circuit breaker") ||
+            errorMessage.includes("OPEN") ||
+            errorMessage.includes("service temporarily unavailable") ||
+            errorMessage.includes("Failed to fetch") ||
+            errorMessage.includes("502") ||
+            errorMessage.includes("503") ||
+            errorMessage.includes("504")
+          ) {
+            setMaraUnavailable(true);
+            setApiError(
+              `MARA pool is temporarily unavailable. You can switch to standard stamping or retry later.`,
+            );
+            setIsSubmitting(false);
+            // Show the unavailable modal
+            setShowMaraUnavailableModal(true);
+          } else {
+            // For other errors, attempt automatic fallback to standard broadcasting
+            logger.warn("stamps", {
+              message: "Attempting automatic fallback to standard broadcasting",
+              originalError: errorMessage,
+            });
+
+            try {
+              // Check if wallet already broadcast the transaction
+              if (result.txid) {
+                logger.info("stamps", {
+                  message:
+                    "Fallback successful - wallet had already broadcast transaction",
+                  txid: result.txid,
+                });
+                showToast(
+                  `MARA failed, but transaction was broadcast: ${
+                    result.txid.substring(0, 10)
+                  }...`,
+                  "info",
+                  false,
+                );
+                setApiError("");
+                setIsSubmitting(false);
+                return;
+              }
+
+              // If we have the signed PSBT hex, attempt standard broadcast
+              if (result.psbt) {
+                const walletProvider = getWalletProvider(wallet.provider);
+
+                // Attempt to broadcast using wallet's broadcast method
+                if (walletProvider.broadcastPSBT) {
+                  const fallbackTxid = await walletProvider.broadcastPSBT(
+                    result.psbt,
+                  );
+                  logger.info("stamps", {
+                    message: "Fallback broadcast successful",
+                    txid: fallbackTxid,
+                    method: "wallet_broadcast_psbt",
+                  });
+                  showToast(
+                    `MARA failed, broadcasted via wallet: ${
+                      fallbackTxid.substring(0, 10)
+                    }...`,
+                    "info",
+                    false,
+                  );
+                  setApiError("");
+                  setIsSubmitting(false);
+                  return;
+                }
+              }
+
+              // If no fallback method worked, show error
+              setApiError(
+                `MARA submission failed and automatic fallback unsuccessful. Error: ${errorMessage}. Please try switching to standard stamping mode.`,
+              );
+              setIsSubmitting(false);
+              // Show the unavailable modal for this error
+              setMaraUnavailable(true);
+              setShowMaraUnavailableModal(true);
+            } catch (fallbackError) {
+              logger.error("stamps", {
+                message: "Both MARA submission and fallback failed",
+                maraError: errorMessage,
+                fallbackError: (fallbackError as any)?.message,
+              });
+              setApiError(
+                `MARA submission and fallback both failed. Please try switching to standard stamping mode.`,
+              );
+              setIsSubmitting(false);
+              // Show the unavailable modal for this error too
+              setMaraUnavailable(true);
+              setShowMaraUnavailableModal(true);
+            }
+          }
+        }
+      } else {
+        // Standard mode - transaction was already broadcast
+        if (result.txid) {
+          logger.debug("stamps", {
+            message: "Transaction signed and broadcast successfully",
+            data: { txid: result.txid },
+          });
+          showToast(
+            `Broadcasted: ${result.txid.substring(0, 10)}...`,
+            "success",
+            false,
+          );
+          setApiError("");
+          setIsSubmitting(false);
+        } else {
+          logger.debug("stamps", {
+            message: "Transaction signed successfully, but txid not returned",
+          });
+          showToast(
+            "Transaction signed and broadcasted successfully. Please check your wallet or a block explorer for confirmation.",
+            "success",
+            false,
+          );
+          setApiError("");
+          setIsSubmitting(false);
+        }
+      }
+    } catch (error) {
+      const errorMsg = extractErrorMessage(error);
+      logger.error("stamps", {
+        message: "Minting error",
+        error,
+        extractedMessage: errorMsg,
+      });
+      setApiError(errorMsg);
+      setSubmissionMessage(null);
+      setIsSubmitting(false);
+    }
+  };
+
   /* ===== MINTING HANDLER ===== */
   const handleMint = async () => {
     if (!isConnected) {
@@ -642,12 +1272,20 @@ function StampingToolMain({ config }: { config: Config }) {
           service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
           dryRun: false, // Critical: Set to false for actual PSBT generation
         };
+
+        // Add MARA parameters if in MARA mode
+        if (maraMode && outputValue !== null) {
+          finalMintPayload.outputValue = outputValue;
+          if (maraFeeRate !== null) {
+            finalMintPayload.maraFeeRate = maraFeeRate;
+          }
+        }
+
         if (stampName) {
           finalMintPayload.assetName = stampName;
         }
 
         // 🚀 Phase 3: Exact fee estimation for optimal transaction construction
-        // This provides the most accurate fees possible right before minting
         logger.debug("stamps", {
           message: "Starting Phase 3 exact fee estimation",
           toolType: "stamp",
@@ -668,157 +1306,16 @@ function StampingToolMain({ config }: { config: Config }) {
           hasExactFees: true, // Mark as exact when Phase 3 completes
         });
 
-        const response = await axiod.post(
-          "/api/v2/olga/mint",
-          finalMintPayload,
-        );
-
-        if (!response.data) {
-          throw new Error("No data received from API");
-        }
-
-        const mintResponse = response.data as MintResponse;
-
-        if (!mintResponse.hex) {
-          throw new Error("Invalid response structure: missing hex field");
-        }
-
-        // Update fee details with ACTUAL values from the final transaction
-        // This ensures the UI shows the exact same values the wallet will use
-        // The wallet shows "You'll transfer X BTC" which is the net spend (input_value - change_value)
-        const netSpendAmount = (mintResponse.input_value || 0) -
-          (mintResponse.change_value || 0);
-
-        setExactFeeDetails({
-          phase: "exact",
-          minerFee: mintResponse.est_miner_fee || 0,
-          dustValue: mintResponse.total_dust_value || 0,
-          totalValue: netSpendAmount, // Use net spend amount to match wallet display
-          hasExactFees: true, // These are the actual transaction values
-          estimationMethod: "final_transaction", // Mark as final transaction values
-        });
-
-        const walletProvider = getWalletProvider(
-          wallet.provider,
-        );
-
-        // Update the inputsToSign construction to use the new format
-        const inputsToSign = mintResponse.txDetails.map((
-          input: TransactionInput,
-        ) => ({
-          index: input.signingIndex,
-        }));
-        logger.debug("stamps", {
-          message: "Constructed inputsToSign",
-          data: { inputsToSign },
-        });
-
-        const result = await walletProvider.signPSBT(
-          mintResponse.hex,
-          inputsToSign,
-        );
-
-        logger.debug("stamps", {
-          message: "Raw wallet provider response",
-          data: {
-            result,
-            resultType: typeof result,
-            error: result?.error,
-            hasSignatures: result?.signed === true,
-            cancelled: result?.cancelled === true,
-            txid: result?.txid,
-          },
-        });
-
-        if (!result) {
-          logger.error("stamps", {
-            message: "Wallet provider returned null or undefined response",
-          });
-          setApiError("Wallet provider error: No response received");
-          setSubmissionMessage(null);
-          setIsSubmitting(false); // Reset submitting state
+        // For MARA mode, show warning modal before proceeding
+        if (maraMode && outputValue !== null) {
+          setPendingMintPayload(finalMintPayload);
+          setShowMaraWarning(true);
+          setIsSubmitting(false); // Reset submitting state while waiting for modal
           return;
         }
 
-        if (!result.signed) {
-          // If result contains an error message, use it directly
-          if (result.error) {
-            logger.debug("stamps", {
-              message: "Using error from result",
-              error: result.error,
-            });
-
-            // Improved error messages for common wallet errors
-            if (result.error.includes("insufficient funds")) {
-              showToast(
-                "Insufficient funds in wallet to cover transaction fees",
-                "error",
-                false,
-              );
-            } else if (
-              result.error.includes("timeout") ||
-              result.error.includes("timed out")
-            ) {
-              showToast(
-                "Wallet connection timed out. Please try again",
-                "error",
-                false,
-              );
-            } else {
-              showToast(result.error, "error", false);
-            }
-            setIsSubmitting(false); // Reset submitting state
-            return;
-          }
-
-          if (result.cancelled) {
-            logger.debug("stamps", {
-              message: "Transaction was cancelled by user",
-            });
-            showToast("Transaction signing was cancelled", "info", true);
-            setIsSubmitting(false); // Reset submitting state
-            return;
-          }
-
-          // Generic error fallback with helpful suggestion
-          logger.error("stamps", {
-            message: "Unknown PSBT signing failure",
-            data: { result },
-          });
-          showToast(
-            "Failed to sign transaction. Please check wallet connection and try again",
-            "error",
-            false,
-          );
-          setIsSubmitting(false); // Reset submitting state
-          return;
-        }
-
-        // Inside the try block after successful operations
-        if (result.txid) {
-          logger.debug("stamps", {
-            message: "Transaction signed and broadcast successfully",
-            data: { txid: result.txid },
-          });
-          showToast(
-            `Broadcasted: ${result.txid.substring(0, 10)}...`,
-            "success",
-            false,
-          );
-          setApiError(""); // Clear any previous errors
-          setIsSubmitting(false); // Reset submitting state
-        } else {
-          logger.debug("stamps", {
-            message: "Transaction signed successfully, but txid not returned",
-          });
-          showToast(
-            "Transaction signed and broadcasted successfully. Please check your wallet or a block explorer for confirmation.",
-            "success",
-            false,
-          );
-          setApiError("");
-          setIsSubmitting(false); // Reset submitting state
-        }
+        // Process standard transaction
+        await processSignedTransaction(finalMintPayload);
       } catch (error) {
         const errorMsg = extractErrorMessage(error);
         logger.error("stamps", {
@@ -828,7 +1325,7 @@ function StampingToolMain({ config }: { config: Config }) {
         });
         setApiError(errorMsg);
         setSubmissionMessage(null);
-        setIsSubmitting(false); // Reset submitting state
+        setIsSubmitting(false);
       }
     } catch (error: any) {
       logger.error("stamps", {
@@ -842,6 +1339,52 @@ function StampingToolMain({ config }: { config: Config }) {
       setSubmissionMessage(null);
       setIsSubmitting(false); // Reset submitting state
     }
+  };
+
+  /* ===== MARA WARNING MODAL HANDLERS ===== */
+  const handleMaraWarningConfirm = async () => {
+    setShowMaraWarning(false);
+    closeModal(); // Close the global modal
+
+    if (pendingMintPayload) {
+      setIsSubmitting(true);
+      await processSignedTransaction(pendingMintPayload);
+      setPendingMintPayload(null);
+    }
+  };
+
+  const handleMaraWarningCancel = () => {
+    setShowMaraWarning(false);
+    closeModal(); // Close the global modal
+    setPendingMintPayload(null);
+    setIsSubmitting(false);
+  };
+
+  /* ===== MARA UNAVAILABLE MODAL HANDLERS ===== */
+  const handleMaraUnavailableRetry = async () => {
+    setShowMaraUnavailableModal(false);
+    closeModal();
+    setMaraUnavailable(false);
+    setApiError("");
+    setMaraError("");
+
+    // Retry fetching MARA fee rate
+    try {
+      await fetchMaraFeeRate();
+    } catch (error) {
+      // Error handling is already in fetchMaraFeeRate
+    }
+  };
+
+  const handleMaraUnavailableSwitchToStandard = () => {
+    setShowMaraUnavailableModal(false);
+    closeModal();
+    switchToStandardMode();
+  };
+
+  const handleMaraUnavailableClose = () => {
+    setShowMaraUnavailableModal(false);
+    closeModal();
   };
 
   const handleCloseFullScreenModal = () => {
@@ -1217,9 +1760,50 @@ function StampingToolMain({ config }: { config: Config }) {
     <div class={bodyTool}>
       <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>STAMP</h1>
 
+      {/* MARA Mode Indicator */}
+      {maraMode && outputValue !== null && (
+        <MaraModeIndicator
+          outputValue={outputValue}
+          feeRate={maraFeeRate}
+          class="mb-4"
+        />
+      )}
+
+      {/* MARA Unavailable Warning Banner */}
+      {maraMode && maraUnavailable && (
+        <div
+          class={`mb-4 ${glassmorphism} bg-gradient-to-br from-orange-900/15 to-orange-800/25 border-orange-500/20 p-4`}
+        >
+          <div class="flex items-start gap-3 mb-3">
+            <div class="text-orange-400 text-xl mt-0.5">⚠️</div>
+            <div class="flex-1">
+              <h3 class="text-orange-300 font-semibold mb-2">
+                MARA Pool Temporarily Unavailable
+              </h3>
+              <p class="text-sm text-stamp-grey-light">
+                The MARA pool submission service is currently unavailable. You
+                can either wait and retry, or switch to standard stamping (333
+                sat outputs).
+              </p>
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <button
+              type="button"
+              onClick={switchToStandardMode}
+              class={`px-4 py-2 ${glassmorphism} bg-gradient-to-br from-purple-600/80 to-purple-700/80 text-white text-sm rounded-lg hover:from-purple-600 hover:to-purple-700 transition-colors font-semibold`}
+            >
+              Switch to Standard
+            </button>
+          </div>
+        </div>
+      )}
+
       {isConnected && addressError && (
-        <div class="w-full text-red-500 text-center font-bold">
-          {addressError}
+        <div
+          class={`w-full mb-4 ${glassmorphism} bg-gradient-to-br from-red-900/15 to-red-800/25 border-red-500/20 p-4`}
+        >
+          <p class="text-red-400 text-center font-medium">{addressError}</p>
         </div>
       )}
 
@@ -1379,12 +1963,17 @@ function StampingToolMain({ config }: { config: Config }) {
           isSubmitting={isSubmitting}
           onSubmit={handleMint}
           buttonName={isConnected ? "STAMP" : "CONNECT WALLET"}
+          maraMode={maraMode}
+          maraFeeRate={maraFeeRate}
+          isLoadingMaraFee={isLoadingMaraFee}
+          showCoinToggle
           feeDetails={(exactFeeDetails || progressiveFeeDetails)
             ? {
               minerFee: (exactFeeDetails || progressiveFeeDetails)?.minerFee ||
                 0,
               dustValue:
                 (exactFeeDetails || progressiveFeeDetails)?.dustValue || 0,
+              serviceFee: maraMode ? 42000 : 0, // MARA service fee
               totalValue:
                 (exactFeeDetails || progressiveFeeDetails)?.totalValue || 0,
               hasExactFees:
@@ -1395,6 +1984,7 @@ function StampingToolMain({ config }: { config: Config }) {
             : {
               minerFee: 0,
               dustValue: 0,
+              serviceFee: maraMode ? 42000 : 0, // MARA service fee
               totalValue: 0,
               hasExactFees: false,
               estimatedSize: 300,
@@ -1403,125 +1993,27 @@ function StampingToolMain({ config }: { config: Config }) {
           onTosChange={setTosAgreed}
           disabled={isConnected ? !isFormValid : false}
           bitname=""
+          progressIndicator={
+            <ProgressiveEstimationIndicator
+              isConnected={isConnected}
+              isSubmitting={isSubmitting}
+              isPreFetching={isPreFetching}
+              currentPhase={currentPhase}
+              phase1={phase1}
+              phase2={phase2}
+              phase3={phase3}
+              feeEstimationError={feeEstimationError}
+              clearError={clearError}
+            />
+          }
         />
-
-        {/* 🚀 Three-Phase Fee Estimation Status Indicator */}
-        <div className="absolute top-3 right-3 z-10">
-          {/* Phase 2: Smart UTXO-based estimation (background pre-fetching) */}
-          {isPreFetching && (
-            <div className="flex items-center gap-2 bg-stamp-grey-darker/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-stamp-grey-light/10 mb-2">
-              <div className="relative">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse">
-                </div>
-                <div className="absolute inset-0 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping opacity-20">
-                </div>
-              </div>
-              <span className="hidden sm:inline text-xs text-stamp-grey-light font-normal opacity-80">
-                Smart UTXO analysis
-              </span>
-              <span className="inline sm:hidden text-blue-400 text-xs opacity-80">
-                💡
-              </span>
-            </div>
-          )}
-
-          {/* Phase 3: Exact estimation (during minting) */}
-          {isSubmitting && currentPhase === "exact" && (
-            <div className="flex items-center gap-2 bg-green-900/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-green-500/20 mb-2">
-              <div className="relative">
-                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse">
-                </div>
-                <div className="absolute inset-0 w-1.5 h-1.5 bg-green-400 rounded-full animate-ping opacity-20">
-                </div>
-              </div>
-              <span className="hidden sm:inline text-xs text-green-300 font-normal opacity-90">
-                Exact fee calculation
-              </span>
-              <span className="inline sm:hidden text-green-400 text-xs opacity-80">
-                🎯
-              </span>
-            </div>
-          )}
-
-          {/* Phase Status Summary - Always visible when connected */}
-          {isConnected && !isSubmitting && (
-            <div className="flex items-center gap-2 bg-stamp-grey-darker/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-stamp-grey-light/10">
-              {/* Phase indicators */}
-              <div className="flex items-center gap-1">
-                {/* Phase 1: Instant */}
-                <div
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    phase1 ? "bg-green-400" : "bg-stamp-grey-light/30"
-                  }`}
-                  title="Phase 1: Instant estimate"
-                >
-                </div>
-
-                {/* Phase 2: Smart */}
-                <div
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    phase2
-                      ? "bg-blue-400"
-                      : currentPhase === "smart" || isPreFetching
-                      ? "bg-blue-400 animate-pulse"
-                      : "bg-stamp-grey-light/30"
-                  }`}
-                  title="Phase 2: Smart UTXO estimate"
-                >
-                </div>
-
-                {/* Phase 3: Exact */}
-                <div
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    phase3 ? "bg-green-500" : "bg-stamp-grey-light/30"
-                  }`}
-                  title="Phase 3: Exact calculation"
-                >
-                </div>
-              </div>
-
-              {/* Current phase text */}
-              <span className="hidden sm:inline text-xs text-stamp-grey-light font-normal opacity-80">
-                {currentPhase === "instant" && "⚡ Instant"}
-                {currentPhase === "smart" && "💡 Smart"}
-                {currentPhase === "exact" && "🎯 Exact"}
-              </span>
-
-              {/* Mobile-only emoji */}
-              <span className="inline sm:hidden text-stamp-grey-light text-xs opacity-80">
-                {currentPhase === "instant" && "⚡"}
-                {currentPhase === "smart" && "💡"}
-                {currentPhase === "exact" && "🎯"}
-              </span>
-            </div>
-          )}
-
-          {/* Error indicator */}
-          {feeEstimationError && (
-            <div className="flex items-center gap-2 bg-red-900/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm border border-red-500/20 mt-2">
-              <div className="w-1.5 h-1.5 bg-red-400 rounded-full"></div>
-              <span className="hidden sm:inline text-xs text-red-300 font-normal opacity-90">
-                Estimation error
-              </span>
-              <span className="inline sm:hidden text-red-400 text-xs opacity-80">
-                ⚠️
-              </span>
-              <button
-                type="button"
-                onClick={clearError}
-                className="text-red-300 hover:text-red-200 text-xs ml-1"
-                title="Clear error"
-              >
-                ×
-              </button>
-            </div>
-          )}
-        </div>
       </div>
 
       <StatusMessages
         submissionMessage={submissionMessage}
-        apiError={apiError}
+        apiError={apiError || maraError || (feeEstimationError
+          ? `Fee estimation error: ${feeEstimationError}`
+          : "")}
       />
 
       {isFullScreenModalOpen && openModal(
@@ -1530,6 +2022,24 @@ function StampingToolMain({ config }: { config: Config }) {
           contentType={file?.type?.startsWith("text/html") ? "html" : "image"}
         />,
         "zoomInOut",
+      )}
+
+      {showMaraWarning && outputValue !== null && openModal(
+        <MaraModeWarningModal
+          outputValue={outputValue}
+          onConfirm={handleMaraWarningConfirm}
+          onCancel={handleMaraWarningCancel}
+        />,
+        "slideUpDown",
+      )}
+
+      {showMaraUnavailableModal && openModal(
+        <MaraServiceUnavailableModal
+          onSwitchToStandard={handleMaraUnavailableSwitchToStandard}
+          onRetry={handleMaraUnavailableRetry}
+          onClose={handleMaraUnavailableClose}
+        />,
+        "slideUpDown",
       )}
 
       <div

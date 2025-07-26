@@ -354,7 +354,7 @@ export class TransactionConstructionService {
     switch (options.toolType) {
       case "stamp": {
         // Provide meaningful defaults for all required stamp fields
-        return {
+        const stampOptions: StampTransactionOptions = {
           ...baseOptions,
           file: options.file ||
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", // 1x1 transparent PNG
@@ -363,7 +363,14 @@ export class TransactionConstructionService {
           quantity: options.quantity || 1,
           locked: options.locked ?? true,
           divisible: options.divisible ?? false,
-        } as StampTransactionOptions;
+        };
+
+        // Add outputValue for MARA mode if specified
+        if (options.outputValue !== undefined) {
+          stampOptions.outputValue = options.outputValue;
+        }
+
+        return stampOptions;
       }
 
       case "src20-deploy": {
