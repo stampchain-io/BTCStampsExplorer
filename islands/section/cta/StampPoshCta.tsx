@@ -1,6 +1,6 @@
 /* ===== STAMP POSH CTA COMPONENT ===== */
-import { subtitleGrey, text } from "$text";
 import { Button } from "$button";
+import { subtitleGrey, text } from "$text";
 
 /* ===== COMPONENT ===== */
 export const StampPoshCta = () => {
@@ -47,7 +47,7 @@ export const StampPoshCta = () => {
       <Button
         variant="flat"
         color="grey"
-        size="md"
+        size="mdR"
         href="/tool/stamp/create"
         class="float-right mt-6"
       >

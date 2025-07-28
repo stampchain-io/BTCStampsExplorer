@@ -1,10 +1,10 @@
 /* TODO @REINAMORA:  Update the contact form to be able to send emails */
 /* ===== CONTACT CTA COMPONENT ===== */
-import { useState } from "preact/hooks";
-import { InputField } from "$form";
 import { ButtonProcessing } from "$button";
-import { subtitleGrey, text, titleGreyLD } from "$text";
+import { InputField } from "$form";
 import { gapGrid, rowForm, rowResponsiveForm } from "$layout";
+import { subtitleGrey, text, titleGreyLD } from "$text";
+import { useState } from "preact/hooks";
 
 /* ===== STATE ===== */
 const ContactCta = () => {
@@ -114,7 +114,7 @@ const ContactCta = () => {
                   type="submit"
                   variant="outline"
                   color="grey"
-                  size="md"
+                  size="mdR"
                   isSubmitting={isSubmitting}
                 >
                   SEND
