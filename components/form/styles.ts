@@ -1,4 +1,5 @@
 /* ===== FORM STYLES MODULE ===== */
+import { glassmorphismLayer2 } from "$layout";
 
 /* ===== BASE STYLES ===== */
 // Global sizes
@@ -8,9 +9,10 @@ const inputFieldHeightLarge = "h-11";
 
 // Input field styles
 const inputFieldStyle = `p-3 w-full
-  rounded-md bg-stamp-grey focus:bg-stamp-grey-light outline-none focus:outline-none
-  font-medium text-sm text-stamp-grey-darkest
-  placeholder:font-light placeholder:text-stamp-grey-darkest placeholder:uppercase`;
+  ${glassmorphismLayer2}
+  focus:bg-stamp-grey-darkest/30 focus:border-stamp-grey-darker/20 focus:outline-none focus-visible:outline-none no-outline
+  font-medium text-sm text-stamp-grey-light
+  placeholder:font-light placeholder:text-stamp-grey placeholder:uppercase`;
 
 /* ===== INPUT STYLES ===== */
 // Base input
@@ -115,9 +117,9 @@ export const outlineGradient = `
   before:transition-colors before:duration-300
   [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#100318]
   [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-[#100318] [&>div]:placeholder:!bg-[#100318] [&>div]:rounded-md
-  [&>div>input]:${inputFieldHeightLarge} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-md [&>div>input]:pl-5 
-  [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-stamp-grey-light 
-  [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-stamp-grey 
+  [&>div>input]:${inputFieldHeightLarge} [&>div>input]:w-full [&>div>input]:bg-transparent [&>div>input]:rounded-md [&>div>input]:pl-5
+  [&>div>input]:font-normal [&>div>input]:text-base [&>div>input]:text-stamp-grey-light
+  [&>div>input]:placeholder:font-light [&>div>input]:placeholder:!text-stamp-grey
   [&>div>input]:!outline-none [&>div>input]:focus-visible:!outline-none [&>div>input]:focus:!bg-[#100318]
 `;
 

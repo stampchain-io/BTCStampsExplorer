@@ -6,6 +6,10 @@ export const glassmorphism =
   bg-gradient-to-br from-stamp-grey-darkest/15 to-stamp-grey-darkest/30
   backdrop-blur-md overflow-hidden
   shadow-[0_8px_32px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_8px_4px_rgba(22,22,22,0.2)]`;
+export const glassmorphismLayer2 =
+  `border-[1px] border-stamp-grey-darkest/20 rounded-lg
+  bg-stamp-grey-darkest/10 backdrop-blur-md overflow-hidden
+  shadow-[0_8px_16px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_8px_4px_rgba(22,22,22,0.2)]`;
 export const transition = "transition-colors duration-200";
 
 /* ===== BODY STYLES ===== */
@@ -24,8 +28,7 @@ export const gapSectionSlim = "gap-6 mobileLg:gap-9"; // Media index page
 export const gapGrid = "gap-6 mobileLg:gap-9 tablet:gap-12"; // - ToS index page
 
 /* ===== CONTAINER STYLES ===== */
-export const containerBackground =
-  `flex flex-col w-full px-6 py-5 ${glassmorphism}`;
+export const containerBackground = `flex flex-col w-full p-5 ${glassmorphism}`;
 
 export const containerDetailImage = `relative p-5 ${glassmorphism}`;
 

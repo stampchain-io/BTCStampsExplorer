@@ -1,7 +1,8 @@
 /* ===== TOGGLE SWITCH BUTTON COMPONENT ===== */
+import { toggleButton, toggleKnob, toggleKnobBackground } from "$button";
+import { toggleSymbol } from "$text";
 import { JSX } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { toggleButton, toggleKnob, toggleKnobBackground } from "$button";
 
 /* ===== TYPES ===== */
 interface ToggleSwitchButtonProps {
@@ -9,6 +10,10 @@ interface ToggleSwitchButtonProps {
   onToggle: () => void;
   toggleButtonId: string;
   className?: string;
+
+  // Custom symbols for the toggle states
+  activeSymbol?: string;
+  inactiveSymbol?: string;
 
   // Event handlers for external tooltip control
   onMouseEnter?: (e: MouseEvent) => void;
@@ -27,6 +32,8 @@ export function ToggleSwitchButton({
   onToggle,
   toggleButtonId,
   className = "",
+  activeSymbol,
+  inactiveSymbol,
   onMouseEnter,
   onMouseLeave,
   onClick,
@@ -52,8 +59,20 @@ export function ToggleSwitchButton({
       // Create inner content
       const innerDiv = document.createElement("div");
       innerDiv.className = `${toggleKnob} ${
-        isActive ? "bg-stamp-purple-dark" : "bg-stamp-purple-darker"
-      }`;
+        isActive ? "bg-stamp-grey-light/50" : "bg-stamp-grey/50"
+      } flex items-center justify-center ${toggleSymbol}`;
+
+      // Add symbol if provided
+      if (isActive && activeSymbol) {
+        const symbolSpan = document.createElement("span");
+        symbolSpan.className = "transform -skew-x-[11deg]";
+        symbolSpan.textContent = activeSymbol;
+        innerDiv.appendChild(symbolSpan);
+      } else if (!isActive && inactiveSymbol) {
+        const symbolSpan = document.createElement("span");
+        symbolSpan.textContent = inactiveSymbol;
+        innerDiv.appendChild(symbolSpan);
+      }
 
       // Clear and append
       handleElement.innerHTML = "";
@@ -76,9 +95,17 @@ export function ToggleSwitchButton({
         // Move handle to active position
         handleElement.classList.add("translate-x-full");
         setTimeout(() => {
-          // Update inner content with active color
+          // Update inner content with active color and symbol
           const innerDiv = document.createElement("div");
-          innerDiv.className = `${toggleKnob} bg-stamp-purple-dark`;
+          innerDiv.className =
+            `${toggleKnob} bg-stamp-grey-light/50 flex items-center justify-center ${toggleSymbol}`;
+
+          if (activeSymbol) {
+            const symbolSpan = document.createElement("span");
+            symbolSpan.className = "transform -skew-x-[11deg]";
+            symbolSpan.textContent = activeSymbol;
+            innerDiv.appendChild(symbolSpan);
+          }
 
           // Clear and append
           handleElement.innerHTML = "";
@@ -88,9 +115,16 @@ export function ToggleSwitchButton({
         // Move handle to inactive position
         handleElement.classList.remove("translate-x-full");
         setTimeout(() => {
-          // Update inner content with inactive color
+          // Update inner content with inactive color and symbol
           const innerDiv = document.createElement("div");
-          innerDiv.className = `${toggleKnob} bg-stamp-purple-darker`;
+          innerDiv.className =
+            `${toggleKnob} bg-stamp-grey/50 flex items-center justify-center ${toggleSymbol}`;
+
+          if (inactiveSymbol) {
+            const symbolSpan = document.createElement("span");
+            symbolSpan.textContent = inactiveSymbol;
+            innerDiv.appendChild(symbolSpan);
+          }
 
           // Clear and append
           handleElement.innerHTML = "";
@@ -98,7 +132,7 @@ export function ToggleSwitchButton({
         }, 150);
       }
     }
-  }, [isActive]);
+  }, [isActive, activeSymbol, inactiveSymbol]);
 
   /* ===== COMPONENT RENDER ===== */
   return (

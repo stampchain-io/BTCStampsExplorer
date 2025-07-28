@@ -154,6 +154,8 @@ export const tagline =
 export const copyright = `font-normal text-xs ${cursor}`; // transparent text - combined with the overlayPurple class - used in footer
 export const loaderText =
   `font-medium text-sm text-stamp-grey uppercase text-center py-3 animated-text-loader ${cursor}`; // table more rows loader
+export const toggleSymbol =
+  `font-bold text-[10px] text-black select-none whitespace-nowrap`; // used in ToggleSwitchButton.tsx
 
 // Captions - used for stamp/token cards
 // Errors - used for error messages - to be defined in /notifications/styles.ts
@@ -269,6 +271,7 @@ export type TextStyles = {
   tagline: string;
   copyright: string;
   loaderText: string;
+  toggleSymbol: string;
   // Card text styles
   cardHashSymbol: string;
   cardStampNumber: string;

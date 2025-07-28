@@ -1,4 +1,5 @@
 /* ===== BUTTON STYLES MODULE ===== */
+import { glassmorphismLayer2 } from "$layout";
 import { JSX } from "preact";
 
 /* ===== TYPE DEFINITIONS ===== */
@@ -255,15 +256,15 @@ export const buttonStyles: ButtonVariants = {
 /* @baba - update toggle switch - possible duplicate */
 
 export const toggleButton =
-  "flex items-center relative w-10 h-5 rounded-full bg-stamp-grey focus:outline-none transition ease-in-out duration-200";
+  `flex items-center relative w-10 h-5 !rounded-full ${glassmorphismLayer2} focus:outline-none transition ease-in-out duration-200`;
 export const toggleKnobBackground =
-  "flex justify-center items-center relative w-5 h-5 bg-stamp-grey rounded-full transition ease-in-out transform duration-400 ";
+  "flex justify-center items-center relative w-5 h-5 bg-transparent rounded-full transition ease-in-out transform duration-400 ";
 export const toggleKnob = "w-[18px] h-[18px] rounded-full";
 export const sliderKnob =
   `[&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:tablet:w-4 [&::-webkit-slider-thumb]:tablet:h-4 [&::-webkit-slider-thumb]:appearance-none
-   [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+   [&::-webkit-slider-thumb]:bg-stamp-grey [&::-webkit-slider-thumb]:hover:bg-stamp-grey [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
    [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:tablet:w-4 [&::-moz-range-thumb]:tablet:h-4 [&::-moz-range-thumb]:appearance-none
-   [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer`;
+   [&::-moz-range-thumb]:bg-stamp-purple [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer`;
 export const sliderBar =
   `w-full h-1.5 tablet:h-1 rounded-lg bg-stamp-grey appearance-none cursor-pointer`;
 
