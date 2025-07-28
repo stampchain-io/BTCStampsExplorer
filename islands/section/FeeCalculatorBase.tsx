@@ -1,9 +1,4 @@
-import {
-  buttonPurpleFlat,
-  buttonPurpleOutline,
-  sliderBar,
-  sliderKnob,
-} from "$button";
+import { button, sliderBar, sliderKnob } from "$button";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { useFees } from "$fees";
 import { Icon } from "$icon";
@@ -12,12 +7,12 @@ import type {
   FeeDetails,
   MintDetails,
 } from "$lib/types/base.d.ts";
+import { estimateTransactionSizeForType } from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
+import { logger } from "$lib/utils/logger.ts";
 import {
   formatSatoshisToBTC,
   formatSatoshisToUSD,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { estimateTransactionSizeForType } from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
 import { tooltipButton, tooltipImage } from "$notification";
 import { labelXs, textXs } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
@@ -913,9 +908,10 @@ export function FeeCalculatorBase({
           {onCancel && (
             <button
               type="button"
-              className={`${buttonPurpleOutline} ${
-                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              className={button("outline", "purple", "md", {
+                disabled: isSubmitting,
+                loading: isSubmitting,
+              })}
               onClick={() => {
                 logger.debug("ui", {
                   message: "Cancel clicked",
@@ -931,11 +927,10 @@ export function FeeCalculatorBase({
           )}
           <button
             type="button"
-            className={`${buttonPurpleFlat} ${
-              (disabled || isSubmitting || !tosAgreed)
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
+            className={button("flat", "purple", "md", {
+              disabled: disabled || isSubmitting || !tosAgreed,
+              loading: isSubmitting,
+            })}
             onClick={() => {
               console.log(
                 "FEE_CALCULATOR_BASE: Internal button onClick fired! About to call props.onSubmit.",

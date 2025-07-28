@@ -207,7 +207,7 @@ export const buttonStyles: ButtonVariants = {
     xl: "text-xl",
   },
 
-  /* ===== PADDING STYLES ===== */
+  /* ===== PADDING STYLES - USED FOR THE SELECTOR BUTTONS ===== */
   padding: {
     xs: "py-[5px] px-[14px]",
     sm: "py-[7px] px-4",
@@ -215,7 +215,7 @@ export const buttonStyles: ButtonVariants = {
     lg: "py-[11px] px-4",
   },
 
-  /* ===== PILL SIZE STYLES ===== */
+  /* ===== PILL SIZE STYLES - USED FOR THE SELECTOR BUTTONS ===== */
   pillSize: {
     xs: "text-xs py-[5px] px-[14px]",
     sm: "text-xs py-[7px] px-4",
@@ -230,8 +230,8 @@ export const buttonStyles: ButtonVariants = {
       cursor-not-allowed
     `,
     loading: `
+      opacity-70
       cursor-wait
-      opacity-75
     `,
     active: `
       scale-95
@@ -251,14 +251,9 @@ export const buttonStyles: ButtonVariants = {
 };
 
 /* ===== ADDITIONAL STYLES ===== */
-/* ===== TEMPORARY STYLES ===== */
-/* @baba - update feeCalculatorBase buttons + toggle switch */
-export const buttonPurpleOutline =
-  "inline-flex items-center justify-center border-[1px] border-stamp-purple rounded-lg text-sm font-bold tracking-wider text-stamp-purple h-[38px] px-4 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors ease-in-out duration-200";
-export const buttonPurpleFlat =
-  "inline-flex items-center justify-center bg-stamp-purple border-[1px] border-stamp-purple rounded-lg text-sm font-bold tracking-wider text-black h-[38px] px-4 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors ease-in-out duration-200";
-
 /* ===== TOGGLE SWITCH BUTTON STYLES ===== */
+/* @baba - update toggle switch - possible duplicate */
+
 export const toggleButton =
   "flex items-center relative w-10 h-5 rounded-full bg-stamp-grey focus:outline-none transition ease-in-out duration-200";
 export const toggleKnobBackground =
