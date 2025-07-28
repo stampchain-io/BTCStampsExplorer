@@ -5,8 +5,8 @@
  */
 
 import { buttonStyles } from "$button";
-import { TEXT_STYLES } from "$card";
 import type { SortOption, UseSortingConfig } from "$lib/types/sorting.d.ts";
+import { cardPriceMinimal } from "$text";
 import { SortingComponent } from "./SortingComponent.tsx";
 import { SortingProvider } from "./SortingProvider.tsx";
 
@@ -209,8 +209,7 @@ function StyledSortingLabel({
     switch (variant) {
       case "compact":
         return `
-          ${TEXT_STYLES.minimal.price.base}
-          ${TEXT_STYLES.minimal.price.sizes}
+          ${cardPriceMinimal}
           text-stamp-grey-light
         `;
       case "detailed":
