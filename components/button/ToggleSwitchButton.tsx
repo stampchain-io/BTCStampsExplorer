@@ -59,19 +59,16 @@ export function ToggleSwitchButton({
       // Create inner content
       const innerDiv = document.createElement("div");
       innerDiv.className = `${toggleKnob} ${
-        isActive ? "bg-stamp-grey-light/50" : "bg-stamp-grey/50"
-      } flex items-center justify-center ${toggleSymbol}`;
+        isActive ? "bg-stamp-grey-light/70" : "bg-stamp-grey/70"
+      } flex items-center justify-center ${toggleSymbol} ${
+        isActive ? "mr-1" : ""
+      }`;
 
       // Add symbol if provided
       if (isActive && activeSymbol) {
-        const symbolSpan = document.createElement("span");
-        symbolSpan.className = "transform -skew-x-[11deg]";
-        symbolSpan.textContent = activeSymbol;
-        innerDiv.appendChild(symbolSpan);
+        innerDiv.textContent = activeSymbol;
       } else if (!isActive && inactiveSymbol) {
-        const symbolSpan = document.createElement("span");
-        symbolSpan.textContent = inactiveSymbol;
-        innerDiv.appendChild(symbolSpan);
+        innerDiv.textContent = inactiveSymbol;
       }
 
       // Clear and append
@@ -98,13 +95,10 @@ export function ToggleSwitchButton({
           // Update inner content with active color and symbol
           const innerDiv = document.createElement("div");
           innerDiv.className =
-            `${toggleKnob} bg-stamp-grey-light/50 flex items-center justify-center ${toggleSymbol}`;
+            `${toggleKnob} bg-stamp-grey-light/70 flex items-center justify-center ${toggleSymbol} mr-1`;
 
           if (activeSymbol) {
-            const symbolSpan = document.createElement("span");
-            symbolSpan.className = "transform -skew-x-[11deg]";
-            symbolSpan.textContent = activeSymbol;
-            innerDiv.appendChild(symbolSpan);
+            innerDiv.textContent = activeSymbol;
           }
 
           // Clear and append
@@ -118,12 +112,10 @@ export function ToggleSwitchButton({
           // Update inner content with inactive color and symbol
           const innerDiv = document.createElement("div");
           innerDiv.className =
-            `${toggleKnob} bg-stamp-grey/50 flex items-center justify-center ${toggleSymbol}`;
+            `${toggleKnob} bg-stamp-grey/70 flex items-center justify-center ${toggleSymbol}`;
 
           if (inactiveSymbol) {
-            const symbolSpan = document.createElement("span");
-            symbolSpan.textContent = inactiveSymbol;
-            innerDiv.appendChild(symbolSpan);
+            innerDiv.textContent = inactiveSymbol;
           }
 
           // Clear and append

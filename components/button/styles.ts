@@ -259,7 +259,7 @@ export const toggleButton =
   `flex items-center relative w-10 h-5 !rounded-full ${glassmorphismLayer2} focus:outline-none transition ease-in-out duration-200`;
 export const toggleKnobBackground =
   "flex justify-center items-center relative w-5 h-5 bg-transparent rounded-full transition ease-in-out transform duration-400 ";
-export const toggleKnob = "w-[18px] h-[18px] rounded-full";
+export const toggleKnob = "w-[16px] h-[16px] rounded-full";
 export const sliderKnob =
   `[&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:tablet:w-4 [&::-webkit-slider-thumb]:tablet:h-4 [&::-webkit-slider-thumb]:appearance-none
    [&::-webkit-slider-thumb]:bg-stamp-grey [&::-webkit-slider-thumb]:hover:bg-stamp-grey [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer

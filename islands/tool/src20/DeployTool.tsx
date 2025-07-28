@@ -9,16 +9,18 @@ import {
   containerBackground,
   containerColForm,
   containerRowForm,
+  glassmorphismLayer2,
   loaderSpinGrey,
+  transition,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { APIResponse } from "$lib/utils/api/responses/apiResponseUtil.ts";
-import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
+import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
 import { StatusMessages, tooltipButton, tooltipImage } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { titlePurpleLD } from "$text";
+import { titleGreyLD } from "$text";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -307,7 +309,7 @@ export function SRC20DeployTool(
   if (!config) {
     return (
       <div class={bodyTool}>
-        <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>DEPLOY</h1>
+        <h1 class={`${titleGreyLD} mobileMd:mx-auto mb-5`}>DEPLOY</h1>
         <div class={`${containerBackground} mb-6`}>
           <div class="flex items-center justify-center p-8">
             <div class={loaderSpinGrey}></div>
@@ -323,7 +325,7 @@ export function SRC20DeployTool(
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>DEPLOY</h1>
+      <h1 class={`${titleGreyLD} mobileMd:mx-auto mb-5`}>DEPLOY</h1>
 
       <form
         class={`${containerBackground} mb-6`}
@@ -341,7 +343,7 @@ export function SRC20DeployTool(
             {/* Image upload preview */}
             <div
               id="image-preview"
-              class="relative flex flex-col items-center justify-center content-center mx-auto min-h-[100px] min-w-[100px] rounded bg-stamp-purple-dark hover:bg-stamp-purple transition duration-300 cursor-pointer"
+              class={`relative flex flex-col items-center justify-center content-center mx-auto min-h-[100px] min-w-[100px] rounded ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer`}
               onMouseMove={handleMouseMove}
               onMouseEnter={handleUploadMouseEnter}
               onMouseLeave={handleUploadMouseLeave}
@@ -378,7 +380,7 @@ export function SRC20DeployTool(
                   <Icon
                     type="icon"
                     name="uploadImage"
-                    weight="normal"
+                    weight="extraLight"
                     size="xxl"
                     color="grey"
                   />
@@ -483,7 +485,7 @@ export function SRC20DeployTool(
 
         {/* ===== ADVANCED OPTIONS SECTION ===== */}
         <div
-          class={`overflow-hidden transition-all duration-500 ${
+          class={`overflow-hidden transition-all duration-400 ${
             showAdvancedOptions
               ? "max-h-[250px] opacity-100 mt-5"
               : "max-h-0 opacity-0 mt-0"

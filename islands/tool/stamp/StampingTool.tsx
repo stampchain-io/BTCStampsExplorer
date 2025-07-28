@@ -8,14 +8,20 @@ import { Config } from "$globals";
 import { Icon } from "$icon";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
-import { bodyTool, containerBackground, containerRowForm } from "$layout";
+import {
+  bodyTool,
+  containerBackground,
+  containerRowForm,
+  glassmorphismLayer2,
+  transition,
+} from "$layout";
 import { useFees } from "$lib/hooks/useFees.ts";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 
 import { NOT_AVAILABLE_IMAGE } from "$constants";
-import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
+import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import {
   StatusMessages,
@@ -24,7 +30,7 @@ import {
   tooltipImage,
 } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { titlePurpleLD } from "$text";
+import { titleGreyLD } from "$text";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -908,7 +914,7 @@ function StampingToolMain({ config }: { config: Config }) {
   const imagePreviewDiv = (
     <div
       id="image-preview"
-      class={`relative items-center content-center mx-auto rounded ${PREVIEW_SIZE_CLASSES} text-center group transition duration-300 cursor-pointer `}
+      class={`relative items-center content-center mx-auto rounded ${PREVIEW_SIZE_CLASSES} text-center group ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer `}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
@@ -930,7 +936,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
               ? (
                 <img
-                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey [image-rendering:pixelated]`}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-conic-pattern bg-[length:4px_4px] bg-stamp-grey/50 [image-rendering:pixelated]`}
                   src={URL.createObjectURL(file)}
                   alt="Preview"
                   onError={(e) => {
@@ -977,7 +983,7 @@ function StampingToolMain({ config }: { config: Config }) {
               <Icon
                 type="icon"
                 name="uploadImage"
-                weight="normal"
+                weight="extraLight"
                 size="xxl"
                 color="grey"
               />
@@ -987,12 +993,12 @@ function StampingToolMain({ config }: { config: Config }) {
         : (
           <label
             for="upload"
-            class="flex flex-col items-center justify-center h-full rounded bg-stamp-purple-dark hover:bg-stamp-purple cursor-pointer"
+            class={`flex flex-col items-center justify-center h-full ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer`}
           >
             <Icon
               type="icon"
               name="uploadImage"
-              weight="normal"
+              weight="extraLight"
               size="xxl"
               color="grey"
             />
@@ -1215,7 +1221,7 @@ function StampingToolMain({ config }: { config: Config }) {
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>STAMP</h1>
+      <h1 class={`${titleGreyLD} mobileMd:mx-auto mb-5`}>STAMP</h1>
 
       {isConnected && addressError && (
         <div class="w-full text-red-500 text-center font-bold">
