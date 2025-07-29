@@ -53,8 +53,14 @@ export class BitcoinNotificationService {
 
     // ADDITIONAL: Clear categories that balance queries might be miscategorized into
     await dbManager.invalidateCacheByCategory('stamp');      // Stamp balance queries
+    await dbManager.invalidateCacheByCategory('stamp_detail'); // Individual stamp details
+    await dbManager.invalidateCacheByCategory('stamp_list'); // Full stamp list (new stamps appear)
     await dbManager.invalidateCacheByCategory('market_data'); // Market data includes balance info
     await dbManager.invalidateCacheByCategory('block');      // Block queries might include balance data
+    await dbManager.invalidateCacheByCategory('src20_transaction'); // SRC20 transaction queries
+    await dbManager.invalidateCacheByCategory('blockchain_data'); // SRC20 tick counts and other blockchain data
+    await dbManager.invalidateCacheByCategory('dispenser'); // Dispenser state changes with blocks
+    await dbManager.invalidateCacheByCategory('transaction'); // Transaction data changes with blocks
 
     // Market data caches - prices/volumes may change with new blocks
     await dbManager.invalidateCacheByPattern('market_data_*');
@@ -63,6 +69,11 @@ export class BitcoinNotificationService {
     // Transaction-related caches
     await dbManager.invalidateCacheByPattern('transaction_*');
     await dbManager.invalidateCacheByPattern('stamp_*');
+
+    // Recent sales and block transactions - simple invalidation
+    // (Append strategy would be more complex than it's worth during rapid development)
+    await dbManager.invalidateCacheByCategory('recent_sales');
+    await dbManager.invalidateCacheByCategory('block_transactions');
 
     console.log(`Cache invalidated for new block ${data.blockHeight} (using comprehensive category-based invalidation)`);
   }

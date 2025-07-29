@@ -145,13 +145,25 @@ export class SRC20ToolAdapter
   readonly endpoint = "/api/v2/src20/create";
 
   buildRequestBody(options: SRC20TransactionOptions): Record<string, any> {
+    // Map uppercase operation to lowercase for API
+    const opMapping: Record<string, string> = {
+      "DEPLOY": "deploy",
+      "MINT": "mint",
+      "TRANSFER": "transfer",
+    };
+
     const body: Record<string, any> = {
-      op: options.op,
+      op: opMapping[options.op] || options.op,
       tick: options.tick,
       sourceAddress: options.walletAddress,
       dryRun: options.dryRun,
       satsPerVB: options.feeRate,
     };
+
+    // Ensure we don't send empty addresses
+    if (!body.sourceAddress || body.sourceAddress === "") {
+      throw new Error("Wallet address is required for SRC20 operations");
+    }
 
     // Add operation-specific fields
     if (options.op === "DEPLOY") {
@@ -163,7 +175,7 @@ export class SRC20ToolAdapter
     }
 
     if (options.op === "TRANSFER" && options.destinationAddress) {
-      body.destinationAddress = options.destinationAddress;
+      body.toAddress = options.destinationAddress; // API expects toAddress, not destinationAddress
     }
 
     if (options.changeAddress) {

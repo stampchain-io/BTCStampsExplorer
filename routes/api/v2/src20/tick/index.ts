@@ -7,6 +7,7 @@ import {
   validateSortParam,
 } from "$server/services/validation/routeValidationService.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 export const handler: Handlers = {
   async GET(req) {
@@ -20,8 +21,8 @@ export const handler: Handlers = {
 
     const { limit, page } = pagination;
 
-    // Validate sort parameter
-    const sortValidation = validateSortParam(url);
+    // Validate sort parameter - API expects 'sort_order' parameter
+    const sortValidation = validateSortParam(url, "sort_order");
     if (!sortValidation.isValid) {
       return sortValidation.error!;
     }
@@ -38,7 +39,9 @@ export const handler: Handlers = {
       const result = await SRC20Service.QueryService.fetchAndFormatSrc20Data(
         params,
       );
-      return ApiResponseUtil.success(result);
+      return ApiResponseUtil.success(result, {
+        routeType: RouteType.BLOCKCHAIN_DATA,
+      });
     } catch (error) {
       return ApiResponseUtil.internalError(error, "Error processing request");
     }

@@ -380,7 +380,9 @@ export class TransactionConstructionService {
           tick: options.tick || "TEST",
           max: options.max || "1000",
           lim: options.lim || "100",
-          dec: options.dec ?? 0,
+          dec: typeof options.dec === "string"
+            ? parseInt(options.dec, 10)
+            : (options.dec ?? 0),
         } as SRC20TransactionOptions;
       }
 

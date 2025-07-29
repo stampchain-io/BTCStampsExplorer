@@ -9,7 +9,7 @@
  * Also includes error state display with clear functionality
  */
 
-import { ComponentChildren } from "preact";
+import { VNode } from "preact";
 
 interface ProgressiveEstimationIndicatorProps {
   /** Whether the component is currently connected to a wallet */
@@ -40,7 +40,7 @@ export function ProgressiveEstimationIndicator({
   phase3,
   feeEstimationError,
   clearError,
-}: ProgressiveEstimationIndicatorProps): ComponentChildren {
+}: ProgressiveEstimationIndicatorProps): VNode<any> | null {
   // Only show when connected
   if (!isConnected) {
     return null;

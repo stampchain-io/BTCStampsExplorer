@@ -14,6 +14,8 @@ interface StatusMessagesProps {
   fileUploadError?: string | null;
   walletError?: string | null;
   maraError?: string | null;
+  transactionHex?: string | null;
+  onCopyHex?: () => void;
 }
 
 export function StatusMessages({
@@ -22,6 +24,8 @@ export function StatusMessages({
   fileUploadError,
   walletError,
   maraError,
+  transactionHex,
+  onCopyHex,
 }: StatusMessagesProps) {
   // Handle different submissionMessage types
   const messageText = typeof submissionMessage === "string"
@@ -61,7 +65,28 @@ export function StatusMessages({
         <div
           class={`w-full mt-4 ${glassmorphism} bg-gradient-to-br from-red-900/15 to-red-800/25 border-red-500/20 p-4`}
         >
-          <p class="text-red-400 text-center font-medium">{apiError}</p>
+          <div class="flex items-center justify-center gap-3">
+            <p class="text-red-400 text-center font-medium">{apiError}</p>
+            {transactionHex && onCopyHex && (
+              <button
+                type="button"
+                onClick={onCopyHex}
+                class="flex items-center gap-1 px-2 py-1 rounded bg-red-500/20 hover:bg-red-500/30 transition-colors group"
+                title="Copy transaction hex"
+              >
+                <svg
+                  class="w-4 h-4 fill-red-300 group-hover:fill-red-200"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+                </svg>
+                <span class="text-xs text-red-300 group-hover:text-red-200">
+                  Copy Hex
+                </span>
+              </button>
+            )}
+          </div>
         </div>
       )}
       {fileUploadError && (

@@ -54,6 +54,7 @@ interface WalletContext {
 // Initialize wallet state
 export const initialWallet: Wallet = {
   accounts: [],
+  address: "",
   btcBalance: {
     confirmed: 0,
     unconfirmed: 0,
@@ -66,11 +67,28 @@ let initialWalletState;
 let initialConnected = false;
 try {
   const savedWallet = localStorage.getItem("wallet");
-  initialConnected = savedWallet ? true : false;
-  initialWalletState = savedWallet ? JSON.parse(savedWallet) : initialWallet;
+  if (savedWallet) {
+    const parsedWallet = JSON.parse(savedWallet);
+    // Only consider connected if wallet has a non-empty address
+    initialConnected = !!parsedWallet.address &&
+      parsedWallet.address.length > 0;
+    initialWalletState = parsedWallet;
+
+    // If wallet data is invalid (no address or empty address), reset to initial state
+    if (!parsedWallet.address || parsedWallet.address.length === 0) {
+      console.warn(
+        "Saved wallet has no valid address, resetting to initial state",
+      );
+      localStorage.removeItem("wallet");
+      initialWalletState = initialWallet;
+    }
+  } else {
+    initialWalletState = initialWallet;
+  }
 } catch (error) {
   console.error("Error reading the wallet state:", error);
   initialWalletState = initialWallet;
+  localStorage.removeItem("wallet");
 }
 
 export const walletSignal = signal<Wallet>(initialWalletState);
@@ -104,7 +122,9 @@ export const walletContext: WalletContext = {
     return walletSignal.value;
   },
   get isConnected() {
-    return isConnectedSignal.value;
+    // Double-check that wallet has a non-empty address to be considered connected
+    return isConnectedSignal.value && !!walletSignal.value.address &&
+      walletSignal.value.address.length > 0;
   },
   updateWallet,
   disconnect,

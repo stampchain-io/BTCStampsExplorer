@@ -392,10 +392,6 @@ paths:
                         format: uri
                       currentVersion:
                         type: string
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "404":
-          $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -1385,7 +1381,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
+                type: object
+                properties:
+                  last_block:
+                    type: number
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Src101Detail"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":

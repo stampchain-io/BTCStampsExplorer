@@ -1,0 +1,54 @@
+{
+  "id": "stampchain-env",
+  "name": "StampChain Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://host.docker.internal:8000",
+      "enabled": true
+    },
+    {
+      "key": "dev_base_url",
+      "value": "http://host.docker.internal:8000",
+      "enabled": true
+    },
+    {
+      "key": "prod_base_url",
+      "value": "https://stampchain.io",
+      "enabled": true
+    },
+    {
+      "key": "test_address",
+      "value": "bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq",
+      "enabled": true
+    },
+    {
+      "key": "test_stamp_id",
+      "value": "1135630",
+      "enabled": true
+    },
+    {
+      "key": "test_block",
+      "value": "903108",
+      "enabled": true
+    },
+    {
+      "key": "test_tx_hash",
+      "value": "106c17f61644e3f9952513e42911ffe78316a4b02d2a288fab8622bcfba3f064",
+      "enabled": true
+    },
+    {
+      "key": "test_src20_tick",
+      "value": "STAMP",
+      "enabled": true
+    },
+    {
+      "key": "test_deploy_hash",
+      "value": "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2025-01-28T03:20:00.000Z",
+  "_postman_exported_using": "Postman/10.0.0"
+}

@@ -64,6 +64,21 @@ export const handler: Handlers = {
         // ✅ NEW: Check for raw transaction instead of PSBT
         if (!response?.result?.rawtransaction) {
           if (response?.error) {
+            // Check for specific error messages and return appropriate status codes
+            const errorMessage = response.error.toLowerCase();
+            if (
+              errorMessage.includes("no assets to detach") ||
+              errorMessage.includes("no assets found") ||
+              errorMessage.includes("assets not found")
+            ) {
+              return ApiResponseUtil.badRequest("No assets to detach");
+            }
+            if (
+              errorMessage.includes("insufficient") &&
+              (errorMessage.includes("btc") || errorMessage.includes("funds"))
+            ) {
+              return ApiResponseUtil.badRequest("Insufficient funds");
+            }
             return ApiResponseUtil.badRequest(response.error);
           }
           throw new Error(
@@ -119,18 +134,34 @@ export const handler: Handlers = {
 
         return ApiResponseUtil.success(processedPSBT);
       } catch (error) {
-        if (
-          error instanceof Error && error.message.includes("Insufficient BTC")
-        ) {
-          return ApiResponseUtil.badRequest(error.message);
+        if (error instanceof Error) {
+          const errorMessage = error.message.toLowerCase();
+          // Handle specific error cases with appropriate messages
+          if (
+            errorMessage.includes("insufficient btc") ||
+            errorMessage.includes("insufficient funds")
+          ) {
+            return ApiResponseUtil.badRequest("Insufficient funds");
+          }
+          if (errorMessage.includes("no assets")) {
+            return ApiResponseUtil.badRequest("No assets to detach");
+          }
+          // For other known errors, return as bad request
+          if (
+            errorMessage.includes("invalid") ||
+            errorMessage.includes("not found")
+          ) {
+            return ApiResponseUtil.badRequest(error.message);
+          }
         }
         throw error;
       }
     } catch (error) {
       console.error("Error composing detach transaction:", error);
+      // Don't expose internal errors, return generic message
       return ApiResponseUtil.internalError(
         error,
-        "Failed to compose detach transaction",
+        "Failed to process stamp detach request",
       );
     }
   },

@@ -49,17 +49,7 @@ export function validateMaraConfigOnStartup(): MaraConfigValidationResult {
     warnings: [],
   };
 
-  // Check if MARA integration is enabled
-  const isEnabled = Deno.env.get('ENABLE_MARA_INTEGRATION') === '1';
-  
-  if (!isEnabled) {
-    logger.info("config", {
-      message: "MARA integration is disabled",
-      ENABLE_MARA_INTEGRATION: Deno.env.get('ENABLE_MARA_INTEGRATION') || '0',
-    });
-    result.warnings.push("MARA integration is disabled via ENABLE_MARA_INTEGRATION");
-    return result;
-  }
+  // MARA is always available - activation depends on user providing outputValue
 
   logger.info("config", {
     message: "Validating MARA configuration",

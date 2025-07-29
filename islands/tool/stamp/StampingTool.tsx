@@ -18,6 +18,12 @@ import { MaraModeIndicator } from "$components/indicators/MaraModeIndicator.tsx"
 import { MaraModeWarningModal } from "$components/modals/MaraModeWarningModal.tsx";
 import { MaraServiceUnavailableModal } from "$components/modals/MaraServiceUnavailableModal.tsx";
 import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
+import { TransactionHexDisplay } from "$components/debug/TransactionHexDisplay.tsx";
+import { MaraStatusLink } from "$components/mara/MaraStatusLink.tsx";
+import {
+  ensureRawTransactionFormat,
+  extractRawTransactionFromPSBT,
+} from "$lib/utils/bitcoin/psbt/psbtUtils.ts";
 import { useFees } from "$lib/hooks/useFees.ts";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 
@@ -272,6 +278,8 @@ function StampingToolMain({ config }: { config: Config }) {
   const [showMaraUnavailableModal, setShowMaraUnavailableModal] = useState(
     false,
   );
+  const [debugTransactionHex, setDebugTransactionHex] = useState<string>("");
+  const [debugTxid, setDebugTxid] = useState<string>("");
 
   // Validation state
   const [fileError, setFileError] = useState<string>("");
@@ -331,7 +339,7 @@ function StampingToolMain({ config }: { config: Config }) {
     quantity: parseInt(issuance, 10),
     locked: true,
     divisible: false,
-    outputValue: outputValue, // Pass custom dust value for MARA mode
+    outputValue: maraMode ? outputValue : undefined, // Only pass outputValue in MARA mode
   });
 
   // Get the best available fee estimate
@@ -432,6 +440,8 @@ function StampingToolMain({ config }: { config: Config }) {
     setMaraUnavailable(false);
     setShowMaraUnavailableModal(false);
     setApiError("");
+    setDebugTransactionHex("");
+    setDebugTxid("");
 
     // Remove URL parameter
     const url = new URL(globalThis.location.href);
@@ -453,18 +463,79 @@ function StampingToolMain({ config }: { config: Config }) {
     const maxRetries = 3;
     const baseDelay = 1000; // 1 second base delay
 
+    // Convert PSBT to raw transaction format
+    const txResult = ensureRawTransactionFormat(signedHex, false); // preferPSBT=false - extract raw tx
+    const transactionHex = txResult.hex;
+
+    logger.info("mara-submission", {
+      message: "Submitting transaction to MARA",
+      format: txResult.isPSBT ? "converted-from-psbt" : "raw-transaction",
+      wasConverted: txResult.wasConverted,
+      hexLength: txResult.hex.length,
+      hexPreview: txResult.hex.substring(0, 40) + "...",
+    });
+
+    // Enhanced debug output
+    console.log("=== MARA SUBMISSION DEBUG ===");
+    console.log(
+      "Transaction format:",
+      txResult.isPSBT ? "PSBT (converted)" : "Raw",
+    );
+    console.log(
+      "Transaction length:",
+      transactionHex.length,
+      "chars,",
+      transactionHex.length / 2,
+      "bytes",
+    );
+    console.log("Output value:", outputValue);
+    console.log("MARA fee rate:", maraFeeRate);
+    console.log("Retry attempt:", retryCount + 1, "of", maxRetries);
+    console.log(
+      "Transaction hex preview:",
+      transactionHex.substring(0, 100) + "...",
+    );
+
+    // Output raw transaction hex for debugging
+    console.log("=== RAW TRANSACTION HEX FOR MARA ===");
+    console.log(
+      "Format:",
+      txResult.isPSBT ? "Extracted from PSBT" : "Already raw transaction",
+    );
+    console.log("Length:", txResult.hex.length);
+    console.log("Full hex:", txResult.hex);
+    console.log("===================================");
+
+    if (txResult.isPSBT && !txResult.wasConverted) {
+      logger.warn("stamps", {
+        message: "Failed to extract raw transaction from PSBT",
+        error: txResult.error,
+      });
+    }
+
     try {
       logger.info("stamps", {
-        message: "Submitting signed transaction to MARA pool",
-        hexLength: signedHex.length,
+        message: "Submitting transaction to MARA pool",
+        hexLength: transactionHex.length,
+        format: "raw-transaction",
+        wasPSBT: txResult.isPSBT,
+        wasConverted: txResult.wasConverted,
         attempt: retryCount + 1,
         maxAttempts: maxRetries + 1,
       });
 
+      console.log("=== CALLING MARA SUBMIT API ===");
       const response = await axiod.post("/api/internal/mara-submit", {
-        hex: signedHex,
+        hex: transactionHex,
         priority: "high",
       });
+
+      console.log("=== MARA SUBMIT API RESPONSE ===");
+      console.log("Status:", response.status);
+      console.log("Status Text:", response.statusText);
+      console.log("Response data type:", typeof response.data);
+      console.log("Response data:", JSON.stringify(response.data, null, 2));
+      console.log("================================");
 
       if (response.data && response.data.txid) {
         const status = response.data.status;
@@ -476,6 +547,9 @@ function StampingToolMain({ config }: { config: Config }) {
           status: status,
           attempts: retryCount + 1,
         });
+
+        // Store txid for debug display
+        setDebugTxid(response.data.txid);
 
         // Display status-specific messages to user
         switch (status) {
@@ -509,11 +583,30 @@ function StampingToolMain({ config }: { config: Config }) {
         }
 
         setApiError("");
+
+        // Set submission message for successful MARA submission with status link
+        const statusUrl =
+          `https://slipstream.mara.com/status?txid=${response.data.txid}`;
+        setSubmissionMessage({
+          message:
+            `Transaction submitted to MARA pool successfully! View status at: ${statusUrl}`,
+          txid: response.data.txid,
+        });
+
         return response.data;
       } else {
         throw new Error("Invalid response from MARA submission");
       }
     } catch (error) {
+      console.log("=== MARA SUBMISSION ERROR ===");
+      console.log("Error object:", error);
+      console.log("Error type:", typeof error);
+      console.log("Error message:", (error as any)?.message);
+      console.log("Error response:", (error as any)?.response);
+      console.log("Error response data:", (error as any)?.response?.data);
+      console.log("Error response status:", (error as any)?.response?.status);
+      console.log("================================");
+
       const errorMessage = (error as any)?.response?.data?.error ||
         (error as any)?.message ||
         "Failed to submit transaction to MARA pool";
@@ -569,13 +662,18 @@ function StampingToolMain({ config }: { config: Config }) {
       const response = await axiod.get("/api/internal/mara-fee-rate");
 
       if (response.data && typeof response.data.fee_rate === "number") {
-        setMaraFeeRate(response.data.fee_rate);
-        setFee(response.data.fee_rate); // Update the fee slider with MARA rate
+        // Ensure we meet MARA's minimum requirement (6 sats/vB) with buffer
+        const maraMinimum = 6.0; // MARA requires 6 sats/vB minimum
+        const bufferedFeeRate = Math.max(response.data.fee_rate, maraMinimum) +
+          0.1;
+        setMaraFeeRate(bufferedFeeRate);
+        setFee(bufferedFeeRate); // Update the fee slider with buffered MARA rate
         setMaraError(""); // Clear any previous errors
 
         logger.info("stamps", {
           message: "MARA fee rate fetched successfully",
-          feeRate: response.data.fee_rate,
+          originalFeeRate: response.data.fee_rate,
+          bufferedFeeRate: bufferedFeeRate,
           minFeeRate: response.data.min_fee_rate,
         });
 
@@ -631,11 +729,23 @@ function StampingToolMain({ config }: { config: Config }) {
     const params = new URLSearchParams(globalThis.location.search);
     const outputValueParam = params.get("outputValue");
 
+    // Check for circuit breaker reset flag
+    if (params.get("resetMara") === "1") {
+      // Call the health endpoint which can trigger a reset
+      axiod.get("/api/internal/mara-health").catch(() => {
+        // Ignore errors - just trying to check status
+      });
+      logger.info("stamps", {
+        message: "Attempting to reset MARA circuit breaker via health check",
+      });
+    }
+
     if (outputValueParam) {
       const value = parseInt(outputValueParam, 10);
 
-      // Validate outputValue is within MARA range (1-332)
-      if (!isNaN(value) && value >= 1 && value <= 332) {
+      // Validate outputValue is within MARA range (1-329)
+      // 330+ uses standard process with wallet auto-broadcast
+      if (!isNaN(value) && value >= 1 && value < 330) {
         setOutputValue(value);
         setMaraMode(true);
 
@@ -673,8 +783,18 @@ function StampingToolMain({ config }: { config: Config }) {
             setMaraError("MARA integration is not available");
           }
         });
+      } else if (!isNaN(value) && value >= 330) {
+        // For 330+, use standard mode
+        logger.info("stamps", {
+          message: "OutputValue >= 330, using standard mode",
+          value: outputValueParam,
+          parsed: value,
+        });
+        // Don't set MARA mode, just continue with standard process
       } else {
-        setMaraError("Invalid outputValue: must be between 1 and 332");
+        setMaraError(
+          "Invalid outputValue: must be between 1 and 329 for MARA mode",
+        );
         logger.error("stamps", {
           message: "Invalid outputValue parameter",
           value: outputValueParam,
@@ -749,12 +869,12 @@ function StampingToolMain({ config }: { config: Config }) {
 
   /* ===== EVENT HANDLERS ===== */
   const handleChangeFee = (newFee: number) => {
-    // In MARA mode, only allow fee rates above the MARA minimum
+    // In MARA mode, only allow fee rates above the MARA minimum (already buffered)
     if (maraMode && maraFeeRate !== null) {
       const validatedFee = Math.max(newFee, maraFeeRate);
       if (newFee < maraFeeRate) {
         logger.warn("stamps", {
-          message: "Fee rate must be at least MARA minimum",
+          message: "Fee rate must be at least MARA minimum (buffered)",
           attemptedFee: newFee,
           maraMinFee: maraFeeRate,
         });
@@ -923,6 +1043,14 @@ function StampingToolMain({ config }: { config: Config }) {
 
   /* ===== SIGNED TRANSACTION PROCESSING ===== */
   const processSignedTransaction = async (mintPayload: MintRequest) => {
+    logger.info("stamps", {
+      message: "processSignedTransaction called",
+      maraMode,
+      hasOutputValue: mintPayload.outputValue !== undefined,
+      outputValue: mintPayload.outputValue,
+      maraFeeRate: mintPayload.maraFeeRate,
+    });
+
     try {
       const response = await axiod.post(
         "/api/v2/olga/mint",
@@ -1087,6 +1215,28 @@ function StampingToolMain({ config }: { config: Config }) {
         }
 
         try {
+          // Extract raw transaction for debug display
+          const rawTx = extractRawTransactionFromPSBT(result.psbt);
+          const hexToDisplay = rawTx || result.psbt;
+
+          // Store the hex for debug display
+          setDebugTransactionHex(hexToDisplay);
+          setDebugTxid(""); // Clear any previous txid
+
+          // Log to console for debugging
+          logger.info("stamps", {
+            message: "MARA mode: Transaction prepared",
+            psbtLength: result.psbt.length,
+            rawTxLength: rawTx ? rawTx.length : 0,
+            hasRawTx: !!rawTx,
+          });
+          console.log("=== MARA TRANSACTION HEX ===");
+          console.log("PSBT:", result.psbt.substring(0, 100) + "...");
+          if (rawTx) {
+            console.log("Raw TX:", rawTx.substring(0, 100) + "...");
+          }
+          console.log("=== END TRANSACTION HEX ===");
+
           await submitToMara(result.psbt);
           setIsSubmitting(false);
         } catch (maraError) {
@@ -1245,6 +1395,15 @@ function StampingToolMain({ config }: { config: Config }) {
       return;
     }
 
+    logger.info("stamps", {
+      message: "Starting mint process",
+      maraMode,
+      outputValue,
+      maraFeeRate,
+      hasMaraError: !!maraError,
+      maraUnavailable,
+    });
+
     setIsSubmitting(true);
     setApiError(""); // Clear any previous errors
 
@@ -1279,6 +1438,11 @@ function StampingToolMain({ config }: { config: Config }) {
           if (maraFeeRate !== null) {
             finalMintPayload.maraFeeRate = maraFeeRate;
           }
+          logger.info("stamps", {
+            message: "MARA parameters added to payload",
+            outputValue: finalMintPayload.outputValue,
+            maraFeeRate: finalMintPayload.maraFeeRate,
+          });
         }
 
         if (stampName) {
@@ -1308,6 +1472,11 @@ function StampingToolMain({ config }: { config: Config }) {
 
         // For MARA mode, show warning modal before proceeding
         if (maraMode && outputValue !== null) {
+          logger.info("stamps", {
+            message: "Showing MARA warning modal",
+            maraMode,
+            outputValue,
+          });
           setPendingMintPayload(finalMintPayload);
           setShowMaraWarning(true);
           setIsSubmitting(false); // Reset submitting state while waiting for modal
@@ -1343,6 +1512,10 @@ function StampingToolMain({ config }: { config: Config }) {
 
   /* ===== MARA WARNING MODAL HANDLERS ===== */
   const handleMaraWarningConfirm = async () => {
+    logger.info("stamps", {
+      message: "MARA warning confirmed, processing transaction",
+      hasPendingPayload: !!pendingMintPayload,
+    });
     setShowMaraWarning(false);
     closeModal(); // Close the global modal
 
@@ -1371,7 +1544,7 @@ function StampingToolMain({ config }: { config: Config }) {
     // Retry fetching MARA fee rate
     try {
       await fetchMaraFeeRate();
-    } catch (error) {
+    } catch (_error) {
       // Error handling is already in fetchMaraFeeRate
     }
   };
@@ -1999,9 +2172,9 @@ function StampingToolMain({ config }: { config: Config }) {
               isSubmitting={isSubmitting}
               isPreFetching={isPreFetching}
               currentPhase={currentPhase}
-              phase1={phase1}
-              phase2={phase2}
-              phase3={phase3}
+              phase1={!!phase1}
+              phase2={!!phase2}
+              phase3={!!phase3}
               feeEstimationError={feeEstimationError}
               clearError={clearError}
             />
@@ -2014,7 +2187,39 @@ function StampingToolMain({ config }: { config: Config }) {
         apiError={apiError || maraError || (feeEstimationError
           ? `Fee estimation error: ${feeEstimationError}`
           : "")}
+        transactionHex={debugTransactionHex}
+        {...(debugTransactionHex
+          ? {
+            onCopyHex: (() => {
+              (async () => {
+                try {
+                  await navigator.clipboard.writeText(debugTransactionHex);
+                  showToast("Transaction hex copied!", "success", false);
+                } catch (_error) {
+                  showToast("Failed to copy transaction hex", "error", false);
+                }
+              })();
+            }) as () => void,
+          }
+          : {})}
       />
+
+      {/* Debug Transaction Hex Display for MARA Mode */}
+      {maraMode && debugTransactionHex && (
+        <TransactionHexDisplay
+          hex={debugTransactionHex}
+          txid={debugTxid}
+          class="mt-4"
+        />
+      )}
+
+      {/* MARA Status Link - Show when we have a txid from successful submission */}
+      {maraMode && debugTxid && submissionMessage?.txid && (
+        <MaraStatusLink
+          txid={debugTxid}
+          class="mt-4"
+        />
+      )}
 
       {isFullScreenModalOpen && openModal(
         <PreviewImageModal

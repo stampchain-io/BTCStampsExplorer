@@ -38,7 +38,10 @@ export type LogNamespace =
   | "tool-endpoint-estimator"
   | "utxo-ancestors"
   | "sql"
-  | "mara";
+  | "mara"
+  | "psbt"
+  | "mara-submission"
+  | "mara-tx-estimator";
 
 declare global {
   interface Window {

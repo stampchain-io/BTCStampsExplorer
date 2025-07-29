@@ -209,4 +209,29 @@ services:
         
         echo 'Parallel test complete. Reports in: reports/newman-parallel/' &&
         ls -la reports/newman-parallel/
-      " 
+      "
+
+  # Data Validation tests - Compares actual data between dev and prod
+  newman-data-validation:
+    image: node:22-alpine
+    working_dir: /app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+      - ./reports:/app/reports
+    environment:
+      - NODE_ENV=test
+      - DEV_BASE_URL=${DEV_BASE_URL:-http://host.docker.internal:8000}
+      - PROD_BASE_URL=${PROD_BASE_URL:-https://stampchain.io}
+      - NEWMAN_COLLECTION=tests/postman/collections/data-validation.json
+      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-tests/postman/environments/comprehensive.json}
+      - NEWMAN_REPORTERS=${NEWMAN_REPORTERS:-cli,html,json}
+      - NEWMAN_ITERATIONS=${NEWMAN_ITERATIONS:-1}
+      - NEWMAN_DELAY_REQUEST=${NEWMAN_DELAY_REQUEST:-0}
+      - NEWMAN_TIMEOUT=${NEWMAN_TIMEOUT:-10000}
+      - NEWMAN_VERBOSE=${NEWMAN_VERBOSE:-false}
+      - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
+      - NEWMAN_FOLDER=${NEWMAN_FOLDER:-}
+      - REPORT_PREFIX=newman-data-validation
+    command: sh scripts/run-newman-enhanced.sh 
