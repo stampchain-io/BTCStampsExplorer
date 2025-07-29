@@ -265,6 +265,11 @@ class DatabaseManager {
   }
 
   releaseClient(client: Client): void {
+    // Prevent double-release
+    if (this.#pool.includes(client)) {
+      this.#logger.warn("Attempting to release a client that's already in the pool");
+      return;
+    }
     this.#pool.push(client);
     this.#activeConnections--; // Track connection returned to pool
   }
@@ -274,7 +279,9 @@ class DatabaseManager {
     const index = this.#pool.indexOf(client);
     if (index > -1) {
       this.#pool.splice(index, 1);
-      this.#activeConnections--; // Track connection being closed
+    } else {
+      // If client is not in pool, it's an active connection
+      this.#activeConnections--; // Track active connection being closed
     }
   }
 
@@ -381,7 +388,8 @@ class DatabaseManager {
             this.#logger.warn(
               `Connection pool exhausted on attempt ${attempt}. Pool stats: ${JSON.stringify(this.getConnectionStats())}`,
             );
-            isConnectionError = true;
+            // Don't set isConnectionError for pool exhaustion - there's no client to clean up
+            shouldRetry = true;
           }
           // Check if it's a connection timeout/network error
           else if (error.message.includes("disconnected by the server") ||
@@ -405,13 +413,16 @@ class DatabaseManager {
           }
         }
 
-        // Handle connection cleanup
-        if (isConnectionError && client) {
-          await this.closeClient(client);
-          client = null;
-        } else if (client) {
-          // For non-connection errors, return client to pool
-          this.releaseClient(client);
+        // Handle connection cleanup - ensure client is always released or closed
+        if (client) {
+          if (isConnectionError) {
+            await this.closeClient(client);
+            client = null;
+          } else {
+            // For non-connection errors, return client to pool
+            this.releaseClient(client);
+            client = null;
+          }
         }
 
         // Log appropriately based on attempt and error type
@@ -826,6 +837,25 @@ class DatabaseManager {
       category = 'stamp_balance';
     } else if (queryUpper.includes('STAMP_MARKET_DATA') || queryUpper.includes('SRC20_MARKET_DATA')) {
       category = 'market_data';
+    } else if (queryUpper.includes('SRC20_TX') || queryUpper.includes('SRC_20_TX') ||
+               (queryUpper.includes('SRC20') && queryUpper.includes('TRANSACTION'))) {
+      category = 'src20_transaction';
+    } else if (queryUpper.includes('FROM SRC20') || 
+               (queryUpper.includes('SRC20') && queryUpper.includes('COUNT')) ||
+               (queryUpper.includes('SRC20') && queryUpper.includes('TICK'))) {
+      // SRC-20 queries that should be invalidated on new blocks
+      category = 'blockchain_data';
+    } else if (queryUpper.includes('DISPENSER') || queryUpper.includes('dispensers')) {
+      category = 'dispenser';
+    } else if ((queryUpper.includes('STAMP') || queryUpper.includes('stamps')) && 
+               queryUpper.includes('WHERE') && 
+               (queryUpper.includes('stamp_id') || queryUpper.includes('ident') || queryUpper.includes('cpid'))) {
+      // Individual stamp detail queries
+      category = 'stamp_detail';
+    } else if ((queryUpper.includes('STAMP') || queryUpper.includes('stamps')) && 
+               (!queryUpper.includes('WHERE') || queryUpper.includes('LIMIT'))) {
+      // Full stamp list queries (no WHERE or just LIMIT)
+      category = 'stamp_list';
     } else if (queryUpper.includes('STAMP_') || queryUpper.includes('stamps')) {
       category = 'stamp';
     } else if (queryUpper.includes('BLOCK_') || queryUpper.includes('block')) {
