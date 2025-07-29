@@ -1,12 +1,15 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
 export const handler: Handlers = {
   async GET(req) {
     // GET requests need origin check but not CSRF
-    const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+    const originError = await InternalApiFrontendGuard.requireInternalAccess(
+      req,
+    );
     if (originError) return originError;
 
     const url = new URL(req.url);
@@ -37,7 +40,9 @@ export const handler: Handlers = {
     const csrfError = await InternalRouteGuard.requireCSRF(req);
     if (csrfError) return csrfError;
 
-    const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+    const originError = await InternalApiFrontendGuard.requireInternalAccess(
+      req,
+    );
     if (originError) return originError;
 
     // Check signature for wallet ownership

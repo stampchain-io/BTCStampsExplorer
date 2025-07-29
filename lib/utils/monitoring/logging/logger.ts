@@ -13,6 +13,7 @@ export type LogNamespace =
   | "database"
   | "cache"
   | "auth"
+  | "security"
   | "system"
   | "ui"
   | "src101"

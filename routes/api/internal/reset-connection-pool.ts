@@ -12,7 +12,9 @@ export const handler: Handlers = {
   async POST(req) {
     try {
       // Security check for internal endpoints
-      const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+      const originError = await InternalRouteGuard.requireAPIKey(
+        req,
+      );
       if (originError) {
         logger.warn("database", {
           message: "Origin validation failed for connection pool reset",
@@ -73,7 +75,9 @@ export const handler: Handlers = {
   async GET(req) {
     try {
       // Security check for internal endpoints
-      const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+      const originError = await InternalRouteGuard.requireAPIKey(
+        req,
+      );
       if (originError) {
         return originError;
       }

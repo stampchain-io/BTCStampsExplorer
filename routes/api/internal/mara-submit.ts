@@ -9,6 +9,7 @@ import { FreshContext, Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { MaraSlipstreamService } from "$/server/services/mara/maraSlipstreamService.ts";
 import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
 interface MaraSubmitRequest {
   /** Signed transaction hex string */
@@ -36,6 +37,10 @@ interface MaraSubmitResponse {
 
 export const handler: Handlers = {
   async POST(req: Request, _ctx: FreshContext) {
+    // Security check for internal endpoints
+    const accessError = InternalRouteGuard.requireAPIKey(req);
+    if (accessError) return accessError;
+
     try {
       // MARA is always available - activation depends on user providing outputValue
 
