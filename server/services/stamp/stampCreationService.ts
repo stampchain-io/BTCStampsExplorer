@@ -3,6 +3,7 @@
 import { base64ToHex } from "$lib/utils/data/binary/baseUtils.ts";
 import { FileToAddressUtils } from "$lib/utils/bitcoin/encoding/fileToAddressUtils.ts";
 import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
+import { estimateMARATransactionSize } from "$lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts";
 import { extractOutputs } from "$lib/utils/bitcoin/minting/transactionUtils.ts";
 import { getScriptTypeInfo, validateWalletAddressForMinting } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
@@ -199,52 +200,118 @@ export class StampCreationService {
     try {
       logger.debug("stamp-create", { message: "Starting PSBT generation with params", address, satsPerVB, service_fee, recipient_fee, cip33AddressCount: cip33Addresses.length, fileSize });
 
-      // For dryRun, return mock PSBT data immediately to avoid unnecessary transaction parsing
+      // For dryRun, return realistic PSBT data with multiple dummy UTXOs
       if (isDryRun) {
-        logger.info("stamp-create", { message: "DryRun mode: returning mock PSBT data", address, fileSize, cip33AddressCount: cip33Addresses.length });
+        logger.info("stamp-create", { message: "DryRun mode: generating realistic dummy UTXOs", address, fileSize, cip33AddressCount: cip33Addresses.length });
+
+        // Import dummy UTXO generator
+        const { generateRealisticDummyUTXOs, estimateInputCount } = await import("$lib/utils/bitcoin/utxo/dummyUtxoGenerator.ts");
 
         // Calculate dust value for CIP33 addresses
         totalDustValue = cip33Addresses.length * dustValue;
 
-        // Calculate accurate estimated size based on transaction structure
-        const dryRunEstimatedSize = estimateMintingTransactionSize({
-          inputs: [{
-            type: "P2WPKH" as ScriptType, // Assume P2WPKH input for estimation
-            isWitness: true
-          }],
-          outputs: [
-            { type: "OP_RETURN" as ScriptType }, // OP_RETURN
-            ...cip33Addresses.map(() => ({
-              type: "P2WSH" as ScriptType
-            })),
-            ...(service_fee > 0 ? [{ type: "P2WPKH" as ScriptType }] : []) // service fee if applicable
-          ],
-          includeChangeOutput: true,
-          changeOutputType: "P2WPKH" as ScriptType
+        // Calculate total output value needed
+        const totalOutputsNeeded = totalDustValue + service_fee;
+
+        // Estimate number of inputs needed based on typical UTXO sizes
+        const estimatedInputs = estimateInputCount(
+          totalOutputsNeeded,
+          50000, // Average UTXO size of 0.0005 BTC
+          satsPerVB
+        );
+
+        // Generate realistic dummy UTXOs
+        const dummyUTXOs = generateRealisticDummyUTXOs({
+          targetAmount: totalOutputsNeeded,
+          averageUTXOSize: 50000,
+          includeSmallUTXOs: true,
+          includeDustUTXOs: true,
+          scriptType: "P2WPKH"
         });
 
-        const estimatedFee = Math.ceil(dryRunEstimatedSize * satsPerVB);
+        // Use only the UTXOs we need (to simulate UTXO selection)
+        const selectedUTXOs = dummyUTXOs.slice(0, Math.min(estimatedInputs, dummyUTXOs.length));
+        const totalInputValue = selectedUTXOs.reduce((sum, utxo) => sum + utxo.value, 0);
 
-        // FIXED: Include miner fee in total output value for accurate estimation display
-        totalOutputValue = totalDustValue + service_fee + estimatedFee;
+        // Calculate accurate estimated size based on realistic inputs
+        // Use MARA estimator for MARA mode (outputValue < 330)
+        const isMaraMode = dustValue < 330;
+        
+        let dryRunEstimatedSize: number;
+        if (isMaraMode) {
+          // Use MARA-specific estimator for accurate calculation
+          const maraEstimate = estimateMARATransactionSize({
+            inputs: selectedUTXOs.map(() => ({
+              type: "P2WPKH" as ScriptType,
+              isWitness: true
+            })),
+            fileSize,
+            outputValue: dustValue,
+            includeServiceFee: service_fee > 0,
+            serviceFeeType: "P2WPKH" as ScriptType,
+            includeChangeOutput: true,
+            changeOutputType: "P2WPKH" as ScriptType,
+            isMaraMode: true,
+            maraFeeRate: satsPerVB
+          });
+          dryRunEstimatedSize = maraEstimate.estimatedSize;
+          
+          logger.info("stamp-create", {
+            message: "MARA mode dry run estimation",
+            maraEstimate,
+            dustValue,
+            chunkCount: maraEstimate.chunkCount
+          });
+        } else {
+          // Use standard estimator for non-MARA mode
+          dryRunEstimatedSize = estimateMintingTransactionSize({
+            inputs: selectedUTXOs.map(() => ({
+              type: "P2WPKH" as ScriptType,
+              isWitness: true
+            })),
+            outputs: [
+              { type: "OP_RETURN" as ScriptType }, // OP_RETURN
+              ...cip33Addresses.map(() => ({
+                type: "P2WSH" as ScriptType
+              })),
+              ...(service_fee > 0 ? [{ type: "P2WPKH" as ScriptType }] : []) // service fee if applicable
+            ],
+            includeChangeOutput: true,
+            changeOutputType: "P2WPKH" as ScriptType
+          });
+        }
+
+        const estimatedFee = Math.ceil(dryRunEstimatedSize * satsPerVB);
+        totalOutputValue = totalDustValue + service_fee;
+        const changeValue = totalInputValue - totalOutputValue - estimatedFee;
+
+        logger.info("stamp-create", {
+          message: "Realistic dryRun estimation",
+          selectedInputs: selectedUTXOs.length,
+          totalInputValue,
+          totalOutputValue,
+          estimatedFee,
+          changeValue,
+          txSize: dryRunEstimatedSize
+        });
 
         return {
           psbt: new bitcoin.Psbt({ network: bitcoin.networks.bitcoin }), // Empty PSBT for dryRun
-          inputs: [{
-            txid: "mock_txid_for_estimation",
-            vout: 0,
-            value: totalOutputValue + estimatedFee + 10000, // Mock sufficient input
-            address: address,
+          inputs: selectedUTXOs.map(utxo => ({
+            txid: utxo.txid,
+            vout: utxo.vout,
+            value: utxo.value,
+            address: utxo.address || address,
             script: "mock_script"
-          }],
+          })),
           vouts: [], // Empty for dryRun
           totalOutputValue,
-          totalInputValue: totalOutputValue + estimatedFee + 10000,
+          totalInputValue,
           estimatedTxSize: dryRunEstimatedSize,
           estMinerFee: estimatedFee,
           totalDustValue,
           actualExactFeeNeeded: estimatedFee,
-          totalChangeOutput: 10000 - (estimatedFee % 10000), // Mock change
+          totalChangeOutput: Math.max(0, changeValue),
           feeRate: satsPerVB
         };
       }
@@ -400,21 +467,51 @@ export class StampCreationService {
       });
 
       // Recalculate the exact fee with the actual number of inputs selected
-      actualEstimatedSize = estimateMintingTransactionSize({
-        inputs: inputs.map((input: UTXO) => ({
-          type: (input.scriptType || "P2WPKH") as ScriptType,
-          isWitness: true
-        })),
-        outputs: [
-          { type: "OP_RETURN" as ScriptType }, // OP_RETURN
-          ...cip33Addresses.map(() => ({
-            type: "P2WSH" as ScriptType
+      // Use MARA estimator for MARA mode (outputValue < 330)
+      const isMaraMode = dustValue < 330;
+      
+      if (isMaraMode) {
+        // Use MARA-specific estimator for accurate calculation
+        const maraEstimate = estimateMARATransactionSize({
+          inputs: inputs.map((input: UTXO) => ({
+            type: (input.scriptType || "P2WPKH") as ScriptType,
+            isWitness: true
           })),
-          { type: "P2WPKH" as ScriptType } // service fee
-        ],
-        includeChangeOutput: true,
-        changeOutputType: "P2WPKH" as ScriptType
-      });
+          fileSize,
+          outputValue: dustValue,
+          includeServiceFee: service_fee > 0,
+          serviceFeeType: "P2WPKH" as ScriptType,
+          includeChangeOutput: true,
+          changeOutputType: "P2WPKH" as ScriptType,
+          isMaraMode: true,
+          maraFeeRate: satsPerVB
+        });
+        actualEstimatedSize = maraEstimate.estimatedSize;
+        
+        logger.info("stamp-create", {
+          message: "MARA mode actual estimation with selected inputs",
+          maraEstimate,
+          dustValue,
+          inputCount: inputs.length
+        });
+      } else {
+        // Use standard estimator for non-MARA mode
+        actualEstimatedSize = estimateMintingTransactionSize({
+          inputs: inputs.map((input: UTXO) => ({
+            type: (input.scriptType || "P2WPKH") as ScriptType,
+            isWitness: true
+          })),
+          outputs: [
+            { type: "OP_RETURN" as ScriptType }, // OP_RETURN
+            ...cip33Addresses.map(() => ({
+              type: "P2WSH" as ScriptType
+            })),
+            { type: "P2WPKH" as ScriptType } // service fee
+          ],
+          includeChangeOutput: true,
+          changeOutputType: "P2WPKH" as ScriptType
+        });
+      }
 
       actualExactFeeNeeded = Math.ceil(actualEstimatedSize * satsPerVB);
 

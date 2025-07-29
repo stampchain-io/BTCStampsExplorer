@@ -90,7 +90,7 @@ run_newman_api_validation() {
       echo -e "${YELLOW}Running smoke tests for critical endpoints...${NC}"
       if command -v curl >/dev/null 2>&1; then
         # Quick health check
-        if ! curl -f -s "${endpoint_url}/api/health" >/dev/null 2>&1; then
+        if ! curl -f -s "${endpoint_url}/api/v2/health" >/dev/null 2>&1; then
           echo -e "${RED}❌ Health endpoint FAILED${NC}"
           return 1
         fi

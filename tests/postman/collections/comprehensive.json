@@ -7121,8 +7121,8 @@
               "script": {
                 "exec": [
                   "// Test Case: UTXO with no stamps attached (nothing to detach)",
-                  "pm.test(\"Status code is 500 (expected for no stamps to detach)\", function () {",
-                  "    pm.response.to.have.status(500);",
+                  "pm.test(\"Status code is 400 (expected for no stamps to detach)\", function () {",
+                  "    pm.response.to.have.status(400);",
                   "});",
                   "",
                   "pm.test(\"Response indicates no assets to detach\", function () {",
@@ -7178,8 +7178,8 @@
               "script": {
                 "exec": [
                   "// Test Case: UTXO with stamp attached but insufficient BTC for fees",
-                  "pm.test(\"Status code is 500 (expected for insufficient funds)\", function () {",
-                  "    pm.response.to.have.status(500);",
+                  "pm.test(\"Status code is 400 (expected for insufficient funds)\", function () {",
+                  "    pm.response.to.have.status(400);",
                   "});",
                   "",
                   "pm.test(\"Response indicates insufficient funds\", function () {",
@@ -7239,8 +7239,8 @@
               "script": {
                 "exec": [
                   "// Test Case: UTXO with no stamps attached (nothing to detach)",
-                  "pm.test(\"Status code is 500 (expected for no stamps to detach)\", function () {",
-                  "    pm.response.to.have.status(500);",
+                  "pm.test(\"Status code is 400 (expected for no stamps to detach)\", function () {",
+                  "    pm.response.to.have.status(400);",
                   "});",
                   "",
                   "pm.test(\"Response indicates no assets to detach\", function () {",
@@ -7296,8 +7296,8 @@
               "script": {
                 "exec": [
                   "// Test Case: UTXO with stamp attached but insufficient BTC for fees",
-                  "pm.test(\"Status code is 500 (expected for insufficient funds)\", function () {",
-                  "    pm.response.to.have.status(500);",
+                  "pm.test(\"Status code is 400 (expected for insufficient funds)\", function () {",
+                  "    pm.response.to.have.status(400);",
                   "});",
                   "",
                   "pm.test(\"Response indicates insufficient funds\", function () {",

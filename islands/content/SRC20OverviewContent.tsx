@@ -125,7 +125,8 @@ export function SRC20OverviewContent({
         onViewTypeChange={handleViewTypeChange}
         viewType={viewType} // 🎸 Pass actual viewType from props
         onTimeframeChange={setCurrentTimeframe}
-        onFilterChange={handleFilterChange}
+        onFilterChange={(filter: string, direction?: "asc" | "desc") =>
+          handleFilterChange(filter as SortOption | null, direction || "desc")}
         currentSort={currentSort}
       />
       <SRC20Gallery

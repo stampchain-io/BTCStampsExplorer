@@ -3,7 +3,12 @@ import {
     SRC20TrxRequestParams,
 } from "$globals";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
-import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "$constants";
+import { 
+  SRC20_BALANCE_TABLE, 
+  SRC20_TABLE,
+  BLOCKCHAIN_SYNC_CACHE_DURATION,
+  BALANCE_CACHE_DURATION 
+} from "$constants";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { bigFloatToString } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
@@ -136,7 +141,7 @@ export class SRC20Repository {
     return await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2,
+      BALANCE_CACHE_DURATION,
     );
   }
 
@@ -425,7 +430,7 @@ export class SRC20Repository {
       const results = await this.db.executeQueryWithCache(
         query,
         fullQueryParams,
-        1000 * 60 * 5, // Cache duration
+        BLOCKCHAIN_SYNC_CACHE_DURATION,
       ) as any;
 
       // Convert response ticks to emoji format
@@ -503,7 +508,7 @@ export class SRC20Repository {
     const results = await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2, // Cache duration
+      BLOCKCHAIN_SYNC_CACHE_DURATION,
     ) as any;
 
     // Retrieve transaction hashes for the ticks
@@ -578,7 +583,7 @@ export class SRC20Repository {
     const result = await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2, // Cache duration: 2 minutes
+      BALANCE_CACHE_DURATION,
     );
 
     return (result as any).rows[0].total;
@@ -607,7 +612,7 @@ export class SRC20Repository {
     const data = await this.db.executeQueryWithCache(
       query,
       [unicodeTick],
-      1000 * 60 * 2,
+      BLOCKCHAIN_SYNC_CACHE_DURATION,
     );
 
     if ((data as any).rows.length === 0) {
@@ -693,7 +698,7 @@ export class SRC20Repository {
       const results = await this.db.executeQueryWithCache(
         query,
         queryParams,
-        1000 * 60 * 20, // Increased cache duration to 20 minutes
+        BLOCKCHAIN_SYNC_CACHE_DURATION,
       );
 
       return {
@@ -736,7 +741,7 @@ export class SRC20Repository {
       const fallbackResults = await this.db.executeQueryWithCache(
         fallbackQuery,
         [],
-        1000 * 60 * 10, // 10 minute cache for fallback
+        BLOCKCHAIN_SYNC_CACHE_DURATION,
       );
 
       return {
@@ -764,7 +769,7 @@ export class SRC20Repository {
     const result = await this.db.executeQueryWithCache(
       query,
       params,
-      1000 * 60 * 10,
+      BLOCKCHAIN_SYNC_CACHE_DURATION,
     );
 
     if (!(result as any).rows || (result as any).rows.length === 0) {
@@ -816,7 +821,7 @@ export class SRC20Repository {
     const result = await this.db.executeQueryWithCache(
       query,
       params,
-      1000 * 60 * 2, // Cache duration
+      BLOCKCHAIN_SYNC_CACHE_DURATION,
     );
 
     if (!(result as any).rows || (result as any).rows.length === 0) {
@@ -871,7 +876,7 @@ export class SRC20Repository {
       const result = await this.db.executeQueryWithCache(
         sqlQuery,
         queryParams,
-        1000 * 60 * 2 // Cache duration: 2 minutes
+        BLOCKCHAIN_SYNC_CACHE_DURATION
       );
 
       return this.convertResponseToEmoji((result as any).rows.map((row: any) => {
@@ -999,7 +1004,7 @@ export class SRC20Repository {
       const results = await this.db.executeQueryWithCache(
         query,
         queryParams,
-        1000 * 60 * 10, // 10 minute cache
+        BLOCKCHAIN_SYNC_CACHE_DURATION,
       );
 
       return {
@@ -1046,7 +1051,7 @@ export class SRC20Repository {
     const data = await this.db.executeQueryWithCache(
       query,
       [unicodeTick],
-      1000 * 60 * 5, // 5 minute cache
+      BLOCKCHAIN_SYNC_CACHE_DURATION,
     );
 
     if ((data as any).rows.length === 0) {
@@ -1148,7 +1153,7 @@ export class SRC20Repository {
     return await this.db.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 5, // Increase cache duration since we're using pre-computed data
+      BLOCKCHAIN_SYNC_CACHE_DURATION,
     );
   }
 

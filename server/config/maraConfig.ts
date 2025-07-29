@@ -131,12 +131,8 @@ export function validateMaraConfig(config: unknown): asserts config is MaraConfi
  * @returns MaraConfig object or null if MARA is disabled
  */
 export function createMaraConfigFromEnv(): MaraConfig | null {
-  const enabled = Deno.env.get('ENABLE_MARA_INTEGRATION') === '1';
-  
-  // If MARA is disabled, return null early
-  if (!enabled) {
-    return null;
-  }
+  // MARA is always available - activation depends on user providing outputValue
+  const enabled = true;
 
   const config: MaraConfig = {
     apiBaseUrl: Deno.env.get('MARA_API_BASE_URL') || 'https://slipstream.mara.com/rest-api',
@@ -160,5 +156,5 @@ export const DEFAULT_MARA_CONFIG: MaraConfig = {
   apiTimeout: 30000,
   serviceFeeAmount: 42000,
   serviceFeeAddress: 'bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m',
-  enabled: false,
+  enabled: true,
 };

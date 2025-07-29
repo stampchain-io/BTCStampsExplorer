@@ -761,7 +761,13 @@ export class StampController {
     baseUrl?: string,
     contentType: string = 'application/octet-stream'
   ) {
-    const proxyPath = `${baseUrl}/stamps/${identifier}`;
+    // Use IMAGES_SRC_PATH for CDN requests if available, otherwise fall back to baseUrl
+    const imagesSrcPath = Deno.env.get("IMAGES_SRC_PATH");
+    
+    // Construct the full proxy path
+    const proxyPath = imagesSrcPath 
+      ? `${imagesSrcPath}/${identifier}` 
+      : `${baseUrl}/stamps/${identifier}`;
 
     try {
       // Use raw fetch for binary content to avoid consuming the response body

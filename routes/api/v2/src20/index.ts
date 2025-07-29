@@ -7,6 +7,7 @@ import {
   validateSRC20SortParam,
 } from "$server/services/validation/routeValidationService.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 
 export const handler: Handlers = {
   async GET(req) {
@@ -96,7 +97,9 @@ export const handler: Handlers = {
           enrichWithProgress: includeProgress || params.op === "DEPLOY", // Always include for DEPLOY ops
         },
       );
-      return ApiResponseUtil.success(result);
+      return ApiResponseUtil.success(result, {
+        routeType: RouteType.BLOCKCHAIN_DATA,
+      });
     } catch (error) {
       return ApiResponseUtil.internalError(error, "Error processing request");
     }

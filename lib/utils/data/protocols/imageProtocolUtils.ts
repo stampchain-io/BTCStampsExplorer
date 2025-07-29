@@ -32,6 +32,11 @@ export const SUPPORTED_PROTOCOLS = {
     description: "Bitcoin Ordinals",
     example: "ord:a1b2c3d4e5f67890123456789012",
   },
+  st: {
+    prefix: "st",
+    description: "Bitcoin Stamps reference (first 20 chars of tx hash)",
+    example: "st:a1b2c3d4e5f67890123",
+  },
 } as const;
 
 /**
@@ -76,12 +81,15 @@ export function validateImageReference(reference: string): boolean {
     return false;
   }
 
-  // Check total length
-  if (reference.length > 32) {
+  // Normalize first (this will truncate st: hashes if needed)
+  const normalizedRef = normalizeImageReference(reference);
+
+  // Check total length after normalization
+  if (normalizedRef.length > 32) {
     return false;
   }
 
-  const parsed = parseImageReference(reference);
+  const parsed = parseImageReference(normalizedRef);
 
   // Check if protocol is supported
   if (
@@ -105,14 +113,34 @@ export function validateImageReference(reference: string): boolean {
 }
 
 /**
- * Get the full URL for an image reference
+ * Normalize an image reference - truncates st: protocol hashes to 20 chars
  */
-export function getImageUrl(reference: string): string | null {
-  if (!validateImageReference(reference)) {
-    return null;
+export function normalizeImageReference(reference: string): string {
+  if (!reference || typeof reference !== "string") {
+    return reference;
   }
 
   const parsed = parseImageReference(reference);
+
+  // Only truncate for st: protocol
+  if (parsed.protocol === "st" && parsed.hash.length > 20) {
+    return `${parsed.protocol}:${parsed.hash.substring(0, 20)}`;
+  }
+
+  return reference;
+}
+
+/**
+ * Get the full URL for an image reference
+ */
+export function getImageUrl(reference: string): string | null {
+  const normalizedRef = normalizeImageReference(reference);
+
+  if (!validateImageReference(normalizedRef)) {
+    return null;
+  }
+
+  const parsed = parseImageReference(normalizedRef);
 
   switch (parsed.protocol) {
     case "ar":
@@ -123,6 +151,10 @@ export function getImageUrl(reference: string): string | null {
       return `https://dweb.link/ipfs/${parsed.hash}`;
     case "ord":
       return `https://ordinals.com/inscription/${parsed.hash}`;
+    case "st":
+      // For stamps, the hash contains the first 20 chars of tx_hash
+      // This will need to be resolved to full stamp data elsewhere
+      return `stamp:${parsed.hash}`;
     default:
       return null;
   }

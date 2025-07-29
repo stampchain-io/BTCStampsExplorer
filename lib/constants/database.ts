@@ -36,6 +36,12 @@ export const SRC101_PRICE_TABLE = "src101price";
 /** Default cache duration in seconds (12 hours) */
 export const DEFAULT_CACHE_DURATION = 60 * 60 * 12;
 
+/** Blockchain-synchronized cache duration in seconds (10 minutes - average block time) */
+export const BLOCKCHAIN_SYNC_CACHE_DURATION = 60 * 10;
+
+/** Short-lived cache duration in seconds (30 seconds - for critical balance data) */
+export const BALANCE_CACHE_DURATION = 30;
+
 /** Multiplier for converting KB to vBytes */
 export const SATS_PER_KB_MULTIPLIER = 1000; // 1 KB = 1000 vBytes
 

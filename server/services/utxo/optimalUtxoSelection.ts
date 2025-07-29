@@ -150,7 +150,7 @@ export class OptimalUTXOSelection {
           spendCost: Number(cost),
           isDust: utxo.value <= Number(cost),
           netValue: utxo.value - Number(cost),
-          efficiency: utxo.value / Number(cost)
+          efficiency: Number(cost) > 0 ? utxo.value / Number(cost) : utxo.value
         };
       });
 
@@ -187,7 +187,10 @@ export class OptimalUTXOSelection {
       examples: filteredUTXOs.slice(0, 3).map(u => ({
         value: u.value,
         spendCost: Number(this.estimateInputCost(u, feeRate)),
-        efficiency: u.value / Number(this.estimateInputCost(u, feeRate))
+        efficiency: (() => {
+          const cost = Number(this.estimateInputCost(u, feeRate));
+          return cost > 0 ? u.value / cost : u.value;
+        })()
       }))
     });
 
@@ -200,7 +203,7 @@ export class OptimalUTXOSelection {
     ];
 
     let bestResult: SelectionResult | null = null;
-    let bestWaste = Infinity;
+    let bestWaste = Number.MAX_SAFE_INTEGER;
     const algorithmMetrics: AlgorithmMetrics[] = [];
 
     for (const algo of algorithms) {
@@ -218,7 +221,7 @@ export class OptimalUTXOSelection {
           algoResult.algorithm = algo.name;
 
           const totalTransactionValue = Number(targetValue) + algoResult.fee;
-          const efficiency = algoResult.inputs.length / spendableUTXOs.length;
+          const efficiency = spendableUTXOs.length > 0 ? algoResult.inputs.length / spendableUTXOs.length : 0;
           const wastePercentage = totalTransactionValue > 0 ? (waste / totalTransactionValue) * 100 : 0;
 
           const metrics: AlgorithmMetrics = {
@@ -348,7 +351,10 @@ export class OptimalUTXOSelection {
           txid: u.txid.substring(0, 8) + "...",
           vout: u.vout,
           value: u.value,
-          efficiency: (u.value / Number(this.estimateInputCost(u, feeRate))).toFixed(2)
+          efficiency: (() => {
+            const cost = Number(this.estimateInputCost(u, feeRate));
+            return cost > 0 ? (u.value / cost).toFixed(2) : u.value.toFixed(2);
+          })()
         })),
         recommendations
       });
@@ -451,7 +457,7 @@ export class OptimalUTXOSelection {
     });
 
     let bestSelection: BasicUTXO[] | null = null;
-    let bestWaste = BigInt(Infinity);
+    let bestWaste = BigInt(Number.MAX_SAFE_INTEGER - 1); // Subtract 1 to ensure safe conversion
     let exactMatches = 0;
     let candidateSolutions = 0;
 
@@ -606,7 +612,7 @@ export class OptimalUTXOSelection {
 
     // Try to find a subset that gets close to target
     let bestSelection: BasicUTXO[] = [];
-    let bestDiff = BigInt(Infinity);
+    let bestDiff = BigInt(Number.MAX_SAFE_INTEGER);
 
     // Dynamic programming approach
     const n = Math.min(sortedUTXOs.length, 50); // Limit for performance
@@ -685,7 +691,7 @@ export class OptimalUTXOSelection {
   ): SelectionResult | null {
     const maxTries = options.maxTries || 1000;
     let bestResult: SelectionResult | null = null;
-    let bestWaste = Infinity;
+    let bestWaste = Number.MAX_SAFE_INTEGER;
 
     for (let attempt = 0; attempt < maxTries; attempt++) {
       // Shuffle UTXOs
@@ -816,7 +822,9 @@ export class OptimalUTXOSelection {
     const inputSize = utxo.scriptType ?
       this.getInputSize(utxo.scriptType) : 68;
 
-    return BigInt(Math.ceil(inputSize * feeRate));
+    // Ensure minimum cost of 1 to prevent division by zero
+    const cost = Math.ceil(inputSize * feeRate);
+    return BigInt(Math.max(1, cost));
   }
 
   /**

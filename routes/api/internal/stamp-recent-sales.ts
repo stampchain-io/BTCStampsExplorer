@@ -149,9 +149,9 @@ export const handler: Handlers = {
         },
       };
 
-      // Return with appropriate cache duration for internal endpoints
+      // Return with long cache duration - will use append strategy on new blocks
       return ApiResponseUtil.success(cleanResponse, {
-        routeType: RouteType.DYNAMIC,
+        routeType: RouteType.STATIC, // 24 hour cache, but appended on new blocks
       });
     } catch (error) {
       logger.error("stamps", {

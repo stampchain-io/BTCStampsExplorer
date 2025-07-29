@@ -12,6 +12,9 @@ export enum RouteType {
   TRANSACTION = 'transaction',
   STAMP_DETAIL = 'stamp_detail',    // Individual stamp details
 
+  // Block-synchronized cache (invalidated on new blocks)
+  BLOCKCHAIN_DATA = 'blockchain_data',  // Data that changes with each block
+
   // Medium cache (moderately changing data)
   STAMP = 'stamp',
   STAMP_METADATA = 'stamp_metadata',
@@ -46,42 +49,64 @@ export function getCacheConfig(routeType: RouteType): CacheConfig {
         staleIfError: 0,
       };
 
-    // Frequently changing data - very short cache
+    // Balance data - invalidated on new blocks
     case RouteType.BALANCE:
+      return {
+        duration: 86400,         // 24 hours (but invalidated on blocks)
+        staleWhileRevalidate: 60,
+        staleIfError: 1200,      // 20 minutes if backend errors
+      };
+
+    // Dispenser data - invalidated on new blocks
     case RouteType.DISPENSER:
       return {
-        duration: 30,            // 30 seconds
-        staleWhileRevalidate: 30,
-        staleIfError: 60,
+        duration: 86400,         // 24 hours (but invalidated on blocks)
+        staleWhileRevalidate: 60,
+        staleIfError: 1200,      // 20 minutes if backend errors
       };
 
-    // Transaction data - short cache
+    // Transaction data - invalidated on new blocks
     case RouteType.TRANSACTION:
       return {
-        duration: 60,            // 1 minute
-        staleWhileRevalidate: 30,
-        staleIfError: 300,
+        duration: 86400,         // 24 hours (but invalidated on blocks)
+        staleWhileRevalidate: 60,
+        staleIfError: 1200,      // 20 minutes if backend errors
       };
 
-    // Individual stamp details - short cache
+    // Blockchain-synchronized data - invalidated on new blocks
+    case RouteType.BLOCKCHAIN_DATA:
+      return {
+        duration: 86400,         // 24 hours (but invalidated on blocks)
+        staleWhileRevalidate: 60,
+        staleIfError: 600,
+      };
+
+    // Individual stamp details - invalidated on new blocks
     case RouteType.STAMP_DETAIL:
       return {
-        duration: 3600,          // 1 hour
-        staleWhileRevalidate: 300,
-        staleIfError: 7200,
+        duration: 86400,         // 24 hours (but invalidated on blocks)
+        staleWhileRevalidate: 60,
+        staleIfError: 1200,      // 20 minutes if backend errors
       };
 
-    // Stamp data - medium cache
+    // Stamp data - invalidated on new blocks
     case RouteType.STAMP:
     case RouteType.STAMP_METADATA:
       return {
-        duration: 300,           // 5 minutes
+        duration: 86400,         // 24 hours (but invalidated on blocks)
         staleWhileRevalidate: 60,
         staleIfError: 3600,
       };
 
-    // Stamp list and other stable data - long cache
+    // Stamp list - invalidated on new blocks (new stamps appear immediately)
     case RouteType.STAMP_LIST:
+      return {
+        duration: 86400,         // 24 hours (but invalidated on blocks)
+        staleWhileRevalidate: 3600,
+        staleIfError: 7200,
+      };
+
+    // Collection and other stable data - long cache
     case RouteType.COLLECTION:
     case RouteType.HISTORICAL:
     case RouteType.PROTOCOL:

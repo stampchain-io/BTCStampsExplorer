@@ -117,7 +117,7 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
       );
     }
 
-    // MARA mode detection - activated when outputValue is provided and < 333
+    // MARA mode detection - activated when outputValue is provided and < 330
     const outputValueNum = body.outputValue !== undefined
       ? (typeof body.outputValue === "string"
         ? parseInt(body.outputValue, 10)
@@ -126,7 +126,7 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
 
     const isMaraMode = outputValueNum !== undefined &&
       outputValueNum >= 1 &&
-      outputValueNum <= 332;
+      outputValueNum < 330; // 330+ uses standard wallet broadcast
 
     let normalizedFees;
     try {
@@ -272,10 +272,10 @@ export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
     // Validate outputValue range if provided
     if (
       outputValueNum !== undefined &&
-      (outputValueNum < 1 || outputValueNum > 332)
+      (outputValueNum < 1 || outputValueNum > 1000) // Allow higher values for standard mode
     ) {
       return ApiResponseUtil.badRequest(
-        "Invalid outputValue: must be between 1 and 332 for MARA mode",
+        "Invalid outputValue: must be between 1 and 5000",
       );
     }
 

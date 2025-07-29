@@ -70,7 +70,11 @@ export function SRC20CardMinting({
 
     // Navigate with new sort parameters
     if (typeof globalThis !== "undefined" && globalThis?.location) {
-      const url = new URL(globalThis.location.href);
+      // Use location.href safely with SSR guard
+      const currentHref = globalThis.location?.href;
+      if (!currentHref) return;
+
+      const url = new URL(currentHref);
       url.searchParams.set("sortBy", apiSortKey);
       url.searchParams.set("sortDirection", newDirection);
       url.searchParams.set("page", "1"); // Reset to page 1 when sorting changes

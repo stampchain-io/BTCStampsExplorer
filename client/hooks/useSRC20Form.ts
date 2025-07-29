@@ -46,6 +46,8 @@ interface SRC20FormState {
   tg: string;
   web: string;
   email: string;
+  img: string;
+  description: string;
   file: File | null;
   psbtFees?: PSBTFees;
   maxAmount?: string;
@@ -125,7 +127,7 @@ export class SRC20FormController {
       // dryRun: false = exact calculation with real UTXOs (connected wallet with funds)
       const shouldUseDryRun = !wallet.address; // Use dryRun if no wallet connected
 
-      const response = await axiod.post("/api/v2/src20/create", {
+      const prepareTxPayload = {
         sourceAddress: wallet.address,
         toAddress: action === "transfer" ? formState.toAddress : wallet.address,
         satsPerVB: formState.fee,
@@ -133,14 +135,35 @@ export class SRC20FormController {
         op: action,
         tick: formState.token || "TEST",
         dryRun: shouldUseDryRun, // Dynamic based on wallet state
+      };
+
+      // Debug log for prepareTx
+      const debugNamespace = action === "deploy"
+        ? "src20-deploy"
+        : action === "mint"
+        ? "src20-mint"
+        : "src20-transfer";
+      logger.debug(debugNamespace, {
+        message: "PrepareTx API call",
+        payload: {
+          ...prepareTxPayload,
+          hasWalletAddress: !!wallet.address,
+          walletObject: wallet,
+        },
+      });
+
+      const response = await axiod.post("/api/v2/src20/create", {
+        ...prepareTxPayload,
         ...(action === "deploy" && {
           max: formState.max || "1000",
           lim: formState.lim || "1000",
-          dec: formState.dec || "18",
+          dec: formState.dec ? parseInt(formState.dec, 10) : 18,
           ...(formState.x && { x: formState.x }),
           ...(formState.tg && { tg: formState.tg }),
           ...(formState.web && { web: formState.web }),
           ...(formState.email && { email: formState.email }),
+          ...(formState.img && { img: formState.img }),
+          ...(formState.description && { description: formState.description }),
         }),
         ...(["mint", "transfer"].includes(action) && {
           amt: formState.amt || "1",
@@ -334,6 +357,8 @@ export function useSRC20Form(
     tg: "",
     web: "",
     email: "",
+    img: "",
+    description: "",
     file: null as File | null,
     psbtFees: {
       estMinerFee: 0,
@@ -570,6 +595,9 @@ export function useSRC20Form(
     } else if (field === "x") {
       // Handle X (Twitter) field validation
       newValue = handleXFieldInput(value);
+    } else if (field === "web") {
+      // Handle website field - automatically add https:// if no protocol specified
+      newValue = handleWebFieldInput(value);
     }
 
     setFormState((prev) => ({
@@ -676,10 +704,85 @@ export function useSRC20Form(
     return cleanValue;
   };
 
+  const handleWebFieldInput = (value: string): string => {
+    const trimmedValue = value.trim();
+    if (trimmedValue === "") {
+      return "";
+    }
+
+    // If the URL doesn't start with http:// or https://, prepend https://
+    if (!/^https?:\/\//i.test(trimmedValue)) {
+      // Check if it looks like a URL (has a domain)
+      if (trimmedValue.includes(".") || trimmedValue.includes("localhost")) {
+        return `https://${trimmedValue}`;
+      }
+    }
+
+    return trimmedValue;
+  };
+
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
       setApiError("");
+
+      // Check wallet connection first
+      if (!wallet?.address || wallet.address === "") {
+        logger.error("stamps", {
+          message: "Wallet not connected or missing address during submission",
+          data: {
+            wallet,
+            hasAddress: !!wallet?.address,
+            isConnected: walletContext.isConnected,
+            walletKeys: wallet ? Object.keys(wallet) : [],
+            address: wallet?.address,
+          },
+        });
+        setApiError("Wallet address not found. Please reconnect your wallet.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate required fields for the operation
+      if (action === "mint" && (!formState.token || formState.token === "")) {
+        logger.error("src20-mint", {
+          message: "Missing token for mint operation",
+          data: { formState, action },
+        });
+        setApiError("Please select a token to mint.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (action === "transfer") {
+        if (!formState.token || formState.token === "") {
+          logger.error("src20-transfer", {
+            message: "Missing token for transfer operation",
+            data: { formState, action },
+          });
+          setApiError("Please select a token to transfer.");
+          setIsSubmitting(false);
+          return;
+        }
+        if (!formState.toAddress || formState.toAddress === "") {
+          logger.error("src20-transfer", {
+            message: "Missing recipient address for transfer operation",
+            data: { formState, action },
+          });
+          setApiError("Please enter a recipient address.");
+          setIsSubmitting(false);
+          return;
+        }
+        if (!formState.amt || formState.amt === "") {
+          logger.error("src20-transfer", {
+            message: "Missing amount for transfer operation",
+            data: { formState, action },
+          });
+          setApiError("Please enter an amount to transfer.");
+          setIsSubmitting(false);
+          return;
+        }
+      }
 
       // Log submission attempt
       logger.debug("stamps", {
@@ -689,6 +792,7 @@ export function useSRC20Form(
           trxType,
           satsPerVB: formState.fee,
           currentEstimate: formState.psbtFees,
+          walletAddress: wallet.address,
         },
       });
 
@@ -720,7 +824,7 @@ export function useSRC20Form(
         return walletResult;
       } else {
         // Create new PSBT only if we don't have one
-        const response = await axiod.post("/api/v2/src20/create", {
+        const requestPayload = {
           sourceAddress: wallet?.address,
           toAddress: action === "transfer"
             ? formState.toAddress
@@ -732,16 +836,43 @@ export function useSRC20Form(
           ...(action === "deploy" && {
             max: formState.max,
             lim: formState.lim,
-            dec: formState.dec,
+            dec: formState.dec ? parseInt(formState.dec, 10) : 18,
             ...(formState.x && { x: formState.x }),
             ...(formState.tg && { tg: formState.tg }),
             ...(formState.web && { web: formState.web }),
             ...(formState.email && { email: formState.email }),
+            ...(formState.img && { img: formState.img }),
+            ...(formState.description &&
+              { description: formState.description }),
           }),
           ...(["mint", "transfer"].includes(action) && {
             amt: formState.amt,
           }),
+        };
+
+        // Debug log the request payload
+        const submitDebugNamespace = action === "deploy"
+          ? "src20-deploy"
+          : action === "mint"
+          ? "src20-mint"
+          : "src20-transfer";
+        logger.debug(submitDebugNamespace, {
+          message: "Sending SRC20 create request",
+          payload: {
+            op: requestPayload.op,
+            tick: requestPayload.tick,
+            sourceAddress: requestPayload.sourceAddress,
+            toAddress: requestPayload.toAddress,
+            trxType: requestPayload.trxType,
+            hasWalletAddress: !!wallet?.address,
+            action: action,
+          },
         });
+
+        const response = await axiod.post(
+          "/api/v2/src20/create",
+          requestPayload,
+        );
 
         // Log the PSBT response
         logger.debug("stamps", {
