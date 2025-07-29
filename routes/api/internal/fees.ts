@@ -1,12 +1,14 @@
 import { Handlers } from "$fresh/server.ts";
 import { RateLimitMiddleware } from "$server/middleware/rateLimitMiddleware.ts";
 import { getProductionFeeService } from "$server/services/fee/feeServiceFactory.ts";
-import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 
 export const handler: Handlers = {
   async GET(req) {
     // Origin validation for read-only endpoint (no CSRF needed)
-    const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+    const originError = await InternalApiFrontendGuard.requireInternalAccess(
+      req,
+    );
     if (originError) {
       console.log("[fees.ts] Origin validation failed");
       return originError;

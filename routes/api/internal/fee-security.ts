@@ -1,12 +1,15 @@
 import { Handlers } from "$fresh/server.ts";
 import { FeeSecurityService } from "$server/services/fee/feeSecurityService.ts";
+import { CloudflareInternalGuard } from "$server/services/security/cloudflareInternalGuard.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
 export const handler: Handlers = {
   async GET(req) {
     try {
       // Origin validation for read-only endpoint (no CSRF needed)
-      const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+      const originError = await CloudflareInternalGuard.requireInternalAccess(
+        req,
+      );
       if (originError) {
         return originError;
       }

@@ -3,6 +3,7 @@ import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 import type { BasicUTXO, UTXO } from "$types/index.d.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 
 /**
  * Internal UTXO Query Endpoint
@@ -40,6 +41,10 @@ import type { BasicUTXO, UTXO } from "$types/index.d.ts";
  */
 export const handler: Handlers = {
   async GET(req: Request) {
+    // Security check for internal endpoints
+    const originError = InternalApiFrontendGuard.requireInternalAccess(req);
+    if (originError) return originError;
+
     const utxoService = new BitcoinUtxoManager();
     try {
       const url = new URL(req.url);

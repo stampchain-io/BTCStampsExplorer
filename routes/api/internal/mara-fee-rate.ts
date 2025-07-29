@@ -9,6 +9,7 @@ import { FreshContext, Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { MaraSlipstreamService } from "$/server/services/mara/maraSlipstreamService.ts";
 import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 
 interface MaraFeeRateResponse {
   /** Current fee rate in sats/vB */
@@ -22,8 +23,18 @@ interface MaraFeeRateResponse {
 }
 
 export const handler: Handlers = {
-  async GET(_req: Request, _ctx: FreshContext) {
+  async GET(req: Request, _ctx: FreshContext) {
     try {
+      // Security check for internal endpoints
+      const originError = InternalApiFrontendGuard.requireInternalAccess(req);
+      if (originError) {
+        logger.warn("api", {
+          message: "Origin validation failed for internal mara-fee-rate",
+          origin: new URL(req.url).origin,
+        });
+        return originError;
+      }
+
       // MARA is always available - activation depends on user providing outputValue
 
       // Check if MARA service is available

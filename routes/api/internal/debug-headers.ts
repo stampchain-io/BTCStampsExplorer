@@ -1,8 +1,13 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
 export const handler: Handlers = {
   GET(req) {
+    // Security check for internal endpoints
+    const accessError = InternalRouteGuard.requireAPIKey(req);
+    if (accessError) return accessError;
+
     // Only available in development
     if (Deno.env.get("DENO_ENV") !== "development") {
       return ApiResponseUtil.badRequest(
