@@ -2,121 +2,161 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "deno: dev",
+      "label": "Dev: Standard",
       "type": "shell",
-      "command": "deno",
-      "args": ["task", "dev"],
+      "command": "deno task dev",
       "group": {
         "kind": "build",
         "isDefault": true
       },
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
+        "panel": "new"
       },
-      "problemMatcher": ["$deno"]
+      "problemMatcher": []
     },
     {
-      "label": "deno: check",
+      "label": "Dev: Frontend Fast (500ms)",
       "type": "shell",
-      "command": "deno",
-      "args": ["task", "check"],
+      "command": "deno task dev:frontend",
       "group": "build",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+        "panel": "new"
       },
-      "problemMatcher": ["$deno"]
+      "problemMatcher": []
     },
     {
-      "label": "deno: check:fmt",
+      "label": "Dev: Full-Stack Debounced (1500ms)",
       "type": "shell",
-      "command": "deno",
-      "args": ["task", "check:fmt"],
+      "command": "deno task dev:debounced",
       "group": "build",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+        "panel": "new"
       },
-      "problemMatcher": ["$deno"]
+      "problemMatcher": []
     },
     {
-      "label": "deno: check:lint",
+      "label": "Dev: Clean Start",
       "type": "shell",
-      "command": "deno",
-      "args": ["task", "check:lint"],
+      "command": "deno task dev:clean",
       "group": "build",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+        "panel": "new"
       },
-      "problemMatcher": ["$deno"]
+      "problemMatcher": []
     },
     {
-      "label": "deno: check:types",
+      "label": "Kill: All Dev Servers",
       "type": "shell",
-      "command": "deno",
-      "args": ["task", "check:types"],
+      "command": "deno task kill",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Kill: Safe (Preserve LSP)",
+      "type": "shell",
+      "command": "deno task kill:safe",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Check Port Status",
+      "type": "shell",
+      "command": "deno task check:ports",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build: Production",
+      "type": "shell",
+      "command": "deno task build",
       "group": "build",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+        "panel": "new"
       },
-      "problemMatcher": ["$deno"]
+      "problemMatcher": []
     },
     {
-      "label": "deno: test:unit",
+      "label": "Build: Fast (No Check)",
       "type": "shell",
-      "command": "deno",
-      "args": ["task", "test:unit"],
+      "command": "deno task build:fast",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Check: All (Format, Lint, Types)",
+      "type": "shell",
+      "command": "deno task check",
       "group": "test",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
         "panel": "shared"
       },
-      "problemMatcher": ["$deno"]
+      "problemMatcher": []
     },
     {
-      "label": "deno: test:integration",
+      "label": "Test: Unit Tests",
       "type": "shell",
-      "command": "deno",
-      "args": ["task", "test:integration"],
+      "command": "deno task test:unit",
       "group": "test",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+        "panel": "new"
       },
-      "problemMatcher": ["$deno"]
+      "problemMatcher": []
     },
     {
-      "label": "deno: build",
+      "label": "Test: Integration Tests",
       "type": "shell",
-      "command": "deno",
-      "args": ["task", "build"],
-      "group": "build",
+      "command": "deno task test:integration",
+      "group": "test",
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+        "panel": "new"
       },
-      "problemMatcher": ["$deno"]
+      "problemMatcher": []
+    },
+    {
+      "label": "Monitor: Memory Usage",
+      "type": "shell",
+      "command": "deno task monitor:local",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Advanced: Dev Server Manager",
+      "type": "shell",
+      "command": "deno run --allow-all scripts/dev-server-manager.ts --debug --frontend-only",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
     }
   ]
 }

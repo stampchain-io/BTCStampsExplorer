@@ -1,114 +1,178 @@
 {
-  // === DENO CONFIGURATION ===
+  // === DENO CORE CONFIGURATION ===
   "deno.enable": true,
   "deno.lint": true,
   "deno.config": "./deno.json",
-  // Remove importMap since deno.json already contains imports
-  // "deno.importMap": "./deno.json",
-  // Enable unstable features to match deno.json tasks
+  // importMap is already in deno.json, no need to duplicate
+
+  // Enable unstable features required by the project
   "deno.unstable": ["byonm", "broadcast-channel", "temporal"],
-  // Disable lockfile since lock: false in deno.json
-  "deno.disablePaths": ["deno.lock"],
+
+  // Import host configuration for JSR and Deno imports
   "deno.suggest.imports.hosts": {
     "https://deno.land": true,
-    "https://jsr.io": true,     // Re-enable since you use jsr imports
-    "https://esm.sh": false,    // Keep disabled if still having issues
-    "https://cdn.nest.land": false,  // Not used in your imports
-    "https://crux.land": false       // Not used in your imports
+    "https://jsr.io": true,
+    "https://esm.sh": false,
+    "https://cdn.nest.land": false,
+    "https://crux.land": false
   },
-  "deno.suggest.imports.autoDiscover": false,  // Disable auto-discovery to prevent errors
+  "deno.suggest.imports.autoDiscover": false,
+
+  // Testing support
   "deno.codeLens.test": true,
   "deno.codeLens.testArgs": ["--allow-all", "--no-check"],
   "deno.testing.enable": true,
-  // Increase document preload limit to avoid warnings
+
+  // Performance optimizations
   "deno.documentPreloadLimit": 2000,
-  // Enable Deno 2.x cache on save for better performance
   "deno.cacheOnSave": true,
-  // Optimize performance by limiting scope
   "deno.enablePaths": [
     "./routes",
     "./components",
     "./islands",
     "./lib",
     "./server",
-    "./utils",
     "./client"
   ],
 
   // === TYPESCRIPT/JAVASCRIPT CONFIGURATION ===
   // Disable built-in TS/JS support in favor of Deno
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": false,
+  "typescript.validate.enable": false,
   "typescript.suggest.autoImports": false,
   "typescript.suggest.completeFunctionCalls": true,
-  "typescript.suggest.names": true,
-  "typescript.suggest.paths": true,
-  "typescript.validate.enable": false,
   "typescript.preferences.quoteStyle": "double",
-  "typescript.preferences.includePackageJsonAutoImports": "off",
+  "javascript.validate.enable": false,
   "javascript.suggest.autoImports": false,
   "javascript.suggest.completeFunctionCalls": true,
-  "javascript.suggest.names": true,
-  "javascript.suggest.paths": true,
-  "javascript.validate.enable": false,
   "javascript.preferences.quoteStyle": "double",
 
   // === EDITOR CONFIGURATION ===
-  "editor.defaultFormatter": "denoland.vscode-deno",
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
-  "editor.formatOnType": false,
-  "editor.tabSize": 2,
-  "editor.insertSpaces": true,
-  "editor.detectIndentation": false,
-  "editor.rulers": [80],
-  "editor.wordWrap": "bounded",
-  "editor.wordWrapColumn": 80,
+  "editor.defaultFormatter": "denoland.vscode-deno",
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit"
   },
-  "editor.bracketPairColorization.enabled": true,
-  "editor.guides.bracketPairs": true,
-  "editor.inlineSuggest.enabled": true,
-
-  // === FILE TYPE SPECIFIC FORMATTING ===
   "[typescript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.tabSize": 2
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.tabSize": 2
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "[javascript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.tabSize": 2
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "[javascriptreact]": {
-    "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.tabSize": 2
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "[json]": {
-    "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.tabSize": 2
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "[jsonc]": {
-    "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.tabSize": 2
-  },
-  "[markdown]": {
-    "editor.defaultFormatter": "yzhang.markdown-all-in-one",
-    "editor.wordWrap": "on",
-    "editor.rulers": []
-  },
-  "[yaml]": {
-    "editor.defaultFormatter": "redhat.vscode-yaml",
-    "editor.tabSize": 2
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
 
-  // === TERMINAL CONFIGURATION ===
+  // Exclude patterns
+  "files.exclude": {
+    "**/_fresh": true,
+    "**/node_modules": true,
+    "**/coverage": true,
+    "**/tmp": true,
+    "**/dist": true,
+    "**/.git": true,
+    "**/build": true,
+    "**/.cache": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/_fresh/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true,
+    "**/tmp/**": true
+  },
+
+  // Search exclusions
+  "search.exclude": {
+    "**/_fresh": true,
+    "**/node_modules": true,
+    "**/coverage": true,
+    "**/tmp": true,
+    "**/dist": true,
+    "**/vendor": true,
+    "**/build": true
+  },
+
+  // File associations
+  "files.associations": {
+    "*.ts": "typescript",
+    "*.tsx": "typescriptreact",
+    "deno.json": "jsonc",
+    "deno.jsonc": "jsonc"
+  },
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+
+  // Editor settings to match deno.json formatting
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.rulers": [80],
+  "editor.wordWrapColumn": 80,
+
+  // Terminal settings
+  "terminal.integrated.env.osx": {
+    "DENO_ENV": "development",
+    "DEV_BASE_URL": "http://localhost:8000",
+    "SKIP_REDIS_CONNECTION": "true"
+  },
+  "terminal.integrated.env.linux": {
+    "DENO_ENV": "development",
+    "DEV_BASE_URL": "http://localhost:8000",
+    "SKIP_REDIS_CONNECTION": "true"
+  },
+  "terminal.integrated.env.windows": {
+    "DENO_ENV": "development",
+    "DEV_BASE_URL": "http://localhost:8000",
+    "SKIP_REDIS_CONNECTION": "true"
+  },
+
+  // Quick suggestions for better development experience
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
+  // GitLens configuration to prevent terminal issues
+  "gitlens.advanced.fileHistoryFollowsRenames": false,
+  "gitlens.advanced.messages": {
+    "suppressFileNotUnderSourceControlWarning": true
+  },
+
+  // === TAILWIND CSS SUPPORT ===
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["tw`([^`]*)", "'([^']*)'"]
+  ],
+
+  // Debug Console Settings
+  "debug.console.fontSize": 12,
+  "debug.console.wordWrap": true,
+  "debug.internalConsoleOptions": "openOnSessionStart",
+  "debug.showInStatusBar": "always",
+  "debug.openDebug": "openOnSessionStart",
+
+  // Terminal Integration
   "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.defaultProfile.windows": "powershell",
+  "terminal.integrated.shellIntegration.enabled": true,
   "terminal.integrated.profiles.osx": {
     "zsh": {
       "path": "/bin/zsh",
@@ -119,133 +183,72 @@
       "args": ["-l"]
     }
   },
-  "terminal.integrated.shellIntegration.enabled": true,
   "terminal.integrated.enableMultiLinePasteWarning": false,
-  "terminal.integrated.allowWorkspaceConfiguration": true,
-  "terminal.integrated.cwd": "${workspaceFolder}",
 
-  // === FILES CONFIGURATION ===
-  "files.exclude": {
-    "**/.git": true,
-    "**/.DS_Store": true,
-    "**/node_modules": true,
-    "**/_fresh": true,
-    "**/dist": true,
-    "**/coverage": true,
-    "**/tmp": true,
-    "**/.cache": true,
-    "**/build": true,
-    "**/vendor": true
-  },
-  "files.watcherExclude": {
-    "**/.git/objects/**": true,
-    "**/.git/subtree-cache/**": true,
-    "**/node_modules/**": true,
-    "**/_fresh/**": true,
-    "**/dist/**": true,
-    "**/coverage/**": true,
-    "**/tmp/**": true,
-    "**/.cache/**": true,
-    "**/build/**": true,
-    "**/vendor/**": true
-  },
-  "files.associations": {
-    "*.tsx": "typescriptreact",
-    "*.ts": "typescript",
-    "deno.json": "jsonc",
-    "deno.jsonc": "jsonc"
-  },
-  "files.eol": "\n",
-  "files.insertFinalNewline": true,
-  "files.trimTrailingWhitespace": true,
-  "files.trimFinalNewlines": true,
+  // === DEVELOPER EXPERIENCE ===
+  // Editor enhancements
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.inlineSuggest.enabled": true,
+  "editor.wordWrap": "bounded",
+  "editor.detectIndentation": false,
+  
+  // Format on type can be useful but kept disabled to prevent conflicts
+  // "editor.formatOnType": false,
 
-  // === SEARCH CONFIGURATION ===
-  "search.exclude": {
-    "**/node_modules": true,
-    "**/_fresh": true,
-    "**/dist": true,
-    "**/coverage": true,
-    "**/tmp": true,
-    "**/.cache": true,
-    "**/build": true,
-    "**/vendor": true,
-    "**/*.log": true
+  // File type specific formatters
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one",
+    "editor.wordWrap": "on",
+    "editor.rulers": []
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.tabSize": 2
   },
 
-  // === TAILWIND CSS CONFIGURATION ===
-  "tailwindCSS.includeLanguages": {
-    "typescript": "javascript",
-    "typescriptreact": "javascript"
-  },
-  "tailwindCSS.experimental.classRegex": [
-    ["tw`([^`]*)", "'([^']*)'"],
-    ["tw=\"([^\"]*)\"", "'([^']*)'"],
-    ["tw={\"([^\"}]*)", "'([^']*)'"],
-    ["tw\\.\\w+`([^`]*)", "'([^']*)'"],
-    ["tw\\(.*?\\)`([^`]*)", "'([^']*)'"]
-  ],
-
-  // === GITLENS CONFIGURATION (to prevent terminal issues) ===
-  "gitlens.advanced.fileHistoryFollowsRenames": false,
-  "gitlens.advanced.fileHistoryShowAllBranches": false,
-  "gitlens.blame.ignoreWhitespace": true,
-  "gitlens.gitCommands.skipConfirmations": ["fetch:command", "stash-push:command"],
-  "gitlens.outputLevel": "warn",
-
-  // === TESTING CONFIGURATION ===
-  "testing.automaticallyOpenPeekView": "never",
-  "testing.openTesting": "neverOpen",
-
-  // === WORKSPACE SPECIFIC ===
+  // Workspace preferences
   "workbench.editor.enablePreview": false,
   "workbench.editor.enablePreviewFromQuickOpen": false,
-  "workbench.startupEditor": "none",
   "explorer.confirmDelete": false,
   "explorer.confirmDragAndDrop": false,
 
+  // Testing preferences
+  "testing.automaticallyOpenPeekView": "never",
+  "testing.openTesting": "neverOpen",
+
   // === SPELL CHECKER ===
   "cSpell.words": [
-    "deno",
-    "preact",
-    "tailwindcss",
-    "bitcoinjs",
-    "bigfloat",
     "axiod",
-    "sweetalert",
-    "qrcode",
+    "bigfloat",
+    "bitcoinjs",
+    "btcstamps",
+    "byonm",
+    "deno",
+    "fairmint",
+    "flatpickr",
+    "highcharts",
+    "msgpack",
+    "olga",
+    "preact",
+    "psbt",
     "puppeteer",
-    "screenshotone",
-    "stampchain",
+    "qrcode",
+    "redis",
+    "secp256k1",
     "src20",
     "src101",
-    "psbt",
+    "stampchain",
+    "stampsxcp",
+    "sweetalert",
+    "swiper",
+    "tailwindcss",
     "utxo",
-    "btcstamps",
-    "fairmint"
+    "utxos"
   ],
 
-  // === PERFORMANCE ===
+  // Performance optimization
   "extensions.experimental.affinity": {
     "denoland.vscode-deno": 1
-  },
-  "testing.automaticallyOpenTestResults": "neverOpen",
-  "folder-color.pathColors": [
-    {
-      "folderPath": "BTCStampsExplorer/routes/",
-      "color": "foldercolorizer.color_cc66ff"
-    },
-    {
-      "folderPath": "BTCStampsExplorer/islands/",
-      "color": "foldercolorizer.color_ffccff"
-    },
-    {
-      "folderPath": "BTCStampsExplorer/components/",
-      "color": "foldercolorizer.color_cc6633"
-    },
-    {
-      "folderPath": "BTCStampsExplorer/static/",
-      "color": "foldercolorizer.color_00cc99"
-    }
-  ]
+  }
 }

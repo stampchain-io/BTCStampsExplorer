@@ -1,0 +1,32 @@
+[
+  {
+    "key": "cmd+shift+k",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Kill: All Dev Servers"
+  },
+  {
+    "key": "cmd+shift+d cmd+shift+f",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Dev: Frontend Fast (500ms)"
+  },
+  {
+    "key": "cmd+shift+d cmd+shift+d",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Dev: Full-Stack Debounced (1500ms)"
+  },
+  {
+    "key": "cmd+shift+d cmd+shift+c",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Dev: Clean Start"
+  },
+  {
+    "key": "cmd+shift+t cmd+shift+u",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Test: Unit Tests"
+  },
+  {
+    "key": "cmd+shift+t cmd+shift+i",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Test: Integration Tests"
+  }
+]
