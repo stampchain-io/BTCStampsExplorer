@@ -8,7 +8,7 @@ import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
 } from "$server/services/validation/routeValidationService.ts";
-import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 import { StampService } from "$server/services/stampService.ts";
 
 /**
@@ -23,7 +23,9 @@ export const handler: Handlers = {
       const url = new URL(req.url);
 
       // Security check for internal endpoints
-      const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+      const originError = await InternalApiFrontendGuard.requireInternalAccess(
+        req,
+      );
       if (originError) {
         logger.warn("stamps", {
           message: "Origin validation failed for internal stamp recent_sales",

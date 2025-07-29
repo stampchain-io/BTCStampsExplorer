@@ -1,6 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { FileUploadService } from "$server/services/file/uploadService.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 import { SRC20BackgroundUpload } from "$lib/types/src20.ts";
 import { logger } from "$lib/utils/logger.ts";
@@ -29,7 +30,9 @@ export const handler: Handlers = {
         return csrfError;
       }
 
-      const originError = await InternalRouteGuard.requireTrustedOrigin(req);
+      const originError = await InternalApiFrontendGuard.requireInternalAccess(
+        req,
+      );
       if (originError) {
         logger.error("stamps", {
           message: "Origin validation failed",

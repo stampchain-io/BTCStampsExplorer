@@ -2,10 +2,14 @@ import { Handlers } from "$fresh/server.ts";
 import { SecurityService } from "$server/services/security/securityService.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 
 export const handler: Handlers = {
-  async GET(_req) {
+  async GET(req) {
     try {
+      // Security check for internal endpoints
+      const originError = InternalApiFrontendGuard.requireInternalAccess(req);
+      if (originError) return originError;
       const token = await SecurityService.generateCSRFToken();
 
       logger.debug("stamps", {

@@ -6,8 +6,13 @@ import { cloudWatchMonitoring } from "$server/services/aws/cloudWatchMonitoring.
 import { objectPoolManager } from "$server/services/memory/objectPool.ts";
 import { memoryMonitor } from "$server/services/monitoring/memoryMonitorService.ts";
 import process from "node:process";
+import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
 export async function handler(req: Request): Promise<Response> {
+  // Security check for internal endpoints
+  const accessError = InternalRouteGuard.requireAPIKey(req);
+  if (accessError) return accessError;
+
   try {
     const url = new URL(req.url);
     const action = url.searchParams.get("action") || "health";

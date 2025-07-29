@@ -1,9 +1,13 @@
 import { Handlers } from "$fresh/server.ts";
 import { BackgroundFeeService } from "$server/services/fee/backgroundFeeService.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 
 export const handler: Handlers = {
-  GET() {
+  GET(req) {
     try {
+      // Security check for internal endpoints
+      const originError = InternalApiFrontendGuard.requireInternalAccess(req);
+      if (originError) return originError;
       const status = BackgroundFeeService.getStatus();
 
       // Enhanced status with separate services information
@@ -48,6 +52,10 @@ export const handler: Handlers = {
 
   async POST(req) {
     try {
+      // Security check for internal endpoints
+      const originError = InternalApiFrontendGuard.requireInternalAccess(req);
+      if (originError) return originError;
+
       const body = await req.json();
       const action = body.action;
 

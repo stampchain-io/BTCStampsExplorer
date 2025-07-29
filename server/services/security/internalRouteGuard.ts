@@ -80,14 +80,15 @@ export class InternalRouteGuard {
   // For webhook routes
   static requireAPIKey(req: Request) {
     const apiKey = req.headers.get("X-API-Key");
-    const configApiKey = serverConfig.API_KEY;
+    // Use INTERNAL_API_KEY from environment instead of serverConfig.API_KEY
+    const configApiKey = Deno.env.get("INTERNAL_API_KEY");
 
     // Check if API key is not configured
     if (!configApiKey || configApiKey.trim() === '') {
-      console.error("API_KEY is not properly configured in server settings");
+      console.error("INTERNAL_API_KEY is not properly configured in environment");
       return ApiResponseUtil.internalError(
         "Configuration error",
-        "Server API key is not properly configured"
+        "Internal API key is not properly configured"
       );
     }
 

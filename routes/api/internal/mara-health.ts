@@ -13,6 +13,7 @@ import { FreshContext, Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { MaraSlipstreamService } from "$/server/services/mara/maraSlipstreamService.ts";
 import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
 
 interface MaraHealthResponse {
   /** Overall health status */
@@ -44,7 +45,17 @@ interface MaraHealthResponse {
 }
 
 export const handler: Handlers = {
-  GET(_req: Request, _ctx: FreshContext) {
+  GET(req: Request, _ctx: FreshContext) {
+    // Security check for internal endpoints
+    const originError = InternalApiFrontendGuard.requireInternalAccess(req);
+    if (originError) {
+      logger.warn("api", {
+        message: "Origin validation failed for internal mara-health",
+        origin: new URL(req.url).origin,
+      });
+      return originError;
+    }
+
     const timestamp = Date.now();
     const components = {
       enabled: false,
