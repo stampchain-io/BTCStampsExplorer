@@ -1041,7 +1041,7 @@ export class StampRepository {
     const result = await this.db.executeQueryWithCache(
       query,
       [address],
-      "never"
+      604800 // 1 week cache (7 days), will be invalidated on updates
     );
 
     if ((result as any) && (result as any).rows && (result as any).rows.length > 0) {
@@ -1067,7 +1067,14 @@ export class StampRepository {
         newName,
         newName,
       ]);
-      return (result as any).affectedRows > 0;
+      
+      // Invalidate creator cache after successful update
+      if ((result as any).affectedRows > 0) {
+        console.log(`[CACHE] Invalidating creator cache after update for address: ${address}`);
+        await this.db.invalidateCacheByCategory('creator');
+        return true;
+      }
+      return false;
     } catch (error) {
       console.error("Error updating creator name:", error);
       return false;
@@ -1261,10 +1268,10 @@ export class StampRepository {
     `;
 
     try {
-      const [result, countResult] = await Promise.all([
-        this.db.executeQueryWithCache(salesHistoryQuery, [limit, offset], 60), // 1 minute cache
-        this.db.executeQueryWithCache(salesHistoryCountQuery, [], 300) // 5 minute cache for count
-      ]);
+      // Execute queries sequentially to avoid connection pool exhaustion
+      // This prevents the connection leak that occurs when multiple queries run in parallel
+      const result = await this.db.executeQueryWithCache(salesHistoryQuery, [limit, offset], 60); // 1 minute cache
+      const countResult = await this.db.executeQueryWithCache(salesHistoryCountQuery, [], 300); // 5 minute cache for count
 
       const stamps = (result as any).rows || [];
       const total = (countResult as any).rows[0]?.total || 0;

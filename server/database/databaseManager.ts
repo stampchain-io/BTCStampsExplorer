@@ -858,10 +858,16 @@ class DatabaseManager {
       category = 'stamp_list';
     } else if (queryUpper.includes('STAMP_') || queryUpper.includes('stamps')) {
       category = 'stamp';
+    } else if (queryUpper.includes('RECENT') && queryUpper.includes('SALES')) {
+      category = 'recent_sales';
+    } else if (queryUpper.includes('BLOCK') && queryUpper.includes('TRANSACTION')) {
+      category = 'block_transactions';
     } else if (queryUpper.includes('BLOCK_') || queryUpper.includes('block')) {
       category = 'block';
     } else if (queryUpper.includes('TRANSACTION') || queryUpper.includes('tx_')) {
       category = 'transaction';
+    } else if (queryUpper.includes('CREATOR') || queryUpper.includes('FROM creator')) {
+      category = 'creator';
     }
 
     if (category) {
@@ -1205,6 +1211,108 @@ class DatabaseManager {
 
     // Clear the registry for this category
     this.#cacheKeyRegistry[category].clear();
+  }
+
+  /**
+   * Append new items to a cached list instead of invalidating
+   * Perfect for time-ordered data like recent sales or block transactions
+   */
+  public async appendToCachedList<T = any>(
+    category: string,
+    newItems: T[],
+    options: {
+      sortField?: string;
+      sortOrder?: 'ASC' | 'DESC';
+      dedupeField?: string;
+      maxItems?: number;
+    } = {}
+  ): Promise<void> {
+    if (!this.#redisAvailable || !this.#redisClient || newItems.length === 0) return;
+
+    const { sortField, sortOrder = 'DESC', dedupeField, maxItems } = options;
+
+    try {
+      const keys = this.#cacheKeyRegistry[category];
+      if (!keys || keys.size === 0) {
+        console.log(`[CACHE APPEND] No cached keys found for category: ${category}`);
+        return;
+      }
+
+      console.log(`[CACHE APPEND] Appending ${newItems.length} items to ${keys.size} cached lists in category: ${category}`);
+
+      for (const cacheKey of keys) {
+        try {
+          const existingData = await this.#redisClient.get(cacheKey);
+          if (!existingData) continue;
+
+          const parsed = JSON.parse(existingData);
+          if (!parsed.data || !Array.isArray(parsed.data)) continue;
+
+          // Append new items
+          const updatedData = [...parsed.data, ...newItems];
+
+          // Remove duplicates if deduplication field specified
+          let finalData = updatedData;
+          if (dedupeField) {
+            const seen = new Set();
+            finalData = updatedData.filter(item => {
+              const key = item[dedupeField];
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+          }
+
+          // Sort if needed
+          if (sortField && finalData[0]?.[sortField] !== undefined) {
+            finalData.sort((a, b) => {
+              const aVal = a[sortField];
+              const bVal = b[sortField];
+              if (sortOrder === 'ASC') {
+                return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+              } else {
+                return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+              }
+            });
+          }
+
+          // Limit items if maxItems specified (keep most recent)
+          if (maxItems && finalData.length > maxItems) {
+            finalData = sortOrder === 'DESC' 
+              ? finalData.slice(0, maxItems)
+              : finalData.slice(-maxItems);
+          }
+
+          // Update the cached data
+          parsed.data = finalData;
+
+          // Update total count if present
+          if (typeof parsed.total === 'number') {
+            parsed.total = finalData.length;
+          }
+
+          // Preserve TTL
+          const ttl = await this.#redisClient.ttl(cacheKey);
+          await this.#redisClient.set(cacheKey, JSON.stringify(parsed));
+          if (ttl > 0) {
+            await this.#redisClient.expire(cacheKey, ttl);
+          }
+
+          console.log(`[CACHE APPEND] Successfully updated cache key: ${cacheKey.substring(0, 20)}...`);
+        } catch (error) {
+          console.error(`Error appending to cache key ${cacheKey}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error(`Error in appendToCachedList for category ${category}:`, error);
+    }
+  }
+
+  /**
+   * Get all cache keys for a specific category
+   */
+  public getCacheKeysByCategory(category: string): Set<string> {
+    return this.#cacheKeyRegistry[category] || new Set();
   }
 
   /**

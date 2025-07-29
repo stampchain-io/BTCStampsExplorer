@@ -294,7 +294,6 @@ export function SRC20MintTool({
     isConnected: !!wallet && !isSubmitting,
     isSubmitting,
     // SRC-20 mint specific parameters
-    op: "MINT",
     tick: formState.token,
     amt: formState.amt,
   });

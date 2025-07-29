@@ -13,7 +13,6 @@ import { FreshContext, Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { MaraSlipstreamService } from "$/server/services/mara/maraSlipstreamService.ts";
 import { logger } from "$lib/utils/monitoring/logging/logger.ts";
-import { isMaraEnabled } from "$/server/utils/mara/maraFeatureFlag.ts";
 
 interface MaraHealthResponse {
   /** Overall health status */
@@ -62,11 +61,8 @@ export const handler: Handlers = {
     let overallStatus: "healthy" | "degraded" | "unhealthy" = "unhealthy";
 
     try {
-      // Check if MARA is enabled
-      components.enabled = isMaraEnabled();
-      if (!components.enabled) {
-        details.push("MARA integration is disabled");
-      }
+      // MARA is always available - activation depends on user providing outputValue
+      components.enabled = true;
 
       // Check if service is configured
       components.configured = MaraSlipstreamService.isConfigured();

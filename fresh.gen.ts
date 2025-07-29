@@ -24,6 +24,8 @@ import * as $api_internal_mara_fee_rate from "./routes/api/internal/mara-fee-rat
 import * as $api_internal_mara_health from "./routes/api/internal/mara-health.ts";
 import * as $api_internal_mara_submit from "./routes/api/internal/mara-submit.ts";
 import * as $api_internal_monitoring from "./routes/api/internal/monitoring.ts";
+import * as $api_internal_purge_creator_cache from "./routes/api/internal/purge-creator-cache.ts";
+import * as $api_internal_reset_connection_pool from "./routes/api/internal/reset-connection-pool.ts";
 import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
 import * as $api_internal_stamp_recent_sales from "./routes/api/internal/stamp-recent-sales.ts";
 import * as $api_internal_test_reset_circuit_breakers from "./routes/api/internal/test-reset-circuit-breakers.ts";
@@ -94,6 +96,7 @@ import * as $api_v2_trx_create_psbt from "./routes/api/v2/trx/create_psbt.ts";
 import * as $api_v2_trx_stampattach from "./routes/api/v2/trx/stampattach.ts";
 import * as $api_v2_trx_stampdetach from "./routes/api/v2/trx/stampdetach.ts";
 import * as $api_v2_utxo_ancestors_address_ from "./routes/api/v2/utxo/ancestors/[address].ts";
+import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $api_v2_versions_changelog from "./routes/api/v2/versions/changelog.ts";
 import * as $api_v2_versions_index from "./routes/api/v2/versions/index.ts";
 import * as $block_block_index_ from "./routes/block/[block_index].tsx";
@@ -322,6 +325,10 @@ const manifest = {
     "./routes/api/internal/mara-health.ts": $api_internal_mara_health,
     "./routes/api/internal/mara-submit.ts": $api_internal_mara_submit,
     "./routes/api/internal/monitoring.ts": $api_internal_monitoring,
+    "./routes/api/internal/purge-creator-cache.ts":
+      $api_internal_purge_creator_cache,
+    "./routes/api/internal/reset-connection-pool.ts":
+      $api_internal_reset_connection_pool,
     "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
     "./routes/api/internal/stamp-recent-sales.ts":
       $api_internal_stamp_recent_sales,
@@ -417,6 +424,7 @@ const manifest = {
     "./routes/api/v2/trx/stampdetach.ts": $api_v2_trx_stampdetach,
     "./routes/api/v2/utxo/ancestors/[address].ts":
       $api_v2_utxo_ancestors_address_,
+    "./routes/api/v2/version.ts": $api_v2_version,
     "./routes/api/v2/versions/changelog.ts": $api_v2_versions_changelog,
     "./routes/api/v2/versions/index.ts": $api_v2_versions_index,
     "./routes/block/[block_index].tsx": $block_block_index_,

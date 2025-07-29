@@ -9,7 +9,6 @@ import { FreshContext, Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { MaraSlipstreamService } from "$/server/services/mara/maraSlipstreamService.ts";
 import { logger } from "$lib/utils/monitoring/logging/logger.ts";
-import { isMaraEnabled } from "$/server/utils/mara/maraFeatureFlag.ts";
 
 interface MaraFeeRateResponse {
   /** Current fee rate in sats/vB */
@@ -25,15 +24,7 @@ interface MaraFeeRateResponse {
 export const handler: Handlers = {
   async GET(_req: Request, _ctx: FreshContext) {
     try {
-      // Check if MARA integration is enabled
-      if (!isMaraEnabled()) {
-        logger.warn("api", {
-          message: "MARA fee rate requested but integration is disabled",
-        });
-        return ApiResponseUtil.badRequest(
-          "MARA integration is not enabled",
-        );
-      }
+      // MARA is always available - activation depends on user providing outputValue
 
       // Check if MARA service is available
       if (!MaraSlipstreamService.isAvailable()) {
@@ -60,7 +51,7 @@ export const handler: Handlers = {
       // Format response with pool identifier
       const response: MaraFeeRateResponse = {
         fee_rate: feeRateData.fee_rate,
-        min_fee_rate: feeRateData.min_fee_rate,
+        min_fee_rate: feeRateData.min_fee_rate ?? feeRateData.fee_rate,
         timestamp: Date.now(),
         pool: "mara",
       };

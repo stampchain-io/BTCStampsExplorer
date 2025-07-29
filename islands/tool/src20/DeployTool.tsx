@@ -74,7 +74,7 @@ export function SRC20DeployTool(
     tick: formState.token,
     max: formState.max,
     lim: formState.lim,
-    dec: formState.dec,
+    dec: formState.dec ? parseInt(formState.dec, 10) : 18,
   });
 
   // Get the best available fee estimate
@@ -485,16 +485,17 @@ export function SRC20DeployTool(
         <div
           class={`overflow-hidden transition-all duration-500 ${
             showAdvancedOptions
-              ? "max-h-[250px] opacity-100 mt-5"
+              ? "max-h-[300px] opacity-100 mt-5"
               : "max-h-0 opacity-0 mt-0"
           }`}
         >
           <div class={containerColForm}>
             <textarea
-              type="text"
               class={`${inputTextarea} scrollbar-grey`}
               placeholder="Description"
               rows={3}
+              value={formState.description || ""}
+              onChange={(e) => handleInputChange(e, "description")}
             />
             <div class={containerRowForm}>
               <SRC20InputField
@@ -506,7 +507,7 @@ export function SRC20DeployTool(
               />
               <SRC20InputField
                 type="text"
-                placeholder="Website"
+                placeholder="Website (e.g., example.com)"
                 value={formState.web}
                 onChange={(e) => handleInputChange(e, "web")}
               />
@@ -525,6 +526,21 @@ export function SRC20DeployTool(
                 onChange={(e) => handleInputChange(e, "email")}
               />
             </div>
+            <SRC20InputField
+              type="text"
+              placeholder="IMAGE"
+              value={formState.img || ""}
+              onChange={(e) => {
+                const value = (e.target as HTMLInputElement).value;
+                // If it's an st: reference and longer than allowed, normalize it
+                if (value.startsWith("st:") && value.length > 23) {
+                  const normalizedValue = `st:${value.substring(3, 23)}`;
+                  (e.target as HTMLInputElement).value = normalizedValue;
+                }
+                handleInputChange(e, "img");
+              }}
+              maxLength={32}
+            />
           </div>
         </div>
       </form>

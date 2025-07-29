@@ -1,5 +1,6 @@
 import { PaginationQueryParams } from "$lib/types/pagination.d.ts";
 import { MAX_PAGINATION_LIMIT } from "$constants";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 
 export function getPaginationParams(
   url: URL,
@@ -24,15 +25,15 @@ export function getPaginationParams(
 
   // Validate numeric parameters
   if (isNaN(limit) || limit < 1) {
-    return new Response("Invalid limit parameter", { status: 400 });
+    return ApiResponseUtil.badRequest("Invalid limit parameter");
   }
   if (limit > MAX_PAGINATION_LIMIT) {
-    return new Response(`Limit cannot exceed ${MAX_PAGINATION_LIMIT}`, {
-      status: 400,
-    });
+    return ApiResponseUtil.badRequest(
+      `Limit cannot exceed ${MAX_PAGINATION_LIMIT}`,
+    );
   }
   if (isNaN(page) || page < 1) {
-    return new Response("Invalid page parameter", { status: 400 });
+    return ApiResponseUtil.badRequest("Invalid page parameter");
   }
 
   return { limit, page };

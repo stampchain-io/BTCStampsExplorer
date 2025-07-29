@@ -399,7 +399,7 @@ export const createStampHandler = (
       const errorMessage = routeConfig.isIndex
         ? `Error fetching paginated ${routeConfig.type}`
         : `Error fetching stamp details for ID ${ctx.params.id}`;
-      return ApiResponseUtil.success({ error: errorMessage }, { status: 500 });
+      return ApiResponseUtil.internalError(error, errorMessage);
     }
   },
 });

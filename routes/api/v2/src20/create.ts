@@ -57,12 +57,52 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
         return ApiResponseUtil.badRequest("Invalid JSON in request body");
       }
 
+      // Debug logging to see what's being received
+      logger.debug("api-src20-create", {
+        message: "Received SRC20 create request",
+        body: {
+          op: body.op,
+          tick: body.tick,
+          sourceAddress: body.sourceAddress,
+          fromAddress: body.fromAddress,
+          changeAddress: body.changeAddress,
+          hasOp: !!body.op,
+          hasTick: !!body.tick,
+          hasAnyAddress:
+            !!(body.sourceAddress || body.fromAddress || body.changeAddress),
+        },
+      });
+
       if (
         !body.op || !body.tick ||
         !(body.sourceAddress || body.fromAddress || body.changeAddress)
       ) {
+        logger.error("api-src20-create", {
+          message: "Missing required fields",
+          missingOp: !body.op,
+          missingTick: !body.tick,
+          missingAddress:
+            !(body.sourceAddress || body.fromAddress || body.changeAddress),
+          addresses: {
+            sourceAddress: body.sourceAddress || "not provided",
+            fromAddress: body.fromAddress || "not provided",
+            changeAddress: body.changeAddress || "not provided",
+          },
+        });
+
+        const missingFields = [];
+        if (!body.op) missingFields.push("op");
+        if (!body.tick) missingFields.push("tick");
+        if (!(body.sourceAddress || body.fromAddress || body.changeAddress)) {
+          missingFields.push(
+            "address (sourceAddress, fromAddress, or changeAddress)",
+          );
+        }
+
         return ApiResponseUtil.badRequest(
-          "Missing required SRC20 operation fields: op, tick, or an address.",
+          `Missing required SRC20 fields: ${
+            missingFields.join(", ")
+          }. Please ensure your wallet is connected.`,
         );
       }
 
@@ -129,23 +169,27 @@ export const handler: Handlers<SRC20CreateResponse | TXError> = {
 
       // Simple image validation
       if (body.img) {
-        const { validateImageReference } = await import(
-          "$lib/utils/imageProtocolUtils.ts"
-        );
+        const { validateImageReference, normalizeImageReference } =
+          await import(
+            "$lib/utils/data/protocols/imageProtocolUtils.ts"
+          );
+        // Normalize first (truncates st: hashes to 20 chars if needed)
+        body.img = normalizeImageReference(body.img);
+
         if (!validateImageReference(body.img)) {
           return ApiResponseUtil.badRequest(
-            "Invalid img format. Use protocol:hash format (max 32 chars). Supported protocols: ar, ipfs, fc, ord",
+            "Invalid img format. Use protocol:hash format (max 32 chars). Supported protocols: ar, ipfs, fc, ord, st",
           );
         }
       }
 
       if (body.icon) {
         const { validateImageReference } = await import(
-          "$lib/utils/imageProtocolUtils.ts"
+          "$lib/utils/data/protocols/imageProtocolUtils.ts"
         );
         if (!validateImageReference(body.icon)) {
           return ApiResponseUtil.badRequest(
-            "Invalid icon format. Use protocol:hash format (max 32 chars). Supported protocols: ar, ipfs, fc, ord",
+            "Invalid icon format. Use protocol:hash format (max 32 chars). Supported protocols: ar, ipfs, fc, ord, st",
           );
         }
       }

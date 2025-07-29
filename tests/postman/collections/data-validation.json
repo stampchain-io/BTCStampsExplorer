@@ -1,0 +1,714 @@
+{
+  "info": {
+    "name": "BTC Stamps Explorer API - Data Validation Tests",
+    "description": "Tests that validate actual data content, sorting, and counts between development and production",
+    "_postman_id": "data-validation-tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Data Discovery",
+      "item": [
+        {
+          "name": "Discover SRC-101 Deploy Hash",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Response has valid structure', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "// Store first valid deploy hash for subsequent tests",
+                  "if (jsonData.data && jsonData.data.length > 0 && jsonData.data[0].deploy_hash) {",
+                  "    const deployHash = jsonData.data[0].deploy_hash;",
+                  "    pm.environment.set('real_src101_deploy_hash', deployHash);",
+                  "    console.log('Found SRC-101 deploy hash:', deployHash);",
+                  "    ",
+                  "    // Store additional test data",
+                  "    if (jsonData.data[0].creator) {",
+                  "        pm.environment.set('real_src101_creator', jsonData.data[0].creator);",
+                  "    }",
+                  "    if (jsonData.data[0].tx_hash) {",
+                  "        pm.environment.set('real_src101_tx_hash', jsonData.data[0].tx_hash);",
+                  "    }",
+                  "} else {",
+                  "    console.log('No SRC-101 data found in development');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src101?limit=10",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stamps Data Validation",
+      "item": [
+        {
+          "name": "Compare Stamps List Sorting - Dev",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Response is valid', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "// Store dev results for comparison",
+                  "pm.environment.set('dev_stamps_data', JSON.stringify(jsonData));",
+                  "",
+                  "// Validate default sorting (should be by stamp ID descending)",
+                  "pm.test('Default sorting is by stamp ID descending', function () {",
+                  "    if (jsonData.data && jsonData.data.length > 1) {",
+                  "        for (let i = 0; i < jsonData.data.length - 1; i++) {",
+                  "            pm.expect(jsonData.data[i].stamp).to.be.above(jsonData.data[i + 1].stamp);",
+                  "        }",
+                  "    }",
+                  "});",
+                  "",
+                  "// Store first few stamp IDs for comparison",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    const stampIds = jsonData.data.map(s => s.stamp);",
+                  "    console.log('Dev stamp IDs (first 10):', stampIds.join(', '));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/stamps?limit=10",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Compare Stamps List Sorting - Prod",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Response is valid', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const prodData = pm.response.json();",
+                  "const devData = JSON.parse(pm.environment.get('dev_stamps_data') || '{}');",
+                  "",
+                  "// Compare stamp IDs between dev and prod",
+                  "pm.test('First stamps match between dev and prod', function () {",
+                  "    if (devData.data && prodData.data && devData.data.length > 0 && prodData.data.length > 0) {",
+                  "        const devIds = devData.data.map(s => s.stamp);",
+                  "        const prodIds = prodData.data.map(s => s.stamp);",
+                  "        ",
+                  "        console.log('Dev stamp IDs:', devIds.slice(0, 5).join(', '));",
+                  "        console.log('Prod stamp IDs:', prodIds.slice(0, 5).join(', '));",
+                  "        ",
+                  "        // At least the first stamp should match (newest)",
+                  "        pm.expect(devIds[0]).to.equal(prodIds[0], 'First stamp ID should match');",
+                  "    }",
+                  "});",
+                  "",
+                  "// Validate prod sorting",
+                  "pm.test('Prod sorting is by stamp ID descending', function () {",
+                  "    if (prodData.data && prodData.data.length > 1) {",
+                  "        for (let i = 0; i < prodData.data.length - 1; i++) {",
+                  "            pm.expect(prodData.data[i].stamp).to.be.above(prodData.data[i + 1].stamp);",
+                  "        }",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/stamps?limit=10",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SRC-20 Data Validation",
+      "item": [
+        {
+          "name": "Compare SRC-20 Ticks Count - Dev",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Response is valid', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "// Store total count",
+                  "if (jsonData.total) {",
+                  "    pm.environment.set('dev_src20_total', jsonData.total);",
+                  "    console.log('Dev SRC-20 total ticks:', jsonData.total);",
+                  "}",
+                  "",
+                  "// Store tick names for comparison",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    const ticks = jsonData.data.map(t => t.tick).filter(Boolean);",
+                  "    pm.environment.set('dev_src20_ticks', JSON.stringify(ticks));",
+                  "    console.log('Dev SRC-20 ticks (sample):', ticks.slice(0, 5).join(', '));",
+                  "}",
+                  "",
+                  "// Validate data has expected fields",
+                  "pm.test('SRC-20 data has required fields', function () {",
+                  "    if (jsonData.data && jsonData.data.length > 0) {",
+                  "        const firstTick = jsonData.data[0];",
+                  "        pm.expect(firstTick).to.have.property('tick');",
+                  "        pm.expect(firstTick).to.have.property('max');  // Fixed: was checking for max_supply",
+                  "        // Note: total_minted is not part of Src20Detail schema",
+                  "        pm.expect(firstTick).to.have.property('amt');",
+                  "        pm.expect(firstTick).to.have.property('lim');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src20/tick?limit=20",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "tick"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Compare SRC-20 Ticks Count - Prod",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Response is valid', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const prodData = pm.response.json();",
+                  "const devTotal = pm.environment.get('dev_src20_total');",
+                  "const devTicks = JSON.parse(pm.environment.get('dev_src20_ticks') || '[]');",
+                  "",
+                  "// Compare totals",
+                  "pm.test('SRC-20 total count is similar between environments', function () {",
+                  "    if (devTotal && prodData.total) {",
+                  "        const diff = Math.abs(prodData.total - devTotal);",
+                  "        console.log(`Dev total: ${devTotal}, Prod total: ${prodData.total}, Difference: ${diff}`);",
+                  "        ",
+                  "        // Allow some difference as new ticks may be created",
+                  "        pm.expect(diff).to.be.below(100, 'Total count difference should be reasonable');",
+                  "    }",
+                  "});",
+                  "",
+                  "// Compare tick names",
+                  "pm.test('Common SRC-20 ticks exist in both environments', function () {",
+                  "    if (prodData.data && prodData.data.length > 0) {",
+                  "        const prodTicks = prodData.data.map(t => t.tick).filter(Boolean);",
+                  "        ",
+                  "        // Check that common ticks like STAMP exist in both",
+                  "        const commonTicks = ['STAMP', 'KEVIN', 'SRC20'];",
+                  "        commonTicks.forEach(tick => {",
+                  "            if (devTicks.includes(tick)) {",
+                  "                pm.expect(prodTicks).to.include(tick, `${tick} should exist in both environments`);",
+                  "            }",
+                  "        });",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src20/tick?limit=20",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src20",
+                "tick"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SRC-101 Data Validation",
+      "item": [
+        {
+          "name": "Test Real SRC-101 Deploy - Dev",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Use discovered deploy hash or fallback",
+                  "const deployHash = pm.environment.get('real_src101_deploy_hash') || '77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed';",
+                  "pm.variables.set('test_deploy_hash', deployHash);",
+                  "console.log('Testing with deploy hash:', deployHash);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const deployHash = pm.variables.get('test_deploy_hash');",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Response is valid', function () {",
+                  "        pm.response.to.be.json;",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('data');",
+                  "    });",
+                  "    ",
+                  "    // Store data for comparison",
+                  "    pm.environment.set('dev_src101_deploy_data', pm.response.text());",
+                  "} else if (pm.response.code === 404) {",
+                  "    console.log(`Deploy hash ${deployHash} not found in dev`);",
+                  "    pm.test.skip('Deploy hash not found in dev environment');",
+                  "} else {",
+                  "    pm.test('Unexpected response code', function () {",
+                  "        pm.expect.fail(`Got ${pm.response.code} for deploy hash ${deployHash}`);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{dev_base_url}}/api/v2/src101/{{test_deploy_hash}}/deploy",
+              "host": [
+                "{{dev_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}",
+                "deploy"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Test Real SRC-101 Deploy - Prod",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Use same deploy hash as dev test",
+                  "const deployHash = pm.environment.get('real_src101_deploy_hash') || '77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed';",
+                  "pm.variables.set('test_deploy_hash', deployHash);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const deployHash = pm.variables.get('test_deploy_hash');",
+                  "const devData = pm.environment.get('dev_src101_deploy_data');",
+                  "",
+                  "if (pm.response.code === 200 && devData) {",
+                  "    pm.test('Data consistency between dev and prod', function () {",
+                  "        const prodData = pm.response.json();",
+                  "        const devDataParsed = JSON.parse(devData);",
+                  "        ",
+                  "        // Compare key fields if both have data",
+                  "        if (devDataParsed.data && prodData.data) {",
+                  "            // Check total count",
+                  "            if (devDataParsed.total && prodData.total) {",
+                  "                console.log(`Dev total: ${devDataParsed.total}, Prod total: ${prodData.total}`);",
+                  "            }",
+                  "            ",
+                  "            // For deployments, the data should be identical",
+                  "            pm.expect(prodData.data.length).to.equal(devDataParsed.data.length, 'Deploy data count should match');",
+                  "        }",
+                  "    });",
+                  "} else if (pm.response.code === 404) {",
+                  "    console.log(`Deploy hash ${deployHash} not found in prod`);",
+                  "    pm.test.skip('Deploy hash not found in prod environment');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{prod_base_url}}/api/v2/src101/{{test_deploy_hash}}/deploy",
+              "host": [
+                "{{prod_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "src101",
+                "{{test_deploy_hash}}",
+                "deploy"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pagination Data Validation",
+      "item": [
+        {
+          "name": "Validate Stamps Pagination Consistency",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Response is valid', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const page1 = pm.response.json();",
+                  "",
+                  "pm.test('Pagination data is consistent', function () {",
+                  "    // Check page 1 data",
+                  "    pm.expect(page1.page).to.equal(1);",
+                  "    pm.expect(page1.limit).to.equal(5);",
+                  "    pm.expect(page1.data.length).to.equal(5);",
+                  "    ",
+                  "    // Validate totalPages calculation",
+                  "    const expectedPages = Math.ceil(page1.total / page1.limit);",
+                  "    pm.expect(page1.totalPages).to.equal(expectedPages, 'totalPages calculation should be correct');",
+                  "});",
+                  "",
+                  "// Store last stamp ID from page 1",
+                  "if (page1.data && page1.data.length > 0) {",
+                  "    const lastStampId = page1.data[page1.data.length - 1].stamp;",
+                  "    pm.environment.set('page1_last_stamp', lastStampId);",
+                  "    console.log('Page 1 last stamp ID:', lastStampId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Validate Stamps Pagination Page 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Response is valid', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const page2 = pm.response.json();",
+                  "const page1LastStamp = pm.environment.get('page1_last_stamp');",
+                  "",
+                  "pm.test('Page 2 data is correct', function () {",
+                  "    pm.expect(page2.page).to.equal(2);",
+                  "    pm.expect(page2.limit).to.equal(5);",
+                  "    pm.expect(page2.data.length).to.equal(5);",
+                  "});",
+                  "",
+                  "pm.test('No duplicate stamps between pages', function () {",
+                  "    if (page1LastStamp && page2.data && page2.data.length > 0) {",
+                  "        const page2FirstStamp = page2.data[0].stamp;",
+                  "        console.log(`Page 1 last: ${page1LastStamp}, Page 2 first: ${page2FirstStamp}`);",
+                  "        ",
+                  "        // Page 2 first stamp should be different from page 1 last stamp",
+                  "        pm.expect(page2FirstStamp).to.not.equal(page1LastStamp);",
+                  "        ",
+                  "        // Since default sort is descending, page 2 first should be less than page 1 last",
+                  "        pm.expect(page2FirstStamp).to.be.below(parseInt(page1LastStamp));",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/stamps?page=2&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "stamps"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "2"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Initialize test data if not already set",
+          "if (!pm.environment.get('test_address')) {",
+          "    pm.environment.set('test_address', 'bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq');",
+          "}",
+          "",
+          "if (!pm.environment.get('test_stamp_id')) {",
+          "    pm.environment.set('test_stamp_id', '1135630');",
+          "}",
+          "",
+          "if (!pm.environment.get('test_src20_tick')) {",
+          "    pm.environment.set('test_src20_tick', 'STAMP');",
+          "}",
+          "",
+          "// Set base_url based on current request",
+          "const url = pm.request.url.toString();",
+          "if (url.includes('{{dev_base_url}}')) {",
+          "    pm.environment.set('base_url', pm.environment.get('dev_base_url'));",
+          "} else if (url.includes('{{prod_base_url}}')) {",
+          "    pm.environment.set('base_url', pm.environment.get('prod_base_url'));",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Common test utilities",
+          "pm.test('Response time is acceptable', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "pm.test('Response has valid JSON', function () {",
+          "    pm.expect(() => pm.response.json()).to.not.throw();",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "test_address",
+      "value": "bc1qzxszplp8v7w0jc89dlrqyct9staqlhwxzy7lkq",
+      "type": "string"
+    },
+    {
+      "key": "test_stamp_id",
+      "value": "1135630",
+      "type": "string"
+    },
+    {
+      "key": "test_src20_tick",
+      "value": "STAMP",
+      "type": "string"
+    },
+    {
+      "key": "test_block",
+      "value": "903108",
+      "type": "string"
+    }
+  ]
+}
