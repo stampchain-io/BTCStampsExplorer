@@ -288,6 +288,9 @@ export default function Home({ data }: PageProps<HomePageData>) {
       {/* Preload carousel CSS for above-fold content */}
       <link rel="preload" href="/carousel.css" as="style" />
       <link rel="stylesheet" href="/carousel.css" />
+      {/* Homepage animation optimizations */}
+      <link rel="preload" href="/homepage-animations.css" as="style" />
+      <link rel="stylesheet" href="/homepage-animations.css" />
       {/* Load Micro5 font only when needed */}
       <Micro5FontLoader />
 
