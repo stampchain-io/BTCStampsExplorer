@@ -128,9 +128,10 @@ async function writeToFile(data: string) {
   // Don't write files during tests to avoid async leaks, unless file operations are mocked
   if (isTestEnvironment()) {
     try {
-      const writeTextFileStr = (globalThis.Deno as any)?.writeTextFile?.toString?.();
+      const writeTextFileStr = (globalThis.Deno as any)?.writeTextFile
+        ?.toString?.();
       // If writeTextFile is mocked (doesn't contain 'native code'), allow file operations for testing
-      if (!writeTextFileStr || writeTextFileStr.includes('[native code]')) {
+      if (!writeTextFileStr || writeTextFileStr.includes("[native code]")) {
         return; // Exit early for real file operations during tests
       }
     } catch {
