@@ -183,3 +183,9 @@ coverage_compression*/*
 
 coverage_report.json
 ssr-safety-report.json
+
+.vscode
+
+# Task files
+# tasks.json
+# tasks/ 
