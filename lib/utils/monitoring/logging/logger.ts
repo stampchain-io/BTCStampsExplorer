@@ -105,23 +105,28 @@ function shouldLog(namespace: LogNamespace): boolean {
 const LOG_DIR = "./logs";
 const LOG_FILE = `${LOG_DIR}/app.log`;
 
+function isTestEnvironment(): boolean {
+  try {
+    return Deno.env.get("DENO_ENV") === "test";
+  } catch {
+    return false;
+  }
+}
+
 async function writeToFile(data: string) {
   if (!isServer()) return;
 
   let isDevelopment = false;
-  let isTest = false;
   try {
     const denoEnv = Deno.env.get("DENO_ENV");
     isDevelopment = denoEnv === "development";
-    isTest = denoEnv === "test";
   } catch {
     // Environment access not available, assume production mode
     isDevelopment = false;
-    isTest = false;
   }
 
   // Don't write files during tests to avoid async leaks, unless file operations are mocked
-  if (isTest) {
+  if (isTestEnvironment()) {
     try {
       const writeTextFileStr = (globalThis.Deno as any)?.writeTextFile?.toString?.();
       // If writeTextFile is mocked (doesn't contain 'native code'), allow file operations for testing
@@ -186,7 +191,10 @@ export const logger = {
     // Always write to file on server if namespace is enabled
     if (shouldLog(namespace)) {
       console.debug(formatted);
-      writeToFile(formatted);
+      // In test environment, skip file operations to prevent leaks
+      if (!isTestEnvironment()) {
+        writeToFile(formatted); // Fire-and-forget in production
+      }
     }
   },
 
@@ -201,7 +209,10 @@ export const logger = {
 
     const formatted = JSON.stringify(logData, bigIntReplacer, 2);
     console.error(formatted);
-    writeToFile(formatted);
+    // In test environment, skip file operations to prevent leaks
+    if (!isTestEnvironment()) {
+      writeToFile(formatted); // Fire-and-forget in production
+    }
   },
 
   info: (namespace: LogNamespace, msg: LogMessage) => {
@@ -219,7 +230,10 @@ export const logger = {
     if (shouldLog(namespace)) {
       console.info(formatted);
     }
-    writeToFile(formatted);
+    // In test environment, skip file operations to prevent leaks
+    if (!isTestEnvironment()) {
+      writeToFile(formatted); // Fire-and-forget in production
+    }
   },
 
   warn: (namespace: LogNamespace, msg: LogMessage) => {
@@ -233,6 +247,9 @@ export const logger = {
 
     const formatted = JSON.stringify(logData, bigIntReplacer, 2);
     console.warn(formatted);
-    writeToFile(formatted);
+    // In test environment, skip file operations to prevent leaks
+    if (!isTestEnvironment()) {
+      writeToFile(formatted); // Fire-and-forget in production
+    }
   },
 };
