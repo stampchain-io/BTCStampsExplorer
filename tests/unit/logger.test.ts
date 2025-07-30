@@ -207,8 +207,11 @@ Deno.test("logger - multiple namespaces in DEBUG", () => {
   teardown();
 });
 
-Deno.test("logger - client-side behavior simulation", () => {
+Deno.test("logger - client-side behavior simulation", async () => {
   setup();
+
+  // Wait for any pending async operations to complete before modifying Deno
+  await new Promise(resolve => setTimeout(resolve, 50));
 
   // Temporarily remove Deno to simulate client environment
   // @ts-ignore - Intentionally modifying global
