@@ -39,7 +39,7 @@
     "check:responses": "deno run --allow-read scripts/check-manual-responses.ts",
     "check:responses:fix": "deno run --allow-read scripts/check-manual-responses.ts || echo \"Found manual Response usage - see suggestions above\"",
     "test:all": "deno task test:unit && deno task test:integration",
-    "test:unit": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-read --allow-write --allow-env --allow-run unit/ --no-check",
+    "test:unit": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-read --allow-write --allow-env --allow-run unit/ --no-check --parallel",
     "test:unit:ci": "./scripts/run-tests-ci.sh",
     "test:unit:coverage": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-read --allow-write --allow-env --allow-run unit/ --coverage=../coverage/ --no-check && cd .. && deno coverage coverage/ --exclude='tests/' --exclude='mockDatabaseManager' --exclude='node_modules/' --exclude='Library/' --exclude='_fresh/' --exclude='dist/' --exclude='coverage/' --exclude='tmp/' --exclude='build/' --exclude='vendor/'",
     "test:integration": "cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-read --allow-write --allow-env integration/ --no-check",
