@@ -111,9 +111,44 @@ function teardown() {
   restoreEnvironment();
 }
 
+// Create an isolated test wrapper that preserves environment
+function isolatedTest(
+  name: string,
+  fn: () => void | Promise<void>,
+  options?: { sanitizeOps?: boolean; sanitizeResources?: boolean }
+) {
+  Deno.test(name, options || {}, async () => {
+    // Save current environment state
+    const originalDebug = Deno.env.get("DEBUG");
+    const originalDenoEnv = Deno.env.get("DENO_ENV");
+    
+    try {
+      // Ensure test mode is set for all tests
+      Deno.env.set("DENO_ENV", "test");
+      
+      // Run the test
+      await fn();
+    } finally {
+      // Always restore environment
+      if (originalDebug !== undefined) {
+        Deno.env.set("DEBUG", originalDebug);
+      } else {
+        try {
+          Deno.env.delete("DEBUG");
+        } catch {
+          // Ignore errors deleting non-existent vars
+        }
+      }
+      if (originalDenoEnv !== undefined) {
+        Deno.env.set("DENO_ENV", originalDenoEnv);
+      }
+    }
+  });
+}
+
 /* ===== FILE WRITING TESTS ===== */
 
-Deno.test("logger - file writing in development mode", async () => {
+isolatedTest("logger - file writing in development mode", async () => {
   setup();
 
   // Set development environment
@@ -144,7 +179,7 @@ Deno.test("logger - file writing in development mode", async () => {
   teardown();
 });
 
-Deno.test("logger - production vs development file writing logic", () => {
+isolatedTest("logger - production vs development file writing logic", () => {
   setup();
 
   // Test that production environment is detected correctly
@@ -165,7 +200,7 @@ Deno.test("logger - production vs development file writing logic", () => {
   teardown();
 });
 
-Deno.test("logger - file writing with directory already exists", async () => {
+isolatedTest("logger - file writing with directory already exists", async () => {
   setup();
 
   // Mock mkdir to throw AlreadyExists error
@@ -188,7 +223,7 @@ Deno.test("logger - file writing with directory already exists", async () => {
   teardown();
 });
 
-Deno.test("logger - file writing with mkdir error", async () => {
+isolatedTest("logger - file writing with mkdir error", async () => {
   setup();
 
   // Mock mkdir to throw a different error
@@ -210,7 +245,7 @@ Deno.test("logger - file writing with mkdir error", async () => {
   teardown();
 });
 
-Deno.test("logger - file writing with writeTextFile error", async () => {
+isolatedTest("logger - file writing with writeTextFile error", async () => {
   setup();
 
   // Mock writeTextFile to throw error
@@ -234,7 +269,7 @@ Deno.test("logger - file writing with writeTextFile error", async () => {
 
 /* ===== CLIENT-SIDE COMPREHENSIVE TESTS ===== */
 
-Deno.test("logger - client-side debug disabled", () => {
+isolatedTest("logger - client-side debug disabled", () => {
   setup();
 
   // Simulate client environment
@@ -257,7 +292,7 @@ Deno.test("logger - client-side debug disabled", () => {
   teardown();
 });
 
-Deno.test("logger - client-side namespace filtering", () => {
+isolatedTest("logger - client-side namespace filtering", () => {
   setup();
 
   // Simulate client environment
@@ -286,7 +321,7 @@ Deno.test("logger - client-side namespace filtering", () => {
   teardown();
 });
 
-Deno.test("logger - client-side info with disabled namespace", () => {
+isolatedTest("logger - client-side info with disabled namespace", () => {
   setup();
 
   // Simulate client environment
@@ -312,7 +347,7 @@ Deno.test("logger - client-side info with disabled namespace", () => {
   teardown();
 });
 
-Deno.test("logger - client-side warn always logs", () => {
+isolatedTest("logger - client-side warn always logs", () => {
   setup();
 
   // Simulate client environment
@@ -337,7 +372,7 @@ Deno.test("logger - client-side warn always logs", () => {
 
 /* ===== SERVER-SIDE EDGE CASES ===== */
 
-Deno.test("logger - server-side no DEBUG env", () => {
+isolatedTest("logger - server-side no DEBUG env", () => {
   setup();
 
   // Clear DEBUG environment
@@ -356,7 +391,7 @@ Deno.test("logger - server-side no DEBUG env", () => {
   teardown();
 });
 
-Deno.test("logger - server-side empty DEBUG env", () => {
+isolatedTest("logger - server-side empty DEBUG env", () => {
   setup();
 
   // Set empty DEBUG environment
@@ -369,7 +404,7 @@ Deno.test("logger - server-side empty DEBUG env", () => {
   teardown();
 });
 
-Deno.test("logger - server-side 'all' namespace", () => {
+isolatedTest("logger - server-side 'all' namespace", () => {
   setup();
 
   Deno.env.set("DEBUG", "all");
@@ -385,7 +420,7 @@ Deno.test("logger - server-side 'all' namespace", () => {
 
 /* ===== COMPREHENSIVE INTEGRATION TESTS ===== */
 
-Deno.test("logger - complex namespace combinations", () => {
+isolatedTest("logger - complex namespace combinations", () => {
   setup();
 
   Deno.env.set("DEBUG", "stamps,api,all,cache");
@@ -401,7 +436,7 @@ Deno.test("logger - complex namespace combinations", () => {
   teardown();
 });
 
-Deno.test("logger - case insensitive namespace matching", () => {
+isolatedTest("logger - case insensitive namespace matching", () => {
   setup();
 
   Deno.env.set("DEBUG", "STAMPS,Api,CaChe");
@@ -416,7 +451,7 @@ Deno.test("logger - case insensitive namespace matching", () => {
   teardown();
 });
 
-Deno.test("logger - whitespace handling in DEBUG", () => {
+isolatedTest("logger - whitespace handling in DEBUG", () => {
   setup();
 
   Deno.env.set("DEBUG", " stamps , api , cache ");
@@ -434,7 +469,7 @@ Deno.test("logger - whitespace handling in DEBUG", () => {
   teardown();
 });
 
-Deno.test("logger - client-side existing namespaces preservation", () => {
+isolatedTest("logger - client-side existing namespaces preservation", () => {
   setup();
 
   // Simulate client environment
@@ -458,7 +493,7 @@ Deno.test("logger - client-side existing namespaces preservation", () => {
   teardown();
 });
 
-Deno.test("logger - client-side initialization with no existing config", () => {
+isolatedTest("logger - client-side initialization with no existing config", () => {
   setup();
 
   // Simulate client environment with no existing __DEBUG

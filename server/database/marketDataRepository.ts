@@ -255,6 +255,7 @@ export class MarketDataRepository {
           file_hash: row.file_hash,
           stamp_base64: row.stamp_base64,
           unbound_quantity: row.unbound_quantity || 0,
+          file_size_bytes: row.file_size_bytes || null,
           // These are optional fields that may not be in the DB result
         };
 
