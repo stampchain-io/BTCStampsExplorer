@@ -388,17 +388,19 @@ export default function WalletProfileDetails({
         </div>
 
         {/* Market Data Status - only show if there are issues */}
-        {(walletData as any).marketDataStatus && 
-         (walletData as any).marketDataStatus.overallStatus !== 'full' && (
+        {(walletData as any).marketDataStatus &&
+          (walletData as any).marketDataStatus.overallStatus !== "full" && (
           <div class="mt-3">
-            <p class={`text-sm ${
-              (walletData as any).marketDataStatus.overallStatus === 'partial' 
-                ? 'text-yellow-500' 
-                : 'text-red-500'
-            }`}>
-              {(walletData as any).marketDataStatus.overallStatus === 'partial' 
-                ? 'Some market data is currently unavailable.'
-                : 'Market data might be delayed or unavailable. Please check back later.'}
+            <p
+              class={`text-sm ${
+                (walletData as any).marketDataStatus.overallStatus === "partial"
+                  ? "text-yellow-500"
+                  : "text-red-500"
+              }`}
+            >
+              {(walletData as any).marketDataStatus.overallStatus === "partial"
+                ? "Some market data is currently unavailable."
+                : "Market data might be delayed or unavailable. Please check back later."}
             </p>
           </div>
         )}

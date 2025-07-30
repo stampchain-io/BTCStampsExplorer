@@ -22,7 +22,8 @@ function TitleText({
       style={`
         animation-delay: ${delay}ms;
         animation-duration: 300ms;
-        animation-fill-mode: forwards;
+        animation-fill-mode: both;
+        animation-timing-function: ease-out;
         filter: drop-shadow(0.05em 0.05em 0.05em rgba(0, 0, 0, 0.75));
       `}
     >
@@ -56,8 +57,9 @@ export function HomeHeader() {
           z-[-10]
         "
         style="
-          animation-duration: 500ms;
-          animation-fill-mode: forwards;
+          animation-duration: 400ms;
+          animation-fill-mode: both;
+          animation-timing-function: ease-out;
         "
       />
       <div class="
@@ -71,7 +73,7 @@ export function HomeHeader() {
         ">
         <h1 class="text-center">
           <TitleText
-            delay="100"
+            delay="50"
             class="
               font-black
               bg-text-gray-1
@@ -91,7 +93,7 @@ export function HomeHeader() {
           </TitleText>
           <br />
           <TitleText
-            delay="400"
+            delay="150"
             class="
               font-bold
               bg-text-gray-1
@@ -128,9 +130,10 @@ export function HomeHeader() {
           animate-fade-in
         "
         style={`
-          animation-delay: 700ms;
-          animation-duration: 500ms;
-          animation-fill-mode: forwards;
+          animation-delay: 250ms;
+          animation-duration: 400ms;
+          animation-fill-mode: both;
+          animation-timing-function: ease-out;
         `}
       >
         Welcome to the forefront of digital collectibles, where each stamp is a
