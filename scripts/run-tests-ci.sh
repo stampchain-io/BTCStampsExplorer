@@ -4,7 +4,7 @@
 # These errors are expected and don't affect test results
 
 # Run the tests and capture both stdout and stderr
-output=$(cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-read --allow-write --allow-env --allow-run unit/ --no-check 2>&1)
+output=$(cd tests && DENO_ENV=test SKIP_REDIS_CONNECTION=true deno test --allow-net --allow-read --allow-write --allow-env --allow-run unit/ --no-check --parallel 2>&1)
 exit_code=$?
 
 # Filter the output

@@ -1132,4 +1132,14 @@ export class MockDatabaseManager {
       insertId: 1,
     };
   }
+
+  /**
+   * Mock implementation of invalidateCacheByCategory
+   * In tests, this just logs the action without doing anything
+   */
+  async invalidateCacheByCategory(category: string): Promise<void> {
+    // Log for test verification if needed
+    console.log(`[MOCK] Invalidating cache for category: ${category}`);
+    return Promise.resolve();
+  }
 }
