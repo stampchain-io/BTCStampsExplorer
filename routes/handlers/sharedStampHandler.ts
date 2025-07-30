@@ -257,6 +257,21 @@ export const createStampHandler = (
           includeMarketData,
         });
 
+        // Filter fields based on API version
+        if (parseFloat(apiVersion) < 2.3 && result.data) {
+          // For v2.2, remove file_size_bytes from responses
+          const filterV22Fields = (stamps: any[]) => {
+            return stamps.map((stamp) => {
+              const { file_size_bytes: _file_size_bytes, ...v22Stamp } = stamp;
+              return v22Stamp;
+            });
+          };
+
+          if (Array.isArray(result.data)) {
+            result.data = filterV22Fields(result.data);
+          }
+        }
+
         // Return the normal result
         return ApiResponseUtil.success(result, { routeType: cacheType });
       } else {
@@ -384,6 +399,15 @@ export const createStampHandler = (
 
         if (!stampData) {
           return ApiResponseUtil.notFound("Stamp not found");
+        }
+
+        // Filter fields based on API version for single stamp
+        const apiVersion = (ctx.state.apiVersion as string) || "2.3";
+        if (parseFloat(apiVersion) < 2.3 && stampData.data?.stamp) {
+          // For v2.2, remove file_size_bytes from single stamp response
+          const { file_size_bytes: _file_size_bytes, ...v22Stamp } =
+            stampData.data.stamp;
+          stampData.data.stamp = v22Stamp;
         }
 
         return ApiResponseUtil.success(

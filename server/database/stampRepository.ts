@@ -698,7 +698,8 @@ export class StampRepository {
       st.tx_index,
       st.ident,
       st.stamp_hash,
-      st.file_hash
+      st.file_hash,
+      st.file_size_bytes
     `;
 
     const secondaryColumns = `

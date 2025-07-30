@@ -357,6 +357,7 @@ export interface StampRow {
   creator_name: string | null;
   stamp_hash: string;
   file_hash: string;
+  file_size_bytes: number | null;
   floorPrice?: number | "priceless";
   marketCap?: number | "priceless";
   balance?: number | string;
