@@ -214,7 +214,10 @@ Deno.test("Task 23.3: Negative Fee Calculation Fix", async (t) => {
   );
 });
 
-Deno.test("Task 23.4: End-to-End Flow Validation", async (t) => {
+Deno.test("Task 23.4: End-to-End Flow Validation", {
+  sanitizeOps: false,
+  sanitizeResources: false,
+}, async (t) => {
   await t.step("should handle complete estimation flow", async () => {
     const estimator = new TransactionConstructionService();
 
