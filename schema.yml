@@ -2685,6 +2685,10 @@ components:
           type: string
         file_hash:
           type: string
+        file_size_bytes:
+          type: integer
+          nullable: true
+          description: "Size of the decoded stamp file in bytes"
         floorPrice:
           type: number
           nullable: true

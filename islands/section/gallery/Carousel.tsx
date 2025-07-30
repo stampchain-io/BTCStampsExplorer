@@ -77,7 +77,7 @@ export default function CarouselGallery(props: CarouselProps) {
       const batchSize = 5;
       for (let i = 0; i < duplicatedStamps.length; i += batchSize) {
         const batch = duplicatedStamps.slice(i, i + batchSize);
-        
+
         await Promise.all(batch.map(async (stamp) => {
           // Skip if already validated
           if (validatedContent[stamp.tx_hash]) {
@@ -153,7 +153,7 @@ export default function CarouselGallery(props: CarouselProps) {
         const carouselElement = document.querySelector(
           ".carousel-slider",
         ) as HTMLElement;
-        
+
         if (carouselElement && !swiperInstance.current) {
           swiperInstance.current = createCarouselSlider(carouselElement);
           swiperInstance.current?.on("slideChange", () => {
