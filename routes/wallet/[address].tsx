@@ -339,7 +339,7 @@ export const handler: Handlers = {
           : "unavailable",
         src20MarketData: src20Response.status === "fulfilled" &&
             (baseSrc20Data.data?.length === 0 || // Empty wallet is OK
-             baseSrc20Data.data?.some((token: any) => token.market_data))
+              baseSrc20Data.data?.some((token: any) => token.market_data))
           ? "available"
           : "unavailable",
         overallStatus: "partial", // Can be "full", "partial", or "unavailable"

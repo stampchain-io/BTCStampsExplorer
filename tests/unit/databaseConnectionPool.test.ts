@@ -4,152 +4,20 @@ import {
   assertRejects,
 } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
-import { stub, returnsNext, spy } from "@std/testing/mock";
+import { stub, spy } from "@std/testing/mock";
 import { Client } from "mysql/mod.ts";
-
-// Mock the database manager module
-const mockPool: Client[] = [];
-let mockActiveConnections = 0;
-const mockConfig = {
-  maxConnections: 10,
-  minConnections: 2,
-  acquireTimeout: 5000,
-  connectionTimeout: 10000,
-  validationTimeout: 1000,
-  retryDelay: 500,
-  enableCompression: false,
-  enableConnectionLogging: true,
-  maxRetries: 3,
-};
-
-// Create a mock DatabaseManager class for testing
-class MockDatabaseManager {
-  #pool: Client[] = mockPool;
-  #activeConnections = mockActiveConnections;
-  #CONNECTION_LIMIT = mockConfig.maxConnections;
-  #MIN_CONNECTIONS = mockConfig.minConnections;
-  #ACQUIRE_TIMEOUT = mockConfig.acquireTimeout;
-  #CONNECTION_TIMEOUT = mockConfig.connectionTimeout;
-  #VALIDATION_TIMEOUT = mockConfig.validationTimeout;
-  #logger = {
-    info: spy(),
-    warn: spy(),
-    error: spy(),
-  };
-
-  async warmupConnectionPool(): Promise<void> {
-    const connectionsToCreate = Math.min(
-      this.#MIN_CONNECTIONS,
-      this.#CONNECTION_LIMIT
-    );
-
-    for (let i = 0; i < connectionsToCreate; i++) {
-      try {
-        const client = await this.#createNewConnection();
-        this.#pool.push(client);
-      } catch (error) {
-        this.#logger.warn(`Failed to create warmup connection ${i + 1}: ${error}`);
-      }
-    }
-
-    this.#logger.info(
-      `Connection pool warmed up with ${this.#pool.length} connections`
-    );
-  }
-
-  async getClient(): Promise<Client> {
-    if (this.#pool.length > 0) {
-      const client = this.#pool.pop() as Client;
-
-      // Validate connection before returning
-      try {
-        await this.#validateConnection(client);
-        this.#activeConnections++;
-        return client;
-      } catch (error) {
-        this.#logger.warn(`Connection validation failed: ${error}`);
-        await this.closeClient(client);
-        // Recursively try to get another connection
-        return this.getClient();
-      }
-    }
-
-    // Check if we can create a new connection
-    if (this.#activeConnections < this.#CONNECTION_LIMIT) {
-      try {
-        const client = await this.#createNewConnection();
-        this.#activeConnections++;
-        return client;
-      } catch (error) {
-        throw new Error(`Failed to create new connection: ${error}`);
-      }
-    }
-
-    // Pool exhausted - wait with timeout
-    const startTime = Date.now();
-    while (Date.now() - startTime < this.#ACQUIRE_TIMEOUT) {
-      if (this.#pool.length > 0) {
-        return this.getClient();
-      }
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-
-    throw new Error(
-      `Connection pool exhausted. Active: ${this.#activeConnections}/${this.#CONNECTION_LIMIT}`
-    );
-  }
-
-  releaseClient(client: Client): void {
-    this.#activeConnections = Math.max(0, this.#activeConnections - 1);
-    this.#pool.push(client);
-    this.#logger.info(
-      `Connection released. Pool size: ${this.#pool.length}, Active: ${this.#activeConnections}`
-    );
-  }
-
-  async closeClient(client: Client): Promise<void> {
-    try {
-      await client.close();
-    } catch (error) {
-      this.#logger.error(`Error closing connection: ${error}`);
-    }
-  }
-
-  async #createNewConnection(): Promise<Client> {
-    const client = new Client();
-    // Mock connection creation
-    return client;
-  }
-
-  async #validateConnection(client: Client): Promise<void> {
-    // Mock validation - can be configured to fail in tests
-    const isValid = (client as any).isValid !== false;
-    if (!isValid) {
-      throw new Error("Connection validation failed");
-    }
-  }
-
-  getPoolMetrics() {
-    return {
-      poolSize: this.#pool.length,
-      activeConnections: this.#activeConnections,
-      totalConnections: this.#pool.length + this.#activeConnections,
-      connectionLimit: this.#CONNECTION_LIMIT,
-      utilizationPercent: Math.round(
-        (this.#activeConnections / this.#CONNECTION_LIMIT) * 100
-      ),
-    };
-  }
-}
+import { 
+  createMockDatabaseManager,
+  createMockClient,
+  defaultDatabaseConfig 
+} from "../fixtures/databaseFixtures.ts";
 
 describe("Database Connection Pool Management", () => {
-  let dbManager: MockDatabaseManager;
+  let dbManager: ReturnType<typeof createMockDatabaseManager>;
 
   beforeEach(() => {
-    // Reset state
-    mockPool.length = 0;
-    mockActiveConnections = 0;
-    dbManager = new MockDatabaseManager();
+    // Create a fresh mock database manager for each test
+    dbManager = createMockDatabaseManager();
   });
 
   describe("Connection Pool Warmup", () => {
@@ -157,34 +25,40 @@ describe("Database Connection Pool Management", () => {
       await dbManager.warmupConnectionPool();
       
       const metrics = dbManager.getPoolMetrics();
-      assertEquals(metrics.poolSize, mockConfig.minConnections);
+      assertEquals(metrics.poolSize, defaultDatabaseConfig.minConnections);
       assertEquals(metrics.activeConnections, 0);
     });
 
     it("should handle warmup failures gracefully", async () => {
-      // Override createNewConnection to fail
-      const originalCreate = (dbManager as any).createNewConnection;
-      (dbManager as any).createNewConnection = stub(
-        dbManager,
-        "#createNewConnection",
-        () => Promise.reject(new Error("Connection failed"))
-      );
+      // Create a manager that will fail to create connections
+      const failingManager = createMockDatabaseManager();
+      
+      // Stub the client creation to fail
+      const originalCreateClient = createMockClient;
+      (globalThis as any).createMockClient = () => {
+        throw new Error("Connection failed");
+      };
+      
+      // Override the internal connection creation
+      stub(Client.prototype, "connect", () => Promise.reject(new Error("Connection failed")));
 
-      await dbManager.warmupConnectionPool();
+      await failingManager.warmupConnectionPool();
       
       // Should log warnings but not throw
-      const metrics = dbManager.getPoolMetrics();
+      const metrics = failingManager.getPoolMetrics();
       assertEquals(metrics.poolSize, 0);
     });
 
     it("should not exceed connection limit during warmup", async () => {
-      // Set min connections higher than limit
-      (dbManager as any).MIN_CONNECTIONS = 20;
-      (dbManager as any).CONNECTION_LIMIT = 10;
+      // Create manager with min connections higher than limit
+      const customManager = createMockDatabaseManager({
+        minConnections: 20,
+        maxConnections: 10,
+      });
 
-      await dbManager.warmupConnectionPool();
+      await customManager.warmupConnectionPool();
       
-      const metrics = dbManager.getPoolMetrics();
+      const metrics = customManager.getPoolMetrics();
       assertEquals(metrics.poolSize <= 10, true);
     });
   });
@@ -199,7 +73,7 @@ describe("Database Connection Pool Management", () => {
       
       const metrics = dbManager.getPoolMetrics();
       assertEquals(metrics.activeConnections, 1);
-      assertEquals(metrics.poolSize, mockConfig.minConnections - 1);
+      assertEquals(metrics.poolSize, defaultDatabaseConfig.minConnections! - 1);
     });
 
     it("should create new connection when pool is empty", async () => {
@@ -216,9 +90,8 @@ describe("Database Connection Pool Management", () => {
       await dbManager.warmupConnectionPool();
       
       // Mark first connection as invalid
-      const pool = (dbManager as any).pool;
-      if (pool[0]) {
-        (pool[0] as any).isValid = false;
+      if (dbManager.pool && dbManager.pool[0]) {
+        (dbManager.pool[0] as any).isValid = false;
       }
 
       const client = await dbManager.getClient();
@@ -231,16 +104,22 @@ describe("Database Connection Pool Management", () => {
     it("should handle pool exhaustion", async () => {
       // Acquire all connections
       const clients: Client[] = [];
-      for (let i = 0; i < mockConfig.maxConnections; i++) {
+      for (let i = 0; i < defaultDatabaseConfig.maxConnections!; i++) {
         clients.push(await dbManager.getClient());
       }
 
-      // Set a short timeout for testing
-      (dbManager as any).ACQUIRE_TIMEOUT = 100;
+      // Create a new manager with short timeout for testing
+      const shortTimeoutManager = createMockDatabaseManager({
+        acquireTimeout: 100,
+      });
+      // Exhaust the pool
+      for (let i = 0; i < defaultDatabaseConfig.maxConnections!; i++) {
+        await shortTimeoutManager.getClient();
+      }
 
       // Next request should timeout
       await assertRejects(
-        () => dbManager.getClient(),
+        () => shortTimeoutManager.getClient(),
         Error,
         "Connection pool exhausted"
       );
@@ -249,7 +128,7 @@ describe("Database Connection Pool Management", () => {
     it("should wait for available connection", async () => {
       // Acquire all connections
       const clients: Client[] = [];
-      for (let i = 0; i < mockConfig.maxConnections; i++) {
+      for (let i = 0; i < defaultDatabaseConfig.maxConnections!; i++) {
         clients.push(await dbManager.getClient());
       }
 
@@ -283,10 +162,8 @@ describe("Database Connection Pool Management", () => {
     });
 
     it("should handle negative active connections", () => {
-      // Force negative scenario
-      (dbManager as any).activeConnections = 0;
-      
-      const client = new Client();
+      // Force negative scenario by releasing without acquiring
+      const client = createMockClient();
       dbManager.releaseClient(client);
       
       const metrics = dbManager.getPoolMetrics();
@@ -296,7 +173,7 @@ describe("Database Connection Pool Management", () => {
 
   describe("Connection Closing", () => {
     it("should close connection gracefully", async () => {
-      const client = new Client();
+      const client = createMockClient();
       const closeSpy = spy(client, "close");
       
       await dbManager.closeClient(client);
@@ -305,22 +182,21 @@ describe("Database Connection Pool Management", () => {
     });
 
     it("should handle close errors", async () => {
-      const client = new Client();
+      const client = createMockClient();
       stub(client, "close", () => Promise.reject(new Error("Close failed")));
       
       // Should not throw
       await dbManager.closeClient(client);
       
       // Should log error
-      const logger = (dbManager as any).logger;
-      assertEquals(logger.error.calls.length >= 1, true);
+      assertEquals(dbManager.logger.error.calls.length >= 1, true);
     });
   });
 
   describe("Pool Metrics", () => {
     it("should calculate utilization correctly", async () => {
       // Acquire half of the connections
-      const halfConnections = Math.floor(mockConfig.maxConnections / 2);
+      const halfConnections = Math.floor(defaultDatabaseConfig.maxConnections! / 2);
       for (let i = 0; i < halfConnections; i++) {
         await dbManager.getClient();
       }
@@ -378,9 +254,10 @@ describe("Database Connection Pool Management", () => {
       await dbManager.warmupConnectionPool();
       
       // Mark all connections as invalid
-      const pool = (dbManager as any).pool;
-      for (const conn of pool) {
-        (conn as any).isValid = false;
+      if (dbManager.pool && Array.isArray(dbManager.pool)) {
+        for (const conn of dbManager.pool) {
+          (conn as any).isValid = false;
+        }
       }
 
       // Should create new connection after failing validations

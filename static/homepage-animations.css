@@ -1,0 +1,97 @@
+/* Homepage Animation Optimizations */
+
+/* Prevent layout shift during animations */
+.animate-slide-down,
+.animate-slide-up,
+.animate-fade-in {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Use backwards fill mode to hide elements before animation */
+.animate-slide-down {
+  animation-fill-mode: backwards;
+  transform: translateY(-20px);
+}
+
+.animate-slide-up {
+  animation-fill-mode: backwards;
+  transform: translateY(20px);
+}
+
+.animate-fade-in {
+  animation-fill-mode: backwards;
+}
+
+/* Optimize text rendering during animations */
+.home-header-text {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translateZ(0);
+}
+
+/* Carousel skeleton loader */
+.carousel-slider-skeleton {
+  min-height: 260px;
+}
+
+@media (min-width: 768px) {
+  .carousel-slider-skeleton {
+    min-height: 400px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .carousel-slider-skeleton {
+    min-height: 540px;
+  }
+}
+
+/* Prevent carousel flicker during initialization */
+.carousel-slider:not(.swiper-initialized) .swiper-slide {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.carousel-slider.swiper-initialized .swiper-slide {
+  opacity: 1;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-down,
+  .animate-slide-up,
+  .animate-fade-in {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+  
+  .carousel-slider * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Performance optimization for low-end devices */
+@media (max-width: 768px) and (hover: none) {
+  /* Disable hover effects on touch devices */
+  .hover-gradient:hover,
+  .hover\\:bg-stamp-purple-bright:hover,
+  .hover\\:shadow-stamp:hover {
+    background: inherit !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Optimize carousel transitions */
+.swiper-wrapper {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prevent content jumping during lazy load */
+.stamp-image {
+  aspect-ratio: 1;
+  background-color: rgba(20, 0, 31, 0.5);
+}

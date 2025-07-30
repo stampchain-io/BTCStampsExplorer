@@ -1,6 +1,6 @@
 /* ===== CAROUSEL GALLERY COMPONENT ===== */
 /* TODO (@baba)-update styling */
-import { useEffect, useMemo, useState } from "preact/hooks";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { StampRow } from "$globals";
 import { ComponentChildren } from "preact";
@@ -28,11 +28,14 @@ export default function CarouselGallery(props: CarouselProps) {
   /* ===== PROPS EXTRACTION ===== */
   const { stamps } = props;
 
+  /* ===== REFS ===== */
+  const carouselInitialized = useRef(false);
+  const swiperInstance = useRef<any>(null);
+
   /* ===== COMPUTED VALUES ===== */
-  const isMobile = globalThis.innerWidth < 768;
+  const isMobile = IS_BROWSER ? globalThis.innerWidth < 768 : false;
 
   // Memoize duplicatedStamps to prevent infinite re-renders
-  // For Swiper loop mode, we need enough slides: minimum 2x slidesPerView
   const duplicatedStamps = useMemo(() => {
     if (stamps.length === 0) return [];
 
@@ -70,88 +73,113 @@ export default function CarouselGallery(props: CarouselProps) {
     const validateStamps = async () => {
       const validated: Record<string, ComponentChildren> = {};
 
-      for (const stamp of duplicatedStamps) {
-        // Skip if already validated
-        if (validatedContent[stamp.tx_hash]) {
-          continue;
-        }
-
-        // Get proper stamp URL using getStampImageSrc
-        const src = await getStampImageSrc(stamp);
-
-        // Handle HTML content
-        if (stamp.stamp_mimetype === "text/html") {
-          validated[stamp.tx_hash] = (
-            <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
-              <iframe
-                width="100%"
-                height="100%"
-                scrolling="no"
-                class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded aspect-square"
-                sandbox="allow-scripts allow-same-origin"
-                src={src}
-                loading="lazy"
-                onLoad={handleLoad}
-              />
-            </a>
-          );
-          continue;
-        }
-
-        // Handle SVG content with caching
-        if (stamp.stamp_mimetype === "image/svg+xml") {
-          const svgSrc = `/content/${stamp.tx_hash}.svg`;
-
-          // Check cache first
-          let isValid = validationCache.get(svgSrc);
-
-          if (isValid === undefined) {
-            // Only validate if not in cache
-            const validationResult = await validateStampContent(svgSrc);
-            isValid = validationResult.isValid;
-            validationCache.set(svgSrc, isValid);
+      // Process stamps in batches to avoid overwhelming the browser
+      const batchSize = 5;
+      for (let i = 0; i < duplicatedStamps.length; i += batchSize) {
+        const batch = duplicatedStamps.slice(i, i + batchSize);
+        
+        await Promise.all(batch.map(async (stamp) => {
+          // Skip if already validated
+          if (validatedContent[stamp.tx_hash]) {
+            return;
           }
 
-          if (!isValid) {
+          // Get proper stamp URL using getStampImageSrc
+          const src = await getStampImageSrc(stamp);
+
+          // Handle HTML content
+          if (stamp.stamp_mimetype === "text/html") {
             validated[stamp.tx_hash] = (
               <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
-                <img
-                  src={ERROR_IMAGE}
-                  alt="Invalid SVG"
-                  class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded"
+                <iframe
+                  width="100%"
+                  height="100%"
+                  scrolling="no"
+                  class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded aspect-square"
+                  sandbox="allow-scripts allow-same-origin"
+                  src={src}
+                  loading="lazy"
                   onLoad={handleLoad}
                 />
               </a>
             );
+            return;
           }
-        }
-      }
 
-      // Only update state if we have new validated content
-      if (Object.keys(validated).length > 0) {
-        setValidatedContent((prev) => ({ ...prev, ...validated }));
+          // Handle SVG content with caching
+          if (stamp.stamp_mimetype === "image/svg+xml") {
+            const svgSrc = `/content/${stamp.tx_hash}.svg`;
+
+            // Check cache first
+            let isValid = validationCache.get(svgSrc);
+
+            if (isValid === undefined) {
+              // Only validate if not in cache
+              const validationResult = await validateStampContent(svgSrc);
+              isValid = validationResult.isValid;
+              validationCache.set(svgSrc, isValid);
+            }
+
+            if (!isValid) {
+              validated[stamp.tx_hash] = (
+                <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
+                  <img
+                    src={ERROR_IMAGE}
+                    alt="Invalid SVG"
+                    class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded"
+                    onLoad={handleLoad}
+                  />
+                </a>
+              );
+            }
+          }
+        }));
+
+        // Update state after each batch
+        if (Object.keys(validated).length > 0) {
+          setValidatedContent((prev) => ({ ...prev, ...validated }));
+        }
       }
     };
 
     validateStamps();
-  }, [duplicatedStamps]); // Now properly memoized
+  }, [duplicatedStamps]);
 
   /* ===== CAROUSEL EFFECT ===== */
   useEffect(() => {
-    if (IS_BROWSER) {
-      const carouselElement = document.querySelector(
-        ".carousel-slider",
-      ) as HTMLElement;
-      const swiper = createCarouselSlider(carouselElement);
-      swiper?.on("slideChange", () => {
-        setActiveSlideIndex(swiper.realIndex);
+    if (IS_BROWSER && !carouselInitialized.current) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        const carouselElement = document.querySelector(
+          ".carousel-slider",
+        ) as HTMLElement;
+        
+        if (carouselElement && !swiperInstance.current) {
+          swiperInstance.current = createCarouselSlider(carouselElement);
+          swiperInstance.current?.on("slideChange", () => {
+            setActiveSlideIndex(swiperInstance.current.realIndex);
+          });
+          carouselInitialized.current = true;
+        }
       });
     }
   }, []);
 
   /* ===== LOADING STATE ===== */
   if (!IS_BROWSER && loading) {
-    return <div>Loading carousel...</div>;
+    return (
+      <div class="carousel-slider-skeleton h-full">
+        <div class="swiper h-full">
+          <div class="swiper-wrapper">
+            {[...Array(5)].map((_, i) => (
+              <div class="swiper-slide" key={`skeleton-${i}`}>
+                <div class="loading-skeleton rounded-md h-full min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px]" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   /* ===== RENDER ===== */

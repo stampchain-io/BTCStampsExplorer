@@ -7,7 +7,7 @@ import {
   MaraModeIndicatorCompact,
   MaraModeBadge,
 } from "$/components/indicators/MaraModeIndicator.tsx";
-import { AccessibilityUtils } from "$utils/ui/accessibility/accessibilityUtils.ts";
+import { AccessibilityUtils } from "$lib/utils/accessibilityUtils.ts";
 import { stub, returnsNext } from "@std/testing/mock";
 
 describe("MaraModeIndicator", () => {
