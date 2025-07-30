@@ -134,11 +134,22 @@ export function createMaraConfigFromEnv(): MaraConfig | null {
   // MARA is always available - activation depends on user providing outputValue
   const enabled = true;
 
+  // Get environment values with proper fallback handling
+  const apiBaseUrl = Deno.env.get('MARA_API_BASE_URL')?.trim() || DEFAULT_MARA_CONFIG.apiBaseUrl;
+  
+  const apiTimeoutStr = Deno.env.get('MARA_API_TIMEOUT')?.trim();
+  const apiTimeout = apiTimeoutStr ? parseInt(apiTimeoutStr, 10) : DEFAULT_MARA_CONFIG.apiTimeout;
+  
+  const serviceFeeAmountStr = Deno.env.get('MARA_SERVICE_FEE_SATS')?.trim();
+  const serviceFeeAmount = serviceFeeAmountStr ? parseInt(serviceFeeAmountStr, 10) : DEFAULT_MARA_CONFIG.serviceFeeAmount;
+  
+  const serviceFeeAddress = Deno.env.get('MARA_SERVICE_FEE_ADDRESS')?.trim() || DEFAULT_MARA_CONFIG.serviceFeeAddress;
+
   const config: MaraConfig = {
-    apiBaseUrl: Deno.env.get('MARA_API_BASE_URL') || 'https://slipstream.mara.com/rest-api',
-    apiTimeout: parseInt(Deno.env.get('MARA_API_TIMEOUT') || '30000', 10),
-    serviceFeeAmount: parseInt(Deno.env.get('MARA_SERVICE_FEE_SATS') || '42000', 10),
-    serviceFeeAddress: Deno.env.get('MARA_SERVICE_FEE_ADDRESS') || '',
+    apiBaseUrl,
+    apiTimeout: isNaN(apiTimeout) ? DEFAULT_MARA_CONFIG.apiTimeout : apiTimeout,
+    serviceFeeAmount: isNaN(serviceFeeAmount) ? DEFAULT_MARA_CONFIG.serviceFeeAmount : serviceFeeAmount,
+    serviceFeeAddress,
     enabled,
   };
 

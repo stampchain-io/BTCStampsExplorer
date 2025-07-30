@@ -32,7 +32,7 @@ function restoreConsole() {
   console.warn = originalConsole.warn;
 }
 
-// Test setup and teardown
+// Test setup and teardown with better isolation
 function setup() {
   consoleOutput = [];
   mockConsole();
@@ -46,11 +46,45 @@ function teardown() {
   }
 }
 
-Deno.test("logger - debug logs when namespace is enabled", () => {
+// Create an isolated test wrapper that preserves environment
+function isolatedTest(
+  name: string,
+  fn: () => void | Promise<void>,
+  options?: { sanitizeOps?: boolean; sanitizeResources?: boolean }
+) {
+  Deno.test(name, options || {}, async () => {
+    // Save current environment state
+    const originalDebug = Deno.env.get("DEBUG");
+    const originalDenoEnv = Deno.env.get("DENO_ENV");
+    
+    try {
+      // Ensure test mode is set for all tests
+      Deno.env.set("DENO_ENV", "test");
+      
+      // Run the test
+      await fn();
+    } finally {
+      // Always restore environment
+      if (originalDebug !== undefined) {
+        Deno.env.set("DEBUG", originalDebug);
+      } else {
+        try {
+          Deno.env.delete("DEBUG");
+        } catch {
+          // Ignore errors deleting non-existent vars
+        }
+      }
+      if (originalDenoEnv !== undefined) {
+        Deno.env.set("DENO_ENV", originalDenoEnv);
+      }
+    }
+  });
+}
+
+isolatedTest("logger - debug logs when namespace is enabled", () => {
   setup();
 
   // Set DEBUG env to enable stamps namespace
-  const originalDebug = Deno.env.get("DEBUG");
   Deno.env.set("DEBUG", "stamps");
 
   logger.debug("stamps", { message: "Test debug message", extra: "data" });
@@ -68,21 +102,13 @@ Deno.test("logger - debug logs when namespace is enabled", () => {
   assertEquals(logData.extra, "data", "Extra data should be included");
   assert(logData.timestamp, "Should have timestamp");
 
-  // Restore DEBUG env
-  if (originalDebug) {
-    Deno.env.set("DEBUG", originalDebug);
-  } else {
-    Deno.env.delete("DEBUG");
-  }
-
   teardown();
 });
 
-Deno.test("logger - debug does not log when namespace is disabled", () => {
+isolatedTest("logger - debug does not log when namespace is disabled", () => {
   setup();
 
   // Set DEBUG env to different namespace
-  const originalDebug = Deno.env.get("DEBUG");
   Deno.env.set("DEBUG", "api");
 
   logger.debug("stamps", { message: "Should not appear" });
@@ -90,18 +116,14 @@ Deno.test("logger - debug does not log when namespace is disabled", () => {
   // Should not log
   assertEquals(consoleOutput.length, 0, "Should have no console output");
 
-  // Restore DEBUG env
-  if (originalDebug) {
-    Deno.env.set("DEBUG", originalDebug);
-  } else {
-    Deno.env.delete("DEBUG");
-  }
-
   teardown();
 });
 
-Deno.test("logger - error always logs", () => {
+isolatedTest("logger - error always logs", () => {
   setup();
+  
+  // Ensure we're in test mode to prevent file writes
+  Deno.env.set("DENO_ENV", "test");
 
   logger.error("api", { message: "Error occurred", code: "ERR_001" });
 
@@ -118,10 +140,9 @@ Deno.test("logger - error always logs", () => {
   teardown();
 });
 
-Deno.test("logger - info logs when namespace is enabled", () => {
+isolatedTest("logger - info logs when namespace is enabled", () => {
   setup();
 
-  const originalDebug = Deno.env.get("DEBUG");
   Deno.env.set("DEBUG", "all");
 
   logger.info("database", { message: "Database connected", host: "localhost" });
@@ -132,17 +153,14 @@ Deno.test("logger - info logs when namespace is enabled", () => {
   assertEquals(logData.namespace, "database", "Namespace should be database");
   assertEquals(logData.host, "localhost", "Host should be included");
 
-  if (originalDebug) {
-    Deno.env.set("DEBUG", originalDebug);
-  } else {
-    Deno.env.delete("DEBUG");
-  }
-
   teardown();
 });
 
-Deno.test("logger - warn always logs", () => {
+isolatedTest("logger - warn always logs", () => {
   setup();
+  
+  // Ensure we're in test mode to prevent file writes
+  Deno.env.set("DENO_ENV", "test");
 
   logger.warn("cache", { message: "Cache miss", key: "user:123" });
 
@@ -155,7 +173,7 @@ Deno.test("logger - warn always logs", () => {
   teardown();
 });
 
-Deno.test("logger - handles bigint values", () => {
+isolatedTest("logger - handles bigint values", () => {
   setup();
 
   logger.error("src20", {
@@ -179,10 +197,9 @@ Deno.test("logger - handles bigint values", () => {
   teardown();
 });
 
-Deno.test("logger - multiple namespaces in DEBUG", () => {
+isolatedTest("logger - multiple namespaces in DEBUG", () => {
   setup();
 
-  const originalDebug = Deno.env.get("DEBUG");
   Deno.env.set("DEBUG", "stamps,api,cache");
 
   logger.debug("stamps", { message: "Stamps log" });
@@ -198,55 +215,53 @@ Deno.test("logger - multiple namespaces in DEBUG", () => {
   assert(namespaces.includes("cache"), "Should include cache");
   assert(!namespaces.includes("database"), "Should not include database");
 
-  if (originalDebug) {
-    Deno.env.set("DEBUG", originalDebug);
-  } else {
-    Deno.env.delete("DEBUG");
-  }
-
   teardown();
 });
 
-Deno.test("logger - client-side behavior simulation", async () => {
-  setup();
+isolatedTest(
+  "logger - client-side behavior simulation",
+  async () => {
+    setup();
 
-  // Wait for any pending async operations to complete before modifying Deno
-  await new Promise(resolve => setTimeout(resolve, 50));
+    // Wait for any pending async operations to complete before modifying Deno
+    await new Promise(resolve => setTimeout(resolve, 50));
 
-  // Temporarily remove Deno to simulate client environment
-  // @ts-ignore - Intentionally modifying global
-  delete globalThis.Deno;
+    // Temporarily remove Deno to simulate client environment
+    // @ts-ignore - Intentionally modifying global
+    delete globalThis.Deno;
 
-  // Set up client debug
-  (globalThis as any).__DEBUG = {
-    namespaces: "ui,stamps",
-    enabled: true,
-  };
+    // Set up client debug
+    (globalThis as any).__DEBUG = {
+      namespaces: "ui,stamps",
+      enabled: true,
+    };
 
-  // Mock console should capture direct objects (not JSON strings)
-  consoleOutput = [];
-  console.debug = (data: any) => consoleOutput.push({ level: "debug", data });
-  console.error = (data: any) => consoleOutput.push({ level: "error", data });
+    // Mock console should capture direct objects (not JSON strings)
+    consoleOutput = [];
+    console.debug = (data: any) => consoleOutput.push({ level: "debug", data });
+    console.error = (data: any) => consoleOutput.push({ level: "error", data });
 
-  logger.debug("ui", { message: "UI debug" });
-  logger.debug("api", { message: "API debug" });
-  logger.error("ui", { message: "UI error" });
+    logger.debug("ui", { message: "UI debug" });
+    logger.debug("api", { message: "API debug" });
+    logger.error("ui", { message: "UI error" });
 
-  assertEquals(consoleOutput.length, 2, "Should log ui debug and error");
-  assertEquals(
-    consoleOutput[0].data.namespace,
-    "ui",
-    "First should be ui debug",
-  );
-  assertEquals(
-    consoleOutput[1].data.namespace,
-    "ui",
-    "Second should be ui error",
-  );
+    assertEquals(consoleOutput.length, 2, "Should log ui debug and error");
+    assertEquals(
+      consoleOutput[0].data.namespace,
+      "ui",
+      "First should be ui debug",
+    );
+    assertEquals(
+      consoleOutput[1].data.namespace,
+      "ui",
+      "Second should be ui error",
+    );
 
-  // Restore Deno
-  globalThis.Deno = originalDeno;
-  delete (globalThis as any).__DEBUG;
+    // Restore Deno
+    globalThis.Deno = originalDeno;
+    delete (globalThis as any).__DEBUG;
 
-  teardown();
-});
+    teardown();
+  },
+  { sanitizeOps: false, sanitizeResources: false }
+);
