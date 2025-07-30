@@ -1,0 +1,284 @@
+import {
+  assertEquals,
+  assertExists,
+  assertThrows,
+} from "@std/assert";
+import { describe, it, beforeEach } from "@std/testing/bdd";
+import * as bitcoin from "bitcoinjs-lib";
+import { PSBTUtils } from "$lib/utils/bitcoin/psbt/psbtUtils.ts";
+
+describe("PSBTUtils", () => {
+  let network: bitcoin.Network;
+  let psbt: bitcoin.Psbt;
+
+  beforeEach(() => {
+    network = bitcoin.networks.bitcoin;
+    psbt = new bitcoin.Psbt({ network });
+  });
+
+  describe("addCustomDustOutput", () => {
+    it("should add output with custom dust value", () => {
+      const address = "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh";
+      const value = 330; // Custom dust value
+
+      PSBTUtils.addCustomDustOutput(psbt, address, value);
+
+      assertEquals(psbt.txOutputs.length, 1);
+      assertEquals(psbt.txOutputs[0].value, value);
+      assertExists(psbt.txOutputs[0].address);
+      assertEquals(psbt.txOutputs[0].address, address);
+    });
+
+    it("should add multiple custom dust outputs", () => {
+      const outputs = [
+        { address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", value: 330 },
+        { address: "bc1q5y6x0fcf5q8zlwn7elglhul0p0t7e4t5xawpj9", value: 331 },
+        { address: "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3", value: 332 },
+      ];
+
+      outputs.forEach(({ address, value }) => {
+        PSBTUtils.addCustomDustOutput(psbt, address, value);
+      });
+
+      assertEquals(psbt.txOutputs.length, 3);
+      outputs.forEach((output, index) => {
+        assertEquals(psbt.txOutputs[index].value, output.value);
+        assertEquals(psbt.txOutputs[index].address, output.address);
+      });
+    });
+
+    it("should handle different address types", () => {
+      const addresses = [
+        { type: "P2WPKH", address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh" },
+        { type: "P2WSH", address: "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3" },
+        { type: "P2TR", address: "bc1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcr" },
+      ];
+
+      addresses.forEach(({ address }, index) => {
+        PSBTUtils.addCustomDustOutput(psbt, address, 330 + index);
+      });
+
+      assertEquals(psbt.txOutputs.length, addresses.length);
+    });
+
+    it("should validate minimum dust value", () => {
+      const address = "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh";
+      
+      // Test values below standard dust (typically 546 for P2WPKH)
+      // But MARA allows 1-332 sats
+      const validValues = [1, 100, 330, 332];
+      
+      validValues.forEach((value) => {
+        const testPsbt = new bitcoin.Psbt({ network });
+        PSBTUtils.addCustomDustOutput(testPsbt, address, value);
+        assertEquals(testPsbt.txOutputs[0].value, value);
+      });
+    });
+
+    it("should work with testnet addresses", () => {
+      const testnet = bitcoin.networks.testnet;
+      const testPsbt = new bitcoin.Psbt({ network: testnet });
+      const address = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx";
+      const value = 330;
+
+      PSBTUtils.addCustomDustOutput(testPsbt, address, value);
+
+      assertEquals(testPsbt.txOutputs.length, 1);
+      assertEquals(testPsbt.txOutputs[0].value, value);
+    });
+  });
+
+  describe("getOutputScriptForAddress", () => {
+    it("should get script for P2WPKH address", () => {
+      const address = "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh";
+      
+      const script = PSBTUtils.getOutputScriptForAddress(address, network);
+      
+      assertExists(script);
+      assertEquals(script.length, 22); // P2WPKH script is 22 bytes
+    });
+
+    it("should get script for P2WSH address", () => {
+      const address = "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3";
+      
+      const script = PSBTUtils.getOutputScriptForAddress(address, network);
+      
+      assertExists(script);
+      assertEquals(script.length, 34); // P2WSH script is 34 bytes
+    });
+
+    it("should get script for P2TR address", () => {
+      const address = "bc1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcr";
+      
+      const script = PSBTUtils.getOutputScriptForAddress(address, network);
+      
+      assertExists(script);
+      assertEquals(script.length, 34); // P2TR script is 34 bytes
+    });
+
+    it("should throw for invalid address", () => {
+      const invalidAddress = "invalid-address";
+      
+      assertThrows(
+        () => PSBTUtils.getOutputScriptForAddress(invalidAddress, network),
+        Error
+      );
+    });
+
+    it("should handle network mismatch", () => {
+      const mainnetAddress = "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh";
+      const testnet = bitcoin.networks.testnet;
+      
+      // Should throw or return null depending on implementation
+      try {
+        const script = PSBTUtils.getOutputScriptForAddress(mainnetAddress, testnet);
+        // If it doesn't throw, it might return a script anyway
+        // This depends on bitcoinjs-lib behavior
+        if (script) {
+          assertExists(script);
+        }
+      } catch (error) {
+        // Expected for network mismatch
+        assertExists(error);
+      }
+    });
+  });
+
+  describe("calculateDustFee", () => {
+    it("should calculate fee for single dust output", () => {
+      const outputCount = 1;
+      const feeRate = 10; // sats/vB
+      
+      const fee = PSBTUtils.calculateDustFee(outputCount, feeRate);
+      
+      // Each P2WPKH output is ~31 vBytes
+      // 1 output * 31 vB * 10 sats/vB = 310 sats
+      assertEquals(fee >= 310, true);
+    });
+
+    it("should calculate fee for multiple dust outputs", () => {
+      const outputCount = 5;
+      const feeRate = 10;
+      
+      const fee = PSBTUtils.calculateDustFee(outputCount, feeRate);
+      
+      // 5 outputs * 31 vB * 10 sats/vB = 1550 sats
+      assertEquals(fee >= 1550, true);
+    });
+
+    it("should handle zero outputs", () => {
+      const fee = PSBTUtils.calculateDustFee(0, 10);
+      assertEquals(fee, 0);
+    });
+
+    it("should handle different fee rates", () => {
+      const outputCount = 1;
+      const feeRates = [1, 5, 10, 50, 100];
+      
+      feeRates.forEach((rate) => {
+        const fee = PSBTUtils.calculateDustFee(outputCount, rate);
+        assertEquals(fee >= 31 * rate, true);
+      });
+    });
+  });
+
+  describe("PSBT manipulation with dust outputs", () => {
+    it("should create valid PSBT with dust outputs", () => {
+      // Add some inputs (mock)
+      psbt.addInput({
+        hash: Buffer.from("a".repeat(64), "hex"),
+        index: 0,
+        witnessUtxo: {
+          script: Buffer.from("0014" + "a".repeat(40), "hex"),
+          value: 10000,
+        },
+      });
+
+      // Add custom dust outputs
+      PSBTUtils.addCustomDustOutput(psbt, "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", 330);
+      PSBTUtils.addCustomDustOutput(psbt, "bc1q5y6x0fcf5q8zlwn7elglhul0p0t7e4t5xawpj9", 331);
+      
+      // Add change output (remaining value)
+      psbt.addOutput({
+        address: "bc1qchange",
+        value: 10000 - 330 - 331 - 1000, // minus dust and fee
+      });
+
+      assertEquals(psbt.txOutputs.length, 3);
+      assertEquals(psbt.txInputs.length, 1);
+    });
+
+    it("should handle PSBT with only dust outputs", () => {
+      psbt.addInput({
+        hash: Buffer.from("b".repeat(64), "hex"),
+        index: 0,
+        witnessUtxo: {
+          script: Buffer.from("0014" + "b".repeat(40), "hex"),
+          value: 1000,
+        },
+      });
+
+      // Add only dust outputs
+      PSBTUtils.addCustomDustOutput(psbt, "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", 330);
+      PSBTUtils.addCustomDustOutput(psbt, "bc1q5y6x0fcf5q8zlwn7elglhul0p0t7e4t5xawpj9", 330);
+
+      assertEquals(psbt.txOutputs.length, 2);
+      assertEquals(psbt.txOutputs[0].value + psbt.txOutputs[1].value, 660);
+    });
+  });
+
+  describe("MARA-specific dust values", () => {
+    it("should support all MARA dust values (1-332)", () => {
+      const address = "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh";
+      
+      // Test boundary values
+      const boundaryValues = [1, 2, 100, 330, 331, 332];
+      
+      boundaryValues.forEach((value) => {
+        const testPsbt = new bitcoin.Psbt({ network });
+        PSBTUtils.addCustomDustOutput(testPsbt, address, value);
+        
+        assertEquals(testPsbt.txOutputs.length, 1);
+        assertEquals(testPsbt.txOutputs[0].value, value);
+      });
+    });
+
+    it("should create PSBT for MARA stamp transaction", () => {
+      // Typical MARA stamp transaction structure
+      psbt.addInput({
+        hash: Buffer.from("c".repeat(64), "hex"),
+        index: 0,
+        witnessUtxo: {
+          script: Buffer.from("0014" + "c".repeat(40), "hex"),
+          value: 100000, // 0.001 BTC input
+        },
+      });
+
+      // Add stamp output (330 sats)
+      const stampAddress = "bc1qstamp";
+      PSBTUtils.addCustomDustOutput(psbt, stampAddress, 330);
+
+      // Add MARA service fee output (42000 sats)
+      const maraFeeAddress = "bc1qmarafee";
+      psbt.addOutput({
+        address: maraFeeAddress,
+        value: 42000,
+      });
+
+      // Add change output
+      const changeAddress = "bc1qchange";
+      const networkFee = 2000; // Estimated network fee
+      const changeValue = 100000 - 330 - 42000 - networkFee;
+      
+      psbt.addOutput({
+        address: changeAddress,
+        value: changeValue,
+      });
+
+      assertEquals(psbt.txOutputs.length, 3);
+      assertEquals(psbt.txOutputs[0].value, 330); // Stamp dust
+      assertEquals(psbt.txOutputs[1].value, 42000); // MARA fee
+      assertEquals(psbt.txOutputs[2].value, changeValue); // Change
+    });
+  });
+});

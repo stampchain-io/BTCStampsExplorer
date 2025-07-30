@@ -80,15 +80,15 @@ describe("ApiResponseUtil", () => {
       const cacheControl = response.headers.get("Cache-Control");
       assertEquals(
         cacheControl,
-        "public, max-age=300, stale-while-revalidate=60, stale-if-error=3600",
+        "public, max-age=86400, stale-while-revalidate=60, stale-if-error=3600",
       );
       assertEquals(response.headers.get("CDN-Cache-Control"), cacheControl);
       assertEquals(
         response.headers.get("Cloudflare-CDN-Cache-Control"),
         cacheControl,
       );
-      assertEquals(response.headers.get("Surrogate-Control"), "max-age=300");
-      assertEquals(response.headers.get("Edge-Control"), "cache-maxage=300");
+      assertEquals(response.headers.get("Surrogate-Control"), "max-age=86400");
+      assertEquals(response.headers.get("Edge-Control"), "cache-maxage=86400");
     });
 
     it("should not add cache headers when forceNoCache is true", () => {

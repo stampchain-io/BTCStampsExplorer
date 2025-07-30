@@ -10,6 +10,12 @@ import type { StampRow } from "$globals";
 class MockDatabaseManager {
   executeQueryWithCache: any;
   executeQuery: any;
+  
+  async invalidateCacheByCategory(category: string): Promise<void> {
+    // Mock implementation - just log for testing
+    console.log(`[MOCK] Invalidating cache for category: ${category}`);
+    return Promise.resolve();
+  }
 }
 
 describe("StampRepository Tests with Fixtures", () => {

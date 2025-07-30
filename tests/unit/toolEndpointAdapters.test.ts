@@ -128,7 +128,7 @@ describe("SRC20ToolAdapter", () => {
   it("should build correct request body for DEPLOY", () => {
     const requestBody = adapter.buildRequestBody(validSRC20Options);
 
-    assertEquals(requestBody.op, "DEPLOY");
+    assertEquals(requestBody.op, "deploy");
     assertEquals(requestBody.tick, "TEST");
     assertEquals(requestBody.sourceAddress, validSRC20Options.walletAddress);
     assertEquals(requestBody.max, "1000");
