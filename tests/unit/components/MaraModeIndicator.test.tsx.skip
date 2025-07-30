@@ -9,11 +9,15 @@ import {
 } from "$/components/indicators/MaraModeIndicator.tsx";
 import { AccessibilityUtils } from "$utils/ui/accessibility/accessibilityUtils.ts";
 import { stub, returnsNext } from "@std/testing/mock";
+import { setupDOM, teardownDOM } from "@tests/unit/utils/testHelpers.ts";
 
 describe("MaraModeIndicator", () => {
   let prefersReducedMotionStub: any;
 
   beforeEach(() => {
+    // Setup DOM environment
+    setupDOM();
+    
     // Mock AccessibilityUtils
     prefersReducedMotionStub = stub(
       AccessibilityUtils,
@@ -25,6 +29,7 @@ describe("MaraModeIndicator", () => {
   afterEach(() => {
     cleanup();
     prefersReducedMotionStub.restore();
+    teardownDOM();
   });
 
   describe("Main Component", () => {

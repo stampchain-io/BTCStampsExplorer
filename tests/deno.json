@@ -125,6 +125,7 @@
     "highcharts/": "https://esm.sh/highcharts@11.2.0/",
     "highcharts-react-official": "https://esm.sh/highcharts-react-official@3.2.1",
     "screenshotone-api-sdk": "https://esm.sh/screenshotone-api-sdk@1.1.19",
+    "@testing-library/preact": "https://esm.sh/@testing-library/preact@3.2.3",
     "$/": "../",
     "$client/": "../client/",
     "$components/": "../components/",
@@ -150,6 +151,7 @@
     "$table": "../islands/table/index.ts",
     "$fees": "../lib/hooks/useFees.ts",
     "$animation": "../lib/hooks/useAnimationControls.ts",
+    "$utils/": "../lib/utils/",
     "@tests/": "./"
   }
 }

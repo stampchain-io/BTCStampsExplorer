@@ -192,7 +192,7 @@
   "editor.inlineSuggest.enabled": true,
   "editor.wordWrap": "bounded",
   "editor.detectIndentation": false,
-  
+
   // Format on type can be useful but kept disabled to prevent conflicts
   // "editor.formatOnType": false,
 
@@ -250,5 +250,6 @@
   // Performance optimization
   "extensions.experimental.affinity": {
     "denoland.vscode-deno": 1
-  }
+  },
+  "testing.automaticallyOpenTestResults": "neverOpen"
 }
