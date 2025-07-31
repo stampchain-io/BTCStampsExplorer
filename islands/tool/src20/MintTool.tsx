@@ -1,7 +1,11 @@
 /* ===== SRC20 TOKEN MINTING COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { SRC20InputField } from "$form";
+import {
+  inputFieldDropdown,
+  inputFieldDropdownHover,
+  SRC20InputField,
+} from "$form";
 import { Icon } from "$icon";
 import {
   bodyTool,
@@ -14,6 +18,7 @@ import {
   loaderSkeletonImage,
   loaderSkeletonLg,
   loaderSkeletonMd,
+  loaderSpinGrey,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { extractSRC20ErrorMessage } from "$lib/utils/bitcoin/src20/errorHandling.tsx";
@@ -410,7 +415,9 @@ export function SRC20MintTool({
 
             {/* Supply and limit information skeleton */}
             <div class="flex flex-col w-full items-start mt-2 min-[480px]:w-[45%] min-[480px]:justify-end min-[480px]:items-end min-[480px]:-mb-1">
-              <div class={`h-14 min-[480px]:h-[52px] w-24 ${loaderSkeletonMd}`}>
+              <div
+                class={`h-14 min-[480px]:h-[52px] w-[88px] ${loaderSkeletonMd}`}
+              >
               </div>
             </div>
           </div>
@@ -496,7 +503,7 @@ export function SRC20MintTool({
               : (
                 <Icon
                   type="icon"
-                  name="uploadImage"
+                  name="previewImage"
                   weight="extraLight"
                   size="xxl"
                   color="grey"
@@ -558,8 +565,7 @@ export function SRC20MintTool({
                   !isSelecting;
                 return shouldShow;
               })() && (
-                <ul class="absolute top-[100%] left-0 max-h-[146px] w-full bg-[#252026]/90 border-b-[1px] backdrop-blur-xl border-stamp-grey-darker/20 rounded-b-lg text-stamp-grey-light text-sm leading-none font-bold z-[11]
-                overflow-y-auto scrollbar-glassmorphism shadow-lg">
+                <ul class={`${inputFieldDropdown} max-h-[146px]`}>
                   {searchResults.map((result: SearchResult) => (
                     <li
                       key={result.tick}
@@ -567,7 +573,7 @@ export function SRC20MintTool({
                         e.preventDefault(); // Prevent input blur
                         handleResultClick(result.tick);
                       }}
-                      class="flex justify-between py-2 px-3 hover:bg-stamp-grey-darker/50 hover:text-stamp-grey-light uppercase border-x-[1px] border-b-[1px] border-stamp-grey-darker/20 last:border-b-0 transition-colors duration-200 cursor-pointer"
+                      class={`${inputFieldDropdownHover}`}
                     >
                       <div class="font-medium text-sm">{result.tick}</div>
                       <div class="font-medium text-xs text-stamp-grey-darker mt-0.5">
