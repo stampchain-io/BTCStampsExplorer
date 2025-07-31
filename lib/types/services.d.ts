@@ -108,7 +108,7 @@ export interface DispenserStats {
  * Service health status information
  */
 export interface ServiceHealth {
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
   details?: string;
   timestamp: string;
   checks?: Record<string, boolean>;
@@ -199,7 +199,7 @@ export interface AsyncOperationConfig {
   timeout: number;
   retries: number;
   retryDelay: number;
-  retryBackoff: 'linear' | 'exponential';
+  retryBackoff: "linear" | "exponential";
   circuit?: CircuitBreakerConfig;
 }
 
@@ -231,13 +231,13 @@ export interface IAsyncService extends IService {
   /** Execute operation with retry and timeout handling */
   executeWithRetry<T>(
     operation: () => Promise<T>,
-    config?: Partial<AsyncOperationConfig>
+    config?: Partial<AsyncOperationConfig>,
   ): Promise<ServiceResult<T>>;
-  
+
   /** Execute operation with circuit breaker protection */
   executeWithCircuitBreaker<T>(
     operation: () => Promise<T>,
-    circuitName: string
+    circuitName: string,
   ): Promise<ServiceResult<T>>;
 }
 
@@ -251,7 +251,7 @@ export interface IAsyncService extends IService {
 export interface ServiceConfig {
   name: string;
   enabled: boolean;
-  environment: 'development' | 'staging' | 'production';
+  environment: "development" | "staging" | "production";
   logging: LoggingConfig;
   monitoring: MonitoringConfig;
   [key: string]: unknown;
@@ -261,9 +261,9 @@ export interface ServiceConfig {
  * Logging configuration for services
  */
 export interface LoggingConfig {
-  level: 'debug' | 'info' | 'warn' | 'error';
-  format: 'json' | 'text';
-  outputs: ('console' | 'file' | 'remote')[];
+  level: "debug" | "info" | "warn" | "error";
+  format: "json" | "text";
+  outputs: ("console" | "file" | "remote")[];
   contextFields: string[];
 }
 
@@ -294,7 +294,10 @@ export interface IServiceMiddleware {
   name: string;
   order: number;
   before?<T>(context: ServiceContext, input: T): Promise<T>;
-  after?<T>(context: ServiceContext, result: ServiceResult<T>): Promise<ServiceResult<T>>;
+  after?<T>(
+    context: ServiceContext,
+    result: ServiceResult<T>,
+  ): Promise<ServiceResult<T>>;
   onError?(context: ServiceContext, error: ServiceError): Promise<void>;
 }
 
@@ -317,7 +320,7 @@ export interface IServicePipeline {
   addMiddleware(middleware: IServiceMiddleware): IServicePipeline;
   execute<TInput, TOutput>(
     input: TInput,
-    context: ServiceContext
+    context: ServiceContext,
   ): Promise<ServiceResult<TOutput>>;
 }
 
@@ -371,7 +374,7 @@ export interface QueryCriteria {
  */
 export interface SortCriteria {
   field: string;
-  direction: 'asc' | 'desc';
+  direction: "asc" | "desc";
 }
 
 /**
@@ -389,9 +392,14 @@ export interface IQueryableRepository<T, ID> extends IRepository<T, ID> {
   /** Find entities matching criteria */
   findByCriteria(criteria: QueryCriteria): Promise<PaginatedResult<T>>;
   /** Find single entity by criteria */
-  findOneByCriteria(criteria: Omit<QueryCriteria, 'pagination'>): Promise<T | null>;
+  findOneByCriteria(
+    criteria: Omit<QueryCriteria, "pagination">,
+  ): Promise<T | null>;
   /** Update entities matching criteria */
-  updateByCriteria(criteria: QueryCriteria, updates: Partial<T>): Promise<number>;
+  updateByCriteria(
+    criteria: QueryCriteria,
+    updates: Partial<T>,
+  ): Promise<number>;
   /** Delete entities matching criteria */
   deleteByCriteria(criteria: QueryCriteria): Promise<number>;
 }
@@ -415,14 +423,20 @@ export interface ServiceEvent<T = unknown> {
 /**
  * Event handler function type
  */
-export type EventHandler<T = unknown> = (event: ServiceEvent<T>) => Promise<void>;
+export type EventHandler<T = unknown> = (
+  event: ServiceEvent<T>,
+) => Promise<void>;
 
 /**
  * Event emitter interface for services
  */
 export interface IEventEmitter {
   /** Emit an event */
-  emit<T>(eventType: string, data: T, metadata?: Record<string, unknown>): Promise<void>;
+  emit<T>(
+    eventType: string,
+    data: T,
+    metadata?: Record<string, unknown>,
+  ): Promise<void>;
   /** Subscribe to events */
   on<T>(eventType: string, handler: EventHandler<T>): void;
   /** Unsubscribe from events */
@@ -438,7 +452,11 @@ export interface IEventEmitter {
  */
 export interface IMessageQueue {
   /** Send message to queue */
-  send<T>(queueName: string, message: T, options?: MessageOptions): Promise<void>;
+  send<T>(
+    queueName: string,
+    message: T,
+    options?: MessageOptions,
+  ): Promise<void>;
   /** Subscribe to queue messages */
   subscribe<T>(queueName: string, handler: MessageHandler<T>): Promise<void>;
   /** Unsubscribe from queue */
@@ -460,7 +478,9 @@ export interface MessageOptions {
 /**
  * Message handler function type
  */
-export type MessageHandler<T = unknown> = (message: QueueMessage<T>) => Promise<void>;
+export type MessageHandler<T = unknown> = (
+  message: QueueMessage<T>,
+) => Promise<void>;
 
 /**
  * Queue message wrapper
@@ -547,7 +567,11 @@ export interface IServiceLogger {
   /** Log warning message */
   warn(message: string, context?: Record<string, unknown>): void;
   /** Log error message */
-  error(message: string, error?: Error, context?: Record<string, unknown>): void;
+  error(
+    message: string,
+    error?: Error,
+    context?: Record<string, unknown>,
+  ): void;
   /** Create child logger with additional context */
   child(context: Record<string, unknown>): IServiceLogger;
 }
@@ -563,7 +587,11 @@ export interface IServiceTracer {
   /** Add tags to span */
   addTags(span: TraceSpan, tags: Record<string, unknown>): void;
   /** Log event to span */
-  logEvent(span: TraceSpan, event: string, data?: Record<string, unknown>): void;
+  logEvent(
+    span: TraceSpan,
+    event: string,
+    data?: Record<string, unknown>,
+  ): void;
 }
 
 /**
@@ -595,11 +623,17 @@ export interface IServiceMonitor {
   /** Record service metrics */
   recordMetrics(metrics: ServiceMetrics): Promise<void>;
   /** Get service statistics */
-  getStatistics(serviceName: string, period: TimePeriod): Promise<ServiceStatistics>;
+  getStatistics(
+    serviceName: string,
+    period: TimePeriod,
+  ): Promise<ServiceStatistics>;
   /** Get current health status */
   getHealthStatus(serviceName: string): Promise<ServiceHealth>;
   /** Register health check */
-  registerHealthCheck(serviceName: string, check: () => Promise<ServiceHealth>): void;
+  registerHealthCheck(
+    serviceName: string,
+    check: () => Promise<ServiceHealth>,
+  ): void;
   /** Start monitoring */
   startMonitoring(): Promise<void>;
   /** Stop monitoring */
@@ -655,7 +689,7 @@ export interface IServiceManager {
  */
 export interface ServiceStatus {
   name: string;
-  status: 'stopped' | 'starting' | 'running' | 'stopping' | 'error';
+  status: "stopped" | "starting" | "running" | "stopping" | "error";
   health: ServiceHealth;
   uptime: number;
   version: string;

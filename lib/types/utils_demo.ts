@@ -4,20 +4,20 @@
  */
 
 import type {
-  DeepPartial,
-  DeepRequired,
-  PickByValue,
-  OmitByValue,
   ApiResponse,
   BitcoinAddressFormat,
-  TransactionInput,
-  FeeEstimate,
-  DeepMerge,
   Brand,
-  NonEmptyArray,
+  DeepMerge,
+  DeepPartial,
+  DeepRequired,
+  FeeEstimate,
   FilterConfig,
+  NonEmptyArray,
+  OmitByValue,
+  PickByValue,
   SortConfig,
-} from './utils.d.ts';
+  TransactionInput,
+} from "./utils.d.ts";
 
 // Example 1: Deep utility types
 interface StampData {
@@ -40,9 +40,9 @@ interface StampData {
 const partialUpdate: DeepPartial<StampData> = {
   metadata: {
     attributes: {
-      collection: "New Collection"
-    }
-  }
+      collection: "New Collection",
+    },
+  },
 };
 
 // DeepRequired ensures all optional properties become required
@@ -60,19 +60,19 @@ interface MixedTypes {
 type NumberProps = PickByValue<MixedTypes, number>; // { count: number, total: number }
 const numbers: NumberProps = { count: 5, total: 100 };
 
-// Omit number properties  
+// Omit number properties
 type NonNumberProps = OmitByValue<MixedTypes, number>; // { name: string, active: boolean }
 const nonNumbers: NonNumberProps = { name: "test", active: true };
 
 // Example 3: Bitcoin-specific types
-const addressFormat: BitcoinAddressFormat = 'P2WPKH';
+const addressFormat: BitcoinAddressFormat = "P2WPKH";
 
 const txInput: TransactionInput = {
-  txid: '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+  txid: "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
   vout: 0,
-  scriptSig: '',
+  scriptSig: "",
   sequence: 0xffffffff,
-  witness: ['304402...', '03ab12...']
+  witness: ["304402...", "03ab12..."],
 };
 
 const feeEstimate: FeeEstimate = {
@@ -80,7 +80,7 @@ const feeEstimate: FeeEstimate = {
   feeRate: 10,
   estimatedSize: 150,
   inputCount: 2,
-  outputCount: 1
+  outputCount: 1,
 };
 
 // Example 4: API Response wrapper
@@ -93,15 +93,15 @@ const stampResponse: ApiResponse<StampData> = {
       description: "A rare Bitcoin stamp",
       attributes: {
         rarity: "uncommon",
-        collection: "Genesis Collection"
-      }
+        collection: "Genesis Collection",
+      },
     },
     transaction: {
       hash: "abc123...",
-      confirmations: 6
-    }
+      confirmations: 6,
+    },
   },
-  timestamp: Date.now()
+  timestamp: Date.now(),
 };
 
 // Example 5: Type-safe merging
@@ -125,13 +125,13 @@ const merged: MergedPrefs = {
   permissions: ["read", "write"],
   settings: {
     notifications: true,
-    adminPanel: true
-  }
+    adminPanel: true,
+  },
 };
 
 // Example 6: Brand types for type safety
-type StampId = Brand<number, 'StampId'>;
-type TransactionId = Brand<string, 'TransactionId'>;
+type StampId = Brand<number, "StampId">;
+type TransactionId = Brand<string, "TransactionId">;
 
 const stampId: StampId = 12345 as StampId;
 const txId: TransactionId = "abc123..." as TransactionId;
@@ -142,43 +142,43 @@ const txId: TransactionId = "abc123..." as TransactionId;
 // Example 7: Array utilities
 const addresses: NonEmptyArray<string> = [
   "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2",
-  "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
+  "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
 ];
 
 // Example 8: Query building with type safety
-const sortConfig: SortConfig<'timestamp' | 'amount' | 'confirmations'> = {
-  field: 'timestamp',
-  order: 'desc'
+const sortConfig: SortConfig<"timestamp" | "amount" | "confirmations"> = {
+  field: "timestamp",
+  order: "desc",
 };
 
-const filterConfig: FilterConfig<'status' | 'amount'> = {
-  field: 'status',
-  operator: 'eq',
-  value: 'confirmed'
+const filterConfig: FilterConfig<"status" | "amount"> = {
+  field: "status",
+  operator: "eq",
+  value: "confirmed",
 };
 
 // Export examples for potential use in tests
 export {
-  partialUpdate,
-  numbers,
-  nonNumbers,
-  addressFormat,
-  txInput,
-  feeEstimate,
-  stampResponse,
-  merged,
-  stampId,
-  txId,
   addresses,
+  addressFormat,
+  feeEstimate,
+  filterConfig,
+  merged,
+  nonNumbers,
+  numbers,
+  partialUpdate,
   sortConfig,
-  filterConfig
+  stampId,
+  stampResponse,
+  txId,
+  txInput,
 };
 
 export type {
   CompleteStampData,
-  NumberProps,
-  NonNumberProps,
   MergedPrefs,
+  NonNumberProps,
+  NumberProps,
   StampId,
-  TransactionId
+  TransactionId,
 };

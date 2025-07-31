@@ -498,6 +498,499 @@ export type StampPageProps = {
 };
 
 // ============================================================================
+// Internal API Types
+// ============================================================================
+
+/**
+ * Internal API endpoint types for system-internal communication
+ * These endpoints are secured and used for internal operations only
+ */
+
+// MARA Integration API Types
+/**
+ * MARA transaction submission request body
+ * Used by /api/internal/mara-submit
+ */
+export interface MaraSubmitRequest {
+  /** Signed transaction hex string */
+  hex: string;
+  /** Optional stamp ID for logging and tracking */
+  txid?: string;
+  /** Transaction priority level */
+  priority?: "high" | "medium" | "low";
+}
+
+/**
+ * MARA transaction submission response
+ * Response from /api/internal/mara-submit
+ */
+export interface MaraSubmitResponse {
+  /** Transaction ID from MARA */
+  txid: string;
+  /** Submission status */
+  status: "accepted" | "pending" | "rejected";
+  /** Pool identifier */
+  pool: "mara";
+  /** Human-readable message */
+  message: string;
+  /** Estimated blocks until confirmation (optional) */
+  estimatedConfirmation?: number;
+  /** Pool priority level (optional) */
+  poolPriority?: number;
+}
+
+/**
+ * MARA health check response
+ * Response from /api/internal/mara-health
+ */
+export interface MaraHealthResponse {
+  /** Overall health status */
+  status: "healthy" | "degraded" | "unhealthy";
+  /** Timestamp of health check */
+  timestamp: number;
+  /** Component health details */
+  components: {
+    /** MARA integration enabled */
+    enabled: boolean;
+    /** Service configuration valid */
+    configured: boolean;
+    /** Circuit breaker healthy */
+    circuitBreaker: "healthy" | "degraded" | "open" | "unhealthy";
+    /** Recent API performance */
+    apiPerformance: "healthy" | "degraded" | "failing";
+  };
+  /** Health check metrics */
+  metrics: {
+    /** Recent success rate (last 1 hour) */
+    successRate: number;
+    /** Average response time (last 1 hour) */
+    avgResponseTime: number;
+    /** Circuit breaker trips (last 24 hours) */
+    circuitBreakerTrips: number;
+  };
+  /** Health check details */
+  details?: string[];
+}
+
+/**
+ * MARA fee rate response
+ * Response from /api/internal/mara-fee-rate
+ */
+export interface MaraFeeRateResponse {
+  /** Current recommended fee rate (sats/vB) */
+  feeRate: number;
+  /** Fee rate source */
+  source: "mara" | "fallback";
+  /** Confidence level */
+  confidence: "high" | "medium" | "low";
+  /** Timestamp of fee rate */
+  timestamp: number;
+  /** Additional fee rate options */
+  tiers?: {
+    fast: number;
+    medium: number;
+    slow: number;
+  };
+}
+
+// Monitoring & System API Types
+/**
+ * System monitoring response
+ * Response from /api/internal/monitoring
+ */
+export interface MonitoringResponse {
+  status: "healthy" | "degraded" | "unhealthy";
+  timestamp: string;
+  uptime: number;
+  memory: NodeJS.MemoryUsage;
+  pid: number;
+  node_version: string;
+  environment: string;
+}
+
+/**
+ * Memory monitoring response
+ * Response from /api/internal/monitoring?action=memory
+ */
+export interface MemoryMonitoringResponse {
+  status: "healthy" | "warning" | "critical";
+  timestamp: string;
+  memory: {
+    heap: {
+      used: number;
+      total: number;
+      available: number;
+      percentage: number;
+    };
+    system: {
+      rss: number;
+      external: number;
+    };
+  };
+  gc?: {
+    lastCollection: string;
+    collections: number;
+  };
+}
+
+/**
+ * Database monitoring response
+ * Response from /api/internal/monitoring?action=database
+ */
+export interface DatabaseMonitoringResponse {
+  connectionPool: {
+    totalConnections: number;
+    activeConnections: number;
+    poolSize: number;
+    maxPoolSize: number;
+  };
+  health: {
+    poolUtilization: number;
+    hasAvailableConnections: boolean;
+    isHealthy: boolean;
+  };
+  timestamp: string;
+}
+
+/**
+ * Fee estimation response
+ * Response from /api/internal/fees
+ */
+export interface FeesResponse {
+  /** Recommended fee rate (sats/vB) */
+  recommendedFee: number;
+  /** Current BTC price in USD */
+  btcPrice: number;
+  /** Data source identifier */
+  source: string;
+  /** Confidence level of the estimate */
+  confidence: "high" | "medium" | "low";
+  /** Response timestamp */
+  timestamp: number;
+  /** Whether fallback data was used */
+  fallbackUsed?: boolean;
+  /** Any errors encountered */
+  errors?: string[];
+  /** Emergency fallback indicator */
+  emergencyFallback?: boolean;
+  /** Additional fee rate tiers */
+  tiers?: {
+    fast: number;
+    medium: number;
+    slow: number;
+  };
+}
+
+/**
+ * BTC price response
+ * Response from /api/internal/btcPrice
+ */
+export interface BTCPriceResponse {
+  data: {
+    /** Current BTC price in USD */
+    price: number;
+    /** Price data source */
+    source: string;
+    /** Price confidence level */
+    confidence: "high" | "medium" | "low";
+    /** Additional price details */
+    details?: {
+      lastUpdate?: string;
+      currency?: string;
+      volume24h?: number;
+      change24h?: number;
+    };
+  };
+}
+
+/**
+ * CSRF token response
+ * Response from /api/internal/csrfToken
+ */
+export interface CSRFTokenResponse {
+  /** CSRF protection token */
+  token: string;
+}
+
+/**
+ * Carousel stamps response
+ * Response from /api/internal/carousel
+ */
+export interface CarouselResponse extends Array<StampRow> {}
+
+/**
+ * Bitcoin notifications response
+ * Response from /api/internal/bitcoinNotifications
+ */
+export interface BitcoinNotificationsResponse {
+  /** Current block height */
+  blockHeight: number;
+  /** Recent notifications */
+  notifications: Array<{
+    /** Notification ID */
+    id: string;
+    /** Notification type */
+    type: "block" | "transaction" | "alert";
+    /** Notification message */
+    message: string;
+    /** Timestamp */
+    timestamp: number;
+    /** Severity level */
+    severity: "info" | "warning" | "error";
+    /** Additional data */
+    data?: Record<string, any>;
+  }>;
+  /** Notification system status */
+  status: "active" | "inactive" | "error";
+}
+
+// File Upload API Types
+/**
+ * SRC-20 background upload request
+ * Request body for /api/internal/src20Background
+ */
+export interface SRC20BackgroundUploadRequest {
+  /** Base64 encoded file data */
+  fileData: string;
+  /** SRC-20 tick identifier */
+  tick: string;
+  /** CSRF protection token */
+  csrfToken?: string;
+}
+
+/**
+ * SRC-20 background upload response
+ * Response from /api/internal/src20Background
+ */
+export interface SRC20BackgroundUploadResponse {
+  /** Upload success status */
+  success: boolean;
+  /** Result message */
+  message: string;
+  /** Uploaded file information */
+  fileInfo?: {
+    /** File name */
+    filename: string;
+    /** File size in bytes */
+    size: number;
+    /** File URL */
+    url: string;
+    /** File type */
+    type: string;
+  };
+  /** Upload timestamp */
+  timestamp?: number;
+}
+
+// Additional Internal Endpoint Types
+/**
+ * Creator name cache response
+ * Response from /api/internal/creatorName
+ */
+export interface CreatorNameResponse {
+  /** Creator address */
+  address: string;
+  /** Creator display name */
+  name: string;
+  /** Cache timestamp */
+  timestamp: number;
+  /** Cache TTL remaining */
+  ttl?: number;
+}
+
+/**
+ * UTXO query response
+ * Response from /api/internal/utxoquery
+ */
+export interface UTXOQueryResponse {
+  /** UTXO list */
+  utxos: Array<{
+    /** Transaction ID */
+    txid: string;
+    /** Output index */
+    vout: number;
+    /** Output value in satoshis */
+    value: number;
+    /** Script public key */
+    scriptPubKey: string;
+    /** Confirmation count */
+    confirmations: number;
+  }>;
+  /** Total UTXO value */
+  totalValue: number;
+  /** Query timestamp */
+  timestamp: number;
+}
+
+/**
+ * Background fee status response
+ * Response from /api/internal/background-fee-status
+ */
+export interface BackgroundFeeStatusResponse {
+  /** Fee calculation status */
+  status: "calculating" | "ready" | "error";
+  /** Current fee estimates */
+  fees?: {
+    fast: number;
+    medium: number;
+    slow: number;
+  };
+  /** Last update timestamp */
+  lastUpdate: number;
+  /** Error message if applicable */
+  error?: string;
+}
+
+/**
+ * BTC price status response
+ * Response from /api/internal/btc-price-status
+ */
+export interface BTCPriceStatusResponse {
+  /** Price fetch status */
+  status: "updating" | "ready" | "stale" | "error";
+  /** Current price */
+  price?: number;
+  /** Price source */
+  source?: string;
+  /** Last update timestamp */
+  lastUpdate: number;
+  /** Next update timestamp */
+  nextUpdate?: number;
+  /** Error message if applicable */
+  error?: string;
+}
+
+/**
+ * Debug headers response
+ * Response from /api/internal/debug-headers
+ */
+export interface DebugHeadersResponse {
+  /** Request headers */
+  headers: Record<string, string>;
+  /** Request method */
+  method: string;
+  /** Request URL */
+  url: string;
+  /** Client IP */
+  clientIP: string;
+  /** User agent */
+  userAgent: string;
+  /** Request timestamp */
+  timestamp: number;
+}
+
+/**
+ * Fee security check response
+ * Response from /api/internal/fee-security
+ */
+export interface FeeSecurityResponse {
+  /** Security check status */
+  status: "secure" | "warning" | "blocked";
+  /** Security checks performed */
+  checks: {
+    /** Rate limiting status */
+    rateLimit: "ok" | "warning" | "exceeded";
+    /** Fee threshold check */
+    feeThreshold: "ok" | "high" | "excessive";
+    /** Source validation */
+    sourceValidation: "ok" | "suspicious" | "blocked";
+  };
+  /** Security messages */
+  messages: string[];
+  /** Check timestamp */
+  timestamp: number;
+}
+
+/**
+ * Recent stamp sales response
+ * Response from /api/internal/stamp-recent-sales
+ */
+export interface StampRecentSalesResponse {
+  /** Recent sales data */
+  sales: Array<{
+    /** Stamp identifier */
+    stamp: number;
+    /** Sale price in satoshis */
+    price: number;
+    /** Sale timestamp */
+    timestamp: number;
+    /** Transaction hash */
+    txHash: string;
+    /** Buyer address */
+    buyer: string;
+    /** Seller address */
+    seller: string;
+  }>;
+  /** Total sales count */
+  totalSales: number;
+  /** Data timestamp */
+  timestamp: number;
+}
+
+// Operation Response Types
+/**
+ * Cache purge response
+ * Response from /api/internal/purge-creator-cache
+ */
+export interface CachePurgeResponse {
+  /** Purge operation success */
+  success: boolean;
+  /** Items purged count */
+  itemsPurged: number;
+  /** Operation message */
+  message: string;
+  /** Purge timestamp */
+  timestamp: number;
+}
+
+/**
+ * Connection pool reset response
+ * Response from /api/internal/reset-connection-pool
+ */
+export interface ConnectionPoolResetResponse {
+  /** Reset operation success */
+  success: boolean;
+  /** Pool statistics before reset */
+  before: {
+    totalConnections: number;
+    activeConnections: number;
+    poolSize: number;
+  };
+  /** Pool statistics after reset */
+  after: {
+    totalConnections: number;
+    activeConnections: number;
+    poolSize: number;
+  };
+  /** Reset timestamp */
+  timestamp: number;
+}
+
+/**
+ * Circuit breaker test reset response
+ * Response from /api/internal/test-reset-circuit-breakers
+ */
+export interface CircuitBreakerTestResetResponse {
+  /** Reset operation success */
+  success: boolean;
+  /** Circuit breakers reset */
+  breakersReset: string[];
+  /** Reset details */
+  details: Record<string, {
+    /** Previous state */
+    previousState: string;
+    /** Current state */
+    currentState: string;
+    /** Reset timestamp */
+    resetAt: number;
+  }>;
+  /** Operation message */
+  message: string;
+  /** Reset timestamp */
+  timestamp: number;
+}
+
+// ============================================================================
 // Type Re-exports for Dependencies
 // ============================================================================
 

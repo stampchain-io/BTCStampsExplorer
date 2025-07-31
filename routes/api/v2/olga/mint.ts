@@ -14,9 +14,9 @@ import {
 } from "$server/services/counterpartyApiService.ts";
 import * as bitcoin from "bitcoinjs-lib"; // Keep for Psbt.fromHex
 import type {
-  RawRequestBody,
   CreateStampIssuanceParams,
   NormalizedMintResponse,
+  RawRequestBody,
   TransactionInput,
 } from "@/lib/types/api.d.ts";
 

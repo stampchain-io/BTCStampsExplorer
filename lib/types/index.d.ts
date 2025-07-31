@@ -1,20 +1,20 @@
 /**
  * BTCStampsExplorer Type Definitions - Public API
- * 
+ *
  * This file provides the main entry point for all client-side type definitions
  * used throughout the BTCStampsExplorer application. Types are organized by
  * functional domains and exported using TypeScript 5.3+ patterns.
- * 
+ *
  * @fileoverview Public API exports for client-side type definitions
  * @version 2.0.0
  * @author BTCStampsExplorer Team
- * 
+ *
  * Usage:
  * ```typescript
  * import type { StampData, SRC20Token, ApiResponse } from '@/lib/types';
  * import type { Bitcoin } from '@/lib/types'; // Namespace import
  * ```
- * 
+ *
  * Export Organization:
  * - Core Domain Types: Bitcoin primitives, transactions, addresses
  * - Token Types: Stamps, SRC-20, SRC-101 token definitions
@@ -29,48 +29,44 @@
 // ============================================================================
 
 export type {
-  // Bitcoin base primitives
-  ScriptType,
-  UTXO,
+  AdvancedFeeCalculatorProps,
+  AncestorInfo,
+  BaseFeeCalculatorProps,
   BasicUTXO,
-  TransactionInput,
-  TransactionOutput,
-  BTCBalance,
-  BtcInfo,
-  
-  // Configuration and constants
-  Config,
-  ROOT_DOMAIN_TYPES,
-  SUBPROTOCOLS,
-  WalletDataTypes,
-  
   // Block and transaction data
   BlockRow,
-  XCPParams,
-  
+  BTCBalance,
+  BtcInfo,
+  // Configuration and constants
+  Config,
   // Fee calculation types
   FeeDetails,
   FeeEstimationParams,
   FeeEstimationResult,
-  BaseFeeCalculatorProps,
+  ROOT_DOMAIN_TYPES,
+  // Bitcoin base primitives
+  ScriptType,
   SimpleFeeCalculatorProps,
-  AdvancedFeeCalculatorProps,
-  AncestorInfo,
+  SUBPROTOCOLS,
+  TransactionInput,
+  TransactionOutput,
+  UTXO,
+  WalletDataTypes,
+  XCPParams,
 } from "./base.d.ts";
 
 export type {
-  // Transaction processing types
-  SendRow,
   BlockInfo,
-  TX,
-  TXError,
+  InputTypeForSizeEstimation,
   MintStampInputData,
-  
+  Output,
+  OutputTypeForSizeEstimation,
   // Script and size estimation
   ScriptTypeInfo,
-  InputTypeForSizeEstimation,
-  OutputTypeForSizeEstimation,
-  Output,
+  // Transaction processing types
+  SendRow,
+  TX,
+  TXError,
 } from "./transaction.d.ts";
 
 // ============================================================================
@@ -78,69 +74,60 @@ export type {
 // ============================================================================
 
 export type {
-  // Core stamp data structures
-  StampRow,
-  StampBalance,
-  ValidatedStamp,
-  
-  // Extended stamp interfaces
-  StampWithOptionalMarketData,
-  
-  // Stamp metadata and validation
-  StampMetadata,
-  StampValidationResult,
-  StampValidationError,
-  StampValidationWarning,
-  
-  // Stamp enums and types
-  StampClassification,
-  StampValidationStatus,
-  StampRarity,
-  StampStatus,
-  STAMP_TYPES,
   STAMP_FILTER_TYPES,
   STAMP_MARKETPLACE,
-  
-  // Stamp transaction types
-  StampTransactionType,
-  StampTransactionInput,
-  StampTransactionOutput,
-  StampParsingResult,
-  
+  STAMP_TYPES,
+  StampBalance,
+  // Stamp enums and types
+  StampClassification,
   // Stamp filters and props
   StampFilters,
+  // Stamp metadata and validation
+  StampMetadata,
+  StampParsingResult,
+  StampRarity,
+  // Core stamp data structures
+  StampRow,
+  StampStatus,
+  StampTransactionInput,
+  StampTransactionOutput,
+  // Stamp transaction types
+  StampTransactionType,
+  StampValidationError,
+  StampValidationResult,
+  StampValidationStatus,
+  StampValidationWarning,
+  // Extended stamp interfaces
+  StampWithOptionalMarketData,
+  ValidatedStamp,
 } from "./stamp.d.ts";
 
 export type {
-  // SRC-20 core types
-  SRC20Row,
-  SRC20Balance,
-  EnrichedSRC20Row,
   Deployment,
-  
-  // SRC-20 operations and status
-  SRC20Operation,
-  SRC20MintStatus,
-  SRC20HolderData,
-  SRC20TickPageData,
-  
+  EnrichedSRC20Row,
+  PaginatedSRC20WithMarketDataResponse,
+  SRC20_DETAILS,
+  SRC20_FILTER_TYPES,
+  SRC20_MARKET,
+  SRC20_STATUS,
   // SRC-20 type constants
   SRC20_TYPES,
-  SRC20_FILTER_TYPES,
-  SRC20_STATUS,
-  SRC20_DETAILS,
-  SRC20_MARKET,
-  
-  // Extended SRC-20 interfaces
-  SRC20WithOptionalMarketData,
-  PaginatedSRC20WithMarketDataResponse,
-  SRC20MarketDataQueryParams,
-  
+  SRC20Balance,
+  SRC20BalanceRequestParams,
   // SRC-20 filters and requests
   SRC20Filters,
-  SRC20TrxRequestParams,
-  SRC20BalanceRequestParams,
+  SRC20HolderData,
+  SRC20MarketDataQueryParams,
+  SRC20MintStatus,
+  // SRC-20 operations and status
+  SRC20Operation,
+  // SRC-20 core types
+  SRC20Row,
   SRC20SnapshotRequestParams,
+  SRC20TickPageData,
+  SRC20TrxRequestParams,
+  // Extended SRC-20 interfaces
+  SRC20WithOptionalMarketData,
 } from "./src20.d.ts";
 
 export type {
@@ -157,32 +144,28 @@ export type {
   AddressHandlerContext,
   AddressTickHandlerContext,
   BlockHandlerContext,
-  IdentHandlerContext,
-  TickHandlerContext,
-  
+  BlockInfoResponseBody,
   // API response bodies
   DeployResponseBody,
-  Src20ResponseBody,
-  Src20BalanceResponseBody,
-  StampBlockResponseBody,
-  BlockInfoResponseBody,
-  
+  IdentHandlerContext,
+  PaginatedDispenserResponseBody,
   // Paginated responses
   PaginatedIdResponseBody,
-  PaginatedDispenserResponseBody,
-  PaginatedSrc20ResponseBody,
   PaginatedSrc20BalanceResponseBody,
-  PaginatedStampResponseBody,
+  PaginatedSrc20ResponseBody,
   PaginatedStampBalanceResponseBody,
+  PaginatedStampResponseBody,
   PaginatedTickResponseBody,
-  
+  Src20BalanceResponseBody,
+  Src20ResponseBody,
   // Request parameters
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
-  
+  StampBlockResponseBody,
   // Page props and combined data
   StampPageProps,
   StampsAndSrc20,
+  TickHandlerContext,
 } from "./api.d.ts";
 
 // ============================================================================
@@ -190,13 +173,11 @@ export type {
 // ============================================================================
 
 export type {
-  // Core wallet types
-  WalletInfo,
-  BTCBalanceInfo,
-  
   // External API responses
   BlockCypherAddressBalanceResponse,
-  
+  BTCBalanceInfo,
+  // Core wallet types
+  WalletInfo,
   // Legacy wallet interface (deprecated - use WalletInfo)
   WalletInfo as Wallet,
 } from "./wallet.d.ts";
@@ -206,68 +187,59 @@ export type {
 // ============================================================================
 
 export type {
+  AnimationProps,
+  AriaAttributes,
+  AsyncStateProps,
+  BaseButtonProps,
   // Base component types
   BaseComponentProps,
-  ExtendedComponentProps,
-  ComponentWithChildren,
-  
-  // Theme and styling
-  ColorPalette,
-  Typography,
-  SpacingScale,
   Breakpoints,
-  Theme,
-  
+  ButtonColor,
+  ButtonProps,
+  ButtonSize,
   // Button types
   ButtonVariant,
-  ButtonColor,
-  ButtonSize,
-  ButtonProps,
-  BaseButtonProps,
-  IconButtonProps,
-  ProcessingButtonProps,
-  
-  // Form component types
-  FormControlProps,
-  InputProps,
-  SelectProps,
-  TextareaProps,
-  
+  CollectionGalleryProps,
+  // Theme and styling
+  ColorPalette,
+  ComponentWithChildren,
+  ContainerProps,
+  EmptyStateProps,
+  ErrorStateProps,
+  ExtendedComponentProps,
   // Layout types
   FlexboxProps,
+  // Form component types
+  FormControlProps,
   GridProps,
-  ContainerProps,
-  
-  // Table and display types
-  TableColumn,
-  TableProps,
-  PaginationProps,
-  
-  // State component types
-  LoadingStateProps,
-  ErrorStateProps,
-  EmptyStateProps,
-  AsyncStateProps,
-  
-  // Gallery and card types
-  StampGalleryProps,
-  CollectionGalleryProps,
-  SRC20CardSize,
-  SRC20CardProps,
-  
-  // Responsive and accessibility
-  ResponsiveValue,
-  ResponsiveProps,
-  AriaAttributes,
-  KeyboardNavigationProps,
-  ScreenReaderProps,
-  
+  IconButtonProps,
+  IconProps,
   // Icon and animation types
   IconSize,
   IconWeight,
-  IconProps,
-  AnimationProps,
+  InputProps,
+  KeyboardNavigationProps,
+  // State component types
+  LoadingStateProps,
+  PaginationProps,
+  ProcessingButtonProps,
+  ResponsiveProps,
+  // Responsive and accessibility
+  ResponsiveValue,
+  ScreenReaderProps,
+  SelectProps,
+  SpacingScale,
+  SRC20CardProps,
+  SRC20CardSize,
+  // Gallery and card types
+  StampGalleryProps,
+  // Table and display types
+  TableColumn,
+  TableProps,
+  TextareaProps,
+  Theme,
   TransitionProps,
+  Typography,
 } from "./ui.d.ts";
 
 // ============================================================================
@@ -275,78 +247,72 @@ export type {
 // ============================================================================
 
 export type {
-  // Pagination types
-  PaginationQueryParams,
   PaginatedResponse,
   PaginationProps,
+  // Pagination types
+  PaginationQueryParams,
 } from "./pagination.d.ts";
 
 export type {
+  DateUtils,
   // Utility functions and helpers
   DeepPartial,
-  Optional,
-  RequiredKeys,
-  PartialKeys,
   NonEmptyArray,
-  
+  NumberUtils,
+  Optional,
+  PartialKeys,
+  RequiredKeys,
+  // String and numeric utilities
+  StringUtils,
   // Type guards and validation
   TypeGuard,
   ValidationFunction,
-  
-  // String and numeric utilities
-  StringUtils,
-  NumberUtils,
-  DateUtils,
 } from "./utils.d.ts";
 
 export type {
-  // Error handling types
-  BaseError,
-  ValidationError,
   APIError,
-  BitcoinError,
-  SRC20Error,
-  StampError,
-  DatabaseError,
-  NetworkError,
-  AuthenticationError,
-  AuthorizationError,
-  ConfigurationError,
-  
-  // Error enums and codes
-  ValidationErrorCode,
   APIErrorCode,
-  BitcoinErrorCode,
-  SRC20ErrorCode,
-  StampErrorCode,
-  ErrorSeverity,
-  
-  // Error structures and responses
-  FieldValidationError,
-  ValidationErrorCollection,
-  ValidationResult,
   ApiErrorResponse,
-  ApiSuccessResponse,
   ApiResponse,
-  
-  // React error boundary types
-  ErrorInfo,
-  ErrorBoundaryState,
-  ErrorBoundaryProps,
-  ErrorFallbackProps,
-  ErrorRecoveryAction,
-  ErrorContext,
-  
+  ApiSuccessResponse,
   // Error discrimination and utilities
   ApplicationError,
-  ErrorByType,
-  Result,
-  AsyncResult,
-  ErrorHandler,
   AsyncErrorHandler,
+  AsyncResult,
+  AuthenticationError,
+  AuthorizationError,
+  // Error handling types
+  BaseError,
+  BitcoinError,
+  BitcoinErrorCode,
+  ConfigurationError,
+  DatabaseError,
+  ErrorBoundaryProps,
+  ErrorBoundaryState,
+  ErrorByType,
+  ErrorContext,
+  ErrorFallbackProps,
+  ErrorHandler,
+  // React error boundary types
+  ErrorInfo,
+  ErrorRecoveryAction,
   ErrorRecoveryFunction,
   ErrorReportingFunction,
+  ErrorSeverity,
   ErrorTransformer,
+  // Error structures and responses
+  FieldValidationError,
+  NetworkError,
+  Result,
+  SRC20Error,
+  SRC20ErrorCode,
+  StampError,
+  StampErrorCode,
+  ValidationError,
+  // Error enums and codes
+  ValidationErrorCode,
+  ValidationErrorCollection,
+  ValidationResult,
 } from "./errors.d.ts";
 
 // ============================================================================
@@ -354,25 +320,22 @@ export type {
 // ============================================================================
 
 export type {
-  // Market data responses
-  SRC20MarketDataResponse,
-  StampMarketDataResponse,
-  
-  // Extended data with market info
-  SRC20WithMarketData,
-  StampWithMarketData,
-  CollectionWithMarketData,
-  
   // Cache and source types
   CacheStatus,
+  CollectionWithMarketData,
+  ExchangeSources,
   MarketDataSource,
   MarketDataSourcesRow,
-  ExchangeSources,
-  VolumeSources,
-  
+  // Market data responses
+  SRC20MarketDataResponse,
+  // Extended data with market info
+  SRC20WithMarketData,
   // Holder and cache data
   StampHolderCache,
   StampHolderCacheRow,
+  StampMarketDataResponse,
+  StampWithMarketData,
+  VolumeSources,
 } from "./marketData.d.ts";
 
 // ============================================================================
@@ -380,25 +343,22 @@ export type {
 // ============================================================================
 
 export type {
-  // Progressive fee estimation
-  ProgressiveFeeEstimationOptions,
-  ProgressiveFeeEstimationResult,
-  EstimationPhase,
-  FeeEstimationError,
-  
-  // Tool-specific types
-  ToolType,
-  ToolEstimationParams,
-  
-  // UTXO management
-  DetailedUTXO,
-  UTXOCache,
-  UtxoSelectionStrategy,
-  
   // Cache management
   CacheManagerConfig,
   CacheResult,
   CacheStats,
+  // UTXO management
+  DetailedUTXO,
+  EstimationPhase,
+  FeeEstimationError,
+  // Progressive fee estimation
+  ProgressiveFeeEstimationOptions,
+  ProgressiveFeeEstimationResult,
+  ToolEstimationParams,
+  // Tool-specific types
+  ToolType,
+  UTXOCache,
+  UtxoSelectionStrategy,
 } from "./fee-estimation.ts";
 
 // ============================================================================
@@ -408,15 +368,15 @@ export type {
 export type {
   // QuickNode API types
   QuickNodeConfig,
-  QuickNodeResponse,
   QuickNodeError,
+  QuickNodeResponse,
 } from "./quicknode.d.ts";
 
 export type {
   // Service configuration and responses
   ServiceConfig,
-  ServiceResponse,
   ServiceError,
+  ServiceResponse,
 } from "./services.d.ts";
 
 // ============================================================================
@@ -425,75 +385,73 @@ export type {
 
 /**
  * Bitcoin-related types organized under a namespace
- * 
+ *
  * Usage:
  * ```typescript
  * import type { Bitcoin } from '@/lib/types';
- * 
+ *
  * const utxo: Bitcoin.UTXO = { ... };
  * const transaction: Bitcoin.TransactionInput = { ... };
  * ```
  */
 export namespace Bitcoin {
   export {
-    type ScriptType,
-    type UTXO,
     type BasicUTXO,
-    type TransactionInput,
-    type TransactionOutput,
+    type BlockRow,
     type BTCBalance,
     type BtcInfo,
-    type BlockRow,
+    type ScriptType,
+    type TransactionInput,
+    type TransactionOutput,
+    type UTXO,
   } from "./base.d.ts";
-  
+
   export {
-    type SendRow,
     type BlockInfo,
-    type TX,
-    type TXError,
     type MintStampInputData,
     type ScriptTypeInfo,
+    type SendRow,
+    type TX,
+    type TXError,
   } from "./transaction.d.ts";
 }
 
 /**
  * Token-related types organized under a namespace
- * 
+ *
  * Usage:
  * ```typescript
  * import type { Tokens } from '@/lib/types';
- * 
+ *
  * const stamp: Tokens.StampData = { ... };
  * const src20: Tokens.SRC20Data = { ... };
  * ```
  */
 export namespace Tokens {
   export {
-    type StampRow,
     type StampBalance,
-    type ValidatedStamp,
+    type StampRow,
     type StampWithOptionalMarketData,
+    type ValidatedStamp,
   } from "./stamp.d.ts";
-  
+
   export {
-    type SRC20Row,
-    type SRC20Balance,
     type Deployment,
+    type SRC20Balance,
+    type SRC20Row,
     type SRC20WithOptionalMarketData,
   } from "./src20.d.ts";
-  
-  export {
-    type SRC101Balance,
-  } from "./src101.d.ts";
+
+  export { type SRC101Balance } from "./src101.d.ts";
 }
 
 /**
  * API-related types organized under a namespace
- * 
+ *
  * Usage:
  * ```typescript
  * import type { API } from '@/lib/types';
- * 
+ *
  * const context: API.AddressHandlerContext = { ... };
  * const response: API.PaginatedStampResponseBody = { ... };
  * ```
@@ -502,47 +460,47 @@ export namespace API {
   export {
     type AddressHandlerContext,
     type BlockHandlerContext,
-    type IdentHandlerContext,
-    type TickHandlerContext,
-    type PaginatedStampResponseBody,
-    type PaginatedSrc20ResponseBody,
-    type DeployResponseBody,
-    type Src20ResponseBody,
-    type Src20BalanceResponseBody,
     type BlockInfoResponseBody,
+    type DeployResponseBody,
+    type IdentHandlerContext,
+    type PaginatedSrc20ResponseBody,
+    type PaginatedStampResponseBody,
+    type Src20BalanceResponseBody,
+    type Src20ResponseBody,
     type StampPageProps,
+    type TickHandlerContext,
   } from "./api.d.ts";
-  
+
   export {
-    type ApiResponse,
     type ApiErrorResponse,
+    type ApiResponse,
     type ApiSuccessResponse,
   } from "./errors.d.ts";
 }
 
 /**
  * Error-related types organized under a namespace
- * 
+ *
  * Usage:
  * ```typescript
  * import type { Errors } from '@/lib/types';
- * 
+ *
  * const validation: Errors.ValidationError = new ValidationError(...);
  * const result: Errors.Result<StampData> = { ... };
  * ```
  */
 export namespace Errors {
   export {
-    type ApplicationError,
-    type ValidationError,
     type APIError,
+    type ApplicationError,
+    type AsyncResult,
     type BitcoinError,
+    type ErrorHandler,
+    type Result,
     type SRC20Error,
     type StampError,
+    type ValidationError,
     type ValidationResult,
-    type Result,
-    type AsyncResult,
-    type ErrorHandler,
   } from "./errors.d.ts";
 }
 

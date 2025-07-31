@@ -923,7 +923,7 @@ export interface stampMintData {
 // NOTE: All API response interfaces have been moved to api.d.ts to eliminate duplication
 // Import API response types from api.d.ts:
 // - PaginatedStampResponseBody
-// - PaginatedIdResponseBody 
+// - PaginatedIdResponseBody
 // - PaginatedStampBalanceResponseBody
 //
 // These types are now centralized in api.d.ts as the single source of truth

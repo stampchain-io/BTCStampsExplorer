@@ -15,7 +15,6 @@ import {
   isSRC20Operation,
   isTxHash,
   isValidBase64StampData,
-  validateBitcoinAddressType,
   isValidCPID,
   isValidScriptType,
   isValidSRC101Deploy,
@@ -32,6 +31,7 @@ import {
   isValidTransactionOutput,
   isValidUTXO,
   typeTest,
+  validateBitcoinAddressType,
   validateTypeQuick,
 } from "./typeAssertions.ts";
 
