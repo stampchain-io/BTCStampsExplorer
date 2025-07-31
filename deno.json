@@ -126,7 +126,11 @@
     "verify:src20-optimization": "deno run --allow-read --allow-env --allow-net scripts/verify-src20-optimization-deployment.ts",
     "analyze:types": "deno run --allow-run --allow-write scripts/analyze-type-errors.ts",
     "type:prioritize": "deno run --allow-read --allow-write scripts/prioritize-type-fixes.ts",
-    "type:gradual": "deno run --allow-read --allow-write --allow-run scripts/setup-gradual-types.ts"
+    "type:gradual": "deno run --allow-read --allow-write --allow-run scripts/setup-gradual-types.ts",
+    "type:test": "deno check lib/types/**/*.d.ts server/types/**/*.d.ts && deno test --allow-read --allow-run test/types/ --no-check=remote",
+    "type:test:watch": "deno test --allow-read --allow-run test/types/ --watch --no-check=remote",
+    "type:check": "deno check lib/types/**/*.d.ts server/types/**/*.d.ts",
+    "type:check:all": "deno check ."
   },
   "lint": {
     "rules": {
