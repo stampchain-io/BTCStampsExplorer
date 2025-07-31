@@ -565,7 +565,7 @@ export function SRC20MintTool({
                   !isSelecting;
                 return shouldShow;
               })() && (
-                <ul class={`${inputFieldDropdown} max-h-[146px]`}>
+                <ul class={`${inputFieldDropdown} max-h-[148px]`}>
                   {searchResults.map((result: SearchResult) => (
                     <li
                       key={result.tick}
@@ -575,9 +575,11 @@ export function SRC20MintTool({
                       }}
                       class={`${inputFieldDropdownHover}`}
                     >
-                      <div class="font-medium text-sm">{result.tick}</div>
-                      <div class="font-medium text-xs text-stamp-grey-darker mt-0.5">
-                        {(result.progress || 0).toFixed(1)}% minted
+                      <div class="pt-[1px]">
+                        {result.tick}
+                      </div>
+                      <div class="text-xs text-stamp-grey">
+                        {(result.progress || 0).toFixed(1)}%
                       </div>
                     </li>
                   ))}
