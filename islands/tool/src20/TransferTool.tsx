@@ -1,21 +1,27 @@
 /* ===== TRANSFER CONTENT COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { SRC20InputField } from "$form";
+import {
+  inputFieldDropdown,
+  inputFieldDropdownHover,
+  SRC20InputField,
+} from "$form";
 import {
   bodyTool,
   containerBackground,
   containerColForm,
-  loaderSpinGrey,
+  loaderSkeletonFull,
+  loaderSkeletonLg,
+  loaderSkeletonMd,
   rowResponsiveForm,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { stripTrailingZeros } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { titlePurpleLD } from "$text";
+import { titleGreyLD } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== INTERFACE DEFINITIONS ===== */
@@ -262,13 +268,53 @@ export function SRC20TransferTool(
   if (!config) {
     return (
       <div class={bodyTool}>
-        <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>TRANSFER</h1>
-        <div class={`${containerBackground} mb-6`}>
-          <div class="flex items-center justify-center p-8">
-            <div class={loaderSpinGrey}></div>
-            <span class="ml-3 text-stamp-grey-light">
-              Loading configuration...
-            </span>
+        <h1 class={`${titleGreyLD} mx-auto mb-4`}>TRANSFER</h1>
+
+        {/* Skeleton Form */}
+        <div class={`${containerBackground} ${containerColForm} mb-6`}>
+          {/* First row skeleton - Token and Amount inputs */}
+          <div class={rowResponsiveForm}>
+            {/* Token input skeleton */}
+            <div class={`h-10 ${loaderSkeletonLg}`}>
+            </div>
+
+            {/* Amount input skeleton */}
+            <div class={`h-10 ${loaderSkeletonLg}`}>
+            </div>
+          </div>
+          {/* Second row skeleton - Recipient address input */}
+          <div class={`h-10 ${loaderSkeletonLg}`}>
+          </div>
+        </div>
+
+        {/* Skeleton Fee Calculator */}
+        <div class={containerBackground}>
+          {/* Fee slider skeleton */}
+          <div class="flex justify-between">
+            <div class={`h-4 w-28 ${loaderSkeletonMd}`}>
+            </div>
+            {/* Toggle switch skeleton */}
+            <div class={`w-10 h-5 ${loaderSkeletonFull}`}>
+            </div>
+          </div>
+          <div class={`h-4 w-[168px] mt-1 ${loaderSkeletonMd}`}>
+          </div>
+          {/* Fee slider skeleton */}
+          <div class={`h-3 w-[50%] mt-4 ${loaderSkeletonFull}`}>
+          </div>
+          {/* Estimate and fee details skeleton */}
+          <div class={`h-5 w-full min-[480px]:w-72 mt-8 ${loaderSkeletonMd}`}>
+          </div>
+          <div class={`h-4 w-16 mt-4 ${loaderSkeletonMd}`}>
+          </div>
+          {/* Terms and Submit button skeleton */}
+          <div class="flex justify-end pt-10">
+            <div class="flex flex-col space-y-3 items-end">
+              <div class={`h-4 w-[156px] tablet:w-56 ${loaderSkeletonMd}`}>
+              </div>
+              <div class={`h-10 tablet:h-9 w-[156px] ${loaderSkeletonMd}`}>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -277,7 +323,7 @@ export function SRC20TransferTool(
 
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>TRANSFER</h1>
+      <h1 class={`${titleGreyLD} mx-auto mb-4`}>TRANSFER</h1>
 
       {/* ===== FORM  ===== */}
       <form
@@ -314,21 +360,21 @@ export function SRC20TransferTool(
             {/* Token Dropdown */}
             {openDrop && searchResults.length > 0 && !isSelecting && (
               <ul
-                class="absolute top-[100%] left-0 max-h-[168px] w-full bg-stamp-grey-light rounded-b-md font-bold text-sm text-stamp-grey-darkest leading-none z-[11] overflow-y-auto scrollbar-grey"
+                class={`${inputFieldDropdown} max-h-[111px] min-[420px]:max-h-[74px]`}
                 role="listbox"
                 aria-label="Available tokens"
               >
                 {searchResults.map((result) => (
                   <li
                     key={result.tick}
-                    class="cursor-pointer p-1.5 pl-3 hover:bg-[#C3C3C3] uppercase"
+                    class={`${inputFieldDropdownHover}`}
                     onClick={() => handleDropDown(result.tick, result.amt)}
                     onMouseDown={(e) => e.preventDefault()}
                     role="option"
                     aria-selected={formState.token === result.tick}
                   >
                     {result.tick}
-                    <h6 class="font-medium text-xs text-stamp-grey-darker">
+                    <h6 class="text-xs text-stamp-grey">
                       {stripTrailingZeros(result.amt)}
                     </h6>
                   </li>
