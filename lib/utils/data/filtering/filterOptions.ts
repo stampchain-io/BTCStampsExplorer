@@ -1,8 +1,8 @@
 import {
   STAMP_FILTER_TYPES as _STAMP_FILTER_TYPES,
   STAMP_SUFFIX_FILTERS as _STAMP_SUFFIX_FILTERS,
-  SUBPROTOCOLS as _SUBPROTOCOLS,
-} from "$globals";
+} from "$types/stamp.d.ts";
+import { SUBPROTOCOLS as _SUBPROTOCOLS } from "$types/base.d.ts";
 
 export const filterOptions = {
   "vector": {

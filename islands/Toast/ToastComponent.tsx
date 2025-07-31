@@ -1,11 +1,5 @@
-import type { Toast as ToastTypeFromProvider } from "./ToastProvider.tsx";
-
-interface ToastComponentProps {
-  id: string;
-  message: string;
-  type: ToastTypeFromProvider["type"];
-  onClose: () => void;
-}
+import type { Toast as ToastTypeFromProvider } from "$islands/Toast/ToastProvider.tsx";
+import type { ToastComponentProps } from "$types/ui.d.ts";
 
 export const ToastComponent = (
   { id, message, type, onClose }: ToastComponentProps,

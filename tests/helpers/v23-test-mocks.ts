@@ -10,7 +10,7 @@
 
 import type { StampBalance } from "$lib/types/wallet.d.ts";
 import type { BTCPriceData } from "$server/services/price/btcPriceService.ts";
-import type { Collection } from "../../globals.d.ts";
+import type { Collection } from "$types/wallet.d.ts";
 
 // XcpBalance - define locally since not found in standard imports
 interface XcpBalance {

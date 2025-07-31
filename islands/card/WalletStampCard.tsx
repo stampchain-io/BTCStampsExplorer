@@ -1,6 +1,7 @@
 /* ===== WALLET STAMP CARD COMPONENT ===== */
 /* Specialized version of StampCard for wallet pages showing user-specific details */
 import { Icon, LoadingIcon } from "$icon";
+import type { WalletStampCardProps } from "$types/ui.d.ts";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import { VNode } from "preact";
 import { memo } from "preact/compat";
@@ -21,11 +22,6 @@ import {
 import { isAtomicIconVisible } from "$lib/utils/bitcoin/stamps/stampUtils.ts";
 
 /* ===== TYPES ===== */
-interface WalletStampCardProps {
-  stamp: WalletStampWithValue;
-  variant?: "default" | "grey";
-  fromPage?: string;
-}
 
 /* ===== UTILITY FUNCTIONS ===== */
 

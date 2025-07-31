@@ -7,8 +7,8 @@
 import { buttonStyles } from "$button";
 import { TEXT_STYLES } from "$card";
 import type { SortOption, UseSortingConfig } from "$lib/types/sorting.d.ts";
-import { SortingComponent } from "./SortingComponent.tsx";
-import { SortingProvider } from "./SortingProvider.tsx";
+import { SortingComponent } from "$islands/sorting/SortingComponent.tsx";
+import { SortingProvider } from "$islands/sorting/SortingProvider.tsx";
 
 // ===== STYLED SORTING COMPONENTS =====
 

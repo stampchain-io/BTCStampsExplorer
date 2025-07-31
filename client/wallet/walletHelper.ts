@@ -1,11 +1,11 @@
 import { logger } from "$lib/utils/logger.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
-import { horizonProvider } from "./horizon.ts";
-import { leatherProvider } from "./leather.ts";
-import { okxProvider } from "./okx.ts";
-import { phantomProvider } from "./phantom.ts";
-import { tapWalletProvider } from "./tapwallet.ts";
-import { unisatProvider } from "./unisat.ts";
+import { horizonProvider } from "$client/wallet/horizon.ts";
+import { leatherProvider } from "$client/wallet/leather.ts";
+import { okxProvider } from "$client/wallet/okx.ts";
+import { phantomProvider } from "$client/wallet/phantom.ts";
+import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
+import { unisatProvider } from "$client/wallet/unisat.ts";
 
 interface WalletProvider {
   signMessage: (message: string) => Promise<string>;

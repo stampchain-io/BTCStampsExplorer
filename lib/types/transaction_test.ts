@@ -2,10 +2,7 @@
 //
 // Tests for transaction.d.ts types including type safety, imports, and interfaces
 
-import {
-  assertEquals,
-  assertExists,
-} from "https://deno.land/std@0.208.0/assert/mod.ts";
+import { assertEquals, assertExists } from "@std/assert";
 import type {
   BlockInfo,
   BlockInfoResponseBody,

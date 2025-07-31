@@ -1,14 +1,10 @@
 import { loaderSpinXsPurple } from "$layout";
+import type { ChartWidgetProps } from "$types/ui.d.ts";
 import type { ChartData } from "$lib/types/src20.d.ts";
 import Highcharts from "highcharts/highstock";
 import { useEffect, useState } from "preact/hooks";
 
 // ✅ Define TypeScript Props Interface with proper imported types
-interface ChartWidgetProps {
-  data: ChartData;
-  fromPage: string;
-  tick: string;
-}
 
 const ChartWidget = (
   { data, fromPage = "detail", tick = "" }: ChartWidgetProps,

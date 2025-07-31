@@ -1,12 +1,9 @@
 import { Icon } from "$icon";
+import type { SpinnerProps } from "$types/ui.d.ts";
+import type { TransactionProgressProps } from "$types/ui.d.ts";
+import type { ProgressIndicatorProps } from "$types/ui.d.ts";
 
 export type ProgressState = "idle" | "loading" | "success" | "error";
-
-interface ProgressIndicatorProps {
-  state: ProgressState;
-  message?: string;
-  class?: string;
-}
 
 export function ProgressIndicator({
   state,
@@ -88,11 +85,6 @@ export interface TransactionStep {
   id: string;
   label: string;
   status: "pending" | "active" | "completed" | "error";
-}
-
-interface TransactionProgressProps {
-  steps: TransactionStep[];
-  class?: string;
 }
 
 export function TransactionProgress({
@@ -180,11 +172,6 @@ export function TransactionProgress({
 }
 
 // Spinner component for loading states
-interface SpinnerProps {
-  size?: "sm" | "md" | "lg";
-  color?: string;
-  class?: string;
-}
 
 export function Spinner({
   size = "md",

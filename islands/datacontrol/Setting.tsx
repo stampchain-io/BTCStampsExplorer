@@ -1,13 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
+import type { SettingProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
-
-interface SettingProps {
-  initFilter: string[];
-  open: boolean;
-  handleOpen: (open: boolean) => void;
-  filterButtons: string[];
-  onFilterClick?: (filter: string) => void;
-}
 
 export function Setting({
   initFilter = [],

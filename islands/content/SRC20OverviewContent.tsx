@@ -1,6 +1,7 @@
 /* ===== SRC20 OVERVIEW CONTENT COMPONENT ===== */
 import { useState } from "preact/hooks";
-// import { SRC20Row } from "$globals"; // Removed unused import
+import type { SRC20OverviewContentProps } from "$types/ui.d.ts";
+// import type { SRC20Row } from "$types/src20.d.ts"; // Removed unused import
 import { SRC20OverviewHeader } from "$header";
 import { SRC20Gallery } from "$section";
 
@@ -12,17 +13,6 @@ type SortOption =
   | "PROGRESS"
   | "MARKET_CAP"
   | "VOLUME";
-
-interface SRC20OverviewContentProps {
-  mintingData?: any;
-  timeframe: "24H" | "7D" | "30D";
-  sortBy: SortOption;
-  sortDirection: "asc" | "desc";
-  viewType: "minted" | "minting"; // 🎸 NEW: Add viewType prop
-  // 🚀 PERFORMANCE: Single BTC price fetch optimization
-  btcPrice?: number;
-  btcPriceSource?: string;
-}
 
 /* ===== COMPONENT ===== */
 export function SRC20OverviewContent({

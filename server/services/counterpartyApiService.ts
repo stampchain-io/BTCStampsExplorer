@@ -6,7 +6,7 @@ import { formatSatoshisToBTC } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
-import { DispenseEvent, Dispenser, DispenserFilter, XcpBalance } from "$types/index.d.ts";
+import type { DispenseEvent, Dispenser, DispenserFilter, XcpBalance } from "$types/services.d.ts";
 
 // Create a shared httpClient instance
 const httpClient = new FetchHttpClient(

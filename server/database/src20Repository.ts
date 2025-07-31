@@ -1,7 +1,4 @@
-import {
-    SRC20SnapshotRequestParams,
-    SRC20TrxRequestParams,
-} from "$globals";
+
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { 
   SRC20_BALANCE_TABLE, 
@@ -13,6 +10,7 @@ import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/ui/format
 import { bigFloatToString } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { BigFloat } from "bigfloat/mod.ts";
+import type { SRC20SnapshotRequestParams, SRC20TrxRequestParams } from "$types/src20.d.ts";
 
 export class SRC20Repository {
   // Dependency injection support
@@ -1156,6 +1154,5 @@ export class SRC20Repository {
       BLOCKCHAIN_SYNC_CACHE_DURATION,
     );
   }
-
 
 }

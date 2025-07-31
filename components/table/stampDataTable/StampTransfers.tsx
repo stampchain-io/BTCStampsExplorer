@@ -1,4 +1,5 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import type { StampTransfersProps } from "$types/ui.d.ts";
 import { rowTable } from "$layout";
 import {
   abbreviateAddress,
@@ -14,10 +15,6 @@ interface SendRow {
   block_time: number | null;
   block_index?: number;
   cpid?: string;
-}
-
-interface StampTransfersProps {
-  sends: SendRow[];
 }
 
 export function StampTransfersTable({ sends }: StampTransfersProps) {

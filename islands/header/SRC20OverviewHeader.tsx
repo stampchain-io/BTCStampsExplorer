@@ -1,21 +1,12 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
 /* @baba - update search button styling */
 import { Button, SelectorButtons } from "$button";
+import type { SRC20OverviewHeaderProps } from "$types/ui.d.ts";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
 import { useCallback, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface SRC20OverviewHeaderProps {
-  onViewTypeChange?: (viewType: string) => void;
-  viewType: "minted" | "minting";
-  onTimeframeChange?: (timeframe: "24H" | "7D" | "30D") => void;
-  onFilterChange?: (filter: string, direction?: "asc" | "desc") => void;
-  currentSort?: {
-    filter: string | null;
-    direction: "asc" | "desc";
-  };
-}
 
 /* ===== COMPONENT ===== */
 export const SRC20OverviewHeader = (

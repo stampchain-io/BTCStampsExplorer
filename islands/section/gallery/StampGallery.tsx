@@ -1,7 +1,8 @@
 /* ===== STAMP GALLERY COMPONENT ===== */
 import { ViewAllButton } from "$button";
 import { StampCard } from "$card";
-import { StampGalleryProps, StampRow } from "$globals";
+import type { StampGalleryProps } from "$types/ui.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";

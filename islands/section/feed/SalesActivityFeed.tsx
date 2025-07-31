@@ -1,5 +1,6 @@
 /* ===== SALES ACTIVITY FEED COMPONENT ===== */
 import { Icon, LoadingIcon } from "$icon";
+import type { SalesActivityFeedProps } from "$types/ui.d.ts";
 import {
   abbreviateAddress,
   formatBTCAmount,
@@ -7,22 +8,6 @@ import {
 import { subtitlePurple, titlePurpleDL } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 import { useEffect, useState } from "preact/hooks";
-
-interface SalesActivityFeedProps {
-  title?: string;
-  subTitle?: string;
-  sales?: StampWithEnhancedSaleData[];
-  isLoading?: boolean;
-  btcPriceUSD?: number;
-  maxItems?: number;
-  showTimestamps?: boolean;
-  showStampPreviews?: boolean;
-  autoRefresh?: boolean;
-  refreshIntervalMs?: number;
-  onRefresh?: () => Promise<void>;
-  onItemClick?: (sale: StampWithEnhancedSaleData) => void;
-  compact?: boolean;
-}
 
 export default function SalesActivityFeed({
   title = "Sales Activity",

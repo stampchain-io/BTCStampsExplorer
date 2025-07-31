@@ -11,6 +11,8 @@
 
 import type { ComponentChildren, ComponentProps, JSX } from "preact";
 import type * as preact from "preact";
+import type { SRC20_TYPES } from "$types/src20.d.ts";
+import type { STAMP_FILTER_TYPES, STAMP_TYPES } from "$types/stamp.d.ts";
 
 // =============================================================================
 // CORE UI FRAMEWORK TYPES
@@ -304,6 +306,33 @@ export type ButtonSize =
   | "smR"
   | "mdR"
   | "lgR";
+
+// =============================================================================
+// NAVIGATION CONTEXT TYPES
+// =============================================================================
+
+/**
+ * Union type for both STAMP_TYPES and SRC20_TYPES
+ * Used in navigation context for type filtering
+ */
+export type NavigatorTypes = STAMP_TYPES | SRC20_TYPES;
+
+/**
+ * Navigator Context Type
+ * Provides navigation state management for stamp and SRC20 type filtering
+ * Migrated from: islands/layout/NavigatorProvider.tsx
+ */
+export interface NavigatorContextType {
+  setTypeOption: (page: string, type: NavigatorTypes, reload?: boolean) => void;
+  setSortOption: (sort: string) => void;
+  setFilterOption: (filter: STAMP_FILTER_TYPES) => void;
+  getSort: () => string;
+  getFilter: () => STAMP_FILTER_TYPES[];
+  getType: () => NavigatorTypes;
+  setFilter: (filters: STAMP_FILTER_TYPES[]) => void;
+  setSort: (sort: string) => void;
+  setType: (type: NavigatorTypes) => void;
+}
 
 /**
  * Base button props interface
@@ -965,6 +994,1457 @@ export interface TransitionProps {
   timingFunction?: AnimationTimingFunction;
   /** Transition delay */
   delay?: number | string;
+}
+
+// =============================================================================
+// COMPONENT PROPS INTERFACES
+// =============================================================================
+
+// CARD COMPONENT PROPS
+// =====================
+
+/**
+ * SRC-20 Card component props
+ */
+export interface SRC20CardProps {
+  data: any[]; // TODO: Replace with SRC20Row from src20.d.ts
+  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
+  timeframe: any; // TODO: Replace with Timeframe from appropriate domain
+  onImageClick: (imgSrc: string) => void;
+  currentSort?: {
+    filter: string | null;
+    direction: "asc" | "desc";
+  };
+}
+
+/**
+ * SRC-20 Card Minting component props
+ */
+export interface SRC20CardMintingProps {
+  data: any[]; // TODO: Replace with SRC20Row from src20.d.ts
+  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
+  timeframe: any; // TODO: Replace with Timeframe from appropriate domain
+  onImageClick: (imgSrc: string) => void;
+  currentSort?: {
+    filter: string | null;
+    direction: "asc" | "desc";
+  };
+}
+
+/**
+ * SRC-20 Small Card component props
+ */
+export interface SRC20CardSmProps {
+  data: any[]; // TODO: Replace with EnrichedSRC20Row from src20.d.ts
+  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
+  onImageClick: (imgSrc: string) => void;
+}
+
+/**
+ * SRC-20 Small Card Minting component props
+ */
+export interface SRC20CardSmMintingProps {
+  data: any[]; // TODO: Replace with EnrichedSRC20Row from src20.d.ts
+  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
+  timeframe: any; // TODO: Replace with Timeframe from appropriate domain
+  onImageClick: (imgSrc: string) => void;
+}
+
+/**
+ * Recent Sale Card component props
+ */
+export interface RecentSaleCardProps {
+  sale: any; // TODO: Replace with StampWithEnhancedSaleData from appropriate domain
+  showFullDetails?: boolean;
+  btcPriceUSD?: number;
+}
+
+/**
+ * Wallet Stamp Card component props
+ */
+export interface WalletStampCardProps {
+  stamp: any; // TODO: Replace with WalletStampWithValue from wallet.d.ts
+  variant?: "default" | "grey";
+  fromPage?: string;
+}
+
+// GALLERY COMPONENT PROPS
+// ========================
+
+/**
+ * Carousel Home component props
+ */
+export interface CarouselHomeProps {
+  carouselStamps: any[]; // TODO: Replace with StampRow from stamp.d.ts
+}
+
+/**
+ * Collections Banner component props
+ */
+export interface CollectionsBannerProps {
+  collection: any; // TODO: Replace with Collection from appropriate domain
+  isDarkMode: boolean;
+}
+
+/**
+ * Carousel component props
+ */
+export interface CarouselProps {
+  stamps: any[]; // TODO: Replace with StampRow from stamp.d.ts
+  automatic?: boolean;
+  showNavigation?: boolean;
+  class?: string;
+}
+
+/**
+ * Fresh SRC-20 Gallery component props
+ */
+export interface FreshSRC20GalleryProps {
+  /** Initial SRC-20 data from server */
+  initialData: any[]; // TODO: Replace with EnrichedSRC20Row from src20.d.ts
+  /** Initial pagination state */
+  initialPagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  /** Wallet address for API calls */
+  address: string;
+  /** Initial sort value - maintaining existing ASC/DESC functionality */
+  initialSort: "ASC" | "DESC";
+  /** Page identifier for conditional rendering */
+  fromPage?: string;
+  /** Show loading skeleton during transitions */
+  showLoadingSkeleton?: boolean;
+  /** Enable Fresh.js partial navigation */
+  enablePartialNavigation?: boolean;
+}
+
+/**
+ * Fresh Stamp Gallery component props
+ */
+export interface FreshStampGalleryProps {
+  /** Initial stamp data from server */
+  initialData: any[]; // TODO: Replace with StampRow from stamp.d.ts
+  /** Initial pagination state */
+  initialPagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  /** Wallet address for API calls */
+  address: string;
+  /** Initial sort value - maintaining existing ASC/DESC functionality */
+  initialSort: "ASC" | "DESC";
+  /** Page identifier for conditional rendering */
+  fromPage?: string;
+  /** Enable/disable Fresh.js partial navigation */
+  enablePartialNavigation?: boolean;
+  /** Show loading skeleton during transitions */
+  showLoadingSkeleton?: boolean;
+  /** Grid class for styling */
+  gridClass?: string;
+}
+
+/**
+ * Recent Sales Gallery component props
+ */
+export interface RecentSalesGalleryProps {
+  title?: string;
+  subTitle?: string;
+  sales?: any[]; // TODO: Replace with StampWithEnhancedSaleData from appropriate domain
+  layout?: "grid" | "list";
+  showFullDetails?: boolean;
+  displayCounts?: {
+    mobileSm?: number;
+    mobileMd?: number;
+    mobileLg?: number;
+    tablet?: number;
+    desktop?: number;
+  };
+  pagination?: {
+    page: number;
+    totalPages: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
+  };
+  isLoading?: boolean;
+  btcPriceUSD?: number;
+  autoRefresh?: boolean;
+  refreshIntervalMs?: number;
+  onRefresh?: () => Promise<void>;
+  gridClass?: string;
+  maxItems?: number;
+}
+
+/**
+ * SRC-20 Gallery component props
+ */
+export interface SRC20GalleryProps {
+  title?: string;
+  subTitle?: string;
+  viewType: "minted" | "minting";
+  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
+  initialData?: any[]; // TODO: Replace with EnrichedSRC20Row from src20.d.ts
+  pagination?: {
+    page: number;
+    totalPages: number;
+    prefix?: string;
+    limit?: number;
+    onPageChange?: (page: number) => void;
+  };
+  timeframe: "24H" | "7D" | "30D";
+  serverData?: {
+    data: any[]; // TODO: Replace with EnrichedSRC20Row from src20.d.ts
+    total: number;
+    page: number;
+    totalPages: number;
+  };
+  currentSort?: {
+    filter: string | null;
+    direction: "asc" | "desc";
+  };
+}
+
+/**
+ * Stamp Overview Gallery component props
+ */
+export interface StampOverviewGalleryProps {
+  stamps_art?: any[]; // TODO: Replace with StampRow from stamp.d.ts
+  stamps_posh?: any[]; // TODO: Replace with StampRow from stamp.d.ts
+  stamps_src721?: any[]; // TODO: Replace with StampRow from stamp.d.ts
+  collectionData?: any[]; // TODO: Replace with Collection from appropriate domain
+}
+
+// TABLE COMPONENT PROPS
+// =====================
+
+/**
+ * SRC-20 Minting Table component props
+ */
+export interface SRC20MintingTableProps {
+  data: any[]; // TODO: Replace with SRC20Row from src20.d.ts
+  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
+  timeframe: any; // TODO: Replace with Timeframe from appropriate domain
+  onImageClick: (imgSrc: string) => void;
+}
+
+/**
+ * SRC-20 Minted Table component props
+ */
+export interface SRC20MintedTableProps {
+  data: any[]; // TODO: Replace with SRC20Row from src20.d.ts
+  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
+  timeframe: any; // TODO: Replace with Timeframe from appropriate domain
+  onImageClick: (imgSrc: string) => void;
+}
+
+/**
+ * SRC-20 Mints component props
+ */
+export interface SRC20MintsProps {
+  mints: any[]; // TODO: Replace with SRC20Row from src20.d.ts
+}
+
+/**
+ * SRC-20 Transfers component props
+ */
+export interface SRC20TransfersProps {
+  sends: any[]; // TODO: Replace with SRC20Row from src20.d.ts
+}
+
+/**
+ * Stamp Sales component props
+ */
+export interface StampSalesProps {
+  initialData?: any[]; // TODO: Replace with StampWithEnhancedSaleData from appropriate domain
+  title?: string;
+  subTitle?: string;
+  variant?: "home" | "detail";
+  displayCounts?: DisplayCountBreakpoints;
+  gridClass?: string;
+}
+
+/**
+ * Stamp Transfers component props
+ */
+export interface StampTransfersProps {
+  transfers: any[]; // TODO: Replace with StampRow from stamp.d.ts
+}
+
+/**
+ * Stamp Listings Open component props
+ */
+export interface StampListingsOpenProps {
+  listings: any[]; // TODO: Replace with appropriate type
+}
+
+/**
+ * Stamp Listings All component props
+ */
+export interface StampListingsAllProps {
+  listings: any[]; // TODO: Replace with appropriate type
+}
+
+/**
+ * Holders Table component props
+ */
+export interface HoldersTableProps {
+  holders?: any[]; // TODO: Replace with Holder from appropriate domain
+}
+
+/**
+ * Holders Table Base component props
+ */
+export interface HoldersTableBaseProps {
+  holders?: any[]; // TODO: Replace with Holder from appropriate domain
+}
+
+/**
+ * Pie Chart component props
+ */
+export interface PieChartProps {
+  holders: Array<{
+    address: string | null;
+    amt: number | string;
+    percentage: number | string;
+  }>;
+}
+
+// CONTENT COMPONENT PROPS
+// ========================
+
+/**
+ * Explorer Content component props
+ */
+export interface ExplorerContentProps {
+  stamps: any[]; // TODO: Replace with StampRow from stamp.d.ts
+  isRecentSales?: boolean;
+  fromPage?: string;
+  pagination?: {
+    page: number;
+    totalPages: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
+  };
+}
+
+/**
+ * Stamp Overview Content component props
+ */
+export interface StampOverviewContentProps {
+  stamps: any[]; // TODO: Replace with StampRow from stamp.d.ts
+  isRecentSales?: boolean;
+  fromPage?: string;
+  pagination?: {
+    page: number;
+    totalPages: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
+  };
+}
+
+/**
+ * SRC-20 Overview Content component props
+ */
+export interface SRC20OverviewContentProps {
+  mintingData?: any;
+  timeframe: "24H" | "7D" | "30D";
+  sortBy: any; // TODO: Replace with SortOption from appropriate domain
+  sortDirection: "asc" | "desc";
+  viewType: "minted" | "minting";
+  btcPrice?: number;
+  btcPriceSource?: string;
+}
+
+/**
+ * Wallet Dashboard Details component props
+ */
+export interface WalletDashboardDetailsProps {
+  walletData: any; // TODO: Replace with WalletOverviewInfo from wallet.d.ts
+  stampsTotal: number;
+  src20Total: number;
+  stampsCreated: number;
+  setShowItem: (type: string) => void;
+}
+
+/**
+ * Wallet Dispenser Details component props
+ */
+export interface WalletDispenserDetailsProps {
+  walletData: any; // TODO: Replace with WalletOverviewInfo from wallet.d.ts
+  stampsTotal: number;
+  src20Total: number;
+  stampsCreated: number;
+  setShowItem: (type: string) => void;
+}
+
+/**
+ * Wallet Profile Details component props
+ */
+export interface WalletProfileDetailsProps {
+  walletData: any; // TODO: Replace with WalletOverviewInfo from wallet.d.ts
+  stampsTotal: number;
+  src20Total: number;
+  stampsCreated: number;
+  setShowItem: (type: string) => void;
+}
+
+/**
+ * Section Header component props
+ */
+export interface SectionHeaderProps {
+  title: string;
+  config: any; // TODO: Replace with SectionSortingConfig from appropriate domain
+  sortBy: string;
+  onSortChange: (sort: string) => void;
+  enableAdvancedSorting?: boolean;
+  showMetrics?: boolean;
+}
+
+/**
+ * Stamp Info component props
+ */
+export interface StampInfoProps {
+  stamp: any; // TODO: Replace with StampRow from stamp.d.ts
+  lowestPriceDispenser: any;
+}
+
+/**
+ * Block component props
+ */
+export interface BlockProps {
+  block: any; // TODO: Replace with BlockRow from appropriate domain
+  selected: any; // TODO: Replace with Signal<BlockRow> from appropriate domain
+}
+
+/**
+ * FAQ Accordion component props
+ */
+export interface FaqAccordionProps {
+  item: any; // TODO: Replace with FAQ_CONTENT item type from appropriate domain
+}
+
+// FORM COMPONENT PROPS
+// ====================
+
+/**
+ * Input Field component props (extends base InputProps)
+ */
+export interface InputFieldProps extends InputProps {
+  type: string;
+  onInput?: (e: JSX.TargetedEvent<HTMLInputElement, Event>) => void;
+  inputMode?: "text" | "numeric";
+  maxLength?: number;
+  minLength?: number;
+  min?: string;
+  step?: string;
+  textAlign?: "left" | "center" | "right";
+  isUppercase?: boolean;
+}
+
+/**
+ * SRC-20 Input Field component props
+ */
+export interface SRC20InputFieldProps {
+  type: string;
+  placeholder: string;
+  value: string;
+  onChange: (e: Event) => void;
+  onBlur?: () => void;
+  error?: string;
+  maxLength?: number;
+  isUppercase?: boolean;
+  inputMode?: "numeric" | "text" | "email";
+  pattern?: string;
+  onFocus?: () => void;
+}
+
+/**
+ * Select Field component props (extends base SelectProps)
+ */
+export interface SelectFieldProps extends SelectProps {
+  onClick?: (e: JSX.TargetedEvent<HTMLSelectElement, Event>) => void;
+  options: any[]; // TODO: Replace with StampRow from stamp.d.ts
+  className?: string;
+}
+
+// MODAL COMPONENT PROPS
+// =====================
+
+/**
+ * Generic modal Props interface (used by multiple modals)
+ */
+export interface ModalComponentProps {
+  img: string;
+  name: string;
+  owner: string;
+}
+
+/**
+ * Buy Stamp Modal component props
+ */
+export interface BuyStampModalProps extends ModalComponentProps {}
+
+/**
+ * Donate Stamp Modal component props
+ */
+export interface DonateStampModalProps extends ModalComponentProps {}
+
+/**
+ * Filter SRC-20 Modal component props
+ */
+export interface FilterSRC20ModalProps extends ModalComponentProps {}
+
+/**
+ * Receive Address Modal component props
+ */
+export interface ReceiveAddyModalProps extends ModalComponentProps {}
+
+/**
+ * Send BTC Modal component props
+ */
+export interface SendBTCModalProps extends ModalComponentProps {}
+
+/**
+ * Detail SRC-101 Modal component props
+ */
+export interface DetailSRC101ModalProps extends ModalComponentProps {}
+
+/**
+ * Connect Wallet Modal component props
+ */
+export interface ConnectWalletModalProps {
+  connectors: ComponentChildren;
+  handleClose: () => void;
+}
+
+/**
+ * Preview Code Modal component props
+ */
+export interface PreviewCodeModalProps {
+  src: string;
+}
+
+/**
+ * Preview Image Modal component props
+ */
+export interface PreviewImageModalProps {
+  src: string | File;
+  contentType?: "html" | "text" | "image" | "audio";
+}
+
+/**
+ * Image Modal component props
+ */
+export interface ImageModalProps {
+  imgSrc: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+// LAYOUT COMPONENT PROPS
+// =======================
+
+/**
+ * Chart Widget component props
+ */
+export interface ChartWidgetProps {
+  data: any; // TODO: Replace with ChartData from appropriate domain
+  fromPage: string;
+  tick: string;
+}
+
+/**
+ * Modal Overlay component props
+ */
+export interface ModalOverlayProps {
+  handleClose: () => void;
+  children: ComponentChildren;
+  animation?: any; // TODO: Replace with ModalAnimation from appropriate domain
+}
+
+/**
+ * Wallet Provider component props
+ */
+export interface WalletProviderProps {
+  providerKey: any; // TODO: Replace with WalletProviderKey from wallet.d.ts
+  onSuccess?: () => void;
+}
+
+/**
+ * Meta Tags component props
+ */
+export interface MetaTagsProps {
+  title?: string;
+  description?: string;
+  image?: string;
+  skipImage?: boolean;
+  skipTitle?: boolean;
+  skipDescription?: boolean;
+  skipOgMeta?: boolean;
+}
+
+/**
+ * Scroll Container component props
+ */
+export interface ScrollContainerProps {
+  children: ComponentChildren;
+  class?: string;
+  onScroll?: (e: Event) => void;
+}
+
+/**
+ * Modal Search Base component props
+ */
+export interface ModalSearchBaseProps {
+  children: ComponentChildren;
+  onClose?: () => void;
+}
+
+// DISPLAY COMPONENT PROPS
+// ========================
+
+/**
+ * BTC Value Display component props
+ */
+export interface BTCValueDisplayProps {
+  value: number;
+  showUSD?: boolean;
+  btcPriceUSD?: number;
+  className?: string;
+}
+
+/**
+ * Stamp BTC Value component props
+ */
+export interface StampBTCValueProps {
+  value: number;
+  showUSD?: boolean;
+  btcPriceUSD?: number;
+  className?: string;
+}
+
+/**
+ * Wallet Stamp Value component props
+ */
+export interface WalletStampValueProps {
+  value: number;
+  showUSD?: boolean;
+  btcPriceUSD?: number;
+  className?: string;
+}
+
+/**
+ * Total BTC Value component props
+ */
+export interface TotalBTCValueProps {
+  value: number;
+  showUSD?: boolean;
+  btcPriceUSD?: number;
+  className?: string;
+}
+
+/**
+ * BTC Value Summary component props
+ */
+export interface BTCValueSummaryProps {
+  value: number;
+  showUSD?: boolean;
+  btcPriceUSD?: number;
+  className?: string;
+}
+
+/**
+ * Market Data Status component props
+ */
+export interface MarketDataStatusProps {
+  status: string;
+  lastUpdated?: Date;
+  className?: string;
+}
+
+// INDICATOR COMPONENT PROPS
+// ==========================
+
+/**
+ * Mara Mode Indicator component props
+ */
+export interface MaraModeIndicatorProps {
+  outputValue: number;
+  feeRate?: number | null;
+  class?: string;
+}
+
+/**
+ * Transaction Status component props
+ */
+export interface TransactionStatusProps {
+  state: any; // TODO: Replace with TransactionState from transaction.d.ts
+  txid?: string;
+  confirmations?: number;
+  targetConfirmations?: number;
+  estimatedTime?: number;
+  errorMessage?: string;
+  class?: string;
+  onViewTransaction?: () => void;
+  onRetry?: () => void;
+}
+
+/**
+ * Transaction Badge component props
+ */
+export interface TransactionBadgeProps {
+  state: any; // TODO: Replace with TransactionState from transaction.d.ts
+  class?: string;
+}
+
+/**
+ * Mara Success Message component props
+ */
+export interface MaraSuccessMessageProps {
+  txid: string;
+  outputValue: number;
+  feeRate: number;
+  poolInfo?: {
+    name: string;
+    hashrate?: string;
+  };
+  class?: string;
+}
+
+/**
+ * Progress Indicator component props
+ */
+export interface ProgressIndicatorProps {
+  state: any; // TODO: Replace with ProgressState from appropriate domain
+  message?: string;
+  class?: string;
+}
+
+/**
+ * Transaction Progress component props
+ */
+export interface TransactionProgressProps {
+  steps: any[]; // TODO: Replace with TransactionStep from transaction.d.ts
+  class?: string;
+}
+
+/**
+ * Spinner component props
+ */
+export interface SpinnerProps {
+  size?: "sm" | "md" | "lg";
+  color?: string;
+  class?: string;
+}
+
+/**
+ * Progressive Estimation Indicator component props
+ */
+export interface ProgressiveEstimationIndicatorProps {
+  /** Whether the component is currently connected to a wallet */
+  isConnected: boolean;
+  /** Whether a transaction is being submitted */
+  isSubmitting: boolean;
+  /** Whether pre-fetching UTXO data is in progress */
+  isPreFetching: boolean;
+  /** Current estimation phase: "instant" | "smart" | "exact" */
+  currentPhase: "instant" | "smart" | "exact";
+  /** Phase completion flags */
+  phase1: boolean;
+  phase2: boolean;
+  phase3: boolean;
+  /** Error message if estimation failed */
+  feeEstimationError: string | null;
+  /** Function to clear the error */
+  clearError: () => void;
+}
+
+// BUTTON COMPONENT PROPS
+// =======================
+
+/**
+ * Selector Buttons component props
+ */
+export interface SelectorButtonsProps {
+  options: any[]; // TODO: Replace with SelectorOption from appropriate domain
+  value?: string;
+  defaultValue?: string;
+  onChange?: (value: string) => void;
+  disabled?: boolean;
+  size: "xs" | "sm" | "md" | "lg";
+  color: "grey" | "purple";
+  className?: string;
+}
+
+/**
+ * Sort Button component props
+ */
+export interface SortProps {
+  searchParams?: URLSearchParams | undefined;
+  initSort?: "ASC" | "DESC" | undefined;
+  sortParam?: string;
+  onChangeSort?: (newSort: "ASC" | "DESC") => void;
+}
+
+/**
+ * Read All Button component props
+ */
+export interface ReadAllButtonProps {
+  href?: string;
+}
+
+/**
+ * Toggle Switch Button component props
+ */
+export interface ToggleSwitchButtonProps {
+  isActive: boolean;
+  onToggle: () => void;
+  toggleButtonId: string;
+  className?: string;
+  onMouseEnter?: (e: MouseEvent) => void;
+  onMouseLeave?: (e: MouseEvent) => void;
+  onClick?: (e: MouseEvent) => void;
+  buttonRef?: preact.RefObject<HTMLButtonElement>;
+}
+
+// ICON COMPONENT PROPS
+// ====================
+
+/**
+ * Loading Icon component props
+ */
+export interface LoadingIconProps {
+  size?: IconSize;
+  className?: string;
+}
+
+/**
+ * Gear Icon component props
+ */
+export interface GearIconProps {
+  size?: IconSize;
+  className?: string;
+  onClick?: () => void;
+}
+
+/**
+ * Close Icon component props
+ */
+export interface CloseIconProps {
+  size?: IconSize;
+  className?: string;
+  onClick?: () => void;
+}
+
+// TOOL COMPONENT PROPS
+// ====================
+
+/**
+ * SRC-20 Mint Tool component props
+ */
+export interface SRC20MintToolProps {
+  trxType?: "olga" | "multisig";
+  tick?: string | undefined | null;
+  mintStatus?: any | null | undefined;
+  holders?: number;
+}
+
+/**
+ * Mint Progress component props
+ */
+export interface MintProgressProps {
+  progress: string;
+  progressWidth: string;
+  maxSupply: string;
+  limit: string;
+  minters: string;
+}
+
+/**
+ * SRC-101 Register Tool component props
+ */
+export interface SRC101RegisterToolProps {
+  trxType?: "olga" | "multisig";
+}
+
+/**
+ * Fairmint Tool component props
+ */
+export interface FairmintToolProps {
+  fairminters: any[];
+}
+
+/**
+ * Status Messages component props
+ */
+export interface StatusMessagesProps {
+  submissionMessage?:
+    | {
+      message: string;
+      txid?: string;
+    }
+    | string
+    | null;
+  apiError?: string | null;
+  fileUploadError?: string | null;
+  walletError?: string | null;
+  maraError?: string | null;
+  transactionHex?: string | null;
+  onCopyHex?: () => void;
+}
+
+// BADGE COMPONENT PROPS
+// =====================
+
+/**
+ * Activity Badge component props
+ */
+export interface ActivityBadgeProps {
+  level: any; // TODO: Replace with ActivityLevelType from appropriate domain
+  showLabel?: boolean;
+  size?: "xs" | "sm" | "md" | "lg";
+  className?: string;
+}
+
+// HEADER COMPONENT PROPS
+// =======================
+
+/**
+ * SRC-20 Overview Header component props
+ */
+export interface SRC20OverviewHeaderProps {
+  onViewTypeChange?: (viewType: string) => void;
+  viewType: "minted" | "minting";
+  onTimeframeChange?: (timeframe: "24H" | "7D" | "30D") => void;
+  onFilterChange?: (filter: string, direction?: "asc" | "desc") => void;
+  currentSort?: {
+    filter: string | null;
+    direction: "asc" | "desc";
+  };
+}
+
+// FEED COMPONENT PROPS
+// ====================
+
+/**
+ * Sales Activity Feed component props
+ */
+export interface SalesActivityFeedProps {
+  title?: string;
+  subTitle?: string;
+  sales?: any[]; // TODO: Replace with StampWithEnhancedSaleData from appropriate domain
+  isLoading?: boolean;
+  btcPriceUSD?: number;
+  maxItems?: number;
+  showTimestamps?: boolean;
+  showStampPreviews?: boolean;
+  autoRefresh?: boolean;
+  refreshIntervalMs?: number;
+  onRefresh?: () => Promise<void>;
+  onItemClick?: (sale: any) => void; // TODO: Replace with StampWithEnhancedSaleData
+  compact?: boolean;
+}
+
+// FILTER COMPONENT PROPS
+// =======================
+
+/**
+ * Range Input component props
+ */
+export interface RangeInputProps {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+  type: "stamp" | "price";
+}
+
+/**
+ * Checkbox component props
+ */
+export interface CheckboxProps {
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+  hasDropdown?: boolean;
+  dropdownContent?: ComponentChildren;
+}
+
+/**
+ * Radio component props
+ */
+export interface RadioProps {
+  label: string;
+  value: string;
+  checked: boolean;
+  onChange: () => void;
+  name: string;
+}
+
+// SORTING COMPONENT PROPS
+// ========================
+
+/**
+ * Sorting Provider component props
+ */
+export interface SortingProviderProps {
+  /** Child components */
+  children: ComponentChildren;
+  /** Sorting configuration */
+  config: any; // TODO: Replace with UseSortingConfig from appropriate domain
+  /** Optional initial sort state */
+  initialState?: any; // TODO: Replace with Partial<SortState> from appropriate domain
+  /** Optional test ID for testing */
+  testId?: string;
+}
+
+/**
+ * Enhanced Sort Button component props
+ */
+export interface EnhancedSortButtonProps {
+  enableAdvancedSorting?: boolean;
+  showMetrics?: boolean;
+  className?: string;
+}
+
+/**
+ * Sorting Component props
+ */
+export interface SortingComponentProps {
+  /** Child components */
+  children: ComponentChildren;
+  /** Additional CSS classes */
+  className?: string;
+  /** Test ID for testing */
+  testId?: string;
+  /** Accessibility label */
+  "aria-label"?: string;
+}
+
+/**
+ * Sorting Dropdown component props
+ */
+export interface SortingDropdownProps {
+  /** Available sort options */
+  options: ReadonlyArray<any>; // TODO: Replace with SortOption from appropriate domain
+  /** Additional CSS classes */
+  className?: string;
+  /** Placeholder text */
+  placeholder?: string;
+  /** Test ID for testing */
+  testId?: string;
+  /** Whether to show loading state */
+  showLoading?: boolean;
+  /** Custom option renderer */
+  renderOption?: (option: any) => ComponentChildren; // TODO: Replace with SortOption
+}
+
+/**
+ * Sorting Buttons component props
+ */
+export interface SortingButtonsProps {
+  /** Available sort options */
+  options: ReadonlyArray<any>; // TODO: Replace with SortOption from appropriate domain
+  /** Additional CSS classes */
+  className?: string;
+  /** Test ID for testing */
+  testId?: string;
+  /** Button variant */
+  variant?: "primary" | "secondary" | "ghost";
+  /** Button size */
+  size?: "sm" | "md" | "lg";
+  /** Whether to show icons */
+  showIcons?: boolean;
+  /** Whether to show loading state */
+  showLoading?: boolean;
+  /** Custom button renderer */
+  renderButton?: (
+    option: any, // TODO: Replace with SortOption
+    isActive: boolean,
+  ) => ComponentChildren;
+}
+
+/**
+ * Sorting Label component props
+ */
+export interface SortingLabelProps {
+  /** Additional CSS classes */
+  className?: string;
+  /** Test ID for testing */
+  testId?: string;
+  /** Whether to show direction indicator */
+  showDirection?: boolean;
+  /** Whether to show loading state */
+  showLoading?: boolean;
+  /** Custom label format */
+  format?: (sortBy: any, direction: string) => string; // TODO: Replace with SortKey
+}
+
+/**
+ * Sorting Error component props
+ */
+export interface SortingErrorProps {
+  /** Additional CSS classes */
+  className?: string;
+  /** Test ID for testing */
+  testId?: string;
+  /** Custom error message */
+  message?: string;
+  /** Whether to show retry button */
+  showRetry?: boolean;
+  /** Custom retry handler */
+  onRetry?: () => void;
+}
+
+/**
+ * Sorting Provider with URL component props
+ */
+export interface SortingProviderWithURLProps {
+  /** Child components */
+  children: ComponentChildren;
+  /** Sorting configuration with URL sync */
+  config: any; // TODO: Replace with SortingProviderWithURLConfig from appropriate domain
+  /** Optional initial sort state */
+  initialState?: any; // TODO: Replace with Partial<SortState<SortKey>> from appropriate domain
+  /** Optional test ID for testing */
+  testId?: string;
+}
+
+/**
+ * Convenience Provider component props
+ */
+export interface ConvenienceProviderProps {
+  /** Child components */
+  children: ComponentChildren;
+  /** Default sort value */
+  defaultSort?: any; // TODO: Replace with SortKey from appropriate domain
+  /** Optional test ID */
+  testId?: string;
+}
+
+/**
+ * Styled Sorting Dropdown component props
+ */
+export interface StyledSortingDropdownProps {
+  /** Available sort options */
+  options: ReadonlyArray<any>; // TODO: Replace with SortOption from appropriate domain
+  /** Additional CSS classes */
+  className?: string;
+  /** Placeholder text */
+  placeholder?: string;
+  /** Test ID for testing */
+  testId?: string;
+  /** Size variant */
+  size?: "sm" | "md" | "lg";
+  /** Whether to show loading state */
+  showLoading?: boolean;
+}
+
+/**
+ * Styled Sorting Buttons component props
+ */
+export interface StyledSortingButtonsProps {
+  /** Available sort options */
+  options: ReadonlyArray<any>; // TODO: Replace with SortOption from appropriate domain
+  /** Additional CSS classes */
+  className?: string;
+  /** Test ID for testing */
+  testId?: string;
+  /** Button variant */
+  variant?: "primary" | "secondary" | "ghost";
+  /** Button size */
+  size?: "sm" | "md" | "lg";
+  /** Whether to show icons */
+  showIcons?: boolean;
+  /** Whether to show loading state */
+  showLoading?: boolean;
+}
+
+/**
+ * Styled Sorting Label component props
+ */
+export interface StyledSortingLabelProps {
+  /** Additional CSS classes */
+  className?: string;
+  /** Test ID for testing */
+  testId?: string;
+  /** Label style variant */
+  variant?: "default" | "compact" | "detailed";
+  /** Whether to show direction indicator */
+  showDirection?: boolean;
+  /** Whether to show loading state */
+  showLoading?: boolean;
+}
+
+/**
+ * Styled Sorting Error component props
+ */
+export interface StyledSortingErrorProps {
+  /** Additional CSS classes */
+  className?: string;
+  /** Test ID for testing */
+  testId?: string;
+  /** Custom error message */
+  message?: string;
+  /** Whether to show retry button */
+  showRetry?: boolean;
+  /** Custom retry handler */
+  onRetry?: () => void;
+}
+
+/**
+ * Complete Sorting Interface component props
+ */
+export interface CompleteSortingInterfaceProps {
+  /** Sorting configuration */
+  config: any; // TODO: Replace with UseSortingConfig from appropriate domain
+  /** Available sort options */
+  options: ReadonlyArray<any>; // TODO: Replace with SortOption from appropriate domain
+  /** UI variant */
+  variant?: "dropdown" | "buttons" | "hybrid";
+  /** Size variant */
+  size?: "sm" | "md" | "lg";
+  /** Additional CSS classes */
+  className?: string;
+  /** Test ID for testing */
+  testId?: string;
+  /** Whether to show current sort label */
+  showLabel?: boolean;
+  /** Whether to show error messages */
+  showError?: boolean;
+}
+
+/**
+ * Sorting Error Boundary component props
+ */
+export interface SortingErrorBoundaryProps {
+  children: ComponentChildren;
+  fallback?: ComponentChildren;
+  onError?: (error: any, errorDetails?: string) => void; // TODO: Replace with ErrorInfo
+  maxRetries?: number;
+  retryDelay?: number;
+  context?: "wallet" | "stamp" | "src20" | "general";
+  className?: string;
+  testId?: string;
+}
+
+/**
+ * Sorting Error Fallback component props
+ */
+export interface SortingErrorFallbackProps {
+  error: any; // TODO: Replace with ErrorInfo from appropriate domain
+  onRetry: () => void;
+  onReset: () => void;
+  context: string;
+  retryCount: number;
+  maxRetries: number;
+}
+
+// TOAST COMPONENT PROPS
+// ======================
+
+/**
+ * Toast Provider component props
+ */
+export interface ToastProviderProps {
+  children: ComponentChildren;
+}
+
+/**
+ * Toast Component props
+ */
+export interface ToastComponentProps {
+  id: string;
+  message: string;
+  type: any; // TODO: Replace with ToastTypeFromProvider["type"] from appropriate domain
+  onClose: () => void;
+}
+
+// ERROR COMPONENT PROPS
+// =====================
+
+/**
+ * Error Display component props
+ */
+export interface ErrorDisplayProps {
+  error: any; // TODO: Replace with ErrorInfo from errors.d.ts
+  onRetry?: () => void;
+  onDismiss?: () => void;
+  compact?: boolean;
+  showDetails?: boolean;
+  className?: string;
+}
+
+// OTHER COMPONENT PROPS
+// =====================
+
+/**
+ * Setting component props
+ */
+export interface SettingProps {
+  initFilter: string[];
+  open: boolean;
+  handleOpen: (open: boolean) => void;
+  filterButtons: string[];
+  onFilterClick?: (filter: string) => void;
+}
+
+/**
+ * Transaction Hex Display component props
+ */
+export interface TransactionHexDisplayProps {
+  hex: string;
+  className?: string;
+}
+
+/**
+ * Mara Status Link component props
+ */
+export interface MaraStatusLinkProps {
+  href: string;
+  className?: string;
+}
+
+/**
+ * Stat Base component props
+ */
+export interface StatBaseProps {
+  label: string | ComponentChildren;
+  value: string | ComponentChildren;
+  align?: any; // TODO: Replace with AlignmentType from appropriate domain
+}
+
+/**
+ * Author component props
+ */
+export interface AuthorProps {
+  name: string;
+  twitter: string;
+  website?: string;
+}
+
+/**
+ * Article component props
+ */
+export interface ArticleProps {
+  title: string;
+  subtitle: string;
+  headerImage: string;
+  children: ComponentChildren;
+  importantNotes?: string[];
+}
+
+/**
+ * Shared List component props
+ */
+export interface SharedListProps {
+  children: ComponentChildren;
+  hasImportantNotes?: boolean;
+}
+
+/**
+ * Mara Service Unavailable Modal component props
+ */
+export interface MaraServiceUnavailableModalProps {
+  onSwitchToStandard: () => void;
+  onRetry: () => void;
+  onClose: () => void;
+}
+
+/**
+ * Mara Mode Warning Modal component props
+ */
+export interface MaraModeWarningModalProps {
+  outputValue: number;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+/**
+ * Stat Title component props
+ */
+export interface StatTitleProps {
+  label: string;
+  value: string | ComponentChildren;
+  align?: "left" | "center" | "right";
+}
+
+/**
+ * Stat Item component props
+ */
+export interface StatItemProps {
+  label: string;
+  value: string | ComponentChildren;
+  align?: "left" | "center" | "right";
+  class?: string;
+}
+
+// PAGE COMPONENT PROPS
+// ====================
+
+/**
+ * SRC-20 Detail Page component props
+ */
+export interface SRC20DetailPageProps {
+  tick: string;
+  data: any; // TODO: Replace with appropriate SRC-20 detail data type
+}
+
+/**
+ * Tool Stamp Page component props
+ */
+export interface ToolStampPageProps {
+  action: string;
+}
+
+/**
+ * Stamp Detail Page component props
+ */
+export interface StampDetailPageProps {
+  id: string;
+  stamp: any; // TODO: Replace with StampRow from stamp.d.ts
+}
+
+/**
+ * Tool Fairmint Page component props
+ */
+export interface ToolFairmintPageProps {
+  fairminters: any[];
+}
+
+/**
+ * Collection Overview Page component props
+ */
+export interface CollectionOverviewPageProps {
+  overview: string;
+  collection: any; // TODO: Replace with Collection from appropriate domain
+}
+
+/**
+ * Tools SRC-101 Page component props
+ */
+export interface ToolsSrc101PageProps {
+  action: string;
+}
+
+/**
+ * Color Swatch component props
+ */
+export interface ColorSwatchProps {
+  color: string;
+  name: string;
+}
+
+/**
+ * Tool SRC-20 Page component props
+ */
+export interface ToolSrc20PageProps {
+  action: string;
+  tick?: string;
 }
 
 // =============================================================================

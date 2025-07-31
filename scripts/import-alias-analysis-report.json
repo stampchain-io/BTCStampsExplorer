@@ -1,0 +1,3566 @@
+{
+  "totalImprovements": 118,
+  "categorizedImprovements": {
+    "tests": [
+      {
+        "file": "test/types/core.type.test.ts",
+        "line": 691,
+        "currentImport": "../../lib/types/stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 70
+      },
+      {
+        "file": "test/types/core.type.test.ts",
+        "line": 692,
+        "currentImport": "../../lib/types/src20.d.ts",
+        "suggestedImport": "$types/src20.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 70
+      },
+      {
+        "file": "test/types/core.type.test.ts",
+        "line": 693,
+        "currentImport": "../../lib/types/transaction.d.ts",
+        "suggestedImport": "$types/transaction.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 70
+      },
+      {
+        "file": "tests/unit/maraConfigValidator.test.ts",
+        "line": 13,
+        "currentImport": "../../server/config/maraConfig.ts",
+        "suggestedImport": "$server/config/maraConfig.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 60
+      },
+      {
+        "file": "tests/unit/stampCreationService.test.ts",
+        "line": 5,
+        "currentImport": "../../server/services/stamp/stampCreationService.ts",
+        "suggestedImport": "$server/services/stamp/stampCreationService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 60
+      },
+      {
+        "file": "tests/unit/transactionSizeEstimator.test.ts",
+        "line": 12,
+        "currentImport": "../../lib/types/index.d.ts",
+        "suggestedImport": "$types/index.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 70
+      },
+      {
+        "file": "tests/unit/maraTransactionSizeEstimator.test.ts",
+        "line": 15,
+        "currentImport": "../../lib/types/index.d.ts",
+        "suggestedImport": "$types/index.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 70
+      },
+      {
+        "file": "islands/sorting/tests/SortingProvider.test.tsx",
+        "line": 9,
+        "currentImport": "../SortingProvider.tsx",
+        "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 55
+      }
+    ],
+    "types": [
+      {
+        "file": "test/types/server/database_test.ts",
+        "line": 69,
+        "currentImport": "../../../lib/types/stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 75
+      },
+      {
+        "file": "test/types/server/database_test.ts",
+        "line": 70,
+        "currentImport": "../../../lib/types/src20.d.ts",
+        "suggestedImport": "$types/src20.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 75
+      },
+      {
+        "file": "test/types/server/database_test.ts",
+        "line": 71,
+        "currentImport": "../../../lib/types/transaction.d.ts",
+        "suggestedImport": "$types/transaction.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 75
+      },
+      {
+        "file": "server/types/collection_guards.ts",
+        "line": 5,
+        "currentImport": "./collection.d.ts",
+        "suggestedImport": "$server/types/collection.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/transaction.d.ts",
+        "line": 11,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/transaction.d.ts",
+        "line": 12,
+        "currentImport": "./stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/stamping.ts",
+        "line": 1,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/fee.d.ts",
+        "line": 1,
+        "currentImport": "./index.d.ts",
+        "suggestedImport": "$types/index.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/fee.d.ts",
+        "line": 2,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api_test.ts",
+        "line": 40,
+        "currentImport": "./stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 33,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 39,
+        "currentImport": "./api_constants.ts",
+        "suggestedImport": "$types/api_constants.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 44,
+        "currentImport": "./utils.d.ts",
+        "suggestedImport": "$types/utils.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 45,
+        "currentImport": "./pagination.d.ts",
+        "suggestedImport": "$types/pagination.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 61,
+        "currentImport": "./transaction.d.ts",
+        "suggestedImport": "$types/transaction.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 63,
+        "currentImport": "./transaction.d.ts",
+        "suggestedImport": "$types/transaction.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1847,
+        "currentImport": "./stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1848,
+        "currentImport": "./src20.d.ts",
+        "suggestedImport": "$types/src20.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1849,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1850,
+        "currentImport": "./transaction.d.ts",
+        "suggestedImport": "$types/transaction.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1851,
+        "currentImport": "./stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1852,
+        "currentImport": "./pagination.d.ts",
+        "suggestedImport": "$types/pagination.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/stamp.d.ts",
+        "line": 12,
+        "currentImport": "./marketData.d.ts",
+        "suggestedImport": "$types/marketData.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/stamp.d.ts",
+        "line": 19,
+        "currentImport": "./pagination.d.ts",
+        "suggestedImport": "$types/pagination.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/errors.ts",
+        "line": 11,
+        "currentImport": "./errors.d.ts",
+        "suggestedImport": "$types/errors.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/wallet_constants.ts",
+        "line": 7,
+        "currentImport": "./wallet.d.ts",
+        "suggestedImport": "$types/wallet.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/wallet.d.ts",
+        "line": 2,
+        "currentImport": "./pagination.d.ts",
+        "suggestedImport": "$types/pagination.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/wallet.d.ts",
+        "line": 3,
+        "currentImport": "./sorting.d.ts",
+        "suggestedImport": "$types/sorting.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/wallet.d.ts",
+        "line": 4,
+        "currentImport": "./wallet_constants.ts",
+        "suggestedImport": "$types/wallet_constants.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.ts",
+        "line": 17,
+        "currentImport": "./pagination.d.ts",
+        "suggestedImport": "$types/pagination.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/ui.d.ts",
+        "line": 14,
+        "currentImport": "./src20.d.ts",
+        "suggestedImport": "$types/src20.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/ui.d.ts",
+        "line": 15,
+        "currentImport": "./stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/utils.d.ts",
+        "line": 28,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/fee-estimation.ts",
+        "line": 13,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      }
+    ],
+    "utilities": [
+      {
+        "file": "tests/fixtures/stampCreationServiceFixtures.ts",
+        "line": 6,
+        "currentImport": "../../lib/types/index.d.ts",
+        "suggestedImport": "$types/index.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 70
+      },
+      {
+        "file": "tests/fixtures/maraTransactionFixtures.ts",
+        "line": 6,
+        "currentImport": "../../lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts",
+        "suggestedImport": "$lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 60
+      },
+      {
+        "file": "islands/card/SRC20CardMinted.tsx",
+        "line": 7,
+        "currentImport": "./SRC20CardBase.tsx",
+        "suggestedImport": "$islands/card/SRC20CardBase.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/card/SRC20CardMinting.tsx",
+        "line": 7,
+        "currentImport": "./SRC20CardBase.tsx",
+        "suggestedImport": "$islands/card/SRC20CardBase.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/Toast/ToastProvider.tsx",
+        "line": 5,
+        "currentImport": "./ToastComponent.tsx",
+        "suggestedImport": "$islands/Toast/ToastComponent.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/Toast/ToastComponent.tsx",
+        "line": 1,
+        "currentImport": "./ToastProvider.tsx",
+        "suggestedImport": "$islands/Toast/ToastProvider.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingStyles.tsx",
+        "line": 10,
+        "currentImport": "./SortingComponent.tsx",
+        "suggestedImport": "$islands/sorting/SortingComponent.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingStyles.tsx",
+        "line": 11,
+        "currentImport": "./SortingProvider.tsx",
+        "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingComponent.tsx",
+        "line": 10,
+        "currentImport": "./SortingProvider.tsx",
+        "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingProviderWithURL.tsx",
+        "line": 15,
+        "currentImport": "./SortingProvider.tsx",
+        "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingProviderWithURL.tsx",
+        "line": 16,
+        "currentImport": "./hooks/useSortingURL.tsx",
+        "suggestedImport": "$islands/sorting/hooks/useSortingURL.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingProviderWithURL.tsx",
+        "line": 17,
+        "currentImport": "./hooks/useSortingURL.tsx",
+        "suggestedImport": "$islands/sorting/hooks/useSortingURL.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/middleware/schemaTransformer.ts",
+        "line": 2,
+        "currentImport": "./apiVersionMiddleware.ts",
+        "suggestedImport": "$server/middleware/apiVersionMiddleware.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/database/circuitBreakerDatabaseManager.ts",
+        "line": 9,
+        "currentImport": "./databaseManager.ts",
+        "suggestedImport": "$server/database/databaseManager.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/database/stampRepository.ts",
+        "line": 27,
+        "currentImport": "./index.ts",
+        "suggestedImport": "$server/database/index.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/controller/stampController.ts",
+        "line": 9,
+        "currentImport": "./collectionController.ts",
+        "suggestedImport": "$server/controller/collectionController.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/transaction/index.ts",
+        "line": 1,
+        "currentImport": "./bitcoinTransactionBuilder.ts",
+        "suggestedImport": "$server/services/transaction/bitcoinTransactionBuilder.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/transaction/index.ts",
+        "line": 2,
+        "currentImport": "./bitcoinUtxoManager.ts",
+        "suggestedImport": "$server/services/transaction/bitcoinUtxoManager.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/quicknode/cachedQuicknodeRpcService.ts",
+        "line": 3,
+        "currentImport": "./quicknodeService.ts",
+        "suggestedImport": "$server/services/quicknode/quicknodeService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/memory/commonPools.ts",
+        "line": 6,
+        "currentImport": "./objectPool.ts",
+        "suggestedImport": "$server/services/memory/objectPool.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/psbt/index.ts",
+        "line": 1,
+        "currentImport": "./src20MultisigPSBTService.ts",
+        "suggestedImport": "$server/services/src20/psbt/src20MultisigPSBTService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/queryService.ts",
+        "line": 18,
+        "currentImport": "./utilityService.ts",
+        "suggestedImport": "$server/services/src20/utilityService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 1,
+        "currentImport": "./queryService.ts",
+        "suggestedImport": "$server/services/src20/queryService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 2,
+        "currentImport": "./transactionService.ts",
+        "suggestedImport": "$server/services/src20/transactionService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 3,
+        "currentImport": "./marketService.ts",
+        "suggestedImport": "$server/services/src20/marketService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 4,
+        "currentImport": "./utilityService.ts",
+        "suggestedImport": "$server/services/src20/utilityService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 5,
+        "currentImport": "./psbt/src20PSBTService.ts",
+        "suggestedImport": "$server/services/src20/psbt/src20PSBTService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 6,
+        "currentImport": "./operations/src20Operations.ts",
+        "suggestedImport": "$server/services/src20/operations/src20Operations.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 7,
+        "currentImport": "./compression/compressionService.ts",
+        "suggestedImport": "$server/services/src20/compression/compressionService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/utilityService.ts",
+        "line": 5,
+        "currentImport": "./queryService.ts",
+        "suggestedImport": "$server/services/src20/queryService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/transactionService.ts",
+        "line": 5,
+        "currentImport": "./operations/src20Operations.ts",
+        "suggestedImport": "$server/services/src20/operations/src20Operations.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/security/internalRouteGuard.ts",
+        "line": 1,
+        "currentImport": "./securityService.ts",
+        "suggestedImport": "$server/services/security/securityService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/psbt/index.ts",
+        "line": 1,
+        "currentImport": "./src101MultisigPSBTService.ts",
+        "suggestedImport": "$server/services/src101/psbt/src101MultisigPSBTService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 1,
+        "currentImport": "./queryService.ts",
+        "suggestedImport": "$server/services/src101/queryService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 2,
+        "currentImport": "./transactionService.ts",
+        "suggestedImport": "$server/services/src101/transactionService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 3,
+        "currentImport": "./utilityService.ts",
+        "suggestedImport": "$server/services/src101/utilityService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 4,
+        "currentImport": "./psbt/src101MultisigPSBTService.ts",
+        "suggestedImport": "$server/services/src101/psbt/src101MultisigPSBTService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 5,
+        "currentImport": "./operations/src101Operations.ts",
+        "suggestedImport": "$server/services/src101/operations/src101Operations.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 6,
+        "currentImport": "./compression/compressionService.ts",
+        "suggestedImport": "$server/services/src101/compression/compressionService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/utilityService.ts",
+        "line": 5,
+        "currentImport": "./queryService.ts",
+        "suggestedImport": "$server/services/src101/queryService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/transactionService.ts",
+        "line": 2,
+        "currentImport": "./index.ts",
+        "suggestedImport": "$server/services/src101/index.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/price/btcPriceSingleton.ts",
+        "line": 1,
+        "currentImport": "./btcPriceService.ts",
+        "suggestedImport": "$server/services/price/btcPriceService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/utxo/commonUtxoService.ts",
+        "line": 11,
+        "currentImport": "./utxoServiceInterface.d.ts",
+        "suggestedImport": "$server/services/utxo/utxoServiceInterface.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/stamp/index.ts",
+        "line": 1,
+        "currentImport": "./stampCreationService.ts",
+        "suggestedImport": "$server/services/stamp/stampCreationService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/stamp/index.ts",
+        "line": 2,
+        "currentImport": "./stampValidationService.ts",
+        "suggestedImport": "$server/services/stamp/stampValidationService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/aws/cloudWatchMonitoring.ts",
+        "line": 6,
+        "currentImport": "./ecsDetection.ts",
+        "suggestedImport": "$server/services/aws/ecsDetection.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/utils/bitcoin/minting/feeCalculations.ts",
+        "line": 10,
+        "currentImport": "./transactionSizes.ts",
+        "suggestedImport": "$lib/utils/bitcoin/minting/transactionSizes.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/utils/bitcoin/encoding/fileToAddressUtils.ts",
+        "line": 1,
+        "currentImport": "../address/bech32Utils.ts",
+        "suggestedImport": "$lib/utils/bitcoin/address/bech32Utils.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 55
+      },
+      {
+        "file": "lib/utils/bitcoin/utxo/utxoUtils.ts",
+        "line": 87,
+        "currentImport": "../scripts/scriptTypeUtils.ts",
+        "suggestedImport": "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 55
+      },
+      {
+        "file": "lib/utils/api/responses/responseUtil.ts",
+        "line": 1,
+        "currentImport": "./apiResponseUtil.ts",
+        "suggestedImport": "$lib/utils/api/responses/apiResponseUtil.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/utils/api/responses/responseUtil.ts",
+        "line": 2,
+        "currentImport": "./webResponseUtil.ts",
+        "suggestedImport": "$lib/utils/api/responses/webResponseUtil.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/utils/api/responses/webResponseUtil.ts",
+        "line": 12,
+        "currentImport": "./apiResponseUtil.ts",
+        "suggestedImport": "$lib/utils/api/responses/apiResponseUtil.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/utils/api/versioning/versionedApiResponse.ts",
+        "line": 3,
+        "currentImport": "./apiResponseUtil.ts",
+        "suggestedImport": "$lib/utils/api/versioning/apiResponseUtil.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/hooks/useBreakpoints.ts",
+        "line": 2,
+        "currentImport": "./useWindowSize.ts",
+        "suggestedImport": "$lib/hooks/useWindowSize.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/tapwallet.ts",
+        "line": 2,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/tapwallet.ts",
+        "line": 4,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/tapwallet.ts",
+        "line": 5,
+        "currentImport": "./walletHelper.ts",
+        "suggestedImport": "$client/wallet/walletHelper.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/leather.ts",
+        "line": 2,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/leather.ts",
+        "line": 5,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/leather.ts",
+        "line": 6,
+        "currentImport": "./walletHelper.ts",
+        "suggestedImport": "$client/wallet/walletHelper.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/horizon.ts",
+        "line": 10,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 3,
+        "currentImport": "./horizon.ts",
+        "suggestedImport": "$client/wallet/horizon.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 4,
+        "currentImport": "./leather.ts",
+        "suggestedImport": "$client/wallet/leather.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 5,
+        "currentImport": "./okx.ts",
+        "suggestedImport": "$client/wallet/okx.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 6,
+        "currentImport": "./phantom.ts",
+        "suggestedImport": "$client/wallet/phantom.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 7,
+        "currentImport": "./tapwallet.ts",
+        "suggestedImport": "$client/wallet/tapwallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 8,
+        "currentImport": "./unisat.ts",
+        "suggestedImport": "$client/wallet/unisat.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/unisat.ts",
+        "line": 2,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/unisat.ts",
+        "line": 4,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/unisat.ts",
+        "line": 5,
+        "currentImport": "./walletHelper.ts",
+        "suggestedImport": "$client/wallet/walletHelper.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/phantom.ts",
+        "line": 2,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/phantom.ts",
+        "line": 4,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/phantom.ts",
+        "line": 5,
+        "currentImport": "./walletHelper.ts",
+        "suggestedImport": "$client/wallet/walletHelper.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/okx.ts",
+        "line": 2,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/okx.ts",
+        "line": 5,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/okx.ts",
+        "line": 6,
+        "currentImport": "./walletHelper.ts",
+        "suggestedImport": "$client/wallet/walletHelper.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      }
+    ]
+  },
+  "batchStrategy": {
+    "batch1": [],
+    "batch2": [],
+    "batch3": [
+      {
+        "file": "test/types/server/database_test.ts",
+        "line": 69,
+        "currentImport": "../../../lib/types/stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 75
+      },
+      {
+        "file": "test/types/server/database_test.ts",
+        "line": 70,
+        "currentImport": "../../../lib/types/src20.d.ts",
+        "suggestedImport": "$types/src20.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 75
+      },
+      {
+        "file": "test/types/server/database_test.ts",
+        "line": 71,
+        "currentImport": "../../../lib/types/transaction.d.ts",
+        "suggestedImport": "$types/transaction.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 75
+      },
+      {
+        "file": "tests/fixtures/stampCreationServiceFixtures.ts",
+        "line": 6,
+        "currentImport": "../../lib/types/index.d.ts",
+        "suggestedImport": "$types/index.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 70
+      },
+      {
+        "file": "tests/fixtures/maraTransactionFixtures.ts",
+        "line": 6,
+        "currentImport": "../../lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts",
+        "suggestedImport": "$lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 60
+      },
+      {
+        "file": "lib/utils/bitcoin/encoding/fileToAddressUtils.ts",
+        "line": 1,
+        "currentImport": "../address/bech32Utils.ts",
+        "suggestedImport": "$lib/utils/bitcoin/address/bech32Utils.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 55
+      },
+      {
+        "file": "lib/utils/bitcoin/utxo/utxoUtils.ts",
+        "line": 87,
+        "currentImport": "../scripts/scriptTypeUtils.ts",
+        "suggestedImport": "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 55
+      },
+      {
+        "file": "islands/card/SRC20CardMinted.tsx",
+        "line": 7,
+        "currentImport": "./SRC20CardBase.tsx",
+        "suggestedImport": "$islands/card/SRC20CardBase.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/card/SRC20CardMinting.tsx",
+        "line": 7,
+        "currentImport": "./SRC20CardBase.tsx",
+        "suggestedImport": "$islands/card/SRC20CardBase.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/Toast/ToastProvider.tsx",
+        "line": 5,
+        "currentImport": "./ToastComponent.tsx",
+        "suggestedImport": "$islands/Toast/ToastComponent.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/Toast/ToastComponent.tsx",
+        "line": 1,
+        "currentImport": "./ToastProvider.tsx",
+        "suggestedImport": "$islands/Toast/ToastProvider.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingStyles.tsx",
+        "line": 10,
+        "currentImport": "./SortingComponent.tsx",
+        "suggestedImport": "$islands/sorting/SortingComponent.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingStyles.tsx",
+        "line": 11,
+        "currentImport": "./SortingProvider.tsx",
+        "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingComponent.tsx",
+        "line": 10,
+        "currentImport": "./SortingProvider.tsx",
+        "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingProviderWithURL.tsx",
+        "line": 15,
+        "currentImport": "./SortingProvider.tsx",
+        "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingProviderWithURL.tsx",
+        "line": 16,
+        "currentImport": "./hooks/useSortingURL.tsx",
+        "suggestedImport": "$islands/sorting/hooks/useSortingURL.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "islands/sorting/SortingProviderWithURL.tsx",
+        "line": 17,
+        "currentImport": "./hooks/useSortingURL.tsx",
+        "suggestedImport": "$islands/sorting/hooks/useSortingURL.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/middleware/schemaTransformer.ts",
+        "line": 2,
+        "currentImport": "./apiVersionMiddleware.ts",
+        "suggestedImport": "$server/middleware/apiVersionMiddleware.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/database/circuitBreakerDatabaseManager.ts",
+        "line": 9,
+        "currentImport": "./databaseManager.ts",
+        "suggestedImport": "$server/database/databaseManager.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/database/stampRepository.ts",
+        "line": 27,
+        "currentImport": "./index.ts",
+        "suggestedImport": "$server/database/index.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/types/collection_guards.ts",
+        "line": 5,
+        "currentImport": "./collection.d.ts",
+        "suggestedImport": "$server/types/collection.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "server/controller/stampController.ts",
+        "line": 9,
+        "currentImport": "./collectionController.ts",
+        "suggestedImport": "$server/controller/collectionController.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/transaction/index.ts",
+        "line": 1,
+        "currentImport": "./bitcoinTransactionBuilder.ts",
+        "suggestedImport": "$server/services/transaction/bitcoinTransactionBuilder.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/transaction/index.ts",
+        "line": 2,
+        "currentImport": "./bitcoinUtxoManager.ts",
+        "suggestedImport": "$server/services/transaction/bitcoinUtxoManager.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/quicknode/cachedQuicknodeRpcService.ts",
+        "line": 3,
+        "currentImport": "./quicknodeService.ts",
+        "suggestedImport": "$server/services/quicknode/quicknodeService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/memory/commonPools.ts",
+        "line": 6,
+        "currentImport": "./objectPool.ts",
+        "suggestedImport": "$server/services/memory/objectPool.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/psbt/index.ts",
+        "line": 1,
+        "currentImport": "./src20MultisigPSBTService.ts",
+        "suggestedImport": "$server/services/src20/psbt/src20MultisigPSBTService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/queryService.ts",
+        "line": 18,
+        "currentImport": "./utilityService.ts",
+        "suggestedImport": "$server/services/src20/utilityService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 1,
+        "currentImport": "./queryService.ts",
+        "suggestedImport": "$server/services/src20/queryService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 2,
+        "currentImport": "./transactionService.ts",
+        "suggestedImport": "$server/services/src20/transactionService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 3,
+        "currentImport": "./marketService.ts",
+        "suggestedImport": "$server/services/src20/marketService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 4,
+        "currentImport": "./utilityService.ts",
+        "suggestedImport": "$server/services/src20/utilityService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 5,
+        "currentImport": "./psbt/src20PSBTService.ts",
+        "suggestedImport": "$server/services/src20/psbt/src20PSBTService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 6,
+        "currentImport": "./operations/src20Operations.ts",
+        "suggestedImport": "$server/services/src20/operations/src20Operations.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/index.ts",
+        "line": 7,
+        "currentImport": "./compression/compressionService.ts",
+        "suggestedImport": "$server/services/src20/compression/compressionService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/utilityService.ts",
+        "line": 5,
+        "currentImport": "./queryService.ts",
+        "suggestedImport": "$server/services/src20/queryService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src20/transactionService.ts",
+        "line": 5,
+        "currentImport": "./operations/src20Operations.ts",
+        "suggestedImport": "$server/services/src20/operations/src20Operations.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/security/internalRouteGuard.ts",
+        "line": 1,
+        "currentImport": "./securityService.ts",
+        "suggestedImport": "$server/services/security/securityService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/psbt/index.ts",
+        "line": 1,
+        "currentImport": "./src101MultisigPSBTService.ts",
+        "suggestedImport": "$server/services/src101/psbt/src101MultisigPSBTService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 1,
+        "currentImport": "./queryService.ts",
+        "suggestedImport": "$server/services/src101/queryService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 2,
+        "currentImport": "./transactionService.ts",
+        "suggestedImport": "$server/services/src101/transactionService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 3,
+        "currentImport": "./utilityService.ts",
+        "suggestedImport": "$server/services/src101/utilityService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 4,
+        "currentImport": "./psbt/src101MultisigPSBTService.ts",
+        "suggestedImport": "$server/services/src101/psbt/src101MultisigPSBTService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 5,
+        "currentImport": "./operations/src101Operations.ts",
+        "suggestedImport": "$server/services/src101/operations/src101Operations.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/index.ts",
+        "line": 6,
+        "currentImport": "./compression/compressionService.ts",
+        "suggestedImport": "$server/services/src101/compression/compressionService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/utilityService.ts",
+        "line": 5,
+        "currentImport": "./queryService.ts",
+        "suggestedImport": "$server/services/src101/queryService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/src101/transactionService.ts",
+        "line": 2,
+        "currentImport": "./index.ts",
+        "suggestedImport": "$server/services/src101/index.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/price/btcPriceSingleton.ts",
+        "line": 1,
+        "currentImport": "./btcPriceService.ts",
+        "suggestedImport": "$server/services/price/btcPriceService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/utxo/commonUtxoService.ts",
+        "line": 11,
+        "currentImport": "./utxoServiceInterface.d.ts",
+        "suggestedImport": "$server/services/utxo/utxoServiceInterface.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/stamp/index.ts",
+        "line": 1,
+        "currentImport": "./stampCreationService.ts",
+        "suggestedImport": "$server/services/stamp/stampCreationService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/stamp/index.ts",
+        "line": 2,
+        "currentImport": "./stampValidationService.ts",
+        "suggestedImport": "$server/services/stamp/stampValidationService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "server/services/aws/cloudWatchMonitoring.ts",
+        "line": 6,
+        "currentImport": "./ecsDetection.ts",
+        "suggestedImport": "$server/services/aws/ecsDetection.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/transaction.d.ts",
+        "line": 11,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/transaction.d.ts",
+        "line": 12,
+        "currentImport": "./stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/stamping.ts",
+        "line": 1,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/fee.d.ts",
+        "line": 1,
+        "currentImport": "./index.d.ts",
+        "suggestedImport": "$types/index.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/fee.d.ts",
+        "line": 2,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api_test.ts",
+        "line": 40,
+        "currentImport": "./stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 33,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 39,
+        "currentImport": "./api_constants.ts",
+        "suggestedImport": "$types/api_constants.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 44,
+        "currentImport": "./utils.d.ts",
+        "suggestedImport": "$types/utils.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 45,
+        "currentImport": "./pagination.d.ts",
+        "suggestedImport": "$types/pagination.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 61,
+        "currentImport": "./transaction.d.ts",
+        "suggestedImport": "$types/transaction.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 63,
+        "currentImport": "./transaction.d.ts",
+        "suggestedImport": "$types/transaction.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1847,
+        "currentImport": "./stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1848,
+        "currentImport": "./src20.d.ts",
+        "suggestedImport": "$types/src20.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1849,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1850,
+        "currentImport": "./transaction.d.ts",
+        "suggestedImport": "$types/transaction.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1851,
+        "currentImport": "./stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.d.ts",
+        "line": 1852,
+        "currentImport": "./pagination.d.ts",
+        "suggestedImport": "$types/pagination.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/stamp.d.ts",
+        "line": 12,
+        "currentImport": "./marketData.d.ts",
+        "suggestedImport": "$types/marketData.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/stamp.d.ts",
+        "line": 19,
+        "currentImport": "./pagination.d.ts",
+        "suggestedImport": "$types/pagination.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/errors.ts",
+        "line": 11,
+        "currentImport": "./errors.d.ts",
+        "suggestedImport": "$types/errors.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/wallet_constants.ts",
+        "line": 7,
+        "currentImport": "./wallet.d.ts",
+        "suggestedImport": "$types/wallet.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/wallet.d.ts",
+        "line": 2,
+        "currentImport": "./pagination.d.ts",
+        "suggestedImport": "$types/pagination.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/wallet.d.ts",
+        "line": 3,
+        "currentImport": "./sorting.d.ts",
+        "suggestedImport": "$types/sorting.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/wallet.d.ts",
+        "line": 4,
+        "currentImport": "./wallet_constants.ts",
+        "suggestedImport": "$types/wallet_constants.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/api.ts",
+        "line": 17,
+        "currentImport": "./pagination.d.ts",
+        "suggestedImport": "$types/pagination.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/ui.d.ts",
+        "line": 14,
+        "currentImport": "./src20.d.ts",
+        "suggestedImport": "$types/src20.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/ui.d.ts",
+        "line": 15,
+        "currentImport": "./stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/utils.d.ts",
+        "line": 28,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/types/fee-estimation.ts",
+        "line": 13,
+        "currentImport": "./base.d.ts",
+        "suggestedImport": "$types/base.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "types",
+        "priority": 50
+      },
+      {
+        "file": "lib/utils/bitcoin/minting/feeCalculations.ts",
+        "line": 10,
+        "currentImport": "./transactionSizes.ts",
+        "suggestedImport": "$lib/utils/bitcoin/minting/transactionSizes.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/utils/api/responses/responseUtil.ts",
+        "line": 1,
+        "currentImport": "./apiResponseUtil.ts",
+        "suggestedImport": "$lib/utils/api/responses/apiResponseUtil.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/utils/api/responses/responseUtil.ts",
+        "line": 2,
+        "currentImport": "./webResponseUtil.ts",
+        "suggestedImport": "$lib/utils/api/responses/webResponseUtil.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/utils/api/responses/webResponseUtil.ts",
+        "line": 12,
+        "currentImport": "./apiResponseUtil.ts",
+        "suggestedImport": "$lib/utils/api/responses/apiResponseUtil.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/utils/api/versioning/versionedApiResponse.ts",
+        "line": 3,
+        "currentImport": "./apiResponseUtil.ts",
+        "suggestedImport": "$lib/utils/api/versioning/apiResponseUtil.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "lib/hooks/useBreakpoints.ts",
+        "line": 2,
+        "currentImport": "./useWindowSize.ts",
+        "suggestedImport": "$lib/hooks/useWindowSize.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/tapwallet.ts",
+        "line": 2,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/tapwallet.ts",
+        "line": 4,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/tapwallet.ts",
+        "line": 5,
+        "currentImport": "./walletHelper.ts",
+        "suggestedImport": "$client/wallet/walletHelper.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/leather.ts",
+        "line": 2,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/leather.ts",
+        "line": 5,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/leather.ts",
+        "line": 6,
+        "currentImport": "./walletHelper.ts",
+        "suggestedImport": "$client/wallet/walletHelper.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/horizon.ts",
+        "line": 10,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 3,
+        "currentImport": "./horizon.ts",
+        "suggestedImport": "$client/wallet/horizon.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 4,
+        "currentImport": "./leather.ts",
+        "suggestedImport": "$client/wallet/leather.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 5,
+        "currentImport": "./okx.ts",
+        "suggestedImport": "$client/wallet/okx.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 6,
+        "currentImport": "./phantom.ts",
+        "suggestedImport": "$client/wallet/phantom.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 7,
+        "currentImport": "./tapwallet.ts",
+        "suggestedImport": "$client/wallet/tapwallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/walletHelper.ts",
+        "line": 8,
+        "currentImport": "./unisat.ts",
+        "suggestedImport": "$client/wallet/unisat.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/unisat.ts",
+        "line": 2,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/unisat.ts",
+        "line": 4,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/unisat.ts",
+        "line": 5,
+        "currentImport": "./walletHelper.ts",
+        "suggestedImport": "$client/wallet/walletHelper.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/phantom.ts",
+        "line": 2,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/phantom.ts",
+        "line": 4,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/phantom.ts",
+        "line": 5,
+        "currentImport": "./walletHelper.ts",
+        "suggestedImport": "$client/wallet/walletHelper.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/okx.ts",
+        "line": 2,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/okx.ts",
+        "line": 5,
+        "currentImport": "./wallet.ts",
+        "suggestedImport": "$client/wallet/wallet.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      },
+      {
+        "file": "client/wallet/okx.ts",
+        "line": 6,
+        "currentImport": "./walletHelper.ts",
+        "suggestedImport": "$client/wallet/walletHelper.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "utilities",
+        "priority": 50
+      }
+    ],
+    "batch4": [
+      {
+        "file": "test/types/core.type.test.ts",
+        "line": 691,
+        "currentImport": "../../lib/types/stamp.d.ts",
+        "suggestedImport": "$types/stamp.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 70
+      },
+      {
+        "file": "test/types/core.type.test.ts",
+        "line": 692,
+        "currentImport": "../../lib/types/src20.d.ts",
+        "suggestedImport": "$types/src20.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 70
+      },
+      {
+        "file": "test/types/core.type.test.ts",
+        "line": 693,
+        "currentImport": "../../lib/types/transaction.d.ts",
+        "suggestedImport": "$types/transaction.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 70
+      },
+      {
+        "file": "tests/unit/transactionSizeEstimator.test.ts",
+        "line": 12,
+        "currentImport": "../../lib/types/index.d.ts",
+        "suggestedImport": "$types/index.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 70
+      },
+      {
+        "file": "tests/unit/maraTransactionSizeEstimator.test.ts",
+        "line": 15,
+        "currentImport": "../../lib/types/index.d.ts",
+        "suggestedImport": "$types/index.d.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 70
+      },
+      {
+        "file": "tests/unit/maraConfigValidator.test.ts",
+        "line": 13,
+        "currentImport": "../../server/config/maraConfig.ts",
+        "suggestedImport": "$server/config/maraConfig.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 60
+      },
+      {
+        "file": "tests/unit/stampCreationService.test.ts",
+        "line": 5,
+        "currentImport": "../../server/services/stamp/stampCreationService.ts",
+        "suggestedImport": "$server/services/stamp/stampCreationService.ts",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 60
+      },
+      {
+        "file": "islands/sorting/tests/SortingProvider.test.tsx",
+        "line": 9,
+        "currentImport": "../SortingProvider.tsx",
+        "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+        "impactLevel": "low",
+        "improvementType": "relative-to-alias",
+        "category": "tests",
+        "priority": 55
+      }
+    ]
+  },
+  "impactSummary": {
+    "tests-low": 8,
+    "types-low": 34,
+    "utilities-low": 76
+  },
+  "priorityRanking": [
+    {
+      "file": "test/types/server/database_test.ts",
+      "line": 69,
+      "currentImport": "../../../lib/types/stamp.d.ts",
+      "suggestedImport": "$types/stamp.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 75
+    },
+    {
+      "file": "test/types/server/database_test.ts",
+      "line": 70,
+      "currentImport": "../../../lib/types/src20.d.ts",
+      "suggestedImport": "$types/src20.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 75
+    },
+    {
+      "file": "test/types/server/database_test.ts",
+      "line": 71,
+      "currentImport": "../../../lib/types/transaction.d.ts",
+      "suggestedImport": "$types/transaction.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 75
+    },
+    {
+      "file": "test/types/core.type.test.ts",
+      "line": 691,
+      "currentImport": "../../lib/types/stamp.d.ts",
+      "suggestedImport": "$types/stamp.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "tests",
+      "priority": 70
+    },
+    {
+      "file": "test/types/core.type.test.ts",
+      "line": 692,
+      "currentImport": "../../lib/types/src20.d.ts",
+      "suggestedImport": "$types/src20.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "tests",
+      "priority": 70
+    },
+    {
+      "file": "test/types/core.type.test.ts",
+      "line": 693,
+      "currentImport": "../../lib/types/transaction.d.ts",
+      "suggestedImport": "$types/transaction.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "tests",
+      "priority": 70
+    },
+    {
+      "file": "tests/unit/transactionSizeEstimator.test.ts",
+      "line": 12,
+      "currentImport": "../../lib/types/index.d.ts",
+      "suggestedImport": "$types/index.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "tests",
+      "priority": 70
+    },
+    {
+      "file": "tests/unit/maraTransactionSizeEstimator.test.ts",
+      "line": 15,
+      "currentImport": "../../lib/types/index.d.ts",
+      "suggestedImport": "$types/index.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "tests",
+      "priority": 70
+    },
+    {
+      "file": "tests/fixtures/stampCreationServiceFixtures.ts",
+      "line": 6,
+      "currentImport": "../../lib/types/index.d.ts",
+      "suggestedImport": "$types/index.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 70
+    },
+    {
+      "file": "tests/unit/maraConfigValidator.test.ts",
+      "line": 13,
+      "currentImport": "../../server/config/maraConfig.ts",
+      "suggestedImport": "$server/config/maraConfig.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "tests",
+      "priority": 60
+    },
+    {
+      "file": "tests/unit/stampCreationService.test.ts",
+      "line": 5,
+      "currentImport": "../../server/services/stamp/stampCreationService.ts",
+      "suggestedImport": "$server/services/stamp/stampCreationService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "tests",
+      "priority": 60
+    },
+    {
+      "file": "tests/fixtures/maraTransactionFixtures.ts",
+      "line": 6,
+      "currentImport": "../../lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts",
+      "suggestedImport": "$lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 60
+    },
+    {
+      "file": "islands/sorting/tests/SortingProvider.test.tsx",
+      "line": 9,
+      "currentImport": "../SortingProvider.tsx",
+      "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "tests",
+      "priority": 55
+    },
+    {
+      "file": "lib/utils/bitcoin/encoding/fileToAddressUtils.ts",
+      "line": 1,
+      "currentImport": "../address/bech32Utils.ts",
+      "suggestedImport": "$lib/utils/bitcoin/address/bech32Utils.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 55
+    },
+    {
+      "file": "lib/utils/bitcoin/utxo/utxoUtils.ts",
+      "line": 87,
+      "currentImport": "../scripts/scriptTypeUtils.ts",
+      "suggestedImport": "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 55
+    },
+    {
+      "file": "islands/card/SRC20CardMinted.tsx",
+      "line": 7,
+      "currentImport": "./SRC20CardBase.tsx",
+      "suggestedImport": "$islands/card/SRC20CardBase.tsx",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "islands/card/SRC20CardMinting.tsx",
+      "line": 7,
+      "currentImport": "./SRC20CardBase.tsx",
+      "suggestedImport": "$islands/card/SRC20CardBase.tsx",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "islands/Toast/ToastProvider.tsx",
+      "line": 5,
+      "currentImport": "./ToastComponent.tsx",
+      "suggestedImport": "$islands/Toast/ToastComponent.tsx",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "islands/Toast/ToastComponent.tsx",
+      "line": 1,
+      "currentImport": "./ToastProvider.tsx",
+      "suggestedImport": "$islands/Toast/ToastProvider.tsx",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "islands/sorting/SortingStyles.tsx",
+      "line": 10,
+      "currentImport": "./SortingComponent.tsx",
+      "suggestedImport": "$islands/sorting/SortingComponent.tsx",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "islands/sorting/SortingStyles.tsx",
+      "line": 11,
+      "currentImport": "./SortingProvider.tsx",
+      "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "islands/sorting/SortingComponent.tsx",
+      "line": 10,
+      "currentImport": "./SortingProvider.tsx",
+      "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "islands/sorting/SortingProviderWithURL.tsx",
+      "line": 15,
+      "currentImport": "./SortingProvider.tsx",
+      "suggestedImport": "$islands/sorting/SortingProvider.tsx",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "islands/sorting/SortingProviderWithURL.tsx",
+      "line": 16,
+      "currentImport": "./hooks/useSortingURL.tsx",
+      "suggestedImport": "$islands/sorting/hooks/useSortingURL.tsx",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "islands/sorting/SortingProviderWithURL.tsx",
+      "line": 17,
+      "currentImport": "./hooks/useSortingURL.tsx",
+      "suggestedImport": "$islands/sorting/hooks/useSortingURL.tsx",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/middleware/schemaTransformer.ts",
+      "line": 2,
+      "currentImport": "./apiVersionMiddleware.ts",
+      "suggestedImport": "$server/middleware/apiVersionMiddleware.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/database/circuitBreakerDatabaseManager.ts",
+      "line": 9,
+      "currentImport": "./databaseManager.ts",
+      "suggestedImport": "$server/database/databaseManager.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/database/stampRepository.ts",
+      "line": 27,
+      "currentImport": "./index.ts",
+      "suggestedImport": "$server/database/index.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/types/collection_guards.ts",
+      "line": 5,
+      "currentImport": "./collection.d.ts",
+      "suggestedImport": "$server/types/collection.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "server/controller/stampController.ts",
+      "line": 9,
+      "currentImport": "./collectionController.ts",
+      "suggestedImport": "$server/controller/collectionController.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/transaction/index.ts",
+      "line": 1,
+      "currentImport": "./bitcoinTransactionBuilder.ts",
+      "suggestedImport": "$server/services/transaction/bitcoinTransactionBuilder.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/transaction/index.ts",
+      "line": 2,
+      "currentImport": "./bitcoinUtxoManager.ts",
+      "suggestedImport": "$server/services/transaction/bitcoinUtxoManager.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/quicknode/cachedQuicknodeRpcService.ts",
+      "line": 3,
+      "currentImport": "./quicknodeService.ts",
+      "suggestedImport": "$server/services/quicknode/quicknodeService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/memory/commonPools.ts",
+      "line": 6,
+      "currentImport": "./objectPool.ts",
+      "suggestedImport": "$server/services/memory/objectPool.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src20/psbt/index.ts",
+      "line": 1,
+      "currentImport": "./src20MultisigPSBTService.ts",
+      "suggestedImport": "$server/services/src20/psbt/src20MultisigPSBTService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src20/queryService.ts",
+      "line": 18,
+      "currentImport": "./utilityService.ts",
+      "suggestedImport": "$server/services/src20/utilityService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src20/index.ts",
+      "line": 1,
+      "currentImport": "./queryService.ts",
+      "suggestedImport": "$server/services/src20/queryService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src20/index.ts",
+      "line": 2,
+      "currentImport": "./transactionService.ts",
+      "suggestedImport": "$server/services/src20/transactionService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src20/index.ts",
+      "line": 3,
+      "currentImport": "./marketService.ts",
+      "suggestedImport": "$server/services/src20/marketService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src20/index.ts",
+      "line": 4,
+      "currentImport": "./utilityService.ts",
+      "suggestedImport": "$server/services/src20/utilityService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src20/index.ts",
+      "line": 5,
+      "currentImport": "./psbt/src20PSBTService.ts",
+      "suggestedImport": "$server/services/src20/psbt/src20PSBTService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src20/index.ts",
+      "line": 6,
+      "currentImport": "./operations/src20Operations.ts",
+      "suggestedImport": "$server/services/src20/operations/src20Operations.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src20/index.ts",
+      "line": 7,
+      "currentImport": "./compression/compressionService.ts",
+      "suggestedImport": "$server/services/src20/compression/compressionService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src20/utilityService.ts",
+      "line": 5,
+      "currentImport": "./queryService.ts",
+      "suggestedImport": "$server/services/src20/queryService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src20/transactionService.ts",
+      "line": 5,
+      "currentImport": "./operations/src20Operations.ts",
+      "suggestedImport": "$server/services/src20/operations/src20Operations.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/security/internalRouteGuard.ts",
+      "line": 1,
+      "currentImport": "./securityService.ts",
+      "suggestedImport": "$server/services/security/securityService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src101/psbt/index.ts",
+      "line": 1,
+      "currentImport": "./src101MultisigPSBTService.ts",
+      "suggestedImport": "$server/services/src101/psbt/src101MultisigPSBTService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src101/index.ts",
+      "line": 1,
+      "currentImport": "./queryService.ts",
+      "suggestedImport": "$server/services/src101/queryService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src101/index.ts",
+      "line": 2,
+      "currentImport": "./transactionService.ts",
+      "suggestedImport": "$server/services/src101/transactionService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src101/index.ts",
+      "line": 3,
+      "currentImport": "./utilityService.ts",
+      "suggestedImport": "$server/services/src101/utilityService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src101/index.ts",
+      "line": 4,
+      "currentImport": "./psbt/src101MultisigPSBTService.ts",
+      "suggestedImport": "$server/services/src101/psbt/src101MultisigPSBTService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src101/index.ts",
+      "line": 5,
+      "currentImport": "./operations/src101Operations.ts",
+      "suggestedImport": "$server/services/src101/operations/src101Operations.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src101/index.ts",
+      "line": 6,
+      "currentImport": "./compression/compressionService.ts",
+      "suggestedImport": "$server/services/src101/compression/compressionService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src101/utilityService.ts",
+      "line": 5,
+      "currentImport": "./queryService.ts",
+      "suggestedImport": "$server/services/src101/queryService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/src101/transactionService.ts",
+      "line": 2,
+      "currentImport": "./index.ts",
+      "suggestedImport": "$server/services/src101/index.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/price/btcPriceSingleton.ts",
+      "line": 1,
+      "currentImport": "./btcPriceService.ts",
+      "suggestedImport": "$server/services/price/btcPriceService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/utxo/commonUtxoService.ts",
+      "line": 11,
+      "currentImport": "./utxoServiceInterface.d.ts",
+      "suggestedImport": "$server/services/utxo/utxoServiceInterface.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/stamp/index.ts",
+      "line": 1,
+      "currentImport": "./stampCreationService.ts",
+      "suggestedImport": "$server/services/stamp/stampCreationService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/stamp/index.ts",
+      "line": 2,
+      "currentImport": "./stampValidationService.ts",
+      "suggestedImport": "$server/services/stamp/stampValidationService.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "server/services/aws/cloudWatchMonitoring.ts",
+      "line": 6,
+      "currentImport": "./ecsDetection.ts",
+      "suggestedImport": "$server/services/aws/ecsDetection.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/transaction.d.ts",
+      "line": 11,
+      "currentImport": "./base.d.ts",
+      "suggestedImport": "$types/base.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/transaction.d.ts",
+      "line": 12,
+      "currentImport": "./stamp.d.ts",
+      "suggestedImport": "$types/stamp.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/stamping.ts",
+      "line": 1,
+      "currentImport": "./base.d.ts",
+      "suggestedImport": "$types/base.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/fee.d.ts",
+      "line": 1,
+      "currentImport": "./index.d.ts",
+      "suggestedImport": "$types/index.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/fee.d.ts",
+      "line": 2,
+      "currentImport": "./base.d.ts",
+      "suggestedImport": "$types/base.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api_test.ts",
+      "line": 40,
+      "currentImport": "./stamp.d.ts",
+      "suggestedImport": "$types/stamp.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 33,
+      "currentImport": "./base.d.ts",
+      "suggestedImport": "$types/base.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 39,
+      "currentImport": "./api_constants.ts",
+      "suggestedImport": "$types/api_constants.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 44,
+      "currentImport": "./utils.d.ts",
+      "suggestedImport": "$types/utils.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 45,
+      "currentImport": "./pagination.d.ts",
+      "suggestedImport": "$types/pagination.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 61,
+      "currentImport": "./transaction.d.ts",
+      "suggestedImport": "$types/transaction.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 63,
+      "currentImport": "./transaction.d.ts",
+      "suggestedImport": "$types/transaction.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 1847,
+      "currentImport": "./stamp.d.ts",
+      "suggestedImport": "$types/stamp.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 1848,
+      "currentImport": "./src20.d.ts",
+      "suggestedImport": "$types/src20.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 1849,
+      "currentImport": "./base.d.ts",
+      "suggestedImport": "$types/base.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 1850,
+      "currentImport": "./transaction.d.ts",
+      "suggestedImport": "$types/transaction.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 1851,
+      "currentImport": "./stamp.d.ts",
+      "suggestedImport": "$types/stamp.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.d.ts",
+      "line": 1852,
+      "currentImport": "./pagination.d.ts",
+      "suggestedImport": "$types/pagination.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/stamp.d.ts",
+      "line": 12,
+      "currentImport": "./marketData.d.ts",
+      "suggestedImport": "$types/marketData.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/stamp.d.ts",
+      "line": 19,
+      "currentImport": "./pagination.d.ts",
+      "suggestedImport": "$types/pagination.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/errors.ts",
+      "line": 11,
+      "currentImport": "./errors.d.ts",
+      "suggestedImport": "$types/errors.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/wallet_constants.ts",
+      "line": 7,
+      "currentImport": "./wallet.d.ts",
+      "suggestedImport": "$types/wallet.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/wallet.d.ts",
+      "line": 2,
+      "currentImport": "./pagination.d.ts",
+      "suggestedImport": "$types/pagination.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/wallet.d.ts",
+      "line": 3,
+      "currentImport": "./sorting.d.ts",
+      "suggestedImport": "$types/sorting.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/wallet.d.ts",
+      "line": 4,
+      "currentImport": "./wallet_constants.ts",
+      "suggestedImport": "$types/wallet_constants.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/api.ts",
+      "line": 17,
+      "currentImport": "./pagination.d.ts",
+      "suggestedImport": "$types/pagination.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/ui.d.ts",
+      "line": 14,
+      "currentImport": "./src20.d.ts",
+      "suggestedImport": "$types/src20.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/ui.d.ts",
+      "line": 15,
+      "currentImport": "./stamp.d.ts",
+      "suggestedImport": "$types/stamp.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/utils.d.ts",
+      "line": 28,
+      "currentImport": "./base.d.ts",
+      "suggestedImport": "$types/base.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/types/fee-estimation.ts",
+      "line": 13,
+      "currentImport": "./base.d.ts",
+      "suggestedImport": "$types/base.d.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "types",
+      "priority": 50
+    },
+    {
+      "file": "lib/utils/bitcoin/minting/feeCalculations.ts",
+      "line": 10,
+      "currentImport": "./transactionSizes.ts",
+      "suggestedImport": "$lib/utils/bitcoin/minting/transactionSizes.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "lib/utils/api/responses/responseUtil.ts",
+      "line": 1,
+      "currentImport": "./apiResponseUtil.ts",
+      "suggestedImport": "$lib/utils/api/responses/apiResponseUtil.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "lib/utils/api/responses/responseUtil.ts",
+      "line": 2,
+      "currentImport": "./webResponseUtil.ts",
+      "suggestedImport": "$lib/utils/api/responses/webResponseUtil.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "lib/utils/api/responses/webResponseUtil.ts",
+      "line": 12,
+      "currentImport": "./apiResponseUtil.ts",
+      "suggestedImport": "$lib/utils/api/responses/apiResponseUtil.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "lib/utils/api/versioning/versionedApiResponse.ts",
+      "line": 3,
+      "currentImport": "./apiResponseUtil.ts",
+      "suggestedImport": "$lib/utils/api/versioning/apiResponseUtil.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "lib/hooks/useBreakpoints.ts",
+      "line": 2,
+      "currentImport": "./useWindowSize.ts",
+      "suggestedImport": "$lib/hooks/useWindowSize.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/tapwallet.ts",
+      "line": 2,
+      "currentImport": "./wallet.ts",
+      "suggestedImport": "$client/wallet/wallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/tapwallet.ts",
+      "line": 4,
+      "currentImport": "./wallet.ts",
+      "suggestedImport": "$client/wallet/wallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/tapwallet.ts",
+      "line": 5,
+      "currentImport": "./walletHelper.ts",
+      "suggestedImport": "$client/wallet/walletHelper.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/leather.ts",
+      "line": 2,
+      "currentImport": "./wallet.ts",
+      "suggestedImport": "$client/wallet/wallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/leather.ts",
+      "line": 5,
+      "currentImport": "./wallet.ts",
+      "suggestedImport": "$client/wallet/wallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/leather.ts",
+      "line": 6,
+      "currentImport": "./walletHelper.ts",
+      "suggestedImport": "$client/wallet/walletHelper.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/horizon.ts",
+      "line": 10,
+      "currentImport": "./wallet.ts",
+      "suggestedImport": "$client/wallet/wallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/walletHelper.ts",
+      "line": 3,
+      "currentImport": "./horizon.ts",
+      "suggestedImport": "$client/wallet/horizon.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/walletHelper.ts",
+      "line": 4,
+      "currentImport": "./leather.ts",
+      "suggestedImport": "$client/wallet/leather.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/walletHelper.ts",
+      "line": 5,
+      "currentImport": "./okx.ts",
+      "suggestedImport": "$client/wallet/okx.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/walletHelper.ts",
+      "line": 6,
+      "currentImport": "./phantom.ts",
+      "suggestedImport": "$client/wallet/phantom.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/walletHelper.ts",
+      "line": 7,
+      "currentImport": "./tapwallet.ts",
+      "suggestedImport": "$client/wallet/tapwallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/walletHelper.ts",
+      "line": 8,
+      "currentImport": "./unisat.ts",
+      "suggestedImport": "$client/wallet/unisat.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/unisat.ts",
+      "line": 2,
+      "currentImport": "./wallet.ts",
+      "suggestedImport": "$client/wallet/wallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/unisat.ts",
+      "line": 4,
+      "currentImport": "./wallet.ts",
+      "suggestedImport": "$client/wallet/wallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/unisat.ts",
+      "line": 5,
+      "currentImport": "./walletHelper.ts",
+      "suggestedImport": "$client/wallet/walletHelper.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/phantom.ts",
+      "line": 2,
+      "currentImport": "./wallet.ts",
+      "suggestedImport": "$client/wallet/wallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/phantom.ts",
+      "line": 4,
+      "currentImport": "./wallet.ts",
+      "suggestedImport": "$client/wallet/wallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/phantom.ts",
+      "line": 5,
+      "currentImport": "./walletHelper.ts",
+      "suggestedImport": "$client/wallet/walletHelper.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/okx.ts",
+      "line": 2,
+      "currentImport": "./wallet.ts",
+      "suggestedImport": "$client/wallet/wallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/okx.ts",
+      "line": 5,
+      "currentImport": "./wallet.ts",
+      "suggestedImport": "$client/wallet/wallet.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    },
+    {
+      "file": "client/wallet/okx.ts",
+      "line": 6,
+      "currentImport": "./walletHelper.ts",
+      "suggestedImport": "$client/wallet/walletHelper.ts",
+      "impactLevel": "low",
+      "improvementType": "relative-to-alias",
+      "category": "utilities",
+      "priority": 50
+    }
+  ]
+}

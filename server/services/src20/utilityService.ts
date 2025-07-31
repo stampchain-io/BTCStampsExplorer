@@ -1,11 +1,11 @@
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
-import { Src20Detail } from "$globals";
+import type { Src20Detail } from "$types/src20.d.ts";
 import { crypto } from "@std/crypto";
 import { isValidBitcoinAddress } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
-import { SRC20QueryService } from "./queryService.ts";
+import { SRC20QueryService } from "$server/services/src20/queryService.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
-import { InputData } from "$types/index.d.ts";
+import type { InputData } from "$types/src20.d.ts";
 import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { validateImageReference } from "$lib/utils/data/protocols/imageProtocolUtils.ts";
 

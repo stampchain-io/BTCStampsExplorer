@@ -1,7 +1,8 @@
 /* ===== HOME PAGE ROUTE ===== */
+import type { Collection } from "$server/types/collection.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
-import type { Collection } from "$globals";
-import { SRC20Row, StampRow } from "$globals";
+
 import { HomeHeader } from "$header";
 import { gapSectionSlim, Micro5FontLoader } from "$layout";
 import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";

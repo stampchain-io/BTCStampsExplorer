@@ -10,7 +10,7 @@ import {
   getValidatedMaraConfig,
 } from "../../server/config/maraConfigValidator.ts";
 
-import { DEFAULT_MARA_CONFIG } from "../../server/config/maraConfig.ts";
+import { DEFAULT_MARA_CONFIG } from "$server/config/maraConfig.ts";
 
 describe("MARA Configuration Validator", () => {
   beforeEach(() => {

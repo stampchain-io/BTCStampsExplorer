@@ -1,6 +1,7 @@
 /* ===== COLLECTION GALLERY COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
-import { Collection, CollectionGalleryProps } from "$globals";
+import type { Collection } from "$server/types/collection.d.ts";
+import type { CollectionGalleryProps } from "$types/ui.d.ts";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { BREAKPOINTS } from "$constants";
 import { CollectionsBanner } from "$section";

@@ -1,5 +1,6 @@
 import { FileToAddressUtils } from "$lib/utils/bitcoin/encoding/fileToAddressUtils.ts";
-import { AncestorInfo, PSBTInput } from "$types/index.d.ts";
+import type { AncestorInfo } from "$types/base.d.ts";
+import type { PSBTInput } from "$types/src20.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 const { networks, address, Psbt } = bitcoin;
 // Removed unused imports: calculateDust, calculateMiningFee, estimateTransactionSize, msgpack
@@ -10,7 +11,7 @@ import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import type { UTXO } from "$types/index.d.ts";
+import type { UTXO } from "$types/base.d.ts";
 
 interface PSBTParams {
   sourceAddress: string;

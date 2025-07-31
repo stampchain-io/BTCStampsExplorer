@@ -1,13 +1,8 @@
 import { glassmorphism } from "$layout";
+import type { TransactionHexDisplayProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
 import { useState } from "preact/hooks";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
-
-interface TransactionHexDisplayProps {
-  hex: string;
-  txid?: string;
-  class?: string;
-}
 
 /**
  * Displays transaction hex in a glassmorphism box with copy functionality

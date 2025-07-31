@@ -1,5 +1,7 @@
 /* ===== NOT IN USE ===== */
 import { ComponentChildren } from "preact";
+import type { StatItemProps } from "$types/ui.d.ts";
+import type { StatTitleProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletData } from "$lib/types/index.d.ts";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
@@ -483,18 +485,6 @@ function TokenStats(
 }
 
 /* ===== TYPES ===== */
-interface StatTitleProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: "left" | "center" | "right";
-}
-
-interface StatItemProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: "left" | "center" | "right";
-  class?: string;
-}
 
 /* ===== STAT TITLE SUBCOMPONENT ===== */
 function StatTitle({ label, value, align = "left" }: StatTitleProps) {

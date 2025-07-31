@@ -1,0 +1,201 @@
+# BTCStampsExplorer Pre-commit Configuration
+# 
+# This configuration enforces code quality standards before commits,
+# including import pattern validation, formatting, and type checking.
+#
+# Install pre-commit hooks with:
+#   pip install pre-commit
+#   pre-commit install
+#
+# Run hooks manually:
+#   pre-commit run --all-files
+
+repos:
+  # Deno formatting and linting
+  - repo: local
+    hooks:
+      # Deno format check
+      - id: deno-fmt
+        name: Deno Format Check
+        entry: deno
+        args: [fmt, --check]
+        language: system
+        files: \.(ts|tsx|js|jsx)$
+        exclude: |
+          (?x)^(
+            _fresh/.*|
+            node_modules/.*|
+            dist/.*|
+            coverage/.*|
+            tmp/.*|
+            build/.*|
+            vendor/.*|
+            \.git/.*|
+            scripts/.*\.(js|cjs)
+          )$
+        
+      # Deno lint check
+      - id: deno-lint
+        name: Deno Lint Check
+        entry: deno
+        args: [lint, --quiet]
+        language: system
+        files: \.(ts|tsx)$
+        exclude: |
+          (?x)^(
+            _fresh/.*|
+            node_modules/.*|
+            dist/.*|
+            coverage/.*|
+            tmp/.*|
+            build/.*|
+            vendor/.*|
+            \.git/.*|
+            scripts/.*\.(js|cjs)
+          )$
+
+      # TypeScript type checking
+      - id: deno-check
+        name: Deno Type Check
+        entry: deno
+        args: [check, main.ts]
+        language: system
+        files: \.(ts|tsx)$
+        exclude: |
+          (?x)^(
+            _fresh/.*|
+            node_modules/.*|
+            dist/.*|
+            coverage/.*|
+            tmp/.*|
+            build/.*|
+            vendor/.*|
+            \.git/.*|
+            tests/.*
+          )$
+
+  # Import pattern validation (critical for domain architecture)
+  - repo: local
+    hooks:
+      - id: import-pattern-validation
+        name: Import Pattern Validation
+        description: "Validates import patterns to prevent $globals usage and enforce alias imports"
+        entry: deno
+        args: [task, check:imports:ci]
+        language: system
+        files: \.(ts|tsx)$
+        exclude: |
+          (?x)^(
+            _fresh/.*|
+            node_modules/.*|
+            dist/.*|
+            coverage/.*|
+            tmp/.*|
+            build/.*|
+            vendor/.*|
+            \.git/.*|
+            scripts/migrate-.*\.ts|
+            scripts/update-imports.*\.ts
+          )$
+        stages: [commit]
+
+  # Security and dependency checks
+  - repo: local
+    hooks:
+      # Check for sensitive information
+      - id: check-secrets
+        name: Check for Secrets
+        entry: bash
+        args:
+          - -c
+          - |
+            # Check for common secret patterns
+            if grep -r --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
+              -E "(password|secret|key|token).*[=:]\s*['\"][^'\"]{8,}['\"]" . --exclude-dir=node_modules --exclude-dir=_fresh --exclude-dir=.git --exclude-dir=coverage --exclude-dir=tmp; then
+              echo "❌ Potential secrets found in code. Please remove or use environment variables."
+              exit 1
+            fi
+            echo "✅ No obvious secrets detected"
+        language: system
+        files: \.(ts|tsx|js|jsx)$
+
+      # Check for TODO comments without issue links
+      - id: check-todos
+        name: Check TODO Comments
+        entry: bash
+        args:
+          - -c
+          - |
+            # Find TODO comments without links to issues
+            todos=$(grep -rn --include="*.ts" --include="*.tsx" "TODO" . --exclude-dir=node_modules --exclude-dir=_fresh --exclude-dir=.git --exclude-dir=coverage --exclude-dir=tmp | grep -v -E "(TODO:|#[0-9]+|https?://|task-[0-9]+)" || true)
+            if [ -n "$todos" ]; then
+              echo "⚠️ Found TODO comments without issue references:"
+              echo "$todos"
+              echo ""
+              echo "Please add issue references like: TODO: Fix this (#123) or TODO(task-42): Update logic"
+              # Don't fail the commit, just warn
+            fi
+        language: system
+        files: \.(ts|tsx)$
+
+  # File integrity checks
+  - repo: local
+    hooks:
+      # Check for large files
+      - id: check-large-files
+        name: Check for Large Files
+        entry: bash
+        args:
+          - -c
+          - |
+            large_files=$(find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) \
+              -not -path "./_fresh/*" -not -path "./node_modules/*" -not -path "./.git/*" \
+              -not -path "./coverage/*" -not -path "./tmp/*" -not -path "./dist/*" \
+              -size +100k)
+            if [ -n "$large_files" ]; then
+              echo "⚠️ Large files detected (>100KB):"
+              echo "$large_files"
+              echo ""
+              echo "Consider breaking down large files or adding them to .gitignore if they're generated"
+              # Don't fail, just warn
+            fi
+        language: system
+
+      # Prevent commits to protected files
+      - id: protect-critical-files
+        name: Protect Critical Configuration Files
+        entry: bash
+        args:
+          - -c
+          - |
+            # Prevent accidental modification of critical config files
+            critical_files="deno.lock fresh.gen.ts"
+            for file in $critical_files; do
+              if git diff --cached --name-only | grep -q "^$file$"; then
+                echo "❌ Attempting to commit critical file: $file"
+                echo "These files should be updated through proper tooling, not manually edited."
+                exit 1
+              fi
+            done
+        language: system
+
+# Global configuration
+default_language_version:
+  python: python3
+
+# Performance settings
+default_stages: [commit]
+fail_fast: false
+
+# Custom configuration
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

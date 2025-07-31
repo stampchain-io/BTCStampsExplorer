@@ -9,7 +9,7 @@ import {
   type TransactionSizeOptions,
 } from "../../lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
 
-import type { ScriptType } from "../../lib/types/index.d.ts";
+import type { ScriptType } from "$types/index.d.ts";
 
 describe("Transaction Size Estimator", () => {
   let loggerStub: Stub;

@@ -1,12 +1,8 @@
 /* ===== EXPLORER PAGE ===== */
+
 import { ExplorerContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import {
-  STAMP_FILTER_TYPES,
-  STAMP_TYPES,
-  StampPageProps,
-  SUBPROTOCOLS,
-} from "$globals";
+
 import { ExplorerHeader } from "$header";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";

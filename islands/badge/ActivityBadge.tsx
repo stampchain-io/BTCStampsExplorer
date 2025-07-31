@@ -1,13 +1,7 @@
 /* ===== ACTIVITY BADGE COMPONENT ===== */
 import { ActivityLevel } from "$constants";
+import type { ActivityBadgeProps } from "$types/ui.d.ts";
 import type { ActivityLevel as ActivityLevelType } from "$types/marketData.d.ts";
-
-interface ActivityBadgeProps {
-  level: ActivityLevelType | null | undefined;
-  showLabel?: boolean;
-  size?: "xs" | "sm" | "md" | "lg";
-  className?: string;
-}
 
 const activityConfig = {
   [ActivityLevel.HOT]: {

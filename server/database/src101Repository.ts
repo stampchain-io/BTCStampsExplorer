@@ -1,22 +1,21 @@
+
 import {
-    BIG_LIMIT,
-    SRC101_ALL_TABLE,
-    SRC101_OWNERS_TABLE,
-    SRC101_PRICE_TABLE,
-    SRC101_RECIPIENTS_TABLE,
-    SRC101_TABLE,
+  BIG_LIMIT,
+  SRC101_ALL_TABLE,
+  SRC101_OWNERS_TABLE,
+  SRC101_PRICE_TABLE,
+  SRC101_RECIPIENTS_TABLE,
+  SRC101_TABLE,
 } from "$constants";
-
-import {
-    SRC101OwnerParams,
-    SRC101TokenidsParams,
-    SRC101TxParams,
-    SRC101ValidTxParams,
-    SRC101ValidTxTotalCountParams,
-    Src101BalanceParams,
-} from "$globals";
-
 import { dbManager } from "$server/database/databaseManager.ts";
+import type { 
+  SRC101ValidTxTotalCountParams, 
+  Src101BalanceParams, 
+  SRC101TokenidsParams, 
+  SRC101TxParams, 
+  SRC101ValidTxParams,
+  SRC101OwnerParams
+} from "$types/src101.d.ts";
 
 export class SRC101Repository {
   // Dependency injection support
@@ -650,7 +649,6 @@ export class SRC101Repository {
   }
 
   static async getSrc101OwnerCount(
-    params:SRC101OwnerParams
   ) {
     const queryParams = [];
     const whereClauses = [];
@@ -698,7 +696,6 @@ export class SRC101Repository {
   }
 
   static async getSrc101Owner(
-    params:SRC101OwnerParams
   ) {
     const queryParams = [];
     const whereClauses = [];

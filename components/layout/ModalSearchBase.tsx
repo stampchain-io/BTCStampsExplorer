@@ -1,10 +1,6 @@
 import { logger } from "$lib/utils/logger.ts";
+import type { ModalSearchBaseProps } from "$types/ui.d.ts";
 import { useEffect } from "preact/hooks";
-
-interface ModalSearchBaseProps {
-  children: preact.ComponentChildren;
-  onClose?: () => void;
-}
 
 export function ModalSearchBase({ children, onClose }: ModalSearchBaseProps) {
   console.log("ModalSearchBase rendered"); // Debug log

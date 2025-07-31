@@ -1,5 +1,6 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { SRC20CardProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import {
@@ -53,17 +54,6 @@ function getVolume24h(src20: any): number {
   // Parse as float to handle string values from API
   const parsed = parseFloat(volume);
   return isNaN(parsed) ? 0 : parsed;
-}
-
-interface SRC20CardProps {
-  data: SRC20Row[];
-  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  timeframe: Timeframe;
-  onImageClick: (imgSrc: string) => void;
-  currentSort?: {
-    filter: string | null;
-    direction: "asc" | "desc";
-  };
 }
 
 export function SRC20Card({

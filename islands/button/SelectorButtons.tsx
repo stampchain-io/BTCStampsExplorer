@@ -1,4 +1,5 @@
 import { color, padding, pillSize, state } from "$button";
+import type { SelectorButtonsProps } from "$types/ui.d.ts";
 import { glassmorphism } from "$layout";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
@@ -7,17 +8,6 @@ interface SelectorOption {
   value: string;
   label: string;
   disabled?: boolean;
-}
-
-interface SelectorButtonsProps {
-  options: SelectorOption[];
-  value?: string;
-  defaultValue?: string;
-  onChange?: (value: string) => void;
-  disabled?: boolean;
-  size: "xs" | "sm" | "md" | "lg";
-  color: "grey" | "purple";
-  className?: string;
 }
 
 /* ===== COMPONENT ===== */

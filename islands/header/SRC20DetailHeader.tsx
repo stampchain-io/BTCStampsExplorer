@@ -1,6 +1,6 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
-import type { MarketListingAggregated } from "$globals";
+import type { MarketListingAggregated } from "$types/marketData.d.ts";
 import { Icon } from "$icon";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import type { AlignmentType } from "$layout";
@@ -12,7 +12,6 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelSm, titleGreyLD, valueSm } from "$text";
-import { Deployment } from "$types/index.d.ts";
 import type { SRC20MintStatus } from "$types/src20.d.ts";
 
 /* ===== TYPES ===== */

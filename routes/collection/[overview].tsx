@@ -1,7 +1,9 @@
 /* ===== COLLECTION OVERVIEW PAGE ===== */
+
 import { StampOverviewContent } from "$content";
+import type { CollectionOverviewPageProps } from "$types/ui.d.ts";
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
-import { STAMP_FILTER_TYPES } from "$globals";
+
 import { CollectionOverviewHeader } from "$header";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { CollectionDetailGallery } from "$section";
@@ -14,17 +16,6 @@ import { CollectionRow } from "$server/types/collection.d.ts";
 const MAX_PAGE_SIZE = 120;
 
 /* ===== TYPES ===== */
-interface CollectionOverviewPageProps {
-  selectedTab: "artist" | "posh" | "recursive";
-  stamps?: any[];
-  collections?: CollectionRow[];
-  page: number;
-  pages: number;
-  sortBy: string;
-  filterBy: string[];
-  partial?: boolean;
-  isRecentSales?: boolean;
-}
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<CollectionOverviewPageProps> = {

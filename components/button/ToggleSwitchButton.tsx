@@ -1,25 +1,10 @@
 /* ===== TOGGLE SWITCH BUTTON COMPONENT ===== */
 import { JSX } from "preact";
+import type { ToggleSwitchButtonProps } from "$types/ui.d.ts";
 import { useEffect, useRef } from "preact/hooks";
 import { toggleButton, toggleKnob, toggleKnobBackground } from "$button";
 
 /* ===== TYPES ===== */
-interface ToggleSwitchButtonProps {
-  isActive: boolean;
-  onToggle: () => void;
-  toggleButtonId: string;
-  className?: string;
-
-  // Event handlers for external tooltip control
-  onMouseEnter?: (e: MouseEvent) => void;
-  onMouseLeave?: (e: MouseEvent) => void;
-
-  // Optional click handler
-  onClick?: (e: MouseEvent) => void;
-
-  // Optional ref forwarding
-  buttonRef?: preact.RefObject<HTMLButtonElement>;
-}
 
 /* ===== COMPONENT ===== */
 export function ToggleSwitchButton({

@@ -7,8 +7,8 @@ import {
   STAMP_RANGES,
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
-  SUBPROTOCOLS,
-} from "$globals";
+} from "$types/stamp.d.ts";
+import { SUBPROTOCOLS } from "$types/base.d.ts";
 import { StampRepository } from "$server/database/index.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { CounterpartyApiManager, CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
@@ -18,7 +18,6 @@ import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
 import { getCacheConfig, RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
-import type { XcpBalance } from "$types/index.d.ts";
 import type { StampMarketData } from "$types/marketData.d.ts";
 
 interface StampServiceOptions {

@@ -1,15 +1,10 @@
 import { ModalBase } from "$components/layout/ModalBase.tsx";
+import type { MaraModeWarningModalProps } from "$types/ui.d.ts";
 import { CloseIcon } from "$icon";
 import { titlePurpleLD } from "$text";
 import { tooltipIcon } from "$notification";
 import { glassmorphism } from "$layout";
 import { useEffect, useRef, useState } from "preact/hooks";
-
-interface MaraModeWarningModalProps {
-  outputValue: number;
-  onConfirm: () => void;
-  onCancel: () => void;
-}
 
 /**
  * Modal warning users about MARA mode transaction behavior

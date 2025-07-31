@@ -7,7 +7,7 @@ import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
-import { getGlobalWallets, walletContext } from "./wallet.ts";
+import { getGlobalWallets, walletContext } from "$client/wallet/wallet.ts";
 
 // Helper function to get Horizon provider safely
 const getHorizonProvider = (): HorizonWalletAPI | undefined => {

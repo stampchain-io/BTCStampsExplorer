@@ -1,5 +1,6 @@
 /* ===== SEND BTC MODAL COMPONENT ===== */
 import { useEffect, useRef, useState } from "preact/hooks";
+import type { SendBTCModalProps } from "$types/ui.d.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { FeeCalculatorBase } from "$section";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
@@ -13,14 +14,11 @@ import { logger } from "$lib/utils/logger.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 
 /* ===== TYPES ===== */
-interface Props {
-  fee: number;
-  balance: number;
-  handleChangeFee: (fee: number) => void;
-}
 
 /* ===== COMPONENT ===== */
-function SendBTCModal({ fee: initialFee, balance, handleChangeFee }: Props) {
+function SendBTCModal(
+  { fee: initialFee, balance, handleChangeFee }: SendBTCModalProps,
+) {
   /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
 

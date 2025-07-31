@@ -148,10 +148,54 @@ export type {
 export type {
   // Core collection data structures
   CollectionRow,
+  CollectionWithCreators,
   CollectionWithOptionalMarketData,
   CollectionQueryParams,
   PaginatedCollectionResponseBody,
   PaginatedCollectionWithMarketDataResponseBody,
+  
+  // Collection processing
+  CollectionProcessor,
+  CollectionProcessingOptions,
+  CollectionProcessingResult,
+  CollectionProcessingError,
+  CollectionProcessingMetrics,
+  
+  // Collection aggregation
+  CollectionAggregator,
+  CollectionMarketDataAggregation,
+  CollectionMetrics,
+  CreatorStatistics,
+  CollectionSummary,
+  RankingOptions,
+  CollectionRanking,
+  
+  // Collection indexing
+  CollectionIndex,
+  CollectionSearchQuery,
+  CollectionSortField,
+  
+  // Collection validation
+  CollectionValidator,
+  CollectionValidationRules,
+  CollectionValidationError,
+  CollectionValidationErrorCode,
+  
+  // Collection service
+  CollectionServiceConfig,
+  CollectionServiceOptions,
+  CollectionCreateParams,
+  CollectionUpdateParams,
+  CollectionServiceResult,
+  
+  // Collection caching
+  CollectionCacheEntry,
+  CollectionCacheStats,
+  CollectionCacheOptions,
+  
+  // Type guards
+  isCollectionRow,
+  isCollectionWithMarketData,
 } from "./collection.d.ts";
 
 // ============================================================================
@@ -291,10 +335,47 @@ export namespace Repository {
 export namespace Collections {
   export {
     type CollectionRow,
+    type CollectionWithCreators,
     type CollectionWithOptionalMarketData,
     type CollectionQueryParams,
     type PaginatedCollectionResponseBody,
     type PaginatedCollectionWithMarketDataResponseBody,
+    
+    type CollectionProcessor,
+    type CollectionProcessingOptions,
+    type CollectionProcessingResult,
+    type CollectionProcessingError,
+    type CollectionProcessingMetrics,
+    
+    type CollectionAggregator,
+    type CollectionMarketDataAggregation,
+    type CollectionMetrics,
+    type CreatorStatistics,
+    type CollectionSummary,
+    type RankingOptions,
+    type CollectionRanking,
+    
+    type CollectionIndex,
+    type CollectionSearchQuery,
+    type CollectionSortField,
+    
+    type CollectionValidator,
+    type CollectionValidationRules,
+    type CollectionValidationError,
+    type CollectionValidationErrorCode,
+    
+    type CollectionServiceConfig,
+    type CollectionServiceOptions,
+    type CollectionCreateParams,
+    type CollectionUpdateParams,
+    type CollectionServiceResult,
+    
+    type CollectionCacheEntry,
+    type CollectionCacheStats,
+    type CollectionCacheOptions,
+    
+    isCollectionRow,
+    isCollectionWithMarketData,
   } from "./collection.d.ts";
 }
 

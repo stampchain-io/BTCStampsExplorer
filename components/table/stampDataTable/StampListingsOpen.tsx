@@ -1,3 +1,4 @@
+import type { StampListingsOpenProps } from "$types/ui.d.ts";
 import {
   formatNumber,
   formatSatoshisToBTC,
@@ -16,13 +17,6 @@ export interface Dispenser {
   close_block_index: number;
   block_index?: number;
   isSelected?: boolean;
-}
-
-interface StampListingsOpenProps {
-  dispensers: Dispenser[];
-  floorPrice: number;
-  onSelectDispenser: (dispenser: Dispenser) => void;
-  selectedDispenser: Dispenser | null;
 }
 
 export function StampListingsOpenTable({

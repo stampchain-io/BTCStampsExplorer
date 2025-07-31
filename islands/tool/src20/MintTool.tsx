@@ -1,5 +1,7 @@
 /* ===== SRC20 TOKEN MINTING COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
+import type { MintProgressProps } from "$types/ui.d.ts";
+import type { SRC20MintToolProps } from "$types/ui.d.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { SRC20InputField } from "$form";
 import { Icon } from "$icon";
@@ -22,21 +24,8 @@ import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== MAIN COMPONENT INTERFACE ===== */
-interface SRC20MintToolProps {
-  trxType?: "olga" | "multisig";
-  tick?: string | undefined | null;
-  mintStatus?: any | null | undefined; // Using any to accept both SRC20Balance and SRC20MintStatus
-  holders?: number;
-}
 
 /* ===== MINT PROGRESS SUBCOMPONENT ===== */
-interface MintProgressProps {
-  progress: string;
-  progressWidth: string;
-  maxSupply: string;
-  limit: string;
-  minters: string;
-}
 
 const MintProgress = (
   { progress, progressWidth, maxSupply, limit, minters }: MintProgressProps,

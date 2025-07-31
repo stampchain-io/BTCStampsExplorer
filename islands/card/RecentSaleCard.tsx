@@ -1,5 +1,6 @@
 /* ===== RECENT SALE CARD COMPONENT ===== */
 import { StampCard } from "$islands/card/StampCard.tsx";
+import type { RecentSaleCardProps } from "$types/ui.d.ts";
 import {
   abbreviateAddress,
   formatBTCAmount,
@@ -8,12 +9,6 @@ import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUti
 import { Icon } from "$icon";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 import { ActivityBadge } from "$islands/badge/index.ts";
-
-interface RecentSaleCardProps {
-  sale: StampWithEnhancedSaleData;
-  showFullDetails?: boolean;
-  btcPriceUSD?: number;
-}
 
 export function RecentSaleCard({
   sale,

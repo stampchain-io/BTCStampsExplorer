@@ -1,5 +1,5 @@
-import type { AncestorInfo, ScriptType } from "./index.d.ts";
-import type { FeeDetails } from "./base.d.ts";
+import type { AncestorInfo, ScriptType } from "$types/index.d.ts";
+import type { FeeDetails } from "$types/base.d.ts";
 
 export interface BaseFeeCalculatorProps {
   fee: number;

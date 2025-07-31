@@ -5,34 +5,13 @@
  */
 
 import { SRC20CardSm } from "$components/card/SRC20CardSm.tsx";
-import type { EnrichedSRC20Row } from "$globals";
+import type { FreshSRC20GalleryProps } from "$types/ui.d.ts";
+import type { EnrichedSRC20Row } from "$types/src20.d.ts";
 import { LoadingIcon } from "$icon";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useEffect, useMemo, useState } from "preact/hooks";
 
 // ===== TYPES =====
-
-interface FreshSRC20GalleryProps {
-  /** Initial SRC-20 data from server */
-  initialData: EnrichedSRC20Row[];
-  /** Initial pagination state */
-  initialPagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-  /** Wallet address for API calls */
-  address: string;
-  /** Initial sort value - maintaining existing ASC/DESC functionality */
-  initialSort: "ASC" | "DESC";
-  /** Page identifier for conditional rendering */
-  fromPage?: string;
-  /** Show loading skeleton during transitions */
-  showLoadingSkeleton?: boolean;
-  /** Enable Fresh.js partial navigation */
-  enablePartialNavigation?: boolean;
-}
 
 interface FreshNavigationOptions {
   /** Use f-partial for smooth transitions */

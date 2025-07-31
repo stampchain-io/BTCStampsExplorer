@@ -1,8 +1,9 @@
 /* ===== CAROUSEL GALLERY COMPONENT ===== */
 /* TODO (@baba)-update styling */
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
+import type { CarouselProps } from "$types/ui.d.ts";
 import { IS_BROWSER } from "$fresh/runtime.ts";
-import { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import { ComponentChildren } from "preact";
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
@@ -13,12 +14,6 @@ import {
 import { ERROR_IMAGE } from "$constants";
 
 /* ===== TYPES ===== */
-interface CarouselProps {
-  stamps: StampRow[];
-  automatic?: boolean;
-  showNavigation?: boolean;
-  class?: string;
-}
 
 // Cache for validation results to prevent re-validation
 const validationCache = new Map<string, boolean>();

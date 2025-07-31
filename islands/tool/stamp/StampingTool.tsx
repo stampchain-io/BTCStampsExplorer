@@ -4,7 +4,7 @@ import { useConfig } from "$client/hooks/useConfig.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { getWalletProvider } from "$client/wallet/walletHelper.ts";
 import { InputField } from "$form";
-import { Config } from "$globals";
+import type { Config } from "$types/base.d.ts";
 import { Icon } from "$icon";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";

@@ -1,11 +1,10 @@
 import { Handlers } from "$fresh/server.ts";
-import { TXError } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
-import { AncestorInfo, InputData } from "$types/index.d.ts";
-import type { SRC20CreateResponse } from "@/lib/types/api.d.ts";
+import type { SRC20CreateResponse } from "$types/api.d.ts";
+import type { TXError } from "$types/transaction.d.ts";
 
 type TrxType = "multisig" | "olga";
 

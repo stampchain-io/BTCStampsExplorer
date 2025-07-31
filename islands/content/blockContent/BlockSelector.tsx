@@ -1,16 +1,13 @@
 /* ===== BLOCK SELECTOR COMPONENT ===== */
 import type { Signal } from "@preact/signals";
+import type { BlockProps } from "$types/ui.d.ts";
 import {
   abbreviateAddress,
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { BlockRow } from "$globals";
+import type { BlockRow } from "$types/base.d.ts";
 
 /* ===== TYPES ===== */
-interface BlockProps {
-  block: BlockRow;
-  selected: Signal<BlockRow>;
-}
 
 /* ===== MAIN COMPONENT ===== */
 export default function BlockSelector(props: BlockProps) {

@@ -12,9 +12,9 @@ import type {
 } from "$lib/types/sorting.d.ts";
 import { createContext } from "preact";
 import { useContext, useEffect, useMemo } from "preact/hooks";
-import { SortingProvider, useSorting } from "./SortingProvider.tsx";
-import type { URLSyncConfig } from "./hooks/useSortingURL.tsx";
-import { useSortingURL } from "./hooks/useSortingURL.tsx";
+import { SortingProvider, useSorting } from "$islands/sorting/SortingProvider.tsx";
+import type { URLSyncConfig } from "$islands/sorting/hooks/useSortingURL.tsx";
+import { useSortingURL } from "$islands/sorting/hooks/useSortingURL.tsx";
 
 // ===== TYPES =====
 

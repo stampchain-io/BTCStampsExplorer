@@ -4,7 +4,7 @@ import { stub } from "@std/testing/mock";
 import { StampRepository } from "$server/database/stampRepository.ts";
 import stampFixtures from "../fixtures/stampData.json" with { type: "json" };
 import { createMockStampRow } from "./utils/testFactories.ts";
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 
 // Mock database manager for testing
 class MockDatabaseManager {

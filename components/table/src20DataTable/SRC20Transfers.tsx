@@ -1,15 +1,12 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
+import type { SRC20TransfersProps } from "$types/ui.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
 import { rowTable } from "$layout";
 import {
   abbreviateAddress,
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
-
-interface SRC20TransfersProps {
-  sends: SRC20Row[];
-}
 
 export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
   const headers = ["FROM", "TO", "AMOUNT", "DATE", "TX HASH"];

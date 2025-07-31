@@ -1,5 +1,5 @@
 /* ===== COLLECTION DETAILS HEADER COMPONENT ===== */
-import { Collection, StampRow } from "$globals";
+import type { Collection, StampRow } from "$server/types/collection.d.ts";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { containerBackground, containerColData } from "$layout";
 import {

@@ -1,4 +1,4 @@
-import { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 
 export type DispenserFilter = "open" | "closed" | "all";
 
@@ -35,7 +35,7 @@ export interface Dispense {
   dispenser_details: any | null;
 }
 
-interface DispenseEvent {
+export interface DispenseEvent {
   event_index: number;
   event: "DISPENSE";
   params: {

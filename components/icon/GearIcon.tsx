@@ -1,16 +1,9 @@
 /* ===== GEAR ICON COMPONENT ===== */
 import { Icon } from "$icon";
+import type { GearIconProps } from "$types/ui.d.ts";
 import type { IconVariants } from "$icon";
 
 /* ===== TYPES ===== */
-interface GearIconProps {
-  isOpen: boolean;
-  onToggle: () => void;
-  size: IconVariants["size"];
-  weight: IconVariants["weight"];
-  color: "greyLogicDL" | "greyLogicLD";
-  className?: string;
-}
 
 /* ===== COMPONENT ===== */
 export function GearIcon({

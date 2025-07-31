@@ -6,8 +6,8 @@ import { base64ToHex } from "$lib/utils/data/binary/baseUtils.ts";
 import { FileToAddressUtils } from "$lib/utils/bitcoin/encoding/fileToAddressUtils.ts";
 import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
 import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
-import type { ScriptType } from "$types/index.d.ts";
-import type { EstimateRequest, EstimateResponse } from "@/lib/types/api.d.ts";
+import type { EstimateRequest, EstimateResponse } from "$types/api.d.ts";
+import type { ScriptType } from "$types/base.d.ts";
 
 export const handler: Handlers = {
   async POST(req: Request): Promise<Response> {

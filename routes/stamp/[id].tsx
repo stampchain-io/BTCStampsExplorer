@@ -1,7 +1,8 @@
 /* ===== STAMP DETAIL PAGE ===== */
 /*@baba-365+390*/
-import { StampRow } from "$globals";
+
 import { Handlers } from "$fresh/server.ts";
+import type { StampDetailPageProps } from "$types/ui.d.ts";
 import { Head } from "$fresh/runtime.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
@@ -28,11 +29,6 @@ interface StampData {
   htmlTitle?: string;
   error?: string;
   url: string;
-}
-
-interface StampDetailPageProps {
-  data: StampData;
-  url?: string;
 }
 
 /* ===== SERVER HANDLER ===== */

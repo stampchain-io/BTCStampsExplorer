@@ -1,5 +1,5 @@
-import { assertEquals } from "https://deno.land/std@0.208.0/assert/mod.ts";
-import { describe, it } from "https://deno.land/std@0.208.0/testing/bdd.ts";
+import { assertEquals } from "@std/assert/mod.ts";
+import { describe, it } from "@std/testing/bdd.ts";
 
 describe("Timezone Handling Tests", () => {
   describe("UTC_TIMESTAMP() vs NOW() consistency", () => {

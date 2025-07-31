@@ -4,37 +4,14 @@
  * world-class sorting infrastructure integration
  */
 
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { FreshStampGalleryProps } from "$types/ui.d.ts";
 import { LoadingIcon } from "$icon";
 import { StampCard } from "$islands/card/StampCard.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useEffect, useState } from "preact/hooks";
 
 // ===== TYPES =====
-
-interface FreshStampGalleryProps {
-  /** Initial stamp data from server */
-  initialData: StampRow[];
-  /** Initial pagination state */
-  initialPagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-  /** Wallet address for API calls */
-  address: string;
-  /** Initial sort value - maintaining existing ASC/DESC functionality */
-  initialSort: "ASC" | "DESC";
-  /** Page identifier for conditional rendering */
-  fromPage?: string;
-  /** Enable/disable Fresh.js partial navigation */
-  enablePartialNavigation?: boolean;
-  /** Show loading skeleton during transitions */
-  showLoadingSkeleton?: boolean;
-  /** Grid class for styling */
-  gridClass?: string;
-}
 
 interface FreshNavigationOptions {
   usePartial?: boolean;

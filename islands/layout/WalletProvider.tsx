@@ -1,5 +1,6 @@
 /* ===== WALLET PROVIDER MODAL COMPONENT ===== */
 import { horizonProvider } from "$client/wallet/horizon.ts";
+import type { WalletProviderProps } from "$types/ui.d.ts";
 import { leatherProvider } from "$client/wallet/leather.ts";
 import { okxProvider } from "$client/wallet/okx.ts";
 import { phantomProvider } from "$client/wallet/phantom.ts";
@@ -13,10 +14,6 @@ import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface WalletProviderProps {
-  providerKey: WalletProviderKey;
-  onSuccess?: () => void;
-}
 
 /* ===== WALLET CONNECTORS CONFIG ===== */
 const walletConnectors = {

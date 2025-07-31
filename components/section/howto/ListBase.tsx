@@ -1,5 +1,6 @@
 /* ===== LIST COMPONENT ===== */
 import { headingGrey, text } from "$text";
+import type { SharedListProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
 export interface ListProps {
@@ -64,10 +65,6 @@ export function List({ title, image, description }: ListProps) {
 }
 
 /* ===== TYPES ===== */
-interface SharedListProps {
-  children: preact.ComponentChildren;
-  hasImportantNotes?: boolean;
-}
 
 /* ===== SHARED COMPONENTS ===== */
 export function StepList(

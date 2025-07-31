@@ -14,7 +14,7 @@ import type {
   StampMarketData,
   StampRow,
 } from "./marketData.d.ts";
-import type { PaginatedResponse } from "./pagination.d.ts";
+import type { PaginatedResponse } from "$types/pagination.d.ts";
 
 /**
  * Cache information included in API responses

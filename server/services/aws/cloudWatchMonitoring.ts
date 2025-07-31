@@ -3,7 +3,7 @@ import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { objectPoolManager } from "$server/services/memory/objectPool.ts";
 import { memoryMonitor } from "$server/services/monitoring/memoryMonitorService.ts";
 import process from "node:process";
-import { ecsDetection, type ECSMetadata } from "./ecsDetection.ts";
+import { ecsDetection, type ECSMetadata } from "$server/services/aws/ecsDetection.ts";
 
 export interface CloudWatchMetric {
   MetricName: string;

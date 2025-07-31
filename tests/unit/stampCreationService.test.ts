@@ -2,7 +2,7 @@ import { assert, assertEquals, assertExists, assertRejects } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
 import { stub, returnsNext, Stub } from "@std/testing/mock";
 
-import { StampCreationService } from "../../server/services/stamp/stampCreationService.ts";
+import { StampCreationService } from "$server/services/stamp/stampCreationService.ts";
 import {
   mockStampParams,
   mockWalletAddresses,

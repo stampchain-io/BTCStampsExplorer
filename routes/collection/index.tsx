@@ -1,11 +1,7 @@
 /* ===== COLLECTION LANDING PAGE ===== */
+
 import { FreshContext, Handlers } from "$fresh/server.ts";
-import {
-  CollectionGalleryProps,
-  STAMP_FILTER_TYPES,
-  StampGalleryProps,
-  StampRow,
-} from "$globals";
+
 import { CollectionOverviewHeader } from "$header";
 import { body, gapSection } from "$layout";
 import {

@@ -4,11 +4,10 @@ import {
   walletContext,
 } from "$client/wallet/wallet.ts";
 import { useFees } from "$fees";
-import { Config } from "$globals";
+import { Config } from "$types/base.d.ts";
 import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
-import type { AncestorInfo } from "$types/index.d.ts";
 import { decodeBase64 } from "@std/encoding/base64";
 import { encodeHex } from "@std/encoding/hex";
 import axiod from "axiod";

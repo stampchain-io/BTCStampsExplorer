@@ -1,20 +1,12 @@
 /* ===== ERROR DISPLAY COMPONENT ===== */
 import { Icon } from "$icon";
+import type { ErrorDisplayProps } from "$types/ui.d.ts";
 import {
   ErrorHandlingUtils,
   ErrorInfo,
   ErrorSeverity,
   ErrorType,
 } from "$lib/utils/errorHandlingUtils.ts";
-
-interface ErrorDisplayProps {
-  error: ErrorInfo;
-  onRetry?: () => void;
-  onDismiss?: () => void;
-  compact?: boolean;
-  showDetails?: boolean;
-  className?: string;
-}
 
 export function ErrorDisplay({
   error,

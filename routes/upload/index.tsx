@@ -1,10 +1,11 @@
 /* ===== UPLOAD PAGE ===== */
 /* @baba+@reinamora - what is this page used for, should it be improved? */
+
 import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
 
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { SRC20Row } from "$globals";
+
 import { body } from "$layout";
 import { titlePurpleLD } from "$text";
 import { UploadImageTable } from "$table";

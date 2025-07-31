@@ -1,10 +1,10 @@
-import {
+import type {
   STAMP_EDITIONS,
   STAMP_FILESIZES,
   STAMP_FILETYPES,
   STAMP_MARKETPLACE as _STAMP_MARKETPLACE,
   STAMP_RANGES,
-} from "$globals";
+} from "$types/stamp.d.ts";
 
 export type StampFilters = {
   // Stamp Type Filter (NEW!)

@@ -1,12 +1,8 @@
 /* ===== AUTHOR COMPONENT ===== */
 import { textLg, textSm } from "$text";
+import type { AuthorProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-interface AuthorProps {
-  name: string;
-  twitter: string;
-  website?: string;
-}
 
 /* ===== COMPONENT ===== */
 export function AuthorSection({ name, twitter, website }: AuthorProps) {

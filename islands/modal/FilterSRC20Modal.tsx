@@ -2,14 +2,11 @@
 // @bbaba+@reinamora - are the
 // deno-lint-ignore-file
 import { Button } from "$button";
+import type { FilterSRC20ModalProps } from "$types/ui.d.ts";
 import { InputField, SelectDate } from "$form";
-import {
-  COLLECTION_FILTER_TYPES,
-  LISTING_FILTER_TYPES,
-  SRC20_FILTER_TYPES,
-  STAMP_FILTER_TYPES,
-  WALLET_FILTER_TYPES,
-} from "$globals";
+import type { SRC20_FILTER_TYPES } from "$types/src20.d.ts";
+import type { STAMP_FILTER_TYPES } from "$types/stamp.d.ts";
+import type { WALLET_FILTER_TYPES } from "$types/wallet.d.ts";
 import { closeModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
@@ -24,12 +21,8 @@ type FilterTypes =
   | COLLECTION_FILTER_TYPES
   | LISTING_FILTER_TYPES;
 
-interface Props {
-  filterOptions: FilterTypes;
-}
-
 /* ===== COMPONENT ===== */
-const FilterSRC20Modal = ({ filterOptions }: Props) => {
+const FilterSRC20Modal = ({ filterOptions }: FilterSRC20ModalProps) => {
   /* ===== STATE ===== */
   const [title, setTitle] = useState("");
   const [progress, setProgress] = useState({ min: "", max: "" });

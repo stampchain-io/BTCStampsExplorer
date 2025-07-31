@@ -1,5 +1,6 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
+import type { SRC20MintedTableProps } from "$types/ui.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import { rowTable, Timeframe } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
@@ -18,13 +19,6 @@ function getMarketCapBTC(src20: any): number {
 
 function getVolume24h(src20: any): number {
   return src20?.market_data?.volume_24h_btc || 0;
-}
-
-interface SRC20MintedTableProps {
-  data: SRC20Row[];
-  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  timeframe: Timeframe;
-  onImageClick: (imgSrc: string) => void;
 }
 
 export function SRC20MintedTable({

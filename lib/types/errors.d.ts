@@ -342,8 +342,9 @@ export type ValidationResult<T = unknown> =
 
 /**
  * Standard API error response format
+ * @deprecated Use ApiErrorResponse from api.d.ts for new code
  */
-export interface ApiErrorResponse {
+export interface LegacyApiErrorResponse {
   error: string;
   status: "error";
   code: string;
@@ -367,8 +368,31 @@ export interface ApiSuccessResponse<T = unknown> {
 
 /**
  * Generic API response type
+ * Note: For new code, prefer the standardized error types from api.d.ts
  */
-export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
+export type ApiResponse<T = unknown> =
+  | ApiSuccessResponse<T>
+  | LegacyApiErrorResponse;
+
+// Re-export the new standardized error response types from api.d.ts
+export type {
+  ApiErrorCode,
+  ApiErrorResponse,
+  AuthenticationErrorResponse,
+  BaseErrorResponse,
+  BlockchainErrorResponse,
+  ErrorHandlerContext,
+  ErrorResponseFactory,
+  ErrorTransformer,
+  FieldError,
+  HttpStatusCode,
+  HttpStatusCodes,
+  HttpStatusToErrorCode,
+  ProblemDetails,
+  RateLimitErrorResponse,
+  ResourceErrorResponse,
+  ValidationErrorResponse,
+} from "./api.d.ts";
 
 /**
  * HTTP status code to error code mapping

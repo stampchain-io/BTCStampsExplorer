@@ -1,13 +1,8 @@
 /* @baba - move/refactor to layout folder */
 import { ComponentChildren } from "preact";
+import type { StatBaseProps } from "$types/ui.d.ts";
 import { alignmentClasses, type AlignmentType } from "$layout";
 import { labelSm, value3xl, valueSm } from "$text";
-
-interface StatBaseProps {
-  label: string | ComponentChildren;
-  value: string | ComponentChildren;
-  align?: AlignmentType;
-}
 
 interface StatItemProps extends StatBaseProps {
   class?: string;

@@ -16,7 +16,7 @@ import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
-import type { ScriptType, UTXO } from "$types/index.d.ts";
+import type { ScriptType, UTXO } from "$types/base.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
 

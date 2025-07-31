@@ -10,7 +10,7 @@
  * @version 1.0.0
  */
 
-import type { BasicUTXO, FeeDetails } from "./base.d.ts";
+import type { BasicUTXO, FeeDetails } from "$types/base.d.ts";
 
 // ===== CORE UTXO INTERFACES =====
 

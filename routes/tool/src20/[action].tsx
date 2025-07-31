@@ -1,6 +1,7 @@
 /* ===== SRC20 TOOLS PAGE ===== */
 /*@baba-154+159*/
 import { Handlers, PageProps } from "$fresh/server.ts";
+import type { ToolSrc20PageProps } from "$types/ui.d.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import type { SRC20MintStatus } from "$lib/types/src20.d.ts";
@@ -16,14 +17,6 @@ import {
 } from "$section";
 
 /* ===== TYPES ===== */
-interface ToolSrc20PageProps {
-  selectedTab: string;
-  trxType: "multisig" | "olga";
-  tick?: string | null;
-  mintStatus?: SRC20MintStatus | null;
-  holders?: number;
-  error?: string;
-}
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<ToolSrc20PageProps> = {

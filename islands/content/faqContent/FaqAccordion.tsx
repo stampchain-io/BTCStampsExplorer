@@ -1,11 +1,9 @@
 /* ===== FAQ ACCORDION CONTENT COMPONENT ===== */
 import { Accordion } from "$content";
+import type { FaqAccordionProps } from "$types/ui.d.ts";
 import type { FAQ_CONTENT } from "$layout";
 
 /* ===== INTERFACE ===== */
-interface FaqAccordionProps {
-  item: typeof FAQ_CONTENT[number]["items"][number];
-}
 
 /* ===== COMPONENT ===== */
 export function FaqAccordion({ item }: FaqAccordionProps) {

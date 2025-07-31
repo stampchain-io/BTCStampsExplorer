@@ -1,6 +1,7 @@
-// import { SRC20Row } from "$globals";
+// import type { SRC20Row } from "$types/src20.d.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import type { EnrichedSRC20Row } from "$globals";
+import type { SRC20CardSmProps } from "$types/ui.d.ts";
+import type { EnrichedSRC20Row } from "$types/src20.d.ts";
 import {
   containerCardTable,
   rowCardBorderCenter,
@@ -10,12 +11,6 @@ import {
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
-
-interface SRC20CardSmProps {
-  data: EnrichedSRC20Row[];
-  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  onImageClick: (imgSrc: string) => void;
-}
 
 export function SRC20CardSm({
   data,

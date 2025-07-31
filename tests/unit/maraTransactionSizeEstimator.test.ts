@@ -12,7 +12,7 @@ import {
   type MARATransactionEstimateConfig,
 } from "../../lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts";
 
-import type { ScriptType } from "../../lib/types/index.d.ts";
+import type { ScriptType } from "$types/index.d.ts";
 
 describe("MARA Transaction Size Estimator", () => {
   // Skip logger mock for now to get tests working

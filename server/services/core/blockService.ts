@@ -1,5 +1,5 @@
 import { BlockRepository, StampRepository } from "$server/database/index.ts";
-import { BlockInfoResponseBody, StampBlockResponseBody } from "$globals";
+import type { BlockInfoResponseBody, StampBlockResponseBody } from "$types/api.d.ts";
 
 export class BlockService {
   static async getLastXBlocks(num: number) {

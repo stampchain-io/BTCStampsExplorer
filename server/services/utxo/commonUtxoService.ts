@@ -8,7 +8,7 @@ import {
 import { serverConfig } from "$server/config/config.ts";
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 import { UTXOOptions as QuicknodeInternalUTXOOptions, QuicknodeUTXOService } from "$server/services/quicknode/quicknodeUTXOService.ts";
-import { ICommonUTXOService, UTXOFetchOptions } from "./utxoServiceInterface.d.ts";
+import { ICommonUTXOService, UTXOFetchOptions } from "$server/services/utxo/utxoServiceInterface.d.ts";
 
 const httpClient = new FetchHttpClient();
 

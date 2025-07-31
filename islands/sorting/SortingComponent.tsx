@@ -7,7 +7,7 @@
 import { Icon } from "$icon";
 import type { SortKey, SortOption } from "$lib/types/sorting.d.ts";
 import { SORT_LABELS } from "$lib/utils/data/sorting/sortingConstants.ts";
-import { useSorting } from "./SortingProvider.tsx";
+import { useSorting } from "$islands/sorting/SortingProvider.tsx";
 
 // ===== BASE SORTING COMPONENT =====
 

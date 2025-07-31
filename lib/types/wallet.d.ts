@@ -1,6 +1,7 @@
 import { WalletProviderKey } from "$constants";
-import { PaginationQueryParams } from "./pagination.d.ts";
-import { WalletSortKey } from "./sorting.d.ts";
+import { PaginationQueryParams } from "$types/pagination.d.ts";
+import { WalletSortKey } from "$types/sorting.d.ts";
+import { ADDRESS_PATTERNS, DERIVATION_PATHS } from "$types/wallet_constants.ts";
 
 // ===== HORIZON WALLET SPECIFIC TYPES =====
 
@@ -516,15 +517,7 @@ export function isP2TRAddress(
   return address.format === AddressFormat.P2TR;
 }
 
-/**
- * Address validation patterns
- */
-export const ADDRESS_PATTERNS = {
-  [AddressFormat.P2PKH]: /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
-  [AddressFormat.P2SH]: /^3[a-km-zA-HJ-NP-Z1-9]{25,34}$/,
-  [AddressFormat.P2WPKH]: /^bc1q[a-z0-9]{38,58}$/,
-  [AddressFormat.P2TR]: /^bc1p[a-z0-9]{58}$/,
-} as const;
+// ADDRESS_PATTERNS constant is imported from wallet_constants.ts
 
 // ============================================================================
 // 🔗 Enhanced Wallet Provider Types
@@ -787,19 +780,7 @@ export interface KeyDerivationPath {
   addressIndex: number; // Address index
 }
 
-/**
- * Standard derivation paths for Bitcoin
- */
-export const DERIVATION_PATHS = {
-  // BIP-44 Legacy (P2PKH) - m/44'/0'/0'/0/0
-  BIP44: { purpose: 44, coinType: 0, account: 0, change: 0, addressIndex: 0 },
-  // BIP-49 Nested SegWit (P2SH-P2WPKH) - m/49'/0'/0'/0/0
-  BIP49: { purpose: 49, coinType: 0, account: 0, change: 0, addressIndex: 0 },
-  // BIP-84 Native SegWit (P2WPKH) - m/84'/0'/0'/0/0
-  BIP84: { purpose: 84, coinType: 0, account: 0, change: 0, addressIndex: 0 },
-  // BIP-86 Taproot (P2TR) - m/86'/0'/0'/0/0
-  BIP86: { purpose: 86, coinType: 0, account: 0, change: 0, addressIndex: 0 },
-} as const;
+// DERIVATION_PATHS constant is imported from wallet_constants.ts
 
 /**
  * Public key information with derivation details
@@ -930,6 +911,17 @@ export type WALLET_FILTER_TYPES =
   | "collections"
   | "dispensers"
   | "tokens";
+
+export type COLLECTION_FILTER_TYPES =
+  | "all"
+  | "posh"
+  | "recursive"
+  | "artists";
+
+export type LISTING_FILTER_TYPES =
+  | "all"
+  | "psbt"
+  | "dispensers";
 
 /**
  * Holder information for wallet display (migrated from globals)

@@ -1,6 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
-import { AddressHandlerContext } from "$globals";
 import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {

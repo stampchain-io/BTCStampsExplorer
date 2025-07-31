@@ -66,9 +66,9 @@ import type {
   SRC20TokenStats
 } from "../../../server/types/database.d.ts";
 
-import type { StampRow } from "../../../lib/types/stamp.d.ts";
-import type { SRC20Row, SRC20Balance } from "../../../lib/types/src20.d.ts";
-import type { SendRow } from "../../../lib/types/transaction.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { SRC20Row, SRC20Balance } from "$types/src20.d.ts";
+import type { SendRow } from "$types/transaction.d.ts";
 
 Deno.test("Database Schema Types", () => {
   // Test DatabaseSchema structure

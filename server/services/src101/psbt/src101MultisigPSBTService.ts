@@ -47,8 +47,8 @@ import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { IPrepareSRC101TX } from "$server/types/services/src101.d.ts";
-import type { UTXO } from "$types/index.d.ts";
-import { PSBTInput, VOUT } from "$types/index.d.ts";
+import type { UTXO } from "$types/base.d.ts";
+import type { PSBTInput, VOUT } from "$types/src20.d.ts";
 import { crypto } from "@std/crypto";
 
 export class SRC101MultisigPSBTService {

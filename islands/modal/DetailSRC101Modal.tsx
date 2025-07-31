@@ -1,17 +1,13 @@
 /* ===== SRC101 DETAIL MODAL COMPONENT ===== */
 import { ModalBase } from "$layout";
+import type { DetailSRC101ModalProps } from "$types/ui.d.ts";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 /* ===== TYPES ===== */
-interface Props {
-  img: string;
-  name: string;
-  owner: string;
-}
 
 /* ===== COMPONENT ===== */
-const DetailSRC101Modal = ({ img, name, owner }: Props) => {
+const DetailSRC101Modal = ({ img, name, owner }: DetailSRC101ModalProps) => {
   const handleCloseModal = () => {
     logger.debug("ui", {
       message: "Modal closing",

@@ -1,5 +1,6 @@
 /* ===== RECEIVE ADDRESS MODAL COMPONENT ===== */
 import { JSX } from "preact";
+import type { ReceiveAddyModalProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { tooltipIcon } from "$notification";
 import { ModalBase } from "$layout";
@@ -9,13 +10,11 @@ import { logger } from "$lib/utils/logger.ts";
 import QRCodeStyling from "https://esm.sh/qr-code-styling@1.6.0-rc.1";
 
 /* ===== TYPES ===== */
-interface Props {
-  address: string;
-  title?: string;
-}
 
 /* ===== COMPONENT ===== */
-function RecieveAddyModal({ address, title = "RECEIVE" }: Props) {
+function RecieveAddyModal(
+  { address, title = "RECEIVE" }: ReceiveAddyModalProps,
+) {
   /* ===== STATE ===== */
   const [isCopyTooltipVisible, setIsCopyTooltipVisible] = useState(false);
   const [allowCopyTooltip, setAllowCopyTooltip] = useState(true);

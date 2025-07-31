@@ -8,7 +8,7 @@ import { extractOutputs } from "$lib/utils/bitcoin/minting/transactionUtils.ts";
 import { getScriptTypeInfo, validateWalletAddressForMinting } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { formatPsbtForLogging } from "$server/services/transaction/bitcoinTransactionBuilder.ts";
-import type { ScriptType } from "$types/index.d.ts";
+import type { ScriptType } from "$types/base.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
 // Removed unused fee calculation imports
@@ -18,7 +18,7 @@ import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
 import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import type { UTXO } from "$types/index.d.ts";
+import type { UTXO } from "$types/base.d.ts";
 
 export class StampCreationService {
   private static commonUtxoService = new CommonUTXOService();

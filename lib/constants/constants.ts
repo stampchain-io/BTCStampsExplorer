@@ -1,4 +1,4 @@
-import { ROOT_DOMAIN_TYPES } from "$globals";
+import { ROOT_DOMAIN_TYPES } from "$types/base.d.ts";
 
 /* ===== BREAKPOINTS ===== */
 export const BREAKPOINTS = {

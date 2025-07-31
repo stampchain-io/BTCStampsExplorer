@@ -1,20 +1,10 @@
 /* ===== EXPLORER CONTENT COMPONENT ===== */
 import { StampCard } from "$card";
-import { StampRow } from "$globals";
+import type { ExplorerContentProps } from "$types/ui.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 /* ===== TYPES ===== */
-interface ExplorerContentProps {
-  stamps: StampRow[];
-  isRecentSales?: boolean;
-  fromPage?: string;
-  pagination?: {
-    page: number;
-    totalPages: number;
-    prefix?: string;
-    onPageChange?: (page: number) => void;
-  };
-}
 
 /* ===== COMPONENT ===== */
 export function ExplorerContent({

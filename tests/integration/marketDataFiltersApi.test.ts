@@ -1,7 +1,7 @@
 import {
   assertEquals,
   assertExists,
-} from "https://deno.land/std@0.208.0/assert/mod.ts";
+} from "@std/assert/mod.ts";
 
 const API_BASE = "http://localhost:8000/api/v2";
 

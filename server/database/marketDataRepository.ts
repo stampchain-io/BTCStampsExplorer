@@ -1,5 +1,5 @@
 import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT } from "$constants";
-import type { StampFilters, StampRow } from "$globals";
+import type { StampFilters, StampRow } from "$types/stamp.d.ts";
 import type {
     CacheStatus,
     CollectionMarketData,
@@ -11,7 +11,7 @@ import type {
     StampMarketData,
     StampMarketDataRow,
     StampWithMarketData,
-} from "$lib/types/marketData.d.ts";
+} from "$types/marketData.d.ts";
 // Local utility functions for market data parsing
 function getCacheStatus(cacheAgeMinutes?: number): any {
   if (!cacheAgeMinutes) return "UNKNOWN";

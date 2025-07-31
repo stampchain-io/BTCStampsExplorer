@@ -1,5 +1,6 @@
 /* ===== SRC20 DETAIL PAGE ===== */
 import { Handlers } from "$fresh/server.ts";
+import type { SRC20DetailPageProps } from "$types/ui.d.ts";
 import { SRC20DetailHeader } from "$header";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
@@ -72,9 +73,6 @@ export const handler: Handlers = {
 };
 
 /* ===== TYPES ===== */
-interface SRC20DetailPageProps {
-  data: SRC20TickPageData | { error: string };
-}
 
 /* ===== PAGE COMPONENT ===== */
 function SRC20DetailPage(props: SRC20DetailPageProps) {

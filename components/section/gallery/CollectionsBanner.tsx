@@ -1,5 +1,6 @@
 /* ===== COLLECTION LIST CARD COMPONENT ===== */
-import { Collection } from "$globals";
+import type { Collection } from "$server/types/collection.d.ts";
+import type { CollectionsBannerProps } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
 
 /* ===== STYLES ===== */
@@ -16,10 +17,6 @@ const nameClassName = `hidden mobileLg:block
 `;
 
 /* ===== TYPES ===== */
-interface CollectionsBannerProps {
-  collection: Collection;
-  isDarkMode: boolean;
-}
 
 /* ===== COMPONENT ===== */
 export function CollectionsBanner(

@@ -1,4 +1,4 @@
-import { StampRow } from "$globals";
+import { StampRow } from "$types/stamp.d.ts";
 
 // Mock stamp data with various sale scenarios
 export const mockStamps: StampRow[] = [

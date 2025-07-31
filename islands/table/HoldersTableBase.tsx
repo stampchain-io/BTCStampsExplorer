@@ -1,5 +1,6 @@
 /* ===== SRC20 HOLDERS TABLE COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
+import type { HoldersTableBaseProps } from "$types/ui.d.ts";
 import { rowTable, ScrollContainer } from "$layout";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
@@ -10,10 +11,6 @@ interface Holder {
   address: string | null;
   amt: number | string;
   percentage: number | string;
-}
-
-interface HoldersTableBaseProps {
-  holders?: Holder[];
 }
 
 /* ===== CONSTANTS ===== */

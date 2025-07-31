@@ -1,24 +1,48 @@
 /**
- * 🔌 API Types Domain Module
+ * 🔌 API Types Domain Module - OpenAPI 3.0+ Compliant
  *
  * This module contains all API-related type definitions including:
- * - HTTP request/response interfaces
- * - API handler context types
- * - Paginated response bodies
- * - Route parameter types
+ * - HTTP request/response interfaces following OpenAPI 3.0+ standards
+ * - API handler context types with full request/response metadata
+ * - Paginated response bodies with standardized pagination metadata
+ * - Route parameter types with validation constraints
+ * - Comprehensive error response types with RFC 7807 compliance
  *
  * Part of the divine type domain migration - extracting API types from globals.d.ts
- * into their celestial organized domain.
+ * into their celestial organized domain with enhanced OpenAPI compliance.
  *
+ * @version 2.0.0
+ * @openapi 3.0.3
  * @see globals.d.ts - Source of truth being migrated
  * @author Bitcoin Stamps 🎵
+ *
+ * Organization:
+ * 1. OpenAPI Schema Types - Core OpenAPI specification types
+ * 2. Request/Response Types - HTTP request and response structures
+ * 3. Public API Endpoints - /api/v2/* route types (49 endpoints)
+ * 4. Internal API Endpoints - /api/internal/* route types (23 endpoints)
+ * 5. Proxy API Endpoints - /api/proxy/* route types (2 endpoints)
+ * 6. Error Response Types - Standardized error handling
+ * 7. Type Guards and Utilities - Runtime type checking functions
  */
 
 // ============================================================================
 // Type Imports from Other Domain Modules
 // ============================================================================
 
-import type { BlockRow, SUBPROTOCOLS } from "./base.d.ts";
+import type { BlockRow, SUBPROTOCOLS } from "$types/base.d.ts";
+import {
+  ApiErrorCode,
+  HttpStatusCodes,
+  HttpStatusToErrorCode,
+} from "./api_constants.ts";
+import type { HttpStatusCode } from "$types/api_constants.ts";
+
+// Re-export the constants and types for external use
+export { ApiErrorCode, HttpStatusCodes, HttpStatusToErrorCode };
+export type { HttpStatusCode };
+import type { PaginationInfo } from "$types/utils.d.ts";
+import type { PaginatedResponse } from "$types/pagination.d.ts";
 
 import type {
   STAMP_FILTER_TYPES,
@@ -34,10 +58,239 @@ import type {
   Src20Detail,
 } from "./src20.d.ts";
 
-import type { SendRow } from "./transaction.d.ts";
+import type { SendRow } from "$types/transaction.d.ts";
 
-// Temporary imports from globals until these types are migrated to their domain modules
-import type { DispenserRow, Pagination } from "../../globals.d.ts";
+import type { DispenserRow, Pagination } from "$types/transaction.d.ts";
+
+// ============================================================================
+// OpenAPI 3.0+ Schema Types
+// ============================================================================
+
+/**
+ * OpenAPI 3.0 specification metadata
+ * Used for generating API documentation and validation
+ */
+export interface OpenAPIInfo {
+  title: string;
+  description?: string;
+  version: string;
+  termsOfService?: string;
+  contact?: {
+    name?: string;
+    url?: string;
+    email?: string;
+  };
+  license?: {
+    name: string;
+    url?: string;
+  };
+}
+
+/**
+ * OpenAPI server configuration
+ */
+export interface OpenAPIServer {
+  url: string;
+  description?: string;
+  variables?: Record<string, {
+    default: string;
+    description?: string;
+    enum?: string[];
+  }>;
+}
+
+/**
+ * OpenAPI security scheme types
+ */
+export type OpenAPISecurityScheme =
+  | { type: "apiKey"; in: "header" | "query" | "cookie"; name: string }
+  | { type: "http"; scheme: string; bearerFormat?: string }
+  | { type: "oauth2"; flows: Record<string, unknown> }
+  | { type: "openIdConnect"; openIdConnectUrl: string };
+
+/**
+ * OpenAPI parameter definition
+ */
+export interface OpenAPIParameter {
+  name: string;
+  in: "query" | "header" | "path" | "cookie";
+  description?: string;
+  required?: boolean;
+  deprecated?: boolean;
+  allowEmptyValue?: boolean;
+  schema: OpenAPISchema;
+  example?: unknown;
+  examples?: Record<string, { value: unknown; summary?: string }>;
+}
+
+/**
+ * OpenAPI schema definition (subset of JSON Schema)
+ */
+export interface OpenAPISchema {
+  type?:
+    | "string"
+    | "number"
+    | "integer"
+    | "boolean"
+    | "array"
+    | "object"
+    | "null";
+  format?: string;
+  title?: string;
+  description?: string;
+  default?: unknown;
+  example?: unknown;
+  enum?: unknown[];
+  minimum?: number;
+  maximum?: number;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  minItems?: number;
+  maxItems?: number;
+  uniqueItems?: boolean;
+  required?: string[];
+  properties?: Record<string, OpenAPISchema>;
+  additionalProperties?: boolean | OpenAPISchema;
+  items?: OpenAPISchema;
+  oneOf?: OpenAPISchema[];
+  anyOf?: OpenAPISchema[];
+  allOf?: OpenAPISchema[];
+  not?: OpenAPISchema;
+  nullable?: boolean;
+  readOnly?: boolean;
+  writeOnly?: boolean;
+  deprecated?: boolean;
+}
+
+/**
+ * OpenAPI operation (endpoint) definition
+ */
+export interface OpenAPIOperation {
+  tags?: string[];
+  summary?: string;
+  description?: string;
+  externalDocs?: { url: string; description?: string };
+  operationId?: string;
+  parameters?: OpenAPIParameter[];
+  requestBody?: {
+    description?: string;
+    content: Record<string, { schema: OpenAPISchema }>;
+    required?: boolean;
+  };
+  responses: Record<string, {
+    description: string;
+    content?: Record<string, { schema: OpenAPISchema }>;
+    headers?: Record<string, OpenAPIParameter>;
+  }>;
+  callbacks?: Record<string, unknown>;
+  deprecated?: boolean;
+  security?: Array<Record<string, string[]>>;
+  servers?: OpenAPIServer[];
+}
+
+/**
+ * OpenAPI path item
+ */
+export interface OpenAPIPathItem {
+  $ref?: string;
+  summary?: string;
+  description?: string;
+  get?: OpenAPIOperation;
+  put?: OpenAPIOperation;
+  post?: OpenAPIOperation;
+  delete?: OpenAPIOperation;
+  options?: OpenAPIOperation;
+  head?: OpenAPIOperation;
+  patch?: OpenAPIOperation;
+  trace?: OpenAPIOperation;
+  servers?: OpenAPIServer[];
+  parameters?: OpenAPIParameter[];
+}
+
+/**
+ * Complete OpenAPI 3.0 specification document
+ */
+export interface OpenAPIDocument {
+  openapi: "3.0.0" | "3.0.1" | "3.0.2" | "3.0.3";
+  info: OpenAPIInfo;
+  servers?: OpenAPIServer[];
+  paths: Record<string, OpenAPIPathItem>;
+  components?: {
+    schemas?: Record<string, OpenAPISchema>;
+    responses?: Record<string, unknown>;
+    parameters?: Record<string, OpenAPIParameter>;
+    examples?: Record<string, unknown>;
+    requestBodies?: Record<string, unknown>;
+    headers?: Record<string, unknown>;
+    securitySchemes?: Record<string, OpenAPISecurityScheme>;
+    links?: Record<string, unknown>;
+    callbacks?: Record<string, unknown>;
+  };
+  security?: Array<Record<string, string[]>>;
+  tags?: Array<{
+    name: string;
+    description?: string;
+    externalDocs?: { url: string; description?: string };
+  }>;
+  externalDocs?: { url: string; description?: string };
+}
+
+// ============================================================================
+// Generic Request/Response Types
+// ============================================================================
+
+/**
+ * Generic API request with OpenAPI metadata
+ */
+export interface ApiRequest<
+  TParams = unknown,
+  TQuery = unknown,
+  TBody = unknown,
+> {
+  params?: TParams;
+  query?: TQuery;
+  body?: TBody;
+  headers: Record<string, string | string[]>;
+  method: string;
+  url: string;
+  path: string;
+  cookies?: Record<string, string>;
+  user?: unknown;
+}
+
+/**
+ * Generic API response with OpenAPI metadata
+ */
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: ApiError;
+  metadata?: {
+    timestamp: number;
+    version: string;
+    requestId?: string;
+  };
+  pagination?: PaginationInfo;
+  links?: Record<string, string>; // HATEOAS links
+}
+
+/**
+ * API error structure (compatible with RFC 7807)
+ */
+export interface ApiError {
+  type?: string;
+  title: string;
+  status: number;
+  detail?: string;
+  instance?: string;
+  code: string;
+  timestamp: string;
+  path?: string;
+  method?: string;
+  correlationId?: string;
+  [key: string]: unknown; // Extension members
+}
 
 // ============================================================================
 // API Handler Context Types
@@ -719,6 +972,17 @@ export interface CSRFTokenResponse {
 export interface CarouselResponse extends Array<StampRow> {}
 
 /**
+ * Fee estimate response for internal endpoints
+ */
+export interface FeeEstimateResponse {
+  fastestFee: number;
+  halfHourFee: number;
+  hourFee: number;
+  economyFee: number;
+  minimumFee: number;
+}
+
+/**
  * Bitcoin notifications response
  * Response from /api/internal/bitcoinNotifications
  */
@@ -991,14 +1255,598 @@ export interface CircuitBreakerTestResetResponse {
 }
 
 // ============================================================================
+// ADDITIONAL V2 API ENDPOINTS
+// ============================================================================
+
+/**
+ * Health check response
+ * GET /api/v2/health
+ */
+export interface HealthCheckResponse {
+  status: "healthy" | "degraded" | "unhealthy";
+  timestamp: number;
+  version: string;
+  uptime: number;
+  checks: {
+    database: boolean;
+    redis: boolean;
+    bitcoin: boolean;
+    [key: string]: boolean;
+  };
+}
+
+/**
+ * Version information response
+ * GET /api/v2/version
+ */
+export interface VersionResponse {
+  version: string;
+  buildDate: string;
+  commit: string;
+  branch: string;
+  environment: string;
+}
+
+/**
+ * API documentation response
+ * GET /api/v2/docs
+ */
+export interface DocsResponse {
+  openapi: string;
+  info: OpenAPIInfo;
+  servers: OpenAPIServer[];
+  paths: Record<string, OpenAPIPathItem>;
+}
+
+/**
+ * Collection information response
+ * GET /api/v2/collections
+ * GET /api/v2/collections/by-name/:name
+ * GET /api/v2/collections/creator/:creator
+ */
+export interface CollectionResponse {
+  success: boolean;
+  data: {
+    name: string;
+    creator: string;
+    description?: string;
+    imageUrl?: string;
+    stamps: StampRow[];
+    totalStamps: number;
+    floorPrice?: number;
+    volumeTraded?: number;
+    createdAt: string;
+  };
+  pagination?: PaginationInfo;
+}
+
+/**
+ * Collection data interface with market data and display properties
+ * Used in collection controllers and API responses
+ */
+export interface Collection {
+  collection_id: string;
+  collection_name: string;
+  collection_description: string;
+  creators: string[];
+  creator_names?: string[]; // Human-readable creator names
+  stamp_count: number;
+  total_editions: number;
+  first_stamp_image?: string | null;
+  stamp_images?: string[] | null;
+  img: string;
+  // Market data fields
+  marketData?: {
+    minFloorPriceBTC: number | null;
+    maxFloorPriceBTC: number | null;
+    avgFloorPriceBTC: number | null;
+    medianFloorPriceBTC: number | null;
+    totalVolume24hBTC: number;
+    stampsWithPricesCount: number;
+    minHolderCount: number;
+    maxHolderCount: number;
+    totalVolumeBTC: number;
+    marketCapBTC: number | null;
+  };
+}
+
+/**
+ * SRC-101 token response types
+ */
+export interface SRC101DeployResponse {
+  deployHash: string;
+  transactionHash: string;
+  tokenName: string;
+  maxSupply: number;
+  decimals: number;
+  deployedAt: string;
+}
+
+export interface SRC101TokenResponse {
+  deployHash: string;
+  tokenId: string;
+  owner: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SRC101BalanceResponse {
+  address: string;
+  tokens: Array<{
+    deployHash: string;
+    tokenIds: string[];
+    balance: number;
+  }>;
+}
+
+/**
+ * OLGA (Optimized Ledger for Global Assets) responses
+ */
+export interface OlgaEstimateResponse {
+  estimatedFee: number;
+  estimatedSize: number;
+  inputs: number;
+  outputs: number;
+  feeRate: number;
+}
+
+export interface OlgaMintResponse {
+  transactionHash: string;
+  stampNumber?: number;
+  cpid: string;
+  status: "pending" | "confirmed" | "failed";
+  fee: number;
+}
+
+/**
+ * Transaction creation responses
+ */
+export interface CreatePSBTResponse {
+  psbt: string;
+  fee: number;
+  inputCount: number;
+  outputCount: number;
+  estimatedSize: number;
+}
+
+export interface CompletePSBTResponse {
+  transactionHash: string;
+  rawTransaction: string;
+  broadcast: boolean;
+  fee: number;
+}
+
+/**
+ * UTXO and ancestor responses
+ */
+export interface UTXOAncestorsResponse {
+  address: string;
+  ancestors: Array<{
+    txid: string;
+    vout: number;
+    value: number;
+    height: number;
+    ancestorCount: number;
+    ancestorSize: number;
+    ancestorFees: number;
+  }>;
+}
+
+/**
+ * Changelog and version history
+ */
+export interface ChangelogResponse {
+  versions: Array<{
+    version: string;
+    date: string;
+    changes: {
+      added?: string[];
+      changed?: string[];
+      deprecated?: string[];
+      removed?: string[];
+      fixed?: string[];
+      security?: string[];
+    };
+  }>;
+}
+
+// ============================================================================
+// PROXY API ENDPOINTS
+// ============================================================================
+
+/**
+ * Arweave proxy response
+ * GET /api/proxy/arweave/*
+ */
+export interface ArweaveProxyResponse {
+  success: boolean;
+  data?: unknown;
+  error?: string;
+  cached: boolean;
+  cacheExpiry?: number;
+}
+
+/**
+ * Ordinals proxy response
+ * GET /api/proxy/ordinals/*
+ */
+export interface OrdinalsProxyResponse {
+  success: boolean;
+  data?: unknown;
+  error?: string;
+  cached: boolean;
+  cacheExpiry?: number;
+}
+
+// ============================================================================
+// STANDARDIZED ERROR RESPONSE TYPES
+// ============================================================================
+
+// HttpStatusCodes and HttpStatusCode are imported from api_constants.ts
+
+// ApiErrorCode enum is imported from api_constants.ts
+
+/**
+ * Base error response structure following OpenAPI 3.0+ standards
+ */
+export interface BaseErrorResponse {
+  success: false;
+  error: {
+    code: ApiErrorCode;
+    message: string;
+    details?: unknown;
+    timestamp: string;
+    path?: string;
+    method?: string;
+    correlationId?: string;
+  };
+}
+
+/**
+ * Field-level validation error details
+ */
+export interface FieldError {
+  field: string;
+  code: string;
+  message: string;
+  value?: unknown;
+  constraints?: Record<string, unknown>;
+}
+
+/**
+ * Validation error response with field-level details
+ */
+export interface ValidationErrorResponse extends BaseErrorResponse {
+  error: BaseErrorResponse["error"] & {
+    code: ApiErrorCode.VALIDATION_FAILED;
+    fieldErrors?: FieldError[];
+  };
+}
+
+/**
+ * Rate limit error response with retry information
+ */
+export interface RateLimitErrorResponse extends BaseErrorResponse {
+  error: BaseErrorResponse["error"] & {
+    code: ApiErrorCode.RATE_LIMIT_EXCEEDED;
+    retryAfter?: number; // seconds
+    limit?: number;
+    remaining?: number;
+    reset?: string; // ISO timestamp
+  };
+}
+
+/**
+ * Authentication error response
+ */
+export interface AuthenticationErrorResponse extends BaseErrorResponse {
+  error: BaseErrorResponse["error"] & {
+    code:
+      | ApiErrorCode.AUTHENTICATION_REQUIRED
+      | ApiErrorCode.INVALID_CREDENTIALS
+      | ApiErrorCode.TOKEN_EXPIRED;
+    realm?: string;
+    authenticationScheme?: string;
+  };
+}
+
+/**
+ * Resource error response
+ */
+export interface ResourceErrorResponse extends BaseErrorResponse {
+  error: BaseErrorResponse["error"] & {
+    code:
+      | ApiErrorCode.RESOURCE_NOT_FOUND
+      | ApiErrorCode.RESOURCE_ALREADY_EXISTS
+      | ApiErrorCode.RESOURCE_CONFLICT;
+    resourceType?: string;
+    resourceId?: string;
+  };
+}
+
+/**
+ * Bitcoin/Blockchain error response
+ */
+export interface BlockchainErrorResponse extends BaseErrorResponse {
+  error: BaseErrorResponse["error"] & {
+    code:
+      | ApiErrorCode.INVALID_ADDRESS
+      | ApiErrorCode.INVALID_TRANSACTION
+      | ApiErrorCode.INSUFFICIENT_FUNDS;
+    txHash?: string;
+    address?: string;
+    requiredAmount?: number;
+    availableAmount?: number;
+  };
+}
+
+/**
+ * Discriminated union of all error response types
+ */
+export type ApiErrorResponse =
+  | ValidationErrorResponse
+  | RateLimitErrorResponse
+  | AuthenticationErrorResponse
+  | ResourceErrorResponse
+  | BlockchainErrorResponse
+  | BaseErrorResponse;
+
+// HttpStatusToErrorCode mapping is imported from api_constants.ts
+
+/**
+ * Problem Details object following RFC 7807
+ */
+export interface ProblemDetails {
+  type?: string; // URI reference
+  title: string;
+  status: HttpStatusCode;
+  detail?: string;
+  instance?: string; // URI reference
+  [key: string]: unknown; // Extension members
+}
+
+/**
+ * Error response factory type
+ */
+export type ErrorResponseFactory<
+  T extends ApiErrorResponse = ApiErrorResponse,
+> = {
+  (error: Partial<T["error"]>): T;
+};
+
+/**
+ * Generic error handler context
+ */
+export interface ErrorHandlerContext {
+  request: {
+    method: string;
+    path: string;
+    headers: Record<string, string>;
+    query?: Record<string, unknown>;
+    body?: unknown;
+  };
+  response: {
+    statusCode: HttpStatusCode;
+    headers: Record<string, string>;
+  };
+  error: Error | unknown;
+}
+
+/**
+ * Error transformation function type
+ */
+export type ErrorTransformer = (
+  error: unknown,
+  context: ErrorHandlerContext,
+) => ApiErrorResponse;
+
+// ============================================================================
+// TYPE GUARDS AND UTILITIES
+// ============================================================================
+
+/**
+ * Type guard for successful API responses
+ */
+export declare function isSuccessResponse<T>(
+  response: ApiResponse<T>,
+): response is { success: true; data: T };
+
+/**
+ * Type guard for error API responses
+ */
+export declare function isErrorResponse<T>(
+  response: ApiResponse<T>,
+): response is { success: false; error: ApiError };
+
+/**
+ * Type guard for paginated responses
+ */
+export declare function isPaginatedResponse<T>(
+  response: any,
+): response is PaginatedResponse<T>;
+
+/**
+ * Type guard for validation error responses
+ */
+export declare function isValidationError(
+  response: ApiErrorResponse,
+): response is ValidationErrorResponse;
+
+/**
+ * Type guard for rate limit error responses
+ */
+export declare function isRateLimitError(
+  response: ApiErrorResponse,
+): response is RateLimitErrorResponse;
+
+/**
+ * Type guard for authentication error responses
+ */
+export declare function isAuthenticationError(
+  response: ApiErrorResponse,
+): response is AuthenticationErrorResponse;
+
+/**
+ * Type guard for resource error responses
+ */
+export declare function isResourceError(
+  response: ApiErrorResponse,
+): response is ResourceErrorResponse;
+
+/**
+ * Type guard for blockchain error responses
+ */
+export declare function isBlockchainError(
+  response: ApiErrorResponse,
+): response is BlockchainErrorResponse;
+
+// ============================================================================
+// OPENAPI ENDPOINT REGISTRY
+// ============================================================================
+
+/**
+ * Complete endpoint registry for BTCStampsExplorer API
+ * Total: 74 endpoints (49 public v2, 23 internal, 2 proxy)
+ */
+export interface EndpointRegistry {
+  "/api/v2/stamps": {
+    GET: PaginatedStampResponseBody;
+  };
+  "/api/v2/stamps/:id": {
+    GET: StampRow;
+  };
+  "/api/v2/stamps/:id/holders": {
+    GET: Array<{ address: string; balance: number }>;
+  };
+  "/api/v2/stamps/:id/dispensers": {
+    GET: PaginatedDispenserResponseBody;
+  };
+  "/api/v2/stamps/:id/dispenses": {
+    GET: Array<{ tx_hash: string; quantity: number; destination: string }>;
+  };
+  "/api/v2/stamps/:id/sends": {
+    GET: Array<SendRow>;
+  };
+  "/api/v2/stamps/block/:block_index": {
+    GET: StampBlockResponseBody;
+  };
+  "/api/v2/stamps/ident/:ident": {
+    GET: PaginatedStampResponseBody;
+  };
+  "/api/v2/src20": {
+    GET: PaginatedSrc20ResponseBody;
+  };
+  "/api/v2/src20/tick/:tick": {
+    GET: Src20ResponseBody;
+  };
+  "/api/v2/src20/balance/:address": {
+    GET: PaginatedSrc20BalanceResponseBody;
+  };
+  "/api/v2/src20/balance/:address/:tick": {
+    GET: Src20BalanceResponseBody;
+  };
+  "/api/v2/block/:block_index": {
+    GET: BlockInfoResponseBody;
+  };
+  "/api/v2/health": {
+    GET: HealthCheckResponse;
+  };
+  "/api/v2/version": {
+    GET: VersionResponse;
+  };
+  "/api/v2/docs": {
+    GET: DocsResponse;
+  };
+  "/api/v2/collections": {
+    GET: CollectionResponse;
+  };
+  "/api/v2/src101/:deploy_hash": {
+    GET: SRC101DeployResponse;
+  };
+  "/api/v2/src101/:deploy_hash/:tokenid": {
+    GET: SRC101TokenResponse;
+  };
+  "/api/v2/src101/balance/:address": {
+    GET: SRC101BalanceResponse;
+  };
+  "/api/v2/olga/estimate": {
+    POST: OlgaEstimateResponse;
+  };
+  "/api/v2/olga/mint": {
+    POST: OlgaMintResponse;
+  };
+  "/api/v2/trx/create_psbt": {
+    POST: CreatePSBTResponse;
+  };
+  "/api/v2/trx/complete_psbt": {
+    POST: CompletePSBTResponse;
+  };
+  "/api/v2/utxo/ancestors/:address": {
+    GET: UTXOAncestorsResponse;
+  };
+  "/api/v2/versions/changelog": {
+    GET: ChangelogResponse;
+  };
+  "/api/internal/mara-submit": {
+    POST: MaraSubmitResponse;
+  };
+  "/api/internal/mara-health": {
+    GET: MaraHealthResponse;
+  };
+  "/api/internal/mara-fee-rate": {
+    GET: MaraFeeRateResponse;
+  };
+  "/api/internal/monitoring": {
+    GET: MonitoringResponse;
+  };
+  "/api/internal/fees": {
+    GET: FeeEstimateResponse;
+  };
+  "/api/internal/bitcoin-notifications": {
+    POST: BitcoinNotificationsResponse;
+  };
+  "/api/proxy/arweave/*": {
+    GET: ArweaveProxyResponse;
+  };
+  "/api/proxy/ordinals/*": {
+    GET: OrdinalsProxyResponse;
+  };
+}
+
+/**
+ * Type helper to extract response type for an endpoint
+ */
+export type EndpointResponse<
+  TPath extends keyof EndpointRegistry,
+  TMethod extends keyof EndpointRegistry[TPath] = "GET",
+> = EndpointRegistry[TPath][TMethod];
+
+/**
+ * OpenAPI tags for endpoint organization
+ */
+export declare const OpenAPITags: {
+  readonly STAMPS: "Bitcoin Stamps";
+  readonly SRC20: "SRC-20 Tokens";
+  readonly SRC101: "SRC-101 NFTs";
+  readonly BLOCKS: "Blockchain Data";
+  readonly TRANSACTIONS: "Transactions";
+  readonly COLLECTIONS: "Collections";
+  readonly OLGA: "OLGA Protocol";
+  readonly INTERNAL: "Internal APIs";
+  readonly PROXY: "Proxy Services";
+  readonly SYSTEM: "System Operations";
+};
+
+// ============================================================================
 // Type Re-exports for Dependencies
 // ============================================================================
 
 // These types are referenced by API types and need to be imported from their domains
 // Import statements would be added here in a real implementation:
-// import type { StampRow, StampBalance } from './stamp.d.ts';
-// import type { SRC20Balance, EnrichedSRC20Row, Src20Detail } from './src20.d.ts';
-// import type { SUBPROTOCOLS, STAMP_FILTER_TYPES, MintStatus } from './base.d.ts';
-// import type { BlockRow, SendRow, DispenserRow } from './transaction.d.ts';
-// import type { StampFilters } from './stamp.d.ts';
-// import type { Pagination } from './pagination.d.ts';
+// import type { StampRow, StampBalance } from '$types/stamp.d.ts';
+// import type { SRC20Balance, EnrichedSRC20Row, Src20Detail } from '$types/src20.d.ts';
+// import type { SUBPROTOCOLS, STAMP_FILTER_TYPES, MintStatus } from '$types/base.d.ts';
+// import type { BlockRow, SendRow, DispenserRow } from '$types/transaction.d.ts';
+// import type { StampFilters } from '$types/stamp.d.ts';
+// import type { Pagination } from '$types/pagination.d.ts';

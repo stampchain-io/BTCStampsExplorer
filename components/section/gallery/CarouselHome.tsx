@@ -1,9 +1,6 @@
-import { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { CarouselHomeProps } from "$types/ui.d.ts";
 import { CarouselGallery, SwiperStyles } from "$section";
-
-interface CarouselHomeProps {
-  carouselStamps: StampRow[];
-}
 
 export function CarouselHome({ carouselStamps }: CarouselHomeProps) {
   if (!carouselStamps?.length) {

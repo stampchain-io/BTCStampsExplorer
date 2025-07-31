@@ -1,5 +1,5 @@
 /* ===== COLLECTION DETAILS CONTENT COMPONENT ===== */
-import { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import { StampCard } from "$card";
 
 /* ===== COMPONENT ===== */

@@ -1,12 +1,12 @@
 import { SRC101Service } from "$server/services/src101/index.ts";
-import {
-  SRC101TokenidsParams,
-  SRC101OwnerParams,
-  SRC101TxParams,
-  SRC101ValidTxTotalCountParams,
-  Src101BalanceParams,
-} from "$globals";
 import { BlockService } from "$server/services/core/blockService.ts";
+import type { 
+  SRC101TokenidsParams, 
+  SRC101OwnerParams, 
+  SRC101TxParams, 
+  SRC101ValidTxTotalCountParams,
+  Src101BalanceParams 
+} from "$types/src101.d.ts";
 
 export class Src101Controller{
   static async handleSrc101TXFromSRC101Table(

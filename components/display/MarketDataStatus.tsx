@@ -1,17 +1,8 @@
+import type { MarketDataStatusProps } from "$types/ui.d.ts";
 /**
  * @fileoverview MarketDataStatus - Simple component to display market data availability
  * @description Shows user-friendly messages about market data status with appropriate styling
  */
-
-interface MarketDataStatusProps {
-  status: {
-    stampsMarketData: "available" | "unavailable";
-    src20MarketData: "available" | "unavailable";
-    overallStatus: "full" | "partial" | "unavailable";
-  };
-  className?: string;
-  showDetails?: boolean;
-}
 
 export function MarketDataStatus({
   status,

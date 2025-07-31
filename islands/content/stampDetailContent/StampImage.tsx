@@ -1,6 +1,6 @@
 /* ===== STAMP IMAGE COMPONENT ===== */
 /* @baba-update audio icon size (custom) - 780*/
-import { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Icon, LoadingIcon } from "$icon";
 import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";

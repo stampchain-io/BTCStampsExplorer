@@ -4,7 +4,7 @@
  * bulk operations, error handling, performance optimization, and edge cases.
  */
 
-import type { SRC20Row } from "$globals";
+import type { SRC20Row } from "$types/src20.d.ts";
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import {

@@ -106,6 +106,8 @@ export type {
   Deployment,
   EnrichedSRC20Row,
   PaginatedSRC20WithMarketDataResponse,
+  // PSBT signing
+  SignPSBTResult,
   SRC20_DETAILS,
   SRC20_FILTER_TYPES,
   SRC20_MARKET,
@@ -176,6 +178,8 @@ export type {
   // External API responses
   BlockCypherAddressBalanceResponse,
   BTCBalanceInfo,
+  // Mempool API response types
+  MempoolAddressResponse,
   // Core wallet types
   WalletInfo,
   // Legacy wallet interface (deprecated - use WalletInfo)
@@ -254,6 +258,8 @@ export type {
 } from "./pagination.d.ts";
 
 export type {
+  // BTC balance options
+  BTCBalanceInfoOptions,
   DateUtils,
   // Utility functions and helpers
   DeepPartial,
@@ -373,6 +379,10 @@ export type {
 } from "./quicknode.d.ts";
 
 export type {
+  // Dispenser types
+  Dispenser,
+  DispenserFilter,
+  DispenserStats,
   // Service configuration and responses
   ServiceConfig,
   ServiceError,
@@ -395,25 +405,22 @@ export type {
  * ```
  */
 export namespace Bitcoin {
-  export {
-    type BasicUTXO,
-    type BlockRow,
-    type BTCBalance,
-    type BtcInfo,
-    type ScriptType,
-    type TransactionInput,
-    type TransactionOutput,
-    type UTXO,
-  } from "./base.d.ts";
+  export type BasicUTXO = import("./base.d.ts").BasicUTXO;
+  export type BlockRow = import("./base.d.ts").BlockRow;
+  export type BTCBalance = import("./base.d.ts").BTCBalance;
+  export type BtcInfo = import("./base.d.ts").BtcInfo;
+  export type ScriptType = import("./base.d.ts").ScriptType;
+  export type TransactionInput = import("./base.d.ts").TransactionInput;
+  export type TransactionOutput = import("./base.d.ts").TransactionOutput;
+  export type UTXO = import("./base.d.ts").UTXO;
 
-  export {
-    type BlockInfo,
-    type MintStampInputData,
-    type ScriptTypeInfo,
-    type SendRow,
-    type TX,
-    type TXError,
-  } from "./transaction.d.ts";
+  export type BlockInfo = import("./transaction.d.ts").BlockInfo;
+  export type MintStampInputData =
+    import("./transaction.d.ts").MintStampInputData;
+  export type ScriptTypeInfo = import("./transaction.d.ts").ScriptTypeInfo;
+  export type SendRow = import("./transaction.d.ts").SendRow;
+  export type TX = import("./transaction.d.ts").TX;
+  export type TXError = import("./transaction.d.ts").TXError;
 }
 
 /**
@@ -428,21 +435,19 @@ export namespace Bitcoin {
  * ```
  */
 export namespace Tokens {
-  export {
-    type StampBalance,
-    type StampRow,
-    type StampWithOptionalMarketData,
-    type ValidatedStamp,
-  } from "./stamp.d.ts";
+  export type StampBalance = import("./stamp.d.ts").StampBalance;
+  export type StampRow = import("./stamp.d.ts").StampRow;
+  export type StampWithOptionalMarketData =
+    import("./stamp.d.ts").StampWithOptionalMarketData;
+  export type ValidatedStamp = import("./stamp.d.ts").ValidatedStamp;
 
-  export {
-    type Deployment,
-    type SRC20Balance,
-    type SRC20Row,
-    type SRC20WithOptionalMarketData,
-  } from "./src20.d.ts";
+  export type Deployment = import("./src20.d.ts").Deployment;
+  export type SRC20Balance = import("./src20.d.ts").SRC20Balance;
+  export type SRC20Row = import("./src20.d.ts").SRC20Row;
+  export type SRC20WithOptionalMarketData =
+    import("./src20.d.ts").SRC20WithOptionalMarketData;
 
-  export { type SRC101Balance } from "./src101.d.ts";
+  export type SRC101Balance = import("./src101.d.ts").SRC101Balance;
 }
 
 /**

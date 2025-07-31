@@ -1,4 +1,4 @@
-import { Bech32Utils } from "../address/bech32Utils.ts";
+import { Bech32Utils } from "$lib/utils/bitcoin/address/bech32Utils.ts";
 
 /**
  * Utilities for encoding files as Bitcoin addresses and decoding them back

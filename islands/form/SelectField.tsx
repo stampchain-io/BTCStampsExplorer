@@ -1,17 +1,7 @@
 import { JSX } from "preact";
-import { StampRow } from "$globals";
+import type { SelectFieldProps } from "$types/ui.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 import { inputField } from "$form";
-
-interface SelectFieldProps {
-  onChange: (e: JSX.TargetedEvent<HTMLSelectElement, Event>) => void;
-  onClick?: (e: JSX.TargetedEvent<HTMLSelectElement, Event>) => void;
-  error?: string;
-  disabled?: boolean;
-  options: StampRow[];
-  value?: string | number | null;
-  placeholder?: string;
-  className?: string;
-}
 
 export function SelectField({
   onChange,

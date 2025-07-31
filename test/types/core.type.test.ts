@@ -688,9 +688,9 @@ Deno.test("Core Types - Performance Benchmarks", async () => {
 Deno.test("Core Types - Real-World Usage Examples", async () => {
   // Test stamp creation workflow
   await withTempTypeFile(`
-    import type { StampRow, StampClassification, StampValidationResult } from "../../lib/types/stamp.d.ts";
-    import type { SRC20Row, SRC20_OPERATIONS } from "../../lib/types/src20.d.ts";
-    import type { TransactionBuilder, UTXOSelectionStrategy } from "../../lib/types/transaction.d.ts";
+    import type { StampRow, StampClassification, StampValidationResult } from "$types/stamp.d.ts";
+    import type { SRC20Row, SRC20_OPERATIONS } from "$types/src20.d.ts";
+    import type { TransactionBuilder, UTXOSelectionStrategy } from "$types/transaction.d.ts";
     
     // Example: Stamp creation workflow
     const newStamp: Partial<StampRow> = {

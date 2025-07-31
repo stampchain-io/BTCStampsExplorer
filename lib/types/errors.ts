@@ -8,7 +8,7 @@
 export * from "./errors.d.ts";
 
 // Import types for local use
-import type { ApplicationError } from "./errors.d.ts";
+import type { ApplicationError } from "$types/errors.d.ts";
 
 // ===== ERROR CODE ENUMS =====
 

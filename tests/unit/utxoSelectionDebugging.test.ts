@@ -3,7 +3,7 @@ import type { BasicUTXO, Output } from "$types/index.d.ts";
 import {
   assertEquals,
   assertExists,
-} from "https://deno.land/std@0.208.0/assert/mod.ts";
+} from "@std/assert";
 
 /**
  * Tests for enhanced UTXO selection debugging features

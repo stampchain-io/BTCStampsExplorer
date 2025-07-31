@@ -1,5 +1,5 @@
 import { SMALL_LIMIT, STAMP_TABLE } from "$constants";
-import { Collection } from "$globals";
+import type { CollectionRow } from "$server/types/collection.d.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 
 // Local utility function for BTC decimal parsing
@@ -139,7 +139,7 @@ export class CollectionRepository {
 
   static async getCollectionByName(
     collectionName: string,
-  ): Promise<Collection | null> {
+  ): Promise<CollectionRow | null> {
     const query = `
       SELECT
         HEX(c.collection_id) as collection_id,
@@ -166,7 +166,7 @@ export class CollectionRepository {
       query,
       [collectionName],
       60 * 10, // Cache for 10 minutes instead of never
-    ) as { rows: Collection[] };
+    ) as { rows: CollectionRow[] };
 
     return result.rows.length > 0 ? result.rows[0] : null;
   }

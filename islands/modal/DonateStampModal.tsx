@@ -1,11 +1,12 @@
 /* ===== DONATE STAMP MODAL COMPONENT ===== */
 import { sliderBar, sliderKnob } from "$button";
+import type { DonateStampModalProps } from "$types/ui.d.ts";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 // Using simplified fee display approach
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { StampImage } from "$content";
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
@@ -18,12 +19,6 @@ import { FeeCalculatorBase } from "$section";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface Props {
-  stamp: StampRow;
-  fee: number;
-  handleChangeFee: (fee: number) => void;
-  dispenser: any;
-}
 
 /* ===== COMPONENT ===== */
 const DonateStampModal = ({
@@ -31,7 +26,7 @@ const DonateStampModal = ({
   fee: initialFee,
   handleChangeFee,
   dispenser,
-}: Props) => {
+}: DonateStampModalProps) => {
   /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
 

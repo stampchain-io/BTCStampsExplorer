@@ -5,6 +5,13 @@
  * error handling, and proper formatting.
  */
 
+import type {
+  BTCValueDisplayProps,
+  BTCValueSummaryProps,
+  StampBTCValueProps,
+  TotalBTCValueProps,
+  WalletStampValueProps,
+} from "$types/ui.d.ts";
 import {
   useBTCValue,
   useStampValue,
@@ -13,16 +20,6 @@ import {
 } from "$lib/hooks/useBTCValue.ts";
 import type { WalletStampWithValue } from "$lib/types/wallet.d.ts";
 import { memo } from "preact/compat";
-
-interface BTCValueDisplayProps {
-  value: number | null;
-  loading?: boolean;
-  error?: string;
-  className?: string;
-  size?: "sm" | "md" | "lg";
-  showSymbol?: boolean;
-  fallback?: string;
-}
 
 /**
  * Generic BTC value display component
@@ -71,14 +68,6 @@ export const BTCValueDisplay = memo(function BTCValueDisplay({
   );
 });
 
-interface StampBTCValueProps {
-  quantity: number;
-  unitPrice: number | null;
-  className?: string;
-  size?: "sm" | "md" | "lg";
-  showBreakdown?: boolean;
-}
-
 /**
  * Component for displaying individual stamp BTC value
  */
@@ -111,14 +100,6 @@ export const StampBTCValue = memo(function StampBTCValue({
     />
   );
 });
-
-interface WalletStampValueProps {
-  stamp: WalletStampWithValue;
-  className?: string;
-  size?: "sm" | "md" | "lg";
-  showBreakdown?: boolean;
-  showSource?: boolean;
-}
 
 /**
  * Component for displaying wallet stamp value with price source
@@ -174,13 +155,6 @@ export const WalletStampValue = memo(function WalletStampValue({
   );
 });
 
-interface TotalBTCValueProps {
-  stamps: WalletStampWithValue[];
-  className?: string;
-  size?: "sm" | "md" | "lg";
-  showStats?: boolean;
-}
-
 /**
  * Component for displaying total portfolio BTC value
  */
@@ -209,11 +183,6 @@ export const TotalBTCValue = memo(function TotalBTCValue({
     </div>
   );
 });
-
-interface BTCValueSummaryProps {
-  stamps: WalletStampWithValue[];
-  className?: string;
-}
 
 /**
  * Component for displaying comprehensive BTC value summary

@@ -1,11 +1,18 @@
-import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT, STAMP_TABLE } from "$constants";
 import {
-  STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
-  STAMP_RANGES, STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES,
-  StampBalance,
-  StampFilters, SUBPROTOCOLS
-} from "$globals";
+  DEFAULT_CACHE_DURATION,
+  MAX_PAGINATION_LIMIT,
+  STAMP_TABLE } from "$constants";
+import {
+  STAMP_EDITIONS,
+  STAMP_FILESIZES,
+  STAMP_FILETYPES,
+  STAMP_FILTER_TYPES,
+  STAMP_MARKETPLACE,
+  STAMP_RANGES,
+  STAMP_SUFFIX_FILTERS,
+  STAMP_TYPES
+} from "$types/stamp.d.ts";
+import { SUBPROTOCOLS } from "$types/base.d.ts";
 import { filterOptions } from "$lib/utils/data/filtering/filterOptions.ts";
 import {
   getIdentifierType,
@@ -16,8 +23,9 @@ import {
 } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/monitoring/logging/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
-import { XcpBalance } from "$types/index.d.ts";
-import { summarize_issuances } from "./index.ts";
+import type { XcpBalance } from "$types/services.d.ts";
+import { summarize_issuances } from "$server/database/index.ts";
+import type { StampBalance, StampFilters } from "$types/stamp.d.ts";
 
 export class StampRepository {
   // Dependency injection support

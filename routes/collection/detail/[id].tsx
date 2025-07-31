@@ -1,7 +1,8 @@
 /* ===== COLLECTION DETAILS PAGE ===== */
+
 import { CollectionDetailContent } from "$content";
 import { FreshContext, Handlers } from "$fresh/server.ts";
-import { STAMP_FILTER_TYPES, StampRow, SUBPROTOCOLS } from "$globals";
+
 import { CollectionDetailHeader } from "$header";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { StampController } from "$server/controller/stampController.ts";

@@ -1,18 +1,9 @@
 /* ===== CLOSE ICON COMPONENT ===== */
 import { Icon } from "$icon";
+import type { CloseIconProps } from "$types/ui.d.ts";
 import type { IconVariants } from "$icon";
 
 /* ===== TYPES ===== */
-interface CloseIconProps {
-  onClick: (e?: MouseEvent) => void;
-  size: IconVariants["size"];
-  weight: IconVariants["weight"];
-  color: "greyGradient" | "purpleGradient";
-  className?: string;
-  onMouseEnter?: (() => void) | undefined;
-  onMouseLeave?: (() => void) | undefined;
-  "aria-label"?: string;
-}
 
 /* ===== COMPONENT ===== */
 export function CloseIcon({

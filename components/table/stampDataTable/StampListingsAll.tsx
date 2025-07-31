@@ -1,4 +1,5 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import type { StampListingsAllProps } from "$types/ui.d.ts";
 import { rowTable } from "$layout";
 import {
   abbreviateAddress,
@@ -14,10 +15,6 @@ interface Dispenser {
   satoshirate: number;
   tx_hash: string;
   close_block_index: number;
-}
-
-interface StampListingsAllProps {
-  dispensers: Dispenser[];
 }
 
 export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {

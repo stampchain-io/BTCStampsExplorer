@@ -37,7 +37,7 @@ import type {
   UTXOQueryResponse,
 } from "./api.d.ts";
 
-import type { StampRow } from "./stamp.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 
 Deno.test("API Types - MARA Integration Types", () => {
   // Test MaraSubmitRequest

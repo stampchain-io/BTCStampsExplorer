@@ -1,16 +1,10 @@
 /* ===== ARTICLE COMPONENT ===== */
 import { body, bodyArticle, gapSection } from "$layout";
+import type { ArticleProps } from "$types/ui.d.ts";
 import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
 import { ArticlesOverview } from "$section";
 
 /* ===== TYPES ===== */
-interface ArticleProps {
-  title: string;
-  subtitle: string;
-  headerImage: string;
-  children: preact.ComponentChildren;
-  importantNotes?: string[];
-}
 
 /* ===== COMPONENT ===== */
 export function Article(

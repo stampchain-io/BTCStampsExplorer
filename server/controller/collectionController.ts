@@ -1,8 +1,9 @@
-import { Collection } from "$globals";
+
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { CollectionQueryParams, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
+import type { Collection } from "$types/api.d.ts";
 
 export class CollectionController {
   static async getCollectionDetails(

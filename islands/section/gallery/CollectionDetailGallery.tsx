@@ -2,7 +2,8 @@
 /* @baba - not updated */
 import { ViewAllButton } from "$button";
 import { CollectionCard } from "$card";
-import { Collection, CollectionGalleryProps } from "$globals";
+import type { Collection } from "$server/types/collection.d.ts";
+import type { CollectionGalleryProps } from "$types/ui.d.ts";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { BREAKPOINTS } from "$constants";

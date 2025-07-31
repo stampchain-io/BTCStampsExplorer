@@ -1,4 +1,4 @@
-import {
+import type {
   MarketListingAggregated,
   PaginatedSrc20ResponseBody,
   Src20ResponseBody,
@@ -6,7 +6,8 @@ import {
   Src20SnapShotDetail,
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams
-} from "$globals";
+
+} from "$types/src20.d.ts";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { stripTrailingZeros } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
@@ -14,7 +15,7 @@ import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { Big } from "big";
-import { SRC20UtilityService } from "./utilityService.ts";
+import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
 
 // Define missing types
 interface PerformanceMetrics {

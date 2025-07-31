@@ -1,8 +1,9 @@
 /* ===== WALLET DASHBOARD PAGE ===== */
 /*@baba - FINETUNE PAGE */
+
 import { WalletDashboardContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import { DispenserRow, SRC20Row, StampRow } from "$globals";
+
 import { WalletDashboardHeader } from "$header";
 import WalletDashboardDetails from "$islands/content/WalletDashboardDetails.tsx";
 import { WalletOverviewInfo, WalletPageProps } from "$lib/types/index.d.ts";

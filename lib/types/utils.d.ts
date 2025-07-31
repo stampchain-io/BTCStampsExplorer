@@ -25,7 +25,7 @@ export interface UTXOFromBlockchain {
 }
 
 // UTXO interface moved to base.d.ts to avoid duplication
-// Import with: import type { UTXO } from "./base.d.ts";
+// Import with: import type { UTXO } from "$types/base.d.ts";
 
 type Output = {
   address: string;

@@ -1,11 +1,6 @@
 /* ===== LOADING ICON COMPONENT ===== */
 import { Icon } from "$components/icon/IconBase.tsx";
-
-interface LoadingIconProps {
-  className?: string;
-  containerClassName?: string;
-  wrapperClassName?: string;
-}
+import type { LoadingIconProps } from "$types/ui.d.ts";
 
 export function LoadingIcon({
   className = "",

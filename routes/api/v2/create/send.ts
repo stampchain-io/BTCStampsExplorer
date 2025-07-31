@@ -11,7 +11,7 @@ import { CounterpartyApiManager } from "$server/services/counterpartyApiService.
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { networks, Psbt, Transaction } from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
-import type { SendRequestBody, SendResponse } from "@/lib/types/api.d.ts";
+import type { SendRequestBody, SendResponse } from "$types/api.d.ts";
 
 export const handler: Handlers<SendResponse | { error: string }> = {
   async POST(req) {

@@ -1,7 +1,8 @@
 /* ===== STAMP OVERVIEW PAGE ===== */
+
 import { StampOverviewContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import { StampPageProps } from "$globals";
+
 import { StampOverviewHeader } from "$header";
 import {
   queryParamsToFilters,

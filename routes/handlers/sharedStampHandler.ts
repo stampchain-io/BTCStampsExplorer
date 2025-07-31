@@ -6,7 +6,7 @@ import {
   STAMP_FILETYPES,
   STAMP_MARKETPLACE,
   STAMP_RANGES,
-} from "$globals";
+} from "$types/stamp.d.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { getIdentifierType } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";

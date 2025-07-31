@@ -1,20 +1,11 @@
 import { Icon } from "$icon";
+import type { MaraSuccessMessageProps } from "$types/ui.d.ts";
+import type { TransactionBadgeProps } from "$types/ui.d.ts";
+import type { TransactionStatusProps } from "$types/ui.d.ts";
 import { buttonPurpleFlat } from "$button";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 export type TransactionState = "submitted" | "pending" | "confirmed" | "failed";
-
-interface TransactionStatusProps {
-  state: TransactionState;
-  txid?: string;
-  confirmations?: number;
-  targetConfirmations?: number;
-  estimatedTime?: number; // in seconds
-  errorMessage?: string;
-  class?: string;
-  onViewTransaction?: () => void;
-  onRetry?: () => void;
-}
 
 export function TransactionStatus({
   state,
@@ -211,10 +202,6 @@ export function TransactionStatus({
 }
 
 // Compact status badge for inline display
-interface TransactionBadgeProps {
-  state: TransactionState;
-  class?: string;
-}
 
 export function TransactionBadge(
   { state, class: className = "" }: TransactionBadgeProps,
@@ -271,16 +258,6 @@ export function TransactionBadge(
 }
 
 // MARA-specific success message component
-interface MaraSuccessMessageProps {
-  txid: string;
-  outputValue: number;
-  feeRate: number;
-  poolInfo?: {
-    name: string;
-    hashrate?: string;
-  };
-  class?: string;
-}
 
 export function MaraSuccessMessage({
   txid,

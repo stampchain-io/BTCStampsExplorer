@@ -1,5 +1,6 @@
 /* ===== FAIRMINT CONTENT COMPONENT ===== */
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
+import type { FairmintToolProps } from "$types/ui.d.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { bodyTool, containerBackground, containerColForm } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -11,9 +12,6 @@ import { titlePurpleLD } from "$text";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface FairmintToolProps {
-  fairminters: any[];
-}
 
 /* ===== COMPONENT ===== */
 export function FairmintTool({ fairminters }: FairmintToolProps) {

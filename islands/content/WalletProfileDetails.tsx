@@ -1,5 +1,6 @@
 /* ===== WALLET PROFILE DETAILS COMPONENT ===== */
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
+import type { WalletProfileDetailsProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
 import { containerBackground } from "$layout";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
@@ -9,13 +10,6 @@ import { labelSm, subtitleGrey, titleGreyLD } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface WalletProfileDetailsProps {
-  walletData: WalletOverviewInfo;
-  stampsTotal: number;
-  src20Total: number;
-  stampsCreated: number;
-  setShowItem: (type: string) => void;
-}
 
 /* ===== WALLET OVERVIEW SUBCOMPONENT ===== */
 function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {

@@ -1,5 +1,4 @@
 import { Handlers } from "$fresh/server.ts";
-import { SRC20TrxRequestParams } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import {

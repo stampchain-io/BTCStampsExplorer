@@ -1,10 +1,11 @@
 /* ===== BUY STAMP MODAL COMPONENT ===== */
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
+import type { BuyStampModalProps } from "$types/ui.d.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { StampImage } from "$content";
 import { inputFieldSquare } from "$form";
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
@@ -16,12 +17,6 @@ import { FeeCalculatorBase } from "$section";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface Props {
-  stamp: StampRow;
-  fee: number;
-  handleChangeFee: (fee: number) => void;
-  dispenser: any;
-}
 
 /* ===== COMPONENT ===== */
 const BuyStampModal = ({
@@ -29,7 +24,7 @@ const BuyStampModal = ({
   fee: initialFee,
   handleChangeFee,
   dispenser,
-}: Props) => {
+}: BuyStampModalProps) => {
   /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
 

@@ -1,7 +1,7 @@
 /* ===== SRC20 CARD BASE COMPONENT ===== */
 /*@baba-check styles*/
 import { cellAlign, Timeframe } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
+import type { SRC20Row } from "$types/src20.d.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { useState } from "preact/hooks";

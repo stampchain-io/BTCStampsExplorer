@@ -8,8 +8,8 @@
 // - StampRow from "./stamp.d.ts"
 
 // Import required base types
-import type { BlockRow, ScriptType } from "./base.d.ts";
-import type { StampRow } from "./stamp.d.ts";
+import type { BlockRow, ScriptType } from "$types/base.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 
 // Re-export ScriptType for convenience
 export type { ScriptType };
@@ -135,4 +135,70 @@ export interface MintStampInputData {
   service_fee: number;
   /** Address to receive the service fee */
   service_fee_address: string;
+}
+
+// Additional Transaction-Related Types -------------------------------------------
+
+/**
+ * Dispense transaction data
+ * Represents individual dispense actions from a dispenser
+ */
+export interface DispenseRow {
+  /** Transaction hash of the dispense */
+  tx_hash: string;
+  /** Block index where dispense occurred */
+  block_index: number;
+  /** Asset being dispensed (CPID) */
+  cpid: string;
+  /** Source address (dispenser owner) */
+  source: string;
+  /** Destination address (recipient) */
+  destination: string;
+  /** Original dispenser transaction hash */
+  dispenser_tx_hash: string;
+  /** Quantity dispensed */
+  dispense_quantity: number;
+}
+
+/**
+ * Dispenser configuration and state
+ * Represents an active or closed dispenser
+ */
+export interface DispenserRow {
+  /** Transaction hash that created the dispenser */
+  tx_hash: string;
+  /** Block index where dispenser was created */
+  block_index: number;
+  /** Source address (dispenser owner) */
+  source: string;
+  /** Asset being dispensed (CPID) */
+  cpid: string;
+  /** Quantity given per dispense */
+  give_quantity: number;
+  /** Remaining quantity available */
+  give_remaining: number;
+  /** Total quantity in escrow */
+  escrow_quantity: number;
+  /** Rate in satoshis per unit */
+  satoshirate: number;
+  /** Rate in BTC per unit */
+  btcrate: number;
+  /** Original dispenser transaction */
+  origin: string;
+  /** Array of dispense transactions */
+  dispenses: DispenseRow[];
+}
+
+/**
+ * Basic pagination interface for paginated responses
+ */
+export interface Pagination {
+  /** Current page number (1-based) */
+  page: number;
+  /** Total number of pages */
+  totalPages: number;
+  /** Optional prefix for pagination controls */
+  prefix?: string;
+  /** Optional callback for page changes */
+  onPageChange?: (page: number) => void;
 }

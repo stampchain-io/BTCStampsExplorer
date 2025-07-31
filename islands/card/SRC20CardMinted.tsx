@@ -4,7 +4,7 @@ import { cellAlign } from "$components/layout/types.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { valueSm } from "$text";
-import { SRC20CardBase, SRC20CardBaseProps } from "./SRC20CardBase.tsx";
+import { SRC20CardBase, SRC20CardBaseProps } from "$islands/card/SRC20CardBase.tsx";
 
 // Local utility functions for v2.3 market data format
 function getFloorPrice(src20: any): number {

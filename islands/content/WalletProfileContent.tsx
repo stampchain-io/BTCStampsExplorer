@@ -1,5 +1,6 @@
 /* ===== WALLET PROFILE CONTENT COMPONENT ===== */
-import { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { SectionHeaderProps } from "$types/ui.d.ts";
 import { Icon, LoadingIcon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
@@ -14,7 +15,6 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { createPaginationHandler } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { Dispenser } from "$types/index.d.ts";
 import { WalletContentProps } from "$types/wallet.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
@@ -105,15 +105,6 @@ const SECTION_CONFIGS: Record<string, SectionSortingConfig> = {
 };
 
 // ===== SECTION HEADER COMPONENT =====
-
-interface SectionHeaderProps {
-  title: string;
-  config: SectionSortingConfig;
-  sortBy: string;
-  onSortChange: (sort: string) => void;
-  enableAdvancedSorting?: boolean;
-  showMetrics?: boolean;
-}
 
 /**
  * Section header with conditional rendering for legacy/advanced sorting

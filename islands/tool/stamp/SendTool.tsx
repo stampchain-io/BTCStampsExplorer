@@ -2,7 +2,7 @@
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { inputField, inputFieldSquare } from "$form";
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Icon } from "$icon";
 import { SelectField } from "$islands/form/SelectField.tsx";
 import {

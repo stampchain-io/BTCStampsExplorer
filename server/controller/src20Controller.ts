@@ -1,6 +1,4 @@
-import {
-    SRC20SnapshotRequestParams
-} from "$globals";
+
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
 import { SRC20BalanceRequestParams, SRC20TickPageData } from "$lib/types/src20.d.ts";
 import { formatAmount } from "$lib/utils/ui/formatting/formatUtils.ts";
@@ -9,7 +7,8 @@ import { BlockService } from "$server/services/core/blockService.ts";
 import { CircuitBreakerService, TRENDING_FALLBACK_DATA } from "$server/services/infrastructure/circuitBreaker.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { MarketDataEnrichmentService } from "$server/services/src20/marketDataEnrichmentService.ts";
-import { MarketListingAggregated } from "$types/index.d.ts";
+import type { MarketListingAggregated } from "$types/marketData.d.ts";
+import type { SRC20SnapshotRequestParams } from "$types/src20.d.ts";
 
 export class Src20Controller {
   /**

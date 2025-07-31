@@ -1,14 +1,8 @@
 /* ===== HOLDERS PIE CHART COMPONENT ===== */
 import { Chart } from "fresh_charts/island.tsx";
+import type { PieChartProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-interface PieChartProps {
-  holders: Array<{
-    address: string | null;
-    amt: number | string;
-    percentage: number | string;
-  }>;
-}
 
 /* ===== COMPONENT ===== */
 export const HoldersPieChart = ({ holders }: PieChartProps) => {

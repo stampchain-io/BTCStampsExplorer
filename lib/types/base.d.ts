@@ -176,6 +176,8 @@ export interface BTCBalance {
   confirmed: number;
   unconfirmed: number;
   total?: number;
+  txCount?: number;
+  unconfirmedTxCount?: number;
 }
 
 // Domain and Protocol Types --------------------------------------------------

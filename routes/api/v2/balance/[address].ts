@@ -1,5 +1,4 @@
 import { Handlers } from "$fresh/server.ts";
-import { AddressHandlerContext } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";

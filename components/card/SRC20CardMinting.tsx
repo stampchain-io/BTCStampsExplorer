@@ -1,7 +1,8 @@
 /* reinamora - update Trending calculations */
 import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { SRC20CardMintingProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
 import {
   containerCardTable,
@@ -14,17 +15,6 @@ import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
-
-interface SRC20CardMintingProps {
-  data: SRC20Row[];
-  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  timeframe: Timeframe;
-  onImageClick: (imgSrc: string) => void;
-  currentSort?: {
-    filter: string | null;
-    direction: "asc" | "desc";
-  };
-}
 
 export function SRC20CardMinting({
   data,

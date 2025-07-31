@@ -1,4 +1,6 @@
-import { SRC101OwnerParams, SRC101TokenidsParams, SRC101TxParams, SRC101ValidTxParams, SRC101ValidTxTotalCountParams, Src101BalanceParams } from "$globals";
+import type {
+  SRC101OwnerParams, SRC101TokenidsParams, SRC101TxParams, SRC101ValidTxParams, SRC101ValidTxTotalCountParams, Src101BalanceParams 
+} from "$types/src101.d.ts";
 import { SRC101Repository } from "$server/database/src101Repository.ts";
 
 export class SRC101QueryService {

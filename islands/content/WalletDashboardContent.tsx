@@ -1,5 +1,5 @@
 /* ===== WALLET DASHBOARD CONTENT COMPONENT ===== */
-import { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Icon, LoadingIcon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
@@ -17,7 +17,6 @@ import {
   navigateWithFresh,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { Dispenser } from "$types/index.d.ts";
 import { WalletContentProps } from "$types/wallet.d.ts";
 import { useEffect, useState } from "preact/hooks";
 

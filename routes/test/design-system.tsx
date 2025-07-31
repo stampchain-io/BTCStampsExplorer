@@ -1,9 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-
-interface ColorSwatchProps {
-  name: string;
-  bgClass: string;
-}
+import type { ColorSwatchProps } from "$types/ui.d.ts";
 
 function ColorSwatch({ name, bgClass }: ColorSwatchProps) {
   return (

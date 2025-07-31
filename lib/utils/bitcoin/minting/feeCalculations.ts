@@ -7,7 +7,7 @@ import type {
   TransactionOutput,
 } from "$lib/types/index.d.ts";
 import { detectScriptType } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
-import { estimateMintingTransactionSize } from "./transactionSizes.ts";
+import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
 
 // Frontend-specific calculations
 export function calculateDust(fileSize: number): number {

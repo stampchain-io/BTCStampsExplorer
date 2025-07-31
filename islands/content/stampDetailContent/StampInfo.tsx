@@ -1,7 +1,9 @@
 /* ===== STAMP INFO COMPONENT ===== */
 /*@baba-750+764+815+icons - refactor to StatItems */
 import { Button } from "$button";
-import { Src101Detail, StampRow } from "$globals";
+import type { StampInfoProps } from "$types/ui.d.ts";
+import type { Src101Detail } from "$types/src101.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
@@ -35,10 +37,6 @@ import {
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface StampInfoProps {
-  stamp: StampRow;
-  lowestPriceDispenser: any;
-}
 
 interface DimensionsType {
   width: number | string;

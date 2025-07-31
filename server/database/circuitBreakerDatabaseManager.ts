@@ -6,7 +6,7 @@
  */
 
 import { createDatabaseCircuitBreaker, type CircuitBreaker } from "$/server/utils/circuitBreaker.ts";
-import { dbManager } from "./databaseManager.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 
 class CircuitBreakerDatabaseManager {
   private circuitBreaker: CircuitBreaker;

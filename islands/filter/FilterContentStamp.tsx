@@ -1,11 +1,12 @@
 import { ToggleButton } from "$button";
+import type { RadioProps } from "$types/ui.d.ts";
 import { inputCheckbox } from "$form";
-import {
+import type {
   STAMP_EDITIONS,
   STAMP_FILESIZES,
   STAMP_FILETYPES,
   STAMP_RANGES,
-} from "$globals";
+} from "$types/stamp.d.ts";
 import { Checkbox, RangeSlider } from "$islands/filter/FilterComponents.tsx";
 import { StampFilters } from "$islands/filter/FilterOptionsStamp.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
@@ -467,14 +468,6 @@ export function queryParamsToServicePayload(search: string) {
     rangeMin: filters.rangeMin,
     rangeMax: filters.rangeMax,
   };
-}
-
-interface RadioProps {
-  label: string;
-  value: string;
-  checked: boolean;
-  onChange: () => void;
-  name: string;
 }
 
 const Radio = ({ label, value, checked, onChange, name }: RadioProps) => {

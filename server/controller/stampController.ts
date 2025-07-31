@@ -1,16 +1,12 @@
-import {
-  HolderRow, PaginatedStampBalanceResponseBody,
-  ProcessedHolder, STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
-  STAMP_RANGES, STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES, StampBalance, StampRow, SUBPROTOCOLS
-} from "$globals";
+import { STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE, STAMP_RANGES, STAMP_SUFFIX_FILTERS, STAMP_TYPES } from "$types/stamp.d.ts";
+import { SUBPROTOCOLS } from "$types/base.d.ts";
 import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$constants";
 import { filterOptions } from "$lib/utils/data/filtering/filterOptions.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { StampService } from "$server/services/stampService.ts";
-import { CollectionController } from "./collectionController.ts";
+import { CollectionController } from "$server/controller/collectionController.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
 // import { formatSatoshisToBTC } from "$lib/utils/ui/formatting/formatUtils.ts"; // Fixed: Removed unused import
 import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
@@ -22,6 +18,9 @@ import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import type { StampBalance, StampRow } from "$types/stamp.d.ts";
+import type { PaginatedStampBalanceResponseBody } from "$types/api.d.ts";
+import type { HolderRow, ProcessedHolder } from "$types/wallet.d.ts";
 
 export class StampController {
   static async getStamps({
@@ -530,8 +529,6 @@ export class StampController {
       throw error;
     }
   }
-
-
 
   static async getMultipleStampCategories(categories: {
     idents: SUBPROTOCOLS[];

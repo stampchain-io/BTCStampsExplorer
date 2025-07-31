@@ -3,7 +3,7 @@
  * Provides mock data and utilities for MARA transaction testing
  */
 
-import type { MARATransactionEstimateConfig } from "../../lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts";
+import type { MARATransactionEstimateConfig } from "$lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts";
 
 // Common test configurations
 export const testConfigurations = {

@@ -2,7 +2,8 @@ import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
-import type { BasicUTXO, Output, UTXO } from "$types/index.d.ts";
+import type { BasicUTXO, UTXO } from "$types/base.d.ts";
+import type { Output } from "$types/transaction.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 
 export class BitcoinUtxoManager {

@@ -1,5 +1,5 @@
 /* ===== COLLECTION OVERVIEW CARD COMPONENT ===== */
-import { Collection } from "$globals";
+import type { Collection } from "$types/api.d.ts";
 import {
   abbreviateAddress,
   formatBTC,

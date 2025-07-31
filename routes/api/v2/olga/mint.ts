@@ -18,7 +18,7 @@ import type {
   NormalizedMintResponse,
   RawRequestBody,
   TransactionInput,
-} from "@/lib/types/api.d.ts";
+} from "$types/api.d.ts";
 
 export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
   async POST(req: Request, _ctx: FreshContext) {

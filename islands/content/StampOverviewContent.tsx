@@ -1,20 +1,10 @@
 /* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
 import { StampCard } from "$card";
-import { StampRow } from "$globals";
+import type { StampOverviewContentProps } from "$types/ui.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 /* ===== TYPES ===== */
-interface StampOverviewContentProps {
-  stamps: StampRow[];
-  isRecentSales?: boolean;
-  fromPage?: string;
-  pagination?: {
-    page: number;
-    totalPages: number;
-    prefix?: string;
-    onPageChange?: (page: number) => void;
-  };
-}
 
 /* ===== COMPONENT ===== */
 export function StampOverviewContent({

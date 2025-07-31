@@ -1,8 +1,9 @@
 /* ===== WALLET DISPENSER DETAILS COMPONENT ===== */
 import { Button } from "$button";
+import type { WalletDispenserDetailsProps } from "$types/ui.d.ts";
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
 import { StampImage } from "$content";
-import { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { openModal } from "$islands/modal/states.ts";
@@ -17,13 +18,6 @@ import { headingGreyLD, textXs, titleGreyLD } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface WalletDispenserDetailsProps {
-  walletData: WalletOverviewInfo;
-  stampsTotal: number;
-  src20Total: number;
-  stampsCreated: number;
-  setShowItem: (type: string) => void;
-}
 
 /* ===== STAMP STATS SUBCOMPONENT ===== */
 function StampStats({

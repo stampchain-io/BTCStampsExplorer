@@ -9,14 +9,14 @@
  * @reference https://github.com/mikeinspace/stamps/blob/main/spec.md
  */
 
-import type { CacheStatus, StampMarketData } from "./marketData.d.ts";
+import type { CacheStatus, StampMarketData } from "$types/marketData.d.ts";
 import type {
   SUBPROTOCOLS,
   TransactionInput,
   TransactionOutput,
   UTXO,
 } from "./base.d.ts";
-import type { PaginationProps } from "./pagination.d.ts";
+import type { PaginationProps } from "$types/pagination.d.ts";
 
 // ============================================================================
 // STAMP PROTOCOL ENUMS AND BASIC TYPES
