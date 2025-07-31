@@ -5,14 +5,14 @@
  * at runtime using Deno's capabilities.
  */
 
-import { assertEquals, assertRejects } from "@std/testing/asserts.ts";
+import { assertEquals } from "@std/assert";
 
 /**
  * Validates that a TypeScript declaration file compiles without errors
  */
 export async function validateTypeCompilation(filePath: string): Promise<void> {
   const command = new Deno.Command("deno", {
-    args: ["check", "--no-emit", filePath],
+    args: ["check", filePath],
     stderr: "piped",
   });
 
@@ -33,7 +33,7 @@ export async function validateTypeCompatibility(
   filePaths: string[],
 ): Promise<void> {
   const command = new Deno.Command("deno", {
-    args: ["check", "--no-emit", ...filePaths],
+    args: ["check", ...filePaths],
     stderr: "piped",
   });
 
@@ -50,7 +50,7 @@ export async function validateModuleImport(modulePath: string): Promise<void> {
   try {
     await import(modulePath);
   } catch (error) {
-    throw new Error(`Failed to import module ${modulePath}: ${error.message}`);
+    throw new Error(`Failed to import module ${modulePath}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 

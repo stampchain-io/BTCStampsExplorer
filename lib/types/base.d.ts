@@ -177,3 +177,152 @@ export interface BTCBalance {
   unconfirmed: number;
   total?: number;
 }
+
+// Domain and Protocol Types --------------------------------------------------
+
+/**
+ * Root domain types supported by the application
+ * These represent various Bitcoin-related domain extensions
+ */
+export type ROOT_DOMAIN_TYPES =
+  | ".btc"
+  | ".sats"
+  | ".xbt"
+  | ".x"
+  | ".pink";
+
+/**
+ * Supported subprotocols for Bitcoin stamps and tokens
+ */
+export type SUBPROTOCOLS =
+  | "STAMP"
+  | "SRC-20"
+  | "SRC-721"
+  | "SRC-101";
+
+// Bitcoin Block Types --------------------------------------------------------
+
+/**
+ * Represents a Bitcoin block row from the database
+ * Contains comprehensive block information including hashes and metadata
+ */
+export interface BlockRow {
+  /** The block height/index number */
+  block_index: number;
+  /** The block hash */
+  block_hash: string;
+  /** The timestamp when the block was mined */
+  block_time: number | Date;
+  /** The hash of the previous block */
+  previous_block_hash: string;
+  /** The mining difficulty of this block */
+  difficulty: number;
+  /** The ledger hash for this block */
+  ledger_hash: string;
+  /** The transaction list hash */
+  txlist_hash: string;
+  /** The messages hash for this block */
+  messages_hash: string;
+  /** Whether this block has been indexed (always 1) */
+  indexed: 1;
+  /** Optional: Number of issuances in this block */
+  issuances?: number;
+  /** Optional: Number of sends in this block */
+  sends?: number;
+}
+
+// Bitcoin Address and Wallet Types -------------------------------------------
+
+/**
+ * Bitcoin address information including balances and transaction counts
+ */
+export interface BtcInfo {
+  /** Bitcoin address */
+  address: string;
+  /** Confirmed balance in satoshis */
+  balance: number;
+  /** Total number of transactions */
+  txCount: number;
+  /** Unconfirmed balance in satoshis */
+  unconfirmedBalance: number;
+  /** Number of unconfirmed transactions */
+  unconfirmedTxCount: number;
+}
+
+/**
+ * Comprehensive wallet data types for wallet integrations
+ */
+export interface WalletDataTypes {
+  /** Array of account addresses */
+  accounts: string[];
+  /** Primary wallet address */
+  address: string;
+  /** Public key of the wallet */
+  publicKey: string;
+  /** Bitcoin balance breakdown */
+  btcBalance: {
+    /** Confirmed balance */
+    confirmed: number;
+    /** Unconfirmed balance */
+    unconfirmed: number;
+    /** Total balance (confirmed + unconfirmed) */
+    total: number;
+  };
+  /** Network type */
+  network: "mainnet" | "testnet";
+  /** Wallet provider name */
+  provider: string;
+}
+
+// Counterparty (XCP) Types ---------------------------------------------------
+
+/**
+ * Parameters for Counterparty (XCP) protocol operations
+ * Used for asset issuance, transfers, and other XCP transactions
+ */
+export interface XCPParams {
+  /** Optional filters for querying */
+  filters?: {
+    field: string;
+    op: string;
+    value: string;
+  }[];
+  /** Bitcoin address */
+  address?: string;
+  /** Asset name */
+  asset?: string;
+  /** Source address */
+  source?: string;
+  /** Quantity of the asset */
+  quantity?: number | string;
+  /** Whether the asset is divisible */
+  divisible?: boolean;
+  /** Whether to lock the issuance */
+  lock?: boolean;
+  /** Asset description */
+  description?: string;
+  /** Whether to reset the asset */
+  reset?: boolean;
+  /** Allow unconfirmed inputs in transactions */
+  allow_unconfirmed_inputs?: boolean;
+  /** Include extended transaction information */
+  extended_tx_info?: boolean;
+  /** Disable UTXO locks */
+  disable_utxo_locks?: boolean;
+  /** Fee per kilobyte in satoshis */
+  fee_per_kb?: number;
+}
+
+// Configuration Types --------------------------------------------------------
+
+/**
+ * Application configuration for minting services
+ */
+export interface Config {
+  /** Whether minting service fee is enabled */
+  MINTING_SERVICE_FEE_ENABLED: boolean;
+  /** The minting service fee amount */
+  MINTING_SERVICE_FEE: string | null;
+  /** The address to receive minting service fees */
+  MINTING_SERVICE_FEE_ADDRESS: string | null;
+}

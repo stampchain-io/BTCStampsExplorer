@@ -72,14 +72,22 @@ export {
   type AncestorInfo,
   type BaseFeeCalculatorProps,
   type BasicUTXO,
+  type BlockRow,
+  type BTCBalance,
+  type BtcInfo,
+  type Config,
   type FeeDetails,
   type FeeEstimationParams,
   type FeeEstimationResult,
+  type ROOT_DOMAIN_TYPES,
   type ScriptType,
   type SimpleFeeCalculatorProps,
+  type SUBPROTOCOLS,
   type TransactionInput,
   type TransactionOutput,
   type UTXO,
+  type WalletDataTypes,
+  type XCPParams,
 } from "./base.d.ts";
 
 export type { Deployment } from "./src20.d.ts";
