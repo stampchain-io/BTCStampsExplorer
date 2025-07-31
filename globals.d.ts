@@ -625,69 +625,6 @@ interface MintStatus {
   limit: number | null;
 }
 
-interface SRC101DeployDetail {
-  tx_hash: string;
-  block_index: number;
-  p: string;
-  op: string;
-  tick: string | null;
-  tick_hash: string | null;
-  name: string | null;
-  description: string | null;
-  wla: string | null;
-  imglp: string | null;
-  imgf: string | null;
-  creator: string;
-  pri: number | null;
-  lim: number | null;
-  mintstart: number | null;
-  mintend: number | null;
-  owner: string | null;
-  block_time: string;
-  recipients: string[];
-}
-
-export interface SRC101Balance {
-  address: string;
-  p: string;
-  deploy_hash: string;
-  tokenid: string;
-  tokenid_utf8: string;
-  expire_timestamp: number;
-  last_update: number;
-  address_btc: string;
-  address_eth: string;
-  txt_data: string;
-  img: string;
-  owner: string;
-}
-
-export interface Src101Detail {
-  tx_hash: string;
-  block_index: number;
-  p: string;
-  op: string;
-  tick: string | null;
-  tick_hash: string | null;
-  name: string | null;
-  tokenid: string[] | null;
-  tokenid_utf8: string | null;
-  description: string | null;
-  wla: string | null;
-  imglp: string | null;
-  imgf: string | null;
-  deploy_hash: string | null;
-  creator: string;
-  pri: number | null;
-  dua: number | null;
-  lim: number | null;
-  mintstart: number | null;
-  mintend: number | null;
-  owner: string | null;
-  toaddress: string | null;
-  destination: string;
-  block_time: string;
-}
 // Request Types ---------------------------------------------------------------
 
 export interface SRC20TrxRequestParams {
@@ -709,64 +646,6 @@ export interface SRC20TrxRequestParams {
   trendingWindow?: "24h" | "7d" | "30d"; // Time window for trending calculations
   includeProgress?: boolean; // Include progress_percentage, total_minted from market data
   mintVelocityMin?: number; // Minimum mint velocity for trending (mints per hour)
-}
-
-export interface SRC101TokenidsParams {
-  deploy_hash: string;
-  address_btc: string;
-  prim: boolean;
-  limit?: number;
-  page?: number;
-  sort?: string;
-}
-
-export interface SRC101ValidTxTotalCountParams {
-  tick?: string;
-  op?: string;
-  block_index?: string;
-  deploy_hash?: string;
-  tx_hash?: string;
-  address?: string;
-  limit?: number;
-  page?: number;
-}
-
-export interface SRC101OwnerParams {
-  deploy_hash?: string;
-  tokenid?: string;
-  index?: number;
-  expire?: number;
-  limit?: number;
-  page?: number;
-  sort?: string;
-}
-
-export interface SRC101TxParams {
-  tick?: string;
-  op?: string;
-  valid?: number;
-  block_index?: string;
-  deploy_hash?: string;
-  limit?: number;
-  page?: number;
-}
-
-export interface SRC101ValidTxParams {
-  tick?: string;
-  op?: string;
-  block_index?: string;
-  deploy_hash?: string;
-  tx_hash?: string;
-  address?: string;
-  limit?: number;
-  page?: number;
-}
-
-export interface Src101BalanceParams {
-  address: string | null;
-  limit?: number;
-  page?: number;
-  sort?: string;
 }
 
 // Response Types --------------------------------------------------------------
@@ -804,27 +683,6 @@ export interface PaginatedSrc20ResponseBody {
   limit: number;
   totalPages: number;
   data: EnrichedSRC20Row[]; // CHANGED from Src20Detail[] to EnrichedSRC20Row[]
-}
-
-export interface PaginatedSrc101ResponseBody {
-  last_block: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  data: Src101Detail[];
-}
-
-export interface TotalSrc101ResponseBody {
-  last_block: number;
-  data: number;
-}
-
-export interface TokenidSrc101ResponseBody {
-  last_block: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  data: string;
 }
 
 export interface PaginatedTickResponseBody {

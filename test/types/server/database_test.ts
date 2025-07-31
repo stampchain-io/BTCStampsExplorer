@@ -558,9 +558,9 @@ Deno.test("Repository Pattern Types", () => {
     findByTick: async (tick: string) => null,
     findByAddress: async (address: string, options?) => [],
     findBalances: async (address: string) => [],
-    getTokenHolders: async (tick: string) => 100,
-    getTotalSupply: async (tick: string) => "1000000",
-    getTokenStats: async (tick: string) => ({
+    getTokenHolders: async (_tick: string) => 100,
+    getTotalSupply: async (_tick: string) => "1000000",
+    getTokenStats: async (_tick: string) => ({
       totalSupply: "1000000",
       circulatingSupply: "500000",
       holders: 100,
@@ -583,7 +583,7 @@ Deno.test("Type Compatibility with Domain Types", () => {
   // Ensure database types are compatible with domain types
   
   // StampRow should be compatible with StampTableSchema (minus database-specific fields)
-  const stampData: StampRow = {} as StampRow;
+  const _stampData: StampRow = {} as StampRow;
   const stampSchema: StampTableSchema = {} as StampTableSchema;
   
   // These assignments should be valid where applicable
@@ -594,7 +594,7 @@ Deno.test("Type Compatibility with Domain Types", () => {
   assertType<boolean>(stampSchema.is_btc_stamp);
   
   // SRC20 types should be compatible
-  const src20Data: SRC20Row = {} as SRC20Row;
+  const _src20Data: SRC20Row = {} as SRC20Row;
   const src20Schema: SRC20TokenTableSchema = {} as SRC20TokenTableSchema;
   
   assertType<string>(src20Schema.tick);
@@ -603,7 +603,7 @@ Deno.test("Type Compatibility with Domain Types", () => {
   assertType<number>(src20Schema.dec);
   
   // Balance types should be compatible
-  const balanceData: SRC20Balance = {} as SRC20Balance;
+  const _balanceData: SRC20Balance = {} as SRC20Balance;
   const balanceSchema: SRC20BalanceTableSchema = {} as SRC20BalanceTableSchema;
   
   assertType<string>(balanceSchema.address);

@@ -404,4 +404,611 @@ export interface WalletOverviewInfo {
   creatorName?: string;
 }
 
+// ============================================================================
+// 🏠 Bitcoin Address Format Types & Discriminated Unions
+// ============================================================================
+
+/**
+ * Bitcoin address formats with proper discrimination
+ */
+export enum AddressFormat {
+  P2PKH = "p2pkh", // Legacy addresses (1...)
+  P2SH = "p2sh", // Script hash addresses (3...)
+  P2WPKH = "p2wpkh", // Native SegWit addresses (bc1q...)
+  P2TR = "p2tr", // Taproot addresses (bc1p...)
+}
+
+/**
+ * Base address interface for all Bitcoin address types
+ */
+export interface BaseAddress {
+  address: string;
+  format: AddressFormat;
+  network: "mainnet" | "testnet";
+  isValid: boolean;
+}
+
+/**
+ * P2PKH (Pay to Public Key Hash) address - Legacy format (1...)
+ */
+export interface P2PKHAddress extends BaseAddress {
+  format: AddressFormat.P2PKH;
+  type: "p2pkh";
+  publicKeyHash: string;
+}
+
+/**
+ * P2SH (Pay to Script Hash) address - Script hash format (3...)
+ */
+export interface P2SHAddress extends BaseAddress {
+  format: AddressFormat.P2SH;
+  type: "p2sh";
+  scriptHash: string;
+  redeemScript?: string;
+}
+
+/**
+ * P2WPKH (Pay to Witness Public Key Hash) - Native SegWit (bc1q...)
+ */
+export interface P2WPKHAddress extends BaseAddress {
+  format: AddressFormat.P2WPKH;
+  type: "p2wpkh";
+  witnessVersion: 0;
+  publicKeyHash: string;
+}
+
+/**
+ * P2TR (Pay to Taproot) - Taproot addresses (bc1p...)
+ */
+export interface P2TRAddress extends BaseAddress {
+  format: AddressFormat.P2TR;
+  type: "p2tr";
+  witnessVersion: 1;
+  taprootOutputKey: string;
+}
+
+/**
+ * Discriminated union of all Bitcoin address types
+ */
+export type BitcoinAddress =
+  | P2PKHAddress
+  | P2SHAddress
+  | P2WPKHAddress
+  | P2TRAddress;
+
+// ============================================================================
+// 🔍 Address Type Guards
+// ============================================================================
+
+/**
+ * Type guard for P2PKH addresses
+ */
+export function isP2PKHAddress(
+  address: BitcoinAddress | BaseAddress,
+): address is P2PKHAddress {
+  return address.format === AddressFormat.P2PKH;
+}
+
+/**
+ * Type guard for P2SH addresses
+ */
+export function isP2SHAddress(
+  address: BitcoinAddress | BaseAddress,
+): address is P2SHAddress {
+  return address.format === AddressFormat.P2SH;
+}
+
+/**
+ * Type guard for P2WPKH addresses
+ */
+export function isP2WPKHAddress(
+  address: BitcoinAddress | BaseAddress,
+): address is P2WPKHAddress {
+  return address.format === AddressFormat.P2WPKH;
+}
+
+/**
+ * Type guard for P2TR addresses
+ */
+export function isP2TRAddress(
+  address: BitcoinAddress | BaseAddress,
+): address is P2TRAddress {
+  return address.format === AddressFormat.P2TR;
+}
+
+/**
+ * Address validation patterns
+ */
+export const ADDRESS_PATTERNS = {
+  [AddressFormat.P2PKH]: /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
+  [AddressFormat.P2SH]: /^3[a-km-zA-HJ-NP-Z1-9]{25,34}$/,
+  [AddressFormat.P2WPKH]: /^bc1q[a-z0-9]{38,58}$/,
+  [AddressFormat.P2TR]: /^bc1p[a-z0-9]{58}$/,
+} as const;
+
+// ============================================================================
+// 🔗 Enhanced Wallet Provider Types
+// ============================================================================
+
+/**
+ * Standard wallet provider identifiers
+ */
+export type StandardWalletProvider =
+  | "unisat"
+  | "xverse"
+  | "hiro"
+  | "leather"
+  | "phantom";
+
+/**
+ * Base wallet provider interface that all providers must implement
+ */
+export interface BaseWalletProvider {
+  readonly name: StandardWalletProvider;
+  readonly version?: string;
+  readonly icon?: string;
+  isInstalled(): boolean;
+  connect(): Promise<WalletConnectionResult>;
+  disconnect(): Promise<void>;
+  getAccounts(): Promise<string[]>;
+  getNetwork(): Promise<"mainnet" | "testnet">;
+  getPublicKey(): Promise<string>;
+  getBalance(): Promise<BTCBalance>;
+  signMessage(message: string, address?: string): Promise<string>;
+  signPsbt(psbt: string): Promise<string>;
+  sendBitcoin(toAddress: string, satoshis: number): Promise<string>;
+}
+
+/**
+ * Wallet connection result
+ */
+export interface WalletConnectionResult {
+  success: boolean;
+  address?: string;
+  publicKey?: string;
+  network?: "mainnet" | "testnet";
+  error?: WalletError;
+}
+
+/**
+ * Enhanced wallet error with provider context
+ */
+export interface WalletError {
+  code: string;
+  message: string;
+  provider?: StandardWalletProvider;
+  timestamp: Date;
+  recoverable?: boolean;
+  userAction?: string;
+}
+
+// ============================================================================
+// 🔌 Provider-Specific Wallet Interfaces
+// ============================================================================
+
+/**
+ * Unisat Wallet API interface
+ */
+export interface UnisatWalletAPI extends BaseWalletProvider {
+  name: "unisat";
+  requestAccounts(): Promise<string[]>;
+  getAccounts(): Promise<string[]>;
+  getNetwork(): Promise<"mainnet" | "testnet">;
+  getPublicKey(): Promise<string>;
+  getBalance(): Promise<
+    { confirmed: number; unconfirmed: number; total: number }
+  >;
+  getInscriptions(cursor?: number, size?: number): Promise<{
+    total: number;
+    list: Array<{
+      inscriptionId: string;
+      inscriptionNumber: number;
+      address: string;
+      outputValue: number;
+      content: string;
+      contentLength: number;
+      contentType: string;
+      timestamp: number;
+    }>;
+  }>;
+  sendBitcoin(
+    toAddress: string,
+    satoshis: number,
+    options?: { feeRate?: number },
+  ): Promise<string>;
+  signMessage(
+    message: string,
+    type?: "ecdsa" | "bip322-simple",
+  ): Promise<string>;
+  signPsbt(
+    psbt: string,
+    options?: {
+      autoFinalized?: boolean;
+      toSignInputs?: Array<{ index: number; address?: string }>;
+    },
+  ): Promise<string>;
+  pushPsbt(psbt: string): Promise<string>;
+  on(event: string, handler: (data: any) => void): void;
+  removeListener(event: string, handler: (data: any) => void): void;
+}
+
+/**
+ * Xverse Wallet API interface
+ */
+export interface XverseWalletAPI extends BaseWalletProvider {
+  name: "xverse";
+  request(method: string, params?: any): Promise<any>;
+  getAddresses(): Promise<{
+    addresses: Array<{
+      address: string;
+      type: "p2wpkh" | "p2tr" | "p2sh";
+      publicKey: string;
+    }>;
+  }>;
+  signMessage(params: {
+    address: string;
+    message: string;
+  }): Promise<string>;
+  signPsbt(params: {
+    hex: string;
+    broadcast?: boolean;
+    inputsToSign?: Array<{
+      address: string;
+      signingIndexes: number[];
+      sigHash?: number;
+    }>;
+  }): Promise<{ psbtHex: string; txId?: string }>;
+  sendBtc(params: {
+    recipients: Array<{
+      address: string;
+      amountSats: number;
+    }>;
+  }): Promise<string>;
+  getCapabilities(): Promise<{
+    addresses: boolean;
+    signMessage: boolean;
+    signPsbt: boolean;
+    sendBtc: boolean;
+  }>;
+}
+
+/**
+ * Hiro Wallet API interface
+ */
+export interface HiroWalletAPI extends BaseWalletProvider {
+  name: "hiro";
+  request(method: string, params?: any): Promise<any>;
+  getAddresses(): Promise<{
+    addresses: Array<{
+      address: string;
+      type: "p2wpkh" | "p2tr";
+      publicKey: string;
+    }>;
+  }>;
+  signMessage(params: {
+    message: string;
+    address: string;
+  }): Promise<{ signature: string }>;
+  signPsbt(params: {
+    hex: string;
+    signAtIndex?: number[];
+    broadcast?: boolean;
+  }): Promise<{ hex: string; tx?: string }>;
+  sendTransfer(params: {
+    recipients: Array<{
+      address: string;
+      amount: number;
+    }>;
+  }): Promise<{ txid: string }>;
+}
+
+/**
+ * Leather Wallet API interface
+ */
+export interface LeatherWalletAPI extends BaseWalletProvider {
+  name: "leather";
+  request(method: string, params?: any): Promise<any>;
+  getAddresses(): Promise<{
+    addresses: Array<{
+      address: string;
+      type: "p2wpkh" | "p2tr" | "p2sh";
+      publicKey: string;
+    }>;
+  }>;
+  signMessage(params: {
+    message: string;
+    address: string;
+  }): Promise<{ messageSignature: string }>;
+  signPsbt(params: {
+    hex: string;
+    account?: number;
+    allowedSighash?: number[];
+  }): Promise<{ hex: string }>;
+}
+
+/**
+ * Union type of all specific wallet APIs
+ */
+export type WalletAPI =
+  | UnisatWalletAPI
+  | XverseWalletAPI
+  | HiroWalletAPI
+  | LeatherWalletAPI;
+
+/**
+ * Wallet provider factory interface
+ */
+export interface WalletProviderFactory {
+  createProvider(type: StandardWalletProvider): BaseWalletProvider | null;
+  getSupportedProviders(): StandardWalletProvider[];
+  isProviderAvailable(type: StandardWalletProvider): boolean;
+}
+
+// ============================================================================
+// 🌐 Global Window Extensions for Wallet Providers
+// ============================================================================
+
+declare global {
+  interface Window {
+    // Unisat
+    unisat?: UnisatWalletAPI;
+
+    // Xverse
+    XverseProviders?: {
+      BitcoinProvider: XverseWalletAPI;
+    };
+
+    // Hiro/Leather
+    HiroWalletProvider?: HiroWalletAPI;
+    LeatherProvider?: LeatherWalletAPI;
+
+    // Phantom (Bitcoin support)
+    phantom?: {
+      bitcoin?: BaseWalletProvider;
+    };
+
+    // Existing Horizon wallet (already defined above)
+    HorizonWalletProvider?: HorizonWalletAPI;
+  }
+}
+
+// ============================================================================
+// 🔐 Key Management and Security Types
+// ============================================================================
+
+/**
+ * Key derivation path for hierarchical deterministic wallets
+ */
+export interface KeyDerivationPath {
+  purpose: number; // BIP-44 purpose (44, 49, 84, 86)
+  coinType: number; // 0 for Bitcoin, 1 for testnet
+  account: number; // Account index
+  change: number; // 0 for external, 1 for internal
+  addressIndex: number; // Address index
+}
+
+/**
+ * Standard derivation paths for Bitcoin
+ */
+export const DERIVATION_PATHS = {
+  // BIP-44 Legacy (P2PKH) - m/44'/0'/0'/0/0
+  BIP44: { purpose: 44, coinType: 0, account: 0, change: 0, addressIndex: 0 },
+  // BIP-49 Nested SegWit (P2SH-P2WPKH) - m/49'/0'/0'/0/0
+  BIP49: { purpose: 49, coinType: 0, account: 0, change: 0, addressIndex: 0 },
+  // BIP-84 Native SegWit (P2WPKH) - m/84'/0'/0'/0/0
+  BIP84: { purpose: 84, coinType: 0, account: 0, change: 0, addressIndex: 0 },
+  // BIP-86 Taproot (P2TR) - m/86'/0'/0'/0/0
+  BIP86: { purpose: 86, coinType: 0, account: 0, change: 0, addressIndex: 0 },
+} as const;
+
+/**
+ * Public key information with derivation details
+ */
+export interface PublicKeyInfo {
+  publicKey: string; // Hex encoded public key
+  compressed: boolean; // Whether key is compressed
+  derivationPath?: KeyDerivationPath;
+  fingerprint?: string; // Key fingerprint for identification
+}
+
+/**
+ * Signature types supported by Bitcoin wallets
+ */
+export enum SignatureType {
+  ECDSA = "ecdsa", // Traditional ECDSA signatures
+  SCHNORR = "schnorr", // Schnorr signatures (Taproot)
+  BIP322_SIMPLE = "bip322-simple", // BIP-322 simple message signing
+  BIP322_FULL = "bip322-full", // BIP-322 full message signing
+}
+
+/**
+ * Message signing request parameters
+ */
+export interface MessageSigningRequest {
+  message: string;
+  address: string;
+  signatureType?: SignatureType;
+  derivationPath?: KeyDerivationPath;
+}
+
+/**
+ * Message signature result
+ */
+export interface MessageSignature {
+  signature: string;
+  signatureType: SignatureType;
+  address: string;
+  publicKey: string;
+  message: string;
+  timestamp: Date;
+}
+
+/**
+ * PSBT (Partially Signed Bitcoin Transaction) signing parameters
+ */
+export interface PSBTSigningRequest {
+  psbt: string; // Base64 encoded PSBT
+  signInputs?: Array<{ // Specific inputs to sign
+    index: number;
+    address?: string;
+    derivationPath?: KeyDerivationPath;
+    sigHash?: number; // Signature hash type
+  }>;
+  autoFinalize?: boolean; // Auto-finalize after signing
+  broadcast?: boolean; // Auto-broadcast after finalizing
+}
+
+/**
+ * PSBT signing result
+ */
+export interface PSBTSigningResult {
+  psbt: string; // Signed PSBT (base64)
+  txId?: string; // Transaction ID if broadcast
+  finalized: boolean; // Whether PSBT was finalized
+  broadcasted: boolean; // Whether transaction was broadcast
+  inputsSigned: number[]; // Indices of inputs that were signed
+}
+
+/**
+ * Wallet security features
+ */
+export interface WalletSecurityFeatures {
+  supportsHardwareWallet: boolean;
+  supportsMultisig: boolean;
+  supportsBip322: boolean;
+  supportsSchnorr: boolean;
+  supportsTaproot: boolean;
+  requiresUserConfirmation: boolean;
+  hasTimelock: boolean;
+  supportsRecoveryPhrase: boolean;
+}
+
+/**
+ * Wallet authentication state
+ */
+export interface WalletAuthState {
+  isLocked: boolean;
+  lastUnlocked?: Date;
+  sessionTimeout?: number; // Session timeout in milliseconds
+  requiresPin: boolean;
+  requiresBiometric: boolean;
+  maxFailedAttempts: number;
+  failedAttempts: number;
+}
+
+/**
+ * Encryption parameters for sensitive data
+ */
+export interface EncryptionParameters {
+  algorithm: "AES-256-GCM" | "ChaCha20-Poly1305";
+  keyDerivation: "PBKDF2" | "scrypt" | "Argon2";
+  iterations?: number;
+  salt: string;
+  iv: string;
+}
+
+/**
+ * Encrypted data container
+ */
+export interface EncryptedData {
+  data: string; // Encrypted data (base64)
+  encryption: EncryptionParameters;
+  timestamp: Date;
+  version: number;
+}
+
+// ============================================================================
+// 📋 Migrated Types from globals.d.ts Inventory
+// ============================================================================
+
+/**
+ * Wallet filter types for content display (migrated from globals)
+ */
+export type WALLET_FILTER_TYPES =
+  | "all"
+  | "stamps"
+  | "collections"
+  | "dispensers"
+  | "tokens";
+
+/**
+ * Holder information for wallet display (migrated from globals)
+ */
+export interface HolderRow {
+  address: string;
+  quantity: number;
+  divisible: boolean;
+}
+
+/**
+ * Processed holder data with percentage calculation (migrated from globals)
+ */
+export interface ProcessedHolder {
+  address: string;
+  amt: number;
+  percentage: number;
+}
+
+/**
+ * Wallet data types interface (migrated from globals)
+ */
+export interface WalletDataTypes {
+  accounts: string[];
+  address: string;
+  publicKey: string;
+  btcBalance: {
+    confirmed: number;
+    unconfirmed: number;
+    total: number;
+  };
+  network: "mainnet" | "testnet";
+  provider: string;
+}
+
+/**
+ * Address handler context for routing (migrated from globals)
+ */
+export interface AddressHandlerContext {
+  params: {
+    address: string;
+  };
+}
+
+/**
+ * Address and tick handler context for routing (migrated from globals)
+ */
+export interface AddressTickHandlerContext {
+  params: {
+    address: string;
+    tick: string | number;
+  };
+}
+
+/**
+ * Mint stamp input data interface (migrated from globals)
+ */
+export interface MintStampInputData {
+  sourceWallet: string;
+  assetName?: string;
+  qty: number;
+  locked: boolean;
+  divisible: boolean;
+  filename: string;
+  file: string;
+  satsPerKB: number;
+  service_fee: number;
+  service_fee_address: string;
+}
+
+/**
+ * BTC info interface from mempool/external APIs (migrated from globals)
+ */
+export interface BtcInfo {
+  address: string;
+  balance: number;
+  txCount: number;
+  unconfirmedBalance: number;
+  unconfirmedTxCount: number;
+}
+
 /* ===== EXISTING WALLET TYPES ===== */

@@ -57,7 +57,7 @@ export type IsUnknown<T> = IsAny<T> extends true ? false
 export type IsNever<T> = [T] extends [never] ? true : false;
 
 // Helper to create compile-time type tests
-export function typeTest<T extends true>(): void {
+export function typeTest<_T extends true>(): void {
   // This function exists only for its type parameter
   // It ensures compile-time type checking
 }
@@ -66,7 +66,7 @@ export function typeTest<T extends true>(): void {
 export type IsExact<T, U> = T extends U ? U extends T ? true : false : false;
 
 // Runtime assertion function for type testing (no-op at runtime)
-export function assertType<T>(value: T): void {
+export function assertType<T>(_value: T): void {
   // This is a no-op function used only for compile-time type checking
   // The presence of this call ensures TypeScript validates the type
 }
