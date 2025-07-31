@@ -190,7 +190,7 @@ export const cardHashSymbolGrey =
 export const cardStampNumberGrey =
   `font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate max-w-full text-lg min-[420px]:text-xl ${transition} ${cursor}`;
 
-/* ===== CARD CONFIGURATION ===== */
+/* ===== CARD CONFIGURATION - check if used ===== */
 export const ABBREVIATION_LENGTHS = {
   desktop: 5,
   tablet: 5,
