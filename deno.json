@@ -129,8 +129,13 @@
     "type:gradual": "deno run --allow-read --allow-write --allow-run scripts/setup-gradual-types.ts",
     "type:test": "deno check lib/types/**/*.d.ts server/types/**/*.d.ts && deno test --allow-read --allow-run test/types/ --no-check=remote",
     "type:test:watch": "deno test --allow-read --allow-run test/types/ --watch --no-check=remote",
+    "type:test:domain": "deno test --allow-read --allow-run test/types/ --filter=\"domain\" --no-check=remote",
+    "type:test:regression": "deno run --allow-read --allow-write --allow-run scripts/type-testing-pipeline.ts --mode=regression",
+    "type:test:ci": "deno run --allow-read --allow-write --allow-run scripts/type-testing-pipeline.ts --mode=ci",
+    "type:coverage": "deno run --allow-read --allow-write --allow-run scripts/type-testing-pipeline.ts --mode=coverage",
     "type:check": "deno check lib/types/**/*.d.ts server/types/**/*.d.ts",
-    "type:check:all": "deno check ."
+    "type:check:all": "deno check .",
+    "type:check:staged": "deno run --allow-read --allow-write --allow-run scripts/type-check-staged.ts"
   },
   "lint": {
     "rules": {
