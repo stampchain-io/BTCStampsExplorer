@@ -52,8 +52,8 @@ function mockFileSystem() {
       return Promise.resolve();
     };
 
-    // Mock Deno.writeTextFile
-    globalThis.Deno.writeTextFile = (
+    // Mock Deno.writeTextFile with custom toString to pass logger's mock detection
+    const mockWriteTextFile = (
       path: any,
       data: any,
       options?: any,
@@ -61,6 +61,9 @@ function mockFileSystem() {
       mockFileOperations.writeTextFile.push({ path, data, options });
       return Promise.resolve();
     };
+    // Override toString to not include "[native code]"
+    mockWriteTextFile.toString = () => "function mockWriteTextFile() { /* mocked */ }";
+    globalThis.Deno.writeTextFile = mockWriteTextFile;
 
     // Mock Deno.errors
     globalThis.Deno.errors = {
@@ -203,14 +206,16 @@ isolatedTest("logger - production vs development file writing logic", () => {
 isolatedTest("logger - file writing with directory already exists", async () => {
   setup();
 
-  // Mock mkdir to throw AlreadyExists error
-  globalThis.Deno.mkdir = () => {
+  // Mock mkdir to throw AlreadyExists error but still track the call
+  globalThis.Deno.mkdir = (path: any, options?: any) => {
+    mockFileOperations.mkdir.push({ path, options });
     const error = new (globalThis.Deno.errors.AlreadyExists)(
       "Directory already exists",
     );
     throw error;
   };
 
+  // Set to development mode to trigger file writing
   Deno.env.set("DENO_ENV", "development");
   Deno.env.set("DEBUG", "stamps");
 
