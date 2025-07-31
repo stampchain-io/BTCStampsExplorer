@@ -10,7 +10,10 @@ import {
   containerColForm,
   containerRowForm,
   glassmorphismLayer2,
-  loaderSpinGrey,
+  loaderSkeletonFull,
+  loaderSkeletonImage,
+  loaderSkeletonLg,
+  loaderSkeletonMd,
   transition,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -309,13 +312,77 @@ export function SRC20DeployTool(
   if (!config) {
     return (
       <div class={bodyTool}>
-        <h1 class={`${titleGreyLD} mobileMd:mx-auto mb-5`}>DEPLOY</h1>
+        <h1 class={`${titleGreyLD} mx-auto mb-4`}>DEPLOY</h1>
+
+        {/* Skeleton Form */}
         <div class={`${containerBackground} mb-6`}>
-          <div class="flex items-center justify-center p-8">
-            <div class={loaderSpinGrey}></div>
-            <span class="ml-3 text-stamp-grey-light">
-              Loading configuration...
-            </span>
+          <div class={containerRowForm}>
+            {/* Left Column Skeleton - Image upload and decimals */}
+            <div class={`${containerColForm} !w-[100px]`}>
+              {/* Image upload skeleton */}
+              <div class={loaderSkeletonImage}>
+              </div>
+
+              {/* Decimals input skeleton */}
+              <div class={`h-10 ${loaderSkeletonLg}`}>
+              </div>
+            </div>
+
+            {/* Right Column Skeleton - Token details */}
+            <div class={containerColForm}>
+              <div class={containerRowForm}>
+                {/* Ticker name input skeleton */}
+                <div class={`flex-1 h-10 ${loaderSkeletonLg}`}>
+                </div>
+
+                {/* Toggle switch skeleton */}
+                <div
+                  class={`w-10 h-5 ${loaderSkeletonFull}`}
+                >
+                </div>
+              </div>
+
+              {/* Supply input skeleton */}
+              <div class={`h-10 ${loaderSkeletonLg}`}>
+              </div>
+
+              {/* Limit per mint input skeleton */}
+              <div class={`h-10 ${loaderSkeletonLg}`}>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton Fee Calculator */}
+        <div class={containerBackground}>
+          {/* Fee slider skeleton */}
+          <div class="flex justify-between">
+            <div class={`h-4 w-28 ${loaderSkeletonMd}`}>
+            </div>
+            {/* Toggle switch skeleton */}
+            <div class={`w-10 h-5 ${loaderSkeletonFull}`}>
+            </div>
+          </div>
+          <div class={`h-4 w-[168px] mt-1 ${loaderSkeletonMd}`}>
+          </div>
+          {/* Fee slider skeleton */}
+          <div class={`h-3 w-[50%] mt-4 ${loaderSkeletonFull}`}>
+          </div>
+
+          {/* Estimate and fee details skeleton */}
+          <div class={`h-5 w-full min-[480px]:w-72 mt-8 ${loaderSkeletonMd}`}>
+          </div>
+          <div class={`h-4 w-16 mt-4 ${loaderSkeletonMd}`}>
+          </div>
+
+          {/* Terms and Submit button skeleton */}
+          <div class="flex justify-end pt-10">
+            <div class="flex flex-col space-y-3 items-end">
+              <div class={`h-4 w-[156px] tablet:w-56 ${loaderSkeletonMd}`}>
+              </div>
+              <div class={`h-10 tablet:h-9 w-[156px] ${loaderSkeletonMd}`}>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -325,7 +392,7 @@ export function SRC20DeployTool(
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mobileMd:mx-auto mb-5`}>DEPLOY</h1>
+      <h1 class={`${titleGreyLD} mx-auto mb-4`}>DEPLOY</h1>
 
       <form
         class={`${containerBackground} mb-6`}
@@ -343,7 +410,7 @@ export function SRC20DeployTool(
             {/* Image upload preview */}
             <div
               id="image-preview"
-              class={`relative flex flex-col items-center justify-center content-center mx-auto min-h-[100px] min-w-[100px] rounded ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer`}
+              class={`relative flex flex-col items-center justify-center content-center mx-auto min-h-[100px] min-w-[100px] ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer`}
               onMouseMove={handleMouseMove}
               onMouseEnter={handleUploadMouseEnter}
               onMouseLeave={handleUploadMouseLeave}
