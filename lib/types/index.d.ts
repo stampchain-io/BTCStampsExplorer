@@ -1,6 +1,6 @@
 import { DispenserRow } from "$globals";
 
-export * from "./api.ts";
+export * from "./api.d.ts";
 export * from "./fee-estimation.ts";
 export * from "./marketData.d.ts";
 export * from "./quicknode.d.ts";
@@ -8,6 +8,7 @@ export * from "./services.d.ts";
 export * from "./src101.d.ts";
 export * from "./src20.d.ts";
 export * from "./stamp.d.ts";
+export * from "./ui.d.ts";
 export * from "./utils.d.ts";
 export * from "./wallet.d.ts";
 
@@ -45,18 +46,28 @@ export type {
 
 // Re-export API types for convenience
 export type {
-  ApiErrorWithMarketContext,
-  ApiResponseWithMarketData,
-  BatchMarketDataResponse,
-  CollectionWithMarketDataResponse,
-  MarketDataCacheInfo,
-  MarketDataErrorResponse,
-  MarketDataHealthResponse,
-  PaginatedMarketDataResponse,
-  SRC20WithMarketDataResponse,
-  StampWithMarketDataResponse,
-  WithMarketDataResponse,
-} from "./api.ts";
+  AddressHandlerContext,
+  AddressTickHandlerContext,
+  BlockHandlerContext,
+  BlockInfoResponseBody,
+  DeployResponseBody,
+  IdentHandlerContext,
+  PaginatedDispenserResponseBody,
+  PaginatedIdResponseBody,
+  PaginatedSrc20BalanceResponseBody,
+  PaginatedSrc20ResponseBody,
+  PaginatedStampBalanceResponseBody,
+  PaginatedStampResponseBody,
+  PaginatedTickResponseBody,
+  Src20BalanceResponseBody,
+  Src20ResponseBody,
+  SRC20SnapshotRequestParams,
+  SRC20TrxRequestParams,
+  StampBlockResponseBody,
+  StampPageProps,
+  StampsAndSrc20,
+  TickHandlerContext,
+} from "./api.d.ts";
 
 // Re-export extended interfaces with optional market data
 export type { StampWithOptionalMarketData } from "./stamp.d.ts";
