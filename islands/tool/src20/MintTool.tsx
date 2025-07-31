@@ -8,16 +8,20 @@ import {
   containerBackground,
   containerColForm,
   containerRowForm,
+  glassmorphismLayer2,
   imagePreviewTool,
-  loaderSpinGrey,
+  loaderSkeletonFull,
+  loaderSkeletonImage,
+  loaderSkeletonLg,
+  loaderSkeletonMd,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
-import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
-import { logger } from "$lib/utils/logger.ts";
 import { extractSRC20ErrorMessage } from "$lib/utils/bitcoin/src20/errorHandling.tsx";
+import { logger } from "$lib/utils/logger.ts";
+import { mapProgressiveFeeDetails } from "$lib/utils/performance/fees/fee-estimation-utils.ts";
 import { StatusMessages } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { labelSm, labelXl, titlePurpleLD, valueSm, valueXl } from "$text";
+import { labelLg, labelSm, titleGreyLD, valueLg, valueSm } from "$text";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -42,12 +46,14 @@ const MintProgress = (
   { progress, progressWidth, maxSupply, limit, minters }: MintProgressProps,
 ) => {
   return (
-    <div class="flex justify-between items-end">
+    <div class="flex flex-col min-[480px]:flex-row
+    min-[480px]:justify-between min-[480px]:items-end
+    gap-3 min-[480px]:gap-0 mt-2 min-[480px]:mt-0">
       {/* Progress indicator */}
-      <div class=" flex flex-col w-1/2 gap-1.5">
-        <h5 class={labelXl}>
+      <div class="flex flex-col w-full min-[480px]:w-[55%] gap-1.5">
+        <h5 class={labelLg}>
           PROGRESS
-          <span class={`${valueXl} pl-3`}>
+          <span class={`${valueLg} pl-3`}>
             {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0]}
             <span class="font-light">
               %
@@ -55,16 +61,22 @@ const MintProgress = (
           </span>
         </h5>
         {/* Progress bar */}
-        <div class="relative w-full max-w-[420px] h-1.5 bg-stamp-grey rounded-full">
+        <div
+          class={`relative w-full max-w-[420px] h-3 ${glassmorphismLayer2} rounded-full`}
+        >
           <div
-            class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
+            class="absolute top-[1px] left-[1px] right-[1px] h-2 bg-stamp-grey rounded-full"
             style={{ width: progressWidth }}
           />
         </div>
       </div>
 
       {/* Supply and limit information */}
-      <div class="flex flex-col w-1/2 justify-end items-end -mb-1">
+      <div
+        class={`flex flex-col w-full items-start mt-2
+        min-[480px]:w-[45%] min-[480px]:justify-end min-[480px]:items-end
+        min-[480px]:-mb-1`}
+      >
         <h5 class={labelSm}>
           SUPPLY <span class={`${valueSm} pl-1.5`}>{maxSupply}</span>
         </h5>
@@ -100,6 +112,7 @@ export function SRC20MintTool({
     handleChangeFee,
     handleInputChange,
     handleSubmit,
+    config,
     isSubmitting,
     submissionMessage,
     apiError,
@@ -355,10 +368,94 @@ export function SRC20MintTool({
     }
   }, [progressiveFeeDetails, isEstimating, currentPhase]);
 
+  /* ===== CONFIG CHECK ===== */
+  if (!config) {
+    return (
+      <div class={bodyTool}>
+        <h1 class={`${titleGreyLD} mx-auto mb-4`}>MINT</h1>
+
+        {/* Skeleton Form */}
+        <div class={`${containerBackground} mb-6`}>
+          <div class={`${containerRowForm} mb-5`}>
+            {/* Token image preview skeleton */}
+            <div class={loaderSkeletonImage}>
+            </div>
+
+            {/* Token inputs skeleton */}
+            <div class={containerColForm}>
+              {/* Token search field skeleton */}
+              <div class={`h-10 ${loaderSkeletonLg}`}>
+              </div>
+
+              {/* Amount input skeleton */}
+              <div class={`h-10 ${loaderSkeletonLg}`}>
+              </div>
+            </div>
+          </div>
+
+          {/* Mint progress skeleton */}
+          <div class="flex flex-col min-[480px]:flex-row
+          min-[480px]:justify-between min-[480px]:items-end
+          gap-4 min-[480px]:gap-0 mt-2 min-[480px]:mt-0">
+            {/* Progress indicator skeleton */}
+            <div class="flex flex-col w-full min-[480px]:w-[55%] gap-2.5">
+              <div class={`h-4 w-36 ${loaderSkeletonMd}`}>
+              </div>
+              {/* Progress bar skeleton */}
+              <div
+                class={`relative w-full max-w-[420px] h-3 ${loaderSkeletonFull}`}
+              >
+              </div>
+            </div>
+
+            {/* Supply and limit information skeleton */}
+            <div class="flex flex-col w-full items-start mt-2 min-[480px]:w-[45%] min-[480px]:justify-end min-[480px]:items-end min-[480px]:-mb-1">
+              <div class={`h-14 min-[480px]:h-[52px] w-24 ${loaderSkeletonMd}`}>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton Fee Calculator */}
+        <div class={containerBackground}>
+          {/* Fee slider skeleton */}
+          <div class="flex justify-between">
+            <div class={`h-4 w-28 ${loaderSkeletonMd}`}>
+            </div>
+            {/* Toggle switch skeleton */}
+            <div class={`w-10 h-5 ${loaderSkeletonFull}`}>
+            </div>
+          </div>
+          <div class={`h-4 w-[168px] mt-1 ${loaderSkeletonMd}`}>
+          </div>
+          {/* Fee slider skeleton */}
+          <div class={`h-3 w-[50%] mt-4 ${loaderSkeletonFull}`}>
+          </div>
+
+          {/* Estimate and fee details skeleton */}
+          <div class={`h-5 w-full min-[480px]:w-72 mt-8 ${loaderSkeletonMd}`}>
+          </div>
+          <div class={`h-4 w-16 mt-4 ${loaderSkeletonMd}`}>
+          </div>
+
+          {/* Terms and Submit button skeleton */}
+          <div class="flex justify-end pt-10">
+            <div class="flex flex-col space-y-3 items-end">
+              <div class={`h-4 w-[156px] tablet:w-56 ${loaderSkeletonMd}`}>
+              </div>
+              <div class={`h-10 tablet:h-9 w-[156px] ${loaderSkeletonMd}`}>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>MINT</h1>
+      <h1 class={`${titleGreyLD} mx-auto mb-4`}>MINT</h1>
 
       {/* ===== ERROR MESSAGE DISPLAY ===== */}
       {error && (
@@ -377,7 +474,7 @@ export function SRC20MintTool({
         novalidate
       >
         {/* ===== TOKEN SEARCH AND AMOUNT INPUT ===== */}
-        <div class={`${containerRowForm} mb-5`}>
+        <div class={`${containerRowForm} mb-3`}>
           {/* Token image preview */}
           <div
             id="image-preview"
@@ -400,7 +497,7 @@ export function SRC20MintTool({
                 <Icon
                   type="icon"
                   name="uploadImage"
-                  weight="normal"
+                  weight="extraLight"
                   size="xxl"
                   color="grey"
                 />
@@ -461,7 +558,8 @@ export function SRC20MintTool({
                   !isSelecting;
                 return shouldShow;
               })() && (
-                <ul class="absolute top-[100%] left-0 max-h-[168px] w-full bg-stamp-grey-light border border-stamp-grey rounded-b-md text-stamp-grey-darkest text-sm leading-none font-bold z-[11] overflow-y-auto scrollbar-grey shadow-lg">
+                <ul class="absolute top-[100%] left-0 max-h-[146px] w-full bg-[#252026]/90 border-b-[1px] backdrop-blur-xl border-stamp-grey-darker/20 rounded-b-lg text-stamp-grey-light text-sm leading-none font-bold z-[11]
+                overflow-y-auto scrollbar-glassmorphism shadow-lg">
                   {searchResults.map((result: SearchResult) => (
                     <li
                       key={result.tick}
@@ -469,10 +567,10 @@ export function SRC20MintTool({
                         e.preventDefault(); // Prevent input blur
                         handleResultClick(result.tick);
                       }}
-                      class="p-3 pl-4 hover:bg-stamp-grey-darker hover:text-stamp-grey-light uppercase cursor-pointer border-b border-stamp-grey last:border-b-0 transition-colors duration-150"
+                      class="flex justify-between py-2 px-3 hover:bg-stamp-grey-darker/50 hover:text-stamp-grey-light uppercase border-x-[1px] border-b-[1px] border-stamp-grey-darker/20 last:border-b-0 transition-colors duration-200 cursor-pointer"
                     >
-                      <div class="font-bold text-base">{result.tick}</div>
-                      <div class="font-medium text-xs text-stamp-grey-darker opacity-75 mt-1">
+                      <div class="font-medium text-sm">{result.tick}</div>
+                      <div class="font-medium text-xs text-stamp-grey-darker mt-0.5">
                         {(result.progress || 0).toFixed(1)}% minted
                       </div>
                     </li>
