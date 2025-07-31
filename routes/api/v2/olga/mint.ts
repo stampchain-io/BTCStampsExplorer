@@ -13,71 +13,12 @@ import {
   normalizeFeeRate,
 } from "$server/services/counterpartyApiService.ts";
 import * as bitcoin from "bitcoinjs-lib"; // Keep for Psbt.fromHex
-
-// Define TransactionInput if not available globally or for clarity here
-interface TransactionInput {
-  txid: string;
-  vout: number;
-  signingIndex: number;
-}
-
-// Interface for the raw request body, allowing flexible types for parsing
-interface RawRequestBody {
-  sourceWallet?: string;
-  assetName?: string;
-  qty?: number | string;
-  locked?: boolean;
-  divisible?: boolean;
-  filename?: string;
-  file?: string;
-  description?: string; // Now explicitly on RawRequestBody
-  prefix?: "stamp" | "file" | "glyph"; // Now explicitly on RawRequestBody
-  dryRun?: boolean;
-  satsPerKB?: number | string;
-  satsPerVB?: number | string;
-  feeRate?: number | string;
-  service_fee?: number | string;
-  service_fee_address?: string;
-  isPoshStamp?: boolean;
-  // MARA integration parameters
-  outputValue?: number | string; // Custom dust value (1-332)
-  maraFeeRate?: number | string; // Pre-fetched MARA fee rate from frontend
-  // Include other fields from MintStampInputData if they can be in the body
-}
-
-// Type for the object passed to StampCreationService.createStampIssuance
-// This should match the parameters of that method precisely.
-interface CreateStampIssuanceParams {
-  sourceWallet: string;
-  assetName: string;
-  qty: string; // ← FIXED: Service expects string, not number
-  locked: boolean;
-  divisible: boolean;
-  filename: string;
-  file: string;
-  satsPerKB: number;
-  satsPerVB: number;
-  description: string;
-  prefix: "stamp" | "file" | "glyph";
-  isDryRun?: boolean;
-  service_fee: number;
-  service_fee_address: string;
-  outputValue?: number; // Optional custom dust value for MARA mode
-}
-
-interface NormalizedMintResponse {
-  hex: string;
-  cpid: string;
-  est_tx_size: number;
-  input_value: number;
-  total_dust_value: number;
-  est_miner_fee: number;
-  change_value: number;
-  total_output_value: number;
-  txDetails: TransactionInput[];
-  is_estimate?: boolean;
-  estimation_method?: string;
-}
+import type {
+  RawRequestBody,
+  CreateStampIssuanceParams,
+  NormalizedMintResponse,
+  TransactionInput,
+} from "@/lib/types/api.d.ts";
 
 export const handler: Handlers<NormalizedMintResponse | { error: string }> = {
   async POST(req: Request, _ctx: FreshContext) {

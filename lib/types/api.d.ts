@@ -278,6 +278,196 @@ export interface PaginatedDispenserResponseBody {
 }
 
 // ============================================================================
+// Extracted Inline API Types
+// ============================================================================
+
+/**
+ * OLGA API - Fee Estimation Request Body
+ * Used by the OLGA minting estimation endpoint
+ */
+export interface EstimateRequest {
+  filename: string;
+  file: string;
+  qty?: number | string;
+  satsPerVB?: number | string;
+  satsPerKB?: number | string;
+  feeRate?: number | string;
+  service_fee?: number | string;
+  isPoshStamp?: boolean;
+}
+
+/**
+ * OLGA API - Fee Estimation Response Body
+ * Comprehensive fee estimation response from OLGA endpoint
+ */
+export interface EstimateResponse {
+  est_tx_size: number;
+  total_dust_value: number;
+  est_miner_fee: number;
+  total_cost: number;
+  fee_breakdown: {
+    miner_fee: number;
+    dust_value: number;
+    service_fee: number;
+  };
+  file_info: {
+    size_bytes: number;
+    cip33_addresses_count: number;
+  };
+  is_estimate: true;
+  estimation_method: "dummy_utxos";
+  dummy_utxo_value: number;
+}
+
+/**
+ * OLGA API - Raw Mint Request Body
+ * Flexible request body for OLGA minting operations
+ */
+export interface RawRequestBody {
+  sourceWallet?: string;
+  assetName?: string;
+  qty?: number | string;
+  locked?: boolean;
+  divisible?: boolean;
+  filename?: string;
+  file?: string;
+  description?: string;
+  prefix?: "stamp" | "file" | "glyph";
+  dryRun?: boolean;
+  satsPerKB?: number | string;
+  satsPerVB?: number | string;
+  feeRate?: number | string;
+  service_fee?: number | string;
+  service_fee_address?: string;
+  isPoshStamp?: boolean;
+  // MARA integration parameters
+  outputValue?: number | string;
+  maraFeeRate?: number | string;
+}
+
+/**
+ * OLGA API - Transaction Input Type
+ * Represents Bitcoin transaction input for OLGA operations
+ */
+export interface TransactionInput {
+  txid: string;
+  vout: number;
+  signingIndex: number;
+}
+
+/**
+ * OLGA API - Stamp Creation Parameters
+ * Normalized parameters passed to StampCreationService
+ */
+export interface CreateStampIssuanceParams {
+  sourceWallet: string;
+  assetName: string;
+  qty: string;
+  locked: boolean;
+  divisible: boolean;
+  filename: string;
+  file: string;
+  satsPerKB: number;
+  satsPerVB: number;
+  description: string;
+  prefix: "stamp" | "file" | "glyph";
+  isDryRun?: boolean;
+  service_fee: number;
+  service_fee_address: string;
+  outputValue?: number;
+}
+
+/**
+ * OLGA API - Normalized Mint Response
+ * Response structure for OLGA minting operations
+ */
+export interface NormalizedMintResponse {
+  hex: string;
+  cpid: string;
+  est_tx_size: number;
+  input_value: number;
+  total_dust_value: number;
+  est_miner_fee: number;
+  change_value: number;
+  total_output_value: number;
+  txDetails: TransactionInput[];
+  is_estimate?: boolean;
+  estimation_method?: string;
+}
+
+/**
+ * Transaction API - PSBT Creation Input
+ * Input parameters for creating Bitcoin PSBTs
+ */
+export interface CreatePSBTInput {
+  utxo: string;
+  salePrice: number;
+  sellerAddress: string;
+}
+
+/**
+ * Transaction API - PSBT Creation Response
+ * Response containing the created PSBT hex
+ */
+export interface CreatePSBTResponse {
+  psbt: string;
+}
+
+/**
+ * Send API - Send Request Body
+ * Request body for Counterparty send operations
+ */
+export interface SendRequestBody {
+  address: string;
+  destination: string;
+  asset: string;
+  quantity: number;
+  satsPerVB: number;
+  options?: {
+    service_fee?: number;
+    service_fee_address?: string;
+    memo?: string;
+    memo_is_hex?: boolean;
+    encoding?: string;
+    fee_per_kb?: number;
+    return_psbt?: boolean;
+  };
+  dryRun?: boolean;
+}
+
+/**
+ * Send API - Send Response
+ * Response structure for send operations
+ */
+export interface SendResponse {
+  psbtHex?: string;
+  inputsToSign?: { index: number; address: string; sighashTypes?: number[] }[];
+  estimatedFee?: number;
+  estimatedVsize?: number;
+}
+
+/**
+ * SRC-20 API - Create Response
+ * Response structure for SRC-20 token creation operations
+ */
+export interface SRC20CreateResponse {
+  hex?: string;
+  est_tx_size?: number;
+  input_value?: number;
+  total_dust_value?: number;
+  est_miner_fee?: number;
+  fee?: number;
+  change_value?: number;
+  inputsToSign?: Array<
+    { index: number; address: string; sighashType?: number }
+  >;
+  sourceAddress?: string;
+  changeAddress?: string;
+  feeDetails?: any;
+  cpid?: string;
+}
+
+// ============================================================================
 // Composite API Types
 // ============================================================================
 

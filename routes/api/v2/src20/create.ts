@@ -5,6 +5,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
 import { AncestorInfo, InputData } from "$types/index.d.ts";
+import type { SRC20CreateResponse } from "@/lib/types/api.d.ts";
 
 type TrxType = "multisig" | "olga";
 
@@ -23,23 +24,6 @@ interface ExtendedInputData
   desc?: string;
   img?: string; // Simple protocol:hash format (max 32 chars)
   icon?: string; // Simple protocol:hash format (max 32 chars)
-}
-
-interface SRC20CreateResponse {
-  hex?: string;
-  est_tx_size?: number;
-  input_value?: number;
-  total_dust_value?: number;
-  est_miner_fee?: number;
-  fee?: number;
-  change_value?: number;
-  inputsToSign?: Array<
-    { index: number; address: string; sighashType?: number }
-  >;
-  sourceAddress?: string;
-  changeAddress?: string;
-  feeDetails?: any;
-  cpid?: string;
 }
 
 export const handler: Handlers<SRC20CreateResponse | TXError> = {

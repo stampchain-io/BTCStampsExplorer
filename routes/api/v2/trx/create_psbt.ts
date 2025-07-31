@@ -4,16 +4,7 @@ import { logger } from "$lib/utils/logger.ts";
 import {
   createBitcoinTransactionBuilder,
 } from "$server/services/transaction/index.ts";
-
-interface CreatePSBTInput {
-  utxo: string;
-  salePrice: number;
-  sellerAddress: string;
-}
-
-interface CreatePSBTResponse {
-  psbt: string;
-}
+import type { CreatePSBTInput, CreatePSBTResponse } from "@/lib/types/api.d.ts";
 
 export const handler: Handlers = {
   async POST(req: Request) {
