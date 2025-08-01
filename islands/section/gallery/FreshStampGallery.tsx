@@ -4,11 +4,14 @@
  * world-class sorting infrastructure integration
  */
 
-import type { StampRow } from "$types/stamp.d.ts";
-import type { FreshStampGalleryProps, PaginationState } from "$types/ui.d.ts";
 import { LoadingIcon } from "$icon";
 import { StampCard } from "$islands/card/StampCard.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import type {
+  FreshStampGalleryProps,
+  PaginationState,
+  StampRow,
+} from "$types/stamp.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 // ===== TYPES =====

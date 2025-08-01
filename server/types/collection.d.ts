@@ -1,7 +1,6 @@
+import type { ValidationResult } from "$types/errors.d.ts";
 import type { CacheStatus, CollectionMarketData } from "$types/marketData.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
-import type { ValidationResult } from "$types/errors.d.ts";
-import type { PaginationQueryParams } from "$types/pagination.d.ts";
 
 // Re-export types that are used by other modules
 export type { StampRow };
@@ -95,17 +94,17 @@ export interface CollectionProcessor {
    * Process raw collection data from database
    */
   processRawCollection(raw: any): CollectionRow;
-  
+
   /**
    * Enrich collection with additional data
    */
   enrichCollection(collection: CollectionRow): Promise<CollectionWithOptionalMarketData>;
-  
+
   /**
    * Process multiple collections in batch
    */
   processBatch(collections: CollectionRow[]): Promise<CollectionWithOptionalMarketData[]>;
-  
+
   /**
    * Transform collection for API response
    */
@@ -164,17 +163,17 @@ export interface CollectionAggregator {
    * Aggregate market data for collections
    */
   aggregateMarketData(collectionIds: string[]): Promise<CollectionMarketDataAggregation>;
-  
+
   /**
    * Calculate collection metrics
    */
   calculateMetrics(collection: CollectionRow): CollectionMetrics;
-  
+
   /**
    * Aggregate creator statistics
    */
   aggregateCreatorStats(creatorAddress: string): Promise<CreatorStatistics>;
-  
+
   /**
    * Generate collection rankings
    */
@@ -280,37 +279,37 @@ export interface CollectionIndex {
    * Index by collection ID
    */
   byId: Map<string, CollectionRow>;
-  
+
   /**
    * Index by creator address
    */
   byCreator: Map<string, string[]>;
-  
+
   /**
    * Index by stamp ID
    */
   byStamp: Map<number, string>;
-  
+
   /**
    * Index by name (normalized)
    */
   byName: Map<string, string>;
-  
+
   /**
    * Build indices from collections
    */
   build(collections: CollectionRow[]): void;
-  
+
   /**
    * Update index with new collection
    */
   update(collection: CollectionRow): void;
-  
+
   /**
    * Remove collection from index
    */
   remove(collectionId: string): void;
-  
+
   /**
    * Search collections
    */
@@ -335,7 +334,7 @@ export interface CollectionSearchQuery {
 /**
  * Collection sort field
  */
-export type CollectionSortField = 
+export type CollectionSortField =
   | 'name'
   | 'stampCount'
   | 'editionCount'
@@ -356,22 +355,22 @@ export interface CollectionValidator {
    * Validate collection data
    */
   validate(collection: Partial<CollectionRow>): ValidationResult<CollectionRow>;
-  
+
   /**
    * Validate collection ID format
    */
   validateId(id: string): boolean;
-  
+
   /**
    * Validate collection name
    */
   validateName(name: string): ValidationResult<string>;
-  
+
   /**
    * Validate stamp array
    */
   validateStamps(stamps: number[]): ValidationResult<number[]>;
-  
+
   /**
    * Validate creator addresses
    */
@@ -533,3 +532,19 @@ export declare function isCollectionRow(value: any): value is CollectionRow;
 export declare function isCollectionWithMarketData(
   value: any
 ): value is CollectionWithOptionalMarketData;
+
+// ============================================================================
+// COLLECTION GALLERY AND UI COMPONENT PROPS
+// ============================================================================
+
+/**
+ * Props for CollectionGallery component
+ */
+export interface CollectionGalleryProps {
+  title?: string;
+  subTitle?: string;
+  collections: CollectionRow[];
+  gridClass?: string;
+  displayCounts?: any;
+  pagination?: any;
+}

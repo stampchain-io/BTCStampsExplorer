@@ -10,6 +10,8 @@
  */
 
 import type { ButtonProps } from "$button";
+import type { Timeframe } from "$components/layout/types.ts";
+import type { SRC20Transaction, StampTransaction } from "$types/stamping.ts";
 import type { FeeDetails } from "$types/base.d.ts";
 
 import type { SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
@@ -232,6 +234,353 @@ export interface BTCValueSummaryProps {
   values: number[];
   className?: string;
   showTotal?: boolean;
+}
+
+export interface StatItemProps {
+  label: string;
+  value: string;
+  align?: "left" | "center" | "right";
+  class?: string;
+  href?: string;
+  target?: "_self" | "_blank";
+}
+
+export interface StatTitleProps {
+  label: string;
+  value: string;
+  align?: "left" | "center" | "right";
+  href?: string;
+  target?: "_self" | "_blank";
+}
+
+export interface RadioProps {
+  label: string;
+  value: string;
+  checked: boolean;
+  onChange: () => void;
+  name: string;
+}
+
+export interface StampSalesProps {
+  // For StampSalesTable
+  dispenses?: Array<{
+    source: string;
+    destination: string;
+    dispense_quantity: number;
+    satoshirate: number;
+    tx_hash: string;
+    block_time: number | null;
+  }>;
+  // For StampSalesGallery
+  initialData?: Array<any>;
+  title?: string;
+  subTitle?: string;
+  variant?: string;
+  displayCounts?: {
+    mobileSm: number;
+    mobileMd: number;
+    mobileLg: number;
+    tablet: number;
+    desktop: number;
+  };
+  gridClass?: string;
+}
+
+export interface ToolSrc20PageProps {
+  selectedTab: string;
+  trxType: "multisig" | "olga";
+  tick?: string | null;
+  mintStatus?: any;
+  holders?: number;
+  error?: string;
+}
+
+export interface ToolsSrc101PageProps {
+  selectedTab: string;
+  trxType: "multisig" | "olga";
+  error?: string;
+}
+
+export interface ToolStampPageProps {
+  selectedTab: string;
+  trxType: "multisig" | "olga";
+  error?: string;
+}
+
+export interface ToolFairmintPageProps {
+  fairminters: Array<any>;
+  error?: string;
+}
+
+export interface WalletProviderProps {
+  providerKey: string;
+  onSuccess: () => void;
+}
+
+export interface WalletDashboardDetailsProps {
+  walletData: any; // Replace with proper WalletData type if available
+  stampsTotal: number;
+  src20Total: number;
+  stampsCreated: number;
+  setShowItem: (item: string) => void;
+}
+
+export interface WalletProfileDetailsProps {
+  walletData: any; // Replace with proper WalletData type if available
+  stampsTotal: number;
+  src20Total: number;
+  stampsCreated: number;
+  setShowItem: (item: string) => void;
+}
+
+export interface WalletDispenserDetailsProps {
+  walletData: any; // Replace with proper WalletData type if available
+}
+
+export interface TransactionProgressProps {
+  steps: Array<{
+    id: string;
+    label: string;
+    status: "pending" | "active" | "completed" | "error";
+  }>;
+  class?: string;
+}
+
+export interface SpinnerProps {
+  size?: "sm" | "md" | "lg";
+  color?: string;
+  class?: string;
+}
+
+export interface TextareaProps extends JSX.HTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  error?: string;
+  placeholder?: string;
+  rows?: number;
+  cols?: number;
+  maxLength?: number;
+  required?: boolean;
+}
+
+export interface SRC20InputFieldProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  error?: string;
+  required?: boolean;
+  type?: "text" | "number";
+}
+
+export interface SRC20GalleryProps {
+  tokens: Array<any>;
+  loading?: boolean;
+  error?: string;
+  onLoadMore?: () => void;
+}
+
+export interface SRC101RegisterToolProps {
+  onRegister: (data: any) => void;
+  loading?: boolean;
+  error?: string;
+}
+
+export interface StatusMessagesProps {
+  messages: Array<{
+    type: "info" | "warning" | "error" | "success";
+    message: string;
+  }>;
+  onDismiss?: (index: number) => void;
+}
+
+export interface StampOverviewContentProps {
+  stamp: any;
+  marketData?: any;
+  loading?: boolean;
+  error?: string;
+}
+
+export interface StampListingsAllProps {
+  listings: Array<any>;
+  loading?: boolean;
+  error?: string;
+  onSelect?: (listing: any) => void;
+}
+
+export interface StampListingsOpenProps {
+  openListings: Array<any>;
+  loading?: boolean;
+  error?: string;
+  onSelect?: (listing: any) => void;
+}
+
+export interface SRC20OverviewContentProps {
+  token: any;
+  marketData?: any;
+  loading?: boolean;
+  error?: string;
+}
+
+export interface StyledSortingButtonsProps {
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+  onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
+  options: Array<{
+    key: string;
+    label: string;
+  }>;
+}
+
+export interface StyledSortingDropdownProps {
+  value: string;
+  onChange: (value: string) => void;
+  options: Array<{
+    value: string;
+    label: string;
+  }>;
+  placeholder?: string;
+}
+
+export interface StyledSortingErrorProps {
+  error: string;
+  onRetry?: () => void;
+}
+
+export interface StyledSortingLabelProps {
+  label: string;
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+  onClick: () => void;
+  active?: boolean;
+}
+
+export interface SelectProps extends JSX.HTMLAttributes<HTMLSelectElement> {
+  options: Array<{
+    value: string;
+    label: string;
+  }>;
+  placeholder?: string;
+  error?: string;
+  label?: string;
+}
+
+export interface SortProps {
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+  onSort: (sortBy: string, sortOrder: "asc" | "desc") => void;
+}
+
+export interface SortingProviderProps {
+  children: ComponentChildren;
+  defaultSort?: {
+    sortBy: string;
+    sortOrder: "asc" | "desc";
+  };
+  onSortChange?: (sortBy: string, sortOrder: "asc" | "desc") => void;
+}
+
+export interface SortingProviderWithURLProps extends SortingProviderProps {
+  urlParams?: boolean;
+  paramPrefix?: string;
+}
+
+export interface SortingLabelProps {
+  label: string;
+  sortBy: string;
+  active?: boolean;
+  onClick: () => void;
+}
+
+export interface SortingErrorProps {
+  error: string;
+  onRetry?: () => void;
+  className?: string;
+}
+
+export interface SortingErrorFallbackProps {
+  error: Error;
+  resetError: () => void;
+}
+
+export interface SettingProps {
+  label: string;
+  value: any;
+  onChange: (value: any) => void;
+  type?: "boolean" | "string" | "number" | "select";
+  options?: Array<{
+    value: any;
+    label: string;
+  }>;
+}
+
+export interface SendBTCModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  address?: string;
+  amount?: number;
+  onSend: (to: string, amount: number) => void;
+}
+
+export interface ReceiveAddyModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  address?: string;
+}
+
+export interface RecentSaleCardProps {
+  sale: any;
+  onClick?: () => void;
+  className?: string;
+}
+
+export interface RecentSalesGalleryProps {
+  sales: Array<any>;
+  loading?: boolean;
+  error?: string;
+  onLoadMore?: () => void;
+}
+
+export interface ResponsiveProps {
+  mobile?: any;
+  tablet?: any;
+  desktop?: any;
+  children?: ComponentChildren;
+}
+
+export interface SalesActivityFeedProps {
+  activities: Array<any>;
+  loading?: boolean;
+  error?: string;
+  onRefresh?: () => void;
+}
+
+export interface ScreenReaderProps {
+  text: string;
+  className?: string;
+}
+
+export interface ScrollContainerProps {
+  children: ComponentChildren;
+  direction?: "horizontal" | "vertical" | "both";
+  className?: string;
+  maxHeight?: string;
+}
+
+export interface SectionHeaderProps {
+  title: string;
+  subtitle?: string;
+  actions?: ComponentChildren;
+  className?: string;
+}
+
+export interface SelectorButtonsProps {
+  options: Array<{
+    value: string;
+    label: string;
+    active?: boolean;
+  }>;
+  onSelect: (value: string) => void;
+  className?: string;
 }
 
 export interface StampBTCValueProps {
@@ -1553,14 +1902,22 @@ export type TransactionState = "submitted" | "pending" | "confirmed" | "failed";
  * SRC20CardBaseProps - Migrated from SRC20CardBase.tsx
  */
 export interface SRC20CardBaseProps {
-  src20: SRC20Row;
+  // For individual card usage (SRC20CardBase component)
+  src20?: SRC20Row;
+  // For bulk card usage (SRC20Card, SRC20CardSm components)
+  data?: SRC20Row[];
   // fromPage is reserved for future use
   fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
   // timeframe is reserved for future use
   timeframe?: Timeframe;
   onImageClick?: (imgSrc: string) => void;
   children?: preact.ComponentChildren;
-  totalColumns: number;
+  totalColumns?: number;
+  // Current sort state for table headers
+  currentSort?: {
+    filter: string;
+    direction: "asc" | "desc";
+  };
 }
 
 /**
@@ -1856,7 +2213,18 @@ export interface StampingProps {
  * SRC20MintingProps - Migrated from stamping.ts
  */
 export interface SRC20MintingProps {
-  transactions: SRC20Transaction[];
+  // For stamping transaction tracking
+  transactions?: SRC20Transaction[];
+  // For minting card components (SRC20CardMinting, SRC20CardSmMinting)
+  data?: SRC20Row[];
+  fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
+  timeframe?: Timeframe;
+  onImageClick?: (imgSrc: string) => void;
+  // Current sort state for table headers
+  currentSort?: {
+    filter: string;
+    direction: "asc" | "desc";
+  };
 }
 
 /**

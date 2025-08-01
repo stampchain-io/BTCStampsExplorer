@@ -1,7 +1,6 @@
 // import type { SRC20Row } from "$types/src20.d.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import type { SRC20CardSmProps } from "$types/ui.d.ts";
-import type { EnrichedSRC20Row } from "$types/src20.d.ts";
 import {
   containerCardTable,
   rowCardBorderCenter,
@@ -122,7 +121,7 @@ export function SRC20CardSm({
       <tbody>
         {data.length
           ? (
-            data.map((src20, index) => {
+            data.map((src20: SRC20Row, index: number) => {
               // SRC-20 Image URL Logic:
               // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
               // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)

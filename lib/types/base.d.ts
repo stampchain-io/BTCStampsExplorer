@@ -277,3 +277,64 @@ export interface Config {
 interface CommonUTXOFetchOptions extends UTXOFetchOptions {
   forcePublicAPI?: boolean;
 }
+
+// ============================================================================
+// FEE CALCULATOR COMPONENT PROPS
+// ============================================================================
+
+/**
+ * Base fee calculator props interface
+ */
+export interface BaseFeeCalculatorProps {
+  fee?: number;
+  handleChangeFee?: (fee: number) => void;
+  BTCPrice?: number;
+  isSubmitting?: boolean;
+  onSubmit?: () => void;
+  onCancel?: () => void;
+  buttonName?: string;
+  className?: string;
+  showCoinToggle?: boolean;
+  tosAgreed?: boolean;
+  onTosChange?: (agreed: boolean) => void;
+  feeDetails?: FeeDetails;
+  mintDetails?: MintDetails;
+  isModal?: boolean;
+  disabled?: boolean;
+  cancelText?: string;
+  confirmText?: string;
+  type?: string;
+  fileType?: string;
+  fileSize?: number;
+  issuance?: string;
+  bitname?: string;
+}
+
+/**
+ * Extended fee calculator props interface
+ */
+export interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
+  amount?: number;
+  receive?: number;
+  fromPage?: string;
+  price?: number;
+  edition?: number;
+  ticker?: string;
+  limit?: number;
+  supply?: number;
+  src20TransferDetails?: {
+    address: string;
+    token: string;
+    amount: number;
+  };
+  stampTransferDetails?: {
+    address: string;
+    stamp: string;
+    editions: number;
+  };
+  dec?: number;
+  maraMode?: boolean;
+  maraFeeRate?: number | null;
+  isLoadingMaraFee?: boolean;
+  progressIndicator?: any;
+}

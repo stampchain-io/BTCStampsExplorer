@@ -3578,3 +3578,54 @@ export interface BaselineStatistics {
   /** Confidence interval (95%) */
   confidenceInterval: [number, number];
 }
+
+/**
+ * Utility type to flatten intersection types for better display
+ */
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
+/**
+ * Type guard function type
+ */
+export type TypeGuard<T> = (value: unknown) => value is T;
+
+/**
+ * Validation function type
+ */
+export type ValidationFunction<T> = (value: T) => boolean | string;
+
+/**
+ * Date utility namespace
+ */
+export namespace DateUtils {
+  export function formatDate(date: Date | string | number): string;
+  export function parseDate(dateString: string): Date | null;
+  export function isValidDate(date: unknown): date is Date;
+  export function addDays(date: Date, days: number): Date;
+  export function differenceInDays(date1: Date, date2: Date): number;
+}
+
+/**
+ * Number utility namespace
+ */
+export namespace NumberUtils {
+  export function isNumber(value: unknown): value is number;
+  export function isInteger(value: unknown): value is number;
+  export function clamp(value: number, min: number, max: number): number;
+  export function round(value: number, decimals?: number): number;
+  export function formatNumber(value: number, options?: Intl.NumberFormatOptions): string;
+}
+
+/**
+ * String utility namespace
+ */
+export namespace StringUtils {
+  export function isString(value: unknown): value is string;
+  export function isEmpty(value: string): boolean;
+  export function capitalize(value: string): string;
+  export function truncate(value: string, length: number, suffix?: string): string;
+  export function kebabCase(value: string): string;
+  export function camelCase(value: string): string;
+}

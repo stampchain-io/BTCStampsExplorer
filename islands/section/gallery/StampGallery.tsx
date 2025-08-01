@@ -1,14 +1,13 @@
 /* ===== STAMP GALLERY COMPONENT ===== */
 import { ViewAllButton } from "$button";
 import { StampCard } from "$card";
-import type { StampGalleryProps } from "$types/ui.d.ts";
-import type { StampRow } from "$types/stamp.d.ts";
+import { BREAKPOINTS } from "$constants";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
-import { BREAKPOINTS } from "$constants";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
+import type { StampGalleryProps, StampRow } from "$types/stamp.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";

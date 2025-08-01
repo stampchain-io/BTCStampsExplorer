@@ -83,7 +83,7 @@ export function SRC20CardSmMinting({
       <tbody>
         {data.length
           ? (
-            data.map((src20) => {
+            data.map((src20: SRC20Row) => {
               // SRC-20 Image URL Logic:
               // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
               // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)

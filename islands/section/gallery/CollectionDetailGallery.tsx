@@ -2,11 +2,10 @@
 /* @baba - not updated */
 import { ViewAllButton } from "$button";
 import { CollectionCard } from "$card";
-import type { Collection } from "$server/types/collection.d.ts";
-import type { CollectionGalleryProps } from "$types/ui.d.ts";
+import { BREAKPOINTS } from "$constants";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { BREAKPOINTS } from "$constants";
+import type { CollectionGalleryProps } from "$server/types/collection.d.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
 import { useEffect, useState } from "preact/hooks";
 

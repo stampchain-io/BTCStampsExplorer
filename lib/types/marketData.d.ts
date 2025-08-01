@@ -1,9 +1,10 @@
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
+import type { MarketDataCacheInfo } from "$types/utils.d.ts";
 
 // Re-export for other modules
-export type { SRC20Row, StampRow };
+export type { SRC20Row, StampRow, MarketDataCacheInfo };
 
 export interface MarketListingSummary {
   tick: string;

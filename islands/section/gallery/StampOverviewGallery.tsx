@@ -1,7 +1,8 @@
 /* ===== STAMP OVERVIEW GALLERY COMPONENT ===== */
-import type { Collection, StampRow } from "$server/types/collection.d.ts";
-import type { StampOverviewGalleryProps } from "$types/ui.d.ts";
-import type { StampGalleryProps } from "$types/ui.d.ts";
+import type {
+  StampGalleryProps,
+  StampOverviewGalleryProps,
+} from "$types/stamp.d.ts";
 
 import { StampGallery } from "$section";
 import { titlePurpleDL } from "$text";

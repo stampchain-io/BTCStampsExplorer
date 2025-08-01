@@ -9,16 +9,16 @@
  * @reference https://github.com/mikeinspace/stamps/blob/main/spec.md
  */
 
-import type { CacheStatus, StampMarketData } from "$types/marketData.d.ts";
 import type { BlockRow, FeeDetails } from "$types/base.d.ts";
+import type { CacheStatus, StampMarketData } from "$types/marketData.d.ts";
 import type {
   SUBPROTOCOLS,
   TransactionInput,
   TransactionOutput,
   UTXO,
 } from "./base.d.ts";
-import type { PaginationProps } from "$types/pagination.d.ts";
-import type { StampGalleryProps } from "$types/ui.d.ts";
+
+import type { CollectionRow } from "$server/types/collection.d.ts";
 
 // ============================================================================
 // STAMP PROTOCOL ENUMS AND BASIC TYPES
@@ -2406,6 +2406,67 @@ export declare function isValidStampTransaction(
   isConfirmed: true;
   confirmations: number;
 };
+
+// ============================================================================
+// STAMP GALLERY AND UI COMPONENT PROPS
+// ============================================================================
+
+/**
+ * Props for StampGallery component
+ */
+export interface StampGalleryProps {
+  title?: string;
+  subTitle?: string;
+  type?: string;
+  stamps: StampRow[];
+  layout?: "grid" | "list";
+  isRecentSales?: boolean;
+  filterBy?: string;
+  showDetails?: boolean;
+  showEdition?: boolean;
+  gridClass?: string;
+  displayCounts?: any;
+  pagination?: any;
+  showMinDetails?: boolean;
+  variant?: "default" | string;
+  viewAllLink?: string;
+  alignRight?: boolean;
+  fromPage?: string;
+  sortBy?: "ASC" | "DESC";
+}
+
+/**
+ * Props for FreshStampGallery component
+ */
+export interface FreshStampGalleryProps {
+  initialData: StampRow[];
+  initialPagination: PaginationState;
+  address?: string;
+  initialSort?: string;
+  enablePartialNavigation?: boolean;
+  showLoadingSkeleton?: boolean;
+  gridClass?: string;
+}
+
+/**
+ * Props for StampOverviewGallery component
+ */
+export interface StampOverviewGalleryProps {
+  stamps_src721?: StampRow[];
+  stamps_art?: StampRow[];
+  stamps_posh?: StampRow[];
+  collectionData?: CollectionRow[];
+}
+
+/**
+ * Pagination state interface
+ */
+export interface PaginationState {
+  page: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
 
 /**
  * Backward compatibility alias

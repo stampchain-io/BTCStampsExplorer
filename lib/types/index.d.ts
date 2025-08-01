@@ -200,7 +200,7 @@ export type {
   ButtonSize,
   // Button types
   ButtonVariant,
-  CollectionGalleryProps,
+
   // Theme and styling
   ColorPalette,
   ComponentWithChildren,
@@ -232,7 +232,6 @@ export type {
   SRC20CardProps,
   SRC20CardSize,
   // Gallery and card types
-  StampGalleryProps,
   // Table and display types
   TableColumn,
   TableProps,
