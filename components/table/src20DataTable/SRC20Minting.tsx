@@ -70,7 +70,7 @@ export function SRC20MintingTable({
         <tbody>
           {data.length
             ? (
-              data.map((src20) => {
+              data.map((src20: SRC20Row) => {
                 const imageUrl = src20.deploy_img ||
                   src20.stamp_url ||
                   (src20.deploy_tx

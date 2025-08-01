@@ -40,12 +40,12 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
             { width: "w-[14%]" },
             { width: "w-[26%]" },
             { width: "w-[14%]" },
-          ]).map((col) => <col key={col.key} class={col.className} />)}
+          ]).map((col: any) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {dispensers.length > 0 && (
           <thead>
             <tr>
-              {headers.map((header, i) => (
+              {headers.map((header: string, i: number) => (
                 <th
                   key={i}
                   class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
@@ -59,7 +59,7 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
         )}
         <tbody>
           {dispensers.length
-            ? dispensers?.map((dispenser, index) => {
+            ? dispensers?.map((dispenser: Dispenser, index: number) => {
               const isEmpty = dispenser.give_remaining === 0;
               const rowDispensersRemain = `${
                 isEmpty ? "text-stamp-grey-darker" : ""

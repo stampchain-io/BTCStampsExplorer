@@ -24,7 +24,7 @@ export function TransactionStatus({
       setRemainingTime(estimatedTime);
 
       intervalRef.current = globalThis.setInterval(() => {
-        setRemainingTime((prev) => {
+        setRemainingTime((prev: number) => {
           if (prev <= 0) {
             if (intervalRef.current) {
               globalThis.clearInterval(intervalRef.current);

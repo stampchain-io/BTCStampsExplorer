@@ -41,7 +41,7 @@ export function Article(
               <p class={`${headingGrey} !text-stamp-grey-light mb-0`}>
                 IMPORTANT
               </p>
-              {importantNotes.map((note, index) => (
+              {importantNotes.map((note: string, index: number) => (
                 <p key={index} class={text}>
                   {note}
                 </p>

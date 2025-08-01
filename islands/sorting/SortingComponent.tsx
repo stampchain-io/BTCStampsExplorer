@@ -84,7 +84,7 @@ SortingComponent.Dropdown = function SortingDropdown({
         <option value="" disabled>
           {placeholder}
         </option>
-        {options.map((option) => (
+        {options.map((option: any) => (
           <option key={option.value} value={option.value}>
             {renderOption ? renderOption(option) : option.label}
           </option>
@@ -139,7 +139,7 @@ SortingComponent.Buttons = function SortingButtons({
       role="group"
       aria-label="Sort options"
     >
-      {options.map((option) => {
+      {options.map((option: any) => {
         const isActive = sortState.sortBy === option.value;
 
         if (renderButton) {

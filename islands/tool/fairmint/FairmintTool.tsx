@@ -122,10 +122,10 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
                 <option value="">SELECT A TOKEN</option>
                 {fairminters
                   .filter(
-                    (fairminter) =>
+                    (fairminter: any) =>
                       fairminter.asset && fairminter.status === "open",
                   )
-                  .map((fairminter) => {
+                  .map((fairminter: any) => {
                     const asset = fairminter.asset;
                     const displayName = asset.startsWith("A")
                       ? fairminter.asset_longname || asset

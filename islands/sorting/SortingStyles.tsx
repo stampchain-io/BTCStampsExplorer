@@ -123,7 +123,7 @@ function StyledSortingButtons({
           flex flex-wrap gap-2
           ${className}
         `}
-        renderButton={(option, isActive) => (
+        renderButton={(option: any, isActive: boolean) => (
           <button
             type="button"
             disabled={showLoading}

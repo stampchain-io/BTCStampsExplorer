@@ -72,11 +72,11 @@ export const HoldersPieChart = ({ holders }: PieChartProps) => {
         },
       },
       data: {
-        labels: holders.map((h) => h.address || "Unknown"),
+        labels: holders.map((h: any) => h.address || "Unknown"),
         datasets: [{
           borderColor: [...Array(holders.length)].fill("#220033"),
           label: "Graph Holder",
-          data: holders.map((holder) => Number(holder.amt)),
+          data: holders.map((holder: any) => Number(holder.amt)),
           backgroundColor: generateColors(holders.length),
           hoverOffset: 9,
         }],

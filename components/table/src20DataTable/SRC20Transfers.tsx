@@ -15,13 +15,13 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
     <div class="w-[660px] min-[660px]:w-full">
       <table class={`${valueSm} w-full`}>
         <colgroup>
-          {colGroup().map((col) => <col key={col.key} class={col.className} />)}
+          {colGroup().map((col: any) => <col key={col.key} class={col.className} />)}
         </colgroup>
         {sends?.length > 0 &&
           (
             <thead>
               <tr>
-                {headers.map((header, i) => (
+                {headers.map((header: string, i: number) => (
                   <th
                     key={i}
                     class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
@@ -35,7 +35,7 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
           )}
         <tbody>
           {sends?.length
-            ? sends?.map((send) => (
+            ? sends?.map((send: SRC20Row) => (
               <tr key={send.tx_hash} class={rowTable}>
                 <td class={cellAlign(0, headers.length)}>
                   <a

@@ -65,7 +65,7 @@ const ItemHeader = ({
             open={isOpenSetting}
             handleOpen={handleOpenSetting}
             filterButtons={["transfer"]}
-            onFilterClick={(filter) => {
+            onFilterClick={(filter: string) => {
               if (filter === "transfer") {
                 setOpenSettingModal(true);
               }

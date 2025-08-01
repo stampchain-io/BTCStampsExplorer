@@ -411,7 +411,7 @@ export class Src20Controller {
       }
 
       // Get the ticks from trending data
-      const ticks = trendingData.data.map(row => row.tick);
+      const ticks = trendingData.data.map((row: any) => row.tick);
 
       // Fetch market data for these specific ticks only (much more efficient)
       const marketDataMap = await SRC20Service.QueryService.getBulkSRC20MarketData(ticks);
@@ -443,13 +443,13 @@ export class Src20Controller {
 
       // Create a map of tick -> deployment data for fast lookup
       const deploymentMap = new Map();
-      deploymentData.data.forEach(item => {
+      deploymentData.data.forEach((item: any) => {
         deploymentMap.set(item.tick, item);
       });
 
       // Merge trending data with deployment data and market data
       const baseData = trendingData.data
-        .map(trendingItem => {
+        .map((trendingItem: any) => {
           const deploymentItem = deploymentMap.get(trendingItem.tick);
 
           if (!deploymentItem) {
@@ -461,7 +461,7 @@ export class Src20Controller {
             ...deploymentItem,
           };
         })
-        .filter(item => item !== null); // Remove null entries
+        .filter((item: any) => item !== null); // Remove null entries
 
       // 🚀 SERVICE LAYER: Structure data with market data
       const structuredData = SRC20Service.QueryService.structureWithMarketData(baseData, marketDataMap);

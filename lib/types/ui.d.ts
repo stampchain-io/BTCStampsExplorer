@@ -11,19 +11,8 @@
 
 import type { ButtonProps } from "$button";
 import type { Timeframe } from "$components/layout/types.ts";
+import type { FeeDetails } from "$types/base.d.ts";
 import type { SRC20Transaction, StampTransaction } from "$types/stamping.ts";
-import type { 
-  FeeDetails,
-  AnimationProps,
-  AsyncStateProps,
-  LoadingStateProps,
-  EmptyStateProps,
-  ErrorStateProps,
-  TransitionProps,
-  PartialKeys,
-  RequiredKeys
-} from "$types/base.d.ts";
-import type { QuickNodeConfig, QuickNodeError } from "$types/services.d.ts";
 
 import type { SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
 import type {
@@ -35,6 +24,22 @@ import type * as preact from "preact";
 import type { ComponentChildren, ComponentProps, JSX } from "preact";
 
 // Re-export imported types that are used by other modules
+export type {
+  AnimationProps,
+  AsyncStateProps,
+  EmptyStateProps,
+  ErrorStateProps,
+  LoadingStateProps,
+  PartialKeys,
+  RequiredKeys,
+  TransitionProps,
+} from "$types/base.d.ts";
+export type {
+  QuickNodeConfig,
+  QuickNodeError,
+  QuickNodeResponse,
+  ServiceResponse,
+} from "$types/services.d.ts";
 export type { ButtonProps };
 // Removed circular self-import block - these types should be defined locally
 // import type {
@@ -242,7 +247,13 @@ export interface ContainerProps extends BaseComponentProps {
  */
 export interface FlexboxProps extends BaseComponentProps {
   direction?: "row" | "column" | "row-reverse" | "column-reverse";
-  justify?: "flex-start" | "flex-end" | "center" | "space-between" | "space-around" | "space-evenly";
+  justify?:
+    | "flex-start"
+    | "flex-end"
+    | "center"
+    | "space-between"
+    | "space-around"
+    | "space-evenly";
   align?: "flex-start" | "flex-end" | "center" | "stretch" | "baseline";
   wrap?: "nowrap" | "wrap" | "wrap-reverse";
   gap?: string;
@@ -259,6 +270,66 @@ export interface GridProps extends BaseComponentProps {
   rowGap?: string;
   templateColumns?: string;
   templateRows?: string;
+}
+
+// =============================================================================
+// CHART & VISUALIZATION COMPONENT PROPS
+// =============================================================================
+
+/**
+ * Chart data structure
+ */
+export interface ChartData {
+  labels: string[];
+  datasets: Array<{
+    label: string;
+    data: number[];
+    backgroundColor?: string | string[];
+    borderColor?: string | string[];
+    borderWidth?: number;
+    fill?: boolean;
+  }>;
+}
+
+/**
+ * Chart widget component props
+ */
+export interface ChartWidgetProps extends BaseComponentProps {
+  type: "line" | "bar" | "pie" | "doughnut" | "radar" | "area";
+  data: ChartData;
+  options?: any; // Chart.js options object
+  width?: number | string;
+  height?: number | string;
+  responsive?: boolean;
+  maintainAspectRatio?: boolean;
+}
+
+// =============================================================================
+// LOADING & PROGRESS COMPONENT PROPS
+// =============================================================================
+
+/**
+ * Loading icon component props
+ */
+export interface LoadingIconProps extends BaseComponentProps {
+  size?: "sm" | "md" | "lg" | "xl";
+  color?: string;
+  speed?: "slow" | "normal" | "fast";
+  label?: string;
+}
+
+/**
+ * Progress indicator component props
+ */
+export interface ProgressIndicatorProps extends BaseComponentProps {
+  value?: number;
+  max?: number;
+  label?: string;
+  showPercentage?: boolean;
+  variant?: "linear" | "circular";
+  color?: string;
+  size?: "sm" | "md" | "lg";
+  indeterminate?: boolean;
 }
 
 // =============================================================================
@@ -330,6 +401,153 @@ export interface InputProps extends FormControlProps {
   pattern?: string;
 }
 
+/**
+ * Input field component props (extends InputProps with additional features)
+ */
+export interface InputFieldProps extends InputProps {
+  icon?: string;
+  iconPosition?: "left" | "right";
+  clearable?: boolean;
+  onClear?: () => void;
+  size?: "sm" | "md" | "lg";
+}
+
+/**
+ * Select field component props
+ */
+export interface SelectFieldProps extends FormControlProps {
+  options: Array<{
+    value: string;
+    label: string;
+    disabled?: boolean;
+  }>;
+  value?: string;
+  defaultValue?: string;
+  placeholder?: string;
+  onChange?: (value: string) => void;
+  multiple?: boolean;
+  size?: "sm" | "md" | "lg";
+}
+
+// =============================================================================
+// MODAL COMPONENT PROPS
+// =============================================================================
+
+/**
+ * Base modal component props
+ */
+export interface ModalBaseProps extends BaseComponentProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+  size?: "sm" | "md" | "lg" | "xl" | "full";
+  closeOnOverlayClick?: boolean;
+  closeOnEscape?: boolean;
+  showCloseButton?: boolean;
+  preventScroll?: boolean;
+}
+
+/**
+ * Search modal base props
+ */
+export interface ModalSearchBaseProps extends ModalBaseProps {
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  placeholder?: string;
+  showSearchIcon?: boolean;
+  autoFocus?: boolean;
+  onSearchSubmit?: (value: string) => void;
+}
+
+/**
+ * Connect wallet modal props
+ */
+export interface ConnectWalletModalProps extends ModalBaseProps {
+  walletProviders?: Array<{
+    id: string;
+    name: string;
+    icon?: string;
+    installed?: boolean;
+  }>;
+  onConnect?: (providerId: string) => void;
+  showTestnet?: boolean;
+  preferredWallet?: string;
+}
+
+// =============================================================================
+// MARA-SPECIFIC COMPONENT PROPS
+// =============================================================================
+
+/**
+ * Mara mode indicator component props
+ */
+export interface MaraModeIndicatorProps extends BaseComponentProps {
+  isActive: boolean;
+  mode?: "standard" | "turbo" | "eco";
+  showLabel?: boolean;
+  size?: "sm" | "md" | "lg";
+  animate?: boolean;
+}
+
+/**
+ * Mara success message component props
+ */
+export interface MaraSuccessMessageProps extends BaseComponentProps {
+  message: string;
+  transactionId?: string;
+  showIcon?: boolean;
+  onDismiss?: () => void;
+  autoHideDuration?: number;
+}
+
+// =============================================================================
+// STATUS & BADGE COMPONENT PROPS
+// =============================================================================
+
+/**
+ * Transaction badge component props
+ */
+export interface TransactionBadgeProps extends BaseComponentProps {
+  status: "pending" | "confirmed" | "failed" | "processing";
+  confirmations?: number;
+  showIcon?: boolean;
+  size?: "sm" | "md" | "lg";
+  animated?: boolean;
+}
+
+/**
+ * Market data status component props
+ */
+export interface MarketDataStatusProps extends BaseComponentProps {
+  status: "loading" | "success" | "error" | "stale";
+  lastUpdated?: Date | string;
+  showTimestamp?: boolean;
+  message?: string;
+  onRefresh?: () => void;
+}
+
+// =============================================================================
+// META & SEO COMPONENT PROPS
+// =============================================================================
+
+/**
+ * Meta tags component props for SEO
+ */
+export interface MetaTagsProps {
+  title: string;
+  description?: string;
+  keywords?: string[];
+  ogImage?: string;
+  ogType?: string;
+  ogUrl?: string;
+  twitterCard?: "summary" | "summary_large_image" | "app" | "player";
+  twitterSite?: string;
+  twitterCreator?: string;
+  canonicalUrl?: string;
+  noindex?: boolean;
+  nofollow?: boolean;
+}
+
 // =============================================================================
 // BASIC COMPONENT PROP TYPES
 // =============================================================================
@@ -337,7 +555,8 @@ export interface InputProps extends FormControlProps {
 /**
  * Basic HTML element prop types
  */
-export interface AnchorElementProps extends JSX.HTMLAttributes<HTMLAnchorElement> {
+export interface AnchorElementProps
+  extends JSX.HTMLAttributes<HTMLAnchorElement> {
   href?: string;
   target?: string;
   rel?: string;
@@ -347,7 +566,8 @@ export interface BaseButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
   type?: "button" | "submit" | "reset";
 }
 
-export interface ButtonElementProps extends JSX.HTMLAttributes<HTMLButtonElement> {
+export interface ButtonElementProps
+  extends JSX.HTMLAttributes<HTMLButtonElement> {
   variant?: string;
   color?: string;
   size?: string;
@@ -2310,8 +2530,6 @@ export interface SortingComponentProps<T = any> {
   testId?: string;
   "aria-label"?: string;
 }
-
-
 
 /**
  * EnhancedSortState - Migrated from sorting.d.ts

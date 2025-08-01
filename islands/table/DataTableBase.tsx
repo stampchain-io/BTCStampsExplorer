@@ -243,7 +243,7 @@ export default function DataTableBase({
             mintCount.json(),
           ]);
 
-          setTotalCounts((prev) => ({
+          setTotalCounts((prev: any) => ({
             ...prev,
             transfers: transferData.total || 0,
             mints: mintData.total || 0,

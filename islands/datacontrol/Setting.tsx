@@ -43,7 +43,7 @@ export function Setting({
               ariaLabel="Close"
             />
             <p class="text-lg font-black text-[#AA00FF] mb-1">TOOLS</p>
-            {filterButtons.map((filter) => (
+            {filterButtons.map((filter: string) => (
               <button
                 key={filter}
                 type="button"

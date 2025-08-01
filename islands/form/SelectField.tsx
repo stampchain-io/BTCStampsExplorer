@@ -27,7 +27,7 @@ export function SelectField({
         )}
 
         {options.length > 0
-          ? options.map((item) => (
+          ? options.map((item: StampRow) => (
             <option
               key={item.tx_hash || item.cpid || item.stamp?.toString()}
               value={item.stamp?.toString()}

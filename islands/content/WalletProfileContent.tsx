@@ -147,7 +147,7 @@ function SectionHeader({
               context="wallet"
               maxRetries={2}
               testId="sorting-interface-boundary"
-              onError={(error) => {
+              onError={(error: Error) => {
                 console.error("Sorting interface error:", error);
               }}
             >
@@ -155,7 +155,7 @@ function SectionHeader({
                 config={{
                   defaultSort: sortBy as WalletSortKey,
                 }}
-                options={config.sortOptions.map((option) => ({
+                options={config.sortOptions.map((option: any) => ({
                   value: option as WalletSortKey,
                   label: getSortLabel(option),
                   direction: option.includes("_desc") ? "desc" : "asc",
@@ -170,7 +170,7 @@ function SectionHeader({
             // Legacy sorting interface
             <SortButton
               initSort={sortBy as "ASC" | "DESC"}
-              onChangeSort={(newSort) => onSortChange(newSort)}
+              onChangeSort={(newSort: any) => onSortChange(newSort)}
               sortParam={config.paramName}
             />
           )}
@@ -497,7 +497,7 @@ export default function WalletProfileContent(
         context="wallet"
         maxRetries={3}
         testId="wallet-sorting-boundary"
-        onError={(error, details) => {
+        onError={(error: Error, details: any) => {
           console.error("Wallet sorting error:", error);
           console.debug("Error details:", details);
           // TODO(#sorting): Report error to monitoring system
@@ -632,7 +632,7 @@ function WalletProfileContentInner({
             open={openSetting}
             handleOpen={setOpenSetting}
             filterButtons={["transfer"]}
-            onFilterClick={(filter) => {
+            onFilterClick={(filter: string) => {
               if (filter === "transfer") {
                 setOpenSettingModal(true);
               }
