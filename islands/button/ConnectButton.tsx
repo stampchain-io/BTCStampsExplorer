@@ -74,7 +74,7 @@ export const ConnectButton = () => {
           <div class={`hidden tablet:block`}>
             <Button
               variant="outlineGradient"
-              color="purpleGradient"
+              color="purple"
               size="sm"
               class="!w-[100px]"
               onClick={handleOpenModal}

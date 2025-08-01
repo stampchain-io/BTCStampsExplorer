@@ -4,7 +4,7 @@ import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { ROOT_DOMAINS } from "$constants";
 import {
-  greyGradient,
+  grey,
   inputFieldDropdown,
   inputFieldDropdownHover,
   inputFieldOutline,
@@ -301,7 +301,7 @@ export function SRC101RegisterTool({
       >
         {/* Animated Input Container */}
         <div
-          class={`${outlineGradient} ${greyGradient} ${
+          class={`${outlineGradient} ${grey} ${
             openTldDropdown && !isSelectingTld ? "input-open-right" : ""
           }`}
         >

@@ -110,7 +110,7 @@ export const buttonStyles: ButtonVariants = {
       !items-start !justify-start !h-auto
       !p-0 bg-transparent !border-0
       font-semibold tracking-wide
-      text-[var(--default-color)] hover:text-[var(--hover-color)]
+      text-[var(--color-medium)] hover:text-[var(--color-light)]
     `,
     glassmorphism: `
       border-[1px] border-stamp-grey-darkest/40 rounded-lg
@@ -158,7 +158,7 @@ export const buttonStyles: ButtonVariants = {
       [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[linear-gradient(to_right,#1a0824,#210925)] [&>*]:!border-0
       [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
       [&>*]:font-bold [&>*]:tracking-wider
-      [&>*]:text-[var(--default-color)] hover:[&>*]:text-[var(--hover-color)]
+      [&>*]:text-[var(--color-medium)] hover:[&>*]:text-[var(--color-light)]
       [&>*]:transition-colors [&>*]:duration-50
     `,
   },
@@ -274,7 +274,7 @@ export const buttonStyles: ButtonVariants = {
     rounded-full
     h-5 w-5
     border-b-[3px]
-    border-[var(--hover-color)]
+    border-[var(--color-light)]
   `,
 };
 
