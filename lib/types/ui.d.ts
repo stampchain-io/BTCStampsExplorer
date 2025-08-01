@@ -9,6 +9,16 @@
  * Usage: Import UI component types and interfaces
  */
 
+import type { ButtonProps } from "$button";
+import type { FeeDetails } from "$types/base.d.ts";
+
+import type { SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
+import type {
+  STAMP_FILTER_TYPES,
+  STAMP_TYPES,
+  StampRow,
+} from "$types/stamp.d.ts";
+import type * as preact from "preact";
 import type { ComponentChildren, ComponentProps, JSX } from "preact";
 import type * as preact from "preact";
 import type { SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
@@ -187,6 +197,75 @@ import type { FeeDetails } from "$types/base.d.ts";
 /**
  * Extended base props with common HTML attributes
  */
+
+// =============================================================================
+// BASIC COMPONENT PROP TYPES
+// =============================================================================
+
+/**
+ * Basic HTML element prop types
+ */
+export interface AnchorElementProps extends JSX.HTMLAttributes<HTMLAnchorElement> {
+  href?: string;
+  target?: string;
+  rel?: string;
+}
+
+export interface BaseButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
+  type?: "button" | "submit" | "reset";
+}
+
+export interface ButtonElementProps extends JSX.HTMLAttributes<HTMLButtonElement> {
+  variant?: string;
+  color?: string;
+  size?: string;
+}
+
+/**
+ * Basic component prop interfaces
+ */
+export interface BTCValueDisplayProps {
+  value: number;
+  className?: string;
+  precision?: number;
+}
+
+export interface BTCValueSummaryProps {
+  values: number[];
+  className?: string;
+  showTotal?: boolean;
+}
+
+export interface StampBTCValueProps {
+  stampId: number;
+  className?: string;
+}
+
+export interface TotalBTCValueProps {
+  items: Array<{ value: number }>;
+  className?: string;
+}
+
+export interface TransactionHexDisplayProps {
+  hex: string;
+  className?: string;
+  collapsed?: boolean;
+}
+
+/**
+ * Icon component props
+ */
+export interface CloseIconProps {
+  className?: string;
+  onClick?: () => void;
+  size?: number;
+}
+
+export interface GearIconProps {
+  className?: string;
+  onClick?: () => void;
+  size?: number;
+}
 
 // =============================================================================
 // THEME AND DESIGN SYSTEM TYPES
@@ -1038,10 +1117,23 @@ export type AnimationTimingFunction =
 /**
  * Read All Button component props
  */
+export interface ReadAllButtonProps {
+  href?: string;
+}
 
 /**
  * Toggle Switch Button component props
  */
+export interface ToggleSwitchButtonProps {
+  isActive: boolean;
+  onToggle: () => void;
+  toggleButtonId?: string;
+  className?: string;
+  onMouseEnter?: (e: MouseEvent) => void;
+  onMouseLeave?: (e: MouseEvent) => void;
+  onClick?: (e: MouseEvent) => void;
+  buttonRef?: preact.RefObject<HTMLButtonElement>;
+}
 
 // ICON COMPONENT PROPS
 // ====================
@@ -1263,6 +1355,28 @@ export type AnimationTimingFunction =
 /**
  * Stamp Detail Page component props
  */
+export interface StampDetailPageProps {
+  data: {
+    stamp: StampRow & { name?: string };
+    total: number;
+    sends: any;
+    dispensers: any;
+    dispenses: any;
+    holders: any[];
+    vaults: any;
+    last_block: number;
+    stamps_recent: any;
+    lowestPriceDispenser: any;
+    htmlTitle?: string;
+    error?: string;
+    initialCounts?: {
+      dispensers: number;
+      sales: number;
+      transfers: number;
+    };
+  };
+  url?: string;
+}
 
 /**
  * Tool Fairmint Page component props
@@ -1701,29 +1815,16 @@ export interface SortState<T extends SortKey = SortKey> {
 }
 
 /**
- * WalletSortingProps - Migrated from sorting.d.ts
+ * Base sorting component props
  */
-export interface WalletSortingProps
-  extends SortingComponentProps<WalletSortKey> {
-  /** Whether market data is available */
-  readonly hasMarketData?: boolean;
-  /** Whether UTXO data is available */
-  readonly hasUTXOData?: boolean;
-  /** Callback when market data is required but unavailable */
-  readonly onMarketDataRequired?: () => void;
+export interface SortingComponentProps<T = any> {
+  children?: ComponentChildren;
+  className?: string;
+  testId?: string;
+  "aria-label"?: string;
 }
 
-/**
- * StampSortingProps - Migrated from sorting.d.ts
- */
-export interface StampSortingProps extends SortingComponentProps<StampSortKey> {
-  /** Whether to prefer database sorting */
-  readonly preferDbSort?: boolean;
-  /** Total number of items being sorted */
-  readonly totalItems?: number;
-  /** Whether large dataset optimizations are enabled */
-  readonly optimizeForLargeDataset?: boolean;
-}
+
 
 /**
  * EnhancedSortState - Migrated from sorting.d.ts
@@ -2163,4 +2264,34 @@ export interface AlertContext {
   sessionId?: string;
   totalAlerts: number;
   criticalAlerts: number;
+}
+
+// =============================================================================
+// TYPE ALIASES FOR BACKWARD COMPATIBILITY
+// =============================================================================
+
+/**
+ * Backward compatibility aliases for commonly expected type names
+ */
+export type SRC20CardProps = SRC20CardBaseProps;
+export type SRC20CardMintingProps = SRC20MintingProps;
+export type SRC20CardSmProps = SRC20CardBaseProps;
+export type SRC20CardSmMintingProps = SRC20MintingProps;
+export type SRC20MintsProps = SRC20MintingProps;
+export type SRC20TransfersProps = TransferProps;
+export type StampTransfersProps = TransferProps;
+
+/**
+ * Additional missing prop interfaces as aliases
+ */
+export interface WalletStampValueProps {
+  stampId: number;
+  walletAddress: string;
+  className?: string;
+}
+
+export interface ProgressiveEstimationIndicatorProps {
+  isEstimating: boolean;
+  progress?: number;
+  className?: string;
 }

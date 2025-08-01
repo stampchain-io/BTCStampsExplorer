@@ -4,11 +4,11 @@ import type { Dispenser } from "$types/services.d.ts";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { CollectionRow } from "$types/stamp.d.ts";
 import type {
-  StampMarketData,
-  SRC20MarketData,
+  CacheStatus,
   CollectionMarketData,
   MarketDataCacheInfo,
-  CacheStatus,
+  SRC20MarketData,
+  StampMarketData,
 } from "$types/marketData.d.ts";
 import type {
   EnhancedWalletContentProps,

@@ -18,6 +18,11 @@ export interface CollectionRow {
 }
 
 /**
+ * Alias for CollectionRow for backward compatibility
+ */
+export type Collection = CollectionRow;
+
+/**
  * Extended collection with creator names
  */
 export interface CollectionWithCreators extends CollectionRow {

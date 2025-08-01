@@ -4,6 +4,8 @@
 import { MetaTags } from "$components/layout/MetaTags.tsx";
 import { WalletProfileContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 
 import WalletDispenserDetails from "$islands/content/WalletDispenserDetails.tsx";
 import WalletProfileDetails from "$islands/content/WalletProfileDetails.tsx";
@@ -12,6 +14,7 @@ import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
 import { PaginatedResponse } from "$types/pagination.d.ts";
+import type { WalletPageProps } from "$types/ui.d.ts";
 import { WalletOverviewInfo } from "$types/wallet.d.ts";
 
 /* ===== SERVER HANDLER ===== */

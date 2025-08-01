@@ -3,6 +3,7 @@
 
 import { Handlers } from "$fresh/server.ts";
 import type { StampDetailPageProps } from "$types/ui.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Head } from "$fresh/runtime.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";

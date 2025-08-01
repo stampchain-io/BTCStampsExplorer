@@ -1,12 +1,22 @@
 /* ===== BUTTON STYLES MODULE ===== */
 import { JSX } from "preact";
-import type {
-  AnchorElementProps,
-  BaseButtonProps,
-  ButtonElementProps,
-} from "$types/ui.d.ts";
-
 /* ===== TYPE DEFINITIONS ===== */
+
+// Basic button props interface - exclude conflicting HTML attributes
+export interface ButtonProps
+  extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "loading" | "size"> {
+  variant?: keyof ButtonVariants["variant"];
+  color?: keyof ButtonVariants["color"];
+  size?: keyof ButtonVariants["size"];
+  disabled?: boolean;
+  loading?: boolean;
+  active?: boolean;
+  fullWidth?: boolean;
+  ariaLabel?: string;
+  "data-type"?: string;
+  "f-partial"?: string;
+}
+
 export interface ButtonVariants {
   base: string;
   variant: Record<

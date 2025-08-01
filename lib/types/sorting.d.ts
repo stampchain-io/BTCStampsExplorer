@@ -13,6 +13,15 @@ import type {
   WalletSortingProps,
 } from "$types/ui.d.ts";
 
+// Re-export imported types that are used by other modules
+export type {
+  EnhancedSortState,
+  SortingComponentProps,
+  SortState,
+  StampSortingProps,
+  WalletSortingProps,
+};
+
 // ===== CORE SORTING TYPES =====
 
 /**
@@ -495,4 +504,40 @@ export interface UseSortStateReturn<T extends SortKey = SortKey>
   readonly restoreFromStorage: () => void;
   /** Function to clear cache */
   readonly clearCache: () => void;
+}
+
+// ============================================================================
+// DOMAIN-SPECIFIC SORTING PROPS
+// ============================================================================
+
+/**
+ * WalletSortingProps - Props for wallet-specific sorting components
+ */
+export interface WalletSortingProps {
+  children?: import("preact").ComponentChildren;
+  className?: string;
+  testId?: string;
+  "aria-label"?: string;
+  /** Whether market data is available */
+  readonly hasMarketData?: boolean;
+  /** Whether UTXO data is available */
+  readonly hasUTXOData?: boolean;
+  /** Callback when market data is required but unavailable */
+  readonly onMarketDataRequired?: () => void;
+}
+
+/**
+ * StampSortingProps - Props for stamp-specific sorting components
+ */
+export interface StampSortingProps {
+  children?: import("preact").ComponentChildren;
+  className?: string;
+  testId?: string;
+  "aria-label"?: string;
+  /** Whether to prefer database sorting */
+  readonly preferDbSort?: boolean;
+  /** Total number of items being sorted */
+  readonly totalItems?: number;
+  /** Whether large dataset optimizations are enabled */
+  readonly optimizeForLargeDataset?: boolean;
 }

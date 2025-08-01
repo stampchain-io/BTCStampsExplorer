@@ -347,17 +347,7 @@ export interface SRC20SnapshotRequestParams {
  */
 export type SRC20Operation = "deploy" | "mint" | "transfer";
 
-/**
- * Chart data point structure
- * Used for price/volume charts: [timestamp, value]
- */
-export type ChartDataPoint = [number, number];
-
-/**
- * Chart data array
- * Collection of chart data points for time-series visualization
- */
-export type ChartData = ChartDataPoint[];
+// Removed unused ChartData type as part of TS6133 cleanup
 
 /**
  * Chart configuration options

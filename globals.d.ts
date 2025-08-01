@@ -199,7 +199,6 @@ export type {
  * @since 1.4.0
  */
 export type {
-  SortableFields,
   SortConfig,
   SortDirection,
   SortState,

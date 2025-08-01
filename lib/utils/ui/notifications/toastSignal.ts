@@ -1,5 +1,9 @@
 import type { BaseToast } from "$types/utils.d.ts";
 import { signal } from "@preact/signals";
+
+// Re-export BaseToast for external usage
+export type { BaseToast };
+
 // We need the Toast type, but ToastProvider itself uses this signal, so we can't import from there directly to avoid circular dependency if Toast is defined there.
 // Let's define a local ToastMessage type here or ensure Toast is defined in a base types file.
 

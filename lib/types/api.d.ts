@@ -30,7 +30,7 @@
 // Type Imports from Other Domain Modules
 // ============================================================================
 
-import type { BlockRow, SUBPROTOCOLS, UTXO, BasicUTXO } from "$types/base.d.ts";
+import type { BasicUTXO, BlockRow, SUBPROTOCOLS, UTXO } from "$types/base.d.ts";
 import type { DetailedUTXO } from "$types/transaction.d.ts";
 import {
   ApiErrorCode,
@@ -42,16 +42,17 @@ import {
 export { ApiErrorCode, HttpStatusCodes, HttpStatusToErrorCode };
 
 // Define HttpStatusCode type based on the values from HttpStatusCodes
-export type HttpStatusCode = typeof HttpStatusCodes[keyof typeof HttpStatusCodes];
+export type HttpStatusCode =
+  typeof HttpStatusCodes[keyof typeof HttpStatusCodes];
 import type { PaginationInfo } from "$types/utils.d.ts";
 import type { PaginatedResponse } from "$types/pagination.d.ts";
 
 import type {
+  RecentSaleData,
   STAMP_FILTER_TYPES,
   StampBalance,
   StampFilters,
   StampRow,
-  RecentSaleData,
 } from "./stamp.d.ts";
 
 import type {
@@ -67,18 +68,18 @@ import type {
   EnrichedSRC20Row,
   MintStatus,
   SRC20Balance,
+  Src20Detail,
   SRC20Row,
   SRC20TokenSchema,
-  Src20Detail,
 } from "./src20.d.ts";
 
 import type { Src101Detail } from "./src101.d.ts";
 
 import type {
-  StampMarketData,
-  SRC20MarketData,
-  CollectionMarketData,
   CacheStatus,
+  CollectionMarketData,
+  SRC20MarketData,
+  StampMarketData,
 } from "./marketData.d.ts";
 
 import type { MarketDataCacheInfo } from "./utils.d.ts";
@@ -1889,7 +1890,6 @@ export interface LeatherSignPSBTResponse {
     cancelled?: boolean;
   };
 }
-
 
 /**
  * WithMarketDataResponse - Migrated from api.ts

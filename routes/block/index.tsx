@@ -2,6 +2,7 @@
 
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { BlockController } from "$server/controller/blockController.ts";
+import type { BlockRow } from "$types/base.d.ts";
 
 import { BlockHeader } from "$header";
 import { BlockSelector, BlockTransactions } from "$content";

@@ -1,7 +1,8 @@
 /* ===== HOME PAGE ROUTE ===== */
-import type { Collection } from "$server/types/collection.d.ts";
-import type { StampRow } from "$types/stamp.d.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
+import type { CollectionRow } from "$server/types/collection.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 
 import { HomeHeader } from "$header";
 import { gapSectionSlim, Micro5FontLoader } from "$layout";
@@ -24,7 +25,7 @@ interface StampControllerData {
   stamps_src721: StampRow[];
   stamps_art: StampRow[];
   stamps_posh: StampRow[];
-  collectionData: Collection[];
+  collectionData: CollectionRow[];
 }
 
 interface HomePageData extends StampControllerData {

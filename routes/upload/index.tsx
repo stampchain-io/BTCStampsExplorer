@@ -2,6 +2,7 @@
 /* @baba+@reinamora - what is this page used for, should it be improved? */
 
 import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
 
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";

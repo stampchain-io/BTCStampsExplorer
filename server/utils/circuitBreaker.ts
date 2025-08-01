@@ -1,4 +1,4 @@
-import type { CircuitState } from "$types/ui.d.ts";
+import { CircuitState } from "$types/ui.d.ts";
 import type { CircuitBreakerState } from "$types/ui.d.ts";
 /**
  * Universal Circuit Breaker Pattern Implementation

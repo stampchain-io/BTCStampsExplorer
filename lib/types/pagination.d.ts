@@ -1,7 +1,4 @@
-import type {
-  InfiniteScrollState,
-  PaginationState,
-} from "$types/ui.d.ts";
+import type { InfiniteScrollState, PaginationState } from "$types/ui.d.ts";
 /**
  * Comprehensive Pagination Type Definitions
  *
@@ -181,4 +178,15 @@ export interface PaginationConfig {
   maxPageSize: number;
   enableCaching?: boolean;
   cacheTimeout?: number;
+}
+
+// ============================================================================
+// PAGINATION COMPONENT PROPS
+// ============================================================================
+
+export interface PaginationProps {
+  page: number;
+  totalPages: number;
+  prefix?: string;
+  onPageChange?: (page: number) => void;
 }

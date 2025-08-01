@@ -6,10 +6,10 @@ import type { FilterSRC20ModalProps } from "$types/ui.d.ts";
 import { InputField, SelectDate } from "$form";
 import type { SRC20_FILTER_TYPES } from "$types/src20.d.ts";
 import type { STAMP_FILTER_TYPES } from "$types/stamp.d.ts";
-import type { 
-  WALLET_FILTER_TYPES,
+import type {
   COLLECTION_FILTER_TYPES,
-  LISTING_FILTER_TYPES
+  LISTING_FILTER_TYPES,
+  WALLET_FILTER_TYPES,
 } from "$types/wallet.d.ts";
 import { closeModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";

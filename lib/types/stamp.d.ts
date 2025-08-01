@@ -10,7 +10,7 @@
  */
 
 import type { CacheStatus, StampMarketData } from "$types/marketData.d.ts";
-import type { FeeDetails, BlockRow } from "$types/base.d.ts";
+import type { BlockRow, FeeDetails } from "$types/base.d.ts";
 import type {
   SUBPROTOCOLS,
   TransactionInput,
@@ -2406,3 +2406,8 @@ export declare function isValidStampTransaction(
   isConfirmed: true;
   confirmations: number;
 };
+
+/**
+ * Backward compatibility alias
+ */
+export type StampDetail = StampData;
