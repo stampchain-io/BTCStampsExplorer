@@ -1,8 +1,9 @@
 /* ===== SEND TOOL COMPONENT ===== */
+import { useConfig } from "$client/hooks/useConfig.ts";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { inputField, inputFieldSquare } from "$form";
-import type { StampRow } from "$globals";
+import type { Config, StampRow } from "$globals";
 import { Icon } from "$icon";
 import { SelectField } from "$islands/form/SelectField.tsx";
 import {
@@ -11,18 +12,25 @@ import {
   containerColForm,
   containerRowForm,
   imagePreviewTool,
+  loaderSkeletonFull,
+  loaderSkeletonImage,
+  loaderSkeletonLg,
+  loaderSkeletonMd,
   loaderSpinGrey,
   rowForm,
 } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import { FeeCalculatorBase } from "$section";
-import { titlePurpleLD } from "$text";
+import { labelLg, labelSm, titleGreyLD } from "$text";
 import { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
 export function StampSendTool() {
   console.log("SENDTOOL: Component rendering - TOP LEVEL");
+
+  /* ===== CONFIG ===== */
+  const { config, isLoading } = useConfig<Config>();
 
   /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
@@ -417,8 +425,8 @@ export function StampSendTool() {
       return (
         <Icon
           type="icon"
-          name="uploadImage"
-          weight="normal"
+          name="previewImage"
+          weight="extraLight"
           size="xxl"
           color="grey"
         />
@@ -482,10 +490,82 @@ export function StampSendTool() {
     );
   };
 
+  /* ===== CONFIG CHECK ===== */
+  if (isLoading || !config) {
+    return (
+      <div class={bodyTool}>
+        <h1 class={`${titleGreyLD} mx-auto mb-4`}>SEND</h1>
+
+        {/* Skeleton Form */}
+        <div class={`${containerBackground} mb-6`}>
+          <div class={`${containerRowForm} mb-5`}>
+            {/* Image preview skeleton */}
+            <div class={loaderSkeletonImage}></div>
+
+            <div class={containerColForm}>
+              {/* Stamp selection dropdown skeleton */}
+              <div class={`h-10 ${loaderSkeletonLg}`}>
+              </div>
+
+              <div class="flex w-full justify-end items-center gap-5">
+                <div class="flex flex-col justify-start space-y-1.5 pt-0.5">
+                  {/* Editions label skeleton */}
+                  <div class={`h-4 w-[88px] ${loaderSkeletonMd}`}>
+                  </div>
+                  {/* Max quantity skeleton */}
+                  <div class={`h-3 w-[56px] ${loaderSkeletonMd}`}>
+                  </div>
+                </div>
+                {/* Editions input skeleton */}
+                <div class={`h-10 w-10 ${loaderSkeletonLg}`}>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Recipient address input skeleton */}
+          <div class={`h-10 ${loaderSkeletonLg}`}>
+          </div>
+        </div>
+
+        {/* Skeleton Fee Calculator */}
+        <div class={containerBackground}>
+          {/* Fee slider skeleton */}
+          <div class="flex justify-between">
+            <div class={`h-4 w-28 ${loaderSkeletonMd}`}>
+            </div>
+            {/* Toggle switch skeleton */}
+            <div class={`w-10 h-5 ${loaderSkeletonFull}`}>
+            </div>
+          </div>
+          <div class={`h-4 w-[168px] mt-1 ${loaderSkeletonMd}`}>
+          </div>
+          {/* Fee slider skeleton */}
+          <div class={`h-3 w-[50%] mt-4 ${loaderSkeletonFull}`}>
+          </div>
+
+          {/* Estimate and fee details skeleton */}
+          <div class={`h-5 w-full min-[480px]:w-72 mt-8 ${loaderSkeletonMd}`}>
+          </div>
+          <div class={`h-4 w-16 mt-4 ${loaderSkeletonMd}`}>
+          </div>
+
+          {/* Terms and Submit button skeleton */}
+          <div class="flex justify-end pt-10">
+            <div class="flex flex-col space-y-3 items-end">
+              <div class={`h-4 w-[156px] tablet:w-56 ${loaderSkeletonMd}`}>
+              </div>
+              <div class={`h-9 tablet:h-8 w-36 ${loaderSkeletonLg}`}></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   /* ===== RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titlePurpleLD} mobileMd:mx-auto mb-1`}>SEND</h1>
+      <h1 class={`${titleGreyLD} mx-auto mb-4`}>SEND</h1>
 
       {/* ===== STAMP SELECTION SECTION ===== */}
       <form
@@ -514,10 +594,10 @@ export function StampSendTool() {
 
             <div class="flex w-full justify-end items-center gap-5">
               <div class="flex flex-col justify-start -space-y-0.5">
-                <h5 class="text-xl font-bold text-stamp-grey">
+                <h5 class={`${labelLg} !text-stamp-grey`}>
                   EDITIONS
                 </h5>
-                <h6 class="text-sm font-medium text-stamp-grey-darker">
+                <h6 class={labelSm}>
                   MAX {maxQuantity}
                 </h6>
               </div>
