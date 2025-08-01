@@ -185,7 +185,7 @@ export function SRC101RegisterTool({
         {/* Skeleton Form */}
         <div class={`${containerBackground} gap-5 mb-6`}>
           {/* Bitname input skeleton */}
-          <div class={`h-10 ${loaderSkeletonLg}`}>
+          <div class={`h-11 ${loaderSkeletonLg}`}>
           </div>
 
           {/* Availability Check Section skeleton */}
@@ -330,7 +330,7 @@ export function SRC101RegisterTool({
                   setAllowTldTooltip(false);
                   setIsTldTooltipVisible(false);
                 }}
-                class="h-10 min-w-16 mt-[1px] px-4 rounded-lg bg-transparent font-semibold text-sm text-stamp-grey text-right hover:text-stamp-grey-light tracking-wider transition-all duration-200 focus-visible:!outline-none"
+                class="h-10 min-w-16 mt-[1px] px-4 rounded-lg bg-transparent font-semibold text-sm text-stamp-grey text-right hover:text-stamp-grey-light tracking-wider transition-all duration-50 focus-visible:!outline-none"
                 onMouseEnter={handleTldMouseEnter}
                 onMouseLeave={handleTldMouseLeave}
                 aria-label="Select top level domain"
@@ -387,7 +387,7 @@ export function SRC101RegisterTool({
             <Button
               type="button"
               variant="glassmorphismColor"
-              color="grey"
+              color="greyDark"
               size="mdR"
               onClick={checkAvailability}
               aria-label="Check bitname availability"

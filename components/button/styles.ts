@@ -101,7 +101,7 @@ export const buttonStyles: ButtonVariants = {
     inline-flex items-center justify-center
     rounded-lg border
     font-bold tracking-wide
-    transition-colors ease-in-out duration-200
+    transition-colors duration-50
   `,
 
   /* ===== VARIANT STYLES ===== */
@@ -114,16 +114,17 @@ export const buttonStyles: ButtonVariants = {
     `,
     glassmorphism: `
       border-[1px] border-stamp-grey-darkest/40 rounded-lg
-      bg-stamp-grey-darkest/30 backdrop-blur-lg overflow-hidden
-      text-[var(--color-opacity-dark)] hover:text-[var(--color-opacity-light)]
+      bg-stamp-grey-darkest/30 backdrop-blur-md overflow-hidden
+      text-[var(--color-dark)] hover:text-[var(--color-light)]
       shadow-[0_6px_12px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_3px_3px_rgba(22,22,22,0.2)]
     `,
     glassmorphismColor: `
       relative border-[1px] border-[var(--color-border)] rounded-lg
-      bg-stamp-grey-darkest/20 overflow-hidden
+      bg-stamp-grey-darkest/10 overflow-hidden
       before:absolute before:inset-0 before:rounded-lg before:z-[-1]
-      before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_68%,var(--color-dark)_68%,var(--color-dark)_100%)]
-      before:blur-md hover:before:blur
+      before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
+      before:blur-[5px] before:transition-transform before:duration-50 before:origin-center
+      hover:before:scale-110 hover:before:blur-sm
       text-[#1e1723]
       shadow-[0_2px_12px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_6px_3px_rgba(22,22,22,0.2)]
     `,
@@ -153,12 +154,12 @@ export const buttonStyles: ButtonVariants = {
       before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
       before:[--angle:0deg] before:animate-rotate
       hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
-      before:transition-colors before:duration-200
+      before:transition-colors before:duration-50
       [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[linear-gradient(to_right,#1a0824,#210925)] [&>*]:!border-0
       [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
       [&>*]:font-bold [&>*]:tracking-wider
       [&>*]:text-[var(--default-color)] hover:[&>*]:text-[var(--hover-color)]
-      [&>*]:transition-colors [&>*]:duration-200
+      [&>*]:transition-colors [&>*]:duration-50
     `,
   },
 
@@ -282,7 +283,7 @@ export const buttonStyles: ButtonVariants = {
 /* @baba - update toggle switch - possible duplicate */
 
 export const toggleButton =
-  `flex items-center relative w-10 h-5 !rounded-full ${glassmorphismLayer2} focus:outline-none transition ease-in-out duration-200`;
+  `flex items-center relative w-10 h-5 !rounded-full ${glassmorphismLayer2} focus:outline-none transition duration-50`;
 export const toggleKnobBackground =
   "flex justify-center items-center relative w-5 h-5 bg-transparent rounded-full transition ease-in-out transform duration-400 ";
 export const toggleKnob = "w-[16px] h-[16px] rounded-full";

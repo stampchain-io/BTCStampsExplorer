@@ -120,7 +120,7 @@ export const SelectorButtons = ({
       <div
         class={`absolute top-0.5 bottom-0.5 z-10
           ${buttonStyles.variant.glassmorphismColor}
-          !absolute !border-0
+          !absolute
           [&:before]:!blur
         `}
         style={{
@@ -157,12 +157,12 @@ export const SelectorButtons = ({
               class={`
                 relative block z-20
                 font-semibold text-center
-                transition-all duration-200 ease-in-out
+                transition-all duration-50 ease-in-out
                 ${pillSize[size]}
                 ${
                 selectedValue === option.value
                   ? "text-black"
-                  : "text-[var(--color-dark)] hover:text-[var(--color-light)]"
+                  : "rounded-lg bg-transparent text-[var(--color-dark)] hover:text-[var(--color-light)] hover:bg-stamp-grey-darkest/30"
               }
                 ${optionDisabled ? state.disabled : "cursor-pointer"}
               `}
