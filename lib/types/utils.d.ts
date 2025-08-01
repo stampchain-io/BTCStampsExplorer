@@ -1,4 +1,6 @@
 import type { TimeSeriesData } from "$types/stamp.d.ts";
+import type { SortKey } from "$types/sorting.d.ts";
+import type { BlockRow } from "$types/base.d.ts";
 
 export interface UTXOFromBlockCypher {
   tx_hash: string;

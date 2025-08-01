@@ -649,6 +649,7 @@ export class SRC101Repository {
   }
 
   static async getSrc101OwnerCount(
+    params: SRC101OwnerParams
   ) {
     const queryParams = [];
     const whereClauses = [];
@@ -696,6 +697,7 @@ export class SRC101Repository {
   }
 
   static async getSrc101Owner(
+    params: SRC101OwnerParams
   ) {
     const queryParams = [];
     const whereClauses = [];

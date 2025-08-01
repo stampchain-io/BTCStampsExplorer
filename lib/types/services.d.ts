@@ -10,6 +10,8 @@ import type {
   MarketDataCacheInfo,
   CacheStatus,
 } from "$types/marketData.d.ts";
+import type { HttpRequestConfig, HttpResponse } from "$types/api.d.ts";
+import type { LogNamespace } from "$lib/utils/monitoring/logging/logger.ts";
 
 // Orchestration System Types for Type Domain Migration
 export type TaskStatus =
