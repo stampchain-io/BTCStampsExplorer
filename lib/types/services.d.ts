@@ -1,6 +1,8 @@
-import type { StampRow, CollectionRow, CollectionWithOptionalMarketData, RecentSaleData } from "$types/stamp.d.ts";
-import type { SRC20Row, SRC20TokenSchema, Src101Detail } from "$types/src20.d.ts";
-import type { UTXO, BasicUTXO, DetailedUTXO } from "$types/base.d.ts";
+import type { StampRow, RecentSaleData } from "$types/stamp.d.ts";
+import type { SRC20Row, SRC20TokenSchema } from "$types/src20.d.ts";
+import type { Src101Detail } from "$types/src101.d.ts";
+import type { UTXO, BasicUTXO } from "$types/base.d.ts";
+import type { DetailedUTXO } from "$types/transaction.d.ts";
 import type {
   StampMarketData,
   SRC20MarketData,

@@ -493,8 +493,7 @@ export interface ServerEnvironment {
 /**
  * Server startup configuration
  */
-// Re-export key types needed for configuration
-export type { DatabaseConnectionConfig, Migration } from "./database.d.ts";
+// Note: DatabaseConnectionConfig and Migration already exported above
 
 export interface ServerConfig {
   environment: ServerEnvironment;

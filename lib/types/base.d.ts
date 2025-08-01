@@ -1,4 +1,4 @@
-// Removed unused imports - these types are not used in base.d.ts
+import type { UTXOFetchOptions } from "./services.d.ts";
 export interface UTXO {
   txid: string;
   vout: number;
