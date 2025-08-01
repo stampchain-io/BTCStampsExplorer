@@ -26,7 +26,7 @@ import type {
   MarketListingAggregated,
   SRC20MarketData,
 } from "$types/marketData.d.ts";
-import type { BufferLike } from "$types/utils.d.ts";
+import type { BufferLike, DomainValidationResult } from "$types/utils.d.ts";
 
 // ============================================================================
 // SRC-20 OPERATION AND FILTER TYPES

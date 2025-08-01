@@ -14,6 +14,7 @@ import type * as preact from "preact";
 import type { SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
 import type { STAMP_FILTER_TYPES, STAMP_TYPES, StampRow } from "$types/stamp.d.ts";
 import type { SortKey } from "$types/sorting.d.ts";
+import type { FeeDetails } from "$types/base.d.ts";
 // Removed circular self-import block - these types should be defined locally
 // import type {
 //   ActivityBadgeProps,

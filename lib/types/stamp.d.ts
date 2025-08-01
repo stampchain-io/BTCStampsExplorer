@@ -10,6 +10,7 @@
  */
 
 import type { CacheStatus, StampMarketData } from "$types/marketData.d.ts";
+import type { FeeDetails, BlockRow } from "$types/base.d.ts";
 import type {
   SUBPROTOCOLS,
   TransactionInput,
