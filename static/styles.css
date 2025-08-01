@@ -125,6 +125,10 @@ body {
   /* Custom handle hover color */
 }
 
+.scrollbar-purple {
+  @apply [&::-webkit-scrollbar-track]:bg-[#AA00FF] [&::-webkit-scrollbar-thumb]:bg-[#8800CC] [&::-webkit-scrollbar-thumb:hover]:bg-[#660099];
+}
+
 .scrollbar-grey {
   @apply [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
 }
@@ -133,8 +137,8 @@ body {
   @apply [&::-webkit-scrollbar-track]:bg-[#000000]/20 [&::-webkit-scrollbar-thumb]:bg-[#666666] [&::-webkit-scrollbar-thumb:hover]:bg-[#999999];
 }
 
-.scrollbar-purple {
-  @apply [&::-webkit-scrollbar-track]:bg-[#AA00FF] [&::-webkit-scrollbar-thumb]:bg-[#8800CC] [&::-webkit-scrollbar-thumb:hover]:bg-[#660099];
+.scrollbar-glassmorphism {
+  @apply [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-track]:bg-[#252026]/90 [&::-webkit-scrollbar-thumb]:bg-[#666666]/50 [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
 }
 
 .pixelart {
@@ -508,7 +512,7 @@ body {
 
 .input-open-right:before,
 .input-open-right>* {
-  @apply rounded-t-md rounded-bl-md rounded-br-[0px] !important;
+  @apply rounded-t-lg rounded-bl-lg rounded-br-[0px] !important;
 }
 
 

@@ -7,6 +7,8 @@ export interface ButtonVariants {
   base: string;
   variant: Record<
     | "text"
+    | "glassmorphism"
+    | "glassmorphismColor"
     | "flat"
     | "outline"
     | "flatOutline"
@@ -97,7 +99,7 @@ export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
   base: `
     inline-flex items-center justify-center
-    rounded-lg border-[1px]
+    rounded-lg border
     font-bold tracking-wide
     transition-colors ease-in-out duration-200
   `,
@@ -109,6 +111,21 @@ export const buttonStyles: ButtonVariants = {
       !p-0 bg-transparent !border-0
       font-semibold tracking-wide
       text-[var(--default-color)] hover:text-[var(--hover-color)]
+    `,
+    glassmorphism: `
+      border-[1px] border-stamp-grey-darkest/40 rounded-lg
+      bg-stamp-grey-darkest/30 backdrop-blur-lg overflow-hidden
+      text-[var(--color-opacity-dark)] hover:text-[var(--color-opacity-light)]
+      shadow-[0_6px_12px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_3px_3px_rgba(22,22,22,0.2)]
+    `,
+    glassmorphismColor: `
+      relative border-[1px] border-[var(--color-border)] rounded-lg
+      bg-stamp-grey-darkest/20 overflow-hidden
+      before:absolute before:inset-0 before:rounded-lg before:z-[-1]
+      before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_68%,var(--color-dark)_68%,var(--color-dark)_100%)]
+      before:blur-md hover:before:blur
+      text-[#1e1723]
+      shadow-[0_2px_12px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_6px_3px_rgba(22,22,22,0.2)]
     `,
     flat: `
       bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
@@ -136,24 +153,29 @@ export const buttonStyles: ButtonVariants = {
       before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
       before:[--angle:0deg] before:animate-rotate
       hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
-      before:transition-colors before:ease-in-out before:duration-200
+      before:transition-colors before:duration-200
       [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-[linear-gradient(to_right,#1a0824,#210925)] [&>*]:!border-0
       [&>*]:inline-flex [&>*]:items-center [&>*]:justify-center [&>*]:w-full [&>*]:h-full [&>*]:px-5
       [&>*]:font-bold [&>*]:tracking-wider
       [&>*]:text-[var(--default-color)] hover:[&>*]:text-[var(--hover-color)]
-      [&>*]:transition-colors [&>*]:ease-in-out [&>*]:duration-200
+      [&>*]:transition-colors [&>*]:duration-200
     `,
   },
 
   /* ===== COLOR STYLES ===== */
+  /* @baba - update Gradient color styles across all buttons */
   color: {
     grey: `
-      [--color-dark:#999999]
+      [--color-dark:#666666]
+      [--color-medium:#999999]
       [--color-light:#CCCCCC]
+      [--color-border:#33333366]
     `,
     greyDark: `
-      [--color-dark:#666666]
+      [--color-dark:#333333]
+      [--color-medium:#666666]
       [--color-light:#999999]
+      [--color-border:#33333366]
     `,
     greyGradient: `
       [--color-dark:#666666]
@@ -163,12 +185,16 @@ export const buttonStyles: ButtonVariants = {
       [--hover-color:var(--color-light)]
     `,
     purple: `
-      [--color-dark:#8800CC]
+      [--color-dark:#660099]
+      [--color-medium:#8800CC]
       [--color-light:#AA00FF]
+      [--color-border:#44006666]
     `,
     purpleDark: `
-      [--color-dark:#660099]
+      [--color-dark:#440066]
+      [--color-medium:#660099]
       [--color-light:#8800CC]
+      [--color-border:#44006666]
     `,
     purpleGradient: `
       [--color-dark:#660099]
@@ -227,7 +253,7 @@ export const buttonStyles: ButtonVariants = {
   /* ===== STATE STYLES ===== */
   state: {
     disabled: `
-      opacity-70
+      opacity-50
       cursor-not-allowed
     `,
     loading: `
@@ -261,12 +287,12 @@ export const toggleKnobBackground =
   "flex justify-center items-center relative w-5 h-5 bg-transparent rounded-full transition ease-in-out transform duration-400 ";
 export const toggleKnob = "w-[16px] h-[16px] rounded-full";
 export const sliderKnob =
-  `[&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:tablet:w-4 [&::-webkit-slider-thumb]:tablet:h-4 [&::-webkit-slider-thumb]:appearance-none
-   [&::-webkit-slider-thumb]:bg-stamp-grey [&::-webkit-slider-thumb]:hover:bg-stamp-grey [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-   [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:tablet:w-4 [&::-moz-range-thumb]:tablet:h-4 [&::-moz-range-thumb]:appearance-none
-   [&::-moz-range-thumb]:bg-stamp-purple [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer`;
+  `[&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:tablet:w-3 [&::-webkit-slider-thumb]:tablet:h-3 [&::-webkit-slider-thumb]:appearance-none
+   [&::-webkit-slider-thumb]:bg-red-500 [&::-webkit-slider-thumb]:hover:bg-stamp-grey [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+   [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:tablet:w- [&::-moz-range-thumb]:tablet:h-3 [&::-moz-range-thumb]:appearance-none
+   [&::-moz-range-thumb]:bg-grey-light [&::-moz-range-thumb]:hover:bg-stamp-grey [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer`;
 export const sliderBar =
-  `w-full h-1.5 tablet:h-1 rounded-lg bg-stamp-grey appearance-none cursor-pointer`;
+  `w-full h-5 tablet:h-4 !rounded-full ${glassmorphismLayer2} cursor-pointer`;
 
 /* ===== STYLE COMPOSITION FUNCTION ===== */
 export const button = (
