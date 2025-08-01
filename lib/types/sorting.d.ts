@@ -11,11 +11,7 @@ import type {
 } from "$types/ui.d.ts";
 
 // Re-export imported types that are used by other modules
-export type {
-  EnhancedSortState,
-  SortingComponentProps,
-  SortState,
-};
+export type { EnhancedSortState, SortingComponentProps, SortState };
 
 // ===== CORE SORTING TYPES =====
 

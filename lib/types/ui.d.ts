@@ -12,7 +12,6 @@
 import type { ButtonProps } from "$button";
 import type { FeeDetails } from "$types/base.d.ts";
 
-import type { SortKey } from "$types/sorting.d.ts";
 import type { SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
 import type {
   STAMP_FILTER_TYPES,
@@ -21,6 +20,9 @@ import type {
 } from "$types/stamp.d.ts";
 import type * as preact from "preact";
 import type { ComponentChildren, ComponentProps, JSX } from "preact";
+
+// Re-export imported types that are used by other modules
+export type { ButtonProps };
 // Removed circular self-import block - these types should be defined locally
 // import type {
 //   ActivityBadgeProps,
@@ -201,8 +203,7 @@ import type { ComponentChildren, ComponentProps, JSX } from "preact";
 /**
  * Basic HTML element prop types
  */
-export interface AnchorElementProps
-  extends JSX.HTMLAttributes<HTMLAnchorElement> {
+export interface AnchorElementProps extends JSX.HTMLAttributes<HTMLAnchorElement> {
   href?: string;
   target?: string;
   rel?: string;
@@ -212,8 +213,7 @@ export interface BaseButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
   type?: "button" | "submit" | "reset";
 }
 
-export interface ButtonElementProps
-  extends JSX.HTMLAttributes<HTMLButtonElement> {
+export interface ButtonElementProps extends JSX.HTMLAttributes<HTMLButtonElement> {
   variant?: string;
   color?: string;
   size?: string;
@@ -1822,6 +1822,8 @@ export interface SortingComponentProps<T = any> {
   "aria-label"?: string;
 }
 
+
+
 /**
  * EnhancedSortState - Migrated from sorting.d.ts
  */
@@ -2187,7 +2189,7 @@ export interface VersionContext {
 /**
  * Context - Migrated from server/middleware/apiVersionMiddleware.ts
  */
-type Context = any;
+export type Context = any;
 type Next = any;
 
 /**

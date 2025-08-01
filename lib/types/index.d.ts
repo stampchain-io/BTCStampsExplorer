@@ -29,9 +29,7 @@
 // ============================================================================
 
 export type {
-  AdvancedFeeCalculatorProps,
   AncestorInfo,
-  BaseFeeCalculatorProps,
   BasicUTXO,
   // Block and transaction data
   BlockRow,
@@ -46,7 +44,6 @@ export type {
   ROOT_DOMAIN_TYPES,
   // Bitcoin base primitives
   ScriptType,
-  SimpleFeeCalculatorProps,
   SUBPROTOCOLS,
   TransactionInput,
   TransactionOutput,
@@ -387,6 +384,7 @@ export type {
   ServiceError,
   ServiceResponse,
 } from "./services.d.ts";
+export type { __TYPE_ONLY_MODULE__ };
 
 // ============================================================================
 // Namespace Exports for Organized Access
@@ -543,4 +541,3 @@ export interface WalletData {
  * This prevents accidental runtime imports and supports tree-shaking
  */
 declare const __TYPE_ONLY_MODULE__: unique symbol;
-export type { __TYPE_ONLY_MODULE__ };

@@ -3,6 +3,9 @@ import type { StampRow } from "$types/stamp.d.ts";
 import type { ValidationResult } from "$types/errors.d.ts";
 import type { PaginationQueryParams } from "$types/pagination.d.ts";
 
+// Re-export types that are used by other modules
+export type { StampRow };
+
 /**
  * Base collection data structure matching database schema
  */

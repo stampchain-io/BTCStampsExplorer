@@ -4,26 +4,48 @@ import {
   sliderBar,
   sliderKnob,
 } from "$button";
+import { MaraModeBadge } from "$components/indicators/MaraModeIndicator.tsx";
+import { FeeSkeletonLoader } from "$components/indicators/ProgressIndicator.tsx";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { useFees } from "$fees";
 import { Icon } from "$icon";
-import type {
-  BaseFeeCalculatorProps,
-  FeeDetails,
-  MintDetails,
-} from "$lib/types/base.d.ts";
+import type { FeeDetails, MintDetails } from "$lib/types/base.d.ts";
+import { estimateTransactionSizeForType } from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
+import { logger } from "$lib/utils/logger.ts";
 import {
   formatSatoshisToBTC,
   formatSatoshisToUSD,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { estimateTransactionSizeForType } from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
 import { tooltipButton, tooltipImage } from "$notification";
 import { labelXs, textXs } from "$text";
-import { useEffect, useRef, useState } from "preact/hooks";
-import { MaraModeBadge } from "$components/indicators/MaraModeIndicator.tsx";
-import { FeeSkeletonLoader } from "$components/indicators/ProgressIndicator.tsx";
 import type { ExtendedBaseFeeCalculatorProps } from "$types/ui.d.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
+
+// Local fee calculator props interface
+interface BaseFeeCalculatorProps {
+  fee?: number;
+  handleChangeFee?: (fee: number) => void;
+  BTCPrice?: number;
+  isSubmitting?: boolean;
+  onSubmit?: () => void;
+  onCancel?: () => void;
+  buttonName?: string;
+  className?: string;
+  showCoinToggle?: boolean;
+  tosAgreed?: boolean;
+  onTosChange?: (agreed: boolean) => void;
+  feeDetails?: FeeDetails;
+  mintDetails?: MintDetails;
+  isModal?: boolean;
+  disabled?: boolean;
+  cancelText?: string;
+  confirmText?: string;
+  type?: string;
+  fileType?: string;
+  fileSize?: number;
+  issuance?: string;
+  bitname?: string;
+}
 
 export function FeeCalculatorBase({
   fee,
