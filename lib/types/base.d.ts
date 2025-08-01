@@ -338,3 +338,93 @@ export interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   isLoadingMaraFee?: boolean;
   progressIndicator?: any;
 }
+
+// ============================================================================
+// STATE MANAGEMENT TYPES
+// ============================================================================
+
+/**
+ * Animation state props for components with animations
+ */
+export interface AnimationProps {
+  animate?: boolean;
+  duration?: number;
+  delay?: number;
+  easing?: "ease" | "ease-in" | "ease-out" | "ease-in-out" | "linear";
+  onAnimationStart?: () => void;
+  onAnimationEnd?: () => void;
+}
+
+/**
+ * Async state props for components handling async operations
+ */
+export interface AsyncStateProps {
+  loading?: boolean;
+  error?: string | Error | null;
+  data?: any;
+  onRetry?: () => void;
+  retryCount?: number;
+  maxRetries?: number;
+}
+
+/**
+ * Loading state props
+ */
+export interface LoadingStateProps {
+  isLoading: boolean;
+  loadingText?: string;
+  showSpinner?: boolean;
+  size?: "sm" | "md" | "lg";
+}
+
+/**
+ * Empty state props for when no data is available
+ */
+export interface EmptyStateProps {
+  title?: string;
+  description?: string;
+  icon?: string;
+  actionText?: string;
+  onAction?: () => void;
+  showIcon?: boolean;
+}
+
+/**
+ * Error state props for error handling
+ */
+export interface ErrorStateProps {
+  error: string | Error;
+  title?: string;
+  description?: string;
+  showRetry?: boolean;
+  onRetry?: () => void;
+  onDismiss?: () => void;
+}
+
+/**
+ * Transition props for component transitions
+ */
+export interface TransitionProps {
+  show?: boolean;
+  enter?: string;
+  enterFrom?: string;
+  enterTo?: string;
+  leave?: string;
+  leaveFrom?: string;
+  leaveTo?: string;
+  duration?: number;
+}
+
+// ============================================================================
+// UTILITY TYPES
+// ============================================================================
+
+/**
+ * Make specific keys of T optional
+ */
+export type PartialKeys<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+/**
+ * Make specific keys of T required
+ */
+export type RequiredKeys<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;

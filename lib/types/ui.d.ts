@@ -12,7 +12,18 @@
 import type { ButtonProps } from "$button";
 import type { Timeframe } from "$components/layout/types.ts";
 import type { SRC20Transaction, StampTransaction } from "$types/stamping.ts";
-import type { FeeDetails } from "$types/base.d.ts";
+import type { 
+  FeeDetails,
+  AnimationProps,
+  AsyncStateProps,
+  LoadingStateProps,
+  EmptyStateProps,
+  ErrorStateProps,
+  TransitionProps,
+  PartialKeys,
+  RequiredKeys
+} from "$types/base.d.ts";
+import type { QuickNodeConfig, QuickNodeError } from "$types/services.d.ts";
 
 import type { SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
 import type {
@@ -193,10 +204,131 @@ export type { ButtonProps };
 /**
  * Base component props that all UI components should extend
  */
+export interface BaseComponentProps {
+  className?: string;
+  children?: ComponentChildren;
+  testId?: string;
+  "aria-label"?: string;
+  id?: string;
+}
 
 /**
  * Extended base props with common HTML attributes
  */
+export interface ExtendedComponentProps extends BaseComponentProps {
+  style?: JSX.CSSProperties;
+  onClick?: (event: MouseEvent) => void;
+  onKeyDown?: (event: KeyboardEvent) => void;
+  role?: string;
+  tabIndex?: number;
+}
+
+// =============================================================================
+// LAYOUT COMPONENT PROPS
+// =============================================================================
+
+/**
+ * Container component props for layout containers
+ */
+export interface ContainerProps extends BaseComponentProps {
+  maxWidth?: string;
+  padding?: string;
+  margin?: string;
+  centered?: boolean;
+}
+
+/**
+ * Flexbox layout component props
+ */
+export interface FlexboxProps extends BaseComponentProps {
+  direction?: "row" | "column" | "row-reverse" | "column-reverse";
+  justify?: "flex-start" | "flex-end" | "center" | "space-between" | "space-around" | "space-evenly";
+  align?: "flex-start" | "flex-end" | "center" | "stretch" | "baseline";
+  wrap?: "nowrap" | "wrap" | "wrap-reverse";
+  gap?: string;
+}
+
+/**
+ * Grid layout component props
+ */
+export interface GridProps extends BaseComponentProps {
+  columns?: number | string;
+  rows?: number | string;
+  gap?: string;
+  columnGap?: string;
+  rowGap?: string;
+  templateColumns?: string;
+  templateRows?: string;
+}
+
+// =============================================================================
+// INTERACTION COMPONENT PROPS
+// =============================================================================
+
+/**
+ * Icon component props
+ */
+export interface IconProps extends BaseComponentProps {
+  name?: string;
+  size?: number | string;
+  color?: string;
+  variant?: "solid" | "outline" | "ghost";
+}
+
+/**
+ * Icon button component props
+ */
+export interface IconButtonProps extends BaseComponentProps {
+  icon: string;
+  size?: "sm" | "md" | "lg";
+  variant?: "solid" | "outline" | "ghost";
+  disabled?: boolean;
+  onClick?: (event: MouseEvent) => void;
+  "aria-label": string; // Required for accessibility
+}
+
+/**
+ * Keyboard navigation props
+ */
+export interface KeyboardNavigationProps {
+  onKeyDown?: (event: KeyboardEvent) => void;
+  onKeyUp?: (event: KeyboardEvent) => void;
+  tabIndex?: number;
+  role?: string;
+  "aria-label"?: string;
+}
+
+// =============================================================================
+// FORM COMPONENT PROPS
+// =============================================================================
+
+/**
+ * Form control wrapper props
+ */
+export interface FormControlProps extends BaseComponentProps {
+  label?: string;
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+  helperText?: string;
+}
+
+/**
+ * Input component props
+ */
+export interface InputProps extends FormControlProps {
+  type?: "text" | "email" | "password" | "number" | "tel" | "url" | "search";
+  value?: string;
+  defaultValue?: string;
+  placeholder?: string;
+  onChange?: (event: Event) => void;
+  onBlur?: (event: FocusEvent) => void;
+  onFocus?: (event: FocusEvent) => void;
+  autoComplete?: string;
+  maxLength?: number;
+  minLength?: number;
+  pattern?: string;
+}
 
 // =============================================================================
 // BASIC COMPONENT PROP TYPES
@@ -2593,14 +2725,7 @@ export interface WalletContext {
   showConnectModal: () => void;
 }
 
-/**
- * ListProps - Props for List component
- */
-export interface ListProps {
-  title: string;
-  image: string;
-  description: string | string[];
-}
+// Duplicate ListProps removed - using the one at line 2387
 
 /**
  * SharedListProps - Props for shared list components

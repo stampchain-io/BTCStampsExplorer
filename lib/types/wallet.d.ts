@@ -47,6 +47,23 @@ declare global {
 // Re-export for convenience
 export type { WalletSortKey } from "./sorting.d.ts";
 
+// ===== CORE WALLET INTERFACE =====
+
+/**
+ * Core Wallet interface representing the minimal wallet state
+ * Used throughout the application for wallet management
+ */
+export interface Wallet {
+  accounts: string[];
+  address: string;
+  btcBalance: {
+    confirmed: number;
+    unconfirmed: number;
+    total: number;
+  };
+  stampBalance: StampBalance[];
+}
+
 export interface StampBalance {
   cpid?: string;
   tick?: string;

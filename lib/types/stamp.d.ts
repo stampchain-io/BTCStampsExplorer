@@ -20,6 +20,9 @@ import type {
 
 import type { CollectionRow } from "$server/types/collection.d.ts";
 
+// Re-export Collection type for backward compatibility
+export type Collection = CollectionRow;
+
 // ============================================================================
 // STAMP PROTOCOL ENUMS AND BASIC TYPES
 // ============================================================================

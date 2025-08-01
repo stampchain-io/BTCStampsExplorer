@@ -1,4 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
+import type { AddressHandlerContext } from "$types/api.d.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
 import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 

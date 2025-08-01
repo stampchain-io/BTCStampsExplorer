@@ -4812,3 +4812,33 @@ export interface ServiceStatus {
   version: string;
   dependencies: ServiceDependency[];
 }
+
+// ============================================================================
+// EXTERNAL API CONFIGURATION TYPES
+// ============================================================================
+
+/**
+ * QuickNode API configuration
+ */
+export interface QuickNodeConfig {
+  endpoint: string;
+  apiKey?: string;
+  timeout?: number;
+  retries?: number;
+  rateLimit?: {
+    requests: number;
+    window: number; // in milliseconds
+  };
+  network?: "mainnet" | "testnet";
+}
+
+/**
+ * QuickNode API error response
+ */
+export interface QuickNodeError {
+  code: number;
+  message: string;
+  details?: any;
+  timestamp?: string;
+  requestId?: string;
+}

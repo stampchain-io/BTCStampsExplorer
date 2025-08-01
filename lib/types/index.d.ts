@@ -71,6 +71,8 @@ export type {
 // ============================================================================
 
 export type {
+  // Collection types
+  Collection,
   STAMP_FILTER_TYPES,
   STAMP_MARKETPLACE,
   STAMP_TYPES,
@@ -177,10 +179,10 @@ export type {
   BTCBalanceInfo,
   // Mempool API response types
   MempoolAddressResponse,
-  // Core wallet types
+  // Core wallet interfaces
+  TransactionOptions,
+  Wallet,
   WalletInfo,
-  // Legacy wallet interface (deprecated - use WalletInfo)
-  WalletInfo as Wallet,
 } from "./wallet.d.ts";
 
 // ============================================================================
@@ -200,7 +202,6 @@ export type {
   ButtonSize,
   // Button types
   ButtonVariant,
-
   // Theme and styling
   ColorPalette,
   ComponentWithChildren,
@@ -220,9 +221,10 @@ export type {
   IconWeight,
   InputProps,
   KeyboardNavigationProps,
+  // List component types
+  ListProps,
   // State component types
   LoadingStateProps,
-  ProcessingButtonProps,
   ResponsiveProps,
   // Responsive and accessibility
   ResponsiveValue,
@@ -234,7 +236,6 @@ export type {
   // Gallery and card types
   // Table and display types
   TableColumn,
-  TableProps,
   TextareaProps,
   Theme,
   TransitionProps,
@@ -251,6 +252,14 @@ export type {
   // Pagination types
   PaginationQueryParams,
 } from "./pagination.d.ts";
+
+export type {
+  // Sorting types
+  SortKey,
+  SortOption,
+  StampSortKey,
+  WalletSortKey,
+} from "./sorting.d.ts";
 
 export type {
   // BTC balance options
