@@ -30,3 +30,62 @@ export {
   // Core interfaces
   type TypeMigrationStatus,
 } from "./MigrationOrchestrator.ts";
+
+// Task 38.3 - Specialist Assignment Coordination
+export {
+  type AccelerationPlan,
+  type AccelerationStrategy,
+  type AssignmentScore,
+  type AssignmentStrategy,
+  type CapabilityCategory,
+  type CapacityAnalysis,
+  type CapacityRecommendation,
+  type PerformanceMetrics,
+  type RebalancingPlan,
+  type RecommendedAssignment,
+  type SpecialistAnalytics,
+  type SpecialistCapability,
+  SpecialistCoordinator,
+  type SpecialistCoordinator as SpecialistCoordinatorType,
+  specialistCoordinator,
+  type SpecialistProfile,
+  type TaskAssignmentRequest,
+  type TaskPriority,
+  type TaskReassignment,
+  type WorkloadBalancer,
+} from "./SpecialistCoordinator.ts";
+
+// Task 38.4 - Critical Path Analysis
+export {
+  type BottleneckInfo,
+  type BottleneckType,
+  type BreakthroughSignal,
+  type BreakthroughType,
+  type CriticalPath,
+  CriticalPathAnalyzer,
+  type CriticalPathAnalyzer as CriticalPathAnalyzerType,
+  criticalPathAnalyzer,
+  type CriticalPathNode,
+  type ParallelizationOpportunity,
+  type PathPriority,
+  type ResolutionStrategy,
+} from "./CriticalPathAnalyzer.ts";
+
+// Task 38.5 - Automated Milestone Detection
+export {
+  type Achievement,
+  type AchievementCategory,
+  type AchievementRarity,
+  type BreakthroughImpact,
+  type CelebrationType,
+  MilestoneDetector,
+  type MilestoneDetector as MilestoneDetectorType,
+  milestoneDetector,
+  type MilestoneEvent,
+  type MilestoneEventType,
+  type MilestoneSignificance,
+  type MilestoneThreshold,
+  type MomentumLevel,
+  type MomentumState,
+  type MomentumTrend,
+} from "./MilestoneDetector.ts";
