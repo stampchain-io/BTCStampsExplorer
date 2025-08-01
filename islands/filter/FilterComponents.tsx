@@ -1,10 +1,10 @@
 // TODO(@baba): Move checkbox + radiobuttons to form folder + rename file to RangeSlider.tsx and move to form folder
-import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { ComponentChildren } from "preact";
-import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { handleIcon } from "$icon";
-import { labelLogicResponsive } from "$text";
 import { inputCheckbox } from "$form";
+import { handleIcon } from "$icon";
+import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { labelLogicResponsive } from "$text";
+import { ComponentChildren } from "preact";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 // Range Slider Component
 export const RangeSlider = ({
@@ -334,6 +334,21 @@ export const RangeSlider = ({
     }
   };
 
+  // Adjusted valueToPosition functions for padding
+  const adjustedValueToPositionMin = (value: number): number => {
+    const basePosition = valueToPosition(value);
+    // Add 1px padding as percentage (assuming ~300px typical slider width)
+    const paddingPercent = 1; // 2% padding for left handle
+    return Math.min(basePosition + paddingPercent, 100);
+  };
+
+  const adjustedValueToPositionMax = (value: number): number => {
+    const basePosition = valueToPosition(value);
+    // Subtract 1px padding as percentage
+    const paddingPercent = 1; // 2% padding for right handle
+    return Math.max(basePosition - paddingPercent, 0);
+  };
+
   // Smart breakpoint snapping function
   const snapToBreakpoint = (value: number): number => {
     if (value === Infinity) return Infinity;
@@ -653,12 +668,12 @@ export const RangeSlider = ({
 
   // Define the gradient colors
   const trackGradientFill = (hoveredHandle: "min" | "max" | null) => {
-    // Calculate percentages based on our non-linear scale
-    const minPercent = valueToPosition(minValue);
+    // Calculate percentages based on our non-linear scale with adjusted positioning
+    const minPercent = adjustedValueToPositionMin(minValue);
     const maxPercent = (variant === "fileSize" && maxValue >= config.max) ||
         maxValue === Infinity
-      ? 100
-      : valueToPosition(maxValue);
+      ? 98 // Adjust max to account for right padding
+      : adjustedValueToPositionMax(maxValue);
 
     // Calculate dynamic offsets based on handle positions
     const minHandleOffset = (minPercent / 100) * 3; // 0% to 3% based on position
@@ -878,13 +893,13 @@ export const RangeSlider = ({
       </div>
 
       <div
-        class="relative h-5 tablet:h-4 rounded-full bg-stamp-grey-darkest border-2 border-stamp-grey-darkest cursor-pointer"
+        class="relative h-[22px] tablet:h-[18px] rounded-full bg-stamp-grey-darkest/15 border-[1px] border-stamp-grey-darkest/20 cursor-pointer"
         ref={sliderRef}
         onClick={handleTrackClick}
       >
         {/* Track fill with dynamic gradient */}
         <div
-          class="absolute top-0 bottom-0 h-4 tablet:h-3 rounded-full transition-colors duration-300 pointer-events-none"
+          class="absolute top-0.5 bottom-0.5 h-4 tablet:h-3 rounded-full transition-colors duration-300 pointer-events-none"
           style={trackGradientFill(hoveredHandle)}
         />
 
@@ -894,7 +909,7 @@ export const RangeSlider = ({
           min="0"
           max="100"
           step="1"
-          value={valueToPosition(minValue)}
+          value={adjustedValueToPositionMin(minValue)}
           onChange={handleMinInput}
           onInput={handleMinInput}
           onMouseEnter={() => setHoveredHandle("min")}
@@ -911,7 +926,7 @@ export const RangeSlider = ({
           min="0"
           max="100"
           step="1"
-          value={valueToPosition(maxValue)}
+          value={adjustedValueToPositionMax(maxValue)}
           onChange={handleMaxInput}
           onInput={handleMaxInput}
           onMouseEnter={() => setHoveredHandle("max")}

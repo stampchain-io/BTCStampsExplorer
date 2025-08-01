@@ -116,7 +116,7 @@ export const iconStyles = {
 /* ===== INTERACTIVE ELEMENT STYLES ===== */
 /* ===== SLIDER HANDLE ===== */
 export const handleIcon = `
-  absolute w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none
+  absolute top-0.5 bottom-0.5 w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
   [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:tablet:size-3
   [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey
