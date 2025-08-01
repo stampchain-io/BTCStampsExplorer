@@ -312,8 +312,7 @@ export function SRC20TransferTool(
             <div class="flex flex-col space-y-3 items-end">
               <div class={`h-4 w-[156px] tablet:w-56 ${loaderSkeletonMd}`}>
               </div>
-              <div class={`h-10 tablet:h-9 w-[156px] ${loaderSkeletonMd}`}>
-              </div>
+              <div class={`h-9 tablet:h-8 w-36 ${loaderSkeletonLg}`}></div>
             </div>
           </div>
         </div>

@@ -13,6 +13,10 @@ import {
   containerBackground,
   containerRowForm,
   glassmorphismLayer2,
+  loaderSkeletonFull,
+  loaderSkeletonImage,
+  loaderSkeletonLg,
+  loaderSkeletonMd,
   transition,
 } from "$layout";
 import { useFees } from "$lib/hooks/useFees.ts";
@@ -30,7 +34,7 @@ import {
   tooltipImage,
 } from "$notification";
 import { FeeCalculatorBase } from "$section";
-import { titleGreyLD } from "$text";
+import { labelLg, titleGreyLD } from "$text";
 import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 
@@ -210,12 +214,73 @@ export function StampingTool() {
   const { config, isLoading } = useConfig<Config>();
 
   /* ===== EARLY RETURN CONDITIONS ===== */
-  if (isLoading) {
-    return <div>Loading configuration...</div>;
-  }
+  if (isLoading || !config) {
+    return (
+      <div class={bodyTool}>
+        <h1 class={`${titleGreyLD} mx-auto mb-4`}>STAMP</h1>
 
-  if (!config) {
-    return <div>Error: Configuration not loaded</div>;
+        {/* Skeleton Form */}
+        <div class={`${containerBackground} mb-6`}>
+          <div className="flex gap-5">
+            <div className="flex gap-5">
+              {/* Image preview skeleton */}
+              <div
+                class={`relative items-center content-center mx-auto w-[100px] h-[100px] mobileMd:w-[100px] mobileMd:h-[100px] ${loaderSkeletonImage}`}
+              >
+              </div>
+            </div>
+
+            <div class="flex flex-col justify-between items-end w-full">
+              <div className="relative">
+                {/* Advanced toggle skeleton */}
+                <div class={`w-10 h-5 ${loaderSkeletonFull}`}>
+                </div>
+              </div>
+              <div className="flex items-center gap-5">
+                {/* Editions label skeleton */}
+                <div class={`h-4 w-[88px] ${loaderSkeletonMd}`}>
+                </div>
+                {/* Editions input skeleton */}
+                <div class={`h-10 w-10 ${loaderSkeletonLg}`}>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton Fee Calculator */}
+        <div class={containerBackground}>
+          {/* Fee slider skeleton */}
+          <div class="flex justify-between">
+            <div class={`h-4 w-28 ${loaderSkeletonMd}`}>
+            </div>
+            {/* Toggle switch skeleton */}
+            <div class={`w-10 h-5 ${loaderSkeletonFull}`}>
+            </div>
+          </div>
+          <div class={`h-4 w-[168px] mt-1 ${loaderSkeletonMd}`}>
+          </div>
+          {/* Fee slider skeleton */}
+          <div class={`h-3 w-[50%] mt-4 ${loaderSkeletonFull}`}>
+          </div>
+
+          {/* Estimate and fee details skeleton */}
+          <div class={`h-5 w-full min-[480px]:w-72 mt-8 ${loaderSkeletonMd}`}>
+          </div>
+          <div class={`h-4 w-16 mt-4 ${loaderSkeletonMd}`}>
+          </div>
+
+          {/* Terms and Submit button skeleton */}
+          <div class="flex justify-end pt-10">
+            <div class="flex flex-col space-y-3 items-end">
+              <div class={`h-4 w-[156px] tablet:w-56 ${loaderSkeletonMd}`}>
+              </div>
+              <div class={`h-9 tablet:h-8 w-36 ${loaderSkeletonLg}`}></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Once we have the config, render the main component
@@ -914,7 +979,7 @@ function StampingToolMain({ config }: { config: Config }) {
   const imagePreviewDiv = (
     <div
       id="image-preview"
-      class={`relative items-center content-center mx-auto rounded ${PREVIEW_SIZE_CLASSES} text-center group ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer `}
+      class={`relative items-center content-center mx-auto ${PREVIEW_SIZE_CLASSES} text-center group ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer `}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
@@ -985,7 +1050,8 @@ function StampingToolMain({ config }: { config: Config }) {
                 name="uploadImage"
                 weight="extraLight"
                 size="xxl"
-                color="grey"
+                color="custom"
+                className="stroke-stamp-grey"
               />
             </div>
           </label>
@@ -993,7 +1059,7 @@ function StampingToolMain({ config }: { config: Config }) {
         : (
           <label
             for="upload"
-            class={`flex flex-col items-center justify-center h-full ${glassmorphismLayer2} hover:bg-stamp-grey-darkest/30 ${transition} cursor-pointer`}
+            class={`flex flex-col items-center justify-center h-full cursor-pointer`}
           >
             <Icon
               type="icon"
@@ -1221,7 +1287,7 @@ function StampingToolMain({ config }: { config: Config }) {
   /* ===== COMPONENT RENDER ===== */
   return (
     <div class={bodyTool}>
-      <h1 class={`${titleGreyLD} mobileMd:mx-auto mb-5`}>STAMP</h1>
+      <h1 class={`${titleGreyLD} mx-auto mb-4`}>STAMP</h1>
 
       {isConnected && addressError && (
         <div class="w-full text-red-500 text-center font-bold">
@@ -1269,8 +1335,8 @@ function StampingToolMain({ config }: { config: Config }) {
                 {tooltipText}
               </div>
             </div>
-            <div className="flex items-center gap-3 min-[420px]:gap-5">
-              <h5 className="font-semibold text-lg min-[420px]:text-xl text-stamp-grey">
+            <div className="flex items-center gap-5">
+              <h5 className={`${labelLg} !text-stamp-grey`}>
                 EDITIONS
               </h5>
 
@@ -1297,7 +1363,7 @@ function StampingToolMain({ config }: { config: Config }) {
             {poshToggleButton}
             <div
               ref={lockButtonRef}
-              className="flex items-center justify-center !w-10 !h-10 rounded-md bg-stamp-grey cursor-pointer group"
+              className={`flex items-center justify-center !w-10 !h-10 ${glassmorphismLayer2} group`}
               onClick={() => {
                 setIsLocked(!isLocked);
                 setIsLockTooltipVisible(false);
@@ -1313,8 +1379,7 @@ function StampingToolMain({ config }: { config: Config }) {
                     name="locked"
                     weight="bold"
                     size="xs"
-                    color="custom"
-                    className="stroke-stamp-purple-dark group-hover:stroke-stamp-purple cursor-pointer"
+                    color="grey"
                   />
                 )
                 : (
@@ -1324,7 +1389,7 @@ function StampingToolMain({ config }: { config: Config }) {
                     weight="bold"
                     size="xs"
                     color="custom"
-                    className="stroke-stamp-purple-bright group-hover:stroke-stamp-purple-dark cursor-pointer"
+                    className="stroke-stamp-grey-light group-hover:stroke-stamp-grey"
                   />
                 )}
             </div>
@@ -1344,7 +1409,7 @@ function StampingToolMain({ config }: { config: Config }) {
 
             <div
               ref={previewButtonRef}
-              className="flex items-center justify-center !w-[46px] !h-10 rounded-md bg-stamp-grey cursor-pointer group" // dunno why but the width has to be +6px ?!?!
+              className={`flex items-center justify-center !w-[46px] !h-10 ${glassmorphismLayer2} group`} // dunno why but the width has to be +6px ?!?!
               onClick={() => {
                 toggleFullScreenModal();
                 setIsPreviewTooltipVisible(false);
@@ -1355,11 +1420,10 @@ function StampingToolMain({ config }: { config: Config }) {
             >
               <Icon
                 type="iconButton"
-                name="previewImage"
+                name="previewImageCornersOut"
                 weight="bold"
                 size="xs"
-                color="custom"
-                className="stroke-stamp-purple-dark group-hover:stroke-stamp-purple cursor-pointer"
+                color="grey"
               />
               <div
                 class={`${tooltipButton} ${
