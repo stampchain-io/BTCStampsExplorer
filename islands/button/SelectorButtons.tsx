@@ -1,4 +1,4 @@
-import { color, padding, pillSize, state } from "$button";
+import { buttonStyles, color, pillSize, state } from "$button";
 import { glassmorphism } from "$layout";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
@@ -119,15 +119,13 @@ export const SelectorButtons = ({
       {/* Selection button */}
       <div
         class={`absolute top-0.5 bottom-0.5 z-10
-          rounded-lg shadow-lg
-          transition-transform duration-200 ease-in-out
-          ${padding[size]}
+          ${buttonStyles.variant.glassmorphismColor}
+          !absolute !border-0
+          [&:before]:!blur
         `}
         style={{
           transform: selectionTransform,
           width: `calc((100% - ${options.length * 2}px) / ${options.length})`,
-          background:
-            `linear-gradient(135deg, var(--color-light), var(--color-dark))`,
         }}
       />
 
