@@ -89,3 +89,30 @@ export {
   type MomentumState,
   type MomentumTrend,
 } from "./MilestoneDetector.ts";
+
+// Task 38.6 - Task Master AI Integration
+export {
+  TaskMasterIntegration,
+  type TaskMasterUpdate,
+  type OrchestrationEvent
+} from "./TaskMasterIntegration.ts";
+
+// Task 38.7 - Maximum Velocity Maintenance
+export {
+  VelocityMaintainer,
+  type VelocityMaintainerConfig,
+  type VelocityMetrics,
+  type CompletionBlocker,
+  type MomentumIndicator
+} from "./VelocityMaintainer.ts";
+
+// Task 38.8 - Type Module Integration
+export {
+  TypeModuleIntegrator,
+  type TypeModule,
+  type TypeModuleIntegratorConfig,
+  type TypeModuleStatus,
+  type DependencyGraph,
+  type ValidationResult,
+  type ParallelMigrationConfig
+} from "./TypeModuleIntegrator.ts";

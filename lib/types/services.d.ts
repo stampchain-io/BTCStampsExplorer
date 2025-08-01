@@ -1,5 +1,91 @@
 import type { StampRow } from "$types/stamp.d.ts";
 
+// Orchestration System Types for Type Domain Migration
+export type TaskStatus = 'pending' | 'in-progress' | 'done' | 'deferred' | 'cancelled' | 'review';
+export type TaskPriority = 'high' | 'medium' | 'low';
+
+export interface MigrationMetrics {
+  totalTasks: number;
+  completedTasks: number;
+  pendingTasks: number;
+  completionPercentage: number;
+  elapsedDays?: number;
+}
+
+export interface VelocityMetrics {
+  tasksPerDay: number;
+  trend: 'increasing' | 'stable' | 'decreasing';
+  projectedCompletion: string;
+}
+
+export interface CompletionBlocker {
+  id: string;
+  type: 'dependency-cycle' | 'resource-constraint' | 'external-dependency' | 'complexity-overload';
+  severity: 'high' | 'medium' | 'low';
+  description: string;
+  estimatedDelay: string;
+  mitigationStrategy: string;
+  detectedAt?: number;
+  riskLevel?: string;
+}
+
+export interface MomentumIndicator {
+  timestamp: number;
+  status: string;
+  velocity: number;
+  momentum: number;
+}
+
+export interface TaskMasterUpdate {
+  type: string;
+  data?: any;
+  priority?: 'high' | 'medium' | 'low';
+  urgent?: boolean;
+  timestamp?: number;
+  integrationId?: string;
+}
+
+export interface OrchestrationEvent {
+  type: string;
+  data: any;
+  timestamp: number;
+}
+
+export interface TypeModuleStatus {
+  name: string;
+  migrationStatus: 'pending' | 'in-progress' | 'completed' | 'validated';
+  productionReady: boolean;
+  validationErrors: string[];
+}
+
+export interface DependencyGraph {
+  nodes: Array<{
+    id: string;
+    label: string;
+    metadata?: Record<string, any>;
+  }>;
+  edges: Array<{
+    from: string;
+    to: string;
+    weight: number;
+  }>;
+}
+
+export interface ValidationResult {
+  moduleId: string;
+  valid: boolean;
+  score: number;
+  errors: string[];
+  warnings: string[];
+  timestamp: number;
+}
+
+export interface ParallelMigrationConfig {
+  maxConcurrent: number;
+  batchSize: number;
+  timeoutMs: number;
+}
+
 export type DispenserFilter = "open" | "closed" | "all";
 
 export interface Dispenser {
@@ -686,6 +772,4014 @@ export interface IServiceManager {
 
 /**
  * Service status information
+
+/**
+ * FeeEstimationService - Migrated from useProgressiveFeeEstimation.ts
+ */
+export interface FeeEstimationService {
+  estimateFees(endpoint: string, payload: any): Promise<any>;
+}
+
+/**
+ * LoggerService - Migrated from useProgressiveFeeEstimation.ts
+ */
+export interface LoggerService {
+  debug(category: LogNamespace, data: any): void;
+  warn(category: LogNamespace, data: any): void;
+  error(category: LogNamespace, data: any): void;
+}
+
+/**
+ * ServerConfig - Migrated from config.ts
+ */
+export type ServerConfig = {
+  readonly APP_ROOT: string;
+  readonly IMAGES_SRC_PATH?: string;
+  readonly MINTING_SERVICE_FEE?: string;
+  readonly MINTING_SERVICE_FEE_ADDRESS?: string;
+  readonly CSRF_SECRET_KEY?: string;
+  readonly MINTING_SERVICE_FEE_ENABLED: string;
+  readonly MINTING_SERVICE_FEE_FIXED_SATS: string;
+  readonly OPENSTAMP_API_KEY: string;
+  readonly API_KEY?: string;
+  readonly QUICKNODE_ENDPOINT?: string;
+  readonly QUICKNODE_API_KEY?: string;
+  readonly DEBUG_NAMESPACES: string;
+  readonly IS_DEBUG_ENABLED: boolean;
+  readonly APP_DOMAIN: string | undefined;
+  readonly ALLOWED_DOMAINS: string | undefined;
+  // MARA Integration Configuration
+  readonly MARA_API_BASE_URL?: string;
+  readonly MARA_API_TIMEOUT?: string;
+  readonly MARA_SERVICE_FEE_SATS?: string;
+  readonly MARA_SERVICE_FEE_ADDRESS?: string;
+  readonly ENABLE_MARA_INTEGRATION?: string;
+  [key: string]: string | boolean | undefined;
+};
+
+/**
+ * DatabaseConfig - Migrated from database.config.ts
+ */
+export interface DatabaseConfig {
+  // Connection Pool Settings
+  maxConnections: number;
+  minConnections: number;
+  maxWaitingForConnection: number;
+  connectionTimeout: number;
+  acquireTimeout: number;
+  validationTimeout: number;
+
+  // Connection Options
+  enableCompression: boolean;
+  enableConnectionLogging: boolean;
+
+  // Retry Strategy
+  maxRetries: number;
+  retryDelay: number;
+
+  // Health Check
+  healthCheckInterval: number;
+
+  // Environment Info
+  environment: "development" | "production" | "test";
+  isRemoteDatabase: boolean;
+}
+
+/**
+ * MaraConfig - Migrated from maraConfig.ts
+ */
+export interface MaraConfig {
+  /**
+   * Base URL for MARA Slipstream API
+   * @example "https://slipstream.mara.com/rest-api"
+   */
+  readonly apiBaseUrl: string;
+
+  /**
+   * API request timeout in milliseconds
+   * @minimum 1000
+   * @maximum 60000
+   * @default 30000
+   */
+  readonly apiTimeout: number;
+
+  /**
+   * Service fee amount in satoshis for MARA transactions
+   * Must be exactly 42000 sats as required by MARA
+   * @constant 42000
+   */
+  readonly serviceFeeAmount: number;
+
+  /**
+   * Bitcoin address for MARA service fee collection
+   * Must be a valid Bitcoin address (bech32 format preferred)
+   * @example "bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m"
+   */
+  readonly serviceFeeAddress: string;
+
+  /**
+   * Feature flag to enable/disable MARA integration
+   * When false, all MARA functionality is bypassed
+   */
+  readonly enabled: boolean;
+}
+
+/**
+ * MaraConfigValidationResult - Migrated from maraConfigValidator.ts
+ */
+export interface MaraConfigValidationResult {
+  /**
+   * Whether the configuration is valid
+   */
+  isValid: boolean;
+
+  /**
+   * The validated configuration (if valid) or default config (if disabled)
+   */
+  config: MaraConfig | null;
+
+  /**
+   * Array of validation errors (if any)
+   */
+  errors: string[];
+
+  /**
+   * Array of validation warnings (non-fatal issues)
+   */
+  warnings: string[];
+}
+
+/**
+ * DatabaseConfig - Migrated from databaseManager.ts
+ */
+export interface DatabaseConfig {
+  DB_HOST: string;
+  DB_USER: string;
+  DB_PASSWORD: string;
+  DB_PORT: number;
+  DB_NAME: string;
+  DB_MAX_RETRIES: number;
+  ELASTICACHE_ENDPOINT: string;
+  DENO_ENV: string;
+  CACHE?: string;
+  REDIS_LOG_LEVEL?: string;
+}
+
+/**
+ * CacheConfig - Migrated from cacheService.ts
+ */
+export interface CacheConfig {
+  duration: number;
+  staleWhileRevalidate?: number;
+  staleIfError?: number;
+  ttl?: number;
+}
+
+/**
+ * DbManager - Migrated from cacheService.ts
+ */
+export interface DbManager {
+  handleCache<T>(
+    key: string,
+    factory: () => Promise<T>,
+    duration: number,
+  ): Promise<T>;
+  getFromCache<T>(key: string): Promise<T | null>;
+}
+
+/**
+ * CacheService - Migrated from cacheService.ts
+ */
+export interface CacheService {
+  /**
+   * Get a value from cache or compute it using the factory function
+   */
+  get<T>(
+    key: string,
+    factory: () => Promise<T>,
+    config: CacheConfig,
+  ): Promise<T>;
+
+  /**
+   * Set a value in cache with optional TTL
+   */
+  set<T>(key: string, value: T, ttlSeconds?: number): Promise<void>;
+
+  /**
+   * Get a value from cache without fallback
+   */
+  getOnly<T>(key: string): Promise<T | null>;
+
+  /**
+   * Delete a key from cache
+   */
+  delete(key: string): Promise<void>;
+
+  /**
+   * Clear all cache entries
+   */
+  clear(): Promise<void>;
+
+  /**
+   * Check if a key exists in cache
+   */
+  exists(key: string): Promise<boolean>;
+
+  /**
+   * Get cache statistics
+   */
+  getStats(): Promise<{
+    hits: number;
+    misses: number;
+    entries: number;
+  }>;
+}
+
+/**
+ * FeeEstimate - Migrated from feeProvider.ts
+ */
+export interface FeeEstimate {
+  recommendedFee: number;
+  fastestFee?: number;
+  halfHourFee?: number;
+  hourFee?: number;
+  economyFee?: number;
+  minimumFee?: number;
+  confidence: "high" | "medium" | "low";
+  source: string;
+  timestamp: number;
+  debug_feesResponse?: any;
+}
+
+/**
+ * FeeProvider - Migrated from feeProvider.ts
+ */
+export interface FeeProvider {
+  /**
+   * Get fee estimates from this provider
+   */
+  getFeeEstimate(): Promise<FeeEstimate>;
+
+  /**
+   * Get the name of this fee provider
+   */
+  getName(): string;
+
+  /**
+   * Check if this provider is currently available
+   */
+  isAvailable(): Promise<boolean>;
+
+  /**
+   * Get the confidence level of this provider
+   */
+  getConfidenceLevel(): "high" | "medium" | "low";
+}
+
+/**
+ * FeeService - Migrated from feeProvider.ts
+ */
+export interface FeeService {
+  /**
+   * Get fee estimates with fallback logic
+   */
+  getFeeEstimate(): Promise<FeeEstimate>;
+
+  /**
+   * Add a fee provider to the service
+   */
+  addProvider(provider: FeeProvider): void;
+
+  /**
+   * Remove a fee provider from the service
+   */
+  removeProvider(providerName: string): void;
+
+  /**
+   * Get list of all providers
+   */
+  getProviders(): FeeProvider[];
+
+  /**
+   * Get health status of all providers
+   */
+  getProviderHealth(): Promise<
+    Array<{
+      name: string;
+      available: boolean;
+      lastEstimate?: FeeEstimate;
+    }>
+  >;
+}
+
+/**
+ * HttpClient - Migrated from httpClient.ts
+ */
+export interface HttpClient {
+  /**
+   * Perform an HTTP request
+   */
+  request<T = any>(
+    url: string,
+    config?: HttpRequestConfig,
+  ): Promise<HttpResponse<T>>;
+
+  /**
+   * GET request
+   */
+  get<T = any>(
+    url: string,
+    config?: Omit<HttpRequestConfig, "method">,
+  ): Promise<HttpResponse<T>>;
+
+  /**
+   * POST request
+   */
+  post<T = any>(
+    url: string,
+    data?: any,
+    config?: Omit<HttpRequestConfig, "method" | "body">,
+  ): Promise<HttpResponse<T>>;
+
+  /**
+   * PUT request
+   */
+  put<T = any>(
+    url: string,
+    data?: any,
+    config?: Omit<HttpRequestConfig, "method" | "body">,
+  ): Promise<HttpResponse<T>>;
+
+  /**
+   * DELETE request
+   */
+  delete<T = any>(
+    url: string,
+    config?: Omit<HttpRequestConfig, "method">,
+  ): Promise<HttpResponse<T>>;
+
+  /**
+   * PATCH request
+   */
+  patch<T = any>(
+    url: string,
+    data?: any,
+    config?: Omit<HttpRequestConfig, "method" | "body">,
+  ): Promise<HttpResponse<T>>;
+
+  /**
+   * Get metrics about the HTTP client performance
+   */
+  getMetrics?(): {
+    poolSize: number;
+    activeRequests: number;
+    totalRequests: number;
+    totalErrors: number;
+  };
+
+  /**
+   * Clear the internal pool of resources
+   */
+  clearPool?(): void;
+}
+
+/**
+ * PriceData - Migrated from priceService.ts
+ */
+export interface PriceData {
+  price: number;
+  source: string;
+  timestamp: number;
+  confidence: "high" | "medium" | "low";
+}
+
+/**
+ * PriceProvider - Migrated from priceService.ts
+ */
+export interface PriceProvider {
+  /**
+   * Get the current BTC price from this provider
+   */
+  getPrice(): Promise<PriceData>;
+
+  /**
+   * Get the name of this price provider
+   */
+  getName(): string;
+
+  /**
+   * Check if this provider is currently available
+   */
+  isAvailable(): Promise<boolean>;
+}
+
+/**
+ * PriceService - Migrated from priceService.ts
+ */
+export interface PriceService {
+  /**
+   * Get the current BTC price with fallback logic
+   */
+  getPrice(): Promise<PriceData>;
+
+  /**
+   * Add a price provider to the service
+   */
+  addProvider(provider: PriceProvider): void;
+
+  /**
+   * Remove a price provider from the service
+   */
+  removeProvider(providerName: string): void;
+
+  /**
+   * Get list of all providers
+   */
+  getProviders(): PriceProvider[];
+
+  /**
+   * Get health status of all providers
+   */
+  getProviderHealth(): Promise<
+    Array<{
+      name: string;
+      available: boolean;
+      lastPrice?: PriceData;
+    }>
+  >;
+}
+
+/**
+ * VersionConfig - Migrated from apiVersionMiddleware.ts
+ */
+export interface VersionConfig {
+  supportedVersions: string[];
+  defaultVersion: string;
+  deprecatedVersions: string[];
+  versionEndOfLife: Record<string, string>; // version -> EOL date
+}
+
+/**
+ * VersionContext - Migrated from apiVersionMiddleware.ts
+ */
+export interface VersionContext {
+  version: string;
+  isDeprecated: boolean;
+  endOfLife?: string;
+  enhancedFields: string[];
+}
+
+/**
+ * Context - Migrated from apiVersionMiddleware.ts
+ */
+export type Context = any;
+
+/**
+ * Next - Migrated from apiVersionMiddleware.ts
+ */
+export type Next = any;
+
+/**
+ * RateLimitEntry - Migrated from rateLimitMiddleware.ts
+ */
+export interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+  firstRequest: number;
+}
+
+/**
+ * TransformationRule - Migrated from schemaTransformer.ts
+ */
+export interface TransformationRule {
+  sourceField: string;
+  targetField?: string;
+  transform?: (value: any, data?: any) => any;
+  condition?: (data: any) => boolean;
+  remove?: boolean;
+}
+
+/**
+ * VersionTransformationConfig - Migrated from schemaTransformer.ts
+ */
+export interface VersionTransformationConfig {
+  version: string;
+  rules: TransformationRule[];
+  globalTransforms?: ((data: any) => any)[];
+}
+
+/**
+ * XcpBalanceOptions - Migrated from counterpartyApiService.ts
+ */
+export interface XcpBalanceOptions {
+  type?: "all" | "send" | "dispenser" | "issuance"; // Types of balances
+  cursor?: string; // Last index for cursor-based pagination
+  limit?: number; // Max results per request
+  offset?: number; // Skip count (overrides cursor)
+  sort?: string; // Sort order (overrides cursor)
+  verbose?: boolean; // Include additional info
+  showUnconfirmed?: boolean; // Include mempool results
+}
+
+/**
+ * ComposeAttachOptions - Migrated from counterpartyApiService.ts
+ */
+export interface ComposeAttachOptions {
+  // Fee parameters
+  fee_per_kb?: number; // Optional - can be provided by caller or handled by API
+
+  // Optional parameters
+  destination_vout?: number;
+  inputs_set?: string; // txid:vout format for specifying UTXO
+  encoding?: string; // default: 'auto'
+  regular_dust_size?: number; // default: 546
+  multisig_dust_size?: number; // default: 1000
+  pubkeys?: string;
+  allow_unconfirmed_inputs?: boolean; // default: false
+  exact_fee?: number;
+  fee_provided?: number; // default: 0
+  unspent_tx_hash?: string;
+  dust_return_pubkey?: string | false;
+  disable_utxo_locks?: boolean; // default: false
+  p2sh_pretx_txid?: string;
+  segwit?: boolean; // default: false
+  confirmation_target?: number; // default: 3
+  exclude_utxos?: string;
+  return_psbt?: boolean; // default: false (API v2 only)
+  return_only_data?: boolean; // default: false (API v2 only)
+  extended_tx_info?: boolean; // default: false (API v1 only)
+  old_style_api?: boolean; // default: false (API v1 only)
+  use_utxos_with_balances?: boolean; // default: false
+  exclude_utxos_with_balances?: boolean; // default: false
+  validate?: boolean; // default: true
+  verbose?: boolean; // default: false
+  show_unconfirmed?: boolean; // default: false
+}
+
+/**
+ * ComposeDetachOptions - Migrated from counterpartyApiService.ts
+ */
+export interface ComposeDetachOptions {
+  // Fee parameters
+  fee_per_kb?: number;
+
+  // Optional parameters
+  destination?: string;
+  encoding?: string;
+  regular_dust_size?: number;
+  multisig_dust_size?: number;
+  pubkeys?: string;
+  allow_unconfirmed_inputs?: boolean;
+  exact_fee?: number;
+  fee_provided?: number;
+  unspent_tx_hash?: string;
+  dust_return_pubkey?: string | false;
+  disable_utxo_locks?: boolean;
+  p2sh_pretx_txid?: string;
+  segwit?: boolean;
+  confirmation_target?: number;
+  exclude_utxos?: string;
+  inputs_set?: string;
+  return_psbt?: boolean;
+  return_only_data?: boolean;
+  extended_tx_info?: boolean;
+  old_style_api?: boolean;
+  use_utxos_with_balances?: boolean;
+  exclude_utxos_with_balances?: boolean;
+  validate?: boolean;
+  verbose?: boolean;
+  show_unconfirmed?: boolean;
+}
+
+/**
+ * IssuanceOptions - Migrated from counterpartyApiService.ts
+ */
+export interface IssuanceOptions {
+  divisible?: boolean;
+  source?: string;
+  allow_unconfirmed_inputs?: boolean;
+  fee_per_kb?: number;
+  fee?: number;
+  encoding?: string;
+  pubkeys?: string;
+  return_psbt?: boolean;
+  extended_tx_info?: boolean;
+  old_style_api?: boolean;
+  verbose?: boolean;
+  show_unconfirmed?: boolean;
+  lock?: boolean;
+  description?: string;
+}
+
+/**
+ * StampServiceOptions - Migrated from stampService.ts
+ */
+export interface StampServiceOptions {
+  cacheType: RouteType;
+}
+
+/**
+ * StampFileResult - Migrated from stampService.ts
+ */
+export interface StampFileResult {
+  status: number;
+  body: string;
+  stamp_url: string;
+  tx_hash: string;
+  headers: {
+    "Content-Type": string;
+    [key: string]: string;
+  };
+}
+
+/**
+ * CollectionRow - Migrated from collection.d.ts
+ */
+export interface CollectionRow {
+  collection_id: string;
+  collection_name: string;
+  collection_description: string;
+  creators: string[];
+  stamp_count: number;
+  total_editions: number;
+  stamps: number[];
+  img: string;
+}
+
+/**
+ * CollectionWithCreators - Migrated from collection.d.ts
+ */
+export interface CollectionWithCreators extends CollectionRow {
+  creator_names?: string[];
+}
+
+/**
+ * CollectionWithOptionalMarketData - Migrated from collection.d.ts
+ */
+export interface CollectionWithOptionalMarketData extends CollectionRow {
+  // Optional market data fields
+  marketData?: CollectionMarketData | null;
+  marketDataMessage?: string;
+  cacheStatus?: CacheStatus;
+  cacheAgeMinutes?: number;
+
+  // Convenience fields for quick access
+  floorPriceRange?: {
+    min: number | null;
+    max: number | null;
+    avg: number | null;
+  } | null;
+  totalVolume24h?: number | null;
+  totalUniqueHolders?: number | null;
+}
+
+/**
+ * CollectionQueryParams - Migrated from collection.d.ts
+ */
+export interface CollectionQueryParams {
+  limit?: number;
+  page?: number;
+  creator?: string;
+  sortBy?: string;
+  minStampCount?: number;
+  includeMarketData?: boolean; // New optional parameter
+}
+
+/**
+ * CollectionProcessor - Migrated from collection.d.ts
+ */
+export interface CollectionProcessor {
+  /**
+   * Process raw collection data from database
+   */
+  processRawCollection(raw: any): CollectionRow;
+
+  /**
+   * Enrich collection with additional data
+   */
+  enrichCollection(
+    collection: CollectionRow,
+  ): Promise<CollectionWithOptionalMarketData>;
+
+  /**
+   * Process multiple collections in batch
+   */
+  processBatch(
+    collections: CollectionRow[],
+  ): Promise<CollectionWithOptionalMarketData[]>;
+
+  /**
+   * Transform collection for API response
+   */
+  transformForApi(collection: CollectionWithOptionalMarketData): any;
+}
+
+/**
+ * CollectionProcessingOptions - Migrated from collection.d.ts
+ */
+export interface CollectionProcessingOptions {
+  includeMarketData?: boolean;
+  includeStampImages?: boolean;
+  enrichCreatorNames?: boolean;
+  calculateMetrics?: boolean;
+  maxStampImages?: number;
+}
+
+/**
+ * CollectionProcessingResult - Migrated from collection.d.ts
+ */
+export interface CollectionProcessingResult {
+  processed: CollectionWithOptionalMarketData[];
+  errors: CollectionProcessingError[];
+  metrics: CollectionProcessingMetrics;
+}
+
+/**
+ * CollectionProcessingError - Migrated from collection.d.ts
+ */
+export interface CollectionProcessingError {
+  collectionId: string;
+  error: Error;
+  phase: "parsing" | "enrichment" | "transformation";
+}
+
+/**
+ * CollectionProcessingMetrics - Migrated from collection.d.ts
+ */
+export interface CollectionProcessingMetrics {
+  totalProcessed: number;
+  successCount: number;
+  errorCount: number;
+  processingTimeMs: number;
+  enrichmentTimeMs: number;
+}
+
+/**
+ * CollectionAggregator - Migrated from collection.d.ts
+ */
+export interface CollectionAggregator {
+  /**
+   * Aggregate market data for collections
+   */
+  aggregateMarketData(
+    collectionIds: string[],
+  ): Promise<CollectionMarketDataAggregation>;
+
+  /**
+   * Calculate collection metrics
+   */
+  calculateMetrics(collection: CollectionRow): CollectionMetrics;
+
+  /**
+   * Aggregate creator statistics
+   */
+  aggregateCreatorStats(creatorAddress: string): Promise<CreatorStatistics>;
+
+  /**
+   * Generate collection rankings
+   */
+  generateRankings(options: RankingOptions): Promise<CollectionRanking[]>;
+}
+
+/**
+ * CollectionMarketDataAggregation - Migrated from collection.d.ts
+ */
+export interface CollectionMarketDataAggregation {
+  collectionId: string;
+  floorPrice: {
+    min: number | null;
+    max: number | null;
+    avg: number | null;
+    median: number | null;
+  };
+  volume: {
+    total24h: number;
+    total7d: number;
+    total30d: number;
+  };
+  holders: {
+    unique: number;
+    distribution: number[];
+  };
+  lastUpdated: Date;
+}
+
+/**
+ * CollectionMetrics - Migrated from collection.d.ts
+ */
+export interface CollectionMetrics {
+  collectionId: string;
+  stampCount: number;
+  editionCount: number;
+  uniqueCreators: number;
+  averageEditionsPerStamp: number;
+  distributionScore: number;
+  activityScore: number;
+  popularityScore: number;
+}
+
+/**
+ * CreatorStatistics - Migrated from collection.d.ts
+ */
+export interface CreatorStatistics {
+  creatorAddress: string;
+  totalCollections: number;
+  totalStamps: number;
+  totalEditions: number;
+  averageCollectionSize: number;
+  topCollections: CollectionSummary[];
+  createdDateRange: {
+    first: Date;
+    last: Date;
+  };
+}
+
+/**
+ * CollectionSummary - Migrated from collection.d.ts
+ */
+export interface CollectionSummary {
+  collectionId: string;
+  collectionName: string;
+  stampCount: number;
+  floorPrice: number | null;
+}
+
+/**
+ * RankingOptions - Migrated from collection.d.ts
+ */
+export interface RankingOptions {
+  metric: "volume" | "holders" | "activity" | "growth";
+  period: "24h" | "7d" | "30d" | "all";
+  limit: number;
+  includeMetadata?: boolean;
+}
+
+/**
+ * CollectionRanking - Migrated from collection.d.ts
+ */
+export interface CollectionRanking {
+  rank: number;
+  collection: CollectionWithOptionalMarketData;
+  score: number;
+  change24h: number;
+  metadata?: {
+    previousRank: number;
+    trend: "up" | "down" | "stable";
+  };
+}
+
+/**
+ * CollectionIndex - Migrated from collection.d.ts
+ */
+export interface CollectionIndex {
+  /**
+   * Index by collection ID
+   */
+  byId: Map<string, CollectionRow>;
+
+  /**
+   * Index by creator address
+   */
+  byCreator: Map<string, string[]>;
+
+  /**
+   * Index by stamp ID
+   */
+  byStamp: Map<number, string>;
+
+  /**
+   * Index by name (normalized)
+   */
+  byName: Map<string, string>;
+
+  /**
+   * Build indices from collections
+   */
+  build(collections: CollectionRow[]): void;
+
+  /**
+   * Update index with new collection
+   */
+  update(collection: CollectionRow): void;
+
+  /**
+   * Remove collection from index
+   */
+  remove(collectionId: string): void;
+
+  /**
+   * Search collections
+   */
+  search(query: CollectionSearchQuery): CollectionRow[];
+}
+
+/**
+ * CollectionSearchQuery - Migrated from collection.d.ts
+ */
+export interface CollectionSearchQuery {
+  text?: string;
+  creator?: string;
+  stampIds?: number[];
+  minStampCount?: number;
+  maxStampCount?: number;
+  sortBy?: CollectionSortField;
+  sortOrder?: "asc" | "desc";
+  limit?: number;
+  offset?: number;
+}
+
+/**
+ * CollectionValidator - Migrated from collection.d.ts
+ */
+export interface CollectionValidator {
+  /**
+   * Validate collection data
+   */
+  validate(collection: Partial<CollectionRow>): ValidationResult<CollectionRow>;
+
+  /**
+   * Validate collection ID format
+   */
+  validateId(id: string): boolean;
+
+  /**
+   * Validate collection name
+   */
+  validateName(name: string): ValidationResult<string>;
+
+  /**
+   * Validate stamp array
+   */
+  validateStamps(stamps: number[]): ValidationResult<number[]>;
+
+  /**
+   * Validate creator addresses
+   */
+  validateCreators(creators: string[]): ValidationResult<string[]>;
+}
+
+/**
+ * CollectionValidationRules - Migrated from collection.d.ts
+ */
+export interface CollectionValidationRules {
+  idPattern: RegExp;
+  nameMinLength: number;
+  nameMaxLength: number;
+  descriptionMaxLength: number;
+  minStampCount: number;
+  maxStampCount: number;
+  maxCreators: number;
+}
+
+/**
+ * CollectionValidationError - Migrated from collection.d.ts
+ */
+export interface CollectionValidationError {
+  field: keyof CollectionRow;
+  code: CollectionValidationErrorCode;
+  message: string;
+  value?: any;
+}
+
+/**
+ * CollectionServiceConfig - Migrated from collection.d.ts
+ */
+export interface CollectionServiceConfig {
+  cacheEnabled: boolean;
+  cacheTTL: number;
+  enrichmentEnabled: boolean;
+  marketDataEnabled: boolean;
+  batchSize: number;
+  maxConcurrentRequests: number;
+}
+
+/**
+ * CollectionServiceOptions - Migrated from collection.d.ts
+ */
+export interface CollectionServiceOptions extends CollectionQueryParams {
+  includeDeleted?: boolean;
+  forceRefresh?: boolean;
+  timeout?: number;
+}
+
+/**
+ * CollectionCreateParams - Migrated from collection.d.ts
+ */
+export interface CollectionCreateParams {
+  collection_name: string;
+  collection_description: string;
+  creators: string[];
+  stamps: number[];
+  img?: string;
+}
+
+/**
+ * CollectionUpdateParams - Migrated from collection.d.ts
+ */
+export interface CollectionUpdateParams {
+  collection_name?: string;
+  collection_description?: string;
+  stamps?: number[];
+  img?: string;
+}
+
+/**
+ * CollectionServiceResult - Migrated from collection.d.ts
+ */
+export interface CollectionServiceResult<T> {
+  success: boolean;
+  data?: T;
+  error?: Error;
+  metadata?: {
+    cached: boolean;
+    processingTimeMs: number;
+    source: "cache" | "database" | "computed";
+  };
+}
+
+/**
+ * CollectionCacheEntry - Migrated from collection.d.ts
+ */
+export interface CollectionCacheEntry {
+  collection: CollectionWithOptionalMarketData;
+  cachedAt: Date;
+  expiresAt: Date;
+  hits: number;
+  source: "database" | "computed" | "external";
+}
+
+/**
+ * CollectionCacheStats - Migrated from collection.d.ts
+ */
+export interface CollectionCacheStats {
+  totalEntries: number;
+  hitRate: number;
+  missRate: number;
+  averageAge: number;
+  oldestEntry: Date | null;
+  newestEntry: Date | null;
+  totalHits: number;
+  totalMisses: number;
+}
+
+/**
+ * CollectionCacheOptions - Migrated from collection.d.ts
+ */
+export interface CollectionCacheOptions {
+  maxSize: number;
+  ttl: number;
+  evictionPolicy: "lru" | "lfu" | "ttl";
+  preload?: string[];
+  warmupOnStart?: boolean;
+}
+
+/**
+ * CollectionSortField - Migrated from collection.d.ts
+ */
+export type CollectionSortField =
+  | "name"
+  | "created_at"
+  | "updated_at"
+  | "creator"
+  | "stamps_count";
+
+/**
+ * CollectionValidationErrorCode - Migrated from collection.d.ts
+ */
+export enum CollectionValidationErrorCode {
+  INVALID_ID = "INVALID_ID",
+  INVALID_NAME = "INVALID_NAME",
+  NAME_TOO_SHORT = "NAME_TOO_SHORT",
+  NAME_TOO_LONG = "NAME_TOO_LONG",
+  DESCRIPTION_TOO_LONG = "DESCRIPTION_TOO_LONG",
+  INVALID_STAMP_COUNT = "INVALID_STAMP_COUNT",
+  INVALID_STAMP_IDS = "INVALID_STAMP_IDS",
+  DUPLICATE_STAMPS = "DUPLICATE_STAMPS",
+  INVALID_CREATORS = "INVALID_CREATORS",
+  TOO_MANY_CREATORS = "TOO_MANY_CREATORS",
+  INVALID_IMAGE_URL = "INVALID_IMAGE_URL",
+}
+
+/**
+ * DatabaseSchema - Migrated from database.d.ts
+ */
+export interface DatabaseSchema {
+  tables: TableDefinitions;
+  indexes: IndexDefinitions;
+  constraints: ConstraintDefinitions;
+  version: string;
+}
+
+/**
+ * TableDefinitions - Migrated from database.d.ts
+ */
+export interface TableDefinitions {
+  [tableName: string]: TableDefinition;
+}
+
+/**
+ * TableDefinition - Migrated from database.d.ts
+ */
+export interface TableDefinition {
+  name: string;
+  columns: ColumnDefinitions;
+  primaryKey: string[];
+  indexes?: IndexDefinition[];
+  constraints?: ConstraintDefinition[];
+  engine?: DatabaseEngine;
+  charset?: string;
+  collation?: string;
+}
+
+/**
+ * ColumnDefinitions - Migrated from database.d.ts
+ */
+export interface ColumnDefinitions {
+  [columnName: string]: ColumnDefinition;
+}
+
+/**
+ * ColumnDefinition - Migrated from database.d.ts
+ */
+export interface ColumnDefinition {
+  type: ColumnType;
+  nullable?: boolean;
+  primaryKey?: boolean;
+  unique?: boolean;
+  autoIncrement?: boolean;
+  default?: unknown;
+  length?: number;
+  precision?: number;
+  scale?: number;
+  comment?: string;
+  collation?: string;
+}
+
+/**
+ * IndexDefinitions - Migrated from database.d.ts
+ */
+export interface IndexDefinitions {
+  [indexName: string]: IndexDefinition;
+}
+
+/**
+ * IndexDefinition - Migrated from database.d.ts
+ */
+export interface IndexDefinition {
+  name: string;
+  table: string;
+  columns: IndexColumn[];
+  type?: IndexType;
+  unique?: boolean;
+  algorithm?: IndexAlgorithm;
+}
+
+/**
+ * IndexColumn - Migrated from database.d.ts
+ */
+export interface IndexColumn {
+  column: string;
+  length?: number;
+  order?: "ASC" | "DESC";
+}
+
+/**
+ * ConstraintDefinitions - Migrated from database.d.ts
+ */
+export interface ConstraintDefinitions {
+  [constraintName: string]: ConstraintDefinition;
+}
+
+/**
+ * ConstraintDefinition - Migrated from database.d.ts
+ */
+export interface ConstraintDefinition {
+  name: string;
+  type: ConstraintType;
+  table: string;
+  columns: string[];
+  referencedTable?: string;
+  referencedColumns?: string[];
+  onDelete?: ReferentialAction;
+  onUpdate?: ReferentialAction;
+}
+
+/**
+ * QueryBuilder - Migrated from database.d.ts
+ */
+export interface QueryBuilder<T = any> {
+  select: SelectQueryBuilder<T>;
+  insert: InsertQueryBuilder<T>;
+  update: UpdateQueryBuilder<T>;
+  delete: DeleteQueryBuilder<T>;
+}
+
+/**
+ * SelectQueryBuilder - Migrated from database.d.ts
+ */
+export interface SelectQueryBuilder<T = any> {
+  from(table: string): SelectQueryBuilder<T>;
+  select(
+    columns?: keyof T | (keyof T)[] | string | string[],
+  ): SelectQueryBuilder<T>;
+  where(
+    condition: WhereCondition<T> | string,
+    value?: any,
+  ): SelectQueryBuilder<T>;
+  whereIn(column: keyof T | string, values: any[]): SelectQueryBuilder<T>;
+  whereNotIn(column: keyof T | string, values: any[]): SelectQueryBuilder<T>;
+  whereBetween(
+    column: keyof T | string,
+    min: any,
+    max: any,
+  ): SelectQueryBuilder<T>;
+  whereNull(column: keyof T | string): SelectQueryBuilder<T>;
+  whereNotNull(column: keyof T | string): SelectQueryBuilder<T>;
+  join(table: string, on: JoinCondition): SelectQueryBuilder<T>;
+  leftJoin(table: string, on: JoinCondition): SelectQueryBuilder<T>;
+  rightJoin(table: string, on: JoinCondition): SelectQueryBuilder<T>;
+  innerJoin(table: string, on: JoinCondition): SelectQueryBuilder<T>;
+  groupBy(
+    columns: keyof T | (keyof T)[] | string | string[],
+  ): SelectQueryBuilder<T>;
+  having(condition: string): SelectQueryBuilder<T>;
+  orderBy(
+    column: keyof T | string,
+    direction?: OrderDirection,
+  ): SelectQueryBuilder<T>;
+  limit(count: number): SelectQueryBuilder<T>;
+  offset(count: number): SelectQueryBuilder<T>;
+  distinct(): SelectQueryBuilder<T>;
+  count(column?: keyof T | string): SelectQueryBuilder<T>;
+  sum(column: keyof T | string): SelectQueryBuilder<T>;
+  avg(column: keyof T | string): SelectQueryBuilder<T>;
+  min(column: keyof T | string): SelectQueryBuilder<T>;
+  max(column: keyof T | string): SelectQueryBuilder<T>;
+  toSQL(): string;
+  execute(): Promise<QueryResult<T>>;
+}
+
+/**
+ * InsertQueryBuilder - Migrated from database.d.ts
+ */
+export interface InsertQueryBuilder<T = any> {
+  into(table: string): InsertQueryBuilder<T>;
+  values(data: Partial<T> | Partial<T>[]): InsertQueryBuilder<T>;
+  onDuplicateKeyUpdate(data: Partial<T>): InsertQueryBuilder<T>;
+  ignore(): InsertQueryBuilder<T>;
+  toSQL(): string;
+  execute(): Promise<InsertResult>;
+}
+
+/**
+ * UpdateQueryBuilder - Migrated from database.d.ts
+ */
+export interface UpdateQueryBuilder<T = any> {
+  table(table: string): UpdateQueryBuilder<T>;
+  set(data: Partial<T>): UpdateQueryBuilder<T>;
+  where(
+    condition: WhereCondition<T> | string,
+    value?: any,
+  ): UpdateQueryBuilder<T>;
+  whereIn(column: keyof T | string, values: any[]): UpdateQueryBuilder<T>;
+  limit(count: number): UpdateQueryBuilder<T>;
+  toSQL(): string;
+  execute(): Promise<UpdateResult>;
+}
+
+/**
+ * DeleteQueryBuilder - Migrated from database.d.ts
+ */
+export interface DeleteQueryBuilder<T = any> {
+  from(table: string): DeleteQueryBuilder<T>;
+  where(
+    condition: WhereCondition<T> | string,
+    value?: any,
+  ): DeleteQueryBuilder<T>;
+  whereIn(column: keyof T | string, values: any[]): DeleteQueryBuilder<T>;
+  limit(count: number): DeleteQueryBuilder<T>;
+  toSQL(): string;
+  execute(): Promise<DeleteResult>;
+}
+
+/**
+ * WhereOperator - Migrated from database.d.ts
+ */
+export interface WhereOperator<T> {
+  $eq?: T;
+  $ne?: T;
+  $gt?: T;
+  $gte?: T;
+  $lt?: T;
+  $lte?: T;
+  $in?: T[];
+  $nin?: T[];
+  $like?: string;
+  $notLike?: string;
+  $between?: [T, T];
+  $notBetween?: [T, T];
+  $isNull?: boolean;
+  $isNotNull?: boolean;
+}
+
+/**
+ * QueryResult - Migrated from database.d.ts
+ */
+export interface QueryResult<T = any> {
+  rows: T[];
+  rowCount: number;
+  fields: FieldInfo[];
+  affectedRows?: number;
+  insertId?: number;
+  warningCount?: number;
+}
+
+/**
+ * InsertResult - Migrated from database.d.ts
+ */
+export interface InsertResult {
+  insertId: number;
+  affectedRows: number;
+  warningCount?: number;
+}
+
+/**
+ * UpdateResult - Migrated from database.d.ts
+ */
+export interface UpdateResult {
+  affectedRows: number;
+  changedRows: number;
+  warningCount?: number;
+}
+
+/**
+ * DeleteResult - Migrated from database.d.ts
+ */
+export interface DeleteResult {
+  affectedRows: number;
+  warningCount?: number;
+}
+
+/**
+ * FieldInfo - Migrated from database.d.ts
+ */
+export interface FieldInfo {
+  name: string;
+  type: string;
+  length: number;
+  nullable: boolean;
+  primaryKey: boolean;
+  unique: boolean;
+  autoIncrement: boolean;
+  default: any;
+}
+
+/**
+ * Model - Migrated from database.d.ts
+ */
+export interface Model<T = any> {
+  tableName: string;
+  primaryKey: keyof T | (keyof T)[];
+  fillable?: (keyof T)[];
+  guarded?: (keyof T)[];
+  hidden?: (keyof T)[];
+  casts?: ModelCasts<T>;
+  timestamps?: boolean;
+  createdAt?: keyof T;
+  updatedAt?: keyof T;
+  deletedAt?: keyof T; // For soft deletes
+  relations?: ModelRelations<T>;
+}
+
+/**
+ * ModelRelations - Migrated from database.d.ts
+ */
+export interface ModelRelations<T> {
+  [relationName: string]: RelationDefinition;
+}
+
+/**
+ * RelationDefinition - Migrated from database.d.ts
+ */
+export interface RelationDefinition {
+  type: RelationType;
+  model: string;
+  foreignKey?: string;
+  localKey?: string;
+  pivotTable?: string;
+  pivotForeignKey?: string;
+  pivotLocalKey?: string;
+  through?: string;
+  throughForeignKey?: string;
+  throughLocalKey?: string;
+}
+
+/**
+ * ModelQueryBuilder - Migrated from database.d.ts
+ */
+export interface ModelQueryBuilder<T = any> extends SelectQueryBuilder<T> {
+  create(data: Omit<T, "id">): Promise<T>;
+  find(id: number | string): Promise<T | null>;
+  findOrFail(id: number | string): Promise<T>;
+  first(): Promise<T | null>;
+  firstOrFail(): Promise<T>;
+  get(): Promise<T[]>;
+  paginate(page: number, perPage: number): Promise<PaginatedResult<T>>;
+  with(relations: string | string[]): ModelQueryBuilder<T>;
+  withCount(relations: string | string[]): ModelQueryBuilder<T>;
+  scopes(scopes: string | string[]): ModelQueryBuilder<T>;
+  fresh(): ModelQueryBuilder<T>;
+  trashed(): ModelQueryBuilder<T>; // For soft deletes
+  withTrashed(): ModelQueryBuilder<T>; // For soft deletes
+  onlyTrashed(): ModelQueryBuilder<T>; // For soft deletes
+}
+
+/**
+ * ModelLifecycleHooks - Migrated from database.d.ts
+ */
+export interface ModelLifecycleHooks<T> {
+  creating?: (model: Partial<T>) => Promise<void> | void;
+  created?: (model: T) => Promise<void> | void;
+  updating?: (model: Partial<T>) => Promise<void> | void;
+  updated?: (model: T) => Promise<void> | void;
+  saving?: (model: Partial<T>) => Promise<void> | void;
+  saved?: (model: T) => Promise<void> | void;
+  deleting?: (model: T) => Promise<void> | void;
+  deleted?: (model: T) => Promise<void> | void;
+  restoring?: (model: T) => Promise<void> | void; // For soft deletes
+  restored?: (model: T) => Promise<void> | void; // For soft deletes
+}
+
+/**
+ * QueryScope - Migrated from database.d.ts
+ */
+export interface QueryScope<T> {
+  [scopeName: string]: (
+    query: ModelQueryBuilder<T>,
+    ...args: any[]
+  ) => ModelQueryBuilder<T>;
+}
+
+/**
+ * Migration - Migrated from database.d.ts
+ */
+export interface Migration {
+  id: string;
+  name: string;
+  version: string;
+  description?: string;
+  up: () => Promise<void>;
+  down: () => Promise<void>;
+  dependencies?: string[];
+  createdAt?: Date;
+  executedAt?: Date;
+}
+
+/**
+ * MigrationOperation - Migrated from database.d.ts
+ */
+export interface MigrationOperation {
+  type: MigrationOperationType;
+  table?: string;
+  column?: string;
+  index?: string;
+  constraint?: string;
+  data?: any;
+}
+
+/**
+ * SchemaBuilder - Migrated from database.d.ts
+ */
+export interface SchemaBuilder {
+  createTable(
+    name: string,
+    callback: (table: TableBuilder) => void,
+  ): Promise<void>;
+  dropTable(name: string): Promise<void>;
+  renameTable(from: string, to: string): Promise<void>;
+  alterTable(
+    name: string,
+    callback: (table: TableBuilder) => void,
+  ): Promise<void>;
+  hasTable(name: string): Promise<boolean>;
+  hasColumn(table: string, column: string): Promise<boolean>;
+  hasIndex(table: string, index: string): Promise<boolean>;
+  raw(sql: string, bindings?: any[]): Promise<void>;
+}
+
+/**
+ * TableBuilder - Migrated from database.d.ts
+ */
+export interface TableBuilder {
+  // Column creation methods
+  increments(name?: string): ColumnBuilder;
+  integer(name: string): ColumnBuilder;
+  bigInteger(name: string): ColumnBuilder;
+  tinyInteger(name: string): ColumnBuilder;
+  smallInteger(name: string): ColumnBuilder;
+  mediumInteger(name: string): ColumnBuilder;
+  decimal(name: string, precision?: number, scale?: number): ColumnBuilder;
+  float(name: string, precision?: number, scale?: number): ColumnBuilder;
+  double(name: string, precision?: number, scale?: number): ColumnBuilder;
+  string(name: string, length?: number): ColumnBuilder;
+  char(name: string, length?: number): ColumnBuilder;
+  text(name: string): ColumnBuilder;
+  mediumText(name: string): ColumnBuilder;
+  longText(name: string): ColumnBuilder;
+  date(name: string): ColumnBuilder;
+  dateTime(name: string): ColumnBuilder;
+  time(name: string): ColumnBuilder;
+  timestamp(name: string): ColumnBuilder;
+  timestamps(): void;
+  binary(name: string): ColumnBuilder;
+  boolean(name: string): ColumnBuilder;
+  json(name: string): ColumnBuilder;
+  enum(name: string, values: string[]): ColumnBuilder;
+
+  // Index methods
+  primary(columns: string | string[]): void;
+  unique(columns: string | string[], indexName?: string): void;
+  index(columns: string | string[], indexName?: string): void;
+  fulltext(columns: string | string[], indexName?: string): void;
+  spatial(columns: string | string[], indexName?: string): void;
+
+  // Foreign key methods
+  foreign(columns: string | string[]): ForeignKeyBuilder;
+
+  // Column modification methods
+  dropColumn(name: string | string[]): void;
+  renameColumn(from: string, to: string): void;
+  dropPrimary(indexName?: string): void;
+  dropUnique(indexName: string): void;
+  dropIndex(indexName: string): void;
+  dropForeign(indexName: string): void;
+}
+
+/**
+ * ColumnBuilder - Migrated from database.d.ts
+ */
+export interface ColumnBuilder {
+  nullable(): ColumnBuilder;
+  notNullable(): ColumnBuilder;
+  primary(): ColumnBuilder;
+  unique(): ColumnBuilder;
+  index(): ColumnBuilder;
+  defaultTo(value: any): ColumnBuilder;
+  comment(text: string): ColumnBuilder;
+  collate(collation: string): ColumnBuilder;
+  after(column: string): ColumnBuilder;
+  first(): ColumnBuilder;
+  unsigned(): ColumnBuilder;
+  autoIncrement(): ColumnBuilder;
+}
+
+/**
+ * ForeignKeyBuilder - Migrated from database.d.ts
+ */
+export interface ForeignKeyBuilder {
+  references(column: string): ForeignKeyBuilder;
+  inTable(table: string): ForeignKeyBuilder;
+  onDelete(action: ReferentialAction): ForeignKeyBuilder;
+  onUpdate(action: ReferentialAction): ForeignKeyBuilder;
+}
+
+/**
+ * MigrationRunner - Migrated from database.d.ts
+ */
+export interface MigrationRunner {
+  up(target?: string): Promise<MigrationResult[]>;
+  down(target?: string): Promise<MigrationResult[]>;
+  rollback(steps?: number): Promise<MigrationResult[]>;
+  reset(): Promise<MigrationResult[]>;
+  refresh(): Promise<MigrationResult[]>;
+  status(): Promise<MigrationStatus[]>;
+  make(name: string): Promise<string>;
+}
+
+/**
+ * MigrationResult - Migrated from database.d.ts
+ */
+export interface MigrationResult {
+  migration: Migration;
+  success: boolean;
+  error?: Error;
+  executionTime?: number;
+}
+
+/**
+ * MigrationStatus - Migrated from database.d.ts
+ */
+export interface MigrationStatus {
+  migration: Migration;
+  executed: boolean;
+  executedAt?: Date;
+  batch?: number;
+}
+
+/**
+ * StampTableSchema - Migrated from database.d.ts
+ */
+export interface StampTableSchema {
+  stamp_number: number;
+  tx_hash: string;
+  tx_index: number;
+  block_index: number;
+  creator: string;
+  stamp_base64: string;
+  stamp_url: string;
+  stamp_mimetype: string;
+  is_btc_stamp: boolean;
+  supply: number;
+  locked: boolean;
+  divisible: boolean;
+  stamp_hash: string;
+  creator_name?: string;
+  cpid?: string;
+  keyburn?: boolean;
+  ident?: string;
+  is_cursed?: boolean;
+  is_reissuance?: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * SRC20TokenTableSchema - Migrated from database.d.ts
+ */
+export interface SRC20TokenTableSchema {
+  id: number;
+  tick: string;
+  max: string;
+  lim: string;
+  dec: number;
+  address: string;
+  tx_hash: string;
+  block_index: number;
+  timestamp: Date;
+  total_minted: string;
+  total_holders: number;
+  total_transfers: number;
+  status: SRC20TokenStatus;
+  creator_fee?: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * SRC20BalanceTableSchema - Migrated from database.d.ts
+ */
+export interface SRC20BalanceTableSchema {
+  id: number;
+  address: string;
+  tick: string;
+  balance: string;
+  last_update_block: number;
+  last_update_tx: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * SRC20TransferTableSchema - Migrated from database.d.ts
+ */
+export interface SRC20TransferTableSchema {
+  id: number;
+  tick: string;
+  from_address: string;
+  to_address: string;
+  amount: string;
+  tx_hash: string;
+  block_index: number;
+  timestamp: Date;
+  transfer_type: SRC20TransferType;
+  status: TransferStatus;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * TransactionTableSchema - Migrated from database.d.ts
+ */
+export interface TransactionTableSchema {
+  id: number;
+  tx_hash: string;
+  block_index: number;
+  block_hash: string;
+  timestamp: Date;
+  source: string;
+  destination?: string;
+  btc_amount: number;
+  fee: number;
+  data?: string;
+  supported: boolean;
+  order_index: number;
+  tx_index: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * BlockTableSchema - Migrated from database.d.ts
+ */
+export interface BlockTableSchema {
+  block_index: number;
+  block_hash: string;
+  block_time: Date;
+  previous_block_hash: string;
+  difficulty: number;
+  ledger_hash: string;
+  txlist_hash: string;
+  messages_hash: string;
+  indexed_at: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * UTXOTableSchema - Migrated from database.d.ts
+ */
+export interface UTXOTableSchema {
+  id: number;
+  txid: string;
+  vout: number;
+  address: string;
+  script: string;
+  value: number;
+  confirmations: number;
+  spent: boolean;
+  spent_by_txid?: string;
+  spent_by_vin?: number;
+  block_index?: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * WalletBalanceTableSchema - Migrated from database.d.ts
+ */
+export interface WalletBalanceTableSchema {
+  id: number;
+  address: string;
+  balance: number;
+  unconfirmed_balance: number;
+  last_update_block: number;
+  last_seen_tx: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * DatabaseConnection - Migrated from database.d.ts
+ */
+export interface DatabaseConnection {
+  type: DatabaseType;
+  config: DatabaseConnectionConfig;
+  client: any;
+  isConnected: boolean;
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  ping(): Promise<boolean>;
+  execute(query: string, params?: any[]): Promise<QueryResult>;
+  transaction<T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
+}
+
+/**
+ * DatabaseConnectionConfig - Migrated from database.d.ts
+ */
+export interface DatabaseConnectionConfig {
+  host: string;
+  port: number;
+  database: string;
+  username: string;
+  password: string;
+  ssl?: boolean;
+  charset?: string;
+  timezone?: string;
+  connectTimeout?: number;
+  acquireTimeout?: number;
+  timeout?: number;
+  reconnect?: boolean;
+  pool?: PoolConfig;
+}
+
+/**
+ * PoolConfig - Migrated from database.d.ts
+ */
+export interface PoolConfig {
+  min: number;
+  max: number;
+  acquireTimeoutMillis?: number;
+  createTimeoutMillis?: number;
+  destroyTimeoutMillis?: number;
+  idleTimeoutMillis?: number;
+  reapIntervalMillis?: number;
+  createRetryIntervalMillis?: number;
+  propagateCreateError?: boolean;
+}
+
+/**
+ * Transaction - Migrated from database.d.ts
+ */
+export interface Transaction {
+  commit(): Promise<void>;
+  rollback(): Promise<void>;
+  savepoint(name: string): Promise<void>;
+  rollbackTo(name: string): Promise<void>;
+  release(name: string): Promise<void>;
+  isCompleted(): boolean;
+  query(sql: string, params?: any[]): Promise<QueryResult>;
+}
+
+/**
+ * SQLDatabase - Migrated from database.d.ts
+ */
+export interface SQLDatabase extends DatabaseConnection {
+  type: "mysql" | "postgresql" | "sqlite";
+  schema: SchemaBuilder;
+  migrate: MigrationRunner;
+  seed: SeedRunner;
+}
+
+/**
+ * NoSQLDatabase - Migrated from database.d.ts
+ */
+export interface NoSQLDatabase extends DatabaseConnection {
+  type: "mongodb";
+  collection(name: string): Collection;
+  listCollections(): Promise<string[]>;
+  createCollection(
+    name: string,
+    options?: CollectionOptions,
+  ): Promise<Collection>;
+  dropCollection(name: string): Promise<boolean>;
+}
+
+/**
+ * Collection - Migrated from database.d.ts
+ */
+export interface Collection {
+  name: string;
+  find(filter?: any, options?: FindOptions): Promise<any[]>;
+  findOne(filter?: any, options?: FindOptions): Promise<any | null>;
+  insertOne(document: any): Promise<InsertOneResult>;
+  insertMany(documents: any[]): Promise<InsertManyResult>;
+  updateOne(
+    filter: any,
+    update: any,
+    options?: UpdateOptions,
+  ): Promise<UpdateOneResult>;
+  updateMany(
+    filter: any,
+    update: any,
+    options?: UpdateOptions,
+  ): Promise<UpdateManyResult>;
+  deleteOne(filter: any): Promise<DeleteOneResult>;
+  deleteMany(filter: any): Promise<DeleteManyResult>;
+  countDocuments(filter?: any): Promise<number>;
+  createIndex(keys: any, options?: IndexOptions): Promise<string>;
+  dropIndex(indexName: string): Promise<void>;
+  aggregate(pipeline: any[]): Promise<any[]>;
+}
+
+/**
+ * FindOptions - Migrated from database.d.ts
+ */
+export interface FindOptions {
+  limit?: number;
+  skip?: number;
+  sort?: any;
+  projection?: any;
+}
+
+/**
+ * UpdateOptions - Migrated from database.d.ts
+ */
+export interface UpdateOptions {
+  upsert?: boolean;
+  multi?: boolean;
+}
+
+/**
+ * IndexOptions - Migrated from database.d.ts
+ */
+export interface IndexOptions {
+  unique?: boolean;
+  sparse?: boolean;
+  background?: boolean;
+  name?: string;
+  expireAfterSeconds?: number;
+}
+
+/**
+ * InsertOneResult - Migrated from database.d.ts
+ */
+export interface InsertOneResult {
+  insertedId: any;
+  acknowledged: boolean;
+}
+
+/**
+ * InsertManyResult - Migrated from database.d.ts
+ */
+export interface InsertManyResult {
+  insertedIds: any[];
+  insertedCount: number;
+  acknowledged: boolean;
+}
+
+/**
+ * UpdateOneResult - Migrated from database.d.ts
+ */
+export interface UpdateOneResult {
+  matchedCount: number;
+  modifiedCount: number;
+  upsertedId?: any;
+  acknowledged: boolean;
+}
+
+/**
+ * UpdateManyResult - Migrated from database.d.ts
+ */
+export interface UpdateManyResult {
+  matchedCount: number;
+  modifiedCount: number;
+  upsertedCount: number;
+  upsertedIds: any[];
+  acknowledged: boolean;
+}
+
+/**
+ * DeleteOneResult - Migrated from database.d.ts
+ */
+export interface DeleteOneResult {
+  deletedCount: number;
+  acknowledged: boolean;
+}
+
+/**
+ * DeleteManyResult - Migrated from database.d.ts
+ */
+export interface DeleteManyResult {
+  deletedCount: number;
+  acknowledged: boolean;
+}
+
+/**
+ * CollectionOptions - Migrated from database.d.ts
+ */
+export interface CollectionOptions {
+  capped?: boolean;
+  size?: number;
+  max?: number;
+  validator?: any;
+  validationLevel?: "off" | "strict" | "moderate";
+  validationAction?: "error" | "warn";
+}
+
+/**
+ * RedisDatabase - Migrated from database.d.ts
+ */
+export interface RedisDatabase extends DatabaseConnection {
+  type: "redis";
+  get(key: string): Promise<string | null>;
+  set(key: string, value: string, ttl?: number): Promise<string>;
+  del(key: string | string[]): Promise<number>;
+  exists(key: string): Promise<boolean>;
+  expire(key: string, seconds: number): Promise<boolean>;
+  ttl(key: string): Promise<number>;
+  keys(pattern: string): Promise<string[]>;
+  flushdb(): Promise<string>;
+  flushall(): Promise<string>;
+  hget(key: string, field: string): Promise<string | null>;
+  hset(key: string, field: string, value: string): Promise<number>;
+  hgetall(key: string): Promise<Record<string, string>>;
+  hdel(key: string, field: string | string[]): Promise<number>;
+  sadd(key: string, member: string | string[]): Promise<number>;
+  smembers(key: string): Promise<string[]>;
+  srem(key: string, member: string | string[]): Promise<number>;
+  zadd(key: string, score: number, member: string): Promise<number>;
+  zrange(key: string, start: number, stop: number): Promise<string[]>;
+  zrem(key: string, member: string | string[]): Promise<number>;
+  publish(channel: string, message: string): Promise<number>;
+  subscribe(channel: string | string[]): Promise<void>;
+  unsubscribe(channel?: string | string[]): Promise<void>;
+}
+
+/**
+ * QueryPerformanceMetrics - Migrated from database.d.ts
+ */
+export interface QueryPerformanceMetrics {
+  query: string;
+  executionTime: number;
+  rowsAffected: number;
+  rowsExamined: number;
+  indexesUsed: string[];
+  warnings: QueryWarning[];
+  timestamp: Date;
+  connectionId: string;
+  database: string;
+  user: string;
+}
+
+/**
+ * QueryWarning - Migrated from database.d.ts
+ */
+export interface QueryWarning {
+  level: "Note" | "Warning" | "Error";
+  code: number;
+  message: string;
+}
+
+/**
+ * ConnectionPoolStatistics - Migrated from database.d.ts
+ */
+export interface ConnectionPoolStatistics {
+  totalConnections: number;
+  activeConnections: number;
+  idleConnections: number;
+  pendingRequests: number;
+  maxConnections: number;
+  minConnections: number;
+  averageAcquireTime: number;
+  peakActiveConnections: number;
+  totalAcquiredConnections: number;
+  totalReleasedConnections: number;
+  connectionErrors: number;
+  lastResetTime: Date;
+}
+
+/**
+ * DatabaseHealthCheck - Migrated from database.d.ts
+ */
+export interface DatabaseHealthCheck {
+  status: HealthStatus;
+  responseTime: number;
+  uptime: number;
+  connections: ConnectionPoolStatistics;
+  performance: PerformanceMetrics;
+  storage: StorageMetrics;
+  replication?: ReplicationStatus;
+  lastCheck: Date;
+  checks: HealthCheckResult[];
+}
+
+/**
+ * HealthCheckResult - Migrated from database.d.ts
+ */
+export interface HealthCheckResult {
+  name: string;
+  status: HealthStatus;
+  message: string;
+  responseTime: number;
+  timestamp: Date;
+}
+
+/**
+ * PerformanceMetrics - Migrated from database.d.ts
+ */
+export interface PerformanceMetrics {
+  queriesPerSecond: number;
+  averageQueryTime: number;
+  slowQueries: number;
+  cacheHitRatio: number;
+  bufferPoolUsage: number;
+  indexEfficiency: number;
+}
+
+/**
+ * StorageMetrics - Migrated from database.d.ts
+ */
+export interface StorageMetrics {
+  totalSize: number;
+  dataSize: number;
+  indexSize: number;
+  freeSpace: number;
+  growthRate: number;
+  fragmentation: number;
+}
+
+/**
+ * ReplicationStatus - Migrated from database.d.ts
+ */
+export interface ReplicationStatus {
+  role: "master" | "slave" | "replica";
+  lag: number;
+  connected: boolean;
+  replicatingDatabases: string[];
+  lastIOError?: string;
+  lastSQLError?: string;
+}
+
+/**
+ * BackupOperation - Migrated from database.d.ts
+ */
+export interface BackupOperation {
+  id: string;
+  type: BackupType;
+  status: BackupStatus;
+  database: string;
+  startTime: Date;
+  endTime?: Date;
+  duration?: number;
+  size?: number;
+  location: string;
+  compression?: CompressionType;
+  encryption?: boolean;
+  checksum?: string;
+  error?: string;
+}
+
+/**
+ * RestoreOperation - Migrated from database.d.ts
+ */
+export interface RestoreOperation {
+  id: string;
+  backupId: string;
+  status: RestoreStatus;
+  database: string;
+  startTime: Date;
+  endTime?: Date;
+  duration?: number;
+  pointInTime?: Date;
+  options: RestoreOptions;
+  error?: string;
+}
+
+/**
+ * RestoreOptions - Migrated from database.d.ts
+ */
+export interface RestoreOptions {
+  overwrite: boolean;
+  verifyChecksum: boolean;
+  skipData: boolean;
+  skipIndexes: boolean;
+  targetDatabase?: string;
+  pointInTime?: Date;
+}
+
+/**
+ * SeedRunner - Migrated from database.d.ts
+ */
+export interface SeedRunner {
+  run(seedName?: string): Promise<SeedResult[]>;
+  make(name: string): Promise<string>;
+  rollback(): Promise<SeedResult[]>;
+  status(): Promise<SeedStatus[]>;
+}
+
+/**
+ * SeedResult - Migrated from database.d.ts
+ */
+export interface SeedResult {
+  seed: string;
+  success: boolean;
+  error?: Error;
+  executionTime?: number;
+}
+
+/**
+ * SeedStatus - Migrated from database.d.ts
+ */
+export interface SeedStatus {
+  seed: string;
+  executed: boolean;
+  executedAt?: Date;
+}
+
+/**
+ * Repository - Migrated from database.d.ts
+ */
+export interface Repository<T = any> {
+  find(id: string | number): Promise<T | null>;
+  findAll(options?: FindAllOptions): Promise<T[]>;
+  findBy(criteria: Partial<T>, options?: FindOptions): Promise<T[]>;
+  findOneBy(criteria: Partial<T>): Promise<T | null>;
+  create(data: Omit<T, "id">): Promise<T>;
+  update(id: string | number, data: Partial<T>): Promise<T | null>;
+  delete(id: string | number): Promise<boolean>;
+  exists(criteria: Partial<T>): Promise<boolean>;
+  count(criteria?: Partial<T>): Promise<number>;
+  paginate(
+    page: number,
+    limit: number,
+    criteria?: Partial<T>,
+  ): Promise<PaginatedResult<T>>;
+}
+
+/**
+ * FindAllOptions - Migrated from database.d.ts
+ */
+export interface FindAllOptions {
+  limit?: number;
+  offset?: number;
+  orderBy?: OrderBy[];
+  include?: string[];
+}
+
+/**
+ * OrderBy - Migrated from database.d.ts
+ */
+export interface OrderBy {
+  field: string;
+  direction: "ASC" | "DESC";
+}
+
+/**
+ * StampRepository - Migrated from database.d.ts
+ */
+export interface StampRepository extends Repository<StampRow> {
+  findByStampNumber(stampNumber: number): Promise<StampRow | null>;
+  findByTxHash(txHash: string): Promise<StampRow[]>;
+  findByCreator(creator: string, options?: FindAllOptions): Promise<StampRow[]>;
+  findCursedStamps(options?: FindAllOptions): Promise<StampRow[]>;
+  findRecentStamps(limit?: number): Promise<StampRow[]>;
+  getStampStats(): Promise<StampStatistics>;
+}
+
+/**
+ * SRC20Repository - Migrated from database.d.ts
+ */
+export interface SRC20Repository extends Repository<SRC20Row> {
+  findByTick(tick: string): Promise<SRC20Row | null>;
+  findByAddress(address: string, options?: FindAllOptions): Promise<SRC20Row[]>;
+  findBalances(address: string): Promise<SRC20Balance[]>;
+  getTokenHolders(tick: string): Promise<number>;
+  getTotalSupply(tick: string): Promise<string>;
+  getTokenStats(tick: string): Promise<SRC20TokenStats>;
+}
+
+/**
+ * TransactionRepository - Migrated from database.d.ts
+ */
+export interface TransactionRepository extends Repository<SendRow> {
+  findByHash(hash: string): Promise<SendRow | null>;
+  findByBlock(blockIndex: number, options?: FindAllOptions): Promise<SendRow[]>;
+  findByAddress(address: string, options?: FindAllOptions): Promise<SendRow[]>;
+  findPending(options?: FindAllOptions): Promise<SendRow[]>;
+  getTransactionFees(limit?: number): Promise<FeeStatistics>;
+}
+
+/**
+ * StampStatistics - Migrated from database.d.ts
+ */
+export interface StampStatistics {
+  totalStamps: number;
+  cursedStamps: number;
+  uniqueCreators: number;
+  totalVolume: number;
+  averageSize: number;
+  latestStamp: number;
+}
+
+/**
+ * SRC20TokenStats - Migrated from database.d.ts
+ */
+export interface SRC20TokenStats {
+  totalSupply: string;
+  circulatingSupply: string;
+  holders: number;
+  transfers: number;
+  mintProgress: number;
+  isCompleted: boolean;
+}
+
+/**
+ * FeeStatistics - Migrated from database.d.ts
+ */
+export interface FeeStatistics {
+  averageFee: number;
+  medianFee: number;
+  minFee: number;
+  maxFee: number;
+  totalFees: number;
+  samples: number;
+  timestamp: Date;
+}
+
+/**
+ * ColumnType - Migrated from database.d.ts
+ */
+export type ColumnType =
+  | "VARCHAR"
+  | "INT"
+  | "BIGINT"
+  | "DECIMAL"
+  | "TEXT"
+  | "DATETIME"
+  | "TIMESTAMP"
+  | "BOOLEAN"
+  | "JSON";
+
+/**
+ * DatabaseEngine - Migrated from database.d.ts
+ */
+export type DatabaseEngine = "InnoDB" | "MyISAM" | "Memory" | "Archive";
+
+/**
+ * IndexType - Migrated from database.d.ts
+ */
+export type IndexType = "BTREE" | "HASH" | "FULLTEXT" | "SPATIAL";
+
+/**
+ * IndexAlgorithm - Migrated from database.d.ts
+ */
+export type IndexAlgorithm = "DEFAULT" | "INPLACE" | "COPY";
+
+/**
+ * ConstraintType - Migrated from database.d.ts
+ */
+export type ConstraintType = "FOREIGN_KEY" | "CHECK" | "UNIQUE" | "PRIMARY_KEY";
+
+/**
+ * ReferentialAction - Migrated from database.d.ts
+ */
+export type ReferentialAction =
+  | "CASCADE"
+  | "SET_NULL"
+  | "RESTRICT"
+  | "NO_ACTION"
+  | "SET_DEFAULT";
+
+/**
+ * WhereCondition - Migrated from database.d.ts
+ */
+export type WhereCondition<T> = {
+  [K in keyof T]?: T[K] | WhereOperator<T[K]>;
+};
+
+/**
+ * JoinCondition - Migrated from database.d.ts
+ */
+export type JoinCondition = string | {
+  left: string;
+  operator: ComparisonOperator;
+  right: string;
+};
+
+/**
+ * ComparisonOperator - Migrated from database.d.ts
+ */
+export type ComparisonOperator =
+  | "="
+  | "!="
+  | "<>"
+  | "<"
+  | "<="
+  | ">"
+  | ">="
+  | "LIKE"
+  | "NOT LIKE";
+
+/**
+ * OrderDirection - Migrated from database.d.ts
+ */
+export type OrderDirection = "ASC" | "DESC";
+
+/**
+ * ModelCasts - Migrated from database.d.ts
+ */
+export type ModelCasts<T> = {
+  [K in keyof T]?: CastType;
+};
+
+/**
+ * CastType - Migrated from database.d.ts
+ */
+export type CastType = "string" | "number" | "boolean" | "date" | "json";
+
+/**
+ * RelationType - Migrated from database.d.ts
+ */
+export type RelationType =
+  | "one-to-one"
+  | "one-to-many"
+  | "many-to-one"
+  | "many-to-many";
+
+/**
+ * MigrationOperationType - Migrated from database.d.ts
+ */
+export type MigrationOperationType =
+  | "CREATE_TABLE"
+  | "ALTER_TABLE"
+  | "DROP_TABLE"
+  | "CREATE_INDEX"
+  | "DROP_INDEX"
+  | "INSERT"
+  | "UPDATE"
+  | "DELETE";
+
+/**
+ * SRC20TokenStatus - Migrated from database.d.ts
+ */
+export type SRC20TokenStatus = "active" | "completed" | "invalid" | "cancelled";
+
+/**
+ * SRC20TransferType - Migrated from database.d.ts
+ */
+export type SRC20TransferType = "mint" | "transfer" | "deploy";
+
+/**
+ * TransferStatus - Migrated from database.d.ts
+ */
+export type TransferStatus = "confirmed" | "pending" | "failed";
+
+/**
+ * DatabaseType - Migrated from database.d.ts
+ */
+export type DatabaseType =
+  | "mysql"
+  | "postgresql"
+  | "sqlite"
+  | "mongodb"
+  | "redis";
+
+/**
+ * HealthStatus - Migrated from database.d.ts
+ */
+export type HealthStatus = "healthy" | "degraded" | "unhealthy" | "unknown";
+
+/**
+ * BackupType - Migrated from database.d.ts
+ */
+export type BackupType = "full" | "incremental" | "differential" | "log";
+
+/**
+ * BackupStatus - Migrated from database.d.ts
+ */
+export type BackupStatus =
+  | "pending"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled";
+
+/**
+ * CompressionType - Migrated from database.d.ts
+ */
+export type CompressionType = "none" | "gzip" | "bzip2" | "lz4" | "zstd";
+
+/**
+ * RestoreStatus - Migrated from database.d.ts
+ */
+export type RestoreStatus =
+  | "pending"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled";
+
+/**
+ * ServerEnvironment - Migrated from index.d.ts
+ */
+export interface ServerEnvironment {
+  /** Application environment mode */
+  NODE_ENV: "development" | "production" | "test" | "staging";
+
+  /** Server port configuration */
+  PORT: number;
+  HOST?: string;
+
+  /** Database configuration */
+  DATABASE_URL: string;
+  DATABASE_HOST?: string;
+  DATABASE_PORT?: number;
+  DATABASE_NAME?: string;
+  DATABASE_USER?: string;
+  DATABASE_PASSWORD?: string;
+
+  /** Redis configuration */
+  REDIS_URL?: string;
+  REDIS_HOST?: string;
+  REDIS_PORT?: number;
+  REDIS_PASSWORD?: string;
+
+  /** External service URLs */
+  BITCOIN_NODE_URL?: string;
+  COUNTERPARTY_API_URL?: string;
+
+  /** Security and authentication */
+  JWT_SECRET?: string;
+  API_KEY?: string;
+
+  /** Monitoring and logging */
+  LOG_LEVEL?: "error" | "warn" | "info" | "debug";
+  ENABLE_METRICS?: boolean;
+  METRICS_PORT?: number;
+
+  /** Performance tuning */
+  DATABASE_POOL_SIZE?: number;
+  REQUEST_TIMEOUT?: number;
+  CACHE_TTL?: number;
+}
+
+/**
+ * ServerConfig - Migrated from index.d.ts
+ */
+export interface ServerConfig {
+  environment: ServerEnvironment;
+  database: DatabaseConnectionConfig;
+  redis?: DatabaseConnectionConfig;
+  services: ServiceConfiguration;
+  monitoring: MonitoringConfiguration;
+  security: SecurityConfiguration;
+}
+
+/**
+ * ServiceConfiguration - Migrated from index.d.ts
+ */
+export interface ServiceConfiguration {
+  bitcoinNode: {
+    url: string;
+    timeout: number;
+    retries: number;
+  };
+  counterpartyApi: {
+    url: string;
+    timeout: number;
+    retries: number;
+  };
+  marketData: {
+    enabled: boolean;
+    refreshInterval: number;
+    sources: string[];
+  };
+}
+
+/**
+ * MonitoringConfiguration - Migrated from index.d.ts
+ */
+export interface MonitoringConfiguration {
+  enabled: boolean;
+  port: number;
+  healthCheck: {
+    interval: number;
+    timeout: number;
+  };
+  metrics: {
+    enabled: boolean;
+    endpoint: string;
+  };
+  logging: {
+    level: string;
+    format: "json" | "text";
+    destination: "console" | "file" | "both";
+  };
+}
+
+/**
+ * SecurityConfiguration - Migrated from index.d.ts
+ */
+export interface SecurityConfiguration {
+  cors: {
+    enabled: boolean;
+    origins: string[];
+    credentials: boolean;
+  };
+  rateLimit: {
+    enabled: boolean;
+    windowMs: number;
+    maxRequests: number;
+  };
+  authentication: {
+    required: boolean;
+    jwtSecret?: string;
+    tokenExpiry: number;
+  };
+}
+
+/**
+ * LegacyDatabaseConfig - Migrated from index.d.ts
+ */
+export interface LegacyDatabaseConfig {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  database: string;
+}
+
+/**
+ * DatabaseMigrationPlan - Migrated from index.d.ts
+ */
+export interface DatabaseMigrationPlan {
+  version: string;
+  fromVersion: string;
+  toVersion: string;
+  migrations: Migration[];
+  rollbackPlan: Migration[];
+  dataTransformations: DataTransformation[];
+  validationRules: ValidationRule[];
+}
+
+/**
+ * DataTransformation - Migrated from index.d.ts
+ */
+export interface DataTransformation {
+  table: string;
+  operation: "rename" | "split" | "merge" | "convert";
+  source: string | string[];
+  target: string | string[];
+  transformer: (data: any) => any;
+}
+
+/**
+ * ValidationRule - Migrated from index.d.ts
+ */
+export interface ValidationRule {
+  table: string;
+  rule: string;
+  description: string;
+  validator: (data: any) => boolean;
+}
+
+/**
+ * MockPSBTService - Migrated from psbt-utxo-fixtures.test.ts
+ */
+export interface MockPSBTService {
+  preparePSBT(inputs: any[], outputs: any[]): Promise<any>;
+  validateInputs(inputs: MockPSBTInput[]): boolean;
+}
+
+/**
+ * CloudWatchMetric - Migrated from cloudWatchMonitoring.ts
+ */
+export interface CloudWatchMetric {
+  MetricName: string;
+  Value: number;
+  Unit: "Count" | "Percent" | "Bytes" | "Milliseconds" | "Seconds" | "None";
+  Timestamp: Date;
+  Dimensions?: Array<{ Name: string; Value: string }>;
+}
+
+/**
+ * CloudWatchLogEvent - Migrated from cloudWatchMonitoring.ts
+ */
+export interface CloudWatchLogEvent {
+  timestamp: number;
+  message: string;
+  level: "INFO" | "WARN" | "ERROR" | "DEBUG";
+  source: string;
+  correlationId?: string;
+  metadata?: Record<string, any>;
+}
+
+/**
+ * BusinessMetrics - Migrated from cloudWatchMonitoring.ts
+ */
+export interface BusinessMetrics {
+  btcPriceFetchSuccessRate: number;
+  btcPriceFetchLatency: number;
+  src20ProcessingThroughput: number;
+  apiResponseTime: number;
+  errorRate: number;
+  circuitBreakerState: string;
+}
+
+/**
+ * ECSMetadata - Migrated from ecsDetection.ts
+ */
+export interface ECSMetadata {
+  isECS: boolean;
+  taskArn?: string;
+  clusterName?: string;
+  serviceName?: string;
+  taskDefinitionFamily?: string;
+  taskDefinitionRevision?: string;
+  containerName?: string;
+  logGroup?: string;
+  logStream?: string;
+  region?: string;
+  availabilityZone?: string;
+}
+
+/**
+ * LoggerService - Migrated from xcpManagerDI.ts
+ */
+export interface LoggerService {
+  info(category: string, data: any): Promise<void>;
+  debug(category: string, data: any): Promise<void>;
+  warn(category: string, data: any): Promise<void>;
+  error(category: string, data: any): Promise<void>;
+}
+
+/**
+ * XcpBalanceOptions - Migrated from xcpManagerDI.ts
+ */
+export interface XcpBalanceOptions {
+  type?: "all" | "send" | "dispenser" | "issuance";
+  cursor?: string;
+  limit?: number;
+  offset?: number;
+  sort?: string;
+  verbose?: boolean;
+  showUnconfirmed?: boolean;
+}
+
+/**
+ * ComposeAttachOptions - Migrated from xcpManagerDI.ts
+ */
+export interface ComposeAttachOptions {
+  fee_per_kb?: number;
+  destination_vout?: number;
+  inputs_set?: string;
+  encoding?: string;
+  regular_dust_size?: number;
+  multisig_dust_size?: number;
+  pubkeys?: string;
+  allow_unconfirmed_inputs?: boolean;
+  exact_fee?: number;
+  fee_provided?: number;
+  unspent_tx_hash?: string;
+  dust_return_pubkey?: string | false;
+  disable_utxo_locks?: boolean;
+  p2sh_pretx_txid?: string;
+  segwit?: boolean;
+  confirmation_target?: number;
+  exclude_utxos?: string;
+  return_psbt?: boolean;
+  return_only_data?: boolean;
+  extended_tx_info?: boolean;
+  old_style_api?: boolean;
+  use_utxos_with_balances?: boolean;
+  exclude_utxos_with_balances?: boolean;
+  validate?: boolean;
+  verbose?: boolean;
+  show_unconfirmed?: boolean;
+}
+
+/**
+ * ComposeDetachOptions - Migrated from xcpManagerDI.ts
+ */
+export interface ComposeDetachOptions {
+  fee_per_kb?: number;
+  destination?: string;
+  encoding?: string;
+  regular_dust_size?: number;
+  multisig_dust_size?: number;
+  pubkeys?: string;
+  allow_unconfirmed_inputs?: boolean;
+  exact_fee?: number;
+  fee_provided?: number;
+  unspent_tx_hash?: string;
+  dust_return_pubkey?: string | false;
+  disable_utxo_locks?: boolean;
+  p2sh_pretx_txid?: string;
+  segwit?: boolean;
+  confirmation_target?: number;
+  exclude_utxos?: string;
+  inputs_set?: string;
+  return_psbt?: boolean;
+  return_only_data?: boolean;
+  extended_tx_info?: boolean;
+  old_style_api?: boolean;
+  use_utxos_with_balances?: boolean;
+  exclude_utxos_with_balances?: boolean;
+  validate?: boolean;
+  verbose?: boolean;
+  show_unconfirmed?: boolean;
+}
+
+/**
+ * IssuanceOptions - Migrated from xcpManagerDI.ts
+ */
+export interface IssuanceOptions {
+  divisible?: boolean;
+  source?: string;
+  allow_unconfirmed_inputs?: boolean;
+  fee_per_kb?: number;
+  fee?: number;
+  encoding?: string;
+  pubkeys?: string;
+  return_psbt?: boolean;
+  extended_tx_info?: boolean;
+  old_style_api?: boolean;
+  verbose?: boolean;
+  show_unconfirmed?: boolean;
+  lock?: boolean;
+  description?: string;
+}
+
+/**
+ * XcpProvider - Migrated from xcpManagerDI.ts
+ */
+export interface XcpProvider {
+  getXcpAsset(cpid: string): Promise<any>;
+  getXcpBalancesByAddress(
+    address: string,
+    cpid?: string,
+    utxoOnly?: boolean,
+    options?: XcpBalanceOptions,
+  ): Promise<{ balances: XcpBalance[]; total: number; next_cursor?: string }>;
+  getAllXcpBalancesByAddress(
+    address: string,
+    utxoOnly?: boolean,
+  ): Promise<{ balances: XcpBalance[]; total: number }>;
+  createDispense(
+    address: string,
+    dispenser: string,
+    quantity: number,
+    options?: any,
+  ): Promise<any>;
+  createSend(
+    address: string,
+    destination: string,
+    asset: string,
+    quantity: number,
+    options?: any,
+  ): Promise<any>;
+  composeAttach(
+    address: string,
+    asset: string,
+    quantity: number,
+    options?: ComposeAttachOptions,
+  ): Promise<any>;
+  composeDetach(
+    utxo: string,
+    destination: string,
+    options?: ComposeDetachOptions,
+  ): Promise<any>;
+  checkHealth(cacheTimeout?: number): Promise<boolean>;
+}
+
+/**
+ * FeeSecurityConfig - Migrated from feeSecurityService.ts
+ */
+export interface FeeSecurityConfig {
+  minFeeRate: number; // Minimum allowed fee rate (sats/vB)
+  maxFeeRate: number; // Maximum allowed fee rate (sats/vB)
+  maxCacheAge: number; // Maximum cache age in milliseconds
+  suspiciousThreshold: number; // Threshold for suspicious activity
+  alertCooldown: number; // Cooldown between alerts in milliseconds
+}
+
+/**
+ * SecurityValidationResult - Migrated from feeSecurityService.ts
+ */
+export interface SecurityValidationResult {
+  isValid: boolean;
+  violations: string[];
+  riskLevel: "low" | "medium" | "high" | "critical";
+  action: "allow" | "warn" | "block";
+}
+
+/**
+ * SecurityEvent - Migrated from feeSecurityService.ts
+ */
+export interface SecurityEvent {
+  type:
+    | "cache_poisoning"
+    | "invalid_data"
+    | "suspicious_activity"
+    | "rate_limit_exceeded";
+  severity: "low" | "medium" | "high" | "critical";
+  source: string;
+  details: Record<string, any>;
+  timestamp: number;
+  clientInfo?: {
+    ip?: string;
+    userAgent?: string;
+    referer?: string;
+  } | undefined;
+}
+
+/**
+ * FeeData - Migrated from feeServiceDI.ts
+ */
+export interface FeeData {
+  recommendedFee: number;
+  btcPrice: number;
+  source: "mempool" | "quicknode" | "cached" | "default";
+  confidence: "high" | "medium" | "low";
+  timestamp: number;
+  debug_feesResponse?: any;
+  fallbackUsed?: boolean;
+  errors?: string[];
+  fastestFee?: number;
+  halfHourFee?: number;
+  hourFee?: number;
+  economyFee?: number;
+  minimumFee?: number;
+}
+
+/**
+ * CacheService - Migrated from feeServiceDI.ts
+ */
+export interface CacheService {
+  get<T>(
+    key: string,
+    factory: () => Promise<T>,
+    durationSeconds: number,
+  ): Promise<T>;
+}
+
+/**
+ * PriceService - Migrated from feeServiceDI.ts
+ */
+export interface PriceService {
+  getPrice(): Promise<{ price: number }>;
+}
+
+/**
+ * FeeProvider - Migrated from feeServiceDI.ts
+ */
+export interface FeeProvider {
+  getName(): string;
+  getFeeEstimate(): Promise<{
+    recommendedFee: number;
+    confidence: "high" | "medium" | "low";
+    debug_feesResponse?: any;
+  }>;
+}
+
+/**
+ * SecurityService - Migrated from feeServiceDI.ts
+ */
+export interface SecurityService {
+  validateFeeData(feeData: any, source: string): {
+    isValid: boolean;
+    violations: string[];
+    riskLevel: "low" | "medium" | "high" | "critical";
+    action: "allow" | "warn" | "block";
+  };
+}
+
+/**
+ * FeeServiceDependencies - Migrated from feeServiceDI.ts
+ */
+export interface FeeServiceDependencies {
+  cacheService: CacheService;
+  priceService: PriceService;
+  feeProviders: FeeProvider[];
+  securityService?: SecurityService;
+}
+
+/**
+ * FeeServiceConfig - Migrated from feeServiceDI.ts
+ */
+export interface FeeServiceConfig {
+  cacheKey: string;
+  cacheDuration: number;
+  maxRetries: number;
+  retryDelay: number;
+  staticFallbackRates: {
+    conservative: number;
+    normal: number;
+    minimum: number;
+  };
+}
+
+/**
+ * CacheConfig - Migrated from cacheService.ts
+ */
+export interface CacheConfig {
+  duration: number; // Cache duration in seconds
+  staleWhileRevalidate: number; // Allow serving stale content while fetching fresh
+  staleIfError: number; // Use stale content if backend errors
+  ttl?: number; // Time to live in seconds (alternative to duration)
+}
+
+/**
+ * RouteType - Migrated from cacheService.ts
+ */
+export enum RouteType {
+  // No cache (real-time data)
+  DYNAMIC = "dynamic",
+  INTERNAL = "internal", // Internal admin endpoints
+  STAMP_DISPENSER = "stamp_dispenser",
+  STAMP_DISPENSE = "stamp_dispense",
+  STAMP_SEND = "stamp_send",
+
+  // Short cache (frequently changing data)
+  BALANCE = "balance",
+  DISPENSER = "dispenser",
+  TRANSACTION = "transaction",
+  STAMP_DETAIL = "stamp_detail", // Individual stamp details
+
+  // Block-synchronized cache (invalidated on new blocks)
+  BLOCKCHAIN_DATA = "blockchain_data", // Data that changes with each block
+
+  // Medium cache (moderately changing data)
+  STAMP = "stamp",
+  STAMP_METADATA = "stamp_metadata",
+
+  // Long cache (stable data)
+  STAMP_LIST = "stamp_list", // List of all stamps
+  COLLECTION = "collection",
+  HISTORICAL = "historical",
+  PROTOCOL = "protocol",
+  STATIC = "static",
+  PRICE = "price",
+}
+
+/**
+ * CircuitBreakerOptions - Migrated from circuitBreaker.ts
+ */
+export interface CircuitBreakerOptions {
+  failureThreshold: number;
+  resetTimeout: number;
+  monitoringWindow: number;
+  timeoutDuration: number;
+  name?: string;
+}
+
+/**
+ * CircuitBreakerMetrics - Migrated from circuitBreaker.ts
+ */
+export interface CircuitBreakerMetrics {
+  state: "CLOSED" | "OPEN" | "HALF_OPEN";
+  failures: number;
+  successes: number;
+  lastFailureTime: number | null;
+  lastSuccessTime: number | null;
+  requestCount: number;
+  averageResponseTime: number;
+}
+
+/**
+ * CircuitBreakerOptions - Migrated from circuitBreakerService.ts
+ */
+export interface CircuitBreakerOptions {
+  failureThreshold: number;
+  resetTimeout: number;
+  monitoringWindow: number;
+  timeoutDuration: number;
+  name?: string;
+}
+
+/**
+ * MaraConfig - Migrated from types.ts
+ */
+export interface MaraConfig {
+  /** Base URL for MARA API */
+  API_BASE_URL: string;
+
+  /** Request timeout in milliseconds */
+  API_TIMEOUT: number;
+
+  /** How long to cache fee rates in seconds */
+  FEE_CACHE_DURATION: number;
+
+  /** Service fee amount in satoshis for MARA pool access */
+  SERVICE_FEE_SATS: number;
+
+  /** Bitcoin address for service fee payment */
+  SERVICE_FEE_ADDRESS: string;
+
+  /** Minimum allowed output value in satoshis */
+  MIN_OUTPUT_VALUE: number;
+
+  /** Maximum allowed output value in satoshis */
+  MAX_OUTPUT_VALUE: number;
+}
+
+/**
+ * UTXOData - Migrated from commonPools.ts
+ */
+export interface UTXOData {
+  txid?: string;
+  vout?: number;
+  value?: bigint;
+  script?: string;
+  confirmations?: number;
+  reset(): void;
+}
+
+/**
+ * SRC20TxData - Migrated from commonPools.ts
+ */
+export interface SRC20TxData {
+  tx_hash?: string;
+  block_index?: number;
+  tick?: string;
+  op?: string;
+  amt?: bigint;
+  from_address?: string;
+  to_address?: string;
+  status?: string;
+  reset(): void;
+}
+
+/**
+ * StampData - Migrated from commonPools.ts
+ */
+export interface StampData {
+  stamp?: number;
+  block_index?: number;
+  cpid?: string;
+  creator?: string;
+  divisible?: boolean;
+  keyburn?: boolean;
+  locked?: boolean;
+  stamp_base64?: string;
+  stamp_mimetype?: string;
+  stamp_url?: string;
+  supply?: bigint;
+  timestamp?: number;
+  tx_hash?: string;
+  tx_index?: number;
+  ident?: string;
+  reset(): void;
+}
+
+/**
+ * PoolableObject - Migrated from objectPool.ts
+ */
+export interface PoolableObject {
+  reset?(): void; // Optional method to reset object state
+}
+
+/**
+ * PoolConfig - Migrated from objectPool.ts
+ */
+export interface PoolConfig {
+  maxSize: number; // Maximum objects to keep in pool
+  createFn: () => any; // Factory function to create new objects
+  resetFn?: (obj: any) => void; // Optional reset function
+  validateFn?: (obj: any) => boolean; // Optional validation function
+}
+
+/**
+ * PoolMetrics - Migrated from objectPool.ts
+ */
+export interface PoolMetrics {
+  totalCreated: number;
+  totalBorrowed: number;
+  totalReturned: number;
+  currentPoolSize: number;
+  maxPoolSize: number;
+  hitRate: number; // Percentage of requests served from pool
+  memoryEstimate: number; // Rough memory usage estimate
+}
+
+/**
+ * MemoryUsage - Migrated from memoryMonitorService.ts
+ */
+export interface MemoryUsage {
+  rss: number; // Resident Set Size
+  heapTotal: number; // Total heap size
+  heapUsed: number; // Used heap size
+  external: number; // External memory usage
+  arrayBuffers: number; // ArrayBuffer memory usage
+}
+
+/**
+ * MemoryMetrics - Migrated from memoryMonitorService.ts
+ */
+export interface MemoryMetrics {
+  current: MemoryUsage;
+  peak: MemoryUsage;
+  timestamp: number;
+  uptimeSeconds: number;
+  memoryPressure: "low" | "medium" | "high" | "critical";
+  leakDetected: boolean;
+  gcInfo?: {
+    lastGC: number;
+    totalGCs: number;
+    averageGCTime: number;
+  };
+}
+
+/**
+ * MemoryLimits - Migrated from memoryMonitorService.ts
+ */
+export interface MemoryLimits {
+  heapLimit: number; // Container memory limit (bytes)
+  warningThreshold: number; // 70% of limit
+  criticalThreshold: number; // 85% of limit
+  maxAllowedRSS: number; // 90% of container limit
+}
+
+/**
+ * BlockNotification - Migrated from bitcoinNotificationService.ts
+ */
+export interface BlockNotification {
+  type: "new_block";
+  blockHeight: number;
+  blockHash: string;
+  timestamp: number;
+}
+
+/**
+ * PriceNotification - Migrated from bitcoinNotificationService.ts
+ */
+export interface PriceNotification {
+  type: "price_update";
+  price: number;
+  timestamp: number;
+}
+
+/**
+ * BitcoinNotification - Migrated from bitcoinNotificationService.ts
+ */
+export type BitcoinNotification = BlockNotification | PriceNotification;
+
+/**
+ * BTCPriceData - Migrated from btcPriceService.ts
+ */
+export interface BTCPriceData {
+  price: number;
+  source:
+    | "quicknode"
+    | "coingecko"
+    | "binance"
+    | "kraken"
+    | "coinbase"
+    | "blockchain"
+    | "bitstamp"
+    | "cached"
+    | "default";
+  confidence: "high" | "medium" | "low";
+  timestamp: number;
+  details?: any;
+  fallbackUsed?: boolean;
+  errors?: string[];
+  circuitBreakerMetrics?: Record<string, CircuitBreakerMetrics>;
+}
+
+/**
+ * BTCPriceData - Migrated from btcPriceServiceDI.ts
+ */
+export interface BTCPriceData {
+  price: number;
+  source: "coingecko" | "binance" | "quicknode" | "cached" | "default";
+  confidence: "high" | "medium" | "low";
+  timestamp: number;
+  details?: any;
+  fallbackUsed?: boolean;
+  errors?: string[];
+}
+
+/**
+ * PriceProvider - Migrated from btcPriceServiceDI.ts
+ */
+export interface PriceProvider {
+  getName(): string;
+  getPrice(): Promise<{
+    price: number;
+    confidence: "high" | "medium" | "low";
+    details?: any;
+  }>;
+}
+
+/**
+ * PriceServiceDependencies - Migrated from btcPriceServiceDI.ts
+ */
+export interface PriceServiceDependencies {
+  cacheService: CacheService;
+  httpClient: HttpClient;
+  priceProviders: PriceProvider[];
+}
+
+/**
+ * PriceServiceConfig - Migrated from btcPriceServiceDI.ts
+ */
+export interface PriceServiceConfig {
+  cacheKey: string;
+  cacheDuration: number;
+  staticFallbackPrice: number;
+  providerRotation: boolean;
+  maxRetries: number;
+  retryDelay: number;
+}
+
+/**
+ * NormalizedFeeEstimate - Migrated from quicknodeService.ts
+ */
+export interface NormalizedFeeEstimate {
+  feeRateSatsPerVB: number; // Converted to sats/vB
+  blocks: number;
+  source: "quicknode";
+  confidence: "high" | "medium" | "low";
+}
+
+/**
+ * QuicknodeConfig - Migrated from quicknodeServiceDI.ts
+ */
+export interface QuicknodeConfig {
+  endpoint: string;
+  apiKey: string;
+  fallbackApiUrl?: string;
+  maxRetries: number;
+  retryDelay: number;
+  requestTimeout: number;
+}
+
+/**
+ * QuicknodeServiceDependencies - Migrated from quicknodeServiceDI.ts
+ */
+export interface QuicknodeServiceDependencies {
+  httpClient: HttpClient;
+  config: QuicknodeConfig;
+}
+
+/**
+ * NormalizedFeeEstimate - Migrated from quicknodeServiceDI.ts
+ */
+export interface NormalizedFeeEstimate {
+  feeRateSatsPerVB: number; // Converted to sats/vB
+  blocks: number;
+  source: "quicknode";
+  confidence: "high" | "medium" | "low";
+}
+
+/**
+ * MultipleFeeEstimates - Migrated from quicknodeServiceDI.ts
+ */
+export interface MultipleFeeEstimates {
+  fast: NormalizedFeeEstimate | null; // 1-2 blocks
+  normal: NormalizedFeeEstimate | null; // 6 blocks
+  economy: NormalizedFeeEstimate | null; // 144 blocks
+}
+
+/**
+ * QuicknodeProvider - Migrated from quicknodeServiceDI.ts
+ */
+export interface QuicknodeProvider {
+  executeRPC<T = any>(
+    method: string,
+    params: any[],
+  ): Promise<QuicknodeRPCResponse<T>>;
+  getPublicKeyFromAddress(address: string): Promise<any>;
+  getRawTx(txHash: string): Promise<string>;
+  getDecodedTx(txHex: string): Promise<any>;
+  getTransaction(txHash: string): Promise<any>;
+  estimateSmartFee(
+    confTarget?: number,
+    estimateMode?: "economical" | "conservative",
+  ): Promise<NormalizedFeeEstimate | null>;
+  getMultipleFeeEstimates(): Promise<MultipleFeeEstimates>;
+}
+
+/**
+ * UTXOOptions - Migrated from quicknodeUTXOService.ts
+ */
+export interface UTXOOptions {
+  confirmedOnly?: boolean;
+  includeAncestors?: boolean; // For fetching financial ancestor data and full script details
+}
+
+/**
+ * QuickNodeUTXO - Migrated from quicknodeUTXOService.ts
+ */
+export interface QuickNodeUTXO {
+  txid: string;
+  vout: number;
+  value: string; // Value in satoshis, as a string (per QN docs)
+  confirmations: number;
+  height: number; // Block height
+  coinbase?: boolean;
+}
+
+/**
+ * QuickNodeTxSpecific - Migrated from quicknodeUTXOService.ts
+ */
+export interface QuickNodeTxSpecific {
+  txid: string;
+  size: number;
+  vsize: number;
+  weight: number;
+  fee?: number; // Fee in satoshis
+  fee_rate?: number; // Fee rate (e.g., sats/vB)
+  height?: number; // Block height of the transaction
+  ancestorcount?: number;
+  ancestorsize?: number;
+  ancestorfees?: number;
+  vin: Array<{
+    txid?: string; // txid of the input transaction
+    vout?: number; // vout of the input transaction
+    txinwitness?: string[];
+    sequence: number;
+    value?: number; // Value of the input being spent (in satoshis)
+    // other input fields if available and needed
+  }>;
+  vout: Array<{
+    value: number; // Value of this output - LIKELY IN BTC from bb_getTxSpecific
+    n: number; // Output index
+    scriptPubKey: {
+      asm: string;
+      desc: string;
+      hex: string;
+      address?: string;
+      type: string;
+    };
+  }>;
+  confirmations: number;
+  time?: number; // Block timestamp
+  blocktime?: number; // Alias for block timestamp often used
+  // status field was present in some versions, ensure if it's used, it's typed
+}
+
+/**
+ * CSRFPayload - Migrated from securityService.ts
+ */
+export interface CSRFPayload {
+  exp: number;
+  [key: string]: unknown;
+}
+
+/**
+ * EnrichmentOptions - Migrated from marketDataEnrichmentService.ts
+ */
+export interface EnrichmentOptions {
+  /** Include extended market data fields (7d, 30d metrics) */
+  includeExtendedFields?: boolean;
+
+  /** Optimize for bulk operations (use Map-based lookups) */
+  bulkOptimized?: boolean;
+
+  /** Enable detailed error logging */
+  enableLogging?: boolean;
+
+  /** Cache duration for bulk operations in milliseconds */
+  cacheDuration?: number;
+}
+
+/**
+ * MarketDataFields - Migrated from marketDataEnrichmentService.ts
+ */
+export interface MarketDataFields {
+  /** Tick symbol for the SRC20 token */
+  tick: string;
+
+  /** Floor price in BTC, null if not available */
+  floor_price_btc: number | null;
+
+  /** Market capitalization in BTC */
+  market_cap_btc: number;
+
+  /** 24-hour trading volume in BTC */
+  volume_24h_btc: number;
+
+  /** 24-hour price change percentage */
+  price_change_24h_percent: number;
+
+  /** Total holder count */
+  holder_count: number;
+
+  /** Data quality score (0-10) */
+  data_quality_score: number;
+
+  /** Last update timestamp */
+  last_updated: Date;
+
+  /** Extended fields (included when includeExtendedFields=true) */
+  volume_7d_btc?: number;
+  volume_30d_btc?: number;
+  price_change_7d_percent?: number;
+  price_change_30d_percent?: number;
+
+  /** Market data source information */
+  primary_exchange?: string | null;
+  exchange_sources?: string[] | null;
+
+  /** Confidence metrics */
+  confidence_level?: number;
+}
+
+/**
+ * EnrichedSRC20Item - Migrated from marketDataEnrichmentService.ts
+ */
+export interface EnrichedSRC20Item extends SRC20Row {
+  /**
+   * Nested market data object - SINGLE SOURCE OF TRUTH (snake_case for API consistency)
+   * NO root-level fields like floor_unit_price, market_cap, volume24, change24
+   */
+  market_data: MarketDataFields | null;
+}
+
+/**
+ * BulkEnrichmentResult - Migrated from marketDataEnrichmentService.ts
+ */
+export interface BulkEnrichmentResult {
+  /** Map of tick symbol to market data for successful lookups */
+  marketDataMap: Map<string, MarketDataFields>;
+
+  /** Array of tick symbols that failed to retrieve market data */
+  failedTicks: string[];
+
+  /** Performance metrics */
+  metrics: {
+    totalProcessed: number;
+    successful: number;
+    failed: number;
+    processingTimeMs: number;
+  };
+}
+
+/**
+ * EnrichedType - Migrated from marketDataEnrichmentService.ts
+ */
+export type EnrichedType<T extends SRC20Row> = T & EnrichedSRC20Item;
+
+/**
+ * PerformanceMetrics - Migrated from queryService.ts
+ */
+export interface PerformanceMetrics {
+  duration: number;
+  cacheHit: boolean;
+  dataSize: number;
+}
+
+/**
+ * TrendingCalculationOptions - Migrated from queryService.ts
+ */
+export interface TrendingCalculationOptions {
+  trendingWindow?: "24h" | "7d" | "30d";
+  mintVelocityMin?: number | undefined; // Allow undefined explicitly
+}
+
+/**
+ * EnhancedSRC20Row - Migrated from queryService.ts
+ */
+export interface EnhancedSRC20Row extends SRC20Row {
+  mint_velocity?: number; // Mints per hour
+  trending_score?: number; // Calculated trending score
+  mint_activity_24h?: number; // 24h mint count
+  mint_activity_7d?: number; // 7d mint count
+  mint_activity_30d?: number; // 30d mint count
+  market_data?: MarketListingAggregated; // Market data for sorting
+}
+
+/**
+ * BitcoinTransactionBuilderDependencies - Migrated from bitcoinTransactionBuilder.ts
+ */
+export interface BitcoinTransactionBuilderDependencies {
+  getUTXOForAddress: typeof getUTXOForAddressFromUtils;
+  estimateFee: typeof estimateFee;
+  commonUtxoService: CommonUTXOService;
+  bitcoin?: typeof import("bitcoinjs-lib"); // Optional bitcoin lib injection for testing
+}
+
+/**
+ * BitcoinTransactionGenerationOptions - Migrated from generalBitcoinTransactionBuilder.ts
+ */
+export interface BitcoinTransactionGenerationOptions {
+  address: string;
+  satsPerVB: number;
+  serviceFee?: number;
+  serviceFeeAddress?: string;
+  operationType: "mint" | "fairmint" | "detach" | "dispense" | "generic";
+  // For mint operations
+  cip33Addresses?: string[];
+  fileSize?: number;
+  // For generic operations
+  customOutputs?: Array<{ value: number; address: string }>;
+}
+
+/**
+ * BitcoinTransactionGenerationResult - Migrated from generalBitcoinTransactionBuilder.ts
+ */
+export interface BitcoinTransactionGenerationResult {
+  psbt: bitcoin.Psbt;
+  estimatedTxSize: number;
+  totalInputValue: number;
+  totalOutputValue: number;
+  totalChangeOutput: number;
+  totalDustValue: number;
+  estMinerFee: number;
+  changeAddress: string;
+}
+
+/**
+ * CommonUTXOFetchOptions - Migrated from commonUtxoService.ts
+ */
+export interface CommonUTXOFetchOptions extends UTXOFetchOptions {
+  forcePublicAPI?: boolean;
+}
+
+/**
+ * MempoolTransaction - Migrated from commonUtxoService.ts
+ */
+export interface MempoolTransaction {
+  txid: string;
+  version: number;
+  locktime: number;
+  vin: Array<{
+    txid: string;
+    vout: number;
+    prevout?: {
+      scriptpubkey: string;
+      scriptpubkey_asm: string;
+      scriptpubkey_type: string;
+      scriptpubkey_address?: string;
+      value: number;
+    };
+    scriptsig: string;
+    scriptsig_asm: string;
+    witness?: string[];
+    is_coinbase: boolean;
+    sequence: number;
+  }>;
+  vout: Array<{
+    scriptpubkey: string;
+    scriptpubkey_asm: string;
+    scriptpubkey_type: string;
+    scriptpubkey_address?: string;
+    value: number;
+  }>;
+  size: number;
+  weight: number;
+  fee: number;
+  status: {
+    confirmed: boolean;
+    block_height?: number;
+    block_hash?: string;
+    block_time?: number;
+  };
+}
+
+/**
+ * BasicUTXO - Migrated from optimalUtxoSelection.ts
+ */
+export interface BasicUTXO extends BaseUTXO {
+  address?: string;
+  script?: string;
+  scriptType?: string;
+  scriptDesc?: string;
+  confirmations?: number;
+}
+
+/**
+ * SelectionResult - Migrated from optimalUtxoSelection.ts
+ */
+export interface SelectionResult {
+  inputs: UTXO[];
+  change: number;
+  fee: number;
+  waste: number; // Cost metric for this selection
+  algorithm: string; // Which algorithm was used
+}
+
+/**
+ * SelectionOptions - Migrated from optimalUtxoSelection.ts
+ */
+export interface SelectionOptions {
+  targetValue: bigint;
+  feeRate: number;
+  longTermFeeRate?: number; // For waste calculation
+  dustThreshold?: number;
+  consolidationMode?: boolean; // Prefer using more inputs
+  avoidChange?: boolean; // Try to find exact matches
+  maxTries?: number; // For random selection
+}
+
+/**
+ * AlgorithmMetrics - Migrated from optimalUtxoSelection.ts
+ */
+export interface AlgorithmMetrics {
+  name: string;
+  executionTimeMs: number;
+  success: boolean;
+  inputsSelected: number;
+  totalInputValue: number;
+  fee: number;
+  change: number;
+  waste: number;
+  failureReason?: string | undefined;
+  efficiency: number; // inputs selected / total available
+  wastePercentage: number; // waste / total transaction value
+}
+
+/**
+ * SelectionMetrics - Migrated from optimalUtxoSelection.ts
+ */
+export interface SelectionMetrics {
+  sessionId: string;
+  totalExecutionTimeMs: number;
+  availableUTXOs: number;
+  spendableUTXOs: number;
+  filteredUTXOs: number;
+  targetValue: number;
+  feeRate: number;
+  algorithms: AlgorithmMetrics[];
+  selectedAlgorithm: string;
+  finalResult: {
+    inputs: number;
+    totalValue: number;
+    fee: number;
+    change: number;
+    waste: number;
+    efficiency: number;
+  };
+  dustAnalysis: {
+    totalFiltered: number;
+    averageFilteredValue: number;
+    filterRatio: number;
+  };
+  recommendations: string[];
+}
+
+/**
+ * UTXOFetchOptions - Migrated from utxoServiceInterface.d.ts
+ */
+export interface UTXOFetchOptions {
+  /**
+   * If true, attempts to include ancestor details (fees, vsize) for each UTXO.
+   * This might involve additional API calls for some UTXO sources.
+   */
+  includeAncestorDetails?: boolean;
+  /**
+   * If true, only fetches confirmed UTXOs.
+   */
+  confirmedOnly?: boolean;
+  // Potential future options:
+  // minConfirmations?: number;
+  // maxUtxosToFetch?: number;
+}
+
+/**
+ * ICommonUTXOService - Migrated from utxoServiceInterface.d.ts
+ */
+export interface ICommonUTXOService {
+  /**
+   * Fetches spendable UTXOs for a given address.
+   * The calling service is responsible for coin selection from the returned UTXOs.
+   *
+   * @param address The Bitcoin address to fetch UTXOs for.
+   * @param amountNeeded Optional hint for the service; it may try to fetch UTXOs collectively covering this amount,
+   *                     but the primary responsibility of coin selection remains with the caller.
+   * @param options Options for fetching UTXOs.
+   * @returns A promise that resolves to an array of UTXO objects.
+   */
+  getSpendableUTXOs(
+    address: string,
+    amountNeeded?: number,
+    options?: UTXOFetchOptions,
+  ): Promise<UTXO[]>;
+
+  /**
+   * Fetches a single specific UTXO by its transaction ID and output index.
+   *
+   * @param txid The transaction ID of the UTXO.
+   * @param vout The output index (vout) of the UTXO.
+   * @param options Options for fetching the UTXO.
+   * @returns A promise that resolves to a UTXO object if found, or null otherwise.
+   */
+  getSpecificUTXO(
+    txid: string,
+    vout: number,
+    options?: UTXOFetchOptions,
+  ): Promise<UTXO | null>;
+
+  /**
+   * Fetches the raw hexadecimal representation of a transaction.
+   *
+   * @param txid The transaction ID.
+   * @returns A promise that resolves to the raw transaction hex string if found, or null otherwise.
+   */
+  getRawTransactionHex(txid: string): Promise<string | null>;
+
+  // Example of a potential future method:
+  // getTransactionDetails(txid: string): Promise<TransactionDetails | null>;
+}
+
+/**
+ * ValidationResult - Migrated from routeValidationService.ts
+ */
+export interface ValidationResult<T> {
+  isValid: boolean;
+  data?: T;
+  error?: Response;
+}
+
+/**
+ * FileValidationOptions - Migrated from routeValidationService.ts
+ */
+export interface FileValidationOptions {
+  maxSizeBytes?: number;
+  allowedMimeTypes?: string[];
+  requiredFields?: string[];
+}
+
+/**
+ * SortDirection - Migrated from routeValidationService.ts
+ */
+export type SortDirection = "ASC" | "DESC";
+
+/**
+ * SortValidationOptions - Migrated from validationService.ts
+ */
+export interface SortValidationOptions {
+  defaultDirection?: SortDirection;
+  allowedDirections?: SortDirection[];
+}
+
+/**
+ * SortDirection - Migrated from validationService.ts
+ */
+export type SortDirection = "ASC" | "DESC";
+
+/**
+ * IPrepareSRC101TX - Migrated from src101.d.ts
+ */
+export interface IPrepareSRC101TX {
+  network: string;
+  // fromAddress: string;
+  sourceAddress: string;
+  changeAddress: string;
+  recAddress?: string;
+  feeRate: number;
+  transferString: string;
+  recVault?: number;
+  enableRBF?: boolean;
+}
+
+/**
+ * IMintSRC101 - Migrated from src101.d.ts
+ */
+export interface IMintSRC101 extends Omit<IPrepareSRC101TX, "transferString"> {
+  hash: string;
+  toaddress: string;
+  tokenid: string[];
+  dua: string;
+  prim: string;
+  coef: string;
+  sig: string;
+  img: string[] | null;
+  recVault?: number;
+}
+
+/**
+ * IDeploySRC101 - Migrated from src101.d.ts
+ */
+export interface IDeploySRC101
+  extends Omit<IPrepareSRC101TX, "transferString"> {
+  root: string;
+  name: string;
+  lim: string;
+  owner: string;
+  rec: string[];
+  tick: string;
+  pri: Record<string, any>;
+  desc: string;
+  mintstart: string;
+  mintend: string;
+  wla: string;
+  imglp: string;
+  imgf: string;
+  idua?: string;
+  description?: string;
+}
+
+/**
+ * ITransferSRC101 - Migrated from src101.d.ts
+ */
+export interface ITransferSRC101
+  extends Omit<IPrepareSRC101TX, "transferString"> {
+  hash: string;
+  toaddress: string;
+  tokenid: string;
+}
+
+/**
+ * ISetrecordSRC101 - Migrated from src101.d.ts
+ */
+export interface ISetrecordSRC101
+  extends Omit<IPrepareSRC101TX, "transferString"> {
+  hash: string;
+  tokenid: string;
+  type: string;
+  data: Record<string, any>;
+  prim: string;
+}
+
+/**
+ * IRenewSRC101 - Migrated from src101.d.ts
+ */
+export interface IRenewSRC101 extends Omit<IPrepareSRC101TX, "transferString"> {
+  hash: string;
+  tokenid: string;
+  dua: string;
+}
+
+/**
+ * IPrepareSRC101TXResult - Migrated from src101.d.ts
+ */
+export interface IPrepareSRC101TXResult {
+  psbtHex: string;
+  fee: number;
+  change: number;
+  inputsToSign: Array<{ index: number }>;
+}
+
+/**
+ * IPrepareSRC20TX - Migrated from src20.d.ts
+ */
+export interface IPrepareSRC20TX {
+  network: string;
+  changeAddress: string;
+  toAddress: string;
+  feeRate: number;
+  transferString: string;
+  enableRBF?: boolean;
+}
+
+/**
+ * IMintSRC20 - Migrated from src20.d.ts
+ */
+export interface IMintSRC20 extends Omit<IPrepareSRC20TX, "transferString"> {
+  tick: string;
+  amt: string;
+}
+
+/**
+ * IDeploySRC20 - Migrated from src20.d.ts
+ */
+export interface IDeploySRC20 extends Omit<IPrepareSRC20TX, "transferString"> {
+  tick: string;
+  max: string;
+  lim: string;
+  dec?: number;
+  x?: string;
+  web?: string;
+  email?: string;
+  tg?: string;
+  description?: string;
+  desc?: string;
+  img?: string;
+  icon?: string;
+}
+
+/**
+ * ITransferSRC20 - Migrated from src20.d.ts
+ */
+export interface ITransferSRC20
+  extends Omit<IPrepareSRC20TX, "transferString"> {
+  fromAddress: string;
+  tick: string;
+  amt: string;
+}
+
+/**
+ * IPrepareSRC20TXResult - Migrated from src20.d.ts
+ */
+export interface IPrepareSRC20TXResult {
+  psbtHex: string;
+  fee: number;
+  change: number;
+  inputsToSign: Array<{ index: number }>;
+}
+
+/**
+ * SRC101Operation - Migrated from src101Operations.ts
+ */
+export interface SRC101Operation {
+  op: string;
+  p: "SRC-101";
+  [key: string]: unknown;
+}
+
+/**
+ * SRC101OperationParams - Migrated from src101Operations.ts
+ */
+export type SRC101OperationParams =
+  | IMintSRC101
+  | IDeploySRC101
+  | ITransferSRC101
+  | ISetrecordSRC101
+  | IRenewSRC101;
+
+/**
+ * SRC20Operation - Migrated from src20Operations.ts
+ */
+export interface SRC20Operation {
+  op: string;
+  p: "SRC-20";
+  tick: string;
+  [key: string]: unknown;
+}
+
+/**
+ * SRC20OperationParams - Migrated from src20Operations.ts
+ */
+export type SRC20OperationParams = IMintSRC20 | IDeploySRC20 | ITransferSRC20;
+
+/**
+ * PSBTParams - Migrated from src20PSBTService.ts
+ */
+export interface PSBTParams {
+  sourceAddress: string;
+  toAddress: string;
+  src20Action: Record<string, unknown>;
+  satsPerVB: number;
+  service_fee: number;
+  service_fee_address: string;
+  changeAddress: string;
+  utxoAncestors?: AncestorInfo[];
+  trxType?: "olga" | "multisig";
+  utxos?: Array<{
+    txid: string;
+    vout: number;
+    value: number;
+    script: string;
+    address: string;
+  }>;
+  isDryRun?: boolean;
+}
+
+/**
+ * ServiceStatus - Migrated from service management
  */
 export interface ServiceStatus {
   name: string;
