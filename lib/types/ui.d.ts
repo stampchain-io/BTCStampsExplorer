@@ -12,6 +12,7 @@
 import type { ButtonProps } from "$button";
 import type { FeeDetails } from "$types/base.d.ts";
 
+import type { SortKey } from "$types/sorting.d.ts";
 import type { SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
 import type {
   STAMP_FILTER_TYPES,
@@ -20,11 +21,6 @@ import type {
 } from "$types/stamp.d.ts";
 import type * as preact from "preact";
 import type { ComponentChildren, ComponentProps, JSX } from "preact";
-import type * as preact from "preact";
-import type { SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
-import type { STAMP_FILTER_TYPES, STAMP_TYPES, StampRow } from "$types/stamp.d.ts";
-import type { SortKey } from "$types/sorting.d.ts";
-import type { FeeDetails } from "$types/base.d.ts";
 // Removed circular self-import block - these types should be defined locally
 // import type {
 //   ActivityBadgeProps,
@@ -205,7 +201,8 @@ import type { FeeDetails } from "$types/base.d.ts";
 /**
  * Basic HTML element prop types
  */
-export interface AnchorElementProps extends JSX.HTMLAttributes<HTMLAnchorElement> {
+export interface AnchorElementProps
+  extends JSX.HTMLAttributes<HTMLAnchorElement> {
   href?: string;
   target?: string;
   rel?: string;
@@ -215,7 +212,8 @@ export interface BaseButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
   type?: "button" | "submit" | "reset";
 }
 
-export interface ButtonElementProps extends JSX.HTMLAttributes<HTMLButtonElement> {
+export interface ButtonElementProps
+  extends JSX.HTMLAttributes<HTMLButtonElement> {
   variant?: string;
   color?: string;
   size?: string;
@@ -1823,8 +1821,6 @@ export interface SortingComponentProps<T = any> {
   testId?: string;
   "aria-label"?: string;
 }
-
-
 
 /**
  * EnhancedSortState - Migrated from sorting.d.ts

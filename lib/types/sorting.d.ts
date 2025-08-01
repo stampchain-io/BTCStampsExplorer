@@ -4,13 +4,10 @@
  * that can be used across different page types (wallet, stamp, etc.) while maintaining type safety
  */
 
-import { JSX } from "preact";
 import type {
   EnhancedSortState,
   SortingComponentProps,
   SortState,
-  StampSortingProps,
-  WalletSortingProps,
 } from "$types/ui.d.ts";
 
 // Re-export imported types that are used by other modules
@@ -18,8 +15,6 @@ export type {
   EnhancedSortState,
   SortingComponentProps,
   SortState,
-  StampSortingProps,
-  WalletSortingProps,
 };
 
 // ===== CORE SORTING TYPES =====

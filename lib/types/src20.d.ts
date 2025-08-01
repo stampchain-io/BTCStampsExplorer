@@ -267,30 +267,9 @@ export interface SRC20Filters {
   search?: string; // Search by tick or tick_hash
 }
 
-/**
- * SRC-20 transaction request parameters
- * Used for querying SRC-20 transactions with advanced filtering
- */
-export interface SRC20TrxRequestParams {
-  block_index?: number | null; // Filter by block index
-  tick?: string | string[] | null; // Filter by ticker(s)
-  op?: string | string[] | null; // Filter by operation(s)
-  limit?: number; // Results per page
-  page?: number; // Page number
-  sort?: string; // Sort order (API requests only)
-  sortBy?: string; // Sort field
-  filterBy?: string | string[] | null; // Additional filters
-  tx_hash?: string | null; // Filter by transaction hash
-  address?: string | null; // Filter by address
-  noPagination?: boolean; // Disable pagination
-  singleResult?: boolean; // Return single result
-
-  // 🚀 NEW V2.3 PARAMETERS FOR TRENDING AND MINT PROGRESS
-  mintingStatus?: "all" | "minting" | "minted"; // Simplified filter: all (default), minting (progress < 100%), minted (progress >= 99.9%)
-  trendingWindow?: "24h" | "7d" | "30d"; // Time window for trending calculations
-  includeProgress?: boolean; // Include progress_percentage, total_minted from market data
-  mintVelocityMin?: number; // Minimum mint velocity for trending (mints per hour)
-}
+// SRC-20 request parameters have been moved to api.d.ts to avoid duplication
+// Re-export for backward compatibility
+export type { SRC20TrxRequestParams } from "$types/api.d.ts";
 
 /**
  * SRC-20 balance request parameters
@@ -309,17 +288,8 @@ export interface SRC20BalanceRequestParams {
   includeMarketData?: boolean; // NEW: API v2.3 enhancement for market data enrichment
 }
 
-/**
- * SRC-20 snapshot request parameters
- * Used for balance snapshot queries
- */
-export interface SRC20SnapshotRequestParams {
-  tick: string; // Token ticker (required)
-  limit: number; // Results per page
-  page: number; // Page number
-  amt: number; // Amount filter
-  sortBy?: string; // Sort field
-}
+// Re-export for backward compatibility
+export type { SRC20SnapshotRequestParams } from "$types/api.d.ts";
 
 // ============================================================================
 // SRC-20 RESPONSE INTERFACES - MOVED TO api.d.ts

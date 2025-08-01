@@ -225,7 +225,6 @@ export type {
   KeyboardNavigationProps,
   // State component types
   LoadingStateProps,
-  PaginationProps,
   ProcessingButtonProps,
   ResponsiveProps,
   // Responsive and accessibility
