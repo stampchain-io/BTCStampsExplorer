@@ -1,3 +1,8 @@
+import type {
+  AdvancedFeeCalculatorProps,
+  BaseFeeCalculatorProps,
+  SimpleFeeCalculatorProps,
+} from "$types/ui.d.ts";
 export interface UTXO {
   txid: string;
   vout: number;
@@ -107,65 +112,6 @@ export interface StampTransferDetails {
 export interface MintDetails {
   amount: number;
   token: string;
-}
-
-export interface BaseFeeCalculatorProps {
-  fee: number;
-  handleChangeFee: (fee: number) => void;
-  BTCPrice: number;
-  isSubmitting: boolean;
-  onSubmit: () => void;
-  onCancel?: () => void;
-  buttonName: string;
-  className?: string;
-  showCoinToggle?: boolean;
-  tosAgreed?: boolean;
-  onTosChange?: (agreed: boolean) => void;
-  feeDetails?: FeeDetails;
-  transferDetails?: TransferDetails;
-  stampTransferDetails?: StampTransferDetails;
-  mintDetails?: MintDetails;
-}
-
-export interface SimpleFeeCalculatorProps extends BaseFeeCalculatorProps {
-  type: "send" | "transfer" | "buy" | "src20";
-  _type?: string;
-  amount?: number;
-  recipientAddress?: string;
-  userAddress?: string;
-  inputType?: ScriptType;
-  outputTypes?: ScriptType[];
-  utxoAncestors?: AncestorInfo[];
-  bitname?: string;
-  receive?: number;
-  fromPage?: string;
-  price?: number;
-  edition?: number;
-  ticker?: string;
-  limit?: number;
-  supply?: number;
-  dec?: number; // Added missing decimals property for SRC20 deploy
-  transferDetails?: TransferDetails;
-  mintDetails?: MintDetails;
-  serviceFeeSats?: number;
-}
-
-export interface AdvancedFeeCalculatorProps extends BaseFeeCalculatorProps {
-  type: string;
-  fileType?: string | undefined;
-  fileSize?: number | undefined;
-  issuance?: number;
-  serviceFee?: number | null;
-  userAddress?: string | undefined;
-  outputTypes?: ScriptType[];
-  utxoAncestors?: AncestorInfo[];
-  feeDetails?: FeeDetails;
-  effectiveFeeRate?: number;
-  onRefresh: () => Promise<void>;
-  disabled?: boolean;
-  inputType?: string;
-  bitname?: string;
-  fromPage?: string;
 }
 
 interface PSBTFees extends FeeDetails {
@@ -327,4 +273,11 @@ export interface Config {
   MINTING_SERVICE_FEE: string | null;
   /** The address to receive minting service fees */
   MINTING_SERVICE_FEE_ADDRESS: string | null;
+}
+
+/**
+ * CommonUTXOFetchOptions - Migrated from server/services/utxo/commonUtxoService.ts
+ */
+interface CommonUTXOFetchOptions extends UTXOFetchOptions {
+  forcePublicAPI?: boolean;
 }

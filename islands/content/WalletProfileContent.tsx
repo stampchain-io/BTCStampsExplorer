@@ -1,6 +1,19 @@
 /* ===== WALLET PROFILE CONTENT COMPONENT ===== */
 import type { StampRow } from "$types/stamp.d.ts";
-import type { SectionHeaderProps } from "$types/ui.d.ts";
+import type { Dispenser } from "$types/services.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { CollectionRow } from "$types/stamp.d.ts";
+import type {
+  StampMarketData,
+  SRC20MarketData,
+  CollectionMarketData,
+  MarketDataCacheInfo,
+  CacheStatus,
+} from "$types/marketData.d.ts";
+import type {
+  EnhancedWalletContentProps,
+  SectionHeaderProps,
+} from "$types/ui.d.ts";
 import { Icon, LoadingIcon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
@@ -29,18 +42,6 @@ import type { WalletSortKey } from "$lib/types/sorting.d.ts";
 /**
  * Enhanced wallet content props with feature flag support
  */
-interface EnhancedWalletContentProps extends WalletContentProps {
-  /** Enable advanced sorting features (default: false for backward compatibility) */
-  enableAdvancedSorting?: boolean;
-  /** Show performance metrics for sorting operations */
-  showSortingMetrics?: boolean;
-  /** Additional sorting configuration */
-  sortingConfig?: {
-    enableUrlSync?: boolean;
-    enablePersistence?: boolean;
-    enableMetrics?: boolean;
-  };
-}
 
 /**
  * Section-specific sorting configuration for advanced mode

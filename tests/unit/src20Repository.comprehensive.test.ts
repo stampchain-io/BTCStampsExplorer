@@ -1,0 +1,765 @@
+/**
+ * Comprehensive Unit Tests for SRC20Repository
+ * 
+ * Tests repository pattern, data access, CRUD operations, caching,
+ * data validation, emoji handling, and database interactions.
+ */
+
+import { assertEquals, assertExists, assertRejects } from "@std/assert";
+import { stub, restore } from "@std/testing@1.0.14/mock";
+import { SRC20Repository } from "../../server/database/src20Repository.ts";
+import { dbManager } from "../../server/database/databaseManager.ts";
+import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "../../lib/utils/ui/formatting/emojiUtils.ts";
+import { BigFloat } from "bigfloat/mod.ts";
+
+// Mock database responses
+const mockSRC20TxResponse = {
+  rows: [
+    {
+      tx_hash: "abc123def456",
+      block_index: 800000,
+      p: "src-20",
+      op: "DEPLOY",
+      tick: "\\U0001F4A9", // Unicode escape for 💩
+      creator: "bc1qcreator123",
+      amt: null,
+      deci: 8,
+      lim: "1000",
+      max: "21000000",
+      destination: null,
+      block_time: "2024-01-01T00:00:00Z",
+      creator_name: "TestCreator",
+      destination_name: null,
+      holders: 100,
+      progress: 50.5,
+      minted_amt: "10500000",
+      total_mints: 10500,
+      deploy_tx: "abc123def456"
+    }
+  ]
+};
+
+const mockBalanceResponse = {
+  rows: [
+    {
+      address: "bc1qholder123",
+      p: "src-20",
+      tick: "\\U0001F4A9",
+      amt: "1000.00000000",
+      block_time: "2024-01-01T00:00:00Z",
+      last_update: "2024-01-01T00:00:00Z"
+    }
+  ]
+};
+
+const mockCountResponse = {
+  rows: [{ total: 42 }]
+};
+
+const mockMintProgressResponse = {
+  rows: [
+    {
+      max: "21000000",
+      deci: 8,
+      lim: "1000",
+      tx_hash: "abc123def456",
+      tick: "\\U0001F4A9",
+      total_minted: "10500000",
+      holders_count: 100,
+      total_mints: 10500
+    }
+  ]
+};
+
+Deno.test("SRC20Repository - Database Dependency Injection", async (t) => {
+  // Store original database
+  const originalDb = (SRC20Repository as any).db;
+
+  await t.step("should allow setting custom database", () => {
+    const mockDb = {
+      executeQueryWithCache: stub().resolves(mockSRC20TxResponse)
+    };
+
+    SRC20Repository.setDatabase(mockDb as any);
+    assertEquals((SRC20Repository as any).db, mockDb);
+  });
+
+  await t.step("should restore original database", () => {
+    SRC20Repository.setDatabase(originalDb);
+    assertEquals((SRC20Repository as any).db, originalDb);
+  });
+});
+
+Deno.test("SRC20Repository - Unicode/Emoji Handling", async (t) => {
+  await t.step("should convert emoji to unicode escape for database operations", () => {
+    const emojiToUnicodeStub = stub(emojiToUnicodeEscape as any, "default", () => "\\U0001F4A9");
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      const params = { tick: "💩" }; // Emoji input
+      await SRC20Repository.getTotalCountValidSrc20TxFromDb(params);
+
+      // Should have converted emoji to unicode escape
+      assertEquals(executeQueryStub.calls[0].args[1].includes("\\U0001F4A9"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should convert unicode escape to emoji in responses", () => {
+    const unicodeToEmojiStub = stub(unicodeEscapeToEmoji as any, "default", () => "💩");
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      const result = await SRC20Repository.getValidSrc20TxFromDb({});
+      
+      // Response should have been converted to emoji
+      assertEquals(result.rows[0].tick, "💩");
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle null/undefined ticks gracefully", () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve({
+      rows: [{ ...mockSRC20TxResponse.rows[0], tick: null }]
+    }));
+
+    try {
+      const result = await SRC20Repository.getValidSrc20TxFromDb({});
+      
+      // Null tick should remain null
+      assertEquals(result.rows[0].tick, null);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle array of ticks with mixed emoji/unicode", () => {
+    const emojiToUnicodeStub = stub(emojiToUnicodeEscape as any, "default", (input: string) => {
+      return input === "💩" ? "\\U0001F4A9" : input;
+    });
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      const params = { tick: ["💩", "\\U0001F4A9", "PLAIN"] };
+      await SRC20Repository.getTotalCountValidSrc20TxFromDb(params);
+
+      // Should process all tick variants
+      assertEquals(executeQueryStub.calls.length, 1);
+    } finally {
+      restore();
+    }
+  });
+});
+
+Deno.test("SRC20Repository - Query Parameter Building", async (t) => {
+  await t.step("should build query with single tick parameter", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockCountResponse));
+
+    try {
+      await SRC20Repository.getTotalCountValidSrc20TxFromDb({ tick: "TEST" });
+      
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(params.includes("TEST"), true);
+      assertEquals(query.includes("tick = ?"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should build query with array of tick parameters", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockCountResponse));
+
+    try {
+      await SRC20Repository.getTotalCountValidSrc20TxFromDb({ tick: ["TEST1", "TEST2"] });
+      
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(params.includes("TEST1"), true);
+      assertEquals(params.includes("TEST2"), true);
+      assertEquals(query.includes("tick IN"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should build query with operation parameters", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockCountResponse));
+
+    try {
+      await SRC20Repository.getTotalCountValidSrc20TxFromDb({ op: "DEPLOY" });
+      
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(params.includes("DEPLOY"), true);
+      assertEquals(query.includes("op = ?"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should build query with multiple parameters", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockCountResponse));
+
+    try {
+      await SRC20Repository.getTotalCountValidSrc20TxFromDb({ 
+        tick: "TEST",
+        op: "MINT",
+        block_index: 800000,
+        address: "bc1qtest123",
+        tx_hash: "abc123def456"
+      });
+      
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(params.includes("TEST"), true);
+      assertEquals(params.includes("MINT"), true);
+      assertEquals(params.includes(800000), true);
+      assertEquals(params.includes("bc1qtest123"), true);
+      assertEquals(params.includes("abc123def456"), true);
+    } finally {
+      restore();
+    }
+  });
+});
+
+Deno.test("SRC20Repository - Filtering and Sorting", async (t) => {
+  await t.step("should apply excludeFullyMinted filter", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      await SRC20Repository.getValidSrc20TxFromDb({}, true); // excludeFullyMinted = true
+      
+      const [query] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("progress_percentage") && query.includes("< 100"), true);
+      assertEquals(query.includes("src20_market_data"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should apply onlyFullyMinted filter", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      await SRC20Repository.getValidSrc20TxFromDb({}, false, true); // onlyFullyMinted = true
+      
+      const [query] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("progress_percentage") && query.includes("= 100"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle market cap sorting", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      await SRC20Repository.getValidSrc20TxFromDb({ sortBy: "MARKET_CAP_DESC" });
+      
+      const [query] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("market_cap_btc DESC"), true);
+      assertEquals(query.includes("src20_market_data"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle holders sorting", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      await SRC20Repository.getValidSrc20TxFromDb({ sortBy: "HOLDERS_DESC" });
+      
+      const [query] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("holder_count") && query.includes("DESC"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle basic sorting without market data", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      await SRC20Repository.getValidSrc20TxFromDb({ sortBy: "BLOCK_DESC" });
+      
+      const [query] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("block_index DESC"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should default to ASC sorting for invalid sortBy", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      await SRC20Repository.getValidSrc20TxFromDb({ sortBy: "INVALID_SORT" });
+      
+      const [query] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("block_index ASC"), true);
+    } finally {
+      restore();
+    }
+  });
+});
+
+Deno.test("SRC20Repository - Pagination", async (t) => {
+  await t.step("should apply default pagination", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      await SRC20Repository.getValidSrc20TxFromDb({});
+      
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("LIMIT ? OFFSET ?"), true);
+      assertEquals(params[params.length - 2], 50); // default limit
+      assertEquals(params[params.length - 1], 0);  // offset for page 1
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle custom pagination", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      await SRC20Repository.getValidSrc20TxFromDb({ limit: 25, page: 3 });
+      
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(params[params.length - 2], 25);  // limit
+      assertEquals(params[params.length - 1], 50);  // offset: (3-1) * 25
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle invalid pagination values", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      await SRC20Repository.getValidSrc20TxFromDb({ limit: -10, page: 0 });
+      
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(params[params.length - 2], 50); // default limit
+      assertEquals(params[params.length - 1], 0);  // page 1 (minimum)
+    } finally {
+      restore();
+    }
+  });
+});
+
+Deno.test("SRC20Repository - Balance Operations", async (t) => {
+  await t.step("should get SRC20 balances with address filter", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => 
+      Promise.resolve(mockBalanceResponse)
+    );
+
+    try {
+      const result = await SRC20Repository.getSrc20BalanceFromDb({ address: "bc1qtest123" });
+      
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("address = ?"), true);
+      assertEquals(params.includes("bc1qtest123"), true);
+      assertEquals(query.includes("amt > 0"), true); // Should only return positive balances
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should get balance count with filtering", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockCountResponse));
+
+    try {
+      const count = await SRC20Repository.getTotalSrc20BalanceCount({ 
+        address: "bc1qtest123",
+        tick: "TEST",
+        amt: 0
+      });
+      
+      assertEquals(count, 42);
+      
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("address = ?"), true);
+      assertEquals(query.includes("tick = ?"), true);
+      assertEquals(query.includes("amt > ?"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle balance queries with sorting", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockBalanceResponse));
+
+    try {
+      await SRC20Repository.getSrc20BalanceFromDb({ 
+        sortBy: "ASC",
+        sortField: "last_update"
+      });
+      
+      const [query] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("ORDER BY last_update ASC"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should validate sort parameters", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockBalanceResponse));
+
+    try {
+      await SRC20Repository.getSrc20BalanceFromDb({ 
+        sortBy: "INVALID",
+        sortField: "invalid_field"
+      });
+      
+      const [query] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("ORDER BY amt DESC"), true); // Should use defaults
+    } finally {
+      restore();
+    }
+  });
+});
+
+Deno.test("SRC20Repository - Mint Progress and Statistics", async (t) => {
+  await t.step("should fetch mint progress with calculations", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockMintProgressResponse));
+
+    try {
+      const result = await SRC20Repository.fetchSrc20MintProgress("TEST");
+      
+      assertExists(result);
+      assertEquals(result.max_supply, "21000000");
+      assertEquals(result.total_minted, "10500000");
+      assertEquals(result.limit, "1000");
+      assertEquals(result.total_mints, 10500);
+      assertEquals(result.decimals, 8);
+      assertEquals(result.holders, 100);
+      assertEquals(result.tx_hash, "abc123def456");
+      
+      // Should convert to emoji
+      assertExists(result.tick);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should return null for non-existent tick", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve({ rows: [] }));
+
+    try {
+      const result = await SRC20Repository.fetchSrc20MintProgress("NONEXISTENT");
+      assertEquals(result, null);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle BigFloat calculations", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockMintProgressResponse));
+
+    try {
+      const result = await SRC20Repository.fetchSrc20MintProgress("TEST");
+      
+      // Should calculate progress percentage
+      assertExists(result.progress);
+      assertEquals(typeof result.progress, "string");
+      
+      // Progress should be calculated as (total_minted / max_supply) * 100
+      const expectedProgress = (10500000 / 21000000) * 100;
+      assertEquals(parseFloat(result.progress), expectedProgress);
+    } finally {
+      restore();
+    }
+  });
+});
+
+Deno.test("SRC20Repository - Trending and Market Data", async (t) => {
+  await t.step("should fetch trending active minting tokens", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      const result = await SRC20Repository.fetchTrendingActiveMintingTokens(100);
+      
+      assertExists(result);
+      assertEquals(result.rows.length, 1);
+      assertEquals(result.total, 1);
+      
+      // Should query with optimized transaction count
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(params[0], 100); // transaction count
+      assertEquals(params[1], 100); // for percentage calculation
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should limit transaction count for performance", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      await SRC20Repository.fetchTrendingActiveMintingTokens(5000); // Large number
+      
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(params[0], 300); // Should be capped at 300
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle trending query errors with fallback", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => {
+      throw new Error("Complex query failed");
+    }).onSecondCall(() => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      const result = await SRC20Repository.fetchTrendingActiveMintingTokens(100);
+      
+      // Should have fallen back to simpler query
+      assertEquals(executeQueryStub.calls.length, 2);
+      assertExists(result);
+    } finally {
+      restore();
+    }
+  });
+});
+
+Deno.test("SRC20Repository - Deployment and Validation", async (t) => {
+  await t.step("should get deployment info with counts", async () => {
+    const deploymentResponse = {
+      rows: [{
+        ...mockSRC20TxResponse.rows[0],
+        creator_name: "TestCreator",
+        total_mints: 500,
+        total_transfers: 250
+      }]
+    };
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(deploymentResponse));
+
+    try {
+      const result = await SRC20Repository.getDeploymentAndCountsForTick("TEST");
+      
+      assertExists(result);
+      assertExists(result.deployment);
+      assertEquals(result.total_mints, 500);
+      assertEquals(result.total_transfers, 250);
+      
+      // Should add image URLs
+      assertExists(result.deployment.stamp_url);
+      assertExists(result.deployment.deploy_img);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should return null for non-existent deployment", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve({ rows: [] }));
+
+    try {
+      const result = await SRC20Repository.getDeploymentAndCountsForTick("NONEXISTENT");
+      assertEquals(result, null);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should check SRC20 deployments health", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockCountResponse));
+
+    try {
+      const result = await SRC20Repository.checkSrc20Deployments();
+      
+      assertEquals(result.isValid, true);
+      assertEquals(result.count, 42);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle deployment check failures", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve({ rows: [] }));
+
+    try {
+      const result = await SRC20Repository.checkSrc20Deployments();
+      
+      assertEquals(result.isValid, false);
+      assertEquals(result.count, 0);
+    } finally {
+      restore();
+    }
+  });
+});
+
+Deno.test("SRC20Repository - Search Functionality", async (t) => {
+  await t.step("should search for SRC20 tokens", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve({
+      rows: [{
+        tick: "\\U0001F4A9",
+        progress: 50.5,
+        total_minted: "10500000",
+        max_supply: "21000000",
+        holders: 100,
+        total_mints: 10500
+      }]
+    }));
+
+    try {
+      const result = await SRC20Repository.searchValidSrc20TxFromDb("test");
+      
+      assertEquals(result.length, 1);
+      assertExists(result[0].tick);
+      assertEquals(result[0].progress, 50.5);
+      
+      // Should sanitize query input
+      const [query, params] = executeQueryStub.calls[0].args;
+      assertEquals(params[0], "%test%"); // Should be wrapped with wildcards
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should sanitize search query", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve({ rows: [] }));
+
+    try {
+      await SRC20Repository.searchValidSrc20TxFromDb("test@#$%^&*()");
+      
+      const [query, params] = executeQueryStub.calls[0].args;
+      // Should remove special characters except - and _
+      assertEquals(params[0], "%test%");
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle search errors gracefully", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => {
+      throw new Error("Search query failed");
+    });
+    const consoleErrorStub = stub(console, "error");
+
+    try {
+      const result = await SRC20Repository.searchValidSrc20TxFromDb("test");
+      
+      assertEquals(result, []);
+      assertEquals(consoleErrorStub.calls.length, 1);
+    } finally {
+      restore();
+    }
+  });
+});
+
+Deno.test("SRC20Repository - Optimized Methods", async (t) => {
+  await t.step("should use optimized trending method", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      const result = await SRC20Repository.fetchTrendingActiveMintingTokensOptimized("24h", 5, 10);
+      
+      assertExists(result);
+      assertEquals(result.rows.length, 1);
+      
+      // Should use pre-populated market data fields
+      const [query] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("src20_market_data"), true);
+      assertEquals(query.includes("trending_score"), true);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle different trending windows", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockSRC20TxResponse));
+
+    try {
+      await SRC20Repository.fetchTrendingActiveMintingTokensOptimized("7d");
+      
+      const [query] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("168"), true); // 7 days * 24 hours
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should fallback to original method on error", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => {
+      throw new Error("Optimized query failed");
+    });
+
+    const fetchTrendingStub = stub(SRC20Repository, "fetchTrendingActiveMintingTokens", () => 
+      Promise.resolve({ rows: [], total: 0 })
+    );
+
+    try {
+      const result = await SRC20Repository.fetchTrendingActiveMintingTokensOptimized("24h");
+      
+      // Should have called fallback method
+      assertEquals(fetchTrendingStub.calls.length, 1);
+      assertExists(result);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should use optimized mint progress method", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(mockMintProgressResponse));
+
+    try {
+      const result = await SRC20Repository.fetchSrc20MintProgressOptimized("TEST");
+      
+      assertExists(result);
+      assertEquals(result.max_supply, "21000000");
+      
+      // Should use pre-populated fields
+      const [query] = executeQueryStub.calls[0].args;
+      assertEquals(query.includes("src20_market_data"), true);
+      assertEquals(query.includes("progress_percentage"), true);
+    } finally {
+      restore();
+    }
+  });
+});
+
+Deno.test("SRC20Repository - Error Handling", async (t) => {
+  await t.step("should handle database errors gracefully", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => {
+      throw new Error("Database connection failed");
+    });
+
+    try {
+      await assertRejects(
+        () => SRC20Repository.getValidSrc20TxFromDb({}),
+        Error,
+        "Database connection failed"
+      );
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should log errors appropriately", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => {
+      throw new Error("Query execution failed");
+    });
+    const consoleErrorStub = stub(console, "error");
+
+    try {
+      await assertRejects(() => SRC20Repository.getValidSrc20TxFromDb({}));
+      assertEquals(consoleErrorStub.calls.length, 1);
+    } finally {
+      restore();
+    }
+  });
+
+  await t.step("should handle malformed database responses", async () => {
+    const executeQueryStub = stub(dbManager, "executeQueryWithCache", () => Promise.resolve(null));
+
+    try {
+      const result = await SRC20Repository.getValidSrc20TxFromDb({});
+      
+      // Should handle null response gracefully
+      assertExists(result);
+    } finally {
+      restore();
+    }
+  });
+});

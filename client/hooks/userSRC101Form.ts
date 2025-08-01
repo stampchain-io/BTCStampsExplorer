@@ -6,6 +6,7 @@ import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
+import type { SRC101FormState } from "$types/ui.d.ts";
 
 interface PSBTFees {
   estMinerFee: number;
@@ -17,35 +18,6 @@ interface PSBTFees {
   inputsToSign?: Array<
     { index: number; address?: string; sighashTypes?: number[] }
   >;
-}
-
-interface SRC101FormState {
-  toAddress: string;
-  token: string;
-  amt: string;
-  fee: number;
-  feeError: string;
-  BTCPrice: number;
-  jsonSize: number;
-  apiError: string;
-  toAddressError: string;
-  tokenError: string;
-  amtError: string;
-  max: string;
-  maxError: string;
-  lim: string;
-  limError: string;
-  dec: string;
-  x: string;
-  tg: string;
-  web: string;
-  email: string;
-  file: File | null;
-  psbtFees?: PSBTFees;
-  maxAmount?: string;
-  root: string;
-  utxoAncestors?: Array<any>; // Add missing utxoAncestors property
-  isLoading?: boolean;
 }
 
 export function useSRC101Form(

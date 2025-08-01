@@ -1,3 +1,4 @@
+// Re-export table types for layout components
 /* ===== DONATE CTA ===== */
 export interface TxOutput {
   scriptpubkey_address: string;
@@ -67,19 +68,6 @@ export const MINTING_COLUMNS: TableColumn[] = [
 
 /* ===== DATA TABLE ===== */
 export type TableType = "stamps" | "src20" | "src101" | "vault";
-
-export interface TableProps {
-  type: TableType;
-  configs: Array<{ id: string }>;
-  cpid?: string;
-  tick?: string;
-  initialCounts?: {
-    dispensers?: number;
-    sales?: number;
-    transfers?: number;
-    mints?: number;
-  };
-}
 
 export interface TabData {
   dispensers?: any[];

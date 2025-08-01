@@ -1,19 +1,7 @@
 /* @baba - move/refactor to layout folder */
-import { ComponentChildren } from "preact";
-import type { StatBaseProps } from "$types/ui.d.ts";
-import { alignmentClasses, type AlignmentType } from "$layout";
+import type { StatItemProps, StatTitleProps } from "$types/ui.d.ts";
+import { alignmentClasses } from "$layout";
 import { labelSm, value3xl, valueSm } from "$text";
-
-interface StatItemProps extends StatBaseProps {
-  class?: string;
-  href?: string;
-  target?: "_blank" | "_self" | "_parent" | "_top";
-}
-
-interface StatTitleProps extends StatBaseProps {
-  href?: string;
-  target?: "_blank" | "_self" | "_parent" | "_top";
-}
 
 export function StatItem({
   label,

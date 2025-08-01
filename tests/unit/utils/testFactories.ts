@@ -8,8 +8,8 @@ import type { SRC20MarketData, StampMarketData } from "$types/marketData.d.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
 import type { BTCBalance } from "$types/wallet.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
-import {
 import type { UTXO } from "$types/base.d.ts";
+import {
   getRandomCollection,
   getRandomMarketData,
   getRandomSRC20Stats,

@@ -1,9 +1,9 @@
 /* ===== SRC20 CARD BASE COMPONENT ===== */
 /*@baba-check styles*/
-import { cellAlign, Timeframe } from "$components/layout/types.ts";
-import type { SRC20Row } from "$types/src20.d.ts";
+import { cellAlign } from "$components/layout/types.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
+import type { SRC20CardBaseProps } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
 
 /* ===== HELPER FUNCTIONS ===== */
@@ -21,18 +21,6 @@ function splitTextAndEmojis(text: string): { text: string; emoji: string } {
     text: text.slice(0, emojiIndex),
     emoji: text.slice(emojiIndex),
   };
-}
-
-/* ===== TYPES ===== */
-export interface SRC20CardBaseProps {
-  src20: SRC20Row;
-  // fromPage is reserved for future use
-  fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
-  // timeframe is reserved for future use
-  timeframe?: Timeframe;
-  onImageClick?: (imgSrc: string) => void;
-  children?: preact.ComponentChildren;
-  totalColumns: number;
 }
 
 /* ===== COMPONENT ===== */

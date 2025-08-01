@@ -3,8 +3,6 @@ import type { SpinnerProps } from "$types/ui.d.ts";
 import type { TransactionProgressProps } from "$types/ui.d.ts";
 import type { ProgressIndicatorProps } from "$types/ui.d.ts";
 
-export type ProgressState = "idle" | "loading" | "success" | "error";
-
 export function ProgressIndicator({
   state,
   message,

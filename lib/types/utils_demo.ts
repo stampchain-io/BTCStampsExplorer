@@ -3,6 +3,7 @@
  * This file shows practical examples of how the new utility types work
  */
 
+import type { NonNumberProps, NumberProps } from "$types/ui.d.ts";
 import type {
   ApiResponse,
   BitcoinAddressFormat,
@@ -57,11 +58,9 @@ interface MixedTypes {
 }
 
 // Pick only number properties
-type NumberProps = PickByValue<MixedTypes, number>; // { count: number, total: number }
 const numbers: NumberProps = { count: 5, total: 100 };
 
 // Omit number properties
-type NonNumberProps = OmitByValue<MixedTypes, number>; // { name: string, active: boolean }
 const nonNumbers: NonNumberProps = { name: "test", active: true };
 
 // Example 3: Bitcoin-specific types

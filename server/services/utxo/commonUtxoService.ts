@@ -1,3 +1,4 @@
+import type { CommonUTXOFetchOptions } from "$types/base.d.ts";
 import { UTXO } from "$lib/types/base.d.ts";
 import { BLOCKSTREAM_API_BASE_URL, MEMPOOL_API_BASE_URL } from "$constants";
 import { logger } from "$lib/utils/monitoring/logging/logger.ts";
@@ -12,9 +13,6 @@ import { ICommonUTXOService, UTXOFetchOptions } from "$server/services/utxo/utxo
 
 const httpClient = new FetchHttpClient();
 
-interface CommonUTXOFetchOptions extends UTXOFetchOptions {
-  forcePublicAPI?: boolean;
-}
 
 // Added interface for mempool.space transaction response
 interface MempoolTransaction {

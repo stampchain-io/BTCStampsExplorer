@@ -1,5 +1,10 @@
 /* ===== BUTTON STYLES MODULE ===== */
 import { JSX } from "preact";
+import type {
+  AnchorElementProps,
+  BaseButtonProps,
+  ButtonElementProps,
+} from "$types/ui.d.ts";
 
 /* ===== TYPE DEFINITIONS ===== */
 export interface ButtonVariants {
@@ -60,36 +65,6 @@ export interface ButtonVariants {
 }
 
 /* ===== BUTTON PROPS INTERFACES ===== */
-interface BaseButtonProps {
-  variant: keyof typeof buttonStyles.variant;
-  color: keyof typeof buttonStyles.color;
-  size: keyof typeof buttonStyles.size;
-  class?: string;
-  children?: JSX.Element | string;
-  disabled?: boolean;
-  role?: JSX.AriaRole;
-  ariaLabel?: string;
-  onClick?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onMouseEnter?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onMouseLeave?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onFocus?: JSX.FocusEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onBlur?: JSX.FocusEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  "data-type"?: string;
-}
-
-export interface ButtonElementProps extends BaseButtonProps {
-  href?: undefined;
-  "f-partial"?: undefined;
-  target?: undefined;
-}
-
-export interface AnchorElementProps extends BaseButtonProps {
-  href: string;
-  "f-partial"?: string;
-  target?: "_blank" | "_self" | "_parent" | "_top";
-}
-
-export type ButtonProps = ButtonElementProps | AnchorElementProps;
 
 /* ===== BUTTON STYLE DEFINITIONS ===== */
 export const buttonStyles: ButtonVariants = {

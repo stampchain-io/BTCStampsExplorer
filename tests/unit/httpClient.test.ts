@@ -1,6 +1,6 @@
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
 import { assert, assertEquals } from "@std/assert";
-import { after, afterEach, beforeEach, describe, it } from "@std/testing/bdd";
+import { after, afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("FetchHttpClient Core Tests", () => {
   let httpClient: FetchHttpClient;

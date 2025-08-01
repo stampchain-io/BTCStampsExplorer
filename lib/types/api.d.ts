@@ -30,7 +30,7 @@
 // Type Imports from Other Domain Modules
 // ============================================================================
 
-import type { BlockRow, SUBPROTOCOLS } from "$types/base.d.ts";
+import type { BlockRow, SUBPROTOCOLS, UTXO, BasicUTXO, DetailedUTXO } from "$types/base.d.ts";
 import {
   ApiErrorCode,
   HttpStatusCodes,
@@ -49,14 +49,26 @@ import type {
   StampBalance,
   StampFilters,
   StampRow,
+  CollectionRow,
+  CollectionWithOptionalMarketData,
+  RecentSaleData,
 } from "./stamp.d.ts";
 
 import type {
   EnrichedSRC20Row,
   MintStatus,
   SRC20Balance,
+  SRC20Row,
   Src20Detail,
 } from "./src20.d.ts";
+
+import type {
+  StampMarketData,
+  SRC20MarketData,
+  CollectionMarketData,
+  MarketDataCacheInfo,
+  CacheStatus,
+} from "./marketData.d.ts";
 
 import type { SendRow } from "$types/transaction.d.ts";
 
@@ -1841,6 +1853,637 @@ export declare const OpenAPITags: {
 // ============================================================================
 // Type Re-exports for Dependencies
 // ============================================================================
+
+/**
+ * ResponseHeaders - Migrated from _middleware.ts
+ */
+export interface ResponseHeaders {
+  "Timing-Allow-Origin": string;
+  "Server-Timing": string;
+  "Cache-Control"?: string;
+  "Content-Type"?: string;
+  "Location"?: string;
+}
+
+/**
+ * LeatherSignPSBTResponse - Migrated from leather.ts
+ */
+export interface LeatherSignPSBTResponse {
+  error?: string;
+  result?: {
+    hex?: string; // Signed PSBT in hex format
+    txid?: string; // Transaction ID if broadcast
+    cancelled?: boolean;
+  };
+}
+
+/**
+ * ApiErrorCode - Migrated from api_constants.ts
+ */
+export enum ApiErrorCode {
+  // General errors
+  UNKNOWN_ERROR = "UNKNOWN_ERROR",
+  INTERNAL_ERROR = "INTERNAL_ERROR",
+  SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE",
+
+  // Request errors
+  INVALID_REQUEST = "INVALID_REQUEST",
+  MISSING_PARAMETER = "MISSING_PARAMETER",
+  INVALID_PARAMETER = "INVALID_PARAMETER",
+  PARAMETER_OUT_OF_RANGE = "PARAMETER_OUT_OF_RANGE",
+
+  // Authentication/Authorization
+  AUTHENTICATION_REQUIRED = "AUTHENTICATION_REQUIRED",
+  INVALID_CREDENTIALS = "INVALID_CREDENTIALS",
+  TOKEN_EXPIRED = "TOKEN_EXPIRED",
+  INSUFFICIENT_PERMISSIONS = "INSUFFICIENT_PERMISSIONS",
+
+  // Resource errors
+  RESOURCE_NOT_FOUND = "RESOURCE_NOT_FOUND",
+  RESOURCE_ALREADY_EXISTS = "RESOURCE_ALREADY_EXISTS",
+  RESOURCE_CONFLICT = "RESOURCE_CONFLICT",
+  RESOURCE_LOCKED = "RESOURCE_LOCKED",
+
+  // Rate limiting
+  RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED",
+  QUOTA_EXCEEDED = "QUOTA_EXCEEDED",
+
+  // Validation errors
+  VALIDATION_FAILED = "VALIDATION_FAILED",
+  INVALID_FORMAT = "INVALID_FORMAT",
+  VALUE_TOO_LARGE = "VALUE_TOO_LARGE",
+  VALUE_TOO_SMALL = "VALUE_TOO_SMALL",
+
+  // Bitcoin/Blockchain specific
+  INVALID_ADDRESS = "INVALID_ADDRESS",
+  INVALID_TRANSACTION = "INVALID_TRANSACTION",
+  INSUFFICIENT_FUNDS = "INSUFFICIENT_FUNDS",
+  NETWORK_ERROR = "NETWORK_ERROR",
+
+  // Stamp specific
+  INVALID_STAMP = "INVALID_STAMP",
+  STAMP_NOT_FOUND = "STAMP_NOT_FOUND",
+  INVALID_CPID = "INVALID_CPID",
+
+  // SRC-20 specific
+  INVALID_TICK = "INVALID_TICK",
+  TICK_NOT_FOUND = "TICK_NOT_FOUND",
+  MINT_EXCEEDED = "MINT_EXCEEDED",
+}
+
+/**
+ * WithMarketDataResponse - Migrated from api.ts
+ */
+export interface WithMarketDataResponse<T, M> {
+  data: T;
+  marketData: M | null;
+  marketDataMessage?: string;
+  cacheInfo?: MarketDataCacheInfo;
+}
+
+/**
+ * StampWithMarketDataResponse - Migrated from api.ts
+ */
+export interface StampWithMarketDataResponse
+  extends WithMarketDataResponse<StampRow, StampMarketData> {
+  // Additional stamp-specific fields can be added here
+}
+
+/**
+ * SRC20WithMarketDataResponse - Migrated from api.ts
+ */
+export interface SRC20WithMarketDataResponse
+  extends WithMarketDataResponse<SRC20Row, SRC20MarketData> {
+  // Additional SRC-20-specific fields can be added here
+}
+
+/**
+ * CollectionWithMarketDataResponse - Migrated from api.ts
+ */
+export interface CollectionWithMarketDataResponse
+  extends WithMarketDataResponse<CollectionRow, CollectionMarketData> {
+  stamps?: StampWithMarketDataResponse[];
+}
+
+/**
+ * PaginatedMarketDataResponse - Migrated from api.ts
+ */
+export interface PaginatedMarketDataResponse<T> extends PaginatedResponse<T> {
+  cacheInfo?: MarketDataCacheInfo;
+  marketDataAvailable: number; // Count of items with market data
+  marketDataUnavailable: number; // Count of items without market data
+}
+
+/**
+ * BatchMarketDataResponse - Migrated from api.ts
+ */
+export interface BatchMarketDataResponse<T> {
+  items: T[];
+  summary: {
+    totalItems: number;
+    withMarketData: number;
+    withoutMarketData: number;
+    cacheStatus: CacheStatus;
+    lastUpdated: Date;
+  };
+}
+
+/**
+ * MarketDataErrorResponse - Migrated from api.ts
+ */
+export interface MarketDataErrorResponse {
+  error: string;
+  code: string;
+  assetId?: string;
+  assetType?: "stamp" | "src20" | "collection";
+  details?: {
+    source?: string;
+    lastAttempt?: Date;
+    nextRetry?: Date;
+  };
+}
+
+/**
+ * MarketDataHealthResponse - Migrated from api.ts
+ */
+export interface MarketDataHealthResponse {
+  cacheHealth: {
+    stamp: {
+      totalCached: number;
+      fresh: number;
+      stale: number;
+      expired: number;
+      lastUpdate: Date | null;
+    };
+    src20: {
+      totalCached: number;
+      fresh: number;
+      stale: number;
+      expired: number;
+      lastUpdate: Date | null;
+    };
+    collection: {
+      totalCached: number;
+      fresh: number;
+      stale: number;
+      expired: number;
+      lastUpdate: Date | null;
+    };
+  };
+  sources: {
+    name: string;
+    status: "online" | "offline" | "degraded";
+    lastSuccessfulFetch: Date | null;
+    averageResponseTime: number;
+  }[];
+}
+
+/**
+ * ApiResponseWithMarketData - Migrated from api.ts
+ */
+export interface ApiResponseWithMarketData<T> {
+  success: boolean;
+  data: T;
+  lastBlock: number;
+  timestamp: Date;
+  cacheInfo?: MarketDataCacheInfo;
+}
+
+/**
+ * ApiErrorWithMarketContext - Migrated from api.ts
+ */
+export interface ApiErrorWithMarketContext {
+  error: string;
+  status: number;
+  code: string;
+  marketDataContext?: {
+    assetId: string;
+    assetType: "stamp" | "src20" | "collection";
+    lastKnownData?: Date;
+    suggestion?: string;
+  };
+}
+
+/**
+ * StampMarketDataResponse - Migrated from marketData.d.ts
+ */
+export interface StampMarketDataResponse {
+  stamp: StampRow;
+  marketData: StampMarketData | null;
+  cacheStatus: CacheStatus;
+  message?: string;
+}
+
+/**
+ * SRC20MarketDataResponse - Migrated from marketData.d.ts
+ */
+export interface SRC20MarketDataResponse {
+  token: SRC20Row;
+  marketData: SRC20MarketData | null;
+  cacheStatus: CacheStatus;
+  message?: string;
+}
+
+/**
+ * RecentSalesResponse - Migrated from marketData.d.ts
+ */
+export interface RecentSalesResponse {
+  recentSales: RecentSaleData[];
+  total: number;
+  btcPriceUSD: number;
+  metadata: {
+    dayRange: number;
+    lastUpdated: string;
+  };
+}
+
+/**
+ * PaginatedSrc101ResponseBody - Migrated from src101.d.ts
+ */
+export interface PaginatedSrc101ResponseBody {
+  /** Last processed block */
+  last_block: number;
+  /** Current page number */
+  page: number;
+  /** Number of results per page */
+  limit: number;
+  /** Total number of pages */
+  totalPages: number;
+  /** Array of SRC-101 details */
+  data: Src101Detail[];
+}
+
+/**
+ * TotalSrc101ResponseBody - Migrated from src101.d.ts
+ */
+export interface TotalSrc101ResponseBody {
+  /** Last processed block */
+  last_block: number;
+  /** Total count */
+  data: number;
+}
+
+/**
+ * TokenidSrc101ResponseBody - Migrated from src101.d.ts
+ */
+export interface TokenidSrc101ResponseBody {
+  /** Last processed block */
+  last_block: number;
+  /** Current page number */
+  page: number;
+  /** Number of results per page */
+  limit: number;
+  /** Total number of pages */
+  totalPages: number;
+  /** Token ID data */
+  data: string;
+}
+
+/**
+ * StandardFeeResponse - Migrated from toolEndpointAdapter.ts
+ */
+export interface StandardFeeResponse {
+  /** Transaction size in bytes */
+  estimatedSize: number;
+  /** Miner fee in satoshis */
+  minerFee: number;
+  /** Dust value for outputs in satoshis */
+  dustValue: number;
+  /** Total transaction cost in satoshis (includes miner fee + dust) */
+  totalCost: number;
+  /** Whether this is an estimate (always true for dryRun) */
+  isEstimate: boolean;
+  /** Method used for estimation */
+  estimationMethod: string;
+  /** Applied fee rate in sats/vB */
+  feeRate: number;
+  /** Optional detailed fee breakdown from the tool */
+  feeDetails?: any;
+  /** Optional change value in satoshis */
+  changeValue?: number;
+  /** Optional input value in satoshis */
+  inputValue?: number;
+}
+
+/**
+ * HttpResponse - Migrated from httpClient.ts
+ */
+export interface HttpResponse<T = any> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+  ok: boolean;
+}
+
+/**
+ * HttpRequestConfig - Migrated from httpClient.ts
+ */
+export interface HttpRequestConfig {
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  headers?: Record<string, string>;
+  body?: any;
+  timeout?: number;
+  retries?: number;
+  retryDelay?: number;
+  signal?: AbortSignal; // Allow external abort signals
+}
+
+/**
+ * PaginatedCollectionResponseBody - Migrated from collection.d.ts
+ */
+export interface PaginatedCollectionResponseBody {
+  page: number;
+  limit: number;
+  totalPages: number;
+  total: number;
+  last_block: number;
+  data: CollectionRow[];
+}
+
+/**
+ * PaginatedCollectionWithMarketDataResponseBody - Migrated from collection.d.ts
+ */
+export interface PaginatedCollectionWithMarketDataResponseBody
+  extends PaginatedCollectionResponseBody {
+  data: CollectionWithOptionalMarketData[];
+  marketDataSummary?: {
+    collectionsWithData: number;
+    collectionsWithoutData: number;
+    cacheStatus: CacheStatus;
+  };
+}
+
+/**
+ * ApiResponseSchema - Migrated from src20Controller.backward-compatibility.test.ts
+ */
+export interface ApiResponseSchema {
+  data: SRC20TokenSchema[];
+  page: number;
+  limit: number;
+  total?: number;
+  totalPages?: number;
+  last_block?: number;
+  [key: string]: any; // Allow additional response fields
+}
+
+/**
+ * LegacyApiConsumer - Migrated from src20Controller.backward-compatibility.test.ts
+ */
+export interface LegacyApiConsumer {
+  name: string;
+  expectedFields: string[];
+  forbiddenFields?: string[];
+  version: string;
+  validateResponse: (data: any) => boolean;
+}
+
+/**
+ * MockResponse - Migrated from fixtureTestHelper.ts
+ */
+export interface MockResponse {
+  rows: any[];
+  rowCount: number;
+  affectedRows?: number;
+}
+
+/**
+ * SingleUTXOResponse - Migrated from quicknodeUTXOService.test.ts
+ */
+export interface SingleUTXOResponse {
+  data?: UTXO;
+  error?: string;
+}
+
+/**
+ * UploadResponse - Migrated from DeployTool.tsx
+ */
+export interface UploadResponse extends APIResponse {
+  url?: string;
+}
+
+/**
+ * MintResponse - Migrated from StampingTool.tsx
+ */
+export interface MintResponse {
+  hex: string;
+  cpid: string;
+  est_tx_size: number;
+  input_value: number;
+  total_dust_value: number;
+  est_miner_fee: number;
+  change_value: number;
+  total_output_value: number;
+  txDetails: TransactionInput[];
+}
+
+/**
+ * MintRequest - Migrated from StampingTool.tsx
+ */
+export interface MintRequest {
+  sourceWallet: string | undefined;
+  qty: string;
+  locked: boolean;
+  filename: string;
+  file: string;
+  satsPerVB: number;
+  service_fee: string | null;
+  service_fee_address: string | null;
+  assetName?: string;
+  divisible: boolean;
+  isPoshStamp: boolean;
+  dryRun?: boolean;
+  outputValue?: number; // MARA custom dust value
+  maraFeeRate?: number; // MARA-specified fee rate
+}
+
+/**
+ * CounterpartyApiManagerConfig - Migrated from xcpManagerDI.ts
+ */
+export interface CounterpartyApiManagerConfig {
+  nodes: Array<{
+    name: string;
+    url: string;
+  }>;
+  defaultCacheTimeout: number;
+  maxRetries: number;
+  retryDelay: number;
+  requestTimeout: number;
+}
+
+/**
+ * CounterpartyApiManagerDependencies - Migrated from xcpManagerDI.ts
+ */
+export interface CounterpartyApiManagerDependencies {
+  httpClient: HttpClient;
+  cacheService: CacheService;
+  logger: LoggerService;
+  config: CounterpartyApiManagerConfig;
+}
+
+/**
+ * MaraSubmissionResponse - Migrated from types.ts
+ */
+export interface MaraSubmissionResponse {
+  /** Transaction ID of the submitted transaction */
+  txid: string;
+
+  /** Current status of the submission */
+  status: "accepted" | "pending" | "rejected";
+
+  /** Optional message with additional details */
+  message?: string;
+
+  /** Estimated blocks until confirmation */
+  estimated_confirmation?: number;
+
+  /** Pool priority level assigned */
+  pool_priority?: number;
+
+  /** Unix timestamp of submission */
+  submission_time: number;
+
+  /** Error code if submission failed */
+  error_code?: string;
+}
+
+/**
+ * MaraErrorResponse - Migrated from types.ts
+ */
+export interface MaraErrorResponse {
+  /** Error message */
+  error: string;
+
+  /** HTTP status code */
+  status: number;
+
+  /** Optional error code for specific error types */
+  code?: string;
+
+  /** Optional additional error details */
+  details?: Record<string, any>;
+}
+
+/**
+ * APIResponse - Migrated from commonPools.ts
+ */
+export interface APIResponse {
+  data?: any;
+  status?: number;
+  message?: string;
+  timestamp?: number;
+  reset(): void;
+}
+
+/**
+ * EstimateSmartFeeResponse - Migrated from quicknodeService.ts
+ */
+export interface EstimateSmartFeeResponse {
+  feerate?: number; // Fee rate in BTC/kB
+  blocks?: number; // Number of blocks for which estimate is valid
+  errors?: string[]; // Any errors encountered
+}
+
+/**
+ * QuicknodeRPCRequest - Migrated from quicknodeServiceDI.ts
+ */
+export interface QuicknodeRPCRequest {
+  id: number;
+  jsonrpc: string;
+  method: string;
+  params: any[];
+}
+
+/**
+ * QuicknodeRPCResponse - Migrated from quicknodeServiceDI.ts
+ */
+export interface QuicknodeRPCResponse<T = any> {
+  id: number;
+  jsonrpc: string;
+  result?: T;
+  error?: {
+    code: number;
+    message: string;
+    data?: any;
+  };
+}
+
+/**
+ * EstimateSmartFeeResponse - Migrated from quicknodeServiceDI.ts
+ */
+export interface EstimateSmartFeeResponse {
+  feerate?: number; // Fee rate in BTC/kB
+  blocks?: number; // Number of blocks for which estimate is valid
+  errors?: string[]; // Any errors encountered
+}
+
+/**
+ * SingleUTXOResponse - Migrated from quicknodeUTXOService.ts
+ */
+export interface SingleUTXOResponse {
+  data?: UTXO;
+  error?: string;
+}
+
+/**
+ * ApiResponseOptions - Migrated from apiResponseUtil.ts
+ */
+export interface ApiResponseOptions {
+  status?: number;
+  headers?: Record<string, string>;
+  routeType?: RouteType;
+  forceNoCache?: boolean;
+}
+
+/**
+ * APIResponse - Migrated from apiResponseUtil.ts
+ */
+export interface APIResponse {
+  success: boolean;
+  message?: string;
+  status?: string;
+  error?: string;
+  code?: string;
+  details?: unknown;
+}
+
+/**
+ * ResponseOptions - Migrated from responseUtil.ts
+ */
+export interface ResponseOptions {
+  status?: number;
+  headers?: Record<string, string>;
+  routeType?: RouteType;
+  forceNoCache?: boolean;
+  raw?: boolean;
+}
+
+/**
+ * StampResponseOptions - Migrated from responseUtil.ts
+ */
+export interface StampResponseOptions extends ResponseOptions {
+  binary?: boolean;
+  encoding?: string;
+}
+
+/**
+ * WebResponseOptions - Migrated from webResponseUtil.ts
+ */
+export interface WebResponseOptions {
+  status?: number;
+  headers?: Record<string, string>;
+  forceNoCache?: boolean;
+  routeType?: RouteType;
+  raw?: boolean;
+}
+
+/**
+ * StampResponseOptions - Migrated from webResponseUtil.ts
+ */
+export interface StampResponseOptions extends WebResponseOptions {
+  binary?: boolean;
+  encoding?: string;
+}
 
 // These types are referenced by API types and need to be imported from their domains
 // Import statements would be added here in a real implementation:

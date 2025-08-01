@@ -1,3 +1,8 @@
+import type {
+  InfiniteScrollState,
+  PaginationProps,
+  PaginationState,
+} from "$types/ui.d.ts";
 /**
  * Comprehensive Pagination Type Definitions
  *
@@ -109,24 +114,6 @@ export interface FilterOptions<T> {
 // PAGINATION STATE MANAGEMENT
 // ============================================================================
 
-export interface PaginationState {
-  currentPage: number;
-  pageSize: number;
-  totalItems: number;
-  totalPages: number;
-  isLoading: boolean;
-  hasError: boolean;
-  errorMessage?: string;
-}
-
-export interface InfiniteScrollState<T> {
-  items: T[];
-  hasMore: boolean;
-  isLoading: boolean;
-  cursor?: string;
-  error?: string;
-}
-
 // ============================================================================
 // INFINITE SCROLL TYPES
 // ============================================================================
@@ -172,16 +159,6 @@ export interface ScrollPaginationHook<T> {
   error?: string;
   loadMore: () => void;
   reset: () => void;
-}
-
-export interface PaginationProps {
-  page: number;
-  totalPages: number;
-  prefix?: string;
-  onPageChange?: (page: number) => void;
-  showFirstLast?: boolean;
-  showPrevNext?: boolean;
-  maxVisiblePages?: number;
 }
 
 // ============================================================================

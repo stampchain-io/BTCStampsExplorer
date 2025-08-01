@@ -638,6 +638,495 @@ export type MintStatus = SRC20MintStatus;
  *
  * @example Market data integration
  * ```typescript
+
+/**
+ * HomePageData - Migrated from index.tsx
+ */
+export interface HomePageData extends StampControllerData {
+  error?: string;
+  src20Data?: {
+    minted: {
+      data: SRC20Row[];
+      total: number;
+      page: number;
+      totalPages: number;
+    };
+    minting: {
+      data: SRC20Row[];
+      total: number;
+      page: number;
+      totalPages: number;
+    };
+  };
+  // Performance optimization - single BTC price fetch
+  btcPrice?: number;
+  btcPriceSource?: string;
+  // Recent sales data for SSR optimization
+  recentSalesData?: {
+    data: any[];
+    total: number;
+    page: number;
+    totalPages: number;
+  };
+}
+
+/**
+ * FilterTypes - Migrated from useURLUpdate.ts
+ */
+export type FilterTypes = "stamp" | "src20" | "collection" | "all";
+
+/**
+ * FilterType - Migrated from FilterButton.tsx
+ */
+export type FilterType = "stamp" | "src20" | "explorer";
+
+/**
+ * AllFilters - Migrated from FilterDrawer.tsx
+ */
+export type AllFilters = StampFilters | SRC20Filters;
+
+/**
+ * FilterTypes - Migrated from FilterSRC20Modal.tsx
+ */
+export type FilterTypesSRC20Modal = "status" | "market" | "trending" | "all";
+
+/**
+ * SortingErrorBoundaryProps - Migrated from SortingErrorBoundary.tsx
+ */
+export interface SortingErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ComponentType<{ error: Error; reset: () => void }>;
+}
+
+/**
+ * SortingErrorBoundaryState - Migrated from SortingErrorBoundary.tsx
+ */
+export interface SortingErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+/**
+ * ProgressiveFeeEstimationOptions - Migrated from useProgressiveFeeEstimation.ts
+ */
+export interface ProgressiveFeeEstimationOptions {
+  // Common parameters
+  feeRate: number;
+  walletAddress?: string;
+  isConnected?: boolean;
+
+  // Tool-specific parameters
+  toolType:
+    | "stamp"
+    | "src20"
+    | "src20-mint"
+    | "src20-deploy"
+    | "src20-transfer"
+    | "src101"
+    | "fairmint"
+    | "transfer"
+    | "send";
+
+  // Stamp-specific
+  file?: string;
+  filename?: string;
+  quantity?: number;
+  locked?: boolean;
+  divisible?: boolean;
+  isPoshStamp?: boolean;
+
+  // SRC20-specific
+  tick?: string;
+  amt?: string;
+  operation?: "deploy" | "mint" | "transfer";
+  // SRC20-deploy specific
+  max?: string;
+  lim?: string;
+  dec?: string;
+
+  // Transfer-specific
+  recipientAddress?: string;
+  asset?: string;
+  transferQuantity?: number;
+
+  // SRC101-specific
+  to?: string;
+  op?: string;
+
+  // Fairmint-specific
+  jsonData?: string;
+
+  // ✨ Dependency injection for testing
+  feeEstimationService?: FeeEstimationService;
+  loggerService?: LoggerService;
+  debounceMs?: number;
+  isSubmitting?: boolean; // Added for testing
+}
+
+/**
+ * SRC20ErrorCode - Migrated from errors.ts
+ */
+export enum SRC20ErrorCode {
+  INVALID_TICKER = "SRC20_INVALID_TICKER",
+  TOKEN_NOT_FOUND = "SRC20_TOKEN_NOT_FOUND",
+  TOKEN_ALREADY_EXISTS = "SRC20_TOKEN_ALREADY_EXISTS",
+  INSUFFICIENT_BALANCE = "SRC20_INSUFFICIENT_BALANCE",
+  INVALID_AMOUNT = "SRC20_INVALID_AMOUNT",
+  MINT_LIMIT_EXCEEDED = "SRC20_MINT_LIMIT_EXCEEDED",
+  TOKEN_FULLY_MINTED = "SRC20_TOKEN_FULLY_MINTED",
+  INVALID_DECIMALS = "SRC20_INVALID_DECIMALS",
+  DEPLOYMENT_FAILED = "SRC20_DEPLOYMENT_FAILED",
+  TRANSFER_FAILED = "SRC20_TRANSFER_FAILED",
+  MINT_FAILED = "SRC20_MINT_FAILED",
+}
+
+/**
+ * ToolEstimationParams - Migrated from fee-estimation.ts
+ */
+export interface ToolEstimationParams {
+  /** Tool type identifier */
+  toolType:
+    | "stamp"
+    | "src20-mint"
+    | "src20-deploy"
+    | "src20-transfer"
+    | "send"
+    | "src101-create";
+  /** Fee rate in sat/vB */
+  feeRate: number;
+  /** User's wallet address */
+  walletAddress?: string;
+  /** Whether wallet is connected */
+  isConnected: boolean;
+  /** Whether a transaction is currently being submitted */
+  isSubmitting?: boolean;
+
+  // Tool-specific parameters (optional based on tool type)
+  /** File data for stamp creation */
+  file?: string;
+  /** Filename for stamp creation */
+  filename?: string;
+  /** Quantity/issuance amount */
+  quantity?: number;
+  /** Whether asset is locked */
+  locked?: boolean;
+  /** Whether asset is divisible */
+  divisible?: boolean;
+  /** For POSH stamps */
+  isPoshStamp?: boolean;
+  /** Asset name for custom stamps */
+  assetName?: string;
+  /** Service fee configuration */
+  service_fee?: string | null;
+  /** Service fee address */
+  service_fee_address?: string | null;
+
+  // SRC-20 specific parameters
+  /** Token ticker */
+  ticker?: string;
+  /** Token supply */
+  supply?: number;
+  /** Mint limit per transaction */
+  limit?: number;
+  /** Number of decimal places */
+  decimals?: number;
+  /** Token description */
+  description?: string;
+
+  // Transfer specific parameters
+  /** Recipient address */
+  recipientAddress?: string;
+  /** Transfer amount */
+  amount?: number;
+  /** Asset to transfer */
+  asset?: string;
+}
+
+/**
+ * SRC20MarketDataRow - Migrated from marketData.d.ts
+ */
+export interface SRC20MarketDataRow {
+  tick: string;
+  price_btc: string | null;
+  price_usd: string | null;
+  floor_price_btc: string | null;
+  market_cap_btc: string;
+  market_cap_usd: string;
+  volume_24h_btc: string;
+  volume_7d_btc: string;
+  volume_30d_btc: string;
+  total_volume_btc: string;
+  holder_count: number;
+  circulating_supply: string;
+  price_change_24h_percent: string;
+  price_change_7d_percent: string;
+  price_change_30d_percent: string;
+  primary_exchange: string | null;
+  exchange_sources: string | null; // JSON string
+  data_quality_score: string;
+  last_updated: Date;
+}
+
+/**
+ * MarketDataSourcesRow - Migrated from marketData.d.ts
+ */
+export interface MarketDataSourcesRow {
+  id: number;
+  asset_type: "stamp" | "src20";
+  asset_id: string; // cpid for stamps, tick for src20
+  source: string; // 'counterparty', 'openstamp', 'kucoin', etc.
+  price_btc: string | null; // DECIMAL(16,8)
+  price_usd: string | null; // DECIMAL(16,2)
+  volume_24h_btc: string; // DECIMAL(16,8)
+  holder_count: number;
+  market_cap_btc: string; // DECIMAL(20,8)
+  source_confidence: string; // DECIMAL(3,1) - 0-10 confidence score
+  api_response_time_ms: number;
+  last_updated: Date;
+}
+
+/**
+ * MarketDataSource - Migrated from marketData.d.ts
+ */
+export interface MarketDataSource {
+  id: number;
+  assetType: "stamp" | "src20";
+  assetId: string;
+  source: string;
+  priceBTC: number | null;
+  priceUSD: number | null;
+  volume24hBTC: number;
+  holderCount: number;
+  marketCapBTC: number;
+  sourceConfidence: number; // 0-10
+  apiResponseTimeMs: number;
+  lastUpdated: Date;
+}
+
+/**
+ * SRC20WithMarketData - Migrated from marketData.d.ts
+ */
+export interface SRC20WithMarketData extends SRC20Row {
+  marketData: SRC20MarketData | null;
+  marketDataMessage?: string;
+  cacheStatus?: CacheStatus;
+  cacheAgeMinutes?: number;
+}
+
+/**
+ * SRC20BackgroundUpload - Migrated from src20.ts
+ */
+export interface SRC20BackgroundUpload {
+  fileData: string;
+  tick: string;
+}
+
+/**
+ * SRC20BackgroundUploadResult - Migrated from src20.ts
+ */
+export interface SRC20BackgroundUploadResult {
+  success: boolean;
+  message?: string;
+  url?: string;
+}
+
+/**
+ * SRC20TransactionOptions - Migrated from toolEndpointAdapter.ts
+ */
+export interface SRC20TransactionOptions extends TransactionOptions {
+  /** SRC-20 operation type */
+  op: "DEPLOY" | "MINT" | "TRANSFER";
+  /** Token ticker */
+  tick: string;
+  /** Maximum supply (for DEPLOY) */
+  max?: string;
+  /** Mint limit per transaction (for DEPLOY) */
+  lim?: string;
+  /** Decimal places (for DEPLOY) */
+  dec?: number;
+  /** Amount to mint/transfer */
+  amt?: string;
+  /** Destination address (for TRANSFER) */
+  destinationAddress?: string;
+}
+
+/**
+ * ToolType - Migrated from toolEndpointAdapter.ts
+ */
+export type ToolType = "stamp" | "src20" | "src101";
+
+/**
+ * AnyTransactionOptions - Migrated from toolEndpointAdapter.ts
+ */
+export type AnyTransactionOptions =
+  | SRC20TransactionOptions
+  | SRC101TransactionOptions
+  | TransactionOptions;
+
+/**
+ * PropTypes - Migrated from index.tsx
+ */
+export interface PropTypes {
+  data: {
+    data: SRC20Row[];
+  };
+}
+
+/**
+ * SRC20TokenTableSchema - Migrated from server.type.test.ts
+ */
+export interface SRC20TokenTableSchema {
+  id: number;
+  tick: string;
+  max: string;
+  lim: string;
+  dec: number;
+  address: string;
+  tx_hash: string;
+  block_index: number;
+  timestamp: Date;
+  total_minted: string;
+  total_holders: number;
+  total_transfers: number;
+  status: string;
+  creator_fee?: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * SRC20BalanceTableSchema - Migrated from server.type.test.ts
+ */
+export interface SRC20BalanceTableSchema {
+  id: number;
+  address: string;
+  tick: string;
+  balance: string;
+  last_update_block: number;
+  last_update_tx: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * SRC20TokenSchema - Migrated from src20Controller.backward-compatibility.test.ts
+ */
+export interface SRC20TokenSchema {
+  tick: string;
+  op: string;
+  creator: string;
+  block_index: number;
+  tx_hash: string;
+  [key: string]: any; // Allow additional fields
+}
+
+/**
+ * SRC20TokenWithMarketData - Migrated from src20MarketData.test.ts
+ */
+export interface SRC20TokenWithMarketData {
+  tick: string;
+  marketData: {
+    priceBTC: number | null;
+    priceUSD: number | null;
+    marketCapBTC: number;
+    marketCapUSD: number;
+    volume24hBTC: number;
+    holderCount: number;
+    priceChange24h: number;
+    primaryExchange: string | null;
+    exchanges: string[];
+    dataQuality: number;
+  } | null;
+  marketDataMessage?: string;
+}
+
+/**
+ * HealthStatus - Migrated from health.ts
+ */
+export interface HealthStatus {
+  status: "OK" | "ERROR";
+  services: {
+    api: boolean;
+    indexer: boolean;
+    mempool: boolean;
+    database: boolean;
+    xcp: boolean;
+    circuitBreaker?: {
+      state: string;
+      isHealthy: boolean;
+    };
+    blockSync?: {
+      indexed: number;
+      network: number;
+      isSynced: boolean;
+    };
+    stats?: {
+      src20Deployments: number;
+      totalStamps: number;
+    };
+  };
+}
+
+/**
+ * AssertSRC20Operation - Migrated from typeAssertions.ts
+ */
+export type AssertSRC20Operation<T> = T extends "deploy" | "mint" | "transfer"
+  ? T
+  : never;
+
+/**
+ * EstimationOptions - Migrated from TransactionConstructionService.ts
+ */
+export interface EstimationOptions {
+  toolType:
+    | "stamp"
+    | "src20-mint"
+    | "src20-deploy"
+    | "src20-transfer"
+    | "src101-create";
+  walletAddress?: string;
+  feeRate: number;
+  isConnected: boolean;
+  isSubmitting?: boolean;
+  // Tool-specific parameters
+  [key: string]: any;
+}
+
+/**
+ * LogNamespace - Migrated from logger.ts
+ */
+export type LogNamespace =
+  | "api"
+  | "database"
+  | "service"
+  | "transaction"
+  | "validation"
+  | "error"
+  | "debug";
+
+/**
+ * DomainTypeValidation - Migrated from astAnalyzer.ts
+ */
+export interface DomainTypeValidation {
+  /** Stamp-related type validation */
+  stampTypes: DomainValidationResult;
+  /** SRC-20 token type validation */
+  src20Types: DomainValidationResult;
+  /** SRC-101 NFT type validation */
+  src101Types: DomainValidationResult;
+  /** Transaction type validation */
+  transactionTypes: DomainValidationResult;
+  /** UTXO type validation */
+  utxoTypes: DomainValidationResult;
+  /** Fee calculation type validation */
+  feeTypes: DomainValidationResult;
+  /** Market data type validation */
+  marketDataTypes: DomainValidationResult;
+}
+
+/**
+ * @example Market data integration
+ * ```typescript
  * import type { SRC20WithOptionalMarketData } from "$types/src20.d.ts";
  *
  * const tokenWithMarket: SRC20WithOptionalMarketData = {

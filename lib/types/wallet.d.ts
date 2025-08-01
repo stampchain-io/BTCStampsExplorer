@@ -2,6 +2,14 @@ import { WalletProviderKey } from "$constants";
 import { PaginationQueryParams } from "$types/pagination.d.ts";
 import { WalletSortKey } from "$types/sorting.d.ts";
 import { ADDRESS_PATTERNS, DERIVATION_PATHS } from "$types/wallet_constants.ts";
+import type {
+  WalletAuthState,
+  WalletConnectionState,
+  WalletContentProps,
+  WalletNavigationState,
+  WalletPageProps,
+  WalletSearchState,
+} from "$types/ui.d.ts";
 
 // ===== HORIZON WALLET SPECIFIC TYPES =====
 
@@ -148,13 +156,6 @@ export interface WalletInfo {
 }
 
 // Wallet connection state
-export interface WalletConnectionState {
-  isConnected: boolean;
-  isConnecting: boolean;
-  error?: string;
-  wallet?: WalletInfo;
-  supportedWallets: WalletProviderKey[];
-}
 
 // Wallet connection methods
 export interface WalletConnectionMethods {
@@ -260,33 +261,8 @@ export interface WalletFilterOptions {
 }
 
 // Wallet search and filter state
-export interface WalletSearchState {
-  query: string;
-  filters: WalletFilterOptions;
-  sortBy: WalletSortKey;
-  isLoading: boolean;
-  error?: string;
-  results: WalletStampWithValue[];
-  totalResults: number;
-}
 
 // Wallet navigation state for complex wallet interfaces
-export interface WalletNavigationState {
-  currentTab: "stamps" | "activity" | "dispensers" | "stats";
-  stampView: "grid" | "list" | "table";
-  showFilters: boolean;
-  showSearch: boolean;
-  selectedStamps: number[];
-  bulkActions: {
-    isEnabled: boolean;
-    availableActions: string[];
-    isProcessing: boolean;
-  };
-  breadcrumbs: {
-    label: string;
-    href: string;
-  }[];
-}
 
 // Wallet page query parameters
 export interface WalletPageParams {
@@ -349,32 +325,7 @@ export interface WalletStampsApiResponse {
   };
 }
 
-export interface WalletPageProps {
-  walletData: WalletOverviewInfo;
-  stampsTotal: number;
-  src20Total: number;
-  stampsCreated: number;
-  data: {
-    stamps: any;
-    src20: any;
-    dispensers: any;
-  };
-  stampsSortBy?: "ASC" | "DESC";
-  src20SortBy?: "ASC" | "DESC";
-}
-
 /* ===== WALLET CONTENT PROPS ===== */
-
-export interface WalletContentProps {
-  stamps: any;
-  src20: any;
-  dispensers: any;
-  address: string;
-  anchor?: string;
-  stampsSortBy?: "ASC" | "DESC";
-  src20SortBy?: "ASC" | "DESC";
-  dispensersSortBy?: "ASC" | "DESC";
-}
 
 export interface WalletOverviewInfo {
   totalStamps: number;
@@ -867,15 +818,6 @@ export interface WalletSecurityFeatures {
 /**
  * Wallet authentication state
  */
-export interface WalletAuthState {
-  isLocked: boolean;
-  lastUnlocked?: Date;
-  sessionTimeout?: number; // Session timeout in milliseconds
-  requiresPin: boolean;
-  requiresBiometric: boolean;
-  maxFailedAttempts: number;
-  failedAttempts: number;
-}
 
 /**
  * Encryption parameters for sensitive data
@@ -995,6 +937,123 @@ export interface MintStampInputData {
 /**
  * BTC info interface from mempool/external APIs (migrated from globals)
  */
+
+/**
+ * WalletProviders - Migrated from wallet.ts
+ */
+export interface WalletProviders {
+  LeatherProvider?: any;
+  okxwallet?: any;
+  unisat?: any;
+  tapwallet?: any;
+  phantom?: any;
+  HorizonWalletProvider?: any;
+}
+
+/**
+ * WalletProviderKey - Migrated from walletProviders.ts
+ */
+export type WalletProviderKey =
+  | "unisat"
+  | "okx"
+  | "xverse"
+  | "leather"
+  | "phantom";
+
+/**
+ * ProgressiveFeeEstimationOptions - Migrated from fee-estimation.ts
+ */
+export interface ProgressiveFeeEstimationOptions {
+  /** Phase 1: Instant estimation timeout (default: 100ms) */
+  instantTimeout: number;
+  /** Phase 2: Smart estimation timeout (default: 2000ms) */
+  smartTimeout: number;
+  /** Phase 3: Exact estimation timeout (default: 10000ms) */
+  exactTimeout: number;
+
+  /** Whether to enable Phase 2 caching */
+  enableCaching: boolean;
+  /** Cache TTL in milliseconds (default: 30000ms) */
+  cacheTtl: number;
+  /** Maximum cache size per wallet (default: 1000 UTXOs) */
+  maxCacheSize: number;
+
+  /** Whether to pre-fetch Phase 2 data in background */
+  enablePreFetch: boolean;
+  /** Debounce delay for pre-fetching (default: 2000ms) */
+  preFetchDebounce: number;
+
+  /** Callback functions for phase completion */
+  onPhaseComplete?: (
+    phase: "instant" | "smart" | "exact",
+    result: ProgressiveFeeEstimationResult,
+  ) => void;
+  /** Error callback */
+  onError?: (error: Error, phase?: "instant" | "smart" | "exact") => void;
+
+  /** Enable debug logging */
+  debug?: boolean;
+}
+
+/**
+ * CacheStats - Migrated from fee-estimation.ts
+ */
+export interface CacheStats {
+  /** Total number of cache entries */
+  totalEntries: number;
+  /** Total number of cached UTXOs across all wallets */
+  totalUtxos: number;
+  /** Cache hit rate (0-1) */
+  hitRate: number;
+  /** Average cache age in milliseconds */
+  averageAge: number;
+  /** Memory usage estimate in bytes */
+  estimatedMemoryUsage: number;
+  /** Number of cache evictions due to TTL */
+  ttlEvictions: number;
+  /** Number of cache evictions due to LRU */
+  lruEvictions: number;
+}
+
+/**
+ * CacheManagerConfig - Migrated from fee-estimation.ts
+ */
+export interface CacheManagerConfig {
+  /** Maximum number of wallet caches to maintain */
+  maxWallets: number;
+  /** Maximum UTXOs per wallet cache */
+  maxUtxosPerWallet: number;
+  /** Default TTL for cache entries */
+  defaultTtl: number;
+  /** Cleanup interval for expired entries */
+  cleanupInterval: number;
+  /** Enable LRU eviction when limits are reached */
+  enableLruEviction: boolean;
+  /** Enable automatic cleanup of expired entries */
+  enableAutoCleanup: boolean;
+}
+
+/**
+ * TransactionOptions - Migrated from toolEndpointAdapter.ts
+ */
+export interface TransactionOptions {
+  /** Source wallet address */
+  walletAddress: string;
+  /** Fee rate in sats/vB */
+  feeRate: number;
+  /** Always true for Phase 2 estimation */
+  dryRun: boolean;
+  /** Optional change address (defaults to source) */
+  changeAddress?: string;
+}
+
+/**
+ * WalletStep - Migrated from data.ts
+ */
+export interface WalletStep extends ListProps {
+  number: number;
+}
+
 export interface BtcInfo {
   address: string;
   balance: number;

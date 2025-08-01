@@ -5,7 +5,7 @@ import {
 } from "$server/services/aws/cloudWatchMonitoring.ts";
 import { ecsDetection } from "$server/services/aws/ecsDetection.ts";
 import { assertEquals, assertExists } from "@std/assert";
-import { afterAll, beforeAll, describe, it } from "@std/testing/bdd";
+import { afterAll, beforeAll, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("CloudWatch Monitoring Service", () => {
   // Store original interval functions to restore later

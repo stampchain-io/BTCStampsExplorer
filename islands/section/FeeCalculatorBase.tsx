@@ -23,44 +23,7 @@ import { labelXs, textXs } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { MaraModeBadge } from "$components/indicators/MaraModeIndicator.tsx";
 import { FeeSkeletonLoader } from "$components/indicators/ProgressIndicator.tsx";
-
-interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
-  isModal?: boolean;
-  disabled?: boolean;
-  cancelText?: string;
-  confirmText?: string;
-  type?: string;
-  fileType?: string | undefined;
-  fileSize?: number | undefined;
-  issuance?: number | undefined;
-  bitname?: string | undefined;
-  amount?: number;
-  receive?: number;
-  fromPage?: string;
-  price?: number;
-  edition?: number;
-  ticker?: string;
-  limit?: number;
-  supply?: number;
-  src20TransferDetails?: {
-    address: string;
-    token: string;
-    amount: number;
-  };
-  stampTransferDetails?: {
-    address: string;
-    stamp: string;
-    editions: number;
-  };
-  dec?: number;
-  onTosChange?: (agreed: boolean) => void;
-  feeDetails?: FeeDetails;
-  mintDetails?: MintDetails;
-  maraMode?: boolean;
-  maraFeeRate?: number | null;
-  isLoadingMaraFee?: boolean;
-  progressIndicator?: preact.ComponentChildren;
-}
+import type { ExtendedBaseFeeCalculatorProps } from "$types/ui.d.ts";
 
 export function FeeCalculatorBase({
   fee,

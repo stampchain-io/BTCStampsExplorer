@@ -12,35 +12,13 @@ import {
   ErrorType,
 } from "$lib/utils/errorHandlingUtils.ts";
 import { Component, type ComponentChildren } from "preact";
+import type {
+  SortingErrorBoundaryProps,
+  SortingErrorBoundaryState,
+  SortingErrorFallbackProps,
+} from "$types/ui.d.ts";
 
 // ===== TYPES =====
-
-interface SortingErrorBoundaryState {
-  hasError: boolean;
-  error: ErrorInfo | null;
-  retryCount: number;
-  lastErrorTime: number;
-}
-
-interface SortingErrorBoundaryProps {
-  children: ComponentChildren;
-  fallback?: ComponentChildren;
-  onError?: (error: ErrorInfo, errorDetails?: string) => void;
-  maxRetries?: number;
-  retryDelay?: number;
-  context?: "wallet" | "stamp" | "src20" | "general";
-  className?: string;
-  testId?: string;
-}
-
-interface SortingErrorFallbackProps {
-  error: ErrorInfo;
-  onRetry: () => void;
-  onReset: () => void;
-  context: string;
-  retryCount: number;
-  maxRetries: number;
-}
 
 // ===== ERROR BOUNDARY COMPONENT =====
 

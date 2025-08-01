@@ -12,21 +12,7 @@ import { decodeBase64 } from "@std/encoding/base64";
 import { encodeHex } from "@std/encoding/hex";
 import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
-
-interface FairmintFormState {
-  asset: string;
-  quantity: string;
-  fee: number;
-  BTCPrice: number;
-  jsonSize: number;
-  utxoAncestors?: AncestorInfo[];
-  psbtFeeDetails?: {
-    estMinerFee: number;
-    totalDustValue: number;
-    hasExactFees: boolean;
-  };
-  isLoading?: boolean;
-}
+import type { FairmintFormState } from "$types/ui.d.ts";
 
 export function useFairmintForm(fairminters: any[]) {
   const { config, isLoading: configLoading } = useConfig<Config>();

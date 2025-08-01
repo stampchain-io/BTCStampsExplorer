@@ -12,7 +12,7 @@
 import {
   assertEquals,
   assertExists,
-} from "@std/assert/mod.ts";
+} from "@std/assert";
 import {
   ErrorHandlingUtils,
   ErrorSeverity,

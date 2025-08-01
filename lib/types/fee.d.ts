@@ -1,53 +1,7 @@
 import type { AncestorInfo, ScriptType } from "$types/index.d.ts";
 import type { FeeDetails } from "$types/base.d.ts";
-
-export interface BaseFeeCalculatorProps {
-  fee: number;
-  handleChangeFee: (fee: number) => void;
-  BTCPrice: number;
-  isSubmitting: boolean;
-  onSubmit: () => void;
-  onCancel?: () => void;
-  buttonName: string;
-  className?: string;
-  showCoinToggle?: boolean;
-  tosAgreed?: boolean;
-  onTosChange?: (agreed: boolean) => void;
-  feeDetails?: FeeDetails;
-}
-
-export interface SimpleFeeCalculatorProps
-  extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
-  type: "send" | "transfer" | "buy" | "src101";
-  amount?: number;
-  recipientAddress?: string;
-  userAddress?: string;
-  inputType?: ScriptType;
-  outputTypes?: ScriptType[];
-  utxoAncestors?: AncestorInfo[];
-  isModal?: boolean;
-}
-
-export interface AdvancedFeeCalculatorProps
-  extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
-  type:
-    | "stamp"
-    | "src20"
-    | "fairmint"
-    | "transfer"
-    | "src20-transfer"
-    | "src101";
-  fileType?: string;
-  fileSize?: number;
-  issuance?: number;
-  recipientAddress?: string;
-  userAddress?: string;
-  inputType?: ScriptType;
-  outputTypes?: ScriptType[];
-  utxoAncestors?: AncestorInfo[];
-  feeDetails?: FeeDetails;
-  onRefresh?: () => void;
-  disabled?: boolean;
-  fromPage?: string;
-  bitname?: string;
-}
+import type {
+  AdvancedFeeCalculatorProps,
+  BaseFeeCalculatorProps,
+  SimpleFeeCalculatorProps,
+} from "$types/ui.d.ts";

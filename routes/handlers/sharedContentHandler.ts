@@ -10,11 +10,9 @@ import { getRecursiveHeaders } from "$lib/utils/security/securityHeaders.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import type { State } from "$types/ui.d.ts";
 
 // Define the state type
-export interface State {
-  baseUrl: string;
-}
 
 export async function handleContentRequest(
   identifier: string,

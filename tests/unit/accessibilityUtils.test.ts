@@ -4,7 +4,7 @@
  */
 
 import { assertEquals } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
 import { MockHTMLElement, withDOM } from "./utils/testHelpers.ts";
 

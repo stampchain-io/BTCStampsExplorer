@@ -1,6 +1,7 @@
 /* ===== COLLECTION LANDING PAGE ===== */
 
 import { FreshContext, Handlers } from "$fresh/server.ts";
+import type { CollectionLandingPageProps } from "$types/ui.d.ts";
 
 import { CollectionOverviewHeader } from "$header";
 import { body, gapSection } from "$layout";
@@ -17,19 +18,6 @@ import {
 } from "$server/types/collection.d.ts";
 
 /* ===== TYPES ===== */
-type CollectionLandingPageProps = {
-  data: {
-    collections: CollectionWithOptionalMarketData[];
-    total: number;
-    _page: number;
-    _pages: number;
-    _page_size: number;
-    _filterBy: string[];
-    sortBy: "ASC" | "DESC";
-    stamps_src721: StampRow[];
-    stamps_posh: StampRow[];
-  };
-};
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {

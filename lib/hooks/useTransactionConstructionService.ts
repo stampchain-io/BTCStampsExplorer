@@ -28,18 +28,9 @@ import {
   transactionConstructionService,
 } from "$lib/utils/minting/TransactionConstructionService.ts";
 import { useCallback, useEffect, useMemo, useReducer } from "preact/hooks";
+import type { FeeEstimatorState } from "$types/ui.d.ts";
 
 // Hook state interface
-interface FeeEstimatorState {
-  phase1: FeeEstimationResult | null;
-  phase2: FeeEstimationResult | null;
-  phase3: FeeEstimationResult | null;
-  currentPhase: "instant" | "smart" | "exact"; // Updated: "cached" -> "smart"
-  isEstimating: boolean;
-  isPreFetching: boolean;
-  error: string | null;
-  lastUpdate: number;
-}
 
 // Hook actions
 type FeeEstimatorAction =

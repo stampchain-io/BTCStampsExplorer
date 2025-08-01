@@ -4,8 +4,8 @@ import {
   assertRejects,
   assertStringIncludes,
 } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { assertSpyCalls, spy } from "@std/testing/mock";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { assertSpyCalls, spy } from "@std/testing@1.0.14/mock";
 import { MaraSlipstreamService } from "$/server/services/mara/maraSlipstreamService.ts";
 import type {
   MaraFeeRateResponse,

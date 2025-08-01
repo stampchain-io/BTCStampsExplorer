@@ -1,0 +1,151 @@
+{
+  "summary": {
+    "averageCompilationTimeMs": 2730.571069333335,
+    "averageImportResolutionMs": 818.7160693333329,
+    "averageBundleSizeBytes": 2383178,
+    "averageMemoryUsageMB": 108.33333333333333,
+    "totalAliasImports": 2533,
+    "totalRelativeImports": 118,
+    "aliasImportPercentage": 95.5488494907582,
+    "treeShakingEffectiveness": 0.9961300309597524
+  },
+  "config": {
+    "iterations": 3,
+    "warmupRuns": 1,
+    "outputDir": ".//Documents/BTCStampsExplorer/scripts/performance/validation/benchmarks",
+    "includeTreeShaking": true,
+    "enableMemoryProfiling": true
+  },
+  "results": [
+    {
+      "timestamp": "2025-07-31T23:56:31.584Z",
+      "environment": {
+        "denoVersion": "2.4.2",
+        "platform": "darwin",
+        "memory": 102
+      },
+      "compilation": {
+        "totalTimeMs": 2650.0388329999987,
+        "filesProcessed": 979,
+        "averageTimePerFile": 2.7068833840653714,
+        "errorCount": 12,
+        "warningCount": 0
+      },
+      "importResolution": {
+        "aliasImports": 2533,
+        "relativeImports": 118,
+        "resolutionTimeMs": 812.9632920000004,
+        "treeShakingEffectiveness": 0.9961300309597523
+      },
+      "bundleSize": {
+        "totalSizeBytes": 2383178,
+        "gzippedSizeBytes": 714953,
+        "moduleCount": 286,
+        "unusedExports": [
+          "AssertEqual",
+          "AssertExtends",
+          "AssertAssignable",
+          "AssertTrue",
+          "AssertFalse",
+          "AssertNever",
+          "AssertHasProperty",
+          "AssertLiteral",
+          "Keys",
+          "BITCOIN_ADDRESS_PATTERNS"
+        ]
+      },
+      "memory": {
+        "peakUsageMB": 122,
+        "averageUsageMB": 111,
+        "gcCollections": 0
+      }
+    },
+    {
+      "timestamp": "2025-07-31T23:56:41.973Z",
+      "environment": {
+        "denoVersion": "2.4.2",
+        "platform": "darwin",
+        "memory": 56
+      },
+      "compilation": {
+        "totalTimeMs": 2824.514500000001,
+        "filesProcessed": 979,
+        "averageTimePerFile": 2.8851016343207365,
+        "errorCount": 12,
+        "warningCount": 0
+      },
+      "importResolution": {
+        "aliasImports": 2533,
+        "relativeImports": 118,
+        "resolutionTimeMs": 774.9492079999982,
+        "treeShakingEffectiveness": 0.9961300309597523
+      },
+      "bundleSize": {
+        "totalSizeBytes": 2383178,
+        "gzippedSizeBytes": 714953,
+        "moduleCount": 286,
+        "unusedExports": [
+          "AssertEqual",
+          "AssertExtends",
+          "AssertAssignable",
+          "AssertTrue",
+          "AssertFalse",
+          "AssertNever",
+          "AssertHasProperty",
+          "AssertLiteral",
+          "Keys",
+          "BITCOIN_ADDRESS_PATTERNS"
+        ]
+      },
+      "memory": {
+        "peakUsageMB": 107,
+        "averageUsageMB": 85,
+        "gcCollections": 0
+      }
+    },
+    {
+      "timestamp": "2025-07-31T23:56:52.414Z",
+      "environment": {
+        "denoVersion": "2.4.2",
+        "platform": "darwin",
+        "memory": 149
+      },
+      "compilation": {
+        "totalTimeMs": 2717.159875000005,
+        "filesProcessed": 979,
+        "averageTimePerFile": 2.7754442032686466,
+        "errorCount": 12,
+        "warningCount": 0
+      },
+      "importResolution": {
+        "aliasImports": 2533,
+        "relativeImports": 118,
+        "resolutionTimeMs": 868.2357080000002,
+        "treeShakingEffectiveness": 0.9961300309597523
+      },
+      "bundleSize": {
+        "totalSizeBytes": 2383178,
+        "gzippedSizeBytes": 714953,
+        "moduleCount": 286,
+        "unusedExports": [
+          "AssertEqual",
+          "AssertExtends",
+          "AssertAssignable",
+          "AssertTrue",
+          "AssertFalse",
+          "AssertNever",
+          "AssertHasProperty",
+          "AssertLiteral",
+          "Keys",
+          "BITCOIN_ADDRESS_PATTERNS"
+        ]
+      },
+      "memory": {
+        "peakUsageMB": 96,
+        "averageUsageMB": 73,
+        "gcCollections": 0
+      }
+    }
+  ],
+  "generatedAt": "2025-07-31T23:56:52.415Z"
+}

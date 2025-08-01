@@ -9,7 +9,7 @@ import {
     assertRejects,
     assertThrows,
 } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import { Buffer } from "node:buffer";
 import * as bitcoin from "../mocks/bitcoinjs-lib.mock.ts";
 import { networks, Psbt, Transaction } from "../mocks/bitcoinjs-lib.mock.ts";

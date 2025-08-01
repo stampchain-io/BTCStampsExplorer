@@ -1,5 +1,5 @@
-import { assertEquals } from "@std/assert/mod.ts";
-import { describe, it } from "@std/testing/bdd.ts";
+import { assertEquals } from "@std/assert";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("Timezone Handling Tests", () => {
   describe("UTC_TIMESTAMP() vs NOW() consistency", () => {

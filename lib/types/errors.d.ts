@@ -660,3 +660,18 @@ export interface LegacyErrorInfo {
   retryable: boolean;
   action?: string;
 }
+
+/**
+ * ApiErrorWithMarketContext - Migrated from lib/types/api.ts
+ */
+export interface ApiErrorWithMarketContext {
+  error: string;
+  status: number;
+  code: string;
+  marketDataContext?: {
+    assetId: string;
+    assetType: "stamp" | "src20" | "collection";
+    lastKnownData?: Date;
+    suggestion?: string;
+  };
+}

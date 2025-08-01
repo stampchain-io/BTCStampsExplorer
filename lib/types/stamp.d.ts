@@ -17,6 +17,7 @@ import type {
   UTXO,
 } from "./base.d.ts";
 import type { PaginationProps } from "$types/pagination.d.ts";
+import type { StampGalleryProps } from "$types/ui.d.ts";
 
 // ============================================================================
 // STAMP PROTOCOL ENUMS AND BASIC TYPES
@@ -862,26 +863,6 @@ export interface DisplayCountBreakpoints {
 /**
  * Props interface for stamp gallery components
  */
-export interface StampGalleryProps {
-  title?: string;
-  subTitle?: string;
-  type?: string;
-  stamps: StampRow[];
-  layout: "grid" | "row";
-  isRecentSales?: boolean;
-  filterBy?: STAMP_FILTER_TYPES | STAMP_FILTER_TYPES[];
-  showDetails?: boolean;
-  showEdition?: boolean;
-  gridClass?: string;
-  displayCounts?: DisplayCountBreakpoints;
-  pagination?: PaginationProps;
-  showMinDetails?: boolean;
-  variant?: "default" | "grey";
-  viewAllLink?: string;
-  alignRight?: boolean;
-  fromPage?: string;
-  sortBy?: "ASC" | "DESC" | undefined;
-}
 
 // ============================================================================
 // STAMP OPERATION INTERFACES (Legacy)
@@ -1234,6 +1215,1186 @@ export declare function meetsComplianceRequirements(
   compliance: ProtocolComplianceLevel,
   minimum?: ProtocolComplianceLevel,
 ): boolean;
+
+/**
+ * StampControllerData - Migrated from index.tsx
+ */
+export interface StampControllerData {
+  carouselStamps: StampRow[];
+  stamps_src721: StampRow[];
+  stamps_art: StampRow[];
+  stamps_posh: StampRow[];
+  collectionData: Collection[];
+}
+
+/**
+ * WalletContext - Migrated from wallet.ts
+ */
+export interface WalletContext {
+  readonly wallet: Wallet;
+  readonly isConnected: boolean;
+  updateWallet: (wallet: Wallet) => void;
+  getBasicStampInfo: (address: string) => Promise<any>;
+  disconnect: () => void;
+  signMessage: (message: string) => Promise<any>;
+  signPSBT: (
+    wallet: Wallet,
+    psbt: string,
+    inputsToSign: any[],
+    enableRBF?: boolean,
+    sighashTypes?: number[],
+    autoBroadcast?: boolean,
+  ) => Promise<any>;
+  broadcastRawTX: (rawTx: string) => Promise<any>;
+  broadcastPSBT: (psbtHex: string) => Promise<any>;
+  showConnectModal: () => void;
+}
+
+/**
+ * StampWithSaleData - Migrated from StampCard.tsx
+ */
+export interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
+  sale_data?: {
+    btc_amount: number;
+    block_index: number;
+    tx_hash: string;
+  };
+  stamp_base64?: string;
+}
+
+/**
+ * StampErrorCode - Migrated from errors.ts
+ */
+export enum StampErrorCode {
+  STAMP_NOT_FOUND = "STAMP_NOT_FOUND",
+  INVALID_STAMP_DATA = "STAMP_INVALID_STAMP_DATA",
+  INVALID_CPID = "STAMP_INVALID_CPID",
+  STAMP_ALREADY_EXISTS = "STAMP_ALREADY_EXISTS",
+  INVALID_CREATOR = "STAMP_INVALID_CREATOR",
+  INVALID_SUPPLY = "STAMP_INVALID_SUPPLY",
+  INVALID_DIVISIBILITY = "STAMP_INVALID_DIVISIBILITY",
+  INVALID_LOCK_STATUS = "STAMP_INVALID_LOCK_STATUS",
+  INVALID_MEDIA_TYPE = "STAMP_INVALID_MEDIA_TYPE",
+  MEDIA_TOO_LARGE = "STAMP_MEDIA_TOO_LARGE",
+  INVALID_BASE64 = "STAMP_INVALID_BASE64",
+}
+
+/**
+ * UTXOCache - Migrated from fee-estimation.ts
+ */
+export interface UTXOCache {
+  /** Wallet address this cache belongs to */
+  walletAddress: string;
+  /** Cached UTXO data */
+  utxos: BasicUTXO[];
+  /** Cache creation timestamp */
+  timestamp: number;
+  /** Time-to-live in milliseconds (default: 30 seconds) */
+  ttl: number;
+  /** Number of times this cache has been accessed */
+  accessCount: number;
+  /** Last access timestamp for LRU eviction */
+  lastAccessed: number;
+}
+
+/**
+ * ProgressiveFeeEstimationResult - Migrated from fee-estimation.ts
+ */
+export interface ProgressiveFeeEstimationResult extends FeeDetails {
+  /** Which estimation phase produced this result */
+  phase: "instant" | "smart" | "exact";
+  /** Whether this came from cache */
+  cacheHit?: boolean;
+  /** Time taken for this estimation in milliseconds */
+  estimationTime?: number;
+  /** Timestamp when this result was generated */
+  timestamp?: number;
+  /** Confidence level (0-100) */
+  confidence?: number;
+  /** Selected UTXOs for this estimation (Phase 2/3 only) */
+  selectedUtxos?: BasicUTXO[] | DetailedUTXO[];
+  /** Transaction size breakdown */
+  sizeBreakdown?: {
+    inputs: number;
+    outputs: number;
+    overhead: number;
+    witness: number;
+  };
+}
+
+/**
+ * WalletData - Migrated from index.d.ts
+ */
+export interface WalletData {
+  balance: number;
+  usdValue: number;
+  address: string;
+  btcPrice: number;
+  fee: number;
+  txCount: number;
+  unconfirmedBalance: number;
+  unconfirmedTxCount: number;
+  stampValue: number;
+  dispensers: {
+    open: number;
+    closed: number;
+    total: number;
+    items: unknown[]; // Simplified to avoid circular dependencies
+  };
+}
+
+/**
+ * MarketListingSummary - Migrated from marketData.d.ts
+ */
+export interface MarketListingSummary {
+  tick: string;
+  // 🎸 PUNK ROCK v2.3 STANDARDIZED FIELDS 🎸
+  floor_price_btc: number | null; // ✅ v2.3 standardized field
+  market_cap_btc: number; // ✅ v2.3 standardized field
+  volume_7d_btc: number | null; // ✅ v2.3 extended field (was sum_7d)
+  volume_3d_btc: number | null; // ✅ v2.3 extended field (was sum_3d)
+  volume_24h_btc: number | null; // ✅ v2.3 standardized field (was sum_1d)
+  stamp_url: string | null;
+  tx_hash: string;
+  holder_count: number;
+}
+
+/**
+ * OpenStampMarketData - Migrated from marketData.d.ts
+ */
+export interface OpenStampMarketData {
+  tokenId: number;
+  name: string; // emoji tick
+  totalSupply: number;
+  holdersCount: number;
+  price: string; // in satoshis
+  amount24: string;
+  volume_24h_btc: string; // ✅ v2.3 standardized field (was volume24, in satoshis)
+  volume_24h_change: string; // ✅ v2.3 standardized field (was volume24Change)
+  change_24h: string; // ✅ v2.3 standardized field (was change24)
+  change_7d: string; // ✅ v2.3 standardized field (was change7d)
+}
+
+/**
+ * StampScanMarketData - Migrated from marketData.d.ts
+ */
+export interface StampScanMarketData {
+  tick: string; // emoji tick
+  // 🎸 PUNK ROCK v2.3 STANDARDIZED FIELDS 🎸
+  floor_price_btc: number | null; // ✅ v2.3 standardized field (was floor_unit_price)
+  market_cap_btc: number; // ✅ v2.3 standardized field (was mcap)
+  volume_7d_btc: number | null; // ✅ v2.3 extended field (was sum_7d)
+  volume_3d_btc: number | null; // ✅ v2.3 extended field (was sum_3d)
+  volume_24h_btc: number | null; // ✅ v2.3 standardized field (was sum_1d)
+  stamp_url: string | null;
+  tx_hash: string;
+  holder_count: number;
+}
+
+/**
+ * MarketListingAggregated - Migrated from marketData.d.ts
+ */
+export interface MarketListingAggregated {
+  tick: string;
+  // 🎸 PUNK ROCK v2.3 STANDARDIZED FIELDS 🎸
+  price_btc?: number | null; // ✅ v2.3 field for fungible SRC-20 tokens
+  floor_price_btc: number | null; // ✅ v2.3 standardized field (for NFTs, lower of stampscan/openstamp)
+  market_cap_btc: number; // ✅ v2.3 standardized field (computed on lower price * totalSupply)
+  volume_24h_btc: number; // ✅ v2.3 standardized field (sum of volumes)
+  volume_7d_btc?: number; // ✅ v2.3 extended field
+  volume_30d_btc?: number; // ✅ v2.3 extended field
+  change_24h_percent?: number | undefined; // ✅ v2.3 standardized field (24h price change percentage)
+  stamp_url?: string | null;
+  tx_hash: string;
+  holder_count: number; // use stampscan holder_count value
+
+  // 🔄 BACKWARD COMPATIBILITY: Legacy field names (DEPRECATED - use standardized names above)
+  floor_unit_price?: number | null; // @deprecated Use floor_price_btc
+  mcap?: number; // @deprecated Use market_cap_btc
+  volume24?: number; // @deprecated Use volume_24h_btc
+  change_24h?: number | undefined; // @deprecated Use change_24h_percent
+  change24?: number | undefined; // @deprecated Use change_24h_percent
+
+  market_data: {
+    stampscan: {
+      price: number; // floor_price_btc
+      volume_24h_btc: number; // ✅ v2.3 standardized field (was volume24)
+    };
+    openstamp: {
+      price: number; // price
+      volume_24h_btc: number; // ✅ v2.3 standardized field (was volume24)
+    };
+  };
+}
+
+/**
+ * StampMarketDataRow - Migrated from marketData.d.ts
+ */
+export interface StampMarketDataRow {
+  cpid: string;
+  floor_price_btc: string | null;
+  recent_sale_price_btc: string | null;
+  open_dispensers_count: number;
+  closed_dispensers_count: number;
+  total_dispensers_count: number;
+  holder_count: number;
+  unique_holder_count: number;
+  top_holder_percentage: string;
+  holder_distribution_score: string;
+  volume_24h_btc: string;
+  volume_7d_btc: string;
+  volume_30d_btc: string;
+  total_volume_btc: string;
+  price_source: string | null;
+  volume_sources: string | null; // JSON string
+  data_quality_score: string;
+  confidence_level: string;
+  last_updated: Date;
+  last_price_update: Date | null;
+  update_frequency_minutes: number;
+  // New transaction detail fields
+  last_sale_tx_hash: string | null;
+  last_sale_buyer_address: string | null;
+  last_sale_dispenser_address: string | null;
+  last_sale_btc_amount: string | null; // BIGINT stored as string (satoshis)
+  last_sale_dispenser_tx_hash: string | null;
+  last_sale_block_index: number | null;
+  // Activity tracking fields
+  activity_level: ActivityLevel | null;
+  last_activity_time: number | null; // Unix timestamp
+}
+
+/**
+ * CollectionMarketDataRow - Migrated from marketData.d.ts
+ */
+export interface CollectionMarketDataRow {
+  collection_id: string;
+  min_floor_price_btc: string | null;
+  max_floor_price_btc: string | null;
+  avg_floor_price_btc: string | null;
+  median_floor_price_btc: string | null;
+  total_volume_24h_btc: string;
+  stamps_with_prices_count: number;
+  min_holder_count: number;
+  max_holder_count: number;
+  avg_holder_count: string;
+  median_holder_count: number;
+  total_unique_holders: number;
+  avg_distribution_score: string;
+  total_stamps_count: number;
+  last_updated: Date;
+}
+
+/**
+ * StampMarketData - Migrated from marketData.d.ts
+ */
+export interface StampMarketData {
+  cpid: string;
+  floorPriceBTC: number | null;
+  recentSalePriceBTC: number | null;
+  lastPriceBTC: number; // Calculated best price (fallback hierarchy: floorPriceBTC > recentSalePriceBTC > defaults)
+  walletValueBTC: number; // Total portfolio value (quantity × lastPriceBTC)
+  openDispensersCount: number;
+  closedDispensersCount: number;
+  totalDispensersCount: number;
+  holderCount: number;
+  uniqueHolderCount: number;
+  topHolderPercentage: number;
+  holderDistributionScore: number; // 0-100
+  volume24hBTC: number;
+  volume7dBTC: number;
+  volume30dBTC: number;
+  totalVolumeBTC: number;
+  priceSource: string | null;
+  volumeSources: Record<string, number> | null;
+  dataQualityScore: number; // 0-10
+  confidenceLevel: number; // 0-10
+  lastUpdated: Date;
+  lastPriceUpdate: Date | null;
+  updateFrequencyMinutes: number;
+  // New transaction detail fields
+  lastSaleTxHash: string | null;
+  lastSaleBuyerAddress: string | null;
+  lastSaleDispenserAddress: string | null;
+  lastSaleBtcAmount: number | null; // Converted from satoshis to BTC
+  lastSaleDispenserTxHash: string | null;
+  lastSaleBlockIndex: number | null;
+  // Activity tracking fields
+  activityLevel: ActivityLevel | null;
+  lastActivityTime: number | null; // Unix timestamp
+}
+
+/**
+ * CollectionMarketData - Migrated from marketData.d.ts
+ */
+export interface CollectionMarketData {
+  collectionId: string;
+  minFloorPriceBTC: number | null;
+  maxFloorPriceBTC: number | null;
+  avgFloorPriceBTC: number | null;
+  medianFloorPriceBTC: number | null;
+  totalVolume24hBTC: number;
+  stampsWithPricesCount: number;
+  minHolderCount: number;
+  maxHolderCount: number;
+  avgHolderCount: number;
+  medianHolderCount: number;
+  totalUniqueHolders: number;
+  avgDistributionScore: number;
+  totalStampsCount: number;
+  lastUpdated: Date;
+}
+
+/**
+ * StampHolderCacheRow - Migrated from marketData.d.ts
+ */
+export interface StampHolderCacheRow {
+  id: number;
+  cpid: string;
+  address: string;
+  quantity: string; // DECIMAL(20,8) stored as string
+  percentage: string; // DECIMAL(5,2) stored as string
+  rank_position: number;
+  last_updated: Date;
+}
+
+/**
+ * StampHolderCache - Migrated from marketData.d.ts
+ */
+export interface StampHolderCache {
+  id: number;
+  cpid: string;
+  address: string;
+  quantity: number;
+  percentage: number;
+  rankPosition: number;
+  lastUpdated: Date;
+}
+
+/**
+ * StampWithMarketData - Migrated from marketData.d.ts
+ */
+export interface StampWithMarketData extends StampRow {
+  marketData: StampMarketData | null;
+  marketDataMessage?: string;
+  cacheStatus?: CacheStatus;
+  cacheAgeMinutes?: number;
+}
+
+/**
+ * CollectionWithMarketData - Migrated from marketData.d.ts
+ */
+export interface CollectionWithMarketData {
+  collection: CollectionRow;
+  stamps: StampWithMarketData[];
+  aggregatedMarketData: CollectionMarketData | null;
+}
+
+/**
+ * RecentSaleData - Migrated from marketData.d.ts
+ */
+export interface RecentSaleData {
+  // Stamp information
+  cpid: string;
+  stamp: number;
+  stampUrl: string;
+  stampMimetype: string;
+  creator: string;
+  creatorName?: string;
+
+  // Sale transaction details
+  sale: {
+    priceBtc: number;
+    priceUsd: number;
+    timestamp: string;
+    timeAgo: string;
+    txHash: string;
+    buyerAddress: string;
+    dispenserAddress?: string;
+    btcAmountSatoshis: number;
+    blockNumber: number;
+    dispenserTxHash?: string;
+  };
+}
+
+/**
+ * StampWithEnhancedSaleData - Migrated from marketData.d.ts
+ */
+export interface StampWithEnhancedSaleData extends StampRow {
+  sale_data?: {
+    btc_amount: number;
+    block_index: number;
+    tx_hash: string;
+    buyer_address?: string;
+    dispenser_address?: string;
+    time_ago?: string;
+    btc_amount_satoshis?: number;
+    dispenser_tx_hash?: string;
+  };
+  marketData?: StampMarketData;
+  activity_level?: ActivityLevel;
+  last_activity_time?: number;
+}
+
+/**
+ * Dispenser - Migrated from services.d.ts
+ */
+export interface Dispenser {
+  tx_hash: string;
+  block_index: number;
+  source: string;
+  cpid: string;
+  give_quantity: number;
+  give_remaining: number;
+  escrow_quantity: number;
+  satoshirate: number;
+  btcrate: number;
+  origin: string;
+  confirmed: boolean;
+  close_block_index: number | null;
+  status: "open" | "closed" | "unknown";
+  asset_info?: any;
+  dispenser_info?: any;
+  stamp?: StampRow | null;
+}
+
+/**
+ * DispenseEvent - Migrated from services.d.ts
+ */
+export interface DispenseEvent {
+  event_index: number;
+  event: "DISPENSE";
+  params: {
+    asset: string;
+    block_index: number;
+    btc_amount: number;
+    destination: string;
+    dispense_index: number;
+    dispense_quantity: number;
+    dispenser_tx_hash: string;
+    source: string;
+    tx_hash: string;
+    tx_index: number;
+  };
+  tx_hash: string;
+  block_index: number;
+  timestamp: string | null;
+}
+
+/**
+ * QueueMessage - Migrated from services.d.ts
+ */
+export interface QueueMessage<T = unknown> {
+  id: string;
+  data: T;
+  timestamp: string;
+  deliveryCount: number;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * TraceEvent - Migrated from services.d.ts
+ */
+export interface TraceEvent {
+  timestamp: string;
+  event: string;
+  data?: Record<string, unknown>;
+}
+
+/**
+ * StampTransactionOptions - Migrated from toolEndpointAdapter.ts
+ */
+export interface StampTransactionOptions extends TransactionOptions {
+  /** Base64 encoded file data */
+  file: string;
+  /** Original filename */
+  filename: string;
+  /** File size in bytes */
+  fileSize: number;
+  /** Quantity to mint */
+  quantity: number;
+  /** Whether asset is locked */
+  locked: boolean;
+  /** Whether asset is divisible */
+  divisible: boolean;
+  /** Custom output value for MARA mode (optional) */
+  outputValue?: number;
+
+  // Optional dispense-specific properties for stamp purchases
+  /** Dispenser source address (for purchases) */
+  dispenserSource?: string;
+  /** Purchase quantity in satoshis (for purchases) */
+  purchaseQuantity?: string;
+}
+
+/**
+ * SendRow - Migrated from transaction.d.ts
+ */
+export interface SendRow {
+  /** Source address of the send */
+  source: string;
+  /** Destination address of the send */
+  destination: string;
+  /** Counterparty asset ID (if applicable) */
+  cpid: string | null;
+  /** SRC-20 tick name (if applicable) */
+  tick: string | null;
+  /** Transaction memo/description */
+  memo: string;
+  /** Quantity being sent (string or bigint for precision) */
+  quantity: string | bigint;
+  /** Transaction hash */
+  tx_hash: string;
+  /** Block index where transaction was confirmed */
+  block_index: number;
+  /** Satoshi rate at time of transaction */
+  satoshirate: number | null;
+  /** Block timestamp */
+  block_time: Date;
+}
+
+/**
+ * BlockInfo - Migrated from transaction.d.ts
+ */
+export interface BlockInfo {
+  /** Basic block information */
+  block_info: BlockRow;
+  /** All stamp/asset issuances in this block */
+  issuances: StampRow[];
+  /** All send transactions in this block */
+  sends: SendRow[];
+}
+
+/**
+ * MintStampInputData - Migrated from transaction.d.ts
+ */
+export interface MintStampInputData {
+  /** Source wallet address for the mint */
+  sourceWallet: string;
+  /** Optional custom name for the asset */
+  assetName?: string;
+  /** Quantity to mint */
+  qty: number;
+  /** Whether the asset should be locked after minting */
+  locked: boolean;
+  /** Whether the asset is divisible */
+  divisible: boolean;
+  /** Filename of the stamp content */
+  filename: string;
+  /** File content (base64 encoded or file data) */
+  file: string;
+  /** Fee rate in satoshis per kilobyte */
+  satsPerKB: number;
+  /** Service fee amount in satoshis */
+  service_fee: number;
+  /** Address to receive the service fee */
+  service_fee_address: string;
+}
+
+/**
+ * StampHandlerConfig - Migrated from sharedStampHandler.ts
+ */
+export type StampHandlerConfig = {
+  type: "stamps" | "cursed";
+  isIndex: boolean;
+};
+
+/**
+ * StampData - Migrated from [id].tsx
+ */
+export interface StampData {
+  stamp: StampRow & { name?: string };
+  total: number;
+  sends: any;
+  dispensers: any;
+  dispenses: any;
+  holders: any[];
+  vaults: any;
+  last_block: number;
+  stamps_recent: any;
+  lowestPriceDispenser: any;
+  htmlTitle?: string;
+  error?: string;
+  url: string;
+}
+
+/**
+ * TestResults - Migrated from test-image.ts
+ */
+export interface TestResults {
+  config?: {
+    BASE_URL: string;
+    IMAGES_SRC_PATH?: string;
+  };
+  stampchainTests: TestResult[];
+  proxyTests: TestResult[];
+  corsTests: {
+    get: TestResult;
+    post: TestResult;
+    options: TestResult;
+  };
+}
+
+/**
+ * ColumnDefinition - Migrated from server.type.test.ts
+ */
+export interface ColumnDefinition {
+  type:
+    | "INT"
+    | "BIGINT"
+    | "TINYINT"
+    | "SMALLINT"
+    | "MEDIUMINT"
+    | "DECIMAL"
+    | "NUMERIC"
+    | "FLOAT"
+    | "DOUBLE"
+    | "VARCHAR"
+    | "CHAR"
+    | "TEXT"
+    | "MEDIUMTEXT"
+    | "LONGTEXT"
+    | "DATE"
+    | "TIME"
+    | "DATETIME"
+    | "TIMESTAMP"
+    | "BINARY"
+    | "VARBINARY"
+    | "BLOB"
+    | "MEDIUMBLOB"
+    | "LONGBLOB"
+    | "JSON"
+    | "ENUM"
+    | "SET"
+    | "BOOLEAN";
+  nullable?: boolean;
+  primaryKey?: boolean;
+  unique?: boolean;
+  autoIncrement?: boolean;
+  default?: unknown;
+  length?: number;
+  precision?: number;
+  scale?: number;
+  comment?: string;
+  collation?: string;
+}
+
+/**
+ * Model - Migrated from server.type.test.ts
+ */
+export interface Model<T> {
+  tableName: string;
+  primaryKey: string;
+  fillable: (keyof T)[];
+  guarded: (keyof T)[];
+  hidden: (keyof T)[];
+  casts: { [K in keyof T]?: "string" | "number" | "boolean" | "date" | "json" };
+  timestamps: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  relations: { [key: string]: RelationDefinition };
+}
+
+/**
+ * StampTableSchema - Migrated from server.type.test.ts
+ */
+export interface StampTableSchema {
+  stamp_number: number;
+  tx_hash: string;
+  tx_index: number;
+  block_index: number;
+  creator: string;
+  stamp_base64: string;
+  stamp_url: string;
+  stamp_mimetype: string;
+  is_btc_stamp: boolean;
+  supply: number;
+  locked: boolean;
+  divisible: boolean;
+  stamp_hash: string;
+  creator_name?: string | null;
+  cpid: string;
+  keyburn: boolean;
+  ident: string;
+  is_cursed: boolean;
+  is_reissuance: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * TransactionTableSchema - Migrated from server.type.test.ts
+ */
+export interface TransactionTableSchema {
+  id: number;
+  tx_hash: string;
+  block_index: number;
+  block_hash: string;
+  timestamp: Date;
+  source: string;
+  destination?: string | null;
+  btc_amount: number;
+  fee: number;
+  data?: string | null;
+  supported: boolean;
+  order_index: number;
+  tx_index: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * QueryPerformanceMetrics - Migrated from server.type.test.ts
+ */
+export interface QueryPerformanceMetrics {
+  query: string;
+  executionTime: number;
+  rowsAffected: number;
+  rowsExamined: number;
+  indexesUsed: string[];
+  warnings: Array<{
+    level: "Note" | "Warning" | "Error";
+    code: number;
+    message: string;
+  }>;
+  timestamp: Date;
+  connectionId: string;
+  database: string;
+  user: string;
+}
+
+/**
+ * DatabaseHealthCheck - Migrated from server.type.test.ts
+ */
+export interface DatabaseHealthCheck {
+  status: "healthy" | "degraded" | "unhealthy";
+  responseTime: number;
+  uptime: number;
+  connections: ConnectionPoolStatistics;
+  performance: {
+    queriesPerSecond: number;
+    averageQueryTime: number;
+    slowQueries: number;
+    cacheHitRatio: number;
+    bufferPoolUsage: number;
+    indexEfficiency: number;
+  };
+  storage: {
+    totalSize: number;
+    dataSize: number;
+    indexSize: number;
+    freeSpace: number;
+    growthRate: number;
+    fragmentation: number;
+  };
+  lastCheck: Date;
+  checks: Array<{
+    name: string;
+    status: "healthy" | "degraded" | "unhealthy";
+    message: string;
+    responseTime: number;
+    timestamp: Date;
+  }>;
+}
+
+/**
+ * PerformanceMetrics - Migrated from src20Controller.performance.test.ts
+ */
+export interface PerformanceMetrics {
+  responseTime: number;
+  memoryUsage: {
+    rss: number;
+    heapUsed: number;
+    heapTotal: number;
+    external: number;
+  };
+  cpuTime: number;
+  timestamp: number;
+}
+
+/**
+ * StampTestCase - Migrated from createStampTransaction.test.ts
+ */
+export interface StampTestCase {
+  name: string;
+  input: {
+    sourceWallet: string;
+    qty: string;
+    locked: boolean;
+    filename: string;
+    file: string;
+    satsPerVB?: number;
+    satsPerKB?: number;
+    assetName?: string;
+    service_fee?: number;
+    service_fee_address?: string;
+    dryRun?: boolean;
+  };
+  expectedOutputs: {
+    dataOutputCount?: number;
+    cpidPrefix?: string;
+    errorPattern?: RegExp; // For error test cases
+  };
+}
+
+/**
+ * BTCPriceData - Migrated from btcPriceService.test.ts
+ */
+export interface BTCPriceData {
+  price: number;
+  source: "quicknode" | "coingecko" | "binance" | "cached" | "default";
+  confidence: "high" | "medium" | "low";
+  timestamp: number;
+  details?: unknown;
+  fallbackUsed?: boolean;
+  errors?: string[];
+}
+
+/**
+ * TestErrorInfo - Migrated from sorting-error-boundaries.test.ts
+ */
+export interface TestErrorInfo {
+  context: string;
+  details?: string;
+  timestamp: Date;
+}
+
+/**
+ * StampMarketData - Migrated from stampMarketData.test.ts
+ */
+export interface StampMarketData {
+  cpid: string;
+  floor_price_btc: number | null;
+  recent_sale_price_btc: number | null;
+  holder_count: number;
+  volume_24h_btc: number;
+  volume_sources: string | null;
+  data_quality_score: number;
+  last_updated: Date;
+}
+
+/**
+ * StampWithMarketData - Migrated from stampMarketData.test.ts
+ */
+export interface StampWithMarketData {
+  cpid: string;
+  marketData: {
+    floorPriceBTC: number | null;
+    floorPriceUSD: number | null;
+    holderCount: number;
+    cacheStatus: "fresh" | "stale" | "expired";
+  } | null;
+  marketDataMessage?: string;
+}
+
+/**
+ * MockStampOptions - Migrated from stampService.comprehensive.test.ts
+ */
+export interface MockStampOptions {
+  _shouldThrow?: boolean;
+  identifier?: string | string[];
+  creatorAddress?: string;
+  limit?: number;
+  page?: number;
+  includeMarketData?: boolean;
+  type?: string;
+}
+
+/**
+ * TypeCheckResult - Migrated from realtime-type-checker.ts
+ */
+export interface TypeCheckResult {
+  timestamp: number;
+  filePath: string;
+  success: boolean;
+  errors: string[];
+  warnings: string[];
+  duration: number;
+  memoryUsage: number;
+}
+
+/**
+ * ValidationParams - Migrated from StampingTool.tsx
+ */
+export interface ValidationParams {
+  file: File | null;
+  fileError: string;
+  issuanceError: string;
+  stampNameError: string;
+  isPoshStamp: boolean;
+  stampName: string;
+  addressError: string | undefined;
+}
+
+/**
+ * HealthMonitorReport - Migrated from typeSystemHealthMonitor.ts
+ */
+export interface HealthMonitorReport {
+  /** Report generation timestamp */
+  timestamp: number;
+  /** Overall health status */
+  status: "healthy" | "warning" | "critical";
+  /** Health score (0-100) */
+  healthScore: number;
+  /** Individual component reports */
+  components: {
+    compilation?: CompilationMetrics;
+    typeSafety?: TypeSafetyReport;
+    coverage?: TypeCoverageAnalysis;
+  };
+  /** Active alerts count */
+  activeAlerts: number;
+  /** Performance summary */
+  performance: {
+    monitoringOverhead: number;
+    analysisTime: number;
+    lastFullAnalysis: number;
+  };
+  /** Recommendations for improvement */
+  recommendations: string[];
+}
+
+/**
+ * StampPageData - Migrated from create.tsx
+ */
+export interface StampPageData {
+  latestStamps: StampRow[];
+}
+
+/**
+ * AssertStampClassification - Migrated from typeAssertions.ts
+ */
+export type AssertStampClassification<T> = T extends string ? T : never;
+
+/**
+ * MARATransactionEstimateConfig - Migrated from maraTransactionSizeEstimator.ts
+ */
+export interface MARATransactionEstimateConfig {
+  // Input configuration
+  inputs: Array<{
+    type: ScriptType;
+    isWitness?: boolean;
+  }>;
+
+  // Stamp-specific parameters
+  fileSize: number; // Size of the file in bytes
+  outputValue: number; // Dust value per P2WSH output (1-333)
+
+  // Service fee configuration
+  includeServiceFee: boolean;
+  serviceFeeType?: ScriptType;
+
+  // Change output
+  includeChangeOutput: boolean;
+  changeOutputType?: ScriptType;
+
+  // MARA specific
+  isMaraMode: boolean;
+  maraFeeRate: number; // sats/vB
+}
+
+/**
+ * CacheEntry - Migrated from ToolEndpointFeeEstimator.ts
+ */
+export interface CacheEntry {
+  response: StandardFeeResponse;
+  timestamp: number;
+  expiresAt: number;
+}
+
+/**
+ * UTXOCache - Migrated from TransactionConstructionService.ts
+ */
+export interface UTXOCache {
+  walletAddress: string;
+  utxos: BasicUTXO[];
+  timestamp: number;
+  ttl: number; // 30 seconds
+}
+
+/**
+ * StorageData - Migrated from localStorage.ts
+ */
+export interface StorageData<T extends SortKey = SortKey> {
+  version: number;
+  timestamp: string;
+  sortBy: T;
+  direction: "asc" | "desc";
+  metrics?: SortMetrics;
+  metadata?: {
+    userAgent?: string;
+    url?: string;
+    sessionId?: string;
+  };
+}
+
+/**
+ * TypeSystemAlert - Migrated from typeSystemAlertManager.ts
+ */
+export interface TypeSystemAlert {
+  /** Unique alert identifier */
+  id: string;
+  /** Alert type */
+  type:
+    | "compilation_performance"
+    | "type_safety"
+    | "coverage_degradation"
+    | "regression_detected";
+  /** Severity level */
+  severity: "critical" | "high" | "medium" | "low";
+  /** Alert title */
+  title: string;
+  /** Detailed alert message */
+  message: string;
+  /** Timestamp when alert was created */
+  timestamp: number;
+  /** Source data that triggered the alert */
+  sourceData:
+    | CompilationMetrics
+    | TypeSafetyReport
+    | TypeCoverageAnalysis
+    | PerformanceRegression;
+  /** Affected files or components */
+  affectedComponents: string[];
+  /** Suggested remediation actions */
+  remediation: string[];
+  /** Alert status */
+  status: "active" | "acknowledged" | "resolved" | "suppressed";
+  /** Escalation information */
+  escalation: {
+    level: number;
+    lastEscalated: number | null;
+    acknowledgedBy?: string;
+    resolvedBy?: string;
+  };
+  /** Notification history */
+  notifications: NotificationRecord[];
+}
+
+/**
+ * NotificationRecord - Migrated from typeSystemAlertManager.ts
+ */
+export interface NotificationRecord {
+  /** Notification timestamp */
+  timestamp: number;
+  /** Notification target */
+  target: string;
+  /** Notification method */
+  method: "webhook" | "email" | "slack";
+  /** Success status */
+  success: boolean;
+  /** Error message if failed */
+  error?: string;
+}
+
+/**
+ * DashboardData - Migrated from typeSystemDashboard.ts
+ */
+export interface DashboardData {
+  /** Dashboard generation timestamp */
+  timestamp: number;
+  /** Overall system health summary */
+  healthSummary: SystemHealthSummary;
+  /** Compilation performance metrics */
+  compilationMetrics: CompilationDashboardData;
+  /** Type safety metrics */
+  typeSafetyMetrics: TypeSafetyDashboardData;
+  /** Type coverage metrics */
+  coverageMetrics: CoverageDashboardData;
+  /** Active alerts */
+  activeAlerts: AlertDashboardData;
+  /** Historical trends */
+  trends: TrendData;
+  /** Performance insights and recommendations */
+  insights: SystemInsight[];
+}
+
+/**
+ * TimeSeriesData - Migrated from typeSystemDashboard.ts
+ */
+export interface TimeSeriesData {
+  timestamp: number;
+  value: number;
+  label?: string;
+}
+
+/**
+ * FeeAlert - Migrated from monitoring.ts
+ */
+export interface FeeAlert {
+  id: string;
+  type:
+    | "source_failure"
+    | "high_failure_rate"
+    | "slow_response"
+    | "fallback_usage";
+  source: string;
+  message: string;
+  timestamp: number;
+  severity: "low" | "medium" | "high" | "critical";
+  resolved: boolean;
+}
+
+/**
+ * TypeSafetyReport - Migrated from astAnalyzer.ts
+ */
+export interface TypeSafetyReport {
+  /** Report generation timestamp */
+  timestamp: number;
+  /** Project-wide type coverage statistics */
+  coverage: TypeCoverageStats;
+  /** Domain-specific type validation results */
+  domainValidation: DomainTypeValidation;
+  /** Type safety violations found */
+  violations: TypeSafetyViolation[];
+  /** Import pattern analysis */
+  importAnalysis: ImportPatternAnalysis;
+  /** Regression analysis compared to previous runs */
+  regressionAnalysis?: TypeSafetyRegression;
+  /** Overall type safety score (0-100) */
+  safetyScore: number;
+}
+
+/**
+ * TypeCoverageAnalysis - Migrated from coverageAnalyzer.ts
+ */
+export interface TypeCoverageAnalysis {
+  /** Analysis timestamp */
+  timestamp: number;
+  /** Overall coverage statistics */
+  overall: CoverageStats;
+  /** Coverage by directory */
+  byDirectory: Record<string, CoverageStats>;
+  /** Coverage by file type */
+  byFileType: Record<string, CoverageStats>;
+  /** Files with lowest coverage */
+  lowCoverageFiles: FileCoverageInfo[];
+  /** Type annotation recommendations */
+  recommendations: TypeRecommendation[];
+  /** Trend analysis compared to previous runs */
+  trend?: CoverageTrend;
+}
+
+/**
+ * StampAttachInput - Migrated from stampattach.ts
+ */
+export interface StampAttachInput {
+  address: string;
+  identifier: string; // cpid, stamp number, or tx_hash
+  quantity: number;
+  options:
+    & Omit<ComposeAttachOptions, "inputs_set" | "fee_per_kb" | "sat_per_vbyte">
+    & {
+      fee_per_kb?: number; // Kept for backward compatibility if client sends it
+      satsPerVB?: number; // Preferred fee rate input
+      service_fee?: number; // Optional service fee amount in sats
+      service_fee_address?: string; // Optional service fee address
+      allow_unconfirmed_inputs?: boolean; // For sequence number
+    };
+  inputs_set?: string; // txid:vout format - moved to top level for clarity
+  service_fee?: number; // Allow top-level override
+  service_fee_address?: string; // Allow top-level override
+}
 
 /**
  * Type guard for stamp transaction relationships

@@ -193,6 +193,406 @@ export interface DispenserRow {
  * Basic pagination interface for paginated responses
  */
 export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+/**
+ * DetailedUTXO - Migrated from fee-estimation.ts
+ */
+export interface DetailedUTXO extends BasicUTXO {
+  /** Number of confirmations for this UTXO */
+  confirmations: number;
+  /** Block height when this UTXO was created */
+  blockHeight: number;
+  /** Script type (P2WPKH, P2SH, P2PKH, etc.) */
+  scriptType: string;
+  /** Raw script public key */
+  scriptPubKey: string;
+  /** Witness data if applicable */
+  witness?: string[];
+  /** Ancestor transaction information for fee calculation */
+  ancestors?: {
+    count: number;
+    size: number;
+    fees: number;
+  };
+  /** Additional metadata for optimization */
+  metadata?: {
+    isOptimal: boolean;
+    selectionPriority: number;
+    estimatedInputSize: number;
+  };
+}
+
+/**
+ * UtxoSelectionStrategy - Migrated from fee-estimation.ts
+ */
+export type UtxoSelectionStrategy =
+  | "largest-first"
+  | "smallest-first"
+  | "random"
+  | "optimal";
+
+/**
+ * GetRawTx - Migrated from quicknode.d.ts
+ */
+export interface GetRawTx {
+  (txHash: string): Promise<any>;
+}
+
+/**
+ * GetDecodedTx - Migrated from quicknode.d.ts
+ */
+export interface GetDecodedTx {
+  (txHex: string): Promise<any>;
+}
+
+/**
+ * GetTransaction - Migrated from quicknode.d.ts
+ */
+export interface GetTransaction {
+  (txHash: string): Promise<any>;
+}
+
+/**
+ * UTXOFromBlockCypher - Migrated from utils.d.ts
+ */
+export interface UTXOFromBlockCypher {
+  tx_hash: string;
+  block_height: number;
+  tx_input_n: number;
+  tx_output_n: number;
+  value: number;
+  ref_balance: number;
+  spent: boolean;
+  confirmations: number;
+  confirmed: Date;
+  double_spend: boolean;
+  script: string;
+  size: number;
+}
+
+/**
+ * UTXOFromBlockchain - Migrated from utils.d.ts
+ */
+export interface UTXOFromBlockchain {
+  tx_hash_big_endian: string;
+  tx_hash: string;
+  tx_output_n: number;
+  script: string;
+  value: number;
+  value_hex: string;
+  confirmations: number;
+  tx_index: number;
+}
+
+/**
+ * TransactionInput - Migrated from utils.d.ts
+ */
+export interface TransactionInput {
+  txid: string;
+  vout: number;
+  scriptSig: string;
+  sequence: number;
+  witness?: string[];
+}
+
+/**
+ * TransactionOutput - Migrated from utils.d.ts
+ */
+export interface TransactionOutput {
+  value: number;
+  scriptPubKey: string;
+  address?: string;
+  scriptType?: ScriptType;
+}
+
+/**
+ * UTXOSelectionStrategy - Migrated from utils.d.ts
+ */
+export type UTXOSelectionStrategy =
+  | "largest-first"
+  | "smallest-first"
+  | "random"
+  | "optimal";
+
+/**
+ * UTXOTableSchema - Migrated from server.type.test.ts
+ */
+export interface UTXOTableSchema {
+  id: number;
+  txid: string;
+  vout: number;
+  address: string;
+  script: string;
+  value: number;
+  confirmations: number;
+  spent: boolean;
+  spent_by_txid?: string | null;
+  spent_by_vin?: number | null;
+  block_index: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * Transaction - Migrated from server.type.test.ts
+ */
+export interface Transaction {
+  query<T>(sql: string, params?: any[]): Promise<QueryResult<T>>;
+  commit(): Promise<void>;
+  rollback(): Promise<void>;
+}
+
+/**
+ * UTXOFixture - Migrated from utxoFixtures.ts
+ */
+export interface UTXOFixture {
+  txid: string;
+  vout: number;
+  value: bigint;
+  script: string; // Hex string for script buffer
+  address: string;
+  scriptType: "p2pkh" | "p2sh" | "p2wpkh" | "p2wsh" | "p2tr";
+  witnessUtxo: {
+    script: string; // Hex string for script buffer
+    value: bigint;
+  };
+  redeemScript?: string; // Hex string for P2SH redeem script
+  witnessScript?: string; // Hex string for P2WSH witness script
+  blockHeight?: number;
+  confirmations?: number;
+  isTestnet?: boolean;
+}
+
+/**
+ * UTXOTestScenario - Migrated from utxoFixtures.ts
+ */
+export interface UTXOTestScenario {
+  name: string;
+  description: string;
+  utxos: UTXOFixture[];
+  expectedBehavior: string;
+}
+
+/**
+ * TxInfo - Migrated from utxoUtils.fixture-based.mock.ts
+ */
+export interface TxInfo {
+  utxo?: UTXO;
+  ancestor?: {
+    fees: number;
+    vsize: number;
+    effectiveRate: number;
+  };
+}
+
+/**
+ * UTXO - Migrated from quicknodeUTXOService.test.ts
+ */
+export interface UTXO {
+  txid: string;
+  vout: number;
+  value: number;
+  script: string;
+  vsize?: number;
+  ancestorCount?: number;
+  ancestorSize?: number;
+  ancestorFees?: number;
+  weight?: number;
+  scriptType?: string;
+  scriptDesc?: string;
+  coinbase?: boolean;
+}
+
+/**
+ * UTXOOptions - Migrated from quicknodeUTXOService.test.ts
+ */
+export interface UTXOOptions {
+  confirmedOnly?: boolean;
+  includeAncestors?: boolean;
+}
+
+/**
+ * QuickNodeUTXO - Migrated from quicknodeUTXOService.test.ts
+ */
+export interface QuickNodeUTXO {
+  txid: string;
+  vout: number;
+  value: string;
+  confirmations: number;
+  height: number;
+  coinbase?: boolean;
+}
+
+/**
+ * ScriptUTXO - Migrated from quicknodeUTXOService.test.ts
+ */
+export interface ScriptUTXO extends QuickNodeUTXO {
+  hex?: string;
+  address?: string;
+  height?: number;
+  confirmations?: number;
+}
+
+/**
+ * TransactionInput - Migrated from StampingTool.tsx
+ */
+export interface TransactionInput {
+  txid: string;
+  vout: number;
+  signingIndex: number;
+}
+
+/**
+ * AssertTxHash - Migrated from typeAssertions.ts
+ */
+export type AssertTxHash<T> = T extends string
+  ? T extends
+    `${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}${string}`
+    ? T
+  : never
+  : never;
+
+/**
+ * MockUTXOOptions - Migrated from testFactories.ts
+ */
+export interface MockUTXOOptions {
+  txid?: string;
+  vout?: number;
+  value?: bigint;
+  script?: string;
+  address?: string;
+  scriptType?: "p2pkh" | "p2sh" | "p2wpkh" | "p2wsh" | "p2tr";
+  blockHeight?: number;
+  confirmations?: number;
+  isTestnet?: boolean;
+}
+
+/**
+ * BasicUTXO - Migrated from TransactionConstructionService.ts
+ */
+export interface BasicUTXO {
+  txid: string;
+  vout: number;
+  value: number;
+  scriptType: "P2WPKH" | "P2SH" | "P2PKH" | "P2WSH";
+  confirmations: number;
+}
+
+/**
+ * DetailedUTXO - Migrated from TransactionConstructionService.ts
+ */
+export interface DetailedUTXO extends BasicUTXO {
+  script: string;
+  witnessData?: string;
+  ancestorDetails?: {
+    size: number;
+    fee: number;
+    count: number;
+  };
+}
+
+/**
+ * InternalTransactionSizeOptions - Migrated from transactionSizes.ts
+ */
+export interface InternalTransactionSizeOptions {
+  inputs: Array<
+    {
+      type: ScriptType;
+      isWitness?: boolean;
+      size?: number;
+      ancestor?: { txid: string; vout: number; weight?: number };
+    }
+  >;
+  outputs: Array<{ type: ScriptType }>;
+  includeChangeOutput?: boolean;
+  changeOutputType?: ScriptType;
+}
+
+/**
+ * TransactionSizeOptions - Migrated from transactionSizeEstimator.ts
+ */
+export interface TransactionSizeOptions {
+  inputs: Array<{
+    type: ScriptType;
+    isWitness?: boolean;
+    size?: number;
+    ancestor?: { txid: string; vout: number; weight?: number };
+  }>;
+  outputs: Array<{ type: ScriptType }>;
+  includeChangeOutput?: boolean;
+  changeOutputType?: ScriptType;
+}
+
+/**
+ * DummyUTXOConfig - Migrated from dummyUtxoGenerator.ts
+ */
+export interface DummyUTXOConfig {
+  targetAmount: number;
+  averageUTXOSize?: number;
+  includeSmallUTXOs?: boolean;
+  includeDustUTXOs?: boolean;
+  scriptType?: "P2WPKH" | "P2PKH" | "P2SH";
+}
+
+/**
+ * TxInfo - Migrated from utxoUtils.ts
+ */
+export interface TxInfo {
+  utxo?: UTXO;
+  ancestor?: {
+    fees: number;
+    vsize: number;
+    effectiveRate: number;
+  };
+}
+
+/**
+ * UTXOWithAncestors - Migrated from [address].ts
+ */
+export interface UTXOWithAncestors {
+  ancestorCount?: number;
+  ancestorFees?: number;
+  ancestorSize?: number;
+}
+
+/**
+ * InternalTransactionSizeOptions - Migrated from transactionSizes.ts
+ */
+export interface InternalTransactionSizeOptions {
+  inputs: Array<
+    {
+      type: ScriptType;
+      isWitness?: boolean;
+      size?: number;
+      ancestor?: { txid: string; vout: number; weight?: number };
+    }
+  >;
+  outputs: Array<{ type: ScriptType }>;
+  includeChangeOutput?: boolean;
+  changeOutputType?: ScriptType;
+}
+
+/**
+ * TxInfo - Migrated from utxoUtils.ts
+ */
+export interface TxInfo {
+  utxo?: UTXO;
+  ancestor?: {
+    fees: number;
+    vsize: number;
+    effectiveRate: number;
+  };
+}
+
+/**
+ * PaginationOptions - Migrated from pagination utilities
+ */
+export interface PaginationOptions {
   /** Current page number (1-based) */
   page: number;
   /** Total number of pages */

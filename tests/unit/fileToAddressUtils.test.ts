@@ -3,7 +3,7 @@
 
 import { FileToAddressUtils } from "$lib/utils/bitcoin/encoding/fileToAddressUtils.ts";
 import { assertEquals, assertExists } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("FileToAddressUtils Test Suite", () => {
   // Test fixtures for file to address conversions

@@ -416,6 +416,23 @@ export interface TokenidSrc101ResponseBody {
 }
 
 // =============================================================================
+
+/**
+ * SRC101TransactionOptions - Migrated from toolEndpointAdapter.ts
+ */
+export interface SRC101TransactionOptions extends TransactionOptions {
+  /** SRC-101 operation type */
+  op: "deploy" | "mint" | "transfer";
+  /** Root domain name */
+  root?: string;
+  /** Subdomain name */
+  name?: string;
+  /** Amount to transfer */
+  amt?: string;
+  /** Destination address (for transfer) */
+  destinationAddress?: string;
+}
+
 // Legacy Compatibility Types
 // =============================================================================
 

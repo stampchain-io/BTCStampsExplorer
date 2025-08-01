@@ -1,11 +1,9 @@
 import { Icon } from "$icon";
-import type { MaraSuccessMessageProps } from "$types/ui.d.ts";
+import type { MaraSuccessMessageProps, TransactionState } from "$types/ui.d.ts";
 import type { TransactionBadgeProps } from "$types/ui.d.ts";
 import type { TransactionStatusProps } from "$types/ui.d.ts";
 import { buttonPurpleFlat } from "$button";
 import { useEffect, useRef, useState } from "preact/hooks";
-
-export type TransactionState = "submitted" | "pending" | "confirmed" | "failed";
 
 export function TransactionStatus({
   state,

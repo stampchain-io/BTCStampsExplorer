@@ -2,26 +2,13 @@
 
 import { CollectionDetailContent } from "$content";
 import { FreshContext, Handlers } from "$fresh/server.ts";
+import type { CollectionDetailsPageProps } from "$types/ui.d.ts";
 
 import { CollectionDetailHeader } from "$header";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 /* ===== TYPES ===== */
-type CollectionDetailsPageProps = {
-  data: {
-    id: string;
-    collection: any;
-    stamps: StampRow[];
-    total: number;
-    page: number;
-    pages: number;
-    page_size: number;
-    selectedTab: "all" | "classic" | "posh";
-    sortBy: string;
-    filterBy: string[];
-  };
-};
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {

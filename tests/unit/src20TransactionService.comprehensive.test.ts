@@ -4,8 +4,8 @@
  */
 
 import { assertEquals } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { restore, stub } from "@std/testing/mock";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { restore, stub } from "@std/testing@1.0.14/mock";
 import { SRC20TransactionService } from "$server/services/src20/transactionService.ts";
 // Import from operations directly to avoid circular dependency
 import { SRC20OperationService } from "$server/services/src20/operations/src20Operations.ts";

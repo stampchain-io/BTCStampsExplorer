@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-07-31T23:56:21.335Z",
+  "environment": {
+    "denoVersion": "2.4.2",
+    "platform": "darwin",
+    "memory": 114
+  },
+  "compilation": {
+    "totalTimeMs": 2692.4569170000013,
+    "filesProcessed": 979,
+    "averageTimePerFile": 2.7502113554647614,
+    "errorCount": 12,
+    "warningCount": 0
+  },
+  "importResolution": {
+    "aliasImports": 2533,
+    "relativeImports": 118,
+    "resolutionTimeMs": 918.0190419999999,
+    "treeShakingEffectiveness": 0.9961300309597523
+  },
+  "bundleSize": {
+    "totalSizeBytes": 2383178,
+    "gzippedSizeBytes": 714953,
+    "moduleCount": 286,
+    "unusedExports": [
+      "AssertEqual",
+      "AssertExtends",
+      "AssertAssignable",
+      "AssertTrue",
+      "AssertFalse",
+      "AssertNever",
+      "AssertHasProperty",
+      "AssertLiteral",
+      "Keys",
+      "BITCOIN_ADDRESS_PATTERNS"
+    ]
+  },
+  "memory": {
+    "peakUsageMB": 101,
+    "averageUsageMB": 75.5,
+    "gcCollections": 0
+  }
+}

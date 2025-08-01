@@ -1,10 +1,8 @@
 /* ===== VIEW ALL BUTTON COMPONENT ===== */
 import { Button } from "$button";
+import type { ViewAllButtonProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-type ViewAllButtonProps = {
-  href: string;
-};
 
 /* ===== COMPONENT ===== */
 export function ViewAllButton({ href }: ViewAllButtonProps) {

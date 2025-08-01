@@ -1,3 +1,4 @@
+import type { LoadingState } from "$types/ui.d.ts";
 /* ===== ERROR HANDLING UTILITIES FOR RECENT SALES ===== */
 
 export enum ErrorType {
@@ -26,14 +27,6 @@ export interface ErrorInfo {
   recoverable: boolean;
   retryable: boolean;
   action?: string;
-}
-
-export interface LoadingState {
-  isLoading: boolean;
-  loadingMessage?: string | undefined;
-  progress?: number | undefined;
-  startTime?: Date | undefined;
-  timeout?: number | undefined;
 }
 
 export class ErrorHandlingUtils {

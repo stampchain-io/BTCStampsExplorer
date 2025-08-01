@@ -1,13 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import type { RefObject } from "preact";
+import type { AnimationState } from "$types/ui.d.ts";
 
 // Global animation state
-interface AnimationState {
-  pageVisible: boolean;
-  reducedMotion: boolean;
-  performanceMode: "high" | "medium" | "low";
-}
 
 // Global animation controls
 class AnimationManager {

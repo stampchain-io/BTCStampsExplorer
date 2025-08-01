@@ -6,7 +6,10 @@
 import type { UseSortingConfig } from "$lib/types/sorting.d.ts";
 import { assertEquals, assertExists } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { SortingProvider, useSorting } from "$islands/sorting/SortingProvider.tsx";
+import {
+  SortingProvider,
+  useSorting,
+} from "$islands/sorting/SortingProvider.tsx";
 
 // Mock localStorage for testing
 const mockLocalStorage = {

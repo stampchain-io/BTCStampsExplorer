@@ -8,6 +8,7 @@ import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { showNotification } from "$lib/utils/notificationUtils.ts";
 import axiod from "axiod";
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
+import type { SRC20FormState } from "$types/ui.d.ts";
 
 interface PSBTFees {
   estMinerFee: number;
@@ -22,35 +23,6 @@ interface PSBTFees {
   inputsToSign?: Array<
     { index: number; address?: string; sighashTypes?: number[] }
   >;
-}
-
-interface SRC20FormState {
-  toAddress: string;
-  token: string;
-  amt: string;
-  fee: number;
-  feeError: string;
-  BTCPrice: number;
-  jsonSize: number;
-  apiError: string;
-  toAddressError: string;
-  tokenError: string;
-  amtError: string;
-  max: string;
-  maxError: string;
-  lim: string;
-  limError: string;
-  dec: string;
-  x: string;
-  xError: string;
-  tg: string;
-  web: string;
-  email: string;
-  img: string;
-  description: string;
-  file: File | null;
-  psbtFees?: PSBTFees;
-  maxAmount?: string;
 }
 
 export class SRC20FormController {

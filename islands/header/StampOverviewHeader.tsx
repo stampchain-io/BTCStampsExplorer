@@ -1,20 +1,16 @@
 /* ===== STAMP OVERVIEW HEADER COMPONENT ===== */
 /* TODO (@baba) - update filter and styling */
-import { useState } from "preact/hooks";
 import { FilterButton } from "$islands/button/FilterButton.tsx";
-import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { titlePurpleLD } from "$text";
+import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
 import {
   defaultFilters,
   StampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
-import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
-
-/* ===== TYPES ===== */
-type StampOverviewHeaderProps = {
-  currentFilters?: StampFilters;
-};
+import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
+import { titlePurpleLD } from "$text";
+import type { StampOverviewHeaderProps } from "$types/ui.d.ts";
+import { useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
 export const StampOverviewHeader = (

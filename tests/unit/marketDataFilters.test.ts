@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert/mod.ts";
+import { assertEquals } from "@std/assert";
 
 // Always skip these tests in CI environment - they are integration tests, not unit tests
 // These tests require a real database connection and should only run in development

@@ -1,8 +1,23 @@
-import type { StampRow } from "$types/stamp.d.ts";
+import type { StampRow, CollectionRow, CollectionWithOptionalMarketData, RecentSaleData } from "$types/stamp.d.ts";
+import type { SRC20Row, SRC20TokenSchema, Src101Detail } from "$types/src20.d.ts";
+import type { UTXO, BasicUTXO, DetailedUTXO } from "$types/base.d.ts";
+import type {
+  StampMarketData,
+  SRC20MarketData,
+  CollectionMarketData,
+  MarketDataCacheInfo,
+  CacheStatus,
+} from "$types/marketData.d.ts";
 
 // Orchestration System Types for Type Domain Migration
-export type TaskStatus = 'pending' | 'in-progress' | 'done' | 'deferred' | 'cancelled' | 'review';
-export type TaskPriority = 'high' | 'medium' | 'low';
+export type TaskStatus =
+  | "pending"
+  | "in-progress"
+  | "done"
+  | "deferred"
+  | "cancelled"
+  | "review";
+export type TaskPriority = "high" | "medium" | "low";
 
 export interface MigrationMetrics {
   totalTasks: number;
@@ -14,14 +29,18 @@ export interface MigrationMetrics {
 
 export interface VelocityMetrics {
   tasksPerDay: number;
-  trend: 'increasing' | 'stable' | 'decreasing';
+  trend: "increasing" | "stable" | "decreasing";
   projectedCompletion: string;
 }
 
 export interface CompletionBlocker {
   id: string;
-  type: 'dependency-cycle' | 'resource-constraint' | 'external-dependency' | 'complexity-overload';
-  severity: 'high' | 'medium' | 'low';
+  type:
+    | "dependency-cycle"
+    | "resource-constraint"
+    | "external-dependency"
+    | "complexity-overload";
+  severity: "high" | "medium" | "low";
   description: string;
   estimatedDelay: string;
   mitigationStrategy: string;
@@ -39,7 +58,7 @@ export interface MomentumIndicator {
 export interface TaskMasterUpdate {
   type: string;
   data?: any;
-  priority?: 'high' | 'medium' | 'low';
+  priority?: "high" | "medium" | "low";
   urgent?: boolean;
   timestamp?: number;
   integrationId?: string;
@@ -53,7 +72,7 @@ export interface OrchestrationEvent {
 
 export interface TypeModuleStatus {
   name: string;
-  migrationStatus: 'pending' | 'in-progress' | 'completed' | 'validated';
+  migrationStatus: "pending" | "in-progress" | "completed" | "validated";
   productionReady: boolean;
   validationErrors: string[];
 }

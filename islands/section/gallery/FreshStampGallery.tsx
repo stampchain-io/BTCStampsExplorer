@@ -5,7 +5,7 @@
  */
 
 import type { StampRow } from "$types/stamp.d.ts";
-import type { FreshStampGalleryProps } from "$types/ui.d.ts";
+import type { FreshStampGalleryProps, PaginationState } from "$types/ui.d.ts";
 import { LoadingIcon } from "$icon";
 import { StampCard } from "$islands/card/StampCard.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
@@ -17,13 +17,6 @@ interface FreshNavigationOptions {
   usePartial?: boolean;
   scrollTarget?: string;
   updateUrl?: boolean;
-}
-
-interface PaginationState {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
 }
 
 // ===== MAIN COMPONENT =====

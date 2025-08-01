@@ -671,11 +671,12 @@ export class ProgressiveCompletionTracker extends EventTarget {
 
   private generateCompletionProjections(): CompletionProjections {
     const velocity = this.calculateVelocityMetrics();
-    
+
     // Get current completion rate directly without causing circular reference
-    const currentCompletion = this.snapshots.length > 0 
+    const currentCompletion = this.snapshots.length > 0
       ? this.snapshots[this.snapshots.length - 1].taskCompletion.completionRate
-      : (ProgressiveCompletionTracker.CURRENT_TASK_COMPLETED / ProgressiveCompletionTracker.CURRENT_TASK_TOTAL) * 100;
+      : (ProgressiveCompletionTracker.CURRENT_TASK_COMPLETED /
+        ProgressiveCompletionTracker.CURRENT_TASK_TOTAL) * 100;
 
     if (velocity.averageVelocity <= 0) {
       return {
@@ -799,7 +800,7 @@ export class ProgressiveCompletionTracker extends EventTarget {
 
     // Generate basic recommendations without circular dependency
     const recommendedActions: OrchestrationAction[] = [];
-    
+
     // Add basic specialist reallocation if overloaded
     if (overloadedSpecialists.length > 0) {
       recommendedActions.push({
@@ -809,7 +810,9 @@ export class ProgressiveCompletionTracker extends EventTarget {
         description: "Reallocate specialist workload",
         expectedImpact: 3.0,
         estimatedEffort: 2,
-        targetBottlenecks: bottlenecks.filter(b => b.type === "specialist_capacity").map(b => b.id),
+        targetBottlenecks: bottlenecks.filter((b) =>
+          b.type === "specialist_capacity"
+        ).map((b) => b.id),
       });
     }
 

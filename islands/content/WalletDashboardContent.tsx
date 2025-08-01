@@ -1,5 +1,15 @@
 /* ===== WALLET DASHBOARD CONTENT COMPONENT ===== */
 import type { StampRow } from "$types/stamp.d.ts";
+import type { Dispenser } from "$types/services.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { CollectionRow } from "$types/stamp.d.ts";
+import type {
+  StampMarketData,
+  SRC20MarketData,
+  CollectionMarketData,
+  MarketDataCacheInfo,
+  CacheStatus,
+} from "$types/marketData.d.ts";
 import { Icon, LoadingIcon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";

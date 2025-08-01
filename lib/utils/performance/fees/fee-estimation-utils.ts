@@ -9,6 +9,7 @@
 
 import type { FeeDetails } from "$types/base.d.ts";
 import type { ProgressiveFeeEstimationResult } from "$types/fee-estimation.ts";
+import type { ProgressiveFeeEstimationProps } from "$types/ui.d.ts";
 
 /**
  * Maps progressive fee estimation result to FeeDetails interface
@@ -57,16 +58,6 @@ export function mapProgressiveFeeDetails(
  * Common progressive fee estimation props for FeeCalculatorBase
  * Ensures consistent props across all tools
  */
-export interface ProgressiveFeeEstimationProps {
-  isEstimating?: boolean;
-  isPreFetching?: boolean;
-  currentPhase?: "instant" | "cached" | "exact";
-  phase1Result?: ProgressiveFeeEstimationResult | null;
-  phase2Result?: ProgressiveFeeEstimationResult | null;
-  phase3Result?: ProgressiveFeeEstimationResult | null;
-  feeEstimationError?: Error | null;
-  clearError?: () => void;
-}
 
 /**
  * Extracts progressive fee estimation props from hook result

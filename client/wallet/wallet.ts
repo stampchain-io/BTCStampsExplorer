@@ -1,3 +1,4 @@
+import type { WalletContext } from "$types/ui.d.ts";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
@@ -29,26 +30,6 @@ interface WalletProviders {
   tapwallet?: any;
   phantom?: any;
   HorizonWalletProvider?: any;
-}
-
-interface WalletContext {
-  readonly wallet: Wallet;
-  readonly isConnected: boolean;
-  updateWallet: (wallet: Wallet) => void;
-  getBasicStampInfo: (address: string) => Promise<any>;
-  disconnect: () => void;
-  signMessage: (message: string) => Promise<any>;
-  signPSBT: (
-    wallet: Wallet,
-    psbt: string,
-    inputsToSign: any[],
-    enableRBF?: boolean,
-    sighashTypes?: number[],
-    autoBroadcast?: boolean,
-  ) => Promise<any>;
-  broadcastRawTX: (rawTx: string) => Promise<any>;
-  broadcastPSBT: (psbtHex: string) => Promise<any>;
-  showConnectModal: () => void;
 }
 
 // Initialize wallet state

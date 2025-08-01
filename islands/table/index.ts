@@ -5,7 +5,6 @@ export * from "$components/table/src20DataTable/SRC20Mints.tsx";
 
 export * from "$components/table/stampDataTable/StampListingsAll.tsx";
 export { StampListingsOpenTable } from "$components/table/stampDataTable/StampListingsOpen.tsx";
-export type { Dispenser } from "$components/table/stampDataTable/StampListingsOpen.tsx";
 export * from "$components/table/stampDataTable/StampSales.tsx";
 export * from "$components/table/stampDataTable/StampTransfers.tsx";
 

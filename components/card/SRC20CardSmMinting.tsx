@@ -2,13 +2,13 @@
 import { Button } from "$button";
 import type { SRC20CardSmMintingProps } from "$types/ui.d.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import type { EnrichedSRC20Row } from "$types/src20.d.ts";
+// SRC20 card component for minting state
 import {
   containerCardTable,
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
-  Timeframe,
+  // Timeframe - removed unused import
 } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";

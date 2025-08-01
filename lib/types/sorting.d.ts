@@ -5,6 +5,13 @@
  */
 
 import { JSX } from "preact";
+import type {
+  EnhancedSortState,
+  SortingComponentProps,
+  SortState,
+  StampSortingProps,
+  WalletSortingProps,
+} from "$types/ui.d.ts";
 
 // ===== CORE SORTING TYPES =====
 
@@ -98,18 +105,6 @@ export interface StampSortOption extends SortOption<StampSortKey> {
  * Current sort state
  * @template T - The sort key type
  */
-export interface SortState<T extends SortKey = SortKey> {
-  /** Currently selected sort key */
-  readonly sortBy: T;
-  /** Sort direction (derived from sortBy but explicit for state management) */
-  readonly direction: SortDirection;
-  /** Whether sorting is currently in progress */
-  readonly isLoading?: boolean;
-  /** Any error that occurred during sorting */
-  readonly error?: string | null;
-  /** Timestamp of last sort operation */
-  readonly lastSorted?: Date | undefined;
-}
 
 /**
  * Sort configuration for different page types
@@ -136,53 +131,14 @@ export interface SortConfig<T extends SortKey = SortKey> {
  * Props for the base sorting component
  * @template T - The sort key type
  */
-export interface SortingComponentProps<T extends SortKey = SortKey> {
-  /** Current sort state */
-  readonly currentSort: SortState<T>;
-  /** Available sort options */
-  readonly sortOptions: ReadonlyArray<SortOption<T>>;
-  /** Callback when sort changes */
-  readonly onSortChange: (sortBy: T) => void;
-  /** Whether the component is in loading state */
-  readonly isLoading?: boolean;
-  /** Optional CSS class name */
-  readonly className?: string;
-  /** Optional test ID for testing */
-  readonly testId?: string;
-  /** Whether the dropdown is disabled */
-  readonly disabled?: boolean;
-  /** Placeholder text when no option is selected */
-  readonly placeholder?: string;
-  /** Whether to show sort direction indicators */
-  readonly showDirection?: boolean;
-  /** Custom render function for options */
-  readonly renderOption?: (option: SortOption<T>) => JSX.Element;
-}
 
 /**
  * Props for wallet-specific sorting component
  */
-export interface WalletSortingProps
-  extends SortingComponentProps<WalletSortKey> {
-  /** Whether market data is available */
-  readonly hasMarketData?: boolean;
-  /** Whether UTXO data is available */
-  readonly hasUTXOData?: boolean;
-  /** Callback when market data is required but unavailable */
-  readonly onMarketDataRequired?: () => void;
-}
 
 /**
  * Props for stamp-specific sorting component
  */
-export interface StampSortingProps extends SortingComponentProps<StampSortKey> {
-  /** Whether to prefer database sorting */
-  readonly preferDbSort?: boolean;
-  /** Total number of items being sorted */
-  readonly totalItems?: number;
-  /** Whether large dataset optimizations are enabled */
-  readonly optimizeForLargeDataset?: boolean;
-}
 
 // ===== HOOK INTERFACES =====
 
@@ -490,23 +446,6 @@ export type SortAction<T extends SortKey = SortKey> =
 /**
  * Enhanced sort state with persistence and URL sync
  */
-export interface EnhancedSortState<T extends SortKey = SortKey>
-  extends SortState<T> {
-  /** Whether URL sync is enabled */
-  readonly urlSyncEnabled: boolean;
-  /** Whether localStorage persistence is enabled */
-  readonly persistenceEnabled: boolean;
-  /** Performance metrics */
-  readonly metrics: SortMetrics | undefined;
-  /** History of recent sorts */
-  readonly sortHistory: ReadonlyArray<T>;
-  /** Cache state */
-  readonly cache: {
-    readonly hits: number;
-    readonly misses: number;
-    readonly size: number;
-  };
-}
 
 /**
  * Sort reducer function type

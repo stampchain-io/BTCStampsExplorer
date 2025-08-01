@@ -9,26 +9,19 @@ import { TEXT_STYLES } from "$card";
 import type { SortOption, UseSortingConfig } from "$lib/types/sorting.d.ts";
 import { SortingComponent } from "$islands/sorting/SortingComponent.tsx";
 import { SortingProvider } from "$islands/sorting/SortingProvider.tsx";
+import type {
+  CompleteSortingInterfaceProps,
+  StyledSortingButtonsProps,
+  StyledSortingDropdownProps,
+  StyledSortingErrorProps,
+  StyledSortingLabelProps,
+} from "$types/ui.d.ts";
 
 // ===== STYLED SORTING COMPONENTS =====
 
 /**
  * Props for StyledSortingDropdown
  */
-interface StyledSortingDropdownProps {
-  /** Available sort options */
-  options: ReadonlyArray<SortOption>;
-  /** Additional CSS classes */
-  className?: string;
-  /** Placeholder text */
-  placeholder?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Size variant */
-  size?: "sm" | "md" | "lg";
-  /** Whether to show loading state */
-  showLoading?: boolean;
-}
 
 /**
  * StyledSortingDropdown - Dropdown with BTCStampsExplorer styling
@@ -74,22 +67,6 @@ function StyledSortingDropdown({
 /**
  * Props for StyledSortingButtons
  */
-interface StyledSortingButtonsProps {
-  /** Available sort options */
-  options: ReadonlyArray<SortOption>;
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Button variant */
-  variant?: "primary" | "secondary" | "ghost";
-  /** Button size */
-  size?: "sm" | "md" | "lg";
-  /** Whether to show icons */
-  showIcons?: boolean;
-  /** Whether to show loading state */
-  showLoading?: boolean;
-}
 
 /**
  * StyledSortingButtons - Button group with BTCStampsExplorer styling
@@ -183,18 +160,6 @@ function StyledSortingButtons({
 /**
  * Props for StyledSortingLabel
  */
-interface StyledSortingLabelProps {
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Label style variant */
-  variant?: "default" | "compact" | "detailed";
-  /** Whether to show direction indicator */
-  showDirection?: boolean;
-  /** Whether to show loading state */
-  showLoading?: boolean;
-}
 
 /**
  * StyledSortingLabel - Label with BTCStampsExplorer styling
@@ -245,18 +210,6 @@ function StyledSortingLabel({
 /**
  * Props for StyledSortingError
  */
-interface StyledSortingErrorProps {
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Custom error message */
-  message?: string;
-  /** Whether to show retry button */
-  showRetry?: boolean;
-  /** Custom retry handler */
-  onRetry?: () => void;
-}
 
 /**
  * StyledSortingError - Error display with BTCStampsExplorer styling
@@ -287,24 +240,6 @@ function StyledSortingError({
 /**
  * Props for CompleteSortingInterface
  */
-interface CompleteSortingInterfaceProps {
-  /** Sorting configuration */
-  config: UseSortingConfig;
-  /** Available sort options */
-  options: ReadonlyArray<SortOption>;
-  /** UI variant */
-  variant?: "dropdown" | "buttons" | "hybrid";
-  /** Size variant */
-  size?: "sm" | "md" | "lg";
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Whether to show current sort label */
-  showLabel?: boolean;
-  /** Whether to show error messages */
-  showError?: boolean;
-}
 
 /**
  * CompleteSortingInterface - Complete sorting UI with provider

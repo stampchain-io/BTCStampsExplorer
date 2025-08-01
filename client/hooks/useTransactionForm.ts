@@ -8,26 +8,10 @@ import { logger } from "$lib/utils/logger.ts";
 import { FeeDetails } from "$lib/types/base.d.ts";
 import axiod from "axiod";
 import { debounce } from "$lib/utils/performance/debounce.ts";
-
-interface TransactionFormState {
-  fee: number;
-  feeError: string;
-  BTCPrice: number;
-  recipientAddress?: string;
-  addressError?: string;
-  amount?: string;
-  amountError?: string;
-  assetId?: string;
-  estimatedTxFees: FeeDetails | null;
-  apiError: string | null;
-}
-
-interface UseTransactionFormProps {
-  type: "send" | "transfer" | "buy";
-  initialFee?: number;
-  initialAssetId?: string;
-  initialAmount?: string;
-}
+import type {
+  TransactionFormState,
+  UseTransactionFormProps,
+} from "$types/ui.d.ts";
 
 interface DebouncedCallParams {
   sourceAddress: string;

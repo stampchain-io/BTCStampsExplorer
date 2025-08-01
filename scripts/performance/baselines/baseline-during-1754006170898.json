@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-07-31T23:56:10.897Z",
+  "version": "1.0.0",
+  "branch": "feature/type-domain-migration",
+  "commitHash": "6d2f6649f92b7a3ca21cc7930a7589c5fa308630",
+  "migration": {
+    "phase": "during",
+    "aliasImportPercentage": 44.726301735647525,
+    "domainMigrationProgress": 94.87870619946092
+  },
+  "performance": {
+    "typeCheckTimeMs": 3052.067583,
+    "buildTimeMs": 6624.638541,
+    "bundleSizeKB": 7529,
+    "memoryUsageMB": 100,
+    "importResolutionMs": 739.8817500000005
+  },
+  "codeMetrics": {
+    "totalFiles": 979,
+    "typeDefinitionFiles": 24,
+    "aliasImports": 2533,
+    "relativeImports": 118,
+    "globalTypeUsage": 19,
+    "domainTypeUsage": 352
+  }
+}

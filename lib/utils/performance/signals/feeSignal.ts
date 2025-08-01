@@ -9,6 +9,7 @@ import {
   recordFeeSuccess,
 } from "$lib/utils/monitoring/metrics/monitoring.ts";
 import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
+import type { FeeState } from "$types/ui.d.ts";
 
 // Fee data interface matching the API response with enhanced metadata
 export interface FeeData {
@@ -29,14 +30,6 @@ export interface FeeData {
 }
 
 // Fee state interface
-interface FeeState {
-  data: FeeData | null;
-  loading: boolean;
-  lastUpdated: number | null;
-  error: string | null;
-  retryCount: number;
-  lastKnownGoodData: FeeData | null; // Keep last successful data
-}
 
 // Initial state
 const initialFeeState: FeeState = {

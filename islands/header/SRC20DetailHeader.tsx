@@ -1,9 +1,7 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
-import type { MarketListingAggregated } from "$types/marketData.d.ts";
 import { Icon } from "$icon";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
-import type { AlignmentType } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import {
   abbreviateAddress,
@@ -12,24 +10,7 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelSm, titleGreyLD, valueSm } from "$text";
-import type { SRC20MintStatus } from "$types/src20.d.ts";
-
-/* ===== TYPES ===== */
-export interface SRC20DetailHeaderProps {
-  deployment: Deployment & {
-    email?: string;
-    web?: string;
-    tg?: string;
-    x?: string;
-    stamp_url?: string;
-    deploy_img?: string;
-  };
-  _mintStatus: SRC20MintStatus;
-  _totalMints: number;
-  _totalTransfers: number;
-  marketInfo?: MarketListingAggregated;
-  _align?: AlignmentType;
-}
+import type { SRC20DetailHeaderProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
 export function SRC20DetailHeader({

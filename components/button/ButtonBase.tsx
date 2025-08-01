@@ -2,6 +2,11 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { JSX } from "preact";
 import { button, ButtonProps, buttonStyles } from "$button";
+import type {
+  ExtendedButtonProps,
+  ExtendedIconButtonProps,
+  ExtendedProcessingButtonProps,
+} from "$types/ui.d.ts";
 
 /* ===== SUBCOMPONENTS - @baba - duplicate of loaderSpin in layout/styles.ts ===== */
 const LoadingSpinner = () => (
@@ -56,13 +61,6 @@ const getCommonButtonProps = ({
 });
 
 /* ===== TYPES ===== */
-type ExtendedButtonProps = ButtonProps & {
-  isActive?: boolean;
-  type?: "button" | "submit" | "reset";
-  ref?:
-    | JSX.HTMLAttributes<HTMLButtonElement>["ref"]
-    | JSX.HTMLAttributes<HTMLAnchorElement>["ref"];
-};
 
 /* ===== COMPONENT ===== */
 export function Button({
@@ -159,9 +157,6 @@ export function Button({
 }
 
 /* ===== TYPES ===== */
-type ExtendedIconButtonProps = ExtendedButtonProps & {
-  isLoading?: boolean;
-};
 
 /* ===== ICON BUTTON COMPONENT ===== */
 export function ButtonIcon({
@@ -223,10 +218,6 @@ export function ButtonIcon({
 }
 
 /* ===== TYPES ===== */
-type ExtendedProcessingButtonProps = ExtendedButtonProps & {
-  isSubmitting: boolean;
-  type?: "button" | "submit" | "reset";
-};
 
 /* ===== PROCESSING BUTTON COMPONENT ===== */
 export function ButtonProcessing({

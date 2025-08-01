@@ -12,9 +12,16 @@ import type {
 } from "$lib/types/sorting.d.ts";
 import { createContext } from "preact";
 import { useContext, useEffect, useMemo } from "preact/hooks";
-import { SortingProvider, useSorting } from "$islands/sorting/SortingProvider.tsx";
+import {
+  SortingProvider,
+  useSorting,
+} from "$islands/sorting/SortingProvider.tsx";
 import type { URLSyncConfig } from "$islands/sorting/hooks/useSortingURL.tsx";
 import { useSortingURL } from "$islands/sorting/hooks/useSortingURL.tsx";
+import type {
+  ConvenienceProviderProps,
+  SortingProviderWithURLProps,
+} from "$types/ui.d.ts";
 
 // ===== TYPES =====
 
@@ -29,16 +36,6 @@ export interface SortingProviderWithURLConfig extends UseSortingConfig {
 /**
  * Props for SortingProviderWithURL
  */
-interface SortingProviderWithURLProps {
-  /** Child components */
-  children: preact.ComponentChildren;
-  /** Sorting configuration with URL sync */
-  config: SortingProviderWithURLConfig;
-  /** Optional initial sort state */
-  initialState?: Partial<SortState<SortKey>>;
-  /** Optional test ID for testing */
-  testId?: string;
-}
 
 /**
  * Context value for URL-aware sorting
@@ -199,14 +196,6 @@ export function useSortingURLUtils() {
 /**
  * Props for convenience providers
  */
-interface ConvenienceProviderProps {
-  /** Child components */
-  children: preact.ComponentChildren;
-  /** Default sort value */
-  defaultSort?: SortKey;
-  /** Optional test ID */
-  testId?: string;
-}
 
 /**
  * Wallet-specific sorting provider with URL sync

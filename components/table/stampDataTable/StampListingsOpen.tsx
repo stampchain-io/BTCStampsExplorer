@@ -1,4 +1,5 @@
 import type { StampListingsOpenProps } from "$types/ui.d.ts";
+import type { Dispenser } from "$types/services.d.ts";
 import {
   formatNumber,
   formatSatoshisToBTC,
@@ -6,18 +7,6 @@ import {
 import { rowTable, ScrollContainer } from "$layout";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { labelXs, valueSm } from "$text";
-
-export interface Dispenser {
-  source: string;
-  give_remaining: number;
-  escrow_quantity: number;
-  give_quantity: number;
-  satoshirate: number;
-  confirmed: boolean;
-  close_block_index: number;
-  block_index?: number;
-  isSelected?: boolean;
-}
 
 export function StampListingsOpenTable({
   dispensers,

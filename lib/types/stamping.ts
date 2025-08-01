@@ -1,16 +1,17 @@
+import type { BaseTransaction } from "$types/utils.d.ts";
 import type { TransactionInput, TransactionOutput } from "$types/base.d.ts";
+import type {
+  DeployProps,
+  SRC20MintingProps,
+  StampingProps,
+  TransferProps,
+} from "$types/ui.d.ts";
 
 // Import StampRow and SRC20Row from domain types
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 
 // Base transaction interface with common properties
-interface BaseTransaction {
-  block_index: number;
-  tx_hash: string;
-  inputs: TransactionInput[];
-  outputs: TransactionOutput[];
-}
 
 // For StampCard transactions - extend both StampRow and BaseTransaction
 export interface StampTransaction extends StampRow, BaseTransaction {
@@ -25,18 +26,3 @@ export interface SRC20Transaction extends SRC20Row, BaseTransaction {
 }
 
 // Props interfaces for each component
-export interface StampingProps {
-  transactions: StampTransaction[];
-}
-
-export interface SRC20MintingProps {
-  transactions: SRC20Transaction[];
-}
-
-export interface TransferProps {
-  transactions: StampTransaction[];
-}
-
-export interface DeployProps {
-  transactions: StampTransaction[];
-}

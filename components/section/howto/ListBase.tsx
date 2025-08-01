@@ -1,13 +1,8 @@
 /* ===== LIST COMPONENT ===== */
 import { headingGrey, text } from "$text";
-import type { SharedListProps } from "$types/ui.d.ts";
+import type { ListProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-export interface ListProps {
-  title: string;
-  image: string;
-  description: string | string[];
-}
 
 /* ===== HELPERS ===== */
 const formatLines = (text: string) => {

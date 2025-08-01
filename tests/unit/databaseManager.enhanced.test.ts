@@ -5,7 +5,7 @@
  */
 
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
-import { describe, it, beforeEach, afterEach, beforeAll, afterAll } from "@std/testing/bdd";
+import { describe, it, beforeEach, afterEach, beforeAll, afterAll } from "jsr:@std/testing@1.0.14/bdd";
 
 // Mock console to reduce noise
 const originalConsole = {

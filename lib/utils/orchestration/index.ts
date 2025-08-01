@@ -92,27 +92,27 @@ export {
 
 // Task 38.6 - Task Master AI Integration
 export {
+  type OrchestrationEvent,
   TaskMasterIntegration,
   type TaskMasterUpdate,
-  type OrchestrationEvent
 } from "./TaskMasterIntegration.ts";
 
 // Task 38.7 - Maximum Velocity Maintenance
 export {
+  type CompletionBlocker,
+  type MomentumIndicator,
   VelocityMaintainer,
   type VelocityMaintainerConfig,
   type VelocityMetrics,
-  type CompletionBlocker,
-  type MomentumIndicator
 } from "./VelocityMaintainer.ts";
 
 // Task 38.8 - Type Module Integration
 export {
-  TypeModuleIntegrator,
+  type DependencyGraph,
+  type ParallelMigrationConfig,
   type TypeModule,
+  TypeModuleIntegrator,
   type TypeModuleIntegratorConfig,
   type TypeModuleStatus,
-  type DependencyGraph,
   type ValidationResult,
-  type ParallelMigrationConfig
 } from "./TypeModuleIntegrator.ts";

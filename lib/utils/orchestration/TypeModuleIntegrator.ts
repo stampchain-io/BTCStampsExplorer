@@ -1,26 +1,26 @@
 /**
  * Type Module Integration System
- * 
- * Integrates with all existing type modules (base, stamp, src20, src101, transaction, 
+ *
+ * Integrates with all existing type modules (base, stamp, src20, src101, transaction,
  * fee, wallet, marketData, services, api, errors, pagination, sorting, utils, ui),
  * adds dependency resolution tracking, implements parallel migration support,
  * and validates production readiness.
  */
 
-import type { 
-  MigrationMetrics,
-  TypeModuleStatus,
+import type {
   DependencyGraph,
+  MigrationMetrics,
+  ParallelMigrationConfig,
+  TypeModuleStatus,
   ValidationResult,
-  ParallelMigrationConfig
-} from '@/lib/types/services.d.ts';
+} from "@/lib/types/services.d.ts";
 
 export interface TypeModule {
   name: string;
   path: string;
   dependencies: string[];
   exports: string[];
-  migrationStatus: 'pending' | 'in-progress' | 'completed' | 'validated';
+  migrationStatus: "pending" | "in-progress" | "completed" | "validated";
   complexity: number;
   lastModified: number;
   validationErrors: string[];
@@ -42,17 +42,31 @@ export class TypeModuleIntegrator {
   private readonly config: TypeModuleIntegratorConfig;
   private readonly typeModules = new Map<string, TypeModule>();
   private readonly dependencyGraph: DependencyGraph = { nodes: [], edges: [] };
-  private readonly migrationQueue: Array<{ moduleId: string; priority: number }> = [];
-  
+  private readonly migrationQueue: Array<
+    { moduleId: string; priority: number }
+  > = [];
+
   private activeMigrations = new Set<string>();
   private migrationResults = new Map<string, ValidationResult>();
   private lastIntegrityCheck = 0;
 
   // Known type modules in the BTCStampsExplorer project
   private readonly KNOWN_TYPE_MODULES = [
-    'base', 'stamp', 'src20', 'src101', 'transaction', 'fee', 
-    'wallet', 'marketData', 'services', 'api', 'errors', 
-    'pagination', 'sorting', 'utils', 'ui'
+    "base",
+    "stamp",
+    "src20",
+    "src101",
+    "transaction",
+    "fee",
+    "wallet",
+    "marketData",
+    "services",
+    "api",
+    "errors",
+    "pagination",
+    "sorting",
+    "utils",
+    "ui",
   ];
 
   constructor(config: Partial<TypeModuleIntegratorConfig> = {}) {
@@ -62,7 +76,7 @@ export class TypeModuleIntegrator {
       dependencyResolutionDepth: 10,
       productionReadinessThreshold: 95,
       migrationBatchSize: 3,
-      ...config
+      ...config,
     };
 
     this.initializeTypeModules();
@@ -86,7 +100,7 @@ export class TypeModuleIntegrator {
 
       console.log(`✅ Initialized ${this.typeModules.size} type modules`);
     } catch (error) {
-      console.error('Failed to initialize type modules:', error);
+      console.error("Failed to initialize type modules:", error);
       throw error;
     }
   }
@@ -97,7 +111,7 @@ export class TypeModuleIntegrator {
   async integrateWithTypeModules(): Promise<{
     modulesDiscovered: number;
     dependenciesResolved: number;
-    integrationStatus: 'complete' | 'partial' | 'failed';
+    integrationStatus: "complete" | "partial" | "failed";
     validationResults: ValidationResult[];
     productionReadiness: number;
   }> {
@@ -115,17 +129,20 @@ export class TypeModuleIntegrator {
       const productionReadiness = this.calculateProductionReadiness();
 
       // Determine integration status
-      const integrationStatus = this.determineIntegrationStatus(validationResults, productionReadiness);
+      const integrationStatus = this.determineIntegrationStatus(
+        validationResults,
+        productionReadiness,
+      );
 
       return {
         modulesDiscovered: this.typeModules.size,
         dependenciesResolved,
         integrationStatus,
         validationResults,
-        productionReadiness
+        productionReadiness,
       };
     } catch (error) {
-      console.error('Failed to integrate with type modules:', error);
+      console.error("Failed to integrate with type modules:", error);
       throw error;
     }
   }
@@ -135,7 +152,9 @@ export class TypeModuleIntegrator {
    */
   async trackDependencyResolution(): Promise<{
     dependencyGraph: DependencyGraph;
-    circularDependencies: Array<{ cycle: string[]; severity: 'warning' | 'error' }>;
+    circularDependencies: Array<
+      { cycle: string[]; severity: "warning" | "error" }
+    >;
     resolutionOrder: string[];
     unresolvedDependencies: Array<{ module: string; missingDeps: string[] }>;
   }> {
@@ -153,10 +172,10 @@ export class TypeModuleIntegrator {
         dependencyGraph: this.dependencyGraph,
         circularDependencies,
         resolutionOrder,
-        unresolvedDependencies
+        unresolvedDependencies,
       };
     } catch (error) {
-      console.error('Failed to track dependency resolution:', error);
+      console.error("Failed to track dependency resolution:", error);
       throw error;
     }
   }
@@ -166,8 +185,12 @@ export class TypeModuleIntegrator {
    */
   async implementParallelMigration(config: ParallelMigrationConfig): Promise<{
     migrationsStarted: number;
-    parallelBatches: Array<{ batchId: string; modules: string[]; estimatedDuration: number }>;
-    migrationTimeline: Array<{ moduleId: string; startTime: number; estimatedCompletion: number }>;
+    parallelBatches: Array<
+      { batchId: string; modules: string[]; estimatedDuration: number }
+    >;
+    migrationTimeline: Array<
+      { moduleId: string; startTime: number; estimatedCompletion: number }
+    >;
     resourceAllocation: Record<string, number>;
   }> {
     try {
@@ -191,10 +214,10 @@ export class TypeModuleIntegrator {
         migrationsStarted,
         parallelBatches,
         migrationTimeline,
-        resourceAllocation
+        resourceAllocation,
       };
     } catch (error) {
-      console.error('Failed to implement parallel migration:', error);
+      console.error("Failed to implement parallel migration:", error);
       throw error;
     }
   }
@@ -205,14 +228,20 @@ export class TypeModuleIntegrator {
   async validateProductionReadiness(): Promise<{
     overallReadiness: number;
     moduleReadiness: Record<string, number>;
-    criticalIssues: Array<{ module: string; issue: string; severity: 'high' | 'medium' | 'low' }>;
+    criticalIssues: Array<
+      { module: string; issue: string; severity: "high" | "medium" | "low" }
+    >;
     recommendations: string[];
-    readinessGates: Array<{ gate: string; passed: boolean; requirements: string[] }>;
+    readinessGates: Array<
+      { gate: string; passed: boolean; requirements: string[] }
+    >;
   }> {
     try {
       // Validate each module
       const moduleReadiness: Record<string, number> = {};
-      const criticalIssues: Array<{ module: string; issue: string; severity: 'high' | 'medium' | 'low' }> = [];
+      const criticalIssues: Array<
+        { module: string; issue: string; severity: "high" | "medium" | "low" }
+      > = [];
 
       for (const [moduleId, module] of this.typeModules) {
         const readiness = await this.validateModuleProductionReadiness(module);
@@ -224,7 +253,10 @@ export class TypeModuleIntegrator {
       const overallReadiness = this.calculateOverallReadiness(moduleReadiness);
 
       // Generate recommendations
-      const recommendations = this.generateReadinessRecommendations(criticalIssues, overallReadiness);
+      const recommendations = this.generateReadinessRecommendations(
+        criticalIssues,
+        overallReadiness,
+      );
 
       // Check readiness gates
       const readinessGates = await this.checkReadinessGates();
@@ -234,10 +266,10 @@ export class TypeModuleIntegrator {
         moduleReadiness,
         criticalIssues,
         recommendations,
-        readinessGates
+        readinessGates,
       };
     } catch (error) {
-      console.error('Failed to validate production readiness:', error);
+      console.error("Failed to validate production readiness:", error);
       throw error;
     }
   }
@@ -247,19 +279,20 @@ export class TypeModuleIntegrator {
    */
   private async discoverTypeModule(moduleName: string): Promise<void> {
     try {
-      const modulePath = `/Users/kevinsitzes/Documents/BTCStampsExplorer/lib/types/${moduleName}.d.ts`;
-      
+      const modulePath =
+        `/Users/kevinsitzes/Documents/BTCStampsExplorer/lib/types/${moduleName}.d.ts`;
+
       // Create type module entry
       const typeModule: TypeModule = {
         name: moduleName,
         path: modulePath,
         dependencies: [], // Will be populated during dependency analysis
         exports: [], // Will be populated during export analysis
-        migrationStatus: 'pending',
+        migrationStatus: "pending",
         complexity: 0, // Will be calculated
         lastModified: Date.now(),
         validationErrors: [],
-        productionReady: false
+        productionReady: false,
       };
 
       // Analyze module structure (simulated - would read actual file in production)
@@ -276,28 +309,28 @@ export class TypeModuleIntegrator {
    */
   private async analyzeModuleStructure(module: TypeModule): Promise<void> {
     // Simulate module analysis - in production would parse TypeScript files
-    
+
     // Set dependencies based on known module relationships
     const dependencyMap: Record<string, string[]> = {
-      'api': ['base', 'errors'],
-      'stamp': ['base', 'transaction'],
-      'src20': ['base', 'transaction'],
-      'src101': ['base', 'transaction'],
-      'wallet': ['base', 'transaction'],
-      'marketData': ['base'],
-      'services': ['base', 'api', 'errors'],
-      'fee': ['base', 'transaction'],
-      'pagination': ['base'],
-      'sorting': ['base'],
-      'utils': ['base'],
-      'ui': ['base']
+      "api": ["base", "errors"],
+      "stamp": ["base", "transaction"],
+      "src20": ["base", "transaction"],
+      "src101": ["base", "transaction"],
+      "wallet": ["base", "transaction"],
+      "marketData": ["base"],
+      "services": ["base", "api", "errors"],
+      "fee": ["base", "transaction"],
+      "pagination": ["base"],
+      "sorting": ["base"],
+      "utils": ["base"],
+      "ui": ["base"],
     };
 
     module.dependencies = dependencyMap[module.name] || [];
-    
+
     // Calculate complexity based on dependencies and known complexity
     module.complexity = Math.max(1, module.dependencies.length * 2);
-    
+
     // Set exports (simulated)
     module.exports = [`${module.name}Types`, `${module.name}Interface`];
   }
@@ -318,8 +351,8 @@ export class TypeModuleIntegrator {
         metadata: {
           path: module.path,
           complexity: module.complexity,
-          status: module.migrationStatus
-        }
+          status: module.migrationStatus,
+        },
       });
     }
 
@@ -330,7 +363,7 @@ export class TypeModuleIntegrator {
           this.dependencyGraph.edges.push({
             from: dependency,
             to: moduleId,
-            weight: 1
+            weight: 1,
           });
         }
       }
@@ -363,7 +396,7 @@ export class TypeModuleIntegrator {
     priority += (10 - module.dependencies.length) * 10;
 
     // Higher priority for foundational modules
-    if (['base', 'errors'].includes(module.name)) {
+    if (["base", "errors"].includes(module.name)) {
       priority += 50;
     }
 
@@ -394,15 +427,15 @@ export class TypeModuleIntegrator {
 
     // Process modules in dependency order
     const resolutionOrder = this.calculateResolutionOrder();
-    
+
     for (const moduleId of resolutionOrder) {
       const module = this.typeModules.get(moduleId);
       if (!module) continue;
 
       // Check if all dependencies are resolved
-      const unresolvedDeps = module.dependencies.filter(dep => {
+      const unresolvedDeps = module.dependencies.filter((dep) => {
         const depModule = this.typeModules.get(dep);
-        return !depModule || depModule.migrationStatus !== 'completed';
+        return !depModule || depModule.migrationStatus !== "completed";
       });
 
       if (unresolvedDeps.length === 0) {
@@ -446,13 +479,13 @@ export class TypeModuleIntegrator {
 
     // Check exports
     if (module.exports.length === 0) {
-      warnings.push('No exports defined');
+      warnings.push("No exports defined");
       score -= 5;
     }
 
     // Check complexity
     if (module.complexity > 8) {
-      warnings.push('High complexity may impact maintainability');
+      warnings.push("High complexity may impact maintainability");
       score -= 10;
     }
 
@@ -462,7 +495,7 @@ export class TypeModuleIntegrator {
       score: Math.max(0, score),
       errors,
       warnings,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 
@@ -471,8 +504,8 @@ export class TypeModuleIntegrator {
    */
   private calculateProductionReadiness(): number {
     const validModules = Array.from(this.typeModules.values())
-      .filter(module => module.productionReady).length;
-    
+      .filter((module) => module.productionReady).length;
+
     return (validModules / this.typeModules.size) * 100;
   }
 
@@ -480,26 +513,33 @@ export class TypeModuleIntegrator {
    * Determine integration status
    */
   private determineIntegrationStatus(
-    validationResults: ValidationResult[], 
-    productionReadiness: number
-  ): 'complete' | 'partial' | 'failed' {
-    const validResults = validationResults.filter(r => r.valid).length;
-    const validationPercentage = (validResults / validationResults.length) * 100;
+    validationResults: ValidationResult[],
+    productionReadiness: number,
+  ): "complete" | "partial" | "failed" {
+    const validResults = validationResults.filter((r) => r.valid).length;
+    const validationPercentage = (validResults / validationResults.length) *
+      100;
 
-    if (validationPercentage >= 95 && productionReadiness >= this.config.productionReadinessThreshold) {
-      return 'complete';
+    if (
+      validationPercentage >= 95 &&
+      productionReadiness >= this.config.productionReadinessThreshold
+    ) {
+      return "complete";
     } else if (validationPercentage >= 70 && productionReadiness >= 70) {
-      return 'partial';
+      return "partial";
     } else {
-      return 'failed';
+      return "failed";
     }
   }
 
   /**
    * Detect circular dependencies
    */
-  private detectCircularDependencies(): Array<{ cycle: string[]; severity: 'warning' | 'error' }> {
-    const cycles: Array<{ cycle: string[]; severity: 'warning' | 'error' }> = [];
+  private detectCircularDependencies(): Array<
+    { cycle: string[]; severity: "warning" | "error" }
+  > {
+    const cycles: Array<{ cycle: string[]; severity: "warning" | "error" }> =
+      [];
     const visited = new Set<string>();
     const recursionStack = new Set<string>();
 
@@ -509,7 +549,7 @@ export class TypeModuleIntegrator {
         if (cycle.length > 0) {
           cycles.push({
             cycle,
-            severity: cycle.length <= 3 ? 'warning' : 'error'
+            severity: cycle.length <= 3 ? "warning" : "error",
           });
         }
       }
@@ -522,10 +562,10 @@ export class TypeModuleIntegrator {
    * Find cycle in dependency graph
    */
   private findCycle(
-    moduleId: string, 
-    visited: Set<string>, 
-    recursionStack: Set<string>, 
-    path: string[]
+    moduleId: string,
+    visited: Set<string>,
+    recursionStack: Set<string>,
+    path: string[],
   ): string[] {
     visited.add(moduleId);
     recursionStack.add(moduleId);
@@ -564,7 +604,9 @@ export class TypeModuleIntegrator {
         if (resolved.has(moduleId)) continue;
 
         const module = this.typeModules.get(moduleId)!;
-        const unresolvedDeps = module.dependencies.filter(dep => !resolved.has(dep));
+        const unresolvedDeps = module.dependencies.filter((dep) =>
+          !resolved.has(dep)
+        );
 
         if (unresolvedDeps.length === 0) {
           order.push(moduleId);
@@ -575,7 +617,7 @@ export class TypeModuleIntegrator {
 
       if (!progress) {
         // Handle remaining modules with circular dependencies
-        const remaining = modules.filter(id => !resolved.has(id));
+        const remaining = modules.filter((id) => !resolved.has(id));
         order.push(...remaining);
         break;
       }
@@ -587,11 +629,15 @@ export class TypeModuleIntegrator {
   /**
    * Find unresolved dependencies
    */
-  private findUnresolvedDependencies(): Array<{ module: string; missingDeps: string[] }> {
+  private findUnresolvedDependencies(): Array<
+    { module: string; missingDeps: string[] }
+  > {
     const unresolved: Array<{ module: string; missingDeps: string[] }> = [];
 
     for (const [moduleId, module] of this.typeModules) {
-      const missingDeps = module.dependencies.filter(dep => !this.typeModules.has(dep));
+      const missingDeps = module.dependencies.filter((dep) =>
+        !this.typeModules.has(dep)
+      );
       if (missingDeps.length > 0) {
         unresolved.push({ module: moduleId, missingDeps });
       }
@@ -603,26 +649,39 @@ export class TypeModuleIntegrator {
   /**
    * Plan parallel migration batches
    */
-  private async planParallelBatches(config: ParallelMigrationConfig): Promise<Array<{
-    batchId: string;
-    modules: string[];
-    estimatedDuration: number;
-  }>> {
-    const batches: Array<{ batchId: string; modules: string[]; estimatedDuration: number }> = [];
+  private async planParallelBatches(
+    config: ParallelMigrationConfig,
+  ): Promise<
+    Array<{
+      batchId: string;
+      modules: string[];
+      estimatedDuration: number;
+    }>
+  > {
+    const batches: Array<
+      { batchId: string; modules: string[]; estimatedDuration: number }
+    > = [];
     const resolutionOrder = this.calculateResolutionOrder();
-    
+
     let currentBatch: string[] = [];
     let batchIndex = 0;
 
-    for (let i = 0; i < resolutionOrder.length; i += this.config.migrationBatchSize) {
-      currentBatch = resolutionOrder.slice(i, i + this.config.migrationBatchSize);
-      
+    for (
+      let i = 0;
+      i < resolutionOrder.length;
+      i += this.config.migrationBatchSize
+    ) {
+      currentBatch = resolutionOrder.slice(
+        i,
+        i + this.config.migrationBatchSize,
+      );
+
       const estimatedDuration = this.estimateBatchDuration(currentBatch);
-      
+
       batches.push({
         batchId: `batch-${batchIndex++}`,
         modules: currentBatch,
-        estimatedDuration
+        estimatedDuration,
       });
     }
 
@@ -634,7 +693,7 @@ export class TypeModuleIntegrator {
    */
   private estimateBatchDuration(modules: string[]): number {
     let totalComplexity = 0;
-    
+
     for (const moduleId of modules) {
       const module = this.typeModules.get(moduleId);
       if (module) {
@@ -649,12 +708,18 @@ export class TypeModuleIntegrator {
   /**
    * Create migration timeline
    */
-  private createMigrationTimeline(batches: Array<{
-    batchId: string;
-    modules: string[];
-    estimatedDuration: number;
-  }>): Array<{ moduleId: string; startTime: number; estimatedCompletion: number }> {
-    const timeline: Array<{ moduleId: string; startTime: number; estimatedCompletion: number }> = [];
+  private createMigrationTimeline(
+    batches: Array<{
+      batchId: string;
+      modules: string[];
+      estimatedDuration: number;
+    }>,
+  ): Array<
+    { moduleId: string; startTime: number; estimatedCompletion: number }
+  > {
+    const timeline: Array<
+      { moduleId: string; startTime: number; estimatedCompletion: number }
+    > = [];
     let currentTime = Date.now();
 
     for (const batch of batches) {
@@ -662,7 +727,7 @@ export class TypeModuleIntegrator {
         timeline.push({
           moduleId,
           startTime: currentTime,
-          estimatedCompletion: currentTime + batch.estimatedDuration
+          estimatedCompletion: currentTime + batch.estimatedDuration,
         });
       }
       currentTime += batch.estimatedDuration;
@@ -674,16 +739,21 @@ export class TypeModuleIntegrator {
   /**
    * Allocate resources for parallel migration
    */
-  private allocateResources(batches: Array<{
-    batchId: string;
-    modules: string[];
-    estimatedDuration: number;
-  }>): Record<string, number> {
+  private allocateResources(
+    batches: Array<{
+      batchId: string;
+      modules: string[];
+      estimatedDuration: number;
+    }>,
+  ): Record<string, number> {
     const allocation: Record<string, number> = {};
-    
+
     for (const batch of batches) {
       // Allocate resources based on batch complexity
-      const resourceCount = Math.min(batch.modules.length, this.config.parallelExecutionLimit);
+      const resourceCount = Math.min(
+        batch.modules.length,
+        this.config.parallelExecutionLimit,
+      );
       allocation[batch.batchId] = resourceCount;
     }
 
@@ -699,9 +769,9 @@ export class TypeModuleIntegrator {
     estimatedDuration: number;
   }): Promise<void> {
     console.log(`🚀 Starting migration batch: ${batch.batchId}`);
-    
+
     // Execute modules in parallel within the batch
-    const migrationPromises = batch.modules.map(moduleId => 
+    const migrationPromises = batch.modules.map((moduleId) =>
       this.executeMigration(moduleId)
     );
 
@@ -722,16 +792,18 @@ export class TypeModuleIntegrator {
     if (!module) throw new Error(`Module not found: ${moduleId}`);
 
     this.activeMigrations.add(moduleId);
-    module.migrationStatus = 'in-progress';
+    module.migrationStatus = "in-progress";
 
     try {
       // Simulate migration work
-      await new Promise(resolve => setTimeout(resolve, module.complexity * 1000));
-      
-      module.migrationStatus = 'completed';
+      await new Promise((resolve) =>
+        setTimeout(resolve, module.complexity * 1000)
+      );
+
+      module.migrationStatus = "completed";
       console.log(`✅ Migration completed: ${moduleId}`);
     } catch (error) {
-      module.migrationStatus = 'pending';
+      module.migrationStatus = "pending";
       console.error(`❌ Migration failed: ${moduleId}`, error);
       throw error;
     } finally {
@@ -744,17 +816,21 @@ export class TypeModuleIntegrator {
    */
   private async validateModuleProductionReadiness(module: TypeModule): Promise<{
     score: number;
-    issues: Array<{ module: string; issue: string; severity: 'high' | 'medium' | 'low' }>;
+    issues: Array<
+      { module: string; issue: string; severity: "high" | "medium" | "low" }
+    >;
   }> {
-    const issues: Array<{ module: string; issue: string; severity: 'high' | 'medium' | 'low' }> = [];
+    const issues: Array<
+      { module: string; issue: string; severity: "high" | "medium" | "low" }
+    > = [];
     let score = 100;
 
     // Check migration status
-    if (module.migrationStatus !== 'completed') {
+    if (module.migrationStatus !== "completed") {
       issues.push({
         module: module.name,
-        issue: 'Migration not completed',
-        severity: 'high'
+        issue: "Migration not completed",
+        severity: "high",
       });
       score -= 30;
     }
@@ -764,13 +840,13 @@ export class TypeModuleIntegrator {
       issues.push({
         module: module.name,
         issue: `${module.validationErrors.length} validation errors`,
-        severity: 'high'
+        severity: "high",
       });
       score -= 25;
     }
 
     // Check dependencies
-    const unresolvedDeps = module.dependencies.filter(dep => {
+    const unresolvedDeps = module.dependencies.filter((dep) => {
       const depModule = this.typeModules.get(dep);
       return !depModule || !depModule.productionReady;
     });
@@ -778,8 +854,8 @@ export class TypeModuleIntegrator {
     if (unresolvedDeps.length > 0) {
       issues.push({
         module: module.name,
-        issue: `Unresolved dependencies: ${unresolvedDeps.join(', ')}`,
-        severity: 'medium'
+        issue: `Unresolved dependencies: ${unresolvedDeps.join(", ")}`,
+        severity: "medium",
       });
       score -= 15;
     }
@@ -793,9 +869,13 @@ export class TypeModuleIntegrator {
   /**
    * Calculate overall readiness
    */
-  private calculateOverallReadiness(moduleReadiness: Record<string, number>): number {
+  private calculateOverallReadiness(
+    moduleReadiness: Record<string, number>,
+  ): number {
     const scores = Object.values(moduleReadiness);
-    return scores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 0;
+    return scores.length > 0
+      ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+      : 0;
   }
 
   /**
@@ -803,26 +883,34 @@ export class TypeModuleIntegrator {
    */
   private generateReadinessRecommendations(
     criticalIssues: Array<{ module: string; issue: string; severity: string }>,
-    overallReadiness: number
+    overallReadiness: number,
   ): string[] {
     const recommendations: string[] = [];
 
     if (overallReadiness < 90) {
-      recommendations.push('Address critical issues before production deployment');
+      recommendations.push(
+        "Address critical issues before production deployment",
+      );
     }
 
-    const highSeverityIssues = criticalIssues.filter(issue => issue.severity === 'high');
+    const highSeverityIssues = criticalIssues.filter((issue) =>
+      issue.severity === "high"
+    );
     if (highSeverityIssues.length > 0) {
-      recommendations.push(`Resolve ${highSeverityIssues.length} high-severity issues immediately`);
+      recommendations.push(
+        `Resolve ${highSeverityIssues.length} high-severity issues immediately`,
+      );
     }
 
     if (this.activeMigrations.size > 0) {
-      recommendations.push('Complete all active migrations before production deployment');
+      recommendations.push(
+        "Complete all active migrations before production deployment",
+      );
     }
 
-    recommendations.push('Run comprehensive integration tests');
-    recommendations.push('Validate all type exports and imports');
-    recommendations.push('Verify backward compatibility');
+    recommendations.push("Run comprehensive integration tests");
+    recommendations.push("Validate all type exports and imports");
+    recommendations.push("Verify backward compatibility");
 
     return recommendations;
   }
@@ -830,37 +918,49 @@ export class TypeModuleIntegrator {
   /**
    * Check production readiness gates
    */
-  private async checkReadinessGates(): Promise<Array<{
-    gate: string;
-    passed: boolean;
-    requirements: string[];
-  }>> {
+  private async checkReadinessGates(): Promise<
+    Array<{
+      gate: string;
+      passed: boolean;
+      requirements: string[];
+    }>
+  > {
     const gates = [
       {
-        gate: 'All modules migrated',
-        passed: Array.from(this.typeModules.values()).every(m => m.migrationStatus === 'completed'),
-        requirements: ['Complete all pending migrations']
+        gate: "All modules migrated",
+        passed: Array.from(this.typeModules.values()).every((m) =>
+          m.migrationStatus === "completed"
+        ),
+        requirements: ["Complete all pending migrations"],
       },
       {
-        gate: 'No validation errors',
-        passed: Array.from(this.typeModules.values()).every(m => m.validationErrors.length === 0),
-        requirements: ['Fix all validation errors']
+        gate: "No validation errors",
+        passed: Array.from(this.typeModules.values()).every((m) =>
+          m.validationErrors.length === 0
+        ),
+        requirements: ["Fix all validation errors"],
       },
       {
-        gate: 'Dependencies resolved',
+        gate: "Dependencies resolved",
         passed: this.findUnresolvedDependencies().length === 0,
-        requirements: ['Resolve all missing dependencies']
+        requirements: ["Resolve all missing dependencies"],
       },
       {
-        gate: 'No circular dependencies',
-        passed: this.detectCircularDependencies().filter(c => c.severity === 'error').length === 0,
-        requirements: ['Break circular dependency cycles']
+        gate: "No circular dependencies",
+        passed:
+          this.detectCircularDependencies().filter((c) =>
+            c.severity === "error"
+          ).length === 0,
+        requirements: ["Break circular dependency cycles"],
       },
       {
-        gate: 'Production readiness threshold met',
-        passed: this.calculateProductionReadiness() >= this.config.productionReadinessThreshold,
-        requirements: [`Achieve ${this.config.productionReadinessThreshold}% readiness score`]
-      }
+        gate: "Production readiness threshold met",
+        passed: this.calculateProductionReadiness() >=
+          this.config.productionReadinessThreshold,
+        requirements: [
+          `Achieve ${this.config.productionReadinessThreshold}% readiness score`,
+        ],
+      },
     ];
 
     return gates;
@@ -878,16 +978,16 @@ export class TypeModuleIntegrator {
   } {
     const totalModules = this.typeModules.size;
     const completedMigrations = Array.from(this.typeModules.values())
-      .filter(m => m.migrationStatus === 'completed').length;
+      .filter((m) => m.migrationStatus === "completed").length;
     const productionReady = Array.from(this.typeModules.values())
-      .filter(m => m.productionReady).length;
+      .filter((m) => m.productionReady).length;
 
     return {
       totalModules,
       completedMigrations,
       activeMigrations: this.activeMigrations.size,
       productionReady,
-      overallProgress: (completedMigrations / totalModules) * 100
+      overallProgress: (completedMigrations / totalModules) * 100,
     };
   }
 

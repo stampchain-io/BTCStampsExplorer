@@ -1,5 +1,5 @@
 import type { SRC20Row } from "$types/src20.d.ts";
-import type { ImageModalProps } from "$types/ui.d.ts";
+import type { ImageModalProps, SRC20BalanceTableProps } from "$types/ui.d.ts";
 import type { WalletDataTypes } from "$types/base.d.ts";
 import { useState } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
@@ -9,9 +9,6 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { textLg } from "$text";
 import { walletSignal } from "$client/wallet/wallet.ts";
-type SRC20BalanceTableProps = {
-  data: SRC20Row[];
-};
 
 const ImageModal = ({ imgSrc, isOpen, onClose }: ImageModalProps) => {
   if (!isOpen) return null;

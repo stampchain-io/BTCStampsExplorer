@@ -1,7 +1,7 @@
+import type { Context } from "$types/ui.d.ts";
+import type { VersionContext } from "$types/ui.d.ts";
 import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 
-// Use any types to avoid Fresh version compatibility issues
-type Context = any;
 type Next = any;
 
 /**
@@ -107,12 +107,6 @@ const VERSION_FIELDS_TO_REMOVE: Record<string, string[]> = {
   "2.2": [] // Base version - no removals needed
 };
 
-export interface VersionContext {
-  version: string;
-  isDeprecated: boolean;
-  endOfLife?: string;
-  enhancedFields: string[];
-}
 
 /**
  * Parse API version from request headers

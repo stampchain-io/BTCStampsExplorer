@@ -1,5 +1,5 @@
 import { assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import { CollectionRepository } from "$server/database/collectionRepository.ts";
 import type {
   CollectionRow,
