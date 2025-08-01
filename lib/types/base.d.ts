@@ -1,8 +1,4 @@
-import type {
-  AdvancedFeeCalculatorProps,
-  BaseFeeCalculatorProps,
-  SimpleFeeCalculatorProps,
-} from "$types/ui.d.ts";
+// Removed unused imports - these types are not used in base.d.ts
 export interface UTXO {
   txid: string;
   vout: number;

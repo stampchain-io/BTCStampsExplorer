@@ -1,6 +1,5 @@
 import type {
   InfiniteScrollState,
-  PaginationProps,
   PaginationState,
 } from "$types/ui.d.ts";
 /**
