@@ -1,10 +1,10 @@
 /*@baba-rename to ModalBase */
-import { useEffect, useRef, useState } from "preact/hooks";
+import { CloseIcon } from "$icon";
+import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
-import { closeModal } from "$islands/modal/states.ts";
 import { titlePurpleLD } from "$text";
-import { CloseIcon } from "$icon";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 interface ModalBaseProps {
   onClose?: () => void;
@@ -92,7 +92,7 @@ export function ModalBase({
   return (
     <div
       className={`
-        relative w-[340px] mobileLg:w-[360px] 
+        relative w-[340px] mobileLg:w-[360px]
         p-6 rounded-lg dark-gradient-modal
         ${className}
       `}
@@ -109,7 +109,7 @@ export function ModalBase({
               <CloseIcon
                 size="sm"
                 weight="bold"
-                color="purpleGradient"
+                color="purple"
                 onClick={() => handleClose()}
               />
               <div

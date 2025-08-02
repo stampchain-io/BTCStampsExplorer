@@ -19,10 +19,8 @@ export interface ButtonVariants {
   color: Record<
     | "grey"
     | "greyDark"
-    | "greyGradient"
     | "purple"
     | "purpleDark"
-    | "purpleGradient"
     | "test"
     | "custom",
     string
