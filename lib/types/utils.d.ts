@@ -1,6 +1,7 @@
 import type { BlockRow, FeeDetails } from "$types/base.d.ts";
 import type { FeeData } from "$types/services.d.ts";
 import type { SortKey } from "$types/sorting.d.ts";
+import type { InputData } from "$types/src20.d.ts";
 import type { TimeSeriesData } from "$types/stamp.d.ts";
 import type { ListProps } from "$types/ui.d.ts";
 

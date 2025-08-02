@@ -16,7 +16,6 @@ import { SRC20Service } from "$server/services/src20/index.ts";
 import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
 import type { SRC20CreateResponse } from "$types/api.d.ts";
 import type { TXError } from "$types/transaction.d.ts";
-import type { InputData } from "$types/src20.d.ts";
 import type { AncestorInfo } from "$types/wallet.d.ts";
 
 type TrxType = "multisig" | "olga";
