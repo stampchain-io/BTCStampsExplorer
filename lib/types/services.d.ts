@@ -1,10 +1,21 @@
 import type { LogNamespace } from "$lib/utils/monitoring/logging/logger.ts";
-import type { HttpRequestConfig, HttpResponse } from "$types/api.d.ts";
-import type { UTXO } from "$types/base.d.ts";
-import type { CacheStatus, CollectionMarketData } from "$types/marketData.d.ts";
-import type { SRC20Row } from "$types/src20.d.ts";
+import type { HttpRequestConfig, HttpResponse, QuicknodeRPCResponse } from "$types/api.d.ts";
+import type {
+  AncestorInfo,
+  BasicUTXO as BaseBasicUTXO,
+  UTXO,
+} from "$types/base.d.ts";
+import type {
+  CacheStatus,
+  CollectionMarketData,
+  MarketListingAggregated,
+} from "$types/marketData.d.ts";
+import type { SRC20Balance, SRC20Row } from "$types/src20.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 import type { SendRow } from "$types/transaction.d.ts";
+import type { MockPSBTInput } from "$types/utils.d.ts";
+import { getUTXOForAddress as getUTXOForAddressFromUtils } from "$lib/utils/bitcoin/utxo/utxoUtils.ts";
+import { estimateFee } from "$lib/utils/bitcoin/minting/feeCalculations.ts";
 
 // Orchestration System Types for Type Domain Migration
 export type TaskStatus =
@@ -4323,7 +4334,7 @@ export interface EnhancedSRC20Row extends SRC20Row {
 export interface BitcoinTransactionBuilderDependencies {
   getUTXOForAddress: typeof getUTXOForAddressFromUtils;
   estimateFee: typeof estimateFee;
-  commonUtxoService: CommonUTXOService;
+  commonUtxoService: ICommonUTXOService;
   bitcoin?: typeof import("bitcoinjs-lib"); // Optional bitcoin lib injection for testing
 }
 
@@ -4408,7 +4419,7 @@ export interface MempoolTransaction {
 /**
  * BasicUTXO - Migrated from optimalUtxoSelection.ts
  */
-export interface BasicUTXO extends BaseUTXO {
+export interface BasicUTXO extends BaseBasicUTXO {
   address?: string;
   script?: string;
   scriptType?: string;

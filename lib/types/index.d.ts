@@ -157,6 +157,8 @@ export type {
   PaginatedStampBalanceResponseBody,
   PaginatedStampResponseBody,
   PaginatedTickResponseBody,
+  // External service API types
+  QuicknodeRPCResponse,
   Src20BalanceResponseBody,
   Src20ResponseBody,
   // Request parameters
@@ -230,6 +232,8 @@ export type {
   ResponsiveValue,
   ScreenReaderProps,
   SelectProps,
+  // Shared component types
+  SharedListProps,
   SpacingScale,
   SRC20CardProps,
   SRC20CardSize,
@@ -267,6 +271,8 @@ export type {
   DateUtils,
   // Utility functions and helpers
   DeepPartial,
+  // Mock types for testing
+  MockPSBTInput,
   NonEmptyArray,
   NumberUtils,
   Optional,
@@ -336,6 +342,8 @@ export type {
   ExchangeSources,
   MarketDataSource,
   MarketDataSourcesRow,
+  // Market listing and aggregated data
+  MarketListingAggregated,
   // Market data responses
   SRC20MarketDataResponse,
   // Extended data with market info
@@ -383,6 +391,8 @@ export type {
 } from "./quicknode.d.ts";
 
 export type {
+  // Collection types
+  CollectionWithOptionalMarketData,
   // Dispenser types
   Dispenser,
   DispenserFilter,

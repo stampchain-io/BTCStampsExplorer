@@ -11,7 +11,9 @@
 
 import type { ButtonProps } from "$button";
 import type { Timeframe } from "$components/layout/types.ts";
-import type { FeeDetails } from "$types/base.d.ts";
+import type { AncestorInfo, FeeDetails } from "$types/base.d.ts";
+import type { MarketListingAggregated } from "$types/marketData.d.ts";
+import type { CollectionWithOptionalMarketData } from "$types/services.d.ts";
 import type { SRC20Transaction, StampTransaction } from "$types/stamping.ts";
 
 import type { SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";

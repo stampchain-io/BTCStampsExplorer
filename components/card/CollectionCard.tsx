@@ -1,5 +1,5 @@
 /* ===== COLLECTION OVERVIEW CARD COMPONENT ===== */
-import type { Collection } from "$types/api.d.ts";
+import type { Collection, CollectionWithOptionalMarketData } from "$types";
 import {
   abbreviateAddress,
   formatBTC,

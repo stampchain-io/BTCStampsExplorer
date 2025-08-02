@@ -1,6 +1,6 @@
 /* ===== LIST COMPONENT ===== */
 import { headingGrey, text } from "$text";
-import type { ListProps } from "$types/ui.d.ts";
+import type { ListProps, SharedListProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
 
