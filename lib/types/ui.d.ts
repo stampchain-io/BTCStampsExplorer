@@ -22,6 +22,7 @@ import type {
   TransferDetails,
 } from "$types/base.d.ts";
 import type { ErrorInfo } from "$types/errors.d.ts";
+import type { ErrorInfo as ErrorHandlingInfo } from "$lib/utils/monitoring/errors/errorHandlingUtils.ts";
 import type { MarketListingAggregated } from "$types/marketData.d.ts";
 import type {
   CollectionWithOptionalMarketData,
@@ -358,6 +359,7 @@ export interface ChartData {
     borderWidth?: number;
     fill?: boolean;
   }>;
+  length?: number;
 }
 
 /**
@@ -371,8 +373,9 @@ export interface ChartWidgetProps extends BaseComponentProps {
   height?: number | string;
   responsive?: boolean;
   maintainAspectRatio?: boolean;
-  fromPage?: string;
-  tick?: string;
+  fromPage: string;  // Made required
+  tick: string;  // Made required
+  data: any;  // Added to support the 'data' prop being passed
 }
 
 // =============================================================================
@@ -405,6 +408,7 @@ export interface ProgressIndicatorProps extends BaseComponentProps {
   indeterminate?: boolean;
   state?: ProgressState;
   message?: string;
+  class?: string;
 }
 
 // =============================================================================
@@ -516,6 +520,7 @@ export interface SelectFieldProps extends FormControlProps {
   onChange?: (value: string) => void;
   multiple?: boolean;
   size?: "sm" | "md" | "lg";
+  onClick?: (event: Event) => void;
 }
 
 // =============================================================================
@@ -563,8 +568,8 @@ export interface ConnectWalletModalProps extends ModalBaseProps {
   onConnect?: (providerId: string) => void;
   showTestnet?: boolean;
   preferredWallet?: string;
-  connectors?: ComponentChildren;
-  handleClose?: () => void;
+  connectors: Element[];  // Explicitly typed as Element[]
+  handleClose: () => void;  // Made non-optional to match usage
 }
 
 /**
@@ -574,6 +579,9 @@ export interface MaraModeWarningModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
+  outputValue?: number;
+  onConfirm?: () => void;
+  onCancel?: () => void;
 }
 
 /**
@@ -583,6 +591,8 @@ export interface MaraServiceUnavailableModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
+  onSwitchToStandard?: () => void;
+  onRetry?: () => void;
 }
 
 // =============================================================================
@@ -597,6 +607,8 @@ export interface MaraStatusLinkProps extends BaseComponentProps {
   variant?: "primary" | "secondary" | "warning" | "error";
   target?: "_blank" | "_self";
   icon?: string;
+  txid?: string;
+  class?: string;
 }
 
 /**
@@ -651,11 +663,13 @@ export interface ActivityBadgeProps extends BaseComponentProps {
  * Transaction badge component props
  */
 export interface TransactionBadgeProps extends BaseComponentProps {
-  status: "pending" | "confirmed" | "failed" | "processing";
+  state: TransactionState;
+  status?: "pending" | "confirmed" | "failed" | "processing";
   confirmations?: number;
   showIcon?: boolean;
   size?: "sm" | "md" | "lg";
   animated?: boolean;
+  class?: string;
 }
 
 /**
@@ -667,6 +681,17 @@ export interface MarketDataStatusProps extends BaseComponentProps {
   showTimestamp?: boolean;
   message?: string;
   onRefresh?: () => void;
+  showDetails?: boolean;
+  overallStatus?: "loading" | "success" | "error" | "stale";
+  stampsMarketData?: MarketDataDetails;
+  src20MarketData?: MarketDataDetails;
+}
+
+export interface MarketDataDetails {
+  status: "loading" | "success" | "error" | "stale";
+  data?: unknown;
+  error?: string;
+  lastUpdated?: Date | string;
 }
 
 // =============================================================================
@@ -689,6 +714,11 @@ export interface MetaTagsProps {
   canonicalUrl?: string;
   noindex?: boolean;
   nofollow?: boolean;
+  image?: string;
+  skipImage?: boolean;
+  skipTitle?: boolean;
+  skipDescription?: boolean;
+  skipOgMeta?: boolean;
 }
 
 // =============================================================================
@@ -728,12 +758,15 @@ export interface BTCValueDisplayProps {
   loading?: boolean;
   error?: string;
   showSymbol?: boolean;
+  [key: string]: any; // Allow dynamic access
 }
 
 export interface BTCValueSummaryProps {
   values: number[];
   className?: string;
   showTotal?: boolean;
+  stamps?: any[];
+  [key: string]: any; // Allow dynamic access
 }
 
 export interface StatItemProps {
@@ -813,7 +846,8 @@ export interface ToolFairmintPageProps {
 }
 
 export interface WalletProviderProps {
-  providerKey: string;
+  key?: WalletProviderKey;  // Added optional key prop
+  providerKey: WalletProviderKey;
   onSuccess: () => void;
 }
 
@@ -870,6 +904,19 @@ export interface SRC20InputFieldProps {
   error?: string;
   required?: boolean;
   type?: "text" | "number";
+  onBlur?: (event: FocusEvent) => void;
+  maxLength?: number;
+  isUppercase?: boolean;
+  inputMode?:
+    | "text"
+    | "decimal"
+    | "numeric"
+    | "tel"
+    | "search"
+    | "email"
+    | "url";
+  pattern?: string;
+  onFocus?: (event: FocusEvent) => void;
 }
 
 export interface SRC20GalleryProps {
@@ -890,6 +937,9 @@ export interface SRC20GalleryProps {
     totalPages: any;
     onPageChange: (newPage: number) => void;
   };
+  title?: string;
+  subTitle?: string;
+  serverData?: any;
 }
 
 export interface SRC101RegisterToolProps {
@@ -918,6 +968,10 @@ export interface StampOverviewContentProps {
   marketData?: any;
   loading?: boolean;
   error?: string;
+  stamps?: any[];
+  isRecentSales?: boolean;
+  pagination?: any;
+  fromPage?: string;
 }
 
 export interface StampListingsAllProps {
@@ -925,6 +979,7 @@ export interface StampListingsAllProps {
   loading?: boolean;
   error?: string;
   onSelect?: (listing: any) => void;
+  dispensers?: any[];
 }
 
 export interface StampListingsOpenProps {
@@ -933,6 +988,9 @@ export interface StampListingsOpenProps {
   error?: string;
   onSelect?: (listing: any) => void;
   selectedDispenser?: any;
+  dispensers?: any[];
+  floorPrice?: number;
+  onSelectDispenser?: (dispenser: any) => void;
 }
 
 export interface SRC20OverviewContentProps {
@@ -957,6 +1015,9 @@ export interface StyledSortingButtonsProps {
     key: string;
     label: string;
   }>;
+  variant?: "default" | "compact" | "inline";
+  size?: "sm" | "md" | "lg";
+  testId?: string;
 }
 
 export interface StyledSortingDropdownProps {
@@ -967,6 +1028,9 @@ export interface StyledSortingDropdownProps {
     label: string;
   }>;
   placeholder?: string;
+  variant?: "default" | "compact" | "inline";
+  size?: "sm" | "md" | "lg";
+  testId?: string;
 }
 
 export interface StyledSortingErrorProps {
@@ -980,6 +1044,9 @@ export interface StyledSortingLabelProps {
   sortOrder: "asc" | "desc";
   onClick: () => void;
   active?: boolean;
+  variant?: "default" | "compact" | "inline";
+  size?: "sm" | "md" | "lg";
+  testId?: string;
 }
 
 export interface SelectProps extends JSX.HTMLAttributes<HTMLSelectElement> {
@@ -999,6 +1066,7 @@ export interface SortProps {
   initSort?: "ASC" | "DESC";
   onChangeSort?: (newSortBy: "ASC" | "DESC") => void;
   sortParam?: string;
+  searchParams?: URLSearchParams;
 }
 
 export interface SortingProviderProps {
@@ -1008,11 +1076,17 @@ export interface SortingProviderProps {
     sortOrder: "asc" | "desc";
   };
   onSortChange?: (sortBy: string, sortOrder: "asc" | "desc") => void;
+  config?: any;
+  initialState?: any;
+  testId?: string;
 }
 
 export interface SortingProviderWithURLProps extends SortingProviderProps {
   urlParams?: boolean;
   paramPrefix?: string;
+  testId?: string;
+  config?: any;
+  initialState?: any;
 }
 
 export interface SortingLabelProps {
@@ -1020,17 +1094,30 @@ export interface SortingLabelProps {
   sortBy: string;
   active?: boolean;
   onClick: () => void;
+  className?: string;
+  testId?: string;
+  showDirection?: boolean;
+  showLoading?: boolean;
+  format?: string;
 }
 
 export interface SortingErrorProps {
   error: string;
   onRetry?: () => void;
   className?: string;
+  testId?: string;
+  message?: string;
+  showRetry?: boolean;
 }
 
 export interface SortingErrorFallbackProps {
-  error: Error;
+  error: Error | ExtendedError;
   resetError: () => void;
+  onRetry?: () => void;
+  onReset?: () => void;
+  context?: any;
+  retryCount?: number;
+  maxRetries?: number;
 }
 
 export interface SettingProps {
@@ -1071,6 +1158,8 @@ export interface RecentSaleCardProps {
   sale: any;
   onClick?: () => void;
   className?: string;
+  showFullDetails?: boolean;
+  btcPriceUSD?: number;
 }
 
 export interface RecentSalesGalleryProps {
@@ -1135,6 +1224,8 @@ export interface ScrollContainerProps {
   direction?: "horizontal" | "vertical" | "both";
   className?: string;
   maxHeight?: string;
+  class?: string;
+  onScroll?: (event: Event) => void;
 }
 
 export interface SectionHeaderProps {
@@ -1154,9 +1245,16 @@ export interface SelectorButtonsProps {
     value: string;
     label: string;
     active?: boolean;
+    disabled?: boolean;
   }>;
   onSelect: (value: string) => void;
   className?: string;
+  value?: string;
+  defaultValue?: string;
+  onChange?: (value: string) => void;
+  size?: "sm" | "md" | "lg";
+  color?: string;
+  disabled?: boolean;
 }
 
 export interface StampBTCValueProps {
@@ -1164,6 +1262,8 @@ export interface StampBTCValueProps {
   className?: string;
   showBreakdown?: boolean;
   size?: IconSize | number;
+  quantity?: number;
+  unitPrice?: number;
 }
 
 export interface TotalBTCValueProps {
@@ -1171,6 +1271,7 @@ export interface TotalBTCValueProps {
   className?: string;
   showStats?: boolean;
   size?: IconSize | number;
+  stamps?: any[];
 }
 
 export interface TransactionHexDisplayProps {
@@ -1808,6 +1909,7 @@ export interface CarouselHomeProps extends BaseComponentProps {
   autoplay?: boolean;
   interval?: number;
   showIndicators?: boolean;
+  carouselStamps?: any[];
 }
 
 /**
@@ -1822,6 +1924,8 @@ export interface CollectionsBannerProps extends BaseComponentProps {
   }>;
   title?: string;
   subtitle?: string;
+  collection?: any;
+  isDarkMode?: boolean;
 }
 
 /**
@@ -1834,6 +1938,9 @@ export interface ArticleProps extends BaseComponentProps {
   publishDate?: string;
   tags?: string[];
   readTime?: number;
+  subtitle?: string;
+  headerImage?: string;
+  importantNotes?: string[];
 }
 
 /**
@@ -1848,6 +1955,8 @@ export interface AuthorProps extends BaseComponentProps {
     github?: string;
     website?: string;
   };
+  twitter?: string;
+  website?: string;
 }
 
 /**
@@ -1862,6 +1971,7 @@ export interface HoldersTableProps extends BaseComponentProps {
   loading?: boolean;
   error?: string;
   title?: string;
+  holders?: any[];
 }
 
 /**
@@ -1871,6 +1981,10 @@ export interface ExplorerContentProps extends BaseComponentProps {
   data: any; // Adjust based on your specific explorer data structure
   loading?: boolean;
   error?: string;
+  stamps?: any[];
+  isRecentSales?: boolean;
+  pagination?: any;
+  fromPage?: string;
 }
 
 /**
@@ -1882,6 +1996,8 @@ export interface BlockProps extends BaseComponentProps {
   variant?: "default" | "outlined" | "elevated";
   padding?: string;
   margin?: string;
+  block?: any;
+  selected?: boolean;
 }
 
 /**
@@ -1895,6 +2011,7 @@ export interface FaqAccordionProps extends BaseComponentProps {
   }>;
   expandIcon?: string;
   collapseIcon?: string;
+  item?: any;
 }
 
 /**
@@ -2050,6 +2167,9 @@ export interface BuyStampModalProps extends ModalBaseProps {
   disabled?: boolean;
   loading?: boolean;
   error?: string;
+  fee?: number;
+  handleChangeFee?: (fee: number) => void;
+  dispenser?: any;
 }
 /**
  * Donate Stamp Modal component props
@@ -2060,6 +2180,9 @@ export interface DonateStampModalProps extends ModalBaseProps {
   disabled?: boolean;
   loading?: boolean;
   error?: string;
+  fee?: number;
+  handleChangeFee?: (fee: number) => void;
+  dispenser?: any;
 }
 /**
  * Filter SRC-20 Modal component props
@@ -2074,6 +2197,7 @@ export interface FilterSRC20ModalProps extends ModalBaseProps {
   onApplyFilters?: (filters: any) => void;
   loading?: boolean;
   error?: string;
+  filterOptions?: any;
 }
 /**
  * Receive Address Modal component props
@@ -2089,6 +2213,9 @@ export interface DetailSRC101ModalProps extends ModalBaseProps {
   onAction?: (actionType: string) => void;
   loading?: boolean;
   error?: string;
+  img?: string;
+  name?: string;
+  owner?: string;
 }
 /**
  * Connect Wallet Modal component props
@@ -2099,6 +2226,7 @@ export interface DetailSRC101ModalProps extends ModalBaseProps {
  */
 export interface PreviewCodeModalProps extends ModalBaseProps {
   code: string;
+  src: string;
   language?: string;
   title?: string;
   onCopy?: () => void;
@@ -2128,6 +2256,7 @@ export interface ModalOverlayProps extends BaseComponentProps {
   children: ComponentChildren;
   animation?: ModalAnimation;
   preventScroll?: boolean;
+  handleClose?: () => void;
 }
 
 /**
@@ -2316,6 +2445,8 @@ export interface CheckboxProps extends BaseComponentProps {
   disabled?: boolean;
   indeterminate?: boolean;
   name?: string;
+  hasDropdown?: boolean;
+  dropdownContent?: ComponentChildren;
 }
 
 /**
@@ -2407,10 +2538,13 @@ export interface CheckboxProps extends BaseComponentProps {
  * Error Display component props
  */
 export interface ErrorDisplayProps extends BaseComponentProps {
-  error: string | Error;
+  error: string | Error | ExtendedError | ErrorHandlingInfo;
   onRetry?: () => void;
   details?: string;
   actionLabel?: string;
+  onDismiss?: () => void;
+  compact?: boolean;
+  showDetails?: boolean;
 }
 
 // OTHER COMPONENT PROPS
@@ -2562,7 +2696,12 @@ export interface SRC101FormState {
   web: string;
   email: string;
   file: File | null;
-  psbtFees?: PSBTFees;
+  psbtFees?: PSBTFees & {
+    totalDustValue?: number;
+    minerFee?: number;
+    est_tx_size?: number; // Add dynamically used property
+    [key: string]: any; // Allow dynamic properties
+  };
   maxAmount?: string;
   root: string;
   utxoAncestors?: Array<any>; // Add missing utxoAncestors property
@@ -2597,7 +2736,11 @@ export interface SRC20FormState {
   img: string;
   description: string;
   file: File | null;
-  psbtFees?: PSBTFees;
+  psbtFees?: PSBTFees & {
+    totalDustValue?: number;
+    minerFee?: number;
+    [key: string]: any; // Allow dynamic properties
+  };
   maxAmount?: string;
 }
 
@@ -2927,6 +3070,7 @@ export interface PaginationState {
   isLoading: boolean;
   hasError: boolean;
   errorMessage?: string;
+  limit: number;
 }
 
 /**
@@ -3010,6 +3154,7 @@ export interface SRC20MintingProps {
     filter: string;
     direction: "asc" | "desc";
   };
+  mints?: any[];
 }
 
 /**
@@ -3093,6 +3238,7 @@ export interface SRC20OverviewHeaderProps {
  */
 export interface TransferProps {
   transactions: StampTransaction[];
+  sends?: any[];
 }
 
 /**
@@ -3264,6 +3410,10 @@ export interface ConvenienceProviderProps extends BaseComponentProps {
   initialValue?: any;
   onChange?: (value: any) => void;
   defaultValue?: any;
+  defaultSort?: {
+    key: string;
+    direction: "asc" | "desc";
+  };
 }
 
 /**
@@ -3274,12 +3424,16 @@ export interface CompleteSortingInterfaceProps extends BaseComponentProps {
   sortOrder: "asc" | "desc";
   onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
   options: Array<{ key: string; label: string }>;
+  variant?: "default" | "compact" | "inline";
+  size?: "sm" | "md" | "lg";
+  showLoading?: boolean;
 }
 
 /**
  * PieChartProps - Pie Chart component props
  */
 export interface PieChartProps extends BaseComponentProps {
+  holders?: any[];  // Added to support the holders prop
   data: {
     labels: string[];
     datasets: Array<{
@@ -3323,6 +3477,7 @@ export interface MintProgressProps extends BaseComponentProps {
   label?: string;
   variant?: "linear" | "circular";
   color?: string;
+  minters?: any[];
 }
 
 /**
@@ -3441,11 +3596,40 @@ export interface FeeState {
   lastKnownGoodData: FeeData | null; // Keep last successful data
 }
 
+// =============================================================================
+// EXTENDED ERROR TYPES
+// =============================================================================
+
+/**
+ * Extended error type with additional properties
+ */
+export interface ExtendedError extends Error {
+  severity?: "low" | "medium" | "high" | "critical";
+  retryable?: boolean;
+  details?: string;
+  type?: string;
+  timestamp?: Date | string;
+  recoverable?: boolean;
+  action?: string;
+}
+
 // EXPORTS
 // =============================================================================
 
 // Re-export commonly used Preact types for convenience
 export type { ComponentChildren, ComponentProps, JSX } from "preact";
+
+// Augment EventTarget to include value property
+declare global {
+  interface EventTarget {
+    value?: string | number;
+    target?: { value?: string | number };
+  }
+
+  interface String {
+    target?: { value?: string | number };
+  }
+}
 
 /**
  * AlertState - Migrated from scripts/alert-system.ts
@@ -3584,6 +3768,8 @@ export interface WalletStampValueProps {
   className?: string;
   showSource?: boolean;
   size?: IconSize | number;
+  stamp?: any;
+  showBreakdown?: boolean;
 }
 
 export interface ProgressiveEstimationIndicatorProps {
@@ -3635,6 +3821,8 @@ export interface ColorSwatchProps extends BaseComponentProps {
   variant?: "solid" | "outline";
   onClick?: () => void;
   selected?: boolean;
+  name?: string;
+  bgClass?: string;
 }
 
 /**
