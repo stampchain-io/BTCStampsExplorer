@@ -558,6 +558,16 @@ export interface MaraServiceUnavailableModalProps {
 // =============================================================================
 
 /**
+ * Mara Status Link component props
+ */
+export interface MaraStatusLinkProps extends BaseComponentProps {
+  href?: string;
+  variant?: "primary" | "secondary" | "warning" | "error";
+  target?: "_blank" | "_self";
+  icon?: string;
+}
+
+/**
  * Mara mode indicator component props
  */
 export interface MaraModeIndicatorProps extends BaseComponentProps {
@@ -598,9 +608,11 @@ export interface MaraSuccessMessageProps extends BaseComponentProps {
  * Activity Badge component props
  */
 export interface ActivityBadgeProps extends BaseComponentProps {
-  size: "xs" | "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   variant?: "primary" | "secondary" | "success" | "warning" | "error";
   children?: ComponentChildren;
+  level?: string | number;
+  showLabel?: boolean;
 }
 
 /**
@@ -1683,7 +1695,7 @@ export type IconSize =
 /**
  * Icon weight variants
  */
-export type IconWeight = "thin" | "light" | "regular" | "bold" | "fill";
+export type IconWeight = "extraLight" | "light" | "normal" | "bold" | "custom";
 
 /**
  * Modal animation types
@@ -1753,6 +1765,108 @@ export type AnimationTimingFunction =
 
 /**
  * Carousel Home component props
+ */
+export interface CarouselHomeProps extends BaseComponentProps {
+  slides: Array<{
+    image: string;
+    title?: string;
+    description?: string;
+    link?: string;
+  }>;
+  autoplay?: boolean;
+  interval?: number;
+  showIndicators?: boolean;
+}
+
+/**
+ * Collections Banner component props
+ */
+export interface CollectionsBannerProps extends BaseComponentProps {
+  collections: Array<{
+    name: string;
+    image: string;
+    description?: string;
+    link?: string;
+  }>;
+  title?: string;
+  subtitle?: string;
+}
+
+/**
+ * Article component props
+ */
+export interface ArticleProps extends BaseComponentProps {
+  title: string;
+  content: string;
+  author?: string;
+  publishDate?: string;
+  tags?: string[];
+  readTime?: number;
+}
+
+/**
+ * Author component props
+ */
+export interface AuthorProps extends BaseComponentProps {
+  name: string;
+  avatar?: string;
+  bio?: string;
+  links?: {
+    twitter?: string;
+    github?: string;
+    website?: string;
+  };
+}
+
+/**
+ * Holders Table component props
+ */
+export interface HoldersTableProps extends BaseComponentProps {
+  data: Array<{
+    address: string;
+    balance: number;
+    percentage: number;
+  }>;
+  loading?: boolean;
+  error?: string;
+  title?: string;
+}
+
+/**
+ * Explorer Content component props
+ */
+export interface ExplorerContentProps extends BaseComponentProps {
+  data: any; // Adjust based on your specific explorer data structure
+  loading?: boolean;
+  error?: string;
+}
+
+/**
+ * Block component props
+ */
+export interface BlockProps extends BaseComponentProps {
+  title?: string;
+  subtitle?: string;
+  variant?: "default" | "outlined" | "elevated";
+  padding?: string;
+  margin?: string;
+}
+
+/**
+ * FAQ Accordion component props
+ */
+export interface FaqAccordionProps extends BaseComponentProps {
+  faqs: Array<{
+    question: string;
+    answer: string;
+    open?: boolean;
+  }>;
+  expandIcon?: string;
+  collapseIcon?: string;
+}
+
+/**
+ * Carousel component props
  */
 
 /**
