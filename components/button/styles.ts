@@ -178,13 +178,6 @@ export const buttonStyles: ButtonVariants = {
       [--color-light:#999999]
       [--color-border:#33333366]
     `,
-    greyGradient: `
-      [--color-dark:#666666]
-      [--color-medium:#999999]
-      [--color-light:#CCCCCC]
-      [--default-color:var(--color-medium)]
-      [--hover-color:var(--color-light)]
-    `,
     purple: `
       [--color-dark:#660099]
       [--color-medium:#8800CC]
@@ -196,13 +189,6 @@ export const buttonStyles: ButtonVariants = {
       [--color-medium:#660099]
       [--color-light:#8800CC]
       [--color-border:#44006666]
-    `,
-    purpleGradient: `
-      [--color-dark:#660099]
-      [--color-medium:#8800CC]
-      [--color-light:#AA00FF]
-      [--default-color:var(--color-medium)]
-      [--hover-color:var(--color-light)]
     `,
     test: `
       [--color-dark:#00CC00]

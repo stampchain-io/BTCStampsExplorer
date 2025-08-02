@@ -1,13 +1,13 @@
 /* ===== CLOSE ICON COMPONENT ===== */
-import { Icon } from "$icon";
 import type { IconVariants } from "$icon";
+import { Icon } from "$icon";
 
 /* ===== TYPES ===== */
 interface CloseIconProps {
   onClick: (e?: MouseEvent) => void;
   size: IconVariants["size"];
   weight: IconVariants["weight"];
-  color: "greyGradient" | "purpleGradient";
+  color: "grey" | "purple";
   className?: string;
   onMouseEnter?: (() => void) | undefined;
   onMouseLeave?: (() => void) | undefined;
@@ -32,10 +32,10 @@ export function CloseIcon({
   };
 
   /* ===== STYLES ===== */
-  const colorClasses = color === "greyGradient"
-    ? `stroke-[url(#greyGradient)] hover:stroke-stamp-grey-light transform transition-colors duration-300`
-    : color === "purpleGradient"
-    ? `stroke-[url(#purpleGradient)] hover:stroke-stamp-purple-bright transform transition-colors duration-300`
+  const colorClasses = color === "grey"
+    ? `stroke-[url(#grey)] hover:stroke-stamp-grey-light transform transition-colors duration-300`
+    : color === "purple"
+    ? `stroke-[url(#purple)] hover:stroke-stamp-purple-bright transform transition-colors duration-300`
     : "";
 
   /* ===== RENDER ICON ===== */
@@ -43,9 +43,9 @@ export function CloseIcon({
     <>
       <svg width="0" height="0">
         <defs>
-          {color === "greyGradient" && (
+          {color === "grey" && (
             <linearGradient
-              id="greyGradient"
+              id="grey"
               gradientTransform="rotate(45)"
             >
               <stop offset="0%" stop-color="#666666" />
@@ -54,9 +54,9 @@ export function CloseIcon({
               <stop offset="100%" stop-color="#CCCCCC" />
             </linearGradient>
           )}
-          {color === "purpleGradient" && (
+          {color === "purple" && (
             <linearGradient
-              id="purpleGradient"
+              id="purple"
               gradientTransform="rotate(130)"
             >
               <stop offset="0%" stop-color="#AA00FF" />
@@ -93,7 +93,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="lg"
  *   weight="light"
- *   color="greyGradient"
+ *   color="grey"
  *   onClick={() => handleClose()}
  * />
  *
@@ -101,7 +101,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="md"
  *   weight="bold"
- *   color="purpleGradient"
+ *   color="purple"
  *   onClick={() => {
  *     if (open) {
  *       closeMenu();
@@ -113,7 +113,7 @@ export function CloseIcon({
  * <CloseIcon
  *   size="lg"
  *   weight="normal"
- *   color="greyGradient"
+ *   color="grey"
  *   onClick={handleClose}
  *   className="ml-2"
  * />

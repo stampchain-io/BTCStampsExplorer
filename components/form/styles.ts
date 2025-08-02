@@ -104,30 +104,26 @@ export const inputSelect = `
 /* ===== ===== ===== */
 
 /* ===== GRADIENT STYLES ===== */
-export const purpleGradient = `
-  [--color-3:#66009980]
-  [--color-2:#8800CC4D]
-  [--color-1:#AA00FF1A]
-  [--default-color:var(--color-2)]
-  [--hover-color:var(--color-1)]
+export const purple = `
+  [--color-dark:#66009980]
+  [--color-medium:#8800CC4D]
+  [--color-light:#AA00FF1A]
 `;
 
-export const greyGradient = `
-  [--color-3:#66666680]
-  [--color-2:#6666664D]
-  [--color-1:#6666661A]
-  [--default-color:var(--color-2)]
-  [--hover-color:var(--color-1)]
+export const grey = `
+  [--color-dark:#66666680]
+  [--color-medium:#6666664D]
+  [--color-light:#6666661A]
 `;
 
 /* ===== GRADIENT INPUT STYLES ===== */
 export const outlineGradient = `
   relative !bg-gradient-to-r !from-[#221b22] !to-[#252129] !p-[1px] rounded-lg !border-0
   before:absolute before:inset-0 before:rounded-lg before:z-[1]
-  before:bg-[conic-gradient(from_var(--angle),var(--color-3),var(--color-2),var(--color-1),var(--color-2),var(--color-3))]
+  before:bg-[conic-gradient(from_var(--angle),var(--color-dark),var(--color-medium),var(--color-light),var(--color-medium),var(--color-dark))]
   before:[--angle:0deg] before:animate-rotate
-  hover:before:bg-[conic-gradient(from_var(--angle),var(--color-1),var(--color-1),var(--color-1),var(--color-1),var(--color-1))]
-  focus-within:before:bg-[conic-gradient(from_var(--angle),var(--color-1),var(--color-1),var(--color-1),var(--color-1),var(--color-1))]
+  hover:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
+  focus-within:before:bg-[conic-gradient(from_var(--angle),var(--color-light),var(--color-light),var(--color-light),var(--color-light),var(--color-light))]
   before:transition-colors before:duration-300
   [&>*]:relative [&>*]:z-[2] [&>*]:rounded-lg [&>*]:bg-gradient-to-r [&>*]:from-[#221b22] [&>*]:to-[#252129]
   [&>div]:flex [&>div]:justify-between [&>div]:relative [&>div]:z-[2] [&>div]:!bg-gradient-to-r [&>div]:!from-[#221b22] [&>div]:!to-[#252129] [&>div]:placeholder:!bg-gradient-to-r [&>div]:rounded-lg
@@ -171,8 +167,8 @@ export type FormStyles = {
   inputFieldDropdownHover: string;
 
   // Gradients
-  purpleGradient: string;
-  greyGradient: string;
+  purple: string;
+  grey: string;
   outlineGradient: string;
 
   // Labels - not used
