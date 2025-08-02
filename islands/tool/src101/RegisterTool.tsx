@@ -386,8 +386,8 @@ export function SRC101RegisterTool({
           <div class="flex flex-col items-end">
             <Button
               type="button"
-              variant="glassmorphismColor"
-              color="greyDark"
+              variant="glassmorphism"
+              color="grey"
               size="mdR"
               onClick={checkAvailability}
               aria-label="Check bitname availability"

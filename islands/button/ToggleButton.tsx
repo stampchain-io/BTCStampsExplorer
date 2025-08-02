@@ -100,7 +100,7 @@ export const ToggleButton = ({
         // Single select: use glassmorphismSelected for selected state with default cursor (can't be deselected)
         return `${
           button("glassmorphismSelected", "grey", size)
-        } cursor-default ${getSelectState(option)}`;
+        } cursor-pointer ${getSelectState(option)}`;
       } else {
         // Multi select: use glassmorphismSelected for selected state
         // Special case for "dispensers" - show default state since it can't be deselected
@@ -109,7 +109,7 @@ export const ToggleButton = ({
             ? "cursor-default [&:hover]:!bg-stamp-grey-darkest/10 [&:hover]:!border-[var(--color-border-hover)] [&:hover]:!text-[#1e1723] [&:hover::before]:!scale-100 [&:hover::before]:!blur-[5px] " +
               "[&:hover::before]:!bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]"
             : ""
-        } ${getSelectState(option)}`;
+        }`;
       }
     } else {
       // Unselected state: use glassmorphismDeselected
