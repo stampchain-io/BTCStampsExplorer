@@ -604,3 +604,63 @@ export interface PaginationOptions {
   /** Optional callback for page changes */
   onPageChange?: (page: number) => void;
 }
+
+/**
+ * Transaction builder interface for constructing various Bitcoin transactions
+ */
+export interface TransactionBuilder {
+  /** Create a Partially Signed Bitcoin Transaction (PSBT) */
+  createPSBT(
+    utxo: string,
+    amount: number,
+    address: string
+  ): Promise<string>;
+
+  /** Process an existing PSBT from a Counterparty transaction */
+  processCounterpartyPSBT?(
+    psbtHex: string,
+    address: string,
+    feeRate: number
+  ): Promise<{
+    psbtHex?: string;
+    estimatedFee?: number;
+    estimatedVsize?: number;
+  }>;
+}
+
+/**
+ * Transaction construction parameters for building Bitcoin transactions
+ */
+export interface TransactionConstructionParams {
+  /** Source address initiating the transaction */
+  sourceAddress: string;
+  /** Destination address for the transaction */
+  destinationAddress: string;
+  /** Amount to send in satoshis */
+  amount: number;
+  /** Optional transaction fee rate in sats/vbyte */
+  feeRate?: number;
+  /** Optional service fee details */
+  serviceFee?: {
+    amount: number;
+    address: string;
+  };
+}
+
+/**
+ * Transaction fee estimation parameters
+ */
+export interface TransactionEstimateParams {
+  /** Inputs to include in fee estimation */
+  inputs: Array<{
+    value: number;
+    scriptType: ScriptType;
+  }>;
+  /** Outputs to include in fee estimation */
+  outputs: Array<{
+    value: number;
+    scriptType: ScriptType;
+  }>;
+  /** Target fee rate in satoshis per virtual byte */
+  feeRate: number;
+}
