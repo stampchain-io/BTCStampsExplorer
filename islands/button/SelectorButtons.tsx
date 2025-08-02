@@ -139,7 +139,13 @@ export const SelectorButtons = ({
             ref={(el) => (optionRefs.current[index] = el)}
             class={`
               relative min-w-0
-              ${optionDisabled ? state.disabled : "cursor-pointer"}
+              ${
+              optionDisabled
+                ? state.disabled
+                : selectedValue === option.value
+                ? "cursor-default"
+                : "cursor-pointer"
+            }
             `}
           >
             <input
@@ -162,9 +168,15 @@ export const SelectorButtons = ({
                 ${
                 selectedValue === option.value
                   ? "text-black"
-                  : "rounded-lg bg-transparent text-[var(--color-dark)] hover:text-[var(--color-light)] hover:bg-stamp-grey-darkest/30"
+                  : "rounded-lg bg-transparent text-[var(--color-dark)] hover:text-[var(--color-medium)] hover:bg-stamp-grey-darkest/30"
               }
-                ${optionDisabled ? state.disabled : "cursor-pointer"}
+                ${
+                optionDisabled
+                  ? state.disabled
+                  : selectedValue === option.value
+                  ? "cursor-default"
+                  : "cursor-pointer"
+              }
               `}
             >
               <span class="block relative z-20">

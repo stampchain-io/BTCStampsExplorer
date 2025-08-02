@@ -1,4 +1,4 @@
-import { ToggleButton } from "$button";
+import { SelectorButtons, ToggleButton } from "$button";
 import { inputCheckbox } from "$form";
 import {
   STAMP_EDITIONS,
@@ -928,36 +928,21 @@ export const FilterContentStamp = ({
 
   return (
     <div ref={drawerRef}>
-      {/* 🎯 STAMP TYPE FILTER - BEAUTIFUL RADIO DESIGN! */}
-      <CollapsibleSection
-        title="STAMP TYPE"
-        section="stampType"
-        expanded={expandedSections.stampType}
-        toggle={() => toggleSection("stampType")}
-        variant="collapsibleTitle"
-      >
-        <Radio
-          label="CLASSIC"
-          value="classic"
-          checked={filters.stampType === "classic"}
-          onChange={() => handleStampTypeChange("classic")}
-          name="stampType"
-        />
-        <Radio
-          label="CURSED"
-          value="cursed"
-          checked={filters.stampType === "cursed"}
-          onChange={() => handleStampTypeChange("cursed")}
-          name="stampType"
-        />
-        <Radio
-          label="POSH COLLECTION"
-          value="posh"
-          checked={filters.stampType === "posh"}
-          onChange={() => handleStampTypeChange("posh")}
-          name="stampType"
-        />
-      </CollapsibleSection>
+      {/* 🎯 STAMP TYPE FILTER - SELECTOR BUTTONS */}
+
+      <SelectorButtons
+        options={[
+          { value: "classic", label: "CLASSIC" },
+          { value: "posh", label: "POSH" },
+          { value: "cursed", label: "CURSED" },
+        ]}
+        value={filters.stampType}
+        onChange={(value) =>
+          handleStampTypeChange(value as "cursed" | "classic" | "posh")}
+        size="sm"
+        color="grey"
+        className="mt-2 mb-5 -mx-0.5"
+      />
 
       <CollapsibleSection
         title="MARKET PLACE"
@@ -1010,6 +995,7 @@ export const FilterContentStamp = ({
                 size="smR"
                 spacing="evenFullwidth"
                 disabledOptions={["atomics"]}
+                color="grey"
               />
             </div>
 
@@ -1100,6 +1086,7 @@ export const FilterContentStamp = ({
                 size="smR"
                 spacing="evenFullwidth"
                 disabledOptions={["atomics"]}
+                color="grey"
               />
             </div>
 
