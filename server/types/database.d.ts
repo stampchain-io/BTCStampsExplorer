@@ -20,7 +20,7 @@ export interface TableDefinitions {
 
 export interface TableDefinition {
   name: string;
-  columns: ColumnDefinitions;
+  columns: { [columnName: string]: UIColumnDefinition };
   primaryKey: string[];
   indexes?: IndexDefinition[];
   constraints?: ConstraintDefinition[];
@@ -30,30 +30,10 @@ export interface TableDefinition {
 }
 
 export interface ColumnDefinitions {
-  [columnName: string]: ColumnDefinition;
+  [columnName: string]: UIColumnDefinition;
 }
 
-export interface ColumnDefinition {
-  type: ColumnType;
-  nullable?: boolean;
-  primaryKey?: boolean;
-  unique?: boolean;
-  autoIncrement?: boolean;
-  default?: unknown;
-  length?: number;
-  precision?: number;
-  scale?: number;
-  comment?: string;
-  collation?: string;
-}
-
-export type ColumnType =
-  | "INT" | "BIGINT" | "TINYINT" | "SMALLINT" | "MEDIUMINT"
-  | "DECIMAL" | "NUMERIC" | "FLOAT" | "DOUBLE"
-  | "VARCHAR" | "CHAR" | "TEXT" | "MEDIUMTEXT" | "LONGTEXT"
-  | "DATE" | "TIME" | "DATETIME" | "TIMESTAMP"
-  | "BINARY" | "VARBINARY" | "BLOB" | "MEDIUMBLOB" | "LONGBLOB"
-  | "JSON" | "ENUM" | "SET" | "BOOLEAN";
+import { ColumnDefinition as UIColumnDefinition } from "$types/ui.d.ts";
 
 export type DatabaseEngine = "InnoDB" | "MyISAM" | "Memory" | "Archive";
 

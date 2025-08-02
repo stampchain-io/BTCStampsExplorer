@@ -47,24 +47,7 @@ interface TableDefinition {
   collation?: string;
 }
 
-interface ColumnDefinition {
-  type: "INT" | "BIGINT" | "TINYINT" | "SMALLINT" | "MEDIUMINT" |
-        "DECIMAL" | "NUMERIC" | "FLOAT" | "DOUBLE" |
-        "VARCHAR" | "CHAR" | "TEXT" | "MEDIUMTEXT" | "LONGTEXT" |
-        "DATE" | "TIME" | "DATETIME" | "TIMESTAMP" |
-        "BINARY" | "VARBINARY" | "BLOB" | "MEDIUMBLOB" | "LONGBLOB" |
-        "JSON" | "ENUM" | "SET" | "BOOLEAN";
-  nullable?: boolean;
-  primaryKey?: boolean;
-  unique?: boolean;
-  autoIncrement?: boolean;
-  default?: unknown;
-  length?: number;
-  precision?: number;
-  scale?: number;
-  comment?: string;
-  collation?: string;
-}
+import type { ColumnDefinition } from "$types/ui.d.ts";
 
 interface IndexDefinition {
   name: string;

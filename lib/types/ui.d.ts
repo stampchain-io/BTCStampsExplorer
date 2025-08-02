@@ -23,8 +23,16 @@ import type {
 } from "$types/base.d.ts";
 import type { ErrorInfo } from "$types/errors.d.ts";
 import type { MarketListingAggregated } from "$types/marketData.d.ts";
-import type { CollectionWithOptionalMarketData, FeeData } from "$types/services.d.ts";
-import type { SortKey, SortDirection, SortMetrics, WalletSortKey } from "$types/sorting.d.ts";
+import type {
+  CollectionWithOptionalMarketData,
+  FeeData,
+} from "$types/services.d.ts";
+import type {
+  SortDirection,
+  SortKey,
+  SortMetrics,
+  WalletSortKey,
+} from "$types/sorting.d.ts";
 import type { SRC20Transaction, StampTransaction } from "$types/stamping.ts";
 
 import type {
@@ -41,6 +49,9 @@ import type {
 } from "$types/stamp.d.ts";
 import type {
   AlignmentType,
+  CompilerConfiguration,
+  FileCompilationMetrics,
+  MixedTypes,
   OmitByValue,
   PickByValue,
   ProgressiveFeeEstimationResult,
@@ -63,8 +74,6 @@ export type {
   EmptyStateProps,
   ErrorStateProps,
   LoadingStateProps,
-  PartialKeys,
-  RequiredKeys,
   TransitionProps,
 } from "$types/base.d.ts";
 export type {
@@ -73,11 +82,34 @@ export type {
   QuickNodeResponse,
   ServiceResponse,
 } from "$types/services.d.ts";
-export type {
-  WalletContentProps,
-  WalletOverviewInfo,
-} from "$types/wallet.d.ts";
+export type { WalletOverviewInfo } from "$types/wallet.d.ts";
 export type { ButtonProps };
+
+/**
+ * Props for generic table component
+ * Supports customization, sorting, and pagination
+ */
+export interface TableProps<T = any> {
+  data: T[];
+  columns?: TableColumn[];
+  onRowClick?: (row: T) => void;
+  loading?: boolean;
+  error?: string;
+  pagination?: {
+    page: number;
+    total: number;
+    limit: number;
+    onPageChange?: (page: number) => void;
+  };
+  customClasses?: {
+    table?: string;
+    header?: string;
+    row?: string;
+    cell?: string;
+  };
+  sortable?: boolean;
+  onSort?: (column: string, direction: "asc" | "desc") => void;
+}
 // Removed circular self-import block - these types should be defined locally
 // import type {
 //   ActivityBadgeProps,
@@ -681,7 +713,7 @@ export interface ButtonElementProps
   extends JSX.HTMLAttributes<HTMLButtonElement> {
   variant?: string;
   color?: string;
-  size?: string;
+  buttonSize?: string;
 }
 
 /**
@@ -802,7 +834,7 @@ export interface WalletProfileDetailsProps {
 }
 
 export interface WalletDispenserDetailsProps {
-  walletData: any; // Replace with proper WalletData type if available
+  walletData: WalletOverviewInfo;
 }
 
 export interface TransactionProgressProps {
@@ -2012,12 +2044,37 @@ export interface FaqAccordionProps extends BaseComponentProps {
 /**
  * Buy Stamp Modal component props
  */
+export interface BuyStampModalProps extends ModalBaseProps {
+  stamp?: StampRow;
+  onBuy?: (stampId: number) => void;
+  disabled?: boolean;
+  loading?: boolean;
+  error?: string;
+}
 /**
  * Donate Stamp Modal component props
  */
+export interface DonateStampModalProps extends ModalBaseProps {
+  stamp?: StampRow;
+  onDonate?: (stampId: number, amount: number) => void;
+  disabled?: boolean;
+  loading?: boolean;
+  error?: string;
+}
 /**
  * Filter SRC-20 Modal component props
  */
+export interface FilterSRC20ModalProps extends ModalBaseProps {
+  currentFilters?: {
+    minHolders?: number;
+    maxHolders?: number;
+    status?: string;
+    type?: string;
+  };
+  onApplyFilters?: (filters: any) => void;
+  loading?: boolean;
+  error?: string;
+}
 /**
  * Receive Address Modal component props
  */
@@ -2027,6 +2084,12 @@ export interface FaqAccordionProps extends BaseComponentProps {
 /**
  * Detail SRC-101 Modal component props
  */
+export interface DetailSRC101ModalProps extends ModalBaseProps {
+  detail?: any; // TODO: Replace with concrete SRC-101 detail type
+  onAction?: (actionType: string) => void;
+  loading?: boolean;
+  error?: string;
+}
 /**
  * Connect Wallet Modal component props
  */
@@ -2034,6 +2097,12 @@ export interface FaqAccordionProps extends BaseComponentProps {
 /**
  * Preview Code Modal component props
  */
+export interface PreviewCodeModalProps extends ModalBaseProps {
+  code: string;
+  language?: string;
+  title?: string;
+  onCopy?: () => void;
+}
 
 /**
  * Preview Image Modal component props
@@ -2053,6 +2122,13 @@ export interface FaqAccordionProps extends BaseComponentProps {
 /**
  * Modal Overlay component props
  */
+export interface ModalOverlayProps extends BaseComponentProps {
+  isOpen: boolean;
+  onClose?: () => void;
+  children: ComponentChildren;
+  animation?: ModalAnimation;
+  preventScroll?: boolean;
+}
 
 /**
  * Wallet Provider component props
@@ -2233,6 +2309,14 @@ export interface ToggleSwitchButtonProps {
 /**
  * Checkbox component props
  */
+export interface CheckboxProps extends BaseComponentProps {
+  label?: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+  indeterminate?: boolean;
+  name?: string;
+}
 
 /**
  * Radio component props
@@ -2322,6 +2406,12 @@ export interface ToggleSwitchButtonProps {
 /**
  * Error Display component props
  */
+export interface ErrorDisplayProps extends BaseComponentProps {
+  error: string | Error;
+  onRetry?: () => void;
+  details?: string;
+  actionLabel?: string;
+}
 
 // OTHER COMPONENT PROPS
 // =====================
@@ -2579,6 +2669,21 @@ export type ProgressState = "idle" | "loading" | "success" | "error";
  * TransactionState - Migrated from TransactionStatus.tsx
  */
 export type TransactionState = "submitted" | "pending" | "confirmed" | "failed";
+
+/**
+ * TransactionStatusProps - Props for TransactionStatus component
+ */
+export interface TransactionStatusProps {
+  state: TransactionState;
+  txid?: string;
+  confirmations?: number;
+  targetConfirmations?: number;
+  estimatedTime?: number;
+  errorMessage?: string;
+  class?: string;
+  onViewTransaction?: () => void;
+  onRetry?: () => void;
+}
 
 /**
  * SRC20CardBaseProps - Migrated from SRC20CardBase.tsx
@@ -2908,6 +3013,82 @@ export interface SRC20MintingProps {
 }
 
 /**
+ * SRC20MintingTableProps - Props for SRC20MintingTable component
+ */
+export interface SRC20MintingTableProps {
+  data?: SRC20Row[];
+  fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
+  timeframe?: Timeframe;
+  onImageClick?: (imgSrc: string) => void;
+}
+
+/**
+ * SRC20MintedTableProps - Props for SRC20MintedTable component
+ */
+export interface SRC20MintedTableProps {
+  data?: SRC20Row[];
+  fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
+  timeframe?: Timeframe;
+  onImageClick?: (imgSrc: string) => void;
+}
+
+/**
+ * ToastProviderProps - Props for ToastProvider component
+ */
+export interface ToastProviderProps {
+  children: ComponentChildren;
+}
+
+/**
+ * ToastComponentProps - Props for ToastComponent
+ */
+export interface ToastComponentProps {
+  id: string;
+  message: string;
+  type: "success" | "error" | "warning" | "info";
+  onClose: () => void;
+}
+
+/**
+ * WalletStampCardProps - Props for WalletStampCard component
+ */
+export interface WalletStampCardProps {
+  stamp: any;
+  variant?: "default" | string;
+  fromPage?: string;
+}
+
+/**
+ * StampInfoProps - Props for StampInfo component
+ */
+export interface StampInfoProps {
+  stamp: any;
+  lowestPriceDispenser?: any;
+}
+
+/**
+ * RangeInputProps - Props for RangeInput component
+ */
+export interface RangeInputProps {
+  label: string;
+  placeholder?: string;
+  value: string;
+  onChange: (value: string) => void;
+  type: string;
+}
+
+/**
+ * SRC20OverviewHeaderProps - Props for SRC20OverviewHeader component
+ */
+export interface SRC20OverviewHeaderProps {
+  onViewTypeChange?: (viewType: string) => void;
+  viewType?: string;
+  onTimeframeChange?: (timeframe: string) => void;
+  onFilterChange?: (filter: any) => void;
+  currentSort?: any;
+}
+
+/**
  * TransferProps - Migrated from stamping.ts
  */
 export interface TransferProps {
@@ -3071,6 +3252,80 @@ export interface ListProps {
 }
 
 /**
+ * StampGalleryProps - Re-export from stamp.d.ts for compatibility
+ */
+export type { StampGalleryProps } from "$types/stamp.d.ts";
+
+/**
+ * ConvenienceProviderProps - Convenience Provider component props
+ */
+export interface ConvenienceProviderProps extends BaseComponentProps {
+  children: ComponentChildren;
+  initialValue?: any;
+  onChange?: (value: any) => void;
+  defaultValue?: any;
+}
+
+/**
+ * CompleteSortingInterfaceProps - Complete Sorting Interface component props
+ */
+export interface CompleteSortingInterfaceProps extends BaseComponentProps {
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+  onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
+  options: Array<{ key: string; label: string }>;
+}
+
+/**
+ * PieChartProps - Pie Chart component props
+ */
+export interface PieChartProps extends BaseComponentProps {
+  data: {
+    labels: string[];
+    datasets: Array<{
+      label: string;
+      data: number[];
+      backgroundColor?: string | string[];
+    }>;
+  };
+  width?: number | string;
+  height?: number | string;
+  title?: string;
+}
+
+/**
+ * ImageModalProps - Image Modal component props
+ */
+export interface ImageModalProps extends ModalBaseProps {
+  src: string;
+  alt?: string;
+  caption?: string;
+  onClose: () => void;
+}
+
+/**
+ * FairmintToolProps - Fairmint Tool component props
+ */
+export interface FairmintToolProps extends BaseComponentProps {
+  asset?: string;
+  quantity?: number;
+  onSubmit?: (data: any) => void;
+  loading?: boolean;
+  error?: string;
+}
+
+/**
+ * MintProgressProps - Mint Progress component props
+ */
+export interface MintProgressProps extends BaseComponentProps {
+  current: number;
+  total: number;
+  label?: string;
+  variant?: "linear" | "circular";
+  color?: string;
+}
+
+/**
  * StampSendsGalleryProps - Migrated from StampSends.tsx
  */
 export interface StampSendsGalleryProps {
@@ -3205,7 +3460,7 @@ interface AlertState {
 /**
  * AlertContext - Migrated from scripts/alert-system.ts
  */
-interface AlertContext {
+export interface AlertContext {
   environment: string;
   sessionId?: string;
   totalAlerts: number;
@@ -3216,7 +3471,7 @@ interface AlertContext {
 /**
  * FeeState - Migrated from tests/integration/feeInfiniteLoopPrevention.test.ts
  */
-interface FeeState {
+export interface FeeState {
   data: {
     recommendedFee: number;
     btcPrice: number;
@@ -3345,3 +3600,66 @@ export interface ProgressiveEstimationIndicatorProps {
   progress?: number;
   className?: string;
 }
+
+export interface ColumnDefinition<T> {
+  key: keyof T;
+  header: string;
+  sortable?: boolean;
+  width?: string;
+  align?: "left" | "right" | "center";
+  transform?: (value: T[keyof T]) => string | number;
+}
+
+export interface ListProps<T> {
+  items: T[];
+  columns: ColumnDefinition<T>[];
+  keyExtractor?: (item: T) => string | number;
+  onItemClick?: (item: T) => void;
+  sortBy?: keyof T;
+  sortOrder?: "asc" | "desc";
+}
+
+export interface MockResponse<T> {
+  data: T;
+  status: number;
+  headers?: Record<string, string>;
+  error?: string;
+}
+
+/**
+ * Color Swatch component props
+ */
+export interface ColorSwatchProps extends BaseComponentProps {
+  color: string;
+  size?: "sm" | "md" | "lg";
+  variant?: "solid" | "outline";
+  onClick?: () => void;
+  selected?: boolean;
+}
+
+/**
+ * Namespace import type for flexible module imports
+ */
+export type NamespaceImport<T> = { [K in keyof T]: T[K] };
+
+/**
+ * XcpBalance type for tracking cryptocurrency balance
+ */
+export interface XcpBalance {
+  asset: string;
+  balance: number;
+  available_balance: number;
+  locked_balance?: number;
+  total_received?: number;
+  total_sent?: number;
+}
+
+// Additional type exports for backward compatibility and comprehensive access
+export type {
+  CompleteSortingInterfaceProps,
+  ConvenienceProviderProps,
+  FairmintToolProps,
+  ImageModalProps,
+  MintProgressProps,
+  PieChartProps,
+};
