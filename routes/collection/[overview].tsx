@@ -1,7 +1,10 @@
 /* ===== COLLECTION OVERVIEW PAGE ===== */
 
 import { StampOverviewContent } from "$content";
-import type { CollectionOverviewPageProps, STAMP_FILTER_TYPES } from "$types/index.d.ts";
+import type {
+  CollectionOverviewPageProps,
+  STAMP_FILTER_TYPES,
+} from "$types/index.d.ts";
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
 
 import { CollectionOverviewHeader } from "$header";

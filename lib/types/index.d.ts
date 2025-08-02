@@ -185,6 +185,7 @@ export type {
   TransactionOptions,
   Wallet,
   WalletInfo,
+  WalletOverviewInfo,
 } from "./wallet.d.ts";
 
 // ============================================================================

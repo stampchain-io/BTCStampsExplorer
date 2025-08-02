@@ -301,10 +301,11 @@ export class ASTTypeSafetyAnalyzer {
       // For now, we'll create a mock project
       this.project = await this.createMockProject(projectRoot);
 
-      logger.info("[ast-analyzer] Initialized TypeScript project for analysis");
+      logger.info("system", { message: "[ast-analyzer] Initialized TypeScript project for analysis" });
     } catch (error) {
       logger.error(
-        `[ast-analyzer] Failed to initialize project: ${error.message}`,
+        "system",
+        { message: `[ast-analyzer] Failed to initialize project: ${error.message}` },
       );
       throw error;
     }
@@ -319,7 +320,7 @@ export class ASTTypeSafetyAnalyzer {
     }
 
     const startTime = performance.now();
-    logger.info("[ast-analyzer] Starting comprehensive type safety analysis");
+    logger.info("system", { message: "[ast-analyzer] Starting comprehensive type safety analysis" });
 
     try {
       // Analyze type coverage
@@ -363,9 +364,10 @@ export class ASTTypeSafetyAnalyzer {
 
       const duration = performance.now() - startTime;
       logger.info(
-        `[ast-analyzer] Type safety analysis completed in ${
+        "system",
+        { message: `[ast-analyzer] Type safety analysis completed in ${
           duration.toFixed(1)
-        }ms`,
+        }ms` },
       );
 
       // Store report for future regression analysis
@@ -374,7 +376,8 @@ export class ASTTypeSafetyAnalyzer {
       return report;
     } catch (error) {
       logger.error(
-        `[ast-analyzer] Type safety analysis failed: ${error.message}`,
+        "system",
+        { message: `[ast-analyzer] Type safety analysis failed: ${error.message}` },
       );
       throw error;
     }

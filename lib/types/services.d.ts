@@ -1,5 +1,11 @@
+import { estimateFee } from "$lib/utils/bitcoin/minting/feeCalculations.ts";
+import { getUTXOForAddress as getUTXOForAddressFromUtils } from "$lib/utils/bitcoin/utxo/utxoUtils.ts";
 import type { LogNamespace } from "$lib/utils/monitoring/logging/logger.ts";
-import type { HttpRequestConfig, HttpResponse, QuicknodeRPCResponse } from "$types/api.d.ts";
+import type {
+  HttpRequestConfig,
+  HttpResponse,
+  QuicknodeRPCResponse,
+} from "$types/api.d.ts";
 import type {
   AncestorInfo,
   BasicUTXO as BaseBasicUTXO,
@@ -14,8 +20,6 @@ import type { SRC20Balance, SRC20Row } from "$types/src20.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 import type { SendRow } from "$types/transaction.d.ts";
 import type { MockPSBTInput } from "$types/utils.d.ts";
-import { getUTXOForAddress as getUTXOForAddressFromUtils } from "$lib/utils/bitcoin/utxo/utxoUtils.ts";
-import { estimateFee } from "$lib/utils/bitcoin/minting/feeCalculations.ts";
 
 // Orchestration System Types for Type Domain Migration
 export type TaskStatus =
@@ -1444,6 +1448,9 @@ export interface CollectionWithCreators extends CollectionRow {
  * CollectionWithOptionalMarketData - Migrated from collection.d.ts
  */
 export interface CollectionWithOptionalMarketData extends CollectionRow {
+  // Creator names from CollectionWithCreators
+  creator_names?: string[];
+
   // Optional market data fields
   marketData?: CollectionMarketData | null;
   marketDataMessage?: string;

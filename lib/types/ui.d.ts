@@ -11,17 +11,36 @@
 
 import type { ButtonProps } from "$button";
 import type { Timeframe } from "$components/layout/types.ts";
-import type { AncestorInfo, FeeDetails } from "$types/base.d.ts";
+import type {
+  AncestorInfo,
+  FeeDetails,
+  FeeEstimationResult,
+  MintDetails,
+  PSBTFees,
+  ScriptType,
+  StampTransferDetails,
+  TransferDetails,
+} from "$types/base.d.ts";
 import type { MarketListingAggregated } from "$types/marketData.d.ts";
 import type { CollectionWithOptionalMarketData } from "$types/services.d.ts";
 import type { SRC20Transaction, StampTransaction } from "$types/stamping.ts";
 
-import type { SRC20_TYPES, SRC20Row } from "$types/src20.d.ts";
+import type {
+  Deployment,
+  SRC20_TYPES,
+  SRC20MintStatus,
+  SRC20Row,
+} from "$types/src20.d.ts";
 import type {
   STAMP_FILTER_TYPES,
   STAMP_TYPES,
+  StampFilters,
   StampRow,
 } from "$types/stamp.d.ts";
+import type {
+  AlignmentType,
+  ProgressiveFeeEstimationResult,
+} from "$types/utils.d.ts";
 import type * as preact from "preact";
 import type { ComponentChildren, ComponentProps, JSX } from "preact";
 
@@ -42,6 +61,10 @@ export type {
   QuickNodeResponse,
   ServiceResponse,
 } from "$types/services.d.ts";
+export type {
+  WalletContentProps,
+  WalletOverviewInfo,
+} from "$types/wallet.d.ts";
 export type { ButtonProps };
 // Removed circular self-import block - these types should be defined locally
 // import type {
@@ -304,6 +327,8 @@ export interface ChartWidgetProps extends BaseComponentProps {
   height?: number | string;
   responsive?: boolean;
   maintainAspectRatio?: boolean;
+  fromPage?: string;
+  tick?: string;
 }
 
 // =============================================================================
@@ -407,6 +432,20 @@ export interface InputProps extends FormControlProps {
  * Input field component props (extends InputProps with additional features)
  */
 export interface InputFieldProps extends InputProps {
+  onInput?: (event: Event) => void;
+  inputMode?:
+    | "text"
+    | "decimal"
+    | "numeric"
+    | "tel"
+    | "search"
+    | "email"
+    | "url";
+  min?: string | number;
+  step?: string | number;
+  textAlign?: "left" | "center" | "right";
+  isUppercase?: boolean;
+  class?: string;
   icon?: string;
   iconPosition?: "left" | "right";
   clearable?: boolean;
@@ -447,6 +486,8 @@ export interface ModalBaseProps extends BaseComponentProps {
   closeOnEscape?: boolean;
   showCloseButton?: boolean;
   preventScroll?: boolean;
+  hideHeader?: boolean;
+  contentClassName?: string;
 }
 
 /**
@@ -474,6 +515,26 @@ export interface ConnectWalletModalProps extends ModalBaseProps {
   onConnect?: (providerId: string) => void;
   showTestnet?: boolean;
   preferredWallet?: string;
+  connectors?: ComponentChildren;
+  handleClose?: () => void;
+}
+
+/**
+ * Mara Mode Warning Modal props
+ */
+export interface MaraModeWarningModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+}
+
+/**
+ * Mara Service Unavailable Modal props
+ */
+export interface MaraServiceUnavailableModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
 }
 
 // =============================================================================
@@ -505,6 +566,15 @@ export interface MaraSuccessMessageProps extends BaseComponentProps {
 // =============================================================================
 // STATUS & BADGE COMPONENT PROPS
 // =============================================================================
+
+/**
+ * Activity Badge component props
+ */
+export interface ActivityBadgeProps extends BaseComponentProps {
+  size: "xs" | "sm" | "md" | "lg";
+  variant?: "primary" | "secondary" | "success" | "warning" | "error";
+  children?: ComponentChildren;
+}
 
 /**
  * Transaction badge component props
@@ -579,9 +649,14 @@ export interface ButtonElementProps
  * Basic component prop interfaces
  */
 export interface BTCValueDisplayProps {
-  value: number;
+  value: number | null;
   className?: string;
   precision?: number;
+  size?: IconSize | number;
+  fallback?: string;
+  loading?: boolean;
+  error?: string;
+  showSymbol?: boolean;
 }
 
 export interface BTCValueSummaryProps {
@@ -731,6 +806,19 @@ export interface SRC20GalleryProps {
   loading?: boolean;
   error?: string;
   onLoadMore?: () => void;
+  viewType?: any;
+  fromPage?: string;
+  initialData?: any;
+  timeframe?: "24H" | "7D" | "30D";
+  currentSort?: {
+    filter: any;
+    direction: "asc" | "desc";
+  };
+  pagination?: {
+    page: any;
+    totalPages: any;
+    onPageChange: (newPage: number) => void;
+  };
 }
 
 export interface SRC101RegisterToolProps {
@@ -740,7 +828,14 @@ export interface SRC101RegisterToolProps {
 }
 
 export interface StatusMessagesProps {
-  messages: Array<{
+  submissionMessage?: string | { message: string; txid?: string };
+  apiError?: string;
+  fileUploadError?: string;
+  walletError?: string;
+  maraError?: string;
+  transactionHex?: string;
+  onCopyHex?: () => void;
+  messages?: Array<{
     type: "info" | "warning" | "error" | "success";
     message: string;
   }>;
@@ -766,10 +861,18 @@ export interface StampListingsOpenProps {
   loading?: boolean;
   error?: string;
   onSelect?: (listing: any) => void;
+  selectedDispenser?: any;
 }
 
 export interface SRC20OverviewContentProps {
-  token: any;
+  mintingData?: any;
+  timeframe?: string;
+  sortBy?: string;
+  sortDirection?: "asc" | "desc";
+  viewType?: string;
+  btcPrice?: number;
+  btcPriceSource?: string;
+  token?: any;
   marketData?: any;
   loading?: boolean;
   error?: string;
@@ -822,6 +925,9 @@ export interface SortProps {
   sortBy: string;
   sortOrder: "asc" | "desc";
   onSort: (sortBy: string, sortOrder: "asc" | "desc") => void;
+  initSort?: "ASC" | "DESC";
+  onChangeSort?: (newSortBy: "ASC" | "DESC") => void;
+  sortParam?: string;
 }
 
 export interface SortingProviderProps {
@@ -865,6 +971,11 @@ export interface SettingProps {
     value: any;
     label: string;
   }>;
+  initFilter?: any[];
+  open?: boolean;
+  handleOpen?: (open: boolean) => void;
+  filterButtons?: string[];
+  onFilterClick?: (filter: string) => void;
 }
 
 export interface SendBTCModalProps {
@@ -873,12 +984,16 @@ export interface SendBTCModalProps {
   address?: string;
   amount?: number;
   onSend: (to: string, amount: number) => void;
+  fee?: number;
+  balance?: any;
+  handleChangeFee?: any;
 }
 
 export interface ReceiveAddyModalProps {
   isOpen: boolean;
   onClose: () => void;
   address?: string;
+  title?: string;
 }
 
 export interface RecentSaleCardProps {
@@ -888,7 +1003,26 @@ export interface RecentSaleCardProps {
 }
 
 export interface RecentSalesGalleryProps {
+  title?: string;
+  subTitle?: string;
   sales: Array<any>;
+  layout?: "grid" | "list";
+  showFullDetails?: boolean;
+  displayCounts?: {
+    mobileSm?: number;
+    mobileMd?: number;
+    mobileLg?: number;
+    tablet?: number;
+    desktop?: number;
+  };
+  pagination?: any;
+  isLoading?: boolean;
+  btcPriceUSD?: number;
+  autoRefresh?: boolean;
+  refreshIntervalMs?: number;
+  onRefresh?: () => void;
+  gridClass?: string;
+  maxItems?: number;
   loading?: boolean;
   error?: string;
   onLoadMore?: () => void;
@@ -902,10 +1036,22 @@ export interface ResponsiveProps {
 }
 
 export interface SalesActivityFeedProps {
-  activities: Array<any>;
+  title?: string;
+  subTitle?: string;
+  sales?: Array<any>;
+  isLoading?: boolean;
+  btcPriceUSD?: number;
+  maxItems?: number;
+  showTimestamps?: boolean;
+  showStampPreviews?: boolean;
+  autoRefresh?: boolean;
+  refreshIntervalMs?: number;
+  onRefresh?: () => void;
+  onItemClick?: (item: any) => void;
+  compact?: boolean;
+  activities?: Array<any>;
   loading?: boolean;
   error?: string;
-  onRefresh?: () => void;
 }
 
 export interface ScreenReaderProps {
@@ -925,6 +1071,11 @@ export interface SectionHeaderProps {
   subtitle?: string;
   actions?: ComponentChildren;
   className?: string;
+  showMetrics?: boolean;
+  config?: any;
+  sortBy?: string;
+  onSortChange?: (newSort: string) => void;
+  enableAdvancedSorting?: boolean;
 }
 
 export interface SelectorButtonsProps {
@@ -940,17 +1091,23 @@ export interface SelectorButtonsProps {
 export interface StampBTCValueProps {
   stampId: number;
   className?: string;
+  showBreakdown?: boolean;
+  size?: IconSize | number;
 }
 
 export interface TotalBTCValueProps {
   items: Array<{ value: number }>;
   className?: string;
+  showStats?: boolean;
+  size?: IconSize | number;
 }
 
 export interface TransactionHexDisplayProps {
   hex: string;
   className?: string;
   collapsed?: boolean;
+  txid?: string;
+  class?: string;
 }
 
 /**
@@ -959,13 +1116,14 @@ export interface TransactionHexDisplayProps {
 export interface CloseIconProps {
   className?: string;
   onClick?: () => void;
-  size?: number;
+  size?: IconSize | number;
 }
 
 export interface GearIconProps {
   className?: string;
   onClick?: () => void;
-  size?: number;
+  size?: IconSize | number;
+  color?: string;
 }
 
 // =============================================================================
@@ -1432,8 +1590,8 @@ export interface PolymorphicProps<
 export type PolymorphicComponent<
   T extends keyof JSX.IntrinsicElements = "div",
 > =
-  & PolymorphicComponentProps<T>
-  & Omit<ComponentProps<T>, keyof PolymorphicComponentProps<T>>;
+  & PolymorphicProps<T>
+  & Omit<ComponentProps<T>, keyof PolymorphicProps<T>>;
 
 /**
  * Generic component props with children
@@ -1469,12 +1627,33 @@ export interface ComponentWithChildren extends ExtendedComponentProps {
 /**
  * Icon size variants
  */
-export type IconSize = "xs" | "sm" | "md" | "lg" | "xl";
+export type IconSize =
+  | "sm"
+  | "md"
+  | "lg"
+  | "xl"
+  | "custom"
+  | "xxs"
+  | "xs"
+  | "xxsR"
+  | "xsR"
+  | "smR"
+  | "mdR"
+  | "lgR"
+  | "xxxs"
+  | "xxl"
+  | "xlR"
+  | "xxlR";
 
 /**
  * Icon weight variants
  */
 export type IconWeight = "thin" | "light" | "regular" | "bold" | "fill";
+
+/**
+ * Modal animation types
+ */
+export type ModalAnimation = "slideUpDown" | "slideDownUp" | "zoomInOut";
 
 /**
  * Icon component props
@@ -2999,10 +3178,21 @@ export interface WalletStampValueProps {
   stampId: number;
   walletAddress: string;
   className?: string;
+  showSource?: boolean;
+  size?: IconSize | number;
 }
 
 export interface ProgressiveEstimationIndicatorProps {
-  isEstimating: boolean;
+  isConnected: boolean;
+  isSubmitting: boolean;
+  isPreFetching: boolean;
+  currentPhase: number;
+  phase1?: any;
+  phase2?: any;
+  phase3?: any;
+  feeEstimationError?: string | null;
+  clearError?: () => void;
+  isEstimating?: boolean;
   progress?: number;
   className?: string;
 }

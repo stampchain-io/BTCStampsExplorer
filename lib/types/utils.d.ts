@@ -1,6 +1,7 @@
-import type { TimeSeriesData } from "$types/stamp.d.ts";
-import type { SortKey } from "$types/sorting.d.ts";
 import type { BlockRow } from "$types/base.d.ts";
+import type { SortKey } from "$types/sorting.d.ts";
+import type { TimeSeriesData } from "$types/stamp.d.ts";
+import type { TransactionOptions } from "$types/wallet.d.ts";
 
 export interface UTXOFromBlockCypher {
   tx_hash: string;
@@ -1611,9 +1612,9 @@ export type WhereCondition<T> = {
 };
 
 /**
- * QueryResult - Migrated from server.type.test.ts
+ * DatabaseQueryResult - Migrated from server.type.test.ts
  */
-export interface QueryResult<T> {
+export interface DatabaseQueryResult<T> {
   rows: T[];
   rowCount: number;
   command: string;
@@ -1651,7 +1652,7 @@ export interface SelectQueryBuilder<T> {
   orderBy(column: keyof T, direction?: "ASC" | "DESC"): SelectQueryBuilder<T>;
   limit(count: number): SelectQueryBuilder<T>;
   offset(count: number): SelectQueryBuilder<T>;
-  execute(): Promise<QueryResult<T>>;
+  execute(): Promise<DatabaseQueryResult<T>>;
 }
 
 /**
@@ -1660,7 +1661,7 @@ export interface SelectQueryBuilder<T> {
 export interface InsertQueryBuilder<T> {
   into(table: string): InsertQueryBuilder<T>;
   values(data: Partial<T> | Partial<T>[]): InsertQueryBuilder<T>;
-  execute(): Promise<QueryResult<T>>;
+  execute(): Promise<DatabaseQueryResult<T>>;
 }
 
 /**
@@ -1670,7 +1671,7 @@ export interface UpdateQueryBuilder<T> {
   table(name: string): UpdateQueryBuilder<T>;
   set(data: Partial<T>): UpdateQueryBuilder<T>;
   where(condition: WhereCondition<T>): UpdateQueryBuilder<T>;
-  execute(): Promise<QueryResult<T>>;
+  execute(): Promise<DatabaseQueryResult<T>>;
 }
 
 /**
@@ -1679,7 +1680,7 @@ export interface UpdateQueryBuilder<T> {
 export interface DeleteQueryBuilder<T> {
   from(table: string): DeleteQueryBuilder<T>;
   where(condition: WhereCondition<T>): DeleteQueryBuilder<T>;
-  execute(): Promise<QueryResult<T>>;
+  execute(): Promise<DatabaseQueryResult<T>>;
 }
 
 /**
@@ -1765,7 +1766,7 @@ export interface DatabaseConnection {
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   ping(): Promise<boolean>;
-  execute(query: string, params?: any[]): Promise<QueryResult<any>>;
+  execute(query: string, params?: any[]): Promise<DatabaseQueryResult<any>>;
   transaction<T>(callback: (trx: any) => Promise<T>): Promise<T>;
 }
 
@@ -1774,7 +1775,7 @@ export interface DatabaseConnection {
  */
 export interface SQLDatabase extends DatabaseConnection {
   type: "mysql" | "postgresql" | "sqlite";
-  query<T>(sql: string, params?: any[]): Promise<QueryResult<T>>;
+  query<T>(sql: string, params?: any[]): Promise<DatabaseQueryResult<T>>;
   prepare(sql: string): PreparedStatement;
   beginTransaction(): Promise<void>;
   commit(): Promise<void>;
@@ -1815,7 +1816,7 @@ export interface RedisDatabase extends DatabaseConnection {
  * PreparedStatement - Migrated from server.type.test.ts
  */
 export interface PreparedStatement {
-  execute(params?: any[]): Promise<QueryResult<any>>;
+  execute(params?: any[]): Promise<DatabaseQueryResult<any>>;
   close(): Promise<void>;
 }
 
@@ -1889,9 +1890,9 @@ export interface RestoreOperation {
 }
 
 /**
- * QueryResult - Migrated from dbMock.ts
+ * MockQueryResult - Migrated from dbMock.ts
  */
-export type QueryResult = {
+export type MockQueryResult = {
   rows: any[];
   rowCount: number;
   affectedRows?: number;
@@ -1902,7 +1903,7 @@ export type QueryResult = {
  */
 export type StubConfig = {
   method: "executeQuery" | "executeQueryWithCache";
-  response: QueryResult | Error;
+  response: MockQueryResult | Error;
 };
 
 /**
@@ -1939,9 +1940,9 @@ export interface FeeState {
 }
 
 /**
- * QueryResult - Migrated from mockDatabaseManager.ts
+ * MockDatabaseQueryResult - Migrated from mockDatabaseManager.ts
  */
-export interface QueryResult {
+export interface MockDatabaseQueryResult {
   rows: any[];
   [key: string]: any;
 }
@@ -3582,9 +3583,11 @@ export interface BaselineStatistics {
 /**
  * Utility type to flatten intersection types for better display
  */
-export type Prettify<T> = {
-  [K in keyof T]: T[K];
-} & {};
+export type Prettify<T> =
+  & {
+    [K in keyof T]: T[K];
+  }
+  & {};
 
 /**
  * Type guard function type
@@ -3615,7 +3618,10 @@ export namespace NumberUtils {
   export function isInteger(value: unknown): value is number;
   export function clamp(value: number, min: number, max: number): number;
   export function round(value: number, decimals?: number): number;
-  export function formatNumber(value: number, options?: Intl.NumberFormatOptions): string;
+  export function formatNumber(
+    value: number,
+    options?: Intl.NumberFormatOptions,
+  ): string;
 }
 
 /**
@@ -3625,7 +3631,11 @@ export namespace StringUtils {
   export function isString(value: unknown): value is string;
   export function isEmpty(value: string): boolean;
   export function capitalize(value: string): string;
-  export function truncate(value: string, length: number, suffix?: string): string;
+  export function truncate(
+    value: string,
+    length: number,
+    suffix?: string,
+  ): string;
   export function kebabCase(value: string): string;
   export function camelCase(value: string): string;
 }

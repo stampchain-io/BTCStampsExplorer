@@ -10,6 +10,7 @@
 // Import required base types
 import type { BlockRow, ScriptType } from "$types/base.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
+import type { DatabaseQueryResult } from "$types/utils.d.ts";
 
 // Re-export ScriptType for convenience
 export type { ScriptType };
@@ -342,7 +343,7 @@ export interface UTXOTableSchema {
  * Transaction - Migrated from server.type.test.ts
  */
 export interface Transaction {
-  query<T>(sql: string, params?: any[]): Promise<QueryResult<T>>;
+  query<T>(sql: string, params?: any[]): Promise<DatabaseQueryResult<T>>;
   commit(): Promise<void>;
   rollback(): Promise<void>;
 }

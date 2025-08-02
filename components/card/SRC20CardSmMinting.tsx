@@ -1,5 +1,6 @@
 /* reinamora - update Trending calculations */
 import { Button } from "$button";
+import type { SRC20Row } from "$types/src20.d.ts";
 import type { SRC20CardSmMintingProps } from "$types/ui.d.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 // SRC20 card component for minting state

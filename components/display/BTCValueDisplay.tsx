@@ -176,8 +176,10 @@ export const TotalBTCValue = memo(function TotalBTCValue({
 
       {showStats && (
         <div class="text-sm text-gray-500 mt-2">
-          {stamps.length} collections,{" "}
-          {stamps.reduce((sum: number, s: WalletStampWithValue) => sum + (s.balance || 0), 0)} stamps
+          {stamps.length} collections, {stamps.reduce(
+            (sum: number, s: WalletStampWithValue) => sum + (s.balance || 0),
+            0,
+          )} stamps
         </div>
       )}
     </div>

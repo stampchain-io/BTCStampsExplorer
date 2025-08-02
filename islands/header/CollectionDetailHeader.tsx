@@ -1,5 +1,5 @@
 /* ===== COLLECTION DETAILS HEADER COMPONENT ===== */
-import type { Collection, StampRow } from "$server/types/collection.d.ts";
+import type { CollectionWithOptionalMarketData, StampRow } from "$server/types/collection.d.ts";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { containerBackground, containerColData } from "$layout";
 import {
@@ -21,7 +21,7 @@ import {
 
 /* ===== COMPONENT ===== */
 export const CollectionDetailHeader = (
-  { collection, stamps }: { collection: Collection; stamps: StampRow[] },
+  { collection, stamps }: { collection: CollectionWithOptionalMarketData; stamps: StampRow[] },
 ) => {
   console.log("collection: ", collection);
 

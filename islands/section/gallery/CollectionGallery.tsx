@@ -2,7 +2,7 @@
 import { BREAKPOINTS } from "$constants";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { CollectionsBanner } from "$section";
-import type { CollectionGalleryProps } from "$server/types/collection.d.ts";
+import type { Collection, CollectionGalleryProps } from "$server/types/collection.d.ts";
 import { subtitleGrey, titleGreyLD } from "$text";
 import { useEffect, useState } from "preact/hooks";
 

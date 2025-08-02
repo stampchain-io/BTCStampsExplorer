@@ -42,6 +42,11 @@ export const initialWallet: Wallet = {
     total: 0,
   },
   stampBalance: [],
+  // Required properties for wallet interface
+  publicKey: "",
+  addressType: "p2wpkh",
+  network: "mainnet",
+  provider: "unisat",
 };
 
 let initialWalletState;

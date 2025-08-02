@@ -110,8 +110,10 @@ export interface MintDetails {
   token: string;
 }
 
-interface PSBTFees extends FeeDetails {
+export interface PSBTFees extends FeeDetails {
   // Additional PSBT-specific fields if needed
+  hex?: string;
+  inputsToSign?: Array<{ index: number; address: string }>;
 }
 
 export interface BTCBalance {

@@ -101,6 +101,7 @@ const handleAccountsChanged = async () => {
         unconfirmed: balanceInfo.unconfirmed,
         total: balanceInfo.total,
       },
+      addressType: "p2wpkh", // Default address type for OKX
       network: "mainnet",
       provider: "okx",
       stampBalance: [],

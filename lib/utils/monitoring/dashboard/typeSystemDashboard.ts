@@ -234,7 +234,7 @@ export class TypeSystemDashboard {
   recordCompilationMetrics(metrics: CompilationMetrics): void {
     this.compilationHistory.push(metrics);
     this.cleanupHistory();
-    logger.debug("[dashboard] Recorded compilation metrics");
+    logger.debug("system", { message: "[dashboard] Recorded compilation metrics" });
   }
 
   /**
@@ -243,7 +243,7 @@ export class TypeSystemDashboard {
   recordTypeSafetyReport(report: TypeSafetyReport): void {
     this.typeSafetyHistory.push(report);
     this.cleanupHistory();
-    logger.debug("[dashboard] Recorded type safety report");
+    logger.debug("system", { message: "[dashboard] Recorded type safety report" });
   }
 
   /**
@@ -252,7 +252,7 @@ export class TypeSystemDashboard {
   recordCoverageAnalysis(analysis: TypeCoverageAnalysis): void {
     this.coverageHistory.push(analysis);
     this.cleanupHistory();
-    logger.debug("[dashboard] Recorded coverage analysis");
+    logger.debug("system", { message: "[dashboard] Recorded coverage analysis" });
   }
 
   /**
@@ -261,7 +261,7 @@ export class TypeSystemDashboard {
   recordAlert(alert: TypeSystemAlert): void {
     this.alertHistory.push(alert);
     this.cleanupHistory();
-    logger.debug("[dashboard] Recorded alert");
+    logger.debug("system", { message: "[dashboard] Recorded alert" });
   }
 
   /**
@@ -269,7 +269,7 @@ export class TypeSystemDashboard {
    */
   async generateDashboardData(): Promise<DashboardData> {
     const startTime = performance.now();
-    logger.info("[dashboard] Generating dashboard data");
+    logger.info("system", { message: "[dashboard] Generating dashboard data" });
 
     try {
       const healthSummary = this.generateHealthSummary();
@@ -293,13 +293,15 @@ export class TypeSystemDashboard {
 
       const duration = performance.now() - startTime;
       logger.info(
-        `[dashboard] Dashboard data generated in ${duration.toFixed(1)}ms`,
+        "system",
+        { message: `[dashboard] Dashboard data generated in ${duration.toFixed(1)}ms` },
       );
 
       return dashboardData;
     } catch (error) {
       logger.error(
-        `[dashboard] Failed to generate dashboard data: ${error.message}`,
+        "system",
+        { message: `[dashboard] Failed to generate dashboard data: ${error.message}` },
       );
       throw error;
     }

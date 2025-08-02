@@ -36,6 +36,9 @@ export interface CollectionWithCreators extends CollectionRow {
  * Used when collections are fetched with aggregated market data from the cache
  */
 export interface CollectionWithOptionalMarketData extends CollectionRow {
+  // Creator names from CollectionWithCreators
+  creator_names?: string[];
+  
   // Optional market data fields
   marketData?: CollectionMarketData | null;
   marketDataMessage?: string;

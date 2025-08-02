@@ -9,7 +9,12 @@
  * @reference https://github.com/mikeinspace/stamps/blob/main/spec.md
  */
 
-import type { BlockRow, FeeDetails } from "$types/base.d.ts";
+import type {
+  BasicUTXO,
+  BlockRow,
+  FeeDetails,
+  ScriptType,
+} from "$types/base.d.ts";
 import type { CacheStatus, StampMarketData } from "$types/marketData.d.ts";
 import type {
   SUBPROTOCOLS,
@@ -18,7 +23,40 @@ import type {
   UTXO,
 } from "./base.d.ts";
 
+import type {
+  CompilationMetrics,
+  PerformanceRegression,
+} from "$lib/utils/monitoring/compilation/performanceTracker.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
+import type {
+  ConnectionPoolStatistics,
+  RelationDefinition,
+} from "$server/types/database.d.ts";
+import type { StandardFeeResponse } from "$types/api.d.ts";
+import type { ComposeAttachOptions } from "$types/services.d.ts";
+import type { SortKey, SortMetrics } from "$types/sorting.d.ts";
+import type { DomainTypeValidation } from "$types/src20.d.ts";
+import type { DetailedUTXO } from "$types/transaction.d.ts";
+import type {
+  ActivityLevel,
+  AlertDashboardData,
+  CompilationDashboardData,
+  CoverageDashboardData,
+  CoverageStats,
+  CoverageTrend,
+  FileCoverageInfo,
+  ImportPatternAnalysis,
+  SystemHealthSummary,
+  SystemInsight,
+  TestResult,
+  TrendData,
+  TypeCoverageStats,
+  TypeRecommendation,
+  TypeSafetyDashboardData,
+  TypeSafetyRegression,
+  TypeSafetyViolation,
+} from "$types/utils.d.ts";
+import type { TransactionOptions, Wallet } from "$types/wallet.d.ts";
 
 // Re-export Collection type for backward compatibility
 export type Collection = CollectionRow;

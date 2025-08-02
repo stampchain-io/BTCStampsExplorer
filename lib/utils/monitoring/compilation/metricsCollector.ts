@@ -50,7 +50,8 @@ export class CompilationMetricsCollector {
     this.startMemoryMonitoring(sessionId);
 
     logger.info(
-      `[metrics-collector] Started collection for session: ${sessionId} (${files.length} files)`,
+      "system",
+      { message: `[metrics-collector] Started collection for session: ${sessionId} (${files.length} files)` },
     );
 
     return context;
@@ -69,7 +70,8 @@ export class CompilationMetricsCollector {
     const context = this.activeContexts.get(sessionId);
     if (!context) {
       logger.warn(
-        `[metrics-collector] No active context for session: ${sessionId}`,
+        "system",
+        { message: `[metrics-collector] No active context for session: ${sessionId}` },
       );
       return;
     }
@@ -89,7 +91,8 @@ export class CompilationMetricsCollector {
     context.fileMetrics.set(filePath, fileMetrics);
 
     logger.debug(
-      `[metrics-collector] Recorded file metrics: ${filePath} (${processingTime}ms)`,
+      "system",
+      { message: `[metrics-collector] Recorded file metrics: ${filePath} (${processingTime}ms)` },
     );
   }
 
@@ -138,9 +141,8 @@ export class CompilationMetricsCollector {
     this.activeContexts.delete(sessionId);
 
     logger.info(
-      `[metrics-collector] Finished collection for session: ${sessionId} (${
-        duration.toFixed(1)
-      }ms)`,
+      "system",
+      { message: `[metrics-collector] Finished collection for session: ${sessionId} (${duration.toFixed(1)}ms)` },
     );
 
     return metrics;
@@ -330,7 +332,8 @@ export class CompilationMetricsCollector {
       };
     } catch (error) {
       logger.warn(
-        `[metrics-collector] Failed to analyze imports for ${filePath}: ${error.message}`,
+        "system",
+        { message: `[metrics-collector] Failed to analyze imports for ${filePath}: ${error.message}` },
       );
       return {
         domainImports: 0,
@@ -442,13 +445,15 @@ export class DenoCheckWrapper {
           );
         } catch (error) {
           logger.warn(
-            `[deno-check-wrapper] Failed to collect metrics for ${file}: ${error.message}`,
+            "system",
+            { message: `[deno-check-wrapper] Failed to collect metrics for ${file}: ${error.message}` },
           );
         }
       }
     } catch (error) {
       logger.error(
-        `[deno-check-wrapper] Type checking failed: ${error.message}`,
+        "system",
+        { message: `[deno-check-wrapper] Type checking failed: ${error.message}` },
       );
       errors.push({
         message: error.message,
@@ -519,7 +524,8 @@ export class DenoCheckWrapper {
       }
     } catch (error) {
       logger.warn(
-        `[deno-check-wrapper] Failed to enumerate TypeScript files: ${error.message}`,
+        "system",
+        { message: `[deno-check-wrapper] Failed to enumerate TypeScript files: ${error.message}` },
       );
     }
 

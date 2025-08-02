@@ -281,7 +281,10 @@ export default function SalesActivityFeed({
           : displayedSales.length > 0
           ? (
             <div class="space-y-0">
-              {displayedSales.map((sale: StampWithEnhancedSaleData, index: number) => renderSaleItem(sale, index))}
+              {displayedSales.map((
+                sale: StampWithEnhancedSaleData,
+                index: number,
+              ) => renderSaleItem(sale, index))}
             </div>
           )
           : (

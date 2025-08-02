@@ -24,7 +24,9 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
     <div class="w-[500px] min-[500px]:w-full">
       <table class={`${valueSm} w-full`}>
         <colgroup>
-          {colGroup().map((col: any) => <col key={col.key} class={col.className} />)}
+          {colGroup().map((col: any) => (
+            <col key={col.key} class={col.className} />
+          ))}
         </colgroup>
         {sends.length > 0 && (
           <thead>

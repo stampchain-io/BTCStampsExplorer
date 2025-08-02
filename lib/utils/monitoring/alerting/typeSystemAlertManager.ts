@@ -525,7 +525,8 @@ export class TypeSystemAlertManager {
     alert.escalation.acknowledgedBy = acknowledgedBy;
 
     logger.info(
-      `[alert-manager] Alert acknowledged: ${alertId} by ${acknowledgedBy}`,
+      "system",
+      { message: `[alert-manager] Alert acknowledged: ${alertId} by ${acknowledgedBy}` },
     );
     return true;
   }
@@ -546,7 +547,7 @@ export class TypeSystemAlertManager {
     this.alertHistory.push(alert);
     this.activeAlerts.delete(alertId);
 
-    logger.info(`[alert-manager] Alert resolved: ${alertId} by ${resolvedBy}`);
+    logger.info("system", { message: `[alert-manager] Alert resolved: ${alertId} by ${resolvedBy}` });
     return true;
   }
 
@@ -596,7 +597,8 @@ export class TypeSystemAlertManager {
     await this.sendNotifications(alert);
 
     logger.info(
-      `[alert-manager] Alert created: ${alert.id} (${alert.severity}) - ${alert.title}`,
+      "system",
+      { message: `[alert-manager] Alert created: ${alert.id} (${alert.severity}) - ${alert.title}` },
     );
   }
 
@@ -629,7 +631,8 @@ export class TypeSystemAlertManager {
           error: error.message,
         });
         logger.error(
-          `[alert-manager] Webhook notification failed: ${error.message}`,
+          "system",
+          { message: `[alert-manager] Webhook notification failed: ${error.message}` },
         );
       }
     }
@@ -653,7 +656,8 @@ export class TypeSystemAlertManager {
           error: error.message,
         });
         logger.error(
-          `[alert-manager] Email notification failed: ${error.message}`,
+          "system",
+          { message: `[alert-manager] Email notification failed: ${error.message}` },
         );
       }
     }
@@ -677,7 +681,8 @@ export class TypeSystemAlertManager {
           error: error.message,
         });
         logger.error(
-          `[alert-manager] Slack notification failed: ${error.message}`,
+          "system",
+          { message: `[alert-manager] Slack notification failed: ${error.message}` },
         );
       }
     }
@@ -739,7 +744,7 @@ export class TypeSystemAlertManager {
     email: string,
   ): Promise<void> {
     // In a real implementation, this would use an email service
-    logger.info(`[alert-manager] Would send email to ${email}: ${alert.title}`);
+    logger.info("system", { message: `[alert-manager] Would send email to ${email}: ${alert.title}` });
   }
 
   /**
@@ -867,7 +872,7 @@ export class TypeSystemAlertManager {
 
     const cleaned = initialCount - this.alertHistory.length;
     if (cleaned > 0) {
-      logger.info(`[alert-manager] Cleaned up ${cleaned} old alerts`);
+      logger.info("system", { message: `[alert-manager] Cleaned up ${cleaned} old alerts` });
     }
   }
 }

@@ -115,7 +115,11 @@ export function Button({
 
     return href
       ? (
-        <a href={href} f-partial={fPartial || href || undefined} class={combinedClass}>
+        <a
+          href={href}
+          f-partial={fPartial || href || undefined}
+          class={combinedClass}
+        >
           {innerContent}
         </a>
       )

@@ -8,6 +8,10 @@
  * Phase 2 to directly call tool endpoints with dryRun=true.
  */
 
+import type { SRC101TransactionOptions } from "$types/src101.d.ts";
+import type { SRC20TransactionOptions } from "$types/src20.d.ts";
+import type { StampTransactionOptions } from "$types/stamp.d.ts";
+
 /**
  * Standardized fee response interface that all tool adapters must return
  */

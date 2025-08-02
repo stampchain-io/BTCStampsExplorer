@@ -15,7 +15,9 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
     <div class="w-[660px] min-[660px]:w-full">
       <table class={`${valueSm} w-full`}>
         <colgroup>
-          {colGroup().map((col: any) => <col key={col.key} class={col.className} />)}
+          {colGroup().map((col: any) => (
+            <col key={col.key} class={col.className} />
+          ))}
         </colgroup>
         {mints.length > 0 && (
           <thead>

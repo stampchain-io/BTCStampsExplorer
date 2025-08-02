@@ -1,4 +1,4 @@
-// import type { SRC20Row } from "$types/src20.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import type { SRC20CardSmProps } from "$types/ui.d.ts";
 import {

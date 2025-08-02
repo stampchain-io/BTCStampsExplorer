@@ -15,7 +15,9 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
     <div class="w-[660px] min-[660px]:w-full">
       <table class={`${valueSm} w-full`}>
         <colgroup>
-          {colGroup().map((col: any) => <col key={col.key} class={col.className} />)}
+          {colGroup().map((col: any) => (
+            <col key={col.key} class={col.className} />
+          ))}
         </colgroup>
         {sends?.length > 0 &&
           (

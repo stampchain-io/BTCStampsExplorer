@@ -16,17 +16,18 @@
  * - utils.d.ts: Utility types
  */
 
-import Big from "big";
-import type {
-  PaginatedResponse as _PaginatedResponse,
-  PaginationProps,
-} from "$types/pagination.d.ts";
 import type {
   CacheStatus,
   MarketListingAggregated,
   SRC20MarketData,
 } from "$types/marketData.d.ts";
+import type { StampControllerData, StampFilters } from "$types/stamp.d.ts";
+import type { ChartData } from "$types/ui.d.ts";
 import type { BufferLike, DomainValidationResult } from "$types/utils.d.ts";
+import type { TransactionOptions } from "$types/wallet.d.ts";
+import Big from "big";
+import type { ComponentChildren } from "preact";
+import * as preact from "preact";
 
 // ============================================================================
 // SRC-20 OPERATION AND FILTER TYPES
@@ -159,6 +160,7 @@ export interface SRC20Row {
   chart?: any[]; // Chart data array
   mint_count?: number | string; // Number of mints
   trending_rank?: number; // Trending rank position
+  market_data?: MarketListingAggregated; // Market data for enhanced display
 }
 
 /**
@@ -654,8 +656,8 @@ export type FilterTypesSRC20Modal = "status" | "market" | "trending" | "all";
  * SortingErrorBoundaryProps - Migrated from SortingErrorBoundary.tsx
  */
 export interface SortingErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ComponentType<{ error: Error; reset: () => void }>;
+  children: ComponentChildren;
+  fallback?: preact.ComponentType<{ error: Error; reset: () => void }>;
 }
 
 /**
@@ -914,14 +916,6 @@ export interface SRC20TransactionOptions extends TransactionOptions {
  * ToolType - Migrated from toolEndpointAdapter.ts
  */
 export type ToolType = "stamp" | "src20" | "src101";
-
-/**
- * AnyTransactionOptions - Migrated from toolEndpointAdapter.ts
- */
-export type AnyTransactionOptions =
-  | SRC20TransactionOptions
-  | SRC101TransactionOptions
-  | TransactionOptions;
 
 /**
  * PropTypes - Migrated from index.tsx

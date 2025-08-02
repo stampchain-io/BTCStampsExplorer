@@ -1,15 +1,8 @@
 import { WalletProviderKey } from "$constants";
 import { PaginationQueryParams } from "$types/pagination.d.ts";
 import { WalletSortKey } from "$types/sorting.d.ts";
-import { ADDRESS_PATTERNS, DERIVATION_PATHS } from "$types/wallet_constants.ts";
-import type {
-  WalletAuthState,
-  WalletConnectionState,
-  WalletContentProps,
-  WalletNavigationState,
-  WalletPageProps,
-  WalletSearchState,
-} from "$types/ui.d.ts";
+import type { WalletConnectionState } from "$types/ui.d.ts";
+import type { ProgressiveFeeEstimationResult } from "$types/utils.d.ts";
 
 // ===== HORIZON WALLET SPECIFIC TYPES =====
 
@@ -62,6 +55,11 @@ export interface Wallet {
     total: number;
   };
   stampBalance: StampBalance[];
+  // Additional properties required by wallet providers
+  publicKey: string;
+  addressType: "p2pkh" | "p2sh" | "p2wpkh" | "p2tr";
+  network: "mainnet" | "testnet";
+  provider: WalletProviderKey;
 }
 
 export interface StampBalance {

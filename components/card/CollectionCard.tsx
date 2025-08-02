@@ -1,5 +1,5 @@
 /* ===== COLLECTION OVERVIEW CARD COMPONENT ===== */
-import type { Collection, CollectionWithOptionalMarketData } from "$types";
+import type { Collection, CollectionWithCreators, CollectionWithOptionalMarketData } from "$types";
 import {
   abbreviateAddress,
   formatBTC,
@@ -17,7 +17,7 @@ function abbreviateCollectionName(name: string): string {
 
 /* ===== COMPONENT ===== */
 export function CollectionCard(
-  { collection }: { collection: Collection },
+  { collection }: { collection: CollectionWithOptionalMarketData },
 ) {
   return (
     <a

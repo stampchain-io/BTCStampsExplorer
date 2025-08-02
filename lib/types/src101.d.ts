@@ -9,6 +9,8 @@
  * @see https://github.com/hydren1/SRC-101
  */
 
+import type { TransactionOptions } from "$types/wallet.d.ts";
+
 // =============================================================================
 // SRC-101 Protocol Operations
 // =============================================================================

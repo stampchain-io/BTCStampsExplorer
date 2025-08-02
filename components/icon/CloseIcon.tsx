@@ -19,7 +19,7 @@ export function CloseIcon({
   /* ===== EVENT HANDLERS ===== */
   const handleClick = (e: MouseEvent) => {
     e.stopPropagation();
-    onClick(e);
+    onClick?.();
   };
 
   /* ===== STYLES ===== */
