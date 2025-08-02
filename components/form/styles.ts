@@ -5,7 +5,6 @@ import { glassmorphismLayer2, transition } from "$layout";
 // Global sizes
 const inputFieldHeight = "h-10";
 const inputFieldWidth = "!w-10";
-const _inputFieldHeightLarge = "h-11"; // Not used
 
 // Input field styles
 const inputFieldStyle = `p-3 w-full

@@ -9,6 +9,8 @@ export interface ButtonVariants {
     | "text"
     | "glassmorphism"
     | "glassmorphismColor"
+    | "glassmorphismSelected"
+    | "glassmorphismDeselected"
     | "flat"
     | "outline"
     | "flatOutline"
@@ -93,12 +95,21 @@ export interface AnchorElementProps extends BaseButtonProps {
 export type ButtonProps = ButtonElementProps | AnchorElementProps;
 
 /* ===== BUTTON STYLE DEFINITIONS ===== */
+const baseBefore =
+  "before:absolute before:inset-0 before:rounded-lg before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
+const baseGlassmorphism =
+  "border-[1px] rounded-lg backdrop-blur overflow-hidden";
+const baseGlassmorphismColor =
+  "relative text-[#1e1723] before:blur-[5px] hover:border-[var(--color-border-hover)] hover:before:scale-110 hover:before:blur-sm";
+const shadow =
+  "shadow-[0_3px_6px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_3px_3px_rgba(22,22,22,0.2)]";
+
 export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
   base: `
     inline-flex items-center justify-center
     rounded-lg border
-    font-bold tracking-wide
+    font-semibold tracking-wide
     transition-colors duration-50
   `,
 
@@ -107,24 +118,34 @@ export const buttonStyles: ButtonVariants = {
     text: `
       !items-start !justify-start !h-auto
       !p-0 bg-transparent !border-0
-      font-semibold tracking-wide
       text-[var(--color-medium)] hover:text-[var(--color-light)]
     `,
     glassmorphism: `
-      border-[1px] border-stamp-grey-darkest/40 rounded-lg
-      bg-stamp-grey-darkest/30 backdrop-blur-md overflow-hidden
-      text-[var(--color-dark)] hover:text-[var(--color-light)]
-      shadow-[0_6px_12px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_3px_3px_rgba(22,22,22,0.2)]
+      ${baseGlassmorphism} bg-stamp-grey-darkest/30 border-stamp-grey-darkest/20
+      hover:bg-stamp-grey-darkest/40 hover:border-stamp-grey-darkest/30
+      text-[var(--color-dark)] hover:text-[var(--color-medium)]
+      ${shadow}
     `,
     glassmorphismColor: `
-      relative border-[1px] border-[var(--color-border)] rounded-lg
-      bg-stamp-grey-darkest/10 overflow-hidden
-      before:absolute before:inset-0 before:rounded-lg before:z-[-1]
+      ${baseGlassmorphism} ${baseGlassmorphismColor}
+      bg-stamp-grey-darkest/10 border-[var(--color-border)]
+      ${baseBefore} ${shadow}
       before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
-      before:blur-[5px] before:transition-transform before:duration-50 before:origin-center
-      hover:before:scale-110 hover:before:blur-sm
-      text-[#1e1723]
-      shadow-[0_2px_12px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_6px_3px_rgba(22,22,22,0.2)]
+    `,
+    glassmorphismSelected: `
+      ${baseGlassmorphism} ${baseGlassmorphismColor}
+      bg-stamp-grey-darkest/10 border-[var(--color-border)]
+      ${baseBefore} ${shadow}
+      before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
+      hover:bg-stamp-grey-darkest/30 hover:border-stamp-grey-darkest/20 hover:before:bg-none hover:text-[var(--color-dark)] hover:before:blur-0
+    `,
+    glassmorphismDeselected: `
+      ${baseGlassmorphism} ${baseGlassmorphismColor}
+      bg-stamp-grey-darkest/30 border-stamp-grey-darkest/20
+      text-[var(--color-dark)] before:bg-none
+      hover:bg-stamp-grey-darkest/10 hover:text-[#1e1723] hover:before:!scale-100 hover:before:!blur-[5px]
+      ${baseBefore} ${shadow}
+      hover:before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
     `,
     flat: `
       bg-gradient-to-br from-[var(--color-light)] to-[var(--color-dark)]
@@ -168,25 +189,29 @@ export const buttonStyles: ButtonVariants = {
       [--color-dark:#666666]
       [--color-medium:#999999]
       [--color-light:#CCCCCC]
-      [--color-border:#33333366]
+      [--color-border:#66666666]
+      [--color-border-hover:#66666699]
     `,
     greyDark: `
       [--color-dark:#333333]
       [--color-medium:#666666]
       [--color-light:#999999]
-      [--color-border:#33333366]
+      [--color-border:#66666666]
+      [--color-border-hover:#66666699]
     `,
     purple: `
       [--color-dark:#660099]
       [--color-medium:#8800CC]
       [--color-light:#AA00FF]
-      [--color-border:#44006666]
+      [--color-border:#66009966]
+      [--color-border-hover:#66009999]
     `,
     purpleDark: `
       [--color-dark:#440066]
       [--color-medium:#660099]
       [--color-light:#8800CC]
-      [--color-border:#44006666]
+      [--color-border:#66009966]
+      [--color-border-hover:#66009999]
     `,
     test: `
       [--color-dark:#00CC00]
@@ -238,7 +263,7 @@ export const buttonStyles: ButtonVariants = {
   /* ===== STATE STYLES ===== */
   state: {
     disabled: `
-      opacity-50
+      opacity-70
       cursor-not-allowed
     `,
     loading: `

@@ -4,11 +4,11 @@
 export const glassmorphism =
   `border-[1px] border-stamp-grey-darkest/20 rounded-xl
   bg-gradient-to-br from-stamp-grey-darkest/15 to-stamp-grey-darkest/30
-  backdrop-blur-lg overflow-hidden
+  backdrop-blur overflow-hidden
   shadow-[0_8px_32px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_8px_4px_rgba(22,22,22,0.2)]`;
 export const glassmorphismLayer2 =
   `border-[1px] border-stamp-grey-darkest/20 rounded-lg
-  bg-stamp-grey-darkest/15 backdrop-blur-lg overflow-hidden
+  bg-stamp-grey-darkest/15 backdrop-blur overflow-hidden
   shadow-[0_8px_16px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_8px_4px_rgba(22,22,22,0.2)]`;
 export const transition = "transition-colors duration-200";
 
