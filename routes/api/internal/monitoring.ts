@@ -1,3 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 // routes/api/internal/monitoring.ts
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";

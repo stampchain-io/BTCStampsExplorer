@@ -212,10 +212,13 @@ class MonitoringSystemOrchestrator {
             );
         }
       } catch (error) {
+        const errorMessage = error instanceof Error
+          ? error.message
+          : String(error);
         return new Response(
           JSON.stringify({
             error: "Internal server error",
-            message: error.message,
+            message: errorMessage,
           }),
           {
             status: 500,
@@ -318,6 +321,9 @@ class MonitoringSystemOrchestrator {
       };
     } catch (error) {
       console.error("❌ Failed to get system metrics:", error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
       return {
         successRate: 0,
         averageCheckTime: 0,
@@ -325,7 +331,7 @@ class MonitoringSystemOrchestrator {
         errorCount: 0,
         warningCount: 0,
         memoryUsage: 0,
-        error: error.message,
+        error: errorMessage,
       };
     }
   }

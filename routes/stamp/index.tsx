@@ -1,3 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 /* ===== STAMP OVERVIEW PAGE ===== */
 
 import { StampOverviewContent } from "$content";
@@ -9,6 +20,7 @@ import {
   queryParamsToServicePayload,
   StampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
+import type { StampPageProps } from "$types/api.d.ts";
 
 // ✅ PROPER SEPARATION: Use HTTP client for API calls
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";

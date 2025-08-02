@@ -1,4 +1,3 @@
-import { JSX } from "preact";
 import type { InputFieldProps } from "$types/ui.d.ts";
 import { inputField } from "$form";
 

@@ -1,3 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 import { Handlers } from "$fresh/server.ts";
 import { BackgroundFeeService } from "$server/services/fee/backgroundFeeService.ts";
 import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";

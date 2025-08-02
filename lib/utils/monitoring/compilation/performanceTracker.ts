@@ -187,7 +187,10 @@ export class CompilationPerformanceTracker {
 
     logger.info(
       "system",
-      { message: `[performance-tracker] Starting compilation tracking: ${sessionId}` },
+      {
+        message:
+          `[performance-tracker] Starting compilation tracking: ${sessionId}`,
+      },
     );
 
     return sessionId;
@@ -213,7 +216,10 @@ export class CompilationPerformanceTracker {
 
     logger.info(
       "system",
-      { message: `[performance-tracker] Recorded metrics for session: ${metrics.sessionId}` },
+      {
+        message:
+          `[performance-tracker] Recorded metrics for session: ${metrics.sessionId}`,
+      },
     );
   }
 
@@ -247,7 +253,10 @@ export class CompilationPerformanceTracker {
 
     logger.info(
       "system",
-      { message: `[performance-tracker] Created baseline: ${id} (${sampleMetrics.length} samples)` },
+      {
+        message:
+          `[performance-tracker] Created baseline: ${id} (${sampleMetrics.length} samples)`,
+      },
     );
 
     return baseline;
@@ -288,7 +297,10 @@ export class CompilationPerformanceTracker {
       regression.resolved = true;
       logger.info(
         "system",
-        { message: `[performance-tracker] Marked regression as resolved: ${regressionId}` },
+        {
+          message:
+            `[performance-tracker] Marked regression as resolved: ${regressionId}`,
+        },
       );
       return true;
     }
@@ -373,7 +385,12 @@ export class CompilationPerformanceTracker {
           this.regressions.set(regression.id, regression);
           logger.warn(
             "system",
-            { message: `[performance-tracker] Performance regression detected: ${regression.type} (${regression.magnitude.toFixed(1)}% increase)` },
+            {
+              message:
+                `[performance-tracker] Performance regression detected: ${regression.type} (${
+                  regression.magnitude.toFixed(1)
+                }% increase)`,
+            },
           );
         }
       }
@@ -554,13 +571,19 @@ export class CompilationPerformanceTracker {
 
     logger.info(
       "system",
-      { message: `[performance-tracker] ${success} Compilation: ${duration}, Memory: ${memory}, Cache: ${cache}` },
+      {
+        message:
+          `[performance-tracker] ${success} Compilation: ${duration}, Memory: ${memory}, Cache: ${cache}`,
+      },
     );
 
     if (metrics.errors && metrics.errors.length > 0) {
       logger.warn(
         "system",
-        { message: `[performance-tracker] Compilation errors: ${metrics.errors.length}` },
+        {
+          message:
+            `[performance-tracker] Compilation errors: ${metrics.errors.length}`,
+        },
       );
     }
   }

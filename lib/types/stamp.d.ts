@@ -906,6 +906,21 @@ export interface DisplayCountBreakpoints {
  * Props interface for stamp gallery components
  */
 
+/**
+ * Dispenser interface for stamp dispensers
+ */
+export interface Dispenser {
+  id: string;
+  stamp_id: number;
+  address: string;
+  price: number;
+  quantity: number;
+  status: "active" | "inactive" | "depleted";
+  created_at: string;
+  updated_at?: string;
+  dispensed_count?: number;
+}
+
 // ============================================================================
 // STAMP OPERATION INTERFACES (Legacy)
 // ============================================================================
@@ -1732,15 +1747,6 @@ export interface QueueMessage<T = unknown> {
   timestamp: string;
   deliveryCount: number;
   metadata?: Record<string, unknown>;
-}
-
-/**
- * TraceEvent - Migrated from services.d.ts
- */
-export interface TraceEvent {
-  timestamp: string;
-  event: string;
-  data?: Record<string, unknown>;
 }
 
 /**

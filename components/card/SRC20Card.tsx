@@ -545,6 +545,7 @@ export function SRC20Card({
                         (src20 as any).chart,
                       )}
                       <ChartWidget
+                        type="line"
                         fromPage="home"
                         data={(src20 as any).chart}
                         tick={src20.tick}

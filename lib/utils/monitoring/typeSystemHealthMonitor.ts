@@ -11,7 +11,7 @@ import { logger } from "$lib/utils/logger.ts";
 // Import all monitoring components
 import { compilationPerformanceTracker } from "./compilation/performanceTracker.ts";
 import {
-  CompilationMetricsCollector,
+  // CompilationMetricsCollector,
   denoCheckWrapper,
 } from "./compilation/metricsCollector.ts";
 import { astTypeSafetyAnalyzer } from "./types/astAnalyzer.ts";
@@ -89,7 +89,7 @@ export interface HealthMonitorReport {
 export class TypeSystemHealthMonitor {
   private config: MonitoringConfiguration;
   private alertManager: TypeSystemAlertManager;
-  private metricsCollector: CompilationMetricsCollector;
+  // private metricsCollector: CompilationMetricsCollector;
 
   private isRunning = false;
   private intervals: {
@@ -105,9 +105,11 @@ export class TypeSystemHealthMonitor {
   constructor(config?: Partial<MonitoringConfiguration>) {
     this.config = this.mergeWithDefaults(config);
     this.alertManager = new TypeSystemAlertManager(this.config.alerting);
-    this.metricsCollector = new CompilationMetricsCollector();
+    // this.metricsCollector = new CompilationMetricsCollector();
 
-    logger.info("system", { message: "[health-monitor] Type System Health Monitor initialized" });
+    logger.info("system", {
+      message: "[health-monitor] Type System Health Monitor initialized",
+    });
   }
 
   /**
@@ -115,11 +117,15 @@ export class TypeSystemHealthMonitor {
    */
   async start(): Promise<void> {
     if (this.isRunning) {
-      logger.warn("system", { message: "[health-monitor] Monitor is already running" });
+      logger.warn("system", {
+        message: "[health-monitor] Monitor is already running",
+      });
       return;
     }
 
-    logger.info("system", { message: "[health-monitor] Starting Type System Health Monitor" });
+    logger.info("system", {
+      message: "[health-monitor] Starting Type System Health Monitor",
+    });
 
     try {
       // Initialize components
@@ -134,12 +140,17 @@ export class TypeSystemHealthMonitor {
       this.isRunning = true;
       logger.info(
         "system",
-        { message: "[health-monitor] Type System Health Monitor started successfully" },
+        {
+          message:
+            "[health-monitor] Type System Health Monitor started successfully",
+        },
       );
     } catch (error) {
       logger.error(
         "system",
-        { message: `[health-monitor] Failed to start monitor: ${error.message}` },
+        {
+          message: `[health-monitor] Failed to start monitor: ${error.message}`,
+        },
       );
       throw error;
     }
@@ -150,11 +161,15 @@ export class TypeSystemHealthMonitor {
    */
   async stop(): Promise<void> {
     if (!this.isRunning) {
-      logger.warn("system", { message: "[health-monitor] Monitor is not running" });
+      logger.warn("system", {
+        message: "[health-monitor] Monitor is not running",
+      });
       return;
     }
 
-    logger.info("system", { message: "[health-monitor] Stopping Type System Health Monitor" });
+    logger.info("system", {
+      message: "[health-monitor] Stopping Type System Health Monitor",
+    });
 
     // Clear intervals
     Object.values(this.intervals).forEach((intervalId) => {
@@ -163,7 +178,9 @@ export class TypeSystemHealthMonitor {
     this.intervals = {};
 
     this.isRunning = false;
-    logger.info("system", { message: "[health-monitor] Type System Health Monitor stopped" });
+    logger.info("system", {
+      message: "[health-monitor] Type System Health Monitor stopped",
+    });
   }
 
   /**
@@ -171,7 +188,9 @@ export class TypeSystemHealthMonitor {
    */
   async performHealthCheck(): Promise<HealthMonitorReport> {
     const startTime = performance.now();
-    logger.info("system", { message: "[health-monitor] Performing health check" });
+    logger.info("system", {
+      message: "[health-monitor] Performing health check",
+    });
 
     try {
       // Quick compilation check
@@ -230,11 +249,17 @@ export class TypeSystemHealthMonitor {
 
       logger.info(
         "system",
-        { message: `[health-monitor] Health check completed in ${analysisTime.toFixed(1)}ms - Status: ${status}` },
+        {
+          message: `[health-monitor] Health check completed in ${
+            analysisTime.toFixed(1)
+          }ms - Status: ${status}`,
+        },
       );
       return report;
     } catch (error) {
-      logger.error("system", { message: `[health-monitor] Health check failed: ${error.message}` });
+      logger.error("system", {
+        message: `[health-monitor] Health check failed: ${error.message}`,
+      });
       throw error;
     }
   }
@@ -244,14 +269,18 @@ export class TypeSystemHealthMonitor {
    */
   async performFullAnalysis(): Promise<HealthMonitorReport> {
     const startTime = performance.now();
-    logger.info("system", { message: "[health-monitor] Performing full analysis" });
+    logger.info("system", {
+      message: "[health-monitor] Performing full analysis",
+    });
 
     try {
       const components: HealthMonitorReport["components"] = {};
 
       // Compilation analysis
       if (this.config.enabled.compilationTracking) {
-        logger.info("system", { message: "[health-monitor] Running compilation analysis" });
+        logger.info("system", {
+          message: "[health-monitor] Running compilation analysis",
+        });
         const result = await denoCheckWrapper.runTypeCheck();
         components.compilation = result.metrics;
 
@@ -264,7 +293,9 @@ export class TypeSystemHealthMonitor {
 
       // Type safety analysis
       if (this.config.enabled.typeSafetyValidation) {
-        logger.info("system", { message: "[health-monitor] Running type safety analysis" });
+        logger.info("system", {
+          message: "[health-monitor] Running type safety analysis",
+        });
         await astTypeSafetyAnalyzer.initialize(this.config.project.rootPath);
         components.typeSafety = await astTypeSafetyAnalyzer.analyzeTypeSafety();
 
@@ -274,7 +305,9 @@ export class TypeSystemHealthMonitor {
 
       // Coverage analysis
       if (this.config.enabled.coverageAnalysis) {
-        logger.info("system", { message: "[health-monitor] Running coverage analysis" });
+        logger.info("system", {
+          message: "[health-monitor] Running coverage analysis",
+        });
         components.coverage = await typeCoverageAnalyzer.analyzeCoverage(
           this.config.project.rootPath,
         );
@@ -318,13 +351,17 @@ export class TypeSystemHealthMonitor {
 
       logger.info(
         "system",
-        { message: `[health-monitor] Full analysis completed in ${
-          analysisTime.toFixed(1)
-        }ms - Status: ${status}` },
+        {
+          message: `[health-monitor] Full analysis completed in ${
+            analysisTime.toFixed(1)
+          }ms - Status: ${status}`,
+        },
       );
       return report;
     } catch (error) {
-      logger.error("system", { message: `[health-monitor] Full analysis failed: ${error.message}` });
+      logger.error("system", {
+        message: `[health-monitor] Full analysis failed: ${error.message}`,
+      });
       throw error;
     }
   }
@@ -333,18 +370,25 @@ export class TypeSystemHealthMonitor {
    * Generate dashboard data
    */
   async generateDashboard(): Promise<DashboardData> {
-    logger.info("system", { message: "[health-monitor] Generating dashboard data" });
+    logger.info("system", {
+      message: "[health-monitor] Generating dashboard data",
+    });
 
     try {
       const dashboardData = await typeSystemDashboard.generateDashboardData();
       this.lastDashboardUpdate = Date.now();
 
-      logger.info("system", { message: "[health-monitor] Dashboard data generated successfully" });
+      logger.info("system", {
+        message: "[health-monitor] Dashboard data generated successfully",
+      });
       return dashboardData;
     } catch (error) {
       logger.error(
         "system",
-        { message: `[health-monitor] Dashboard generation failed: ${error.message}` },
+        {
+          message:
+            `[health-monitor] Dashboard generation failed: ${error.message}`,
+        },
       );
       throw error;
     }
@@ -376,7 +420,9 @@ export class TypeSystemHealthMonitor {
    */
   updateConfiguration(updates: Partial<MonitoringConfiguration>): void {
     this.config = { ...this.config, ...updates };
-    logger.info("system", { message: "[health-monitor] Configuration updated" });
+    logger.info("system", {
+      message: "[health-monitor] Configuration updated",
+    });
 
     // Restart intervals if running
     if (this.isRunning) {
@@ -431,7 +477,9 @@ export class TypeSystemHealthMonitor {
    * Perform initial analysis on startup
    */
   private async performInitialAnalysis(): Promise<void> {
-    logger.info("system", { message: "[health-monitor] Performing initial analysis" });
+    logger.info("system", {
+      message: "[health-monitor] Performing initial analysis",
+    });
 
     // Start with a health check
     await this.performHealthCheck();

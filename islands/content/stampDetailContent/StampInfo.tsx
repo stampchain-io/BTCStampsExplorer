@@ -1,9 +1,6 @@
 /* ===== STAMP INFO COMPONENT ===== */
 /*@baba-750+764+815+icons - refactor to StatItems */
 import { Button } from "$button";
-import type { StampInfoProps } from "$types/ui.d.ts";
-import type { Src101Detail } from "$types/src101.d.ts";
-import type { StampRow } from "$types/stamp.d.ts";
 import { Icon } from "$icon";
 import BuyStampModal from "$islands/modal/BuyStampModal.tsx";
 import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
@@ -14,18 +11,18 @@ import {
   containerColData,
   gapSectionSlim,
 } from "$layout";
+import { calculateTransactionSize } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import {
   abbreviateAddress,
   formatBTCAmount,
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { calculateTransactionSize } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import {
   getSRC101Data,
   getStampImageSrc,
 } from "$lib/utils/ui/media/imageUtils.ts";
 import { tooltipIcon } from "$notification";
-import { Dispenser, StampListingsOpenTable } from "$table";
+import { /* Dispenser, */ StampListingsOpenTable } from "$table";
 import {
   headingGreyDLLink,
   labelSm,
@@ -34,6 +31,9 @@ import {
   valueDark,
   valueSm,
 } from "$text";
+import type { Src101Detail } from "$types/src101.d.ts";
+import type { Dispenser, StampRow } from "$types/stamp.d.ts";
+import type { StampInfoProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */

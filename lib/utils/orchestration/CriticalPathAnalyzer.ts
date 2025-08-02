@@ -450,14 +450,11 @@ export class CriticalPathAnalyzer {
       const dependencies = this.extractDependencies(task);
       const dependents = this.findDependents(task.taskId, tasks);
 
-      return {
+      const node: Partial<CriticalPathNode> = {
         taskId: task.taskId,
         title: this.getTaskTitle(task),
         status: task.status,
         estimatedDuration: this.estimateTaskDuration(task),
-        actualDuration: task.completionTime
-          ? this.calculateActualDuration(task)
-          : undefined,
         startTime: task.startTime,
         endTime: task.completionTime,
         dependencies,
@@ -466,6 +463,12 @@ export class CriticalPathAnalyzer {
         slack: 0, // Will be calculated
         priority: this.calculateTaskPriority(task),
       };
+
+      if (task.completionTime) {
+        node.actualDuration = this.calculateActualDuration(task);
+      }
+
+      return node as CriticalPathNode;
     });
   }
 

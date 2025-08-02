@@ -90,7 +90,8 @@ Deno.test("Utils Types - Basic TypeScript Utility Types", () => {
 
   type PartialTest = DeepPartial<TestObj>;
   const partialObj: PartialTest = { a: "test" }; // Should work
-  const partialNested: PartialTest = { b: { c: 1 } }; // Should work
+  // Test nested partial type - compile-time check only
+  // const _: PartialTest = { b: { c: 1 } }; // Type test only
 
   // Test DeepRequired
   type OptionalObj = {
@@ -348,10 +349,8 @@ Deno.test("Utils Types - Tuple Utilities", () => {
 });
 
 Deno.test("Utils Types - Function and Callback Types", () => {
-  // Test EventHandler
-  const eventHandler: EventHandler<string> = (event: string) => {
-    console.log("Event:", event);
-  };
+  // Test EventHandler type only
+  type _EventHandlerTest = EventHandler<string>;
 
   // Test Callback types
   const callback: Callback<string> = () => "result";

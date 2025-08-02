@@ -5,7 +5,6 @@ import {
   walletContext,
 } from "$client/wallet/wallet.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { FeeDetails } from "$lib/types/base.d.ts";
 import axiod from "axiod";
 import { debounce } from "$lib/utils/performance/debounce.ts";
 import type {

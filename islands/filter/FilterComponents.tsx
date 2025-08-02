@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import type { RadioProps } from "$types/ui.d.ts";
 import type { CheckboxProps } from "$types/ui.d.ts";
 import type { RangeInputProps } from "$types/ui.d.ts";
-import { ComponentChildren } from "preact";
 import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { handleIcon } from "$icon";
 import { labelLogicResponsive } from "$text";

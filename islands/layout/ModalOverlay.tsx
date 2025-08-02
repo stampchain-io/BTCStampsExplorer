@@ -1,5 +1,4 @@
 // islands/modal/ModalOverlay.tsx
-import { ModalAnimation } from "$islands/modal/states.ts";
 import type { ModalOverlayProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 

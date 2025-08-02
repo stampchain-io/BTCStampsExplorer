@@ -1,3 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 /* ===== SRC20 TOOLS PAGE ===== */
 /*@baba-154+159*/
 import { Handlers, PageProps } from "$fresh/server.ts";

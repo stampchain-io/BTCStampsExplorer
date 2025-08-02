@@ -1,8 +1,20 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 /* ===== HOME PAGE ROUTE ===== */
 import { Handlers, PageProps } from "$fresh/server.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
+import type { PriceData, VolumeData } from "$types/marketData.d.ts";
 
 import { HomeHeader } from "$header";
 import { gapSectionSlim, Micro5FontLoader } from "$layout";

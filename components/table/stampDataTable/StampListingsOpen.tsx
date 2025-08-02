@@ -1,5 +1,4 @@
 import type { StampListingsOpenProps } from "$types/ui.d.ts";
-import type { Dispenser } from "$types/services.d.ts";
 import {
   formatNumber,
   formatSatoshisToBTC,
@@ -22,7 +21,7 @@ export function StampListingsOpenTable({
 
   return (
     <div class="relative w-full">
-      <ScrollContainer class="max-h-[164px]">
+      <ScrollContainer className="max-h-[164px]">
         <div class="w-full">
           <table class={`${valueSm} w-full`}>
             <colgroup>

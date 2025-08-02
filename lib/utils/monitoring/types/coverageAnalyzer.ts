@@ -122,12 +122,16 @@ export class TypeCoverageAnalyzer {
     projectRoot: string = ".",
   ): Promise<TypeCoverageAnalysis> {
     const startTime = performance.now();
-    logger.info("system", { message: "[coverage-analyzer] Starting type coverage analysis" });
+    logger.info("system", {
+      message: "[coverage-analyzer] Starting type coverage analysis",
+    });
 
     try {
       // Get all TypeScript files
       const files = await this.getTypeScriptFiles(projectRoot);
-      logger.info("system", { message: `[coverage-analyzer] Found ${files.length} TypeScript files` });
+      logger.info("system", {
+        message: `[coverage-analyzer] Found ${files.length} TypeScript files`,
+      });
 
       // Analyze each file
       const fileAnalyses = await Promise.all(
@@ -171,7 +175,11 @@ export class TypeCoverageAnalyzer {
       const duration = performance.now() - startTime;
       logger.info(
         "system",
-        { message: `[coverage-analyzer] Analysis completed in ${duration.toFixed(1)}ms` },
+        {
+          message: `[coverage-analyzer] Analysis completed in ${
+            duration.toFixed(1)
+          }ms`,
+        },
       );
 
       // Store for future trend analysis
@@ -179,7 +187,11 @@ export class TypeCoverageAnalyzer {
 
       return analysis;
     } catch (error) {
-      logger.error("system", { message: `[coverage-analyzer] Analysis failed: ${(error as Error).message}` });
+      logger.error("system", {
+        message: `[coverage-analyzer] Analysis failed: ${
+          (error as Error).message
+        }`,
+      });
       throw error;
     }
   }
@@ -236,7 +248,11 @@ export class TypeCoverageAnalyzer {
     } catch (error) {
       logger.warn(
         "system",
-        { message: `[coverage-analyzer] Failed to enumerate files: ${(error as Error).message}` },
+        {
+          message: `[coverage-analyzer] Failed to enumerate files: ${
+            (error as Error).message
+          }`,
+        },
       );
     }
 
@@ -265,7 +281,11 @@ export class TypeCoverageAnalyzer {
     } catch (error) {
       logger.warn(
         "system",
-        { message: `[coverage-analyzer] Failed to analyze ${filePath}: ${(error as Error).message}` },
+        {
+          message: `[coverage-analyzer] Failed to analyze ${filePath}: ${
+            (error as Error).message
+          }`,
+        },
       );
 
       // Return minimal coverage info for failed files

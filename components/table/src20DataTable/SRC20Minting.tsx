@@ -2,7 +2,7 @@ import { Button } from "$button";
 import type { SRC20MintingTableProps } from "$types/ui.d.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import type { SRC20Row } from "$types/src20.d.ts";
-import { rowTable, Timeframe } from "$layout";
+import { rowTable } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";

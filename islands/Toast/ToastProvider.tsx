@@ -1,5 +1,4 @@
 // ToastContext.tsx
-import { ComponentChildren } from "preact";
 import type { ToastProviderProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 import { ToastComponent } from "$islands/Toast/ToastComponent.tsx";

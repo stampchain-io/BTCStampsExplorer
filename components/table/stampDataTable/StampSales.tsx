@@ -8,15 +8,6 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
 
-interface Dispense {
-  source: string;
-  destination: string;
-  dispense_quantity: number;
-  satoshirate: number;
-  tx_hash: string;
-  block_time: number | null;
-}
-
 export function StampSalesTable({ dispenses }: StampSalesProps) {
   const headers = ["FROM", "TO", "QUANTITY", "PRICE", "DATE"];
 

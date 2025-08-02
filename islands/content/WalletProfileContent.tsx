@@ -1,8 +1,6 @@
 /* ===== WALLET PROFILE CONTENT COMPONENT ===== */
 import type { StampRow } from "$types/stamp.d.ts";
 import type { Dispenser } from "$types/services.d.ts";
-import type { SRC20Row } from "$types/src20.d.ts";
-import type { CollectionRow } from "$types/stamp.d.ts";
 import type {
   CacheStatus,
   CollectionMarketData,
@@ -28,7 +26,6 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { createPaginationHandler } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { WalletContentProps } from "$types/wallet.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 // ===== ADVANCED SORTING IMPORTS =====

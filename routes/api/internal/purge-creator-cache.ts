@@ -1,3 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 import { FreshContext } from "$fresh/server.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";

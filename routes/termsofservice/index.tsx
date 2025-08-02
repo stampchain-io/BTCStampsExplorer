@@ -1,3 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 /* ===== TERMS OF SERVICE PAGE ===== */
 import { body, CourierFontLoader, gapGrid } from "$layout";
 import { subtitleGrey, text, textSm, titleGreyLD } from "$text";

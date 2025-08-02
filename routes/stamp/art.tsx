@@ -1,3 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 /* ===== ART REDIRECT ROUTE ===== */
 import { Handlers } from "$fresh/server.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";

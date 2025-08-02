@@ -4,10 +4,8 @@ import { Button } from "$button";
 import { cellAlign } from "$components/layout/types.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { valueSm } from "$text";
-import {
-  SRC20CardBase,
-  SRC20CardBaseProps,
-} from "$islands/card/SRC20CardBase.tsx";
+import { SRC20CardBase } from "$islands/card/SRC20CardBase.tsx";
+import type { SRC20CardBaseProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
 export function SRC20CardMinting(

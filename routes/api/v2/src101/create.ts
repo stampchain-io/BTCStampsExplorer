@@ -1,8 +1,21 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 import { Handlers } from "$fresh/server.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 import { SRC101Service } from "$server/services/src101/index.ts";
 import type { TX, TXError } from "$types/transaction.d.ts";
+import type { AddressHandlerContext } from "$types/base.d.ts";
+import type { SRC101InputData } from "$types/src101.d.ts";
 
 type TrxType = "multisig" | "olga";
 

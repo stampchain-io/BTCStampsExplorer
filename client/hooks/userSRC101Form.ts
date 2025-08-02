@@ -8,18 +8,6 @@ import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
 import type { SRC101FormState } from "$types/ui.d.ts";
 
-interface PSBTFees {
-  estMinerFee: number;
-  totalDustValue: number;
-  hasExactFees: boolean;
-  totalValue: number;
-  est_tx_size: number;
-  hex?: string;
-  inputsToSign?: Array<
-    { index: number; address?: string; sighashTypes?: number[] }
-  >;
-}
-
 export function useSRC101Form(
   action: string,
   trxType: "olga" | "multisig" = "multisig",

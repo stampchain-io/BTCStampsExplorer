@@ -234,7 +234,9 @@ export class TypeSystemDashboard {
   recordCompilationMetrics(metrics: CompilationMetrics): void {
     this.compilationHistory.push(metrics);
     this.cleanupHistory();
-    logger.debug("system", { message: "[dashboard] Recorded compilation metrics" });
+    logger.debug("system", {
+      message: "[dashboard] Recorded compilation metrics",
+    });
   }
 
   /**
@@ -243,7 +245,9 @@ export class TypeSystemDashboard {
   recordTypeSafetyReport(report: TypeSafetyReport): void {
     this.typeSafetyHistory.push(report);
     this.cleanupHistory();
-    logger.debug("system", { message: "[dashboard] Recorded type safety report" });
+    logger.debug("system", {
+      message: "[dashboard] Recorded type safety report",
+    });
   }
 
   /**
@@ -252,7 +256,9 @@ export class TypeSystemDashboard {
   recordCoverageAnalysis(analysis: TypeCoverageAnalysis): void {
     this.coverageHistory.push(analysis);
     this.cleanupHistory();
-    logger.debug("system", { message: "[dashboard] Recorded coverage analysis" });
+    logger.debug("system", {
+      message: "[dashboard] Recorded coverage analysis",
+    });
   }
 
   /**
@@ -294,14 +300,21 @@ export class TypeSystemDashboard {
       const duration = performance.now() - startTime;
       logger.info(
         "system",
-        { message: `[dashboard] Dashboard data generated in ${duration.toFixed(1)}ms` },
+        {
+          message: `[dashboard] Dashboard data generated in ${
+            duration.toFixed(1)
+          }ms`,
+        },
       );
 
       return dashboardData;
     } catch (error) {
       logger.error(
         "system",
-        { message: `[dashboard] Failed to generate dashboard data: ${error.message}` },
+        {
+          message:
+            `[dashboard] Failed to generate dashboard data: ${error.message}`,
+        },
       );
       throw error;
     }
@@ -706,15 +719,17 @@ export class TypeSystemDashboard {
     const recentCompilation = this.compilationHistory.filter((m) =>
       m.startTime >= thirtyDaysAgo
     );
-    const recentTypeSafety = this.typeSafetyHistory.filter((r) =>
-      r.timestamp >= thirtyDaysAgo
-    );
+    // Filter type safety history
+    // const recentTypeSafety = this.typeSafetyHistory.filter((r) =>
+    //   r.timestamp >= thirtyDaysAgo
+    // );
     const recentCoverage = this.coverageHistory.filter((a) =>
       a.timestamp >= thirtyDaysAgo
     );
-    const recentAlerts = this.alertHistory.filter((a) =>
-      a.timestamp >= thirtyDaysAgo
-    );
+    // Note: recentAlerts would be used for alert trend analysis
+    // const recentAlerts = this.alertHistory.filter((a) =>
+    //   a.timestamp >= thirtyDaysAgo
+    // );
 
     // Generate daily aggregated data for trends
     const healthScore = this.generateDailyHealthScores();

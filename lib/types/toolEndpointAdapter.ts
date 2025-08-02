@@ -242,6 +242,6 @@ export class ToolResponseError extends ToolEndpointError {
 }
 
 // Re-exports for types commonly imported from this adapter
-export type { ColumnDefinition } from "$types/ui.d.ts";
-export type { FeeAlert } from "$types/fee.d.ts";
+export type { ColumnDefinition, MockResponse, NamespaceImport, XcpBalance } from "$types/ui.d.ts";
+export type { FeeAlert, ToolEstimationParams } from "$types/fee.d.ts";
 export type { InputData } from "$types/src20.d.ts";

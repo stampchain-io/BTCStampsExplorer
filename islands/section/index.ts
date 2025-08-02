@@ -40,6 +40,7 @@ export * from "$components/section/howto/ArticlesOverviewBase.tsx";
 export * from "$components/section/howto/AuthorBase.tsx";
 export * from "$components/section/howto/data.ts";
 export * from "$components/section/howto/ListBase.tsx";
+export type { ListProps } from "$types/ui.d.ts";
 
 /* ===== CTA ===== */
 export { default as GetStampingCta } from "$islands/section/cta/GetStampingCta.tsx";

@@ -9,8 +9,8 @@ import type { IconVariants } from "$icon";
 export function GearIcon({
   isOpen,
   onToggle,
-  weight,
-  size,
+  weight = "normal",
+  size = "md",
   color,
   className = "",
 }: GearIconProps) {
@@ -43,7 +43,7 @@ export function GearIcon({
       type="iconButton"
       name="tools"
       weight={weight}
-      size={size}
+      size={typeof size === "number" ? "custom" : size}
       color="custom"
       className={`fill-none ${colorClasses} ${className}`
         .trim()}

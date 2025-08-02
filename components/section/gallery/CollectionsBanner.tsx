@@ -1,5 +1,4 @@
 /* ===== COLLECTION LIST CARD COMPONENT ===== */
-import type { Collection } from "$server/types/collection.d.ts";
 import type { CollectionsBannerProps } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
 

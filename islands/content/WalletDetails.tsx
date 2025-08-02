@@ -1,5 +1,4 @@
 /* ===== NOT IN USE ===== */
-import { ComponentChildren } from "preact";
 import type { StatItemProps } from "$types/ui.d.ts";
 import type { StatTitleProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";

@@ -5,7 +5,6 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { StampImage } from "$content";
 import { inputFieldSquare } from "$form";
-import type { StampRow } from "$types/stamp.d.ts";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";

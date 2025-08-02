@@ -1,4 +1,3 @@
-import { JSX } from "preact";
 import type { SelectFieldProps } from "$types/ui.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 import { inputField } from "$form";

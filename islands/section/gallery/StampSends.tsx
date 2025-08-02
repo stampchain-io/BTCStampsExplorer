@@ -1,6 +1,5 @@
 /* ===== STAMP RECENT SALES GALLERY COMPONENT ===== */
 import { StampCard } from "$card";
-import type { StampTransaction } from "$lib/types/stamping.ts";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import type { JSX } from "preact";
 import type { StampSendsGalleryProps } from "$types/ui.d.ts";

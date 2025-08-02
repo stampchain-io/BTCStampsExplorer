@@ -1,29 +1,14 @@
 import { useConfig } from "$client/hooks/useConfig.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { useFees } from "$fees";
-import { Config } from "$types/base.d.ts";
-import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { showNotification } from "$lib/utils/notificationUtils.ts";
+import { debounce } from "$lib/utils/performance/debounce.ts";
+import { Config } from "$types/base.d.ts";
+import type { SRC20FormState } from "$types/ui.d.ts";
 import axiod from "axiod";
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
-import type { SRC20FormState } from "$types/ui.d.ts";
-
-interface PSBTFees {
-  estMinerFee: number;
-  totalDustValue: number;
-  hasExactFees: boolean;
-  totalValue: number;
-  effectiveFeeRate: number;
-  estimatedSize?: number;
-  totalVsize?: number;
-  est_tx_size?: number;
-  hex?: string;
-  inputsToSign?: Array<
-    { index: number; address?: string; sighashTypes?: number[] }
-  >;
-}
 
 export class SRC20FormController {
   private static prepareTxDebounced = debounce(async (

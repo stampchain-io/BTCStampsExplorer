@@ -12,7 +12,6 @@ import type {
   OpenAPIInfo,
   OpenAPIOperation,
   OpenAPIParameter,
-  OpenAPIPathItem,
   OpenAPISchema,
   OpenAPIServer,
 } from "./api.d.ts";
@@ -293,7 +292,6 @@ Deno.test("API error structure - RFC 7807 compliance", () => {
 
 Deno.test("Endpoint registry coverage", () => {
   // This is a type-level test to ensure EndpointRegistry is properly structured
-  type TestRegistry = EndpointRegistry;
 
   // Test that we can extract response types
   type StampsResponse = EndpointRegistry["/api/v2/stamps"]["GET"];

@@ -9,7 +9,6 @@ import { useEffect, useRef, useState } from "preact/hooks";
 
 import { TEXT_STYLES } from "$card";
 import { WalletStampValue } from "$components/display/BTCValueDisplay.tsx";
-import { WalletStampWithValue } from "$lib/types/wallet.d.ts";
 import {
   AUDIO_FILE_IMAGE,
   LIBRARY_FILE_IMAGE,

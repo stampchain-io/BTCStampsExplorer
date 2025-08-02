@@ -2,7 +2,7 @@ import { WalletProviderKey } from "$constants";
 import { PaginationQueryParams } from "$types/pagination.d.ts";
 import type { FeeData } from "$types/services.d.ts";
 import { WalletSortKey } from "$types/sorting.d.ts";
-import type { WalletConnectionState } from "$types/ui.d.ts";
+import type { ListProps, WalletConnectionState } from "$types/ui.d.ts";
 import type { ProgressiveFeeEstimationResult } from "$types/utils.d.ts";
 
 // ===== HORIZON WALLET SPECIFIC TYPES =====
@@ -40,6 +40,9 @@ declare global {
 
 // Re-export for convenience
 export type { WalletSortKey } from "./sorting.d.ts";
+
+// Re-export AncestorInfo from base types
+export type { AncestorInfo } from "$types/base.d.ts";
 
 // ===== CORE WALLET INTERFACE =====
 
@@ -342,6 +345,20 @@ export interface WalletStampsApiResponse {
 }
 
 /* ===== WALLET CONTENT PROPS ===== */
+
+/**
+ * WalletContentProps - Props for WalletDashboardContent component
+ */
+export interface WalletContentProps {
+  stamps: any;
+  src20: any;
+  dispensers: any;
+  address: string;
+  anchor: string;
+  stampsSortBy?: "ASC" | "DESC";
+  src20SortBy?: "ASC" | "DESC";
+  dispensersSortBy?: "ASC" | "DESC";
+}
 
 export interface WalletOverviewInfo {
   totalStamps: number;

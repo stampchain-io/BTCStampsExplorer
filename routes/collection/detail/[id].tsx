@@ -1,8 +1,20 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 /* ===== COLLECTION DETAILS PAGE ===== */
 
 import { CollectionDetailContent } from "$content";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import type { CollectionDetailsPageProps } from "$types/ui.d.ts";
+import type { STAMP_FILTER_TYPES, SUBPROTOCOLS } from "$types/stamp.d.ts";
 
 import { CollectionDetailHeader } from "$header";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";

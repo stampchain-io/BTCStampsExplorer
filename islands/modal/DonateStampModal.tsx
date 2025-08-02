@@ -6,7 +6,6 @@ import { walletContext } from "$client/wallet/wallet.ts";
 // Using simplified fee display approach
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { StampImage } from "$content";
-import type { StampRow } from "$types/stamp.d.ts";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";

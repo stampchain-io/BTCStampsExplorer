@@ -1,5 +1,5 @@
 import { Icon } from "$icon";
-import type { MaraSuccessMessageProps, TransactionState } from "$types/ui.d.ts";
+import type { MaraSuccessMessageProps } from "$types/ui.d.ts";
 import type { TransactionBadgeProps } from "$types/ui.d.ts";
 import type { TransactionStatusProps } from "$types/ui.d.ts";
 import { buttonPurpleFlat } from "$button";

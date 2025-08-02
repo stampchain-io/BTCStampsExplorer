@@ -30,7 +30,13 @@
 // Type Imports from Other Domain Modules
 // ============================================================================
 
-import type { BasicUTXO, BlockRow, FeeDetails, SUBPROTOCOLS, UTXO } from "$types/base.d.ts";
+import type {
+  BasicUTXO,
+  BlockRow,
+  FeeDetails,
+  SUBPROTOCOLS,
+  UTXO,
+} from "$types/base.d.ts";
 import type { DetailedUTXO } from "$types/transaction.d.ts";
 import {
   ApiErrorCode,

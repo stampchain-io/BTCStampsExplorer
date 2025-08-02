@@ -1,5 +1,5 @@
 /* ===== COLLECTION OVERVIEW CARD COMPONENT ===== */
-import type { Collection, CollectionWithCreators, CollectionWithOptionalMarketData } from "$types";
+import type { CollectionWithOptionalMarketData } from "$types";
 import {
   abbreviateAddress,
   formatBTC,

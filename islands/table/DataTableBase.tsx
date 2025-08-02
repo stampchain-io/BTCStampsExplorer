@@ -1,5 +1,5 @@
 /* ===== DATA TABLE BASE COMPONENT ===== */
-import { TabData, TableProps, TableType } from "$components/layout/types.ts";
+import { TabData, TableProps, TableType } from "@/lib/types/ui.d.ts";
 import { containerBackground, ScrollContainer } from "$layout";
 import {
   SRC20MintsTable,

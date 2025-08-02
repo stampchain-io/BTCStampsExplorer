@@ -9,9 +9,9 @@ import { logger } from "$lib/utils/logger.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import type { SendRequestBody, SendResponse } from "$types/api.d.ts";
 import { networks, Psbt, Transaction } from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
-import type { SendRequestBody, SendResponse } from "$types/api.d.ts";
 
 export const handler: Handlers<SendResponse | { error: string }> = {
   async POST(req) {
@@ -198,7 +198,7 @@ export const handler: Handlers<SendResponse | { error: string }> = {
       inputsToSign.push({
         index: 0,
         address: address,
-        sighashTypes: [Transaction.SIGHASH_ALL],
+        sighashTypes: [Transaction.__SIGHASH_ALL],
       });
 
       // Add all outputs from Counterparty's transaction

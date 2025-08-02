@@ -613,14 +613,14 @@ export interface TransactionBuilder {
   createPSBT(
     utxo: string,
     amount: number,
-    address: string
+    address: string,
   ): Promise<string>;
 
   /** Process an existing PSBT from a Counterparty transaction */
   processCounterpartyPSBT?(
     psbtHex: string,
     address: string,
-    feeRate: number
+    feeRate: number,
   ): Promise<{
     psbtHex?: string;
     estimatedFee?: number;

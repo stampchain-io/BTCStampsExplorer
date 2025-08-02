@@ -1,7 +1,7 @@
 export * from "$components/table/HoldersTable.tsx";
 
-export * from "$components/table/src20DataTable/SRC20Transfers.tsx";
 export * from "$components/table/src20DataTable/SRC20Mints.tsx";
+export * from "$components/table/src20DataTable/SRC20Transfers.tsx";
 
 export * from "$components/table/stampDataTable/StampListingsAll.tsx";
 export { StampListingsOpenTable } from "$components/table/stampDataTable/StampListingsOpen.tsx";
@@ -9,6 +9,9 @@ export * from "$components/table/stampDataTable/StampSales.tsx";
 export * from "$components/table/stampDataTable/StampTransfers.tsx";
 
 export { default as DataTableBase } from "$islands/table/DataTableBase.tsx";
-export { default as HoldersTableBase } from "$islands/table/HoldersTableBase.tsx";
 export * from "$islands/table/HoldersPieChart.tsx";
+export { default as HoldersTableBase } from "$islands/table/HoldersTableBase.tsx";
 export * from "$islands/table/UploadImageTable.tsx";
+
+// Export Dispenser as requested - TEMPORARILY DISABLED (missing file)
+// export { default as Dispenser } from "$components/dispenser/Dispenser.tsx";

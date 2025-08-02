@@ -14,27 +14,20 @@ import type {
   AsyncStateProps,
   // Core UI Framework Types
   BaseComponentProps,
-  Breakpoints,
   ButtonColor,
   // Button Types
   ButtonProps,
   ButtonSize,
   ButtonVariant,
-  CollectionGalleryProps,
   ColorPalette,
-  ComponentWithChildren,
   ConfirmDialogProps,
-  ContainerProps,
   DisplayCountBreakpoints,
-  EmptyStateProps,
   ErrorStateProps,
   ExtendedComponentProps,
   // Layout Types
   FlexboxProps,
   // Form Types
   FormControlProps,
-  // Generic Component Types
-  ForwardRefComponent,
   GridProps,
   IconButtonProps,
   // Icon Types
@@ -47,32 +40,22 @@ import type {
   LoadingStateProps,
   // Modal Types
   ModalBaseProps,
-  NotificationBannerProps,
-  PaginationProps,
-  PolymorphicComponent,
-  ProcessingButtonProps,
   ResponsiveProps,
   // Responsive Design Types
   ResponsiveValue,
   ScreenReaderProps,
   SelectProps,
-  SpacingScale,
   SRC20CardProps,
   // Bitcoin Stamps UI Types
   StampGalleryProps,
   TableColumn,
   // Table Types
   TableProps,
-  TextareaProps,
-  // Theme and Design System Types
-  Theme,
   // Notification Types
   ToastProps,
   ToastVariant,
   TransitionProps,
-  Transitions,
   Typography,
-  WalletComponentProps,
 } from "./ui.d.ts";
 
 Deno.test("UI Types - Core Component Props", () => {

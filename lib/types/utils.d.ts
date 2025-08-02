@@ -1,7 +1,37 @@
-import type { BlockRow } from "$types/base.d.ts";
+import type { BlockRow, FeeDetails } from "$types/base.d.ts";
 import type { FeeData } from "$types/services.d.ts";
 import type { SortKey } from "$types/sorting.d.ts";
 import type { TimeSeriesData } from "$types/stamp.d.ts";
+import type { ListProps } from "$types/ui.d.ts";
+
+export interface TypeSafetyReport {
+  totalTypes: number;
+  coveragePercentage: number;
+  safetyScore: number;
+  criticalIssues: string[];
+}
+
+export interface TypeCoverageAnalysis {
+  filesCovered: number;
+  totalFiles: number;
+  uncoveredFiles: string[];
+  complexityRating: "low" | "medium" | "high";
+}
+
+export interface TypeSystemAlert {
+  type: "warning" | "error" | "info";
+  message: string;
+  affectedFiles?: string[];
+  suggestedFix?: string;
+}
+
+export interface CompilationMetrics {
+  totalLines: number;
+  typeAnnotationCoverage: number;
+  errorCount: number;
+  warningCount: number;
+  compilationTime: number; // in milliseconds
+}
 import type { TransactionOptions } from "$types/wallet.d.ts";
 
 export interface UTXOFromBlockCypher {
@@ -882,7 +912,14 @@ export type ActivityLevelType = "low" | "medium" | "high" | "critical";
 /**
  * FlagKeys - Migrated from flags.ts
  */
-export type FlagKeys = keyof typeof FLAGS;
+export type FlagKeys = keyof {
+  debug: boolean;
+  production: boolean;
+  staging: boolean;
+  development: boolean;
+  testnet: boolean;
+  mainnet: boolean;
+};
 
 /**
  * Breakpoints - Migrated from useBreakpoints.ts
@@ -2348,12 +2385,6 @@ export type AssertEqual<T, U> = T extends U ? U extends T ? true : false
 export type AssertTrue<T extends true> = T;
 
 /**
- * AssertEqual - Migrated from typeAssertions.ts
- */
-export type AssertEqual<T, U> = T extends U ? U extends T ? true : false
-  : false;
-
-/**
  * AssertExtends - Migrated from typeAssertions.ts
  */
 export type AssertExtends<T, U> = T extends U ? true : false;
@@ -2362,11 +2393,6 @@ export type AssertExtends<T, U> = T extends U ? true : false;
  * AssertAssignable - Migrated from typeAssertions.ts
  */
 export type AssertAssignable<T, U> = U extends T ? true : false;
-
-/**
- * AssertTrue - Migrated from typeAssertions.ts
- */
-export type AssertTrue<T extends true> = T;
 
 /**
  * AssertFalse - Migrated from typeAssertions.ts
@@ -3474,11 +3500,6 @@ export interface ExtendedInputData
 }
 
 /**
- * TrxType - Migrated from create.ts
- */
-export type TrxType = "multisig" | "olga";
-
-/**
  * AncestorData - Migrated from [address].ts
  */
 export interface AncestorData {
@@ -3640,3 +3661,40 @@ export namespace StringUtils {
   export function kebabCase(value: string): string;
   export function camelCase(value: string): string;
 }
+
+export type MixedTypes = string | number | boolean | null | undefined;
+
+export type FilterTypes<T> = {
+  [K in keyof T]: T[K] extends MixedTypes ? T[K] : never;
+};
+
+export type NonNumberProps<T> = {
+  [K in keyof T]: T[K] extends number ? never : K;
+}[keyof T];
+
+export interface CompilerConfiguration {
+  target: string;
+  module: string;
+  strict: boolean;
+  esModuleInterop: boolean;
+}
+
+export interface FileCompilationMetrics {
+  filePath: string;
+  linesOfCode: number;
+  compilationTime: number;
+  errorCount: number;
+  warningCount: number;
+  complexity: number;
+}
+
+export const alignmentClasses = {
+  left: "text-left",
+  right: "text-right",
+  center: "text-center",
+  top: "align-top",
+  bottom: "align-bottom",
+  middle: "align-middle",
+} as const;
+
+export type AlignmentKey = keyof typeof alignmentClasses;

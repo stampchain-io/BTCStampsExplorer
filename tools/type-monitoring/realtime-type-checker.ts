@@ -8,12 +8,7 @@
  * for the Type Domain Migration using Deno's built-in TypeScript APIs.
  */
 
-import {
-  join,
-  relative,
-  resolve,
-} from "https://deno.land/std@0.213.0/path/mod.ts";
-import { createHash } from "https://deno.land/std@0.213.0/crypto/crypto.ts";
+import { join, relative } from "https://deno.land/std@0.213.0/path/mod.ts";
 
 interface TypeCheckResult {
   timestamp: number;
@@ -86,15 +81,19 @@ class RealTimeTypeChecker {
         stderr: "piped",
       });
 
-      const { success, stdout, stderr } = await command.output();
+      const { success, stderr } = await command.output();
       const duration = performance.now() - startTime;
       const memoryUsage = this.getMemoryUsage() - memoryBefore;
+
+      // Parse individual TypeScript errors from stderr
+      const errorOutput = new TextDecoder().decode(stderr);
+      const individualErrors = this.parseTypeScriptErrors(errorOutput);
 
       const result: TypeCheckResult = {
         timestamp: Date.now(),
         filePath: "full-check",
         success,
-        errors: success ? [] : [new TextDecoder().decode(stderr)],
+        errors: individualErrors,
         warnings: [],
         duration,
         memoryUsage,
@@ -115,24 +114,56 @@ class RealTimeTypeChecker {
 
   private async setupFileWatcher(): Promise<void> {
     try {
-      this.watcher = Deno.watchFs(this.config.projectRoot, { recursive: true });
+      console.log("📁 Setting up file system watcher...");
 
-      for await (const event of this.watcher) {
-        if (!this.isRunning) break;
+      // Add timeout to prevent hanging
+      const watcherPromise = this.createWatcher();
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("File watcher setup timeout")), 5000)
+      );
 
-        // Filter for TypeScript files
-        const tsFiles = event.paths.filter((path) =>
-          path.endsWith(".ts") || path.endsWith(".tsx") ||
-          path.endsWith(".d.ts")
-        );
+      await Promise.race([watcherPromise, timeoutPromise]);
+      console.log("✅ File watcher setup complete");
+    } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : String(error);
+      console.warn(
+        "⚠️ File watcher setup failed, continuing without live updates:",
+        errorMessage,
+      );
+      // Continue without file watching - monitoring will still work for manual checks
+    }
+  }
 
-        if (tsFiles.length > 0 && event.kind === "modify") {
-          await this.checkModifiedFiles(tsFiles);
+  private async createWatcher(): Promise<void> {
+    this.watcher = Deno.watchFs(this.config.projectRoot, { recursive: true });
+
+    // Run watcher in background
+    (async () => {
+      try {
+        for await (const event of this.watcher!) {
+          if (!this.isRunning) break;
+
+          // Filter for TypeScript files
+          const tsFiles = event.paths.filter((path) =>
+            path.endsWith(".ts") || path.endsWith(".tsx") ||
+            path.endsWith(".d.ts")
+          );
+
+          if (tsFiles.length > 0 && event.kind === "modify") {
+            await this.checkModifiedFiles(tsFiles);
+          }
+        }
+      } catch (error) {
+        if (this.isRunning) {
+          const errorMessage = error instanceof Error
+            ? error.message
+            : String(error);
+          console.warn("⚠️ File watcher stopped:", errorMessage);
         }
       }
-    } catch (error) {
-      console.error("❌ File watcher error:", error);
-    }
+    })();
   }
 
   private async checkModifiedFiles(files: string[]): Promise<void> {
@@ -153,7 +184,7 @@ class RealTimeTypeChecker {
         stderr: "piped",
       });
 
-      const { success, stdout, stderr } = await command.output();
+      const { success, stderr } = await command.output();
       const duration = performance.now() - startTime;
       const memoryUsage = this.getMemoryUsage() - memoryBefore;
 
@@ -230,7 +261,7 @@ class RealTimeTypeChecker {
     };
   }
 
-  private async checkThresholds(result: TypeCheckResult): Promise<void> {
+  private async checkThresholds(_result: TypeCheckResult): Promise<void> {
     const metrics = this.calculateMetrics();
     const alerts: string[] = [];
 

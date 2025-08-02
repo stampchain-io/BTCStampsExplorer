@@ -1,3 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 /* ===== EXPLORER PAGE ===== */
 
 import { ExplorerContent } from "$content";
@@ -6,6 +17,10 @@ import { Handlers } from "$fresh/server.ts";
 import { ExplorerHeader } from "$header";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
+import type { STAMP_FILTER_TYPES } from "$types/stamp.d.ts";
+import type { STAMP_TYPES } from "$types/stamp.d.ts";
+import type { StampPageProps } from "$types/api.d.ts";
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;

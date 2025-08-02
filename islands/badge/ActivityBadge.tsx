@@ -1,7 +1,6 @@
 /* ===== ACTIVITY BADGE COMPONENT ===== */
 import { ActivityLevel } from "$constants";
 import type { ActivityBadgeProps } from "$types/ui.d.ts";
-import type { ActivityLevel as ActivityLevelType } from "$types/marketData.d.ts";
 
 const activityConfig = {
   [ActivityLevel.HOT]: {

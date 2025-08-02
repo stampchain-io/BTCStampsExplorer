@@ -4,8 +4,6 @@
 import { Button } from "$button";
 import type { FilterSRC20ModalProps } from "$types/ui.d.ts";
 import { InputField, SelectDate } from "$form";
-import type { SRC20_FILTER_TYPES } from "$types/src20.d.ts";
-import type { STAMP_FILTER_TYPES } from "$types/stamp.d.ts";
 import type {
   COLLECTION_FILTER_TYPES,
   LISTING_FILTER_TYPES,
@@ -18,12 +16,6 @@ import type { JSX } from "preact";
 import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-type FilterTypes =
-  | SRC20_FILTER_TYPES
-  | STAMP_FILTER_TYPES
-  | WALLET_FILTER_TYPES
-  | COLLECTION_FILTER_TYPES
-  | LISTING_FILTER_TYPES;
 
 /* ===== COMPONENT ===== */
 const FilterSRC20Modal = ({ filterOptions }: FilterSRC20ModalProps) => {

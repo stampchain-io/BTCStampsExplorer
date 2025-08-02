@@ -1,7 +1,19 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 /* ===== SRC20 OVERVIEW PAGE ===== */
 /*@baba-149*/
 import { SRC20OverviewContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
+import type { PriceData, VolumeData } from "$types/marketData.d.ts";
 
 /* ===== HELPER FUNCTIONS ===== */
 /**

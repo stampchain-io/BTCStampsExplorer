@@ -1,8 +1,6 @@
 /* ===== WALLET DASHBOARD CONTENT COMPONENT ===== */
 import type { StampRow } from "$types/stamp.d.ts";
 import type { Dispenser } from "$types/services.d.ts";
-import type { SRC20Row } from "$types/src20.d.ts";
-import type { CollectionRow } from "$types/stamp.d.ts";
 import type {
   CacheStatus,
   CollectionMarketData,

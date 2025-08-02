@@ -6,7 +6,6 @@
 
 import type {
   SortKey,
-  SortState,
   UseSortingConfig,
   UseSortingReturn,
 } from "$lib/types/sorting.d.ts";

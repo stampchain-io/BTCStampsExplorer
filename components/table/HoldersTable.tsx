@@ -3,12 +3,6 @@ import type { HoldersTableProps } from "$types/ui.d.ts";
 import { containerBackground } from "$layout";
 import { labelSm, value3xl } from "$text";
 
-interface Holder {
-  address?: string;
-  amt: string;
-  percentage: string;
-}
-
 export function HoldersTable({ holders = [] }: HoldersTableProps) {
   if (!holders.length) {
     return (

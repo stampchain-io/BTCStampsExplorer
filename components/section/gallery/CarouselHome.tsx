@@ -1,4 +1,3 @@
-import type { StampRow } from "$types/stamp.d.ts";
 import type { CarouselHomeProps } from "$types/ui.d.ts";
 import { CarouselGallery, SwiperStyles } from "$section";
 

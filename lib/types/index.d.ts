@@ -50,6 +50,9 @@ export type {
   UTXO,
   WalletDataTypes,
   XCPParams,
+  // Additional types for compatibility
+  MockResponse,
+  NamespaceImport,
 } from "./base.d.ts";
 
 export type {
@@ -124,16 +127,17 @@ export type {
   SRC20Operation,
   // SRC-20 core types
   SRC20Row,
-  SRC20SnapshotRequestParams,
   SRC20TickPageData,
-  SRC20TrxRequestParams,
   // Extended SRC-20 interfaces
   SRC20WithOptionalMarketData,
+  // Tool estimation parameters
+  ToolEstimationParams,
 } from "./src20.d.ts";
 
 export type {
   // SRC-101 types
   SRC101Balance,
+  SRC101InputData,
 } from "./src101.d.ts";
 
 // ============================================================================
@@ -373,7 +377,6 @@ export type {
   // Progressive fee estimation
   ProgressiveFeeEstimationOptions,
   ProgressiveFeeEstimationResult,
-  ToolEstimationParams,
   // Tool-specific types
   ToolType,
   UTXOCache,
@@ -404,6 +407,21 @@ export type {
   ServiceResponse,
 } from "./services.d.ts";
 export type { __TYPE_ONLY_MODULE__ };
+
+/**
+ * Page props for Collection Overview pages
+ * Used in routes to pass collection data and metadata
+ */
+export interface CollectionOverviewPageProps {
+  data: {
+    collection: any; // Replace with more specific type from Collection type
+    stamps?: any[]; // Replace with StampRow[]
+    src20?: any[]; // Replace with SRC20Row[]
+    totalStamps?: number;
+    totalSRC20?: number;
+    error?: string;
+  };
+}
 
 // ============================================================================
 // Namespace Exports for Organized Access

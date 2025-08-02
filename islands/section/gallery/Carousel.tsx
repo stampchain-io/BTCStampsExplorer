@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import type { CarouselProps } from "$types/ui.d.ts";
 import { IS_BROWSER } from "$fresh/runtime.ts";
-import type { StampRow } from "$types/stamp.d.ts";
 import { ComponentChildren } from "preact";
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";

@@ -88,11 +88,11 @@ export type {
   SRC20_DETAILS,
   SRC20_FILTER_TYPES,
   SRC20_MARKET,
-  SRC20_OPERATIONS,
   SRC20_STATUS,
   SRC20_TYPES,
   SRC20Balance,
   Src20Detail,
+  SRC20Operation,
   SRC20Row,
   Src20SnapShotDetail,
 } from "./lib/types/src20.d.ts";
@@ -123,10 +123,10 @@ export type {
  */
 export type {
   SendRow,
+  Transaction,
   TransactionBuilder,
   TransactionConstructionParams,
   TransactionEstimateParams,
-  TransactionRow,
   UTXOSelectionStrategy,
 } from "./lib/types/transaction.d.ts";
 
@@ -189,7 +189,7 @@ export type {
 export type {
   PaginationConfig,
   PaginationProps,
-  PaginationState,
+  PaginationType,
 } from "./lib/types/pagination.d.ts";
 
 // Sorting Types
@@ -224,7 +224,7 @@ export type {
  * @since 1.4.0
  */
 export type {
-  AppError,
+  APIError,
   ErrorContext,
   ErrorSeverity,
   NetworkError,

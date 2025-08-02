@@ -1,4 +1,4 @@
-import type { FeeData, UTXOFetchOptions } from "./services.d.ts";
+import type { UTXOFetchOptions } from "./services.d.ts";
 export interface UTXO {
   txid: string;
   vout: number;
@@ -82,6 +82,7 @@ export type ScriptType =
 
 export interface FeeDetails {
   minerFee: number;
+  estMinerFee?: number; // Temporary compatibility for existing code
   serviceFee?: number;
   itemPrice?: number;
   totalValue: number;
@@ -145,6 +146,74 @@ export type SUBPROTOCOLS =
   | "SRC-20"
   | "SRC-721"
   | "SRC-101";
+
+/**
+ * Base handler context for various Bitcoin-related operations
+ */
+export interface BaseHandlerContext {
+  /** The Bitcoin address associated with the handler */
+  address?: string;
+  /** The transaction hash */
+  txHash?: string;
+  /** Block height or index */
+  blockHeight?: number;
+  /** Timestamp of the transaction/event */
+  timestamp?: number | Date;
+  /** Any additional metadata or context */
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Handler context for address-related operations
+ */
+export interface AddressHandlerContext extends BaseHandlerContext {
+  /** Bitcoin address being processed */
+  address: string;
+  /** Balance information */
+  balance?: number;
+  /** Transaction count */
+  txCount?: number;
+}
+
+/**
+ * Handler context for block-related operations
+ */
+export interface BlockHandlerContext extends BaseHandlerContext {
+  /** Block hash */
+  blockHash: string;
+  /** Previous block hash */
+  previousBlockHash?: string;
+  /** Mining difficulty */
+  difficulty?: number;
+}
+
+/**
+ * Handler context for tick-related operations
+ */
+export interface TickHandlerContext extends BaseHandlerContext {
+  /** Tick identifier */
+  tick?: string;
+  /** Subprotocol context */
+  subprotocol?: SUBPROTOCOLS;
+}
+
+/**
+ * Handler context for identifier-related operations
+ */
+export interface IdentHandlerContext extends BaseHandlerContext {
+  /** Unique identifier */
+  ident?: string;
+  /** Associated data */
+  data?: Record<string, unknown>;
+}
+
+/**
+ * Address tick handler context for combined address and tick operations
+ */
+export interface AddressTickHandlerContext
+  extends AddressHandlerContext, TickHandlerContext {
+  /** Combined properties from both address and tick contexts */
+}
 
 // Bitcoin Block Types --------------------------------------------------------
 

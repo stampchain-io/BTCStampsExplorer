@@ -1,5 +1,4 @@
 /* ===== CONNECT WALLET MODAL COMPONENT ===== */
-import { ComponentChildren } from "preact";
 import type { ConnectWalletModalProps } from "$types/ui.d.ts";
 import { showConnectWalletModal } from "$client/wallet/wallet.ts";
 import { subtitlePurple } from "$text";

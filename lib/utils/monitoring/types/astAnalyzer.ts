@@ -301,11 +301,16 @@ export class ASTTypeSafetyAnalyzer {
       // For now, we'll create a mock project
       this.project = await this.createMockProject(projectRoot);
 
-      logger.info("system", { message: "[ast-analyzer] Initialized TypeScript project for analysis" });
+      logger.info("system", {
+        message: "[ast-analyzer] Initialized TypeScript project for analysis",
+      });
     } catch (error) {
       logger.error(
         "system",
-        { message: `[ast-analyzer] Failed to initialize project: ${error.message}` },
+        {
+          message:
+            `[ast-analyzer] Failed to initialize project: ${error.message}`,
+        },
       );
       throw error;
     }
@@ -320,7 +325,9 @@ export class ASTTypeSafetyAnalyzer {
     }
 
     const startTime = performance.now();
-    logger.info("system", { message: "[ast-analyzer] Starting comprehensive type safety analysis" });
+    logger.info("system", {
+      message: "[ast-analyzer] Starting comprehensive type safety analysis",
+    });
 
     try {
       // Analyze type coverage
@@ -365,9 +372,11 @@ export class ASTTypeSafetyAnalyzer {
       const duration = performance.now() - startTime;
       logger.info(
         "system",
-        { message: `[ast-analyzer] Type safety analysis completed in ${
-          duration.toFixed(1)
-        }ms` },
+        {
+          message: `[ast-analyzer] Type safety analysis completed in ${
+            duration.toFixed(1)
+          }ms`,
+        },
       );
 
       // Store report for future regression analysis
@@ -377,7 +386,10 @@ export class ASTTypeSafetyAnalyzer {
     } catch (error) {
       logger.error(
         "system",
-        { message: `[ast-analyzer] Type safety analysis failed: ${error.message}` },
+        {
+          message:
+            `[ast-analyzer] Type safety analysis failed: ${error.message}`,
+        },
       );
       throw error;
     }
@@ -534,15 +546,15 @@ export class ASTTypeSafetyAnalyzer {
    * Validate domain-specific types
    */
   private async validateDomainTypes(): Promise<DomainTypeValidation> {
-    const domains = [
-      "stamp",
-      "src20",
-      "src101",
-      "transaction",
-      "utxo",
-      "fee",
-      "marketData",
-    ];
+    // const domains = [
+    //   "stamp",
+    //   "src20",
+    //   "src101",
+    //   "transaction",
+    //   "utxo",
+    //   "fee",
+    //   "marketData",
+    // ];
 
     const validation: DomainTypeValidation = {
       stampTypes: await this.validateDomainTypeIntegrity("stamp"),
@@ -645,7 +657,7 @@ export class ASTTypeSafetyAnalyzer {
    */
   private async validateInterface(
     iface: InterfaceDeclaration,
-    domain: string,
+    _domain: string,
     filePath: string,
   ): Promise<DomainTypeIssue[]> {
     const issues: DomainTypeIssue[] = [];
@@ -712,7 +724,7 @@ export class ASTTypeSafetyAnalyzer {
    */
   private async validateTypeAlias(
     typeAlias: TypeAliasDeclaration,
-    domain: string,
+    _domain: string,
     filePath: string,
   ): Promise<DomainTypeIssue[]> {
     const issues: DomainTypeIssue[] = [];
@@ -941,11 +953,11 @@ export class ASTTypeSafetyAnalyzer {
    * Create a mock project for demonstration purposes
    * In a real implementation, this would use ts-morph
    */
-  private async createMockProject(projectRoot: string): Promise<Project> {
+  private async createMockProject(_projectRoot: string): Promise<Project> {
     // This is a simplified mock implementation
     // In production, use ts-morph's Project class
     return {
-      addSourceFilesAtPaths: async (patterns: string[]) => [],
+      addSourceFilesAtPaths: async (_patterns: string[]) => [],
       getSourceFiles: () => [],
       getSourceFile: (path: string) => undefined,
       getPreEmitDiagnostics: () => [],

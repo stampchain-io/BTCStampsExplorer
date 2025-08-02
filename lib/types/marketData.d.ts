@@ -4,7 +4,13 @@ import type { CollectionRow } from "$server/types/collection.d.ts";
 import type { MarketDataCacheInfo } from "$types/utils.d.ts";
 
 // Re-export for other modules
-export type { MarketDataCacheInfo, SRC20Row, StampRow };
+export type { 
+  MarketDataCacheInfo, 
+  SRC20Row, 
+  StampRow, 
+  PriceData, 
+  VolumeData 
+};
 
 export interface MarketListingSummary {
   tick: string;
@@ -329,6 +335,76 @@ export type VolumeSources = Record<string, number>;
  * Exchange sources type for parsed JSON data
  */
 export type ExchangeSources = string[];
+
+/**
+ * Price data interface for market data
+ * Represents pricing information for an asset
+ */
+export interface PriceData {
+  /** Price in BTC */
+  priceBTC: number | null;
+  /** Price in USD */
+  priceUSD: number | null;
+  /** Timestamp of the price */
+  timestamp: number;
+  /** Source of the price data */
+  source: string;
+  /** Confidence level of the price data (0-10) */
+  confidence?: number;
+}
+
+/**
+ * Volume data interface for market data
+ * Represents trading volume information for an asset
+ */
+export interface VolumeData {
+  /** Volume in BTC over 24 hours */
+  volume24hBTC: number;
+  /** Volume in BTC over 7 days */
+  volume7dBTC: number;
+  /** Volume in BTC over 30 days */
+  volume30dBTC: number;
+  /** Timestamp of the volume data */
+  timestamp: number;
+  /** Source of the volume data */
+  source: string;
+  /** Confidence level of the volume data (0-10) */
+  confidence?: number;
+}
+
+/**
+ * Interface for market data providers
+ * Defines standard methods for retrieving market data
+ */
+export interface MarketDataProvider {
+  /**
+   * Retrieve price data for a specific asset
+   * @param asset Asset identifier (ticker, CPID, etc.)
+   */
+  getPrice(asset: string): Promise<PriceData>;
+
+  /**
+   * Retrieve market data for a specific asset
+   * @param asset Asset identifier (ticker, CPID, etc.)
+   */
+  getMarketData(asset: string): Promise<StampMarketData | SRC20MarketData>;
+
+  /**
+   * Retrieve trading volume data
+   * @param asset Asset identifier (ticker, CPID, etc.)
+   */
+  getVolume(asset: string): Promise<VolumeData>;
+
+  /**
+   * Get the name of the market data provider
+   */
+  getName(): string;
+
+  /**
+   * Check if the provider is currently available
+   */
+  isAvailable(): Promise<boolean>;
+}
 
 /**
  * Extended stamp interface that includes market data

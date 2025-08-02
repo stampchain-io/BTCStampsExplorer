@@ -11,7 +11,7 @@ import {
   ErrorInfo,
   ErrorType,
 } from "$lib/utils/errorHandlingUtils.ts";
-import { Component, type ComponentChildren } from "preact";
+import { Component } from "preact";
 import type {
   SortingErrorBoundaryProps,
   SortingErrorBoundaryState,

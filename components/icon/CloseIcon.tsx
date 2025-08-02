@@ -1,15 +1,14 @@
 /* ===== CLOSE ICON COMPONENT ===== */
 import { Icon } from "$icon";
 import type { CloseIconProps } from "$types/ui.d.ts";
-import type { IconVariants } from "$icon";
 
 /* ===== TYPES ===== */
 
 /* ===== COMPONENT ===== */
 export function CloseIcon({
   onClick,
-  weight,
-  size,
+  weight = "normal",
+  size = "md",
   color,
   className = "",
   onMouseEnter,
@@ -62,7 +61,7 @@ export function CloseIcon({
         type="iconButton"
         name="close"
         weight={weight}
-        size={size}
+        size={typeof size === "number" ? "custom" : size}
         color="custom"
         className={`${colorClasses} ${className}`.trim()}
         onClick={handleClick}

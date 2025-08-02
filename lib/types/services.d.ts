@@ -16,7 +16,7 @@ import type {
   CollectionMarketData,
   MarketListingAggregated,
 } from "$types/marketData.d.ts";
-import type { SortKey, SortDirection, SortMetrics } from "$types/sorting.d.ts";
+import type { SortDirection, SortKey, SortMetrics } from "$types/sorting.d.ts";
 import type { SRC20Balance, SRC20Row } from "$types/src20.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 import type { SendRow } from "$types/transaction.d.ts";
@@ -822,9 +822,9 @@ export interface LoggerService {
 }
 
 /**
- * ServerConfig - Migrated from config.ts
+ * ServerEnvConfig - Migrated from config.ts
  */
-export type ServerConfig = {
+export type ServerEnvConfig = {
   readonly APP_ROOT: string;
   readonly IMAGES_SRC_PATH?: string;
   readonly MINTING_SERVICE_FEE?: string;
@@ -1107,6 +1107,26 @@ export interface FeeService {
 /**
  * HttpClient - Migrated from httpClient.ts
  */
+/**
+ * Notification service for managing application notifications
+ */
+export interface NotificationService {
+  sendNotification(type: string, message: string): void;
+  markNotificationAsRead(id: string): Promise<void>;
+  getUnreadNotifications(): Promise<any[]>;
+}
+
+/**
+ * Database service for managing database connections and operations
+ */
+export interface DatabaseService {
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  query(sql: string, params?: any[]): Promise<any>;
+  transaction<T>(fn: (tx: any) => Promise<T>): Promise<T>;
+  healthCheck(): Promise<boolean>;
+}
+
 export interface HttpClient {
   /**
    * Perform an HTTP request
@@ -3681,6 +3701,46 @@ export interface SecurityEvent {
 /**
  * FeeData - Migrated from feeServiceDI.ts
  */
+export interface NamespaceImport {
+  defaultNamespace?: string;
+  namespaceMap?: Record<string, string>;
+  resolveStrategy?: "first" | "last" | "merge";
+}
+
+export interface AncestorInfo {
+  parentId?: string | number;
+  depth?: number;
+  path?: string[];
+  originHash?: string;
+}
+
+export interface XcpBalance {
+  assetName: string;
+  balance: number;
+  totalSupply?: number;
+  percentOfTotal?: number;
+}
+
+export interface MockResponse {
+  status: number;
+  data: Record<string, any>;
+  headers?: Record<string, string>;
+}
+
+export interface ColumnDefinition {
+  header: string;
+  key: string;
+  sortable?: boolean;
+  filterable?: boolean;
+  type: "string" | "number" | "date" | "boolean";
+  format?: (value: any) => string;
+}
+
+export const FLAGS: Record<string, boolean> = {
+  VERBOSE_LOGGING: false,
+  PERFORMANCE_MONITORING: true,
+  EXPERIMENTAL_FEATURES: false,
+};
 export interface FeeData {
   recommendedFee: number;
   btcPrice: number;
@@ -4588,22 +4648,12 @@ export interface FileValidationOptions {
 }
 
 /**
- * SortDirection - Migrated from routeValidationService.ts
- */
-export type SortDirection = "ASC" | "DESC";
-
-/**
  * SortValidationOptions - Migrated from validationService.ts
  */
 export interface SortValidationOptions {
   defaultDirection?: SortDirection;
   allowedDirections?: SortDirection[];
 }
-
-/**
- * SortDirection - Migrated from validationService.ts
- */
-export type SortDirection = "ASC" | "DESC";
 
 /**
  * IPrepareSRC101TX - Migrated from src101.d.ts
@@ -4879,4 +4929,27 @@ export interface ServiceResponse<T = any> {
     source?: string;
     version?: string;
   };
+}
+
+export type PerformanceTraceEvent = {
+  name: string;
+  timestamp: number;
+  duration?: number;
+  metadata?: Record<string, unknown>;
+};
+
+export enum ProtocolComplianceLevel {
+  NONE = 0,
+  MINIMAL = 1,
+  PARTIAL = 2,
+  FULL = 3,
+  ENHANCED = 4,
+}
+
+export interface SystemPerformanceMetrics {
+  cpuUsage: number;
+  memoryUsage: number;
+  networkLatency: number;
+  traceEvents: PerformanceTraceEvent[];
+  complianceLevel: ProtocolComplianceLevel;
 }

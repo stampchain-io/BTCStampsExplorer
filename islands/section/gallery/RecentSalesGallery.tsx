@@ -8,7 +8,6 @@ import { subtitlePurple, titlePurpleDL } from "$text";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
 import { BREAKPOINTS } from "$constants";
-import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 
 export default function RecentSalesGallery({
   title = "Recent Sales",

@@ -7,7 +7,6 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
 import { Icon } from "$icon";
-import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 import { ActivityBadge } from "$islands/badge/index.ts";
 
 export function RecentSaleCard({

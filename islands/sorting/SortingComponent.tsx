@@ -5,7 +5,7 @@
  */
 
 import { Icon } from "$icon";
-import type { SortKey, SortOption } from "$lib/types/sorting.d.ts";
+import type { SortKey } from "$lib/types/sorting.d.ts";
 import { SORT_LABELS } from "$lib/utils/data/sorting/sortingConstants.ts";
 import { useSorting } from "$islands/sorting/SortingProvider.tsx";
 import type {

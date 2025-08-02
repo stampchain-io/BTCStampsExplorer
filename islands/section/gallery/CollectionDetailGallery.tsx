@@ -5,7 +5,10 @@ import { CollectionCard } from "$card";
 import { BREAKPOINTS } from "$constants";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import type { Collection, CollectionGalleryProps } from "$server/types/collection.d.ts";
+import type {
+  Collection,
+  CollectionGalleryProps,
+} from "$server/types/collection.d.ts";
 import { subtitlePurple, titlePurpleLD } from "$text";
 import { useEffect, useState } from "preact/hooks";
 

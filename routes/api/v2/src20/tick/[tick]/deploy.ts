@@ -1,3 +1,25 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
+import type {
+  AddressTickHandlerContext,
+  BlockHandlerContext,
+  IdentHandlerContext,
+  TickHandlerContext,
+} from "$types/base.d.ts";
+import type {
+  PaginatedIdResponseBody,
+  PaginatedTickResponseBody,
+  SRC20TrxRequestParams,
+} from "$types/api.d.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 //  // Temporarily replaced
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";

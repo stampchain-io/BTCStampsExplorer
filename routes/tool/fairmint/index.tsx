@@ -1,3 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 /* ===== FAIRMINT TOOL PAGE ===== */
 import { Handlers, PageProps } from "$fresh/server.ts";
 import type { ToolFairmintPageProps } from "$types/ui.d.ts";

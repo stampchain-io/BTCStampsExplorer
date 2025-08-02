@@ -1,3 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 // MintStampInputData import removed as RawRequestBody is now explicitly defined
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";

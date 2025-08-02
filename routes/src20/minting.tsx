@@ -1,3 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type {
+  ColumnDefinition,
+  FeeAlert,
+  InputData,
+  MockResponse,
+  NamespaceImport,
+  ProtocolComplianceLevel,
+  ToolEstimationParams,
+  XcpBalance,
+} from "$types/toolEndpointAdapter.ts";
 import { Handlers } from "$fresh/server.ts";
 import { SRC20OverviewHeader } from "$header";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";

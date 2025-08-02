@@ -1,7 +1,6 @@
 /* ===== FAQ ACCORDION CONTENT COMPONENT ===== */
 import { Accordion } from "$content";
 import type { FaqAccordionProps } from "$types/ui.d.ts";
-import type { FAQ_CONTENT } from "$layout";
 
 /* ===== INTERFACE ===== */
 
