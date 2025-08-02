@@ -1,5 +1,6 @@
 /* ===== TOGGLE SWITCH BUTTON COMPONENT ===== */
 import { JSX } from "preact";
+import type { TargetedMouseEvent } from "preact/compat";
 import type { ToggleSwitchButtonProps } from "$types/ui.d.ts";
 import { useEffect, useRef } from "preact/hooks";
 import { toggleButton, toggleKnob, toggleKnobBackground } from "$button";
@@ -23,7 +24,7 @@ export function ToggleSwitchButton({
   const actualRef = buttonRef || internalRef;
 
   /* ===== EVENT HANDLERS ===== */
-  const handleClick = (e: MouseEvent) => {
+  const handleClick = (e: TargetedMouseEvent<HTMLButtonElement>) => {
     if (onClick) {
       onClick(e);
     }

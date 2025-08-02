@@ -2,6 +2,7 @@
 import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import type { SRC20Row } from "$types/src20.d.ts";
+import type { TargetedMouseEvent } from "preact/compat";
 import type { SRC20CardMintingProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
 import {
@@ -242,7 +243,7 @@ export function SRC20CardMinting({
                   encodeURIComponent(src20.tick)
                 }&trxType=olga`;
 
-                const handleMintClick = (event: MouseEvent) => {
+                const handleMintClick = (event: TargetedMouseEvent<HTMLButtonElement>) => {
                   event.preventDefault();
 
                   // SSR-safe browser environment check
