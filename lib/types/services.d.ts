@@ -16,6 +16,7 @@ import type {
   CollectionMarketData,
   MarketListingAggregated,
 } from "$types/marketData.d.ts";
+import type { SortKey, SortDirection, SortMetrics } from "$types/sorting.d.ts";
 import type { SRC20Balance, SRC20Row } from "$types/src20.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 import type { SendRow } from "$types/transaction.d.ts";

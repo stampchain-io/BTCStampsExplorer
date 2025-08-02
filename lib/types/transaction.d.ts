@@ -8,7 +8,8 @@
 // - StampRow from "./stamp.d.ts"
 
 // Import required base types
-import type { BlockRow, ScriptType } from "$types/base.d.ts";
+import type { BlockRow, FeeDetails, ScriptType } from "$types/base.d.ts";
+import type { FeeData } from "$types/services.d.ts";
 import type { StampRow } from "$types/stamp.d.ts";
 import type { DatabaseQueryResult } from "$types/utils.d.ts";
 

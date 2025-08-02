@@ -1,4 +1,5 @@
 import type { BlockRow } from "$types/base.d.ts";
+import type { FeeData } from "$types/services.d.ts";
 import type { SortKey } from "$types/sorting.d.ts";
 import type { TimeSeriesData } from "$types/stamp.d.ts";
 import type { TransactionOptions } from "$types/wallet.d.ts";

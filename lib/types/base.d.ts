@@ -1,4 +1,4 @@
-import type { UTXOFetchOptions } from "./services.d.ts";
+import type { FeeData, UTXOFetchOptions } from "./services.d.ts";
 export interface UTXO {
   txid: string;
   vout: number;

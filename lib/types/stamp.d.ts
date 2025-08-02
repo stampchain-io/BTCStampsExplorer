@@ -33,7 +33,7 @@ import type {
   RelationDefinition,
 } from "$server/types/database.d.ts";
 import type { StandardFeeResponse } from "$types/api.d.ts";
-import type { ComposeAttachOptions } from "$types/services.d.ts";
+import type { ComposeAttachOptions, FeeData } from "$types/services.d.ts";
 import type { SortKey, SortMetrics } from "$types/sorting.d.ts";
 import type { DomainTypeValidation } from "$types/src20.d.ts";
 import type { DetailedUTXO } from "$types/transaction.d.ts";

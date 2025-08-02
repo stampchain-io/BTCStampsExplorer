@@ -8,6 +8,8 @@
  * @version 1.0.0
  */
 
+import type { FeeData } from "$types/services.d.ts";
+
 // ===== BASE ERROR TYPES =====
 
 /**

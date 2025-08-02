@@ -21,8 +21,10 @@ import type {
   StampTransferDetails,
   TransferDetails,
 } from "$types/base.d.ts";
+import type { ErrorInfo } from "$types/errors.d.ts";
 import type { MarketListingAggregated } from "$types/marketData.d.ts";
-import type { CollectionWithOptionalMarketData } from "$types/services.d.ts";
+import type { CollectionWithOptionalMarketData, FeeData } from "$types/services.d.ts";
+import type { SortKey, SortDirection, SortMetrics, WalletSortKey } from "$types/sorting.d.ts";
 import type { SRC20Transaction, StampTransaction } from "$types/stamping.ts";
 
 import type {
@@ -39,8 +41,18 @@ import type {
 } from "$types/stamp.d.ts";
 import type {
   AlignmentType,
+  OmitByValue,
+  PickByValue,
   ProgressiveFeeEstimationResult,
 } from "$types/utils.d.ts";
+import type {
+  Wallet,
+  WalletFilterOptions,
+  WalletInfo,
+  WalletOverviewInfo,
+  WalletProviderKey,
+  WalletStampWithValue,
+} from "$types/wallet.d.ts";
 import type * as preact from "preact";
 import type { ComponentChildren, ComponentProps, JSX } from "preact";
 
@@ -343,6 +355,8 @@ export interface LoadingIconProps extends BaseComponentProps {
   color?: string;
   speed?: "slow" | "normal" | "fast";
   label?: string;
+  containerClassName?: string;
+  wrapperClassName?: string;
 }
 
 /**
@@ -357,6 +371,8 @@ export interface ProgressIndicatorProps extends BaseComponentProps {
   color?: string;
   size?: "sm" | "md" | "lg";
   indeterminate?: boolean;
+  state?: ProgressState;
+  message?: string;
 }
 
 // =============================================================================
@@ -550,17 +566,28 @@ export interface MaraModeIndicatorProps extends BaseComponentProps {
   showLabel?: boolean;
   size?: "sm" | "md" | "lg";
   animate?: boolean;
+  outputValue?: number;
+  feeRate?: number;
+  class?: string;
 }
 
 /**
  * Mara success message component props
  */
 export interface MaraSuccessMessageProps extends BaseComponentProps {
-  message: string;
+  message?: string;
   transactionId?: string;
   showIcon?: boolean;
   onDismiss?: () => void;
   autoHideDuration?: number;
+  txid?: string;
+  outputValue?: number;
+  feeRate?: number;
+  poolInfo?: {
+    name: string;
+    hashrate?: string;
+  };
+  class?: string;
 }
 
 // =============================================================================
@@ -1117,6 +1144,11 @@ export interface CloseIconProps {
   className?: string;
   onClick?: () => void;
   size?: IconSize | number;
+  weight?: IconWeight;
+  color?: string;
+  onMouseEnter?: (event: MouseEvent) => void;
+  onMouseLeave?: (event: MouseEvent) => void;
+  "aria-label"?: string;
 }
 
 export interface GearIconProps {
@@ -1124,6 +1156,9 @@ export interface GearIconProps {
   onClick?: () => void;
   size?: IconSize | number;
   color?: string;
+  isOpen?: boolean;
+  onToggle?: () => void;
+  weight?: IconWeight;
 }
 
 // =============================================================================

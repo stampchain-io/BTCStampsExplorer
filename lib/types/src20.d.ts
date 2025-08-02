@@ -21,6 +21,7 @@ import type {
   MarketListingAggregated,
   SRC20MarketData,
 } from "$types/marketData.d.ts";
+import type { FeeEstimationService, LoggerService } from "$types/services.d.ts";
 import type { StampControllerData, StampFilters } from "$types/stamp.d.ts";
 import type { ChartData } from "$types/ui.d.ts";
 import type { BufferLike, DomainValidationResult } from "$types/utils.d.ts";
