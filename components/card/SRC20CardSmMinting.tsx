@@ -1,7 +1,7 @@
 /* reinamora - update Trending calculations */
 import { Button } from "$button";
 import type { SRC20Row } from "$types/src20.d.ts";
-import type { TargetedMouseEvent } from "preact/compat";
+import type { TargetedEvent } from "preact/compat";
 import type { SRC20CardSmMintingProps } from "$types/ui.d.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 // SRC20 card component for minting state
@@ -17,7 +17,7 @@ import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
 
 export function SRC20CardSmMinting({
-  data,
+  data = [], // Default to empty array to prevent undefined errors
   onImageClick,
 }: SRC20CardSmMintingProps) {
   const headers = [
@@ -104,7 +104,7 @@ export function SRC20CardSmMinting({
                 encodeURIComponent(src20.tick)
               }&trxType=olga`;
 
-              const handleMintClick = (event: TargetedMouseEvent<HTMLButtonElement>) => {
+              const handleMintClick = (event: TargetedEvent<HTMLButtonElement>) => {
                 event.preventDefault();
 
                 // SSR-safe browser environment check

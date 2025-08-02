@@ -9,7 +9,9 @@
  * Usage: Import UI component types and interfaces
  */
 
+import type { OffsetPaginationParams } from "'$types/pagination.d.ts'";
 import type { ButtonProps } from "$button";
+import type { OffsetPaginationParams } from "'$types/pagination.d.ts'";
 import type { Timeframe } from "$components/layout/types.ts";
 import type {
   AncestorInfo,
@@ -21,8 +23,11 @@ import type {
   StampTransferDetails,
   TransferDetails,
 } from "$types/base.d.ts";
+import type { OffsetPaginationParams } from "'$types/pagination.d.ts'";
 import type { ErrorInfo } from "$types/errors.d.ts";
+import type { OffsetPaginationParams } from "'$types/pagination.d.ts'";
 import type { ErrorInfo as ErrorHandlingInfo } from "$lib/utils/monitoring/errors/errorHandlingUtils.ts";
+import type { OffsetPaginationParams } from "'$types/pagination.d.ts'";
 import type { MarketListingAggregated } from "$types/marketData.d.ts";
 import type {
   CollectionWithOptionalMarketData,
@@ -34,6 +39,7 @@ import type {
   SortMetrics,
   WalletSortKey,
 } from "$types/sorting.d.ts";
+import type { OffsetPaginationParams } from "'$types/pagination.d.ts'";
 import type { SRC20Transaction, StampTransaction } from "$types/stamping.ts";
 
 import type {
@@ -66,6 +72,7 @@ import type {
   WalletStampWithValue,
 } from "$types/wallet.d.ts";
 import type * as preact from "preact";
+import type { OffsetPaginationParams } from "'$types/pagination.d.ts'";
 import type { ComponentChildren, ComponentProps, JSX } from "preact";
 
 // Re-export imported types that are used by other modules
@@ -91,6 +98,8 @@ export type { ButtonProps };
  * Supports customization, sorting, and pagination
  */
 export interface TableProps<T = any> {
+    striped?: boolean;
+    rowKey?: string;
   data: T[];
   columns?: TableColumn[];
   onRowClick?: (row: T) => void;
@@ -280,6 +289,7 @@ export interface TableProps<T = any> {
  * Base component props that all UI components should extend
  */
 export interface BaseComponentProps {
+    class?: string;
   className?: string;
   children?: ComponentChildren;
   testId?: string;
@@ -333,6 +343,7 @@ export interface FlexboxProps extends BaseComponentProps {
  * Grid layout component props
  */
 export interface GridProps extends BaseComponentProps {
+    cols?: number;
   columns?: number | string;
   rows?: number | string;
   gap?: string;
@@ -373,9 +384,9 @@ export interface ChartWidgetProps extends BaseComponentProps {
   height?: number | string;
   responsive?: boolean;
   maintainAspectRatio?: boolean;
-  fromPage: string;  // Made required
-  tick: string;  // Made required
-  data: any;  // Added to support the 'data' prop being passed
+  fromPage: string; // Made required
+  tick: string; // Made required
+  data: any; // Added to support the 'data' prop being passed
 }
 
 // =============================================================================
@@ -423,12 +434,15 @@ export interface IconProps extends BaseComponentProps {
   size?: number | string;
   color?: string;
   variant?: "solid" | "outline" | "ghost";
+  weight?: "light" | "regular" | "bold";
+  onClick?: () => void;
 }
 
 /**
  * Icon button component props
  */
 export interface IconButtonProps extends BaseComponentProps {
+    isLoading?: boolean;
   icon: string;
   size?: "sm" | "md" | "lg";
   variant?: "solid" | "outline" | "ghost";
@@ -456,6 +470,8 @@ export interface KeyboardNavigationProps {
  * Form control wrapper props
  */
 export interface FormControlProps extends BaseComponentProps {
+    name?: string;
+    onChange?: (value: any) => void;
   label?: string;
   error?: string;
   required?: boolean;
@@ -531,7 +547,7 @@ export interface SelectFieldProps extends FormControlProps {
  * Base modal component props
  */
 export interface ModalBaseProps extends BaseComponentProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   title?: string;
   size?: "sm" | "md" | "lg" | "xl" | "full";
@@ -541,6 +557,8 @@ export interface ModalBaseProps extends BaseComponentProps {
   preventScroll?: boolean;
   hideHeader?: boolean;
   contentClassName?: string;
+  className?: string;
+  children?: ComponentChildren;
 }
 
 /**
@@ -568,8 +586,8 @@ export interface ConnectWalletModalProps extends ModalBaseProps {
   onConnect?: (providerId: string) => void;
   showTestnet?: boolean;
   preferredWallet?: string;
-  connectors: Element[];  // Explicitly typed as Element[]
-  handleClose: () => void;  // Made non-optional to match usage
+  connectors: Element[]; // Explicitly typed as Element[]
+  handleClose: () => void; // Made non-optional to match usage
 }
 
 /**
@@ -771,7 +789,7 @@ export interface BTCValueSummaryProps {
 
 export interface StatItemProps {
   label: string;
-  value: string;
+  value: string | ComponentChildren;
   align?: "left" | "center" | "right";
   class?: string;
   href?: string;
@@ -780,7 +798,7 @@ export interface StatItemProps {
 
 export interface StatTitleProps {
   label: string;
-  value: string;
+  value: string | ComponentChildren;
   align?: "left" | "center" | "right";
   href?: string;
   target?: "_self" | "_blank";
@@ -846,7 +864,7 @@ export interface ToolFairmintPageProps {
 }
 
 export interface WalletProviderProps {
-  key?: WalletProviderKey;  // Added optional key prop
+  key?: WalletProviderKey; // Added optional key prop
   providerKey: WalletProviderKey;
   onSuccess: () => void;
 }
@@ -943,6 +961,7 @@ export interface SRC20GalleryProps {
 }
 
 export interface SRC101RegisterToolProps {
+  trxType?: string;
   onRegister: (data: any) => void;
   loading?: boolean;
   error?: string;
@@ -1008,6 +1027,9 @@ export interface SRC20OverviewContentProps {
 }
 
 export interface StyledSortingButtonsProps {
+  className?: string;
+  showIcons?: boolean;
+  showLoading?: boolean;
   sortBy: string;
   sortOrder: "asc" | "desc";
   onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
@@ -1021,6 +1043,8 @@ export interface StyledSortingButtonsProps {
 }
 
 export interface StyledSortingDropdownProps {
+  className?: string;
+  showLoading?: boolean;
   value: string;
   onChange: (value: string) => void;
   options: Array<{
@@ -1034,11 +1058,16 @@ export interface StyledSortingDropdownProps {
 }
 
 export interface StyledSortingErrorProps {
+  className?: string;
+  showRetry?: boolean;
   error: string;
   onRetry?: () => void;
 }
 
 export interface StyledSortingLabelProps {
+  className?: string;
+  showDirection?: boolean;
+  showLoading?: boolean;
   label: string;
   sortBy: string;
   sortOrder: "asc" | "desc";
@@ -1136,15 +1165,13 @@ export interface SettingProps {
   onFilterClick?: (filter: string) => void;
 }
 
-export interface SendBTCModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+export interface SendBTCModalProps extends ModalBaseProps {
+  fee: number;
+  balance: number | null;
+  handleChangeFee: (newFee: number) => void;
+  onSend?: (to: string, amount: number) => void;
   address?: string;
   amount?: number;
-  onSend: (to: string, amount: number) => void;
-  fee?: number;
-  balance?: any;
-  handleChangeFee?: any;
 }
 
 export interface ReceiveAddyModalProps {
@@ -1748,7 +1775,7 @@ export type SRC20CardSize = "sm" | "md" | "lg";
 /**
  * Forward ref component type
  */
-export type ForwardRefComponent<T, P = {}> = (
+export type ForwardRefComponent<T, P = Record<PropertyKey, never>> = (
   props: P & {
     ref?: preact.RefObject<T> | ((instance: T | null) => void) | null;
   },
@@ -2209,7 +2236,7 @@ export interface FilterSRC20ModalProps extends ModalBaseProps {
  * Detail SRC-101 Modal component props
  */
 export interface DetailSRC101ModalProps extends ModalBaseProps {
-  detail?: any; // TODO: Replace with concrete SRC-101 detail type
+  detail?: any; // TODO(#type-migration): Replace with concrete SRC-101 detail type
   onAction?: (actionType: string) => void;
   loading?: boolean;
   error?: string;
@@ -2774,6 +2801,7 @@ export interface UseTransactionFormProps {
  * ExtendedButtonProps - Migrated from ButtonBase.tsx
  */
 export type ExtendedButtonProps = ButtonProps & {
+  "f-partial"?: string | SignalLike<string>;
   isActive?: boolean;
   type?: "button" | "submit" | "reset";
   ref?:
@@ -3062,7 +3090,15 @@ export interface AdvancedFeeCalculatorProps extends BaseFeeCalculatorProps {
 /**
  * PaginationState - Migrated from pagination.d.ts
  */
-export interface PaginationState {
+export interface PaginationState extends OffsetPaginationParams {
+  totalPages?: number;
+  totalPages?: number;
+  totalPages?: number;
+  page?: number;
+  limit?: number;
+  totalPages?: number;
+  limit?: number;
+  limit?: number;
   currentPage: number;
   pageSize: number;
   totalItems: number;
@@ -3420,6 +3456,9 @@ export interface ConvenienceProviderProps extends BaseComponentProps {
  * CompleteSortingInterfaceProps - Complete Sorting Interface component props
  */
 export interface CompleteSortingInterfaceProps extends BaseComponentProps {
+  config?: any;
+  showLabel?: boolean;
+  showError?: boolean;
   sortBy: string;
   sortOrder: "asc" | "desc";
   onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
@@ -3433,7 +3472,7 @@ export interface CompleteSortingInterfaceProps extends BaseComponentProps {
  * PieChartProps - Pie Chart component props
  */
 export interface PieChartProps extends BaseComponentProps {
-  holders?: any[];  // Added to support the holders prop
+  holders?: any[]; // Added to support the holders prop
   data: {
     labels: string[];
     datasets: Array<{
@@ -3451,6 +3490,7 @@ export interface PieChartProps extends BaseComponentProps {
  * ImageModalProps - Image Modal component props
  */
 export interface ImageModalProps extends ModalBaseProps {
+  imgSrc?: string;
   src: string;
   alt?: string;
   caption?: string;
@@ -3461,6 +3501,7 @@ export interface ImageModalProps extends ModalBaseProps {
  * FairmintToolProps - Fairmint Tool component props
  */
 export interface FairmintToolProps extends BaseComponentProps {
+  fairminters?: any[];
   asset?: string;
   quantity?: number;
   onSubmit?: (data: any) => void;
@@ -3472,6 +3513,11 @@ export interface FairmintToolProps extends BaseComponentProps {
  * MintProgressProps - Mint Progress component props
  */
 export interface MintProgressProps extends BaseComponentProps {
+  progress?: number;
+  progressWidth?: number;
+  maxSupply?: number;
+  limit?: number;
+  progress?: number;
   current: number;
   total: number;
   label?: string;
@@ -3754,7 +3800,10 @@ export interface AlertContext {
 export type SRC20CardProps = SRC20CardBaseProps;
 export type SRC20CardMintingProps = SRC20MintingProps;
 export type SRC20CardSmProps = SRC20CardBaseProps;
-export type SRC20CardSmMintingProps = SRC20MintingProps;
+export interface SRC20CardSmMintingProps extends SRC20MintingProps {
+  // Ensure explicit onImageClick type handling
+  onImageClick?: (imgSrc: string) => void;
+}
 export type SRC20MintsProps = SRC20MintingProps;
 export type SRC20TransfersProps = TransferProps;
 export type StampTransfersProps = TransferProps;
