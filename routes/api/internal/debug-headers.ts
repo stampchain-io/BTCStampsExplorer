@@ -1,3 +1,5 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type { ProtocolComplianceLevel, ColumnDefinition, FeeAlert, InputData } from "$types/toolEndpointAdapter.ts";
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";

@@ -1,3 +1,5 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type { ProtocolComplianceLevel, ColumnDefinition, FeeAlert, InputData } from "$types/toolEndpointAdapter.ts";
 import { Handlers } from "$fresh/server.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { serverConfig } from "$server/config/config.ts";

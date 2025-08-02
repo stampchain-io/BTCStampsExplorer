@@ -120,6 +120,21 @@ export interface SRC101TransactionOptions extends TransactionOptions {
 export type ToolType = "stamp" | "src20" | "src101";
 
 /**
+ * Protocol Compliance Level Enum
+ * Indicates the degree of adherence to protocol standards
+ */
+export enum ProtocolComplianceLevel {
+  /** Full compliance with all protocol specifications */
+  FULL_COMPLIANCE = "full",
+  /** Mostly compliant with minor deviations */
+  PARTIAL_COMPLIANCE = "partial",
+  /** Significant deviations from protocol standards */
+  NON_COMPLIANT = "non-compliant",
+  /** Unknown or unverified compliance status */
+  UNKNOWN = "unknown",
+}
+
+/**
  * Union type for all possible transaction options
  */
 export type AnyTransactionOptions =
@@ -225,3 +240,8 @@ export class ToolResponseError extends ToolEndpointError {
     this.name = "ToolResponseError";
   }
 }
+
+// Re-exports for types commonly imported from this adapter
+export type { ColumnDefinition } from "$types/ui.d.ts";
+export type { FeeAlert } from "$types/fee.d.ts";
+export type { InputData } from "$types/src20.d.ts";
