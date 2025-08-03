@@ -1,6 +1,6 @@
 
 /* ===== BUTTON MANAGEMENT SYSTEM DOCUMENTATION ===== */
-/* =====  @baba - UPDATE NEEDED !!! ===== */
+/* =====  @baba - add commentary to the button files + doc UPDATE NEEDED !!! ===== */
 /**
  * Button Components
  *

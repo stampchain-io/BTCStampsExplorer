@@ -6,6 +6,9 @@ export const { color, size, state } = buttonStyles;
 
 export * from "$components/button/ButtonBase.tsx";
 
+export * from "$islands/button/RangeSlider.tsx";
+export * from "$islands/button/RangeSliderDual.tsx";
+
 export * from "$components/button/ReadAllButton.tsx";
 export * from "$components/button/ToggleSwitchButton.tsx";
 export * from "$components/button/ViewAllButton.tsx";

@@ -1,4 +1,4 @@
-import { SelectorButtons, ToggleButton } from "$button";
+import { RangeSliderDual, SelectorButtons, ToggleButton } from "$button";
 import { inputCheckbox } from "$form";
 import {
   STAMP_EDITIONS,
@@ -6,7 +6,7 @@ import {
   STAMP_FILETYPES,
   STAMP_RANGES,
 } from "$globals";
-import { Checkbox, RangeSlider } from "$islands/filter/FilterComponents.tsx";
+import { Checkbox } from "$islands/filter/FilterComponents.tsx";
 import { StampFilters } from "$islands/filter/FilterOptionsStamp.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import { labelLogicResponsive, labelXsPosition, labelXsR } from "$text";
@@ -1044,7 +1044,7 @@ export const FilterContentStamp = ({
                 {/* Custom price range slider */}
                 {filters.listings === "custom" && (
                   <div class="mt-3 pl-0.5">
-                    <RangeSlider
+                    <RangeSliderDual
                       variant="price"
                       onChange={handlePriceRangeChange}
                     />
@@ -1125,7 +1125,7 @@ export const FilterContentStamp = ({
             {/* Custom price range slider for sales */}
             {filters.sales === "custom" && (
               <div class="mt-3 pl-0.5">
-                <RangeSlider
+                <RangeSliderDual
                   variant="price"
                   onChange={handlePriceRangeChange}
                 />
@@ -1299,7 +1299,7 @@ export const FilterContentStamp = ({
 
         {filters.fileSize === "custom" && (
           <div class="mt-2">
-            <RangeSlider
+            <RangeSliderDual
               variant="fileSize"
               onChange={handleFileSizeRangeChange}
               initialMin={filters.fileSizeMin
@@ -1384,7 +1384,7 @@ export const FilterContentStamp = ({
           toggle={() => {}}
           variant="collapsibleLabel"
         >
-          <RangeSlider
+          <RangeSliderDual
             variant="range"
             onChange={handleRangeSliderChange}
           />
