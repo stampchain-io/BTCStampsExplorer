@@ -192,7 +192,7 @@ export function SRC101RegisterTool({
           <div class="flex flex-row justify-end w-full">
             <div class="flex flex-col items-end">
               {/* Availability button skeleton */}
-              <div class={`h-8 w-[124px] ${loaderSkeletonLg}`}>
+              <div class={`h-8 w-[118px] ${loaderSkeletonLg}`}>
               </div>
             </div>
           </div>
@@ -223,10 +223,10 @@ export function SRC101RegisterTool({
           </div>
 
           {/* Terms and Submit button skeleton */}
-          <div class="flex justify-end pt-10 tablet:pt-[42px]">
+          <div class="flex justify-end pt-[42px] tablet:pt-[44px]">
             <div class="flex flex-col items-end">
               <div
-                class={`h-5 tablet:h-3.5 w-[162px] tablet:w-[230px] ${loaderSkeletonMd}`}
+                class={`h-4 tablet:h-3 w-[160px] tablet:w-[226px] ${loaderSkeletonMd}`}
               >
               </div>
               <div
