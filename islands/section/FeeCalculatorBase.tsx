@@ -1,8 +1,8 @@
-import { button, sliderBar, sliderKnob } from "$button";
+import { button } from "$button";
 import { ToggleSwitchButton } from "$components/button/ToggleSwitchButton.tsx";
-import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { useFees } from "$fees";
 import { Icon } from "$icon";
+import { RangeSlider } from "$islands/button/RangeSlider.tsx";
 import type {
   BaseFeeCalculatorProps,
   FeeDetails,
@@ -98,8 +98,6 @@ export function FeeCalculatorBase({
   const { fees } = useFees();
   const [visible, setVisible] = useState(false);
   const [coinType, setCoinType] = useState("BTC");
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  const [isFeeTooltipVisible, setIsFeeTooltipVisible] = useState(false);
   const feeTooltipTimeoutRef = useRef<number | null>(null);
   const [isCurrencyTooltipVisible, setIsCurrencyTooltipVisible] = useState(
     false,
@@ -111,6 +109,8 @@ export function FeeCalculatorBase({
   const [allowHover, setAllowHover] = useState(true);
   const [isTxSizeTooltipVisible, setIsTxSizeTooltipVisible] = useState(false);
   const txSizeTooltipTimeoutRef = useRef<number | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [isFeeTooltipVisible, setIsFeeTooltipVisible] = useState(false);
 
   useEffect(() => {
     logger.debug("ui", {
@@ -152,38 +152,6 @@ export function FeeCalculatorBase({
     setCoinType(coinType === "BTC" ? "USDT" : "BTC");
     setIsCurrencyTooltipVisible(false);
     setAllowCurrencyTooltip(false);
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    setTooltipPosition({
-      x: e.clientX,
-      y: e.clientY,
-    });
-  };
-
-  const handleFeeMouseEnter = () => {
-    if (feeTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(feeTooltipTimeoutRef.current);
-    }
-
-    feeTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-      setIsFeeTooltipVisible(true);
-    }, 1500);
-  };
-
-  const handleFeeMouseLeave = () => {
-    if (feeTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(feeTooltipTimeoutRef.current);
-    }
-    setIsFeeTooltipVisible(false);
-  };
-
-  // Add mousedown handler to hide tooltip
-  const handleMouseDown = () => {
-    if (feeTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(feeTooltipTimeoutRef.current);
-    }
-    setIsFeeTooltipVisible(false);
   };
 
   const handleCurrencyMouseEnter = () => {
@@ -232,6 +200,35 @@ export function FeeCalculatorBase({
     setIsTxSizeTooltipVisible(false);
   };
 
+  const handleMouseMove = (e: MouseEvent) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    setTooltipPosition({ x, y: rect.top });
+  };
+
+  const handleFeeMouseEnter = () => {
+    if (feeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(feeTooltipTimeoutRef.current);
+    }
+    feeTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+      setIsFeeTooltipVisible(true);
+    }, 1500);
+  };
+
+  const handleFeeMouseLeave = () => {
+    if (feeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(feeTooltipTimeoutRef.current);
+    }
+    setIsFeeTooltipVisible(false);
+  };
+
+  const handleFeeMouseDown = () => {
+    if (feeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(feeTooltipTimeoutRef.current);
+    }
+    setIsFeeTooltipVisible(false);
+  };
+
   // Helper functions to convert between slider position and fee value
   // New structure: 0.1-5.0 (0.1 increments) takes 25% of slider, 5-10 (0.5 increments) takes 15%, 10-264 (1.0 increments) takes 60%
   const feeToSliderPos = (fee: number) => {
@@ -265,15 +262,8 @@ export function FeeCalculatorBase({
 
   // Fee selector component
   const renderFeeSelector = () => (
-    <div class={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
-      <h6 class="font-light text-base text-stamp-grey-light">
-        <span class="text-stamp-grey-darker pr-2">FEE</span>
-        <span class="font-bold">
-          {fee === 0 ? <span class="animate-pulse">XX</span> : fee}
-        </span>{" "}
-        SAT/vB
-      </h6>
-      <h6 class="font-light text-sm text-stamp-grey-light mb-3 text-nowrap">
+    <div class={`flex flex-col ${isModal ? "w-2/3" : "w-[89%]"}`}>
+      <h6 class="font-light text-xs text-stamp-grey text-nowrap">
         <span class="text-stamp-grey-darker pr-2">RECOMMENDED</span>
         <span class="font-medium">
           {fees?.recommendedFee
@@ -284,30 +274,23 @@ export function FeeCalculatorBase({
         </span>{" "}
         SAT/vB
       </h6>
-      <div
-        className="relative w-full group"
-        onMouseMove={handleMouseMove}
-        onMouseEnter={handleFeeMouseEnter}
-        onMouseLeave={handleFeeMouseLeave}
-        onMouseDown={handleMouseDown}
-        onClick={(e) =>
-          e.stopPropagation()}
-      >
-        <input
-          type="range"
-          value={feeToSliderPos(fee)}
-          min="0"
-          max="100"
-          step="0.25"
-          onChange={(e) =>
-            handleChangeFee(
-              sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
-            )}
-          onInput={(e) =>
-            handleChangeFee(
-              sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
-            )}
-          className={`${sliderBar} ${sliderKnob}`}
+      <h6 class="mb-1.5 font-light text-base text-stamp-grey-light">
+        <span class="text-stamp-grey-darker pr-2">FEE</span>
+        <span class="font-bold">
+          {fee === 0 ? <span class="animate-pulse">XX</span> : fee}
+        </span>{" "}
+        SAT/vB
+      </h6>
+      <div class="relative">
+        <RangeSlider
+          value={fee}
+          onChange={handleChangeFee}
+          valueToPosition={feeToSliderPos}
+          positionToValue={sliderPosToFee}
+          onMouseEnter={handleFeeMouseEnter}
+          onMouseLeave={handleFeeMouseLeave}
+          onMouseDown={handleFeeMouseDown}
+          onMouseMove={handleMouseMove}
         />
         <div
           className={`${tooltipImage} ${
@@ -329,7 +312,7 @@ export function FeeCalculatorBase({
   const renderDetails = () => {
     return (
       <div
-        className={`transition-all duration-300 ease-in-out overflow-hidden ${
+        className={`transition-all duration-400 ease-in-out overflow-hidden ${
           visible ? "max-h-[220px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
@@ -714,7 +697,7 @@ export function FeeCalculatorBase({
         {showCoinToggle && (
           <div
             className={`flex gap-1 items-start justify-end ${
-              isModal ? "w-1/3" : "w-1/2"
+              isModal ? "w-1/3" : "w-[11%]"
             }`}
           >
             <div className="relative">
@@ -739,7 +722,7 @@ export function FeeCalculatorBase({
         )}
       </div>
 
-      <h6 class="mt-4 text-xl text-stamp-grey-light font-light">
+      <h6 class="mt-5 text-lg text-stamp-grey-light font-light">
         <span class="text-stamp-grey-darker">ESTIMATE</span>
         {feeDetails?.totalValue !== undefined
           ? (
@@ -766,7 +749,6 @@ export function FeeCalculatorBase({
                     <span class="font-light">{coinType}</span>
                   </>
                 )}
-              {/* Removed (est) from main ESTIMATE line as requested */}
             </>
           )
           : (
@@ -779,7 +761,7 @@ export function FeeCalculatorBase({
 
       <div
         onClick={() => setVisible(!visible)}
-        className="flex items-center mt-2 font-normal text-xs text-stamp-grey-darker hover:text-stamp-grey-light uppercase transition-colors duration-300 gap-2 cursor-pointer group"
+        className="flex items-center font-normal text-xs text-stamp-grey-darker hover:text-stamp-grey-light uppercase transition-colors duration-200 gap-2 cursor-pointer group"
       >
         DETAILS
         <Icon
@@ -788,7 +770,7 @@ export function FeeCalculatorBase({
           weight="bold"
           size="xxxs"
           color="custom"
-          className={` stroke-stamp-grey-darker group-hover:stroke-stamp-grey-light transition-all duration-300 transform ${
+          className={` stroke-stamp-grey-darker group-hover:stroke-stamp-grey-light transition-all duration-200 transform ${
             visible ? "scale-y-[-1]" : ""
           }`}
         />
@@ -821,31 +803,31 @@ export function FeeCalculatorBase({
                 w-4 h-4 tablet:w-3 tablet:h-3 mr-3 tablet:mr-2
                 flex items-center justify-center
                 rounded-sm
-                transition-all duration-300 ease-in-out
+                transition-all duration-200 ease-in-out
                 border
                 relative
                 overflow-hidden
                 ${
                 tosAgreed
                   ? canHoverSelected
-                    ? "bg-stamp-grey-darker border-stamp-grey-darker group-hover:bg-stamp-grey-light group-hover:border-stamp-grey-light"
-                    : "bg-stamp-grey-darker border-stamp-grey-darker"
+                    ? "bg-stamp-grey-darkest border-stamp-grey-darker  group-hover:border-stamp-grey-light"
+                    : "bg-stamp-grey-darkest border-stamp-grey-darker"
                   : canHoverSelected
-                  ? "bg-stamp-grey-light border-stamp-grey-light group-hover:bg-stamp-grey-darker group-hover:border-stamp-grey-darker"
-                  : "bg-stamp-grey-light border-stamp-grey-light"
+                  ? "bg-stamp-grey-darkest border-stamp-grey-light group-hover:border-stamp-grey-darker"
+                  : "bg-stamp-grey-darkest border-stamp-grey-light"
               }
               `}
             >
               <div
                 className={`
                   absolute
-                  inset-0.5
-                  transform transition-all duration-300 ease-in-out
+                  inset-[1px]
+                  transform transition-all duration-200 ease-in-out
                   ${tosAgreed ? "scale-100" : "scale-0"}
                   ${
                   canHoverSelected
-                    ? "bg-stamp-grey-darkest group-hover:bg-stamp-grey-darkest/50"
-                    : "bg-stamp-grey-darkest"
+                    ? "bg-stamp-grey-darker group-hover:bg-stamp-grey-light"
+                    : "bg-stamp-grey-darker"
                 }
                 `}
               />
@@ -853,7 +835,7 @@ export function FeeCalculatorBase({
             <span
               className={`
                 text-xs font-medium select-none
-                transition-colors duration-300
+                transition-colors duration-200
                 ${
                 tosAgreed ? "text-stamp-grey-darker" : "text-stamp-grey-light"
               }
@@ -867,16 +849,18 @@ export function FeeCalculatorBase({
               `}
             >
               AGREE TO THE{" "}
-              <span class="text-stamp-purple">
+              <span class="text-stamp-grey-darker">
                 <span class="tablet:hidden">
                   <a
                     href="/termsofservice"
                     className={`
-                      transition-colors duration-300
+                      transition-colors duration-200
                       ${
-                      tosAgreed ? "text-stamp-purple-dark" : "text-stamp-purple"
+                      tosAgreed
+                        ? "text-stamp-grey-darker"
+                        : "text-stamp-grey-darker"
                     }
-                      hover:text-stamp-purple-bright
+                      hover:text-stamp-grey-light
                     `}
                   >
                     TERMS
@@ -886,11 +870,13 @@ export function FeeCalculatorBase({
                   <a
                     href="/termsofservice"
                     className={`
-                      transition-colors duration-300
+                      transition-colors duration-200
                       ${
-                      tosAgreed ? "text-stamp-purple-dark" : "text-stamp-purple"
+                      tosAgreed
+                        ? "text-stamp-grey-darker"
+                        : "text-stamp-grey-darker"
                     }
-                      hover:text-stamp-purple-bright
+                      hover:text-stamp-grey-light
                     `}
                   >
                     TERMS OF SERVICE
@@ -902,10 +888,11 @@ export function FeeCalculatorBase({
         </div>
 
         <div class="flex justify-end gap-6">
-          {onCancel && (
+          {
+            /* {onCancel && (
             <button
               type="button"
-              className={button("outline", "purple", "md", {
+              className={button("outline", "grey", "mdR", {
                 disabled: isSubmitting,
                 loading: isSubmitting,
               })}
@@ -921,10 +908,11 @@ export function FeeCalculatorBase({
             >
               {cancelText}
             </button>
-          )}
+          )} */
+          }
           <button
             type="button"
-            className={button("flat", "purple", "md", {
+            className={button("glassmorphismColor", "grey", "mdR", {
               disabled: disabled || isSubmitting || !tosAgreed,
               loading: isSubmitting,
             })}
