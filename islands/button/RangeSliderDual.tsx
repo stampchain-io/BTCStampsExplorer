@@ -1,4 +1,5 @@
 import { sliderKnob, trackFill } from "$button";
+import { glassmorphismLayer2 } from "$layout";
 import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
@@ -883,7 +884,7 @@ export const RangeSliderDual = ({
       </div>
 
       <div
-        class="relative h-[22px] tablet:h-[18px] rounded-full bg-stamp-grey-darkest/15 border-[1px] border-stamp-grey-darkest/20 cursor-pointer"
+        class={`relative h-5 tablet:h-4 !rounded-full ${glassmorphismLayer2}`}
         ref={sliderRef}
         onClick={handleTrackClick}
       >
