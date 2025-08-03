@@ -45,7 +45,7 @@ export const StampPoshCta = () => {
 
       {/* ===== BUTTON SECTION ===== */}
       <Button
-        variant="flat"
+        variant="glassmorphismColor"
         color="grey"
         size="mdR"
         href="/tool/stamp/create"

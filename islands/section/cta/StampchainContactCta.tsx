@@ -47,7 +47,7 @@ export const StampchainContactCta = () => {
       {/* ===== BUTTONS SECTION ===== */}
       <div class="flex gap-6 justify-end">
         <Button
-          variant="outline"
+          variant="glassmorphism"
           color="grey"
           size="mdR"
           href="/about/#contact"
@@ -55,7 +55,7 @@ export const StampchainContactCta = () => {
           CONTACT
         </Button>
         <Button
-          variant="flat"
+          variant="glassmorphismColor"
           color="grey"
           size="mdR"
           href="/about"

@@ -11,7 +11,7 @@ export function ViewAllButton({ href }: ViewAllButtonProps) {
   return (
     <div class="flex justify-end w-full mt-6 mobileLg:mt-9">
       <Button
-        variant="outline"
+        variant="glassmorphismColor"
         color="purple"
         size="mdR"
         href={href}

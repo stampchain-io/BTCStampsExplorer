@@ -112,7 +112,7 @@ const ContactCta = () => {
               <div class="w-full flex justify-end">
                 <ButtonProcessing
                   type="submit"
-                  variant="outline"
+                  variant="glassmorphismColor"
                   color="grey"
                   size="mdR"
                   isSubmitting={isSubmitting}
