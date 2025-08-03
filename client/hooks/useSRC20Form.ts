@@ -794,7 +794,7 @@ export function useSRC20Form(
 
         if (walletResult.signed) {
           showSuccess(
-            `Transaction Successfully. TXID: ${walletResult.txid}`
+            `Transaction Successfully. TXID: ${walletResult.txid}`,
           );
         } else if (walletResult.cancelled) {
           setSubmissionMessage({

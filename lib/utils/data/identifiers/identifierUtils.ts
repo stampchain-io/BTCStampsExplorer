@@ -1,4 +1,9 @@
-import { isCpid as isCpidTypeGuard, isStampHash as isStampHashTypeGuard, isStampNumber as isStampNumberTypeGuard, isTxHash as isTxHashTypeGuard } from "$lib/utils/typeGuards.ts";
+import {
+  isCpid as isCpidTypeGuard,
+  isStampHash as isStampHashTypeGuard,
+  isStampNumber as isStampNumberTypeGuard,
+  isTxHash as isTxHashTypeGuard,
+} from "$lib/utils/typeGuards.ts";
 
 /**
  * Validates if a value is a valid stamp number (positive or negative integer)
