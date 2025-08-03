@@ -211,7 +211,7 @@ export function SRC101RegisterTool({
           <div class={`mt-0.5 h-[14px] w-[116px] ${loaderSkeletonMd}`}>
           </div>
           {/* Fee slider skeleton */}
-          <div class={`mt-2.5 h-5 tablet:h-4 w-[89%] ${loaderSkeletonFull}`}>
+          <div class={`mt-2.5 h-5 tablet:h-4 w-[85%] ${loaderSkeletonFull}`}>
           </div>
 
           {/* Estimate and fee details skeleton */}
