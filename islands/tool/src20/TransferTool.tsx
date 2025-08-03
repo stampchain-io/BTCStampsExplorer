@@ -291,28 +291,37 @@ export function SRC20TransferTool(
         <div class={containerBackground}>
           {/* Fee slider skeleton */}
           <div class="flex justify-between">
-            <div class={`h-4 w-28 ${loaderSkeletonMd}`}>
+            <div class={`mt-1 h-2.5 w-[160px] ${loaderSkeletonMd}`}>
             </div>
             {/* Toggle switch skeleton */}
             <div class={`w-10 h-5 ${loaderSkeletonFull}`}>
             </div>
           </div>
-          <div class={`h-4 w-[168px] mt-1 ${loaderSkeletonMd}`}>
+          <div class={`mt-0.5 h-[14px] w-[116px] ${loaderSkeletonMd}`}>
           </div>
           {/* Fee slider skeleton */}
-          <div class={`h-3 w-[50%] mt-4 ${loaderSkeletonFull}`}>
+          <div class={`mt-2.5 h-5 tablet:h-4 w-[89%] ${loaderSkeletonFull}`}>
           </div>
+
           {/* Estimate and fee details skeleton */}
-          <div class={`h-5 w-full min-[480px]:w-72 mt-8 ${loaderSkeletonMd}`}>
+          <div
+            class={`mt-6 h-[18px] w-full min-[480px]:w-[256px] ${loaderSkeletonMd}`}
+          >
           </div>
-          <div class={`h-4 w-16 mt-4 ${loaderSkeletonMd}`}>
+          <div class={`mt-2 h-3 w-[72px] ${loaderSkeletonMd}`}>
           </div>
+
           {/* Terms and Submit button skeleton */}
-          <div class="flex justify-end pt-10">
-            <div class="flex flex-col space-y-3 items-end">
-              <div class={`h-4 w-[156px] tablet:w-56 ${loaderSkeletonMd}`}>
+          <div class="flex justify-end pt-10 tablet:pt-[42px]">
+            <div class="flex flex-col items-end">
+              <div
+                class={`h-5 tablet:h-3.5 w-[162px] tablet:w-[230px] ${loaderSkeletonMd}`}
+              >
               </div>
-              <div class={`h-9 tablet:h-8 w-36 ${loaderSkeletonLg}`}></div>
+              <div
+                class={`mt-4 tablet:mt-5 h-9 tablet:h-8 w-[168px] tablet:w-[150px] ${loaderSkeletonLg}`}
+              >
+              </div>
             </div>
           </div>
         </div>
