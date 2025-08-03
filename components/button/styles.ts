@@ -91,7 +91,7 @@ export type ButtonProps = ButtonElementProps | AnchorElementProps;
 const baseBefore =
   "before:absolute before:inset-0 before:rounded-lg before:z-[-1] before:transition-transform before:duration-50 before:origin-center";
 const baseGlassmorphism =
-  "border-[1px] rounded-lg backdrop-blur overflow-hidden";
+  "border-[1px] rounded-lg backdrop-blur-sm overflow-hidden";
 const baseGlassmorphismColor =
   "relative text-[#1e1723] before:blur-[5px] hover:border-[var(--color-border-hover)] hover:before:scale-110 hover:before:blur-sm";
 const shadow =
@@ -115,8 +115,8 @@ export const buttonStyles: ButtonVariants = {
       text-[var(--color-medium)] hover:text-[var(--color-light)]
     `,
     glassmorphism: `
-      ${baseGlassmorphism} bg-stamp-grey-darkest/30 border-stamp-grey-darkest/20
-      hover:bg-stamp-grey-darkest/40 hover:border-stamp-grey-darkest/30
+      ${baseGlassmorphism} bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20
+      hover:bg-stamp-grey-darkest/30 hover:border-stamp-grey-darkest/40
       text-[var(--color-dark)] hover:text-[var(--color-medium)]
       ${shadow}
     `,
@@ -131,11 +131,11 @@ export const buttonStyles: ButtonVariants = {
       bg-stamp-grey-darkest/10 border-[var(--color-border)]
       ${baseBefore} ${shadow}
       before:bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]
-      hover:bg-stamp-grey-darkest/30 hover:border-stamp-grey-darkest/20 hover:before:bg-none hover:text-[var(--color-dark)] hover:before:blur-0
+      hover:bg-stamp-grey-darkest/15 hover:border-stamp-grey-darkest/20 hover:before:bg-none hover:text-[var(--color-dark)] hover:before:blur-0
     `,
     glassmorphismDeselected: `
       ${baseGlassmorphism} ${baseGlassmorphismColor}
-      bg-stamp-grey-darkest/30 border-stamp-grey-darkest/20
+      bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20
       text-[var(--color-dark)] before:bg-none
       hover:bg-stamp-grey-darkest/10 hover:text-[#1e1723] hover:before:!scale-100 hover:before:!blur-[5px]
       ${baseBefore} ${shadow}
@@ -275,20 +275,20 @@ export const toggleKnobBackground =
   "flex justify-center items-center relative w-5 h-5 bg-transparent rounded-full transition ease-in-out transform duration-400 ";
 export const toggleKnob = "w-[14px] h-[14px] rounded-full";
 export const sliderKnob = `
-  absolute top-0.5 bottom-0.5 w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none
+  absolute top-0.5 bottom-0.5 w-full h-[14px] tablet:h-[10px] rounded-full appearance-none bg-transparent pointer-events-none
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
-  [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:tablet:size-3
+  [&::-webkit-slider-thumb]:size-[14px] [&::-webkit-slider-thumb]:tablet:size-[10px]
   [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey
   [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
   [&::-webkit-slider-thumb]:active:cursor-grabbing
   [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
-  [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:tablet:size-3
+  [&::-moz-range-thumb]:size-[14px][&::-moz-range-thumb]:tablet:size-[10px]
   [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey
   [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
   `;
 export const trackFill = `
-  absolute top-0.5 bottom-0.5 h-4 tablet:h-3 rounded-full transition-colors duration-200 pointer-events-none
+  absolute top-0.5 bottom-0.5 h-[14px] tablet:h-[10px] rounded-full transition-colors duration-200 pointer-events-none
   `;
 export const sliderBar =
   `w-full h-5 tablet:h-4 !rounded-full ${glassmorphismLayer2} cursor-pointer`;

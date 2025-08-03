@@ -99,7 +99,7 @@ export const ToggleButton = ({
 
     return selectState.action === "select"
       ? glassmorphismColor
-      : `!bg-stamp-grey-darkest/30 !border-stamp-grey-darkest/20 !text-[var(--color-dark)] [&:hover::before]:!bg-none`;
+      : `!bg-stamp-grey-darkest/15 !border-stamp-grey-darkest/20 !text-[var(--color-dark)] [&:hover::before]:!bg-none`;
   };
 
   // Custom button class function
@@ -132,7 +132,7 @@ export const ToggleButton = ({
           // Force TRENDING to always show special effect with persistent animation
           const trendingClickState = selectState?.option === "TRENDING"
             ? glassmorphismColor
-            : `hover:bg-stamp-grey-darkest/30 hover:border-stamp-grey-darkest/20 hover:text-[var(--color-dark)] hover:before:bg-none `;
+            : `hover:bg-stamp-grey-darkest/15 hover:border-stamp-grey-darkest/20 hover:text-[var(--color-dark)] hover:before:bg-none `;
           return `${
             button("glassmorphismSelected", color, size)
           } cursor-pointer ${trendingClickState} ${getSelectState(option)}`;
