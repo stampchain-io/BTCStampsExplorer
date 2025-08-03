@@ -21,10 +21,11 @@ const nameClassName = `hidden mobileLg:block
 export function CollectionsBanner(
   { collection, isDarkMode }: CollectionsBannerProps,
 ) {
-  // Guard against undefined collection
-  if (!collection) return null;
   /* ===== STATE ===== */
   const [isHovered, setIsHovered] = useState(false);
+
+  // Guard against undefined collection
+  if (!collection) return null;
 
   /* ===== COMPONENT ===== */
   return (

@@ -17,7 +17,6 @@ import {
   getStampImageSrc,
   handleImageError,
 } from "$lib/utils/ui/media/imageUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
 import { VNode } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
@@ -31,11 +30,6 @@ function RightPanel(
     showCodeButton: boolean;
   },
 ) {
-  // Early return if stamp is undefined
-  if (!stamp) {
-    return null;
-  }
-
   /* ===== STATE & REFS ===== */
   const [showCopied, setShowCopied] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
@@ -86,6 +80,11 @@ function RightPanel(
       }
     };
   }, []);
+
+  // Early return if stamp is undefined
+  if (!stamp) {
+    return null;
+  }
 
   /* ===== SHARING CONFIGURATION ===== */
   const url = `https://stampchain.io/stamp/${stamp.stamp}`;
@@ -449,20 +448,22 @@ export function StampImage(
     flag?: boolean;
   },
 ) {
-  // Early return if stamp is undefined
-  if (!stamp) {
-    return (
-      <div className="stamp-container bg-gray-200 rounded-lg p-4 text-center text-gray-500">
-        No stamp data available
-      </div>
-    );
-  }
-
   /* ===== STATE & REFS ===== */
   const [loading, setLoading] = useState<boolean>(true);
   const imgScopeRef = useRef<HTMLDivElement | null>(null);
   const [transform, setTransform] = useState("");
   const [src, setSrc] = useState("");
+  const [htmlContent, setHtmlContent] = useState<string | null>(null);
+  const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
+  const [isValidating, setIsValidating] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const tooltipTimeoutRef = useRef<number | null>(null);
+  const copyTooltipTimeoutRef = useRef<number | null>(null);
+  const shareTooltipTimeoutRef = useRef<number | null>(null);
+  const codeTooltipTimeoutRef = useRef<number | null>(null);
+  const fullscreenTooltipTimeoutRef = useRef<number | null>(null);
+  const xTooltipTimeoutRef = useRef<number | null>(null);
 
   const updateTransform = () => {
     if (!imgScopeRef.current) return;
@@ -472,36 +473,8 @@ export function StampImage(
     );
   };
 
-  useEffect(() => {
-    // Set initial transform
-    updateTransform();
-
-    // Add event listener to handle window resize
-    globalThis.addEventListener("resize", updateTransform);
-
-    // Cleanup event listener on component unmount
-    return () => {
-      globalThis.removeEventListener("resize", updateTransform);
-    };
-  }, []);
-
-  const toggleFullScreenModal = () => {
-    const modalContent = (
-      <PreviewImageModal
-        src={src}
-        contentType={stamp.stamp_mimetype === "text/html"
-          ? "html"
-          : stamp.stamp_mimetype === "text/plain"
-          ? "text"
-          : stamp.stamp_mimetype?.startsWith("audio/")
-          ? "audio"
-          : "image"}
-      />
-    );
-    openModal(modalContent, "zoomInOut");
-  };
-
   const fetchStampImage = async () => {
+    if (!stamp) return;
     setLoading(true);
     const res = await getStampImageSrc(stamp);
     if (res) {
@@ -510,30 +483,9 @@ export function StampImage(
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchStampImage().catch((error) => {
-      console.error("Error fetching stamp image:", error);
-      setLoading(false); // Ensure loading is set to false even on error
-    });
-  }, []);
-
-  const isHtml = stamp.stamp_mimetype === "text/html";
-  const isPlainText = stamp.stamp_mimetype === "text/plain";
-  const isAudio = stamp.stamp_mimetype?.startsWith("audio/");
-  const isLibraryFile = stamp.stamp_mimetype === "text/css" ||
-    stamp.stamp_mimetype === "text/javascript" ||
-    stamp.stamp_mimetype === "application/javascript" ||
-    stamp.stamp_mimetype === "application/gzip";
-
-  const [htmlContent, setHtmlContent] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isHtml) {
-      fetchHtmlContent();
-    }
-  }, [stamp]);
-
   const fetchHtmlContent = async () => {
+    if (!stamp) return;
+
     try {
       // Use the API endpoint to get raw stamp content instead of the rendered webpage
       const response = await fetch(`/api/v2/stamps/${stamp.stamp}`);
@@ -562,163 +514,105 @@ export function StampImage(
     }
   };
 
-  const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
-  const [isValidating, setIsValidating] = useState<boolean>(false);
+  const validateContent = async () => {
+    if (!stamp || stamp.stamp_mimetype !== "image/svg+xml" || !src) {
+      setIsValidating(false);
+      return;
+    }
 
-  useEffect(() => {
-    const validateContent = async () => {
-      if (stamp.stamp_mimetype === "image/svg+xml" && src) {
-        setIsValidating(true);
+    setIsValidating(true);
 
-        try {
-          // Fetch the SVG content
-          const response = await fetch(src);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch SVG: ${response.status}`);
-          }
+    try {
+      // Fetch the SVG content
+      const response = await fetch(src);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch SVG: ${response.status}`);
+      }
 
-          const svgContent = await response.text();
+      const svgContent = await response.text();
 
-          // Check if SVG has external ordinals.com or arweave.net references
-          if (
-            svgContent.includes("ordinals.com/content/") ||
-            svgContent.includes("arweave.net/")
-          ) {
-            // Rewrite external references to use our proxy
-            let rewrittenSVG = svgContent.replace(
-              /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
-              "/api/proxy/ordinals/$1",
-            ).replace(
-              /https:\/\/arweave\.net\/([^"'\s>]+)/g,
-              "/api/proxy/arweave/$1",
-            );
+      // Check if SVG has external ordinals.com or arweave.net references
+      if (
+        svgContent.includes("ordinals.com/content/") ||
+        svgContent.includes("arweave.net/")
+      ) {
+        // Rewrite external references to use our proxy
+        let rewrittenSVG = svgContent.replace(
+          /https:\/\/ordinals\.com\/content\/([^"'\s>]+)/g,
+          "/api/proxy/ordinals/$1",
+        ).replace(
+          /https:\/\/arweave\.net\/([^"'\s>]+)/g,
+          "/api/proxy/arweave/$1",
+        );
 
-            // Ensure SVG fills container by removing fixed dimensions and adding proper styling
-            if (rewrittenSVG.includes("<svg")) {
-              // Remove width and height attributes
-              rewrittenSVG = rewrittenSVG.replace(
-                /<svg([^>]*)\s+width="([^"]*)"([^>]*)/,
-                "<svg$1$3",
-              ).replace(
-                /<svg([^>]*)\s+height="([^"]*)"([^>]*)/,
-                "<svg$1$3",
-              );
+        // Ensure SVG fills container by removing fixed dimensions and adding proper styling
+        if (rewrittenSVG.includes("<svg")) {
+          // Remove width and height attributes
+          rewrittenSVG = rewrittenSVG.replace(
+            /<svg([^>]*)\s+width="([^"]*)"([^>]*)/,
+            "<svg$1$3",
+          ).replace(
+            /<svg([^>]*)\s+height="([^"]*)"([^>]*)/,
+            "<svg$1$3",
+          );
 
-              // Add viewBox if not present (using the original dimensions)
-              if (!rewrittenSVG.includes("viewBox")) {
-                rewrittenSVG = rewrittenSVG.replace(
-                  /<svg([^>]*)>/,
-                  '<svg$1 viewBox="0 0 460 500">',
-                );
-              }
-
-              // Add responsive styling to fill container properly
-              rewrittenSVG = rewrittenSVG.replace(
-                /<svg([^>]*)>/,
-                '<svg$1 style="max-width: 100%; max-height: 100%; width: auto; height: auto; display: block;">',
-              );
-            }
-
-            setValidatedContent(
-              <div
-                className="max-w-none object-contain rounded pixelart stamp-image h-full w-full flex items-center justify-center"
-                dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              />,
-            );
-          } else {
-            // No external references, use original src
-            setValidatedContent(
-              <img
-                width="100%"
-                loading="lazy"
-                className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-                src={src}
-                onError={handleImageError}
-                alt={`Stamp No. ${stamp.stamp}`}
-              />,
+          // Add viewBox if not present (using the original dimensions)
+          if (!rewrittenSVG.includes("viewBox")) {
+            rewrittenSVG = rewrittenSVG.replace(
+              /<svg([^>]*)>/,
+              '<svg$1 viewBox="0 0 460 500">',
             );
           }
-        } catch (_error) {
-          // Fallback to original src
-          setValidatedContent(
-            <img
-              width="100%"
-              loading="lazy"
-              className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
-              src={src}
-              onError={handleImageError}
-              alt={`Stamp No. ${stamp.stamp}`}
-            />,
+
+          // Add responsive styling to fill container properly
+          rewrittenSVG = rewrittenSVG.replace(
+            /<svg([^>]*)>/,
+            '<svg$1 style="max-width: 100%; max-height: 100%; width: auto; height: auto; display: block;">',
           );
         }
 
-        setIsValidating(false);
+        setValidatedContent(
+          <div
+            className="max-w-none object-contain rounded pixelart stamp-image h-full w-full flex items-center justify-center"
+            dangerouslySetInnerHTML={{ __html: rewrittenSVG }}
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          />,
+        );
       } else {
-        setIsValidating(false);
+        // No external references, use original src
+        setValidatedContent(
+          <img
+            width="100%"
+            loading="lazy"
+            className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+            src={src}
+            onError={handleImageError}
+            alt={`Stamp No. ${stamp.stamp}`}
+          />,
+        );
       }
-    };
-    validateContent();
-  }, [src, stamp.stamp_mimetype]);
-
-  // All tooltip-related refs
-  const tooltipTimeoutRef = useRef<number | null>(null);
-  const copyTooltipTimeoutRef = useRef<number | null>(null);
-  const shareTooltipTimeoutRef = useRef<number | null>(null);
-  const codeTooltipTimeoutRef = useRef<number | null>(null);
-  const fullscreenTooltipTimeoutRef = useRef<number | null>(null);
-
-  // Add cleanup effect for tooltips
-  useEffect(() => {
-    logger.debug("ui", {
-      message: "StampImage mounted",
-      component: "StampImage",
-    });
-
-    return () => {
-      logger.debug("ui", {
-        message: "StampImage unmounting",
-        component: "StampImage",
-      });
-      // Clean up all tooltip timeouts
-      [
-        tooltipTimeoutRef,
-        copyTooltipTimeoutRef,
-        shareTooltipTimeoutRef,
-        codeTooltipTimeoutRef,
-        fullscreenTooltipTimeoutRef,
-        xTooltipTimeoutRef,
-      ].forEach((ref) => {
-        if (ref.current !== null) {
-          globalThis.clearTimeout(ref.current);
-          ref.current = null;
-        }
-      });
-    };
-  }, []);
-
-  const xTooltipTimeoutRef = useRef<number | null>(null);
-
-  // Add to cleanup useEffect
-  useEffect(() => {
-    return () => {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-      }
-      if (xTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(xTooltipTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
+    } catch (_error) {
+      // Fallback to original src
+      setValidatedContent(
+        <img
+          width="100%"
+          loading="lazy"
+          className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+          src={src}
+          onError={handleImageError}
+          alt={`Stamp No. ${stamp.stamp}`}
+        />,
+      );
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
   const togglePlayback = () => {
     if (!audioRef.current) return;
@@ -734,6 +628,90 @@ export function StampImage(
   const handleAudioEnded = () => {
     setIsPlaying(false);
   };
+
+  useEffect(() => {
+    // Set initial transform
+    updateTransform();
+
+    // Add event listener to handle window resize
+    globalThis.addEventListener("resize", updateTransform);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      globalThis.removeEventListener("resize", updateTransform);
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchStampImage().catch((error) => {
+      console.error("Error fetching stamp image:", error);
+      setLoading(false); // Ensure loading is set to false even on error
+    });
+  }, []);
+
+  useEffect(() => {
+    const isHtml = stamp?.stamp_mimetype === "text/html";
+    if (isHtml) {
+      fetchHtmlContent();
+    }
+  }, [stamp]);
+
+  useEffect(() => {
+    validateContent();
+  }, [stamp, src]);
+
+  useEffect(() => {
+    return () => {
+      const timeoutRefs = [
+        tooltipTimeoutRef,
+        copyTooltipTimeoutRef,
+        shareTooltipTimeoutRef,
+        codeTooltipTimeoutRef,
+        fullscreenTooltipTimeoutRef,
+        xTooltipTimeoutRef,
+      ];
+
+      timeoutRefs.forEach((ref) => {
+        if (ref.current !== null) {
+          globalThis.clearTimeout(ref.current);
+          ref.current = null;
+        }
+      });
+    };
+  }, []);
+
+  // Early return if stamp is undefined
+  if (!stamp) {
+    return (
+      <div className="stamp-container bg-gray-200 rounded-lg p-4 text-center text-gray-500">
+        No stamp data available
+      </div>
+    );
+  }
+
+  const toggleFullScreenModal = () => {
+    const modalContent = (
+      <PreviewImageModal
+        src={src}
+        contentType={stamp.stamp_mimetype === "text/html"
+          ? "html"
+          : stamp.stamp_mimetype === "text/plain"
+          ? "text"
+          : stamp.stamp_mimetype?.startsWith("audio/")
+          ? "audio"
+          : "image"}
+      />
+    );
+    openModal(modalContent, "zoomInOut");
+  };
+
+  const isHtml = stamp.stamp_mimetype === "text/html";
+  const isPlainText = stamp.stamp_mimetype === "text/plain";
+  const isAudio = stamp.stamp_mimetype?.startsWith("audio/");
+  const isLibraryFile = stamp.stamp_mimetype === "text/css" ||
+    stamp.stamp_mimetype === "text/javascript" ||
+    stamp.stamp_mimetype === "application/javascript" ||
+    stamp.stamp_mimetype === "application/gzip";
 
   // Update the toggleCodeModal function to use the new pattern
   const toggleCodeModal = () => {
