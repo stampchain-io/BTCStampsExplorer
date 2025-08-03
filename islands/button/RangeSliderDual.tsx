@@ -284,36 +284,34 @@ export const RangeSliderDual = ({
     const segment1End = segment0End + config.segments[1].proportion * 100;
     const segment2End = variant === "fileSize" ? 100 : 99; // For fileSize, use full range
 
+    let value: number;
+
     if (position <= segment0End) {
       // First segment
-      const value = (position / segment0End) * config.segments[0].end;
-      return variant === "price"
-        ? Number(value.toFixed(6))
-        : Number(value.toFixed(0));
+      value = (position / segment0End) * config.segments[0].end;
     } else if (position <= segment1End) {
       // Second segment
       const segmentPosition = position - segment0End;
       const segmentRange = config.segments[1].proportion * 100;
-      const value = config.segments[0].end + (segmentPosition / segmentRange) *
+      value = config.segments[0].end + (segmentPosition / segmentRange) *
           (config.segments[1].end - config.segments[0].end);
-
-      return variant === "price"
-        ? Number(value.toFixed(6))
-        : Number(value.toFixed(0));
     } else if (position <= segment2End) {
       // Third segment
       const segmentPosition = position - segment1End;
       const segmentRange = segment2End - segment1End;
-      const value = config.segments[1].end + (segmentPosition / segmentRange) *
+      value = config.segments[1].end + (segmentPosition / segmentRange) *
           (config.segments[2].end - config.segments[1].end);
-
-      return variant === "price"
-        ? Number(value.toFixed(4))
-        : Number(value.toFixed(0));
     } else {
       // Beyond segment2End (should be handled by the special case above)
       return variant === "fileSize" ? config.max : Infinity;
     }
+
+    // Clamp to minimum value to prevent negative values
+    const clampedValue = Math.max(config.min, value);
+
+    return variant === "price"
+      ? Number(clampedValue.toFixed(6))
+      : Number(clampedValue.toFixed(0));
   };
 
   // Adjusted valueToPosition functions for padding
@@ -506,21 +504,24 @@ export const RangeSliderDual = ({
         ? snappedValue
         : Math.min(snappedValue, maxValue - minStep * 10);
 
-      setPendingMin(newMin);
-      setMinValue(newMin);
+      // Ensure min value is never below config.min (0 for price variant)
+      const clampedNewMin = Math.max(config.min, newMin);
+
+      setPendingMin(clampedNewMin);
+      setMinValue(clampedNewMin);
       setLastChangedHandle("min");
 
       // Trigger onChange immediately for track clicks
       if (variant === "price") {
-        const finalMin = newMin < 0.0001
-          ? Number(newMin.toFixed(6))
-          : newMin < 0.01
-          ? Number(newMin.toFixed(5))
-          : Number(newMin.toFixed(3));
+        const finalMin = clampedNewMin < 0.0001
+          ? Number(clampedNewMin.toFixed(6))
+          : clampedNewMin < 0.01
+          ? Number(clampedNewMin.toFixed(5))
+          : Number(clampedNewMin.toFixed(3));
         onChange?.(finalMin, maxValue);
       } else {
         onChange?.(
-          Math.round(newMin),
+          Math.round(clampedNewMin),
           maxValue === Infinity ? Infinity : Math.round(maxValue),
         );
       }
@@ -573,7 +574,11 @@ export const RangeSliderDual = ({
     const maxLimit = variant === "fileSize"
       ? config.max
       : (pendingMax === Infinity ? snappedValue : pendingMax);
-    const clampedMin = Math.min(snappedValue, maxLimit - minStep * 10);
+    // Ensure min value is never below config.min (0 for price variant)
+    const clampedMin = Math.max(
+      config.min,
+      Math.min(snappedValue, maxLimit - minStep * 10),
+    );
 
     setPendingMin(clampedMin);
     setMinValue(clampedMin);
