@@ -1,6 +1,6 @@
 /* ===== SRC20 HEADER COMPONENT ===== */
 /* @baba - update search button styling */
-import { Button, SelectorButtons } from "$button";
+import { SelectorButtons, ToggleButton } from "$button";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
 import { useCallback, useState } from "preact/hooks";
@@ -47,17 +47,13 @@ export const SRC20OverviewHeader = (
     [onTimeframeChange],
   );
 
-  const handleTrendingClick = useCallback(() => {
+  const handleTrendingToggle = useCallback((_value: string | string[]) => {
+    // Toggle between TRENDING and DEPLOY when the button is clicked
     const currentFilter = currentSort?.filter || "TRENDING";
     const newFilter = currentFilter === "TRENDING" ? "DEPLOY" : "TRENDING";
     const newDirection = newFilter === "DEPLOY" ? "asc" : "desc";
     onFilterChange?.(newFilter, newDirection);
   }, [onFilterChange, currentSort?.filter]);
-
-  // 🚀 PREACT OPTIMIZATION: Memoized variant getters
-  const getTrendingVariant = useCallback(() => {
-    return currentSort?.filter === "TRENDING" ? "flatOutline" : "outlineFlat";
-  }, [currentSort?.filter]);
 
   /* ===== RENDER ===== */
   return (
@@ -89,7 +85,7 @@ export const SRC20OverviewHeader = (
             ]}
             value={viewType}
             onChange={handleViewTypeClick}
-            size="sm"
+            size="smR"
             color="purple"
             className="w-full mobileMd:w-auto"
           />
@@ -97,23 +93,17 @@ export const SRC20OverviewHeader = (
 
         {/* Trending and Timeframes - Right */}
         <div class="flex justify-between pt-3 mobileLg:pt-0 gap-3">
-          {/* Trending Button */}
-          <Button
-            variant={getTrendingVariant()}
-            color="grey"
-            size="xs"
-            onClick={handleTrendingClick}
-            class={`
-              ${
-              currentSort?.filter === "TRENDING"
-                ? "cursor-default"
-                : "cursor-pointer"
-            }
-              mt-[3px]
-            `}
-          >
-            TRENDING
-          </Button>
+          {/* Trending Toggle */}
+          <div class="mt-[3px]">
+            <ToggleButton
+              options={["TRENDING"]}
+              selected={currentSort?.filter === "TRENDING" ? "TRENDING" : ""}
+              onChange={handleTrendingToggle}
+              mode="single"
+              size="smR"
+              color="grey"
+            />
+          </div>
 
           {/* Timeframe Buttons */}
           <SelectorButtons
@@ -124,7 +114,7 @@ export const SRC20OverviewHeader = (
             ]}
             value={selectedTimeframe}
             onChange={handleTimeframeClick}
-            size="sm"
+            size="smR"
             color="grey"
           />
         </div>

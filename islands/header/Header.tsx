@@ -348,7 +348,7 @@ export function Header() {
                                   subLink?.href ? subLink?.href : null,
                                 );
                               }}
-                              class={`font-semibold text-xs transition-colors duration-300 ${
+                              class={`font-semibold text-xs transition-colors duration-200 ${
                                 currentPath === subLink.href
                                   ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                                   : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -379,7 +379,7 @@ export function Header() {
                                   subLink?.href ? subLink?.href : null,
                                 );
                               }}
-                              class={`font-semibold text-xs transition-colors duration-300 ${
+                              class={`font-semibold text-xs transition-colors duration-200 ${
                                 currentPath === subLink.href
                                   ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                                   : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -408,7 +408,7 @@ export function Header() {
                                   subLink?.href ? subLink?.href : null,
                                 );
                               }}
-                              class={`font-semibold text-xs transition-colors duration-300 ${
+                              class={`font-semibold text-xs transition-colors duration-200 ${
                                 currentPath === subLink.href
                                   ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                                   : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -433,7 +433,7 @@ export function Header() {
                               subLink?.href ? subLink?.href : null,
                             );
                           }}
-                          class={`font-semibold text-center text-xs transition-colors duration-300 ${
+                          class={`font-semibold text-center text-xs transition-colors duration-200 ${
                             currentPath === subLink.href
                               ? "text-sm text-stamp-purple-bright hover:text-stamp-purple"
                               : "text-sm text-stamp-purple hover:text-stamp-purple-bright"
@@ -505,7 +505,7 @@ export function Header() {
               <CloseIcon
                 size="sm"
                 weight="bold"
-                color="greyGradient"
+                color="grey"
                 onClick={() => {
                   if (open) {
                     closeMenu();
@@ -522,7 +522,7 @@ export function Header() {
           </div>
 
           <div class="flex flex-col w-full sticky bottom-0
-          bg-gradient-to-b from-[#000000]/80 to-[#000000]/100
+          bg-gradient-to-br from-black/20 to-black/40 backdrop-blur-md
           shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
             {/* Tools section with gear icon */}
             <div class="flex w-full justify-between pt-3 pb-8 px-9">
@@ -536,7 +536,7 @@ export function Header() {
                 />
               </div>
               <div
-                class={`flex justify-end items-center transition-opacity duration-100
+                class={`flex justify-end items-center transition-opacity duration-200
                   ${toolsOpen ? "opacity-0" : "opacity-100"}`}
                 style={{
                   transitionDelay: toolsOpen ? "0ms" : "425ms",
@@ -562,7 +562,7 @@ export function Header() {
                       toggleMenu();
                       setCurrentPath(link.href);
                     }}
-                    class={`font-bold transition-colors duration-300 ${
+                    class={`font-bold transition-colors duration-200 ${
                       currentPath === link.href
                         ? "text-base text-stamp-grey-darker hover:text-stamp-grey-light"
                         : "text-base text-stamp-grey-light hover:!text-stamp-grey-darker"
@@ -601,7 +601,7 @@ Map through dropdown items
       setCurrentPath(subLink?.href ? subLink?.href : null); // Update current path
     }}
     // Complex conditional styling for active/inactive states
-    class={`font-bold transition-colors duration-300 ${
+    class={`font-bold transition-colors duration-200 ${
       isMobile
         ? currentPath === subLink.href
           ? "text-base text-stamp-grey-light hover:text-stamp-grey py-1"

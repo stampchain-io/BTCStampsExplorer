@@ -262,7 +262,7 @@ export function FeeCalculatorBase({
 
   // Fee selector component
   const renderFeeSelector = () => (
-    <div class={`flex flex-col ${isModal ? "w-2/3" : "w-[89%]"}`}>
+    <div class={`flex flex-col ${isModal ? "w-2/3" : "w-[85%]"}`}>
       <h6 class="font-light text-xs text-stamp-grey text-nowrap">
         <span class="text-stamp-grey-darker pr-2">RECOMMENDED</span>
         <span class="font-medium">
@@ -697,7 +697,7 @@ export function FeeCalculatorBase({
         {showCoinToggle && (
           <div
             className={`flex gap-1 items-start justify-end ${
-              isModal ? "w-1/3" : "w-[11%]"
+              isModal ? "w-1/3" : "w-[15%]"
             }`}
           >
             <div className="relative">
@@ -810,11 +810,11 @@ export function FeeCalculatorBase({
                 ${
                 tosAgreed
                   ? canHoverSelected
-                    ? "bg-stamp-grey-darkest border-stamp-grey-darker  group-hover:border-stamp-grey-light"
-                    : "bg-stamp-grey-darkest border-stamp-grey-darker"
+                    ? "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20  group-hover:border-stamp-grey-darkest/40"
+                    : "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20"
                   : canHoverSelected
-                  ? "bg-stamp-grey-darkest border-stamp-grey-light group-hover:border-stamp-grey-darker"
-                  : "bg-stamp-grey-darkest border-stamp-grey-light"
+                  ? "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20 group-hover:border-stamp-grey-darkest/40"
+                  : "bg-stamp-grey-darkest/15 border-stamp-grey-darkest/20"
               }
               `}
             >
@@ -822,6 +822,7 @@ export function FeeCalculatorBase({
                 className={`
                   absolute
                   inset-[1px]
+                  rounded-sm
                   transform transition-all duration-200 ease-in-out
                   ${tosAgreed ? "scale-100" : "scale-0"}
                   ${

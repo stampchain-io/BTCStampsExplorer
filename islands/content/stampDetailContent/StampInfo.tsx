@@ -12,12 +12,12 @@ import {
   containerColData,
   gapSectionSlim,
 } from "$layout";
+import { calculateTransactionSize } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import {
   abbreviateAddress,
   formatBTCAmount,
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { calculateTransactionSize } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import {
   getSRC101Data,
   getStampImageSrc,
@@ -28,6 +28,7 @@ import {
   headingGreyDLLink,
   labelSm,
   titleGreyLD,
+  value2xl,
   value3xl,
   valueDark,
   valueSm,
@@ -818,7 +819,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                         })} <span className="font-light">USD</span>
                       </h6>
                     )}
-                    <h6 className={value3xl}>
+                    <h6 className={value2xl}>
                       {formatBTCAmount(
                         typeof displayPrice === "number" ? displayPrice : 0,
                         { excludeSuffix: true },
@@ -855,9 +856,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
                 <div className="flex justify-end">
                   <Button
-                    variant="outline"
-                    color="purple"
-                    size="md"
+                    variant="glassmorphismColor"
+                    color="grey"
+                    size="mdR"
                     onClick={() =>
                       toggleModal(selectedDispenser || lowestPriceDispenser)}
                   >
