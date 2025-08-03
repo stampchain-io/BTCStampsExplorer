@@ -1,23 +1,27 @@
-import { DEFAULT_CACHE_DURATION, MAX_PAGINATION_LIMIT, STAMP_TABLE } from "$constants";
+import type {
+  StampEdition,
+  StampFilesize,
+  StampFiletype,
+  StampFilterType,
+  StampRange,
+  StampSuffixFilter
+} from "$constants";
 import {
-  STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
-  STAMP_RANGES, STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES,
-  StampBalance,
-  StampFilters, SUBPROTOCOLS
-} from "$globals";
+  DEFAULT_CACHE_DURATION,
+  MAX_PAGINATION_LIMIT,
+  STAMP_TABLE,
+  STAMP_TYPES as STAMP_TYPE_CONSTANTS,
+  type StampType
+} from "$constants";
 import { filterOptions } from "$lib/utils/data/filtering/filterOptions.ts";
-import {
-  getIdentifierType,
-  isCpid,
-  isStampHash,
-  isStampNumber,
-  isTxHash,
-} from "$lib/utils/data/identifiers/identifierUtils.ts";
-import { logger, LogNamespace } from "$lib/utils/monitoring/logging/logger.ts";
+import { getIdentifierType } from "$lib/utils/data/identifiers/identifierUtils.ts";
+import { isCpid, isStampHash, isStampNumber, isTxHash } from "$lib/utils/typeGuards.ts";
+import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
-import { XcpBalance } from "$types/index.d.ts";
-import { summarize_issuances } from "./index.ts";
+import { summarize_issuances } from "$server/database/index.ts";
+import { SUBPROTOCOLS } from "$types/base.d.ts";
+import type { XcpBalance } from "$types/services.d.ts";
+import type { StampBalance, StampFilters } from "$types/stamp.d.ts";
 
 export class StampRepository {
   // Dependency injection support
@@ -35,16 +39,16 @@ export class StampRepository {
     whereConditions: string[],
     queryParams: (string | number)[],
     identifier?: string | number | (string | number)[],
-    type?: STAMP_TYPES,
+    type?: StampType,
     ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string,
     blockIdentifier?: number | string,
     collectionId?: string | string[],
-    filterBy?: STAMP_FILTER_TYPES[],
-    combinedFilters?: (STAMP_SUFFIX_FILTERS | STAMP_FILETYPES)[],
+    filterBy?: StampFilterType[],
+    combinedFilters?: (StampSuffixFilter | StampFiletype)[],
     isSearchQuery?: boolean,
     filters?: StampFilters,
-    editions?: STAMP_EDITIONS[],
-    range?: STAMP_RANGES,
+    editions?: StampEdition[],
+    range?: StampRange,
     rangeMin?: string,
     rangeMax?: string
   ) {
@@ -53,7 +57,7 @@ export class StampRepository {
       if (Array.isArray(identifier)) {
         const validIdentifiers = identifier.filter(
           (id) =>
-            isStampNumber(id) || isTxHash(id) || isStampHash(id) || isCpid(id)
+            isStampNumber(id) || (typeof id === "string" && isTxHash(id)) || isStampHash(id) || isCpid(id)
         );
 
         if (validIdentifiers.length === 0) {
@@ -65,7 +69,7 @@ export class StampRepository {
           isStampNumber(id)
         );
         const txHashes = validIdentifiers.filter((id): id is string =>
-          isTxHash(id)
+          typeof id === "string" && isTxHash(id)
         );
         const stampHashes = validIdentifiers.filter((id): id is string =>
           isStampHash(id)
@@ -105,7 +109,7 @@ export class StampRepository {
         if (isStampNumber(identifier)) {
             whereConditions.push("st.stamp = ?");
             queryParams.push(Number(identifier));
-        } else if (isTxHash(identifier)) {
+        } else if (typeof identifier === "string" && isTxHash(identifier)) {
           whereConditions.push("st.tx_hash = ?");
           queryParams.push(identifier);
         } else if (isStampHash(identifier)) {
@@ -192,23 +196,23 @@ export class StampRepository {
       // Separate file extensions (STAMP_SUFFIX_FILTERS) from other types
       const fileExtensions = combinedFilters.filter(filter =>
         ["gif", "jpg", "png", "webp", "bmp", "jpeg", "svg", "html"].includes(filter as string)
-      ) as STAMP_SUFFIX_FILTERS[];
+      ) as StampSuffixFilter[];
 
       // Separate encoding filters (legacy/olga)
       const encodingFilters = combinedFilters.filter(filter =>
         ["legacy", "olga"].includes(filter as string)
-      ) as STAMP_FILETYPES[];
+      ) as StampFiletype[];
 
       // Separate edition filters
       const editionFilters = combinedFilters.filter(filter =>
         ["single", "multiple", "locked", "unlocked", "divisible"].includes(filter as string)
-      ) as unknown as STAMP_EDITIONS[];
+      ) as unknown as StampEdition[];
 
       // Separate other file type filters (mimetype-based)
       const mimetypeFilters = combinedFilters.filter(filter =>
         ["jpg", "jpeg", "png", "gif", "webp", "avif", "bmp", "svg", "html", "txt", "mp3", "mpeg"].includes(filter as string) &&
         !["legacy", "olga", "single", "multiple", "locked", "unlocked", "divisible"].includes(filter as string)
-      ) as STAMP_FILETYPES[];
+      ) as StampFiletype[];
 
       // Process file extensions (URL-based filtering)
       if (fileExtensions.length > 0) {
@@ -293,18 +297,18 @@ export class StampRepository {
   }
 
   static async getTotalStampCountFromDb(options: {
-    type?: STAMP_TYPES;
+    type?: StampType;
     ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
     identifier?: string | number | (string | number)[];
     blockIdentifier?: number | string;
     collectionId?: string | string[];
-    filterBy?: STAMP_FILTER_TYPES[];
-    suffix?: STAMP_SUFFIX_FILTERS[];
-    fileType?: STAMP_FILETYPES[];
+    filterBy?: StampFilterType[];
+    suffix?: StampSuffixFilter[];
+    fileType?: StampFiletype[];
     creatorAddress?: string;
   }) {
     const {
-      type = "stamps",
+      type = STAMP_TYPE_CONSTANTS.STAMPS,
       ident,
       identifier,
       blockIdentifier,
@@ -547,7 +551,7 @@ export class StampRepository {
     limit?: number;
     page?: number;
     sortBy?: "ASC" | "DESC";
-    type?: STAMP_TYPES;
+    type?: StampType;
     ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
     identifier?: string | number | (string | number)[];
     blockIdentifier?: number | string;
@@ -565,26 +569,26 @@ export class StampRepository {
     creatorAddress?: string;
     isSearchQuery?: boolean;
     filters?: StampFilters;
-    filterBy?: STAMP_FILTER_TYPES[];
-    suffix?: STAMP_SUFFIX_FILTERS[];
-    fileType?: STAMP_FILETYPES[];
-    editions?: STAMP_EDITIONS[];
-    range?: STAMP_RANGES;
+    filterBy?: StampFilterType[];
+    suffix?: StampSuffixFilter[];
+    fileType?: StampFiletype[];
+    editions?: StampEdition[];
+    range?: StampRange;
     rangeMin?: string;
     rangeMax?: string;
-    market?: Extract<STAMP_MARKETPLACE, "listings" | "sales"> | "";
+    market?: "listings" | "sales" | "";
     dispensers?: boolean;
     atomics?: boolean;
-    listings?: Extract<STAMP_MARKETPLACE, "all" | "bargain" | "affordable" | "premium" | "custom"> | "";
+    listings?: "all" | "bargain" | "affordable" | "premium" | "custom" | "";
     listingsMin?: string;
     listingsMax?: string;
-    sales?: Extract<STAMP_MARKETPLACE, "recent" | "premium" | "custom" | "volume"> | "";
+    sales?: "recent" | "premium" | "custom" | "volume" | "";
     salesMin?: string;
     salesMax?: string;
     volume?: "24h" | "7d" | "30d" | "";
     volumeMin?: string;
     volumeMax?: string;
-    fileSize?: STAMP_FILESIZES | null;
+    fileSize?: StampFilesize | null;
     fileSizeMin?: string;
     fileSizeMax?: string;
   }) {
@@ -676,7 +680,7 @@ export class StampRepository {
           min: rangeMin || "",
           max: rangeMax || ""
         }
-      } as unknown as STAMP_RANGES;
+              } as unknown as StampRange;
       console.log("Repository created range filters:", effectiveRange);
     }
 
@@ -1068,7 +1072,7 @@ export class StampRepository {
         newName,
         newName,
       ]);
-      
+
       // Invalidate creator cache after successful update
       if ((result as any).affectedRows > 0) {
         console.log(`[CACHE] Invalidating creator cache after update for address: ${address}`);
@@ -1088,7 +1092,7 @@ export class StampRepository {
   }> {
     try {
       const result = await this.getTotalStampCountFromDb({
-        type: "all" as STAMP_TYPES,
+        type: "all" as StampType,
       });
       // If we can't get a count or it's 0, that indicates a database problem
       if (!(result as any)?.rows?.[0]?.total) {
@@ -1188,27 +1192,27 @@ export class StampRepository {
     page = 1,
     limit = 50,
     includeMarketData = true,
-    type = "all"
+    type = STAMP_TYPE_CONSTANTS.ALL
   }: {
     page?: number;
     limit?: number;
     includeMarketData?: boolean;
-    type?: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
-  }): Promise<{ stamps: any[], total: number }> {
+    type?: StampType;
+  }): Promise<{ stamps: import("$lib/types/stamp.d.ts").StampRow[], total: number }> {
     const offset = (page - 1) * limit;
 
     // Build type-based filtering condition
     let typeCondition = "";
-    if (type !== "all") {
-      if (type === "cursed") {
+    if (type !== STAMP_TYPE_CONSTANTS.ALL) {
+      if (type === STAMP_TYPE_CONSTANTS.CURSED) {
         typeCondition = "AND s.stamp < 0";
-      } else if (type === "classic") {
+      } else if (type === STAMP_TYPE_CONSTANTS.CLASSIC) {
         typeCondition = "AND s.stamp >= 0 AND s.cpid LIKE 'A%' AND s.ident != 'SRC-20'";
-      } else if (type === "stamps") {
+      } else if (type === STAMP_TYPE_CONSTANTS.STAMPS) {
         typeCondition = "AND s.stamp >= 0 AND s.ident != 'SRC-20'";
-      } else if (type === "posh") {
+      } else if (type === STAMP_TYPE_CONSTANTS.POSH) {
         typeCondition = "AND s.stamp < 0 AND s.cpid NOT LIKE 'A%' AND s.ident != 'SRC-20'";
-      } else if (type === "src20") {
+      } else if (type === STAMP_TYPE_CONSTANTS.SRC20) {
         typeCondition = "AND s.ident = 'SRC-20'";
       }
     }
@@ -1352,7 +1356,7 @@ export class StampRepository {
    * @param queryParams Array of parameters to append to
    */
   private static buildFileTypeFilterConditions(
-    filetypes: STAMP_FILETYPES[],
+    filetypes: StampFiletype[],
     whereConditions: string[],
     _queryParams: (string | number)[] // Not used - filetype filters are static SQL conditions
   ) {
@@ -1423,7 +1427,7 @@ export class StampRepository {
    * @param filters Array of file type filters that may include "legacy" or "olga"
    * @returns SQL condition string for filtering by encoding based on block height
    */
-  private static buildEncodingFilterSQL(filters: STAMP_FILETYPES[]): string {
+  private static buildEncodingFilterSQL(filters: StampFiletype[]): string {
     if (!filters || !filters.includes("legacy") && !filters.includes("olga")) {
       return "";
     }
@@ -1470,7 +1474,7 @@ export class StampRepository {
 
     // Handle market filters
     if (filters.market) {
-      this.buildMarketFilterConditions([filters.market] as STAMP_MARKETPLACE[], whereConditions, queryParams, undefined, undefined);
+              this.buildMarketFilterConditions([filters.market] as Array<"listings" | "sales" | "all" | "bargain" | "affordable" | "premium" | "custom" | "recent" | "volume">, whereConditions, queryParams, undefined, undefined);
     }
 
     // Handle new market data filters (Task 42)
@@ -1489,7 +1493,7 @@ export class StampRepository {
    * @param queryParams Array of parameters to append to
    */
   private static buildEditionsFilterConditions(
-    editions: STAMP_EDITIONS[],
+    editions: StampEdition[],
     whereConditions: string[],
     _queryParams: (string | number)[] // Not used - edition filters are static SQL conditions
   ) {
@@ -1545,7 +1549,7 @@ export class StampRepository {
   }
 
   private static buildRangeFilterConditions(
-    range: STAMP_RANGES,
+    range: StampRange,
     whereConditions: string[],
     queryParams: (string | number)[],
     rangeMin?: string,
@@ -1590,7 +1594,7 @@ export class StampRepository {
   }
 
   private static buildMarketFilterConditions(
-    marketFilters: STAMP_MARKETPLACE[],
+    marketFilters: Array<"listings" | "sales" | "all" | "bargain" | "affordable" | "premium" | "custom" | "recent" | "volume">,
     whereConditions: string[],
     queryParams: (string | number)[],
     marketMin?: string,
@@ -1616,10 +1620,10 @@ export class StampRepository {
     if (marketFilters.includes("sales")) {
       saleFilters.push("st.has_recent_sale = true");
     }
-    // NEEDS TO BE CORRECTLY UPDATED
-    if (marketFilters.includes("psbt")) {
-      saleFilters.push("st.has_recent_sale = true");
-    }
+    // TODO: Add PSBT market filter when supported
+    // if (marketFilters.includes("psbt")) {
+    //   saleFilters.push("st.has_recent_sale = true");
+    // }
 
     // Build category conditions - within each category use OR
     const categoryConditions = [];

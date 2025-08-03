@@ -1,15 +1,14 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
 /* ===== EXPLORER PAGE ===== */
+
 import { ExplorerContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import {
-  STAMP_FILTER_TYPES,
-  STAMP_TYPES,
-  StampPageProps,
-  SUBPROTOCOLS,
-} from "$globals";
+
 import { ExplorerHeader } from "$header";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
+import type { StampPageProps } from "$types/api.d.ts";
+import type { StampFilterType, StampType } from "$constants";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
@@ -36,10 +35,9 @@ export const handler: Handlers = {
       const filterBy = url.searchParams.get("filterBy")
         ? (url.searchParams.get("filterBy")?.split(",").filter(
           Boolean,
-        ) as STAMP_FILTER_TYPES[])
+        ) as StampFilterType[])
         : [];
-      const selectedTab =
-        (url.searchParams.get("type") || "all") as STAMP_TYPES;
+      const selectedTab = (url.searchParams.get("type") || "all") as StampType;
       const page = parseInt(url.searchParams.get("page") || "1");
       const requestedPageSize = parseInt(url.searchParams.get("limit") || "60");
       const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);

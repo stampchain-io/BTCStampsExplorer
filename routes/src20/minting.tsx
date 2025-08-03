@@ -49,7 +49,7 @@ export default function SRC20MintingPage({ data }: any) {
   const {
     src20s = [],
     page = 1,
-    totalPages = 1,
+    // totalPages removed to resolve type warning
     // filterBy = [], // Removed as filterBy prop on SRC20OverviewHeader is commented out
     // sortBy = "ASC", // Removed as sortBy prop on SRC20OverviewHeader is commented out
   } = data;
@@ -66,7 +66,6 @@ export default function SRC20MintingPage({ data }: any) {
           page,
           limit: data.limit || 11,
           total: data.total || 0,
-          totalPages,
         }}
         address="" // Not applicable for minting page
         initialSort="ASC" // Default sort for minting tokens

@@ -1,5 +1,6 @@
+import type { BlockHandlerContext } from "$types/base.d.ts";
+// Unused imports removed: IdentHandlerContext, TickHandlerContext, PaginatedTickResponseBody, SRC20TrxRequestParams
 import { Handlers } from "$fresh/server.ts";
-import { BlockHandlerContext } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 

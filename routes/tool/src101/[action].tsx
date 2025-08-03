@@ -1,15 +1,12 @@
 /* ===== SRC101 TOOLS PAGE ===== */
 /*@baba-60+61+65*/
 import { Handlers, PageProps } from "$fresh/server.ts";
+import type { ToolsSrc101PageProps } from "$types/ui.d.ts";
 import { body, gapSection } from "$layout";
 import { SRC101RegisterTool } from "$tool";
 import { SRC101RegisterHowto } from "$section";
 
 /* ===== TYPES ===== */
-interface ToolsSrc101PageProps {
-  selectedTab: string;
-  trxType: "multisig" | "olga";
-}
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<ToolsSrc101PageProps> = {

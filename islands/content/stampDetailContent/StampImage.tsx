@@ -1,7 +1,8 @@
 /* ===== STAMP IMAGE COMPONENT ===== */
 /* @baba-update audio icon size (custom) - 780*/
-import { StampRow } from "$globals";
+
 import { Icon, LoadingIcon } from "$icon";
+import type { StampRow } from "$types/stamp.d.ts";
 import TextContentIsland from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import PreviewCodeModal from "$islands/modal/PreviewCodeModal.tsx";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
@@ -24,12 +25,17 @@ import { useEffect, useRef, useState } from "preact/hooks";
 /* ===== RIGHT PANEL SUBCOMPONENT ===== */
 function RightPanel(
   { stamp, toggleCodeModal, toggleFullScreenModal, showCodeButton }: {
-    stamp: StampRow;
+    stamp?: StampRow;
     toggleCodeModal: () => void;
     toggleFullScreenModal: () => void;
     showCodeButton: boolean;
   },
 ) {
+  // Early return if stamp is undefined
+  if (!stamp) {
+    return null;
+  }
+
   /* ===== STATE & REFS ===== */
   const [showCopied, setShowCopied] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
@@ -438,11 +444,20 @@ function RightPanel(
 /* ===== MAIN STAMP IMAGE COMPONENT ===== */
 export function StampImage(
   { stamp, className, flag }: {
-    stamp: StampRow;
+    stamp?: StampRow;
     className?: string;
     flag?: boolean;
   },
 ) {
+  // Early return if stamp is undefined
+  if (!stamp) {
+    return (
+      <div className="stamp-container bg-gray-200 rounded-lg p-4 text-center text-gray-500">
+        No stamp data available
+      </div>
+    );
+  }
+
   /* ===== STATE & REFS ===== */
   const [loading, setLoading] = useState<boolean>(true);
   const imgScopeRef = useRef<HTMLDivElement | null>(null);

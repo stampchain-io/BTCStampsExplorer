@@ -1,9 +1,12 @@
 import { signal } from "@preact/signals";
-import { walletContext } from "./wallet.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
-import { handleWalletError } from "./walletHelper.ts";
+import {
+  checkWalletAvailability,
+  getGlobalWallets,
+} from "$client/wallet/wallet.ts";
+import { handleWalletError } from "$client/wallet/walletHelper.ts";
 import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 
 export const isOKXInstalled = signal<boolean>(false);
@@ -98,6 +101,7 @@ const handleAccountsChanged = async () => {
         unconfirmed: balanceInfo.unconfirmed,
         total: balanceInfo.total,
       },
+      addressType: "p2wpkh", // Default address type for OKX
       network: "mainnet",
       provider: "okx",
       stampBalance: [],

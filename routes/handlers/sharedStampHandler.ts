@@ -1,22 +1,27 @@
-import { MAX_PAGINATION_LIMIT } from "$constants";
-import { Handlers } from "$fresh/server.ts";
+import type {
+  StampEdition,
+  StampFilesize,
+  StampFiletype,
+  StampMarketplace,
+  StampRange,
+} from "$constants";
+import type { StampRow } from "$lib/types/stamp.d.ts";
 import {
-  STAMP_EDITIONS,
-  STAMP_FILESIZES,
-  STAMP_FILETYPES,
-  STAMP_MARKETPLACE,
-  STAMP_RANGES,
-} from "$globals";
+  API_STAMP_TYPE_VALUES,
+  type HandlerStampType,
+  MAX_PAGINATION_LIMIT,
+} from "$constants";
+import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { getIdentifierType } from "$lib/utils/data/identifiers/identifierUtils.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
-import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { validateSortDirection } from "$server/services/validation/validationService.ts";
 
 type StampHandlerConfig = {
-  type: "stamps" | "cursed";
+  type: HandlerStampType;
   isIndex: boolean;
 };
 
@@ -84,9 +89,9 @@ export const createStampHandler = (
 
         // Extract filters
         const fileType = url.searchParams.get("filetype")?.split(",")
-          .filter(Boolean) as STAMP_FILETYPES[] | undefined;
+          .filter(Boolean) as StampFiletype[] | undefined;
         const editions = url.searchParams.get("editions")?.split(",")
-          .filter(Boolean) as STAMP_EDITIONS[] | undefined;
+          .filter(Boolean) as StampEdition[] | undefined;
 
         // Extract ident parameter
         const identParam = url.searchParams.get("ident");
@@ -96,13 +101,13 @@ export const createStampHandler = (
 
         // Extract new marketplace filters
         const market = url.searchParams.get("market") as
-          | Extract<STAMP_MARKETPLACE, "listings" | "sales">
+          | Extract<StampMarketplace, "listings" | "sales">
           | "";
         const dispensers = url.searchParams.get("dispensers") === "true";
         const atomics = url.searchParams.get("atomics") === "true";
         const listings = url.searchParams.get("listings") as
           | Extract<
-            STAMP_MARKETPLACE,
+            StampMarketplace,
             "all" | "bargain" | "affordable" | "premium" | "custom"
           >
           | "";
@@ -110,7 +115,7 @@ export const createStampHandler = (
         const listingsMax = url.searchParams.get("listingsMax") || undefined;
         const sales = url.searchParams.get("sales") as
           | Extract<
-            STAMP_MARKETPLACE,
+            StampMarketplace,
             "recent" | "premium" | "custom" | "volume"
           >
           | "";
@@ -126,40 +131,35 @@ export const createStampHandler = (
 
         // Extract file size filters
         const fileSize = url.searchParams.get("fileSize") as
-          | STAMP_FILESIZES
+          | StampFilesize
           | null;
         const fileSizeMin = url.searchParams.get("fileSizeMin") || undefined;
         const fileSizeMax = url.searchParams.get("fileSizeMax") || undefined;
 
         // Extract type parameter (NEW: Support for stamp type filtering!)
         const typeParam = url.searchParams.get("type");
-        const validTypes = [
-          "classic",
-          "cursed",
-          "posh",
-          "src20",
-        ];
-        const stampType = (typeParam && validTypes.includes(typeParam))
-          ? typeParam as
-            | "classic"
-            | "cursed"
-            | "posh"
-            | "src20"
-          : "classic"; // Default to classic
+        const stampType =
+          (typeParam && API_STAMP_TYPE_VALUES.includes(typeParam as any))
+            ? typeParam as
+              | "classic"
+              | "cursed"
+              | "posh"
+              | "src20"
+            : "classic"; // Default to classic
 
         // Extract range filters
         const rangePreset = url.searchParams.get("rangePreset") || "";
         const rangeMin = url.searchParams.get("rangeMin") || "";
         const rangeMax = url.searchParams.get("rangeMax") || "";
 
-        let range: STAMP_RANGES | undefined = undefined;
+        let range: StampRange | undefined = undefined;
 
         // Set range based on preset or custom values
         if (
           rangePreset &&
           ["100", "1000", "5000", "10000"].includes(rangePreset)
         ) {
-          range = rangePreset as STAMP_RANGES;
+          range = rangePreset as StampRange;
         } else if (rangeMin || rangeMax) {
           range = "custom";
         }
@@ -260,10 +260,10 @@ export const createStampHandler = (
         // Filter fields based on API version
         if (parseFloat(apiVersion) < 2.3 && result.data) {
           // For v2.2, remove file_size_bytes from responses
-          const filterV22Fields = (stamps: any[]) => {
+          const filterV22Fields = (stamps: StampRow[]) => {
             return stamps.map((stamp) => {
               const { file_size_bytes: _file_size_bytes, ...v22Stamp } = stamp;
-              return v22Stamp;
+              return v22Stamp as StampRow;
             });
           };
 

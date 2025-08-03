@@ -4,68 +4,26 @@ import {
   sliderBar,
   sliderKnob,
 } from "$button";
+import { MaraModeBadge } from "$components/indicators/MaraModeIndicator.tsx";
+import { FeeSkeletonLoader } from "$components/indicators/ProgressIndicator.tsx";
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { useFees } from "$fees";
 import { Icon } from "$icon";
-import type {
-  BaseFeeCalculatorProps,
-  FeeDetails,
-  MintDetails,
-} from "$lib/types/base.d.ts";
+import type { ExtendedBaseFeeCalculatorProps } from "$lib/types/base.d.ts";
+import { estimateTransactionSizeForType } from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
+import { logger } from "$lib/utils/logger.ts";
 import {
   formatSatoshisToBTC,
   formatSatoshisToUSD,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { logger } from "$lib/utils/logger.ts";
-import { estimateTransactionSizeForType } from "$lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
 import { tooltipButton, tooltipImage } from "$notification";
 import { labelXs, textXs } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { MaraModeBadge } from "$components/indicators/MaraModeIndicator.tsx";
-import { FeeSkeletonLoader } from "$components/indicators/ProgressIndicator.tsx";
-
-interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
-  isModal?: boolean;
-  disabled?: boolean;
-  cancelText?: string;
-  confirmText?: string;
-  type?: string;
-  fileType?: string | undefined;
-  fileSize?: number | undefined;
-  issuance?: number | undefined;
-  bitname?: string | undefined;
-  amount?: number;
-  receive?: number;
-  fromPage?: string;
-  price?: number;
-  edition?: number;
-  ticker?: string;
-  limit?: number;
-  supply?: number;
-  src20TransferDetails?: {
-    address: string;
-    token: string;
-    amount: number;
-  };
-  stampTransferDetails?: {
-    address: string;
-    stamp: string;
-    editions: number;
-  };
-  dec?: number;
-  onTosChange?: (agreed: boolean) => void;
-  feeDetails?: FeeDetails;
-  mintDetails?: MintDetails;
-  maraMode?: boolean;
-  maraFeeRate?: number | null;
-  isLoadingMaraFee?: boolean;
-  progressIndicator?: preact.ComponentChildren;
-}
 
 export function FeeCalculatorBase({
   fee,
   handleChangeFee,
-  BTCPrice,
+  BTCPrice = 0, // Default to 0 if not provided
   isSubmitting,
   onSubmit,
   onCancel,
@@ -329,12 +287,12 @@ export function FeeCalculatorBase({
         >
           <input
             type="range"
-            value={feeToSliderPos(fee)}
+            value={feeToSliderPos(fee ?? 1)}
             min="0"
             max="100"
             step="0.25"
             onChange={(e) => {
-              if (!maraMode) {
+              if (!maraMode && handleChangeFee) {
                 handleChangeFee(
                   sliderPosToFee(
                     parseFloat((e.target as HTMLInputElement).value),
@@ -343,7 +301,7 @@ export function FeeCalculatorBase({
               }
             }}
             onInput={(e) => {
-              if (!maraMode) {
+              if (!maraMode && handleChangeFee) {
                 handleChangeFee(
                   sliderPosToFee(
                     parseFloat((e.target as HTMLInputElement).value),
@@ -461,7 +419,8 @@ export function FeeCalculatorBase({
                     ? formatSatoshisToBTC(feeDetails.minerFee, {
                       includeSymbol: false,
                     })
-                    : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice)}{" "}
+                    : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice ?? 0)}
+                  {" "}
                   <span class="font-light">{coinType}</span>
                   {!feeDetails?.hasExactFees && (
                     <span class="text-stamp-grey-light text-xs ml-1 opacity-70">
@@ -488,7 +447,8 @@ export function FeeCalculatorBase({
                 ? formatSatoshisToBTC(feeDetails.serviceFee, {
                   includeSymbol: false,
                 })
-                : formatSatoshisToUSD(feeDetails.serviceFee, BTCPrice)}{" "}
+                : formatSatoshisToUSD(feeDetails.serviceFee, BTCPrice ?? 0)}
+              {" "}
               <span class="font-light">{coinType}</span>
             </h6>
           )}
@@ -506,9 +466,10 @@ export function FeeCalculatorBase({
                       ? formatSatoshisToBTC(feeDetails.dustValue, {
                         includeSymbol: false,
                       })
-                      : formatSatoshisToUSD(feeDetails.dustValue, BTCPrice)}
-                    {" "}
-                    <span class="font-light">{coinType}</span>
+                      : formatSatoshisToUSD(
+                        feeDetails.dustValue,
+                        BTCPrice ?? 0,
+                      )} <span class="font-light">{coinType}</span>
                   </>
                 )
                 : <span class="animate-pulse">0.00000000</span>}
@@ -545,12 +506,13 @@ export function FeeCalculatorBase({
                 ? (
                   <>
                     {coinType === "BTC"
-                      ? formatSatoshisToBTC(feeDetails.itemPrice, {
+                      ? formatSatoshisToBTC(feeDetails.itemPrice ?? 0, {
                         includeSymbol: false,
                       })
-                      : formatSatoshisToUSD(feeDetails.itemPrice, BTCPrice)}
-                    {" "}
-                    <span class="font-light">{coinType}</span>
+                      : formatSatoshisToUSD(
+                        feeDetails.itemPrice ?? 0,
+                        BTCPrice ?? 0,
+                      )} <span class="font-light">{coinType}</span>
                   </>
                 )
                 : (
@@ -584,12 +546,13 @@ export function FeeCalculatorBase({
                 ? (
                   <>
                     {coinType === "BTC"
-                      ? formatSatoshisToBTC(feeDetails.itemPrice, {
+                      ? formatSatoshisToBTC(feeDetails.itemPrice ?? 0, {
                         includeSymbol: false,
                       })
-                      : formatSatoshisToUSD(feeDetails.itemPrice, BTCPrice)}
-                    {" "}
-                    <span class="font-light">{coinType}</span>
+                      : formatSatoshisToUSD(
+                        feeDetails.itemPrice ?? 0,
+                        BTCPrice ?? 0,
+                      )} <span class="font-light">{coinType}</span>
                   </>
                 )
                 : (
@@ -728,7 +691,7 @@ export function FeeCalculatorBase({
                     ? formatSatoshisToBTC(feeDetails.totalValue, {
                       includeSymbol: false,
                     })
-                    : formatSatoshisToUSD(feeDetails.totalValue, BTCPrice)}
+                    : formatSatoshisToUSD(feeDetails.totalValue, BTCPrice ?? 0)}
                 </>
               )
               : <span class="animate-pulse">0.00000000</span>}{" "}

@@ -1,0 +1,63 @@
+{
+  "batches": [
+    {
+      "batchId": 1,
+      "name": "High-Impact Services and API Routes",
+      "description": "Priority processing of core services, API endpoints, and critical business logic files",
+      "priority": "high",
+      "estimatedFiles": 0,
+      "estimatedDuration": "0 minutes",
+      "dependencies": [],
+      "validationLevel": "comprehensive"
+    },
+    {
+      "batchId": 2,
+      "name": "Core Components and UI Modules",
+      "description": "Frequent usage targets including islands, components, and UI-critical modules",
+      "priority": "high",
+      "estimatedFiles": 0,
+      "estimatedDuration": "0 minutes",
+      "dependencies": [
+        1
+      ],
+      "validationLevel": "comprehensive"
+    },
+    {
+      "batchId": 3,
+      "name": "Utility and Helper Files",
+      "description": "Systematic optimization of lib utilities, helpers, and type definitions",
+      "priority": "medium",
+      "estimatedFiles": 110,
+      "estimatedDuration": "37 minutes",
+      "dependencies": [
+        1,
+        2
+      ],
+      "validationLevel": "standard"
+    },
+    {
+      "batchId": 4,
+      "name": "Test Files and Configuration",
+      "description": "Final consistency pass for test files, configuration, and edge cases",
+      "priority": "low",
+      "estimatedFiles": 8,
+      "estimatedDuration": "2 minutes",
+      "dependencies": [
+        1,
+        2,
+        3
+      ],
+      "validationLevel": "minimal"
+    }
+  ],
+  "executionOrder": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "totalFiles": 118,
+  "estimatedDuration": "39 minutes",
+  "parallelExecutionCompatible": false,
+  "rollbackStrategy": "\n**Rollback Strategy for Import Alias Optimization**\n\n1. **Git-based Rollback**:\n   - Each batch creates a separate commit for easy rollback\n   - Use: git revert [commit-hash] for specific batch rollback\n   - Full rollback: git reset --hard [pre-batch commit]\n\n2. **Backup Strategy**:\n   - Create backup branch before starting: git checkout -b backup/pre-import-optimization\n   - Preserve original file patterns in backup files\n   - Document all changes in batch reports\n\n3. **Validation Checkpoints**:\n   - TypeScript compilation must pass after each batch\n   - Test suite execution required for high-priority batches\n   - Performance benchmarks for critical paths\n\n4. **Automated Rollback Triggers**:\n   - Compilation errors: Auto-rollback affected batch\n   - Test failures: Selective rollback with manual review\n   - Performance degradation >10%: Full rollback recommended\n\n5. **Recovery Procedures**:\n   - Use TypeScript compiler errors to identify problematic imports\n   - Selective file restoration from backup branch\n   - Re-run analysis to identify remaining improvements post-rollback\n"
+}

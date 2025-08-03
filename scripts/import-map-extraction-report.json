@@ -1,0 +1,1399 @@
+{
+  "totalAliases": 198,
+  "corePaths": [
+    {
+      "alias": "$/",
+      "originalPath": "./",
+      "pathType": "core",
+      "category": "general"
+    },
+    {
+      "alias": "$client/",
+      "originalPath": "./client/",
+      "pathType": "core",
+      "category": "general"
+    },
+    {
+      "alias": "$components/",
+      "originalPath": "./components/",
+      "pathType": "core",
+      "category": "components"
+    },
+    {
+      "alias": "$constants",
+      "originalPath": "./lib/constants/index.ts",
+      "pathType": "core",
+      "category": "general"
+    },
+    {
+      "alias": "$globals",
+      "originalPath": "./globals.d.ts",
+      "pathType": "core",
+      "category": "general"
+    },
+    {
+      "alias": "$handlers/",
+      "originalPath": "./routes/handlers/",
+      "pathType": "core",
+      "category": "general"
+    },
+    {
+      "alias": "$islands/",
+      "originalPath": "./islands/",
+      "pathType": "core",
+      "category": "islands"
+    },
+    {
+      "alias": "$lib/",
+      "originalPath": "./lib/",
+      "pathType": "core",
+      "category": "general"
+    },
+    {
+      "alias": "$routes/",
+      "originalPath": "./routes/",
+      "pathType": "core",
+      "category": "general"
+    },
+    {
+      "alias": "$server/",
+      "originalPath": "./server/",
+      "pathType": "core",
+      "category": "server"
+    },
+    {
+      "alias": "$types/",
+      "originalPath": "./lib/types/",
+      "pathType": "core",
+      "category": "types"
+    },
+    {
+      "alias": "$utils/",
+      "originalPath": "./lib/utils/",
+      "pathType": "core",
+      "category": "general"
+    }
+  ],
+  "utilityPaths": [
+    {
+      "alias": "stream",
+      "originalPath": "node:stream",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "stream/promises",
+      "originalPath": "node:stream/promises",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "stream/consumers",
+      "originalPath": "node:stream/consumers",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "stream/web",
+      "originalPath": "node:stream/web",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "events",
+      "originalPath": "node:events",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "buffer",
+      "originalPath": "node:buffer",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "crypto",
+      "originalPath": "node:crypto",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "tls",
+      "originalPath": "node:tls",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "net",
+      "originalPath": "node:net",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "dns",
+      "originalPath": "node:dns",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "dns/promises",
+      "originalPath": "node:dns/promises",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@preact/signals",
+      "originalPath": "https://esm.sh/*@preact/signals@1.2.2",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@preact/signals-core",
+      "originalPath": "https://esm.sh/*@preact/signals-core@1.5.1",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@std/assert",
+      "originalPath": "jsr:/@std/assert@^1.0.9",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@std/async",
+      "originalPath": "jsr:/@std/async@^1.0.5",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@std/crypto",
+      "originalPath": "jsr:@std/crypto@^1.0.3",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@std/dotenv",
+      "originalPath": "jsr:/@std/dotenv@^0.225.2",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@std/encoding",
+      "originalPath": "jsr:@std/encoding@^1.0.5",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@std/fs",
+      "originalPath": "jsr:/@std/fs@^1.0.5",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@std/log",
+      "originalPath": "jsr:/@std/log@0.224.0",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@std/path",
+      "originalPath": "jsr:/@std/path@^0.219.1",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@std/testing",
+      "originalPath": "jsr:/@std/testing@^1.0.6",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "@std/yaml",
+      "originalPath": "jsr:/@std/yaml@^0.219.1",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "axiod",
+      "originalPath": "https://deno.land/x/axiod@0.26.2/mod.ts",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "bitcoinjs-lib",
+      "originalPath": "npm:bitcoinjs-lib@7.0.0-rc.0",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "big",
+      "originalPath": "https://esm.sh/big.js@6.2.1",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "bigfloat/",
+      "originalPath": "https://deno.land/x/bigfloat@v3.0.2/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "compress",
+      "originalPath": "https://deno.land/x/foras@v2.1.4/src/deno/mod.ts",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "dayjs",
+      "originalPath": "https://esm.sh/dayjs@1.11.10",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "dayjs/",
+      "originalPath": "https://esm.sh/dayjs@1.11.10/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "djwt/",
+      "originalPath": "https://deno.land/x/djwt@v3.0.2/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "dom",
+      "originalPath": "https://deno.land/x/deno_dom@v0.1.49/deno-dom-wasm.ts",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "flatpickr",
+      "originalPath": "https://esm.sh/flatpickr@4.6.13",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "flatpickr/",
+      "originalPath": "https://esm.sh/flatpickr@4.6.13/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "$fresh/",
+      "originalPath": "https://deno.land/x/fresh@1.7.3/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "fresh_charts/",
+      "originalPath": "https://deno.land/x/fresh_charts@0.3.1/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "fresh/tests/",
+      "originalPath": "https://deno.land/x/fresh@1.7.6/tests/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "msgpack",
+      "originalPath": "https://deno.land/x/msgpack@v1.4/mod.ts",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "mysql/",
+      "originalPath": "https://deno.land/x/mysql@v2.12.1/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "preact",
+      "originalPath": "https://esm.sh/preact@10.22.0",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "preact/",
+      "originalPath": "https://esm.sh/preact@10.22.0/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "puppeteer",
+      "originalPath": "https://deno.land/x/puppeteer@16.2.0/mod.ts",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "qrcode",
+      "originalPath": "https://esm.sh/qrcode@1.5.1",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "redis",
+      "originalPath": "https://deno.land/x/redis@v0.32.4/mod.ts",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "swiper/",
+      "originalPath": "https://esm.sh/swiper@11.1.14/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "swiper",
+      "originalPath": "https://esm.sh/swiper@11.1.14",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "sweetalert2",
+      "originalPath": "https://esm.sh/sweetalert2@11.15.10",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "tailwindcss",
+      "originalPath": "npm:tailwindcss@3.4.17",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "tailwindcss/",
+      "originalPath": "npm:tailwindcss@3.4.17/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "tailwindcss/plugin",
+      "originalPath": "npm:tailwindcss@3.4.17/plugin.js",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "tiny-secp256k1",
+      "originalPath": "npm:tiny-secp256k1@2.2.3",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "js-beautify",
+      "originalPath": "https://esm.sh/js-beautify@1.15.4",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "highcharts",
+      "originalPath": "https://esm.sh/highcharts@11.2.0",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "highcharts/",
+      "originalPath": "https://esm.sh/highcharts@11.2.0/",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "highcharts-react-official",
+      "originalPath": "https://esm.sh/highcharts-react-official@3.2.1",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "$lib/utils/webResponseUtil.ts",
+      "originalPath": "./lib/utils/api/responses/webResponseUtil.ts",
+      "pathType": "utility",
+      "category": "api"
+    },
+    {
+      "alias": "$lib/utils/apiResponseUtil.ts",
+      "originalPath": "./lib/utils/api/responses/apiResponseUtil.ts",
+      "pathType": "utility",
+      "category": "api"
+    },
+    {
+      "alias": "$lib/utils/responseUtil.ts",
+      "originalPath": "./lib/utils/api/responses/responseUtil.ts",
+      "pathType": "utility",
+      "category": "api"
+    },
+    {
+      "alias": "$lib/utils/logger.ts",
+      "originalPath": "./lib/utils/monitoring/logging/logger.ts",
+      "pathType": "utility",
+      "category": "monitoring"
+    },
+    {
+      "alias": "$lib/utils/formatUtils.ts",
+      "originalPath": "./lib/utils/ui/formatting/formatUtils.ts",
+      "pathType": "utility",
+      "category": "ui"
+    },
+    {
+      "alias": "$lib/utils/imageUtils.ts",
+      "originalPath": "./lib/utils/ui/media/imageUtils.ts",
+      "pathType": "utility",
+      "category": "ui"
+    },
+    {
+      "alias": "$lib/utils/scriptTypeUtils.ts",
+      "originalPath": "./lib/utils/bitcoin/scripts/scriptTypeUtils.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/mempool.ts",
+      "originalPath": "./lib/utils/bitcoin/network/mempool.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/utxoUtils.ts",
+      "originalPath": "./lib/utils/bitcoin/utxo/utxoUtils.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/stampUtils.ts",
+      "originalPath": "./lib/utils/bitcoin/stamps/stampUtils.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/btcCalculations.ts",
+      "originalPath": "./lib/utils/bitcoin/calculations/btcCalculations.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/transactionSizeEstimator.ts",
+      "originalPath": "./lib/utils/bitcoin/transactions/transactionSizeEstimator.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/paginationUtils.ts",
+      "originalPath": "./lib/utils/data/pagination/paginationUtils.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/filterOptions.ts",
+      "originalPath": "./lib/utils/data/filtering/filterOptions.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/sortingConstants.ts",
+      "originalPath": "./lib/utils/data/sorting/sortingConstants.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/numberUtils.ts",
+      "originalPath": "./lib/utils/data/numbers/numberUtils.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/identifierUtils.ts",
+      "originalPath": "./lib/utils/data/identifiers/identifierUtils.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/protocol.ts",
+      "originalPath": "./lib/utils/data/protocols/protocol.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/imageProtocolUtils.ts",
+      "originalPath": "./lib/utils/data/protocols/imageProtocolUtils.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/balanceUtils.ts",
+      "originalPath": "./lib/utils/data/processing/balanceUtils.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/headerUtils.ts",
+      "originalPath": "./lib/utils/api/headers/headerUtils.ts",
+      "pathType": "utility",
+      "category": "api"
+    },
+    {
+      "alias": "$lib/utils/toolEndpointAdapters.ts",
+      "originalPath": "./lib/utils/api/adapters/toolEndpointAdapters.ts",
+      "pathType": "utility",
+      "category": "api"
+    },
+    {
+      "alias": "$lib/utils/versionedApiResponse.ts",
+      "originalPath": "./lib/utils/api/versioning/versionedApiResponse.ts",
+      "pathType": "utility",
+      "category": "api"
+    },
+    {
+      "alias": "$lib/utils/freshNavigationUtils.ts",
+      "originalPath": "./lib/utils/navigation/freshNavigationUtils.ts",
+      "pathType": "utility",
+      "category": "general"
+    },
+    {
+      "alias": "$lib/utils/errorHandlingUtils.ts",
+      "originalPath": "./lib/utils/monitoring/errors/errorHandlingUtils.ts",
+      "pathType": "utility",
+      "category": "monitoring"
+    },
+    {
+      "alias": "$lib/utils/monitoring.ts",
+      "originalPath": "./lib/utils/monitoring/metrics/monitoring.ts",
+      "pathType": "utility",
+      "category": "monitoring"
+    },
+    {
+      "alias": "$lib/utils/notificationUtils.ts",
+      "originalPath": "./lib/utils/monitoring/notifications/notificationUtils.ts",
+      "pathType": "utility",
+      "category": "monitoring"
+    },
+    {
+      "alias": "$lib/utils/debounce.ts",
+      "originalPath": "./lib/utils/performance/debounce.ts",
+      "pathType": "utility",
+      "category": "performance"
+    },
+    {
+      "alias": "$lib/utils/localStorage.ts",
+      "originalPath": "./lib/utils/performance/storage/localStorage.ts",
+      "pathType": "utility",
+      "category": "performance"
+    },
+    {
+      "alias": "$lib/utils/feeSignal.ts",
+      "originalPath": "./lib/utils/performance/signals/feeSignal.ts",
+      "pathType": "utility",
+      "category": "performance"
+    },
+    {
+      "alias": "$lib/utils/fee-estimation-utils.ts",
+      "originalPath": "./lib/utils/performance/fees/fee-estimation-utils.ts",
+      "pathType": "utility",
+      "category": "performance"
+    },
+    {
+      "alias": "$lib/utils/securityUtils.ts",
+      "originalPath": "./lib/utils/security/securityUtils.ts",
+      "pathType": "utility",
+      "category": "security"
+    },
+    {
+      "alias": "$lib/utils/clientSecurityUtils.ts",
+      "originalPath": "./lib/utils/security/clientSecurityUtils.ts",
+      "pathType": "utility",
+      "category": "security"
+    },
+    {
+      "alias": "$lib/utils/securityHeaders.ts",
+      "originalPath": "./lib/utils/security/securityHeaders.ts",
+      "pathType": "utility",
+      "category": "security"
+    },
+    {
+      "alias": "$lib/utils/cryptoUtils.ts",
+      "originalPath": "./lib/utils/security/cryptoUtils.ts",
+      "pathType": "utility",
+      "category": "security"
+    },
+    {
+      "alias": "$lib/utils/svgUtils.ts",
+      "originalPath": "./lib/utils/ui/rendering/svgUtils.ts",
+      "pathType": "utility",
+      "category": "ui"
+    },
+    {
+      "alias": "$lib/utils/emojiUtils.ts",
+      "originalPath": "./lib/utils/ui/formatting/emojiUtils.ts",
+      "pathType": "utility",
+      "category": "ui"
+    },
+    {
+      "alias": "$lib/utils/htmlRenderer.ts",
+      "originalPath": "./lib/utils/ui/rendering/htmlRenderer.ts",
+      "pathType": "utility",
+      "category": "ui"
+    },
+    {
+      "alias": "$lib/utils/localRenderer.ts",
+      "originalPath": "./lib/utils/ui/rendering/localRenderer.ts",
+      "pathType": "utility",
+      "category": "ui"
+    },
+    {
+      "alias": "$lib/utils/accessibilityUtils.ts",
+      "originalPath": "./lib/utils/ui/accessibility/accessibilityUtils.ts",
+      "pathType": "utility",
+      "category": "ui"
+    },
+    {
+      "alias": "$lib/utils/toastSignal.ts",
+      "originalPath": "./lib/utils/ui/notifications/toastSignal.ts",
+      "pathType": "utility",
+      "category": "ui"
+    },
+    {
+      "alias": "$lib/utils/binary/baseUtils.ts",
+      "originalPath": "./lib/utils/data/binary/baseUtils.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/minting/TransactionConstructionService.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/TransactionConstructionService.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/minting/ToolEndpointFeeEstimator.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/ToolEndpointFeeEstimator.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/minting/broadcast.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/broadcast.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/minting/broadcast.build.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/broadcast.build.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/minting/feeCalculations.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/feeCalculations.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/minting/transactionSizes.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/transactionSizes.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/minting/transactionUtils.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/transactionUtils.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/minting/constants.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/constants.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/minting/olga/CIP33.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/olga/CIP33.ts",
+      "pathType": "utility",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$lib/utils/sorting/config.ts",
+      "originalPath": "./lib/utils/data/sorting/config.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/sorting/freshUrlSync.ts",
+      "originalPath": "./lib/utils/data/sorting/freshUrlSync.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/sorting/localStorage.ts",
+      "originalPath": "./lib/utils/data/sorting/localStorage.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/sorting/performance.ts",
+      "originalPath": "./lib/utils/data/sorting/performance.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/sorting/sortStateReducer.ts",
+      "originalPath": "./lib/utils/data/sorting/sortStateReducer.ts",
+      "pathType": "utility",
+      "category": "data"
+    },
+    {
+      "alias": "$lib/utils/src20/errorHandling.tsx",
+      "originalPath": "./lib/utils/bitcoin/src20/errorHandling.tsx",
+      "pathType": "utility",
+      "category": "bitcoin"
+    }
+  ],
+  "componentPaths": [
+    {
+      "alias": "$freshNav",
+      "originalPath": "./lib/utils/freshNavigationUtils.ts",
+      "pathType": "component",
+      "category": "general"
+    },
+    {
+      "alias": "$layout",
+      "originalPath": "./components/layout/index.ts",
+      "pathType": "component",
+      "category": "components"
+    },
+    {
+      "alias": "$header",
+      "originalPath": "./islands/header/index.ts",
+      "pathType": "component",
+      "category": "islands"
+    },
+    {
+      "alias": "$content",
+      "originalPath": "./islands/content/index.ts",
+      "pathType": "component",
+      "category": "islands"
+    },
+    {
+      "alias": "$section",
+      "originalPath": "./islands/section/index.ts",
+      "pathType": "component",
+      "category": "islands"
+    },
+    {
+      "alias": "$card",
+      "originalPath": "./islands/card/index.ts",
+      "pathType": "component",
+      "category": "islands"
+    },
+    {
+      "alias": "$tool",
+      "originalPath": "./islands/tool/index.ts",
+      "pathType": "component",
+      "category": "islands"
+    },
+    {
+      "alias": "$text",
+      "originalPath": "./components/text/styles.ts",
+      "pathType": "component",
+      "category": "components"
+    },
+    {
+      "alias": "$button",
+      "originalPath": "./components/button/index.ts",
+      "pathType": "component",
+      "category": "components"
+    },
+    {
+      "alias": "$icon",
+      "originalPath": "./components/icon/index.ts",
+      "pathType": "component",
+      "category": "components"
+    },
+    {
+      "alias": "$form",
+      "originalPath": "./components/form/index.ts",
+      "pathType": "component",
+      "category": "components"
+    },
+    {
+      "alias": "$notification",
+      "originalPath": "./components/notification/index.ts",
+      "pathType": "component",
+      "category": "components"
+    },
+    {
+      "alias": "$table",
+      "originalPath": "./islands/table/index.ts",
+      "pathType": "component",
+      "category": "islands"
+    },
+    {
+      "alias": "$fee",
+      "originalPath": "./components/fee/index.ts",
+      "pathType": "component",
+      "category": "components"
+    },
+    {
+      "alias": "$fees",
+      "originalPath": "./lib/hooks/useFees.ts",
+      "pathType": "component",
+      "category": "general"
+    },
+    {
+      "alias": "$animation",
+      "originalPath": "./lib/hooks/useAnimationControls.ts",
+      "pathType": "component",
+      "category": "general"
+    },
+    {
+      "alias": "$progressiveFees",
+      "originalPath": "./lib/hooks/useProgressiveFeeEstimation.ts",
+      "pathType": "component",
+      "category": "general"
+    }
+  ],
+  "duplicatePaths": [
+    {
+      "alias": "$/lib/utils/webResponseUtil.ts",
+      "originalPath": "./lib/utils/api/responses/webResponseUtil.ts",
+      "pathType": "duplicate",
+      "category": "api"
+    },
+    {
+      "alias": "$/lib/utils/apiResponseUtil.ts",
+      "originalPath": "./lib/utils/api/responses/apiResponseUtil.ts",
+      "pathType": "duplicate",
+      "category": "api"
+    },
+    {
+      "alias": "$/lib/utils/responseUtil.ts",
+      "originalPath": "./lib/utils/api/responses/responseUtil.ts",
+      "pathType": "duplicate",
+      "category": "api"
+    },
+    {
+      "alias": "$/lib/utils/logger.ts",
+      "originalPath": "./lib/utils/monitoring/logging/logger.ts",
+      "pathType": "duplicate",
+      "category": "monitoring"
+    },
+    {
+      "alias": "$/lib/utils/formatUtils.ts",
+      "originalPath": "./lib/utils/ui/formatting/formatUtils.ts",
+      "pathType": "duplicate",
+      "category": "ui"
+    },
+    {
+      "alias": "$/lib/utils/imageUtils.ts",
+      "originalPath": "./lib/utils/ui/media/imageUtils.ts",
+      "pathType": "duplicate",
+      "category": "ui"
+    },
+    {
+      "alias": "$/lib/utils/scriptTypeUtils.ts",
+      "originalPath": "./lib/utils/bitcoin/scripts/scriptTypeUtils.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/mempool.ts",
+      "originalPath": "./lib/utils/bitcoin/network/mempool.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/utxoUtils.ts",
+      "originalPath": "./lib/utils/bitcoin/utxo/utxoUtils.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/stampUtils.ts",
+      "originalPath": "./lib/utils/bitcoin/stamps/stampUtils.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/btcCalculations.ts",
+      "originalPath": "./lib/utils/bitcoin/calculations/btcCalculations.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/transactionSizeEstimator.ts",
+      "originalPath": "./lib/utils/bitcoin/transactions/transactionSizeEstimator.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/paginationUtils.ts",
+      "originalPath": "./lib/utils/data/pagination/paginationUtils.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/filterOptions.ts",
+      "originalPath": "./lib/utils/data/filtering/filterOptions.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/sortingConstants.ts",
+      "originalPath": "./lib/utils/data/sorting/sortingConstants.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/numberUtils.ts",
+      "originalPath": "./lib/utils/data/numbers/numberUtils.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/identifierUtils.ts",
+      "originalPath": "./lib/utils/data/identifiers/identifierUtils.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/protocol.ts",
+      "originalPath": "./lib/utils/data/protocols/protocol.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/imageProtocolUtils.ts",
+      "originalPath": "./lib/utils/data/protocols/imageProtocolUtils.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/balanceUtils.ts",
+      "originalPath": "./lib/utils/data/processing/balanceUtils.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/headerUtils.ts",
+      "originalPath": "./lib/utils/api/headers/headerUtils.ts",
+      "pathType": "duplicate",
+      "category": "api"
+    },
+    {
+      "alias": "$/lib/utils/toolEndpointAdapters.ts",
+      "originalPath": "./lib/utils/api/adapters/toolEndpointAdapters.ts",
+      "pathType": "duplicate",
+      "category": "api"
+    },
+    {
+      "alias": "$/lib/utils/versionedApiResponse.ts",
+      "originalPath": "./lib/utils/api/versioning/versionedApiResponse.ts",
+      "pathType": "duplicate",
+      "category": "api"
+    },
+    {
+      "alias": "$/lib/utils/freshNavigationUtils.ts",
+      "originalPath": "./lib/utils/navigation/freshNavigationUtils.ts",
+      "pathType": "duplicate",
+      "category": "general"
+    },
+    {
+      "alias": "$/lib/utils/errorHandlingUtils.ts",
+      "originalPath": "./lib/utils/monitoring/errors/errorHandlingUtils.ts",
+      "pathType": "duplicate",
+      "category": "monitoring"
+    },
+    {
+      "alias": "$/lib/utils/monitoring.ts",
+      "originalPath": "./lib/utils/monitoring/metrics/monitoring.ts",
+      "pathType": "duplicate",
+      "category": "monitoring"
+    },
+    {
+      "alias": "$/lib/utils/notificationUtils.ts",
+      "originalPath": "./lib/utils/monitoring/notifications/notificationUtils.ts",
+      "pathType": "duplicate",
+      "category": "monitoring"
+    },
+    {
+      "alias": "$/lib/utils/debounce.ts",
+      "originalPath": "./lib/utils/performance/debounce.ts",
+      "pathType": "duplicate",
+      "category": "performance"
+    },
+    {
+      "alias": "$/lib/utils/localStorage.ts",
+      "originalPath": "./lib/utils/performance/storage/localStorage.ts",
+      "pathType": "duplicate",
+      "category": "performance"
+    },
+    {
+      "alias": "$/lib/utils/feeSignal.ts",
+      "originalPath": "./lib/utils/performance/signals/feeSignal.ts",
+      "pathType": "duplicate",
+      "category": "performance"
+    },
+    {
+      "alias": "$/lib/utils/fee-estimation-utils.ts",
+      "originalPath": "./lib/utils/performance/fees/fee-estimation-utils.ts",
+      "pathType": "duplicate",
+      "category": "performance"
+    },
+    {
+      "alias": "$/lib/utils/securityUtils.ts",
+      "originalPath": "./lib/utils/security/securityUtils.ts",
+      "pathType": "duplicate",
+      "category": "security"
+    },
+    {
+      "alias": "$/lib/utils/clientSecurityUtils.ts",
+      "originalPath": "./lib/utils/security/clientSecurityUtils.ts",
+      "pathType": "duplicate",
+      "category": "security"
+    },
+    {
+      "alias": "$/lib/utils/securityHeaders.ts",
+      "originalPath": "./lib/utils/security/securityHeaders.ts",
+      "pathType": "duplicate",
+      "category": "security"
+    },
+    {
+      "alias": "$/lib/utils/cryptoUtils.ts",
+      "originalPath": "./lib/utils/security/cryptoUtils.ts",
+      "pathType": "duplicate",
+      "category": "security"
+    },
+    {
+      "alias": "$/lib/utils/svgUtils.ts",
+      "originalPath": "./lib/utils/ui/rendering/svgUtils.ts",
+      "pathType": "duplicate",
+      "category": "ui"
+    },
+    {
+      "alias": "$/lib/utils/emojiUtils.ts",
+      "originalPath": "./lib/utils/ui/formatting/emojiUtils.ts",
+      "pathType": "duplicate",
+      "category": "ui"
+    },
+    {
+      "alias": "$/lib/utils/htmlRenderer.ts",
+      "originalPath": "./lib/utils/ui/rendering/htmlRenderer.ts",
+      "pathType": "duplicate",
+      "category": "ui"
+    },
+    {
+      "alias": "$/lib/utils/localRenderer.ts",
+      "originalPath": "./lib/utils/ui/rendering/localRenderer.ts",
+      "pathType": "duplicate",
+      "category": "ui"
+    },
+    {
+      "alias": "$/lib/utils/accessibilityUtils.ts",
+      "originalPath": "./lib/utils/ui/accessibility/accessibilityUtils.ts",
+      "pathType": "duplicate",
+      "category": "ui"
+    },
+    {
+      "alias": "$/lib/utils/toastSignal.ts",
+      "originalPath": "./lib/utils/ui/notifications/toastSignal.ts",
+      "pathType": "duplicate",
+      "category": "ui"
+    },
+    {
+      "alias": "$/lib/utils/binary/baseUtils.ts",
+      "originalPath": "./lib/utils/data/binary/baseUtils.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/minting/TransactionConstructionService.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/TransactionConstructionService.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/minting/ToolEndpointFeeEstimator.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/ToolEndpointFeeEstimator.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/minting/broadcast.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/broadcast.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/minting/broadcast.build.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/broadcast.build.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/minting/feeCalculations.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/feeCalculations.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/minting/transactionSizes.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/transactionSizes.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/minting/transactionUtils.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/transactionUtils.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/minting/constants.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/constants.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/minting/olga/CIP33.ts",
+      "originalPath": "./lib/utils/bitcoin/minting/olga/CIP33.ts",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    },
+    {
+      "alias": "$/lib/utils/sorting/config.ts",
+      "originalPath": "./lib/utils/data/sorting/config.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/sorting/freshUrlSync.ts",
+      "originalPath": "./lib/utils/data/sorting/freshUrlSync.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/sorting/localStorage.ts",
+      "originalPath": "./lib/utils/data/sorting/localStorage.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/sorting/performance.ts",
+      "originalPath": "./lib/utils/data/sorting/performance.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/sorting/sortStateReducer.ts",
+      "originalPath": "./lib/utils/data/sorting/sortStateReducer.ts",
+      "pathType": "duplicate",
+      "category": "data"
+    },
+    {
+      "alias": "$/lib/utils/src20/errorHandling.tsx",
+      "originalPath": "./lib/utils/bitcoin/src20/errorHandling.tsx",
+      "pathType": "duplicate",
+      "category": "bitcoin"
+    }
+  ],
+  "conversionMapping": {
+    "stream": "node:stream",
+    "stream/promises": "node:stream/promises",
+    "stream/consumers": "node:stream/consumers",
+    "stream/web": "node:stream/web",
+    "events": "node:events",
+    "buffer": "node:buffer",
+    "crypto": "node:crypto",
+    "tls": "node:tls",
+    "net": "node:net",
+    "dns": "node:dns",
+    "dns/promises": "node:dns/promises",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
+    "@std/assert": "jsr:/@std/assert@^1.0.9",
+    "@std/async": "jsr:/@std/async@^1.0.5",
+    "@std/crypto": "jsr:@std/crypto@^1.0.3",
+    "@std/dotenv": "jsr:/@std/dotenv@^0.225.2",
+    "@std/encoding": "jsr:@std/encoding@^1.0.5",
+    "@std/fs": "jsr:/@std/fs@^1.0.5",
+    "@std/log": "jsr:/@std/log@0.224.0",
+    "@std/path": "jsr:/@std/path@^0.219.1",
+    "@std/testing": "jsr:/@std/testing@^1.0.6",
+    "@std/yaml": "jsr:/@std/yaml@^0.219.1",
+    "axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
+    "bitcoinjs-lib": "npm:bitcoinjs-lib@7.0.0-rc.0",
+    "big": "https://esm.sh/big.js@6.2.1",
+    "bigfloat/": "https://deno.land/x/bigfloat@v3.0.2/",
+    "compress": "https://deno.land/x/foras@v2.1.4/src/deno/mod.ts",
+    "dayjs": "https://esm.sh/dayjs@1.11.10",
+    "dayjs/": "https://esm.sh/dayjs@1.11.10/",
+    "djwt/": "https://deno.land/x/djwt@v3.0.2/",
+    "dom": "https://deno.land/x/deno_dom@v0.1.49/deno-dom-wasm.ts",
+    "flatpickr": "https://esm.sh/flatpickr@4.6.13",
+    "flatpickr/": "https://esm.sh/flatpickr@4.6.13/",
+    "$fresh/": "https://deno.land/x/fresh@1.7.3/",
+    "fresh_charts/": "https://deno.land/x/fresh_charts@0.3.1/",
+    "fresh/tests/": "https://deno.land/x/fresh@1.7.6/tests/",
+    "msgpack": "https://deno.land/x/msgpack@v1.4/mod.ts",
+    "mysql/": "https://deno.land/x/mysql@v2.12.1/",
+    "preact": "https://esm.sh/preact@10.22.0",
+    "preact/": "https://esm.sh/preact@10.22.0/",
+    "puppeteer": "https://deno.land/x/puppeteer@16.2.0/mod.ts",
+    "qrcode": "https://esm.sh/qrcode@1.5.1",
+    "redis": "https://deno.land/x/redis@v0.32.4/mod.ts",
+    "swiper/": "https://esm.sh/swiper@11.1.14/",
+    "swiper": "https://esm.sh/swiper@11.1.14",
+    "sweetalert2": "https://esm.sh/sweetalert2@11.15.10",
+    "tailwindcss": "npm:tailwindcss@3.4.17",
+    "tailwindcss/": "npm:tailwindcss@3.4.17/",
+    "tailwindcss/plugin": "npm:tailwindcss@3.4.17/plugin.js",
+    "tiny-secp256k1": "npm:tiny-secp256k1@2.2.3",
+    "js-beautify": "https://esm.sh/js-beautify@1.15.4",
+    "highcharts": "https://esm.sh/highcharts@11.2.0",
+    "highcharts/": "https://esm.sh/highcharts@11.2.0/",
+    "highcharts-react-official": "https://esm.sh/highcharts-react-official@3.2.1",
+    "$/": "../",
+    "$client/": "../client/",
+    "$components/": "../components/",
+    "$constants": "../lib/constants/index.ts",
+    "$globals": "../globals.d.ts",
+    "$handlers/": "../routes/handlers/",
+    "$islands/": "../islands/",
+    "$lib/": "../lib/",
+    "$routes/": "../routes/",
+    "$server/": "../server/",
+    "$types/": "../lib/types/",
+    "$utils/": "../lib/utils/",
+    "$freshNav": "../lib/utils/freshNavigationUtils.ts",
+    "$layout": "../components/layout/index.ts",
+    "$header": "../islands/header/index.ts",
+    "$content": "../islands/content/index.ts",
+    "$section": "../islands/section/index.ts",
+    "$card": "../islands/card/index.ts",
+    "$tool": "../islands/tool/index.ts",
+    "$text": "../components/text/styles.ts",
+    "$button": "../components/button/index.ts",
+    "$icon": "../components/icon/index.ts",
+    "$form": "../components/form/index.ts",
+    "$notification": "../components/notification/index.ts",
+    "$table": "../islands/table/index.ts",
+    "$fee": "../components/fee/index.ts",
+    "$fees": "../lib/hooks/useFees.ts",
+    "$animation": "../lib/hooks/useAnimationControls.ts",
+    "$progressiveFees": "../lib/hooks/useProgressiveFeeEstimation.ts",
+    "$lib/utils/webResponseUtil.ts": "../lib/utils/api/responses/webResponseUtil.ts",
+    "$lib/utils/apiResponseUtil.ts": "../lib/utils/api/responses/apiResponseUtil.ts",
+    "$lib/utils/responseUtil.ts": "../lib/utils/api/responses/responseUtil.ts",
+    "$lib/utils/logger.ts": "../lib/utils/monitoring/logging/logger.ts",
+    "$lib/utils/formatUtils.ts": "../lib/utils/ui/formatting/formatUtils.ts",
+    "$lib/utils/imageUtils.ts": "../lib/utils/ui/media/imageUtils.ts",
+    "$lib/utils/scriptTypeUtils.ts": "../lib/utils/bitcoin/scripts/scriptTypeUtils.ts",
+    "$lib/utils/mempool.ts": "../lib/utils/bitcoin/network/mempool.ts",
+    "$lib/utils/utxoUtils.ts": "../lib/utils/bitcoin/utxo/utxoUtils.ts",
+    "$lib/utils/stampUtils.ts": "../lib/utils/bitcoin/stamps/stampUtils.ts",
+    "$lib/utils/btcCalculations.ts": "../lib/utils/bitcoin/calculations/btcCalculations.ts",
+    "$lib/utils/transactionSizeEstimator.ts": "../lib/utils/bitcoin/transactions/transactionSizeEstimator.ts",
+    "$lib/utils/paginationUtils.ts": "../lib/utils/data/pagination/paginationUtils.ts",
+    "$lib/utils/filterOptions.ts": "../lib/utils/data/filtering/filterOptions.ts",
+    "$lib/utils/sortingConstants.ts": "../lib/utils/data/sorting/sortingConstants.ts",
+    "$lib/utils/numberUtils.ts": "../lib/utils/data/numbers/numberUtils.ts",
+    "$lib/utils/identifierUtils.ts": "../lib/utils/data/identifiers/identifierUtils.ts",
+    "$lib/utils/protocol.ts": "../lib/utils/data/protocols/protocol.ts",
+    "$lib/utils/imageProtocolUtils.ts": "../lib/utils/data/protocols/imageProtocolUtils.ts",
+    "$lib/utils/balanceUtils.ts": "../lib/utils/data/processing/balanceUtils.ts",
+    "$lib/utils/headerUtils.ts": "../lib/utils/api/headers/headerUtils.ts",
+    "$lib/utils/toolEndpointAdapters.ts": "../lib/utils/api/adapters/toolEndpointAdapters.ts",
+    "$lib/utils/versionedApiResponse.ts": "../lib/utils/api/versioning/versionedApiResponse.ts",
+    "$lib/utils/freshNavigationUtils.ts": "../lib/utils/navigation/freshNavigationUtils.ts",
+    "$lib/utils/errorHandlingUtils.ts": "../lib/utils/monitoring/errors/errorHandlingUtils.ts",
+    "$lib/utils/monitoring.ts": "../lib/utils/monitoring/metrics/monitoring.ts",
+    "$lib/utils/notificationUtils.ts": "../lib/utils/monitoring/notifications/notificationUtils.ts",
+    "$lib/utils/debounce.ts": "../lib/utils/performance/debounce.ts",
+    "$lib/utils/localStorage.ts": "../lib/utils/performance/storage/localStorage.ts",
+    "$lib/utils/feeSignal.ts": "../lib/utils/performance/signals/feeSignal.ts",
+    "$lib/utils/fee-estimation-utils.ts": "../lib/utils/performance/fees/fee-estimation-utils.ts",
+    "$lib/utils/securityUtils.ts": "../lib/utils/security/securityUtils.ts",
+    "$lib/utils/clientSecurityUtils.ts": "../lib/utils/security/clientSecurityUtils.ts",
+    "$lib/utils/securityHeaders.ts": "../lib/utils/security/securityHeaders.ts",
+    "$lib/utils/cryptoUtils.ts": "../lib/utils/security/cryptoUtils.ts",
+    "$lib/utils/svgUtils.ts": "../lib/utils/ui/rendering/svgUtils.ts",
+    "$lib/utils/emojiUtils.ts": "../lib/utils/ui/formatting/emojiUtils.ts",
+    "$lib/utils/htmlRenderer.ts": "../lib/utils/ui/rendering/htmlRenderer.ts",
+    "$lib/utils/localRenderer.ts": "../lib/utils/ui/rendering/localRenderer.ts",
+    "$lib/utils/accessibilityUtils.ts": "../lib/utils/ui/accessibility/accessibilityUtils.ts",
+    "$lib/utils/toastSignal.ts": "../lib/utils/ui/notifications/toastSignal.ts",
+    "$lib/utils/binary/baseUtils.ts": "../lib/utils/data/binary/baseUtils.ts",
+    "$lib/utils/minting/TransactionConstructionService.ts": "../lib/utils/bitcoin/minting/TransactionConstructionService.ts",
+    "$lib/utils/minting/ToolEndpointFeeEstimator.ts": "../lib/utils/bitcoin/minting/ToolEndpointFeeEstimator.ts",
+    "$lib/utils/minting/broadcast.ts": "../lib/utils/bitcoin/minting/broadcast.ts",
+    "$lib/utils/minting/broadcast.build.ts": "../lib/utils/bitcoin/minting/broadcast.build.ts",
+    "$lib/utils/minting/feeCalculations.ts": "../lib/utils/bitcoin/minting/feeCalculations.ts",
+    "$lib/utils/minting/transactionSizes.ts": "../lib/utils/bitcoin/minting/transactionSizes.ts",
+    "$lib/utils/minting/transactionUtils.ts": "../lib/utils/bitcoin/minting/transactionUtils.ts",
+    "$lib/utils/minting/constants.ts": "../lib/utils/bitcoin/minting/constants.ts",
+    "$lib/utils/minting/olga/CIP33.ts": "../lib/utils/bitcoin/minting/olga/CIP33.ts",
+    "$lib/utils/sorting/config.ts": "../lib/utils/data/sorting/config.ts",
+    "$lib/utils/sorting/freshUrlSync.ts": "../lib/utils/data/sorting/freshUrlSync.ts",
+    "$lib/utils/sorting/localStorage.ts": "../lib/utils/data/sorting/localStorage.ts",
+    "$lib/utils/sorting/performance.ts": "../lib/utils/data/sorting/performance.ts",
+    "$lib/utils/sorting/sortStateReducer.ts": "../lib/utils/data/sorting/sortStateReducer.ts",
+    "$lib/utils/src20/errorHandling.tsx": "../lib/utils/bitcoin/src20/errorHandling.tsx",
+    "$/lib/utils/webResponseUtil.ts": "../lib/utils/api/responses/webResponseUtil.ts",
+    "$/lib/utils/apiResponseUtil.ts": "../lib/utils/api/responses/apiResponseUtil.ts",
+    "$/lib/utils/responseUtil.ts": "../lib/utils/api/responses/responseUtil.ts",
+    "$/lib/utils/logger.ts": "../lib/utils/monitoring/logging/logger.ts",
+    "$/lib/utils/formatUtils.ts": "../lib/utils/ui/formatting/formatUtils.ts",
+    "$/lib/utils/imageUtils.ts": "../lib/utils/ui/media/imageUtils.ts",
+    "$/lib/utils/scriptTypeUtils.ts": "../lib/utils/bitcoin/scripts/scriptTypeUtils.ts",
+    "$/lib/utils/mempool.ts": "../lib/utils/bitcoin/network/mempool.ts",
+    "$/lib/utils/utxoUtils.ts": "../lib/utils/bitcoin/utxo/utxoUtils.ts",
+    "$/lib/utils/stampUtils.ts": "../lib/utils/bitcoin/stamps/stampUtils.ts",
+    "$/lib/utils/btcCalculations.ts": "../lib/utils/bitcoin/calculations/btcCalculations.ts",
+    "$/lib/utils/transactionSizeEstimator.ts": "../lib/utils/bitcoin/transactions/transactionSizeEstimator.ts",
+    "$/lib/utils/paginationUtils.ts": "../lib/utils/data/pagination/paginationUtils.ts",
+    "$/lib/utils/filterOptions.ts": "../lib/utils/data/filtering/filterOptions.ts",
+    "$/lib/utils/sortingConstants.ts": "../lib/utils/data/sorting/sortingConstants.ts",
+    "$/lib/utils/numberUtils.ts": "../lib/utils/data/numbers/numberUtils.ts",
+    "$/lib/utils/identifierUtils.ts": "../lib/utils/data/identifiers/identifierUtils.ts",
+    "$/lib/utils/protocol.ts": "../lib/utils/data/protocols/protocol.ts",
+    "$/lib/utils/imageProtocolUtils.ts": "../lib/utils/data/protocols/imageProtocolUtils.ts",
+    "$/lib/utils/balanceUtils.ts": "../lib/utils/data/processing/balanceUtils.ts",
+    "$/lib/utils/headerUtils.ts": "../lib/utils/api/headers/headerUtils.ts",
+    "$/lib/utils/toolEndpointAdapters.ts": "../lib/utils/api/adapters/toolEndpointAdapters.ts",
+    "$/lib/utils/versionedApiResponse.ts": "../lib/utils/api/versioning/versionedApiResponse.ts",
+    "$/lib/utils/freshNavigationUtils.ts": "../lib/utils/navigation/freshNavigationUtils.ts",
+    "$/lib/utils/errorHandlingUtils.ts": "../lib/utils/monitoring/errors/errorHandlingUtils.ts",
+    "$/lib/utils/monitoring.ts": "../lib/utils/monitoring/metrics/monitoring.ts",
+    "$/lib/utils/notificationUtils.ts": "../lib/utils/monitoring/notifications/notificationUtils.ts",
+    "$/lib/utils/debounce.ts": "../lib/utils/performance/debounce.ts",
+    "$/lib/utils/localStorage.ts": "../lib/utils/performance/storage/localStorage.ts",
+    "$/lib/utils/feeSignal.ts": "../lib/utils/performance/signals/feeSignal.ts",
+    "$/lib/utils/fee-estimation-utils.ts": "../lib/utils/performance/fees/fee-estimation-utils.ts",
+    "$/lib/utils/securityUtils.ts": "../lib/utils/security/securityUtils.ts",
+    "$/lib/utils/clientSecurityUtils.ts": "../lib/utils/security/clientSecurityUtils.ts",
+    "$/lib/utils/securityHeaders.ts": "../lib/utils/security/securityHeaders.ts",
+    "$/lib/utils/cryptoUtils.ts": "../lib/utils/security/cryptoUtils.ts",
+    "$/lib/utils/svgUtils.ts": "../lib/utils/ui/rendering/svgUtils.ts",
+    "$/lib/utils/emojiUtils.ts": "../lib/utils/ui/formatting/emojiUtils.ts",
+    "$/lib/utils/htmlRenderer.ts": "../lib/utils/ui/rendering/htmlRenderer.ts",
+    "$/lib/utils/localRenderer.ts": "../lib/utils/ui/rendering/localRenderer.ts",
+    "$/lib/utils/accessibilityUtils.ts": "../lib/utils/ui/accessibility/accessibilityUtils.ts",
+    "$/lib/utils/toastSignal.ts": "../lib/utils/ui/notifications/toastSignal.ts",
+    "$/lib/utils/binary/baseUtils.ts": "../lib/utils/data/binary/baseUtils.ts",
+    "$/lib/utils/minting/TransactionConstructionService.ts": "../lib/utils/bitcoin/minting/TransactionConstructionService.ts",
+    "$/lib/utils/minting/ToolEndpointFeeEstimator.ts": "../lib/utils/bitcoin/minting/ToolEndpointFeeEstimator.ts",
+    "$/lib/utils/minting/broadcast.ts": "../lib/utils/bitcoin/minting/broadcast.ts",
+    "$/lib/utils/minting/broadcast.build.ts": "../lib/utils/bitcoin/minting/broadcast.build.ts",
+    "$/lib/utils/minting/feeCalculations.ts": "../lib/utils/bitcoin/minting/feeCalculations.ts",
+    "$/lib/utils/minting/transactionSizes.ts": "../lib/utils/bitcoin/minting/transactionSizes.ts",
+    "$/lib/utils/minting/transactionUtils.ts": "../lib/utils/bitcoin/minting/transactionUtils.ts",
+    "$/lib/utils/minting/constants.ts": "../lib/utils/bitcoin/minting/constants.ts",
+    "$/lib/utils/minting/olga/CIP33.ts": "../lib/utils/bitcoin/minting/olga/CIP33.ts",
+    "$/lib/utils/sorting/config.ts": "../lib/utils/data/sorting/config.ts",
+    "$/lib/utils/sorting/freshUrlSync.ts": "../lib/utils/data/sorting/freshUrlSync.ts",
+    "$/lib/utils/sorting/localStorage.ts": "../lib/utils/data/sorting/localStorage.ts",
+    "$/lib/utils/sorting/performance.ts": "../lib/utils/data/sorting/performance.ts",
+    "$/lib/utils/sorting/sortStateReducer.ts": "../lib/utils/data/sorting/sortStateReducer.ts",
+    "$/lib/utils/src20/errorHandling.tsx": "../lib/utils/bitcoin/src20/errorHandling.tsx"
+  }
+}

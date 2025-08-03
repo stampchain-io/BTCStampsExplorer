@@ -1,19 +1,10 @@
 import { HoldersPieChart, HoldersTableBase } from "$table";
+import type { HoldersTableProps } from "$types/ui.d.ts";
 import { containerBackground } from "$layout";
 import { labelSm, value3xl } from "$text";
 
-interface Holder {
-  address?: string;
-  amt: string;
-  percentage: string;
-}
-
-interface HoldersTableProps {
-  holders?: Holder[];
-}
-
 export function HoldersTable({ holders = [] }: HoldersTableProps) {
-  if (!holders.length) {
+  if (!holders?.length) {
     return (
       <div class="flex flex-col bg-gradient-to-br primary-gradient p-6 relative rounded-lg">
         <div class="text-center py-10">No holder data available</div>
@@ -21,7 +12,7 @@ export function HoldersTable({ holders = [] }: HoldersTableProps) {
     );
   }
 
-  const totalHolders = holders.length;
+  const totalHolders = holders?.length ?? 0;
 
   return (
     <div class={containerBackground}>

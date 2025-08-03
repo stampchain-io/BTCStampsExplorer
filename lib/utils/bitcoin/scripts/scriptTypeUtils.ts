@@ -35,7 +35,15 @@ export function isP2TR(script: string | Uint8Array): boolean {
 }
 
 // Address format validation
+/**
+ * @deprecated Use isValidBitcoinAddress from lib/utils/typeGuards.ts instead
+ */
 export function isValidBitcoinAddress(address: string): boolean {
+  console.warn(
+    "DEPRECATION WARNING: isValidBitcoinAddress from scriptTypeUtils is deprecated. " +
+      "Please import from lib/utils/typeGuards.ts instead.",
+  );
+
   const p2pkhRegex = /^1[1-9A-HJ-NP-Za-km-z]{25,34}$/; // Legacy P2PKH
   const p2shRegex = /^3[1-9A-HJ-NP-Za-km-z]{25,34}$/; // P2SH
   const bech32Regex = /^(bc1q)[0-9a-z]{38,59}$/; // Bech32 P2WPKH
@@ -97,9 +105,11 @@ export function getScriptTypeInfo(
 
   // Handle cases where TX_CONSTANTS doesn't have the script type
   const constants = TX_CONSTANTS as Record<string, unknown>;
-  const typeConstants = constants[type] as
-    | { size: number; isWitness: boolean }
-    | undefined;
+  const typeConstants = type
+    ? constants[type] as
+      | { size: number; isWitness: boolean }
+      | undefined
+    : undefined;
 
   if (typeConstants) {
     return {

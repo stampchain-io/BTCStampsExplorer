@@ -4,14 +4,14 @@
  */
 
 import { assertEquals } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { restore, stub } from "@std/testing/mock";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { restore, stub } from "@std/testing@1.0.14/mock";
 import { SRC20TransactionService } from "$server/services/src20/transactionService.ts";
 // Import from operations directly to avoid circular dependency
 import { SRC20OperationService } from "$server/services/src20/operations/src20Operations.ts";
 // TX and TXError types are used for type checking in the service but not directly in tests
-import type { InputData } from "$types/index.d.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import type { InputData } from "$types/src20.d.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 // Test fixtures
 const mockDeployResult = {

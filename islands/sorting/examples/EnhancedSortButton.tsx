@@ -9,12 +9,7 @@ import {
   useSortingMetrics,
 } from "$islands/sorting/SortingProvider.tsx";
 import { useMemo } from "preact/hooks";
-
-interface EnhancedSortButtonProps {
-  enableAdvancedSorting?: boolean;
-  showMetrics?: boolean;
-  className?: string;
-}
+import type { EnhancedSortButtonProps } from "$types/ui.d.ts";
 
 export function EnhancedSortButton({
   enableAdvancedSorting = false,

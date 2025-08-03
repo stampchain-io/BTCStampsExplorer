@@ -1,5 +1,5 @@
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 /**
  * Security guard for internal API endpoints that need to be accessible from our frontend

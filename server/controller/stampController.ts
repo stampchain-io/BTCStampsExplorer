@@ -1,27 +1,26 @@
-import {
-  HolderRow, PaginatedStampBalanceResponseBody,
-  ProcessedHolder, STAMP_EDITIONS, STAMP_FILESIZES, STAMP_FILETYPES, STAMP_FILTER_TYPES, STAMP_MARKETPLACE,
-  STAMP_RANGES, STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES, StampBalance, StampRow, SUBPROTOCOLS
-} from "$globals";
-import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$constants";
+import type { StampEdition, StampFilesize, StampFiletype, StampFilterType, StampMarketplace, StampRange, StampSuffixFilter } from "$constants";
+import { BIG_LIMIT, CAROUSEL_STAMP_IDS, STAMP_TYPES as STAMP_TYPE_CONSTANTS, type StampType } from "$constants";
 import { filterOptions } from "$lib/utils/data/filtering/filterOptions.ts";
+import { CollectionController } from "$server/controller/collectionController.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { StampService } from "$server/services/stampService.ts";
-import { CollectionController } from "./collectionController.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
+import { SUBPROTOCOLS } from "$types/base.d.ts";
 // import { formatSatoshisToBTC } from "$lib/utils/ui/formatting/formatUtils.ts"; // Fixed: Removed unused import
-import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
-import { decodeBase64 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
-import { isCpid } from "$lib/utils/data/identifiers/identifierUtils.ts";
-import { detectContentType, getMimeType } from "$lib/utils/ui/media/imageUtils.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { API_RESPONSE_VERSION, ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
-import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { isCpid } from "$lib/utils/typeGuards.ts";
+import { decodeBase64 } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { detectContentType, getMimeType } from "$lib/utils/ui/media/imageUtils.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
+import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import type { PaginatedStampBalanceResponseBody } from "$types/api.d.ts";
+import type { StampBalance, StampRow } from "$types/stamp.d.ts";
+import type { HolderRow, ProcessedHolder } from "$types/wallet.d.ts";
 
 export class StampController {
   static async getStamps({
@@ -29,7 +28,7 @@ export class StampController {
     limit = BIG_LIMIT,
     sortBy = "DESC",
     type = "all",
-    filterBy = [] as STAMP_FILTER_TYPES[],
+    filterBy = [] as StampFilterType[],
     ident,
     collectionId,
     identifier,
@@ -93,7 +92,7 @@ export class StampController {
     enrichWithAssetInfo?: boolean;
     skipTotalCount?: boolean;
     collectionId?: string | undefined;
-    type?: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
+    type?: StampType;
     allColumns?: boolean;
     identifier?: string | number | (string | number)[];
     blockIdentifier?: string | number;
@@ -104,25 +103,25 @@ export class StampController {
     groupBy?: string;
     groupBySubquery?: string | boolean;
     cacheType?: RouteType;
-    filterBy?: STAMP_FILTER_TYPES[];
-    fileType?: STAMP_FILETYPES[];
-    editions?: STAMP_EDITIONS[];
-    range?: STAMP_RANGES;
+    filterBy?: StampFilterType[];
+    fileType?: StampFiletype[];
+    editions?: StampEdition[];
+    range?: StampRange;
     rangeMin?: string;
     rangeMax?: string;
-    market?: Extract<STAMP_MARKETPLACE, "listings" | "sales"> | "";
+    market?: Extract<StampMarketplace, "listings" | "sales"> | "";
     dispensers?: boolean;
     atomics?: boolean;
-    listings?: Extract<STAMP_MARKETPLACE, "all" | "bargain" | "affordable" | "premium" | "custom"> | "";
+    listings?: Extract<StampMarketplace, "all" | "bargain" | "affordable" | "premium" | "custom"> | "";
     listingsMin?: string;
     listingsMax?: string;
-    sales?: Extract<STAMP_MARKETPLACE, "recent" | "premium" | "custom" | "volume"> | "";
+    sales?: Extract<StampMarketplace, "recent" | "premium" | "custom" | "volume"> | "";
     salesMin?: string;
     salesMax?: string;
     volume?: "24h" | "7d" | "30d" | "";
     volumeMin?: string;
     volumeMax?: string;
-    fileSize?: STAMP_FILESIZES | null;
+    fileSize?: StampFilesize | null;
     fileSizeMin?: string;
     fileSizeMax?: string;
     // Market Data Filters (Task 42)
@@ -176,10 +175,10 @@ export class StampController {
 
     console.log("About to call repository with range:", range);
 
-    const filterByArray: STAMP_FILTER_TYPES[] = Array.isArray(filterBy)
+    const filterByArray: StampFilterType[] = Array.isArray(filterBy)
       ? filterBy
       : typeof filterBy === "string" && filterBy
-        ? (filterBy as string).split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
+        ? (filterBy as string).split(",").filter(Boolean) as StampFilterType[]
         : [];
 
     // Initialize ident based on type
@@ -204,22 +203,22 @@ export class StampController {
     }
 
     if ((!ident || ident.length === 0) && type) {
-      if (type === "classic") {
+      if (type === STAMP_TYPE_CONSTANTS.CLASSIC) {
         finalIdent = ["STAMP"];
-      } else if (type === "posh") {
+      } else if (type === STAMP_TYPE_CONSTANTS.POSH) {
         finalIdent = [];
-      } else if (type === "stamps") {
+      } else if (type === STAMP_TYPE_CONSTANTS.STAMPS) {
         finalIdent = ["STAMP", "SRC-721"];
-      } else if (type === "src20") {
+      } else if (type === STAMP_TYPE_CONSTANTS.SRC20) {
         finalIdent = ["SRC-20"];
-      } else if (type === "all") {
+      } else if (type === STAMP_TYPE_CONSTANTS.ALL) {
         finalIdent = []; // We'll handle 'all' in the repository
       } else {
         finalIdent = [];
       }
     }
 
-    let filterSuffix: STAMP_SUFFIX_FILTERS[] = [];
+    let filterSuffix: StampSuffixFilter[] = [];
     if (filterByArray.length > 0) {
       // Extract ident and suffix from filterBy
       const identFromFilter = filterByArray.flatMap((filter) =>
@@ -227,7 +226,7 @@ export class StampController {
       );
       filterSuffix = filterByArray.flatMap((filter) =>
         filter in filterOptions ? filterOptions[filter as keyof typeof filterOptions]?.suffixFilters || [] : []
-      ) as STAMP_SUFFIX_FILTERS[];
+      ) as StampSuffixFilter[];
 
       // Combine ident from type and filterBy, removing duplicates
       if (identFromFilter.length > 0) {
@@ -241,8 +240,8 @@ export class StampController {
       suffix = []; // No suffix filter applied
     }
 
-    // Handle custom range - STAMP_RANGES expects string literals, not objects
-    let customRange: STAMP_RANGES | undefined = range;
+    // Handle custom range - StampRange expects string literals, not objects
+    let customRange: StampRange | undefined = range;
     if (!range && url) {
       try {
         const urlObj = new URL(url);
@@ -297,7 +296,7 @@ export class StampController {
       sortBy,
       type,
       ident: finalIdent,
-      suffix: suffix as STAMP_SUFFIX_FILTERS[],
+      suffix: suffix as StampSuffixFilter[],
       allColumns,
       includeSecondary: shouldIncludeSecondary,
       ...(collectionId !== undefined ? { collectionId } : {}),
@@ -398,7 +397,7 @@ export class StampController {
   // This becomes a wrapper around getStamps for backward compatibility
   static getStampDetailsById(
     id: string,
-    stampType: STAMP_TYPES = "all",
+    stampType: StampType = "all",
     cacheType: RouteType = RouteType.STAMP_DETAIL,
     cacheDuration?: number,
     includeSecondary: boolean = true,
@@ -457,7 +456,7 @@ export class StampController {
     options?: {
       dayRange?: number;
       includeFullDetails?: boolean;
-      type?: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
+      type?: StampType;
     }
   ) {
     try {
@@ -531,12 +530,10 @@ export class StampController {
     }
   }
 
-
-
   static async getMultipleStampCategories(categories: {
     idents: SUBPROTOCOLS[];
     limit: number;
-    type: STAMP_TYPES;
+    type: StampType;
     sortBy?: "ASC" | "DESC";
   }[]) {
     const results = await Promise.all(
@@ -567,7 +564,7 @@ export class StampController {
     try {
       console.log("[StampController] getHomePageData started");
       const overallStartTime = Date.now();
-      
+
       // Critical above-the-fold content first
       console.log("[StampController] Starting parallel fetch of carousel, categories, and collections...");
       const parallelStartTime = Date.now();
@@ -600,7 +597,7 @@ export class StampController {
       const poshStartTime = Date.now();
       const poshCollection = await CollectionService.getCollectionByName("posh");
       console.log(`[StampController] Posh collection lookup took ${Date.now() - poshStartTime}ms`);
-      
+
       let poshStamps = [];
       if (poshCollection) {
         console.log("[StampController] Fetching posh stamps with collection_id:", poshCollection.collection_id);
@@ -655,7 +652,7 @@ export class StampController {
         stamps_posh: poshStamps,
         collectionData: collectionData ?? [],
       };
-      
+
       console.log(`[StampController] getHomePageData completed in ${Date.now() - overallStartTime}ms`);
       return result;
 
@@ -695,7 +692,7 @@ export class StampController {
         "posh",
       );
       console.log(`[StampController] Posh collection lookup took ${Date.now() - poshLookupStartTime}ms`);
-      
+
       let stamps_posh = [];
       if (poshCollection) {
         const poshCollectionId = poshCollection.collection_id;
@@ -721,7 +718,7 @@ export class StampController {
         });
         console.log("[StampController] No posh collection found");
       }
-      
+
       const result = {
         stamps_src721: stampCategories[0].stamps,
         stamps_posh,
@@ -730,7 +727,7 @@ export class StampController {
           source: btcPriceData.source
         }
       };
-      
+
       console.log(`[StampController] getCollectionPageData completed in ${Date.now() - overallStartTime}ms`);
       return result;
     } catch (error) {
@@ -763,10 +760,10 @@ export class StampController {
   ) {
     // Use IMAGES_SRC_PATH for CDN requests if available, otherwise fall back to baseUrl
     const imagesSrcPath = Deno.env.get("IMAGES_SRC_PATH");
-    
+
     // Construct the full proxy path
-    const proxyPath = imagesSrcPath 
-      ? `${imagesSrcPath}/${identifier}` 
+    const proxyPath = imagesSrcPath
+      ? `${imagesSrcPath}/${identifier}`
       : `${baseUrl}/stamps/${identifier}`;
 
     try {
@@ -1011,15 +1008,15 @@ export class StampController {
       // Add detailed logging for dispenser data
       console.log("[StampController] Dispenser data details:", {
         total: dispensersData.total,
-        dispensersCount: dispensersData.dispensers.length,
+        dispensersCount: dispensersData.dispensers?.length ?? 0,
         page,
         limit,
-        hasDispensers: dispensersData.dispensers.length > 0,
-        firstDispenser: dispensersData.dispensers[0]?.cpid,
-        lastDispenser: dispensersData.dispensers[dispensersData.dispensers.length - 1]?.cpid
+        hasDispensers: (dispensersData.dispensers?.length ?? 0) > 0,
+        firstDispenser: dispensersData.dispensers?.[0]?.cpid,
+        lastDispenser: dispensersData.dispensers?.[Math.max(0, (dispensersData.dispensers?.length ?? 1) - 1)]?.cpid
       });
 
-      if (!dispensersData.dispensers.length) {
+      if (!(dispensersData.dispensers?.length)) {
         return {
           dispensers: [],
           total: 0
@@ -1027,7 +1024,7 @@ export class StampController {
       }
 
       // Get unique CPIDs from dispensers
-      const uniqueCpids = [...new Set(dispensersData.dispensers.map(d => d.cpid))];
+      const uniqueCpids = [...new Set(dispensersData.dispensers?.map(d => d.cpid) ?? [])];
 
       // Fetch stamps data for all CPIDs
       const stampsData = await this.getStamps({
@@ -1042,10 +1039,10 @@ export class StampController {
       );
 
       // Merge stamp data into dispensers
-      const dispensersWithStamps = dispensersData.dispensers.map(dispenser => ({
+      const dispensersWithStamps = dispensersData.dispensers?.map(dispenser => ({
         ...dispenser,
         stamp: stampsByCpid.get(dispenser.cpid) || null
-      }));
+      })) ?? [];
 
       return {
         dispensers: dispensersWithStamps,

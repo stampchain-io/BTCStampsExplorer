@@ -1,7 +1,8 @@
-#!/usr/bin/env -S deno run --allow-run --allow-read
+#!/usr/bin/env -S deno run --allow-run --allow-read --allow-write
 
 /**
  * Type check only staged TypeScript files
+ * Enhanced for automated pipeline integration
  * Useful for pre-commit hooks and local development
  */
 
@@ -146,9 +147,37 @@ async function main() {
     console.log("🚀 Gradual improvement: fix errors when convenient!");
   }
 
-  // Exit with success regardless of errors (gradual improvement mode)
-  // Uncomment the next line if you want to fail on any type errors:
-  // Deno.exit(filesWithErrors > 0 ? 1 : 0);
+  // Check for strict mode environment variable
+  const strictMode = Deno.env.get("TYPE_CHECK_STRICT") === "true";
+  
+  // Save results for pipeline integration
+  const reportData = {
+    timestamp: new Date().toISOString(),
+    filesChecked: stagedFiles.length,
+    filesWithErrors,
+    totalErrors,
+    results,
+    strictMode
+  };
+  
+  try {
+    await Deno.mkdir("reports/type-testing", { recursive: true });
+    await Deno.writeTextFile(
+      "reports/type-testing/staged-check-latest.json", 
+      JSON.stringify(reportData, null, 2)
+    );
+  } catch {
+    // Ignore write errors in case permissions are restricted
+  }
+
+  // Exit behavior based on mode
+  if (strictMode && filesWithErrors > 0) {
+    console.log("🚫 TYPE_CHECK_STRICT=true: Failing due to type errors");
+    Deno.exit(1);
+  }
+  
+  // Default: Exit with success (gradual improvement mode)
+  // This allows commits to proceed while tracking progress
 }
 
 if (import.meta.main) {

@@ -1,5 +1,6 @@
+import type { TickHandlerContext } from "$types/base.d.ts";
+// Unused imports removed: BlockHandlerContext, IdentHandlerContext, PaginatedTickResponseBody, SRC20TrxRequestParams
 import { Handlers } from "$fresh/server.ts";
-import { TickHandlerContext } from "$globals";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";

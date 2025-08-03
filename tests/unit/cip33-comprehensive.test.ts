@@ -4,7 +4,7 @@
 
 import { CIP33 } from "$lib/utils/bitcoin/minting/olga/CIP33.ts";
 import { assertEquals, assertExists, assertThrows } from "@std/assert";
-import { beforeEach, describe, it } from "@std/testing/bdd";
+import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 // Test fixtures for CIP33 functionality
 const testFixtures = {

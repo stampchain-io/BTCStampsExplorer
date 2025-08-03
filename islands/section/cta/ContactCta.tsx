@@ -1,10 +1,12 @@
 /* TODO @REINAMORA:  Update the contact form to be able to send emails */
 /* ===== CONTACT CTA COMPONENT ===== */
-import { useState } from "preact/hooks";
-import { InputField } from "$form";
 import { ButtonProcessing } from "$button";
-import { subtitleGrey, text, titleGreyLD } from "$text";
+import { InputField } from "$form";
 import { gapGrid, rowForm, rowResponsiveForm } from "$layout";
+import { subtitleGrey, text, titleGreyLD } from "$text";
+import type { FormEventHandler } from "$types/ui.d.ts";
+
+import { useState } from "preact/hooks";
 
 /* ===== STATE ===== */
 const ContactCta = () => {
@@ -16,7 +18,7 @@ const ContactCta = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   /* ===== EVENT HANDLERS ===== */
-  const handleSubmit = (e: Event) => {
+  const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault();
     // Basic validation
     setIsSubmitting(true);
@@ -77,13 +79,13 @@ const ContactCta = () => {
                 <InputField
                   type="text"
                   value={name}
-                  onChange={(e) => setName(e.currentTarget.value)}
+                  onChange={(e) => setName(e.currentTarget?.value ?? "")}
                   placeholder="Name"
                 />
                 <InputField
                   type="text"
                   value={email}
-                  onChange={(e) => setEmail(e.currentTarget.value)}
+                  onChange={(e) => setEmail(e.currentTarget?.value ?? "")}
                   placeholder="Email"
                 />
               </div>
@@ -93,7 +95,7 @@ const ContactCta = () => {
                 <InputField
                   type="text"
                   value={subject}
-                  onChange={(e) => setSubject(e.currentTarget.value)}
+                  onChange={(e) => setSubject(e.currentTarget?.value ?? "")}
                   placeholder="Subject"
                 />
               </div>

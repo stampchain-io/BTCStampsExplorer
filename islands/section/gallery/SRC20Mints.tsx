@@ -1,6 +1,6 @@
 /* ===== SRC20 RECENT MINTS GALLERY COMPONENT ===== */
 import { SRC20CardSmMinting } from "$card";
-import type { SRC20Row } from "$globals";
+import type { SRC20Row } from "$types/src20.d.ts";
 import { subtitlePurple, titlePurpleDL, titlePurpleLD } from "$text";
 import { useEffect, useState } from "preact/hooks";
 

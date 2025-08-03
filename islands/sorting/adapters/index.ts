@@ -9,12 +9,8 @@
 export { useStampSortingAdapter } from "./StampSortingAdapter.tsx";
 export { useWalletSortingAdapter } from "./WalletSortingAdapter.tsx";
 
-export type {
-  WalletSortingAdapterProps,
-  WalletSortingAdapterReturn,
-} from "./WalletSortingAdapter.tsx";
+export type { WalletSortingAdapterReturn } from "./WalletSortingAdapter.tsx";
 
-export type {
-  StampSortingAdapterProps,
-  StampSortingAdapterReturn,
-} from "./StampSortingAdapter.tsx";
+export type { WalletSortingAdapterProps } from "$types/ui.d.ts";
+
+export type { StampSortingAdapterReturn } from "./StampSortingAdapter.tsx";

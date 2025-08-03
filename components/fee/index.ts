@@ -9,5 +9,4 @@
 // Re-export types for convenience
 export type {
   ProgressiveFeeEstimationResult,
-  ToolEstimationParams,
 } from "$lib/types/fee-estimation.ts";

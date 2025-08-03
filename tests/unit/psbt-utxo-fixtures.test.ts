@@ -5,7 +5,7 @@
 import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
 import { DatabaseManager } from "$server/database/databaseManager.ts";
 import { assertEquals, assertExists, assertThrows } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import {
     createUTXOFixture,
     safeBigIntConversion,

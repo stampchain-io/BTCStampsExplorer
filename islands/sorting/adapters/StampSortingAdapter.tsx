@@ -4,21 +4,11 @@
  * sort options, data transformations, and business logic for regular stamp pages
  */
 
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import type { SortOption } from "$lib/types/sorting.d.ts";
 import { getAvailableSortOptions } from "$lib/utils/data/sorting/performance.ts";
 import { useMemo } from "preact/hooks";
-
-export interface StampSortingAdapterProps {
-  stamps: StampRow[];
-  onSortChange?: (sortedStamps: StampRow[]) => void;
-  enableAdvancedSorting?: boolean;
-  sortingConfig?: {
-    cacheSize?: number;
-    enableMetrics?: boolean;
-    performanceThreshold?: number;
-  };
-}
+import type { StampSortingAdapterProps } from "$types/ui.d.ts";
 
 export interface StampSortingAdapterReturn {
   sortedStamps: StampRow[];

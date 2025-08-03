@@ -1,13 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import type { RefObject } from "preact";
+import type { AnimationState } from "$types/ui.d.ts";
 
 // Global animation state
-interface AnimationState {
-  pageVisible: boolean;
-  reducedMotion: boolean;
-  performanceMode: "high" | "medium" | "low";
-}
 
 // Global animation controls
 class AnimationManager {
@@ -66,8 +62,20 @@ class AnimationManager {
 
   private initializePerformanceDetection() {
     // Detect performance capabilities
-    const connection = (navigator as any).connection;
-    const memory = (performance as any).memory;
+    const connection = (navigator as Navigator & {
+      connection?: {
+        effectiveType?: string;
+        downlink?: number;
+        saveData?: boolean;
+      };
+    }).connection;
+    const memory = (performance as Performance & {
+      memory?: {
+        usedJSHeapSize?: number;
+        totalJSHeapSize?: number;
+        jsHeapSizeLimit?: number;
+      };
+    }).memory;
 
     let performanceMode: "high" | "medium" | "low" = "high";
 
@@ -84,7 +92,9 @@ class AnimationManager {
     }
 
     // Check memory constraints
-    if (memory && memory.jsHeapSizeLimit < 1000000000) { // Less than 1GB
+    if (
+      memory && memory.jsHeapSizeLimit && memory.jsHeapSizeLimit < 1000000000
+    ) { // Less than 1GB
       performanceMode = "low";
     }
 

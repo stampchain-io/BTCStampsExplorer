@@ -10,7 +10,7 @@ import {
     type EstimationOptions,
 } from "$lib/utils/bitcoin/minting/TransactionConstructionService.ts";
 import { assertEquals, assertExists } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("TransactionConstructionService Phase 2 Dummy Address Tests", () => {
   const estimator = new TransactionConstructionService();

@@ -3,19 +3,10 @@
 import { Button, SelectorButtons } from "$button";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
 import { titlePurpleLD } from "$text";
+import type { SRC20OverviewHeaderProps } from "$types/ui.d.ts";
 import { useCallback, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface SRC20OverviewHeaderProps {
-  onViewTypeChange?: (viewType: string) => void;
-  viewType: "minted" | "minting";
-  onTimeframeChange?: (timeframe: "24H" | "7D" | "30D") => void;
-  onFilterChange?: (filter: string, direction?: "asc" | "desc") => void;
-  currentSort?: {
-    filter: string | null;
-    direction: "asc" | "desc";
-  };
-}
 
 /* ===== COMPONENT ===== */
 export const SRC20OverviewHeader = (
@@ -50,8 +41,7 @@ export const SRC20OverviewHeader = (
   const handleTrendingClick = useCallback(() => {
     const currentFilter = currentSort?.filter || "TRENDING";
     const newFilter = currentFilter === "TRENDING" ? "DEPLOY" : "TRENDING";
-    const newDirection = newFilter === "DEPLOY" ? "asc" : "desc";
-    onFilterChange?.(newFilter, newDirection);
+    onFilterChange?.(newFilter);
   }, [onFilterChange, currentSort?.filter]);
 
   // 🚀 PREACT OPTIMIZATION: Memoized variant getters
@@ -89,7 +79,7 @@ export const SRC20OverviewHeader = (
             ]}
             value={viewType}
             onChange={handleViewTypeClick}
-            size="sm"
+            _size="sm"
             color="purple"
             className="w-full mobileMd:w-auto"
           />
@@ -124,7 +114,7 @@ export const SRC20OverviewHeader = (
             ]}
             value={selectedTimeframe}
             onChange={handleTimeframeClick}
-            size="sm"
+            _size="sm"
             color="grey"
           />
         </div>

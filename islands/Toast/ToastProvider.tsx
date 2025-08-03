@@ -1,7 +1,7 @@
 // ToastContext.tsx
-import { ComponentChildren } from "preact";
+import type { ToastProviderProps } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
-import { ToastComponent } from "./ToastComponent.tsx";
+import { ToastComponent } from "$islands/Toast/ToastComponent.tsx";
 import {
   type BaseToast,
   toastSignal,
@@ -11,10 +11,6 @@ import {
 // This Toast type is for the state array within ToastProvider (which includes an id)
 export interface Toast extends BaseToast {
   id: string; // Toast instances in the provider need an id for keying and removal
-}
-
-interface ToastProviderProps {
-  children: ComponentChildren;
 }
 
 export const ToastProvider = ({ children }: ToastProviderProps) => {

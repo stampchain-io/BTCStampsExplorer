@@ -3,8 +3,13 @@ import { ToggleSwitchButton } from "$button";
 import { useConfig } from "$client/hooks/useConfig.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { getWalletProvider } from "$client/wallet/walletHelper.ts";
+import { TransactionHexDisplay } from "$components/debug/TransactionHexDisplay.tsx";
+import { MaraModeIndicator } from "$components/indicators/MaraModeIndicator.tsx";
+import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
+import { MaraStatusLink } from "$components/mara/MaraStatusLink.tsx";
+import { MaraModeWarningModal } from "$components/modals/MaraModeWarningModal.tsx";
+import { MaraServiceUnavailableModal } from "$components/modals/MaraServiceUnavailableModal.tsx";
 import { InputField } from "$form";
-import { Config } from "$globals";
 import { Icon } from "$icon";
 import PreviewImageModal from "$islands/modal/PreviewImageModal.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
@@ -14,23 +19,18 @@ import {
   containerRowForm,
   glassmorphism,
 } from "$layout";
-import { MaraModeIndicator } from "$components/indicators/MaraModeIndicator.tsx";
-import { MaraModeWarningModal } from "$components/modals/MaraModeWarningModal.tsx";
-import { MaraServiceUnavailableModal } from "$components/modals/MaraServiceUnavailableModal.tsx";
-import { ProgressiveEstimationIndicator } from "$components/indicators/ProgressiveEstimationIndicator.tsx";
-import { TransactionHexDisplay } from "$components/debug/TransactionHexDisplay.tsx";
-import { MaraStatusLink } from "$components/mara/MaraStatusLink.tsx";
+import { useFees } from "$lib/hooks/useFees.ts";
+import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
 import {
   ensureRawTransactionFormat,
   extractRawTransactionFromPSBT,
 } from "$lib/utils/bitcoin/psbt/psbtUtils.ts";
-import { useFees } from "$lib/hooks/useFees.ts";
-import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
+import type { Config } from "$types/base.d.ts";
 
 import { NOT_AVAILABLE_IMAGE } from "$constants";
-import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
+import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import {
   StatusMessages,
@@ -1936,8 +1936,9 @@ function StampingToolMain({ config }: { config: Config }) {
       {/* MARA Mode Indicator */}
       {maraMode && outputValue !== null && (
         <MaraModeIndicator
+          isActive
           outputValue={outputValue}
-          feeRate={maraFeeRate}
+          {...(maraFeeRate !== null && { feeRate: maraFeeRate })}
           class="mb-4"
         />
       )}
@@ -2129,8 +2130,8 @@ function StampingToolMain({ config }: { config: Config }) {
           fee={fee}
           handleChangeFee={handleChangeFee}
           type="stamp"
-          fileType={file?.type}
-          fileSize={fileSize}
+          fileType={file?.type || "image/png"}
+          fileSize={fileSize || 0}
           issuance={parseInt(issuance, 10)}
           BTCPrice={BTCPrice}
           isSubmitting={isSubmitting}
@@ -2240,6 +2241,7 @@ function StampingToolMain({ config }: { config: Config }) {
 
       {showMaraUnavailableModal && openModal(
         <MaraServiceUnavailableModal
+          isOpen
           onSwitchToStandard={handleMaraUnavailableSwitchToStandard}
           onRetry={handleMaraUnavailableRetry}
           onClose={handleMaraUnavailableClose}

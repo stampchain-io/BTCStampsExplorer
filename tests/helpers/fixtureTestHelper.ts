@@ -13,7 +13,7 @@ export interface MockResponse {
 export interface MockConfig {
   method?: "executeQuery" | "executeQueryWithCache";
   response: MockResponse | Error;
-  mapFixture?: (data: any) => any;
+  mapFixture?: <T = unknown, R = unknown>(data: T) => R;
 }
 
 /**
@@ -62,7 +62,7 @@ export class FixtureTestHelper {
   /**
    * Mock a cached query with fixture data
    */
-  mockCachedQuery(rows: any[], mapFn?: (data: any) => any): Stub {
+  mockCachedQuery<T = unknown, R = unknown>(rows: T[], mapFn?: (data: T) => R): Stub {
     return this.mockDbCall({
       method: "executeQueryWithCache",
       response: { rows, rowCount: rows.length },

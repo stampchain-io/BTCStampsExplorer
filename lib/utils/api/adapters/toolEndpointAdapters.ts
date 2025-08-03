@@ -352,6 +352,8 @@ export class SRC101ToolAdapter
       feeRate: response.feeDetails?.effectiveFeeRate ??
         (response.est_miner_fee / response.est_tx_size),
       feeDetails: response.feeDetails || response,
+      changeValue: response.change_value,
+      inputValue: response.input_value,
     };
   }
 

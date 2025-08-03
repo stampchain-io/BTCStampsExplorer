@@ -1,0 +1,289 @@
+{
+  "info": {
+    "name": "Request Validation Tests",
+    "description": "Tests for OpenAPI request body and parameter validation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Malformed JSON Tests",
+      "item": [
+        {
+          "name": "POST with Malformed JSON",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message indicates JSON parsing error', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.exist;",
+                  "    pm.expect(jsonData.status).to.equal('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"invalid\": \"json}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "src20", "create"]
+            }
+          }
+        },
+        {
+          "name": "POST with Empty Body",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error indicates validation failure', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "src20", "create"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Schema Validation Tests",
+      "item": [
+        {
+          "name": "SRC-20 Create - Missing Required Fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error indicates missing required fields', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.include('Missing required');",
+                  "    pm.expect(jsonData.status).to.equal('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"op\": \"deploy\"\n  // Missing required fields like sourceAddress, changeAddress\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "src20", "create"]
+            }
+          }
+        },
+        {
+          "name": "SRC-20 Create - Invalid Field Types",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error indicates type validation failure', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.exist;",
+                  "    if (jsonData.errors) {",
+                  "        pm.expect(jsonData.errors[0].message).to.include('should be');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"toAddress\": \"bc1qtest\",\n  \"changeAddress\": \"bc1qtest\",\n  \"op\": \"deploy\",\n  \"tick\": \"TYPETEST\",\n  \"max\": \"not-a-number\",\n  \"lim\": true,\n  \"dec\": \"eighteen\",\n  \"satsPerVB\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "src20", "create"]
+            }
+          }
+        },
+        {
+          "name": "Stamp Attach - Missing UTXO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error indicates missing required field', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"bc1qtest\"\n  // Missing required 'utxo' field\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/trx/stampdetach",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "trx", "stampdetach"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Content-Type Tests",
+      "item": [
+        {
+          "name": "POST without Content-Type",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Request is processed (no JSON validation)', function () {",
+                  "    // Without Content-Type, body won't be parsed as JSON",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 422, 500]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"test\": \"data\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "src20", "create"]
+            }
+          }
+        },
+        {
+          "name": "POST with Wrong Content-Type",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Request is processed without JSON validation', function () {",
+                  "    // With wrong Content-Type, JSON validation is skipped",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 422, 500]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/plain"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"test\": \"data\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/src20/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "src20", "create"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

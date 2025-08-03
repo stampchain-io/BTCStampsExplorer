@@ -1,5 +1,6 @@
 /* ===== FAIRMINT CONTENT COMPONENT ===== */
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
+import type { FairmintToolProps } from "$types/ui.d.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { bodyTool, containerBackground, containerColForm } from "$layout";
 import { useTransactionConstructionService } from "$lib/hooks/useTransactionConstructionService.ts";
@@ -11,9 +12,6 @@ import { titlePurpleLD } from "$text";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface FairmintToolProps {
-  fairminters: any[];
-}
 
 /* ===== COMPONENT ===== */
 export function FairmintTool({ fairminters }: FairmintToolProps) {
@@ -28,7 +26,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
     isSubmitting,
     submissionMessage,
     apiError,
-  } = useFairmintForm(fairminters);
+  } = useFairmintForm(fairminters || []);
 
   const [tosAgreed, setTosAgreed] = useState(false);
   const { wallet } = walletContext;
@@ -124,10 +122,10 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
                 <option value="">SELECT A TOKEN</option>
                 {fairminters
                   .filter(
-                    (fairminter) =>
+                    (fairminter: any) =>
                       fairminter.asset && fairminter.status === "open",
                   )
-                  .map((fairminter) => {
+                  .map((fairminter: any) => {
                     const asset = fairminter.asset;
                     const displayName = asset.startsWith("A")
                       ? fairminter.asset_longname || asset
@@ -225,7 +223,7 @@ export function FairmintTool({ fairminters }: FairmintToolProps) {
           handleChangeFee={handleChangeFee}
           type="fairmint"
           fileType="application/json"
-          fileSize={formState.jsonSize}
+          fileSize={formState.jsonSize || 0}
           BTCPrice={formState.BTCPrice}
           isSubmitting={isSubmitting}
           onSubmit={handleFairmintWithExactFees}

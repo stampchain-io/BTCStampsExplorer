@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertExists, assertThrows } from "@std/assert";
-import { beforeEach, describe, it } from "@std/testing/bdd";
-import { stub, restore } from "@std/testing/mock";
+import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { stub, restore } from "@std/testing@1.0.14/mock";
 
 import {
   type MaraConfigValidationResult,
@@ -10,7 +10,7 @@ import {
   getValidatedMaraConfig,
 } from "../../server/config/maraConfigValidator.ts";
 
-import { DEFAULT_MARA_CONFIG } from "../../server/config/maraConfig.ts";
+import { DEFAULT_MARA_CONFIG } from "$server/config/maraConfig.ts";
 
 describe("MARA Configuration Validator", () => {
   beforeEach(() => {

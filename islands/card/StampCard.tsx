@@ -1,7 +1,7 @@
 /* ===== STAMP CARD COMPONENT ===== */
 /* @baba-update audio icon size (custom) - 247*/
 /*@baba-check styles+icon*/
-import { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Icon, LoadingIcon } from "$icon";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import { VNode } from "preact";

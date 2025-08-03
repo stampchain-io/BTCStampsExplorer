@@ -9,34 +9,9 @@ import { logger } from "$lib/utils/logger.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import type { SendRequestBody, SendResponse } from "$types/api.d.ts";
 import { networks, Psbt, Transaction } from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
-
-interface SendRequestBody {
-  address: string; // Source address for CP, and for fetching UTXO details if needed
-  destination: string;
-  asset: string;
-  quantity: number;
-  satsPerVB: number; // Target fee rate for potential future adjustments, or if CP needs it
-  options?: {
-    service_fee?: number; // Will be handled in a later refinement
-    service_fee_address?: string;
-    memo?: string;
-    memo_is_hex?: boolean;
-    encoding?: string;
-    // Options for CounterpartyApiManager.createSend
-    fee_per_kb?: number; // CounterpartyApiManager.createSend might take this for CP API
-    return_psbt?: boolean; // Should be false for this flow
-  };
-  dryRun?: boolean; // Dry run will be complex with this model, deferring full implementation
-}
-
-interface SendResponse {
-  psbtHex?: string;
-  inputsToSign?: { index: number; address: string; sighashTypes?: number[] }[];
-  estimatedFee?: number; // This would be CP's fee initially
-  estimatedVsize?: number;
-}
 
 export const handler: Handlers<SendResponse | { error: string }> = {
   async POST(req) {
@@ -223,7 +198,7 @@ export const handler: Handlers<SendResponse | { error: string }> = {
       inputsToSign.push({
         index: 0,
         address: address,
-        sighashTypes: [Transaction.SIGHASH_ALL],
+        sighashTypes: [Transaction.__SIGHASH_ALL],
       });
 
       // Add all outputs from Counterparty's transaction

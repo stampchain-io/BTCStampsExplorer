@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
-import { TX, TXError } from "$globals";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
+import type { TX, TXError } from "$types/transaction.d.ts";
 
 export const handler: Handlers<TX | TXError> = {
   async POST(req: Request, ctx) {

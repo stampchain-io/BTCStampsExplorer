@@ -8,6 +8,19 @@
  * Phase 2 to directly call tool endpoints with dryRun=true.
  */
 
+import type { TransactionOptions } from "$types/base.d.ts";
+
+import type { SRC101TransactionOptions } from "$types/src101.d.ts";
+import type { SRC20TransactionOptions } from "$types/src20.d.ts";
+import type { StampTransactionOptions } from "$types/stamp.d.ts";
+
+// Re-export transaction options for use by other modules
+export type {
+  SRC101TransactionOptions,
+  SRC20TransactionOptions,
+  StampTransactionOptions,
+};
+
 /**
  * Standardized fee response interface that all tool adapters must return
  */
@@ -27,93 +40,26 @@ export interface StandardFeeResponse {
   /** Applied fee rate in sats/vB */
   feeRate: number;
   /** Optional detailed fee breakdown from the tool */
-  feeDetails?: any;
+  feeDetails: any | undefined;
   /** Optional change value in satoshis */
-  changeValue?: number;
+  changeValue: number | undefined;
   /** Optional input value in satoshis */
-  inputValue?: number;
+  inputValue: number | undefined;
 }
 
-/**
- * Common transaction options that all tools should support
- */
-export interface TransactionOptions {
-  /** Source wallet address */
-  walletAddress: string;
-  /** Fee rate in sats/vB */
-  feeRate: number;
-  /** Always true for Phase 2 estimation */
-  dryRun: boolean;
-  /** Optional change address (defaults to source) */
-  changeAddress?: string;
-}
+// StampTransactionOptions imported from $types/stamp.d.ts
 
-/**
- * Stamp-specific transaction options
- */
-export interface StampTransactionOptions extends TransactionOptions {
-  /** Base64 encoded file data */
-  file: string;
-  /** Original filename */
-  filename: string;
-  /** File size in bytes */
-  fileSize: number;
-  /** Quantity to mint */
-  quantity: number;
-  /** Whether asset is locked */
-  locked: boolean;
-  /** Whether asset is divisible */
-  divisible: boolean;
-  /** Custom output value for MARA mode (optional) */
-  outputValue?: number;
+// SRC20TransactionOptions imported from $types/src20.d.ts
 
-  // Optional dispense-specific properties for stamp purchases
-  /** Dispenser source address (for purchases) */
-  dispenserSource?: string;
-  /** Purchase quantity in satoshis (for purchases) */
-  purchaseQuantity?: string;
-}
-
-/**
- * SRC-20 specific transaction options
- */
-export interface SRC20TransactionOptions extends TransactionOptions {
-  /** SRC-20 operation type */
-  op: "DEPLOY" | "MINT" | "TRANSFER";
-  /** Token ticker */
-  tick: string;
-  /** Maximum supply (for DEPLOY) */
-  max?: string;
-  /** Mint limit per transaction (for DEPLOY) */
-  lim?: string;
-  /** Decimal places (for DEPLOY) */
-  dec?: number;
-  /** Amount to mint/transfer */
-  amt?: string;
-  /** Destination address (for TRANSFER) */
-  destinationAddress?: string;
-}
-
-/**
- * SRC-101 specific transaction options
- */
-export interface SRC101TransactionOptions extends TransactionOptions {
-  /** SRC-101 operation type */
-  op: "deploy" | "mint" | "transfer";
-  /** Root domain name */
-  root?: string;
-  /** Subdomain name */
-  name?: string;
-  /** Amount to transfer */
-  amt?: string;
-  /** Destination address (for transfer) */
-  destinationAddress?: string;
-}
+// SRC101TransactionOptions imported from $types/src101.d.ts
 
 /**
  * Tool type enumeration
  */
 export type ToolType = "stamp" | "src20" | "src101";
+
+// ToolProtocolComplianceLevel is now imported from $constants
+export { ToolProtocolComplianceLevel as ProtocolComplianceLevel } from "$constants";
 
 /**
  * Union type for all possible transaction options
@@ -221,3 +167,13 @@ export class ToolResponseError extends ToolEndpointError {
     this.name = "ToolResponseError";
   }
 }
+
+// Re-exports for types commonly imported from this adapter
+export type { FeeAlert, ToolEstimationParams } from "$types/fee.d.ts";
+export type { InputData } from "$types/src20.d.ts";
+export type {
+  ColumnDefinition,
+  MockResponse,
+  NamespaceImport,
+  XcpBalance,
+} from "$types/ui.d.ts";

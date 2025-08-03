@@ -1,5 +1,6 @@
+import { type BlockStampType } from "$constants";
 import { BlockRepository, StampRepository } from "$server/database/index.ts";
-import { BlockInfoResponseBody, StampBlockResponseBody } from "$globals";
+import type { BlockInfoResponseBody, StampBlockResponseBody } from "$types/api.d.ts";
 
 export class BlockService {
   static async getLastXBlocks(num: number) {
@@ -8,7 +9,7 @@ export class BlockService {
 
   static async getBlockInfoWithStamps(
     blockIdentifier: number | string,
-    type: "stamps" | "cursed" | "all" = "all",
+    type: BlockStampType = "all",
   ): Promise<StampBlockResponseBody> {
     const [block_info, last_block, data] = await Promise.all([
       BlockRepository.getBlockInfoFromDb(blockIdentifier),

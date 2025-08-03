@@ -5,8 +5,8 @@
  */
 
 import { assertEquals, assertExists } from "@std/assert";
-import { afterEach, describe, it } from "@std/testing/bdd";
-import { restore } from "@std/testing/mock";
+import { afterEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { restore } from "@std/testing@1.0.14/mock";
 
 describe("Stamp Handler Migration Validation", () => {
   afterEach(() => {

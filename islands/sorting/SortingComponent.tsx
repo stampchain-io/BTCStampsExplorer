@@ -5,25 +5,22 @@
  */
 
 import { Icon } from "$icon";
-import type { SortKey, SortOption } from "$lib/types/sorting.d.ts";
+import { useSorting } from "$islands/sorting/SortingProvider.tsx";
+import type { SortKey } from "$lib/types/sorting.d.ts";
 import { SORT_LABELS } from "$lib/utils/data/sorting/sortingConstants.ts";
-import { useSorting } from "./SortingProvider.tsx";
+import type {
+  SortingComponentProps,
+  SortingErrorProps,
+  SortingLabelProps,
+  StyledSortingButtonsProps,
+  StyledSortingDropdownProps,
+} from "$types/ui.d.ts";
 
 // ===== BASE SORTING COMPONENT =====
 
 /**
  * Props for the main SortingComponent
  */
-interface SortingComponentProps {
-  /** Child components */
-  children: preact.ComponentChildren;
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Accessibility label */
-  "aria-label"?: string;
-}
 
 /**
  * Main SortingComponent - Container for sorting UI elements
@@ -51,20 +48,6 @@ export function SortingComponent({
 /**
  * Props for SortingDropdown
  */
-interface SortingDropdownProps {
-  /** Available sort options */
-  options: ReadonlyArray<SortOption>;
-  /** Additional CSS classes */
-  className?: string;
-  /** Placeholder text */
-  placeholder?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Whether to show loading state */
-  showLoading?: boolean;
-  /** Custom option renderer */
-  renderOption?: (option: SortOption) => preact.ComponentChildren;
-}
 
 /**
  * SortingDropdown - Dropdown selector for sort options
@@ -76,7 +59,7 @@ SortingComponent.Dropdown = function SortingDropdown({
   testId,
   showLoading = false,
   renderOption,
-}: SortingDropdownProps) {
+}: StyledSortingDropdownProps) {
   const { sortState, setSortBy, isLoading } = useSorting();
 
   const handleChange = (event: Event) => {
@@ -101,7 +84,7 @@ SortingComponent.Dropdown = function SortingDropdown({
         <option value="" disabled>
           {placeholder}
         </option>
-        {options.map((option) => (
+        {options.map((option: any) => (
           <option key={option.value} value={option.value}>
             {renderOption ? renderOption(option) : option.label}
           </option>
@@ -127,27 +110,6 @@ SortingComponent.Dropdown = function SortingDropdown({
 /**
  * Props for SortingButtons
  */
-interface SortingButtonsProps {
-  /** Available sort options */
-  options: ReadonlyArray<SortOption>;
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Button variant */
-  variant?: "primary" | "secondary" | "ghost";
-  /** Button size */
-  size?: "sm" | "md" | "lg";
-  /** Whether to show icons */
-  showIcons?: boolean;
-  /** Whether to show loading state */
-  showLoading?: boolean;
-  /** Custom button renderer */
-  renderButton?: (
-    option: SortOption,
-    isActive: boolean,
-  ) => preact.ComponentChildren;
-}
 
 /**
  * SortingButtons - Button group for sort options
@@ -161,7 +123,7 @@ SortingComponent.Buttons = function SortingButtons({
   showIcons = true,
   showLoading = false,
   renderButton,
-}: SortingButtonsProps) {
+}: StyledSortingButtonsProps) {
   const { sortState, setSortBy, isLoading } = useSorting();
 
   const handleClick = (value: SortKey) => {
@@ -177,7 +139,7 @@ SortingComponent.Buttons = function SortingButtons({
       role="group"
       aria-label="Sort options"
     >
-      {options.map((option) => {
+      {options.map((option: any) => {
         const isActive = sortState.sortBy === option.value;
 
         if (renderButton) {
@@ -239,18 +201,6 @@ SortingComponent.Buttons = function SortingButtons({
 /**
  * Props for SortingLabel
  */
-interface SortingLabelProps {
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Whether to show direction indicator */
-  showDirection?: boolean;
-  /** Whether to show loading state */
-  showLoading?: boolean;
-  /** Custom label format */
-  format?: (sortBy: SortKey, direction: string) => string;
-}
 
 /**
  * SortingLabel - Display current sort selection
@@ -268,7 +218,7 @@ SortingComponent.Label = function SortingLabel({
 
   const getLabel = () => {
     if (format) {
-      return format(sortState.sortBy, sortState.direction);
+      return `${sortState.sortBy}-${sortState.direction}`;
     }
 
     const baseLabel =
@@ -321,18 +271,6 @@ SortingComponent.Label = function SortingLabel({
 /**
  * Props for SortingError
  */
-interface SortingErrorProps {
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Custom error message */
-  message?: string;
-  /** Whether to show retry button */
-  showRetry?: boolean;
-  /** Custom retry handler */
-  onRetry?: () => void;
-}
 
 /**
  * SortingError - Display sorting errors

@@ -1,7 +1,8 @@
+import type { PaginatedTickResponseBody } from "$types/api.d.ts";
+// Unused imports removed: BlockHandlerContext, IdentHandlerContext, TickHandlerContext, SRC20TrxRequestParams
 import { Handlers } from "$fresh/server.ts";
-import { PaginatedTickResponseBody } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
-import { isValidSrc20Tick } from "$lib/utils/data/identifiers/identifierUtils.ts";
+import { isValidSrc20Tick } from "$lib/utils/typeGuards.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import {
@@ -87,9 +88,12 @@ export const handler: Handlers = {
           total_mints: mint_status.total_mints ?? 0,
           progress: mint_status.progress ?? "0",
           decimals: mint_status.decimals ?? 0,
-          limit: typeof mint_status.limit === "string"
-            ? parseInt(mint_status.limit) || null
-            : (mint_status.limit ?? null),
+          limit: mint_status.limit
+            ? (typeof mint_status.limit === "string"
+              ? mint_status.limit
+              : String(mint_status.limit))
+            : "0",
+          tx_hash: mint_status.tx_hash ?? "", // Add required tx_hash field
         }
         : {
           max_supply: "0",
@@ -97,7 +101,8 @@ export const handler: Handlers = {
           total_mints: 0,
           progress: "0",
           decimals: 0,
-          limit: 0,
+          limit: "0",
+          tx_hash: "", // Add required tx_hash field for default case
         };
 
       // Construct response body

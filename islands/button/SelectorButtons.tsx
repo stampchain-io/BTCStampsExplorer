@@ -1,4 +1,5 @@
 import { color, padding, pillSize, state } from "$button";
+import type { SelectorButtonsProps } from "$types/ui.d.ts";
 import { glassmorphism } from "$layout";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
@@ -9,24 +10,13 @@ interface SelectorOption {
   disabled?: boolean;
 }
 
-interface SelectorButtonsProps {
-  options: SelectorOption[];
-  value?: string;
-  defaultValue?: string;
-  onChange?: (value: string) => void;
-  disabled?: boolean;
-  size: "xs" | "sm" | "md" | "lg";
-  color: "grey" | "purple";
-  className?: string;
-}
-
 /* ===== COMPONENT ===== */
 export const SelectorButtons = ({
   options,
   value,
   defaultValue,
   onChange,
-  size,
+  size = "md",
   color: colorProp,
   className = "",
   disabled: disabledProp = false,
@@ -96,7 +86,7 @@ export const SelectorButtons = ({
   const colorVariants = {
     grey: color.grey,
     purple: color.purple,
-  };
+  } as const satisfies Record<string, string>;
 
   // Helper function to determine if an option is disabled
   const isOptionDisabled = useCallback((option: SelectorOption) => {
@@ -108,7 +98,11 @@ export const SelectorButtons = ({
       ref={containerRef}
       class={`relative grid p-0.5 select-none
         ${glassmorphism}
-        ${colorVariants[colorProp]}
+        ${
+        (colorProp === "purple" || colorProp === "grey")
+          ? colorVariants[colorProp]
+          : colorVariants.grey
+      }
         ${disabledProp ? state.disabled : ""}
         ${className}
       `}
@@ -160,7 +154,7 @@ export const SelectorButtons = ({
                 relative block z-20
                 font-semibold text-center
                 transition-all duration-200 ease-in-out
-                ${pillSize[size]}
+                ${pillSize[size as keyof typeof pillSize]}
                 ${
                 selectedValue === option.value
                   ? "text-black"

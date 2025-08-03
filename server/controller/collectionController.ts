@@ -1,8 +1,9 @@
-import { Collection } from "$globals";
+
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 import { StampService } from "$server/services/stampService.ts";
-import { CollectionQueryParams, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
+import { CollectionQueryParams, PaginatedCollectionResponseBody, CollectionRow } from "$server/types/collection.d.ts";
+import type { Collection } from "$types/api.d.ts";
 
 export class CollectionController {
   static async getCollectionDetails(
@@ -108,18 +109,42 @@ export class CollectionController {
 
       // Map collections with their stamps
       const collections: Collection[] = collectionsResult.data.map(
-        (collection: Collection) => {
-          const collectionId = collection.collection_id.toUpperCase();
+        (collectionRow: CollectionRow) => {
+          const collectionId = collectionRow.collection_id.toUpperCase();
           const stamps = stampsByCollection.get(collectionId) || [];
 
           // Use the second stamp if available, otherwise fall back to the first stamp
           const firstStampImage = stamps[1] || stamps[0] || null;
 
-          return {
-            ...collection,
+          // Convert CollectionRow to Collection format
+          const collection: Collection = {
+            collection_id: collectionRow.collection_id,
+            collection_name: collectionRow.collection_name,
+            collection_description: collectionRow.collection_description,
+            creators: collectionRow.creators,
+            stamp_count: collectionRow.stamp_count,
+            total_editions: collectionRow.total_editions,
+            img: collectionRow.img,
             first_stamp_image: firstStampImage,
             stamp_images: stamps,
+            // Convert marketData from CollectionMarketData to the expected format
+            ...(collectionRow.marketData && {
+              marketData: {
+                minFloorPriceBTC: collectionRow.marketData.minFloorPriceBTC,
+                maxFloorPriceBTC: collectionRow.marketData.maxFloorPriceBTC,
+                avgFloorPriceBTC: collectionRow.marketData.avgFloorPriceBTC,
+                medianFloorPriceBTC: collectionRow.marketData.medianFloorPriceBTC,
+                totalVolume24hBTC: collectionRow.marketData.totalVolume24hBTC,
+                stampsWithPricesCount: collectionRow.marketData.stampsWithPricesCount,
+                minHolderCount: collectionRow.marketData.minHolderCount,
+                maxHolderCount: collectionRow.marketData.maxHolderCount,
+                totalVolumeBTC: collectionRow.marketData.totalVolume24hBTC, // Use 24h volume as total
+                marketCapBTC: null, // Not available in CollectionMarketData
+              }
+            }),
           };
+
+          return collection;
         }
       );
 

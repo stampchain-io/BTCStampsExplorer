@@ -1,4 +1,4 @@
-import { BTCPriceData, BTCPriceService } from "./btcPriceService.ts";
+import { BTCPriceData, BTCPriceService } from "$server/services/price/btcPriceService.ts";
 
 /**
  * Global singleton for BTC price caching

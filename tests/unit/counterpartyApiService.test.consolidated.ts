@@ -1,4 +1,4 @@
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import {
   type ComposeAttachOptions,

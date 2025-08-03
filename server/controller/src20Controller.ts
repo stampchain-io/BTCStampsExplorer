@@ -1,6 +1,4 @@
-import {
-    SRC20SnapshotRequestParams
-} from "$globals";
+
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
 import { SRC20BalanceRequestParams, SRC20TickPageData } from "$lib/types/src20.d.ts";
 import { formatAmount } from "$lib/utils/ui/formatting/formatUtils.ts";
@@ -9,7 +7,8 @@ import { BlockService } from "$server/services/core/blockService.ts";
 import { CircuitBreakerService, TRENDING_FALLBACK_DATA } from "$server/services/infrastructure/circuitBreaker.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { MarketDataEnrichmentService } from "$server/services/src20/marketDataEnrichmentService.ts";
-import { MarketListingAggregated } from "$types/index.d.ts";
+import type { MarketListingAggregated } from "$types/marketData.d.ts";
+import type { SRC20SnapshotRequestParams } from "$types/src20.d.ts";
 
 export class Src20Controller {
   /**
@@ -195,10 +194,17 @@ export class Src20Controller {
 
   static async handleSrc20SnapshotRequest(params: SRC20SnapshotRequestParams) {
     try {
+      // Create compatible params for getTotalSrc20BalanceCount (excluding null values)
+      const { address, ...baseParams } = params;
+      const balanceCountParams = {
+        ...baseParams,
+        ...(address !== null && address !== undefined && { address }),
+      };
+
       const [snapshotData, lastBlock, total] = await Promise.all([
         SRC20Service.QueryService.fetchSrc20Snapshot(params),
         BlockService.getLastBlock(),
-        SRC20Service.QueryService.getTotalSrc20BalanceCount(params),
+        SRC20Service.QueryService.getTotalSrc20BalanceCount(balanceCountParams),
       ]);
 
       const limit = params.limit || snapshotData.length;
@@ -412,7 +418,7 @@ export class Src20Controller {
       }
 
       // Get the ticks from trending data
-      const ticks = trendingData.data.map(row => row.tick);
+      const ticks = trendingData.data.map((row: any) => row.tick);
 
       // Fetch market data for these specific ticks only (much more efficient)
       const marketDataMap = await SRC20Service.QueryService.getBulkSRC20MarketData(ticks);
@@ -444,13 +450,13 @@ export class Src20Controller {
 
       // Create a map of tick -> deployment data for fast lookup
       const deploymentMap = new Map();
-      deploymentData.data.forEach(item => {
+      deploymentData.data.forEach((item: any) => {
         deploymentMap.set(item.tick, item);
       });
 
       // Merge trending data with deployment data and market data
       const baseData = trendingData.data
-        .map(trendingItem => {
+        .map((trendingItem: any) => {
           const deploymentItem = deploymentMap.get(trendingItem.tick);
 
           if (!deploymentItem) {
@@ -462,7 +468,7 @@ export class Src20Controller {
             ...deploymentItem,
           };
         })
-        .filter(item => item !== null); // Remove null entries
+        .filter((item: any) => item !== null); // Remove null entries
 
       // 🚀 SERVICE LAYER: Structure data with market data
       const structuredData = SRC20Service.QueryService.structureWithMarketData(baseData, marketDataMap);

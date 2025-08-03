@@ -1,7 +1,9 @@
 /* ===== BLOCK INDEX PAGE ROUTE ===== */
+
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { BlockController } from "$server/controller/blockController.ts";
-import { BlockRow } from "$globals";
+import type { BlockRow } from "$types/base.d.ts";
+
 import { BlockHeader } from "$header";
 import { BlockSelector, BlockTransactions } from "$content";
 import { signal } from "@preact/signals";
@@ -93,7 +95,9 @@ export default function BlockIndexPage({ data }: PageProps<BlockIndexData>) {
             <BlockSelector
               key={block.block_index}
               block={block}
-              selected={selectedBlock}
+              selected={{
+                value: selectedBlock.value?.block_index === block.block_index,
+              }}
             />
           ))}
         </div>

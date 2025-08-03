@@ -28,18 +28,9 @@ import {
   transactionConstructionService,
 } from "$lib/utils/minting/TransactionConstructionService.ts";
 import { useCallback, useEffect, useMemo, useReducer } from "preact/hooks";
+import type { FeeEstimatorState } from "$types/ui.d.ts";
 
 // Hook state interface
-interface FeeEstimatorState {
-  phase1: FeeEstimationResult | null;
-  phase2: FeeEstimationResult | null;
-  phase3: FeeEstimationResult | null;
-  currentPhase: "instant" | "smart" | "exact"; // Updated: "cached" -> "smart"
-  isEstimating: boolean;
-  isPreFetching: boolean;
-  error: string | null;
-  lastUpdate: number;
-}
 
 // Hook actions
 type FeeEstimatorAction =
@@ -144,6 +135,8 @@ export function useTransactionConstructionService(options: EstimationOptions) {
       toolType: options.toolType,
       feeRate: options.feeRate,
       isConnected: options.isConnected,
+      walletAddress: options.walletAddress,
+      isSubmitting: options.isSubmitting,
     };
 
     // Add optional properties only if they're defined
@@ -384,7 +377,7 @@ export function useTransactionConstructionService(options: EstimationOptions) {
   const getBestEstimate = useCallback((): FeeEstimationResult | null => {
     // Prefer Phase 2 (smart) over Phase 1 (instant) over Phase 3 (exact)
     // Phase 3 is only used when explicitly requested
-    return state.phase2 || state.phase1 || null;
+    return (state.phase2 || state.phase1 || null) as FeeEstimationResult | null;
   }, [state.phase1, state.phase2]);
 
   // Get cache statistics

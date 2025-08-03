@@ -7,7 +7,7 @@ import type {
 } from "$lib/types/transaction.d.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
 import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { serverConfig } from "$server/config/config.ts"; // Import serverConfig
@@ -172,7 +172,7 @@ export const handler: Handlers = {
         inputsToSign.push({
           index: 0,
           address: address,
-          sighashTypes: [Transaction.SIGHASH_ALL],
+          sighashTypes: [Transaction.__SIGHASH_ALL],
         });
       } else { // Counterparty chose the input(s) - assume one for now from cpTx.ins[0]
         if (!cpTx.ins || cpTx.ins.length === 0) {
@@ -229,7 +229,7 @@ export const handler: Handlers = {
         inputsToSign.push({
           index: 0,
           address: address,
-          sighashTypes: [Transaction.SIGHASH_ALL],
+          sighashTypes: [Transaction.__SIGHASH_ALL],
         });
       }
 

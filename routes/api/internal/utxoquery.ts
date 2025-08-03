@@ -130,13 +130,18 @@ export const handler: Handlers = {
       }
 
       // Sort UTXOs by value (ascending) for consistent ordering
-      const sortedUtxos = [...utxos].sort((a, b) => a.value - b.value);
+      const sortedUtxos = [...utxos].sort((a, b) =>
+        (a.value ?? 0) - (b.value ?? 0)
+      );
 
       logger.debug("api", {
         message: "Internal API: Successfully processed UTXO query",
         address,
         finalCount: sortedUtxos.length,
-        totalValue: sortedUtxos.reduce((sum, utxo) => sum + utxo.value, 0),
+        totalValue: sortedUtxos.reduce(
+          (sum, utxo) => sum + (utxo.value ?? 0),
+          0,
+        ),
       });
 
       return ApiResponseUtil.success({ utxos: sortedUtxos });

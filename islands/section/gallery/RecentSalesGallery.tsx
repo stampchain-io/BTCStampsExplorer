@@ -1,5 +1,6 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
+import type { RecentSalesGalleryProps } from "$types/ui.d.ts";
 import { RecentSaleCard } from "$islands/card/RecentSaleCard.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { LoadingIcon } from "$icon";
@@ -7,35 +8,6 @@ import { subtitlePurple, titlePurpleDL } from "$text";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
 import { BREAKPOINTS } from "$constants";
-import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
-
-interface RecentSalesGalleryProps {
-  title?: string;
-  subTitle?: string;
-  sales?: StampWithEnhancedSaleData[];
-  layout?: "grid" | "list";
-  showFullDetails?: boolean;
-  displayCounts?: {
-    mobileSm?: number;
-    mobileMd?: number;
-    mobileLg?: number;
-    tablet?: number;
-    desktop?: number;
-  };
-  pagination?: {
-    page: number;
-    totalPages: number;
-    prefix?: string;
-    onPageChange?: (page: number) => void;
-  };
-  isLoading?: boolean;
-  btcPriceUSD?: number;
-  autoRefresh?: boolean;
-  refreshIntervalMs?: number;
-  onRefresh?: () => Promise<void>;
-  gridClass?: string;
-  maxItems?: number;
-}
 
 export default function RecentSalesGallery({
   title = "Recent Sales",

@@ -3,7 +3,7 @@
 
 import { Bech32Utils } from "$lib/utils/bitcoin/address/bech32Utils.ts";
 import { assertEquals, assertExists, assertThrows } from "@std/assert";
-import { beforeEach, describe, it } from "@std/testing/bdd";
+import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("Bech32Utils Test Suite", () => {
   // Test fixtures for Bech32 conversions

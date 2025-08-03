@@ -4,49 +4,19 @@
  * world-class sorting infrastructure integration
  */
 
-import type { StampRow } from "$globals";
 import { LoadingIcon } from "$icon";
 import { StampCard } from "$islands/card/StampCard.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import type { FreshStampGalleryProps, StampRow } from "$types/stamp.d.ts";
+import type { PaginationState } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 // ===== TYPES =====
-
-interface FreshStampGalleryProps {
-  /** Initial stamp data from server */
-  initialData: StampRow[];
-  /** Initial pagination state */
-  initialPagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-  /** Wallet address for API calls */
-  address: string;
-  /** Initial sort value - maintaining existing ASC/DESC functionality */
-  initialSort: "ASC" | "DESC";
-  /** Page identifier for conditional rendering */
-  fromPage?: string;
-  /** Enable/disable Fresh.js partial navigation */
-  enablePartialNavigation?: boolean;
-  /** Show loading skeleton during transitions */
-  showLoadingSkeleton?: boolean;
-  /** Grid class for styling */
-  gridClass?: string;
-}
 
 interface FreshNavigationOptions {
   usePartial?: boolean;
   scrollTarget?: string;
   updateUrl?: boolean;
-}
-
-interface PaginationState {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
 }
 
 // ===== MAIN COMPONENT =====
@@ -63,7 +33,9 @@ export function FreshStampGallery({
 }: FreshStampGalleryProps) {
   // ===== STATE =====
   const [stamps, setStamps] = useState<StampRow[]>(initialData);
-  const [currentSort, setCurrentSort] = useState<"ASC" | "DESC">(initialSort);
+  const [currentSort, setCurrentSort] = useState<"ASC" | "DESC">(
+    (initialSort ?? "DESC") as "ASC" | "DESC",
+  );
   const [pagination, setPagination] = useState<PaginationState>(
     initialPagination,
   );
@@ -140,12 +112,14 @@ export function FreshStampGallery({
 
       // Update state with new data
       setStamps(data.data || []);
-      setPagination({
+      setPagination((prev) => ({
+        ...prev,
         page: data.page || 1,
-        limit: data.limit || pagination.limit,
-        total: data.total || 0,
+        limit: data.limit || prev.limit,
         totalPages: data.totalPages || 1,
-      });
+        hasNext: (data.page || 1) < (data.totalPages || 1),
+        hasPrev: (data.page || 1) > 1,
+      }));
     } catch (err) {
       const errorMessage = err instanceof Error
         ? err.message
@@ -180,7 +154,7 @@ export function FreshStampGallery({
   // Sync with external sort changes
   useEffect(() => {
     if (initialSort !== currentSort) {
-      setCurrentSort(initialSort);
+      setCurrentSort((initialSort ?? "DESC") as "ASC" | "DESC");
     }
   }, [initialSort]);
 
@@ -206,7 +180,7 @@ export function FreshStampGallery({
 
         // Update sort if it changed
         if (newSort !== currentSort) {
-          setCurrentSort(newSort);
+          setCurrentSort(newSort as "ASC" | "DESC");
         }
 
         // Fetch new data
@@ -223,13 +197,15 @@ export function FreshStampGallery({
 
           // Update state with new data
           setStamps(data.data || []);
-          const newPagination = {
+          setPagination((prev) => ({
+            ...prev,
             page: data.pagination?.page || data.page || 1,
-            limit: data.pagination?.limit || data.limit || pagination.limit,
-            total: data.pagination?.total || data.total || 0,
+            limit: data.pagination?.limit || data.limit || prev.limit,
             totalPages: data.pagination?.totalPages || data.totalPages || 1,
-          };
-          setPagination(newPagination);
+            hasNext: (data.pagination?.page || data.page || 1) <
+              (data.pagination?.totalPages || data.totalPages || 1),
+            hasPrev: (data.pagination?.page || data.page || 1) > 1,
+          }));
 
           // Scroll to section after data loads
           setTimeout(() => {

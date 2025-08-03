@@ -5,7 +5,7 @@
  * Tests the API endpoints and transaction submission flow
  */
 
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 // Test configuration
 const MARA_API_BASE = "https://slipstream.mara.com/rest-api";

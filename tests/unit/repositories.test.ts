@@ -7,7 +7,7 @@
  */
 
 import { assertEquals, assertExists } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import stampFixtures from "../fixtures/stampData.json" with { type: "json" };
 import marketDataFixtures from "../fixtures/marketData.json" with {
   type: "json",

@@ -1,6 +1,6 @@
 // lib/utils/minting/broadcast.ts
 import { Psbt } from "bitcoinjs-lib";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 // Removed unused interface: BroadcastResponse
 

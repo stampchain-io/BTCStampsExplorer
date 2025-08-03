@@ -22,7 +22,7 @@ import {
   StampToolAdapter,
 } from "$lib/utils/api/adapters/toolEndpointAdapters.ts";
 import { assertEquals, assertThrows } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("StampToolAdapter", () => {
   const adapter = new StampToolAdapter();

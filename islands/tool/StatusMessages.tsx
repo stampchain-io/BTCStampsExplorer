@@ -1,22 +1,7 @@
 /* ===== STATUS MESSAGES ===== */
 /*@baba-move file*/
 import { glassmorphism } from "$layout";
-
-interface StatusMessagesProps {
-  submissionMessage?:
-    | {
-      message: string;
-      txid?: string;
-    }
-    | string
-    | null;
-  apiError?: string | null;
-  fileUploadError?: string | null;
-  walletError?: string | null;
-  maraError?: string | null;
-  transactionHex?: string | null;
-  onCopyHex?: () => void;
-}
+import type { StatusMessagesProps } from "$types/ui.d.ts";
 
 export function StatusMessages({
   submissionMessage,

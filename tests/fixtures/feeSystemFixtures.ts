@@ -1,229 +1,308 @@
-/**
- * Fee System Fixtures for Testing
- * Provides mock data and utilities for fee system testing
- */
+// World-Class Fee System Test Fixtures
+// Comprehensive mock data for all external APIs and services
 
-// Test scenarios for different fee conditions
+export const mempoolFeeFixture = {
+  success: {
+    fastestFee: 20,
+    halfHourFee: 15,
+    hourFee: 10,
+    economyFee: 5,
+    minimumFee: 1,
+  },
+  highFees: {
+    fastestFee: 150,
+    halfHourFee: 120,
+    hourFee: 100,
+    economyFee: 80,
+    minimumFee: 50,
+  },
+  lowFees: {
+    fastestFee: 2,
+    halfHourFee: 2,
+    hourFee: 1,
+    economyFee: 1,
+    minimumFee: 1,
+  },
+};
+
+export const coinGeckoFixture = {
+  success: {
+    bitcoin: {
+      usd: 45000,
+      last_updated_at: 1704067200, // 2024-01-01T00:00:00Z
+    },
+  },
+  highPrice: {
+    bitcoin: {
+      usd: 100000,
+      last_updated_at: 1704067200,
+    },
+  },
+  lowPrice: {
+    bitcoin: {
+      usd: 20000,
+      last_updated_at: 1704067200,
+    },
+  },
+};
+
+export const binanceFixture = {
+  success: {
+    symbol: "BTCUSDT",
+    price: "45000.00",
+  },
+  highPrice: {
+    symbol: "BTCUSDT",
+    price: "100000.00",
+  },
+  lowPrice: {
+    symbol: "BTCUSDT",
+    price: "20000.00",
+  },
+};
+
+export const quickNodeFeeFixture = {
+  success: {
+    id: 1,
+    jsonrpc: "2.0",
+    result: {
+      feerate: 0.00015, // BTC/kB (converts to 15 sats/vB)
+      blocks: 6,
+    },
+  },
+  highFee: {
+    id: 1,
+    jsonrpc: "2.0",
+    result: {
+      feerate: 0.0015, // 150 sats/vB
+      blocks: 6,
+    },
+  },
+  lowFee: {
+    id: 1,
+    jsonrpc: "2.0",
+    result: {
+      feerate: 0.00001, // 1 sats/vB
+      blocks: 6,
+    },
+  },
+  error: {
+    id: 1,
+    jsonrpc: "2.0",
+    error: {
+      code: -32603,
+      message: "Internal error",
+    },
+  },
+};
+
+// Comprehensive mock responses factory
+export const createMockResponse = <T = unknown>(
+  data: T,
+  status = 200,
+  ok = true,
+) => {
+  return Promise.resolve({
+    ok,
+    status,
+    statusText: ok ? "OK" : "Error",
+    json: () => Promise.resolve(data),
+    text: () => Promise.resolve(JSON.stringify(data)),
+    headers: new Headers({ "content-type": "application/json" }),
+  } as Response);
+};
+
+// World-class URL-based mock router
+export const createWorldClassFetchMock = (
+  scenario: "success" | "failure" | "mixed" | "highFees" | "lowFees" =
+    "success",
+) => {
+  return (url: string | URL | Request, options?: RequestInit) => {
+    const urlString = typeof url === "string" ? url : url.toString();
+
+    console.log(`🎯 Mock intercepted: ${urlString}`);
+
+    // Mempool.space API
+    if (
+      urlString.includes("mempool.space") ||
+      urlString.includes("/v1/fees/recommended")
+    ) {
+      switch (scenario) {
+        case "failure":
+          return createMockResponse(
+            { error: "Service unavailable" },
+            503,
+            false,
+          );
+        case "highFees":
+          return createMockResponse(mempoolFeeFixture.highFees);
+        case "lowFees":
+          return createMockResponse(mempoolFeeFixture.lowFees);
+        default:
+          return createMockResponse(mempoolFeeFixture.success);
+      }
+    }
+
+    // CoinGecko API
+    if (urlString.includes("coingecko") || urlString.includes("simple/price")) {
+      switch (scenario) {
+        case "failure":
+          return createMockResponse(
+            { error: "Rate limit exceeded" },
+            429,
+            false,
+          );
+        case "highFees":
+          return createMockResponse(coinGeckoFixture.highPrice);
+        case "lowFees":
+          return createMockResponse(coinGeckoFixture.lowPrice);
+        default:
+          return createMockResponse(coinGeckoFixture.success);
+      }
+    }
+
+    // Binance API
+    if (urlString.includes("binance") || urlString.includes("ticker/price")) {
+      switch (scenario) {
+        case "failure":
+          return createMockResponse({ msg: "Service unavailable" }, 503, false);
+        case "highFees":
+          return createMockResponse(binanceFixture.highPrice);
+        case "lowFees":
+          return createMockResponse(binanceFixture.lowPrice);
+        default:
+          return createMockResponse(binanceFixture.success);
+      }
+    }
+
+    // QuickNode API (JSON-RPC)
+    if (urlString.includes("quicknode") || options?.method === "POST") {
+      const body = options?.body ? JSON.parse(options.body as string) : {};
+      if (body.method === "estimatesmartfee") {
+        switch (scenario) {
+          case "failure":
+            return createMockResponse(quickNodeFeeFixture.error);
+          case "highFees":
+            return createMockResponse(quickNodeFeeFixture.highFee);
+          case "lowFees":
+            return createMockResponse(quickNodeFeeFixture.lowFee);
+          default:
+            return createMockResponse(quickNodeFeeFixture.success);
+        }
+      }
+    }
+
+    // Default fallback for any other URL
+    console.log(`⚠️  Unhandled URL in mock: ${urlString}`);
+    return createMockResponse({ error: "Not mocked" }, 404, false);
+  };
+};
+
+// Test scenario configurations
 export const testScenarios = {
   normal: {
-    name: "Normal Fee Conditions",
-    scenario: "normal",
+    name: "Normal Market Conditions",
+    scenario: "success" as const,
     expectedFee: 15,
     expectedPrice: 45000,
-    expectedFallback: false,
   },
-  high: {
-    name: "High Fee Conditions",
-    scenario: "high",
-    expectedFee: 85,
-    expectedPrice: 65000,
-    expectedFallback: false,
+  highFees: {
+    name: "High Fee Environment",
+    scenario: "highFees" as const,
+    expectedFee: 150,
+    expectedPrice: 100000,
   },
-  low: {
-    name: "Low Fee Conditions",
-    scenario: "low",
-    expectedFee: 5,
-    expectedPrice: 35000,
-    expectedFallback: false,
+  lowFees: {
+    name: "Low Fee Environment",
+    scenario: "lowFees" as const,
+    expectedFee: 2,
+    expectedPrice: 20000,
   },
-  failure: {
-    name: "Network Failure",
-    scenario: "failure",
-    expectedFee: 20,
-    expectedPrice: 50000,
+  networkFailure: {
+    name: "Network Failure Recovery",
+    scenario: "failure" as const,
     expectedFallback: true,
   },
 };
 
-// Mock API responses for different scenarios
-export const mockApiResponses = {
-  normal: {
-    mempool: {
-      fastestFee: 20,
-      halfHourFee: 15,
-      hourFee: 12,
-      economyFee: 8,
-      minimumFee: 1,
-    },
-    coingecko: {
-      bitcoin: { usd: 45000 }
-    },
-    binance: {
-      price: "45000.00"
-    },
-    quicknode: {
-      result: {
-        fastestFee: 20,
-        halfHourFee: 15,
-        hourFee: 12,
-        economyFee: 8,
-        minimumFee: 1,
-      }
-    }
-  },
-  high: {
-    mempool: {
-      fastestFee: 95,
-      halfHourFee: 85,
-      hourFee: 75,
-      economyFee: 65,
-      minimumFee: 1,
-    },
-    coingecko: {
-      bitcoin: { usd: 65000 }
-    },
-    binance: {
-      price: "65000.00"
-    },
-    quicknode: {
-      result: {
-        fastestFee: 95,
-        halfHourFee: 85,
-        hourFee: 75,
-        economyFee: 65,
-        minimumFee: 1,
-      }
-    }
-  },
-  low: {
-    mempool: {
-      fastestFee: 8,
-      halfHourFee: 5,
-      hourFee: 3,
-      economyFee: 2,
-      minimumFee: 1,
-    },
-    coingecko: {
-      bitcoin: { usd: 35000 }
-    },
-    binance: {
-      price: "35000.00"
-    },
-    quicknode: {
-      result: {
-        fastestFee: 8,
-        halfHourFee: 5,
-        hourFee: 3,
-        economyFee: 2,
-        minimumFee: 1,
-      }
-    }
-  },
-  failure: {
-    mempool: null, // Will cause fetch to fail
-    coingecko: null,
-    binance: null,
-    quicknode: null,
-  }
-};
-
-// Create world-class fetch mock
-export function createWorldClassFetchMock(scenario: string) {
-  const responses = mockApiResponses[scenario as keyof typeof mockApiResponses];
-
-  return async (url: string | URL | Request): Promise<Response> => {
-    const urlString = typeof url === 'string' ? url : url.toString();
-
-    // Handle failure scenario
-    if (scenario === 'failure') {
-      throw new Error(`Network error for ${urlString}`);
-    }
-
-    // Mempool.space API
-    if (urlString.includes('mempool.space/api/v1/fees/recommended')) {
-      return new Response(JSON.stringify(responses.mempool), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // CoinGecko API
-    if (urlString.includes('api.coingecko.com')) {
-      return new Response(JSON.stringify(responses.coingecko), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Binance API
-    if (urlString.includes('api.binance.com')) {
-      return new Response(JSON.stringify(responses.binance), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // QuickNode API
-    if (urlString.includes('quicknode') || urlString.includes('rpc')) {
-      return new Response(JSON.stringify(responses.quicknode), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Default fallback
-    return new Response('Not Found', { status: 404 });
-  };
-}
-
-// Expected fee data structure
-export const expectedFeeDataStructure = {
-  recommendedFee: 'number',
-  btcPrice: 'number',
-  source: 'string',
-  confidence: 'string',
-  timestamp: 'number',
-  fastestFee: 'number',
-  halfHourFee: 'number',
-  hourFee: 'number',
-  economyFee: 'number',
-  minimumFee: 'number',
-  fallbackUsed: 'boolean',
-  debug_feesResponse: 'object',
-};
-
-// Validate fee data structure
-export function validateFeeData(data: any): string[] {
-  const errors: string[] = [];
-
-  for (const [key, expectedType] of Object.entries(expectedFeeDataStructure)) {
-    if (!(key in data)) {
-      errors.push(`Missing field: ${key}`);
-      continue;
-    }
-
-    const actualType = typeof data[key];
-    if (actualType !== expectedType) {
-      errors.push(`Field ${key}: expected ${expectedType}, got ${actualType}`);
-    }
-  }
-
-  return errors;
-}
-
 // Performance test fixtures
 export const performanceFixtures = {
   iterations: 10,
-  warmupIterations: 3,
-  maxAcceptableTime: 50, // ms
+  maxAcceptableTime: 50, // ms for mocked responses
+  maxCacheTime: 10, // ms for cached responses
+  warmupIterations: 2,
 };
 
 // Cache test fixtures
 export const cacheTestFixtures = {
-  testKey: "test_fee_data",
+  testKey: "fee_system_test_cache",
   testData: {
     recommendedFee: 15,
     btcPrice: 45000,
-    source: "test",
-    confidence: "high",
     timestamp: Date.now(),
-    fastestFee: 20,
-    halfHourFee: 15,
-    hourFee: 12,
-    economyFee: 8,
-    minimumFee: 1,
-    fallbackUsed: false,
-    debug_feesResponse: {}
+    source: "test",
   },
-  cacheDuration: 30000, // 30 seconds
+  cacheDuration: 60, // seconds
+};
+
+// Background service test fixtures
+export const backgroundServiceFixtures = {
+  testBaseUrl: "https://test-fee-service.example.com",
+  serviceInterval: 100, // ms for testing (much faster than production)
+  warmupDelay: 50, // ms
+  shutdownDelay: 100, // ms
+};
+
+// Expected fee data structure
+export const expectedFeeDataStructure = {
+  recommendedFee: "number",
+  btcPrice: "number",
+  source: "string",
+  confidence: "string",
+  timestamp: "number",
+  fastestFee: "number",
+  halfHourFee: "number",
+  hourFee: "number",
+  economyFee: "number",
+  minimumFee: "number",
+  fallbackUsed: "boolean",
+  debug_feesResponse: "object",
+};
+
+// Validation helpers
+export const validateFeeData = (data: unknown) => {
+  const errors: string[] = [];
+
+  if (!data || typeof data !== "object") {
+    return { isValid: false, errors: ["Invalid data: not an object"] };
+  }
+
+  const dataObj = data as Record<string, unknown>;
+  Object.entries(expectedFeeDataStructure).forEach(([key, expectedType]) => {
+    if (!(key in dataObj)) {
+      errors.push(`Missing required field: ${key}`);
+    } else if (typeof dataObj[key] !== expectedType) {
+      errors.push(
+        `Field ${key} should be ${expectedType}, got ${typeof dataObj[key]}`,
+      );
+    }
+  });
+
+  // Additional validations
+  if (
+    data.recommendedFee &&
+    (data.recommendedFee < 1 || data.recommendedFee > 1000)
+  ) {
+    errors.push(
+      `Recommended fee ${data.recommendedFee} is outside reasonable range (1-1000 sats/vB)`,
+    );
+  }
+
+  if (data.btcPrice && (data.btcPrice < 1000 || data.btcPrice > 1000000)) {
+    errors.push(
+      `BTC price ${data.btcPrice} is outside reasonable range ($1,000-$1,000,000)`,
+    );
+  }
+
+  return errors;
 };

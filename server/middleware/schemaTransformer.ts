@@ -1,5 +1,5 @@
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
-import { getFieldsToStrip } from "./apiVersionMiddleware.ts";
+import { logger } from "$lib/utils/logger.ts";
+import { getFieldsToStrip } from "$server/middleware/apiVersionMiddleware.ts";
 
 /**
  * Schema Transformation Framework

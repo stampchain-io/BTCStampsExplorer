@@ -5,7 +5,7 @@
 
 import type { HttpClient } from "$server/interfaces/httpClient.ts";
 import type { CacheService } from "$server/interfaces/cacheService.ts";
-import type { XcpBalance } from "$types/index.d.ts";
+import type { XcpBalance } from "$types/services.d.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$constants";
 
 // Core configuration interface
@@ -402,6 +402,8 @@ export class CounterpartyApiManagerDI {
                                 utxo: balance.utxo || "",
                                 utxo_address: balance.utxo_address || "",
                                 divisible: balance.divisible || false,
+                                assetName: balance.asset || "",
+                                balance: balance.quantity || 0,
                             });
                         }
                     }
@@ -418,6 +420,8 @@ export class CounterpartyApiManagerDI {
                 utxo: response.result.utxo || "",
                 utxo_address: response.result.utxo_address || "",
                 divisible: response.result.divisible || false,
+                assetName: response.result.asset || "",
+                balance: response.result.quantity || 0,
             }];
             total = 1;
         }
@@ -1101,6 +1105,8 @@ export class MockXcpProvider implements XcpProvider {
       utxo: utxoOnly ? "mock_utxo" : "",
       utxo_address: "",
       divisible: true,
+      assetName: cpid || "MOCKASSET",
+      balance: 1000,
     };
 
     return {

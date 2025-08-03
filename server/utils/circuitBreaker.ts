@@ -1,3 +1,7 @@
+import { CircuitState } from "$lib/constants/serviceConstants.ts";
+import type { CircuitBreakerState } from "$types/ui.d.ts";
+
+export { CircuitState };
 /**
  * Universal Circuit Breaker Pattern Implementation
  *
@@ -10,12 +14,6 @@
  * - Monitoring recent failures over time windows
  */
 
-export enum CircuitState {
-  CLOSED = "CLOSED",           // Normal operation - requests allowed
-  OPEN = "OPEN",              // Circuit is open - requests blocked
-  HALF_OPEN = "HALF_OPEN",    // Testing if service has recovered
-  PERMANENTLY_OPEN = "PERMANENTLY_OPEN" // Circuit permanently disabled
-}
 
 export interface CircuitBreakerOptions {
   failureThreshold: number;      // Number of failures before opening circuit
@@ -27,20 +25,6 @@ export interface CircuitBreakerOptions {
   name?: string;                // Name for logging
 }
 
-export interface CircuitBreakerState {
-  state: CircuitState;
-  failureCount: number;
-  successCount: number;
-  lastFailureTime?: Date;
-  lastSuccessTime?: Date;
-  lastStateChange: Date;
-  requestCount: number;
-  totalFailures: number;
-  totalSuccesses: number;
-  averageResponseTime: number;
-  recentFailures: number[];
-  permanentDisableReason?: string;
-}
 
 export interface CircuitBreakerMetrics {
   name: string;

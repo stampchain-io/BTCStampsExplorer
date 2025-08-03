@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { stub, Stub } from "@std/testing/mock";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { stub, Stub } from "@std/testing@1.0.14/mock";
 
 import {
   estimateTransactionSize,
@@ -9,7 +9,7 @@ import {
   type TransactionSizeOptions,
 } from "../../lib/utils/bitcoin/transactions/transactionSizeEstimator.ts";
 
-import type { ScriptType } from "../../lib/types/index.d.ts";
+import type { ScriptType } from "$types/index.d.ts";
 
 describe("Transaction Size Estimator", () => {
   let loggerStub: Stub;

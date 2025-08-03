@@ -44,7 +44,7 @@ export const ConnectButton = () => {
         const modalContent = (
           <ConnectWalletModal
             connectors={providerComponents}
-            handleClose={closeModal}
+            onClose={closeModal}
           />
         );
 

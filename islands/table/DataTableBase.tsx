@@ -1,5 +1,4 @@
 /* ===== DATA TABLE BASE COMPONENT ===== */
-import { TabData, TableProps, TableType } from "$components/layout/types.ts";
 import { containerBackground, ScrollContainer } from "$layout";
 import {
   SRC20MintsTable,
@@ -9,6 +8,7 @@ import {
   StampTransfersTable,
 } from "$table";
 import { labelSm, loaderText, value3xlTransparent } from "$text";
+import { TabData, TableProps, TableType } from "$types/ui.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 /* ===== CONSTANTS ===== */
@@ -17,13 +17,13 @@ const PAGE_SIZE = 20;
 /* ===== COMPONENT ===== */
 export default function DataTableBase({
   type,
-  configs,
+  configs = [],
   cpid,
   tick,
   initialCounts = {},
 }: TableProps) {
   /* ===== STATE ===== */
-  const [selectedTab, setSelectedTab] = useState<string>(configs[0].id);
+  const [selectedTab, setSelectedTab] = useState<string>(configs[0]?.id || "");
   const [tabData, setTabData] = useState<TabData>({});
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -35,13 +35,13 @@ export default function DataTableBase({
     if (!dispenses || !dispensers) return [];
 
     const dispenserRates = new Map(
-      dispensers.map((d) => [d.tx_hash, d.satoshirate]),
+      dispensers?.map((d) => [d.tx_hash, d.satoshirate]) ?? [],
     );
 
-    return dispenses.map((dispense) => ({
+    return dispenses?.map((dispense) => ({
       ...dispense,
       satoshirate: dispenserRates.get(dispense.dispenser_tx_hash) || 0,
-    }));
+    })) ?? [];
   };
 
   const fetchData = async (
@@ -74,7 +74,7 @@ export default function DataTableBase({
         // Handle 404 responses (no data found) gracefully
         if (!response.ok) {
           if (response.status === 404) {
-            setTabData((prev) => ({
+            setTabData((prev: TabData) => ({
               ...prev,
               [operation]: isTabChange ? [] : prev[operation] || [],
             }));
@@ -86,7 +86,7 @@ export default function DataTableBase({
 
         const data = await response.json();
 
-        setTabData((prev) => ({
+        setTabData((prev: TabData) => ({
           ...prev,
           [operation]: isTabChange
             ? data.data
@@ -112,7 +112,7 @@ export default function DataTableBase({
         );
         const data = await response.json();
 
-        setTabData((prev) => ({
+        setTabData((prev: TabData) => ({
           ...prev,
           [tabId]: isTabChange
             ? data.data
@@ -134,7 +134,10 @@ export default function DataTableBase({
       switch (selectedTab) {
         case "dispensers":
           return (
-            <StampListingsAllTable dispensers={tabData.dispensers || []} />
+            <StampListingsAllTable
+              listings={tabData.dispensers || []}
+              dispensers={tabData.dispensers || []}
+            />
           );
         case "sales": {
           const dispensesWithRates = mapDispensesWithRates(
@@ -144,7 +147,12 @@ export default function DataTableBase({
           return <StampSalesTable dispenses={dispensesWithRates} />;
         }
         case "transfers":
-          return <StampTransfersTable sends={tabData.sends || []} />;
+          return (
+            <StampTransfersTable
+              transactions={tabData.sends || []}
+              sends={tabData.sends || []}
+            />
+          );
         default:
           return null;
       }
@@ -153,7 +161,12 @@ export default function DataTableBase({
         case "mints":
           return <SRC20MintsTable mints={tabData.mints || []} />;
         case "transfers":
-          return <SRC20TransfersTable sends={tabData.transfers || []} />;
+          return (
+            <SRC20TransfersTable
+              transactions={tabData.transfers || []}
+              sends={tabData.transfers || []}
+            />
+          );
         default:
           return null;
       }
@@ -243,7 +256,7 @@ export default function DataTableBase({
             mintCount.json(),
           ]);
 
-          setTotalCounts((prev) => ({
+          setTotalCounts((prev: any) => ({
             ...prev,
             transfers: transferData.total || 0,
             mints: mintData.total || 0,
@@ -261,14 +274,14 @@ export default function DataTableBase({
   const getTabAlignment = (id: string, totalTabs: number) => {
     // For 3 tabs
     if (totalTabs === 3) {
-      if (id === configs[0].id) return "text-left";
-      if (id === configs[1].id) return "text-center";
+      if (configs[0] && id === configs[0].id) return "text-left";
+      if (configs[1] && id === configs[1].id) return "text-center";
       return "text-right";
     }
 
     // For 2 tabs
     if (totalTabs === 2) {
-      return id === configs[0].id ? "text-left" : "text-right";
+      return configs[0] && id === configs[0].id ? "text-left" : "text-right";
     }
 
     // For 1 tab
@@ -301,7 +314,7 @@ export default function DataTableBase({
     <div class={containerBackground}>
       {/* ===== TABS SECTION ===== */}
       <div class="flex justify-between items-start w-full mb-6">
-        {configs.map(({ id }) => {
+        {configs.map(({ id }: TabData) => {
           const count = totalCounts[id as keyof typeof totalCounts];
           const alignment = getTabAlignment(id, configs.length);
 
@@ -314,7 +327,7 @@ export default function DataTableBase({
               <span
                 class={`${labelSm} group-hover:text-stamp-grey-light`}
               >
-                {getTabLabel(type, id)}
+                {type ? getTabLabel(type, id) : id}
               </span>
               <div
                 class={`${value3xlTransparent} text-stamp-grey-darker ${

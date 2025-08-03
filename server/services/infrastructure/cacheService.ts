@@ -1,32 +1,8 @@
-export enum RouteType {
-  // No cache (real-time data)
-  DYNAMIC = 'dynamic',
-  INTERNAL = 'internal',           // Internal admin endpoints
-  STAMP_DISPENSER = 'stamp_dispenser',
-  STAMP_DISPENSE = 'stamp_dispense',
-  STAMP_SEND = 'stamp_send',
+// Import RouteType from constants
+import { RouteType } from "$constants";
 
-  // Short cache (frequently changing data)
-  BALANCE = 'balance',
-  DISPENSER = 'dispenser',
-  TRANSACTION = 'transaction',
-  STAMP_DETAIL = 'stamp_detail',    // Individual stamp details
-
-  // Block-synchronized cache (invalidated on new blocks)
-  BLOCKCHAIN_DATA = 'blockchain_data',  // Data that changes with each block
-
-  // Medium cache (moderately changing data)
-  STAMP = 'stamp',
-  STAMP_METADATA = 'stamp_metadata',
-
-  // Long cache (stable data)
-  STAMP_LIST = 'stamp_list',        // List of all stamps
-  COLLECTION = 'collection',
-  HISTORICAL = 'historical',
-  PROTOCOL = 'protocol',
-  STATIC = 'static',
-  PRICE = 'price',
-}
+// Re-export for external use
+export { RouteType };
 
 export interface CacheConfig {
   duration: number;              // Cache duration in seconds
@@ -129,6 +105,14 @@ export function getCacheConfig(routeType: RouteType): CacheConfig {
       return {
         duration: 60,            // 1 minute
         staleWhileRevalidate: 300,
+        staleIfError: 600,
+      };
+
+    // Default case for any unhandled route types
+    default:
+      return {
+        duration: 300,           // 5 minutes default
+        staleWhileRevalidate: 60,
         staleIfError: 600,
       };
   }

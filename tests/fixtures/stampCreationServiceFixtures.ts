@@ -3,7 +3,7 @@
  * Provides mock data and utilities for stamp creation testing
  */
 
-import type { UTXO, ScriptType } from "../../lib/types/index.d.ts";
+import type { UTXO, ScriptType } from "$types/index.d.ts";
 
 // Mock stamp creation parameters
 export const mockStampParams = {

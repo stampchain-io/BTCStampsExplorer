@@ -1,30 +1,24 @@
+import type { MarketDataStatusProps } from "$types/ui.d.ts";
 /**
  * @fileoverview MarketDataStatus - Simple component to display market data availability
  * @description Shows user-friendly messages about market data status with appropriate styling
  */
 
-interface MarketDataStatusProps {
-  status: {
-    stampsMarketData: "available" | "unavailable";
-    src20MarketData: "available" | "unavailable";
-    overallStatus: "full" | "partial" | "unavailable";
-  };
-  className?: string;
-  showDetails?: boolean;
-}
-
 export function MarketDataStatus({
-  status,
+  status: _status,
   className = "",
   showDetails = false,
+  overallStatus,
+  stampsMarketData,
+  src20MarketData,
 }: MarketDataStatusProps) {
   // Don't show anything if market data is fully available
-  if (status.overallStatus === "full") {
+  if (overallStatus === "full") {
     return null;
   }
 
   const getStatusMessage = () => {
-    switch (status.overallStatus) {
+    switch (overallStatus) {
       case "partial":
         return "Some market data may be unavailable";
       case "unavailable":
@@ -35,7 +29,7 @@ export function MarketDataStatus({
   };
 
   const getStatusColor = () => {
-    switch (status.overallStatus) {
+    switch (overallStatus) {
       case "partial":
         return "text-yellow-400 border-yellow-400/20 bg-yellow-400/5";
       case "unavailable":
@@ -46,7 +40,7 @@ export function MarketDataStatus({
   };
 
   const getStatusIcon = () => {
-    return status.overallStatus === "partial" ? "⚠️" : "ℹ️";
+    return overallStatus === "partial" ? "⚠️" : "ℹ️";
   };
 
   return (
@@ -64,7 +58,8 @@ export function MarketDataStatus({
 
       {showDetails && (
         <span class="opacity-75 ml-2">
-          Stamps: {status.stampsMarketData} • SRC-20: {status.src20MarketData}
+          Stamps: {stampsMarketData?.status || "unknown"} • SRC-20:{" "}
+          {src20MarketData?.status || "unknown"}
         </span>
       )}
     </div>

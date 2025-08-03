@@ -5,7 +5,7 @@
 
 import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { existsSync } from "@std/fs";
-import { describe, it } from "@std/testing/bdd";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 // Test actual component files for SSR safety
 describe("SSR Safety Integration Tests", () => {

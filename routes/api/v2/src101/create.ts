@@ -1,9 +1,10 @@
 import { Handlers } from "$fresh/server.ts";
-import { TX, TXError } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
 import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
 import { SRC101Service } from "$server/services/src101/index.ts";
-import { SRC101InputData } from "$types/index.d.ts";
+import type { TX, TXError } from "$types/transaction.d.ts";
+// AddressHandlerContext import removed - not used in this file
+import type { SRC101InputData } from "$types/src101.d.ts";
 
 type TrxType = "multisig" | "olga";
 

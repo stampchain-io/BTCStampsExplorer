@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
+import type { AddressHandlerContext } from "$types/base.d.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
-import { AddressHandlerContext } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";

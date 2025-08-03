@@ -9,17 +9,8 @@
  * 4. Largest First - Fallback greedy algorithm
  */
 
-import type { BasicUTXO as BaseUTXO, Output, UTXO } from "$lib/types/index.d.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
-
-// Extend BasicUTXO to include optional fields we need
-interface BasicUTXO extends BaseUTXO {
-  address?: string;
-  script?: string;
-  scriptType?: string;
-  scriptDesc?: string;
-  confirmations?: number;
-}
+import type { BasicUTXO, Output, ScriptType, UTXO } from "$lib/types/index.d.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 interface SelectionResult {
   inputs: UTXO[];
@@ -118,11 +109,11 @@ export class OptimalUTXOSelection {
       feeRate,
       options: selectionOptions,
       utxoStatistics: {
-        totalValue: availableUTXOs.reduce((sum, u) => sum + u.value, 0),
+        totalValue: availableUTXOs.reduce((sum, u) => sum + (u.value ?? 0), 0),
         averageValue: availableUTXOs.length > 0 ?
-          Math.floor(availableUTXOs.reduce((sum, u) => sum + u.value, 0) / availableUTXOs.length) : 0,
-        largestUTXO: availableUTXOs.length > 0 ? Math.max(...availableUTXOs.map(u => u.value)) : 0,
-        smallestUTXO: availableUTXOs.length > 0 ? Math.min(...availableUTXOs.map(u => u.value)) : 0,
+          Math.floor(availableUTXOs.reduce((sum, u) => sum + (u.value ?? 0), 0) / availableUTXOs.length) : 0,
+        largestUTXO: availableUTXOs.length > 0 ? Math.max(...availableUTXOs.map(u => u.value ?? 0)) : 0,
+        smallestUTXO: availableUTXOs.length > 0 ? Math.min(...availableUTXOs.map(u => u.value ?? 0)) : 0,
       }
     });
 
@@ -132,7 +123,7 @@ export class OptimalUTXOSelection {
     const dustFilterTime = performance.now() - dustFilterStart;
 
     const filteredUTXOs = availableUTXOs.filter(u => !spendableUTXOs.includes(u));
-    const totalFilteredValue = filteredUTXOs.reduce((sum, u) => sum + u.value, 0);
+    const totalFilteredValue = filteredUTXOs.reduce((sum, u) => sum + (u.value ?? 0), 0);
     const dustAnalysis = {
       totalFiltered: filteredUTXOs.length,
       averageFilteredValue: filteredUTXOs.length > 0 ? totalFilteredValue / filteredUTXOs.length : 0,
@@ -229,7 +220,7 @@ export class OptimalUTXOSelection {
             executionTimeMs: performance.now() - algoStart,
             success: true,
             inputsSelected: algoResult.inputs.length,
-            totalInputValue: algoResult.inputs.reduce((sum, u) => sum + u.value, 0),
+            totalInputValue: algoResult.inputs.reduce((sum, u) => sum + (u.value ?? 0), 0),
             fee: algoResult.fee,
             change: algoResult.change,
             waste,
@@ -303,7 +294,7 @@ export class OptimalUTXOSelection {
 
     if (!bestResult) {
       // Enhanced UTXO analysis logging when selection fails
-      const totalAvailable = spendableUTXOs.reduce((sum, u) => sum + BigInt(u.value), BigInt(0));
+      const totalAvailable = spendableUTXOs.reduce((sum, u) => sum + BigInt(u.value ?? 0), BigInt(0));
       const totalRequired = targetValue;
       const estimatedFee = this.estimateFeeForInputCount(spendableUTXOs.length, outputs.length, feeRate);
       const totalWithFee = totalRequired + estimatedFee;
@@ -375,7 +366,7 @@ export class OptimalUTXOSelection {
       selectedAlgorithm: bestResult.algorithm,
       finalResult: {
         inputs: bestResult.inputs.length,
-        totalValue: bestResult.inputs.reduce((sum, u) => sum + u.value, 0),
+        totalValue: bestResult.inputs.reduce((sum, u) => sum + (u.value ?? 0), 0),
         fee: bestResult.fee,
         change: bestResult.change,
         waste: bestResult.waste,
@@ -439,7 +430,7 @@ export class OptimalUTXOSelection {
     })).filter(u => u.effectiveValue > 0n)
       .sort((a, b) => Number(b.effectiveValue - a.effectiveValue));
 
-    const totalEffectiveValue = effectiveUTXOs.reduce((sum, u) => sum + u.effectiveValue, 0n);
+    const totalEffectiveValue = effectiveUTXOs.reduce((sum, u) => sum + (u.effectiveValue ?? 0n), 0n);
     const candidateUTXOs = effectiveUTXOs.slice(0, 10); // Show top UTXOs for debugging
 
     logger.debug("transaction-utxo-service", {
@@ -662,7 +653,7 @@ export class OptimalUTXOSelection {
 
     // Calculate actual fee and change
     const selectedUTXOs = (bestSelection as BasicUTXO[]).map(u => this.basicToFullUTXO(u));
-    const totalValue = (bestSelection as BasicUTXO[]).reduce((sum, u) => sum + BigInt(u.value), 0n);
+    const totalValue = (bestSelection as BasicUTXO[]).reduce((sum, u) => sum + BigInt(u.value ?? 0), 0n);
     const fee = this.calculateFeeForSelection(bestSelection as BasicUTXO[], outputs, options.feeRate);
 
     if (totalValue < options.targetValue + fee) {
@@ -792,7 +783,11 @@ export class OptimalUTXOSelection {
 
     // Cost of spending the change output in the future
     const changeCost = result.change > 0 ?
-      Number(this.estimateInputCost({ value: result.change } as BasicUTXO, longTermFeeRate)) : 0;
+      Number(this.estimateInputCost({ 
+        txid: "", 
+        vout: 0, 
+        value: result.change 
+      } as BasicUTXO, longTermFeeRate)) : 0;
 
     // Excess is any extra amount paid in fees
     const excess = result.fee - Number(this.calculateFeeForSelection(
@@ -830,15 +825,18 @@ export class OptimalUTXOSelection {
   /**
    * Get input size in vbytes for different script types
    */
-  private static getInputSize(scriptType: string): number {
-    // Normalize to uppercase for comparison
-    const normalizedType = scriptType.toUpperCase();
-    switch (normalizedType) {
+  private static getInputSize(scriptType: ScriptType): number {
+    // Handle undefined or empty input
+    if (!scriptType) return 68; // Default to P2WPKH
+    
+    switch (scriptType) {
       case "P2PKH": return 148;
       case "P2WPKH": return 68;
       case "P2SH": return 91; // Assuming P2SH-P2WPKH
       case "P2WSH": return 104; // Approximate
       case "P2TR": return 58; // Taproot
+      case "OP_RETURN": return 0; // OP_RETURN outputs don't create spendable inputs
+      case "UNKNOWN":
       default: return 68; // Default to P2WPKH
     }
   }
@@ -935,12 +933,12 @@ export class OptimalUTXOSelection {
    * Convert BasicUTXO to full UTXO format
    */
   private static basicToFullUTXO(basic: BasicUTXO): UTXO {
-    const scriptType = (basic.scriptType || "P2WPKH").toUpperCase();
+    const scriptType: ScriptType = basic.scriptType || "P2WPKH";
     return {
       ...basic,
       script: basic.script || "",
       scriptType: scriptType,
-      scriptDesc: basic.scriptDesc || scriptType
+      scriptDesc: scriptType
     };
   }
 
@@ -971,7 +969,7 @@ export class OptimalUTXOSelection {
     feeRate: number
   ): string[] {
     const recommendations: string[] = [];
-    const totalAvailable = spendableUTXOs.reduce((sum, u) => sum + BigInt(u.value), BigInt(0));
+    const totalAvailable = spendableUTXOs.reduce((sum, u) => sum + BigInt(u.value ?? 0), BigInt(0));
     const deficit = totalWithFee - Number(totalAvailable);
 
     if (deficit > 0) {
@@ -998,7 +996,7 @@ export class OptimalUTXOSelection {
  * Backward compatibility wrapper for existing code
  */
 export function selectOptimalUTXOs(
-  utxos: BaseUTXO[],
+  utxos: BasicUTXO[],
   outputs: Output[],
   feeRate: number,
   options?: Partial<SelectionOptions>

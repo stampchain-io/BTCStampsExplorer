@@ -1,4 +1,4 @@
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { getProductionFeeService } from "$server/services/fee/feeServiceFactory.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 

@@ -52,11 +52,19 @@ export class MemoryMonitorService {
     // Set default memory limits (can be overridden by container environment)
     this.memoryLimits = this.detectContainerLimits();
 
-    // Start monitoring
-    this.startMonitoring();
+    // Only start monitoring in production or if explicitly enabled
+    const isDevelopment = Deno.env.get("DENO_ENV") === "development";
+    const forceMonitoring = Deno.env.get("FORCE_MEMORY_MONITORING") === "true";
+    
+    if (!isDevelopment || forceMonitoring) {
+      // Start monitoring
+      this.startMonitoring();
 
-    // Setup graceful shutdown
-    this.setupShutdownHandlers();
+      // Setup graceful shutdown
+      this.setupShutdownHandlers();
+    } else {
+      console.log("[MemoryMonitor] Monitoring disabled in development (set FORCE_MEMORY_MONITORING=true to enable)");
+    }
   }
 
   static getInstance(): MemoryMonitorService {
@@ -472,5 +480,32 @@ export class MemoryMonitorService {
   }
 }
 
-// Export singleton instance
-export const memoryMonitor = MemoryMonitorService.getInstance();
+// Export singleton instance lazily to prevent instantiation during imports in development
+let _memoryMonitor: MemoryMonitorService | null = null;
+
+export const memoryMonitor = {
+  getMemoryStats: () => {
+    if (!_memoryMonitor) {
+      _memoryMonitor = MemoryMonitorService.getInstance();
+    }
+    return _memoryMonitor.getMemoryStats();
+  },
+  getMemoryMetrics: () => {
+    if (!_memoryMonitor) {
+      _memoryMonitor = MemoryMonitorService.getInstance();
+    }
+    return _memoryMonitor.getMemoryMetrics();
+  },
+  setMemoryLimits: (limits: Partial<MemoryLimits>) => {
+    if (!_memoryMonitor) {
+      _memoryMonitor = MemoryMonitorService.getInstance();
+    }
+    return _memoryMonitor.setMemoryLimits(limits);
+  },
+  getHealthStatus: () => {
+    if (!_memoryMonitor) {
+      _memoryMonitor = MemoryMonitorService.getInstance();
+    }
+    return _memoryMonitor.getHealthStatus();
+  }
+};

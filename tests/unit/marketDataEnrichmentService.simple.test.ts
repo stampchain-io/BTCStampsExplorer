@@ -1,6 +1,6 @@
 import { MarketDataEnrichmentService } from "$server/services/src20/marketDataEnrichmentService.ts";
 import { assertEquals, assertExists } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("MarketDataEnrichmentService Basic Tests", () => {
   it("should exist and be importable", () => {

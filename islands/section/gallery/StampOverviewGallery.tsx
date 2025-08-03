@@ -1,16 +1,13 @@
 /* ===== STAMP OVERVIEW GALLERY COMPONENT ===== */
-import { Collection, StampGalleryProps, StampRow } from "$globals";
+import type {
+  StampGalleryProps,
+  StampOverviewGalleryProps,
+} from "$types/stamp.d.ts";
 
 import { StampGallery } from "$section";
 import { titlePurpleDL } from "$text";
 
 /* ===== TYPES ===== */
-interface StampOverviewGalleryProps {
-  stamps_art?: StampRow[];
-  stamps_posh?: StampRow[];
-  stamps_src721?: StampRow[];
-  collectionData?: Collection[];
-}
 
 /* ===== COMPONENT ===== */
 export function StampOverviewGallery({

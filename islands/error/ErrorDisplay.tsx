@@ -1,20 +1,12 @@
 /* ===== ERROR DISPLAY COMPONENT ===== */
 import { Icon } from "$icon";
+import type { ErrorDisplayProps } from "$types/ui.d.ts";
 import {
   ErrorHandlingUtils,
   ErrorInfo,
   ErrorSeverity,
   ErrorType,
-} from "$lib/utils/errorHandlingUtils.ts";
-
-interface ErrorDisplayProps {
-  error: ErrorInfo;
-  onRetry?: () => void;
-  onDismiss?: () => void;
-  compact?: boolean;
-  showDetails?: boolean;
-  className?: string;
-}
+} from "$lib/utils/errorHandling.ts";
 
 export function ErrorDisplay({
   error,
@@ -24,11 +16,47 @@ export function ErrorDisplay({
   showDetails = false,
   className = "",
 }: ErrorDisplayProps) {
-  const userMessage = ErrorHandlingUtils.getUserFriendlyMessage(error);
+  // Convert error to ErrorInfo format for consistent handling
+  const errorInfo: ErrorInfo = (() => {
+    if (typeof error === "string" || error instanceof Error) {
+      return ErrorHandlingUtils.createErrorInfo(error);
+    } else if (error && "severity" in error && "code" in error) {
+      // Handle ErrorHandlingInfo type
+      const errorHandlingInfo = error as any;
+      return {
+        type: ErrorType.UNKNOWN_ERROR,
+        severity: errorHandlingInfo.severity === "error"
+          ? ErrorSeverity.HIGH
+          : errorHandlingInfo.severity === "warning"
+          ? ErrorSeverity.MEDIUM
+          : ErrorSeverity.LOW,
+        message: errorHandlingInfo.message,
+        name: errorHandlingInfo.code,
+        timestamp: new Date(),
+        recoverable: true,
+        retryable: errorHandlingInfo.severity !== "error",
+        action: "retry",
+      };
+    } else if (error) {
+      return error as ErrorInfo;
+    } else {
+      return {
+        type: ErrorType.UNKNOWN_ERROR,
+        severity: ErrorSeverity.LOW,
+        message: "Unknown error occurred",
+        name: "UnknownError",
+        timestamp: new Date(),
+        recoverable: true,
+        retryable: false,
+      };
+    }
+  })();
+
+  const userMessage = ErrorHandlingUtils.getUserFriendlyMessage(errorInfo);
 
   // Get styling based on error severity
   const getSeverityStyles = () => {
-    switch (error.severity) {
+    switch (errorInfo.severity) {
       case ErrorSeverity.LOW:
         return {
           container: "bg-yellow-900/20 border-yellow-500/30 text-yellow-100",
@@ -79,7 +107,7 @@ export function ErrorDisplay({
         />
         <span class="text-sm flex-1">{userMessage}</span>
 
-        {error.retryable && onRetry && (
+        {errorInfo.retryable && onRetry && (
           <button
             type="button"
             onClick={onRetry}
@@ -126,11 +154,11 @@ export function ErrorDisplay({
 
         <div class="flex-1 min-w-0">
           <div class="font-semibold mb-1">
-            {error.severity === ErrorSeverity.CRITICAL
+            {errorInfo.severity === ErrorSeverity.CRITICAL
               ? "Critical Error"
-              : error.severity === ErrorSeverity.HIGH
+              : errorInfo.severity === ErrorSeverity.HIGH
               ? "Error"
-              : error.severity === ErrorSeverity.MEDIUM
+              : errorInfo.severity === ErrorSeverity.MEDIUM
               ? "Warning"
               : "Notice"}
           </div>
@@ -139,22 +167,22 @@ export function ErrorDisplay({
             {userMessage}
           </div>
 
-          {showDetails && error.details && (
+          {showDetails && errorInfo.details && (
             <details class="mb-3">
               <summary class="text-xs text-gray-400 cursor-pointer hover:text-gray-300">
                 Technical Details
               </summary>
               <pre class="text-xs mt-2 p-2 bg-black/20 rounded overflow-auto">
-                {error.details}
+                {errorInfo.details}
               </pre>
             </details>
           )}
 
           <div class="flex items-center gap-2 text-xs text-gray-400">
-            <span>Type: {error.type}</span>
+            <span>Type: {errorInfo.type}</span>
             <span>•</span>
-            <span>Time: {error.timestamp.toLocaleTimeString()}</span>
-            {error.recoverable && (
+            <span>Time: {errorInfo.timestamp.toLocaleTimeString()}</span>
+            {errorInfo.recoverable && (
               <>
                 <span>•</span>
                 <span class="text-green-400">Recoverable</span>
@@ -164,7 +192,7 @@ export function ErrorDisplay({
         </div>
 
         <div class="flex items-center gap-2 flex-shrink-0">
-          {error.retryable && onRetry && (
+          {errorInfo.retryable && onRetry && (
             <button
               type="button"
               onClick={onRetry}
@@ -194,10 +222,10 @@ export function ErrorDisplay({
       </div>
 
       {/* Action suggestions */}
-      {error.action && (
+      {errorInfo.action && (
         <div class="mt-3 pt-3 border-t border-gray-600/30">
           <div class="text-xs text-gray-300">
-            Suggested action: {getActionMessage(error.action)}
+            Suggested action: {getActionMessage(errorInfo.action)}
           </div>
         </div>
       )}
@@ -229,6 +257,7 @@ export function NetworkErrorDisplay({ onRetry }: { onRetry?: () => void }) {
     type: ErrorType.NETWORK_ERROR,
     severity: ErrorSeverity.HIGH,
     message: "Unable to load sales data",
+    name: "NetworkError",
     timestamp: new Date(),
     recoverable: true,
     retryable: true,
@@ -243,6 +272,7 @@ export function LoadingTimeoutDisplay({ onRetry }: { onRetry?: () => void }) {
     type: ErrorType.TIMEOUT_ERROR,
     severity: ErrorSeverity.MEDIUM,
     message: "Loading is taking longer than expected",
+    name: "TimeoutError",
     timestamp: new Date(),
     recoverable: true,
     retryable: true,
@@ -257,6 +287,7 @@ export function DataNotFoundDisplay() {
     type: ErrorType.DATA_ERROR,
     severity: ErrorSeverity.LOW,
     message: "No recent sales data available",
+    name: "DataError",
     timestamp: new Date(),
     recoverable: true,
     retryable: false,

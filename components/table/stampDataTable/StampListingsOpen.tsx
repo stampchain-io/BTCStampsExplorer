@@ -1,3 +1,4 @@
+import type { StampListingsOpenProps } from "$types/ui.d.ts";
 import {
   formatNumber,
   formatSatoshisToBTC,
@@ -5,25 +6,6 @@ import {
 import { rowTable, ScrollContainer } from "$layout";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
 import { labelXs, valueSm } from "$text";
-
-export interface Dispenser {
-  source: string;
-  give_remaining: number;
-  escrow_quantity: number;
-  give_quantity: number;
-  satoshirate: number;
-  confirmed: boolean;
-  close_block_index: number;
-  block_index?: number;
-  isSelected?: boolean;
-}
-
-interface StampListingsOpenProps {
-  dispensers: Dispenser[];
-  floorPrice: number;
-  onSelectDispenser: (dispenser: Dispenser) => void;
-  selectedDispenser: Dispenser | null;
-}
 
 export function StampListingsOpenTable({
   dispensers,
@@ -33,13 +15,13 @@ export function StampListingsOpenTable({
 }: StampListingsOpenProps) {
   const headers = ["PRICE", "ESCROW", "GIVE", "REMAIN", "SOURCE"];
 
-  const sortedDispensers = [...dispensers]
+  const sortedDispensers = [...(dispensers || [])]
     .filter((dispenser) => dispenser.give_remaining > 0)
     .sort((a, b) => b.give_remaining - a.give_remaining);
 
   return (
     <div class="relative w-full">
-      <ScrollContainer class="max-h-[164px]">
+      <ScrollContainer className="max-h-[164px]">
         <div class="w-full">
           <table class={`${valueSm} w-full`}>
             <colgroup>
@@ -96,7 +78,7 @@ export function StampListingsOpenTable({
                   <tr
                     key={dispenser.source}
                     class={rowDispensers}
-                    onClick={() => onSelectDispenser(dispenser)}
+                    onClick={() => onSelectDispenser?.(dispenser)}
                   >
                     <td
                       class={`${

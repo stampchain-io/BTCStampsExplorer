@@ -1,14 +1,9 @@
 import { loaderSpinXsPurple } from "$layout";
-import type { ChartData } from "$lib/types/src20.d.ts";
+import type { ChartWidgetProps, HighchartsData } from "$types/ui.d.ts";
 import Highcharts from "highcharts/highstock";
 import { useEffect, useState } from "preact/hooks";
 
 // ✅ Define TypeScript Props Interface with proper imported types
-interface ChartWidgetProps {
-  data: ChartData;
-  fromPage: string;
-  tick: string;
-}
 
 const ChartWidget = (
   { data, fromPage = "detail", tick = "" }: ChartWidgetProps,
@@ -31,7 +26,10 @@ const ChartWidget = (
       const container = document.getElementById(containerId);
       if (!container) return;
 
-      console.log("Initializing Highcharts for", containerId, data);
+      // Ensure data is properly typed and available
+      const chartData: HighchartsData = data || [];
+
+      console.log("Initializing Highcharts for", containerId, chartData);
       if (fromPage === "home") {
         Highcharts.stockChart(containerId, {
           chart: {
@@ -70,7 +68,7 @@ const ChartWidget = (
             {
               type: "line",
               name: "",
-              data: data,
+              data: chartData,
               color: "#8800CC",
               lineWidth: 2,
               tooltip: {
@@ -122,7 +120,7 @@ const ChartWidget = (
               type: chartType, // Chart type constant
               name: "Price in SAT",
               color: "#8800CC",
-              data: data,
+              data: chartData,
               tooltip: {
                 valueSuffix: " SAT",
               },

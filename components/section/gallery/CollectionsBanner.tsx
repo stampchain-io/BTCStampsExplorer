@@ -1,5 +1,5 @@
 /* ===== COLLECTION LIST CARD COMPONENT ===== */
-import { Collection } from "$globals";
+import type { CollectionsBannerProps } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
 
 /* ===== STYLES ===== */
@@ -16,22 +16,20 @@ const nameClassName = `hidden mobileLg:block
 `;
 
 /* ===== TYPES ===== */
-interface CollectionsBannerProps {
-  collection: Collection;
-  isDarkMode: boolean;
-}
 
 /* ===== COMPONENT ===== */
 export function CollectionsBanner(
   { collection, isDarkMode }: CollectionsBannerProps,
 ) {
+  // Guard against undefined collection
+  if (!collection) return null;
   /* ===== STATE ===== */
   const [isHovered, setIsHovered] = useState(false);
 
   /* ===== COMPONENT ===== */
   return (
     <a
-      href={`/collection/detail/${collection.collection_name}`}
+      href={`/collection/detail/${collection.collection_name ?? ""}`}
       class={`${containerClassName} ${isHovered ? "shadow-collection" : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -40,7 +38,8 @@ export function CollectionsBanner(
         class={`${imageContentClassName} ${isHovered ? "grayscale-0" : ""}`}
         style={{
           backgroundImage: `url('${
-            collection.first_stamp_image || collection.img
+            collection.first_stamp_image ?? collection.img ??
+              "/default-collection-image.png"
           }')`,
         }}
       >

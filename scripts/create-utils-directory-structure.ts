@@ -58,10 +58,7 @@ const directories = [
   
   // Monitoring with subdirectories
   "monitoring",
-  "monitoring/errors",
-  "monitoring/logging",
-  "monitoring/metrics",
-  "monitoring/notifications",
+  "logging",
   
   // Performance with subdirectories
   "performance",
@@ -215,8 +212,8 @@ This directory contains monitoring, logging, and error handling utilities.
 
 Import monitoring utilities using:
 \`\`\`typescript
-import { logger } from "$lib/utils/monitoring/logging";
-import { errorHandlingUtils } from "$lib/utils/monitoring/errors";
+import { logger } from "$lib/utils/logging";
+import { ErrorHandlingUtils } from "$lib/utils/errorHandling";
 \`\`\`
 `,
 

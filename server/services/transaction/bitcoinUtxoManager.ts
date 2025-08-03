@@ -1,8 +1,9 @@
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
-import type { BasicUTXO, Output, UTXO } from "$types/index.d.ts";
+import type { BasicUTXO, UTXO } from "$types/base.d.ts";
+import type { Output } from "$types/transaction.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 
 export class BitcoinUtxoManager {
@@ -78,7 +79,11 @@ export class BitcoinUtxoManager {
         });
       }
     }
-    return basicUtxos;
+    // Filter out UTXOs with undefined values to ensure BasicUTXO compatibility
+    return basicUtxos.filter((utxo): utxo is BasicUTXO => 
+      utxo.value !== undefined && 
+      utxo.script !== undefined
+    );
   }
 
   static estimateVoutSize(output: Output): number {
@@ -195,7 +200,7 @@ export class BitcoinUtxoManager {
         message: "UTXO selection successful using optimal algorithm",
         algorithm: selectionResult.algorithm,
         inputsSelected: selectionResult.inputs.length,
-        totalInputValue: selectionResult.inputs.reduce((sum, u) => sum + u.value, 0),
+        totalInputValue: selectionResult.inputs.reduce((sum, u) => sum + (u.value ?? 0), 0),
         fee: selectionResult.fee,
         change: selectionResult.change,
         waste: selectionResult.waste,

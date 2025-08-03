@@ -1,6 +1,7 @@
 /* ===== SRC20 OVERVIEW CONTENT COMPONENT ===== */
 import { useState } from "preact/hooks";
-// import { SRC20Row } from "$globals"; // Removed unused import
+import type { SRC20OverviewContentProps } from "$types/ui.d.ts";
+// import type { SRC20Row } from "$types/src20.d.ts"; // Removed unused import
 import { SRC20OverviewHeader } from "$header";
 import { SRC20Gallery } from "$section";
 
@@ -12,17 +13,6 @@ type SortOption =
   | "PROGRESS"
   | "MARKET_CAP"
   | "VOLUME";
-
-interface SRC20OverviewContentProps {
-  mintingData?: any;
-  timeframe: "24H" | "7D" | "30D";
-  sortBy: SortOption;
-  sortDirection: "asc" | "desc";
-  viewType: "minted" | "minting"; // 🎸 NEW: Add viewType prop
-  // 🚀 PERFORMANCE: Single BTC price fetch optimization
-  btcPrice?: number;
-  btcPriceSource?: string;
-}
 
 /* ===== COMPONENT ===== */
 export function SRC20OverviewContent({
@@ -42,7 +32,7 @@ export function SRC20OverviewContent({
   // 🤘 PUNK ROCK SIMPLIFICATION: Remove complexity, just use the data directly
   const [_currentTimeframe, setCurrentTimeframe] = useState<
     "24H" | "7D" | "30D"
-  >(timeframe);
+  >(timeframe as "24H" | "7D" | "30D");
   const [isNavigating, setIsNavigating] = useState(false);
 
   // Get the current data (simplified) - all tokens are in mintingData
@@ -77,9 +67,9 @@ export function SRC20OverviewContent({
       link.href = url.toString();
       link.setAttribute("f-partial", "");
       link.style.display = "none";
-      document.body.appendChild(link);
+      document.body.appendChild(link as Node);
       link.click();
-      document.body.removeChild(link);
+      document.body.removeChild(link as Node);
     }
 
     // Reset loading state after a short delay (Fresh.js will handle the actual navigation)
@@ -101,9 +91,9 @@ export function SRC20OverviewContent({
       link.href = url.toString();
       link.setAttribute("f-partial", "");
       link.style.display = "none";
-      document.body.appendChild(link);
+      document.body.appendChild(link as Node);
       link.click();
-      document.body.removeChild(link);
+      document.body.removeChild(link as Node);
     }
 
     // Reset loading state after a short delay
@@ -123,14 +113,20 @@ export function SRC20OverviewContent({
       )}
       <SRC20OverviewHeader
         onViewTypeChange={handleViewTypeChange}
-        viewType={viewType} // 🎸 Pass actual viewType from props
-        onTimeframeChange={setCurrentTimeframe}
+        viewType={viewType || "minted"} // 🔧 Fix TS2375: Provide default when undefined
+        onTimeframeChange={(timeframe: string) => {
+          if (
+            timeframe === "24H" || timeframe === "7D" || timeframe === "30D"
+          ) {
+            setCurrentTimeframe(timeframe);
+          }
+        }}
         onFilterChange={(filter: string, direction?: "asc" | "desc") =>
           handleFilterChange(filter as SortOption | null, direction || "desc")}
         currentSort={currentSort}
       />
       <SRC20Gallery
-        viewType={viewType} // 🎸 Pass actual viewType from props
+        viewType={viewType || "minted"} // 🔧 Fix TS2375: Provide default when undefined
         fromPage="src20"
         initialData={currentData}
         timeframe={_currentTimeframe}
@@ -149,9 +145,9 @@ export function SRC20OverviewContent({
               link.href = url.toString();
               link.setAttribute("f-partial", "");
               link.style.display = "none";
-              document.body.appendChild(link);
+              document.body.appendChild(link as Node);
               link.click();
-              document.body.removeChild(link);
+              document.body.removeChild(link as Node);
             }
           },
         }}

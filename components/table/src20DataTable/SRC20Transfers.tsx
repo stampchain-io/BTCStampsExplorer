@@ -1,15 +1,12 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
+import type { SRC20TransfersProps } from "$types/ui.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
 import { rowTable } from "$layout";
 import {
   abbreviateAddress,
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
-
-interface SRC20TransfersProps {
-  sends: SRC20Row[];
-}
 
 export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
   const headers = ["FROM", "TO", "AMOUNT", "DATE", "TX HASH"];
@@ -18,13 +15,15 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
     <div class="w-[660px] min-[660px]:w-full">
       <table class={`${valueSm} w-full`}>
         <colgroup>
-          {colGroup().map((col) => <col key={col.key} class={col.className} />)}
+          {colGroup().map((col: any) => (
+            <col key={col.key} class={col.className} />
+          ))}
         </colgroup>
-        {sends?.length > 0 &&
+        {(sends?.length ?? 0) > 0 &&
           (
             <thead>
               <tr>
-                {headers.map((header, i) => (
+                {headers.map((header: string, i: number) => (
                   <th
                     key={i}
                     class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
@@ -37,8 +36,8 @@ export function SRC20TransfersTable({ sends }: SRC20TransfersProps) {
             </thead>
           )}
         <tbody>
-          {sends?.length
-            ? sends?.map((send) => (
+          {(sends?.length ?? 0) > 0
+            ? sends?.map((send: SRC20Row) => (
               <tr key={send.tx_hash} class={rowTable}>
                 <td class={cellAlign(0, headers.length)}>
                   <a

@@ -1,15 +1,10 @@
 import { ModalBase } from "$components/layout/ModalBase.tsx";
+import type { MaraModeWarningModalProps } from "$types/ui.d.ts";
 import { CloseIcon } from "$icon";
 import { titlePurpleLD } from "$text";
 import { tooltipIcon } from "$notification";
 import { glassmorphism } from "$layout";
 import { useEffect, useRef, useState } from "preact/hooks";
-
-interface MaraModeWarningModalProps {
-  outputValue: number;
-  onConfirm: () => void;
-  onCancel: () => void;
-}
 
 /**
  * Modal warning users about MARA mode transaction behavior
@@ -45,7 +40,7 @@ export function MaraModeWarningModal({
   };
 
   const handleConfirm = () => {
-    onConfirm();
+    onConfirm?.();
     // Modal should close automatically via parent state management
   };
 
@@ -60,8 +55,9 @@ export function MaraModeWarningModal({
 
   return (
     <ModalBase
+      isOpen={true}
       title="MARA Mode Transaction Warning"
-      onClose={onCancel}
+      onClose={onCancel || (() => {})}
       className={`!w-[400px] mobileLg:!w-[450px] ${glassmorphism} !bg-gradient-to-br !from-stamp-grey-darkest/70 !to-stamp-grey-darkest/80`}
       contentClassName="space-y-4"
       hideHeader
@@ -77,7 +73,7 @@ export function MaraModeWarningModal({
             size="sm"
             weight="bold"
             color="purpleGradient"
-            onClick={onCancel}
+            onClick={onCancel || (() => {})}
           />
           <div
             class={`${tooltipIcon} ${
@@ -164,7 +160,7 @@ export function MaraModeWarningModal({
       <div class="flex gap-3 mt-6">
         <button
           type="button"
-          onClick={onCancel}
+          onClick={onCancel || (() => {})}
           class={`flex-1 px-4 py-2 rounded-lg transition-colors ${glassmorphism} bg-gradient-to-br from-stamp-grey-darkest/20 to-stamp-grey-darkest/40 text-stamp-grey-light hover:from-stamp-grey-darkest/30 hover:to-stamp-grey-darkest/50`}
         >
           Cancel

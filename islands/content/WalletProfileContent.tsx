@@ -1,21 +1,24 @@
 /* ===== WALLET PROFILE CONTENT COMPONENT ===== */
-import { StampRow } from "$globals";
+import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
+
 import { Icon, LoadingIcon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
+import type {
+  EnhancedWalletContentProps,
+  SectionHeaderProps,
+} from "$types/ui.d.ts";
 // AjaxStampGallery has been replaced with FreshStampGallery for Fresh.js partial navigation
+import { NOT_AVAILABLE_IMAGE } from "$constants";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
-import { NOT_AVAILABLE_IMAGE } from "$constants";
+import { createPaginationHandler } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import {
   abbreviateAddress,
   formatBTCAmount,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { createPaginationHandler } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { Dispenser } from "$types/index.d.ts";
-import { WalletContentProps } from "$types/wallet.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
 // ===== ADVANCED SORTING IMPORTS =====
@@ -29,18 +32,6 @@ import type { WalletSortKey } from "$lib/types/sorting.d.ts";
 /**
  * Enhanced wallet content props with feature flag support
  */
-interface EnhancedWalletContentProps extends WalletContentProps {
-  /** Enable advanced sorting features (default: false for backward compatibility) */
-  enableAdvancedSorting?: boolean;
-  /** Show performance metrics for sorting operations */
-  showSortingMetrics?: boolean;
-  /** Additional sorting configuration */
-  sortingConfig?: {
-    enableUrlSync?: boolean;
-    enablePersistence?: boolean;
-    enableMetrics?: boolean;
-  };
-}
 
 /**
  * Section-specific sorting configuration for advanced mode
@@ -106,22 +97,13 @@ const SECTION_CONFIGS: Record<string, SectionSortingConfig> = {
 
 // ===== SECTION HEADER COMPONENT =====
 
-interface SectionHeaderProps {
-  title: string;
-  config: SectionSortingConfig;
-  sortBy: string;
-  onSortChange: (sort: string) => void;
-  enableAdvancedSorting?: boolean;
-  showMetrics?: boolean;
-}
-
 /**
  * Section header with conditional rendering for legacy/advanced sorting
  */
 function SectionHeader({
   title,
   config,
-  sortBy,
+  sortBy = "DESC", // Provide a default value
   onSortChange,
   enableAdvancedSorting = false,
   showMetrics = false,
@@ -155,7 +137,7 @@ function SectionHeader({
               context="wallet"
               maxRetries={2}
               testId="sorting-interface-boundary"
-              onError={(error) => {
+              onError={(error: Error) => {
                 console.error("Sorting interface error:", error);
               }}
             >
@@ -163,13 +145,24 @@ function SectionHeader({
                 config={{
                   defaultSort: sortBy as WalletSortKey,
                 }}
-                options={config.sortOptions.map((option) => ({
+                options={config.sortOptions.map((option: any) => ({
                   value: option as WalletSortKey,
                   label: getSortLabel(option),
                   direction: option.includes("_desc") ? "desc" : "asc",
                 }))}
+                sortBy={sortBy}
+                sortOrder={sortBy.includes("_desc") ? "desc" : "asc"}
+                onSortChange={(
+                  newSortBy: string,
+                  newSortOrder: "asc" | "desc",
+                ) => {
+                  const sortValue = newSortOrder === "desc"
+                    ? newSortBy + "_desc"
+                    : newSortBy;
+                  onSortChange?.(sortValue);
+                }}
                 variant="buttons"
-                size="sm"
+                _size="sm"
                 showLabel={false}
               />
             </SortingErrorBoundary>
@@ -178,7 +171,7 @@ function SectionHeader({
             // Legacy sorting interface
             <SortButton
               initSort={sortBy as "ASC" | "DESC"}
-              onChangeSort={(newSort) => onSortChange(newSort)}
+              onChangeSort={(newSort: any) => onSortChange?.(newSort)}
               sortParam={config.paramName}
             />
           )}
@@ -227,7 +220,7 @@ function DispenserItem({
   }
 
   /* ===== DISPENSER FILTERING ===== */
-  const dispensersWithStamps = dispensers.filter((d) => d.stamp);
+  const dispensersWithStamps = dispensers?.filter((d) => d.stamp) ?? [];
   const openDispensers = dispensersWithStamps.filter((d) =>
     d.give_remaining > 0
   );
@@ -505,7 +498,7 @@ export default function WalletProfileContent(
         context="wallet"
         maxRetries={3}
         testId="wallet-sorting-boundary"
-        onError={(error, details) => {
+        onError={(error: Error, details: any) => {
           console.error("Wallet sorting error:", error);
           console.debug("Error details:", details);
           // TODO(#sorting): Report error to monitoring system
@@ -640,7 +633,7 @@ function WalletProfileContentInner({
             open={openSetting}
             handleOpen={setOpenSetting}
             filterButtons={["transfer"]}
-            onFilterClick={(filter) => {
+            onFilterClick={(filter: string) => {
               if (filter === "transfer") {
                 setOpenSettingModal(true);
               }
@@ -672,10 +665,28 @@ function WalletProfileContentInner({
                   totalPages: Math.ceil(
                     stamps.pagination.total / stamps.pagination.limit,
                   ),
+                  hasNext: stamps.pagination.page <
+                    Math.ceil(
+                      stamps.pagination.total / stamps.pagination.limit,
+                    ),
+                  hasPrev: stamps.pagination.page > 1,
+                  currentPage: stamps.pagination.page,
+                  pageSize: stamps.pagination.limit,
+                  totalItems: stamps.pagination.total,
+                  hasNextPage: stamps.pagination.page <
+                    Math.ceil(
+                      stamps.pagination.total / stamps.pagination.limit,
+                    ),
+                  hasPreviousPage: stamps.pagination.page > 1,
+                  startIndex: (stamps.pagination.page - 1) *
+                    stamps.pagination.limit,
+                  endIndex: Math.min(
+                    stamps.pagination.page * stamps.pagination.limit,
+                    stamps.pagination.total,
+                  ),
                 }}
                 address={address}
                 initialSort="DESC"
-                fromPage="wallet"
                 gridClass={`
                 grid w-full
                 gap-3
@@ -716,10 +727,9 @@ function WalletProfileContentInner({
                   page: src20.pagination.page,
                   limit: src20.pagination.limit || 50,
                   total: src20.pagination.total || src20.data.length,
-                  totalPages: src20.pagination.totalPages,
                 }}
                 address={address}
-                initialSort="DESC"
+                initialSort={{ key: "stamp", direction: "desc" }}
                 fromPage="wallet"
               />
             )

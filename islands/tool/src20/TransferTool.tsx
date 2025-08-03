@@ -225,8 +225,8 @@ export function SRC20TransferTool(
   }, [wallet?.address]);
 
   /* ===== AMOUNT INPUT HANDLER ===== */
-  const handleAmountChange = (e: Event) => {
-    const inputAmount = Number((e.target as HTMLInputElement).value);
+  const handleAmountChange = (value: string) => {
+    const inputAmount = Number(value);
     const maxAmount = Number(formState.maxAmount);
 
     if (!isNaN(inputAmount) && !isNaN(maxAmount) && inputAmount > maxAmount) {
@@ -236,19 +236,27 @@ export function SRC20TransferTool(
       return;
     }
 
-    handleInputChange(e, "amt");
+    const syntheticEvent = {
+      target: { value },
+      type: "change",
+    } as unknown as Event;
+    handleInputChange(syntheticEvent, "amt");
   };
 
   /* ===== TOKEN CHANGE HANDLER ===== */
-  const handleTokenChange = (e: Event) => {
-    const target = e.target as HTMLInputElement;
+  const handleTokenChange = (value: string) => {
     console.log("Token input event:", {
-      type: e.type,
-      targetValue: target.value,
+      type: "change",
+      targetValue: value,
     });
-    const newValue = target.value.toUpperCase();
+    const newValue = value.toUpperCase();
     if (newValue !== formState.token && !isSelecting) {
-      handleInputChange(e, "token");
+      // Create a synthetic event for handleInputChange
+      const syntheticEvent = {
+        target: { value: newValue },
+        type: "change",
+      } as unknown as Event;
+      handleInputChange(syntheticEvent, "token");
       setOpenDrop(true);
     }
   };

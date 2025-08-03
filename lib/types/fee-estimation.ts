@@ -10,7 +10,7 @@
  * @version 1.0.0
  */
 
-import type { BasicUTXO, FeeDetails } from "./base.d.ts";
+import type { BasicUTXO, FeeDetails, ScriptType } from "$types/base.d.ts";
 
 // ===== CORE UTXO INTERFACES =====
 
@@ -24,7 +24,7 @@ export interface DetailedUTXO extends BasicUTXO {
   /** Block height when this UTXO was created */
   blockHeight: number;
   /** Script type (P2WPKH, P2SH, P2PKH, etc.) */
-  scriptType: string;
+  scriptType?: ScriptType;
   /** Raw script public key */
   scriptPubKey: string;
   /** Witness data if applicable */
@@ -92,64 +92,7 @@ export interface ProgressiveFeeEstimationResult extends FeeDetails {
 /**
  * Tool-specific parameters for fee estimation
  */
-export interface ToolEstimationParams {
-  /** Tool type identifier */
-  toolType:
-    | "stamp"
-    | "src20-mint"
-    | "src20-deploy"
-    | "src20-transfer"
-    | "send"
-    | "src101-create";
-  /** Fee rate in sat/vB */
-  feeRate: number;
-  /** User's wallet address */
-  walletAddress?: string;
-  /** Whether wallet is connected */
-  isConnected: boolean;
-  /** Whether a transaction is currently being submitted */
-  isSubmitting?: boolean;
-
-  // Tool-specific parameters (optional based on tool type)
-  /** File data for stamp creation */
-  file?: string;
-  /** Filename for stamp creation */
-  filename?: string;
-  /** Quantity/issuance amount */
-  quantity?: number;
-  /** Whether asset is locked */
-  locked?: boolean;
-  /** Whether asset is divisible */
-  divisible?: boolean;
-  /** For POSH stamps */
-  isPoshStamp?: boolean;
-  /** Asset name for custom stamps */
-  assetName?: string;
-  /** Service fee configuration */
-  service_fee?: string | null;
-  /** Service fee address */
-  service_fee_address?: string | null;
-
-  // SRC-20 specific parameters
-  /** Token ticker */
-  ticker?: string;
-  /** Token supply */
-  supply?: number;
-  /** Mint limit per transaction */
-  limit?: number;
-  /** Number of decimal places */
-  decimals?: number;
-  /** Token description */
-  description?: string;
-
-  // Transfer specific parameters
-  /** Recipient address */
-  recipientAddress?: string;
-  /** Transfer amount */
-  amount?: number;
-  /** Asset to transfer */
-  asset?: string;
-}
+// Removed duplicate ToolEstimationParams definition
 
 /**
  * Progressive fee estimation options and configuration
@@ -253,7 +196,7 @@ export interface FeeEstimationError extends Error {
 /**
  * Tool type union for type safety
  */
-export type ToolType = ToolEstimationParams["toolType"];
+export type ToolType = "stamp" | "src20" | "src101";
 
 /**
  * Estimation phase union for type safety

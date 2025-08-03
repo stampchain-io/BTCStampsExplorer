@@ -1,7 +1,11 @@
 /* ===== BUTTON COMPONENT ===== */
 import { IS_BROWSER } from "$fresh/runtime.ts";
-import { JSX } from "preact";
-import { button, ButtonProps, buttonStyles } from "$button";
+import { button, buttonStyles } from "$button";
+import type {
+  ExtendedButtonProps,
+  ExtendedIconButtonProps,
+  ExtendedProcessingButtonProps,
+} from "$types/ui.d.ts";
 
 /* ===== SUBCOMPONENTS - @baba - duplicate of loaderSpin in layout/styles.ts ===== */
 const LoadingSpinner = () => (
@@ -48,7 +52,7 @@ const getCommonButtonProps = ({
   onFocus,
   onBlur,
   role,
-  "aria-label": ariaLabel,
+  ...(ariaLabel ? { "aria-label": ariaLabel } : {}),
   "data-type": dataType,
   class: className,
   ref,
@@ -56,19 +60,12 @@ const getCommonButtonProps = ({
 });
 
 /* ===== TYPES ===== */
-type ExtendedButtonProps = ButtonProps & {
-  isActive?: boolean;
-  type?: "button" | "submit" | "reset";
-  ref?:
-    | JSX.HTMLAttributes<HTMLButtonElement>["ref"]
-    | JSX.HTMLAttributes<HTMLAnchorElement>["ref"];
-};
 
 /* ===== COMPONENT ===== */
 export function Button({
-  variant,
-  color,
-  size,
+  variant = "outline",
+  color = "purple",
+  size = "md",
   disabled,
   isActive,
   href,
@@ -118,7 +115,11 @@ export function Button({
 
     return href
       ? (
-        <a href={href} f-partial={fPartial || href} class={combinedClass}>
+        <a
+          href={href}
+          f-partial={fPartial ?? href}
+          class={combinedClass}
+        >
           {innerContent}
         </a>
       )
@@ -147,7 +148,7 @@ export function Button({
 
   return href
     ? (
-      <a href={href} f-partial={fPartial || href} {...commonProps}>
+      <a href={href} f-partial={fPartial ?? href} {...commonProps}>
         {children}
       </a>
     )
@@ -159,15 +160,12 @@ export function Button({
 }
 
 /* ===== TYPES ===== */
-type ExtendedIconButtonProps = ExtendedButtonProps & {
-  isLoading?: boolean;
-};
 
 /* ===== ICON BUTTON COMPONENT ===== */
 export function ButtonIcon({
-  variant,
-  color,
-  size,
+  variant = "outline",
+  color = "purple",
+  size = "md",
   disabled,
   isLoading,
   isActive,
@@ -211,7 +209,7 @@ export function ButtonIcon({
 
   return href
     ? (
-      <a href={href} f-partial={fPartial || href} {...commonProps}>
+      <a href={href} f-partial={fPartial ?? href} {...commonProps}>
         {content}
       </a>
     )
@@ -223,16 +221,12 @@ export function ButtonIcon({
 }
 
 /* ===== TYPES ===== */
-type ExtendedProcessingButtonProps = ExtendedButtonProps & {
-  isSubmitting: boolean;
-  type?: "button" | "submit" | "reset";
-};
 
 /* ===== PROCESSING BUTTON COMPONENT ===== */
 export function ButtonProcessing({
-  variant,
-  color,
-  size,
+  variant = "outline",
+  color = "purple",
+  size = "md",
   disabled,
   isSubmitting,
   isActive,
@@ -278,7 +272,7 @@ export function ButtonProcessing({
 
   return href
     ? (
-      <a href={href} f-partial={fPartial || href} {...commonProps}>
+      <a href={href} f-partial={fPartial ?? href} {...commonProps}>
         {content}
       </a>
     )

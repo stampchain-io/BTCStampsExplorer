@@ -1,13 +1,6 @@
 /* ===== ACTIVITY BADGE COMPONENT ===== */
 import { ActivityLevel } from "$constants";
-import type { ActivityLevel as ActivityLevelType } from "$types/marketData.d.ts";
-
-interface ActivityBadgeProps {
-  level: ActivityLevelType | null | undefined;
-  showLabel?: boolean;
-  size?: "xs" | "sm" | "md" | "lg";
-  className?: string;
-}
+import type { ActivityBadgeProps } from "$types/ui.d.ts";
 
 const activityConfig = {
   [ActivityLevel.HOT]: {
@@ -59,7 +52,7 @@ export function ActivityBadge({
   return (
     <span
       class={`inline-flex items-center gap-1 rounded-full border font-medium ${config.className} ${
-        sizeClasses[size]
+        sizeClasses[size ?? "sm"]
       } ${className}`}
       title={`Activity: ${config.label}`}
       aria-label={`Activity level: ${config.label}`}

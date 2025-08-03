@@ -1,17 +1,18 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
+import type { IdentHandlerContext } from "$types/base.d.ts";
+import type { PaginatedIdResponseBody } from "$types/api.d.ts";
+// Unused imports removed: BlockHandlerContext, TickHandlerContext, PaginatedTickResponseBody, SRC20TrxRequestParams
 import { Handlers } from "$fresh/server.ts";
-import { StampController } from "$server/controller/stampController.ts";
-import { PROTOCOL_IDENTIFIERS } from "$lib/utils/data/protocols/protocol.ts";
-import { IdentHandlerContext, PaginatedIdResponseBody } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
+import { PROTOCOL_IDENTIFIERS } from "$lib/utils/data/protocols/protocol.ts";
+import { StampController } from "$server/controller/stampController.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
   validateRequiredParams,
   validateSortParam,
 } from "$server/services/validation/routeValidationService.ts";
-import { SUBPROTOCOLS } from "$globals";
-
 export const handler: Handlers<IdentHandlerContext> = {
   async GET(req, ctx) {
     const { ident } = ctx.params;

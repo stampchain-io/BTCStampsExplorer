@@ -1,5 +1,6 @@
 /* ===== WALLET PROVIDER MODAL COMPONENT ===== */
 import { horizonProvider } from "$client/wallet/horizon.ts";
+import type { WalletProviderProps } from "$types/ui.d.ts";
 import { leatherProvider } from "$client/wallet/leather.ts";
 import { okxProvider } from "$client/wallet/okx.ts";
 import { phantomProvider } from "$client/wallet/phantom.ts";
@@ -7,19 +8,24 @@ import { tapWalletProvider } from "$client/wallet/tapwallet.ts";
 import { unisatProvider } from "$client/wallet/unisat.ts";
 import { closeForegroundModal, closeModal } from "$islands/modal/states.ts";
 import { containerCard } from "$layout";
-import { WALLET_PROVIDERS, WalletProviderKey } from "$constants";
+import { WALLET_PROVIDERS } from "$constants";
+import type { WalletProviderKey } from "$constants/walletProviders.ts";
 import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { showToast } from "$lib/utils/ui/notifications/toastSignal.ts";
+import { handleUnknownError } from "$lib/utils/errorHandling.ts";
 import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface WalletProviderProps {
-  providerKey: WalletProviderKey;
-  onSuccess?: () => void;
-}
+type AddToastFunction = (
+  message: string,
+  type: "error" | "warning" | "info" | "success",
+) => void;
 
 /* ===== WALLET CONNECTORS CONFIG ===== */
-const walletConnectors = {
+const walletConnectors: Record<
+  WalletProviderKey,
+  (addToast: AddToastFunction) => Promise<void>
+> = {
   unisat: unisatProvider.connectUnisat,
   leather: leatherProvider.connectLeather,
   okx: okxProvider.connectOKX,
@@ -33,7 +39,9 @@ export function WalletProvider(
   { providerKey, onSuccess }: WalletProviderProps,
 ) {
   /* ===== HOOKS ===== */
-  const providerInfo = WALLET_PROVIDERS[providerKey];
+  const providerInfo = (providerKey in WALLET_PROVIDERS)
+    ? WALLET_PROVIDERS[providerKey as keyof typeof WALLET_PROVIDERS]
+    : { name: "Unknown", logo: "" };
 
   /* ===== STATE ===== */
   const [isHovered, setIsHovered] = useState(false);
@@ -41,7 +49,8 @@ export function WalletProvider(
   /* ===== EVENT HANDLERS ===== */
   const handleConnect = async () => {
     try {
-      const connectFunction = walletConnectors[providerKey];
+      const connectFunction =
+        walletConnectors[providerKey as WalletProviderKey];
       if (!connectFunction) {
         throw new Error(`Unsupported wallet provider: ${providerKey}`);
       }
@@ -74,12 +83,13 @@ export function WalletProvider(
           closeModal();
         }, 600);
       }
-    } catch (error: unknown) {
-      const errorMessage = `Failed to connect to ${providerKey} wallet: ${
-        error instanceof Error ? error.message : String(error)
-      }`;
-      showToast(errorMessage, "error", false);
-      console.error(errorMessage);
+    } catch (unknownError) {
+      const error = handleUnknownError(
+        unknownError,
+        `Failed to connect to ${providerKey} wallet`,
+      );
+      showToast(error.message, "error", false);
+      console.error(error.message);
     }
   };
 

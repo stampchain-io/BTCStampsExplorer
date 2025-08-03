@@ -1,6 +1,7 @@
 /* ===== RECENT SALES GALLERY COMPONENT ===== */
 /*@baba-153+154-move Refreshing to ViewAllButton-remove default (not used)*/
 import { loaderSpinXsPurple } from "$layout";
+import type { StampSalesProps } from "$types/ui.d.ts";
 import { StampGallery } from "$section";
 import { titlePurpleLD } from "$text";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
@@ -13,15 +14,6 @@ interface DisplayCountBreakpoints {
   mobileLg: number;
   tablet: number;
   desktop: number;
-}
-
-interface StampSalesProps {
-  initialData?: StampWithEnhancedSaleData[];
-  title?: string;
-  subTitle?: string;
-  variant?: "home" | "detail";
-  displayCounts?: DisplayCountBreakpoints;
-  gridClass?: string;
 }
 
 /* ===== COMPONENT ===== */

@@ -1,53 +1,45 @@
-import type { AncestorInfo, ScriptType } from "./index.d.ts";
-import type { FeeDetails } from "./base.d.ts";
+export type FeeRate = number & { __brand: "fee-rate" }; // satoshis per byte
 
-export interface BaseFeeCalculatorProps {
-  fee: number;
-  handleChangeFee: (fee: number) => void;
-  BTCPrice: number;
-  isSubmitting: boolean;
-  onSubmit: () => void;
-  onCancel?: () => void;
-  buttonName: string;
-  className?: string;
-  showCoinToggle?: boolean;
-  tosAgreed?: boolean;
-  onTosChange?: (agreed: boolean) => void;
-  feeDetails?: FeeDetails;
+export interface FeeEstimate {
+  recommendedFee: number;
+  effectiveFeeRate?: number;
+  feeRateSatsPerVB?: number;
+  convertedSatsPerVb?: number;
+  minFeeRate?: number;
+  maxFeeRate?: number;
 }
 
-export interface SimpleFeeCalculatorProps
-  extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
-  type: "send" | "transfer" | "buy" | "src101";
-  amount?: number;
-  recipientAddress?: string;
-  userAddress?: string;
-  inputType?: ScriptType;
-  outputTypes?: ScriptType[];
-  utxoAncestors?: AncestorInfo[];
-  isModal?: boolean;
+export interface FeeCalculatorConfig {
+  minFeeRate: number;
+  maxFeeRate: number;
 }
 
-export interface AdvancedFeeCalculatorProps
-  extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
-  type:
-    | "stamp"
-    | "src20"
-    | "fairmint"
-    | "transfer"
-    | "src20-transfer"
-    | "src101";
-  fileType?: string;
-  fileSize?: number;
-  issuance?: number;
-  recipientAddress?: string;
-  userAddress?: string;
-  inputType?: ScriptType;
-  outputTypes?: ScriptType[];
-  utxoAncestors?: AncestorInfo[];
-  feeDetails?: FeeDetails;
-  onRefresh?: () => void;
-  disabled?: boolean;
-  fromPage?: string;
-  bitname?: string;
+export interface FeeCalculatorResult {
+  effectiveFeeRate: number;
+  normalizedFees?: {
+    normalizedSatsPerVB: number;
+    normalizedSatsPerKB: number;
+  };
+}
+
+export interface FeeAlert {
+  type: "warning" | "critical" | "info";
+  message: string;
+  currentFee: number;
+  recommendedFee: number;
+  threshold?: number;
+}
+
+// FeeDetails interface removed - use the one from base.d.ts instead
+// This was causing conflicts with the authoritative definition in base.d.ts
+
+export interface ToolEstimationParams {
+  transactionType: "transfer" | "inscription" | "marketplace" | "other";
+  dataSize: number;
+  priorityLevel: "low" | "medium" | "high";
+  baseFee: number;
+  dynamicFeeMultiplier?: number;
+  feeToken?: string;
+  discountEligibility?: boolean;
+  maxFeeThreshold?: number;
 }

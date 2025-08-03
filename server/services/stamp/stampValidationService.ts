@@ -1,6 +1,6 @@
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { generateRandomNumber } from "$lib/utils/data/numbers/numberUtils.ts";
-import { isCpid } from "$lib/utils/data/identifiers/identifierUtils.ts";
+import { isCpid } from "$lib/utils/typeGuards.ts";
 
 export class StampValidationService {
   static async checkAssetAvailability(assetName: string): Promise<boolean> {

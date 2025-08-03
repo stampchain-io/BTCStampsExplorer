@@ -117,6 +117,70 @@ storybook-static
 tmp/
 temp/
 
+# Temporary scripts - NEVER commit these
+temp-*.ts
+tmp-*.ts
+test-*.ts
+debug-*.ts
+*-temp.ts
+*-tmp.ts
+*-test.ts
+*-debug.ts
+migration-*.ts
+migrate-*.ts
+cleanup-*.ts
+scaffold-*.ts
+setup-*.ts
+init-*.ts
+*-migration.ts
+*-cleanup.ts
+*-setup.ts
+
+# One-off scripts
+fix-*.ts
+patch-*.ts
+update-*.ts
+convert-*.ts
+hotfix-*.ts
+quickfix-*.ts
+workaround-*.ts
+
+# Test data files
+test-data/
+temp-data/
+migration-data/
+sample-data/
+*.sql
+*.dump
+*.backup
+*.bak
+*.test.json
+*.sample.json
+
+# Personal/local files
+TODO.md
+NOTES.md
+*.personal
+*.local
+*.private
+scratch.ts
+playground.ts
+experiment-*.ts
+
+# Debug artifacts
+debug/
+*.debug
+debug-*.json
+debug-*.log
+*.trace
+trace-*.log
+perf-*.log
+
+# Console log artifacts
+console-*.log
+output-*.txt
+result-*.json
+
 # Editor directories and files
 !.vscode/extensions.json
 .idea
@@ -188,4 +252,5 @@ ssr-safety-report.json
 
 # Task files
 # tasks.json
-# tasks/ 
+# tasks/
+tests/coverage/

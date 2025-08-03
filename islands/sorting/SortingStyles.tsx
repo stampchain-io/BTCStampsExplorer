@@ -6,29 +6,42 @@
 
 import { buttonStyles } from "$button";
 import { TEXT_STYLES } from "$card";
-import type { SortOption, UseSortingConfig } from "$lib/types/sorting.d.ts";
-import { SortingComponent } from "./SortingComponent.tsx";
-import { SortingProvider } from "./SortingProvider.tsx";
+import { SortingComponent } from "$islands/sorting/SortingComponent.tsx";
+import { SortingProvider } from "$islands/sorting/SortingProvider.tsx";
+import type { ButtonSize } from "$lib/constants/uiConstants.ts";
+import type {
+  CompleteSortingInterfaceProps,
+  StyledSortingButtonsProps,
+  StyledSortingDropdownProps,
+  StyledSortingErrorProps,
+  StyledSortingLabelProps,
+} from "$types/ui.d.ts";
 
 // ===== STYLED SORTING COMPONENTS =====
 
 /**
+ * Maps ButtonSize to the acceptable _size values for sorting components
+ */
+function mapButtonSizeToSortingSize(size: ButtonSize): "sm" | "md" | "lg" {
+  switch (size) {
+    case "xxs":
+    case "xs":
+      return "sm";
+    case "sm":
+      return "sm";
+    case "md":
+      return "md";
+    case "lg":
+    case "xl":
+      return "lg";
+    default:
+      return "md";
+  }
+}
+
+/**
  * Props for StyledSortingDropdown
  */
-interface StyledSortingDropdownProps {
-  /** Available sort options */
-  options: ReadonlyArray<SortOption>;
-  /** Additional CSS classes */
-  className?: string;
-  /** Placeholder text */
-  placeholder?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Size variant */
-  size?: "sm" | "md" | "lg";
-  /** Whether to show loading state */
-  showLoading?: boolean;
-}
 
 /**
  * StyledSortingDropdown - Dropdown with BTCStampsExplorer styling
@@ -41,10 +54,15 @@ function StyledSortingDropdown({
   showLoading = false,
 }: StyledSortingDropdownProps) {
   const sizeClasses = {
+    xxs: "h-[28px] px-2 text-xs",
+    xs: "h-[30px] px-2 text-xs",
     sm: "h-[34px] px-3 text-xs",
     md: "h-[38px] px-4 text-sm",
     lg: "h-[42px] px-4 text-sm",
-  };
+    xl: "h-[46px] px-5 text-base",
+    "2xl": "h-[50px] px-6 text-lg",
+    custom: "px-4 py-2 text-sm",
+  } as const;
 
   return (
     <div className="styled-sorting-dropdown">
@@ -74,22 +92,6 @@ function StyledSortingDropdown({
 /**
  * Props for StyledSortingButtons
  */
-interface StyledSortingButtonsProps {
-  /** Available sort options */
-  options: ReadonlyArray<SortOption>;
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Button variant */
-  variant?: "primary" | "secondary" | "ghost";
-  /** Button size */
-  size?: "sm" | "md" | "lg";
-  /** Whether to show icons */
-  showIcons?: boolean;
-  /** Whether to show loading state */
-  showLoading?: boolean;
-}
 
 /**
  * StyledSortingButtons - Button group with BTCStampsExplorer styling
@@ -146,7 +148,7 @@ function StyledSortingButtons({
           flex flex-wrap gap-2
           ${className}
         `}
-        renderButton={(option, isActive) => (
+        renderButton={(option: any, isActive: boolean) => (
           <button
             type="button"
             disabled={showLoading}
@@ -183,18 +185,6 @@ function StyledSortingButtons({
 /**
  * Props for StyledSortingLabel
  */
-interface StyledSortingLabelProps {
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Label style variant */
-  variant?: "default" | "compact" | "detailed";
-  /** Whether to show direction indicator */
-  showDirection?: boolean;
-  /** Whether to show loading state */
-  showLoading?: boolean;
-}
 
 /**
  * StyledSortingLabel - Label with BTCStampsExplorer styling
@@ -213,7 +203,7 @@ function StyledSortingLabel({
           ${TEXT_STYLES.minimal.price.sizes}
           text-stamp-grey-light
         `;
-      case "detailed":
+      case "inline":
         return `
           font-medium text-stamp-grey-darkest
           text-sm mobileLg:text-base
@@ -245,18 +235,6 @@ function StyledSortingLabel({
 /**
  * Props for StyledSortingError
  */
-interface StyledSortingErrorProps {
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Custom error message */
-  message?: string;
-  /** Whether to show retry button */
-  showRetry?: boolean;
-  /** Custom retry handler */
-  onRetry?: () => void;
-}
 
 /**
  * StyledSortingError - Error display with BTCStampsExplorer styling
@@ -287,24 +265,6 @@ function StyledSortingError({
 /**
  * Props for CompleteSortingInterface
  */
-interface CompleteSortingInterfaceProps {
-  /** Sorting configuration */
-  config: UseSortingConfig;
-  /** Available sort options */
-  options: ReadonlyArray<SortOption>;
-  /** UI variant */
-  variant?: "dropdown" | "buttons" | "hybrid";
-  /** Size variant */
-  size?: "sm" | "md" | "lg";
-  /** Additional CSS classes */
-  className?: string;
-  /** Test ID for testing */
-  testId?: string;
-  /** Whether to show current sort label */
-  showLabel?: boolean;
-  /** Whether to show error messages */
-  showError?: boolean;
-}
 
 /**
  * CompleteSortingInterface - Complete sorting UI with provider
@@ -318,6 +278,12 @@ function CompleteSortingInterface({
   showLabel = true,
   showError = true,
 }: CompleteSortingInterfaceProps) {
+  // Transform options from { key, label } to { value, label } format
+  const transformedOptions = options.map(({ key, label }) => ({
+    value: key,
+    label,
+  }));
+
   return (
     <SortingProvider config={config}>
       <SortingComponent
@@ -331,32 +297,15 @@ function CompleteSortingInterface({
           <div className="flex-1">
             {variant === "dropdown" && (
               <StyledSortingDropdown
-                options={options}
-                size={size}
+                options={transformedOptions}
+                _size={mapButtonSizeToSortingSize(size)}
               />
             )}
             {variant === "buttons" && (
               <StyledSortingButtons
-                options={options}
-                size={size}
+                options={transformedOptions}
+                size={mapButtonSizeToSortingSize(size)}
               />
-            )}
-            {variant === "hybrid" && (
-              <div className="flex items-center gap-2">
-                <div className="desktop:hidden">
-                  <StyledSortingDropdown
-                    options={options}
-                    size={size}
-                  />
-                </div>
-                <div className="hidden desktop:block">
-                  <StyledSortingButtons
-                    options={options}
-                    size={size}
-                    variant="ghost"
-                  />
-                </div>
-              </div>
             )}
           </div>
 

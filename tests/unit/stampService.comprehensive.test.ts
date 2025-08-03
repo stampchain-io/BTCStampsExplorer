@@ -9,7 +9,7 @@ import {
   createMockStampMarketData,
   createMockStampRow,
 } from "./utils/testFactories.ts";
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 
 // Interfaces for mock repository options
 interface MockStampOptions {

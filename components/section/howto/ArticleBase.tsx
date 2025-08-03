@@ -1,16 +1,10 @@
 /* ===== ARTICLE COMPONENT ===== */
 import { body, bodyArticle, gapSection } from "$layout";
+import type { ArticleProps } from "$types/ui.d.ts";
 import { headingGrey, subtitleGrey, text, titleGreyLD } from "$text";
 import { ArticlesOverview } from "$section";
 
 /* ===== TYPES ===== */
-interface ArticleProps {
-  title: string;
-  subtitle: string;
-  headerImage: string;
-  children: preact.ComponentChildren;
-  importantNotes?: string[];
-}
 
 /* ===== COMPONENT ===== */
 export function Article(
@@ -47,7 +41,7 @@ export function Article(
               <p class={`${headingGrey} !text-stamp-grey-light mb-0`}>
                 IMPORTANT
               </p>
-              {importantNotes.map((note, index) => (
+              {importantNotes.map((note: string, index: number) => (
                 <p key={index} class={text}>
                   {note}
                 </p>

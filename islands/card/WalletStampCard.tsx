@@ -1,6 +1,7 @@
 /* ===== WALLET STAMP CARD COMPONENT ===== */
 /* Specialized version of StampCard for wallet pages showing user-specific details */
 import { Icon, LoadingIcon } from "$icon";
+import type { WalletStampCardProps } from "$types/ui.d.ts";
 import StampTextContent from "$islands/content/stampDetailContent/StampTextContent.tsx";
 import { VNode } from "preact";
 import { memo } from "preact/compat";
@@ -8,7 +9,6 @@ import { useEffect, useRef, useState } from "preact/hooks";
 
 import { TEXT_STYLES } from "$card";
 import { WalletStampValue } from "$components/display/BTCValueDisplay.tsx";
-import { WalletStampWithValue } from "$lib/types/wallet.d.ts";
 import {
   AUDIO_FILE_IMAGE,
   LIBRARY_FILE_IMAGE,
@@ -21,11 +21,6 @@ import {
 import { isAtomicIconVisible } from "$lib/utils/bitcoin/stamps/stampUtils.ts";
 
 /* ===== TYPES ===== */
-interface WalletStampCardProps {
-  stamp: WalletStampWithValue;
-  variant?: "default" | "grey";
-  fromPage?: string;
-}
 
 /* ===== UTILITY FUNCTIONS ===== */
 
@@ -472,6 +467,8 @@ const WalletStampCardComponent = (
                     stamp={stamp}
                     size="sm"
                     className={`${TEXT_STYLES.price.base} ${TEXT_STYLES.price.sizes}`}
+                    stampId={stamp.stamp || 0}
+                    walletAddress=""
                   />
                 )
                 : (

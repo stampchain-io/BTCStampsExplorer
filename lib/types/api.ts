@@ -14,7 +14,7 @@ import type {
   StampMarketData,
   StampRow,
 } from "./marketData.d.ts";
-import type { PaginatedResponse } from "./pagination.d.ts";
+import type { PaginatedResponse } from "$types/pagination.d.ts";
 
 /**
  * Cache information included in API responses
@@ -202,14 +202,3 @@ export interface ApiResponseWithMarketData<T> {
 /**
  * Error response with market data context
  */
-export interface ApiErrorWithMarketContext {
-  error: string;
-  status: number;
-  code: string;
-  marketDataContext?: {
-    assetId: string;
-    assetType: "stamp" | "src20" | "collection";
-    lastKnownData?: Date;
-    suggestion?: string;
-  };
-}

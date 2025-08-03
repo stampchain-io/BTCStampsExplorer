@@ -1,9 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-
-interface ColorSwatchProps {
-  name: string;
-  bgClass: string;
-}
+import type { ColorSwatchProps } from "$types/ui.d.ts";
 
 function ColorSwatch({ name, bgClass }: ColorSwatchProps) {
   return (
@@ -43,18 +39,22 @@ export default function DesignSystem() {
                 <ColorSwatch
                   name="Primary Default"
                   bgClass="bg-stamp-primary"
+                  color="primary"
                 />
                 <ColorSwatch
                   name="Primary Light"
                   bgClass="bg-stamp-primary-light"
+                  color="primary-light"
                 />
                 <ColorSwatch
                   name="Primary Dark"
                   bgClass="bg-stamp-primary-dark"
+                  color="primary-dark"
                 />
                 <ColorSwatch
                   name="Primary Hover"
                   bgClass="bg-stamp-primary-hover"
+                  color="primary-hover"
                 />
               </div>
             </div>
@@ -68,15 +68,22 @@ export default function DesignSystem() {
                 <ColorSwatch
                   name="Text Primary"
                   bgClass="bg-stamp-text-primary"
+                  color="text-primary"
                 />
                 <ColorSwatch
                   name="Text Secondary"
                   bgClass="bg-stamp-text-secondary"
+                  color="text-secondary"
                 />
-                <ColorSwatch name="Table Text" bgClass="bg-stamp-table-text" />
+                <ColorSwatch
+                  name="Table Text"
+                  bgClass="bg-stamp-table-text"
+                  color="table-text"
+                />
                 <ColorSwatch
                   name="Search Placeholder"
                   bgClass="bg-stamp-search-placeholder"
+                  color="search-placeholder"
                 />
               </div>
             </div>

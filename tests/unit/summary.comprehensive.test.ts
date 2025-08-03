@@ -6,7 +6,7 @@
 
 import { summarize_issuances } from "$server/database/summary.ts";
 import { assertEquals } from "@std/assert";
-import type { StampRow } from "../../globals.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 
 // Helper function to create mock StampRow data
 function createMockStampRow(overrides: Partial<StampRow> = {}): StampRow {

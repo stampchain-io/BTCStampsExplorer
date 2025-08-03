@@ -1,6 +1,6 @@
 import { dbManager } from "$server/database/databaseManager.ts";
 import { Buffer } from "node:buffer";
-import { QuicknodeService } from "./quicknodeService.ts";
+import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 
 export class CachedQuicknodeRPCService {
   private static readonly CACHE_DURATION = 300;  // 5 minutes

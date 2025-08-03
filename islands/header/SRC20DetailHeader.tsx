@@ -1,9 +1,7 @@
 /* ===== SRC20 DETAIL HEADER COMPONENT ===== */
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
-import type { MarketListingAggregated } from "$globals";
 import { Icon } from "$icon";
 import { SearchSRC20Modal } from "$islands/modal/SearchSRC20Modal.tsx";
-import type { AlignmentType } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import {
   abbreviateAddress,
@@ -12,25 +10,7 @@ import {
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelSm, titleGreyLD, valueSm } from "$text";
-import { Deployment } from "$types/index.d.ts";
-import type { SRC20MintStatus } from "$types/src20.d.ts";
-
-/* ===== TYPES ===== */
-export interface SRC20DetailHeaderProps {
-  deployment: Deployment & {
-    email?: string;
-    web?: string;
-    tg?: string;
-    x?: string;
-    stamp_url?: string;
-    deploy_img?: string;
-  };
-  _mintStatus: SRC20MintStatus;
-  _totalMints: number;
-  _totalTransfers: number;
-  marketInfo?: MarketListingAggregated;
-  _align?: AlignmentType;
-}
+import type { SRC20DetailHeaderProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
 export function SRC20DetailHeader({
@@ -49,7 +29,7 @@ export function SRC20DetailHeader({
     : "N/A";
 
   // Format deployment date
-  const deployDate = formatDate(new Date(deployment.block_time), {
+  const deployDate = formatDate(new Date(deployment.block_time || 0), {
     month: "short",
     year: "numeric",
   });
@@ -186,7 +166,7 @@ export function SRC20DetailHeader({
                 </h6>
                 <h5 class="font-bold text-lg gray-gradient3-hover tracking-wide -mt-1">
                   {deployment.creator_name ||
-                    abbreviateAddress(deployment.destination)}
+                    abbreviateAddress(deployment.destination || "")}
                 </h5>
               </div>
             </div>
@@ -215,7 +195,9 @@ export function SRC20DetailHeader({
                     TX ID
                   </h5>
                   <h6 class={valueSm}>
-                    {abbreviateAddress(deployment.tx_hash)}
+                    {deployment.tx_hash
+                      ? abbreviateAddress(deployment.tx_hash)
+                      : "N/A"}
                   </h6>
                 </div>
               </div>
@@ -237,7 +219,9 @@ export function SRC20DetailHeader({
                     LIMIT
                   </h5>
                   <h6 class={valueSm}>
-                    {formatNumber(deployment.lim, 0)}
+                    {deployment.lim !== undefined
+                      ? formatNumber(deployment.lim as number, 0)
+                      : "N/A"}
                   </h6>
                 </div>
                 <div class="flex items-center gap-1.5 justify-end">
@@ -245,7 +229,7 @@ export function SRC20DetailHeader({
                     SUPPLY
                   </h5>
                   <h6 class={valueSm}>
-                    {formatNumber(deployment.max, 0)}
+                    {formatNumber(deployment.max ?? 0, 0)}
                   </h6>
                 </div>
               </div>

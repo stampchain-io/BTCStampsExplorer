@@ -3,8 +3,8 @@
 
 import { DatabaseManager } from "$server/database/databaseManager.ts";
 import { assertExists, assertRejects } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { restore, stub } from "@std/testing/mock";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { restore, stub } from "@std/testing@1.0.14/mock";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 

@@ -1,15 +1,17 @@
 import { ToggleButton } from "$button";
+import type {
+  FrontendStampType,
+  StampEdition,
+  StampFilesize,
+  StampFiletype,
+  StampRange,
+} from "$constants";
 import { inputCheckbox } from "$form";
-import {
-  STAMP_EDITIONS,
-  STAMP_FILESIZES,
-  STAMP_FILETYPES,
-  STAMP_RANGES,
-} from "$globals";
 import { Checkbox, RangeSlider } from "$islands/filter/FilterComponents.tsx";
 import { StampFilters } from "$islands/filter/FilterOptionsStamp.tsx";
 import { CollapsibleSection } from "$islands/layout/CollapsibleSection.tsx";
 import { labelLogicResponsive, labelXsPosition, labelXsR } from "$text";
+import type { RadioProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 const defaultFilters: StampFilters = {
@@ -168,23 +170,23 @@ export function filtersToQueryParams(search: string, filters: StampFilters) {
 export function filtersToServicePayload(filters: typeof defaultFilters) {
   const filterPayload = {
     vector: {
-      fileType: [] as STAMP_FILETYPES[],
+      fileType: [] as StampFiletype[],
       ident: ["STAMP"],
     },
     pixel: {
-      fileType: [] as STAMP_FILETYPES[],
+      fileType: [] as StampFiletype[],
       ident: ["STAMP, SRC-721"],
     },
     recursive: {
-      fileType: [] as STAMP_FILETYPES[],
+      fileType: [] as StampFiletype[],
       ident: ["SRC-721"],
     },
     audio: {
-      fileType: [] as STAMP_FILETYPES[],
+      fileType: [] as StampFiletype[],
       ident: ["STAMP"],
     },
     encoding: {
-      fileType: [] as STAMP_FILETYPES[],
+      fileType: [] as StampFiletype[],
       ident: ["STAMP"],
     },
   };
@@ -262,7 +264,7 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
       }
       return acc;
     },
-    [] as STAMP_FILETYPES[],
+    [] as StampFiletype[],
   );
 
   return {
@@ -398,13 +400,13 @@ export function queryParamsToFilters(query: string): StampFilters {
   // Parse filetype parameter
   const filetypeParam = params.get("filetype");
   if (filetypeParam) {
-    filters.fileType = filetypeParam.split(",") as STAMP_FILETYPES[];
+    filters.fileType = filetypeParam.split(",") as StampFiletype[];
   }
 
   // Parse file size parameters
   const fileSize = params.get("fileSize");
   if (fileSize) {
-    filters.fileSize = fileSize as STAMP_FILESIZES;
+    filters.fileSize = fileSize as StampFilesize;
   }
 
   const fileSizeMin = params.get("fileSizeMin");
@@ -420,13 +422,13 @@ export function queryParamsToFilters(query: string): StampFilters {
   // Parse editions parameter (comma-separated string to array)
   const editionsParam = params.get("editions");
   if (editionsParam) {
-    filters.editions = editionsParam.split(",") as STAMP_EDITIONS[];
+    filters.editions = editionsParam.split(",") as StampEdition[];
   }
 
   // Parse range parameters (flat structure)
   const range = params.get("range");
   if (range) {
-    filters.range = range as STAMP_RANGES;
+    filters.range = range as StampRange;
   }
 
   const rangeMin = params.get("rangeMin");
@@ -467,14 +469,6 @@ export function queryParamsToServicePayload(search: string) {
     rangeMin: filters.rangeMin,
     rangeMax: filters.rangeMax,
   };
-}
-
-interface RadioProps {
-  label: string;
-  value: string;
-  checked: boolean;
-  onChange: () => void;
-  name: string;
 }
 
 const Radio = ({ label, value, checked, onChange, name }: RadioProps) => {
@@ -634,7 +628,7 @@ export const FilterContentStamp = ({
       // Otherwise set the new value
       const newFilters = {
         ...prevFilters,
-        range: value as STAMP_RANGES | null,
+        range: value as StampRange | null,
         rangeMin: "",
         rangeMax: "",
       };
@@ -682,7 +676,7 @@ export const FilterContentStamp = ({
   };
 
   // Fix: Add a dedicated file type toggle function
-  const toggleFileType = (type: STAMP_FILETYPES) => {
+  const toggleFileType = (type: StampFiletype) => {
     setFilters((prevFilters) => {
       let newFileTypes = [...prevFilters.fileType];
 
@@ -724,7 +718,7 @@ export const FilterContentStamp = ({
   };
 
   // Fix: Add a dedicated editions toggle function
-  const toggleEdition = (type: STAMP_EDITIONS) => {
+  const toggleEdition = (type: StampEdition) => {
     setFilters((prevFilters) => {
       const newEditions = [...prevFilters.editions];
       const index = newEditions.indexOf(type);
@@ -864,7 +858,7 @@ export const FilterContentStamp = ({
     });
   };
 
-  const handleFileSizeChange = (sizeType: STAMP_FILESIZES | null) => {
+  const handleFileSizeChange = (sizeType: StampFilesize | null) => {
     setFilters((prevFilters) => {
       const newFilters = {
         ...prevFilters,
@@ -914,7 +908,7 @@ export const FilterContentStamp = ({
 
   // Handler for stamp type changes
   const handleStampTypeChange = (
-    type: "cursed" | "classic" | "posh", // Removed "all" and "stamps"
+    type: FrontendStampType,
   ) => {
     setFilters((prevFilters) => {
       const newFilters = {

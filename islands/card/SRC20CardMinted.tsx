@@ -4,7 +4,8 @@ import { cellAlign } from "$components/layout/types.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { valueSm } from "$text";
-import { SRC20CardBase, SRC20CardBaseProps } from "./SRC20CardBase.tsx";
+import { SRC20CardBase } from "$islands/card/SRC20CardBase.tsx";
+import type { SRC20CardBaseProps } from "$types/ui.d.ts";
 
 // Local utility functions for v2.3 market data format
 function getFloorPrice(src20: any): number {
@@ -27,15 +28,20 @@ function hasMarketData(src20: any): boolean {
 export function SRC20CardMinted(
   { src20, fromPage, onImageClick, totalColumns }: SRC20CardBaseProps,
 ) {
+  // Early return if src20 is null or undefined
+  if (!src20) {
+    return null;
+  }
+
   return (
     <SRC20CardBase
       src20={src20}
       {...(fromPage && { fromPage })}
       {...(onImageClick && { onImageClick })}
-      totalColumns={totalColumns}
+      totalColumns={totalColumns ?? 1}
     >
       {/* Deploy Cell */}
-      <td class={`${cellAlign(1, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(1, totalColumns ?? 1)} ${valueSm}`}>
         {formatDate(new Date(src20.block_time), {
           month: "numeric",
           day: "numeric",
@@ -44,35 +50,35 @@ export function SRC20CardMinted(
       </td>
 
       {/* Holders Cell */}
-      <td class={`${cellAlign(2, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(2, totalColumns ?? 1)} ${valueSm}`}>
         {Number(src20.holders).toLocaleString()}
       </td>
 
       {/* Price Cell - ✅ CLEANED: No more root-level field access */}
-      <td class={`${cellAlign(3, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(3, totalColumns ?? 1)} ${valueSm}`}>
         {Math.round(getFloorPrice(src20) * 1e8).toLocaleString()}
         <span class="text-stamp-grey-light ml-1">SATS</span>
       </td>
 
       {/* Change Cell */}
-      <td class={`${cellAlign(4, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(4, totalColumns ?? 1)} ${valueSm}`}>
         <span class="text-stamp-grey-light">N/A%</span>
       </td>
 
       {/* Volume Cell - ✅ CLEANED: No more type casting chaos */}
-      <td class={`${cellAlign(5, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(5, totalColumns ?? 1)} ${valueSm}`}>
         {Math.round(getVolume24h(src20)).toLocaleString()}
         <span class="text-stamp-grey-light ml-1">BTC</span>
       </td>
 
       {/* Market Cap Cell - ✅ CLEANED: No more type casting chaos */}
-      <td class={`${cellAlign(6, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(6, totalColumns ?? 1)} ${valueSm}`}>
         {Math.round(getMarketCapBTC(src20) * 1e8).toLocaleString()}
         <span class="text-stamp-grey-light ml-1">SATS</span>
       </td>
 
       {/* Chart Cell - ✅ IMPROVED: Type-safe chart access */}
-      <td class={`${cellAlign(7, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(7, totalColumns ?? 1)} ${valueSm}`}>
         <ChartWidget
           fromPage="home"
           data={hasMarketData(src20) ? (src20 as any).chart : null}

@@ -1,3 +1,4 @@
+import type { ScrollContainerProps } from "$types/ui.d.ts";
 // deno-lint-ignore-file react-no-danger
 const scrollbarPadding = `
   (function() {
@@ -17,12 +18,6 @@ const scrollbarPadding = `
     resizeObserver.observe(container);
   })();
 `;
-
-interface ScrollContainerProps {
-  children: preact.ComponentChildren;
-  class?: string;
-  onScroll?: (e: Event) => void;
-}
 
 export function ScrollContainer(
   { children, class: className = "", onScroll }: ScrollContainerProps,

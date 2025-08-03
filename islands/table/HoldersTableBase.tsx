@@ -1,19 +1,20 @@
 /* ===== SRC20 HOLDERS TABLE COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
-import { rowTable, ScrollContainer } from "$layout";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import { rowTable, ScrollContainer } from "$layout";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, loaderText, textSm, textSmLink } from "$text";
+import type { HoldersTableProps } from "$types/ui.d.ts";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
+// Import HolderRow from wallet types
+import type { HolderRow } from "$types/wallet.d.ts";
+
+// Transform HolderRow to match expected shape
 interface Holder {
   address: string | null;
   amt: number | string;
   percentage: number | string;
-}
-
-interface HoldersTableBaseProps {
-  holders?: Holder[];
 }
 
 /* ===== CONSTANTS ===== */
@@ -21,16 +22,23 @@ const PAGE_SIZE = 20;
 
 /* ===== COMPONENT ===== */
 const HoldersTableBase = (
-  { holders = [] }: HoldersTableBaseProps,
+  { holders }: HoldersTableProps,
 ) => {
+  // Transform HolderRow[] to Holder[]
+  const safeHolders: Holder[] = (holders ?? []).map((h: HolderRow) => ({
+    address: h.address,
+    amt: h.amt ?? h.quantity ?? 0,
+    percentage: h.percentage ?? 0,
+  }));
+
   /* ===== STATE ===== */
-  const [data, setData] = useState<Holder[]>(holders.slice(0, PAGE_SIZE) || []);
+  const [data, setData] = useState<Holder[]>(safeHolders.slice(0, PAGE_SIZE));
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
   const headers = ["ADDRESS", "AMOUNT", "PERCENT"];
-  const totalCounts = holders.length;
+  const totalCounts = safeHolders.length;
 
   /* ===== DATA HANDLERS ===== */
   const fetchData = (nextPage: number) => {
@@ -38,7 +46,7 @@ const HoldersTableBase = (
     setIsLoading(true);
     setData((prevData: Holder[]) => [
       ...prevData,
-      ...holders.slice((nextPage - 1) * PAGE_SIZE, nextPage * PAGE_SIZE),
+      ...safeHolders.slice((nextPage - 1) * PAGE_SIZE, nextPage * PAGE_SIZE),
     ]);
     setIsLoading(false);
   };

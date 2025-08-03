@@ -14,13 +14,8 @@ export interface FileValidationOptions {
   requiredFields?: string[];
 }
 
-/**
- * Default pagination values
- */
-export const DEFAULT_PAGINATION = {
-  limit: 50,
-  page: 1,
-} as const;
+// Re-export DEFAULT_PAGINATION from $constants
+export { DEFAULT_PAGINATION } from "$constants";
 
 /**
  * Validates required path parameters

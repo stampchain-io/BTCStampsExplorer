@@ -1,9 +1,12 @@
 /**
  * MARA Slipstream Integration Configuration
- * 
+ *
  * This module defines the configuration types and interfaces for the MARA integration,
  * including API endpoints, service fees, and feature flags.
  */
+
+// Import DEFAULT_MARA_CONFIG for use within this file
+import { DEFAULT_MARA_CONFIG } from "$constants";
 
 /**
  * MARA configuration interface with strongly typed properties
@@ -136,13 +139,13 @@ export function createMaraConfigFromEnv(): MaraConfig | null {
 
   // Get environment values with proper fallback handling
   const apiBaseUrl = Deno.env.get('MARA_API_BASE_URL')?.trim() || DEFAULT_MARA_CONFIG.apiBaseUrl;
-  
+
   const apiTimeoutStr = Deno.env.get('MARA_API_TIMEOUT')?.trim();
   const apiTimeout = apiTimeoutStr ? parseInt(apiTimeoutStr, 10) : DEFAULT_MARA_CONFIG.apiTimeout;
-  
+
   const serviceFeeAmountStr = Deno.env.get('MARA_SERVICE_FEE_SATS')?.trim();
   const serviceFeeAmount = serviceFeeAmountStr ? parseInt(serviceFeeAmountStr, 10) : DEFAULT_MARA_CONFIG.serviceFeeAmount;
-  
+
   const serviceFeeAddress = Deno.env.get('MARA_SERVICE_FEE_ADDRESS')?.trim() || DEFAULT_MARA_CONFIG.serviceFeeAddress;
 
   const config: MaraConfig = {
@@ -159,13 +162,5 @@ export function createMaraConfigFromEnv(): MaraConfig | null {
   return config;
 }
 
-/**
- * Default MARA configuration for development
- */
-export const DEFAULT_MARA_CONFIG: MaraConfig = {
-  apiBaseUrl: 'https://slipstream.mara.com/rest-api',
-  apiTimeout: 30000,
-  serviceFeeAmount: 42000,
-  serviceFeeAddress: 'bc1qhhv6rmxvq5mj2fc3zne2gpjqduy45urapje64m',
-  enabled: true,
-};
+// Re-export DEFAULT_MARA_CONFIG from $constants
+export { DEFAULT_MARA_CONFIG } from "$constants";

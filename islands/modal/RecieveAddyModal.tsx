@@ -1,5 +1,6 @@
 /* ===== RECEIVE ADDRESS MODAL COMPONENT ===== */
 import { JSX } from "preact";
+import type { ReceiveAddyModalProps } from "$types/ui.d.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { tooltipIcon } from "$notification";
 import { ModalBase } from "$layout";
@@ -9,13 +10,11 @@ import { logger } from "$lib/utils/logger.ts";
 import QRCodeStyling from "https://esm.sh/qr-code-styling@1.6.0-rc.1";
 
 /* ===== TYPES ===== */
-interface Props {
-  address: string;
-  title?: string;
-}
 
 /* ===== COMPONENT ===== */
-function RecieveAddyModal({ address, title = "RECEIVE" }: Props) {
+function RecieveAddyModal(
+  { address, title = "RECEIVE" }: ReceiveAddyModalProps,
+) {
   /* ===== STATE ===== */
   const [isCopyTooltipVisible, setIsCopyTooltipVisible] = useState(false);
   const [allowCopyTooltip, setAllowCopyTooltip] = useState(true);
@@ -96,7 +95,7 @@ function RecieveAddyModal({ address, title = "RECEIVE" }: Props) {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(address);
+      await navigator.clipboard.writeText(address ?? "");
       setCopyTooltipText("ADDY COPIED");
       setIsCopyTooltipVisible(true);
       setAllowCopyTooltip(false);
@@ -138,7 +137,7 @@ function RecieveAddyModal({ address, title = "RECEIVE" }: Props) {
         {/* ===== ADDRESS SECTION ===== */}
         <div class="flex flex-col items-center">
           <p class="break-all text-center text-base leading-relaxed text-stamp-grey-light max-w-full pt-4">
-            {formatAddress(address)}
+            {formatAddress(address ?? "")}
           </p>
         </div>
 

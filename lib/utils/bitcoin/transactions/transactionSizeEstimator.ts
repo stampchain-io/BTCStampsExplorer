@@ -7,7 +7,7 @@
 
 import { TX_CONSTANTS } from "$constants";
 import type { ScriptType } from "$lib/types/index.d.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 /**
  * Detailed transaction size options for precise calculation
@@ -32,7 +32,7 @@ function calculateWitnessWeight(
 ): number {
   if (!input.isWitness) return 0;
 
-  const normalizedType = input.type.toUpperCase();
+  const normalizedType = input.type?.toUpperCase() ?? "UNKNOWN";
   if (
     normalizedType === "P2WPKH" || normalizedType === "P2WSH" ||
     normalizedType === "P2TR"
@@ -75,8 +75,10 @@ function calculateWitnessWeight(
 /**
  * Calculate output script weight for a specific script type
  */
-function calculateOutputScriptWeight(outputType: ScriptType): number {
-  switch (outputType.toUpperCase()) {
+function calculateOutputScriptWeight(
+  outputType: ScriptType | undefined,
+): number {
+  switch (outputType?.toUpperCase() ?? "P2WPKH") {
     case "P2PKH":
       return 25 * 4; // DUP HASH160 <20 bytes> EQUALVERIFY CHECKSIG
     case "P2WPKH":
@@ -123,7 +125,7 @@ export function estimateTransactionSize(
     }
     // Directly lookup type in TX_CONSTANTS instead of using getScriptTypeInfo
     const typeInfo = TX_CONSTANTS[input.type as keyof typeof TX_CONSTANTS] as {
-      isWitness: boolean;
+      isWitness?: boolean;
     } | undefined;
     return typeInfo?.isWitness ?? false;
   });
@@ -155,12 +157,16 @@ export function estimateTransactionSize(
         witnessWeight;
     } else {
       // Non-witness input: outpoint + script + sequence
-      const size = TX_CONSTANTS[
-        input.type as Exclude<
-          ScriptType,
-          "OP_RETURN" | "UNKNOWN" | "P2WPKH" | "P2WSH" | "P2TR"
-        >
-      ]?.size;
+      const inputType: Exclude<
+        ScriptType,
+        "OP_RETURN" | "UNKNOWN" | "P2WPKH" | "P2WSH" | "P2TR" | undefined
+      > =
+        (input.type && input.type !== "OP_RETURN" && input.type !== "UNKNOWN" &&
+            input.type !== "P2WPKH" && input.type !== "P2WSH" &&
+            input.type !== "P2TR")
+          ? input.type
+          : "P2PKH"; // Default to P2PKH if type is undefined or excluded
+      const size = TX_CONSTANTS[inputType]?.size;
 
       if (size === undefined) {
         logger.warn("system", {

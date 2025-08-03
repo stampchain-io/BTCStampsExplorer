@@ -4,8 +4,8 @@
  * persistence, metrics, and error handling using Preact/Fresh architecture
  */
 
+import type { EnhancedSortState } from "$lib/types/ui.d.ts";
 import type {
-  EnhancedSortState,
   SortAction,
   SortError,
   SortKey,

@@ -2,8 +2,8 @@ import {
   assertEquals,
   assertExists,
 } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { stub, returnsNext } from "@std/testing/mock";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { stub, returnsNext } from "@std/testing@1.0.14/mock";
 import { InternalApiFrontendGuard } from "$/server/services/security/internalApiFrontendGuard.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 

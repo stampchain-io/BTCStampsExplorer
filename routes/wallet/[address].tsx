@@ -1,17 +1,21 @@
 /* ===== WALLET PAGE ===== */
 /*@baba-367*/
+
 import { MetaTags } from "$components/layout/MetaTags.tsx";
 import { WalletProfileContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import { SRC20Row, StampRow } from "$globals";
+import type { SRC20Balance, SRC20Row } from "$types/src20.d.ts";
+import type { Dispenser, StampRow } from "$types/stamp.d.ts";
+import type { WalletStampWithValue } from "$types/wallet.d.ts";
+
 import WalletDispenserDetails from "$islands/content/WalletDispenserDetails.tsx";
 import WalletProfileDetails from "$islands/content/WalletProfileDetails.tsx";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
-import { WalletPageProps } from "$types/index.d.ts";
 import { PaginatedResponse } from "$types/pagination.d.ts";
+import type { WalletPageProps } from "$types/ui.d.ts";
 import { WalletOverviewInfo } from "$types/wallet.d.ts";
 
 /* ===== SERVER HANDLER ===== */
@@ -138,7 +142,6 @@ export const handler: Handlers = {
         // BTC info
         getBTCBalanceInfo(address, {
           includeUSD: true,
-          apiBaseUrl: url.origin,
         }),
 
         // Dispensers with sorting and pagination
@@ -551,9 +554,9 @@ function isDispenserOnlyAddress(data: {
   stampsCreated: number;
   anchor: string;
   data?: {
-    stamps: { data: any[] };
-    src20: { data: any[] };
-    dispensers: { data: any[] };
+    stamps: { data: WalletStampWithValue[] };
+    src20: { data: SRC20Balance[] };
+    dispensers: { data: Dispenser[] };
   };
 }) {
   // Safety check: if data.data doesn't exist or is missing dispensers, return false

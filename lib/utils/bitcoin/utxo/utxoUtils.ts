@@ -84,7 +84,7 @@ export async function getTxInfo(tx: string): Promise<number | string> {
 }
 
 // isValidBitcoinAddress is now exported from scriptTypeUtils.ts
-// Import from there if needed: import { isValidBitcoinAddress } from "../scripts/scriptTypeUtils.ts";
+// Import from there if needed: import { isValidBitcoinAddress } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 
 function reverseEndian(hexString: string): string {
   if (hexString.length % 2 !== 0) {

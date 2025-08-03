@@ -1,20 +1,9 @@
 import { Icon } from "$icon";
+import type { MaraSuccessMessageProps } from "$types/ui.d.ts";
+import type { TransactionBadgeProps } from "$types/ui.d.ts";
+import type { TransactionStatusProps } from "$types/ui.d.ts";
 import { buttonPurpleFlat } from "$button";
 import { useEffect, useRef, useState } from "preact/hooks";
-
-export type TransactionState = "submitted" | "pending" | "confirmed" | "failed";
-
-interface TransactionStatusProps {
-  state: TransactionState;
-  txid?: string;
-  confirmations?: number;
-  targetConfirmations?: number;
-  estimatedTime?: number; // in seconds
-  errorMessage?: string;
-  class?: string;
-  onViewTransaction?: () => void;
-  onRetry?: () => void;
-}
 
 export function TransactionStatus({
   state,
@@ -35,7 +24,7 @@ export function TransactionStatus({
       setRemainingTime(estimatedTime);
 
       intervalRef.current = globalThis.setInterval(() => {
-        setRemainingTime((prev) => {
+        setRemainingTime((prev: number) => {
           if (prev <= 0) {
             if (intervalRef.current) {
               globalThis.clearInterval(intervalRef.current);
@@ -211,10 +200,6 @@ export function TransactionStatus({
 }
 
 // Compact status badge for inline display
-interface TransactionBadgeProps {
-  state: TransactionState;
-  class?: string;
-}
 
 export function TransactionBadge(
   { state, class: className = "" }: TransactionBadgeProps,
@@ -271,16 +256,6 @@ export function TransactionBadge(
 }
 
 // MARA-specific success message component
-interface MaraSuccessMessageProps {
-  txid: string;
-  outputValue: number;
-  feeRate: number;
-  poolInfo?: {
-    name: string;
-    hashrate?: string;
-  };
-  class?: string;
-}
 
 export function MaraSuccessMessage({
   txid,
@@ -348,7 +323,7 @@ export function MaraSuccessMessage({
 
             <p class="text-xs text-purple-400/60 mt-3">
               Transaction ID:{" "}
-              <span class="font-mono">{txid.slice(0, 16)}...</span>
+              <span class="font-mono">{txid?.slice(0, 16)}...</span>
             </p>
           </div>
         </div>

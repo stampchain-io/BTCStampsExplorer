@@ -1,25 +1,24 @@
-import {
-  STAMP_EDITIONS,
-  STAMP_FILESIZES,
-  STAMP_FILETYPES,
-  STAMP_FILTER_TYPES,
-  STAMP_MARKETPLACE,
-  STAMP_RANGES,
-  STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES,
-  SUBPROTOCOLS,
-} from "$globals";
+import type {
+    StampEdition,
+    StampFilesize,
+    StampFiletype,
+    StampFilterType,
+    StampMarketplace,
+    StampRange,
+    StampSuffixFilter
+} from "$constants";
+import { type StampType } from "$constants";
 import { StampRepository } from "$server/database/index.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { CounterpartyApiManager, CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
+import { SUBPROTOCOLS } from "$types/base.d.ts";
 
-import { logger, LogNamespace } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { CreatorService } from "$server/services/creator/creatorService.ts";
 import { getCacheConfig, RouteType } from "$server/services/infrastructure/cacheService.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
-import type { XcpBalance } from "$types/index.d.ts";
-import type { StampMarketData } from "$types/marketData.d.ts";
+import type { StampMarketData, XcpBalance } from "$types";
 
 interface StampServiceOptions {
   cacheType: RouteType;
@@ -39,7 +38,7 @@ interface StampFileResult {
 export class StampService {
   static async getStampDetailsById(
     id: string | number,
-    stampType: STAMP_TYPES = "all",
+    stampType: StampType = "all",
     cacheType?: RouteType,
     cacheDuration?: number | "never",
     includeSecondary: boolean = true
@@ -113,7 +112,7 @@ export class StampService {
     page?: number;
     limit?: number;
     sortBy?: "ASC" | "DESC";
-    type?: STAMP_TYPES;
+    type?: StampType;
     ident?: SUBPROTOCOLS | SUBPROTOCOLS[];
     identifier?: string | number | (string | number)[];
     blockIdentifier?: number | string;
@@ -128,26 +127,26 @@ export class StampService {
     skipTotalCount?: boolean;
     cacheType?: RouteType;
     creatorAddress?: string;
-    filterBy?: STAMP_FILTER_TYPES[];
-    suffix?: STAMP_SUFFIX_FILTERS[];
-    fileType?: STAMP_FILETYPES[];
-    editions?: STAMP_EDITIONS[];
-    range?: STAMP_RANGES;
+    filterBy?: StampFilterType[];
+    suffix?: StampSuffixFilter[];
+    fileType?: StampFiletype[];
+    editions?: StampEdition[];
+    range?: StampRange;
     rangeMin?: string;
     rangeMax?: string;
-    market?: Extract<STAMP_MARKETPLACE, "listings" | "sales"> | "";
+    market?: Extract<StampMarketplace, "listings" | "sales"> | "";
     dispensers?: boolean;
     atomics?: boolean;
-    listings?: Extract<STAMP_MARKETPLACE, "all" | "bargain" | "affordable" | "premium" | "custom"> | "";
+    listings?: Extract<StampMarketplace, "all" | "bargain" | "affordable" | "premium" | "custom"> | "";
     listingsMin?: string;
     listingsMax?: string;
-    sales?: Extract<STAMP_MARKETPLACE, "recent" | "premium" | "custom" | "volume"> | "";
+    sales?: Extract<StampMarketplace, "recent" | "premium" | "custom" | "volume"> | "";
     salesMin?: string;
     salesMax?: string;
     volume?: "24h" | "7d" | "30d" | "";
     volumeMin?: string;
     volumeMax?: string;
-    fileSize?: STAMP_FILESIZES | null;
+    fileSize?: StampFilesize | null;
     fileSizeMin?: string;
     fileSizeMax?: string;
     url?: string;
@@ -181,7 +180,7 @@ export class StampService {
         if (urlRangeMin || urlRangeMax) {
           console.log("Service extracting range params:", { urlRangeMin, urlRangeMax });
           // Set range to "custom" and pass min/max separately
-          range = "custom" as STAMP_RANGES;
+          range = "custom" as StampRange;
           rangeMin = urlRangeMin || rangeMin;
           rangeMax = urlRangeMax || rangeMax;
           console.log("Service set range to custom with:", { range, rangeMin, rangeMax });
@@ -353,12 +352,12 @@ export class StampService {
 
   static mapDispensesWithRates(dispenses: any, dispensers: any) {
     const dispenserRates = new Map(
-      dispensers.map((d: any) => [d.tx_hash, d.satoshirate]),
+      dispensers?.map((d: any) => [d.tx_hash, d.satoshirate]) ?? [],
     );
-    return dispenses.map((dispense: any) => ({
+    return dispenses?.map((dispense: any) => ({
       ...dispense,
       satoshirate: dispenserRates.get(dispense.dispenser_tx_hash) || 0,
-    }));
+    })) ?? [];
   }
 
   static async getRecentSales(
@@ -367,7 +366,7 @@ export class StampService {
     options?: {
       dayRange?: number;
       includeFullDetails?: boolean;
-      type?: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
+      type?: StampType;
     }
   ) {
     // Use local market data instead of fetching all dispense events

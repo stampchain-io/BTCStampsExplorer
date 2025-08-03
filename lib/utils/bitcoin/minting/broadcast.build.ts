@@ -1,6 +1,6 @@
 // This is a stub implementation for the build process
 // It will be used only during the build and not at runtime
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 /**
  * A stub implementation of broadcastTransaction for build-time usage.

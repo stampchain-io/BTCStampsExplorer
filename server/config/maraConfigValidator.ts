@@ -1,16 +1,16 @@
 /**
  * MARA Configuration Validator
- * 
+ *
  * This module provides validation logic for MARA configuration on server startup
  * to ensure all settings are valid before the application starts.
  */
 
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
-import { 
-  type MaraConfig, 
-  createMaraConfigFromEnv, 
-  DEFAULT_MARA_CONFIG 
-} from "$/server/config/maraConfig.ts";
+import { logger } from "$lib/utils/logger.ts";
+import {
+    type MaraConfig,
+    createMaraConfigFromEnv,
+    DEFAULT_MARA_CONFIG
+} from "$server/config/maraConfig.ts";
 
 /**
  * Result of MARA configuration validation
@@ -58,7 +58,7 @@ export function validateMaraConfigOnStartup(): MaraConfigValidationResult {
   try {
     // Create and validate configuration
     const config = createMaraConfigFromEnv();
-    
+
     if (!config) {
       result.errors.push("Failed to create MARA configuration from environment");
       result.isValid = false;
@@ -66,7 +66,7 @@ export function validateMaraConfigOnStartup(): MaraConfigValidationResult {
     }
 
     // Additional validation checks
-    
+
     // 1. Validate API URL is reachable (warning only, don't fail startup)
     try {
       const url = new URL(config.apiBaseUrl);
@@ -96,7 +96,7 @@ export function validateMaraConfigOnStartup(): MaraConfigValidationResult {
     // 4. Check for development/production consistency
     const isProduction = Deno.env.get('DENO_ENV') === 'production';
     const isDefaultAddress = config.serviceFeeAddress === DEFAULT_MARA_CONFIG.serviceFeeAddress;
-    
+
     if (!isProduction && !isDefaultAddress) {
       result.warnings.push(
         "Using non-default MARA service fee address in non-production environment"
@@ -121,7 +121,7 @@ export function validateMaraConfigOnStartup(): MaraConfigValidationResult {
     result.errors.push(
       error instanceof Error ? error.message : "Unknown configuration error"
     );
-    
+
     logger.error("config", {
       message: "MARA configuration validation failed",
       error: error instanceof Error ? error.message : String(error),
@@ -150,12 +150,12 @@ export function validateMaraConfigOnStartup(): MaraConfigValidationResult {
 /**
  * Validates MARA configuration and throws on error
  * Use this for critical paths where invalid config should halt execution
- * 
+ *
  * @throws Error if configuration is invalid
  */
 export function assertValidMaraConfig(): MaraConfig {
   const validation = validateMaraConfigOnStartup();
-  
+
   if (!validation.isValid || !validation.config) {
     const errorMessage = validation.errors.length > 0
       ? `MARA configuration errors: ${validation.errors.join(', ')}`

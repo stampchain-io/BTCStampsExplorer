@@ -1,11 +1,8 @@
 /* ===== FAQ ACCORDION CONTENT COMPONENT ===== */
 import { Accordion } from "$content";
-import type { FAQ_CONTENT } from "$layout";
+import type { FaqAccordionProps } from "$types/ui.d.ts";
 
 /* ===== INTERFACE ===== */
-interface FaqAccordionProps {
-  item: typeof FAQ_CONTENT[number]["items"][number];
-}
 
 /* ===== COMPONENT ===== */
 export function FaqAccordion({ item }: FaqAccordionProps) {
@@ -16,9 +13,9 @@ export function FaqAccordion({ item }: FaqAccordionProps) {
         {/* ===== CONTENT RENDERING SECTION ===== */}
         {/* Handles both array and single string content formats */}
         {Array.isArray(item.content)
-          ? item.content.map((paragraph, index) => (
+          ? item.content.map((paragraph: string, index: number) => (
             <p key={index}>
-              {paragraph.split("\n").map((line, lineIndex) => (
+              {paragraph.split("\n").map((line: string, lineIndex: number) => (
                 <span key={lineIndex}>
                   {line}
                   {lineIndex < paragraph.split("\n").length - 1 && <br />}
@@ -32,7 +29,7 @@ export function FaqAccordion({ item }: FaqAccordionProps) {
         {/* ===== LIST ITEMS SECTION ===== */}
         {item.listItems && (
           <ul>
-            {item.listItems.map((listItem, index) => (
+            {item.listItems.map((listItem: any, index: number) => (
               <li key={index}>
                 {listItem.href
                   ? (
@@ -55,7 +52,7 @@ export function FaqAccordion({ item }: FaqAccordionProps) {
         {/* ===== ADDITIONAL LINKS SECTION ===== */}
         {item.links && (
           <div class="">
-            {item.links.map((link, index) => (
+            {item.links.map((link: any, index: number) => (
               <div key={index}>
                 <a
                   href={link.href}

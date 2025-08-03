@@ -1,13 +1,7 @@
 import { Icon } from "$components/icon/IconBase.tsx";
+import type { SortProps } from "$types/ui.d.ts";
 import { tooltipIcon } from "$notification";
 import { useEffect, useRef, useState } from "preact/hooks";
-
-interface SortProps {
-  searchParams?: URLSearchParams | undefined;
-  initSort?: "ASC" | "DESC" | undefined;
-  sortParam?: string;
-  onChangeSort?: (newSort: "ASC" | "DESC") => void;
-}
 
 export function SortButton(
   { searchParams, initSort, sortParam = "sortBy" }: SortProps,

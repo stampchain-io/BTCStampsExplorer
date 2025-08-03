@@ -1,15 +1,20 @@
 /* ===== WALLET DASHBOARD PAGE ===== */
 /*@baba - FINETUNE PAGE */
+
 import { WalletDashboardContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import { DispenserRow, SRC20Row, StampRow } from "$globals";
+
 import { WalletDashboardHeader } from "$header";
 import WalletDashboardDetails from "$islands/content/WalletDashboardDetails.tsx";
-import { WalletOverviewInfo, WalletPageProps } from "$lib/types/index.d.ts";
 import { PaginatedResponse } from "$lib/types/pagination.d.ts";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { StampController } from "$server/controller/stampController.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
+
+import type { WalletPageProps } from "$types/ui.d.ts";
+import { WalletOverviewInfo } from "$types/wallet.d.ts";
 
 /* ===== HELPERS ===== */
 /**
@@ -89,7 +94,6 @@ export const handler: Handlers = {
         // BTC info
         getBTCBalanceInfo(address, {
           includeUSD: true,
-          apiBaseUrl: url.origin,
         }),
 
         // Dispensers with sorting and pagination
@@ -134,32 +138,38 @@ export const handler: Handlers = {
         : { data: [], total: 0, page: 1, limit: 10, totalPages: 0 };
 
       // Calculate total SRC20 value from enriched tokens
-      const src20Value = src20Data.data.reduce((total, token: any) => {
-        // For v2.3, market data is in token.market_data
-        const marketData = token.market_data;
-        if (marketData?.floor_price_btc && token.amt) {
-          const quantity = typeof token.amt === "bigint"
-            ? Number(token.amt)
-            : token.amt;
-          const valueInBTC = marketData.floor_price_btc * quantity;
-          return total + valueInBTC;
-        }
-        return total;
-      }, 0);
+      const src20Value = src20Data.data.reduce(
+        (
+          total,
+          token: import("$lib/types/src20.d.ts").SRC20WithOptionalMarketData,
+        ) => {
+          // For v2.3, market data is in token.market_data
+          const marketData = token.market_data;
+          if (marketData?.floor_price_btc && token.amt) {
+            const quantity = typeof token.amt === "bigint"
+              ? Number(token.amt)
+              : Number(token.amt);
+            const valueInBTC = marketData.floor_price_btc * quantity;
+            return total + valueInBTC;
+          }
+          return total;
+        },
+        0,
+      );
 
       const dispensersData = dispensersResponse.status === "fulfilled"
         ? {
-          data: dispensersResponse.value.dispensers.map((dispenser: any) => ({
+          data: dispensersResponse.value.dispensers?.map((dispenser: any) => ({
             ...dispenser,
             dispenses: dispenser.dispenses || [], // Ensure dispenses field exists
-          })),
+          })) ?? [],
           total: dispensersResponse.value.total,
           page: dispensersParams.page,
           limit: dispensersParams.limit,
           totalPages: Math.ceil(
             dispensersResponse.value.total / dispensersParams.limit,
           ),
-        } as PaginatedResponse<DispenserRow>
+        } as PaginatedResponse<any>
         : { data: [], total: 0, page: 1, limit: 10, totalPages: 0 };
 
       const btcInfo = btcInfoResponse.status === "fulfilled"
@@ -168,7 +178,7 @@ export const handler: Handlers = {
 
       // Calculate dispenser counts from the full response
       const allDispensers = dispensersResponse.status === "fulfilled"
-        ? dispensersResponse.value.dispensers
+        ? dispensersResponse.value.dispensers ?? []
         : [];
       const openDispensers = allDispensers.filter((d) => d.give_remaining > 0);
       const closedDispensers = allDispensers.filter((d) =>

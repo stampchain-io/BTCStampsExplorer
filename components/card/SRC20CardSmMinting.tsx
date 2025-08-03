@@ -1,27 +1,23 @@
 /* reinamora - update Trending calculations */
 import { Button } from "$button";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { TargetedEvent } from "preact/compat";
+import type { SRC20CardSmMintingProps } from "$types/ui.d.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import type { EnrichedSRC20Row } from "$globals";
+// SRC20 card component for minting state
 import {
   containerCardTable,
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
-  Timeframe,
+  // Timeframe - removed unused import
 } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
 
-interface SRC20CardSmMintingProps {
-  data: EnrichedSRC20Row[];
-  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  timeframe: Timeframe;
-  onImageClick: (imgSrc: string) => void;
-}
-
 export function SRC20CardSmMinting({
-  data,
+  data = [], // Default to empty array to prevent undefined errors
   onImageClick,
 }: SRC20CardSmMintingProps) {
   const headers = [
@@ -36,7 +32,7 @@ export function SRC20CardSmMinting({
     const emojiRegex =
       /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]/gu;
     const match = text.match(emojiRegex);
-    if (!match) return { text, emoji: "" };
+    if (!match || !match[0]) return { text, emoji: "" };
     const emojiIndex = text.indexOf(match[0]);
     return {
       text: text.slice(0, emojiIndex),
@@ -75,7 +71,7 @@ export function SRC20CardSmMinting({
           {headers.map((header, i) => (
             <th
               key={header}
-              class={`${labelXs} ${cellAlign(i, headers.length)} ${
+              class={`${labelXs} ${cellAlign(i, headers?.length ?? 0)} ${
                 i === 1
                   ? "hidden min-[600px]:table-cell tablet:hidden min-[1280px]:table-cell"
                   : "" // MINTS
@@ -87,9 +83,9 @@ export function SRC20CardSmMinting({
         </tr>
       </thead>
       <tbody>
-        {data.length
+        {data?.length
           ? (
-            data.map((src20) => {
+            data.map((src20: SRC20Row) => {
               // SRC-20 Image URL Logic:
               // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
               // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
@@ -101,14 +97,16 @@ export function SRC20CardSmMinting({
                 "/img/placeholder/stamp-no-image.svg";
 
               const href = `/src20/${
-                encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
+                encodeURIComponent(unicodeEscapeToEmoji(src20.tick ?? ""))
               }`;
 
               const mintHref = `/tool/src20/mint?tick=${
-                encodeURIComponent(src20.tick)
+                encodeURIComponent(src20.tick ?? "")
               }&trxType=olga`;
 
-              const handleMintClick = (event: MouseEvent) => {
+              const handleMintClick = (
+                event: TargetedEvent<HTMLButtonElement>,
+              ) => {
                 event.preventDefault();
 
                 // SSR-safe browser environment check
@@ -125,14 +123,14 @@ export function SRC20CardSmMinting({
                 if (isMintPage) {
                   // If we're on the mint page, update URL parameters to populate form
                   const newUrl = new URL(globalThis.location.href);
-                  newUrl.searchParams.set("tick", src20.tick);
+                  newUrl.searchParams.set("tick", src20.tick ?? "");
                   newUrl.searchParams.set("trxType", "olga");
                   globalThis.history.replaceState({}, "", newUrl.toString());
 
                   // Trigger a custom event that the MintTool can listen to
                   globalThis.dispatchEvent(
                     new CustomEvent("mintTokenSelected", {
-                      detail: { tick: src20.tick },
+                      detail: { tick: src20.tick ?? "" },
                     }),
                   );
                 } else {
@@ -149,7 +147,7 @@ export function SRC20CardSmMinting({
                   {/* TOKEN */}
                   <td
                     class={`${
-                      cellAlign(0, headers.length)
+                      cellAlign(0, headers?.length ?? 0)
                     } ${rowCardBorderLeft}`}
                   >
                     <div class="flex items-center gap-4">
@@ -160,13 +158,13 @@ export function SRC20CardSmMinting({
                           e.preventDefault();
                           onImageClick?.(imageUrl);
                         }}
-                        alt={unicodeEscapeToEmoji(src20.tick)}
+                        alt={unicodeEscapeToEmoji(src20.tick ?? "")}
                       />
                       <div class="flex flex-col">
                         <div class="font-bold text-base uppercase tracking-wide">
                           {(() => {
                             const { text, emoji } = splitTextAndEmojis(
-                              unicodeEscapeToEmoji(src20.tick),
+                              unicodeEscapeToEmoji(src20.tick ?? ""),
                             );
                             return (
                               <>
@@ -208,7 +206,7 @@ export function SRC20CardSmMinting({
                   {/* MINTS */}
                   <td
                     class={`${
-                      cellAlign(1, headers.length)
+                      cellAlign(1, headers?.length ?? 0)
                     } ${rowCardBorderCenter} hidden min-[600px]:table-cell tablet:hidden min-[1280px]:table-cell`}
                   >
                     {src20.mint_progress?.total_mints || src20.mint_count ||
@@ -217,7 +215,7 @@ export function SRC20CardSmMinting({
                   {/* PROGRESS */}
                   <td
                     class={`${
-                      cellAlign(2, headers.length)
+                      cellAlign(2, headers?.length ?? 0)
                     } ${rowCardBorderCenter}`}
                   >
                     <div class="flex items-center justify-center w-full">
@@ -225,13 +223,8 @@ export function SRC20CardSmMinting({
                         <div class="!text-xs text-center">
                           {(() => {
                             // ✅ FIXED: Use the same data access pattern as SRC20CardMinting
-                            const progressRaw = src20.mint_progress?.progress ||
-                              src20.progress;
-                            if (
-                              progressRaw === undefined || progressRaw === null
-                            ) {
-                              return "0";
-                            }
+                            const progressRaw = src20.mint_progress?.progress ??
+                              src20.progress ?? 0;
                             const progressValue = Number(progressRaw);
                             if (isNaN(progressValue)) {
                               return "0";
@@ -248,14 +241,8 @@ export function SRC20CardSmMinting({
                                 (() => {
                                   // ✅ FIXED: Use the same data access pattern as SRC20CardMinting
                                   const progressRaw =
-                                    src20.mint_progress?.progress ||
-                                    src20.progress;
-                                  if (
-                                    progressRaw === undefined ||
-                                    progressRaw === null
-                                  ) {
-                                    return 0;
-                                  }
+                                    src20.mint_progress?.progress ??
+                                      src20.progress ?? 0;
                                   const progressValue = Number(progressRaw);
                                   if (isNaN(progressValue)) {
                                     return 0;
@@ -275,7 +262,7 @@ export function SRC20CardSmMinting({
                   {/* HOLDERS */}
                   <td
                     class={`${
-                      cellAlign(3, headers.length)
+                      cellAlign(3, headers?.length ?? 0)
                     } ${rowCardBorderCenter}`}
                   >
                     {(() => {
@@ -290,7 +277,7 @@ export function SRC20CardSmMinting({
                   {/* MINT BUTTON */}
                   <td
                     class={`${
-                      cellAlign(4, headers.length)
+                      cellAlign(4, headers?.length ?? 0)
                     } ${rowCardBorderRight}`}
                   >
                     <Button
@@ -310,7 +297,10 @@ export function SRC20CardSmMinting({
           )
           : (
             <tr>
-              <td colSpan={headers.length} class={`${valueDarkSm} w-full`}>
+              <td
+                colSpan={headers?.length ?? 0}
+                class={`${valueDarkSm} w-full`}
+              >
                 NO MINTING TOKENS
               </td>
             </tr>

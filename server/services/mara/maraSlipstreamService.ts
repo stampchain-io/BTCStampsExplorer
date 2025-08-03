@@ -6,7 +6,7 @@
 
 import { FetchHttpClient } from "$/server/interfaces/httpClient.ts";
 import { createPriceServiceCircuitBreaker } from "$/server/utils/circuitBreaker.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { getMaraConfig } from "$/server/config/config.ts";
 import { assertValidMaraConfig } from "$/server/config/maraConfigValidator.ts";
 import type {

@@ -1,12 +1,8 @@
 /* ===== LIST COMPONENT ===== */
 import { headingGrey, text } from "$text";
+import type { HowToStepProps, SharedListProps } from "$types/ui.d.ts";
 
 /* ===== TYPES ===== */
-export interface ListProps {
-  title: string;
-  image: string;
-  description: string | string[];
-}
 
 /* ===== HELPERS ===== */
 const formatLines = (text: string) => {
@@ -19,7 +15,7 @@ const formatLines = (text: string) => {
 };
 
 /* ===== COMPONENT ===== */
-export function List({ title, image, description }: ListProps) {
+export function List({ title, image, description }: HowToStepProps) {
   return (
     <li
       class={`${headingGrey} font-light list-decimal list-inside mb-9 mobileLg:mb-12`}
@@ -64,10 +60,6 @@ export function List({ title, image, description }: ListProps) {
 }
 
 /* ===== TYPES ===== */
-interface SharedListProps {
-  children: preact.ComponentChildren;
-  hasImportantNotes?: boolean;
-}
 
 /* ===== SHARED COMPONENTS ===== */
 export function StepList(

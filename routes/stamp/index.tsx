@@ -1,13 +1,17 @@
 /* ===== STAMP OVERVIEW PAGE ===== */
+
 import { StampOverviewContent } from "$content";
 import { Handlers } from "$fresh/server.ts";
-import { StampPageProps } from "$globals";
+
+import { FRONTEND_STAMP_TYPE_VALUES } from "$constants";
 import { StampOverviewHeader } from "$header";
 import {
   queryParamsToFilters,
   queryParamsToServicePayload,
   StampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
+import type { StampPageProps } from "$types/api.d.ts";
+import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
 
 // ✅ PROPER SEPARATION: Use HTTP client for API calls
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
@@ -41,16 +45,13 @@ export const handler: Handlers = {
       // ✅ NEW: Handle type parameter for stamp filtering (classic, cursed, posh, etc.)
       // Note: SRC-20 excluded from frontend options as they're handled separately in the app
       const stampType = url.searchParams.get("type") || "classic"; // Default to classic
-      const validTypes = [
-        "classic",
-        "cursed",
-        "posh",
-      ]; // Removed "all" and "stamps"
-      const typeFilter = validTypes.includes(stampType) ? stampType : "classic";
+      const typeFilter = FRONTEND_STAMP_TYPE_VALUES.includes(stampType as any)
+        ? stampType
+        : "classic";
 
       /* ===== DATA FETCHING BASED ON MODE ===== */
       let stampsData: {
-        data: any[];
+        data: StampRow[];
         pagination: {
           total: number;
           page?: number | undefined;
@@ -60,7 +61,7 @@ export const handler: Handlers = {
         data: [],
         pagination: { total: 0 },
       };
-      let recentSalesData: any[] = [];
+      let recentSalesData: StampSaleRow[] = [];
 
       if (recentSales) {
         // ✅ FIX: When recentSales=true, fetch from optimized internal API endpoint
@@ -98,7 +99,33 @@ export const handler: Handlers = {
 
           // ✅ FIX: Format as stamps data for StampOverviewContent
           stampsData = {
-            data: recentSalesData,
+            data: recentSalesData.map((sale) => ({
+              stamp: sale.stamp_number,
+              cpid: sale.cpid,
+              tx_hash: sale.tx_hash,
+              tx_index: 0, // Default to 0, as transaction index is not available in StampSaleRow
+              block_index: sale.block_index,
+              block_time: sale.timestamp,
+              stamp_base64: "", // Default empty string for StampSaleRow
+              stamp_url: "", // Default empty string for StampSaleRow
+              stamp_mimetype: "", // Default empty string for StampSaleRow
+              stamp_hash: "", // Default empty string for StampSaleRow
+              file_hash: "", // Default empty string for StampSaleRow
+              file_size_bytes: null, // Not available in StampSaleRow
+              ident: "STAMP" as const, // Default to STAMP for sales data
+              creator: sale.seller,
+              creator_name: null, // Not available in StampSaleRow
+              divisible: false, // Assuming not divisible, as it's not in StampSaleRow
+              keyburn: null, // Not available in StampSaleRow
+              locked: 0, // Assuming not locked, as it's not in StampSaleRow
+              supply: 0, // Assuming zero supply, as it's not in StampSaleRow
+              unbound_quantity: 0, // Default to 0
+              sale_data: {
+                btc_amount: sale.price_btc,
+                block_index: sale.block_index,
+                tx_hash: sale.tx_hash,
+              },
+            })),
             pagination: {
               total: recentSalesResponse.data?.total || recentSalesData.length,
               page: page,

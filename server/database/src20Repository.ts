@@ -1,17 +1,15 @@
+
 import {
-    SRC20SnapshotRequestParams,
-    SRC20TrxRequestParams,
-} from "$globals";
-import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
-import { 
-  SRC20_BALANCE_TABLE, 
-  SRC20_TABLE,
-  BLOCKCHAIN_SYNC_CACHE_DURATION,
-  BALANCE_CACHE_DURATION 
+    BALANCE_CACHE_DURATION,
+    BLOCKCHAIN_SYNC_CACHE_DURATION,
+    SRC20_BALANCE_TABLE,
+    SRC20_TABLE
 } from "$constants";
+import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { bigFloatToString } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
+import type { SRC20SnapshotRequestParams, SRC20TrxRequestParams } from "$types/src20.d.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 
 export class SRC20Repository {
@@ -242,7 +240,7 @@ export class SRC20Repository {
     }
 
     if (sortBy) {
-      const normalizedSortBy = sortBy.toUpperCase();
+      const normalizedSortBy = typeof sortBy === 'string' ? sortBy.toUpperCase() : `${sortBy.field}_${sortBy.direction}`.toUpperCase();
 
       // HOLDERS sorting (requires holder count calculation)
       if (normalizedSortBy === "HOLDERS_DESC") {
@@ -489,8 +487,9 @@ export class SRC20Repository {
     const limitOffsetClause = "LIMIT ? OFFSET ?";
     queryParams.push(safeLimit, offset);
 
-    const validOrder = ["ASC", "DESC"].includes(sortBy.toUpperCase())
-      ? sortBy.toUpperCase()
+    const sortString = typeof sortBy === 'string' ? sortBy : sortBy.direction;
+    const validOrder = ["ASC", "DESC"].includes(sortString.toUpperCase())
+      ? sortString.toUpperCase()
       : "DESC";
 
     const validSortField = ["amt", "last_update"].includes(sortField)
@@ -642,7 +641,7 @@ export class SRC20Repository {
 
   static async fetchTrendingActiveMintingTokens(
     transactionCount: number = 1000,
-  ) {
+  ): Promise<{ rows: import("$lib/types/src20.d.ts").SRC20Row[]; total: number }> {
     // Reduce transaction count for better performance in production
     const optimizedTransactionCount = Math.min(transactionCount, 300);
 
@@ -702,7 +701,27 @@ export class SRC20Repository {
       );
 
       return {
-        rows: this.convertResponseToEmoji((results as any).rows),
+        rows: this.convertResponseToEmoji((results as any).rows.map((row: any) => ({
+          tx_hash: row.tx_hash,
+          block_index: row.block_index,
+          p: row.p,
+          op: row.op,
+          tick: row.tick,
+          creator: row.creator,
+          creator_name: row.creator_name,
+          amt: row.amt,
+          deci: row.deci,
+          lim: row.lim,
+          max: row.max,
+          destination: row.destination,
+          block_time: row.block_time,
+          holders: row.holders,
+          total_minted: row.total_minted,
+          total_mints: row.total_mints,
+          progress: row.progress,
+          mint_velocity: row.mint_velocity,
+          trending_score: row.trending_score
+        }))),
         total: (results as any).rows.length
       };
     } catch (error) {
@@ -712,13 +731,11 @@ export class SRC20Repository {
       const fallbackQuery = `
         SELECT
           'data' as type,
-          src20_deploy.tick,
-          0 as mint_count,
-          0 as top_mints_percentage,
           src20_deploy.tx_hash,
           src20_deploy.block_index,
           src20_deploy.p,
           src20_deploy.op,
+          src20_deploy.tick,
           src20_deploy.creator,
           src20_deploy.amt,
           src20_deploy.deci,
@@ -728,7 +745,11 @@ export class SRC20Repository {
           src20_deploy.block_time,
           creator_info.creator as creator_name,
           COALESCE(stats.holders_count, 0) as holders,
-          COALESCE(stats.total_minted, 0) as total_minted
+          COALESCE(stats.total_minted, 0) as total_minted,
+          0 as total_mints,
+          0 as progress,
+          0 as mint_velocity,
+          0 as trending_score
         FROM ${SRC20_TABLE} src20_deploy
         LEFT JOIN creator creator_info ON src20_deploy.creator = creator_info.address
         LEFT JOIN src20_token_stats stats ON stats.tick = src20_deploy.tick
@@ -745,7 +766,27 @@ export class SRC20Repository {
       );
 
       return {
-        rows: this.convertResponseToEmoji((fallbackResults as any).rows),
+        rows: this.convertResponseToEmoji((fallbackResults as any).rows.map((row: any) => ({
+          tx_hash: row.tx_hash,
+          block_index: row.block_index,
+          p: row.p,
+          op: row.op,
+          tick: row.tick,
+          creator: row.creator,
+          creator_name: row.creator_name,
+          amt: row.amt,
+          deci: row.deci,
+          lim: row.lim,
+          max: row.max,
+          destination: row.destination,
+          block_time: row.block_time,
+          holders: row.holders,
+          total_minted: row.total_minted,
+          total_mints: row.total_mints,
+          progress: row.progress,
+          mint_velocity: row.mint_velocity,
+          trending_score: row.trending_score
+        }))),
         total: (fallbackResults as any).rows.length
       };
     }
@@ -930,7 +971,7 @@ export class SRC20Repository {
     trendingWindow: '24h' | '7d' | '30d' = '24h',
     mintVelocityMin?: number,
     limit: number = 25
-  ): Promise<{ rows: any[]; total: number }> {
+  ): Promise<{ rows: import("$lib/types/src20.d.ts").SRC20Row[]; total: number }> {
     // Convert trending window to hours for velocity calculation
     const windowHours = trendingWindow === '24h' ? 24 : trendingWindow === '7d' ? 168 : 720;
 
@@ -1156,6 +1197,5 @@ export class SRC20Repository {
       BLOCKCHAIN_SYNC_CACHE_DURATION,
     );
   }
-
 
 }

@@ -1,15 +1,10 @@
 import { ModalBase } from "$components/layout/ModalBase.tsx";
+import type { MaraServiceUnavailableModalProps } from "$types/ui.d.ts";
 import { CloseIcon } from "$icon";
 import { titlePurpleLD } from "$text";
 import { tooltipIcon } from "$notification";
 import { glassmorphism } from "$layout";
 import { useEffect, useRef, useState } from "preact/hooks";
-
-interface MaraServiceUnavailableModalProps {
-  onSwitchToStandard: () => void;
-  onRetry: () => void;
-  onClose: () => void;
-}
 
 /**
  * Modal displayed when MARA service is unavailable
@@ -55,6 +50,7 @@ export function MaraServiceUnavailableModal({
 
   return (
     <ModalBase
+      isOpen={true}
       title="MARA Service Unavailable"
       onClose={onClose}
       className={`!w-[400px] mobileLg:!w-[450px] ${glassmorphism} !bg-gradient-to-br !from-stamp-grey-darkest/70 !to-stamp-grey-darkest/80`}

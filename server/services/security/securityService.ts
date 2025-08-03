@@ -1,6 +1,6 @@
 import { create, Header, verify } from "djwt/mod.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 interface CSRFPayload {
   exp: number;

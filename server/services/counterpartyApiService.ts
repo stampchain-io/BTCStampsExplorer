@@ -1,12 +1,12 @@
 // TODO(@team): Move to /server
 
+import { SATS_PER_KB_MULTIPLIER, XCP_V2_NODES } from "$constants";
 import type { Fairminter } from "$lib/types/services.d.ts";
-import { SATS_PER_KB_MULTIPLIER } from "$constants";
+import { logger } from "$lib/utils/logger.ts";
 import { formatSatoshisToBTC } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { FetchHttpClient } from "$server/interfaces/httpClient.ts";
-import { DispenseEvent, Dispenser, DispenserFilter, XcpBalance } from "$types/index.d.ts";
+import type { DispenseEvent, Dispenser, DispenserFilter, XcpBalance } from "$types/services.d.ts";
 
 // Create a shared httpClient instance
 const httpClient = new FetchHttpClient(
@@ -15,17 +15,8 @@ const httpClient = new FetchHttpClient(
   1000   // defaultRetryDelay
 );
 
-// Only include active, working counterparty nodes
-export const xcp_v2_nodes = [
-  {
-    name: "counterparty.io",
-    url: "https://api.counterparty.io:4000/v2",
-  },
-  {
-    name: "dev.counterparty.io",
-    url: "https://api.counterparty.io:4000/v2",
-  },
-];
+// Re-export XCP nodes from $constants
+export { XCP_V2_NODES as xcp_v2_nodes } from "$constants";
 
 
 export interface XcpBalanceOptions {
@@ -93,7 +84,7 @@ export async function fetchXcpV2WithCache<T>(
     cacheKey,
     async () => {
       let errorMessage = null;
-      for (const node of xcp_v2_nodes) {
+      for (const node of XCP_V2_NODES) {
         const url = `${node.url}${endpoint}?${queryParams.toString()}`;
         await logger.debug("api", {
           message: "Attempting XCP node fetch",
@@ -343,7 +334,7 @@ export class CounterpartyDispenserService {
         }));
 
         allDispenses = allDispenses.concat(dispenses);
-        processedCount += dispenses.length;
+        processedCount += dispenses?.length ?? 0;
 
         // If we have enough items for the requested page, break
         if (allDispenses.length >= skipCount + limit) {
@@ -501,7 +492,7 @@ export class CounterpartyApiManager {
     page: number = 1,
     limit: number = 50,
     cacheTimeout?: number
-  ): Promise<{ holders: any[], total: number }> {
+  ): Promise<{ holders: import("$lib/types/wallet.d.ts").HolderRow[], total: number }> {
     const endpoint = `/assets/${cpid}/balances`;
     let cursor: string | null = null;
     const apiLimit = 1000;  // FIXME: need to handle this more gracefully getAllXcpBalancesByAddress is a better example for fetching all
@@ -571,7 +562,8 @@ export class CounterpartyApiManager {
     const allHolders = Array.from(holderMap.entries())
       .map(([address, quantity]) => ({
         address,
-        quantity
+        quantity,
+        divisible: false // Default to false as we don't have this info from the API
       }))
       .sort((a, b) => b.quantity - a.quantity);
 
@@ -652,6 +644,8 @@ export class CounterpartyApiManager {
                                 utxo: balance.utxo || "",
                                 utxo_address: balance.utxo_address || "",
                                 divisible: balance.divisible || false,
+                                assetName: balance.asset,
+                                balance: balance.quantity,
                             });
                         }
                     }
@@ -667,6 +661,8 @@ export class CounterpartyApiManager {
                 quantity: response.result.quantity,
                 utxo: response.result.utxo || "",
                 utxo_address: response.result.utxo_address || "",
+                assetName: response.result.asset,
+                balance: response.result.quantity,
                 divisible: response.result.divisible || false,
             }];
             total = 1;
@@ -802,9 +798,9 @@ export class CounterpartyApiManager {
     page: number = 1,
     limit: number = 50,
     cacheTimeout?: number
-  ): Promise<{ sends: any[], total: number }> {
+  ): Promise<{ sends: import("$lib/types/transaction.d.ts").SendRow[], total: number }> {
     const endpoint = `/assets/${cpid}/sends`;
-    let allSends: any[] = [];
+    let allSends: import("$lib/types/transaction.d.ts").SendRow[] = [];
     let cursor: string | null = null;
     const apiLimit = 1000;
 
@@ -844,17 +840,21 @@ export class CounterpartyApiManager {
           return {
             tx_hash: send.tx_hash,
             block_index: send.block_index,
-            block_time: send.block_time ? send.block_time * 1000 : null, // Convert to milliseconds
+            block_time: send.block_time ? new Date(send.block_time * 1000) : new Date(), // Convert timestamp to Date
             source: send.source,
             destination: send.destination,
             quantity: send.quantity,
             asset: cpid,
             status: send.status,
+            cpid: cpid, // Add cpid field
+            tick: null, // Add optional tick field
+            memo: send.memo, // Add optional memo field from API
+            satoshirate: null, // Add optional satoshirate field
           };
         });
 
         allSends = allSends.concat(sends);
-        processedCount += sends.length;
+        processedCount += sends?.length ?? 0;
 
         // If we have enough items for the requested page, break
         if (allSends.length >= skipCount + limit) {
@@ -1067,7 +1067,7 @@ export class CounterpartyApiManager {
 
     let lastError: string | null = null;
 
-    for (const node of xcp_v2_nodes) {
+    for (const node of XCP_V2_NODES) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
 
       try {
@@ -1161,7 +1161,7 @@ export class CounterpartyApiManager {
 
     let lastError: string | null = null;
 
-    for (const node of xcp_v2_nodes) {
+    for (const node of XCP_V2_NODES) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
       console.log(`Attempting to fetch from URL: ${url}`);
 
@@ -1310,7 +1310,7 @@ export class CounterpartyApiManager {
 
     let lastError: string | null = null;
 
-    for (const node of xcp_v2_nodes) {
+    for (const node of XCP_V2_NODES) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
       console.log(`Attempting to fetch from URL: ${url}`);
 
@@ -1406,7 +1406,7 @@ export class CounterpartyApiManager {
       }
     }
 
-    for (const node of xcp_v2_nodes) {
+    for (const node of XCP_V2_NODES) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
       console.log(`Attempting to fetch from URL: ${url}`);
 
@@ -1479,7 +1479,7 @@ export class CounterpartyApiManager {
       }
     }
 
-    for (const node of xcp_v2_nodes) {
+    for (const node of XCP_V2_NODES) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
       console.log(`Attempting to fetch from URL: ${url}`);
 
@@ -1670,7 +1670,7 @@ export class CounterpartyApiManager {
     });
 
     try {
-      for (const node of xcp_v2_nodes) {
+      for (const node of XCP_V2_NODES) {
         const url = `${node.url}${endpoint}?${queryParams.toString()}`;
         console.log(`Attempting to fetch from URL: ${url}`);
 
@@ -1785,7 +1785,7 @@ export class CounterpartyApiManager {
 
       console.log("[CounterpartyApiManager] Returning dispensers:", {
         address,
-        dispensersCount: dispensers.length,
+        dispensersCount: dispensers?.length ?? 0,
         totalCount,
         page,
         limit

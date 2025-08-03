@@ -1,7 +1,7 @@
 /* ===== DONATE CTA COMPONENT ===== */
 import { Button } from "$button";
 import { StampCard } from "$card";
-import { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Icon } from "$icon";
 import DonateStampModal from "$islands/modal/DonateStampModal.tsx";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";

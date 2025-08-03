@@ -3,14 +3,14 @@
  * This provides complete test isolation and covers all major functionality
  */
 
-import { beforeEach, describe, it } from "@std/testing/bdd";
+import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import {
   assertEquals,
   assertExists,
   assertRejects,
   assertThrows,
 } from "@std/assert";
-import { assertSpyCall, spy } from "@std/testing/mock";
+import { assertSpyCall, spy } from "@std/testing@1.0.14/mock";
 import { Buffer } from "node:buffer";
 import * as bitcoinjsMock from "../mocks/bitcoinjs-lib.mock.ts";
 

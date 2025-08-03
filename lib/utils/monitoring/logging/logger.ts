@@ -1,256 +1,139 @@
-interface LogMessage {
-  message: string;
-  [key: string]: unknown;
+/**
+ * Logger utility with namespace-based filtering and JSON output
+ * Supports DEBUG environment variable for selective logging
+ */
+
+import {
+  LOG_CONFIG,
+  type LogNamespace,
+} from "$lib/constants/loggingConstants.ts";
+
+// Re-export LogNamespace for convenience
+export type { LogNamespace };
+
+export interface LogData {
+  level: string;
+  namespace: string;
+  timestamp: string;
+  [key: string]: any;
 }
 
-type LogLevel = "debug" | "error" | "info" | "warn";
-export type LogNamespace =
-  | "aws"
-  | "stamps"
-  | "content"
-  | "config"
-  | "api"
-  | "database"
-  | "cache"
-  | "auth"
-  | "security"
-  | "system"
-  | "ui"
-  | "src101"
-  | "src20"
-  | "stamp-create"
-  | "src20-transfer"
-  | "src20-deploy"
-  | "src20-mint"
-  | "src20-multisig"
-  | "quicknode-service"
-  | "common-utxo-service"
-  | "transaction-utxo-service"
-  | "psbt-service"
-  | "api-utxo-query"
-  | "api-src20-create"
-  | "src101-psbt-service"
-  | "src20-operation-service"
-  | "src101-operation-service"
-  | "src20-multisig-psbt-service"
-  | "api-src101-create"
-  | "broadcast"
-  | "src20-utility"
-  | "tool-endpoint-estimator"
-  | "utxo-ancestors"
-  | "sql"
-  | "mara"
-  | "psbt"
-  | "mara-submission"
-  | "mara-tx-estimator";
+class Logger {
+  private enabledNamespaces: Set<string> = new Set();
+  private enableFileLogging = false;
+  private logFilePath: string = LOG_CONFIG.DEFAULT_LOG_PATH;
 
-declare global {
-  interface Window {
-    __DEBUG?: {
-      namespaces: string;
-      enabled: boolean;
-    };
-  }
-}
-
-declare global {
-  interface globalThis {
-    __DEBUG?: {
-      namespaces: string;
-      enabled: boolean;
-    };
-  }
-}
-
-function isServer(): boolean {
-  return typeof Deno !== "undefined";
-}
-
-function initializeClientDebug() {
-  if (!isServer()) {
-    const existingNamespaces = (globalThis as any).__DEBUG?.namespaces;
-
-    (globalThis as any).__DEBUG = {
-      namespaces: existingNamespaces || "stamps,ui,debug,all",
-      enabled: (globalThis as any).__DEBUG?.enabled ?? true,
-    };
-  }
-}
-
-function shouldLog(namespace: LogNamespace): boolean {
-  if (!isServer()) {
-    if (!(globalThis as any).__DEBUG?.enabled) return false;
-
-    const namespaces = ((globalThis as any).__DEBUG.namespaces || "")
-      .split(",")
-      .map((n: string) => n.trim().toLowerCase());
-
-    return namespaces.includes("all") ||
-      namespaces.includes(namespace.toLowerCase());
+  constructor() {
+    this.updateEnabledNamespaces();
   }
 
-  try {
-    const debug = Deno.env.get("DEBUG") || "";
-    if (!debug) return false;
+  private updateEnabledNamespaces(): void {
+    const debugEnv = globalThis.Deno?.env.get("DEBUG") || "";
+    this.enabledNamespaces.clear();
 
-    const namespaces = debug.split(",").map((n) => n.trim().toLowerCase());
-    return namespaces.includes("all") ||
-      namespaces.includes(namespace.toLowerCase());
-  } catch {
-    // Environment access not available (e.g., in tests without --allow-env)
-    return false;
-  }
-}
-
-const LOG_DIR = "./logs";
-const LOG_FILE = `${LOG_DIR}/app.log`;
-
-function isTestEnvironment(): boolean {
-  try {
-    return Deno.env.get("DENO_ENV") === "test";
-  } catch {
-    return false;
-  }
-}
-
-async function writeToFile(data: string) {
-  if (!isServer()) return;
-
-  let isDevelopment = false;
-  try {
-    const denoEnv = Deno.env.get("DENO_ENV");
-    isDevelopment = denoEnv === "development";
-  } catch {
-    // Environment access not available, assume production mode
-    isDevelopment = false;
-  }
-
-  // Don't write files during tests to avoid async leaks, unless file operations are mocked
-  if (isTestEnvironment()) {
-    try {
-      const writeTextFileStr = (globalThis.Deno as any)?.writeTextFile
-        ?.toString?.();
-      // If writeTextFile is mocked (doesn't contain 'native code'), allow file operations for testing
-      if (!writeTextFileStr || writeTextFileStr.includes("[native code]")) {
-        return; // Exit early for real file operations during tests
-      }
-    } catch {
-      return; // Exit early if we can't determine if it's mocked
+    if (debugEnv === "*") {
+      this.enabledNamespaces.add("*");
+    } else if (debugEnv) {
+      debugEnv.split(",").forEach((ns) => {
+        this.enabledNamespaces.add(ns.trim());
+      });
     }
   }
 
-  try {
-    // In production, only write errors to file
-    if (!isDevelopment && !data.includes('"level":"error"')) {
+  private isNamespaceEnabled(namespace: string): boolean {
+    if (this.enabledNamespaces.has("*")) return true;
+    return this.enabledNamespaces.has(namespace);
+  }
+
+  private formatLogData(level: string, namespace: string, data: any): string {
+    const logData: LogData = {
+      level,
+      namespace,
+      timestamp: new Date().toISOString(),
+      ...data,
+    };
+
+    // Handle BigInt serialization
+    return JSON.stringify(logData, (_key, value) => {
+      if (typeof value === "bigint") {
+        return value.toString();
+      }
+      return value;
+    });
+  }
+
+  private async writeToFile(logEntry: string): Promise<void> {
+    if (!this.enableFileLogging || !globalThis.Deno) {
       return;
     }
 
-    // Ensure log directory exists
     try {
-      await Deno.mkdir(LOG_DIR, { recursive: true });
+      const logDir = this.logFilePath.substring(
+        0,
+        this.logFilePath.lastIndexOf("/"),
+      );
+      await Deno.mkdir(logDir, { recursive: true });
+      await Deno.writeTextFile(this.logFilePath, logEntry + "\n", {
+        append: true,
+      });
     } catch (error) {
-      if (!(error instanceof Deno.errors.AlreadyExists)) {
-        throw error;
-      }
+      // Silently fail file writing
     }
+  }
 
-    // Write log with timestamp
-    const timestamp = new Date().toISOString();
-    const logEntry = `${timestamp} ${data}\n`;
-    await Deno.writeTextFile(LOG_FILE, logEntry, { append: true });
-  } catch (error) {
-    console.error("Failed to write to log file:", error);
+  debug(namespace: LogNamespace, data: any): void {
+    this.updateEnabledNamespaces();
+    if (this.isNamespaceEnabled(namespace)) {
+      const logEntry = this.formatLogData("debug", namespace, data);
+      console.debug(logEntry);
+      this.writeToFile(logEntry);
+    }
+  }
+
+  info(namespace: LogNamespace, data: any): void {
+    this.updateEnabledNamespaces();
+    if (this.isNamespaceEnabled(namespace)) {
+      const logEntry = this.formatLogData("info", namespace, data);
+      console.info(logEntry);
+      this.writeToFile(logEntry);
+    }
+  }
+
+  warn(namespace: LogNamespace, data: any): void {
+    // Warn always logs regardless of namespace
+    const logEntry = this.formatLogData("warn", namespace, data);
+    console.warn(logEntry);
+    this.writeToFile(logEntry);
+  }
+
+  error(namespace: LogNamespace, data: any): void {
+    // Error always logs regardless of namespace
+    const logEntry = this.formatLogData("error", namespace, data);
+    console.error(logEntry);
+    this.writeToFile(logEntry);
+  }
+
+  setConfig(
+    config: { enableFileLogging?: boolean; logFilePath?: string },
+  ): void {
+    if (config.enableFileLogging !== undefined) {
+      this.enableFileLogging = config.enableFileLogging;
+    }
+    if (config.logFilePath !== undefined) {
+      this.logFilePath = config.logFilePath;
+    }
+  }
+
+  getConfig(): { enableFileLogging: boolean; logFilePath: string } {
+    return {
+      enableFileLogging: this.enableFileLogging,
+      logFilePath: this.logFilePath,
+    };
   }
 }
 
-function formatLog(level: LogLevel, namespace: LogNamespace, msg: LogMessage) {
-  return {
-    timestamp: new Date().toISOString(),
-    level,
-    namespace,
-    ...msg,
-  };
-}
+// Export a singleton instance
+export const logger = new Logger();
 
-const bigIntReplacer = (_key: string, value: any) =>
-  typeof value === "bigint" ? value.toString() : value;
-
-export const logger = {
-  debug: (namespace: LogNamespace, msg: LogMessage) => {
-    initializeClientDebug();
-    const logData = formatLog("debug", namespace, msg);
-
-    if (!isServer()) {
-      if (shouldLog(namespace)) {
-        console.debug(logData);
-      }
-      return;
-    }
-
-    const formatted = JSON.stringify(logData, bigIntReplacer, 2);
-
-    // Always write to file on server if namespace is enabled
-    if (shouldLog(namespace)) {
-      console.debug(formatted);
-      // In test environment, skip file operations to prevent leaks
-      if (!isTestEnvironment()) {
-        writeToFile(formatted); // Fire-and-forget in production
-      }
-    }
-  },
-
-  error: (namespace: LogNamespace, msg: LogMessage) => {
-    initializeClientDebug();
-    const logData = formatLog("error", namespace, msg);
-
-    if (!isServer()) {
-      console.error(logData);
-      return;
-    }
-
-    const formatted = JSON.stringify(logData, bigIntReplacer, 2);
-    console.error(formatted);
-    // In test environment, skip file operations to prevent leaks
-    if (!isTestEnvironment()) {
-      writeToFile(formatted); // Fire-and-forget in production
-    }
-  },
-
-  info: (namespace: LogNamespace, msg: LogMessage) => {
-    initializeClientDebug();
-    const logData = formatLog("info", namespace, msg);
-
-    if (!isServer()) {
-      if (shouldLog(namespace)) {
-        console.info(logData);
-      }
-      return;
-    }
-
-    const formatted = JSON.stringify(logData, bigIntReplacer, 2);
-    if (shouldLog(namespace)) {
-      console.info(formatted);
-    }
-    // In test environment, skip file operations to prevent leaks
-    if (!isTestEnvironment()) {
-      writeToFile(formatted); // Fire-and-forget in production
-    }
-  },
-
-  warn: (namespace: LogNamespace, msg: LogMessage) => {
-    initializeClientDebug();
-    const logData = formatLog("warn", namespace, msg);
-
-    if (!isServer()) {
-      console.warn(logData);
-      return;
-    }
-
-    const formatted = JSON.stringify(logData, bigIntReplacer, 2);
-    console.warn(formatted);
-    // In test environment, skip file operations to prevent leaks
-    if (!isTestEnvironment()) {
-      writeToFile(formatted); // Fire-and-forget in production
-    }
-  },
-};
+// Also export the class for testing purposes
+export { Logger };

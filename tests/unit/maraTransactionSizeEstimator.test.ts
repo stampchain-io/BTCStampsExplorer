@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertExists, assertThrows } from "@std/assert";
-import { beforeEach, describe, it } from "@std/testing/bdd";
-import { stub, returnsNext, Stub } from "@std/testing/mock";
+import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { stub, returnsNext, Stub } from "@std/testing@1.0.14/mock";
 
 import {
   calculateCIP33ChunkCount,
@@ -12,7 +12,7 @@ import {
   type MARATransactionEstimateConfig,
 } from "../../lib/utils/bitcoin/minting/maraTransactionSizeEstimator.ts";
 
-import type { ScriptType } from "../../lib/types/index.d.ts";
+import type { ScriptType } from "$types/index.d.ts";
 
 describe("MARA Transaction Size Estimator", () => {
   // Skip logger mock for now to get tests working

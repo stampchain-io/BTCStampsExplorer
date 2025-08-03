@@ -5,34 +5,14 @@
  */
 
 import { SRC20CardSm } from "$components/card/SRC20CardSm.tsx";
-import type { EnrichedSRC20Row } from "$globals";
+import type { SRC20GalleryProps as FreshSRC20GalleryProps } from "$types/ui.d.ts";
+import type { EnrichedSRC20Row } from "$types/src20.d.ts";
 import { LoadingIcon } from "$icon";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { hasProperty, isNumber } from "$lib/utils/errorTypeGuards.ts";
 import { useEffect, useMemo, useState } from "preact/hooks";
 
 // ===== TYPES =====
-
-interface FreshSRC20GalleryProps {
-  /** Initial SRC-20 data from server */
-  initialData: EnrichedSRC20Row[];
-  /** Initial pagination state */
-  initialPagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-  /** Wallet address for API calls */
-  address: string;
-  /** Initial sort value - maintaining existing ASC/DESC functionality */
-  initialSort: "ASC" | "DESC";
-  /** Page identifier for conditional rendering */
-  fromPage?: string;
-  /** Show loading skeleton during transitions */
-  showLoadingSkeleton?: boolean;
-  /** Enable Fresh.js partial navigation */
-  enablePartialNavigation?: boolean;
-}
 
 interface FreshNavigationOptions {
   /** Use f-partial for smooth transitions */
@@ -56,10 +36,20 @@ export default function FreshSRC20Gallery({
 }: FreshSRC20GalleryProps) {
   // ===== STATE =====
   const [tokens, setTokens] = useState<EnrichedSRC20Row[]>(initialData);
-  const [pagination, setPagination] = useState(initialPagination);
+  const [pagination, setPagination] = useState(
+    initialPagination || {
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+      hasNext: false,
+      hasPrev: false,
+    },
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentSort, setCurrentSort] = useState<"ASC" | "DESC">(initialSort);
+  const [currentSort, setCurrentSort] = useState<"ASC" | "DESC">(
+    typeof initialSort === "string" ? initialSort : "ASC",
+  );
 
   // ===== FRESH PERFORMANCE OPTIMIZATION =====
   // Memoize tokens to prevent unnecessary re-renders when market data hasn't changed
@@ -152,7 +142,15 @@ export default function FreshSRC20Gallery({
 
       // Update state with new data
       setTokens(data.data || []);
-      setPagination(data.pagination || initialPagination);
+      setPagination(
+        data.pagination || {
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
+      );
 
       // Scroll to target element
       if (scrollTarget && typeof globalThis !== "undefined") {
@@ -176,7 +174,7 @@ export default function FreshSRC20Gallery({
   const buildApiUrl = (page: number, sort: "ASC" | "DESC"): string => {
     const params = new URLSearchParams({
       page: page.toString(),
-      limit: pagination.limit.toString(),
+      limit: (pagination?.limit ?? 10).toString(),
       sortBy: sort,
       includeMintData: "true",
     });
@@ -301,9 +299,10 @@ export default function FreshSRC20Gallery({
           setTokens(data.data || []);
           setPagination({
             page: data.page || 1,
-            limit: data.limit || pagination.limit,
-            total: data.total || 0,
+            limit: data.limit || pagination?.limit || 10,
             totalPages: data.totalPages || 1,
+            hasNext: (data.page || 1) < (data.totalPages || 1),
+            hasPrev: (data.page || 1) > 1,
           });
 
           // Scroll to section after data loads
@@ -368,7 +367,7 @@ export default function FreshSRC20Gallery({
           type="button"
           onClick={() => {
             setError(null);
-            handlePageChange(pagination.page);
+            handlePageChange(pagination?.page ?? 1);
           }}
           class="mt-2 text-xs text-red-300 hover:text-red-100 underline"
         >
@@ -391,7 +390,7 @@ export default function FreshSRC20Gallery({
       <div class="relative">
         <SRC20CardSm
           data={memoizedTokens}
-          fromPage={fromPage as "src20" | "wallet" | "stamping/src20" | "home"}
+          fromPage={fromPage}
           onImageClick={(imgSrc: string) => {
             console.log("SRC-20 image clicked:", imgSrc);
             // TODO(@dev): Implement image modal or navigation
@@ -400,16 +399,25 @@ export default function FreshSRC20Gallery({
       </div>
 
       {/* Pagination */}
-      {pagination.totalPages > 1 && (
-        <div class="mt-6">
-          <Pagination
-            page={pagination.page}
-            totalPages={pagination.totalPages}
-            prefix="src20"
-            onPageChange={handlePageChange}
-          />
-        </div>
-      )}
+      {(() => {
+        const totalPages = hasProperty(pagination, "totalPages") &&
+            isNumber(pagination.totalPages)
+          ? pagination.totalPages
+          : hasProperty(pagination, "total") && isNumber(pagination.total) &&
+              isNumber(pagination.limit)
+          ? Math.ceil(pagination.total / Math.max(pagination.limit, 1))
+          : 0;
+        return totalPages > 1 && (
+          <div class="mt-6">
+            <Pagination
+              page={pagination?.page ?? 1}
+              totalPages={totalPages}
+              prefix="src20"
+              onPageChange={handlePageChange}
+            />
+          </div>
+        );
+      })()}
     </div>
   );
 }
