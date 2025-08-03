@@ -939,7 +939,7 @@ export const FilterContentStamp = ({
         value={filters.stampType}
         onChange={(value) =>
           handleStampTypeChange(value as "cursed" | "classic" | "posh")}
-        size="sm"
+        size="smR"
         color="grey"
         className="mt-2 mb-5 -mx-0.5"
       />
@@ -959,7 +959,7 @@ export const FilterContentStamp = ({
             onChange={(value) =>
               toggleMarketType(value as "listings" | "sales")}
             mode="single"
-            size="mdR"
+            size="smR"
             spacing="evenFullwidth"
           />
         </div>
@@ -995,7 +995,7 @@ export const FilterContentStamp = ({
                 size="smR"
                 spacing="evenFullwidth"
                 disabledOptions={["atomics"]}
-                color="grey"
+                color="greyDark"
               />
             </div>
 
@@ -1086,7 +1086,7 @@ export const FilterContentStamp = ({
                 size="smR"
                 spacing="evenFullwidth"
                 disabledOptions={["atomics"]}
-                color="grey"
+                color="greyDark"
               />
             </div>
 
@@ -1132,7 +1132,7 @@ export const FilterContentStamp = ({
               </div>
             )}
 
-            {/* Volume Period Selection - only show if TRENDING is selected */}
+            {/* Volume Period Selection */}
             {filters.sales === "volume" && (
               <div class="mt-3 pl-0.5">
                 <ToggleButton
@@ -1140,6 +1140,7 @@ export const FilterContentStamp = ({
                   selected={filters.volume}
                   onChange={(value) => handleVolumeChange(value as string)}
                   mode="single"
+                  size="smR"
                   spacing="evenFullwidth"
                 />
               </div>

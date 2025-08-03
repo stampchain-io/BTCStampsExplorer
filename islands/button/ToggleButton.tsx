@@ -1,6 +1,10 @@
 import { button } from "$button";
 import { useState } from "preact/hooks";
 
+// Glassmorphism color effect styling - must be identical to the glassmorphismColor variant in the button/styles.ts file
+const glassmorphismColor =
+  "[&:hover]:!bg-stamp-grey-darkest/10 [&:hover]:!border-[var(--color-border-hover)] [&:hover]:!text-[#1e1723] [&:hover::before]:!scale-100 [&:hover::before]:!blur-[5px] [&:hover::before]:!bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]";
+
 export const ToggleButton = ({
   options,
   selected,
@@ -10,12 +14,24 @@ export const ToggleButton = ({
   spacing = "normal",
   disabledOptions = [],
   color = "purple",
+  className = "",
 }: {
   options: string[];
   selected: string | string[];
   onChange: (value: string | string[]) => void;
   mode?: "single" | "multi";
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "xsR" | "smR" | "mdR" | "lgR";
+  size:
+    | "xxs"
+    | "xs"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "xxsR"
+    | "xsR"
+    | "smR"
+    | "mdR"
+    | "lgR";
   spacing?: "normal" | "tight" | "even" | "evenFullwidth";
   disabledOptions?: string[];
   color?:
@@ -25,6 +41,7 @@ export const ToggleButton = ({
     | "purpleDark"
     | "test"
     | "custom";
+  className?: string;
 }) => {
   const [selectState, setselectState] = useState<
     {
@@ -63,8 +80,10 @@ export const ToggleButton = ({
   };
 
   const handleMouseLeave = () => {
-    // Clear the last clicked button when mouse leaves
-    setselectState(null);
+    // Don't clear selectState for TRENDING to keep visual effect visible
+    if (selectState?.option !== "TRENDING") {
+      setselectState(null);
+    }
   };
 
   const isOptionSelected = (option: string): boolean => {
@@ -79,7 +98,7 @@ export const ToggleButton = ({
     if (selectState?.option !== option) return "";
 
     return selectState.action === "select"
-      ? `[&:hover]:!bg-stamp-grey-darkest/10 [&:hover]:!border-[var(--color-border-hover)] [&:hover]:!text-[#1e1723] [&:hover::before]:!scale-100 [&:hover::before]:!blur-[5px] [&:hover::before]:!bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]`
+      ? glassmorphismColor
       : `!bg-stamp-grey-darkest/30 !border-stamp-grey-darkest/20 !text-[var(--color-dark)] [&:hover::before]:!bg-none`;
   };
 
@@ -91,24 +110,42 @@ export const ToggleButton = ({
     if (isDisabled) {
       return `${
         button("glassmorphismDeselected", "grey", size)
-      } opacity-30 cursor-not-allowed`;
+      } opacity-50 cursor-not-allowed`;
     }
 
     // Choose variant and color based on selection state and mode
     if (isSelected) {
       if (mode === "single") {
-        // Single select: use glassmorphismSelected for selected state with default cursor (can't be deselected)
-        return `${
-          button("glassmorphismSelected", "grey", size)
-        } cursor-pointer ${getSelectState(option)}`;
+        // Single select: use glassmorphismSelected for selected state
+        // Special case for timeframe buttons - show default state since they can't be deselected
+        // Interactive buttons like marketplace and trending get special select state behavior
+        const isTimeframe = ["24h", "7d", "30d"].includes(option);
+
+        // Special handling for TRENDING button
+        const isTrending = option === "TRENDING";
+
+        if (isTimeframe) {
+          return `${
+            button("glassmorphismSelected", "grey", size)
+          } cursor-default ${glassmorphismColor}`;
+        } else if (isTrending) {
+          // Force TRENDING to always show special effect with persistent animation
+          const trendingClickState = selectState?.option === "TRENDING"
+            ? glassmorphismColor
+            : `hover:bg-stamp-grey-darkest/30 hover:border-stamp-grey-darkest/20 hover:text-[var(--color-dark)] hover:before:bg-none `;
+          return `${
+            button("glassmorphismSelected", color, size)
+          } cursor-pointer ${trendingClickState} ${getSelectState(option)}`;
+        } else {
+          return `${
+            button("glassmorphismSelected", "grey", size)
+          } cursor-pointer ${getSelectState(option)}`;
+        }
       } else {
         // Multi select: use glassmorphismSelected for selected state
         // Special case for "dispensers" - show default state since it can't be deselected
         return `${button("glassmorphismSelected", color, size)} ${
-          option === "dispensers"
-            ? "cursor-default [&:hover]:!bg-stamp-grey-darkest/10 [&:hover]:!border-[var(--color-border-hover)] [&:hover]:!text-[#1e1723] [&:hover::before]:!scale-100 [&:hover::before]:!blur-[5px] " +
-              "[&:hover::before]:!bg-[linear-gradient(to_bottom_right,var(--color-dark)_0%,var(--color-dark)_20%,var(--color-medium)_20%,var(--color-medium)_45%,var(--color-light)_45%,var(--color-light)_52%,var(--color-medium)_52%,var(--color-medium)_70%,var(--color-dark)_70%,var(--color-dark)_100%)]"
-            : ""
+          option === "dispensers" ? `cursor-default ${glassmorphismColor}` : ""
         }`;
       }
     } else {
@@ -149,8 +186,12 @@ export const ToggleButton = ({
               type="button"
               class={`${getButtonClass(option)} ${
                 spacing === "evenFullwidth" ? "w-full" : ""
-              }`}
-              onClick={() => handleClick(option)}
+              } ${className}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleClick(option);
+              }}
               onMouseLeave={handleMouseLeave}
             >
               {option.toUpperCase()}
@@ -159,7 +200,7 @@ export const ToggleButton = ({
             {/* Coming Soon overlay text for disabled buttons */}
             {isDisabled && (
               <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity ease-in-out duration-200 pointer-events-none z-10">
-                <div class="text-stamp-grey-light text-xs font-bold">
+                <div class="text-stamp-grey-light text-xs font-semibold">
                   SOON™
                 </div>
               </div>

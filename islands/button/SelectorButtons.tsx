@@ -1,4 +1,4 @@
-import { buttonStyles, color, pillSize, state } from "$button";
+import { buttonStyles, color, size as buttonSize, state } from "$button";
 import { glassmorphism } from "$layout";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
@@ -15,7 +15,18 @@ interface SelectorButtonsProps {
   defaultValue?: string;
   onChange?: (value: string) => void;
   disabled?: boolean;
-  size: "xs" | "sm" | "md" | "lg";
+  size:
+    | "xxs"
+    | "xs"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "xxsR"
+    | "xsR"
+    | "smR"
+    | "mdR"
+    | "lgR";
   color: "grey" | "purple";
   className?: string;
 }
@@ -118,10 +129,8 @@ export const SelectorButtons = ({
     >
       {/* Selection button */}
       <div
-        class={`absolute top-0.5 bottom-0.5 z-10
+        class={`!absolute top-0.5 bottom-0.5 z-10
           ${buttonStyles.variant.glassmorphismColor}
-          !absolute
-          [&:before]:!blur
         `}
         style={{
           transform: selectionTransform,
@@ -161,10 +170,10 @@ export const SelectorButtons = ({
             <label
               for={`selector-${option.value}`}
               class={`
-                relative block z-20
+                relative flex items-center justify-center z-20
                 font-semibold text-center
-                transition-all duration-50 ease-in-out
-                ${pillSize[size]}
+                transition-all duration-50
+                ${buttonSize[size]}
                 ${
                 selectedValue === option.value
                   ? "text-black"

@@ -46,14 +46,7 @@ export interface ButtonVariants {
     "xs" | "sm" | "md" | "lg" | "xl",
     string
   >;
-  padding: Record<
-    "xs" | "sm" | "md" | "lg",
-    string
-  >;
-  pillSize: Record<
-    "xs" | "sm" | "md" | "lg",
-    string
-  >;
+
   state: {
     disabled: string;
     loading: string;
@@ -114,6 +107,7 @@ export const buttonStyles: ButtonVariants = {
   `,
 
   /* ===== VARIANT STYLES ===== */
+  /* If the glassmorphismColor variant "before:"" background gradient is changed then  the ToggleButton.tsx file must be update too */
   variant: {
     text: `
       !items-start !justify-start !h-auto
@@ -193,11 +187,11 @@ export const buttonStyles: ButtonVariants = {
       [--color-border-hover:#66666699]
     `,
     greyDark: `
-      [--color-dark:#333333]
-      [--color-medium:#666666]
-      [--color-light:#999999]
-      [--color-border:#66666666]
-      [--color-border-hover:#66666699]
+      [--color-dark:#555555]
+      [--color-medium:#888888]
+      [--color-light:#bbbbbb]
+      [--color-border:#55555566]
+      [--color-border-hover:#55555599]
     `,
     purple: `
       [--color-dark:#660099]
@@ -207,11 +201,11 @@ export const buttonStyles: ButtonVariants = {
       [--color-border-hover:#66009999]
     `,
     purpleDark: `
-      [--color-dark:#440066]
-      [--color-medium:#660099]
-      [--color-light:#8800CC]
-      [--color-border:#66009966]
-      [--color-border-hover:#66009999]
+      [--color-dark:#550080]
+      [--color-medium:#7700b3]
+      [--color-light:#9900e6]
+      [--color-border:#55008066]
+      [--color-border-hover:#55008099]
     `,
     test: `
       [--color-dark:#00CC00]
@@ -229,7 +223,7 @@ export const buttonStyles: ButtonVariants = {
     lg: "h-[42px] px-4 text-sm",
     xl: "h-[46px] px-5 text-base",
     xxsR: "h-[26px] tablet:h-[22px] px-[14px] text-[10px]",
-    xsR: "h-[30px] tablet:h-[26px] px-[14px] text-xs",
+    xsR: "h-[30px] tablet:h-[26px] px-[14px] text-xs tablet:text-[10px]",
     smR: "h-[34px] tablet:h-[30px] px-4 text-xs",
     mdR: "h-[38px] tablet:h-[34px] px-4 text-sm tablet:text-xs",
     lgR: "h-[42px] tablet:h-[38px] px-4 text-sm",
@@ -242,22 +236,6 @@ export const buttonStyles: ButtonVariants = {
     md: "text-base",
     lg: "text-lg",
     xl: "text-xl",
-  },
-
-  /* ===== PADDING STYLES - USED FOR THE SELECTOR BUTTONS ===== */
-  padding: {
-    xs: "py-[5px] px-[14px]",
-    sm: "py-[7px] px-4",
-    md: "py-[9px] px-4",
-    lg: "py-[11px] px-4",
-  },
-
-  /* ===== PILL SIZE STYLES - USED FOR THE SELECTOR BUTTONS ===== */
-  pillSize: {
-    xs: "text-xs py-[5px] px-[14px]",
-    sm: "text-xs py-[7px] px-4",
-    md: "text-sm py-[9px] px-4",
-    lg: "text-sm py-[11px] px-4",
   },
 
   /* ===== STATE STYLES ===== */
