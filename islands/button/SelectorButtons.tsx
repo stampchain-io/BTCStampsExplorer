@@ -134,7 +134,7 @@ export const SelectorButtons = ({
         `}
         style={{
           transform: selectionTransform,
-          width: `calc((100% - ${options.length * 2}px) / ${options.length})`,
+          width: `calc((100% - ${options.length * 4}px) / ${options.length})`,
         }}
       />
 
@@ -177,7 +177,7 @@ export const SelectorButtons = ({
                 ${
                 selectedValue === option.value
                   ? "text-black"
-                  : "rounded-lg bg-transparent text-[var(--color-dark)] hover:text-[var(--color-medium)] hover:bg-stamp-grey-darkest/30"
+                  : "mx-[1px] !rounded-lg bg-transparent text-[var(--color-dark)] hover:text-[var(--color-medium)] hover:bg-stamp-grey-darkest/30"
               }
                 ${
                 optionDisabled

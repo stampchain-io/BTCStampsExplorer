@@ -1,4 +1,4 @@
-import { handleIcon } from "$icon";
+import { sliderKnob, trackFill } from "$button";
 import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
@@ -785,7 +785,7 @@ export const RangeSliderDual = ({
                   hoveredHandle === "min"
                     ? "text-stamp-grey-light"
                     : "text-stamp-grey"
-                } hover:text-stamp-grey-light transition-colors duration-300`}
+                } hover:text-stamp-grey-light transition-colors duration-200`}
                 onClick={() => startEditing("min")}
               >
                 {config.formatValue(minValue)}
@@ -873,7 +873,7 @@ export const RangeSliderDual = ({
                   hoveredHandle === "max"
                     ? "text-stamp-grey-light"
                     : "text-stamp-grey"
-                } hover:text-stamp-grey-light transition-colors duration-300`}
+                } hover:text-stamp-grey-light transition-colors duration-200`}
                 onClick={() => startEditing("max")}
               >
                 {config.formatValue(maxValue)}
@@ -889,7 +889,7 @@ export const RangeSliderDual = ({
       >
         {/* Track fill with dynamic gradient */}
         <div
-          class="absolute top-0.5 bottom-0.5 h-4 tablet:h-3 rounded-full transition-colors duration-300 pointer-events-none"
+          class={trackFill}
           style={trackGradientFill(hoveredHandle)}
         />
 
@@ -905,7 +905,7 @@ export const RangeSliderDual = ({
           onMouseEnter={() => setHoveredHandle("min")}
           onMouseLeave={() => setHoveredHandle(null)}
           tabIndex={3}
-          class={`${handleIcon} ${
+          class={`${sliderKnob} ${
             lastChangedHandle === "min" ? "z-20" : "z-10"
           }`}
         />
@@ -922,7 +922,7 @@ export const RangeSliderDual = ({
           onMouseEnter={() => setHoveredHandle("max")}
           onMouseLeave={() => setHoveredHandle(null)}
           tabIndex={4}
-          class={`${handleIcon} ${
+          class={`${sliderKnob} ${
             lastChangedHandle === "max" ? "z-20" : "z-10"
           }`}
         />

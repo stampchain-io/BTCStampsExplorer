@@ -273,12 +273,23 @@ export const toggleButton =
   `flex items-center relative w-10 h-5 !rounded-full ${glassmorphismLayer2} focus:outline-none transition duration-50`;
 export const toggleKnobBackground =
   "flex justify-center items-center relative w-5 h-5 bg-transparent rounded-full transition ease-in-out transform duration-400 ";
-export const toggleKnob = "w-[16px] h-[16px] rounded-full";
-export const sliderKnob =
-  `[&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:tablet:w-3 [&::-webkit-slider-thumb]:tablet:h-3 [&::-webkit-slider-thumb]:appearance-none
-   [&::-webkit-slider-thumb]:bg-red-500 [&::-webkit-slider-thumb]:hover:bg-stamp-grey [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-   [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:tablet:w- [&::-moz-range-thumb]:tablet:h-3 [&::-moz-range-thumb]:appearance-none
-   [&::-moz-range-thumb]:bg-grey-light [&::-moz-range-thumb]:hover:bg-stamp-grey [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer`;
+export const toggleKnob = "w-[14px] h-[14px] rounded-full";
+export const sliderKnob = `
+  absolute top-0.5 bottom-0.5 w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none
+  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
+  [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:tablet:size-3
+  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey
+  [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
+  [&::-webkit-slider-thumb]:active:cursor-grabbing
+  [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
+  [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:tablet:size-3
+  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey
+  [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
+  [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
+  `;
+export const trackFill = `
+  absolute top-0.5 bottom-0.5 h-4 tablet:h-3 rounded-full transition-colors duration-200 pointer-events-none
+  `;
 export const sliderBar =
   `w-full h-5 tablet:h-4 !rounded-full ${glassmorphismLayer2} cursor-pointer`;
 

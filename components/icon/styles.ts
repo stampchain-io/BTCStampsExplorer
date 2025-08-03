@@ -112,19 +112,3 @@ export const iconStyles = {
     custom: "",
   },
 } as const;
-
-/* ===== INTERACTIVE ELEMENT STYLES ===== */
-/* ===== SLIDER HANDLE ===== */
-export const handleIcon = `
-  absolute top-0.5 bottom-0.5 w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none
-  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
-  [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:tablet:size-3
-  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey
-  [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
-  [&::-webkit-slider-thumb]:active:cursor-grabbing
-  [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
-  [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:tablet:size-3
-  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey
-  [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
-  [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
-`;
