@@ -27,7 +27,7 @@ export function showNotification(options: NotificationOptions): void {
     content: options.message,
   });
 
-  // TODO: Implement actual notification UI
+  // TODO(@BitcoinStamps): Implement actual notification UI
   if (typeof globalThis !== "undefined" && "console" in globalThis) {
     const prefix = `[${options.type.toUpperCase()}]`;
     const title = options.title ? `${options.title}: ` : "";
