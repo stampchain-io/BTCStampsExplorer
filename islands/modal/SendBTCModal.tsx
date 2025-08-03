@@ -20,7 +20,7 @@ function SendBTCModal({
   fee: initialFee,
   balance,
   handleChangeFee,
-  onClose = () => {},
+  onClose: _onClose = () => {},
   ...baseProps
 }: SendBTCModalProps) {
   /* ===== CONTEXT ===== */

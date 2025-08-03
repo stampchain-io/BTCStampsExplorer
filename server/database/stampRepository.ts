@@ -15,8 +15,8 @@ import {
 } from "$constants";
 import { filterOptions } from "$lib/utils/data/filtering/filterOptions.ts";
 import { getIdentifierType } from "$lib/utils/data/identifiers/identifierUtils.ts";
-import { isCpid, isStampHash, isStampNumber, isTxHash } from "$lib/utils/typeGuards.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
+import { isCpid, isStampHash, isStampNumber, isTxHash } from "$lib/utils/typeGuards.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { summarize_issuances } from "$server/database/index.ts";
 import { SUBPROTOCOLS } from "$types/base.d.ts";
@@ -1620,7 +1620,7 @@ export class StampRepository {
     if (marketFilters.includes("sales")) {
       saleFilters.push("st.has_recent_sale = true");
     }
-    // TODO: Add PSBT market filter when supported
+    // TODO(BitcoinStamps): Add PSBT market filter when supported
     // if (marketFilters.includes("psbt")) {
     //   saleFilters.push("st.has_recent_sale = true");
     // }

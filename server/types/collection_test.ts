@@ -101,11 +101,11 @@ Deno.test("CollectionProcessor interface", () => {
       stamps: raw.stamps || [],
       img: raw.image || "",
     }),
-    enrichCollection: async (collection) => ({
+    enrichCollection: (collection) => Promise.resolve({
       ...collection,
       marketData: null,
     }),
-    processBatch: async (collections) => 
+    processBatch: (collections) => 
       Promise.all(collections.map(c => processor.enrichCollection(c))),
     transformForApi: (collection) => ({
       id: collection.collection_id,

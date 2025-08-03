@@ -560,7 +560,6 @@ export class ErrorHandlingUtils {
       message = errorObj.message as string || message;
       try {
         details = JSON.stringify(errorObj);
-        // deno-lint-ignore no-unused-vars
       } catch (unknownJsonError) {
         // Handle circular references or other JSON.stringify errors
         handleUnknownError(unknownJsonError, "JSON stringify failed");

@@ -76,7 +76,7 @@ class Logger {
       await Deno.writeTextFile(this.logFilePath, logEntry + "\n", {
         append: true,
       });
-    } catch (error) {
+    } catch (_error) {
       // Silently fail file writing
     }
   }
