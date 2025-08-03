@@ -20,7 +20,11 @@ export function recordFeeSuccess(provider: string, responseTime: number): void {
 /**
  * Record failed fee fetch
  */
-export function recordFeeFailure(provider: string, error: string, responseTime: number): void {
+export function recordFeeFailure(
+  provider: string,
+  error: string,
+  responseTime: number,
+): void {
   logger.warn(LOG_NAMESPACES.FEE_MONITORING, {
     message: "Fee fetch failed",
     provider,
@@ -35,7 +39,7 @@ export function recordFeeFailure(provider: string, error: string, responseTime: 
 export function recordFallbackUsage(
   fallbackType: string,
   reason: string,
-  details?: string
+  details?: string,
 ): void {
   logger.info(LOG_NAMESPACES.FEE_MONITORING, {
     message: "Fee fallback used",
