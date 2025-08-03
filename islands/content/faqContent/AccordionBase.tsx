@@ -1,8 +1,8 @@
 /* ===== ACCORDION BASE COMPONENT ===== */
-import { JSX } from "preact";
-import { signal } from "@preact/signals";
 import { Icon } from "$icon";
 import { text } from "$text";
+import { signal } from "@preact/signals";
+import { JSX } from "preact";
 
 /* ===== STATE  ===== */
 // Create a shared signal outside the component
