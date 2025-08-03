@@ -12,7 +12,7 @@ import {
   ToolEndpointError,
   ToolType,
 } from "$lib/types/toolEndpointAdapter.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import {
   getToolAdapter,
   isSRC101TransactionOptions,

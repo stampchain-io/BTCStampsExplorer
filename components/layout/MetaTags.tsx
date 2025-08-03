@@ -1,17 +1,8 @@
+import type { MetaTagsProps } from "$types/ui.d.ts";
 import {
   STAMPCHAIN_FAVICON_IMAGE,
   STAMPCHAIN_OPENGRAPH_IMAGE,
 } from "$constants";
-
-interface MetaTagsProps {
-  title?: string;
-  description?: string;
-  image?: string;
-  skipImage?: boolean;
-  skipTitle?: boolean;
-  skipDescription?: boolean;
-  skipOgMeta?: boolean;
-}
 
 export function MetaTags({
   title = "Bitcoin Stamps",

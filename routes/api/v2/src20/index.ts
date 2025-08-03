@@ -1,5 +1,13 @@
+import type {
+  BlockHandlerContext as _BlockHandlerContext,
+  IdentHandlerContext as _IdentHandlerContext,
+  TickHandlerContext as _TickHandlerContext,
+} from "$types/base.d.ts";
+import type {
+  PaginatedTickResponseBody as _PaginatedTickResponseBody,
+  SRC20TrxRequestParams as _SRC20TrxRequestParams,
+} from "$types/api.d.ts";
 import { Handlers } from "$fresh/server.ts";
-import { SRC20TrxRequestParams } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import {
@@ -70,7 +78,7 @@ export const handler: Handlers = {
       );
     }
 
-    const params: SRC20TrxRequestParams = {
+    const params: _SRC20TrxRequestParams = {
       ...(op && { op }),
       ...(tick && { tick }),
       ...(sortValidation.data && { sortBy: sortValidation.data }),

@@ -1,20 +1,10 @@
 /* ===== STAMP OVERVIEW CONTENT COMPONENT ===== */
 import { StampCard } from "$card";
-import { StampRow } from "$globals";
+import type { StampOverviewContentProps } from "$types/ui.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 /* ===== TYPES ===== */
-interface StampOverviewContentProps {
-  stamps: StampRow[];
-  isRecentSales?: boolean;
-  fromPage?: string;
-  pagination?: {
-    page: number;
-    totalPages: number;
-    prefix?: string;
-    onPageChange?: (page: number) => void;
-  };
-}
 
 /* ===== COMPONENT ===== */
 export function StampOverviewContent({
@@ -29,7 +19,7 @@ export function StampOverviewContent({
       {stamps?.length
         ? (
           <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-3 mobileMd:gap-6 w-full auto-rows-fr">
-            {stamps.map((stamp, index) => (
+            {stamps.map((stamp: StampRow, index: number) => (
               <StampCard
                 key={isRecentSales && stamp.sale_data
                   ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}-${stamp.sale_data.block_index}-${index}`

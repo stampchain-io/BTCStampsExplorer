@@ -1,5 +1,6 @@
 /* ===== STATES ===== */
 /* @baba - refactor and move to shared states file in /layout/ */
+import type { GlobalModalState, SearchState } from "$types/ui.d.ts";
 import { signal } from "@preact/signals";
 import type { ComponentChildren } from "preact";
 
@@ -15,25 +16,12 @@ export interface ModalConfig {
 
 export const DEFAULT_MODAL_ANIMATION: ModalAnimation = "slideUpDown";
 
-/* ===== MODAL STATE ===== */
-export interface GlobalModalState {
-  isOpen: boolean;
-  content: ComponentChildren | null;
-  animation: ModalAnimation;
-}
-
 // Create the signal with explicit typing
 export const globalModal = signal<GlobalModalState>({
   isOpen: false,
   content: null,
   animation: "slideUpDown",
 });
-
-export interface SearchState {
-  term: string;
-  error: string;
-  results?: Array<{ tick: string }>;
-}
 
 export const searchState = signal<SearchState>({
   term: "",

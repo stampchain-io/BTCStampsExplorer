@@ -3,7 +3,7 @@ import {
   bigIntSerializer,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { assertEquals } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("BigInt Serialization and Deserialization", () => {
   it("should serialize BigInt values correctly", () => {

@@ -5,7 +5,7 @@
  * to improve Phase 2 fee estimation accuracy.
  */
 
-import type { UTXO } from "$lib/types/base.d.ts";
+import type { ScriptType, UTXO } from "$lib/types/base.d.ts";
 import { TX_CONSTANTS } from "$constants";
 
 export interface DummyUTXOConfig {
@@ -13,7 +13,7 @@ export interface DummyUTXOConfig {
   averageUTXOSize?: number;
   includeSmallUTXOs?: boolean;
   includeDustUTXOs?: boolean;
-  scriptType?: "P2WPKH" | "P2PKH" | "P2SH";
+  scriptType?: ScriptType;
 }
 
 /**
@@ -83,7 +83,7 @@ export function generateRealisticDummyUTXOs(config: DummyUTXOConfig): UTXO[] {
 function createDummyUTXO(
   index: number,
   value: number,
-  scriptType: string,
+  scriptType: ScriptType,
 ): UTXO {
   const txid = generateDummyTxId(index);
 
@@ -116,7 +116,7 @@ function generateDummyTxId(index: number): string {
 /**
  * Generates a dummy script based on script type
  */
-function generateDummyScript(scriptType: string): string {
+function generateDummyScript(scriptType: ScriptType): string {
   switch (scriptType) {
     case "P2WPKH":
       // OP_0 <20-byte pubkey hash>
@@ -135,7 +135,7 @@ function generateDummyScript(scriptType: string): string {
 /**
  * Generates a dummy address based on script type
  */
-function generateDummyAddress(scriptType: string): string {
+function generateDummyAddress(scriptType: ScriptType): string {
   switch (scriptType) {
     case "P2WPKH":
       return "bc1qdummy" + Array(33).fill("x").join("");

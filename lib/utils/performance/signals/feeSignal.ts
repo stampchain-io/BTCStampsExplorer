@@ -7,8 +7,9 @@ import {
 import {
   recordFeeFailure,
   recordFeeSuccess,
-} from "$lib/utils/monitoring/metrics/monitoring.ts";
+} from "$lib/utils/performance/fees/feeMonitoring.ts";
 import { getCSRFToken } from "$lib/utils/security/clientSecurityUtils.ts";
+import type { FeeState } from "$types/ui.d.ts";
 
 // Fee data interface matching the API response with enhanced metadata
 export interface FeeData {
@@ -16,8 +17,8 @@ export interface FeeData {
   btcPrice: number;
   // Source and confidence metadata
   source?: "mempool" | "quicknode" | "cached" | "default";
-  confidence?: "high" | "medium" | "low";
-  timestamp?: number;
+  confidence: "high" | "medium" | "low"; // Required to match services.d.ts
+  timestamp: number; // Required to match services.d.ts
   fallbackUsed?: boolean;
   // Full fee structure from mempool API
   fastestFee?: number;
@@ -29,14 +30,6 @@ export interface FeeData {
 }
 
 // Fee state interface
-interface FeeState {
-  data: FeeData | null;
-  loading: boolean;
-  lastUpdated: number | null;
-  error: string | null;
-  retryCount: number;
-  lastKnownGoodData: FeeData | null; // Keep last successful data
-}
 
 // Initial state
 const initialFeeState: FeeState = {

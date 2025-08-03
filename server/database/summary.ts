@@ -1,4 +1,4 @@
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 
 export const summarize_issuances = (issuances: StampRow[]) => {
   const summary = {

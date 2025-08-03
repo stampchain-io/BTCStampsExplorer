@@ -110,7 +110,7 @@ export const ToggleButton = ({
 
   return (
     <div class={getContainerClass()}>
-      {options.map((option) => {
+      {options.map((option: string) => {
         const isDisabled = disabledOptions.includes(option);
 
         return (

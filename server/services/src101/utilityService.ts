@@ -1,11 +1,11 @@
 // import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts"; // Unused import - removed
-import { TXError } from "$globals";
+import type { TXError } from "$types/transaction.d.ts";
 // import { crypto } from "@std/crypto"; // Unused import - removed
-import { isValidBitcoinAddress } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
-import { SRC101QueryService } from "./queryService.ts";
+import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
+import { SRC101QueryService } from "$server/services/src101/queryService.ts";
 // import { BigFloat } from "bigfloat/mod.ts"; // Unused import - removed
 // import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts"; // Unused import - removed
-import { SRC101InputData } from "$types/index.d.ts"; // Fixed import path
+import type { SRC101InputData } from "$types/src101.d.ts";
 
 export class SRC101UtilityService {
   static async getDeployDetails(deploy_hash: string) {

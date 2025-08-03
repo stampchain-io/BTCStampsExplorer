@@ -1,10 +1,10 @@
-import { SRC20QueryService } from "./queryService.ts";
-import { SRC20TransactionService } from "./transactionService.ts";
-import { SRC20MarketService } from "./marketService.ts";
-import { SRC20UtilityService } from "./utilityService.ts";
-import { SRC20PSBTService } from "./psbt/src20PSBTService.ts";
-import { SRC20OperationService } from "./operations/src20Operations.ts";
-import { SRC20CompressionService } from "./compression/compressionService.ts";
+import { SRC20QueryService } from "$server/services/src20/queryService.ts";
+import { SRC20TransactionService } from "$server/services/src20/transactionService.ts";
+import { SRC20MarketService } from "$server/services/src20/marketService.ts";
+import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
+import { SRC20PSBTService } from "$server/services/src20/psbt/src20PSBTService.ts";
+import { SRC20OperationService } from "$server/services/src20/operations/src20Operations.ts";
+import { SRC20CompressionService } from "$server/services/src20/compression/compressionService.ts";
 
 // Create a combined service class
 export class SRC20Service {

@@ -1,7 +1,10 @@
 /* ===== STAMP DETAIL PAGE ===== */
 /*@baba-365+390*/
-import { StampRow } from "$globals";
+
 import { Handlers } from "$fresh/server.ts";
+import type { StampDetailPageProps } from "$types/ui.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { HolderRow } from "$types/wallet.d.ts";
 import { Head } from "$fresh/runtime.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CounterpartyDispenserService } from "$server/services/counterpartyApiService.ts";
@@ -20,7 +23,7 @@ interface StampData {
   sends: any;
   dispensers: any;
   dispenses: any;
-  holders: any[];
+  holders: HolderRow[];
   vaults: any;
   last_block: number;
   stamps_recent: any;
@@ -28,11 +31,6 @@ interface StampData {
   htmlTitle?: string;
   error?: string;
   url: string;
-}
-
-interface StampDetailPageProps {
-  data: StampData;
-  url?: string;
 }
 
 /* ===== SERVER HANDLER ===== */
@@ -173,9 +171,25 @@ export const handler: Handlers<StampData> = {
 
 /* ===== HELPERS ===== */
 // Helper functions to improve readability
-function findLowestPriceDispenser(dispensers: any[]) {
-  const openDispensers = dispensers.filter((d) => d.give_remaining > 0);
-  return openDispensers.reduce(
+function findLowestPriceDispenser(
+  dispensers: Array<{
+    give_remaining: number;
+    satoshirate: number;
+    close_block_index: number | null;
+  }>,
+): {
+  give_remaining: number;
+  satoshirate: number;
+  close_block_index: number | null;
+} | null {
+  const openDispensers = dispensers?.filter((d) => d.give_remaining > 0) ?? [];
+  return openDispensers.reduce<
+    {
+      give_remaining: number;
+      satoshirate: number;
+      close_block_index: number | null;
+    } | null
+  >(
     (lowest, dispenser) => {
       if (!lowest || dispenser.satoshirate < lowest.satoshirate) {
         return dispenser;
@@ -203,8 +217,8 @@ export default function StampDetailPage(props: StampDetailPageProps) {
   const title = htmlTitle
     ? htmlTitle.toUpperCase()
     : stamp?.cpid?.startsWith("A")
-    ? `Bitcoin Stamp #${stamp?.stamp || ""}`
-    : stamp?.cpid || "Stamp Not Found";
+    ? `Bitcoin Stamp #${stamp?.stamp ?? ""}`
+    : stamp?.cpid ?? "Stamp Not Found";
 
   // Update the getMetaImageInfo and add dimension handling
   const getMetaImageInfo = (stamp: StampRow | undefined, baseUrl: string) => {
@@ -266,14 +280,17 @@ export default function StampDetailPage(props: StampDetailPageProps) {
   const tableConfigs = [
     {
       id: "dispensers",
+      label: "DISPENSERS",
       count: dispensers?.length || 0,
     },
     {
       id: "sales",
+      label: "SALES",
       count: dispenses?.length || 0,
     },
     {
       id: "transfers",
+      label: "TRANSFERS",
       count: sends?.length || 0,
     },
   ];
@@ -348,14 +365,22 @@ export default function StampDetailPage(props: StampDetailPageProps) {
         </div>
 
         {holders && holders.length > 0 && (
-          <HoldersTable holders={holders || []} />
+          <HoldersTable
+            holders={holders.map((holder) => ({
+              quantity: Number(holder.quantity),
+              divisible: holder.divisible,
+              address: holder.address,
+              amt: Number(holder.amt ?? 0),
+              percentage: Number(holder.percentage ?? 0),
+            }))}
+          />
         )}
 
-        {stamp.ident !== "SRC-20" && (
+        {stamp?.ident !== "SRC-20" && (
           <DataTableBase
             type="stamps"
             configs={tableConfigs}
-            cpid={stamp.cpid}
+            cpid={stamp?.cpid || ""}
           />
         )}
 

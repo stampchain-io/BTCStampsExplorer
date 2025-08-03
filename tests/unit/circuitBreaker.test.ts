@@ -10,7 +10,7 @@ import {
   assertStringIncludes,
   fail,
 } from "@std/assert";
-import { beforeEach, describe, it } from "@std/testing/bdd";
+import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("CircuitBreaker", () => {
   let circuitBreaker: CircuitBreaker;

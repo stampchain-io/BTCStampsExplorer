@@ -10,7 +10,7 @@ import {
   ErrorSeverity,
   ErrorType,
   type LoadingState,
-} from "$lib/utils/monitoring/errors/errorHandlingUtils.ts";
+} from "$lib/utils/errorHandling.ts";
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
 
 /* ===== BASIC ERROR INFO CREATION TESTS ===== */

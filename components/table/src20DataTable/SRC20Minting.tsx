@@ -1,18 +1,12 @@
 import { Button } from "$button";
+import type { SRC20MintingTableProps } from "$types/ui.d.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
-import { rowTable, Timeframe } from "$layout";
+import type { SRC20Row } from "$types/src20.d.ts";
+import { rowTable } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelSm, textSm, valueDark } from "$text";
-
-interface SRC20MintingTableProps {
-  data: SRC20Row[];
-  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  timeframe: Timeframe;
-  onImageClick: (imgSrc: string) => void;
-}
 
 export function SRC20MintingTable({
   data,
@@ -74,9 +68,9 @@ export function SRC20MintingTable({
           </tr>
         </thead>
         <tbody>
-          {data.length
+          {data?.length
             ? (
-              data.map((src20) => {
+              data.map((src20: SRC20Row) => {
                 const imageUrl = src20.deploy_img ||
                   src20.stamp_url ||
                   (src20.deploy_tx

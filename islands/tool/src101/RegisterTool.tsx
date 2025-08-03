@@ -1,9 +1,11 @@
 /* ===== SRC101 BITNAME REGISTRATION COMPONENT ===== */
 import { Button } from "$button";
+import type { SRC101RegisterToolProps } from "$types/ui.d.ts";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { inputFieldOutline, outlineGradient, purpleGradient } from "$form";
-import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
+import type { ROOT_DOMAIN_TYPES } from "$types/base.d.ts";
+import type { SRC101Balance } from "$types/src101.d.ts";
 import DetailSRC101Modal from "$islands/modal/DetailSRC101Modal.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { bodyTool, containerBackground, loaderSpinGrey } from "$layout";
@@ -17,9 +19,6 @@ import { titlePurpleLD } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== COMPONENT INTERFACE ===== */
-interface SRC101RegisterToolProps {
-  trxType?: "olga" | "multisig";
-}
 
 /* ===== MAIN COMPONENT IMPLEMENTATION ===== */
 export function SRC101RegisterTool({
@@ -352,7 +351,7 @@ export function SRC101RegisterTool({
           type="src101"
           fromPage="src101_bitname"
           fileType="application/json"
-          fileSize={formState.jsonSize}
+          fileSize={formState.jsonSize || 0}
           BTCPrice={formState.BTCPrice}
           isSubmitting={isSubmitting}
           onSubmit={handleRegisterWithExactFees}

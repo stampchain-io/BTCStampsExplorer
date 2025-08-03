@@ -4,16 +4,7 @@ import { logger } from "$lib/utils/logger.ts";
 import {
   createBitcoinTransactionBuilder,
 } from "$server/services/transaction/index.ts";
-
-interface CreatePSBTInput {
-  utxo: string;
-  salePrice: number;
-  sellerAddress: string;
-}
-
-interface CreatePSBTResponse {
-  psbt: string;
-}
+import type { CreatePSBTInput, CreatePSBTResponse } from "$types/api.d.ts";
 
 export const handler: Handlers = {
   async POST(req: Request) {
@@ -51,7 +42,15 @@ export const handler: Handlers = {
           salePrice,
           sellerAddress,
         );
-      const response: CreatePSBTResponse = { psbt: psbtHex };
+
+      // TODO: Get actual values from PSBT analysis
+      const response: CreatePSBTResponse = {
+        psbt: psbtHex,
+        fee: 0, // Placeholder - should be calculated from PSBT
+        inputCount: 1, // Placeholder - should be derived from PSBT
+        outputCount: 2, // Placeholder - should be derived from PSBT
+        estimatedSize: 250, // Placeholder - should be calculated from PSBT
+      };
 
       return ApiResponseUtil.success(response);
     } catch (error) {

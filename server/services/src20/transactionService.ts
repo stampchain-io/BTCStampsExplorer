@@ -1,8 +1,8 @@
-import { TX, TXError } from "$globals";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import type { TX, TXError } from "$types/transaction.d.ts";
+import { logger } from "$lib/utils/logger.ts";
 import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$server/types/services/src20.d.ts";
-import { InputData } from "$types/index.d.ts";
-import { SRC20OperationService } from "./operations/src20Operations.ts";
+import type { InputData } from "$types/src20.d.ts";
+import { SRC20OperationService } from "$server/services/src20/operations/src20Operations.ts";
 
 export class SRC20TransactionService {
   static async handleOperation(

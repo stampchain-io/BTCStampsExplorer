@@ -2,7 +2,7 @@
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { inputField, inputFieldSquare } from "$form";
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 import { Icon } from "$icon";
 import { SelectField } from "$islands/form/SelectField.tsx";
 import {
@@ -220,11 +220,7 @@ export function StampSendTool() {
   }, [formState.recipientAddress, selectedStamp?.stamp, quantity]);
 
   /* ===== EVENT HANDLERS ===== */
-  const handleStampSelect = (e: Event) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const value = (e.currentTarget as HTMLSelectElement).value;
+  const handleStampSelect = (value: string) => {
     const selectedItem = stamps.data.find(
       (item) => item?.stamp?.toString() === value,
     );
@@ -507,9 +503,15 @@ export function StampSendTool() {
 
           <div class={containerColForm}>
             <SelectField
-              options={stamps.data}
+              options={stamps.data.map((stamp) => ({
+                value: stamp.stamp?.toString() ?? "",
+                label: `Stamp ${stamp.stamp}${
+                  stamp.ident ? ` - ${stamp.ident}` : ""
+                }`,
+                disabled: false,
+              }))}
               onChange={handleStampSelect}
-              value={selectedStamp?.stamp?.toString() ?? null}
+              value={selectedStamp?.stamp?.toString() ?? ""}
             />
 
             <div class="flex w-full justify-end items-center gap-5">

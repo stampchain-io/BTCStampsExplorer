@@ -21,7 +21,7 @@ services:
       - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
       - NEWMAN_FOLDER=${NEWMAN_FOLDER:-}
       - REPORT_PREFIX=${REPORT_PREFIX:-newman}
-    command: sh scripts/run-newman-enhanced.sh
+    command: sh scripts/run-newman-with-openapi.sh
   
   # Comprehensive collection testing - NEW
   newman-comprehensive:
@@ -46,7 +46,7 @@ services:
       - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
       - NEWMAN_FOLDER=${NEWMAN_FOLDER:-}
       - REPORT_PREFIX=newman-comprehensive
-    command: sh scripts/run-newman-comprehensive.sh
+    command: sh scripts/run-newman-with-openapi.sh
 
   # Pagination validation testing
   newman-pagination:
@@ -71,7 +71,7 @@ services:
       - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
       - NEWMAN_FOLDER=${NEWMAN_FOLDER:-}
       - REPORT_PREFIX=newman-pagination-validation
-    command: sh scripts/run-newman-pagination-validation-simple.sh
+    command: sh scripts/run-newman-with-openapi.sh
 
   # Simple collection testing
   newman-simple:
@@ -84,7 +84,7 @@ services:
       - ./reports:/app/reports
     environment:
       - NODE_ENV=test
-    command: sh scripts/run-newman-simple.sh
+    command: sh scripts/run-newman-with-openapi.sh
 
   # Advanced collection testing
   newman-advanced:
@@ -211,6 +211,31 @@ services:
         ls -la reports/newman-parallel/
       "
 
+  # Request Validation tests - Tests OpenAPI request validation
+  newman-request-validation:
+    image: node:22-alpine
+    working_dir: /app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/app
+      - ./reports:/app/reports
+    environment:
+      - NODE_ENV=test
+      - DEV_BASE_URL=${DEV_BASE_URL:-http://host.docker.internal:8000}
+      - PROD_BASE_URL=${PROD_BASE_URL:-https://stampchain.io}
+      - NEWMAN_COLLECTION=tests/postman/collections/request-validation.json
+      - NEWMAN_ENVIRONMENT=${NEWMAN_ENVIRONMENT:-tests/postman/environments/comprehensive.json}
+      - NEWMAN_REPORTERS=${NEWMAN_REPORTERS:-cli,html,json}
+      - NEWMAN_ITERATIONS=${NEWMAN_ITERATIONS:-1}
+      - NEWMAN_DELAY_REQUEST=${NEWMAN_DELAY_REQUEST:-0}
+      - NEWMAN_TIMEOUT=${NEWMAN_TIMEOUT:-10000}
+      - NEWMAN_VERBOSE=${NEWMAN_VERBOSE:-false}
+      - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
+      - NEWMAN_FOLDER=${NEWMAN_FOLDER:-}
+      - REPORT_PREFIX=newman-request-validation
+    command: sh scripts/run-newman-with-openapi.sh
+
   # Data Validation tests - Compares actual data between dev and prod
   newman-data-validation:
     image: node:22-alpine
@@ -234,4 +259,4 @@ services:
       - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
       - NEWMAN_FOLDER=${NEWMAN_FOLDER:-}
       - REPORT_PREFIX=newman-data-validation
-    command: sh scripts/run-newman-enhanced.sh 
+    command: sh scripts/run-newman-with-openapi.sh 

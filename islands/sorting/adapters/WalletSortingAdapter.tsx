@@ -9,18 +9,7 @@ import type { WalletStampWithValue } from "$lib/types/wallet.d.ts";
 import { walletSortingConfig } from "$lib/utils/data/sorting/config.ts";
 import { getAvailableSortOptions } from "$lib/utils/data/sorting/performance.ts";
 import { useMemo } from "preact/hooks";
-
-export interface WalletSortingAdapterProps {
-  stamps: WalletStampWithValue[];
-  address: string;
-  onSortChange?: (sortedStamps: WalletStampWithValue[]) => void;
-  enableAdvancedSorting?: boolean;
-  sortingConfig?: {
-    cacheSize?: number;
-    enableMetrics?: boolean;
-    performanceThreshold?: number;
-  };
-}
+import type { WalletSortingAdapterProps } from "$types/ui.d.ts";
 
 export interface WalletSortingAdapterReturn {
   sortedStamps: WalletStampWithValue[];

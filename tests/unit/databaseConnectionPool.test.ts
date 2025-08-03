@@ -3,8 +3,8 @@ import {
   assertExists,
   assertRejects,
 } from "@std/assert";
-import { beforeEach, describe, it } from "@std/testing/bdd";
-import { assertSpyCall, spy } from "@std/testing/mock";
+import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { assertSpyCall, spy } from "@std/testing@1.0.14/mock";
 import { Client } from "mysql/mod.ts";
 
 // Mock configuration

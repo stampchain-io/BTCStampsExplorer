@@ -7,7 +7,7 @@
 
 import type { ScriptType } from "$lib/types/index.d.ts";
 import { TX_CONSTANTS } from "$constants";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 export interface MARATransactionEstimateConfig {
   // Input configuration
@@ -101,7 +101,7 @@ export function estimateMARATransactionSize(
 
   // Check if we have witness inputs
   const hasWitness = inputs.some((input) =>
-    input.isWitness || input.type.toUpperCase().includes("P2W")
+    input.isWitness ?? (input.type?.toUpperCase().includes("P2W") ?? false)
   );
 
   if (hasWitness) {
@@ -112,7 +112,9 @@ export function estimateMARATransactionSize(
   // Calculate input weights
   let inputWeight = 0;
   for (const input of inputs) {
-    if (input.isWitness || input.type.toUpperCase().includes("P2W")) {
+    const isWitness = input.isWitness ??
+      (input.type?.toUpperCase().includes("P2W") ?? false);
+    if (isWitness) {
       // P2WPKH input: 41 bytes base + 27 witness bytes
       // Base: outpoint (36) + sequence (4) + script length (1)
       inputWeight += 41 * 4 + 27; // 164 + 27 = 191 weight units

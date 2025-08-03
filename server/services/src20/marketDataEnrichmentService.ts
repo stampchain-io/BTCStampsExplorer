@@ -8,8 +8,11 @@
  * @author BTCStampsExplorer Team
  */
 
-import type { SRC20Row } from "$globals";
-import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { 
+  SRC20MarketData, 
+  MarketListingAggregated 
+} from "$lib/types/marketData.d.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 
 /**
@@ -48,21 +51,22 @@ export interface MarketDataFields {
   volume_24h_btc: number;
 
   /** 24-hour price change percentage */
-  price_change_24h_percent: number;
+  price_change_24h_percent: number | undefined;
 
   /** Total holder count */
   holder_count: number;
 
   /** Data quality score (0-10) */
-  data_quality_score: number;
+  data_quality_score: number | undefined;
 
   /** Last update timestamp */
-  last_updated: Date;
+  last_updated: Date | undefined;
 
   /** Extended fields (included when includeExtendedFields=true) */
   volume_7d_btc?: number;
   volume_30d_btc?: number;
   price_change_7d_percent?: number;
+  change_7d?: number;
   price_change_30d_percent?: number;
 
   /** Market data source information */
@@ -83,7 +87,7 @@ export interface EnrichedSRC20Item extends SRC20Row {
    * Nested market data object - SINGLE SOURCE OF TRUTH (snake_case for API consistency)
    * NO root-level fields like floor_unit_price, market_cap, volume24, change24
    */
-  market_data: MarketDataFields | null;
+  market_data?: MarketListingAggregated;
 }
 
 /**
@@ -339,20 +343,19 @@ export class MarketDataEnrichmentService {
       floor_price_btc: data.floorPriceBTC,
       market_cap_btc: data.marketCapBTC,
       volume_24h_btc: data.volume24hBTC,
-      price_change_24h_percent: data.priceChange24hPercent,
       holder_count: data.holderCount,
-      data_quality_score: data.dataQualityScore,
-      last_updated: data.lastUpdated,
-      primary_exchange: data.primaryExchange,
-      exchange_sources: data.exchangeSources,
+      
+      // Required fields with default values if not available
+      price_change_24h_percent: data.priceChange24hPercent ?? 0,
+      data_quality_score: data.dataQualityScore ?? 5, // Default to medium quality
+      last_updated: data.lastUpdated ? new Date(data.lastUpdated) : new Date(),
     };
 
     // Include extended fields when requested
     if (includeExtendedFields) {
       standardized.volume_7d_btc = data.volume7dBTC;
       standardized.volume_30d_btc = data.volume30dBTC;
-      standardized.price_change_7d_percent = data.priceChange7dPercent;
-      standardized.price_change_30d_percent = data.priceChange30dPercent;
+      standardized.change_7d = data.priceChange7dPercent;
     }
 
     return standardized;

@@ -1,10 +1,6 @@
 import { Icon } from "$icon";
+import type { MaraStatusLinkProps } from "$types/ui.d.ts";
 import { glassmorphism } from "$layout";
-
-interface MaraStatusLinkProps {
-  txid: string;
-  class?: string;
-}
 
 export function MaraStatusLink(
   { txid, class: className = "" }: MaraStatusLinkProps,

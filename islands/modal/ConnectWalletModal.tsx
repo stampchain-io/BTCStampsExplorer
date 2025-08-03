@@ -1,15 +1,11 @@
 /* ===== CONNECT WALLET MODAL COMPONENT ===== */
-import { ComponentChildren } from "preact";
+import type { ConnectWalletModalProps } from "$types/ui.d.ts";
 import { showConnectWalletModal } from "$client/wallet/wallet.ts";
 import { subtitlePurple } from "$text";
 import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
 
 /* ===== TYPES ===== */
-interface ConnectWalletModalProps {
-  connectors: ComponentChildren;
-  handleClose: () => void;
-}
 
 /* ===== COMPONENT ===== */
 export const ConnectWalletModal = ({
@@ -32,7 +28,7 @@ export const ConnectWalletModal = ({
     // Then wait for animation to complete before closing
     setTimeout(() => {
       showConnectWalletModal.value = false;
-      handleClose();
+      handleClose?.();
     }, 600); // matches --animation-cleanup-delay from modal.css
   };
 

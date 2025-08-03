@@ -6,7 +6,7 @@
  */
 
 import * as bitcoin from "bitcoinjs-lib";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 /**
  * Extracts a raw transaction hex from a fully signed PSBT

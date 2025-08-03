@@ -1,10 +1,10 @@
 /* ===== SRC20 DETAIL PAGE ===== */
 import { Handlers } from "$fresh/server.ts";
-import { SRC20DetailHeader } from "$header";
+import { SRC20DetailHeader } from "$islands/header/index.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { DataTableBase, HoldersTable } from "$table";
-import type { SRC20TickPageData } from "$types/src20.d.ts";
+import type { ProcessedHolder } from "$types/wallet.d.ts";
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
@@ -72,12 +72,19 @@ export const handler: Handlers = {
 };
 
 /* ===== TYPES ===== */
-interface SRC20DetailPageProps {
-  data: SRC20TickPageData | { error: string };
+interface SRC20DetailPageData {
+  deployment: any;
+  holders: ProcessedHolder[];
+  mint_status: any;
+  total_mints: number;
+  total_transfers: number;
+  marketInfo?: any;
+  highcharts?: any[];
+  error?: string;
 }
 
 /* ===== PAGE COMPONENT ===== */
-function SRC20DetailPage(props: SRC20DetailPageProps) {
+function SRC20DetailPage(props: { data: SRC20DetailPageData }) {
   /* ===== ERROR HANDLING ===== */
   if ("error" in props.data) {
     return (
@@ -115,8 +122,19 @@ function SRC20DetailPage(props: SRC20DetailPageProps) {
         _totalTransfers={total_transfers}
         {...(marketInfo && { marketInfo })}
       />
-      <ChartWidget data={highcharts || []} fromPage="src20" tick={tick} />
-      <HoldersTable holders={holders as any} />
+      <ChartWidget
+        type="line"
+        data={highcharts || []}
+        fromPage="src20"
+        tick={tick}
+      />
+      <HoldersTable
+        data={holders.map((h) => ({
+          address: h.address,
+          balance: h.amt,
+          percentage: h.percentage,
+        }))}
+      />
       <DataTableBase
         type="src20"
         configs={tableConfigs}

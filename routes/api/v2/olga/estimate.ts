@@ -1,42 +1,13 @@
 import { TX_CONSTANTS } from "$constants";
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { base64ToHex } from "$lib/utils/data/binary/baseUtils.ts";
 import { FileToAddressUtils } from "$lib/utils/bitcoin/encoding/fileToAddressUtils.ts";
 import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
 import { normalizeFeeRate } from "$server/services/counterpartyApiService.ts";
-import type { ScriptType } from "$types/index.d.ts";
-
-interface EstimateRequest {
-  filename: string;
-  file: string;
-  qty?: number | string;
-  satsPerVB?: number | string;
-  satsPerKB?: number | string;
-  feeRate?: number | string;
-  service_fee?: number | string;
-  isPoshStamp?: boolean;
-}
-
-interface EstimateResponse {
-  est_tx_size: number;
-  total_dust_value: number;
-  est_miner_fee: number;
-  total_cost: number;
-  fee_breakdown: {
-    miner_fee: number;
-    dust_value: number;
-    service_fee: number;
-  };
-  file_info: {
-    size_bytes: number;
-    cip33_addresses_count: number;
-  };
-  is_estimate: true;
-  estimation_method: "dummy_utxos";
-  dummy_utxo_value: number;
-}
+import type { EstimateRequest, EstimateResponse } from "$types/api.d.ts";
+import type { ScriptType } from "$types/base.d.ts";
 
 export const handler: Handlers = {
   async POST(req: Request): Promise<Response> {

@@ -1,24 +1,14 @@
 /* ===== CLOSE ICON COMPONENT ===== */
 import { Icon } from "$icon";
-import type { IconVariants } from "$icon";
-
+// Removed unused MouseEventHandler import
+import type { CloseIconProps } from "$types/ui.d.ts";
 /* ===== TYPES ===== */
-interface CloseIconProps {
-  onClick: (e?: MouseEvent) => void;
-  size: IconVariants["size"];
-  weight: IconVariants["weight"];
-  color: "greyGradient" | "purpleGradient";
-  className?: string;
-  onMouseEnter?: (() => void) | undefined;
-  onMouseLeave?: (() => void) | undefined;
-  "aria-label"?: string;
-}
 
 /* ===== COMPONENT ===== */
 export function CloseIcon({
   onClick,
-  weight,
-  size,
+  weight = "normal",
+  size = "md",
   color,
   className = "",
   onMouseEnter,
@@ -26,9 +16,17 @@ export function CloseIcon({
   "aria-label": ariaLabel,
 }: CloseIconProps) {
   /* ===== EVENT HANDLERS ===== */
-  const handleClick = (e: MouseEvent) => {
+  const handleClick = (
+    e: MouseEvent & {
+      currentTarget:
+        | HTMLButtonElement
+        | HTMLAnchorElement
+        | HTMLImageElement
+        | SVGElement;
+    },
+  ) => {
     e.stopPropagation();
-    onClick(e);
+    onClick?.();
   };
 
   /* ===== STYLES ===== */
@@ -71,12 +69,32 @@ export function CloseIcon({
         type="iconButton"
         name="close"
         weight={weight}
-        size={size}
+        size={typeof size === "number" ? "custom" : size}
         color="custom"
         className={`${colorClasses} ${className}`.trim()}
         onClick={handleClick}
-        {...(onMouseEnter && { onMouseEnter })}
-        {...(onMouseLeave && { onMouseLeave })}
+        onMouseEnter={onMouseEnter
+          ? (
+            e: MouseEvent & {
+              currentTarget:
+                | HTMLButtonElement
+                | HTMLAnchorElement
+                | HTMLImageElement
+                | SVGElement;
+            },
+          ) => onMouseEnter(e)
+          : undefined}
+        onMouseLeave={onMouseLeave
+          ? (
+            e: MouseEvent & {
+              currentTarget:
+                | HTMLButtonElement
+                | HTMLAnchorElement
+                | HTMLImageElement
+                | SVGElement;
+            },
+          ) => onMouseLeave(e)
+          : undefined}
         ariaLabel={ariaLabel || "Close"}
       />
     </>

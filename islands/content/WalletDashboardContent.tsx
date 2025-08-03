@@ -1,5 +1,6 @@
 /* ===== WALLET DASHBOARD CONTENT COMPONENT ===== */
-import { StampRow } from "$globals";
+import type { DispenserRow as Dispenser, StampRow } from "$types/stamp.d.ts";
+
 import { Icon, LoadingIcon } from "$icon";
 import { SortButton } from "$islands/button/SortButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
@@ -17,7 +18,6 @@ import {
   navigateWithFresh,
 } from "$lib/utils/navigation/freshNavigationUtils.ts";
 import { getStampImageSrc } from "$lib/utils/ui/media/imageUtils.ts";
-import { Dispenser } from "$types/index.d.ts";
 import { WalletContentProps } from "$types/wallet.d.ts";
 import { useEffect, useState } from "preact/hooks";
 
@@ -56,7 +56,7 @@ const ItemHeader = ({
             open={isOpenSetting}
             handleOpen={handleOpenSetting}
             filterButtons={["transfer"]}
-            onFilterClick={(filter) => {
+            onFilterClick={(filter: string) => {
               if (filter === "transfer") {
                 setOpenSettingModal(true);
               }
@@ -102,7 +102,7 @@ function DispenserItem({
   }
 
   /* ===== DISPENSER FILTERING ===== */
-  const dispensersWithStamps = dispensers.filter((d) => d.stamp);
+  const dispensersWithStamps = dispensers?.filter((d) => d.stamp) ?? [];
   const openDispensers = dispensersWithStamps.filter((d) =>
     d.give_remaining > 0
   );
@@ -386,7 +386,7 @@ const WalletDashboardContent = ({
 
   /* ===== COMPUTED VALUES ===== */
   const openDispensersCount =
-    dispensers.data.filter((d: any) => d.give_remaining > 0).length;
+    dispensers.data?.filter((d: any) => d.give_remaining > 0)?.length ?? 0;
 
   /* ===== EFFECTS ===== */
   useEffect(() => {
@@ -484,6 +484,25 @@ const WalletDashboardContent = ({
                   totalPages: Math.ceil(
                     stamps.pagination.total / stamps.pagination.limit,
                   ),
+                  hasNext: stamps.pagination.page <
+                    Math.ceil(
+                      stamps.pagination.total / stamps.pagination.limit,
+                    ),
+                  hasPrev: stamps.pagination.page > 1,
+                  currentPage: stamps.pagination.page,
+                  pageSize: stamps.pagination.limit || 10,
+                  totalItems: stamps.pagination.total || 0,
+                  hasNextPage: stamps.pagination.page <
+                    Math.ceil(
+                      stamps.pagination.total / stamps.pagination.limit,
+                    ),
+                  hasPreviousPage: stamps.pagination.page > 1,
+                  startIndex: (stamps.pagination.page - 1) *
+                    (stamps.pagination.limit || 10),
+                  endIndex: Math.min(
+                    stamps.pagination.page * (stamps.pagination.limit || 10),
+                    stamps.pagination.total,
+                  ),
                 }}
                 address={address}
                 initialSort={sortStamps}
@@ -525,10 +544,12 @@ const WalletDashboardContent = ({
                   page: src20.pagination.page,
                   limit: src20.pagination.limit || 10,
                   total: src20.pagination.total || 0,
-                  totalPages: src20.pagination.totalPages,
                 }}
                 address={address}
-                initialSort={sortTokens}
+                initialSort={{
+                  key: "stamp",
+                  direction: sortTokens === "ASC" ? "asc" : "desc",
+                }}
                 enablePartialNavigation
                 showLoadingSkeleton
               />
@@ -538,7 +559,7 @@ const WalletDashboardContent = ({
       </div>
 
       {/* Dispensers Section */}
-      {dispensers.data.length > 0 && (
+      {(dispensers.data?.length ?? 0) > 0 && (
         <div class="mt-48">
           <ItemHeader
             title="LISTINGS"

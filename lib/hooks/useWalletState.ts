@@ -1,6 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { isConnectedSignal, walletSignal } from "$client/wallet/wallet.ts";
-import type { WalletDataTypes } from "$globals";
+import type { WalletDataTypes } from "$types/wallet.d.ts";
 
 /**
  * Hook to get wallet state without polling - BEST PRACTICE VERSION

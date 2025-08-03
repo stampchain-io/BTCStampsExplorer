@@ -32,7 +32,7 @@ export const stackConnectWalletModal = (onConnected?: () => void) => {
   const modalContent = (
     <ConnectWalletModal
       connectors={providerComponents}
-      handleClose={closeForegroundModal}
+      onClose={closeForegroundModal}
     />
   );
 

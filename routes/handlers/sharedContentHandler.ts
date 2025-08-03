@@ -1,20 +1,15 @@
 import { FreshContext } from "$fresh/server.ts";
 import { normalizeHeaders } from "$lib/utils/api/headers/headerUtils.ts";
-import {
-  getIdentifierType,
-  isCpid,
-  isTxHash,
-} from "$lib/utils/data/identifiers/identifierUtils.ts";
+import { getIdentifierType } from "$lib/utils/data/identifiers/identifierUtils.ts";
+import { isCpid, isTxHash } from "$lib/utils/typeGuards.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { getRecursiveHeaders } from "$lib/utils/security/securityHeaders.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import type { State } from "$types/ui.d.ts";
 
 // Define the state type
-export interface State {
-  baseUrl: string;
-}
 
 export async function handleContentRequest(
   identifier: string,

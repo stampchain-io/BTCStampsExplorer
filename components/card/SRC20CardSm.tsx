@@ -1,6 +1,6 @@
-// import { SRC20Row } from "$globals";
+import type { SRC20Row } from "$types/src20.d.ts";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import type { EnrichedSRC20Row } from "$globals";
+import type { SRC20CardSmProps } from "$types/ui.d.ts";
 import {
   containerCardTable,
   rowCardBorderCenter,
@@ -10,12 +10,6 @@ import {
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
-
-interface SRC20CardSmProps {
-  data: EnrichedSRC20Row[];
-  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  onImageClick: (imgSrc: string) => void;
-}
 
 export function SRC20CardSm({
   data,
@@ -44,6 +38,7 @@ export function SRC20CardSm({
       /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]/gu;
     const match = text.match(emojiRegex);
     if (!match) return { text, emoji: "" };
+    if (!match || !match[0]) return { text, emoji: "" };
     const emojiIndex = text.indexOf(match[0]);
     return {
       text: text.slice(0, emojiIndex),
@@ -107,7 +102,7 @@ export function SRC20CardSm({
           {headers.map((header, i) => (
             <th
               key={header}
-              class={`${labelXs} ${cellAlign(i, headers.length)}
+              class={`${labelXs} ${cellAlign(i, headers?.length ?? 0)}
               ${
                 header === "MARKETCAP"
                   ? "hidden mobileMd:table-cell tablet:hidden desktop:table-cell"
@@ -125,9 +120,9 @@ export function SRC20CardSm({
         </tr>
       </thead>
       <tbody>
-        {data.length
+        {data?.length
           ? (
-            data.map((src20, index) => {
+            data.map((src20: SRC20Row, index: number) => {
               // SRC-20 Image URL Logic:
               // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
               // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
@@ -141,7 +136,9 @@ export function SRC20CardSm({
               // --- BEGIN DEBUG LOGS ---
               if (index < 3) { // Log only for the first 3 items to avoid spam
                 console.log(
-                  `[SRC20CardSm] Debugging item ${index}, Tick: ${src20.tick}`,
+                  `[SRC20CardSm] Debugging item ${index}, Tick: ${
+                    src20.tick ?? ""
+                  }`,
                 );
                 console.log(
                   `  Raw src20.market_data:`,
@@ -188,7 +185,9 @@ export function SRC20CardSm({
                         return; // Cannot navigate during SSR
                       }
                       const href = `/src20/${
-                        encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
+                        encodeURIComponent(
+                          unicodeEscapeToEmoji(src20.tick ?? ""),
+                        )
                       }`;
                       globalThis.location.href = href;
                     }
@@ -197,7 +196,7 @@ export function SRC20CardSm({
                   {/* TOKEN */}
                   <td
                     class={`${
-                      cellAlign(0, headers.length)
+                      cellAlign(0, headers?.length ?? 0)
                     } ${rowCardBorderLeft}`}
                   >
                     <div class="flex items-center gap-4">
@@ -209,13 +208,13 @@ export function SRC20CardSm({
                           e.stopPropagation(); // Prevent row click
                           onImageClick?.(imageUrl);
                         }}
-                        alt={unicodeEscapeToEmoji(src20.tick)}
+                        alt={unicodeEscapeToEmoji(src20.tick ?? "")}
                       />
                       <div class="flex flex-col">
                         <div class="font-bold text-base uppercase tracking-wide">
                           {(() => {
                             const { text, emoji } = splitTextAndEmojis(
-                              unicodeEscapeToEmoji(src20.tick),
+                              unicodeEscapeToEmoji(src20.tick ?? ""),
                             );
                             return (
                               <>
@@ -238,7 +237,7 @@ export function SRC20CardSm({
                   {fromPage === "wallet" && (
                     <td
                       class={`${
-                        cellAlign(1, headers.length)
+                        cellAlign(1, headers?.length ?? 0)
                       } ${rowCardBorderCenter}`}
                     >
                       {(() => {
@@ -252,17 +251,15 @@ export function SRC20CardSm({
                   {/* PRICE */}
                   <td
                     class={`${
-                      cellAlign(fromPage === "wallet" ? 2 : 1, headers.length)
+                      cellAlign(
+                        fromPage === "wallet" ? 2 : 1,
+                        headers?.length ?? 0,
+                      )
                     } ${rowCardBorderCenter}`}
                   >
                     {(() => {
                       // ✅ FIXED: Use price_btc for fungible tokens with proper type conversion
-                      const priceInBtcRaw = src20.market_data?.price_btc;
-                      if (
-                        priceInBtcRaw === undefined || priceInBtcRaw === null
-                      ) {
-                        return "0 SATS";
-                      }
+                      const priceInBtcRaw = src20.market_data?.price_btc ?? 0;
 
                       // Convert to number and validate
                       const priceInBtc = Number(priceInBtcRaw);
@@ -303,15 +300,8 @@ export function SRC20CardSm({
                   >
                     {/* ✅ FIXED: Use change_24h_percent (correct field name) */}
                     {(() => {
-                      const changePercent = src20.market_data
-                        ?.change_24h_percent;
-                      if (
-                        changePercent === undefined || changePercent === null
-                      ) {
-                        return (
-                          <span class="text-stamp-grey-light">+0.00%</span>
-                        );
-                      }
+                      const changePercent =
+                        src20.market_data?.change_24h_percent ?? 0;
 
                       // Convert to number and validate
                       const changeValue = Number(changePercent);
@@ -343,10 +333,7 @@ export function SRC20CardSm({
                   >
                     {(() => {
                       // ✅ FIXED: Use v2.3 standardized field name with proper type conversion
-                      const volumeRaw = src20.market_data?.volume_24h_btc;
-                      if (volumeRaw === undefined || volumeRaw === null) {
-                        return "N/A";
-                      }
+                      const volumeRaw = src20.market_data?.volume_24h_btc ?? 0;
 
                       // Convert to number and validate
                       const volume = Number(volumeRaw);
@@ -382,7 +369,10 @@ export function SRC20CardSm({
                   <td
                     class={`
                       ${
-                      cellAlign(fromPage === "wallet" ? 5 : 4, headers.length)
+                      cellAlign(
+                        fromPage === "wallet" ? 5 : 4,
+                        headers?.length ?? 0,
+                      )
                     }
                       ${rowCardBorderRight}
                       hidden mobileMd:table-cell tablet:hidden desktop:table-cell
@@ -390,10 +380,8 @@ export function SRC20CardSm({
                   >
                     {(() => {
                       // ✅ FIXED: Use v2.3 standardized field name with proper type conversion
-                      const marketCapRaw = src20.market_data?.market_cap_btc;
-                      if (marketCapRaw === undefined || marketCapRaw === null) {
-                        return "N/A";
-                      }
+                      const marketCapRaw = src20.market_data?.market_cap_btc ??
+                        0;
 
                       // Convert to number and validate
                       const marketCap = Number(marketCapRaw);
@@ -425,7 +413,10 @@ export function SRC20CardSm({
           )
           : (
             <tr>
-              <td colSpan={headers.length} class={`${valueDarkSm} w-full`}>
+              <td
+                colSpan={headers?.length ?? 0}
+                class={`${valueDarkSm} w-full`}
+              >
                 NO TOKENS TO DISPLAY
               </td>
             </tr>

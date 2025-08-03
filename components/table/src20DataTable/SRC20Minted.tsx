@@ -1,7 +1,8 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
+import type { SRC20MintedTableProps } from "$types/ui.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
-import { rowTable, Timeframe } from "$layout";
+import { rowTable } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
@@ -18,13 +19,6 @@ function getMarketCapBTC(src20: any): number {
 
 function getVolume24h(src20: any): number {
   return src20?.market_data?.volume_24h_btc || 0;
-}
-
-interface SRC20MintedTableProps {
-  data: SRC20Row[];
-  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  timeframe: Timeframe;
-  onImageClick: (imgSrc: string) => void;
 }
 
 export function SRC20MintedTable({
@@ -86,9 +80,9 @@ export function SRC20MintedTable({
           </tr>
         </thead>
         <tbody>
-          {data.length
+          {data?.length
             ? (
-              data.map((src20) => {
+              data.map((src20: SRC20Row) => {
                 const imageUrl = src20.deploy_img ||
                   src20.stamp_url ||
                   (src20.deploy_tx
@@ -169,6 +163,7 @@ export function SRC20MintedTable({
                     {/* CHART */}
                     <td class={cellAlign(7, headers.length)}>
                       <ChartWidget
+                        type="line"
                         fromPage="home"
                         data={src20.chart as [number, number][] || []}
                         tick={src20.tick}

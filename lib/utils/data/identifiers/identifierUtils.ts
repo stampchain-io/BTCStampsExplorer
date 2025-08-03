@@ -1,54 +1,52 @@
+import { isCpid as isCpidTypeGuard, isStampHash as isStampHashTypeGuard, isStampNumber as isStampNumberTypeGuard, isTxHash as isTxHashTypeGuard } from "$lib/utils/typeGuards.ts";
+
 /**
  * Validates if a value is a valid stamp number (positive or negative integer)
  * Stamp numbers can be negative (cursed stamps) or positive
+ * @deprecated Use isStampNumber from lib/utils/typeGuards.ts instead
  */
 export function isStampNumber(value: unknown): boolean {
-  if (typeof value === "number") return Number.isInteger(value);
-  if (typeof value !== "string") return false;
-  const num = Number(value);
-  return !isNaN(num) && Number.isInteger(num);
+  console.warn(
+    "DEPRECATION WARNING: isStampNumber from identifierUtils is deprecated. " +
+      "Please import from lib/utils/typeGuards.ts instead.",
+  );
+  return isStampNumberTypeGuard(value);
 }
 
 /**
  * Validates if a string is a Bitcoin transaction hash
+ * @deprecated Use isTxHash from lib/utils/typeGuards.ts instead
  */
 export function isTxHash(value: unknown): boolean {
-  return typeof value === "string" &&
-    value.length === 64 &&
-    /^[a-fA-F0-9]+$/.test(value);
+  console.warn(
+    "DEPRECATION WARNING: isTxHash from identifierUtils is deprecated. " +
+      "Please import from lib/utils/typeGuards.ts instead.",
+  );
+  return typeof value === "string" && isTxHashTypeGuard(value);
 }
 
 /**
  * Validates if a string is a stamp hash
+ * @deprecated Use isStampHash from lib/utils/typeGuards.ts instead
  */
 export function isStampHash(value: unknown): boolean {
-  return typeof value === "string" &&
-    /^[a-zA-Z0-9]{12,20}$/.test(value) &&
-    /[a-z]/.test(value) &&
-    /[A-Z]/.test(value);
+  console.warn(
+    "DEPRECATION WARNING: isStampHash from identifierUtils is deprecated. " +
+      "Please import from lib/utils/typeGuards.ts instead.",
+  );
+  return isStampHashTypeGuard(value);
 }
 
 /**
  * Validates if a string is a valid CPID (either numeric or alphabetic format)
+ * @deprecated Use isCpid from lib/utils/typeGuards.ts instead
  */
 export function isCpid(value: unknown): boolean {
-  if (typeof value !== "string") return false;
-
-  // Handle A-prefixed numeric CPIDs
-  if (value.startsWith("A")) {
-    try {
-      const numericPart = BigInt(value.slice(1));
-      const min = BigInt(26n ** 12n + 1n);
-      const max = BigInt(2n ** 64n - 1n);
-      const isValid = numericPart >= min && numericPart <= max;
-      return isValid;
-    } catch {
-      return false;
-    }
-  }
-
-  // Handle alphabetic CPIDs
-  return /^[B-Z][A-Z]{0,12}$/.test(value);
+  console.warn(
+    "DEPRECATION WARNING: isCpid from identifierUtils is deprecated. " +
+      "Please import from lib/utils/typeGuards.ts instead.",
+  );
+  return isCpidTypeGuard(value);
 }
 
 /**
@@ -57,10 +55,10 @@ export function isCpid(value: unknown): boolean {
 export function getIdentifierType(
   value: unknown,
 ): "stamp_number" | "tx_hash" | "stamp_hash" | "cpid" | "invalid" {
-  if (isStampNumber(value)) return "stamp_number";
-  if (isTxHash(value)) return "tx_hash";
-  if (isStampHash(value)) return "stamp_hash";
-  if (isCpid(value)) return "cpid";
+  if (isStampNumberTypeGuard(value)) return "stamp_number";
+  if (typeof value === "string" && isTxHashTypeGuard(value)) return "tx_hash";
+  if (isStampHashTypeGuard(value)) return "stamp_hash";
+  if (isCpidTypeGuard(value)) return "cpid";
   return "invalid";
 }
 
@@ -68,7 +66,15 @@ export function getIdentifierType(
  * Validates if a string is a valid SRC20 tick format
  * SRC20 ticks can be 1-5 characters, alphanumeric, symbols, and Unicode/emoji characters
  */
+/**
+ * @deprecated Use isValidSrc20Tick from lib/utils/typeGuards.ts instead
+ */
 export function isValidSrc20Tick(value: unknown): boolean {
+  console.warn(
+    "DEPRECATION WARNING: isValidSrc20Tick from identifierUtils is deprecated. " +
+      "Please import from lib/utils/typeGuards.ts instead.",
+  );
+
   if (typeof value !== "string") return false;
 
   // Check length in terms of Unicode code points (not UTF-16 code units)

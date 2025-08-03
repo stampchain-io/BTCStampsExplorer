@@ -1,0 +1,367 @@
+name: Production Deployment Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      validation_level:
+        description: 'Validation level'
+        required: true
+        default: 'standard'
+        type: choice
+        options:
+        - standard
+        - comprehensive
+        - emergency
+
+env:
+  DENO_VERSION: '2.4.x'
+  NODE_VERSION: '18'
+
+jobs:
+  # Task 36 - Production Readiness Gates
+  production-gates:
+    name: Production Readiness Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: ${{ env.DENO_VERSION }}
+        
+    - name: Cache Deno dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/deno
+        key: deno-${{ hashFiles('deno.json', 'deno.lock') }}
+        restore-keys: deno-
+        
+    - name: Run TypeScript validation
+      run: deno task check:types
+      
+    - name: Run test coverage validation
+      run: deno task test:unit:coverage
+      
+    - name: Run security audit
+      run: deno task check:imports
+      
+    - name: Run bundle size analysis
+      run: |
+        deno task build
+        ls -la _fresh/
+        
+    - name: Execute production readiness gates
+      run: deno task deploy:validate
+      env:
+        DEPLOYMENT_ENV: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+        
+    - name: Upload validation report
+      uses: actions/upload-artifact@v4
+      with:
+        name: production-readiness-report
+        path: reports/production-readiness-*.json
+        retention-days: 30
+
+  # Task 36 - Performance Benchmarking
+  performance-benchmarking:
+    name: Performance Benchmarking
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: production-gates
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: ${{ env.DENO_VERSION }}
+        
+    - name: Cache Deno dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/deno
+        key: deno-${{ hashFiles('deno.json', 'deno.lock') }}
+        restore-keys: deno-
+        
+    - name: Run performance benchmarks
+      run: deno task deploy:benchmark
+      env:
+        DEPLOYMENT_VERSION: ${{ github.sha }}
+        
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-benchmarks
+        path: reports/performance-baselines.json
+        retention-days: 90
+        
+    - name: Comment PR with performance results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = 'reports/performance-baselines.json';
+          
+          if (fs.existsSync(path)) {
+            const results = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const latestBaseline = results[results.length - 1];
+            
+            const comment = `## 📈 Performance Benchmark Results
+            
+            **Suite Results:**
+            ${latestBaseline.suites.map(suite => 
+              `- **${suite.name}**: ${suite.benchmarks.length} tests, ${suite.totalDuration.toFixed(1)}ms total`
+            ).join('\n')}
+            
+            **Environment:**
+            - Deno Version: ${latestBaseline.metadata.denoVersion}
+            - Platform: ${latestBaseline.metadata.platform}
+            - Architecture: ${latestBaseline.metadata.architecture}
+            
+            View detailed results in the [benchmark artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          }
+
+  # Task 37 - Cross-Module Integration Testing
+  cross-module-integration:
+    name: Cross-Module Integration Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: production-gates
+    
+    strategy:
+      matrix:
+        typescript-version: ['5.0', '5.1', '5.2', '5.3']
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: ${{ env.DENO_VERSION }}
+        
+    - name: Cache Deno dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/deno
+        key: deno-${{ matrix.typescript-version }}-${{ hashFiles('deno.json', 'deno.lock') }}
+        restore-keys: deno-${{ matrix.typescript-version }}-
+        
+    - name: Run dependency graph analysis
+      run: deno task validate:dependencies
+      
+    - name: Run cross-module type compatibility tests
+      run: deno task test:cross-module
+      
+    - name: Generate dependency visualization
+      run: deno task validate:dependencies:mermaid
+      
+    - name: Upload integration test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: cross-module-integration-ts${{ matrix.typescript-version }}
+        path: |
+          reports/cross-module-integration-*.json
+          reports/dependency-analysis.json
+          reports/dependency-graph.mmd
+        retention-days: 30
+
+  # Dependency Health Check
+  dependency-health:
+    name: Dependency Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: ${{ env.DENO_VERSION }}
+        
+    - name: Check for circular dependencies
+      run: deno task validate:dependencies
+      
+    - name: Validate client-server separation
+      run: deno task validate:client-server
+      
+    - name: Generate dependency report
+      run: deno task validate:dependencies:json
+      
+    - name: Check dependency health score
+      run: |
+        if [ -f "reports/dependency-analysis.json" ]; then
+          HEALTH_SCORE=$(cat reports/dependency-analysis.json | jq '.summary.averageHealthScore')
+          echo "Average dependency health score: $HEALTH_SCORE"
+          
+          if (( $(echo "$HEALTH_SCORE < 70" | bc -l) )); then
+            echo "❌ Dependency health score too low: $HEALTH_SCORE"
+            exit 1
+          fi
+          
+          CRITICAL_ISSUES=$(cat reports/dependency-analysis.json | jq '.summary.criticalIssues | length')
+          if [ "$CRITICAL_ISSUES" -gt 0 ]; then
+            echo "❌ Found $CRITICAL_ISSUES critical dependency issues"
+            exit 1
+          fi
+        fi
+
+  # Rollback Testing
+  rollback-testing:
+    name: Rollback Procedure Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: ${{ env.DENO_VERSION }}
+        
+    - name: Test rollback procedures in staging
+      run: deno task deploy:rollback:test
+      
+    - name: Validate rollback health checks
+      run: deno task deploy:rollback:check
+      env:
+        BASE_URL: http://localhost:8000
+        
+    - name: Upload rollback test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: rollback-test-results
+        path: reports/rollback-*.json
+        retention-days: 30
+
+  # Security and Compliance
+  security-validation:
+    name: Security Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: ${{ env.DENO_VERSION }}
+        
+    - name: Run security checks
+      run: |
+        deno task check:imports:ci
+        deno task check:ssr
+        
+    - name: Check for hardcoded secrets
+      run: |
+        # Check for potential secrets in code
+        if grep -r "password\|secret\|key" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules --exclude-dir=_fresh . | grep -v "PASSWORD\|SECRET\|KEY" | grep -v "\.d\.ts" | grep -v test; then
+          echo "❌ Potential hardcoded secrets found"
+          exit 1
+        fi
+        
+    - name: Validate environment security
+      run: |
+        # Check for .env files in repository
+        if find . -name ".env*" -not -path "./.env.example" -not -path "./.env.template" | grep -q .; then
+          echo "❌ Environment files found in repository"
+          exit 1
+        fi
+
+  # Comprehensive Validation (for main branch)
+  comprehensive-validation:
+    name: Comprehensive Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [production-gates, performance-benchmarking, cross-module-integration, dependency-health, rollback-testing, security-validation]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: ${{ env.DENO_VERSION }}
+        
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts/
+        
+    - name: Run comprehensive validation suite
+      run: |
+        echo "🚀 Running comprehensive production validation..."
+        
+        # Combine all validation results
+        mkdir -p reports/comprehensive/
+        cp artifacts/**/*.json reports/comprehensive/ 2>/dev/null || true
+        
+        # Generate comprehensive report
+        deno run --allow-all scripts/deployment/generate-comprehensive-report.ts
+        
+    - name: Upload comprehensive report
+      uses: actions/upload-artifact@v4
+      with:
+        name: comprehensive-validation-report
+        path: reports/comprehensive/
+        retention-days: 90
+        
+    - name: Create deployment summary
+      run: |
+        echo "## 🎯 Production Validation Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ All validation gates passed successfully" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Performance benchmarks within acceptable limits" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Cross-module integration validated" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Dependency health score acceptable" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Rollback procedures tested and verified" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Security validation completed" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🚀 **Ready for production deployment**" >> $GITHUB_STEP_SUMMARY
+
+  # Notification on failure
+  notify-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    if: failure()
+    needs: [production-gates, performance-benchmarking, cross-module-integration, dependency-health, rollback-testing, security-validation]
+    
+    steps:
+    - name: Create failure summary
+      run: |
+        echo "## ❌ Production Validation Failed" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "One or more validation steps failed. Please check the job logs for details." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Failed Jobs:**" >> $GITHUB_STEP_SUMMARY
+        echo "- Check individual job status above" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🚫 **Deployment blocked until issues are resolved**" >> $GITHUB_STEP_SUMMARY

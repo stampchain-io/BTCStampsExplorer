@@ -4,7 +4,7 @@
  * bulk operations, error handling, performance optimization, and edge cases.
  */
 
-import type { SRC20Row } from "$globals";
+import type { SRC20Row } from "$types/src20.d.ts";
 import type { SRC20MarketData } from "$lib/types/marketData.d.ts";
 import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import {
@@ -12,7 +12,7 @@ import {
   MarketDataEnrichmentService,
 } from "$server/services/src20/marketDataEnrichmentService.ts";
 import { assert, assertEquals, assertExists } from "@std/assert";
-import { afterAll, beforeAll, describe, it } from "@std/testing/bdd";
+import { afterAll, beforeAll, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
 
 // Test fixtures

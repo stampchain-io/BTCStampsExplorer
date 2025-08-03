@@ -8,7 +8,7 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { MaraSlipstreamService } from "$/server/services/mara/maraSlipstreamService.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
 interface MaraSubmitRequest {

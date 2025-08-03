@@ -1,20 +1,16 @@
 /* ===== STAMP OVERVIEW HEADER COMPONENT ===== */
 /* TODO (@baba) - update filter and styling */
-import { useState } from "preact/hooks";
 import { FilterButton } from "$islands/button/FilterButton.tsx";
-import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
 import { SortButton } from "$islands/button/SortButton.tsx";
-import { titlePurpleLD } from "$text";
+import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
 import {
   defaultFilters,
-  StampFilters,
+  StampFilters as FilterStampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
-import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
-
-/* ===== TYPES ===== */
-type StampOverviewHeaderProps = {
-  currentFilters?: StampFilters;
-};
+import { SearchStampModal } from "$islands/modal/SearchStampModal.tsx";
+import { titlePurpleLD } from "$text";
+import type { StampOverviewHeaderProps } from "$types/ui.d.ts";
+import { useState } from "preact/hooks";
 
 /* ===== COMPONENT ===== */
 export const StampOverviewHeader = (
@@ -29,7 +25,7 @@ export const StampOverviewHeader = (
   };
 
   /* ===== HELPER FUNCTION ===== */
-  function countActiveStampFilters(filters: StampFilters): number {
+  function countActiveStampFilters(filters: FilterStampFilters): number {
     let count = 0;
 
     // Marketplace filter group - count as 1 if any marketplace filters are active
@@ -72,7 +68,9 @@ export const StampOverviewHeader = (
       <div class="flex flex-col">
         <div class="flex relative items-start justify-between gap-[18px] tablet:gap-3">
           <FilterButton
-            count={countActiveStampFilters(currentFilters)}
+            count={countActiveStampFilters(
+              currentFilters as FilterStampFilters,
+            )}
             open={isOpen1}
             setOpen={handleOpen1}
             type="stamp"

@@ -1,10 +1,13 @@
 /* ===== COLLECTION GALLERY COMPONENT ===== */
-import { useEffect, useState } from "preact/hooks";
-import { Collection, CollectionGalleryProps } from "$globals";
-import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { BREAKPOINTS } from "$constants";
+import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { CollectionsBanner } from "$section";
+import type {
+  Collection,
+  CollectionGalleryProps,
+} from "$server/types/collection.d.ts";
 import { subtitleGrey, titleGreyLD } from "$text";
+import { useEffect, useState } from "preact/hooks";
 
 /* ===== STATE ===== */
 export default function CollectionGallery({

@@ -1,8 +1,8 @@
 import {
   assertEquals,
   assertExists,
-} from "https://deno.land/std@0.208.0/assert/mod.ts";
-import { stub } from "https://deno.land/std@0.208.0/testing/mock.ts";
+} from "@std/assert/mod.ts";
+import { stub } from "@std/testing/mock.ts";
 import { handler } from "$routes/api/v2/olga/mint.ts";
 import { mintAddressUTXOs } from "../fixtures/utxoFixtures.mint.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";

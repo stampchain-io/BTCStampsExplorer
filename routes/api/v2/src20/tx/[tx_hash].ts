@@ -1,5 +1,5 @@
+import type { SRC20TrxRequestParams } from "$types/api.d.ts";
 import { Handlers } from "$fresh/server.ts";
-import { AddressHandlerContext, SRC20TrxRequestParams } from "$globals";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
 import {
@@ -8,7 +8,7 @@ import {
 } from "$server/services/validation/routeValidationService.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 
-export const handler: Handlers<AddressHandlerContext> = {
+export const handler: Handlers = {
   async GET(req, ctx) {
     const { tx_hash } = ctx.params;
     const url = new URL(req.url);

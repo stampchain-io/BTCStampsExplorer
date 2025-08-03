@@ -8,8 +8,8 @@
  */
 
 import { assertEquals } from "@std/assert";
-import { afterEach, describe, it } from "@std/testing/bdd";
-import { restore, stub } from "@std/testing/mock";
+import { afterEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { restore, stub } from "@std/testing@1.0.14/mock";
 
 // Import the modules we need to test
 import { CollectionService } from "$server/services/core/collectionService.ts";

@@ -1,5 +1,6 @@
 /* ===== SRC20 TOKEN MINTING COMPONENT ===== */
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
+import type { MintProgressProps } from "$types/ui.d.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { SRC20InputField } from "$form";
 import { Icon } from "$icon";
@@ -22,21 +23,8 @@ import axiod from "axiod";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== MAIN COMPONENT INTERFACE ===== */
-interface SRC20MintToolProps {
-  trxType?: "olga" | "multisig";
-  tick?: string | undefined | null;
-  mintStatus?: any | null | undefined; // Using any to accept both SRC20Balance and SRC20MintStatus
-  holders?: number;
-}
 
 /* ===== MINT PROGRESS SUBCOMPONENT ===== */
-interface MintProgressProps {
-  progress: string;
-  progressWidth: string;
-  maxSupply: string;
-  limit: string;
-  minters: string;
-}
 
 const MintProgress = (
   { progress, progressWidth, maxSupply, limit, minters }: MintProgressProps,
@@ -48,7 +36,7 @@ const MintProgress = (
         <h5 class={labelXl}>
           PROGRESS
           <span class={`${valueXl} pl-3`}>
-            {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0]}
+            {progress?.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0] ?? "0"}
             <span class="font-light">
               %
             </span>
@@ -87,6 +75,13 @@ interface SearchResult {
   max_supply: number;
 }
 
+interface SRC20MintToolProps {
+  trxType?: string;
+  tick?: string;
+  mintStatus?: any;
+  holders?: any;
+}
+
 /* ===== MINT CONTENT COMPONENT IMPLEMENTATION ===== */
 export function SRC20MintTool({
   trxType = "olga",
@@ -105,7 +100,11 @@ export function SRC20MintTool({
     apiError,
     setFormState,
     handleInputBlur,
-  } = useSRC20Form("mint", trxType, tick ?? undefined);
+  } = useSRC20Form(
+    "mint",
+    trxType as "olga" | "multisig" | undefined,
+    tick ?? undefined,
+  );
 
   /* ===== LOCAL STATE ===== */
   const [mintStatus, setMintStatus] = useState<any>(initialMintStatus || null);
@@ -272,11 +271,9 @@ export function SRC20MintTool({
 
   /* ===== MINT PROGRESS CALCULATIONS ===== */
   const progress = mintStatus ? mintStatus.progress : "0";
-  const progressWidth = `${progress}%`;
-  const maxSupply = mintStatus
-    ? Number(mintStatus.max_supply).toLocaleString()
-    : "0";
-  const limit = mintStatus ? Number(mintStatus.limit).toLocaleString() : "0";
+  const progressWidth = Number(progress);
+  const maxSupply = mintStatus ? Number(mintStatus.max_supply) : 0;
+  const limit = mintStatus ? Number(mintStatus.limit) : 0;
   const minters = holders ? holders.toString() : "0";
 
   /* ===== PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
@@ -501,6 +498,8 @@ export function SRC20MintTool({
           maxSupply={maxSupply}
           limit={limit}
           minters={minters}
+          current={Math.floor((progressWidth * maxSupply) / 100)}
+          total={maxSupply}
         />
       </form>
 

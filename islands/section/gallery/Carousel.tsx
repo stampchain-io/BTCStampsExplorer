@@ -1,32 +1,27 @@
 /* ===== CAROUSEL GALLERY COMPONENT ===== */
 /* TODO (@baba)-update styling */
-import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { IS_BROWSER } from "$fresh/runtime.ts";
-import { StampRow } from "$globals";
-import { ComponentChildren } from "preact";
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
+import { ERROR_IMAGE } from "$constants";
+import { IS_BROWSER } from "$fresh/runtime.ts";
 import { abbreviateAddress } from "$lib/utils/ui/formatting/formatUtils.ts";
 import {
   getStampImageSrc,
   validateStampContent,
 } from "$lib/utils/ui/media/imageUtils.ts";
-import { ERROR_IMAGE } from "$constants";
+import type { CarouselHomeProps } from "$types/ui.d.ts";
+import { ComponentChildren } from "preact";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface CarouselProps {
-  stamps: StampRow[];
-  automatic?: boolean;
-  showNavigation?: boolean;
-  class?: string;
-}
 
 // Cache for validation results to prevent re-validation
 const validationCache = new Map<string, boolean>();
 
 /* ===== COMPONENT ===== */
-export default function CarouselGallery(props: CarouselProps) {
+export default function CarouselGallery(props: CarouselHomeProps) {
   /* ===== PROPS EXTRACTION ===== */
-  const { stamps } = props;
+  const { carouselStamps } = props;
+  const stamps = carouselStamps || [];
 
   /* ===== REFS ===== */
   const carouselInitialized = useRef(false);
@@ -257,7 +252,7 @@ export default function CarouselGallery(props: CarouselProps) {
         {/* ===== PAGINATION ===== */}
         <div
           class="swiper-pagination"
-          data-slides-length={props.stamps.length}
+          data-slides-length={stamps?.length || 0}
         >
         </div>
       </div>

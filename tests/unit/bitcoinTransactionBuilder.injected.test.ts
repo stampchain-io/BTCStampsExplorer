@@ -4,7 +4,7 @@
  */
 
 import { assertEquals, assertExists, assertRejects } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import { Buffer } from "node:buffer";
 // Import our mock instead of real bitcoinjs-lib for complete isolation
 import * as bitcoin from "../mocks/bitcoinjs-lib.mock.ts";

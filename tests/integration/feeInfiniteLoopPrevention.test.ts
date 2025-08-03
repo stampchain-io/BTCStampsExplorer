@@ -1,3 +1,4 @@
+import type { FeeState } from "$types/ui.d.ts";
 import { assertEquals } from "@std/assert";
 import { signal } from "@preact/signals";
 
@@ -11,13 +12,6 @@ import { signal } from "@preact/signals";
  */
 
 // Simulate the fee signal behavior
-interface FeeState {
-  data: {
-    recommendedFee: number;
-    btcPrice: number;
-  } | null;
-  loading: boolean;
-}
 
 const testFeeSignal = signal<FeeState>({
   data: null,

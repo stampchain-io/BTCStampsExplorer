@@ -9,14 +9,15 @@
 
 import { TX_CONSTANTS } from "$constants";
 import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
 import { extractOutputs } from "$lib/utils/bitcoin/minting/transactionUtils.ts";
 import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
-import type { ScriptType, UTXO } from "$types/index.d.ts";
+import type { ScriptType, UTXO } from "$types/base.d.ts";
+import { toBasicUTXOs, safeUTXOValue } from "$lib/utils/bitcoin/utxo/utxoTypeUtils.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
 
@@ -182,9 +183,36 @@ export class GeneralBitcoinTransactionBuilder {
         ...(vout.address && { address: vout.address })
       }));
 
+      // Convert UTXOs to BasicUTXOs for the selection algorithm
+      const importedBasicUTXOs = toBasicUTXOs(fullUTXOs);
+
+      if (importedBasicUTXOs.length === 0) {
+        throw new Error(`No valid UTXOs available for ${operationType} operation`);
+      }
+
+      // Convert to the local BasicUTXO interface expected by OptimalUTXOSelection
+      const basicUTXOs = importedBasicUTXOs.map(utxo => {
+        const localBasicUTXO: any = {
+          txid: utxo.txid,
+          vout: utxo.vout,
+          value: utxo.value,
+          script: undefined,
+          scriptType: undefined,
+          scriptDesc: undefined,
+          confirmations: undefined
+        };
+        
+        // Only include address if it exists and is not undefined
+        if (utxo.address !== undefined) {
+          localBasicUTXO.address = utxo.address;
+        }
+        
+        return localBasicUTXO;
+      });
+
       // Select optimal UTXOs
       const selectionResult = OptimalUTXOSelection.selectUTXOs(
-        fullUTXOs,
+        basicUTXOs,
         outputsForSelection,
         satsPerVB,
         {
@@ -195,7 +223,7 @@ export class GeneralBitcoinTransactionBuilder {
       );
 
       const { inputs } = selectionResult;
-      const totalInputValue = inputs.reduce((sum: number, input: UTXO) => sum + input.value, 0);
+      const totalInputValue = inputs.reduce((sum: number, input: UTXO) => sum + safeUTXOValue(input), 0);
 
       // Recalculate with actual inputs
       const actualEstimatedSize = estimateMintingTransactionSize({
@@ -274,7 +302,7 @@ export class GeneralBitcoinTransactionBuilder {
         if (isWitnessInput) {
           psbtInputData.witnessUtxo = {
             script: new Uint8Array(hex2bin(input.script)),
-            value: BigInt(input.value),
+            value: BigInt(safeUTXOValue(input)),
           };
         } else {
           const rawTxHex = await this.commonUtxoService.getRawTransactionHex(input.txid);
@@ -375,7 +403,7 @@ export class GeneralBitcoinTransactionBuilder {
           { includeAncestorDetails: true }
         );
 
-        if (fullUtxo && fullUtxo.script && fullUtxo.value > 0) {
+        if (fullUtxo && fullUtxo.script && fullUtxo.value !== undefined && fullUtxo.value > 0) {
           fullUTXOs.push(fullUtxo);
         }
       } catch (error) {

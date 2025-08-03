@@ -1,11 +1,12 @@
 /* ===== COLLECTION LANDING PAGE ===== */
 import { FreshContext, Handlers } from "$fresh/server.ts";
-import {
-  CollectionGalleryProps,
-  STAMP_FILTER_TYPES,
+import type { CollectionGalleryProps } from "$server/types/collection.d.ts";
+import type { StampFilterType } from "$constants";
+import type {
+  CollectionLandingPageProps,
   StampGalleryProps,
-  StampRow,
-} from "$globals";
+} from "$types/ui.d.ts";
+
 import { CollectionOverviewHeader } from "$header";
 import { body, gapSection } from "$layout";
 import {
@@ -21,19 +22,6 @@ import {
 } from "$server/types/collection.d.ts";
 
 /* ===== TYPES ===== */
-type CollectionLandingPageProps = {
-  data: {
-    collections: CollectionWithOptionalMarketData[];
-    total: number;
-    _page: number;
-    _pages: number;
-    _page_size: number;
-    _filterBy: string[];
-    sortBy: "ASC" | "DESC";
-    stamps_src721: StampRow[];
-    stamps_posh: StampRow[];
-  };
-};
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
@@ -45,7 +33,7 @@ export const handler: Handlers = {
         : "DESC";
       const filterBy = url.searchParams.get("filterBy")?.split(",").filter(
         Boolean,
-      ) as STAMP_FILTER_TYPES[] || [];
+      ) as StampFilterType[] || [];
       const selectedTab = url.searchParams.get("ident") || "all";
       const page = parseInt(url.searchParams.get("page") || "1");
       const limit = parseInt(url.searchParams.get("limit") || "60");
@@ -167,12 +155,12 @@ export default function CollectionLandingPage(
         <CollectionOverviewHeader />
         <StampGallery
           sortBy={sortBy}
-          {...CollectionSection[0]}
+          {...(CollectionSection[0] ?? {})}
         />
         <StampPoshCta />
       </div>
       <div>
-        <StampGallery {...CollectionSection[1]} />
+        <StampGallery {...(CollectionSection[1] ?? {})} />
         <RecursiveContactCta />
       </div>
       <CollectionDetailGallery {...CollectionDetailSection} />

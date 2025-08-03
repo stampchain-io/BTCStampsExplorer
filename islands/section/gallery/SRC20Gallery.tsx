@@ -1,13 +1,14 @@
 /* ===== SRC20 GALLERY COMPONENT ===== */
 // @baba - add token cards specific to wallet page
 import { ViewAllButton } from "$button";
+import type { SRC20GalleryProps } from "$types/ui.d.ts";
 import {
   SRC20Card,
   SRC20CardMinting,
   SRC20CardSm,
   SRC20CardSmMinting,
 } from "$card";
-import { EnrichedSRC20Row } from "$globals";
+import type { EnrichedSRC20Row } from "$types/src20.d.ts";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { useLoadingSkeleton } from "$lib/hooks/useLoadingSkeleton.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
@@ -15,31 +16,6 @@ import { subtitlePurple, titlePurpleLD } from "$text";
 import { useEffect, useMemo, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface SRC20GalleryProps {
-  title?: string;
-  subTitle?: string;
-  viewType: "minted" | "minting";
-  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  initialData?: EnrichedSRC20Row[]; // 🎯 FIXED: Use EnrichedSRC20Row for market data support
-  pagination?: {
-    page: number;
-    totalPages: number;
-    prefix?: string;
-    limit?: number;
-    onPageChange?: (page: number) => void;
-  };
-  timeframe: "24H" | "7D" | "30D";
-  serverData?: {
-    data: EnrichedSRC20Row[]; // 🎯 FIXED: Use EnrichedSRC20Row for market data support
-    total: number;
-    page: number;
-    totalPages: number;
-  };
-  currentSort?: {
-    filter: string | null;
-    direction: "asc" | "desc";
-  };
-}
 
 /* ===== COMPONENT ===== */
 export function SRC20Gallery({
@@ -110,7 +86,7 @@ export function SRC20Gallery({
   const cardProps = useMemo(() => ({
     data: processedData,
     fromPage,
-    timeframe,
+    ...(timeframe && { timeframe }), // Only pass timeframe if it exists
     onImageClick: handleImageClick,
     ...(currentSort && { currentSort }), // Only pass currentSort if it exists
   }), [processedData, fromPage, timeframe, handleImageClick, currentSort]);

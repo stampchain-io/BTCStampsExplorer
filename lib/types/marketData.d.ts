@@ -1,8 +1,10 @@
-import type { SRC20Row, StampRow } from "$globals";
 import type { CollectionRow } from "$server/types/collection.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { MarketDataCacheInfo } from "$types/utils.d.ts";
 
 // Re-export for other modules
-export type { SRC20Row, StampRow };
+export type { MarketDataCacheInfo, SRC20Row, StampRow };
 
 export interface MarketListingSummary {
   tick: string;
@@ -28,6 +30,7 @@ export interface OpenStampMarketData {
   volume_24h_change: string; // ✅ v2.3 standardized field (was volume24Change)
   change_24h: string; // ✅ v2.3 standardized field (was change24)
   change_7d: string; // ✅ v2.3 standardized field (was change7d)
+  isOpen?: boolean; // Added optional flag for market status
 }
 
 export interface StampScanMarketData {
@@ -53,9 +56,18 @@ export interface MarketListingAggregated {
   volume_7d_btc?: number; // ✅ v2.3 extended field
   volume_30d_btc?: number; // ✅ v2.3 extended field
   change_24h_percent?: number | undefined; // ✅ v2.3 standardized field (24h price change percentage)
+  change_7d?: number | undefined; // ✅ v2.3 standardized field (7d price change percentage)
   stamp_url?: string | null;
   tx_hash: string;
   holder_count: number; // use stampscan holder_count value
+
+  // Added to match MarketDataFields
+  price_change_24h_percent?: number; // Added to match MarketDataFields
+  data_quality_score?: number; // Added to match MarketDataFields
+  last_updated?: Date; // Added to match MarketDataFields
+
+  // New market status field
+  isOpen?: boolean; // Optional flag to indicate market status
 
   // 🔄 BACKWARD COMPATIBILITY: Legacy field names (DEPRECATED - use standardized names above)
   floor_unit_price?: number | null; // @deprecated Use floor_price_btc
@@ -65,21 +77,32 @@ export interface MarketListingAggregated {
   change24?: number | undefined; // @deprecated Use change_24h_percent
 
   market_data: {
-    stampscan: {
-      price: number; // floor_price_btc
-      volume_24h_btc: number; // ✅ v2.3 standardized field (was volume24)
-    };
-    openstamp: {
-      price: number; // price
-      volume_24h_btc: number; // ✅ v2.3 standardized field (was volume24)
-    };
-  };
+    stampscan?: {
+      price: number | null; // floor_price_btc
+      volume_24h_btc: number | null; // ✅ v2.3 standardized field (was volume24)
+    } | null;
+    openstamp?: {
+      price: number | null; // price
+      volume_24h_btc: number | null; // ✅ v2.3 standardized field (was volume24)
+    } | null;
+  } | null;
 }
 
 /**
  * Activity level type for stamps
  */
 export type ActivityLevel = "HOT" | "WARM" | "COOL" | "DORMANT" | "COLD";
+
+/**
+ * Standardized market data status for fetch operations
+ */
+export type MarketDataStatusValue = "loading" | "success" | "error" | "stale";
+
+export interface MarketDataStatus {
+  status: MarketDataStatusValue;
+  message?: string;
+  timestamp?: number;
+}
 
 /**
  * Database row interface for stamp_market_data table
@@ -329,14 +352,85 @@ export type VolumeSources = Record<string, number>;
 export type ExchangeSources = string[];
 
 /**
+ * Price data interface for market data
+ * Represents pricing information for an asset
+ */
+export interface PriceData {
+  /** Price in BTC */
+  priceBTC: number | null;
+  /** Price in USD */
+  priceUSD: number | null;
+  /** Timestamp of the price */
+  timestamp: number;
+  /** Source of the price data */
+  source: string;
+  /** Confidence level of the price data (0-10) */
+  confidence?: number;
+}
+
+/**
+ * Volume data interface for market data
+ * Represents trading volume information for an asset
+ */
+export interface VolumeData {
+  /** Volume in BTC over 24 hours */
+  volume24hBTC: number;
+  /** Volume in BTC over 7 days */
+  volume7dBTC: number;
+  /** Volume in BTC over 30 days */
+  volume30dBTC: number;
+  /** Timestamp of the volume data */
+  timestamp: number;
+  /** Source of the volume data */
+  source: string;
+  /** Confidence level of the volume data (0-10) */
+  confidence?: number;
+}
+
+/**
+ * Interface for market data providers
+ * Defines standard methods for retrieving market data
+ */
+export interface MarketDataProvider {
+  /**
+   * Retrieve price data for a specific asset
+   * @param asset Asset identifier (ticker, CPID, etc.)
+   */
+  getPrice(asset: string): Promise<PriceData>;
+
+  /**
+   * Retrieve market data for a specific asset
+   * @param asset Asset identifier (ticker, CPID, etc.)
+   */
+  getMarketData(asset: string): Promise<StampMarketData | SRC20MarketData>;
+
+  /**
+   * Retrieve trading volume data
+   * @param asset Asset identifier (ticker, CPID, etc.)
+   */
+  getVolume(asset: string): Promise<VolumeData>;
+
+  /**
+   * Get the name of the market data provider
+   */
+  getName(): string;
+
+  /**
+   * Check if the provider is currently available
+   */
+  isAvailable(): Promise<boolean>;
+}
+
+/**
  * Extended stamp interface that includes market data
  * Used when joining stamps with market data cache
  */
 export interface StampWithMarketData extends StampRow {
-  marketData: StampMarketData | null;
-  marketDataMessage?: string;
-  cacheStatus?: CacheStatus;
-  cacheAgeMinutes?: number;
+  marketData?: StampMarketData | null;
+  marketDataMessage?: string | null;
+  cacheStatus?: CacheStatus | null;
+  cacheAgeMinutes?: number | null;
+  overallStatus?: MarketDataStatus | null;
 }
 
 /**
@@ -344,10 +438,11 @@ export interface StampWithMarketData extends StampRow {
  * Used when joining SRC20 tokens with market data cache
  */
 export interface SRC20WithMarketData extends SRC20Row {
-  marketData: SRC20MarketData | null;
-  marketDataMessage?: string;
-  cacheStatus?: CacheStatus;
-  cacheAgeMinutes?: number;
+  marketData?: SRC20MarketData | null;
+  marketDataMessage?: string | null;
+  cacheStatus?: CacheStatus | null;
+  cacheAgeMinutes?: number | null;
+  overallStatus?: MarketDataStatus | null;
 }
 
 /**
@@ -356,9 +451,10 @@ export interface SRC20WithMarketData extends SRC20Row {
  */
 export interface StampMarketDataResponse {
   stamp: StampRow;
-  marketData: StampMarketData | null;
-  cacheStatus: CacheStatus;
-  message?: string;
+  marketData?: StampMarketData | null;
+  cacheStatus?: CacheStatus | null;
+  message?: string | null;
+  overallStatus?: MarketDataStatus | null;
 }
 
 /**
@@ -367,9 +463,10 @@ export interface StampMarketDataResponse {
  */
 export interface SRC20MarketDataResponse {
   token: SRC20Row;
-  marketData: SRC20MarketData | null;
-  cacheStatus: CacheStatus;
-  message?: string;
+  marketData?: SRC20MarketData | null;
+  cacheStatus?: CacheStatus | null;
+  message?: string | null;
+  overallStatus?: MarketDataStatus | null;
 }
 
 /**
@@ -377,8 +474,8 @@ export interface SRC20MarketDataResponse {
  */
 export interface CollectionWithMarketData {
   collection: CollectionRow;
-  stamps: StampWithMarketData[];
-  aggregatedMarketData: CollectionMarketData | null;
+  stamps?: StampWithMarketData[] | null;
+  aggregatedMarketData?: CollectionMarketData | null;
 }
 
 /**

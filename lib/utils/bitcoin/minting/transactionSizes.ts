@@ -1,19 +1,19 @@
 import { TX_CONSTANTS } from "$constants";
 import type { ScriptType } from "$lib/types/index.d.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { getScriptTypeInfo as getScriptTypeInfoFromUtils } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 
 // Using imported types for the options if they resolve correctly
 interface InternalTransactionSizeOptions {
   inputs: Array<
     {
-      type: ScriptType;
+      type?: ScriptType;
       isWitness?: boolean;
       size?: number;
       ancestor?: { txid: string; vout: number; weight?: number };
     }
   >;
-  outputs: Array<{ type: ScriptType }>;
+  outputs: Array<{ type?: ScriptType }>;
   includeChangeOutput?: boolean;
   changeOutputType?: ScriptType;
 }
@@ -23,7 +23,7 @@ function calculateWitnessWeight(
 ) {
   if (!input.isWitness) return 0;
   // Normalize script type to uppercase for comparison
-  const normalizedType = input.type.toUpperCase();
+  const normalizedType = input.type?.toUpperCase() ?? "UNKNOWN";
   if (
     normalizedType === "P2WPKH" || normalizedType === "P2WSH" ||
     normalizedType === "P2TR"
@@ -75,7 +75,9 @@ export function estimateMintingTransactionSize({
     // If InputTypeForSizeEstimation provides isWitness directly, use it.
     // Otherwise, use getScriptTypeInfo if input only has `type: ScriptType`.
     // The InputTypeForSizeEstimation defined in transaction.d.ts has isWitness?: boolean
-    return getScriptTypeInfoFromUtils(input.type).isWitness;
+    return input.type
+      ? getScriptTypeInfoFromUtils(input.type).isWitness
+      : false;
   });
 
   if (hasWitness) {
@@ -84,27 +86,30 @@ export function estimateMintingTransactionSize({
 
   const inputWeights = inputs.map((input) => {
     let inputWeight = 0;
-    if (input.isWitness) {
+    if (
+      input.isWitness ??
+        (input.type ? getScriptTypeInfoFromUtils(input.type).isWitness : false)
+    ) {
       const outpointWeight = 36 * 4;
       const sequenceWeight = 4 * 4;
       const scriptSigWeight = 1 * 4;
       const witnessWeightVal = calculateWitnessWeight({
-        type: input.type,
+        type: input.type ?? "UNKNOWN",
         isWitness: true,
       });
       inputWeight = outpointWeight + sequenceWeight + scriptSigWeight +
         witnessWeightVal;
     } else {
-      const size = TX_CONSTANTS[
-        input.type as Exclude<
-          ScriptType,
-          "OP_RETURN" | "UNKNOWN" | "P2WPKH" | "P2WSH" | "P2TR"
-        >
-      ]?.size;
+      const nonConstSizes = ["P2PKH", "P2SH"] as const;
+      const size = input.type &&
+          nonConstSizes.includes(input.type as (typeof nonConstSizes)[number])
+        ? TX_CONSTANTS[input.type as (typeof nonConstSizes)[number]]?.size
+        : undefined;
       if (size === undefined) {
         logger.warn("system", {
-          message:
-            `No size in TX_CONSTANTS for non-witness type: ${input.type}, using P2PKH default`,
+          message: `No size in TX_CONSTANTS for non-witness type: ${
+            input.type ?? "UNDEFINED"
+          }, using P2PKH default`,
         });
         inputWeight = TX_CONSTANTS.P2PKH.size * 4;
       } else {
@@ -127,7 +132,7 @@ export function estimateMintingTransactionSize({
     // P2SH output: 23 bytes (HASH160 <20 bytes> EQUAL)
     // P2TR output: 34 bytes (OP_1 <32 bytes>)
 
-    switch (output.type.toUpperCase()) {
+    switch (output.type?.toUpperCase() ?? "UNKNOWN") {
       case "P2PKH":
         scriptWeight = 25 * 4;
         break;
@@ -149,7 +154,9 @@ export function estimateMintingTransactionSize({
         break;
       default:
         logger.warn("system", {
-          message: `Unknown output type: ${output.type}, using P2WPKH default`,
+          message: `Unknown output type: ${
+            output.type ?? "UNDEFINED"
+          }, using P2WPKH default`,
         });
         scriptWeight = 22 * 4; // Default to P2WPKH
     }

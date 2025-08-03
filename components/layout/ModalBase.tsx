@@ -2,18 +2,10 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { logger } from "$lib/utils/logger.ts";
 import { tooltipIcon } from "$notification";
+import type { ModalBaseProps } from "$types/ui.d.ts";
 import { closeModal } from "$islands/modal/states.ts";
 import { titlePurpleLD } from "$text";
 import { CloseIcon } from "$icon";
-
-interface ModalBaseProps {
-  onClose?: () => void;
-  title: string;
-  children: preact.ComponentChildren;
-  className?: string;
-  contentClassName?: string;
-  hideHeader?: boolean;
-}
 
 export function ModalBase({
   onClose,
@@ -22,6 +14,12 @@ export function ModalBase({
   className = "",
   contentClassName = "",
   hideHeader = false,
+  isOpen: _isOpen = true,
+  size: _size = "md",
+  closeOnOverlayClick: _closeOnOverlayClick = true,
+  closeOnEscape: _closeOnEscape = true,
+  showCloseButton: _showCloseButton = true,
+  preventScroll: _preventScroll = true,
 }: ModalBaseProps) {
   const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
   const [allowCloseTooltip, setAllowCloseTooltip] = useState(true);

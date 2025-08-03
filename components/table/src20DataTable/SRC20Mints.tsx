@@ -1,15 +1,12 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
+import type { SRC20MintsProps } from "$types/ui.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
 import { rowTable } from "$layout";
 import {
   abbreviateAddress,
   formatDate,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
-
-interface SRC20MintsProps {
-  mints: SRC20Row[];
-}
 
 export function SRC20MintsTable({ mints }: SRC20MintsProps) {
   const headers = ["AMOUNT", "ADDRESS", "DATE", "TX HASH", "BLOCK"];
@@ -18,12 +15,14 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
     <div class="w-[660px] min-[660px]:w-full">
       <table class={`${valueSm} w-full`}>
         <colgroup>
-          {colGroup().map((col) => <col key={col.key} class={col.className} />)}
+          {colGroup().map((col: any) => (
+            <col key={col.key} class={col.className} />
+          ))}
         </colgroup>
-        {mints.length > 0 && (
+        {(mints?.length ?? 0) > 0 && (
           <thead>
             <tr>
-              {headers.map((header, i) => (
+              {headers.map((header: string, i: number) => (
                 <th
                   key={i}
                   class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
@@ -36,8 +35,8 @@ export function SRC20MintsTable({ mints }: SRC20MintsProps) {
           </thead>
         )}
         <tbody>
-          {mints?.length
-            ? mints?.map((mint) => (
+          {(mints?.length ?? 0) > 0
+            ? mints?.map((mint: SRC20Row) => (
               <tr key={mint.tx_hash} class={rowTable}>
                 <td class={cellAlign(0, headers.length)}>
                   {mint.amt}

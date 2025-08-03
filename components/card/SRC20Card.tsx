@@ -1,5 +1,4 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
 import { Icon } from "$icon";
 import ChartWidget from "$islands/layout/ChartWidget.tsx";
 import {
@@ -8,18 +7,20 @@ import {
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
-  Timeframe,
 } from "$layout";
+// Removed safeMarketDataAccess import - using direct safe access instead
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { HighchartsData, SRC20CardProps } from "$types/ui.d.ts";
 
-function getMarketCap(src20: any): number {
-  const marketCap = src20?.market_data?.market_cap_btc;
+function getMarketCap(src20: SRC20Row): number {
+  const marketCap = src20.market_data?.market_cap_btc ?? src20.market_cap_btc;
   if (!marketCap) return 0;
   // Parse as float to handle string values from API
-  const parsed = parseFloat(marketCap);
+  const parsed = parseFloat(marketCap.toString());
   return isNaN(parsed) ? 0 : parsed;
 }
 
@@ -39,31 +40,20 @@ function getPriceSourceLabel(sourceType?: string): string {
 }
 
 // ✅ FIXED: Use price_btc for fungible SRC-20 tokens (not floor_price_btc)
-function getPrice(src20: any): number {
-  const price = src20?.market_data?.price_btc;
+function getPrice(src20: SRC20Row): number {
+  const price = src20.market_data?.price_btc ?? src20.floor_price_btc;
   if (!price) return 0;
   // Parse as float to handle string values from API
-  const parsed = parseFloat(price);
+  const parsed = parseFloat(price.toString());
   return isNaN(parsed) ? 0 : parsed;
 }
 
-function getVolume24h(src20: any): number {
-  const volume = src20?.market_data?.volume_24h_btc;
+function getVolume24h(src20: SRC20Row): number {
+  const volume = src20.market_data?.volume_24h_btc ?? src20.volume_7d_btc;
   if (!volume) return 0;
   // Parse as float to handle string values from API
-  const parsed = parseFloat(volume);
+  const parsed = parseFloat(volume.toString());
   return isNaN(parsed) ? 0 : parsed;
-}
-
-interface SRC20CardProps {
-  data: SRC20Row[];
-  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  timeframe: Timeframe;
-  onImageClick: (imgSrc: string) => void;
-  currentSort?: {
-    filter: string | null;
-    direction: "asc" | "desc";
-  };
 }
 
 export function SRC20Card({
@@ -123,9 +113,9 @@ export function SRC20Card({
       link.href = url.toString();
       link.setAttribute("f-partial", "");
       link.style.display = "none";
-      document.body.appendChild(link);
+      document.body.appendChild(link as Node);
       link.click();
-      document.body.removeChild(link);
+      document.body.removeChild(link as Node);
     }
   };
 
@@ -137,7 +127,9 @@ export function SRC20Card({
     isSelected: boolean,
     isClickable: boolean,
   ) => {
-    const baseClass = `${labelXs} ${cellAlign(index, headers.length)} py-2`;
+    const baseClass = `${labelXs} ${
+      cellAlign(index, headers?.length ?? 0)
+    } py-2`;
 
     // Row background color and rounded corners
     const rowClass = isFirst
@@ -203,7 +195,7 @@ export function SRC20Card({
     const emojiRegex =
       /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]/gu;
     const match = text.match(emojiRegex);
-    if (!match) return { text, emoji: "" };
+    if (!match || !match[0]) return { text, emoji: "" };
     const emojiIndex = text.indexOf(match[0]);
     return {
       text: text.slice(0, emojiIndex),
@@ -235,7 +227,7 @@ export function SRC20Card({
           <tr class={`${glassmorphism}`}>
             {headers.map((header, i) => {
               const isFirst = i === 0;
-              const isLast = i === headers.length - 1;
+              const isLast = i === (headers?.length ?? 0) - 1;
               const isClickable = header !== "CHART";
 
               // Get sort state for segmented control styling
@@ -281,9 +273,9 @@ export function SRC20Card({
           </tr>
         </thead>
         <tbody>
-          {data.length
+          {data?.length
             ? (
-              data.map((src20) => {
+              data.map((src20: SRC20Row) => {
                 // SRC-20 Image URL Logic:
                 // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
                 // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
@@ -318,7 +310,9 @@ export function SRC20Card({
                           return; // Cannot navigate during SSR
                         }
                         const href = `/src20/${
-                          encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
+                          encodeURIComponent(
+                            unicodeEscapeToEmoji(src20.tick ?? ""),
+                          )
                         }`;
                         globalThis.location.href = href;
                       }
@@ -327,7 +321,7 @@ export function SRC20Card({
                     {/* TOKEN */}
                     <td
                       class={`${
-                        cellAlign(0, headers.length)
+                        cellAlign(0, headers?.length ?? 0)
                       } ${rowCardBorderLeft} sticky left-0 tablet:static backdrop-blur-sm tablet:backdrop-blur-none z-10`}
                     >
                       <div class="flex items-center gap-4">
@@ -339,13 +333,13 @@ export function SRC20Card({
                             e.stopPropagation(); // Prevent row click
                             onImageClick?.(imageUrl);
                           }}
-                          alt={unicodeEscapeToEmoji(src20.tick)}
+                          alt={unicodeEscapeToEmoji(src20.tick ?? "")}
                         />
                         <div class="flex flex-col">
                           <div class="font-bold text-base uppercase tracking-wide">
                             {(() => {
                               const { text, emoji } = splitTextAndEmojis(
-                                unicodeEscapeToEmoji(src20.tick),
+                                unicodeEscapeToEmoji(src20.tick ?? ""),
                               );
                               return (
                                 <>
@@ -367,14 +361,13 @@ export function SRC20Card({
                     {/* PRICE */}
                     <td
                       class={`${
-                        cellAlign(1, headers.length)
+                        cellAlign(1, headers?.length ?? 0)
                       } ${rowCardBorderCenter}`}
                     >
                       {(() => {
                         // ✅ CLEANED: No more root-level field access
                         const priceInBtc = getPrice(src20);
-                        const priceSourceType = (src20 as any)?.market_data
-                          ?.price_source_type;
+                        const priceSourceType = undefined; // price_source_type not available in MarketListingAggregated
                         const sourceLabel = getPriceSourceLabel(
                           priceSourceType,
                         );
@@ -432,10 +425,9 @@ export function SRC20Card({
                       class={`text-center ${rowCardBorderCenter}`}
                     >
                       {(() => {
-                        const change = (src20 as any)?.market_data
-                          ?.change_24h_percent;
+                        const change = src20.market_data?.change_24h_percent;
                         if (change !== undefined && change !== null) {
-                          const changeNum = parseFloat(change);
+                          const changeNum = Number(change);
                           if (!isNaN(changeNum)) {
                             return (
                               <span
@@ -455,7 +447,7 @@ export function SRC20Card({
                     {/* VOLUME */}
                     <td
                       class={`${
-                        cellAlign(3, headers.length)
+                        cellAlign(3, headers?.length ?? 0)
                       } ${rowCardBorderCenter}`}
                     >
                       {(() => {
@@ -490,7 +482,7 @@ export function SRC20Card({
                     {/* MARKETCAP */}
                     <td
                       class={`${
-                        cellAlign(4, headers.length)
+                        cellAlign(4, headers?.length ?? 0)
                       } ${rowCardBorderCenter}`}
                     >
                       {(() => {
@@ -518,7 +510,7 @@ export function SRC20Card({
                     {/* DEPLOY */}
                     <td
                       class={`${
-                        cellAlign(5, headers.length)
+                        cellAlign(5, headers?.length ?? 0)
                       } ${rowCardBorderCenter}`}
                     >
                       {formatDate(new Date(src20.block_time), {
@@ -530,15 +522,14 @@ export function SRC20Card({
                     {/* HOLDERS */}
                     <td
                       class={`${
-                        cellAlign(6, headers.length)
+                        cellAlign(6, headers?.length ?? 0)
                       } ${rowCardBorderCenter}`}
                     >
                       {(() => {
                         // First try market_data.holder_count (v2.3 structure)
-                        const holderCount =
-                          (src20 as any)?.market_data?.holder_count ||
+                        const holderCount = src20.market_data?.holder_count ??
                           // Fallback to root level holders for backward compatibility
-                          (src20 as any)?.holders ||
+                          src20.holders ??
                           0;
                         return Number(holderCount).toLocaleString();
                       })()}
@@ -547,20 +538,23 @@ export function SRC20Card({
                     {/* CHART */}
                     <td
                       class={`${
-                        cellAlign(7, headers.length)
+                        cellAlign(7, headers?.length ?? 0)
                       } ${rowCardBorderRight} !py-0`}
                     >
                       {console.log(
                         "Chart data for",
-                        src20.tick,
-                        (src20 as any).chart,
+                        src20.tick ?? "",
+                        src20.chart,
                       )}
-                      <ChartWidget
-                        fromPage="home"
-                        data={(src20 as any).chart}
-                        tick={src20.tick}
-                        data-chart-widget
-                      />
+                      {src20.chart && (
+                        <ChartWidget
+                          type="line"
+                          fromPage="home"
+                          data={src20.chart as unknown as HighchartsData}
+                          tick={src20.tick ?? ""}
+                          data-chart-widget
+                        />
+                      )}
                     </td>
                   </tr>
                 );
@@ -568,7 +562,10 @@ export function SRC20Card({
             )
             : (
               <tr>
-                <td colSpan={headers.length} class={`${valueDarkSm} w-full`}>
+                <td
+                  colSpan={headers?.length ?? 0}
+                  class={`${valueDarkSm} w-full`}
+                >
                   NO TOKENS TO DISPLAY
                 </td>
               </tr>

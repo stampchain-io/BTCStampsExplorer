@@ -1,10 +1,8 @@
 import { CollectionRepository } from "$server/database/collectionRepository.ts";
 import { BlockController } from "$server/controller/blockController.ts";
-import {
-  Collection,
-} from "$globals";
 import { CollectionQueryParams, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
 import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
+import type { CollectionRow } from "$server/types/collection.d.ts";
 
 export class CollectionService {
   static async getCollectionDetails(
@@ -49,7 +47,7 @@ export class CollectionService {
 
   static async getCollectionByName(
     collectionName: string,
-  ): Promise<Collection | null> {
+  ): Promise<CollectionRow | null> {
     return await CollectionRepository.getCollectionByName(collectionName);
   }
 

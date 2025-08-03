@@ -1,9 +1,9 @@
 /* ===== SRC20 CARD BASE COMPONENT ===== */
 /*@baba-check styles*/
-import { cellAlign, Timeframe } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
+import { cellAlign } from "$components/layout/types.ts";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
+import type { SRC20CardBaseProps } from "$types/ui.d.ts";
 import { useState } from "preact/hooks";
 
 /* ===== HELPER FUNCTIONS ===== */
@@ -23,18 +23,6 @@ function splitTextAndEmojis(text: string): { text: string; emoji: string } {
   };
 }
 
-/* ===== TYPES ===== */
-export interface SRC20CardBaseProps {
-  src20: SRC20Row;
-  // fromPage is reserved for future use
-  fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
-  // timeframe is reserved for future use
-  timeframe?: Timeframe;
-  onImageClick?: (imgSrc: string) => void;
-  children?: preact.ComponentChildren;
-  totalColumns: number;
-}
-
 /* ===== COMPONENT ===== */
 export function SRC20CardBase({
   src20,
@@ -45,6 +33,11 @@ export function SRC20CardBase({
   totalColumns,
 }: SRC20CardBaseProps) {
   const [isHovered, setIsHovered] = useState(false);
+
+  // Early return if src20 is null or undefined
+  if (!src20) {
+    return null;
+  }
 
   // SRC-20 Image URL Logic:
   // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
@@ -62,7 +55,7 @@ export function SRC20CardBase({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <td class={cellAlign(0, totalColumns)}>
+      <td class={cellAlign(0, totalColumns ?? 1)}>
         <div class="flex items-center gap-4 p-3">
           <img
             src={imageUrl}

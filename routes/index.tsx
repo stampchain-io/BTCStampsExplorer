@@ -1,7 +1,9 @@
 /* ===== HOME PAGE ROUTE ===== */
 import { Handlers, PageProps } from "$fresh/server.ts";
-import type { Collection } from "$globals";
-import { SRC20Row, StampRow } from "$globals";
+import type { CollectionRow } from "$server/types/collection.d.ts";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { StampRow, StampSaleRow } from "$types/stamp.d.ts";
+
 import { HomeHeader } from "$header";
 import { gapSectionSlim, Micro5FontLoader } from "$layout";
 import { ResponseUtil } from "$lib/utils/api/responses/responseUtil.ts";
@@ -23,7 +25,7 @@ interface StampControllerData {
   stamps_src721: StampRow[];
   stamps_art: StampRow[];
   stamps_posh: StampRow[];
-  collectionData: Collection[];
+  collectionData: CollectionRow[];
 }
 
 interface HomePageData extends StampControllerData {
@@ -47,7 +49,7 @@ interface HomePageData extends StampControllerData {
   btcPriceSource?: string;
   // Recent sales data for SSR optimization
   recentSalesData?: {
-    data: any[];
+    data: StampSaleRow[];
     total: number;
     page: number;
     totalPages: number;

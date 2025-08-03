@@ -13,6 +13,7 @@ import type {
 import { DEFAULT_SORT_CONFIG } from "$lib/utils/data/sorting/sortingConstants.ts";
 import { createContext } from "preact";
 import { useContext, useEffect, useState } from "preact/hooks";
+import type { SortingProviderProps } from "$types/ui.d.ts";
 
 // ===== CONTEXT DEFINITION =====
 
@@ -43,16 +44,6 @@ const SortingContext = createContext<SortingContextValue | null>(null);
 /**
  * Props for SortingProvider
  */
-interface SortingProviderProps {
-  /** Child components */
-  children: preact.ComponentChildren;
-  /** Sorting configuration */
-  config: UseSortingConfig;
-  /** Optional initial sort state */
-  initialState?: Partial<SortState>;
-  /** Optional test ID for testing */
-  testId?: string;
-}
 
 /**
  * SortingProvider - Provides sorting state management to child components

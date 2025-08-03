@@ -1,6 +1,7 @@
 /* ===== STAMPING TOOL PAGE ===== */
 /*@baba-71-81*/
-import type { StampRow } from "$globals";
+
+import type { StampRow } from "$types/stamp.d.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { StampingTool } from "$tool";

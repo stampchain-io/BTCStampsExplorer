@@ -1,16 +1,17 @@
 import { FileToAddressUtils } from "$lib/utils/bitcoin/encoding/fileToAddressUtils.ts";
-import { AncestorInfo, PSBTInput } from "$types/index.d.ts";
+import type { AncestorInfo } from "$types/base.d.ts";
+import type { PSBTInput } from "$types/src20.d.ts";
 import * as bitcoin from "bitcoinjs-lib";
 const { networks, address, Psbt } = bitcoin;
 // Removed unused imports: calculateDust, calculateMiningFee, estimateTransactionSize, msgpack
 import { hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
 // Removed TransactionService import - using direct OptimalUTXOSelection instead
 import { TX_CONSTANTS } from "$constants";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { BitcoinUtxoManager } from "$server/services/transaction/bitcoinUtxoManager.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
-import type { UTXO } from "$types/index.d.ts";
+import type { UTXO } from "$types/base.d.ts";
 
 interface PSBTParams {
   sourceAddress: string;
@@ -111,7 +112,7 @@ export class SRC20PSBTService {
       logger.debug("src20", {
         message: "Optimal UTXO selection completed",
         inputCount: fullUTXOs.length,
-        totalInputValue: fullUTXOs.reduce((sum: number, input: UTXO) => sum + input.value, 0),
+        totalInputValue: fullUTXOs.reduce((sum: number, input: UTXO) => sum + (input.value ?? 0), 0),
         inputDetails: fullUTXOs.map((input: UTXO) => ({
           value: input.value,
           hasAncestor: !!input.ancestor,
@@ -160,8 +161,8 @@ export class SRC20PSBTService {
       if (change > TX_CONSTANTS.SRC20_DUST) {
         psbt.addOutput({ script: address.toOutputScript(effectiveChangeAddress, network), value: BigInt(change) });
       }
-      const finalTotalInputValue = inputs.reduce((sum: any, input: any) => sum + Number(input.value), 0);
-      const finalTotalOutputAmount = outputs.reduce((sum: any, out: any) => sum + out.value, 0) + (change > TX_CONSTANTS.SRC20_DUST ? change : 0);
+      const finalTotalInputValue = inputs.reduce((sum: any, input: any) => sum + Number(input.value ?? 0), 0);
+      const finalTotalOutputAmount = outputs.reduce((sum: any, out: any) => sum + (out.value ?? 0), 0) + (change > TX_CONSTANTS.SRC20_DUST ? change : 0);
       const actualFee = finalTotalInputValue - finalTotalOutputAmount;
       // Calculate dust total: only count P2WSH data outputs, not the recipient output
       const finalDustTotal = chunks.length * TX_CONSTANTS.SRC20_DUST;

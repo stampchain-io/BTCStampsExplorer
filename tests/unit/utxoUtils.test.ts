@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { isValidBitcoinAddress } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
+import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
 
 // Note: reverseEndian is not exported, so we'll test the exported functions
 

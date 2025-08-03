@@ -1,7 +1,22 @@
 /* ===== BUTTON STYLES MODULE ===== */
 import { JSX } from "preact";
-
 /* ===== TYPE DEFINITIONS ===== */
+
+// Basic button props interface - exclude conflicting HTML attributes
+export interface ButtonProps
+  extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "loading" | "size"> {
+  variant?: keyof ButtonVariants["variant"];
+  color?: keyof ButtonVariants["color"];
+  size?: keyof ButtonVariants["size"];
+  disabled?: boolean;
+  loading?: boolean;
+  active?: boolean;
+  fullWidth?: boolean;
+  ariaLabel?: string;
+  "data-type"?: string;
+  "f-partial"?: string;
+}
+
 export interface ButtonVariants {
   base: string;
   variant: Record<
@@ -10,7 +25,13 @@ export interface ButtonVariants {
     | "outline"
     | "flatOutline"
     | "outlineFlat"
-    | "outlineGradient",
+    | "outlineGradient"
+    | "custom"
+    | "fill"
+    | "light"
+    | "thin"
+    | "regular"
+    | "bold",
     string
   >;
   color: Record<
@@ -20,6 +41,10 @@ export interface ButtonVariants {
     | "purple"
     | "purpleDark"
     | "purpleGradient"
+    | "blue"
+    | "green"
+    | "red"
+    | "gray"
     | "test"
     | "custom",
     string
@@ -32,11 +57,13 @@ export interface ButtonVariants {
     | "md"
     | "lg"
     | "xl"
+    | "xxl"
     | "xxsR"
     | "xsR"
     | "smR"
     | "mdR"
-    | "lgR",
+    | "lgR"
+    | "custom",
     string
   >;
   textSize: Record<
@@ -44,11 +71,23 @@ export interface ButtonVariants {
     string
   >;
   padding: Record<
-    "xs" | "sm" | "md" | "lg",
+    | "xxs"
+    | "xs"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "xxl"
+    | "xxsR"
+    | "xsR"
+    | "smR"
+    | "mdR"
+    | "lgR"
+    | "custom",
     string
   >;
   pillSize: Record<
-    "xs" | "sm" | "md" | "lg",
+    "xs" | "sm" | "md" | "lg" | "xl",
     string
   >;
   state: {
@@ -60,36 +99,6 @@ export interface ButtonVariants {
 }
 
 /* ===== BUTTON PROPS INTERFACES ===== */
-interface BaseButtonProps {
-  variant: keyof typeof buttonStyles.variant;
-  color: keyof typeof buttonStyles.color;
-  size: keyof typeof buttonStyles.size;
-  class?: string;
-  children?: JSX.Element | string;
-  disabled?: boolean;
-  role?: JSX.AriaRole;
-  ariaLabel?: string;
-  onClick?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onMouseEnter?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onMouseLeave?: JSX.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onFocus?: JSX.FocusEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onBlur?: JSX.FocusEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  "data-type"?: string;
-}
-
-export interface ButtonElementProps extends BaseButtonProps {
-  href?: undefined;
-  "f-partial"?: undefined;
-  target?: undefined;
-}
-
-export interface AnchorElementProps extends BaseButtonProps {
-  href: string;
-  "f-partial"?: string;
-  target?: "_blank" | "_self" | "_parent" | "_top";
-}
-
-export type ButtonProps = ButtonElementProps | AnchorElementProps;
 
 /* ===== BUTTON STYLE DEFINITIONS ===== */
 export const buttonStyles: ButtonVariants = {
@@ -142,6 +151,32 @@ export const buttonStyles: ButtonVariants = {
       [&>*]:text-[var(--default-color)] hover:[&>*]:text-[var(--hover-color)]
       [&>*]:transition-colors [&>*]:ease-in-out [&>*]:duration-200
     `,
+    custom: `
+      /* Custom variant - allows external styling via className */
+    `,
+    fill: `
+      bg-[var(--color-dark)] border-[var(--color-dark)] text-white
+      hover:bg-[var(--color-light)] hover:border-[var(--color-light)]
+    `,
+    light: `
+      bg-[var(--color-light)] border-[var(--color-light)] text-black
+      hover:bg-[var(--color-dark)] hover:border-[var(--color-dark)] hover:text-white
+    `,
+    thin: `
+      bg-transparent border-[var(--color-dark)] text-[var(--color-dark)]
+      border-opacity-50 font-normal
+      hover:border-opacity-100 hover:bg-[var(--color-dark)] hover:bg-opacity-10
+    `,
+    regular: `
+      bg-[var(--color-dark)] border-[var(--color-dark)] text-white
+      font-medium
+      hover:bg-[var(--color-light)] hover:border-[var(--color-light)]
+    `,
+    bold: `
+      bg-[var(--color-dark)] border-[var(--color-dark)] text-white
+      font-bold border-2
+      hover:bg-[var(--color-light)] hover:border-[var(--color-light)]
+    `,
   },
 
   /* ===== COLOR STYLES ===== */
@@ -180,6 +215,22 @@ export const buttonStyles: ButtonVariants = {
       [--color-dark:#00CC00]
       [--color-light:#CC0000]
     `,
+    blue: `
+      [--color-dark:#0066CC]
+      [--color-light:#0099FF]
+    `,
+    green: `
+      [--color-dark:#00AA00]
+      [--color-light:#00CC00]
+    `,
+    red: `
+      [--color-dark:#CC0000]
+      [--color-light:#FF0000]
+    `,
+    gray: `
+      [--color-dark:#666666]
+      [--color-light:#999999]
+    `,
     custom: "",
   },
 
@@ -191,11 +242,13 @@ export const buttonStyles: ButtonVariants = {
     md: "h-[38px] px-4 text-sm",
     lg: "h-[42px] px-4 text-sm",
     xl: "h-[46px] px-5 text-base",
+    xxl: "h-[50px] px-6 text-lg",
     xxsR: "h-[26px] tablet:h-[22px] px-[14px] text-[10px]",
     xsR: "h-[30px] tablet:h-[26px] px-[14px] text-xs",
     smR: "h-[34px] tablet:h-[30px] px-4 text-xs",
     mdR: "h-[38px] tablet:h-[34px] px-4 text-sm tablet:text-xs",
     lgR: "h-[42px] tablet:h-[38px] px-4 text-sm",
+    custom: "/* Custom size - allows external sizing via className */",
   },
 
   /* ===== TEXT SIZE STYLES - ONLY USED FOR TEXT BUTTONS ===== */
@@ -209,10 +262,19 @@ export const buttonStyles: ButtonVariants = {
 
   /* ===== PADDING STYLES ===== */
   padding: {
+    xxs: "py-[3px] px-[14px]",
     xs: "py-[5px] px-[14px]",
     sm: "py-[7px] px-4",
     md: "py-[9px] px-4",
     lg: "py-[11px] px-4",
+    xl: "py-[13px] px-5",
+    xxl: "py-[15px] px-6",
+    xxsR: "py-[3px] tablet:py-[1px] px-[14px]",
+    xsR: "py-[5px] tablet:py-[3px] px-[14px]",
+    smR: "py-[7px] tablet:py-[5px] px-4",
+    mdR: "py-[9px] tablet:py-[7px] px-4",
+    lgR: "py-[11px] tablet:py-[9px] px-4",
+    custom: "/* Custom padding - allows external styling via className */",
   },
 
   /* ===== PILL SIZE STYLES ===== */
@@ -221,6 +283,7 @@ export const buttonStyles: ButtonVariants = {
     sm: "text-xs py-[7px] px-4",
     md: "text-sm py-[9px] px-4",
     lg: "text-sm py-[11px] px-4",
+    xl: "text-base py-[13px] px-5",
   },
 
   /* ===== STATE STYLES ===== */

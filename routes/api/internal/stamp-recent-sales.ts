@@ -1,15 +1,16 @@
+import { STAMP_TYPE_VALUES } from "$constants";
 import { Handlers } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
-import { logger } from "$lib/utils/logger.ts";
 import { getPaginationParams } from "$lib/utils/data/pagination/paginationUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { RouteType } from "$server/services/infrastructure/cacheService.ts";
+import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
+import { StampService } from "$server/services/stampService.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
 } from "$server/services/validation/routeValidationService.ts";
-import { InternalApiFrontendGuard } from "$server/services/security/internalApiFrontendGuard.ts";
-import { StampService } from "$server/services/stampService.ts";
 
 /**
  * Internal API endpoint for recent stamp sales with cleaned structure
@@ -57,15 +58,7 @@ export const handler: Handlers = {
       // Validate type parameter
       // Note: src20 is available for completeness but not used in frontend navigation
       // (SRC-20 tokens are handled separately in the app)
-      const validTypes = [
-        "all",
-        "classic",
-        "cursed",
-        "posh",
-        "stamps",
-        "src20",
-      ];
-      const stampType = validTypes.includes(type) ? type : "all";
+      const stampType = STAMP_TYPE_VALUES.includes(type as any) ? type : "all";
 
       // Use existing StampService.getRecentSales method as data source
       const result = await StampService.getRecentSales(

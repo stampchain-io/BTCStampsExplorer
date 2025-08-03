@@ -1,10 +1,10 @@
 import { assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { stub } from "@std/testing/mock";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
+import { stub } from "@std/testing@1.0.14/mock";
 import { StampRepository } from "$server/database/stampRepository.ts";
 import stampFixtures from "../fixtures/stampData.json" with { type: "json" };
 import { createMockStampRow } from "./utils/testFactories.ts";
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
 
 // Mock database manager for testing
 class MockDatabaseManager {

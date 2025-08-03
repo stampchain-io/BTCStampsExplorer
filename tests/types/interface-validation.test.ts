@@ -11,7 +11,7 @@ import type {
     SRC20Token,
     SRC20WithOptionalMarketData, // Legacy interface
 } from "$lib/types/src20.d.ts";
-import { assert } from "https://deno.land/std@0.208.0/assert/mod.ts";
+import { assert } from "@std/assert";
 
 console.log("🧪 TypeScript Interface Validation Tests");
 

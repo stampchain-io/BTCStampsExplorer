@@ -1,4 +1,4 @@
-import {
+import type {
   MarketListingAggregated,
   PaginatedSrc20ResponseBody,
   Src20ResponseBody,
@@ -6,7 +6,8 @@ import {
   Src20SnapShotDetail,
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams
-} from "$globals";
+
+} from "$types/src20.d.ts";
 import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { stripTrailingZeros } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { paginate } from "$lib/utils/data/pagination/paginationUtils.ts";
@@ -14,7 +15,7 @@ import { MarketDataRepository } from "$server/database/marketDataRepository.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/core/blockService.ts";
 import { Big } from "big";
-import { SRC20UtilityService } from "./utilityService.ts";
+import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
 
 // Define missing types
 interface PerformanceMetrics {
@@ -40,6 +41,15 @@ interface EnhancedSRC20Row extends SRC20Row {
 
 // Change class name from Src20Service to SRC20QueryService
 export class SRC20QueryService {
+  /**
+   * Helper function to normalize sortBy parameter to a string
+   * Handles both string and object format for backward compatibility
+   */
+  private static normalizeSortBy(sortBy?: string | { field: string; direction: 'asc' | 'desc' }): string | undefined {
+    if (!sortBy) return undefined;
+    if (typeof sortBy === 'string') return sortBy;
+    return `${sortBy.field}_${sortBy.direction.toUpperCase()}`;
+  }
   static async getTotalCountValidSrc20Tx(params: {
     tick?: string | string[];
     op?: string | string[];
@@ -106,7 +116,7 @@ export class SRC20QueryService {
         tx_hash: sanitizedParams.tx_hash || null,
         limit,
         page,
-        sortBy: sanitizedParams.sortBy || "ASC",
+        sortBy: sanitizedParams.sortBy || { field: "amt", direction: "asc" },
       };
 
       // Remove the op property if it's null
@@ -237,11 +247,11 @@ export class SRC20QueryService {
   ): Promise<Src20SnapShotDetail[]> {
     try {
       const balanceParams: SRC20BalanceRequestParams = {
-        tick: params.tick,
+        tick: params.tick || null,
         amt: params.amt || 0,
-        limit: params.limit,
-        page: params.page,
-        sortBy: params.sortBy || "DESC",
+        ...(params.limit !== undefined && { limit: params.limit }),
+        ...(params.page !== undefined && { page: params.page }),
+        sortBy: params.sortBy || { field: "amt", direction: "desc" },
       };
 
       const balanceResponse = await this.fetchSrc20Balance(balanceParams);
@@ -610,7 +620,7 @@ export class SRC20QueryService {
         op: sanitizedParams.op || null,
         limit,
         page,
-        sortBy: sanitizedParams.sortBy || "ASC",
+        sortBy: sanitizedParams.sortBy || { field: "amt", direction: "asc" },
       };
 
       // Remove undefined op property
@@ -782,13 +792,14 @@ export class SRC20QueryService {
       }
 
       // 🚀 NEW V2.3 TRENDING CALCULATIONS AND FILTERING
-      const isTrendingSortRequested = sanitizedParams.sortBy && [
+      const normalizedSortBy = this.normalizeSortBy(sanitizedParams.sortBy);
+      const isTrendingSortRequested = normalizedSortBy && typeof normalizedSortBy === 'string' && [
         'TRENDING_MINTING_DESC', 'TRENDING_MINTING_ASC',
         'MINT_VELOCITY_DESC', 'MINT_VELOCITY_ASC',
         'TRENDING_24H_DESC', 'TRENDING_24H_ASC',
         'TRENDING_7D_DESC', 'TRENDING_7D_ASC',
         'TRENDING_30D_DESC', 'TRENDING_30D_ASC'
-      ].includes(sanitizedParams.sortBy);
+      ].includes(normalizedSortBy);
 
       // 🚀 USE OPTIMIZED REPOSITORY METHODS FOR TRENDING QUERIES
       if ((isTrendingSortRequested || sanitizedParams.mintVelocityMin || sanitizedParams.trendingWindow) &&
@@ -845,8 +856,8 @@ export class SRC20QueryService {
           : enhancedTokens;
 
         // Apply trending-based sorting if requested
-        if (isTrendingSortRequested && sanitizedParams.sortBy) {
-          filteredTokens = this.applyTrendingSorting(filteredTokens, sanitizedParams.sortBy);
+        if (isTrendingSortRequested && normalizedSortBy) {
+          filteredTokens = this.applyTrendingSorting(filteredTokens, normalizedSortBy);
         }
 
                         // 🚀 FILTER OUT ZERO-VOLUME TOKENS FOR TRENDING SORTS (MINTED TOKENS ONLY)
@@ -854,11 +865,11 @@ export class SRC20QueryService {
         // 1. MINTING tokens (< 100% progress) don't have trading volume yet - they use mint activity
         // 2. MINTED tokens should be filtered by actual trading volume to show true "top tickers"
         // 3. We differentiate between mint-based trending (TRENDING_MINTING_*) and volume-based trending (TRENDING_24H_*, etc.)
-        const isVolumeBasedTrendingSort = sanitizedParams.sortBy ? [
+        const isVolumeBasedTrendingSort = normalizedSortBy ? [
           'TRENDING_24H_DESC', 'TRENDING_24H_ASC',
           'TRENDING_7D_DESC', 'TRENDING_7D_ASC',
           'TRENDING_30D_DESC', 'TRENDING_30D_ASC'
-        ].includes(sanitizedParams.sortBy) : false;
+        ].includes(normalizedSortBy) : false;
 
                 const isMintedTokensQuery = !options.excludeFullyMinted; // excludeFullyMinted is false for minted tokens
 
@@ -877,10 +888,10 @@ export class SRC20QueryService {
             }
           };
 
-          const timeframe = sanitizedParams.sortBy?.includes('24H') ? '24h' :
-                           sanitizedParams.sortBy?.includes('7D') ? '7d' : '30d';
+          const timeframe = (typeof normalizedSortBy === 'string' && normalizedSortBy.includes('24H')) ? '24h' :
+                           (typeof normalizedSortBy === 'string' && normalizedSortBy.includes('7D')) ? '7d' : '30d';
 
-          console.log(`[fetchAndFormatSrc20DataV2] Analyzing ${timeframe} volume distribution for ${sanitizedParams.sortBy || 'unknown'}`);
+          console.log(`[fetchAndFormatSrc20DataV2] Analyzing ${timeframe} volume distribution for ${normalizedSortBy || 'unknown'}`);
           const beforeCount = filteredTokens.length;
 
                     // Count tokens with meaningful volume (> 0.01 BTC = ~$600+ at current prices)

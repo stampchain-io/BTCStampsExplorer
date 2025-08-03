@@ -12,12 +12,12 @@
 import {
   assertEquals,
   assertExists,
-} from "https://deno.land/std@0.208.0/assert/mod.ts";
+} from "@std/assert";
 import {
   ErrorHandlingUtils,
   ErrorSeverity,
   ErrorType,
-} from "$lib/utils/monitoring/errors/errorHandlingUtils.ts";
+} from "$lib/utils/errorHandling.ts";
 import { AccessibilityUtils } from "$lib/utils/ui/accessibility/accessibilityUtils.ts";
 import type { StampWithEnhancedSaleData } from "$types/marketData.d.ts";
 

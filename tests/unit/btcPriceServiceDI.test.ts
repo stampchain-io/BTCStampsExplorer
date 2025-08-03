@@ -4,7 +4,7 @@
  */
 
 import { assertEquals, assertExists } from "@std/assert";
-import { beforeEach, describe, it } from "@std/testing/bdd";
+import { beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 // Set test environment
 (globalThis as unknown as { SKIP_REDIS_CONNECTION: boolean })

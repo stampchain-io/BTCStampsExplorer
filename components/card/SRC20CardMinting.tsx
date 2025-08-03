@@ -1,30 +1,20 @@
 /* reinamora - update Trending calculations */
 import { Button } from "$button";
 import { cellAlign, colGroup } from "$components/layout/types.ts";
-import { SRC20Row } from "$globals";
+import type { SRC20Row } from "$types/src20.d.ts";
+import type { TargetedEvent } from "preact/compat";
+import type { SRC20CardMintingProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
 import {
   containerCardTable,
   rowCardBorderCenter,
   rowCardBorderLeft,
   rowCardBorderRight,
-  Timeframe,
 } from "$layout";
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
-
-interface SRC20CardMintingProps {
-  data: SRC20Row[];
-  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
-  timeframe: Timeframe;
-  onImageClick: (imgSrc: string) => void;
-  currentSort?: {
-    filter: string | null;
-    direction: "asc" | "desc";
-  };
-}
 
 export function SRC20CardMinting({
   data,
@@ -84,9 +74,11 @@ export function SRC20CardMinting({
       link.href = url.toString();
       link.setAttribute("f-partial", "");
       link.style.display = "none";
-      document.body.appendChild(link);
+      // Type-safe DOM manipulation for navigation
+      const bodyElement = document.body;
+      bodyElement.appendChild(link as Node);
       link.click();
-      document.body.removeChild(link);
+      bodyElement.removeChild(link as Node);
     }
   };
 
@@ -98,7 +90,9 @@ export function SRC20CardMinting({
     isSelected: boolean,
     isClickable: boolean,
   ) => {
-    const baseClass = `${labelXs} ${cellAlign(index, headers.length)} py-2`;
+    const baseClass = `${labelXs} ${
+      cellAlign(index, headers?.length ?? 0)
+    } py-2`;
 
     // Row background color and rounded corners
     const rowClass = isFirst
@@ -163,6 +157,7 @@ export function SRC20CardMinting({
       /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]/gu;
     const match = text.match(emojiRegex);
     if (!match) return { text, emoji: "" };
+    if (!match || !match[0]) return { text, emoji: "" };
     const emojiIndex = text.indexOf(match[0]);
     return {
       text: text.slice(0, emojiIndex),
@@ -191,7 +186,7 @@ export function SRC20CardMinting({
           <tr>
             {headers.map((header, i) => {
               const isFirst = i === 0;
-              const isLast = i === headers.length - 1;
+              const isLast = i === (headers?.length ?? 0) - 1;
               const isClickable = header !== "" && header !== "TRENDING";
 
               // Get sort state for segmented control styling
@@ -234,9 +229,9 @@ export function SRC20CardMinting({
           </tr>
         </thead>
         <tbody>
-          {data.length
+          {data?.length
             ? (
-              data.map((src20) => {
+              data.map((src20: SRC20Row) => {
                 // SRC-20 Image URL Logic:
                 // 1. Use deploy_img if provided (for deploy operations: https://stampchain.io/stamps/{deploy_tx}.svg)
                 // 2. Use stamp_url if provided (for transaction stamps: https://stampchain.io/stamps/{tx_hash}.svg)
@@ -250,10 +245,12 @@ export function SRC20CardMinting({
                   "/img/placeholder/stamp-no-image.svg";
 
                 const mintHref = `/tool/src20/mint?tick=${
-                  encodeURIComponent(src20.tick)
+                  encodeURIComponent(src20.tick ?? "")
                 }&trxType=olga`;
 
-                const handleMintClick = (event: MouseEvent) => {
+                const handleMintClick = (
+                  event: TargetedEvent<HTMLButtonElement>,
+                ) => {
                   event.preventDefault();
 
                   // SSR-safe browser environment check
@@ -285,7 +282,9 @@ export function SRC20CardMinting({
                           globalThis?.location
                         ) {
                           const href = `/src20/${
-                            encodeURIComponent(unicodeEscapeToEmoji(src20.tick))
+                            encodeURIComponent(
+                              unicodeEscapeToEmoji(src20.tick ?? ""),
+                            )
                           }`;
                           globalThis.location.href = href;
                         }
@@ -295,7 +294,7 @@ export function SRC20CardMinting({
                     {/* TOKEN */}
                     <td
                       class={`${
-                        cellAlign(0, headers.length)
+                        cellAlign(0, headers?.length ?? 0)
                       } ${rowCardBorderLeft} sticky left-0 tablet:static backdrop-blur-sm tablet:backdrop-blur-none z-10`}
                     >
                       <div class="flex items-center gap-4">
@@ -307,13 +306,13 @@ export function SRC20CardMinting({
                             e.stopPropagation(); // Prevent row click
                             onImageClick?.(imageUrl);
                           }}
-                          alt={unicodeEscapeToEmoji(src20.tick)}
+                          alt={unicodeEscapeToEmoji(src20.tick ?? "")}
                         />
                         <div class="flex flex-col">
                           <div class="font-bold text-base uppercase tracking-wide">
                             {(() => {
                               const { text, emoji } = splitTextAndEmojis(
-                                unicodeEscapeToEmoji(src20.tick),
+                                unicodeEscapeToEmoji(src20.tick ?? ""),
                               );
                               return (
                                 <>
@@ -335,7 +334,7 @@ export function SRC20CardMinting({
                     {/* MINTS */}
                     <td
                       class={`${
-                        cellAlign(1, headers.length)
+                        cellAlign(1, headers?.length ?? 0)
                       } ${rowCardBorderCenter}`}
                     >
                       {src20.mint_progress?.total_mints || "N/A"}
@@ -343,7 +342,7 @@ export function SRC20CardMinting({
                     {/* PROGRESS */}
                     <td
                       class={`${
-                        cellAlign(2, headers.length)
+                        cellAlign(2, headers?.length ?? 0)
                       } ${rowCardBorderCenter}`}
                     >
                       <div class="flex items-center justify-center w-full">
@@ -372,7 +371,7 @@ export function SRC20CardMinting({
                     {/* TRENDING */}
                     <td
                       class={`${
-                        cellAlign(3, headers.length)
+                        cellAlign(3, headers?.length ?? 0)
                       } ${rowCardBorderCenter}`}
                     >
                       {"N/A"}
@@ -380,7 +379,7 @@ export function SRC20CardMinting({
                     {/* DEPLOY */}
                     <td
                       class={`${
-                        cellAlign(4, headers.length)
+                        cellAlign(4, headers?.length ?? 0)
                       } ${rowCardBorderCenter}`}
                     >
                       {formatDate(new Date(src20.block_time), {
@@ -392,7 +391,7 @@ export function SRC20CardMinting({
                     {/* HOLDERS */}
                     <td
                       class={`${
-                        cellAlign(5, headers.length)
+                        cellAlign(5, headers?.length ?? 0)
                       } ${rowCardBorderCenter}`}
                     >
                       {Number(
@@ -421,7 +420,10 @@ export function SRC20CardMinting({
             )
             : (
               <tr>
-                <td colSpan={headers.length} class={`${valueDarkSm} w-full`}>
+                <td
+                  colSpan={headers?.length ?? 0}
+                  class={`${valueDarkSm} w-full`}
+                >
                   NO MINTING TOKENS
                 </td>
               </tr>

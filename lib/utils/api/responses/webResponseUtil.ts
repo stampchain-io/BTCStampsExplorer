@@ -9,7 +9,7 @@ import {
   getCacheConfig,
   RouteType,
 } from "$server/services/infrastructure/cacheService.ts";
-import { API_RESPONSE_VERSION } from "./apiResponseUtil.ts";
+import { API_RESPONSE_VERSION } from "$lib/utils/api/responses/apiResponseUtil.ts";
 
 export interface WebResponseOptions {
   status?: number;

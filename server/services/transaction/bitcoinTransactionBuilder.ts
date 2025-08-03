@@ -1,10 +1,10 @@
 import { TX_CONSTANTS } from "$constants";
 import type { Output } from "$lib/types/index.d.ts";
-import { bytesToHex, hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
 import { estimateFee } from "$lib/utils/bitcoin/minting/feeCalculations.ts";
 import { getScriptTypeInfo } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
 import { getUTXOForAddress as getUTXOForAddressFromUtils } from "$lib/utils/bitcoin/utxo/utxoUtils.ts";
+import { bytesToHex, hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "node:buffer";
@@ -100,7 +100,7 @@ export class BitcoinTransactionBuilderImpl {
     const rawTxBuffer = Buffer.from(rawTxHex, 'hex');
 
     // Determine the script type and add appropriate input
-    const script = Buffer.from(utxoDetails.script, 'hex');
+    const script = Buffer.from(utxoDetails.script ?? '', 'hex');
     const scriptTypeInfo = getScriptTypeInfo(script);
 
     const inputData: any = {
@@ -113,7 +113,7 @@ export class BitcoinTransactionBuilderImpl {
     if (scriptTypeInfo.isWitness) {
       inputData.witnessUtxo = {
         script: script,
-        value: BigInt(utxoDetails.value),
+        value: BigInt(utxoDetails.value ?? 0),
       };
     } else {
       inputData.nonWitnessUtxo = rawTxBuffer;
@@ -138,7 +138,7 @@ export class BitcoinTransactionBuilderImpl {
       1 // one input
     );
 
-    const changeAmount = BigInt(utxoDetails.value) - satoshiAmount - BigInt(estimatedFee);
+    const changeAmount = BigInt(utxoDetails.value ?? 0) - satoshiAmount - BigInt(estimatedFee);
     console.log("BitcoinTransactionBuilder DEBUG - Change calculation:", {
       utxoValue: utxoDetails.value,
       satoshiAmount: satoshiAmount.toString(),
@@ -149,7 +149,7 @@ export class BitcoinTransactionBuilderImpl {
     });
 
     if (changeAmount < 0n) {
-      throw new Error(`Insufficient funds: need ${satoshiAmount + BigInt(estimatedFee)} satoshis but only have ${utxoDetails.value} satoshis`);
+      throw new Error(`Insufficient funds: need ${satoshiAmount + BigInt(estimatedFee)} satoshis but only have ${utxoDetails.value ?? 0} satoshis`);
     } else if (changeAmount > BigInt(TX_CONSTANTS.SRC20_DUST)) {
       // Add change output back to seller
       psbt.addOutput({
@@ -182,7 +182,7 @@ export class BitcoinTransactionBuilderImpl {
 
       // Try to derive address from the script
       try {
-        const script = Buffer.from(utxo.script, 'hex');
+        const script = Buffer.from(utxo.script ?? '', 'hex');
         const network = this.getAddressNetwork(address);
         const derivedAddress = this.bitcoin.address.fromOutputScript(script, network);
         return derivedAddress === address;
@@ -259,8 +259,8 @@ export class BitcoinTransactionBuilderImpl {
       hash: txid,
       index: vout,
       witnessUtxo: {
-        script: Buffer.from(utxoDetails.script, 'hex'),
-        value: BigInt(utxoDetails.value),
+        script: Buffer.from(utxoDetails.script ?? '', 'hex'),
+        value: BigInt(utxoDetails.value ?? 0),
       },
     });
 
@@ -297,7 +297,7 @@ export class BitcoinTransactionBuilderImpl {
         if (scriptTypeInfo.isWitness) {
           inputData.witnessUtxo = {
             script: script,
-            value: BigInt(utxoInfo.value),
+            value: BigInt(utxoInfo.value ?? 0),
           };
         } else {
           // For non-segwit, we need the full transaction
@@ -383,7 +383,7 @@ export class BitcoinTransactionBuilder {
         script: new Uint8Array(hex2bin(utxoDetails.script)), // Use hex2bin and be explicit with Uint8Array
         value: BigInt(inputAmount), // Use BigInt for values
       },
-      sighashType: Transaction.SIGHASH_SINGLE | Transaction.SIGHASH_ANYONECANPAY,
+      sighashType: bitcoin.Transaction.__SIGHASH_SINGLE | bitcoin.Transaction.__SIGHASH_ANYONECANPAY,
     };
 
     // Add input
@@ -601,7 +601,7 @@ export class BitcoinTransactionBuilder {
       sequence: 0xfffffffd, // Enable RBF
       witnessUtxo: {
         script: new Uint8Array(hex2bin(buyerUtxo.script)), // Use hex2bin and be explicit
-        value: BigInt(buyerUtxo.value), // Use BigInt
+        value: BigInt(buyerUtxo.value ?? 0), // Use BigInt
       },
     });
 
@@ -716,14 +716,14 @@ export class BitcoinTransactionBuilder {
           throw new Error(`UTXO details/script not found for input ${index}: ${inputTxid}:${inputVout}.`);
         }
 
-        totalInputValue += BigInt(utxoDetails.value);
+        totalInputValue += BigInt(utxoDetails.value ?? 0);
         const scriptTypeInfo = getScriptTypeInfo(utxoDetails.script);
-        const updateData: any = { sighashType: Transaction.SIGHASH_ALL };
+        const updateData: any = { sighashType: bitcoin.Transaction.__SIGHASH_ALL };
 
         if (scriptTypeInfo.isWitness || (scriptTypeInfo.type === "P2SH" && scriptTypeInfo.redeemScriptType?.isWitness)) {
           updateData.witnessUtxo = {
             script: hex2bin(utxoDetails.script),
-            value: BigInt(utxoDetails.value),
+            value: BigInt(utxoDetails.value ?? 0),
           };
         } else {
           const rawTxHex = await this.commonUtxoService.getRawTransactionHex(inputTxid);
@@ -756,8 +756,8 @@ export class BitcoinTransactionBuilder {
           } catch (_e) { /* Not an address output or not parsable, definitely not change to userAddress */ }
 
           if (!isChangeToUser) {
-            outputsToPreserve.push({ script: Buffer.from(output.script), value: BigInt(output.value) });
-            totalValueToPreservedOutputs += BigInt(output.value);
+            outputsToPreserve.push({ script: Buffer.from(output.script), value: BigInt(output.value ?? 0) });
+            totalValueToPreservedOutputs += BigInt(output.value ?? 0);
             console.log(`[BitcoinTransactionBuilder] Preserving original output: value=${output.value}, script=${bytesToHex(output.script)}`);
           } else {
             console.log(`[BitcoinTransactionBuilder] Ignoring original output to user (potential old change): value=${output.value}, script=${bytesToHex(output.script)}`);
@@ -855,7 +855,7 @@ export class BitcoinTransactionBuilder {
       // Create inputsToSign array for return value
       const inputsToSign: { index: number; address?: string; sighashTypes?: number[] }[] = [];
       for (let i = 0; i < psbt.inputCount; i++) {
-        inputsToSign.push({ index: i, address: userAddress, sighashTypes: [Transaction.SIGHASH_ALL] });
+        inputsToSign.push({ index: i, address: userAddress, sighashTypes: [bitcoin.Transaction.__SIGHASH_ALL] });
         try {
           psbt.finalizeInput(i);
           console.log(`[BitcoinTransactionBuilder] Successfully finalized input #${i} on final PSBT.`);
@@ -958,7 +958,7 @@ export class BitcoinTransactionBuilder {
             `Failed to fetch UTXO details for input ${index}: ${inputTxid}:${inputVout}`,
           );
         }
-        const inputValue = BigInt(utxoDetails.value);
+        const inputValue = BigInt(utxoDetails.value ?? 0);
         totalBuyerInputValue += inputValue;
         console.log(
           `[BitcoinTransactionBuilder] Fetched UTXO details for input ${index}: script=${utxoDetails.script}, value=${inputValue}`,
@@ -974,7 +974,7 @@ export class BitcoinTransactionBuilder {
           },
         });
         // Assuming all inputs from cpTx are to be signed by the userAddress
-        inputsToSign.push({ index, address: userAddress, sighashTypes: [Transaction.SIGHASH_ALL] });
+        inputsToSign.push({ index, address: userAddress, sighashTypes: [bitcoin.Transaction.__SIGHASH_ALL] });
       }
 
       let totalValueToOthers = BigInt(0);
@@ -990,7 +990,7 @@ export class BitcoinTransactionBuilder {
       // 2. OP_RETURN output from cpTx
       const opReturnOutput = cpTx.outs.find(out => out.script.length > 0 && out.script[0] === 0x6a);
       if (opReturnOutput) {
-        finalOutputs.push({ script: Buffer.from(opReturnOutput.script), value: BigInt(opReturnOutput.value) });
+        finalOutputs.push({ script: Buffer.from(opReturnOutput.script), value: BigInt(opReturnOutput.value ?? 0) });
       }
 
       // 3. Service fee output

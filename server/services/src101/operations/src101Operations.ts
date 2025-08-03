@@ -1,6 +1,6 @@
 import { SRC101Service } from "$server/services/src101/index.ts";
 import type { IDeploySRC101, IMintSRC101, ITransferSRC101, ISetrecordSRC101, IRenewSRC101, IPrepareSRC101TX } from "$server/types/services/src101.d.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 interface SRC101Operation {
   op: string;

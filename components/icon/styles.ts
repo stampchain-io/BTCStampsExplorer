@@ -27,15 +27,39 @@ export interface IconVariants {
   className?: string;
   role?: JSX.AriaRole;
   ariaLabel?: string;
-  onClick?: JSX.MouseEventHandler<
-    HTMLButtonElement | HTMLAnchorElement | HTMLImageElement | SVGElement
-  >;
-  onMouseEnter?: JSX.MouseEventHandler<
-    HTMLButtonElement | HTMLAnchorElement | HTMLImageElement | SVGElement
-  >;
-  onMouseLeave?: JSX.MouseEventHandler<
-    HTMLButtonElement | HTMLAnchorElement | HTMLImageElement | SVGElement
-  >;
+  onClick?:
+    | ((
+      e: MouseEvent & {
+        currentTarget:
+          | HTMLButtonElement
+          | HTMLAnchorElement
+          | HTMLImageElement
+          | SVGElement;
+      },
+    ) => void)
+    | undefined;
+  onMouseEnter?:
+    | ((
+      e: MouseEvent & {
+        currentTarget:
+          | HTMLButtonElement
+          | HTMLAnchorElement
+          | HTMLImageElement
+          | SVGElement;
+      },
+    ) => void)
+    | undefined;
+  onMouseLeave?:
+    | ((
+      e: MouseEvent & {
+        currentTarget:
+          | HTMLButtonElement
+          | HTMLAnchorElement
+          | HTMLImageElement
+          | SVGElement;
+      },
+    ) => void)
+    | undefined;
   href?: string;
   target?: string;
   rel?: string;

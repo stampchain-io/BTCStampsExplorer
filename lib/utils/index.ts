@@ -13,7 +13,6 @@ export * from "./bitcoin/index.ts";
 export * from "./api/index.ts";
 export * from "./data/index.ts";
 export * from "./navigation/index.ts";
-export * from "./monitoring/index.ts";
 export * from "./performance/index.ts";
 
 // Individual exports for backward compatibility
@@ -53,10 +52,10 @@ export * from "./data/identifiers/identifierUtils.ts";
 export * from "./data/protocols/protocol.ts";
 export * from "./data/protocols/imageProtocolUtils.ts";
 export * from "./navigation/freshNavigationUtils.ts";
-export * from "./monitoring/logging/logger.ts";
-export * from "./monitoring/metrics/monitoring.ts";
-export * from "./monitoring/errors/errorHandlingUtils.ts";
-export * from "./monitoring/notifications/notificationUtils.ts";
+export * from "./logging/logger.ts";
+export * from "./performance/fees/feeMonitoring.ts";
+export { ErrorHandlingUtils, type ErrorInfo } from "./errorHandling.ts";
+export { showNotification } from "./ui/notifications/sweetAlertUtils.ts";
 export * from "./performance/debounce.ts";
 export * from "./performance/storage/localStorage.ts";
 export * from "./performance/signals/feeSignal.ts";

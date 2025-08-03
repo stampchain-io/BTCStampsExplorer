@@ -1,10 +1,14 @@
 // TODO(@baba): Move checkbox + radiobuttons to form folder + rename file to RangeSlider.tsx and move to form folder
-import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { ComponentChildren } from "preact";
-import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
-import { handleIcon } from "$icon";
-import { labelLogicResponsive } from "$text";
 import { inputCheckbox } from "$form";
+import { handleIcon } from "$icon";
+import { formatNumberWithCommas } from "$lib/utils/ui/formatting/formatUtils.ts";
+import { labelLogicResponsive } from "$text";
+import type {
+  CheckboxProps,
+  RadioProps,
+  RangeInputProps,
+} from "$types/ui.d.ts";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 // Range Slider Component
 export const RangeSlider = ({
@@ -954,14 +958,6 @@ export const RangeSlider = ({
   );
 };
 
-interface RangeInputProps {
-  label: string;
-  placeholder: string;
-  value: string;
-  onChange: (value: string) => void;
-  type: "stamp" | "price";
-}
-
 export const RangeInput = (
   { label, placeholder, value, onChange, type }: RangeInputProps,
 ) => (
@@ -1025,13 +1021,6 @@ export const RangeInput = (
 );
 
 // Checkbox Component
-interface CheckboxProps {
-  label: string;
-  checked: boolean;
-  onChange: () => void;
-  hasDropdown?: boolean;
-  dropdownContent?: ComponentChildren;
-}
 
 export const Checkbox = ({
   label,
@@ -1043,7 +1032,7 @@ export const Checkbox = ({
   const [canHoverSelected, setCanHoverSelected] = useState(true);
 
   const handleChange = () => {
-    onChange();
+    onChange(!checked);
     setTimeout(() => setCanHoverSelected(false), 0);
   };
 
@@ -1079,13 +1068,6 @@ export const Checkbox = ({
 };
 
 // Radiobutton Component
-interface RadioProps {
-  label: string;
-  value: string;
-  checked: boolean;
-  onChange: () => void;
-  name: string;
-}
 
 export const Radiobutton = (
   { label, value, checked, onChange, name }: RadioProps,

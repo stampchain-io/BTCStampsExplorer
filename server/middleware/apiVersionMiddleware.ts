@@ -1,7 +1,7 @@
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { DEPRECATED_ENDPOINTS, VERSION_CONFIG, type VersionConfig } from "$constants";
+import { logger } from "$lib/utils/logger.ts";
+import type { Context, VersionContext } from "$types/ui.d.ts";
 
-// Use any types to avoid Fresh version compatibility issues
-type Context = any;
 type Next = any;
 
 /**
@@ -13,45 +13,8 @@ type Next = any;
  * Task 4.1: Implement API Version Header Middleware and Validation
  */
 
-export interface VersionConfig {
-  supportedVersions: string[];
-  defaultVersion: string;
-  deprecatedVersions: string[];
-  versionEndOfLife: Record<string, string>; // version -> EOL date
-}
-
-// Version configuration
-export const VERSION_CONFIG: VersionConfig = {
-  supportedVersions: ["2.2", "2.3"],
-  defaultVersion: "2.3", // Latest version by default
-  deprecatedVersions: ["2.1"],
-  versionEndOfLife: {
-    "2.1": "2025-06-01",
-    "2.2": "2025-12-01"
-  }
-};
-
-// ✅ ENDPOINT DEPRECATION CONFIGURATION
-// Endpoints that are deprecated in specific versions
-export const DEPRECATED_ENDPOINTS: Record<string, {
-  deprecatedInVersion: string;
-  reason: string;
-  alternative: string;
-  endOfLife: string;
-}> = {
-  "/api/v2/cursed": {
-    deprecatedInVersion: "2.3",
-    reason: "Redundant endpoint - use /api/v2/stamps with type=cursed filter instead",
-    alternative: "/api/v2/stamps?type=cursed",
-    endOfLife: "2025-12-01"
-  },
-  "/api/v2/cursed/": {
-    deprecatedInVersion: "2.3",
-    reason: "Redundant endpoint - use /api/v2/stamps with type=cursed filter instead",
-    alternative: "/api/v2/stamps?type=cursed",
-    endOfLife: "2025-12-01"
-  }
-};
+// Re-export for external use
+export { DEPRECATED_ENDPOINTS, VERSION_CONFIG, type VersionConfig };
 
 // Helper function to check if an endpoint is deprecated in a specific version
 export function isEndpointDeprecated(pathname: string, version: string): boolean {
@@ -107,12 +70,6 @@ const VERSION_FIELDS_TO_REMOVE: Record<string, string[]> = {
   "2.2": [] // Base version - no removals needed
 };
 
-export interface VersionContext {
-  version: string;
-  isDeprecated: boolean;
-  endOfLife?: string;
-  enhancedFields: string[];
-}
 
 /**
  * Parse API version from request headers

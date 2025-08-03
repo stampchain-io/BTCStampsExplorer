@@ -8,14 +8,47 @@
  */
 
 import type { FeeDetails } from "$types/base.d.ts";
-import type { ProgressiveFeeEstimationResult } from "$types/fee-estimation.ts";
+import type { ProgressiveFeeEstimationResult as FeeEstimationResult } from "$types/fee-estimation.ts";
+import type { ProgressiveFeeEstimationResult as UIProgressiveResult } from "$hooks/useProgressiveFeeEstimation.ts";
+import type { ProgressiveFeeEstimationProps } from "$types/ui.d.ts";
+
+/**
+ * Converts FeeEstimationResult to UIProgressiveResult
+ */
+function convertToUIProgressiveResult(
+  result: FeeEstimationResult | null,
+): UIProgressiveResult | null {
+  if (!result) return null;
+
+  return {
+    feeDetails: {
+      minerFee: result.minerFee || 0,
+      dustValue: result.dustValue || 0,
+      totalValue: result.totalValue || 0,
+      hasExactFees: result.hasExactFees || false,
+      estimatedSize: result.estimatedSize || 300,
+      serviceFee: result.serviceFee ?? null,
+      itemPrice: result.itemPrice ?? null,
+      effectiveFeeRate: result.effectiveFeeRate ?? null,
+    },
+    isEstimating: false,
+    estimationError: null,
+    refresh: () => {},
+    estimationCount: 0,
+    lastEstimationTime: result.timestamp || null,
+    cacheStatus: result.cacheHit ? "fresh" : "empty",
+    feeDetailsVersion: 1,
+    isPreFetching: false,
+    preFetchedFees: null,
+  };
+}
 
 /**
  * Maps progressive fee estimation result to FeeDetails interface
  * Used by all tools to ensure consistent fee details formatting
  */
 export function mapProgressiveFeeDetails(
-  progressiveFeeDetails: ProgressiveFeeEstimationResult | null,
+  progressiveFeeDetails: FeeEstimationResult | null,
   defaultEstimatedSize = 300,
 ): FeeDetails {
   if (!progressiveFeeDetails) {
@@ -37,18 +70,19 @@ export function mapProgressiveFeeDetails(
   };
 
   // Add optional fields only if they exist
-  if (progressiveFeeDetails.serviceFee !== undefined) {
-    feeDetails.serviceFee = progressiveFeeDetails.serviceFee;
-  }
-  if (progressiveFeeDetails.itemPrice !== undefined) {
-    feeDetails.itemPrice = progressiveFeeDetails.itemPrice;
-  }
-  if (progressiveFeeDetails.effectiveFeeRate !== undefined) {
-    feeDetails.effectiveFeeRate = progressiveFeeDetails.effectiveFeeRate;
-  }
-  if (progressiveFeeDetails.totalVsize !== undefined) {
-    feeDetails.totalVsize = progressiveFeeDetails.totalVsize;
-  }
+  const optionalFields = [
+    "serviceFee",
+    "itemPrice",
+    "effectiveFeeRate",
+    "totalVsize",
+  ];
+
+  optionalFields.forEach((field) => {
+    const value = progressiveFeeDetails[field];
+    if (value !== undefined) {
+      feeDetails[field] = value;
+    }
+  });
 
   return feeDetails;
 }
@@ -57,16 +91,6 @@ export function mapProgressiveFeeDetails(
  * Common progressive fee estimation props for FeeCalculatorBase
  * Ensures consistent props across all tools
  */
-export interface ProgressiveFeeEstimationProps {
-  isEstimating?: boolean;
-  isPreFetching?: boolean;
-  currentPhase?: "instant" | "cached" | "exact";
-  phase1Result?: ProgressiveFeeEstimationResult | null;
-  phase2Result?: ProgressiveFeeEstimationResult | null;
-  phase3Result?: ProgressiveFeeEstimationResult | null;
-  feeEstimationError?: Error | null;
-  clearError?: () => void;
-}
 
 /**
  * Extracts progressive fee estimation props from hook result
@@ -76,9 +100,9 @@ export function extractProgressiveFeeProps(hookResult: {
   isEstimating?: boolean;
   isPreFetching?: boolean;
   currentPhase?: "instant" | "cached" | "exact";
-  phase1Result?: ProgressiveFeeEstimationResult | null;
-  phase2Result?: ProgressiveFeeEstimationResult | null;
-  phase3Result?: ProgressiveFeeEstimationResult | null;
+  phase1Result?: FeeEstimationResult | null;
+  phase2Result?: FeeEstimationResult | null;
+  phase3Result?: FeeEstimationResult | null;
   error?: Error | null;
   clearError?: () => void;
 }): ProgressiveFeeEstimationProps {
@@ -94,13 +118,13 @@ export function extractProgressiveFeeProps(hookResult: {
     props.currentPhase = hookResult.currentPhase;
   }
   if (hookResult.phase1Result !== undefined) {
-    props.phase1Result = hookResult.phase1Result;
+    props.phase1Result = convertToUIProgressiveResult(hookResult.phase1Result);
   }
   if (hookResult.phase2Result !== undefined) {
-    props.phase2Result = hookResult.phase2Result;
+    props.phase2Result = convertToUIProgressiveResult(hookResult.phase2Result);
   }
   if (hookResult.phase3Result !== undefined) {
-    props.phase3Result = hookResult.phase3Result;
+    props.phase3Result = convertToUIProgressiveResult(hookResult.phase3Result);
   }
   if (hookResult.error !== undefined) {
     props.feeEstimationError = hookResult.error;

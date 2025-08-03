@@ -1,5 +1,6 @@
+// All handler context and response type imports removed - not used in this file
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-// import { TickHandlerContext } from "$globals"; // Temporarily replaced
+//  // Temporarily replaced
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { FreshContext } from "$fresh/server.ts";
 

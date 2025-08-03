@@ -2,12 +2,12 @@
 // Based on API discovery from testing - supports 6 methods:
 // getAddresses, signPsbt, signMessage, fairmint, dispense, openOrder
 
+import { getGlobalWallets, walletContext } from "$client/wallet/wallet.ts";
 import type { HorizonAddress, HorizonWalletAPI } from "$lib/types/wallet.d.ts";
 import { getBTCBalanceInfo } from "$lib/utils/data/processing/balanceUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import type { BaseToast } from "$lib/utils/ui/notifications/toastSignal.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
-import { getGlobalWallets, walletContext } from "./wallet.ts";
 
 // Helper function to get Horizon provider safely
 const getHorizonProvider = (): HorizonWalletAPI | undefined => {
@@ -138,9 +138,10 @@ export class HorizonWallet {
       }
 
       throw new Error("Invalid response format from Horizon Wallet");
-    } catch (error: any) {
-      if (error.error && typeof error.error === "string") {
-        throw new Error(error.error);
+    } catch (error) {
+      const err = error as import("$lib/types/errors.d.ts").CatchError;
+      if (err.error && typeof err.error === "string") {
+        throw new Error(err.error);
       }
       throw error;
     }
@@ -192,9 +193,10 @@ export class HorizonWallet {
           JSON.stringify(response, null, 2)
         }`,
       );
-    } catch (error: any) {
-      if (error.error && typeof error.error === "string") {
-        throw new Error(error.error);
+    } catch (error) {
+      const err = error as import("$lib/types/errors.d.ts").CatchError;
+      if (err.error && typeof err.error === "string") {
+        throw new Error(err.error);
       }
       throw error;
     }
@@ -251,9 +253,10 @@ export class HorizonWallet {
       });
 
       return response.signature || response;
-    } catch (error: any) {
-      if (error.error && typeof error.error === "string") {
-        throw new Error(error.error);
+    } catch (error) {
+      const err = error as import("$lib/types/errors.d.ts").CatchError;
+      if (err.error && typeof err.error === "string") {
+        throw new Error(err.error);
       }
       throw error;
     }
@@ -288,9 +291,10 @@ export class HorizonWallet {
       });
 
       return response.hex || response.signedPsbt || response;
-    } catch (error: any) {
-      if (error.error && typeof error.error === "string") {
-        throw new Error(error.error);
+    } catch (error) {
+      const err = error as import("$lib/types/errors.d.ts").CatchError;
+      if (err.error && typeof err.error === "string") {
+        throw new Error(err.error);
       }
       throw error;
     }
@@ -306,9 +310,10 @@ export class HorizonWallet {
 
     try {
       return await this.provider.request("fairmint", params);
-    } catch (error: any) {
-      if (error.error && typeof error.error === "string") {
-        throw new Error(error.error);
+    } catch (error) {
+      const err = error as import("$lib/types/errors.d.ts").CatchError;
+      if (err.error && typeof err.error === "string") {
+        throw new Error(err.error);
       }
       throw error;
     }
@@ -324,9 +329,10 @@ export class HorizonWallet {
 
     try {
       return await this.provider.request("dispense", params);
-    } catch (error: any) {
-      if (error.error && typeof error.error === "string") {
-        throw new Error(error.error);
+    } catch (error) {
+      const err = error as import("$lib/types/errors.d.ts").CatchError;
+      if (err.error && typeof err.error === "string") {
+        throw new Error(err.error);
       }
       throw error;
     }
@@ -342,9 +348,10 @@ export class HorizonWallet {
 
     try {
       return await this.provider.request("openOrder", params);
-    } catch (error: any) {
-      if (error.error && typeof error.error === "string") {
-        throw new Error(error.error);
+    } catch (error) {
+      const err = error as import("$lib/types/errors.d.ts").CatchError;
+      if (err.error && typeof err.error === "string") {
+        throw new Error(err.error);
       }
       throw error;
     }

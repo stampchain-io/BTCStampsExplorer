@@ -1,4 +1,5 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import type { StampTransfersProps } from "$types/ui.d.ts";
 import { rowTable } from "$layout";
 import {
   abbreviateAddress,
@@ -16,10 +17,6 @@ interface SendRow {
   cpid?: string;
 }
 
-interface StampTransfersProps {
-  sends: SendRow[];
-}
-
 export function StampTransfersTable({ sends }: StampTransfersProps) {
   const headers = ["FROM", "TO", "QUANTITY", "TX HASH", "DATE"];
 
@@ -27,12 +24,14 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
     <div class="w-[500px] min-[500px]:w-full">
       <table class={`${valueSm} w-full`}>
         <colgroup>
-          {colGroup().map((col) => <col key={col.key} class={col.className} />)}
+          {colGroup().map((col: any) => (
+            <col key={col.key} class={col.className} />
+          ))}
         </colgroup>
-        {sends.length > 0 && (
+        {(sends?.length ?? 0) > 0 && (
           <thead>
             <tr>
-              {headers.map((header, i) => (
+              {headers.map((header: string, i: number) => (
                 <th
                   key={i}
                   class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
@@ -45,8 +44,8 @@ export function StampTransfersTable({ sends }: StampTransfersProps) {
           </thead>
         )}
         <tbody>
-          {sends.length
-            ? sends?.map((send, index) => (
+          {(sends?.length ?? 0) > 0
+            ? sends?.map((send: SendRow, index: number) => (
               <tr key={`${send.tx_hash}-${index}`} class={rowTable}>
                 <td class={cellAlign(0, headers.length)}>
                   {send.source

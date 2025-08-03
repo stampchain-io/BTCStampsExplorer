@@ -4,7 +4,7 @@
  * Focuses on file writing, client-side scenarios, and edge cases
  */
 
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { assert, assertEquals } from "@std/assert";
 
 // Save original console methods and Deno

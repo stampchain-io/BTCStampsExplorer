@@ -1,13 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
+import type { SettingProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
-
-interface SettingProps {
-  initFilter: string[];
-  open: boolean;
-  handleOpen: (open: boolean) => void;
-  filterButtons: string[];
-  onFilterClick?: (filter: string) => void;
-}
 
 export function Setting({
   initFilter = [],
@@ -27,7 +20,7 @@ export function Setting({
     if (onFilterClick) {
       onFilterClick(filter);
     }
-    handleOpen(false);
+    handleOpen?.(false);
   };
 
   return (
@@ -46,11 +39,11 @@ export function Setting({
               color="custom"
               weight="normal"
               className="absolute top-5 right-2"
-              onClick={() => handleOpen(false)}
+              onClick={() => handleOpen?.(false)}
               ariaLabel="Close"
             />
             <p class="text-lg font-black text-[#AA00FF] mb-1">TOOLS</p>
-            {filterButtons.map((filter) => (
+            {filterButtons?.map((filter: string) => (
               <button
                 key={filter}
                 type="button"
@@ -75,7 +68,7 @@ export function Setting({
             color="purple"
             className="mt-[5px] w-[26px] h-[26px] tablet:w-[24px] tablet:h-[24px] transform transition-all duration-300"
             ariaLabel="Settings"
-            onClick={() => handleOpen(true)}
+            onClick={() => handleOpen?.(true)}
             onMouseEnter={() => setVisible(true)}
             onMouseLeave={() => setVisible(false)}
           />

@@ -17,19 +17,13 @@ import type {
   StampTransactionOptions,
   ToolType,
 } from "$lib/types/toolEndpointAdapter.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import type { BasicUTXO } from "$lib/types/base.d.ts";
+import { logger } from "$lib/utils/logger.ts";
 import {
   toolEndpointFeeEstimator,
 } from "$lib/utils/bitcoin/minting/ToolEndpointFeeEstimator.ts";
 
 // Core interfaces for the fee estimation system
-export interface BasicUTXO {
-  txid: string;
-  vout: number;
-  value: number;
-  scriptType: "P2WPKH" | "P2SH" | "P2PKH" | "P2WSH";
-  confirmations: number;
-}
 
 export interface DetailedUTXO extends BasicUTXO {
   script: string;
@@ -66,12 +60,12 @@ export interface EstimationOptions {
     | "src20-deploy"
     | "src20-transfer"
     | "src101-create";
-  walletAddress?: string;
+  walletAddress: string | undefined;
   feeRate: number;
   isConnected: boolean;
-  isSubmitting?: boolean;
+  isSubmitting: boolean | undefined;
   // Tool-specific parameters
-  [key: string]: any;
+  [key: string]: any | undefined;
 }
 
 /**

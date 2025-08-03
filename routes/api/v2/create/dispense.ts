@@ -1,5 +1,6 @@
 // routes/api/v2/dispense.ts
 import { Handlers } from "$fresh/server.ts";
+// FeeDetails import removed - not used in this file
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { serverConfig } from "$server/config/config.ts";

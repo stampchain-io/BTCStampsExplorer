@@ -6,8 +6,8 @@ import * as bitcoin from "bitcoinjs-lib";
 import {
   assertEquals,
   assertExists,
-} from "https://deno.land/std@0.208.0/assert/mod.ts";
-import { stub } from "https://deno.land/std@0.208.0/testing/mock.ts";
+} from "@std/assert/mod.ts";
+import { stub } from "@std/testing/mock.ts";
 import { mintAddressUTXOs } from "../fixtures/utxoFixtures.mint.ts";
 
 /**

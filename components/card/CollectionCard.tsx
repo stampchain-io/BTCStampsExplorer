@@ -1,5 +1,5 @@
 /* ===== COLLECTION OVERVIEW CARD COMPONENT ===== */
-import { Collection } from "$globals";
+import type { CollectionWithOptionalMarketData } from "$types";
 import {
   abbreviateAddress,
   formatBTC,
@@ -17,11 +17,21 @@ function abbreviateCollectionName(name: string): string {
 
 /* ===== COMPONENT ===== */
 export function CollectionCard(
-  { collection }: { collection: Collection },
+  { collection }: { collection: CollectionWithOptionalMarketData },
 ) {
+  // Early return if collection is undefined
+  if (!collection) {
+    return null;
+  }
+
+  // Safe access to collection properties with fallbacks
+  const collectionName = collection.collection_name ?? "Unknown Collection";
+  const stampImage = collection.first_stamp_image ?? collection.img ?? "";
+  const stampCount = collection.stamp_count ?? 0;
+
   return (
     <a
-      href={`/collection/detail/${collection.collection_name}`}
+      href={`/collection/detail/${collectionName}`}
       className={`${containerBackground} gap-6 hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent group`}
     >
       {/* ===== CARD HEADER ===== */}
@@ -29,7 +39,7 @@ export function CollectionCard(
         <div class="min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[98px] mobileMd:min-h-[98px] mobileMd:max-w-[98px] mobileMd:max-h-[98px] rounded aspect-stamp image-rendering-pixelated overflow-hidden">
           <div class="relative flex items-center justify-center w-full h-full">
             <img
-              src={collection.first_stamp_image || collection.img}
+              src={stampImage}
               alt=""
               className="w-full h-full"
             />
@@ -40,11 +50,11 @@ export function CollectionCard(
             {/* check code */}
             <h2 class="font-black text-2xl gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] tracking-wide inline-block w-fit">
               <span class="min-[420px]:hidden">
-                {abbreviateCollectionName(collection.collection_name)
+                {abbreviateCollectionName(collectionName)
                   .toUpperCase()}
               </span>
               <span class="hidden min-[420px]:inline">
-                {collection.collection_name.toUpperCase()}
+                {collectionName.toUpperCase()}
               </span>
             </h2>
 
@@ -57,20 +67,29 @@ export function CollectionCard(
                       {/* Use creator name if available, otherwise fall back to address */}
                       {collection.creator_names &&
                           collection.creator_names.length > 0
-                        ? <span>{collection.creator_names[0]}</span>
+                        ? <span>{collection.creator_names?.[0] ?? ""}</span>
                         : (
                           <>
                             <span class="mobileMd:hidden">
-                              {abbreviateAddress(collection.creators[0], 4)}
+                              {abbreviateAddress(
+                                collection.creators?.[0] ?? "",
+                                4,
+                              )}
                             </span>
                             <span class="hidden mobileMd:inline mobileLg:hidden">
-                              {abbreviateAddress(collection.creators[0], 7)}
+                              {abbreviateAddress(
+                                collection.creators?.[0] ?? "",
+                                7,
+                              )}
                             </span>
                             <span class="hidden mobileLg:inline tablet:hidden">
-                              {abbreviateAddress(collection.creators[0], 9)}
+                              {abbreviateAddress(
+                                collection.creators?.[0] ?? "",
+                                9,
+                              )}
                             </span>
                             <span class="hidden tablet:inline">
-                              {collection.creators[0]}
+                              {collection.creators?.[0] ?? ""}
                             </span>
                           </>
                         )}
@@ -84,13 +103,13 @@ export function CollectionCard(
             <h5 class={`${labelSm} -mt-0.5`}>
               STAMPS{" "}
               <span class={valueSm}>
-                {collection.stamp_count}
+                {stampCount}
               </span>
             </h5>
             <h5 class={`${labelSm} -mt-0.5 hidden mobileLg:block`}>
               VOLUME{" "}
               <span class={valueSm}>
-                {collection.marketData?.totalVolume24hBTC !== undefined
+                {collection.marketData?.totalVolume24hBTC
                   ? formatVolume(collection.marketData.totalVolume24hBTC)
                   : "N/A"}
               </span>{"  "}
@@ -102,8 +121,7 @@ export function CollectionCard(
               <span class="min-[400px]:hidden">PRICE</span>
               <span class="hidden min-[400px]:inline">FLOOR PRICE</span>{" "}
               <span class={valueSm}>
-                {collection.marketData?.minFloorPriceBTC !== null &&
-                    collection.marketData?.minFloorPriceBTC !== undefined
+                {collection.marketData?.minFloorPriceBTC
                   ? formatBTC(collection.marketData.minFloorPriceBTC)
                   : "N/A"}
               </span>{" "}
@@ -113,8 +131,7 @@ export function CollectionCard(
               <span class="min-[400px]:hidden">MCAP</span>
               <span class="hidden min-[400px]:inline">MARKETCAP</span>{" "}
               <span class={valueSm}>
-                {collection.marketData?.minFloorPriceBTC !== null &&
-                    collection.marketData?.minFloorPriceBTC !== undefined &&
+                {collection.marketData?.minFloorPriceBTC &&
                     collection.total_editions
                   ? formatMarketCap(
                     collection.marketData.minFloorPriceBTC *
@@ -132,7 +149,7 @@ export function CollectionCard(
       <div class="grid grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-6 tablet:grid-cols-8 desktop:grid-cols-10 gap-6">
         {collection.stamp_images &&
           collection.stamp_images.slice(-10).reverse().map(
-            (imageUrl, index) => {
+            (imageUrl: string, index: number) => {
               return (
                 <div
                   className={`w-full h-full rounded aspect-stamp image-rendering-pixelated overflow-hidden ${

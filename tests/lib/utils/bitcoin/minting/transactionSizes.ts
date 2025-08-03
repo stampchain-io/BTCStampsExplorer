@@ -5,7 +5,7 @@ import type {
   ScriptType,
 } from "$lib/types/transaction.d.ts";
 import { getScriptTypeInfo as getScriptTypeInfoFromUtils } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 // Using imported types for the options if they resolve correctly
 interface InternalTransactionSizeOptions {
@@ -27,7 +27,7 @@ function calculateWitnessWeight(
 ) {
   if (!input.isWitness) return 0;
   // Normalize script type to uppercase for comparison
-  const normalizedType = input.type.toUpperCase();
+  const normalizedType = input.type?.toUpperCase() ?? "UNKNOWN";
   if (
     normalizedType === "P2WPKH" || normalizedType === "P2WSH" ||
     normalizedType === "P2TR"

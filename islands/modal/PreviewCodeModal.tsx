@@ -1,13 +1,11 @@
 /* ===== PREVIEW CODE MODAL COMPONENT ===== */
 import { useEffect, useState } from "preact/hooks";
+import type { PreviewCodeModalProps } from "$types/ui.d.ts";
 import { ModalBase } from "$layout";
 import { closeModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 /* ===== TYPES ===== */
-interface PreviewCodeModalProps {
-  src: string;
-}
 
 /* ===== COMPONENT ===== */
 export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
@@ -17,7 +15,7 @@ export default function PreviewCodeModal({ src }: PreviewCodeModalProps) {
   /* ===== EFFECTS ===== */
   // Effect to format the source code
   useEffect(() => {
-    setFormattedSrc(formatHtmlSource(src));
+    setFormattedSrc(formatHtmlSource(src ?? ""));
   }, [src]);
 
   /* ===== HELPER FUNCTIONS ===== */

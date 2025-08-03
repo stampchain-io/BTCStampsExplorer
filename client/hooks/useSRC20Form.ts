@@ -1,57 +1,15 @@
 import { useConfig } from "$client/hooks/useConfig.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { useFees } from "$fees";
-import { Config } from "$globals";
-import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
-import { showNotification } from "$lib/utils/notificationUtils.ts";
+import { showSuccess } from "$lib/utils/monitoring/notifications/notificationUtils.ts";
+import { debounce } from "$lib/utils/performance/debounce.ts";
+import { handleUnknownError } from "$lib/utils/errorHandling.ts";
+import { Config } from "$types/base.d.ts";
+import type { SRC20FormState } from "$types/ui.d.ts";
 import axiod from "axiod";
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
-
-interface PSBTFees {
-  estMinerFee: number;
-  totalDustValue: number;
-  hasExactFees: boolean;
-  totalValue: number;
-  effectiveFeeRate: number;
-  estimatedSize?: number;
-  totalVsize?: number;
-  est_tx_size?: number;
-  hex?: string;
-  inputsToSign?: Array<
-    { index: number; address?: string; sighashTypes?: number[] }
-  >;
-}
-
-interface SRC20FormState {
-  toAddress: string;
-  token: string;
-  amt: string;
-  fee: number;
-  feeError: string;
-  BTCPrice: number;
-  jsonSize: number;
-  apiError: string;
-  toAddressError: string;
-  tokenError: string;
-  amtError: string;
-  max: string;
-  maxError: string;
-  lim: string;
-  limError: string;
-  dec: string;
-  x: string;
-  xError: string;
-  tg: string;
-  web: string;
-  email: string;
-  img: string;
-  description: string;
-  file: File | null;
-  psbtFees?: PSBTFees;
-  maxAmount?: string;
-}
 
 export class SRC20FormController {
   private static prepareTxDebounced = debounce(async (
@@ -92,11 +50,14 @@ export class SRC20FormController {
       setFormState((prev) => ({
         ...prev,
         psbtFees: {
-          estMinerFee: immediateEstimate,
+          minerFee: immediateEstimate,
+          estMinerFee: immediateEstimate, // backward compatibility
           totalDustValue: dustValue,
-          totalValue: totalEstimate,
+          totalFee: totalEstimate,
+          totalValue: totalEstimate, // required by FeeDetails
           hasExactFees: false, // Mark as estimate
-          effectiveFeeRate: formState.fee,
+          feeRate: formState.fee,
+          effectiveFeeRate: formState.fee, // backward compatibility
           estimatedSize: Math.ceil(immediateEstimate / formState.fee),
         },
         isLoading: true, // Show that we're upgrading to exact fees
@@ -113,10 +74,18 @@ export class SRC20FormController {
           isEstimate: true,
         },
       });
-    } catch (error) {
+    } catch (unknownError) {
+      const error = handleUnknownError(
+        unknownError,
+        "Failed to provide immediate fee estimate",
+      );
       logger.error("stamps", {
         message: "Failed to provide immediate fee estimate",
-        error: error instanceof Error ? error.message : String(error),
+        error: error.message,
+        errorDetails: {
+          name: error.name,
+          stack: error.stack,
+        },
       });
     }
 
@@ -205,13 +174,17 @@ export class SRC20FormController {
           const newState = {
             ...prev,
             psbtFees: {
-              estMinerFee: Number(response.data.est_miner_fee) || 0,
+              minerFee: Number(response.data.est_miner_fee) || 0,
+              estMinerFee: Number(response.data.est_miner_fee) || 0, // backward compatibility
               totalDustValue: Number(response.data.total_dust_value) || 0,
-              hasExactFees: !shouldUseDryRun, // Exact fees when dryRun=false, estimates when dryRun=true
-              totalValue: (Number(response.data.est_miner_fee) || 0) +
+              totalFee: (Number(response.data.est_miner_fee) || 0) +
                 (Number(response.data.total_dust_value) || 0),
+              totalValue: (Number(response.data.est_miner_fee) || 0) +
+                (Number(response.data.total_dust_value) || 0), // required by FeeDetails
+              hasExactFees: !shouldUseDryRun, // Exact fees when dryRun=false, estimates when dryRun=true
+              feeRate: Number(response.data.feeDetails?.effectiveFeeRate) || 0,
               effectiveFeeRate:
-                Number(response.data.feeDetails?.effectiveFeeRate) || 0,
+                Number(response.data.feeDetails?.effectiveFeeRate) || 0, // backward compatibility
               estimatedSize: Number(response.data.est_tx_size) ||
                 Number(response.data.feeDetails?.estimatedSize) || 0,
               totalVsize: Number(response.data.feeDetails?.totalVsize) || 0,
@@ -247,10 +220,15 @@ export class SRC20FormController {
           },
         });
       }
-    } catch (error) {
+    } catch (unknownError) {
+      const error = handleUnknownError(unknownError, "Fee calculation failed");
       logger.error("stamps", {
         message: "Fee calculation failed",
-        error,
+        error: error.message,
+        errorDetails: {
+          name: error.name,
+          stack: error.stack,
+        },
         data: {
           action,
           token: formState.token,
@@ -281,8 +259,12 @@ export class SRC20FormController {
       } else {
         setFormState((prev) => ({ ...prev, tokenError: "" }));
       }
-    } catch (error) {
-      console.error("Error checking tick existence:", error);
+    } catch (unknownError) {
+      const error = handleUnknownError(
+        unknownError,
+        "Error checking tick existence",
+      );
+      console.error("Error checking tick existence:", error.message);
       setFormState((prev) => ({ ...prev, tokenError: "" }));
     }
   }, 800);
@@ -361,11 +343,14 @@ export function useSRC20Form(
     description: "",
     file: null as File | null,
     psbtFees: {
-      estMinerFee: 0,
+      minerFee: 0,
+      estMinerFee: 0, // backward compatibility
       totalDustValue: 0,
+      totalFee: 0,
+      totalValue: 0, // required by FeeDetails
       hasExactFees: false,
-      totalValue: 0,
-      effectiveFeeRate: 0,
+      feeRate: 0,
+      effectiveFeeRate: 0, // backward compatibility
       estimatedSize: 0,
     },
   });
@@ -569,8 +554,10 @@ export function useSRC20Form(
     isSubmitting,
   ]);
 
-  const handleInputChange = (e: Event, field: string) => {
-    const value = (e.target as HTMLInputElement).value;
+  const handleInputChange = (e: Event | string, field: string) => {
+    const value = typeof e === "string"
+      ? e
+      : (e.target as HTMLInputElement).value;
     let newValue = value;
 
     if (field === "token") {
@@ -806,10 +793,8 @@ export function useSRC20Form(
         );
 
         if (walletResult.signed) {
-          showNotification(
-            "Transaction Successfully.",
-            walletResult.txid,
-            "success",
+          showSuccess(
+            `Transaction Successfully. TXID: ${walletResult.txid}`
           );
         } else if (walletResult.cancelled) {
           setSubmissionMessage({
@@ -924,13 +909,21 @@ export function useSRC20Form(
 
         return response.data;
       }
-    } catch (error) {
+    } catch (unknownError) {
+      const error = handleUnknownError(
+        unknownError,
+        `${action} error occurred`,
+      );
       logger.error("ui", {
         message: `${action} error occurred`,
-        error: error instanceof Error ? error.message : String(error),
-        details: error,
+        error: error.message,
+        errorDetails: {
+          name: error.name,
+          stack: error.stack,
+        },
+        originalError: unknownError,
       });
-      const resolvedApiError = error instanceof Error
+      const resolvedApiError = error
         ? error.message
         : (error as any).response?.data?.error ||
           "An unexpected error occurred";

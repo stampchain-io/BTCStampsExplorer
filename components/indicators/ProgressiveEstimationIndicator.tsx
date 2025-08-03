@@ -1,3 +1,4 @@
+import type { ProgressiveEstimationIndicatorProps } from "$types/ui.d.ts";
 /**
  * Progressive Fee Estimation Indicator Component
  *
@@ -10,25 +11,6 @@
  */
 
 import { VNode } from "preact";
-
-interface ProgressiveEstimationIndicatorProps {
-  /** Whether the component is currently connected to a wallet */
-  isConnected: boolean;
-  /** Whether a transaction is being submitted */
-  isSubmitting: boolean;
-  /** Whether pre-fetching UTXO data is in progress */
-  isPreFetching: boolean;
-  /** Current estimation phase: "instant" | "smart" | "exact" */
-  currentPhase: "instant" | "smart" | "exact";
-  /** Phase completion flags */
-  phase1: boolean;
-  phase2: boolean;
-  phase3: boolean;
-  /** Error message if estimation failed */
-  feeEstimationError: string | null;
-  /** Function to clear the error */
-  clearError: () => void;
-}
 
 export function ProgressiveEstimationIndicator({
   isConnected,

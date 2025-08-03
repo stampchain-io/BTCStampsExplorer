@@ -1,4 +1,5 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import type { StampSalesProps } from "$types/ui.d.ts";
 import { rowTable } from "$layout";
 import {
   abbreviateAddress,
@@ -6,19 +7,6 @@ import {
   formatSatoshisToBTC,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
-
-interface Dispense {
-  source: string;
-  destination: string;
-  dispense_quantity: number;
-  satoshirate: number;
-  tx_hash: string;
-  block_time: number | null;
-}
-
-interface StampSalesProps {
-  dispenses: Dispense[];
-}
 
 export function StampSalesTable({ dispenses }: StampSalesProps) {
   const headers = ["FROM", "TO", "QUANTITY", "PRICE", "DATE"];
@@ -29,7 +17,7 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
         <colgroup>
           {colGroup().map((col) => <col key={col.key} class={col.className} />)}
         </colgroup>
-        {dispenses.length > 0 && (
+        {(dispenses?.length ?? 0) > 0 && (
           <thead>
             <tr>
               {headers.map((header, i) => (
@@ -45,7 +33,7 @@ export function StampSalesTable({ dispenses }: StampSalesProps) {
           </thead>
         )}
         <tbody>
-          {dispenses.length
+          {(dispenses?.length ?? 0) > 0
             ? dispenses?.map((dispense, index) => (
               <tr key={`${dispense.tx_hash}-${index}`} class={rowTable}>
                 <td class={cellAlign(0, headers.length)}>

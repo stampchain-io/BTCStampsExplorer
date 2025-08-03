@@ -1,14 +1,14 @@
-import { useCallback } from "preact/hooks";
+import { StampFilterType } from "$constants";
+import { SRC20_FILTER_TYPES } from "$types/src20.d.ts";
 import {
   COLLECTION_FILTER_TYPES,
   LISTING_FILTER_TYPES,
-  SRC20_FILTER_TYPES,
-  STAMP_FILTER_TYPES,
   WALLET_FILTER_TYPES,
-} from "$globals";
+} from "$types/wallet.d.ts";
+import { useCallback } from "preact/hooks";
 
 type FilterTypes =
-  | STAMP_FILTER_TYPES
+  | StampFilterType
   | SRC20_FILTER_TYPES
   | COLLECTION_FILTER_TYPES
   | WALLET_FILTER_TYPES

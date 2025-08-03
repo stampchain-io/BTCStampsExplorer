@@ -1,17 +1,19 @@
-import {
-  STAMP_EDITIONS,
-  STAMP_FILESIZES,
-  STAMP_FILETYPES,
-  STAMP_MARKETPLACE as _STAMP_MARKETPLACE,
-  STAMP_RANGES,
-} from "$globals";
+import type {
+  FrontendStampType,
+  StampEdition,
+  StampFilesize,
+  StampFiletype,
+  StampMarketplace,
+  StampRange,
+} from "$constants";
+import { FRONTEND_STAMP_TYPE_VALUES } from "$constants";
 
 export type StampFilters = {
   // Stamp Type Filter (NEW!)
-  stampType: "cursed" | "classic" | "posh"; // Removed "all" and "stamps"
+  stampType: FrontendStampType;
 
   // Market Place filters
-  market: Extract<_STAMP_MARKETPLACE, "listings" | "sales"> | "";
+  market: Extract<StampMarketplace, "listings" | "sales"> | "";
 
   // LISTINGS options
   dispensers: boolean;
@@ -20,7 +22,7 @@ export type StampFilters = {
   // Listings price range
   listings:
     | Extract<
-      _STAMP_MARKETPLACE,
+      StampMarketplace,
       "all" | "bargain" | "affordable" | "premium" | "custom"
     >
     | "";
@@ -29,7 +31,7 @@ export type StampFilters = {
 
   // SALES options
   sales:
-    | Extract<_STAMP_MARKETPLACE, "recent" | "premium" | "custom" | "volume">
+    | Extract<StampMarketplace, "recent" | "premium" | "custom" | "volume">
     | "";
   salesMin: string;
   salesMax: string;
@@ -40,12 +42,12 @@ export type StampFilters = {
   volumeMax: string; // Maximum volume in BTC
 
   // Other existing filters
-  fileType: STAMP_FILETYPES[];
-  fileSize: STAMP_FILESIZES | null;
+  fileType: StampFiletype[];
+  fileSize: StampFilesize | null;
   fileSizeMin: string;
   fileSizeMax: string;
-  editions: STAMP_EDITIONS[];
-  range: STAMP_RANGES | null;
+  editions: StampEdition[];
+  range: StampRange | null;
   rangeMin: string;
   rangeMax: string;
 
@@ -321,14 +323,14 @@ export function filtersToQueryParams(
 }
 
 export function filtersToServicePayload(filters: StampFilters) {
-  let range: STAMP_RANGES | undefined = undefined;
+  let range: StampRange | undefined = undefined;
   if (filters.range) {
     range = filters.range;
   } else if (filters.rangeMin || filters.rangeMax) {
     range = "custom";
   }
 
-  let fileSize: STAMP_FILESIZES | undefined = undefined;
+  let fileSize: StampFilesize | undefined = undefined;
   if (filters.fileSize) {
     fileSize = filters.fileSize;
   } else if (filters.fileSizeMin || filters.fileSizeMax) {
@@ -459,14 +461,9 @@ export function queryParamsToFilters(query: string): StampFilters {
   const stampTypeParam = params.get("type") || params.get("stampType");
   if (
     stampTypeParam &&
-    ["cursed", "classic", "posh"].includes(
-      stampTypeParam,
-    )
+    FRONTEND_STAMP_TYPE_VALUES.includes(stampTypeParam as any)
   ) {
-    filtersPartial.stampType = stampTypeParam as
-      | "cursed"
-      | "classic"
-      | "posh";
+    filtersPartial.stampType = stampTypeParam as FrontendStampType;
   }
 
   // Parse market type parameter
@@ -557,19 +554,19 @@ export function queryParamsToFilters(query: string): StampFilters {
   // Parse filetype parameter
   const filetypeParam = params.get("filetype");
   if (filetypeParam) {
-    filtersPartial.fileType = filetypeParam.split(",") as STAMP_FILETYPES[];
+    filtersPartial.fileType = filetypeParam.split(",") as StampFiletype[];
   }
 
   // Parse editions parameter
   const editionsParam = params.get("editions");
   if (editionsParam) {
-    filtersPartial.editions = editionsParam.split(",") as STAMP_EDITIONS[];
+    filtersPartial.editions = editionsParam.split(",") as StampEdition[];
   }
 
   // Parse range parameters (flat structure)
   const range = params.get("range");
   if (range) {
-    filtersPartial.range = range as STAMP_RANGES;
+    filtersPartial.range = range as StampRange;
   }
 
   const rangeMin = params.get("rangeMin");
@@ -585,7 +582,7 @@ export function queryParamsToFilters(query: string): StampFilters {
   // Parse file size parameters
   const fileSize = params.get("fileSize");
   if (fileSize) {
-    filtersPartial.fileSize = fileSize as STAMP_FILESIZES;
+    filtersPartial.fileSize = fileSize as StampFilesize;
   }
 
   const fileSizeMin = params.get("fileSizeMin");

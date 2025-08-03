@@ -1,7 +1,7 @@
 import { arraysEqual } from "$lib/utils/data/binary/baseUtils.ts";
 import { SRC20CompressionService } from "$server/services/src20/compression/compressionService.ts";
 import { assertEquals, assertInstanceOf } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("SRC20CompressionService", () => {
   describe("zLibCompress", () => {

@@ -1,26 +1,16 @@
+import type { SUBPROTOCOLS } from "$types/base.d.ts";
 /* ===== COLLECTION DETAILS PAGE ===== */
+
+import type { StampFilterType } from "$constants";
 import { CollectionDetailContent } from "$content";
 import { FreshContext, Handlers } from "$fresh/server.ts";
-import { STAMP_FILTER_TYPES, StampRow, SUBPROTOCOLS } from "$globals";
+import type { CollectionDetailsPageProps } from "$types/ui.d.ts";
+
 import { CollectionDetailHeader } from "$header";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
 /* ===== TYPES ===== */
-type CollectionDetailsPageProps = {
-  data: {
-    id: string;
-    collection: any;
-    stamps: StampRow[];
-    total: number;
-    page: number;
-    pages: number;
-    page_size: number;
-    selectedTab: "all" | "classic" | "posh";
-    sortBy: string;
-    filterBy: string[];
-  };
-};
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers = {
@@ -34,7 +24,7 @@ export const handler: Handlers = {
         ? "ASC"
         : "DESC";
       const filterBy = url.searchParams.get("filterBy")?.split(",").map((f) =>
-        f as STAMP_FILTER_TYPES
+        f as StampFilterType
       ) || [];
       const selectedTab = url.searchParams.get("ident") || "all";
       const ident: SUBPROTOCOLS[] = selectedTab === "all"

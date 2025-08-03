@@ -1,6 +1,6 @@
 import { MemoryMonitorService } from "$/server/services/monitoring/memoryMonitorService.ts";
 import { assert, assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 describe("MemoryMonitorService", () => {
   let memoryMonitor: MemoryMonitorService;

@@ -6,41 +6,15 @@
  */
 
 import { ErrorDisplay } from "$islands/error/ErrorDisplay.tsx";
-import {
-  ErrorHandlingUtils,
+import type { SortingErrorBoundaryProps } from "$types/src20.d.ts";
+import type {
   ErrorInfo,
-  ErrorType,
-} from "$lib/utils/errorHandlingUtils.ts";
-import { Component, type ComponentChildren } from "preact";
+  SortingErrorBoundaryState,
+  SortingErrorFallbackProps,
+} from "$types/ui.d.ts";
+import { Component } from "preact";
 
 // ===== TYPES =====
-
-interface SortingErrorBoundaryState {
-  hasError: boolean;
-  error: ErrorInfo | null;
-  retryCount: number;
-  lastErrorTime: number;
-}
-
-interface SortingErrorBoundaryProps {
-  children: ComponentChildren;
-  fallback?: ComponentChildren;
-  onError?: (error: ErrorInfo, errorDetails?: string) => void;
-  maxRetries?: number;
-  retryDelay?: number;
-  context?: "wallet" | "stamp" | "src20" | "general";
-  className?: string;
-  testId?: string;
-}
-
-interface SortingErrorFallbackProps {
-  error: ErrorInfo;
-  onRetry: () => void;
-  onReset: () => void;
-  context: string;
-  retryCount: number;
-  maxRetries: number;
-}
 
 // ===== ERROR BOUNDARY COMPONENT =====
 
@@ -61,6 +35,7 @@ export class SortingErrorBoundary extends Component<
     this.state = {
       hasError: false,
       error: null,
+      errorInfo: null,
       retryCount: 0,
       lastErrorTime: 0,
     };
@@ -77,24 +52,11 @@ export class SortingErrorBoundary extends Component<
 
   override componentDidCatch(
     error: Error,
-    errorInfo: { componentStack: string },
+    errorInfo: ErrorInfo,
   ) {
-    // Create comprehensive error info using existing utility
-    const sortingError: ErrorInfo = ErrorHandlingUtils.createErrorInfo(
-      error,
-      `sorting-${this.props.context || "general"}`,
-      this.categorizeError(error),
-    );
-
-    // Update retryable status based on current retry count
-    const updatedError: ErrorInfo = {
-      ...sortingError,
-      retryable: this.state.retryCount < this.maxRetries &&
-        sortingError.retryable,
-    };
-
     this.setState({
-      error: updatedError,
+      error: error,
+      errorInfo: errorInfo,
     });
 
     // Call external error handler
@@ -105,7 +67,7 @@ Props: ${JSON.stringify(this.props, null, 2)}
 Timestamp: ${new Date().toISOString()}
     `.trim();
 
-    this.props.onError?.(updatedError, errorDetails);
+    this.props.onError?.(error, errorDetails);
 
     // Log error for debugging
     console.error("[SortingErrorBoundary] Caught error:", {
@@ -116,36 +78,7 @@ Timestamp: ${new Date().toISOString()}
     });
   }
 
-  // ===== ERROR CATEGORIZATION =====
-
-  private categorizeError(error: Error): ErrorType {
-    const message = error.message.toLowerCase();
-
-    if (message.includes("network") || message.includes("fetch")) {
-      return ErrorType.NETWORK_ERROR;
-    }
-
-    if (message.includes("timeout")) {
-      return ErrorType.TIMEOUT_ERROR;
-    }
-
-    if (message.includes("permission") || message.includes("unauthorized")) {
-      return ErrorType.AUTH_ERROR;
-    }
-
-    if (
-      message.includes("parse") || message.includes("json") ||
-      message.includes("syntax")
-    ) {
-      return ErrorType.DATA_ERROR;
-    }
-
-    if (message.includes("validation")) {
-      return ErrorType.VALIDATION_ERROR;
-    }
-
-    return ErrorType.API_ERROR; // Default for sorting-related errors
-  }
+  // ===== ERROR CATEGORIZATION REMOVED - Using simplified error boundary =====
 
   // ===== RETRY LOGIC =====
 
@@ -251,14 +184,20 @@ function SortingErrorFallback({
   retryCount,
   maxRetries,
 }: SortingErrorFallbackProps) {
-  const canRetry = retryCount < maxRetries && error.retryable;
+  if (!error) {
+    return <div>No error information available.</div>;
+  }
+
+  const canRetry = (retryCount ?? 0) < (maxRetries ?? 3) &&
+    "retryable" in error &&
+    error.retryable;
 
   return (
     <div className="sorting-error-fallback p-4">
       <ErrorDisplay
         error={error}
         {...(canRetry ? { onRetry } : {})}
-        onDismiss={onReset}
+        {...(onReset ? { onDismiss: onReset } : {})}
         showDetails
         compact={false}
         className="mb-4"
@@ -267,7 +206,7 @@ function SortingErrorFallback({
       {/* Context-specific guidance */}
       <div className="text-sm text-gray-400 mb-4">
         <div className="font-semibold mb-1">Context: {context} sorting</div>
-        <div>Retry attempts: {retryCount} / {maxRetries}</div>
+        <div>Retry attempts: {retryCount ?? 0} / {maxRetries ?? 3}</div>
       </div>
 
       {/* Action buttons */}
@@ -278,7 +217,7 @@ function SortingErrorFallback({
             onClick={onRetry}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded text-sm transition-colors"
           >
-            Retry ({maxRetries - retryCount} left)
+            Retry ({(maxRetries ?? 3) - (retryCount ?? 0)} left)
           </button>
         )}
 
@@ -292,13 +231,13 @@ function SortingErrorFallback({
       </div>
 
       {/* Recovery suggestions */}
-      {error.action && (
+      {"action" in error && error.action && (
         <div className="mt-4 p-3 bg-gray-800 rounded text-xs">
           <div className="font-semibold text-gray-300 mb-1">
             Suggested action:
           </div>
           <div className="text-gray-400">
-            {getActionMessage(error.action)}
+            {getActionMessage("action" in error ? error.action : "")}
           </div>
         </div>
       )}

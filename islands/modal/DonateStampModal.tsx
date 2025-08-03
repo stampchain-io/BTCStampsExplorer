@@ -1,11 +1,11 @@
 /* ===== DONATE STAMP MODAL COMPONENT ===== */
 import { sliderBar, sliderKnob } from "$button";
+import type { DonateStampModalProps } from "$types/ui.d.ts";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 // Using simplified fee display approach
 import { handleModalClose } from "$components/layout/ModalBase.tsx";
 import { StampImage } from "$content";
-import type { StampRow } from "$globals";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { closeModal, openModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
@@ -18,12 +18,6 @@ import { FeeCalculatorBase } from "$section";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface Props {
-  stamp: StampRow;
-  fee: number;
-  handleChangeFee: (fee: number) => void;
-  dispenser: any;
-}
 
 /* ===== COMPONENT ===== */
 const DonateStampModal = ({
@@ -31,7 +25,7 @@ const DonateStampModal = ({
   fee: initialFee,
   handleChangeFee,
   dispenser,
-}: Props) => {
+}: DonateStampModalProps) => {
   /* ===== CONTEXT ===== */
   const { wallet } = walletContext;
 
@@ -56,7 +50,7 @@ const DonateStampModal = ({
     setError: setFormHookError,
   } = useTransactionForm({
     type: "buy",
-    initialFee,
+    ...(initialFee !== undefined && { initialFee }),
   });
 
   /* ===== 🚀 PROGRESSIVE FEE ESTIMATION INTEGRATION ===== */
@@ -114,8 +108,10 @@ const DonateStampModal = ({
   /* ===== EFFECTS ===== */
   // Sync fee state with parent
   useEffect(() => {
-    handleChangeFee(formState.fee);
-  }, [formState.fee]);
+    if (handleChangeFee && formState.fee !== undefined) {
+      handleChangeFee(formState.fee);
+    }
+  }, [formState.fee, handleChangeFee]);
 
   // Update total price when dispenser or quantity changes
   useEffect(() => {
@@ -211,8 +207,8 @@ const DonateStampModal = ({
         openModal(
           <DonateStampModal
             stamp={stamp}
-            fee={initialFee}
-            handleChangeFee={handleChangeFee}
+            fee={initialFee ?? 1}
+            handleChangeFee={handleChangeFee ?? (() => {})}
             dispenser={dispenser}
           />,
           "slideUpDown",
@@ -406,71 +402,73 @@ const DonateStampModal = ({
       {/* Using simplified fee display approach */}
 
       {/* ===== STAMP DETAILS ===== */}
-      <div className="flex flex-row gap-6">
-        <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
-          <StampImage
-            stamp={stamp}
-            className=""
-            flag={false}
-          />
-        </div>
-
-        {/* ===== QUANTITY SELECTION ===== */}
-        <div className="flex flex-col w-full">
-          <div className="flex flex-col items-start pt-0.5 -space-y-0.5">
-            <h6 className="font-light text-sm text-stamp-grey-darker">
-              RECEIVE
-            </h6>
-            <h6 className="font-light text-lg text-stamp-grey-light">
-              <span className="font-bold">{quantity * 1000}</span> USDSTAMPS
-              {quantity * 1000 > 1 ? "" : ""}
-            </h6>
+      {stamp && (
+        <div className="flex flex-row gap-6">
+          <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
+            <StampImage
+              stamp={stamp}
+              className=""
+              flag={false}
+            />
           </div>
 
-          {/* ===== AMOUNT SLIDER ===== */}
-          <div className="mt-[18px]">
-            <div
-              className="relative w-full group"
-              onMouseMove={handleMouseMove}
-              onMouseEnter={handleAmountMouseEnter}
-              onMouseLeave={handleAmountMouseLeave}
-              onMouseDown={handleMouseDown}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <input
-                type="range"
-                min="1"
-                max="100"
-                step="0.25"
-                value={amountToSliderPos(quantity)}
-                onInput={(e) => {
-                  const target = e.target as HTMLInputElement;
-                  setQuantity(
-                    Math.max(1, sliderPosToAmount(parseFloat(target.value))),
-                  );
-                }}
-                className={`${sliderBar} ${sliderKnob}`}
-              />
+          {/* ===== QUANTITY SELECTION ===== */}
+          <div className="flex flex-col w-full">
+            <div className="flex flex-col items-start pt-0.5 -space-y-0.5">
+              <h6 className="font-light text-sm text-stamp-grey-darker">
+                RECEIVE
+              </h6>
+              <h6 className="font-light text-lg text-stamp-grey-light">
+                <span className="font-bold">{quantity * 1000}</span> USDSTAMPS
+                {quantity * 1000 > 1 ? "" : ""}
+              </h6>
+            </div>
+
+            {/* ===== AMOUNT SLIDER ===== */}
+            <div className="mt-[18px]">
               <div
-                className={`${tooltipImage} ${
-                  isAmountTooltipVisible ? "opacity-100" : "opacity-0"
-                }`}
-                style={{
-                  left: `${tooltipPosition.x}px`,
-                  top: `${tooltipPosition.y - 6}px`,
-                  transform: "translate(-50%, -100%)",
-                }}
+                className="relative w-full group"
+                onMouseMove={handleMouseMove}
+                onMouseEnter={handleAmountMouseEnter}
+                onMouseLeave={handleAmountMouseLeave}
+                onMouseDown={handleMouseDown}
+                onClick={(e) => e.stopPropagation()}
               >
-                SELECT AMOUNT
+                <input
+                  type="range"
+                  min="1"
+                  max="100"
+                  step="0.25"
+                  value={amountToSliderPos(quantity)}
+                  onInput={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    setQuantity(
+                      Math.max(1, sliderPosToAmount(parseFloat(target.value))),
+                    );
+                  }}
+                  className={`${sliderBar} ${sliderKnob}`}
+                />
+                <div
+                  className={`${tooltipImage} ${
+                    isAmountTooltipVisible ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={{
+                    left: `${tooltipPosition.x}px`,
+                    top: `${tooltipPosition.y - 6}px`,
+                    transform: "translate(-50%, -100%)",
+                  }}
+                >
+                  SELECT AMOUNT
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ===== FEE CALCULATOR ===== */}
       <FeeCalculatorBase
-        fee={formState.fee}
+        fee={formState.fee || 1}
         handleChangeFee={(newFee: number) => {
           logger.debug("ui", {
             message: "Fee changing",
@@ -486,7 +484,7 @@ const DonateStampModal = ({
         price={0} // Donation has no price
         edition={quantity * 1000} // USDSTAMPS received
         fromPage="donate"
-        BTCPrice={formState.BTCPrice}
+        BTCPrice={formState.BTCPrice || 0}
         isSubmitting={isSubmitting}
         onSubmit={() => {
           logger.debug("ui", {
@@ -500,7 +498,6 @@ const DonateStampModal = ({
         }}
         buttonName={wallet?.address ? "DONATE" : "CONNECT WALLET"}
         className="pt-9 mobileLg:pt-12"
-        bitname={undefined}
         // ===== 🚀 PROGRESSIVE FEE DETAILS INTEGRATION =====
         feeDetails={(() => {
           const baseFeeDetails = mapProgressiveFeeDetails(
@@ -509,7 +506,10 @@ const DonateStampModal = ({
 
           // For donate transactions, add the donation amount to totalValue
           // and remove dust since dispense uses OP_RETURN (no dust needed)
-          if (baseFeeDetails && totalPrice > 0) {
+          if (
+            baseFeeDetails && totalPrice > 0 &&
+            baseFeeDetails.minerFee !== undefined
+          ) {
             // Recalculate totalValue: minerFee only (no dust) + donation amount
             const correctedTotalValue = baseFeeDetails.minerFee + totalPrice;
 

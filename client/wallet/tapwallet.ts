@@ -1,8 +1,8 @@
 import { signal } from "@preact/signals";
-import { walletContext } from "./wallet.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
-import { checkWalletAvailability } from "./wallet.ts";
-import { handleWalletError } from "./walletHelper.ts";
+import { checkWalletAvailability } from "$client/wallet/wallet.ts";
+import { handleWalletError } from "$client/wallet/walletHelper.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 export const isTapWalletInstalled = signal<boolean>(false);

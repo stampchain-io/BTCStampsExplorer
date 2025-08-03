@@ -5,7 +5,7 @@
  */
 
 import { assertEquals, assertExists } from "@std/assert";
-import { describe, it } from "@std/testing/bdd";
+import { describe, it } from "jsr:@std/testing@1.0.14/bdd";
 
 // Set environment to skip Redis and external connections before importing
 (globalThis as any).SKIP_REDIS_CONNECTION = true;

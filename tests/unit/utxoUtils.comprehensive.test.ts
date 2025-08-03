@@ -1,10 +1,10 @@
 import { assertArrayIncludes, assertEquals, assertExists } from "@std/assert";
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
 import {
   getTxInfo,
   getUTXOForAddress,
 } from "$lib/utils/bitcoin/utxo/utxoUtils.ts";
-import { isValidBitcoinAddress } from "$lib/utils/bitcoin/scripts/scriptTypeUtils.ts";
+import { isValidBitcoinAddress } from "$lib/utils/typeGuards.ts";
 import { createMockUTXO } from "./utils/testFactories.ts";
 
 // Helper function to create mock Response objects

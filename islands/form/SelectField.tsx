@@ -1,17 +1,5 @@
-import { JSX } from "preact";
-import { StampRow } from "$globals";
+import type { SelectFieldProps } from "$types/ui.d.ts";
 import { inputField } from "$form";
-
-interface SelectFieldProps {
-  onChange: (e: JSX.TargetedEvent<HTMLSelectElement, Event>) => void;
-  onClick?: (e: JSX.TargetedEvent<HTMLSelectElement, Event>) => void;
-  error?: string;
-  disabled?: boolean;
-  options: StampRow[];
-  value?: string | number | null;
-  placeholder?: string;
-  className?: string;
-}
 
 export function SelectField({
   onChange,
@@ -23,10 +11,15 @@ export function SelectField({
   placeholder,
   className,
 }: SelectFieldProps) {
+  const handleChange = (e: Event) => {
+    const target = e.target as HTMLSelectElement;
+    onChange?.(target.value);
+  };
+
   return (
     <div class={`w-full ${className || ""}`}>
       <select
-        onChange={onChange}
+        onChange={handleChange}
         onClick={onClick}
         disabled={disabled}
         class={inputField}
@@ -39,11 +32,11 @@ export function SelectField({
         {options.length > 0
           ? options.map((item) => (
             <option
-              key={item.tx_hash || item.cpid || item.stamp?.toString()}
-              value={item.stamp?.toString()}
+              key={item.value}
+              value={item.value}
               class="font-light uppercase"
             >
-              #{item.stamp}
+              {item.label}
             </option>
           ))
           : !placeholder && <option value="" disabled>NO STAMPS</option>}

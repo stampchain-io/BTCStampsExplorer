@@ -1,5 +1,5 @@
-import { StampCreationService } from "./stampCreationService.ts";
-import { StampValidationService } from "./stampValidationService.ts";
+import { StampCreationService } from "$server/services/stamp/stampCreationService.ts";
+import { StampValidationService } from "$server/services/stamp/stampValidationService.ts";
 
 export { StampCreationService, StampValidationService };
 

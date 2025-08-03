@@ -1,30 +1,21 @@
 /* ===== COLLECTION OVERVIEW PAGE ===== */
+
 import { StampOverviewContent } from "$content";
 import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
-import { STAMP_FILTER_TYPES } from "$globals";
+import type { CollectionOverviewPageProps } from "$types/index.d.ts";
+import type { StampFilterType } from "$constants";
+
 import { CollectionOverviewHeader } from "$header";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { CollectionDetailGallery } from "$section";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/core/collectionService.ts";
-import { CollectionRow } from "$server/types/collection.d.ts";
 
 /* ===== CONSTANTS ===== */
 const MAX_PAGE_SIZE = 120;
 
 /* ===== TYPES ===== */
-interface CollectionOverviewPageProps {
-  selectedTab: "artist" | "posh" | "recursive";
-  stamps?: any[];
-  collections?: CollectionRow[];
-  page: number;
-  pages: number;
-  sortBy: string;
-  filterBy: string[];
-  partial?: boolean;
-  isRecentSales?: boolean;
-}
 
 /* ===== SERVER HANDLER ===== */
 export const handler: Handlers<CollectionOverviewPageProps> = {
@@ -82,7 +73,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
           const filterBy = url.searchParams.get("filterBy")
             ? (url.searchParams.get("filterBy")?.split(",").filter(
               Boolean,
-            ) as STAMP_FILTER_TYPES[])
+            ) as StampFilterType[])
             : [];
 
           const poshCollection = await CollectionService.getCollectionByName(
@@ -121,7 +112,7 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
             limit: page_size,
             sortBy: sortBy as "DESC" | "ASC",
             type: "all",
-            filterBy: ["recursive"] as STAMP_FILTER_TYPES[],
+            filterBy: ["recursive"] as StampFilterType[],
             ident: [],
             collectionId: undefined,
           });
@@ -176,8 +167,8 @@ export default function CollectionOverviewPage(
             <CollectionDetailGallery collections={collections || []} />
             <div class="mt-12 mobileLg:mt-[72px]">
               <Pagination
-                page={page}
-                totalPages={pages}
+                page={page ?? 1}
+                totalPages={pages ?? 1}
                 prefix=""
               />
             </div>
@@ -193,14 +184,17 @@ export default function CollectionOverviewPage(
                 stamps={stamps || []}
                 isRecentSales={isRecentSales}
                 pagination={{
-                  page,
-                  totalPages: pages,
+                  page: page ?? 1,
+                  totalPages: pages ?? 1,
                   prefix: "",
                 }}
               />
             </div>
           </div>
         );
+
+      default:
+        return null;
     }
   };
 

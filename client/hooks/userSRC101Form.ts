@@ -1,52 +1,12 @@
 import { useConfig } from "$client/hooks/useConfig.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { useFees } from "$fees";
-import { Config } from "$globals";
+import { Config } from "$types/base.d.ts";
 import { debounce } from "$lib/utils/performance/debounce.ts";
 import { logger } from "$lib/utils/logger.ts";
 import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
-
-interface PSBTFees {
-  estMinerFee: number;
-  totalDustValue: number;
-  hasExactFees: boolean;
-  totalValue: number;
-  est_tx_size: number;
-  hex?: string;
-  inputsToSign?: Array<
-    { index: number; address?: string; sighashTypes?: number[] }
-  >;
-}
-
-interface SRC101FormState {
-  toAddress: string;
-  token: string;
-  amt: string;
-  fee: number;
-  feeError: string;
-  BTCPrice: number;
-  jsonSize: number;
-  apiError: string;
-  toAddressError: string;
-  tokenError: string;
-  amtError: string;
-  max: string;
-  maxError: string;
-  lim: string;
-  limError: string;
-  dec: string;
-  x: string;
-  tg: string;
-  web: string;
-  email: string;
-  file: File | null;
-  psbtFees?: PSBTFees;
-  maxAmount?: string;
-  root: string;
-  utxoAncestors?: Array<any>; // Add missing utxoAncestors property
-  isLoading?: boolean;
-}
+import type { SRC101FormState } from "$types/ui.d.ts";
 
 export function useSRC101Form(
   action: string,
@@ -88,10 +48,14 @@ export function useSRC101Form(
     email: "",
     file: null as File | null,
     psbtFees: {
-      estMinerFee: 0,
+      minerFee: 0,
+      estMinerFee: 0, // backward compatibility
       totalDustValue: 0,
+      totalFee: 0,
+      totalValue: 0, // required by FeeDetails
       hasExactFees: false,
-      totalValue: 0,
+      feeRate: 10,
+      effectiveFeeRate: 10, // backward compatibility
       est_tx_size: 0,
     },
     isLoading: false,
@@ -131,10 +95,14 @@ export function useSRC101Form(
       setFormState((prev) => ({
         ...prev,
         psbtFees: {
-          estMinerFee: immediateEstimate,
+          minerFee: immediateEstimate,
+          estMinerFee: immediateEstimate, // backward compatibility
           totalDustValue: dustValue,
-          totalValue: totalEstimate,
+          totalFee: totalEstimate,
+          totalValue: totalEstimate, // required by FeeDetails
           hasExactFees: false, // Mark as estimate
+          feeRate: formData.fee || 10,
+          effectiveFeeRate: formData.fee || 10, // backward compatibility
           est_tx_size: estimatedTxSize,
         },
         isLoading: true, // Show that we're upgrading to exact fees
@@ -189,12 +157,18 @@ export function useSRC101Form(
         setFormState((prev) => ({
           ...prev,
           psbtFees: {
-            estMinerFee: Number(response.data.est_miner_fee) ||
+            minerFee: Number(response.data.est_miner_fee) ||
               Number(response.data.estimatedFee) || 0,
+            estMinerFee: Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0, // backward compatibility
             totalDustValue: Number(response.data.total_dust_value) || 546,
-            hasExactFees: !shouldUseDryRun, // Exact fees when dryRun=false, estimates when dryRun=true
-            totalValue: (Number(response.data.est_miner_fee) || 0) +
+            totalFee: (Number(response.data.est_miner_fee) || 0) +
               (Number(response.data.total_dust_value) || 546),
+            totalValue: (Number(response.data.est_miner_fee) || 0) +
+              (Number(response.data.total_dust_value) || 546), // required by FeeDetails
+            hasExactFees: !shouldUseDryRun, // Exact fees when dryRun=false, estimates when dryRun=true
+            feeRate: formData.fee || 10,
+            effectiveFeeRate: formData.fee || 10, // backward compatibility
             est_tx_size: Number(response.data.est_tx_size) || 0,
             hex: response.data.hex,
             inputsToSign: response.data.inputsToSign,
@@ -271,8 +245,10 @@ export function useSRC101Form(
     fetchPrice();
   }, []);
 
-  const handleInputChange = (e: Event, field: string) => {
-    const value = (e.target as HTMLInputElement).value;
+  const handleInputChange = (e: Event | string, field: string) => {
+    const value = typeof e === "string"
+      ? e
+      : (e.target as HTMLInputElement).value;
     let newValue = value;
 
     if (["lim", "max"].includes(field)) {
@@ -419,12 +395,18 @@ export function useSRC101Form(
         setFormState((prev) => ({
           ...prev,
           psbtFees: {
-            estMinerFee: Number(response.data.est_miner_fee) ||
+            minerFee: Number(response.data.est_miner_fee) ||
               Number(response.data.estimatedFee) || 0,
+            estMinerFee: Number(response.data.est_miner_fee) ||
+              Number(response.data.estimatedFee) || 0, // backward compatibility
             totalDustValue: Number(response.data.total_dust_value) || 546,
-            hasExactFees: true, // Always exact for submission
-            totalValue: (Number(response.data.est_miner_fee) || 0) +
+            totalFee: (Number(response.data.est_miner_fee) || 0) +
               (Number(response.data.total_dust_value) || 546),
+            totalValue: (Number(response.data.est_miner_fee) || 0) +
+              (Number(response.data.total_dust_value) || 546), // required by FeeDetails
+            hasExactFees: true, // Always exact for submission
+            feeRate: formState.fee,
+            effectiveFeeRate: formState.fee, // backward compatibility
             est_tx_size: Number(response.data.est_tx_size) || 0,
             hex: response.data.hex,
             inputsToSign: response.data.inputsToSign,

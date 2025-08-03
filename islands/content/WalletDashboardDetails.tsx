@@ -1,6 +1,7 @@
 /* ===== WALLET DASHBOARD DETAILS COMPONENT ===== */
 /* @baba - cleanup button/icon code */
 import { StatItem, StatTitle } from "$components/section/WalletComponents.tsx";
+import type { WalletDashboardDetailsProps } from "$types/ui.d.ts";
 import { Icon } from "$icon";
 import RecieveAddyModal from "$islands/modal/RecieveAddyModal.tsx";
 import SendBTCModal from "$islands/modal/SendBTCModal.tsx";
@@ -13,13 +14,6 @@ import { titleGreyLD } from "$text";
 import { useEffect, useRef, useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-interface WalletDashboardDetailsProps {
-  walletData: WalletOverviewInfo;
-  stampsTotal: number;
-  src20Total: number;
-  stampsCreated: number;
-  setShowItem: (type: string) => void;
-}
 
 /* ===== WALLET OVERVIEW SUBCOMPONENT ===== */
 function WalletOverview(

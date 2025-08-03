@@ -1,3 +1,4 @@
+import type { WalletContext } from "$types/ui.d.ts";
 import { stackConnectWalletModal } from "$islands/layout/ModalStack.tsx";
 import { openModal } from "$islands/modal/states.ts";
 import { logger } from "$lib/utils/logger.ts";
@@ -31,26 +32,6 @@ interface WalletProviders {
   HorizonWalletProvider?: any;
 }
 
-interface WalletContext {
-  readonly wallet: Wallet;
-  readonly isConnected: boolean;
-  updateWallet: (wallet: Wallet) => void;
-  getBasicStampInfo: (address: string) => Promise<any>;
-  disconnect: () => void;
-  signMessage: (message: string) => Promise<any>;
-  signPSBT: (
-    wallet: Wallet,
-    psbt: string,
-    inputsToSign: any[],
-    enableRBF?: boolean,
-    sighashTypes?: number[],
-    autoBroadcast?: boolean,
-  ) => Promise<any>;
-  broadcastRawTX: (rawTx: string) => Promise<any>;
-  broadcastPSBT: (psbtHex: string) => Promise<any>;
-  showConnectModal: () => void;
-}
-
 // Initialize wallet state
 export const initialWallet: Wallet = {
   accounts: [],
@@ -61,6 +42,11 @@ export const initialWallet: Wallet = {
     total: 0,
   },
   stampBalance: [],
+  // Required properties for wallet interface
+  publicKey: "",
+  addressType: "p2wpkh",
+  network: "mainnet",
+  provider: "unisat",
 };
 
 let initialWalletState;
@@ -135,7 +121,7 @@ export const walletContext: WalletContext = {
   signPSBT: async (
     wallet: Wallet,
     psbt: string,
-    inputsToSign: any[],
+    inputsToSign: import("$types/wallet.d.ts").PSBTInputToSign[],
     enableRBF = true,
     sighashTypes?: number[],
     autoBroadcast = true,

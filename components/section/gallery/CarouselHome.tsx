@@ -1,9 +1,5 @@
-import { StampRow } from "$globals";
 import { CarouselGallery, SwiperStyles } from "$section";
-
-interface CarouselHomeProps {
-  carouselStamps: StampRow[];
-}
+import type { CarouselHomeProps } from "$types/ui.d.ts";
 
 export function CarouselHome({ carouselStamps }: CarouselHomeProps) {
   if (!carouselStamps?.length) {
@@ -29,7 +25,7 @@ export function CarouselHome({ carouselStamps }: CarouselHomeProps) {
           items-center
         ">
           <CarouselGallery
-            stamps={carouselStamps}
+            carouselStamps={carouselStamps}
             class="carousel-container"
           />
         </div>

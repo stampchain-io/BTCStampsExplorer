@@ -14,7 +14,7 @@
  * @version 1.0.0
  */
 
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 // ===== CUSTOM ERROR CLASSES =====
 

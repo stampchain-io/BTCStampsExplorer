@@ -6,9 +6,9 @@
 
 import type { SRC20MarketData, StampMarketData } from "$types/marketData.d.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
-import type { PSBTInput, UTXO } from "$types/index.d.ts";
 import type { BTCBalance } from "$types/wallet.d.ts";
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/stamp.d.ts";
+import type { UTXO } from "$types/base.d.ts";
 import {
   getRandomCollection,
   getRandomMarketData,

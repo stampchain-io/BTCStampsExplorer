@@ -1,5 +1,6 @@
 /* ===== PREVIEW IMAGE MODAL COMPONENT ===== */
 import { ModalBase } from "$components/layout/ModalBase.tsx";
+import type { PreviewImageModalProps } from "$types/ui.d.ts";
 import { AUDIO_FILE_IMAGE } from "$constants";
 import { StampTextContent } from "$content";
 import { closeModal } from "$islands/modal/states.ts";
@@ -7,10 +8,6 @@ import { handleImageError } from "$lib/utils/ui/media/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 /* ===== TYPES ===== */
-interface PreviewImageModalProps {
-  src: string | File;
-  contentType?: "html" | "text" | "image" | "audio";
-}
 
 /* ===== COMPONENT ===== */
 const PreviewImageModal = ({

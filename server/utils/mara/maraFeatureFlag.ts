@@ -4,7 +4,7 @@
  * Provides runtime control and checking for MARA integration feature flag
  */
 
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { isMaraIntegrationEnabled, getValidatedMaraConfig } from "$/server/config/maraConfigValidator.ts";
 
 /**

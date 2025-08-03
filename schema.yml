@@ -3476,10 +3476,17 @@ components:
             - type: string
         max:
           type: string
+          pattern: "^[0-9]+$"
+          description: "Maximum supply as numeric string (digits only)"
         lim:
           type: string
+          pattern: "^[0-9]+$"
+          description: "Limit per mint as numeric string (digits only)"
         dec:
           type: number
+          minimum: 0
+          maximum: 18
+          description: "Number of decimal places (0-18)"
         # Optional metadata fields (database-aligned)
         x:
           type: string
@@ -3558,9 +3565,9 @@ components:
             - type: number
             - type: string
         amt:
-          oneOf:
-            - type: number
-            - type: string
+          type: string
+          pattern: "^[0-9]+$"
+          description: "Amount as numeric string (digits only)"
 
     SRC20TransferData:
       type: object
@@ -3595,9 +3602,9 @@ components:
             - type: number
             - type: string
         amt:
-          oneOf:
-            - type: number
-            - type: string
+          type: string
+          pattern: "^[0-9]+$"
+          description: "Amount as numeric string (digits only)"
 
     MintStampInputData:
       type: object

@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
-import { StampRow } from "$globals";
 import { NOT_AVAILABLE_IMAGE } from "$constants";
+import type { StampRow } from "$types/stamp.d.ts";
 
 /**
  * Get the base URL for the current environment
@@ -31,7 +31,10 @@ export const constructStampUrl = (
   return `${baseUrl}/stamps/${txHash}.${extension}`;
 };
 
+// Extended MIME types including all supported formats for stamps and web assets
+// Core stamp MIME types are also available in $constants/MIME_TYPES
 export const mimeTypes: { [key: string]: string } = {
+  // Common stamp content formats
   "jpg": "image/jpeg",
   "jpeg": "image/jpeg",
   "png": "image/png",
@@ -48,6 +51,13 @@ export const mimeTypes: { [key: string]: string } = {
   "htm": "text/html",
   "txt": "text/plain",
   "md": "text/markdown",
+  "mp3": "audio/mpeg",
+  "wav": "audio/wav",
+  "mp4": "video/mp4",
+  "webm": "video/webm",
+  "ogg": "audio/ogg",
+  "ogv": "video/ogg",
+  // Additional web asset formats
   "csv": "text/csv",
   "js": "application/javascript",
   "mjs": "application/javascript",
@@ -72,14 +82,8 @@ export const mimeTypes: { [key: string]: string } = {
   "ttf": "font/ttf",
   "otf": "font/otf",
   "eot": "application/vnd.ms-fontobject",
-  "mp3": "audio/mpeg",
-  "wav": "audio/wav",
-  "mp4": "video/mp4",
-  "webm": "video/webm",
-  "ogg": "audio/ogg",
-  "ogv": "video/ogg",
-  "mpeg": "video/mpeg",
   "avi": "video/x-msvideo",
+  "mpeg": "video/mpeg",
 };
 
 export const mimeTypeToSuffix = Object.entries(mimeTypes).reduce(

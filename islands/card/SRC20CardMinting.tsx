@@ -4,12 +4,18 @@ import { Button } from "$button";
 import { cellAlign } from "$components/layout/types.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { valueSm } from "$text";
-import { SRC20CardBase, SRC20CardBaseProps } from "./SRC20CardBase.tsx";
+import { SRC20CardBase } from "$islands/card/SRC20CardBase.tsx";
+import type { SRC20CardBaseProps } from "$types/ui.d.ts";
 
 /* ===== COMPONENT ===== */
 export function SRC20CardMinting(
   { src20, fromPage, onImageClick, totalColumns }: SRC20CardBaseProps,
 ) {
+  // Early return if src20 is null or undefined
+  if (!src20) {
+    return null;
+  }
+
   /* ===== COMPUTED VALUES ===== */
   const mintHref = `/stamping/src20/mint?tick=${
     encodeURIComponent(src20.tick)
@@ -30,10 +36,10 @@ export function SRC20CardMinting(
       src20={src20}
       {...(fromPage && { fromPage })}
       {...(onImageClick && { onImageClick })}
-      totalColumns={totalColumns}
+      totalColumns={totalColumns ?? 1}
     >
       {/* Deploy Cell */}
-      <td class={`${cellAlign(1, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(1, totalColumns ?? 1)} ${valueSm}`}>
         {formatDate(new Date(src20.block_time), {
           month: "numeric",
           day: "numeric",
@@ -42,7 +48,7 @@ export function SRC20CardMinting(
       </td>
 
       {/* Holders Cell */}
-      <td class={`${cellAlign(2, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(2, totalColumns ?? 1)} ${valueSm}`}>
         {Number(
           (src20 as any)?.market_data?.holder_count ||
             (src20 as any)?.holders || 0,
@@ -50,34 +56,34 @@ export function SRC20CardMinting(
       </td>
 
       {/* TRENDING */}
-      <td class={`${cellAlign(3, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(3, totalColumns ?? 1)} ${valueSm}`}>
         {src20.top_mints_percentage?.toFixed(1) || "N/A"}
         <span class="text-stamp-grey-light">%</span>
       </td>
 
       {/* MINTS */}
-      <td class={`${cellAlign(4, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(4, totalColumns ?? 1)} ${valueSm}`}>
         {src20.mint_progress?.total_mints || "N/A"}
       </td>
 
       {/* Progress Cell */}
-      <td class={`${cellAlign(5, totalColumns)} ${valueSm}`}>
+      <td class={`${cellAlign(5, totalColumns ?? 1)} ${valueSm}`}>
         <div class="flex flex-col gap-1">
           <div class="text-right">
-            {Number(src20.progress)}
+            {Number(src20.progress ?? 0)}
             <span class="text-stamp-grey-light">%</span>
           </div>
           <div class="relative h-1.5 bg-stamp-grey rounded-full">
             <div
               class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
-              style={{ width: `${src20.progress}%` }}
+              style={{ width: `${src20.progress ?? 0}%` }}
             />
           </div>
         </div>
       </td>
 
       {/* MINT BUTTON */}
-      <td class={`${cellAlign(6, totalColumns)}`}>
+      <td class={`${cellAlign(6, totalColumns ?? 1)}`}>
         <Button
           variant="flat"
           color="purple"

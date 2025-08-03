@@ -1,24 +1,12 @@
 import { cellAlign, colGroup } from "$components/layout/types.ts";
+import type { StampListingsAllProps } from "$types/ui.d.ts";
+import type { Dispenser } from "$types/stamp.d.ts";
 import { rowTable } from "$layout";
 import {
   abbreviateAddress,
   formatSatoshisToBTC,
 } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { labelXs, valueDark, valueSm, valueSmLink } from "$text";
-
-interface Dispenser {
-  source: string;
-  give_remaining: number;
-  escrow_quantity: number;
-  give_quantity: number;
-  satoshirate: number;
-  tx_hash: string;
-  close_block_index: number;
-}
-
-interface StampListingsAllProps {
-  dispensers: Dispenser[];
-}
 
 export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
   const headers = [
@@ -43,12 +31,12 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
             { width: "w-[14%]" },
             { width: "w-[26%]" },
             { width: "w-[14%]" },
-          ]).map((col) => <col key={col.key} class={col.className} />)}
+          ]).map((col: any) => <col key={col.key} class={col.className} />)}
         </colgroup>
-        {dispensers.length > 0 && (
+        {(dispensers?.length ?? 0) > 0 && (
           <thead>
             <tr>
-              {headers.map((header, i) => (
+              {headers.map((header: string, i: number) => (
                 <th
                   key={i}
                   class={`${labelXs} pb-1.5 ${cellAlign(i, headers.length)}`}
@@ -61,8 +49,8 @@ export function StampListingsAllTable({ dispensers }: StampListingsAllProps) {
           </thead>
         )}
         <tbody>
-          {dispensers.length
-            ? dispensers?.map((dispenser, index) => {
+          {(dispensers?.length ?? 0) > 0
+            ? dispensers?.map((dispenser: Dispenser, index: number) => {
               const isEmpty = dispenser.give_remaining === 0;
               const rowDispensersRemain = `${
                 isEmpty ? "text-stamp-grey-darker" : ""

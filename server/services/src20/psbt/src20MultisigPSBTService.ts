@@ -1,29 +1,14 @@
 // was previously // lib/utils/minting/src20/tx.ts
 
 import * as bitcoin from "bitcoinjs-lib";
-// Conditionally import tiny-secp256k1 only if we're not in build mode
+// Conditionally import tiny-secp256k1
 let ecc: any = null;
-if (!Deno.args.includes("build")) {
-  // Only import in runtime mode
-  try {
-    ecc = await import("tiny-secp256k1");
-    console.log("Successfully loaded tiny-secp256k1");
-    bitcoin.initEccLib(ecc);
-  } catch (e) {
-    console.error("Failed to load tiny-secp256k1:", e);
-    // Provide stub implementation for ecc
-    ecc = {
-      privateKeyVerify: () => true,
-      publicKeyCreate: () => new Uint8Array(33),
-      publicKeyVerify: () => true,
-      ecdsaSign: () => ({ signature: new Uint8Array(64), recid: 0 }),
-      ecdsaVerify: () => true,
-      ecdsaRecover: () => new Uint8Array(65),
-      isPoint: () => true
-    };
-  }
-} else {
-  // In build mode, provide stub implementation
+const isBuildMode = Deno.args.includes("build");
+const isDevelopment = Deno.env.get("DENO_ENV") === "development";
+const useStubs = Deno.env.get("USE_CRYPTO_STUBS") === "true";
+
+if (isBuildMode) {
+  // In build mode, always use stub implementation
   console.log("[BUILD] Using stub implementation for tiny-secp256k1");
   ecc = {
     privateKeyVerify: () => true,
@@ -34,10 +19,39 @@ if (!Deno.args.includes("build")) {
     ecdsaRecover: () => new Uint8Array(65),
     isPoint: () => true
   };
+} else {
+  // In runtime mode, try to load the real implementation
+  try {
+    ecc = await import("tiny-secp256k1");
+    console.log("Successfully loaded tiny-secp256k1 (real implementation)");
+    bitcoin.initEccLib(ecc);
+  } catch (e) {
+    // If loading fails, check if we should use stubs or throw error
+    if (isDevelopment || useStubs) {
+      console.warn("Failed to load tiny-secp256k1, using stub implementation:", e);
+      console.warn("⚠️  Bitcoin transactions will NOT work properly with stubs!");
+      console.warn("⚠️  To test real transactions, ensure tiny-secp256k1 loads correctly.");
+      // Provide stub implementation for development
+      ecc = {
+        privateKeyVerify: () => true,
+        publicKeyCreate: () => new Uint8Array(33),
+        publicKeyVerify: () => true,
+        ecdsaSign: () => ({ signature: new Uint8Array(64), recid: 0 }),
+        ecdsaVerify: () => true,
+        ecdsaRecover: () => new Uint8Array(65),
+        isPoint: () => true
+      };
+      bitcoin.initEccLib(ecc);
+    } else {
+      // In production, this is a fatal error
+      console.error("FATAL: Failed to load tiny-secp256k1 in production:", e);
+      throw new Error("Failed to initialize cryptographic library for Bitcoin operations");
+    }
+  }
 }
 
 import { bin2hex, hex2bin } from "$lib/utils/data/binary/baseUtils.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 import { estimateMintingTransactionSize } from "$lib/utils/bitcoin/minting/transactionSizes.ts";
 import { arc4 } from "$lib/utils/bitcoin/minting/transactionUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
@@ -47,8 +61,9 @@ import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 import { OptimalUTXOSelection } from "$server/services/utxo/optimalUtxoSelection.ts";
 import { CounterpartyApiManager } from "$server/services/counterpartyApiService.ts";
 import { IPrepareSRC20TX } from "$server/types/services/src20.d.ts";
-import type { UTXO } from "$types/index.d.ts";
-import { PSBTInput, VOUT } from "$types/index.d.ts";
+import type { UTXO } from "$types/base.d.ts";
+import { convertUTXOsToBasic } from "$lib/utils/bitcoin/utxo/utxoTypeUtils.ts";
+import type { PSBTInput, VOUT } from "$types/src20.d.ts";
 import { crypto } from "@std/crypto";
 import * as msgpack from "msgpack";
 // import { Psbt } from "npm:bitcoinjs-lib";
@@ -185,9 +200,12 @@ export class SRC20MultisigPSBTService {
         throw new Error("No UTXOs available for SRC-20 multisig transaction");
       }
 
+      // Convert UTXOs to BasicUTXO format for selection
+      const basicUTXOsForSelection = convertUTXOsToBasic(fullUTXOs);
+
       // Use optimal UTXO selection directly - same pattern as stamp minting
       const selectionResult = OptimalUTXOSelection.selectUTXOs(
-        fullUTXOs,
+        basicUTXOsForSelection,
         initialOutputsForSelection,
         feeRate,
         {

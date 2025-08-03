@@ -2,14 +2,8 @@
 // @bbaba+@reinamora - are the
 // deno-lint-ignore-file
 import { Button } from "$button";
+import type { FilterSRC20ModalProps } from "$types/ui.d.ts";
 import { InputField, SelectDate } from "$form";
-import {
-  COLLECTION_FILTER_TYPES,
-  LISTING_FILTER_TYPES,
-  SRC20_FILTER_TYPES,
-  STAMP_FILTER_TYPES,
-  WALLET_FILTER_TYPES,
-} from "$globals";
 import { closeModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
@@ -17,19 +11,9 @@ import type { JSX } from "preact";
 import { useState } from "preact/hooks";
 
 /* ===== TYPES ===== */
-type FilterTypes =
-  | SRC20_FILTER_TYPES
-  | STAMP_FILTER_TYPES
-  | WALLET_FILTER_TYPES
-  | COLLECTION_FILTER_TYPES
-  | LISTING_FILTER_TYPES;
-
-interface Props {
-  filterOptions: FilterTypes;
-}
 
 /* ===== COMPONENT ===== */
-const FilterSRC20Modal = ({ filterOptions }: Props) => {
+const FilterSRC20Modal = ({ filterOptions }: FilterSRC20ModalProps) => {
   /* ===== STATE ===== */
   const [title, setTitle] = useState("");
   const [progress, setProgress] = useState({ min: "", max: "" });
@@ -203,14 +187,16 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
               type="text"
               placeholder="MIN MINT PROGRESS IN PERCENT"
               value={progress.min}
-              onChange={(e) => handleChange(e, "progress_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "progress_min")}
             />
 
             <InputField
               type="text"
               placeholder="MAX MINT PROGRESS IN PERCENT"
               value={progress.max}
-              onChange={(e) => handleChange(e, "progress_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "progress_max")}
             />
           </>
         );
@@ -222,13 +208,15 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
               type="text"
               placeholder="MIN AMOUNT OF TRANSACTIONS"
               value={transactionCount.min}
-              onChange={(e) => handleChange(e, "min_tx")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "min_tx")}
             />
             <InputField
               type="text"
               placeholder="MAX AMOUNT OF TRANSACTIONS"
               value={transactionCount.max}
-              onChange={(e) => handleChange(e, "max_tx")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "max_tx")}
             />
           </>
         );
@@ -247,14 +235,16 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
               type="text"
               placeholder="MIN SUPPLY"
               value={supply.min}
-              onChange={(e) => handleChange(e, "supply_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "supply_min")}
             />
 
             <InputField
               type="text"
               placeholder="MAX SUPPLY"
               value={supply.max}
-              onChange={(e) => handleChange(e, "supply_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "supply_max")}
             />
           </>
         );
@@ -266,14 +256,16 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
               type="text"
               placeholder="MIN MARKETCAP"
               value={marketcap.min}
-              onChange={(e) => handleChange(e, "marketcap_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "marketcap_min")}
             />
 
             <InputField
               type="text"
               placeholder="MAX MARKETCAP"
               value={marketcap.max}
-              onChange={(e) => handleChange(e, "marketcap_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "marketcap_max")}
             />
           </>
         );
@@ -285,14 +277,16 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
               type="text"
               placeholder="MIN HOLDERS AMOUNT"
               value={holder.min}
-              onChange={(e) => handleChange(e, "holder_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "holder_min")}
             />
 
             <InputField
               type="text"
               placeholder="MAX HOLDERS AMOUNT"
               value={holder.max}
-              onChange={(e) => handleChange(e, "holder_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "holder_max")}
             />
           </>
         );
@@ -304,14 +298,16 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
               type="text"
               placeholder="MIN"
               value={volume.min}
-              onChange={(e) => handleChange(e, "volume_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "volume_min")}
             />
 
             <InputField
               type="text"
               placeholder="MAX"
               value={volume.max}
-              onChange={(e) => handleChange(e, "volume_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "volume_max")}
             />
           </>
         );
@@ -325,13 +321,15 @@ const FilterSRC20Modal = ({ filterOptions }: Props) => {
               type="text"
               placeholder="MIN PERCENT CHANGE"
               value={price.min}
-              onChange={(e) => handleChange(e, "price_min")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "price_min")}
             />
             <InputField
               type="text"
               placeholder="MAX PERCENT CHANGE"
               value={price.max}
-              onChange={(e) => handleChange(e, "price_max")}
+              onChange={(e: JSX.TargetedEvent<HTMLInputElement>) =>
+                handleChange(e, "price_max")}
             />
           </>
         );

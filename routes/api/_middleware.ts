@@ -2,6 +2,10 @@ import { FreshContext } from "$fresh/server.ts";
 import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 import { apiVersionMiddleware } from "$server/middleware/apiVersionMiddleware.ts";
 import { transformResponseForVersion } from "$server/middleware/schemaTransformer.ts";
+import {
+  openapiValidatorMiddleware,
+  requestValidatorMiddleware,
+} from "$server/middleware/openapiValidator.ts";
 
 /**
  * API-specific middleware
@@ -15,7 +19,37 @@ export async function handler(
   // Store request in state for middleware
   ctx.state.request = req;
 
-  // Apply API version middleware first
+  // Apply request validation first (if enabled)
+  if (Deno.env.get("OPENAPI_VALIDATION_DISABLED") !== "true") {
+    // Create a context wrapper for the request validator
+    const requestValidationContext = {
+      request: req,
+      response: { status: 200, body: null, headers: new Headers() },
+      state: ctx.state,
+    };
+
+    // Run request validation
+    await requestValidatorMiddleware(
+      requestValidationContext as any,
+      async () => {
+        // No-op - validation happens before continuing
+      },
+    );
+
+    // If validation set a response status of 400, return the error
+    if (
+      requestValidationContext.response.status === 400 &&
+      requestValidationContext.response.body
+    ) {
+      const responseBody = requestValidationContext.response.body as any;
+      return ApiResponseUtil.badRequest(
+        responseBody.message || "Request validation failed",
+        responseBody,
+      );
+    }
+  }
+
+  // Apply API version middleware after request validation
   const versionResponse = await apiVersionMiddleware(ctx, async () => {
     // Continue to next middleware/handler
     const response = await ctx.next();
@@ -97,6 +131,22 @@ export async function handler(
 
     return response;
   });
+
+  // Apply OpenAPI validation middleware after version transformation
+  // This ensures we validate the final response structure
+  // Validation is always on unless explicitly disabled
+  if (Deno.env.get("OPENAPI_VALIDATION_DISABLED") !== "true") {
+    // Create a context wrapper for the OpenAPI validator
+    const validationContext = {
+      request: req,
+      response: versionResponse,
+      state: ctx.state,
+    };
+
+    await openapiValidatorMiddleware(validationContext as any, async () => {
+      // No-op, validation happens on the response
+    });
+  }
 
   return versionResponse;
 }

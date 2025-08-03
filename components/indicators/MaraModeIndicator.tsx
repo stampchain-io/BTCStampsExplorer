@@ -1,12 +1,7 @@
 import { Icon } from "$icon";
+import type { MaraModeIndicatorProps } from "$types/ui.d.ts";
 import { useRef, useState } from "preact/hooks";
 import { AccessibilityUtils } from "$utils/ui/accessibility/accessibilityUtils.ts";
-
-interface MaraModeIndicatorProps {
-  outputValue: number;
-  feeRate?: number | null;
-  class?: string;
-}
 
 export function MaraModeIndicator({
   outputValue,

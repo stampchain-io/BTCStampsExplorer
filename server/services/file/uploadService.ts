@@ -2,7 +2,7 @@ import { saveFileToDatabase } from "$server/database/fileOperations.ts";
 import { SRC20BackgroundUpload, SRC20BackgroundUploadResult } from "$lib/types/src20.ts";
 import { SecurityService } from "$server/services/security/securityService.ts";
 import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
-import { logger } from "$lib/utils/monitoring/logging/logger.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 export class FileUploadService {
   private static readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB

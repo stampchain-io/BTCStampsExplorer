@@ -1,9 +1,3 @@
-import {
-  STAMP_FILTER_TYPES as _STAMP_FILTER_TYPES,
-  STAMP_SUFFIX_FILTERS as _STAMP_SUFFIX_FILTERS,
-  SUBPROTOCOLS as _SUBPROTOCOLS,
-} from "$globals";
-
 export const filterOptions = {
   "vector": {
     suffixFilters: ["svg" as const, "html" as const],

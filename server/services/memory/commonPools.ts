@@ -3,7 +3,7 @@
  * Pre-configured pools for frequently used data structures
  */
 
-import { objectPoolManager } from "./objectPool.ts";
+import { objectPoolManager } from "$server/services/memory/objectPool.ts";
 
 /**
  * Common data structures that get created/destroyed frequently

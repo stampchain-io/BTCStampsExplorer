@@ -1,9 +1,7 @@
+import type { ReadAllButtonProps } from "$types/ui.d.ts";
 /* ===== READ ALL BUTTON COMPONENT ===== */
 
 /* ===== TYPES ===== */
-interface ReadAllButtonProps {
-  href?: string;
-}
 
 /* ===== COMPONENT ===== */
 export function ReadAllButton({ href = "/howto" }: ReadAllButtonProps) {

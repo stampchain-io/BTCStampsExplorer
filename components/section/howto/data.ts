@@ -1,5 +1,5 @@
 /* ===== HOW-TO GUIDES DATA AND CONFIGURATION ===== */
-import { ListProps } from "$section";
+import type { HowToStepProps, NumberedHowToStepProps } from "$types/ui.d.ts";
 
 /* ===== NAVIGATION AND ARTICLE LINKS ===== */
 export interface ArticleLinks {
@@ -19,7 +19,7 @@ export const ARTICLE_LINKS: ArticleLinks[] = [
 ];
 
 /* ===== EXAMPLE STEPS CONFIGURATION ===== */
-export const EXAMPLE_STEPS: ListProps[] = [
+export const EXAMPLE_STEPS: HowToStepProps[] = [
   {
     title: "SINGLE LINE",
     image: "/img/how-tos/example/01.png",
@@ -43,7 +43,7 @@ export const EXAMPLE_STEPS: ListProps[] = [
 ];
 
 /* ===== TOKEN DEPLOYMENT GUIDE ===== */
-export const DEPLOY_STEPS: ListProps[] = [
+export const DEPLOY_STEPS: HowToStepProps[] = [
   {
     title: "NAVIGATE TO DEPLOY PAGE",
     image: "/img/how-tos/deploy/01.png",
@@ -83,8 +83,7 @@ export const DEPLOY_IMPORTANT_NOTES = [
 ];
 
 /* ===== LEATHER WALLET CONNECTION GUIDE ===== */
-interface ConnectStep extends ListProps {
-  number: number;
+interface ConnectStep extends NumberedHowToStepProps {
 }
 
 export const LEATHER_CONNECT_STEPS: ConnectStep[] = [
@@ -139,8 +138,7 @@ export const LEATHER_CONNECT_IMPORTANT_NOTES = [
 ];
 
 /* ===== LEATHER WALLET CREATION GUIDE ===== */
-interface WalletStep extends ListProps {
-  number: number;
+interface WalletStep extends NumberedHowToStepProps {
 }
 
 export const LEATHER_CREATE_WALLET_STEPS: WalletStep[] = [
@@ -222,7 +220,7 @@ export const LEATHER_CREATE_IMPORTANT_NOTES = [
 ];
 
 /* ===== TOKEN MINTING GUIDE ===== */
-export const MINT_STEPS: ListProps[] = [
+export const MINT_STEPS: HowToStepProps[] = [
   {
     title: "NAVIGATE TO MINT",
     image: "/img/how-tos/mintsrc20/01.png",
@@ -259,7 +257,7 @@ export const MINT_STEPS: ListProps[] = [
 export const MINT_IMPORTANT_NOTES = [];
 
 /* ===== BITNAME REGISTRATION GUIDE ===== */
-export const BITNAME_STEPS: ListProps[] = [
+export const BITNAME_STEPS: HowToStepProps[] = [
   {
     title: "NAVIGATE TO REGISTER",
     image: "/img/how-tos/bitname/01.png",
@@ -290,7 +288,7 @@ export const BITNAME_STEPS: ListProps[] = [
 export const BITNAME_IMPORTANT_NOTES = [];
 
 /* ===== STAMP CREATION GUIDE ===== */
-export const STAMP_STEPS: ListProps[] = [
+export const STAMP_STEPS: HowToStepProps[] = [
   {
     title: "NAVIGATE TO MINT PAGE",
     image: "/img/how-tos/stamping/01.png",
@@ -330,7 +328,7 @@ export const STAMP_IMPORTANT_NOTES = [
 ];
 
 /* ===== BITNAME TRANSFER GUIDE ===== */
-export const TRANSFER_BITNAME_STEPS: ListProps[] = [
+export const TRANSFER_BITNAME_STEPS: HowToStepProps[] = [
   {
     title: "NAVIGATE TO TRANSFER PAGE",
     image: "/img/how-tos/bitnametransfer/01.png",
@@ -362,7 +360,7 @@ export const TRANSFER_BITNAME_IMPORTANT_NOTES = [
 ];
 
 /* ===== STAMP SEND GUIDE ===== */
-export const SEND_STAMP_STEPS: ListProps[] = [
+export const SEND_STAMP_STEPS: HowToStepProps[] = [
   {
     title: "NAVIGATE TO SEND STAMP PAGE",
     image: "/img/how-tos/sendstamp/01.png",
@@ -402,7 +400,7 @@ export const SEND_STAMP_IMPORTANT_NOTES = [
 ];
 
 /* ===== TOKEN TRANSFER GUIDE ===== */
-export const TRANSFER_TOKEN_STEPS: ListProps[] = [
+export const TRANSFER_TOKEN_STEPS: HowToStepProps[] = [
   {
     title: "NAVIGATE TO MINT PAGE",
     image: "/img/how-tos/stamping/01.png",
@@ -442,8 +440,7 @@ export const TRANSFER_TOKEN_IMPORTANT_NOTES = [
 ];
 
 /* ===== TEMPLATE CONFIGURATION ===== */
-interface TemplateStep extends ListProps {
-  number: number;
+interface TemplateStep extends NumberedHowToStepProps {
 }
 
 export const TEMPLATE_STEPS: TemplateStep[] = [
