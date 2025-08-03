@@ -91,7 +91,7 @@ export const RangeSlider = ({
     if (inputRef.current) {
       // Dynamic thumb width: 0% position = 10px, 100% position = 0px
       const position = convertValueToPosition(value);
-      const dynamicThumbWidth = 24 - (position / 100) * 24; // 24 at 0%, 0 at 100%
+      const dynamicThumbWidth = 24 - (position / 100) * 30; // 24 at 0%, 0 at 100%
       setKnobWidth(dynamicThumbWidth);
     }
   }, [value, convertValueToPosition]);

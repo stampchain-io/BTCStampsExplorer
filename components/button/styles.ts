@@ -95,7 +95,7 @@ const baseGlassmorphism =
 const baseGlassmorphismColor =
   "relative text-[#1e1723] before:blur-[5px] hover:border-[var(--color-border-hover)] hover:before:scale-110 hover:before:blur-sm";
 const shadow =
-  "shadow-[0_3px_6px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_3px_3px_rgba(22,22,22,0.2)]";
+  "shadow-[0_2px_4px_rgba(22,22,22,0.1),inset_0_1px_0_rgba(22,22,22,0.3),inset_0_-1px_0_rgba(22,22,22,0.1),inset_0_0_2px_2px_rgba(22,22,22,0.2)]";
 
 export const buttonStyles: ButtonVariants = {
   /* ===== BASE STYLES ===== */
