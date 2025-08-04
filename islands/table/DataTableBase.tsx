@@ -23,7 +23,9 @@ export default function DataTableBase({
   initialCounts = {},
 }: TableProps) {
   /* ===== STATE ===== */
-  const [selectedTab, setSelectedTab] = useState<string>(configs[0]?.id || "");
+  const [selectedTab, setSelectedTab] = useState<string>(
+    configs.length > 0 ? configs[0].id : "",
+  );
   const [tabData, setTabData] = useState<TabData>({});
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
