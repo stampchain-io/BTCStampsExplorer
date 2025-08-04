@@ -50,13 +50,18 @@ export function formatSatoshisToBTC(
 
 export function formatSatoshisToUSD(
   satoshis: number,
-  btcPrice: number,
+  btcPrice: number | undefined | null,
   options: {
     decimals?: number;
     includeSymbol?: boolean;
   } = {},
 ): string {
   const { decimals = 2, includeSymbol = false } = options;
+
+  // Handle cases where BTC price is not available
+  if (btcPrice === undefined || btcPrice === null || btcPrice <= 0) {
+    return "N/A";
+  }
 
   // Convert satoshis to BTC then to USD
   const btcValue = satoshis / SATOSHIS_PER_BTC;
