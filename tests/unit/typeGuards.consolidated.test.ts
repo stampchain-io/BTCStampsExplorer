@@ -278,7 +278,9 @@ Deno.test("Stamp Protocol Type Guards", async (t) => {
 
   await t.step("isStampHash", () => {
     assertEquals(isStampHash("AbCdEf123456"), true);
-    assertEquals(isStampHash("ABCDEF123456789012"), true);
+    assertEquals(isStampHash("aBc123XyZ456"), true);
+    assertEquals(isStampHash("ABCDEF123456789012"), false); // No lowercase
+    assertEquals(isStampHash("alllowercase123"), false); // No uppercase
     assertEquals(isStampHash("toolong12345678901234"), false);
     assertEquals(isStampHash("short"), false);
   });

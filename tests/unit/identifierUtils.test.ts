@@ -1,12 +1,14 @@
 import { assert, assertEquals } from "@std/assert";
 import {
   getIdentifierType,
+} from "$lib/utils/data/identifiers/identifierUtils.ts";
+import {
   isCpid,
   isStampHash,
   isStampNumber,
   isTxHash,
   isValidSrc20Tick,
-} from "$lib/utils/data/identifiers/identifierUtils.ts";
+} from "$lib/utils/typeGuards.ts";
 
 Deno.test("identifierUtils - isStampNumber", async (t) => {
   await t.step("should validate positive integers", () => {
