@@ -1,6 +1,7 @@
 import { FreshContext } from "$fresh/server.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { WebResponseUtil } from "$lib/utils/api/responses/webResponseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/api/responses/apiResponseUtil.ts";
 
 export const handler = async (
   _req: Request,
@@ -39,8 +40,8 @@ export const handler = async (
     // Convert to Uint8Array for direct response
     const uint8Array = new Uint8Array(content);
 
-    // Return binary content directly to avoid WebResponseUtil issues
-    return new Response(uint8Array, {
+    // Return binary content using ApiResponseUtil.custom for proper handling
+    return ApiResponseUtil.custom(uint8Array, 200, {
       headers: {
         "Content-Type": contentType,
         "Cache-Control": "public, max-age=31536000, immutable",

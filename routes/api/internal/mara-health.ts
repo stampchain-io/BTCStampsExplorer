@@ -166,18 +166,14 @@ export const handler: Handlers = {
           },
         });
       } else if (overallStatus === "degraded") {
-        return new Response(JSON.stringify(response), {
-          status: 200, // Return 200 but indicate degraded in body
+        return ApiResponseUtil.success(response, {
           headers: {
-            "Content-Type": "application/json",
             "Cache-Control": "private, max-age=5",
           },
         });
       } else {
-        return new Response(JSON.stringify(response), {
-          status: 503, // Service Unavailable
+        return ApiResponseUtil.serviceUnavailable("Service health degraded", response, {
           headers: {
-            "Content-Type": "application/json",
             "Cache-Control": "private, max-age=5",
             "Retry-After": "60", // Suggest retry after 60 seconds
           },
@@ -206,10 +202,8 @@ export const handler: Handlers = {
         details: [`Health check error: ${errorMessage}`],
       };
 
-      return new Response(JSON.stringify(errorResponse), {
-        status: 503,
+      return ApiResponseUtil.serviceUnavailable("Health check failed", errorResponse, {
         headers: {
-          "Content-Type": "application/json",
           "Cache-Control": "private, max-age=5",
         },
       });
