@@ -19,6 +19,7 @@ import {
   isBrowser,
   safeNavigate,
 } from "$utils/navigation/freshNavigationUtils.ts";
+import { SSRSafeUrlBuilder } from "$components/navigation/SSRSafeUrlBuilder.tsx";
 
 function getMarketCap(src20: SRC20Row): number {
   const marketCap = src20.market_data?.market_cap_btc ?? src20.market_cap_btc;
@@ -105,16 +106,17 @@ export function SRC20Card({
       ? "asc"
       : "desc";
 
-    // Navigate with new sort parameters
-    if (typeof globalThis !== "undefined" && globalThis?.location) {
-      const url = new URL(globalThis.location.href);
-      url.searchParams.set("sortBy", apiSortKey);
-      url.searchParams.set("sortDirection", newDirection);
-      url.searchParams.set("page", "1"); // Reset to page 1 when sorting changes
+    // Navigate with new sort parameters using SSR-safe URL builder
+    if (isBrowser()) {
+      const url = SSRSafeUrlBuilder.fromCurrent()
+        .setParam("sortBy", apiSortKey)
+        .setParam("sortDirection", newDirection)
+        .setParam("page", "1") // Reset to page 1 when sorting changes
+        .toString();
 
       // Use Fresh.js navigation
       const link = document.createElement("a");
-      link.href = url.toString();
+      link.href = url;
       link.setAttribute("f-partial", "");
       link.style.display = "none";
       document.body.appendChild(link as Node);

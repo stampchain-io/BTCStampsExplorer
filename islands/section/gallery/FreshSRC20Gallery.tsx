@@ -11,6 +11,7 @@ import { LoadingIcon } from "$icon";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { hasProperty, isNumber } from "$lib/utils/errorTypeGuards.ts";
 import { useEffect, useMemo, useState } from "preact/hooks";
+import { useSSRSafeNavigation } from "$lib/hooks/useSSRSafeNavigation.ts";
 
 // ===== TYPES =====
 
@@ -34,6 +35,7 @@ export default function FreshSRC20Gallery({
   showLoadingSkeleton = true,
   enablePartialNavigation = true,
 }: FreshSRC20GalleryProps) {
+  const { updateSearchParams, isClient } = useSSRSafeNavigation();
   // ===== STATE =====
   const [tokens, setTokens] = useState<EnrichedSRC20Row[]>(initialData);
   const [pagination, setPagination] = useState(
@@ -205,13 +207,13 @@ export default function FreshSRC20Gallery({
   const handleSortChange = async (newSort: "ASC" | "DESC") => {
     setCurrentSort(newSort);
 
-    // Update URL params to reflect sort change
-    if (typeof globalThis !== "undefined") {
-      const url = new URL(globalThis.location.href);
-      url.searchParams.set("src20SortBy", newSort);
-      url.searchParams.delete("src20_page"); // Reset to page 1 on sort change
-      url.searchParams.set("anchor", "src20");
-      globalThis.history.pushState({}, "", url.toString());
+    // Update URL params to reflect sort change using SSR-safe navigation
+    if (isClient) {
+      updateSearchParams((params) => {
+        params.set("src20SortBy", newSort);
+        params.delete("src20_page"); // Reset to page 1 on sort change
+        params.set("anchor", "src20");
+      });
     }
 
     // Fetch new data with sort (reset to page 1)
