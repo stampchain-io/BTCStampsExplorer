@@ -185,10 +185,8 @@ function SortingErrorFallback({
   maxRetries,
 }: SortingErrorFallbackProps) {
   if (!error) {
-    // This should never happen: error boundary fallback must only be rendered with a real error.
-    throw new Error(
-      "SortingErrorFallback called without an error object. This indicates a logic error in the error boundary implementation.",
-    );
+    // Return empty fragment if no error - this handles the optional error case gracefully
+    return null;
   }
 
   const canRetry = (retryCount ?? 0) < (maxRetries ?? 3) &&
@@ -240,7 +238,7 @@ function SortingErrorFallback({
             Suggested action:
           </div>
           <div className="text-gray-400">
-            {getActionMessage("action" in error ? error.action : "")}
+            {getActionMessage(error.action || "")}
           </div>
         </div>
       )}
