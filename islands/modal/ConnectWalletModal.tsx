@@ -10,7 +10,7 @@ import { logger } from "$lib/utils/logger.ts";
 /* ===== COMPONENT ===== */
 export const ConnectWalletModal = ({
   connectors,
-  handleClose,
+  onClose,
 }: ConnectWalletModalProps) => {
   /* ===== EVENT HANDLERS ===== */
   const handleModalClose = () => {
@@ -28,7 +28,7 @@ export const ConnectWalletModal = ({
     // Then wait for animation to complete before closing
     setTimeout(() => {
       showConnectWalletModal.value = false;
-      handleClose?.();
+      onClose?.();
     }, 600); // matches --animation-cleanup-delay from modal.css
   };
 

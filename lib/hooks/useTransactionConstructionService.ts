@@ -140,12 +140,6 @@ export function useTransactionConstructionService(options: EstimationOptions) {
     };
 
     // Add optional properties only if they're defined
-    if (options.walletAddress !== undefined) {
-      baseOptions.walletAddress = options.walletAddress;
-    }
-    if (options.isSubmitting !== undefined) {
-      baseOptions.isSubmitting = options.isSubmitting;
-    }
     if (options.file !== undefined) {
       baseOptions.file = options.file;
     }

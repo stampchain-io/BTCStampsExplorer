@@ -4,6 +4,7 @@ import { useRef, useState } from "preact/hooks";
 import { AccessibilityUtils } from "$utils/ui/accessibility/accessibilityUtils.ts";
 
 export function MaraModeIndicator({
+  isActive,
   outputValue,
   feeRate,
   class: className = "",
@@ -76,12 +77,12 @@ export function MaraModeIndicator({
         <div class="relative">
           <div
             class={`w-2 h-2 bg-purple-400 rounded-full ${
-              shouldReduceMotion ? "" : "animate-pulse"
+              shouldReduceMotion || !isActive ? "" : "animate-pulse"
             }`}
           />
           <div
             class={`absolute inset-0 w-2 h-2 bg-purple-400 rounded-full opacity-20 ${
-              shouldReduceMotion ? "" : "animate-ping"
+              shouldReduceMotion || !isActive ? "" : "animate-ping"
             }`}
           />
         </div>
