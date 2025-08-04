@@ -21,19 +21,7 @@ import type {
 } from "$types/base.d.ts";
 import type { CacheStatus } from "$types/marketData.d.ts";
 
-import type { CompilationMetrics } from "$types/utils.d.ts";
 import type { CollectionRow } from "$server/types/collection.d.ts";
-
-// Temporary definition until properly exported from utils.d.ts
-interface PerformanceRegression {
-  type: string;
-  endpoint?: string;
-  metric: string;
-  baseline: number;
-  current: number;
-  regression: number;
-  severity: "critical" | "warning";
-}
 import type {
   ConnectionPoolStatistics,
   RelationDefinition,
@@ -48,6 +36,7 @@ import type {
   ActivityLevel,
   AlertDashboardData,
   CompilationDashboardData,
+  CompilationMetrics,
   CoverageDashboardData,
   CoverageStats,
   CoverageTrend,
@@ -60,6 +49,17 @@ import type {
   TypeSafetyReport,
 } from "$types/utils.d.ts";
 import type { Wallet } from "$types/wallet.d.ts";
+
+// Temporary definition until properly exported from utils.d.ts
+interface PerformanceRegression {
+  type: string;
+  endpoint?: string;
+  metric: string;
+  baseline: number;
+  current: number;
+  regression: number;
+  severity: "critical" | "warning";
+}
 // Re-export Collection type for backward compatibility
 export type Collection = CollectionRow;
 
@@ -76,7 +76,7 @@ import type {
   StampMarketplace,
   StampRange,
   StampType,
-} from "$constants/stampConstants.ts";
+} from "$constants";
 
 /**
  * Bitcoin Stamps protocol subprotocol identifier
@@ -92,76 +92,36 @@ export type STAMP_TYPES = StampType;
 // ============================================================================
 
 /**
- * Stamp classification types based on Bitcoin Stamps protocol
- * These represent the different categories of stamps according to protocol rules
+ * Import and re-export stamp-related enums from constants
+ * Following single-source-of-truth pattern
  */
-export enum StampClassification {
-  /** Blessed stamps - follow all protocol rules and are indexed properly */
-  BLESSED = "blessed",
-  /** Cursed stamps - violate protocol rules but are still valid Bitcoin transactions */
-  CURSED = "cursed",
-  /** Classic stamps - early stamps before certain protocol updates */
-  CLASSIC = "classic",
-  /** Posh stamps - premium or high-quality stamps */
-  POSH = "posh",
-}
+import {
+  ProtocolComplianceLevel,
+  StampClassification,
+  StampErrorCode,
+  StampProtocolVersion,
+  StampRarity,
+  StampStatus,
+  StampTransactionType,
+  StampValidationStatus,
+} from "$constants";
+
+export {
+  ProtocolComplianceLevel,
+  StampClassification,
+  StampErrorCode,
+  StampProtocolVersion,
+  StampRarity,
+  StampStatus,
+  StampTransactionType,
+  StampValidationStatus,
+};
 
 /**
  * Legacy type alias for backward compatibility
  * @deprecated Use StampClassification enum instead
  */
 export type CursedTypes = StampClassification;
-
-/**
- * Stamp validation status enumeration
- * Represents the validation state of a stamp according to protocol rules
- */
-export enum StampValidationStatus {
-  /** Stamp is valid according to all protocol rules */
-  VALID = "valid",
-  /** Stamp is invalid but still recorded on blockchain */
-  INVALID = "invalid",
-  /** Stamp validation is pending or incomplete */
-  PENDING = "pending",
-  /** Stamp validation failed due to technical issues */
-  ERROR = "error",
-}
-
-/**
- * Stamp rarity classification based on various factors
- */
-export enum StampRarity {
-  /** Common stamps with high supply or frequency */
-  COMMON = "common",
-  /** Uncommon stamps with moderate scarcity */
-  UNCOMMON = "uncommon",
-  /** Rare stamps with low supply or unique properties */
-  RARE = "rare",
-  /** Epic stamps with very low supply or special significance */
-  EPIC = "epic",
-  /** Legendary stamps with extreme rarity or historical importance */
-  LEGENDARY = "legendary",
-}
-
-/**
- * Stamp status enumeration for tracking lifecycle
- */
-export enum StampStatus {
-  /** Stamp is being created/minted */
-  CREATING = "creating",
-  /** Stamp creation is pending confirmation */
-  PENDING = "pending",
-  /** Stamp is confirmed and active */
-  CONFIRMED = "confirmed",
-  /** Stamp has been transferred */
-  TRANSFERRED = "transferred",
-  /** Stamp is listed for sale */
-  LISTED = "listed",
-  /** Stamp has been sold */
-  SOLD = "sold",
-  /** Stamp is locked or frozen */
-  LOCKED = "locked",
-}
 
 /**
  * Comprehensive stamp metadata interface
@@ -416,16 +376,6 @@ export interface StampTransactionRelationship {
 /**
  * Types of stamp-transaction relationships - This needs cleanup before implementation
  */
-export enum StampTransactionType {
-  /** Stamp creation transaction */
-  CREATION = "creation",
-  /** Stamp transfer transaction */
-  TRANSFER = "transfer",
-  /** Stamp burn/destroy transaction */
-  BURN = "burn",
-  /** Stamp update/modification transaction */
-  UPDATE = "update",
-}
 
 /**
  * Stamp UTXO reference interface
@@ -946,39 +896,9 @@ export interface StampNumberValidationResult {
   nextAvailableNumber?: number;
 }
 
-/**
- * Protocol version enumeration
- * Tracks different versions of the Bitcoin Stamps protocol -
- * FIXME(stamps):should this be aligned with the indexer versions or API versions?
- */
-export enum StampProtocolVersion {
-  /** Initial protocol version */
-  V1_0 = "1.0",
-  /** Enhanced validation rules */
-  V1_1 = "1.1",
-  /** Cursed stamps support */
-  V2_0 = "2.0",
-  /** Current version with full feature set */
-  V2_1 = "2.1",
-  /** Development/beta version */
-  BETA = "beta",
-}
+// StampProtocolVersion enum moved to constants/stampConstants.ts
 
-/**
- * Protocol compliance levels
- */
-export enum ProtocolComplianceLevel {
-  /** Fully compliant with all protocol rules */
-  FULL = "full",
-  /** Mostly compliant with minor violations */
-  PARTIAL = "partial",
-  /** Significant violations but still functional */
-  LIMITED = "limited",
-  /** Major violations, may not function correctly */
-  MINIMAL = "minimal",
-  /** Non-compliant, protocol violations */
-  NONE = "none",
-}
+// ProtocolComplianceLevel enum moved to constants/stampConstants.ts
 
 /**
  * Comprehensive protocol compliance interface
@@ -1229,22 +1149,7 @@ export interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
   stamp_base64?: string;
 }
 
-/**
- * StampErrorCode - Migrated from errors.ts
- */
-export enum StampErrorCode {
-  STAMP_NOT_FOUND = "STAMP_NOT_FOUND",
-  INVALID_STAMP_DATA = "STAMP_INVALID_STAMP_DATA",
-  INVALID_CPID = "STAMP_INVALID_CPID",
-  STAMP_ALREADY_EXISTS = "STAMP_ALREADY_EXISTS",
-  INVALID_CREATOR = "STAMP_INVALID_CREATOR",
-  INVALID_SUPPLY = "STAMP_INVALID_SUPPLY",
-  INVALID_DIVISIBILITY = "STAMP_INVALID_DIVISIBILITY",
-  INVALID_LOCK_STATUS = "STAMP_INVALID_LOCK_STATUS",
-  INVALID_MEDIA_TYPE = "STAMP_INVALID_MEDIA_TYPE",
-  MEDIA_TOO_LARGE = "STAMP_MEDIA_TOO_LARGE",
-  INVALID_BASE64 = "STAMP_INVALID_BASE64",
-}
+// StampErrorCode enum moved to constants/stampConstants.ts
 
 /**
  * UTXOCache - Migrated from fee-estimation.ts

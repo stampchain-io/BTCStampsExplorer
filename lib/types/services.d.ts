@@ -1,5 +1,6 @@
 import {
   CollectionValidationErrorCode,
+  ProtocolComplianceLevel,
   RouteType,
   SortDirection,
 } from "$constants";
@@ -4807,13 +4808,8 @@ export type PerformanceTraceEvent = {
   metadata?: Record<string, unknown>;
 };
 
-export enum ProtocolComplianceLevel {
-  NONE = 0,
-  MINIMAL = 1,
-  PARTIAL = 2,
-  FULL = 3,
-  ENHANCED = 4,
-}
+// ProtocolComplianceLevel enum moved to constants/stampConstants.ts
+// Note: The constants version uses string values, not numeric values
 
 export interface SystemPerformanceMetrics {
   cpuUsage: number;

@@ -363,7 +363,6 @@ export function isValidSRC101Deploy(value: unknown): value is {
  * Type assertion for stamp classification types
  */
 export type AssertStampClassification<T> = T extends
-  | "blessed"
   | "cursed"
   | "classic"
   | "posh" ? T
@@ -374,8 +373,8 @@ export type AssertStampClassification<T> = T extends
  */
 export function isValidStampClassification(
   value: string,
-): value is "blessed" | "cursed" | "classic" | "posh" {
-  return ["blessed", "cursed", "classic", "posh"].includes(value);
+): value is "cursed" | "classic" | "posh" {
+  return ["cursed", "classic", "posh"].includes(value);
 }
 
 /**

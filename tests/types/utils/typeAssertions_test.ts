@@ -410,11 +410,11 @@ Deno.test("SRC-101 NFT - isValidSRC101Deploy", () => {
 // ============================================================================
 
 Deno.test("Stamp Protocol - isValidStampClassification", () => {
-  assertEquals(isValidStampClassification("blessed"), true);
   assertEquals(isValidStampClassification("cursed"), true);
   assertEquals(isValidStampClassification("classic"), true);
   assertEquals(isValidStampClassification("posh"), true);
 
+  assertEquals(isValidStampClassification("blessed"), false);
   assertEquals(isValidStampClassification("invalid"), false);
   assertEquals(isValidStampClassification(""), false);
 });

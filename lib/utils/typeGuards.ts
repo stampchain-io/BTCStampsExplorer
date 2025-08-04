@@ -32,6 +32,7 @@ import type { Wallet, WalletConnectionResult } from "../types/wallet.d.ts";
 import type { WalletProviderKey } from "../constants/walletProviders.ts";
 import type { FeeAlert, FeeEstimate } from "../types/fee.d.ts";
 import type { PaginatedResponse } from "../types/pagination.d.ts";
+import { StampClassification } from "$constants";
 
 // ============================================================================
 // CONSTANTS & REGEX PATTERNS
@@ -674,8 +675,6 @@ export function isCpid(value: unknown): boolean {
 /**
  * Stamp classification types
  */
-type StampClassification = "blessed" | "cursed" | "classic" | "posh";
-
 /**
  * Validates stamp classification
  * @param classification - Classification to validate
@@ -684,8 +683,9 @@ type StampClassification = "blessed" | "cursed" | "classic" | "posh";
 export function isValidStampClassification(
   classification: unknown,
 ): classification is StampClassification {
-  return classification === "blessed" || classification === "cursed" ||
-    classification === "classic" || classification === "posh";
+  return classification === StampClassification.CURSED ||
+    classification === StampClassification.CLASSIC ||
+    classification === StampClassification.POSH;
 }
 
 /**
