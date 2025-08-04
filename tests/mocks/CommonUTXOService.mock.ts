@@ -5,7 +5,7 @@
 
 import type { UTXOFixture } from "../fixtures/utxoFixtures.ts";
 import { utxoFixtures } from "../fixtures/utxoFixtures.ts";
-import type { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
+import { CommonUTXOService } from "$server/services/utxo/commonUtxoService.ts";
 
 // Store mock responses for different scenarios
 const mockResponses = new Map<string, any>();

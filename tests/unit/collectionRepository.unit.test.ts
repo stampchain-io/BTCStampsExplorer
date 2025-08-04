@@ -1,13 +1,13 @@
 import { assertEquals, assertExists } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "jsr:@std/testing@1.0.14/bdd";
-import type { CollectionRepository } from "$server/database/collectionRepository.ts";
+import { CollectionRepository } from "$server/database/collectionRepository.ts";
 import type {
   CollectionRow,
   CollectionWithOptionalMarketData,
 } from "$server/types/collection.d.ts";
-import type { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
-import type { dbManager } from "$server/database/databaseManager.ts";
-import type {
+import { MockDatabaseManager } from "../mocks/mockDatabaseManager.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
+import {
   createMockCollection,
   createMockDatabaseManager,
 } from "./utils/testFactories.ts";

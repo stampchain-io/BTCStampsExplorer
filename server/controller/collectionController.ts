@@ -45,7 +45,18 @@ export class CollectionController {
       });
       console.log(`[CollectionController] Collection details fetched in ${Date.now() - collectionsStartTime}ms, got ${collectionsResult.data?.length || 0} collections`);
 
-      if (!collectionsResult.data || collectionsResult.data.length === 0) {
+      if (!collectionsResult.data) {
+        return {
+          ...collectionsResult,
+          data: [],
+        };
+      }
+
+      if (!Array.isArray(collectionsResult.data)) {
+        throw new Error("Invalid data structure from CollectionService: data is not an array");
+      }
+
+      if (collectionsResult.data.length === 0) {
         return {
           ...collectionsResult,
           data: [],
