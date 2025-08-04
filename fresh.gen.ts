@@ -188,6 +188,7 @@ import * as $content_stampDetailContent_StampImage from "./islands/content/stamp
 import * as $content_stampDetailContent_StampInfo from "./islands/content/stampDetailContent/StampInfo.tsx";
 import * as $content_stampDetailContent_StampTextContent from "./islands/content/stampDetailContent/StampTextContent.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
+import * as $datacontrol_PaginationSSRSafe from "./islands/datacontrol/PaginationSSRSafe.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_faq from "./islands/datacontrol/faq.ts";
 import * as $error_ErrorDisplay from "./islands/error/ErrorDisplay.tsx";
@@ -531,6 +532,8 @@ const manifest = {
     "./islands/content/stampDetailContent/StampTextContent.tsx":
       $content_stampDetailContent_StampTextContent,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
+    "./islands/datacontrol/PaginationSSRSafe.tsx":
+      $datacontrol_PaginationSSRSafe,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/faq.ts": $datacontrol_faq,
     "./islands/error/ErrorDisplay.tsx": $error_ErrorDisplay,
