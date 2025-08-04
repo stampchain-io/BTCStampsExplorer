@@ -18,6 +18,11 @@ import { Button } from "$button";
 import { CloseIcon, Icon } from "$icon";
 import { FilterType } from "$islands/button/FilterButton.tsx";
 import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
+import {
+  getSearchParams,
+  isBrowser,
+  safeNavigate,
+} from "$utils/navigation/freshNavigationUtils.ts";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 import { tooltipIcon } from "$notification";
 
@@ -43,13 +48,12 @@ const FilterDrawer = (
   // Parse the current URL parameters to initialize filters
   const getInitialFilters = (): AllFilters => {
     // SSR-safe browser environment check
-    if (typeof globalThis === "undefined" || !globalThis?.location) {
+    if (!isBrowser()) {
       // SSR: return default filters
       return getEmptyFilters();
     }
-    const searchString = globalThis.location.search.startsWith("?")
-      ? globalThis.location.search.slice(1)
-      : globalThis.location.search;
+    const searchParams = getSearchParams();
+    const searchString = searchParams.toString();
 
     let filters;
     switch (type) {
@@ -297,7 +301,7 @@ const FilterDrawer = (
       (queryParams ? `?${queryParams}` : "");
 
     // Update URL and close drawer
-    globalThis.location.href = newUrl;
+    safeNavigate(newUrl);
     setOpen(false);
   };
 

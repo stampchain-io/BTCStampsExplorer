@@ -15,6 +15,10 @@ import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { formatDate } from "$lib/utils/ui/formatting/formatUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
+import {
+  isBrowser,
+  safeNavigate,
+} from "$utils/navigation/freshNavigationUtils.ts";
 
 export function SRC20CardMinting({
   data,
@@ -277,16 +281,13 @@ export function SRC20CardMinting({
                         e.button !== 1
                       ) {
                         e.preventDefault();
-                        if (
-                          typeof globalThis !== "undefined" &&
-                          globalThis?.location
-                        ) {
+                        if (isBrowser()) {
                           const href = `/src20/${
                             encodeURIComponent(
                               unicodeEscapeToEmoji(src20.tick ?? ""),
                             )
                           }`;
-                          globalThis.location.href = href;
+                          safeNavigate(href);
                         }
                       }
                     }}

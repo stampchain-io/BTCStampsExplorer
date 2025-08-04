@@ -15,6 +15,11 @@ import {
 import { unicodeEscapeToEmoji } from "$lib/utils/ui/formatting/emojiUtils.ts";
 import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
+import {
+  getCurrentUrl,
+  isBrowser,
+  safeNavigate,
+} from "$utils/navigation/freshNavigationUtils.ts";
 
 export function SRC20CardSmMinting({
   data = [], // Default to empty array to prevent undefined errors
@@ -110,19 +115,18 @@ export function SRC20CardSmMinting({
                 event.preventDefault();
 
                 // SSR-safe browser environment check
-                if (
-                  typeof globalThis === "undefined" || !globalThis?.location
-                ) {
+                if (!isBrowser()) {
                   return; // Cannot navigate during SSR
                 }
 
                 // Check if we're already on the mint page
-                const currentPath = globalThis.location.pathname;
-                const isMintPage = currentPath.includes("/tool/src20/mint");
+                const currentUrl = getCurrentUrl();
+                const url = new URL(currentUrl);
+                const isMintPage = url.pathname.includes("/tool/src20/mint");
 
                 if (isMintPage) {
                   // If we're on the mint page, update URL parameters to populate form
-                  const newUrl = new URL(globalThis.location.href);
+                  const newUrl = new URL(currentUrl);
                   newUrl.searchParams.set("tick", src20.tick ?? "");
                   newUrl.searchParams.set("trxType", "olga");
                   globalThis.history.replaceState({}, "", newUrl.toString());
@@ -135,7 +139,7 @@ export function SRC20CardSmMinting({
                   );
                 } else {
                   // Otherwise, navigate to mint page with parameters
-                  globalThis.location.href = mintHref;
+                  safeNavigate(mintHref);
                 }
               };
 

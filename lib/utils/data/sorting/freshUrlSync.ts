@@ -9,6 +9,10 @@ import type {
   StampSortKey,
   WalletSortKey,
 } from "$lib/types/sorting.d.ts";
+import {
+  getSearchParams,
+  isBrowser,
+} from "$utils/navigation/freshNavigationUtils.ts";
 
 // ===== SERVER-SIDE URL PARSING =====
 
@@ -194,8 +198,8 @@ export function createFreshNavigationHandler<T extends SortKey>(config: {
   return (sortBy: T) => {
     try {
       // Get current URL parameters
-      const currentParams = typeof globalThis.location !== "undefined"
-        ? new URLSearchParams(globalThis.location.search)
+      const currentParams = isBrowser()
+        ? getSearchParams()
         : new URLSearchParams();
 
       // Create new parameters, preserving specified ones

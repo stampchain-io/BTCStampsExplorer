@@ -20,6 +20,11 @@ import {
   sortStateReducer,
   validateSortKey,
 } from "$lib/utils/data/sorting/sortStateReducer.ts";
+import {
+  getCurrentUrl,
+  getSearchParams,
+  isBrowser,
+} from "$utils/navigation/freshNavigationUtils.ts";
 
 // ===== CONSTANTS =====
 
@@ -37,10 +42,10 @@ const DEFAULT_CONFIG = {
  * Get current URL search params
  */
 function getCurrentUrlParams(): URLSearchParams {
-  if (typeof globalThis.location === "undefined") {
+  if (!isBrowser()) {
     return new URLSearchParams();
   }
-  return new URLSearchParams(globalThis.location.search);
+  return getSearchParams();
 }
 
 /**
@@ -50,14 +55,13 @@ function updateUrl(
   params: URLSearchParams,
   mode: "replace" | "push" = "replace",
 ): void {
-  if (
-    typeof globalThis.history === "undefined" ||
-    typeof globalThis.location === "undefined"
-  ) {
+  if (!isBrowser()) {
     return;
   }
 
-  const newUrl = `${globalThis.location.pathname}?${params.toString()}`;
+  const currentUrl = getCurrentUrl();
+  const url = new URL(currentUrl);
+  const newUrl = `${url.pathname}?${params.toString()}`;
 
   if (mode === "replace") {
     globalThis.history.replaceState(null, "", newUrl);

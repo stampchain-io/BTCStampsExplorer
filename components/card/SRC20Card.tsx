@@ -15,6 +15,10 @@ import { constructStampUrl } from "$lib/utils/ui/media/imageUtils.ts";
 import { labelXs, textSm, valueDarkSm } from "$text";
 import type { SRC20Row } from "$types/src20.d.ts";
 import type { HighchartsData, SRC20CardProps } from "$types/ui.d.ts";
+import {
+  isBrowser,
+  safeNavigate,
+} from "$utils/navigation/freshNavigationUtils.ts";
 
 function getMarketCap(src20: SRC20Row): number {
   const marketCap = src20.market_data?.market_cap_btc ?? src20.market_cap_btc;
@@ -303,10 +307,7 @@ export function SRC20Card({
                       ) {
                         e.preventDefault();
                         // SSR-safe browser environment check
-                        if (
-                          typeof globalThis === "undefined" ||
-                          !globalThis?.location
-                        ) {
+                        if (!isBrowser()) {
                           return; // Cannot navigate during SSR
                         }
                         const href = `/src20/${
@@ -314,7 +315,7 @@ export function SRC20Card({
                             unicodeEscapeToEmoji(src20.tick ?? ""),
                           )
                         }`;
-                        globalThis.location.href = href;
+                        safeNavigate(href);
                       }
                     }}
                   >

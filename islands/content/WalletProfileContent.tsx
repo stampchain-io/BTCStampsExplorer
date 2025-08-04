@@ -13,7 +13,11 @@ import type {
 import { NOT_AVAILABLE_IMAGE } from "$constants";
 import FreshSRC20Gallery from "$islands/section/gallery/FreshSRC20Gallery.tsx";
 import { FreshStampGallery } from "$islands/section/gallery/FreshStampGallery.tsx";
-import { createPaginationHandler } from "$lib/utils/navigation/freshNavigationUtils.ts";
+import {
+  createPaginationHandler,
+  isBrowser,
+  safeNavigate,
+} from "$utils/navigation/freshNavigationUtils.ts";
 import {
   abbreviateAddress,
   formatBTCAmount,
@@ -576,31 +580,31 @@ function WalletProfileContentInner({
   /* ===== HANDLERS ===== */
   const handleStampSort = (newSort: string) => {
     // SSR safety check
-    if (typeof globalThis === "undefined" || !globalThis?.location) {
+    if (!isBrowser()) {
       return; // Cannot navigate during SSR
     }
     const url = new URL(globalThis.location.href);
     url.searchParams.set(SECTION_CONFIGS.stamps.paramName, newSort);
     url.searchParams.delete(SECTION_CONFIGS.stamps.pageParamName);
     url.searchParams.set("anchor", SECTION_CONFIGS.stamps.anchorName);
-    globalThis.location.href = url.toString();
+    safeNavigate(url.toString());
   };
 
   const handleTokenSort = (newSort: string) => {
     // SSR safety check
-    if (typeof globalThis === "undefined" || !globalThis?.location) {
+    if (!isBrowser()) {
       return; // Cannot navigate during SSR
     }
     const url = new URL(globalThis.location.href);
     url.searchParams.set(SECTION_CONFIGS.src20.paramName, newSort);
     url.searchParams.delete(SECTION_CONFIGS.src20.pageParamName);
     url.searchParams.set("anchor", SECTION_CONFIGS.src20.anchorName);
-    globalThis.location.href = url.toString();
+    safeNavigate(url.toString());
   };
 
   const handleDispenserSort = (newSort: string) => {
     // SSR safety check
-    if (typeof globalThis === "undefined" || !globalThis?.location) {
+    if (!isBrowser()) {
       return; // Cannot navigate during SSR
     }
     const url = new URL(globalThis.location.href);
@@ -610,7 +614,7 @@ function WalletProfileContentInner({
       "anchor",
       openDispensersCount > 0 ? "open_listings" : "closed_listings",
     );
-    globalThis.location.href = url.toString();
+    safeNavigate(url.toString());
   };
 
   /* ===== RENDER ===== */

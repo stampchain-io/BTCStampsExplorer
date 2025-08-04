@@ -7,6 +7,7 @@ import { InputField, SelectDate } from "$form";
 import { closeModal } from "$islands/modal/states.ts";
 import { ModalBase } from "$layout";
 import { logger } from "$lib/utils/logger.ts";
+import { safeNavigate } from "$utils/navigation/freshNavigationUtils.ts";
 import type { JSX } from "preact";
 import { useState } from "preact/hooks";
 
@@ -170,7 +171,7 @@ const FilterSRC20Modal = ({ filterOptions }: FilterSRC20ModalProps) => {
         break;
     }
 
-    globalThis.location.href = url.toString();
+    safeNavigate(url.toString());
     closeModal();
   };
 
